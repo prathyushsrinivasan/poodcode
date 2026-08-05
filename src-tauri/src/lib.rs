@@ -21,7 +21,7 @@ use models::Problem;
 
 /// Bump when the bundled seed problems change so existing installs pick up new
 /// content on next launch (existing user progress is preserved via upsert).
-const SEED_VERSION: i64 = 4;
+const SEED_VERSION: i64 = 5;
 
 /// Original starter problems, authored for this app (no third-party content).
 const SEED_PROBLEMS: &str = include_str!("../seeds/problems.json");
@@ -54,14 +54,48 @@ fn seed_paths(conn: &Connection) {
             "Get comfortable reading input, doing arithmetic, branching, and looping.",
             &[
                 "print-greeting", "echo-line", "add-two-numbers", "rectangle-area",
-                "even-or-odd", "larger-of-two", "sum-to-n", "countdown",
+                "even-or-odd", "is-even", "larger-of-two", "max-of-three",
+                "sum-to-n", "countdown", "absolute-value", "square-number",
+                "sum-of-digits", "factorial",
             ],
         ),
         (
             "arrays-hashing",
             "Arrays & Hashing",
             "The bread and butter: scanning arrays and using hash maps for O(1) lookups.",
-            &["array-sum", "two-sum-exists", "two-sum-indices", "rotate-array", "group-anagrams-count"],
+            &[
+                "array-sum", "array-minimum", "count-evens", "running-sum",
+                "contains-duplicate", "two-sum-exists", "two-sum-indices",
+                "move-zeroes", "second-largest", "product-except-self",
+                "rotate-array", "rotate-array-right", "group-anagrams-count",
+            ],
+        ),
+        (
+            "hashing-patterns",
+            "Hashing Patterns",
+            "Turn 'search' into O(1) lookups: complements, counts, sets, and prefix sums.",
+            &[
+                "valid-anagram", "first-unique-char", "majority-element",
+                "single-number", "subarray-sum-k", "longest-consecutive",
+            ],
+        ),
+        (
+            "bit-manipulation",
+            "Bit Manipulation",
+            "Think in bits: XOR tricks and popcount.",
+            &["number-of-1-bits", "single-number"],
+        ),
+        (
+            "greedy",
+            "Greedy",
+            "Make the locally-best choice and prove it stays globally optimal.",
+            &["best-time-buy-sell", "jump-game", "container-most-water"],
+        ),
+        (
+            "stack-monotonic",
+            "Stacks & Monotonic Stacks",
+            "Matching brackets and 'next greater' style problems.",
+            &["valid-parentheses", "daily-temperatures", "next-greater-element"],
         ),
         (
             "two-pointers-sliding",
@@ -73,13 +107,33 @@ fn seed_paths(conn: &Connection) {
             "binary-search",
             "Binary Search",
             "Halving the search space — on arrays and on answers.",
-            &["binary-search-first", "longest-increasing-subsequence"],
+            &["binary-search-first", "search-insert-position", "integer-sqrt", "longest-increasing-subsequence"],
         ),
         (
             "dp-ladder",
             "Dynamic Programming Ladder",
             "Build DP intuition from 1-D recurrences up to 2-D tables.",
-            &["nth-fibonacci", "climbing-stairs", "maximum-subarray", "edit-distance", "longest-increasing-subsequence"],
+            &[
+                "nth-fibonacci", "climbing-stairs", "min-cost-climbing-stairs",
+                "house-robber", "maximum-subarray", "max-subarray-fn",
+                "coin-change", "coin-change-ways", "edit-distance",
+                "longest-increasing-subsequence",
+            ],
+        ),
+        (
+            "dp-advanced",
+            "Dynamic Programming II (Hard)",
+            "Tougher recurrences: strings, subsets, and products.",
+            &[
+                "word-break", "decode-ways", "maximum-product-subarray",
+                "partition-equal-subset-sum", "longest-palindrome-length", "edit-distance",
+            ],
+        ),
+        (
+            "math",
+            "Math & Number Theory",
+            "Primes, digits, and integer arithmetic.",
+            &["gcd", "palindrome-number", "is-prime", "count-primes", "integer-sqrt"],
         ),
         (
             "graphs",

@@ -175,6 +175,24 @@ fn java_function_harness_accepts_correct_solution() {
 }
 
 #[test]
+fn java_harness_handles_array_return() {
+    // "running sum" returns int[] — exercises the Java harness array serializer.
+    let code = "class Solution {\n    int[] solve(int[] nums) {\n        int[] out = new int[nums.length];\n        int s = 0;\n        for (int i = 0; i < nums.length; i++) { s += nums[i]; out[i] = s; }\n        return out;\n    }\n}";
+    let spec = FunctionSpec {
+        name: "solve".into(),
+        params: vec![Param { name: "nums".into(), ty: "int[]".into() }],
+        returns: "int[]".into(),
+    };
+    let cfg = JudgeConfig { mode: "exact".into(), tolerance: 0.0, function_spec: Some(spec), timeout: T };
+    let cases = vec![tc("1 2 3 4\n", "1 3 6 10"), tc("5\n", "5")];
+    let rep = judge_with("java", code, &cases, &cfg);
+    if rep.status == "not_installed" {
+        return;
+    }
+    assert_eq!(rep.status, "accepted", "report: {rep:?}");
+}
+
+#[test]
 fn float_compare_mode_tolerates_small_error() {
     let code = "print(3.14159)\n";
     let cfg = JudgeConfig { mode: "float".into(), tolerance: 1e-2, function_spec: None, timeout: T };

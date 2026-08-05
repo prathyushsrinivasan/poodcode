@@ -3347,7 +3347,8 @@
       ],
       "returns": "int[]"
     },
-    "judge_mode": "exact"
+    "judge_mode": "exact",
+    "float_tolerance": 0
   },
   {
     "slug": "max-subarray-fn",
@@ -3445,7 +3446,8 @@
       ],
       "returns": "int"
     },
-    "judge_mode": "exact"
+    "judge_mode": "exact",
+    "float_tolerance": 0
   },
   {
     "slug": "reverse-array-fn",
@@ -3541,7 +3543,8 @@
       ],
       "returns": "int[]"
     },
-    "judge_mode": "exact"
+    "judge_mode": "exact",
+    "float_tolerance": 0
   },
   {
     "slug": "is-palindrome-fn",
@@ -3637,6 +3640,3925 @@
       ],
       "returns": "bool"
     },
-    "judge_mode": "exact"
+    "judge_mode": "exact",
+    "float_tolerance": 0
+  },
+  {
+    "slug": "is-even",
+    "title": "Is Even",
+    "difficulty": "Intro",
+    "description": "Return `true` if the integer is even, otherwise `false`.",
+    "constraints": "",
+    "examples": [
+      {
+        "input": "4",
+        "output": "true",
+        "explanation": "4 is even."
+      },
+      {
+        "input": "7",
+        "output": "false",
+        "explanation": "7 is odd."
+      }
+    ],
+    "editorial": "An integer is even iff `n % 2 == 0`.",
+    "optimal_time": "O(1)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "A single modulo check.",
+    "starter_code": {
+      "python": "def solve(n):\n    # TODO: implement\n    return False\n",
+      "java": "class Solution {\n    boolean solve(int n) {\n        // TODO: implement\n        return false;\n    }\n}\n"
+    },
+    "topics": [
+      "Basics"
+    ],
+    "subtopics": [
+      "Conditionals"
+    ],
+    "companies": [
+      "Amazon"
+    ],
+    "patterns": [],
+    "hints": [
+      "A number is even when it leaves no remainder mod 2.",
+      "Use the modulo operator `%`.",
+      "`n % 2 == 0`."
+    ],
+    "prerequisites": [],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Even",
+        "input": "4\n",
+        "expected_output": "true",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Odd",
+        "input": "7\n",
+        "expected_output": "false",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Zero",
+        "input": "0\n",
+        "expected_output": "true",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Negative even",
+        "input": "-8\n",
+        "expected_output": "true",
+        "ordering": 3
+      },
+      {
+        "kind": "hidden",
+        "name": "Negative odd",
+        "input": "-3\n",
+        "expected_output": "false",
+        "ordering": 4
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "n",
+          "type": "int"
+        }
+      ],
+      "returns": "bool"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0
+  },
+  {
+    "slug": "absolute-value",
+    "title": "Absolute Value",
+    "difficulty": "Intro",
+    "description": "Return the absolute value of the integer (its distance from zero).",
+    "constraints": "",
+    "examples": [
+      {
+        "input": "-5",
+        "output": "5",
+        "explanation": "|-5| = 5."
+      },
+      {
+        "input": "9",
+        "output": "9",
+        "explanation": "|9| = 9."
+      }
+    ],
+    "editorial": "",
+    "optimal_time": "O(1)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "One comparison.",
+    "starter_code": {
+      "python": "def solve(n):\n    # TODO: implement\n    return 0\n",
+      "java": "class Solution {\n    int solve(int n) {\n        // TODO: implement\n        return 0;\n    }\n}\n"
+    },
+    "topics": [
+      "Basics",
+      "Math"
+    ],
+    "subtopics": [
+      "Arithmetic"
+    ],
+    "companies": [
+      "Microsoft"
+    ],
+    "patterns": [],
+    "hints": [
+      "Negatives flip sign; non-negatives stay.",
+      "If n < 0 return -n."
+    ],
+    "prerequisites": [],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Negative",
+        "input": "-5\n",
+        "expected_output": "5",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Positive",
+        "input": "9\n",
+        "expected_output": "9",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Zero",
+        "input": "0\n",
+        "expected_output": "0",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Large",
+        "input": "-100000\n",
+        "expected_output": "100000",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "n",
+          "type": "int"
+        }
+      ],
+      "returns": "int"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0
+  },
+  {
+    "slug": "max-of-three",
+    "title": "Max of Three",
+    "difficulty": "Intro",
+    "description": "Return the largest of three integers.",
+    "constraints": "",
+    "examples": [
+      {
+        "input": "3\n9\n5",
+        "output": "9",
+        "explanation": "9 is the largest."
+      },
+      {
+        "input": "-1\n-7\n-3",
+        "output": "-1",
+        "explanation": "-1 is the largest."
+      }
+    ],
+    "editorial": "",
+    "optimal_time": "O(1)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "Constant comparisons.",
+    "starter_code": {
+      "python": "def solve(a, b, c):\n    # TODO: implement\n    return 0\n",
+      "java": "class Solution {\n    int solve(int a, int b, int c) {\n        // TODO: implement\n        return 0;\n    }\n}\n"
+    },
+    "topics": [
+      "Basics"
+    ],
+    "subtopics": [
+      "Conditionals"
+    ],
+    "companies": [
+      "Adobe"
+    ],
+    "patterns": [],
+    "hints": [
+      "Compare pairwise.",
+      "max(a, max(b, c))."
+    ],
+    "prerequisites": [],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example",
+        "input": "3\n9\n5\n",
+        "expected_output": "9",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Negatives",
+        "input": "-1\n-7\n-3\n",
+        "expected_output": "-1",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Ties",
+        "input": "4\n4\n2\n",
+        "expected_output": "4",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "First largest",
+        "input": "10\n1\n2\n",
+        "expected_output": "10",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "a",
+          "type": "int"
+        },
+        {
+          "name": "b",
+          "type": "int"
+        },
+        {
+          "name": "c",
+          "type": "int"
+        }
+      ],
+      "returns": "int"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0
+  },
+  {
+    "slug": "square-number",
+    "title": "Square",
+    "difficulty": "Intro",
+    "description": "Return the square of the integer.",
+    "constraints": "",
+    "examples": [
+      {
+        "input": "5",
+        "output": "25",
+        "explanation": "5² = 25."
+      },
+      {
+        "input": "-4",
+        "output": "16",
+        "explanation": "(-4)² = 16."
+      }
+    ],
+    "editorial": "",
+    "optimal_time": "O(1)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "One multiplication.",
+    "starter_code": {
+      "python": "def solve(n):\n    # TODO: implement\n    return 0\n",
+      "java": "class Solution {\n    long solve(int n) {\n        // TODO: implement\n        return 0L;\n    }\n}\n"
+    },
+    "topics": [
+      "Basics",
+      "Math"
+    ],
+    "subtopics": [
+      "Arithmetic"
+    ],
+    "companies": [
+      "Amazon"
+    ],
+    "patterns": [],
+    "hints": [
+      "Multiply the number by itself."
+    ],
+    "prerequisites": [],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example",
+        "input": "5\n",
+        "expected_output": "25",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Negative",
+        "input": "-4\n",
+        "expected_output": "16",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Zero",
+        "input": "0\n",
+        "expected_output": "0",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Large",
+        "input": "100000\n",
+        "expected_output": "10000000000",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "n",
+          "type": "int"
+        }
+      ],
+      "returns": "long"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0
+  },
+  {
+    "slug": "sum-of-digits",
+    "title": "Sum of Digits",
+    "difficulty": "Intro",
+    "description": "Return the sum of the decimal digits of a non-negative integer.",
+    "constraints": "",
+    "examples": [
+      {
+        "input": "1234",
+        "output": "10",
+        "explanation": "1+2+3+4 = 10."
+      },
+      {
+        "input": "7",
+        "output": "7",
+        "explanation": "Single digit sums to itself."
+      }
+    ],
+    "editorial": "",
+    "optimal_time": "O(log n)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "One pass over the digits.",
+    "starter_code": {
+      "python": "def solve(n):\n    # TODO: implement\n    return 0\n",
+      "java": "class Solution {\n    int solve(int n) {\n        // TODO: implement\n        return 0;\n    }\n}\n"
+    },
+    "topics": [
+      "Math"
+    ],
+    "subtopics": [
+      "Digits"
+    ],
+    "companies": [
+      "Bloomberg"
+    ],
+    "patterns": [],
+    "hints": [
+      "Peel digits with % 10 and // 10.",
+      "Or iterate the string form."
+    ],
+    "prerequisites": [],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example",
+        "input": "1234\n",
+        "expected_output": "10",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Single",
+        "input": "7\n",
+        "expected_output": "7",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Zero",
+        "input": "0\n",
+        "expected_output": "0",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Repeated",
+        "input": "99999\n",
+        "expected_output": "45",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "n",
+          "type": "int"
+        }
+      ],
+      "returns": "int"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0
+  },
+  {
+    "slug": "factorial",
+    "title": "Factorial",
+    "difficulty": "Intro",
+    "description": "Return n! = 1·2·…·n (with 0! = 1).",
+    "constraints": "",
+    "examples": [
+      {
+        "input": "5",
+        "output": "120",
+        "explanation": "5! = 120."
+      },
+      {
+        "input": "0",
+        "output": "1",
+        "explanation": "0! = 1 by definition."
+      }
+    ],
+    "editorial": "",
+    "optimal_time": "O(n)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "A single multiply loop.",
+    "starter_code": {
+      "python": "def solve(n):\n    # TODO: implement\n    return 0\n",
+      "java": "class Solution {\n    long solve(int n) {\n        // TODO: implement\n        return 0L;\n    }\n}\n"
+    },
+    "topics": [
+      "Math"
+    ],
+    "subtopics": [
+      "Loops"
+    ],
+    "companies": [
+      "Google"
+    ],
+    "patterns": [],
+    "hints": [
+      "Multiply a running product from 1 to n.",
+      "Use a 64-bit type — factorials grow fast."
+    ],
+    "prerequisites": [],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "5!",
+        "input": "5\n",
+        "expected_output": "120",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "0!",
+        "input": "0\n",
+        "expected_output": "1",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "1!",
+        "input": "1\n",
+        "expected_output": "1",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "10!",
+        "input": "10\n",
+        "expected_output": "3628800",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "n",
+          "type": "int"
+        }
+      ],
+      "returns": "long"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0
+  },
+  {
+    "slug": "count-evens",
+    "title": "Count Evens",
+    "difficulty": "Intro",
+    "description": "Return how many elements of the array are even.",
+    "constraints": "",
+    "examples": [
+      {
+        "input": "1 2 3 4",
+        "output": "2",
+        "explanation": "2 and 4 are even."
+      },
+      {
+        "input": "1 3 5",
+        "output": "0",
+        "explanation": "No evens."
+      }
+    ],
+    "editorial": "",
+    "optimal_time": "O(n)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "Single pass.",
+    "starter_code": {
+      "python": "def solve(nums):\n    # TODO: implement\n    return 0\n",
+      "java": "class Solution {\n    int solve(int[] nums) {\n        // TODO: implement\n        return 0;\n    }\n}\n"
+    },
+    "topics": [
+      "Arrays"
+    ],
+    "subtopics": [
+      "Counting"
+    ],
+    "companies": [
+      "Amazon"
+    ],
+    "patterns": [
+      "Counting"
+    ],
+    "hints": [
+      "Scan once, test each element mod 2.",
+      "Increment a counter."
+    ],
+    "prerequisites": [],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Mixed",
+        "input": "1 2 3 4\n",
+        "expected_output": "2",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "None",
+        "input": "1 3 5\n",
+        "expected_output": "0",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "All even",
+        "input": "2 4 6 8\n",
+        "expected_output": "4",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Empty",
+        "input": "\n",
+        "expected_output": "0",
+        "ordering": 3
+      },
+      {
+        "kind": "hidden",
+        "name": "Negatives",
+        "input": "-2 -1 0\n",
+        "expected_output": "2",
+        "ordering": 4
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "nums",
+          "type": "int[]"
+        }
+      ],
+      "returns": "int"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0
+  },
+  {
+    "slug": "array-minimum",
+    "title": "Array Minimum",
+    "difficulty": "Intro",
+    "description": "Return the smallest element of a non-empty array.",
+    "constraints": "",
+    "examples": [
+      {
+        "input": "3 1 4 1 5",
+        "output": "1",
+        "explanation": "1 is smallest."
+      },
+      {
+        "input": "-2 -9 -1",
+        "output": "-9",
+        "explanation": "-9 is smallest."
+      }
+    ],
+    "editorial": "",
+    "optimal_time": "O(n)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "Single pass tracking the min.",
+    "starter_code": {
+      "python": "def solve(nums):\n    # TODO: implement\n    return 0\n",
+      "java": "class Solution {\n    int solve(int[] nums) {\n        // TODO: implement\n        return 0;\n    }\n}\n"
+    },
+    "topics": [
+      "Arrays"
+    ],
+    "subtopics": [
+      "Traversal"
+    ],
+    "companies": [
+      "Microsoft"
+    ],
+    "patterns": [],
+    "hints": [
+      "Track a running minimum as you scan."
+    ],
+    "prerequisites": [],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example",
+        "input": "3 1 4 1 5\n",
+        "expected_output": "1",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Negatives",
+        "input": "-2 -9 -1\n",
+        "expected_output": "-9",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Single",
+        "input": "42\n",
+        "expected_output": "42",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Sorted",
+        "input": "1 2 3\n",
+        "expected_output": "1",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "nums",
+          "type": "int[]"
+        }
+      ],
+      "returns": "int"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0
+  },
+  {
+    "slug": "contains-duplicate",
+    "title": "Contains Duplicate",
+    "difficulty": "Easy",
+    "description": "Return `true` if any value appears at least twice.",
+    "constraints": "",
+    "examples": [
+      {
+        "input": "1 2 3 1",
+        "output": "true",
+        "explanation": "1 repeats."
+      },
+      {
+        "input": "1 2 3 4",
+        "output": "false",
+        "explanation": "All distinct."
+      }
+    ],
+    "editorial": "Insert into a set; a collision means a duplicate. Equivalent to `len(set) != len(arr)`.",
+    "optimal_time": "O(n)",
+    "optimal_space": "O(n)",
+    "optimal_explanation": "One pass with a hash set.",
+    "starter_code": {
+      "python": "def solve(nums):\n    # TODO: implement\n    return False\n",
+      "java": "class Solution {\n    boolean solve(int[] nums) {\n        // TODO: implement\n        return false;\n    }\n}\n"
+    },
+    "topics": [
+      "Arrays",
+      "Hashing"
+    ],
+    "subtopics": [
+      "Hash Set"
+    ],
+    "companies": [
+      "Amazon",
+      "Google"
+    ],
+    "patterns": [
+      "Hashing"
+    ],
+    "hints": [
+      "A set remembers what you've seen.",
+      "If insertion finds a value already present, return true.",
+      "Compare set size to array length."
+    ],
+    "prerequisites": [],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Has dup",
+        "input": "1 2 3 1\n",
+        "expected_output": "true",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Unique",
+        "input": "1 2 3 4\n",
+        "expected_output": "false",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Empty",
+        "input": "\n",
+        "expected_output": "false",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "All same",
+        "input": "5 5 5\n",
+        "expected_output": "true",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "nums",
+          "type": "int[]"
+        }
+      ],
+      "returns": "bool"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0
+  },
+  {
+    "slug": "single-number",
+    "title": "Single Number",
+    "difficulty": "Easy",
+    "description": "Every element appears twice except one. Return the element that appears once.",
+    "constraints": "",
+    "examples": [
+      {
+        "input": "2 3 2",
+        "output": "3",
+        "explanation": "3 is unique."
+      },
+      {
+        "input": "4 1 2 1 2",
+        "output": "4",
+        "explanation": "4 is unique."
+      }
+    ],
+    "editorial": "XOR all elements; duplicates cancel to 0 and the loner remains.",
+    "optimal_time": "O(n)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "XOR cancels pairs, leaving the unique value.",
+    "starter_code": {
+      "python": "def solve(nums):\n    # TODO: implement\n    return 0\n",
+      "java": "class Solution {\n    int solve(int[] nums) {\n        // TODO: implement\n        return 0;\n    }\n}\n"
+    },
+    "topics": [
+      "Bit Manipulation",
+      "Arrays"
+    ],
+    "subtopics": [
+      "XOR"
+    ],
+    "companies": [
+      "Amazon",
+      "Uber"
+    ],
+    "patterns": [
+      "Bit Manipulation"
+    ],
+    "hints": [
+      "XOR of a value with itself is 0.",
+      "XOR is commutative — pairs cancel.",
+      "Fold the whole array with XOR."
+    ],
+    "prerequisites": [],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example",
+        "input": "2 3 2\n",
+        "expected_output": "3",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Longer",
+        "input": "4 1 2 1 2\n",
+        "expected_output": "4",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Single",
+        "input": "7\n",
+        "expected_output": "7",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Zeros",
+        "input": "0 5 0\n",
+        "expected_output": "5",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "nums",
+          "type": "int[]"
+        }
+      ],
+      "returns": "int"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0
+  },
+  {
+    "slug": "majority-element",
+    "title": "Majority Element",
+    "difficulty": "Easy",
+    "description": "An element appears more than ⌊n/2⌋ times. Return it.",
+    "constraints": "",
+    "examples": [
+      {
+        "input": "3 2 3",
+        "output": "3",
+        "explanation": "3 is the majority."
+      },
+      {
+        "input": "2 2 1 1 2 2 2",
+        "output": "2",
+        "explanation": "2 appears 5/7 times."
+      }
+    ],
+    "editorial": "Boyer-Moore: keep a candidate and a count; reset the candidate when count hits 0.",
+    "optimal_time": "O(n)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "Boyer-Moore majority vote.",
+    "starter_code": {
+      "python": "def solve(nums):\n    # TODO: implement\n    return 0\n",
+      "java": "class Solution {\n    int solve(int[] nums) {\n        // TODO: implement\n        return 0;\n    }\n}\n"
+    },
+    "topics": [
+      "Arrays",
+      "Hashing"
+    ],
+    "subtopics": [
+      "Boyer-Moore"
+    ],
+    "companies": [
+      "Amazon",
+      "Adobe"
+    ],
+    "patterns": [
+      "Hashing"
+    ],
+    "hints": [
+      "A count that cancels non-matches survives for the majority.",
+      "Boyer-Moore voting keeps one candidate.",
+      "O(1) space is possible."
+    ],
+    "prerequisites": [],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example",
+        "input": "3 2 3\n",
+        "expected_output": "3",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Longer",
+        "input": "2 2 1 1 2 2 2\n",
+        "expected_output": "2",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Single",
+        "input": "9\n",
+        "expected_output": "9",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "All same",
+        "input": "4 4 4 4\n",
+        "expected_output": "4",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "nums",
+          "type": "int[]"
+        }
+      ],
+      "returns": "int"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0
+  },
+  {
+    "slug": "is-prime",
+    "title": "Is Prime",
+    "difficulty": "Easy",
+    "description": "Return `true` if the integer is prime.",
+    "constraints": "",
+    "examples": [
+      {
+        "input": "13",
+        "output": "true",
+        "explanation": "13 is prime."
+      },
+      {
+        "input": "12",
+        "output": "false",
+        "explanation": "12 = 3·4."
+      }
+    ],
+    "editorial": "",
+    "optimal_time": "O(√n)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "Trial division up to the square root.",
+    "starter_code": {
+      "python": "def solve(n):\n    # TODO: implement\n    return False\n",
+      "java": "class Solution {\n    boolean solve(int n) {\n        // TODO: implement\n        return false;\n    }\n}\n"
+    },
+    "topics": [
+      "Math"
+    ],
+    "subtopics": [
+      "Number Theory"
+    ],
+    "companies": [
+      "Bloomberg"
+    ],
+    "patterns": [],
+    "hints": [
+      "Primes have no divisor between 2 and √n.",
+      "Only trial-divide up to √n.",
+      "Handle n < 2 as not prime."
+    ],
+    "prerequisites": [],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Prime",
+        "input": "13\n",
+        "expected_output": "true",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Composite",
+        "input": "12\n",
+        "expected_output": "false",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "One",
+        "input": "1\n",
+        "expected_output": "false",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Two",
+        "input": "2\n",
+        "expected_output": "true",
+        "ordering": 3
+      },
+      {
+        "kind": "hidden",
+        "name": "Large prime",
+        "input": "7919\n",
+        "expected_output": "true",
+        "ordering": 4
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "n",
+          "type": "int"
+        }
+      ],
+      "returns": "bool"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0
+  },
+  {
+    "slug": "count-primes",
+    "title": "Count Primes",
+    "difficulty": "Easy",
+    "description": "Return the number of primes strictly less than n.",
+    "constraints": "",
+    "examples": [
+      {
+        "input": "10",
+        "output": "4",
+        "explanation": "2,3,5,7 → 4."
+      },
+      {
+        "input": "2",
+        "output": "0",
+        "explanation": "No primes below 2."
+      }
+    ],
+    "editorial": "Sieve: mark composites by crossing out multiples of each prime starting at i².",
+    "optimal_time": "O(n log log n)",
+    "optimal_space": "O(n)",
+    "optimal_explanation": "Sieve of Eratosthenes.",
+    "starter_code": {
+      "python": "def solve(n):\n    # TODO: implement\n    return 0\n",
+      "java": "class Solution {\n    int solve(int n) {\n        // TODO: implement\n        return 0;\n    }\n}\n"
+    },
+    "topics": [
+      "Math"
+    ],
+    "subtopics": [
+      "Sieve"
+    ],
+    "companies": [
+      "Google"
+    ],
+    "patterns": [
+      "Math"
+    ],
+    "hints": [
+      "Trial-dividing each number is slow.",
+      "Mark multiples with a Sieve of Eratosthenes.",
+      "Start crossing out at i·i."
+    ],
+    "prerequisites": [],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Below 10",
+        "input": "10\n",
+        "expected_output": "4",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Below 2",
+        "input": "2\n",
+        "expected_output": "0",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Below 0",
+        "input": "0\n",
+        "expected_output": "0",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Below 100",
+        "input": "100\n",
+        "expected_output": "25",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "n",
+          "type": "int"
+        }
+      ],
+      "returns": "int"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0
+  },
+  {
+    "slug": "valid-anagram",
+    "title": "Valid Anagram",
+    "difficulty": "Easy",
+    "description": "Return `true` if `t` is an anagram of `s` (same letters, same counts).",
+    "constraints": "",
+    "examples": [
+      {
+        "input": "listen\nsilent",
+        "output": "true",
+        "explanation": "Same letters rearranged."
+      },
+      {
+        "input": "rat\ncar",
+        "output": "false",
+        "explanation": "Different letters."
+      }
+    ],
+    "editorial": "",
+    "optimal_time": "O(n)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "Compare 26-letter frequency counts.",
+    "starter_code": {
+      "python": "def solve(s, t):\n    # TODO: implement\n    return False\n",
+      "java": "class Solution {\n    boolean solve(String s, String t) {\n        // TODO: implement\n        return false;\n    }\n}\n"
+    },
+    "topics": [
+      "Strings",
+      "Hashing"
+    ],
+    "subtopics": [
+      "Counting"
+    ],
+    "companies": [
+      "Amazon",
+      "Meta"
+    ],
+    "patterns": [
+      "Hashing",
+      "Counting"
+    ],
+    "hints": [
+      "Anagrams have identical character counts.",
+      "Compare frequency maps, or compare sorted strings."
+    ],
+    "prerequisites": [],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Anagram",
+        "input": "listen\nsilent\n",
+        "expected_output": "true",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Not",
+        "input": "rat\ncar\n",
+        "expected_output": "false",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Diff length",
+        "input": "a\nab\n",
+        "expected_output": "false",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Same",
+        "input": "abc\nabc\n",
+        "expected_output": "true",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "s",
+          "type": "string"
+        },
+        {
+          "name": "t",
+          "type": "string"
+        }
+      ],
+      "returns": "bool"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0
+  },
+  {
+    "slug": "first-unique-char",
+    "title": "First Unique Character",
+    "difficulty": "Easy",
+    "description": "Return the index of the first non-repeating character, or -1 if none.",
+    "constraints": "",
+    "examples": [
+      {
+        "input": "leetcode",
+        "output": "0",
+        "explanation": "'l' at index 0 is unique."
+      },
+      {
+        "input": "aabb",
+        "output": "-1",
+        "explanation": "No unique char → -1."
+      }
+    ],
+    "editorial": "",
+    "optimal_time": "O(n)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "Two passes: count, then find.",
+    "starter_code": {
+      "python": "def solve(s):\n    # TODO: implement\n    return 0\n",
+      "java": "class Solution {\n    int solve(String s) {\n        // TODO: implement\n        return 0;\n    }\n}\n"
+    },
+    "topics": [
+      "Strings",
+      "Hashing"
+    ],
+    "subtopics": [
+      "Counting"
+    ],
+    "companies": [
+      "Amazon",
+      "Bloomberg"
+    ],
+    "patterns": [
+      "Hashing",
+      "Counting"
+    ],
+    "hints": [
+      "Count characters first.",
+      "Then scan left to right for the first count of 1."
+    ],
+    "prerequisites": [],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example",
+        "input": "leetcode\n",
+        "expected_output": "0",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Repeats",
+        "input": "aabb\n",
+        "expected_output": "-1",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Single",
+        "input": "z\n",
+        "expected_output": "0",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Last unique",
+        "input": "aabbc\n",
+        "expected_output": "4",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "s",
+          "type": "string"
+        }
+      ],
+      "returns": "int"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0
+  },
+  {
+    "slug": "move-zeroes",
+    "title": "Move Zeroes",
+    "difficulty": "Easy",
+    "description": "Move all zeroes to the end while keeping the order of non-zero elements. Return the resulting array.",
+    "constraints": "",
+    "examples": [
+      {
+        "input": "0 1 0 3 12",
+        "output": "1 3 12 0 0",
+        "explanation": "Non-zeros keep order; zeros trail."
+      },
+      {
+        "input": "1 2 3",
+        "output": "1 2 3",
+        "explanation": "Unchanged."
+      }
+    ],
+    "editorial": "",
+    "optimal_time": "O(n)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "Stable partition around zero.",
+    "starter_code": {
+      "python": "def solve(nums):\n    # TODO: implement\n    return []\n",
+      "java": "class Solution {\n    int[] solve(int[] nums) {\n        // TODO: implement\n        return new int[]{};\n    }\n}\n"
+    },
+    "topics": [
+      "Arrays",
+      "Two Pointers"
+    ],
+    "subtopics": [
+      "Two Pointers"
+    ],
+    "companies": [
+      "Meta",
+      "Amazon"
+    ],
+    "patterns": [
+      "Two Pointers"
+    ],
+    "hints": [
+      "Keep a write pointer for the next non-zero slot.",
+      "Fill the rest with zeroes.",
+      "Relative order of non-zeros must hold."
+    ],
+    "prerequisites": [],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example",
+        "input": "0 1 0 3 12\n",
+        "expected_output": "1 3 12 0 0",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "No zeroes",
+        "input": "1 2 3\n",
+        "expected_output": "1 2 3",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "All zeroes",
+        "input": "0 0 0\n",
+        "expected_output": "0 0 0",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Leading nonzero",
+        "input": "4 0 5 0\n",
+        "expected_output": "4 5 0 0",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "nums",
+          "type": "int[]"
+        }
+      ],
+      "returns": "int[]"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0
+  },
+  {
+    "slug": "running-sum",
+    "title": "Running Sum",
+    "difficulty": "Easy",
+    "description": "Return the running (prefix) sum: out[i] = nums[0] + … + nums[i].",
+    "constraints": "",
+    "examples": [
+      {
+        "input": "1 2 3 4",
+        "output": "1 3 6 10",
+        "explanation": "1,3,6,10."
+      },
+      {
+        "input": "3 -1 2",
+        "output": "3 2 4",
+        "explanation": "3,2,4."
+      }
+    ],
+    "editorial": "",
+    "optimal_time": "O(n)",
+    "optimal_space": "O(n)",
+    "optimal_explanation": "Single prefix pass.",
+    "starter_code": {
+      "python": "def solve(nums):\n    # TODO: implement\n    return []\n",
+      "java": "class Solution {\n    int[] solve(int[] nums) {\n        // TODO: implement\n        return new int[]{};\n    }\n}\n"
+    },
+    "topics": [
+      "Arrays"
+    ],
+    "subtopics": [
+      "Prefix Sum"
+    ],
+    "companies": [
+      "Google"
+    ],
+    "patterns": [
+      "Prefix Sums"
+    ],
+    "hints": [
+      "Accumulate as you scan.",
+      "out[i] = out[i-1] + nums[i]."
+    ],
+    "prerequisites": [],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example",
+        "input": "1 2 3 4\n",
+        "expected_output": "1 3 6 10",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Negatives",
+        "input": "3 -1 2\n",
+        "expected_output": "3 2 4",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Single",
+        "input": "5\n",
+        "expected_output": "5",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Empty",
+        "input": "\n",
+        "expected_output": "",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "nums",
+          "type": "int[]"
+        }
+      ],
+      "returns": "int[]"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0
+  },
+  {
+    "slug": "max-consecutive-ones",
+    "title": "Max Consecutive Ones",
+    "difficulty": "Easy",
+    "description": "Given a 0/1 array, return the length of the longest run of consecutive 1s.",
+    "constraints": "",
+    "examples": [
+      {
+        "input": "1 1 0 1 1 1",
+        "output": "3",
+        "explanation": "Best run is 3."
+      },
+      {
+        "input": "1 1 1",
+        "output": "3",
+        "explanation": "Run of 3."
+      }
+    ],
+    "editorial": "",
+    "optimal_time": "O(n)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "Single pass with a running counter.",
+    "starter_code": {
+      "python": "def solve(nums):\n    # TODO: implement\n    return 0\n",
+      "java": "class Solution {\n    int solve(int[] nums) {\n        // TODO: implement\n        return 0;\n    }\n}\n"
+    },
+    "topics": [
+      "Arrays"
+    ],
+    "subtopics": [
+      "Counting"
+    ],
+    "companies": [
+      "Amazon"
+    ],
+    "patterns": [
+      "Counting"
+    ],
+    "hints": [
+      "Track the current run and the best run.",
+      "Reset the current run on a 0."
+    ],
+    "prerequisites": [],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example",
+        "input": "1 1 0 1 1 1\n",
+        "expected_output": "3",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "All ones",
+        "input": "1 1 1\n",
+        "expected_output": "3",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "No ones",
+        "input": "0 0\n",
+        "expected_output": "0",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Empty",
+        "input": "\n",
+        "expected_output": "0",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "nums",
+          "type": "int[]"
+        }
+      ],
+      "returns": "int"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0
+  },
+  {
+    "slug": "second-largest",
+    "title": "Second Largest",
+    "difficulty": "Easy",
+    "description": "Return the second largest distinct value (or the largest if only one distinct value exists).",
+    "constraints": "",
+    "examples": [
+      {
+        "input": "3 1 4 1 5",
+        "output": "4",
+        "explanation": "4 is second largest."
+      },
+      {
+        "input": "5 5 3",
+        "output": "3",
+        "explanation": "3 is second largest."
+      }
+    ],
+    "editorial": "",
+    "optimal_time": "O(n)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "Single pass tracking two maxima.",
+    "starter_code": {
+      "python": "def solve(nums):\n    # TODO: implement\n    return 0\n",
+      "java": "class Solution {\n    int solve(int[] nums) {\n        // TODO: implement\n        return 0;\n    }\n}\n"
+    },
+    "topics": [
+      "Arrays"
+    ],
+    "subtopics": [
+      "Traversal"
+    ],
+    "companies": [
+      "Adobe"
+    ],
+    "patterns": [],
+    "hints": [
+      "Track the top two as you scan.",
+      "Skip duplicates of the max."
+    ],
+    "prerequisites": [],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example",
+        "input": "3 1 4 1 5\n",
+        "expected_output": "4",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Dupes at top",
+        "input": "5 5 3\n",
+        "expected_output": "3",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Single",
+        "input": "9\n",
+        "expected_output": "9",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Two",
+        "input": "2 7\n",
+        "expected_output": "2",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "nums",
+          "type": "int[]"
+        }
+      ],
+      "returns": "int"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0
+  },
+  {
+    "slug": "count-occurrences",
+    "title": "Count Occurrences",
+    "difficulty": "Easy",
+    "description": "Return how many times `target` appears in the array.",
+    "constraints": "",
+    "examples": [
+      {
+        "input": "1 2 2 3 2\n2",
+        "output": "3",
+        "explanation": "2 appears 3 times."
+      },
+      {
+        "input": "1 2 3\n9",
+        "output": "0",
+        "explanation": "9 is absent."
+      }
+    ],
+    "editorial": "",
+    "optimal_time": "O(n)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "Single pass.",
+    "starter_code": {
+      "python": "def solve(nums, target):\n    # TODO: implement\n    return 0\n",
+      "java": "class Solution {\n    int solve(int[] nums, int target) {\n        // TODO: implement\n        return 0;\n    }\n}\n"
+    },
+    "topics": [
+      "Arrays"
+    ],
+    "subtopics": [
+      "Counting"
+    ],
+    "companies": [
+      "Microsoft"
+    ],
+    "patterns": [
+      "Counting"
+    ],
+    "hints": [
+      "Scan and count matches."
+    ],
+    "prerequisites": [],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example",
+        "input": "1 2 2 3 2\n2\n",
+        "expected_output": "3",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Absent",
+        "input": "1 2 3\n9\n",
+        "expected_output": "0",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Empty",
+        "input": "\n1\n",
+        "expected_output": "0",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "All",
+        "input": "4 4 4\n4\n",
+        "expected_output": "3",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "nums",
+          "type": "int[]"
+        },
+        {
+          "name": "target",
+          "type": "int"
+        }
+      ],
+      "returns": "int"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0
+  },
+  {
+    "slug": "number-of-1-bits",
+    "title": "Number of 1 Bits",
+    "difficulty": "Easy",
+    "description": "Return the number of set bits (1s) in the binary representation of a non-negative integer.",
+    "constraints": "",
+    "examples": [
+      {
+        "input": "11",
+        "output": "3",
+        "explanation": "1011 has three 1s."
+      },
+      {
+        "input": "128",
+        "output": "1",
+        "explanation": "10000000 has one."
+      }
+    ],
+    "editorial": "",
+    "optimal_time": "O(bits)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "Count set bits.",
+    "starter_code": {
+      "python": "def solve(n):\n    # TODO: implement\n    return 0\n",
+      "java": "class Solution {\n    int solve(int n) {\n        // TODO: implement\n        return 0;\n    }\n}\n"
+    },
+    "topics": [
+      "Bit Manipulation"
+    ],
+    "subtopics": [
+      "Bit Manipulation"
+    ],
+    "companies": [
+      "Apple",
+      "Amazon"
+    ],
+    "patterns": [
+      "Bit Manipulation"
+    ],
+    "hints": [
+      "Check the lowest bit with & 1, then shift.",
+      "Or use n & (n-1) to drop the lowest set bit."
+    ],
+    "prerequisites": [],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Eleven",
+        "input": "11\n",
+        "expected_output": "3",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Power of two",
+        "input": "128\n",
+        "expected_output": "1",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Zero",
+        "input": "0\n",
+        "expected_output": "0",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "All low bits",
+        "input": "255\n",
+        "expected_output": "8",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "n",
+          "type": "int"
+        }
+      ],
+      "returns": "int"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0
+  },
+  {
+    "slug": "product-except-self",
+    "title": "Product of Array Except Self",
+    "difficulty": "Medium",
+    "description": "Return an array where out[i] is the product of every element except nums[i] — without using division.",
+    "constraints": "",
+    "examples": [
+      {
+        "input": "1 2 3 4",
+        "output": "24 12 8 6",
+        "explanation": "24,12,8,6."
+      },
+      {
+        "input": "0 4 0",
+        "output": "0 0 0",
+        "explanation": "Two zeros → all zero."
+      }
+    ],
+    "editorial": "Left-to-right prefix products, then multiply by right-to-left suffix products.",
+    "optimal_time": "O(n)",
+    "optimal_space": "O(n)",
+    "optimal_explanation": "Prefix and suffix products.",
+    "starter_code": {
+      "python": "def solve(nums):\n    # TODO: implement\n    return []\n",
+      "java": "class Solution {\n    int[] solve(int[] nums) {\n        // TODO: implement\n        return new int[]{};\n    }\n}\n"
+    },
+    "topics": [
+      "Arrays",
+      "Prefix Sum"
+    ],
+    "subtopics": [
+      "Prefix Sum"
+    ],
+    "companies": [
+      "Amazon",
+      "Meta",
+      "Apple"
+    ],
+    "patterns": [
+      "Prefix Sums"
+    ],
+    "hints": [
+      "Prefix products to the left, suffix products to the right.",
+      "Combine the two passes.",
+      "No division allowed."
+    ],
+    "prerequisites": [],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example",
+        "input": "1 2 3 4\n",
+        "expected_output": "24 12 8 6",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "With zero",
+        "input": "0 4 0\n",
+        "expected_output": "0 0 0",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Negatives",
+        "input": "-1 1 2\n",
+        "expected_output": "2 -2 -1",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Two",
+        "input": "3 5\n",
+        "expected_output": "5 3",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "nums",
+          "type": "int[]"
+        }
+      ],
+      "returns": "int[]"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0
+  },
+  {
+    "slug": "best-time-buy-sell",
+    "title": "Best Time to Buy and Sell Stock",
+    "difficulty": "Medium",
+    "description": "Given daily prices, return the maximum profit from one buy followed by one later sell (0 if no profit).",
+    "constraints": "",
+    "examples": [
+      {
+        "input": "7 1 5 3 6 4",
+        "output": "5",
+        "explanation": "Buy at 1, sell at 6 → 5."
+      },
+      {
+        "input": "7 6 4 3",
+        "output": "0",
+        "explanation": "No profit → 0."
+      }
+    ],
+    "editorial": "Sweep left to right keeping the min price; the answer is the max of price − min.",
+    "optimal_time": "O(n)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "Track the running min and best profit.",
+    "starter_code": {
+      "python": "def solve(prices):\n    # TODO: implement\n    return 0\n",
+      "java": "class Solution {\n    int solve(int[] prices) {\n        // TODO: implement\n        return 0;\n    }\n}\n"
+    },
+    "topics": [
+      "Arrays",
+      "Dynamic Programming"
+    ],
+    "subtopics": [
+      "Greedy"
+    ],
+    "companies": [
+      "Amazon",
+      "Bloomberg"
+    ],
+    "patterns": [
+      "Dynamic Programming",
+      "Greedy"
+    ],
+    "hints": [
+      "Track the lowest price seen so far.",
+      "Best profit = price − running minimum.",
+      "One pass suffices."
+    ],
+    "prerequisites": [],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example",
+        "input": "7 1 5 3 6 4\n",
+        "expected_output": "5",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Decreasing",
+        "input": "7 6 4 3\n",
+        "expected_output": "0",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Single",
+        "input": "5\n",
+        "expected_output": "0",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Increasing",
+        "input": "1 2 3 4\n",
+        "expected_output": "3",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "prices",
+          "type": "int[]"
+        }
+      ],
+      "returns": "int"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0
+  },
+  {
+    "slug": "container-most-water",
+    "title": "Container With Most Water",
+    "difficulty": "Medium",
+    "description": "Given heights, return the most water a container formed by two lines can hold (area = min(h[i],h[j])·(j−i)).",
+    "constraints": "",
+    "examples": [
+      {
+        "input": "1 8 6 2 5 4 8 3 7",
+        "output": "49",
+        "explanation": "Lines 8 and 7 → 49."
+      },
+      {
+        "input": "1 1",
+        "output": "1",
+        "explanation": "Area 1."
+      }
+    ],
+    "editorial": "Two pointers: area is bounded by the shorter wall, so advance that side to seek a taller one.",
+    "optimal_time": "O(n)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "Two pointers from both ends.",
+    "starter_code": {
+      "python": "def solve(heights):\n    # TODO: implement\n    return 0\n",
+      "java": "class Solution {\n    int solve(int[] heights) {\n        // TODO: implement\n        return 0;\n    }\n}\n"
+    },
+    "topics": [
+      "Arrays",
+      "Two Pointers"
+    ],
+    "subtopics": [
+      "Two Pointers"
+    ],
+    "companies": [
+      "Amazon",
+      "Google"
+    ],
+    "patterns": [
+      "Two Pointers"
+    ],
+    "hints": [
+      "Start with the widest pair.",
+      "Move the shorter side inward — it's the limiter.",
+      "Track the best area."
+    ],
+    "prerequisites": [],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example",
+        "input": "1 8 6 2 5 4 8 3 7\n",
+        "expected_output": "49",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Flat",
+        "input": "1 1\n",
+        "expected_output": "1",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Increasing",
+        "input": "1 2 3 4\n",
+        "expected_output": "4",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Peak",
+        "input": "4 1 4\n",
+        "expected_output": "8",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "heights",
+          "type": "int[]"
+        }
+      ],
+      "returns": "int"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0
+  },
+  {
+    "slug": "house-robber",
+    "title": "House Robber",
+    "difficulty": "Medium",
+    "description": "You can't rob two adjacent houses. Return the maximum total you can rob.",
+    "constraints": "",
+    "examples": [
+      {
+        "input": "1 2 3 1",
+        "output": "4",
+        "explanation": "Rob houses 1 and 3 → 4."
+      },
+      {
+        "input": "2 7 9 3 1",
+        "output": "12",
+        "explanation": "Rob 2,9,1 → 12."
+      }
+    ],
+    "editorial": "At each house either skip (keep prev) or rob (prev-prev + value); take the max.",
+    "optimal_time": "O(n)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "1-D DP with two rolling states.",
+    "starter_code": {
+      "python": "def solve(nums):\n    # TODO: implement\n    return 0\n",
+      "java": "class Solution {\n    int solve(int[] nums) {\n        // TODO: implement\n        return 0;\n    }\n}\n"
+    },
+    "topics": [
+      "Dynamic Programming"
+    ],
+    "subtopics": [
+      "1D DP"
+    ],
+    "companies": [
+      "Amazon",
+      "Adobe"
+    ],
+    "patterns": [
+      "Dynamic Programming"
+    ],
+    "hints": [
+      "Decide rob-or-skip at each house.",
+      "best[i] = max(best[i-1], best[i-2] + nums[i]).",
+      "Two rolling variables suffice."
+    ],
+    "prerequisites": [],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example",
+        "input": "1 2 3 1\n",
+        "expected_output": "4",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Bigger",
+        "input": "2 7 9 3 1\n",
+        "expected_output": "12",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Single",
+        "input": "5\n",
+        "expected_output": "5",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Empty",
+        "input": "\n",
+        "expected_output": "0",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "nums",
+          "type": "int[]"
+        }
+      ],
+      "returns": "int"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0
+  },
+  {
+    "slug": "jump-game",
+    "title": "Jump Game",
+    "difficulty": "Medium",
+    "description": "Each value is the max jump length from that index. Return `true` if you can reach the last index.",
+    "constraints": "",
+    "examples": [
+      {
+        "input": "2 3 1 1 4",
+        "output": "true",
+        "explanation": "Jumps reach the end."
+      },
+      {
+        "input": "3 2 1 0 4",
+        "output": "false",
+        "explanation": "Stuck at the 0."
+      }
+    ],
+    "editorial": "Sweep left to right; if index i ever exceeds the running max reach, return false.",
+    "optimal_time": "O(n)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "Track the furthest reach greedily.",
+    "starter_code": {
+      "python": "def solve(nums):\n    # TODO: implement\n    return False\n",
+      "java": "class Solution {\n    boolean solve(int[] nums) {\n        // TODO: implement\n        return false;\n    }\n}\n"
+    },
+    "topics": [
+      "Arrays",
+      "Greedy"
+    ],
+    "subtopics": [
+      "Greedy"
+    ],
+    "companies": [
+      "Amazon",
+      "Meta"
+    ],
+    "patterns": [
+      "Greedy"
+    ],
+    "hints": [
+      "Track the furthest reachable index.",
+      "If your position ever exceeds reach, you're stuck.",
+      "Greedy beats DP here."
+    ],
+    "prerequisites": [],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Reachable",
+        "input": "2 3 1 1 4\n",
+        "expected_output": "true",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Stuck",
+        "input": "3 2 1 0 4\n",
+        "expected_output": "false",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Single",
+        "input": "0\n",
+        "expected_output": "true",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Zero early",
+        "input": "0 1\n",
+        "expected_output": "false",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "nums",
+          "type": "int[]"
+        }
+      ],
+      "returns": "bool"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0
+  },
+  {
+    "slug": "coin-change",
+    "title": "Coin Change",
+    "difficulty": "Medium",
+    "description": "Given coin denominations and an amount, return the fewest coins that make the amount, or -1 if impossible.",
+    "constraints": "",
+    "examples": [
+      {
+        "input": "1 2 5\n11",
+        "output": "3",
+        "explanation": "5+5+1 → 3 coins."
+      },
+      {
+        "input": "2\n3",
+        "output": "-1",
+        "explanation": "Odd amount, only 2s → -1."
+      }
+    ],
+    "editorial": "dp[a] = 1 + min(dp[a-c]) over coins c ≤ a; unreachable stays ∞ → -1.",
+    "optimal_time": "O(amount·coins)",
+    "optimal_space": "O(amount)",
+    "optimal_explanation": "Bottom-up unbounded-knapsack DP.",
+    "starter_code": {
+      "python": "def solve(coins, amount):\n    # TODO: implement\n    return 0\n",
+      "java": "class Solution {\n    int solve(int[] coins, int amount) {\n        // TODO: implement\n        return 0;\n    }\n}\n"
+    },
+    "topics": [
+      "Dynamic Programming"
+    ],
+    "subtopics": [
+      "1D DP"
+    ],
+    "companies": [
+      "Amazon",
+      "Uber",
+      "Google"
+    ],
+    "patterns": [
+      "Dynamic Programming"
+    ],
+    "hints": [
+      "Build up answers for every amount from 0 to target.",
+      "dp[a] = min over coins of dp[a-c] + 1.",
+      "Unbounded coins — iterate amounts outward."
+    ],
+    "prerequisites": [],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example",
+        "input": "1 2 5\n11\n",
+        "expected_output": "3",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Impossible",
+        "input": "2\n3\n",
+        "expected_output": "-1",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Zero",
+        "input": "1\n0\n",
+        "expected_output": "0",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Exact",
+        "input": "1 3 4\n6\n",
+        "expected_output": "2",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "coins",
+          "type": "int[]"
+        },
+        {
+          "name": "amount",
+          "type": "int"
+        }
+      ],
+      "returns": "int"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0
+  },
+  {
+    "slug": "coin-change-ways",
+    "title": "Coin Change II (Count Ways)",
+    "difficulty": "Medium",
+    "description": "Return the number of distinct combinations of coins that sum to the amount (order doesn't matter).",
+    "constraints": "",
+    "examples": [
+      {
+        "input": "1 2 5\n5",
+        "output": "4",
+        "explanation": "4 combinations make 5."
+      },
+      {
+        "input": "2\n4",
+        "output": "1",
+        "explanation": "2+2 → 1 way."
+      }
+    ],
+    "editorial": "",
+    "optimal_time": "O(amount·coins)",
+    "optimal_space": "O(amount)",
+    "optimal_explanation": "Combination-count DP (coin outer loop).",
+    "starter_code": {
+      "python": "def solve(coins, amount):\n    # TODO: implement\n    return 0\n",
+      "java": "class Solution {\n    int solve(int[] coins, int amount) {\n        // TODO: implement\n        return 0;\n    }\n}\n"
+    },
+    "topics": [
+      "Dynamic Programming"
+    ],
+    "subtopics": [
+      "1D DP"
+    ],
+    "companies": [
+      "Amazon"
+    ],
+    "patterns": [
+      "Dynamic Programming"
+    ],
+    "hints": [
+      "Iterate coins in the outer loop to avoid counting permutations.",
+      "dp[a] += dp[a-c].",
+      "Start dp[0]=1."
+    ],
+    "prerequisites": [],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example",
+        "input": "1 2 5\n5\n",
+        "expected_output": "4",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "One way",
+        "input": "2\n4\n",
+        "expected_output": "1",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Zero",
+        "input": "1 2\n0\n",
+        "expected_output": "1",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "None",
+        "input": "3\n2\n",
+        "expected_output": "0",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "coins",
+          "type": "int[]"
+        },
+        {
+          "name": "amount",
+          "type": "int"
+        }
+      ],
+      "returns": "int"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0
+  },
+  {
+    "slug": "longest-common-prefix",
+    "title": "Longest Common Prefix",
+    "difficulty": "Medium",
+    "description": "Return the longest common leading prefix shared by all strings (empty string if none).",
+    "constraints": "",
+    "examples": [
+      {
+        "input": "flower flow flight",
+        "output": "fl",
+        "explanation": "'fl' is shared."
+      },
+      {
+        "input": "dog cat",
+        "output": "",
+        "explanation": "No common prefix."
+      }
+    ],
+    "editorial": "",
+    "optimal_time": "O(total chars)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "Shrink a prefix across all words.",
+    "starter_code": {
+      "python": "def solve(strs):\n    # TODO: implement\n    return \"\"\n",
+      "java": "class Solution {\n    String solve(String[] strs) {\n        // TODO: implement\n        return \"\";\n    }\n}\n"
+    },
+    "topics": [
+      "Strings"
+    ],
+    "subtopics": [
+      "Matching"
+    ],
+    "companies": [
+      "Amazon",
+      "Adobe"
+    ],
+    "patterns": [],
+    "hints": [
+      "The answer is no longer than the shortest string.",
+      "Shrink a candidate prefix against each word.",
+      "Stop as soon as it's empty."
+    ],
+    "prerequisites": [],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example",
+        "input": "flower flow flight\n",
+        "expected_output": "fl",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "None",
+        "input": "dog cat\n",
+        "expected_output": "",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Single",
+        "input": "solo\n",
+        "expected_output": "solo",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Identical",
+        "input": "ab ab\n",
+        "expected_output": "ab",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "strs",
+          "type": "string[]"
+        }
+      ],
+      "returns": "string"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0
+  },
+  {
+    "slug": "search-insert-position",
+    "title": "Search Insert Position",
+    "difficulty": "Medium",
+    "description": "In a sorted array, return the index of target, or the index where it would be inserted to keep order.",
+    "constraints": "",
+    "examples": [
+      {
+        "input": "1 3 5 6\n5",
+        "output": "2",
+        "explanation": "5 is at index 2."
+      },
+      {
+        "input": "1 3 5 6\n2",
+        "output": "1",
+        "explanation": "2 inserts at index 1."
+      }
+    ],
+    "editorial": "",
+    "optimal_time": "O(log n)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "Lower-bound binary search.",
+    "starter_code": {
+      "python": "def solve(nums, target):\n    # TODO: implement\n    return 0\n",
+      "java": "class Solution {\n    int solve(int[] nums, int target) {\n        // TODO: implement\n        return 0;\n    }\n}\n"
+    },
+    "topics": [
+      "Binary Search",
+      "Arrays"
+    ],
+    "subtopics": [
+      "Lower Bound"
+    ],
+    "companies": [
+      "Amazon",
+      "Microsoft"
+    ],
+    "patterns": [
+      "Binary Search"
+    ],
+    "hints": [
+      "This is a lower-bound binary search.",
+      "Narrow [lo, hi) until they meet.",
+      "Return lo."
+    ],
+    "prerequisites": [],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Present",
+        "input": "1 3 5 6\n5\n",
+        "expected_output": "2",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Insert middle",
+        "input": "1 3 5 6\n2\n",
+        "expected_output": "1",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Before all",
+        "input": "2 4\n1\n",
+        "expected_output": "0",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "After all",
+        "input": "2 4\n9\n",
+        "expected_output": "2",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "nums",
+          "type": "int[]"
+        },
+        {
+          "name": "target",
+          "type": "int"
+        }
+      ],
+      "returns": "int"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0
+  },
+  {
+    "slug": "integer-sqrt",
+    "title": "Integer Square Root",
+    "difficulty": "Medium",
+    "description": "Return the floor of the square root of a non-negative integer (no floating point).",
+    "constraints": "",
+    "examples": [
+      {
+        "input": "16",
+        "output": "4",
+        "explanation": "√16 = 4."
+      },
+      {
+        "input": "17",
+        "output": "4",
+        "explanation": "⌊√17⌋ = 4."
+      }
+    ],
+    "editorial": "",
+    "optimal_time": "O(log x)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "Binary search on the answer.",
+    "starter_code": {
+      "python": "def solve(x):\n    # TODO: implement\n    return 0\n",
+      "java": "class Solution {\n    int solve(int x) {\n        // TODO: implement\n        return 0;\n    }\n}\n"
+    },
+    "topics": [
+      "Binary Search",
+      "Math"
+    ],
+    "subtopics": [
+      "Lower Bound"
+    ],
+    "companies": [
+      "Bloomberg",
+      "Google"
+    ],
+    "patterns": [
+      "Binary Search"
+    ],
+    "hints": [
+      "Binary search the largest m with m·m ≤ x.",
+      "Beware overflow when squaring.",
+      "Answer is the high pointer."
+    ],
+    "prerequisites": [],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Perfect",
+        "input": "16\n",
+        "expected_output": "4",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Floor",
+        "input": "17\n",
+        "expected_output": "4",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Zero",
+        "input": "0\n",
+        "expected_output": "0",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "One",
+        "input": "1\n",
+        "expected_output": "1",
+        "ordering": 3
+      },
+      {
+        "kind": "hidden",
+        "name": "Large",
+        "input": "2147395599\n",
+        "expected_output": "46339",
+        "ordering": 4
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "x",
+          "type": "int"
+        }
+      ],
+      "returns": "int"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0
+  },
+  {
+    "slug": "min-cost-climbing-stairs",
+    "title": "Min Cost Climbing Stairs",
+    "difficulty": "Medium",
+    "description": "Each step has a cost; from a step you may climb 1 or 2. Starting before the first step, return the min cost to go past the top.",
+    "constraints": "",
+    "examples": [
+      {
+        "input": "10 15 20",
+        "output": "15",
+        "explanation": "Start at 15, step to top → 15."
+      },
+      {
+        "input": "1 100 1 1 1 100 1 1 100 1",
+        "output": "6",
+        "explanation": "Weave the cheap steps → 6."
+      }
+    ],
+    "editorial": "",
+    "optimal_time": "O(n)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "1-D DP with two rolling states.",
+    "starter_code": {
+      "python": "def solve(cost):\n    # TODO: implement\n    return 0\n",
+      "java": "class Solution {\n    int solve(int[] cost) {\n        // TODO: implement\n        return 0;\n    }\n}\n"
+    },
+    "topics": [
+      "Dynamic Programming"
+    ],
+    "subtopics": [
+      "1D DP"
+    ],
+    "companies": [
+      "Amazon"
+    ],
+    "patterns": [
+      "Dynamic Programming"
+    ],
+    "hints": [
+      "Reaching step i costs its cost plus the cheaper of the two below.",
+      "dp[i] = cost[i] + min(dp[i-1], dp[i-2]).",
+      "You may start at step 0 or 1."
+    ],
+    "prerequisites": [],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example",
+        "input": "10 15 20\n",
+        "expected_output": "15",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Longer",
+        "input": "1 100 1 1 1 100 1 1 100 1\n",
+        "expected_output": "6",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Two",
+        "input": "5 3\n",
+        "expected_output": "3",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Empty",
+        "input": "\n",
+        "expected_output": "0",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "cost",
+          "type": "int[]"
+        }
+      ],
+      "returns": "int"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0
+  },
+  {
+    "slug": "daily-temperatures",
+    "title": "Daily Temperatures",
+    "difficulty": "Medium",
+    "description": "For each day, return how many days until a warmer temperature (0 if none).",
+    "constraints": "",
+    "examples": [
+      {
+        "input": "73 74 75 71 69 72 76 73",
+        "output": "1 1 4 2 1 1 0 0",
+        "explanation": "1,1,4,2,1,1,0,0."
+      },
+      {
+        "input": "5 4 3",
+        "output": "0 0 0",
+        "explanation": "Never warmer → all 0."
+      }
+    ],
+    "editorial": "Keep a stack of indices with decreasing temps; when today is warmer, pop and record the day gap.",
+    "optimal_time": "O(n)",
+    "optimal_space": "O(n)",
+    "optimal_explanation": "Monotonic stack of indices.",
+    "starter_code": {
+      "python": "def solve(temps):\n    # TODO: implement\n    return []\n",
+      "java": "class Solution {\n    int[] solve(int[] temps) {\n        // TODO: implement\n        return new int[]{};\n    }\n}\n"
+    },
+    "topics": [
+      "Stack",
+      "Arrays"
+    ],
+    "subtopics": [
+      "Monotonic Stack"
+    ],
+    "companies": [
+      "Amazon",
+      "Google"
+    ],
+    "patterns": [
+      "Stack"
+    ],
+    "hints": [
+      "A monotonic decreasing stack of indices helps.",
+      "Pop while the current day is warmer.",
+      "The gap is the answer for popped days."
+    ],
+    "prerequisites": [],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example",
+        "input": "73 74 75 71 69 72 76 73\n",
+        "expected_output": "1 1 4 2 1 1 0 0",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Decreasing",
+        "input": "5 4 3\n",
+        "expected_output": "0 0 0",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Single",
+        "input": "50\n",
+        "expected_output": "0",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Increasing",
+        "input": "1 2 3\n",
+        "expected_output": "1 1 0",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "temps",
+          "type": "int[]"
+        }
+      ],
+      "returns": "int[]"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0
+  },
+  {
+    "slug": "next-greater-element",
+    "title": "Next Greater Element",
+    "difficulty": "Medium",
+    "description": "For each element, return the next strictly greater element to its right, or -1 if none.",
+    "constraints": "",
+    "examples": [
+      {
+        "input": "2 1 3 4 2",
+        "output": "3 3 4 -1 -1",
+        "explanation": "3,3,4,-1,-1."
+      },
+      {
+        "input": "5 4 3",
+        "output": "-1 -1 -1",
+        "explanation": "No greater to the right → all -1."
+      }
+    ],
+    "editorial": "",
+    "optimal_time": "O(n)",
+    "optimal_space": "O(n)",
+    "optimal_explanation": "Monotonic decreasing stack.",
+    "starter_code": {
+      "python": "def solve(nums):\n    # TODO: implement\n    return []\n",
+      "java": "class Solution {\n    int[] solve(int[] nums) {\n        // TODO: implement\n        return new int[]{};\n    }\n}\n"
+    },
+    "topics": [
+      "Stack",
+      "Arrays"
+    ],
+    "subtopics": [
+      "Monotonic Stack"
+    ],
+    "companies": [
+      "Amazon",
+      "Bloomberg"
+    ],
+    "patterns": [
+      "Stack"
+    ],
+    "hints": [
+      "Monotonic stack of pending indices.",
+      "Pop when a bigger value arrives.",
+      "Unpopped indices get -1."
+    ],
+    "prerequisites": [],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example",
+        "input": "2 1 3 4 2\n",
+        "expected_output": "3 3 4 -1 -1",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Decreasing",
+        "input": "5 4 3\n",
+        "expected_output": "-1 -1 -1",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Single",
+        "input": "7\n",
+        "expected_output": "-1",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Increasing",
+        "input": "1 2 3\n",
+        "expected_output": "2 3 -1",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "nums",
+          "type": "int[]"
+        }
+      ],
+      "returns": "int[]"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0
+  },
+  {
+    "slug": "subarray-sum-k",
+    "title": "Subarray Sum Equals K",
+    "difficulty": "Medium",
+    "description": "Return the number of contiguous subarrays whose elements sum to k.",
+    "constraints": "",
+    "examples": [
+      {
+        "input": "1 1 1\n2",
+        "output": "2",
+        "explanation": "Two subarrays sum to 2."
+      },
+      {
+        "input": "1 -1 0\n0",
+        "output": "3",
+        "explanation": "Three subarrays sum to 0."
+      }
+    ],
+    "editorial": "For running prefix s, add the count of earlier prefixes equal to s−k.",
+    "optimal_time": "O(n)",
+    "optimal_space": "O(n)",
+    "optimal_explanation": "Prefix sums + hash map of counts.",
+    "starter_code": {
+      "python": "def solve(nums, k):\n    # TODO: implement\n    return 0\n",
+      "java": "class Solution {\n    int solve(int[] nums, int k) {\n        // TODO: implement\n        return 0;\n    }\n}\n"
+    },
+    "topics": [
+      "Arrays",
+      "Hashing"
+    ],
+    "subtopics": [
+      "Prefix Sum"
+    ],
+    "companies": [
+      "Amazon",
+      "Meta"
+    ],
+    "patterns": [
+      "Hashing",
+      "Prefix Sums"
+    ],
+    "hints": [
+      "Prefix sums turn 'range sum = k' into 'seen a prefix of s-k'.",
+      "Count prefix sums in a hash map.",
+      "Handle the empty prefix (sum 0)."
+    ],
+    "prerequisites": [],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example",
+        "input": "1 1 1\n2\n",
+        "expected_output": "2",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "With negatives",
+        "input": "1 -1 0\n0\n",
+        "expected_output": "3",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Single",
+        "input": "3\n3\n",
+        "expected_output": "1",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "None",
+        "input": "1 2\n9\n",
+        "expected_output": "0",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "nums",
+          "type": "int[]"
+        },
+        {
+          "name": "k",
+          "type": "int"
+        }
+      ],
+      "returns": "int"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0
+  },
+  {
+    "slug": "longest-consecutive",
+    "title": "Longest Consecutive Sequence",
+    "difficulty": "Medium",
+    "description": "Return the length of the longest run of consecutive integers (order in the array doesn't matter).",
+    "constraints": "",
+    "examples": [
+      {
+        "input": "100 4 200 1 3 2",
+        "output": "4",
+        "explanation": "1,2,3,4 → 4."
+      },
+      {
+        "input": "1 2 2 3",
+        "output": "3",
+        "explanation": "1,2,3 → 3."
+      }
+    ],
+    "editorial": "Insert all into a set; for each value with no predecessor, extend upward and measure the run.",
+    "optimal_time": "O(n)",
+    "optimal_space": "O(n)",
+    "optimal_explanation": "Hash set; count only from sequence starts.",
+    "starter_code": {
+      "python": "def solve(nums):\n    # TODO: implement\n    return 0\n",
+      "java": "class Solution {\n    int solve(int[] nums) {\n        // TODO: implement\n        return 0;\n    }\n}\n"
+    },
+    "topics": [
+      "Arrays",
+      "Hashing"
+    ],
+    "subtopics": [
+      "Hash Set"
+    ],
+    "companies": [
+      "Google",
+      "Amazon"
+    ],
+    "patterns": [
+      "Hashing"
+    ],
+    "hints": [
+      "Put everything in a set for O(1) membership.",
+      "Only start counting at sequence starts (no x-1 present).",
+      "Walk upward while x+1 exists."
+    ],
+    "prerequisites": [],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example",
+        "input": "100 4 200 1 3 2\n",
+        "expected_output": "4",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Dupes",
+        "input": "1 2 2 3\n",
+        "expected_output": "3",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Empty",
+        "input": "\n",
+        "expected_output": "0",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Single",
+        "input": "9\n",
+        "expected_output": "1",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "nums",
+          "type": "int[]"
+        }
+      ],
+      "returns": "int"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0
+  },
+  {
+    "slug": "kth-largest-element",
+    "title": "Kth Largest Element",
+    "difficulty": "Medium",
+    "description": "Return the kth largest element in the array (1-indexed, k valid).",
+    "constraints": "",
+    "examples": [
+      {
+        "input": "3 2 1 5 6 4\n2",
+        "output": "5",
+        "explanation": "2nd largest is 5."
+      },
+      {
+        "input": "3 2 3 1 2 4 5 5 6\n4",
+        "output": "4",
+        "explanation": "4th largest is 4."
+      }
+    ],
+    "editorial": "",
+    "optimal_time": "O(n log n)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "Sort descending and index (heap/quickselect improve it).",
+    "starter_code": {
+      "python": "def solve(nums, k):\n    # TODO: implement\n    return 0\n",
+      "java": "class Solution {\n    int solve(int[] nums, int k) {\n        // TODO: implement\n        return 0;\n    }\n}\n"
+    },
+    "topics": [
+      "Sorting",
+      "Heap"
+    ],
+    "subtopics": [
+      "Sorting"
+    ],
+    "companies": [
+      "Amazon",
+      "Meta"
+    ],
+    "patterns": [
+      "Sorting"
+    ],
+    "hints": [
+      "Sorting is the simple route.",
+      "A size-k min-heap is more efficient.",
+      "Quickselect gives average O(n)."
+    ],
+    "prerequisites": [],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example",
+        "input": "3 2 1 5 6 4\n2\n",
+        "expected_output": "5",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "With dupes",
+        "input": "3 2 3 1 2 4 5 5 6\n4\n",
+        "expected_output": "4",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "First",
+        "input": "1\n1\n",
+        "expected_output": "1",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Last",
+        "input": "7 8 9\n3\n",
+        "expected_output": "7",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "nums",
+          "type": "int[]"
+        },
+        {
+          "name": "k",
+          "type": "int"
+        }
+      ],
+      "returns": "int"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0
+  },
+  {
+    "slug": "rotate-array-right",
+    "title": "Rotate Array Right",
+    "difficulty": "Medium",
+    "description": "Rotate the array to the right by k steps and return the result.",
+    "constraints": "",
+    "examples": [
+      {
+        "input": "1 2 3 4 5 6 7\n3",
+        "output": "5 6 7 1 2 3 4",
+        "explanation": "5,6,7,1,2,3,4."
+      },
+      {
+        "input": "1 2 3\n4",
+        "output": "3 1 2",
+        "explanation": "k mod 3 = 1 → 3,1,2."
+      }
+    ],
+    "editorial": "",
+    "optimal_time": "O(n)",
+    "optimal_space": "O(n)",
+    "optimal_explanation": "Slice/reverse to shift by k mod n.",
+    "starter_code": {
+      "python": "def solve(nums, k):\n    # TODO: implement\n    return []\n",
+      "java": "class Solution {\n    int[] solve(int[] nums, int k) {\n        // TODO: implement\n        return new int[]{};\n    }\n}\n"
+    },
+    "topics": [
+      "Arrays"
+    ],
+    "subtopics": [
+      "Cyclic Shift"
+    ],
+    "companies": [
+      "Amazon",
+      "Microsoft"
+    ],
+    "patterns": [],
+    "hints": [
+      "k can exceed the length — take k mod n.",
+      "The last k elements wrap to the front.",
+      "Reversal trick does it in place."
+    ],
+    "prerequisites": [],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example",
+        "input": "1 2 3 4 5 6 7\n3\n",
+        "expected_output": "5 6 7 1 2 3 4",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "k > n",
+        "input": "1 2 3\n4\n",
+        "expected_output": "3 1 2",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "k = 0",
+        "input": "1 2\n0\n",
+        "expected_output": "1 2",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Single",
+        "input": "9\n5\n",
+        "expected_output": "9",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "nums",
+          "type": "int[]"
+        },
+        {
+          "name": "k",
+          "type": "int"
+        }
+      ],
+      "returns": "int[]"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0
+  },
+  {
+    "slug": "word-break",
+    "title": "Word Break",
+    "difficulty": "Hard",
+    "description": "Return `true` if the string can be segmented into a space-separated sequence of dictionary words.",
+    "constraints": "",
+    "examples": [
+      {
+        "input": "leetcode\nleet code",
+        "output": "true",
+        "explanation": "'leet code'."
+      },
+      {
+        "input": "catsandog\ncats dog sand and cat",
+        "output": "false",
+        "explanation": "Cannot cover 'catsandog'."
+      }
+    ],
+    "editorial": "dp[i] true iff a split point j exists with dp[j] true and substring s[j:i] in the dictionary.",
+    "optimal_time": "O(n²)",
+    "optimal_space": "O(n)",
+    "optimal_explanation": "DP over prefixes with a word set.",
+    "starter_code": {
+      "python": "def solve(s, words):\n    # TODO: implement\n    return False\n",
+      "java": "class Solution {\n    boolean solve(String s, String[] words) {\n        // TODO: implement\n        return false;\n    }\n}\n"
+    },
+    "topics": [
+      "Dynamic Programming",
+      "Strings"
+    ],
+    "subtopics": [
+      "1D DP"
+    ],
+    "companies": [
+      "Amazon",
+      "Google",
+      "Meta"
+    ],
+    "patterns": [
+      "Dynamic Programming"
+    ],
+    "hints": [
+      "dp[i] = can we segment the first i characters.",
+      "dp[i] is true if some dp[j] is true and s[j:i] is a word.",
+      "Use a set for word lookups."
+    ],
+    "prerequisites": [],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Breakable",
+        "input": "leetcode\nleet code\n",
+        "expected_output": "true",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Not",
+        "input": "catsandog\ncats dog sand and cat\n",
+        "expected_output": "false",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Reuse",
+        "input": "aaaa\na aa\n",
+        "expected_output": "true",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Single",
+        "input": "abc\nabc\n",
+        "expected_output": "true",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "s",
+          "type": "string"
+        },
+        {
+          "name": "words",
+          "type": "string[]"
+        }
+      ],
+      "returns": "bool"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0
+  },
+  {
+    "slug": "decode-ways",
+    "title": "Decode Ways",
+    "difficulty": "Hard",
+    "description": "A→1 … Z→26. Return how many ways a digit string can be decoded to letters.",
+    "constraints": "",
+    "examples": [
+      {
+        "input": "12",
+        "output": "2",
+        "explanation": "'AB' or 'L' → 2."
+      },
+      {
+        "input": "226",
+        "output": "3",
+        "explanation": "'BZ','VF','BBF' → 3."
+      }
+    ],
+    "editorial": "dp[i] += dp[i-1] if s[i-1]≠'0'; dp[i] += dp[i-2] if s[i-2:i] in 10..26.",
+    "optimal_time": "O(n)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "1-D DP counting valid 1- and 2-digit splits.",
+    "starter_code": {
+      "python": "def solve(s):\n    # TODO: implement\n    return 0\n",
+      "java": "class Solution {\n    int solve(String s) {\n        // TODO: implement\n        return 0;\n    }\n}\n"
+    },
+    "topics": [
+      "Dynamic Programming",
+      "Strings"
+    ],
+    "subtopics": [
+      "1D DP"
+    ],
+    "companies": [
+      "Amazon",
+      "Meta"
+    ],
+    "patterns": [
+      "Dynamic Programming"
+    ],
+    "hints": [
+      "Each position: take one digit (1–9) or two digits (10–26).",
+      "dp[i] sums the valid one- and two-digit extensions.",
+      "Leading zeros kill a decoding."
+    ],
+    "prerequisites": [],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Two ways",
+        "input": "12\n",
+        "expected_output": "2",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "226",
+        "input": "226\n",
+        "expected_output": "3",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Leading zero",
+        "input": "06\n",
+        "expected_output": "0",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Zero pair",
+        "input": "10\n",
+        "expected_output": "1",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "s",
+          "type": "string"
+        }
+      ],
+      "returns": "int"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0
+  },
+  {
+    "slug": "longest-palindrome-length",
+    "title": "Longest Palindromic Substring (length)",
+    "difficulty": "Hard",
+    "description": "Return the length of the longest palindromic substring.",
+    "constraints": "",
+    "examples": [
+      {
+        "input": "babad",
+        "output": "3",
+        "explanation": "'bab' (or 'aba') → 3."
+      },
+      {
+        "input": "cbbd",
+        "output": "2",
+        "explanation": "'bb' → 2."
+      }
+    ],
+    "editorial": "For each center (single char and gap), expand while characters match; keep the longest span.",
+    "optimal_time": "O(n²)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "Expand around each center.",
+    "starter_code": {
+      "python": "def solve(s):\n    # TODO: implement\n    return 0\n",
+      "java": "class Solution {\n    int solve(String s) {\n        // TODO: implement\n        return 0;\n    }\n}\n"
+    },
+    "topics": [
+      "Strings",
+      "Dynamic Programming"
+    ],
+    "subtopics": [
+      "Expand Around Center"
+    ],
+    "companies": [
+      "Amazon",
+      "Microsoft"
+    ],
+    "patterns": [
+      "Dynamic Programming",
+      "Two Pointers"
+    ],
+    "hints": [
+      "Every palindrome has a center.",
+      "Expand outward from each of the 2n−1 centers.",
+      "Track the best length."
+    ],
+    "prerequisites": [],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "babad",
+        "input": "babad\n",
+        "expected_output": "3",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "cbbd",
+        "input": "cbbd\n",
+        "expected_output": "2",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Single",
+        "input": "a\n",
+        "expected_output": "1",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "All same",
+        "input": "aaaa\n",
+        "expected_output": "4",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "s",
+          "type": "string"
+        }
+      ],
+      "returns": "int"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0
+  },
+  {
+    "slug": "maximum-product-subarray",
+    "title": "Maximum Product Subarray",
+    "difficulty": "Hard",
+    "description": "Return the largest product of a contiguous non-empty subarray.",
+    "constraints": "",
+    "examples": [
+      {
+        "input": "2 3 -2 4",
+        "output": "6",
+        "explanation": "2·3 → 6."
+      },
+      {
+        "input": "-2 0 -1",
+        "output": "0",
+        "explanation": "Best single is 0."
+      }
+    ],
+    "editorial": "Because negatives swap extremes, carry both max and min ending at i; answer is the running max.",
+    "optimal_time": "O(n)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "Track running max and min products.",
+    "starter_code": {
+      "python": "def solve(nums):\n    # TODO: implement\n    return 0\n",
+      "java": "class Solution {\n    int solve(int[] nums) {\n        // TODO: implement\n        return 0;\n    }\n}\n"
+    },
+    "topics": [
+      "Dynamic Programming",
+      "Arrays"
+    ],
+    "subtopics": [
+      "1D DP"
+    ],
+    "companies": [
+      "Amazon",
+      "Bloomberg"
+    ],
+    "patterns": [
+      "Dynamic Programming"
+    ],
+    "hints": [
+      "A negative can flip the largest and smallest.",
+      "Track both the max and min product ending here.",
+      "Update the answer each step."
+    ],
+    "prerequisites": [],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example",
+        "input": "2 3 -2 4\n",
+        "expected_output": "6",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Zeroes",
+        "input": "-2 0 -1\n",
+        "expected_output": "0",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Two negs",
+        "input": "-2 -3 7\n",
+        "expected_output": "42",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Single",
+        "input": "-5\n",
+        "expected_output": "-5",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "nums",
+          "type": "int[]"
+        }
+      ],
+      "returns": "int"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0
+  },
+  {
+    "slug": "partition-equal-subset-sum",
+    "title": "Partition Equal Subset Sum",
+    "difficulty": "Hard",
+    "description": "Return `true` if the array can be split into two subsets with equal sum.",
+    "constraints": "",
+    "examples": [
+      {
+        "input": "1 5 11 5",
+        "output": "true",
+        "explanation": "{1,5,5} and {11}."
+      },
+      {
+        "input": "1 2 3 5",
+        "output": "false",
+        "explanation": "Total 11 is odd-ish — no equal split."
+      }
+    ],
+    "editorial": "Reduce to: is there a subset summing to total/2? Solve with a boolean 0/1-knapsack DP.",
+    "optimal_time": "O(n·sum)",
+    "optimal_space": "O(sum)",
+    "optimal_explanation": "Subset-sum DP to total/2.",
+    "starter_code": {
+      "python": "def solve(nums):\n    # TODO: implement\n    return False\n",
+      "java": "class Solution {\n    boolean solve(int[] nums) {\n        // TODO: implement\n        return false;\n    }\n}\n"
+    },
+    "topics": [
+      "Dynamic Programming"
+    ],
+    "subtopics": [
+      "Subset Sum"
+    ],
+    "companies": [
+      "Amazon",
+      "Uber"
+    ],
+    "patterns": [
+      "Dynamic Programming"
+    ],
+    "hints": [
+      "If the total is odd, it's impossible.",
+      "Otherwise, can we hit total/2 as a subset sum?",
+      "0/1 knapsack over a boolean DP."
+    ],
+    "prerequisites": [],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Splittable",
+        "input": "1 5 11 5\n",
+        "expected_output": "true",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Not",
+        "input": "1 2 3 5\n",
+        "expected_output": "false",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Two equal",
+        "input": "2 2\n",
+        "expected_output": "true",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Odd total",
+        "input": "1 2\n",
+        "expected_output": "false",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "nums",
+          "type": "int[]"
+        }
+      ],
+      "returns": "bool"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0
   }
 ]
