@@ -35,6 +35,7 @@ fn sample_problem(slug: &str) -> Problem {
         time_limit_ms: 0,
         editorials: vec![],
         follow_ups: vec![],
+        order: 0,
         test_cases: vec![TestCase {
             id: 0,
             problem_id: 0,

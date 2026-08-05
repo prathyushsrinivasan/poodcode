@@ -331,5 +331,23 @@
     "deep": "Comparisons produce booleans, and &&, ||, ! combine them. Short-circuit evaluation means the right side of && is skipped when the left is false, which is both handy and sometimes necessary to avoid errors.",
     "java": "boolean type; comparisons ==, !=, <, <=, >, >=; logic && (and), || (or), ! (not).",
     "lesson": "### Worked example\nA number is in the range [1, 10] when it is `>= 1` **and** `<= 10`.\n\n### In code (Java)\n```java\nint x = 7;\nboolean inRange = (x >= 1) && (x <= 10); // true\nboolean outside = (x < 1) || (x > 10);   // false\nSystem.out.println(inRange && !outside); // true\n```\n\n### Watch out for\n- `&&` and `||` short-circuit: the right side is skipped once the result is known.\n- `=` assigns while `==` compares — a very common typo.\n"
+  },
+  {
+    "key": "bit_manip",
+    "name": "Bit Manipulation",
+    "category": "Foundations",
+    "what": "Operating on the individual binary bits of an integer with AND, OR, XOR, and shifts.",
+    "deep": "Bit tricks give O(1) tools that replace loops: `x & (x-1)` clears the lowest set bit, `x & -x` isolates it, XOR cancels equal values, and shifting multiplies or divides by powers of two. They shine in set membership (bitmasks), parity, and counting.",
+    "java": "Use &, |, ^, ~, <<, >>, and >>> (unsigned shift). Integer.bitCount(x) counts set bits; x & (x-1) drops the lowest one.",
+    "lesson": ""
+  },
+  {
+    "key": "prefix_sum",
+    "name": "Prefix Sums",
+    "category": "Arrays",
+    "what": "Precomputed running totals so any range sum is a single subtraction.",
+    "deep": "Build P[i] = a[0]+…+a[i-1]; then the sum of a[l..r] is P[r+1] − P[l] in O(1). Paired with a hash map of seen prefixes it counts subarrays with a target sum in one pass. The same idea extends to prefix XOR, products, and 2-D grids.",
+    "java": "A long[] prefix of length n+1, or a running long combined with a HashMap<Long,Integer> of prefix counts.",
+    "lesson": ""
   }
 ]

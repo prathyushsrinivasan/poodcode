@@ -146,7 +146,7 @@ export default function Library() {
           <div>
             <div className="io-label">Sort</div>
             <select value={f.sort} onChange={(e) => setF({ ...f, sort: e.target.value as SortKey })}>
-              <option value="difficulty">Difficulty</option>
+              <option value="difficulty">Difficulty (easy → hard)</option>
               <option value="title">Title</option>
               <option value="recently_added">Recently Added</option>
               <option value="recently_solved">Recently Solved</option>

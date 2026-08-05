@@ -36,6 +36,7 @@ CREATE TABLE IF NOT EXISTS problems (
   time_limit_ms       INTEGER NOT NULL DEFAULT 0,   -- 0 = use the global default
   editorials_json     TEXT NOT NULL DEFAULT '[]',   -- multiple approaches (brute→optimal)
   follow_ups_json     TEXT NOT NULL DEFAULT '[]',   -- linked variant problems
+  sort_order          INTEGER NOT NULL DEFAULT 0,   -- curated easiest→hardest rank
   is_favorite         INTEGER NOT NULL DEFAULT 0,
   solved_status       TEXT NOT NULL DEFAULT 'unsolved',
   confidence          INTEGER NOT NULL DEFAULT 0,
@@ -264,6 +265,7 @@ fn migrate(conn: &Connection) -> AppResult<()> {
     add_col("problems", "time_limit_ms", "INTEGER NOT NULL DEFAULT 0")?;
     add_col("problems", "editorials_json", "TEXT NOT NULL DEFAULT '[]'")?;
     add_col("problems", "follow_ups_json", "TEXT NOT NULL DEFAULT '[]'")?;
+    add_col("problems", "sort_order", "INTEGER NOT NULL DEFAULT 0")?;
     // New review columns (SM-2 adaptive scheduling).
     add_col("reviews", "ease", "REAL NOT NULL DEFAULT 2.5")?;
     add_col("reviews", "reps", "INTEGER NOT NULL DEFAULT 0")?;

@@ -85,6 +85,7 @@ export interface Problem {
   time_limit_ms: number;
   editorials: Editorial[];
   follow_ups: FollowUp[];
+  order: number;
   is_favorite: boolean;
   solved_status: SolvedStatus;
   confidence: number;

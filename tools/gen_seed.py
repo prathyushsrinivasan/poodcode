@@ -3592,6 +3592,524 @@ def _kth_largest_helper(nums, k):
     return sorted(nums, reverse=True)[k - 1]
 
 
+# --- More reference implementations (second expansion batch) ---
+
+def _count_digits(n):
+    return len(str(abs(n)))
+
+
+def _missing_number(nums):
+    n = len(nums)
+    return n * (n + 1) // 2 - sum(nums)
+
+
+def _fizzbuzz(n):
+    if n % 15 == 0:
+        return "FizzBuzz"
+    if n % 3 == 0:
+        return "Fizz"
+    if n % 5 == 0:
+        return "Buzz"
+    return str(n)
+
+
+def _two_sum_sorted(nums, target):
+    l, r = 0, len(nums) - 1
+    while l < r:
+        s = nums[l] + nums[r]
+        if s == target:
+            return [l + 1, r + 1]
+        if s < target:
+            l += 1
+        else:
+            r -= 1
+    return [-1]
+
+
+def _merge_sorted(a, b):
+    i = j = 0
+    out2 = []
+    while i < len(a) and j < len(b):
+        if a[i] <= b[j]:
+            out2.append(a[i]); i += 1
+        else:
+            out2.append(b[j]); j += 1
+    out2.extend(a[i:])
+    out2.extend(b[j:])
+    return out2
+
+
+def _gcd_array(nums):
+    g = nums[0]
+    for x in nums[1:]:
+        g = math.gcd(g, x)
+    return g
+
+
+def _fast_power(base, exp):
+    result = 1
+    b = base
+    e = exp
+    while e > 0:
+        if e & 1:
+            result *= b
+        b *= b
+        e >>= 1
+    return result
+
+
+def _unique_paths(m, n):
+    dp = [1] * n
+    for _ in range(1, m):
+        for j in range(1, n):
+            dp[j] += dp[j - 1]
+    return dp[n - 1]
+
+
+def _lcs(a, b):
+    m, n = len(a), len(b)
+    dp = [[0] * (n + 1) for _ in range(m + 1)]
+    for i in range(1, m + 1):
+        for j in range(1, n + 1):
+            dp[i][j] = dp[i - 1][j - 1] + 1 if a[i - 1] == b[j - 1] else max(dp[i - 1][j], dp[i][j - 1])
+    return dp[m][n]
+
+
+def _top_k_frequent(nums, k):
+    c = Counter(nums)
+    ordered = sorted(c.items(), key=lambda kv: (-kv[1], kv[0]))
+    return [v for v, _ in ordered[:k]]
+
+
+def _count_bits(n):
+    return [bin(i).count("1") for i in range(n + 1)]
+
+
+def _largest_rectangle(heights):
+    st = []
+    best = 0
+    for i, h in enumerate(heights + [0]):
+        while st and heights[st[-1]] >= h:
+            top = st.pop()
+            width = i if not st else i - st[-1] - 1
+            best = max(best, heights[top] * width)
+        st.append(i)
+    return best
+
+
+def _window_max(nums, k):
+    dq = deque()
+    out2 = []
+    for i, x in enumerate(nums):
+        while dq and nums[dq[-1]] <= x:
+            dq.pop()
+        dq.append(i)
+        if dq[0] <= i - k:
+            dq.popleft()
+        if i >= k - 1:
+            out2.append(nums[dq[0]])
+    return out2
+
+
+def _jump_ii(nums):
+    if len(nums) <= 1:
+        return 0
+    jumps = 0
+    cur_end = 0
+    farthest = 0
+    for i in range(len(nums) - 1):
+        farthest = max(farthest, i + nums[i])
+        if i == cur_end:
+            jumps += 1
+            cur_end = farthest
+    return jumps
+
+
+def _longest_valid_parens(s):
+    st = [-1]
+    best = 0
+    for i, ch in enumerate(s):
+        if ch == "(":
+            st.append(i)
+        else:
+            st.pop()
+            if not st:
+                st.append(i)
+            else:
+                best = max(best, i - st[-1])
+    return best
+
+
+def _min_window_len(s, t):
+    if not t or not s:
+        return 0
+    need = Counter(t)
+    missing = len(t)
+    l = 0
+    best = math.inf
+    for r, ch in enumerate(s):
+        if need[ch] > 0:
+            missing -= 1
+        need[ch] -= 1
+        while missing == 0:
+            best = min(best, r - l + 1)
+            need[s[l]] += 1
+            if need[s[l]] > 0:
+                missing += 1
+            l += 1
+    return 0 if best == math.inf else best
+
+
+HARNESS_DEFS += [
+    # ---------------- INTRO ----------------
+    dict(slug="min-of-two", title="Min of Two", difficulty="Intro", topics=["Basics"], subtopics=["Conditionals"], companies=["Amazon"],
+         description="Return the smaller of two integers.",
+         constraints="-10^9 ≤ a, b ≤ 10^9",
+         hints=["Compare the two values.", "Return whichever is not larger."],
+         opt=("O(1)", "O(1)", "A single comparison."),
+         spec={"name": "solve", "params": [{"name": "a", "type": "int"}, {"name": "b", "type": "int"}], "returns": "int"},
+         fn=lambda a, b: min(a, b),
+         cases=[("example", "Example", (3, 8)), ("example", "Negatives", (-2, -9)), ("hidden", "Equal", (5, 5)), ("hidden", "Zero", (0, -1))],
+         example_expl=["3 < 8.", "-9 is smaller."]),
+    dict(slug="cube-number", title="Cube", difficulty="Intro", topics=["Basics", "Math"], subtopics=["Arithmetic"], companies=["Microsoft"],
+         description="Return the cube (n³) of the integer.",
+         constraints="-10^4 ≤ n ≤ 10^4",
+         hints=["Multiply n by itself three times.", "Use a 64-bit return type."],
+         opt=("O(1)", "O(1)", "Two multiplications."),
+         spec={"name": "solve", "params": [{"name": "n", "type": "int"}], "returns": "long"},
+         fn=lambda n: n * n * n,
+         cases=[("example", "Example", (3,)), ("example", "Negative", (-2,)), ("hidden", "Zero", (0,)), ("hidden", "Larger", (100,))],
+         example_expl=["3³ = 27.", "(-2)³ = -8."]),
+    dict(slug="is-multiple", title="Is Multiple", difficulty="Intro", topics=["Math"], subtopics=["Number Theory"], companies=["Adobe"],
+         description="Return `true` if `a` is a multiple of `b` (b ≠ 0).",
+         constraints="1 ≤ b ≤ 10^9\n0 ≤ a ≤ 10^9",
+         hints=["A is a multiple of b when the remainder is zero.", "Use the modulo operator."],
+         opt=("O(1)", "O(1)", "One modulo test."),
+         spec={"name": "solve", "params": [{"name": "a", "type": "int"}, {"name": "b", "type": "int"}], "returns": "bool"},
+         fn=lambda a, b: b != 0 and a % b == 0,
+         cases=[("example", "Multiple", (12, 3)), ("example", "Not", (10, 3)), ("hidden", "Zero dividend", (0, 5)), ("hidden", "Self", (7, 7))],
+         example_expl=["12 = 4·3.", "10 mod 3 = 1."]),
+    dict(slug="count-digits", title="Count Digits", difficulty="Intro", topics=["Math"], subtopics=["Digits"], companies=["Amazon"],
+         description="Return how many decimal digits a non-negative integer has (0 has one digit).",
+         constraints="0 ≤ n ≤ 10^9",
+         hints=["Divide by 10 repeatedly and count.", "Or take the length of the string form."],
+         opt=("O(log n)", "O(1)", "One pass over the digits."),
+         spec={"name": "solve", "params": [{"name": "n", "type": "int"}], "returns": "int"},
+         fn=lambda n: _count_digits(n),
+         cases=[("example", "Example", (12345,)), ("example", "Single", (7,)), ("hidden", "Zero", (0,)), ("hidden", "Round", (1000,))],
+         example_expl=["Five digits.", "One digit."]),
+    dict(slug="array-maximum", title="Array Maximum", difficulty="Intro", topics=["Arrays"], subtopics=["Traversal"], companies=["Microsoft"],
+         description="Return the largest element of a non-empty array.",
+         constraints="1 ≤ n ≤ 10^5",
+         hints=["Track a running maximum as you scan."],
+         opt=("O(n)", "O(1)", "Single pass tracking the max."),
+         spec={"name": "solve", "params": [{"name": "nums", "type": "int[]"}], "returns": "int"},
+         fn=lambda nums: max(nums),
+         cases=[("example", "Example", ([3, 1, 4, 1, 5],)), ("example", "Negatives", ([-2, -9, -1],)), ("hidden", "Single", ([42],)), ("hidden", "Sorted", ([1, 2, 3],))],
+         example_expl=["5 is largest.", "-1 is largest."]),
+
+    # ---------------- EASY ----------------
+    dict(slug="reverse-integer", title="Reverse Integer", difficulty="Easy", topics=["Math"], subtopics=["Digits"], companies=["Amazon", "Bloomberg"],
+         description="Return the integer with its digits reversed, preserving sign (assume the result fits in 32 bits).",
+         constraints="-2^31 ≤ n ≤ 2^31 − 1",
+         hints=["Peel digits off with % 10 and build the reverse.", "Track the sign separately.", "Trailing zeros vanish (120 → 21)."],
+         opt=("O(log n)", "O(1)", "One pass over the digits."),
+         editorial="Pop the last digit with %10 and push it onto an accumulator (acc = acc*10 + digit); reapply the sign.",
+         spec={"name": "solve", "params": [{"name": "n", "type": "int"}], "returns": "int"},
+         fn=lambda n: _reverse_int(n),
+         cases=[("example", "Positive", (123,)), ("example", "Negative", (-380,)), ("hidden", "Palindrome", (121,)), ("hidden", "Single", (5,))],
+         example_expl=["321.", "-83 (trailing zero dropped)."]),
+    dict(slug="power-of-two", title="Power of Two", difficulty="Easy", topics=["Bit Manipulation", "Math"], subtopics=["Bit Manipulation"], companies=["Apple", "Amazon"],
+         description="Return `true` if the integer is a power of two.",
+         constraints="-2^31 ≤ n ≤ 2^31 − 1",
+         hints=["Powers of two have exactly one set bit.", "n & (n-1) clears the lowest set bit.", "Positive numbers only."],
+         opt=("O(1)", "O(1)", "Single bit trick: n>0 and n&(n-1)==0."),
+         editorial="A positive power of two has a single 1 bit, so n & (n−1) removes it and yields 0.",
+         spec={"name": "solve", "params": [{"name": "n", "type": "int"}], "returns": "bool"},
+         fn=lambda n: n > 0 and (n & (n - 1)) == 0,
+         cases=[("example", "Yes", (16,)), ("example", "No", (18,)), ("hidden", "One", (1,)), ("hidden", "Zero", (0,)), ("hidden", "Negative", (-8,))],
+         example_expl=["16 = 2⁴.", "18 is not a power of two."]),
+    dict(slug="missing-number", title="Missing Number", difficulty="Easy", topics=["Arrays", "Math"], subtopics=["XOR"], companies=["Amazon", "Microsoft"],
+         description="An array holds n distinct numbers from the range [0, n]. Return the one that's missing.",
+         constraints="1 ≤ n ≤ 10^5\nValues are distinct and in [0, n].",
+         hints=["The full range has a known sum: n(n+1)/2.", "Subtract the actual sum.", "XOR also works and avoids overflow."],
+         opt=("O(n)", "O(1)", "Expected-sum minus actual-sum (or XOR)."),
+         editorial="The sum 0+…+n is n(n+1)/2; subtract the array's sum to reveal the gap. XOR of indices and values also isolates it.",
+         spec={"name": "solve", "params": [{"name": "nums", "type": "int[]"}], "returns": "int"},
+         fn=lambda nums: _missing_number(nums),
+         cases=[("example", "Example", ([3, 0, 1],)), ("example", "Missing last", ([0, 1, 2],)), ("hidden", "Single", ([1],)), ("hidden", "Missing first", ([1, 2],))],
+         example_expl=["2 is missing.", "3 is missing."]),
+    dict(slug="count-negatives", title="Count Negatives", difficulty="Easy", topics=["Arrays"], subtopics=["Counting"], companies=["Amazon"],
+         description="Return how many elements are negative.",
+         constraints="0 ≤ n ≤ 10^5",
+         hints=["Scan once and count values below zero."],
+         opt=("O(n)", "O(1)", "Single pass."),
+         spec={"name": "solve", "params": [{"name": "nums", "type": "int[]"}], "returns": "int"},
+         fn=lambda nums: sum(1 for x in nums if x < 0),
+         cases=[("example", "Example", ([-1, 2, -3, 4],)), ("example", "None", ([1, 2, 3],)), ("hidden", "All", ([-1, -2],)), ("hidden", "Empty", ([],))],
+         example_expl=["-1 and -3 → 2.", "No negatives."]),
+    dict(slug="is-sorted", title="Is Sorted", difficulty="Easy", topics=["Arrays"], subtopics=["Traversal"], companies=["Adobe"],
+         description="Return `true` if the array is sorted in non-decreasing order.",
+         constraints="0 ≤ n ≤ 10^5",
+         hints=["Every element should be ≤ the next.", "One violation is enough to fail.", "Empty and single arrays are sorted."],
+         opt=("O(n)", "O(1)", "Single adjacent-pair scan."),
+         spec={"name": "solve", "params": [{"name": "nums", "type": "int[]"}], "returns": "bool"},
+         fn=lambda nums: all(nums[i] <= nums[i + 1] for i in range(len(nums) - 1)),
+         cases=[("example", "Sorted", ([1, 2, 2, 3],)), ("example", "Not", ([3, 1, 2],)), ("hidden", "Single", ([5],)), ("hidden", "Empty", ([],))],
+         example_expl=["Non-decreasing.", "3 > 1 breaks order."]),
+    dict(slug="fizzbuzz-value", title="FizzBuzz Value", difficulty="Easy", topics=["Math"], subtopics=["Conditionals"], companies=["Amazon", "Microsoft"],
+         description="Return \"FizzBuzz\" if n is divisible by 15, \"Fizz\" if by 3, \"Buzz\" if by 5, otherwise the number as a string.",
+         constraints="1 ≤ n ≤ 10^6",
+         hints=["Check divisibility by 15 first.", "Then 3, then 5.", "Otherwise return the number itself."],
+         opt=("O(1)", "O(1)", "A few modulo checks."),
+         spec={"name": "solve", "params": [{"name": "n", "type": "int"}], "returns": "string"},
+         fn=lambda n: _fizzbuzz(n),
+         cases=[("example", "Fizz", (9,)), ("example", "FizzBuzz", (15,)), ("hidden", "Buzz", (10,)), ("hidden", "Plain", (7,))],
+         example_expl=["9 divisible by 3 → Fizz.", "15 divisible by both → FizzBuzz."]),
+    dict(slug="two-sum-sorted", title="Two Sum II (sorted)", difficulty="Easy", topics=["Two Pointers", "Arrays"], subtopics=["Two Pointers"], companies=["Amazon", "Google"],
+         description="Given a sorted array with exactly one solution, return the 1-based indices of the two numbers adding to `target`.",
+         constraints="2 ≤ n ≤ 10^4\nArray is sorted ascending; exactly one answer.",
+         hints=["Exploit the sorted order.", "Two pointers from both ends adjust based on the sum.", "Move left up if the sum is too small, right down if too big."],
+         opt=("O(n)", "O(1)", "Converging two pointers on a sorted array."),
+         editorial="With the array sorted, converge two pointers: if the pair sum is below target move left up, if above move right down.",
+         spec={"name": "solve", "params": [{"name": "nums", "type": "int[]"}, {"name": "target", "type": "int"}], "returns": "int[]"},
+         fn=lambda nums, target: _two_sum_sorted(nums, target),
+         cases=[("example", "Example", ([2, 7, 11, 15], 9)), ("example", "Ends", ([1, 2, 3, 6], 7)), ("hidden", "Adjacent", ([1, 4, 5], 9)), ("hidden", "Small", ([0, 3], 3))],
+         example_expl=["2+7 at indices 1,2.", "1+6 at indices 1,4."]),
+
+    # ---------------- MEDIUM ----------------
+    dict(slug="merge-sorted-arrays", title="Merge Two Sorted Arrays", difficulty="Medium", topics=["Arrays", "Two Pointers"], subtopics=["Two Pointers"], companies=["Amazon", "Microsoft"],
+         description="Merge two sorted arrays into one sorted array and return it.",
+         constraints="0 ≤ |a|, |b| ≤ 10^5",
+         hints=["Walk both arrays with two indices.", "Always take the smaller current head.", "Append the leftover tail."],
+         opt=("O(m+n)", "O(m+n)", "Two-pointer merge (the merge step of merge sort)."),
+         editorial="Advance two pointers, emitting the smaller front element each step, then append whichever array remains.",
+         spec={"name": "solve", "params": [{"name": "a", "type": "int[]"}, {"name": "b", "type": "int[]"}], "returns": "int[]"},
+         fn=lambda a, b: _merge_sorted(a, b),
+         cases=[("example", "Example", ([1, 3, 5], [2, 4, 6])), ("example", "One empty", ([], [1, 2])), ("hidden", "Overlap", ([1, 2, 3], [2, 3, 4])), ("hidden", "Both single", ([5], [1]))],
+         example_expl=["1,2,3,4,5,6.", "1,2."]),
+    dict(slug="kth-smallest", title="Kth Smallest Element", difficulty="Medium", topics=["Sorting", "Heap"], subtopics=["Sorting"], companies=["Amazon", "Bloomberg"],
+         description="Return the kth smallest element (1-indexed, k valid).",
+         constraints="1 ≤ k ≤ n ≤ 10^5",
+         hints=["Sorting is the simplest approach.", "A size-k max-heap works too.", "Quickselect gives average O(n)."],
+         opt=("O(n log n)", "O(1)", "Sort ascending and index (heap/quickselect improve it)."),
+         spec={"name": "solve", "params": [{"name": "nums", "type": "int[]"}, {"name": "k", "type": "int"}], "returns": "int"},
+         fn=lambda nums, k: sorted(nums)[k - 1],
+         cases=[("example", "Example", ([3, 2, 1, 5, 4], 2)), ("example", "Dupes", ([2, 2, 1, 3], 3)), ("hidden", "First", ([9], 1)), ("hidden", "Max", ([1, 2, 3], 3))],
+         example_expl=["2nd smallest is 2.", "3rd smallest is 2."]),
+    dict(slug="gcd-of-array", title="GCD of Array", difficulty="Medium", topics=["Math"], subtopics=["Number Theory"], companies=["Bloomberg"],
+         description="Return the greatest common divisor of all elements in a non-empty array.",
+         constraints="1 ≤ n ≤ 10^5\n1 ≤ a[i] ≤ 10^9",
+         hints=["gcd is associative: fold it across the array.", "Use the Euclidean algorithm for each pair.", "The running gcd only shrinks."],
+         opt=("O(n·log max)", "O(1)", "Fold pairwise gcd across the array."),
+         editorial="gcd(a,b,c,…) = gcd(gcd(a,b),c,…); accumulate a running gcd using the Euclidean algorithm.",
+         spec={"name": "solve", "params": [{"name": "nums", "type": "int[]"}], "returns": "int"},
+         fn=lambda nums: _gcd_array(nums),
+         cases=[("example", "Example", ([12, 18, 24],)), ("example", "Coprime", ([7, 5],)), ("hidden", "Single", ([9],)), ("hidden", "Multiples", ([4, 8, 16],))],
+         example_expl=["gcd is 6.", "Coprime → 1."]),
+    dict(slug="fast-power", title="Fast Power", difficulty="Medium", topics=["Math", "Recursion"], subtopics=["Recurrence"], companies=["Google", "Amazon"],
+         description="Compute base^exp for a non-negative exponent using fast exponentiation.",
+         constraints="0 ≤ exp ≤ 40\n-100 ≤ base ≤ 100 (result fits in 64 bits)",
+         hints=["Squaring halves the exponent each step.", "Multiply in the base only on odd bits.", "This is O(log exp), not O(exp)."],
+         opt=("O(log exp)", "O(1)", "Exponentiation by squaring."),
+         editorial="Binary exponentiation: while exp>0, if the low bit is set multiply the base into the result, then square the base and shift.",
+         spec={"name": "solve", "params": [{"name": "base", "type": "int"}, {"name": "exp", "type": "int"}], "returns": "long"},
+         fn=lambda base, exp: _fast_power(base, exp),
+         cases=[("example", "Example", (2, 10)), ("example", "Zero exp", (5, 0)), ("hidden", "Base one", (1, 40)), ("hidden", "Negative base", (-2, 3))],
+         example_expl=["2¹⁰ = 1024.", "Anything⁰ = 1."]),
+    dict(slug="unique-paths", title="Unique Paths", difficulty="Medium", topics=["Dynamic Programming"], subtopics=["2D DP"], companies=["Amazon", "Bloomberg"],
+         description="A robot moves only right or down on an m×n grid from the top-left to the bottom-right. Return how many distinct paths exist.",
+         constraints="1 ≤ m, n ≤ 100",
+         hints=["Paths to a cell = paths from above + paths from the left.", "The first row and column each have exactly one path.", "A single rolling row of size n suffices."],
+         opt=("O(m·n)", "O(n)", "Grid DP with a rolling row."),
+         editorial="dp[j] += dp[j-1] across m rows starting from all-ones — each cell sums the paths from above and from the left.",
+         spec={"name": "solve", "params": [{"name": "m", "type": "int"}, {"name": "n", "type": "int"}], "returns": "int"},
+         fn=lambda m, n: _unique_paths(m, n),
+         cases=[("example", "Example", (3, 7)), ("example", "Square", (3, 3)), ("hidden", "Row", (1, 5)), ("hidden", "Small", (2, 2))],
+         example_expl=["28 paths on a 3×7 grid.", "6 paths on a 3×3 grid."]),
+    dict(slug="longest-common-subsequence", title="Longest Common Subsequence", difficulty="Medium", topics=["Dynamic Programming", "Strings"], subtopics=["2D DP"], companies=["Amazon", "Google", "Adobe"],
+         description="Return the length of the longest subsequence common to both strings (characters in order, not necessarily contiguous).",
+         constraints="0 ≤ |a|, |b| ≤ 1000",
+         hints=["Compare prefixes of the two strings.", "If the last characters match, extend the diagonal; else take the better of dropping one.", "It's a classic 2-D DP table."],
+         opt=("O(m·n)", "O(m·n)", "2-D DP over prefixes of both strings."),
+         editorial="dp[i][j] = dp[i-1][j-1]+1 when a[i-1]==b[j-1], else max(dp[i-1][j], dp[i][j-1]).",
+         spec={"name": "solve", "params": [{"name": "a", "type": "string"}, {"name": "b", "type": "string"}], "returns": "int"},
+         fn=lambda a, b: _lcs(a, b),
+         cases=[("example", "Example", ("abcde", "ace")), ("example", "None", ("abc", "def")), ("hidden", "Equal", ("abc", "abc")), ("hidden", "Interleaved", ("abcbdab", "bdcab"))],
+         example_expl=["'ace' → 3.", "No common subsequence → 0."]),
+    dict(slug="top-k-frequent", title="Top K Frequent Elements", difficulty="Medium", topics=["Hashing", "Heap", "Sorting"], subtopics=["Counting"], companies=["Amazon", "Meta"],
+         description="Return the k most frequent values, ordered by frequency descending and, for ties, by value ascending.",
+         constraints="1 ≤ k ≤ number of distinct values",
+         hints=["Count occurrences with a hash map.", "Order by (−count, value) to make ties deterministic.", "A heap of size k avoids a full sort."],
+         opt=("O(n log n)", "O(n)", "Count, then order by frequency (heap or sort)."),
+         editorial="Tally counts, then sort the distinct values by descending count (ascending value on ties) and take the first k.",
+         spec={"name": "solve", "params": [{"name": "nums", "type": "int[]"}, {"name": "k", "type": "int"}], "returns": "int[]"},
+         fn=lambda nums, k: _top_k_frequent(nums, k),
+         cases=[("example", "Example", ([1, 1, 1, 2, 2, 3], 2)), ("example", "Tie", ([4, 4, 5, 5, 6], 2)), ("hidden", "All distinct", ([3, 1, 2], 2)), ("hidden", "Single", ([7, 7], 1))],
+         example_expl=["1 (×3), 2 (×2) → 1 2.", "Ties broken by value → 4 5."]),
+    dict(slug="count-bits", title="Counting Bits", difficulty="Medium", topics=["Bit Manipulation", "Dynamic Programming"], subtopics=["Bit Manipulation"], companies=["Amazon", "Apple"],
+         description="Return an array where out[i] is the number of set bits in i, for i from 0 to n.",
+         constraints="0 ≤ n ≤ 10^5",
+         hints=["popcount(i) = popcount(i>>1) + (i & 1).", "Or popcount(i) = popcount(i & (i-1)) + 1.", "Build the table bottom-up."],
+         opt=("O(n)", "O(n)", "DP: popcount(i) = popcount(i>>1) + (i&1)."),
+         editorial="Each number's bit count is its half's count plus its lowest bit: dp[i] = dp[i>>1] + (i&1).",
+         spec={"name": "solve", "params": [{"name": "n", "type": "int"}], "returns": "int[]"},
+         fn=lambda n: _count_bits(n),
+         cases=[("example", "To 5", (5,)), ("example", "To 2", (2,)), ("hidden", "Zero", (0,)), ("hidden", "To 8", (8,))],
+         example_expl=["0,1,1,2,1,2.", "0,1,1."]),
+
+    # ---------------- HARD ----------------
+    dict(slug="largest-rectangle-histogram", title="Largest Rectangle in Histogram", difficulty="Hard", topics=["Stack", "Arrays"], subtopics=["Monotonic Stack"], companies=["Amazon", "Google"],
+         description="Given bar heights of width 1, return the area of the largest rectangle that fits within the histogram.",
+         constraints="0 ≤ n ≤ 10^5\n0 ≤ height ≤ 10^9",
+         hints=["For each bar, how far left and right can it extend at its own height?", "A monotonic increasing stack finds the bounds in O(n).", "Pop when a shorter bar appears and settle the popped bar's rectangle."],
+         opt=("O(n)", "O(n)", "Monotonic stack of increasing bar indices."),
+         editorial="Keep a stack of increasing heights; when a shorter bar arrives, pop and compute each popped bar's maximal width (bounded by the new bar and the stack's previous index).",
+         spec={"name": "solve", "params": [{"name": "heights", "type": "int[]"}], "returns": "long"},
+         fn=lambda heights: _largest_rectangle(heights),
+         cases=[("example", "Example", ([2, 1, 5, 6, 2, 3],)), ("example", "Increasing", ([1, 2, 3, 4],)), ("hidden", "Flat", ([3, 3, 3],)), ("hidden", "Single", ([5],))],
+         example_expl=["5 and 6 form area 10.", "Bars 3,4 → 6."]),
+    dict(slug="sliding-window-maximum", title="Sliding Window Maximum", difficulty="Hard", topics=["Stack", "Arrays"], subtopics=["Monotonic Stack"], companies=["Amazon", "Google", "Meta"],
+         description="Return the maximum of every contiguous window of size k as it slides across the array.",
+         constraints="1 ≤ k ≤ n ≤ 10^5",
+         hints=["A monotonic decreasing deque of indices holds candidates.", "Drop indices that fall out of the window from the front.", "Drop smaller values from the back before adding a new one."],
+         opt=("O(n)", "O(k)", "Monotonic deque of indices."),
+         editorial="Maintain a deque of indices with decreasing values; the front is always the window max. Evict out-of-window indices and pop smaller tails.",
+         spec={"name": "solve", "params": [{"name": "nums", "type": "int[]"}, {"name": "k", "type": "int"}], "returns": "int[]"},
+         fn=lambda nums, k: _window_max(nums, k),
+         cases=[("example", "Example", ([1, 3, -1, -3, 5, 3, 6, 7], 3)), ("example", "k=1", ([4, 2, 12], 1)), ("hidden", "Whole", ([2, 1, 3], 3)), ("hidden", "Increasing", ([1, 2, 3, 4], 2))],
+         example_expl=["3,3,5,5,6,7.", "Each element is its own window."]),
+    dict(slug="jump-game-ii", title="Jump Game II (min jumps)", difficulty="Hard", topics=["Arrays", "Greedy"], subtopics=["Greedy"], companies=["Amazon", "Meta"],
+         description="Each value is the max jump length from that index. Return the fewest jumps to reach the last index (always reachable).",
+         constraints="1 ≤ n ≤ 10^4",
+         hints=["Think in levels: the range reachable with j jumps.", "Extend a 'current end' greedily to the farthest reachable.", "Bump the jump count when you cross the current end."],
+         opt=("O(n)", "O(1)", "Greedy BFS-by-levels over reachable ranges."),
+         editorial="Track the farthest reach and the current level's end; each time i hits the end, take a jump and extend the end to farthest.",
+         spec={"name": "solve", "params": [{"name": "nums", "type": "int[]"}], "returns": "int"},
+         fn=lambda nums: _jump_ii(nums),
+         cases=[("example", "Example", ([2, 3, 1, 1, 4],)), ("example", "Single", ([0],)), ("hidden", "Two", ([1, 1],)), ("hidden", "Big first", ([5, 1, 1, 1, 1],))],
+         example_expl=["2 jumps: index 0→1→4.", "Already at the end → 0."]),
+    dict(slug="longest-valid-parentheses", title="Longest Valid Parentheses", difficulty="Hard", topics=["Stack", "Strings", "Dynamic Programming"], subtopics=["Monotonic Stack"], companies=["Amazon", "Google"],
+         description="Return the length of the longest substring of well-formed parentheses.",
+         constraints="0 ≤ |s| ≤ 10^5\ns contains only '(' and ')'.",
+         hints=["A stack of indices marks unmatched positions.", "Seed the stack with -1 as a base.", "On ')', pop; the gap to the new stack top is a valid length."],
+         opt=("O(n)", "O(n)", "Index stack tracking the last unmatched boundary."),
+         editorial="Push indices of '('; on ')', pop and measure i minus the new top (the last unmatched boundary). Reset the boundary when the stack empties.",
+         spec={"name": "solve", "params": [{"name": "s", "type": "string"}], "returns": "int"},
+         fn=lambda s: _longest_valid_parens(s),
+         cases=[("example", "Example", ("(()",)), ("example", "Longer", (")()())",)), ("hidden", "Empty", ("",)), ("hidden", "All open", ("(((",))],
+         example_expl=["'()' → 2.", "'()()' → 4."]),
+    dict(slug="min-window-length", title="Minimum Window Substring (length)", difficulty="Hard", topics=["Sliding Window", "Strings", "Hashing"], subtopics=["Sliding Window"], companies=["Amazon", "Meta", "Google"],
+         description="Return the length of the shortest substring of s that contains every character of t (with multiplicity), or 0 if none.",
+         constraints="1 ≤ |s|, |t| ≤ 10^5",
+         hints=["Expand a window until it covers all of t.", "Then shrink from the left while it still covers t.", "Track counts of needed characters."],
+         opt=("O(|s|)", "O(|t|)", "Sliding window with a 'missing count'."),
+         editorial="Grow the right edge tracking how many required characters are still missing; when zero, shrink the left edge to find the minimal covering window.",
+         spec={"name": "solve", "params": [{"name": "s", "type": "string"}, {"name": "t", "type": "string"}], "returns": "int"},
+         fn=lambda s, t: _min_window_len(s, t),
+         cases=[("example", "Example", ("ADOBECODEBANC", "ABC")), ("example", "None", ("a", "aa")), ("hidden", "Whole", ("abc", "cba")), ("hidden", "Single", ("aa", "a"))],
+         example_expl=["'BANC' → 4.", "Impossible → 0."]),
+]
+
+
+# ---------------------------------------------------------------------------
+# Extend the concept catalog + prerequisites so EVERY problem is fully explained.
+# ---------------------------------------------------------------------------
+
+CONCEPTS.update({
+    "bit_manip": {
+        "name": "Bit Manipulation",
+        "what": "Operating on the individual binary bits of an integer with AND, OR, XOR, and shifts.",
+        "deep": "Bit tricks give O(1) tools that replace loops: `x & (x-1)` clears the lowest set bit, `x & -x` isolates it, XOR cancels equal values, and shifting multiplies or divides by powers of two. They shine in set membership (bitmasks), parity, and counting.",
+        "java": "Use &, |, ^, ~, <<, >>, and >>> (unsigned shift). Integer.bitCount(x) counts set bits; x & (x-1) drops the lowest one.",
+    },
+    "prefix_sum": {
+        "name": "Prefix Sums",
+        "what": "Precomputed running totals so any range sum is a single subtraction.",
+        "deep": "Build P[i] = a[0]+…+a[i-1]; then the sum of a[l..r] is P[r+1] − P[l] in O(1). Paired with a hash map of seen prefixes it counts subarrays with a target sum in one pass. The same idea extends to prefix XOR, products, and 2-D grids.",
+        "java": "A long[] prefix of length n+1, or a running long combined with a HashMap<Long,Integer> of prefix counts.",
+    },
+})
+CATEGORY.update({"bit_manip": "Foundations", "prefix_sum": "Arrays"})
+
+# Prerequisites for every function-harness problem: (concept_key, why-it-helps-here).
+PREREQS.update({
+    "two-sum-fn": [("complement", "For each x, look up target − x instead of scanning all pairs."), ("hashing", "A hash map makes that complement lookup O(1)."), ("iteration", "One left-to-right pass records indices as you go.")],
+    "max-subarray-fn": [("dp", "Carry the best sum ending at the current index."), ("iteration", "A single sweep updates the running and global best."), ("greedy", "Drop a negative running sum — it can never help a later subarray.")],
+    "reverse-array-fn": [("two_pointers", "Swap the ends and move inward."), ("iteration", "Or build the result from back to front in one pass.")],
+    "is-palindrome-fn": [("two_pointers", "Compare characters from both ends moving inward."), ("string_basics", "Index into the string and compare characters.")],
+    "is-even": [("modulo", "Even means the remainder mod 2 is zero."), ("conditionals", "Return a boolean from the comparison.")],
+    "absolute-value": [("conditionals", "Negatives flip sign; others stay."), ("arithmetic", "Negate when below zero.")],
+    "max-of-three": [("conditionals", "Chain comparisons to find the largest."), ("variables", "Hold the running best in a variable.")],
+    "square-number": [("arithmetic", "Multiply the number by itself."), ("overflow", "Use a 64-bit type so large squares don't wrap.")],
+    "sum-of-digits": [("math_digits", "Peel digits with % 10 and // 10."), ("modulo", "The remainder mod 10 is the last digit.")],
+    "factorial": [("loops_basic", "Multiply a running product from 1 to n."), ("overflow", "Factorials grow fast — use a 64-bit accumulator.")],
+    "count-evens": [("iteration", "Scan once, testing each element."), ("modulo", "Even is remainder-zero mod 2.")],
+    "array-minimum": [("iteration", "Track a running minimum across one pass.")],
+    "array-maximum": [("iteration", "Track a running maximum across one pass.")],
+    "contains-duplicate": [("hashing", "A set answers 'seen before?' in O(1)."), ("visited_set", "Insert values and detect a repeat.")],
+    "single-number": [("bit_manip", "XOR cancels equal pairs, leaving the loner."), ("iteration", "Fold the whole array with XOR.")],
+    "majority-element": [("hashing", "Counts of each value reveal the majority (or use voting)."), ("iteration", "Boyer-Moore keeps one candidate in a single pass.")],
+    "is-prime": [("number_theory", "A prime has no divisor up to its square root."), ("loops_basic", "Trial-divide from 2 to √n.")],
+    "count-primes": [("number_theory", "Cross out multiples with a sieve."), ("iteration", "Sweep and mark composites.")],
+    "valid-anagram": [("hashing", "Compare character frequency maps."), ("canonical", "Sorting both strings is a canonical form."), ("sorting", "Equal anagrams sort to identical strings.")],
+    "first-unique-char": [("hashing", "Count characters first."), ("iteration", "Then scan for the first count of one.")],
+    "move-zeroes": [("two_pointers", "A write pointer packs the non-zeros."), ("iteration", "Fill the remaining slots with zeroes.")],
+    "running-sum": [("prefix_sum", "Each output is the prefix total so far."), ("iteration", "Accumulate as you scan.")],
+    "max-consecutive-ones": [("iteration", "Track current and best run lengths."), ("variables", "Reset the current run on a zero.")],
+    "second-largest": [("iteration", "Track the top two distinct values."), ("sorting", "Or sort the distinct values and take the runner-up.")],
+    "count-occurrences": [("iteration", "Scan once and count matches.")],
+    "number-of-1-bits": [("bit_manip", "Check the low bit and shift, or use x & (x-1)."), ("loops_basic", "Loop over the bits.")],
+    "product-except-self": [("prefix_sum", "Prefix products left, suffix products right (multiplicative)."), ("iteration", "Two passes combine into the answer.")],
+    "best-time-buy-sell": [("greedy", "Best profit is price minus the lowest price seen."), ("iteration", "Track the running minimum in one pass."), ("dp", "It's a one-state DP over 'min so far'.")],
+    "container-most-water": [("two_pointers", "The shorter wall limits the area — move it inward."), ("greedy", "Advancing the taller wall can never increase the area.")],
+    "house-robber": [("dp", "Choose to rob or skip each house."), ("recurrence", "best[i] = max(best[i-1], best[i-2] + nums[i]).")],
+    "jump-game": [("greedy", "Track the furthest index you can reach."), ("iteration", "If your position outruns the reach, you're stuck.")],
+    "coin-change": [("dp", "Build the fewest coins for every amount up to the target."), ("recurrence", "dp[a] = 1 + min(dp[a - coin]).")],
+    "coin-change-ways": [("dp", "Count combinations for each amount."), ("recurrence", "Iterate coins outermost so order doesn't create duplicates.")],
+    "longest-common-prefix": [("string_basics", "Compare characters position by position."), ("iteration", "Shrink a candidate prefix across all words.")],
+    "search-insert-position": [("binary_search", "Lower-bound search finds the slot in O(log n)."), ("big_o", "Halving the range beats a linear scan.")],
+    "integer-sqrt": [("binary_search", "Search the largest m with m·m ≤ x."), ("overflow", "Squaring m can overflow — use a wide type or compare carefully.")],
+    "min-cost-climbing-stairs": [("dp", "Cheapest way to reach each step."), ("recurrence", "dp[i] = cost[i] + min(dp[i-1], dp[i-2]).")],
+    "daily-temperatures": [("stack", "A monotonic stack of indices awaits a warmer day."), ("iteration", "Pop and record the day gap when a warmer day arrives.")],
+    "next-greater-element": [("stack", "Pending indices wait on a decreasing stack."), ("iteration", "Resolve them when a larger value appears.")],
+    "subarray-sum-k": [("prefix_sum", "A range sum of k means two prefixes differ by k."), ("hashing", "Count prefix sums in a map."), ("complement", "For prefix s, add the count of earlier prefixes equal to s − k.")],
+    "longest-consecutive": [("hashing", "A set gives O(1) membership for neighbours."), ("visited_set", "Only start counting at sequence starts.")],
+    "kth-largest-element": [("sorting", "Sort descending and index."), ("heap", "A size-k min-heap avoids a full sort.")],
+    "rotate-array-right": [("inplace_reverse", "Three reversals rotate in O(1) space."), ("iteration", "Reduce k modulo n first.")],
+    "word-break": [("dp", "Can the prefix of length i be segmented?"), ("hashing", "A set makes dictionary lookups O(1)."), ("string_basics", "Test substrings against the dictionary.")],
+    "decode-ways": [("dp", "Ways to decode each prefix."), ("recurrence", "Add one- and two-digit extensions."), ("string_basics", "Read one or two characters at a time.")],
+    "longest-palindrome-length": [("two_pointers", "Expand outward from each center."), ("string_basics", "Match characters around a center.")],
+    "maximum-product-subarray": [("dp", "Carry both max and min products — a negative flips them."), ("iteration", "Update the answer each step.")],
+    "partition-equal-subset-sum": [("dp", "Reduce to a subset summing to total/2."), ("recurrence", "0/1 knapsack over reachable subset sums.")],
+    # --- second expansion batch ---
+    "min-of-two": [("conditionals", "Return whichever value is not larger.")],
+    "cube-number": [("arithmetic", "Multiply the number by itself twice."), ("overflow", "Use a 64-bit return type.")],
+    "is-multiple": [("modulo", "A multiple leaves remainder zero."), ("number_theory", "Divisibility is a remainder test.")],
+    "count-digits": [("math_digits", "Divide by 10 repeatedly, counting steps."), ("loops_basic", "Loop until the number reaches zero.")],
+    "reverse-integer": [("math_digits", "Peel the last digit with % 10 and push it onto an accumulator."), ("overflow", "Guard against exceeding the 32-bit range.")],
+    "power-of-two": [("bit_manip", "Powers of two have a single set bit: n & (n-1) == 0."), ("conditionals", "Reject non-positive numbers.")],
+    "missing-number": [("prefix_sum", "The full range sum minus the actual sum is the gap."), ("bit_manip", "XOR of indices and values also isolates it."), ("iteration", "One pass sums the array.")],
+    "count-negatives": [("iteration", "Scan once, counting values below zero.")],
+    "is-sorted": [("iteration", "Check every adjacent pair in one pass."), ("boolean_logic", "One violation makes the whole answer false.")],
+    "fizzbuzz-value": [("modulo", "Divisibility drives the branch."), ("conditionals", "Test 15 before 3 and 5.")],
+    "two-sum-sorted": [("two_pointers", "Converge from both ends of the sorted array."), ("iteration", "Adjust a pointer based on whether the sum is too big or small.")],
+    "merge-sorted-arrays": [("two_pointers", "Advance the pointer with the smaller head."), ("sorting", "This is the merge step of merge sort.")],
+    "kth-smallest": [("sorting", "Sort ascending and index."), ("heap", "A size-k max-heap works in O(n log k).")],
+    "gcd-of-array": [("number_theory", "gcd is associative — fold it pairwise."), ("recursion", "The Euclidean algorithm reduces each pair.")],
+    "fast-power": [("recursion", "Squaring halves the exponent each step."), ("bit_manip", "Multiply in the base only on set bits of the exponent."), ("overflow", "Results grow quickly — use a wide type.")],
+    "unique-paths": [("dp", "Paths to a cell sum the paths from above and left."), ("dp2d", "A grid DP, reducible to one rolling row.")],
+    "longest-common-subsequence": [("dp2d", "A 2-D table over prefixes of both strings."), ("recurrence", "Match extends the diagonal; mismatch takes the better neighbour.")],
+    "top-k-frequent": [("hashing", "Tally counts with a map."), ("heap", "A size-k heap surfaces the most frequent."), ("sorting", "Order by (−count, value) for deterministic ties.")],
+    "count-bits": [("bit_manip", "dp[i] = dp[i>>1] + (i & 1)."), ("dp", "Reuse the already-computed count of i/2.")],
+    "largest-rectangle-histogram": [("stack", "A monotonic increasing stack finds each bar's span."), ("iteration", "Settle rectangles as shorter bars arrive.")],
+    "sliding-window-maximum": [("stack", "A monotonic deque keeps window candidates."), ("sliding_window", "The window slides one step at a time, evicting stale indices.")],
+    "jump-game-ii": [("greedy", "Extend the reachable range level by level."), ("bfs", "Each jump is a BFS level over indices.")],
+    "longest-valid-parentheses": [("stack", "Indices of unmatched positions bound valid runs."), ("dp", "Or a DP over ends of valid substrings.")],
+    "min-window-length": [("sliding_window", "Grow to cover t, then shrink to minimise."), ("hashing", "Track required character counts."), ("two_pointers", "Left and right edges define the window.")],
+})
+
+
 # ---------------------------------------------------------------------------
 # Build JSON
 # ---------------------------------------------------------------------------
@@ -3677,7 +4195,7 @@ for d in HARNESS_DEFS:
     out.append({
         "slug": d["slug"], "title": d["title"], "difficulty": d["difficulty"],
         "description": d["description"], "constraints": d.get("constraints", ""),
-        "examples": examples, "editorial": d.get("editorial", ""),
+        "examples": examples, "editorial": d.get("editorial") or opt_expl,
         "optimal_time": opt_time, "optimal_space": opt_space, "optimal_explanation": opt_expl,
         "starter_code": {
             "python": d.get("starter_py") or stub_py(spec),
@@ -3691,6 +4209,13 @@ for d in HARNESS_DEFS:
         "function_spec": spec, "judge_mode": d.get("judge_mode", "exact"),
         "float_tolerance": d.get("float_tolerance", 0),
     })
+
+# Assign a curated easiest→hardest global rank (used by the library's default sort):
+# primary axis is the difficulty tier, then the authoring order within the tier.
+_DIFF_RANK = {"Intro": 0, "Easy": 1, "Medium": 2, "Hard": 3}
+_ranked = sorted(range(len(out)), key=lambda i: (_DIFF_RANK.get(out[i]["difficulty"], 9), i))
+for _rank, _idx in enumerate(_ranked):
+    out[_idx]["order"] = _rank
 
 os.makedirs(os.path.dirname(OUT), exist_ok=True)
 with open(OUT, "w", encoding="utf-8") as f:

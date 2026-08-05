@@ -29,6 +29,7 @@ function p(over: Partial<Problem>): Problem {
     time_limit_ms: 0,
     editorials: [],
     follow_ups: [],
+    order: 0,
     is_favorite: false,
     solved_status: "unsolved",
     confidence: 0,

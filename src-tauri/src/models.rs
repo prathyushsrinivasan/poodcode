@@ -72,6 +72,9 @@ pub struct Problem {
     pub editorials: Vec<Editorial>,
     #[serde(default)]
     pub follow_ups: Vec<FollowUp>,
+    /// Curated global rank for easiest→hardest ordering in the library.
+    #[serde(default)]
+    pub order: i64,
     // Progress / metadata
     #[serde(default)]
     pub is_favorite: bool,

@@ -70,7 +70,8 @@
     ],
     "editorials": [],
     "follow_ups": [],
-    "judge_mode": "exact"
+    "judge_mode": "exact",
+    "order": 0
   },
   {
     "slug": "echo-line",
@@ -150,7 +151,8 @@
     ],
     "editorials": [],
     "follow_ups": [],
-    "judge_mode": "exact"
+    "judge_mode": "exact",
+    "order": 1
   },
   {
     "slug": "add-two-numbers",
@@ -257,7 +259,8 @@
     ],
     "editorials": [],
     "follow_ups": [],
-    "judge_mode": "exact"
+    "judge_mode": "exact",
+    "order": 2
   },
   {
     "slug": "rectangle-area",
@@ -352,7 +355,8 @@
     ],
     "editorials": [],
     "follow_ups": [],
-    "judge_mode": "exact"
+    "judge_mode": "exact",
+    "order": 3
   },
   {
     "slug": "even-or-odd",
@@ -459,7 +463,8 @@
     ],
     "editorials": [],
     "follow_ups": [],
-    "judge_mode": "exact"
+    "judge_mode": "exact",
+    "order": 4
   },
   {
     "slug": "larger-of-two",
@@ -554,7 +559,8 @@
     ],
     "editorials": [],
     "follow_ups": [],
-    "judge_mode": "exact"
+    "judge_mode": "exact",
+    "order": 5
   },
   {
     "slug": "sum-to-n",
@@ -661,7 +667,8 @@
     ],
     "editorials": [],
     "follow_ups": [],
-    "judge_mode": "exact"
+    "judge_mode": "exact",
+    "order": 6
   },
   {
     "slug": "countdown",
@@ -761,7 +768,8 @@
     ],
     "editorials": [],
     "follow_ups": [],
-    "judge_mode": "exact"
+    "judge_mode": "exact",
+    "order": 7
   },
   {
     "slug": "array-sum",
@@ -872,7 +880,8 @@
     ],
     "editorials": [],
     "follow_ups": [],
-    "judge_mode": "exact"
+    "judge_mode": "exact",
+    "order": 21
   },
   {
     "slug": "reverse-string",
@@ -985,7 +994,8 @@
     ],
     "editorials": [],
     "follow_ups": [],
-    "judge_mode": "exact"
+    "judge_mode": "exact",
+    "order": 22
   },
   {
     "slug": "count-vowels",
@@ -1098,7 +1108,8 @@
     ],
     "editorials": [],
     "follow_ups": [],
-    "judge_mode": "exact"
+    "judge_mode": "exact",
+    "order": 23
   },
   {
     "slug": "gcd",
@@ -1209,7 +1220,8 @@
     ],
     "editorials": [],
     "follow_ups": [],
-    "judge_mode": "exact"
+    "judge_mode": "exact",
+    "order": 24
   },
   {
     "slug": "palindrome-number",
@@ -1320,7 +1332,8 @@
     ],
     "editorials": [],
     "follow_ups": [],
-    "judge_mode": "exact"
+    "judge_mode": "exact",
+    "order": 25
   },
   {
     "slug": "nth-fibonacci",
@@ -1433,7 +1446,8 @@
     ],
     "editorials": [],
     "follow_ups": [],
-    "judge_mode": "exact"
+    "judge_mode": "exact",
+    "order": 26
   },
   {
     "slug": "two-sum-exists",
@@ -1548,7 +1562,8 @@
     ],
     "editorials": [],
     "follow_ups": [],
-    "judge_mode": "exact"
+    "judge_mode": "exact",
+    "order": 27
   },
   {
     "slug": "two-sum-indices",
@@ -1683,7 +1698,8 @@
         "note": "Same idea, boolean answer."
       }
     ],
-    "judge_mode": "exact"
+    "judge_mode": "exact",
+    "order": 51
   },
   {
     "slug": "longest-unique-substring",
@@ -1807,7 +1823,8 @@
       }
     ],
     "follow_ups": [],
-    "judge_mode": "exact"
+    "judge_mode": "exact",
+    "order": 52
   },
   {
     "slug": "valid-parentheses",
@@ -1922,7 +1939,8 @@
     ],
     "editorials": [],
     "follow_ups": [],
-    "judge_mode": "exact"
+    "judge_mode": "exact",
+    "order": 53
   },
   {
     "slug": "binary-search-first",
@@ -2043,7 +2061,8 @@
         "note": "Binary search on the answer (patience sorting)."
       }
     ],
-    "judge_mode": "exact"
+    "judge_mode": "exact",
+    "order": 54
   },
   {
     "slug": "maximum-subarray",
@@ -2178,7 +2197,8 @@
         "note": "Another 1-D DP recurrence."
       }
     ],
-    "judge_mode": "exact"
+    "judge_mode": "exact",
+    "order": 55
   },
   {
     "slug": "climbing-stairs",
@@ -2293,7 +2313,8 @@
     ],
     "editorials": [],
     "follow_ups": [],
-    "judge_mode": "exact"
+    "judge_mode": "exact",
+    "order": 56
   },
   {
     "slug": "rotate-array",
@@ -2405,7 +2426,8 @@
     ],
     "editorials": [],
     "follow_ups": [],
-    "judge_mode": "exact"
+    "judge_mode": "exact",
+    "order": 57
   },
   {
     "slug": "number-of-islands",
@@ -2530,7 +2552,8 @@
     ],
     "editorials": [],
     "follow_ups": [],
-    "judge_mode": "exact"
+    "judge_mode": "exact",
+    "order": 58
   },
   {
     "slug": "group-anagrams-count",
@@ -2646,7 +2669,8 @@
     ],
     "editorials": [],
     "follow_ups": [],
-    "judge_mode": "exact"
+    "judge_mode": "exact",
+    "order": 59
   },
   {
     "slug": "course-schedule",
@@ -2770,7 +2794,8 @@
     ],
     "editorials": [],
     "follow_ups": [],
-    "judge_mode": "exact"
+    "judge_mode": "exact",
+    "order": 60
   },
   {
     "slug": "longest-increasing-subsequence",
@@ -2887,7 +2912,8 @@
     ],
     "editorials": [],
     "follow_ups": [],
-    "judge_mode": "exact"
+    "judge_mode": "exact",
+    "order": 87
   },
   {
     "slug": "edit-distance",
@@ -3003,7 +3029,8 @@
     ],
     "editorials": [],
     "follow_ups": [],
-    "judge_mode": "exact"
+    "judge_mode": "exact",
+    "order": 88
   },
   {
     "slug": "trapping-rain-water",
@@ -3120,7 +3147,8 @@
     ],
     "editorials": [],
     "follow_ups": [],
-    "judge_mode": "exact"
+    "judge_mode": "exact",
+    "order": 89
   },
   {
     "slug": "dijkstra-shortest-path",
@@ -3245,7 +3273,8 @@
     ],
     "editorials": [],
     "follow_ups": [],
-    "judge_mode": "exact"
+    "judge_mode": "exact",
+    "order": 90
   },
   {
     "slug": "two-sum-fn",
@@ -3293,7 +3322,32 @@
       "Store value → index as you scan.",
       "Return the stored index and the current index (1-based)."
     ],
-    "prerequisites": [],
+    "prerequisites": [
+      {
+        "key": "complement",
+        "name": "Complement Thinking",
+        "what": "Instead of testing all pairs, ask what single value would complete the current one, and look it up.",
+        "deep": "Reframes 'find two things that combine to T' as 'for each x, does T - x already exist?'. Paired with a hash structure this removes an entire nested loop, and the idea generalizes to differences, XORs, and remainders.",
+        "java": "Keep a HashSet<Integer> or HashMap<Integer,Integer> of seen values and query target - x before inserting x.",
+        "how": "For each x, look up target − x instead of scanning all pairs."
+      },
+      {
+        "key": "hashing",
+        "name": "Hash Maps & Sets",
+        "what": "Structures giving average O(1) insertion and lookup, trading memory for speed.",
+        "deep": "A hash table answers 'have I seen X?' or 'what maps to X?' in expected constant time, converting many O(n^2) pair scans into O(n) single passes. Worst case is O(n) per op under adversarial hashing, but that is rare in practice.",
+        "java": "HashMap<K,V> and HashSet<E>. Use getOrDefault(k, 0) and merge(k, 1, Integer::sum) for counting, containsKey/add for membership. For dense int keys, an int[] beats a HashMap.",
+        "how": "A hash map makes that complement lookup O(1)."
+      },
+      {
+        "key": "iteration",
+        "name": "Array Iteration",
+        "what": "Walking through elements one at a time while maintaining running state such as a sum, max, or counter.",
+        "deep": "The workhorse of array problems: one for-loop that updates accumulators as it goes. Most linear-time solutions are just one well-chosen pass, so the real skill is deciding what state to carry so a single sweep suffices.",
+        "java": "Use for (int i = 0; i < n; i++) or for (int x : nums). Prefer a primitive int[] over Integer[] to avoid autoboxing overhead.",
+        "how": "One left-to-right pass records indices as you go."
+      }
+    ],
     "test_cases": [
       {
         "kind": "example",
@@ -3348,7 +3402,8 @@
       "returns": "int[]"
     },
     "judge_mode": "exact",
-    "float_tolerance": 0
+    "float_tolerance": 0,
+    "order": 28
   },
   {
     "slug": "max-subarray-fn",
@@ -3396,7 +3451,32 @@
       "cur = max(x, cur + x).",
       "Keep a separate running maximum."
     ],
-    "prerequisites": [],
+    "prerequisites": [
+      {
+        "key": "dp",
+        "name": "Dynamic Programming",
+        "what": "Breaking a problem into overlapping subproblems and reusing their answers.",
+        "deep": "Applies when there is optimal substructure and overlapping subproblems. Two styles exist: top-down memoized recursion and bottom-up tabulation. Defining the state and transition precisely is the whole game, and space can often be rolled down a dimension.",
+        "java": "A memo HashMap or an int[]/int[][] table. For memoization initialize a sentinel with Arrays.fill(dp, -1).",
+        "how": "Carry the best sum ending at the current index."
+      },
+      {
+        "key": "iteration",
+        "name": "Array Iteration",
+        "what": "Walking through elements one at a time while maintaining running state such as a sum, max, or counter.",
+        "deep": "The workhorse of array problems: one for-loop that updates accumulators as it goes. Most linear-time solutions are just one well-chosen pass, so the real skill is deciding what state to carry so a single sweep suffices.",
+        "java": "Use for (int i = 0; i < n; i++) or for (int x : nums). Prefer a primitive int[] over Integer[] to avoid autoboxing overhead.",
+        "how": "A single sweep updates the running and global best."
+      },
+      {
+        "key": "greedy",
+        "name": "Greedy Choice",
+        "what": "Taking the locally-best option at each step when that provably reaches a global optimum.",
+        "deep": "Greedy is fast and simple but correct only when the problem has the greedy-choice property and optimal substructure; otherwise DP is the fallback. Proving correctness (often an exchange argument) matters more than the code.",
+        "java": "Often just Arrays.sort plus a linear scan, or a PriorityQueue to always grab the current best.",
+        "how": "Drop a negative running sum — it can never help a later subarray."
+      }
+    ],
     "test_cases": [
       {
         "kind": "example",
@@ -3447,7 +3527,8 @@
       "returns": "int"
     },
     "judge_mode": "exact",
-    "float_tolerance": 0
+    "float_tolerance": 0,
+    "order": 61
   },
   {
     "slug": "reverse-array-fn",
@@ -3493,7 +3574,24 @@
       "Two pointers work in place.",
       "Return the reversed list."
     ],
-    "prerequisites": [],
+    "prerequisites": [
+      {
+        "key": "two_pointers",
+        "name": "Two Pointers",
+        "what": "Two indices moving through a sequence (from both ends, or at different speeds) to replace a nested loop.",
+        "deep": "By advancing pointers based on a comparison you explore O(n) states instead of O(n^2). Common shapes are opposite ends converging (sorted pair sums, palindromes, rain water) and fast/slow (cycle detection). Correctness hinges on why the pointer you move cannot skip a better answer.",
+        "java": "Two int indices lo/hi (or i/j) in a while (lo < hi) loop; no special class needed.",
+        "how": "Swap the ends and move inward."
+      },
+      {
+        "key": "iteration",
+        "name": "Array Iteration",
+        "what": "Walking through elements one at a time while maintaining running state such as a sum, max, or counter.",
+        "deep": "The workhorse of array problems: one for-loop that updates accumulators as it goes. Most linear-time solutions are just one well-chosen pass, so the real skill is deciding what state to carry so a single sweep suffices.",
+        "java": "Use for (int i = 0; i < n; i++) or for (int x : nums). Prefer a primitive int[] over Integer[] to avoid autoboxing overhead.",
+        "how": "Or build the result from back to front in one pass."
+      }
+    ],
     "test_cases": [
       {
         "kind": "example",
@@ -3544,7 +3642,8 @@
       "returns": "int[]"
     },
     "judge_mode": "exact",
-    "float_tolerance": 0
+    "float_tolerance": 0,
+    "order": 29
   },
   {
     "slug": "is-palindrome-fn",
@@ -3590,7 +3689,24 @@
       "Any mismatch means false.",
       "s == s reversed also works."
     ],
-    "prerequisites": [],
+    "prerequisites": [
+      {
+        "key": "two_pointers",
+        "name": "Two Pointers",
+        "what": "Two indices moving through a sequence (from both ends, or at different speeds) to replace a nested loop.",
+        "deep": "By advancing pointers based on a comparison you explore O(n) states instead of O(n^2). Common shapes are opposite ends converging (sorted pair sums, palindromes, rain water) and fast/slow (cycle detection). Correctness hinges on why the pointer you move cannot skip a better answer.",
+        "java": "Two int indices lo/hi (or i/j) in a while (lo < hi) loop; no special class needed.",
+        "how": "Compare characters from both ends moving inward."
+      },
+      {
+        "key": "string_basics",
+        "name": "String Traversal",
+        "what": "Treating a string as an indexable sequence of characters to count and compare.",
+        "deep": "Most string problems reduce to a single pass with charAt or a char[]. Remember Java strings are immutable, so build output with StringBuilder, and character math relies on ASCII codes.",
+        "java": "s.charAt(i), s.length(), s.toCharArray(); build results with StringBuilder, never += inside a loop.",
+        "how": "Index into the string and compare characters."
+      }
+    ],
     "test_cases": [
       {
         "kind": "example",
@@ -3641,7 +3757,8 @@
       "returns": "bool"
     },
     "judge_mode": "exact",
-    "float_tolerance": 0
+    "float_tolerance": 0,
+    "order": 30
   },
   {
     "slug": "is-even",
@@ -3684,7 +3801,24 @@
       "Use the modulo operator `%`.",
       "`n % 2 == 0`."
     ],
-    "prerequisites": [],
+    "prerequisites": [
+      {
+        "key": "modulo",
+        "name": "Modular Reduction",
+        "what": "Using n % k to wrap indices around and drop redundant whole cycles.",
+        "deep": "Modulo collapses equivalent states: rotating by k equals rotating by k % n, and hashing or bucketing uses remainders. In Java, beware that % can return a negative result for negative operands.",
+        "java": "Use k % n after guarding n > 0; for possibly-negative values use Math.floorMod(x, n).",
+        "how": "Even means the remainder mod 2 is zero."
+      },
+      {
+        "key": "conditionals",
+        "name": "Conditionals (if / else)",
+        "what": "Choosing what to do based on whether a condition is true.",
+        "deep": "if/else branches let your program react to data. The condition is a boolean expression built from comparisons (==, !=, <, >) and logic (&&, ||, !). Chain several with else if when there are more than two outcomes.",
+        "java": "if (n % 2 == 0) { ... } else { ... }. Compare ints with ==, but compare Strings with .equals(), never ==.",
+        "how": "Return a boolean from the comparison."
+      }
+    ],
     "test_cases": [
       {
         "kind": "example",
@@ -3735,7 +3869,8 @@
       "returns": "bool"
     },
     "judge_mode": "exact",
-    "float_tolerance": 0
+    "float_tolerance": 0,
+    "order": 8
   },
   {
     "slug": "absolute-value",
@@ -3755,7 +3890,7 @@
         "explanation": "|9| = 9."
       }
     ],
-    "editorial": "",
+    "editorial": "One comparison.",
     "optimal_time": "O(1)",
     "optimal_space": "O(1)",
     "optimal_explanation": "One comparison.",
@@ -3778,7 +3913,24 @@
       "Negatives flip sign; non-negatives stay.",
       "If n < 0 return -n."
     ],
-    "prerequisites": [],
+    "prerequisites": [
+      {
+        "key": "conditionals",
+        "name": "Conditionals (if / else)",
+        "what": "Choosing what to do based on whether a condition is true.",
+        "deep": "if/else branches let your program react to data. The condition is a boolean expression built from comparisons (==, !=, <, >) and logic (&&, ||, !). Chain several with else if when there are more than two outcomes.",
+        "java": "if (n % 2 == 0) { ... } else { ... }. Compare ints with ==, but compare Strings with .equals(), never ==.",
+        "how": "Negatives flip sign; others stay."
+      },
+      {
+        "key": "arithmetic",
+        "name": "Arithmetic & Operators",
+        "what": "Doing math with +, -, *, / and the remainder operator %.",
+        "deep": "Operators combine values. The Java gotchas: integer division truncates (7 / 2 is 3, not 3.5), % gives the remainder (great for even/odd and wrapping), and mixing an int with a double promotes the result to double.",
+        "java": "Use +, -, *, /, %. Note 7 / 2 == 3 (int) but 7.0 / 2 == 3.5 (double). Math.max, Math.min, Math.abs help too.",
+        "how": "Negate when below zero."
+      }
+    ],
     "test_cases": [
       {
         "kind": "example",
@@ -3822,7 +3974,8 @@
       "returns": "int"
     },
     "judge_mode": "exact",
-    "float_tolerance": 0
+    "float_tolerance": 0,
+    "order": 9
   },
   {
     "slug": "max-of-three",
@@ -3842,7 +3995,7 @@
         "explanation": "-1 is the largest."
       }
     ],
-    "editorial": "",
+    "editorial": "Constant comparisons.",
     "optimal_time": "O(1)",
     "optimal_space": "O(1)",
     "optimal_explanation": "Constant comparisons.",
@@ -3864,7 +4017,24 @@
       "Compare pairwise.",
       "max(a, max(b, c))."
     ],
-    "prerequisites": [],
+    "prerequisites": [
+      {
+        "key": "conditionals",
+        "name": "Conditionals (if / else)",
+        "what": "Choosing what to do based on whether a condition is true.",
+        "deep": "if/else branches let your program react to data. The condition is a boolean expression built from comparisons (==, !=, <, >) and logic (&&, ||, !). Chain several with else if when there are more than two outcomes.",
+        "java": "if (n % 2 == 0) { ... } else { ... }. Compare ints with ==, but compare Strings with .equals(), never ==.",
+        "how": "Chain comparisons to find the largest."
+      },
+      {
+        "key": "variables",
+        "name": "Variables & Types",
+        "what": "Named boxes that hold values of a specific type such as int, long, double, boolean, or String.",
+        "deep": "A variable stores a value you can read and update. Java is statically typed, so you declare the type up front and it never changes. Picking the right type (int vs long, int vs double) prevents overflow and rounding surprises down the line.",
+        "java": "Declare with a type: int n = 5; long big = 10000000000L; double d = 3.14; boolean ok = true; String s = ... .",
+        "how": "Hold the running best in a variable."
+      }
+    ],
     "test_cases": [
       {
         "kind": "example",
@@ -3916,7 +4086,8 @@
       "returns": "int"
     },
     "judge_mode": "exact",
-    "float_tolerance": 0
+    "float_tolerance": 0,
+    "order": 10
   },
   {
     "slug": "square-number",
@@ -3936,7 +4107,7 @@
         "explanation": "(-4)² = 16."
       }
     ],
-    "editorial": "",
+    "editorial": "One multiplication.",
     "optimal_time": "O(1)",
     "optimal_space": "O(1)",
     "optimal_explanation": "One multiplication.",
@@ -3958,7 +4129,24 @@
     "hints": [
       "Multiply the number by itself."
     ],
-    "prerequisites": [],
+    "prerequisites": [
+      {
+        "key": "arithmetic",
+        "name": "Arithmetic & Operators",
+        "what": "Doing math with +, -, *, / and the remainder operator %.",
+        "deep": "Operators combine values. The Java gotchas: integer division truncates (7 / 2 is 3, not 3.5), % gives the remainder (great for even/odd and wrapping), and mixing an int with a double promotes the result to double.",
+        "java": "Use +, -, *, /, %. Note 7 / 2 == 3 (int) but 7.0 / 2 == 3.5 (double). Math.max, Math.min, Math.abs help too.",
+        "how": "Multiply the number by itself."
+      },
+      {
+        "key": "overflow",
+        "name": "Integer Overflow (int vs long)",
+        "what": "Guarding against results that exceed a 32-bit int's range of about 2.1x10^9.",
+        "deep": "Sums, products, and reversed numbers can silently wrap a 32-bit int, giving a wrong answer with no error. The fix is a wide enough type or a modulo reduction, so estimate the maximum magnitude before choosing the type.",
+        "java": "int overflows past ~2.1e9; long reaches ~9.2e18. Cast early with (long) a * b and accumulate sums into a long.",
+        "how": "Use a 64-bit type so large squares don't wrap."
+      }
+    ],
     "test_cases": [
       {
         "kind": "example",
@@ -4002,7 +4190,8 @@
       "returns": "long"
     },
     "judge_mode": "exact",
-    "float_tolerance": 0
+    "float_tolerance": 0,
+    "order": 11
   },
   {
     "slug": "sum-of-digits",
@@ -4022,7 +4211,7 @@
         "explanation": "Single digit sums to itself."
       }
     ],
-    "editorial": "",
+    "editorial": "One pass over the digits.",
     "optimal_time": "O(log n)",
     "optimal_space": "O(1)",
     "optimal_explanation": "One pass over the digits.",
@@ -4044,7 +4233,24 @@
       "Peel digits with % 10 and // 10.",
       "Or iterate the string form."
     ],
-    "prerequisites": [],
+    "prerequisites": [
+      {
+        "key": "math_digits",
+        "name": "Digit Manipulation",
+        "what": "Working with a number's decimal digits or its string form while handling signs and edge cases.",
+        "deep": "Digit problems peel digits with % 10 and / 10, or operate on the string form. Classic gotchas are negative numbers, trailing zeros, and overflow when reversing, so the first choice is arithmetic vs string handling.",
+        "java": "n % 10 and n / 10 to extract digits, or Long.toString(n); use long to avoid overflow on reversal.",
+        "how": "Peel digits with % 10 and // 10."
+      },
+      {
+        "key": "modulo",
+        "name": "Modular Reduction",
+        "what": "Using n % k to wrap indices around and drop redundant whole cycles.",
+        "deep": "Modulo collapses equivalent states: rotating by k equals rotating by k % n, and hashing or bucketing uses remainders. In Java, beware that % can return a negative result for negative operands.",
+        "java": "Use k % n after guarding n > 0; for possibly-negative values use Math.floorMod(x, n).",
+        "how": "The remainder mod 10 is the last digit."
+      }
+    ],
     "test_cases": [
       {
         "kind": "example",
@@ -4088,7 +4294,8 @@
       "returns": "int"
     },
     "judge_mode": "exact",
-    "float_tolerance": 0
+    "float_tolerance": 0,
+    "order": 12
   },
   {
     "slug": "factorial",
@@ -4108,7 +4315,7 @@
         "explanation": "0! = 1 by definition."
       }
     ],
-    "editorial": "",
+    "editorial": "A single multiply loop.",
     "optimal_time": "O(n)",
     "optimal_space": "O(1)",
     "optimal_explanation": "A single multiply loop.",
@@ -4130,7 +4337,24 @@
       "Multiply a running product from 1 to n.",
       "Use a 64-bit type — factorials grow fast."
     ],
-    "prerequisites": [],
+    "prerequisites": [
+      {
+        "key": "loops_basic",
+        "name": "Loops (for / while)",
+        "what": "Repeating a block of code a set number of times or until a condition changes.",
+        "deep": "A for-loop fits when you know the count; a while-loop when you stop on a condition. Loops are how you process every element or accumulate a running result, and getting the start/end bounds right is the main beginner pitfall.",
+        "java": "for (int i = 1; i <= n; i++) { ... } or while (condition) { ... }. Build output strings with StringBuilder inside the loop.",
+        "how": "Multiply a running product from 1 to n."
+      },
+      {
+        "key": "overflow",
+        "name": "Integer Overflow (int vs long)",
+        "what": "Guarding against results that exceed a 32-bit int's range of about 2.1x10^9.",
+        "deep": "Sums, products, and reversed numbers can silently wrap a 32-bit int, giving a wrong answer with no error. The fix is a wide enough type or a modulo reduction, so estimate the maximum magnitude before choosing the type.",
+        "java": "int overflows past ~2.1e9; long reaches ~9.2e18. Cast early with (long) a * b and accumulate sums into a long.",
+        "how": "Factorials grow fast — use a 64-bit accumulator."
+      }
+    ],
     "test_cases": [
       {
         "kind": "example",
@@ -4174,7 +4398,8 @@
       "returns": "long"
     },
     "judge_mode": "exact",
-    "float_tolerance": 0
+    "float_tolerance": 0,
+    "order": 13
   },
   {
     "slug": "count-evens",
@@ -4194,7 +4419,7 @@
         "explanation": "No evens."
       }
     ],
-    "editorial": "",
+    "editorial": "Single pass.",
     "optimal_time": "O(n)",
     "optimal_space": "O(1)",
     "optimal_explanation": "Single pass.",
@@ -4218,7 +4443,24 @@
       "Scan once, test each element mod 2.",
       "Increment a counter."
     ],
-    "prerequisites": [],
+    "prerequisites": [
+      {
+        "key": "iteration",
+        "name": "Array Iteration",
+        "what": "Walking through elements one at a time while maintaining running state such as a sum, max, or counter.",
+        "deep": "The workhorse of array problems: one for-loop that updates accumulators as it goes. Most linear-time solutions are just one well-chosen pass, so the real skill is deciding what state to carry so a single sweep suffices.",
+        "java": "Use for (int i = 0; i < n; i++) or for (int x : nums). Prefer a primitive int[] over Integer[] to avoid autoboxing overhead.",
+        "how": "Scan once, testing each element."
+      },
+      {
+        "key": "modulo",
+        "name": "Modular Reduction",
+        "what": "Using n % k to wrap indices around and drop redundant whole cycles.",
+        "deep": "Modulo collapses equivalent states: rotating by k equals rotating by k % n, and hashing or bucketing uses remainders. In Java, beware that % can return a negative result for negative operands.",
+        "java": "Use k % n after guarding n > 0; for possibly-negative values use Math.floorMod(x, n).",
+        "how": "Even is remainder-zero mod 2."
+      }
+    ],
     "test_cases": [
       {
         "kind": "example",
@@ -4269,7 +4511,8 @@
       "returns": "int"
     },
     "judge_mode": "exact",
-    "float_tolerance": 0
+    "float_tolerance": 0,
+    "order": 14
   },
   {
     "slug": "array-minimum",
@@ -4289,7 +4532,7 @@
         "explanation": "-9 is smallest."
       }
     ],
-    "editorial": "",
+    "editorial": "Single pass tracking the min.",
     "optimal_time": "O(n)",
     "optimal_space": "O(1)",
     "optimal_explanation": "Single pass tracking the min.",
@@ -4310,7 +4553,16 @@
     "hints": [
       "Track a running minimum as you scan."
     ],
-    "prerequisites": [],
+    "prerequisites": [
+      {
+        "key": "iteration",
+        "name": "Array Iteration",
+        "what": "Walking through elements one at a time while maintaining running state such as a sum, max, or counter.",
+        "deep": "The workhorse of array problems: one for-loop that updates accumulators as it goes. Most linear-time solutions are just one well-chosen pass, so the real skill is deciding what state to carry so a single sweep suffices.",
+        "java": "Use for (int i = 0; i < n; i++) or for (int x : nums). Prefer a primitive int[] over Integer[] to avoid autoboxing overhead.",
+        "how": "Track a running minimum across one pass."
+      }
+    ],
     "test_cases": [
       {
         "kind": "example",
@@ -4354,7 +4606,8 @@
       "returns": "int"
     },
     "judge_mode": "exact",
-    "float_tolerance": 0
+    "float_tolerance": 0,
+    "order": 15
   },
   {
     "slug": "contains-duplicate",
@@ -4401,7 +4654,24 @@
       "If insertion finds a value already present, return true.",
       "Compare set size to array length."
     ],
-    "prerequisites": [],
+    "prerequisites": [
+      {
+        "key": "hashing",
+        "name": "Hash Maps & Sets",
+        "what": "Structures giving average O(1) insertion and lookup, trading memory for speed.",
+        "deep": "A hash table answers 'have I seen X?' or 'what maps to X?' in expected constant time, converting many O(n^2) pair scans into O(n) single passes. Worst case is O(n) per op under adversarial hashing, but that is rare in practice.",
+        "java": "HashMap<K,V> and HashSet<E>. Use getOrDefault(k, 0) and merge(k, 1, Integer::sum) for counting, containsKey/add for membership. For dense int keys, an int[] beats a HashMap.",
+        "how": "A set answers 'seen before?' in O(1)."
+      },
+      {
+        "key": "visited_set",
+        "name": "Visited Tracking",
+        "what": "Recording which nodes or cells are already processed so you never revisit or double-count.",
+        "deep": "Graph and grid traversals loop forever or over-count without visited marks. Mark as early as possible (on enqueue) so a node is not added twice; for grids you can use a boolean[][] or mutate the input to a sentinel value.",
+        "java": "boolean[] visited / boolean[][] seen, or overwrite grid cells (set '1' to '0') when mutation is allowed.",
+        "how": "Insert values and detect a repeat."
+      }
+    ],
     "test_cases": [
       {
         "kind": "example",
@@ -4445,7 +4715,8 @@
       "returns": "bool"
     },
     "judge_mode": "exact",
-    "float_tolerance": 0
+    "float_tolerance": 0,
+    "order": 31
   },
   {
     "slug": "single-number",
@@ -4492,7 +4763,24 @@
       "XOR is commutative — pairs cancel.",
       "Fold the whole array with XOR."
     ],
-    "prerequisites": [],
+    "prerequisites": [
+      {
+        "key": "bit_manip",
+        "name": "Bit Manipulation",
+        "what": "Operating on the individual binary bits of an integer with AND, OR, XOR, and shifts.",
+        "deep": "Bit tricks give O(1) tools that replace loops: `x & (x-1)` clears the lowest set bit, `x & -x` isolates it, XOR cancels equal values, and shifting multiplies or divides by powers of two. They shine in set membership (bitmasks), parity, and counting.",
+        "java": "Use &, |, ^, ~, <<, >>, and >>> (unsigned shift). Integer.bitCount(x) counts set bits; x & (x-1) drops the lowest one.",
+        "how": "XOR cancels equal pairs, leaving the loner."
+      },
+      {
+        "key": "iteration",
+        "name": "Array Iteration",
+        "what": "Walking through elements one at a time while maintaining running state such as a sum, max, or counter.",
+        "deep": "The workhorse of array problems: one for-loop that updates accumulators as it goes. Most linear-time solutions are just one well-chosen pass, so the real skill is deciding what state to carry so a single sweep suffices.",
+        "java": "Use for (int i = 0; i < n; i++) or for (int x : nums). Prefer a primitive int[] over Integer[] to avoid autoboxing overhead.",
+        "how": "Fold the whole array with XOR."
+      }
+    ],
     "test_cases": [
       {
         "kind": "example",
@@ -4536,7 +4824,8 @@
       "returns": "int"
     },
     "judge_mode": "exact",
-    "float_tolerance": 0
+    "float_tolerance": 0,
+    "order": 32
   },
   {
     "slug": "majority-element",
@@ -4583,7 +4872,24 @@
       "Boyer-Moore voting keeps one candidate.",
       "O(1) space is possible."
     ],
-    "prerequisites": [],
+    "prerequisites": [
+      {
+        "key": "hashing",
+        "name": "Hash Maps & Sets",
+        "what": "Structures giving average O(1) insertion and lookup, trading memory for speed.",
+        "deep": "A hash table answers 'have I seen X?' or 'what maps to X?' in expected constant time, converting many O(n^2) pair scans into O(n) single passes. Worst case is O(n) per op under adversarial hashing, but that is rare in practice.",
+        "java": "HashMap<K,V> and HashSet<E>. Use getOrDefault(k, 0) and merge(k, 1, Integer::sum) for counting, containsKey/add for membership. For dense int keys, an int[] beats a HashMap.",
+        "how": "Counts of each value reveal the majority (or use voting)."
+      },
+      {
+        "key": "iteration",
+        "name": "Array Iteration",
+        "what": "Walking through elements one at a time while maintaining running state such as a sum, max, or counter.",
+        "deep": "The workhorse of array problems: one for-loop that updates accumulators as it goes. Most linear-time solutions are just one well-chosen pass, so the real skill is deciding what state to carry so a single sweep suffices.",
+        "java": "Use for (int i = 0; i < n; i++) or for (int x : nums). Prefer a primitive int[] over Integer[] to avoid autoboxing overhead.",
+        "how": "Boyer-Moore keeps one candidate in a single pass."
+      }
+    ],
     "test_cases": [
       {
         "kind": "example",
@@ -4627,7 +4933,8 @@
       "returns": "int"
     },
     "judge_mode": "exact",
-    "float_tolerance": 0
+    "float_tolerance": 0,
+    "order": 33
   },
   {
     "slug": "is-prime",
@@ -4647,7 +4954,7 @@
         "explanation": "12 = 3·4."
       }
     ],
-    "editorial": "",
+    "editorial": "Trial division up to the square root.",
     "optimal_time": "O(√n)",
     "optimal_space": "O(1)",
     "optimal_explanation": "Trial division up to the square root.",
@@ -4670,7 +4977,24 @@
       "Only trial-divide up to √n.",
       "Handle n < 2 as not prime."
     ],
-    "prerequisites": [],
+    "prerequisites": [
+      {
+        "key": "number_theory",
+        "name": "Number Theory Basics",
+        "what": "Divisibility, gcd, and modular arithmetic facts used to reason about integers.",
+        "deep": "Foundations like the Euclidean algorithm, prime factorization, and modular arithmetic underpin many math problems. Even simple tasks benefit from gcd/lcm identities and knowing how modulo distributes over addition and multiplication.",
+        "java": "Math.floorMod for correct modulo of negatives; write a short gcd helper (Euclid); BigInteger has gcd() if needed.",
+        "how": "A prime has no divisor up to its square root."
+      },
+      {
+        "key": "loops_basic",
+        "name": "Loops (for / while)",
+        "what": "Repeating a block of code a set number of times or until a condition changes.",
+        "deep": "A for-loop fits when you know the count; a while-loop when you stop on a condition. Loops are how you process every element or accumulate a running result, and getting the start/end bounds right is the main beginner pitfall.",
+        "java": "for (int i = 1; i <= n; i++) { ... } or while (condition) { ... }. Build output strings with StringBuilder inside the loop.",
+        "how": "Trial-divide from 2 to √n."
+      }
+    ],
     "test_cases": [
       {
         "kind": "example",
@@ -4721,7 +5045,8 @@
       "returns": "bool"
     },
     "judge_mode": "exact",
-    "float_tolerance": 0
+    "float_tolerance": 0,
+    "order": 34
   },
   {
     "slug": "count-primes",
@@ -4766,7 +5091,24 @@
       "Mark multiples with a Sieve of Eratosthenes.",
       "Start crossing out at i·i."
     ],
-    "prerequisites": [],
+    "prerequisites": [
+      {
+        "key": "number_theory",
+        "name": "Number Theory Basics",
+        "what": "Divisibility, gcd, and modular arithmetic facts used to reason about integers.",
+        "deep": "Foundations like the Euclidean algorithm, prime factorization, and modular arithmetic underpin many math problems. Even simple tasks benefit from gcd/lcm identities and knowing how modulo distributes over addition and multiplication.",
+        "java": "Math.floorMod for correct modulo of negatives; write a short gcd helper (Euclid); BigInteger has gcd() if needed.",
+        "how": "Cross out multiples with a sieve."
+      },
+      {
+        "key": "iteration",
+        "name": "Array Iteration",
+        "what": "Walking through elements one at a time while maintaining running state such as a sum, max, or counter.",
+        "deep": "The workhorse of array problems: one for-loop that updates accumulators as it goes. Most linear-time solutions are just one well-chosen pass, so the real skill is deciding what state to carry so a single sweep suffices.",
+        "java": "Use for (int i = 0; i < n; i++) or for (int x : nums). Prefer a primitive int[] over Integer[] to avoid autoboxing overhead.",
+        "how": "Sweep and mark composites."
+      }
+    ],
     "test_cases": [
       {
         "kind": "example",
@@ -4810,7 +5152,8 @@
       "returns": "int"
     },
     "judge_mode": "exact",
-    "float_tolerance": 0
+    "float_tolerance": 0,
+    "order": 35
   },
   {
     "slug": "valid-anagram",
@@ -4830,7 +5173,7 @@
         "explanation": "Different letters."
       }
     ],
-    "editorial": "",
+    "editorial": "Compare 26-letter frequency counts.",
     "optimal_time": "O(n)",
     "optimal_space": "O(1)",
     "optimal_explanation": "Compare 26-letter frequency counts.",
@@ -4857,7 +5200,32 @@
       "Anagrams have identical character counts.",
       "Compare frequency maps, or compare sorted strings."
     ],
-    "prerequisites": [],
+    "prerequisites": [
+      {
+        "key": "hashing",
+        "name": "Hash Maps & Sets",
+        "what": "Structures giving average O(1) insertion and lookup, trading memory for speed.",
+        "deep": "A hash table answers 'have I seen X?' or 'what maps to X?' in expected constant time, converting many O(n^2) pair scans into O(n) single passes. Worst case is O(n) per op under adversarial hashing, but that is rare in practice.",
+        "java": "HashMap<K,V> and HashSet<E>. Use getOrDefault(k, 0) and merge(k, 1, Integer::sum) for counting, containsKey/add for membership. For dense int keys, an int[] beats a HashMap.",
+        "how": "Compare character frequency maps."
+      },
+      {
+        "key": "canonical",
+        "name": "Canonical Form",
+        "what": "Reducing equivalent items to one identical representative so they collide in a map.",
+        "deep": "A canonical key makes 'are these the same up to X?' a simple equality or hash test. For anagrams it is the sorted letters, for fractions the reduced form, for graphs a normalized encoding. Choosing a cheap, collision-free key is the trick.",
+        "java": "For anagrams: char[] c = s.toCharArray(); Arrays.sort(c); String key = new String(c); or a length-26 count signature.",
+        "how": "Sorting both strings is a canonical form."
+      },
+      {
+        "key": "sorting",
+        "name": "Sorting",
+        "what": "Ordering elements (usually O(n log n)) so structure like duplicates and order statistics becomes easy.",
+        "deep": "Sorting is a preprocessing multiplier: it enables binary search, two-pointer sweeps, greedy choices, and grouping. The cost is O(n log n) comparisons, though counting/radix sort can beat that for bounded integer keys.",
+        "java": "Arrays.sort(int[]) or Arrays.sort(T[], Comparator) / Collections.sort. For custom order use Comparator.comparingInt(...). Note primitive sort has no comparator overload.",
+        "how": "Equal anagrams sort to identical strings."
+      }
+    ],
     "test_cases": [
       {
         "kind": "example",
@@ -4905,7 +5273,8 @@
       "returns": "bool"
     },
     "judge_mode": "exact",
-    "float_tolerance": 0
+    "float_tolerance": 0,
+    "order": 36
   },
   {
     "slug": "first-unique-char",
@@ -4925,7 +5294,7 @@
         "explanation": "No unique char → -1."
       }
     ],
-    "editorial": "",
+    "editorial": "Two passes: count, then find.",
     "optimal_time": "O(n)",
     "optimal_space": "O(1)",
     "optimal_explanation": "Two passes: count, then find.",
@@ -4952,7 +5321,24 @@
       "Count characters first.",
       "Then scan left to right for the first count of 1."
     ],
-    "prerequisites": [],
+    "prerequisites": [
+      {
+        "key": "hashing",
+        "name": "Hash Maps & Sets",
+        "what": "Structures giving average O(1) insertion and lookup, trading memory for speed.",
+        "deep": "A hash table answers 'have I seen X?' or 'what maps to X?' in expected constant time, converting many O(n^2) pair scans into O(n) single passes. Worst case is O(n) per op under adversarial hashing, but that is rare in practice.",
+        "java": "HashMap<K,V> and HashSet<E>. Use getOrDefault(k, 0) and merge(k, 1, Integer::sum) for counting, containsKey/add for membership. For dense int keys, an int[] beats a HashMap.",
+        "how": "Count characters first."
+      },
+      {
+        "key": "iteration",
+        "name": "Array Iteration",
+        "what": "Walking through elements one at a time while maintaining running state such as a sum, max, or counter.",
+        "deep": "The workhorse of array problems: one for-loop that updates accumulators as it goes. Most linear-time solutions are just one well-chosen pass, so the real skill is deciding what state to carry so a single sweep suffices.",
+        "java": "Use for (int i = 0; i < n; i++) or for (int x : nums). Prefer a primitive int[] over Integer[] to avoid autoboxing overhead.",
+        "how": "Then scan for the first count of one."
+      }
+    ],
     "test_cases": [
       {
         "kind": "example",
@@ -4996,7 +5382,8 @@
       "returns": "int"
     },
     "judge_mode": "exact",
-    "float_tolerance": 0
+    "float_tolerance": 0,
+    "order": 37
   },
   {
     "slug": "move-zeroes",
@@ -5016,7 +5403,7 @@
         "explanation": "Unchanged."
       }
     ],
-    "editorial": "",
+    "editorial": "Stable partition around zero.",
     "optimal_time": "O(n)",
     "optimal_space": "O(1)",
     "optimal_explanation": "Stable partition around zero.",
@@ -5043,7 +5430,24 @@
       "Fill the rest with zeroes.",
       "Relative order of non-zeros must hold."
     ],
-    "prerequisites": [],
+    "prerequisites": [
+      {
+        "key": "two_pointers",
+        "name": "Two Pointers",
+        "what": "Two indices moving through a sequence (from both ends, or at different speeds) to replace a nested loop.",
+        "deep": "By advancing pointers based on a comparison you explore O(n) states instead of O(n^2). Common shapes are opposite ends converging (sorted pair sums, palindromes, rain water) and fast/slow (cycle detection). Correctness hinges on why the pointer you move cannot skip a better answer.",
+        "java": "Two int indices lo/hi (or i/j) in a while (lo < hi) loop; no special class needed.",
+        "how": "A write pointer packs the non-zeros."
+      },
+      {
+        "key": "iteration",
+        "name": "Array Iteration",
+        "what": "Walking through elements one at a time while maintaining running state such as a sum, max, or counter.",
+        "deep": "The workhorse of array problems: one for-loop that updates accumulators as it goes. Most linear-time solutions are just one well-chosen pass, so the real skill is deciding what state to carry so a single sweep suffices.",
+        "java": "Use for (int i = 0; i < n; i++) or for (int x : nums). Prefer a primitive int[] over Integer[] to avoid autoboxing overhead.",
+        "how": "Fill the remaining slots with zeroes."
+      }
+    ],
     "test_cases": [
       {
         "kind": "example",
@@ -5087,7 +5491,8 @@
       "returns": "int[]"
     },
     "judge_mode": "exact",
-    "float_tolerance": 0
+    "float_tolerance": 0,
+    "order": 38
   },
   {
     "slug": "running-sum",
@@ -5107,7 +5512,7 @@
         "explanation": "3,2,4."
       }
     ],
-    "editorial": "",
+    "editorial": "Single prefix pass.",
     "optimal_time": "O(n)",
     "optimal_space": "O(n)",
     "optimal_explanation": "Single prefix pass.",
@@ -5131,7 +5536,24 @@
       "Accumulate as you scan.",
       "out[i] = out[i-1] + nums[i]."
     ],
-    "prerequisites": [],
+    "prerequisites": [
+      {
+        "key": "prefix_sum",
+        "name": "Prefix Sums",
+        "what": "Precomputed running totals so any range sum is a single subtraction.",
+        "deep": "Build P[i] = a[0]+…+a[i-1]; then the sum of a[l..r] is P[r+1] − P[l] in O(1). Paired with a hash map of seen prefixes it counts subarrays with a target sum in one pass. The same idea extends to prefix XOR, products, and 2-D grids.",
+        "java": "A long[] prefix of length n+1, or a running long combined with a HashMap<Long,Integer> of prefix counts.",
+        "how": "Each output is the prefix total so far."
+      },
+      {
+        "key": "iteration",
+        "name": "Array Iteration",
+        "what": "Walking through elements one at a time while maintaining running state such as a sum, max, or counter.",
+        "deep": "The workhorse of array problems: one for-loop that updates accumulators as it goes. Most linear-time solutions are just one well-chosen pass, so the real skill is deciding what state to carry so a single sweep suffices.",
+        "java": "Use for (int i = 0; i < n; i++) or for (int x : nums). Prefer a primitive int[] over Integer[] to avoid autoboxing overhead.",
+        "how": "Accumulate as you scan."
+      }
+    ],
     "test_cases": [
       {
         "kind": "example",
@@ -5175,7 +5597,8 @@
       "returns": "int[]"
     },
     "judge_mode": "exact",
-    "float_tolerance": 0
+    "float_tolerance": 0,
+    "order": 39
   },
   {
     "slug": "max-consecutive-ones",
@@ -5195,7 +5618,7 @@
         "explanation": "Run of 3."
       }
     ],
-    "editorial": "",
+    "editorial": "Single pass with a running counter.",
     "optimal_time": "O(n)",
     "optimal_space": "O(1)",
     "optimal_explanation": "Single pass with a running counter.",
@@ -5219,7 +5642,24 @@
       "Track the current run and the best run.",
       "Reset the current run on a 0."
     ],
-    "prerequisites": [],
+    "prerequisites": [
+      {
+        "key": "iteration",
+        "name": "Array Iteration",
+        "what": "Walking through elements one at a time while maintaining running state such as a sum, max, or counter.",
+        "deep": "The workhorse of array problems: one for-loop that updates accumulators as it goes. Most linear-time solutions are just one well-chosen pass, so the real skill is deciding what state to carry so a single sweep suffices.",
+        "java": "Use for (int i = 0; i < n; i++) or for (int x : nums). Prefer a primitive int[] over Integer[] to avoid autoboxing overhead.",
+        "how": "Track current and best run lengths."
+      },
+      {
+        "key": "variables",
+        "name": "Variables & Types",
+        "what": "Named boxes that hold values of a specific type such as int, long, double, boolean, or String.",
+        "deep": "A variable stores a value you can read and update. Java is statically typed, so you declare the type up front and it never changes. Picking the right type (int vs long, int vs double) prevents overflow and rounding surprises down the line.",
+        "java": "Declare with a type: int n = 5; long big = 10000000000L; double d = 3.14; boolean ok = true; String s = ... .",
+        "how": "Reset the current run on a zero."
+      }
+    ],
     "test_cases": [
       {
         "kind": "example",
@@ -5263,7 +5703,8 @@
       "returns": "int"
     },
     "judge_mode": "exact",
-    "float_tolerance": 0
+    "float_tolerance": 0,
+    "order": 40
   },
   {
     "slug": "second-largest",
@@ -5283,7 +5724,7 @@
         "explanation": "3 is second largest."
       }
     ],
-    "editorial": "",
+    "editorial": "Single pass tracking two maxima.",
     "optimal_time": "O(n)",
     "optimal_space": "O(1)",
     "optimal_explanation": "Single pass tracking two maxima.",
@@ -5305,7 +5746,24 @@
       "Track the top two as you scan.",
       "Skip duplicates of the max."
     ],
-    "prerequisites": [],
+    "prerequisites": [
+      {
+        "key": "iteration",
+        "name": "Array Iteration",
+        "what": "Walking through elements one at a time while maintaining running state such as a sum, max, or counter.",
+        "deep": "The workhorse of array problems: one for-loop that updates accumulators as it goes. Most linear-time solutions are just one well-chosen pass, so the real skill is deciding what state to carry so a single sweep suffices.",
+        "java": "Use for (int i = 0; i < n; i++) or for (int x : nums). Prefer a primitive int[] over Integer[] to avoid autoboxing overhead.",
+        "how": "Track the top two distinct values."
+      },
+      {
+        "key": "sorting",
+        "name": "Sorting",
+        "what": "Ordering elements (usually O(n log n)) so structure like duplicates and order statistics becomes easy.",
+        "deep": "Sorting is a preprocessing multiplier: it enables binary search, two-pointer sweeps, greedy choices, and grouping. The cost is O(n log n) comparisons, though counting/radix sort can beat that for bounded integer keys.",
+        "java": "Arrays.sort(int[]) or Arrays.sort(T[], Comparator) / Collections.sort. For custom order use Comparator.comparingInt(...). Note primitive sort has no comparator overload.",
+        "how": "Or sort the distinct values and take the runner-up."
+      }
+    ],
     "test_cases": [
       {
         "kind": "example",
@@ -5349,7 +5807,8 @@
       "returns": "int"
     },
     "judge_mode": "exact",
-    "float_tolerance": 0
+    "float_tolerance": 0,
+    "order": 41
   },
   {
     "slug": "count-occurrences",
@@ -5369,7 +5828,7 @@
         "explanation": "9 is absent."
       }
     ],
-    "editorial": "",
+    "editorial": "Single pass.",
     "optimal_time": "O(n)",
     "optimal_space": "O(1)",
     "optimal_explanation": "Single pass.",
@@ -5392,7 +5851,16 @@
     "hints": [
       "Scan and count matches."
     ],
-    "prerequisites": [],
+    "prerequisites": [
+      {
+        "key": "iteration",
+        "name": "Array Iteration",
+        "what": "Walking through elements one at a time while maintaining running state such as a sum, max, or counter.",
+        "deep": "The workhorse of array problems: one for-loop that updates accumulators as it goes. Most linear-time solutions are just one well-chosen pass, so the real skill is deciding what state to carry so a single sweep suffices.",
+        "java": "Use for (int i = 0; i < n; i++) or for (int x : nums). Prefer a primitive int[] over Integer[] to avoid autoboxing overhead.",
+        "how": "Scan once and count matches."
+      }
+    ],
     "test_cases": [
       {
         "kind": "example",
@@ -5440,7 +5908,8 @@
       "returns": "int"
     },
     "judge_mode": "exact",
-    "float_tolerance": 0
+    "float_tolerance": 0,
+    "order": 42
   },
   {
     "slug": "number-of-1-bits",
@@ -5460,7 +5929,7 @@
         "explanation": "10000000 has one."
       }
     ],
-    "editorial": "",
+    "editorial": "Count set bits.",
     "optimal_time": "O(bits)",
     "optimal_space": "O(1)",
     "optimal_explanation": "Count set bits.",
@@ -5485,7 +5954,24 @@
       "Check the lowest bit with & 1, then shift.",
       "Or use n & (n-1) to drop the lowest set bit."
     ],
-    "prerequisites": [],
+    "prerequisites": [
+      {
+        "key": "bit_manip",
+        "name": "Bit Manipulation",
+        "what": "Operating on the individual binary bits of an integer with AND, OR, XOR, and shifts.",
+        "deep": "Bit tricks give O(1) tools that replace loops: `x & (x-1)` clears the lowest set bit, `x & -x` isolates it, XOR cancels equal values, and shifting multiplies or divides by powers of two. They shine in set membership (bitmasks), parity, and counting.",
+        "java": "Use &, |, ^, ~, <<, >>, and >>> (unsigned shift). Integer.bitCount(x) counts set bits; x & (x-1) drops the lowest one.",
+        "how": "Check the low bit and shift, or use x & (x-1)."
+      },
+      {
+        "key": "loops_basic",
+        "name": "Loops (for / while)",
+        "what": "Repeating a block of code a set number of times or until a condition changes.",
+        "deep": "A for-loop fits when you know the count; a while-loop when you stop on a condition. Loops are how you process every element or accumulate a running result, and getting the start/end bounds right is the main beginner pitfall.",
+        "java": "for (int i = 1; i <= n; i++) { ... } or while (condition) { ... }. Build output strings with StringBuilder inside the loop.",
+        "how": "Loop over the bits."
+      }
+    ],
     "test_cases": [
       {
         "kind": "example",
@@ -5529,7 +6015,8 @@
       "returns": "int"
     },
     "judge_mode": "exact",
-    "float_tolerance": 0
+    "float_tolerance": 0,
+    "order": 43
   },
   {
     "slug": "product-except-self",
@@ -5577,7 +6064,24 @@
       "Combine the two passes.",
       "No division allowed."
     ],
-    "prerequisites": [],
+    "prerequisites": [
+      {
+        "key": "prefix_sum",
+        "name": "Prefix Sums",
+        "what": "Precomputed running totals so any range sum is a single subtraction.",
+        "deep": "Build P[i] = a[0]+…+a[i-1]; then the sum of a[l..r] is P[r+1] − P[l] in O(1). Paired with a hash map of seen prefixes it counts subarrays with a target sum in one pass. The same idea extends to prefix XOR, products, and 2-D grids.",
+        "java": "A long[] prefix of length n+1, or a running long combined with a HashMap<Long,Integer> of prefix counts.",
+        "how": "Prefix products left, suffix products right (multiplicative)."
+      },
+      {
+        "key": "iteration",
+        "name": "Array Iteration",
+        "what": "Walking through elements one at a time while maintaining running state such as a sum, max, or counter.",
+        "deep": "The workhorse of array problems: one for-loop that updates accumulators as it goes. Most linear-time solutions are just one well-chosen pass, so the real skill is deciding what state to carry so a single sweep suffices.",
+        "java": "Use for (int i = 0; i < n; i++) or for (int x : nums). Prefer a primitive int[] over Integer[] to avoid autoboxing overhead.",
+        "how": "Two passes combine into the answer."
+      }
+    ],
     "test_cases": [
       {
         "kind": "example",
@@ -5621,7 +6125,8 @@
       "returns": "int[]"
     },
     "judge_mode": "exact",
-    "float_tolerance": 0
+    "float_tolerance": 0,
+    "order": 62
   },
   {
     "slug": "best-time-buy-sell",
@@ -5669,7 +6174,32 @@
       "Best profit = price − running minimum.",
       "One pass suffices."
     ],
-    "prerequisites": [],
+    "prerequisites": [
+      {
+        "key": "greedy",
+        "name": "Greedy Choice",
+        "what": "Taking the locally-best option at each step when that provably reaches a global optimum.",
+        "deep": "Greedy is fast and simple but correct only when the problem has the greedy-choice property and optimal substructure; otherwise DP is the fallback. Proving correctness (often an exchange argument) matters more than the code.",
+        "java": "Often just Arrays.sort plus a linear scan, or a PriorityQueue to always grab the current best.",
+        "how": "Best profit is price minus the lowest price seen."
+      },
+      {
+        "key": "iteration",
+        "name": "Array Iteration",
+        "what": "Walking through elements one at a time while maintaining running state such as a sum, max, or counter.",
+        "deep": "The workhorse of array problems: one for-loop that updates accumulators as it goes. Most linear-time solutions are just one well-chosen pass, so the real skill is deciding what state to carry so a single sweep suffices.",
+        "java": "Use for (int i = 0; i < n; i++) or for (int x : nums). Prefer a primitive int[] over Integer[] to avoid autoboxing overhead.",
+        "how": "Track the running minimum in one pass."
+      },
+      {
+        "key": "dp",
+        "name": "Dynamic Programming",
+        "what": "Breaking a problem into overlapping subproblems and reusing their answers.",
+        "deep": "Applies when there is optimal substructure and overlapping subproblems. Two styles exist: top-down memoized recursion and bottom-up tabulation. Defining the state and transition precisely is the whole game, and space can often be rolled down a dimension.",
+        "java": "A memo HashMap or an int[]/int[][] table. For memoization initialize a sentinel with Arrays.fill(dp, -1).",
+        "how": "It's a one-state DP over 'min so far'."
+      }
+    ],
     "test_cases": [
       {
         "kind": "example",
@@ -5713,7 +6243,8 @@
       "returns": "int"
     },
     "judge_mode": "exact",
-    "float_tolerance": 0
+    "float_tolerance": 0,
+    "order": 63
   },
   {
     "slug": "container-most-water",
@@ -5760,7 +6291,24 @@
       "Move the shorter side inward — it's the limiter.",
       "Track the best area."
     ],
-    "prerequisites": [],
+    "prerequisites": [
+      {
+        "key": "two_pointers",
+        "name": "Two Pointers",
+        "what": "Two indices moving through a sequence (from both ends, or at different speeds) to replace a nested loop.",
+        "deep": "By advancing pointers based on a comparison you explore O(n) states instead of O(n^2). Common shapes are opposite ends converging (sorted pair sums, palindromes, rain water) and fast/slow (cycle detection). Correctness hinges on why the pointer you move cannot skip a better answer.",
+        "java": "Two int indices lo/hi (or i/j) in a while (lo < hi) loop; no special class needed.",
+        "how": "The shorter wall limits the area — move it inward."
+      },
+      {
+        "key": "greedy",
+        "name": "Greedy Choice",
+        "what": "Taking the locally-best option at each step when that provably reaches a global optimum.",
+        "deep": "Greedy is fast and simple but correct only when the problem has the greedy-choice property and optimal substructure; otherwise DP is the fallback. Proving correctness (often an exchange argument) matters more than the code.",
+        "java": "Often just Arrays.sort plus a linear scan, or a PriorityQueue to always grab the current best.",
+        "how": "Advancing the taller wall can never increase the area."
+      }
+    ],
     "test_cases": [
       {
         "kind": "example",
@@ -5804,7 +6352,8 @@
       "returns": "int"
     },
     "judge_mode": "exact",
-    "float_tolerance": 0
+    "float_tolerance": 0,
+    "order": 64
   },
   {
     "slug": "house-robber",
@@ -5850,7 +6399,24 @@
       "best[i] = max(best[i-1], best[i-2] + nums[i]).",
       "Two rolling variables suffice."
     ],
-    "prerequisites": [],
+    "prerequisites": [
+      {
+        "key": "dp",
+        "name": "Dynamic Programming",
+        "what": "Breaking a problem into overlapping subproblems and reusing their answers.",
+        "deep": "Applies when there is optimal substructure and overlapping subproblems. Two styles exist: top-down memoized recursion and bottom-up tabulation. Defining the state and transition precisely is the whole game, and space can often be rolled down a dimension.",
+        "java": "A memo HashMap or an int[]/int[][] table. For memoization initialize a sentinel with Arrays.fill(dp, -1).",
+        "how": "Choose to rob or skip each house."
+      },
+      {
+        "key": "recurrence",
+        "name": "Recurrence Relations",
+        "what": "Expressing an answer in terms of smaller answers, e.g. f(n) = f(n-1) + f(n-2).",
+        "deep": "A recurrence is the mathematical heart of many DP and divide-and-conquer solutions. Once you name the base cases and the transition you can either recurse with memoization or iterate bottom-up, often reducing space to a few rolling variables.",
+        "java": "Iterate bottom-up with a few long variables, or memoize with a long[] dp. Use long when terms grow fast.",
+        "how": "best[i] = max(best[i-1], best[i-2] + nums[i])."
+      }
+    ],
     "test_cases": [
       {
         "kind": "example",
@@ -5894,7 +6460,8 @@
       "returns": "int"
     },
     "judge_mode": "exact",
-    "float_tolerance": 0
+    "float_tolerance": 0,
+    "order": 65
   },
   {
     "slug": "jump-game",
@@ -5941,7 +6508,24 @@
       "If your position ever exceeds reach, you're stuck.",
       "Greedy beats DP here."
     ],
-    "prerequisites": [],
+    "prerequisites": [
+      {
+        "key": "greedy",
+        "name": "Greedy Choice",
+        "what": "Taking the locally-best option at each step when that provably reaches a global optimum.",
+        "deep": "Greedy is fast and simple but correct only when the problem has the greedy-choice property and optimal substructure; otherwise DP is the fallback. Proving correctness (often an exchange argument) matters more than the code.",
+        "java": "Often just Arrays.sort plus a linear scan, or a PriorityQueue to always grab the current best.",
+        "how": "Track the furthest index you can reach."
+      },
+      {
+        "key": "iteration",
+        "name": "Array Iteration",
+        "what": "Walking through elements one at a time while maintaining running state such as a sum, max, or counter.",
+        "deep": "The workhorse of array problems: one for-loop that updates accumulators as it goes. Most linear-time solutions are just one well-chosen pass, so the real skill is deciding what state to carry so a single sweep suffices.",
+        "java": "Use for (int i = 0; i < n; i++) or for (int x : nums). Prefer a primitive int[] over Integer[] to avoid autoboxing overhead.",
+        "how": "If your position outruns the reach, you're stuck."
+      }
+    ],
     "test_cases": [
       {
         "kind": "example",
@@ -5985,7 +6569,8 @@
       "returns": "bool"
     },
     "judge_mode": "exact",
-    "float_tolerance": 0
+    "float_tolerance": 0,
+    "order": 66
   },
   {
     "slug": "coin-change",
@@ -6032,7 +6617,24 @@
       "dp[a] = min over coins of dp[a-c] + 1.",
       "Unbounded coins — iterate amounts outward."
     ],
-    "prerequisites": [],
+    "prerequisites": [
+      {
+        "key": "dp",
+        "name": "Dynamic Programming",
+        "what": "Breaking a problem into overlapping subproblems and reusing their answers.",
+        "deep": "Applies when there is optimal substructure and overlapping subproblems. Two styles exist: top-down memoized recursion and bottom-up tabulation. Defining the state and transition precisely is the whole game, and space can often be rolled down a dimension.",
+        "java": "A memo HashMap or an int[]/int[][] table. For memoization initialize a sentinel with Arrays.fill(dp, -1).",
+        "how": "Build the fewest coins for every amount up to the target."
+      },
+      {
+        "key": "recurrence",
+        "name": "Recurrence Relations",
+        "what": "Expressing an answer in terms of smaller answers, e.g. f(n) = f(n-1) + f(n-2).",
+        "deep": "A recurrence is the mathematical heart of many DP and divide-and-conquer solutions. Once you name the base cases and the transition you can either recurse with memoization or iterate bottom-up, often reducing space to a few rolling variables.",
+        "java": "Iterate bottom-up with a few long variables, or memoize with a long[] dp. Use long when terms grow fast.",
+        "how": "dp[a] = 1 + min(dp[a - coin])."
+      }
+    ],
     "test_cases": [
       {
         "kind": "example",
@@ -6080,7 +6682,8 @@
       "returns": "int"
     },
     "judge_mode": "exact",
-    "float_tolerance": 0
+    "float_tolerance": 0,
+    "order": 67
   },
   {
     "slug": "coin-change-ways",
@@ -6100,7 +6703,7 @@
         "explanation": "2+2 → 1 way."
       }
     ],
-    "editorial": "",
+    "editorial": "Combination-count DP (coin outer loop).",
     "optimal_time": "O(amount·coins)",
     "optimal_space": "O(amount)",
     "optimal_explanation": "Combination-count DP (coin outer loop).",
@@ -6125,7 +6728,24 @@
       "dp[a] += dp[a-c].",
       "Start dp[0]=1."
     ],
-    "prerequisites": [],
+    "prerequisites": [
+      {
+        "key": "dp",
+        "name": "Dynamic Programming",
+        "what": "Breaking a problem into overlapping subproblems and reusing their answers.",
+        "deep": "Applies when there is optimal substructure and overlapping subproblems. Two styles exist: top-down memoized recursion and bottom-up tabulation. Defining the state and transition precisely is the whole game, and space can often be rolled down a dimension.",
+        "java": "A memo HashMap or an int[]/int[][] table. For memoization initialize a sentinel with Arrays.fill(dp, -1).",
+        "how": "Count combinations for each amount."
+      },
+      {
+        "key": "recurrence",
+        "name": "Recurrence Relations",
+        "what": "Expressing an answer in terms of smaller answers, e.g. f(n) = f(n-1) + f(n-2).",
+        "deep": "A recurrence is the mathematical heart of many DP and divide-and-conquer solutions. Once you name the base cases and the transition you can either recurse with memoization or iterate bottom-up, often reducing space to a few rolling variables.",
+        "java": "Iterate bottom-up with a few long variables, or memoize with a long[] dp. Use long when terms grow fast.",
+        "how": "Iterate coins outermost so order doesn't create duplicates."
+      }
+    ],
     "test_cases": [
       {
         "kind": "example",
@@ -6173,7 +6793,8 @@
       "returns": "int"
     },
     "judge_mode": "exact",
-    "float_tolerance": 0
+    "float_tolerance": 0,
+    "order": 68
   },
   {
     "slug": "longest-common-prefix",
@@ -6193,7 +6814,7 @@
         "explanation": "No common prefix."
       }
     ],
-    "editorial": "",
+    "editorial": "Shrink a prefix across all words.",
     "optimal_time": "O(total chars)",
     "optimal_space": "O(1)",
     "optimal_explanation": "Shrink a prefix across all words.",
@@ -6217,7 +6838,24 @@
       "Shrink a candidate prefix against each word.",
       "Stop as soon as it's empty."
     ],
-    "prerequisites": [],
+    "prerequisites": [
+      {
+        "key": "string_basics",
+        "name": "String Traversal",
+        "what": "Treating a string as an indexable sequence of characters to count and compare.",
+        "deep": "Most string problems reduce to a single pass with charAt or a char[]. Remember Java strings are immutable, so build output with StringBuilder, and character math relies on ASCII codes.",
+        "java": "s.charAt(i), s.length(), s.toCharArray(); build results with StringBuilder, never += inside a loop.",
+        "how": "Compare characters position by position."
+      },
+      {
+        "key": "iteration",
+        "name": "Array Iteration",
+        "what": "Walking through elements one at a time while maintaining running state such as a sum, max, or counter.",
+        "deep": "The workhorse of array problems: one for-loop that updates accumulators as it goes. Most linear-time solutions are just one well-chosen pass, so the real skill is deciding what state to carry so a single sweep suffices.",
+        "java": "Use for (int i = 0; i < n; i++) or for (int x : nums). Prefer a primitive int[] over Integer[] to avoid autoboxing overhead.",
+        "how": "Shrink a candidate prefix across all words."
+      }
+    ],
     "test_cases": [
       {
         "kind": "example",
@@ -6261,7 +6899,8 @@
       "returns": "string"
     },
     "judge_mode": "exact",
-    "float_tolerance": 0
+    "float_tolerance": 0,
+    "order": 69
   },
   {
     "slug": "search-insert-position",
@@ -6281,7 +6920,7 @@
         "explanation": "2 inserts at index 1."
       }
     ],
-    "editorial": "",
+    "editorial": "Lower-bound binary search.",
     "optimal_time": "O(log n)",
     "optimal_space": "O(1)",
     "optimal_explanation": "Lower-bound binary search.",
@@ -6308,7 +6947,24 @@
       "Narrow [lo, hi) until they meet.",
       "Return lo."
     ],
-    "prerequisites": [],
+    "prerequisites": [
+      {
+        "key": "binary_search",
+        "name": "Binary Search",
+        "what": "Halving a sorted search space to find a target or boundary in O(log n).",
+        "deep": "Beyond exact matches it locates boundaries (first/last occurrence, lower/upper bound) and can 'search on the answer' for any monotonic predicate. The subtle parts are the loop invariant and avoiding off-by-one at the boundary.",
+        "java": "Arrays.binarySearch does not give first/last, so hand-roll while (lo <= hi) with mid = lo + (hi - lo) / 2 to avoid overflow.",
+        "how": "Lower-bound search finds the slot in O(log n)."
+      },
+      {
+        "key": "big_o",
+        "name": "Big-O / Complexity Analysis",
+        "what": "Reasoning about how time and memory grow with the input size.",
+        "deep": "Big-O bounds the dominant growth term and tells you whether an approach scales to the constraints. Read the limits: n up to 10^5 suggests O(n) or O(n log n), while 10^9 suggests O(log n) or O(1). Sanity-check the work against roughly 10^8 operations per second.",
+        "java": "No API - this is analysis. Match your algorithm to the constraints stated in each problem before you start coding.",
+        "how": "Halving the range beats a linear scan."
+      }
+    ],
     "test_cases": [
       {
         "kind": "example",
@@ -6356,7 +7012,8 @@
       "returns": "int"
     },
     "judge_mode": "exact",
-    "float_tolerance": 0
+    "float_tolerance": 0,
+    "order": 70
   },
   {
     "slug": "integer-sqrt",
@@ -6376,7 +7033,7 @@
         "explanation": "⌊√17⌋ = 4."
       }
     ],
-    "editorial": "",
+    "editorial": "Binary search on the answer.",
     "optimal_time": "O(log x)",
     "optimal_space": "O(1)",
     "optimal_explanation": "Binary search on the answer.",
@@ -6403,7 +7060,24 @@
       "Beware overflow when squaring.",
       "Answer is the high pointer."
     ],
-    "prerequisites": [],
+    "prerequisites": [
+      {
+        "key": "binary_search",
+        "name": "Binary Search",
+        "what": "Halving a sorted search space to find a target or boundary in O(log n).",
+        "deep": "Beyond exact matches it locates boundaries (first/last occurrence, lower/upper bound) and can 'search on the answer' for any monotonic predicate. The subtle parts are the loop invariant and avoiding off-by-one at the boundary.",
+        "java": "Arrays.binarySearch does not give first/last, so hand-roll while (lo <= hi) with mid = lo + (hi - lo) / 2 to avoid overflow.",
+        "how": "Search the largest m with m·m ≤ x."
+      },
+      {
+        "key": "overflow",
+        "name": "Integer Overflow (int vs long)",
+        "what": "Guarding against results that exceed a 32-bit int's range of about 2.1x10^9.",
+        "deep": "Sums, products, and reversed numbers can silently wrap a 32-bit int, giving a wrong answer with no error. The fix is a wide enough type or a modulo reduction, so estimate the maximum magnitude before choosing the type.",
+        "java": "int overflows past ~2.1e9; long reaches ~9.2e18. Cast early with (long) a * b and accumulate sums into a long.",
+        "how": "Squaring m can overflow — use a wide type or compare carefully."
+      }
+    ],
     "test_cases": [
       {
         "kind": "example",
@@ -6454,7 +7128,8 @@
       "returns": "int"
     },
     "judge_mode": "exact",
-    "float_tolerance": 0
+    "float_tolerance": 0,
+    "order": 71
   },
   {
     "slug": "min-cost-climbing-stairs",
@@ -6474,7 +7149,7 @@
         "explanation": "Weave the cheap steps → 6."
       }
     ],
-    "editorial": "",
+    "editorial": "1-D DP with two rolling states.",
     "optimal_time": "O(n)",
     "optimal_space": "O(1)",
     "optimal_explanation": "1-D DP with two rolling states.",
@@ -6499,7 +7174,24 @@
       "dp[i] = cost[i] + min(dp[i-1], dp[i-2]).",
       "You may start at step 0 or 1."
     ],
-    "prerequisites": [],
+    "prerequisites": [
+      {
+        "key": "dp",
+        "name": "Dynamic Programming",
+        "what": "Breaking a problem into overlapping subproblems and reusing their answers.",
+        "deep": "Applies when there is optimal substructure and overlapping subproblems. Two styles exist: top-down memoized recursion and bottom-up tabulation. Defining the state and transition precisely is the whole game, and space can often be rolled down a dimension.",
+        "java": "A memo HashMap or an int[]/int[][] table. For memoization initialize a sentinel with Arrays.fill(dp, -1).",
+        "how": "Cheapest way to reach each step."
+      },
+      {
+        "key": "recurrence",
+        "name": "Recurrence Relations",
+        "what": "Expressing an answer in terms of smaller answers, e.g. f(n) = f(n-1) + f(n-2).",
+        "deep": "A recurrence is the mathematical heart of many DP and divide-and-conquer solutions. Once you name the base cases and the transition you can either recurse with memoization or iterate bottom-up, often reducing space to a few rolling variables.",
+        "java": "Iterate bottom-up with a few long variables, or memoize with a long[] dp. Use long when terms grow fast.",
+        "how": "dp[i] = cost[i] + min(dp[i-1], dp[i-2])."
+      }
+    ],
     "test_cases": [
       {
         "kind": "example",
@@ -6543,7 +7235,8 @@
       "returns": "int"
     },
     "judge_mode": "exact",
-    "float_tolerance": 0
+    "float_tolerance": 0,
+    "order": 72
   },
   {
     "slug": "daily-temperatures",
@@ -6590,7 +7283,24 @@
       "Pop while the current day is warmer.",
       "The gap is the answer for popped days."
     ],
-    "prerequisites": [],
+    "prerequisites": [
+      {
+        "key": "stack",
+        "name": "Stack (LIFO)",
+        "what": "A last-in-first-out structure whose top is always the most recent unmatched item.",
+        "deep": "Ideal when the newest open item must be resolved first: bracket matching, monotonic-stack range queries, expression parsing, or iterative DFS. Push, pop, and peek are all O(1).",
+        "java": "Use ArrayDeque<T> as a stack (push/pop/peek) - it is faster than the legacy Stack class. For brackets use Deque<Character>.",
+        "how": "A monotonic stack of indices awaits a warmer day."
+      },
+      {
+        "key": "iteration",
+        "name": "Array Iteration",
+        "what": "Walking through elements one at a time while maintaining running state such as a sum, max, or counter.",
+        "deep": "The workhorse of array problems: one for-loop that updates accumulators as it goes. Most linear-time solutions are just one well-chosen pass, so the real skill is deciding what state to carry so a single sweep suffices.",
+        "java": "Use for (int i = 0; i < n; i++) or for (int x : nums). Prefer a primitive int[] over Integer[] to avoid autoboxing overhead.",
+        "how": "Pop and record the day gap when a warmer day arrives."
+      }
+    ],
     "test_cases": [
       {
         "kind": "example",
@@ -6634,7 +7344,8 @@
       "returns": "int[]"
     },
     "judge_mode": "exact",
-    "float_tolerance": 0
+    "float_tolerance": 0,
+    "order": 73
   },
   {
     "slug": "next-greater-element",
@@ -6654,7 +7365,7 @@
         "explanation": "No greater to the right → all -1."
       }
     ],
-    "editorial": "",
+    "editorial": "Monotonic decreasing stack.",
     "optimal_time": "O(n)",
     "optimal_space": "O(n)",
     "optimal_explanation": "Monotonic decreasing stack.",
@@ -6681,7 +7392,24 @@
       "Pop when a bigger value arrives.",
       "Unpopped indices get -1."
     ],
-    "prerequisites": [],
+    "prerequisites": [
+      {
+        "key": "stack",
+        "name": "Stack (LIFO)",
+        "what": "A last-in-first-out structure whose top is always the most recent unmatched item.",
+        "deep": "Ideal when the newest open item must be resolved first: bracket matching, monotonic-stack range queries, expression parsing, or iterative DFS. Push, pop, and peek are all O(1).",
+        "java": "Use ArrayDeque<T> as a stack (push/pop/peek) - it is faster than the legacy Stack class. For brackets use Deque<Character>.",
+        "how": "Pending indices wait on a decreasing stack."
+      },
+      {
+        "key": "iteration",
+        "name": "Array Iteration",
+        "what": "Walking through elements one at a time while maintaining running state such as a sum, max, or counter.",
+        "deep": "The workhorse of array problems: one for-loop that updates accumulators as it goes. Most linear-time solutions are just one well-chosen pass, so the real skill is deciding what state to carry so a single sweep suffices.",
+        "java": "Use for (int i = 0; i < n; i++) or for (int x : nums). Prefer a primitive int[] over Integer[] to avoid autoboxing overhead.",
+        "how": "Resolve them when a larger value appears."
+      }
+    ],
     "test_cases": [
       {
         "kind": "example",
@@ -6725,7 +7453,8 @@
       "returns": "int[]"
     },
     "judge_mode": "exact",
-    "float_tolerance": 0
+    "float_tolerance": 0,
+    "order": 74
   },
   {
     "slug": "subarray-sum-k",
@@ -6773,7 +7502,32 @@
       "Count prefix sums in a hash map.",
       "Handle the empty prefix (sum 0)."
     ],
-    "prerequisites": [],
+    "prerequisites": [
+      {
+        "key": "prefix_sum",
+        "name": "Prefix Sums",
+        "what": "Precomputed running totals so any range sum is a single subtraction.",
+        "deep": "Build P[i] = a[0]+…+a[i-1]; then the sum of a[l..r] is P[r+1] − P[l] in O(1). Paired with a hash map of seen prefixes it counts subarrays with a target sum in one pass. The same idea extends to prefix XOR, products, and 2-D grids.",
+        "java": "A long[] prefix of length n+1, or a running long combined with a HashMap<Long,Integer> of prefix counts.",
+        "how": "A range sum of k means two prefixes differ by k."
+      },
+      {
+        "key": "hashing",
+        "name": "Hash Maps & Sets",
+        "what": "Structures giving average O(1) insertion and lookup, trading memory for speed.",
+        "deep": "A hash table answers 'have I seen X?' or 'what maps to X?' in expected constant time, converting many O(n^2) pair scans into O(n) single passes. Worst case is O(n) per op under adversarial hashing, but that is rare in practice.",
+        "java": "HashMap<K,V> and HashSet<E>. Use getOrDefault(k, 0) and merge(k, 1, Integer::sum) for counting, containsKey/add for membership. For dense int keys, an int[] beats a HashMap.",
+        "how": "Count prefix sums in a map."
+      },
+      {
+        "key": "complement",
+        "name": "Complement Thinking",
+        "what": "Instead of testing all pairs, ask what single value would complete the current one, and look it up.",
+        "deep": "Reframes 'find two things that combine to T' as 'for each x, does T - x already exist?'. Paired with a hash structure this removes an entire nested loop, and the idea generalizes to differences, XORs, and remainders.",
+        "java": "Keep a HashSet<Integer> or HashMap<Integer,Integer> of seen values and query target - x before inserting x.",
+        "how": "For prefix s, add the count of earlier prefixes equal to s − k."
+      }
+    ],
     "test_cases": [
       {
         "kind": "example",
@@ -6821,7 +7575,8 @@
       "returns": "int"
     },
     "judge_mode": "exact",
-    "float_tolerance": 0
+    "float_tolerance": 0,
+    "order": 75
   },
   {
     "slug": "longest-consecutive",
@@ -6868,7 +7623,24 @@
       "Only start counting at sequence starts (no x-1 present).",
       "Walk upward while x+1 exists."
     ],
-    "prerequisites": [],
+    "prerequisites": [
+      {
+        "key": "hashing",
+        "name": "Hash Maps & Sets",
+        "what": "Structures giving average O(1) insertion and lookup, trading memory for speed.",
+        "deep": "A hash table answers 'have I seen X?' or 'what maps to X?' in expected constant time, converting many O(n^2) pair scans into O(n) single passes. Worst case is O(n) per op under adversarial hashing, but that is rare in practice.",
+        "java": "HashMap<K,V> and HashSet<E>. Use getOrDefault(k, 0) and merge(k, 1, Integer::sum) for counting, containsKey/add for membership. For dense int keys, an int[] beats a HashMap.",
+        "how": "A set gives O(1) membership for neighbours."
+      },
+      {
+        "key": "visited_set",
+        "name": "Visited Tracking",
+        "what": "Recording which nodes or cells are already processed so you never revisit or double-count.",
+        "deep": "Graph and grid traversals loop forever or over-count without visited marks. Mark as early as possible (on enqueue) so a node is not added twice; for grids you can use a boolean[][] or mutate the input to a sentinel value.",
+        "java": "boolean[] visited / boolean[][] seen, or overwrite grid cells (set '1' to '0') when mutation is allowed.",
+        "how": "Only start counting at sequence starts."
+      }
+    ],
     "test_cases": [
       {
         "kind": "example",
@@ -6912,7 +7684,8 @@
       "returns": "int"
     },
     "judge_mode": "exact",
-    "float_tolerance": 0
+    "float_tolerance": 0,
+    "order": 76
   },
   {
     "slug": "kth-largest-element",
@@ -6932,7 +7705,7 @@
         "explanation": "4th largest is 4."
       }
     ],
-    "editorial": "",
+    "editorial": "Sort descending and index (heap/quickselect improve it).",
     "optimal_time": "O(n log n)",
     "optimal_space": "O(1)",
     "optimal_explanation": "Sort descending and index (heap/quickselect improve it).",
@@ -6959,7 +7732,24 @@
       "A size-k min-heap is more efficient.",
       "Quickselect gives average O(n)."
     ],
-    "prerequisites": [],
+    "prerequisites": [
+      {
+        "key": "sorting",
+        "name": "Sorting",
+        "what": "Ordering elements (usually O(n log n)) so structure like duplicates and order statistics becomes easy.",
+        "deep": "Sorting is a preprocessing multiplier: it enables binary search, two-pointer sweeps, greedy choices, and grouping. The cost is O(n log n) comparisons, though counting/radix sort can beat that for bounded integer keys.",
+        "java": "Arrays.sort(int[]) or Arrays.sort(T[], Comparator) / Collections.sort. For custom order use Comparator.comparingInt(...). Note primitive sort has no comparator overload.",
+        "how": "Sort descending and index."
+      },
+      {
+        "key": "heap",
+        "name": "Priority Queue (Heap)",
+        "what": "A structure that always yields the smallest or largest pending item in O(log n).",
+        "deep": "A binary heap supports push and pop-min/max in O(log n) and peek in O(1). It powers greedy expansion (Dijkstra, Prim), top-k selection, and merging sorted streams, but it has no fast arbitrary lookup or deletion.",
+        "java": "PriorityQueue<T> is a min-heap by default. For pairs use long[]/int[] with a comparator: new PriorityQueue<>((a, b) -> Long.compare(a[0], b[0])).",
+        "how": "A size-k min-heap avoids a full sort."
+      }
+    ],
     "test_cases": [
       {
         "kind": "example",
@@ -7007,7 +7797,8 @@
       "returns": "int"
     },
     "judge_mode": "exact",
-    "float_tolerance": 0
+    "float_tolerance": 0,
+    "order": 77
   },
   {
     "slug": "rotate-array-right",
@@ -7027,7 +7818,7 @@
         "explanation": "k mod 3 = 1 → 3,1,2."
       }
     ],
-    "editorial": "",
+    "editorial": "Slice/reverse to shift by k mod n.",
     "optimal_time": "O(n)",
     "optimal_space": "O(n)",
     "optimal_explanation": "Slice/reverse to shift by k mod n.",
@@ -7051,7 +7842,24 @@
       "The last k elements wrap to the front.",
       "Reversal trick does it in place."
     ],
-    "prerequisites": [],
+    "prerequisites": [
+      {
+        "key": "inplace_reverse",
+        "name": "In-place Reversal",
+        "what": "Reversing a segment by swapping symmetric elements, using O(1) extra space.",
+        "deep": "Swapping a[i] with a[n-1-i] for i in [0, n/2) reverses a range without allocation. It is the building block for array rotation (reverse-whole-then-parts) and for string reversal.",
+        "java": "A helper void reverse(int[] a, int i, int j) { while (i < j) { int t = a[i]; a[i++] = a[j]; a[j--] = t; } }.",
+        "how": "Three reversals rotate in O(1) space."
+      },
+      {
+        "key": "iteration",
+        "name": "Array Iteration",
+        "what": "Walking through elements one at a time while maintaining running state such as a sum, max, or counter.",
+        "deep": "The workhorse of array problems: one for-loop that updates accumulators as it goes. Most linear-time solutions are just one well-chosen pass, so the real skill is deciding what state to carry so a single sweep suffices.",
+        "java": "Use for (int i = 0; i < n; i++) or for (int x : nums). Prefer a primitive int[] over Integer[] to avoid autoboxing overhead.",
+        "how": "Reduce k modulo n first."
+      }
+    ],
     "test_cases": [
       {
         "kind": "example",
@@ -7099,7 +7907,8 @@
       "returns": "int[]"
     },
     "judge_mode": "exact",
-    "float_tolerance": 0
+    "float_tolerance": 0,
+    "order": 78
   },
   {
     "slug": "word-break",
@@ -7147,7 +7956,32 @@
       "dp[i] is true if some dp[j] is true and s[j:i] is a word.",
       "Use a set for word lookups."
     ],
-    "prerequisites": [],
+    "prerequisites": [
+      {
+        "key": "dp",
+        "name": "Dynamic Programming",
+        "what": "Breaking a problem into overlapping subproblems and reusing their answers.",
+        "deep": "Applies when there is optimal substructure and overlapping subproblems. Two styles exist: top-down memoized recursion and bottom-up tabulation. Defining the state and transition precisely is the whole game, and space can often be rolled down a dimension.",
+        "java": "A memo HashMap or an int[]/int[][] table. For memoization initialize a sentinel with Arrays.fill(dp, -1).",
+        "how": "Can the prefix of length i be segmented?"
+      },
+      {
+        "key": "hashing",
+        "name": "Hash Maps & Sets",
+        "what": "Structures giving average O(1) insertion and lookup, trading memory for speed.",
+        "deep": "A hash table answers 'have I seen X?' or 'what maps to X?' in expected constant time, converting many O(n^2) pair scans into O(n) single passes. Worst case is O(n) per op under adversarial hashing, but that is rare in practice.",
+        "java": "HashMap<K,V> and HashSet<E>. Use getOrDefault(k, 0) and merge(k, 1, Integer::sum) for counting, containsKey/add for membership. For dense int keys, an int[] beats a HashMap.",
+        "how": "A set makes dictionary lookups O(1)."
+      },
+      {
+        "key": "string_basics",
+        "name": "String Traversal",
+        "what": "Treating a string as an indexable sequence of characters to count and compare.",
+        "deep": "Most string problems reduce to a single pass with charAt or a char[]. Remember Java strings are immutable, so build output with StringBuilder, and character math relies on ASCII codes.",
+        "java": "s.charAt(i), s.length(), s.toCharArray(); build results with StringBuilder, never += inside a loop.",
+        "how": "Test substrings against the dictionary."
+      }
+    ],
     "test_cases": [
       {
         "kind": "example",
@@ -7195,7 +8029,8 @@
       "returns": "bool"
     },
     "judge_mode": "exact",
-    "float_tolerance": 0
+    "float_tolerance": 0,
+    "order": 91
   },
   {
     "slug": "decode-ways",
@@ -7242,7 +8077,32 @@
       "dp[i] sums the valid one- and two-digit extensions.",
       "Leading zeros kill a decoding."
     ],
-    "prerequisites": [],
+    "prerequisites": [
+      {
+        "key": "dp",
+        "name": "Dynamic Programming",
+        "what": "Breaking a problem into overlapping subproblems and reusing their answers.",
+        "deep": "Applies when there is optimal substructure and overlapping subproblems. Two styles exist: top-down memoized recursion and bottom-up tabulation. Defining the state and transition precisely is the whole game, and space can often be rolled down a dimension.",
+        "java": "A memo HashMap or an int[]/int[][] table. For memoization initialize a sentinel with Arrays.fill(dp, -1).",
+        "how": "Ways to decode each prefix."
+      },
+      {
+        "key": "recurrence",
+        "name": "Recurrence Relations",
+        "what": "Expressing an answer in terms of smaller answers, e.g. f(n) = f(n-1) + f(n-2).",
+        "deep": "A recurrence is the mathematical heart of many DP and divide-and-conquer solutions. Once you name the base cases and the transition you can either recurse with memoization or iterate bottom-up, often reducing space to a few rolling variables.",
+        "java": "Iterate bottom-up with a few long variables, or memoize with a long[] dp. Use long when terms grow fast.",
+        "how": "Add one- and two-digit extensions."
+      },
+      {
+        "key": "string_basics",
+        "name": "String Traversal",
+        "what": "Treating a string as an indexable sequence of characters to count and compare.",
+        "deep": "Most string problems reduce to a single pass with charAt or a char[]. Remember Java strings are immutable, so build output with StringBuilder, and character math relies on ASCII codes.",
+        "java": "s.charAt(i), s.length(), s.toCharArray(); build results with StringBuilder, never += inside a loop.",
+        "how": "Read one or two characters at a time."
+      }
+    ],
     "test_cases": [
       {
         "kind": "example",
@@ -7286,7 +8146,8 @@
       "returns": "int"
     },
     "judge_mode": "exact",
-    "float_tolerance": 0
+    "float_tolerance": 0,
+    "order": 92
   },
   {
     "slug": "longest-palindrome-length",
@@ -7334,7 +8195,24 @@
       "Expand outward from each of the 2n−1 centers.",
       "Track the best length."
     ],
-    "prerequisites": [],
+    "prerequisites": [
+      {
+        "key": "two_pointers",
+        "name": "Two Pointers",
+        "what": "Two indices moving through a sequence (from both ends, or at different speeds) to replace a nested loop.",
+        "deep": "By advancing pointers based on a comparison you explore O(n) states instead of O(n^2). Common shapes are opposite ends converging (sorted pair sums, palindromes, rain water) and fast/slow (cycle detection). Correctness hinges on why the pointer you move cannot skip a better answer.",
+        "java": "Two int indices lo/hi (or i/j) in a while (lo < hi) loop; no special class needed.",
+        "how": "Expand outward from each center."
+      },
+      {
+        "key": "string_basics",
+        "name": "String Traversal",
+        "what": "Treating a string as an indexable sequence of characters to count and compare.",
+        "deep": "Most string problems reduce to a single pass with charAt or a char[]. Remember Java strings are immutable, so build output with StringBuilder, and character math relies on ASCII codes.",
+        "java": "s.charAt(i), s.length(), s.toCharArray(); build results with StringBuilder, never += inside a loop.",
+        "how": "Match characters around a center."
+      }
+    ],
     "test_cases": [
       {
         "kind": "example",
@@ -7378,7 +8256,8 @@
       "returns": "int"
     },
     "judge_mode": "exact",
-    "float_tolerance": 0
+    "float_tolerance": 0,
+    "order": 93
   },
   {
     "slug": "maximum-product-subarray",
@@ -7425,7 +8304,24 @@
       "Track both the max and min product ending here.",
       "Update the answer each step."
     ],
-    "prerequisites": [],
+    "prerequisites": [
+      {
+        "key": "dp",
+        "name": "Dynamic Programming",
+        "what": "Breaking a problem into overlapping subproblems and reusing their answers.",
+        "deep": "Applies when there is optimal substructure and overlapping subproblems. Two styles exist: top-down memoized recursion and bottom-up tabulation. Defining the state and transition precisely is the whole game, and space can often be rolled down a dimension.",
+        "java": "A memo HashMap or an int[]/int[][] table. For memoization initialize a sentinel with Arrays.fill(dp, -1).",
+        "how": "Carry both max and min products — a negative flips them."
+      },
+      {
+        "key": "iteration",
+        "name": "Array Iteration",
+        "what": "Walking through elements one at a time while maintaining running state such as a sum, max, or counter.",
+        "deep": "The workhorse of array problems: one for-loop that updates accumulators as it goes. Most linear-time solutions are just one well-chosen pass, so the real skill is deciding what state to carry so a single sweep suffices.",
+        "java": "Use for (int i = 0; i < n; i++) or for (int x : nums). Prefer a primitive int[] over Integer[] to avoid autoboxing overhead.",
+        "how": "Update the answer each step."
+      }
+    ],
     "test_cases": [
       {
         "kind": "example",
@@ -7469,7 +8365,8 @@
       "returns": "int"
     },
     "judge_mode": "exact",
-    "float_tolerance": 0
+    "float_tolerance": 0,
+    "order": 94
   },
   {
     "slug": "partition-equal-subset-sum",
@@ -7515,7 +8412,24 @@
       "Otherwise, can we hit total/2 as a subset sum?",
       "0/1 knapsack over a boolean DP."
     ],
-    "prerequisites": [],
+    "prerequisites": [
+      {
+        "key": "dp",
+        "name": "Dynamic Programming",
+        "what": "Breaking a problem into overlapping subproblems and reusing their answers.",
+        "deep": "Applies when there is optimal substructure and overlapping subproblems. Two styles exist: top-down memoized recursion and bottom-up tabulation. Defining the state and transition precisely is the whole game, and space can often be rolled down a dimension.",
+        "java": "A memo HashMap or an int[]/int[][] table. For memoization initialize a sentinel with Arrays.fill(dp, -1).",
+        "how": "Reduce to a subset summing to total/2."
+      },
+      {
+        "key": "recurrence",
+        "name": "Recurrence Relations",
+        "what": "Expressing an answer in terms of smaller answers, e.g. f(n) = f(n-1) + f(n-2).",
+        "deep": "A recurrence is the mathematical heart of many DP and divide-and-conquer solutions. Once you name the base cases and the transition you can either recurse with memoization or iterate bottom-up, often reducing space to a few rolling variables.",
+        "java": "Iterate bottom-up with a few long variables, or memoize with a long[] dp. Use long when terms grow fast.",
+        "how": "0/1 knapsack over reachable subset sums."
+      }
+    ],
     "test_cases": [
       {
         "kind": "example",
@@ -7559,6 +8473,2758 @@
       "returns": "bool"
     },
     "judge_mode": "exact",
-    "float_tolerance": 0
+    "float_tolerance": 0,
+    "order": 95
+  },
+  {
+    "slug": "min-of-two",
+    "title": "Min of Two",
+    "difficulty": "Intro",
+    "description": "Return the smaller of two integers.",
+    "constraints": "-10^9 ≤ a, b ≤ 10^9",
+    "examples": [
+      {
+        "input": "3\n8",
+        "output": "3",
+        "explanation": "3 < 8."
+      },
+      {
+        "input": "-2\n-9",
+        "output": "-9",
+        "explanation": "-9 is smaller."
+      }
+    ],
+    "editorial": "A single comparison.",
+    "optimal_time": "O(1)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "A single comparison.",
+    "starter_code": {
+      "python": "def solve(a, b):\n    # TODO: implement\n    return 0\n",
+      "java": "class Solution {\n    int solve(int a, int b) {\n        // TODO: implement\n        return 0;\n    }\n}\n"
+    },
+    "topics": [
+      "Basics"
+    ],
+    "subtopics": [
+      "Conditionals"
+    ],
+    "companies": [
+      "Amazon"
+    ],
+    "patterns": [],
+    "hints": [
+      "Compare the two values.",
+      "Return whichever is not larger."
+    ],
+    "prerequisites": [
+      {
+        "key": "conditionals",
+        "name": "Conditionals (if / else)",
+        "what": "Choosing what to do based on whether a condition is true.",
+        "deep": "if/else branches let your program react to data. The condition is a boolean expression built from comparisons (==, !=, <, >) and logic (&&, ||, !). Chain several with else if when there are more than two outcomes.",
+        "java": "if (n % 2 == 0) { ... } else { ... }. Compare ints with ==, but compare Strings with .equals(), never ==.",
+        "how": "Return whichever value is not larger."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example",
+        "input": "3\n8\n",
+        "expected_output": "3",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Negatives",
+        "input": "-2\n-9\n",
+        "expected_output": "-9",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Equal",
+        "input": "5\n5\n",
+        "expected_output": "5",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Zero",
+        "input": "0\n-1\n",
+        "expected_output": "-1",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "a",
+          "type": "int"
+        },
+        {
+          "name": "b",
+          "type": "int"
+        }
+      ],
+      "returns": "int"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0,
+    "order": 16
+  },
+  {
+    "slug": "cube-number",
+    "title": "Cube",
+    "difficulty": "Intro",
+    "description": "Return the cube (n³) of the integer.",
+    "constraints": "-10^4 ≤ n ≤ 10^4",
+    "examples": [
+      {
+        "input": "3",
+        "output": "27",
+        "explanation": "3³ = 27."
+      },
+      {
+        "input": "-2",
+        "output": "-8",
+        "explanation": "(-2)³ = -8."
+      }
+    ],
+    "editorial": "Two multiplications.",
+    "optimal_time": "O(1)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "Two multiplications.",
+    "starter_code": {
+      "python": "def solve(n):\n    # TODO: implement\n    return 0\n",
+      "java": "class Solution {\n    long solve(int n) {\n        // TODO: implement\n        return 0L;\n    }\n}\n"
+    },
+    "topics": [
+      "Basics",
+      "Math"
+    ],
+    "subtopics": [
+      "Arithmetic"
+    ],
+    "companies": [
+      "Microsoft"
+    ],
+    "patterns": [],
+    "hints": [
+      "Multiply n by itself three times.",
+      "Use a 64-bit return type."
+    ],
+    "prerequisites": [
+      {
+        "key": "arithmetic",
+        "name": "Arithmetic & Operators",
+        "what": "Doing math with +, -, *, / and the remainder operator %.",
+        "deep": "Operators combine values. The Java gotchas: integer division truncates (7 / 2 is 3, not 3.5), % gives the remainder (great for even/odd and wrapping), and mixing an int with a double promotes the result to double.",
+        "java": "Use +, -, *, /, %. Note 7 / 2 == 3 (int) but 7.0 / 2 == 3.5 (double). Math.max, Math.min, Math.abs help too.",
+        "how": "Multiply the number by itself twice."
+      },
+      {
+        "key": "overflow",
+        "name": "Integer Overflow (int vs long)",
+        "what": "Guarding against results that exceed a 32-bit int's range of about 2.1x10^9.",
+        "deep": "Sums, products, and reversed numbers can silently wrap a 32-bit int, giving a wrong answer with no error. The fix is a wide enough type or a modulo reduction, so estimate the maximum magnitude before choosing the type.",
+        "java": "int overflows past ~2.1e9; long reaches ~9.2e18. Cast early with (long) a * b and accumulate sums into a long.",
+        "how": "Use a 64-bit return type."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example",
+        "input": "3\n",
+        "expected_output": "27",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Negative",
+        "input": "-2\n",
+        "expected_output": "-8",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Zero",
+        "input": "0\n",
+        "expected_output": "0",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Larger",
+        "input": "100\n",
+        "expected_output": "1000000",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "n",
+          "type": "int"
+        }
+      ],
+      "returns": "long"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0,
+    "order": 17
+  },
+  {
+    "slug": "is-multiple",
+    "title": "Is Multiple",
+    "difficulty": "Intro",
+    "description": "Return `true` if `a` is a multiple of `b` (b ≠ 0).",
+    "constraints": "1 ≤ b ≤ 10^9\n0 ≤ a ≤ 10^9",
+    "examples": [
+      {
+        "input": "12\n3",
+        "output": "true",
+        "explanation": "12 = 4·3."
+      },
+      {
+        "input": "10\n3",
+        "output": "false",
+        "explanation": "10 mod 3 = 1."
+      }
+    ],
+    "editorial": "One modulo test.",
+    "optimal_time": "O(1)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "One modulo test.",
+    "starter_code": {
+      "python": "def solve(a, b):\n    # TODO: implement\n    return False\n",
+      "java": "class Solution {\n    boolean solve(int a, int b) {\n        // TODO: implement\n        return false;\n    }\n}\n"
+    },
+    "topics": [
+      "Math"
+    ],
+    "subtopics": [
+      "Number Theory"
+    ],
+    "companies": [
+      "Adobe"
+    ],
+    "patterns": [],
+    "hints": [
+      "A is a multiple of b when the remainder is zero.",
+      "Use the modulo operator."
+    ],
+    "prerequisites": [
+      {
+        "key": "modulo",
+        "name": "Modular Reduction",
+        "what": "Using n % k to wrap indices around and drop redundant whole cycles.",
+        "deep": "Modulo collapses equivalent states: rotating by k equals rotating by k % n, and hashing or bucketing uses remainders. In Java, beware that % can return a negative result for negative operands.",
+        "java": "Use k % n after guarding n > 0; for possibly-negative values use Math.floorMod(x, n).",
+        "how": "A multiple leaves remainder zero."
+      },
+      {
+        "key": "number_theory",
+        "name": "Number Theory Basics",
+        "what": "Divisibility, gcd, and modular arithmetic facts used to reason about integers.",
+        "deep": "Foundations like the Euclidean algorithm, prime factorization, and modular arithmetic underpin many math problems. Even simple tasks benefit from gcd/lcm identities and knowing how modulo distributes over addition and multiplication.",
+        "java": "Math.floorMod for correct modulo of negatives; write a short gcd helper (Euclid); BigInteger has gcd() if needed.",
+        "how": "Divisibility is a remainder test."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Multiple",
+        "input": "12\n3\n",
+        "expected_output": "true",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Not",
+        "input": "10\n3\n",
+        "expected_output": "false",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Zero dividend",
+        "input": "0\n5\n",
+        "expected_output": "true",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Self",
+        "input": "7\n7\n",
+        "expected_output": "true",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "a",
+          "type": "int"
+        },
+        {
+          "name": "b",
+          "type": "int"
+        }
+      ],
+      "returns": "bool"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0,
+    "order": 18
+  },
+  {
+    "slug": "count-digits",
+    "title": "Count Digits",
+    "difficulty": "Intro",
+    "description": "Return how many decimal digits a non-negative integer has (0 has one digit).",
+    "constraints": "0 ≤ n ≤ 10^9",
+    "examples": [
+      {
+        "input": "12345",
+        "output": "5",
+        "explanation": "Five digits."
+      },
+      {
+        "input": "7",
+        "output": "1",
+        "explanation": "One digit."
+      }
+    ],
+    "editorial": "One pass over the digits.",
+    "optimal_time": "O(log n)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "One pass over the digits.",
+    "starter_code": {
+      "python": "def solve(n):\n    # TODO: implement\n    return 0\n",
+      "java": "class Solution {\n    int solve(int n) {\n        // TODO: implement\n        return 0;\n    }\n}\n"
+    },
+    "topics": [
+      "Math"
+    ],
+    "subtopics": [
+      "Digits"
+    ],
+    "companies": [
+      "Amazon"
+    ],
+    "patterns": [],
+    "hints": [
+      "Divide by 10 repeatedly and count.",
+      "Or take the length of the string form."
+    ],
+    "prerequisites": [
+      {
+        "key": "math_digits",
+        "name": "Digit Manipulation",
+        "what": "Working with a number's decimal digits or its string form while handling signs and edge cases.",
+        "deep": "Digit problems peel digits with % 10 and / 10, or operate on the string form. Classic gotchas are negative numbers, trailing zeros, and overflow when reversing, so the first choice is arithmetic vs string handling.",
+        "java": "n % 10 and n / 10 to extract digits, or Long.toString(n); use long to avoid overflow on reversal.",
+        "how": "Divide by 10 repeatedly, counting steps."
+      },
+      {
+        "key": "loops_basic",
+        "name": "Loops (for / while)",
+        "what": "Repeating a block of code a set number of times or until a condition changes.",
+        "deep": "A for-loop fits when you know the count; a while-loop when you stop on a condition. Loops are how you process every element or accumulate a running result, and getting the start/end bounds right is the main beginner pitfall.",
+        "java": "for (int i = 1; i <= n; i++) { ... } or while (condition) { ... }. Build output strings with StringBuilder inside the loop.",
+        "how": "Loop until the number reaches zero."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example",
+        "input": "12345\n",
+        "expected_output": "5",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Single",
+        "input": "7\n",
+        "expected_output": "1",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Zero",
+        "input": "0\n",
+        "expected_output": "1",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Round",
+        "input": "1000\n",
+        "expected_output": "4",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "n",
+          "type": "int"
+        }
+      ],
+      "returns": "int"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0,
+    "order": 19
+  },
+  {
+    "slug": "array-maximum",
+    "title": "Array Maximum",
+    "difficulty": "Intro",
+    "description": "Return the largest element of a non-empty array.",
+    "constraints": "1 ≤ n ≤ 10^5",
+    "examples": [
+      {
+        "input": "3 1 4 1 5",
+        "output": "5",
+        "explanation": "5 is largest."
+      },
+      {
+        "input": "-2 -9 -1",
+        "output": "-1",
+        "explanation": "-1 is largest."
+      }
+    ],
+    "editorial": "Single pass tracking the max.",
+    "optimal_time": "O(n)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "Single pass tracking the max.",
+    "starter_code": {
+      "python": "def solve(nums):\n    # TODO: implement\n    return 0\n",
+      "java": "class Solution {\n    int solve(int[] nums) {\n        // TODO: implement\n        return 0;\n    }\n}\n"
+    },
+    "topics": [
+      "Arrays"
+    ],
+    "subtopics": [
+      "Traversal"
+    ],
+    "companies": [
+      "Microsoft"
+    ],
+    "patterns": [],
+    "hints": [
+      "Track a running maximum as you scan."
+    ],
+    "prerequisites": [
+      {
+        "key": "iteration",
+        "name": "Array Iteration",
+        "what": "Walking through elements one at a time while maintaining running state such as a sum, max, or counter.",
+        "deep": "The workhorse of array problems: one for-loop that updates accumulators as it goes. Most linear-time solutions are just one well-chosen pass, so the real skill is deciding what state to carry so a single sweep suffices.",
+        "java": "Use for (int i = 0; i < n; i++) or for (int x : nums). Prefer a primitive int[] over Integer[] to avoid autoboxing overhead.",
+        "how": "Track a running maximum across one pass."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example",
+        "input": "3 1 4 1 5\n",
+        "expected_output": "5",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Negatives",
+        "input": "-2 -9 -1\n",
+        "expected_output": "-1",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Single",
+        "input": "42\n",
+        "expected_output": "42",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Sorted",
+        "input": "1 2 3\n",
+        "expected_output": "3",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "nums",
+          "type": "int[]"
+        }
+      ],
+      "returns": "int"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0,
+    "order": 20
+  },
+  {
+    "slug": "reverse-integer",
+    "title": "Reverse Integer",
+    "difficulty": "Easy",
+    "description": "Return the integer with its digits reversed, preserving sign (assume the result fits in 32 bits).",
+    "constraints": "-2^31 ≤ n ≤ 2^31 − 1",
+    "examples": [
+      {
+        "input": "123",
+        "output": "321",
+        "explanation": "321."
+      },
+      {
+        "input": "-380",
+        "output": "-83",
+        "explanation": "-83 (trailing zero dropped)."
+      }
+    ],
+    "editorial": "Pop the last digit with %10 and push it onto an accumulator (acc = acc*10 + digit); reapply the sign.",
+    "optimal_time": "O(log n)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "One pass over the digits.",
+    "starter_code": {
+      "python": "def solve(n):\n    # TODO: implement\n    return 0\n",
+      "java": "class Solution {\n    int solve(int n) {\n        // TODO: implement\n        return 0;\n    }\n}\n"
+    },
+    "topics": [
+      "Math"
+    ],
+    "subtopics": [
+      "Digits"
+    ],
+    "companies": [
+      "Amazon",
+      "Bloomberg"
+    ],
+    "patterns": [],
+    "hints": [
+      "Peel digits off with % 10 and build the reverse.",
+      "Track the sign separately.",
+      "Trailing zeros vanish (120 → 21)."
+    ],
+    "prerequisites": [
+      {
+        "key": "math_digits",
+        "name": "Digit Manipulation",
+        "what": "Working with a number's decimal digits or its string form while handling signs and edge cases.",
+        "deep": "Digit problems peel digits with % 10 and / 10, or operate on the string form. Classic gotchas are negative numbers, trailing zeros, and overflow when reversing, so the first choice is arithmetic vs string handling.",
+        "java": "n % 10 and n / 10 to extract digits, or Long.toString(n); use long to avoid overflow on reversal.",
+        "how": "Peel the last digit with % 10 and push it onto an accumulator."
+      },
+      {
+        "key": "overflow",
+        "name": "Integer Overflow (int vs long)",
+        "what": "Guarding against results that exceed a 32-bit int's range of about 2.1x10^9.",
+        "deep": "Sums, products, and reversed numbers can silently wrap a 32-bit int, giving a wrong answer with no error. The fix is a wide enough type or a modulo reduction, so estimate the maximum magnitude before choosing the type.",
+        "java": "int overflows past ~2.1e9; long reaches ~9.2e18. Cast early with (long) a * b and accumulate sums into a long.",
+        "how": "Guard against exceeding the 32-bit range."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Positive",
+        "input": "123\n",
+        "expected_output": "321",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Negative",
+        "input": "-380\n",
+        "expected_output": "-83",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Palindrome",
+        "input": "121\n",
+        "expected_output": "121",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Single",
+        "input": "5\n",
+        "expected_output": "5",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "n",
+          "type": "int"
+        }
+      ],
+      "returns": "int"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0,
+    "order": 44
+  },
+  {
+    "slug": "power-of-two",
+    "title": "Power of Two",
+    "difficulty": "Easy",
+    "description": "Return `true` if the integer is a power of two.",
+    "constraints": "-2^31 ≤ n ≤ 2^31 − 1",
+    "examples": [
+      {
+        "input": "16",
+        "output": "true",
+        "explanation": "16 = 2⁴."
+      },
+      {
+        "input": "18",
+        "output": "false",
+        "explanation": "18 is not a power of two."
+      }
+    ],
+    "editorial": "A positive power of two has a single 1 bit, so n & (n−1) removes it and yields 0.",
+    "optimal_time": "O(1)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "Single bit trick: n>0 and n&(n-1)==0.",
+    "starter_code": {
+      "python": "def solve(n):\n    # TODO: implement\n    return False\n",
+      "java": "class Solution {\n    boolean solve(int n) {\n        // TODO: implement\n        return false;\n    }\n}\n"
+    },
+    "topics": [
+      "Bit Manipulation",
+      "Math"
+    ],
+    "subtopics": [
+      "Bit Manipulation"
+    ],
+    "companies": [
+      "Apple",
+      "Amazon"
+    ],
+    "patterns": [
+      "Bit Manipulation"
+    ],
+    "hints": [
+      "Powers of two have exactly one set bit.",
+      "n & (n-1) clears the lowest set bit.",
+      "Positive numbers only."
+    ],
+    "prerequisites": [
+      {
+        "key": "bit_manip",
+        "name": "Bit Manipulation",
+        "what": "Operating on the individual binary bits of an integer with AND, OR, XOR, and shifts.",
+        "deep": "Bit tricks give O(1) tools that replace loops: `x & (x-1)` clears the lowest set bit, `x & -x` isolates it, XOR cancels equal values, and shifting multiplies or divides by powers of two. They shine in set membership (bitmasks), parity, and counting.",
+        "java": "Use &, |, ^, ~, <<, >>, and >>> (unsigned shift). Integer.bitCount(x) counts set bits; x & (x-1) drops the lowest one.",
+        "how": "Powers of two have a single set bit: n & (n-1) == 0."
+      },
+      {
+        "key": "conditionals",
+        "name": "Conditionals (if / else)",
+        "what": "Choosing what to do based on whether a condition is true.",
+        "deep": "if/else branches let your program react to data. The condition is a boolean expression built from comparisons (==, !=, <, >) and logic (&&, ||, !). Chain several with else if when there are more than two outcomes.",
+        "java": "if (n % 2 == 0) { ... } else { ... }. Compare ints with ==, but compare Strings with .equals(), never ==.",
+        "how": "Reject non-positive numbers."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Yes",
+        "input": "16\n",
+        "expected_output": "true",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "No",
+        "input": "18\n",
+        "expected_output": "false",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "One",
+        "input": "1\n",
+        "expected_output": "true",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Zero",
+        "input": "0\n",
+        "expected_output": "false",
+        "ordering": 3
+      },
+      {
+        "kind": "hidden",
+        "name": "Negative",
+        "input": "-8\n",
+        "expected_output": "false",
+        "ordering": 4
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "n",
+          "type": "int"
+        }
+      ],
+      "returns": "bool"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0,
+    "order": 45
+  },
+  {
+    "slug": "missing-number",
+    "title": "Missing Number",
+    "difficulty": "Easy",
+    "description": "An array holds n distinct numbers from the range [0, n]. Return the one that's missing.",
+    "constraints": "1 ≤ n ≤ 10^5\nValues are distinct and in [0, n].",
+    "examples": [
+      {
+        "input": "3 0 1",
+        "output": "2",
+        "explanation": "2 is missing."
+      },
+      {
+        "input": "0 1 2",
+        "output": "3",
+        "explanation": "3 is missing."
+      }
+    ],
+    "editorial": "The sum 0+…+n is n(n+1)/2; subtract the array's sum to reveal the gap. XOR of indices and values also isolates it.",
+    "optimal_time": "O(n)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "Expected-sum minus actual-sum (or XOR).",
+    "starter_code": {
+      "python": "def solve(nums):\n    # TODO: implement\n    return 0\n",
+      "java": "class Solution {\n    int solve(int[] nums) {\n        // TODO: implement\n        return 0;\n    }\n}\n"
+    },
+    "topics": [
+      "Arrays",
+      "Math"
+    ],
+    "subtopics": [
+      "XOR"
+    ],
+    "companies": [
+      "Amazon",
+      "Microsoft"
+    ],
+    "patterns": [
+      "Bit Manipulation"
+    ],
+    "hints": [
+      "The full range has a known sum: n(n+1)/2.",
+      "Subtract the actual sum.",
+      "XOR also works and avoids overflow."
+    ],
+    "prerequisites": [
+      {
+        "key": "prefix_sum",
+        "name": "Prefix Sums",
+        "what": "Precomputed running totals so any range sum is a single subtraction.",
+        "deep": "Build P[i] = a[0]+…+a[i-1]; then the sum of a[l..r] is P[r+1] − P[l] in O(1). Paired with a hash map of seen prefixes it counts subarrays with a target sum in one pass. The same idea extends to prefix XOR, products, and 2-D grids.",
+        "java": "A long[] prefix of length n+1, or a running long combined with a HashMap<Long,Integer> of prefix counts.",
+        "how": "The full range sum minus the actual sum is the gap."
+      },
+      {
+        "key": "bit_manip",
+        "name": "Bit Manipulation",
+        "what": "Operating on the individual binary bits of an integer with AND, OR, XOR, and shifts.",
+        "deep": "Bit tricks give O(1) tools that replace loops: `x & (x-1)` clears the lowest set bit, `x & -x` isolates it, XOR cancels equal values, and shifting multiplies or divides by powers of two. They shine in set membership (bitmasks), parity, and counting.",
+        "java": "Use &, |, ^, ~, <<, >>, and >>> (unsigned shift). Integer.bitCount(x) counts set bits; x & (x-1) drops the lowest one.",
+        "how": "XOR of indices and values also isolates it."
+      },
+      {
+        "key": "iteration",
+        "name": "Array Iteration",
+        "what": "Walking through elements one at a time while maintaining running state such as a sum, max, or counter.",
+        "deep": "The workhorse of array problems: one for-loop that updates accumulators as it goes. Most linear-time solutions are just one well-chosen pass, so the real skill is deciding what state to carry so a single sweep suffices.",
+        "java": "Use for (int i = 0; i < n; i++) or for (int x : nums). Prefer a primitive int[] over Integer[] to avoid autoboxing overhead.",
+        "how": "One pass sums the array."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example",
+        "input": "3 0 1\n",
+        "expected_output": "2",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Missing last",
+        "input": "0 1 2\n",
+        "expected_output": "3",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Single",
+        "input": "1\n",
+        "expected_output": "0",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Missing first",
+        "input": "1 2\n",
+        "expected_output": "0",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "nums",
+          "type": "int[]"
+        }
+      ],
+      "returns": "int"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0,
+    "order": 46
+  },
+  {
+    "slug": "count-negatives",
+    "title": "Count Negatives",
+    "difficulty": "Easy",
+    "description": "Return how many elements are negative.",
+    "constraints": "0 ≤ n ≤ 10^5",
+    "examples": [
+      {
+        "input": "-1 2 -3 4",
+        "output": "2",
+        "explanation": "-1 and -3 → 2."
+      },
+      {
+        "input": "1 2 3",
+        "output": "0",
+        "explanation": "No negatives."
+      }
+    ],
+    "editorial": "Single pass.",
+    "optimal_time": "O(n)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "Single pass.",
+    "starter_code": {
+      "python": "def solve(nums):\n    # TODO: implement\n    return 0\n",
+      "java": "class Solution {\n    int solve(int[] nums) {\n        // TODO: implement\n        return 0;\n    }\n}\n"
+    },
+    "topics": [
+      "Arrays"
+    ],
+    "subtopics": [
+      "Counting"
+    ],
+    "companies": [
+      "Amazon"
+    ],
+    "patterns": [
+      "Counting"
+    ],
+    "hints": [
+      "Scan once and count values below zero."
+    ],
+    "prerequisites": [
+      {
+        "key": "iteration",
+        "name": "Array Iteration",
+        "what": "Walking through elements one at a time while maintaining running state such as a sum, max, or counter.",
+        "deep": "The workhorse of array problems: one for-loop that updates accumulators as it goes. Most linear-time solutions are just one well-chosen pass, so the real skill is deciding what state to carry so a single sweep suffices.",
+        "java": "Use for (int i = 0; i < n; i++) or for (int x : nums). Prefer a primitive int[] over Integer[] to avoid autoboxing overhead.",
+        "how": "Scan once, counting values below zero."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example",
+        "input": "-1 2 -3 4\n",
+        "expected_output": "2",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "None",
+        "input": "1 2 3\n",
+        "expected_output": "0",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "All",
+        "input": "-1 -2\n",
+        "expected_output": "2",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Empty",
+        "input": "\n",
+        "expected_output": "0",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "nums",
+          "type": "int[]"
+        }
+      ],
+      "returns": "int"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0,
+    "order": 47
+  },
+  {
+    "slug": "is-sorted",
+    "title": "Is Sorted",
+    "difficulty": "Easy",
+    "description": "Return `true` if the array is sorted in non-decreasing order.",
+    "constraints": "0 ≤ n ≤ 10^5",
+    "examples": [
+      {
+        "input": "1 2 2 3",
+        "output": "true",
+        "explanation": "Non-decreasing."
+      },
+      {
+        "input": "3 1 2",
+        "output": "false",
+        "explanation": "3 > 1 breaks order."
+      }
+    ],
+    "editorial": "Single adjacent-pair scan.",
+    "optimal_time": "O(n)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "Single adjacent-pair scan.",
+    "starter_code": {
+      "python": "def solve(nums):\n    # TODO: implement\n    return False\n",
+      "java": "class Solution {\n    boolean solve(int[] nums) {\n        // TODO: implement\n        return false;\n    }\n}\n"
+    },
+    "topics": [
+      "Arrays"
+    ],
+    "subtopics": [
+      "Traversal"
+    ],
+    "companies": [
+      "Adobe"
+    ],
+    "patterns": [],
+    "hints": [
+      "Every element should be ≤ the next.",
+      "One violation is enough to fail.",
+      "Empty and single arrays are sorted."
+    ],
+    "prerequisites": [
+      {
+        "key": "iteration",
+        "name": "Array Iteration",
+        "what": "Walking through elements one at a time while maintaining running state such as a sum, max, or counter.",
+        "deep": "The workhorse of array problems: one for-loop that updates accumulators as it goes. Most linear-time solutions are just one well-chosen pass, so the real skill is deciding what state to carry so a single sweep suffices.",
+        "java": "Use for (int i = 0; i < n; i++) or for (int x : nums). Prefer a primitive int[] over Integer[] to avoid autoboxing overhead.",
+        "how": "Check every adjacent pair in one pass."
+      },
+      {
+        "key": "boolean_logic",
+        "name": "Booleans & Comparison",
+        "what": "True/false values and the operators that combine them.",
+        "deep": "Comparisons produce booleans, and &&, ||, ! combine them. Short-circuit evaluation means the right side of && is skipped when the left is false, which is both handy and sometimes necessary to avoid errors.",
+        "java": "boolean type; comparisons ==, !=, <, <=, >, >=; logic && (and), || (or), ! (not).",
+        "how": "One violation makes the whole answer false."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Sorted",
+        "input": "1 2 2 3\n",
+        "expected_output": "true",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Not",
+        "input": "3 1 2\n",
+        "expected_output": "false",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Single",
+        "input": "5\n",
+        "expected_output": "true",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Empty",
+        "input": "\n",
+        "expected_output": "true",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "nums",
+          "type": "int[]"
+        }
+      ],
+      "returns": "bool"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0,
+    "order": 48
+  },
+  {
+    "slug": "fizzbuzz-value",
+    "title": "FizzBuzz Value",
+    "difficulty": "Easy",
+    "description": "Return \"FizzBuzz\" if n is divisible by 15, \"Fizz\" if by 3, \"Buzz\" if by 5, otherwise the number as a string.",
+    "constraints": "1 ≤ n ≤ 10^6",
+    "examples": [
+      {
+        "input": "9",
+        "output": "Fizz",
+        "explanation": "9 divisible by 3 → Fizz."
+      },
+      {
+        "input": "15",
+        "output": "FizzBuzz",
+        "explanation": "15 divisible by both → FizzBuzz."
+      }
+    ],
+    "editorial": "A few modulo checks.",
+    "optimal_time": "O(1)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "A few modulo checks.",
+    "starter_code": {
+      "python": "def solve(n):\n    # TODO: implement\n    return \"\"\n",
+      "java": "class Solution {\n    String solve(int n) {\n        // TODO: implement\n        return \"\";\n    }\n}\n"
+    },
+    "topics": [
+      "Math"
+    ],
+    "subtopics": [
+      "Conditionals"
+    ],
+    "companies": [
+      "Amazon",
+      "Microsoft"
+    ],
+    "patterns": [],
+    "hints": [
+      "Check divisibility by 15 first.",
+      "Then 3, then 5.",
+      "Otherwise return the number itself."
+    ],
+    "prerequisites": [
+      {
+        "key": "modulo",
+        "name": "Modular Reduction",
+        "what": "Using n % k to wrap indices around and drop redundant whole cycles.",
+        "deep": "Modulo collapses equivalent states: rotating by k equals rotating by k % n, and hashing or bucketing uses remainders. In Java, beware that % can return a negative result for negative operands.",
+        "java": "Use k % n after guarding n > 0; for possibly-negative values use Math.floorMod(x, n).",
+        "how": "Divisibility drives the branch."
+      },
+      {
+        "key": "conditionals",
+        "name": "Conditionals (if / else)",
+        "what": "Choosing what to do based on whether a condition is true.",
+        "deep": "if/else branches let your program react to data. The condition is a boolean expression built from comparisons (==, !=, <, >) and logic (&&, ||, !). Chain several with else if when there are more than two outcomes.",
+        "java": "if (n % 2 == 0) { ... } else { ... }. Compare ints with ==, but compare Strings with .equals(), never ==.",
+        "how": "Test 15 before 3 and 5."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Fizz",
+        "input": "9\n",
+        "expected_output": "Fizz",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "FizzBuzz",
+        "input": "15\n",
+        "expected_output": "FizzBuzz",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Buzz",
+        "input": "10\n",
+        "expected_output": "Buzz",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Plain",
+        "input": "7\n",
+        "expected_output": "7",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "n",
+          "type": "int"
+        }
+      ],
+      "returns": "string"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0,
+    "order": 49
+  },
+  {
+    "slug": "two-sum-sorted",
+    "title": "Two Sum II (sorted)",
+    "difficulty": "Easy",
+    "description": "Given a sorted array with exactly one solution, return the 1-based indices of the two numbers adding to `target`.",
+    "constraints": "2 ≤ n ≤ 10^4\nArray is sorted ascending; exactly one answer.",
+    "examples": [
+      {
+        "input": "2 7 11 15\n9",
+        "output": "1 2",
+        "explanation": "2+7 at indices 1,2."
+      },
+      {
+        "input": "1 2 3 6\n7",
+        "output": "1 4",
+        "explanation": "1+6 at indices 1,4."
+      }
+    ],
+    "editorial": "With the array sorted, converge two pointers: if the pair sum is below target move left up, if above move right down.",
+    "optimal_time": "O(n)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "Converging two pointers on a sorted array.",
+    "starter_code": {
+      "python": "def solve(nums, target):\n    # TODO: implement\n    return []\n",
+      "java": "class Solution {\n    int[] solve(int[] nums, int target) {\n        // TODO: implement\n        return new int[]{};\n    }\n}\n"
+    },
+    "topics": [
+      "Two Pointers",
+      "Arrays"
+    ],
+    "subtopics": [
+      "Two Pointers"
+    ],
+    "companies": [
+      "Amazon",
+      "Google"
+    ],
+    "patterns": [
+      "Two Pointers"
+    ],
+    "hints": [
+      "Exploit the sorted order.",
+      "Two pointers from both ends adjust based on the sum.",
+      "Move left up if the sum is too small, right down if too big."
+    ],
+    "prerequisites": [
+      {
+        "key": "two_pointers",
+        "name": "Two Pointers",
+        "what": "Two indices moving through a sequence (from both ends, or at different speeds) to replace a nested loop.",
+        "deep": "By advancing pointers based on a comparison you explore O(n) states instead of O(n^2). Common shapes are opposite ends converging (sorted pair sums, palindromes, rain water) and fast/slow (cycle detection). Correctness hinges on why the pointer you move cannot skip a better answer.",
+        "java": "Two int indices lo/hi (or i/j) in a while (lo < hi) loop; no special class needed.",
+        "how": "Converge from both ends of the sorted array."
+      },
+      {
+        "key": "iteration",
+        "name": "Array Iteration",
+        "what": "Walking through elements one at a time while maintaining running state such as a sum, max, or counter.",
+        "deep": "The workhorse of array problems: one for-loop that updates accumulators as it goes. Most linear-time solutions are just one well-chosen pass, so the real skill is deciding what state to carry so a single sweep suffices.",
+        "java": "Use for (int i = 0; i < n; i++) or for (int x : nums). Prefer a primitive int[] over Integer[] to avoid autoboxing overhead.",
+        "how": "Adjust a pointer based on whether the sum is too big or small."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example",
+        "input": "2 7 11 15\n9\n",
+        "expected_output": "1 2",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Ends",
+        "input": "1 2 3 6\n7\n",
+        "expected_output": "1 4",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Adjacent",
+        "input": "1 4 5\n9\n",
+        "expected_output": "2 3",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Small",
+        "input": "0 3\n3\n",
+        "expected_output": "1 2",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "nums",
+          "type": "int[]"
+        },
+        {
+          "name": "target",
+          "type": "int"
+        }
+      ],
+      "returns": "int[]"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0,
+    "order": 50
+  },
+  {
+    "slug": "merge-sorted-arrays",
+    "title": "Merge Two Sorted Arrays",
+    "difficulty": "Medium",
+    "description": "Merge two sorted arrays into one sorted array and return it.",
+    "constraints": "0 ≤ |a|, |b| ≤ 10^5",
+    "examples": [
+      {
+        "input": "1 3 5\n2 4 6",
+        "output": "1 2 3 4 5 6",
+        "explanation": "1,2,3,4,5,6."
+      },
+      {
+        "input": "\n1 2",
+        "output": "1 2",
+        "explanation": "1,2."
+      }
+    ],
+    "editorial": "Advance two pointers, emitting the smaller front element each step, then append whichever array remains.",
+    "optimal_time": "O(m+n)",
+    "optimal_space": "O(m+n)",
+    "optimal_explanation": "Two-pointer merge (the merge step of merge sort).",
+    "starter_code": {
+      "python": "def solve(a, b):\n    # TODO: implement\n    return []\n",
+      "java": "class Solution {\n    int[] solve(int[] a, int[] b) {\n        // TODO: implement\n        return new int[]{};\n    }\n}\n"
+    },
+    "topics": [
+      "Arrays",
+      "Two Pointers"
+    ],
+    "subtopics": [
+      "Two Pointers"
+    ],
+    "companies": [
+      "Amazon",
+      "Microsoft"
+    ],
+    "patterns": [
+      "Two Pointers"
+    ],
+    "hints": [
+      "Walk both arrays with two indices.",
+      "Always take the smaller current head.",
+      "Append the leftover tail."
+    ],
+    "prerequisites": [
+      {
+        "key": "two_pointers",
+        "name": "Two Pointers",
+        "what": "Two indices moving through a sequence (from both ends, or at different speeds) to replace a nested loop.",
+        "deep": "By advancing pointers based on a comparison you explore O(n) states instead of O(n^2). Common shapes are opposite ends converging (sorted pair sums, palindromes, rain water) and fast/slow (cycle detection). Correctness hinges on why the pointer you move cannot skip a better answer.",
+        "java": "Two int indices lo/hi (or i/j) in a while (lo < hi) loop; no special class needed.",
+        "how": "Advance the pointer with the smaller head."
+      },
+      {
+        "key": "sorting",
+        "name": "Sorting",
+        "what": "Ordering elements (usually O(n log n)) so structure like duplicates and order statistics becomes easy.",
+        "deep": "Sorting is a preprocessing multiplier: it enables binary search, two-pointer sweeps, greedy choices, and grouping. The cost is O(n log n) comparisons, though counting/radix sort can beat that for bounded integer keys.",
+        "java": "Arrays.sort(int[]) or Arrays.sort(T[], Comparator) / Collections.sort. For custom order use Comparator.comparingInt(...). Note primitive sort has no comparator overload.",
+        "how": "This is the merge step of merge sort."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example",
+        "input": "1 3 5\n2 4 6\n",
+        "expected_output": "1 2 3 4 5 6",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "One empty",
+        "input": "\n1 2\n",
+        "expected_output": "1 2",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Overlap",
+        "input": "1 2 3\n2 3 4\n",
+        "expected_output": "1 2 2 3 3 4",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Both single",
+        "input": "5\n1\n",
+        "expected_output": "1 5",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "a",
+          "type": "int[]"
+        },
+        {
+          "name": "b",
+          "type": "int[]"
+        }
+      ],
+      "returns": "int[]"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0,
+    "order": 79
+  },
+  {
+    "slug": "kth-smallest",
+    "title": "Kth Smallest Element",
+    "difficulty": "Medium",
+    "description": "Return the kth smallest element (1-indexed, k valid).",
+    "constraints": "1 ≤ k ≤ n ≤ 10^5",
+    "examples": [
+      {
+        "input": "3 2 1 5 4\n2",
+        "output": "2",
+        "explanation": "2nd smallest is 2."
+      },
+      {
+        "input": "2 2 1 3\n3",
+        "output": "2",
+        "explanation": "3rd smallest is 2."
+      }
+    ],
+    "editorial": "Sort ascending and index (heap/quickselect improve it).",
+    "optimal_time": "O(n log n)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "Sort ascending and index (heap/quickselect improve it).",
+    "starter_code": {
+      "python": "def solve(nums, k):\n    # TODO: implement\n    return 0\n",
+      "java": "class Solution {\n    int solve(int[] nums, int k) {\n        // TODO: implement\n        return 0;\n    }\n}\n"
+    },
+    "topics": [
+      "Sorting",
+      "Heap"
+    ],
+    "subtopics": [
+      "Sorting"
+    ],
+    "companies": [
+      "Amazon",
+      "Bloomberg"
+    ],
+    "patterns": [
+      "Sorting"
+    ],
+    "hints": [
+      "Sorting is the simplest approach.",
+      "A size-k max-heap works too.",
+      "Quickselect gives average O(n)."
+    ],
+    "prerequisites": [
+      {
+        "key": "sorting",
+        "name": "Sorting",
+        "what": "Ordering elements (usually O(n log n)) so structure like duplicates and order statistics becomes easy.",
+        "deep": "Sorting is a preprocessing multiplier: it enables binary search, two-pointer sweeps, greedy choices, and grouping. The cost is O(n log n) comparisons, though counting/radix sort can beat that for bounded integer keys.",
+        "java": "Arrays.sort(int[]) or Arrays.sort(T[], Comparator) / Collections.sort. For custom order use Comparator.comparingInt(...). Note primitive sort has no comparator overload.",
+        "how": "Sort ascending and index."
+      },
+      {
+        "key": "heap",
+        "name": "Priority Queue (Heap)",
+        "what": "A structure that always yields the smallest or largest pending item in O(log n).",
+        "deep": "A binary heap supports push and pop-min/max in O(log n) and peek in O(1). It powers greedy expansion (Dijkstra, Prim), top-k selection, and merging sorted streams, but it has no fast arbitrary lookup or deletion.",
+        "java": "PriorityQueue<T> is a min-heap by default. For pairs use long[]/int[] with a comparator: new PriorityQueue<>((a, b) -> Long.compare(a[0], b[0])).",
+        "how": "A size-k max-heap works in O(n log k)."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example",
+        "input": "3 2 1 5 4\n2\n",
+        "expected_output": "2",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Dupes",
+        "input": "2 2 1 3\n3\n",
+        "expected_output": "2",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "First",
+        "input": "9\n1\n",
+        "expected_output": "9",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Max",
+        "input": "1 2 3\n3\n",
+        "expected_output": "3",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "nums",
+          "type": "int[]"
+        },
+        {
+          "name": "k",
+          "type": "int"
+        }
+      ],
+      "returns": "int"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0,
+    "order": 80
+  },
+  {
+    "slug": "gcd-of-array",
+    "title": "GCD of Array",
+    "difficulty": "Medium",
+    "description": "Return the greatest common divisor of all elements in a non-empty array.",
+    "constraints": "1 ≤ n ≤ 10^5\n1 ≤ a[i] ≤ 10^9",
+    "examples": [
+      {
+        "input": "12 18 24",
+        "output": "6",
+        "explanation": "gcd is 6."
+      },
+      {
+        "input": "7 5",
+        "output": "1",
+        "explanation": "Coprime → 1."
+      }
+    ],
+    "editorial": "gcd(a,b,c,…) = gcd(gcd(a,b),c,…); accumulate a running gcd using the Euclidean algorithm.",
+    "optimal_time": "O(n·log max)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "Fold pairwise gcd across the array.",
+    "starter_code": {
+      "python": "def solve(nums):\n    # TODO: implement\n    return 0\n",
+      "java": "class Solution {\n    int solve(int[] nums) {\n        // TODO: implement\n        return 0;\n    }\n}\n"
+    },
+    "topics": [
+      "Math"
+    ],
+    "subtopics": [
+      "Number Theory"
+    ],
+    "companies": [
+      "Bloomberg"
+    ],
+    "patterns": [],
+    "hints": [
+      "gcd is associative: fold it across the array.",
+      "Use the Euclidean algorithm for each pair.",
+      "The running gcd only shrinks."
+    ],
+    "prerequisites": [
+      {
+        "key": "number_theory",
+        "name": "Number Theory Basics",
+        "what": "Divisibility, gcd, and modular arithmetic facts used to reason about integers.",
+        "deep": "Foundations like the Euclidean algorithm, prime factorization, and modular arithmetic underpin many math problems. Even simple tasks benefit from gcd/lcm identities and knowing how modulo distributes over addition and multiplication.",
+        "java": "Math.floorMod for correct modulo of negatives; write a short gcd helper (Euclid); BigInteger has gcd() if needed.",
+        "how": "gcd is associative — fold it pairwise."
+      },
+      {
+        "key": "recursion",
+        "name": "Recursion",
+        "what": "A function that calls itself on smaller inputs, with base cases that stop the descent.",
+        "deep": "Expresses divide-and-conquer and tree/graph walks naturally. Watch the recursion depth against stack limits, and whether subproblems overlap - if they do, add memoization to avoid exponential blow-up.",
+        "java": "A private static helper that calls itself. The JVM stack handles ~10^4 depth; convert to an explicit ArrayDeque if you risk StackOverflowError.",
+        "how": "The Euclidean algorithm reduces each pair."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example",
+        "input": "12 18 24\n",
+        "expected_output": "6",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Coprime",
+        "input": "7 5\n",
+        "expected_output": "1",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Single",
+        "input": "9\n",
+        "expected_output": "9",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Multiples",
+        "input": "4 8 16\n",
+        "expected_output": "4",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "nums",
+          "type": "int[]"
+        }
+      ],
+      "returns": "int"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0,
+    "order": 81
+  },
+  {
+    "slug": "fast-power",
+    "title": "Fast Power",
+    "difficulty": "Medium",
+    "description": "Compute base^exp for a non-negative exponent using fast exponentiation.",
+    "constraints": "0 ≤ exp ≤ 40\n-100 ≤ base ≤ 100 (result fits in 64 bits)",
+    "examples": [
+      {
+        "input": "2\n10",
+        "output": "1024",
+        "explanation": "2¹⁰ = 1024."
+      },
+      {
+        "input": "5\n0",
+        "output": "1",
+        "explanation": "Anything⁰ = 1."
+      }
+    ],
+    "editorial": "Binary exponentiation: while exp>0, if the low bit is set multiply the base into the result, then square the base and shift.",
+    "optimal_time": "O(log exp)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "Exponentiation by squaring.",
+    "starter_code": {
+      "python": "def solve(base, exp):\n    # TODO: implement\n    return 0\n",
+      "java": "class Solution {\n    long solve(int base, int exp) {\n        // TODO: implement\n        return 0L;\n    }\n}\n"
+    },
+    "topics": [
+      "Math",
+      "Recursion"
+    ],
+    "subtopics": [
+      "Recurrence"
+    ],
+    "companies": [
+      "Google",
+      "Amazon"
+    ],
+    "patterns": [
+      "Dynamic Programming"
+    ],
+    "hints": [
+      "Squaring halves the exponent each step.",
+      "Multiply in the base only on odd bits.",
+      "This is O(log exp), not O(exp)."
+    ],
+    "prerequisites": [
+      {
+        "key": "recursion",
+        "name": "Recursion",
+        "what": "A function that calls itself on smaller inputs, with base cases that stop the descent.",
+        "deep": "Expresses divide-and-conquer and tree/graph walks naturally. Watch the recursion depth against stack limits, and whether subproblems overlap - if they do, add memoization to avoid exponential blow-up.",
+        "java": "A private static helper that calls itself. The JVM stack handles ~10^4 depth; convert to an explicit ArrayDeque if you risk StackOverflowError.",
+        "how": "Squaring halves the exponent each step."
+      },
+      {
+        "key": "bit_manip",
+        "name": "Bit Manipulation",
+        "what": "Operating on the individual binary bits of an integer with AND, OR, XOR, and shifts.",
+        "deep": "Bit tricks give O(1) tools that replace loops: `x & (x-1)` clears the lowest set bit, `x & -x` isolates it, XOR cancels equal values, and shifting multiplies or divides by powers of two. They shine in set membership (bitmasks), parity, and counting.",
+        "java": "Use &, |, ^, ~, <<, >>, and >>> (unsigned shift). Integer.bitCount(x) counts set bits; x & (x-1) drops the lowest one.",
+        "how": "Multiply in the base only on set bits of the exponent."
+      },
+      {
+        "key": "overflow",
+        "name": "Integer Overflow (int vs long)",
+        "what": "Guarding against results that exceed a 32-bit int's range of about 2.1x10^9.",
+        "deep": "Sums, products, and reversed numbers can silently wrap a 32-bit int, giving a wrong answer with no error. The fix is a wide enough type or a modulo reduction, so estimate the maximum magnitude before choosing the type.",
+        "java": "int overflows past ~2.1e9; long reaches ~9.2e18. Cast early with (long) a * b and accumulate sums into a long.",
+        "how": "Results grow quickly — use a wide type."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example",
+        "input": "2\n10\n",
+        "expected_output": "1024",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Zero exp",
+        "input": "5\n0\n",
+        "expected_output": "1",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Base one",
+        "input": "1\n40\n",
+        "expected_output": "1",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Negative base",
+        "input": "-2\n3\n",
+        "expected_output": "-8",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "base",
+          "type": "int"
+        },
+        {
+          "name": "exp",
+          "type": "int"
+        }
+      ],
+      "returns": "long"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0,
+    "order": 82
+  },
+  {
+    "slug": "unique-paths",
+    "title": "Unique Paths",
+    "difficulty": "Medium",
+    "description": "A robot moves only right or down on an m×n grid from the top-left to the bottom-right. Return how many distinct paths exist.",
+    "constraints": "1 ≤ m, n ≤ 100",
+    "examples": [
+      {
+        "input": "3\n7",
+        "output": "28",
+        "explanation": "28 paths on a 3×7 grid."
+      },
+      {
+        "input": "3\n3",
+        "output": "6",
+        "explanation": "6 paths on a 3×3 grid."
+      }
+    ],
+    "editorial": "dp[j] += dp[j-1] across m rows starting from all-ones — each cell sums the paths from above and from the left.",
+    "optimal_time": "O(m·n)",
+    "optimal_space": "O(n)",
+    "optimal_explanation": "Grid DP with a rolling row.",
+    "starter_code": {
+      "python": "def solve(m, n):\n    # TODO: implement\n    return 0\n",
+      "java": "class Solution {\n    int solve(int m, int n) {\n        // TODO: implement\n        return 0;\n    }\n}\n"
+    },
+    "topics": [
+      "Dynamic Programming"
+    ],
+    "subtopics": [
+      "2D DP"
+    ],
+    "companies": [
+      "Amazon",
+      "Bloomberg"
+    ],
+    "patterns": [
+      "Dynamic Programming"
+    ],
+    "hints": [
+      "Paths to a cell = paths from above + paths from the left.",
+      "The first row and column each have exactly one path.",
+      "A single rolling row of size n suffices."
+    ],
+    "prerequisites": [
+      {
+        "key": "dp",
+        "name": "Dynamic Programming",
+        "what": "Breaking a problem into overlapping subproblems and reusing their answers.",
+        "deep": "Applies when there is optimal substructure and overlapping subproblems. Two styles exist: top-down memoized recursion and bottom-up tabulation. Defining the state and transition precisely is the whole game, and space can often be rolled down a dimension.",
+        "java": "A memo HashMap or an int[]/int[][] table. For memoization initialize a sentinel with Arrays.fill(dp, -1).",
+        "how": "Paths to a cell sum the paths from above and left."
+      },
+      {
+        "key": "dp2d",
+        "name": "2-D Dynamic Programming",
+        "what": "A table dp[i][j] indexed by two dimensions, filled from smaller states.",
+        "deep": "Used when the state needs two coordinates: prefixes of two sequences, positions in a grid, or index-plus-capacity. The fill order must respect dependencies, and many 2-D DPs compress to one row because dp[i] depends only on dp[i-1].",
+        "java": "int[][] dp = new int[m + 1][n + 1] filled row by row; compress to two int[] rows (prev/cur) to save memory.",
+        "how": "A grid DP, reducible to one rolling row."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example",
+        "input": "3\n7\n",
+        "expected_output": "28",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Square",
+        "input": "3\n3\n",
+        "expected_output": "6",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Row",
+        "input": "1\n5\n",
+        "expected_output": "1",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Small",
+        "input": "2\n2\n",
+        "expected_output": "2",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "m",
+          "type": "int"
+        },
+        {
+          "name": "n",
+          "type": "int"
+        }
+      ],
+      "returns": "int"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0,
+    "order": 83
+  },
+  {
+    "slug": "longest-common-subsequence",
+    "title": "Longest Common Subsequence",
+    "difficulty": "Medium",
+    "description": "Return the length of the longest subsequence common to both strings (characters in order, not necessarily contiguous).",
+    "constraints": "0 ≤ |a|, |b| ≤ 1000",
+    "examples": [
+      {
+        "input": "abcde\nace",
+        "output": "3",
+        "explanation": "'ace' → 3."
+      },
+      {
+        "input": "abc\ndef",
+        "output": "0",
+        "explanation": "No common subsequence → 0."
+      }
+    ],
+    "editorial": "dp[i][j] = dp[i-1][j-1]+1 when a[i-1]==b[j-1], else max(dp[i-1][j], dp[i][j-1]).",
+    "optimal_time": "O(m·n)",
+    "optimal_space": "O(m·n)",
+    "optimal_explanation": "2-D DP over prefixes of both strings.",
+    "starter_code": {
+      "python": "def solve(a, b):\n    # TODO: implement\n    return 0\n",
+      "java": "class Solution {\n    int solve(String a, String b) {\n        // TODO: implement\n        return 0;\n    }\n}\n"
+    },
+    "topics": [
+      "Dynamic Programming",
+      "Strings"
+    ],
+    "subtopics": [
+      "2D DP"
+    ],
+    "companies": [
+      "Amazon",
+      "Google",
+      "Adobe"
+    ],
+    "patterns": [
+      "Dynamic Programming"
+    ],
+    "hints": [
+      "Compare prefixes of the two strings.",
+      "If the last characters match, extend the diagonal; else take the better of dropping one.",
+      "It's a classic 2-D DP table."
+    ],
+    "prerequisites": [
+      {
+        "key": "dp2d",
+        "name": "2-D Dynamic Programming",
+        "what": "A table dp[i][j] indexed by two dimensions, filled from smaller states.",
+        "deep": "Used when the state needs two coordinates: prefixes of two sequences, positions in a grid, or index-plus-capacity. The fill order must respect dependencies, and many 2-D DPs compress to one row because dp[i] depends only on dp[i-1].",
+        "java": "int[][] dp = new int[m + 1][n + 1] filled row by row; compress to two int[] rows (prev/cur) to save memory.",
+        "how": "A 2-D table over prefixes of both strings."
+      },
+      {
+        "key": "recurrence",
+        "name": "Recurrence Relations",
+        "what": "Expressing an answer in terms of smaller answers, e.g. f(n) = f(n-1) + f(n-2).",
+        "deep": "A recurrence is the mathematical heart of many DP and divide-and-conquer solutions. Once you name the base cases and the transition you can either recurse with memoization or iterate bottom-up, often reducing space to a few rolling variables.",
+        "java": "Iterate bottom-up with a few long variables, or memoize with a long[] dp. Use long when terms grow fast.",
+        "how": "Match extends the diagonal; mismatch takes the better neighbour."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example",
+        "input": "abcde\nace\n",
+        "expected_output": "3",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "None",
+        "input": "abc\ndef\n",
+        "expected_output": "0",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Equal",
+        "input": "abc\nabc\n",
+        "expected_output": "3",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Interleaved",
+        "input": "abcbdab\nbdcab\n",
+        "expected_output": "4",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "a",
+          "type": "string"
+        },
+        {
+          "name": "b",
+          "type": "string"
+        }
+      ],
+      "returns": "int"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0,
+    "order": 84
+  },
+  {
+    "slug": "top-k-frequent",
+    "title": "Top K Frequent Elements",
+    "difficulty": "Medium",
+    "description": "Return the k most frequent values, ordered by frequency descending and, for ties, by value ascending.",
+    "constraints": "1 ≤ k ≤ number of distinct values",
+    "examples": [
+      {
+        "input": "1 1 1 2 2 3\n2",
+        "output": "1 2",
+        "explanation": "1 (×3), 2 (×2) → 1 2."
+      },
+      {
+        "input": "4 4 5 5 6\n2",
+        "output": "4 5",
+        "explanation": "Ties broken by value → 4 5."
+      }
+    ],
+    "editorial": "Tally counts, then sort the distinct values by descending count (ascending value on ties) and take the first k.",
+    "optimal_time": "O(n log n)",
+    "optimal_space": "O(n)",
+    "optimal_explanation": "Count, then order by frequency (heap or sort).",
+    "starter_code": {
+      "python": "def solve(nums, k):\n    # TODO: implement\n    return []\n",
+      "java": "class Solution {\n    int[] solve(int[] nums, int k) {\n        // TODO: implement\n        return new int[]{};\n    }\n}\n"
+    },
+    "topics": [
+      "Hashing",
+      "Heap",
+      "Sorting"
+    ],
+    "subtopics": [
+      "Counting"
+    ],
+    "companies": [
+      "Amazon",
+      "Meta"
+    ],
+    "patterns": [
+      "Hashing",
+      "Sorting",
+      "Counting"
+    ],
+    "hints": [
+      "Count occurrences with a hash map.",
+      "Order by (−count, value) to make ties deterministic.",
+      "A heap of size k avoids a full sort."
+    ],
+    "prerequisites": [
+      {
+        "key": "hashing",
+        "name": "Hash Maps & Sets",
+        "what": "Structures giving average O(1) insertion and lookup, trading memory for speed.",
+        "deep": "A hash table answers 'have I seen X?' or 'what maps to X?' in expected constant time, converting many O(n^2) pair scans into O(n) single passes. Worst case is O(n) per op under adversarial hashing, but that is rare in practice.",
+        "java": "HashMap<K,V> and HashSet<E>. Use getOrDefault(k, 0) and merge(k, 1, Integer::sum) for counting, containsKey/add for membership. For dense int keys, an int[] beats a HashMap.",
+        "how": "Tally counts with a map."
+      },
+      {
+        "key": "heap",
+        "name": "Priority Queue (Heap)",
+        "what": "A structure that always yields the smallest or largest pending item in O(log n).",
+        "deep": "A binary heap supports push and pop-min/max in O(log n) and peek in O(1). It powers greedy expansion (Dijkstra, Prim), top-k selection, and merging sorted streams, but it has no fast arbitrary lookup or deletion.",
+        "java": "PriorityQueue<T> is a min-heap by default. For pairs use long[]/int[] with a comparator: new PriorityQueue<>((a, b) -> Long.compare(a[0], b[0])).",
+        "how": "A size-k heap surfaces the most frequent."
+      },
+      {
+        "key": "sorting",
+        "name": "Sorting",
+        "what": "Ordering elements (usually O(n log n)) so structure like duplicates and order statistics becomes easy.",
+        "deep": "Sorting is a preprocessing multiplier: it enables binary search, two-pointer sweeps, greedy choices, and grouping. The cost is O(n log n) comparisons, though counting/radix sort can beat that for bounded integer keys.",
+        "java": "Arrays.sort(int[]) or Arrays.sort(T[], Comparator) / Collections.sort. For custom order use Comparator.comparingInt(...). Note primitive sort has no comparator overload.",
+        "how": "Order by (−count, value) for deterministic ties."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example",
+        "input": "1 1 1 2 2 3\n2\n",
+        "expected_output": "1 2",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Tie",
+        "input": "4 4 5 5 6\n2\n",
+        "expected_output": "4 5",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "All distinct",
+        "input": "3 1 2\n2\n",
+        "expected_output": "1 2",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Single",
+        "input": "7 7\n1\n",
+        "expected_output": "7",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "nums",
+          "type": "int[]"
+        },
+        {
+          "name": "k",
+          "type": "int"
+        }
+      ],
+      "returns": "int[]"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0,
+    "order": 85
+  },
+  {
+    "slug": "count-bits",
+    "title": "Counting Bits",
+    "difficulty": "Medium",
+    "description": "Return an array where out[i] is the number of set bits in i, for i from 0 to n.",
+    "constraints": "0 ≤ n ≤ 10^5",
+    "examples": [
+      {
+        "input": "5",
+        "output": "0 1 1 2 1 2",
+        "explanation": "0,1,1,2,1,2."
+      },
+      {
+        "input": "2",
+        "output": "0 1 1",
+        "explanation": "0,1,1."
+      }
+    ],
+    "editorial": "Each number's bit count is its half's count plus its lowest bit: dp[i] = dp[i>>1] + (i&1).",
+    "optimal_time": "O(n)",
+    "optimal_space": "O(n)",
+    "optimal_explanation": "DP: popcount(i) = popcount(i>>1) + (i&1).",
+    "starter_code": {
+      "python": "def solve(n):\n    # TODO: implement\n    return []\n",
+      "java": "class Solution {\n    int[] solve(int n) {\n        // TODO: implement\n        return new int[]{};\n    }\n}\n"
+    },
+    "topics": [
+      "Bit Manipulation",
+      "Dynamic Programming"
+    ],
+    "subtopics": [
+      "Bit Manipulation"
+    ],
+    "companies": [
+      "Amazon",
+      "Apple"
+    ],
+    "patterns": [
+      "Bit Manipulation",
+      "Dynamic Programming"
+    ],
+    "hints": [
+      "popcount(i) = popcount(i>>1) + (i & 1).",
+      "Or popcount(i) = popcount(i & (i-1)) + 1.",
+      "Build the table bottom-up."
+    ],
+    "prerequisites": [
+      {
+        "key": "bit_manip",
+        "name": "Bit Manipulation",
+        "what": "Operating on the individual binary bits of an integer with AND, OR, XOR, and shifts.",
+        "deep": "Bit tricks give O(1) tools that replace loops: `x & (x-1)` clears the lowest set bit, `x & -x` isolates it, XOR cancels equal values, and shifting multiplies or divides by powers of two. They shine in set membership (bitmasks), parity, and counting.",
+        "java": "Use &, |, ^, ~, <<, >>, and >>> (unsigned shift). Integer.bitCount(x) counts set bits; x & (x-1) drops the lowest one.",
+        "how": "dp[i] = dp[i>>1] + (i & 1)."
+      },
+      {
+        "key": "dp",
+        "name": "Dynamic Programming",
+        "what": "Breaking a problem into overlapping subproblems and reusing their answers.",
+        "deep": "Applies when there is optimal substructure and overlapping subproblems. Two styles exist: top-down memoized recursion and bottom-up tabulation. Defining the state and transition precisely is the whole game, and space can often be rolled down a dimension.",
+        "java": "A memo HashMap or an int[]/int[][] table. For memoization initialize a sentinel with Arrays.fill(dp, -1).",
+        "how": "Reuse the already-computed count of i/2."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "To 5",
+        "input": "5\n",
+        "expected_output": "0 1 1 2 1 2",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "To 2",
+        "input": "2\n",
+        "expected_output": "0 1 1",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Zero",
+        "input": "0\n",
+        "expected_output": "0",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "To 8",
+        "input": "8\n",
+        "expected_output": "0 1 1 2 1 2 2 3 1",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "n",
+          "type": "int"
+        }
+      ],
+      "returns": "int[]"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0,
+    "order": 86
+  },
+  {
+    "slug": "largest-rectangle-histogram",
+    "title": "Largest Rectangle in Histogram",
+    "difficulty": "Hard",
+    "description": "Given bar heights of width 1, return the area of the largest rectangle that fits within the histogram.",
+    "constraints": "0 ≤ n ≤ 10^5\n0 ≤ height ≤ 10^9",
+    "examples": [
+      {
+        "input": "2 1 5 6 2 3",
+        "output": "10",
+        "explanation": "5 and 6 form area 10."
+      },
+      {
+        "input": "1 2 3 4",
+        "output": "6",
+        "explanation": "Bars 3,4 → 6."
+      }
+    ],
+    "editorial": "Keep a stack of increasing heights; when a shorter bar arrives, pop and compute each popped bar's maximal width (bounded by the new bar and the stack's previous index).",
+    "optimal_time": "O(n)",
+    "optimal_space": "O(n)",
+    "optimal_explanation": "Monotonic stack of increasing bar indices.",
+    "starter_code": {
+      "python": "def solve(heights):\n    # TODO: implement\n    return 0\n",
+      "java": "class Solution {\n    long solve(int[] heights) {\n        // TODO: implement\n        return 0L;\n    }\n}\n"
+    },
+    "topics": [
+      "Stack",
+      "Arrays"
+    ],
+    "subtopics": [
+      "Monotonic Stack"
+    ],
+    "companies": [
+      "Amazon",
+      "Google"
+    ],
+    "patterns": [
+      "Stack"
+    ],
+    "hints": [
+      "For each bar, how far left and right can it extend at its own height?",
+      "A monotonic increasing stack finds the bounds in O(n).",
+      "Pop when a shorter bar appears and settle the popped bar's rectangle."
+    ],
+    "prerequisites": [
+      {
+        "key": "stack",
+        "name": "Stack (LIFO)",
+        "what": "A last-in-first-out structure whose top is always the most recent unmatched item.",
+        "deep": "Ideal when the newest open item must be resolved first: bracket matching, monotonic-stack range queries, expression parsing, or iterative DFS. Push, pop, and peek are all O(1).",
+        "java": "Use ArrayDeque<T> as a stack (push/pop/peek) - it is faster than the legacy Stack class. For brackets use Deque<Character>.",
+        "how": "A monotonic increasing stack finds each bar's span."
+      },
+      {
+        "key": "iteration",
+        "name": "Array Iteration",
+        "what": "Walking through elements one at a time while maintaining running state such as a sum, max, or counter.",
+        "deep": "The workhorse of array problems: one for-loop that updates accumulators as it goes. Most linear-time solutions are just one well-chosen pass, so the real skill is deciding what state to carry so a single sweep suffices.",
+        "java": "Use for (int i = 0; i < n; i++) or for (int x : nums). Prefer a primitive int[] over Integer[] to avoid autoboxing overhead.",
+        "how": "Settle rectangles as shorter bars arrive."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example",
+        "input": "2 1 5 6 2 3\n",
+        "expected_output": "10",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Increasing",
+        "input": "1 2 3 4\n",
+        "expected_output": "6",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Flat",
+        "input": "3 3 3\n",
+        "expected_output": "9",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Single",
+        "input": "5\n",
+        "expected_output": "5",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "heights",
+          "type": "int[]"
+        }
+      ],
+      "returns": "long"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0,
+    "order": 96
+  },
+  {
+    "slug": "sliding-window-maximum",
+    "title": "Sliding Window Maximum",
+    "difficulty": "Hard",
+    "description": "Return the maximum of every contiguous window of size k as it slides across the array.",
+    "constraints": "1 ≤ k ≤ n ≤ 10^5",
+    "examples": [
+      {
+        "input": "1 3 -1 -3 5 3 6 7\n3",
+        "output": "3 3 5 5 6 7",
+        "explanation": "3,3,5,5,6,7."
+      },
+      {
+        "input": "4 2 12\n1",
+        "output": "4 2 12",
+        "explanation": "Each element is its own window."
+      }
+    ],
+    "editorial": "Maintain a deque of indices with decreasing values; the front is always the window max. Evict out-of-window indices and pop smaller tails.",
+    "optimal_time": "O(n)",
+    "optimal_space": "O(k)",
+    "optimal_explanation": "Monotonic deque of indices.",
+    "starter_code": {
+      "python": "def solve(nums, k):\n    # TODO: implement\n    return []\n",
+      "java": "class Solution {\n    int[] solve(int[] nums, int k) {\n        // TODO: implement\n        return new int[]{};\n    }\n}\n"
+    },
+    "topics": [
+      "Stack",
+      "Arrays"
+    ],
+    "subtopics": [
+      "Monotonic Stack"
+    ],
+    "companies": [
+      "Amazon",
+      "Google",
+      "Meta"
+    ],
+    "patterns": [
+      "Stack"
+    ],
+    "hints": [
+      "A monotonic decreasing deque of indices holds candidates.",
+      "Drop indices that fall out of the window from the front.",
+      "Drop smaller values from the back before adding a new one."
+    ],
+    "prerequisites": [
+      {
+        "key": "stack",
+        "name": "Stack (LIFO)",
+        "what": "A last-in-first-out structure whose top is always the most recent unmatched item.",
+        "deep": "Ideal when the newest open item must be resolved first: bracket matching, monotonic-stack range queries, expression parsing, or iterative DFS. Push, pop, and peek are all O(1).",
+        "java": "Use ArrayDeque<T> as a stack (push/pop/peek) - it is faster than the legacy Stack class. For brackets use Deque<Character>.",
+        "how": "A monotonic deque keeps window candidates."
+      },
+      {
+        "key": "sliding_window",
+        "name": "Sliding Window",
+        "what": "A moving sub-range [left, right] whose bounds expand and contract to maintain an invariant.",
+        "deep": "Turns 'longest/best sub-array meeting a condition' into an amortized O(n) scan: extend the right edge, and when the invariant breaks advance the left edge. Each index enters and leaves the window at most once, which is why it stays linear.",
+        "java": "Two int pointers plus a HashMap<Character,Integer> or an int[128] frequency table to track window contents.",
+        "how": "The window slides one step at a time, evicting stale indices."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example",
+        "input": "1 3 -1 -3 5 3 6 7\n3\n",
+        "expected_output": "3 3 5 5 6 7",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "k=1",
+        "input": "4 2 12\n1\n",
+        "expected_output": "4 2 12",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Whole",
+        "input": "2 1 3\n3\n",
+        "expected_output": "3",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Increasing",
+        "input": "1 2 3 4\n2\n",
+        "expected_output": "2 3 4",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "nums",
+          "type": "int[]"
+        },
+        {
+          "name": "k",
+          "type": "int"
+        }
+      ],
+      "returns": "int[]"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0,
+    "order": 97
+  },
+  {
+    "slug": "jump-game-ii",
+    "title": "Jump Game II (min jumps)",
+    "difficulty": "Hard",
+    "description": "Each value is the max jump length from that index. Return the fewest jumps to reach the last index (always reachable).",
+    "constraints": "1 ≤ n ≤ 10^4",
+    "examples": [
+      {
+        "input": "2 3 1 1 4",
+        "output": "2",
+        "explanation": "2 jumps: index 0→1→4."
+      },
+      {
+        "input": "0",
+        "output": "0",
+        "explanation": "Already at the end → 0."
+      }
+    ],
+    "editorial": "Track the farthest reach and the current level's end; each time i hits the end, take a jump and extend the end to farthest.",
+    "optimal_time": "O(n)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "Greedy BFS-by-levels over reachable ranges.",
+    "starter_code": {
+      "python": "def solve(nums):\n    # TODO: implement\n    return 0\n",
+      "java": "class Solution {\n    int solve(int[] nums) {\n        // TODO: implement\n        return 0;\n    }\n}\n"
+    },
+    "topics": [
+      "Arrays",
+      "Greedy"
+    ],
+    "subtopics": [
+      "Greedy"
+    ],
+    "companies": [
+      "Amazon",
+      "Meta"
+    ],
+    "patterns": [
+      "Greedy"
+    ],
+    "hints": [
+      "Think in levels: the range reachable with j jumps.",
+      "Extend a 'current end' greedily to the farthest reachable.",
+      "Bump the jump count when you cross the current end."
+    ],
+    "prerequisites": [
+      {
+        "key": "greedy",
+        "name": "Greedy Choice",
+        "what": "Taking the locally-best option at each step when that provably reaches a global optimum.",
+        "deep": "Greedy is fast and simple but correct only when the problem has the greedy-choice property and optimal substructure; otherwise DP is the fallback. Proving correctness (often an exchange argument) matters more than the code.",
+        "java": "Often just Arrays.sort plus a linear scan, or a PriorityQueue to always grab the current best.",
+        "how": "Extend the reachable range level by level."
+      },
+      {
+        "key": "bfs",
+        "name": "Breadth-First Search",
+        "what": "Exploring a graph level by level with a queue; finds shortest paths in unweighted graphs.",
+        "deep": "BFS visits nodes in order of distance from the source, so the first time it reaches a node is via a shortest unweighted path. It needs a queue and a visited marker and runs in O(V+E).",
+        "java": "ArrayDeque<Integer> as the queue (offer/poll) plus a boolean[] visited. Mark visited when enqueuing, not dequeuing, to avoid duplicates.",
+        "how": "Each jump is a BFS level over indices."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example",
+        "input": "2 3 1 1 4\n",
+        "expected_output": "2",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Single",
+        "input": "0\n",
+        "expected_output": "0",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Two",
+        "input": "1 1\n",
+        "expected_output": "1",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Big first",
+        "input": "5 1 1 1 1\n",
+        "expected_output": "1",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "nums",
+          "type": "int[]"
+        }
+      ],
+      "returns": "int"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0,
+    "order": 98
+  },
+  {
+    "slug": "longest-valid-parentheses",
+    "title": "Longest Valid Parentheses",
+    "difficulty": "Hard",
+    "description": "Return the length of the longest substring of well-formed parentheses.",
+    "constraints": "0 ≤ |s| ≤ 10^5\ns contains only '(' and ')'.",
+    "examples": [
+      {
+        "input": "(()",
+        "output": "2",
+        "explanation": "'()' → 2."
+      },
+      {
+        "input": ")()())",
+        "output": "4",
+        "explanation": "'()()' → 4."
+      }
+    ],
+    "editorial": "Push indices of '('; on ')', pop and measure i minus the new top (the last unmatched boundary). Reset the boundary when the stack empties.",
+    "optimal_time": "O(n)",
+    "optimal_space": "O(n)",
+    "optimal_explanation": "Index stack tracking the last unmatched boundary.",
+    "starter_code": {
+      "python": "def solve(s):\n    # TODO: implement\n    return 0\n",
+      "java": "class Solution {\n    int solve(String s) {\n        // TODO: implement\n        return 0;\n    }\n}\n"
+    },
+    "topics": [
+      "Stack",
+      "Strings",
+      "Dynamic Programming"
+    ],
+    "subtopics": [
+      "Monotonic Stack"
+    ],
+    "companies": [
+      "Amazon",
+      "Google"
+    ],
+    "patterns": [
+      "Stack",
+      "Dynamic Programming"
+    ],
+    "hints": [
+      "A stack of indices marks unmatched positions.",
+      "Seed the stack with -1 as a base.",
+      "On ')', pop; the gap to the new stack top is a valid length."
+    ],
+    "prerequisites": [
+      {
+        "key": "stack",
+        "name": "Stack (LIFO)",
+        "what": "A last-in-first-out structure whose top is always the most recent unmatched item.",
+        "deep": "Ideal when the newest open item must be resolved first: bracket matching, monotonic-stack range queries, expression parsing, or iterative DFS. Push, pop, and peek are all O(1).",
+        "java": "Use ArrayDeque<T> as a stack (push/pop/peek) - it is faster than the legacy Stack class. For brackets use Deque<Character>.",
+        "how": "Indices of unmatched positions bound valid runs."
+      },
+      {
+        "key": "dp",
+        "name": "Dynamic Programming",
+        "what": "Breaking a problem into overlapping subproblems and reusing their answers.",
+        "deep": "Applies when there is optimal substructure and overlapping subproblems. Two styles exist: top-down memoized recursion and bottom-up tabulation. Defining the state and transition precisely is the whole game, and space can often be rolled down a dimension.",
+        "java": "A memo HashMap or an int[]/int[][] table. For memoization initialize a sentinel with Arrays.fill(dp, -1).",
+        "how": "Or a DP over ends of valid substrings."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example",
+        "input": "(()\n",
+        "expected_output": "2",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Longer",
+        "input": ")()())\n",
+        "expected_output": "4",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Empty",
+        "input": "\n",
+        "expected_output": "0",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "All open",
+        "input": "(((\n",
+        "expected_output": "0",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "s",
+          "type": "string"
+        }
+      ],
+      "returns": "int"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0,
+    "order": 99
+  },
+  {
+    "slug": "min-window-length",
+    "title": "Minimum Window Substring (length)",
+    "difficulty": "Hard",
+    "description": "Return the length of the shortest substring of s that contains every character of t (with multiplicity), or 0 if none.",
+    "constraints": "1 ≤ |s|, |t| ≤ 10^5",
+    "examples": [
+      {
+        "input": "ADOBECODEBANC\nABC",
+        "output": "4",
+        "explanation": "'BANC' → 4."
+      },
+      {
+        "input": "a\naa",
+        "output": "0",
+        "explanation": "Impossible → 0."
+      }
+    ],
+    "editorial": "Grow the right edge tracking how many required characters are still missing; when zero, shrink the left edge to find the minimal covering window.",
+    "optimal_time": "O(|s|)",
+    "optimal_space": "O(|t|)",
+    "optimal_explanation": "Sliding window with a 'missing count'.",
+    "starter_code": {
+      "python": "def solve(s, t):\n    # TODO: implement\n    return 0\n",
+      "java": "class Solution {\n    int solve(String s, String t) {\n        // TODO: implement\n        return 0;\n    }\n}\n"
+    },
+    "topics": [
+      "Sliding Window",
+      "Strings",
+      "Hashing"
+    ],
+    "subtopics": [
+      "Sliding Window"
+    ],
+    "companies": [
+      "Amazon",
+      "Meta",
+      "Google"
+    ],
+    "patterns": [
+      "Sliding Window",
+      "Hashing"
+    ],
+    "hints": [
+      "Expand a window until it covers all of t.",
+      "Then shrink from the left while it still covers t.",
+      "Track counts of needed characters."
+    ],
+    "prerequisites": [
+      {
+        "key": "sliding_window",
+        "name": "Sliding Window",
+        "what": "A moving sub-range [left, right] whose bounds expand and contract to maintain an invariant.",
+        "deep": "Turns 'longest/best sub-array meeting a condition' into an amortized O(n) scan: extend the right edge, and when the invariant breaks advance the left edge. Each index enters and leaves the window at most once, which is why it stays linear.",
+        "java": "Two int pointers plus a HashMap<Character,Integer> or an int[128] frequency table to track window contents.",
+        "how": "Grow to cover t, then shrink to minimise."
+      },
+      {
+        "key": "hashing",
+        "name": "Hash Maps & Sets",
+        "what": "Structures giving average O(1) insertion and lookup, trading memory for speed.",
+        "deep": "A hash table answers 'have I seen X?' or 'what maps to X?' in expected constant time, converting many O(n^2) pair scans into O(n) single passes. Worst case is O(n) per op under adversarial hashing, but that is rare in practice.",
+        "java": "HashMap<K,V> and HashSet<E>. Use getOrDefault(k, 0) and merge(k, 1, Integer::sum) for counting, containsKey/add for membership. For dense int keys, an int[] beats a HashMap.",
+        "how": "Track required character counts."
+      },
+      {
+        "key": "two_pointers",
+        "name": "Two Pointers",
+        "what": "Two indices moving through a sequence (from both ends, or at different speeds) to replace a nested loop.",
+        "deep": "By advancing pointers based on a comparison you explore O(n) states instead of O(n^2). Common shapes are opposite ends converging (sorted pair sums, palindromes, rain water) and fast/slow (cycle detection). Correctness hinges on why the pointer you move cannot skip a better answer.",
+        "java": "Two int indices lo/hi (or i/j) in a while (lo < hi) loop; no special class needed.",
+        "how": "Left and right edges define the window."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example",
+        "input": "ADOBECODEBANC\nABC\n",
+        "expected_output": "4",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "None",
+        "input": "a\naa\n",
+        "expected_output": "0",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Whole",
+        "input": "abc\ncba\n",
+        "expected_output": "3",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Single",
+        "input": "aa\na\n",
+        "expected_output": "1",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "s",
+          "type": "string"
+        },
+        {
+          "name": "t",
+          "type": "string"
+        }
+      ],
+      "returns": "int"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0,
+    "order": 100
   }
 ]

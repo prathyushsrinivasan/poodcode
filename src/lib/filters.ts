@@ -99,8 +99,12 @@ export function applyFilter(problems: Problem[], f: ProblemFilter): Problem[] {
         return a.confidence - b.confidence;
       case "difficulty":
       default:
-        return DIFF_ORDER[a.difficulty] - DIFF_ORDER[b.difficulty] ||
-          a.title.localeCompare(b.title);
+        // Curated easiest→hardest rank; fall back to tier + title if unset.
+        return (
+          a.order - b.order ||
+          DIFF_ORDER[a.difficulty] - DIFF_ORDER[b.difficulty] ||
+          a.title.localeCompare(b.title)
+        );
     }
   });
   return out;
