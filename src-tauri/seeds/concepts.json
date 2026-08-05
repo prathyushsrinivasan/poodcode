@@ -1,0 +1,335 @@
+[
+  {
+    "key": "iteration",
+    "name": "Array Iteration",
+    "category": "Arrays",
+    "what": "Walking through elements one at a time while maintaining running state such as a sum, max, or counter.",
+    "deep": "The workhorse of array problems: one for-loop that updates accumulators as it goes. Most linear-time solutions are just one well-chosen pass, so the real skill is deciding what state to carry so a single sweep suffices.",
+    "java": "Use for (int i = 0; i < n; i++) or for (int x : nums). Prefer a primitive int[] over Integer[] to avoid autoboxing overhead.",
+    "lesson": "### Worked example\nFind the maximum of `[3, 9, 2, 7]` in one pass: start from the first element and update when you see something bigger.\n\n### In code (Java)\n```java\nint[] a = {3, 9, 2, 7};\nint best = a[0];\nfor (int i = 1; i < a.length; i++) {\n    if (a[i] > best) best = a[i];\n}\nSystem.out.println(best); // 9\n```\n\n### Watch out for\n- Initialize `best` from `a[0]`, not `0` — the array might be all negative.\n- One pass is O(n); avoid nesting a second loop when a running variable suffices.\n"
+  },
+  {
+    "key": "hashing",
+    "name": "Hash Maps & Sets",
+    "category": "Data Structures",
+    "what": "Structures giving average O(1) insertion and lookup, trading memory for speed.",
+    "deep": "A hash table answers 'have I seen X?' or 'what maps to X?' in expected constant time, converting many O(n^2) pair scans into O(n) single passes. Worst case is O(n) per op under adversarial hashing, but that is rare in practice.",
+    "java": "HashMap<K,V> and HashSet<E>. Use getOrDefault(k, 0) and merge(k, 1, Integer::sum) for counting, containsKey/add for membership. For dense int keys, an int[] beats a HashMap.",
+    "lesson": "### Worked example\nDoes the array have a duplicate? Track seen values in a set; if one appears twice, yes.\n\n### In code (Java)\n```java\nint[] a = {1, 3, 2, 3};\nSet<Integer> seen = new HashSet<>();\nfor (int x : a) {\n    if (!seen.add(x)) { System.out.println(\"duplicate\"); break; }\n}\n```\n\n### Watch out for\n- `add` returns false if the value was already present — a tidy one-line check.\n- To count occurrences use `map.merge(key, 1, Integer::sum)` or `getOrDefault`.\n"
+  },
+  {
+    "key": "complement",
+    "name": "Complement Thinking",
+    "category": "Data Structures",
+    "what": "Instead of testing all pairs, ask what single value would complete the current one, and look it up.",
+    "deep": "Reframes 'find two things that combine to T' as 'for each x, does T - x already exist?'. Paired with a hash structure this removes an entire nested loop, and the idea generalizes to differences, XORs, and remainders.",
+    "java": "Keep a HashSet<Integer> or HashMap<Integer,Integer> of seen values and query target - x before inserting x.",
+    "lesson": "### Worked example\nDo two values in `[2, 7, 4, 8]` sum to 10? For 2 you need 8; store values as you go and check for the partner.\n\n### In code (Java)\n```java\nint[] a = {2, 7, 4, 8}; int target = 10;\nSet<Integer> seen = new HashSet<>();\nfor (int x : a) {\n    if (seen.contains(target - x)) { System.out.println(\"found\"); break; }\n    seen.add(x);\n}\n```\n\n### Watch out for\n- Check for the complement **before** inserting the current value.\n- Each lookup is O(1), so the whole scan is O(n).\n"
+  },
+  {
+    "key": "two_pointers",
+    "name": "Two Pointers",
+    "category": "Arrays",
+    "what": "Two indices moving through a sequence (from both ends, or at different speeds) to replace a nested loop.",
+    "deep": "By advancing pointers based on a comparison you explore O(n) states instead of O(n^2). Common shapes are opposite ends converging (sorted pair sums, palindromes, rain water) and fast/slow (cycle detection). Correctness hinges on why the pointer you move cannot skip a better answer.",
+    "java": "Two int indices lo/hi (or i/j) in a while (lo < hi) loop; no special class needed.",
+    "lesson": "### Worked example\nIs `\"racecar\"` a palindrome? Compare characters from both ends moving inward; they all match.\n\n### In code (Java)\n```java\nString s = \"racecar\";\nint i = 0, j = s.length() - 1;\nboolean ok = true;\nwhile (i < j) {\n    if (s.charAt(i++) != s.charAt(j--)) { ok = false; break; }\n}\nSystem.out.println(ok); // true\n```\n\n### Watch out for\n- The loop ends when `i >= j`; a middle character (odd length) needs no check.\n- On a sorted array, move the pointer that steps you toward the target.\n"
+  },
+  {
+    "key": "sliding_window",
+    "name": "Sliding Window",
+    "category": "Arrays",
+    "what": "A moving sub-range [left, right] whose bounds expand and contract to maintain an invariant.",
+    "deep": "Turns 'longest/best sub-array meeting a condition' into an amortized O(n) scan: extend the right edge, and when the invariant breaks advance the left edge. Each index enters and leaves the window at most once, which is why it stays linear.",
+    "java": "Two int pointers plus a HashMap<Character,Integer> or an int[128] frequency table to track window contents.",
+    "lesson": "### Worked example\nLongest run of distinct characters in `\"abcabc\"` is 3. Grow the window right; when a repeat enters, push `left` past the previous copy.\n\n### In code (Java)\n```java\nString s = \"abcabc\";\nMap<Character,Integer> last = new HashMap<>();\nint left = 0, best = 0;\nfor (int r = 0; r < s.length(); r++) {\n    char ch = s.charAt(r);\n    if (last.containsKey(ch) && last.get(ch) >= left) left = last.get(ch) + 1;\n    last.put(ch, r);\n    best = Math.max(best, r - left + 1);\n}\nSystem.out.println(best); // 3\n```\n\n### Watch out for\n- Each index enters and leaves the window once, so it is O(n) despite the nested feel.\n- Only ever move `left` forward, never backward.\n"
+  },
+  {
+    "key": "stack",
+    "name": "Stack (LIFO)",
+    "category": "Data Structures",
+    "what": "A last-in-first-out structure whose top is always the most recent unmatched item.",
+    "deep": "Ideal when the newest open item must be resolved first: bracket matching, monotonic-stack range queries, expression parsing, or iterative DFS. Push, pop, and peek are all O(1).",
+    "java": "Use ArrayDeque<T> as a stack (push/pop/peek) - it is faster than the legacy Stack class. For brackets use Deque<Character>.",
+    "lesson": "### Worked example\nAre the brackets in `\"([])\"` balanced? Push openers; each closer must match the top of the stack.\n\n### In code (Java)\n```java\nDeque<Character> st = new ArrayDeque<>();\nMap<Character,Character> match = Map.of(')', '(', ']', '[', '}', '{');\nboolean ok = true;\nfor (char c : \"([])\".toCharArray()) {\n    if (c == '(' || c == '[' || c == '{') st.push(c);\n    else if (st.isEmpty() || st.pop() != match.get(c)) { ok = false; break; }\n}\nok = ok && st.isEmpty();\n```\n\n### Watch out for\n- Always check `isEmpty()` before `pop()`.\n- Use `ArrayDeque` as your stack, not the legacy `Stack` class.\n"
+  },
+  {
+    "key": "recursion",
+    "name": "Recursion",
+    "category": "Recursion & DP",
+    "what": "A function that calls itself on smaller inputs, with base cases that stop the descent.",
+    "deep": "Expresses divide-and-conquer and tree/graph walks naturally. Watch the recursion depth against stack limits, and whether subproblems overlap - if they do, add memoization to avoid exponential blow-up.",
+    "java": "A private static helper that calls itself. The JVM stack handles ~10^4 depth; convert to an explicit ArrayDeque if you risk StackOverflowError.",
+    "lesson": "### Worked example\nFactorial: `fact(4) = 4 * fact(3) = ... = 24`. The base case `fact(0) = 1` stops the descent.\n\n### In code (Java)\n```java\nstatic long fact(int n) {\n    if (n <= 1) return 1;      // base case\n    return n * fact(n - 1);    // smaller subproblem\n}\n```\n\n### Watch out for\n- Every recursion needs a base case, or it never stops (StackOverflowError).\n- If the same subproblem recurs, cache results (memoization) to avoid exponential work.\n"
+  },
+  {
+    "key": "sorting",
+    "name": "Sorting",
+    "category": "Searching & Sorting",
+    "what": "Ordering elements (usually O(n log n)) so structure like duplicates and order statistics becomes easy.",
+    "deep": "Sorting is a preprocessing multiplier: it enables binary search, two-pointer sweeps, greedy choices, and grouping. The cost is O(n log n) comparisons, though counting/radix sort can beat that for bounded integer keys.",
+    "java": "Arrays.sort(int[]) or Arrays.sort(T[], Comparator) / Collections.sort. For custom order use Comparator.comparingInt(...). Note primitive sort has no comparator overload.",
+    "lesson": "### Worked example\nSorting `[3, 1, 2]` gives `[1, 2, 3]`, after which smallest/largest and neighbours are trivial to read.\n\n### In code (Java)\n```java\nint[] a = {3, 1, 2};\nArrays.sort(a);                 // [1, 2, 3]\n\nInteger[] b = {3, 1, 2};\nArrays.sort(b, Comparator.reverseOrder()); // [3, 2, 1]\n```\n\n### Watch out for\n- Primitive `int[]` sort has no comparator; use `Integer[]` for custom order.\n- Sorting is O(n log n) — often the step that unlocks an otherwise-hard problem.\n"
+  },
+  {
+    "key": "binary_search",
+    "name": "Binary Search",
+    "category": "Searching & Sorting",
+    "what": "Halving a sorted search space to find a target or boundary in O(log n).",
+    "deep": "Beyond exact matches it locates boundaries (first/last occurrence, lower/upper bound) and can 'search on the answer' for any monotonic predicate. The subtle parts are the loop invariant and avoiding off-by-one at the boundary.",
+    "java": "Arrays.binarySearch does not give first/last, so hand-roll while (lo <= hi) with mid = lo + (hi - lo) / 2 to avoid overflow.",
+    "lesson": "### Worked example\nFind 7 in sorted `[1, 3, 5, 7, 9]`. Check the middle (5), go right, check 7 — found in O(log n).\n\n### In code (Java)\n```java\nint[] a = {1,3,5,7,9}; int target = 7, lo = 0, hi = a.length - 1, ans = -1;\nwhile (lo <= hi) {\n    int mid = lo + (hi - lo) / 2;\n    if (a[mid] == target) { ans = mid; break; }\n    else if (a[mid] < target) lo = mid + 1;\n    else hi = mid - 1;\n}\n```\n\n### Watch out for\n- Use `lo + (hi - lo) / 2` to avoid overflow on large indices.\n- For the *first* match, keep searching left after a hit instead of stopping.\n"
+  },
+  {
+    "key": "dp",
+    "name": "Dynamic Programming",
+    "category": "Recursion & DP",
+    "what": "Breaking a problem into overlapping subproblems and reusing their answers.",
+    "deep": "Applies when there is optimal substructure and overlapping subproblems. Two styles exist: top-down memoized recursion and bottom-up tabulation. Defining the state and transition precisely is the whole game, and space can often be rolled down a dimension.",
+    "java": "A memo HashMap or an int[]/int[][] table. For memoization initialize a sentinel with Arrays.fill(dp, -1).",
+    "lesson": "### Worked example\nWays to climb n stairs taking 1 or 2 steps: `ways(n) = ways(n-1) + ways(n-2)`. Build up from the bottom.\n\n### In code (Java)\n```java\nint n = 5;\nlong a = 1, b = 1;           // ways(0), ways(1)\nfor (int i = 2; i <= n; i++) { long c = a + b; a = b; b = c; }\nSystem.out.println(b);       // 8\n```\n\n### Watch out for\n- Identify the **state** and the **transition** first — the code follows.\n- Bottom-up with a couple of variables often replaces an exponential recursion.\n"
+  },
+  {
+    "key": "recurrence",
+    "name": "Recurrence Relations",
+    "category": "Recursion & DP",
+    "what": "Expressing an answer in terms of smaller answers, e.g. f(n) = f(n-1) + f(n-2).",
+    "deep": "A recurrence is the mathematical heart of many DP and divide-and-conquer solutions. Once you name the base cases and the transition you can either recurse with memoization or iterate bottom-up, often reducing space to a few rolling variables.",
+    "java": "Iterate bottom-up with a few long variables, or memoize with a long[] dp. Use long when terms grow fast.",
+    "lesson": "### Worked example\nFibonacci is a recurrence: each term sums the previous two — 0, 1, 1, 2, 3, 5, 8, ...\n\n### In code (Java)\n```java\nstatic long fib(int n) {\n    long a = 0, b = 1;\n    for (int i = 0; i < n; i++) { long c = a + b; a = b; b = c; }\n    return a;\n}\n```\n\n### Watch out for\n- Nail the base cases (`fib(0)=0`, `fib(1)=1`) before the transition.\n- Terms grow fast — use `long` to avoid overflow.\n"
+  },
+  {
+    "key": "dp2d",
+    "name": "2-D Dynamic Programming",
+    "category": "Recursion & DP",
+    "what": "A table dp[i][j] indexed by two dimensions, filled from smaller states.",
+    "deep": "Used when the state needs two coordinates: prefixes of two sequences, positions in a grid, or index-plus-capacity. The fill order must respect dependencies, and many 2-D DPs compress to one row because dp[i] depends only on dp[i-1].",
+    "java": "int[][] dp = new int[m + 1][n + 1] filled row by row; compress to two int[] rows (prev/cur) to save memory.",
+    "lesson": "### Worked example\nEdit distance between `\"ab\"` and `\"abc\"` is 1 (insert `c`). A table `dp[i][j]` compares the first i and j characters.\n\n### In code (Java)\n```java\nString a = \"ab\", b = \"abc\";\nint[][] dp = new int[a.length()+1][b.length()+1];\nfor (int i = 0; i <= a.length(); i++) dp[i][0] = i;\nfor (int j = 0; j <= b.length(); j++) dp[0][j] = j;\nfor (int i = 1; i <= a.length(); i++)\n  for (int j = 1; j <= b.length(); j++)\n    dp[i][j] = a.charAt(i-1) == b.charAt(j-1)\n             ? dp[i-1][j-1]\n             : 1 + Math.min(dp[i-1][j-1], Math.min(dp[i-1][j], dp[i][j-1]));\n```\n\n### Watch out for\n- Initialize the first row and column (matching against an empty prefix).\n- Fill in an order where every cell you read is already computed.\n"
+  },
+  {
+    "key": "graph_repr",
+    "name": "Graph Representation",
+    "category": "Graphs",
+    "what": "Modeling entities as nodes and relationships as edges, usually an adjacency list.",
+    "deep": "The representation dictates efficiency: adjacency lists are O(V+E) space and iterate neighbors quickly, while adjacency matrices are O(V^2) but give O(1) edge tests. Directed vs undirected and weighted vs unweighted change how you build and traverse it.",
+    "java": "List<List<Integer>> adj, or List<int[]>[] adj = new List[n] storing new int[]{to, w} for weighted edges.",
+    "lesson": "### Worked example\nStore edges 0-1 and 0-2 as an adjacency list: node 0 lists [1, 2]; nodes 1 and 2 list [0].\n\n### In code (Java)\n```java\nint n = 3;\nList<List<Integer>> adj = new ArrayList<>();\nfor (int i = 0; i < n; i++) adj.add(new ArrayList<>());\nadj.get(0).add(1); adj.get(1).add(0);   // undirected edge 0-1\nadj.get(0).add(2); adj.get(2).add(0);\n```\n\n### Watch out for\n- For undirected graphs, add the edge in **both** directions.\n- Adjacency lists use O(V+E) memory and iterate neighbours quickly.\n"
+  },
+  {
+    "key": "bfs",
+    "name": "Breadth-First Search",
+    "category": "Graphs",
+    "what": "Exploring a graph level by level with a queue; finds shortest paths in unweighted graphs.",
+    "deep": "BFS visits nodes in order of distance from the source, so the first time it reaches a node is via a shortest unweighted path. It needs a queue and a visited marker and runs in O(V+E).",
+    "java": "ArrayDeque<Integer> as the queue (offer/poll) plus a boolean[] visited. Mark visited when enqueuing, not dequeuing, to avoid duplicates.",
+    "lesson": "### Worked example\nFrom node 0 in the chain 0-1-2, BFS visits 0, then 1, then 2 — in order of distance.\n\n### In code (Java)\n```java\nQueue<Integer> q = new ArrayDeque<>();\nboolean[] seen = new boolean[n];\nq.offer(0); seen[0] = true;\nwhile (!q.isEmpty()) {\n    int u = q.poll();\n    for (int v : adj.get(u)) if (!seen[v]) { seen[v] = true; q.offer(v); }\n}\n```\n\n### Watch out for\n- Mark `seen` when you **enqueue**, not when you dequeue, or nodes get added twice.\n- BFS gives shortest paths only in *unweighted* graphs.\n"
+  },
+  {
+    "key": "flood_fill",
+    "name": "Flood Fill",
+    "category": "Graphs",
+    "what": "Spreading outward from a start cell to mark an entire connected region of a grid.",
+    "deep": "A grid-specialized BFS/DFS over 4- or 8-directional neighbors. Each launch consumes exactly one connected component, so counting launches counts components - islands, regions, or paint buckets.",
+    "java": "From (r, c) run BFS/DFS over the four deltas {{1,0},{-1,0},{0,1},{0,-1}}, guarding bounds and the visited/grid state.",
+    "lesson": "### Worked example\nCount islands in a grid: each time you find unvisited land, flood its whole region and add one to the count.\n\n### In code (Java)\n```java\nstatic int[][] DIR = {{1,0},{-1,0},{0,1},{0,-1}};\n// from (r, c): mark visited, then visit each in-bounds land neighbour\nfor (int[] d : DIR) {\n    int nr = r + d[0], nc = c + d[1];\n    // if in bounds and grid[nr][nc] == '1' and not visited -> recurse/enqueue\n}\n```\n\n### Watch out for\n- Guard the array bounds before touching a neighbour.\n- Mark cells visited (or overwrite them) so the flood cannot loop forever.\n"
+  },
+  {
+    "key": "topo",
+    "name": "Topological Sort",
+    "category": "Graphs",
+    "what": "Ordering the nodes of a DAG so every edge points forward; impossible iff there is a cycle.",
+    "deep": "Applies to dependency problems like build order and course scheduling. Two algorithms exist: Kahn's (BFS on in-degrees) and DFS post-order. If not all nodes are emitted, the graph has a cycle.",
+    "java": "Kahn's: an int[] indegree and an ArrayDeque queue of zero-indegree nodes; count how many you pop.",
+    "lesson": "### Worked example\nTasks with `A before B` and `B before C` order as A, B, C. A cycle (`A before B`, `B before A`) has no valid order.\n\n### In code (Java)\n```java\n// Kahn's algorithm: start from indegree-0 nodes, remove them,\n// decrement each neighbour, and add newly-zeroed nodes. If you\n// emit fewer than n nodes, there is a cycle.\n```\n\n### Watch out for\n- Emitting fewer than n nodes means the graph has a cycle.\n- Edge direction matters: `b before a` is an edge b -> a.\n"
+  },
+  {
+    "key": "indegree",
+    "name": "In-degree / Kahn's Algorithm",
+    "category": "Graphs",
+    "what": "Counting incoming edges and repeatedly removing zero-indegree nodes to order a DAG.",
+    "deep": "In-degree is how many prerequisites a node still has. Start from nodes with none, complete them, and decrement their neighbors; newly-zeroed nodes become available. Finishing all n nodes means no cycle exists.",
+    "java": "int[] indegree = new int[n]; increment per edge; seed an ArrayDeque with every node whose indegree is 0.",
+    "lesson": "### Worked example\nCourse 1 needs course 0: `indegree[1] = 1`, `indegree[0] = 0`. Take 0, drop `indegree[1]` to 0, then take 1.\n\n### In code (Java)\n```java\nint[] indeg = new int[n];\nfor (int[] e : edges) indeg[e[0]]++;   // edge b->a increments a\nDeque<Integer> q = new ArrayDeque<>();\nfor (int i = 0; i < n; i++) if (indeg[i] == 0) q.offer(i);\n```\n\n### Watch out for\n- Indegree counts remaining prerequisites; seed the queue with the zeros.\n- Count how many you pop — it must equal n for a valid ordering.\n"
+  },
+  {
+    "key": "heap",
+    "name": "Priority Queue (Heap)",
+    "category": "Data Structures",
+    "what": "A structure that always yields the smallest or largest pending item in O(log n).",
+    "deep": "A binary heap supports push and pop-min/max in O(log n) and peek in O(1). It powers greedy expansion (Dijkstra, Prim), top-k selection, and merging sorted streams, but it has no fast arbitrary lookup or deletion.",
+    "java": "PriorityQueue<T> is a min-heap by default. For pairs use long[]/int[] with a comparator: new PriorityQueue<>((a, b) -> Long.compare(a[0], b[0])).",
+    "lesson": "### Worked example\nAlways take the smallest pending item: a min-heap of `{5, 1, 3}` pops 1, then 3, then 5.\n\n### In code (Java)\n```java\nPriorityQueue<Integer> pq = new PriorityQueue<>();\npq.offer(5); pq.offer(1); pq.offer(3);\nwhile (!pq.isEmpty()) System.out.print(pq.poll() + \" \"); // 1 3 5\n```\n\n### Watch out for\n- `PriorityQueue` is a **min**-heap; for max use `Comparator.reverseOrder()`.\n- Peeking is O(1), but there is no fast search or arbitrary removal.\n"
+  },
+  {
+    "key": "greedy",
+    "name": "Greedy Choice",
+    "category": "Searching & Sorting",
+    "what": "Taking the locally-best option at each step when that provably reaches a global optimum.",
+    "deep": "Greedy is fast and simple but correct only when the problem has the greedy-choice property and optimal substructure; otherwise DP is the fallback. Proving correctness (often an exchange argument) matters more than the code.",
+    "java": "Often just Arrays.sort plus a linear scan, or a PriorityQueue to always grab the current best.",
+    "lesson": "### Worked example\nFewest coins for 30 with {25, 10, 5}: take the biggest that fits each time — 25, then 5 — two coins.\n\n### In code (Java)\n```java\nint[] coins = {25, 10, 5}; int amount = 30, used = 0;\nfor (int c : coins) { used += amount / c; amount %= c; }\n```\n\n### Watch out for\n- Greedy is only correct for some problems (this coin set works; arbitrary sets need DP).\n- Sorting the input first is a common setup step.\n"
+  },
+  {
+    "key": "prefix_max",
+    "name": "Running Maxima / Prefix Aggregates",
+    "category": "Arrays",
+    "what": "Tracking the best value seen so far from the left/right to answer range questions in one pass.",
+    "deep": "Precomputing prefix (and suffix) maxima, sums, or counts converts per-query O(n) work into O(1). It is the idea behind prefix sums and the left/right walls in rain-water style problems.",
+    "java": "int[] prefix arrays, or two running int variables when you only need the maxima at the current index.",
+    "lesson": "### Worked example\nFor heights `[2, 0, 2]`, water over the middle bar is `min(leftMax, rightMax) - height = min(2, 2) - 0 = 2`.\n\n### In code (Java)\n```java\nint[] h = {2, 0, 2};\nint[] left = new int[h.length], right = new int[h.length];\nleft[0] = h[0];\nfor (int i = 1; i < h.length; i++) left[i] = Math.max(left[i-1], h[i]);\nright[h.length-1] = h[h.length-1];\nfor (int i = h.length-2; i >= 0; i--) right[i] = Math.max(right[i+1], h[i]);\n```\n\n### Watch out for\n- Prefix arrays turn repeated range questions into O(1) lookups.\n- A two-pointer variant computes the same maxima using O(1) extra space.\n"
+  },
+  {
+    "key": "string_basics",
+    "name": "String Traversal",
+    "category": "Strings",
+    "what": "Treating a string as an indexable sequence of characters to count and compare.",
+    "deep": "Most string problems reduce to a single pass with charAt or a char[]. Remember Java strings are immutable, so build output with StringBuilder, and character math relies on ASCII codes.",
+    "java": "s.charAt(i), s.length(), s.toCharArray(); build results with StringBuilder, never += inside a loop.",
+    "lesson": "### Worked example\nCount the letter `a` in `\"banana\"` — the answer is 3.\n\n### In code (Java)\n```java\nString s = \"banana\";\nint count = 0;\nfor (int i = 0; i < s.length(); i++) {\n    if (s.charAt(i) == 'a') count++;\n}\nSystem.out.println(count); // 3\n```\n\n### Watch out for\n- Strings are immutable; build output with `StringBuilder`, not `+=` in a loop.\n- Index characters with `charAt(i)` (0-based) and compare Strings with `.equals`.\n"
+  },
+  {
+    "key": "canonical",
+    "name": "Canonical Form",
+    "category": "Strings",
+    "what": "Reducing equivalent items to one identical representative so they collide in a map.",
+    "deep": "A canonical key makes 'are these the same up to X?' a simple equality or hash test. For anagrams it is the sorted letters, for fractions the reduced form, for graphs a normalized encoding. Choosing a cheap, collision-free key is the trick.",
+    "java": "For anagrams: char[] c = s.toCharArray(); Arrays.sort(c); String key = new String(c); or a length-26 count signature.",
+    "lesson": "### Worked example\n`\"eat\"` and `\"tea\"` are anagrams because both share the canonical key `\"aet\"` (sorted letters).\n\n### In code (Java)\n```java\nchar[] c = \"tea\".toCharArray();\nArrays.sort(c);\nString key = new String(c); // \"aet\"\n```\n\n### Watch out for\n- A 26-length count signature is an O(n) alternative to O(n log n) sorting.\n- The key must be identical for equivalent items and different otherwise.\n"
+  },
+  {
+    "key": "math_digits",
+    "name": "Digit Manipulation",
+    "category": "Math",
+    "what": "Working with a number's decimal digits or its string form while handling signs and edge cases.",
+    "deep": "Digit problems peel digits with % 10 and / 10, or operate on the string form. Classic gotchas are negative numbers, trailing zeros, and overflow when reversing, so the first choice is arithmetic vs string handling.",
+    "java": "n % 10 and n / 10 to extract digits, or Long.toString(n); use long to avoid overflow on reversal.",
+    "lesson": "### Worked example\nSum the digits of 123: `123 % 10 = 3`, then `123 / 10 = 12`, and so on — 3 + 2 + 1 = 6.\n\n### In code (Java)\n```java\nint n = 123, sum = 0;\nwhile (n > 0) { sum += n % 10; n /= 10; }\nSystem.out.println(sum); // 6\n```\n\n### Watch out for\n- Handle 0 and negatives explicitly (take `Math.abs` first if sign should not matter).\n- Reversing a number arithmetically can overflow — consider the String form.\n"
+  },
+  {
+    "key": "number_theory",
+    "name": "Number Theory Basics",
+    "category": "Math",
+    "what": "Divisibility, gcd, and modular arithmetic facts used to reason about integers.",
+    "deep": "Foundations like the Euclidean algorithm, prime factorization, and modular arithmetic underpin many math problems. Even simple tasks benefit from gcd/lcm identities and knowing how modulo distributes over addition and multiplication.",
+    "java": "Math.floorMod for correct modulo of negatives; write a short gcd helper (Euclid); BigInteger has gcd() if needed.",
+    "lesson": "### Worked example\ngcd(12, 18): 18 % 12 = 6, then 12 % 6 = 0, so the gcd is 6.\n\n### In code (Java)\n```java\nstatic long gcd(long a, long b) { return b == 0 ? a : gcd(b, a % b); }\n```\n\n### Watch out for\n- `Math.floorMod` gives a non-negative remainder for negative inputs.\n- lcm(a, b) = a / gcd(a, b) * b — divide before multiplying to avoid overflow.\n"
+  },
+  {
+    "key": "modulo",
+    "name": "Modular Reduction",
+    "category": "Math",
+    "what": "Using n % k to wrap indices around and drop redundant whole cycles.",
+    "deep": "Modulo collapses equivalent states: rotating by k equals rotating by k % n, and hashing or bucketing uses remainders. In Java, beware that % can return a negative result for negative operands.",
+    "java": "Use k % n after guarding n > 0; for possibly-negative values use Math.floorMod(x, n).",
+    "lesson": "### Worked example\nRotating a length-5 array by k = 7 equals rotating by `7 % 5 = 2` — the extra full turns do nothing.\n\n### In code (Java)\n```java\nint n = 5, k = 7;\nk = k % n;                        // 2\nint idx = Math.floorMod(-1, n);   // 4, safe for negatives\n```\n\n### Watch out for\n- Java's `%` can be negative; `Math.floorMod` keeps the result in [0, n).\n- Reduce `k % n` before using it to index, and guard `n > 0`.\n"
+  },
+  {
+    "key": "inplace_reverse",
+    "name": "In-place Reversal",
+    "category": "Arrays",
+    "what": "Reversing a segment by swapping symmetric elements, using O(1) extra space.",
+    "deep": "Swapping a[i] with a[n-1-i] for i in [0, n/2) reverses a range without allocation. It is the building block for array rotation (reverse-whole-then-parts) and for string reversal.",
+    "java": "A helper void reverse(int[] a, int i, int j) { while (i < j) { int t = a[i]; a[i++] = a[j]; a[j--] = t; } }.",
+    "lesson": "### Worked example\nReverse `[1, 2, 3, 4]` by swapping ends inward: (1,4) then (2,3) gives `[4, 3, 2, 1]`.\n\n### In code (Java)\n```java\nstatic void reverse(int[] a, int i, int j) {\n    while (i < j) { int t = a[i]; a[i++] = a[j]; a[j--] = t; }\n}\n```\n\n### Watch out for\n- Rotate right by k = reverse all, reverse the first k, reverse the rest.\n- Uses O(1) extra space — no second array required.\n"
+  },
+  {
+    "key": "big_o",
+    "name": "Big-O / Complexity Analysis",
+    "category": "Foundations",
+    "what": "Reasoning about how time and memory grow with the input size.",
+    "deep": "Big-O bounds the dominant growth term and tells you whether an approach scales to the constraints. Read the limits: n up to 10^5 suggests O(n) or O(n log n), while 10^9 suggests O(log n) or O(1). Sanity-check the work against roughly 10^8 operations per second.",
+    "java": "No API - this is analysis. Match your algorithm to the constraints stated in each problem before you start coding.",
+    "lesson": "### Worked example\nWith n up to 100,000, an O(n^2) approach is ~10^10 operations (too slow), but O(n log n) is ~1.7 million — easily fast enough.\n\n### Rules of thumb\n```text\nn <= 20        -> even O(2^n) may pass\nn <= 5,000     -> O(n^2) is fine\nn <= 100,000   -> aim for O(n) or O(n log n)\nn <= 1e9       -> O(log n) or O(1)\n```\n\n### Watch out for\n- Read the constraints first; they hint at the intended complexity.\n- Budget roughly 10^8 simple operations per second as a guide.\n"
+  },
+  {
+    "key": "overflow",
+    "name": "Integer Overflow (int vs long)",
+    "category": "Foundations",
+    "what": "Guarding against results that exceed a 32-bit int's range of about 2.1x10^9.",
+    "deep": "Sums, products, and reversed numbers can silently wrap a 32-bit int, giving a wrong answer with no error. The fix is a wide enough type or a modulo reduction, so estimate the maximum magnitude before choosing the type.",
+    "java": "int overflows past ~2.1e9; long reaches ~9.2e18. Cast early with (long) a * b and accumulate sums into a long.",
+    "lesson": "### Worked example\n`100000 * 100000` overflows an `int` (max ~2.1e9) into a garbage negative number; as a `long` it is correctly 10^10.\n\n### In code (Java)\n```java\nint a = 100000;\nlong bad = a * a;          // overflow happens BEFORE the assignment\nlong good = (long) a * a;  // cast first -> 10_000_000_000\n```\n\n### Watch out for\n- Cast to `long` **before** the multiplication, not after.\n- Accumulate sums of many or large values into a `long`.\n"
+  },
+  {
+    "key": "char_arrays",
+    "name": "Char Arrays & ASCII",
+    "category": "Strings",
+    "what": "Manipulating characters via their numeric codes and mutable char arrays.",
+    "deep": "Characters are small integers, so 'a'..'z' map to a 26-slot table via c - 'a'. Because Java strings are immutable, in-place character work needs a char[]. This underlies frequency counts, canonical keys, and in-place edits.",
+    "java": "int idx = c - 'a'; char[] arr = s.toCharArray(); new String(arr) to rebuild. A length-26 or length-128 int[] beats a HashMap for letters.",
+    "lesson": "### Worked example\nReverse `\"code\"` in place by converting to a char array and swapping the ends.\n\n### In code (Java)\n```java\nchar[] c = \"code\".toCharArray();\nint i = 0, j = c.length - 1;\nwhile (i < j) { char t = c[i]; c[i++] = c[j]; c[j--] = t; }\nSystem.out.println(new String(c)); // edoc\n\nint[] freq = new int[26];\nfor (char ch : \"aab\".toCharArray()) freq[ch - 'a']++;\n```\n\n### Watch out for\n- `ch - 'a'` maps 'a'..'z' to 0..25 — a fast index into a size-26 array.\n- Rebuild a String with `new String(charArray)`.\n"
+  },
+  {
+    "key": "visited_set",
+    "name": "Visited Tracking",
+    "category": "Data Structures",
+    "what": "Recording which nodes or cells are already processed so you never revisit or double-count.",
+    "deep": "Graph and grid traversals loop forever or over-count without visited marks. Mark as early as possible (on enqueue) so a node is not added twice; for grids you can use a boolean[][] or mutate the input to a sentinel value.",
+    "java": "boolean[] visited / boolean[][] seen, or overwrite grid cells (set '1' to '0') when mutation is allowed.",
+    "lesson": "### Worked example\nWalking a graph with a cycle loops forever unless you remember visited nodes; marking them makes each node processed once.\n\n### In code (Java)\n```java\nboolean[] seen = new boolean[n];        // graph\nboolean[][] seen2 = new boolean[rows][cols]; // grid\n```\n\n### Watch out for\n- Mark visited as early as possible (on enqueue) to avoid duplicates.\n- For grids you can overwrite the cell (set '1' to '0') instead of a separate array.\n"
+  },
+  {
+    "key": "queue",
+    "name": "Queue (FIFO)",
+    "category": "Data Structures",
+    "what": "A first-in-first-out structure that returns items in arrival order.",
+    "deep": "Queues drive breadth-first processing: BFS levels, Kahn's topological sort, and streaming buffers. Enqueue at the back and dequeue from the front, both in O(1).",
+    "java": "ArrayDeque<T> via offer/poll (avoid the slower LinkedList, and never the legacy Stack/Vector).",
+    "lesson": "### Worked example\nA queue serves in arrival order: offer 1, 2, 3 and `poll` returns 1, then 2, then 3.\n\n### In code (Java)\n```java\nQueue<Integer> q = new ArrayDeque<>();\nq.offer(1); q.offer(2);\nint first = q.poll(); // 1\n```\n\n### Watch out for\n- Use `ArrayDeque`, not `LinkedList` (slower) or the legacy `Stack`.\n- `poll()` returns null on an empty queue — check `isEmpty()` in loops.\n"
+  },
+  {
+    "key": "io_basics",
+    "name": "Reading Input & Printing",
+    "category": "Foundations",
+    "what": "Getting values in from standard input and writing answers out to standard output.",
+    "deep": "Every problem here communicates over stdin/stdout: your program reads the input the grader feeds it and prints the answer. Reading the input format correctly is half the battle when you are starting out, so always match how many numbers or lines the problem describes.",
+    "java": "Scanner sc = new Scanner(System.in); then sc.nextInt(), sc.next(), or sc.nextLine(). Print with System.out.println(...). Switch to BufferedReader later for speed.",
+    "lesson": "### Worked example\nThe grader sends text on **standard input**; you reply on **standard output**. If the input is `3 4`, you read the two numbers and print their sum, `7`.\n\n### In code (Java)\n```java\nimport java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int a = sc.nextInt();       // reads 3\n        int b = sc.nextInt();       // reads 4\n        System.out.println(a + b);  // prints 7\n    }\n}\n```\n\n### Watch out for\n- `nextInt()` reads one number; `nextLine()` reads a whole line (use it for text).\n- Print **only** the answer. Extra text like `Enter a number:` will fail the grader.\n"
+  },
+  {
+    "key": "variables",
+    "name": "Variables & Types",
+    "category": "Foundations",
+    "what": "Named boxes that hold values of a specific type such as int, long, double, boolean, or String.",
+    "deep": "A variable stores a value you can read and update. Java is statically typed, so you declare the type up front and it never changes. Picking the right type (int vs long, int vs double) prevents overflow and rounding surprises down the line.",
+    "java": "Declare with a type: int n = 5; long big = 10000000000L; double d = 3.14; boolean ok = true; String s = ... .",
+    "lesson": "### Worked example\nA variable is a labelled box. `int score = 0;` makes a box named `score` holding 0; `score = score + 10;` updates it to 10.\n\n### In code (Java)\n```java\nint count = 5;               // whole number\nlong big = 5_000_000_000L;   // too big for int -> long, note the L\ndouble avg = 4.5;            // decimal\nboolean done = false;        // true / false\nString name = \"Ada\";         // text\n```\n\n### Watch out for\n- `int` holds about plus or minus 2.1 billion; if a value can exceed that, use `long`.\n- Dividing two `int`s drops the fraction (`7 / 2` is `3`). Use `double` for `3.5`.\n"
+  },
+  {
+    "key": "arithmetic",
+    "name": "Arithmetic & Operators",
+    "category": "Foundations",
+    "what": "Doing math with +, -, *, / and the remainder operator %.",
+    "deep": "Operators combine values. The Java gotchas: integer division truncates (7 / 2 is 3, not 3.5), % gives the remainder (great for even/odd and wrapping), and mixing an int with a double promotes the result to double.",
+    "java": "Use +, -, *, /, %. Note 7 / 2 == 3 (int) but 7.0 / 2 == 3.5 (double). Math.max, Math.min, Math.abs help too.",
+    "lesson": "### Worked example\n`%` (remainder) is the beginner's secret weapon: `17 % 5` is `2`, and `n % 2 == 0` tests even.\n\n### In code (Java)\n```java\nint a = 17, b = 5;\nSystem.out.println(a + b);   // 22\nSystem.out.println(a / b);   // 3   (integer division)\nSystem.out.println(a % b);   // 2   (remainder)\nSystem.out.println(7.0 / 2); // 3.5 (double math)\n```\n\n### Watch out for\n- Integer division truncates toward zero — there is no rounding.\n- `%` of a negative can be negative in Java (`-3 % 2` is `-1`).\n"
+  },
+  {
+    "key": "conditionals",
+    "name": "Conditionals (if / else)",
+    "category": "Foundations",
+    "what": "Choosing what to do based on whether a condition is true.",
+    "deep": "if/else branches let your program react to data. The condition is a boolean expression built from comparisons (==, !=, <, >) and logic (&&, ||, !). Chain several with else if when there are more than two outcomes.",
+    "java": "if (n % 2 == 0) { ... } else { ... }. Compare ints with ==, but compare Strings with .equals(), never ==.",
+    "lesson": "### Worked example\nLabel a number: if it divides evenly by 2 it is Even, otherwise Odd.\n\n### In code (Java)\n```java\nint n = 7;\nif (n % 2 == 0) {\n    System.out.println(\"Even\");\n} else {\n    System.out.println(\"Odd\");\n}\n```\n\n### Watch out for\n- Compare numbers with `==`, but compare Strings with `a.equals(b)`.\n- Use `else if` to chain more than two outcomes.\n"
+  },
+  {
+    "key": "loops_basic",
+    "name": "Loops (for / while)",
+    "category": "Foundations",
+    "what": "Repeating a block of code a set number of times or until a condition changes.",
+    "deep": "A for-loop fits when you know the count; a while-loop when you stop on a condition. Loops are how you process every element or accumulate a running result, and getting the start/end bounds right is the main beginner pitfall.",
+    "java": "for (int i = 1; i <= n; i++) { ... } or while (condition) { ... }. Build output strings with StringBuilder inside the loop.",
+    "lesson": "### Worked example\nAdd 1..n. For n = 5 you want 1+2+3+4+5 = 15.\n\n### In code (Java)\n```java\nint n = 5;\nlong sum = 0;\nfor (int i = 1; i <= n; i++) {\n    sum += i;   // 1, 3, 6, 10, 15\n}\nSystem.out.println(sum);\n```\n\n### Watch out for\n- Off-by-one: `i <= n` includes n, `i < n` stops one short.\n- Count down with `for (int i = n; i >= 1; i--)`.\n"
+  },
+  {
+    "key": "boolean_logic",
+    "name": "Booleans & Comparison",
+    "category": "Foundations",
+    "what": "True/false values and the operators that combine them.",
+    "deep": "Comparisons produce booleans, and &&, ||, ! combine them. Short-circuit evaluation means the right side of && is skipped when the left is false, which is both handy and sometimes necessary to avoid errors.",
+    "java": "boolean type; comparisons ==, !=, <, <=, >, >=; logic && (and), || (or), ! (not).",
+    "lesson": "### Worked example\nA number is in the range [1, 10] when it is `>= 1` **and** `<= 10`.\n\n### In code (Java)\n```java\nint x = 7;\nboolean inRange = (x >= 1) && (x <= 10); // true\nboolean outside = (x < 1) || (x > 10);   // false\nSystem.out.println(inRange && !outside); // true\n```\n\n### Watch out for\n- `&&` and `||` short-circuit: the right side is skipped once the result is known.\n- `=` assigns while `==` compares — a very common typo.\n"
+  }
+]

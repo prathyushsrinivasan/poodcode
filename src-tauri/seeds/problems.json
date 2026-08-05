@@ -1,0 +1,3642 @@
+[
+  {
+    "slug": "print-greeting",
+    "title": "Print a Greeting",
+    "difficulty": "Intro",
+    "description": "Print exactly the text `Hello, World!` (without the backticks).\n\n### Input\nThere is no input.\n\n### Output\nA single line: `Hello, World!`",
+    "constraints": "None.",
+    "examples": [
+      {
+        "input": "",
+        "output": "Hello, World!",
+        "explanation": "No input is given; simply print the greeting."
+      }
+    ],
+    "editorial": "## Approach\nThere is no input to read. Just print the fixed string with `System.out.println(\"Hello, World!\")`. This warms up the read-nothing / print-something shape used everywhere.",
+    "optimal_time": "O(1)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "A single print statement; there is nothing to read.",
+    "starter_code": {
+      "java": "public class Main {\n    public static void main(String[] args) {\n        // TODO: print exactly  Hello, World!\n        System.out.println();\n    }\n}\n",
+      "python": "# TODO: print exactly:  Hello, World!\n"
+    },
+    "topics": [
+      "Basics"
+    ],
+    "subtopics": [
+      "Output"
+    ],
+    "companies": [],
+    "patterns": [],
+    "hints": [
+      "System.out.println prints a line of text.",
+      "Copy the text exactly, including the comma and exclamation mark.",
+      "Capitalization matters: H and W are uppercase.",
+      "Print: Hello, World!"
+    ],
+    "prerequisites": [
+      {
+        "key": "io_basics",
+        "name": "Reading Input & Printing",
+        "what": "Getting values in from standard input and writing answers out to standard output.",
+        "deep": "Every problem here communicates over stdin/stdout: your program reads the input the grader feeds it and prints the answer. Reading the input format correctly is half the battle when you are starting out, so always match how many numbers or lines the problem describes.",
+        "java": "Scanner sc = new Scanner(System.in); then sc.nextInt(), sc.next(), or sc.nextLine(). Print with System.out.println(...). Switch to BufferedReader later for speed.",
+        "how": "Even with no numbers to read, you must print the exact text to standard output for the grader to accept it."
+      },
+      {
+        "key": "string_basics",
+        "name": "String Traversal",
+        "what": "Treating a string as an indexable sequence of characters to count and compare.",
+        "deep": "Most string problems reduce to a single pass with charAt or a char[]. Remember Java strings are immutable, so build output with StringBuilder, and character math relies on ASCII codes.",
+        "java": "s.charAt(i), s.length(), s.toCharArray(); build results with StringBuilder, never += inside a loop.",
+        "how": "The greeting is a fixed piece of text you print exactly, including its punctuation."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Only case",
+        "input": "",
+        "expected_output": "Hello, World!",
+        "ordering": 0
+      },
+      {
+        "kind": "hidden",
+        "name": "Grader check",
+        "input": "",
+        "expected_output": "Hello, World!",
+        "ordering": 1
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "judge_mode": "exact"
+  },
+  {
+    "slug": "echo-line",
+    "title": "Echo",
+    "difficulty": "Intro",
+    "description": "Read one line of text and print it back unchanged.\n\n### Input\nA single line.\n\n### Output\nThe same line.",
+    "constraints": "1 ≤ line length ≤ 1000",
+    "examples": [
+      {
+        "input": "hello",
+        "output": "hello",
+        "explanation": "The input line is printed back unchanged."
+      }
+    ],
+    "editorial": "## Approach\nRead the line with `nextLine()` (or `readLine()`), then print it. This teaches reading text input versus numbers.",
+    "optimal_time": "O(n)",
+    "optimal_space": "O(n)",
+    "optimal_explanation": "You copy the line once.",
+    "starter_code": {
+      "java": "import java.io.*;\n\npublic class Main {\n    public static void main(String[] args) throws IOException {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        String line = br.readLine();\n        // TODO: print the line\n    }\n}\n",
+      "python": "# TODO: read one line and print it\n"
+    },
+    "topics": [
+      "Basics"
+    ],
+    "subtopics": [
+      "Input/Output"
+    ],
+    "companies": [],
+    "patterns": [],
+    "hints": [
+      "Read a whole line, not just one word.",
+      "Scanner.nextLine() or BufferedReader.readLine() reads a line.",
+      "Then print exactly what you read.",
+      "Do not add extra text."
+    ],
+    "prerequisites": [
+      {
+        "key": "io_basics",
+        "name": "Reading Input & Printing",
+        "what": "Getting values in from standard input and writing answers out to standard output.",
+        "deep": "Every problem here communicates over stdin/stdout: your program reads the input the grader feeds it and prints the answer. Reading the input format correctly is half the battle when you are starting out, so always match how many numbers or lines the problem describes.",
+        "java": "Scanner sc = new Scanner(System.in); then sc.nextInt(), sc.next(), or sc.nextLine(). Print with System.out.println(...). Switch to BufferedReader later for speed.",
+        "how": "You read one line of input and print it straight back out."
+      },
+      {
+        "key": "variables",
+        "name": "Variables & Types",
+        "what": "Named boxes that hold values of a specific type such as int, long, double, boolean, or String.",
+        "deep": "A variable stores a value you can read and update. Java is statically typed, so you declare the type up front and it never changes. Picking the right type (int vs long, int vs double) prevents overflow and rounding surprises down the line.",
+        "java": "Declare with a type: int n = 5; long big = 10000000000L; double d = 3.14; boolean ok = true; String s = ... .",
+        "how": "Store the line in a String variable, then print that variable."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Word",
+        "input": "hello\n",
+        "expected_output": "hello",
+        "ordering": 0
+      },
+      {
+        "kind": "hidden",
+        "name": "Sentence",
+        "input": "Java is fun\n",
+        "expected_output": "Java is fun",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Digits",
+        "input": "12345\n",
+        "expected_output": "12345",
+        "ordering": 2
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "judge_mode": "exact"
+  },
+  {
+    "slug": "add-two-numbers",
+    "title": "Add Two Numbers",
+    "difficulty": "Intro",
+    "description": "Read two integers and print their sum.\n\n### Input\nTwo integers `a b` on one line.\n\n### Output\nThe value of a + b.",
+    "constraints": "-10^9 ≤ a, b ≤ 10^9",
+    "examples": [
+      {
+        "input": "2 3",
+        "output": "5",
+        "explanation": "2 + 3 = 5."
+      },
+      {
+        "input": "-4 10",
+        "output": "6",
+        "explanation": "-4 + 10 = 6."
+      }
+    ],
+    "editorial": "## Approach\nRead `a` and `b`, then print `a + b`. The sum of two values up to 10^9 stays within int here, but using long is a safe habit.",
+    "optimal_time": "O(1)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "Read two numbers and add them.",
+    "starter_code": {
+      "java": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int a = sc.nextInt();\n        int b = sc.nextInt();\n        // TODO: print a + b\n    }\n}\n",
+      "python": "a, b = map(int, input().split())\n# TODO: print a + b\n"
+    },
+    "topics": [
+      "Basics"
+    ],
+    "subtopics": [
+      "Arithmetic"
+    ],
+    "companies": [],
+    "patterns": [],
+    "hints": [
+      "Read two integers with sc.nextInt() twice.",
+      "Store them in int variables.",
+      "Add with the + operator.",
+      "Print the result."
+    ],
+    "prerequisites": [
+      {
+        "key": "io_basics",
+        "name": "Reading Input & Printing",
+        "what": "Getting values in from standard input and writing answers out to standard output.",
+        "deep": "Every problem here communicates over stdin/stdout: your program reads the input the grader feeds it and prints the answer. Reading the input format correctly is half the battle when you are starting out, so always match how many numbers or lines the problem describes.",
+        "java": "Scanner sc = new Scanner(System.in); then sc.nextInt(), sc.next(), or sc.nextLine(). Print with System.out.println(...). Switch to BufferedReader later for speed.",
+        "how": "Read the two integers that arrive on the input."
+      },
+      {
+        "key": "variables",
+        "name": "Variables & Types",
+        "what": "Named boxes that hold values of a specific type such as int, long, double, boolean, or String.",
+        "deep": "A variable stores a value you can read and update. Java is statically typed, so you declare the type up front and it never changes. Picking the right type (int vs long, int vs double) prevents overflow and rounding surprises down the line.",
+        "java": "Declare with a type: int n = 5; long big = 10000000000L; double d = 3.14; boolean ok = true; String s = ... .",
+        "how": "Hold each number in its own int variable."
+      },
+      {
+        "key": "arithmetic",
+        "name": "Arithmetic & Operators",
+        "what": "Doing math with +, -, *, / and the remainder operator %.",
+        "deep": "Operators combine values. The Java gotchas: integer division truncates (7 / 2 is 3, not 3.5), % gives the remainder (great for even/odd and wrapping), and mixing an int with a double promotes the result to double.",
+        "java": "Use +, -, *, /, %. Note 7 / 2 == 3 (int) but 7.0 / 2 == 3.5 (double). Math.max, Math.min, Math.abs help too.",
+        "how": "Add them with the + operator and print the result."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Positives",
+        "input": "2 3\n",
+        "expected_output": "5",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Negative",
+        "input": "-4 10\n",
+        "expected_output": "6",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Zeros",
+        "input": "0 0\n",
+        "expected_output": "0",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Large",
+        "input": "1000000 2000000\n",
+        "expected_output": "3000000",
+        "ordering": 3
+      },
+      {
+        "kind": "hidden",
+        "name": "Both negative",
+        "input": "-5 -7\n",
+        "expected_output": "-12",
+        "ordering": 4
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "judge_mode": "exact"
+  },
+  {
+    "slug": "rectangle-area",
+    "title": "Rectangle Area",
+    "difficulty": "Intro",
+    "description": "Given a rectangle's width and height, print its area.\n\n### Input\nTwo integers `w h` on one line.\n\n### Output\nThe area (w times h).",
+    "constraints": "1 ≤ w, h ≤ 10^4",
+    "examples": [
+      {
+        "input": "3 4",
+        "output": "12",
+        "explanation": "3 x 4 = 12."
+      }
+    ],
+    "editorial": "## Approach\nRead `w` and `h` and print `w * h`. A gentle introduction to multiplication and reading two values.",
+    "optimal_time": "O(1)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "One multiplication.",
+    "starter_code": {
+      "java": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int w = sc.nextInt();\n        int h = sc.nextInt();\n        // TODO: print the area (w * h)\n    }\n}\n",
+      "python": "w, h = map(int, input().split())\n# TODO: print w * h\n"
+    },
+    "topics": [
+      "Basics"
+    ],
+    "subtopics": [
+      "Arithmetic"
+    ],
+    "companies": [],
+    "patterns": [],
+    "hints": [
+      "Area is width multiplied by height.",
+      "Use the * operator.",
+      "Read both integers first.",
+      "Print w * h."
+    ],
+    "prerequisites": [
+      {
+        "key": "io_basics",
+        "name": "Reading Input & Printing",
+        "what": "Getting values in from standard input and writing answers out to standard output.",
+        "deep": "Every problem here communicates over stdin/stdout: your program reads the input the grader feeds it and prints the answer. Reading the input format correctly is half the battle when you are starting out, so always match how many numbers or lines the problem describes.",
+        "java": "Scanner sc = new Scanner(System.in); then sc.nextInt(), sc.next(), or sc.nextLine(). Print with System.out.println(...). Switch to BufferedReader later for speed.",
+        "how": "Read the width and height from the input line."
+      },
+      {
+        "key": "variables",
+        "name": "Variables & Types",
+        "what": "Named boxes that hold values of a specific type such as int, long, double, boolean, or String.",
+        "deep": "A variable stores a value you can read and update. Java is statically typed, so you declare the type up front and it never changes. Picking the right type (int vs long, int vs double) prevents overflow and rounding surprises down the line.",
+        "java": "Declare with a type: int n = 5; long big = 10000000000L; double d = 3.14; boolean ok = true; String s = ... .",
+        "how": "Keep width and height in int variables."
+      },
+      {
+        "key": "arithmetic",
+        "name": "Arithmetic & Operators",
+        "what": "Doing math with +, -, *, / and the remainder operator %.",
+        "deep": "Operators combine values. The Java gotchas: integer division truncates (7 / 2 is 3, not 3.5), % gives the remainder (great for even/odd and wrapping), and mixing an int with a double promotes the result to double.",
+        "java": "Use +, -, *, /, %. Note 7 / 2 == 3 (int) but 7.0 / 2 == 3.5 (double). Math.max, Math.min, Math.abs help too.",
+        "how": "Area is width times height - use the * operator."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "3 by 4",
+        "input": "3 4\n",
+        "expected_output": "12",
+        "ordering": 0
+      },
+      {
+        "kind": "hidden",
+        "name": "Square",
+        "input": "5 5\n",
+        "expected_output": "25",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Thin",
+        "input": "10 1\n",
+        "expected_output": "10",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Six by seven",
+        "input": "7 6\n",
+        "expected_output": "42",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "judge_mode": "exact"
+  },
+  {
+    "slug": "even-or-odd",
+    "title": "Even or Odd",
+    "difficulty": "Intro",
+    "description": "Decide whether a number is even or odd.\n\n### Input\nA single integer `n`.\n\n### Output\n`Even` if n is even, otherwise `Odd`.",
+    "constraints": "-10^9 ≤ n ≤ 10^9",
+    "examples": [
+      {
+        "input": "4",
+        "output": "Even",
+        "explanation": "4 divides evenly by 2, so Even."
+      },
+      {
+        "input": "7",
+        "output": "Odd",
+        "explanation": "7 leaves remainder 1, so Odd."
+      }
+    ],
+    "editorial": "## Approach\nCompute `n % 2`. If it is 0 print `Even`, otherwise print `Odd`. This is your first conditional.",
+    "optimal_time": "O(1)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "One remainder test.",
+    "starter_code": {
+      "java": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        // TODO: print \"Even\" or \"Odd\"\n    }\n}\n",
+      "python": "n = int(input())\n# TODO: print 'Even' or 'Odd'\n"
+    },
+    "topics": [
+      "Basics"
+    ],
+    "subtopics": [
+      "Conditionals"
+    ],
+    "companies": [],
+    "patterns": [],
+    "hints": [
+      "A number is even when it divides by 2 with no remainder.",
+      "n % 2 == 0 means even.",
+      "Use if/else to choose the word.",
+      "Print exactly Even or Odd."
+    ],
+    "prerequisites": [
+      {
+        "key": "io_basics",
+        "name": "Reading Input & Printing",
+        "what": "Getting values in from standard input and writing answers out to standard output.",
+        "deep": "Every problem here communicates over stdin/stdout: your program reads the input the grader feeds it and prints the answer. Reading the input format correctly is half the battle when you are starting out, so always match how many numbers or lines the problem describes.",
+        "java": "Scanner sc = new Scanner(System.in); then sc.nextInt(), sc.next(), or sc.nextLine(). Print with System.out.println(...). Switch to BufferedReader later for speed.",
+        "how": "Read the single integer to test."
+      },
+      {
+        "key": "arithmetic",
+        "name": "Arithmetic & Operators",
+        "what": "Doing math with +, -, *, / and the remainder operator %.",
+        "deep": "Operators combine values. The Java gotchas: integer division truncates (7 / 2 is 3, not 3.5), % gives the remainder (great for even/odd and wrapping), and mixing an int with a double promotes the result to double.",
+        "java": "Use +, -, *, /, %. Note 7 / 2 == 3 (int) but 7.0 / 2 == 3.5 (double). Math.max, Math.min, Math.abs help too.",
+        "how": "n % 2 is 0 for even numbers and non-zero for odd ones."
+      },
+      {
+        "key": "conditionals",
+        "name": "Conditionals (if / else)",
+        "what": "Choosing what to do based on whether a condition is true.",
+        "deep": "if/else branches let your program react to data. The condition is a boolean expression built from comparisons (==, !=, <, >) and logic (&&, ||, !). Chain several with else if when there are more than two outcomes.",
+        "java": "if (n % 2 == 0) { ... } else { ... }. Compare ints with ==, but compare Strings with .equals(), never ==.",
+        "how": "Use if/else to print Even or Odd based on that remainder."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Even",
+        "input": "4\n",
+        "expected_output": "Even",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Odd",
+        "input": "7\n",
+        "expected_output": "Odd",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Zero",
+        "input": "0\n",
+        "expected_output": "Even",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Negative odd",
+        "input": "-3\n",
+        "expected_output": "Odd",
+        "ordering": 3
+      },
+      {
+        "kind": "hidden",
+        "name": "Big even",
+        "input": "100\n",
+        "expected_output": "Even",
+        "ordering": 4
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "judge_mode": "exact"
+  },
+  {
+    "slug": "larger-of-two",
+    "title": "Larger of Two",
+    "difficulty": "Intro",
+    "description": "Print the larger of two integers.\n\n### Input\nTwo integers `a b` on one line.\n\n### Output\nThe larger value (if equal, print that value).",
+    "constraints": "-10^9 ≤ a, b ≤ 10^9",
+    "examples": [
+      {
+        "input": "3 8",
+        "output": "8",
+        "explanation": "8 is larger than 3."
+      }
+    ],
+    "editorial": "## Approach\nCompare `a` and `b` with an if/else, or simply print `Math.max(a, b)`.",
+    "optimal_time": "O(1)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "One comparison.",
+    "starter_code": {
+      "java": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int a = sc.nextInt();\n        int b = sc.nextInt();\n        // TODO: print the larger of a and b\n    }\n}\n",
+      "python": "a, b = map(int, input().split())\n# TODO: print the larger of a and b\n"
+    },
+    "topics": [
+      "Basics"
+    ],
+    "subtopics": [
+      "Conditionals"
+    ],
+    "companies": [],
+    "patterns": [],
+    "hints": [
+      "Compare the two numbers.",
+      "a > b means a is larger.",
+      "Math.max(a, b) does this in one call.",
+      "Print the larger one."
+    ],
+    "prerequisites": [
+      {
+        "key": "io_basics",
+        "name": "Reading Input & Printing",
+        "what": "Getting values in from standard input and writing answers out to standard output.",
+        "deep": "Every problem here communicates over stdin/stdout: your program reads the input the grader feeds it and prints the answer. Reading the input format correctly is half the battle when you are starting out, so always match how many numbers or lines the problem describes.",
+        "java": "Scanner sc = new Scanner(System.in); then sc.nextInt(), sc.next(), or sc.nextLine(). Print with System.out.println(...). Switch to BufferedReader later for speed.",
+        "how": "Read the two integers to compare."
+      },
+      {
+        "key": "variables",
+        "name": "Variables & Types",
+        "what": "Named boxes that hold values of a specific type such as int, long, double, boolean, or String.",
+        "deep": "A variable stores a value you can read and update. Java is statically typed, so you declare the type up front and it never changes. Picking the right type (int vs long, int vs double) prevents overflow and rounding surprises down the line.",
+        "java": "Declare with a type: int n = 5; long big = 10000000000L; double d = 3.14; boolean ok = true; String s = ... .",
+        "how": "Store both numbers so you can compare them."
+      },
+      {
+        "key": "conditionals",
+        "name": "Conditionals (if / else)",
+        "what": "Choosing what to do based on whether a condition is true.",
+        "deep": "if/else branches let your program react to data. The condition is a boolean expression built from comparisons (==, !=, <, >) and logic (&&, ||, !). Chain several with else if when there are more than two outcomes.",
+        "java": "if (n % 2 == 0) { ... } else { ... }. Compare ints with ==, but compare Strings with .equals(), never ==.",
+        "how": "Compare with > and print the larger, or just use Math.max."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Second larger",
+        "input": "3 8\n",
+        "expected_output": "8",
+        "ordering": 0
+      },
+      {
+        "kind": "hidden",
+        "name": "First larger",
+        "input": "10 2\n",
+        "expected_output": "10",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Equal",
+        "input": "5 5\n",
+        "expected_output": "5",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Negatives",
+        "input": "-1 -4\n",
+        "expected_output": "-1",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "judge_mode": "exact"
+  },
+  {
+    "slug": "sum-to-n",
+    "title": "Sum From 1 to N",
+    "difficulty": "Intro",
+    "description": "Add up all integers from 1 to n.\n\n### Input\nA single integer `n`.\n\n### Output\n1 + 2 + ... + n.",
+    "constraints": "1 ≤ n ≤ 10^4",
+    "examples": [
+      {
+        "input": "5",
+        "output": "15",
+        "explanation": "1+2+3+4+5 = 15."
+      },
+      {
+        "input": "1",
+        "output": "1",
+        "explanation": "Just 1."
+      }
+    ],
+    "editorial": "## Approach\nLoop `i` from 1 to n adding to a running `sum`, then print it. Or use the closed form `n*(n+1)/2`. Your first loop that accumulates a result.",
+    "optimal_time": "O(1)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "The closed form n*(n+1)/2 avoids the loop, though an O(n) loop is perfectly fine here.",
+    "starter_code": {
+      "java": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        long sum = 0;\n        // TODO: add 1, 2, ..., n to sum\n        System.out.println(sum);\n    }\n}\n",
+      "python": "n = int(input())\n# TODO: add 1..n and print the total\n"
+    },
+    "topics": [
+      "Basics"
+    ],
+    "subtopics": [
+      "Loops"
+    ],
+    "companies": [],
+    "patterns": [],
+    "hints": [
+      "A for-loop from 1 to n can add each number.",
+      "Keep a running total variable starting at 0.",
+      "Add i to the total each iteration.",
+      "There is also a formula: n*(n+1)/2."
+    ],
+    "prerequisites": [
+      {
+        "key": "io_basics",
+        "name": "Reading Input & Printing",
+        "what": "Getting values in from standard input and writing answers out to standard output.",
+        "deep": "Every problem here communicates over stdin/stdout: your program reads the input the grader feeds it and prints the answer. Reading the input format correctly is half the battle when you are starting out, so always match how many numbers or lines the problem describes.",
+        "java": "Scanner sc = new Scanner(System.in); then sc.nextInt(), sc.next(), or sc.nextLine(). Print with System.out.println(...). Switch to BufferedReader later for speed.",
+        "how": "Read the single value n."
+      },
+      {
+        "key": "loops_basic",
+        "name": "Loops (for / while)",
+        "what": "Repeating a block of code a set number of times or until a condition changes.",
+        "deep": "A for-loop fits when you know the count; a while-loop when you stop on a condition. Loops are how you process every element or accumulate a running result, and getting the start/end bounds right is the main beginner pitfall.",
+        "java": "for (int i = 1; i <= n; i++) { ... } or while (condition) { ... }. Build output strings with StringBuilder inside the loop.",
+        "how": "Loop i from 1 to n, adding each i to a running total."
+      },
+      {
+        "key": "arithmetic",
+        "name": "Arithmetic & Operators",
+        "what": "Doing math with +, -, *, / and the remainder operator %.",
+        "deep": "Operators combine values. The Java gotchas: integer division truncates (7 / 2 is 3, not 3.5), % gives the remainder (great for even/odd and wrapping), and mixing an int with a double promotes the result to double.",
+        "java": "Use +, -, *, /, %. Note 7 / 2 == 3 (int) but 7.0 / 2 == 3.5 (double). Math.max, Math.min, Math.abs help too.",
+        "how": "Or use the closed form n*(n+1)/2 - either way, accumulate carefully."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Five",
+        "input": "5\n",
+        "expected_output": "15",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "One",
+        "input": "1\n",
+        "expected_output": "1",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Hundred",
+        "input": "100\n",
+        "expected_output": "5050",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Ten",
+        "input": "10\n",
+        "expected_output": "55",
+        "ordering": 3
+      },
+      {
+        "kind": "hidden",
+        "name": "Max",
+        "input": "10000\n",
+        "expected_output": "50005000",
+        "ordering": 4
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "judge_mode": "exact"
+  },
+  {
+    "slug": "countdown",
+    "title": "Countdown",
+    "difficulty": "Intro",
+    "description": "Print the numbers from n down to 1 on one line, separated by single spaces.\n\n### Input\nA single integer `n`.\n\n### Output\n`n n-1 ... 1` separated by spaces.",
+    "constraints": "1 ≤ n ≤ 1000",
+    "examples": [
+      {
+        "input": "5",
+        "output": "5 4 3 2 1",
+        "explanation": "Counts down from 5 to 1."
+      },
+      {
+        "input": "1",
+        "output": "1",
+        "explanation": "Only 1."
+      }
+    ],
+    "editorial": "## Approach\nLoop `i` from n down to 1, appending each to a StringBuilder with spaces, then print. Practice with a decreasing loop.",
+    "optimal_time": "O(n)",
+    "optimal_space": "O(n)",
+    "optimal_explanation": "You emit n numbers.",
+    "starter_code": {
+      "java": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        StringBuilder sb = new StringBuilder();\n        // TODO: append n, n-1, ..., 1 separated by spaces\n        System.out.println(sb.toString().trim());\n    }\n}\n",
+      "python": "n = int(input())\n# TODO: print n, n-1, ..., 1 on one line separated by spaces\n"
+    },
+    "topics": [
+      "Basics"
+    ],
+    "subtopics": [
+      "Loops"
+    ],
+    "companies": [],
+    "patterns": [],
+    "hints": [
+      "A for-loop can count downward: start at n, step -1.",
+      "Print each number followed by a space (or join them).",
+      "A StringBuilder keeps the output tidy.",
+      "Do not print a trailing newline between numbers."
+    ],
+    "prerequisites": [
+      {
+        "key": "io_basics",
+        "name": "Reading Input & Printing",
+        "what": "Getting values in from standard input and writing answers out to standard output.",
+        "deep": "Every problem here communicates over stdin/stdout: your program reads the input the grader feeds it and prints the answer. Reading the input format correctly is half the battle when you are starting out, so always match how many numbers or lines the problem describes.",
+        "java": "Scanner sc = new Scanner(System.in); then sc.nextInt(), sc.next(), or sc.nextLine(). Print with System.out.println(...). Switch to BufferedReader later for speed.",
+        "how": "Read the starting value n."
+      },
+      {
+        "key": "loops_basic",
+        "name": "Loops (for / while)",
+        "what": "Repeating a block of code a set number of times or until a condition changes.",
+        "deep": "A for-loop fits when you know the count; a while-loop when you stop on a condition. Loops are how you process every element or accumulate a running result, and getting the start/end bounds right is the main beginner pitfall.",
+        "java": "for (int i = 1; i <= n; i++) { ... } or while (condition) { ... }. Build output strings with StringBuilder inside the loop.",
+        "how": "Loop i from n down to 1, emitting each number."
+      },
+      {
+        "key": "string_basics",
+        "name": "String Traversal",
+        "what": "Treating a string as an indexable sequence of characters to count and compare.",
+        "deep": "Most string problems reduce to a single pass with charAt or a char[]. Remember Java strings are immutable, so build output with StringBuilder, and character math relies on ASCII codes.",
+        "java": "s.charAt(i), s.length(), s.toCharArray(); build results with StringBuilder, never += inside a loop.",
+        "how": "Join the numbers into one line separated by spaces (a StringBuilder is tidy)."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Five",
+        "input": "5\n",
+        "expected_output": "5 4 3 2 1",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "One",
+        "input": "1\n",
+        "expected_output": "1",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Three",
+        "input": "3\n",
+        "expected_output": "3 2 1",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Ten",
+        "input": "10\n",
+        "expected_output": "10 9 8 7 6 5 4 3 2 1",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "judge_mode": "exact"
+  },
+  {
+    "slug": "array-sum",
+    "title": "Array Sum",
+    "difficulty": "Easy",
+    "description": "Given an integer array, return the sum of all its elements.\n\n### Input\n- Line 1: integer `n` — the number of elements.\n- Line 2: `n` space-separated integers.\n\n### Output\nA single integer: the sum of the array.",
+    "constraints": "1 ≤ n ≤ 10^5\n-10^9 ≤ a[i] ≤ 10^9",
+    "examples": [
+      {
+        "input": "3\n1 2 3",
+        "output": "6",
+        "explanation": "1 + 2 + 3 = 6."
+      },
+      {
+        "input": "5\n-1 -2 -3 -4 -5",
+        "output": "-15",
+        "explanation": "The values sum to -15."
+      }
+    ],
+    "editorial": "## Approach\nInitialize an accumulator to 0 and add each element. Because you must read every element to know the sum, O(n) time is optimal, and only a single accumulator is needed, giving O(1) extra space.",
+    "optimal_time": "O(n)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "A single pass accumulating a running total is optimal; every element must be read at least once.",
+    "starter_code": {
+      "java": "import java.util.*;\n\npublic class Main {\n    static long solve(int[] nums) {\n        // TODO: return the sum of nums (use long!)\n        return 0;\n    }\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] nums = new int[n];\n        for (int i = 0; i < n; i++) nums[i] = sc.nextInt();\n        System.out.println(solve(nums));\n    }\n}\n",
+      "python": "import sys\n\ndef solve(nums):\n    # TODO: return the sum of nums\n    return 0\n\ndata = sys.stdin.read().split()\nn = int(data[0])\nnums = list(map(int, data[1:1+n]))\nprint(solve(nums))\n",
+      "javascript": "const data = require('fs').readFileSync(0, 'utf8').split(/\\s+/).filter(Boolean).map(Number);\nconst n = data[0];\nconst nums = data.slice(1, 1 + n);\n\nfunction solve(nums) {\n  // TODO: return the sum of nums\n  return 0;\n}\n\nconsole.log(solve(nums));\n",
+      "typescript": "const data = require('fs').readFileSync(0, 'utf8').split(/\\s+/).filter(Boolean).map(Number);\nconst n = data[0];\nconst nums = data.slice(1, 1 + n);\n\nfunction solve(nums) {\n  // TODO: return the sum of nums\n  return 0;\n}\n\nconsole.log(solve(nums));\n"
+    },
+    "topics": [
+      "Arrays"
+    ],
+    "subtopics": [
+      "Traversal"
+    ],
+    "companies": [
+      "Amazon"
+    ],
+    "patterns": [],
+    "hints": [
+      "You only need to look at each element once.",
+      "Keep a running total as you scan left to right.",
+      "Watch out for negative numbers — they reduce the sum.",
+      "Sum all elements: `total += a[i]`."
+    ],
+    "prerequisites": [
+      {
+        "key": "big_o",
+        "name": "Big-O / Complexity Analysis",
+        "what": "Reasoning about how time and memory grow with the input size.",
+        "deep": "Big-O bounds the dominant growth term and tells you whether an approach scales to the constraints. Read the limits: n up to 10^5 suggests O(n) or O(n log n), while 10^9 suggests O(log n) or O(1). Sanity-check the work against roughly 10^8 operations per second.",
+        "java": "No API - this is analysis. Match your algorithm to the constraints stated in each problem before you start coding.",
+        "how": "The single loop touches each of the n elements once, so the time is Theta(n) - you must read every value to sum it, and no approach is faster."
+      },
+      {
+        "key": "iteration",
+        "name": "Array Iteration",
+        "what": "Walking through elements one at a time while maintaining running state such as a sum, max, or counter.",
+        "deep": "The workhorse of array problems: one for-loop that updates accumulators as it goes. Most linear-time solutions are just one well-chosen pass, so the real skill is deciding what state to carry so a single sweep suffices.",
+        "java": "Use for (int i = 0; i < n; i++) or for (int x : nums). Prefer a primitive int[] over Integer[] to avoid autoboxing overhead.",
+        "how": "You keep a running total and add each element as you pass over the array exactly once."
+      },
+      {
+        "key": "overflow",
+        "name": "Integer Overflow (int vs long)",
+        "what": "Guarding against results that exceed a 32-bit int's range of about 2.1x10^9.",
+        "deep": "Sums, products, and reversed numbers can silently wrap a 32-bit int, giving a wrong answer with no error. The fix is a wide enough type or a modulo reduction, so estimate the maximum magnitude before choosing the type.",
+        "java": "int overflows past ~2.1e9; long reaches ~9.2e18. Cast early with (long) a * b and accumulate sums into a long.",
+        "how": "With up to 10^5 values as large as 10^9, the sum can reach ~10^14, which overflows a 32-bit int - accumulate into a long."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example 1",
+        "input": "3\n1 2 3\n",
+        "expected_output": "6",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Example 2",
+        "input": "5\n-1 -2 -3 -4 -5\n",
+        "expected_output": "-15",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Single element",
+        "input": "1\n1000000000\n",
+        "expected_output": "1000000000",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "All zeros",
+        "input": "4\n0 0 0 0\n",
+        "expected_output": "0",
+        "ordering": 3
+      },
+      {
+        "kind": "hidden",
+        "name": "Mixed",
+        "input": "6\n10 -4 3 -3 100 -1\n",
+        "expected_output": "105",
+        "ordering": 4
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "judge_mode": "exact"
+  },
+  {
+    "slug": "reverse-string",
+    "title": "Reverse String",
+    "difficulty": "Easy",
+    "description": "Return the input string reversed.\n\n### Input\nA single line containing a string `s` of visible characters (no spaces).\n\n### Output\nThe reversed string.",
+    "constraints": "1 ≤ |s| ≤ 10^5",
+    "examples": [
+      {
+        "input": "hello",
+        "output": "olleh",
+        "explanation": "'hello' reversed is 'olleh'."
+      },
+      {
+        "input": "racecar",
+        "output": "racecar",
+        "explanation": "A palindrome reversed is itself."
+      }
+    ],
+    "editorial": "## Approach\nUse two indices, one at each end, swapping and moving inward until they meet.",
+    "optimal_time": "O(n)",
+    "optimal_space": "O(n)",
+    "optimal_explanation": "Each character is moved once; the output itself needs O(n) space.",
+    "starter_code": {
+      "java": "import java.io.*;\n\npublic class Main {\n    static String solve(String s) {\n        // TODO: return s reversed\n        return s;\n    }\n    public static void main(String[] args) throws IOException {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        String s = br.readLine();\n        if (s == null) s = \"\";\n        System.out.println(solve(s));\n    }\n}\n",
+      "python": "s = input()\n\ndef solve(s):\n    # TODO: return s reversed\n    return s\n\nprint(solve(s))\n",
+      "javascript": "const s = require('fs').readFileSync(0, 'utf8').replace(/\\n$/, '');\n\nfunction solve(s) {\n  // TODO: return s reversed\n  return s;\n}\n\nconsole.log(solve(s));\n",
+      "typescript": "const s = require('fs').readFileSync(0, 'utf8').replace(/\\n$/, '');\n\nfunction solve(s) {\n  // TODO: return s reversed\n  return s;\n}\n\nconsole.log(solve(s));\n"
+    },
+    "topics": [
+      "Strings"
+    ],
+    "subtopics": [
+      "Two Pointers"
+    ],
+    "companies": [
+      "Microsoft"
+    ],
+    "patterns": [
+      "Two Pointers"
+    ],
+    "hints": [
+      "Think about the first and last characters swapping places.",
+      "Two pointers moving toward each other work well in-place.",
+      "Or build the result from the end to the start.",
+      "Swap s[i] and s[n-1-i] for i in [0, n/2)."
+    ],
+    "prerequisites": [
+      {
+        "key": "two_pointers",
+        "name": "Two Pointers",
+        "what": "Two indices moving through a sequence (from both ends, or at different speeds) to replace a nested loop.",
+        "deep": "By advancing pointers based on a comparison you explore O(n) states instead of O(n^2). Common shapes are opposite ends converging (sorted pair sums, palindromes, rain water) and fast/slow (cycle detection). Correctness hinges on why the pointer you move cannot skip a better answer.",
+        "java": "Two int indices lo/hi (or i/j) in a while (lo < hi) loop; no special class needed.",
+        "how": "Put one index at the start and one at the end, swap the characters, and step them toward the middle until they cross."
+      },
+      {
+        "key": "inplace_reverse",
+        "name": "In-place Reversal",
+        "what": "Reversing a segment by swapping symmetric elements, using O(1) extra space.",
+        "deep": "Swapping a[i] with a[n-1-i] for i in [0, n/2) reverses a range without allocation. It is the building block for array rotation (reverse-whole-then-parts) and for string reversal.",
+        "java": "A helper void reverse(int[] a, int i, int j) { while (i < j) { int t = a[i]; a[i++] = a[j]; a[j--] = t; } }.",
+        "how": "Swapping symmetric positions reverses the text using no extra array - O(1) auxiliary space."
+      },
+      {
+        "key": "char_arrays",
+        "name": "Char Arrays & ASCII",
+        "what": "Manipulating characters via their numeric codes and mutable char arrays.",
+        "deep": "Characters are small integers, so 'a'..'z' map to a 26-slot table via c - 'a'. Because Java strings are immutable, in-place character work needs a char[]. This underlies frequency counts, canonical keys, and in-place edits.",
+        "java": "int idx = c - 'a'; char[] arr = s.toCharArray(); new String(arr) to rebuild. A length-26 or length-128 int[] beats a HashMap for letters.",
+        "how": "Java strings are immutable, so convert with toCharArray(), swap in place, then rebuild via new String(arr)."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example 1",
+        "input": "hello\n",
+        "expected_output": "olleh",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Example 2",
+        "input": "racecar\n",
+        "expected_output": "racecar",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Single char",
+        "input": "a\n",
+        "expected_output": "a",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Even length",
+        "input": "abcd\n",
+        "expected_output": "dcba",
+        "ordering": 3
+      },
+      {
+        "kind": "hidden",
+        "name": "Digits",
+        "input": "12345\n",
+        "expected_output": "54321",
+        "ordering": 4
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "judge_mode": "exact"
+  },
+  {
+    "slug": "count-vowels",
+    "title": "Count Vowels",
+    "difficulty": "Easy",
+    "description": "Count how many vowels (a, e, i, o, u) appear in a lowercase string.\n\n### Input\nA single line: a lowercase string `s`.\n\n### Output\nThe number of vowels.",
+    "constraints": "1 ≤ |s| ≤ 10^5\ns consists of lowercase English letters",
+    "examples": [
+      {
+        "input": "hello",
+        "output": "2",
+        "explanation": "'e' and 'o' are vowels → 2."
+      },
+      {
+        "input": "aeiou",
+        "output": "5",
+        "explanation": "All five characters are vowels → 5."
+      }
+    ],
+    "editorial": "## Approach\nIterate the string and increment a counter whenever the character is in the vowel set.",
+    "optimal_time": "O(n)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "One pass; the vowel set is constant size.",
+    "starter_code": {
+      "java": "import java.io.*;\n\npublic class Main {\n    static int solve(String s) {\n        // TODO: count vowels a, e, i, o, u\n        return 0;\n    }\n    public static void main(String[] args) throws IOException {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        String s = br.readLine();\n        if (s == null) s = \"\";\n        System.out.println(solve(s));\n    }\n}\n",
+      "python": "s = input()\nVOWELS = set('aeiou')\n\ndef solve(s):\n    # TODO: count vowels\n    return 0\n\nprint(solve(s))\n",
+      "javascript": "const s = require('fs').readFileSync(0, 'utf8').replace(/\\n$/, '');\n\nfunction solve(s) {\n  // TODO: count vowels\n  return 0;\n}\n\nconsole.log(solve(s));\n",
+      "typescript": "const s = require('fs').readFileSync(0, 'utf8').replace(/\\n$/, '');\n\nfunction solve(s) {\n  // TODO: count vowels\n  return 0;\n}\n\nconsole.log(solve(s));\n"
+    },
+    "topics": [
+      "Strings"
+    ],
+    "subtopics": [
+      "Counting"
+    ],
+    "companies": [
+      "Adobe"
+    ],
+    "patterns": [
+      "Counting"
+    ],
+    "hints": [
+      "A set of vowels makes membership tests easy.",
+      "Scan once and increment a counter.",
+      "`c in {'a','e','i','o','u'}`.",
+      "Return the counter."
+    ],
+    "prerequisites": [
+      {
+        "key": "string_basics",
+        "name": "String Traversal",
+        "what": "Treating a string as an indexable sequence of characters to count and compare.",
+        "deep": "Most string problems reduce to a single pass with charAt or a char[]. Remember Java strings are immutable, so build output with StringBuilder, and character math relies on ASCII codes.",
+        "java": "s.charAt(i), s.length(), s.toCharArray(); build results with StringBuilder, never += inside a loop.",
+        "how": "You walk the string once, inspecting each character in turn."
+      },
+      {
+        "key": "hashing",
+        "name": "Hash Maps & Sets",
+        "what": "Structures giving average O(1) insertion and lookup, trading memory for speed.",
+        "deep": "A hash table answers 'have I seen X?' or 'what maps to X?' in expected constant time, converting many O(n^2) pair scans into O(n) single passes. Worst case is O(n) per op under adversarial hashing, but that is rare in practice.",
+        "java": "HashMap<K,V> and HashSet<E>. Use getOrDefault(k, 0) and merge(k, 1, Integer::sum) for counting, containsKey/add for membership. For dense int keys, an int[] beats a HashMap.",
+        "how": "Storing the five vowels in a set makes each 'is this a vowel?' test O(1) instead of up to five comparisons."
+      },
+      {
+        "key": "char_arrays",
+        "name": "Char Arrays & ASCII",
+        "what": "Manipulating characters via their numeric codes and mutable char arrays.",
+        "deep": "Characters are small integers, so 'a'..'z' map to a 26-slot table via c - 'a'. Because Java strings are immutable, in-place character work needs a char[]. This underlies frequency counts, canonical keys, and in-place edits.",
+        "java": "int idx = c - 'a'; char[] arr = s.toCharArray(); new String(arr) to rebuild. A length-26 or length-128 int[] beats a HashMap for letters.",
+        "how": "Iterate with charAt(i) or over toCharArray() and compare each char against the vowel set."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example 1",
+        "input": "hello\n",
+        "expected_output": "2",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Example 2",
+        "input": "aeiou\n",
+        "expected_output": "5",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "No vowels",
+        "input": "sky\n",
+        "expected_output": "0",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Longer",
+        "input": "programming\n",
+        "expected_output": "3",
+        "ordering": 3
+      },
+      {
+        "kind": "hidden",
+        "name": "Repeated",
+        "input": "banana\n",
+        "expected_output": "3",
+        "ordering": 4
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "judge_mode": "exact"
+  },
+  {
+    "slug": "gcd",
+    "title": "Greatest Common Divisor",
+    "difficulty": "Easy",
+    "description": "Compute the greatest common divisor of two non-negative integers.\n\n### Input\nTwo space-separated integers `a b` on one line.\n\n### Output\ngcd(a, b).",
+    "constraints": "0 ≤ a, b ≤ 10^9 (not both zero)",
+    "examples": [
+      {
+        "input": "12 18",
+        "output": "6",
+        "explanation": "6 divides both 12 and 18."
+      },
+      {
+        "input": "17 5",
+        "output": "1",
+        "explanation": "17 and 5 are coprime → 1."
+      }
+    ],
+    "editorial": "## Approach\nRepeatedly replace (a, b) with (b, a mod b) until b is 0; a is then the gcd.",
+    "optimal_time": "O(log(min(a,b)))",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "The Euclidean algorithm reduces the arguments logarithmically.",
+    "starter_code": {
+      "java": "import java.util.*;\n\npublic class Main {\n    static long solve(long a, long b) {\n        // TODO: return gcd(a, b)\n        return 0;\n    }\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        long a = sc.nextLong();\n        long b = sc.nextLong();\n        System.out.println(solve(a, b));\n    }\n}\n",
+      "python": "a, b = map(int, input().split())\n\ndef solve(a, b):\n    # TODO: return gcd(a, b)\n    return 0\n\nprint(solve(a, b))\n",
+      "javascript": "const [a, b] = require('fs').readFileSync(0, 'utf8').trim().split(/\\s+/).map(Number);\n\nfunction solve(a, b) {\n  // TODO: return gcd(a, b)\n  return 0;\n}\n\nconsole.log(solve(a, b));\n",
+      "typescript": "const [a, b] = require('fs').readFileSync(0, 'utf8').trim().split(/\\s+/).map(Number);\n\nfunction solve(a, b) {\n  // TODO: return gcd(a, b)\n  return 0;\n}\n\nconsole.log(solve(a, b));\n"
+    },
+    "topics": [
+      "Math"
+    ],
+    "subtopics": [
+      "Number Theory"
+    ],
+    "companies": [
+      "Bloomberg"
+    ],
+    "patterns": [],
+    "hints": [
+      "The Euclidean algorithm is the classic tool.",
+      "gcd(a, b) = gcd(b, a mod b).",
+      "Recurse/loop until b becomes 0.",
+      "When b == 0, the answer is a."
+    ],
+    "prerequisites": [
+      {
+        "key": "number_theory",
+        "name": "Number Theory Basics",
+        "what": "Divisibility, gcd, and modular arithmetic facts used to reason about integers.",
+        "deep": "Foundations like the Euclidean algorithm, prime factorization, and modular arithmetic underpin many math problems. Even simple tasks benefit from gcd/lcm identities and knowing how modulo distributes over addition and multiplication.",
+        "java": "Math.floorMod for correct modulo of negatives; write a short gcd helper (Euclid); BigInteger has gcd() if needed.",
+        "how": "The gcd is the largest integer dividing both inputs; Euclid's insight is that gcd(a, b) equals gcd(b, a mod b)."
+      },
+      {
+        "key": "recursion",
+        "name": "Recursion",
+        "what": "A function that calls itself on smaller inputs, with base cases that stop the descent.",
+        "deep": "Expresses divide-and-conquer and tree/graph walks naturally. Watch the recursion depth against stack limits, and whether subproblems overlap - if they do, add memoization to avoid exponential blow-up.",
+        "java": "A private static helper that calls itself. The JVM stack handles ~10^4 depth; convert to an explicit ArrayDeque if you risk StackOverflowError.",
+        "how": "That identity is naturally recursive - recurse on (b, a % b) until the second argument is 0, then a is the answer (a while-loop works too)."
+      },
+      {
+        "key": "modulo",
+        "name": "Modular Reduction",
+        "what": "Using n % k to wrap indices around and drop redundant whole cycles.",
+        "deep": "Modulo collapses equivalent states: rotating by k equals rotating by k % n, and hashing or bucketing uses remainders. In Java, beware that % can return a negative result for negative operands.",
+        "java": "Use k % n after guarding n > 0; for possibly-negative values use Math.floorMod(x, n).",
+        "how": "The % operator drives each step, and the base case is gcd(x, 0) = x."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example 1",
+        "input": "12 18\n",
+        "expected_output": "6",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Example 2",
+        "input": "17 5\n",
+        "expected_output": "1",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Divisible",
+        "input": "100 10\n",
+        "expected_output": "10",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Zero operand",
+        "input": "0 7\n",
+        "expected_output": "7",
+        "ordering": 3
+      },
+      {
+        "kind": "hidden",
+        "name": "Large",
+        "input": "1000000000 8\n",
+        "expected_output": "8",
+        "ordering": 4
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "judge_mode": "exact"
+  },
+  {
+    "slug": "palindrome-number",
+    "title": "Palindrome Number",
+    "difficulty": "Easy",
+    "description": "Determine whether an integer reads the same forwards and backwards. Negative numbers are never palindromes.\n\n### Input\nA single integer `n`.\n\n### Output\n`true` or `false`.",
+    "constraints": "-10^18 ≤ n ≤ 10^18",
+    "examples": [
+      {
+        "input": "121",
+        "output": "true",
+        "explanation": "121 reversed is 121 → true."
+      },
+      {
+        "input": "-121",
+        "output": "false",
+        "explanation": "Negatives are never palindromes → false."
+      }
+    ],
+    "editorial": "## Approach\nReject negatives immediately, then compare the digit string to its reverse.",
+    "optimal_time": "O(d)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "d = number of digits; reversing half the digits is optimal.",
+    "starter_code": {
+      "java": "import java.io.*;\n\npublic class Main {\n    // n is the integer in String form.\n    static String solve(String n) {\n        // TODO: return \"true\" or \"false\"\n        return \"false\";\n    }\n    public static void main(String[] args) throws IOException {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        String n = br.readLine().trim();\n        System.out.println(solve(n));\n    }\n}\n",
+      "python": "n = input().strip()\n\ndef solve(n):\n    # n is the string form of the integer\n    # TODO: return 'true' or 'false'\n    return 'false'\n\nprint(solve(n))\n",
+      "javascript": "const n = require('fs').readFileSync(0, 'utf8').trim();\n\nfunction solve(n) {\n  // n is the string form of the integer\n  // TODO: return 'true' or 'false'\n  return 'false';\n}\n\nconsole.log(solve(n));\n",
+      "typescript": "const n = require('fs').readFileSync(0, 'utf8').trim();\n\nfunction solve(n) {\n  // n is the string form of the integer\n  // TODO: return 'true' or 'false'\n  return 'false';\n}\n\nconsole.log(solve(n));\n"
+    },
+    "topics": [
+      "Math"
+    ],
+    "subtopics": [
+      "Digits"
+    ],
+    "companies": [
+      "Amazon"
+    ],
+    "patterns": [],
+    "hints": [
+      "Negative numbers start with '-', which can't match the end.",
+      "You can compare the decimal string with its reverse.",
+      "Or reverse the number arithmetically and compare.",
+      "Return whether str(n) == reverse(str(n))."
+    ],
+    "prerequisites": [
+      {
+        "key": "math_digits",
+        "name": "Digit Manipulation",
+        "what": "Working with a number's decimal digits or its string form while handling signs and edge cases.",
+        "deep": "Digit problems peel digits with % 10 and / 10, or operate on the string form. Classic gotchas are negative numbers, trailing zeros, and overflow when reversing, so the first choice is arithmetic vs string handling.",
+        "java": "n % 10 and n / 10 to extract digits, or Long.toString(n); use long to avoid overflow on reversal.",
+        "how": "You compare digits from the two ends inward; a leading minus sign means it can never be a palindrome."
+      },
+      {
+        "key": "two_pointers",
+        "name": "Two Pointers",
+        "what": "Two indices moving through a sequence (from both ends, or at different speeds) to replace a nested loop.",
+        "deep": "By advancing pointers based on a comparison you explore O(n) states instead of O(n^2). Common shapes are opposite ends converging (sorted pair sums, palindromes, rain water) and fast/slow (cycle detection). Correctness hinges on why the pointer you move cannot skip a better answer.",
+        "java": "Two int indices lo/hi (or i/j) in a while (lo < hi) loop; no special class needed.",
+        "how": "Comparing the decimal string from outside in is the classic two-pointer palindrome test."
+      },
+      {
+        "key": "overflow",
+        "name": "Integer Overflow (int vs long)",
+        "what": "Guarding against results that exceed a 32-bit int's range of about 2.1x10^9.",
+        "deep": "Sums, products, and reversed numbers can silently wrap a 32-bit int, giving a wrong answer with no error. The fix is a wide enough type or a modulo reduction, so estimate the maximum magnitude before choosing the type.",
+        "java": "int overflows past ~2.1e9; long reaches ~9.2e18. Cast early with (long) a * b and accumulate sums into a long.",
+        "how": "If you reverse the number arithmetically instead of as a string, the reversed value can overflow int - use long or compare the string form."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example 1",
+        "input": "121\n",
+        "expected_output": "true",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Example 2",
+        "input": "-121\n",
+        "expected_output": "false",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Not palindrome",
+        "input": "10\n",
+        "expected_output": "false",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Zero",
+        "input": "0\n",
+        "expected_output": "true",
+        "ordering": 3
+      },
+      {
+        "kind": "hidden",
+        "name": "Long palindrome",
+        "input": "123454321\n",
+        "expected_output": "true",
+        "ordering": 4
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "judge_mode": "exact"
+  },
+  {
+    "slug": "nth-fibonacci",
+    "title": "Nth Fibonacci",
+    "difficulty": "Easy",
+    "description": "Return the n-th Fibonacci number, where F(0)=0, F(1)=1, and F(k)=F(k-1)+F(k-2).\n\n### Input\nA single integer `n`.\n\n### Output\nF(n).",
+    "constraints": "0 ≤ n ≤ 90 (fits in a 64-bit integer)",
+    "examples": [
+      {
+        "input": "10",
+        "output": "55",
+        "explanation": "F(10) = 55."
+      },
+      {
+        "input": "0",
+        "output": "0",
+        "explanation": "F(0) = 0 by definition."
+      }
+    ],
+    "editorial": "## Approach\nAvoid exponential naive recursion. Iterate keeping only the last two values, which is O(n) time and O(1) space.",
+    "optimal_time": "O(n)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "Bottom-up iteration with two rolling variables.",
+    "starter_code": {
+      "java": "import java.util.*;\n\npublic class Main {\n    static long solve(int n) {\n        // TODO: return F(n)\n        return 0;\n    }\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        System.out.println(solve(n));\n    }\n}\n",
+      "python": "n = int(input())\n\ndef solve(n):\n    # TODO: return F(n)\n    return 0\n\nprint(solve(n))\n",
+      "javascript": "const n = Number(require('fs').readFileSync(0, 'utf8').trim());\n\nfunction solve(n) {\n  // TODO: return F(n) (use BigInt-safe logic; n <= 90)\n  return 0;\n}\n\nconsole.log(solve(n));\n",
+      "typescript": "const n = Number(require('fs').readFileSync(0, 'utf8').trim());\n\nfunction solve(n) {\n  // TODO: return F(n) (use BigInt-safe logic; n <= 90)\n  return 0;\n}\n\nconsole.log(solve(n));\n"
+    },
+    "topics": [
+      "Dynamic Programming"
+    ],
+    "subtopics": [
+      "Recurrence"
+    ],
+    "companies": [
+      "Google"
+    ],
+    "patterns": [
+      "Dynamic Programming"
+    ],
+    "hints": [
+      "You only need the two previous values at any time.",
+      "Iterate from the bottom up.",
+      "Keep variables a=F(i-1), b=F(i).",
+      "Advance (a, b) → (b, a+b), n times."
+    ],
+    "prerequisites": [
+      {
+        "key": "recurrence",
+        "name": "Recurrence Relations",
+        "what": "Expressing an answer in terms of smaller answers, e.g. f(n) = f(n-1) + f(n-2).",
+        "deep": "A recurrence is the mathematical heart of many DP and divide-and-conquer solutions. Once you name the base cases and the transition you can either recurse with memoization or iterate bottom-up, often reducing space to a few rolling variables.",
+        "java": "Iterate bottom-up with a few long variables, or memoize with a long[] dp. Use long when terms grow fast.",
+        "how": "Each term is the sum of the previous two: F(n) = F(n-1) + F(n-2), with F(0)=0 and F(1)=1."
+      },
+      {
+        "key": "dp",
+        "name": "Dynamic Programming",
+        "what": "Breaking a problem into overlapping subproblems and reusing their answers.",
+        "deep": "Applies when there is optimal substructure and overlapping subproblems. Two styles exist: top-down memoized recursion and bottom-up tabulation. Defining the state and transition precisely is the whole game, and space can often be rolled down a dimension.",
+        "java": "A memo HashMap or an int[]/int[][] table. For memoization initialize a sentinel with Arrays.fill(dp, -1).",
+        "how": "Naive recursion recomputes terms exponentially; keep only the last two values and roll forward in O(n)."
+      },
+      {
+        "key": "overflow",
+        "name": "Integer Overflow (int vs long)",
+        "what": "Guarding against results that exceed a 32-bit int's range of about 2.1x10^9.",
+        "deep": "Sums, products, and reversed numbers can silently wrap a 32-bit int, giving a wrong answer with no error. The fix is a wide enough type or a modulo reduction, so estimate the maximum magnitude before choosing the type.",
+        "java": "int overflows past ~2.1e9; long reaches ~9.2e18. Cast early with (long) a * b and accumulate sums into a long.",
+        "how": "F(90) is about 2.9x10^18 - it fits in a long but not an int, so use long."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example 1",
+        "input": "10\n",
+        "expected_output": "55",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Example 2",
+        "input": "0\n",
+        "expected_output": "0",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "One",
+        "input": "1\n",
+        "expected_output": "1",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Twenty",
+        "input": "20\n",
+        "expected_output": "6765",
+        "ordering": 3
+      },
+      {
+        "kind": "hidden",
+        "name": "Large",
+        "input": "50\n",
+        "expected_output": "12586269025",
+        "ordering": 4
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "judge_mode": "exact"
+  },
+  {
+    "slug": "two-sum-exists",
+    "title": "Two Sum — Exists",
+    "difficulty": "Easy",
+    "description": "Given an array and a target, decide whether any two distinct positions sum to the target.\n\n### Input\n- Line 1: `n`\n- Line 2: `n` integers\n- Line 3: `target`\n\n### Output\n`YES` if such a pair exists, otherwise `NO`.",
+    "constraints": "1 ≤ n ≤ 10^5\n-10^9 ≤ a[i], target ≤ 10^9",
+    "examples": [
+      {
+        "input": "4\n2 7 11 15\n9",
+        "output": "YES",
+        "explanation": "2 + 7 = 9 → YES."
+      },
+      {
+        "input": "3\n1 2 3\n7",
+        "output": "NO",
+        "explanation": "No two of 1,2,3 sum to 7 → NO."
+      }
+    ],
+    "editorial": "## Approach\nScan once. For each element check whether its complement `target - x` was already seen; if so, a pair exists.",
+    "optimal_time": "O(n)",
+    "optimal_space": "O(n)",
+    "optimal_explanation": "A single pass with a hash set of previously seen values.",
+    "starter_code": {
+      "java": "import java.util.*;\n\npublic class Main {\n    static String solve(int[] nums, long target) {\n        // TODO: return \"YES\" or \"NO\"\n        return \"NO\";\n    }\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] nums = new int[n];\n        for (int i = 0; i < n; i++) nums[i] = sc.nextInt();\n        long target = sc.nextLong();\n        System.out.println(solve(nums, target));\n    }\n}\n",
+      "python": "import sys\ndata = sys.stdin.read().split()\nn = int(data[0])\nnums = list(map(int, data[1:1+n]))\ntarget = int(data[1+n])\n\ndef solve(nums, target):\n    # TODO: return 'YES' or 'NO'\n    return 'NO'\n\nprint(solve(nums, target))\n",
+      "javascript": "const d = require('fs').readFileSync(0,'utf8').split(/\\s+/).filter(Boolean).map(Number);\nconst n = d[0], nums = d.slice(1, 1+n), target = d[1+n];\n\nfunction solve(nums, target) {\n  // TODO: return 'YES' or 'NO'\n  return 'NO';\n}\n\nconsole.log(solve(nums, target));\n",
+      "typescript": "const d = require('fs').readFileSync(0,'utf8').split(/\\s+/).filter(Boolean).map(Number);\nconst n = d[0], nums = d.slice(1, 1+n), target = d[1+n];\n\nfunction solve(nums, target) {\n  // TODO: return 'YES' or 'NO'\n  return 'NO';\n}\n\nconsole.log(solve(nums, target));\n"
+    },
+    "topics": [
+      "Hashing",
+      "Arrays"
+    ],
+    "subtopics": [
+      "Complement Lookup"
+    ],
+    "companies": [
+      "Amazon",
+      "Meta"
+    ],
+    "patterns": [
+      "Hashing"
+    ],
+    "hints": [
+      "For each value x, you're looking for target - x.",
+      "A hash set of values seen so far answers that in O(1).",
+      "Check the complement BEFORE inserting the current value.",
+      "If target - x was seen, answer YES."
+    ],
+    "prerequisites": [
+      {
+        "key": "hashing",
+        "name": "Hash Maps & Sets",
+        "what": "Structures giving average O(1) insertion and lookup, trading memory for speed.",
+        "deep": "A hash table answers 'have I seen X?' or 'what maps to X?' in expected constant time, converting many O(n^2) pair scans into O(n) single passes. Worst case is O(n) per op under adversarial hashing, but that is rare in practice.",
+        "java": "HashMap<K,V> and HashSet<E>. Use getOrDefault(k, 0) and merge(k, 1, Integer::sum) for counting, containsKey/add for membership. For dense int keys, an int[] beats a HashMap.",
+        "how": "A HashSet of values already seen answers 'is the complement present?' in O(1) average time."
+      },
+      {
+        "key": "complement",
+        "name": "Complement Thinking",
+        "what": "Instead of testing all pairs, ask what single value would complete the current one, and look it up.",
+        "deep": "Reframes 'find two things that combine to T' as 'for each x, does T - x already exist?'. Paired with a hash structure this removes an entire nested loop, and the idea generalizes to differences, XORs, and remainders.",
+        "java": "Keep a HashSet<Integer> or HashMap<Integer,Integer> of seen values and query target - x before inserting x.",
+        "how": "For each x the partner you need is target - x; checking the set for it avoids the O(n^2) all-pairs scan."
+      },
+      {
+        "key": "big_o",
+        "name": "Big-O / Complexity Analysis",
+        "what": "Reasoning about how time and memory grow with the input size.",
+        "deep": "Big-O bounds the dominant growth term and tells you whether an approach scales to the constraints. Read the limits: n up to 10^5 suggests O(n) or O(n log n), while 10^9 suggests O(log n) or O(1). Sanity-check the work against roughly 10^8 operations per second.",
+        "java": "No API - this is analysis. Match your algorithm to the constraints stated in each problem before you start coding.",
+        "how": "One pass with O(1) lookups gives Theta(n) time and Theta(n) space - the standard time/space trade-off."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example 1",
+        "input": "4\n2 7 11 15\n9\n",
+        "expected_output": "YES",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Example 2",
+        "input": "3\n1 2 3\n7\n",
+        "expected_output": "NO",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Duplicate values",
+        "input": "2\n3 3\n6\n",
+        "expected_output": "YES",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Middle pair",
+        "input": "5\n1 5 3 8 2\n10\n",
+        "expected_output": "YES",
+        "ordering": 3
+      },
+      {
+        "kind": "hidden",
+        "name": "No pair",
+        "input": "4\n1 2 3 4\n8\n",
+        "expected_output": "NO",
+        "ordering": 4
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "judge_mode": "exact"
+  },
+  {
+    "slug": "two-sum-indices",
+    "title": "Two Sum — Indices",
+    "difficulty": "Medium",
+    "description": "Return the 1-based indices of the two elements that add up to the target. Exactly one solution exists and you may not use the same element twice.\n\n### Input\n- Line 1: `n`\n- Line 2: `n` integers\n- Line 3: `target`\n\n### Output\nThe two indices in increasing order, space-separated.",
+    "constraints": "2 ≤ n ≤ 10^5\nExactly one valid pair exists.",
+    "examples": [
+      {
+        "input": "4\n2 7 11 15\n9",
+        "output": "1 2",
+        "explanation": "nums[1]+nums[2] = 2+7 = 9 → '1 2'."
+      },
+      {
+        "input": "3\n3 2 4\n6",
+        "output": "2 3",
+        "explanation": "nums[2]+nums[3] = 2+4 = 6 → '2 3'."
+      }
+    ],
+    "editorial": "## Approach\nStore each value's index in a map. For each new value, if its complement is already mapped, output both indices (1-based, smaller first).",
+    "optimal_time": "O(n)",
+    "optimal_space": "O(n)",
+    "optimal_explanation": "One pass storing value → index in a hash map.",
+    "starter_code": {
+      "java": "import java.util.*;\n\npublic class Main {\n    // Return the two 1-based indices as \"i j\".\n    static String solve(int[] nums, long target) {\n        // TODO\n        return \"-1\";\n    }\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] nums = new int[n];\n        for (int i = 0; i < n; i++) nums[i] = sc.nextInt();\n        long target = sc.nextLong();\n        System.out.println(solve(nums, target));\n    }\n}\n",
+      "python": "import sys\ndata = sys.stdin.read().split()\nn = int(data[0])\nnums = list(map(int, data[1:1+n]))\ntarget = int(data[1+n])\n\ndef solve(nums, target):\n    # TODO: return two 1-based indices as 'i j'\n    return '-1'\n\nprint(solve(nums, target))\n",
+      "javascript": "const d = require('fs').readFileSync(0,'utf8').split(/\\s+/).filter(Boolean).map(Number);\nconst n = d[0], nums = d.slice(1, 1+n), target = d[1+n];\n\nfunction solve(nums, target) {\n  // TODO: return 'i j' (1-based)\n  return '-1';\n}\n\nconsole.log(solve(nums, target));\n",
+      "typescript": "const d = require('fs').readFileSync(0,'utf8').split(/\\s+/).filter(Boolean).map(Number);\nconst n = d[0], nums = d.slice(1, 1+n), target = d[1+n];\n\nfunction solve(nums, target) {\n  // TODO: return 'i j' (1-based)\n  return '-1';\n}\n\nconsole.log(solve(nums, target));\n"
+    },
+    "topics": [
+      "Hashing",
+      "Arrays"
+    ],
+    "subtopics": [
+      "Complement Lookup"
+    ],
+    "companies": [
+      "Amazon",
+      "Google",
+      "Meta"
+    ],
+    "patterns": [
+      "Hashing"
+    ],
+    "hints": [
+      "Map each value to the index where you saw it.",
+      "For value x, look up target - x in the map.",
+      "Because indices are 1-based, add 1 when printing.",
+      "Return the earlier index first."
+    ],
+    "prerequisites": [
+      {
+        "key": "hashing",
+        "name": "Hash Maps & Sets",
+        "what": "Structures giving average O(1) insertion and lookup, trading memory for speed.",
+        "deep": "A hash table answers 'have I seen X?' or 'what maps to X?' in expected constant time, converting many O(n^2) pair scans into O(n) single passes. Worst case is O(n) per op under adversarial hashing, but that is rare in practice.",
+        "java": "HashMap<K,V> and HashSet<E>. Use getOrDefault(k, 0) and merge(k, 1, Integer::sum) for counting, containsKey/add for membership. For dense int keys, an int[] beats a HashMap.",
+        "how": "Use a HashMap from value to index so you can recover the partner's position, not just whether it exists."
+      },
+      {
+        "key": "complement",
+        "name": "Complement Thinking",
+        "what": "Instead of testing all pairs, ask what single value would complete the current one, and look it up.",
+        "deep": "Reframes 'find two things that combine to T' as 'for each x, does T - x already exist?'. Paired with a hash structure this removes an entire nested loop, and the idea generalizes to differences, XORs, and remainders.",
+        "java": "Keep a HashSet<Integer> or HashMap<Integer,Integer> of seen values and query target - x before inserting x.",
+        "how": "As you scan, look up target - nums[i]; if present you have both indices (remember the answer is 1-based)."
+      },
+      {
+        "key": "iteration",
+        "name": "Array Iteration",
+        "what": "Walking through elements one at a time while maintaining running state such as a sum, max, or counter.",
+        "deep": "The workhorse of array problems: one for-loop that updates accumulators as it goes. Most linear-time solutions are just one well-chosen pass, so the real skill is deciding what state to carry so a single sweep suffices.",
+        "java": "Use for (int i = 0; i < n; i++) or for (int x : nums). Prefer a primitive int[] over Integer[] to avoid autoboxing overhead.",
+        "how": "Insert each value into the map only after checking, so an element is never paired with itself."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example 1",
+        "input": "4\n2 7 11 15\n9\n",
+        "expected_output": "1 2",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Example 2",
+        "input": "3\n3 2 4\n6\n",
+        "expected_output": "2 3",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Duplicates",
+        "input": "2\n3 3\n6\n",
+        "expected_output": "1 2",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "End pair",
+        "input": "5\n1 2 3 4 5\n9\n",
+        "expected_output": "4 5",
+        "ordering": 3
+      },
+      {
+        "kind": "hidden",
+        "name": "Negatives",
+        "input": "4\n-3 4 3 90\n0\n",
+        "expected_output": "1 3",
+        "ordering": 4
+      }
+    ],
+    "editorials": [
+      {
+        "title": "Brute force",
+        "body": "Check every pair (i, j) and return the first whose values sum to the target.",
+        "time": "O(n^2)",
+        "space": "O(1)"
+      },
+      {
+        "title": "Hash map (optimal)",
+        "body": "Scan once, storing each value's index. For each element, look up `target - x`; if seen, you have the answer.",
+        "time": "O(n)",
+        "space": "O(n)"
+      }
+    ],
+    "follow_ups": [
+      {
+        "slug": "two-sum-exists",
+        "title": "Two Sum (exists?)",
+        "note": "Same idea, boolean answer."
+      }
+    ],
+    "judge_mode": "exact"
+  },
+  {
+    "slug": "longest-unique-substring",
+    "title": "Longest Substring Without Repeating Characters",
+    "difficulty": "Medium",
+    "description": "Find the length of the longest substring that contains no repeated character.\n\n### Input\nA single line: string `s`.\n\n### Output\nThe length of the longest substring without repeating characters.",
+    "constraints": "1 ≤ |s| ≤ 10^5",
+    "examples": [
+      {
+        "input": "abcabcbb",
+        "output": "3",
+        "explanation": "'abc' has length 3."
+      },
+      {
+        "input": "pwwkew",
+        "output": "3",
+        "explanation": "'wke' has length 3."
+      }
+    ],
+    "editorial": "## Approach\nSlide a window while recording the last seen index of each character. On a repeat inside the window, advance the left edge to one past the previous occurrence, and track the max width.",
+    "optimal_time": "O(n)",
+    "optimal_space": "O(min(n, Σ))",
+    "optimal_explanation": "Each index enters and leaves the window at most once.",
+    "starter_code": {
+      "java": "import java.io.*;\n\npublic class Main {\n    static int solve(String s) {\n        // TODO: length of longest substring without repeats\n        return 0;\n    }\n    public static void main(String[] args) throws IOException {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        String s = br.readLine();\n        if (s == null) s = \"\";\n        System.out.println(solve(s));\n    }\n}\n",
+      "python": "s = input()\n\ndef solve(s):\n    # TODO: length of longest substring without repeats\n    return 0\n\nprint(solve(s))\n",
+      "javascript": "const s = require('fs').readFileSync(0,'utf8').replace(/\\n$/, '');\n\nfunction solve(s) {\n  // TODO: length of longest substring without repeats\n  return 0;\n}\n\nconsole.log(solve(s));\n",
+      "typescript": "const s = require('fs').readFileSync(0,'utf8').replace(/\\n$/, '');\n\nfunction solve(s) {\n  // TODO: length of longest substring without repeats\n  return 0;\n}\n\nconsole.log(solve(s));\n"
+    },
+    "topics": [
+      "Sliding Window",
+      "Strings"
+    ],
+    "subtopics": [
+      "Two Pointers"
+    ],
+    "companies": [
+      "Amazon",
+      "Google",
+      "Bloomberg"
+    ],
+    "patterns": [
+      "Sliding Window",
+      "Two Pointers"
+    ],
+    "hints": [
+      "A window [start, i] should always hold distinct characters.",
+      "Track the last index at which each character appeared.",
+      "When you see a repeat inside the window, jump `start` past it.",
+      "Answer is the maximum window width seen."
+    ],
+    "prerequisites": [
+      {
+        "key": "sliding_window",
+        "name": "Sliding Window",
+        "what": "A moving sub-range [left, right] whose bounds expand and contract to maintain an invariant.",
+        "deep": "Turns 'longest/best sub-array meeting a condition' into an amortized O(n) scan: extend the right edge, and when the invariant breaks advance the left edge. Each index enters and leaves the window at most once, which is why it stays linear.",
+        "java": "Two int pointers plus a HashMap<Character,Integer> or an int[128] frequency table to track window contents.",
+        "how": "Maintain a window [left, right] of all-distinct characters; extend right each step and pull left forward when a repeat enters."
+      },
+      {
+        "key": "hashing",
+        "name": "Hash Maps & Sets",
+        "what": "Structures giving average O(1) insertion and lookup, trading memory for speed.",
+        "deep": "A hash table answers 'have I seen X?' or 'what maps to X?' in expected constant time, converting many O(n^2) pair scans into O(n) single passes. Worst case is O(n) per op under adversarial hashing, but that is rare in practice.",
+        "java": "HashMap<K,V> and HashSet<E>. Use getOrDefault(k, 0) and merge(k, 1, Integer::sum) for counting, containsKey/add for membership. For dense int keys, an int[] beats a HashMap.",
+        "how": "A map from character to last index lets you jump left directly past a previous occurrence instead of shrinking one step at a time."
+      },
+      {
+        "key": "string_basics",
+        "name": "String Traversal",
+        "what": "Treating a string as an indexable sequence of characters to count and compare.",
+        "deep": "Most string problems reduce to a single pass with charAt or a char[]. Remember Java strings are immutable, so build output with StringBuilder, and character math relies on ASCII codes.",
+        "java": "s.charAt(i), s.length(), s.toCharArray(); build results with StringBuilder, never += inside a loop.",
+        "how": "Track the best window width as you scan the string exactly once."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example 1",
+        "input": "abcabcbb\n",
+        "expected_output": "3",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Example 2",
+        "input": "pwwkew\n",
+        "expected_output": "3",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "All same",
+        "input": "bbbbb\n",
+        "expected_output": "1",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "All distinct",
+        "input": "abcdef\n",
+        "expected_output": "6",
+        "ordering": 3
+      },
+      {
+        "kind": "hidden",
+        "name": "Two chars",
+        "input": "au\n",
+        "expected_output": "2",
+        "ordering": 4
+      }
+    ],
+    "editorials": [
+      {
+        "title": "Sliding window",
+        "body": "Expand the right edge; when a repeat appears, jump the left edge past the previous occurrence.",
+        "time": "O(n)",
+        "space": "O(min(n, alphabet))"
+      }
+    ],
+    "follow_ups": [],
+    "judge_mode": "exact"
+  },
+  {
+    "slug": "valid-parentheses",
+    "title": "Valid Parentheses",
+    "difficulty": "Medium",
+    "description": "Given a string of brackets `()[]{}`, decide whether every bracket is correctly opened and closed in the right order.\n\n### Input\nA single line containing only the characters ()[]{}\n\n### Output\n`true` or `false`.",
+    "constraints": "1 ≤ |s| ≤ 10^5",
+    "examples": [
+      {
+        "input": "()[]{}",
+        "output": "true",
+        "explanation": "All brackets match in order → true."
+      },
+      {
+        "input": "([)]",
+        "output": "false",
+        "explanation": "']' does not match the open '(' → false."
+      }
+    ],
+    "editorial": "## Approach\nPush opening brackets. For a closing bracket, the stack top must be its matching opener; otherwise it's invalid. The string is valid only if the stack ends empty.",
+    "optimal_time": "O(n)",
+    "optimal_space": "O(n)",
+    "optimal_explanation": "Each character is pushed/popped at most once.",
+    "starter_code": {
+      "java": "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    static String solve(String s) {\n        // TODO: return \"true\" or \"false\"\n        return \"false\";\n    }\n    public static void main(String[] args) throws IOException {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        String s = br.readLine();\n        if (s == null) s = \"\";\n        System.out.println(solve(s));\n    }\n}\n",
+      "python": "s = input()\n\ndef solve(s):\n    # TODO: return 'true' or 'false'\n    return 'false'\n\nprint(solve(s))\n",
+      "javascript": "const s = require('fs').readFileSync(0,'utf8').replace(/\\n$/, '');\n\nfunction solve(s) {\n  // TODO: return 'true' or 'false'\n  return 'false';\n}\n\nconsole.log(solve(s));\n",
+      "typescript": "const s = require('fs').readFileSync(0,'utf8').replace(/\\n$/, '');\n\nfunction solve(s) {\n  // TODO: return 'true' or 'false'\n  return 'false';\n}\n\nconsole.log(solve(s));\n"
+    },
+    "topics": [
+      "Stack",
+      "Strings"
+    ],
+    "subtopics": [
+      "Matching"
+    ],
+    "companies": [
+      "Microsoft",
+      "Amazon"
+    ],
+    "patterns": [
+      "Stack"
+    ],
+    "hints": [
+      "A closing bracket must match the most recently opened one.",
+      "That 'most recent' behavior is a stack.",
+      "Push opens; on a close, pop and compare.",
+      "Valid iff the stack is empty at the end and never mismatches."
+    ],
+    "prerequisites": [
+      {
+        "key": "stack",
+        "name": "Stack (LIFO)",
+        "what": "A last-in-first-out structure whose top is always the most recent unmatched item.",
+        "deep": "Ideal when the newest open item must be resolved first: bracket matching, monotonic-stack range queries, expression parsing, or iterative DFS. Push, pop, and peek are all O(1).",
+        "java": "Use ArrayDeque<T> as a stack (push/pop/peek) - it is faster than the legacy Stack class. For brackets use Deque<Character>.",
+        "how": "Every closer must match the most recently opened bracket - that most-recent rule is exactly a stack."
+      },
+      {
+        "key": "string_basics",
+        "name": "String Traversal",
+        "what": "Treating a string as an indexable sequence of characters to count and compare.",
+        "deep": "Most string problems reduce to a single pass with charAt or a char[]. Remember Java strings are immutable, so build output with StringBuilder, and character math relies on ASCII codes.",
+        "java": "s.charAt(i), s.length(), s.toCharArray(); build results with StringBuilder, never += inside a loop.",
+        "how": "Scan left to right, pushing openers and popping on closers."
+      },
+      {
+        "key": "hashing",
+        "name": "Hash Maps & Sets",
+        "what": "Structures giving average O(1) insertion and lookup, trading memory for speed.",
+        "deep": "A hash table answers 'have I seen X?' or 'what maps to X?' in expected constant time, converting many O(n^2) pair scans into O(n) single passes. Worst case is O(n) per op under adversarial hashing, but that is rare in practice.",
+        "java": "HashMap<K,V> and HashSet<E>. Use getOrDefault(k, 0) and merge(k, 1, Integer::sum) for counting, containsKey/add for membership. For dense int keys, an int[] beats a HashMap.",
+        "how": "A small map from closing to opening bracket keeps the matching logic clean."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example 1",
+        "input": "()[]{}\n",
+        "expected_output": "true",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Example 2",
+        "input": "([)]\n",
+        "expected_output": "false",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Nested",
+        "input": "{[]}\n",
+        "expected_output": "true",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Unclosed",
+        "input": "(((\n",
+        "expected_output": "false",
+        "ordering": 3
+      },
+      {
+        "kind": "hidden",
+        "name": "Single pair",
+        "input": "()\n",
+        "expected_output": "true",
+        "ordering": 4
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "judge_mode": "exact"
+  },
+  {
+    "slug": "binary-search-first",
+    "title": "First Occurrence",
+    "difficulty": "Medium",
+    "description": "In a non-decreasing array, return the index (0-based) of the FIRST occurrence of a target value, or -1 if absent.\n\n### Input\n- Line 1: `n`\n- Line 2: `n` non-decreasing integers\n- Line 3: `target`\n\n### Output\nThe first index of `target`, or -1.",
+    "constraints": "1 ≤ n ≤ 10^5\nArray is sorted non-decreasing.",
+    "examples": [
+      {
+        "input": "5\n1 2 2 2 3\n2",
+        "output": "1",
+        "explanation": "First '2' is at index 1."
+      },
+      {
+        "input": "5\n1 2 3 4 5\n6",
+        "output": "-1",
+        "explanation": "6 is not present → -1."
+      }
+    ],
+    "editorial": "## Approach\nBinary search for the target; whenever `a[mid] >= target` move `hi` left, recording `mid` when it equals the target. This converges on the leftmost occurrence.",
+    "optimal_time": "O(log n)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "Binary search narrowing to the lower bound.",
+    "starter_code": {
+      "java": "import java.util.*;\n\npublic class Main {\n    static int solve(int[] arr, int target) {\n        // TODO: first index of target, or -1\n        return -1;\n    }\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] arr = new int[n];\n        for (int i = 0; i < n; i++) arr[i] = sc.nextInt();\n        int target = sc.nextInt();\n        System.out.println(solve(arr, target));\n    }\n}\n",
+      "python": "import sys\nd = sys.stdin.read().split()\nn = int(d[0]); arr = list(map(int, d[1:1+n])); target = int(d[1+n])\n\ndef solve(arr, target):\n    # TODO: return first index of target or -1\n    return -1\n\nprint(solve(arr, target))\n",
+      "javascript": "const d = require('fs').readFileSync(0,'utf8').split(/\\s+/).filter(Boolean).map(Number);\nconst n=d[0], arr=d.slice(1,1+n), target=d[1+n];\n\nfunction solve(arr, target) {\n  // TODO: return first index of target or -1\n  return -1;\n}\n\nconsole.log(solve(arr, target));\n",
+      "typescript": "const d = require('fs').readFileSync(0,'utf8').split(/\\s+/).filter(Boolean).map(Number);\nconst n=d[0], arr=d.slice(1,1+n), target=d[1+n];\n\nfunction solve(arr, target) {\n  // TODO: return first index of target or -1\n  return -1;\n}\n\nconsole.log(solve(arr, target));\n"
+    },
+    "topics": [
+      "Binary Search",
+      "Arrays"
+    ],
+    "subtopics": [
+      "Lower Bound"
+    ],
+    "companies": [
+      "Google",
+      "Adobe"
+    ],
+    "patterns": [
+      "Binary Search"
+    ],
+    "hints": [
+      "Plain linear scan is O(n); the sorted order lets you do better.",
+      "Binary search, but don't stop at the first match.",
+      "When you find the target, keep searching the left half.",
+      "Track the best (leftmost) index found."
+    ],
+    "prerequisites": [
+      {
+        "key": "binary_search",
+        "name": "Binary Search",
+        "what": "Halving a sorted search space to find a target or boundary in O(log n).",
+        "deep": "Beyond exact matches it locates boundaries (first/last occurrence, lower/upper bound) and can 'search on the answer' for any monotonic predicate. The subtle parts are the loop invariant and avoiding off-by-one at the boundary.",
+        "java": "Arrays.binarySearch does not give first/last, so hand-roll while (lo <= hi) with mid = lo + (hi - lo) / 2 to avoid overflow.",
+        "how": "Halve the sorted range each step; the trick for the FIRST occurrence is to keep searching left even after a match."
+      },
+      {
+        "key": "sorting",
+        "name": "Sorting",
+        "what": "Ordering elements (usually O(n log n)) so structure like duplicates and order statistics becomes easy.",
+        "deep": "Sorting is a preprocessing multiplier: it enables binary search, two-pointer sweeps, greedy choices, and grouping. The cost is O(n log n) comparisons, though counting/radix sort can beat that for bounded integer keys.",
+        "java": "Arrays.sort(int[]) or Arrays.sort(T[], Comparator) / Collections.sort. For custom order use Comparator.comparingInt(...). Note primitive sort has no comparator overload.",
+        "how": "The method only works because the input is already sorted non-decreasing."
+      },
+      {
+        "key": "big_o",
+        "name": "Big-O / Complexity Analysis",
+        "what": "Reasoning about how time and memory grow with the input size.",
+        "deep": "Big-O bounds the dominant growth term and tells you whether an approach scales to the constraints. Read the limits: n up to 10^5 suggests O(n) or O(n log n), while 10^9 suggests O(log n) or O(1). Sanity-check the work against roughly 10^8 operations per second.",
+        "java": "No API - this is analysis. Match your algorithm to the constraints stated in each problem before you start coding.",
+        "how": "This turns an O(n) scan into O(log n) - the payoff of exploiting sorted order."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example 1",
+        "input": "5\n1 2 2 2 3\n2\n",
+        "expected_output": "1",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Example 2",
+        "input": "5\n1 2 3 4 5\n6\n",
+        "expected_output": "-1",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "All equal",
+        "input": "6\n1 1 1 1 1 1\n1\n",
+        "expected_output": "0",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Single",
+        "input": "1\n5\n5\n",
+        "expected_output": "0",
+        "ordering": 3
+      },
+      {
+        "kind": "hidden",
+        "name": "Last element",
+        "input": "4\n2 4 6 8\n8\n",
+        "expected_output": "3",
+        "ordering": 4
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [
+      {
+        "slug": "longest-increasing-subsequence",
+        "title": "Longest Increasing Subsequence",
+        "note": "Binary search on the answer (patience sorting)."
+      }
+    ],
+    "judge_mode": "exact"
+  },
+  {
+    "slug": "maximum-subarray",
+    "title": "Maximum Subarray Sum",
+    "difficulty": "Medium",
+    "description": "Return the largest possible sum of a non-empty contiguous subarray.\n\n### Input\n- Line 1: `n`\n- Line 2: `n` integers (may be negative)\n\n### Output\nThe maximum subarray sum.",
+    "constraints": "1 ≤ n ≤ 10^5\n-10^9 ≤ a[i] ≤ 10^9",
+    "examples": [
+      {
+        "input": "9\n-2 1 -3 4 -1 2 1 -5 4",
+        "output": "6",
+        "explanation": "[4,-1,2,1] sums to 6."
+      },
+      {
+        "input": "5\n1 2 3 4 5",
+        "output": "15",
+        "explanation": "The whole array sums to 15."
+      }
+    ],
+    "editorial": "## Approach\nKadane's algorithm. Maintain the best subarray sum ending at the current index (`cur = max(a[i], cur + a[i])`) and the global best across all positions.",
+    "optimal_time": "O(n)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "Kadane's algorithm: a single pass with two running values.",
+    "starter_code": {
+      "java": "import java.util.*;\n\npublic class Main {\n    static long solve(int[] nums) {\n        // TODO: maximum subarray sum (use long)\n        return 0;\n    }\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] nums = new int[n];\n        for (int i = 0; i < n; i++) nums[i] = sc.nextInt();\n        System.out.println(solve(nums));\n    }\n}\n",
+      "python": "import sys\nd = sys.stdin.read().split()\nn = int(d[0]); nums = list(map(int, d[1:1+n]))\n\ndef solve(nums):\n    # TODO: return maximum subarray sum\n    return 0\n\nprint(solve(nums))\n",
+      "javascript": "const d = require('fs').readFileSync(0,'utf8').split(/\\s+/).filter(Boolean).map(Number);\nconst n=d[0], nums=d.slice(1,1+n);\n\nfunction solve(nums) {\n  // TODO: return maximum subarray sum\n  return 0;\n}\n\nconsole.log(solve(nums));\n",
+      "typescript": "const d = require('fs').readFileSync(0,'utf8').split(/\\s+/).filter(Boolean).map(Number);\nconst n=d[0], nums=d.slice(1,1+n);\n\nfunction solve(nums) {\n  // TODO: return maximum subarray sum\n  return 0;\n}\n\nconsole.log(solve(nums));\n"
+    },
+    "topics": [
+      "Dynamic Programming",
+      "Arrays"
+    ],
+    "subtopics": [
+      "Kadane"
+    ],
+    "companies": [
+      "Amazon",
+      "Bloomberg",
+      "Microsoft"
+    ],
+    "patterns": [
+      "Dynamic Programming"
+    ],
+    "hints": [
+      "At each index, ask: best sum ENDING here?",
+      "Either extend the previous best or start fresh at a[i].",
+      "cur = max(a[i], cur + a[i]).",
+      "Track the global maximum of `cur`."
+    ],
+    "prerequisites": [
+      {
+        "key": "dp",
+        "name": "Dynamic Programming",
+        "what": "Breaking a problem into overlapping subproblems and reusing their answers.",
+        "deep": "Applies when there is optimal substructure and overlapping subproblems. Two styles exist: top-down memoized recursion and bottom-up tabulation. Defining the state and transition precisely is the whole game, and space can often be rolled down a dimension.",
+        "java": "A memo HashMap or an int[]/int[][] table. For memoization initialize a sentinel with Arrays.fill(dp, -1).",
+        "how": "Kadane's algorithm asks 'best sum ending here?' and reuses the previous answer: cur = max(a[i], cur + a[i])."
+      },
+      {
+        "key": "iteration",
+        "name": "Array Iteration",
+        "what": "Walking through elements one at a time while maintaining running state such as a sum, max, or counter.",
+        "deep": "The workhorse of array problems: one for-loop that updates accumulators as it goes. Most linear-time solutions are just one well-chosen pass, so the real skill is deciding what state to carry so a single sweep suffices.",
+        "java": "Use for (int i = 0; i < n; i++) or for (int x : nums). Prefer a primitive int[] over Integer[] to avoid autoboxing overhead.",
+        "how": "A single left-to-right pass maintains cur and the global best."
+      },
+      {
+        "key": "overflow",
+        "name": "Integer Overflow (int vs long)",
+        "what": "Guarding against results that exceed a 32-bit int's range of about 2.1x10^9.",
+        "deep": "Sums, products, and reversed numbers can silently wrap a 32-bit int, giving a wrong answer with no error. The fix is a wide enough type or a modulo reduction, so estimate the maximum magnitude before choosing the type.",
+        "java": "int overflows past ~2.1e9; long reaches ~9.2e18. Cast early with (long) a * b and accumulate sums into a long.",
+        "how": "With 10^5 values up to 10^9, sums can exceed int range - use long for the running and best sums."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example 1",
+        "input": "9\n-2 1 -3 4 -1 2 1 -5 4\n",
+        "expected_output": "6",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Example 2",
+        "input": "5\n1 2 3 4 5\n",
+        "expected_output": "15",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "All negative",
+        "input": "4\n-1 -2 -3 -4\n",
+        "expected_output": "-1",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Single negative",
+        "input": "1\n-7\n",
+        "expected_output": "-7",
+        "ordering": 3
+      },
+      {
+        "kind": "hidden",
+        "name": "Peak in middle",
+        "input": "7\n-2 -1 5 6 -3 4 -8\n",
+        "expected_output": "12",
+        "ordering": 4
+      }
+    ],
+    "editorials": [
+      {
+        "title": "Brute force",
+        "body": "Try every subarray and track the maximum sum.",
+        "time": "O(n^2)",
+        "space": "O(1)"
+      },
+      {
+        "title": "Kadane (optimal)",
+        "body": "Carry the best sum ending at each index: `cur = max(x, cur + x)`; track the running maximum.",
+        "time": "O(n)",
+        "space": "O(1)"
+      }
+    ],
+    "follow_ups": [
+      {
+        "slug": "climbing-stairs",
+        "title": "Climbing Stairs",
+        "note": "Another 1-D DP recurrence."
+      }
+    ],
+    "judge_mode": "exact"
+  },
+  {
+    "slug": "climbing-stairs",
+    "title": "Climbing Stairs",
+    "difficulty": "Medium",
+    "description": "You climb a staircase of `n` steps, taking 1 or 2 steps at a time. How many distinct ways can you reach the top?\n\n### Input\nA single integer `n`.\n\n### Output\nThe number of distinct ways.",
+    "constraints": "0 ≤ n ≤ 45",
+    "examples": [
+      {
+        "input": "2",
+        "output": "2",
+        "explanation": "1+1 or 2 → 2 ways."
+      },
+      {
+        "input": "3",
+        "output": "3",
+        "explanation": "1+1+1, 1+2, 2+1 → 3 ways."
+      }
+    ],
+    "editorial": "## Approach\nThe number of ways satisfies ways(n)=ways(n-1)+ways(n-2) with base cases ways(0)=ways(1)=1 — the Fibonacci sequence shifted by one.",
+    "optimal_time": "O(n)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "Bottom-up DP with two rolling variables (Fibonacci).",
+    "starter_code": {
+      "java": "import java.util.*;\n\npublic class Main {\n    static long solve(int n) {\n        // TODO: number of ways to climb n steps\n        return 0;\n    }\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        System.out.println(solve(n));\n    }\n}\n",
+      "python": "n = int(input())\n\ndef solve(n):\n    # TODO: number of ways to climb n steps\n    return 0\n\nprint(solve(n))\n",
+      "javascript": "const n = Number(require('fs').readFileSync(0,'utf8').trim());\n\nfunction solve(n) {\n  // TODO: number of ways to climb n steps\n  return 0;\n}\n\nconsole.log(solve(n));\n",
+      "typescript": "const n = Number(require('fs').readFileSync(0,'utf8').trim());\n\nfunction solve(n) {\n  // TODO: number of ways to climb n steps\n  return 0;\n}\n\nconsole.log(solve(n));\n"
+    },
+    "topics": [
+      "Dynamic Programming"
+    ],
+    "subtopics": [
+      "Counting"
+    ],
+    "companies": [
+      "Amazon",
+      "Adobe"
+    ],
+    "patterns": [
+      "Dynamic Programming",
+      "Counting"
+    ],
+    "hints": [
+      "To reach step n you came from n-1 or n-2.",
+      "So ways(n) = ways(n-1) + ways(n-2).",
+      "That's the Fibonacci recurrence with ways(0)=ways(1)=1.",
+      "Iterate bottom-up keeping two values."
+    ],
+    "prerequisites": [
+      {
+        "key": "recurrence",
+        "name": "Recurrence Relations",
+        "what": "Expressing an answer in terms of smaller answers, e.g. f(n) = f(n-1) + f(n-2).",
+        "deep": "A recurrence is the mathematical heart of many DP and divide-and-conquer solutions. Once you name the base cases and the transition you can either recurse with memoization or iterate bottom-up, often reducing space to a few rolling variables.",
+        "java": "Iterate bottom-up with a few long variables, or memoize with a long[] dp. Use long when terms grow fast.",
+        "how": "You reach step n from n-1 or n-2, so ways(n) = ways(n-1) + ways(n-2)."
+      },
+      {
+        "key": "dp",
+        "name": "Dynamic Programming",
+        "what": "Breaking a problem into overlapping subproblems and reusing their answers.",
+        "deep": "Applies when there is optimal substructure and overlapping subproblems. Two styles exist: top-down memoized recursion and bottom-up tabulation. Defining the state and transition precisely is the whole game, and space can often be rolled down a dimension.",
+        "java": "A memo HashMap or an int[]/int[][] table. For memoization initialize a sentinel with Arrays.fill(dp, -1).",
+        "how": "It is Fibonacci in disguise; iterate with two rolling counters instead of exponential recursion."
+      },
+      {
+        "key": "overflow",
+        "name": "Integer Overflow (int vs long)",
+        "what": "Guarding against results that exceed a 32-bit int's range of about 2.1x10^9.",
+        "deep": "Sums, products, and reversed numbers can silently wrap a 32-bit int, giving a wrong answer with no error. The fix is a wide enough type or a modulo reduction, so estimate the maximum magnitude before choosing the type.",
+        "java": "int overflows past ~2.1e9; long reaches ~9.2e18. Cast early with (long) a * b and accumulate sums into a long.",
+        "how": "ways(45) is about 1.8x10^9, right at the int limit, so a long is safest."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example 1",
+        "input": "2\n",
+        "expected_output": "2",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Example 2",
+        "input": "3\n",
+        "expected_output": "3",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Base zero",
+        "input": "0\n",
+        "expected_output": "1",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Five",
+        "input": "5\n",
+        "expected_output": "8",
+        "ordering": 3
+      },
+      {
+        "kind": "hidden",
+        "name": "Large",
+        "input": "45\n",
+        "expected_output": "1836311903",
+        "ordering": 4
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "judge_mode": "exact"
+  },
+  {
+    "slug": "rotate-array",
+    "title": "Rotate Array",
+    "difficulty": "Medium",
+    "description": "Rotate an array to the RIGHT by `k` positions.\n\n### Input\n- Line 1: `n`\n- Line 2: `n` integers\n- Line 3: `k` (may exceed n)\n\n### Output\nThe rotated array, space-separated.",
+    "constraints": "1 ≤ n ≤ 10^5\n0 ≤ k ≤ 10^9",
+    "examples": [
+      {
+        "input": "5\n1 2 3 4 5\n2",
+        "output": "4 5 1 2 3",
+        "explanation": "Right by 2 → 4 5 1 2 3."
+      },
+      {
+        "input": "3\n1 2 3\n4",
+        "output": "3 1 2",
+        "explanation": "k=4 ≡ 1 (mod 3) → 3 1 2."
+      }
+    ],
+    "editorial": "## Approach\nReduce k modulo n. The optimal in-place method reverses the whole array, then reverses the first k and the remaining n-k elements.",
+    "optimal_time": "O(n)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "The reverse-reverse-reverse method rotates in place.",
+    "starter_code": {
+      "java": "import java.util.*;\n\npublic class Main {\n    static int[] solve(int[] arr, long k) {\n        // TODO: rotate arr right by k and return it\n        return arr;\n    }\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] arr = new int[n];\n        for (int i = 0; i < n; i++) arr[i] = sc.nextInt();\n        long k = sc.nextLong();\n        int[] res = solve(arr, k);\n        StringBuilder sb = new StringBuilder();\n        for (int i = 0; i < res.length; i++) {\n            if (i > 0) sb.append(' ');\n            sb.append(res[i]);\n        }\n        System.out.println(sb.toString());\n    }\n}\n",
+      "python": "import sys\nd = sys.stdin.read().split()\nn = int(d[0]); arr = list(map(int, d[1:1+n])); k = int(d[1+n])\n\ndef solve(arr, k):\n    # TODO: return rotated list\n    return arr\n\nprint(' '.join(map(str, solve(arr, k))))\n",
+      "javascript": "const d = require('fs').readFileSync(0,'utf8').split(/\\s+/).filter(Boolean).map(Number);\nconst n=d[0], arr=d.slice(1,1+n), k=d[1+n];\n\nfunction solve(arr, k) {\n  // TODO: return rotated array\n  return arr;\n}\n\nconsole.log(solve(arr, k).join(' '));\n",
+      "typescript": "const d = require('fs').readFileSync(0,'utf8').split(/\\s+/).filter(Boolean).map(Number);\nconst n=d[0], arr=d.slice(1,1+n), k=d[1+n];\n\nfunction solve(arr, k) {\n  // TODO: return rotated array\n  return arr;\n}\n\nconsole.log(solve(arr, k).join(' '));\n"
+    },
+    "topics": [
+      "Arrays"
+    ],
+    "subtopics": [
+      "Cyclic Shift"
+    ],
+    "companies": [
+      "Microsoft",
+      "Amazon"
+    ],
+    "patterns": [],
+    "hints": [
+      "Rotating by n leaves the array unchanged, so reduce k mod n.",
+      "The last k elements move to the front.",
+      "A three-reversal trick rotates in place with O(1) extra space.",
+      "Reverse all, reverse first k, reverse the rest."
+    ],
+    "prerequisites": [
+      {
+        "key": "modulo",
+        "name": "Modular Reduction",
+        "what": "Using n % k to wrap indices around and drop redundant whole cycles.",
+        "deep": "Modulo collapses equivalent states: rotating by k equals rotating by k % n, and hashing or bucketing uses remainders. In Java, beware that % can return a negative result for negative operands.",
+        "java": "Use k % n after guarding n > 0; for possibly-negative values use Math.floorMod(x, n).",
+        "how": "Rotating by n is a no-op, so first reduce k to k % n; k can be as large as 10^9."
+      },
+      {
+        "key": "inplace_reverse",
+        "name": "In-place Reversal",
+        "what": "Reversing a segment by swapping symmetric elements, using O(1) extra space.",
+        "deep": "Swapping a[i] with a[n-1-i] for i in [0, n/2) reverses a range without allocation. It is the building block for array rotation (reverse-whole-then-parts) and for string reversal.",
+        "java": "A helper void reverse(int[] a, int i, int j) { while (i < j) { int t = a[i]; a[i++] = a[j]; a[j--] = t; } }.",
+        "how": "Reverse the whole array, then the first k and the remaining n-k - three reversals rotate in O(1) space."
+      },
+      {
+        "key": "iteration",
+        "name": "Array Iteration",
+        "what": "Walking through elements one at a time while maintaining running state such as a sum, max, or counter.",
+        "deep": "The workhorse of array problems: one for-loop that updates accumulators as it goes. Most linear-time solutions are just one well-chosen pass, so the real skill is deciding what state to carry so a single sweep suffices.",
+        "java": "Use for (int i = 0; i < n; i++) or for (int x : nums). Prefer a primitive int[] over Integer[] to avoid autoboxing overhead.",
+        "how": "Alternatively copy each element to index (i + k) % n in a fresh array - simpler but O(n) extra space."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example 1",
+        "input": "5\n1 2 3 4 5\n2\n",
+        "expected_output": "4 5 1 2 3",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Example 2",
+        "input": "3\n1 2 3\n4\n",
+        "expected_output": "3 1 2",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "k=0",
+        "input": "4\n1 2 3 4\n0\n",
+        "expected_output": "1 2 3 4",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Single",
+        "input": "1\n7\n3\n",
+        "expected_output": "7",
+        "ordering": 3
+      },
+      {
+        "kind": "hidden",
+        "name": "k equals n",
+        "input": "3\n9 8 7\n3\n",
+        "expected_output": "9 8 7",
+        "ordering": 4
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "judge_mode": "exact"
+  },
+  {
+    "slug": "number-of-islands",
+    "title": "Number of Islands",
+    "difficulty": "Medium",
+    "description": "Count connected groups of land cells ('1') in a grid. Cells connect horizontally and vertically (not diagonally).\n\n### Input\n- Line 1: `R C`\n- Next `R` lines: strings of `0`/`1` of length `C`\n\n### Output\nThe number of islands.",
+    "constraints": "1 ≤ R, C ≤ 300",
+    "examples": [
+      {
+        "input": "4 5\n11110\n11010\n11000\n00000",
+        "output": "1",
+        "explanation": "One connected land mass → 1."
+      },
+      {
+        "input": "3 3\n101\n010\n101",
+        "output": "5",
+        "explanation": "Five separate single-cell islands → 5."
+      }
+    ],
+    "editorial": "## Approach\nScan the grid. Each time you meet an unvisited '1', increment the island count and BFS/DFS-mark the entire connected land mass so it isn't recounted.",
+    "optimal_time": "O(R·C)",
+    "optimal_space": "O(R·C)",
+    "optimal_explanation": "Each cell is visited once; the queue/visited grid is O(R·C).",
+    "starter_code": {
+      "java": "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    static int solve(char[][] grid, int r, int c) {\n        // TODO: count islands (4-directional)\n        return 0;\n    }\n    public static void main(String[] args) throws IOException {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        StringTokenizer st = new StringTokenizer(br.readLine());\n        int r = Integer.parseInt(st.nextToken());\n        int c = Integer.parseInt(st.nextToken());\n        char[][] grid = new char[r][];\n        for (int i = 0; i < r; i++) grid[i] = br.readLine().toCharArray();\n        System.out.println(solve(grid, r, c));\n    }\n}\n",
+      "python": "import sys\nlines = sys.stdin.read().split('\\n')\nr, c = map(int, lines[0].split())\ngrid = [lines[1+i] for i in range(r)]\n\ndef solve(grid, r, c):\n    # TODO: count islands\n    return 0\n\nprint(solve(grid, r, c))\n",
+      "javascript": "const lines = require('fs').readFileSync(0,'utf8').split('\\n');\nconst [r, c] = lines[0].split(/\\s+/).map(Number);\nconst grid = []; for (let i=0;i<r;i++) grid.push(lines[1+i]);\n\nfunction solve(grid, r, c) {\n  // TODO: count islands\n  return 0;\n}\n\nconsole.log(solve(grid, r, c));\n",
+      "typescript": "const lines = require('fs').readFileSync(0,'utf8').split('\\n');\nconst [r, c] = lines[0].split(/\\s+/).map(Number);\nconst grid = []; for (let i=0;i<r;i++) grid.push(lines[1+i]);\n\nfunction solve(grid, r, c) {\n  // TODO: count islands\n  return 0;\n}\n\nconsole.log(solve(grid, r, c));\n"
+    },
+    "topics": [
+      "Graphs",
+      "Matrix"
+    ],
+    "subtopics": [
+      "BFS",
+      "Flood Fill"
+    ],
+    "companies": [
+      "Amazon",
+      "Google",
+      "Meta"
+    ],
+    "patterns": [
+      "BFS / DFS"
+    ],
+    "hints": [
+      "Each unvisited land cell starts a new island.",
+      "From it, flood the whole connected component.",
+      "Use BFS or DFS over 4-directional neighbors.",
+      "Count how many times you launch a fresh flood."
+    ],
+    "prerequisites": [
+      {
+        "key": "graph_repr",
+        "name": "Graph Representation",
+        "what": "Modeling entities as nodes and relationships as edges, usually an adjacency list.",
+        "deep": "The representation dictates efficiency: adjacency lists are O(V+E) space and iterate neighbors quickly, while adjacency matrices are O(V^2) but give O(1) edge tests. Directed vs undirected and weighted vs unweighted change how you build and traverse it.",
+        "java": "List<List<Integer>> adj, or List<int[]>[] adj = new List[n] storing new int[]{to, w} for weighted edges.",
+        "how": "Treat each cell as a node with edges to its up/down/left/right land neighbors."
+      },
+      {
+        "key": "bfs",
+        "name": "Breadth-First Search",
+        "what": "Exploring a graph level by level with a queue; finds shortest paths in unweighted graphs.",
+        "deep": "BFS visits nodes in order of distance from the source, so the first time it reaches a node is via a shortest unweighted path. It needs a queue and a visited marker and runs in O(V+E).",
+        "java": "ArrayDeque<Integer> as the queue (offer/poll) plus a boolean[] visited. Mark visited when enqueuing, not dequeuing, to avoid duplicates.",
+        "how": "From each new land cell a queue floods outward, marking the whole connected region."
+      },
+      {
+        "key": "flood_fill",
+        "name": "Flood Fill",
+        "what": "Spreading outward from a start cell to mark an entire connected region of a grid.",
+        "deep": "A grid-specialized BFS/DFS over 4- or 8-directional neighbors. Each launch consumes exactly one connected component, so counting launches counts components - islands, regions, or paint buckets.",
+        "java": "From (r, c) run BFS/DFS over the four deltas {{1,0},{-1,0},{0,1},{0,-1}}, guarding bounds and the visited/grid state.",
+        "how": "Each time you start a flood from an unvisited '1' you have found one more island."
+      },
+      {
+        "key": "visited_set",
+        "name": "Visited Tracking",
+        "what": "Recording which nodes or cells are already processed so you never revisit or double-count.",
+        "deep": "Graph and grid traversals loop forever or over-count without visited marks. Mark as early as possible (on enqueue) so a node is not added twice; for grids you can use a boolean[][] or mutate the input to a sentinel value.",
+        "java": "boolean[] visited / boolean[][] seen, or overwrite grid cells (set '1' to '0') when mutation is allowed.",
+        "how": "Mark cells visited (a boolean[][] or by overwriting the grid) so regions are not counted twice."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example 1",
+        "input": "4 5\n11110\n11010\n11000\n00000\n",
+        "expected_output": "1",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Example 2",
+        "input": "3 3\n101\n010\n101\n",
+        "expected_output": "5",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Empty water",
+        "input": "1 1\n0\n",
+        "expected_output": "0",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Full land",
+        "input": "2 2\n11\n11\n",
+        "expected_output": "1",
+        "ordering": 3
+      },
+      {
+        "kind": "hidden",
+        "name": "Diagonal split",
+        "input": "3 3\n100\n010\n001\n",
+        "expected_output": "3",
+        "ordering": 4
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "judge_mode": "exact"
+  },
+  {
+    "slug": "group-anagrams-count",
+    "title": "Group Anagrams — Count",
+    "difficulty": "Medium",
+    "description": "Given a list of words, count how many groups of anagrams there are. Two words are anagrams if one is a rearrangement of the other.\n\n### Input\n- Line 1: `n`\n- Next `n` lines: one lowercase word each\n\n### Output\nThe number of distinct anagram groups.",
+    "constraints": "1 ≤ n ≤ 10^4\nWords are lowercase, total length ≤ 10^5.",
+    "examples": [
+      {
+        "input": "3\nabc\nbca\nxyz",
+        "output": "2",
+        "explanation": "{abc,bca} and {xyz} → 2 groups."
+      },
+      {
+        "input": "5\neat\ntea\ntan\nate\nnat",
+        "output": "2",
+        "explanation": "{eat,tea,ate}, {tan,nat} → 2 groups."
+      }
+    ],
+    "editorial": "## Approach\nMap each word to a canonical key (its sorted characters). Anagrams collide on the same key, so the number of groups is the number of distinct keys.",
+    "optimal_time": "O(Σ k log k)",
+    "optimal_space": "O(Σ k)",
+    "optimal_explanation": "k = word length; sorting each word to form its key dominates.",
+    "starter_code": {
+      "java": "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    static int solve(String[] words) {\n        // TODO: number of anagram groups\n        return 0;\n    }\n    public static void main(String[] args) throws IOException {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        int n = Integer.parseInt(br.readLine().trim());\n        String[] words = new String[n];\n        for (int i = 0; i < n; i++) words[i] = br.readLine();\n        System.out.println(solve(words));\n    }\n}\n",
+      "python": "import sys\nlines = sys.stdin.read().split('\\n')\nn = int(lines[0])\nwords = [lines[1+i] for i in range(n)]\n\ndef solve(words):\n    # TODO: number of anagram groups\n    return 0\n\nprint(solve(words))\n",
+      "javascript": "const lines = require('fs').readFileSync(0,'utf8').split('\\n');\nconst n = Number(lines[0]);\nconst words = []; for (let i=0;i<n;i++) words.push(lines[1+i]);\n\nfunction solve(words) {\n  // TODO: number of anagram groups\n  return 0;\n}\n\nconsole.log(solve(words));\n",
+      "typescript": "const lines = require('fs').readFileSync(0,'utf8').split('\\n');\nconst n = Number(lines[0]);\nconst words = []; for (let i=0;i<n;i++) words.push(lines[1+i]);\n\nfunction solve(words) {\n  // TODO: number of anagram groups\n  return 0;\n}\n\nconsole.log(solve(words));\n"
+    },
+    "topics": [
+      "Hashing",
+      "Strings"
+    ],
+    "subtopics": [
+      "Canonical Form"
+    ],
+    "companies": [
+      "Amazon",
+      "Adobe",
+      "Bloomberg"
+    ],
+    "patterns": [
+      "Hashing"
+    ],
+    "hints": [
+      "Anagrams share the same multiset of letters.",
+      "A canonical key: the sorted letters of the word.",
+      "Words with the same key belong to the same group.",
+      "Count the distinct keys."
+    ],
+    "prerequisites": [
+      {
+        "key": "canonical",
+        "name": "Canonical Form",
+        "what": "Reducing equivalent items to one identical representative so they collide in a map.",
+        "deep": "A canonical key makes 'are these the same up to X?' a simple equality or hash test. For anagrams it is the sorted letters, for fractions the reduced form, for graphs a normalized encoding. Choosing a cheap, collision-free key is the trick.",
+        "java": "For anagrams: char[] c = s.toCharArray(); Arrays.sort(c); String key = new String(c); or a length-26 count signature.",
+        "how": "Sorting a word's letters yields a canonical key that all of its anagrams share."
+      },
+      {
+        "key": "hashing",
+        "name": "Hash Maps & Sets",
+        "what": "Structures giving average O(1) insertion and lookup, trading memory for speed.",
+        "deep": "A hash table answers 'have I seen X?' or 'what maps to X?' in expected constant time, converting many O(n^2) pair scans into O(n) single passes. Worst case is O(n) per op under adversarial hashing, but that is rare in practice.",
+        "java": "HashMap<K,V> and HashSet<E>. Use getOrDefault(k, 0) and merge(k, 1, Integer::sum) for counting, containsKey/add for membership. For dense int keys, an int[] beats a HashMap.",
+        "how": "Putting those keys in a HashSet collapses anagrams together, so the answer is the number of distinct keys."
+      },
+      {
+        "key": "sorting",
+        "name": "Sorting",
+        "what": "Ordering elements (usually O(n log n)) so structure like duplicates and order statistics becomes easy.",
+        "deep": "Sorting is a preprocessing multiplier: it enables binary search, two-pointer sweeps, greedy choices, and grouping. The cost is O(n log n) comparisons, though counting/radix sort can beat that for bounded integer keys.",
+        "java": "Arrays.sort(int[]) or Arrays.sort(T[], Comparator) / Collections.sort. For custom order use Comparator.comparingInt(...). Note primitive sort has no comparator overload.",
+        "how": "You sort each word's characters - O(k log k) per word of length k - to build the key."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example 1",
+        "input": "3\nabc\nbca\nxyz\n",
+        "expected_output": "2",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Example 2",
+        "input": "5\neat\ntea\ntan\nate\nnat\n",
+        "expected_output": "2",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Single",
+        "input": "1\na\n",
+        "expected_output": "1",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Two groups",
+        "input": "4\nab\nba\nabc\ncba\n",
+        "expected_output": "2",
+        "ordering": 3
+      },
+      {
+        "kind": "hidden",
+        "name": "All same group",
+        "input": "3\nlisten\nsilent\nenlist\n",
+        "expected_output": "1",
+        "ordering": 4
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "judge_mode": "exact"
+  },
+  {
+    "slug": "course-schedule",
+    "title": "Course Schedule",
+    "difficulty": "Medium",
+    "description": "There are `n` courses labeled 0..n-1 with prerequisite pairs. `a b` means course `b` must be taken before course `a`. Determine whether all courses can be finished.\n\n### Input\n- Line 1: `n m` (courses, prerequisite pairs)\n- Next `m` lines: `a b`\n\n### Output\n`true` if a valid order exists, otherwise `false`.",
+    "constraints": "1 ≤ n ≤ 10^5\n0 ≤ m ≤ 2·10^5",
+    "examples": [
+      {
+        "input": "2 1\n1 0",
+        "output": "true",
+        "explanation": "Take 0 then 1 → true."
+      },
+      {
+        "input": "2 2\n1 0\n0 1",
+        "output": "false",
+        "explanation": "0 and 1 require each other → false."
+      }
+    ],
+    "editorial": "## Approach\nBuild the prerequisite graph and run Kahn's algorithm: start from courses with no prerequisites, and 'complete' them, decrementing indegrees. If every course is completed, no cycle exists.",
+    "optimal_time": "O(n + m)",
+    "optimal_space": "O(n + m)",
+    "optimal_explanation": "Kahn's topological sort visits each node and edge once.",
+    "starter_code": {
+      "java": "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    // edges[i] = {a, b} means b must be taken before a.\n    static String solve(int n, int[][] edges) {\n        // TODO: return \"true\" if all courses can be finished, else \"false\"\n        return \"true\";\n    }\n    public static void main(String[] args) throws IOException {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        StringTokenizer st = new StringTokenizer(br.readLine());\n        int n = Integer.parseInt(st.nextToken());\n        int m = Integer.parseInt(st.nextToken());\n        int[][] edges = new int[m][2];\n        for (int i = 0; i < m; i++) {\n            st = new StringTokenizer(br.readLine());\n            edges[i][0] = Integer.parseInt(st.nextToken());\n            edges[i][1] = Integer.parseInt(st.nextToken());\n        }\n        System.out.println(solve(n, edges));\n    }\n}\n",
+      "python": "import sys\nlines = sys.stdin.read().split('\\n')\nn, m = map(int, lines[0].split())\nedges = [tuple(map(int, lines[1+i].split())) for i in range(m)]\n\ndef solve(n, edges):\n    # edges are (a, b): b before a. Return 'true' or 'false'.\n    return 'true'\n\nprint(solve(n, edges))\n",
+      "javascript": "const lines = require('fs').readFileSync(0,'utf8').split('\\n');\nconst [n, m] = lines[0].split(/\\s+/).map(Number);\nconst edges = []; for (let i=0;i<m;i++) edges.push(lines[1+i].split(/\\s+/).map(Number));\n\nfunction solve(n, edges) {\n  // edges are [a, b]: b before a. Return 'true' or 'false'.\n  return 'true';\n}\n\nconsole.log(solve(n, edges));\n",
+      "typescript": "const lines = require('fs').readFileSync(0,'utf8').split('\\n');\nconst [n, m] = lines[0].split(/\\s+/).map(Number);\nconst edges = []; for (let i=0;i<m;i++) edges.push(lines[1+i].split(/\\s+/).map(Number));\n\nfunction solve(n, edges) {\n  // edges are [a, b]: b before a. Return 'true' or 'false'.\n  return 'true';\n}\n\nconsole.log(solve(n, edges));\n"
+    },
+    "topics": [
+      "Graphs"
+    ],
+    "subtopics": [
+      "Topological Sort",
+      "Cycle Detection"
+    ],
+    "companies": [
+      "Amazon",
+      "Google",
+      "Meta"
+    ],
+    "patterns": [
+      "Topological Sort"
+    ],
+    "hints": [
+      "Model courses as nodes and prerequisites as directed edges b → a.",
+      "A valid order exists iff the graph has no directed cycle.",
+      "Kahn's algorithm repeatedly removes zero-indegree nodes.",
+      "If you can remove all n nodes, there's no cycle."
+    ],
+    "prerequisites": [
+      {
+        "key": "graph_repr",
+        "name": "Graph Representation",
+        "what": "Modeling entities as nodes and relationships as edges, usually an adjacency list.",
+        "deep": "The representation dictates efficiency: adjacency lists are O(V+E) space and iterate neighbors quickly, while adjacency matrices are O(V^2) but give O(1) edge tests. Directed vs undirected and weighted vs unweighted change how you build and traverse it.",
+        "java": "List<List<Integer>> adj, or List<int[]>[] adj = new List[n] storing new int[]{to, w} for weighted edges.",
+        "how": "Courses are nodes; a prerequisite 'a needs b' is a directed edge b -> a stored as an adjacency list."
+      },
+      {
+        "key": "topo",
+        "name": "Topological Sort",
+        "what": "Ordering the nodes of a DAG so every edge points forward; impossible iff there is a cycle.",
+        "deep": "Applies to dependency problems like build order and course scheduling. Two algorithms exist: Kahn's (BFS on in-degrees) and DFS post-order. If not all nodes are emitted, the graph has a cycle.",
+        "java": "Kahn's: an int[] indegree and an ArrayDeque queue of zero-indegree nodes; count how many you pop.",
+        "how": "You can finish everything exactly when the graph is a DAG - a valid order exists iff there is no cycle."
+      },
+      {
+        "key": "indegree",
+        "name": "In-degree / Kahn's Algorithm",
+        "what": "Counting incoming edges and repeatedly removing zero-indegree nodes to order a DAG.",
+        "deep": "In-degree is how many prerequisites a node still has. Start from nodes with none, complete them, and decrement their neighbors; newly-zeroed nodes become available. Finishing all n nodes means no cycle exists.",
+        "java": "int[] indegree = new int[n]; increment per edge; seed an ArrayDeque with every node whose indegree is 0.",
+        "how": "Kahn's algorithm counts incoming edges and repeatedly removes zero-indegree courses; if all n are removed, no cycle exists."
+      },
+      {
+        "key": "queue",
+        "name": "Queue (FIFO)",
+        "what": "A first-in-first-out structure that returns items in arrival order.",
+        "deep": "Queues drive breadth-first processing: BFS levels, Kahn's topological sort, and streaming buffers. Enqueue at the back and dequeue from the front, both in O(1).",
+        "java": "ArrayDeque<T> via offer/poll (avoid the slower LinkedList, and never the legacy Stack/Vector).",
+        "how": "A queue holds the currently takeable (zero-prerequisite) courses as you process them."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example 1",
+        "input": "2 1\n1 0\n",
+        "expected_output": "true",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Example 2",
+        "input": "2 2\n1 0\n0 1\n",
+        "expected_output": "false",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "No prereqs",
+        "input": "3 0\n",
+        "expected_output": "true",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Chain",
+        "input": "4 3\n1 0\n2 1\n3 2\n",
+        "expected_output": "true",
+        "ordering": 3
+      },
+      {
+        "kind": "hidden",
+        "name": "Cycle of three",
+        "input": "3 3\n1 0\n2 1\n0 2\n",
+        "expected_output": "false",
+        "ordering": 4
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "judge_mode": "exact"
+  },
+  {
+    "slug": "longest-increasing-subsequence",
+    "title": "Longest Increasing Subsequence",
+    "difficulty": "Hard",
+    "description": "Return the length of the longest STRICTLY increasing subsequence of an array. A subsequence keeps order but need not be contiguous.\n\n### Input\n- Line 1: `n`\n- Line 2: `n` integers\n\n### Output\nThe LIS length.",
+    "constraints": "1 ≤ n ≤ 10^5\n-10^9 ≤ a[i] ≤ 10^9",
+    "examples": [
+      {
+        "input": "8\n10 9 2 5 3 7 101 18",
+        "output": "4",
+        "explanation": "[2,3,7,18] or [2,3,7,101] → length 4."
+      },
+      {
+        "input": "5\n1 3 6 7 9",
+        "output": "5",
+        "explanation": "The whole array is increasing → 5."
+      }
+    ],
+    "editorial": "## Approach\nKeep an array `tails` where `tails[i]` is the smallest possible tail of an increasing subsequence of length i+1. For each element, binary-search the first tail ≥ it and overwrite; if none, append. The final length of `tails` is the LIS length.",
+    "optimal_time": "O(n log n)",
+    "optimal_space": "O(n)",
+    "optimal_explanation": "Patience sorting: binary search into the tails array for each element.",
+    "starter_code": {
+      "java": "import java.util.*;\n\npublic class Main {\n    static int solve(int[] nums) {\n        // TODO: length of the LIS\n        return 0;\n    }\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] nums = new int[n];\n        for (int i = 0; i < n; i++) nums[i] = sc.nextInt();\n        System.out.println(solve(nums));\n    }\n}\n",
+      "python": "import sys, bisect\nd = sys.stdin.read().split()\nn = int(d[0]); nums = list(map(int, d[1:1+n]))\n\ndef solve(nums):\n    # TODO: return LIS length\n    return 0\n\nprint(solve(nums))\n",
+      "javascript": "const d = require('fs').readFileSync(0,'utf8').split(/\\s+/).filter(Boolean).map(Number);\nconst n=d[0], nums=d.slice(1,1+n);\n\nfunction solve(nums) {\n  // TODO: return LIS length\n  return 0;\n}\n\nconsole.log(solve(nums));\n",
+      "typescript": "const d = require('fs').readFileSync(0,'utf8').split(/\\s+/).filter(Boolean).map(Number);\nconst n=d[0], nums=d.slice(1,1+n);\n\nfunction solve(nums) {\n  // TODO: return LIS length\n  return 0;\n}\n\nconsole.log(solve(nums));\n"
+    },
+    "topics": [
+      "Dynamic Programming",
+      "Binary Search"
+    ],
+    "subtopics": [
+      "Patience Sorting"
+    ],
+    "companies": [
+      "Google",
+      "Amazon",
+      "Microsoft"
+    ],
+    "patterns": [
+      "Dynamic Programming",
+      "Binary Search"
+    ],
+    "hints": [
+      "The O(n²) DP asks: LIS ending at each index.",
+      "For O(n log n), maintain 'tails': smallest possible tail for each length.",
+      "For each value, binary-search the first tail ≥ it.",
+      "Replace it (or append). The tails array length is the answer."
+    ],
+    "prerequisites": [
+      {
+        "key": "dp",
+        "name": "Dynamic Programming",
+        "what": "Breaking a problem into overlapping subproblems and reusing their answers.",
+        "deep": "Applies when there is optimal substructure and overlapping subproblems. Two styles exist: top-down memoized recursion and bottom-up tabulation. Defining the state and transition precisely is the whole game, and space can often be rolled down a dimension.",
+        "java": "A memo HashMap or an int[]/int[][] table. For memoization initialize a sentinel with Arrays.fill(dp, -1).",
+        "how": "The O(n^2) view is dp[i] = longest increasing subsequence ending at index i, built from earlier indices."
+      },
+      {
+        "key": "binary_search",
+        "name": "Binary Search",
+        "what": "Halving a sorted search space to find a target or boundary in O(log n).",
+        "deep": "Beyond exact matches it locates boundaries (first/last occurrence, lower/upper bound) and can 'search on the answer' for any monotonic predicate. The subtle parts are the loop invariant and avoiding off-by-one at the boundary.",
+        "java": "Arrays.binarySearch does not give first/last, so hand-roll while (lo <= hi) with mid = lo + (hi - lo) / 2 to avoid overflow.",
+        "how": "The O(n log n) method keeps a tails array and binary-searches the first tail >= the current value to overwrite."
+      },
+      {
+        "key": "greedy",
+        "name": "Greedy Choice",
+        "what": "Taking the locally-best option at each step when that provably reaches a global optimum.",
+        "deep": "Greedy is fast and simple but correct only when the problem has the greedy-choice property and optimal substructure; otherwise DP is the fallback. Proving correctness (often an exchange argument) matters more than the code.",
+        "java": "Often just Arrays.sort plus a linear scan, or a PriorityQueue to always grab the current best.",
+        "how": "Greedily keeping the smallest possible tail for each length lets more elements extend the sequence later."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example 1",
+        "input": "8\n10 9 2 5 3 7 101 18\n",
+        "expected_output": "4",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Example 2",
+        "input": "5\n1 3 6 7 9\n",
+        "expected_output": "5",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "All equal",
+        "input": "6\n7 7 7 7 7 7\n",
+        "expected_output": "1",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Decreasing",
+        "input": "5\n5 4 3 2 1\n",
+        "expected_output": "1",
+        "ordering": 3
+      },
+      {
+        "kind": "hidden",
+        "name": "Single",
+        "input": "1\n42\n",
+        "expected_output": "1",
+        "ordering": 4
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "judge_mode": "exact"
+  },
+  {
+    "slug": "edit-distance",
+    "title": "Edit Distance",
+    "difficulty": "Hard",
+    "description": "Compute the minimum number of single-character insertions, deletions, or substitutions to turn `word1` into `word2` (Levenshtein distance).\n\n### Input\n- Line 1: `word1`\n- Line 2: `word2`\n\n### Output\nThe edit distance.",
+    "constraints": "1 ≤ |word1|, |word2| ≤ 1000\nWords are lowercase letters.",
+    "examples": [
+      {
+        "input": "horse\nros",
+        "output": "3",
+        "explanation": "horse→rorse→rose→ros → 3."
+      },
+      {
+        "input": "intention\nexecution",
+        "output": "5",
+        "explanation": "Five edits transform the words → 5."
+      }
+    ],
+    "editorial": "## Approach\nLet dp[i][j] be the edit distance between the first i characters of word1 and the first j of word2. If characters match, dp[i][j]=dp[i-1][j-1]; else 1 + min of the three neighboring states. Roll the table to one row for O(min(m,n)) space.",
+    "optimal_time": "O(m·n)",
+    "optimal_space": "O(min(m, n))",
+    "optimal_explanation": "The classic Levenshtein DP with a rolling 1-D row.",
+    "starter_code": {
+      "java": "import java.io.*;\n\npublic class Main {\n    static int solve(String a, String b) {\n        // TODO: return the edit distance\n        return 0;\n    }\n    public static void main(String[] args) throws IOException {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        String a = br.readLine();\n        String b = br.readLine();\n        if (a == null) a = \"\";\n        if (b == null) b = \"\";\n        System.out.println(solve(a, b));\n    }\n}\n",
+      "python": "import sys\nlines = sys.stdin.read().split('\\n')\na, b = lines[0], lines[1]\n\ndef solve(a, b):\n    # TODO: return edit distance\n    return 0\n\nprint(solve(a, b))\n",
+      "javascript": "const lines = require('fs').readFileSync(0,'utf8').split('\\n');\nconst a = lines[0], b = lines[1];\n\nfunction solve(a, b) {\n  // TODO: return edit distance\n  return 0;\n}\n\nconsole.log(solve(a, b));\n",
+      "typescript": "const lines = require('fs').readFileSync(0,'utf8').split('\\n');\nconst a = lines[0], b = lines[1];\n\nfunction solve(a, b) {\n  // TODO: return edit distance\n  return 0;\n}\n\nconsole.log(solve(a, b));\n"
+    },
+    "topics": [
+      "Dynamic Programming",
+      "Strings"
+    ],
+    "subtopics": [
+      "2D DP"
+    ],
+    "companies": [
+      "Google",
+      "Amazon",
+      "Microsoft"
+    ],
+    "patterns": [
+      "Dynamic Programming"
+    ],
+    "hints": [
+      "Define dp[i][j] = distance between prefixes of lengths i and j.",
+      "If the current characters match, no new cost is added.",
+      "Otherwise take 1 + min(insert, delete, replace).",
+      "You can compress the 2D table to one row."
+    ],
+    "prerequisites": [
+      {
+        "key": "dp2d",
+        "name": "2-D Dynamic Programming",
+        "what": "A table dp[i][j] indexed by two dimensions, filled from smaller states.",
+        "deep": "Used when the state needs two coordinates: prefixes of two sequences, positions in a grid, or index-plus-capacity. The fill order must respect dependencies, and many 2-D DPs compress to one row because dp[i] depends only on dp[i-1].",
+        "java": "int[][] dp = new int[m + 1][n + 1] filled row by row; compress to two int[] rows (prev/cur) to save memory.",
+        "how": "dp[i][j] is the edit distance between the first i characters of word1 and the first j of word2, filled from smaller prefixes."
+      },
+      {
+        "key": "recurrence",
+        "name": "Recurrence Relations",
+        "what": "Expressing an answer in terms of smaller answers, e.g. f(n) = f(n-1) + f(n-2).",
+        "deep": "A recurrence is the mathematical heart of many DP and divide-and-conquer solutions. Once you name the base cases and the transition you can either recurse with memoization or iterate bottom-up, often reducing space to a few rolling variables.",
+        "java": "Iterate bottom-up with a few long variables, or memoize with a long[] dp. Use long when terms grow fast.",
+        "how": "On a character match dp[i][j] = dp[i-1][j-1]; otherwise it is 1 + min(insert, delete, replace)."
+      },
+      {
+        "key": "string_basics",
+        "name": "String Traversal",
+        "what": "Treating a string as an indexable sequence of characters to count and compare.",
+        "deep": "Most string problems reduce to a single pass with charAt or a char[]. Remember Java strings are immutable, so build output with StringBuilder, and character math relies on ASCII codes.",
+        "java": "s.charAt(i), s.length(), s.toCharArray(); build results with StringBuilder, never += inside a loop.",
+        "how": "Index both strings by prefix length; the 2-D table can be compressed to a single rolling row."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example 1",
+        "input": "horse\nros\n",
+        "expected_output": "3",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Example 2",
+        "input": "intention\nexecution\n",
+        "expected_output": "5",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Identical",
+        "input": "abcde\nabcde\n",
+        "expected_output": "0",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "One char",
+        "input": "a\nb\n",
+        "expected_output": "1",
+        "ordering": 3
+      },
+      {
+        "kind": "hidden",
+        "name": "Prefix",
+        "input": "kitten\nsitting\n",
+        "expected_output": "3",
+        "ordering": 4
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "judge_mode": "exact"
+  },
+  {
+    "slug": "trapping-rain-water",
+    "title": "Trapping Rain Water",
+    "difficulty": "Hard",
+    "description": "Given an elevation map where each bar has width 1, compute how much water it traps after raining.\n\n### Input\n- Line 1: `n`\n- Line 2: `n` non-negative heights\n\n### Output\nThe total trapped water.",
+    "constraints": "1 ≤ n ≤ 10^5\n0 ≤ h[i] ≤ 10^4",
+    "examples": [
+      {
+        "input": "12\n0 1 0 2 1 0 1 3 2 1 2 1",
+        "output": "6",
+        "explanation": "The dips trap 6 units."
+      },
+      {
+        "input": "6\n4 2 0 3 2 5",
+        "output": "9",
+        "explanation": "This profile traps 9 units."
+      }
+    ],
+    "editorial": "## Approach\nUse two pointers with running left/right maxima. The side with the smaller max determines the water at that position, so advance it and add `runningMax − height`.",
+    "optimal_time": "O(n)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "Two pointers moving inward, each contributing bounded by the smaller side's running max.",
+    "starter_code": {
+      "java": "import java.util.*;\n\npublic class Main {\n    static long solve(int[] h) {\n        // TODO: total trapped water\n        return 0;\n    }\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] h = new int[n];\n        for (int i = 0; i < n; i++) h[i] = sc.nextInt();\n        System.out.println(solve(h));\n    }\n}\n",
+      "python": "import sys\nd = sys.stdin.read().split()\nn = int(d[0]); h = list(map(int, d[1:1+n]))\n\ndef solve(h):\n    # TODO: return trapped water\n    return 0\n\nprint(solve(h))\n",
+      "javascript": "const d = require('fs').readFileSync(0,'utf8').split(/\\s+/).filter(Boolean).map(Number);\nconst n=d[0], h=d.slice(1,1+n);\n\nfunction solve(h) {\n  // TODO: return trapped water\n  return 0;\n}\n\nconsole.log(solve(h));\n",
+      "typescript": "const d = require('fs').readFileSync(0,'utf8').split(/\\s+/).filter(Boolean).map(Number);\nconst n=d[0], h=d.slice(1,1+n);\n\nfunction solve(h) {\n  // TODO: return trapped water\n  return 0;\n}\n\nconsole.log(solve(h));\n"
+    },
+    "topics": [
+      "Two Pointers",
+      "Arrays"
+    ],
+    "subtopics": [
+      "Prefix Max"
+    ],
+    "companies": [
+      "Amazon",
+      "Google",
+      "Bloomberg"
+    ],
+    "patterns": [
+      "Two Pointers",
+      "Prefix Sums"
+    ],
+    "hints": [
+      "Water above a bar = min(max-left, max-right) − its height.",
+      "Precomputing left/right maxima is an O(n) space solution.",
+      "Two pointers reach O(1) space.",
+      "Advance the side with the smaller running max."
+    ],
+    "prerequisites": [
+      {
+        "key": "prefix_max",
+        "name": "Running Maxima / Prefix Aggregates",
+        "what": "Tracking the best value seen so far from the left/right to answer range questions in one pass.",
+        "deep": "Precomputing prefix (and suffix) maxima, sums, or counts converts per-query O(n) work into O(1). It is the idea behind prefix sums and the left/right walls in rain-water style problems.",
+        "java": "int[] prefix arrays, or two running int variables when you only need the maxima at the current index.",
+        "how": "The water above a bar equals min(highest bar to its left, highest to its right) minus its own height."
+      },
+      {
+        "key": "two_pointers",
+        "name": "Two Pointers",
+        "what": "Two indices moving through a sequence (from both ends, or at different speeds) to replace a nested loop.",
+        "deep": "By advancing pointers based on a comparison you explore O(n) states instead of O(n^2). Common shapes are opposite ends converging (sorted pair sums, palindromes, rain water) and fast/slow (cycle detection). Correctness hinges on why the pointer you move cannot skip a better answer.",
+        "java": "Two int indices lo/hi (or i/j) in a while (lo < hi) loop; no special class needed.",
+        "how": "Two pointers move inward, and the side with the smaller running max is the one safely bounded, giving O(1) space."
+      },
+      {
+        "key": "big_o",
+        "name": "Big-O / Complexity Analysis",
+        "what": "Reasoning about how time and memory grow with the input size.",
+        "deep": "Big-O bounds the dominant growth term and tells you whether an approach scales to the constraints. Read the limits: n up to 10^5 suggests O(n) or O(n log n), while 10^9 suggests O(log n) or O(1). Sanity-check the work against roughly 10^8 operations per second.",
+        "java": "No API - this is analysis. Match your algorithm to the constraints stated in each problem before you start coding.",
+        "how": "Both the prefix-max and two-pointer approaches are Theta(n); the two-pointer one drops the extra arrays."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example 1",
+        "input": "12\n0 1 0 2 1 0 1 3 2 1 2 1\n",
+        "expected_output": "6",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Example 2",
+        "input": "6\n4 2 0 3 2 5\n",
+        "expected_output": "9",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Monotonic",
+        "input": "3\n1 2 3\n",
+        "expected_output": "0",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Single bar",
+        "input": "1\n5\n",
+        "expected_output": "0",
+        "ordering": 3
+      },
+      {
+        "kind": "hidden",
+        "name": "Valley",
+        "input": "5\n5 0 0 0 5\n",
+        "expected_output": "15",
+        "ordering": 4
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "judge_mode": "exact"
+  },
+  {
+    "slug": "dijkstra-shortest-path",
+    "title": "Shortest Path (Dijkstra)",
+    "difficulty": "Hard",
+    "description": "Given a weighted undirected graph with non-negative weights, find the shortest path distance from `s` to `t`, or -1 if unreachable.\n\n### Input\n- Line 1: `n m` (nodes 0..n-1, edges)\n- Next `m` lines: `u v w`\n- Last line: `s t`\n\n### Output\nThe shortest distance from `s` to `t`, or -1.",
+    "constraints": "1 ≤ n ≤ 10^5\n0 ≤ m ≤ 2·10^5\n0 ≤ w ≤ 10^9",
+    "examples": [
+      {
+        "input": "5 6\n0 1 2\n0 2 4\n1 2 1\n1 3 7\n2 4 3\n3 4 1\n0 4",
+        "output": "6",
+        "explanation": "0→1→2→4 costs 2+1+3 = 6."
+      },
+      {
+        "input": "2 1\n0 1 3\n1 0",
+        "output": "3",
+        "explanation": "The single edge has weight 3."
+      }
+    ],
+    "editorial": "## Approach\nDijkstra's algorithm: maintain a distance array initialized to infinity, push (0, s), and repeatedly pop the smallest-distance node, relaxing outgoing edges. Ignore stale heap entries. Report dist[t] or -1.",
+    "optimal_time": "O((n + m) log n)",
+    "optimal_space": "O(n + m)",
+    "optimal_explanation": "Dijkstra with a binary heap.",
+    "starter_code": {
+      "java": "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    // edges[i] = {u, v, w}, undirected.\n    static long solve(int n, int[][] edges, int s, int t) {\n        // TODO: shortest distance s -> t, or -1 if unreachable\n        return -1;\n    }\n    public static void main(String[] args) throws IOException {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        StringTokenizer st = new StringTokenizer(br.readLine());\n        int n = Integer.parseInt(st.nextToken());\n        int m = Integer.parseInt(st.nextToken());\n        int[][] edges = new int[m][3];\n        for (int i = 0; i < m; i++) {\n            st = new StringTokenizer(br.readLine());\n            edges[i][0] = Integer.parseInt(st.nextToken());\n            edges[i][1] = Integer.parseInt(st.nextToken());\n            edges[i][2] = Integer.parseInt(st.nextToken());\n        }\n        st = new StringTokenizer(br.readLine());\n        int s = Integer.parseInt(st.nextToken());\n        int t = Integer.parseInt(st.nextToken());\n        System.out.println(solve(n, edges, s, t));\n    }\n}\n",
+      "python": "import sys, heapq\nlines = sys.stdin.read().split('\\n')\nn, m = map(int, lines[0].split())\nedges = [tuple(map(int, lines[1+i].split())) for i in range(m)]\ns, t = map(int, lines[1+m].split())\n\ndef solve(n, edges, s, t):\n    # TODO: return shortest distance s->t or -1\n    return -1\n\nprint(solve(n, edges, s, t))\n",
+      "javascript": "const lines = require('fs').readFileSync(0,'utf8').split('\\n');\nconst [n, m] = lines[0].split(/\\s+/).map(Number);\nconst edges = []; for (let i=0;i<m;i++) edges.push(lines[1+i].split(/\\s+/).map(Number));\nconst [s, t] = lines[1+m].split(/\\s+/).map(Number);\n\nfunction solve(n, edges, s, t) {\n  // TODO: return shortest distance s->t or -1\n  return -1;\n}\n\nconsole.log(solve(n, edges, s, t));\n",
+      "typescript": "const lines = require('fs').readFileSync(0,'utf8').split('\\n');\nconst [n, m] = lines[0].split(/\\s+/).map(Number);\nconst edges = []; for (let i=0;i<m;i++) edges.push(lines[1+i].split(/\\s+/).map(Number));\nconst [s, t] = lines[1+m].split(/\\s+/).map(Number);\n\nfunction solve(n, edges, s, t) {\n  // TODO: return shortest distance s->t or -1\n  return -1;\n}\n\nconsole.log(solve(n, edges, s, t));\n"
+    },
+    "topics": [
+      "Graphs"
+    ],
+    "subtopics": [
+      "Dijkstra",
+      "Priority Queue"
+    ],
+    "companies": [
+      "Google",
+      "Amazon",
+      "Uber"
+    ],
+    "patterns": [
+      "Dijkstra",
+      "Heap / Priority Queue"
+    ],
+    "hints": [
+      "Non-negative weights → Dijkstra's algorithm.",
+      "Use a min-priority-queue keyed by tentative distance.",
+      "Pop the closest unfinalized node and relax its edges.",
+      "Skip stale queue entries where popped distance > best known."
+    ],
+    "prerequisites": [
+      {
+        "key": "graph_repr",
+        "name": "Graph Representation",
+        "what": "Modeling entities as nodes and relationships as edges, usually an adjacency list.",
+        "deep": "The representation dictates efficiency: adjacency lists are O(V+E) space and iterate neighbors quickly, while adjacency matrices are O(V^2) but give O(1) edge tests. Directed vs undirected and weighted vs unweighted change how you build and traverse it.",
+        "java": "List<List<Integer>> adj, or List<int[]>[] adj = new List[n] storing new int[]{to, w} for weighted edges.",
+        "how": "Store the weighted graph as an adjacency list of (neighbor, weight) pairs per node."
+      },
+      {
+        "key": "heap",
+        "name": "Priority Queue (Heap)",
+        "what": "A structure that always yields the smallest or largest pending item in O(log n).",
+        "deep": "A binary heap supports push and pop-min/max in O(log n) and peek in O(1). It powers greedy expansion (Dijkstra, Prim), top-k selection, and merging sorted streams, but it has no fast arbitrary lookup or deletion.",
+        "java": "PriorityQueue<T> is a min-heap by default. For pairs use long[]/int[] with a comparator: new PriorityQueue<>((a, b) -> Long.compare(a[0], b[0])).",
+        "how": "A min-priority-queue always hands you the closest unfinalized node, which is why Dijkstra is efficient."
+      },
+      {
+        "key": "greedy",
+        "name": "Greedy Choice",
+        "what": "Taking the locally-best option at each step when that provably reaches a global optimum.",
+        "deep": "Greedy is fast and simple but correct only when the problem has the greedy-choice property and optimal substructure; otherwise DP is the fallback. Proving correctness (often an exchange argument) matters more than the code.",
+        "java": "Often just Arrays.sort plus a linear scan, or a PriorityQueue to always grab the current best.",
+        "how": "Finalizing the nearest node first is provably correct because all edge weights are non-negative."
+      },
+      {
+        "key": "visited_set",
+        "name": "Visited Tracking",
+        "what": "Recording which nodes or cells are already processed so you never revisit or double-count.",
+        "deep": "Graph and grid traversals loop forever or over-count without visited marks. Mark as early as possible (on enqueue) so a node is not added twice; for grids you can use a boolean[][] or mutate the input to a sentinel value.",
+        "java": "boolean[] visited / boolean[][] seen, or overwrite grid cells (set '1' to '0') when mutation is allowed.",
+        "how": "Skip stale queue entries (a popped distance greater than the best known) so each node is finalized once."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example 1",
+        "input": "5 6\n0 1 2\n0 2 4\n1 2 1\n1 3 7\n2 4 3\n3 4 1\n0 4\n",
+        "expected_output": "6",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Example 2",
+        "input": "2 1\n0 1 3\n1 0\n",
+        "expected_output": "3",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Unreachable",
+        "input": "3 1\n0 1 5\n0 2\n",
+        "expected_output": "-1",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Same node",
+        "input": "1 0\n0 0\n",
+        "expected_output": "0",
+        "ordering": 3
+      },
+      {
+        "kind": "hidden",
+        "name": "Pick cheaper route",
+        "input": "4 4\n0 1 1\n1 3 1\n0 2 5\n2 3 1\n0 3\n",
+        "expected_output": "2",
+        "ordering": 4
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "judge_mode": "exact"
+  },
+  {
+    "slug": "two-sum-fn",
+    "title": "Two Sum (function)",
+    "difficulty": "Easy",
+    "description": "Return the **1-based indices** of the two numbers that add up to `target`.\n\nYou implement a function — the app handles input parsing and output. This is the function-signature style you'll see in real interviews.",
+    "constraints": "2 ≤ n ≤ 10^4\nExactly one valid answer exists.",
+    "examples": [
+      {
+        "input": "2 7 11 15\n9",
+        "output": "1 2",
+        "explanation": "nums[1]+nums[2] = 2+7 = 9."
+      },
+      {
+        "input": "3 2 4\n6",
+        "output": "2 3",
+        "explanation": "nums[2]+nums[3] = 2+4 = 6."
+      }
+    ],
+    "editorial": "## Approach\nScan once, remembering each value's index. For each element look up `target - x`.",
+    "optimal_time": "O(n)",
+    "optimal_space": "O(n)",
+    "optimal_explanation": "A single pass with a hash map of seen values.",
+    "starter_code": {
+      "python": "def solve(nums, target):\n    # nums: list[int], target: int -> return [i, j] (1-based indices)\n    return []\n",
+      "java": "class Solution {\n    int[] solve(int[] nums, int target) {\n        // return the two 1-based indices\n        return new int[]{};\n    }\n}\n"
+    },
+    "topics": [
+      "Hashing",
+      "Arrays"
+    ],
+    "subtopics": [
+      "Complement Lookup"
+    ],
+    "companies": [
+      "Amazon",
+      "Google"
+    ],
+    "patterns": [
+      "Hashing"
+    ],
+    "hints": [
+      "A hash map turns the 'find the complement' step into O(1).",
+      "For each x, check whether target - x was already seen.",
+      "Store value → index as you scan.",
+      "Return the stored index and the current index (1-based)."
+    ],
+    "prerequisites": [],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example 1",
+        "input": "2 7 11 15\n9\n",
+        "expected_output": "1 2",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Example 2",
+        "input": "3 2 4\n6\n",
+        "expected_output": "2 3",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "First and last",
+        "input": "1 5 3 7\n8\n",
+        "expected_output": "2 3",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Adjacent",
+        "input": "10 20 30\n50\n",
+        "expected_output": "2 3",
+        "ordering": 3
+      },
+      {
+        "kind": "hidden",
+        "name": "Negatives",
+        "input": "-3 4 1 90\n-2\n",
+        "expected_output": "1 3",
+        "ordering": 4
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "nums",
+          "type": "int[]"
+        },
+        {
+          "name": "target",
+          "type": "int"
+        }
+      ],
+      "returns": "int[]"
+    },
+    "judge_mode": "exact"
+  },
+  {
+    "slug": "max-subarray-fn",
+    "title": "Maximum Subarray (function)",
+    "difficulty": "Medium",
+    "description": "Return the largest sum obtainable from a **contiguous** non-empty subarray.\n\nImplement the function; the app supplies the array and reads your return value.",
+    "constraints": "1 ≤ n ≤ 10^5\n-10^4 ≤ a[i] ≤ 10^4",
+    "examples": [
+      {
+        "input": "-2 1 -3 4 -1 2 1 -5 4",
+        "output": "6",
+        "explanation": "The subarray [4,-1,2,1] sums to 6."
+      },
+      {
+        "input": "1",
+        "output": "1",
+        "explanation": "A single element is its own best subarray."
+      }
+    ],
+    "editorial": "## Approach\nKadane's: `cur = max(x, cur + x)`, track the max.",
+    "optimal_time": "O(n)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "Kadane's algorithm in a single pass.",
+    "starter_code": {
+      "python": "def solve(nums):\n    # nums: list[int] -> return the maximum contiguous subarray sum\n    return 0\n",
+      "java": "class Solution {\n    int solve(int[] nums) {\n        // return the maximum contiguous subarray sum\n        return 0;\n    }\n}\n"
+    },
+    "topics": [
+      "Dynamic Programming",
+      "Arrays"
+    ],
+    "subtopics": [
+      "Kadane"
+    ],
+    "companies": [
+      "Bloomberg",
+      "Amazon"
+    ],
+    "patterns": [
+      "Dynamic Programming"
+    ],
+    "hints": [
+      "Track the best sum ending exactly at the current index.",
+      "Either extend the previous run or start fresh at x.",
+      "cur = max(x, cur + x).",
+      "Keep a separate running maximum."
+    ],
+    "prerequisites": [],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example 1",
+        "input": "-2 1 -3 4 -1 2 1 -5 4\n",
+        "expected_output": "6",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Example 2",
+        "input": "1\n",
+        "expected_output": "1",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "All negative",
+        "input": "-5 -2 -8\n",
+        "expected_output": "-2",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "All positive",
+        "input": "1 2 3 4\n",
+        "expected_output": "10",
+        "ordering": 3
+      },
+      {
+        "kind": "hidden",
+        "name": "Single dip",
+        "input": "5 -1 5\n",
+        "expected_output": "9",
+        "ordering": 4
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "nums",
+          "type": "int[]"
+        }
+      ],
+      "returns": "int"
+    },
+    "judge_mode": "exact"
+  },
+  {
+    "slug": "reverse-array-fn",
+    "title": "Reverse Array (function)",
+    "difficulty": "Easy",
+    "description": "Return the input array reversed. Implement the function; the app handles I/O.",
+    "constraints": "0 ≤ n ≤ 10^5",
+    "examples": [
+      {
+        "input": "1 2 3 4",
+        "output": "4 3 2 1",
+        "explanation": "[1,2,3,4] → [4,3,2,1]."
+      },
+      {
+        "input": "5",
+        "output": "5",
+        "explanation": "A single element is unchanged."
+      }
+    ],
+    "editorial": "## Approach\nReverse with two pointers or a slice.",
+    "optimal_time": "O(n)",
+    "optimal_space": "O(n)",
+    "optimal_explanation": "Each element is moved once.",
+    "starter_code": {
+      "python": "def solve(nums):\n    # nums: list[int] -> return nums reversed\n    return nums\n",
+      "java": "class Solution {\n    int[] solve(int[] nums) {\n        // return nums reversed\n        return nums;\n    }\n}\n"
+    },
+    "topics": [
+      "Arrays"
+    ],
+    "subtopics": [
+      "Two Pointers"
+    ],
+    "companies": [
+      "Microsoft"
+    ],
+    "patterns": [
+      "Two Pointers"
+    ],
+    "hints": [
+      "Swap ends moving inward.",
+      "Or build the output back-to-front.",
+      "Two pointers work in place.",
+      "Return the reversed list."
+    ],
+    "prerequisites": [],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example 1",
+        "input": "1 2 3 4\n",
+        "expected_output": "4 3 2 1",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Example 2",
+        "input": "5\n",
+        "expected_output": "5",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Empty",
+        "input": "\n",
+        "expected_output": "",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Two",
+        "input": "9 8\n",
+        "expected_output": "8 9",
+        "ordering": 3
+      },
+      {
+        "kind": "hidden",
+        "name": "Longer",
+        "input": "1 1 2 3 5 8\n",
+        "expected_output": "8 5 3 2 1 1",
+        "ordering": 4
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "nums",
+          "type": "int[]"
+        }
+      ],
+      "returns": "int[]"
+    },
+    "judge_mode": "exact"
+  },
+  {
+    "slug": "is-palindrome-fn",
+    "title": "Is Palindrome (function)",
+    "difficulty": "Easy",
+    "description": "Return `true` if the string reads the same forwards and backwards. Implement the function.",
+    "constraints": "1 ≤ |s| ≤ 10^5\nLowercase letters only.",
+    "examples": [
+      {
+        "input": "racecar",
+        "output": "true",
+        "explanation": "'racecar' is a palindrome."
+      },
+      {
+        "input": "hello",
+        "output": "false",
+        "explanation": "'hello' is not."
+      }
+    ],
+    "editorial": "## Approach\nTwo pointers from each end; mismatch ⇒ not a palindrome.",
+    "optimal_time": "O(n)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "One pass with two pointers.",
+    "starter_code": {
+      "python": "def solve(s):\n    # s: str -> return True if s is a palindrome else False\n    return False\n",
+      "java": "class Solution {\n    boolean solve(String s) {\n        // return true if s is a palindrome\n        return false;\n    }\n}\n"
+    },
+    "topics": [
+      "Strings"
+    ],
+    "subtopics": [
+      "Two Pointers"
+    ],
+    "companies": [
+      "Adobe"
+    ],
+    "patterns": [
+      "Two Pointers"
+    ],
+    "hints": [
+      "Compare characters from both ends.",
+      "Advance inward while they match.",
+      "Any mismatch means false.",
+      "s == s reversed also works."
+    ],
+    "prerequisites": [],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example 1",
+        "input": "racecar\n",
+        "expected_output": "true",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Example 2",
+        "input": "hello\n",
+        "expected_output": "false",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Single",
+        "input": "a\n",
+        "expected_output": "true",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Even palindrome",
+        "input": "abba\n",
+        "expected_output": "true",
+        "ordering": 3
+      },
+      {
+        "kind": "hidden",
+        "name": "Almost",
+        "input": "abca\n",
+        "expected_output": "false",
+        "ordering": 4
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "s",
+          "type": "string"
+        }
+      ],
+      "returns": "bool"
+    },
+    "judge_mode": "exact"
+  }
+]

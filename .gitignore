@@ -1,0 +1,14 @@
+node_modules
+dist
+dist-ssr
+*.local
+.DS_Store
+*.tsbuildinfo
+
+# Rust / Tauri
+src-tauri/target
+src-tauri/gen
+
+# App data (local database created at runtime in the OS app-data dir)
+*.sqlite
+*.sqlite-*
