@@ -7,10 +7,13 @@ use crate::models::{FunctionSpec, TestCase};
 
 /// Per-problem judging configuration.
 pub struct JudgeConfig {
-    /// "exact" | "float" | "unordered"
+    /// "exact" | "float" | "unordered" | "checker"
     pub mode: String,
     pub tolerance: f64,
     pub function_spec: Option<FunctionSpec>,
+    /// Special-judge script (Python `def check(input, output) -> bool`). Used
+    /// when `mode == "checker"` to accept any valid answer, not one exact string.
+    pub checker: Option<String>,
     pub timeout: Duration,
 }
 
@@ -20,6 +23,7 @@ impl JudgeConfig {
             mode: "exact".into(),
             tolerance: 0.0,
             function_spec: None,
+            checker: None,
             timeout,
         }
     }
@@ -78,7 +82,7 @@ impl JudgeReport {
 fn normalize(s: &str) -> String {
     let cleaned = s.replace('\r', "");
     let mut lines: Vec<&str> = cleaned.split('\n').map(|l| l.trim_end()).collect();
-    while lines.last().map_or(false, |l| l.is_empty()) {
+    while lines.last().is_some_and(|l| l.is_empty()) {
         lines.pop();
     }
     lines.join("\n")
@@ -126,6 +130,36 @@ fn unordered_match(actual: &str, expected: &str) -> bool {
     a.sort_unstable();
     b.sort_unstable();
     a == b
+}
+
+/// Run a special-judge checker: a Python snippet defining `check(input, output)`
+/// that returns True when the program's output is a valid answer for the case.
+/// Requires Python; returns Err if it can't run so the case is treated as failed.
+fn run_checker(checker_src: &str, input: &str, output: &str, timeout: Duration) -> Result<bool, String> {
+    use std::process::{Command, Stdio};
+
+    let dir = std::env::temp_dir().join(format!("poodcode-chk-{}", uuid::Uuid::new_v4()));
+    std::fs::create_dir_all(&dir).map_err(|e| e.to_string())?;
+    let _guard = DirGuard(dir.clone());
+    std::fs::write(dir.join("in.txt"), input).map_err(|e| e.to_string())?;
+    std::fs::write(dir.join("out.txt"), output).map_err(|e| e.to_string())?;
+    let runner = format!(
+        "import io\nwith io.open('in.txt', encoding='utf-8') as f: _inp = f.read()\nwith io.open('out.txt', encoding='utf-8') as f: _out = f.read()\n{checker}\nprint('1' if check(_inp, _out) else '0')\n",
+        checker = checker_src
+    );
+    std::fs::write(dir.join("run.py"), &runner).map_err(|e| e.to_string())?;
+
+    let _ = timeout; // checkers are our own trusted, fast scripts
+    let out = Command::new("python")
+        .arg("run.py")
+        .current_dir(&dir)
+        .stdin(Stdio::null())
+        .output()
+        .map_err(|e| e.to_string())?;
+    if !out.status.success() {
+        return Err(String::from_utf8_lossy(&out.stderr).to_string());
+    }
+    Ok(String::from_utf8_lossy(&out.stdout).trim() == "1")
 }
 
 /// Back-compat entry point: exact match, no harness, given a per-case timeout.
@@ -191,9 +225,19 @@ pub fn judge_with(
                 total_ms += out.runtime_ms;
                 peak_mem = max_opt(peak_mem, out.memory_kb);
                 let actual = out.stdout.clone();
-                let matched = outputs_match(&actual, &tc.expected_output, &cfg.mode, cfg.tolerance);
+                let runnable = !out.timed_out && !out.truncated && out.exit_code == Some(0);
+                let matched = if cfg.mode == "checker" {
+                    match (&cfg.checker, runnable) {
+                        (Some(src), true) => {
+                            run_checker(src, &tc.input, &actual, cfg.timeout).unwrap_or(false)
+                        }
+                        _ => false,
+                    }
+                } else {
+                    outputs_match(&actual, &tc.expected_output, &cfg.mode, cfg.tolerance)
+                };
                 // A truncated stdout can never be judged as correct.
-                let ok = !out.timed_out && !out.truncated && out.exit_code == Some(0) && matched;
+                let ok = runnable && matched;
                 if ok {
                     passed += 1;
                 }

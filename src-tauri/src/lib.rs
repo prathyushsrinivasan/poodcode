@@ -1,3 +1,6 @@
+// `Stats` is built field-by-field after `default()` for readability.
+#![allow(clippy::field_reassign_with_default)]
+
 mod commands;
 mod db;
 mod error;
@@ -21,7 +24,7 @@ use models::Problem;
 
 /// Bump when the bundled seed problems change so existing installs pick up new
 /// content on next launch (existing user progress is preserved via upsert).
-const SEED_VERSION: i64 = 8;
+const SEED_VERSION: i64 = 9;
 
 /// Original starter problems, authored for this app (no third-party content).
 const SEED_PROBLEMS: &str = include_str!("../seeds/problems.json");

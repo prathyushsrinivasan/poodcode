@@ -32,6 +32,7 @@ fn sample_problem(slug: &str) -> Problem {
         function_spec: None,
         judge_mode: "exact".into(),
         float_tolerance: 0.0,
+        checker: String::new(),
         time_limit_ms: 0,
         editorials: vec![],
         follow_ups: vec![],

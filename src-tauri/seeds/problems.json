@@ -71,6 +71,7 @@
     "editorials": [],
     "follow_ups": [],
     "judge_mode": "exact",
+    "checker": "",
     "order": 0
   },
   {
@@ -152,6 +153,7 @@
     "editorials": [],
     "follow_ups": [],
     "judge_mode": "exact",
+    "checker": "",
     "order": 1
   },
   {
@@ -260,6 +262,7 @@
     "editorials": [],
     "follow_ups": [],
     "judge_mode": "exact",
+    "checker": "",
     "order": 2
   },
   {
@@ -356,6 +359,7 @@
     "editorials": [],
     "follow_ups": [],
     "judge_mode": "exact",
+    "checker": "",
     "order": 3
   },
   {
@@ -464,6 +468,7 @@
     "editorials": [],
     "follow_ups": [],
     "judge_mode": "exact",
+    "checker": "",
     "order": 4
   },
   {
@@ -560,6 +565,7 @@
     "editorials": [],
     "follow_ups": [],
     "judge_mode": "exact",
+    "checker": "",
     "order": 5
   },
   {
@@ -668,6 +674,7 @@
     "editorials": [],
     "follow_ups": [],
     "judge_mode": "exact",
+    "checker": "",
     "order": 6
   },
   {
@@ -769,6 +776,7 @@
     "editorials": [],
     "follow_ups": [],
     "judge_mode": "exact",
+    "checker": "",
     "order": 7
   },
   {
@@ -881,6 +889,7 @@
     "editorials": [],
     "follow_ups": [],
     "judge_mode": "exact",
+    "checker": "",
     "order": 26
   },
   {
@@ -995,6 +1004,7 @@
     "editorials": [],
     "follow_ups": [],
     "judge_mode": "exact",
+    "checker": "",
     "order": 27
   },
   {
@@ -1109,6 +1119,7 @@
     "editorials": [],
     "follow_ups": [],
     "judge_mode": "exact",
+    "checker": "",
     "order": 28
   },
   {
@@ -1221,6 +1232,7 @@
     "editorials": [],
     "follow_ups": [],
     "judge_mode": "exact",
+    "checker": "",
     "order": 29
   },
   {
@@ -1333,6 +1345,7 @@
     "editorials": [],
     "follow_ups": [],
     "judge_mode": "exact",
+    "checker": "",
     "order": 30
   },
   {
@@ -1447,6 +1460,7 @@
     "editorials": [],
     "follow_ups": [],
     "judge_mode": "exact",
+    "checker": "",
     "order": 31
   },
   {
@@ -1563,6 +1577,7 @@
     "editorials": [],
     "follow_ups": [],
     "judge_mode": "exact",
+    "checker": "",
     "order": 32
   },
   {
@@ -1699,7 +1714,8 @@
       }
     ],
     "judge_mode": "exact",
-    "order": 77
+    "checker": "",
+    "order": 78
   },
   {
     "slug": "longest-unique-substring",
@@ -1824,7 +1840,8 @@
     ],
     "follow_ups": [],
     "judge_mode": "exact",
-    "order": 78
+    "checker": "",
+    "order": 79
   },
   {
     "slug": "valid-parentheses",
@@ -1940,7 +1957,8 @@
     "editorials": [],
     "follow_ups": [],
     "judge_mode": "exact",
-    "order": 79
+    "checker": "",
+    "order": 80
   },
   {
     "slug": "binary-search-first",
@@ -2062,7 +2080,8 @@
       }
     ],
     "judge_mode": "exact",
-    "order": 80
+    "checker": "",
+    "order": 81
   },
   {
     "slug": "maximum-subarray",
@@ -2198,7 +2217,8 @@
       }
     ],
     "judge_mode": "exact",
-    "order": 81
+    "checker": "",
+    "order": 82
   },
   {
     "slug": "climbing-stairs",
@@ -2314,7 +2334,8 @@
     "editorials": [],
     "follow_ups": [],
     "judge_mode": "exact",
-    "order": 82
+    "checker": "",
+    "order": 83
   },
   {
     "slug": "rotate-array",
@@ -2427,7 +2448,8 @@
     "editorials": [],
     "follow_ups": [],
     "judge_mode": "exact",
-    "order": 83
+    "checker": "",
+    "order": 84
   },
   {
     "slug": "number-of-islands",
@@ -2554,7 +2576,8 @@
     "editorials": [],
     "follow_ups": [],
     "judge_mode": "exact",
-    "order": 84
+    "checker": "",
+    "order": 85
   },
   {
     "slug": "group-anagrams-count",
@@ -2671,7 +2694,8 @@
     "editorials": [],
     "follow_ups": [],
     "judge_mode": "exact",
-    "order": 85
+    "checker": "",
+    "order": 86
   },
   {
     "slug": "course-schedule",
@@ -2796,7 +2820,8 @@
     "editorials": [],
     "follow_ups": [],
     "judge_mode": "exact",
-    "order": 86
+    "checker": "",
+    "order": 87
   },
   {
     "slug": "longest-increasing-subsequence",
@@ -2914,7 +2939,8 @@
     "editorials": [],
     "follow_ups": [],
     "judge_mode": "exact",
-    "order": 117
+    "checker": "",
+    "order": 118
   },
   {
     "slug": "edit-distance",
@@ -3031,7 +3057,8 @@
     "editorials": [],
     "follow_ups": [],
     "judge_mode": "exact",
-    "order": 118
+    "checker": "",
+    "order": 119
   },
   {
     "slug": "trapping-rain-water",
@@ -3149,7 +3176,8 @@
     "editorials": [],
     "follow_ups": [],
     "judge_mode": "exact",
-    "order": 119
+    "checker": "",
+    "order": 120
   },
   {
     "slug": "dijkstra-shortest-path",
@@ -3275,7 +3303,8 @@
     "editorials": [],
     "follow_ups": [],
     "judge_mode": "exact",
-    "order": 120
+    "checker": "",
+    "order": 121
   },
   {
     "slug": "color-bomb-explosion",
@@ -3392,6 +3421,7 @@
     "editorials": [],
     "follow_ups": [],
     "judge_mode": "exact",
+    "checker": "",
     "order": 33
   },
   {
@@ -3501,6 +3531,7 @@
     "editorials": [],
     "follow_ups": [],
     "judge_mode": "exact",
+    "checker": "",
     "order": 34
   },
   {
@@ -3611,6 +3642,7 @@
     "editorials": [],
     "follow_ups": [],
     "judge_mode": "exact",
+    "checker": "",
     "order": 35
   },
   {
@@ -3720,6 +3752,7 @@
     "editorials": [],
     "follow_ups": [],
     "judge_mode": "exact",
+    "checker": "",
     "order": 36
   },
   {
@@ -3831,7 +3864,8 @@
     "editorials": [],
     "follow_ups": [],
     "judge_mode": "exact",
-    "order": 87
+    "checker": "",
+    "order": 88
   },
   {
     "slug": "set-matrix-zeroes",
@@ -3941,7 +3975,8 @@
     "editorials": [],
     "follow_ups": [],
     "judge_mode": "exact",
-    "order": 88
+    "checker": "",
+    "order": 89
   },
   {
     "slug": "rotate-matrix-90",
@@ -4052,7 +4087,8 @@
     "editorials": [],
     "follow_ups": [],
     "judge_mode": "exact",
-    "order": 89
+    "checker": "",
+    "order": 90
   },
   {
     "slug": "spiral-order",
@@ -4163,7 +4199,8 @@
     "editorials": [],
     "follow_ups": [],
     "judge_mode": "exact",
-    "order": 90
+    "checker": "",
+    "order": 91
   },
   {
     "slug": "two-sum-fn",
@@ -4292,6 +4329,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
+    "checker": "",
     "order": 37
   },
   {
@@ -4417,7 +4455,8 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 91
+    "checker": "",
+    "order": 92
   },
   {
     "slug": "reverse-array-fn",
@@ -4532,6 +4571,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
+    "checker": "",
     "order": 38
   },
   {
@@ -4647,6 +4687,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
+    "checker": "",
     "order": 39
   },
   {
@@ -4759,6 +4800,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
+    "checker": "",
     "order": 8
   },
   {
@@ -4864,6 +4906,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
+    "checker": "",
     "order": 9
   },
   {
@@ -4976,6 +5019,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
+    "checker": "",
     "order": 10
   },
   {
@@ -5080,6 +5124,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
+    "checker": "",
     "order": 11
   },
   {
@@ -5184,6 +5229,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
+    "checker": "",
     "order": 12
   },
   {
@@ -5288,6 +5334,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
+    "checker": "",
     "order": 13
   },
   {
@@ -5401,6 +5448,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
+    "checker": "",
     "order": 14
   },
   {
@@ -5496,6 +5544,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
+    "checker": "",
     "order": 15
   },
   {
@@ -5605,6 +5654,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
+    "checker": "",
     "order": 40
   },
   {
@@ -5714,6 +5764,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
+    "checker": "",
     "order": 41
   },
   {
@@ -5823,6 +5874,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
+    "checker": "",
     "order": 42
   },
   {
@@ -5935,6 +5987,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
+    "checker": "",
     "order": 43
   },
   {
@@ -6042,6 +6095,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
+    "checker": "",
     "order": 44
   },
   {
@@ -6163,6 +6217,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
+    "checker": "",
     "order": 45
   },
   {
@@ -6272,6 +6327,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
+    "checker": "",
     "order": 46
   },
   {
@@ -6381,6 +6437,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
+    "checker": "",
     "order": 47
   },
   {
@@ -6487,6 +6544,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
+    "checker": "",
     "order": 48
   },
   {
@@ -6593,6 +6651,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
+    "checker": "",
     "order": 49
   },
   {
@@ -6697,6 +6756,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
+    "checker": "",
     "order": 50
   },
   {
@@ -6798,6 +6858,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
+    "checker": "",
     "order": 51
   },
   {
@@ -6905,6 +6966,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
+    "checker": "",
     "order": 52
   },
   {
@@ -7015,7 +7077,8 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 92
+    "checker": "",
+    "order": 93
   },
   {
     "slug": "best-time-buy-sell",
@@ -7133,7 +7196,8 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 93
+    "checker": "",
+    "order": 94
   },
   {
     "slug": "container-most-water",
@@ -7242,7 +7306,8 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 94
+    "checker": "",
+    "order": 95
   },
   {
     "slug": "house-robber",
@@ -7350,7 +7415,8 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 95
+    "checker": "",
+    "order": 96
   },
   {
     "slug": "jump-game",
@@ -7459,7 +7525,8 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 96
+    "checker": "",
+    "order": 97
   },
   {
     "slug": "coin-change",
@@ -7572,7 +7639,8 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 97
+    "checker": "",
+    "order": 98
   },
   {
     "slug": "coin-change-ways",
@@ -7683,7 +7751,8 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 98
+    "checker": "",
+    "order": 99
   },
   {
     "slug": "longest-common-prefix",
@@ -7789,7 +7858,8 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 99
+    "checker": "",
+    "order": 100
   },
   {
     "slug": "search-insert-position",
@@ -7902,7 +7972,8 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 100
+    "checker": "",
+    "order": 101
   },
   {
     "slug": "integer-sqrt",
@@ -8018,7 +8089,8 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 101
+    "checker": "",
+    "order": 102
   },
   {
     "slug": "min-cost-climbing-stairs",
@@ -8125,7 +8197,8 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 102
+    "checker": "",
+    "order": 103
   },
   {
     "slug": "daily-temperatures",
@@ -8234,7 +8307,8 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 103
+    "checker": "",
+    "order": 104
   },
   {
     "slug": "next-greater-element",
@@ -8343,7 +8417,8 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 104
+    "checker": "",
+    "order": 105
   },
   {
     "slug": "subarray-sum-k",
@@ -8465,7 +8540,8 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 105
+    "checker": "",
+    "order": 106
   },
   {
     "slug": "longest-consecutive",
@@ -8574,7 +8650,8 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 106
+    "checker": "",
+    "order": 107
   },
   {
     "slug": "kth-largest-element",
@@ -8687,7 +8764,8 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 107
+    "checker": "",
+    "order": 108
   },
   {
     "slug": "rotate-array-right",
@@ -8797,7 +8875,8 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 108
+    "checker": "",
+    "order": 109
   },
   {
     "slug": "word-break",
@@ -8919,7 +8998,8 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 121
+    "checker": "",
+    "order": 122
   },
   {
     "slug": "decode-ways",
@@ -9036,7 +9116,8 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 122
+    "checker": "",
+    "order": 123
   },
   {
     "slug": "longest-palindrome-length",
@@ -9146,7 +9227,8 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 123
+    "checker": "",
+    "order": 124
   },
   {
     "slug": "maximum-product-subarray",
@@ -9255,7 +9337,8 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 124
+    "checker": "",
+    "order": 125
   },
   {
     "slug": "partition-equal-subset-sum",
@@ -9363,7 +9446,8 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 125
+    "checker": "",
+    "order": 126
   },
   {
     "slug": "min-of-two",
@@ -9463,6 +9547,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
+    "checker": "",
     "order": 16
   },
   {
@@ -9568,6 +9653,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
+    "checker": "",
     "order": 17
   },
   {
@@ -9676,6 +9762,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
+    "checker": "",
     "order": 18
   },
   {
@@ -9780,6 +9867,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
+    "checker": "",
     "order": 19
   },
   {
@@ -9875,6 +9963,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
+    "checker": "",
     "order": 20
   },
   {
@@ -9981,6 +10070,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
+    "checker": "",
     "order": 53
   },
   {
@@ -10097,6 +10187,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
+    "checker": "",
     "order": 54
   },
   {
@@ -10214,6 +10305,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
+    "checker": "",
     "order": 55
   },
   {
@@ -10311,6 +10403,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
+    "checker": "",
     "order": 56
   },
   {
@@ -10416,6 +10509,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
+    "checker": "",
     "order": 57
   },
   {
@@ -10522,6 +10616,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
+    "checker": "",
     "order": 58
   },
   {
@@ -10635,6 +10730,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
+    "checker": "",
     "order": 59
   },
   {
@@ -10748,7 +10844,8 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 109
+    "checker": "",
+    "order": 110
   },
   {
     "slug": "kth-smallest",
@@ -10861,7 +10958,8 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 110
+    "checker": "",
+    "order": 111
   },
   {
     "slug": "gcd-of-array",
@@ -10966,7 +11064,8 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 111
+    "checker": "",
+    "order": 112
   },
   {
     "slug": "fast-power",
@@ -11087,7 +11186,8 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 112
+    "checker": "",
+    "order": 113
   },
   {
     "slug": "unique-paths",
@@ -11199,7 +11299,8 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 113
+    "checker": "",
+    "order": 114
   },
   {
     "slug": "longest-common-subsequence",
@@ -11313,7 +11414,8 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 114
+    "checker": "",
+    "order": 115
   },
   {
     "slug": "top-k-frequent",
@@ -11437,7 +11539,8 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 115
+    "checker": "",
+    "order": 116
   },
   {
     "slug": "count-bits",
@@ -11547,7 +11650,8 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 116
+    "checker": "",
+    "order": 117
   },
   {
     "slug": "largest-rectangle-histogram",
@@ -11656,7 +11760,8 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 126
+    "checker": "",
+    "order": 127
   },
   {
     "slug": "sliding-window-maximum",
@@ -11770,7 +11875,8 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 127
+    "checker": "",
+    "order": 128
   },
   {
     "slug": "jump-game-ii",
@@ -11879,7 +11985,8 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 128
+    "checker": "",
+    "order": 129
   },
   {
     "slug": "longest-valid-parentheses",
@@ -11990,7 +12097,8 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 129
+    "checker": "",
+    "order": 130
   },
   {
     "slug": "min-window-length",
@@ -12114,7 +12222,8 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 130
+    "checker": "",
+    "order": 131
   },
   {
     "slug": "leap-year",
@@ -12219,6 +12328,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
+    "checker": "",
     "order": 21
   },
   {
@@ -12332,6 +12442,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
+    "checker": "",
     "order": 22
   },
   {
@@ -12437,6 +12548,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
+    "checker": "",
     "order": 23
   },
   {
@@ -12542,6 +12654,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
+    "checker": "",
     "order": 24
   },
   {
@@ -12650,6 +12763,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
+    "checker": "",
     "order": 25
   },
   {
@@ -12757,6 +12871,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
+    "checker": "",
     "order": 60
   },
   {
@@ -12862,6 +12977,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
+    "checker": "",
     "order": 61
   },
   {
@@ -12967,6 +13083,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
+    "checker": "",
     "order": 62
   },
   {
@@ -13075,6 +13192,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
+    "checker": "",
     "order": 63
   },
   {
@@ -13180,6 +13298,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
+    "checker": "",
     "order": 64
   },
   {
@@ -13287,6 +13406,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
+    "checker": "",
     "order": 65
   },
   {
@@ -13393,6 +13513,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
+    "checker": "",
     "order": 66
   },
   {
@@ -13500,6 +13621,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
+    "checker": "",
     "order": 67
   },
   {
@@ -13611,6 +13733,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
+    "checker": "",
     "order": 68
   },
   {
@@ -13731,6 +13854,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
+    "checker": "",
     "order": 69
   },
   {
@@ -13839,6 +13963,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
+    "checker": "",
     "order": 70
   },
   {
@@ -13956,6 +14081,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
+    "checker": "",
     "order": 71
   },
   {
@@ -14064,6 +14190,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
+    "checker": "",
     "order": 72
   },
   {
@@ -14169,6 +14296,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
+    "checker": "",
     "order": 73
   },
   {
@@ -14278,6 +14406,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
+    "checker": "",
     "order": 74
   },
   {
@@ -14387,6 +14516,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
+    "checker": "",
     "order": 75
   },
   {
@@ -14495,6 +14625,129 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
+    "checker": "",
     "order": 76
+  },
+  {
+    "slug": "two-sum-any",
+    "title": "Two Sum (any valid pair)",
+    "difficulty": "Easy",
+    "description": "Return the 1-based indices of **any** two distinct elements that add up to `target` (at least one such pair exists). **Any** valid pair is accepted — a special judge checks your answer, so you don't have to match one specific output.",
+    "constraints": "2 ≤ n ≤ 10^4\nAt least one valid pair exists.",
+    "examples": [
+      {
+        "input": "2 7 11 15\n9",
+        "output": "1 2",
+        "explanation": "Indices 1 and 2 (2+7=9) — but 'any' valid pair is accepted."
+      },
+      {
+        "input": "3 2 4\n6",
+        "output": "2 3",
+        "explanation": "Indices 2 and 3 (2+4=6)."
+      }
+    ],
+    "editorial": "Because multiple answers are valid, a checker verifies that your two indices are in range, distinct, and sum to the target. A single hash-map pass finds one such pair.",
+    "optimal_time": "O(n)",
+    "optimal_space": "O(n)",
+    "optimal_explanation": "Hash-map complement lookup; any valid pair is accepted.",
+    "starter_code": {
+      "python": "def solve(nums, target):\n    # TODO: implement\n    return []\n",
+      "java": "class Solution {\n    int[] solve(int[] nums, int target) {\n        // TODO: implement\n        return new int[]{};\n    }\n}\n"
+    },
+    "topics": [
+      "Hashing",
+      "Arrays"
+    ],
+    "subtopics": [
+      "Complement Lookup"
+    ],
+    "companies": [
+      "Amazon",
+      "Google"
+    ],
+    "patterns": [
+      "Hashing"
+    ],
+    "hints": [
+      "Any correct pair scores — you don't have to find a particular one.",
+      "A hash map of seen values finds a complement in O(1).",
+      "Return the two 1-based indices in either order."
+    ],
+    "prerequisites": [
+      {
+        "key": "complement",
+        "name": "Complement Thinking",
+        "what": "Instead of testing all pairs, ask what single value would complete the current one, and look it up.",
+        "deep": "Reframes 'find two things that combine to T' as 'for each x, does T - x already exist?'. Paired with a hash structure this removes an entire nested loop, and the idea generalizes to differences, XORs, and remainders.",
+        "java": "Keep a HashSet<Integer> or HashMap<Integer,Integer> of seen values and query target - x before inserting x.",
+        "how": "For each x, look up target − x."
+      },
+      {
+        "key": "hashing",
+        "name": "Hash Maps & Sets",
+        "what": "Structures giving average O(1) insertion and lookup, trading memory for speed.",
+        "deep": "A hash table answers 'have I seen X?' or 'what maps to X?' in expected constant time, converting many O(n^2) pair scans into O(n) single passes. Worst case is O(n) per op under adversarial hashing, but that is rare in practice.",
+        "java": "HashMap<K,V> and HashSet<E>. Use getOrDefault(k, 0) and merge(k, 1, Integer::sum) for counting, containsKey/add for membership. For dense int keys, an int[] beats a HashMap.",
+        "how": "A hash map makes the lookup O(1)."
+      },
+      {
+        "key": "iteration",
+        "name": "Array Iteration",
+        "what": "Walking through elements one at a time while maintaining running state such as a sum, max, or counter.",
+        "deep": "The workhorse of array problems: one for-loop that updates accumulators as it goes. Most linear-time solutions are just one well-chosen pass, so the real skill is deciding what state to carry so a single sweep suffices.",
+        "java": "Use for (int i = 0; i < n; i++) or for (int x : nums). Prefer a primitive int[] over Integer[] to avoid autoboxing overhead.",
+        "how": "One pass finds a valid pair; the checker accepts any correct one."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example 1",
+        "input": "2 7 11 15\n9\n",
+        "expected_output": "1 2",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Example 2",
+        "input": "3 2 4\n6\n",
+        "expected_output": "2 3",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Multiple pairs",
+        "input": "1 2 3 4 5\n6\n",
+        "expected_output": "1 5",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Ends",
+        "input": "5 1 2 4\n9\n",
+        "expected_output": "1 4",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "nums",
+          "type": "int[]"
+        },
+        {
+          "name": "target",
+          "type": "int"
+        }
+      ],
+      "returns": "int[]"
+    },
+    "judge_mode": "checker",
+    "float_tolerance": 0,
+    "checker": "def check(inp, out):\n    lines = inp.strip().split('\\n')\n    nums = list(map(int, lines[0].split())) if lines and lines[0].strip() else []\n    target = int(lines[1]) if len(lines) > 1 else 0\n    toks = out.split()\n    if len(toks) != 2:\n        return False\n    try:\n        i, j = int(toks[0]), int(toks[1])\n    except ValueError:\n        return False\n    n = len(nums)\n    if not (1 <= i <= n and 1 <= j <= n and i != j):\n        return False\n    return nums[i - 1] + nums[j - 1] == target\n",
+    "order": 77
   }
 ]

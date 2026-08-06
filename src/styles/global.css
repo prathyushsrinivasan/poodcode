@@ -561,6 +561,29 @@ table.data tbody tr:hover {
   font-style: italic;
 }
 
+/* Welcome / onboarding ---------------------------------------------------- */
+.welcome-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 24px;
+  z-index: 300;
+}
+.welcome-card {
+  width: 620px;
+  max-width: 94vw;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  padding: 22px 24px;
+}
+
 /* Command palette --------------------------------------------------------- */
 .palette-overlay {
   position: fixed;

@@ -82,6 +82,7 @@ export interface Problem {
   function_spec: FunctionSpec | null;
   judge_mode: string;
   float_tolerance: number;
+  checker: string;
   time_limit_ms: number;
   editorials: Editorial[];
   follow_ups: FollowUp[];

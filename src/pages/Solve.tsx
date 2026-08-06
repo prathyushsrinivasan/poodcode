@@ -627,6 +627,13 @@ function DescriptionTab({
         </div>
       )}
 
+      {problem.judge_mode === "checker" && (
+        <div className="card" style={{ marginBottom: 12, borderColor: "var(--good)" }}>
+          <strong style={{ color: "var(--good)" }}>✓ Multiple answers accepted.</strong>{" "}
+          <span className="dim">A special judge validates your output, so any correct answer passes — you don't have to match one exact string.</span>
+        </div>
+      )}
+
       <Markdown>{problem.description}</Markdown>
 
       {problem.constraints && (

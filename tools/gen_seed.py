@@ -5047,6 +5047,62 @@ PREREQS.update({
 
 
 # ---------------------------------------------------------------------------
+# Special-judge (checker) demo — a problem with MULTIPLE valid answers, judged
+# by a checker instead of exact match. Proves the checker pipeline.
+# ---------------------------------------------------------------------------
+
+def _two_sum_any(nums, target):
+    n = len(nums)
+    for i in range(n):
+        for j in range(i + 1, n):
+            if nums[i] + nums[j] == target:
+                return [i + 1, j + 1]
+    return [-1, -1]
+
+
+_TWO_SUM_CHECKER = (
+    "def check(inp, out):\n"
+    "    lines = inp.strip().split('\\n')\n"
+    "    nums = list(map(int, lines[0].split())) if lines and lines[0].strip() else []\n"
+    "    target = int(lines[1]) if len(lines) > 1 else 0\n"
+    "    toks = out.split()\n"
+    "    if len(toks) != 2:\n"
+    "        return False\n"
+    "    try:\n"
+    "        i, j = int(toks[0]), int(toks[1])\n"
+    "    except ValueError:\n"
+    "        return False\n"
+    "    n = len(nums)\n"
+    "    if not (1 <= i <= n and 1 <= j <= n and i != j):\n"
+    "        return False\n"
+    "    return nums[i - 1] + nums[j - 1] == target\n"
+)
+
+HARNESS_DEFS += [
+    dict(slug="two-sum-any", title="Two Sum (any valid pair)", difficulty="Easy",
+         topics=["Hashing", "Arrays"], subtopics=["Complement Lookup"], companies=["Amazon", "Google"],
+         description=(
+             "Return the 1-based indices of **any** two distinct elements that add up to `target` "
+             "(at least one such pair exists). **Any** valid pair is accepted — a special judge checks "
+             "your answer, so you don't have to match one specific output."
+         ),
+         constraints="2 ≤ n ≤ 10^4\nAt least one valid pair exists.",
+         hints=["Any correct pair scores — you don't have to find a particular one.", "A hash map of seen values finds a complement in O(1).", "Return the two 1-based indices in either order."],
+         opt=("O(n)", "O(n)", "Hash-map complement lookup; any valid pair is accepted."),
+         editorial="Because multiple answers are valid, a checker verifies that your two indices are in range, distinct, and sum to the target. A single hash-map pass finds one such pair.",
+         spec={"name": "solve", "params": [{"name": "nums", "type": "int[]"}, {"name": "target", "type": "int"}], "returns": "int[]"},
+         fn=lambda nums, target: _two_sum_any(nums, target),
+         judge_mode="checker", checker=_TWO_SUM_CHECKER,
+         cases=[("example", "Example 1", ([2, 7, 11, 15], 9)), ("example", "Example 2", ([3, 2, 4], 6)), ("hidden", "Multiple pairs", ([1, 2, 3, 4, 5], 6)), ("hidden", "Ends", ([5, 1, 2, 4], 9))],
+         example_expl=["Indices 1 and 2 (2+7=9) — but 'any' valid pair is accepted.", "Indices 2 and 3 (2+4=6)."]),
+]
+
+PREREQS.update({
+    "two-sum-any": [("complement", "For each x, look up target − x."), ("hashing", "A hash map makes the lookup O(1)."), ("iteration", "One pass finds a valid pair; the checker accepts any correct one.")],
+})
+
+
+# ---------------------------------------------------------------------------
 # Build JSON
 # ---------------------------------------------------------------------------
 
@@ -5103,7 +5159,8 @@ for d in DEFS:
         "test_cases": test_cases,
         "editorials": EDITORIALS_EXTRA.get(d["slug"], []),
         "follow_ups": FOLLOWUPS.get(d["slug"], []),
-        "judge_mode": "exact",
+        "judge_mode": d.get("judge_mode", "exact"),
+        "checker": d.get("checker", ""),
     })
 
 # Function-harness demo problems: inputs are serialized args, expected outputs
@@ -5144,6 +5201,7 @@ for d in HARNESS_DEFS:
         "editorials": d.get("editorials", []), "follow_ups": d.get("follow_ups", []),
         "function_spec": spec, "judge_mode": d.get("judge_mode", "exact"),
         "float_tolerance": d.get("float_tolerance", 0),
+        "checker": d.get("checker", ""),
     })
 
 # Assign a curated easiest→hardest global rank (used by the library's default sort):
@@ -5163,3 +5221,102 @@ concepts = build_concepts()
 with open(CONCEPTS_OUT, "w", encoding="utf-8") as f:
     json.dump(concepts, f, indent=2, ensure_ascii=False)
 print(f"Wrote {len(concepts)} concepts to {os.path.relpath(CONCEPTS_OUT)}")
+
+# ---------------------------------------------------------------------------
+# Reference solutions — CORRECT, submittable solutions in each shipped language,
+# used by the backend test `verify_seeds` to prove the judging + harness
+# serialization contract end-to-end (a correct solution must be Accepted). This
+# is NOT embedded in the app; it exists purely to guarantee trust in the bank.
+# Curated to cover every return type, param type, and both languages.
+# ---------------------------------------------------------------------------
+
+REFERENCE_SOLUTIONS = {
+    # -- harness problems: implement the function --
+    "two-sum-fn": {
+        "python": "def solve(nums, target):\n    pos = {}\n    for i, x in enumerate(nums):\n        if target - x in pos:\n            return [pos[target - x] + 1, i + 1]\n        pos[x] = i\n    return [-1]\n",
+        "java": "import java.util.*;\nclass Solution {\n    int[] solve(int[] nums, int target) {\n        HashMap<Integer,Integer> pos = new HashMap<>();\n        for (int i = 0; i < nums.length; i++) {\n            if (pos.containsKey(target - nums[i])) return new int[]{pos.get(target - nums[i]) + 1, i + 1};\n            pos.put(nums[i], i);\n        }\n        return new int[]{-1};\n    }\n}\n",
+    },
+    "max-subarray-fn": {
+        "python": "def solve(nums):\n    best = cur = nums[0]\n    for x in nums[1:]:\n        cur = max(x, cur + x)\n        best = max(best, cur)\n    return best\n",
+        "java": "class Solution {\n    int solve(int[] nums) {\n        int best = nums[0], cur = nums[0];\n        for (int i = 1; i < nums.length; i++) { cur = Math.max(nums[i], cur + nums[i]); best = Math.max(best, cur); }\n        return best;\n    }\n}\n",
+    },
+    "reverse-array-fn": {
+        "python": "def solve(nums):\n    return nums[::-1]\n",
+        "java": "class Solution {\n    int[] solve(int[] nums) {\n        int n = nums.length; int[] r = new int[n];\n        for (int i = 0; i < n; i++) r[i] = nums[n - 1 - i];\n        return r;\n    }\n}\n",
+    },
+    "is-palindrome-fn": {
+        "python": "def solve(s):\n    return s == s[::-1]\n",
+        "java": "class Solution {\n    boolean solve(String s) {\n        int i = 0, j = s.length() - 1;\n        while (i < j) { if (s.charAt(i) != s.charAt(j)) return false; i++; j--; }\n        return true;\n    }\n}\n",
+    },
+    "factorial": {
+        "python": "def solve(n):\n    r = 1\n    for i in range(2, n + 1):\n        r *= i\n    return r\n",
+        "java": "class Solution {\n    long solve(int n) {\n        long r = 1;\n        for (int i = 2; i <= n; i++) r *= i;\n        return r;\n    }\n}\n",
+    },
+    "contains-duplicate": {
+        "python": "def solve(nums):\n    return len(set(nums)) != len(nums)\n",
+        "java": "import java.util.*;\nclass Solution {\n    boolean solve(int[] nums) {\n        HashSet<Integer> seen = new HashSet<>();\n        for (int x : nums) if (!seen.add(x)) return true;\n        return false;\n    }\n}\n",
+    },
+    "running-sum": {
+        "python": "def solve(nums):\n    out = []\n    s = 0\n    for x in nums:\n        s += x\n        out.append(s)\n    return out\n",
+        "java": "class Solution {\n    int[] solve(int[] nums) {\n        int[] r = new int[nums.length]; int s = 0;\n        for (int i = 0; i < nums.length; i++) { s += nums[i]; r[i] = s; }\n        return r;\n    }\n}\n",
+    },
+    "product-except-self": {
+        "python": "def solve(nums):\n    n = len(nums)\n    res = [1] * n\n    pre = 1\n    for i in range(n):\n        res[i] = pre\n        pre *= nums[i]\n    suf = 1\n    for i in range(n - 1, -1, -1):\n        res[i] *= suf\n        suf *= nums[i]\n    return res\n",
+        "java": "class Solution {\n    int[] solve(int[] nums) {\n        int n = nums.length; int[] res = new int[n];\n        int pre = 1; for (int i = 0; i < n; i++) { res[i] = pre; pre *= nums[i]; }\n        int suf = 1; for (int i = n - 1; i >= 0; i--) { res[i] *= suf; suf *= nums[i]; }\n        return res;\n    }\n}\n",
+    },
+    "fizzbuzz-value": {
+        "python": "def solve(n):\n    if n % 15 == 0: return 'FizzBuzz'\n    if n % 3 == 0: return 'Fizz'\n    if n % 5 == 0: return 'Buzz'\n    return str(n)\n",
+        "java": "class Solution {\n    String solve(int n) {\n        if (n % 15 == 0) return \"FizzBuzz\";\n        if (n % 3 == 0) return \"Fizz\";\n        if (n % 5 == 0) return \"Buzz\";\n        return Integer.toString(n);\n    }\n}\n",
+    },
+    "caesar-cipher": {
+        "python": "def solve(s, k):\n    k %= 26\n    out = []\n    for ch in s:\n        if 'a' <= ch <= 'z':\n            out.append(chr((ord(ch) - 97 + k) % 26 + 97))\n        else:\n            out.append(ch)\n    return ''.join(out)\n",
+        "java": "class Solution {\n    String solve(String s, int k) {\n        k %= 26; StringBuilder sb = new StringBuilder();\n        for (char c : s.toCharArray()) {\n            if (c >= 'a' && c <= 'z') sb.append((char)((c - 'a' + k) % 26 + 'a'));\n            else sb.append(c);\n        }\n        return sb.toString();\n    }\n}\n",
+    },
+    "word-break": {
+        "python": "def solve(s, words):\n    w = set(words)\n    n = len(s)\n    dp = [True] + [False] * n\n    for i in range(1, n + 1):\n        for j in range(i):\n            if dp[j] and s[j:i] in w:\n                dp[i] = True\n                break\n    return dp[n]\n",
+        "java": "import java.util.*;\nclass Solution {\n    boolean solve(String s, String[] words) {\n        Set<String> w = new HashSet<>(Arrays.asList(words));\n        int n = s.length(); boolean[] dp = new boolean[n + 1]; dp[0] = true;\n        for (int i = 1; i <= n; i++)\n            for (int j = 0; j < i; j++)\n                if (dp[j] && w.contains(s.substring(j, i))) { dp[i] = true; break; }\n        return dp[n];\n    }\n}\n",
+    },
+    "count-primes": {
+        "python": "def solve(n):\n    if n < 3: return 0\n    sieve = [True] * n\n    sieve[0] = sieve[1] = False\n    i = 2\n    while i * i < n:\n        if sieve[i]:\n            for j in range(i * i, n, i): sieve[j] = False\n        i += 1\n    return sum(sieve)\n",
+        "java": "class Solution {\n    int solve(int n) {\n        if (n < 3) return 0;\n        boolean[] c = new boolean[n];\n        int cnt = 0;\n        for (int i = 2; i < n; i++) {\n            if (!c[i]) { cnt++; for (long j = (long)i * i; j < n; j += i) c[(int)j] = true; }\n        }\n        return cnt;\n    }\n}\n",
+    },
+    "daily-temperatures": {
+        "python": "def solve(temps):\n    res = [0] * len(temps)\n    st = []\n    for i, x in enumerate(temps):\n        while st and temps[st[-1]] < x:\n            j = st.pop(); res[j] = i - j\n        st.append(i)\n    return res\n",
+        "java": "import java.util.*;\nclass Solution {\n    int[] solve(int[] temps) {\n        int[] res = new int[temps.length];\n        Deque<Integer> st = new ArrayDeque<>();\n        for (int i = 0; i < temps.length; i++) {\n            while (!st.isEmpty() && temps[st.peek()] < temps[i]) { int j = st.pop(); res[j] = i - j; }\n            st.push(i);\n        }\n        return res;\n    }\n}\n",
+    },
+    "coin-change": {
+        "python": "def solve(coins, amount):\n    INF = float('inf')\n    dp = [0] + [INF] * amount\n    for a in range(1, amount + 1):\n        for c in coins:\n            if c <= a: dp[a] = min(dp[a], dp[a - c] + 1)\n    return dp[amount] if dp[amount] != INF else -1\n",
+        "java": "import java.util.*;\nclass Solution {\n    int solve(int[] coins, int amount) {\n        int[] dp = new int[amount + 1];\n        Arrays.fill(dp, amount + 1); dp[0] = 0;\n        for (int a = 1; a <= amount; a++)\n            for (int c : coins) if (c <= a) dp[a] = Math.min(dp[a], dp[a - c] + 1);\n        return dp[amount] > amount ? -1 : dp[amount];\n    }\n}\n",
+    },
+    "two-sum-sorted": {
+        "python": "def solve(nums, target):\n    l, r = 0, len(nums) - 1\n    while l < r:\n        s = nums[l] + nums[r]\n        if s == target: return [l + 1, r + 1]\n        if s < target: l += 1\n        else: r -= 1\n    return [-1]\n",
+        "java": "class Solution {\n    int[] solve(int[] nums, int target) {\n        int l = 0, r = nums.length - 1;\n        while (l < r) {\n            int s = nums[l] + nums[r];\n            if (s == target) return new int[]{l + 1, r + 1};\n            if (s < target) l++; else r--;\n        }\n        return new int[]{-1};\n    }\n}\n",
+    },
+    "digital-root": {
+        "python": "def solve(n):\n    n = abs(n)\n    while n >= 10:\n        n = sum(int(c) for c in str(n))\n    return n\n",
+        "java": "class Solution {\n    int solve(int n) {\n        n = Math.abs(n);\n        while (n >= 10) { int s = 0; while (n > 0) { s += n % 10; n /= 10; } n = s; }\n        return n;\n    }\n}\n",
+    },
+    "seconds-to-clock": {
+        "python": "def solve(s):\n    return f\"{s // 3600}:{(s % 3600) // 60:02d}:{s % 60:02d}\"\n",
+        "java": "class Solution {\n    String solve(int s) {\n        return (s / 3600) + \":\" + String.format(\"%02d\", (s % 3600) / 60) + \":\" + String.format(\"%02d\", s % 60);\n    }\n}\n",
+    },
+    # -- special-judge problem: a valid pair (may differ from the sample) --
+    "two-sum-any": {
+        "python": "def solve(nums, target):\n    seen = {}\n    for i in range(len(nums)):\n        for j in range(i + 1, len(nums)):\n            if nums[i] + nums[j] == target:\n                return [i + 1, j + 1]\n    return [-1, -1]\n",
+        "java": "class Solution {\n    int[] solve(int[] nums, int target) {\n        for (int i = 0; i < nums.length; i++)\n            for (int j = i + 1; j < nums.length; j++)\n                if (nums[i] + nums[j] == target) return new int[]{i + 1, j + 1};\n        return new int[]{-1, -1};\n    }\n}\n",
+    },
+    # -- raw stdin/stdout problems: full programs --
+    "array-sum": {
+        "python": "import sys\nd = sys.stdin.read().split()\nn = int(d[0])\nprint(sum(map(int, d[1:1 + n])))\n",
+        "java": "import java.util.*;\npublic class Main {\n    public static void main(String[] a) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt(); long s = 0;\n        for (int i = 0; i < n; i++) s += sc.nextLong();\n        System.out.println(s);\n    }\n}\n",
+    },
+    "minesweeper-counts": {
+        "python": "import sys\nL = sys.stdin.read().split('\\n')\nH, W = map(int, L[0].split())\ng = [L[1 + i] for i in range(H)]\nout = []\nfor i in range(H):\n    row = []\n    for j in range(W):\n        if g[i][j] == '*':\n            row.append('*')\n        else:\n            c = 0\n            for di in (-1, 0, 1):\n                for dj in (-1, 0, 1):\n                    if di == 0 and dj == 0: continue\n                    ni, nj = i + di, j + dj\n                    if 0 <= ni < H and 0 <= nj < W and g[ni][nj] == '*': c += 1\n            row.append(str(c))\n    out.append(''.join(row))\nprint('\\n'.join(out))\n",
+        "java": "import java.util.*;\nimport java.io.*;\npublic class Main {\n    public static void main(String[] args) throws IOException {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        StringTokenizer st = new StringTokenizer(br.readLine());\n        int H = Integer.parseInt(st.nextToken()), W = Integer.parseInt(st.nextToken());\n        char[][] g = new char[H][];\n        for (int i = 0; i < H; i++) g[i] = br.readLine().toCharArray();\n        StringBuilder sb = new StringBuilder();\n        for (int i = 0; i < H; i++) {\n            for (int j = 0; j < W; j++) {\n                if (g[i][j] == '*') { sb.append('*'); continue; }\n                int c = 0;\n                for (int di = -1; di <= 1; di++) for (int dj = -1; dj <= 1; dj++) {\n                    if (di == 0 && dj == 0) continue;\n                    int ni = i + di, nj = j + dj;\n                    if (ni >= 0 && ni < H && nj >= 0 && nj < W && g[ni][nj] == '*') c++;\n                }\n                sb.append((char)('0' + c));\n            }\n            sb.append('\\n');\n        }\n        System.out.print(sb);\n    }\n}\n",
+    },
+}
+
+REFS_OUT = os.path.join(HERE, "..", "src-tauri", "seeds", "reference_solutions.json")
+with open(REFS_OUT, "w", encoding="utf-8") as f:
+    json.dump(REFERENCE_SOLUTIONS, f, indent=2, ensure_ascii=False)
+print(f"Wrote {len(REFERENCE_SOLUTIONS)} reference solution sets to {os.path.relpath(REFS_OUT)}")

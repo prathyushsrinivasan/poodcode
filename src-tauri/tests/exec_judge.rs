@@ -147,6 +147,7 @@ fn python_function_harness_accepts_correct_solution() {
         mode: "exact".into(),
         tolerance: 0.0,
         function_spec: Some(spec),
+        checker: None,
         timeout: T,
     };
     let cases = vec![tc("2 7 11 15\n9\n", "1 2"), tc("3 2 4\n6\n", "2 3")];
@@ -165,7 +166,7 @@ fn java_function_harness_accepts_correct_solution() {
         params: vec![Param { name: "nums".into(), ty: "int[]".into() }],
         returns: "int".into(),
     };
-    let cfg = JudgeConfig { mode: "exact".into(), tolerance: 0.0, function_spec: Some(spec), timeout: T };
+    let cfg = JudgeConfig { mode: "exact".into(), tolerance: 0.0, function_spec: Some(spec), checker: None, timeout: T };
     let cases = vec![tc("-2 1 -3 4 -1 2 1 -5 4\n", "6"), tc("1\n", "1")];
     let rep = judge_with("java", code, &cases, &cfg);
     if rep.status == "not_installed" {
@@ -183,7 +184,7 @@ fn java_harness_handles_array_return() {
         params: vec![Param { name: "nums".into(), ty: "int[]".into() }],
         returns: "int[]".into(),
     };
-    let cfg = JudgeConfig { mode: "exact".into(), tolerance: 0.0, function_spec: Some(spec), timeout: T };
+    let cfg = JudgeConfig { mode: "exact".into(), tolerance: 0.0, function_spec: Some(spec), checker: None, timeout: T };
     let cases = vec![tc("1 2 3 4\n", "1 3 6 10"), tc("5\n", "5")];
     let rep = judge_with("java", code, &cases, &cfg);
     if rep.status == "not_installed" {
@@ -195,7 +196,7 @@ fn java_harness_handles_array_return() {
 #[test]
 fn float_compare_mode_tolerates_small_error() {
     let code = "print(3.14159)\n";
-    let cfg = JudgeConfig { mode: "float".into(), tolerance: 1e-2, function_spec: None, timeout: T };
+    let cfg = JudgeConfig { mode: "float".into(), tolerance: 1e-2, function_spec: None, checker: None, timeout: T };
     let cases = vec![tc("", "3.14")];
     let rep = judge_with("python", code, &cases, &cfg);
     if rep.status == "not_installed" {
@@ -207,13 +208,50 @@ fn float_compare_mode_tolerates_small_error() {
 #[test]
 fn unordered_compare_mode_ignores_order() {
     let code = "print('3 1 2')\n";
-    let cfg = JudgeConfig { mode: "unordered".into(), tolerance: 0.0, function_spec: None, timeout: T };
+    let cfg = JudgeConfig { mode: "unordered".into(), tolerance: 0.0, function_spec: None, checker: None, timeout: T };
     let cases = vec![tc("", "1 2 3")];
     let rep = judge_with("python", code, &cases, &cfg);
     if rep.status == "not_installed" {
         return;
     }
     assert_eq!(rep.status, "accepted", "report: {rep:?}");
+}
+
+#[test]
+fn checker_mode_accepts_any_valid_answer() {
+    // Two-sum "any pair": a checker validates the output instead of exact match.
+    let checker = "def check(inp, out):\n    lines = inp.strip().split('\\n')\n    nums = list(map(int, lines[0].split()))\n    target = int(lines[1])\n    i, j = map(int, out.split())\n    n = len(nums)\n    return 1 <= i <= n and 1 <= j <= n and i != j and nums[i-1] + nums[j-1] == target\n";
+    let spec = FunctionSpec {
+        name: "solve".into(),
+        params: vec![
+            Param { name: "nums".into(), ty: "int[]".into() },
+            Param { name: "target".into(), ty: "int".into() },
+        ],
+        returns: "int[]".into(),
+    };
+    // A solution returning indices in the OPPOSITE order still passes the checker.
+    let code = "def solve(nums, target):\n    for i in range(len(nums)):\n        for j in range(i+1, len(nums)):\n            if nums[i]+nums[j]==target:\n                return [j+1, i+1]\n    return [-1,-1]\n";
+    let cfg = JudgeConfig {
+        mode: "checker".into(),
+        tolerance: 0.0,
+        function_spec: Some(spec.clone()),
+        checker: Some(checker.to_string()),
+        timeout: T,
+    };
+    let cases = vec![tc("2 7 11 15\n9\n", ""), tc("1 2 3 4 5\n6\n", "")];
+    let rep = judge_with("python", code, &cases, &cfg);
+    if rep.status == "not_installed" {
+        return;
+    }
+    assert_eq!(rep.status, "accepted", "valid pair should pass checker: {rep:?}");
+
+    // A wrong pair must be rejected.
+    let bad = "def solve(nums, target):\n    return [1, 2]\n";
+    let cfg2 = JudgeConfig { mode: "checker".into(), tolerance: 0.0, function_spec: Some(spec), checker: Some(checker.to_string()), timeout: T };
+    let rep2 = judge_with("python", bad, &[tc("1 2 3 4 5\n100\n", "")], &cfg2);
+    if rep2.status != "not_installed" {
+        assert_ne!(rep2.status, "accepted", "invalid pair must fail checker");
+    }
 }
 
 #[test]

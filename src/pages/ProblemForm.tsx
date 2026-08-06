@@ -28,6 +28,7 @@ function emptyProblem(): Problem {
     function_spec: null,
     judge_mode: "exact",
     float_tolerance: 0,
+    checker: "",
     time_limit_ms: 0,
     editorials: [],
     follow_ups: [],

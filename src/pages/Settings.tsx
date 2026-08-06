@@ -120,6 +120,19 @@ export default function Settings() {
       </div>
 
       <div className="card" style={{ marginBottom: 16 }}>
+        <h3 style={{ marginTop: 0 }}>Getting started</h3>
+        <Field label="Welcome tour">
+          <button
+            onClick={() => {
+              api.setSetting("onboarded", "0").then(() => window.location.reload());
+            }}
+          >
+            ↻ Show again
+          </button>
+        </Field>
+      </div>
+
+      <div className="card" style={{ marginBottom: 16 }}>
         <h3 style={{ marginTop: 0 }}>Backup &amp; restore</h3>
         <p className="dim" style={{ marginTop: 0 }}>
           A backup is a single-file snapshot of your entire database — problems, notes, attempts,

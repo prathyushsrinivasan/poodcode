@@ -237,6 +237,7 @@ fn judge_config_for(conn: &Connection, problem_id: Option<i64>) -> judge::JudgeC
                 mode: p.judge_mode,
                 tolerance: p.float_tolerance,
                 function_spec: p.function_spec,
+                checker: if p.checker.is_empty() { None } else { Some(p.checker) },
                 timeout,
             };
         }

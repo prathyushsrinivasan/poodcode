@@ -323,7 +323,7 @@ fn peak_memory_kb(child: &std::process::Child) -> Option<i64> {
     unsafe {
         let mut c: ProcessMemoryCounters = std::mem::zeroed();
         c.cb = std::mem::size_of::<ProcessMemoryCounters>() as u32;
-        if K32GetProcessMemoryInfo(handle as *mut std::ffi::c_void, &mut c, c.cb) != 0 {
+        if K32GetProcessMemoryInfo(handle, &mut c, c.cb) != 0 {
             Some((c.PeakWorkingSetSize / 1024) as i64)
         } else {
             None

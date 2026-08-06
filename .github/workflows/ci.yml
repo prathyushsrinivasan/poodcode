@@ -1,0 +1,77 @@
+name: CI
+
+# Continuous verification of the problem bank and the app. The seed-verification
+# tests run correct reference solutions through the real judge, so a broken
+# harness/serialization or an incomplete problem fails the build.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  frontend:
+    name: Frontend (typecheck + tests + build)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: Typecheck
+        run: npx tsc -b --noEmit
+      - name: Unit tests
+        run: npm run test
+      - name: Build
+        run: npm run build
+
+  seeds:
+    name: Seeds match the generator
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Regenerate seeds and check they are committed
+        run: |
+          python tools/gen_seed.py
+          git diff --exit-code src-tauri/seeds/ \
+            || (echo "::error::seeds are stale — run 'python tools/gen_seed.py' and commit" && exit 1)
+
+  backend:
+    name: Backend (tests + verification + clippy)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+      # Toolchains the judge/verification tests execute against.
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      # Tauri's Linux build/link deps (needed for the crate to compile).
+      - name: Install system deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libgtk-3-dev librsvg2-dev libayatana-appindicator3-dev
+      - name: Clippy
+        working-directory: src-tauri
+        run: cargo clippy --all-targets -- -D warnings
+      - name: Tests (incl. seed verification: correct solutions must be Accepted)
+        working-directory: src-tauri
+        run: cargo test --all-targets

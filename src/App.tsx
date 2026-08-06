@@ -4,6 +4,7 @@ import { useStore } from "./store";
 import { api } from "./api";
 import { ToastProvider } from "./components/Toast";
 import { CommandPalette } from "./components/CommandPalette";
+import { Welcome } from "./components/Welcome";
 
 import Dashboard from "./pages/Dashboard";
 import Library from "./pages/Library";
@@ -87,10 +88,26 @@ export default function App() {
   const init = useStore((s) => s.init);
   const loaded = useStore((s) => s.loaded);
   const [reviewsDue, setReviewsDue] = useState(0);
+  const [showWelcome, setShowWelcome] = useState(false);
 
   useEffect(() => {
     init();
   }, [init]);
+
+  // First-run onboarding: show the welcome unless it's been dismissed before.
+  useEffect(() => {
+    api
+      .getSettings()
+      .then((s) => {
+        if (s.onboarded !== "1") setShowWelcome(true);
+      })
+      .catch(() => {});
+  }, []);
+
+  const dismissWelcome = () => {
+    setShowWelcome(false);
+    api.setSetting("onboarded", "1").catch(() => {});
+  };
 
   const refreshBadge = () => {
     api.dueReviews().then((r) => setReviewsDue(r.length)).catch(() => {});
@@ -135,6 +152,7 @@ export default function App() {
         </main>
       </div>
       <CommandPalette />
+      {showWelcome && <Welcome onClose={dismissWelcome} />}
     </ToastProvider>
   );
 }

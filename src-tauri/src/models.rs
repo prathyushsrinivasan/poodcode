@@ -66,6 +66,9 @@ pub struct Problem {
     pub judge_mode: String, // "exact" | "float" | "unordered"
     #[serde(default)]
     pub float_tolerance: f64,
+    /// Special-judge checker (Python `def check(input, output) -> bool`); empty = exact/mode.
+    #[serde(default)]
+    pub checker: String,
     #[serde(default)]
     pub time_limit_ms: i64, // 0 = global default
     #[serde(default)]

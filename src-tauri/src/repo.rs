@@ -86,7 +86,7 @@ fn hydrate_problem(conn: &Connection, id: i64, include_heavy: bool) -> AppResult
                     hints_json, is_favorite, solved_status, confidence, last_solved_at,
                     time_taken_seconds, attempts_count, success_count, created_at, updated_at,
                     prerequisites_json, function_spec_json, judge_mode, float_tolerance,
-                    time_limit_ms, editorials_json, follow_ups_json, sort_order
+                    time_limit_ms, editorials_json, follow_ups_json, sort_order, checker_code
              FROM problems WHERE id = ?1",
             params![id],
             |r| {
@@ -139,6 +139,7 @@ fn hydrate_problem(conn: &Connection, id: i64, include_heavy: bool) -> AppResult
                         Vec::new()
                     },
                     order: r.get(29)?,
+                    checker: r.get(30)?,
                     patterns: Vec::new(),
                     topics: Vec::new(),
                     subtopics: Vec::new(),
@@ -215,14 +216,14 @@ pub fn upsert_problem(conn: &Connection, p: &Problem) -> AppResult<i64> {
                 optimal_explanation=?10, starter_json=?11, hints_json=?12, updated_at=?13,
                 prerequisites_json=?14, function_spec_json=?15, judge_mode=?16,
                 float_tolerance=?17, time_limit_ms=?18, editorials_json=?19, follow_ups_json=?20,
-                sort_order=?21
+                sort_order=?21, checker_code=?22
              WHERE id=?1",
             params![
                 id, p.title, p.difficulty, p.description, p.constraints, examples_json,
                 p.editorial, p.optimal_time, p.optimal_space, p.optimal_explanation,
                 starter_json, hints_json, now_iso(), prerequisites_json, function_spec_json,
                 p.judge_mode, p.float_tolerance, p.time_limit_ms, editorials_json, follow_ups_json,
-                p.order
+                p.order, p.checker
             ],
         )?;
         id
@@ -231,13 +232,13 @@ pub fn upsert_problem(conn: &Connection, p: &Problem) -> AppResult<i64> {
             "INSERT INTO problems(slug, title, difficulty, description, constraints,
                 examples_json, editorial, optimal_time, optimal_space, optimal_explanation,
                 starter_json, hints_json, prerequisites_json, function_spec_json, judge_mode,
-                float_tolerance, time_limit_ms, editorials_json, follow_ups_json, sort_order)
-             VALUES(?1,?2,?3,?4,?5,?6,?7,?8,?9,?10,?11,?12,?13,?14,?15,?16,?17,?18,?19,?20)",
+                float_tolerance, time_limit_ms, editorials_json, follow_ups_json, sort_order, checker_code)
+             VALUES(?1,?2,?3,?4,?5,?6,?7,?8,?9,?10,?11,?12,?13,?14,?15,?16,?17,?18,?19,?20,?21)",
             params![
                 p.slug, p.title, p.difficulty, p.description, p.constraints, examples_json,
                 p.editorial, p.optimal_time, p.optimal_space, p.optimal_explanation,
                 starter_json, hints_json, prerequisites_json, function_spec_json, p.judge_mode,
-                p.float_tolerance, p.time_limit_ms, editorials_json, follow_ups_json, p.order
+                p.float_tolerance, p.time_limit_ms, editorials_json, follow_ups_json, p.order, p.checker
             ],
         )?;
         conn.last_insert_rowid()

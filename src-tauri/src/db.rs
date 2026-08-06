@@ -31,8 +31,9 @@ CREATE TABLE IF NOT EXISTS problems (
   prerequisites_json  TEXT NOT NULL DEFAULT '[]',
   -- Richer judging + curriculum metadata (all optional / back-compatible).
   function_spec_json  TEXT NOT NULL DEFAULT '',    -- function-harness signature, empty = raw stdin mode
-  judge_mode          TEXT NOT NULL DEFAULT 'exact', -- 'exact' | 'float' | 'unordered'
+  judge_mode          TEXT NOT NULL DEFAULT 'exact', -- 'exact' | 'float' | 'unordered' | 'checker'
   float_tolerance     REAL NOT NULL DEFAULT 0,
+  checker_code        TEXT NOT NULL DEFAULT '',     -- special-judge script (mode='checker')
   time_limit_ms       INTEGER NOT NULL DEFAULT 0,   -- 0 = use the global default
   editorials_json     TEXT NOT NULL DEFAULT '[]',   -- multiple approaches (brute→optimal)
   follow_ups_json     TEXT NOT NULL DEFAULT '[]',   -- linked variant problems
@@ -266,6 +267,7 @@ fn migrate(conn: &Connection) -> AppResult<()> {
     add_col("problems", "editorials_json", "TEXT NOT NULL DEFAULT '[]'")?;
     add_col("problems", "follow_ups_json", "TEXT NOT NULL DEFAULT '[]'")?;
     add_col("problems", "sort_order", "INTEGER NOT NULL DEFAULT 0")?;
+    add_col("problems", "checker_code", "TEXT NOT NULL DEFAULT ''")?;
     // New review columns (SM-2 adaptive scheduling).
     add_col("reviews", "ease", "REAL NOT NULL DEFAULT 2.5")?;
     add_col("reviews", "reps", "INTEGER NOT NULL DEFAULT 0")?;
