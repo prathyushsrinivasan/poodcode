@@ -2663,6 +2663,11 @@ PATTERN_FROM = {
     "Hash Set": "Hashing",
     "1D DP": "Dynamic Programming",
     "Subset Sum": "Dynamic Programming",
+    "Simulation": "Simulation",
+    "Grid": "Grid / Matrix",
+    "Matrix": "Grid / Matrix",
+    "Neighbors": "Grid / Matrix",
+    "State Machine": "Simulation",
 }
 
 
@@ -4108,6 +4113,510 @@ PREREQS.update({
     "longest-valid-parentheses": [("stack", "Indices of unmatched positions bound valid runs."), ("dp", "Or a DP over ends of valid substrings.")],
     "min-window-length": [("sliding_window", "Grow to cover t, then shrink to minimise."), ("hashing", "Track required character counts."), ("two_pointers", "Left and right edges define the window.")],
 })
+
+
+# ---------------------------------------------------------------------------
+# Grid / simulation problems (2-D stdin/stdout) — implementation-heavy and
+# beginner-friendly. NOT harness problems (the harness is 1-D): each reads a
+# board from stdin and prints a board or a short answer. Reference solutions
+# compute the expected outputs.
+# ---------------------------------------------------------------------------
+
+def sol_color_bomb(inp):
+    L = inp.rstrip("\n").split("\n")
+    H, W = map(int, L[0].split())
+    g = [L[1 + i] for i in range(H)]
+    painted = [[False] * W for _ in range(H)]
+    for bi in range(H):
+        for bj in range(W):
+            if g[bi][bj].isdigit():
+                D = int(g[bi][bj])
+                for i in range(H):
+                    for j in range(W):
+                        if abs(i - bi) + abs(j - bj) <= D:
+                            painted[i][j] = True
+    return "\n".join("".join("#" if painted[i][j] else "." for j in range(W)) for i in range(H))
+
+
+def sol_territory(inp):
+    L = inp.rstrip("\n").split("\n")
+    Q = int(L[1])
+    state = {}  # (x,y) -> 1 A, 2 B, 3 lockedA, 4 lockedB; absent = neutral
+    for t in range(Q):
+        p, xs, ys = L[2 + t].split()
+        k = (int(xs), int(ys))
+        s = state.get(k, 0)
+        if s in (3, 4):
+            continue
+        if p == "A":
+            state[k] = {0: 1, 2: 0, 1: 3}[s]
+        else:
+            state[k] = {0: 2, 1: 0, 2: 4}[s]
+    a = sum(1 for v in state.values() if v in (1, 3))
+    b = sum(1 for v in state.values() if v in (2, 4))
+    return "A" if a > b else "B" if b > a else "Draw"
+
+
+def sol_minesweeper(inp):
+    L = inp.rstrip("\n").split("\n")
+    H, W = map(int, L[0].split())
+    g = [L[1 + i] for i in range(H)]
+    res = []
+    for i in range(H):
+        row = []
+        for j in range(W):
+            if g[i][j] == "*":
+                row.append("*")
+            else:
+                c = 0
+                for di in (-1, 0, 1):
+                    for dj in (-1, 0, 1):
+                        if di == 0 and dj == 0:
+                            continue
+                        ni, nj = i + di, j + dj
+                        if 0 <= ni < H and 0 <= nj < W and g[ni][nj] == "*":
+                            c += 1
+                row.append(str(c))
+        res.append("".join(row))
+    return "\n".join(res)
+
+
+def sol_life(inp):
+    L = inp.rstrip("\n").split("\n")
+    H, W = map(int, L[0].split())
+    g = [L[1 + i] for i in range(H)]
+
+    def alive(i, j):
+        return 0 <= i < H and 0 <= j < W and g[i][j] == "#"
+
+    res = []
+    for i in range(H):
+        row = []
+        for j in range(W):
+            n = sum(alive(i + di, j + dj) for di in (-1, 0, 1) for dj in (-1, 0, 1) if not (di == 0 and dj == 0))
+            if g[i][j] == "#":
+                row.append("#" if n in (2, 3) else ".")
+            else:
+                row.append("#" if n == 3 else ".")
+        res.append("".join(row))
+    return "\n".join(res)
+
+
+def sol_robot(inp):
+    L = inp.rstrip("\n").split("\n")
+    H, W = map(int, L[0].split())
+    r, c = map(int, L[1].split())
+    cmds = L[2] if len(L) > 2 else ""
+    r -= 1
+    c -= 1
+    vis = [[False] * W for _ in range(H)]
+    vis[r][c] = True
+    delta = {"U": (-1, 0), "D": (1, 0), "L": (0, -1), "R": (0, 1)}
+    for ch in cmds.strip():
+        dr, dc = delta.get(ch, (0, 0))
+        nr, nc = r + dr, c + dc
+        if 0 <= nr < H and 0 <= nc < W:
+            r, c = nr, nc
+            vis[r][c] = True
+    return "\n".join("".join("#" if vis[i][j] else "." for j in range(W)) for i in range(H))
+
+
+def sol_set_zeroes(inp):
+    L = inp.rstrip("\n").split("\n")
+    H, W = map(int, L[0].split())
+    g = [list(L[1 + i]) for i in range(H)]
+    rows, cols = set(), set()
+    for i in range(H):
+        for j in range(W):
+            if g[i][j] == "0":
+                rows.add(i)
+                cols.add(j)
+    for i in range(H):
+        for j in range(W):
+            if i in rows or j in cols:
+                g[i][j] = "0"
+    return "\n".join("".join(r) for r in g)
+
+
+def sol_rotate(inp):
+    L = inp.rstrip("\n").split("\n")
+    H, W = map(int, L[0].split())
+    g = [L[1 + i] for i in range(H)]
+    return "\n".join("".join(g[H - 1 - i][j] for i in range(H)) for j in range(W))
+
+
+def sol_spiral(inp):
+    L = inp.rstrip("\n").split("\n")
+    H, W = map(int, L[0].split())
+    g = [L[1 + i] for i in range(H)]
+    top, bottom, left, right = 0, H - 1, 0, W - 1
+    res = []
+    while top <= bottom and left <= right:
+        for j in range(left, right + 1):
+            res.append(g[top][j])
+        top += 1
+        for i in range(top, bottom + 1):
+            res.append(g[i][right])
+        right -= 1
+        if top <= bottom:
+            for j in range(right, left - 1, -1):
+                res.append(g[bottom][j])
+            bottom -= 1
+        if left <= right:
+            for i in range(bottom, top - 1, -1):
+                res.append(g[i][left])
+            left += 1
+    return "".join(res)
+
+
+# Shared starter helpers keep these readable.
+_PY_GRID = "import sys\n\ndef solve(H, W, grid):\n    # grid is a list of H strings. TODO: return a list of H output strings.\n    return grid\n\ndata = sys.stdin.read().split('\\n')\nH, W = map(int, data[0].split())\ngrid = [data[1 + i] for i in range(H)]\nfor line in solve(H, W, grid):\n    print(line)\n"
+_JS_GRID = "const data = require('fs').readFileSync(0, 'utf8').split('\\n');\nconst [H, W] = data[0].split(' ').map(Number);\nconst grid = [];\nfor (let i = 0; i < H; i++) grid.push(data[1 + i]);\n\nfunction solve(H, W, grid) {\n  // TODO: return an array of H output strings\n  return grid;\n}\n\nconsole.log(solve(H, W, grid).join('\\n'));\n"
+
+GRID_DEFS = [
+    dict(
+        slug="color-bomb-explosion", title="Color Bomb Explosion", difficulty="Easy",
+        topics=["Simulation", "Matrix"], subtopics=["Grid", "Neighbors"], companies=["AtCoder"],
+        description=(
+            "A board has `H` rows and `W` columns. Each cell is `.` (empty) or a digit `0`–`9`, a **Color Bomb** "
+            "whose explosion power equals that digit.\n\n"
+            "When a bomb of power `D` explodes it paints every cell within **Manhattan distance** `D` (including its own "
+            "cell) with `#`. Bombs explode independently and do not interfere. Initially nothing is painted.\n\n"
+            "The Manhattan distance between `(r1,c1)` and `(r2,c2)` is `|r1−r2| + |c1−c2|`.\n\n"
+            "### Input\n- Line 1: `H W`.\n- Next `H` lines: the board, each a string of length `W`.\n\n"
+            "### Output\nPrint `H` lines: `#` if a cell is painted by at least one bomb, otherwise `.`"
+        ),
+        constraints="1 ≤ H, W ≤ 70\nEach character is `.` or a digit 0–9.",
+        hints=[
+            "Handle each bomb independently — there's no interaction to track.",
+            "For a bomb at (bi,bj) with power D, scan every cell and paint it if |i−bi|+|j−bj| ≤ D.",
+            "Keep a separate H×W boolean 'painted' grid; a cell stays painted if ANY bomb reaches it.",
+            "With H,W ≤ 70 even checking every cell for every bomb (~24M ops) is fast enough.",
+        ],
+        opt=("O((H·W)^2)", "O(H·W)", "For each bomb, sweep the whole board and mark cells within its Manhattan radius; the small bound makes the brute force comfortably fast."),
+        editorial=(
+            "## Approach\nCollect nothing fancy — just simulate. Keep a `painted[H][W]` boolean grid, initially all false. "
+            "For every cell that holds a digit `D`, loop over the whole board and set `painted[i][j] = true` wherever "
+            "`|i−bi| + |j−bj| ≤ D`. A cell can be reached by several bombs; once painted it stays painted. Finally print "
+            "`#`/`.` from the boolean grid. Because H,W ≤ 70, the O((H·W)²) double sweep is only a few million operations."
+        ),
+        ref=sol_color_bomb,
+        starter_py=_PY_GRID, starter_js=_JS_GRID,
+        cases=[
+            ("example", "Example 1", "5 5\n0..0.\n.2..0\n.....\n....1\n.0...\n"),
+            ("example", "Example 2", "7 7\n...0...\n.......\n...1...\n..131..\n...1...\n.......\n...0...\n"),
+            ("hidden", "Single power-0 bomb", "1 1\n0\n"),
+            ("hidden", "No bombs", "2 3\n...\n...\n"),
+            ("hidden", "Corner reach", "3 3\n2..\n...\n...\n"),
+        ],
+        example_expl=[
+            "Six bombs paint the shown cells; the power-2 bomb at (1,1) covers a diamond of radius 2.",
+            "The central chain of bombs paints a large diamond.",
+        ],
+    ),
+    dict(
+        slug="territory-capture", title="Territory Capture Game", difficulty="Easy",
+        topics=["Simulation"], subtopics=["State Machine", "Grid"], companies=["AtCoder"],
+        description=(
+            "Players **A** and **B** play on an `N × M` grid; every cell starts **neutral**. Over `Q` turns a player tries "
+            "to capture a cell:\n\n"
+            "- **Neutral cell** → becomes that player's territory.\n"
+            "- **Opponent's cell** → becomes neutral.\n"
+            "- **Your own cell** → becomes **locked** (permanently yours).\n"
+            "- **Locked cell** → never changes again, whoever tries.\n\n"
+            "After all turns, output who owns more cells.\n\n"
+            "### Input\n- Line 1: `N M`.\n- Line 2: `Q`.\n- Next `Q` lines: `P x y` — player (`A`/`B`), row `x` (1-indexed), column `y` (1-indexed).\n\n"
+            "### Output\n`A` if A owns more cells, `B` if B owns more, otherwise `Draw`."
+        ),
+        constraints="1 ≤ N, M ≤ 100\n1 ≤ Q ≤ 100\n1 ≤ x ≤ N, 1 ≤ y ≤ M",
+        hints=[
+            "Give each cell a state code: neutral, owned-by-A, owned-by-B, locked-A, locked-B.",
+            "Process turns in order; a locked cell ignores every later move.",
+            "Translate each rule into a precise transition based on (current state, acting player).",
+            "At the end, count owned + locked cells for each player and compare.",
+        ],
+        opt=("O(Q + N·M)", "O(N·M)", "Each turn is O(1) state update; a final O(N·M) pass counts ownership."),
+        editorial=(
+            "## Approach\nPure simulation. Store each cell's state as a small integer: 0 neutral, 1 A, 2 B, 3 locked-A, "
+            "4 locked-B. For each move, if the cell is locked do nothing; otherwise apply the rule for the acting player "
+            "(neutral→owned, opponent→neutral, own→locked). After the turns, count states {1,3} for A and {2,4} for B and "
+            "print A / B / Draw. Nothing here needs cleverness — the skill is turning the rules into exact transitions and "
+            "respecting 1-indexed input."
+        ),
+        ref=sol_territory,
+        starter_py="import sys\n\ndef solve(N, M, moves):\n    # moves is a list of (player, x, y). TODO: return 'A', 'B', or 'Draw'.\n    return 'Draw'\n\ndata = sys.stdin.read().split('\\n')\nN, M = map(int, data[0].split())\nQ = int(data[1])\nmoves = []\nfor i in range(Q):\n    p, x, y = data[2 + i].split()\n    moves.append((p, int(x), int(y)))\nprint(solve(N, M, moves))\n",
+        starter_js="const data = require('fs').readFileSync(0, 'utf8').split('\\n');\nconst [N, M] = data[0].split(' ').map(Number);\nconst Q = Number(data[1]);\nconst moves = [];\nfor (let i = 0; i < Q; i++) {\n  const [p, x, y] = data[2 + i].split(' ');\n  moves.push([p, Number(x), Number(y)]);\n}\nfunction solve(N, M, moves) {\n  // TODO: return 'A', 'B', or 'Draw'\n  return 'Draw';\n}\nconsole.log(solve(N, M, moves));\n",
+        cases=[
+            ("example", "Example 1", "2 2\n4\nA 1 2\nA 1 1\nB 1 1\nB 1 2\n"),
+            ("example", "Example 2", "3 3\n10\nA 3 2\nB 3 1\nA 3 3\nB 2 2\nB 2 2\nA 2 1\nB 1 2\nA 3 3\nA 3 1\nA 1 2\n"),
+            ("hidden", "Lock then attack", "1 1\n3\nA 1 1\nA 1 1\nB 1 1\n"),
+            ("hidden", "Single A capture", "2 2\n1\nA 1 1\n"),
+        ],
+        example_expl=[
+            "A takes two cells, then B neutralises both → 0 vs 0 → Draw.",
+            "A ends up owning more cells after the sequence of captures and locks.",
+        ],
+    ),
+    dict(
+        slug="minesweeper-counts", title="Minesweeper Counts", difficulty="Easy",
+        topics=["Simulation", "Matrix"], subtopics=["Grid", "Neighbors"], companies=["Bloomberg"],
+        description=(
+            "You're given a Minesweeper board with `*` for mines and `.` for empty cells. Produce the revealed board: "
+            "keep each mine as `*`, and replace each empty cell with the number of mines among its **8 neighbours** "
+            "(horizontal, vertical, and diagonal).\n\n"
+            "### Input\n- Line 1: `H W`.\n- Next `H` lines: the board of `*` and `.`\n\n"
+            "### Output\nThe revealed board: `*` stays, empty cells become a digit `0`–`8`."
+        ),
+        constraints="1 ≤ H, W ≤ 100",
+        hints=[
+            "Mines are printed unchanged.",
+            "For an empty cell, look at up to 8 neighbours using offset pairs.",
+            "Bounds-check every neighbour before reading it (0 ≤ ni < H and 0 ≤ nj < W).",
+            "Count the mines and print that single digit.",
+        ],
+        opt=("O(H·W)", "O(H·W)", "Each cell inspects a constant 8 neighbours."),
+        editorial=(
+            "## Approach\nFor every cell: if it's a mine, output `*`. Otherwise, iterate the 8 offsets `(di,dj)` with "
+            "`di,dj ∈ {-1,0,1}` excluding `(0,0)`, guard the indices against the border, and count neighbouring `*`. "
+            "Output that count. A tidy trick is to keep `int[] dr = {-1,-1,-1,0,0,1,1,1}` and `int[] dc = {-1,0,1,-1,1,-1,0,1}`."
+        ),
+        ref=sol_minesweeper,
+        starter_py=_PY_GRID, starter_js=_JS_GRID,
+        cases=[
+            ("example", "Example 1", "3 4\n*...\n..*.\n....\n"),
+            ("example", "Example 2", "2 2\n**\n**\n"),
+            ("hidden", "No mines", "2 3\n...\n...\n"),
+            ("hidden", "Single mine", "3 3\n...\n.*.\n...\n"),
+        ],
+        example_expl=[
+            "Each empty cell shows how many of its 8 neighbours are mines.",
+            "Every cell is a mine, so all stay `*`.",
+        ],
+    ),
+    dict(
+        slug="robot-grid-walk", title="Robot Grid Walk", difficulty="Easy",
+        topics=["Simulation"], subtopics=["Grid", "State Machine"], companies=["Amazon"],
+        description=(
+            "A robot stands on an `H × W` grid at a start cell and follows a string of moves: `U` (up), `D` (down), "
+            "`L` (left), `R` (right). A move that would leave the grid is **ignored** (the robot stays put). Mark every "
+            "cell the robot ever occupies — including the start — with `#`, and print the board.\n\n"
+            "### Input\n- Line 1: `H W`.\n- Line 2: `r c` — the 1-indexed start cell.\n- Line 3: the move string (may be empty).\n\n"
+            "### Output\nThe `H × W` board: `#` for visited cells, `.` otherwise."
+        ),
+        constraints="1 ≤ H, W ≤ 100\n0 ≤ |moves| ≤ 10^5",
+        hints=[
+            "Track the robot's current (row, col); mark it visited to start.",
+            "Map each command to a (dr, dc) delta.",
+            "Only apply a move if the destination is inside the grid.",
+            "Mark each newly-occupied cell visited.",
+        ],
+        opt=("O(H·W + |moves|)", "O(H·W)", "One pass over the moves plus printing the board."),
+        editorial=(
+            "## Approach\nConvert to 0-indexed, mark the start visited, and walk the command string. For each command look "
+            "up its delta, compute the next cell, and move only if it's in bounds — otherwise stay. Mark every cell you "
+            "land on. Print `#`/`.` from the visited grid. The one subtlety is that off-grid moves are skipped, not clamped "
+            "to the border in a way that still marks a new cell."
+        ),
+        ref=sol_robot,
+        starter_py="import sys\n\ndef solve(H, W, r, c, cmds):\n    # r,c are 1-indexed. TODO: return a list of H strings of '#'/'.'\n    return ['.' * W for _ in range(H)]\n\ndata = sys.stdin.read().split('\\n')\nH, W = map(int, data[0].split())\nr, c = map(int, data[1].split())\ncmds = data[2] if len(data) > 2 else ''\nfor line in solve(H, W, r, c, cmds):\n    print(line)\n",
+        starter_js="const data = require('fs').readFileSync(0, 'utf8').split('\\n');\nconst [H, W] = data[0].split(' ').map(Number);\nconst [r, c] = data[1].split(' ').map(Number);\nconst cmds = data[2] || '';\nfunction solve(H, W, r, c, cmds) {\n  // r,c are 1-indexed. TODO: return an array of H strings\n  return Array.from({length: H}, () => '.'.repeat(W));\n}\nconsole.log(solve(H, W, r, c, cmds).join('\\n'));\n",
+        cases=[
+            ("example", "Example 1", "3 3\n2 2\nUURRDD\n"),
+            ("example", "Example 2", "2 2\n1 1\nRRDD\n"),
+            ("hidden", "No moves", "2 2\n1 1\n\n"),
+            ("hidden", "Bounces off wall", "1 3\n1 1\nLLLRR\n"),
+        ],
+        example_expl=[
+            "The robot traces a path from the centre; off-grid steps are ignored.",
+            "From the corner it visits the right column then the bottom-right.",
+        ],
+    ),
+    dict(
+        slug="game-of-life-step", title="Game of Life (One Step)", difficulty="Medium",
+        topics=["Simulation", "Matrix"], subtopics=["Grid", "Neighbors"], companies=["Google", "Amazon"],
+        description=(
+            "Conway's Game of Life on an `H × W` board: `#` is a live cell, `.` is dead. Compute the **next** generation, "
+            "where all cells update simultaneously based on their 8 neighbours:\n\n"
+            "- A live cell with **2 or 3** live neighbours stays live; otherwise it dies.\n"
+            "- A dead cell with **exactly 3** live neighbours becomes live.\n\n"
+            "### Input\n- Line 1: `H W`.\n- Next `H` lines: the board of `#` and `.`\n\n"
+            "### Output\nThe board after one step."
+        ),
+        constraints="1 ≤ H, W ≤ 100",
+        hints=[
+            "Every cell updates from the CURRENT board — read from the old grid, write to a new one.",
+            "Count the 8 neighbours with bounds checks.",
+            "Live survives on a count of 2 or 3; dead is born on exactly 3.",
+            "Don't overwrite cells in place, or later counts will be wrong.",
+        ],
+        opt=("O(H·W)", "O(H·W)", "Constant neighbour work per cell; a fresh output grid avoids in-place corruption."),
+        editorial=(
+            "## Approach\nThe classic pitfall is updating in place: because all cells change at once, you must count live "
+            "neighbours on the *old* board and write results to a *new* board. For each cell, count live neighbours over the "
+            "8 offsets with bounds checks, then apply the rule: a live cell survives with 2–3 neighbours; a dead cell is born "
+            "with exactly 3. Print the new board."
+        ),
+        ref=sol_life,
+        starter_py=_PY_GRID, starter_js=_JS_GRID,
+        cases=[
+            ("example", "Blinker", "3 3\n...\n###\n...\n"),
+            ("example", "Block (still life)", "4 4\n....\n.##.\n.##.\n....\n"),
+            ("hidden", "All dead", "2 2\n..\n..\n"),
+            ("hidden", "Single live dies", "3 3\n...\n.#.\n...\n"),
+        ],
+        example_expl=[
+            "A horizontal blinker becomes a vertical one.",
+            "A 2×2 block is stable — it maps to itself.",
+        ],
+    ),
+    dict(
+        slug="set-matrix-zeroes", title="Set Matrix Zeroes", difficulty="Medium",
+        topics=["Matrix", "Simulation"], subtopics=["Grid"], companies=["Amazon", "Microsoft"],
+        description=(
+            "You're given an `H × W` grid of single digits (`0`–`9`). If a cell is `0`, set its **entire row and column** to "
+            "`0`. Print the resulting grid.\n\n"
+            "### Input\n- Line 1: `H W`.\n- Next `H` lines: rows of `W` digits.\n\n"
+            "### Output\nThe grid after zeroing every row and column that originally contained a `0`."
+        ),
+        constraints="1 ≤ H, W ≤ 100\nEach character is a digit 0–9.",
+        hints=[
+            "Decide which rows/columns to zero BEFORE changing anything.",
+            "First pass: record the rows and columns that contain a 0.",
+            "Second pass: zero any cell whose row or column was marked.",
+            "Zeroing as you go would spread zeros incorrectly.",
+        ],
+        opt=("O(H·W)", "O(H + W)", "Two passes with a set of zero rows and a set of zero columns."),
+        editorial=(
+            "## Approach\nThe trap is that zeroing immediately would cascade — a freshly-written 0 would trigger more rows and "
+            "columns. So first scan the original grid and record which rows and which columns contain a 0 (two sets). Then scan "
+            "again and set a cell to 0 if its row or column is marked. This runs in O(H·W) time and O(H+W) extra space."
+        ),
+        ref=sol_set_zeroes,
+        starter_py=_PY_GRID, starter_js=_JS_GRID,
+        cases=[
+            ("example", "Example 1", "3 3\n123\n405\n678\n"),
+            ("example", "No zeroes", "2 2\n12\n34\n"),
+            ("hidden", "Whole row", "2 3\n100\n456\n"),
+            ("hidden", "Single zero", "1 1\n0\n"),
+        ],
+        example_expl=[
+            "The 0 at (1,0) blanks its row and column.",
+            "No zeroes present, so the grid is unchanged.",
+        ],
+    ),
+    dict(
+        slug="rotate-matrix-90", title="Rotate Matrix 90°", difficulty="Medium",
+        topics=["Matrix", "Simulation"], subtopics=["Grid"], companies=["Amazon", "Adobe", "Apple"],
+        description=(
+            "Rotate an `H × W` grid of characters **90° clockwise** and print the result. The rotated board has `W` rows and "
+            "`H` columns.\n\n"
+            "### Input\n- Line 1: `H W`.\n- Next `H` lines: the grid (any visible characters, no spaces).\n\n"
+            "### Output\nThe rotated grid: `W` lines, each of length `H`."
+        ),
+        constraints="1 ≤ H, W ≤ 100",
+        hints=[
+            "After a clockwise rotation the first column (bottom-to-top) becomes the first row.",
+            "Output row `j` is old column `j` read from the bottom up.",
+            "Formula: newGrid[j][i] = oldGrid[H-1-i][j].",
+            "Remember the dimensions swap: output is W×H.",
+        ],
+        opt=("O(H·W)", "O(H·W)", "Emit each rotated cell once."),
+        editorial=(
+            "## Approach\nA 90° clockwise rotation maps old cell `(i, j)` to new cell `(j, H-1-i)`. Equivalently, build output "
+            "row `j` by reading old column `j` from the last row up to the first: `newRow_j = [old[H-1-i][j] for i in 0..H)`. "
+            "The output has `W` rows of length `H`."
+        ),
+        ref=sol_rotate,
+        starter_py=_PY_GRID, starter_js=_JS_GRID,
+        cases=[
+            ("example", "Example 1", "2 3\nabc\ndef\n"),
+            ("example", "Square", "3 3\n123\n456\n789\n"),
+            ("hidden", "Single row", "1 3\nxyz\n"),
+            ("hidden", "Single cell", "1 1\nA\n"),
+        ],
+        example_expl=[
+            "Columns become rows: first output row is 'da' (old column 0 bottom-up).",
+            "The 3×3 grid rotates a quarter turn clockwise.",
+        ],
+    ),
+    dict(
+        slug="spiral-order", title="Spiral Order", difficulty="Medium",
+        topics=["Matrix", "Simulation"], subtopics=["Grid"], companies=["Amazon", "Google", "Microsoft"],
+        description=(
+            "Read an `H × W` grid of characters in **spiral order** — clockwise starting at the top-left: across the top row, "
+            "down the right column, back along the bottom, up the left, then inward — and print all characters on one line.\n\n"
+            "### Input\n- Line 1: `H W`.\n- Next `H` lines: the grid (visible characters, no spaces).\n\n"
+            "### Output\nA single line: the characters in spiral order, concatenated."
+        ),
+        constraints="1 ≤ H, W ≤ 100",
+        hints=[
+            "Track four boundaries: top, bottom, left, right.",
+            "Walk right along the top, then down the right, then left along the bottom, then up the left.",
+            "Shrink the boundary after finishing each edge.",
+            "Guard against re-walking a row/column when the grid is a single line or column.",
+        ],
+        opt=("O(H·W)", "O(H·W)", "Peel one ring at a time, visiting each cell once."),
+        editorial=(
+            "## Approach\nKeep four shrinking boundaries `top, bottom, left, right`. Repeatedly: walk left→right along `top` "
+            "then `top++`; walk `top→bottom` down `right` then `right--`; if `top ≤ bottom`, walk right→left along `bottom` then "
+            "`bottom--`; if `left ≤ right`, walk `bottom→top` up `left` then `left++`. The two guards prevent double-visiting the "
+            "middle row/column of odd-shaped grids."
+        ),
+        ref=sol_spiral,
+        starter_py="import sys\n\ndef solve(H, W, grid):\n    # TODO: return the characters in spiral order as one string\n    return ''\n\ndata = sys.stdin.read().split('\\n')\nH, W = map(int, data[0].split())\ngrid = [data[1 + i] for i in range(H)]\nprint(solve(H, W, grid))\n",
+        starter_js="const data = require('fs').readFileSync(0, 'utf8').split('\\n');\nconst [H, W] = data[0].split(' ').map(Number);\nconst grid = [];\nfor (let i = 0; i < H; i++) grid.push(data[1 + i]);\nfunction solve(H, W, grid) {\n  // TODO: return the spiral-order characters as one string\n  return '';\n}\nconsole.log(solve(H, W, grid));\n",
+        cases=[
+            ("example", "Example 1", "3 3\n123\n456\n789\n"),
+            ("example", "Wide", "2 4\nabcd\nefgh\n"),
+            ("hidden", "Single row", "1 4\nwxyz\n"),
+            ("hidden", "Single column", "3 1\na\nb\nc\n"),
+        ],
+        example_expl=[
+            "1 2 3 6 9 8 7 4 5 spiralling inward.",
+            "a b c d h g f e around the ring.",
+        ],
+    ),
+]
+
+CONCEPTS.update({
+    "grid": {
+        "name": "Grid / Matrix Traversal",
+        "what": "Walking a 2-D board with nested loops, neighbour offsets, and bounds checks.",
+        "deep": "Most grid problems are two nested loops over rows and columns. Neighbours come from offset lists — 4-directional {(-1,0),(1,0),(0,-1),(0,1)} or 8-directional including diagonals — and every access must be bounds-checked (0<=r<H and 0<=c<W). Manhattan distance |r1-r2|+|c1-c2| counts 4-directional steps between two cells.",
+        "java": "char[][] or int[][]; loop for(i..H) for(j..W). Keep int[] dr={-1,1,0,0}, dc={0,0,-1,1} for the four neighbours (or all 8) and guard indices before reading.",
+    },
+    "simulation": {
+        "name": "Simulation",
+        "what": "Directly modelling a process step by step, exactly as the statement describes, instead of finding a formula.",
+        "deep": "When constraints are small, the intended solution is often to just do what the problem says: hold the state, apply each event or rule in order, and read the answer at the end. The skill is translating rules into precise state transitions and handling edge cases and 1- vs 0-indexing carefully.",
+        "java": "Model state in an array or a small int/enum code; process events in a loop, updating state per the rules. Watch off-by-one and 1-indexed input.",
+    },
+})
+CATEGORY.update({"grid": "Arrays", "simulation": "Foundations"})
+
+PREREQS.update({
+    "color-bomb-explosion": [("grid", "Nested loops over the board plus a Manhattan-distance test decide each cell."), ("simulation", "Model each bomb's blast directly rather than deriving a formula."), ("big_o", "With H,W ≤ 70 the O((H·W)²) brute force is fast enough — no cleverness needed.")],
+    "territory-capture": [("simulation", "Model each cell's state and apply each turn's rule in order."), ("conditionals", "Branch on the current owner and the acting player."), ("iteration", "Tally owned and locked cells at the end.")],
+    "minesweeper-counts": [("grid", "For each empty cell, count mines among its 8 neighbours."), ("conditionals", "Leave mines untouched; otherwise write the neighbour count."), ("iteration", "Bounds-check every neighbour before reading it.")],
+    "robot-grid-walk": [("simulation", "Move the robot command by command, ignoring off-grid steps."), ("grid", "Mark visited cells on the board."), ("conditionals", "Only move when the destination is inside the grid.")],
+    "game-of-life-step": [("grid", "Count live neighbours with the 8 offsets and bounds checks."), ("simulation", "Apply the birth/survival rules to produce the next generation."), ("boolean_logic", "Survive on 2–3 neighbours; born on exactly 3 — and read from the old board.")],
+    "set-matrix-zeroes": [("grid", "Record which rows and columns hold a 0, then blank them."), ("iteration", "Two passes: find the zeros, then apply."), ("conditionals", "Zero a cell if its row or column was marked.")],
+    "rotate-matrix-90": [("grid", "Map each source cell to its rotated position: new[j][i] = old[H-1-i][j]."), ("char_arrays", "Build each rotated row as a sequence of characters."), ("iteration", "Emit the W×H output row by row.")],
+    "spiral-order": [("grid", "Peel the board ring by ring."), ("simulation", "Track four shrinking boundaries: top, bottom, left, right."), ("iteration", "Walk right, down, left, and up on each layer.")],
+})
+
+JAVA_STARTERS.update({
+    "color-bomb-explosion": "import java.util.*;\nimport java.io.*;\n\npublic class Main {\n    public static void main(String[] args) throws IOException {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        StringTokenizer st = new StringTokenizer(br.readLine());\n        int H = Integer.parseInt(st.nextToken()), W = Integer.parseInt(st.nextToken());\n        char[][] g = new char[H][];\n        for (int i = 0; i < H; i++) g[i] = br.readLine().toCharArray();\n        boolean[][] painted = new boolean[H][W];\n        // TODO: for each digit cell (a bomb of power D), paint cells within Manhattan distance D\n        StringBuilder sb = new StringBuilder();\n        for (int i = 0; i < H; i++) {\n            for (int j = 0; j < W; j++) sb.append(painted[i][j] ? '#' : '.');\n            sb.append('\\n');\n        }\n        System.out.print(sb);\n    }\n}\n",
+    "territory-capture": "import java.util.*;\nimport java.io.*;\n\npublic class Main {\n    public static void main(String[] args) throws IOException {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        StringTokenizer st = new StringTokenizer(br.readLine());\n        int N = Integer.parseInt(st.nextToken()), M = Integer.parseInt(st.nextToken());\n        int Q = Integer.parseInt(br.readLine().trim());\n        int[][] state = new int[N + 1][M + 1]; // 0 neutral,1 A,2 B,3 lockA,4 lockB\n        for (int t = 0; t < Q; t++) {\n            st = new StringTokenizer(br.readLine());\n            String p = st.nextToken();\n            int x = Integer.parseInt(st.nextToken()), y = Integer.parseInt(st.nextToken());\n            // TODO: update state[x][y] per the capture rules\n        }\n        int a = 0, b = 0;\n        // TODO: count cells owned/locked by each player\n        System.out.println(a > b ? \"A\" : b > a ? \"B\" : \"Draw\");\n    }\n}\n",
+    "minesweeper-counts": "import java.util.*;\nimport java.io.*;\n\npublic class Main {\n    public static void main(String[] args) throws IOException {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        StringTokenizer st = new StringTokenizer(br.readLine());\n        int H = Integer.parseInt(st.nextToken()), W = Integer.parseInt(st.nextToken());\n        char[][] g = new char[H][];\n        for (int i = 0; i < H; i++) g[i] = br.readLine().toCharArray();\n        StringBuilder sb = new StringBuilder();\n        for (int i = 0; i < H; i++) {\n            for (int j = 0; j < W; j++) {\n                // TODO: '*' stays '*'; otherwise print the count of neighbouring mines\n                sb.append('.');\n            }\n            sb.append('\\n');\n        }\n        System.out.print(sb);\n    }\n}\n",
+    "robot-grid-walk": "import java.util.*;\nimport java.io.*;\n\npublic class Main {\n    public static void main(String[] args) throws IOException {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        StringTokenizer st = new StringTokenizer(br.readLine());\n        int H = Integer.parseInt(st.nextToken()), W = Integer.parseInt(st.nextToken());\n        st = new StringTokenizer(br.readLine());\n        int r = Integer.parseInt(st.nextToken()) - 1, c = Integer.parseInt(st.nextToken()) - 1;\n        String cmds = br.readLine();\n        if (cmds == null) cmds = \"\";\n        boolean[][] vis = new boolean[H][W];\n        vis[r][c] = true;\n        // TODO: apply each move (U/D/L/R), ignoring off-grid steps, marking visited cells\n        StringBuilder sb = new StringBuilder();\n        for (int i = 0; i < H; i++) {\n            for (int j = 0; j < W; j++) sb.append(vis[i][j] ? '#' : '.');\n            sb.append('\\n');\n        }\n        System.out.print(sb);\n    }\n}\n",
+    "game-of-life-step": "import java.util.*;\nimport java.io.*;\n\npublic class Main {\n    public static void main(String[] args) throws IOException {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        StringTokenizer st = new StringTokenizer(br.readLine());\n        int H = Integer.parseInt(st.nextToken()), W = Integer.parseInt(st.nextToken());\n        char[][] g = new char[H][];\n        for (int i = 0; i < H; i++) g[i] = br.readLine().toCharArray();\n        char[][] out = new char[H][W];\n        // TODO: count live neighbours from g (the OLD board) and fill out with the next generation\n        StringBuilder sb = new StringBuilder();\n        for (int i = 0; i < H; i++) { sb.append(new String(out[i])); sb.append('\\n'); }\n        System.out.print(sb);\n    }\n}\n",
+    "set-matrix-zeroes": "import java.util.*;\nimport java.io.*;\n\npublic class Main {\n    public static void main(String[] args) throws IOException {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        StringTokenizer st = new StringTokenizer(br.readLine());\n        int H = Integer.parseInt(st.nextToken()), W = Integer.parseInt(st.nextToken());\n        char[][] g = new char[H][];\n        for (int i = 0; i < H; i++) g[i] = br.readLine().toCharArray();\n        boolean[] zr = new boolean[H], zc = new boolean[W];\n        // TODO: first mark rows/columns that contain a '0', then blank them\n        StringBuilder sb = new StringBuilder();\n        for (int i = 0; i < H; i++) { sb.append(new String(g[i])); sb.append('\\n'); }\n        System.out.print(sb);\n    }\n}\n",
+    "rotate-matrix-90": "import java.util.*;\nimport java.io.*;\n\npublic class Main {\n    public static void main(String[] args) throws IOException {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        StringTokenizer st = new StringTokenizer(br.readLine());\n        int H = Integer.parseInt(st.nextToken()), W = Integer.parseInt(st.nextToken());\n        char[][] g = new char[H][];\n        for (int i = 0; i < H; i++) g[i] = br.readLine().toCharArray();\n        StringBuilder sb = new StringBuilder();\n        // TODO: output W rows of length H; row j is old column j read bottom-to-top\n        System.out.print(sb);\n    }\n}\n",
+    "spiral-order": "import java.util.*;\nimport java.io.*;\n\npublic class Main {\n    public static void main(String[] args) throws IOException {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        StringTokenizer st = new StringTokenizer(br.readLine());\n        int H = Integer.parseInt(st.nextToken()), W = Integer.parseInt(st.nextToken());\n        char[][] g = new char[H][];\n        for (int i = 0; i < H; i++) g[i] = br.readLine().toCharArray();\n        StringBuilder sb = new StringBuilder();\n        // TODO: append characters in clockwise spiral order using top/bottom/left/right bounds\n        System.out.println(sb.toString());\n    }\n}\n",
+})
+
+DEFS += GRID_DEFS
 
 
 # ---------------------------------------------------------------------------

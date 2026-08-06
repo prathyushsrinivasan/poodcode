@@ -1699,7 +1699,7 @@
       }
     ],
     "judge_mode": "exact",
-    "order": 51
+    "order": 55
   },
   {
     "slug": "longest-unique-substring",
@@ -1824,7 +1824,7 @@
     ],
     "follow_ups": [],
     "judge_mode": "exact",
-    "order": 52
+    "order": 56
   },
   {
     "slug": "valid-parentheses",
@@ -1940,7 +1940,7 @@
     "editorials": [],
     "follow_ups": [],
     "judge_mode": "exact",
-    "order": 53
+    "order": 57
   },
   {
     "slug": "binary-search-first",
@@ -2062,7 +2062,7 @@
       }
     ],
     "judge_mode": "exact",
-    "order": 54
+    "order": 58
   },
   {
     "slug": "maximum-subarray",
@@ -2198,7 +2198,7 @@
       }
     ],
     "judge_mode": "exact",
-    "order": 55
+    "order": 59
   },
   {
     "slug": "climbing-stairs",
@@ -2314,7 +2314,7 @@
     "editorials": [],
     "follow_ups": [],
     "judge_mode": "exact",
-    "order": 56
+    "order": 60
   },
   {
     "slug": "rotate-array",
@@ -2427,7 +2427,7 @@
     "editorials": [],
     "follow_ups": [],
     "judge_mode": "exact",
-    "order": 57
+    "order": 61
   },
   {
     "slug": "number-of-islands",
@@ -2471,6 +2471,7 @@
       "Meta"
     ],
     "patterns": [
+      "Grid / Matrix",
       "BFS / DFS"
     ],
     "hints": [
@@ -2553,7 +2554,7 @@
     "editorials": [],
     "follow_ups": [],
     "judge_mode": "exact",
-    "order": 58
+    "order": 62
   },
   {
     "slug": "group-anagrams-count",
@@ -2670,7 +2671,7 @@
     "editorials": [],
     "follow_ups": [],
     "judge_mode": "exact",
-    "order": 59
+    "order": 63
   },
   {
     "slug": "course-schedule",
@@ -2795,7 +2796,7 @@
     "editorials": [],
     "follow_ups": [],
     "judge_mode": "exact",
-    "order": 60
+    "order": 64
   },
   {
     "slug": "longest-increasing-subsequence",
@@ -2913,7 +2914,7 @@
     "editorials": [],
     "follow_ups": [],
     "judge_mode": "exact",
-    "order": 87
+    "order": 95
   },
   {
     "slug": "edit-distance",
@@ -3030,7 +3031,7 @@
     "editorials": [],
     "follow_ups": [],
     "judge_mode": "exact",
-    "order": 88
+    "order": 96
   },
   {
     "slug": "trapping-rain-water",
@@ -3148,7 +3149,7 @@
     "editorials": [],
     "follow_ups": [],
     "judge_mode": "exact",
-    "order": 89
+    "order": 97
   },
   {
     "slug": "dijkstra-shortest-path",
@@ -3274,7 +3275,895 @@
     "editorials": [],
     "follow_ups": [],
     "judge_mode": "exact",
-    "order": 90
+    "order": 98
+  },
+  {
+    "slug": "color-bomb-explosion",
+    "title": "Color Bomb Explosion",
+    "difficulty": "Easy",
+    "description": "A board has `H` rows and `W` columns. Each cell is `.` (empty) or a digit `0`–`9`, a **Color Bomb** whose explosion power equals that digit.\n\nWhen a bomb of power `D` explodes it paints every cell within **Manhattan distance** `D` (including its own cell) with `#`. Bombs explode independently and do not interfere. Initially nothing is painted.\n\nThe Manhattan distance between `(r1,c1)` and `(r2,c2)` is `|r1−r2| + |c1−c2|`.\n\n### Input\n- Line 1: `H W`.\n- Next `H` lines: the board, each a string of length `W`.\n\n### Output\nPrint `H` lines: `#` if a cell is painted by at least one bomb, otherwise `.`",
+    "constraints": "1 ≤ H, W ≤ 70\nEach character is `.` or a digit 0–9.",
+    "examples": [
+      {
+        "input": "5 5\n0..0.\n.2..0\n.....\n....1\n.0...",
+        "output": "####.\n#####\n###.#\n.#.##\n.#..#",
+        "explanation": "Six bombs paint the shown cells; the power-2 bomb at (1,1) covers a diamond of radius 2."
+      },
+      {
+        "input": "7 7\n...0...\n.......\n...1...\n..131..\n...1...\n.......\n...0...",
+        "output": "...#...\n..###..\n.#####.\n#######\n.#####.\n..###..\n...#...",
+        "explanation": "The central chain of bombs paints a large diamond."
+      }
+    ],
+    "editorial": "## Approach\nCollect nothing fancy — just simulate. Keep a `painted[H][W]` boolean grid, initially all false. For every cell that holds a digit `D`, loop over the whole board and set `painted[i][j] = true` wherever `|i−bi| + |j−bj| ≤ D`. A cell can be reached by several bombs; once painted it stays painted. Finally print `#`/`.` from the boolean grid. Because H,W ≤ 70, the O((H·W)²) double sweep is only a few million operations.",
+    "optimal_time": "O((H·W)^2)",
+    "optimal_space": "O(H·W)",
+    "optimal_explanation": "For each bomb, sweep the whole board and mark cells within its Manhattan radius; the small bound makes the brute force comfortably fast.",
+    "starter_code": {
+      "java": "import java.util.*;\nimport java.io.*;\n\npublic class Main {\n    public static void main(String[] args) throws IOException {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        StringTokenizer st = new StringTokenizer(br.readLine());\n        int H = Integer.parseInt(st.nextToken()), W = Integer.parseInt(st.nextToken());\n        char[][] g = new char[H][];\n        for (int i = 0; i < H; i++) g[i] = br.readLine().toCharArray();\n        boolean[][] painted = new boolean[H][W];\n        // TODO: for each digit cell (a bomb of power D), paint cells within Manhattan distance D\n        StringBuilder sb = new StringBuilder();\n        for (int i = 0; i < H; i++) {\n            for (int j = 0; j < W; j++) sb.append(painted[i][j] ? '#' : '.');\n            sb.append('\\n');\n        }\n        System.out.print(sb);\n    }\n}\n",
+      "python": "import sys\n\ndef solve(H, W, grid):\n    # grid is a list of H strings. TODO: return a list of H output strings.\n    return grid\n\ndata = sys.stdin.read().split('\\n')\nH, W = map(int, data[0].split())\ngrid = [data[1 + i] for i in range(H)]\nfor line in solve(H, W, grid):\n    print(line)\n",
+      "javascript": "const data = require('fs').readFileSync(0, 'utf8').split('\\n');\nconst [H, W] = data[0].split(' ').map(Number);\nconst grid = [];\nfor (let i = 0; i < H; i++) grid.push(data[1 + i]);\n\nfunction solve(H, W, grid) {\n  // TODO: return an array of H output strings\n  return grid;\n}\n\nconsole.log(solve(H, W, grid).join('\\n'));\n",
+      "typescript": "const data = require('fs').readFileSync(0, 'utf8').split('\\n');\nconst [H, W] = data[0].split(' ').map(Number);\nconst grid = [];\nfor (let i = 0; i < H; i++) grid.push(data[1 + i]);\n\nfunction solve(H, W, grid) {\n  // TODO: return an array of H output strings\n  return grid;\n}\n\nconsole.log(solve(H, W, grid).join('\\n'));\n"
+    },
+    "topics": [
+      "Simulation",
+      "Matrix"
+    ],
+    "subtopics": [
+      "Grid",
+      "Neighbors"
+    ],
+    "companies": [
+      "AtCoder"
+    ],
+    "patterns": [
+      "Simulation",
+      "Grid / Matrix"
+    ],
+    "hints": [
+      "Handle each bomb independently — there's no interaction to track.",
+      "For a bomb at (bi,bj) with power D, scan every cell and paint it if |i−bi|+|j−bj| ≤ D.",
+      "Keep a separate H×W boolean 'painted' grid; a cell stays painted if ANY bomb reaches it.",
+      "With H,W ≤ 70 even checking every cell for every bomb (~24M ops) is fast enough."
+    ],
+    "prerequisites": [
+      {
+        "key": "grid",
+        "name": "Grid / Matrix Traversal",
+        "what": "Walking a 2-D board with nested loops, neighbour offsets, and bounds checks.",
+        "deep": "Most grid problems are two nested loops over rows and columns. Neighbours come from offset lists — 4-directional {(-1,0),(1,0),(0,-1),(0,1)} or 8-directional including diagonals — and every access must be bounds-checked (0<=r<H and 0<=c<W). Manhattan distance |r1-r2|+|c1-c2| counts 4-directional steps between two cells.",
+        "java": "char[][] or int[][]; loop for(i..H) for(j..W). Keep int[] dr={-1,1,0,0}, dc={0,0,-1,1} for the four neighbours (or all 8) and guard indices before reading.",
+        "how": "Nested loops over the board plus a Manhattan-distance test decide each cell."
+      },
+      {
+        "key": "simulation",
+        "name": "Simulation",
+        "what": "Directly modelling a process step by step, exactly as the statement describes, instead of finding a formula.",
+        "deep": "When constraints are small, the intended solution is often to just do what the problem says: hold the state, apply each event or rule in order, and read the answer at the end. The skill is translating rules into precise state transitions and handling edge cases and 1- vs 0-indexing carefully.",
+        "java": "Model state in an array or a small int/enum code; process events in a loop, updating state per the rules. Watch off-by-one and 1-indexed input.",
+        "how": "Model each bomb's blast directly rather than deriving a formula."
+      },
+      {
+        "key": "big_o",
+        "name": "Big-O / Complexity Analysis",
+        "what": "Reasoning about how time and memory grow with the input size.",
+        "deep": "Big-O bounds the dominant growth term and tells you whether an approach scales to the constraints. Read the limits: n up to 10^5 suggests O(n) or O(n log n), while 10^9 suggests O(log n) or O(1). Sanity-check the work against roughly 10^8 operations per second.",
+        "java": "No API - this is analysis. Match your algorithm to the constraints stated in each problem before you start coding.",
+        "how": "With H,W ≤ 70 the O((H·W)²) brute force is fast enough — no cleverness needed."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example 1",
+        "input": "5 5\n0..0.\n.2..0\n.....\n....1\n.0...\n",
+        "expected_output": "####.\n#####\n###.#\n.#.##\n.#..#",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Example 2",
+        "input": "7 7\n...0...\n.......\n...1...\n..131..\n...1...\n.......\n...0...\n",
+        "expected_output": "...#...\n..###..\n.#####.\n#######\n.#####.\n..###..\n...#...",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Single power-0 bomb",
+        "input": "1 1\n0\n",
+        "expected_output": "#",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "No bombs",
+        "input": "2 3\n...\n...\n",
+        "expected_output": "...\n...",
+        "ordering": 3
+      },
+      {
+        "kind": "hidden",
+        "name": "Corner reach",
+        "input": "3 3\n2..\n...\n...\n",
+        "expected_output": "###\n##.\n#..",
+        "ordering": 4
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "judge_mode": "exact",
+    "order": 28
+  },
+  {
+    "slug": "territory-capture",
+    "title": "Territory Capture Game",
+    "difficulty": "Easy",
+    "description": "Players **A** and **B** play on an `N × M` grid; every cell starts **neutral**. Over `Q` turns a player tries to capture a cell:\n\n- **Neutral cell** → becomes that player's territory.\n- **Opponent's cell** → becomes neutral.\n- **Your own cell** → becomes **locked** (permanently yours).\n- **Locked cell** → never changes again, whoever tries.\n\nAfter all turns, output who owns more cells.\n\n### Input\n- Line 1: `N M`.\n- Line 2: `Q`.\n- Next `Q` lines: `P x y` — player (`A`/`B`), row `x` (1-indexed), column `y` (1-indexed).\n\n### Output\n`A` if A owns more cells, `B` if B owns more, otherwise `Draw`.",
+    "constraints": "1 ≤ N, M ≤ 100\n1 ≤ Q ≤ 100\n1 ≤ x ≤ N, 1 ≤ y ≤ M",
+    "examples": [
+      {
+        "input": "2 2\n4\nA 1 2\nA 1 1\nB 1 1\nB 1 2",
+        "output": "Draw",
+        "explanation": "A takes two cells, then B neutralises both → 0 vs 0 → Draw."
+      },
+      {
+        "input": "3 3\n10\nA 3 2\nB 3 1\nA 3 3\nB 2 2\nB 2 2\nA 2 1\nB 1 2\nA 3 3\nA 3 1\nA 1 2",
+        "output": "A",
+        "explanation": "A ends up owning more cells after the sequence of captures and locks."
+      }
+    ],
+    "editorial": "## Approach\nPure simulation. Store each cell's state as a small integer: 0 neutral, 1 A, 2 B, 3 locked-A, 4 locked-B. For each move, if the cell is locked do nothing; otherwise apply the rule for the acting player (neutral→owned, opponent→neutral, own→locked). After the turns, count states {1,3} for A and {2,4} for B and print A / B / Draw. Nothing here needs cleverness — the skill is turning the rules into exact transitions and respecting 1-indexed input.",
+    "optimal_time": "O(Q + N·M)",
+    "optimal_space": "O(N·M)",
+    "optimal_explanation": "Each turn is O(1) state update; a final O(N·M) pass counts ownership.",
+    "starter_code": {
+      "java": "import java.util.*;\nimport java.io.*;\n\npublic class Main {\n    public static void main(String[] args) throws IOException {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        StringTokenizer st = new StringTokenizer(br.readLine());\n        int N = Integer.parseInt(st.nextToken()), M = Integer.parseInt(st.nextToken());\n        int Q = Integer.parseInt(br.readLine().trim());\n        int[][] state = new int[N + 1][M + 1]; // 0 neutral,1 A,2 B,3 lockA,4 lockB\n        for (int t = 0; t < Q; t++) {\n            st = new StringTokenizer(br.readLine());\n            String p = st.nextToken();\n            int x = Integer.parseInt(st.nextToken()), y = Integer.parseInt(st.nextToken());\n            // TODO: update state[x][y] per the capture rules\n        }\n        int a = 0, b = 0;\n        // TODO: count cells owned/locked by each player\n        System.out.println(a > b ? \"A\" : b > a ? \"B\" : \"Draw\");\n    }\n}\n",
+      "python": "import sys\n\ndef solve(N, M, moves):\n    # moves is a list of (player, x, y). TODO: return 'A', 'B', or 'Draw'.\n    return 'Draw'\n\ndata = sys.stdin.read().split('\\n')\nN, M = map(int, data[0].split())\nQ = int(data[1])\nmoves = []\nfor i in range(Q):\n    p, x, y = data[2 + i].split()\n    moves.append((p, int(x), int(y)))\nprint(solve(N, M, moves))\n",
+      "javascript": "const data = require('fs').readFileSync(0, 'utf8').split('\\n');\nconst [N, M] = data[0].split(' ').map(Number);\nconst Q = Number(data[1]);\nconst moves = [];\nfor (let i = 0; i < Q; i++) {\n  const [p, x, y] = data[2 + i].split(' ');\n  moves.push([p, Number(x), Number(y)]);\n}\nfunction solve(N, M, moves) {\n  // TODO: return 'A', 'B', or 'Draw'\n  return 'Draw';\n}\nconsole.log(solve(N, M, moves));\n",
+      "typescript": "const data = require('fs').readFileSync(0, 'utf8').split('\\n');\nconst [N, M] = data[0].split(' ').map(Number);\nconst Q = Number(data[1]);\nconst moves = [];\nfor (let i = 0; i < Q; i++) {\n  const [p, x, y] = data[2 + i].split(' ');\n  moves.push([p, Number(x), Number(y)]);\n}\nfunction solve(N, M, moves) {\n  // TODO: return 'A', 'B', or 'Draw'\n  return 'Draw';\n}\nconsole.log(solve(N, M, moves));\n"
+    },
+    "topics": [
+      "Simulation"
+    ],
+    "subtopics": [
+      "State Machine",
+      "Grid"
+    ],
+    "companies": [
+      "AtCoder"
+    ],
+    "patterns": [
+      "Simulation",
+      "Grid / Matrix"
+    ],
+    "hints": [
+      "Give each cell a state code: neutral, owned-by-A, owned-by-B, locked-A, locked-B.",
+      "Process turns in order; a locked cell ignores every later move.",
+      "Translate each rule into a precise transition based on (current state, acting player).",
+      "At the end, count owned + locked cells for each player and compare."
+    ],
+    "prerequisites": [
+      {
+        "key": "simulation",
+        "name": "Simulation",
+        "what": "Directly modelling a process step by step, exactly as the statement describes, instead of finding a formula.",
+        "deep": "When constraints are small, the intended solution is often to just do what the problem says: hold the state, apply each event or rule in order, and read the answer at the end. The skill is translating rules into precise state transitions and handling edge cases and 1- vs 0-indexing carefully.",
+        "java": "Model state in an array or a small int/enum code; process events in a loop, updating state per the rules. Watch off-by-one and 1-indexed input.",
+        "how": "Model each cell's state and apply each turn's rule in order."
+      },
+      {
+        "key": "conditionals",
+        "name": "Conditionals (if / else)",
+        "what": "Choosing what to do based on whether a condition is true.",
+        "deep": "if/else branches let your program react to data. The condition is a boolean expression built from comparisons (==, !=, <, >) and logic (&&, ||, !). Chain several with else if when there are more than two outcomes.",
+        "java": "if (n % 2 == 0) { ... } else { ... }. Compare ints with ==, but compare Strings with .equals(), never ==.",
+        "how": "Branch on the current owner and the acting player."
+      },
+      {
+        "key": "iteration",
+        "name": "Array Iteration",
+        "what": "Walking through elements one at a time while maintaining running state such as a sum, max, or counter.",
+        "deep": "The workhorse of array problems: one for-loop that updates accumulators as it goes. Most linear-time solutions are just one well-chosen pass, so the real skill is deciding what state to carry so a single sweep suffices.",
+        "java": "Use for (int i = 0; i < n; i++) or for (int x : nums). Prefer a primitive int[] over Integer[] to avoid autoboxing overhead.",
+        "how": "Tally owned and locked cells at the end."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example 1",
+        "input": "2 2\n4\nA 1 2\nA 1 1\nB 1 1\nB 1 2\n",
+        "expected_output": "Draw",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Example 2",
+        "input": "3 3\n10\nA 3 2\nB 3 1\nA 3 3\nB 2 2\nB 2 2\nA 2 1\nB 1 2\nA 3 3\nA 3 1\nA 1 2\n",
+        "expected_output": "A",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Lock then attack",
+        "input": "1 1\n3\nA 1 1\nA 1 1\nB 1 1\n",
+        "expected_output": "A",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Single A capture",
+        "input": "2 2\n1\nA 1 1\n",
+        "expected_output": "A",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "judge_mode": "exact",
+    "order": 29
+  },
+  {
+    "slug": "minesweeper-counts",
+    "title": "Minesweeper Counts",
+    "difficulty": "Easy",
+    "description": "You're given a Minesweeper board with `*` for mines and `.` for empty cells. Produce the revealed board: keep each mine as `*`, and replace each empty cell with the number of mines among its **8 neighbours** (horizontal, vertical, and diagonal).\n\n### Input\n- Line 1: `H W`.\n- Next `H` lines: the board of `*` and `.`\n\n### Output\nThe revealed board: `*` stays, empty cells become a digit `0`–`8`.",
+    "constraints": "1 ≤ H, W ≤ 100",
+    "examples": [
+      {
+        "input": "3 4\n*...\n..*.\n....",
+        "output": "*211\n12*1\n0111",
+        "explanation": "Each empty cell shows how many of its 8 neighbours are mines."
+      },
+      {
+        "input": "2 2\n**\n**",
+        "output": "**\n**",
+        "explanation": "Every cell is a mine, so all stay `*`."
+      }
+    ],
+    "editorial": "## Approach\nFor every cell: if it's a mine, output `*`. Otherwise, iterate the 8 offsets `(di,dj)` with `di,dj ∈ {-1,0,1}` excluding `(0,0)`, guard the indices against the border, and count neighbouring `*`. Output that count. A tidy trick is to keep `int[] dr = {-1,-1,-1,0,0,1,1,1}` and `int[] dc = {-1,0,1,-1,1,-1,0,1}`.",
+    "optimal_time": "O(H·W)",
+    "optimal_space": "O(H·W)",
+    "optimal_explanation": "Each cell inspects a constant 8 neighbours.",
+    "starter_code": {
+      "java": "import java.util.*;\nimport java.io.*;\n\npublic class Main {\n    public static void main(String[] args) throws IOException {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        StringTokenizer st = new StringTokenizer(br.readLine());\n        int H = Integer.parseInt(st.nextToken()), W = Integer.parseInt(st.nextToken());\n        char[][] g = new char[H][];\n        for (int i = 0; i < H; i++) g[i] = br.readLine().toCharArray();\n        StringBuilder sb = new StringBuilder();\n        for (int i = 0; i < H; i++) {\n            for (int j = 0; j < W; j++) {\n                // TODO: '*' stays '*'; otherwise print the count of neighbouring mines\n                sb.append('.');\n            }\n            sb.append('\\n');\n        }\n        System.out.print(sb);\n    }\n}\n",
+      "python": "import sys\n\ndef solve(H, W, grid):\n    # grid is a list of H strings. TODO: return a list of H output strings.\n    return grid\n\ndata = sys.stdin.read().split('\\n')\nH, W = map(int, data[0].split())\ngrid = [data[1 + i] for i in range(H)]\nfor line in solve(H, W, grid):\n    print(line)\n",
+      "javascript": "const data = require('fs').readFileSync(0, 'utf8').split('\\n');\nconst [H, W] = data[0].split(' ').map(Number);\nconst grid = [];\nfor (let i = 0; i < H; i++) grid.push(data[1 + i]);\n\nfunction solve(H, W, grid) {\n  // TODO: return an array of H output strings\n  return grid;\n}\n\nconsole.log(solve(H, W, grid).join('\\n'));\n",
+      "typescript": "const data = require('fs').readFileSync(0, 'utf8').split('\\n');\nconst [H, W] = data[0].split(' ').map(Number);\nconst grid = [];\nfor (let i = 0; i < H; i++) grid.push(data[1 + i]);\n\nfunction solve(H, W, grid) {\n  // TODO: return an array of H output strings\n  return grid;\n}\n\nconsole.log(solve(H, W, grid).join('\\n'));\n"
+    },
+    "topics": [
+      "Simulation",
+      "Matrix"
+    ],
+    "subtopics": [
+      "Grid",
+      "Neighbors"
+    ],
+    "companies": [
+      "Bloomberg"
+    ],
+    "patterns": [
+      "Simulation",
+      "Grid / Matrix"
+    ],
+    "hints": [
+      "Mines are printed unchanged.",
+      "For an empty cell, look at up to 8 neighbours using offset pairs.",
+      "Bounds-check every neighbour before reading it (0 ≤ ni < H and 0 ≤ nj < W).",
+      "Count the mines and print that single digit."
+    ],
+    "prerequisites": [
+      {
+        "key": "grid",
+        "name": "Grid / Matrix Traversal",
+        "what": "Walking a 2-D board with nested loops, neighbour offsets, and bounds checks.",
+        "deep": "Most grid problems are two nested loops over rows and columns. Neighbours come from offset lists — 4-directional {(-1,0),(1,0),(0,-1),(0,1)} or 8-directional including diagonals — and every access must be bounds-checked (0<=r<H and 0<=c<W). Manhattan distance |r1-r2|+|c1-c2| counts 4-directional steps between two cells.",
+        "java": "char[][] or int[][]; loop for(i..H) for(j..W). Keep int[] dr={-1,1,0,0}, dc={0,0,-1,1} for the four neighbours (or all 8) and guard indices before reading.",
+        "how": "For each empty cell, count mines among its 8 neighbours."
+      },
+      {
+        "key": "conditionals",
+        "name": "Conditionals (if / else)",
+        "what": "Choosing what to do based on whether a condition is true.",
+        "deep": "if/else branches let your program react to data. The condition is a boolean expression built from comparisons (==, !=, <, >) and logic (&&, ||, !). Chain several with else if when there are more than two outcomes.",
+        "java": "if (n % 2 == 0) { ... } else { ... }. Compare ints with ==, but compare Strings with .equals(), never ==.",
+        "how": "Leave mines untouched; otherwise write the neighbour count."
+      },
+      {
+        "key": "iteration",
+        "name": "Array Iteration",
+        "what": "Walking through elements one at a time while maintaining running state such as a sum, max, or counter.",
+        "deep": "The workhorse of array problems: one for-loop that updates accumulators as it goes. Most linear-time solutions are just one well-chosen pass, so the real skill is deciding what state to carry so a single sweep suffices.",
+        "java": "Use for (int i = 0; i < n; i++) or for (int x : nums). Prefer a primitive int[] over Integer[] to avoid autoboxing overhead.",
+        "how": "Bounds-check every neighbour before reading it."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example 1",
+        "input": "3 4\n*...\n..*.\n....\n",
+        "expected_output": "*211\n12*1\n0111",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Example 2",
+        "input": "2 2\n**\n**\n",
+        "expected_output": "**\n**",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "No mines",
+        "input": "2 3\n...\n...\n",
+        "expected_output": "000\n000",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Single mine",
+        "input": "3 3\n...\n.*.\n...\n",
+        "expected_output": "111\n1*1\n111",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "judge_mode": "exact",
+    "order": 30
+  },
+  {
+    "slug": "robot-grid-walk",
+    "title": "Robot Grid Walk",
+    "difficulty": "Easy",
+    "description": "A robot stands on an `H × W` grid at a start cell and follows a string of moves: `U` (up), `D` (down), `L` (left), `R` (right). A move that would leave the grid is **ignored** (the robot stays put). Mark every cell the robot ever occupies — including the start — with `#`, and print the board.\n\n### Input\n- Line 1: `H W`.\n- Line 2: `r c` — the 1-indexed start cell.\n- Line 3: the move string (may be empty).\n\n### Output\nThe `H × W` board: `#` for visited cells, `.` otherwise.",
+    "constraints": "1 ≤ H, W ≤ 100\n0 ≤ |moves| ≤ 10^5",
+    "examples": [
+      {
+        "input": "3 3\n2 2\nUURRDD",
+        "output": ".##\n.##\n..#",
+        "explanation": "The robot traces a path from the centre; off-grid steps are ignored."
+      },
+      {
+        "input": "2 2\n1 1\nRRDD",
+        "output": "##\n.#",
+        "explanation": "From the corner it visits the right column then the bottom-right."
+      }
+    ],
+    "editorial": "## Approach\nConvert to 0-indexed, mark the start visited, and walk the command string. For each command look up its delta, compute the next cell, and move only if it's in bounds — otherwise stay. Mark every cell you land on. Print `#`/`.` from the visited grid. The one subtlety is that off-grid moves are skipped, not clamped to the border in a way that still marks a new cell.",
+    "optimal_time": "O(H·W + |moves|)",
+    "optimal_space": "O(H·W)",
+    "optimal_explanation": "One pass over the moves plus printing the board.",
+    "starter_code": {
+      "java": "import java.util.*;\nimport java.io.*;\n\npublic class Main {\n    public static void main(String[] args) throws IOException {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        StringTokenizer st = new StringTokenizer(br.readLine());\n        int H = Integer.parseInt(st.nextToken()), W = Integer.parseInt(st.nextToken());\n        st = new StringTokenizer(br.readLine());\n        int r = Integer.parseInt(st.nextToken()) - 1, c = Integer.parseInt(st.nextToken()) - 1;\n        String cmds = br.readLine();\n        if (cmds == null) cmds = \"\";\n        boolean[][] vis = new boolean[H][W];\n        vis[r][c] = true;\n        // TODO: apply each move (U/D/L/R), ignoring off-grid steps, marking visited cells\n        StringBuilder sb = new StringBuilder();\n        for (int i = 0; i < H; i++) {\n            for (int j = 0; j < W; j++) sb.append(vis[i][j] ? '#' : '.');\n            sb.append('\\n');\n        }\n        System.out.print(sb);\n    }\n}\n",
+      "python": "import sys\n\ndef solve(H, W, r, c, cmds):\n    # r,c are 1-indexed. TODO: return a list of H strings of '#'/'.'\n    return ['.' * W for _ in range(H)]\n\ndata = sys.stdin.read().split('\\n')\nH, W = map(int, data[0].split())\nr, c = map(int, data[1].split())\ncmds = data[2] if len(data) > 2 else ''\nfor line in solve(H, W, r, c, cmds):\n    print(line)\n",
+      "javascript": "const data = require('fs').readFileSync(0, 'utf8').split('\\n');\nconst [H, W] = data[0].split(' ').map(Number);\nconst [r, c] = data[1].split(' ').map(Number);\nconst cmds = data[2] || '';\nfunction solve(H, W, r, c, cmds) {\n  // r,c are 1-indexed. TODO: return an array of H strings\n  return Array.from({length: H}, () => '.'.repeat(W));\n}\nconsole.log(solve(H, W, r, c, cmds).join('\\n'));\n",
+      "typescript": "const data = require('fs').readFileSync(0, 'utf8').split('\\n');\nconst [H, W] = data[0].split(' ').map(Number);\nconst [r, c] = data[1].split(' ').map(Number);\nconst cmds = data[2] || '';\nfunction solve(H, W, r, c, cmds) {\n  // r,c are 1-indexed. TODO: return an array of H strings\n  return Array.from({length: H}, () => '.'.repeat(W));\n}\nconsole.log(solve(H, W, r, c, cmds).join('\\n'));\n"
+    },
+    "topics": [
+      "Simulation"
+    ],
+    "subtopics": [
+      "Grid",
+      "State Machine"
+    ],
+    "companies": [
+      "Amazon"
+    ],
+    "patterns": [
+      "Simulation",
+      "Grid / Matrix"
+    ],
+    "hints": [
+      "Track the robot's current (row, col); mark it visited to start.",
+      "Map each command to a (dr, dc) delta.",
+      "Only apply a move if the destination is inside the grid.",
+      "Mark each newly-occupied cell visited."
+    ],
+    "prerequisites": [
+      {
+        "key": "simulation",
+        "name": "Simulation",
+        "what": "Directly modelling a process step by step, exactly as the statement describes, instead of finding a formula.",
+        "deep": "When constraints are small, the intended solution is often to just do what the problem says: hold the state, apply each event or rule in order, and read the answer at the end. The skill is translating rules into precise state transitions and handling edge cases and 1- vs 0-indexing carefully.",
+        "java": "Model state in an array or a small int/enum code; process events in a loop, updating state per the rules. Watch off-by-one and 1-indexed input.",
+        "how": "Move the robot command by command, ignoring off-grid steps."
+      },
+      {
+        "key": "grid",
+        "name": "Grid / Matrix Traversal",
+        "what": "Walking a 2-D board with nested loops, neighbour offsets, and bounds checks.",
+        "deep": "Most grid problems are two nested loops over rows and columns. Neighbours come from offset lists — 4-directional {(-1,0),(1,0),(0,-1),(0,1)} or 8-directional including diagonals — and every access must be bounds-checked (0<=r<H and 0<=c<W). Manhattan distance |r1-r2|+|c1-c2| counts 4-directional steps between two cells.",
+        "java": "char[][] or int[][]; loop for(i..H) for(j..W). Keep int[] dr={-1,1,0,0}, dc={0,0,-1,1} for the four neighbours (or all 8) and guard indices before reading.",
+        "how": "Mark visited cells on the board."
+      },
+      {
+        "key": "conditionals",
+        "name": "Conditionals (if / else)",
+        "what": "Choosing what to do based on whether a condition is true.",
+        "deep": "if/else branches let your program react to data. The condition is a boolean expression built from comparisons (==, !=, <, >) and logic (&&, ||, !). Chain several with else if when there are more than two outcomes.",
+        "java": "if (n % 2 == 0) { ... } else { ... }. Compare ints with ==, but compare Strings with .equals(), never ==.",
+        "how": "Only move when the destination is inside the grid."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example 1",
+        "input": "3 3\n2 2\nUURRDD\n",
+        "expected_output": ".##\n.##\n..#",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Example 2",
+        "input": "2 2\n1 1\nRRDD\n",
+        "expected_output": "##\n.#",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "No moves",
+        "input": "2 2\n1 1\n\n",
+        "expected_output": "#.\n..",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Bounces off wall",
+        "input": "1 3\n1 1\nLLLRR\n",
+        "expected_output": "###",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "judge_mode": "exact",
+    "order": 31
+  },
+  {
+    "slug": "game-of-life-step",
+    "title": "Game of Life (One Step)",
+    "difficulty": "Medium",
+    "description": "Conway's Game of Life on an `H × W` board: `#` is a live cell, `.` is dead. Compute the **next** generation, where all cells update simultaneously based on their 8 neighbours:\n\n- A live cell with **2 or 3** live neighbours stays live; otherwise it dies.\n- A dead cell with **exactly 3** live neighbours becomes live.\n\n### Input\n- Line 1: `H W`.\n- Next `H` lines: the board of `#` and `.`\n\n### Output\nThe board after one step.",
+    "constraints": "1 ≤ H, W ≤ 100",
+    "examples": [
+      {
+        "input": "3 3\n...\n###\n...",
+        "output": ".#.\n.#.\n.#.",
+        "explanation": "A horizontal blinker becomes a vertical one."
+      },
+      {
+        "input": "4 4\n....\n.##.\n.##.\n....",
+        "output": "....\n.##.\n.##.\n....",
+        "explanation": "A 2×2 block is stable — it maps to itself."
+      }
+    ],
+    "editorial": "## Approach\nThe classic pitfall is updating in place: because all cells change at once, you must count live neighbours on the *old* board and write results to a *new* board. For each cell, count live neighbours over the 8 offsets with bounds checks, then apply the rule: a live cell survives with 2–3 neighbours; a dead cell is born with exactly 3. Print the new board.",
+    "optimal_time": "O(H·W)",
+    "optimal_space": "O(H·W)",
+    "optimal_explanation": "Constant neighbour work per cell; a fresh output grid avoids in-place corruption.",
+    "starter_code": {
+      "java": "import java.util.*;\nimport java.io.*;\n\npublic class Main {\n    public static void main(String[] args) throws IOException {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        StringTokenizer st = new StringTokenizer(br.readLine());\n        int H = Integer.parseInt(st.nextToken()), W = Integer.parseInt(st.nextToken());\n        char[][] g = new char[H][];\n        for (int i = 0; i < H; i++) g[i] = br.readLine().toCharArray();\n        char[][] out = new char[H][W];\n        // TODO: count live neighbours from g (the OLD board) and fill out with the next generation\n        StringBuilder sb = new StringBuilder();\n        for (int i = 0; i < H; i++) { sb.append(new String(out[i])); sb.append('\\n'); }\n        System.out.print(sb);\n    }\n}\n",
+      "python": "import sys\n\ndef solve(H, W, grid):\n    # grid is a list of H strings. TODO: return a list of H output strings.\n    return grid\n\ndata = sys.stdin.read().split('\\n')\nH, W = map(int, data[0].split())\ngrid = [data[1 + i] for i in range(H)]\nfor line in solve(H, W, grid):\n    print(line)\n",
+      "javascript": "const data = require('fs').readFileSync(0, 'utf8').split('\\n');\nconst [H, W] = data[0].split(' ').map(Number);\nconst grid = [];\nfor (let i = 0; i < H; i++) grid.push(data[1 + i]);\n\nfunction solve(H, W, grid) {\n  // TODO: return an array of H output strings\n  return grid;\n}\n\nconsole.log(solve(H, W, grid).join('\\n'));\n",
+      "typescript": "const data = require('fs').readFileSync(0, 'utf8').split('\\n');\nconst [H, W] = data[0].split(' ').map(Number);\nconst grid = [];\nfor (let i = 0; i < H; i++) grid.push(data[1 + i]);\n\nfunction solve(H, W, grid) {\n  // TODO: return an array of H output strings\n  return grid;\n}\n\nconsole.log(solve(H, W, grid).join('\\n'));\n"
+    },
+    "topics": [
+      "Simulation",
+      "Matrix"
+    ],
+    "subtopics": [
+      "Grid",
+      "Neighbors"
+    ],
+    "companies": [
+      "Google",
+      "Amazon"
+    ],
+    "patterns": [
+      "Simulation",
+      "Grid / Matrix"
+    ],
+    "hints": [
+      "Every cell updates from the CURRENT board — read from the old grid, write to a new one.",
+      "Count the 8 neighbours with bounds checks.",
+      "Live survives on a count of 2 or 3; dead is born on exactly 3.",
+      "Don't overwrite cells in place, or later counts will be wrong."
+    ],
+    "prerequisites": [
+      {
+        "key": "grid",
+        "name": "Grid / Matrix Traversal",
+        "what": "Walking a 2-D board with nested loops, neighbour offsets, and bounds checks.",
+        "deep": "Most grid problems are two nested loops over rows and columns. Neighbours come from offset lists — 4-directional {(-1,0),(1,0),(0,-1),(0,1)} or 8-directional including diagonals — and every access must be bounds-checked (0<=r<H and 0<=c<W). Manhattan distance |r1-r2|+|c1-c2| counts 4-directional steps between two cells.",
+        "java": "char[][] or int[][]; loop for(i..H) for(j..W). Keep int[] dr={-1,1,0,0}, dc={0,0,-1,1} for the four neighbours (or all 8) and guard indices before reading.",
+        "how": "Count live neighbours with the 8 offsets and bounds checks."
+      },
+      {
+        "key": "simulation",
+        "name": "Simulation",
+        "what": "Directly modelling a process step by step, exactly as the statement describes, instead of finding a formula.",
+        "deep": "When constraints are small, the intended solution is often to just do what the problem says: hold the state, apply each event or rule in order, and read the answer at the end. The skill is translating rules into precise state transitions and handling edge cases and 1- vs 0-indexing carefully.",
+        "java": "Model state in an array or a small int/enum code; process events in a loop, updating state per the rules. Watch off-by-one and 1-indexed input.",
+        "how": "Apply the birth/survival rules to produce the next generation."
+      },
+      {
+        "key": "boolean_logic",
+        "name": "Booleans & Comparison",
+        "what": "True/false values and the operators that combine them.",
+        "deep": "Comparisons produce booleans, and &&, ||, ! combine them. Short-circuit evaluation means the right side of && is skipped when the left is false, which is both handy and sometimes necessary to avoid errors.",
+        "java": "boolean type; comparisons ==, !=, <, <=, >, >=; logic && (and), || (or), ! (not).",
+        "how": "Survive on 2–3 neighbours; born on exactly 3 — and read from the old board."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Blinker",
+        "input": "3 3\n...\n###\n...\n",
+        "expected_output": ".#.\n.#.\n.#.",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Block (still life)",
+        "input": "4 4\n....\n.##.\n.##.\n....\n",
+        "expected_output": "....\n.##.\n.##.\n....",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "All dead",
+        "input": "2 2\n..\n..\n",
+        "expected_output": "..\n..",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Single live dies",
+        "input": "3 3\n...\n.#.\n...\n",
+        "expected_output": "...\n...\n...",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "judge_mode": "exact",
+    "order": 65
+  },
+  {
+    "slug": "set-matrix-zeroes",
+    "title": "Set Matrix Zeroes",
+    "difficulty": "Medium",
+    "description": "You're given an `H × W` grid of single digits (`0`–`9`). If a cell is `0`, set its **entire row and column** to `0`. Print the resulting grid.\n\n### Input\n- Line 1: `H W`.\n- Next `H` lines: rows of `W` digits.\n\n### Output\nThe grid after zeroing every row and column that originally contained a `0`.",
+    "constraints": "1 ≤ H, W ≤ 100\nEach character is a digit 0–9.",
+    "examples": [
+      {
+        "input": "3 3\n123\n405\n678",
+        "output": "103\n000\n608",
+        "explanation": "The 0 at (1,0) blanks its row and column."
+      },
+      {
+        "input": "2 2\n12\n34",
+        "output": "12\n34",
+        "explanation": "No zeroes present, so the grid is unchanged."
+      }
+    ],
+    "editorial": "## Approach\nThe trap is that zeroing immediately would cascade — a freshly-written 0 would trigger more rows and columns. So first scan the original grid and record which rows and which columns contain a 0 (two sets). Then scan again and set a cell to 0 if its row or column is marked. This runs in O(H·W) time and O(H+W) extra space.",
+    "optimal_time": "O(H·W)",
+    "optimal_space": "O(H + W)",
+    "optimal_explanation": "Two passes with a set of zero rows and a set of zero columns.",
+    "starter_code": {
+      "java": "import java.util.*;\nimport java.io.*;\n\npublic class Main {\n    public static void main(String[] args) throws IOException {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        StringTokenizer st = new StringTokenizer(br.readLine());\n        int H = Integer.parseInt(st.nextToken()), W = Integer.parseInt(st.nextToken());\n        char[][] g = new char[H][];\n        for (int i = 0; i < H; i++) g[i] = br.readLine().toCharArray();\n        boolean[] zr = new boolean[H], zc = new boolean[W];\n        // TODO: first mark rows/columns that contain a '0', then blank them\n        StringBuilder sb = new StringBuilder();\n        for (int i = 0; i < H; i++) { sb.append(new String(g[i])); sb.append('\\n'); }\n        System.out.print(sb);\n    }\n}\n",
+      "python": "import sys\n\ndef solve(H, W, grid):\n    # grid is a list of H strings. TODO: return a list of H output strings.\n    return grid\n\ndata = sys.stdin.read().split('\\n')\nH, W = map(int, data[0].split())\ngrid = [data[1 + i] for i in range(H)]\nfor line in solve(H, W, grid):\n    print(line)\n",
+      "javascript": "const data = require('fs').readFileSync(0, 'utf8').split('\\n');\nconst [H, W] = data[0].split(' ').map(Number);\nconst grid = [];\nfor (let i = 0; i < H; i++) grid.push(data[1 + i]);\n\nfunction solve(H, W, grid) {\n  // TODO: return an array of H output strings\n  return grid;\n}\n\nconsole.log(solve(H, W, grid).join('\\n'));\n",
+      "typescript": "const data = require('fs').readFileSync(0, 'utf8').split('\\n');\nconst [H, W] = data[0].split(' ').map(Number);\nconst grid = [];\nfor (let i = 0; i < H; i++) grid.push(data[1 + i]);\n\nfunction solve(H, W, grid) {\n  // TODO: return an array of H output strings\n  return grid;\n}\n\nconsole.log(solve(H, W, grid).join('\\n'));\n"
+    },
+    "topics": [
+      "Matrix",
+      "Simulation"
+    ],
+    "subtopics": [
+      "Grid"
+    ],
+    "companies": [
+      "Amazon",
+      "Microsoft"
+    ],
+    "patterns": [
+      "Grid / Matrix",
+      "Simulation"
+    ],
+    "hints": [
+      "Decide which rows/columns to zero BEFORE changing anything.",
+      "First pass: record the rows and columns that contain a 0.",
+      "Second pass: zero any cell whose row or column was marked.",
+      "Zeroing as you go would spread zeros incorrectly."
+    ],
+    "prerequisites": [
+      {
+        "key": "grid",
+        "name": "Grid / Matrix Traversal",
+        "what": "Walking a 2-D board with nested loops, neighbour offsets, and bounds checks.",
+        "deep": "Most grid problems are two nested loops over rows and columns. Neighbours come from offset lists — 4-directional {(-1,0),(1,0),(0,-1),(0,1)} or 8-directional including diagonals — and every access must be bounds-checked (0<=r<H and 0<=c<W). Manhattan distance |r1-r2|+|c1-c2| counts 4-directional steps between two cells.",
+        "java": "char[][] or int[][]; loop for(i..H) for(j..W). Keep int[] dr={-1,1,0,0}, dc={0,0,-1,1} for the four neighbours (or all 8) and guard indices before reading.",
+        "how": "Record which rows and columns hold a 0, then blank them."
+      },
+      {
+        "key": "iteration",
+        "name": "Array Iteration",
+        "what": "Walking through elements one at a time while maintaining running state such as a sum, max, or counter.",
+        "deep": "The workhorse of array problems: one for-loop that updates accumulators as it goes. Most linear-time solutions are just one well-chosen pass, so the real skill is deciding what state to carry so a single sweep suffices.",
+        "java": "Use for (int i = 0; i < n; i++) or for (int x : nums). Prefer a primitive int[] over Integer[] to avoid autoboxing overhead.",
+        "how": "Two passes: find the zeros, then apply."
+      },
+      {
+        "key": "conditionals",
+        "name": "Conditionals (if / else)",
+        "what": "Choosing what to do based on whether a condition is true.",
+        "deep": "if/else branches let your program react to data. The condition is a boolean expression built from comparisons (==, !=, <, >) and logic (&&, ||, !). Chain several with else if when there are more than two outcomes.",
+        "java": "if (n % 2 == 0) { ... } else { ... }. Compare ints with ==, but compare Strings with .equals(), never ==.",
+        "how": "Zero a cell if its row or column was marked."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example 1",
+        "input": "3 3\n123\n405\n678\n",
+        "expected_output": "103\n000\n608",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "No zeroes",
+        "input": "2 2\n12\n34\n",
+        "expected_output": "12\n34",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Whole row",
+        "input": "2 3\n100\n456\n",
+        "expected_output": "000\n400",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Single zero",
+        "input": "1 1\n0\n",
+        "expected_output": "0",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "judge_mode": "exact",
+    "order": 66
+  },
+  {
+    "slug": "rotate-matrix-90",
+    "title": "Rotate Matrix 90°",
+    "difficulty": "Medium",
+    "description": "Rotate an `H × W` grid of characters **90° clockwise** and print the result. The rotated board has `W` rows and `H` columns.\n\n### Input\n- Line 1: `H W`.\n- Next `H` lines: the grid (any visible characters, no spaces).\n\n### Output\nThe rotated grid: `W` lines, each of length `H`.",
+    "constraints": "1 ≤ H, W ≤ 100",
+    "examples": [
+      {
+        "input": "2 3\nabc\ndef",
+        "output": "da\neb\nfc",
+        "explanation": "Columns become rows: first output row is 'da' (old column 0 bottom-up)."
+      },
+      {
+        "input": "3 3\n123\n456\n789",
+        "output": "741\n852\n963",
+        "explanation": "The 3×3 grid rotates a quarter turn clockwise."
+      }
+    ],
+    "editorial": "## Approach\nA 90° clockwise rotation maps old cell `(i, j)` to new cell `(j, H-1-i)`. Equivalently, build output row `j` by reading old column `j` from the last row up to the first: `newRow_j = [old[H-1-i][j] for i in 0..H)`. The output has `W` rows of length `H`.",
+    "optimal_time": "O(H·W)",
+    "optimal_space": "O(H·W)",
+    "optimal_explanation": "Emit each rotated cell once.",
+    "starter_code": {
+      "java": "import java.util.*;\nimport java.io.*;\n\npublic class Main {\n    public static void main(String[] args) throws IOException {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        StringTokenizer st = new StringTokenizer(br.readLine());\n        int H = Integer.parseInt(st.nextToken()), W = Integer.parseInt(st.nextToken());\n        char[][] g = new char[H][];\n        for (int i = 0; i < H; i++) g[i] = br.readLine().toCharArray();\n        StringBuilder sb = new StringBuilder();\n        // TODO: output W rows of length H; row j is old column j read bottom-to-top\n        System.out.print(sb);\n    }\n}\n",
+      "python": "import sys\n\ndef solve(H, W, grid):\n    # grid is a list of H strings. TODO: return a list of H output strings.\n    return grid\n\ndata = sys.stdin.read().split('\\n')\nH, W = map(int, data[0].split())\ngrid = [data[1 + i] for i in range(H)]\nfor line in solve(H, W, grid):\n    print(line)\n",
+      "javascript": "const data = require('fs').readFileSync(0, 'utf8').split('\\n');\nconst [H, W] = data[0].split(' ').map(Number);\nconst grid = [];\nfor (let i = 0; i < H; i++) grid.push(data[1 + i]);\n\nfunction solve(H, W, grid) {\n  // TODO: return an array of H output strings\n  return grid;\n}\n\nconsole.log(solve(H, W, grid).join('\\n'));\n",
+      "typescript": "const data = require('fs').readFileSync(0, 'utf8').split('\\n');\nconst [H, W] = data[0].split(' ').map(Number);\nconst grid = [];\nfor (let i = 0; i < H; i++) grid.push(data[1 + i]);\n\nfunction solve(H, W, grid) {\n  // TODO: return an array of H output strings\n  return grid;\n}\n\nconsole.log(solve(H, W, grid).join('\\n'));\n"
+    },
+    "topics": [
+      "Matrix",
+      "Simulation"
+    ],
+    "subtopics": [
+      "Grid"
+    ],
+    "companies": [
+      "Amazon",
+      "Adobe",
+      "Apple"
+    ],
+    "patterns": [
+      "Grid / Matrix",
+      "Simulation"
+    ],
+    "hints": [
+      "After a clockwise rotation the first column (bottom-to-top) becomes the first row.",
+      "Output row `j` is old column `j` read from the bottom up.",
+      "Formula: newGrid[j][i] = oldGrid[H-1-i][j].",
+      "Remember the dimensions swap: output is W×H."
+    ],
+    "prerequisites": [
+      {
+        "key": "grid",
+        "name": "Grid / Matrix Traversal",
+        "what": "Walking a 2-D board with nested loops, neighbour offsets, and bounds checks.",
+        "deep": "Most grid problems are two nested loops over rows and columns. Neighbours come from offset lists — 4-directional {(-1,0),(1,0),(0,-1),(0,1)} or 8-directional including diagonals — and every access must be bounds-checked (0<=r<H and 0<=c<W). Manhattan distance |r1-r2|+|c1-c2| counts 4-directional steps between two cells.",
+        "java": "char[][] or int[][]; loop for(i..H) for(j..W). Keep int[] dr={-1,1,0,0}, dc={0,0,-1,1} for the four neighbours (or all 8) and guard indices before reading.",
+        "how": "Map each source cell to its rotated position: new[j][i] = old[H-1-i][j]."
+      },
+      {
+        "key": "char_arrays",
+        "name": "Char Arrays & ASCII",
+        "what": "Manipulating characters via their numeric codes and mutable char arrays.",
+        "deep": "Characters are small integers, so 'a'..'z' map to a 26-slot table via c - 'a'. Because Java strings are immutable, in-place character work needs a char[]. This underlies frequency counts, canonical keys, and in-place edits.",
+        "java": "int idx = c - 'a'; char[] arr = s.toCharArray(); new String(arr) to rebuild. A length-26 or length-128 int[] beats a HashMap for letters.",
+        "how": "Build each rotated row as a sequence of characters."
+      },
+      {
+        "key": "iteration",
+        "name": "Array Iteration",
+        "what": "Walking through elements one at a time while maintaining running state such as a sum, max, or counter.",
+        "deep": "The workhorse of array problems: one for-loop that updates accumulators as it goes. Most linear-time solutions are just one well-chosen pass, so the real skill is deciding what state to carry so a single sweep suffices.",
+        "java": "Use for (int i = 0; i < n; i++) or for (int x : nums). Prefer a primitive int[] over Integer[] to avoid autoboxing overhead.",
+        "how": "Emit the W×H output row by row."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example 1",
+        "input": "2 3\nabc\ndef\n",
+        "expected_output": "da\neb\nfc",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Square",
+        "input": "3 3\n123\n456\n789\n",
+        "expected_output": "741\n852\n963",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Single row",
+        "input": "1 3\nxyz\n",
+        "expected_output": "x\ny\nz",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Single cell",
+        "input": "1 1\nA\n",
+        "expected_output": "A",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "judge_mode": "exact",
+    "order": 67
+  },
+  {
+    "slug": "spiral-order",
+    "title": "Spiral Order",
+    "difficulty": "Medium",
+    "description": "Read an `H × W` grid of characters in **spiral order** — clockwise starting at the top-left: across the top row, down the right column, back along the bottom, up the left, then inward — and print all characters on one line.\n\n### Input\n- Line 1: `H W`.\n- Next `H` lines: the grid (visible characters, no spaces).\n\n### Output\nA single line: the characters in spiral order, concatenated.",
+    "constraints": "1 ≤ H, W ≤ 100",
+    "examples": [
+      {
+        "input": "3 3\n123\n456\n789",
+        "output": "123698745",
+        "explanation": "1 2 3 6 9 8 7 4 5 spiralling inward."
+      },
+      {
+        "input": "2 4\nabcd\nefgh",
+        "output": "abcdhgfe",
+        "explanation": "a b c d h g f e around the ring."
+      }
+    ],
+    "editorial": "## Approach\nKeep four shrinking boundaries `top, bottom, left, right`. Repeatedly: walk left→right along `top` then `top++`; walk `top→bottom` down `right` then `right--`; if `top ≤ bottom`, walk right→left along `bottom` then `bottom--`; if `left ≤ right`, walk `bottom→top` up `left` then `left++`. The two guards prevent double-visiting the middle row/column of odd-shaped grids.",
+    "optimal_time": "O(H·W)",
+    "optimal_space": "O(H·W)",
+    "optimal_explanation": "Peel one ring at a time, visiting each cell once.",
+    "starter_code": {
+      "java": "import java.util.*;\nimport java.io.*;\n\npublic class Main {\n    public static void main(String[] args) throws IOException {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        StringTokenizer st = new StringTokenizer(br.readLine());\n        int H = Integer.parseInt(st.nextToken()), W = Integer.parseInt(st.nextToken());\n        char[][] g = new char[H][];\n        for (int i = 0; i < H; i++) g[i] = br.readLine().toCharArray();\n        StringBuilder sb = new StringBuilder();\n        // TODO: append characters in clockwise spiral order using top/bottom/left/right bounds\n        System.out.println(sb.toString());\n    }\n}\n",
+      "python": "import sys\n\ndef solve(H, W, grid):\n    # TODO: return the characters in spiral order as one string\n    return ''\n\ndata = sys.stdin.read().split('\\n')\nH, W = map(int, data[0].split())\ngrid = [data[1 + i] for i in range(H)]\nprint(solve(H, W, grid))\n",
+      "javascript": "const data = require('fs').readFileSync(0, 'utf8').split('\\n');\nconst [H, W] = data[0].split(' ').map(Number);\nconst grid = [];\nfor (let i = 0; i < H; i++) grid.push(data[1 + i]);\nfunction solve(H, W, grid) {\n  // TODO: return the spiral-order characters as one string\n  return '';\n}\nconsole.log(solve(H, W, grid));\n",
+      "typescript": "const data = require('fs').readFileSync(0, 'utf8').split('\\n');\nconst [H, W] = data[0].split(' ').map(Number);\nconst grid = [];\nfor (let i = 0; i < H; i++) grid.push(data[1 + i]);\nfunction solve(H, W, grid) {\n  // TODO: return the spiral-order characters as one string\n  return '';\n}\nconsole.log(solve(H, W, grid));\n"
+    },
+    "topics": [
+      "Matrix",
+      "Simulation"
+    ],
+    "subtopics": [
+      "Grid"
+    ],
+    "companies": [
+      "Amazon",
+      "Google",
+      "Microsoft"
+    ],
+    "patterns": [
+      "Grid / Matrix",
+      "Simulation"
+    ],
+    "hints": [
+      "Track four boundaries: top, bottom, left, right.",
+      "Walk right along the top, then down the right, then left along the bottom, then up the left.",
+      "Shrink the boundary after finishing each edge.",
+      "Guard against re-walking a row/column when the grid is a single line or column."
+    ],
+    "prerequisites": [
+      {
+        "key": "grid",
+        "name": "Grid / Matrix Traversal",
+        "what": "Walking a 2-D board with nested loops, neighbour offsets, and bounds checks.",
+        "deep": "Most grid problems are two nested loops over rows and columns. Neighbours come from offset lists — 4-directional {(-1,0),(1,0),(0,-1),(0,1)} or 8-directional including diagonals — and every access must be bounds-checked (0<=r<H and 0<=c<W). Manhattan distance |r1-r2|+|c1-c2| counts 4-directional steps between two cells.",
+        "java": "char[][] or int[][]; loop for(i..H) for(j..W). Keep int[] dr={-1,1,0,0}, dc={0,0,-1,1} for the four neighbours (or all 8) and guard indices before reading.",
+        "how": "Peel the board ring by ring."
+      },
+      {
+        "key": "simulation",
+        "name": "Simulation",
+        "what": "Directly modelling a process step by step, exactly as the statement describes, instead of finding a formula.",
+        "deep": "When constraints are small, the intended solution is often to just do what the problem says: hold the state, apply each event or rule in order, and read the answer at the end. The skill is translating rules into precise state transitions and handling edge cases and 1- vs 0-indexing carefully.",
+        "java": "Model state in an array or a small int/enum code; process events in a loop, updating state per the rules. Watch off-by-one and 1-indexed input.",
+        "how": "Track four shrinking boundaries: top, bottom, left, right."
+      },
+      {
+        "key": "iteration",
+        "name": "Array Iteration",
+        "what": "Walking through elements one at a time while maintaining running state such as a sum, max, or counter.",
+        "deep": "The workhorse of array problems: one for-loop that updates accumulators as it goes. Most linear-time solutions are just one well-chosen pass, so the real skill is deciding what state to carry so a single sweep suffices.",
+        "java": "Use for (int i = 0; i < n; i++) or for (int x : nums). Prefer a primitive int[] over Integer[] to avoid autoboxing overhead.",
+        "how": "Walk right, down, left, and up on each layer."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example 1",
+        "input": "3 3\n123\n456\n789\n",
+        "expected_output": "123698745",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Wide",
+        "input": "2 4\nabcd\nefgh\n",
+        "expected_output": "abcdhgfe",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Single row",
+        "input": "1 4\nwxyz\n",
+        "expected_output": "wxyz",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Single column",
+        "input": "3 1\na\nb\nc\n",
+        "expected_output": "abc",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "judge_mode": "exact",
+    "order": 68
   },
   {
     "slug": "two-sum-fn",
@@ -3403,7 +4292,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 28
+    "order": 32
   },
   {
     "slug": "max-subarray-fn",
@@ -3528,7 +4417,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 61
+    "order": 69
   },
   {
     "slug": "reverse-array-fn",
@@ -3643,7 +4532,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 29
+    "order": 33
   },
   {
     "slug": "is-palindrome-fn",
@@ -3758,7 +4647,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 30
+    "order": 34
   },
   {
     "slug": "is-even",
@@ -4716,7 +5605,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 31
+    "order": 35
   },
   {
     "slug": "single-number",
@@ -4825,7 +5714,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 32
+    "order": 36
   },
   {
     "slug": "majority-element",
@@ -4934,7 +5823,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 33
+    "order": 37
   },
   {
     "slug": "is-prime",
@@ -5046,7 +5935,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 34
+    "order": 38
   },
   {
     "slug": "count-primes",
@@ -5153,7 +6042,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 35
+    "order": 39
   },
   {
     "slug": "valid-anagram",
@@ -5274,7 +6163,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 36
+    "order": 40
   },
   {
     "slug": "first-unique-char",
@@ -5383,7 +6272,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 37
+    "order": 41
   },
   {
     "slug": "move-zeroes",
@@ -5492,7 +6381,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 38
+    "order": 42
   },
   {
     "slug": "running-sum",
@@ -5598,7 +6487,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 39
+    "order": 43
   },
   {
     "slug": "max-consecutive-ones",
@@ -5704,7 +6593,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 40
+    "order": 44
   },
   {
     "slug": "second-largest",
@@ -5808,7 +6697,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 41
+    "order": 45
   },
   {
     "slug": "count-occurrences",
@@ -5909,7 +6798,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 42
+    "order": 46
   },
   {
     "slug": "number-of-1-bits",
@@ -6016,7 +6905,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 43
+    "order": 47
   },
   {
     "slug": "product-except-self",
@@ -6126,7 +7015,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 62
+    "order": 70
   },
   {
     "slug": "best-time-buy-sell",
@@ -6244,7 +7133,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 63
+    "order": 71
   },
   {
     "slug": "container-most-water",
@@ -6353,7 +7242,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 64
+    "order": 72
   },
   {
     "slug": "house-robber",
@@ -6461,7 +7350,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 65
+    "order": 73
   },
   {
     "slug": "jump-game",
@@ -6570,7 +7459,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 66
+    "order": 74
   },
   {
     "slug": "coin-change",
@@ -6683,7 +7572,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 67
+    "order": 75
   },
   {
     "slug": "coin-change-ways",
@@ -6794,7 +7683,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 68
+    "order": 76
   },
   {
     "slug": "longest-common-prefix",
@@ -6900,7 +7789,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 69
+    "order": 77
   },
   {
     "slug": "search-insert-position",
@@ -7013,7 +7902,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 70
+    "order": 78
   },
   {
     "slug": "integer-sqrt",
@@ -7129,7 +8018,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 71
+    "order": 79
   },
   {
     "slug": "min-cost-climbing-stairs",
@@ -7236,7 +8125,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 72
+    "order": 80
   },
   {
     "slug": "daily-temperatures",
@@ -7345,7 +8234,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 73
+    "order": 81
   },
   {
     "slug": "next-greater-element",
@@ -7454,7 +8343,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 74
+    "order": 82
   },
   {
     "slug": "subarray-sum-k",
@@ -7576,7 +8465,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 75
+    "order": 83
   },
   {
     "slug": "longest-consecutive",
@@ -7685,7 +8574,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 76
+    "order": 84
   },
   {
     "slug": "kth-largest-element",
@@ -7798,7 +8687,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 77
+    "order": 85
   },
   {
     "slug": "rotate-array-right",
@@ -7908,7 +8797,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 78
+    "order": 86
   },
   {
     "slug": "word-break",
@@ -8030,7 +8919,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 91
+    "order": 99
   },
   {
     "slug": "decode-ways",
@@ -8147,7 +9036,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 92
+    "order": 100
   },
   {
     "slug": "longest-palindrome-length",
@@ -8257,7 +9146,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 93
+    "order": 101
   },
   {
     "slug": "maximum-product-subarray",
@@ -8366,7 +9255,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 94
+    "order": 102
   },
   {
     "slug": "partition-equal-subset-sum",
@@ -8474,7 +9363,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 95
+    "order": 103
   },
   {
     "slug": "min-of-two",
@@ -9092,7 +9981,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 44
+    "order": 48
   },
   {
     "slug": "power-of-two",
@@ -9208,7 +10097,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 45
+    "order": 49
   },
   {
     "slug": "missing-number",
@@ -9325,7 +10214,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 46
+    "order": 50
   },
   {
     "slug": "count-negatives",
@@ -9422,7 +10311,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 47
+    "order": 51
   },
   {
     "slug": "is-sorted",
@@ -9527,7 +10416,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 48
+    "order": 52
   },
   {
     "slug": "fizzbuzz-value",
@@ -9633,7 +10522,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 49
+    "order": 53
   },
   {
     "slug": "two-sum-sorted",
@@ -9746,7 +10635,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 50
+    "order": 54
   },
   {
     "slug": "merge-sorted-arrays",
@@ -9859,7 +10748,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 79
+    "order": 87
   },
   {
     "slug": "kth-smallest",
@@ -9972,7 +10861,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 80
+    "order": 88
   },
   {
     "slug": "gcd-of-array",
@@ -10077,7 +10966,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 81
+    "order": 89
   },
   {
     "slug": "fast-power",
@@ -10198,7 +11087,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 82
+    "order": 90
   },
   {
     "slug": "unique-paths",
@@ -10310,7 +11199,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 83
+    "order": 91
   },
   {
     "slug": "longest-common-subsequence",
@@ -10424,7 +11313,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 84
+    "order": 92
   },
   {
     "slug": "top-k-frequent",
@@ -10548,7 +11437,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 85
+    "order": 93
   },
   {
     "slug": "count-bits",
@@ -10658,7 +11547,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 86
+    "order": 94
   },
   {
     "slug": "largest-rectangle-histogram",
@@ -10767,7 +11656,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 96
+    "order": 104
   },
   {
     "slug": "sliding-window-maximum",
@@ -10881,7 +11770,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 97
+    "order": 105
   },
   {
     "slug": "jump-game-ii",
@@ -10990,7 +11879,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 98
+    "order": 106
   },
   {
     "slug": "longest-valid-parentheses",
@@ -11101,7 +11990,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 99
+    "order": 107
   },
   {
     "slug": "min-window-length",
@@ -11225,6 +12114,6 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 100
+    "order": 108
   }
 ]

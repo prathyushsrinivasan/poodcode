@@ -349,5 +349,23 @@
     "deep": "Build P[i] = a[0]+…+a[i-1]; then the sum of a[l..r] is P[r+1] − P[l] in O(1). Paired with a hash map of seen prefixes it counts subarrays with a target sum in one pass. The same idea extends to prefix XOR, products, and 2-D grids.",
     "java": "A long[] prefix of length n+1, or a running long combined with a HashMap<Long,Integer> of prefix counts.",
     "lesson": ""
+  },
+  {
+    "key": "grid",
+    "name": "Grid / Matrix Traversal",
+    "category": "Arrays",
+    "what": "Walking a 2-D board with nested loops, neighbour offsets, and bounds checks.",
+    "deep": "Most grid problems are two nested loops over rows and columns. Neighbours come from offset lists — 4-directional {(-1,0),(1,0),(0,-1),(0,1)} or 8-directional including diagonals — and every access must be bounds-checked (0<=r<H and 0<=c<W). Manhattan distance |r1-r2|+|c1-c2| counts 4-directional steps between two cells.",
+    "java": "char[][] or int[][]; loop for(i..H) for(j..W). Keep int[] dr={-1,1,0,0}, dc={0,0,-1,1} for the four neighbours (or all 8) and guard indices before reading.",
+    "lesson": ""
+  },
+  {
+    "key": "simulation",
+    "name": "Simulation",
+    "category": "Foundations",
+    "what": "Directly modelling a process step by step, exactly as the statement describes, instead of finding a formula.",
+    "deep": "When constraints are small, the intended solution is often to just do what the problem says: hold the state, apply each event or rule in order, and read the answer at the end. The skill is translating rules into precise state transitions and handling edge cases and 1- vs 0-indexing carefully.",
+    "java": "Model state in an array or a small int/enum code; process events in a loop, updating state per the rules. Watch off-by-one and 1-indexed input.",
+    "lesson": ""
   }
 ]
