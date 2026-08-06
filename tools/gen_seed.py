@@ -4620,6 +4620,433 @@ DEFS += GRID_DEFS
 
 
 # ---------------------------------------------------------------------------
+# "Basics" problems — ad-hoc reasoning solvable with core Java (loops,
+# conditionals, arithmetic, strings, arrays). No data structures or algorithmic
+# techniques required — just figure out the logic and implement it. Authored as
+# harness problems so the learner writes only the function body.
+# ---------------------------------------------------------------------------
+
+def _leap(y):
+    return y % 4 == 0 and (y % 100 != 0 or y % 400 == 0)
+
+
+def _count_divisors(n):
+    n = abs(n)
+    if n == 0:
+        return 0
+    c = 0
+    i = 1
+    while i * i <= n:
+        if n % i == 0:
+            c += 1 if i * i == n else 2
+        i += 1
+    return c
+
+
+def _digital_root(n):
+    n = abs(n)
+    while n >= 10:
+        n = sum(int(ch) for ch in str(n))
+    return n
+
+
+def _alt_sum(nums):
+    return sum(x if i % 2 == 0 else -x for i, x in enumerate(nums))
+
+
+def _count_above_avg(nums):
+    total = sum(nums)
+    n = len(nums)
+    return sum(1 for x in nums if x * n > total)
+
+
+def _us_coins(cents):
+    count = 0
+    for coin in (25, 10, 5, 1):
+        count += cents // coin
+        cents %= coin
+    return count
+
+
+def _armstrong(n):
+    s = str(n)
+    k = len(s)
+    return sum(int(d) ** k for d in s) == n
+
+
+def _perfect(n):
+    if n < 2:
+        return False
+    return sum(d for d in range(1, n) if n % d == 0) == n
+
+
+def _collatz(n):
+    steps = 0
+    while n != 1:
+        n = n // 2 if n % 2 == 0 else 3 * n + 1
+        steps += 1
+    return steps
+
+
+def _sec_to_clock(s):
+    return f"{s // 3600}:{(s % 3600) // 60:02d}:{s % 60:02d}"
+
+
+def _count_words(s):
+    return len(s.split())
+
+
+def _mountain(nums):
+    n = len(nums)
+    if n < 3:
+        return False
+    i = 0
+    while i + 1 < n and nums[i] < nums[i + 1]:
+        i += 1
+    if i == 0 or i == n - 1:
+        return False
+    while i + 1 < n and nums[i] > nums[i + 1]:
+        i += 1
+    return i == n - 1
+
+
+def _is_perm(nums):
+    return sorted(nums) == list(range(1, len(nums) + 1))
+
+
+def _rps(a, b):
+    beats = {"R": "S", "S": "P", "P": "R"}
+    aw = bw = 0
+    for x, y in zip(a, b):
+        if x == y:
+            continue
+        if beats[x] == y:
+            aw += 1
+        else:
+            bw += 1
+    return "A" if aw > bw else "B" if bw > aw else "Draw"
+
+
+def _traffic(g, y, r, t):
+    p = t % (g + y + r)
+    return "green" if p < g else "yellow" if p < g + y else "red"
+
+
+def _max_depth(s):
+    depth = best = 0
+    for ch in s:
+        if ch == "(":
+            depth += 1
+            best = max(best, depth)
+        elif ch == ")":
+            depth -= 1
+    return best
+
+
+def _caesar(s, k):
+    k %= 26
+    return "".join(chr((ord(ch) - 97 + k) % 26 + 97) if "a" <= ch <= "z" else ch for ch in s)
+
+
+def _rle(s):
+    if not s:
+        return ""
+    out2 = []
+    run = 1
+    for i in range(1, len(s) + 1):
+        if i < len(s) and s[i] == s[i - 1]:
+            run += 1
+        else:
+            out2.append(s[i - 1] + str(run))
+            run = 1
+    return "".join(out2)
+
+
+def _password_ok(s):
+    return (
+        len(s) >= 8
+        and any(c.isupper() for c in s)
+        and any(c.islower() for c in s)
+        and any(c.isdigit() for c in s)
+    )
+
+
+def _bank_balance(tx):
+    bal = 0
+    for t in tx:
+        if t < 0 and bal + t < 0:
+            continue
+        bal += t
+    return bal
+
+
+def _max_passengers(changes):
+    cur = best = 0
+    for c in changes:
+        cur += c
+        best = max(best, cur)
+    return best
+
+
+def _good_pairs(nums):
+    c = 0
+    for i in range(len(nums)):
+        for j in range(i + 1, len(nums)):
+            if nums[i] == nums[j]:
+                c += 1
+    return c
+
+
+HARNESS_DEFS += [
+    # ------- INTRO -------
+    dict(slug="leap-year", title="Leap Year", difficulty="Intro", topics=["Math"], subtopics=["Conditionals"], companies=["Microsoft"],
+         description="Return `true` if the given year is a leap year. A year is a leap year if it is divisible by 4, **except** century years (divisible by 100), which are leap years only if also divisible by 400.",
+         constraints="1 ≤ y ≤ 10^5",
+         hints=["Start from 'divisible by 4'.", "Then carve out the century exception.", "2000 is a leap year; 1900 is not."],
+         opt=("O(1)", "O(1)", "A short chain of divisibility checks."),
+         editorial="Leap iff (y%4==0 and y%100!=0) or y%400==0. Get the operator precedence right.",
+         spec={"name": "solve", "params": [{"name": "y", "type": "int"}], "returns": "bool"},
+         fn=lambda y: _leap(y),
+         cases=[("example", "Divisible by 4", (2024,)), ("example", "Century non-leap", (1900,)), ("hidden", "400 year", (2000,)), ("hidden", "Ordinary", (2023,))],
+         example_expl=["2024 is divisible by 4 → leap.", "1900 is a century but not divisible by 400 → not leap."]),
+    dict(slug="count-divisors", title="Count Divisors", difficulty="Intro", topics=["Math"], subtopics=["Number Theory"], companies=["Amazon"],
+         description="Return how many positive integers divide `n` exactly (including 1 and n itself).",
+         constraints="1 ≤ n ≤ 10^9",
+         hints=["A divisor d pairs with n/d.", "You only need to test up to √n.", "Count both members of each pair (once when d·d = n)."],
+         opt=("O(√n)", "O(1)", "Test divisors up to the square root, counting each pair."),
+         editorial="For i from 1 to √n, if i divides n add 2 (for i and n/i), or add 1 when i·i == n.",
+         spec={"name": "solve", "params": [{"name": "n", "type": "int"}], "returns": "int"},
+         fn=lambda n: _count_divisors(n),
+         cases=[("example", "Twelve", (12,)), ("example", "Prime", (7,)), ("hidden", "One", (1,)), ("hidden", "Square", (36,))],
+         example_expl=["1,2,3,4,6,12 → 6 divisors.", "A prime has exactly 2."]),
+    dict(slug="digital-root", title="Digital Root", difficulty="Intro", topics=["Math"], subtopics=["Digits"], companies=["Adobe"],
+         description="Repeatedly replace the number by the sum of its digits until a single digit remains, and return it.",
+         constraints="0 ≤ n ≤ 10^9",
+         hints=["Sum the digits.", "If the result has more than one digit, repeat.", "Loop until the value is below 10."],
+         opt=("O(log n) per pass", "O(1)", "Repeatedly fold the digit sum until a single digit remains."),
+         spec={"name": "solve", "params": [{"name": "n", "type": "int"}], "returns": "int"},
+         fn=lambda n: _digital_root(n),
+         cases=[("example", "Example", (942,)), ("example", "Single", (7,)), ("hidden", "Zero", (0,)), ("hidden", "Nines", (99999,))],
+         example_expl=["9+4+2=15 → 1+5=6.", "Already a single digit."]),
+    dict(slug="alternating-sum", title="Alternating Sum", difficulty="Intro", topics=["Arrays"], subtopics=["Traversal"], companies=["Bloomberg"],
+         description="Return a[0] − a[1] + a[2] − a[3] + … (add even indices, subtract odd indices).",
+         constraints="0 ≤ n ≤ 10^5",
+         hints=["Walk the array with an index.", "Add when the index is even, subtract when odd.", "An empty array sums to 0."],
+         opt=("O(n)", "O(1)", "One pass toggling the sign by index parity."),
+         spec={"name": "solve", "params": [{"name": "nums", "type": "int[]"}], "returns": "int"},
+         fn=lambda nums: _alt_sum(nums),
+         cases=[("example", "Example", ([1, 2, 3, 4, 5],)), ("example", "Two", ([10, 3],)), ("hidden", "Single", ([7],)), ("hidden", "Empty", ([],))],
+         example_expl=["1-2+3-4+5 = 3.", "10-3 = 7."]),
+    dict(slug="us-coins-change", title="Coin Count (US coins)", difficulty="Intro", topics=["Math", "Greedy"], subtopics=["Greedy"], companies=["Amazon"],
+         description="Make `cents` using quarters (25), dimes (10), nickels (5), and pennies (1). Return the **fewest** coins needed. (With these denominations, always take the largest coin that fits.)",
+         constraints="0 ≤ cents ≤ 10^6",
+         hints=["Take as many quarters as possible, then dimes, then nickels, then pennies.", "After each coin, keep the remainder with %.", "Sum how many coins you used."],
+         opt=("O(1)", "O(1)", "Greedy over four fixed denominations."),
+         editorial="Greedily divide by 25, then 10, then 5, then 1, summing the quotients — optimal for these canonical coins.",
+         spec={"name": "solve", "params": [{"name": "cents", "type": "int"}], "returns": "int"},
+         fn=lambda cents: _us_coins(cents),
+         cases=[("example", "63 cents", (63,)), ("example", "Exact quarter", (25,)), ("hidden", "Zero", (0,)), ("hidden", "Pennies only", (4,))],
+         example_expl=["2×25 + 1×10 + 3×1 = 6 coins.", "One quarter."]),
+
+    # ------- EASY -------
+    dict(slug="count-above-average", title="Count Above Average", difficulty="Easy", topics=["Arrays"], subtopics=["Counting"], companies=["Amazon"],
+         description="Return how many elements are strictly greater than the array's average.",
+         constraints="1 ≤ n ≤ 10^5",
+         hints=["First find the total (or average).", "Then count elements above it.", "To avoid fractions, compare x·n with the sum instead of x with sum/n."],
+         opt=("O(n)", "O(1)", "One pass for the sum, one to count."),
+         editorial="Compute the sum; an element x beats the average exactly when x·n > sum — this dodges floating point.",
+         spec={"name": "solve", "params": [{"name": "nums", "type": "int[]"}], "returns": "int"},
+         fn=lambda nums: _count_above_avg(nums),
+         cases=[("example", "Example", ([1, 2, 3, 4, 5],)), ("example", "Flat", ([2, 2, 2],)), ("hidden", "One big", ([1, 1, 10],)), ("hidden", "Single", ([5],))],
+         example_expl=["Average 3; 4 and 5 are above → 2.", "Nothing exceeds the average."]),
+    dict(slug="armstrong-number", title="Armstrong Number", difficulty="Easy", topics=["Math"], subtopics=["Digits"], companies=["Adobe"],
+         description="Return `true` if `n` equals the sum of each of its digits raised to the power of the number of digits (e.g. 153 = 1³+5³+3³).",
+         constraints="0 ≤ n ≤ 10^9",
+         hints=["Count the digits first — that's the exponent.", "Raise each digit to that power and add.", "Compare the total to n."],
+         opt=("O(d)", "O(1)", "One pass over the d digits."),
+         editorial="Let k be the digit count; sum digit^k over all digits and check equality with n.",
+         spec={"name": "solve", "params": [{"name": "n", "type": "int"}], "returns": "bool"},
+         fn=lambda n: _armstrong(n),
+         cases=[("example", "153", (153,)), ("example", "Not", (100,)), ("hidden", "Single", (5,)), ("hidden", "Four-digit", (9474,))],
+         example_expl=["1³+5³+3³ = 153.", "1+0+0 ≠ 100."]),
+    dict(slug="perfect-number", title="Perfect Number", difficulty="Easy", topics=["Math"], subtopics=["Number Theory"], companies=["Bloomberg"],
+         description="Return `true` if `n` equals the sum of its proper divisors (all positive divisors except itself).",
+         constraints="1 ≤ n ≤ 10^5",
+         hints=["Proper divisors of n are 1..n-1 that divide n.", "Sum them and compare to n.", "6 = 1+2+3 is the smallest perfect number."],
+         opt=("O(√n)", "O(1)", "Sum divisors up to √n in pairs."),
+         editorial="Add every proper divisor (pair i with n/i up to √n, excluding n itself) and test equality with n.",
+         spec={"name": "solve", "params": [{"name": "n", "type": "int"}], "returns": "bool"},
+         fn=lambda n: _perfect(n),
+         cases=[("example", "Six", (6,)), ("example", "Not", (10,)), ("hidden", "28", (28,)), ("hidden", "One", (1,))],
+         example_expl=["1+2+3 = 6.", "1+2+5 = 8 ≠ 10."]),
+    dict(slug="collatz-steps", title="Collatz Steps", difficulty="Easy", topics=["Math", "Simulation"], subtopics=["Simulation"], companies=["Google"],
+         description="Starting from `n`, repeatedly halve it if even or replace it with 3n+1 if odd. Return how many steps it takes to reach 1.",
+         constraints="1 ≤ n ≤ 10^6",
+         hints=["Loop until n becomes 1.", "Even → n/2, odd → 3n+1.", "Count each transformation."],
+         opt=("O(steps)", "O(1)", "Simulate the sequence, counting steps."),
+         editorial="Just simulate the rule, incrementing a counter until n reaches 1. No formula is known — you run it.",
+         spec={"name": "solve", "params": [{"name": "n", "type": "int"}], "returns": "int"},
+         fn=lambda n: _collatz(n),
+         cases=[("example", "Example", (6,)), ("example", "Already one", (1,)), ("hidden", "Power of two", (16,)), ("hidden", "Odd", (7,))],
+         example_expl=["6→3→10→5→16→8→4→2→1 = 8 steps.", "0 steps."]),
+    dict(slug="seconds-to-clock", title="Seconds to Clock", difficulty="Easy", topics=["Math"], subtopics=["Arithmetic"], companies=["Amazon"],
+         description="Convert a number of seconds into `H:MM:SS` form: hours as-is, minutes and seconds zero-padded to two digits.",
+         constraints="0 ≤ s ≤ 10^9",
+         hints=["Hours = s / 3600.", "Minutes = (s / 60) % 60, seconds = s % 60.", "Zero-pad minutes and seconds to width 2."],
+         opt=("O(1)", "O(1)", "Integer division and modulo, then format."),
+         editorial="h = s/3600, m = (s%3600)/60, sec = s%60; print h ':' then two-digit m and sec.",
+         spec={"name": "solve", "params": [{"name": "s", "type": "int"}], "returns": "string"},
+         fn=lambda s: _sec_to_clock(s),
+         cases=[("example", "Example", (3661,)), ("example", "Zero", (0,)), ("hidden", "Minutes", (75,)), ("hidden", "Big", (86399,))],
+         example_expl=["1:01:01.", "0:00:00."]),
+    dict(slug="count-words", title="Count Words", difficulty="Easy", topics=["Strings"], subtopics=["Counting"], companies=["Microsoft"],
+         description="Return the number of words in a sentence. Words are maximal runs of non-space characters; there may be extra spaces.",
+         constraints="0 ≤ |s| ≤ 10^5",
+         hints=["Split the string on spaces.", "Ignore empty pieces caused by repeated spaces.", "An empty or all-space string has 0 words."],
+         opt=("O(|s|)", "O(1)", "Scan once, counting transitions into a word."),
+         editorial="Count the number of times a non-space character follows a space (or the start) — equivalently the number of non-empty split tokens.",
+         spec={"name": "solve", "params": [{"name": "s", "type": "string"}], "returns": "int"},
+         fn=lambda s: _count_words(s),
+         cases=[("example", "Example", ("the quick brown fox",)), ("example", "Extra spaces", ("  hello   world  ",)), ("hidden", "One word", ("java",)), ("hidden", "Empty", ("",))],
+         example_expl=["Four words.", "Extra spaces don't add words → 2."]),
+    dict(slug="mountain-array", title="Mountain Array", difficulty="Easy", topics=["Arrays"], subtopics=["Traversal"], companies=["Amazon", "Meta"],
+         description="Return `true` if the array strictly increases to a single peak and then strictly decreases. The peak must not be the first or last element (length ≥ 3).",
+         constraints="0 ≤ n ≤ 10^5",
+         hints=["Walk up while strictly increasing.", "The peak can't be at either end.", "Then it must strictly decrease all the way down."],
+         opt=("O(n)", "O(1)", "Two directional scans (up then down)."),
+         editorial="Advance while a[i] < a[i+1]; the stopping index is the peak (reject if at an end); then require strictly decreasing to the last index.",
+         spec={"name": "solve", "params": [{"name": "nums", "type": "int[]"}], "returns": "bool"},
+         fn=lambda nums: _mountain(nums),
+         cases=[("example", "Mountain", ([1, 3, 5, 4, 2],)), ("example", "Only up", ([1, 2, 3],)), ("hidden", "Plateau", ([1, 2, 2, 1],)), ("hidden", "Too short", ([1, 2],))],
+         example_expl=["Up to 5 then down → true.", "Never comes down → false."]),
+    dict(slug="is-permutation-1n", title="Is a Permutation of 1..n", difficulty="Easy", topics=["Arrays"], subtopics=["Counting"], companies=["Adobe"],
+         description="Return `true` if the array of length n contains every integer from 1 to n exactly once (in any order).",
+         constraints="0 ≤ n ≤ 10^5",
+         hints=["A valid permutation uses each of 1..n once.", "Sorting it should give 1,2,…,n.", "Or mark seen values and check for duplicates / out-of-range."],
+         opt=("O(n log n)", "O(1)", "Sort and compare to 1..n (or a seen-array in O(n))."),
+         spec={"name": "solve", "params": [{"name": "nums", "type": "int[]"}], "returns": "bool"},
+         fn=lambda nums: _is_perm(nums),
+         cases=[("example", "Permutation", ([3, 1, 2],)), ("example", "Missing", ([1, 2, 2],)), ("hidden", "Empty", ([],)), ("hidden", "Out of range", ([0, 1],))],
+         example_expl=["Exactly 1,2,3 → true.", "2 repeats, 3 missing → false."]),
+    dict(slug="rock-paper-scissors", title="Rock Paper Scissors", difficulty="Easy", topics=["Simulation"], subtopics=["State Machine"], companies=["Amazon"],
+         description="Two players play several rounds. Each move is `R`, `P`, or `S` (rock beats scissors, scissors beats paper, paper beats rock). Given both players' move strings of equal length, return `A`, `B`, or `Draw` for whoever wins more rounds.",
+         constraints="0 ≤ length ≤ 10^5\nEach character is R, P, or S.",
+         hints=["Compare the moves round by round.", "Encode who-beats-whom in a small lookup.", "Tally each player's round wins, then compare totals."],
+         opt=("O(n)", "O(1)", "One pass tallying round wins."),
+         editorial="Use beats = {R:S, S:P, P:R}. For each round, if a beats b give A a point, else B; equal moves are draws. Compare totals.",
+         spec={"name": "solve", "params": [{"name": "a", "type": "string"}, {"name": "b", "type": "string"}], "returns": "string"},
+         fn=lambda a, b: _rps(a, b),
+         cases=[("example", "A wins", ("RPS", "SRP")), ("example", "Draw", ("RR", "RR")), ("hidden", "B wins", ("R", "P")), ("hidden", "Mixed", ("RPSR", "PSRP"))],
+         example_expl=["A wins each round → A.", "Identical moves → Draw."]),
+    dict(slug="traffic-light", title="Traffic Light", difficulty="Easy", topics=["Math", "Simulation"], subtopics=["Simulation"], companies=["Bloomberg"],
+         description="A light cycles green for `g` seconds, then yellow for `y`, then red for `r`, forever, starting at green at time 0. Return the colour (\"green\", \"yellow\", or \"red\") at time `t`.",
+         constraints="1 ≤ g, y, r ≤ 10^4\n0 ≤ t ≤ 10^9",
+         hints=["The pattern repeats every g+y+r seconds.", "Reduce t modulo the cycle length.", "Then place it in the green / yellow / red band."],
+         opt=("O(1)", "O(1)", "One modulo plus two comparisons."),
+         editorial="phase = t mod (g+y+r); it's green if phase < g, yellow if phase < g+y, otherwise red.",
+         spec={"name": "solve", "params": [{"name": "g", "type": "int"}, {"name": "y", "type": "int"}, {"name": "r", "type": "int"}, {"name": "t", "type": "int"}], "returns": "string"},
+         fn=lambda g, y, r, t: _traffic(g, y, r, t),
+         cases=[("example", "Green", (5, 2, 3, 1)), ("example", "Red", (5, 2, 3, 9)), ("hidden", "Yellow edge", (5, 2, 3, 6)), ("hidden", "Wraps", (5, 2, 3, 10))],
+         example_expl=["t=1 is within the first 5s → green.", "t=9 mod 10 = 9 → red band."]),
+    dict(slug="max-nesting-depth", title="Maximum Nesting Depth", difficulty="Easy", topics=["Strings"], subtopics=["Counting"], companies=["Amazon", "Google"],
+         description="Given a string of parentheses (guaranteed balanced), return the maximum nesting depth.",
+         constraints="0 ≤ |s| ≤ 10^5\ns contains only '(' and ')'.",
+         hints=["Track a running depth.", "'(' increases it, ')' decreases it.", "Remember the largest depth seen."],
+         opt=("O(n)", "O(1)", "A single counter — no stack needed."),
+         editorial="Scan the string keeping a depth counter; bump it on '(' (updating the max) and drop it on ')'. Because the input is balanced, a plain counter suffices.",
+         spec={"name": "solve", "params": [{"name": "s", "type": "string"}], "returns": "int"},
+         fn=lambda s: _max_depth(s),
+         cases=[("example", "Nested", ("((()))",)), ("example", "Flat", ("()()",)), ("hidden", "Empty", ("",)), ("hidden", "Mixed", ("(()(()))",))],
+         example_expl=["Three levels deep.", "Never deeper than 1."]),
+    dict(slug="caesar-cipher", title="Caesar Cipher", difficulty="Easy", topics=["Strings"], subtopics=["Arithmetic"], companies=["Adobe"],
+         description="Shift each lowercase letter forward by `k` positions in the alphabet, wrapping past 'z' back to 'a'. Non-letter characters are unchanged.",
+         constraints="0 ≤ |s| ≤ 10^5\n0 ≤ k ≤ 10^9\nLetters are lowercase.",
+         hints=["Map each letter to 0–25 with c − 'a'.", "Add k, wrap with mod 26, map back.", "Reduce k mod 26 first for big shifts."],
+         opt=("O(|s|)", "O(|s|)", "Shift each character in one pass."),
+         editorial="For each lowercase c: ((c - 'a' + k) mod 26) + 'a'. Reducing k mod 26 keeps the arithmetic small.",
+         spec={"name": "solve", "params": [{"name": "s", "type": "string"}, {"name": "k", "type": "int"}], "returns": "string"},
+         fn=lambda s, k: _caesar(s, k),
+         cases=[("example", "Shift 3", ("abc", 3)), ("example", "Wrap", ("xyz", 2)), ("hidden", "No shift", ("hello", 0)), ("hidden", "Big k", ("abc", 29))],
+         example_expl=["a→d, b→e, c→f.", "x→z, y→a, z→b."]),
+    dict(slug="run-length-encode", title="Run-Length Encoding", difficulty="Easy", topics=["Strings"], subtopics=["Counting"], companies=["Amazon", "Microsoft"],
+         description="Compress a string by replacing each run of identical characters with the character followed by its count. For example `aaabbc` → `a3b2c1`.",
+         constraints="0 ≤ |s| ≤ 10^5",
+         hints=["Track the current character and how long its run is.", "When the character changes, emit char + count.", "Don't forget to emit the final run."],
+         opt=("O(|s|)", "O(|s|)", "One pass grouping consecutive equal characters."),
+         editorial="Walk the string; while the next char equals the current, grow the run; otherwise append char+count and reset. Emit the last run at the end.",
+         spec={"name": "solve", "params": [{"name": "s", "type": "string"}], "returns": "string"},
+         fn=lambda s: _rle(s),
+         cases=[("example", "Example", ("aaabbc",)), ("example", "All same", ("zzzz",)), ("hidden", "Empty", ("",)), ("hidden", "No runs", ("abc",))],
+         example_expl=["a3b2c1.", "z4."]),
+    dict(slug="password-strength", title="Valid Password", difficulty="Easy", topics=["Strings"], subtopics=["Conditionals"], companies=["Amazon"],
+         description="Return `true` if the password is valid: at least 8 characters long AND containing at least one uppercase letter, one lowercase letter, and one digit.",
+         constraints="0 ≤ |s| ≤ 10^5",
+         hints=["Check the length first.", "Scan once, setting flags for upper, lower, and digit.", "All conditions must hold."],
+         opt=("O(|s|)", "O(1)", "One pass collecting character-class flags."),
+         editorial="Track three booleans (seen upper, lower, digit) in a single scan and combine them with the length requirement.",
+         spec={"name": "solve", "params": [{"name": "s", "type": "string"}], "returns": "bool"},
+         fn=lambda s: _password_ok(s),
+         cases=[("example", "Valid", ("Abcdef12",)), ("example", "Too short", ("Abc12",)), ("hidden", "No digit", ("Abcdefgh",)), ("hidden", "No upper", ("abcdefg1",))],
+         example_expl=["8 chars with upper, lower, digit → valid.", "Only 5 characters → invalid."]),
+    dict(slug="bank-balance", title="Bank Account Balance", difficulty="Easy", topics=["Arrays", "Simulation"], subtopics=["Simulation"], companies=["Bloomberg", "Amazon"],
+         description="Process a list of transactions on an account that starts at 0. A positive value is a deposit (always applied). A negative value is a withdrawal, but a withdrawal that would make the balance negative is **rejected** (skipped). Return the final balance.",
+         constraints="0 ≤ n ≤ 10^5",
+         hints=["Keep a running balance.", "Apply deposits directly.", "Only apply a withdrawal if the balance stays ≥ 0; otherwise skip it."],
+         opt=("O(n)", "O(1)", "Single pass with a guarded update."),
+         editorial="Iterate the transactions; for a negative t, apply it only if balance + t ≥ 0, otherwise ignore it. Positives always apply.",
+         spec={"name": "solve", "params": [{"name": "transactions", "type": "int[]"}], "returns": "int"},
+         fn=lambda transactions: _bank_balance(transactions),
+         cases=[("example", "Example", ([100, -30, -200, 50],)), ("example", "All deposits", ([10, 20, 30],)), ("hidden", "Reject first", ([-5, 40],)), ("hidden", "Empty", ([],))],
+         example_expl=["100, then -30 → 70, -200 rejected, +50 → 120.", "10+20+30 = 60."]),
+    dict(slug="max-passengers", title="Maximum Passengers", difficulty="Easy", topics=["Arrays", "Simulation"], subtopics=["Prefix Sum"], companies=["Amazon"],
+         description="A bus starts empty. At each stop, `changes[i]` people board (or leave, if negative). Return the maximum number of passengers on the bus at any moment.",
+         constraints="1 ≤ n ≤ 10^5\nThe bus is never over-emptied (running total stays ≥ 0).",
+         hints=["Keep a running count of passengers.", "Update it at each stop.", "Track the largest value it reaches."],
+         opt=("O(n)", "O(1)", "Running total with a max tracker."),
+         editorial="Accumulate the changes into a running passenger count and record the maximum seen — a prefix-sum-with-running-max.",
+         spec={"name": "solve", "params": [{"name": "changes", "type": "int[]"}], "returns": "int"},
+         fn=lambda changes: _max_passengers(changes),
+         cases=[("example", "Example", ([3, 2, -1, 4, -3],)), ("example", "Only boarding", ([1, 1, 1],)), ("hidden", "Empties", ([5, -5, 2],)), ("hidden", "Single", ([7],))],
+         example_expl=["Counts 3,5,4,8,5 → peak 8.", "1,2,3 → peak 3."]),
+    dict(slug="count-equal-pairs", title="Count Equal Pairs", difficulty="Easy", topics=["Arrays"], subtopics=["Counting"], companies=["Amazon", "Adobe"],
+         description="Return the number of index pairs (i, j) with i < j and nums[i] == nums[j].",
+         constraints="1 ≤ n ≤ 2000",
+         hints=["A pair needs two equal values at different indices.", "With small n, a double loop is fine.", "For each i, compare against every later j."],
+         opt=("O(n²)", "O(1)", "Check every pair — the small bound makes it fine (counts also work)."),
+         editorial="With n ≤ 2000 a nested loop over i < j counting equal values is well within limits. (Frequency counts give an O(n) alternative: sum c·(c−1)/2.)",
+         spec={"name": "solve", "params": [{"name": "nums", "type": "int[]"}], "returns": "int"},
+         fn=lambda nums: _good_pairs(nums),
+         cases=[("example", "Example", ([1, 2, 1, 1],)), ("example", "None", ([1, 2, 3],)), ("hidden", "All same", ([5, 5, 5, 5],)), ("hidden", "Single", ([9],))],
+         example_expl=["Pairs (0,2),(0,3),(2,3) → 3.", "All distinct → 0."]),
+]
+
+PREREQS.update({
+    "leap-year": [("conditionals", "The rule is a chain of divisibility conditions."), ("modulo", "Divisibility is a remainder test.")],
+    "count-divisors": [("number_theory", "Divisors pair as d and n/d."), ("loops_basic", "Trial-divide up to √n."), ("big_o", "Stopping at √n turns O(n) into O(√n).")],
+    "digital-root": [("math_digits", "Sum the digits with % 10 and // 10 (or the string form)."), ("loops_basic", "Repeat until a single digit remains.")],
+    "alternating-sum": [("iteration", "Walk the array once."), ("conditionals", "Add or subtract based on index parity.")],
+    "count-above-average": [("iteration", "One pass for the sum, one to count."), ("arithmetic", "Compare x·n with the sum to avoid fractions.")],
+    "us-coins-change": [("greedy", "Always take the largest coin that fits."), ("modulo", "Keep the remainder after each denomination.")],
+    "armstrong-number": [("math_digits", "Break n into its digits."), ("arithmetic", "Raise each digit to the digit-count power and sum.")],
+    "perfect-number": [("number_theory", "Sum the proper divisors."), ("loops_basic", "Find divisors up to √n in pairs.")],
+    "collatz-steps": [("simulation", "Apply the even/odd rule step by step."), ("loops_basic", "Loop until you reach 1.")],
+    "seconds-to-clock": [("arithmetic", "Integer division and modulo split the seconds."), ("string_basics", "Zero-pad the minute and second fields.")],
+    "count-words": [("string_basics", "Split on spaces and ignore empties."), ("iteration", "Or count word-start transitions in one scan.")],
+    "mountain-array": [("iteration", "Walk up to the peak, then down."), ("conditionals", "Reject peaks at the ends or non-strict steps.")],
+    "is-permutation-1n": [("sorting", "Sorting should yield 1..n."), ("iteration", "Or mark seen values and check the range.")],
+    "rock-paper-scissors": [("simulation", "Resolve each round in order."), ("conditionals", "Encode who beats whom and tally wins.")],
+    "traffic-light": [("modulo", "The pattern repeats every g+y+r seconds."), ("conditionals", "Place the phase in the right colour band.")],
+    "max-nesting-depth": [("iteration", "A single depth counter over the string."), ("conditionals", "Bump on '(' and drop on ')'.")],
+    "caesar-cipher": [("string_basics", "Map letters to 0–25 and back."), ("modulo", "Wrap past 'z' with mod 26."), ("char_arrays", "Rebuild the shifted string character by character.")],
+    "run-length-encode": [("string_basics", "Group consecutive equal characters."), ("iteration", "Emit char+count when the run ends — including the last run.")],
+    "password-strength": [("string_basics", "Scan for character classes."), ("boolean_logic", "All requirements must hold together.")],
+    "bank-balance": [("simulation", "Apply each transaction in order."), ("conditionals", "Reject a withdrawal that would overdraft.")],
+    "max-passengers": [("prefix_sum", "The running total is the current passenger count."), ("iteration", "Track the maximum as you go.")],
+    "count-equal-pairs": [("iteration", "Compare every pair i < j."), ("big_o", "The small n makes the O(n²) double loop acceptable.")],
+})
+
+
+# ---------------------------------------------------------------------------
 # Build JSON
 # ---------------------------------------------------------------------------
 

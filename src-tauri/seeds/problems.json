@@ -881,7 +881,7 @@
     "editorials": [],
     "follow_ups": [],
     "judge_mode": "exact",
-    "order": 21
+    "order": 26
   },
   {
     "slug": "reverse-string",
@@ -995,7 +995,7 @@
     "editorials": [],
     "follow_ups": [],
     "judge_mode": "exact",
-    "order": 22
+    "order": 27
   },
   {
     "slug": "count-vowels",
@@ -1109,7 +1109,7 @@
     "editorials": [],
     "follow_ups": [],
     "judge_mode": "exact",
-    "order": 23
+    "order": 28
   },
   {
     "slug": "gcd",
@@ -1221,7 +1221,7 @@
     "editorials": [],
     "follow_ups": [],
     "judge_mode": "exact",
-    "order": 24
+    "order": 29
   },
   {
     "slug": "palindrome-number",
@@ -1333,7 +1333,7 @@
     "editorials": [],
     "follow_ups": [],
     "judge_mode": "exact",
-    "order": 25
+    "order": 30
   },
   {
     "slug": "nth-fibonacci",
@@ -1447,7 +1447,7 @@
     "editorials": [],
     "follow_ups": [],
     "judge_mode": "exact",
-    "order": 26
+    "order": 31
   },
   {
     "slug": "two-sum-exists",
@@ -1563,7 +1563,7 @@
     "editorials": [],
     "follow_ups": [],
     "judge_mode": "exact",
-    "order": 27
+    "order": 32
   },
   {
     "slug": "two-sum-indices",
@@ -1699,7 +1699,7 @@
       }
     ],
     "judge_mode": "exact",
-    "order": 55
+    "order": 77
   },
   {
     "slug": "longest-unique-substring",
@@ -1824,7 +1824,7 @@
     ],
     "follow_ups": [],
     "judge_mode": "exact",
-    "order": 56
+    "order": 78
   },
   {
     "slug": "valid-parentheses",
@@ -1940,7 +1940,7 @@
     "editorials": [],
     "follow_ups": [],
     "judge_mode": "exact",
-    "order": 57
+    "order": 79
   },
   {
     "slug": "binary-search-first",
@@ -2062,7 +2062,7 @@
       }
     ],
     "judge_mode": "exact",
-    "order": 58
+    "order": 80
   },
   {
     "slug": "maximum-subarray",
@@ -2198,7 +2198,7 @@
       }
     ],
     "judge_mode": "exact",
-    "order": 59
+    "order": 81
   },
   {
     "slug": "climbing-stairs",
@@ -2314,7 +2314,7 @@
     "editorials": [],
     "follow_ups": [],
     "judge_mode": "exact",
-    "order": 60
+    "order": 82
   },
   {
     "slug": "rotate-array",
@@ -2427,7 +2427,7 @@
     "editorials": [],
     "follow_ups": [],
     "judge_mode": "exact",
-    "order": 61
+    "order": 83
   },
   {
     "slug": "number-of-islands",
@@ -2554,7 +2554,7 @@
     "editorials": [],
     "follow_ups": [],
     "judge_mode": "exact",
-    "order": 62
+    "order": 84
   },
   {
     "slug": "group-anagrams-count",
@@ -2671,7 +2671,7 @@
     "editorials": [],
     "follow_ups": [],
     "judge_mode": "exact",
-    "order": 63
+    "order": 85
   },
   {
     "slug": "course-schedule",
@@ -2796,7 +2796,7 @@
     "editorials": [],
     "follow_ups": [],
     "judge_mode": "exact",
-    "order": 64
+    "order": 86
   },
   {
     "slug": "longest-increasing-subsequence",
@@ -2914,7 +2914,7 @@
     "editorials": [],
     "follow_ups": [],
     "judge_mode": "exact",
-    "order": 95
+    "order": 117
   },
   {
     "slug": "edit-distance",
@@ -3031,7 +3031,7 @@
     "editorials": [],
     "follow_ups": [],
     "judge_mode": "exact",
-    "order": 96
+    "order": 118
   },
   {
     "slug": "trapping-rain-water",
@@ -3149,7 +3149,7 @@
     "editorials": [],
     "follow_ups": [],
     "judge_mode": "exact",
-    "order": 97
+    "order": 119
   },
   {
     "slug": "dijkstra-shortest-path",
@@ -3275,7 +3275,7 @@
     "editorials": [],
     "follow_ups": [],
     "judge_mode": "exact",
-    "order": 98
+    "order": 120
   },
   {
     "slug": "color-bomb-explosion",
@@ -3392,7 +3392,7 @@
     "editorials": [],
     "follow_ups": [],
     "judge_mode": "exact",
-    "order": 28
+    "order": 33
   },
   {
     "slug": "territory-capture",
@@ -3501,7 +3501,7 @@
     "editorials": [],
     "follow_ups": [],
     "judge_mode": "exact",
-    "order": 29
+    "order": 34
   },
   {
     "slug": "minesweeper-counts",
@@ -3611,7 +3611,7 @@
     "editorials": [],
     "follow_ups": [],
     "judge_mode": "exact",
-    "order": 30
+    "order": 35
   },
   {
     "slug": "robot-grid-walk",
@@ -3720,7 +3720,7 @@
     "editorials": [],
     "follow_ups": [],
     "judge_mode": "exact",
-    "order": 31
+    "order": 36
   },
   {
     "slug": "game-of-life-step",
@@ -3831,7 +3831,7 @@
     "editorials": [],
     "follow_ups": [],
     "judge_mode": "exact",
-    "order": 65
+    "order": 87
   },
   {
     "slug": "set-matrix-zeroes",
@@ -3941,7 +3941,7 @@
     "editorials": [],
     "follow_ups": [],
     "judge_mode": "exact",
-    "order": 66
+    "order": 88
   },
   {
     "slug": "rotate-matrix-90",
@@ -4052,7 +4052,7 @@
     "editorials": [],
     "follow_ups": [],
     "judge_mode": "exact",
-    "order": 67
+    "order": 89
   },
   {
     "slug": "spiral-order",
@@ -4163,7 +4163,7 @@
     "editorials": [],
     "follow_ups": [],
     "judge_mode": "exact",
-    "order": 68
+    "order": 90
   },
   {
     "slug": "two-sum-fn",
@@ -4292,7 +4292,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 32
+    "order": 37
   },
   {
     "slug": "max-subarray-fn",
@@ -4417,7 +4417,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 69
+    "order": 91
   },
   {
     "slug": "reverse-array-fn",
@@ -4532,7 +4532,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 33
+    "order": 38
   },
   {
     "slug": "is-palindrome-fn",
@@ -4647,7 +4647,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 34
+    "order": 39
   },
   {
     "slug": "is-even",
@@ -5605,7 +5605,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 35
+    "order": 40
   },
   {
     "slug": "single-number",
@@ -5714,7 +5714,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 36
+    "order": 41
   },
   {
     "slug": "majority-element",
@@ -5823,7 +5823,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 37
+    "order": 42
   },
   {
     "slug": "is-prime",
@@ -5935,7 +5935,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 38
+    "order": 43
   },
   {
     "slug": "count-primes",
@@ -6042,7 +6042,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 39
+    "order": 44
   },
   {
     "slug": "valid-anagram",
@@ -6163,7 +6163,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 40
+    "order": 45
   },
   {
     "slug": "first-unique-char",
@@ -6272,7 +6272,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 41
+    "order": 46
   },
   {
     "slug": "move-zeroes",
@@ -6381,7 +6381,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 42
+    "order": 47
   },
   {
     "slug": "running-sum",
@@ -6487,7 +6487,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 43
+    "order": 48
   },
   {
     "slug": "max-consecutive-ones",
@@ -6593,7 +6593,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 44
+    "order": 49
   },
   {
     "slug": "second-largest",
@@ -6697,7 +6697,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 45
+    "order": 50
   },
   {
     "slug": "count-occurrences",
@@ -6798,7 +6798,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 46
+    "order": 51
   },
   {
     "slug": "number-of-1-bits",
@@ -6905,7 +6905,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 47
+    "order": 52
   },
   {
     "slug": "product-except-self",
@@ -7015,7 +7015,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 70
+    "order": 92
   },
   {
     "slug": "best-time-buy-sell",
@@ -7133,7 +7133,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 71
+    "order": 93
   },
   {
     "slug": "container-most-water",
@@ -7242,7 +7242,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 72
+    "order": 94
   },
   {
     "slug": "house-robber",
@@ -7350,7 +7350,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 73
+    "order": 95
   },
   {
     "slug": "jump-game",
@@ -7459,7 +7459,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 74
+    "order": 96
   },
   {
     "slug": "coin-change",
@@ -7572,7 +7572,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 75
+    "order": 97
   },
   {
     "slug": "coin-change-ways",
@@ -7683,7 +7683,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 76
+    "order": 98
   },
   {
     "slug": "longest-common-prefix",
@@ -7789,7 +7789,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 77
+    "order": 99
   },
   {
     "slug": "search-insert-position",
@@ -7902,7 +7902,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 78
+    "order": 100
   },
   {
     "slug": "integer-sqrt",
@@ -8018,7 +8018,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 79
+    "order": 101
   },
   {
     "slug": "min-cost-climbing-stairs",
@@ -8125,7 +8125,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 80
+    "order": 102
   },
   {
     "slug": "daily-temperatures",
@@ -8234,7 +8234,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 81
+    "order": 103
   },
   {
     "slug": "next-greater-element",
@@ -8343,7 +8343,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 82
+    "order": 104
   },
   {
     "slug": "subarray-sum-k",
@@ -8465,7 +8465,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 83
+    "order": 105
   },
   {
     "slug": "longest-consecutive",
@@ -8574,7 +8574,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 84
+    "order": 106
   },
   {
     "slug": "kth-largest-element",
@@ -8687,7 +8687,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 85
+    "order": 107
   },
   {
     "slug": "rotate-array-right",
@@ -8797,7 +8797,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 86
+    "order": 108
   },
   {
     "slug": "word-break",
@@ -8919,7 +8919,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 99
+    "order": 121
   },
   {
     "slug": "decode-ways",
@@ -9036,7 +9036,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 100
+    "order": 122
   },
   {
     "slug": "longest-palindrome-length",
@@ -9146,7 +9146,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 101
+    "order": 123
   },
   {
     "slug": "maximum-product-subarray",
@@ -9255,7 +9255,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 102
+    "order": 124
   },
   {
     "slug": "partition-equal-subset-sum",
@@ -9363,7 +9363,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 103
+    "order": 125
   },
   {
     "slug": "min-of-two",
@@ -9981,7 +9981,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 48
+    "order": 53
   },
   {
     "slug": "power-of-two",
@@ -10097,7 +10097,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 49
+    "order": 54
   },
   {
     "slug": "missing-number",
@@ -10214,7 +10214,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 50
+    "order": 55
   },
   {
     "slug": "count-negatives",
@@ -10311,7 +10311,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 51
+    "order": 56
   },
   {
     "slug": "is-sorted",
@@ -10416,7 +10416,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 52
+    "order": 57
   },
   {
     "slug": "fizzbuzz-value",
@@ -10522,7 +10522,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 53
+    "order": 58
   },
   {
     "slug": "two-sum-sorted",
@@ -10635,7 +10635,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 54
+    "order": 59
   },
   {
     "slug": "merge-sorted-arrays",
@@ -10748,7 +10748,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 87
+    "order": 109
   },
   {
     "slug": "kth-smallest",
@@ -10861,7 +10861,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 88
+    "order": 110
   },
   {
     "slug": "gcd-of-array",
@@ -10966,7 +10966,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 89
+    "order": 111
   },
   {
     "slug": "fast-power",
@@ -11087,7 +11087,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 90
+    "order": 112
   },
   {
     "slug": "unique-paths",
@@ -11199,7 +11199,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 91
+    "order": 113
   },
   {
     "slug": "longest-common-subsequence",
@@ -11313,7 +11313,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 92
+    "order": 114
   },
   {
     "slug": "top-k-frequent",
@@ -11437,7 +11437,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 93
+    "order": 115
   },
   {
     "slug": "count-bits",
@@ -11547,7 +11547,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 94
+    "order": 116
   },
   {
     "slug": "largest-rectangle-histogram",
@@ -11656,7 +11656,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 104
+    "order": 126
   },
   {
     "slug": "sliding-window-maximum",
@@ -11770,7 +11770,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 105
+    "order": 127
   },
   {
     "slug": "jump-game-ii",
@@ -11879,7 +11879,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 106
+    "order": 128
   },
   {
     "slug": "longest-valid-parentheses",
@@ -11990,7 +11990,7 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 107
+    "order": 129
   },
   {
     "slug": "min-window-length",
@@ -12114,6 +12114,2387 @@
     },
     "judge_mode": "exact",
     "float_tolerance": 0,
-    "order": 108
+    "order": 130
+  },
+  {
+    "slug": "leap-year",
+    "title": "Leap Year",
+    "difficulty": "Intro",
+    "description": "Return `true` if the given year is a leap year. A year is a leap year if it is divisible by 4, **except** century years (divisible by 100), which are leap years only if also divisible by 400.",
+    "constraints": "1 ≤ y ≤ 10^5",
+    "examples": [
+      {
+        "input": "2024",
+        "output": "true",
+        "explanation": "2024 is divisible by 4 → leap."
+      },
+      {
+        "input": "1900",
+        "output": "false",
+        "explanation": "1900 is a century but not divisible by 400 → not leap."
+      }
+    ],
+    "editorial": "Leap iff (y%4==0 and y%100!=0) or y%400==0. Get the operator precedence right.",
+    "optimal_time": "O(1)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "A short chain of divisibility checks.",
+    "starter_code": {
+      "python": "def solve(y):\n    # TODO: implement\n    return False\n",
+      "java": "class Solution {\n    boolean solve(int y) {\n        // TODO: implement\n        return false;\n    }\n}\n"
+    },
+    "topics": [
+      "Math"
+    ],
+    "subtopics": [
+      "Conditionals"
+    ],
+    "companies": [
+      "Microsoft"
+    ],
+    "patterns": [],
+    "hints": [
+      "Start from 'divisible by 4'.",
+      "Then carve out the century exception.",
+      "2000 is a leap year; 1900 is not."
+    ],
+    "prerequisites": [
+      {
+        "key": "conditionals",
+        "name": "Conditionals (if / else)",
+        "what": "Choosing what to do based on whether a condition is true.",
+        "deep": "if/else branches let your program react to data. The condition is a boolean expression built from comparisons (==, !=, <, >) and logic (&&, ||, !). Chain several with else if when there are more than two outcomes.",
+        "java": "if (n % 2 == 0) { ... } else { ... }. Compare ints with ==, but compare Strings with .equals(), never ==.",
+        "how": "The rule is a chain of divisibility conditions."
+      },
+      {
+        "key": "modulo",
+        "name": "Modular Reduction",
+        "what": "Using n % k to wrap indices around and drop redundant whole cycles.",
+        "deep": "Modulo collapses equivalent states: rotating by k equals rotating by k % n, and hashing or bucketing uses remainders. In Java, beware that % can return a negative result for negative operands.",
+        "java": "Use k % n after guarding n > 0; for possibly-negative values use Math.floorMod(x, n).",
+        "how": "Divisibility is a remainder test."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Divisible by 4",
+        "input": "2024\n",
+        "expected_output": "true",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Century non-leap",
+        "input": "1900\n",
+        "expected_output": "false",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "400 year",
+        "input": "2000\n",
+        "expected_output": "true",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Ordinary",
+        "input": "2023\n",
+        "expected_output": "false",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "y",
+          "type": "int"
+        }
+      ],
+      "returns": "bool"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0,
+    "order": 21
+  },
+  {
+    "slug": "count-divisors",
+    "title": "Count Divisors",
+    "difficulty": "Intro",
+    "description": "Return how many positive integers divide `n` exactly (including 1 and n itself).",
+    "constraints": "1 ≤ n ≤ 10^9",
+    "examples": [
+      {
+        "input": "12",
+        "output": "6",
+        "explanation": "1,2,3,4,6,12 → 6 divisors."
+      },
+      {
+        "input": "7",
+        "output": "2",
+        "explanation": "A prime has exactly 2."
+      }
+    ],
+    "editorial": "For i from 1 to √n, if i divides n add 2 (for i and n/i), or add 1 when i·i == n.",
+    "optimal_time": "O(√n)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "Test divisors up to the square root, counting each pair.",
+    "starter_code": {
+      "python": "def solve(n):\n    # TODO: implement\n    return 0\n",
+      "java": "class Solution {\n    int solve(int n) {\n        // TODO: implement\n        return 0;\n    }\n}\n"
+    },
+    "topics": [
+      "Math"
+    ],
+    "subtopics": [
+      "Number Theory"
+    ],
+    "companies": [
+      "Amazon"
+    ],
+    "patterns": [],
+    "hints": [
+      "A divisor d pairs with n/d.",
+      "You only need to test up to √n.",
+      "Count both members of each pair (once when d·d = n)."
+    ],
+    "prerequisites": [
+      {
+        "key": "number_theory",
+        "name": "Number Theory Basics",
+        "what": "Divisibility, gcd, and modular arithmetic facts used to reason about integers.",
+        "deep": "Foundations like the Euclidean algorithm, prime factorization, and modular arithmetic underpin many math problems. Even simple tasks benefit from gcd/lcm identities and knowing how modulo distributes over addition and multiplication.",
+        "java": "Math.floorMod for correct modulo of negatives; write a short gcd helper (Euclid); BigInteger has gcd() if needed.",
+        "how": "Divisors pair as d and n/d."
+      },
+      {
+        "key": "loops_basic",
+        "name": "Loops (for / while)",
+        "what": "Repeating a block of code a set number of times or until a condition changes.",
+        "deep": "A for-loop fits when you know the count; a while-loop when you stop on a condition. Loops are how you process every element or accumulate a running result, and getting the start/end bounds right is the main beginner pitfall.",
+        "java": "for (int i = 1; i <= n; i++) { ... } or while (condition) { ... }. Build output strings with StringBuilder inside the loop.",
+        "how": "Trial-divide up to √n."
+      },
+      {
+        "key": "big_o",
+        "name": "Big-O / Complexity Analysis",
+        "what": "Reasoning about how time and memory grow with the input size.",
+        "deep": "Big-O bounds the dominant growth term and tells you whether an approach scales to the constraints. Read the limits: n up to 10^5 suggests O(n) or O(n log n), while 10^9 suggests O(log n) or O(1). Sanity-check the work against roughly 10^8 operations per second.",
+        "java": "No API - this is analysis. Match your algorithm to the constraints stated in each problem before you start coding.",
+        "how": "Stopping at √n turns O(n) into O(√n)."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Twelve",
+        "input": "12\n",
+        "expected_output": "6",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Prime",
+        "input": "7\n",
+        "expected_output": "2",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "One",
+        "input": "1\n",
+        "expected_output": "1",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Square",
+        "input": "36\n",
+        "expected_output": "9",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "n",
+          "type": "int"
+        }
+      ],
+      "returns": "int"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0,
+    "order": 22
+  },
+  {
+    "slug": "digital-root",
+    "title": "Digital Root",
+    "difficulty": "Intro",
+    "description": "Repeatedly replace the number by the sum of its digits until a single digit remains, and return it.",
+    "constraints": "0 ≤ n ≤ 10^9",
+    "examples": [
+      {
+        "input": "942",
+        "output": "6",
+        "explanation": "9+4+2=15 → 1+5=6."
+      },
+      {
+        "input": "7",
+        "output": "7",
+        "explanation": "Already a single digit."
+      }
+    ],
+    "editorial": "Repeatedly fold the digit sum until a single digit remains.",
+    "optimal_time": "O(log n) per pass",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "Repeatedly fold the digit sum until a single digit remains.",
+    "starter_code": {
+      "python": "def solve(n):\n    # TODO: implement\n    return 0\n",
+      "java": "class Solution {\n    int solve(int n) {\n        // TODO: implement\n        return 0;\n    }\n}\n"
+    },
+    "topics": [
+      "Math"
+    ],
+    "subtopics": [
+      "Digits"
+    ],
+    "companies": [
+      "Adobe"
+    ],
+    "patterns": [],
+    "hints": [
+      "Sum the digits.",
+      "If the result has more than one digit, repeat.",
+      "Loop until the value is below 10."
+    ],
+    "prerequisites": [
+      {
+        "key": "math_digits",
+        "name": "Digit Manipulation",
+        "what": "Working with a number's decimal digits or its string form while handling signs and edge cases.",
+        "deep": "Digit problems peel digits with % 10 and / 10, or operate on the string form. Classic gotchas are negative numbers, trailing zeros, and overflow when reversing, so the first choice is arithmetic vs string handling.",
+        "java": "n % 10 and n / 10 to extract digits, or Long.toString(n); use long to avoid overflow on reversal.",
+        "how": "Sum the digits with % 10 and // 10 (or the string form)."
+      },
+      {
+        "key": "loops_basic",
+        "name": "Loops (for / while)",
+        "what": "Repeating a block of code a set number of times or until a condition changes.",
+        "deep": "A for-loop fits when you know the count; a while-loop when you stop on a condition. Loops are how you process every element or accumulate a running result, and getting the start/end bounds right is the main beginner pitfall.",
+        "java": "for (int i = 1; i <= n; i++) { ... } or while (condition) { ... }. Build output strings with StringBuilder inside the loop.",
+        "how": "Repeat until a single digit remains."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example",
+        "input": "942\n",
+        "expected_output": "6",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Single",
+        "input": "7\n",
+        "expected_output": "7",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Zero",
+        "input": "0\n",
+        "expected_output": "0",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Nines",
+        "input": "99999\n",
+        "expected_output": "9",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "n",
+          "type": "int"
+        }
+      ],
+      "returns": "int"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0,
+    "order": 23
+  },
+  {
+    "slug": "alternating-sum",
+    "title": "Alternating Sum",
+    "difficulty": "Intro",
+    "description": "Return a[0] − a[1] + a[2] − a[3] + … (add even indices, subtract odd indices).",
+    "constraints": "0 ≤ n ≤ 10^5",
+    "examples": [
+      {
+        "input": "1 2 3 4 5",
+        "output": "3",
+        "explanation": "1-2+3-4+5 = 3."
+      },
+      {
+        "input": "10 3",
+        "output": "7",
+        "explanation": "10-3 = 7."
+      }
+    ],
+    "editorial": "One pass toggling the sign by index parity.",
+    "optimal_time": "O(n)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "One pass toggling the sign by index parity.",
+    "starter_code": {
+      "python": "def solve(nums):\n    # TODO: implement\n    return 0\n",
+      "java": "class Solution {\n    int solve(int[] nums) {\n        // TODO: implement\n        return 0;\n    }\n}\n"
+    },
+    "topics": [
+      "Arrays"
+    ],
+    "subtopics": [
+      "Traversal"
+    ],
+    "companies": [
+      "Bloomberg"
+    ],
+    "patterns": [],
+    "hints": [
+      "Walk the array with an index.",
+      "Add when the index is even, subtract when odd.",
+      "An empty array sums to 0."
+    ],
+    "prerequisites": [
+      {
+        "key": "iteration",
+        "name": "Array Iteration",
+        "what": "Walking through elements one at a time while maintaining running state such as a sum, max, or counter.",
+        "deep": "The workhorse of array problems: one for-loop that updates accumulators as it goes. Most linear-time solutions are just one well-chosen pass, so the real skill is deciding what state to carry so a single sweep suffices.",
+        "java": "Use for (int i = 0; i < n; i++) or for (int x : nums). Prefer a primitive int[] over Integer[] to avoid autoboxing overhead.",
+        "how": "Walk the array once."
+      },
+      {
+        "key": "conditionals",
+        "name": "Conditionals (if / else)",
+        "what": "Choosing what to do based on whether a condition is true.",
+        "deep": "if/else branches let your program react to data. The condition is a boolean expression built from comparisons (==, !=, <, >) and logic (&&, ||, !). Chain several with else if when there are more than two outcomes.",
+        "java": "if (n % 2 == 0) { ... } else { ... }. Compare ints with ==, but compare Strings with .equals(), never ==.",
+        "how": "Add or subtract based on index parity."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example",
+        "input": "1 2 3 4 5\n",
+        "expected_output": "3",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Two",
+        "input": "10 3\n",
+        "expected_output": "7",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Single",
+        "input": "7\n",
+        "expected_output": "7",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Empty",
+        "input": "\n",
+        "expected_output": "0",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "nums",
+          "type": "int[]"
+        }
+      ],
+      "returns": "int"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0,
+    "order": 24
+  },
+  {
+    "slug": "us-coins-change",
+    "title": "Coin Count (US coins)",
+    "difficulty": "Intro",
+    "description": "Make `cents` using quarters (25), dimes (10), nickels (5), and pennies (1). Return the **fewest** coins needed. (With these denominations, always take the largest coin that fits.)",
+    "constraints": "0 ≤ cents ≤ 10^6",
+    "examples": [
+      {
+        "input": "63",
+        "output": "6",
+        "explanation": "2×25 + 1×10 + 3×1 = 6 coins."
+      },
+      {
+        "input": "25",
+        "output": "1",
+        "explanation": "One quarter."
+      }
+    ],
+    "editorial": "Greedily divide by 25, then 10, then 5, then 1, summing the quotients — optimal for these canonical coins.",
+    "optimal_time": "O(1)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "Greedy over four fixed denominations.",
+    "starter_code": {
+      "python": "def solve(cents):\n    # TODO: implement\n    return 0\n",
+      "java": "class Solution {\n    int solve(int cents) {\n        // TODO: implement\n        return 0;\n    }\n}\n"
+    },
+    "topics": [
+      "Math",
+      "Greedy"
+    ],
+    "subtopics": [
+      "Greedy"
+    ],
+    "companies": [
+      "Amazon"
+    ],
+    "patterns": [
+      "Greedy"
+    ],
+    "hints": [
+      "Take as many quarters as possible, then dimes, then nickels, then pennies.",
+      "After each coin, keep the remainder with %.",
+      "Sum how many coins you used."
+    ],
+    "prerequisites": [
+      {
+        "key": "greedy",
+        "name": "Greedy Choice",
+        "what": "Taking the locally-best option at each step when that provably reaches a global optimum.",
+        "deep": "Greedy is fast and simple but correct only when the problem has the greedy-choice property and optimal substructure; otherwise DP is the fallback. Proving correctness (often an exchange argument) matters more than the code.",
+        "java": "Often just Arrays.sort plus a linear scan, or a PriorityQueue to always grab the current best.",
+        "how": "Always take the largest coin that fits."
+      },
+      {
+        "key": "modulo",
+        "name": "Modular Reduction",
+        "what": "Using n % k to wrap indices around and drop redundant whole cycles.",
+        "deep": "Modulo collapses equivalent states: rotating by k equals rotating by k % n, and hashing or bucketing uses remainders. In Java, beware that % can return a negative result for negative operands.",
+        "java": "Use k % n after guarding n > 0; for possibly-negative values use Math.floorMod(x, n).",
+        "how": "Keep the remainder after each denomination."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "63 cents",
+        "input": "63\n",
+        "expected_output": "6",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Exact quarter",
+        "input": "25\n",
+        "expected_output": "1",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Zero",
+        "input": "0\n",
+        "expected_output": "0",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Pennies only",
+        "input": "4\n",
+        "expected_output": "4",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "cents",
+          "type": "int"
+        }
+      ],
+      "returns": "int"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0,
+    "order": 25
+  },
+  {
+    "slug": "count-above-average",
+    "title": "Count Above Average",
+    "difficulty": "Easy",
+    "description": "Return how many elements are strictly greater than the array's average.",
+    "constraints": "1 ≤ n ≤ 10^5",
+    "examples": [
+      {
+        "input": "1 2 3 4 5",
+        "output": "2",
+        "explanation": "Average 3; 4 and 5 are above → 2."
+      },
+      {
+        "input": "2 2 2",
+        "output": "0",
+        "explanation": "Nothing exceeds the average."
+      }
+    ],
+    "editorial": "Compute the sum; an element x beats the average exactly when x·n > sum — this dodges floating point.",
+    "optimal_time": "O(n)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "One pass for the sum, one to count.",
+    "starter_code": {
+      "python": "def solve(nums):\n    # TODO: implement\n    return 0\n",
+      "java": "class Solution {\n    int solve(int[] nums) {\n        // TODO: implement\n        return 0;\n    }\n}\n"
+    },
+    "topics": [
+      "Arrays"
+    ],
+    "subtopics": [
+      "Counting"
+    ],
+    "companies": [
+      "Amazon"
+    ],
+    "patterns": [
+      "Counting"
+    ],
+    "hints": [
+      "First find the total (or average).",
+      "Then count elements above it.",
+      "To avoid fractions, compare x·n with the sum instead of x with sum/n."
+    ],
+    "prerequisites": [
+      {
+        "key": "iteration",
+        "name": "Array Iteration",
+        "what": "Walking through elements one at a time while maintaining running state such as a sum, max, or counter.",
+        "deep": "The workhorse of array problems: one for-loop that updates accumulators as it goes. Most linear-time solutions are just one well-chosen pass, so the real skill is deciding what state to carry so a single sweep suffices.",
+        "java": "Use for (int i = 0; i < n; i++) or for (int x : nums). Prefer a primitive int[] over Integer[] to avoid autoboxing overhead.",
+        "how": "One pass for the sum, one to count."
+      },
+      {
+        "key": "arithmetic",
+        "name": "Arithmetic & Operators",
+        "what": "Doing math with +, -, *, / and the remainder operator %.",
+        "deep": "Operators combine values. The Java gotchas: integer division truncates (7 / 2 is 3, not 3.5), % gives the remainder (great for even/odd and wrapping), and mixing an int with a double promotes the result to double.",
+        "java": "Use +, -, *, /, %. Note 7 / 2 == 3 (int) but 7.0 / 2 == 3.5 (double). Math.max, Math.min, Math.abs help too.",
+        "how": "Compare x·n with the sum to avoid fractions."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example",
+        "input": "1 2 3 4 5\n",
+        "expected_output": "2",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Flat",
+        "input": "2 2 2\n",
+        "expected_output": "0",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "One big",
+        "input": "1 1 10\n",
+        "expected_output": "1",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Single",
+        "input": "5\n",
+        "expected_output": "0",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "nums",
+          "type": "int[]"
+        }
+      ],
+      "returns": "int"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0,
+    "order": 60
+  },
+  {
+    "slug": "armstrong-number",
+    "title": "Armstrong Number",
+    "difficulty": "Easy",
+    "description": "Return `true` if `n` equals the sum of each of its digits raised to the power of the number of digits (e.g. 153 = 1³+5³+3³).",
+    "constraints": "0 ≤ n ≤ 10^9",
+    "examples": [
+      {
+        "input": "153",
+        "output": "true",
+        "explanation": "1³+5³+3³ = 153."
+      },
+      {
+        "input": "100",
+        "output": "false",
+        "explanation": "1+0+0 ≠ 100."
+      }
+    ],
+    "editorial": "Let k be the digit count; sum digit^k over all digits and check equality with n.",
+    "optimal_time": "O(d)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "One pass over the d digits.",
+    "starter_code": {
+      "python": "def solve(n):\n    # TODO: implement\n    return False\n",
+      "java": "class Solution {\n    boolean solve(int n) {\n        // TODO: implement\n        return false;\n    }\n}\n"
+    },
+    "topics": [
+      "Math"
+    ],
+    "subtopics": [
+      "Digits"
+    ],
+    "companies": [
+      "Adobe"
+    ],
+    "patterns": [],
+    "hints": [
+      "Count the digits first — that's the exponent.",
+      "Raise each digit to that power and add.",
+      "Compare the total to n."
+    ],
+    "prerequisites": [
+      {
+        "key": "math_digits",
+        "name": "Digit Manipulation",
+        "what": "Working with a number's decimal digits or its string form while handling signs and edge cases.",
+        "deep": "Digit problems peel digits with % 10 and / 10, or operate on the string form. Classic gotchas are negative numbers, trailing zeros, and overflow when reversing, so the first choice is arithmetic vs string handling.",
+        "java": "n % 10 and n / 10 to extract digits, or Long.toString(n); use long to avoid overflow on reversal.",
+        "how": "Break n into its digits."
+      },
+      {
+        "key": "arithmetic",
+        "name": "Arithmetic & Operators",
+        "what": "Doing math with +, -, *, / and the remainder operator %.",
+        "deep": "Operators combine values. The Java gotchas: integer division truncates (7 / 2 is 3, not 3.5), % gives the remainder (great for even/odd and wrapping), and mixing an int with a double promotes the result to double.",
+        "java": "Use +, -, *, /, %. Note 7 / 2 == 3 (int) but 7.0 / 2 == 3.5 (double). Math.max, Math.min, Math.abs help too.",
+        "how": "Raise each digit to the digit-count power and sum."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "153",
+        "input": "153\n",
+        "expected_output": "true",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Not",
+        "input": "100\n",
+        "expected_output": "false",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Single",
+        "input": "5\n",
+        "expected_output": "true",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Four-digit",
+        "input": "9474\n",
+        "expected_output": "true",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "n",
+          "type": "int"
+        }
+      ],
+      "returns": "bool"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0,
+    "order": 61
+  },
+  {
+    "slug": "perfect-number",
+    "title": "Perfect Number",
+    "difficulty": "Easy",
+    "description": "Return `true` if `n` equals the sum of its proper divisors (all positive divisors except itself).",
+    "constraints": "1 ≤ n ≤ 10^5",
+    "examples": [
+      {
+        "input": "6",
+        "output": "true",
+        "explanation": "1+2+3 = 6."
+      },
+      {
+        "input": "10",
+        "output": "false",
+        "explanation": "1+2+5 = 8 ≠ 10."
+      }
+    ],
+    "editorial": "Add every proper divisor (pair i with n/i up to √n, excluding n itself) and test equality with n.",
+    "optimal_time": "O(√n)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "Sum divisors up to √n in pairs.",
+    "starter_code": {
+      "python": "def solve(n):\n    # TODO: implement\n    return False\n",
+      "java": "class Solution {\n    boolean solve(int n) {\n        // TODO: implement\n        return false;\n    }\n}\n"
+    },
+    "topics": [
+      "Math"
+    ],
+    "subtopics": [
+      "Number Theory"
+    ],
+    "companies": [
+      "Bloomberg"
+    ],
+    "patterns": [],
+    "hints": [
+      "Proper divisors of n are 1..n-1 that divide n.",
+      "Sum them and compare to n.",
+      "6 = 1+2+3 is the smallest perfect number."
+    ],
+    "prerequisites": [
+      {
+        "key": "number_theory",
+        "name": "Number Theory Basics",
+        "what": "Divisibility, gcd, and modular arithmetic facts used to reason about integers.",
+        "deep": "Foundations like the Euclidean algorithm, prime factorization, and modular arithmetic underpin many math problems. Even simple tasks benefit from gcd/lcm identities and knowing how modulo distributes over addition and multiplication.",
+        "java": "Math.floorMod for correct modulo of negatives; write a short gcd helper (Euclid); BigInteger has gcd() if needed.",
+        "how": "Sum the proper divisors."
+      },
+      {
+        "key": "loops_basic",
+        "name": "Loops (for / while)",
+        "what": "Repeating a block of code a set number of times or until a condition changes.",
+        "deep": "A for-loop fits when you know the count; a while-loop when you stop on a condition. Loops are how you process every element or accumulate a running result, and getting the start/end bounds right is the main beginner pitfall.",
+        "java": "for (int i = 1; i <= n; i++) { ... } or while (condition) { ... }. Build output strings with StringBuilder inside the loop.",
+        "how": "Find divisors up to √n in pairs."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Six",
+        "input": "6\n",
+        "expected_output": "true",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Not",
+        "input": "10\n",
+        "expected_output": "false",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "28",
+        "input": "28\n",
+        "expected_output": "true",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "One",
+        "input": "1\n",
+        "expected_output": "false",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "n",
+          "type": "int"
+        }
+      ],
+      "returns": "bool"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0,
+    "order": 62
+  },
+  {
+    "slug": "collatz-steps",
+    "title": "Collatz Steps",
+    "difficulty": "Easy",
+    "description": "Starting from `n`, repeatedly halve it if even or replace it with 3n+1 if odd. Return how many steps it takes to reach 1.",
+    "constraints": "1 ≤ n ≤ 10^6",
+    "examples": [
+      {
+        "input": "6",
+        "output": "8",
+        "explanation": "6→3→10→5→16→8→4→2→1 = 8 steps."
+      },
+      {
+        "input": "1",
+        "output": "0",
+        "explanation": "0 steps."
+      }
+    ],
+    "editorial": "Just simulate the rule, incrementing a counter until n reaches 1. No formula is known — you run it.",
+    "optimal_time": "O(steps)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "Simulate the sequence, counting steps.",
+    "starter_code": {
+      "python": "def solve(n):\n    # TODO: implement\n    return 0\n",
+      "java": "class Solution {\n    int solve(int n) {\n        // TODO: implement\n        return 0;\n    }\n}\n"
+    },
+    "topics": [
+      "Math",
+      "Simulation"
+    ],
+    "subtopics": [
+      "Simulation"
+    ],
+    "companies": [
+      "Google"
+    ],
+    "patterns": [
+      "Simulation"
+    ],
+    "hints": [
+      "Loop until n becomes 1.",
+      "Even → n/2, odd → 3n+1.",
+      "Count each transformation."
+    ],
+    "prerequisites": [
+      {
+        "key": "simulation",
+        "name": "Simulation",
+        "what": "Directly modelling a process step by step, exactly as the statement describes, instead of finding a formula.",
+        "deep": "When constraints are small, the intended solution is often to just do what the problem says: hold the state, apply each event or rule in order, and read the answer at the end. The skill is translating rules into precise state transitions and handling edge cases and 1- vs 0-indexing carefully.",
+        "java": "Model state in an array or a small int/enum code; process events in a loop, updating state per the rules. Watch off-by-one and 1-indexed input.",
+        "how": "Apply the even/odd rule step by step."
+      },
+      {
+        "key": "loops_basic",
+        "name": "Loops (for / while)",
+        "what": "Repeating a block of code a set number of times or until a condition changes.",
+        "deep": "A for-loop fits when you know the count; a while-loop when you stop on a condition. Loops are how you process every element or accumulate a running result, and getting the start/end bounds right is the main beginner pitfall.",
+        "java": "for (int i = 1; i <= n; i++) { ... } or while (condition) { ... }. Build output strings with StringBuilder inside the loop.",
+        "how": "Loop until you reach 1."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example",
+        "input": "6\n",
+        "expected_output": "8",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Already one",
+        "input": "1\n",
+        "expected_output": "0",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Power of two",
+        "input": "16\n",
+        "expected_output": "4",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Odd",
+        "input": "7\n",
+        "expected_output": "16",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "n",
+          "type": "int"
+        }
+      ],
+      "returns": "int"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0,
+    "order": 63
+  },
+  {
+    "slug": "seconds-to-clock",
+    "title": "Seconds to Clock",
+    "difficulty": "Easy",
+    "description": "Convert a number of seconds into `H:MM:SS` form: hours as-is, minutes and seconds zero-padded to two digits.",
+    "constraints": "0 ≤ s ≤ 10^9",
+    "examples": [
+      {
+        "input": "3661",
+        "output": "1:01:01",
+        "explanation": "1:01:01."
+      },
+      {
+        "input": "0",
+        "output": "0:00:00",
+        "explanation": "0:00:00."
+      }
+    ],
+    "editorial": "h = s/3600, m = (s%3600)/60, sec = s%60; print h ':' then two-digit m and sec.",
+    "optimal_time": "O(1)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "Integer division and modulo, then format.",
+    "starter_code": {
+      "python": "def solve(s):\n    # TODO: implement\n    return \"\"\n",
+      "java": "class Solution {\n    String solve(int s) {\n        // TODO: implement\n        return \"\";\n    }\n}\n"
+    },
+    "topics": [
+      "Math"
+    ],
+    "subtopics": [
+      "Arithmetic"
+    ],
+    "companies": [
+      "Amazon"
+    ],
+    "patterns": [],
+    "hints": [
+      "Hours = s / 3600.",
+      "Minutes = (s / 60) % 60, seconds = s % 60.",
+      "Zero-pad minutes and seconds to width 2."
+    ],
+    "prerequisites": [
+      {
+        "key": "arithmetic",
+        "name": "Arithmetic & Operators",
+        "what": "Doing math with +, -, *, / and the remainder operator %.",
+        "deep": "Operators combine values. The Java gotchas: integer division truncates (7 / 2 is 3, not 3.5), % gives the remainder (great for even/odd and wrapping), and mixing an int with a double promotes the result to double.",
+        "java": "Use +, -, *, /, %. Note 7 / 2 == 3 (int) but 7.0 / 2 == 3.5 (double). Math.max, Math.min, Math.abs help too.",
+        "how": "Integer division and modulo split the seconds."
+      },
+      {
+        "key": "string_basics",
+        "name": "String Traversal",
+        "what": "Treating a string as an indexable sequence of characters to count and compare.",
+        "deep": "Most string problems reduce to a single pass with charAt or a char[]. Remember Java strings are immutable, so build output with StringBuilder, and character math relies on ASCII codes.",
+        "java": "s.charAt(i), s.length(), s.toCharArray(); build results with StringBuilder, never += inside a loop.",
+        "how": "Zero-pad the minute and second fields."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example",
+        "input": "3661\n",
+        "expected_output": "1:01:01",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Zero",
+        "input": "0\n",
+        "expected_output": "0:00:00",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Minutes",
+        "input": "75\n",
+        "expected_output": "0:01:15",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Big",
+        "input": "86399\n",
+        "expected_output": "23:59:59",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "s",
+          "type": "int"
+        }
+      ],
+      "returns": "string"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0,
+    "order": 64
+  },
+  {
+    "slug": "count-words",
+    "title": "Count Words",
+    "difficulty": "Easy",
+    "description": "Return the number of words in a sentence. Words are maximal runs of non-space characters; there may be extra spaces.",
+    "constraints": "0 ≤ |s| ≤ 10^5",
+    "examples": [
+      {
+        "input": "the quick brown fox",
+        "output": "4",
+        "explanation": "Four words."
+      },
+      {
+        "input": "  hello   world  ",
+        "output": "2",
+        "explanation": "Extra spaces don't add words → 2."
+      }
+    ],
+    "editorial": "Count the number of times a non-space character follows a space (or the start) — equivalently the number of non-empty split tokens.",
+    "optimal_time": "O(|s|)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "Scan once, counting transitions into a word.",
+    "starter_code": {
+      "python": "def solve(s):\n    # TODO: implement\n    return 0\n",
+      "java": "class Solution {\n    int solve(String s) {\n        // TODO: implement\n        return 0;\n    }\n}\n"
+    },
+    "topics": [
+      "Strings"
+    ],
+    "subtopics": [
+      "Counting"
+    ],
+    "companies": [
+      "Microsoft"
+    ],
+    "patterns": [
+      "Counting"
+    ],
+    "hints": [
+      "Split the string on spaces.",
+      "Ignore empty pieces caused by repeated spaces.",
+      "An empty or all-space string has 0 words."
+    ],
+    "prerequisites": [
+      {
+        "key": "string_basics",
+        "name": "String Traversal",
+        "what": "Treating a string as an indexable sequence of characters to count and compare.",
+        "deep": "Most string problems reduce to a single pass with charAt or a char[]. Remember Java strings are immutable, so build output with StringBuilder, and character math relies on ASCII codes.",
+        "java": "s.charAt(i), s.length(), s.toCharArray(); build results with StringBuilder, never += inside a loop.",
+        "how": "Split on spaces and ignore empties."
+      },
+      {
+        "key": "iteration",
+        "name": "Array Iteration",
+        "what": "Walking through elements one at a time while maintaining running state such as a sum, max, or counter.",
+        "deep": "The workhorse of array problems: one for-loop that updates accumulators as it goes. Most linear-time solutions are just one well-chosen pass, so the real skill is deciding what state to carry so a single sweep suffices.",
+        "java": "Use for (int i = 0; i < n; i++) or for (int x : nums). Prefer a primitive int[] over Integer[] to avoid autoboxing overhead.",
+        "how": "Or count word-start transitions in one scan."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example",
+        "input": "the quick brown fox\n",
+        "expected_output": "4",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Extra spaces",
+        "input": "  hello   world  \n",
+        "expected_output": "2",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "One word",
+        "input": "java\n",
+        "expected_output": "1",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Empty",
+        "input": "\n",
+        "expected_output": "0",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "s",
+          "type": "string"
+        }
+      ],
+      "returns": "int"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0,
+    "order": 65
+  },
+  {
+    "slug": "mountain-array",
+    "title": "Mountain Array",
+    "difficulty": "Easy",
+    "description": "Return `true` if the array strictly increases to a single peak and then strictly decreases. The peak must not be the first or last element (length ≥ 3).",
+    "constraints": "0 ≤ n ≤ 10^5",
+    "examples": [
+      {
+        "input": "1 3 5 4 2",
+        "output": "true",
+        "explanation": "Up to 5 then down → true."
+      },
+      {
+        "input": "1 2 3",
+        "output": "false",
+        "explanation": "Never comes down → false."
+      }
+    ],
+    "editorial": "Advance while a[i] < a[i+1]; the stopping index is the peak (reject if at an end); then require strictly decreasing to the last index.",
+    "optimal_time": "O(n)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "Two directional scans (up then down).",
+    "starter_code": {
+      "python": "def solve(nums):\n    # TODO: implement\n    return False\n",
+      "java": "class Solution {\n    boolean solve(int[] nums) {\n        // TODO: implement\n        return false;\n    }\n}\n"
+    },
+    "topics": [
+      "Arrays"
+    ],
+    "subtopics": [
+      "Traversal"
+    ],
+    "companies": [
+      "Amazon",
+      "Meta"
+    ],
+    "patterns": [],
+    "hints": [
+      "Walk up while strictly increasing.",
+      "The peak can't be at either end.",
+      "Then it must strictly decrease all the way down."
+    ],
+    "prerequisites": [
+      {
+        "key": "iteration",
+        "name": "Array Iteration",
+        "what": "Walking through elements one at a time while maintaining running state such as a sum, max, or counter.",
+        "deep": "The workhorse of array problems: one for-loop that updates accumulators as it goes. Most linear-time solutions are just one well-chosen pass, so the real skill is deciding what state to carry so a single sweep suffices.",
+        "java": "Use for (int i = 0; i < n; i++) or for (int x : nums). Prefer a primitive int[] over Integer[] to avoid autoboxing overhead.",
+        "how": "Walk up to the peak, then down."
+      },
+      {
+        "key": "conditionals",
+        "name": "Conditionals (if / else)",
+        "what": "Choosing what to do based on whether a condition is true.",
+        "deep": "if/else branches let your program react to data. The condition is a boolean expression built from comparisons (==, !=, <, >) and logic (&&, ||, !). Chain several with else if when there are more than two outcomes.",
+        "java": "if (n % 2 == 0) { ... } else { ... }. Compare ints with ==, but compare Strings with .equals(), never ==.",
+        "how": "Reject peaks at the ends or non-strict steps."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Mountain",
+        "input": "1 3 5 4 2\n",
+        "expected_output": "true",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Only up",
+        "input": "1 2 3\n",
+        "expected_output": "false",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Plateau",
+        "input": "1 2 2 1\n",
+        "expected_output": "false",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Too short",
+        "input": "1 2\n",
+        "expected_output": "false",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "nums",
+          "type": "int[]"
+        }
+      ],
+      "returns": "bool"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0,
+    "order": 66
+  },
+  {
+    "slug": "is-permutation-1n",
+    "title": "Is a Permutation of 1..n",
+    "difficulty": "Easy",
+    "description": "Return `true` if the array of length n contains every integer from 1 to n exactly once (in any order).",
+    "constraints": "0 ≤ n ≤ 10^5",
+    "examples": [
+      {
+        "input": "3 1 2",
+        "output": "true",
+        "explanation": "Exactly 1,2,3 → true."
+      },
+      {
+        "input": "1 2 2",
+        "output": "false",
+        "explanation": "2 repeats, 3 missing → false."
+      }
+    ],
+    "editorial": "Sort and compare to 1..n (or a seen-array in O(n)).",
+    "optimal_time": "O(n log n)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "Sort and compare to 1..n (or a seen-array in O(n)).",
+    "starter_code": {
+      "python": "def solve(nums):\n    # TODO: implement\n    return False\n",
+      "java": "class Solution {\n    boolean solve(int[] nums) {\n        // TODO: implement\n        return false;\n    }\n}\n"
+    },
+    "topics": [
+      "Arrays"
+    ],
+    "subtopics": [
+      "Counting"
+    ],
+    "companies": [
+      "Adobe"
+    ],
+    "patterns": [
+      "Counting"
+    ],
+    "hints": [
+      "A valid permutation uses each of 1..n once.",
+      "Sorting it should give 1,2,…,n.",
+      "Or mark seen values and check for duplicates / out-of-range."
+    ],
+    "prerequisites": [
+      {
+        "key": "sorting",
+        "name": "Sorting",
+        "what": "Ordering elements (usually O(n log n)) so structure like duplicates and order statistics becomes easy.",
+        "deep": "Sorting is a preprocessing multiplier: it enables binary search, two-pointer sweeps, greedy choices, and grouping. The cost is O(n log n) comparisons, though counting/radix sort can beat that for bounded integer keys.",
+        "java": "Arrays.sort(int[]) or Arrays.sort(T[], Comparator) / Collections.sort. For custom order use Comparator.comparingInt(...). Note primitive sort has no comparator overload.",
+        "how": "Sorting should yield 1..n."
+      },
+      {
+        "key": "iteration",
+        "name": "Array Iteration",
+        "what": "Walking through elements one at a time while maintaining running state such as a sum, max, or counter.",
+        "deep": "The workhorse of array problems: one for-loop that updates accumulators as it goes. Most linear-time solutions are just one well-chosen pass, so the real skill is deciding what state to carry so a single sweep suffices.",
+        "java": "Use for (int i = 0; i < n; i++) or for (int x : nums). Prefer a primitive int[] over Integer[] to avoid autoboxing overhead.",
+        "how": "Or mark seen values and check the range."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Permutation",
+        "input": "3 1 2\n",
+        "expected_output": "true",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Missing",
+        "input": "1 2 2\n",
+        "expected_output": "false",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Empty",
+        "input": "\n",
+        "expected_output": "true",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Out of range",
+        "input": "0 1\n",
+        "expected_output": "false",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "nums",
+          "type": "int[]"
+        }
+      ],
+      "returns": "bool"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0,
+    "order": 67
+  },
+  {
+    "slug": "rock-paper-scissors",
+    "title": "Rock Paper Scissors",
+    "difficulty": "Easy",
+    "description": "Two players play several rounds. Each move is `R`, `P`, or `S` (rock beats scissors, scissors beats paper, paper beats rock). Given both players' move strings of equal length, return `A`, `B`, or `Draw` for whoever wins more rounds.",
+    "constraints": "0 ≤ length ≤ 10^5\nEach character is R, P, or S.",
+    "examples": [
+      {
+        "input": "RPS\nSRP",
+        "output": "A",
+        "explanation": "A wins each round → A."
+      },
+      {
+        "input": "RR\nRR",
+        "output": "Draw",
+        "explanation": "Identical moves → Draw."
+      }
+    ],
+    "editorial": "Use beats = {R:S, S:P, P:R}. For each round, if a beats b give A a point, else B; equal moves are draws. Compare totals.",
+    "optimal_time": "O(n)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "One pass tallying round wins.",
+    "starter_code": {
+      "python": "def solve(a, b):\n    # TODO: implement\n    return \"\"\n",
+      "java": "class Solution {\n    String solve(String a, String b) {\n        // TODO: implement\n        return \"\";\n    }\n}\n"
+    },
+    "topics": [
+      "Simulation"
+    ],
+    "subtopics": [
+      "State Machine"
+    ],
+    "companies": [
+      "Amazon"
+    ],
+    "patterns": [
+      "Simulation"
+    ],
+    "hints": [
+      "Compare the moves round by round.",
+      "Encode who-beats-whom in a small lookup.",
+      "Tally each player's round wins, then compare totals."
+    ],
+    "prerequisites": [
+      {
+        "key": "simulation",
+        "name": "Simulation",
+        "what": "Directly modelling a process step by step, exactly as the statement describes, instead of finding a formula.",
+        "deep": "When constraints are small, the intended solution is often to just do what the problem says: hold the state, apply each event or rule in order, and read the answer at the end. The skill is translating rules into precise state transitions and handling edge cases and 1- vs 0-indexing carefully.",
+        "java": "Model state in an array or a small int/enum code; process events in a loop, updating state per the rules. Watch off-by-one and 1-indexed input.",
+        "how": "Resolve each round in order."
+      },
+      {
+        "key": "conditionals",
+        "name": "Conditionals (if / else)",
+        "what": "Choosing what to do based on whether a condition is true.",
+        "deep": "if/else branches let your program react to data. The condition is a boolean expression built from comparisons (==, !=, <, >) and logic (&&, ||, !). Chain several with else if when there are more than two outcomes.",
+        "java": "if (n % 2 == 0) { ... } else { ... }. Compare ints with ==, but compare Strings with .equals(), never ==.",
+        "how": "Encode who beats whom and tally wins."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "A wins",
+        "input": "RPS\nSRP\n",
+        "expected_output": "A",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Draw",
+        "input": "RR\nRR\n",
+        "expected_output": "Draw",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "B wins",
+        "input": "R\nP\n",
+        "expected_output": "B",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Mixed",
+        "input": "RPSR\nPSRP\n",
+        "expected_output": "B",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "a",
+          "type": "string"
+        },
+        {
+          "name": "b",
+          "type": "string"
+        }
+      ],
+      "returns": "string"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0,
+    "order": 68
+  },
+  {
+    "slug": "traffic-light",
+    "title": "Traffic Light",
+    "difficulty": "Easy",
+    "description": "A light cycles green for `g` seconds, then yellow for `y`, then red for `r`, forever, starting at green at time 0. Return the colour (\"green\", \"yellow\", or \"red\") at time `t`.",
+    "constraints": "1 ≤ g, y, r ≤ 10^4\n0 ≤ t ≤ 10^9",
+    "examples": [
+      {
+        "input": "5\n2\n3\n1",
+        "output": "green",
+        "explanation": "t=1 is within the first 5s → green."
+      },
+      {
+        "input": "5\n2\n3\n9",
+        "output": "red",
+        "explanation": "t=9 mod 10 = 9 → red band."
+      }
+    ],
+    "editorial": "phase = t mod (g+y+r); it's green if phase < g, yellow if phase < g+y, otherwise red.",
+    "optimal_time": "O(1)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "One modulo plus two comparisons.",
+    "starter_code": {
+      "python": "def solve(g, y, r, t):\n    # TODO: implement\n    return \"\"\n",
+      "java": "class Solution {\n    String solve(int g, int y, int r, int t) {\n        // TODO: implement\n        return \"\";\n    }\n}\n"
+    },
+    "topics": [
+      "Math",
+      "Simulation"
+    ],
+    "subtopics": [
+      "Simulation"
+    ],
+    "companies": [
+      "Bloomberg"
+    ],
+    "patterns": [
+      "Simulation"
+    ],
+    "hints": [
+      "The pattern repeats every g+y+r seconds.",
+      "Reduce t modulo the cycle length.",
+      "Then place it in the green / yellow / red band."
+    ],
+    "prerequisites": [
+      {
+        "key": "modulo",
+        "name": "Modular Reduction",
+        "what": "Using n % k to wrap indices around and drop redundant whole cycles.",
+        "deep": "Modulo collapses equivalent states: rotating by k equals rotating by k % n, and hashing or bucketing uses remainders. In Java, beware that % can return a negative result for negative operands.",
+        "java": "Use k % n after guarding n > 0; for possibly-negative values use Math.floorMod(x, n).",
+        "how": "The pattern repeats every g+y+r seconds."
+      },
+      {
+        "key": "conditionals",
+        "name": "Conditionals (if / else)",
+        "what": "Choosing what to do based on whether a condition is true.",
+        "deep": "if/else branches let your program react to data. The condition is a boolean expression built from comparisons (==, !=, <, >) and logic (&&, ||, !). Chain several with else if when there are more than two outcomes.",
+        "java": "if (n % 2 == 0) { ... } else { ... }. Compare ints with ==, but compare Strings with .equals(), never ==.",
+        "how": "Place the phase in the right colour band."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Green",
+        "input": "5\n2\n3\n1\n",
+        "expected_output": "green",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Red",
+        "input": "5\n2\n3\n9\n",
+        "expected_output": "red",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Yellow edge",
+        "input": "5\n2\n3\n6\n",
+        "expected_output": "yellow",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Wraps",
+        "input": "5\n2\n3\n10\n",
+        "expected_output": "green",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "g",
+          "type": "int"
+        },
+        {
+          "name": "y",
+          "type": "int"
+        },
+        {
+          "name": "r",
+          "type": "int"
+        },
+        {
+          "name": "t",
+          "type": "int"
+        }
+      ],
+      "returns": "string"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0,
+    "order": 69
+  },
+  {
+    "slug": "max-nesting-depth",
+    "title": "Maximum Nesting Depth",
+    "difficulty": "Easy",
+    "description": "Given a string of parentheses (guaranteed balanced), return the maximum nesting depth.",
+    "constraints": "0 ≤ |s| ≤ 10^5\ns contains only '(' and ')'.",
+    "examples": [
+      {
+        "input": "((()))",
+        "output": "3",
+        "explanation": "Three levels deep."
+      },
+      {
+        "input": "()()",
+        "output": "1",
+        "explanation": "Never deeper than 1."
+      }
+    ],
+    "editorial": "Scan the string keeping a depth counter; bump it on '(' (updating the max) and drop it on ')'. Because the input is balanced, a plain counter suffices.",
+    "optimal_time": "O(n)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "A single counter — no stack needed.",
+    "starter_code": {
+      "python": "def solve(s):\n    # TODO: implement\n    return 0\n",
+      "java": "class Solution {\n    int solve(String s) {\n        // TODO: implement\n        return 0;\n    }\n}\n"
+    },
+    "topics": [
+      "Strings"
+    ],
+    "subtopics": [
+      "Counting"
+    ],
+    "companies": [
+      "Amazon",
+      "Google"
+    ],
+    "patterns": [
+      "Counting"
+    ],
+    "hints": [
+      "Track a running depth.",
+      "'(' increases it, ')' decreases it.",
+      "Remember the largest depth seen."
+    ],
+    "prerequisites": [
+      {
+        "key": "iteration",
+        "name": "Array Iteration",
+        "what": "Walking through elements one at a time while maintaining running state such as a sum, max, or counter.",
+        "deep": "The workhorse of array problems: one for-loop that updates accumulators as it goes. Most linear-time solutions are just one well-chosen pass, so the real skill is deciding what state to carry so a single sweep suffices.",
+        "java": "Use for (int i = 0; i < n; i++) or for (int x : nums). Prefer a primitive int[] over Integer[] to avoid autoboxing overhead.",
+        "how": "A single depth counter over the string."
+      },
+      {
+        "key": "conditionals",
+        "name": "Conditionals (if / else)",
+        "what": "Choosing what to do based on whether a condition is true.",
+        "deep": "if/else branches let your program react to data. The condition is a boolean expression built from comparisons (==, !=, <, >) and logic (&&, ||, !). Chain several with else if when there are more than two outcomes.",
+        "java": "if (n % 2 == 0) { ... } else { ... }. Compare ints with ==, but compare Strings with .equals(), never ==.",
+        "how": "Bump on '(' and drop on ')'."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Nested",
+        "input": "((()))\n",
+        "expected_output": "3",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Flat",
+        "input": "()()\n",
+        "expected_output": "1",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Empty",
+        "input": "\n",
+        "expected_output": "0",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Mixed",
+        "input": "(()(()))\n",
+        "expected_output": "3",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "s",
+          "type": "string"
+        }
+      ],
+      "returns": "int"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0,
+    "order": 70
+  },
+  {
+    "slug": "caesar-cipher",
+    "title": "Caesar Cipher",
+    "difficulty": "Easy",
+    "description": "Shift each lowercase letter forward by `k` positions in the alphabet, wrapping past 'z' back to 'a'. Non-letter characters are unchanged.",
+    "constraints": "0 ≤ |s| ≤ 10^5\n0 ≤ k ≤ 10^9\nLetters are lowercase.",
+    "examples": [
+      {
+        "input": "abc\n3",
+        "output": "def",
+        "explanation": "a→d, b→e, c→f."
+      },
+      {
+        "input": "xyz\n2",
+        "output": "zab",
+        "explanation": "x→z, y→a, z→b."
+      }
+    ],
+    "editorial": "For each lowercase c: ((c - 'a' + k) mod 26) + 'a'. Reducing k mod 26 keeps the arithmetic small.",
+    "optimal_time": "O(|s|)",
+    "optimal_space": "O(|s|)",
+    "optimal_explanation": "Shift each character in one pass.",
+    "starter_code": {
+      "python": "def solve(s, k):\n    # TODO: implement\n    return \"\"\n",
+      "java": "class Solution {\n    String solve(String s, int k) {\n        // TODO: implement\n        return \"\";\n    }\n}\n"
+    },
+    "topics": [
+      "Strings"
+    ],
+    "subtopics": [
+      "Arithmetic"
+    ],
+    "companies": [
+      "Adobe"
+    ],
+    "patterns": [],
+    "hints": [
+      "Map each letter to 0–25 with c − 'a'.",
+      "Add k, wrap with mod 26, map back.",
+      "Reduce k mod 26 first for big shifts."
+    ],
+    "prerequisites": [
+      {
+        "key": "string_basics",
+        "name": "String Traversal",
+        "what": "Treating a string as an indexable sequence of characters to count and compare.",
+        "deep": "Most string problems reduce to a single pass with charAt or a char[]. Remember Java strings are immutable, so build output with StringBuilder, and character math relies on ASCII codes.",
+        "java": "s.charAt(i), s.length(), s.toCharArray(); build results with StringBuilder, never += inside a loop.",
+        "how": "Map letters to 0–25 and back."
+      },
+      {
+        "key": "modulo",
+        "name": "Modular Reduction",
+        "what": "Using n % k to wrap indices around and drop redundant whole cycles.",
+        "deep": "Modulo collapses equivalent states: rotating by k equals rotating by k % n, and hashing or bucketing uses remainders. In Java, beware that % can return a negative result for negative operands.",
+        "java": "Use k % n after guarding n > 0; for possibly-negative values use Math.floorMod(x, n).",
+        "how": "Wrap past 'z' with mod 26."
+      },
+      {
+        "key": "char_arrays",
+        "name": "Char Arrays & ASCII",
+        "what": "Manipulating characters via their numeric codes and mutable char arrays.",
+        "deep": "Characters are small integers, so 'a'..'z' map to a 26-slot table via c - 'a'. Because Java strings are immutable, in-place character work needs a char[]. This underlies frequency counts, canonical keys, and in-place edits.",
+        "java": "int idx = c - 'a'; char[] arr = s.toCharArray(); new String(arr) to rebuild. A length-26 or length-128 int[] beats a HashMap for letters.",
+        "how": "Rebuild the shifted string character by character."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Shift 3",
+        "input": "abc\n3\n",
+        "expected_output": "def",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Wrap",
+        "input": "xyz\n2\n",
+        "expected_output": "zab",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "No shift",
+        "input": "hello\n0\n",
+        "expected_output": "hello",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Big k",
+        "input": "abc\n29\n",
+        "expected_output": "def",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "s",
+          "type": "string"
+        },
+        {
+          "name": "k",
+          "type": "int"
+        }
+      ],
+      "returns": "string"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0,
+    "order": 71
+  },
+  {
+    "slug": "run-length-encode",
+    "title": "Run-Length Encoding",
+    "difficulty": "Easy",
+    "description": "Compress a string by replacing each run of identical characters with the character followed by its count. For example `aaabbc` → `a3b2c1`.",
+    "constraints": "0 ≤ |s| ≤ 10^5",
+    "examples": [
+      {
+        "input": "aaabbc",
+        "output": "a3b2c1",
+        "explanation": "a3b2c1."
+      },
+      {
+        "input": "zzzz",
+        "output": "z4",
+        "explanation": "z4."
+      }
+    ],
+    "editorial": "Walk the string; while the next char equals the current, grow the run; otherwise append char+count and reset. Emit the last run at the end.",
+    "optimal_time": "O(|s|)",
+    "optimal_space": "O(|s|)",
+    "optimal_explanation": "One pass grouping consecutive equal characters.",
+    "starter_code": {
+      "python": "def solve(s):\n    # TODO: implement\n    return \"\"\n",
+      "java": "class Solution {\n    String solve(String s) {\n        // TODO: implement\n        return \"\";\n    }\n}\n"
+    },
+    "topics": [
+      "Strings"
+    ],
+    "subtopics": [
+      "Counting"
+    ],
+    "companies": [
+      "Amazon",
+      "Microsoft"
+    ],
+    "patterns": [
+      "Counting"
+    ],
+    "hints": [
+      "Track the current character and how long its run is.",
+      "When the character changes, emit char + count.",
+      "Don't forget to emit the final run."
+    ],
+    "prerequisites": [
+      {
+        "key": "string_basics",
+        "name": "String Traversal",
+        "what": "Treating a string as an indexable sequence of characters to count and compare.",
+        "deep": "Most string problems reduce to a single pass with charAt or a char[]. Remember Java strings are immutable, so build output with StringBuilder, and character math relies on ASCII codes.",
+        "java": "s.charAt(i), s.length(), s.toCharArray(); build results with StringBuilder, never += inside a loop.",
+        "how": "Group consecutive equal characters."
+      },
+      {
+        "key": "iteration",
+        "name": "Array Iteration",
+        "what": "Walking through elements one at a time while maintaining running state such as a sum, max, or counter.",
+        "deep": "The workhorse of array problems: one for-loop that updates accumulators as it goes. Most linear-time solutions are just one well-chosen pass, so the real skill is deciding what state to carry so a single sweep suffices.",
+        "java": "Use for (int i = 0; i < n; i++) or for (int x : nums). Prefer a primitive int[] over Integer[] to avoid autoboxing overhead.",
+        "how": "Emit char+count when the run ends — including the last run."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example",
+        "input": "aaabbc\n",
+        "expected_output": "a3b2c1",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "All same",
+        "input": "zzzz\n",
+        "expected_output": "z4",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Empty",
+        "input": "\n",
+        "expected_output": "",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "No runs",
+        "input": "abc\n",
+        "expected_output": "a1b1c1",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "s",
+          "type": "string"
+        }
+      ],
+      "returns": "string"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0,
+    "order": 72
+  },
+  {
+    "slug": "password-strength",
+    "title": "Valid Password",
+    "difficulty": "Easy",
+    "description": "Return `true` if the password is valid: at least 8 characters long AND containing at least one uppercase letter, one lowercase letter, and one digit.",
+    "constraints": "0 ≤ |s| ≤ 10^5",
+    "examples": [
+      {
+        "input": "Abcdef12",
+        "output": "true",
+        "explanation": "8 chars with upper, lower, digit → valid."
+      },
+      {
+        "input": "Abc12",
+        "output": "false",
+        "explanation": "Only 5 characters → invalid."
+      }
+    ],
+    "editorial": "Track three booleans (seen upper, lower, digit) in a single scan and combine them with the length requirement.",
+    "optimal_time": "O(|s|)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "One pass collecting character-class flags.",
+    "starter_code": {
+      "python": "def solve(s):\n    # TODO: implement\n    return False\n",
+      "java": "class Solution {\n    boolean solve(String s) {\n        // TODO: implement\n        return false;\n    }\n}\n"
+    },
+    "topics": [
+      "Strings"
+    ],
+    "subtopics": [
+      "Conditionals"
+    ],
+    "companies": [
+      "Amazon"
+    ],
+    "patterns": [],
+    "hints": [
+      "Check the length first.",
+      "Scan once, setting flags for upper, lower, and digit.",
+      "All conditions must hold."
+    ],
+    "prerequisites": [
+      {
+        "key": "string_basics",
+        "name": "String Traversal",
+        "what": "Treating a string as an indexable sequence of characters to count and compare.",
+        "deep": "Most string problems reduce to a single pass with charAt or a char[]. Remember Java strings are immutable, so build output with StringBuilder, and character math relies on ASCII codes.",
+        "java": "s.charAt(i), s.length(), s.toCharArray(); build results with StringBuilder, never += inside a loop.",
+        "how": "Scan for character classes."
+      },
+      {
+        "key": "boolean_logic",
+        "name": "Booleans & Comparison",
+        "what": "True/false values and the operators that combine them.",
+        "deep": "Comparisons produce booleans, and &&, ||, ! combine them. Short-circuit evaluation means the right side of && is skipped when the left is false, which is both handy and sometimes necessary to avoid errors.",
+        "java": "boolean type; comparisons ==, !=, <, <=, >, >=; logic && (and), || (or), ! (not).",
+        "how": "All requirements must hold together."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Valid",
+        "input": "Abcdef12\n",
+        "expected_output": "true",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Too short",
+        "input": "Abc12\n",
+        "expected_output": "false",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "No digit",
+        "input": "Abcdefgh\n",
+        "expected_output": "false",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "No upper",
+        "input": "abcdefg1\n",
+        "expected_output": "false",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "s",
+          "type": "string"
+        }
+      ],
+      "returns": "bool"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0,
+    "order": 73
+  },
+  {
+    "slug": "bank-balance",
+    "title": "Bank Account Balance",
+    "difficulty": "Easy",
+    "description": "Process a list of transactions on an account that starts at 0. A positive value is a deposit (always applied). A negative value is a withdrawal, but a withdrawal that would make the balance negative is **rejected** (skipped). Return the final balance.",
+    "constraints": "0 ≤ n ≤ 10^5",
+    "examples": [
+      {
+        "input": "100 -30 -200 50",
+        "output": "120",
+        "explanation": "100, then -30 → 70, -200 rejected, +50 → 120."
+      },
+      {
+        "input": "10 20 30",
+        "output": "60",
+        "explanation": "10+20+30 = 60."
+      }
+    ],
+    "editorial": "Iterate the transactions; for a negative t, apply it only if balance + t ≥ 0, otherwise ignore it. Positives always apply.",
+    "optimal_time": "O(n)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "Single pass with a guarded update.",
+    "starter_code": {
+      "python": "def solve(transactions):\n    # TODO: implement\n    return 0\n",
+      "java": "class Solution {\n    int solve(int[] transactions) {\n        // TODO: implement\n        return 0;\n    }\n}\n"
+    },
+    "topics": [
+      "Arrays",
+      "Simulation"
+    ],
+    "subtopics": [
+      "Simulation"
+    ],
+    "companies": [
+      "Bloomberg",
+      "Amazon"
+    ],
+    "patterns": [
+      "Simulation"
+    ],
+    "hints": [
+      "Keep a running balance.",
+      "Apply deposits directly.",
+      "Only apply a withdrawal if the balance stays ≥ 0; otherwise skip it."
+    ],
+    "prerequisites": [
+      {
+        "key": "simulation",
+        "name": "Simulation",
+        "what": "Directly modelling a process step by step, exactly as the statement describes, instead of finding a formula.",
+        "deep": "When constraints are small, the intended solution is often to just do what the problem says: hold the state, apply each event or rule in order, and read the answer at the end. The skill is translating rules into precise state transitions and handling edge cases and 1- vs 0-indexing carefully.",
+        "java": "Model state in an array or a small int/enum code; process events in a loop, updating state per the rules. Watch off-by-one and 1-indexed input.",
+        "how": "Apply each transaction in order."
+      },
+      {
+        "key": "conditionals",
+        "name": "Conditionals (if / else)",
+        "what": "Choosing what to do based on whether a condition is true.",
+        "deep": "if/else branches let your program react to data. The condition is a boolean expression built from comparisons (==, !=, <, >) and logic (&&, ||, !). Chain several with else if when there are more than two outcomes.",
+        "java": "if (n % 2 == 0) { ... } else { ... }. Compare ints with ==, but compare Strings with .equals(), never ==.",
+        "how": "Reject a withdrawal that would overdraft."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example",
+        "input": "100 -30 -200 50\n",
+        "expected_output": "120",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "All deposits",
+        "input": "10 20 30\n",
+        "expected_output": "60",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Reject first",
+        "input": "-5 40\n",
+        "expected_output": "40",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Empty",
+        "input": "\n",
+        "expected_output": "0",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "transactions",
+          "type": "int[]"
+        }
+      ],
+      "returns": "int"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0,
+    "order": 74
+  },
+  {
+    "slug": "max-passengers",
+    "title": "Maximum Passengers",
+    "difficulty": "Easy",
+    "description": "A bus starts empty. At each stop, `changes[i]` people board (or leave, if negative). Return the maximum number of passengers on the bus at any moment.",
+    "constraints": "1 ≤ n ≤ 10^5\nThe bus is never over-emptied (running total stays ≥ 0).",
+    "examples": [
+      {
+        "input": "3 2 -1 4 -3",
+        "output": "8",
+        "explanation": "Counts 3,5,4,8,5 → peak 8."
+      },
+      {
+        "input": "1 1 1",
+        "output": "3",
+        "explanation": "1,2,3 → peak 3."
+      }
+    ],
+    "editorial": "Accumulate the changes into a running passenger count and record the maximum seen — a prefix-sum-with-running-max.",
+    "optimal_time": "O(n)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "Running total with a max tracker.",
+    "starter_code": {
+      "python": "def solve(changes):\n    # TODO: implement\n    return 0\n",
+      "java": "class Solution {\n    int solve(int[] changes) {\n        // TODO: implement\n        return 0;\n    }\n}\n"
+    },
+    "topics": [
+      "Arrays",
+      "Simulation"
+    ],
+    "subtopics": [
+      "Prefix Sum"
+    ],
+    "companies": [
+      "Amazon"
+    ],
+    "patterns": [
+      "Simulation",
+      "Prefix Sums"
+    ],
+    "hints": [
+      "Keep a running count of passengers.",
+      "Update it at each stop.",
+      "Track the largest value it reaches."
+    ],
+    "prerequisites": [
+      {
+        "key": "prefix_sum",
+        "name": "Prefix Sums",
+        "what": "Precomputed running totals so any range sum is a single subtraction.",
+        "deep": "Build P[i] = a[0]+…+a[i-1]; then the sum of a[l..r] is P[r+1] − P[l] in O(1). Paired with a hash map of seen prefixes it counts subarrays with a target sum in one pass. The same idea extends to prefix XOR, products, and 2-D grids.",
+        "java": "A long[] prefix of length n+1, or a running long combined with a HashMap<Long,Integer> of prefix counts.",
+        "how": "The running total is the current passenger count."
+      },
+      {
+        "key": "iteration",
+        "name": "Array Iteration",
+        "what": "Walking through elements one at a time while maintaining running state such as a sum, max, or counter.",
+        "deep": "The workhorse of array problems: one for-loop that updates accumulators as it goes. Most linear-time solutions are just one well-chosen pass, so the real skill is deciding what state to carry so a single sweep suffices.",
+        "java": "Use for (int i = 0; i < n; i++) or for (int x : nums). Prefer a primitive int[] over Integer[] to avoid autoboxing overhead.",
+        "how": "Track the maximum as you go."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example",
+        "input": "3 2 -1 4 -3\n",
+        "expected_output": "8",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Only boarding",
+        "input": "1 1 1\n",
+        "expected_output": "3",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Empties",
+        "input": "5 -5 2\n",
+        "expected_output": "5",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Single",
+        "input": "7\n",
+        "expected_output": "7",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "changes",
+          "type": "int[]"
+        }
+      ],
+      "returns": "int"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0,
+    "order": 75
+  },
+  {
+    "slug": "count-equal-pairs",
+    "title": "Count Equal Pairs",
+    "difficulty": "Easy",
+    "description": "Return the number of index pairs (i, j) with i < j and nums[i] == nums[j].",
+    "constraints": "1 ≤ n ≤ 2000",
+    "examples": [
+      {
+        "input": "1 2 1 1",
+        "output": "3",
+        "explanation": "Pairs (0,2),(0,3),(2,3) → 3."
+      },
+      {
+        "input": "1 2 3",
+        "output": "0",
+        "explanation": "All distinct → 0."
+      }
+    ],
+    "editorial": "With n ≤ 2000 a nested loop over i < j counting equal values is well within limits. (Frequency counts give an O(n) alternative: sum c·(c−1)/2.)",
+    "optimal_time": "O(n²)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "Check every pair — the small bound makes it fine (counts also work).",
+    "starter_code": {
+      "python": "def solve(nums):\n    # TODO: implement\n    return 0\n",
+      "java": "class Solution {\n    int solve(int[] nums) {\n        // TODO: implement\n        return 0;\n    }\n}\n"
+    },
+    "topics": [
+      "Arrays"
+    ],
+    "subtopics": [
+      "Counting"
+    ],
+    "companies": [
+      "Amazon",
+      "Adobe"
+    ],
+    "patterns": [
+      "Counting"
+    ],
+    "hints": [
+      "A pair needs two equal values at different indices.",
+      "With small n, a double loop is fine.",
+      "For each i, compare against every later j."
+    ],
+    "prerequisites": [
+      {
+        "key": "iteration",
+        "name": "Array Iteration",
+        "what": "Walking through elements one at a time while maintaining running state such as a sum, max, or counter.",
+        "deep": "The workhorse of array problems: one for-loop that updates accumulators as it goes. Most linear-time solutions are just one well-chosen pass, so the real skill is deciding what state to carry so a single sweep suffices.",
+        "java": "Use for (int i = 0; i < n; i++) or for (int x : nums). Prefer a primitive int[] over Integer[] to avoid autoboxing overhead.",
+        "how": "Compare every pair i < j."
+      },
+      {
+        "key": "big_o",
+        "name": "Big-O / Complexity Analysis",
+        "what": "Reasoning about how time and memory grow with the input size.",
+        "deep": "Big-O bounds the dominant growth term and tells you whether an approach scales to the constraints. Read the limits: n up to 10^5 suggests O(n) or O(n log n), while 10^9 suggests O(log n) or O(1). Sanity-check the work against roughly 10^8 operations per second.",
+        "java": "No API - this is analysis. Match your algorithm to the constraints stated in each problem before you start coding.",
+        "how": "The small n makes the O(n²) double loop acceptable."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example",
+        "input": "1 2 1 1\n",
+        "expected_output": "3",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "None",
+        "input": "1 2 3\n",
+        "expected_output": "0",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "All same",
+        "input": "5 5 5 5\n",
+        "expected_output": "6",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Single",
+        "input": "9\n",
+        "expected_output": "0",
+        "ordering": 3
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "function_spec": {
+      "name": "solve",
+      "params": [
+        {
+          "name": "nums",
+          "type": "int[]"
+        }
+      ],
+      "returns": "int"
+    },
+    "judge_mode": "exact",
+    "float_tolerance": 0,
+    "order": 76
   }
 ]
