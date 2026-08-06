@@ -1,0 +1,3 @@
+# Generated seed files + generator must be LF so CI regeneration matches on Linux.
+src-tauri/seeds/*.json text eol=lf
+tools/gen_seed.py text eol=lf

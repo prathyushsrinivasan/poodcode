@@ -5212,13 +5212,13 @@ for _rank, _idx in enumerate(_ranked):
     out[_idx]["order"] = _rank
 
 os.makedirs(os.path.dirname(OUT), exist_ok=True)
-with open(OUT, "w", encoding="utf-8") as f:
+with open(OUT, "w", encoding="utf-8", newline="\n") as f:
     json.dump(out, f, indent=2, ensure_ascii=False)
 print(f"Wrote {len(out)} problems to {os.path.relpath(OUT)}")
 
 CONCEPTS_OUT = os.path.join(HERE, "..", "src-tauri", "seeds", "concepts.json")
 concepts = build_concepts()
-with open(CONCEPTS_OUT, "w", encoding="utf-8") as f:
+with open(CONCEPTS_OUT, "w", encoding="utf-8", newline="\n") as f:
     json.dump(concepts, f, indent=2, ensure_ascii=False)
 print(f"Wrote {len(concepts)} concepts to {os.path.relpath(CONCEPTS_OUT)}")
 
@@ -5317,6 +5317,6 @@ REFERENCE_SOLUTIONS = {
 }
 
 REFS_OUT = os.path.join(HERE, "..", "src-tauri", "seeds", "reference_solutions.json")
-with open(REFS_OUT, "w", encoding="utf-8") as f:
+with open(REFS_OUT, "w", encoding="utf-8", newline="\n") as f:
     json.dump(REFERENCE_SOLUTIONS, f, indent=2, ensure_ascii=False)
 print(f"Wrote {len(REFERENCE_SOLUTIONS)} reference solution sets to {os.path.relpath(REFS_OUT)}")
