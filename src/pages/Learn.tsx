@@ -11,17 +11,37 @@ const CATEGORY_ORDER = [
   "Arrays",
   "Strings",
   "Data Structures",
+  "Linked Lists",
+  "Trees",
   "Searching & Sorting",
   "Recursion & DP",
   "Graphs",
   "Math",
   "General",
+  // TypeScript track categories (shown when the TS toggle is active)
+  "TS: Language Basics",
+  "TS: Functions & Types",
+  "TS: Data Structures",
+  "TS: Composition & Reuse",
+  "TS: Robustness",
 ];
+
+// A concept with no explicit language is legacy Java content.
+const conceptLang = (c: Concept) => c.language || "java";
+
+const LANG_TABS: { id: string; label: string }[] = [
+  { id: "java", label: "Java" },
+  { id: "typescript", label: "TypeScript" },
+];
+const LANG_STORE_KEY = "poodcode:learn-lang";
 
 export default function Learn() {
   const { key } = useParams();
   const [concepts, setConcepts] = useState<Concept[]>([]);
   const [problems, setProblems] = useState<Problem[]>([]);
+  const [lang, setLang] = useState<string>(
+    () => localStorage.getItem(LANG_STORE_KEY) || "java"
+  );
   const nav = useNavigate();
 
   useEffect(() => {
@@ -29,16 +49,33 @@ export default function Learn() {
     api.listProblems().then(setProblems).catch(() => {});
   }, []);
 
+  function pickLang(id: string) {
+    setLang(id);
+    localStorage.setItem(LANG_STORE_KEY, id);
+  }
+
+  // Which languages actually have concepts, so the toggle only offers real tabs.
+  const availableLangs = useMemo(() => {
+    const present = new Set(concepts.map(conceptLang));
+    return LANG_TABS.filter((t) => present.has(t.id));
+  }, [concepts]);
+
   const byCategory = useMemo(() => {
     const map = new Map<string, Concept[]>();
     for (const c of concepts) {
+      if (conceptLang(c) !== lang) continue;
       if (!map.has(c.category)) map.set(c.category, []);
       map.get(c.category)!.push(c);
     }
     return [...map.entries()].sort(
       (a, b) => CATEGORY_ORDER.indexOf(a[0]) - CATEGORY_ORDER.indexOf(b[0])
     );
-  }, [concepts]);
+  }, [concepts, lang]);
+
+  const shownCount = useMemo(
+    () => concepts.filter((c) => conceptLang(c) === lang).length,
+    [concepts, lang]
+  );
 
   if (key) {
     const concept = concepts.find((c) => c.key === key);
@@ -55,13 +92,39 @@ export default function Learn() {
     return <ConceptDetail concept={concept} related={related} problems={problems} />;
   }
 
+  const isTs = lang === "typescript";
+
   return (
     <div className="page">
-      <h1 className="page-title">Learn</h1>
+      <div className="row" style={{ justifyContent: "space-between", alignItems: "flex-start" }}>
+        <h1 className="page-title">Learn</h1>
+        {availableLangs.length > 1 && (
+          <div className="row" style={{ gap: 6 }}>
+            {availableLangs.map((t) => (
+              <button
+                key={t.id}
+                className={t.id === lang ? "" : "ghost"}
+                onClick={() => pickLang(t.id)}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
       <p className="page-sub">
-        {concepts.length} concepts. Each teaches the syntax, then hands you short{" "}
-        <strong>fill-in-the-blank drills</strong> — type just the piece the lesson is about
-        and check it instantly. New to Java? Start with <strong>Foundations</strong>.
+        {shownCount} {isTs ? "TypeScript" : "Java"} concepts. Each teaches the syntax, then hands
+        you short <strong>fill-in-the-blank drills</strong> and{" "}
+        <strong>full-length problems</strong> — run them right here and check instantly.{" "}
+        {isTs ? (
+          <>
+            New to TypeScript? Start with <strong>TS: Language Basics</strong>.
+          </>
+        ) : (
+          <>
+            New to Java? Start with <strong>Foundations</strong>.
+          </>
+        )}
       </p>
 
       {byCategory.map(([cat, items]) => (
@@ -132,7 +195,9 @@ function ConceptDetail({
       </div>
 
       <div className="card" style={{ marginBottom: 14, borderColor: "var(--accent)" }}>
-        <div className="io-label" style={{ color: "var(--accent)" }}>In Java</div>
+        <div className="io-label" style={{ color: "var(--accent)" }}>
+          In {conceptLang(concept) === "typescript" ? "TypeScript" : "Java"}
+        </div>
         <p style={{ marginBottom: 0 }}>{concept.java}</p>
       </div>
 

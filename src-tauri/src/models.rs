@@ -14,6 +14,10 @@ pub struct Concept {
     pub deep: String,
     #[serde(default)]
     pub java: String,
+    /// Which language this concept teaches ("java" | "typescript"). Drives the
+    /// Learn-tab language toggle. Empty is treated as "java" by the frontend.
+    #[serde(default)]
+    pub language: String,
     /// Full Markdown lesson (worked example, code, pitfalls).
     #[serde(default)]
     pub lesson: String,

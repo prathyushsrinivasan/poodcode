@@ -62,6 +62,7 @@ export interface Concept {
   what: string;
   deep: string;
   java: string;
+  language: string;
   lesson: string;
   exercises: Exercise[];
 }

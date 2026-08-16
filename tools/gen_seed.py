@@ -3480,6 +3480,7 @@ def build_concepts():
             "what": c["what"],
             "deep": c["deep"],
             "java": c["java"],
+            "language": c.get("language", "java"),
             "lesson": LESSONS.get(key, ""),
             "exercises": EXERCISES.get(key, []),
         })
@@ -5973,6 +5974,31 @@ _exp_path = os.path.join(HERE, "expansion_defs.py")
 if os.path.exists(_exp_path):
     with open(_exp_path, encoding="utf-8") as _ef:
         exec(compile(_ef.read(), _exp_path, "exec"))
+
+
+# ---------------------------------------------------------------------------
+# TypeScript foundational Learn track — a second language for the Learn tab.
+# Authored in a separate file and exec'd here so it can extend CONCEPTS /
+# CATEGORY / LESSONS / EXERCISES in place with TypeScript concepts (each marked
+# "language": "typescript"). No problem-bank / SEED_VERSION impact — concepts
+# are embedded JSON, not SQLite.
+# ---------------------------------------------------------------------------
+_ts_path = os.path.join(HERE, "typescript_defs.py")
+if os.path.exists(_ts_path):
+    with open(_ts_path, encoding="utf-8") as _tf:
+        exec(compile(_tf.read(), _ts_path, "exec"))
+
+
+# ---------------------------------------------------------------------------
+# Java core-concept drills — backfills fill-in-the-blank exercises for the
+# high-value interview concepts that shipped with lessons but no practice
+# (strings, hashing/complement, stack/queue, recursion, binary search,
+# sorting). Extends EXERCISES in place; concepts/lessons already exist.
+# ---------------------------------------------------------------------------
+_jc_path = os.path.join(HERE, "java_core_drills.py")
+if os.path.exists(_jc_path):
+    with open(_jc_path, encoding="utf-8") as _jf:
+        exec(compile(_jf.read(), _jc_path, "exec"))
 
 
 # ---------------------------------------------------------------------------
