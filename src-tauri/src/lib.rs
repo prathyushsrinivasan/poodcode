@@ -24,7 +24,7 @@ use models::Problem;
 
 /// Bump when the bundled seed problems change so existing installs pick up new
 /// content on next launch (existing user progress is preserved via upsert).
-const SEED_VERSION: i64 = 9;
+const SEED_VERSION: i64 = 10;
 
 /// Original starter problems, authored for this app (no third-party content).
 const SEED_PROBLEMS: &str = include_str!("../seeds/problems.json");
@@ -150,11 +150,154 @@ fn seed_paths(conn: &Connection) {
             "Matching, counting, and canonical forms.",
             &["valid-parentheses", "count-vowels", "group-anagrams-count"],
         ),
+        // ---- Syllabus expansion tracks (SEED_VERSION 10) ----
+        (
+            "trees",
+            "Binary Trees",
+            "Traversals, depth, and the recursion that powers every tree problem.",
+            &[
+                "max-depth-tree", "min-depth-tree", "invert-binary-tree", "same-tree",
+                "level-order-traversal", "right-side-view", "path-sum-exists",
+                "balanced-tree", "diameter-of-tree", "lca-binary-tree", "max-path-sum",
+            ],
+        ),
+        (
+            "bst",
+            "Binary Search Trees",
+            "Exploit the left < node < right invariant for search, order, and validation.",
+            &["bst-search", "bst-insert", "kth-smallest-bst", "lca-bst", "validate-bst"],
+        ),
+        (
+            "linked-lists",
+            "Linked Lists",
+            "Pointer surgery: reversal, fast/slow pointers, and cycle detection.",
+            &[
+                "list-length", "reverse-linked-list", "middle-of-list",
+                "remove-duplicates-sorted-list", "merge-two-sorted-lists",
+                "remove-nth-from-end", "palindrome-linked-list", "has-cycle",
+                "reorder-list", "reverse-k-group",
+            ],
+        ),
+        (
+            "backtracking",
+            "Backtracking",
+            "Choose / explore / un-choose over subsets, permutations, and constraint puzzles.",
+            &[
+                "subset-sum-count", "combination-sum-count", "generate-subsets",
+                "generate-permutations", "generate-parentheses", "word-search",
+                "palindrome-partition-count", "n-queens-count",
+            ],
+        ),
+        (
+            "heaps",
+            "Heaps & Priority Queues",
+            "Top-K, two-heap medians, and greedy-with-a-heap scheduling.",
+            &[
+                "last-stone-weight", "kth-largest-in-array", "k-closest-distances",
+                "top-k-frequent-words", "task-scheduler", "reorganize-string",
+                "merge-k-sorted", "median-from-stream",
+            ],
+        ),
+        (
+            "intervals",
+            "Intervals",
+            "Sort by start or end, merge, and sweep for concurrency.",
+            &[
+                "can-attend-meetings", "merge-intervals", "insert-interval",
+                "min-meeting-rooms", "non-overlapping-remove", "min-arrows-balloons",
+                "interval-intersections", "employee-free-time",
+            ],
+        ),
+        (
+            "design-ds",
+            "Design & Data Structures",
+            "Compose primitives into caches, stacks-from-queues, and streaming structures.",
+            &[
+                "min-stack", "implement-queue-stacks", "design-hashmap",
+                "design-circular-queue", "lru-cache", "time-based-kv",
+                "stock-spanner", "lfu-cache",
+            ],
+        ),
+        (
+            "union-find",
+            "Union-Find (DSU)",
+            "Connectivity, components, cycle detection, and Kruskal's MST.",
+            &[
+                "count-components", "number-of-provinces", "graph-valid-tree",
+                "redundant-connection", "largest-component-size",
+                "make-network-connected", "earliest-full-connect",
+            ],
+        ),
+        (
+            "advanced-graphs",
+            "Advanced Graphs",
+            "Dijkstra, Bellman-Ford, MST, topological order, and cycle detection.",
+            &[
+                "network-delay-time", "cheapest-flights-k-stops", "mst-total-weight",
+                "min-cost-connect-points", "detect-cycle-directed", "course-schedule-possible",
+                "bipartite-check", "word-ladder-length", "alien-dictionary-order",
+            ],
+        ),
+        (
+            "tries",
+            "Tries (Prefix Trees)",
+            "Prefix-indexed lookups: dictionaries, autocomplete, wildcards, and bit-tries.",
+            &[
+                "longest-common-prefix-strs", "word-in-dictionary", "prefix-counts",
+                "replace-words-roots", "implement-trie-ops", "word-dictionary-wildcard",
+                "max-xor-pair",
+            ],
+        ),
     ];
     for (i, (key, title, desc, slugs)) in paths.iter().enumerate() {
         let owned: Vec<String> = slugs.iter().map(|s| s.to_string()).collect();
         if let Err(e) = repo::upsert_path(conn, key, title, desc, i as i64, &owned) {
             eprintln!("[paths] failed to seed {key}: {e}");
+        }
+    }
+}
+
+/// Concept flashcards (signal → technique), authored in the generator and
+/// seeded idempotently so review progress survives relaunches.
+const SEED_FLASHCARDS: &str = include_str!("../seeds/flashcards.json");
+
+#[derive(serde::Deserialize)]
+struct SeedCard {
+    front: String,
+    back: String,
+    source: String,
+}
+
+fn seed_flashcards(conn: &Connection) {
+    match serde_json::from_str::<Vec<SeedCard>>(SEED_FLASHCARDS) {
+        Ok(cards) => {
+            for c in &cards {
+                if let Err(e) = repo::seed_flashcard_if_absent(conn, &c.front, &c.back, &c.source) {
+                    eprintln!("[flashcards] failed to seed: {e}");
+                }
+            }
+        }
+        Err(e) => eprintln!("[flashcards] could not parse seed flashcards: {e}"),
+    }
+}
+
+/// One timed practice contest per syllabus domain, created once (idempotent by
+/// title) so users have a ready-made mock-interview set to launch.
+fn seed_contests(conn: &Connection) {
+    let contests: &[(&str, i64, &[&str])] = &[
+        ("Tree Traversal Gauntlet", 3600, &["max-depth-tree", "level-order-traversal", "validate-bst", "diameter-of-tree", "lca-binary-tree"]),
+        ("Linked List Sprint", 3600, &["reverse-linked-list", "middle-of-list", "merge-two-sorted-lists", "has-cycle", "reorder-list"]),
+        ("Backtracking Dash", 3600, &["generate-subsets", "generate-permutations", "combination-sum-count", "word-search", "n-queens-count"]),
+        ("Heap Time Trial", 3600, &["kth-largest-in-array", "top-k-frequent-words", "task-scheduler", "merge-k-sorted", "median-from-stream"]),
+        ("Interval Sprint", 3600, &["merge-intervals", "insert-interval", "min-meeting-rooms", "non-overlapping-remove", "interval-intersections"]),
+        ("Design Bracket", 3600, &["min-stack", "implement-queue-stacks", "lru-cache", "time-based-kv", "stock-spanner"]),
+        ("Union-Find Round", 3600, &["count-components", "graph-valid-tree", "redundant-connection", "make-network-connected", "largest-component-size"]),
+        ("Graph Showdown", 3600, &["network-delay-time", "cheapest-flights-k-stops", "mst-total-weight", "course-schedule-possible", "word-ladder-length"]),
+        ("Trie Power Hour", 3600, &["word-in-dictionary", "prefix-counts", "replace-words-roots", "implement-trie-ops", "word-dictionary-wildcard"]),
+    ];
+    for (title, dur, slugs) in contests {
+        if let Err(e) = repo::create_contest_if_absent(conn, title, slugs, *dur) {
+            eprintln!("[contests] failed to seed {title}: {e}");
         }
     }
 }
@@ -173,6 +316,8 @@ pub fn run() {
             let conn = db::open(&db_path).expect("failed to open database");
             seed_if_needed(&conn);
             seed_paths(&conn);
+            seed_flashcards(&conn);
+            seed_contests(&conn);
             app.manage(AppState {
                 db: Mutex::new(conn),
                 db_path,

@@ -1019,6 +1019,63 @@ pub fn add_flashcard(conn: &Connection, front: &str, back: &str, source: &str) -
     Ok(conn.last_insert_rowid())
 }
 
+/// Insert a seeded flashcard only if one with the same front + source doesn't
+/// already exist, so re-seeding on every launch preserves the user's review
+/// progress (idempotent).
+pub fn seed_flashcard_if_absent(
+    conn: &Connection,
+    front: &str,
+    back: &str,
+    source: &str,
+) -> AppResult<()> {
+    let exists: Option<i64> = conn
+        .query_row(
+            "SELECT id FROM flashcards WHERE front = ?1 AND source = ?2 LIMIT 1",
+            params![front, source],
+            |r| r.get(0),
+        )
+        .optional()?;
+    if exists.is_none() {
+        add_flashcard(conn, front, back, source)?;
+    }
+    Ok(())
+}
+
+/// Create a themed practice contest from problem slugs, once (idempotent by
+/// title). Missing slugs are skipped; if none resolve the contest is not created.
+pub fn create_contest_if_absent(
+    conn: &Connection,
+    title: &str,
+    slugs: &[&str],
+    duration_seconds: i64,
+) -> AppResult<()> {
+    let exists: Option<i64> = conn
+        .query_row(
+            "SELECT id FROM contests WHERE title = ?1 LIMIT 1",
+            params![title],
+            |r| r.get(0),
+        )
+        .optional()?;
+    if exists.is_some() {
+        return Ok(());
+    }
+    let mut ids = Vec::new();
+    for s in slugs {
+        if let Some(pid) = conn
+            .query_row("SELECT id FROM problems WHERE slug = ?1", params![s], |r| {
+                r.get::<_, i64>(0)
+            })
+            .optional()?
+        {
+            ids.push(pid);
+        }
+    }
+    if !ids.is_empty() {
+        create_contest(conn, title, &ids, duration_seconds)?;
+    }
+    Ok(())
+}
+
 pub fn list_flashcards(conn: &Connection) -> AppResult<Vec<Flashcard>> {
     let mut stmt = conn.prepare(
         "SELECT id, front, back, source, ease, reps, lapses, interval_days, due_date, created_at

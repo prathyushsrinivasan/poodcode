@@ -17,6 +17,37 @@ pub struct Concept {
     /// Full Markdown lesson (worked example, code, pitfalls).
     #[serde(default)]
     pub lesson: String,
+    /// Half-coded fill-in-the-blank drills for this concept (Learn tab).
+    #[serde(default)]
+    pub exercises: Vec<Exercise>,
+}
+
+/// A single stdin/stdout check for a concept exercise.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ExerciseTest {
+    pub input: String,
+    pub output: String,
+}
+
+/// A "half-coded" drill: the learner is shown `starter` (a full Java program
+/// with a `____` blank) and types back the one piece the lesson teaches. The
+/// completed program is judged against `tests`; `solution` is the reveal-able
+/// correct answer and the reference proven by tests/verify_exercises.rs.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Exercise {
+    pub id: String,
+    pub title: String,
+    pub prompt: String,
+    #[serde(default)]
+    pub hint: String,
+    #[serde(default)]
+    pub language: String,
+    pub starter: String,
+    pub solution: String,
+    pub tests: Vec<ExerciseTest>,
+    /// Optional Library problem slug this drill leads into (advanced concepts).
+    #[serde(default)]
+    pub source_slug: String,
 }
 
 /// A coding problem. `topics`, `subtopics` and `companies` are denormalized on

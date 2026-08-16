@@ -1,0 +1,192 @@
+[
+  {
+    "front": "Tree question — which traversal for 'sorted values' in a BST?",
+    "back": "Inorder (left, node, right) emits BST values in sorted order.",
+    "source": "seed:tree_traversal"
+  },
+  {
+    "front": "Tree question — 'shallowest leaf' / per-level answer?",
+    "back": "BFS with a queue, one level at a time.",
+    "source": "seed:tree_traversal"
+  },
+  {
+    "front": "Validate a BST — why isn't checking children enough?",
+    "back": "A node must respect ancestors too; carry a (low, high) range down.",
+    "source": "seed:bst"
+  },
+  {
+    "front": "Diameter / max-path-sum trick?",
+    "back": "Postorder: RETURN one side up (height/gain), RECORD both sides (L+R) in a global best.",
+    "source": "seed:tree_dp"
+  },
+  {
+    "front": "Lowest common ancestor in a plain binary tree?",
+    "back": "DFS; the node where left and right subtrees each return a target is the LCA.",
+    "source": "seed:tree_dp"
+  },
+  {
+    "front": "Reverse a linked list in O(1) space?",
+    "back": "Rolling prev/cur/next: cache next, flip cur.next=prev, advance both; return prev.",
+    "source": "seed:list_reversal"
+  },
+  {
+    "front": "Find the middle of a linked list in one pass?",
+    "back": "Fast/slow: slow+=1, fast+=2; when fast ends, slow is the middle.",
+    "source": "seed:fast_slow"
+  },
+  {
+    "front": "Detect a cycle in a linked list?",
+    "back": "Floyd's tortoise & hare — if fast (2x) ever meets slow (1x), there's a cycle.",
+    "source": "seed:fast_slow"
+  },
+  {
+    "front": "Find where a cycle starts?",
+    "back": "After the fast/slow meeting, reset one pointer to head; step both by 1; they meet at the entry.",
+    "source": "seed:fast_slow"
+  },
+  {
+    "front": "Why use a dummy head node?",
+    "back": "It removes the special case when the real head is removed or reassigned.",
+    "source": "seed:list_basics"
+  },
+  {
+    "front": "Backtracking template?",
+    "back": "choose → explore → un-choose: add a choice, recurse, then remove it to restore state.",
+    "source": "seed:backtracking"
+  },
+  {
+    "front": "Prompt says 'generate all subsets/permutations/combinations' — technique?",
+    "back": "Backtracking (DFS over the decision tree); n is small so exponential is fine.",
+    "source": "seed:backtracking"
+  },
+  {
+    "front": "Backtracker times out — first fix?",
+    "back": "Prune: sort + break past the target, and skip duplicate choices at the same depth.",
+    "source": "seed:pruning"
+  },
+  {
+    "front": "Word search / N-queens / Sudoku share what shape?",
+    "back": "Constraint backtracking: try a placement, recurse, undo on conflict.",
+    "source": "seed:backtracking"
+  },
+  {
+    "front": "'k largest / most frequent / closest' — technique?",
+    "back": "Size-k heap (min-heap for k largest): push, pop when size>k; root is the k-th best. O(n log k).",
+    "source": "seed:top_k"
+  },
+  {
+    "front": "Running median of a stream?",
+    "back": "Two heaps: max-heap (low half) + min-heap (high half), kept balanced; median is the top(s).",
+    "source": "seed:two_heaps"
+  },
+  {
+    "front": "'Repeatedly take the biggest and modify it' — technique?",
+    "back": "Greedy with a heap: poll the extreme, transform, offer it back (last-stone, reorganize, scheduler).",
+    "source": "seed:heap_greedy"
+  },
+  {
+    "front": "Merge k sorted lists efficiently?",
+    "back": "Min-heap of the k current fronts; pop the min, push its successor. O(N log k).",
+    "source": "seed:heap_greedy"
+  },
+  {
+    "front": "Interval problem — sort by start or by end?",
+    "back": "By START to merge/scan overlaps; by END for greedy 'keep the most non-overlapping'.",
+    "source": "seed:intervals"
+  },
+  {
+    "front": "Two intervals [a1,b1],[a2,b2] overlap when?",
+    "back": "a1 <= b2 AND a2 <= b1 (use < / > if touching endpoints don't count).",
+    "source": "seed:intervals"
+  },
+  {
+    "front": "Minimum meeting rooms / max concurrent intervals?",
+    "back": "Sweep line: sort starts and ends; +1 on a start, -1 on an end; answer is the peak count.",
+    "source": "seed:intervals"
+  },
+  {
+    "front": "Fewest arrows / max non-overlapping intervals?",
+    "back": "Greedy: sort by end, take an interval whenever it starts after the last kept end.",
+    "source": "seed:intervals"
+  },
+  {
+    "front": "Design a cache that evicts least-recently-used?",
+    "back": "HashMap<key,node> for O(1) find + doubly-linked list for O(1) move-to-front; evict the tail.",
+    "source": "seed:design_ds"
+  },
+  {
+    "front": "Min Stack — O(1) getMin?",
+    "back": "Push pairs (value, min-so-far); getMin reads the top's stored min.",
+    "source": "seed:design_ds"
+  },
+  {
+    "front": "Queue from two stacks?",
+    "back": "Push to 'in'; when 'out' is empty pour 'in' into it (reversing). Amortized O(1).",
+    "source": "seed:design_ds"
+  },
+  {
+    "front": "'Design X' — how to approach?",
+    "back": "Map each required op to a structure that makes it cheap (hashmap=lookup, DLL=reorder, heap=top-k, monotonic stack=span).",
+    "source": "seed:design_ds"
+  },
+  {
+    "front": "Prompt: 'connected components / provinces / valid tree / redundant edge' — technique?",
+    "back": "Union-Find (DSU): union endpoints; a union that finds them already joined is a cycle.",
+    "source": "seed:union_find"
+  },
+  {
+    "front": "Union-Find near-O(1) — which two optimizations?",
+    "back": "Path compression in find + union by size/rank.",
+    "source": "seed:union_find"
+  },
+  {
+    "front": "Detect a cycle in an UNDIRECTED graph?",
+    "back": "Union-Find: if an edge's endpoints already share a root, it closes a cycle.",
+    "source": "seed:union_find"
+  },
+  {
+    "front": "Min edges to connect n nodes given components?",
+    "back": "components - 1 (if you have at least n-1 edges total).",
+    "source": "seed:union_find"
+  },
+  {
+    "front": "Shortest path with non-negative weights?",
+    "back": "Dijkstra: min-heap of (dist,node); pop the closest, relax edges; skip stale pops.",
+    "source": "seed:dijkstra"
+  },
+  {
+    "front": "Shortest path with 'at most k stops' or negative edges?",
+    "back": "Bellman-Ford: relax all edges k+1 times using a snapshot of the previous round.",
+    "source": "seed:bellman_ford"
+  },
+  {
+    "front": "Connect all nodes at minimum total cost?",
+    "back": "Minimum Spanning Tree — Kruskal (sort + union-find) or Prim (grow a tree with a heap).",
+    "source": "seed:mst"
+  },
+  {
+    "front": "Detect a cycle in a DIRECTED graph / order tasks?",
+    "back": "DFS 3-coloring (gray = on stack → cycle) or Kahn's topological sort (leftover nodes = cycle).",
+    "source": "seed:graph_cycle"
+  },
+  {
+    "front": "Prompt mentions 'prefix / autocomplete / dictionary of words' — structure?",
+    "back": "Trie (prefix tree): edges are characters; O(word length) insert/search independent of dictionary size.",
+    "source": "seed:trie"
+  },
+  {
+    "front": "Trie search vs startsWith — difference?",
+    "back": "search needs the path AND end==true; startsWith only needs the path to exist.",
+    "source": "seed:trie"
+  },
+  {
+    "front": "Wildcard '.' word search?",
+    "back": "Trie DFS: exact child for a letter, recurse into ALL children for '.'.",
+    "source": "seed:trie"
+  },
+  {
+    "front": "Maximum XOR of two numbers in a set?",
+    "back": "Binary trie of bits (high→low); for each number greedily walk toward the opposite bit.",
+    "source": "seed:trie"
+  }
+]

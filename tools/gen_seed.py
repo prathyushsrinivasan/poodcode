@@ -925,6 +925,12 @@ DEFS = [
 # ---------------------------------------------------------------------------
 
 CONCEPTS = {
+    "array_patterns": {
+        "name": "Array Problem Patterns",
+        "what": "A decision guide that maps the wording of an array question to the technique that solves it.",
+        "deep": "Almost every array problem is one of a handful of shapes. The real skill is reading the prompt, spotting the signal words ('contiguous', 'sorted', 'longest', 'size k', 'in place'), and jumping straight to the matching skeleton instead of re-deriving an approach each time.",
+        "java": "No single API — this is a routing table. Learn the signal → pattern → skeleton mapping, then reach for iteration, two pointers, sliding window, prefix sums, or in-place reversal.",
+    },
     "iteration": {
         "name": "Array Iteration",
         "what": "Walking through elements one at a time while maintaining running state such as a sum, max, or counter.",
@@ -2001,6 +2007,7 @@ CATEGORY = {
     "io_basics": "Foundations", "variables": "Foundations", "arithmetic": "Foundations",
     "conditionals": "Foundations", "loops_basic": "Foundations", "boolean_logic": "Foundations",
     "string_basics": "Strings", "char_arrays": "Strings", "canonical": "Strings",
+    "array_patterns": "Arrays",
     "iteration": "Arrays", "inplace_reverse": "Arrays", "prefix_max": "Arrays",
     "two_pointers": "Arrays", "sliding_window": "Arrays",
     "hashing": "Data Structures", "stack": "Data Structures", "queue": "Data Structures",
@@ -2151,8 +2158,79 @@ for (char ch : "aab".toCharArray()) freq[ch - 'a']++;
 - `ch - 'a'` maps 'a'..'z' to 0..25 — a fast index into a size-26 array.
 - Rebuild a String with `new String(charArray)`.
 """,
-    "iteration": """### Worked example
-Find the maximum of `[3, 9, 2, 7]` in one pass: start from the first element and update when you see something bigger.
+    "array_patterns": """### The core idea
+Nearly every array question is one of a **small number of shapes**. If you can name the shape from the wording, you already know the code skeleton. Read the prompt, find the signal word, jump to the pattern.
+
+### Signal → pattern cheat sheet
+| The question says… | Reach for | Key move |
+| --- | --- | --- |
+| "sum / max / min / count of the array", "in one pass" | **Single-pass iteration** | Carry a running accumulator |
+| "**contiguous** subarray with the largest sum" | **Kadane** | Extend-or-restart at each index |
+| "sum of `a[l..r]`", many **range-sum queries** | **Prefix sums** | Precompute once, answer in O(1) |
+| "**sorted** array" + "pair that sums to T / closest / container" | **Two pointers** (ends inward) | Move the end that helps |
+| "remove / move / dedupe **in place**" | **Two pointers** (slow write, fast read) | Slow pointer writes kept elements |
+| "**longest / shortest** subarray or substring with <property>" | **Sliding window** (variable) | Grow right, shrink left on break |
+| "window / subarray of **size k**" | **Sliding window** (fixed) | Add entering, drop leaving |
+| "reverse", "**rotate by k**", "O(1) extra space" | **In-place reversal** | Swap ends; rotate = 3 reversals |
+| "count occurrences", values are small integers | **Counting array** `int[]` | Index by value |
+| "element appears **more than n/2** times" | **Boyer–Moore majority** | Cancel non-matches |
+| "**sorted**" + "find / first index of / does X exist" | **Binary search** | Halve the search space |
+
+### The five skeletons you will reuse most
+```java
+// 1. Single pass — one summary of the whole array
+long acc = 0;                       // or best = a[0], count = 0
+for (int x : a) acc += x;           // combine each element
+
+// 2. Two pointers, converging (needs a SORTED array)
+int lo = 0, hi = n - 1;
+while (lo < hi) {
+    int s = a[lo] + a[hi];
+    if (s == target) { /* found */ break; }
+    else if (s < target) lo++;      // need a bigger value
+    else hi--;                      // need a smaller value
+}
+
+// 3. Two pointers, slow write / fast read (in-place filter)
+int w = 0;
+for (int r = 0; r < n; r++)
+    if (keep(a[r])) a[w++] = a[r];  // a[0..w-1] is the result, w its length
+
+// 4. Sliding window (variable size)
+int left = 0; long cur = 0, best = 0;
+for (int r = 0; r < n; r++) {
+    cur += a[r];                        // extend right
+    while (invariantBroken(cur)) cur -= a[left++]; // shrink left
+    best = Math.max(best, r - left + 1);
+}
+
+// 5. Prefix sums (answer any range in O(1))
+long[] pre = new long[n + 1];
+for (int i = 0; i < n; i++) pre[i + 1] = pre[i] + a[i];
+long sumLR = pre[r + 1] - pre[l];       // sum of a[l..r], inclusive
+```
+
+### How to use this page
+1. Underline the signal words in the prompt: *contiguous, sorted, longest, size k, in place, range sum*.
+2. Match a row in the table above.
+3. Paste the skeleton, then fill in the one problem-specific line (the test, the update, the accumulator).
+
+The drills below make you write that one decisive line for each pattern.
+""",
+    "iteration": """### When to reach for this
+The question wants a **single summary of the whole array** — a sum, max, min, count, or the index of one of those — and the order does not matter. Carry a running variable and update it as you sweep once, left to right.
+
+### Simulated solve — max of `[3, 9, 2, 7]`
+Start `best` at the first element, then update only when you see something bigger.
+
+| i | a[i] | best before | bigger? | best after |
+| - | ---- | ----------- | ------- | ---------- |
+| 0 | 3 | — | init | 3 |
+| 1 | 9 | 3 | 9 > 3 ✓ | 9 |
+| 2 | 2 | 9 | 2 > 9 ✗ | 9 |
+| 3 | 7 | 9 | 7 > 9 ✗ | 9 |
+
+Answer: **9**. One sweep — O(n) time, O(1) extra space.
 
 ### In code (Java)
 ```java
@@ -2201,44 +2279,69 @@ for (int x : a) {
 - Check for the complement **before** inserting the current value.
 - Each lookup is O(1), so the whole scan is O(n).
 """,
-    "two_pointers": """### Worked example
-Is `"racecar"` a palindrome? Compare characters from both ends moving inward; they all match.
+    "two_pointers": """### When to reach for this
+Two signals point here. **(1)** The array is **sorted** and you need a pair/triple (sum to T, closest, most water) → converge from both ends. **(2)** You must **remove / move / dedupe in place** → a slow *write* pointer trails a fast *read* pointer.
+
+### Simulated solve — does a pair in sorted `[1, 2, 4, 7, 11]` sum to 9?
+Look at the two ends. Too big? lower the high end. Too small? raise the low end.
+
+| lo | hi | a[lo]+a[hi] | vs 9 | move |
+| -- | -- | ----------- | ---- | ---- |
+| 0 | 4 | 1 + 11 = 12 | too big | hi-- |
+| 0 | 3 | 1 + 7 = 8 | too small | lo++ |
+| 1 | 3 | 2 + 7 = 9 | equal ✓ | **found** |
+
+Answer: **yes** (2 + 7). Each pointer only moves inward, so it is O(n).
 
 ### In code (Java)
 ```java
-String s = "racecar";
-int i = 0, j = s.length() - 1;
-boolean ok = true;
-while (i < j) {
-    if (s.charAt(i++) != s.charAt(j--)) { ok = false; break; }
+int lo = 0, hi = n - 1;                 // converging variant (sorted input)
+while (lo < hi) {
+    int s = a[lo] + a[hi];
+    if (s == target) return true;
+    else if (s < target) lo++;          // need bigger → raise the low end
+    else hi--;                          // need smaller → lower the high end
 }
-System.out.println(ok); // true
+
+int w = 0;                              // slow/fast variant (in-place filter)
+for (int r = 0; r < n; r++)
+    if (a[r] != 0) a[w++] = a[r];       // keep non-zeros, in order
 ```
 
 ### Watch out for
-- The loop ends when `i >= j`; a middle character (odd length) needs no check.
-- On a sorted array, move the pointer that steps you toward the target.
+- The converging variant needs a **sorted** array — sort first if it isn't.
+- The slow/fast variant preserves order: only kept elements advance `w`.
+- The loop ends when `lo >= hi`; a lone middle element needs no test.
 """,
-    "sliding_window": """### Worked example
-Longest run of distinct characters in `"abcabc"` is 3. Grow the window right; when a repeat enters, push `left` past the previous copy.
+    "sliding_window": """### When to reach for this
+Signals: **"longest / shortest"** subarray or substring meeting a condition, or a window of **fixed size k**. Extend the right edge; when the invariant breaks (or the window overflows size k), advance the left edge. Each index enters and leaves once → O(n).
 
-### In code (Java)
+### Simulated solve — max sum of a size-2 window in `[1, 3, -1, 5, 2]`
+Slide by **adding the element that enters** and **subtracting the one that leaves**.
+
+| r | enters | leaves | window sum | best |
+| - | ------ | ------ | ---------- | ---- |
+| 1 | 1+3 (init) | — | 4 | 4 |
+| 2 | -1 | 1 | 2 | 4 |
+| 3 | 5 | 3 | 4 | 4 |
+| 4 | 2 | -1 | 7 | **7** |
+
+Answer: **7** — the window `[5, 2]`.
+
+### In code (Java) — variable window (longest with sum ≤ limit)
 ```java
-String s = "abcabc";
-Map<Character,Integer> last = new HashMap<>();
-int left = 0, best = 0;
-for (int r = 0; r < s.length(); r++) {
-    char ch = s.charAt(r);
-    if (last.containsKey(ch) && last.get(ch) >= left) left = last.get(ch) + 1;
-    last.put(ch, r);
+int left = 0; long cur = 0; int best = 0;
+for (int r = 0; r < n; r++) {
+    cur += a[r];                             // extend right
+    while (cur > limit) cur -= a[left++];    // shrink until valid again
     best = Math.max(best, r - left + 1);
 }
-System.out.println(best); // 3
 ```
 
 ### Watch out for
-- Each index enters and leaves the window once, so it is O(n) despite the nested feel.
-- Only ever move `left` forward, never backward.
+- The inner `while` looks quadratic but is not: `left` only ever moves forward → O(n) total.
+- Variable-size windows assume **non-negative** values, so shrinking always helps.
+- Fixed size k? Skip the `while`; just do `cur += a[r] - a[r - k]` once `r >= k`.
 """,
     "stack": """### Worked example
 Are the brackets in `"([])"` balanced? Push openers; each closer must match the top of the stack.
@@ -2466,22 +2569,33 @@ for (int c : coins) { used += amount / c; amount %= c; }
 - Greedy is only correct for some problems (this coin set works; arbitrary sets need DP).
 - Sorting the input first is a common setup step.
 """,
-    "prefix_max": """### Worked example
-For heights `[2, 0, 2]`, water over the middle bar is `min(leftMax, rightMax) - height = min(2, 2) - 0 = 2`.
+    "prefix_max": """### When to reach for this
+Signals: **"sum of `a[l..r]`"** with many queries, or **"best value so far"** — max profit, running maximum, cheapest-so-far. Precompute an aggregate from the left so each later answer is O(1).
 
-### In code (Java)
+### Simulated solve — best profit on prices `[7, 1, 5, 3, 6]`
+"Buy low, sell later" = for each day, how much could you make selling today given the cheapest price seen so far? Track `minSoFar` and the best gap.
+
+| i | price | minSoFar | price − minSoFar | best |
+| - | ----- | -------- | ---------------- | ---- |
+| 0 | 7 | 7 | — | 0 |
+| 1 | 1 | 1 | 0 | 0 |
+| 2 | 5 | 1 | 4 | 4 |
+| 3 | 3 | 1 | 2 | 4 |
+| 4 | 6 | 1 | 5 | **5** |
+
+Answer: **5** (buy at 1, sell at 6). One pass, no nested loop.
+
+### Prefix sums in code (Java)
 ```java
-int[] h = {2, 0, 2};
-int[] left = new int[h.length], right = new int[h.length];
-left[0] = h[0];
-for (int i = 1; i < h.length; i++) left[i] = Math.max(left[i-1], h[i]);
-right[h.length-1] = h[h.length-1];
-for (int i = h.length-2; i >= 0; i--) right[i] = Math.max(right[i+1], h[i]);
+long[] pre = new long[n + 1];               // pre[0] = 0
+for (int i = 0; i < n; i++) pre[i + 1] = pre[i] + a[i];
+long sumLR = pre[r + 1] - pre[l];           // sum of a[l..r], inclusive
 ```
 
 ### Watch out for
-- Prefix arrays turn repeated range questions into O(1) lookups.
-- A two-pointer variant computes the same maxima using O(1) extra space.
+- Use a size **n + 1** prefix array so `pre[0] = 0` and the query needs no special case.
+- Sums grow fast — accumulate in `long` to dodge overflow.
+- "Best so far" problems keep just one or two running variables, not a whole array.
 """,
     "canonical": """### Worked example
 `"eat"` and `"tea"` are anagrams because both share the canonical key `"aet"` (sorted letters).
@@ -2537,19 +2651,37 @@ int idx = Math.floorMod(-1, n);   // 4, safe for negatives
 - Java's `%` can be negative; `Math.floorMod` keeps the result in [0, n).
 - Reduce `k % n` before using it to index, and guard `n > 0`.
 """,
-    "inplace_reverse": """### Worked example
-Reverse `[1, 2, 3, 4]` by swapping ends inward: (1,4) then (2,3) gives `[4, 3, 2, 1]`.
+    "inplace_reverse": """### When to reach for this
+Signals: **"reverse"**, **"rotate by k"**, or "**O(1) extra space**". Swap symmetric positions inward. The neat trick: a right-rotation is just three reversals.
+
+### Simulated solve — rotate `[1, 2, 3, 4, 5]` right by k = 2
+Reverse the whole thing, then reverse the first `k`, then reverse the rest.
+
+| step | operation | array |
+| ---- | --------- | ----- |
+| start | — | 1 2 3 4 5 |
+| 1 | reverse all | 5 4 3 2 1 |
+| 2 | reverse first k = 2 | 4 5 3 2 1 |
+| 3 | reverse last n − k = 3 | **4 5 1 2 3** |
+
+Answer: **4 5 1 2 3** — the last 2 elements wrapped to the front, no second array.
 
 ### In code (Java)
 ```java
-static void reverse(int[] a, int i, int j) {
-    while (i < j) { int t = a[i]; a[i++] = a[j]; a[j--] = t; }
+static void rev(int[] a, int i, int j) {
+    while (i < j) { int t = a[i]; a[i] = a[j]; a[j] = t; i++; j--; }
 }
+// rotate right by k:
+k %= n;                                  // rotating by n is a no-op
+rev(a, 0, n - 1);
+rev(a, 0, k - 1);
+rev(a, k, n - 1);
 ```
 
 ### Watch out for
-- Rotate right by k = reverse all, reverse the first k, reverse the rest.
-- Uses O(1) extra space — no second array required.
+- Reduce `k %= n` first, or `k` past the length breaks the partial reversals.
+- Each swap is `a[i] ↔ a[j]`; the loop stops when `i >= j`.
+- O(1) extra space — that is the whole point over "copy into a new array".
 """,
     "big_o": """### Worked example
 With n up to 100,000, an O(n^2) approach is ~10^10 operations (too slow), but O(n log n) is ~1.7 million — easily fast enough.
@@ -2610,6 +2742,734 @@ int first = q.poll(); // 1
 }
 
 
+# ---------------------------------------------------------------------------
+# Concept exercises — tiny "half-coded" fill-in-the-blank drills.
+#
+# Each concept in the Learn tab teaches syntax, then offers >=3 exercises where
+# almost the whole Java program is written and the learner types only the one
+# piece the lesson is about. The blank the learner fills is shown as ____.
+#
+# Authoring model (`ex`): give the COMPLETE, correct program (`full`, the
+# reveal-able solution) plus the exact substring(s) to blank out (`blanks`).
+# The starter shown to the learner is `full` with each blank replaced by ____.
+# `tests` are (stdin, expected_stdout) pairs; expected outputs are proven
+# correct by tests/verify_exercises.rs, which runs `full` through the REAL judge
+# (same trust model as reference_solutions.json).
+# ---------------------------------------------------------------------------
+
+def prog(body):
+    """Wrap an indented main() body in the standard Scanner scaffold."""
+    return (
+        "import java.util.*;\n\n"
+        "public class Main {\n"
+        "    public static void main(String[] args) {\n"
+        "        Scanner sc = new Scanner(System.in);\n"
+        f"{body}\n"
+        "    }\n"
+        "}\n"
+    )
+
+
+def ex(eid, title, prompt, full, blanks, tests, hint="", source_slug=None):
+    starter = full
+    for b in blanks:
+        assert b in full, f"exercise {eid}: blank not found in solution: {b!r}"
+        starter = starter.replace(b, "____", 1)
+    assert starter != full, f"exercise {eid}: no blank was applied"
+    assert tests, f"exercise {eid}: needs at least one test"
+    return {
+        "id": eid,
+        "title": title,
+        "prompt": prompt,
+        "hint": hint,
+        "language": "java",
+        "starter": starter,
+        "solution": full,
+        "tests": [{"input": i, "output": o} for (i, o) in tests],
+        "source_slug": source_slug or "",
+    }
+
+
+EXERCISES = {
+    # -- Foundations ------------------------------------------------------
+    "io_basics": [
+        ex(
+            "io_basics-sum", "Print the sum",
+            "The two numbers are already read into `a` and `b`. Replace `____` so the program prints their sum.",
+            prog(
+                "        int a = sc.nextInt();\n"
+                "        int b = sc.nextInt();\n"
+                "        System.out.println(a + b);"),
+            ["System.out.println(a + b);"],
+            [("3 4", "7"), ("10 -2", "8"), ("0 0", "0")],
+            hint="System.out.println(...) prints one line — put a + b inside the parentheses.",
+        ),
+        ex(
+            "io_basics-echo-line", "Read a whole line",
+            "The program should echo one full line of text. Replace `____` with the statement that reads the line into `line`.",
+            prog(
+                "        String line = sc.nextLine();\n"
+                "        System.out.println(line);"),
+            ["String line = sc.nextLine();"],
+            [("hello world", "hello world"), ("Poodcode rocks", "Poodcode rocks"),
+             ("42 is just text here", "42 is just text here")],
+            hint="nextLine() reads a whole line (spaces and all); nextInt() would only grab one number.",
+        ),
+        ex(
+            "io_basics-greet", "Build the greeting",
+            "The name is in `name`. Replace `____` to print exactly `Hi, <name>!` — for input `Ada` print `Hi, Ada!`.",
+            prog(
+                "        String name = sc.nextLine();\n"
+                "        System.out.println(\"Hi, \" + name + \"!\");"),
+            ["System.out.println(\"Hi, \" + name + \"!\");"],
+            [("Ada", "Hi, Ada!"), ("Bob", "Hi, Bob!"), ("Grace Hopper", "Hi, Grace Hopper!")],
+            hint="Glue text together with + : \"Hi, \" + name + \"!\".",
+        ),
+    ],
+    "variables": [
+        ex(
+            "variables-long", "Hold a big number",
+            "The input is larger than an `int` can hold (over 2.1 billion). Replace `____` to read it into a `long` named `big`.",
+            prog(
+                "        long big = sc.nextLong();\n"
+                "        System.out.println(big);"),
+            ["long big = sc.nextLong();"],
+            [("5000000000", "5000000000"), ("9999999999", "9999999999"), ("42", "42")],
+            hint="Declare the variable as long and read it with sc.nextLong().",
+        ),
+        ex(
+            "variables-avg", "Average as a decimal",
+            "Replace `____` so `avg` is the true average of `a` and `b` — a decimal, not rounded down.",
+            prog(
+                "        int a = sc.nextInt();\n"
+                "        int b = sc.nextInt();\n"
+                "        double avg = (a + b) / 2.0;\n"
+                "        System.out.println(avg);"),
+            ["double avg = (a + b) / 2.0;"],
+            [("3 4", "3.5"), ("10 10", "10.0"), ("1 2", "1.5")],
+            hint="Divide by 2.0 (a double) so the fraction survives, and store it in a double.",
+        ),
+        ex(
+            "variables-boolean", "Store a yes/no",
+            "Replace `____` so `isZero` is `true` when `n` equals 0 and `false` otherwise.",
+            prog(
+                "        int n = sc.nextInt();\n"
+                "        boolean isZero = (n == 0);\n"
+                "        System.out.println(isZero);"),
+            ["boolean isZero = (n == 0);"],
+            [("0", "true"), ("5", "false"), ("-3", "false")],
+            hint="Compare numbers with ==, and keep the true/false result in a boolean.",
+        ),
+    ],
+    "arithmetic": [
+        ex(
+            "arithmetic-divmod", "Quotient and remainder",
+            "Replace `____` to print the integer quotient and remainder of `a / b`, separated by a space (e.g. `17 5` -> `3 2`).",
+            prog(
+                "        int a = sc.nextInt();\n"
+                "        int b = sc.nextInt();\n"
+                "        System.out.println(a / b + \" \" + a % b);"),
+            ["a / b + \" \" + a % b"],
+            [("17 5", "3 2"), ("20 4", "5 0"), ("7 3", "2 1")],
+            hint="/ is integer division; % is the remainder.",
+        ),
+        ex(
+            "arithmetic-lastdigit", "Last digit",
+            "Replace `____` to print the last digit of `n` (e.g. 1234 -> 4).",
+            prog(
+                "        int n = sc.nextInt();\n"
+                "        System.out.println(n % 10);"),
+            ["n % 10"],
+            [("1234", "4"), ("7", "7"), ("40", "0")],
+            hint="The last decimal digit is the remainder after dividing by 10.",
+        ),
+        ex(
+            "arithmetic-double-div", "Keep the fraction",
+            "`a / b` on two ints throws the fraction away. Replace `____` to print the exact decimal result (e.g. 7 2 -> 3.5).",
+            prog(
+                "        int a = sc.nextInt();\n"
+                "        int b = sc.nextInt();\n"
+                "        System.out.println((double) a / b);"),
+            ["(double) a / b"],
+            [("7 2", "3.5"), ("9 4", "2.25"), ("5 2", "2.5")],
+            hint="Cast one side to double first: (double) a / b.",
+        ),
+    ],
+    "conditionals": [
+        ex(
+            "conditionals-evenodd", "Even or odd",
+            "Replace `____` with the condition that is true when `n` is even, so the program prints `Even` or `Odd`.",
+            prog(
+                "        int n = sc.nextInt();\n"
+                "        if (n % 2 == 0) {\n"
+                "            System.out.println(\"Even\");\n"
+                "        } else {\n"
+                "            System.out.println(\"Odd\");\n"
+                "        }"),
+            ["n % 2 == 0"],
+            [("4", "Even"), ("7", "Odd"), ("0", "Even")],
+            hint="A number is even when its remainder mod 2 is 0.",
+        ),
+        ex(
+            "conditionals-sign", "Positive, negative, zero",
+            "The `Positive` and `Zero` branches are written. Replace `____` with the middle branch that catches negative numbers.",
+            prog(
+                "        int n = sc.nextInt();\n"
+                "        if (n > 0) {\n"
+                "            System.out.println(\"Positive\");\n"
+                "        } else if (n < 0) {\n"
+                "            System.out.println(\"Negative\");\n"
+                "        } else {\n"
+                "            System.out.println(\"Zero\");\n"
+                "        }"),
+            ["else if (n < 0)"],
+            [("5", "Positive"), ("-2", "Negative"), ("0", "Zero")],
+            hint="Chain another test with `else if (...)` between the first if and the final else.",
+        ),
+        ex(
+            "conditionals-max2", "The larger of two",
+            "Replace `____` so the program prints the larger of `a` and `b` (print either when they are equal).",
+            prog(
+                "        int a = sc.nextInt();\n"
+                "        int b = sc.nextInt();\n"
+                "        if (a > b) {\n"
+                "            System.out.println(a);\n"
+                "        } else {\n"
+                "            System.out.println(b);\n"
+                "        }"),
+            ["if (a > b)"],
+            [("3 8", "8"), ("10 4", "10"), ("5 5", "5")],
+            hint="Test whether a is greater than b.",
+        ),
+    ],
+    "loops_basic": [
+        ex(
+            "loops_basic-sum", "Sum 1..n",
+            "The loop runs `i` from 1 to n. Replace `____` in the loop body so `sum` ends up as 1+2+...+n.",
+            prog(
+                "        int n = sc.nextInt();\n"
+                "        long sum = 0;\n"
+                "        for (int i = 1; i <= n; i++) {\n"
+                "            sum += i;\n"
+                "        }\n"
+                "        System.out.println(sum);"),
+            ["sum += i;"],
+            [("5", "15"), ("1", "1"), ("100", "5050")],
+            hint="Add the current i to sum each pass: sum += i;",
+        ),
+        ex(
+            "loops_basic-factorial", "Factorial",
+            "Replace `____` so `f` becomes n! = 1*2*...*n (5! is 120).",
+            prog(
+                "        int n = sc.nextInt();\n"
+                "        long f = 1;\n"
+                "        for (int i = 2; i <= n; i++) {\n"
+                "            f *= i;\n"
+                "        }\n"
+                "        System.out.println(f);"),
+            ["f *= i;"],
+            [("5", "120"), ("1", "1"), ("10", "3628800")],
+            hint="Multiply f by each i: f *= i;",
+        ),
+        ex(
+            "loops_basic-countdown", "Count down",
+            "Replace `____` in the for-header so the loop counts down from n to 1, printing `n ... 2 1` (e.g. 3 -> `3 2 1`).",
+            prog(
+                "        int n = sc.nextInt();\n"
+                "        StringBuilder sb = new StringBuilder();\n"
+                "        for (int i = n; i >= 1; i--) {\n"
+                "            sb.append(i);\n"
+                "            if (i > 1) sb.append(\" \");\n"
+                "        }\n"
+                "        System.out.println(sb.toString());"),
+            ["int i = n; i >= 1; i--"],
+            [("3", "3 2 1"), ("1", "1"), ("5", "5 4 3 2 1")],
+            hint="Start i at n, keep going while i >= 1, and step with i--.",
+        ),
+    ],
+    "boolean_logic": [
+        ex(
+            "boolean_logic-inrange", "Inside a range",
+            "Replace `____` so `inRange` is true exactly when x is between 1 and 10, inclusive.",
+            prog(
+                "        int x = sc.nextInt();\n"
+                "        boolean inRange = (x >= 1) && (x <= 10);\n"
+                "        System.out.println(inRange);"),
+            ["(x >= 1) && (x <= 10)"],
+            [("5", "true"), ("10", "true"), ("11", "false"), ("0", "false")],
+            hint="Both parts must hold at once — combine them with &&.",
+        ),
+        ex(
+            "boolean_logic-div3or5", "Divisible by 3 or 5",
+            "Replace `____` so `hit` is true when x is divisible by 3 or by 5 (or both).",
+            prog(
+                "        int x = sc.nextInt();\n"
+                "        boolean hit = (x % 3 == 0) || (x % 5 == 0);\n"
+                "        System.out.println(hit);"),
+            ["(x % 3 == 0) || (x % 5 == 0)"],
+            [("9", "true"), ("10", "true"), ("7", "false"), ("15", "true")],
+            hint="Either condition is enough — combine them with ||.",
+        ),
+        ex(
+            "boolean_logic-not-even", "Flip a boolean",
+            "`even` is already computed. Replace `____` so `odd` is its logical opposite using `!`.",
+            prog(
+                "        int x = sc.nextInt();\n"
+                "        boolean even = (x % 2 == 0);\n"
+                "        boolean odd = !even;\n"
+                "        System.out.println(odd);"),
+            ["!even"],
+            [("7", "true"), ("4", "false"), ("0", "false")],
+            hint="! flips a boolean: !even is true when even is false.",
+        ),
+    ],
+    "overflow": [
+        ex(
+            "overflow-sum-long", "Sum without overflow",
+            "`a + b` can exceed the `int` range and wrap to a wrong value. Replace `____` so `sum` is computed in `long`.",
+            prog(
+                "        int a = sc.nextInt();\n"
+                "        int b = sc.nextInt();\n"
+                "        long sum = (long) a + b;\n"
+                "        System.out.println(sum);"),
+            ["(long) a + b"],
+            [("2000000000 2000000000", "4000000000"), ("1 2", "3"),
+             ("2147483647 1", "2147483648")],
+            hint="Promote the maths to long before it overflows: (long) a + b.",
+        ),
+        ex(
+            "overflow-product", "Product without overflow",
+            "Two ints can multiply past the `int` limit. Replace `____` so `product` is the correct `long`.",
+            prog(
+                "        int a = sc.nextInt();\n"
+                "        int b = sc.nextInt();\n"
+                "        long product = (long) a * b;\n"
+                "        System.out.println(product);"),
+            ["(long) a * b"],
+            [("100000 100000", "10000000000"), ("46341 46341", "2147488281"), ("3 4", "12")],
+            hint="Cast one factor first so the multiply happens in long: (long) a * b.",
+        ),
+        ex(
+            "overflow-factorial", "Factorial that fits",
+            "13! already overflows `int`. Replace `____` so the running factorial `f` is a `long` (correct up to 20!).",
+            prog(
+                "        int n = sc.nextInt();\n"
+                "        long f = 1;\n"
+                "        for (int i = 2; i <= n; i++) {\n"
+                "            f *= i;\n"
+                "        }\n"
+                "        System.out.println(f);"),
+            ["long f = 1;"],
+            [("13", "6227020800"), ("20", "2432902008176640000"), ("5", "120")],
+            hint="Declare f as long (starting at 1) so it can hold the huge product.",
+        ),
+    ],
+    # -- Arrays -----------------------------------------------------------
+    "array_patterns": [
+        ex(
+            "patterns-kadane", "Contiguous max sum (Kadane)",
+            "Signal: *\"contiguous subarray with the largest sum\"* → **Kadane**. At each index, the best subarray ending here either extends the previous one or restarts at the current element. Replace `____` with that choice.",
+            prog(
+                "        int n = sc.nextInt();\n"
+                "        int[] a = new int[n];\n"
+                "        for (int i = 0; i < n; i++) a[i] = sc.nextInt();\n"
+                "        long cur = a[0], best = a[0];\n"
+                "        for (int i = 1; i < n; i++) {\n"
+                "            cur = Math.max(a[i], cur + a[i]);\n"
+                "            best = Math.max(best, cur);\n"
+                "        }\n"
+                "        System.out.println(best);"),
+            ["cur = Math.max(a[i], cur + a[i]);"],
+            [("9\n-2 1 -3 4 -1 2 1 -5 4", "6"), ("3\n-5 -2 -8", "-2"), ("4\n1 2 3 4", "10")],
+            hint="Extend or restart: cur = max(a[i], cur + a[i]). Then track best separately.",
+            source_slug="maximum-subarray",
+        ),
+        ex(
+            "patterns-counting", "Most frequent value (counting array)",
+            "Signal: *\"count occurrences\"* with small integer values (0–100) → a **counting array**. Replace `____` to tally each value into `cnt` indexed by the value itself.",
+            prog(
+                "        int n = sc.nextInt();\n"
+                "        int[] a = new int[n];\n"
+                "        for (int i = 0; i < n; i++) a[i] = sc.nextInt();\n"
+                "        int[] cnt = new int[101];\n"
+                "        for (int x : a) cnt[x]++;\n"
+                "        int best = 0, mode = 0;\n"
+                "        for (int v = 0; v <= 100; v++) {\n"
+                "            if (cnt[v] > best) { best = cnt[v]; mode = v; }\n"
+                "        }\n"
+                "        System.out.println(mode);"),
+            ["for (int x : a) cnt[x]++;"],
+            [("5\n1 2 2 3 2", "2"), ("3\n5 5 1", "5"), ("1\n42", "42")],
+            hint="Use the value as the index: cnt[x]++ for each x.",
+        ),
+        ex(
+            "patterns-majority", "Majority element (Boyer–Moore)",
+            "Signal: *\"element that appears more than n/2 times\"* → **Boyer–Moore voting**. Keep a candidate and a counter; matches add 1, mismatches subtract 1, and a zero counter adopts the next value. Replace `____` with the vote step.",
+            prog(
+                "        int n = sc.nextInt();\n"
+                "        int[] a = new int[n];\n"
+                "        for (int i = 0; i < n; i++) a[i] = sc.nextInt();\n"
+                "        int cand = a[0], count = 0;\n"
+                "        for (int x : a) {\n"
+                "            if (count == 0) cand = x;\n"
+                "            count += (x == cand) ? 1 : -1;\n"
+                "        }\n"
+                "        System.out.println(cand);"),
+            ["count += (x == cand) ? 1 : -1;"],
+            [("5\n3 3 4 2 3", "3"), ("3\n1 1 1", "1"), ("7\n5 5 5 5 1 2 3", "5")],
+            hint="Same as candidate → +1, otherwise −1: count += (x == cand) ? 1 : -1;",
+        ),
+    ],
+    "iteration": [
+        ex(
+            "iteration-sum", "Sum in one pass",
+            "Read `n` then `n` integers, and add each to a running total. Replace `____` so `sum` accumulates every element.",
+            prog(
+                "        int n = sc.nextInt();\n"
+                "        long sum = 0;\n"
+                "        for (int i = 0; i < n; i++) {\n"
+                "            int x = sc.nextInt();\n"
+                "            sum += x;\n"
+                "        }\n"
+                "        System.out.println(sum);"),
+            ["sum += x;"],
+            [("4\n1 2 3 4", "10"), ("1\n5", "5"), ("3\n-1 -2 -3", "-6")],
+            hint="Add the current element to the accumulator each pass: sum += x;",
+            source_slug="array-sum",
+        ),
+        ex(
+            "iteration-max", "Maximum element",
+            "`best` starts at `a[0]`. Replace `____` so a single pass leaves `best` holding the largest value.",
+            prog(
+                "        int n = sc.nextInt();\n"
+                "        int[] a = new int[n];\n"
+                "        for (int i = 0; i < n; i++) a[i] = sc.nextInt();\n"
+                "        int best = a[0];\n"
+                "        for (int i = 1; i < n; i++) {\n"
+                "            if (a[i] > best) best = a[i];\n"
+                "        }\n"
+                "        System.out.println(best);"),
+            ["if (a[i] > best) best = a[i];"],
+            [("4\n3 9 2 7", "9"), ("3\n-5 -1 -9", "-1"), ("1\n42", "42")],
+            hint="Update only when the current element beats the best so far.",
+        ),
+        ex(
+            "iteration-count-above", "Count above a threshold",
+            "Input is `n t` then `n` values. Replace `____` to count how many values are strictly greater than `t`.",
+            prog(
+                "        int n = sc.nextInt();\n"
+                "        int t = sc.nextInt();\n"
+                "        int count = 0;\n"
+                "        for (int i = 0; i < n; i++) {\n"
+                "            int x = sc.nextInt();\n"
+                "            if (x > t) count++;\n"
+                "        }\n"
+                "        System.out.println(count);"),
+            ["if (x > t) count++;"],
+            [("4 5\n3 6 1 9", "2"), ("3 0\n-1 -2 -3", "0"), ("3 0\n1 2 3", "3")],
+            hint="Increment count whenever x > t.",
+        ),
+        ex(
+            "iteration-argmax", "Index of the maximum",
+            "Track the *index* of the largest element seen. Replace `____` so `bi` ends at the position of the first maximum.",
+            prog(
+                "        int n = sc.nextInt();\n"
+                "        int[] a = new int[n];\n"
+                "        for (int i = 0; i < n; i++) a[i] = sc.nextInt();\n"
+                "        int bi = 0;\n"
+                "        for (int i = 1; i < n; i++) {\n"
+                "            if (a[i] > a[bi]) bi = i;\n"
+                "        }\n"
+                "        System.out.println(bi);"),
+            ["if (a[i] > a[bi]) bi = i;"],
+            [("4\n3 9 2 7", "1"), ("3\n5 5 1", "0"), ("5\n1 2 3 2 3", "2")],
+            hint="Compare against a[bi] and move bi only on a strict improvement (keeps the first max).",
+        ),
+    ],
+    "prefix_max": [
+        ex(
+            "prefix-running-sum", "Running (prefix) sums",
+            "Print each prefix total: after reading `[1,2,3,4]` print `1 3 6 10`. Replace `____` so `run` accumulates as you go.",
+            prog(
+                "        int n = sc.nextInt();\n"
+                "        int[] a = new int[n];\n"
+                "        for (int i = 0; i < n; i++) a[i] = sc.nextInt();\n"
+                "        long run = 0;\n"
+                "        StringBuilder sb = new StringBuilder();\n"
+                "        for (int i = 0; i < n; i++) {\n"
+                "            run += a[i];\n"
+                "            sb.append(run);\n"
+                "            if (i < n - 1) sb.append(' ');\n"
+                "        }\n"
+                "        System.out.println(sb.toString());"),
+            ["run += a[i];"],
+            [("4\n1 2 3 4", "1 3 6 10"), ("3\n5 0 5", "5 5 10"), ("1\n7", "7")],
+            hint="Each prefix total is the previous total plus the current element: run += a[i];",
+        ),
+        ex(
+            "prefix-range-sum", "Range sum with a prefix array",
+            "Build a size `n+1` prefix array, then answer the query `l r` (inclusive, 0-based) in O(1). Replace `____` so `pre` is the array of prefix sums.",
+            prog(
+                "        int n = sc.nextInt();\n"
+                "        int[] a = new int[n];\n"
+                "        for (int i = 0; i < n; i++) a[i] = sc.nextInt();\n"
+                "        long[] pre = new long[n + 1];\n"
+                "        for (int i = 0; i < n; i++) pre[i + 1] = pre[i] + a[i];\n"
+                "        int l = sc.nextInt(), r = sc.nextInt();\n"
+                "        System.out.println(pre[r + 1] - pre[l]);"),
+            ["pre[i + 1] = pre[i] + a[i];"],
+            [("5\n1 2 3 4 5\n1 3", "9"), ("3\n10 20 30\n0 2", "60"), ("4\n5 5 5 5\n2 2", "5")],
+            hint="pre[i+1] = pre[i] + a[i]; then sum of a[l..r] is pre[r+1] - pre[l].",
+        ),
+        ex(
+            "prefix-running-max", "Running maximum",
+            "Print the max of every prefix: `[3,1,4,1,5]` → `3 3 4 4 5`. Replace `____` so `best` tracks the largest value so far.",
+            prog(
+                "        int n = sc.nextInt();\n"
+                "        int[] a = new int[n];\n"
+                "        for (int i = 0; i < n; i++) a[i] = sc.nextInt();\n"
+                "        int best = a[0];\n"
+                "        StringBuilder sb = new StringBuilder();\n"
+                "        for (int i = 0; i < n; i++) {\n"
+                "            best = Math.max(best, a[i]);\n"
+                "            sb.append(best);\n"
+                "            if (i < n - 1) sb.append(' ');\n"
+                "        }\n"
+                "        System.out.println(sb.toString());"),
+            ["best = Math.max(best, a[i]);"],
+            [("5\n3 1 4 1 5", "3 3 4 4 5"), ("3\n5 4 3", "5 5 5"), ("1\n9", "9")],
+            hint="best = Math.max(best, a[i]); before appending it.",
+        ),
+        ex(
+            "prefix-best-profit", "Best buy-low sell-high",
+            "Prices come in time order; find the max `price[j] - price[i]` with `i < j` (0 if never profitable). Replace `____` so `best` uses the cheapest price seen so far.",
+            prog(
+                "        int n = sc.nextInt();\n"
+                "        int[] a = new int[n];\n"
+                "        for (int i = 0; i < n; i++) a[i] = sc.nextInt();\n"
+                "        int minSoFar = a[0], best = 0;\n"
+                "        for (int i = 1; i < n; i++) {\n"
+                "            best = Math.max(best, a[i] - minSoFar);\n"
+                "            minSoFar = Math.min(minSoFar, a[i]);\n"
+                "        }\n"
+                "        System.out.println(best);"),
+            ["best = Math.max(best, a[i] - minSoFar);"],
+            [("6\n7 1 5 3 6 4", "5"), ("5\n7 6 4 3 1", "0"), ("2\n1 5", "4")],
+            hint="Selling today earns a[i] - minSoFar; keep the best of those.",
+        ),
+    ],
+    "two_pointers": [
+        ex(
+            "twoptr-pair-sum", "Pair sum in a sorted array",
+            "The array is **sorted**. Decide whether any two elements sum to `target`, converging from both ends. Replace `____` with the move when the current sum is too small.",
+            prog(
+                "        int n = sc.nextInt();\n"
+                "        int[] a = new int[n];\n"
+                "        for (int i = 0; i < n; i++) a[i] = sc.nextInt();\n"
+                "        int target = sc.nextInt();\n"
+                "        int lo = 0, hi = n - 1;\n"
+                "        boolean found = false;\n"
+                "        while (lo < hi) {\n"
+                "            int s = a[lo] + a[hi];\n"
+                "            if (s == target) { found = true; break; }\n"
+                "            else if (s < target) lo++;\n"
+                "            else hi--;\n"
+                "        }\n"
+                "        System.out.println(found ? \"yes\" : \"no\");"),
+            ["else if (s < target) lo++;"],
+            [("5\n1 2 4 7 11\n9", "yes"), ("4\n1 2 3 4\n100", "no"), ("3\n-3 0 3\n0", "yes")],
+            hint="Too small a sum? You need a bigger value, so raise the low pointer: lo++.",
+        ),
+        ex(
+            "twoptr-palindrome", "Is the array a palindrome?",
+            "Compare elements from both ends moving inward. Replace `____` with the mismatch check that fails fast.",
+            prog(
+                "        int n = sc.nextInt();\n"
+                "        int[] a = new int[n];\n"
+                "        for (int i = 0; i < n; i++) a[i] = sc.nextInt();\n"
+                "        int i = 0, j = n - 1;\n"
+                "        boolean ok = true;\n"
+                "        while (i < j) {\n"
+                "            if (a[i] != a[j]) { ok = false; break; }\n"
+                "            i++;\n"
+                "            j--;\n"
+                "        }\n"
+                "        System.out.println(ok);"),
+            ["if (a[i] != a[j]) { ok = false; break; }"],
+            [("3\n1 2 1", "true"), ("4\n1 2 2 1", "true"), ("3\n1 2 3", "false")],
+            hint="If the mirrored pair differs, it is not a palindrome: if (a[i] != a[j]) ...",
+        ),
+        ex(
+            "twoptr-move-zeros", "Move zeros to the end",
+            "Push every non-zero to the front in order, then pad with zeros — the slow/fast write pattern. Replace `____` so kept elements are written at `w`.",
+            prog(
+                "        int n = sc.nextInt();\n"
+                "        int[] a = new int[n];\n"
+                "        for (int i = 0; i < n; i++) a[i] = sc.nextInt();\n"
+                "        int w = 0;\n"
+                "        for (int r = 0; r < n; r++) {\n"
+                "            if (a[r] != 0) { a[w] = a[r]; w++; }\n"
+                "        }\n"
+                "        while (w < n) { a[w] = 0; w++; }\n"
+                "        StringBuilder sb = new StringBuilder();\n"
+                "        for (int i = 0; i < n; i++) { sb.append(a[i]); if (i < n - 1) sb.append(' '); }\n"
+                "        System.out.println(sb.toString());"),
+            ["if (a[r] != 0) { a[w] = a[r]; w++; }"],
+            [("5\n0 1 0 3 12", "1 3 12 0 0"), ("3\n0 0 0", "0 0 0"), ("3\n1 2 3", "1 2 3")],
+            hint="Write only non-zeros and advance the write index: a[w] = a[r]; w++.",
+        ),
+        ex(
+            "twoptr-dedupe-sorted", "Count uniques in a sorted array",
+            "The array is sorted, so duplicates are adjacent. Replace `____` with the test that keeps only the first copy of each value; print the unique count `w`.",
+            prog(
+                "        int n = sc.nextInt();\n"
+                "        int[] a = new int[n];\n"
+                "        for (int i = 0; i < n; i++) a[i] = sc.nextInt();\n"
+                "        int w = 0;\n"
+                "        for (int r = 0; r < n; r++) {\n"
+                "            if (r == 0 || a[r] != a[r - 1]) { a[w] = a[r]; w++; }\n"
+                "        }\n"
+                "        System.out.println(w);"),
+            ["if (r == 0 || a[r] != a[r - 1])"],
+            [("5\n1 1 2 2 3", "3"), ("4\n1 2 3 4", "4"), ("3\n5 5 5", "1")],
+            hint="Keep a[r] when it is the first element or differs from its predecessor.",
+        ),
+    ],
+    "sliding_window": [
+        ex(
+            "window-maxsum-k", "Max sum of a size-k window",
+            "Fixed window: after the first `k` elements, slide by adding the entering element and dropping the one that left. Replace `____` with that slide step.",
+            prog(
+                "        int n = sc.nextInt();\n"
+                "        int k = sc.nextInt();\n"
+                "        int[] a = new int[n];\n"
+                "        for (int i = 0; i < n; i++) a[i] = sc.nextInt();\n"
+                "        long sum = 0;\n"
+                "        for (int i = 0; i < k; i++) sum += a[i];\n"
+                "        long best = sum;\n"
+                "        for (int r = k; r < n; r++) {\n"
+                "            sum += a[r] - a[r - k];\n"
+                "            best = Math.max(best, sum);\n"
+                "        }\n"
+                "        System.out.println(best);"),
+            ["sum += a[r] - a[r - k];"],
+            [("5 2\n1 3 -1 5 2", "7"), ("3 3\n1 2 3", "6"), ("4 1\n4 1 3 2", "4")],
+            hint="Add the new element, subtract the one k positions back: sum += a[r] - a[r-k].",
+        ),
+        ex(
+            "window-longest-atmost", "Longest window with sum ≤ S",
+            "Values are non-negative. Grow the window right; when the sum exceeds `S`, shrink from the left. Replace `____` with the shrink loop.",
+            prog(
+                "        int n = sc.nextInt();\n"
+                "        long S = sc.nextLong();\n"
+                "        int[] a = new int[n];\n"
+                "        for (int i = 0; i < n; i++) a[i] = sc.nextInt();\n"
+                "        long sum = 0; int left = 0, best = 0;\n"
+                "        for (int r = 0; r < n; r++) {\n"
+                "            sum += a[r];\n"
+                "            while (sum > S) { sum -= a[left]; left++; }\n"
+                "            best = Math.max(best, r - left + 1);\n"
+                "        }\n"
+                "        System.out.println(best);"),
+            ["while (sum > S) { sum -= a[left]; left++; }"],
+            [("5 3\n2 1 1 1 1", "3"), ("3 100\n1 2 3", "3"), ("3 0\n1 2 3", "0")],
+            hint="Shrink while the invariant is broken: while (sum > S) { sum -= a[left]; left++; }",
+        ),
+        ex(
+            "window-min-atleast", "Shortest window with sum ≥ S",
+            "Non-negative values. Whenever the window sum reaches `S`, record its length and shrink. Replace `____` with the length update. Print 0 if impossible.",
+            prog(
+                "        int n = sc.nextInt();\n"
+                "        long S = sc.nextLong();\n"
+                "        int[] a = new int[n];\n"
+                "        for (int i = 0; i < n; i++) a[i] = sc.nextInt();\n"
+                "        long sum = 0; int left = 0, best = Integer.MAX_VALUE;\n"
+                "        for (int r = 0; r < n; r++) {\n"
+                "            sum += a[r];\n"
+                "            while (sum >= S) {\n"
+                "                best = Math.min(best, r - left + 1);\n"
+                "                sum -= a[left];\n"
+                "                left++;\n"
+                "            }\n"
+                "        }\n"
+                "        System.out.println(best == Integer.MAX_VALUE ? 0 : best);"),
+            ["best = Math.min(best, r - left + 1);"],
+            [("6 7\n2 3 1 2 4 3", "2"), ("3 100\n1 2 3", "0"), ("3 6\n1 2 3", "3")],
+            hint="Window length is r - left + 1; keep the smallest that still satisfies sum ≥ S.",
+        ),
+    ],
+    "inplace_reverse": [
+        ex(
+            "reverse-array", "Reverse in place",
+            "Swap symmetric elements moving inward — no second array. Replace `____` with the three-line swap of `a[i]` and `a[j]`.",
+            prog(
+                "        int n = sc.nextInt();\n"
+                "        int[] a = new int[n];\n"
+                "        for (int i = 0; i < n; i++) a[i] = sc.nextInt();\n"
+                "        int i = 0, j = n - 1;\n"
+                "        while (i < j) {\n"
+                "            int t = a[i]; a[i] = a[j]; a[j] = t;\n"
+                "            i++;\n"
+                "            j--;\n"
+                "        }\n"
+                "        StringBuilder sb = new StringBuilder();\n"
+                "        for (int k = 0; k < n; k++) { sb.append(a[k]); if (k < n - 1) sb.append(' '); }\n"
+                "        System.out.println(sb.toString());"),
+            ["int t = a[i]; a[i] = a[j]; a[j] = t;"],
+            [("4\n1 2 3 4", "4 3 2 1"), ("1\n7", "7"), ("3\n5 6 7", "7 6 5")],
+            hint="Classic swap via a temp: int t = a[i]; a[i] = a[j]; a[j] = t;",
+        ),
+        ex(
+            "reverse-subrange", "Reverse a sub-range",
+            "Reverse only `a[l..r]` (inclusive), leaving the rest untouched. Replace `____` with the swap of the current ends.",
+            prog(
+                "        int n = sc.nextInt();\n"
+                "        int[] a = new int[n];\n"
+                "        for (int i = 0; i < n; i++) a[i] = sc.nextInt();\n"
+                "        int l = sc.nextInt(), r = sc.nextInt();\n"
+                "        while (l < r) {\n"
+                "            int t = a[l]; a[l] = a[r]; a[r] = t;\n"
+                "            l++;\n"
+                "            r--;\n"
+                "        }\n"
+                "        StringBuilder sb = new StringBuilder();\n"
+                "        for (int k = 0; k < n; k++) { sb.append(a[k]); if (k < n - 1) sb.append(' '); }\n"
+                "        System.out.println(sb.toString());"),
+            ["int t = a[l]; a[l] = a[r]; a[r] = t;"],
+            [("5\n1 2 3 4 5\n1 3", "1 4 3 2 5"), ("3\n1 2 3\n0 2", "3 2 1"), ("4\n1 2 3 4\n2 2", "1 2 3 4")],
+            hint="Swap a[l] and a[r], then step l forward and r backward.",
+        ),
+        ex(
+            "reverse-rotate", "Rotate right by k (three reversals)",
+            "Rotate the array right by `k` using the reversal trick: reverse all, reverse the first k, reverse the rest. The `rev` helper is written. Replace `____` with the two partial reversals.",
+            "import java.util.*;\n\n"
+            "public class Main {\n"
+            "    static void rev(int[] a, int i, int j) {\n"
+            "        while (i < j) { int t = a[i]; a[i] = a[j]; a[j] = t; i++; j--; }\n"
+            "    }\n"
+            "    public static void main(String[] args) {\n"
+            "        Scanner sc = new Scanner(System.in);\n"
+            "        int n = sc.nextInt();\n"
+            "        int[] a = new int[n];\n"
+            "        for (int i = 0; i < n; i++) a[i] = sc.nextInt();\n"
+            "        int k = sc.nextInt() % n;\n"
+            "        rev(a, 0, n - 1);\n"
+            "        rev(a, 0, k - 1);\n"
+            "        rev(a, k, n - 1);\n"
+            "        StringBuilder sb = new StringBuilder();\n"
+            "        for (int i = 0; i < n; i++) { sb.append(a[i]); if (i < n - 1) sb.append(' '); }\n"
+            "        System.out.println(sb.toString());\n"
+            "    }\n"
+            "}\n",
+            ["rev(a, 0, k - 1);\n        rev(a, k, n - 1);"],
+            [("5\n1 2 3 4 5\n2", "4 5 1 2 3"), ("3\n1 2 3\n0", "1 2 3"), ("4\n1 2 3 4\n5", "4 1 2 3")],
+            hint="After reversing the whole array, reverse a[0..k-1] and a[k..n-1].",
+            source_slug="rotate-array",
+        ),
+    ],
+}
+
+
 def build_concepts():
     cats = []
     for key, c in CONCEPTS.items():
@@ -2621,6 +3481,7 @@ def build_concepts():
             "deep": c["deep"],
             "java": c["java"],
             "lesson": LESSONS.get(key, ""),
+            "exercises": EXERCISES.get(key, []),
         })
     return cats
 
@@ -5103,6 +5964,18 @@ PREREQS.update({
 
 
 # ---------------------------------------------------------------------------
+# Syllabus expansion — 9 interview domains (trees, linked lists, backtracking,
+# heaps, intervals, design, union-find, advanced graphs, tries). Authored in a
+# separate file and exec'd here so it can extend CONCEPTS/HARNESS_DEFS/DEFS/etc.
+# in place. Defines EXPANSION_REFS (merged into REFERENCE_SOLUTIONS below).
+# ---------------------------------------------------------------------------
+_exp_path = os.path.join(HERE, "expansion_defs.py")
+if os.path.exists(_exp_path):
+    with open(_exp_path, encoding="utf-8") as _ef:
+        exec(compile(_ef.read(), _exp_path, "exec"))
+
+
+# ---------------------------------------------------------------------------
 # Build JSON
 # ---------------------------------------------------------------------------
 
@@ -5222,6 +6095,16 @@ with open(CONCEPTS_OUT, "w", encoding="utf-8", newline="\n") as f:
     json.dump(concepts, f, indent=2, ensure_ascii=False)
 print(f"Wrote {len(concepts)} concepts to {os.path.relpath(CONCEPTS_OUT)}")
 
+# Concept flashcards (signal -> technique), seeded idempotently at launch.
+FLASHCARDS_OUT = os.path.join(HERE, "..", "src-tauri", "seeds", "flashcards.json")
+_flashcards = [
+    {"front": f, "back": b, "source": s}
+    for (f, b, s) in globals().get("FLASHCARDS", [])
+]
+with open(FLASHCARDS_OUT, "w", encoding="utf-8", newline="\n") as f:
+    json.dump(_flashcards, f, indent=2, ensure_ascii=False)
+print(f"Wrote {len(_flashcards)} flashcards to {os.path.relpath(FLASHCARDS_OUT)}")
+
 # ---------------------------------------------------------------------------
 # Reference solutions — CORRECT, submittable solutions in each shipped language,
 # used by the backend test `verify_seeds` to prove the judging + harness
@@ -5315,6 +6198,8 @@ REFERENCE_SOLUTIONS = {
         "java": "import java.util.*;\nimport java.io.*;\npublic class Main {\n    public static void main(String[] args) throws IOException {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        StringTokenizer st = new StringTokenizer(br.readLine());\n        int H = Integer.parseInt(st.nextToken()), W = Integer.parseInt(st.nextToken());\n        char[][] g = new char[H][];\n        for (int i = 0; i < H; i++) g[i] = br.readLine().toCharArray();\n        StringBuilder sb = new StringBuilder();\n        for (int i = 0; i < H; i++) {\n            for (int j = 0; j < W; j++) {\n                if (g[i][j] == '*') { sb.append('*'); continue; }\n                int c = 0;\n                for (int di = -1; di <= 1; di++) for (int dj = -1; dj <= 1; dj++) {\n                    if (di == 0 && dj == 0) continue;\n                    int ni = i + di, nj = j + dj;\n                    if (ni >= 0 && ni < H && nj >= 0 && nj < W && g[ni][nj] == '*') c++;\n                }\n                sb.append((char)('0' + c));\n            }\n            sb.append('\\n');\n        }\n        System.out.print(sb);\n    }\n}\n",
     },
 }
+
+REFERENCE_SOLUTIONS.update(globals().get("EXPANSION_REFS", {}))
 
 REFS_OUT = os.path.join(HERE, "..", "src-tauri", "seeds", "reference_solutions.json")
 with open(REFS_OUT, "w", encoding="utf-8", newline="\n") as f:

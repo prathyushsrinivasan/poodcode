@@ -39,6 +39,22 @@ export interface FollowUp {
   note: string;
 }
 
+export interface ExerciseTest {
+  input: string;
+  output: string;
+}
+export interface Exercise {
+  id: string;
+  title: string;
+  prompt: string;
+  hint: string;
+  language: string;
+  starter: string;
+  solution: string;
+  tests: ExerciseTest[];
+  source_slug: string;
+}
+
 export interface Concept {
   key: string;
   name: string;
@@ -47,6 +63,7 @@ export interface Concept {
   deep: string;
   java: string;
   lesson: string;
+  exercises: Exercise[];
 }
 
 export interface TestCase {
