@@ -896,7 +896,80 @@
     "java": "A memo HashMap or an int[]/int[][] table. For memoization initialize a sentinel with Arrays.fill(dp, -1).",
     "language": "java",
     "lesson": "### Worked example\nWays to climb n stairs taking 1 or 2 steps: `ways(n) = ways(n-1) + ways(n-2)`. Build up from the bottom.\n\n### In code (Java)\n```java\nint n = 5;\nlong a = 1, b = 1;           // ways(0), ways(1)\nfor (int i = 2; i <= n; i++) { long c = a + b; a = b; b = c; }\nSystem.out.println(b);       // 8\n```\n\n### Watch out for\n- Identify the **state** and the **transition** first — the code follows.\n- Bottom-up with a couple of variables often replaces an exponential recursion.\n",
-    "exercises": []
+    "exercises": [
+      {
+        "id": "dp-stairs",
+        "title": "Climbing stairs",
+        "prompt": "Ways to climb `n` stairs (1 or 2 steps at a time) follow `ways(i) = ways(i-1) + ways(i-2)`. Replace `____` with that transition.",
+        "hint": "Each step's ways is the sum of the previous two — carry them in a and b.",
+        "language": "java",
+        "starter": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        long a = 1, b = 1;\n        for (int i = 2; i <= n; i++) {\n            ____\n            a = b;\n            b = c;\n        }\n        System.out.println(b);\n    }\n}\n",
+        "solution": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        long a = 1, b = 1;\n        for (int i = 2; i <= n; i++) {\n            long c = a + b;\n            a = b;\n            b = c;\n        }\n        System.out.println(b);\n    }\n}\n",
+        "tests": [
+          {
+            "input": "2",
+            "output": "2"
+          },
+          {
+            "input": "5",
+            "output": "8"
+          },
+          {
+            "input": "1",
+            "output": "1"
+          }
+        ],
+        "source_slug": ""
+      },
+      {
+        "id": "dp-robber",
+        "title": "House robber",
+        "prompt": "You can't take two adjacent values. `incl`/`excl` track the best if you take or skip the current house. Replace `____` with the new 'take' value (skip-the-previous plus this house).",
+        "hint": "To take house x you must have skipped the previous one, so it's excl + x.",
+        "language": "java",
+        "starter": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] v = new int[n];\n        for (int i = 0; i < n; i++) v[i] = sc.nextInt();\n        long incl = 0, excl = 0;\n        for (int x : v) {\n            ____\n            excl = Math.max(incl, excl);\n            incl = newIncl;\n        }\n        System.out.println(Math.max(incl, excl));\n    }\n}\n",
+        "solution": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] v = new int[n];\n        for (int i = 0; i < n; i++) v[i] = sc.nextInt();\n        long incl = 0, excl = 0;\n        for (int x : v) {\n            long newIncl = excl + x;\n            excl = Math.max(incl, excl);\n            incl = newIncl;\n        }\n        System.out.println(Math.max(incl, excl));\n    }\n}\n",
+        "tests": [
+          {
+            "input": "4\n1 2 3 1",
+            "output": "4"
+          },
+          {
+            "input": "3\n2 7 9",
+            "output": "11"
+          },
+          {
+            "input": "1\n5",
+            "output": "5"
+          }
+        ],
+        "source_slug": ""
+      },
+      {
+        "id": "dp-coinchange",
+        "title": "Coin change (fewest coins)",
+        "prompt": "Write the solution: given an amount and a set of coin values, print the fewest coins that make the amount, or `-1` if impossible. Build `dp[a]` = fewest coins for amount `a`.",
+        "hint": "dp[a] = min over coins c of dp[a - c] + 1; an untouched sentinel means 'impossible'.",
+        "language": "java",
+        "starter": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int amount = sc.nextInt();\n        int m = sc.nextInt();\n        int[] coins = new int[m];\n        for (int i = 0; i < m; i++) coins[i] = sc.nextInt();\n____\n    }\n}\n",
+        "solution": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int amount = sc.nextInt();\n        int m = sc.nextInt();\n        int[] coins = new int[m];\n        for (int i = 0; i < m; i++) coins[i] = sc.nextInt();\n        int[] dp = new int[amount + 1];\n        Arrays.fill(dp, amount + 1);\n        dp[0] = 0;\n        for (int a = 1; a <= amount; a++) {\n            for (int c : coins) {\n                if (c <= a) dp[a] = Math.min(dp[a], dp[a - c] + 1);\n            }\n        }\n        System.out.println(dp[amount] > amount ? -1 : dp[amount]);\n    }\n}\n",
+        "tests": [
+          {
+            "input": "11\n3\n1 2 5",
+            "output": "3"
+          },
+          {
+            "input": "3\n1\n2",
+            "output": "-1"
+          },
+          {
+            "input": "6\n2\n1 3",
+            "output": "2"
+          }
+        ],
+        "source_slug": ""
+      }
+    ]
   },
   {
     "key": "recurrence",
@@ -907,7 +980,80 @@
     "java": "Iterate bottom-up with a few long variables, or memoize with a long[] dp. Use long when terms grow fast.",
     "language": "java",
     "lesson": "### Worked example\nFibonacci is a recurrence: each term sums the previous two — 0, 1, 1, 2, 3, 5, 8, ...\n\n### In code (Java)\n```java\nstatic long fib(int n) {\n    long a = 0, b = 1;\n    for (int i = 0; i < n; i++) { long c = a + b; a = b; b = c; }\n    return a;\n}\n```\n\n### Watch out for\n- Nail the base cases (`fib(0)=0`, `fib(1)=1`) before the transition.\n- Terms grow fast — use `long` to avoid overflow.\n",
-    "exercises": []
+    "exercises": [
+      {
+        "id": "recurrence-fib",
+        "title": "Fibonacci",
+        "prompt": "Fibonacci sums the previous two terms. Replace `____` with the next term `a + b`.",
+        "hint": "Advance the pair (a, b) -> (b, a + b) n times; a holds fib(n).",
+        "language": "java",
+        "starter": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        long a = 0, b = 1;\n        for (int i = 0; i < n; i++) {\n            ____\n            a = b;\n            b = c;\n        }\n        System.out.println(a);\n    }\n}\n",
+        "solution": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        long a = 0, b = 1;\n        for (int i = 0; i < n; i++) {\n            long c = a + b;\n            a = b;\n            b = c;\n        }\n        System.out.println(a);\n    }\n}\n",
+        "tests": [
+          {
+            "input": "0",
+            "output": "0"
+          },
+          {
+            "input": "7",
+            "output": "13"
+          },
+          {
+            "input": "10",
+            "output": "55"
+          }
+        ],
+        "source_slug": ""
+      },
+      {
+        "id": "recurrence-tribonacci",
+        "title": "Tribonacci",
+        "prompt": "The tribonacci sequence (0, 1, 1, 2, 4, 7, 13, ...) sums the previous THREE terms. Replace `____` with that transition.",
+        "hint": "Each term is the sum of the three before it; seed t[0..2] = 0, 1, 1.",
+        "language": "java",
+        "starter": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        long[] t = new long[Math.max(n + 1, 3)];\n        t[0] = 0; t[1] = 1; t[2] = 1;\n        for (int i = 3; i <= n; i++) {\n            ____\n        }\n        System.out.println(t[n]);\n    }\n}\n",
+        "solution": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        long[] t = new long[Math.max(n + 1, 3)];\n        t[0] = 0; t[1] = 1; t[2] = 1;\n        for (int i = 3; i <= n; i++) {\n            t[i] = t[i - 1] + t[i - 2] + t[i - 3];\n        }\n        System.out.println(t[n]);\n    }\n}\n",
+        "tests": [
+          {
+            "input": "4",
+            "output": "4"
+          },
+          {
+            "input": "6",
+            "output": "13"
+          },
+          {
+            "input": "0",
+            "output": "0"
+          }
+        ],
+        "source_slug": ""
+      },
+      {
+        "id": "recurrence-custom",
+        "title": "A custom recurrence",
+        "prompt": "Solve `f(n) = 2*f(n-1) + 3*f(n-2)` with `f(0) = 1`, `f(1) = 2`. Write the solution: iterate bottom-up and print `f(n)`.",
+        "hint": "Carry the two previous terms; each new term is 2*(previous) + 3*(one before that).",
+        "language": "java",
+        "starter": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n____\n    }\n}\n",
+        "solution": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        long a = 1, b = 2;\n        if (n == 0) { System.out.println(a); return; }\n        for (int i = 2; i <= n; i++) {\n            long c = 2 * b + 3 * a;\n            a = b;\n            b = c;\n        }\n        System.out.println(b);\n    }\n}\n",
+        "tests": [
+          {
+            "input": "0",
+            "output": "1"
+          },
+          {
+            "input": "2",
+            "output": "7"
+          },
+          {
+            "input": "3",
+            "output": "20"
+          }
+        ],
+        "source_slug": ""
+      }
+    ]
   },
   {
     "key": "dp2d",
@@ -940,7 +1086,80 @@
     "java": "ArrayDeque<Integer> as the queue (offer/poll) plus a boolean[] visited. Mark visited when enqueuing, not dequeuing, to avoid duplicates.",
     "language": "java",
     "lesson": "### Worked example\nFrom node 0 in the chain 0-1-2, BFS visits 0, then 1, then 2 — in order of distance.\n\n### In code (Java)\n```java\nQueue<Integer> q = new ArrayDeque<>();\nboolean[] seen = new boolean[n];\nq.offer(0); seen[0] = true;\nwhile (!q.isEmpty()) {\n    int u = q.poll();\n    for (int v : adj.get(u)) if (!seen[v]) { seen[v] = true; q.offer(v); }\n}\n```\n\n### Watch out for\n- Mark `seen` when you **enqueue**, not when you dequeue, or nodes get added twice.\n- BFS gives shortest paths only in *unweighted* graphs.\n",
-    "exercises": []
+    "exercises": [
+      {
+        "id": "bfs-expand",
+        "title": "Visit neighbours",
+        "prompt": "The graph is built as an adjacency list. Replace `____` with the step that, for an unseen neighbour `w`, marks it seen and enqueues it (mark on ENQUEUE to avoid duplicates).",
+        "hint": "Only enqueue a neighbour you haven't seen, and mark it seen at that moment.",
+        "language": "java",
+        "starter": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int m = sc.nextInt();\n        List<List<Integer>> adj = new ArrayList<>();\n        for (int i = 0; i < n; i++) adj.add(new ArrayList<>());\n        for (int i = 0; i < m; i++) {\n            int u = sc.nextInt();\n            int v = sc.nextInt();\n            adj.get(u).add(v);\n            adj.get(v).add(u);\n        }\n        Queue<Integer> q = new ArrayDeque<>();\n        boolean[] seen = new boolean[n];\n        q.offer(0);\n        seen[0] = true;\n        int count = 0;\n        while (!q.isEmpty()) {\n            int u = q.poll();\n            count++;\n            for (int w : adj.get(u)) {\n                ____\n            }\n        }\n        System.out.println(count);\n    }\n}\n",
+        "solution": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int m = sc.nextInt();\n        List<List<Integer>> adj = new ArrayList<>();\n        for (int i = 0; i < n; i++) adj.add(new ArrayList<>());\n        for (int i = 0; i < m; i++) {\n            int u = sc.nextInt();\n            int v = sc.nextInt();\n            adj.get(u).add(v);\n            adj.get(v).add(u);\n        }\n        Queue<Integer> q = new ArrayDeque<>();\n        boolean[] seen = new boolean[n];\n        q.offer(0);\n        seen[0] = true;\n        int count = 0;\n        while (!q.isEmpty()) {\n            int u = q.poll();\n            count++;\n            for (int w : adj.get(u)) {\n                if (!seen[w]) { seen[w] = true; q.offer(w); }\n            }\n        }\n        System.out.println(count);\n    }\n}\n",
+        "tests": [
+          {
+            "input": "3 2\n0 1\n1 2",
+            "output": "3"
+          },
+          {
+            "input": "4 2\n0 1\n2 3",
+            "output": "2"
+          },
+          {
+            "input": "1 0",
+            "output": "1"
+          }
+        ],
+        "source_slug": ""
+      },
+      {
+        "id": "bfs-distance",
+        "title": "Shortest distance",
+        "prompt": "BFS finds shortest distances in an unweighted graph. Replace `____` with the line that sets a newly-reached node's distance to one more than the node you came from.",
+        "hint": "Each BFS layer is one step further, so a neighbour's distance is dist[u] + 1.",
+        "language": "java",
+        "starter": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int m = sc.nextInt();\n        List<List<Integer>> adj = new ArrayList<>();\n        for (int i = 0; i < n; i++) adj.add(new ArrayList<>());\n        for (int i = 0; i < m; i++) {\n            int u = sc.nextInt();\n            int v = sc.nextInt();\n            adj.get(u).add(v);\n            adj.get(v).add(u);\n        }\n        int t = sc.nextInt();\n        int[] dist = new int[n];\n        Arrays.fill(dist, -1);\n        Queue<Integer> q = new ArrayDeque<>();\n        q.offer(0);\n        dist[0] = 0;\n        while (!q.isEmpty()) {\n            int u = q.poll();\n            for (int w : adj.get(u)) {\n                if (dist[w] == -1) { ____ q.offer(w); }\n            }\n        }\n        System.out.println(dist[t]);\n    }\n}\n",
+        "solution": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int m = sc.nextInt();\n        List<List<Integer>> adj = new ArrayList<>();\n        for (int i = 0; i < n; i++) adj.add(new ArrayList<>());\n        for (int i = 0; i < m; i++) {\n            int u = sc.nextInt();\n            int v = sc.nextInt();\n            adj.get(u).add(v);\n            adj.get(v).add(u);\n        }\n        int t = sc.nextInt();\n        int[] dist = new int[n];\n        Arrays.fill(dist, -1);\n        Queue<Integer> q = new ArrayDeque<>();\n        q.offer(0);\n        dist[0] = 0;\n        while (!q.isEmpty()) {\n            int u = q.poll();\n            for (int w : adj.get(u)) {\n                if (dist[w] == -1) { dist[w] = dist[u] + 1; q.offer(w); }\n            }\n        }\n        System.out.println(dist[t]);\n    }\n}\n",
+        "tests": [
+          {
+            "input": "3 2\n0 1\n1 2\n2",
+            "output": "2"
+          },
+          {
+            "input": "4 2\n0 1\n2 3\n3",
+            "output": "-1"
+          },
+          {
+            "input": "2 1\n0 1\n1",
+            "output": "1"
+          }
+        ],
+        "source_slug": ""
+      },
+      {
+        "id": "bfs-components",
+        "title": "Count connected components",
+        "prompt": "Write the solution: run a BFS from every not-yet-seen node and count how many separate components the undirected graph has.",
+        "hint": "Every time you start a BFS from an unseen node you've found a new component.",
+        "language": "java",
+        "starter": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int m = sc.nextInt();\n        List<List<Integer>> adj = new ArrayList<>();\n        for (int i = 0; i < n; i++) adj.add(new ArrayList<>());\n        for (int i = 0; i < m; i++) {\n            int u = sc.nextInt();\n            int v = sc.nextInt();\n            adj.get(u).add(v);\n            adj.get(v).add(u);\n        }\n____\n    }\n}\n",
+        "solution": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int m = sc.nextInt();\n        List<List<Integer>> adj = new ArrayList<>();\n        for (int i = 0; i < n; i++) adj.add(new ArrayList<>());\n        for (int i = 0; i < m; i++) {\n            int u = sc.nextInt();\n            int v = sc.nextInt();\n            adj.get(u).add(v);\n            adj.get(v).add(u);\n        }\n        boolean[] seen = new boolean[n];\n        int components = 0;\n        for (int start = 0; start < n; start++) {\n            if (seen[start]) continue;\n            components++;\n            Queue<Integer> q = new ArrayDeque<>();\n            q.offer(start);\n            seen[start] = true;\n            while (!q.isEmpty()) {\n                int u = q.poll();\n                for (int w : adj.get(u)) {\n                    if (!seen[w]) { seen[w] = true; q.offer(w); }\n                }\n            }\n        }\n        System.out.println(components);\n    }\n}\n",
+        "tests": [
+          {
+            "input": "5 3\n0 1\n1 2\n3 4",
+            "output": "2"
+          },
+          {
+            "input": "4 0",
+            "output": "4"
+          },
+          {
+            "input": "3 2\n0 1\n1 2",
+            "output": "1"
+          }
+        ],
+        "source_slug": ""
+      }
+    ]
   },
   {
     "key": "flood_fill",
@@ -984,7 +1203,80 @@
     "java": "PriorityQueue<T> is a min-heap by default. For pairs use long[]/int[] with a comparator: new PriorityQueue<>((a, b) -> Long.compare(a[0], b[0])).",
     "language": "java",
     "lesson": "### Worked example\nAlways take the smallest pending item: a min-heap of `{5, 1, 3}` pops 1, then 3, then 5.\n\n### In code (Java)\n```java\nPriorityQueue<Integer> pq = new PriorityQueue<>();\npq.offer(5); pq.offer(1); pq.offer(3);\nwhile (!pq.isEmpty()) System.out.print(pq.poll() + \" \"); // 1 3 5\n```\n\n### Watch out for\n- `PriorityQueue` is a **min**-heap; for max use `Comparator.reverseOrder()`.\n- Peeking is O(1), but there is no fast search or arbitrary removal.\n",
-    "exercises": []
+    "exercises": [
+      {
+        "id": "heap-minorder",
+        "title": "Pop in sorted order",
+        "prompt": "A `PriorityQueue` is a min-heap. Replace `____` with the call that removes and returns the smallest remaining item.",
+        "hint": "poll() always returns the current minimum of a PriorityQueue.",
+        "language": "java",
+        "starter": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        PriorityQueue<Integer> pq = new PriorityQueue<>();\n        for (int i = 0; i < n; i++) pq.offer(sc.nextInt());\n        StringBuilder sb = new StringBuilder();\n        while (!pq.isEmpty()) sb.append(____).append(' ');\n        System.out.println(sb.toString().trim());\n    }\n}\n",
+        "solution": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        PriorityQueue<Integer> pq = new PriorityQueue<>();\n        for (int i = 0; i < n; i++) pq.offer(sc.nextInt());\n        StringBuilder sb = new StringBuilder();\n        while (!pq.isEmpty()) sb.append(pq.poll()).append(' ');\n        System.out.println(sb.toString().trim());\n    }\n}\n",
+        "tests": [
+          {
+            "input": "3\n5 1 3",
+            "output": "1 3 5"
+          },
+          {
+            "input": "1\n9",
+            "output": "9"
+          },
+          {
+            "input": "4\n4 3 2 1",
+            "output": "1 2 3 4"
+          }
+        ],
+        "source_slug": ""
+      },
+      {
+        "id": "heap-max",
+        "title": "Largest element",
+        "prompt": "Replace `____` with the comparator that turns the default min-heap into a max-heap, so `poll()` returns the largest value.",
+        "hint": "Comparator.reverseOrder() makes the heap yield the maximum first.",
+        "language": "java",
+        "starter": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        PriorityQueue<Integer> pq = new PriorityQueue<>(____);\n        for (int i = 0; i < n; i++) pq.offer(sc.nextInt());\n        System.out.println(pq.poll());\n    }\n}\n",
+        "solution": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        PriorityQueue<Integer> pq = new PriorityQueue<>(Comparator.reverseOrder());\n        for (int i = 0; i < n; i++) pq.offer(sc.nextInt());\n        System.out.println(pq.poll());\n    }\n}\n",
+        "tests": [
+          {
+            "input": "3\n5 1 3",
+            "output": "5"
+          },
+          {
+            "input": "1\n9",
+            "output": "9"
+          },
+          {
+            "input": "4\n2 8 4 1",
+            "output": "8"
+          }
+        ],
+        "source_slug": ""
+      },
+      {
+        "id": "heap-kthlargest",
+        "title": "Kth largest element",
+        "prompt": "Write the solution: keep a min-heap of size `k`; after adding each value, drop the smallest if the heap grew past `k`. The heap's minimum is then the k-th largest — print it.",
+        "hint": "A size-k min-heap keeps the k largest seen so far; its smallest is the k-th largest.",
+        "language": "java",
+        "starter": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int k = sc.nextInt();\n____\n    }\n}\n",
+        "solution": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int k = sc.nextInt();\n        PriorityQueue<Integer> pq = new PriorityQueue<>();\n        for (int i = 0; i < n; i++) {\n            pq.offer(sc.nextInt());\n            if (pq.size() > k) pq.poll();\n        }\n        System.out.println(pq.poll());\n    }\n}\n",
+        "tests": [
+          {
+            "input": "5 2\n3 2 1 5 4",
+            "output": "4"
+          },
+          {
+            "input": "3 1\n7 8 9",
+            "output": "9"
+          },
+          {
+            "input": "4 3\n10 5 20 15",
+            "output": "10"
+          }
+        ],
+        "source_slug": ""
+      }
+    ]
   },
   {
     "key": "greedy",
@@ -995,7 +1287,80 @@
     "java": "Often just Arrays.sort plus a linear scan, or a PriorityQueue to always grab the current best.",
     "language": "java",
     "lesson": "### Worked example\nFewest coins for 30 with {25, 10, 5}: take the biggest that fits each time — 25, then 5 — two coins.\n\n### In code (Java)\n```java\nint[] coins = {25, 10, 5}; int amount = 30, used = 0;\nfor (int c : coins) { used += amount / c; amount %= c; }\n```\n\n### Watch out for\n- Greedy is only correct for some problems (this coin set works; arbitrary sets need DP).\n- Sorting the input first is a common setup step.\n",
-    "exercises": []
+    "exercises": [
+      {
+        "id": "greedy-coins",
+        "title": "Fewest coins",
+        "prompt": "Coins `{25, 10, 5, 1}` are tried largest-first. Replace `____` with the line that adds as many of coin `c` as fit into what remains.",
+        "hint": "amount / c is how many of coin c fit; amount %= c leaves the remainder.",
+        "language": "java",
+        "starter": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int amount = sc.nextInt();\n        int[] coins = {25, 10, 5, 1};\n        int used = 0;\n        for (int c : coins) {\n            ____\n            amount %= c;\n        }\n        System.out.println(used);\n    }\n}\n",
+        "solution": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int amount = sc.nextInt();\n        int[] coins = {25, 10, 5, 1};\n        int used = 0;\n        for (int c : coins) {\n            used += amount / c;\n            amount %= c;\n        }\n        System.out.println(used);\n    }\n}\n",
+        "tests": [
+          {
+            "input": "30",
+            "output": "2"
+          },
+          {
+            "input": "41",
+            "output": "4"
+          },
+          {
+            "input": "99",
+            "output": "9"
+          }
+        ],
+        "source_slug": ""
+      },
+      {
+        "id": "greedy-largest",
+        "title": "Largest number from digits",
+        "prompt": "Greedily place the biggest digits first. The digits are sorted ascending, so replace `____` with the call that flips them into descending order.",
+        "hint": "Sorting ascending then reversing puts the largest digit first.",
+        "language": "java",
+        "starter": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        String s = sc.next();\n        char[] d = s.toCharArray();\n        Arrays.sort(d);\n        StringBuilder sb = new StringBuilder(new String(d));\n        ____\n        System.out.println(sb.toString());\n    }\n}\n",
+        "solution": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        String s = sc.next();\n        char[] d = s.toCharArray();\n        Arrays.sort(d);\n        StringBuilder sb = new StringBuilder(new String(d));\n        sb.reverse();\n        System.out.println(sb.toString());\n    }\n}\n",
+        "tests": [
+          {
+            "input": "312",
+            "output": "321"
+          },
+          {
+            "input": "1000",
+            "output": "1000"
+          },
+          {
+            "input": "52341",
+            "output": "54321"
+          }
+        ],
+        "source_slug": ""
+      },
+      {
+        "id": "greedy-cookies",
+        "title": "Assign cookies",
+        "prompt": "Children have greed factors, cookies have sizes; a child is satisfied by a cookie at least as big as their greed. Write the solution: sort both, then greedily match the smallest cookie that satisfies the least-greedy remaining child, and print how many children are satisfied.",
+        "hint": "Sort both, then sweep the cookies; each cookie that clears the current child's greed satisfies them.",
+        "language": "java",
+        "starter": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] g = new int[n];\n        for (int i = 0; i < n; i++) g[i] = sc.nextInt();\n        int m = sc.nextInt();\n        int[] s = new int[m];\n        for (int i = 0; i < m; i++) s[i] = sc.nextInt();\n____\n    }\n}\n",
+        "solution": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] g = new int[n];\n        for (int i = 0; i < n; i++) g[i] = sc.nextInt();\n        int m = sc.nextInt();\n        int[] s = new int[m];\n        for (int i = 0; i < m; i++) s[i] = sc.nextInt();\n        Arrays.sort(g);\n        Arrays.sort(s);\n        int child = 0;\n        for (int j = 0; j < m && child < n; j++) {\n            if (s[j] >= g[child]) child++;\n        }\n        System.out.println(child);\n    }\n}\n",
+        "tests": [
+          {
+            "input": "3\n1 2 3\n2\n1 1",
+            "output": "1"
+          },
+          {
+            "input": "2\n1 2\n3\n1 2 3",
+            "output": "2"
+          },
+          {
+            "input": "2\n10 20\n2\n5 5",
+            "output": "0"
+          }
+        ],
+        "source_slug": ""
+      }
+    ]
   },
   {
     "key": "prefix_max",
@@ -1282,7 +1647,80 @@
     "java": "n % 10 and n / 10 to extract digits, or Long.toString(n); use long to avoid overflow on reversal.",
     "language": "java",
     "lesson": "### Worked example\nSum the digits of 123: `123 % 10 = 3`, then `123 / 10 = 12`, and so on — 3 + 2 + 1 = 6.\n\n### In code (Java)\n```java\nint n = 123, sum = 0;\nwhile (n > 0) { sum += n % 10; n /= 10; }\nSystem.out.println(sum); // 6\n```\n\n### Watch out for\n- Handle 0 and negatives explicitly (take `Math.abs` first if sign should not matter).\n- Reversing a number arithmetically can overflow — consider the String form.\n",
-    "exercises": []
+    "exercises": [
+      {
+        "id": "math_digits-sum",
+        "title": "Sum the digits",
+        "prompt": "Replace `____` with the expression for the last digit of `n`, so the loop adds up every digit.",
+        "hint": "n % 10 peels off the last digit; n /= 10 removes it.",
+        "language": "java",
+        "starter": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int sum = 0;\n        while (n > 0) {\n            sum += ____;\n            n /= 10;\n        }\n        System.out.println(sum);\n    }\n}\n",
+        "solution": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int sum = 0;\n        while (n > 0) {\n            sum += n % 10;\n            n /= 10;\n        }\n        System.out.println(sum);\n    }\n}\n",
+        "tests": [
+          {
+            "input": "123",
+            "output": "6"
+          },
+          {
+            "input": "9",
+            "output": "9"
+          },
+          {
+            "input": "100",
+            "output": "1"
+          }
+        ],
+        "source_slug": ""
+      },
+      {
+        "id": "math_digits-count",
+        "title": "Count the digits",
+        "prompt": "Replace `____` with the statement that drops the last digit of `n` each pass, so the loop counts how many digits it has.",
+        "hint": "Integer division n /= 10 shortens the number by one digit.",
+        "language": "java",
+        "starter": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int count = 0;\n        while (n > 0) {\n            count++;\n            ____\n        }\n        System.out.println(count);\n    }\n}\n",
+        "solution": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int count = 0;\n        while (n > 0) {\n            count++;\n            n /= 10;\n        }\n        System.out.println(count);\n    }\n}\n",
+        "tests": [
+          {
+            "input": "123",
+            "output": "3"
+          },
+          {
+            "input": "7",
+            "output": "1"
+          },
+          {
+            "input": "1000",
+            "output": "4"
+          }
+        ],
+        "source_slug": ""
+      },
+      {
+        "id": "math_digits-reverse",
+        "title": "Reverse the digits",
+        "prompt": "Write the solution: build the reversed number by repeatedly taking the last digit of `n` and appending it (`123` -> `321`).",
+        "hint": "rev = rev * 10 + (last digit) shifts the built-up number left and adds the new digit.",
+        "language": "java",
+        "starter": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n____\n    }\n}\n",
+        "solution": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int rev = 0;\n        while (n > 0) {\n            rev = rev * 10 + n % 10;\n            n /= 10;\n        }\n        System.out.println(rev);\n    }\n}\n",
+        "tests": [
+          {
+            "input": "123",
+            "output": "321"
+          },
+          {
+            "input": "1230",
+            "output": "321"
+          },
+          {
+            "input": "5",
+            "output": "5"
+          }
+        ],
+        "source_slug": ""
+      }
+    ]
   },
   {
     "key": "number_theory",
@@ -1293,7 +1731,80 @@
     "java": "Math.floorMod for correct modulo of negatives; write a short gcd helper (Euclid); BigInteger has gcd() if needed.",
     "language": "java",
     "lesson": "### Worked example\ngcd(12, 18): 18 % 12 = 6, then 12 % 6 = 0, so the gcd is 6.\n\n### In code (Java)\n```java\nstatic long gcd(long a, long b) { return b == 0 ? a : gcd(b, a % b); }\n```\n\n### Watch out for\n- `Math.floorMod` gives a non-negative remainder for negative inputs.\n- lcm(a, b) = a / gcd(a, b) * b — divide before multiplying to avoid overflow.\n",
-    "exercises": []
+    "exercises": [
+      {
+        "id": "number_theory-gcd",
+        "title": "Euclid's GCD",
+        "prompt": "Replace `____` with the recursive step of Euclid's algorithm (`gcd(b, a % b)`), with the base case `b == 0`.",
+        "hint": "gcd(a, b) = gcd(b, a % b), and gcd(a, 0) = a.",
+        "language": "java",
+        "starter": "import java.util.*;\n\npublic class Main {\n    static long gcd(long a, long b) {\n        ____\n    }\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        long a = sc.nextLong();\n        long b = sc.nextLong();\n        System.out.println(gcd(a, b));\n    }\n}\n",
+        "solution": "import java.util.*;\n\npublic class Main {\n    static long gcd(long a, long b) {\n        return b == 0 ? a : gcd(b, a % b);\n    }\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        long a = sc.nextLong();\n        long b = sc.nextLong();\n        System.out.println(gcd(a, b));\n    }\n}\n",
+        "tests": [
+          {
+            "input": "12 18",
+            "output": "6"
+          },
+          {
+            "input": "7 5",
+            "output": "1"
+          },
+          {
+            "input": "100 10",
+            "output": "10"
+          }
+        ],
+        "source_slug": ""
+      },
+      {
+        "id": "number_theory-prime",
+        "title": "Is it prime?",
+        "prompt": "Replace `____` with the divisibility test that, when true, proves `n` is not prime.",
+        "hint": "If n % d == 0 for some d in [2, sqrt(n)], then d divides n, so n isn't prime.",
+        "language": "java",
+        "starter": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        boolean prime = n >= 2;\n        for (int d = 2; (long) d * d <= n; d++) {\n            if (____) { prime = false; break; }\n        }\n        System.out.println(prime);\n    }\n}\n",
+        "solution": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        boolean prime = n >= 2;\n        for (int d = 2; (long) d * d <= n; d++) {\n            if (n % d == 0) { prime = false; break; }\n        }\n        System.out.println(prime);\n    }\n}\n",
+        "tests": [
+          {
+            "input": "7",
+            "output": "true"
+          },
+          {
+            "input": "12",
+            "output": "false"
+          },
+          {
+            "input": "1",
+            "output": "false"
+          }
+        ],
+        "source_slug": ""
+      },
+      {
+        "id": "number_theory-lcm",
+        "title": "Least common multiple",
+        "prompt": "Write the solution: compute `lcm(a, b)` as `a / gcd(a, b) * b` (divide before multiplying to avoid overflow) and print it.",
+        "hint": "lcm(a, b) = a / gcd(a, b) * b — dividing first keeps the intermediate value small.",
+        "language": "java",
+        "starter": "import java.util.*;\n\npublic class Main {\n    static long gcd(long a, long b) {\n        return b == 0 ? a : gcd(b, a % b);\n    }\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        long a = sc.nextLong();\n        long b = sc.nextLong();\n____\n    }\n}\n",
+        "solution": "import java.util.*;\n\npublic class Main {\n    static long gcd(long a, long b) {\n        return b == 0 ? a : gcd(b, a % b);\n    }\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        long a = sc.nextLong();\n        long b = sc.nextLong();\n        long result = a / gcd(a, b) * b;\n        System.out.println(result);\n    }\n}\n",
+        "tests": [
+          {
+            "input": "4 6",
+            "output": "12"
+          },
+          {
+            "input": "3 5",
+            "output": "15"
+          },
+          {
+            "input": "10 10",
+            "output": "10"
+          }
+        ],
+        "source_slug": ""
+      }
+    ]
   },
   {
     "key": "modulo",
@@ -1304,7 +1815,80 @@
     "java": "Use k % n after guarding n > 0; for possibly-negative values use Math.floorMod(x, n).",
     "language": "java",
     "lesson": "### Worked example\nRotating a length-5 array by k = 7 equals rotating by `7 % 5 = 2` — the extra full turns do nothing.\n\n### In code (Java)\n```java\nint n = 5, k = 7;\nk = k % n;                        // 2\nint idx = Math.floorMod(-1, n);   // 4, safe for negatives\n```\n\n### Watch out for\n- Java's `%` can be negative; `Math.floorMod` keeps the result in [0, n).\n- Reduce `k % n` before using it to index, and guard `n > 0`.\n",
-    "exercises": []
+    "exercises": [
+      {
+        "id": "modulo-reduce",
+        "title": "Drop the extra turns",
+        "prompt": "Rotating a length-`n` array by `k` is the same as rotating by `k % n`. Replace `____` with that reduced amount.",
+        "hint": "k % n removes whole cycles, leaving the effective offset in [0, n).",
+        "language": "java",
+        "starter": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int k = sc.nextInt();\n        System.out.println(____);\n    }\n}\n",
+        "solution": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int k = sc.nextInt();\n        System.out.println(k % n);\n    }\n}\n",
+        "tests": [
+          {
+            "input": "5 7",
+            "output": "2"
+          },
+          {
+            "input": "3 3",
+            "output": "0"
+          },
+          {
+            "input": "10 4",
+            "output": "4"
+          }
+        ],
+        "source_slug": ""
+      },
+      {
+        "id": "modulo-floormod",
+        "title": "Safe modulo of negatives",
+        "prompt": "Java's `%` can be negative. Replace `____` with the call that always returns a non-negative remainder in `[0, n)`.",
+        "hint": "Math.floorMod(x, n) wraps negatives correctly, unlike the % operator.",
+        "language": "java",
+        "starter": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int x = sc.nextInt();\n        int n = sc.nextInt();\n        System.out.println(____);\n    }\n}\n",
+        "solution": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int x = sc.nextInt();\n        int n = sc.nextInt();\n        System.out.println(Math.floorMod(x, n));\n    }\n}\n",
+        "tests": [
+          {
+            "input": "-1 5",
+            "output": "4"
+          },
+          {
+            "input": "7 5",
+            "output": "2"
+          },
+          {
+            "input": "-7 3",
+            "output": "2"
+          }
+        ],
+        "source_slug": ""
+      },
+      {
+        "id": "modulo-clock",
+        "title": "Wrap around a 24-hour clock",
+        "prompt": "Write the solution: given a start hour and hours to add, print the resulting hour on a 24-hour clock (it must stay in 0..23).",
+        "hint": "Add the hours, then reduce modulo 24 so the clock wraps past midnight.",
+        "language": "java",
+        "starter": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int start = sc.nextInt();\n        int add = sc.nextInt();\n____\n    }\n}\n",
+        "solution": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int start = sc.nextInt();\n        int add = sc.nextInt();\n        int hour = Math.floorMod(start + add, 24);\n        System.out.println(hour);\n    }\n}\n",
+        "tests": [
+          {
+            "input": "22 5",
+            "output": "3"
+          },
+          {
+            "input": "0 0",
+            "output": "0"
+          },
+          {
+            "input": "10 40",
+            "output": "2"
+          }
+        ],
+        "source_slug": ""
+      }
+    ]
   },
   {
     "key": "inplace_reverse",
@@ -2184,8 +2768,81 @@
     "deep": "Bit tricks give O(1) tools that replace loops: `x & (x-1)` clears the lowest set bit, `x & -x` isolates it, XOR cancels equal values, and shifting multiplies or divides by powers of two. They shine in set membership (bitmasks), parity, and counting.",
     "java": "Use &, |, ^, ~, <<, >>, and >>> (unsigned shift). Integer.bitCount(x) counts set bits; x & (x-1) drops the lowest one.",
     "language": "java",
-    "lesson": "",
-    "exercises": []
+    "lesson": "### Worked example\nBitwise operators act on the binary form of an integer. `5` is `101`, so bits 0 and 2 are set. `5 & 1` (AND with `001`) is `1`, telling you the lowest bit is on — i.e. the number is odd.\n\n### In code (Java)\n```java\nint n = 5;               // 101\nn & 1;                   // 1  — lowest bit (odd?)\nn >> 1;                  // 2  — divide by 2 (drop lowest bit)\nn << 1;                  // 10 — multiply by 2\nInteger.bitCount(n);     // 2  — number of set bits\nn & (n - 1);             // 4  — clears the lowest set bit\n```\n\n### Watch out for\n- `&` AND, `|` OR, `^` XOR, `~` NOT, `<<` / `>>` shift, `>>>` unsigned shift.\n- Test bit `i` with `(n >> i) & 1`; set it with `n | (1 << i)`.\n- For `x > 0`, `(x & (x - 1)) == 0` means `x` is a power of two.\n",
+    "exercises": [
+      {
+        "id": "bit_manip-testbit",
+        "title": "Is a bit set?",
+        "prompt": "Replace `____` with the expression that is true when bit `i` of `n` is 1.",
+        "hint": "Shift bit i down to position 0 with n >> i, then mask it with & 1.",
+        "language": "java",
+        "starter": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int i = sc.nextInt();\n        boolean set = ____;\n        System.out.println(set);\n    }\n}\n",
+        "solution": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int i = sc.nextInt();\n        boolean set = ((n >> i) & 1) == 1;\n        System.out.println(set);\n    }\n}\n",
+        "tests": [
+          {
+            "input": "5 0",
+            "output": "true"
+          },
+          {
+            "input": "5 1",
+            "output": "false"
+          },
+          {
+            "input": "5 2",
+            "output": "true"
+          }
+        ],
+        "source_slug": ""
+      },
+      {
+        "id": "bit_manip-popcount",
+        "title": "Count the set bits",
+        "prompt": "Replace `____` with the trick that clears the lowest set bit of `n`, so the loop runs once per 1-bit.",
+        "hint": "n & (n - 1) removes the lowest set bit; count how many times you can do it.",
+        "language": "java",
+        "starter": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int count = 0;\n        while (n != 0) {\n            n = ____;\n            count++;\n        }\n        System.out.println(count);\n    }\n}\n",
+        "solution": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int count = 0;\n        while (n != 0) {\n            n = n & (n - 1);\n            count++;\n        }\n        System.out.println(count);\n    }\n}\n",
+        "tests": [
+          {
+            "input": "5",
+            "output": "2"
+          },
+          {
+            "input": "7",
+            "output": "3"
+          },
+          {
+            "input": "8",
+            "output": "1"
+          }
+        ],
+        "source_slug": ""
+      },
+      {
+        "id": "bit_manip-poweroftwo",
+        "title": "Power of two?",
+        "prompt": "Write the solution: print `true` when `n` is a positive power of two. A power of two has exactly one set bit.",
+        "hint": "For x > 0, (x & (x - 1)) == 0 is true exactly when x has a single set bit.",
+        "language": "java",
+        "starter": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n____\n    }\n}\n",
+        "solution": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        boolean pow = n > 0 && (n & (n - 1)) == 0;\n        System.out.println(pow);\n    }\n}\n",
+        "tests": [
+          {
+            "input": "8",
+            "output": "true"
+          },
+          {
+            "input": "6",
+            "output": "false"
+          },
+          {
+            "input": "1",
+            "output": "true"
+          }
+        ],
+        "source_slug": ""
+      }
+    ]
   },
   {
     "key": "prefix_sum",
@@ -2195,8 +2852,81 @@
     "deep": "Build P[i] = a[0]+…+a[i-1]; then the sum of a[l..r] is P[r+1] − P[l] in O(1). Paired with a hash map of seen prefixes it counts subarrays with a target sum in one pass. The same idea extends to prefix XOR, products, and 2-D grids.",
     "java": "A long[] prefix of length n+1, or a running long combined with a HashMap<Long,Integer> of prefix counts.",
     "language": "java",
-    "lesson": "",
-    "exercises": []
+    "lesson": "### Worked example\nTo answer \"sum of elements from index 1 to 3\" instantly, precompute running totals. With `a = [1, 2, 3, 4, 5]` the prefix array is `[0, 1, 3, 6, 10, 15]` (length n+1). The range sum `a[1..3]` is `prefix[4] - prefix[1] = 10 - 1 = 9` — one subtraction, no loop.\n\n### In code (Java)\n```java\nint[] a = {1, 2, 3, 4, 5};\nlong[] prefix = new long[a.length + 1];\nfor (int i = 0; i < a.length; i++) prefix[i + 1] = prefix[i] + a[i];\nlong rangeSum = prefix[4] - prefix[1]; // sum of a[1..3] = 9\n```\n\n### Watch out for\n- `prefix[i]` is the sum of the first `i` elements, so `prefix[0] = 0` and `prefix[n]` is the grand total.\n- The inclusive range `[l, r]` is `prefix[r + 1] - prefix[l]`.\n- Use a `long[]` prefix — repeated sums overflow `int` quickly.\n",
+    "exercises": [
+      {
+        "id": "prefix_sum-build",
+        "title": "Build the prefix array",
+        "prompt": "Replace `____` with the line that fills `prefix[i + 1]` as the running total (previous prefix plus the next value).",
+        "hint": "Each prefix entry is the one before it plus the current element.",
+        "language": "java",
+        "starter": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        long[] prefix = new long[n + 1];\n        for (int i = 0; i < n; i++) {\n            ____\n        }\n        int l = sc.nextInt();\n        int r = sc.nextInt();\n        System.out.println(prefix[r + 1] - prefix[l]);\n    }\n}\n",
+        "solution": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        long[] prefix = new long[n + 1];\n        for (int i = 0; i < n; i++) {\n            prefix[i + 1] = prefix[i] + sc.nextInt();\n        }\n        int l = sc.nextInt();\n        int r = sc.nextInt();\n        System.out.println(prefix[r + 1] - prefix[l]);\n    }\n}\n",
+        "tests": [
+          {
+            "input": "5\n1 2 3 4 5\n1 3",
+            "output": "9"
+          },
+          {
+            "input": "3\n10 20 30\n0 2",
+            "output": "60"
+          },
+          {
+            "input": "4\n1 1 1 1\n2 3",
+            "output": "2"
+          }
+        ],
+        "source_slug": ""
+      },
+      {
+        "id": "prefix_sum-total",
+        "title": "The grand total",
+        "prompt": "`prefix[n]` holds the sum of all `n` elements. Replace `____` with that value.",
+        "hint": "prefix[n] is the running total after adding every element.",
+        "language": "java",
+        "starter": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        long[] prefix = new long[n + 1];\n        for (int i = 0; i < n; i++) {\n            prefix[i + 1] = prefix[i] + sc.nextInt();\n        }\n        System.out.println(____);\n    }\n}\n",
+        "solution": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        long[] prefix = new long[n + 1];\n        for (int i = 0; i < n; i++) {\n            prefix[i + 1] = prefix[i] + sc.nextInt();\n        }\n        System.out.println(prefix[n]);\n    }\n}\n",
+        "tests": [
+          {
+            "input": "5\n1 2 3 4 5",
+            "output": "15"
+          },
+          {
+            "input": "3\n10 20 30",
+            "output": "60"
+          },
+          {
+            "input": "1\n7",
+            "output": "7"
+          }
+        ],
+        "source_slug": ""
+      },
+      {
+        "id": "prefix_sum-maxrange",
+        "title": "Best range among queries",
+        "prompt": "After the values comes a count `q` and then `q` ranges `l r`. Write the solution: print the largest range sum among the queries (each is `prefix[r + 1] - prefix[l]`).",
+        "hint": "Each query is one subtraction on the prefix array; keep the maximum.",
+        "language": "java",
+        "starter": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        long[] prefix = new long[n + 1];\n        for (int i = 0; i < n; i++) prefix[i + 1] = prefix[i] + sc.nextInt();\n____\n    }\n}\n",
+        "solution": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        long[] prefix = new long[n + 1];\n        for (int i = 0; i < n; i++) prefix[i + 1] = prefix[i] + sc.nextInt();\n        int q = sc.nextInt();\n        long best = Long.MIN_VALUE;\n        for (int i = 0; i < q; i++) {\n            int l = sc.nextInt();\n            int r = sc.nextInt();\n            best = Math.max(best, prefix[r + 1] - prefix[l]);\n        }\n        System.out.println(best);\n    }\n}\n",
+        "tests": [
+          {
+            "input": "5\n1 2 3 4 5\n2\n0 4\n1 2",
+            "output": "15"
+          },
+          {
+            "input": "3\n10 20 30\n2\n0 0\n1 2",
+            "output": "50"
+          },
+          {
+            "input": "4\n1 1 1 1\n1\n0 3",
+            "output": "4"
+          }
+        ],
+        "source_slug": ""
+      }
+    ]
   },
   {
     "key": "grid",

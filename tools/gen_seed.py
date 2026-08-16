@@ -6000,6 +6000,12 @@ if os.path.exists(_jc_path):
     with open(_jc_path, encoding="utf-8") as _jf:
         exec(compile(_jf.read(), _jc_path, "exec"))
 
+# Batch 2: math, prefix sums, bit manipulation, greedy, dp/recurrence, heap, BFS.
+_jc2_path = os.path.join(HERE, "java_core2_drills.py")
+if os.path.exists(_jc2_path):
+    with open(_jc2_path, encoding="utf-8") as _jf2:
+        exec(compile(_jf2.read(), _jc2_path, "exec"))
+
 
 # ---------------------------------------------------------------------------
 # Build JSON
