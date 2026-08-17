@@ -24,6 +24,25 @@ pub struct Concept {
     /// Half-coded fill-in-the-blank drills for this concept (Learn tab).
     #[serde(default)]
     pub exercises: Vec<Exercise>,
+    /// Structured vocabulary cards for flashcard study (Japanese track). Empty
+    /// for code concepts, which teach via `lesson` + `exercises` instead.
+    #[serde(default)]
+    pub cards: Vec<Card>,
+}
+
+/// One vocabulary flashcard: a term on the front, its reading / meaning /
+/// example on the back. Populated only for reference concepts (Japanese track).
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Card {
+    pub front: String,
+    #[serde(default)]
+    pub reading: String,
+    #[serde(default)]
+    pub meaning: String,
+    #[serde(default)]
+    pub example_ja: String,
+    #[serde(default)]
+    pub example_en: String,
 }
 
 /// A single stdin/stdout check for a concept exercise.
@@ -415,6 +434,65 @@ pub struct Flashcard {
     pub due_date: String,
     #[serde(default)]
     pub created_at: String,
+}
+
+/// SM-2 scheduling state for a single vocabulary card (Japanese track). Card
+/// content lives in concepts.json; this is only the per-card review state,
+/// keyed by a stable id ("<conceptKey>#<term>").
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CardReview {
+    pub card_id: String,
+    #[serde(default = "default_ease")]
+    pub ease: f64,
+    #[serde(default)]
+    pub reps: i64,
+    #[serde(default)]
+    pub lapses: i64,
+    #[serde(default)]
+    pub interval_days: i64,
+    #[serde(default)]
+    pub due_date: String,
+    /// Last grade given (0=Again..3=Easy), -1 if never graded.
+    #[serde(default)]
+    pub last_quality: i64,
+}
+
+/// One problem restated in Japanese, linked (by `slug`) to a real problem in
+/// the bank so the UI can open it in the solver. Part of the Japanese track.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct BridgeProblem {
+    pub slug: String,
+    pub title_ja: String,
+    pub statement_ja: String,
+    #[serde(default)]
+    pub io_ja: String,
+    /// [term, reading, english] triples for the words used in the statement.
+    #[serde(default)]
+    pub vocab: Vec<Vec<String>>,
+    #[serde(default)]
+    pub hint_ja: String,
+}
+
+/// A Japanese technical-interview question with a model answer (JP + EN).
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct InterviewQA {
+    pub q_ja: String,
+    #[serde(default)]
+    pub q_en: String,
+    pub a_ja: String,
+    #[serde(default)]
+    pub a_en: String,
+    #[serde(default)]
+    pub tags: Vec<String>,
+}
+
+/// The whole Japanese → Java bridge catalog (embedded seeds/jp_bridge.json).
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct JpBridge {
+    #[serde(default)]
+    pub problems: Vec<BridgeProblem>,
+    #[serde(default)]
+    pub interview: Vec<InterviewQA>,
 }
 
 /// A review item joined with its problem for the review queue UI.

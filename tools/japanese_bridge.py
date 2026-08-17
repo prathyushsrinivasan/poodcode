@@ -1,0 +1,249 @@
+# -*- coding: utf-8 -*-
+# ---------------------------------------------------------------------------
+# Japanese → Java "bridge" content: read a real coding problem stated in
+# Japanese, then solve it in Java in the normal editor; plus a bank of Japanese
+# technical-interview questions with model answers.
+#
+# exec()'d inside gen_seed.py (after japanese_defs.py). It just defines the
+# JP_BRIDGE dict; gen_seed writes it to seeds/jp_bridge.json (embedded via
+# include_str! and served by the `jp_bridge` command). Pure reference data —
+# no SQLite / SEED_VERSION impact.
+#
+# Each problem's `slug` must match an existing problem in problems.json so the
+# UI can open it in the solver. `vocab` is [term, reading, english] triples.
+# ---------------------------------------------------------------------------
+
+JP_BRIDGE = {
+    "problems": [
+        {
+            "slug": "print-greeting",
+            "title_ja": "あいさつを出力する",
+            "statement_ja": "「Hello, World!」という文字列を1行で出力するプログラムを書いてください。",
+            "io_ja": "入力: なし\n出力: Hello, World!",
+            "vocab": [
+                ["出力", "しゅつりょく", "output"],
+                ["文字列", "もじれつ", "string"],
+                ["1行", "いちぎょう", "one line"],
+            ],
+            "hint_ja": "System.out.println を使って文字列をそのまま出力します。",
+        },
+        {
+            "slug": "add-two-numbers",
+            "title_ja": "二つの数の和",
+            "statement_ja": "2つの整数が空白区切りで1行に与えられます。その和を出力してください。",
+            "io_ja": "入力: 3 5\n出力: 8",
+            "vocab": [
+                ["整数", "せいすう", "integer"],
+                ["和", "わ", "sum"],
+                ["空白区切り", "くうはくくぎり", "space-separated"],
+            ],
+            "hint_ja": "Scanner で2つの int を読み取り、足した結果を出力します。",
+        },
+        {
+            "slug": "even-or-odd",
+            "title_ja": "偶数か奇数か",
+            "statement_ja": "整数 n が与えられます。n が偶数なら「even」、奇数なら「odd」を出力してください。",
+            "io_ja": "入力: 4\n出力: even",
+            "vocab": [
+                ["偶数", "ぐうすう", "even number"],
+                ["奇数", "きすう", "odd number"],
+                ["剰余", "じょうよ", "remainder / modulo"],
+            ],
+            "hint_ja": "n を 2 で割った剰余（n % 2）が 0 なら偶数です。",
+        },
+        {
+            "slug": "larger-of-two",
+            "title_ja": "大きい方の数",
+            "statement_ja": "2つの整数が与えられます。大きい方の数を出力してください。等しい場合はその値を出力します。",
+            "io_ja": "入力: 7 3\n出力: 7",
+            "vocab": [
+                ["比較", "ひかく", "comparison"],
+                ["条件分岐", "じょうけんぶんき", "conditional branch"],
+                ["以上", "いじょう", "greater than or equal"],
+            ],
+            "hint_ja": "if 文で比較するか、Math.max を使います。",
+        },
+        {
+            "slug": "sum-to-n",
+            "title_ja": "1からNまでの合計",
+            "statement_ja": "正の整数 N が与えられます。1 から N までのすべての整数の合計を出力してください。",
+            "io_ja": "入力: 5\n出力: 15",
+            "vocab": [
+                ["合計", "ごうけい", "total / sum"],
+                ["繰り返し", "くりかえし", "loop / iteration"],
+                ["正の整数", "せいのせいすう", "positive integer"],
+            ],
+            "hint_ja": "for ループで 1 から N まで足すか、公式 N*(N+1)/2 を使います。",
+        },
+        {
+            "slug": "sum-of-digits",
+            "title_ja": "各桁の和",
+            "statement_ja": "非負整数 n が与えられます。各桁の数字の合計を出力してください。",
+            "io_ja": "入力: 1234\n出力: 10",
+            "vocab": [
+                ["桁", "けた", "digit"],
+                ["各桁", "かくけた", "each digit"],
+                ["非負", "ひふ", "non-negative"],
+            ],
+            "hint_ja": "n % 10 で一の位を取り出し、n /= 10 で桁を1つ減らすのを繰り返します。",
+        },
+        {
+            "slug": "factorial",
+            "title_ja": "階乗",
+            "statement_ja": "非負整数 n が与えられます。n の階乗（n!）を出力してください。0! は 1 です。",
+            "io_ja": "入力: 5\n出力: 120",
+            "vocab": [
+                ["階乗", "かいじょう", "factorial"],
+                ["再帰", "さいき", "recursion"],
+                ["積", "せき", "product"],
+            ],
+            "hint_ja": "1 から n までを掛け合わせます。結果が大きくなるので long を使うと安全です。",
+        },
+        {
+            "slug": "array-minimum",
+            "title_ja": "配列の最小値",
+            "statement_ja": "1行目に要素数、2行目に整数の配列が与えられます。配列の最小値を出力してください。",
+            "io_ja": "入力: 5\n3 1 4 1 5\n出力: 1",
+            "vocab": [
+                ["配列", "はいれつ", "array"],
+                ["最小値", "さいしょうち", "minimum value"],
+                ["要素数", "ようそすう", "number of elements"],
+            ],
+            "hint_ja": "最初の要素を仮の最小値とし、残りと比較しながら更新します。",
+        },
+        {
+            "slug": "array-sum",
+            "title_ja": "配列の合計",
+            "statement_ja": "1行目に要素数 n、2行目に n 個の整数が与えられます。すべての要素の合計を出力してください。",
+            "io_ja": "入力: 4\n1 2 3 4\n出力: 10",
+            "vocab": [
+                ["要素", "ようそ", "element"],
+                ["合計", "ごうけい", "sum"],
+                ["走査", "そうさ", "traverse / scan"],
+            ],
+            "hint_ja": "配列を一度走査して、各要素を合計に足していきます。",
+        },
+        {
+            "slug": "reverse-string",
+            "title_ja": "文字列の反転",
+            "statement_ja": "文字列が1行で与えられます。文字を逆順にして出力してください。",
+            "io_ja": "入力: hello\n出力: olleh",
+            "vocab": [
+                ["文字列", "もじれつ", "string"],
+                ["反転", "はんてん", "reverse"],
+                ["逆順", "ぎゃくじゅん", "reverse order"],
+            ],
+            "hint_ja": "StringBuilder の reverse() を使うか、末尾から1文字ずつ組み立てます。",
+        },
+        {
+            "slug": "gcd",
+            "title_ja": "最大公約数",
+            "statement_ja": "2つの正の整数が与えられます。最大公約数（GCD）を出力してください。",
+            "io_ja": "入力: 12 18\n出力: 6",
+            "vocab": [
+                ["最大公約数", "さいだいこうやくすう", "greatest common divisor"],
+                ["互除法", "ごじょほう", "Euclidean algorithm"],
+                ["割り切れる", "わりきれる", "divisible"],
+            ],
+            "hint_ja": "ユークリッドの互除法：gcd(a, b) = gcd(b, a % b) を b が 0 になるまで繰り返します。",
+        },
+        {
+            "slug": "nth-fibonacci",
+            "title_ja": "N番目のフィボナッチ数",
+            "statement_ja": "整数 n が与えられます。n 番目のフィボナッチ数を出力してください（0番目は0、1番目は1）。",
+            "io_ja": "入力: 7\n出力: 13",
+            "vocab": [
+                ["フィボナッチ数", "フィボナッチすう", "Fibonacci number"],
+                ["漸化式", "ぜんかしき", "recurrence relation"],
+                ["動的計画法", "どうてきけいかくほう", "dynamic programming"],
+            ],
+            "hint_ja": "直前の2つの値を保持しながら、ループで順に足していきます。",
+        },
+    ],
+    "interview": [
+        {
+            "q_ja": "このアルゴリズムの時間計算量はいくつですか？",
+            "q_en": "What is the time complexity of this algorithm?",
+            "a_ja": "配列を一度だけ走査するので、時間計算量は O(n) です。",
+            "a_en": "We scan the array only once, so the time complexity is O(n).",
+            "tags": ["計算量"],
+        },
+        {
+            "q_ja": "なぜハッシュマップを使ったのですか？",
+            "q_en": "Why did you use a hash map?",
+            "a_ja": "値の検索を平均 O(1) で行えるため、全体を O(n) に抑えられるからです。",
+            "a_en": "It looks up values in O(1) on average, which keeps the whole solution O(n).",
+            "tags": ["データ構造"],
+        },
+        {
+            "q_ja": "空間計算量はどうなりますか？",
+            "q_en": "What is the space complexity?",
+            "a_ja": "追加の配列を使わず、変数だけで処理するので空間計算量は O(1) です。",
+            "a_en": "We use only a few variables and no extra array, so the space complexity is O(1).",
+            "tags": ["計算量"],
+        },
+        {
+            "q_ja": "このコードのエッジケースは何ですか？",
+            "q_en": "What are the edge cases for this code?",
+            "a_ja": "空の配列、要素が1つだけの場合、負の数が含まれる場合を考慮する必要があります。",
+            "a_en": "We need to consider an empty array, a single element, and negative numbers.",
+            "tags": ["エッジケース"],
+        },
+        {
+            "q_ja": "計算量をさらに改善できますか？",
+            "q_en": "Can you improve the complexity further?",
+            "a_ja": "はい、ソートの代わりにハッシュ集合を使えば O(n log n) から O(n) に改善できます。",
+            "a_en": "Yes — using a hash set instead of sorting improves it from O(n log n) to O(n).",
+            "tags": ["最適化"],
+        },
+        {
+            "q_ja": "再帰と反復のどちらを選びますか？",
+            "q_en": "Would you choose recursion or iteration?",
+            "a_ja": "深い再帰はスタックオーバーフローの危険があるため、この場合は反復を選びます。",
+            "a_en": "Deep recursion risks a stack overflow, so here I'd choose iteration.",
+            "tags": ["再帰"],
+        },
+        {
+            "q_ja": "なぜ int ではなく long を使ったのですか？",
+            "q_en": "Why did you use long instead of int?",
+            "a_ja": "合計が int の範囲を超える可能性があり、オーバーフローを防ぐためです。",
+            "a_en": "The sum could exceed the int range, so long prevents overflow.",
+            "tags": ["型", "オーバーフロー"],
+        },
+        {
+            "q_ja": "まず何から始めますか？",
+            "q_en": "How do you start solving a problem?",
+            "a_ja": "まず要件を確認し、入力と出力の例を整理してから、考え方を説明します。",
+            "a_en": "First I confirm the requirements, work through input/output examples, then explain my approach.",
+            "tags": ["面接の進め方"],
+        },
+        {
+            "q_ja": "このアルゴリズムをどうテストしますか？",
+            "q_en": "How would you test this algorithm?",
+            "a_ja": "通常のケース、境界値、異常な入力について単体テストを書いて確認します。",
+            "a_en": "I write unit tests for the normal case, boundary values, and invalid input.",
+            "tags": ["テスト"],
+        },
+        {
+            "q_ja": "null が渡されたらどうなりますか？",
+            "q_en": "What happens if null is passed in?",
+            "a_ja": "最初に null チェックを行い、例外を投げるか空の結果を返します。",
+            "a_en": "I check for null first and either throw an exception or return an empty result.",
+            "tags": ["例外処理"],
+        },
+        {
+            "q_ja": "詰まったときはどうしますか？",
+            "q_en": "What do you do when you get stuck?",
+            "a_ja": "簡単な例を手で試し、問題を小さく分解して考え直します。",
+            "a_en": "I work a small example by hand and break the problem into smaller parts.",
+            "tags": ["面接の進め方"],
+        },
+        {
+            "q_ja": "このメソッドはスレッドセーフですか？",
+            "q_en": "Is this method thread-safe?",
+            "a_ja": "共有状態を変更せず、ローカル変数だけを使うのでスレッドセーフです。",
+            "a_en": "It doesn't modify shared state and uses only local variables, so it's thread-safe.",
+            "tags": ["並行処理"],
+        },
+    ],
+}

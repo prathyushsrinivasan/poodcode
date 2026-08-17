@@ -39,6 +39,15 @@ pub fn concepts() -> AppResult<Vec<crate::models::Concept>> {
     Ok(serde_json::from_str(CONCEPTS_JSON)?)
 }
 
+/// Japanese → Java bridge content (problem statements in Japanese + interview
+/// Q&A), authored in tools/japanese_bridge.py.
+const JP_BRIDGE_JSON: &str = include_str!("../seeds/jp_bridge.json");
+
+#[tauri::command]
+pub fn jp_bridge() -> AppResult<crate::models::JpBridge> {
+    Ok(serde_json::from_str(JP_BRIDGE_JSON)?)
+}
+
 // ---------------------------------------------------------------------------
 // Problems
 // ---------------------------------------------------------------------------
@@ -462,6 +471,25 @@ pub fn grade_flashcard(state: State<'_, AppState>, id: i64, quality: i64) -> App
 #[tauri::command]
 pub fn delete_flashcard(state: State<'_, AppState>, id: i64) -> AppResult<()> {
     repo::delete_flashcard(&state.conn(), id)
+}
+
+#[tauri::command]
+pub fn card_reviews(state: State<'_, AppState>) -> AppResult<Vec<crate::models::CardReview>> {
+    repo::card_review_states(&state.conn())
+}
+
+#[tauri::command]
+pub fn grade_card(
+    state: State<'_, AppState>,
+    card_id: String,
+    quality: i64,
+) -> AppResult<crate::models::CardReview> {
+    repo::grade_card(&state.conn(), &card_id, quality)
+}
+
+#[tauri::command]
+pub fn reset_cards(state: State<'_, AppState>, card_ids: Vec<String>) -> AppResult<()> {
+    repo::reset_cards(&state.conn(), &card_ids)
 }
 
 #[tauri::command]

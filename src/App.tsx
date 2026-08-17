@@ -18,6 +18,7 @@ import Interview from "./pages/Interview";
 import Settings from "./pages/Settings";
 import ProblemForm from "./pages/ProblemForm";
 import Learn from "./pages/Learn";
+import JapaneseBridge from "./pages/JapaneseBridge";
 import Paths from "./pages/Paths";
 import Flashcards from "./pages/Flashcards";
 import Contest from "./pages/Contest";
@@ -29,6 +30,7 @@ const NAV = [
   { to: "/", label: "Dashboard", icon: "🏠", end: true },
   { to: "/library", label: "Problem Library", icon: "📚" },
   { to: "/learn", label: "Learn", icon: "📘" },
+  { to: "/jp-bridge", label: "日本語 → Java", icon: "🈁" },
   { to: "/paths", label: "Learning Paths", icon: "🧭" },
   { to: "/revision", label: "Revision Queue", icon: "🔁", badge: "reviews" },
   { to: "/flashcards", label: "Flashcards", icon: "🃏" },
@@ -132,6 +134,7 @@ export default function App() {
             <Route path="/library" element={<Library />} />
             <Route path="/learn" element={<Learn />} />
             <Route path="/learn/:key" element={<Learn />} />
+            <Route path="/jp-bridge" element={<JapaneseBridge />} />
             <Route path="/problem/new" element={<ProblemForm />} />
             <Route path="/problem/:id/edit" element={<ProblemForm />} />
             <Route path="/solve/:id" element={<Solve onProgress={refreshBadge} />} />

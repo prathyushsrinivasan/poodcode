@@ -55,6 +55,46 @@ export interface Exercise {
   source_slug: string;
 }
 
+export interface Card {
+  front: string;
+  reading: string;
+  meaning: string;
+  example_ja: string;
+  example_en: string;
+}
+
+export interface BridgeProblem {
+  slug: string;
+  title_ja: string;
+  statement_ja: string;
+  io_ja: string;
+  vocab: string[][];
+  hint_ja: string;
+}
+
+export interface InterviewQA {
+  q_ja: string;
+  q_en: string;
+  a_ja: string;
+  a_en: string;
+  tags: string[];
+}
+
+export interface JpBridge {
+  problems: BridgeProblem[];
+  interview: InterviewQA[];
+}
+
+export interface CardReview {
+  card_id: string;
+  ease: number;
+  reps: number;
+  lapses: number;
+  interval_days: number;
+  due_date: string;
+  last_quality: number;
+}
+
 export interface Concept {
   key: string;
   name: string;
@@ -65,6 +105,7 @@ export interface Concept {
   language: string;
   lesson: string;
   exercises: Exercise[];
+  cards: Card[];
 }
 
 export interface TestCase {

@@ -1130,3 +1130,75 @@ pub fn delete_flashcard(conn: &Connection, id: i64) -> AppResult<()> {
     conn.execute("DELETE FROM flashcards WHERE id = ?1", params![id])?;
     Ok(())
 }
+
+// ---------------------------------------------------------------------------
+// Vocabulary card reviews (Japanese track) — SM-2 state keyed by card id.
+// ---------------------------------------------------------------------------
+
+/// All stored card-review states. Cards with no row here have never been
+/// studied (the frontend treats those as "new" and due immediately).
+pub fn card_review_states(conn: &Connection) -> AppResult<Vec<CardReview>> {
+    let mut stmt = conn.prepare(
+        "SELECT card_id, ease, reps, lapses, interval_days, due_date, last_quality
+         FROM card_reviews",
+    )?;
+    let rows = stmt
+        .query_map([], |r| {
+            Ok(CardReview {
+                card_id: r.get(0)?,
+                ease: r.get(1)?,
+                reps: r.get(2)?,
+                lapses: r.get(3)?,
+                interval_days: r.get(4)?,
+                due_date: r.get(5)?,
+                last_quality: r.get(6)?,
+            })
+        })?
+        .collect::<Result<Vec<_>, _>>()?;
+    Ok(rows)
+}
+
+/// Grade a card on the 0..=3 (Again/Hard/Good/Easy) scale, advancing its SM-2
+/// state (creating the row on first grade). Returns the updated state.
+pub fn grade_card(conn: &Connection, card_id: &str, quality: i64) -> AppResult<CardReview> {
+    let (interval, ease, reps, lapses): (i64, f64, i64, i64) = conn
+        .query_row(
+            "SELECT interval_days, ease, reps, lapses FROM card_reviews WHERE card_id = ?1",
+            params![card_id],
+            |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?, r.get(3)?)),
+        )
+        .optional()?
+        .unwrap_or((0, 2.5, 0, 0));
+    let (new_interval, new_ease, is_lapse) = sm2(interval, ease, reps, quality);
+    let new_reps = if is_lapse { 0 } else { reps + 1 };
+    let new_lapses = lapses + if is_lapse { 1 } else { 0 };
+    let due = (today() + Duration::days(new_interval))
+        .format("%Y-%m-%d")
+        .to_string();
+    conn.execute(
+        "INSERT INTO card_reviews(card_id, ease, reps, lapses, interval_days, due_date, last_quality)
+         VALUES(?1,?2,?3,?4,?5,?6,?7)
+         ON CONFLICT(card_id) DO UPDATE SET
+           ease=?2, reps=?3, lapses=?4, interval_days=?5, due_date=?6, last_quality=?7",
+        params![card_id, new_ease, new_reps, new_lapses, new_interval, due, quality],
+    )?;
+    Ok(CardReview {
+        card_id: card_id.to_string(),
+        ease: new_ease,
+        reps: new_reps,
+        lapses: new_lapses,
+        interval_days: new_interval,
+        due_date: due,
+        last_quality: quality,
+    })
+}
+
+/// Forget all scheduling for a set of cards (used by "reset progress").
+pub fn reset_cards(conn: &Connection, card_ids: &[String]) -> AppResult<()> {
+    let tx = conn.unchecked_transaction()?;
+    for id in card_ids {
+        tx.execute("DELETE FROM card_reviews WHERE card_id = ?1", params![id])?;
+    }
+    tx.commit()?;
+    Ok(())
+}

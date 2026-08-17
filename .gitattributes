@@ -5,3 +5,5 @@ tools/expansion_defs.py text eol=lf
 tools/typescript_defs.py text eol=lf
 tools/java_core_drills.py text eol=lf
 tools/java_core2_drills.py text eol=lf
+tools/japanese_defs.py text eol=lf
+tools/japanese_bridge.py text eol=lf

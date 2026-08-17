@@ -21,6 +21,8 @@ import type {
   Path,
   Contest,
   Flashcard,
+  CardReview,
+  JpBridge,
 } from "./types";
 
 export const api = {
@@ -126,6 +128,15 @@ export const api = {
   gradeFlashcard: (id: number, quality: number) =>
     invoke<void>("grade_flashcard", { id, quality }),
   deleteFlashcard: (id: number) => invoke<void>("delete_flashcard", { id }),
+
+  // Vocabulary card spaced-repetition (Japanese track)
+  cardReviews: () => invoke<CardReview[]>("card_reviews"),
+  gradeCard: (cardId: string, quality: number) =>
+    invoke<CardReview>("grade_card", { cardId, quality }),
+  resetCards: (cardIds: string[]) => invoke<void>("reset_cards", { cardIds }),
+
+  // Japanese → Java bridge (problem statements in Japanese + interview Q&A)
+  jpBridge: () => invoke<JpBridge>("jp_bridge"),
 
   // Stats / dashboard
   statistics: () => invoke<Stats>("statistics"),

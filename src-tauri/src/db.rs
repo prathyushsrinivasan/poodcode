@@ -229,6 +229,22 @@ CREATE INDEX IF NOT EXISTS idx_reviews_due ON reviews(due_date);
 CREATE INDEX IF NOT EXISTS idx_mistakes_problem ON mistakes(problem_id);
 CREATE INDEX IF NOT EXISTS idx_path_items_path ON path_items(path_id);
 CREATE INDEX IF NOT EXISTS idx_flashcards_due ON flashcards(due_date);
+
+-- Spaced-repetition state for vocabulary cards (e.g. the Japanese track). The
+-- card *content* lives in the embedded seeds/concepts.json; only per-card SM-2
+-- scheduling state is stored here, keyed by a stable id "<conceptKey>#<term>".
+-- Schema-only (CREATE IF NOT EXISTS) — no SEED_VERSION bump / migration needed.
+CREATE TABLE IF NOT EXISTS card_reviews (
+  card_id        TEXT PRIMARY KEY,
+  ease           REAL    NOT NULL DEFAULT 2.5,
+  reps           INTEGER NOT NULL DEFAULT 0,
+  lapses         INTEGER NOT NULL DEFAULT 0,
+  interval_days  INTEGER NOT NULL DEFAULT 0,
+  due_date       TEXT    NOT NULL,
+  last_quality   INTEGER NOT NULL DEFAULT -1,
+  created_at     TEXT    NOT NULL DEFAULT (datetime('now'))
+);
+CREATE INDEX IF NOT EXISTS idx_card_reviews_due ON card_reviews(due_date);
 "#;
 
 /// Open (creating if needed) the database at `path`, applying the schema.

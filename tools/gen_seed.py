@@ -3483,6 +3483,7 @@ def build_concepts():
             "language": c.get("language", "java"),
             "lesson": LESSONS.get(key, ""),
             "exercises": EXERCISES.get(key, []),
+            "cards": c.get("cards", []),
         })
     return cats
 
@@ -5990,6 +5991,25 @@ if os.path.exists(_ts_path):
 
 
 # ---------------------------------------------------------------------------
+# Japanese coding-vocabulary Learn track — a THIRD "language" for the Learn
+# tab. Reference concepts only (big vocabulary tables, no code drills), each
+# marked "language": "japanese". Extends CONCEPTS / CATEGORY / LESSONS in
+# place. No SEED_VERSION / SQLite impact — concepts are embedded JSON.
+# ---------------------------------------------------------------------------
+_jp_path = os.path.join(HERE, "japanese_defs.py")
+if os.path.exists(_jp_path):
+    with open(_jp_path, encoding="utf-8") as _jpf:
+        exec(compile(_jpf.read(), _jp_path, "exec"))
+
+# Japanese → Java bridge content (problem statements in Japanese + interview
+# Q&A). Defines JP_BRIDGE; written to seeds/jp_bridge.json near the concepts.
+_jpb_path = os.path.join(HERE, "japanese_bridge.py")
+if os.path.exists(_jpb_path):
+    with open(_jpb_path, encoding="utf-8") as _jpbf:
+        exec(compile(_jpbf.read(), _jpb_path, "exec"))
+
+
+# ---------------------------------------------------------------------------
 # Java core-concept drills — backfills fill-in-the-blank exercises for the
 # high-value interview concepts that shipped with lessons but no practice
 # (strings, hashing/complement, stack/queue, recursion, binary search,
@@ -6136,6 +6156,16 @@ _flashcards = [
 with open(FLASHCARDS_OUT, "w", encoding="utf-8", newline="\n") as f:
     json.dump(_flashcards, f, indent=2, ensure_ascii=False)
 print(f"Wrote {len(_flashcards)} flashcards to {os.path.relpath(FLASHCARDS_OUT)}")
+
+# Japanese → Java bridge (problem statements in Japanese + interview Q&A).
+BRIDGE_OUT = os.path.join(HERE, "..", "src-tauri", "seeds", "jp_bridge.json")
+_bridge = globals().get("JP_BRIDGE", {"problems": [], "interview": []})
+with open(BRIDGE_OUT, "w", encoding="utf-8", newline="\n") as f:
+    json.dump(_bridge, f, indent=2, ensure_ascii=False)
+print(
+    f"Wrote {len(_bridge['problems'])} bridge problems + "
+    f"{len(_bridge['interview'])} interview Q&A to {os.path.relpath(BRIDGE_OUT)}"
+)
 
 # ---------------------------------------------------------------------------
 # Reference solutions — CORRECT, submittable solutions in each shipped language,
