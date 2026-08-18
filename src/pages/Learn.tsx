@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { api } from "../api";
-import type { Concept, Exercise, JudgeReport, Problem, TestCase } from "../types";
+import type { Concept, Exercise, JudgeReport, Problem, QuizQuestion, TestCase } from "../types";
 import { Markdown } from "../components/Markdown";
 import { CodeEditor } from "../components/CodeEditor";
 import { CardStudy } from "../components/CardStudy";
@@ -40,6 +40,11 @@ const CATEGORY_ORDER = [
   "JP: TS Functions",
   "JP: TS Objects & Tooling",
   "JP: Web & Frontend",
+  // Language-agnostic Algorithms track (shown under the 🧠 Algorithms toggle)
+  "Algo: Foundations",
+  "Algo: Searching & Scanning",
+  "Algo: Sorting",
+  "Algo: Recursion",
 ];
 
 // A concept with no explicit language is legacy Java content.
@@ -49,6 +54,7 @@ const LANG_TABS: { id: string; label: string }[] = [
   { id: "java", label: "Java" },
   { id: "typescript", label: "TypeScript" },
   { id: "japanese", label: "日本語" },
+  { id: "algorithms", label: "🧠 Algorithms" },
 ];
 
 // Human-readable name for a Learn language, used in headings and card labels.
@@ -56,6 +62,7 @@ const LANG_LABEL: Record<string, string> = {
   java: "Java",
   typescript: "TypeScript",
   japanese: "Japanese",
+  algorithms: "Algorithms",
 };
 const langLabel = (id: string) => LANG_LABEL[id] || "Java";
 const LANG_STORE_KEY = "poodcode:learn-lang";
@@ -132,6 +139,7 @@ export default function Learn() {
 
   const isTs = lang === "typescript";
   const isJp = lang === "japanese";
+  const isAlg = lang === "algorithms";
 
   return (
     <div className="page">
@@ -152,7 +160,15 @@ export default function Learn() {
         )}
       </div>
       <p className="page-sub">
-        {isJp ? (
+        {isAlg ? (
+          <>
+            {shownCount} <strong>language-agnostic</strong> algorithm lessons — the idea,
+            pseudocode, worked traces, and cost of each technique, with{" "}
+            <strong>multiple-choice quizzes</strong> to test yourself and curated{" "}
+            <strong>practice problems</strong> to apply it in any language. New here? Start with{" "}
+            <strong>Algo: Foundations → What Is an Algorithm?</strong>
+          </>
+        ) : isJp ? (
           <>
             {shownCount} Japanese coding-vocabulary sets — the words, readings, and{" "}
             <strong>example sentences</strong> you'll meet writing Java and doing technical
@@ -212,6 +228,10 @@ export default function Learn() {
             <div className="grid cols-3">
               {items.map((c) => {
                 const isDone = done.has(c.key);
+                const exs = c.exercises ?? [];
+                const drillN = exs.filter((e) => (e.kind || "drill") !== "challenge").length;
+                const challengeN = exs.filter((e) => e.kind === "challenge").length;
+                const quizN = c.quiz?.length ?? 0;
                 return (
                   <div
                     key={c.key}
@@ -222,22 +242,44 @@ export default function Learn() {
                     }}
                     onClick={() => nav(`/learn/${c.key}`)}
                   >
-                    <div className="row" style={{ justifyContent: "space-between" }}>
+                    <div className="row" style={{ justifyContent: "space-between", alignItems: "flex-start" }}>
                       <strong>
                         {isDone && <span style={{ color: "var(--good)" }}>✓ </span>}
                         {c.name}
                       </strong>
-                      {c.cards?.length > 0 ? (
-                        <span className="badge" title="Vocabulary flashcards">
-                          {c.cards.length} cards
-                        </span>
-                      ) : (
-                        c.exercises?.length > 0 && (
-                          <span className="badge" title="Fill-in-the-blank drills">
-                            {c.exercises.length} drills
+                      <span className="row" style={{ gap: 4, flexWrap: "wrap", justifyContent: "flex-end" }}>
+                        {c.cards?.length > 0 ? (
+                          <span className="badge" title="Vocabulary flashcards">
+                            {c.cards.length} cards
                           </span>
-                        )
-                      )}
+                        ) : (
+                          <>
+                            {drillN > 0 && (
+                              <span className="badge" title="Fill-in-the-blank drills">
+                                {drillN} drills
+                              </span>
+                            )}
+                            {challengeN > 0 && (
+                              <span
+                                className="badge"
+                                title="Coding challenge"
+                                style={{ borderColor: "var(--accent)", color: "var(--accent)" }}
+                              >
+                                🏆 challenge
+                              </span>
+                            )}
+                            {quizN > 0 && (
+                              <span
+                                className="badge"
+                                title="Multiple-choice self-check quiz"
+                                style={{ borderColor: "var(--accent)", color: "var(--accent)" }}
+                              >
+                                ❓ {quizN} quiz
+                              </span>
+                            )}
+                          </>
+                        )}
+                      </span>
                     </div>
                     <p className="dim" style={{ margin: "6px 0 0", fontSize: 13 }}>
                       {c.what}
@@ -274,7 +316,13 @@ function ConceptDetail({
   }, [problems]);
 
   const exercises = concept.exercises ?? [];
+  const drills = exercises.filter((e) => (e.kind || "drill") !== "challenge");
+  const challenges = exercises.filter((e) => e.kind === "challenge");
   const cards = concept.cards ?? [];
+  const quiz = concept.quiz ?? [];
+  const practiceRefs = (concept.practice ?? [])
+    .map((pr) => ({ note: pr.note, problem: bySlug.get(pr.slug) }))
+    .filter((x): x is { note: string; problem: Problem } => !!x.problem);
   const [mode, setMode] = useState<"lesson" | "cards">("lesson");
 
   return (
@@ -309,6 +357,8 @@ function ConceptDetail({
         <div className="io-label" style={{ color: "var(--accent)" }}>
           {conceptLang(concept) === "japanese"
             ? "How to read this"
+            : conceptLang(concept) === "algorithms"
+            ? "At a glance"
             : `In ${langLabel(conceptLang(concept))}`}
         </div>
         <Markdown>{concept.java}</Markdown>
@@ -331,15 +381,58 @@ function ConceptDetail({
         <Markdown>{concept.lesson}</Markdown>
       )}
 
-      {exercises.length > 0 && (
+      {quiz.length > 0 && (
         <>
           <div className="divider" />
-          <h3>Try it — fill in the blank</h3>
+          <h3>❓ Check yourself</h3>
+          <p className="dim" style={{ marginTop: -4 }}>
+            {quiz.length} quick questions. Pick an answer to see whether it&rsquo;s right and{" "}
+            <strong>why</strong>. No code to run — just recall.
+          </p>
+          <QuizSection questions={quiz} />
+        </>
+      )}
+
+      {practiceRefs.length > 0 && (
+        <>
+          <div className="divider" />
+          <h3>🎯 Practice this technique</h3>
+          <p className="dim" style={{ marginTop: -4 }}>
+            Real problems from the Library where this idea is the key. Solve them in whatever
+            language you like.
+          </p>
+          <div className="grid cols-2">
+            {practiceRefs.map(({ note, problem }) => (
+              <div
+                key={problem.id}
+                className="card"
+                style={{ cursor: "pointer" }}
+                onClick={() => nav(`/solve/${problem.id}`)}
+              >
+                <div className="row" style={{ justifyContent: "space-between" }}>
+                  <strong>{problem.title}</strong>
+                  <DiffBadge d={problem.difficulty} />
+                </div>
+                {note && (
+                  <p className="dim" style={{ margin: "6px 0 0", fontSize: 13 }}>
+                    {note}
+                  </p>
+                )}
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+
+      {drills.length > 0 && (
+        <>
+          <div className="divider" />
+          <h3>🧩 Warm-up drills — fill in the blank</h3>
           <p className="dim" style={{ marginTop: -4 }}>
             Everything is written except the one piece this lesson teaches. Replace{" "}
             <code>____</code>, then press <strong>Check</strong>.
           </p>
-          {exercises.map((ex, i) => (
+          {drills.map((ex, i) => (
             <ExerciseCard
               key={ex.id}
               index={i + 1}
@@ -350,24 +443,41 @@ function ConceptDetail({
         </>
       )}
 
-      {conceptLang(concept) !== "japanese" && (
+      {challenges.length > 0 && (
         <>
           <div className="divider" />
-          <h3>Practice this concept</h3>
-          {related.length === 0 ? (
-            <div className="dim">No problems tagged with this concept yet.</div>
-          ) : (
-            <div className="grid cols-2">
-              {related.map((p) => (
-                <div key={p.id} className="card" style={{ cursor: "pointer" }} onClick={() => nav(`/solve/${p.id}`)}>
-                  <div className="row">
-                    <strong>{p.title}</strong>
-                    <DiffBadge d={p.difficulty} />
-                  </div>
+          <h3>🏆 Coding challenge</h3>
+          <p className="dim" style={{ marginTop: -4 }}>
+            Now put it together. This is a complete little problem using only what
+            you&rsquo;ve learned so far — write the whole solution where you see{" "}
+            <code>____</code>, then <strong>Check</strong>. Stuck? Reveal the solution.
+          </p>
+          {challenges.map((ex, i) => (
+            <ExerciseCard
+              key={ex.id}
+              index={i + 1}
+              exercise={ex}
+              challenge
+              source={ex.source_slug ? bySlug.get(ex.source_slug) : undefined}
+            />
+          ))}
+        </>
+      )}
+
+      {conceptLang(concept) !== "japanese" && related.length > 0 && (
+        <>
+          <div className="divider" />
+          <h3>Practice more in the Library</h3>
+          <div className="grid cols-2">
+            {related.map((p) => (
+              <div key={p.id} className="card" style={{ cursor: "pointer" }} onClick={() => nav(`/solve/${p.id}`)}>
+                <div className="row">
+                  <strong>{p.title}</strong>
+                  <DiffBadge d={p.difficulty} />
                 </div>
-              ))}
-            </div>
-          )}
+              </div>
+            ))}
+          </div>
         </>
       )}
     </div>
@@ -378,10 +488,12 @@ function ExerciseCard({
   index,
   exercise,
   source,
+  challenge = false,
 }: {
   index: number;
   exercise: Exercise;
   source?: Problem;
+  challenge?: boolean;
 }) {
   const nav = useNavigate();
   const storeKey = `poodcode:learn-ex:${exercise.id}`;
@@ -395,9 +507,11 @@ function ExerciseCard({
   const [showHint, setShowHint] = useState(false);
   const [showSolution, setShowSolution] = useState(false);
 
+  // Challenges are written from scratch, so give them a roomier editor than a
+  // short fill-in-the-blank drill (whose starter already sizes it well).
   const height = Math.min(
-    Math.max(exercise.starter.split("\n").length * 20 + 24, 150),
-    480
+    Math.max(exercise.starter.split("\n").length * 20 + 24, challenge ? 260 : 150),
+    challenge ? 560 : 480
   );
 
   function update(v: string) {
@@ -441,13 +555,25 @@ function ExerciseCard({
   return (
     <div
       className="card"
-      style={{ marginBottom: 14, borderColor: solved ? "var(--good)" : undefined }}
+      style={{
+        marginBottom: 14,
+        borderColor: solved
+          ? "var(--good)"
+          : challenge
+          ? "var(--accent)"
+          : undefined,
+      }}
     >
       <div className="row" style={{ justifyContent: "space-between" }}>
         <strong>
           {index}. {exercise.title} {solved && <span style={{ color: "var(--good)" }}>✓</span>}
         </strong>
-        <span className="badge">{lang}</span>
+        <span className="row" style={{ gap: 6 }}>
+          {challenge && exercise.difficulty && (
+            <span className={`badge diff ${exercise.difficulty}`}>{exercise.difficulty}</span>
+          )}
+          <span className="badge">{lang}</span>
+        </span>
       </div>
       <p style={{ margin: "6px 0 10px" }}>{exercise.prompt}</p>
 
@@ -518,6 +644,139 @@ function ExerciseCard({
           >
             Open “{source.title}” →
           </a>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/** A language-agnostic multiple-choice self-check quiz. Graded entirely on the
+ * client by comparing the picked option index — no code execution. Tracks a
+ * running score across the concept's questions. */
+function QuizSection({ questions }: { questions: QuizQuestion[] }) {
+  // picked[i] = the option index the user chose for question i, or -1 if unanswered.
+  const [picked, setPicked] = useState<number[]>(() => questions.map(() => -1));
+
+  const answered = picked.filter((p) => p >= 0).length;
+  const correct = picked.filter((p, i) => p === questions[i].answer).length;
+
+  return (
+    <div>
+      {answered > 0 && (
+        <div className="row" style={{ marginBottom: 10, gap: 8, alignItems: "center" }}>
+          <span
+            className="badge"
+            style={{
+              borderColor: correct === questions.length ? "var(--good)" : "var(--accent)",
+              color: correct === questions.length ? "var(--good)" : "var(--accent)",
+            }}
+          >
+            Score {correct}/{questions.length}
+          </span>
+          <span className="dim" style={{ fontSize: 12 }}>
+            {answered}/{questions.length} answered
+          </span>
+          {answered > 0 && (
+            <button
+              className="ghost"
+              style={{ padding: "2px 8px", fontSize: 12 }}
+              onClick={() => setPicked(questions.map(() => -1))}
+            >
+              Reset
+            </button>
+          )}
+        </div>
+      )}
+      {questions.map((q, qi) => (
+        <QuizItem
+          key={qi}
+          index={qi + 1}
+          question={q}
+          picked={picked[qi]}
+          onPick={(oi) =>
+            setPicked((prev) => {
+              if (prev[qi] >= 0) return prev; // lock the first answer
+              const next = [...prev];
+              next[qi] = oi;
+              return next;
+            })
+          }
+        />
+      ))}
+    </div>
+  );
+}
+
+function QuizItem({
+  index,
+  question,
+  picked,
+  onPick,
+}: {
+  index: number;
+  question: QuizQuestion;
+  picked: number;
+  onPick: (optionIndex: number) => void;
+}) {
+  const answered = picked >= 0;
+  const isRight = picked === question.answer;
+
+  return (
+    <div
+      className="card"
+      style={{
+        marginBottom: 12,
+        borderColor: answered ? (isRight ? "var(--good)" : "var(--bad)") : undefined,
+      }}
+    >
+      <strong>
+        {index}. {question.question}
+      </strong>
+      <div style={{ display: "flex", flexDirection: "column", gap: 6, marginTop: 10 }}>
+        {question.options.map((opt, oi) => {
+          let border: string | undefined;
+          let color: string | undefined;
+          if (answered) {
+            if (oi === question.answer) {
+              border = "var(--good)";
+              color = "var(--good)";
+            } else if (oi === picked) {
+              border = "var(--bad)";
+              color = "var(--bad)";
+            }
+          }
+          return (
+            <button
+              key={oi}
+              className="ghost"
+              style={{ textAlign: "left", borderColor: border, color, padding: "8px 12px" }}
+              onClick={() => onPick(oi)}
+              disabled={answered}
+            >
+              {answered && oi === question.answer && "✓ "}
+              {answered && oi === picked && oi !== question.answer && "✗ "}
+              {opt}
+            </button>
+          );
+        })}
+      </div>
+      {answered && (
+        <div
+          className="card"
+          style={{
+            marginTop: 10,
+            marginBottom: 0,
+            background: "var(--accent-dim)",
+            borderColor: isRight ? "var(--good)" : "var(--bad)",
+          }}
+        >
+          <div
+            className="io-label"
+            style={{ color: isRight ? "var(--good)" : "var(--bad)" }}
+          >
+            {isRight ? "Correct" : "Not quite"}
+          </div>
+          <p style={{ margin: 0 }}>{question.explanation}</p>
         </div>
       )}
     </div>

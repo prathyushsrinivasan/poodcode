@@ -49,6 +49,10 @@ export interface Exercise {
   prompt: string;
   hint: string;
   language: string;
+  /** "drill" (fill-in-the-blank, default) or "challenge" (full coding problem). */
+  kind: string;
+  /** Suggested difficulty for a challenge: "Intro" | "Easy" | "Medium". */
+  difficulty: string;
   starter: string;
   solution: string;
   tests: ExerciseTest[];
@@ -61,6 +65,19 @@ export interface Card {
   meaning: string;
   example_ja: string;
   example_en: string;
+}
+
+export interface QuizQuestion {
+  question: string;
+  options: string[];
+  /** 0-based index into `options`. */
+  answer: number;
+  explanation: string;
+}
+
+export interface PracticeRef {
+  slug: string;
+  note: string;
 }
 
 export interface BridgeProblem {
@@ -106,6 +123,8 @@ export interface Concept {
   lesson: string;
   exercises: Exercise[];
   cards: Card[];
+  quiz: QuizQuestion[];
+  practice: PracticeRef[];
 }
 
 export interface TestCase {

@@ -33,7 +33,8 @@ def _P(src):
     return src.lstrip("\n").rstrip() + "\n"
 
 
-def tsx(eid, title, prompt, full, blanks, tests, hint="", source_slug=None):
+def tsx(eid, title, prompt, full, blanks, tests, hint="", source_slug=None,
+        kind="drill", difficulty=""):
     """Like gen_seed.ex(), but tags the drill as TypeScript."""
     starter = full
     for b in blanks:
@@ -47,11 +48,25 @@ def tsx(eid, title, prompt, full, blanks, tests, hint="", source_slug=None):
         "prompt": prompt,
         "hint": hint,
         "language": "typescript",
+        "kind": kind,
+        "difficulty": difficulty,
         "starter": starter,
         "solution": full,
         "tests": [{"input": i, "output": o} for (i, o) in tests],
         "source_slug": source_slug or "",
     }
+
+
+def tsc(eid, title, difficulty, prompt, full, blank, tests, hint=""):
+    """A TypeScript *coding challenge*: a fuller, self-contained problem (not a
+    one-liner). `full` is the complete reference program; `blank` is the solution
+    region replaced by a single `____` so the learner writes the real logic. The
+    starter keeps the input-reading scaffold; everything the lesson asks for lives
+    in the blanked region. Tagged kind="challenge" so the Learn UI renders it in
+    its own section with a difficulty badge."""
+    e = tsx(eid, title, prompt, full, [blank], tests, hint,
+            kind="challenge", difficulty=difficulty)
+    return e
 
 
 # Standard input-reading preamble reused across drills. Reading stdin is

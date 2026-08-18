@@ -28,6 +28,37 @@ pub struct Concept {
     /// for code concepts, which teach via `lesson` + `exercises` instead.
     #[serde(default)]
     pub cards: Vec<Card>,
+    /// Multiple-choice self-check questions (language-agnostic Algorithms
+    /// track). Graded client-side by option index — no code execution. Empty
+    /// for concepts that teach through code drills instead.
+    #[serde(default)]
+    pub quiz: Vec<QuizQuestion>,
+    /// Curated real Library problems to practice this concept on. Resolved to a
+    /// problem by `slug` in the frontend, so the lesson can hand the learner
+    /// straight into the solver. Empty when there is nothing linked.
+    #[serde(default)]
+    pub practice: Vec<PracticeRef>,
+}
+
+/// One multiple-choice question for a concept's self-check quiz. `answer` is the
+/// 0-based index into `options`; `explanation` is shown after the learner picks.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct QuizQuestion {
+    pub question: String,
+    #[serde(default)]
+    pub options: Vec<String>,
+    #[serde(default)]
+    pub answer: i64,
+    #[serde(default)]
+    pub explanation: String,
+}
+
+/// A pointer from a concept to a real Library problem to practice it on.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct PracticeRef {
+    pub slug: String,
+    #[serde(default)]
+    pub note: String,
 }
 
 /// One vocabulary flashcard: a term on the front, its reading / meaning /
@@ -65,6 +96,15 @@ pub struct Exercise {
     pub hint: String,
     #[serde(default)]
     pub language: String,
+    /// "drill" (short fill-in-the-blank, the default) or "challenge" (a fuller,
+    /// self-contained coding problem scoped to the syllabus so far). Empty is
+    /// treated as "drill" by the frontend.
+    #[serde(default)]
+    pub kind: String,
+    /// Suggested difficulty for a challenge ("Intro" | "Easy" | "Medium").
+    /// Empty for plain drills.
+    #[serde(default)]
+    pub difficulty: String,
     pub starter: String,
     pub solution: String,
     pub tests: Vec<ExerciseTest>,

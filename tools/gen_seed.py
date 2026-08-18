@@ -2770,7 +2770,8 @@ def prog(body):
     )
 
 
-def ex(eid, title, prompt, full, blanks, tests, hint="", source_slug=None):
+def ex(eid, title, prompt, full, blanks, tests, hint="", source_slug=None,
+       kind="drill", difficulty=""):
     starter = full
     for b in blanks:
         assert b in full, f"exercise {eid}: blank not found in solution: {b!r}"
@@ -2783,6 +2784,8 @@ def ex(eid, title, prompt, full, blanks, tests, hint="", source_slug=None):
         "prompt": prompt,
         "hint": hint,
         "language": "java",
+        "kind": kind,
+        "difficulty": difficulty,
         "starter": starter,
         "solution": full,
         "tests": [{"input": i, "output": o} for (i, o) in tests],
@@ -3484,6 +3487,8 @@ def build_concepts():
             "lesson": LESSONS.get(key, ""),
             "exercises": EXERCISES.get(key, []),
             "cards": c.get("cards", []),
+            "quiz": c.get("quiz", []),
+            "practice": c.get("practice", []),
         })
     return cats
 
@@ -5989,6 +5994,14 @@ if os.path.exists(_ts_path):
     with open(_ts_path, encoding="utf-8") as _tf:
         exec(compile(_tf.read(), _ts_path, "exec"))
 
+# TypeScript expansion — one coding challenge per foundational concept, plus
+# two new foundational concepts (Numbers & Math, String Methods). Runs after
+# typescript_defs.py so it can reuse tsx/tsc/_P and extend EXERCISES in place.
+_tse_path = os.path.join(HERE, "typescript_expand.py")
+if os.path.exists(_tse_path):
+    with open(_tse_path, encoding="utf-8") as _tef:
+        exec(compile(_tef.read(), _tse_path, "exec"))
+
 
 # ---------------------------------------------------------------------------
 # Japanese coding-vocabulary Learn track — a THIRD "language" for the Learn
@@ -6007,6 +6020,20 @@ _jpb_path = os.path.join(HERE, "japanese_bridge.py")
 if os.path.exists(_jpb_path):
     with open(_jpb_path, encoding="utf-8") as _jpbf:
         exec(compile(_jpbf.read(), _jpb_path, "exec"))
+
+
+# ---------------------------------------------------------------------------
+# Language-agnostic Algorithms Learn track — a FOURTH "language" for the Learn
+# tab. Concepts teach the algorithm itself (pseudocode, complexity, worked
+# trace tables) plus multiple-choice quizzes and curated practice-problem
+# pointers — no code judge, each marked "language": "algorithms". Extends
+# CONCEPTS / CATEGORY / LESSONS in place. No SEED_VERSION / SQLite impact —
+# concepts are embedded JSON.
+# ---------------------------------------------------------------------------
+_alg_path = os.path.join(HERE, "algorithms_defs.py")
+if os.path.exists(_alg_path):
+    with open(_alg_path, encoding="utf-8") as _algf:
+        exec(compile(_algf.read(), _alg_path, "exec"))
 
 
 # ---------------------------------------------------------------------------
