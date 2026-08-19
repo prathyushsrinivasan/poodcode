@@ -48,11 +48,23 @@ function sample<T>(xs: T[], n: number, not: (x: T) => boolean): T[] {
 
 type Mode = "flip" | "choice" | "cloze" | "type";
 
-const MODES: { id: Mode; label: string }[] = [
+/** Study variant. "japanese" decks carry a rōmaji reading (Type mode) and
+ * example sentences; "vocab" decks (e.g. the Java vocabulary track) instead
+ * carry a textbook line, a plain-English line, and a code snippet, so the
+ * rōmaji Type mode is dropped and the card back is laid out differently. */
+export type StudyVariant = "japanese" | "vocab";
+
+const JP_MODES: { id: Mode; label: string }[] = [
   { id: "flip", label: "🔄 Flip" },
   { id: "choice", label: "🔘 Choice" },
   { id: "cloze", label: "✍️ Cloze" },
   { id: "type", label: "⌨️ Type reading" },
+];
+
+const VOCAB_MODES: { id: Mode; label: string }[] = [
+  { id: "flip", label: "🔄 Flip" },
+  { id: "choice", label: "🔘 Choice" },
+  { id: "cloze", label: "✍️ Code cloze" },
 ];
 
 const GRADES: { q: number; label: string; hint: string; color?: string }[] = [
@@ -79,7 +91,16 @@ const BLANK = "＿＿＿";
  * (correct → Good, wrong → Again): multiple Choice, Cloze (fill the blank in
  * the example sentence), and Type (the romaji reading).
  */
-export function CardStudy({ conceptKey, cards }: { conceptKey: string; cards: Card[] }) {
+export function CardStudy({
+  conceptKey,
+  cards,
+  variant = "japanese",
+}: {
+  conceptKey: string;
+  cards: Card[];
+  variant?: StudyVariant;
+}) {
+  const modes = variant === "vocab" ? VOCAB_MODES : JP_MODES;
   const ids = useMemo(() => cards.map((c) => cardId(conceptKey, c.front)), [cards, conceptKey]);
   const [reviews, setReviews] = useState<Map<string, CardReview>>(new Map());
   const [loading, setLoading] = useState(true);
@@ -261,7 +282,7 @@ export function CardStudy({ conceptKey, cards }: { conceptKey: string; cards: Ca
       {/* header: mode switch + progress */}
       <div className="row" style={{ justifyContent: "space-between", flexWrap: "wrap", gap: 8 }}>
         <div className="row" style={{ gap: 6, flexWrap: "wrap" }}>
-          {MODES.map((m) => (
+          {modes.map((m) => (
             <button
               key={m.id}
               className={mode === m.id ? "" : "ghost"}
@@ -308,7 +329,7 @@ export function CardStudy({ conceptKey, cards }: { conceptKey: string; cards: Ca
           >
             <div style={{ fontSize: 40, fontWeight: 600 }}>{current.front}</div>
             {revealed ? (
-              <CardBack card={current} />
+              <CardBack card={current} variant={variant} />
             ) : (
               <p className="dim" style={{ marginTop: 16, marginBottom: 0, fontSize: 13 }}>
                 Tap to reveal
@@ -340,6 +361,7 @@ export function CardStudy({ conceptKey, cards }: { conceptKey: string; cards: Ca
             setAnswered(true);
           }}
           card={current}
+          variant={variant}
           onNext={() => grade(picked === quiz.answer ? 2 : 0)}
         />
       )}
@@ -357,6 +379,7 @@ export function CardStudy({ conceptKey, cards }: { conceptKey: string; cards: Ca
             setAnswered(true);
           }}
           card={current}
+          variant={variant}
           onNext={() => grade(picked === quiz.answer ? 2 : 0)}
         />
       )}
@@ -406,7 +429,7 @@ export function CardStudy({ conceptKey, cards }: { conceptKey: string; cards: Ca
                 >
                   {normRomaji(typed) === quiz.accepted ? "Correct!" : "Not quite"}
                 </div>
-                <CardBack card={current} />
+                <CardBack card={current} variant={variant} />
               </div>
             )}
           </div>
@@ -429,7 +452,33 @@ export function CardStudy({ conceptKey, cards }: { conceptKey: string; cards: Ca
 
 /* --------------------------------------------------------------- subviews */
 
-function CardBack({ card }: { card: Card }) {
+function CardBack({ card, variant = "japanese" }: { card: Card; variant?: StudyVariant }) {
+  if (variant === "vocab") {
+    // Java-vocab layout: textbook line, plain-English line, then a code snippet.
+    // (meaning = textbook, example_en = plain English, example_ja = code.)
+    return (
+      <div style={{ marginTop: 14, width: "100%", maxWidth: 560, textAlign: "left" }}>
+        <div style={{ fontSize: 12, color: "var(--accent)", marginBottom: 2 }}>Textbook</div>
+        <div style={{ fontSize: 16, marginBottom: 12 }}>{card.meaning}</div>
+        <div style={{ fontSize: 12, color: "var(--accent)", marginBottom: 2 }}>In plain English</div>
+        <div style={{ fontSize: 15, marginBottom: card.example_ja ? 12 : 0 }}>{card.example_en}</div>
+        {card.example_ja && (
+          <pre
+            style={{
+              margin: 0,
+              padding: "8px 10px",
+              borderRadius: 6,
+              background: "var(--bg-elev-2)",
+              fontSize: 13,
+              overflowX: "auto",
+            }}
+          >
+            <code>{card.example_ja}</code>
+          </pre>
+        )}
+      </div>
+    );
+  }
   return (
     <div style={{ marginTop: 14, width: "100%", maxWidth: 520 }}>
       <div style={{ fontSize: 15, color: "var(--accent)", marginBottom: 4 }}>{card.reading}</div>
@@ -475,6 +524,7 @@ function ChoiceQuiz({
   onPick,
   onNext,
   card,
+  variant = "japanese",
 }: {
   promptBig: boolean;
   prompt: string;
@@ -485,6 +535,7 @@ function ChoiceQuiz({
   onPick: (opt: string) => void;
   onNext: () => void;
   card: Card;
+  variant?: StudyVariant;
 }) {
   return (
     <div>
@@ -516,7 +567,7 @@ function ChoiceQuiz({
       {answered && (
         <>
           <div className="card" style={{ marginTop: 12, textAlign: "center" }}>
-            <CardBack card={card} />
+            <CardBack card={card} variant={variant} />
           </div>
           <div className="row" style={{ marginTop: 12 }}>
             <button onClick={onNext}>Next →</button>

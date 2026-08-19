@@ -6055,6 +6055,19 @@ if os.path.exists(_jc2_path):
 
 
 # ---------------------------------------------------------------------------
+# Java vocabulary track — ~280 reference terms (14 chapters), each with a
+# textbook definition + a plain-English gloss + example, plus flashcards and a
+# self-check quiz. Marked language="java_vocab" so it shows under its own 📖
+# Java Vocab toggle in the Learn tab. Extends CONCEPTS / CATEGORY / LESSONS in
+# place; concepts are embedded JSON so there's no SEED_VERSION / SQLite impact.
+# ---------------------------------------------------------------------------
+_jv_path = os.path.join(HERE, "java_vocab_defs.py")
+if os.path.exists(_jv_path):
+    with open(_jv_path, encoding="utf-8") as _jvf:
+        exec(compile(_jvf.read(), _jv_path, "exec"))
+
+
+# ---------------------------------------------------------------------------
 # Build JSON
 # ---------------------------------------------------------------------------
 

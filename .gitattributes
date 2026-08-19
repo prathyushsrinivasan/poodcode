@@ -9,3 +9,4 @@ tools/java_core2_drills.py text eol=lf
 tools/japanese_defs.py text eol=lf
 tools/japanese_bridge.py text eol=lf
 tools/algorithms_defs.py text eol=lf
+tools/java_vocab_defs.py text eol=lf

@@ -45,6 +45,21 @@ const CATEGORY_ORDER = [
   "Algo: Searching & Scanning",
   "Algo: Sorting",
   "Algo: Recursion",
+  // Java vocabulary track (shown under the 📖 Java Vocab toggle)
+  "JV: Language Core",
+  "JV: OOP",
+  "JV: Modifiers",
+  "JV: Types",
+  "JV: Collections",
+  "JV: Generics",
+  "JV: Exceptions",
+  "JV: Concurrency",
+  "JV: Functional",
+  "JV: JVM & Memory",
+  "JV: Strings",
+  "JV: I/O",
+  "JV: Tooling",
+  "JV: Modern Java",
 ];
 
 // A concept with no explicit language is legacy Java content.
@@ -55,6 +70,7 @@ const LANG_TABS: { id: string; label: string }[] = [
   { id: "typescript", label: "TypeScript" },
   { id: "japanese", label: "日本語" },
   { id: "algorithms", label: "🧠 Algorithms" },
+  { id: "java_vocab", label: "📖 Java Vocab" },
 ];
 
 // Human-readable name for a Learn language, used in headings and card labels.
@@ -63,6 +79,7 @@ const LANG_LABEL: Record<string, string> = {
   typescript: "TypeScript",
   japanese: "Japanese",
   algorithms: "Algorithms",
+  java_vocab: "Java Vocab",
 };
 const langLabel = (id: string) => LANG_LABEL[id] || "Java";
 const LANG_STORE_KEY = "poodcode:learn-lang";
@@ -140,6 +157,7 @@ export default function Learn() {
   const isTs = lang === "typescript";
   const isJp = lang === "japanese";
   const isAlg = lang === "algorithms";
+  const isVocab = lang === "java_vocab";
 
   return (
     <div className="page">
@@ -160,7 +178,16 @@ export default function Learn() {
         )}
       </div>
       <p className="page-sub">
-        {isAlg ? (
+        {isVocab ? (
+          <>
+            {shownCount} Java vocabulary chapters — <strong>266 terms</strong>, each with a
+            crisp <strong>textbook definition</strong> and a{" "}
+            <strong>plain-English</strong> "what it actually means" line, plus a tiny example.
+            Skim the glossary, drill it with <strong>🎴 spaced-repetition flashcards</strong>,
+            and <strong>❓ quiz yourself</strong>. New here? Start with{" "}
+            <strong>JV: Language Core → Keywords &amp; Syntax</strong>.
+          </>
+        ) : isAlg ? (
           <>
             {shownCount} <strong>language-agnostic</strong> algorithm lessons — the idea,
             pseudocode, worked traces, and cost of each technique, with{" "}
@@ -268,16 +295,16 @@ export default function Learn() {
                                 🏆 challenge
                               </span>
                             )}
-                            {quizN > 0 && (
-                              <span
-                                className="badge"
-                                title="Multiple-choice self-check quiz"
-                                style={{ borderColor: "var(--accent)", color: "var(--accent)" }}
-                              >
-                                ❓ {quizN} quiz
-                              </span>
-                            )}
                           </>
+                        )}
+                        {quizN > 0 && (
+                          <span
+                            className="badge"
+                            title="Multiple-choice self-check quiz"
+                            style={{ borderColor: "var(--accent)", color: "var(--accent)" }}
+                          >
+                            ❓ {quizN} quiz
+                          </span>
                         )}
                       </span>
                     </div>
@@ -359,6 +386,8 @@ function ConceptDetail({
             ? "How to read this"
             : conceptLang(concept) === "algorithms"
             ? "At a glance"
+            : conceptLang(concept) === "java_vocab"
+            ? "How to use this set"
             : `In ${langLabel(conceptLang(concept))}`}
         </div>
         <Markdown>{concept.java}</Markdown>
@@ -376,7 +405,11 @@ function ConceptDetail({
       )}
 
       {cards.length > 0 && mode === "cards" ? (
-        <CardStudy conceptKey={concept.key} cards={cards} />
+        <CardStudy
+          conceptKey={concept.key}
+          cards={cards}
+          variant={conceptLang(concept) === "japanese" ? "japanese" : "vocab"}
+        />
       ) : (
         <Markdown>{concept.lesson}</Markdown>
       )}
