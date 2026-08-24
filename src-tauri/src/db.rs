@@ -245,6 +245,41 @@ CREATE TABLE IF NOT EXISTS card_reviews (
   created_at     TEXT    NOT NULL DEFAULT (datetime('now'))
 );
 CREATE INDEX IF NOT EXISTS idx_card_reviews_due ON card_reviews(due_date);
+
+-- Learn-tab chapter completion. This used to live in localStorage, which meant
+-- it was invisible to backup/restore and lost when site data was cleared. The
+-- concept *content* stays in the embedded seeds/concepts.json; only which
+-- chapters the learner has finished is stored here.
+CREATE TABLE IF NOT EXISTS chapter_progress (
+  concept_key  TEXT PRIMARY KEY,
+  done_at      TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+-- 6-Month Mastery progress, one row per (track, week). The curriculum itself is
+-- embedded content (seeds/mastery.json); this is purely the learner's state, so
+-- it is covered by backup/restore like every other kind of progress.
+CREATE TABLE IF NOT EXISTS mastery_progress (
+  track_key      TEXT    NOT NULL,
+  week           INTEGER NOT NULL,
+  -- Best end-of-week multiple-choice score as a percentage; -1 = never taken.
+  best_quiz      INTEGER NOT NULL DEFAULT -1,
+  -- Whether the week's coding final has been accepted by the judge.
+  exam_passed    INTEGER NOT NULL DEFAULT 0,
+  exam_code      TEXT    NOT NULL DEFAULT '',
+  -- The week's build project: free-form notes plus the code, and a done flag.
+  project_notes  TEXT    NOT NULL DEFAULT '',
+  project_code   TEXT    NOT NULL DEFAULT '',
+  project_done   INTEGER NOT NULL DEFAULT 0,
+  -- Time spent with this week open, mirrored into daily_sessions for the stats
+  -- heatmap so mastery study counts towards the streak like everything else.
+  study_seconds  INTEGER NOT NULL DEFAULT 0,
+  -- Set the first time the week is opened / completed. completed_at is also the
+  -- idempotency guard for seeding the week's flashcards and reviews.
+  started_at     TEXT,
+  completed_at   TEXT,
+  PRIMARY KEY (track_key, week)
+);
+CREATE INDEX IF NOT EXISTS idx_mastery_track ON mastery_progress(track_key);
 "#;
 
 /// Open (creating if needed) the database at `path`, applying the schema.

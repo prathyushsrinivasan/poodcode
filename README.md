@@ -162,7 +162,16 @@ Markdown Notes with section templates · **Prerequisites checklist** (per-proble
 concepts you check off as known, each expandable into "what it is" + "how it
 helps *this* problem, with a deeper dive, Java-specific guidance, and a link to
 the full lesson) · **Learn** section (a per-concept teaching page with a worked
-example, Java code, and pitfalls) · Spaced-Repetition Revision
+example, code, and pitfalls; every section collapsible, and every Java and
+TypeScript chapter pairs its fill-in-the-blank drills with a full coding
+challenge) · **6-Month Mastery** (two tracks — TypeScript and Java — each
+sequencing the Learn catalog into 26 gated weeks: chapters, curated problems, a
+build project with its own notes + code workspace, a shuffled multiple-choice
+quiz drawn from a per-week bank, and a **judged coding final**; a week unlocks
+the next only when chapters, quiz and final are all cleared, completed weeks
+feed their material into the flashcard and revision queues, study time flows
+into the heatmap, and pacing is tracked against a start date) ·
+Spaced-Repetition Revision
 (1→3→7→14→30→90 ladder, grade/snooze/manual) · Attempt History + Code
 Comparison (first vs latest) · Progressive Hint System · Complexity Analyzer
 (heuristic estimate vs optimal, with explanation) · Statistics (per

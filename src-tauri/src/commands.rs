@@ -2,7 +2,7 @@ use std::sync::Mutex;
 use std::time::Duration;
 
 use chrono::Local;
-use rusqlite::Connection;
+use rusqlite::{Connection, OptionalExtension};
 use serde::Serialize;
 use tauri::State;
 
@@ -39,6 +39,33 @@ pub fn concepts() -> AppResult<Vec<crate::models::Concept>> {
     Ok(serde_json::from_str(CONCEPTS_JSON)?)
 }
 
+/// The SQL track's shared databases (authored in tools/sql_defs.py). Kept out of
+/// concepts.json so a schema used by six chapters is stored once, not six times.
+const SQL_DATASETS_JSON: &str = include_str!("../seeds/sql_datasets.json");
+
+#[tauri::command]
+pub fn sql_datasets() -> AppResult<Vec<crate::models::SqlDataset>> {
+    Ok(serde_json::from_str(SQL_DATASETS_JSON)?)
+}
+
+/// Run SQL against a throwaway in-memory database built from `setup`, returning
+/// the result grid rather than a pass/fail verdict. This is the SQL track's
+/// equivalent of the editor's scratch Run box: it powers the "Run query" button,
+/// so a learner can look at what their query actually returns while working
+/// toward the expected answer.
+#[tauri::command]
+pub fn sql_query(setup: String, sql: String) -> AppResult<crate::sqlexec::SqlOut> {
+    Ok(crate::sqlexec::run(&setup, &sql, RUN_TIMEOUT))
+}
+
+/// Introspect a dataset for the schema/data browser: every table with its
+/// `CREATE TABLE` text, column metadata and rows. Joins are unlearnable without
+/// being able to see the rows you are joining, so this is not a nicety.
+#[tauri::command]
+pub fn sql_tables(setup: String) -> AppResult<Vec<crate::sqlexec::SqlTable>> {
+    crate::sqlexec::dataset_tables(&setup).map_err(AppError::Other)
+}
+
 /// Japanese → Java bridge content (problem statements in Japanese + interview
 /// Q&A), authored in tools/japanese_bridge.py.
 const JP_BRIDGE_JSON: &str = include_str!("../seeds/jp_bridge.json");
@@ -46,6 +73,17 @@ const JP_BRIDGE_JSON: &str = include_str!("../seeds/jp_bridge.json");
 #[tauri::command]
 pub fn jp_bridge() -> AppResult<crate::models::JpBridge> {
     Ok(serde_json::from_str(JP_BRIDGE_JSON)?)
+}
+
+/// The 6-Month Mastery programme — the concept catalog sequenced into weeks
+/// (authored in tools/mastery_defs.py, which validates every concept key and
+/// problem slug it references at generation time). Read-only content; the
+/// learner's progress lives in `mastery_progress` so backup/restore covers it.
+const MASTERY_JSON: &str = include_str!("../seeds/mastery.json");
+
+#[tauri::command]
+pub fn mastery() -> AppResult<Vec<crate::models::MasteryTrack>> {
+    Ok(serde_json::from_str(MASTERY_JSON)?)
 }
 
 // ---------------------------------------------------------------------------
@@ -959,4 +997,182 @@ pub fn log_study_time(state: State<'_, AppState>, seconds: i64) -> AppResult<()>
 pub fn timeline(state: State<'_, AppState>) -> AppResult<Vec<stats::CountPair>> {
     let st = stats::compute(&state.conn())?;
     Ok(st.monthly_activity)
+}
+
+// ---------------------------------------------------------------------------
+// Learn-tab chapter completion + 6-Month Mastery progress
+// ---------------------------------------------------------------------------
+
+#[tauri::command]
+pub fn done_chapters(state: State<'_, AppState>) -> AppResult<Vec<String>> {
+    repo::done_chapters(&state.conn())
+}
+
+#[tauri::command]
+pub fn set_chapter_done(
+    state: State<'_, AppState>,
+    key: String,
+    done: bool,
+) -> AppResult<()> {
+    repo::set_chapter_done(&state.conn(), &key, done)
+}
+
+#[tauri::command]
+pub fn mastery_progress(state: State<'_, AppState>) -> AppResult<Vec<MasteryProgress>> {
+    repo::mastery_progress(&state.conn())
+}
+
+#[tauri::command]
+pub fn mastery_record_quiz(
+    state: State<'_, AppState>,
+    track_key: String,
+    week: i64,
+    percent: i64,
+) -> AppResult<()> {
+    repo::mastery_record_quiz(&state.conn(), &track_key, week, percent)
+}
+
+#[tauri::command]
+pub fn mastery_record_exam(
+    state: State<'_, AppState>,
+    track_key: String,
+    week: i64,
+    passed: bool,
+    code: String,
+) -> AppResult<()> {
+    repo::mastery_record_exam(&state.conn(), &track_key, week, passed, &code)
+}
+
+#[tauri::command]
+pub fn mastery_save_project(
+    state: State<'_, AppState>,
+    track_key: String,
+    week: i64,
+    notes: String,
+    code: String,
+    done: bool,
+) -> AppResult<()> {
+    repo::mastery_save_project(&state.conn(), &track_key, week, &notes, &code, done)
+}
+
+#[tauri::command]
+pub fn mastery_log_time(
+    state: State<'_, AppState>,
+    track_key: String,
+    week: i64,
+    seconds: i64,
+) -> AppResult<()> {
+    repo::mastery_log_time(&state.conn(), &track_key, week, seconds)
+}
+
+/// Finish a week: stamp it complete and, the FIRST time only, fold its material
+/// into the app's spaced repetition — one flashcard per concept studied, and a
+/// review entry for every curated problem the learner actually solved.
+///
+/// Without this, Week 3 is genuinely gone by Week 20, which is the failure mode
+/// of every long curriculum. The frontend decides *when* a week is complete
+/// (chapters done + quiz passed + coding final accepted); this command owns the
+/// consequences, because only the backend has the curriculum and problem bank.
+#[tauri::command]
+pub fn mastery_complete_week(
+    state: State<'_, AppState>,
+    track_key: String,
+    week: i64,
+) -> AppResult<bool> {
+    let conn = state.conn();
+    if !repo::mastery_mark_complete(&conn, &track_key, week)? {
+        return Ok(false); // already completed — nothing to seed again
+    }
+
+    let tracks: Vec<MasteryTrack> = serde_json::from_str(MASTERY_JSON)?;
+    let Some(track) = tracks.iter().find(|t| t.key == track_key) else {
+        return Ok(true);
+    };
+    let Some(w) = track.weeks.iter().find(|w| w.week == week) else {
+        return Ok(true);
+    };
+
+    // One card per concept: the chapter name on the front, its one-line summary
+    // on the back. Seeded idempotently by (front, source).
+    let concepts: Vec<Concept> = serde_json::from_str(CONCEPTS_JSON)?;
+    let source = format!("mastery:{track_key}:w{week}");
+    for key in &w.concepts {
+        if let Some(c) = concepts.iter().find(|c| &c.key == key) {
+            if !c.what.trim().is_empty() {
+                repo::seed_flashcard_if_absent(&conn, &c.name, &c.what, &source)?;
+            }
+        }
+    }
+
+    // Put the week's solved problems into the revision queue. Unsolved ones are
+    // skipped — scheduling a review for something never solved would just
+    // clutter the queue.
+    for p in &w.problems {
+        if let Some(id) = repo::problem_id_for_slug(&conn, &p.slug)? {
+            let solved: bool = conn
+                .query_row(
+                    "SELECT solved_status = 'solved' FROM problems WHERE id = ?1",
+                    rusqlite::params![id],
+                    |r| r.get(0),
+                )
+                .unwrap_or(false);
+            if solved {
+                repo::schedule_after_solve(&conn, id)?;
+            }
+        }
+    }
+
+    Ok(true)
+}
+
+/// Create (once) the timed checkpoint contest attached to a week, and return
+/// its id so the UI can jump straight into it. Reuses the existing Contest
+/// machinery rather than inventing a second timer.
+#[tauri::command]
+pub fn mastery_start_contest(
+    state: State<'_, AppState>,
+    track_key: String,
+    week: i64,
+) -> AppResult<i64> {
+    let conn = state.conn();
+    let tracks: Vec<MasteryTrack> = serde_json::from_str(MASTERY_JSON)?;
+    let track = tracks
+        .iter()
+        .find(|t| t.key == track_key)
+        .ok_or_else(|| AppError::NotFound("mastery track".into()))?;
+    let w = track
+        .weeks
+        .iter()
+        .find(|w| w.week == week)
+        .ok_or_else(|| AppError::NotFound("mastery week".into()))?;
+    let contest = w
+        .contest
+        .as_ref()
+        .ok_or_else(|| AppError::NotFound("week checkpoint contest".into()))?;
+
+    // Reuse an existing contest with the same title rather than piling up a new
+    // one on every click.
+    if let Some(id) = conn
+        .query_row(
+            "SELECT id FROM contests WHERE title = ?1 ORDER BY id DESC LIMIT 1",
+            rusqlite::params![&contest.title],
+            |r| r.get::<_, i64>(0),
+        )
+        .optional()?
+    {
+        return Ok(id);
+    }
+
+    let mut ids = Vec::new();
+    for p in &w.problems {
+        if let Some(id) = repo::problem_id_for_slug(&conn, &p.slug)? {
+            ids.push(id);
+        }
+    }
+    if ids.is_empty() {
+        return Err(AppError::NotFound(
+            "no problems resolved for this checkpoint".into(),
+        ));
+    }
+    repo::create_contest(&conn, &contest.title, &ids, contest.duration_seconds)
 }

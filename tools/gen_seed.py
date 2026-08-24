@@ -6002,6 +6002,16 @@ if os.path.exists(_tse_path):
     with open(_tse_path, encoding="utf-8") as _tef:
         exec(compile(_tef.read(), _tse_path, "exec"))
 
+# TypeScript mastery track — the advanced half of the syllabus (type guards,
+# discriminated unions, satisfies, brands, generics, mapped/conditional types,
+# iterators, typed errors, promise combinators, declaration files). Feeds the
+# 6-Month Mastery programme; runs after the foundational TS files so it can
+# reuse tsx/tsc/_P.
+_tsm_path = os.path.join(HERE, "typescript_mastery.py")
+if os.path.exists(_tsm_path):
+    with open(_tsm_path, encoding="utf-8") as _tmf:
+        exec(compile(_tmf.read(), _tsm_path, "exec"))
+
 
 # ---------------------------------------------------------------------------
 # Japanese coding-vocabulary Learn track — a THIRD "language" for the Learn
@@ -6053,6 +6063,14 @@ if os.path.exists(_jc2_path):
     with open(_jc2_path, encoding="utf-8") as _jf2:
         exec(compile(_jf2.read(), _jc2_path, "exec"))
 
+# Java coding challenges — one full "now put it together" problem per Java
+# concept, mirroring what typescript_expand.py gives the TypeScript track.
+# Runs last so it can append after every drill batch (and reuse _cls).
+_jch_path = os.path.join(HERE, "java_challenges.py")
+if os.path.exists(_jch_path):
+    with open(_jch_path, encoding="utf-8") as _jchf:
+        exec(compile(_jchf.read(), _jch_path, "exec"))
+
 
 # ---------------------------------------------------------------------------
 # Java vocabulary track — ~280 reference terms (14 chapters), each with a
@@ -6065,6 +6083,36 @@ _jv_path = os.path.join(HERE, "java_vocab_defs.py")
 if os.path.exists(_jv_path):
     with open(_jv_path, encoding="utf-8") as _jvf:
         exec(compile(_jvf.read(), _jv_path, "exec"))
+
+
+# ---------------------------------------------------------------------------
+# SQL track — joins and everything above them, marked language="sql" so it gets
+# its own 🗄 SQL toggle in the Learn tab. Unlike every other track, its exercises
+# are judged by running real SQL against a real (in-memory) SQLite database, so
+# each one also names the `dataset` it queries; the datasets themselves are
+# written to their own seed file rather than repeated inside every exercise.
+# ---------------------------------------------------------------------------
+#
+# sql_defs.py holds the engine (dataset builders, the Python-side mirror of the
+# Rust result renderer, and the `sq`/`concept` authoring helpers) plus the
+# datasets themselves. The chapter files that follow are exec'd into the same
+# namespace so they can use those helpers, in syllabus order.
+_sql_path = os.path.join(HERE, "sql_defs.py")
+if os.path.exists(_sql_path):
+    with open(_sql_path, encoding="utf-8") as _sqf:
+        exec(compile(_sqf.read(), _sql_path, "exec"))
+    for _sql_chapter in ("sql_joins.py", "sql_joins_advanced.py",
+                         "sql_aggregation.py", "sql_windows.py",
+                         "sql_advanced.py"):
+        _p = os.path.join(HERE, _sql_chapter)
+        if os.path.exists(_p):
+            with open(_p, encoding="utf-8") as _cf:
+                exec(compile(_cf.read(), _p, "exec"))
+    CONCEPTS.update(SQL_CONCEPTS)
+    CATEGORY.update(SQL_CATEGORY)
+    LESSONS.update(SQL_LESSONS)
+    EXERCISES.update(SQL_EXERCISES)
+    _check_sql()
 
 
 # ---------------------------------------------------------------------------
@@ -6186,6 +6234,38 @@ concepts = build_concepts()
 with open(CONCEPTS_OUT, "w", encoding="utf-8", newline="\n") as f:
     json.dump(concepts, f, indent=2, ensure_ascii=False)
 print(f"Wrote {len(concepts)} concepts to {os.path.relpath(CONCEPTS_OUT)}")
+
+# SQL datasets — the databases the SQL track's exercises are judged against.
+# Kept out of concepts.json because one schema is shared by many chapters, and
+# repeating a 4 KB CREATE/INSERT batch inside every exercise would bloat the
+# catalog by an order of magnitude for no gain.
+SQL_DATASETS_OUT = os.path.join(HERE, "..", "src-tauri", "seeds", "sql_datasets.json")
+_sql_datasets = list(globals().get("DATASETS", {}).values())
+with open(SQL_DATASETS_OUT, "w", encoding="utf-8", newline="\n") as f:
+    json.dump(_sql_datasets, f, indent=2, ensure_ascii=False)
+_sql_ex = sum(len(c["exercises"]) for c in concepts if c["language"] == "sql")
+print(
+    f"Wrote {len(_sql_datasets)} SQL datasets to {os.path.relpath(SQL_DATASETS_OUT)} "
+    f"({_sql_ex} SQL exercises across "
+    f"{sum(1 for c in concepts if c['language'] == 'sql')} chapters)"
+)
+
+# 6-Month Mastery programme — the curated week-by-week track built on top of the
+# concept catalog. Authored in tools/mastery_defs.py, which also asserts that
+# every concept key and problem slug it references really exists and that the
+# schedule covers its language's syllabus exactly once.
+_mst_path = os.path.join(HERE, "mastery_defs.py")
+if os.path.exists(_mst_path):
+    with open(_mst_path, encoding="utf-8") as _mf:
+        exec(compile(_mf.read(), _mst_path, "exec"))
+    _finalize_mastery(MASTERY, CONCEPTS)
+    _check_mastery(MASTERY, CONCEPTS, {p["slug"] for p in out})
+    MASTERY_OUT = os.path.join(HERE, "..", "src-tauri", "seeds", "mastery.json")
+    with open(MASTERY_OUT, "w", encoding="utf-8", newline="\n") as f:
+        json.dump(MASTERY, f, indent=2, ensure_ascii=False)
+    _weeks = sum(len(t["weeks"]) for t in MASTERY)
+    print(f"Wrote {len(MASTERY)} mastery track(s), {_weeks} weeks "
+          f"to {os.path.relpath(MASTERY_OUT)}")
 
 # Concept flashcards (signal -> technique), seeded idempotently at launch.
 FLASHCARDS_OUT = os.path.join(HERE, "..", "src-tauri", "seeds", "flashcards.json")

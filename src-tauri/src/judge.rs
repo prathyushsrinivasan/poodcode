@@ -4,6 +4,7 @@ use std::time::Duration;
 use crate::exec::{self, PrepareError, RunSpec};
 use crate::harness;
 use crate::models::{FunctionSpec, TestCase};
+use crate::sqlexec;
 
 /// Per-problem judging configuration.
 pub struct JudgeConfig {
@@ -175,6 +176,12 @@ pub fn judge_with(
     cases: &[TestCase],
     cfg: &JudgeConfig,
 ) -> JudgeReport {
+    // SQL has no toolchain to spawn — it runs in-process against a throwaway
+    // in-memory database (see sqlexec.rs), so it takes its own path here.
+    if language == "sql" {
+        return judge_sql(code, cases, cfg);
+    }
+
     let timeout = cfg.timeout;
 
     // If this is a function-harness problem, wrap the user's function with
@@ -324,6 +331,131 @@ pub fn judge_with(
         not_installed_hint: String::new(),
         results,
     }
+}
+
+/// Judge a SQL answer: for each case, build the dataset described by the case's
+/// `input`, run the learner's SQL against it, and compare the rendered result
+/// grid to `expected_output`.
+///
+/// Two things differ from the stdin/stdout path, both because of what SQL is:
+///
+/// - **A syntax error short-circuits.** Every case runs the same SQL against the
+///   same schema, so if it fails to compile once it fails identically every
+///   time. Reporting it as one `error` (the way a Java compile error is
+///   reported) beats printing the same message N times.
+/// - **The header line compares case-insensitively.** SQL identifiers are
+///   case-insensitive, so `AS total` and `AS TOTAL` name the same column and
+///   neither should be marked wrong. The *data* rows still compare exactly.
+fn judge_sql(sql: &str, cases: &[TestCase], cfg: &JudgeConfig) -> JudgeReport {
+    if cases.is_empty() {
+        return JudgeReport::error("error", "no test cases to run".into());
+    }
+
+    let mut results = Vec::with_capacity(cases.len());
+    let mut passed = 0i64;
+    let mut total_ms = 0i64;
+    let mut had_error = false;
+    let mut any_tle = false;
+
+    for (i, tc) in cases.iter().enumerate() {
+        let out = sqlexec::run(&tc.input, sql, cfg.timeout);
+        total_ms += out.runtime_ms;
+
+        if out.syntax_error && i == 0 {
+            return JudgeReport::error("error", out.error);
+        }
+
+        let matched = out.ok()
+            && rows_match(&out.text, &tc.expected_output, &cfg.mode)
+            && !out.grid.as_ref().is_some_and(|g| g.truncated);
+        if matched {
+            passed += 1;
+        }
+        if !out.ok() {
+            had_error = true;
+        }
+        if out.timed_out {
+            any_tle = true;
+        }
+
+        let verdict = if matched {
+            "pass"
+        } else if out.timed_out {
+            "tle"
+        } else if !out.ok() {
+            "re"
+        } else if out.grid.as_ref().is_some_and(|g| g.truncated) {
+            "trunc"
+        } else {
+            "wrong"
+        };
+
+        results.push(CaseResult {
+            name: if tc.name.is_empty() {
+                format!("Case {}", i + 1)
+            } else {
+                tc.name.clone()
+            },
+            kind: tc.kind.clone(),
+            input: tc.input.clone(),
+            expected: tc.expected_output.clone(),
+            actual: out.text.clone(),
+            stderr: out.error.clone(),
+            passed: matched,
+            timed_out: out.timed_out,
+            runtime_ms: out.runtime_ms,
+            memory_kb: None,
+            truncated: out.grid.as_ref().is_some_and(|g| g.truncated),
+            verdict: verdict.to_string(),
+        });
+    }
+
+    let total = cases.len() as i64;
+    let status = if passed == total {
+        "accepted"
+    } else if any_tle {
+        "tle"
+    } else if had_error {
+        "error"
+    } else {
+        "wrong"
+    };
+
+    JudgeReport {
+        status: status.into(),
+        passed,
+        total,
+        runtime_ms: total_ms,
+        memory_kb: None,
+        compile_error: String::new(),
+        not_installed_hint: String::new(),
+        results,
+    }
+}
+
+/// Compare two rendered result grids. The first line is the header (column
+/// names, compared case-insensitively); the rest are data rows, compared
+/// exactly — or as a multiset when `mode == "unordered"`, for the rare exercise
+/// whose statement genuinely does not pin down a row order.
+fn rows_match(actual: &str, expected: &str, mode: &str) -> bool {
+    let a = normalize(actual);
+    let b = normalize(expected);
+    let mut al = a.split('\n');
+    let mut bl = b.split('\n');
+    let (ah, bh) = (al.next().unwrap_or(""), bl.next().unwrap_or(""));
+    if !ah.eq_ignore_ascii_case(bh) {
+        return false;
+    }
+    let mut ar: Vec<&str> = al.collect();
+    let mut br: Vec<&str> = bl.collect();
+    if ar.len() != br.len() {
+        return false;
+    }
+    if mode == "unordered" {
+        ar.sort_unstable();
+        br.sort_unstable();
+    }
+    ar == br
 }
 
 /// Larger of two optional measurements (ignoring `None`).

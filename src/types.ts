@@ -57,6 +57,61 @@ export interface Exercise {
   solution: string;
   tests: ExerciseTest[];
   source_slug: string;
+  /** SQL track only: key of the {@link SqlDataset} this exercise queries. The
+   * dataset's SQL is prepended to each test's `input` (which holds only that
+   * case's variation on the data) before the query runs. */
+  dataset: string;
+}
+
+// --- SQL track (seeds/sql_datasets.json + the in-process SQL engine) --------
+
+/** A ready-made database the SQL exercises are judged against. Replayed into a
+ * fresh in-memory SQLite database before every run. */
+export interface SqlDataset {
+  key: string;
+  title: string;
+  summary: string;
+  /** Markdown: what the tables mean and which quirks were planted in the data. */
+  story: string;
+  sql: string;
+}
+
+/** One result set, structured for the table view. */
+export interface SqlGrid {
+  columns: string[];
+  rows: string[][];
+  truncated: boolean;
+}
+
+/** The outcome of running SQL against a dataset (the "Run query" button). */
+export interface SqlOut {
+  grid: SqlGrid | null;
+  /** `grid` rendered as the text the judge compares. */
+  text: string;
+  error: string;
+  /** True when the failure was at compile time (syntax, unknown table/column). */
+  syntax_error: boolean;
+  timed_out: boolean;
+  row_count: number;
+  statements: number;
+  runtime_ms: number;
+}
+
+export interface SqlColumn {
+  name: string;
+  decl_type: string;
+  not_null: boolean;
+  primary_key: boolean;
+}
+
+/** One table of a dataset, as the schema browser shows it. */
+export interface SqlTable {
+  name: string;
+  ddl: string;
+  columns: SqlColumn[];
+  rows: string[][];
+  row_count: number;
+  truncated: boolean;
 }
 
 export interface Card {
@@ -100,6 +155,82 @@ export interface InterviewQA {
 export interface JpBridge {
   problems: BridgeProblem[];
   interview: InterviewQA[];
+}
+
+// --- 6-Month Mastery programme (seeds/mastery.json) ------------------------
+// The Learn catalog is a reference library; a mastery track sequences it into
+// weeks. Content is read-only — progress lives in localStorage (lib/mastery.ts).
+
+export interface MasteryProblem {
+  slug: string;
+  note: string;
+}
+
+/** The week's coding final, judged exactly like a Learn challenge. */
+export interface MasteryExam {
+  title: string;
+  prompt: string;
+  hint: string;
+  language: string;
+  starter: string;
+  solution: string;
+  tests: ExerciseTest[];
+}
+
+/** An optional timed checkpoint built from the week's problems. */
+export interface MasteryContest {
+  title: string;
+  duration_seconds: number;
+}
+
+export interface MasteryWeek {
+  /** 1-based; weeks are numbered 1..N with no gaps. */
+  week: number;
+  /** Month / phase label, used to group the week list. */
+  phase: string;
+  title: string;
+  goal: string;
+  /** Concept keys, resolved against the Learn catalog. */
+  concepts: string[];
+  problems: MasteryProblem[];
+  /** Free-text build brief; the learner's notes and code are stored per week. */
+  project: string;
+  /** The end-of-week question BANK — the UI samples and shuffles from it. */
+  quiz: QuizQuestion[];
+  /** How many bank questions make one sitting of the exam. */
+  quiz_sample: number;
+  exam: MasteryExam | null;
+  contest: MasteryContest | null;
+}
+
+export interface MasteryTrack {
+  key: string;
+  title: string;
+  /** Learn-catalog language whose concepts this track schedules. */
+  language: string;
+  subtitle: string;
+  intro: string;
+  /** Percentage of the week's quiz required to unlock the next week. */
+  pass_mark: number;
+  /** Language the coding finals are written in. */
+  exam_language: string;
+  weeks: MasteryWeek[];
+}
+
+/** Per-week learner state, persisted in SQLite (table `mastery_progress`). */
+export interface MasteryProgress {
+  track_key: string;
+  week: number;
+  /** Best multiple-choice percentage; -1 when never attempted. */
+  best_quiz: number;
+  exam_passed: boolean;
+  exam_code: string;
+  project_notes: string;
+  project_code: string;
+  project_done: boolean;
+  study_seconds: number;
+  started_at: string | null;
+  completed_at: string | null;
 }
 
 export interface CardReview {

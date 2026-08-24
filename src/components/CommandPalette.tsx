@@ -34,12 +34,9 @@ export function CommandPalette() {
     const nav: Cmd[] = [
       { id: "dash", label: "Go to Dashboard", run: () => navigate("/") },
       { id: "lib", label: "Go to Problem Library", run: () => navigate("/library") },
+      { id: "learn", label: "Go to Learn", run: () => navigate("/learn") },
+      { id: "mastery", label: "Go to 6-Month Mastery", run: () => navigate("/mastery") },
       { id: "rev", label: "Go to Revision Queue", run: () => navigate("/revision") },
-      { id: "stats", label: "Go to Statistics", run: () => navigate("/stats") },
-      { id: "timeline", label: "Go to Learning Timeline", run: () => navigate("/timeline") },
-      { id: "random", label: "Go to Random Practice", run: () => navigate("/random") },
-      { id: "companies", label: "Go to Company Prep", run: () => navigate("/companies") },
-      { id: "interview", label: "Start Interview Mode", run: () => navigate("/interview") },
       { id: "settings", label: "Open Settings", run: () => navigate("/settings") },
       { id: "theme", label: "Toggle Light / Dark Theme", run: () => toggleTheme() },
     ];

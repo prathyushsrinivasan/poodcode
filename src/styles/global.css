@@ -740,3 +740,136 @@ table.data tbody tr:hover {
   border-radius: 3px;
   background: var(--bg-elev-2);
 }
+
+/* ---- Collapsible sections (Learn / Mastery) -------------------------- */
+.collapsible {
+  margin-bottom: 18px;
+}
+.collapsible-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  padding: 6px 8px 6px 2px;
+  border-radius: 8px;
+  user-select: none;
+}
+.collapsible-head:hover {
+  background: var(--bg-elev-2);
+}
+.collapsible-head:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.collapsible-head .caret {
+  display: inline-block;
+  width: 14px;
+  flex: none;
+  color: var(--text-faint);
+  transition: transform 0.12s ease;
+}
+.collapsible-head .caret.open {
+  transform: rotate(90deg);
+}
+.collapsible-body {
+  padding-top: 8px;
+}
+
+/* ---- Mastery programme ---------------------------------------------- */
+.progress-track {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--bg-elev-2);
+  overflow: hidden;
+  margin-top: 12px;
+}
+.progress-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.25s ease;
+}
+.week-card {
+  margin-bottom: 12px;
+}
+.week-card.locked {
+  opacity: 0.55;
+  border-style: dashed;
+}
+.week-num {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--bg-elev-2);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+
+/* SQL result grids -------------------------------------------------------- */
+/* The SQL track's output is a table, so it gets a table: monospace and compact,
+   scrollable in both directions so a wide join never pushes the page sideways,
+   with a sticky header row that survives vertical scrolling. */
+.sqlgrid-wrap {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: auto;
+  max-height: 340px;
+  background: var(--bg-elev);
+}
+table.sqlgrid {
+  border-collapse: collapse;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  width: max-content;
+  min-width: 100%;
+}
+table.sqlgrid th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  text-align: left;
+  white-space: nowrap;
+  padding: 6px 10px;
+  background: var(--bg-elev-2);
+  border-bottom: 1px solid var(--border);
+  color: var(--accent);
+  font-weight: 600;
+}
+table.sqlgrid td {
+  padding: 4px 10px;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+table.sqlgrid tbody tr:last-child td {
+  border-bottom: none;
+}
+table.sqlgrid tbody tr:nth-child(even) {
+  background: color-mix(in srgb, var(--bg-elev-2) 45%, transparent);
+}
+/* The row that differs from what was expected. */
+table.sqlgrid tbody tr.diff td {
+  background: color-mix(in srgb, var(--bad) 16%, transparent);
+}
+/* NULL and the empty string look identical in a plain grid and behave nothing
+   alike, so the track renders them differently on purpose. */
+.sql-null {
+  color: var(--text-faint);
+  font-style: italic;
+}
+.sql-empty {
+  color: var(--text-faint);
+  opacity: 0.7;
+}
+/* Expected-vs-actual, side by side on a wide screen and stacked on a narrow one. */
+.sql-compare {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 10px;
+}

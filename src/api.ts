@@ -23,6 +23,11 @@ import type {
   Flashcard,
   CardReview,
   JpBridge,
+  MasteryTrack,
+  MasteryProgress,
+  SqlDataset,
+  SqlOut,
+  SqlTable,
 } from "./types";
 
 export const api = {
@@ -72,6 +77,41 @@ export const api = {
 
   // Learn / concepts
   concepts: () => invoke<Concept[]>("concepts"),
+
+  // SQL track — the datasets its exercises query, plus the in-process engine
+  // that runs SQL against a throwaway in-memory database (see src-tauri/src/sqlexec.rs).
+  sqlDatasets: () => invoke<SqlDataset[]>("sql_datasets"),
+  /** Run SQL against `setup` and get the result grid back instead of a verdict. */
+  sqlQuery: (setup: string, sql: string) => invoke<SqlOut>("sql_query", { setup, sql }),
+  /** Introspect a dataset for the schema/data browser. */
+  sqlTables: (setup: string) => invoke<SqlTable[]>("sql_tables", { setup }),
+
+  // Learn-tab chapter completion (SQLite, so backup/restore covers it)
+  doneChapters: () => invoke<string[]>("done_chapters"),
+  setChapterDone: (key: string, done: boolean) =>
+    invoke<void>("set_chapter_done", { key, done }),
+
+  // 6-Month Mastery programme — read-only curriculum plus per-week progress
+  mastery: () => invoke<MasteryTrack[]>("mastery"),
+  masteryProgress: () => invoke<MasteryProgress[]>("mastery_progress"),
+  masteryRecordQuiz: (trackKey: string, week: number, percent: number) =>
+    invoke<void>("mastery_record_quiz", { trackKey, week, percent }),
+  masteryRecordExam: (trackKey: string, week: number, passed: boolean, code: string) =>
+    invoke<void>("mastery_record_exam", { trackKey, week, passed, code }),
+  masterySaveProject: (
+    trackKey: string,
+    week: number,
+    notes: string,
+    code: string,
+    done: boolean
+  ) => invoke<void>("mastery_save_project", { trackKey, week, notes, code, done }),
+  masteryLogTime: (trackKey: string, week: number, seconds: number) =>
+    invoke<void>("mastery_log_time", { trackKey, week, seconds }),
+  /** Stamp a week complete and, the first time, seed its flashcards + reviews. */
+  masteryCompleteWeek: (trackKey: string, week: number) =>
+    invoke<boolean>("mastery_complete_week", { trackKey, week }),
+  masteryStartContest: (trackKey: string, week: number) =>
+    invoke<number>("mastery_start_contest", { trackKey, week }),
 
   // Execution
   languages: () => invoke<LangInfo[]>("languages"),

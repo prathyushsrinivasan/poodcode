@@ -161,3 +161,117 @@ fn confidence_is_clamped() {
     repo::set_confidence(&c, id, -3).unwrap();
     assert_eq!(repo::get_problem(&c, id).unwrap().confidence, 0);
 }
+
+
+// ---------------------------------------------------------------------------
+// Learn chapter completion + mastery progress
+//
+// These moved out of localStorage specifically so they'd be covered by
+// backup/restore, which makes their persistence behaviour worth pinning down.
+// ---------------------------------------------------------------------------
+
+#[test]
+fn chapter_progress_round_trips_and_is_idempotent() {
+    let c = conn();
+    assert!(repo::done_chapters(&c).unwrap().is_empty());
+
+    repo::set_chapter_done(&c, "ts_generics", true).unwrap();
+    // Marking the same chapter twice must not error or duplicate the row.
+    repo::set_chapter_done(&c, "ts_generics", true).unwrap();
+    repo::set_chapter_done(&c, "bfs", true).unwrap();
+    assert_eq!(repo::done_chapters(&c).unwrap(), vec!["bfs", "ts_generics"]);
+
+    repo::set_chapter_done(&c, "bfs", false).unwrap();
+    assert_eq!(repo::done_chapters(&c).unwrap(), vec!["ts_generics"]);
+
+    // Un-marking something never marked is a no-op, not an error.
+    repo::set_chapter_done(&c, "never_seen", false).unwrap();
+    assert_eq!(repo::done_chapters(&c).unwrap(), vec!["ts_generics"]);
+}
+
+fn week_row(c: &rusqlite::Connection, track: &str, week: i64) -> MasteryProgress {
+    repo::mastery_progress(c)
+        .unwrap()
+        .into_iter()
+        .find(|r| r.track_key == track && r.week == week)
+        .expect("row exists")
+}
+
+#[test]
+fn mastery_quiz_keeps_only_the_best_score() {
+    let c = conn();
+    repo::mastery_record_quiz(&c, "ts", 1, 40).unwrap();
+    assert_eq!(week_row(&c, "ts", 1).best_quiz, 40);
+
+    repo::mastery_record_quiz(&c, "ts", 1, 100).unwrap();
+    assert_eq!(week_row(&c, "ts", 1).best_quiz, 100);
+
+    // A worse retake must not take back a week the learner already unlocked.
+    repo::mastery_record_quiz(&c, "ts", 1, 25).unwrap();
+    assert_eq!(week_row(&c, "ts", 1).best_quiz, 100);
+}
+
+#[test]
+fn mastery_exam_pass_is_sticky_but_code_is_not() {
+    let c = conn();
+    repo::mastery_record_exam(&c, "ts", 3, false, "first try").unwrap();
+    let row = week_row(&c, "ts", 3);
+    assert!(!row.exam_passed);
+    assert_eq!(row.exam_code, "first try");
+
+    repo::mastery_record_exam(&c, "ts", 3, true, "working").unwrap();
+    assert!(week_row(&c, "ts", 3).exam_passed);
+
+    // Saving a broken draft afterwards keeps the code but not the failure —
+    // otherwise editing a solved week would re-lock everything after it.
+    repo::mastery_record_exam(&c, "ts", 3, false, "broken again").unwrap();
+    let row = week_row(&c, "ts", 3);
+    assert!(row.exam_passed);
+    assert_eq!(row.exam_code, "broken again");
+}
+
+#[test]
+fn mastery_rows_are_scoped_per_track() {
+    let c = conn();
+    repo::mastery_record_quiz(&c, "ts", 1, 80).unwrap();
+    repo::mastery_record_quiz(&c, "java", 1, 55).unwrap();
+    assert_eq!(week_row(&c, "ts", 1).best_quiz, 80);
+    assert_eq!(week_row(&c, "java", 1).best_quiz, 55);
+    assert_eq!(repo::mastery_progress(&c).unwrap().len(), 2);
+}
+
+#[test]
+fn mastery_project_and_time_accumulate() {
+    let c = conn();
+    repo::mastery_save_project(&c, "ts", 2, "notes", "code", false).unwrap();
+    let row = week_row(&c, "ts", 2);
+    assert_eq!(row.project_notes, "notes");
+    assert_eq!(row.project_code, "code");
+    assert!(!row.project_done);
+
+    repo::mastery_save_project(&c, "ts", 2, "notes v2", "code v2", true).unwrap();
+    assert!(week_row(&c, "ts", 2).project_done);
+
+    // Study time adds up rather than overwriting, and ignores nonsense values.
+    repo::mastery_log_time(&c, "ts", 2, 60).unwrap();
+    repo::mastery_log_time(&c, "ts", 2, 90).unwrap();
+    repo::mastery_log_time(&c, "ts", 2, -5).unwrap();
+    assert_eq!(week_row(&c, "ts", 2).study_seconds, 150);
+}
+
+#[test]
+fn mastery_week_completes_exactly_once() {
+    let c = conn();
+    // The first call stamps it; later calls report false so the caller knows
+    // not to seed the week's flashcards and reviews a second time.
+    assert!(repo::mastery_mark_complete(&c, "ts", 4).unwrap());
+    assert!(!repo::mastery_mark_complete(&c, "ts", 4).unwrap());
+    assert!(week_row(&c, "ts", 4).completed_at.is_some());
+}
+
+#[test]
+fn mastery_touching_a_week_stamps_when_it_started() {
+    let c = conn();
+    repo::mastery_log_time(&c, "ts", 7, 30).unwrap();
+    assert!(week_row(&c, "ts", 7).started_at.is_some());
+}

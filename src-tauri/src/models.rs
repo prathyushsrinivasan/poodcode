@@ -111,6 +111,34 @@ pub struct Exercise {
     /// Optional Library problem slug this drill leads into (advanced concepts).
     #[serde(default)]
     pub source_slug: String,
+    /// SQL track only: the key of the [`SqlDataset`] this exercise queries. The
+    /// dataset's DDL + rows are prepended to each test's `input` (which then
+    /// holds only that case's *variation* on the data), so a schema shared by a
+    /// whole chapter is stored once instead of once per exercise.
+    #[serde(default)]
+    pub dataset: String,
+}
+
+/// A ready-made database for the SQL track: schema plus rows, as one batch of
+/// SQL that `sqlexec` replays into a fresh in-memory database before every run.
+///
+/// Datasets are shared across chapters on purpose. Re-meeting the same customers
+/// and orders in the joins chapter, the window-functions chapter and the
+/// performance chapter means the learner spends their attention on the technique
+/// rather than on re-reading a new schema each time.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SqlDataset {
+    pub key: String,
+    pub title: String,
+    /// One line describing what is in here, shown on the dataset chip.
+    #[serde(default)]
+    pub summary: String,
+    /// Markdown: what the tables mean and which quirks were planted in the data
+    /// (orphan rows, NULLs, ties) so the exercises have something to bite on.
+    #[serde(default)]
+    pub story: String,
+    /// The full `CREATE TABLE` + `INSERT` batch.
+    pub sql: String,
 }
 
 /// A coding problem. `topics`, `subtopics` and `companies` are denormalized on
@@ -533,6 +561,120 @@ pub struct JpBridge {
     pub problems: Vec<BridgeProblem>,
     #[serde(default)]
     pub interview: Vec<InterviewQA>,
+}
+
+// ---------------------------------------------------------------------------
+// 6-Month Mastery programme (seeds/mastery.json, authored in
+// tools/mastery_defs.py). The Learn catalog is a reference library you can read
+// in any order; a mastery track sequences it into weeks with problems, a build
+// project and a gating end-of-week exam. Progress lives client-side, so these
+// models are read-only content.
+// ---------------------------------------------------------------------------
+
+/// A curated Library problem for one week, with the reason it was chosen.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MasteryProblem {
+    pub slug: String,
+    #[serde(default)]
+    pub note: String,
+}
+
+/// The week's coding final — a full problem run through the same judge as the
+/// Learn challenges (`run_tests` with a null problem id). Answering multiple
+/// choice is not enough to unlock the next week; this has to be accepted too.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MasteryExam {
+    pub title: String,
+    pub prompt: String,
+    #[serde(default)]
+    pub hint: String,
+    pub language: String,
+    pub starter: String,
+    /// Reference solution, revealable after a pass (and proven by the seed tests).
+    pub solution: String,
+    #[serde(default)]
+    pub tests: Vec<ExerciseTest>,
+}
+
+/// An optional timed checkpoint contest attached to a week, built from that
+/// week's problems through the existing Contest machinery.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MasteryContest {
+    pub title: String,
+    pub duration_seconds: i64,
+}
+
+/// One week of a mastery track.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MasteryWeek {
+    /// 1-based week number; weeks are numbered 1..N with no gaps.
+    pub week: i64,
+    /// Which month/phase this week belongs to, for grouping in the UI.
+    #[serde(default)]
+    pub phase: String,
+    pub title: String,
+    #[serde(default)]
+    pub goal: String,
+    /// Concept keys to study, resolved against the Learn catalog.
+    #[serde(default)]
+    pub concepts: Vec<String>,
+    #[serde(default)]
+    pub problems: Vec<MasteryProblem>,
+    /// A build-it-yourself brief. Not graded, but the learner's notes and code
+    /// for it are stored against the week.
+    #[serde(default)]
+    pub project: String,
+    /// The end-of-week question BANK. The UI samples `quiz_sample` of these and
+    /// shuffles both the questions and each question's options, so a retake is
+    /// not a memory test for answer positions.
+    #[serde(default)]
+    pub quiz: Vec<QuizQuestion>,
+    /// How many bank questions make up one sitting of the exam.
+    #[serde(default)]
+    pub quiz_sample: i64,
+    /// The week's coding final.
+    pub exam: Option<MasteryExam>,
+    /// A timed checkpoint contest, on consolidation weeks.
+    pub contest: Option<MasteryContest>,
+}
+
+/// The learner's state for one week of one track (table `mastery_progress`).
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MasteryProgress {
+    pub track_key: String,
+    pub week: i64,
+    /// Best multiple-choice percentage; -1 when never attempted.
+    pub best_quiz: i64,
+    pub exam_passed: bool,
+    pub exam_code: String,
+    pub project_notes: String,
+    pub project_code: String,
+    pub project_done: bool,
+    pub study_seconds: i64,
+    pub started_at: Option<String>,
+    pub completed_at: Option<String>,
+}
+
+/// A full programme — currently one track (TypeScript), built to hold more.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MasteryTrack {
+    pub key: String,
+    pub title: String,
+    /// Learn-catalog language whose concepts this track schedules.
+    #[serde(default)]
+    pub language: String,
+    #[serde(default)]
+    pub subtitle: String,
+    #[serde(default)]
+    pub intro: String,
+    /// Percentage of the end-of-week quiz required to unlock the next week.
+    #[serde(default)]
+    pub pass_mark: i64,
+    /// Language the coding finals are written in.
+    #[serde(default)]
+    pub exam_language: String,
+    #[serde(default)]
+    pub weeks: Vec<MasteryWeek>,
 }
 
 /// A review item joined with its problem for the review queue UI.

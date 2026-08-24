@@ -4,6 +4,7 @@ import { api } from "../api";
 import type { Dashboard as Dash, TopicRecommendation } from "../types";
 import { formatDuration } from "../lib/format";
 import { DiffBadge, Stat } from "../components/common";
+import { MasteryCard } from "../components/MasteryCard";
 
 function GoalRow({ label, done, target }: { label: string; done: number; target: number }) {
   if (target <= 0) return null;
@@ -59,6 +60,8 @@ export default function Dashboard() {
         <Stat value={`${d.current_streak}🔥`} label="Current streak" />
         <Stat value={d.reviews_due} label="Reviews due" />
       </div>
+
+      <MasteryCard />
 
       <div className="grid cols-2">
         <div className="card">
@@ -171,8 +174,6 @@ export default function Dashboard() {
       <div className="row" style={{ marginTop: 18 }}>
         <button onClick={() => nav("/library")}>Browse Library</button>
         <button onClick={() => nav("/revision")}>Start Reviews ({d.reviews_due})</button>
-        <button onClick={() => nav("/random")}>Random Problem</button>
-        <button onClick={() => nav("/interview")}>Interview Mode</button>
       </div>
     </div>
   );

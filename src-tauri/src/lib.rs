@@ -9,6 +9,7 @@ pub mod harness;
 pub mod judge;
 pub mod models;
 mod repo;
+pub mod sqlexec;
 mod stats;
 
 #[cfg(test)]
@@ -349,6 +350,9 @@ pub fn run() {
             commands::list_attempts,
             commands::languages,
             commands::concepts,
+            commands::sql_datasets,
+            commands::sql_query,
+            commands::sql_tables,
             commands::run_tests,
             commands::run_scratch,
             commands::submit,
@@ -374,6 +378,16 @@ pub fn run() {
             commands::grade_card,
             commands::reset_cards,
             commands::jp_bridge,
+            commands::mastery,
+            commands::mastery_progress,
+            commands::mastery_record_quiz,
+            commands::mastery_record_exam,
+            commands::mastery_save_project,
+            commands::mastery_log_time,
+            commands::mastery_complete_week,
+            commands::mastery_start_contest,
+            commands::done_chapters,
+            commands::set_chapter_done,
             commands::statistics,
             commands::dashboard,
             commands::get_settings,

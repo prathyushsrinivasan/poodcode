@@ -1,12 +1,28 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { api } from "../api";
-import type { Concept, Exercise, JudgeReport, Problem, QuizQuestion, TestCase } from "../types";
+import type {
+  Concept,
+  Exercise,
+  JudgeReport,
+  Problem,
+  QuizQuestion,
+  SqlDataset,
+  SqlOut,
+  TestCase,
+} from "../types";
 import { Markdown } from "../components/Markdown";
 import { CodeEditor } from "../components/CodeEditor";
 import { CardStudy } from "../components/CardStudy";
 import { DiffBadge, Empty } from "../components/common";
-import { doneChapters, setChapterDone } from "../lib/learnProgress";
+import { Section, useCollapse } from "../components/Collapsible";
+import {
+  DatasetBrowser,
+  ResultGrid,
+  TextGrid,
+  differingRows,
+} from "../components/SqlGrid";
+import { loadDoneChapters, setChapterDone } from "../lib/learnProgress";
 
 const CATEGORY_ORDER = [
   "Foundations",
@@ -26,6 +42,10 @@ const CATEGORY_ORDER = [
   "TS: Data Structures",
   "TS: Composition & Reuse",
   "TS: Robustness",
+  // Mastery-track TypeScript categories (tools/typescript_mastery.py)
+  "TS: Type System",
+  "TS: Generics & Type-Level",
+  "TS: Runtime & Architecture",
   // Japanese coding-vocabulary categories (shown under the 日本語 toggle)
   "JP: Coding Basics",
   "JP: Java Language",
@@ -60,6 +80,15 @@ const CATEGORY_ORDER = [
   "JV: I/O",
   "JV: Tooling",
   "JV: Modern Java",
+  // SQL track (shown under the 🗄 SQL toggle) — joins first, then everything
+  // that builds on them. Must stay in sync with SQL_CATEGORY_ORDER in
+  // tools/sql_defs.py, which refuses to generate a chapter filed anywhere else.
+  "SQL: Join Foundations",
+  "SQL: Aggregation",
+  "SQL: Subqueries & CTEs",
+  "SQL: Window Functions",
+  "SQL: Sets & NULLs",
+  "SQL: Performance",
 ];
 
 // A concept with no explicit language is legacy Java content.
@@ -71,6 +100,7 @@ const LANG_TABS: { id: string; label: string }[] = [
   { id: "japanese", label: "日本語" },
   { id: "algorithms", label: "🧠 Algorithms" },
   { id: "java_vocab", label: "📖 Java Vocab" },
+  { id: "sql", label: "🗄 SQL" },
 ];
 
 // Human-readable name for a Learn language, used in headings and card labels.
@@ -80,6 +110,7 @@ const LANG_LABEL: Record<string, string> = {
   japanese: "Japanese",
   algorithms: "Algorithms",
   java_vocab: "Java Vocab",
+  sql: "SQL",
 };
 const langLabel = (id: string) => LANG_LABEL[id] || "Java";
 const LANG_STORE_KEY = "poodcode:learn-lang";
@@ -88,19 +119,33 @@ export default function Learn() {
   const { key } = useParams();
   const [concepts, setConcepts] = useState<Concept[]>([]);
   const [problems, setProblems] = useState<Problem[]>([]);
+  // The SQL track's databases, keyed for lookup by an exercise's `dataset`.
+  // Loaded once here rather than per exercise card, since one dataset is shared
+  // by a whole chapter (and often by several).
+  const [datasets, setDatasets] = useState<Map<string, SqlDataset>>(new Map());
   const [lang, setLang] = useState<string>(
     () => localStorage.getItem(LANG_STORE_KEY) || "java"
   );
-  const [done, setDone] = useState<Set<string>>(() => doneChapters());
+  const [done, setDone] = useState<Set<string>>(new Set());
+  // Category sections fold independently per language track, so collapsing
+  // "Arrays" under Java doesn't also fold it under another tab.
+  const cats = useCollapse(`learn-cat:${lang}`);
   const nav = useNavigate();
 
-  function toggleDone(key: string) {
-    setDone(new Set(setChapterDone(key, !done.has(key))));
+  async function toggleDone(key: string) {
+    setDone(await setChapterDone(done, key, !done.has(key)));
   }
 
   useEffect(() => {
     api.concepts().then(setConcepts).catch(() => {});
     api.listProblems().then(setProblems).catch(() => {});
+    api
+      .sqlDatasets()
+      .then((ds) => setDatasets(new Map(ds.map((d) => [d.key, d]))))
+      .catch(() => {});
+    // Chapter completion lives in SQLite now (so backups cover it), which makes
+    // it an async load rather than a synchronous localStorage read.
+    loadDoneChapters().then(setDone).catch(() => {});
   }, []);
 
   function pickLang(id: string) {
@@ -148,6 +193,7 @@ export default function Learn() {
         concept={concept}
         related={related}
         problems={problems}
+        datasets={datasets}
         isDone={done.has(concept.key)}
         onToggleDone={() => toggleDone(concept.key)}
       />
@@ -158,6 +204,7 @@ export default function Learn() {
   const isJp = lang === "japanese";
   const isAlg = lang === "algorithms";
   const isVocab = lang === "java_vocab";
+  const isSql = lang === "sql";
 
   return (
     <div className="page">
@@ -178,7 +225,17 @@ export default function Learn() {
         )}
       </div>
       <p className="page-sub">
-        {isVocab ? (
+        {isSql ? (
+          <>
+            {shownCount} SQL chapters, starting at <strong>joins</strong> and building up
+            through aggregation, subqueries, CTEs and window functions. Every drill and
+            challenge runs <strong>real SQL against a real database</strong> — five small
+            ones you can read end to end — and is checked against the exact result set.
+            New here? Start with <strong>SQL: Join Foundations → How a Join Actually
+            Works</strong>, and read <strong>Choosing the Right Join</strong> when you can
+            do all four but never know which to reach for.
+          </>
+        ) : isVocab ? (
           <>
             {shownCount} Java vocabulary chapters — <strong>266 terms</strong>, each with a
             crisp <strong>textbook definition</strong> and a{" "}
@@ -209,7 +266,8 @@ export default function Learn() {
             <strong>full-length problems</strong> — run them right here and check instantly.{" "}
             {isTs ? (
               <>
-                New to TypeScript? Start with <strong>TS: Language Basics</strong>.
+                New to TypeScript? Start with <strong>TS: Language Basics</strong> — then
+                keep going through the type-system and type-level chapters.
               </>
             ) : (
               <>
@@ -239,19 +297,62 @@ export default function Learn() {
         </div>
       )}
 
+      {isTs && (
+        <div
+          className="card"
+          style={{ cursor: "pointer", borderColor: "var(--accent)", marginBottom: 22 }}
+          onClick={() => nav("/mastery")}
+        >
+          <div className="row" style={{ justifyContent: "space-between", alignItems: "center" }}>
+            <div>
+              <strong>🎓 6-Month Mastery — these chapters, in order</strong>
+              <p className="dim" style={{ margin: "4px 0 0", fontSize: 13 }}>
+                Prefer a syllabus to a library? The mastery programme sequences every chapter
+                below into 26 weeks, each with curated problems, a build project and an exam
+                that unlocks the next week.
+              </p>
+            </div>
+            <span className="badge">Open →</span>
+          </div>
+        </div>
+      )}
+
+      {byCategory.length > 1 && (
+        <div className="row" style={{ gap: 6, marginBottom: 12 }}>
+          <button
+            className="ghost"
+            style={{ padding: "2px 10px", fontSize: 12 }}
+            onClick={() => cats.setAll(byCategory.map(([c]) => c), true)}
+          >
+            Expand all
+          </button>
+          <button
+            className="ghost"
+            style={{ padding: "2px 10px", fontSize: 12 }}
+            onClick={() => cats.setAll(byCategory.map(([c]) => c), false)}
+          >
+            Collapse all
+          </button>
+        </div>
+      )}
+
       {byCategory.map(([cat, items]) => {
         const doneN = items.filter((c) => done.has(c.key)).length;
         return (
-          <div key={cat} style={{ marginBottom: 22 }}>
-            <div className="row" style={{ justifyContent: "space-between", marginBottom: 10 }}>
-              <h3 style={{ margin: 0 }}>{cat}</h3>
+          <Section
+            key={cat}
+            title={cat}
+            open={cats.isOpen(cat)}
+            onToggle={() => cats.toggle(cat)}
+            meta={
               <span
                 className="dim"
                 style={{ fontSize: 12, color: doneN === items.length ? "var(--good)" : undefined }}
               >
                 {doneN}/{items.length} done
               </span>
-            </div>
+            }
+          >
             <div className="grid cols-3">
               {items.map((c) => {
                 const isDone = done.has(c.key);
@@ -315,7 +416,7 @@ export default function Learn() {
                 );
               })}
             </div>
-          </div>
+          </Section>
         );
       })}
     </div>
@@ -326,12 +427,14 @@ function ConceptDetail({
   concept,
   related,
   problems,
+  datasets,
   isDone,
   onToggleDone,
 }: {
   concept: Concept;
   related: Problem[];
   problems: Problem[];
+  datasets: Map<string, SqlDataset>;
   isDone: boolean;
   onToggleDone: () => void;
 }) {
@@ -351,6 +454,30 @@ function ConceptDetail({
     .map((pr) => ({ note: pr.note, problem: bySlug.get(pr.slug) }))
     .filter((x): x is { note: string; problem: Problem } => !!x.problem);
   const [mode, setMode] = useState<"lesson" | "cards">("lesson");
+  // The datasets this chapter's exercises actually query, in first-use order.
+  // Shown once at the top rather than repeated on every card: joins are
+  // unlearnable without being able to see the rows you are joining.
+  const usedDatasets = useMemo(() => {
+    const keys: string[] = [];
+    for (const ex of exercises) {
+      if (ex.dataset && !keys.includes(ex.dataset)) keys.push(ex.dataset);
+    }
+    return keys.map((k) => datasets.get(k)).filter((d): d is SqlDataset => !!d);
+  }, [exercises, datasets]);
+  const [activeDataset, setActiveDataset] = useState(0);
+  // Sections fold per concept, so a long chapter can be narrowed down to just
+  // the drills (or just the lesson) and stay that way when you come back.
+  const sec = useCollapse(`learn-sec:${concept.key}`);
+  const secKeys = [
+    "idea",
+    "lesson",
+    "dataset",
+    "quiz",
+    "practice",
+    "drills",
+    "challenges",
+    "library",
+  ];
 
   return (
     <div className="page">
@@ -375,61 +502,132 @@ function ConceptDetail({
       </h1>
       <p className="page-sub">{concept.what}</p>
 
-      <div className="card" style={{ marginBottom: 14 }}>
-        <div className="io-label">The idea</div>
-        <p style={{ marginBottom: 0 }}>{concept.deep}</p>
+      <div className="row" style={{ gap: 6, marginBottom: 10 }}>
+        <button
+          className="ghost"
+          style={{ padding: "2px 10px", fontSize: 12 }}
+          onClick={() => sec.setAll(secKeys, true)}
+        >
+          Expand all
+        </button>
+        <button
+          className="ghost"
+          style={{ padding: "2px 10px", fontSize: 12 }}
+          onClick={() => sec.setAll(secKeys, false)}
+        >
+          Collapse all
+        </button>
       </div>
 
-      <div className="card" style={{ marginBottom: 14, borderColor: "var(--accent)" }}>
-        <div className="io-label" style={{ color: "var(--accent)" }}>
-          {conceptLang(concept) === "japanese"
-            ? "How to read this"
-            : conceptLang(concept) === "algorithms"
-            ? "At a glance"
-            : conceptLang(concept) === "java_vocab"
-            ? "How to use this set"
-            : `In ${langLabel(conceptLang(concept))}`}
+      <Section
+        title="💡 The idea"
+        open={sec.isOpen("idea")}
+        onToggle={() => sec.toggle("idea")}
+      >
+        <div className="card" style={{ marginBottom: 14 }}>
+          <p style={{ margin: 0 }}>{concept.deep}</p>
         </div>
-        <Markdown>{concept.java}</Markdown>
-      </div>
 
-      {cards.length > 0 && (
-        <div className="row" style={{ gap: 6, marginBottom: 14 }}>
-          <button className={mode === "lesson" ? "" : "ghost"} onClick={() => setMode("lesson")}>
-            📖 Glossary
-          </button>
-          <button className={mode === "cards" ? "" : "ghost"} onClick={() => setMode("cards")}>
-            🎴 Study cards
-          </button>
+        <div className="card" style={{ marginBottom: 0, borderColor: "var(--accent)" }}>
+          <div className="io-label" style={{ color: "var(--accent)" }}>
+            {conceptLang(concept) === "japanese"
+              ? "How to read this"
+              : conceptLang(concept) === "algorithms"
+              ? "At a glance"
+              : conceptLang(concept) === "java_vocab"
+              ? "How to use this set"
+              : `In ${langLabel(conceptLang(concept))}`}
+          </div>
+          <Markdown>{concept.java}</Markdown>
         </div>
-      )}
+      </Section>
 
-      {cards.length > 0 && mode === "cards" ? (
-        <CardStudy
-          conceptKey={concept.key}
-          cards={cards}
-          variant={conceptLang(concept) === "japanese" ? "japanese" : "vocab"}
-        />
-      ) : (
-        <Markdown>{concept.lesson}</Markdown>
+      <Section
+        title={cards.length > 0 ? "📖 Reference" : "📖 Lesson"}
+        open={sec.isOpen("lesson")}
+        onToggle={() => sec.toggle("lesson")}
+      >
+        {cards.length > 0 && (
+          <div className="row" style={{ gap: 6, marginBottom: 14 }}>
+            <button className={mode === "lesson" ? "" : "ghost"} onClick={() => setMode("lesson")}>
+              📖 Glossary
+            </button>
+            <button className={mode === "cards" ? "" : "ghost"} onClick={() => setMode("cards")}>
+              🎴 Study cards
+            </button>
+          </div>
+        )}
+
+        {cards.length > 0 && mode === "cards" ? (
+          <CardStudy
+            conceptKey={concept.key}
+            cards={cards}
+            variant={conceptLang(concept) === "japanese" ? "japanese" : "vocab"}
+          />
+        ) : (
+          <Markdown>{concept.lesson}</Markdown>
+        )}
+      </Section>
+
+      {usedDatasets.length > 0 && (
+        <Section
+          title="🗄 The dataset"
+          open={sec.isOpen("dataset")}
+          onToggle={() => sec.toggle("dataset")}
+          meta={
+            <span className="badge">
+              {usedDatasets.length === 1
+                ? usedDatasets[0].key
+                : `${usedDatasets.length} databases`}
+            </span>
+          }
+        >
+          <p className="dim" style={{ marginTop: -4 }}>
+            Every exercise below runs against a <strong>fresh copy</strong> of one of these,
+            rebuilt from scratch each time — so nothing you run can break anything. Read the
+            rows before you write the query.
+          </p>
+          {usedDatasets.length > 1 && (
+            <div className="row" style={{ gap: 6, marginBottom: 12, flexWrap: "wrap" }}>
+              {usedDatasets.map((d, i) => (
+                <button
+                  key={d.key}
+                  className={i === activeDataset ? "" : "ghost"}
+                  onClick={() => setActiveDataset(i)}
+                >
+                  {d.title}
+                </button>
+              ))}
+            </div>
+          )}
+          <DatasetBrowser
+            dataset={usedDatasets[Math.min(activeDataset, usedDatasets.length - 1)]}
+          />
+        </Section>
       )}
 
       {quiz.length > 0 && (
-        <>
-          <div className="divider" />
-          <h3>❓ Check yourself</h3>
+        <Section
+          title="❓ Check yourself"
+          open={sec.isOpen("quiz")}
+          onToggle={() => sec.toggle("quiz")}
+          meta={<span className="badge">{quiz.length} questions</span>}
+        >
           <p className="dim" style={{ marginTop: -4 }}>
             {quiz.length} quick questions. Pick an answer to see whether it&rsquo;s right and{" "}
             <strong>why</strong>. No code to run — just recall.
           </p>
           <QuizSection questions={quiz} />
-        </>
+        </Section>
       )}
 
       {practiceRefs.length > 0 && (
-        <>
-          <div className="divider" />
-          <h3>🎯 Practice this technique</h3>
+        <Section
+          title="🎯 Practice this technique"
+          open={sec.isOpen("practice")}
+          onToggle={() => sec.toggle("practice")}
+          meta={<span className="badge">{practiceRefs.length} problems</span>}
+        >
           <p className="dim" style={{ marginTop: -4 }}>
             Real problems from the Library where this idea is the key. Solve them in whatever
             language you like.
@@ -454,13 +652,16 @@ function ConceptDetail({
               </div>
             ))}
           </div>
-        </>
+        </Section>
       )}
 
       {drills.length > 0 && (
-        <>
-          <div className="divider" />
-          <h3>🧩 Warm-up drills — fill in the blank</h3>
+        <Section
+          title="🧩 Warm-up drills — fill in the blank"
+          open={sec.isOpen("drills")}
+          onToggle={() => sec.toggle("drills")}
+          meta={<span className="badge">{drills.length} drills</span>}
+        >
           <p className="dim" style={{ marginTop: -4 }}>
             Everything is written except the one piece this lesson teaches. Replace{" "}
             <code>____</code>, then press <strong>Check</strong>.
@@ -470,16 +671,25 @@ function ConceptDetail({
               key={ex.id}
               index={i + 1}
               exercise={ex}
+              dataset={ex.dataset ? datasets.get(ex.dataset) : undefined}
               source={ex.source_slug ? bySlug.get(ex.source_slug) : undefined}
             />
           ))}
-        </>
+        </Section>
       )}
 
       {challenges.length > 0 && (
-        <>
-          <div className="divider" />
-          <h3>🏆 Coding challenge</h3>
+        <Section
+          title={challenges.length > 1 ? "🏆 Coding challenges" : "🏆 Coding challenge"}
+          open={sec.isOpen("challenges")}
+          onToggle={() => sec.toggle("challenges")}
+          accent="var(--accent)"
+          meta={
+            <span className="badge" style={{ borderColor: "var(--accent)", color: "var(--accent)" }}>
+              {challenges.length} challenge{challenges.length > 1 ? "s" : ""}
+            </span>
+          }
+        >
           <p className="dim" style={{ marginTop: -4 }}>
             Now put it together. This is a complete little problem using only what
             you&rsquo;ve learned so far — write the whole solution where you see{" "}
@@ -491,16 +701,20 @@ function ConceptDetail({
               index={i + 1}
               exercise={ex}
               challenge
+              dataset={ex.dataset ? datasets.get(ex.dataset) : undefined}
               source={ex.source_slug ? bySlug.get(ex.source_slug) : undefined}
             />
           ))}
-        </>
+        </Section>
       )}
 
       {conceptLang(concept) !== "japanese" && related.length > 0 && (
-        <>
-          <div className="divider" />
-          <h3>Practice more in the Library</h3>
+        <Section
+          title="Practice more in the Library"
+          open={sec.isOpen("library")}
+          onToggle={() => sec.toggle("library")}
+          meta={<span className="badge">{related.length}</span>}
+        >
           <div className="grid cols-2">
             {related.map((p) => (
               <div key={p.id} className="card" style={{ cursor: "pointer" }} onClick={() => nav(`/solve/${p.id}`)}>
@@ -511,7 +725,7 @@ function ConceptDetail({
               </div>
             ))}
           </div>
-        </>
+        </Section>
       )}
     </div>
   );
@@ -521,16 +735,20 @@ function ExerciseCard({
   index,
   exercise,
   source,
+  dataset,
   challenge = false,
 }: {
   index: number;
   exercise: Exercise;
   source?: Problem;
+  /** SQL track: the database this exercise queries. */
+  dataset?: SqlDataset;
   challenge?: boolean;
 }) {
   const nav = useNavigate();
   const storeKey = `poodcode:learn-ex:${exercise.id}`;
   const lang = exercise.language || "java";
+  const isSql = lang === "sql";
   const [code, setCode] = useState<string>(
     () => localStorage.getItem(storeKey) ?? exercise.starter
   );
@@ -539,6 +757,10 @@ function ExerciseCard({
   const [err, setErr] = useState("");
   const [showHint, setShowHint] = useState(false);
   const [showSolution, setShowSolution] = useState(false);
+  // The SQL track's scratch run: the learner's query against the base dataset,
+  // showing whatever it returns rather than a pass/fail. Looking at the wrong
+  // answer is most of how you get to the right one.
+  const [preview, setPreview] = useState<SqlOut | null>(null);
 
   // Challenges are written from scratch, so give them a roomier editor than a
   // short fill-in-the-blank drill (whose starter already sizes it well).
@@ -555,8 +777,19 @@ function ExerciseCard({
   function reset() {
     update(exercise.starter);
     setReport(null);
+    setPreview(null);
     setErr("");
     setShowSolution(false);
+  }
+
+  /** The SQL a case runs against: the dataset, then that case's variation on it.
+   * Keeping the shared schema out of the individual tests is what stops a 4 KB
+   * CREATE/INSERT batch from being repeated inside all 161 exercises — see
+   * `Exercise.dataset` and tools/sql_defs.py. */
+  function setupFor(caseInput: string): string {
+    if (!isSql) return caseInput;
+    const base = dataset?.sql ?? "";
+    return caseInput.trim() ? `${base}\n${caseInput}\n` : base;
   }
 
   async function check() {
@@ -567,14 +800,29 @@ function ExerciseCard({
       id: 0,
       problem_id: 0,
       kind: "example",
-      name: `Test ${i + 1}`,
-      input: t.input,
+      name: isSql && t.input.trim() ? `Test ${i + 1} (changed data)` : `Test ${i + 1}`,
+      input: setupFor(t.input),
       expected_output: t.output,
       ordering: i,
     }));
     try {
       const r = await api.runTests(null, lang, code, cases);
       setReport(r);
+    } catch (e) {
+      setErr(String(e));
+    } finally {
+      setRunning(false);
+    }
+  }
+
+  /** Run the query against the base dataset and just show what comes back. */
+  async function runQuery() {
+    if (!dataset) return;
+    setRunning(true);
+    setErr("");
+    setReport(null);
+    try {
+      setPreview(await api.sqlQuery(dataset.sql, code));
     } catch (e) {
       setErr(String(e));
     } finally {
@@ -605,6 +853,19 @@ function ExerciseCard({
           {challenge && exercise.difficulty && (
             <span className={`badge diff ${exercise.difficulty}`}>{exercise.difficulty}</span>
           )}
+          {isSql && exercise.tests.length > 1 && (
+            <span
+              className="badge"
+              title={`Checked against ${exercise.tests.length} datasets — the same schema with the data changed, so a hard-coded answer fails`}
+            >
+              {exercise.tests.length} datasets
+            </span>
+          )}
+          {isSql && dataset && (
+            <span className="badge" title={dataset.summary}>
+              🗄 {dataset.key}
+            </span>
+          )}
           <span className="badge">{lang}</span>
         </span>
       </div>
@@ -625,6 +886,16 @@ function ExerciseCard({
         <button onClick={check} disabled={running}>
           {running ? "Checking…" : "Check"}
         </button>
+        {isSql && dataset && (
+          <button
+            className="ghost"
+            onClick={runQuery}
+            disabled={running}
+            title="Run this SQL against the dataset and just show the result — no pass/fail"
+          >
+            ▶ Run query
+          </button>
+        )}
         <button className="ghost" onClick={reset} disabled={running}>
           Reset
         </button>
@@ -643,6 +914,13 @@ function ExerciseCard({
         )}
       </div>
 
+      {isSql && (
+        <p className="dim" style={{ margin: "8px 0 0", fontSize: 12 }}>
+          Tip: put <code>EXPLAIN QUERY PLAN</code> in front of your query and press{" "}
+          <strong>Run query</strong> to see how SQLite intends to execute it.
+        </p>
+      )}
+
       {showHint && exercise.hint && (
         <div
           className="card"
@@ -660,7 +938,9 @@ function ExerciseCard({
         </div>
       )}
 
-      {report && <Feedback report={report} />}
+      {preview && <SqlPreview out={preview} />}
+
+      {report && <Feedback report={report} isSql={isSql} />}
 
       {showSolution && (
         <div style={{ marginTop: 10 }}>
@@ -816,13 +1096,111 @@ function QuizItem({
   );
 }
 
-function Feedback({ report }: { report: JudgeReport }) {
+/** The result of a scratch "Run query", shown as a table rather than as text. */
+function SqlPreview({ out }: { out: SqlOut }) {
+  if (out.error) {
+    return (
+      <div className="card" style={{ marginTop: 10, marginBottom: 0, borderColor: "var(--bad)" }}>
+        <div className="io-label" style={{ color: "var(--bad)" }}>
+          {out.timed_out
+            ? "Query timed out"
+            : out.syntax_error
+            ? "SQL error — the query would not compile"
+            : "SQL error"}
+        </div>
+        <pre style={{ margin: 0, whiteSpace: "pre-wrap", fontSize: 12 }}>{out.error}</pre>
+        {out.timed_out && (
+          <p className="dim" style={{ margin: "6px 0 0", fontSize: 12 }}>
+            An accidental cross join is the usual cause — check that every table after the
+            first has an <code>ON</code> clause.
+          </p>
+        )}
+      </div>
+    );
+  }
+  return (
+    <div className="card" style={{ marginTop: 10, marginBottom: 0 }}>
+      <div className="io-label">
+        Query result — {out.row_count} row{out.row_count === 1 ? "" : "s"} in{" "}
+        {out.runtime_ms} ms
+      </div>
+      {out.grid && (
+        <ResultGrid
+          columns={out.grid.columns}
+          rows={out.grid.rows}
+          truncated={out.grid.truncated}
+        />
+      )}
+      <p className="dim" style={{ margin: "6px 0 0", fontSize: 12 }}>
+        This is just what your SQL returns — press <strong>Check</strong> to compare it
+        against the expected answer.
+      </p>
+    </div>
+  );
+}
+
+/** The failing case, as two aligned tables with the differing rows tinted. */
+function SqlCaseDiff({
+  name,
+  variation,
+  expected,
+  actual,
+  stderr,
+  timedOut,
+}: {
+  name: string;
+  variation: boolean;
+  expected: string;
+  actual: string;
+  stderr: string;
+  timedOut: boolean;
+}) {
+  const diff = differingRows(expected, actual);
+  return (
+    <div style={{ marginTop: 10 }}>
+      <div className="dim" style={{ fontSize: 12, marginBottom: 4 }}>
+        {name}
+        {variation && " — the same schema with the data changed, so a hard-coded answer fails here"}
+      </div>
+      {stderr ? (
+        <pre
+          style={{
+            margin: 0,
+            whiteSpace: "pre-wrap",
+            fontSize: 12,
+            color: "var(--bad)",
+          }}
+        >
+          {timedOut ? "Query timed out. " : ""}
+          {stderr}
+        </pre>
+      ) : (
+        <div className="sql-compare">
+          <div>
+            <div className="io-label" style={{ color: "var(--good)" }}>
+              Expected
+            </div>
+            <TextGrid text={expected} highlightRows={diff} />
+          </div>
+          <div>
+            <div className="io-label" style={{ color: "var(--bad)" }}>
+              Your query returned
+            </div>
+            <TextGrid text={actual} highlightRows={diff} />
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function Feedback({ report, isSql = false }: { report: JudgeReport; isSql?: boolean }) {
   if (report.status === "not_installed") {
     return (
       <div className="card" style={{ marginTop: 10, marginBottom: 0, borderColor: "var(--bad)" }}>
-        <div className="io-label" style={{ color: "var(--bad)" }}>Java not available</div>
+        <div className="io-label" style={{ color: "var(--bad)" }}>Toolchain not available</div>
         <p style={{ margin: 0 }}>
-          {report.not_installed_hint || "Install a JDK to run these drills."}
+          {report.not_installed_hint || "Install the language's toolchain to run these drills."}
         </p>
       </div>
     );
@@ -831,7 +1209,9 @@ function Feedback({ report }: { report: JudgeReport }) {
   if (report.compile_error) {
     return (
       <div className="card" style={{ marginTop: 10, marginBottom: 0, borderColor: "var(--bad)" }}>
-        <div className="io-label" style={{ color: "var(--bad)" }}>Compile error</div>
+        <div className="io-label" style={{ color: "var(--bad)" }}>
+          {isSql ? "SQL error — the query would not compile" : "Compile error"}
+        </div>
         <pre style={{ margin: 0, whiteSpace: "pre-wrap", fontSize: 12 }}>
           {report.compile_error}
         </pre>
@@ -853,6 +1233,20 @@ function Feedback({ report }: { report: JudgeReport }) {
           : `${report.passed} / ${report.total} tests passed`}
       </div>
       {!ok &&
+        isSql &&
+        failing.slice(0, 2).map((r, i) => (
+          <SqlCaseDiff
+            key={i}
+            name={r.name}
+            variation={r.name.includes("changed data")}
+            expected={r.expected}
+            actual={r.actual}
+            stderr={r.stderr}
+            timedOut={r.timed_out}
+          />
+        ))}
+      {!ok &&
+        !isSql &&
         failing.slice(0, 3).map((r, i) => (
           <div key={i} style={{ marginTop: 6, fontSize: 12 }}>
             <div className="dim">{r.name}</div>

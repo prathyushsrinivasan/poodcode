@@ -1202,3 +1202,180 @@ pub fn reset_cards(conn: &Connection, card_ids: &[String]) -> AppResult<()> {
     tx.commit()?;
     Ok(())
 }
+
+// ---------------------------------------------------------------------------
+// Learn-tab chapter completion
+// ---------------------------------------------------------------------------
+
+/// Concept keys the learner has marked complete.
+pub fn done_chapters(conn: &Connection) -> AppResult<Vec<String>> {
+    let mut stmt = conn.prepare("SELECT concept_key FROM chapter_progress ORDER BY concept_key")?;
+    let rows = stmt.query_map([], |r| r.get::<_, String>(0))?;
+    Ok(rows.collect::<Result<Vec<_>, _>>()?)
+}
+
+pub fn set_chapter_done(conn: &Connection, concept_key: &str, done: bool) -> AppResult<()> {
+    if done {
+        conn.execute(
+            "INSERT INTO chapter_progress(concept_key) VALUES(?1)
+             ON CONFLICT(concept_key) DO NOTHING",
+            params![concept_key],
+        )?;
+    } else {
+        conn.execute(
+            "DELETE FROM chapter_progress WHERE concept_key = ?1",
+            params![concept_key],
+        )?;
+    }
+    Ok(())
+}
+
+// ---------------------------------------------------------------------------
+// 6-Month Mastery progress
+// ---------------------------------------------------------------------------
+
+fn row_to_mastery(row: &rusqlite::Row<'_>) -> rusqlite::Result<MasteryProgress> {
+    Ok(MasteryProgress {
+        track_key: row.get(0)?,
+        week: row.get(1)?,
+        best_quiz: row.get(2)?,
+        exam_passed: row.get::<_, i64>(3)? != 0,
+        exam_code: row.get(4)?,
+        project_notes: row.get(5)?,
+        project_code: row.get(6)?,
+        project_done: row.get::<_, i64>(7)? != 0,
+        study_seconds: row.get(8)?,
+        started_at: row.get(9)?,
+        completed_at: row.get(10)?,
+    })
+}
+
+const MASTERY_COLS: &str = "track_key, week, best_quiz, exam_passed, exam_code, \
+     project_notes, project_code, project_done, study_seconds, started_at, completed_at";
+
+pub fn mastery_progress(conn: &Connection) -> AppResult<Vec<MasteryProgress>> {
+    let sql = format!(
+        "SELECT {MASTERY_COLS} FROM mastery_progress ORDER BY track_key, week"
+    );
+    let mut stmt = conn.prepare(&sql)?;
+    let rows = stmt.query_map([], row_to_mastery)?;
+    Ok(rows.collect::<Result<Vec<_>, _>>()?)
+}
+
+/// Create the row for a week if it does not exist yet, stamping `started_at`.
+/// Every mutation below funnels through this so a week is "started" the first
+/// time the learner touches it.
+fn ensure_week(conn: &Connection, track_key: &str, week: i64) -> AppResult<()> {
+    conn.execute(
+        "INSERT INTO mastery_progress(track_key, week, started_at) VALUES(?1, ?2, ?3)
+         ON CONFLICT(track_key, week) DO NOTHING",
+        params![track_key, week, now_iso()],
+    )?;
+    Ok(())
+}
+
+/// Record a sitting of the end-of-week quiz. Only an improvement is kept, so a
+/// retake can never take back a week the learner had already unlocked.
+pub fn mastery_record_quiz(
+    conn: &Connection,
+    track_key: &str,
+    week: i64,
+    percent: i64,
+) -> AppResult<()> {
+    ensure_week(conn, track_key, week)?;
+    conn.execute(
+        "UPDATE mastery_progress SET best_quiz = MAX(best_quiz, ?3)
+         WHERE track_key = ?1 AND week = ?2",
+        params![track_key, week, percent],
+    )?;
+    Ok(())
+}
+
+/// Record an attempt at the week's coding final. `passed` is sticky — once the
+/// judge has accepted a solution the week stays unlocked even if the learner
+/// later saves a broken draft.
+pub fn mastery_record_exam(
+    conn: &Connection,
+    track_key: &str,
+    week: i64,
+    passed: bool,
+    code: &str,
+) -> AppResult<()> {
+    ensure_week(conn, track_key, week)?;
+    conn.execute(
+        "UPDATE mastery_progress
+            SET exam_passed = MAX(exam_passed, ?3), exam_code = ?4
+          WHERE track_key = ?1 AND week = ?2",
+        params![track_key, week, passed as i64, code],
+    )?;
+    Ok(())
+}
+
+pub fn mastery_save_project(
+    conn: &Connection,
+    track_key: &str,
+    week: i64,
+    notes: &str,
+    code: &str,
+    done: bool,
+) -> AppResult<()> {
+    ensure_week(conn, track_key, week)?;
+    conn.execute(
+        "UPDATE mastery_progress
+            SET project_notes = ?3, project_code = ?4, project_done = ?5
+          WHERE track_key = ?1 AND week = ?2",
+        params![track_key, week, notes, code, done as i64],
+    )?;
+    Ok(())
+}
+
+/// Attribute study time to a week AND to today's session, so mastery work shows
+/// up in the heatmap, the streak and the daily study total like anything else.
+pub fn mastery_log_time(
+    conn: &Connection,
+    track_key: &str,
+    week: i64,
+    seconds: i64,
+) -> AppResult<()> {
+    if seconds <= 0 {
+        return Ok(());
+    }
+    ensure_week(conn, track_key, week)?;
+    conn.execute(
+        "UPDATE mastery_progress SET study_seconds = study_seconds + ?3
+          WHERE track_key = ?1 AND week = ?2",
+        params![track_key, week, seconds],
+    )?;
+    bump_daily(conn, false, seconds)?;
+    Ok(())
+}
+
+/// Mark a week finished, once. Returns true the first time (so the caller can
+/// celebrate); later calls are no-ops. Seeding of review material is the
+/// caller's job — see `commands::mastery_complete_week`, which has the
+/// curriculum JSON needed to resolve concepts and problems.
+pub fn mastery_mark_complete(conn: &Connection, track_key: &str, week: i64) -> AppResult<bool> {
+    ensure_week(conn, track_key, week)?;
+    let already: Option<String> = conn.query_row(
+        "SELECT completed_at FROM mastery_progress WHERE track_key = ?1 AND week = ?2",
+        params![track_key, week],
+        |r| r.get(0),
+    )?;
+    if already.is_some() {
+        return Ok(false);
+    }
+    conn.execute(
+        "UPDATE mastery_progress SET completed_at = ?3 WHERE track_key = ?1 AND week = ?2",
+        params![track_key, week, now_iso()],
+    )?;
+    Ok(true)
+}
+
+/// Resolve a problem slug to its id, if the bank has it.
+pub fn problem_id_for_slug(conn: &Connection, slug: &str) -> AppResult<Option<i64>> {
+    Ok(conn
+        .query_row("SELECT id FROM problems WHERE slug = ?1", params![slug], |r| {
+            r.get::<_, i64>(0)
+        })
+        .optional()?)
+}
