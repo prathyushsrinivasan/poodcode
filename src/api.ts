@@ -23,6 +23,7 @@ import type {
   Flashcard,
   CardReview,
   JpBridge,
+  TsCourse,
   MasteryTrack,
   MasteryProgress,
   SqlDataset,
@@ -77,6 +78,7 @@ export const api = {
 
   // Learn / concepts
   concepts: () => invoke<Concept[]>("concepts"),
+  tsCourse: () => invoke<TsCourse>("ts_course"),
 
   // SQL track — the datasets its exercises query, plus the in-process engine
   // that runs SQL against a throwaway in-memory database (see src-tauri/src/sqlexec.rs).

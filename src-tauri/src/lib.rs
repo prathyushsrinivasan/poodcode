@@ -378,6 +378,7 @@ pub fn run() {
             commands::grade_card,
             commands::reset_cards,
             commands::jp_bridge,
+            commands::ts_course,
             commands::mastery,
             commands::mastery_progress,
             commands::mastery_record_quiz,

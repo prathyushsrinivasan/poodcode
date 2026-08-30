@@ -75,6 +75,14 @@ pub fn jp_bridge() -> AppResult<crate::models::JpBridge> {
     Ok(serde_json::from_str(JP_BRIDGE_JSON)?)
 }
 
+/// The 8-month structured TypeScript course (authored in tools/typescript_course.py).
+const TS_COURSE_JSON: &str = include_str!("../seeds/ts_course.json");
+
+#[tauri::command]
+pub fn ts_course() -> AppResult<crate::models::TsCourse> {
+    Ok(serde_json::from_str(TS_COURSE_JSON)?)
+}
+
 /// The 6-Month Mastery programme — the concept catalog sequenced into weeks
 /// (authored in tools/mastery_defs.py, which validates every concept key and
 /// problem slug it references at generation time). Read-only content; the

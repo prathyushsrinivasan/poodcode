@@ -13,9 +13,8 @@ export function Welcome({ onClose }: { onClose: () => void }) {
   const items: { icon: string; title: string; body: string }[] = [
     { icon: "📚", title: "Problem Library", body: "132 problems ordered easiest → hardest. Start at the top and work down." },
     { icon: "🧭", title: "Learning Paths", body: "Curated tracks (Foundations, Arrays, DP…) that build skills in order." },
-    { icon: "🔁", title: "Revision", body: "Solved problems return on a spaced-repetition schedule so they stick." },
-    { icon: "🧩", title: "Drill & 🔬 Debugger", body: "Name the pattern before coding; step through algorithms visually." },
-    { icon: "⏱️", title: "Interview & 🏁 Contest", body: "Timed practice when you're ready to simulate the real thing." },
+    { icon: "📗", title: "TypeScript Course", body: "A full 8-month course, beginner to interview — a themed goal and project every week." },
+    { icon: "🎓", title: "6-Month Mastery", body: "Structured weekly programme with quizzes, projects, and exams." },
   ];
 
   return (
@@ -28,8 +27,8 @@ export function Welcome({ onClose }: { onClose: () => void }) {
           <button className="ghost" onClick={onClose}>✕</button>
         </div>
         <p className="dim" style={{ marginTop: 8 }}>
-          Your offline coding-interview trainer. You write a solution, it's judged against real test
-          cases, and what you solve comes back for review so it sticks. Here's the lay of the land:
+          Your offline coding-interview trainer. You write a solution and it's judged against real
+          test cases. Here's the lay of the land:
         </p>
 
         <div style={{ margin: "10px 0" }}>

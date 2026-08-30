@@ -157,6 +157,41 @@ export interface JpBridge {
   interview: InterviewQA[];
 }
 
+// --- TypeScript course (8-month structured curriculum) ---------------------
+export interface Capstone {
+  title: string;
+  brief: string;
+  /** "auto" = judged via `exercise`; "brief" = free build, self-marked. */
+  kind: string;
+  exercise: Exercise | null;
+}
+export interface CourseLesson {
+  key: string;
+  title: string;
+  what: string;
+  lesson: string;
+  exercises: Exercise[];
+  quiz: QuizQuestion[];
+}
+export interface CourseWeek {
+  number: number;
+  month: number;
+  month_title: string;
+  theme: string;
+  goal: string;
+  summary: string;
+  /** false = skeleton placeholder ("coming soon"). */
+  authored: boolean;
+  lessons: CourseLesson[];
+  capstone: Capstone | null;
+}
+export interface TsCourse {
+  key: string;
+  title: string;
+  subtitle: string;
+  weeks: CourseWeek[];
+}
+
 // --- 6-Month Mastery programme (seeds/mastery.json) ------------------------
 // The Learn catalog is a reference library; a mastery track sequences it into
 // weeks. Content is read-only — progress lives in localStorage (lib/mastery.ts).

@@ -62,3 +62,31 @@ export async function setChapterDone(
 export function cardId(conceptKey: string, front: string): string {
   return `${conceptKey}#${front}`;
 }
+
+// Per-exercise "solved once" marks. Like the exercise DRAFTS above, this is a
+// lightweight UI convenience (used to decide when a lesson/week has had all its
+// problems solved so it can auto-complete), so it stays in localStorage.
+const SOLVED_EX_KEY = "poodcode:learn-ex-solved";
+
+function readSolved(): Set<string> {
+  try {
+    const raw = JSON.parse(localStorage.getItem(SOLVED_EX_KEY) || "[]");
+    return new Set(Array.isArray(raw) ? raw : []);
+  } catch {
+    return new Set();
+  }
+}
+
+/** Exercise ids the learner has solved (judged Accepted) at least once. */
+export function solvedExercises(): Set<string> {
+  return readSolved();
+}
+
+export function markExerciseSolved(id: string): Set<string> {
+  const s = readSolved();
+  if (!s.has(id)) {
+    s.add(id);
+    localStorage.setItem(SOLVED_EX_KEY, JSON.stringify([...s]));
+  }
+  return s;
+}

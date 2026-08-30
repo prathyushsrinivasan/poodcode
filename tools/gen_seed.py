@@ -6012,6 +6012,14 @@ if os.path.exists(_tsm_path):
     with open(_tsm_path, encoding="utf-8") as _tmf:
         exec(compile(_tmf.read(), _tsm_path, "exec"))
 
+# The 8-month structured TypeScript COURSE (weeks/themes/goals/lessons/capstones).
+# Runs after the other TypeScript files so it can reuse tsx/tsc/_P. Defines
+# TS_COURSE; written to seeds/ts_course.json near the concepts.
+_tsc_path = os.path.join(HERE, "typescript_course.py")
+if os.path.exists(_tsc_path):
+    with open(_tsc_path, encoding="utf-8") as _tcf:
+        exec(compile(_tcf.read(), _tsc_path, "exec"))
+
 
 # ---------------------------------------------------------------------------
 # Japanese coding-vocabulary Learn track — a THIRD "language" for the Learn
@@ -6285,6 +6293,17 @@ with open(BRIDGE_OUT, "w", encoding="utf-8", newline="\n") as f:
 print(
     f"Wrote {len(_bridge['problems'])} bridge problems + "
     f"{len(_bridge['interview'])} interview Q&A to {os.path.relpath(BRIDGE_OUT)}"
+)
+
+# The 8-month TypeScript course (weeks / lessons / capstones).
+TS_COURSE_OUT = os.path.join(HERE, "..", "src-tauri", "seeds", "ts_course.json")
+_ts_course = globals().get("TS_COURSE", {"key": "typescript", "title": "", "subtitle": "", "weeks": []})
+with open(TS_COURSE_OUT, "w", encoding="utf-8", newline="\n") as f:
+    json.dump(_ts_course, f, indent=2, ensure_ascii=False)
+_authored = sum(1 for w in _ts_course["weeks"] if w.get("authored"))
+print(
+    f"Wrote TS course: {len(_ts_course['weeks'])} weeks "
+    f"({_authored} authored) to {os.path.relpath(TS_COURSE_OUT)}"
 )
 
 # ---------------------------------------------------------------------------

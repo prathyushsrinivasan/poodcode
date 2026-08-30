@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { api } from "../api";
 import type {
@@ -22,7 +22,12 @@ import {
   TextGrid,
   differingRows,
 } from "../components/SqlGrid";
-import { loadDoneChapters, setChapterDone } from "../lib/learnProgress";
+import {
+  loadDoneChapters,
+  setChapterDone,
+  solvedExercises,
+  markExerciseSolved,
+} from "../lib/learnProgress";
 
 const CATEGORY_ORDER = [
   "Foundations",
@@ -132,8 +137,8 @@ export default function Learn() {
   const cats = useCollapse(`learn-cat:${lang}`);
   const nav = useNavigate();
 
-  async function toggleDone(key: string) {
-    setDone(await setChapterDone(done, key, !done.has(key)));
+  async function setDoneState(key: string, value: boolean) {
+    setDone(await setChapterDone(done, key, value));
   }
 
   useEffect(() => {
@@ -195,7 +200,7 @@ export default function Learn() {
         problems={problems}
         datasets={datasets}
         isDone={done.has(concept.key)}
-        onToggleDone={() => toggleDone(concept.key)}
+        onSetDone={(v) => setDoneState(concept.key, v)}
       />
     );
   }
@@ -293,6 +298,26 @@ export default function Learn() {
               </p>
             </div>
             <span className="badge">Open →</span>
+          </div>
+        </div>
+      )}
+
+      {isTs && (
+        <div
+          className="card"
+          style={{ cursor: "pointer", borderColor: "var(--accent)", marginBottom: 12 }}
+          onClick={() => nav("/course")}
+        >
+          <div className="row" style={{ justifyContent: "space-between", alignItems: "center" }}>
+            <div>
+              <strong>📗 New: the 8-month TypeScript course — from zero</strong>
+              <p className="dim" style={{ margin: "4px 0 0", fontSize: 13 }}>
+                A guided, week-by-week path from your first line of code to interview-ready. Each
+                week has a goal, lessons that never outrun what you've learned, and a capstone
+                project. The chapters below are your free-form reference.
+              </p>
+            </div>
+            <span className="badge">Start →</span>
           </div>
         </div>
       )}
@@ -429,14 +454,14 @@ function ConceptDetail({
   problems,
   datasets,
   isDone,
-  onToggleDone,
+  onSetDone,
 }: {
   concept: Concept;
   related: Problem[];
   problems: Problem[];
   datasets: Map<string, SqlDataset>;
   isDone: boolean;
-  onToggleDone: () => void;
+  onSetDone: (done: boolean) => void;
 }) {
   const nav = useNavigate();
   const bySlug = useMemo(() => {
@@ -448,6 +473,33 @@ function ConceptDetail({
   const exercises = concept.exercises ?? [];
   const drills = exercises.filter((e) => (e.kind || "drill") !== "challenge");
   const challenges = exercises.filter((e) => e.kind === "challenge");
+
+  // --- Auto-complete: mark this chapter done once the learner has scrolled to
+  // the bottom AND solved all of its exercises (a chapter with no exercises just
+  // needs to be read through). The manual Done toggle still works.
+  const [solvedEx, setSolvedEx] = useState<Set<string>>(() => solvedExercises());
+  const [scrolledToBottom, setScrolledToBottom] = useState(false);
+  const bottomRef = useRef<HTMLDivElement | null>(null);
+  const gradableIds = exercises.map((e) => e.id);
+  const allSolved = gradableIds.every((id) => solvedEx.has(id));
+  const onSolved = (id: string) => setSolvedEx(new Set(markExerciseSolved(id)));
+
+  useEffect(() => {
+    const el = bottomRef.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) setScrolledToBottom(true);
+      },
+      { threshold: 0.01 }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [concept.key]);
+
+  useEffect(() => {
+    if (!isDone && scrolledToBottom && allSolved) onSetDone(true);
+  }, [isDone, scrolledToBottom, allSolved, onSetDone]);
   const cards = concept.cards ?? [];
   const quiz = concept.quiz ?? [];
   const practiceRefs = (concept.practice ?? [])
@@ -491,7 +543,7 @@ function ConceptDetail({
         <button
           className="ghost"
           style={isDone ? { borderColor: "var(--good)", color: "var(--good)" } : undefined}
-          onClick={onToggleDone}
+          onClick={() => onSetDone(!isDone)}
           title={isDone ? "Marked complete — click to undo" : "Mark this chapter as complete"}
         >
           {isDone ? "✓ Done" : "Mark done"}
@@ -673,6 +725,7 @@ function ConceptDetail({
               exercise={ex}
               dataset={ex.dataset ? datasets.get(ex.dataset) : undefined}
               source={ex.source_slug ? bySlug.get(ex.source_slug) : undefined}
+              onSolved={onSolved}
             />
           ))}
         </Section>
@@ -703,6 +756,7 @@ function ConceptDetail({
               challenge
               dataset={ex.dataset ? datasets.get(ex.dataset) : undefined}
               source={ex.source_slug ? bySlug.get(ex.source_slug) : undefined}
+              onSolved={onSolved}
             />
           ))}
         </Section>
@@ -727,6 +781,17 @@ function ConceptDetail({
           </div>
         </Section>
       )}
+
+      {!isDone && (
+        <p className="faint" style={{ fontSize: 12, marginTop: 20, textAlign: "center" }}>
+          {gradableIds.length > 0
+            ? `This chapter marks itself ✓ Done once you've read to here and solved its ${gradableIds.length} exercise${gradableIds.length === 1 ? "" : "s"}${allSolved ? " — all solved!" : ` (${gradableIds.filter((id) => solvedEx.has(id)).length}/${gradableIds.length} solved)`}.`
+            : "This chapter marks itself ✓ Done once you've read to here."}
+        </p>
+      )}
+
+      {/* Sentinel: intersecting means the lesson has been read to the bottom. */}
+      <div ref={bottomRef} style={{ height: 1 }} />
     </div>
   );
 }
@@ -737,6 +802,7 @@ function ExerciseCard({
   source,
   dataset,
   challenge = false,
+  onSolved,
 }: {
   index: number;
   exercise: Exercise;
@@ -744,6 +810,7 @@ function ExerciseCard({
   /** SQL track: the database this exercise queries. */
   dataset?: SqlDataset;
   challenge?: boolean;
+  onSolved?: (id: string) => void;
 }) {
   const nav = useNavigate();
   const storeKey = `poodcode:learn-ex:${exercise.id}`;
@@ -808,6 +875,7 @@ function ExerciseCard({
     try {
       const r = await api.runTests(null, lang, code, cases);
       setReport(r);
+      if (r.status === "accepted") onSolved?.(exercise.id);
     } catch (e) {
       setErr(String(e));
     } finally {

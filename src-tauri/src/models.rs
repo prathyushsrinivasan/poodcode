@@ -564,6 +564,79 @@ pub struct JpBridge {
 }
 
 // ---------------------------------------------------------------------------
+// TypeScript course — an 8-month, week-by-week structured curriculum. Content
+// lives in the embedded seeds/ts_course.json; served by the `ts_course`
+// command. Lessons reuse the same `Exercise` + `QuizQuestion` model (and the
+// same stdin/stdout judge) as the Learn concepts.
+// ---------------------------------------------------------------------------
+
+/// The whole TypeScript course (embedded seeds/ts_course.json).
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct TsCourse {
+    #[serde(default)]
+    pub key: String,
+    #[serde(default)]
+    pub title: String,
+    #[serde(default)]
+    pub subtitle: String,
+    #[serde(default)]
+    pub weeks: Vec<CourseWeek>,
+}
+
+/// One themed week of the course: a goal, a set of lessons, and a capstone.
+/// `authored=false` marks a skeleton placeholder shown as "coming soon".
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CourseWeek {
+    pub number: i64,
+    #[serde(default)]
+    pub month: i64,
+    #[serde(default)]
+    pub month_title: String,
+    #[serde(default)]
+    pub theme: String,
+    #[serde(default)]
+    pub goal: String,
+    #[serde(default)]
+    pub summary: String,
+    #[serde(default)]
+    pub authored: bool,
+    #[serde(default)]
+    pub lessons: Vec<CourseLesson>,
+    #[serde(default)]
+    pub capstone: Option<Capstone>,
+}
+
+/// One lesson within a week: prose (`lesson`, Markdown) plus judged exercises
+/// and an optional self-check quiz, all scoped to what's been taught so far.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CourseLesson {
+    pub key: String,
+    pub title: String,
+    #[serde(default)]
+    pub what: String,
+    #[serde(default)]
+    pub lesson: String,
+    #[serde(default)]
+    pub exercises: Vec<Exercise>,
+    #[serde(default)]
+    pub quiz: Vec<QuizQuestion>,
+}
+
+/// A week's capstone mini-project. `kind = "auto"` carries a judged `exercise`
+/// (a fuller build with hidden tests); `kind = "brief"` is a written spec the
+/// learner builds freely and self-marks (some projects don't fit console I/O).
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Capstone {
+    pub title: String,
+    #[serde(default)]
+    pub brief: String,
+    #[serde(default)]
+    pub kind: String,
+    #[serde(default)]
+    pub exercise: Option<Exercise>,
+}
+
+// ---------------------------------------------------------------------------
 // 6-Month Mastery programme (seeds/mastery.json, authored in
 // tools/mastery_defs.py). The Learn catalog is a reference library you can read
 // in any order; a mastery track sequences it into weeks with problems, a build

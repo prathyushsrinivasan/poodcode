@@ -35,8 +35,8 @@ export function CommandPalette() {
       { id: "dash", label: "Go to Dashboard", run: () => navigate("/") },
       { id: "lib", label: "Go to Problem Library", run: () => navigate("/library") },
       { id: "learn", label: "Go to Learn", run: () => navigate("/learn") },
+      { id: "course", label: "Open the TypeScript Course", run: () => navigate("/course") },
       { id: "mastery", label: "Go to 6-Month Mastery", run: () => navigate("/mastery") },
-      { id: "rev", label: "Go to Revision Queue", run: () => navigate("/revision") },
       { id: "settings", label: "Open Settings", run: () => navigate("/settings") },
       { id: "theme", label: "Toggle Light / Dark Theme", run: () => toggleTheme() },
     ];

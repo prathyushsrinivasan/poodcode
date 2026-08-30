@@ -109,6 +109,60 @@ pub enum PrepareError {
     Io(String),
 }
 
+/// Installed Node.js `(major, minor)`, probed once and cached. `None` if Node is
+/// missing or its version string can't be parsed.
+fn node_version() -> Option<(u32, u32)> {
+    static VER: OnceLock<Option<(u32, u32)>> = OnceLock::new();
+    *VER.get_or_init(|| {
+        let out = Command::new("node")
+            .arg("--version") // prints e.g. "v22.6.0"
+            .stdin(Stdio::null())
+            .stderr(Stdio::null())
+            .output()
+            .ok()?;
+        let s = String::from_utf8_lossy(&out.stdout);
+        let s = s.trim().trim_start_matches('v');
+        let mut parts = s.split('.');
+        let major = parts.next()?.parse().ok()?;
+        let minor = parts.next().unwrap_or("0").parse().unwrap_or(0);
+        Some((major, minor))
+    })
+}
+
+/// Node args needed to run a `.ts` file by stripping types, chosen for the
+/// installed Node version:
+/// - **≥ 22.18 / ≥ 23.6 / ≥ 24**: type stripping is on by default — no flag
+///   needed (and `--experimental-strip-types` is deprecated / may be removed).
+/// - **22.6 – 22.17 / 23.0 – 23.5**: needs `--experimental-strip-types`.
+/// - **< 22.6**: can't run TypeScript — return a clear, actionable error.
+///
+/// Always passes `--no-warnings` so an ExperimentalWarning never lands on stderr.
+fn ts_node_args() -> Result<Vec<String>, PrepareError> {
+    let native_default = |maj: u32, min: u32| -> bool {
+        maj >= 24 || (maj == 23 && min >= 6) || (maj == 22 && min >= 18)
+    };
+    let supports_flag = |maj: u32, min: u32| -> bool {
+        maj >= 23 || (maj == 22 && min >= 6)
+    };
+    match node_version() {
+        Some((maj, min)) if native_default(maj, min) => {
+            Ok(vec!["--no-warnings".into()])
+        }
+        Some((maj, min)) if supports_flag(maj, min) => {
+            Ok(vec!["--experimental-strip-types".into(), "--no-warnings".into()])
+        }
+        Some((maj, min)) => Err(PrepareError::NotInstalled {
+            hint: format!(
+                "TypeScript needs Node 22.6+ to run (found v{maj}.{min}). \
+                 Update Node.js, or switch this problem to JavaScript."
+            ),
+        }),
+        // Version unknown but `node` resolved as installed: fall back to the flag
+        // form, which works on every Node that has type stripping at all.
+        None => Ok(vec!["--experimental-strip-types".into(), "--no-warnings".into()]),
+    }
+}
+
 /// How to run a prepared program.
 pub struct RunSpec {
     program: String,
@@ -164,12 +218,14 @@ pub fn prepare(lang_id: &str, code: &str, dir: &Path) -> Result<RunSpec, Prepare
         }
         "typescript" => {
             write("main.ts", code)?;
-            // Node 22+ strips type annotations natively.
-            Ok(RunSpec {
-                program: "node".into(),
-                args: vec!["--experimental-strip-types".into(), "--no-warnings".into(), "main.ts".into()],
-                cwd,
-            })
+            // Node runs `.ts` by stripping type annotations. HOW to invoke that
+            // depends on the installed Node version, so resolve the right args
+            // (or a clear "too old" error) rather than hard-coding a flag that
+            // may not exist — an unknown flag makes Node exit non-zero, which
+            // silently fails *every* TS run, even a correct `console.log`.
+            let mut args = ts_node_args()?;
+            args.push("main.ts".into());
+            Ok(RunSpec { program: "node".into(), args, cwd })
         }
         "java" => {
             write("Main.java", code)?;

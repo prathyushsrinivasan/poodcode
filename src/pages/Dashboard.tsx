@@ -54,11 +54,10 @@ export default function Dashboard() {
         {d.total_solved}/{d.total_problems} problems solved overall
       </p>
 
-      <div className="grid cols-4" style={{ marginBottom: 18 }}>
+      <div className="grid cols-3" style={{ marginBottom: 18 }}>
         <Stat value={d.solved_today} label="Solved today" />
         <Stat value={formatDuration(d.study_seconds_today)} label="Study time today" />
         <Stat value={`${d.current_streak}🔥`} label="Current streak" />
-        <Stat value={d.reviews_due} label="Reviews due" />
       </div>
 
       <MasteryCard />
@@ -173,7 +172,7 @@ export default function Dashboard() {
 
       <div className="row" style={{ marginTop: 18 }}>
         <button onClick={() => nav("/library")}>Browse Library</button>
-        <button onClick={() => nav("/revision")}>Start Reviews ({d.reviews_due})</button>
+        <button onClick={() => nav("/course")}>TypeScript Course</button>
       </div>
     </div>
   );
