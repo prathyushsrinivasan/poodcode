@@ -31,14 +31,27 @@ export function ExerciseCard({
   const [report, setReport] = useState<JudgeReport | null>(null);
   const [running, setRunning] = useState(false);
   const [err, setErr] = useState("");
-  const [showHint, setShowHint] = useState(false);
+  const [hintsShown, setHintsShown] = useState(0);
   const [showSolution, setShowSolution] = useState(false);
 
-  // Challenges are written from scratch, so give them a roomier editor than a
-  // short fill-in-the-blank drill (whose starter already sizes it well).
+  // Progressive hint ladder (nudge → strategy → near-answer); fall back to the
+  // single legacy `hint` when no ladder is authored.
+  const hintLadder =
+    exercise.hints && exercise.hints.length > 0
+      ? exercise.hints
+      : exercise.hint
+      ? [exercise.hint]
+      : [];
+
+  // "fix" = a complete but buggy program to correct; like a challenge, it's a
+  // full program (no ____ blank) so it wants a roomier editor and accent frame.
+  const isFix = exercise.kind === "fix";
+  const big = challenge || isFix;
+  const hasBlank = exercise.starter.includes("____");
+
   const height = Math.min(
-    Math.max(exercise.starter.split("\n").length * 20 + 24, challenge ? 260 : 150),
-    challenge ? 560 : 480
+    Math.max(exercise.starter.split("\n").length * 20 + 24, big ? 260 : 150),
+    big ? 560 : 480
   );
 
   function update(v: string) {
@@ -77,7 +90,7 @@ export function ExerciseCard({
     }
   }
 
-  const untouched = code === exercise.starter || code.includes("____");
+  const untouched = hasBlank && (code === exercise.starter || code.includes("____"));
   const solved = report?.status === "accepted";
 
   return (
@@ -87,7 +100,7 @@ export function ExerciseCard({
         marginBottom: 14,
         borderColor: solved
           ? "var(--good)"
-          : challenge
+          : big
           ? "var(--accent)"
           : undefined,
       }}
@@ -97,7 +110,12 @@ export function ExerciseCard({
           {index}. {exercise.title} {solved && <span style={{ color: "var(--good)" }}>✓</span>}
         </strong>
         <span className="row" style={{ gap: 6 }}>
-          {challenge && exercise.difficulty && (
+          {isFix && (
+            <span className="badge" style={{ borderColor: "var(--bad)", color: "var(--bad)" }}>
+              🐞 fix the bug
+            </span>
+          )}
+          {exercise.difficulty && (
             <span className={`badge diff ${exercise.difficulty}`}>{exercise.difficulty}</span>
           )}
           <span className="badge">{lang}</span>
@@ -123,9 +141,13 @@ export function ExerciseCard({
         <button className="ghost" onClick={reset} disabled={running}>
           Reset
         </button>
-        {exercise.hint && (
-          <button className="ghost" onClick={() => setShowHint((s) => !s)}>
-            {showHint ? "Hide hint" : "Hint"}
+        {hintsShown < hintLadder.length && (
+          <button className="ghost" onClick={() => setHintsShown((n) => n + 1)}>
+            {hintsShown === 0
+              ? hintLadder.length > 1
+                ? `Hint (${hintLadder.length})`
+                : "Hint"
+              : `Next hint (${hintsShown}/${hintLadder.length})`}
           </button>
         )}
         <button className="ghost" onClick={() => setShowSolution((s) => !s)}>
@@ -138,13 +160,20 @@ export function ExerciseCard({
         )}
       </div>
 
-      {showHint && exercise.hint && (
+      {hintsShown > 0 && (
         <div
           className="card"
           style={{ marginTop: 10, marginBottom: 0, background: "var(--accent-dim)" }}
         >
-          <div className="io-label" style={{ color: "var(--accent)" }}>Hint</div>
-          <p style={{ margin: 0 }}>{exercise.hint}</p>
+          <div className="io-label" style={{ color: "var(--accent)" }}>
+            {hintLadder.length > 1 ? `Hints (${hintsShown}/${hintLadder.length})` : "Hint"}
+          </div>
+          {hintLadder.slice(0, hintsShown).map((h, i) => (
+            <p key={i} style={{ margin: i === 0 ? 0 : "6px 0 0" }}>
+              {hintLadder.length > 1 && <strong>{i + 1}. </strong>}
+              {h}
+            </p>
+          ))}
         </div>
       )}
 

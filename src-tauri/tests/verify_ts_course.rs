@@ -19,7 +19,7 @@ fn load_course() -> TsCourse {
     serde_json::from_str(COURSE).expect("ts_course.json parses")
 }
 
-/// Every judged exercise in the course (lesson exercises + auto capstone).
+/// Every judged exercise in the course (lesson exercises + capstone + stretch).
 fn all_exercises(course: &TsCourse) -> Vec<(String, &Exercise)> {
     let mut out = Vec::new();
     for w in &course.weeks {
@@ -32,9 +32,23 @@ fn all_exercises(course: &TsCourse) -> Vec<(String, &Exercise)> {
             if let Some(ex) = &cap.exercise {
                 out.push((format!("W{}/capstone", w.number), ex));
             }
+            if let Some(ex) = &cap.stretch {
+                out.push((format!("W{}/stretch", w.number), ex));
+            }
         }
     }
     out
+}
+
+/// Validate a quiz's answer indices are all in range.
+fn check_quiz(quiz: &[poodcode_lib::models::QuizQuestion], where_: &str) {
+    for q in quiz {
+        assert!(
+            q.answer >= 0 && (q.answer as usize) < q.options.len(),
+            "quiz in {where_} has out-of-range answer {}",
+            q.answer
+        );
+    }
 }
 
 #[test]
@@ -63,24 +77,26 @@ fn course_structure_is_well_formed() {
         assert!(!ex.title.trim().is_empty(), "{}: empty title", ex.id);
         assert!(!ex.prompt.trim().is_empty(), "{}: empty prompt", ex.id);
         assert!(!ex.solution.trim().is_empty(), "{}: empty solution", ex.id);
-        assert!(ex.starter.contains("____"), "{}: starter has no ____ blank", ex.id);
+        // "fix" exercises hand the learner a complete buggy program (no blank);
+        // every other kind must have a ____ blank to fill.
+        if ex.kind == "fix" {
+            assert!(!ex.starter.contains("____"), "{}: fix starter should have no blank", ex.id);
+        } else {
+            assert!(ex.starter.contains("____"), "{}: starter has no ____ blank", ex.id);
+        }
         assert_ne!(ex.starter, ex.solution, "{}: starter equals solution", ex.id);
         assert!(!ex.tests.is_empty(), "{}: no tests", ex.id);
         total += 1;
     }
     assert!(total > 0, "no course exercises shipped");
 
-    // Every quiz answer index is in range.
+    // Every quiz answer index is in range — lesson warm-ups, lesson quizzes,
+    // and the end-of-week review.
     for w in &course.weeks {
+        check_quiz(&w.review, &format!("W{}/review", w.number));
         for l in &w.lessons {
-            for q in &l.quiz {
-                assert!(
-                    q.answer >= 0 && (q.answer as usize) < q.options.len(),
-                    "quiz in {} has out-of-range answer {}",
-                    l.key,
-                    q.answer
-                );
-            }
+            check_quiz(&l.warmup, &format!("W{}/{}/warmup", w.number, l.key));
+            check_quiz(&l.quiz, &format!("W{}/{}/quiz", w.number, l.key));
         }
     }
     eprintln!("verified {total} well-formed course exercises across 32 weeks");

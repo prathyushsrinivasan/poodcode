@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { api } from "../api";
-import type { CourseLesson, CourseWeek, TsCourse } from "../types";
+import type { CourseLesson, CourseWeek, Exercise, TsCourse } from "../types";
 import { Markdown } from "../components/Markdown";
 import { ExerciseCard, QuizSection } from "../components/LearnExercise";
+import { Section, useCollapse } from "../components/Collapsible";
 import { Empty } from "../components/common";
+import { useToast } from "../components/Toast";
 import {
   loadDoneChapters,
   setChapterDone,
@@ -16,6 +18,15 @@ import {
 // set as the Learn tab, under a namespaced key so it never collides with a
 // concept key.
 const weekKey = (n: number) => `ts-course:w${n}`;
+
+// Every judged exercise required to complete a week: all lesson exercises plus
+// an auto-graded capstone. The optional "stretch" build is NOT required.
+function requiredExerciseIds(week: CourseWeek): string[] {
+  const ids: string[] = [];
+  for (const l of week.lessons ?? []) for (const e of l.exercises ?? []) ids.push(e.id);
+  if (week.capstone?.exercise) ids.push(week.capstone.exercise.id);
+  return ids;
+}
 
 export default function Course() {
   const { week } = useParams();
@@ -53,11 +64,17 @@ export default function Course() {
         </div>
       );
     }
+    // Neighbours for prev/next nav — only among authored weeks.
+    const authored = course.weeks.filter((w) => w.authored).sort((a, b) => a.number - b.number);
+    const idx = authored.findIndex((w) => w.number === wk.number);
     return (
       <WeekDetail
+        key={wk.number}
         week={wk}
         isDone={done.has(weekKey(wk.number))}
         onSetDone={(v) => setWeekDone(wk.number, v)}
+        prev={idx > 0 ? authored[idx - 1] : null}
+        next={idx >= 0 && idx < authored.length - 1 ? authored[idx + 1] : null}
       />
     );
   }
@@ -68,7 +85,6 @@ export default function Course() {
 function Overview({ course, done }: { course: TsCourse; done: Set<string> }) {
   const nav = useNavigate();
 
-  // Group weeks into months, preserving order.
   const months = useMemo(() => {
     const map = new Map<number, { title: string; weeks: CourseWeek[] }>();
     for (const w of course.weeks) {
@@ -106,7 +122,7 @@ function Overview({ course, done }: { course: TsCourse; done: Set<string> }) {
           </div>
           {nextWeek && (
             <button className="primary" onClick={() => nav(`/course/${nextWeek.number}`)}>
-              {doneCount === 0 ? "Start Week 1 →" : `Continue · Week ${nextWeek.number} →`}
+              {doneCount === 0 ? "Start Week 1 →" : `Resume · Week ${nextWeek.number} →`}
             </button>
           )}
         </div>
@@ -133,6 +149,7 @@ function Overview({ course, done }: { course: TsCourse; done: Set<string> }) {
               const isDone = done.has(weekKey(w.number));
               const soon = !w.authored;
               const nLessons = w.lessons?.length ?? 0;
+              const nEx = requiredExerciseIds(w).length;
               return (
                 <div
                   key={w.number}
@@ -152,8 +169,9 @@ function Overview({ course, done }: { course: TsCourse; done: Set<string> }) {
                     {soon ? (
                       <span className="badge">soon</span>
                     ) : (
-                      <span className="row" style={{ gap: 4 }}>
+                      <span className="row" style={{ gap: 4, flexWrap: "wrap", justifyContent: "flex-end" }}>
                         {nLessons > 0 && <span className="badge">{nLessons} lessons</span>}
+                        {nEx > 0 && <span className="badge">{nEx} exercises</span>}
                         {w.capstone && (
                           <span
                             className="badge"
@@ -169,6 +187,11 @@ function Overview({ course, done }: { course: TsCourse; done: Set<string> }) {
                   <p className="dim" style={{ margin: "6px 0 0", fontSize: 13 }}>
                     🎯 {w.goal}
                   </p>
+                  {!soon && w.est_minutes > 0 && (
+                    <p className="faint" style={{ margin: "6px 0 0", fontSize: 12 }}>
+                      ⏱️ about {w.est_minutes} min
+                    </p>
+                  )}
                 </div>
               );
             })}
@@ -183,23 +206,24 @@ function WeekDetail({
   week,
   isDone,
   onSetDone,
+  prev,
+  next,
 }: {
   week: CourseWeek;
   isDone: boolean;
   onSetDone: (done: boolean) => void;
+  prev: CourseWeek | null;
+  next: CourseWeek | null;
 }) {
   const nav = useNavigate();
+  const toast = useToast();
   const [solvedEx, setSolvedEx] = useState<Set<string>>(() => solvedExercises());
   const [scrolledToBottom, setScrolledToBottom] = useState(false);
   const bottomRef = useRef<HTMLDivElement | null>(null);
+  const celebrated = useRef(false);
+  const sec = useCollapse(`course-sec:w${week.number}`);
 
-  // Every judged exercise across the week's lessons + an auto-graded capstone.
-  const gradableIds = useMemo(() => {
-    const ids: string[] = [];
-    for (const l of week.lessons ?? []) for (const e of l.exercises ?? []) ids.push(e.id);
-    if (week.capstone?.exercise) ids.push(week.capstone.exercise.id);
-    return ids;
-  }, [week]);
+  const gradableIds = useMemo(() => requiredExerciseIds(week), [week]);
   const allSolved = gradableIds.every((id) => solvedEx.has(id));
   const solvedCount = gradableIds.filter((id) => solvedEx.has(id)).length;
 
@@ -221,8 +245,14 @@ function WeekDetail({
   }, [week.number]);
 
   useEffect(() => {
-    if (!isDone && scrolledToBottom && allSolved) onSetDone(true);
-  }, [isDone, scrolledToBottom, allSolved, onSetDone]);
+    if (!isDone && scrolledToBottom && allSolved && !celebrated.current) {
+      celebrated.current = true;
+      onSetDone(true);
+      toast(week.milestone ? `🎉 Week ${week.number} complete! ${week.milestone}` : `🎉 Week ${week.number} complete!`);
+    }
+  }, [isDone, scrolledToBottom, allSolved, onSetDone, toast, week.milestone, week.number]);
+
+  const cap = week.capstone;
 
   return (
     <div className="page">
@@ -234,6 +264,7 @@ function WeekDetail({
           <span className="badge">
             Week {week.number} · Month {week.month}
           </span>
+          {week.est_minutes > 0 && <span className="badge">⏱️ ~{week.est_minutes} min</span>}
         </div>
         <button
           className="ghost"
@@ -253,35 +284,148 @@ function WeekDetail({
         <div className="io-label" style={{ color: "var(--accent)" }}>
           🎯 This week's goal
         </div>
-        <p style={{ marginBottom: 0 }}>{week.goal}</p>
+        <p style={{ marginBottom: week.why ? 8 : 0 }}>{week.goal}</p>
+        {week.why && (
+          <p className="dim" style={{ margin: 0, fontSize: 13 }}>
+            💡 Why it matters: {week.why}
+          </p>
+        )}
       </div>
+
+      {week.objectives.length > 0 && (
+        <div className="card" style={{ marginBottom: 14 }}>
+          <div className="io-label">By the end of this week you can…</div>
+          <ul style={{ margin: "6px 0 0", paddingLeft: 20 }}>
+            {week.objectives.map((o, i) => (
+              <li key={i} style={{ marginBottom: 2 }}>{o}</li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {week.summary && <Markdown>{week.summary}</Markdown>}
 
       {(week.lessons ?? []).map((lesson, li) => (
-        <LessonBlock key={lesson.key} index={li + 1} lesson={lesson} onSolved={handleSolved} />
+        <Section
+          key={lesson.key}
+          title={`${li + 1}. ${lesson.title}`}
+          open={sec.isOpen(lesson.key)}
+          onToggle={() => sec.toggle(lesson.key)}
+          meta={
+            <span className="dim" style={{ fontSize: 12 }}>
+              {lessonSolvedLabel(lesson, solvedEx)}
+            </span>
+          }
+        >
+          <LessonBody lesson={lesson} onSolved={handleSolved} />
+        </Section>
       ))}
 
-      {week.capstone && (
+      {cap && (
         <>
           <div className="divider" />
           <h2 style={{ marginBottom: 4 }}>🏆 Capstone project</h2>
           <div className="card" style={{ marginBottom: 14, borderColor: "var(--accent)" }}>
-            <strong style={{ fontSize: 16 }}>{week.capstone.title}</strong>
+            <strong style={{ fontSize: 16 }}>{cap.title}</strong>
             <div style={{ marginTop: 8 }}>
-              <Markdown>{week.capstone.brief}</Markdown>
+              <Markdown>{cap.brief}</Markdown>
             </div>
-            {week.capstone.kind === "brief" && (
+            {cap.example_io && (
+              <>
+                <div className="io-label" style={{ marginTop: 6 }}>Expected output</div>
+                <Markdown>{"```\n" + cap.example_io + "\n```"}</Markdown>
+              </>
+            )}
+            {cap.rubric.length > 0 && (
+              <>
+                <div className="io-label" style={{ marginTop: 6 }}>Checklist</div>
+                <ul style={{ margin: "4px 0 0", paddingLeft: 20 }}>
+                  {cap.rubric.map((r, i) => (
+                    <li key={i} style={{ marginBottom: 2 }}>{r}</li>
+                  ))}
+                </ul>
+              </>
+            )}
+            {cap.kind === "brief" && (
               <p className="faint" style={{ fontSize: 12, margin: "8px 0 0" }}>
                 This is a free-build project — write it in the editor of your choice, then mark the
                 week done yourself when you're happy with it.
               </p>
             )}
           </div>
-          {week.capstone.exercise && (
-            <ExerciseCard index={1} exercise={week.capstone.exercise} challenge onSolved={handleSolved} />
+          {cap.exercise && (
+            <ExerciseCard index={1} exercise={cap.exercise} challenge onSolved={handleSolved} />
+          )}
+          {cap.reference && <ReferenceReveal reference={cap.reference} />}
+          {cap.stretch && (
+            <>
+              <h4 style={{ margin: "14px 0 4px" }}>🚀 Stretch goal (optional)</h4>
+              <ExerciseCard index={1} exercise={cap.stretch} challenge onSolved={handleSolved} />
+            </>
           )}
         </>
+      )}
+
+      {week.self_check.length > 0 && (
+        <>
+          <div className="divider" />
+          <h3>✅ Self-check</h3>
+          <p className="dim" style={{ marginTop: -4 }}>
+            Before you move on, make sure you can honestly say yes to each of these:
+          </p>
+          <div className="card">
+            <ul style={{ margin: 0, paddingLeft: 20 }}>
+              {week.self_check.map((s, i) => (
+                <li key={i} style={{ marginBottom: 4 }}>{s}</li>
+              ))}
+            </ul>
+          </div>
+        </>
+      )}
+
+      {week.review.length > 0 && (
+        <>
+          <div className="divider" />
+          <h3>🔁 End-of-week review</h3>
+          <p className="dim" style={{ marginTop: -4 }}>
+            A quick mixed quiz — some of these reach back to earlier weeks.
+          </p>
+          <QuizSection questions={week.review} />
+        </>
+      )}
+
+      {week.glossary.length > 0 && (
+        <Section
+          title="📖 Glossary"
+          open={sec.isOpen("glossary")}
+          onToggle={() => sec.toggle("glossary")}
+          meta={<span className="badge">{week.glossary.length} terms</span>}
+        >
+          <div className="card" style={{ marginTop: 0 }}>
+            {week.glossary.map((g, i) => (
+              <div key={i} style={{ padding: "5px 0", borderBottom: i < week.glossary.length - 1 ? "1px solid var(--border)" : undefined }}>
+                <code style={{ color: "var(--accent)" }}>{g.term}</code> — {g.def}
+              </div>
+            ))}
+          </div>
+        </Section>
+      )}
+
+      {week.cheatsheet && (
+        <Section
+          title="🧾 Cheat sheet"
+          open={sec.isOpen("cheatsheet")}
+          onToggle={() => sec.toggle("cheatsheet")}
+        >
+          <Markdown>{week.cheatsheet}</Markdown>
+        </Section>
+      )}
+
+      {week.milestone && (
+        <div className="card" style={{ marginTop: 16, borderColor: "var(--good)" }}>
+          <div className="io-label" style={{ color: "var(--good)" }}>🎉 Milestone</div>
+          <p style={{ margin: 0 }}>{week.milestone}</p>
+        </div>
       )}
 
       {!isDone && (
@@ -292,30 +436,71 @@ function WeekDetail({
         </p>
       )}
 
+      <div className="row" style={{ marginTop: 20, justifyContent: "space-between" }}>
+        {prev ? (
+          <button className="ghost" onClick={() => nav(`/course/${prev.number}`)}>
+            ← Week {prev.number}: {prev.theme}
+          </button>
+        ) : (
+          <span />
+        )}
+        {next ? (
+          <button className="primary" onClick={() => nav(`/course/${next.number}`)}>
+            Week {next.number}: {next.theme} →
+          </button>
+        ) : (
+          <button className="ghost" onClick={() => nav("/course")}>
+            Back to course overview
+          </button>
+        )}
+      </div>
+
+      {/* Sentinel: intersecting means the week has been read to the bottom. */}
       <div ref={bottomRef} style={{ height: 1 }} />
     </div>
   );
 }
 
-function LessonBlock({
-  index,
+function lessonSolvedLabel(lesson: CourseLesson, solvedEx: Set<string>): string {
+  const ids = (lesson.exercises ?? []).map((e) => e.id);
+  if (ids.length === 0) return "";
+  const n = ids.filter((id) => solvedEx.has(id)).length;
+  return n === ids.length ? "✓ done" : `${n}/${ids.length}`;
+}
+
+function ReferenceReveal({ reference }: { reference: string }) {
+  const [show, setShow] = useState(false);
+  return (
+    <div style={{ marginTop: 10 }}>
+      <button className="ghost" onClick={() => setShow((s) => !s)}>
+        {show ? "Hide reference solution" : "Reveal a reference solution"}
+      </button>
+      {show && (
+        <div style={{ marginTop: 10 }}>
+          <Markdown>{"```ts\n" + reference + "\n```"}</Markdown>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function LessonBody({
   lesson,
   onSolved,
 }: {
-  index: number;
   lesson: CourseLesson;
   onSolved: (id: string) => void;
 }) {
   const exercises = lesson.exercises ?? [];
-  const drills = exercises.filter((e) => (e.kind || "drill") !== "challenge");
-  const challenges = exercises.filter((e) => e.kind === "challenge");
+  const kindOf = (e: Exercise) => e.kind || "drill";
+  const drills = exercises.filter((e) => kindOf(e) === "drill");
+  const fixes = exercises.filter((e) => kindOf(e) === "fix");
+  const challenges = exercises.filter((e) => kindOf(e) === "challenge");
+  const warmup = lesson.warmup ?? [];
   const quiz = lesson.quiz ?? [];
 
   return (
-    <div style={{ marginTop: 18 }}>
-      <h2 style={{ marginBottom: 2 }}>
-        {index}. {lesson.title}
-      </h2>
+    <div>
       {lesson.what && (
         <p className="dim" style={{ marginTop: 0 }}>
           {lesson.what}
@@ -323,10 +508,13 @@ function LessonBlock({
       )}
       <Markdown>{lesson.lesson}</Markdown>
 
-      {quiz.length > 0 && (
+      {warmup.length > 0 && (
         <>
-          <h4>❓ Check yourself</h4>
-          <QuizSection questions={quiz} />
+          <h4>🔮 Predict the output</h4>
+          <p className="dim" style={{ marginTop: -4 }}>
+            Read the code and guess what it prints — then check.
+          </p>
+          <QuizSection questions={warmup} />
         </>
       )}
 
@@ -339,12 +527,31 @@ function LessonBlock({
         </>
       )}
 
+      {fixes.length > 0 && (
+        <>
+          <h4>🐞 Fix the bug</h4>
+          <p className="dim" style={{ marginTop: -4 }}>
+            This program looks right but doesn't work. Find and fix the bug so the tests pass.
+          </p>
+          {fixes.map((ex, i) => (
+            <ExerciseCard key={ex.id} index={i + 1} exercise={ex} onSolved={onSolved} />
+          ))}
+        </>
+      )}
+
       {challenges.length > 0 && (
         <>
           <h4>🏆 Coding challenge</h4>
           {challenges.map((ex, i) => (
             <ExerciseCard key={ex.id} index={i + 1} exercise={ex} challenge onSolved={onSolved} />
           ))}
+        </>
+      )}
+
+      {quiz.length > 0 && (
+        <>
+          <h4>❓ Check yourself</h4>
+          <QuizSection questions={quiz} />
         </>
       )}
     </div>

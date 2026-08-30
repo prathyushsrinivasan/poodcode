@@ -94,6 +94,10 @@ pub struct Exercise {
     pub prompt: String,
     #[serde(default)]
     pub hint: String,
+    /// Progressive hint ladder (nudge → strategy → near-answer). When present the
+    /// UI reveals one at a time; falls back to the single `hint` when empty.
+    #[serde(default)]
+    pub hints: Vec<String>,
     #[serde(default)]
     pub language: String,
     /// "drill" (short fill-in-the-blank, the default) or "challenge" (a fuller,
@@ -604,10 +608,44 @@ pub struct CourseWeek {
     pub lessons: Vec<CourseLesson>,
     #[serde(default)]
     pub capstone: Option<Capstone>,
+    // --- Polish fields (all optional; empty = section hidden) --------------
+    /// "By the end of this week you can…" bullet list.
+    #[serde(default)]
+    pub objectives: Vec<String>,
+    /// One-line real-world "why this matters" hook.
+    #[serde(default)]
+    pub why: String,
+    /// Estimated time to complete the week, in minutes.
+    #[serde(default)]
+    pub est_minutes: i64,
+    /// Term → plain-English definition for the week's new vocabulary.
+    #[serde(default)]
+    pub glossary: Vec<GlossaryItem>,
+    /// A short Markdown syntax cheat-sheet for everything introduced this week.
+    #[serde(default)]
+    pub cheatsheet: String,
+    /// "Can you…?" self-check prompts shown at the end.
+    #[serde(default)]
+    pub self_check: Vec<String>,
+    /// End-of-week mixed-review quiz (may pull from earlier weeks).
+    #[serde(default)]
+    pub review: Vec<QuizQuestion>,
+    /// "You can now build…" milestone celebrated on completion.
+    #[serde(default)]
+    pub milestone: String,
 }
 
-/// One lesson within a week: prose (`lesson`, Markdown) plus judged exercises
-/// and an optional self-check quiz, all scoped to what's been taught so far.
+/// One term and its plain-English definition (week glossary).
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct GlossaryItem {
+    pub term: String,
+    #[serde(default)]
+    pub def: String,
+}
+
+/// One lesson within a week: prose (`lesson`, Markdown) plus judged exercises,
+/// an optional "predict the output" warm-up, and a self-check quiz — all scoped
+/// to what's been taught so far.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CourseLesson {
     pub key: String,
@@ -616,6 +654,9 @@ pub struct CourseLesson {
     pub what: String,
     #[serde(default)]
     pub lesson: String,
+    /// "What does this print?" multiple-choice warm-up shown before the drills.
+    #[serde(default)]
+    pub warmup: Vec<QuizQuestion>,
     #[serde(default)]
     pub exercises: Vec<Exercise>,
     #[serde(default)]
@@ -634,6 +675,18 @@ pub struct Capstone {
     pub kind: String,
     #[serde(default)]
     pub exercise: Option<Exercise>,
+    /// Exact expected console output for the core build (shown in the spec).
+    #[serde(default)]
+    pub example_io: String,
+    /// A "did I do it?" checklist for the learner.
+    #[serde(default)]
+    pub rubric: Vec<String>,
+    /// A reference solution revealed after a brief (free-build) capstone.
+    #[serde(default)]
+    pub reference: String,
+    /// An optional harder "stretch" build for fast learners.
+    #[serde(default)]
+    pub stretch: Option<Exercise>,
 }
 
 // ---------------------------------------------------------------------------

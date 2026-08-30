@@ -1,7 +1,7 @@
 {
   "key": "typescript",
   "title": "TypeScript: Zero to Interview",
-  "subtitle": "An 8-month, week-by-week course from your very first line of code to interview-ready — DSA solved in TypeScript and deep type-system mastery. Every week has a goal, lessons that never outrun what you've learned, and a capstone project.",
+  "subtitle": "An 8-month, week-by-week course from your very first line of code to interview-ready — DSA solved in TypeScript and deep type-system mastery. Every week has a goal, lessons that never outrun what you've learned, warm-ups, hint ladders, a glossary, a cheat sheet, and a growing capstone project (Budget Buddy).",
   "weeks": [
     {
       "number": 1,
@@ -9,23 +9,51 @@
       "month_title": "First Steps: Values, Logic & Loops",
       "theme": "Output & Variables",
       "goal": "Write a program that prints text and does arithmetic with named values.",
-      "summary": "Welcome! This is the very beginning — no prior coding needed. This week you'll\nrun your first TypeScript program, print things to the screen, store values in\nnamed variables, and do some arithmetic. That's genuinely all a lot of programs\ndo: take some values, combine them, and print a result.\n\nEverything you write here runs and is **checked instantly**. Replace the\n`____` in each drill with the missing piece, then press **Check**.\n",
+      "summary": "Welcome! This is the very beginning — no prior coding needed. This week you'll\nrun your first TypeScript program, print things to the screen, store values in\nnamed variables, and do arithmetic. That's genuinely what most programs do: take\nsome values, combine them, and print a result.\n\nEverything you write is **checked instantly**. Replace the `____` in each drill,\nthen press **Check**.\n",
       "authored": true,
       "lessons": [
         {
           "key": "w1-hello",
           "title": "Your first program",
           "what": "Printing text with console.log.",
-          "lesson": "A **program** is a list of instructions the computer runs top to bottom. The\ninstruction you'll use most is `console.log(...)`, which prints its argument\nfollowed by a newline.\n\n```ts\nconsole.log(\"Hello, world!\");\n```\n\nText wrapped in quotes is called a **string**. `console.log` can print strings,\nnumbers, and more. Every statement ends with a semicolon `;`.\n",
+          "lesson": "A **program** is a list of instructions run top to bottom. The one you'll use\nmost is `console.log(...)`, which prints its argument followed by a newline.\n\n```ts\nconsole.log(\"Hello, world!\");\n```\n\nText in quotes is a **string**. Every statement ends with `;`.\n\n> ⚠️ **Common mistakes:** forgetting the quotes around text, or forgetting the\n> parentheses — it's `console.log(\"hi\")`, not `console.log \"hi\"`.\n",
+          "warmup": [
+            {
+              "question": "What does `console.log(\"Hi\")` print?",
+              "options": [
+                "\"Hi\"",
+                "Hi",
+                "Hi (with quotes)",
+                "nothing"
+              ],
+              "answer": 1,
+              "explanation": "The quotes mark the string; they aren't printed."
+            },
+            {
+              "question": "What does `console.log(2 + 3)` print?",
+              "options": [
+                "2 + 3",
+                "23",
+                "5",
+                "\"5\""
+              ],
+              "answer": 2,
+              "explanation": "2 + 3 is arithmetic, so it prints 5."
+            }
+          ],
           "exercises": [
             {
               "id": "tscourse-w1-hello-1",
               "title": "Print a greeting",
               "prompt": "Make the program print exactly: Hello, world!",
               "hint": "A string is text in double quotes.",
+              "hints": [
+                "A string is text in double quotes.",
+                "Put \"Hello, world!\" inside console.log(...)."
+              ],
               "language": "typescript",
               "kind": "drill",
-              "difficulty": "",
+              "difficulty": "Intro",
               "starter": "console.log(____);\n",
               "solution": "console.log(\"Hello, world!\");\n",
               "tests": [
@@ -34,16 +62,21 @@
                   "output": "Hello, world!"
                 }
               ],
-              "source_slug": ""
+              "source_slug": "",
+              "dataset": ""
             },
             {
               "id": "tscourse-w1-hello-2",
               "title": "Print two lines",
-              "prompt": "Print two lines: first `Line one`, then `Line two`.",
+              "prompt": "Print `Line one` then `Line two`, each on its own line.",
               "hint": "Each console.log prints its own line.",
+              "hints": [
+                "Each console.log prints its own line.",
+                "The second line should print \"Line two\"."
+              ],
               "language": "typescript",
               "kind": "drill",
-              "difficulty": "",
+              "difficulty": "Intro",
               "starter": "console.log(\"Line one\");\nconsole.log(____);\n",
               "solution": "console.log(\"Line one\");\nconsole.log(\"Line two\");\n",
               "tests": [
@@ -52,48 +85,66 @@
                   "output": "Line one\nLine two"
                 }
               ],
-              "source_slug": ""
-            }
-          ],
-          "quiz": [
-            {
-              "question": "What does console.log do?",
-              "options": [
-                "Reads a line of input",
-                "Prints its argument, then a newline",
-                "Deletes a variable",
-                "Defines a function"
-              ],
-              "answer": 1,
-              "explanation": "console.log writes its argument to the output followed by a newline."
+              "source_slug": "",
+              "dataset": ""
             },
             {
-              "question": "Which of these is a string?",
-              "options": [
-                "42",
-                "true",
-                "\"cat\"",
-                "x + 1"
+              "id": "tscourse-w1-hello-fix",
+              "title": "Fix the greeting",
+              "prompt": "This should print `Hello!` but it prints the wrong thing. Fix it.",
+              "hint": "Look at the text inside the quotes.",
+              "hints": [
+                "Look at the text inside the quotes.",
+                "Change \"Goodbye!\" to \"Hello!\"."
               ],
-              "answer": 2,
-              "explanation": "A string is text wrapped in quotes, like \"cat\"."
+              "language": "typescript",
+              "kind": "fix",
+              "difficulty": "Easy",
+              "starter": "console.log(\"Goodbye!\");\n",
+              "solution": "console.log(\"Hello!\");\n",
+              "tests": [
+                {
+                  "input": "",
+                  "output": "Hello!"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
             }
-          ]
+          ],
+          "quiz": []
         },
         {
           "key": "w1-variables",
           "title": "Variables: let and const",
           "what": "Naming values so you can reuse them.",
-          "lesson": "A **variable** is a named box for a value. Declare one with `const` (the name\nkeeps one value for good) or `let` (you can reassign it later). Prefer `const`\nunless you truly need to change the value.\n\n```ts\nconst name = \"Ada\";\nlet count = 0;\ncount = count + 1;\nconsole.log(name);   // Ada\nconsole.log(count);  // 1\n```\n\nBoth are **block-scoped**: they exist only inside the `{ }` they're declared in.\n",
+          "lesson": "A **variable** is a named box for a value. Use `const` when the value never\nchanges, `let` when you'll reassign it. Prefer `const`.\n\n```ts\nconst name = \"Ada\";\nlet count = 0;\ncount = count + 1;   // reassigned to 1\n```\n\n> ⚠️ **Common mistakes:** trying to reassign a `const` (that's an error), or\n> writing `let` again when you reassign — the second time it's just `count = 2`.\n",
+          "warmup": [
+            {
+              "question": "After `let n = 1; n = n + 4;`, what is n?",
+              "options": [
+                "1",
+                "5",
+                "14",
+                "4"
+              ],
+              "answer": 1,
+              "explanation": "n becomes 1 + 4 = 5."
+            }
+          ],
           "exercises": [
             {
               "id": "tscourse-w1-var-1",
               "title": "Name a value",
-              "prompt": "Store the string `Ada` in `name`, so the program prints `Hello, Ada`.",
-              "hint": "Joining strings with + is called concatenation.",
+              "prompt": "Store `Ada` in `name` so it prints `Hello, Ada`.",
+              "hint": "Joining strings with + is concatenation.",
+              "hints": [
+                "Joining strings with + is concatenation.",
+                "Set name to the string \"Ada\"."
+              ],
               "language": "typescript",
               "kind": "drill",
-              "difficulty": "",
+              "difficulty": "Intro",
               "starter": "const name = ____;\nconsole.log(\"Hello, \" + name);\n",
               "solution": "const name = \"Ada\";\nconsole.log(\"Hello, \" + name);\n",
               "tests": [
@@ -102,16 +153,21 @@
                   "output": "Hello, Ada"
                 }
               ],
-              "source_slug": ""
+              "source_slug": "",
+              "dataset": ""
             },
             {
               "id": "tscourse-w1-var-2",
               "title": "Reassign with let",
               "prompt": "Reassign `count` to 2 so the program prints 2.",
-              "hint": "Reassignment is `count = 2;` — no `let` the second time.",
+              "hint": "Reassignment doesn't repeat `let`.",
+              "hints": [
+                "Reassignment doesn't repeat `let`.",
+                "Write `count = 2;`."
+              ],
               "language": "typescript",
               "kind": "drill",
-              "difficulty": "",
+              "difficulty": "Intro",
               "starter": "let count = 1;\n____\nconsole.log(count);\n",
               "solution": "let count = 1;\ncount = 2;\nconsole.log(count);\n",
               "tests": [
@@ -120,7 +176,31 @@
                   "output": "2"
                 }
               ],
-              "source_slug": ""
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w1-var-fix",
+              "title": "Fix the reassignment",
+              "prompt": "This should print 10 but has a bug. Fix it so it prints 10.",
+              "hint": "You can only declare a variable with `let` once.",
+              "hints": [
+                "You can only declare a variable with `let` once.",
+                "The second line should reassign, not redeclare — drop the `let`."
+              ],
+              "language": "typescript",
+              "kind": "fix",
+              "difficulty": "Easy",
+              "starter": "let total = 4;\nlet total = 10;\nconsole.log(total);\n",
+              "solution": "let total = 4;\ntotal = 10;\nconsole.log(total);\n",
+              "tests": [
+                {
+                  "input": "",
+                  "output": "10"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
             }
           ],
           "quiz": []
@@ -128,17 +208,45 @@
         {
           "key": "w1-numbers",
           "title": "Numbers & arithmetic",
-          "what": "Doing math with +, -, *, / and %.",
-          "lesson": "TypeScript has one `number` type for whole numbers and decimals alike. The\noperators are `+` `-` `*` `/` and `%` (remainder — what's left after division).\n\n```ts\nconsole.log(6 * 7);    // 42\nconsole.log(17 % 5);   // 2  (17 = 3*5 + 2)\nconsole.log(10 / 4);   // 2.5\n```\n",
+          "what": "Doing math with + - * / and %.",
+          "lesson": "One `number` type covers whole numbers and decimals. Operators: `+ - * /` and\n`%` (remainder — what's left after division).\n\n```ts\n6 * 7      // 42\n17 % 5     // 2\n10 / 4     // 2.5\n```\n\n> ⚠️ **Common mistakes:** expecting `10 / 3` to be a whole number (it's\n> 3.333…), and mixing up `/` (divide) with `%` (remainder).\n",
+          "warmup": [
+            {
+              "question": "What does `console.log(10 / 4)` print?",
+              "options": [
+                "2",
+                "2.5",
+                "3",
+                "2.4"
+              ],
+              "answer": 1,
+              "explanation": "Division keeps the decimal: 2.5."
+            },
+            {
+              "question": "What does `console.log(9 % 2)` print?",
+              "options": [
+                "4.5",
+                "0",
+                "1",
+                "4"
+              ],
+              "answer": 2,
+              "explanation": "9 = 4*2 + 1, remainder 1."
+            }
+          ],
           "exercises": [
             {
               "id": "tscourse-w1-num-1",
               "title": "Multiply",
               "prompt": "Print the product of `a` and `b` (should be 42).",
               "hint": "Use the * operator.",
+              "hints": [
+                "Use the * operator.",
+                "Write `a * b`."
+              ],
               "language": "typescript",
               "kind": "drill",
-              "difficulty": "",
+              "difficulty": "Intro",
               "starter": "const a = 6;\nconst b = 7;\nconsole.log(____);\n",
               "solution": "const a = 6;\nconst b = 7;\nconsole.log(a * b);\n",
               "tests": [
@@ -147,16 +255,21 @@
                   "output": "42"
                 }
               ],
-              "source_slug": ""
+              "source_slug": "",
+              "dataset": ""
             },
             {
               "id": "tscourse-w1-num-2",
               "title": "Remainder",
               "prompt": "Print the remainder of `total` divided by 5.",
               "hint": "`%` gives the remainder.",
+              "hints": [
+                "`%` gives the remainder.",
+                "Write `total % 5`."
+              ],
               "language": "typescript",
               "kind": "drill",
-              "difficulty": "",
+              "difficulty": "Intro",
               "starter": "const total = 17;\nconsole.log(____);\n",
               "solution": "const total = 17;\nconsole.log(total % 5);\n",
               "tests": [
@@ -165,35 +278,171 @@
                   "output": "2"
                 }
               ],
-              "source_slug": ""
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w1-num-fix",
+              "title": "Fix the total",
+              "prompt": "This should print the SUM of a and b (8) but prints something else.",
+              "hint": "Check the operator between a and b.",
+              "hints": [
+                "Check the operator between a and b.",
+                "A sum uses + , not - ."
+              ],
+              "language": "typescript",
+              "kind": "fix",
+              "difficulty": "Easy",
+              "starter": "const a = 5;\nconst b = 3;\nconsole.log(a - b);\n",
+              "solution": "const a = 5;\nconst b = 3;\nconsole.log(a + b);\n",
+              "tests": [
+                {
+                  "input": "",
+                  "output": "8"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
             }
           ],
           "quiz": []
         }
       ],
       "capstone": {
-        "title": "Receipt printer",
-        "brief": "\nPut Week 1 together. Using only `const`, arithmetic, and string joining, print a\ntwo-line receipt for **4 coffees at $3 each**:\n\n```\nCoffee x4\nTotal: $12\n```\n\nThe scaffold declares the item, price, and quantity. Fill in the calculation and\nthe two `console.log` lines.\n",
+        "title": "Budget Buddy #1 — a receipt line",
+        "brief": "Meet **Budget Buddy**, the little expense tool you'll grow all through the\ncourse. This week: using only `const`, arithmetic, and string joining, print a\ntwo-line receipt for **4 coffees at $3 each**, against a **$20** budget:\n\n```\nCoffee x4 = $12\nRemaining: $8\n```\n",
         "kind": "auto",
         "exercise": {
           "id": "tscourse-w1-capstone",
-          "title": "Receipt printer",
-          "prompt": "Print the item line and the total line exactly as shown.",
-          "hint": "total is price * qty; build each line by joining strings with +.",
+          "title": "Budget Buddy #1",
+          "prompt": "Compute the line total and remaining budget, and print both lines.",
+          "hint": "lineTotal is price * qty.",
+          "hints": [
+            "lineTotal is price * qty.",
+            "Remaining is budget - lineTotal.",
+            "Build each line by joining strings with + , e.g. \"Remaining: $\" + (budget - lineTotal)."
+          ],
           "language": "typescript",
           "kind": "challenge",
           "difficulty": "Intro",
-          "starter": "const item = \"Coffee\";\nconst price = 3;\nconst qty = 4;\n____\n",
-          "solution": "const item = \"Coffee\";\nconst price = 3;\nconst qty = 4;\nconst total = price * qty;\nconsole.log(item + \" x\" + qty);\nconsole.log(\"Total: $\" + total);\n",
+          "starter": "const item = \"Coffee\";\nconst price = 3;\nconst qty = 4;\nconst budget = 20;\n____\n",
+          "solution": "const item = \"Coffee\";\nconst price = 3;\nconst qty = 4;\nconst budget = 20;\nconst lineTotal = price * qty;\nconsole.log(item + \" x\" + qty + \" = $\" + lineTotal);\nconsole.log(\"Remaining: $\" + (budget - lineTotal));\n",
           "tests": [
             {
               "input": "",
-              "output": "Coffee x4\nTotal: $12"
+              "output": "Coffee x4 = $12\nRemaining: $8"
             }
           ],
-          "source_slug": ""
+          "source_slug": "",
+          "dataset": ""
+        },
+        "example_io": "Coffee x4 = $12\nRemaining: $8",
+        "rubric": [
+          "Prints the item, quantity and line total on line 1",
+          "Prints the remaining budget on line 2",
+          "Uses variables (not hard-coded 12 and 8)"
+        ],
+        "reference": "",
+        "stretch": {
+          "id": "tscourse-w1-capstone-stretch",
+          "title": "Budget Buddy #1 (stretch)",
+          "prompt": "Also print a third line: the price of a single item as `Each: $3`.",
+          "hint": "Add one more console.log at the end.",
+          "hints": [
+            "Add one more console.log at the end.",
+            "Print \"Each: $\" + price."
+          ],
+          "language": "typescript",
+          "kind": "challenge",
+          "difficulty": "Easy",
+          "starter": "const item = \"Coffee\";\nconst price = 3;\nconst qty = 4;\nconst budget = 20;\n____\n",
+          "solution": "const item = \"Coffee\";\nconst price = 3;\nconst qty = 4;\nconst budget = 20;\nconst lineTotal = price * qty;\nconsole.log(item + \" x\" + qty + \" = $\" + lineTotal);\nconsole.log(\"Remaining: $\" + (budget - lineTotal));\nconsole.log(\"Each: $\" + price);\n",
+          "tests": [
+            {
+              "input": "",
+              "output": "Coffee x4 = $12\nRemaining: $8\nEach: $3"
+            }
+          ],
+          "source_slug": "",
+          "dataset": ""
         }
-      }
+      },
+      "objectives": [
+        "Print text and numbers with console.log",
+        "Store values in const and let variables",
+        "Do arithmetic with + - * / and %",
+        "Build a line of output by joining strings"
+      ],
+      "why": "Every program you'll ever write starts by holding values and showing results — this is the bedrock.",
+      "est_minutes": 35,
+      "glossary": [
+        {
+          "term": "statement",
+          "def": "One instruction, usually ending in a semicolon."
+        },
+        {
+          "term": "string",
+          "def": "Text, written inside quotes: \"hello\"."
+        },
+        {
+          "term": "variable",
+          "def": "A named box that holds a value."
+        },
+        {
+          "term": "const",
+          "def": "A variable whose value never changes."
+        },
+        {
+          "term": "let",
+          "def": "A variable you can reassign later."
+        },
+        {
+          "term": "operator",
+          "def": "A symbol that combines values: + - * / %."
+        }
+      ],
+      "cheatsheet": "```ts\nconsole.log(\"hi\");        // print text + newline\nconst name = \"Ada\";       // fixed value\nlet count = 0;            // reassignable\ncount = count + 1;        // reassign\n6 * 7                     // 42   (* / + - )\n17 % 5                    // 2    (remainder)\n\"a\" + \"b\"                // \"ab\"  (join strings)\n```\n",
+      "self_check": [
+        "Can you print an exact line of text?",
+        "Can you explain when to use const vs let?",
+        "Can you compute a total from a price and a quantity?"
+      ],
+      "review": [
+        {
+          "question": "Which declares a value that never changes?",
+          "options": [
+            "let x = 1",
+            "const x = 1",
+            "var x = 1",
+            "x = 1"
+          ],
+          "answer": 1,
+          "explanation": "const fixes the binding; let allows reassignment."
+        },
+        {
+          "question": "What does 17 % 5 evaluate to?",
+          "options": [
+            "3",
+            "2",
+            "3.4",
+            "12"
+          ],
+          "answer": 1,
+          "explanation": "% is the remainder: 17 = 3*5 + 2."
+        },
+        {
+          "question": "What does \"5\" + 3 look like if both were strings joined?",
+          "options": [
+            "8",
+            "\"53\"",
+            "error",
+            "15"
+          ],
+          "answer": 1,
+          "explanation": "Joining strings with + concatenates them; \"5\"+\"3\" is \"53\"."
+        }
+      ],
+      "milestone": "You can already write a program that prints a formatted receipt line. That's real code!"
     },
     {
       "number": 2,
@@ -201,23 +450,40 @@
       "month_title": "First Steps: Values, Logic & Loops",
       "theme": "Strings & Input",
       "goal": "Read input from the user and build text with template literals and string tools.",
-      "summary": "Last week your programs always printed the same thing. This week they react to\n**input**. You'll read what the user types, then shape text with **template\nliterals** and a few everyday **string methods**.\n\nFrom now on most programs start by reading standard input:\n\n```ts\nimport * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n```\n\n`fs.readFileSync(0, \"utf8\")` reads everything the user typed as one string;\n`.trim()` removes the trailing newline.\n",
+      "summary": "Last week your programs always printed the same thing. This week they react to\n**input**. You'll read what the user types, then shape text with **template\nliterals** and a few everyday **string methods**.\n\nMost programs from now on start by reading standard input:\n\n```ts\nimport * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n```\n\n`fs.readFileSync(0, \"utf8\")` reads everything typed as one string; `.trim()`\nremoves the trailing newline.\n",
       "authored": true,
       "lessons": [
         {
           "key": "w2-input",
           "title": "Reading input",
           "what": "Getting text from standard input.",
-          "lesson": "Reading input is boilerplate you'll reuse constantly. Read it all, trim it, and\nyou have a string to work with.\n\n```ts\nimport * as fs from \"fs\";\nconst line = fs.readFileSync(0, \"utf8\").trim();\nconsole.log(line);   // echoes what was typed\n```\n",
+          "lesson": "Read it all, trim it, and you have a string to work with.\n\n```ts\nimport * as fs from \"fs\";\nconst line = fs.readFileSync(0, \"utf8\").trim();\nconsole.log(line);\n```\n\n> ⚠️ **Common mistakes:** forgetting `.trim()` (your output ends up with an\n> extra blank line), or forgetting the `import` line at the top.\n",
+          "warmup": [
+            {
+              "question": "If the user types `cat` and the program does `console.log(input)`, output is…",
+              "options": [
+                "cat",
+                "\"cat\"",
+                "input",
+                "3"
+              ],
+              "answer": 0,
+              "explanation": "It echoes the text: cat."
+            }
+          ],
           "exercises": [
             {
               "id": "tscourse-w2-input-1",
               "title": "Echo the input",
               "prompt": "Read the whole input (trimmed) and print it back.",
-              "hint": "readFileSync(0, \"utf8\") reads stdin; .trim() drops surrounding whitespace.",
+              "hint": "readFileSync(0, \"utf8\") reads stdin.",
+              "hints": [
+                "readFileSync(0, \"utf8\") reads stdin.",
+                "Add .trim() to drop surrounding whitespace."
+              ],
               "language": "typescript",
               "kind": "drill",
-              "difficulty": "",
+              "difficulty": "Intro",
               "starter": "import * as fs from \"fs\";\nconst input = ____;\nconsole.log(input);\n",
               "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconsole.log(input);\n",
               "tests": [
@@ -230,84 +496,124 @@
                   "output": "spaced"
                 }
               ],
-              "source_slug": ""
+              "source_slug": "",
+              "dataset": ""
             },
             {
               "id": "tscourse-w2-input-2",
               "title": "Greet the input",
               "prompt": "Read a name and print `Hello, <name>!`.",
-              "hint": "Join the pieces with +.",
+              "hint": "Join the three pieces with +.",
+              "hints": [
+                "Join the three pieces with +.",
+                "It is \"Hello, \" + name + \"!\"."
+              ],
               "language": "typescript",
               "kind": "drill",
-              "difficulty": "",
+              "difficulty": "Intro",
               "starter": "import * as fs from \"fs\";\nconst name = fs.readFileSync(0, \"utf8\").trim();\nconsole.log(____);\n",
               "solution": "import * as fs from \"fs\";\nconst name = fs.readFileSync(0, \"utf8\").trim();\nconsole.log(\"Hello, \" + name + \"!\");\n",
               "tests": [
                 {
                   "input": "Ada",
                   "output": "Hello, Ada!"
+                },
+                {
+                  "input": "Bo",
+                  "output": "Hello, Bo!"
                 }
               ],
-              "source_slug": ""
-            }
-          ],
-          "quiz": [
-            {
-              "question": "Why call .trim() on the input?",
-              "options": [
-                "To make it uppercase",
-                "To remove the trailing newline and stray spaces",
-                "To convert it to a number",
-                "To split it into words"
-              ],
-              "answer": 1,
-              "explanation": "Input usually ends in a newline; .trim() removes surrounding whitespace."
+              "source_slug": "",
+              "dataset": ""
             },
             {
-              "question": "What type does fs.readFileSync(0, \"utf8\") return?",
-              "options": [
-                "number",
-                "boolean",
-                "string",
-                "an array"
+              "id": "tscourse-w2-input-fix",
+              "title": "Fix the echo",
+              "prompt": "This should echo what the user typed, but it prints a fixed word. Fix it.",
+              "hint": "It prints the literal word \"input\" instead of the value.",
+              "hints": [
+                "It prints the literal word \"input\" instead of the value.",
+                "Log the variable input (no quotes)."
               ],
-              "answer": 2,
-              "explanation": "With the \"utf8\" encoding it returns the input as a string."
+              "language": "typescript",
+              "kind": "fix",
+              "difficulty": "Easy",
+              "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconsole.log(\"input\");\n",
+              "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconsole.log(input);\n",
+              "tests": [
+                {
+                  "input": "hello",
+                  "output": "hello"
+                },
+                {
+                  "input": "bo",
+                  "output": "bo"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
             }
-          ]
+          ],
+          "quiz": []
         },
         {
           "key": "w2-templates",
           "title": "Template literals",
           "what": "Splicing values into text with backticks.",
-          "lesson": "Backtick strings let you drop values straight into text with `${ }` — much\nclearer than gluing pieces with `+`.\n\n```ts\nconst name = \"Sam\";\nconst age = 3;\nconsole.log(`Hi ${name}, you are ${age}`);   // Hi Sam, you are 3\nconsole.log(`2 + 2 = ${2 + 2}`);              // 2 + 2 = 4\n```\n",
+          "lesson": "Backtick strings drop values straight into text with `${ }`.\n\n```ts\nconst name = \"Sam\";\n`Hi ${name}`        // Hi Sam\n`2 + 2 = ${2 + 2}`  // 2 + 2 = 4\n```\n\n> ⚠️ **Common mistakes:** using normal quotes instead of backticks (then\n> `${name}` prints literally), or forgetting the `$` before `{ }`.\n",
+          "warmup": [
+            {
+              "question": "With `const n = 3;`, what does `` `n = ${n}` `` produce?",
+              "options": [
+                "n = ${n}",
+                "n = 3",
+                "n = n",
+                "3"
+              ],
+              "answer": 1,
+              "explanation": "${n} is replaced by the value 3."
+            }
+          ],
           "exercises": [
             {
               "id": "tscourse-w2-tmpl-1",
               "title": "Welcome message",
               "prompt": "Use a template literal to print `Hi <name>, welcome!`.",
-              "hint": "Use backticks and ${name}.",
+              "hint": "Use backticks, not quotes.",
+              "hints": [
+                "Use backticks, not quotes.",
+                "Put ${name} inside the text."
+              ],
               "language": "typescript",
               "kind": "drill",
-              "difficulty": "",
+              "difficulty": "Intro",
               "starter": "import * as fs from \"fs\";\nconst name = fs.readFileSync(0, \"utf8\").trim();\nconsole.log(____);\n",
               "solution": "import * as fs from \"fs\";\nconst name = fs.readFileSync(0, \"utf8\").trim();\nconsole.log(`Hi ${name}, welcome!`);\n",
               "tests": [
                 {
                   "input": "Sam",
                   "output": "Hi Sam, welcome!"
+                },
+                {
+                  "input": "Ada",
+                  "output": "Hi Ada, welcome!"
                 }
               ],
-              "source_slug": ""
+              "source_slug": "",
+              "dataset": ""
             },
             {
               "id": "tscourse-w2-tmpl-2",
               "title": "Inline arithmetic",
               "prompt": "Print `<a> + <b> = <sum>` using a template literal.",
               "hint": "You can put an expression like a + b inside ${ }.",
+              "hints": [
+                "You can put an expression like a + b inside ${ }.",
+                "The template is `${a} + ${b} = ${a + b}`."
+              ],
               "language": "typescript",
               "kind": "drill",
-              "difficulty": "",
+              "difficulty": "Intro",
               "starter": "const a = 3;\nconst b = 4;\nconsole.log(____);\n",
               "solution": "const a = 3;\nconst b = 4;\nconsole.log(`${a} + ${b} = ${a + b}`);\n",
               "tests": [
@@ -316,7 +622,31 @@
                   "output": "3 + 4 = 7"
                 }
               ],
-              "source_slug": ""
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w2-tmpl-fix",
+              "title": "Fix the template",
+              "prompt": "This was meant to greet the name but prints it literally. Fix it.",
+              "hint": "${...} only works inside backticks.",
+              "hints": [
+                "${...} only works inside backticks.",
+                "Swap the single quotes for backticks (`)."
+              ],
+              "language": "typescript",
+              "kind": "fix",
+              "difficulty": "Easy",
+              "starter": "import * as fs from \"fs\";\nconst name = fs.readFileSync(0, \"utf8\").trim();\nconsole.log('Hi ${name}!');\n",
+              "solution": "import * as fs from \"fs\";\nconst name = fs.readFileSync(0, \"utf8\").trim();\nconsole.log(`Hi ${name}!`);\n",
+              "tests": [
+                {
+                  "input": "Sam",
+                  "output": "Hi Sam!"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
             }
           ],
           "quiz": []
@@ -325,34 +655,69 @@
           "key": "w2-methods",
           "title": "String methods",
           "what": "Inspecting and transforming text.",
-          "lesson": "Strings come with handy built-in methods:\n\n```ts\nconst s = \"hello\";\nconsole.log(s.length);         // 5   (a property, no parentheses)\nconsole.log(s.toUpperCase());  // HELLO\nconsole.log(s.includes(\"ell\")); // true\nconsole.log(s.slice(0, 3));    // hel\n```\n",
+          "lesson": "```ts\nconst s = \"hello\";\ns.length         // 5   (property, no parentheses)\ns.toUpperCase()  // HELLO\ns.includes(\"ell\")// true\ns.slice(0, 3)    // hel\n```\n\n> ⚠️ **Common mistakes:** writing `s.length()` — `length` is a property, so no\n> parentheses. Methods like `toUpperCase()` DO need them.\n",
+          "warmup": [
+            {
+              "question": "What is `\"hi\".toUpperCase()`?",
+              "options": [
+                "hi",
+                "HI",
+                "Hi",
+                "\"HI\""
+              ],
+              "answer": 1,
+              "explanation": "toUpperCase returns HI."
+            },
+            {
+              "question": "What is `\"cat\".length`?",
+              "options": [
+                "cat",
+                "2",
+                "3",
+                "\"3\""
+              ],
+              "answer": 2,
+              "explanation": "cat has 3 characters."
+            }
+          ],
           "exercises": [
             {
               "id": "tscourse-w2-meth-1",
               "title": "Shout it",
               "prompt": "Print the input in UPPERCASE.",
               "hint": "Call .toUpperCase() on the string.",
+              "hints": [
+                "Call .toUpperCase() on the string."
+              ],
               "language": "typescript",
               "kind": "drill",
-              "difficulty": "",
+              "difficulty": "Intro",
               "starter": "import * as fs from \"fs\";\nconst s = fs.readFileSync(0, \"utf8\").trim();\nconsole.log(____);\n",
               "solution": "import * as fs from \"fs\";\nconst s = fs.readFileSync(0, \"utf8\").trim();\nconsole.log(s.toUpperCase());\n",
               "tests": [
                 {
                   "input": "hello",
                   "output": "HELLO"
+                },
+                {
+                  "input": "Bo",
+                  "output": "BO"
                 }
               ],
-              "source_slug": ""
+              "source_slug": "",
+              "dataset": ""
             },
             {
               "id": "tscourse-w2-meth-2",
               "title": "Count the letters",
               "prompt": "Print how many characters the input has.",
               "hint": "length is a property — no parentheses.",
+              "hints": [
+                "length is a property — no parentheses."
+              ],
               "language": "typescript",
               "kind": "drill",
-              "difficulty": "",
+              "difficulty": "Intro",
               "starter": "import * as fs from \"fs\";\nconst s = fs.readFileSync(0, \"utf8\").trim();\nconsole.log(____);\n",
               "solution": "import * as fs from \"fs\";\nconst s = fs.readFileSync(0, \"utf8\").trim();\nconsole.log(s.length);\n",
               "tests": [
@@ -365,39 +730,148 @@
                   "output": "2"
                 }
               ],
-              "source_slug": ""
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w2-meth-fix",
+              "title": "Fix the length call",
+              "prompt": "This should print the length but crashes. Fix it.",
+              "hint": "length is a property, not a method.",
+              "hints": [
+                "length is a property, not a method.",
+                "Remove the () after length."
+              ],
+              "language": "typescript",
+              "kind": "fix",
+              "difficulty": "Easy",
+              "starter": "import * as fs from \"fs\";\nconst s = fs.readFileSync(0, \"utf8\").trim();\nconsole.log(s.length());\n",
+              "solution": "import * as fs from \"fs\";\nconst s = fs.readFileSync(0, \"utf8\").trim();\nconsole.log(s.length);\n",
+              "tests": [
+                {
+                  "input": "hello",
+                  "output": "5"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
             }
           ],
           "quiz": []
         }
       ],
       "capstone": {
-        "title": "Name card",
-        "brief": "\nRead a single name and print a three-line card:\n\n```\nName: Ada\nLetters: 3\nShout: ADA\n```\n\nUse a template literal for each line, plus `.length` and `.toUpperCase()`.\n",
+        "title": "Budget Buddy #2 — entry label",
+        "brief": "Read a single expense **description** and print a tidy three-line label:\n\n```\nEntry: coffee\nTag: COFFEE\nLength: 6\n```\n",
         "kind": "auto",
         "exercise": {
           "id": "tscourse-w2-capstone",
-          "title": "Name card",
-          "prompt": "Print the three lines exactly, based on the input name.",
+          "title": "Budget Buddy #2",
+          "prompt": "Print the three lines exactly, based on the input description.",
           "hint": "One template-literal console.log per line.",
+          "hints": [
+            "One template-literal console.log per line.",
+            "Use ${desc.toUpperCase()} and ${desc.length}."
+          ],
           "language": "typescript",
           "kind": "challenge",
           "difficulty": "Intro",
-          "starter": "import * as fs from \"fs\";\nconst name = fs.readFileSync(0, \"utf8\").trim();\n____\n",
-          "solution": "import * as fs from \"fs\";\nconst name = fs.readFileSync(0, \"utf8\").trim();\nconsole.log(`Name: ${name}`);\nconsole.log(`Letters: ${name.length}`);\nconsole.log(`Shout: ${name.toUpperCase()}`);\n",
+          "starter": "import * as fs from \"fs\";\nconst desc = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+          "solution": "import * as fs from \"fs\";\nconst desc = fs.readFileSync(0, \"utf8\").trim();\nconsole.log(`Entry: ${desc}`);\nconsole.log(`Tag: ${desc.toUpperCase()}`);\nconsole.log(`Length: ${desc.length}`);\n",
           "tests": [
             {
-              "input": "Ada",
-              "output": "Name: Ada\nLetters: 3\nShout: ADA"
+              "input": "coffee",
+              "output": "Entry: coffee\nTag: COFFEE\nLength: 6"
             },
             {
-              "input": "bo",
-              "output": "Name: bo\nLetters: 2\nShout: BO"
+              "input": "rent",
+              "output": "Entry: rent\nTag: RENT\nLength: 4"
             }
           ],
-          "source_slug": ""
+          "source_slug": "",
+          "dataset": ""
+        },
+        "example_io": "Entry: coffee\nTag: COFFEE\nLength: 6",
+        "rubric": [
+          "Line 1 echoes the description",
+          "Line 2 is the description uppercased",
+          "Line 3 is the character count"
+        ],
+        "reference": "",
+        "stretch": null
+      },
+      "objectives": [
+        "Read a line of input from the user",
+        "Insert values into text with template literals",
+        "Use .length, .toUpperCase() and .trim()",
+        "Build multi-line output from input"
+      ],
+      "why": "Real programs respond to input — a search box, a form, a command. Reading input is step one.",
+      "est_minutes": 40,
+      "glossary": [
+        {
+          "term": "standard input",
+          "def": "The stream of text a program reads from (what the user types)."
+        },
+        {
+          "term": "template literal",
+          "def": "A backtick string with ${...} holes: `Hi ${name}`."
+        },
+        {
+          "term": "method",
+          "def": "A function attached to a value: s.toUpperCase()."
+        },
+        {
+          "term": ".trim()",
+          "def": "Removes whitespace from both ends of a string."
+        },
+        {
+          "term": ".length",
+          "def": "A property giving the number of characters."
         }
-      }
+      ],
+      "cheatsheet": "```ts\nimport * as fs from \"fs\";\nconst s = fs.readFileSync(0, \"utf8\").trim();  // read input\n`Hi ${name}, you are ${age}`   // template literal\ns.length            // number of characters\ns.toUpperCase()     // \"HELLO\"\ns.includes(\"ell\")   // true / false\ns.slice(0, 3)       // first 3 characters\n```\n",
+      "self_check": [
+        "Can you read a line of input and print it back?",
+        "Can you build a sentence that includes a value with a template literal?",
+        "Do you know the difference between .length (a property) and .toUpperCase() (a method call)?"
+      ],
+      "review": [
+        {
+          "question": "Why call .trim() on input?",
+          "options": [
+            "To uppercase it",
+            "To remove the trailing newline / stray spaces",
+            "To make it a number",
+            "To split it"
+          ],
+          "answer": 1,
+          "explanation": "Input usually ends in a newline; trim removes surrounding whitespace."
+        },
+        {
+          "question": "Which builds `Hi Sam` from `const name = \"Sam\"`?",
+          "options": [
+            "\"Hi \" + name",
+            "`Hi ${name}`",
+            "Both of these",
+            "Neither"
+          ],
+          "answer": 2,
+          "explanation": "Concatenation and template literals both work; templates are clearer."
+        },
+        {
+          "question": "`\"hello\".length` is…",
+          "options": [
+            "a method call",
+            "5",
+            "\"5\"",
+            "an error"
+          ],
+          "answer": 1,
+          "explanation": "length is a property whose value is 5."
+        }
+      ],
+      "milestone": "Budget Buddy can now label an expense entry from whatever the user types."
     },
     {
       "number": 3,
@@ -405,23 +879,51 @@
       "month_title": "First Steps: Values, Logic & Loops",
       "theme": "Making Decisions",
       "goal": "Branch on conditions with if/else and combine tests with boolean logic.",
-      "summary": "Programs get interesting when they **choose** what to do. This week: comparisons\nthat produce `true`/`false`, `if`/`else` branching, and the logical operators\n`&&` (and), `||` (or), `!` (not).\n\nOne new helper you'll need: input arrives as **text**, so wrap it in `Number(...)`\nwhen you want to do math or numeric comparisons:\n\n```ts\nconst n = Number(fs.readFileSync(0, \"utf8\").trim());  // \"42\" -> 42\n```\n",
+      "summary": "Programs get interesting when they **choose** what to do. This week: comparisons\nthat produce `true`/`false`, `if`/`else` branching, and the logical operators\n`&&` (and), `||` (or), `!` (not).\n\nOne helper you'll need: input arrives as **text**, so wrap it in `Number(...)`\nfor math or numeric comparisons:\n\n```ts\nconst n = Number(fs.readFileSync(0, \"utf8\").trim());  // \"42\" -> 42\n```\n",
       "authored": true,
       "lessons": [
         {
           "key": "w3-compare",
           "title": "Booleans & comparison",
           "what": "Values that are true or false.",
-          "lesson": "Comparisons produce a **boolean** (`true` or `false`). Always compare with\n`===` / `!==` (strict — no surprise conversions), plus `<`, `>`, `<=`, `>=`.\n\n```ts\nconsole.log(5 > 3);        // true\nconsole.log(\"a\" === \"b\");  // false\nconsole.log(10 >= 10);     // true\n```\n",
+          "lesson": "Comparisons produce a **boolean**. Always compare with `===` / `!==` (strict),\nplus `<`, `>`, `<=`, `>=`.\n\n```ts\n5 > 3        // true\n\"a\" === \"b\"  // false\n10 >= 10     // true\n```\n\n`console.log(someBoolean)` prints `true` or `false`.\n\n> ⚠️ **Common mistakes:** using `=` (assignment) where you meant `===`\n> (comparison), and comparing input text to a number without `Number(...)`.\n",
+          "warmup": [
+            {
+              "question": "What does `console.log(4 > 9)` print?",
+              "options": [
+                "true",
+                "false",
+                "4",
+                "9"
+              ],
+              "answer": 1,
+              "explanation": "4 is not greater than 9."
+            },
+            {
+              "question": "What does `console.log(\"a\" === \"a\")` print?",
+              "options": [
+                "a",
+                "true",
+                "false",
+                "1"
+              ],
+              "answer": 1,
+              "explanation": "The strings are equal."
+            }
+          ],
           "exercises": [
             {
               "id": "tscourse-w3-cmp-1",
               "title": "Greater than ten",
               "prompt": "Print whether the number is greater than 10.",
-              "hint": "Use the > operator; console.log prints true/false.",
+              "hint": "Use the > operator.",
+              "hints": [
+                "Use the > operator.",
+                "console.log prints the boolean directly."
+              ],
               "language": "typescript",
               "kind": "drill",
-              "difficulty": "",
+              "difficulty": "Intro",
               "starter": "import * as fs from \"fs\";\nconst n = Number(fs.readFileSync(0, \"utf8\").trim());\nconsole.log(____);\n",
               "solution": "import * as fs from \"fs\";\nconst n = Number(fs.readFileSync(0, \"utf8\").trim());\nconsole.log(n > 10);\n",
               "tests": [
@@ -432,18 +934,27 @@
                 {
                   "input": "3",
                   "output": "false"
+                },
+                {
+                  "input": "10",
+                  "output": "false"
                 }
               ],
-              "source_slug": ""
+              "source_slug": "",
+              "dataset": ""
             },
             {
               "id": "tscourse-w3-cmp-2",
               "title": "Exact match",
               "prompt": "Print whether the input equals the string `yes`.",
               "hint": "Use === for a strict comparison.",
+              "hints": [
+                "Use === for a strict comparison.",
+                "Compare s to \"yes\"."
+              ],
               "language": "typescript",
               "kind": "drill",
-              "difficulty": "",
+              "difficulty": "Intro",
               "starter": "import * as fs from \"fs\";\nconst s = fs.readFileSync(0, \"utf8\").trim();\nconsole.log(____);\n",
               "solution": "import * as fs from \"fs\";\nconst s = fs.readFileSync(0, \"utf8\").trim();\nconsole.log(s === \"yes\");\n",
               "tests": [
@@ -456,48 +967,74 @@
                   "output": "false"
                 }
               ],
-              "source_slug": ""
-            }
-          ],
-          "quiz": [
-            {
-              "question": "Which operator should you use to compare for equality?",
-              "options": [
-                "=",
-                "==",
-                "===",
-                "=>"
-              ],
-              "answer": 2,
-              "explanation": "=== is strict equality (no type coercion). = is assignment."
+              "source_slug": "",
+              "dataset": ""
             },
             {
-              "question": "What does Number(\"7\") produce?",
-              "options": [
-                "the string \"7\"",
-                "the number 7",
-                "true",
-                "an error"
+              "id": "tscourse-w3-cmp-fix",
+              "title": "Fix the threshold",
+              "prompt": "This should be true only when STRICTLY greater than 10, but 10 itself prints true. Fix it.",
+              "hint": ">= includes 10 itself.",
+              "hints": [
+                ">= includes 10 itself.",
+                "Use > for strictly greater than."
               ],
-              "answer": 1,
-              "explanation": "Number(...) converts a numeric string into a number."
+              "language": "typescript",
+              "kind": "fix",
+              "difficulty": "Easy",
+              "starter": "import * as fs from \"fs\";\nconst n = Number(fs.readFileSync(0, \"utf8\").trim());\nconsole.log(n >= 10);\n",
+              "solution": "import * as fs from \"fs\";\nconst n = Number(fs.readFileSync(0, \"utf8\").trim());\nconsole.log(n > 10);\n",
+              "tests": [
+                {
+                  "input": "15",
+                  "output": "true"
+                },
+                {
+                  "input": "10",
+                  "output": "false"
+                },
+                {
+                  "input": "3",
+                  "output": "false"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
             }
-          ]
+          ],
+          "quiz": []
         },
         {
           "key": "w3-ifelse",
           "title": "if / else",
           "what": "Choosing between branches.",
-          "lesson": "`if` runs a block when its condition is true; `else` covers the other case, and\n`else if` chains more tests.\n\n```ts\nif (score >= 90) {\n  console.log(\"A\");\n} else if (score >= 80) {\n  console.log(\"B\");\n} else {\n  console.log(\"C\");\n}\n```\n\nOnly the first matching branch runs.\n",
+          "lesson": "`if` runs a block when its condition is true; `else` covers the rest; `else if`\nchains more tests. Only the **first** matching branch runs.\n\n```ts\nif (score >= 90) {\n  console.log(\"A\");\n} else if (score >= 80) {\n  console.log(\"B\");\n} else {\n  console.log(\"C\");\n}\n```\n\n> ⚠️ **Common mistakes:** ordering branches wrong (a broad test first swallows\n> the narrow ones), and forgetting that only one branch runs.\n",
+          "warmup": [
+            {
+              "question": "With score = 85, which line prints from the chain above?",
+              "options": [
+                "A",
+                "B",
+                "C",
+                "all three"
+              ],
+              "answer": 1,
+              "explanation": "85 fails >=90 but passes >=80, so B."
+            }
+          ],
           "exercises": [
             {
               "id": "tscourse-w3-if-1",
               "title": "Sign of a number",
-              "prompt": "Print `non-negative` when n >= 0, otherwise `negative`.",
-              "hint": "Zero counts as non-negative, so use >=.",
+              "prompt": "Print `non-negative` when n >= 0, else `negative`.",
+              "hint": "Zero counts as non-negative.",
+              "hints": [
+                "Zero counts as non-negative.",
+                "Use >= 0."
+              ],
               "language": "typescript",
               "kind": "drill",
-              "difficulty": "",
+              "difficulty": "Intro",
               "starter": "import * as fs from \"fs\";\nconst n = Number(fs.readFileSync(0, \"utf8\").trim());\nif (____) {\n  console.log(\"non-negative\");\n} else {\n  console.log(\"negative\");\n}\n",
               "solution": "import * as fs from \"fs\";\nconst n = Number(fs.readFileSync(0, \"utf8\").trim());\nif (n >= 0) {\n  console.log(\"non-negative\");\n} else {\n  console.log(\"negative\");\n}\n",
               "tests": [
@@ -514,16 +1051,21 @@
                   "output": "non-negative"
                 }
               ],
-              "source_slug": ""
+              "source_slug": "",
+              "dataset": ""
             },
             {
               "id": "tscourse-w3-if-2",
               "title": "Letter grade",
-              "prompt": "Fill the middle test so 85 prints B (>=80), 95 prints A, 70 prints C.",
-              "hint": "The B branch is for scores of 80 or more.",
+              "prompt": "Fill the middle test so 85→B, 95→A, 70→C.",
+              "hint": "The B band is 80 or more.",
+              "hints": [
+                "The B band is 80 or more.",
+                "Write score >= 80."
+              ],
               "language": "typescript",
               "kind": "drill",
-              "difficulty": "",
+              "difficulty": "Intro",
               "starter": "import * as fs from \"fs\";\nconst score = Number(fs.readFileSync(0, \"utf8\").trim());\nif (score >= 90) {\n  console.log(\"A\");\n} else if (____) {\n  console.log(\"B\");\n} else {\n  console.log(\"C\");\n}\n",
               "solution": "import * as fs from \"fs\";\nconst score = Number(fs.readFileSync(0, \"utf8\").trim());\nif (score >= 90) {\n  console.log(\"A\");\n} else if (score >= 80) {\n  console.log(\"B\");\n} else {\n  console.log(\"C\");\n}\n",
               "tests": [
@@ -540,7 +1082,39 @@
                   "output": "C"
                 }
               ],
-              "source_slug": ""
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w3-if-fix",
+              "title": "Fix the branch order",
+              "prompt": "Every input prints `adult`. Fix the logic so age 10 prints `minor`, age 40 prints `adult`.",
+              "hint": "`age >= 0` is true for everyone, so it always wins.",
+              "hints": [
+                "`age >= 0` is true for everyone, so it always wins.",
+                "Test the minor case (age < 18) first."
+              ],
+              "language": "typescript",
+              "kind": "fix",
+              "difficulty": "Medium",
+              "starter": "import * as fs from \"fs\";\nconst age = Number(fs.readFileSync(0, \"utf8\").trim());\nif (age >= 0) {\n  console.log(\"adult\");\n} else if (age < 18) {\n  console.log(\"minor\");\n} else {\n  console.log(\"adult\");\n}\n",
+              "solution": "import * as fs from \"fs\";\nconst age = Number(fs.readFileSync(0, \"utf8\").trim());\nif (age < 18) {\n  console.log(\"minor\");\n} else {\n  console.log(\"adult\");\n}\n",
+              "tests": [
+                {
+                  "input": "10",
+                  "output": "minor"
+                },
+                {
+                  "input": "40",
+                  "output": "adult"
+                },
+                {
+                  "input": "18",
+                  "output": "adult"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
             }
           ],
           "quiz": []
@@ -549,16 +1123,40 @@
           "key": "w3-logic",
           "title": "Logical operators",
           "what": "Combining conditions with && , || and !.",
-          "lesson": "- `a && b` is true only when **both** are true.\n- `a || b` is true when **either** is true.\n- `!a` flips a boolean.\n\n```ts\nconsole.log(n >= 1 && n <= 5);   // in range 1..5 ?\nconsole.log(s === \"y\" || s === \"yes\");\n```\n",
+          "lesson": "- `a && b` — true only when **both** are true.\n- `a || b` — true when **either** is true.\n- `!a` — flips a boolean.\n\n```ts\nn >= 1 && n <= 5       // in range 1..5 ?\ns === \"y\" || s === \"yes\"\n```\n\n> ⚠️ **Common mistakes:** writing `1 <= n <= 5` (doesn't work as you'd expect) —\n> use `n >= 1 && n <= 5`.\n",
+          "warmup": [
+            {
+              "question": "`true && false` is…",
+              "options": [
+                "true",
+                "false"
+              ],
+              "answer": 1,
+              "explanation": "AND needs both true."
+            },
+            {
+              "question": "`false || true` is…",
+              "options": [
+                "true",
+                "false"
+              ],
+              "answer": 0,
+              "explanation": "OR needs just one true."
+            }
+          ],
           "exercises": [
             {
               "id": "tscourse-w3-log-1",
               "title": "In range",
               "prompt": "Print whether n is between 1 and 5 (inclusive).",
-              "hint": "Both conditions must hold, so use &&.",
+              "hint": "Both conditions must hold.",
+              "hints": [
+                "Both conditions must hold.",
+                "Use && between them."
+              ],
               "language": "typescript",
               "kind": "drill",
-              "difficulty": "",
+              "difficulty": "Intro",
               "starter": "import * as fs from \"fs\";\nconst n = Number(fs.readFileSync(0, \"utf8\").trim());\nconsole.log(____);\n",
               "solution": "import * as fs from \"fs\";\nconst n = Number(fs.readFileSync(0, \"utf8\").trim());\nconsole.log(n >= 1 && n <= 5);\n",
               "tests": [
@@ -575,16 +1173,21 @@
                   "output": "true"
                 }
               ],
-              "source_slug": ""
+              "source_slug": "",
+              "dataset": ""
             },
             {
               "id": "tscourse-w3-log-2",
               "title": "Yes in either form",
               "prompt": "Print true when the input is `y` or `yes`.",
-              "hint": "Either spelling is acceptable, so use ||.",
+              "hint": "Either spelling is acceptable.",
+              "hints": [
+                "Either spelling is acceptable.",
+                "Use || between the two checks."
+              ],
               "language": "typescript",
               "kind": "drill",
-              "difficulty": "",
+              "difficulty": "Intro",
               "starter": "import * as fs from \"fs\";\nconst s = fs.readFileSync(0, \"utf8\").trim();\nconsole.log(____);\n",
               "solution": "import * as fs from \"fs\";\nconst s = fs.readFileSync(0, \"utf8\").trim();\nconsole.log(s === \"y\" || s === \"yes\");\n",
               "tests": [
@@ -601,55 +1204,194 @@
                   "output": "false"
                 }
               ],
-              "source_slug": ""
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w3-log-fix",
+              "title": "Fix the range test",
+              "prompt": "This should be true only for 1..5, but 9 also prints true. Fix it.",
+              "hint": "|| is true when EITHER side holds — too loose here.",
+              "hints": [
+                "|| is true when EITHER side holds — too loose here.",
+                "Both must hold, so use &&."
+              ],
+              "language": "typescript",
+              "kind": "fix",
+              "difficulty": "Easy",
+              "starter": "import * as fs from \"fs\";\nconst n = Number(fs.readFileSync(0, \"utf8\").trim());\nconsole.log(n >= 1 || n <= 5);\n",
+              "solution": "import * as fs from \"fs\";\nconst n = Number(fs.readFileSync(0, \"utf8\").trim());\nconsole.log(n >= 1 && n <= 5);\n",
+              "tests": [
+                {
+                  "input": "3",
+                  "output": "true"
+                },
+                {
+                  "input": "9",
+                  "output": "false"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
             }
           ],
           "quiz": []
         }
       ],
       "capstone": {
-        "title": "Ticket pricing",
-        "brief": "\nRead a person's **age** and print their ticket price:\n\n- under 5 → `Free`\n- 5 to 17 → `$10`\n- 65 and over → `$12`\n- everyone else → `$20`\n\nFill in the `if`/`else if`/`else` chain.\n",
+        "title": "Budget Buddy #3 — size an expense",
+        "brief": "Read an expense **amount** and print its size band:\n\n- under 10 → `small`\n- 10 to 49 → `medium`\n- 50 and up → `large`\n",
         "kind": "auto",
         "exercise": {
           "id": "tscourse-w3-capstone",
-          "title": "Ticket pricing",
-          "prompt": "Print the correct price for the given age.",
-          "hint": "Order matters — test the youngest and oldest bands with the right cutoffs.",
+          "title": "Budget Buddy #3",
+          "prompt": "Print small / medium / large for the given amount.",
+          "hint": "Test the smallest band first.",
+          "hints": [
+            "Test the smallest band first.",
+            "small is < 10, medium is < 50, else large."
+          ],
           "language": "typescript",
           "kind": "challenge",
           "difficulty": "Easy",
-          "starter": "import * as fs from \"fs\";\nconst age = Number(fs.readFileSync(0, \"utf8\").trim());\n____\n",
-          "solution": "import * as fs from \"fs\";\nconst age = Number(fs.readFileSync(0, \"utf8\").trim());\nif (age < 5) {\n  console.log(\"Free\");\n} else if (age < 18) {\n  console.log(\"$10\");\n} else if (age >= 65) {\n  console.log(\"$12\");\n} else {\n  console.log(\"$20\");\n}\n",
+          "starter": "import * as fs from \"fs\";\nconst amt = Number(fs.readFileSync(0, \"utf8\").trim());\n____\n",
+          "solution": "import * as fs from \"fs\";\nconst amt = Number(fs.readFileSync(0, \"utf8\").trim());\nif (amt < 10) {\n  console.log(\"small\");\n} else if (amt < 50) {\n  console.log(\"medium\");\n} else {\n  console.log(\"large\");\n}\n",
           "tests": [
             {
-              "input": "3",
-              "output": "Free"
+              "input": "4",
+              "output": "small"
             },
             {
-              "input": "12",
-              "output": "$10"
+              "input": "25",
+              "output": "medium"
             },
             {
-              "input": "70",
-              "output": "$12"
+              "input": "50",
+              "output": "large"
             },
             {
-              "input": "30",
-              "output": "$20"
+              "input": "9",
+              "output": "small"
             },
             {
-              "input": "65",
-              "output": "$12"
-            },
-            {
-              "input": "5",
-              "output": "$10"
+              "input": "49",
+              "output": "medium"
             }
           ],
-          "source_slug": ""
+          "source_slug": "",
+          "dataset": ""
+        },
+        "example_io": "(amount 25) → medium",
+        "rubric": [
+          "Handles amounts below 10, 10–49, and 50+",
+          "Uses an if / else if / else chain",
+          "Reads the amount as a number"
+        ],
+        "reference": "",
+        "stretch": {
+          "id": "tscourse-w3-capstone-stretch",
+          "title": "Budget Buddy #3 (stretch)",
+          "prompt": "Also flag over-budget: if the amount is 50+, print `large (over budget!)`.",
+          "hint": "Only the last branch changes.",
+          "hints": [
+            "Only the last branch changes.",
+            "Print \"large (over budget!)\" for 50+."
+          ],
+          "language": "typescript",
+          "kind": "challenge",
+          "difficulty": "Medium",
+          "starter": "import * as fs from \"fs\";\nconst amt = Number(fs.readFileSync(0, \"utf8\").trim());\n____\n",
+          "solution": "import * as fs from \"fs\";\nconst amt = Number(fs.readFileSync(0, \"utf8\").trim());\nif (amt < 10) {\n  console.log(\"small\");\n} else if (amt < 50) {\n  console.log(\"medium\");\n} else {\n  console.log(\"large (over budget!)\");\n}\n",
+          "tests": [
+            {
+              "input": "4",
+              "output": "small"
+            },
+            {
+              "input": "25",
+              "output": "medium"
+            },
+            {
+              "input": "80",
+              "output": "large (over budget!)"
+            }
+          ],
+          "source_slug": "",
+          "dataset": ""
         }
-      }
+      },
+      "objectives": [
+        "Compare values with === , !== , < , > and produce booleans",
+        "Convert input text to a number with Number(...)",
+        "Branch with if / else if / else",
+        "Combine conditions with && , || and !"
+      ],
+      "why": "Decisions are how software adapts — access control, pricing tiers, validation. It's all if/else.",
+      "est_minutes": 45,
+      "glossary": [
+        {
+          "term": "boolean",
+          "def": "A value that is either true or false."
+        },
+        {
+          "term": "===",
+          "def": "Strict equality — compares without surprise conversions."
+        },
+        {
+          "term": "Number(x)",
+          "def": "Converts a numeric string to a number."
+        },
+        {
+          "term": "if / else",
+          "def": "Runs one block or another depending on a condition."
+        },
+        {
+          "term": "&& , || , !",
+          "def": "Logical AND, OR, and NOT."
+        }
+      ],
+      "cheatsheet": "```ts\nconst n = Number(input);        // text -> number\n5 > 3            // true\na === b          // strict equality (use this, not ==)\nif (n >= 0) { ... } else { ... }\nif (s >= 90) {...} else if (s >= 80) {...} else {...}\na && b   // both true\na || b   // either true\n!a       // not\n```\n",
+      "self_check": [
+        "Can you convert input text to a number and compare it?",
+        "Can you write an if / else if / else chain that picks the right branch?",
+        "Do you know why === is preferred over == ?"
+      ],
+      "review": [
+        {
+          "question": "Which operator is strict equality?",
+          "options": [
+            "=",
+            "==",
+            "===",
+            "=>"
+          ],
+          "answer": 2,
+          "explanation": "=== compares without type coercion; = is assignment."
+        },
+        {
+          "question": "`Number(\"7\")` produces…",
+          "options": [
+            "\"7\"",
+            "7",
+            "true",
+            "an error"
+          ],
+          "answer": 1,
+          "explanation": "It converts the string to the number 7."
+        },
+        {
+          "question": "`(n >= 1 && n <= 5)` is true when…",
+          "options": [
+            "n is 1..5 inclusive",
+            "n is any number",
+            "n is 0",
+            "never"
+          ],
+          "answer": 0,
+          "explanation": "Both parts must hold: n between 1 and 5."
+        }
+      ],
+      "milestone": "Budget Buddy can now judge an expense — small, medium, or large."
     },
     {
       "number": 4,
@@ -657,23 +1399,40 @@
       "month_title": "First Steps: Values, Logic & Loops",
       "theme": "Loops",
       "goal": "Repeat work with while and for loops, and accumulate results.",
-      "summary": "Computers shine at doing the same thing many times. This week you'll meet\n`while` and `for` loops, the idea of an **accumulator** (a running total or\ncounter), and `for...of` for walking through text a character at a time.\n",
+      "summary": "Computers shine at doing the same thing many times. This week: `while` and `for`\nloops, the idea of an **accumulator** (a running total/counter), and `for...of`\nfor walking through text a character at a time.\n",
       "authored": true,
       "lessons": [
         {
           "key": "w4-while",
           "title": "while loops",
           "what": "Repeat while a condition holds.",
-          "lesson": "A `while` loop runs its body over and over as long as its condition is true. Be\nsure something inside moves toward making the condition false, or it runs\nforever.\n\n```ts\nlet i = 1;\nlet sum = 0;\nwhile (i <= 5) {\n  sum = sum + i;\n  i = i + 1;\n}\nconsole.log(sum);   // 15\n```\n",
+          "lesson": "A `while` loop runs its body while its condition is true. Something inside must\nmove toward making it false.\n\nWatch the state evolve summing 1..3:\n\n| step | i | i <= 3 | sum after |\n|------|---|--------|-----------|\n| start| 1 | —      | 0         |\n| 1    | 1 | true   | 1         |\n| 2    | 2 | true   | 3         |\n| 3    | 3 | true   | 6         |\n| end  | 4 | false  | 6         |\n\n```ts\nlet i = 1, sum = 0;\nwhile (i <= 3) { sum = sum + i; i = i + 1; }\nconsole.log(sum);   // 6\n```\n\n> ⚠️ **Common mistakes:** forgetting to advance `i`, which loops forever.\n",
+          "warmup": [
+            {
+              "question": "`let i=0; while(i<2){ i = i+1; } console.log(i);` prints…",
+              "options": [
+                "0",
+                "1",
+                "2",
+                "forever"
+              ],
+              "answer": 2,
+              "explanation": "i climbs to 2, then i<2 is false."
+            }
+          ],
           "exercises": [
             {
               "id": "tscourse-w4-while-1",
               "title": "Sum 1..n",
               "prompt": "Loop while i <= n, adding each i to sum. Print the total.",
               "hint": "Keep going while i has not passed n.",
+              "hints": [
+                "Keep going while i has not passed n.",
+                "Condition: i <= n."
+              ],
               "language": "typescript",
               "kind": "drill",
-              "difficulty": "",
+              "difficulty": "Intro",
               "starter": "import * as fs from \"fs\";\nconst n = Number(fs.readFileSync(0, \"utf8\").trim());\nlet sum = 0;\nlet i = 1;\nwhile (____) {\n  sum = sum + i;\n  i = i + 1;\n}\nconsole.log(sum);\n",
               "solution": "import * as fs from \"fs\";\nconst n = Number(fs.readFileSync(0, \"utf8\").trim());\nlet sum = 0;\nlet i = 1;\nwhile (i <= n) {\n  sum = sum + i;\n  i = i + 1;\n}\nconsole.log(sum);\n",
               "tests": [
@@ -690,16 +1449,21 @@
                   "output": "55"
                 }
               ],
-              "source_slug": ""
+              "source_slug": "",
+              "dataset": ""
             },
             {
               "id": "tscourse-w4-while-2",
               "title": "Countdown",
-              "prompt": "Print n, n-1, ... down to 1, each on its own line.",
-              "hint": "Move i toward 0 each pass so the loop ends.",
+              "prompt": "Print n, n-1, … down to 1, each on its own line.",
+              "hint": "Move i toward 0 each pass.",
+              "hints": [
+                "Move i toward 0 each pass.",
+                "Write i = i - 1;"
+              ],
               "language": "typescript",
               "kind": "drill",
-              "difficulty": "",
+              "difficulty": "Intro",
               "starter": "import * as fs from \"fs\";\nconst n = Number(fs.readFileSync(0, \"utf8\").trim());\nlet i = n;\nwhile (i >= 1) {\n  console.log(i);\n  ____\n}\n",
               "solution": "import * as fs from \"fs\";\nconst n = Number(fs.readFileSync(0, \"utf8\").trim());\nlet i = n;\nwhile (i >= 1) {\n  console.log(i);\n  i = i - 1;\n}\n",
               "tests": [
@@ -712,48 +1476,66 @@
                   "output": "1"
                 }
               ],
-              "source_slug": ""
-            }
-          ],
-          "quiz": [
-            {
-              "question": "What is an 'accumulator'?",
-              "options": [
-                "A type of loop",
-                "A variable that builds up a result across iterations",
-                "A comparison operator",
-                "A way to read input"
-              ],
-              "answer": 1,
-              "explanation": "An accumulator (like a running sum or counter) collects a result as the loop runs."
+              "source_slug": "",
+              "dataset": ""
             },
             {
-              "question": "What happens if a while loop's condition never becomes false?",
-              "options": [
-                "It runs once",
-                "It never runs",
-                "It loops forever",
-                "It prints an error"
+              "id": "tscourse-w4-while-fix",
+              "title": "Fix the infinite loop",
+              "prompt": "This loop never ends because i never changes. Fix it so it prints 1 2 3.",
+              "hint": "Nothing advances i, so i <= n stays true forever.",
+              "hints": [
+                "Nothing advances i, so i <= n stays true forever.",
+                "Add i = i + 1; inside the loop."
               ],
-              "answer": 2,
-              "explanation": "Without progress toward ending, the loop runs forever (an infinite loop)."
+              "language": "typescript",
+              "kind": "fix",
+              "difficulty": "Medium",
+              "starter": "import * as fs from \"fs\";\nconst n = Number(fs.readFileSync(0, \"utf8\").trim());\nlet i = 1;\nwhile (i <= n) {\n  console.log(i);\n}\n",
+              "solution": "import * as fs from \"fs\";\nconst n = Number(fs.readFileSync(0, \"utf8\").trim());\nlet i = 1;\nwhile (i <= n) {\n  console.log(i);\n  i = i + 1;\n}\n",
+              "tests": [
+                {
+                  "input": "3",
+                  "output": "1\n2\n3"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
             }
-          ]
+          ],
+          "quiz": []
         },
         {
           "key": "w4-for",
           "title": "for loops",
           "what": "A compact counting loop.",
-          "lesson": "A `for` loop packs the setup, condition, and step into one line:\n\n```ts\nfor (let i = 1; i <= n; i = i + 1) {\n  // body runs for i = 1, 2, ... n\n}\n```\n\nIt's the same idea as `while`, just tidier when you're counting.\n",
+          "lesson": "A `for` loop packs setup, condition, and step into one line:\n\n```ts\nfor (let i = 1; i <= n; i = i + 1) {\n  // body runs for i = 1, 2, ... n\n}\n```\n\nSame idea as `while`, tidier when counting.\n\n> ⚠️ **Common mistakes:** an off-by-one — `i < n` stops at n-1, `i <= n` includes n.\n",
+          "warmup": [
+            {
+              "question": "`for (let i=0; i<3; i=i+1) console.log(i);` prints…",
+              "options": [
+                "0 1 2 3",
+                "0 1 2",
+                "1 2 3",
+                "3"
+              ],
+              "answer": 1,
+              "explanation": "i < 3 runs for 0,1,2."
+            }
+          ],
           "exercises": [
             {
               "id": "tscourse-w4-for-1",
               "title": "Factorial",
               "prompt": "Multiply 1*2*...*n into product. Print it.",
               "hint": "Each pass multiplies the running product by i.",
+              "hints": [
+                "Each pass multiplies the running product by i.",
+                "Write product = product * i;"
+              ],
               "language": "typescript",
               "kind": "drill",
-              "difficulty": "",
+              "difficulty": "Intro",
               "starter": "import * as fs from \"fs\";\nconst n = Number(fs.readFileSync(0, \"utf8\").trim());\nlet product = 1;\nfor (let i = 1; i <= n; i = i + 1) {\n  ____\n}\nconsole.log(product);\n",
               "solution": "import * as fs from \"fs\";\nconst n = Number(fs.readFileSync(0, \"utf8\").trim());\nlet product = 1;\nfor (let i = 1; i <= n; i = i + 1) {\n  product = product * i;\n}\nconsole.log(product);\n",
               "tests": [
@@ -770,25 +1552,66 @@
                   "output": "24"
                 }
               ],
-              "source_slug": ""
+              "source_slug": "",
+              "dataset": ""
             },
             {
               "id": "tscourse-w4-for-2",
               "title": "Count evens",
-              "prompt": "Count how many numbers from 1..10 are even. Print the count.",
-              "hint": "A number is even when its remainder mod 2 is 0.",
+              "prompt": "Count how many numbers from 1..n are even. Print the count.",
+              "hint": "Even means remainder 0 mod 2.",
+              "hints": [
+                "Even means remainder 0 mod 2.",
+                "Test i % 2 === 0."
+              ],
               "language": "typescript",
               "kind": "drill",
-              "difficulty": "",
-              "starter": "const n = 10;\nlet count = 0;\nfor (let i = 1; i <= n; i = i + 1) {\n  if (____) {\n    count = count + 1;\n  }\n}\nconsole.log(count);\n",
-              "solution": "const n = 10;\nlet count = 0;\nfor (let i = 1; i <= n; i = i + 1) {\n  if (i % 2 === 0) {\n    count = count + 1;\n  }\n}\nconsole.log(count);\n",
+              "difficulty": "Intro",
+              "starter": "import * as fs from \"fs\";\nconst n = Number(fs.readFileSync(0, \"utf8\").trim());\nlet count = 0;\nfor (let i = 1; i <= n; i = i + 1) {\n  if (____) {\n    count = count + 1;\n  }\n}\nconsole.log(count);\n",
+              "solution": "import * as fs from \"fs\";\nconst n = Number(fs.readFileSync(0, \"utf8\").trim());\nlet count = 0;\nfor (let i = 1; i <= n; i = i + 1) {\n  if (i % 2 === 0) {\n    count = count + 1;\n  }\n}\nconsole.log(count);\n",
               "tests": [
                 {
-                  "input": "",
+                  "input": "10",
                   "output": "5"
+                },
+                {
+                  "input": "1",
+                  "output": "0"
+                },
+                {
+                  "input": "2",
+                  "output": "1"
                 }
               ],
-              "source_slug": ""
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w4-for-fix",
+              "title": "Fix the off-by-one",
+              "prompt": "This should sum 1..n but leaves out n. Fix the loop so sum(1..3)=6.",
+              "hint": "`i < n` stops one short — it never adds n itself.",
+              "hints": [
+                "`i < n` stops one short — it never adds n itself.",
+                "Use i <= n."
+              ],
+              "language": "typescript",
+              "kind": "fix",
+              "difficulty": "Easy",
+              "starter": "import * as fs from \"fs\";\nconst n = Number(fs.readFileSync(0, \"utf8\").trim());\nlet sum = 0;\nfor (let i = 1; i < n; i = i + 1) {\n  sum = sum + i;\n}\nconsole.log(sum);\n",
+              "solution": "import * as fs from \"fs\";\nconst n = Number(fs.readFileSync(0, \"utf8\").trim());\nlet sum = 0;\nfor (let i = 1; i <= n; i = i + 1) {\n  sum = sum + i;\n}\nconsole.log(sum);\n",
+              "tests": [
+                {
+                  "input": "3",
+                  "output": "6"
+                },
+                {
+                  "input": "5",
+                  "output": "15"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
             }
           ],
           "quiz": []
@@ -797,16 +1620,32 @@
           "key": "w4-forof",
           "title": "Looping over text",
           "what": "for...of walks a string character by character.",
-          "lesson": "`for...of` hands you each item of a sequence in turn. For a string, that's each\ncharacter.\n\n```ts\nlet vowels = 0;\nfor (const ch of \"hello\") {\n  if (ch === \"e\" || ch === \"o\") {\n    vowels = vowels + 1;\n  }\n}\nconsole.log(vowels);   // 2\n```\n",
+          "lesson": "`for...of` hands you each character in turn.\n\n```ts\nlet vowels = 0;\nfor (const ch of \"hello\") {\n  if (ch === \"e\" || ch === \"o\") vowels = vowels + 1;\n}\nconsole.log(vowels);   // 2\n```\n\n> ⚠️ **Common mistakes:** confusing `for...of` (values) with `for...in` (keys) —\n> for strings and arrays you almost always want `for...of`.\n",
+          "warmup": [
+            {
+              "question": "How many times does `for (const c of \"aba\")` run its body?",
+              "options": [
+                "1",
+                "2",
+                "3",
+                "0"
+              ],
+              "answer": 2,
+              "explanation": "Once per character: a, b, a."
+            }
+          ],
           "exercises": [
             {
               "id": "tscourse-w4-of-1",
               "title": "Count a letter",
               "prompt": "Count how many times the letter `a` appears in the input.",
               "hint": "Compare each character to \"a\".",
+              "hints": [
+                "Compare each character to \"a\"."
+              ],
               "language": "typescript",
               "kind": "drill",
-              "difficulty": "",
+              "difficulty": "Intro",
               "starter": "import * as fs from \"fs\";\nconst s = fs.readFileSync(0, \"utf8\").trim();\nlet count = 0;\nfor (const ch of s) {\n  if (____) {\n    count = count + 1;\n  }\n}\nconsole.log(count);\n",
               "solution": "import * as fs from \"fs\";\nconst s = fs.readFileSync(0, \"utf8\").trim();\nlet count = 0;\nfor (const ch of s) {\n  if (ch === \"a\") {\n    count = count + 1;\n  }\n}\nconsole.log(count);\n",
               "tests": [
@@ -817,18 +1656,27 @@
                 {
                   "input": "xyz",
                   "output": "0"
+                },
+                {
+                  "input": "aaa",
+                  "output": "3"
                 }
               ],
-              "source_slug": ""
+              "source_slug": "",
+              "dataset": ""
             },
             {
               "id": "tscourse-w4-of-2",
               "title": "Reverse a string",
               "prompt": "Build the input backwards by putting each new char in front.",
-              "hint": "Prepend each character: ch + out.",
+              "hint": "Prepend each character.",
+              "hints": [
+                "Prepend each character.",
+                "Write ch + out."
+              ],
               "language": "typescript",
               "kind": "drill",
-              "difficulty": "",
+              "difficulty": "Intro",
               "starter": "import * as fs from \"fs\";\nconst s = fs.readFileSync(0, \"utf8\").trim();\nlet out = \"\";\nfor (const ch of s) {\n  out = ____;\n}\nconsole.log(out);\n",
               "solution": "import * as fs from \"fs\";\nconst s = fs.readFileSync(0, \"utf8\").trim();\nlet out = \"\";\nfor (const ch of s) {\n  out = ch + out;\n}\nconsole.log(out);\n",
               "tests": [
@@ -841,43 +1689,170 @@
                   "output": "olleh"
                 }
               ],
-              "source_slug": ""
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w4-of-fix",
+              "title": "Fix the reversal",
+              "prompt": "This should reverse the string but returns it unchanged. Fix it.",
+              "hint": "out + ch appends — that keeps the original order.",
+              "hints": [
+                "out + ch appends — that keeps the original order.",
+                "Prepend instead: ch + out."
+              ],
+              "language": "typescript",
+              "kind": "fix",
+              "difficulty": "Easy",
+              "starter": "import * as fs from \"fs\";\nconst s = fs.readFileSync(0, \"utf8\").trim();\nlet out = \"\";\nfor (const ch of s) {\n  out = out + ch;\n}\nconsole.log(out);\n",
+              "solution": "import * as fs from \"fs\";\nconst s = fs.readFileSync(0, \"utf8\").trim();\nlet out = \"\";\nfor (const ch of s) {\n  out = ch + out;\n}\nconsole.log(out);\n",
+              "tests": [
+                {
+                  "input": "abc",
+                  "output": "cba"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
             }
           ],
           "quiz": []
         }
       ],
       "capstone": {
-        "title": "FizzBuzz",
-        "brief": "\nThe classic. Read a number **n** and print the numbers `1` to `n`, one per line,\nwith two twists:\n\n- multiples of 3 → `Fizz`\n- multiples of 5 → `Buzz`\n- multiples of both → `FizzBuzz`\n\nFill in the loop body (test the both-case first!).\n",
+        "title": "Budget Buddy #4 — savings schedule",
+        "brief": "Read a number of **days** and print a running savings total, adding **$5** each\nday:\n\n```\nDay 1: $5\nDay 2: $10\nDay 3: $15\n```\n",
         "kind": "auto",
         "exercise": {
           "id": "tscourse-w4-capstone",
-          "title": "FizzBuzz",
-          "prompt": "Print 1..n applying the Fizz / Buzz / FizzBuzz rules.",
-          "hint": "Check divisibility by 15 before 3 and 5, or the both-case never fires.",
+          "title": "Budget Buddy #4",
+          "prompt": "Loop over the days, keep a running total, and print each day's line.",
+          "hint": "Keep a running total that grows by 5 each pass.",
+          "hints": [
+            "Keep a running total that grows by 5 each pass.",
+            "Print `Day ${d}: $${total}` inside the loop."
+          ],
           "language": "typescript",
           "kind": "challenge",
           "difficulty": "Easy",
-          "starter": "import * as fs from \"fs\";\nconst n = Number(fs.readFileSync(0, \"utf8\").trim());\nfor (let i = 1; i <= n; i = i + 1) {\n  ____\n}\n",
-          "solution": "import * as fs from \"fs\";\nconst n = Number(fs.readFileSync(0, \"utf8\").trim());\nfor (let i = 1; i <= n; i = i + 1) {\n  if (i % 15 === 0) {\n    console.log(\"FizzBuzz\");\n  } else if (i % 3 === 0) {\n    console.log(\"Fizz\");\n  } else if (i % 5 === 0) {\n    console.log(\"Buzz\");\n  } else {\n    console.log(i);\n  }\n}\n",
+          "starter": "import * as fs from \"fs\";\nconst days = Number(fs.readFileSync(0, \"utf8\").trim());\n____\n",
+          "solution": "import * as fs from \"fs\";\nconst days = Number(fs.readFileSync(0, \"utf8\").trim());\nlet total = 0;\nfor (let d = 1; d <= days; d = d + 1) {\n  total = total + 5;\n  console.log(`Day ${d}: $${total}`);\n}\n",
           "tests": [
             {
-              "input": "5",
-              "output": "1\n2\nFizz\n4\nBuzz"
-            },
-            {
               "input": "3",
-              "output": "1\n2\nFizz"
+              "output": "Day 1: $5\nDay 2: $10\nDay 3: $15"
             },
             {
-              "input": "15",
-              "output": "1\n2\nFizz\n4\nBuzz\nFizz\n7\n8\nFizz\nBuzz\n11\nFizz\n13\n14\nFizzBuzz"
+              "input": "1",
+              "output": "Day 1: $5"
             }
           ],
-          "source_slug": ""
+          "source_slug": "",
+          "dataset": ""
+        },
+        "example_io": "Day 1: $5\nDay 2: $10\nDay 3: $15",
+        "rubric": [
+          "Loops once per day",
+          "Keeps a running total (+$5 each day)",
+          "Prints the day number and total on each line"
+        ],
+        "reference": "",
+        "stretch": {
+          "id": "tscourse-w4-capstone-stretch",
+          "title": "Budget Buddy #4 (stretch)",
+          "prompt": "After the schedule, print `Total saved: $<total>`.",
+          "hint": "Print the summary line after the loop ends.",
+          "hints": [
+            "Print the summary line after the loop ends.",
+            "The total variable already holds the final amount."
+          ],
+          "language": "typescript",
+          "kind": "challenge",
+          "difficulty": "Medium",
+          "starter": "import * as fs from \"fs\";\nconst days = Number(fs.readFileSync(0, \"utf8\").trim());\n____\n",
+          "solution": "import * as fs from \"fs\";\nconst days = Number(fs.readFileSync(0, \"utf8\").trim());\nlet total = 0;\nfor (let d = 1; d <= days; d = d + 1) {\n  total = total + 5;\n  console.log(`Day ${d}: $${total}`);\n}\nconsole.log(`Total saved: $${total}`);\n",
+          "tests": [
+            {
+              "input": "3",
+              "output": "Day 1: $5\nDay 2: $10\nDay 3: $15\nTotal saved: $15"
+            }
+          ],
+          "source_slug": "",
+          "dataset": ""
         }
-      }
+      },
+      "objectives": [
+        "Repeat work with while and for loops",
+        "Build a running total or counter (an accumulator)",
+        "Walk a string with for...of",
+        "Know how to avoid an infinite loop"
+      ],
+      "why": "Loops power everything repetitive — from summing a column of numbers to a game's frame loop.",
+      "est_minutes": 50,
+      "glossary": [
+        {
+          "term": "loop",
+          "def": "Code that repeats while a condition holds."
+        },
+        {
+          "term": "accumulator",
+          "def": "A variable that builds a result across iterations."
+        },
+        {
+          "term": "for",
+          "def": "A compact loop with setup, condition, and step on one line."
+        },
+        {
+          "term": "for...of",
+          "def": "A loop that hands you each item of a sequence."
+        },
+        {
+          "term": "infinite loop",
+          "def": "A loop whose condition never becomes false — it never ends."
+        }
+      ],
+      "cheatsheet": "```ts\nlet i = 1;\nwhile (i <= n) { sum = sum + i; i = i + 1; }   // while\nfor (let i = 1; i <= n; i = i + 1) { ... }      // for\nfor (const ch of \"hello\") { ... }                // each character\n```\n",
+      "self_check": [
+        "Can you sum the numbers 1..n with a loop?",
+        "Can you count how often a character appears in a string?",
+        "Can you explain what makes a loop infinite?"
+      ],
+      "review": [
+        {
+          "question": "What is an accumulator?",
+          "options": [
+            "A loop keyword",
+            "A variable that builds a result across iterations",
+            "A comparison",
+            "An input reader"
+          ],
+          "answer": 1,
+          "explanation": "Like a running sum or counter."
+        },
+        {
+          "question": "A while loop whose condition never becomes false…",
+          "options": [
+            "runs once",
+            "never runs",
+            "loops forever",
+            "errors"
+          ],
+          "answer": 2,
+          "explanation": "It's an infinite loop."
+        },
+        {
+          "question": "`for (const ch of \"hi\")` runs the body…",
+          "options": [
+            "once",
+            "twice (h, then i)",
+            "three times",
+            "never"
+          ],
+          "answer": 1,
+          "explanation": "Once per character: h, i."
+        }
+      ],
+      "milestone": "Budget Buddy can now project a savings schedule day by day."
     },
     {
       "number": 5,
@@ -885,23 +1860,40 @@
       "month_title": "Data & Functions",
       "theme": "Functions",
       "goal": "Package logic into reusable functions with parameters and return values.",
-      "summary": "A **function** is a named, reusable piece of logic: give it inputs\n(**parameters**), it hands back a result (**return value**). Functions let you\nname an idea once and use it everywhere. This week: declaring functions, arrow\nfunctions, and returning values.\n\nYou'll see type annotations like `(x: number): number` — they document what goes\nin and comes out. (They're checked while you write, then stripped before the\nprogram runs.)\n",
+      "summary": "A **function** is named, reusable logic: give it inputs (**parameters**), it\nhands back a **return value**. Functions let you name an idea once and use it\neverywhere. This week: declaring functions, arrow functions, and returning values.\n\nYou'll see annotations like `(x: number): number` — they document what goes in\nand out. (They're checked as you write, then stripped before the program runs.)\n",
       "authored": true,
       "lessons": [
         {
           "key": "w5-declare",
           "title": "Declaring functions",
           "what": "function name(params) { return ... }",
-          "lesson": "```ts\nfunction square(x: number): number {\n  return x * x;\n}\nconsole.log(square(5));   // 25\n```\n\n`return` sends a value back to whoever called the function and ends it.\n",
+          "lesson": "```ts\nfunction square(x: number): number {\n  return x * x;\n}\nconsole.log(square(5));   // 25\n```\n\n`return` sends a value back and ends the function.\n\n> ⚠️ **Common mistakes:** forgetting `return` (the function then returns\n> `undefined`), and confusing `console.log` (prints) with `return` (hands back).\n",
+          "warmup": [
+            {
+              "question": "`function f(x){ return x + 1; } console.log(f(4));` prints…",
+              "options": [
+                "4",
+                "5",
+                "x + 1",
+                "undefined"
+              ],
+              "answer": 1,
+              "explanation": "f(4) returns 5."
+            }
+          ],
           "exercises": [
             {
               "id": "tscourse-w5-dec-1",
               "title": "Square",
               "prompt": "Return x times itself.",
               "hint": "Multiply x by x.",
+              "hints": [
+                "Multiply x by x.",
+                "return x * x;"
+              ],
               "language": "typescript",
               "kind": "drill",
-              "difficulty": "",
+              "difficulty": "Intro",
               "starter": "function square(x: number): number {\n  return ____;\n}\nconsole.log(square(5));\n",
               "solution": "function square(x: number): number {\n  return x * x;\n}\nconsole.log(square(5));\n",
               "tests": [
@@ -910,16 +1902,20 @@
                   "output": "25"
                 }
               ],
-              "source_slug": ""
+              "source_slug": "",
+              "dataset": ""
             },
             {
               "id": "tscourse-w5-dec-2",
               "title": "Greet",
               "prompt": "Return a greeting string for the given name.",
               "hint": "Return a template literal using name.",
+              "hints": [
+                "Return a template literal using name."
+              ],
               "language": "typescript",
               "kind": "drill",
-              "difficulty": "",
+              "difficulty": "Intro",
               "starter": "function greet(name: string): string {\n  return ____;\n}\nconsole.log(greet(\"Ada\"));\n",
               "solution": "function greet(name: string): string {\n  return `Hello, ${name}!`;\n}\nconsole.log(greet(\"Ada\"));\n",
               "tests": [
@@ -928,48 +1924,65 @@
                   "output": "Hello, Ada!"
                 }
               ],
-              "source_slug": ""
-            }
-          ],
-          "quiz": [
-            {
-              "question": "What does `return` do?",
-              "options": [
-                "Prints a value",
-                "Sends a value back to the caller and ends the function",
-                "Declares a variable",
-                "Starts a loop"
-              ],
-              "answer": 1,
-              "explanation": "return produces the function's result and stops its execution."
+              "source_slug": "",
+              "dataset": ""
             },
             {
-              "question": "In `function f(x: number)`, what is `x`?",
-              "options": [
-                "A return value",
-                "A parameter (an input to the function)",
-                "A global variable",
-                "A type alias"
+              "id": "tscourse-w5-dec-fix",
+              "title": "Fix the missing return",
+              "prompt": "This should print 25 but prints undefined. Fix it.",
+              "hint": "The function computes x*x but never hands it back.",
+              "hints": [
+                "The function computes x*x but never hands it back.",
+                "Add `return` before x * x."
               ],
-              "answer": 1,
-              "explanation": "x is a parameter — a named input the caller supplies."
+              "language": "typescript",
+              "kind": "fix",
+              "difficulty": "Easy",
+              "starter": "function square(x: number): number {\n  x * x;\n}\nconsole.log(square(5));\n",
+              "solution": "function square(x: number): number {\n  return x * x;\n}\nconsole.log(square(5));\n",
+              "tests": [
+                {
+                  "input": "",
+                  "output": "25"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
             }
-          ]
+          ],
+          "quiz": []
         },
         {
           "key": "w5-params",
           "title": "Parameters & return values",
           "what": "Passing inputs and using the result.",
-          "lesson": "Functions compose: the value one returns can feed into more logic.\n\n```ts\nfunction double(x: number): number {\n  return x * 2;\n}\nconst n = 21;\nconsole.log(double(n));   // 42\n```\n",
+          "lesson": "Functions compose — one's result feeds the next.\n\n```ts\nfunction double(x: number): number { return x * 2; }\nconsole.log(double(21));   // 42\n```\n\n> ⚠️ **Common mistakes:** mixing up the order of arguments, or forgetting to\n> actually *call* the function (writing `double` instead of `double(21)`).\n",
+          "warmup": [
+            {
+              "question": "`function add(a,b){return a-b;} add(5,3)` returns…",
+              "options": [
+                "8",
+                "2",
+                "15",
+                "error"
+              ],
+              "answer": 1,
+              "explanation": "This (buggy) add subtracts: 5-3=2."
+            }
+          ],
           "exercises": [
             {
               "id": "tscourse-w5-par-1",
               "title": "Double the input",
-              "prompt": "Return x doubled, then print double(n) for the input n.",
+              "prompt": "Return x doubled; the program prints double(n) for the input n.",
               "hint": "Multiply the parameter by 2.",
+              "hints": [
+                "Multiply the parameter by 2."
+              ],
               "language": "typescript",
               "kind": "drill",
-              "difficulty": "",
+              "difficulty": "Intro",
               "starter": "import * as fs from \"fs\";\nfunction double(x: number): number {\n  return ____;\n}\nconst n = Number(fs.readFileSync(0, \"utf8\").trim());\nconsole.log(double(n));\n",
               "solution": "import * as fs from \"fs\";\nfunction double(x: number): number {\n  return x * 2;\n}\nconst n = Number(fs.readFileSync(0, \"utf8\").trim());\nconsole.log(double(n));\n",
               "tests": [
@@ -982,16 +1995,20 @@
                   "output": "0"
                 }
               ],
-              "source_slug": ""
+              "source_slug": "",
+              "dataset": ""
             },
             {
               "id": "tscourse-w5-par-2",
               "title": "Absolute value",
               "prompt": "Return the negation of x when x is negative.",
               "hint": "The opposite of x is -x.",
+              "hints": [
+                "The opposite of x is -x."
+              ],
               "language": "typescript",
               "kind": "drill",
-              "difficulty": "",
+              "difficulty": "Intro",
               "starter": "import * as fs from \"fs\";\nfunction abs(x: number): number {\n  if (x < 0) {\n    return ____;\n  }\n  return x;\n}\nconst n = Number(fs.readFileSync(0, \"utf8\").trim());\nconsole.log(abs(n));\n",
               "solution": "import * as fs from \"fs\";\nfunction abs(x: number): number {\n  if (x < 0) {\n    return -x;\n  }\n  return x;\n}\nconst n = Number(fs.readFileSync(0, \"utf8\").trim());\nconsole.log(abs(n));\n",
               "tests": [
@@ -1004,7 +2021,31 @@
                   "output": "7"
                 }
               ],
-              "source_slug": ""
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w5-par-fix",
+              "title": "Fix the call",
+              "prompt": "This should print 42 but prints a function, not a number. Fix the call.",
+              "hint": "`double` names the function; it doesn't run it.",
+              "hints": [
+                "`double` names the function; it doesn't run it.",
+                "Call it with the value: double(n)."
+              ],
+              "language": "typescript",
+              "kind": "fix",
+              "difficulty": "Easy",
+              "starter": "import * as fs from \"fs\";\nfunction double(x: number): number {\n  return x * 2;\n}\nconst n = Number(fs.readFileSync(0, \"utf8\").trim());\nconsole.log(double);\n",
+              "solution": "import * as fs from \"fs\";\nfunction double(x: number): number {\n  return x * 2;\n}\nconst n = Number(fs.readFileSync(0, \"utf8\").trim());\nconsole.log(double(n));\n",
+              "tests": [
+                {
+                  "input": "21",
+                  "output": "42"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
             }
           ],
           "quiz": []
@@ -1013,16 +2054,32 @@
           "key": "w5-arrow",
           "title": "Arrow functions",
           "what": "A shorter way to write small functions.",
-          "lesson": "Arrow functions are compact. When the body is a single expression, its value is\nreturned automatically (no `return` needed).\n\n```ts\nconst cube = (x: number): number => x * x * x;\nconsole.log(cube(3));   // 27\n```\n",
+          "lesson": "When the body is a single expression, its value is returned automatically.\n\n```ts\nconst cube = (x: number): number => x * x * x;\nconsole.log(cube(3));   // 27\n```\n\n> ⚠️ **Common mistakes:** adding `{ }` around a single-expression arrow body but\n> forgetting `return` — with braces you must write `return` yourself.\n",
+          "warmup": [
+            {
+              "question": "`const f = (x:number) => x + 10; f(5)` is…",
+              "options": [
+                "5",
+                "10",
+                "15",
+                "error"
+              ],
+              "answer": 2,
+              "explanation": "5 + 10 = 15."
+            }
+          ],
           "exercises": [
             {
               "id": "tscourse-w5-arr-1",
               "title": "Cube (arrow)",
-              "prompt": "Return x cubed from the arrow function.",
+              "prompt": "Return x cubed.",
               "hint": "x times x times x.",
+              "hints": [
+                "x times x times x."
+              ],
               "language": "typescript",
               "kind": "drill",
-              "difficulty": "",
+              "difficulty": "Intro",
               "starter": "const cube = (x: number): number => ____;\nconsole.log(cube(3));\n",
               "solution": "const cube = (x: number): number => x * x * x;\nconsole.log(cube(3));\n",
               "tests": [
@@ -1031,16 +2088,20 @@
                   "output": "27"
                 }
               ],
-              "source_slug": ""
+              "source_slug": "",
+              "dataset": ""
             },
             {
               "id": "tscourse-w5-arr-2",
               "title": "Triple (arrow)",
-              "prompt": "Return x * 3, then print triple(n) for the input.",
+              "prompt": "Return x * 3; print triple(n) for the input.",
               "hint": "Multiply x by 3.",
+              "hints": [
+                "Multiply x by 3."
+              ],
               "language": "typescript",
               "kind": "drill",
-              "difficulty": "",
+              "difficulty": "Intro",
               "starter": "import * as fs from \"fs\";\nconst triple = (x: number): number => ____;\nconst n = Number(fs.readFileSync(0, \"utf8\").trim());\nconsole.log(triple(n));\n",
               "solution": "import * as fs from \"fs\";\nconst triple = (x: number): number => x * 3;\nconst n = Number(fs.readFileSync(0, \"utf8\").trim());\nconsole.log(triple(n));\n",
               "tests": [
@@ -1053,39 +2114,149 @@
                   "output": "30"
                 }
               ],
-              "source_slug": ""
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w5-arr-fix",
+              "title": "Fix the arrow body",
+              "prompt": "This arrow has braces but forgot to return. Fix it so cube(2)=8.",
+              "hint": "With { } you must write return yourself.",
+              "hints": [
+                "With { } you must write return yourself.",
+                "Either add return, or drop the braces for an auto-return arrow."
+              ],
+              "language": "typescript",
+              "kind": "fix",
+              "difficulty": "Easy",
+              "starter": "const cube = (x: number): number => { x * x * x; };\nconsole.log(cube(2));\n",
+              "solution": "const cube = (x: number): number => x * x * x;\nconsole.log(cube(2));\n",
+              "tests": [
+                {
+                  "input": "",
+                  "output": "8"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
             }
           ],
           "quiz": []
         }
       ],
       "capstone": {
-        "title": "Temperature converter",
-        "brief": "\nWrite two functions and use them together. Read a Celsius temperature and print:\n\n1. that temperature in Fahrenheit (`C * 9 / 5 + 32`)\n2. the result converted back to Celsius (`(F - 32) * 5 / 9`) — which should equal\n   what you started with\n\nFor input `100`:\n\n```\n212\n100\n```\n",
+        "title": "Budget Buddy #5 — money helpers",
+        "brief": "Write two functions and use them. Read a **pre-tax amount** and print:\n\n1. the amount with **8% tax** added (`withTax`)\n2. that taxed amount rounded down to a whole dollar (`Math.floor`)\n\nFor input `50`:\n\n```\n54\n54\n```\n(50 + 8% = 54 exactly.)\n",
         "kind": "auto",
         "exercise": {
           "id": "tscourse-w5-capstone",
-          "title": "Temperature converter",
+          "title": "Budget Buddy #5",
           "prompt": "Fill in the two function bodies.",
-          "hint": "cToF is c*9/5+32; fToC reverses it with (f-32)*5/9.",
+          "hint": "withTax multiplies by 1.08.",
+          "hints": [
+            "withTax multiplies by 1.08.",
+            "whole uses Math.floor(amount).",
+            "The second line prints whole(withTax(amt))."
+          ],
           "language": "typescript",
           "kind": "challenge",
           "difficulty": "Easy",
-          "starter": "import * as fs from \"fs\";\n____\nconst c = Number(fs.readFileSync(0, \"utf8\").trim());\nconsole.log(cToF(c));\nconsole.log(fToC(cToF(c)));\n",
-          "solution": "import * as fs from \"fs\";\nfunction cToF(c: number): number {\n  return c * 9 / 5 + 32;\n}\nfunction fToC(f: number): number {\n  return (f - 32) * 5 / 9;\n}\nconst c = Number(fs.readFileSync(0, \"utf8\").trim());\nconsole.log(cToF(c));\nconsole.log(fToC(cToF(c)));\n",
+          "starter": "import * as fs from \"fs\";\n____\nconst amt = Number(fs.readFileSync(0, \"utf8\").trim());\nconsole.log(withTax(amt));\nconsole.log(whole(withTax(amt)));\n",
+          "solution": "import * as fs from \"fs\";\nfunction withTax(amount: number): number {\n  return amount * 1.08;\n}\nfunction whole(amount: number): number {\n  return Math.floor(amount);\n}\nconst amt = Number(fs.readFileSync(0, \"utf8\").trim());\nconsole.log(withTax(amt));\nconsole.log(whole(withTax(amt)));\n",
           "tests": [
             {
-              "input": "100",
-              "output": "212\n100"
+              "input": "50",
+              "output": "54\n54"
             },
             {
-              "input": "0",
-              "output": "32\n0"
+              "input": "100",
+              "output": "108\n108"
             }
           ],
-          "source_slug": ""
+          "source_slug": "",
+          "dataset": ""
+        },
+        "example_io": "(amount 50) → 54  then  54",
+        "rubric": [
+          "withTax adds 8%",
+          "whole floors to an integer dollar",
+          "The two functions are composed on the last line"
+        ],
+        "reference": "",
+        "stretch": null
+      },
+      "objectives": [
+        "Declare a function with parameters and a return value",
+        "Call a function and use what it returns",
+        "Write short functions as arrow functions",
+        "Compose functions — feed one result into another"
+      ],
+      "why": "Functions are how you tame complexity: name a step once, reuse and test it everywhere.",
+      "est_minutes": 45,
+      "glossary": [
+        {
+          "term": "function",
+          "def": "Named, reusable logic that takes inputs and returns a value."
+        },
+        {
+          "term": "parameter",
+          "def": "A named input to a function."
+        },
+        {
+          "term": "argument",
+          "def": "The actual value you pass in when calling."
+        },
+        {
+          "term": "return",
+          "def": "Sends a value back to the caller and ends the function."
+        },
+        {
+          "term": "arrow function",
+          "def": "A compact function: (x) => x * 2."
         }
-      }
+      ],
+      "cheatsheet": "```ts\nfunction square(x: number): number { return x * x; }\nconst cube = (x: number): number => x * x * x;   // arrow (auto-return)\nsquare(5)   // 25\ncube(3)     // 27\n```\n",
+      "self_check": [
+        "Can you write a function that takes a number and returns a result?",
+        "Can you call a function and print what it returns?",
+        "Can you write the same tiny function as an arrow function?"
+      ],
+      "review": [
+        {
+          "question": "What does `return` do?",
+          "options": [
+            "Prints a value",
+            "Sends a value back to the caller and ends the function",
+            "Declares a variable",
+            "Starts a loop"
+          ],
+          "answer": 1,
+          "explanation": "return produces the function's result."
+        },
+        {
+          "question": "In `function f(x: number)`, `x` is a…",
+          "options": [
+            "return value",
+            "parameter",
+            "global",
+            "type alias"
+          ],
+          "answer": 1,
+          "explanation": "x is a parameter — an input."
+        },
+        {
+          "question": "`const d = (x: number): number => x * 2; d(4)` is…",
+          "options": [
+            "4",
+            "8",
+            "24",
+            "error"
+          ],
+          "answer": 1,
+          "explanation": "It doubles: 8."
+        }
+      ],
+      "milestone": "Budget Buddy now has reusable money helpers — like applying tax."
     },
     {
       "number": 6,
@@ -1093,23 +2264,39 @@
       "month_title": "Data & Functions",
       "theme": "Arrays",
       "goal": "Store lists of values and process them with loops and array methods.",
-      "summary": "An **array** holds an ordered list of values, reached by index (`nums[0]` is the\nfirst). This week: creating and indexing arrays, iterating them, and the trio\n`map` / `filter` / `reduce` that makes list-processing concise.\n\nTo read a line of numbers into an array:\n\n```ts\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\n```\n\n`.split(\" \")` cuts the text into pieces at spaces; `.map(Number)` turns each\npiece into a number.\n",
+      "summary": "An **array** is an ordered list, reached by index (`nums[0]` is the first). This\nweek: creating and indexing arrays, iterating them, and `map` / `filter` that\nmake list-processing concise.\n\nTo read a line of numbers into an array:\n\n```ts\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\n```\n\n`.split(\" \")` cuts the text at spaces; `.map(Number)` turns each piece into a number.\n",
       "authored": true,
       "lessons": [
         {
           "key": "w6-basics",
           "title": "Creating & indexing",
           "what": "Arrays and their indexes.",
-          "lesson": "```ts\nconst names = [\"Ada\", \"Bo\", \"Cy\"];\nconsole.log(names[0]);      // Ada   (indexes start at 0)\nconsole.log(names.length);  // 3\n```\n",
+          "lesson": "```ts\nconst names = [\"Ada\", \"Bo\", \"Cy\"];\nnames[0]      // Ada  (indexes start at 0)\nnames.length  // 3\n```\n\n> ⚠️ **Common mistakes:** expecting `a[1]` to be the first element (it's the\n> *second*), and reading past the end (`a[a.length]` is `undefined`).\n",
+          "warmup": [
+            {
+              "question": "`const a = [10,20,30]; console.log(a[1]);` prints…",
+              "options": [
+                "10",
+                "20",
+                "30",
+                "1"
+              ],
+              "answer": 1,
+              "explanation": "Index 1 is the second element, 20."
+            }
+          ],
           "exercises": [
             {
               "id": "tscourse-w6-b-1",
               "title": "First number",
               "prompt": "Read the numbers and print the first one.",
               "hint": "The first element is at index 0.",
+              "hints": [
+                "The first element is at index 0."
+              ],
               "language": "typescript",
               "kind": "drill",
-              "difficulty": "",
+              "difficulty": "Intro",
               "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconsole.log(____);\n",
               "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconsole.log(nums[0]);\n",
               "tests": [
@@ -1122,16 +2309,20 @@
                   "output": "9"
                 }
               ],
-              "source_slug": ""
+              "source_slug": "",
+              "dataset": ""
             },
             {
               "id": "tscourse-w6-b-2",
               "title": "How many",
               "prompt": "Print how many space-separated words the input has.",
               "hint": "length gives the number of elements.",
+              "hints": [
+                "length gives the number of elements."
+              ],
               "language": "typescript",
               "kind": "drill",
-              "difficulty": "",
+              "difficulty": "Intro",
               "starter": "import * as fs from \"fs\";\nconst words = fs.readFileSync(0, \"utf8\").trim().split(\" \");\nconsole.log(____);\n",
               "solution": "import * as fs from \"fs\";\nconst words = fs.readFileSync(0, \"utf8\").trim().split(\" \");\nconsole.log(words.length);\n",
               "tests": [
@@ -1144,48 +2335,65 @@
                   "output": "1"
                 }
               ],
-              "source_slug": ""
-            }
-          ],
-          "quiz": [
-            {
-              "question": "What index is the first element of an array?",
-              "options": [
-                "1",
-                "0",
-                "-1",
-                "It depends"
-              ],
-              "answer": 1,
-              "explanation": "Arrays are zero-indexed: the first element is at index 0."
+              "source_slug": "",
+              "dataset": ""
             },
             {
-              "question": "What does \"3 5 7\".split(\" \") produce?",
-              "options": [
-                "the number 357",
-                "the array [\"3\", \"5\", \"7\"]",
-                "the string \"357\"",
-                "an error"
+              "id": "tscourse-w6-b-fix",
+              "title": "Fix the index",
+              "prompt": "This should print the FIRST number but prints the second. Fix it.",
+              "hint": "Index 1 is the second element.",
+              "hints": [
+                "Index 1 is the second element.",
+                "The first element is index 0."
               ],
-              "answer": 1,
-              "explanation": "split cuts the string at each space into an array of pieces."
+              "language": "typescript",
+              "kind": "fix",
+              "difficulty": "Easy",
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconsole.log(nums[1]);\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconsole.log(nums[0]);\n",
+              "tests": [
+                {
+                  "input": "3 5 7",
+                  "output": "3"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
             }
-          ]
+          ],
+          "quiz": []
         },
         {
           "key": "w6-iterate",
           "title": "Iterating & accumulating",
           "what": "Walk an array with for...of.",
-          "lesson": "```ts\nlet sum = 0;\nfor (const x of [1, 2, 3, 4]) {\n  sum = sum + x;\n}\nconsole.log(sum);   // 10\n```\n",
+          "lesson": "Sum the array [1,2,3,4]:\n\n| step | x | sum after |\n|------|---|-----------|\n| 1    | 1 | 1         |\n| 2    | 2 | 3         |\n| 3    | 3 | 6         |\n| 4    | 4 | 10        |\n\n```ts\nlet sum = 0;\nfor (const x of [1, 2, 3, 4]) sum = sum + x;\nconsole.log(sum);   // 10\n```\n",
+          "warmup": [
+            {
+              "question": "Summing [2,2,2] with a for...of accumulator gives…",
+              "options": [
+                "2",
+                "6",
+                "3",
+                "222"
+              ],
+              "answer": 1,
+              "explanation": "2+2+2 = 6."
+            }
+          ],
           "exercises": [
             {
               "id": "tscourse-w6-it-1",
               "title": "Sum the list",
               "prompt": "Add every number and print the total.",
               "hint": "Add each x to the running sum.",
+              "hints": [
+                "Add each x to the running sum."
+              ],
               "language": "typescript",
               "kind": "drill",
-              "difficulty": "",
+              "difficulty": "Intro",
               "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nlet sum = 0;\nfor (const x of nums) {\n  ____\n}\nconsole.log(sum);\n",
               "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nlet sum = 0;\nfor (const x of nums) {\n  sum = sum + x;\n}\nconsole.log(sum);\n",
               "tests": [
@@ -1198,16 +2406,20 @@
                   "output": "5"
                 }
               ],
-              "source_slug": ""
+              "source_slug": "",
+              "dataset": ""
             },
             {
               "id": "tscourse-w6-it-2",
               "title": "Largest",
               "prompt": "Track and print the largest number in the list.",
               "hint": "Replace best whenever x is bigger.",
+              "hints": [
+                "Replace best whenever x is bigger."
+              ],
               "language": "typescript",
               "kind": "drill",
-              "difficulty": "",
+              "difficulty": "Intro",
               "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nlet best = nums[0];\nfor (const x of nums) {\n  if (____) {\n    best = x;\n  }\n}\nconsole.log(best);\n",
               "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nlet best = nums[0];\nfor (const x of nums) {\n  if (x > best) {\n    best = x;\n  }\n}\nconsole.log(best);\n",
               "tests": [
@@ -1220,25 +2432,64 @@
                   "output": "4"
                 }
               ],
-              "source_slug": ""
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w6-it-fix",
+              "title": "Fix the sum start",
+              "prompt": "This sum is always one too big. Fix it so sum(1 2 3)=6.",
+              "hint": "A running sum must start at 0, not 1.",
+              "hints": [
+                "A running sum must start at 0, not 1."
+              ],
+              "language": "typescript",
+              "kind": "fix",
+              "difficulty": "Easy",
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nlet sum = 1;\nfor (const x of nums) {\n  sum = sum + x;\n}\nconsole.log(sum);\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nlet sum = 0;\nfor (const x of nums) {\n  sum = sum + x;\n}\nconsole.log(sum);\n",
+              "tests": [
+                {
+                  "input": "1 2 3",
+                  "output": "6"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
             }
           ],
           "quiz": []
         },
         {
           "key": "w6-methods",
-          "title": "map, filter, reduce",
-          "what": "Transform, select, and combine.",
-          "lesson": "- `map` makes a new array by transforming each element.\n- `filter` keeps only elements that pass a test.\n- `join` glues an array back into a string.\n\n```ts\nconst nums = [1, 2, 3];\nconsole.log(nums.map((x) => x * 2).join(\" \"));   // 2 4 6\nconsole.log(nums.filter((x) => x % 2 === 1).length); // 2\n```\n",
+          "title": "map & filter",
+          "what": "Transform and select.",
+          "lesson": "- `map` makes a new array by transforming each element.\n- `filter` keeps only elements that pass a test.\n- `join` glues an array into a string.\n\n```ts\nconst nums = [1, 2, 3];\nnums.map((x) => x * 2).join(\" \")     // \"2 4 6\"\nnums.filter((x) => x % 2 === 1).length // 2\n```\n\n> ⚠️ **Common mistakes:** forgetting `map`/`filter` return a NEW array (they\n> don't change the original), and forgetting to `return`/produce a value in the callback.\n",
+          "warmup": [
+            {
+              "question": "`[1,2,3,4].filter((x)=>x%2===0)` is…",
+              "options": [
+                "[1,3]",
+                "[2,4]",
+                "[1,2,3,4]",
+                "2"
+              ],
+              "answer": 1,
+              "explanation": "Keeps the even numbers."
+            }
+          ],
           "exercises": [
             {
               "id": "tscourse-w6-m-1",
               "title": "Count evens",
               "prompt": "Keep the even numbers and print how many there are.",
               "hint": "Even means remainder 0 mod 2.",
+              "hints": [
+                "Even means remainder 0 mod 2."
+              ],
               "language": "typescript",
               "kind": "drill",
-              "difficulty": "",
+              "difficulty": "Intro",
               "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst evens = nums.filter((x) => ____);\nconsole.log(evens.length);\n",
               "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst evens = nums.filter((x) => x % 2 === 0);\nconsole.log(evens.length);\n",
               "tests": [
@@ -1251,16 +2502,20 @@
                   "output": "0"
                 }
               ],
-              "source_slug": ""
+              "source_slug": "",
+              "dataset": ""
             },
             {
               "id": "tscourse-w6-m-2",
               "title": "Double them",
               "prompt": "Double every number and print them space-separated.",
               "hint": "map transforms each x to x * 2.",
+              "hints": [
+                "map transforms each x to x * 2."
+              ],
               "language": "typescript",
               "kind": "drill",
-              "difficulty": "",
+              "difficulty": "Intro",
               "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst doubled = nums.map((x) => ____);\nconsole.log(doubled.join(\" \"));\n",
               "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst doubled = nums.map((x) => x * 2);\nconsole.log(doubled.join(\" \"));\n",
               "tests": [
@@ -1273,39 +2528,179 @@
                   "output": "20"
                 }
               ],
-              "source_slug": ""
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w6-m-fix",
+              "title": "Fix filter vs map",
+              "prompt": "This should COUNT the evens, but it doubles instead. Fix it.",
+              "hint": "map keeps every element (so length never changes).",
+              "hints": [
+                "map keeps every element (so length never changes).",
+                "To keep only some elements, use filter."
+              ],
+              "language": "typescript",
+              "kind": "fix",
+              "difficulty": "Medium",
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst evens = nums.map((x) => x % 2 === 0);\nconsole.log(evens.length);\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst evens = nums.filter((x) => x % 2 === 0);\nconsole.log(evens.length);\n",
+              "tests": [
+                {
+                  "input": "1 2 3 4 5 6",
+                  "output": "3"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
             }
           ],
           "quiz": []
         }
       ],
       "capstone": {
-        "title": "Number stats",
-        "brief": "\nRead a line of numbers and print three stats:\n\n```\nsum 14\nmax 5\ncount 5\n```\n\nfor input `3 1 4 1 5`. Fill in the loop that computes the sum and max, then the\nthree report lines.\n",
+        "title": "Budget Buddy #6 — month stats",
+        "brief": "Read a line of expense **amounts** and print three stats:\n\n```\ntotal 14\nbiggest 5\ncount 5\n```\n\nfor input `3 1 4 1 5`.\n",
         "kind": "auto",
         "exercise": {
           "id": "tscourse-w6-capstone",
-          "title": "Number stats",
-          "prompt": "Compute sum and max in one pass, then print the report.",
-          "hint": "Start max at nums[0], then update sum and max together in one loop.",
+          "title": "Budget Buddy #6",
+          "prompt": "Compute total and the biggest in one pass, then print the report.",
+          "hint": "Start biggest at nums[0].",
+          "hints": [
+            "Start biggest at nums[0].",
+            "Update total and biggest together in one loop.",
+            "count is nums.length."
+          ],
           "language": "typescript",
           "kind": "challenge",
           "difficulty": "Easy",
           "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\n____\n",
-          "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nlet sum = 0;\nlet max = nums[0];\nfor (const x of nums) {\n  sum = sum + x;\n  if (x > max) {\n    max = x;\n  }\n}\nconsole.log(`sum ${sum}`);\nconsole.log(`max ${max}`);\nconsole.log(`count ${nums.length}`);\n",
+          "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nlet total = 0;\nlet biggest = nums[0];\nfor (const x of nums) {\n  total = total + x;\n  if (x > biggest) {\n    biggest = x;\n  }\n}\nconsole.log(`total ${total}`);\nconsole.log(`biggest ${biggest}`);\nconsole.log(`count ${nums.length}`);\n",
           "tests": [
             {
               "input": "3 1 4 1 5",
-              "output": "sum 14\nmax 5\ncount 5"
+              "output": "total 14\nbiggest 5\ncount 5"
             },
             {
               "input": "10",
-              "output": "sum 10\nmax 10\ncount 1"
+              "output": "total 10\nbiggest 10\ncount 1"
             }
           ],
-          "source_slug": ""
+          "source_slug": "",
+          "dataset": ""
+        },
+        "example_io": "total 14\nbiggest 5\ncount 5",
+        "rubric": [
+          "Prints total, biggest and count",
+          "Computes total and biggest in a single loop",
+          "biggest starts from the first element"
+        ],
+        "reference": "",
+        "stretch": {
+          "id": "tscourse-w6-capstone-stretch",
+          "title": "Budget Buddy #6 (stretch)",
+          "prompt": "Also print `average <avg>` where avg = total / count (a decimal is fine).",
+          "hint": "average is total divided by the count.",
+          "hints": [
+            "average is total divided by the count.",
+            "Use total / nums.length."
+          ],
+          "language": "typescript",
+          "kind": "challenge",
+          "difficulty": "Medium",
+          "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\n____\n",
+          "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nlet total = 0;\nfor (const x of nums) {\n  total = total + x;\n}\nconsole.log(`total ${total}`);\nconsole.log(`count ${nums.length}`);\nconsole.log(`average ${total / nums.length}`);\n",
+          "tests": [
+            {
+              "input": "2 4 6",
+              "output": "total 12\ncount 3\naverage 4"
+            },
+            {
+              "input": "10",
+              "output": "total 10\ncount 1\naverage 10"
+            }
+          ],
+          "source_slug": "",
+          "dataset": ""
         }
-      }
+      },
+      "objectives": [
+        "Create arrays and read elements by index",
+        "Read a line of numbers into an array",
+        "Loop over an array to sum or find a max",
+        "Transform and filter with map and filter"
+      ],
+      "why": "Almost all real data is a list — rows, items, results. Arrays are how you hold and process them.",
+      "est_minutes": 50,
+      "glossary": [
+        {
+          "term": "array",
+          "def": "An ordered list of values."
+        },
+        {
+          "term": "index",
+          "def": "A position in an array, starting at 0."
+        },
+        {
+          "term": ".split(sep)",
+          "def": "Cuts a string into an array of pieces."
+        },
+        {
+          "term": ".map(f)",
+          "def": "Makes a new array by transforming each element."
+        },
+        {
+          "term": ".filter(f)",
+          "def": "Keeps only the elements that pass a test."
+        },
+        {
+          "term": ".join(sep)",
+          "def": "Glues an array back into a string."
+        }
+      ],
+      "cheatsheet": "```ts\nconst a = [3, 5, 7];\na[0]         // 3   (index starts at 0)\na.length     // 3\n\"1 2 3\".split(\" \").map(Number)   // [1,2,3]\na.map((x) => x * 2)              // [6,10,14]\na.filter((x) => x > 4)           // [5,7]\na.join(\" \")                       // \"3 5 7\"\n```\n",
+      "self_check": [
+        "Can you read numbers into an array and print the first one?",
+        "Can you sum an array with a loop?",
+        "Can you keep only the even numbers with filter?"
+      ],
+      "review": [
+        {
+          "question": "The first element of an array is at index…",
+          "options": [
+            "1",
+            "0",
+            "-1",
+            "any"
+          ],
+          "answer": 1,
+          "explanation": "Arrays are zero-indexed."
+        },
+        {
+          "question": "`\"3 5\".split(\" \")` gives…",
+          "options": [
+            "35",
+            "[\"3\",\"5\"]",
+            "\"3 5\"",
+            "error"
+          ],
+          "answer": 1,
+          "explanation": "split cuts into pieces."
+        },
+        {
+          "question": "`[1,2,3].filter((x)=>x>1).length` is…",
+          "options": [
+            "1",
+            "2",
+            "3",
+            "0"
+          ],
+          "answer": 1,
+          "explanation": "Keeps 2 and 3 → length 2."
+        }
+      ],
+      "milestone": "Budget Buddy can now crunch a whole month of expenses at once."
     },
     {
       "number": 7,
@@ -1313,23 +2708,39 @@
       "month_title": "Data & Functions",
       "theme": "Objects",
       "goal": "Model structured data with objects, and combine them with arrays.",
-      "summary": "An **object** groups related values under named keys — perfect for modeling a\n'thing' like a user or a product. This week: object literals, reading and\nupdating properties, and arrays of objects (the shape of most real data).\n\n```ts\nconst user = { name: \"Ada\", age: 36 };\nconsole.log(user.name);   // Ada\nuser.age = user.age + 1;  // update a property\n```\n",
+      "summary": "An **object** groups related values under named keys — perfect for a 'thing'\nlike an expense or a user. This week: object literals, reading and updating\nproperties, and arrays of objects (the shape of most real data).\n\n```ts\nconst user = { name: \"Ada\", age: 36 };\nuser.name          // Ada\nuser.age = user.age + 1;\n```\n",
       "authored": true,
       "lessons": [
         {
           "key": "w7-basics",
           "title": "Object basics",
           "what": "Keys, values, and dot access.",
-          "lesson": "Reach a property with dot notation: `obj.key`. You can read it or, on a `const`\nobject, still change its properties.\n\n```ts\nconst point = { x: 3, y: 4 };\nconsole.log(point.x);        // 3\npoint.y = point.y + 1;       // 5\n```\n",
+          "lesson": "```ts\nconst point = { x: 3, y: 4 };\npoint.x            // 3\npoint.y = point.y + 1;   // 5\n```\n\n> ⚠️ **Common mistakes:** using `[]` with a bare word (`obj[name]` looks up a\n> *variable* name); for a known key, use dot access `obj.name`.\n",
+          "warmup": [
+            {
+              "question": "`const u = { age: 5 }; console.log(u.age);` prints…",
+              "options": [
+                "age",
+                "5",
+                "u.age",
+                "undefined"
+              ],
+              "answer": 1,
+              "explanation": "It reads the property value 5."
+            }
+          ],
           "exercises": [
             {
               "id": "tscourse-w7-b-1",
               "title": "Read a property",
               "prompt": "Print the user's name.",
               "hint": "Access it with user.name.",
+              "hints": [
+                "Access it with user.name."
+              ],
               "language": "typescript",
               "kind": "drill",
-              "difficulty": "",
+              "difficulty": "Intro",
               "starter": "const user = { name: \"Ada\", age: 36 };\nconsole.log(____);\n",
               "solution": "const user = { name: \"Ada\", age: 36 };\nconsole.log(user.name);\n",
               "tests": [
@@ -1338,16 +2749,20 @@
                   "output": "Ada"
                 }
               ],
-              "source_slug": ""
+              "source_slug": "",
+              "dataset": ""
             },
             {
               "id": "tscourse-w7-b-2",
               "title": "Update a property",
               "prompt": "Add 5 to counter.value, then print it.",
               "hint": "Read the current value and add 5.",
+              "hints": [
+                "Read the current value and add 5."
+              ],
               "language": "typescript",
               "kind": "drill",
-              "difficulty": "",
+              "difficulty": "Intro",
               "starter": "const counter = { value: 0 };\ncounter.value = ____;\nconsole.log(counter.value);\n",
               "solution": "const counter = { value: 0 };\ncounter.value = counter.value + 5;\nconsole.log(counter.value);\n",
               "tests": [
@@ -1356,48 +2771,65 @@
                   "output": "5"
                 }
               ],
-              "source_slug": ""
-            }
-          ],
-          "quiz": [
-            {
-              "question": "How do you read the `name` property of `user`?",
-              "options": [
-                "user[name]",
-                "user->name",
-                "user.name",
-                "name(user)"
-              ],
-              "answer": 2,
-              "explanation": "Dot notation: user.name."
+              "source_slug": "",
+              "dataset": ""
             },
             {
-              "question": "An object is best for...",
-              "options": [
-                "An ordered list of values",
-                "Grouping related values under named keys",
-                "Repeating an action",
-                "Comparing two numbers"
+              "id": "tscourse-w7-b-fix",
+              "title": "Fix the property name",
+              "prompt": "This should print the name but prints undefined. Fix the property.",
+              "hint": "There is no `username` key on this object.",
+              "hints": [
+                "There is no `username` key on this object.",
+                "The key is `name`."
               ],
-              "answer": 1,
-              "explanation": "Objects group related fields (name, age, ...) under keys."
+              "language": "typescript",
+              "kind": "fix",
+              "difficulty": "Easy",
+              "starter": "const user = { name: \"Ada\", age: 36 };\nconsole.log(user.username);\n",
+              "solution": "const user = { name: \"Ada\", age: 36 };\nconsole.log(user.name);\n",
+              "tests": [
+                {
+                  "input": "",
+                  "output": "Ada"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
             }
-          ]
+          ],
+          "quiz": []
         },
         {
           "key": "w7-funcs",
           "title": "Objects & functions",
           "what": "Passing objects around.",
-          "lesson": "Functions can take and return objects. Annotate the shape inline or with a type\n(you'll formalize this next week).\n\n```ts\nfunction fullName(p: { first: string; last: string }): string {\n  return `${p.first} ${p.last}`;\n}\nconsole.log(fullName({ first: \"Ada\", last: \"Lovelace\" }));\n```\n",
+          "lesson": "Functions can take and return objects.\n\n```ts\nfunction fullName(p: { first: string; last: string }): string {\n  return `${p.first} ${p.last}`;\n}\nfullName({ first: \"Ada\", last: \"Lovelace\" });   // Ada Lovelace\n```\n",
+          "warmup": [
+            {
+              "question": "`fullName({first:\"A\", last:\"B\"})` above returns…",
+              "options": [
+                "A",
+                "B",
+                "A B",
+                "AB"
+              ],
+              "answer": 2,
+              "explanation": "Template joins them with a space."
+            }
+          ],
           "exercises": [
             {
               "id": "tscourse-w7-f-1",
               "title": "Full name",
               "prompt": "Return the first and last name joined by a space.",
               "hint": "Template literal with p.first and p.last.",
+              "hints": [
+                "Template literal with p.first and p.last."
+              ],
               "language": "typescript",
               "kind": "drill",
-              "difficulty": "",
+              "difficulty": "Intro",
               "starter": "function fullName(p: { first: string; last: string }): string {\n  return ____;\n}\nconsole.log(fullName({ first: \"Ada\", last: \"Lovelace\" }));\n",
               "solution": "function fullName(p: { first: string; last: string }): string {\n  return `${p.first} ${p.last}`;\n}\nconsole.log(fullName({ first: \"Ada\", last: \"Lovelace\" }));\n",
               "tests": [
@@ -1406,25 +2838,57 @@
                   "output": "Ada Lovelace"
                 }
               ],
-              "source_slug": ""
+              "source_slug": "",
+              "dataset": ""
             },
             {
               "id": "tscourse-w7-f-2",
               "title": "Build from input",
               "prompt": "Store a greeting on the object, then print it.",
               "hint": "The greeting is a template literal using name.",
+              "hints": [
+                "The greeting is a template literal using name."
+              ],
               "language": "typescript",
               "kind": "drill",
-              "difficulty": "",
+              "difficulty": "Intro",
               "starter": "import * as fs from \"fs\";\nconst name = fs.readFileSync(0, \"utf8\").trim();\nconst user = { name: name, greeting: ____ };\nconsole.log(user.greeting);\n",
               "solution": "import * as fs from \"fs\";\nconst name = fs.readFileSync(0, \"utf8\").trim();\nconst user = { name: name, greeting: `Hi ${name}` };\nconsole.log(user.greeting);\n",
               "tests": [
                 {
                   "input": "Sam",
                   "output": "Hi Sam"
+                },
+                {
+                  "input": "Ada",
+                  "output": "Hi Ada"
                 }
               ],
-              "source_slug": ""
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w7-f-fix",
+              "title": "Fix the field access",
+              "prompt": "This should print the first name but reads the wrong field. Fix it.",
+              "hint": "It returns p.last but should return the first name.",
+              "hints": [
+                "It returns p.last but should return the first name.",
+                "Return p.first."
+              ],
+              "language": "typescript",
+              "kind": "fix",
+              "difficulty": "Easy",
+              "starter": "function first(p: { first: string; last: string }): string {\n  return p.last;\n}\nconsole.log(first({ first: \"Ada\", last: \"Lovelace\" }));\n",
+              "solution": "function first(p: { first: string; last: string }): string {\n  return p.first;\n}\nconsole.log(first({ first: \"Ada\", last: \"Lovelace\" }));\n",
+              "tests": [
+                {
+                  "input": "",
+                  "output": "Ada"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
             }
           ],
           "quiz": []
@@ -1433,16 +2897,32 @@
           "key": "w7-arrays",
           "title": "Arrays of objects",
           "what": "The shape of real datasets.",
-          "lesson": "Most data is a list of records — an array of objects. Loop over it and reach\ninto each one.\n\n```ts\nconst people = [{ name: \"Ada\", age: 36 }, { name: \"Bo\", age: 20 }];\nlet total = 0;\nfor (const p of people) {\n  total = total + p.age;\n}\nconsole.log(total);   // 56\n```\n",
+          "lesson": "Most data is a list of records. Loop over it and reach into each one.\n\n```ts\nconst people = [{ name: \"Ada\", age: 36 }, { name: \"Bo\", age: 20 }];\nlet total = 0;\nfor (const p of people) total = total + p.age;\nconsole.log(total);   // 56\n```\n",
+          "warmup": [
+            {
+              "question": "Totalling `age` over [{age:1},{age:2},{age:3}] gives…",
+              "options": [
+                "3",
+                "6",
+                "123",
+                "error"
+              ],
+              "answer": 1,
+              "explanation": "1+2+3 = 6."
+            }
+          ],
           "exercises": [
             {
               "id": "tscourse-w7-a-1",
               "title": "Total ages",
               "prompt": "Sum everyone's age and print it.",
               "hint": "Add each person's age to total.",
+              "hints": [
+                "Add each person's age to total."
+              ],
               "language": "typescript",
               "kind": "drill",
-              "difficulty": "",
+              "difficulty": "Intro",
               "starter": "const people = [\n  { name: \"Ada\", age: 36 },\n  { name: \"Bo\", age: 20 },\n];\nlet total = 0;\nfor (const p of people) {\n  total = ____;\n}\nconsole.log(total);\n",
               "solution": "const people = [\n  { name: \"Ada\", age: 36 },\n  { name: \"Bo\", age: 20 },\n];\nlet total = 0;\nfor (const p of people) {\n  total = total + p.age;\n}\nconsole.log(total);\n",
               "tests": [
@@ -1451,16 +2931,20 @@
                   "output": "56"
                 }
               ],
-              "source_slug": ""
+              "source_slug": "",
+              "dataset": ""
             },
             {
               "id": "tscourse-w7-a-2",
               "title": "Count adults",
               "prompt": "Count people aged 21 or older and print the count.",
               "hint": "Keep people whose age is at least 21.",
+              "hints": [
+                "Keep people whose age is at least 21."
+              ],
               "language": "typescript",
               "kind": "drill",
-              "difficulty": "",
+              "difficulty": "Intro",
               "starter": "const people = [\n  { name: \"Ada\", age: 36 },\n  { name: \"Bo\", age: 20 },\n];\nconst adults = people.filter((p) => ____);\nconsole.log(adults.length);\n",
               "solution": "const people = [\n  { name: \"Ada\", age: 36 },\n  { name: \"Bo\", age: 20 },\n];\nconst adults = people.filter((p) => p.age >= 21);\nconsole.log(adults.length);\n",
               "tests": [
@@ -1469,18 +2953,118 @@
                   "output": "1"
                 }
               ],
-              "source_slug": ""
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w7-a-fix",
+              "title": "Fix the field in the loop",
+              "prompt": "This should total ages but totals nothing sensible. Fix the field it reads.",
+              "hint": "There is no `years` field — it's `age`.",
+              "hints": [
+                "There is no `years` field — it's `age`.",
+                "Read p.age."
+              ],
+              "language": "typescript",
+              "kind": "fix",
+              "difficulty": "Easy",
+              "starter": "const people = [\n  { name: \"Ada\", age: 36 },\n  { name: \"Bo\", age: 20 },\n];\nlet total = 0;\nfor (const p of people) {\n  total = total + p.years;\n}\nconsole.log(total);\n",
+              "solution": "const people = [\n  { name: \"Ada\", age: 36 },\n  { name: \"Bo\", age: 20 },\n];\nlet total = 0;\nfor (const p of people) {\n  total = total + p.age;\n}\nconsole.log(total);\n",
+              "tests": [
+                {
+                  "input": "",
+                  "output": "56"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
             }
           ],
           "quiz": []
         }
       ],
       "capstone": {
-        "title": "Design: a tiny library catalog",
-        "brief": "\nA **free-build** project (no auto-grader — build it your way, then mark the week\ndone). In the editor, model a small **library**:\n\n1. Represent each book as an object with `title`, `author`, and `available`\n   (a boolean).\n2. Put several books in an array.\n3. Write a function that takes the array and prints a report: how many books\n   there are, and the titles of the ones currently available.\n\nTry to use everything from Weeks 1–7: variables, loops, functions, arrays, and\nobjects. There's no single right answer — experiment. When you're happy with the\noutput, click **Mark done**.\n",
+        "title": "Budget Buddy #7 — model your expenses (free build)",
+        "brief": "A **free-build** project — no auto-grader. In the editor, model Budget Buddy's data:\n\n1. Represent each expense as an object with `desc`, `amount`, and `paid` (a boolean).\n2. Put several expenses in an array.\n3. Write a function that takes the array and prints a report: the number of\n   expenses, the total amount, and the descriptions of the unpaid ones.\n\nUse everything from Weeks 1–7: variables, loops, functions, arrays, objects.\nWhen you're happy with the output, click **Mark done**. A reference solution is\nbelow if you want to compare.\n",
         "kind": "brief",
-        "exercise": null
-      }
+        "exercise": null,
+        "example_io": "",
+        "rubric": [
+          "Each expense is an object with desc, amount, paid",
+          "A function takes the array and prints a report",
+          "The report includes the count, the total, and the unpaid descriptions"
+        ],
+        "reference": "const expenses = [\n  { desc: \"coffee\", amount: 3, paid: true },\n  { desc: \"book\", amount: 12, paid: false },\n  { desc: \"lunch\", amount: 9, paid: false },\n];\nfunction report(items) {\n  let total = 0;\n  for (const e of items) total = total + e.amount;\n  console.log(`Expenses: ${items.length}`);\n  console.log(`Total: $${total}`);\n  const unpaid = items.filter((e) => !e.paid).map((e) => e.desc);\n  console.log(`Unpaid: ${unpaid.join(\", \")}`);\n}\nreport(expenses);\n",
+        "stretch": null
+      },
+      "objectives": [
+        "Create objects and read properties with dot access",
+        "Update a property on an object",
+        "Pass objects into functions",
+        "Loop over an array of objects and reach into each one"
+      ],
+      "why": "Objects model the real world — a product, a user, an expense — as one tidy bundle of fields.",
+      "est_minutes": 45,
+      "glossary": [
+        {
+          "term": "object",
+          "def": "A bundle of named values (keys) — { name: \"Ada\" }."
+        },
+        {
+          "term": "property / key",
+          "def": "A named slot on an object."
+        },
+        {
+          "term": "dot access",
+          "def": "Reaching a property: obj.name."
+        },
+        {
+          "term": "array of objects",
+          "def": "A list where each item is an object — the shape of most data."
+        }
+      ],
+      "cheatsheet": "```ts\nconst p = { name: \"Ada\", age: 36 };\np.name           // \"Ada\"\np.age = p.age + 1;  // update\nconst people = [{ name: \"Ada\", age: 36 }, { name: \"Bo\", age: 20 }];\nfor (const q of people) total = total + q.age;\npeople.filter((q) => q.age >= 21)\n```\n",
+      "self_check": [
+        "Can you read and update a property on an object?",
+        "Can you write a function that takes an object and returns a field?",
+        "Can you total a field across an array of objects?"
+      ],
+      "review": [
+        {
+          "question": "How do you read the `name` of `user`?",
+          "options": [
+            "user[name]",
+            "user->name",
+            "user.name",
+            "name(user)"
+          ],
+          "answer": 2,
+          "explanation": "Dot notation: user.name."
+        },
+        {
+          "question": "An object is best for…",
+          "options": [
+            "an ordered list",
+            "grouping related values under keys",
+            "repeating an action",
+            "comparing numbers"
+          ],
+          "answer": 1,
+          "explanation": "Objects bundle related fields."
+        },
+        {
+          "question": "`[{a:1},{a:2}].filter((o)=>o.a>1).length` is…",
+          "options": [
+            "0",
+            "1",
+            "2",
+            "error"
+          ],
+          "answer": 1,
+          "explanation": "Only {a:2} passes."
+        }
+      ],
+      "milestone": "Budget Buddy now models each expense as a proper record."
     },
     {
       "number": 8,
@@ -1488,23 +3072,39 @@
       "month_title": "Data & Functions",
       "theme": "Types that Describe Your Data",
       "goal": "Annotate values and name shapes with type aliases and interfaces.",
-      "summary": "You've used TypeScript's types implicitly all along. This week you make them\nexplicit: **annotations** on values and functions, and naming reusable shapes\nwith **`interface`** and **`type`**. Well-named types are documentation the\ncompiler checks for you.\n\nRemember: types are erased before the program runs, so the drills still exercise\nruntime logic — the annotations are there to describe it.\n",
+      "summary": "You've used TypeScript's types implicitly all along. This week you make them\nexplicit: **annotations** on values and functions, and naming reusable shapes\nwith **`interface`** and **`type`**. Well-named types are documentation the\ncompiler checks for you.\n\nTypes are erased before the program runs, so the drills still exercise runtime\nlogic — the annotations describe it.\n",
       "authored": true,
       "lessons": [
         {
           "key": "w8-annotations",
           "title": "Annotations & inference",
           "what": "Writing types on values and functions.",
-          "lesson": "```ts\nconst price: number = 10;\nconst label: string = \"Total\";\nfunction repeat(s: string, n: number): string {\n  return s.repeat(n);\n}\n```\n\nOften you can omit annotations and let TypeScript **infer** them — but writing\nthem on function parameters and returns is good practice.\n",
+          "lesson": "```ts\nconst price: number = 10;\nfunction repeat(s: string, n: number): string {\n  return s.repeat(n);\n}\n```\n\nOften you can omit annotations and let TypeScript **infer** them — but writing\nthem on function parameters and returns is good practice.\n\n> ⚠️ **Common mistakes:** thinking annotations change runtime behaviour — they\n> don't; they're checked, then stripped.\n",
+          "warmup": [
+            {
+              "question": "`\"ab\".repeat(3)` is…",
+              "options": [
+                "ababab",
+                "ab3",
+                "6",
+                "aaabbb"
+              ],
+              "answer": 0,
+              "explanation": "repeat concatenates 3 copies."
+            }
+          ],
           "exercises": [
             {
               "id": "tscourse-w8-an-1",
               "title": "Typed total",
               "prompt": "Compute price * qty into the annotated total.",
               "hint": "Multiply the two annotated numbers.",
+              "hints": [
+                "Multiply the two annotated numbers."
+              ],
               "language": "typescript",
               "kind": "drill",
-              "difficulty": "",
+              "difficulty": "Intro",
               "starter": "const price: number = 10;\nconst qty: number = 3;\nconst total: number = ____;\nconsole.log(total);\n",
               "solution": "const price: number = 10;\nconst qty: number = 3;\nconst total: number = price * qty;\nconsole.log(total);\n",
               "tests": [
@@ -1513,16 +3113,20 @@
                   "output": "30"
                 }
               ],
-              "source_slug": ""
+              "source_slug": "",
+              "dataset": ""
             },
             {
               "id": "tscourse-w8-an-2",
               "title": "Typed repeat",
               "prompt": "Return the string repeated n times.",
               "hint": "Strings have a .repeat(n) method.",
+              "hints": [
+                "Strings have a .repeat(n) method."
+              ],
               "language": "typescript",
               "kind": "drill",
-              "difficulty": "",
+              "difficulty": "Intro",
               "starter": "function repeat(s: string, n: number): string {\n  return ____;\n}\nconsole.log(repeat(\"ab\", 3));\n",
               "solution": "function repeat(s: string, n: number): string {\n  return s.repeat(n);\n}\nconsole.log(repeat(\"ab\", 3));\n",
               "tests": [
@@ -1531,48 +3135,65 @@
                   "output": "ababab"
                 }
               ],
-              "source_slug": ""
-            }
-          ],
-          "quiz": [
-            {
-              "question": "What happens to type annotations when the program runs?",
-              "options": [
-                "They slow it down",
-                "They are stripped away — types are compile-time only",
-                "They become comments",
-                "They turn into console.logs"
-              ],
-              "answer": 1,
-              "explanation": "TypeScript types are erased before execution; they guide you and the compiler, not the runtime."
+              "source_slug": "",
+              "dataset": ""
             },
             {
-              "question": "What does `interface` do?",
-              "options": [
-                "Creates a running object",
-                "Names the shape of an object type",
-                "Loops over an array",
-                "Reads input"
+              "id": "tscourse-w8-an-fix",
+              "title": "Fix the annotation mismatch",
+              "prompt": "This should print 30, but a wrong operator sneaks in. Fix it.",
+              "hint": "price + qty is 13, not 30.",
+              "hints": [
+                "price + qty is 13, not 30.",
+                "A total of items uses multiplication."
               ],
-              "answer": 1,
-              "explanation": "An interface names a reusable object shape (its properties and their types)."
+              "language": "typescript",
+              "kind": "fix",
+              "difficulty": "Easy",
+              "starter": "const price: number = 10;\nconst qty: number = 3;\nconst total: number = price + qty;\nconsole.log(total);\n",
+              "solution": "const price: number = 10;\nconst qty: number = 3;\nconst total: number = price * qty;\nconsole.log(total);\n",
+              "tests": [
+                {
+                  "input": "",
+                  "output": "30"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
             }
-          ]
+          ],
+          "quiz": []
         },
         {
           "key": "w8-interfaces",
           "title": "Interfaces & type aliases",
           "what": "Naming the shape of your data.",
-          "lesson": "Name a shape once, use it everywhere:\n\n```ts\ninterface Point { x: number; y: number; }\ntype User = { name: string; admin: boolean };\n\nfunction dist(p: Point): number {\n  return Math.abs(p.x) + Math.abs(p.y);\n}\n```\n\n`Math.abs(n)` gives the distance of n from zero (its absolute value).\n",
+          "lesson": "Name a shape once, use it everywhere:\n\n```ts\ninterface Point { x: number; y: number; }\ntype User = { name: string; admin: boolean };\n\nfunction dist(p: Point): number {\n  return Math.abs(p.x) + Math.abs(p.y);\n}\n```\n\n`Math.abs(n)` is the distance of n from zero.\n",
+          "warmup": [
+            {
+              "question": "`Math.abs(-4)` is…",
+              "options": [
+                "-4",
+                "4",
+                "0",
+                "error"
+              ],
+              "answer": 1,
+              "explanation": "abs gives the magnitude, 4."
+            }
+          ],
           "exercises": [
             {
               "id": "tscourse-w8-if-1",
               "title": "Manhattan distance",
               "prompt": "Return |p.x| + |p.y| using Math.abs.",
               "hint": "Add the absolute values of x and y.",
+              "hints": [
+                "Add the absolute values of x and y."
+              ],
               "language": "typescript",
               "kind": "drill",
-              "difficulty": "",
+              "difficulty": "Intro",
               "starter": "interface Point {\n  x: number;\n  y: number;\n}\nfunction dist(p: Point): number {\n  return ____;\n}\nconsole.log(dist({ x: 3, y: -4 }));\n",
               "solution": "interface Point {\n  x: number;\n  y: number;\n}\nfunction dist(p: Point): number {\n  return Math.abs(p.x) + Math.abs(p.y);\n}\nconsole.log(dist({ x: 3, y: -4 }));\n",
               "tests": [
@@ -1581,16 +3202,20 @@
                   "output": "7"
                 }
               ],
-              "source_slug": ""
+              "source_slug": "",
+              "dataset": ""
             },
             {
               "id": "tscourse-w8-if-2",
               "title": "Labelled user",
               "prompt": "Return `<name> (admin)` when admin is true, else just the name.",
-              "hint": "A ternary `cond ? a : b` picks a when cond is true.",
+              "hint": "A ternary cond ? a : b picks a when cond is true.",
+              "hints": [
+                "A ternary cond ? a : b picks a when cond is true."
+              ],
               "language": "typescript",
               "kind": "drill",
-              "difficulty": "",
+              "difficulty": "Intro",
               "starter": "type User = { name: string; admin: boolean };\nfunction label(u: User): string {\n  return ____;\n}\nconsole.log(label({ name: \"Ada\", admin: true }));\n",
               "solution": "type User = { name: string; admin: boolean };\nfunction label(u: User): string {\n  return u.admin ? `${u.name} (admin)` : u.name;\n}\nconsole.log(label({ name: \"Ada\", admin: true }));\n",
               "tests": [
@@ -1599,25 +3224,65 @@
                   "output": "Ada (admin)"
                 }
               ],
-              "source_slug": ""
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w8-if-fix",
+              "title": "Fix the distance",
+              "prompt": "Negative coordinates break this. Fix it so dist({x:3,y:-4}) is 7.",
+              "hint": "3 + (-4) is -1, not a distance.",
+              "hints": [
+                "3 + (-4) is -1, not a distance.",
+                "Wrap each coordinate in Math.abs."
+              ],
+              "language": "typescript",
+              "kind": "fix",
+              "difficulty": "Easy",
+              "starter": "interface Point {\n  x: number;\n  y: number;\n}\nfunction dist(p: Point): number {\n  return p.x + p.y;\n}\nconsole.log(dist({ x: 3, y: -4 }));\n",
+              "solution": "interface Point {\n  x: number;\n  y: number;\n}\nfunction dist(p: Point): number {\n  return Math.abs(p.x) + Math.abs(p.y);\n}\nconsole.log(dist({ x: 3, y: -4 }));\n",
+              "tests": [
+                {
+                  "input": "",
+                  "output": "7"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
             }
           ],
           "quiz": []
         },
         {
           "key": "w8-typed-arrays",
-          "title": "Typed arrays of records",
-          "what": "Putting interfaces to work over lists.",
-          "lesson": "Annotate an array of records with `Item[]` and process it with the methods you\nknow:\n\n```ts\ninterface Item { name: string; price: number; }\nconst items: Item[] = [{ name: \"A\", price: 4 }, { name: \"B\", price: 6 }];\nconst total = items.reduce((sum, it) => sum + it.price, 0);\nconsole.log(total);   // 10\n```\n\n`reduce` folds a list into one value, carrying an accumulator (`sum`, starting at 0).\n",
+          "title": "Typed arrays & reduce",
+          "what": "Interfaces over lists, folded with reduce.",
+          "lesson": "Annotate an array of records with `Item[]`, and fold it with `reduce`:\n\n```ts\ninterface Item { name: string; price: number; }\nconst items: Item[] = [{ name: \"A\", price: 4 }, { name: \"B\", price: 6 }];\nconst total = items.reduce((sum, it) => sum + it.price, 0);   // 10\n```\n\n`reduce` carries an accumulator (`sum`, starting at 0) across the list.\n",
+          "warmup": [
+            {
+              "question": "`[2,3,5].reduce((s,x)=>s+x, 0)` is…",
+              "options": [
+                "0",
+                "10",
+                "235",
+                "3"
+              ],
+              "answer": 1,
+              "explanation": "Folds to the sum, 10."
+            }
+          ],
           "exercises": [
             {
               "id": "tscourse-w8-ta-1",
               "title": "Total price",
               "prompt": "Reduce the items to the sum of their prices.",
               "hint": "Each step adds it.price to the running sum.",
+              "hints": [
+                "Each step adds it.price to the running sum."
+              ],
               "language": "typescript",
               "kind": "drill",
-              "difficulty": "",
+              "difficulty": "Intro",
               "starter": "interface Item {\n  name: string;\n  price: number;\n}\nconst items: Item[] = [\n  { name: \"A\", price: 4 },\n  { name: \"B\", price: 6 },\n];\nconst total = items.reduce((sum, it) => ____, 0);\nconsole.log(total);\n",
               "solution": "interface Item {\n  name: string;\n  price: number;\n}\nconst items: Item[] = [\n  { name: \"A\", price: 4 },\n  { name: \"B\", price: 6 },\n];\nconst total = items.reduce((sum, it) => sum + it.price, 0);\nconsole.log(total);\n",
               "tests": [
@@ -1626,35 +3291,145 @@
                   "output": "10"
                 }
               ],
-              "source_slug": ""
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w8-ta-fix",
+              "title": "Fix the reduce start",
+              "prompt": "The total is one too high — the seed is wrong. Fix it to 10.",
+              "hint": "The reduce seed (last argument) starts the sum.",
+              "hints": [
+                "The reduce seed (last argument) starts the sum.",
+                "A sum should seed at 0, not 1."
+              ],
+              "language": "typescript",
+              "kind": "fix",
+              "difficulty": "Easy",
+              "starter": "interface Item {\n  name: string;\n  price: number;\n}\nconst items: Item[] = [\n  { name: \"A\", price: 4 },\n  { name: \"B\", price: 6 },\n];\nconst total = items.reduce((sum, it) => sum + it.price, 1);\nconsole.log(total);\n",
+              "solution": "interface Item {\n  name: string;\n  price: number;\n}\nconst items: Item[] = [\n  { name: \"A\", price: 4 },\n  { name: \"B\", price: 6 },\n];\nconst total = items.reduce((sum, it) => sum + it.price, 0);\nconsole.log(total);\n",
+              "tests": [
+                {
+                  "input": "",
+                  "output": "10"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
             }
           ],
           "quiz": []
         }
       ],
       "capstone": {
-        "title": "Typed contacts report",
-        "brief": "\nModel a contact list with an `interface`, then report on it. Given three\ncontacts, print:\n\n```\nTotal: 3\nAdults: 2\nNames: Ada, Bo, Cy\n```\n\n(Adults are aged 18+.) Fill in the block that computes the adults, the two\ncounts, and the comma-joined names.\n",
+        "title": "Budget Buddy #8 — typed report",
+        "brief": "Bring it home: model expenses with an `interface`, then report on them. Given\nthree expenses, print:\n\n```\nCount: 3\nTotal: $24\nUnpaid: book, lunch\n```\n",
         "kind": "auto",
         "exercise": {
           "id": "tscourse-w8-capstone",
-          "title": "Typed contacts report",
-          "prompt": "Use filter, map, join and .length over a typed array of records.",
-          "hint": "filter for age>=18, map to names then join with \", \".",
+          "title": "Budget Buddy #8",
+          "prompt": "Use filter, map, join, reduce and .length over a typed array of records.",
+          "hint": "reduce sums the amounts (seed 0).",
+          "hints": [
+            "reduce sums the amounts (seed 0).",
+            "Filter to unpaid, then map to descriptions.",
+            "Join the unpaid descriptions with \", \"."
+          ],
           "language": "typescript",
           "kind": "challenge",
           "difficulty": "Medium",
-          "starter": "interface Contact {\n  name: string;\n  age: number;\n}\nconst contacts: Contact[] = [\n  { name: \"Ada\", age: 36 },\n  { name: \"Bo\", age: 17 },\n  { name: \"Cy\", age: 40 },\n];\n____\n",
-          "solution": "interface Contact {\n  name: string;\n  age: number;\n}\nconst contacts: Contact[] = [\n  { name: \"Ada\", age: 36 },\n  { name: \"Bo\", age: 17 },\n  { name: \"Cy\", age: 40 },\n];\nconst adults = contacts.filter((c) => c.age >= 18);\nconsole.log(`Total: ${contacts.length}`);\nconsole.log(`Adults: ${adults.length}`);\nconst names = contacts.map((c) => c.name).join(\", \");\nconsole.log(`Names: ${names}`);\n",
+          "starter": "interface Expense {\n  desc: string;\n  amount: number;\n  paid: boolean;\n}\nconst expenses: Expense[] = [\n  { desc: \"coffee\", amount: 3, paid: true },\n  { desc: \"book\", amount: 12, paid: false },\n  { desc: \"lunch\", amount: 9, paid: false },\n];\n____\n",
+          "solution": "interface Expense {\n  desc: string;\n  amount: number;\n  paid: boolean;\n}\nconst expenses: Expense[] = [\n  { desc: \"coffee\", amount: 3, paid: true },\n  { desc: \"book\", amount: 12, paid: false },\n  { desc: \"lunch\", amount: 9, paid: false },\n];\nconst total = expenses.reduce((sum, e) => sum + e.amount, 0);\nconst unpaid = expenses.filter((e) => !e.paid).map((e) => e.desc);\nconsole.log(`Count: ${expenses.length}`);\nconsole.log(`Total: $${total}`);\nconsole.log(`Unpaid: ${unpaid.join(\", \")}`);\n",
           "tests": [
             {
               "input": "",
-              "output": "Total: 3\nAdults: 2\nNames: Ada, Bo, Cy"
+              "output": "Count: 3\nTotal: $24\nUnpaid: book, lunch"
             }
           ],
-          "source_slug": ""
+          "source_slug": "",
+          "dataset": ""
+        },
+        "example_io": "Count: 3\nTotal: $24\nUnpaid: book, lunch",
+        "rubric": [
+          "expenses is typed as Expense[]",
+          "Total uses reduce; count uses .length",
+          "Unpaid list uses filter + map + join"
+        ],
+        "reference": "",
+        "stretch": null
+      },
+      "objectives": [
+        "Write type annotations on values and functions",
+        "Name a shape with interface or type",
+        "Annotate an array of records (Item[])",
+        "Fold a list to one value with reduce"
+      ],
+      "why": "Types catch whole classes of bugs before the program ever runs — the reason TypeScript exists.",
+      "est_minutes": 50,
+      "glossary": [
+        {
+          "term": "annotation",
+          "def": "A written type after a colon: let n: number."
+        },
+        {
+          "term": "inference",
+          "def": "TypeScript working out a type for you."
+        },
+        {
+          "term": "interface",
+          "def": "A name for the shape of an object type."
+        },
+        {
+          "term": "type alias",
+          "def": "Another way to name a type: type User = {...}."
+        },
+        {
+          "term": ".reduce(f, start)",
+          "def": "Folds a list into a single accumulated value."
         }
-      }
+      ],
+      "cheatsheet": "```ts\nconst price: number = 10;\nfunction repeat(s: string, n: number): string { return s.repeat(n); }\ninterface Point { x: number; y: number; }\ntype User = { name: string; admin: boolean };\nconst items: Item[] = [...];\nitems.reduce((sum, it) => sum + it.price, 0)   // fold to one number\n```\n",
+      "self_check": [
+        "Can you annotate a function's parameters and return type?",
+        "Can you name an object shape with interface and use it?",
+        "Can you total a field over a typed array with reduce?"
+      ],
+      "review": [
+        {
+          "question": "What happens to type annotations at runtime?",
+          "options": [
+            "they slow it down",
+            "they're erased (compile-time only)",
+            "they become comments",
+            "they print"
+          ],
+          "answer": 1,
+          "explanation": "Types guide you and the compiler, then vanish before running."
+        },
+        {
+          "question": "`interface` names…",
+          "options": [
+            "a running object",
+            "the shape of an object type",
+            "a loop",
+            "an input"
+          ],
+          "answer": 1,
+          "explanation": "It names a reusable object shape."
+        },
+        {
+          "question": "`[1,2,3].reduce((s,x)=>s+x, 0)` is…",
+          "options": [
+            "0",
+            "6",
+            "123",
+            "3"
+          ],
+          "answer": 1,
+          "explanation": "It folds to the sum, 6."
+        }
+      ],
+      "milestone": "Budget Buddy is now fully typed — the compiler guards its data. You've finished Month 2!"
     },
     {
       "number": 9,
@@ -1665,7 +3440,15 @@
       "summary": "",
       "authored": false,
       "lessons": [],
-      "capstone": null
+      "capstone": null,
+      "objectives": [],
+      "why": "",
+      "est_minutes": 40,
+      "glossary": [],
+      "cheatsheet": "",
+      "self_check": [],
+      "review": [],
+      "milestone": ""
     },
     {
       "number": 10,
@@ -1676,7 +3459,15 @@
       "summary": "",
       "authored": false,
       "lessons": [],
-      "capstone": null
+      "capstone": null,
+      "objectives": [],
+      "why": "",
+      "est_minutes": 40,
+      "glossary": [],
+      "cheatsheet": "",
+      "self_check": [],
+      "review": [],
+      "milestone": ""
     },
     {
       "number": 11,
@@ -1687,7 +3478,15 @@
       "summary": "",
       "authored": false,
       "lessons": [],
-      "capstone": null
+      "capstone": null,
+      "objectives": [],
+      "why": "",
+      "est_minutes": 40,
+      "glossary": [],
+      "cheatsheet": "",
+      "self_check": [],
+      "review": [],
+      "milestone": ""
     },
     {
       "number": 12,
@@ -1698,7 +3497,15 @@
       "summary": "",
       "authored": false,
       "lessons": [],
-      "capstone": null
+      "capstone": null,
+      "objectives": [],
+      "why": "",
+      "est_minutes": 40,
+      "glossary": [],
+      "cheatsheet": "",
+      "self_check": [],
+      "review": [],
+      "milestone": ""
     },
     {
       "number": 13,
@@ -1709,7 +3516,15 @@
       "summary": "",
       "authored": false,
       "lessons": [],
-      "capstone": null
+      "capstone": null,
+      "objectives": [],
+      "why": "",
+      "est_minutes": 40,
+      "glossary": [],
+      "cheatsheet": "",
+      "self_check": [],
+      "review": [],
+      "milestone": ""
     },
     {
       "number": 14,
@@ -1720,7 +3535,15 @@
       "summary": "",
       "authored": false,
       "lessons": [],
-      "capstone": null
+      "capstone": null,
+      "objectives": [],
+      "why": "",
+      "est_minutes": 40,
+      "glossary": [],
+      "cheatsheet": "",
+      "self_check": [],
+      "review": [],
+      "milestone": ""
     },
     {
       "number": 15,
@@ -1731,7 +3554,15 @@
       "summary": "",
       "authored": false,
       "lessons": [],
-      "capstone": null
+      "capstone": null,
+      "objectives": [],
+      "why": "",
+      "est_minutes": 40,
+      "glossary": [],
+      "cheatsheet": "",
+      "self_check": [],
+      "review": [],
+      "milestone": ""
     },
     {
       "number": 16,
@@ -1742,7 +3573,15 @@
       "summary": "",
       "authored": false,
       "lessons": [],
-      "capstone": null
+      "capstone": null,
+      "objectives": [],
+      "why": "",
+      "est_minutes": 40,
+      "glossary": [],
+      "cheatsheet": "",
+      "self_check": [],
+      "review": [],
+      "milestone": ""
     },
     {
       "number": 17,
@@ -1753,7 +3592,15 @@
       "summary": "",
       "authored": false,
       "lessons": [],
-      "capstone": null
+      "capstone": null,
+      "objectives": [],
+      "why": "",
+      "est_minutes": 40,
+      "glossary": [],
+      "cheatsheet": "",
+      "self_check": [],
+      "review": [],
+      "milestone": ""
     },
     {
       "number": 18,
@@ -1764,7 +3611,15 @@
       "summary": "",
       "authored": false,
       "lessons": [],
-      "capstone": null
+      "capstone": null,
+      "objectives": [],
+      "why": "",
+      "est_minutes": 40,
+      "glossary": [],
+      "cheatsheet": "",
+      "self_check": [],
+      "review": [],
+      "milestone": ""
     },
     {
       "number": 19,
@@ -1775,7 +3630,15 @@
       "summary": "",
       "authored": false,
       "lessons": [],
-      "capstone": null
+      "capstone": null,
+      "objectives": [],
+      "why": "",
+      "est_minutes": 40,
+      "glossary": [],
+      "cheatsheet": "",
+      "self_check": [],
+      "review": [],
+      "milestone": ""
     },
     {
       "number": 20,
@@ -1786,7 +3649,15 @@
       "summary": "",
       "authored": false,
       "lessons": [],
-      "capstone": null
+      "capstone": null,
+      "objectives": [],
+      "why": "",
+      "est_minutes": 40,
+      "glossary": [],
+      "cheatsheet": "",
+      "self_check": [],
+      "review": [],
+      "milestone": ""
     },
     {
       "number": 21,
@@ -1797,7 +3668,15 @@
       "summary": "",
       "authored": false,
       "lessons": [],
-      "capstone": null
+      "capstone": null,
+      "objectives": [],
+      "why": "",
+      "est_minutes": 40,
+      "glossary": [],
+      "cheatsheet": "",
+      "self_check": [],
+      "review": [],
+      "milestone": ""
     },
     {
       "number": 22,
@@ -1808,7 +3687,15 @@
       "summary": "",
       "authored": false,
       "lessons": [],
-      "capstone": null
+      "capstone": null,
+      "objectives": [],
+      "why": "",
+      "est_minutes": 40,
+      "glossary": [],
+      "cheatsheet": "",
+      "self_check": [],
+      "review": [],
+      "milestone": ""
     },
     {
       "number": 23,
@@ -1819,7 +3706,15 @@
       "summary": "",
       "authored": false,
       "lessons": [],
-      "capstone": null
+      "capstone": null,
+      "objectives": [],
+      "why": "",
+      "est_minutes": 40,
+      "glossary": [],
+      "cheatsheet": "",
+      "self_check": [],
+      "review": [],
+      "milestone": ""
     },
     {
       "number": 24,
@@ -1830,7 +3725,15 @@
       "summary": "",
       "authored": false,
       "lessons": [],
-      "capstone": null
+      "capstone": null,
+      "objectives": [],
+      "why": "",
+      "est_minutes": 40,
+      "glossary": [],
+      "cheatsheet": "",
+      "self_check": [],
+      "review": [],
+      "milestone": ""
     },
     {
       "number": 25,
@@ -1841,7 +3744,15 @@
       "summary": "",
       "authored": false,
       "lessons": [],
-      "capstone": null
+      "capstone": null,
+      "objectives": [],
+      "why": "",
+      "est_minutes": 40,
+      "glossary": [],
+      "cheatsheet": "",
+      "self_check": [],
+      "review": [],
+      "milestone": ""
     },
     {
       "number": 26,
@@ -1852,7 +3763,15 @@
       "summary": "",
       "authored": false,
       "lessons": [],
-      "capstone": null
+      "capstone": null,
+      "objectives": [],
+      "why": "",
+      "est_minutes": 40,
+      "glossary": [],
+      "cheatsheet": "",
+      "self_check": [],
+      "review": [],
+      "milestone": ""
     },
     {
       "number": 27,
@@ -1863,7 +3782,15 @@
       "summary": "",
       "authored": false,
       "lessons": [],
-      "capstone": null
+      "capstone": null,
+      "objectives": [],
+      "why": "",
+      "est_minutes": 40,
+      "glossary": [],
+      "cheatsheet": "",
+      "self_check": [],
+      "review": [],
+      "milestone": ""
     },
     {
       "number": 28,
@@ -1874,7 +3801,15 @@
       "summary": "",
       "authored": false,
       "lessons": [],
-      "capstone": null
+      "capstone": null,
+      "objectives": [],
+      "why": "",
+      "est_minutes": 40,
+      "glossary": [],
+      "cheatsheet": "",
+      "self_check": [],
+      "review": [],
+      "milestone": ""
     },
     {
       "number": 29,
@@ -1885,7 +3820,15 @@
       "summary": "",
       "authored": false,
       "lessons": [],
-      "capstone": null
+      "capstone": null,
+      "objectives": [],
+      "why": "",
+      "est_minutes": 40,
+      "glossary": [],
+      "cheatsheet": "",
+      "self_check": [],
+      "review": [],
+      "milestone": ""
     },
     {
       "number": 30,
@@ -1896,7 +3839,15 @@
       "summary": "",
       "authored": false,
       "lessons": [],
-      "capstone": null
+      "capstone": null,
+      "objectives": [],
+      "why": "",
+      "est_minutes": 40,
+      "glossary": [],
+      "cheatsheet": "",
+      "self_check": [],
+      "review": [],
+      "milestone": ""
     },
     {
       "number": 31,
@@ -1907,7 +3858,15 @@
       "summary": "",
       "authored": false,
       "lessons": [],
-      "capstone": null
+      "capstone": null,
+      "objectives": [],
+      "why": "",
+      "est_minutes": 40,
+      "glossary": [],
+      "cheatsheet": "",
+      "self_check": [],
+      "review": [],
+      "milestone": ""
     },
     {
       "number": 32,
@@ -1918,7 +3877,15 @@
       "summary": "",
       "authored": false,
       "lessons": [],
-      "capstone": null
+      "capstone": null,
+      "objectives": [],
+      "why": "",
+      "est_minutes": 40,
+      "glossary": [],
+      "cheatsheet": "",
+      "self_check": [],
+      "review": [],
+      "milestone": ""
     }
   ]
 }

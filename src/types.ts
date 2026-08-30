@@ -48,8 +48,11 @@ export interface Exercise {
   title: string;
   prompt: string;
   hint: string;
+  /** Progressive hint ladder; falls back to `hint` when empty. */
+  hints: string[];
   language: string;
-  /** "drill" (fill-in-the-blank, default) or "challenge" (full coding problem). */
+  /** "drill" (fill-in-the-blank, default), "challenge" (full coding problem),
+   * or "fix" (a complete but buggy program the learner corrects). */
   kind: string;
   /** Suggested difficulty for a challenge: "Intro" | "Easy" | "Medium". */
   difficulty: string;
@@ -158,18 +161,28 @@ export interface JpBridge {
 }
 
 // --- TypeScript course (8-month structured curriculum) ---------------------
+export interface GlossaryItem {
+  term: string;
+  def: string;
+}
 export interface Capstone {
   title: string;
   brief: string;
   /** "auto" = judged via `exercise`; "brief" = free build, self-marked. */
   kind: string;
   exercise: Exercise | null;
+  example_io: string;
+  rubric: string[];
+  reference: string;
+  stretch: Exercise | null;
 }
 export interface CourseLesson {
   key: string;
   title: string;
   what: string;
   lesson: string;
+  /** "What does this print?" warm-up shown before the drills. */
+  warmup: QuizQuestion[];
   exercises: Exercise[];
   quiz: QuizQuestion[];
 }
@@ -184,6 +197,14 @@ export interface CourseWeek {
   authored: boolean;
   lessons: CourseLesson[];
   capstone: Capstone | null;
+  objectives: string[];
+  why: string;
+  est_minutes: number;
+  glossary: GlossaryItem[];
+  cheatsheet: string;
+  self_check: string[];
+  review: QuizQuestion[];
+  milestone: string;
 }
 export interface TsCourse {
   key: string;
