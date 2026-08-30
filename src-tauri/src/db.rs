@@ -116,21 +116,6 @@ CREATE TABLE IF NOT EXISTS attempts (
   created_at       TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
-CREATE TABLE IF NOT EXISTS reviews (
-  id               INTEGER PRIMARY KEY AUTOINCREMENT,
-  problem_id       INTEGER NOT NULL UNIQUE REFERENCES problems(id) ON DELETE CASCADE,
-  due_date         TEXT NOT NULL,
-  interval_index   INTEGER NOT NULL DEFAULT 0,
-  -- SM-2 adaptive scheduling fields.
-  ease             REAL NOT NULL DEFAULT 2.5,
-  reps             INTEGER NOT NULL DEFAULT 0,
-  lapses           INTEGER NOT NULL DEFAULT 0,
-  interval_days    INTEGER NOT NULL DEFAULT 0,
-  last_quality     INTEGER NOT NULL DEFAULT 0,
-  last_reviewed_at TEXT,
-  created_at       TEXT NOT NULL DEFAULT (datetime('now'))
-);
-
 CREATE TABLE IF NOT EXISTS daily_sessions (
   date            TEXT PRIMARY KEY,        -- YYYY-MM-DD
   problems_solved INTEGER NOT NULL DEFAULT 0,
@@ -225,7 +210,6 @@ CREATE INDEX IF NOT EXISTS idx_test_cases_problem ON test_cases(problem_id);
 CREATE INDEX IF NOT EXISTS idx_attempts_problem ON attempts(problem_id);
 CREATE INDEX IF NOT EXISTS idx_solutions_problem ON solutions(problem_id);
 CREATE INDEX IF NOT EXISTS idx_problem_tags_tag ON problem_tags(tag_id);
-CREATE INDEX IF NOT EXISTS idx_reviews_due ON reviews(due_date);
 CREATE INDEX IF NOT EXISTS idx_mistakes_problem ON mistakes(problem_id);
 CREATE INDEX IF NOT EXISTS idx_path_items_path ON path_items(path_id);
 CREATE INDEX IF NOT EXISTS idx_flashcards_due ON flashcards(due_date);
@@ -284,12 +268,6 @@ fn migrate(conn: &Connection) -> AppResult<()> {
     add_col("problems", "follow_ups_json", "TEXT NOT NULL DEFAULT '[]'")?;
     add_col("problems", "sort_order", "INTEGER NOT NULL DEFAULT 0")?;
     add_col("problems", "checker_code", "TEXT NOT NULL DEFAULT ''")?;
-    // New review columns (SM-2 adaptive scheduling).
-    add_col("reviews", "ease", "REAL NOT NULL DEFAULT 2.5")?;
-    add_col("reviews", "reps", "INTEGER NOT NULL DEFAULT 0")?;
-    add_col("reviews", "lapses", "INTEGER NOT NULL DEFAULT 0")?;
-    add_col("reviews", "interval_days", "INTEGER NOT NULL DEFAULT 0")?;
-    add_col("reviews", "last_quality", "INTEGER NOT NULL DEFAULT 0")?;
     Ok(())
 }
 

@@ -48,6 +48,14 @@ pub fn jp_bridge() -> AppResult<crate::models::JpBridge> {
     Ok(serde_json::from_str(JP_BRIDGE_JSON)?)
 }
 
+/// The 8-month structured TypeScript course (authored in tools/typescript_course.py).
+const TS_COURSE_JSON: &str = include_str!("../seeds/ts_course.json");
+
+#[tauri::command]
+pub fn ts_course() -> AppResult<crate::models::TsCourse> {
+    Ok(serde_json::from_str(TS_COURSE_JSON)?)
+}
+
 // ---------------------------------------------------------------------------
 // Problems
 // ---------------------------------------------------------------------------
@@ -299,7 +307,7 @@ pub fn run_scratch(
 }
 
 /// Submit: judge against the problem's hidden cases (falling back to examples),
-/// persist an attempt, update progress, and seed/advance the review schedule.
+/// persist an attempt, and update progress.
 #[tauri::command]
 pub fn submit(
     state: State<'_, AppState>,
@@ -341,35 +349,6 @@ pub fn submit(
         repo::record_attempt(&state.conn(), &attempt)?;
     }
     Ok(report)
-}
-
-// ---------------------------------------------------------------------------
-// Revision
-// ---------------------------------------------------------------------------
-
-#[tauri::command]
-pub fn due_reviews(state: State<'_, AppState>) -> AppResult<Vec<ReviewItem>> {
-    let today = Local::now().date_naive().format("%Y-%m-%d").to_string();
-    repo::due_reviews(&state.conn(), &today)
-}
-
-#[tauri::command]
-pub fn mark_reviewed(
-    state: State<'_, AppState>,
-    problem_id: i64,
-    remembered: bool,
-) -> AppResult<()> {
-    repo::mark_reviewed(&state.conn(), problem_id, remembered)
-}
-
-/// Grade a review with a 0..=3 quality (Again / Hard / Good / Easy) using SM-2.
-#[tauri::command]
-pub fn grade_review(
-    state: State<'_, AppState>,
-    problem_id: i64,
-    quality: i64,
-) -> AppResult<()> {
-    repo::mark_reviewed_quality(&state.conn(), problem_id, quality)
 }
 
 // ---------------------------------------------------------------------------
@@ -492,15 +471,6 @@ pub fn reset_cards(state: State<'_, AppState>, card_ids: Vec<String>) -> AppResu
     repo::reset_cards(&state.conn(), &card_ids)
 }
 
-#[tauri::command]
-pub fn reschedule_review(
-    state: State<'_, AppState>,
-    problem_id: i64,
-    due_date: String,
-) -> AppResult<()> {
-    repo::reschedule_review(&state.conn(), problem_id, &due_date)
-}
-
 // ---------------------------------------------------------------------------
 // Statistics + dashboard
 // ---------------------------------------------------------------------------
@@ -514,7 +484,6 @@ pub fn statistics(state: State<'_, AppState>) -> AppResult<stats::Stats> {
 pub struct Dashboard {
     pub solved_today: i64,
     pub study_seconds_today: i64,
-    pub reviews_due: i64,
     pub current_streak: i64,
     pub weakest_topic: Option<String>,
     pub suggested_problem: Option<Problem>,
@@ -530,7 +499,6 @@ pub struct Goals {
     pub easy: i64,
     pub medium: i64,
     pub hard: i64,
-    pub reviews: i64,
 }
 
 #[derive(Debug, Serialize)]
@@ -539,7 +507,6 @@ pub struct GoalProgress {
     pub easy: i64,
     pub medium: i64,
     pub hard: i64,
-    pub reviews: i64,
 }
 
 #[tauri::command]
@@ -547,19 +514,13 @@ pub fn dashboard(state: State<'_, AppState>) -> AppResult<Dashboard> {
     let conn = state.conn();
     let today = Local::now().date_naive().format("%Y-%m-%d").to_string();
 
-    let (solved_today, study_seconds_today, reviews_done_today): (i64, i64, i64) = conn
+    let (solved_today, study_seconds_today): (i64, i64) = conn
         .query_row(
-            "SELECT problems_solved, study_seconds, reviews_done FROM daily_sessions WHERE date = ?1",
+            "SELECT problems_solved, study_seconds FROM daily_sessions WHERE date = ?1",
             [&today],
-            |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?)),
+            |r| Ok((r.get(0)?, r.get(1)?)),
         )
-        .unwrap_or((0, 0, 0));
-
-    let reviews_due: i64 = conn.query_row(
-        "SELECT COUNT(*) FROM reviews WHERE due_date <= ?1",
-        [&today],
-        |r| r.get(0),
-    )?;
+        .unwrap_or((0, 0));
 
     // Today's solved counts per difficulty (from accepted attempts today on
     // problems solved today). Approximate via attempts joined to problems.
@@ -587,13 +548,11 @@ pub fn dashboard(state: State<'_, AppState>) -> AppResult<Dashboard> {
         easy: count_today("Easy"),
         medium: count_today("Medium"),
         hard: count_today("Hard"),
-        reviews: reviews_done_today,
     };
 
     Ok(Dashboard {
         solved_today,
         study_seconds_today,
-        reviews_due,
         current_streak: st.current_streak,
         weakest_topic,
         suggested_problem,
@@ -617,7 +576,6 @@ fn load_goals(conn: &Connection) -> Goals {
         easy: get("goal_easy", 2),
         medium: get("goal_medium", 1),
         hard: get("goal_hard", 0),
-        reviews: get("goal_reviews", 3),
     }
 }
 

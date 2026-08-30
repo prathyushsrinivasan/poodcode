@@ -11,7 +11,6 @@ import type {
   Note,
   Problem,
   ProcOut,
-  ReviewItem,
   Solution,
   Stats,
   TestCase,
@@ -23,6 +22,7 @@ import type {
   Flashcard,
   CardReview,
   JpBridge,
+  TsCourse,
 } from "./types";
 
 export const api = {
@@ -72,6 +72,7 @@ export const api = {
 
   // Learn / concepts
   concepts: () => invoke<Concept[]>("concepts"),
+  tsCourse: () => invoke<TsCourse>("ts_course"),
 
   // Execution
   languages: () => invoke<LangInfo[]>("languages"),
@@ -93,15 +94,6 @@ export const api = {
     }),
   listAttempts: (problemId: number) =>
     invoke<Attempt[]>("list_attempts", { problemId }),
-
-  // Revision
-  dueReviews: () => invoke<ReviewItem[]>("due_reviews"),
-  markReviewed: (problemId: number, remembered: boolean) =>
-    invoke<void>("mark_reviewed", { problemId, remembered }),
-  gradeReview: (problemId: number, quality: number) =>
-    invoke<void>("grade_review", { problemId, quality }),
-  rescheduleReview: (problemId: number, dueDate: string) =>
-    invoke<void>("reschedule_review", { problemId, dueDate }),
 
   // Mistakes (reflection)
   listMistakes: (problemId: number) => invoke<Mistake[]>("list_mistakes", { problemId }),

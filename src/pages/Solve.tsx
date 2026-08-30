@@ -26,7 +26,7 @@ type LeftTab =
   | "reflect"
   | "editorial";
 
-export default function Solve({ onProgress }: { onProgress?: () => void }) {
+export default function Solve() {
   const { id } = useParams();
   const pid = Number(id);
   const nav = useNavigate();
@@ -247,7 +247,7 @@ export default function Solve({ onProgress }: { onProgress?: () => void }) {
       const rep = await api.submit(problem.id, langInfo.id, code, delta);
       setReport(rep);
       if (rep.status === "accepted") {
-        toast("✅ Accepted! Added to revision schedule.");
+        toast("✅ Accepted! Nice work.");
         const fresh = await api.getProblem(problem.id);
         setProblem(fresh);
       } else if (rep.status === "not_installed") {
@@ -260,13 +260,12 @@ export default function Solve({ onProgress }: { onProgress?: () => void }) {
       if (contestId) {
         api.recordContestResult(contestId, problem.id, rep.status === "accepted").catch(() => {});
       }
-      onProgress?.();
     } catch (e) {
       toast(`Submit error: ${e}`);
     } finally {
       setRunning(false);
     }
-  }, [langInfo, running, locked, drillLocked, problem, elapsed, code, toast, onProgress, contestId]);
+  }, [langInfo, running, locked, drillLocked, problem, elapsed, code, toast, contestId]);
 
   const revealHint = () => {
     const n = revealed + 1;

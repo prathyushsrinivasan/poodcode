@@ -1,12 +1,17 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { api } from "../api";
-import type { Concept, Exercise, JudgeReport, Problem, QuizQuestion, TestCase } from "../types";
+import type { Concept, Problem } from "../types";
 import { Markdown } from "../components/Markdown";
-import { CodeEditor } from "../components/CodeEditor";
 import { CardStudy } from "../components/CardStudy";
+import { ExerciseCard, QuizSection } from "../components/LearnExercise";
 import { DiffBadge, Empty } from "../components/common";
-import { doneChapters, setChapterDone } from "../lib/learnProgress";
+import {
+  doneChapters,
+  setChapterDone,
+  solvedExercises,
+  markExerciseSolved,
+} from "../lib/learnProgress";
 
 const CATEGORY_ORDER = [
   "Foundations",
@@ -94,8 +99,8 @@ export default function Learn() {
   const [done, setDone] = useState<Set<string>>(() => doneChapters());
   const nav = useNavigate();
 
-  function toggleDone(key: string) {
-    setDone(new Set(setChapterDone(key, !done.has(key))));
+  function setDoneState(key: string, value: boolean) {
+    setDone(new Set(setChapterDone(key, value)));
   }
 
   useEffect(() => {
@@ -149,7 +154,7 @@ export default function Learn() {
         related={related}
         problems={problems}
         isDone={done.has(concept.key)}
-        onToggleDone={() => toggleDone(concept.key)}
+        onSetDone={(v) => setDoneState(concept.key, v)}
       />
     );
   }
@@ -235,6 +240,26 @@ export default function Learn() {
               </p>
             </div>
             <span className="badge">Open →</span>
+          </div>
+        </div>
+      )}
+
+      {isTs && (
+        <div
+          className="card"
+          style={{ cursor: "pointer", borderColor: "var(--accent)", marginBottom: 22 }}
+          onClick={() => nav("/course")}
+        >
+          <div className="row" style={{ justifyContent: "space-between", alignItems: "center" }}>
+            <div>
+              <strong>📗 New: the 8-month TypeScript course</strong>
+              <p className="dim" style={{ margin: "4px 0 0", fontSize: 13 }}>
+                A guided, week-by-week path from absolute beginner to interview-ready — each week has
+                a goal, lessons that never outrun what you've learned, and a capstone project. The
+                concepts below are your free-form reference.
+              </p>
+            </div>
+            <span className="badge">Start →</span>
           </div>
         </div>
       )}
@@ -327,13 +352,13 @@ function ConceptDetail({
   related,
   problems,
   isDone,
-  onToggleDone,
+  onSetDone,
 }: {
   concept: Concept;
   related: Problem[];
   problems: Problem[];
   isDone: boolean;
-  onToggleDone: () => void;
+  onSetDone: (done: boolean) => void;
 }) {
   const nav = useNavigate();
   const bySlug = useMemo(() => {
@@ -352,6 +377,41 @@ function ConceptDetail({
     .filter((x): x is { note: string; problem: Problem } => !!x.problem);
   const [mode, setMode] = useState<"lesson" | "cards">("lesson");
 
+  // --- Auto-complete: mark this chapter done once the learner has scrolled to
+  // the bottom AND solved all of its exercises. Manual toggle still works.
+  const [solvedEx, setSolvedEx] = useState<Set<string>>(() => solvedExercises());
+  const [scrolledToBottom, setScrolledToBottom] = useState(false);
+  const bottomRef = useRef<HTMLDivElement | null>(null);
+
+  // Every judged exercise (drills + challenges) is a "given problem" to solve.
+  // A chapter with no exercises just needs to be read to the bottom.
+  const gradableIds = exercises.map((e) => e.id);
+  const allSolved = gradableIds.every((id) => solvedEx.has(id));
+
+  function handleExerciseSolved(id: string) {
+    setSolvedEx(new Set(markExerciseSolved(id)));
+  }
+
+  // Watch a sentinel at the very bottom of the page: when it scrolls into view
+  // (or the page is short enough that it's already visible), the lesson has been
+  // read through. Works regardless of which ancestor is the scroll container.
+  useEffect(() => {
+    const el = bottomRef.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) setScrolledToBottom(true);
+      },
+      { threshold: 0.01 }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [concept.key]);
+
+  useEffect(() => {
+    if (!isDone && scrolledToBottom && allSolved) onSetDone(true);
+  }, [isDone, scrolledToBottom, allSolved, onSetDone]);
+
   return (
     <div className="page">
       <div className="row" style={{ marginBottom: 4, justifyContent: "space-between" }}>
@@ -364,7 +424,7 @@ function ConceptDetail({
         <button
           className="ghost"
           style={isDone ? { borderColor: "var(--good)", color: "var(--good)" } : undefined}
-          onClick={onToggleDone}
+          onClick={() => onSetDone(!isDone)}
           title={isDone ? "Marked complete — click to undo" : "Mark this chapter as complete"}
         >
           {isDone ? "✓ Done" : "Mark done"}
@@ -471,6 +531,7 @@ function ConceptDetail({
               index={i + 1}
               exercise={ex}
               source={ex.source_slug ? bySlug.get(ex.source_slug) : undefined}
+              onSolved={handleExerciseSolved}
             />
           ))}
         </>
@@ -492,6 +553,7 @@ function ConceptDetail({
               exercise={ex}
               challenge
               source={ex.source_slug ? bySlug.get(ex.source_slug) : undefined}
+              onSolved={handleExerciseSolved}
             />
           ))}
         </>
@@ -513,365 +575,18 @@ function ConceptDetail({
           </div>
         </>
       )}
-    </div>
-  );
-}
 
-function ExerciseCard({
-  index,
-  exercise,
-  source,
-  challenge = false,
-}: {
-  index: number;
-  exercise: Exercise;
-  source?: Problem;
-  challenge?: boolean;
-}) {
-  const nav = useNavigate();
-  const storeKey = `poodcode:learn-ex:${exercise.id}`;
-  const lang = exercise.language || "java";
-  const [code, setCode] = useState<string>(
-    () => localStorage.getItem(storeKey) ?? exercise.starter
-  );
-  const [report, setReport] = useState<JudgeReport | null>(null);
-  const [running, setRunning] = useState(false);
-  const [err, setErr] = useState("");
-  const [showHint, setShowHint] = useState(false);
-  const [showSolution, setShowSolution] = useState(false);
-
-  // Challenges are written from scratch, so give them a roomier editor than a
-  // short fill-in-the-blank drill (whose starter already sizes it well).
-  const height = Math.min(
-    Math.max(exercise.starter.split("\n").length * 20 + 24, challenge ? 260 : 150),
-    challenge ? 560 : 480
-  );
-
-  function update(v: string) {
-    setCode(v);
-    localStorage.setItem(storeKey, v);
-  }
-
-  function reset() {
-    update(exercise.starter);
-    setReport(null);
-    setErr("");
-    setShowSolution(false);
-  }
-
-  async function check() {
-    setRunning(true);
-    setErr("");
-    setReport(null);
-    const cases: TestCase[] = exercise.tests.map((t, i) => ({
-      id: 0,
-      problem_id: 0,
-      kind: "example",
-      name: `Test ${i + 1}`,
-      input: t.input,
-      expected_output: t.output,
-      ordering: i,
-    }));
-    try {
-      const r = await api.runTests(null, lang, code, cases);
-      setReport(r);
-    } catch (e) {
-      setErr(String(e));
-    } finally {
-      setRunning(false);
-    }
-  }
-
-  const untouched = code === exercise.starter || code.includes("____");
-  const solved = report?.status === "accepted";
-
-  return (
-    <div
-      className="card"
-      style={{
-        marginBottom: 14,
-        borderColor: solved
-          ? "var(--good)"
-          : challenge
-          ? "var(--accent)"
-          : undefined,
-      }}
-    >
-      <div className="row" style={{ justifyContent: "space-between" }}>
-        <strong>
-          {index}. {exercise.title} {solved && <span style={{ color: "var(--good)" }}>✓</span>}
-        </strong>
-        <span className="row" style={{ gap: 6 }}>
-          {challenge && exercise.difficulty && (
-            <span className={`badge diff ${exercise.difficulty}`}>{exercise.difficulty}</span>
-          )}
-          <span className="badge">{lang}</span>
-        </span>
-      </div>
-      <p style={{ margin: "6px 0 10px" }}>{exercise.prompt}</p>
-
-      <div
-        style={{
-          height,
-          border: "1px solid var(--border)",
-          borderRadius: 6,
-          overflow: "hidden",
-        }}
-      >
-        <CodeEditor language={lang} value={code} onChange={update} onRun={check} />
-      </div>
-
-      <div className="row" style={{ marginTop: 10, flexWrap: "wrap", gap: 8 }}>
-        <button onClick={check} disabled={running}>
-          {running ? "Checking…" : "Check"}
-        </button>
-        <button className="ghost" onClick={reset} disabled={running}>
-          Reset
-        </button>
-        {exercise.hint && (
-          <button className="ghost" onClick={() => setShowHint((s) => !s)}>
-            {showHint ? "Hide hint" : "Hint"}
-          </button>
-        )}
-        <button className="ghost" onClick={() => setShowSolution((s) => !s)}>
-          {showSolution ? "Hide solution" : "Reveal solution"}
-        </button>
-        {untouched && !running && (
-          <span className="dim" style={{ fontSize: 12, alignSelf: "center" }}>
-            Replace the <code>____</code> before checking.
-          </span>
-        )}
-      </div>
-
-      {showHint && exercise.hint && (
-        <div
-          className="card"
-          style={{ marginTop: 10, marginBottom: 0, background: "var(--accent-dim)" }}
-        >
-          <div className="io-label" style={{ color: "var(--accent)" }}>Hint</div>
-          <p style={{ margin: 0 }}>{exercise.hint}</p>
-        </div>
-      )}
-
-      {err && (
-        <div className="card" style={{ marginTop: 10, marginBottom: 0, borderColor: "var(--bad)" }}>
-          <div className="io-label" style={{ color: "var(--bad)" }}>Couldn’t run</div>
-          <pre style={{ margin: 0, whiteSpace: "pre-wrap", fontSize: 12 }}>{err}</pre>
-        </div>
-      )}
-
-      {report && <Feedback report={report} />}
-
-      {showSolution && (
-        <div style={{ marginTop: 10 }}>
-          <Markdown>{"```" + lang + "\n" + exercise.solution + "\n```"}</Markdown>
-        </div>
-      )}
-
-      {source && (
-        <div className="dim" style={{ marginTop: 8, fontSize: 13 }}>
-          Ready for the whole thing?{" "}
-          <a
-            style={{ cursor: "pointer", color: "var(--accent)" }}
-            onClick={() => nav(`/solve/${source.id}`)}
-          >
-            Open “{source.title}” →
-          </a>
-        </div>
-      )}
-    </div>
-  );
-}
-
-/** A language-agnostic multiple-choice self-check quiz. Graded entirely on the
- * client by comparing the picked option index — no code execution. Tracks a
- * running score across the concept's questions. */
-function QuizSection({ questions }: { questions: QuizQuestion[] }) {
-  // picked[i] = the option index the user chose for question i, or -1 if unanswered.
-  const [picked, setPicked] = useState<number[]>(() => questions.map(() => -1));
-
-  const answered = picked.filter((p) => p >= 0).length;
-  const correct = picked.filter((p, i) => p === questions[i].answer).length;
-
-  return (
-    <div>
-      {answered > 0 && (
-        <div className="row" style={{ marginBottom: 10, gap: 8, alignItems: "center" }}>
-          <span
-            className="badge"
-            style={{
-              borderColor: correct === questions.length ? "var(--good)" : "var(--accent)",
-              color: correct === questions.length ? "var(--good)" : "var(--accent)",
-            }}
-          >
-            Score {correct}/{questions.length}
-          </span>
-          <span className="dim" style={{ fontSize: 12 }}>
-            {answered}/{questions.length} answered
-          </span>
-          {answered > 0 && (
-            <button
-              className="ghost"
-              style={{ padding: "2px 8px", fontSize: 12 }}
-              onClick={() => setPicked(questions.map(() => -1))}
-            >
-              Reset
-            </button>
-          )}
-        </div>
-      )}
-      {questions.map((q, qi) => (
-        <QuizItem
-          key={qi}
-          index={qi + 1}
-          question={q}
-          picked={picked[qi]}
-          onPick={(oi) =>
-            setPicked((prev) => {
-              if (prev[qi] >= 0) return prev; // lock the first answer
-              const next = [...prev];
-              next[qi] = oi;
-              return next;
-            })
-          }
-        />
-      ))}
-    </div>
-  );
-}
-
-function QuizItem({
-  index,
-  question,
-  picked,
-  onPick,
-}: {
-  index: number;
-  question: QuizQuestion;
-  picked: number;
-  onPick: (optionIndex: number) => void;
-}) {
-  const answered = picked >= 0;
-  const isRight = picked === question.answer;
-
-  return (
-    <div
-      className="card"
-      style={{
-        marginBottom: 12,
-        borderColor: answered ? (isRight ? "var(--good)" : "var(--bad)") : undefined,
-      }}
-    >
-      <strong>
-        {index}. {question.question}
-      </strong>
-      <div style={{ display: "flex", flexDirection: "column", gap: 6, marginTop: 10 }}>
-        {question.options.map((opt, oi) => {
-          let border: string | undefined;
-          let color: string | undefined;
-          if (answered) {
-            if (oi === question.answer) {
-              border = "var(--good)";
-              color = "var(--good)";
-            } else if (oi === picked) {
-              border = "var(--bad)";
-              color = "var(--bad)";
-            }
-          }
-          return (
-            <button
-              key={oi}
-              className="ghost"
-              style={{ textAlign: "left", borderColor: border, color, padding: "8px 12px" }}
-              onClick={() => onPick(oi)}
-              disabled={answered}
-            >
-              {answered && oi === question.answer && "✓ "}
-              {answered && oi === picked && oi !== question.answer && "✗ "}
-              {opt}
-            </button>
-          );
-        })}
-      </div>
-      {answered && (
-        <div
-          className="card"
-          style={{
-            marginTop: 10,
-            marginBottom: 0,
-            background: "var(--accent-dim)",
-            borderColor: isRight ? "var(--good)" : "var(--bad)",
-          }}
-        >
-          <div
-            className="io-label"
-            style={{ color: isRight ? "var(--good)" : "var(--bad)" }}
-          >
-            {isRight ? "Correct" : "Not quite"}
-          </div>
-          <p style={{ margin: 0 }}>{question.explanation}</p>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function Feedback({ report }: { report: JudgeReport }) {
-  if (report.status === "not_installed") {
-    return (
-      <div className="card" style={{ marginTop: 10, marginBottom: 0, borderColor: "var(--bad)" }}>
-        <div className="io-label" style={{ color: "var(--bad)" }}>Java not available</div>
-        <p style={{ margin: 0 }}>
-          {report.not_installed_hint || "Install a JDK to run these drills."}
+      {!isDone && (
+        <p className="faint" style={{ fontSize: 12, marginTop: 24, textAlign: "center" }}>
+          {gradableIds.length > 0
+            ? `This chapter marks itself ✓ Done once you've read to here and solved its ${gradableIds.length} exercise${gradableIds.length === 1 ? "" : "s"}${allSolved ? " — all solved!" : ` (${gradableIds.filter((id) => solvedEx.has(id)).length}/${gradableIds.length} solved)`}.`
+          : "This chapter marks itself ✓ Done once you've read to here."}
         </p>
-      </div>
-    );
-  }
+      )}
 
-  if (report.compile_error) {
-    return (
-      <div className="card" style={{ marginTop: 10, marginBottom: 0, borderColor: "var(--bad)" }}>
-        <div className="io-label" style={{ color: "var(--bad)" }}>Compile error</div>
-        <pre style={{ margin: 0, whiteSpace: "pre-wrap", fontSize: 12 }}>
-          {report.compile_error}
-        </pre>
-      </div>
-    );
-  }
-
-  const ok = report.status === "accepted";
-  const failing = report.results.filter((r) => !r.passed);
-
-  return (
-    <div
-      className="card"
-      style={{ marginTop: 10, marginBottom: 0, borderColor: ok ? "var(--good)" : "var(--bad)" }}
-    >
-      <div className="io-label" style={{ color: ok ? "var(--good)" : "var(--bad)" }}>
-        {ok
-          ? `All ${report.total} tests passed 🎉`
-          : `${report.passed} / ${report.total} tests passed`}
-      </div>
-      {!ok &&
-        failing.slice(0, 3).map((r, i) => (
-          <div key={i} style={{ marginTop: 6, fontSize: 12 }}>
-            <div className="dim">{r.name}</div>
-            <div style={{ fontFamily: "var(--font-mono)" }}>
-              <div>
-                input: <code>{r.input.replace(/\n/g, " ⏎ ") || "(none)"}</code>
-              </div>
-              <div>
-                expected: <code>{r.expected}</code>
-              </div>
-              <div style={{ color: "var(--bad)" }}>
-                got: <code>{r.timed_out ? "(timed out)" : r.actual || "(nothing)"}</code>
-              </div>
-              {r.stderr && (
-                <pre style={{ margin: "4px 0 0", whiteSpace: "pre-wrap" }}>{r.stderr}</pre>
-              )}
-            </div>
-          </div>
-        ))}
+      {/* Sentinel: intersecting means the lesson has been read to the bottom. */}
+      <div ref={bottomRef} style={{ height: 1 }} />
     </div>
   );
 }
+

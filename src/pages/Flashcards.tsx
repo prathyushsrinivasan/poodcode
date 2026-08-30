@@ -53,7 +53,7 @@ export default function Flashcards() {
     <div className="page">
       <h1 className="page-title">Flashcards</h1>
       <p className="page-sub">
-        Concept recall on the same SM-2 engine as problem reviews. {due.length} due.
+        Concept recall on an adaptive SM-2 spaced-repetition engine. {due.length} due.
       </p>
 
       {current ? (

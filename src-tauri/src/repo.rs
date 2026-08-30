@@ -5,10 +5,6 @@ use std::collections::HashMap;
 use crate::error::{AppError, AppResult};
 use crate::models::*;
 
-/// Spaced-repetition interval ladder, in days. Mirrored in the frontend
-/// (`src/lib/revision.ts`) which carries the unit tests for this logic.
-pub const LADDER: [i64; 6] = [1, 3, 7, 14, 30, 90];
-
 fn today() -> NaiveDate {
     Local::now().date_naive()
 }
@@ -492,7 +488,6 @@ pub fn record_attempt(conn: &Connection, a: &Attempt) -> AppResult<i64> {
 
     if accepted {
         bump_daily(conn, true, a.duration_seconds)?;
-        schedule_after_solve(conn, a.problem_id)?;
     } else {
         bump_daily(conn, false, a.duration_seconds)?;
     }
@@ -542,19 +537,11 @@ fn bump_daily(conn: &Connection, solved: bool, seconds: i64) -> AppResult<()> {
 }
 
 // ---------------------------------------------------------------------------
-// Revision (spaced repetition)
+// Spaced-repetition scheduling (SM-2) — used by vocabulary flashcards.
 // ---------------------------------------------------------------------------
-
-fn due_from(index: usize) -> String {
-    let idx = index.min(LADDER.len() - 1);
-    (today() + Duration::days(LADDER[idx]))
-        .format("%Y-%m-%d")
-        .to_string()
-}
 
 /// SM-2 next-interval computation. `quality` is 0..=3 mapping to
 /// Again / Hard / Good / Easy. Returns `(interval_days, new_ease, is_lapse)`.
-/// Mirrored in the frontend `revision.ts::sm2`.
 pub fn sm2(prev_interval: i64, ease: f64, reps: i64, quality: i64) -> (i64, f64, bool) {
     // Ease adjustment on a 0..=3 scale (Again lowers a lot, Easy raises).
     let delta = match quality {
@@ -581,130 +568,6 @@ pub fn sm2(prev_interval: i64, ease: f64, reps: i64, quality: i64) -> (i64, f64,
         ((prev_interval.max(1) as f64) * new_ease).round() as i64
     };
     (interval.clamp(1, 365), new_ease, false)
-}
-
-/// When a problem is first solved, seed a review due tomorrow. If a review
-/// already exists it is left untouched (progression happens via mark_reviewed).
-pub fn schedule_after_solve(conn: &Connection, problem_id: i64) -> AppResult<()> {
-    let exists: bool = conn
-        .query_row(
-            "SELECT 1 FROM reviews WHERE problem_id = ?1",
-            params![problem_id],
-            |_| Ok(true),
-        )
-        .optional()?
-        .unwrap_or(false);
-    if !exists {
-        conn.execute(
-            "INSERT INTO reviews(problem_id, due_date, interval_index, interval_days, reps)
-             VALUES(?1, ?2, 0, 1, 0)",
-            params![problem_id, due_from(0)],
-        )?;
-    }
-    Ok(())
-}
-
-/// Grade a review with a 0..=3 quality (Again/Hard/Good/Easy) using SM-2.
-/// `remembered` false is treated as quality 0 for backward compatibility.
-pub fn mark_reviewed_quality(conn: &Connection, problem_id: i64, quality: i64) -> AppResult<()> {
-    let (interval, ease, reps, lapses): (i64, f64, i64, i64) = conn
-        .query_row(
-            "SELECT interval_days, ease, reps, lapses FROM reviews WHERE problem_id = ?1",
-            params![problem_id],
-            |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?, r.get(3)?)),
-        )
-        .optional()?
-        .unwrap_or((1, 2.5, 0, 0));
-
-    let (new_interval, new_ease, is_lapse) = sm2(interval, ease, reps, quality);
-    let new_reps = if is_lapse { 0 } else { reps + 1 };
-    let new_lapses = lapses + if is_lapse { 1 } else { 0 };
-    let due = (today() + Duration::days(new_interval)).format("%Y-%m-%d").to_string();
-
-    conn.execute(
-        "INSERT INTO reviews(problem_id, due_date, interval_index, ease, reps, lapses,
-            interval_days, last_quality, last_reviewed_at)
-         VALUES(?1, ?2, 0, ?3, ?4, ?5, ?6, ?7, ?8)
-         ON CONFLICT(problem_id) DO UPDATE SET
-            due_date = excluded.due_date,
-            ease = excluded.ease,
-            reps = excluded.reps,
-            lapses = excluded.lapses,
-            interval_days = excluded.interval_days,
-            last_quality = excluded.last_quality,
-            last_reviewed_at = excluded.last_reviewed_at",
-        params![problem_id, due, new_ease, new_reps, new_lapses, new_interval, quality, now_iso()],
-    )?;
-
-    let date = today().format("%Y-%m-%d").to_string();
-    conn.execute(
-        "INSERT INTO daily_sessions(date, reviews_done) VALUES(?1, 1)
-         ON CONFLICT(date) DO UPDATE SET reviews_done = reviews_done + 1",
-        params![date],
-    )?;
-    Ok(())
-}
-
-/// Backward-compatible binary grading (remembered → Good, forgot → Again).
-pub fn mark_reviewed(conn: &Connection, problem_id: i64, remembered: bool) -> AppResult<()> {
-    mark_reviewed_quality(conn, problem_id, if remembered { 2 } else { 0 })
-}
-
-/// Set an explicit due date (manual adjustment).
-pub fn reschedule_review(conn: &Connection, problem_id: i64, due_date: &str) -> AppResult<()> {
-    conn.execute(
-        "INSERT INTO reviews(problem_id, due_date, interval_index) VALUES(?1, ?2, 0)
-         ON CONFLICT(problem_id) DO UPDATE SET due_date = excluded.due_date",
-        params![problem_id, due_date],
-    )?;
-    Ok(())
-}
-
-pub fn due_reviews(conn: &Connection, on_or_before: &str) -> AppResult<Vec<ReviewItem>> {
-    // Order by due date, then shakiest first (lowest ease / most lapses) so the
-    // hardest recalls surface at the top of the queue.
-    let mut stmt = conn.prepare(
-        "SELECT r.id, r.problem_id, r.due_date, r.interval_index, r.ease, r.reps, r.lapses,
-                r.interval_days, r.last_quality, r.last_reviewed_at, r.created_at,
-                p.title, p.difficulty, p.confidence
-         FROM reviews r JOIN problems p ON p.id = r.problem_id
-         WHERE r.due_date <= ?1
-         ORDER BY r.due_date, r.lapses DESC, r.ease ASC",
-    )?;
-    let rows = stmt.query_map(params![on_or_before], |r| {
-        Ok((
-            Review {
-                id: r.get(0)?,
-                problem_id: r.get(1)?,
-                due_date: r.get(2)?,
-                interval_index: r.get(3)?,
-                ease: r.get(4)?,
-                reps: r.get(5)?,
-                lapses: r.get(6)?,
-                interval_days: r.get(7)?,
-                last_quality: r.get(8)?,
-                last_reviewed_at: r.get(9)?,
-                created_at: r.get(10)?,
-            },
-            r.get::<_, String>(11)?,
-            r.get::<_, String>(12)?,
-            r.get::<_, i64>(13)?,
-        ))
-    })?;
-    let mut out = Vec::new();
-    for row in rows {
-        let (review, title, difficulty, confidence) = row?;
-        let pid = review.problem_id;
-        out.push(ReviewItem {
-            review,
-            problem_id: pid,
-            title,
-            difficulty,
-            confidence,
-            topics: tags_for(conn, pid, "topic")?,
-        });
-    }
-    Ok(out)
 }
 
 // ---------------------------------------------------------------------------

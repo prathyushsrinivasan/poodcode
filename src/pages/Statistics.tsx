@@ -56,11 +56,9 @@ export default function Statistics() {
         <p className="faint" style={{ fontSize: 12, marginTop: 0 }}>
           Behavioral signals — what actually happened, not self-report.
         </p>
-        <div className="grid cols-4">
+        <div className="grid cols-2">
           <Stat value={percent(s.first_attempt_rate)} label="First-try solve rate" />
           <Stat value={s.avg_tries_to_solve.toFixed(1)} label="Avg tries to solve" />
-          <Stat value={s.reviews_total > 0 ? percent(s.retention_rate) : "—"} label="Review retention" />
-          <Stat value={s.reviews_total} label="Reviews graded" />
         </div>
       </div>
 

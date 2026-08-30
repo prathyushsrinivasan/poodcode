@@ -102,6 +102,41 @@ export interface JpBridge {
   interview: InterviewQA[];
 }
 
+// --- TypeScript course (8-month structured curriculum) ---------------------
+export interface Capstone {
+  title: string;
+  brief: string;
+  /** "auto" = judged via `exercise`; "brief" = free build, self-marked. */
+  kind: string;
+  exercise: Exercise | null;
+}
+export interface CourseLesson {
+  key: string;
+  title: string;
+  what: string;
+  lesson: string;
+  exercises: Exercise[];
+  quiz: QuizQuestion[];
+}
+export interface CourseWeek {
+  number: number;
+  month: number;
+  month_title: string;
+  theme: string;
+  goal: string;
+  summary: string;
+  /** false = skeleton placeholder ("coming soon"). */
+  authored: boolean;
+  lessons: CourseLesson[];
+  capstone: Capstone | null;
+}
+export interface TsCourse {
+  key: string;
+  title: string;
+  subtitle: string;
+  weeks: CourseWeek[];
+}
+
 export interface CardReview {
   card_id: string;
   ease: number;
@@ -211,20 +246,6 @@ export interface Attempt {
   created_at: string;
 }
 
-export interface Review {
-  id: number;
-  problem_id: number;
-  due_date: string;
-  interval_index: number;
-  ease: number;
-  reps: number;
-  lapses: number;
-  interval_days: number;
-  last_quality: number;
-  last_reviewed_at: string | null;
-  created_at: string;
-}
-
 export interface Mistake {
   id: number;
   problem_id: number;
@@ -280,15 +301,6 @@ export interface Flashcard {
   interval_days: number;
   due_date: string;
   created_at: string;
-}
-
-export interface ReviewItem {
-  review: Review;
-  problem_id: number;
-  title: string;
-  difficulty: Difficulty;
-  confidence: number;
-  topics: string[];
 }
 
 export interface LangInfo {
@@ -360,13 +372,11 @@ export interface Goals {
   easy: number;
   medium: number;
   hard: number;
-  reviews: number;
 }
 
 export interface Dashboard {
   solved_today: number;
   study_seconds_today: number;
-  reviews_due: number;
   current_streak: number;
   weakest_topic: string | null;
   suggested_problem: Problem | null;
@@ -411,9 +421,7 @@ export interface Stats {
   weakest_topics: TopicStat[];
   strongest_topics: TopicStat[];
   first_attempt_rate: number;
-  retention_rate: number;
   avg_tries_to_solve: number;
-  reviews_total: number;
   mistake_tally: CountPair[];
   topic_behavior: TopicBehavior[];
 }

@@ -9,7 +9,6 @@ import { Welcome } from "./components/Welcome";
 import Dashboard from "./pages/Dashboard";
 import Library from "./pages/Library";
 import Solve from "./pages/Solve";
-import Revision from "./pages/Revision";
 import Statistics from "./pages/Statistics";
 import Timeline from "./pages/Timeline";
 import RandomPractice from "./pages/RandomPractice";
@@ -18,6 +17,7 @@ import Interview from "./pages/Interview";
 import Settings from "./pages/Settings";
 import ProblemForm from "./pages/ProblemForm";
 import Learn from "./pages/Learn";
+import Course from "./pages/Course";
 import JapaneseBridge from "./pages/JapaneseBridge";
 import Paths from "./pages/Paths";
 import Flashcards from "./pages/Flashcards";
@@ -30,9 +30,9 @@ const NAV = [
   { to: "/", label: "Dashboard", icon: "🏠", end: true },
   { to: "/library", label: "Problem Library", icon: "📚" },
   { to: "/learn", label: "Learn", icon: "📘" },
+  { to: "/course", label: "TypeScript Course", icon: "📗" },
   { to: "/jp-bridge", label: "日本語 → Java", icon: "🈁" },
   { to: "/paths", label: "Learning Paths", icon: "🧭" },
-  { to: "/revision", label: "Revision Queue", icon: "🔁", badge: "reviews" },
   { to: "/flashcards", label: "Flashcards", icon: "🃏" },
   { to: "/random", label: "Random Practice", icon: "🎲" },
   { to: "/drill", label: "Pattern Drill", icon: "🧩" },
@@ -48,7 +48,7 @@ const NAV = [
   { to: "/settings", label: "Settings", icon: "⚙️" },
 ];
 
-function Sidebar({ reviewsDue }: { reviewsDue: number }) {
+function Sidebar() {
   const setPalette = useStore((s) => s.setPalette);
   return (
     <aside className="sidebar">
@@ -72,9 +72,6 @@ function Sidebar({ reviewsDue }: { reviewsDue: number }) {
           >
             <span className="ico">{item.icon}</span>
             <span>{item.label}</span>
-            {item.badge === "reviews" && reviewsDue > 0 && (
-              <span className="nav-badge">{reviewsDue}</span>
-            )}
           </NavLink>
         )
       )}
@@ -89,7 +86,6 @@ function Sidebar({ reviewsDue }: { reviewsDue: number }) {
 export default function App() {
   const init = useStore((s) => s.init);
   const loaded = useStore((s) => s.loaded);
-  const [reviewsDue, setReviewsDue] = useState(0);
   const [showWelcome, setShowWelcome] = useState(false);
 
   useEffect(() => {
@@ -111,15 +107,6 @@ export default function App() {
     api.setSetting("onboarded", "1").catch(() => {});
   };
 
-  const refreshBadge = () => {
-    api.dueReviews().then((r) => setReviewsDue(r.length)).catch(() => {});
-  };
-  useEffect(() => {
-    refreshBadge();
-    const t = setInterval(refreshBadge, 30_000);
-    return () => clearInterval(t);
-  }, []);
-
   if (!loaded) {
     return <div className="empty" style={{ paddingTop: "20vh" }}>Loading Poodcode…</div>;
   }
@@ -127,18 +114,19 @@ export default function App() {
   return (
     <ToastProvider>
       <div className="app">
-        <Sidebar reviewsDue={reviewsDue} />
+        <Sidebar />
         <main className="main">
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/library" element={<Library />} />
             <Route path="/learn" element={<Learn />} />
             <Route path="/learn/:key" element={<Learn />} />
+            <Route path="/course" element={<Course />} />
+            <Route path="/course/:week" element={<Course />} />
             <Route path="/jp-bridge" element={<JapaneseBridge />} />
             <Route path="/problem/new" element={<ProblemForm />} />
             <Route path="/problem/:id/edit" element={<ProblemForm />} />
-            <Route path="/solve/:id" element={<Solve onProgress={refreshBadge} />} />
-            <Route path="/revision" element={<Revision onChange={refreshBadge} />} />
+            <Route path="/solve/:id" element={<Solve />} />
             <Route path="/stats" element={<Statistics />} />
             <Route path="/timeline" element={<Timeline />} />
             <Route path="/random" element={<RandomPractice />} />

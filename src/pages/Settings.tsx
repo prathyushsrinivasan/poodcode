@@ -17,7 +17,7 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 export default function Settings() {
   const { prefs, setPref, toggleTheme, languages } = useStore();
   const toast = useToast();
-  const [goals, setGoals] = useState({ intro: 3, easy: 2, medium: 1, hard: 0, reviews: 3 });
+  const [goals, setGoals] = useState({ intro: 3, easy: 2, medium: 1, hard: 0 });
 
   useEffect(() => {
     api.getSettings().then((s) => {
@@ -26,7 +26,6 @@ export default function Settings() {
         easy: Number(s.goal_easy ?? 2),
         medium: Number(s.goal_medium ?? 1),
         hard: Number(s.goal_hard ?? 0),
-        reviews: Number(s.goal_reviews ?? 3),
       });
     });
   }, []);
@@ -45,7 +44,7 @@ export default function Settings() {
     if (!path) return;
     try {
       await api.backupDatabase(path);
-      toast("Backup written — everything (problems, notes, attempts, drafts, schedule).");
+      toast("Backup written — everything (problems, notes, attempts, drafts).");
     } catch (e) {
       toast(`Backup failed: ${e}`);
     }
@@ -112,7 +111,7 @@ export default function Settings() {
 
       <div className="card" style={{ marginBottom: 16 }}>
         <h3 style={{ marginTop: 0 }}>Daily goals</h3>
-        {(["intro", "easy", "medium", "hard", "reviews"] as const).map((k) => (
+        {(["intro", "easy", "medium", "hard"] as const).map((k) => (
           <Field key={k} label={k[0].toUpperCase() + k.slice(1)}>
             <input type="number" min={0} max={20} style={{ width: 80 }} value={goals[k]} onChange={(e) => saveGoal(k, Number(e.target.value))} />
           </Field>
@@ -136,7 +135,7 @@ export default function Settings() {
         <h3 style={{ marginTop: 0 }}>Backup &amp; restore</h3>
         <p className="dim" style={{ marginTop: 0 }}>
           A backup is a single-file snapshot of your entire database — problems, notes, attempts,
-          solutions, drafts, review schedule, and settings. Keep one somewhere safe.
+          solutions, drafts, and settings. Keep one somewhere safe.
         </p>
         <div className="row">
           <button className="primary" onClick={doBackup}>

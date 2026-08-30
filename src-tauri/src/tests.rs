@@ -68,7 +68,7 @@ fn upsert_is_idempotent_by_slug() {
 }
 
 #[test]
-fn accepted_attempt_marks_solved_and_seeds_review() {
+fn accepted_attempt_marks_solved() {
     let c = conn();
     let id = repo::upsert_problem(&c, &sample_problem("p1")).unwrap();
     let attempt = Attempt {
@@ -91,34 +91,6 @@ fn accepted_attempt_marks_solved_and_seeds_review() {
     assert_eq!(p.solved_status, "solved");
     assert_eq!(p.success_count, 1);
     assert_eq!(p.attempts_count, 1);
-
-    // A review should now be due today (ladder index 0 => +1 day, but it is
-    // created; due_reviews with a far-future date should include it).
-    let far = "2999-01-01";
-    let due = repo::due_reviews(&c, far).unwrap();
-    assert_eq!(due.len(), 1);
-    assert_eq!(due[0].review.interval_index, 0);
-}
-
-#[test]
-fn review_ladder_advances_and_resets() {
-    let c = conn();
-    let id = repo::upsert_problem(&c, &sample_problem("p1")).unwrap();
-    repo::schedule_after_solve(&c, id).unwrap();
-
-    repo::mark_reviewed(&c, id, true).unwrap(); // Good
-    let due = repo::due_reviews(&c, "2999-01-01").unwrap();
-    assert_eq!(due[0].review.reps, 1);
-
-    repo::mark_reviewed(&c, id, true).unwrap(); // Good
-    let due = repo::due_reviews(&c, "2999-01-01").unwrap();
-    assert_eq!(due[0].review.reps, 2);
-
-    // Forgetting (Again) resets reps and records a lapse.
-    repo::mark_reviewed(&c, id, false).unwrap();
-    let due = repo::due_reviews(&c, "2999-01-01").unwrap();
-    assert_eq!(due[0].review.reps, 0);
-    assert_eq!(due[0].review.lapses, 1);
 }
 
 #[test]
@@ -136,20 +108,6 @@ fn sm2_grows_interval_on_good_and_lapses_on_again() {
     assert_eq!(i4, 1);
     assert!(lapse4);
     assert!(e4 < e3, "ease should drop on a lapse");
-}
-
-#[test]
-fn review_grading_persists_sm2_state() {
-    let c = conn();
-    let id = repo::upsert_problem(&c, &sample_problem("p1")).unwrap();
-    repo::schedule_after_solve(&c, id).unwrap();
-    repo::mark_reviewed_quality(&c, id, 3).unwrap(); // Easy
-    repo::mark_reviewed_quality(&c, id, 2).unwrap(); // Good
-    let due = repo::due_reviews(&c, "2999-01-01").unwrap();
-    assert_eq!(due.len(), 1);
-    assert!(due[0].review.reps >= 2);
-    assert!(due[0].review.interval_days >= 3);
-    assert_eq!(due[0].review.last_quality, 2);
 }
 
 #[test]

@@ -34,7 +34,8 @@ export function CommandPalette() {
     const nav: Cmd[] = [
       { id: "dash", label: "Go to Dashboard", run: () => navigate("/") },
       { id: "lib", label: "Go to Problem Library", run: () => navigate("/library") },
-      { id: "rev", label: "Go to Revision Queue", run: () => navigate("/revision") },
+      { id: "learn", label: "Go to Learn", run: () => navigate("/learn") },
+      { id: "course", label: "Open the TypeScript Course", run: () => navigate("/course") },
       { id: "stats", label: "Go to Statistics", run: () => navigate("/stats") },
       { id: "timeline", label: "Go to Learning Timeline", run: () => navigate("/timeline") },
       { id: "random", label: "Go to Random Practice", run: () => navigate("/random") },

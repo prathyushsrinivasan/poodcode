@@ -23,9 +23,7 @@ pub struct Stats {
     pub strongest_topics: Vec<TopicStat>,
     // Behavioral / learning-outcome signals.
     pub first_attempt_rate: f64,   // fraction of solved problems solved on the first submission
-    pub retention_rate: f64,       // fraction of reviews graded Good/Easy
     pub avg_tries_to_solve: f64,   // mean submissions before the first AC (solved problems)
-    pub reviews_total: i64,
     pub mistake_tally: Vec<CountPair>,
     pub topic_behavior: Vec<TopicBehavior>,
 }
@@ -257,19 +255,6 @@ fn behavioral(conn: &Connection, s: &mut Stats) -> AppResult<()> {
     let n_solved = solved_ids.len().max(1) as f64;
     s.first_attempt_rate = first_try as f64 / n_solved;
     s.avg_tries_to_solve = total_tries_sum as f64 / n_solved;
-
-    // Retention: fraction of graded reviews that were Good/Easy (quality >= 2).
-    s.reviews_total = conn
-        .query_row("SELECT COUNT(*) FROM reviews WHERE reps > 0 OR last_quality > 0", [], |r| r.get(0))
-        .unwrap_or(0);
-    let good: i64 = conn
-        .query_row("SELECT COUNT(*) FROM reviews WHERE last_quality >= 2", [], |r| r.get(0))
-        .unwrap_or(0);
-    s.retention_rate = if s.reviews_total > 0 {
-        good as f64 / s.reviews_total as f64
-    } else {
-        0.0
-    };
 
     // Mistake tally by category.
     {
