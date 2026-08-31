@@ -28,6 +28,14 @@ function requiredExerciseIds(week: CourseWeek): string[] {
   return ids;
 }
 
+// Weeks are sized in study hours, not minutes — "~5 h" reads as a plan, where
+// "~300 min" reads as a wall.
+function studyTime(minutes: number): string {
+  if (minutes < 90) return `~${minutes} min`;
+  const hours = minutes / 60;
+  return `~${Number.isInteger(hours) ? hours : hours.toFixed(1)} h`;
+}
+
 export default function Course() {
   const { week } = useParams();
   const [course, setCourse] = useState<TsCourse | null>(null);
@@ -189,7 +197,7 @@ function Overview({ course, done }: { course: TsCourse; done: Set<string> }) {
                   </p>
                   {!soon && w.est_minutes > 0 && (
                     <p className="faint" style={{ margin: "6px 0 0", fontSize: 12 }}>
-                      ⏱️ about {w.est_minutes} min
+                      ⏱️ about {studyTime(w.est_minutes)} of study
                     </p>
                   )}
                 </div>
@@ -221,7 +229,20 @@ function WeekDetail({
   const [scrolledToBottom, setScrolledToBottom] = useState(false);
   const bottomRef = useRef<HTMLDivElement | null>(null);
   const celebrated = useRef(false);
-  const sec = useCollapse(`course-sec:w${week.number}`);
+  // Lessons start collapsed: a week now runs to forty-odd exercises, and each
+  // open lesson mounts a Monaco editor per exercise. The contents card below is
+  // how you navigate them.
+  const sec = useCollapse(`course-sec:w${week.number}`, false);
+  const lessons = week.lessons ?? [];
+  const lessonKeys = useMemo(() => lessons.map((l) => l.key), [lessons]);
+
+  function openLesson(key: string) {
+    if (!sec.isOpen(key)) sec.toggle(key);
+    // Let the body mount before scrolling to it.
+    requestAnimationFrame(() =>
+      document.getElementById(`lesson-${key}`)?.scrollIntoView({ behavior: "smooth", block: "start" })
+    );
+  }
 
   const gradableIds = useMemo(() => requiredExerciseIds(week), [week]);
   const allSolved = gradableIds.every((id) => solvedEx.has(id));
@@ -264,7 +285,7 @@ function WeekDetail({
           <span className="badge">
             Week {week.number} · Month {week.month}
           </span>
-          {week.est_minutes > 0 && <span className="badge">⏱️ ~{week.est_minutes} min</span>}
+          {week.est_minutes > 0 && <span className="badge">⏱️ {studyTime(week.est_minutes)}</span>}
         </div>
         <button
           className="ghost"
@@ -305,20 +326,82 @@ function WeekDetail({
 
       {week.summary && <Markdown>{week.summary}</Markdown>}
 
-      {(week.lessons ?? []).map((lesson, li) => (
-        <Section
-          key={lesson.key}
-          title={`${li + 1}. ${lesson.title}`}
-          open={sec.isOpen(lesson.key)}
-          onToggle={() => sec.toggle(lesson.key)}
-          meta={
-            <span className="dim" style={{ fontSize: 12 }}>
-              {lessonSolvedLabel(lesson, solvedEx)}
-            </span>
-          }
-        >
-          <LessonBody lesson={lesson} onSolved={handleSolved} />
-        </Section>
+      {lessons.length > 0 && (
+        <div className="card" style={{ marginBottom: 14 }}>
+          <div className="row" style={{ marginBottom: 8 }}>
+            <div className="io-label" style={{ margin: 0 }}>
+              📚 Lessons in this week
+            </div>
+            <span className="spacer" />
+            <button
+              className="ghost"
+              style={{ padding: "2px 8px", fontSize: 12 }}
+              onClick={() => sec.setAll(lessonKeys, true)}
+            >
+              Expand all
+            </button>
+            <button
+              className="ghost"
+              style={{ padding: "2px 8px", fontSize: 12 }}
+              onClick={() => sec.setAll(lessonKeys, false)}
+            >
+              Collapse all
+            </button>
+          </div>
+          {lessons.map((lesson, li) => {
+            const ids = (lesson.exercises ?? []).map((e) => e.id);
+            const n = ids.filter((id) => solvedEx.has(id)).length;
+            const complete = ids.length > 0 && n === ids.length;
+            return (
+              <div
+                key={lesson.key}
+                className="row"
+                style={{
+                  cursor: "pointer",
+                  gap: 8,
+                  padding: "5px 0",
+                  borderBottom: li < lessons.length - 1 ? "1px solid var(--border)" : undefined,
+                }}
+                onClick={() => openLesson(lesson.key)}
+              >
+                <span style={{ color: complete ? "var(--good)" : "var(--accent)", width: 18 }}>
+                  {complete ? "✓" : li + 1}
+                </span>
+                <span style={{ flex: 1 }}>
+                  {lesson.title}
+                  {lesson.what && (
+                    <span className="faint" style={{ fontSize: 12 }}>
+                      {" "}
+                      — {lesson.what}
+                    </span>
+                  )}
+                </span>
+                {ids.length > 0 && (
+                  <span className="dim mono" style={{ fontSize: 12 }}>
+                    {n}/{ids.length}
+                  </span>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {lessons.map((lesson, li) => (
+        <div key={lesson.key} id={`lesson-${lesson.key}`}>
+          <Section
+            title={`${li + 1}. ${lesson.title}`}
+            open={sec.isOpen(lesson.key)}
+            onToggle={() => sec.toggle(lesson.key)}
+            meta={
+              <span className="dim" style={{ fontSize: 12 }}>
+                {lessonSolvedLabel(lesson, solvedEx)}
+              </span>
+            }
+          >
+            <LessonBody lesson={lesson} onSolved={handleSolved} />
+          </Section>
+        </div>
       ))}
 
       {cap && (

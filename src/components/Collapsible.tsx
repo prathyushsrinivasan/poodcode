@@ -19,17 +19,25 @@ function writeCollapsed(s: Set<string>) {
 }
 
 /** Remembered open/closed state for a set of sections sharing a namespace.
- * Sections are open by default; only the collapsed ids are persisted. */
-export function useCollapse(namespace: string) {
-  const [collapsed, setCollapsed] = useState<Set<string>>(readCollapsed);
+ *
+ * The persisted set holds the ids that differ from `defaultOpen`, so a
+ * default-open namespace stores its collapsed sections and a default-closed one
+ * stores its expanded sections. Default-closed matters where a section body is
+ * expensive — a course lesson mounts a Monaco editor per exercise, and a week
+ * has dozens, so opening them all at once would stall the page. */
+export function useCollapse(namespace: string, defaultOpen = true) {
+  const [overrides, setOverrides] = useState<Set<string>>(readCollapsed);
 
   const id = useCallback((k: string) => `${namespace}:${k}`, [namespace]);
 
-  const isOpen = useCallback((k: string) => !collapsed.has(id(k)), [collapsed, id]);
+  const isOpen = useCallback(
+    (k: string) => (overrides.has(id(k)) ? !defaultOpen : defaultOpen),
+    [overrides, id, defaultOpen]
+  );
 
   const toggle = useCallback(
     (k: string) => {
-      setCollapsed((prev) => {
+      setOverrides((prev) => {
         const next = new Set(prev);
         if (next.has(id(k))) next.delete(id(k));
         else next.add(id(k));
@@ -43,17 +51,17 @@ export function useCollapse(namespace: string) {
   /** Collapse or expand every section in this namespace at once. */
   const setAll = useCallback(
     (keys: string[], open: boolean) => {
-      setCollapsed((prev) => {
+      setOverrides((prev) => {
         const next = new Set(prev);
         for (const k of keys) {
-          if (open) next.delete(id(k));
+          if (open === defaultOpen) next.delete(id(k));
           else next.add(id(k));
         }
         writeCollapsed(next);
         return next;
       });
     },
-    [id]
+    [id, defaultOpen]
   );
 
   return { isOpen, toggle, setAll };

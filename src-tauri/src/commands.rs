@@ -54,16 +54,24 @@ pub fn sql_datasets() -> AppResult<Vec<crate::models::SqlDataset>> {
 /// so a learner can look at what their query actually returns while working
 /// toward the expected answer.
 #[tauri::command]
-pub fn sql_query(setup: String, sql: String) -> AppResult<crate::sqlexec::SqlOut> {
-    Ok(crate::sqlexec::run(&setup, &sql, RUN_TIMEOUT))
+pub async fn sql_query(setup: String, sql: String) -> AppResult<crate::sqlexec::SqlOut> {
+    // Building the dataset and running an arbitrary learner query can take a
+    // while; keep it off the UI thread (see `run_tests`).
+    tauri::async_runtime::spawn_blocking(move || crate::sqlexec::run(&setup, &sql, RUN_TIMEOUT))
+        .await
+        .map_err(|e| AppError::Other(e.to_string()))
 }
 
 /// Introspect a dataset for the schema/data browser: every table with its
 /// `CREATE TABLE` text, column metadata and rows. Joins are unlearnable without
 /// being able to see the rows you are joining, so this is not a nicety.
 #[tauri::command]
-pub fn sql_tables(setup: String) -> AppResult<Vec<crate::sqlexec::SqlTable>> {
-    crate::sqlexec::dataset_tables(&setup).map_err(AppError::Other)
+pub async fn sql_tables(setup: String) -> AppResult<Vec<crate::sqlexec::SqlTable>> {
+    tauri::async_runtime::spawn_blocking(move || {
+        crate::sqlexec::dataset_tables(&setup).map_err(AppError::Other)
+    })
+    .await
+    .map_err(|e| AppError::Other(e.to_string()))?
 }
 
 /// Japanese → Java bridge content (problem statements in Japanese + interview
@@ -273,9 +281,14 @@ pub fn list_attempts(state: State<'_, AppState>, problem_id: i64) -> AppResult<V
     repo::list_attempts(&state.conn(), problem_id)
 }
 
+/// Probing which toolchains are installed shells out to every candidate compiler
+/// (`node --version`, `java -version`, …) the first time, which is seconds of
+/// blocking work — never on the UI thread.
 #[tauri::command]
-pub fn languages() -> Vec<LangInfo> {
-    exec::languages()
+pub async fn languages() -> Vec<LangInfo> {
+    tauri::async_runtime::spawn_blocking(exec::languages)
+        .await
+        .unwrap_or_default()
 }
 
 /// Build the judging configuration (compare mode, tolerance, harness spec, time
@@ -302,8 +315,13 @@ fn judge_config_for(conn: &Connection, problem_id: Option<i64>) -> judge::JudgeC
 
 /// Run the user's code against an explicit set of test cases (the "Run" action).
 /// Nothing is persisted. `problem_id` supplies the judge config (harness/mode).
+///
+/// Async + `spawn_blocking`: judging shells out to a compiler/runtime and blocks
+/// for seconds across several cases. Running that on Tauri's main thread freezes
+/// the whole webview (no scrolling, no clicks) until it returns, so the heavy
+/// work is pushed to a blocking worker and the UI thread stays responsive.
 #[tauri::command]
-pub fn run_tests(
+pub async fn run_tests(
     state: State<'_, AppState>,
     problem_id: Option<i64>,
     language: String,
@@ -311,13 +329,15 @@ pub fn run_tests(
     cases: Vec<TestCase>,
 ) -> AppResult<JudgeReport> {
     let cfg = judge_config_for(&state.conn(), problem_id);
-    Ok(judge::judge_with(&language, &code, &cases, &cfg))
+    tauri::async_runtime::spawn_blocking(move || judge::judge_with(&language, &code, &cases, &cfg))
+        .await
+        .map_err(|e| AppError::Other(e.to_string()))
 }
 
 /// Quick scratch run: execute once against a single stdin blob (editor Run box).
 /// For a function-harness problem the user's function is wrapped first.
 #[tauri::command]
-pub fn run_scratch(
+pub async fn run_scratch(
     state: State<'_, AppState>,
     problem_id: Option<i64>,
     language: String,
@@ -325,29 +345,35 @@ pub fn run_scratch(
     stdin: String,
 ) -> AppResult<ProcOut> {
     let cfg = judge_config_for(&state.conn(), problem_id);
-    let effective = match &cfg.function_spec {
-        Some(fs) => crate::harness::wrap(&language, &code, fs).map_err(AppError::Other)?,
-        None => code,
-    };
-    let dir = std::env::temp_dir().join(format!("poodcode-{}", uuid::Uuid::new_v4()));
-    std::fs::create_dir_all(&dir)?;
-    let result = (|| {
-        let spec = exec::prepare(&language, &effective, &dir).map_err(|e| match e {
-            exec::PrepareError::NotInstalled { hint } => AppError::Other(hint),
-            exec::PrepareError::Compile { message } => AppError::Other(message),
-            exec::PrepareError::Unknown(id) => AppError::Other(format!("unknown language: {id}")),
-            exec::PrepareError::Io(m) => AppError::Other(m),
-        })?;
-        exec::run_once(&spec, &stdin, cfg.timeout).map_err(AppError::Other)
-    })();
-    let _ = std::fs::remove_dir_all(&dir);
-    result
+    // Preparing and running the program blocks (compile + child process). Offload
+    // it so the UI thread doesn't stall — see `run_tests` for the rationale.
+    tauri::async_runtime::spawn_blocking(move || {
+        let effective = match &cfg.function_spec {
+            Some(fs) => crate::harness::wrap(&language, &code, fs).map_err(AppError::Other)?,
+            None => code,
+        };
+        let dir = std::env::temp_dir().join(format!("poodcode-{}", uuid::Uuid::new_v4()));
+        std::fs::create_dir_all(&dir)?;
+        let result = (|| {
+            let spec = exec::prepare(&language, &effective, &dir).map_err(|e| match e {
+                exec::PrepareError::NotInstalled { hint } => AppError::Other(hint),
+                exec::PrepareError::Compile { message } => AppError::Other(message),
+                exec::PrepareError::Unknown(id) => AppError::Other(format!("unknown language: {id}")),
+                exec::PrepareError::Io(m) => AppError::Other(m),
+            })?;
+            exec::run_once(&spec, &stdin, cfg.timeout).map_err(AppError::Other)
+        })();
+        let _ = std::fs::remove_dir_all(&dir);
+        result
+    })
+    .await
+    .map_err(|e| AppError::Other(e.to_string()))?
 }
 
 /// Submit: judge against the problem's hidden cases (falling back to examples),
 /// persist an attempt, update progress, and seed/advance the review schedule.
 #[tauri::command]
-pub fn submit(
+pub async fn submit(
     state: State<'_, AppState>,
     problem_id: i64,
     language: String,
@@ -366,7 +392,15 @@ pub fn submit(
         (cases, judge_config_for(&conn, Some(problem_id)))
     };
 
-    let report = judge::judge_with(&language, &code, &cases, &cfg);
+    // Judging blocks on an external toolchain; keep it off the UI thread.
+    let report = {
+        let (language, code) = (language.clone(), code.clone());
+        tauri::async_runtime::spawn_blocking(move || {
+            judge::judge_with(&language, &code, &cases, &cfg)
+        })
+        .await
+        .map_err(|e| AppError::Other(e.to_string()))?
+    };
 
     // Don't record a "not_installed" outcome as an attempt.
     if report.status != "not_installed" {
