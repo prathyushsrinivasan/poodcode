@@ -4680,9 +4680,10 @@ rather than at 3am.
         "Give parameters defaults and mark them optional",
         "Explain scope, shadowing, and why a pure function is easier to trust",
         "Pass a function to another function as a value",
+        "Return a function from a function, and explain what a closure captures",
     ],
     why="Functions are how you stop a program growing into an unreadable sheet of statements. Every abstraction you will ever build — modules, classes, components, APIs — is this idea repeated at a larger scale.",
-    est_minutes=300,
+    est_minutes=330,
     glossary=[
         _gloss("function", "Named, reusable logic that takes inputs and returns a value."),
         _gloss("parameter", "A named input, written in the declaration."),
@@ -4702,6 +4703,8 @@ rather than at 3am.
         _gloss("composition", "Feeding one function's result into another: whole(withTax(x))."),
         _gloss("higher-order function", "A function that takes or returns another function."),
         _gloss("hoisting", "Function declarations are usable before the line that defines them; const arrow functions are not."),
+        _gloss("closure", "A function together with the variables it captured from the scope around it."),
+        _gloss("factory", "A function whose job is to build and return another function."),
     ],
     cheatsheet="""
 ```ts
@@ -4759,6 +4762,7 @@ applyTwice(cube, 2)   // 512
         "Can you give a parameter a default and say when the default is used?",
         "Can you say why a pure function is easier to test than one that prints?",
         "Can you pass one function into another as an argument?",
+        "Can you write a function that returns a configured function, and say what it remembers?",
     ],
     review=[
         _q("What does `return` do?",
@@ -5771,6 +5775,179 @@ console.log(applyTwice((x: number): number => x + 3, 10));   // 16
                    "map, filter and reduce — next week — are all higher-order."),
             ],
         ),
+        # ---- Lesson 8 --------------------------------------------------
+        _lesson(
+            "w5-closures", "Functions that build functions",
+            "Returning a function, and the variables it remembers.",
+            """
+A function can **return** a function, just as it can return a number. That
+sounds like a curiosity; it's actually one of the most useful tools you have.
+
+```ts
+function multiplier(factor: number): (x: number) => number {
+  return (x: number): number => x * factor;
+}
+
+const double = multiplier(2);
+const triple = multiplier(3);
+console.log(double(10));   // 20
+console.log(triple(10));   // 30
+```
+
+Read the return type `(x: number) => number` as *"…and it hands back a function
+from number to number."*
+
+**The remembering part.** `multiplier(2)` finishes and returns. Yet the little
+function it produced still knows that `factor` was 2 — forever. A function
+bundled together with the variables it captured from the scope around it is
+called a **closure**.
+
+```ts
+function counter(): () => number {
+  let n = 0;                       // lives on, privately
+  return (): number => {
+    n = n + 1;
+    return n;
+  };
+}
+
+const next = counter();
+console.log(next());   // 1
+console.log(next());   // 2
+console.log(next());   // 3
+```
+
+`n` is not a global and nothing outside can touch it, but it survives between
+calls because the returned function still holds a reference to it. That's a
+**private variable** — genuinely private, enforced by scope rather than
+convention.
+
+**Each call makes a fresh one.** `counter()` twice gives two independent
+counters with two separate `n`s. This is why closures are how you make
+*configured* behaviour:
+
+```ts
+const withRate = multiplier(1.08);    // a tax function, configured once
+```
+
+**Where you'll meet this next.** A closure is what makes `filter` calls like
+this work:
+
+```ts
+const limit = 10;
+items.filter((x) => x > limit);       // the arrow captured `limit`
+```
+
+The little function you hand to `filter` reaches out and remembers `limit` from
+the surrounding scope. You've been relying on closures without naming them.
+
+> ⚠️ **Common mistakes:** calling the outer function every time
+> (`multiplier(2)(10)` works but throws away the configured function); expecting
+> two calls to the factory to share state (they don't); and returning the
+> *result* rather than the function — `return x * factor;` in the outer body is
+> a different program entirely.
+""",
+            warmup=[
+                _q("`const double = multiplier(2); double(10)` gives…",
+                   ["2", "10", "20", "a function"], 2, "factor is 2, so 10 * 2."),
+                _q("After `const a = counter(); const b = counter(); a(); a(); b();` what did the last call print?",
+                   ["3", "2", "1", "0"], 2,
+                   "b has its own independent n, so its first call is 1."),
+                _q("A closure is…",
+                   ["a loop that closes", "a function plus the variables it captured",
+                    "a type annotation", "a return statement"], 1,
+                   "The function keeps its surrounding variables alive."),
+            ],
+            exercises=[
+                _ex("tscourse-w5-clo-1", "Return a function",
+                    "Complete multiplier so it hands back a function that multiplies by factor.",
+                    'function multiplier(factor: number): (x: number) => number {\n'
+                    '  return (x: number): number => x * factor;\n}\n'
+                    'const double = multiplier(2);\nconsole.log(double(10));\n',
+                    'return (x: number): number => x * factor;', [("", "20")],
+                    hints=["The outer function returns a function, not a number.",
+                           "Write return (x: number): number => x * factor;"],
+                    difficulty="Medium"),
+                _ex("tscourse-w5-clo-2", "Configure it once",
+                    "Build a tripling function from the factory, then use it.",
+                    _FS + 'function multiplier(factor: number): (x: number) => number {\n'
+                    '  return (x: number): number => x * factor;\n}\n'
+                    'const triple = multiplier(3);\n'
+                    'const n = Number(fs.readFileSync(0, "utf8").trim());\nconsole.log(triple(n));\n',
+                    'multiplier(3)', [("5", "15"), ("10", "30")],
+                    hints=["Call the factory once with the factor you want.",
+                           "Write multiplier(3)."]),
+                _ex("tscourse-w5-clo-3", "A private counter",
+                    "Complete the returned function so each call gives the next number.",
+                    'function counter(): () => number {\n  let n = 0;\n'
+                    '  return (): number => {\n    n = n + 1;\n    return n;\n  };\n}\n'
+                    'const next = counter();\nconsole.log(next());\nconsole.log(next());\nconsole.log(next());\n',
+                    'n = n + 1;\n    return n;', [("", "1\n2\n3")],
+                    hints=["Advance the captured variable, then hand it back.",
+                           "Write n = n + 1; then return n;"],
+                    difficulty="Medium"),
+                _ex("tscourse-w5-clo-4", "A configured greeter",
+                    "Return a function that greets a name with the captured greeting word.",
+                    _FS + 'function greeterFor(word: string): (name: string) => string {\n'
+                    '  return (name: string): string => `${word}, ${name}!`;\n}\n'
+                    'const hello = greeterFor("Hello");\n'
+                    'const who = fs.readFileSync(0, "utf8").trim();\nconsole.log(hello(who));\n',
+                    '`${word}, ${name}!`', [("Ada", "Hello, Ada!"), ("Bo", "Hello, Bo!")],
+                    hints=["The inner function sees both its own parameter and the captured word.",
+                           "Write `${word}, ${name}!`."],
+                    difficulty="Medium"),
+                _ex("tscourse-w5-clo-5", "Two independent counters",
+                    "Show that each factory call gets its own state: print a's first two, then b's first.",
+                    'function counter(): () => number {\n  let n = 0;\n'
+                    '  return (): number => {\n    n = n + 1;\n    return n;\n  };\n}\n'
+                    'const a = counter();\nconst b = counter();\n'
+                    'console.log(a());\nconsole.log(a());\nconsole.log(b());\n',
+                    'const b = counter();', [("", "1\n2\n1")],
+                    hints=["b must come from its own call to the factory.",
+                           "Write const b = counter();"],
+                    difficulty="Medium"),
+                _fix("tscourse-w5-clo-fix1", "Fix the factory that forgot to be one",
+                     "This should print 20, but the factory returns a number instead of a function. Fix it.",
+                     'function multiplier(factor: number): (x: number) => number {\n'
+                     '  return factor;\n}\n'
+                     'const double = multiplier(2);\nconsole.log(double(10));\n',
+                     'function multiplier(factor: number): (x: number) => number {\n'
+                     '  return (x: number): number => x * factor;\n}\n'
+                     'const double = multiplier(2);\nconsole.log(double(10));\n',
+                     [("", "20")],
+                     hints=["`double` is supposed to be callable, but it was handed the number 2.",
+                            "Return a function: (x: number): number => x * factor."],
+                     difficulty="Medium"),
+                _fix("tscourse-w5-clo-fix2", "Fix the shared state",
+                     "These two counters should be independent — expected 1, 2, 1 — but the second one continues the first. Fix it.",
+                     'function counter(): () => number {\n  let n = 0;\n'
+                     '  return (): number => {\n    n = n + 1;\n    return n;\n  };\n}\n'
+                     'const a = counter();\nconst b = a;\n'
+                     'console.log(a());\nconsole.log(a());\nconsole.log(b());\n',
+                     'function counter(): () => number {\n  let n = 0;\n'
+                     '  return (): number => {\n    n = n + 1;\n    return n;\n  };\n}\n'
+                     'const a = counter();\nconst b = counter();\n'
+                     'console.log(a());\nconsole.log(a());\nconsole.log(b());\n',
+                     [("", "1\n2\n1")],
+                     hints=["`const b = a;` points b at the SAME function, so it shares a's captured n.",
+                            "Call the factory again to get a fresh one: const b = counter();"],
+                     difficulty="Medium"),
+            ],
+            quiz=[
+                _q("What keeps `factor` alive after `multiplier` has returned?",
+                   ["a global variable", "the closure — the returned function captured it",
+                    "nothing, it is copied", "the type annotation"], 1,
+                   "The returned function holds a reference to the scope it was created in."),
+                _q("`(x: number) => number` written as a RETURN type means…",
+                   ["the function returns a number", "the function returns another function",
+                    "the parameter is a function", "it is a syntax error"], 1,
+                   "The whole arrow notation is the type of the returned value."),
+                _q("Why is the `n` inside `counter` effectively private?",
+                   ["it is const", "nothing outside the closure has a reference to it",
+                    "it is annotated private", "it is a global"], 1,
+                   "Scope, not convention, enforces it."),
+            ],
+        ),
     ],
     capstone=_cap_auto(
         "Budget Buddy #5 — refactored into helpers",
@@ -5881,225 +6058,1205 @@ Each helper is **pure** — it returns a value and prints nothing. All the
 ))
 
 # --- Week 6 ---------------------------------------------------------------
+_NUMS = _FS + 'const nums = fs.readFileSync(0, "utf8").trim().split(" ").map(Number);\n'
+_WORDS = _FS + 'const words = fs.readFileSync(0, "utf8").trim().split(" ");\n'
+
 _WEEKS.append(_week(
     6, 2, _M2,
     "Arrays",
-    "Store lists of values and process them with loops and array methods.",
+    "Hold lists of values, walk them, reshape them with map/filter/find, and sort them correctly.",
     """
-An **array** is an ordered list, reached by index (`nums[0]` is the first). This
-week: creating and indexing arrays, iterating them, and `map` / `filter` that
-make list-processing concise.
+A variable holds one value. An **array** holds an ordered list of them, reached
+by position. Nearly all real data is a list — rows in a report, items in a
+basket, results from a search — so this is the week your programs start looking
+like real programs.
 
-To read a line of numbers into an array:
+Two halves to it:
 
-```ts
-const nums = fs.readFileSync(0, "utf8").trim().split(" ").map(Number);
-```
+1. **The manual half** — creating, indexing, looping, accumulating. This is last
+   week's accumulator pattern applied to lists, and it never stops being useful.
+2. **The method half** — `map`, `filter`, `find`, `some`, `every`, `sort`. Each
+   takes a small function (exactly what you learned to pass in week 5) and
+   describes an operation on the *whole* list in one line.
 
-`.split(" ")` cuts the text at spaces; `.map(Number)` turns each piece into a number.
+The methods are not just shorthand. `nums.filter((x) => x > 10)` says *what you
+want*; the loop that does the same thing says *how to get it*, and you have to
+read all five lines to find out. Learn both — you need the loop when the
+operation doesn't fit a method, and the method every other time.
+
+⏱️ Budget about **five hours**.
 """,
     objectives=[
-        "Create arrays and read elements by index",
-        "Read a line of numbers into an array",
-        "Loop over an array to sum or find a max",
-        "Transform and filter with map and filter",
+        "Create arrays, index them, and reach the last element safely",
+        "Turn a line of input into an array with split, and back with join",
+        "Walk an array with for...of and an indexed for, accumulating a result",
+        "Add and remove elements, and tell mutation apart from making a new array",
+        "Transform every element with map",
+        "Select elements with filter, find, findIndex, some and every",
+        "Sort numbers and strings correctly with a comparator, without wrecking the original",
     ],
-    why="Almost all real data is a list — rows, items, results. Arrays are how you hold and process them.",
-    est_minutes=50,
+    why="Every list you will ever process — search results, table rows, log lines, basket items — is an array. The methods in this week are the vocabulary of day-to-day data work.",
+    est_minutes=300,
     glossary=[
-        _gloss("array", "An ordered list of values."),
-        _gloss("index", "A position in an array, starting at 0."),
+        _gloss("array", "An ordered list of values: [3, 5, 7]."),
+        _gloss("element", "One value inside an array."),
+        _gloss("index", "An element's position, from 0."),
+        _gloss(".length", "How many elements the array holds."),
         _gloss(".split(sep)", "Cuts a string into an array of pieces."),
-        _gloss(".map(f)", "Makes a new array by transforming each element."),
-        _gloss(".filter(f)", "Keeps only the elements that pass a test."),
-        _gloss(".join(sep)", "Glues an array back into a string."),
+        _gloss(".join(sep)", "Glues an array into one string, with sep between."),
+        _gloss(".push(x)", "Adds x to the END, changing the array in place."),
+        _gloss(".pop()", "Removes and returns the LAST element."),
+        _gloss(".shift() / .unshift(x)", "Remove from / add to the FRONT."),
+        _gloss("mutation", "Changing an array in place, so every reference to it sees the change."),
+        _gloss("spread (...)", "Copies elements out: [...a] is a fresh copy of a."),
+        _gloss(".map(f)", "A NEW array with f applied to every element. Same length."),
+        _gloss(".filter(f)", "A NEW array of only the elements passing f. Same or shorter."),
+        _gloss(".find(f)", "The FIRST element passing f, or undefined."),
+        _gloss(".findIndex(f)", "The index of the first element passing f, or -1."),
+        _gloss(".some(f) / .every(f)", "Does any / does every element pass f?"),
+        _gloss("callback", "The small function you hand to map, filter, sort…"),
+        _gloss("predicate", "A callback returning true/false, used to test elements."),
+        _gloss("comparator", "The (a, b) function sort uses to order two elements."),
     ],
     cheatsheet="""
 ```ts
+// ---- create & index --------------------------------------------------
 const a = [3, 5, 7];
-a[0]         // 3   (index starts at 0)
-a.length     // 3
-"1 2 3".split(" ").map(Number)   // [1,2,3]
-a.map((x) => x * 2)              // [6,10,14]
-a.filter((x) => x > 4)           // [5,7]
-a.join(" ")                       // "3 5 7"
+a[0]                 // 3      first
+a.length             // 3
+a[a.length - 1]      // 7      last
+a.at(-1)             // 7      last, more readably
+a[99]                // undefined  (no error)
+
+// ---- input & output --------------------------------------------------
+"1 2 3".split(" ")            // ["1","2","3"]   (strings!)
+"1 2 3".split(" ").map(Number) // [1,2,3]
+"abc".split("")               // ["a","b","c"]
+a.join(" ")                   // "3 5 7"
+a.join(", ")                  // "3, 5, 7"
+
+// ---- walk -------------------------------------------------------------
+for (const x of a) { ... }              // values
+for (let i = 0; i < a.length; i++) { }  // positions
+
+// ---- change in place (MUTATES) ---------------------------------------
+a.push(9);      // add to end        a is now [3,5,7,9]
+a.pop();        // remove from end   returns 9
+a.unshift(1);   // add to front
+a.shift();      // remove from front
+a.includes(5)   // true
+a.indexOf(5)    // 1   (or -1)
+
+// ---- make a NEW array (leaves the original alone) --------------------
+[...a]                       // a copy
+a.slice(1, 3)                // elements 1 and 2
+a.map((x) => x * 2)          // [6,10,14]
+a.filter((x) => x > 4)       // [5,7]
+a.concat([8, 9])             // a with more on the end
+
+// ---- search ------------------------------------------------------------
+a.find((x) => x > 4)         // 5      the element
+a.findIndex((x) => x > 4)    // 1      the position
+a.some((x) => x > 6)         // true   any?
+a.every((x) => x > 0)        // true   all?
+
+// ---- sort (MUTATES — copy first if you care) --------------------------
+[...a].sort((x, y) => x - y)   // ascending numbers
+[...a].sort((x, y) => y - x)   // descending numbers
+[...names].sort()               // strings, alphabetical
+[10, 9, 1].sort()               // ⚠️ [1, 10, 9] — sorts as TEXT
 ```
 """,
     self_check=[
-        "Can you read numbers into an array and print the first one?",
-        "Can you sum an array with a loop?",
-        "Can you keep only the even numbers with filter?",
+        "Can you read a line of numbers into an array and print the last one?",
+        "Can you sum an array with a loop, and say why the accumulator sits outside it?",
+        "Can you say what map returns when the array has 5 elements?",
+        "Can you pick the right one of find, filter, some and includes for a given question?",
+        "Can you sort numbers descending, without changing the original array?",
+        "Can you explain why [10, 9, 1].sort() gives [1, 10, 9]?",
     ],
     review=[
         _q("The first element of an array is at index…", ["1", "0", "-1", "any"], 1,
-           "Arrays are zero-indexed."),
+           "Arrays are zero-indexed, so the last is at length - 1."),
         _q('`"3 5".split(" ")` gives…',
-           ["35", '["3","5"]', '"3 5"', "error"], 1, "split cuts into pieces."),
-        _q("`[1,2,3].filter((x)=>x>1).length` is…", ["1", "2", "3", "0"], 1,
-           "Keeps 2 and 3 → length 2."),
+           ["35", '["3","5"]', '[3,5]', "an error"], 1,
+           'split always produces STRINGS — hence the .map(Number) that usually follows.'),
+        _q("`[1,2,3].map((x) => x * 2)` has how many elements?",
+           ["1", "2", "3", "6"], 2, "map never changes the length — one output per input."),
+        _q("`[1,2,3].filter((x) => x > 1).length` is…", ["1", "2", "3", "0"], 1,
+           "It keeps 2 and 3."),
+        _q("Which returns the ELEMENT rather than a list?",
+           ["filter", "map", "find", "some"], 2,
+           "find gives the first match itself, or undefined."),
+        _q("`[1,2,3].some((x) => x > 2)` is…", ["true", "false", "3", "[3]"], 0,
+           "At least one element passes."),
+        _q("`a.push(4)` does what to `a`?",
+           ["returns a new array", "changes a in place", "nothing", "sorts it"], 1,
+           "push mutates. map/filter/slice are the ones that return new arrays."),
+        _q("`[10, 9, 1].sort()` gives…",
+           ["[1, 9, 10]", "[1, 10, 9]", "[10, 9, 1]", "an error"], 1,
+           'With no comparator, sort compares as text: "1" < "10" < "9".'),
+        _q("Sorting numbers ascending needs the comparator…",
+           ["(a, b) => a > b", "(a, b) => a - b", "(a, b) => b - a", "none"], 1,
+           "A negative result means a comes first."),
+        _q("To sort without disturbing the original you…",
+           ["cannot", "copy first: [...a].sort(...)", "use map", "use filter"], 1,
+           "sort mutates the array it is called on."),
     ],
-    milestone="Budget Buddy can now crunch a whole month of expenses at once.",
+    milestone="Budget Buddy can now crunch a whole month of expenses at once — totals, extremes, averages and a ranked list.",
     lessons=[
+        # ---- Lesson 1 --------------------------------------------------
         _lesson(
             "w6-basics", "Creating & indexing",
-            "Arrays and their indexes.",
+            "Making an array and reaching into it.",
             """
+Write an array as a comma-separated list in square brackets:
+
 ```ts
 const names = ["Ada", "Bo", "Cy"];
-names[0]      // Ada  (indexes start at 0)
-names.length  // 3
+const nums = [3, 5, 7];
+const empty: number[] = [];
 ```
 
-> ⚠️ **Common mistakes:** expecting `a[1]` to be the first element (it's the
-> *second*), and reading past the end (`a[a.length]` is `undefined`).
+That `number[]` annotation reads as *"an array of numbers"*. You need it on an
+empty array, because there is nothing there for TypeScript to infer from.
+
+**Indexing** works exactly like string indexing — positions start at **0**:
+
+```
+ "Ada"  "Bo"  "Cy"
+   0      1     2
+```
+
+```ts
+names[0]                 // "Ada"
+names.length             // 3
+names[names.length - 1]  // "Cy"   the last one
+names.at(-1)             // "Cy"   the same, said better
+names[99]                // undefined  — no error, just nothing
+```
+
+The `length - 1` for the last element is the same off-by-one you met in week 2,
+and it catches people just as often here.
+
+**Out of range is silent.** `names[99]` doesn't throw; it hands back
+`undefined`, which then flows onward and breaks something far away. When an
+index might be out of range, check it.
+
+**Arrays can hold anything**, including other arrays:
+
+```ts
+const grid = [[1, 2], [3, 4]];
+grid[1][0]     // 3   — row 1, then column 0
+```
+
+Read `grid[1][0]` left to right: take element 1 (`[3, 4]`), then element 0 of
+that (`3`).
+
+> ⚠️ **Common mistakes:** thinking `a[1]` is the first element; using
+> `a[a.length]` for the last; and calling `a.length()` — like strings, it is a
+> property, with no parentheses.
 """,
             warmup=[
-                _q('`const a = [10,20,30]; console.log(a[1]);` prints…',
-                   ["10", "20", "30", "1"], 1, "Index 1 is the second element, 20."),
+                _q("`const a = [10,20,30]; console.log(a[1]);` prints…",
+                   ["10", "20", "30", "1"], 1, "Index 1 is the second element."),
+                _q("`[10,20,30].length` is…", ["2", "3", "30", "undefined"], 1,
+                   "Three elements."),
+                _q("`[10,20,30][3]` is…", ["30", "0", "undefined", "an error"], 2,
+                   "Valid indices are 0, 1, 2."),
+                _q("`[[1,2],[3,4]][0][1]` is…", ["1", "2", "3", "4"], 1,
+                   "Row 0 is [1,2]; its element 1 is 2."),
             ],
             exercises=[
-                _ex("tscourse-w6-b-1", "First number",
-                    "Read the numbers and print the first one.",
-                    _FS + 'const nums = fs.readFileSync(0, "utf8").trim().split(" ").map(Number);\nconsole.log(nums[0]);\n',
-                    'nums[0]', [("3 5 7", "3"), ("9", "9")],
-                    hints=["The first element is at index 0."]),
+                _ex("tscourse-w6-b-1", "First element",
+                    "Print the first name in the list.",
+                    'const names = ["Ada", "Bo", "Cy"];\nconsole.log(names[0]);\n',
+                    'names[0]', [("", "Ada")],
+                    hints=["Positions start at 0."]),
                 _ex("tscourse-w6-b-2", "How many",
-                    "Print how many space-separated words the input has.",
-                    _FS + 'const words = fs.readFileSync(0, "utf8").trim().split(" ");\nconsole.log(words.length);\n',
-                    'words.length', [("a b c d", "4"), ("hi", "1")],
-                    hints=["length gives the number of elements."]),
-                _fix("tscourse-w6-b-fix", "Fix the index",
-                     "This should print the FIRST number but prints the second. Fix it.",
-                     _FS + 'const nums = fs.readFileSync(0, "utf8").trim().split(" ").map(Number);\nconsole.log(nums[1]);\n',
-                     _FS + 'const nums = fs.readFileSync(0, "utf8").trim().split(" ").map(Number);\nconsole.log(nums[0]);\n',
-                     [("3 5 7", "3")],
+                    "Print how many names there are.",
+                    'const names = ["Ada", "Bo", "Cy"];\nconsole.log(names.length);\n',
+                    'names.length', [("", "3")],
+                    hints=["length is a property — no parentheses."]),
+                _ex("tscourse-w6-b-3", "Last element",
+                    "Print the last name, computed from the length (not typed as 2).",
+                    'const names = ["Ada", "Bo", "Cy"];\nconsole.log(names[names.length - 1]);\n',
+                    'names[names.length - 1]', [("", "Cy")],
+                    hints=["The last index is one less than the length.",
+                           "Write names[names.length - 1]."]),
+                _ex("tscourse-w6-b-4", "An annotated empty array",
+                    "Annotate the empty array as an array of numbers.",
+                    'const scores: number[] = [];\nconsole.log(scores.length);\n',
+                    'number[]', [("", "0")],
+                    hints=["An array of numbers is written number[].",
+                           "Write const scores: number[] = [];"]),
+                _ex("tscourse-w6-b-5", "Into the grid",
+                    "Print the value in row 1, column 0 (it should be 3).",
+                    'const grid = [[1, 2], [3, 4]];\nconsole.log(grid[1][0]);\n',
+                    'grid[1][0]', [("", "3")],
+                    hints=["Index the row first, then the column.",
+                           "Write grid[1][0]."]),
+                _fix("tscourse-w6-b-fix1", "Fix the index",
+                     "This should print the FIRST name but prints the second. Fix it.",
+                     'const names = ["Ada", "Bo", "Cy"];\nconsole.log(names[1]);\n',
+                     'const names = ["Ada", "Bo", "Cy"];\nconsole.log(names[0]);\n',
+                     [("", "Ada")],
                      hints=["Index 1 is the second element.",
-                            "The first element is index 0."]),
+                            "The first is index 0."]),
+                _fix("tscourse-w6-b-fix2", "Fix the off-by-one",
+                     "This should print the last name but prints nothing. Fix it.",
+                     'const names = ["Ada", "Bo", "Cy"];\nconsole.log(names[names.length]);\n',
+                     'const names = ["Ada", "Bo", "Cy"];\nconsole.log(names[names.length - 1]);\n',
+                     [("", "Cy")],
+                     hints=["A 3-element array has indices 0, 1, 2 — never 3.",
+                            "Subtract one from the length."],
+                     difficulty="Medium"),
+            ],
+            quiz=[
+                _q("For an array of length n, the valid indices are…",
+                   ["1..n", "0..n", "0..n-1", "0..n+1"], 2, "Zero-based."),
+                _q("Why annotate `const xs: number[] = []`?",
+                   ["It is required", "There is nothing in it to infer a type from",
+                    "It makes it faster", "To make it readonly"], 1,
+                   "An empty literal gives the compiler no evidence."),
             ],
         ),
+        # ---- Lesson 2 --------------------------------------------------
         _lesson(
-            "w6-iterate", "Iterating & accumulating",
-            "Walk an array with for...of.",
+            "w6-input", "split & join",
+            "Turning a line of text into an array, and back again.",
             """
-Sum the array [1,2,3,4]:
+Input arrives as one string. `split` cuts it into an array:
 
-| step | x | sum after |
-|------|---|-----------|
-| 1    | 1 | 1         |
-| 2    | 2 | 3         |
-| 3    | 3 | 6         |
-| 4    | 4 | 10        |
+```ts
+"1 2 3".split(" ")        // ["1", "2", "3"]
+"a,b,c".split(",")        // ["a", "b", "c"]
+"abc".split("")           // ["a", "b", "c"]   — every character
+```
+
+**Everything split produces is a string**, even when it looks like a number.
+`["1","2","3"]` is three strings. To compute with them, convert:
+
+```ts
+"1 2 3".split(" ").map(Number)     // [1, 2, 3]
+```
+
+`.map(Number)` runs `Number` on each piece. You'll meet `map` properly in
+lesson 5 — for now, take this as the standard opening line for a numeric
+program:
+
+```ts
+import * as fs from "fs";
+const nums = fs.readFileSync(0, "utf8").trim().split(" ").map(Number);
+```
+
+Read it right to left: read the input, trim it, cut at spaces, convert each
+piece.
+
+**`join` is the mirror image**, gluing an array into one string:
+
+```ts
+[3, 5, 7].join(" ")      // "3 5 7"
+[3, 5, 7].join(", ")     // "3, 5, 7"
+[3, 5, 7].join("")       // "357"
+["a"].join(", ")         // "a"        — no trailing separator
+[].join(", ")            // ""
+```
+
+`join` is how you print a list on one line, and it never leaves a dangling
+separator at the end — which a loop building `out += x + ", "` always does.
+
+**Why trim first.** Without `.trim()`, `"1 2 3\\n".split(" ")` gives
+`["1", "2", "3\\n"]`, and that last entry converts to a number just fine but
+prints with a stray newline. Trim, then split.
+
+> ⚠️ **Common mistakes:** forgetting `.map(Number)` and then adding strings
+> (`"1" + "2"` is `"12"`); splitting on `""` when you meant `" "`; and building
+> output with `+=` and a separator instead of using `join`.
+""",
+            warmup=[
+                _q('`"a b".split(" ")` gives…',
+                   ['"ab"', '["a","b"]', '["a b"]', '["a"," ","b"]'], 1,
+                   "Two pieces, with the separator removed."),
+                _q('`"1 2".split(" ")[0] + 1` gives…',
+                   ["2", '"11"', "11", "an error"], 1,
+                   'The piece is the STRING "1", so + joins.'),
+                _q('`[1,2,3].join("-")` gives…',
+                   ['"1-2-3"', '"123"', "[1,2,3]", '"1-2-3-"'], 0,
+                   "Separators go between, never at the end."),
+                _q('`"abc".split("")` gives…',
+                   ['["abc"]', '["a","b","c"]', '"abc"', "[]"], 1,
+                   "An empty separator splits between every character."),
+            ],
+            exercises=[
+                _ex("tscourse-w6-in-1", "Read the numbers",
+                    "Read the space-separated numbers into an array and print the first one.",
+                    _NUMS + 'console.log(nums[0]);\n',
+                    '.split(" ").map(Number)',
+                    [("3 5 7", "3"), ("9 1", "9")],
+                    hints=["Cut at spaces, then convert each piece.",
+                           'Chain .split(" ").map(Number).']),
+                _ex("tscourse-w6-in-2", "How many words",
+                    "Print how many space-separated words the input has.",
+                    _WORDS + 'console.log(words.length);\n',
+                    'words.length', [("a b c d", "4"), ("hi", "1")],
+                    hints=["Split first, then take the length."]),
+                _ex("tscourse-w6-in-3", "Join with commas",
+                    "Print the words joined by `, `.",
+                    _WORDS + 'console.log(words.join(", "));\n',
+                    'words.join(", ")', [("a b c", "a, b, c"), ("solo", "solo")],
+                    hints=["join puts the separator between elements only.",
+                           'Write words.join(", ").']),
+                _ex("tscourse-w6-in-4", "Sum two numbers from input",
+                    "The input is two numbers. Print their sum.",
+                    _NUMS + 'console.log(nums[0] + nums[1]);\n',
+                    'nums[0] + nums[1]',
+                    [("3 4", "7"), ("10 -2", "8")],
+                    hints=["They are already numbers thanks to map(Number).",
+                           "Write nums[0] + nums[1]."]),
+                _ex("tscourse-w6-in-5", "Letters of a word",
+                    "Split the input into individual characters and print them space-separated.",
+                    _FS + 'const s = fs.readFileSync(0, "utf8").trim();\n'
+                    'console.log(s.split("").join(" "));\n',
+                    's.split("").join(" ")',
+                    [("abc", "a b c"), ("hi", "h i")],
+                    hints=["An empty separator splits every character apart.",
+                           'Write s.split("").join(" ").'],
+                    difficulty="Medium"),
+                _fix("tscourse-w6-in-fix1", "Fix the missing conversion",
+                     "This should print the sum 7 for `3 4`, but prints `34`. Fix it.",
+                     _FS + 'const nums = fs.readFileSync(0, "utf8").trim().split(" ");\n'
+                     'console.log(nums[0] + nums[1]);\n',
+                     _FS + 'const nums = fs.readFileSync(0, "utf8").trim().split(" ").map(Number);\n'
+                     'console.log(nums[0] + nums[1]);\n',
+                     [("3 4", "7"), ("10 5", "15")],
+                     hints=["split gives strings, so + is joining them.",
+                            "Add .map(Number) after the split."],
+                     difficulty="Medium"),
+                _fix("tscourse-w6-in-fix2", "Fix the trailing separator",
+                     "This builds the line by hand and leaves a trailing `, `. Rewrite it using join.",
+                     _WORDS + 'let out = "";\nfor (const w of words) {\n  out += w + ", ";\n}\nconsole.log(out);\n',
+                     _WORDS + 'console.log(words.join(", "));\n',
+                     [("a b c", "a, b, c"), ("solo", "solo")],
+                     hints=["Every pass appends a separator, including after the last word.",
+                            'join solves this exactly: words.join(", ").'],
+                     difficulty="Medium"),
+            ],
+            quiz=[
+                _q("What type are the pieces from `.split(\" \")`?",
+                   ["numbers", "strings", "booleans", "it depends on the input"], 1,
+                   "Always strings — convert explicitly."),
+                _q("Why is join better than += with a separator?",
+                   ["It is faster", "It never leaves a separator dangling at the end",
+                    "It sorts", "It removes duplicates"], 1,
+                   "Separators go strictly between elements."),
+            ],
+        ),
+        # ---- Lesson 3 --------------------------------------------------
+        _lesson(
+            "w6-loop", "Walking an array",
+            "Loops and accumulators over lists.",
+            """
+Everything you learned about loops in week 4 applies directly. `for...of` hands
+you each element:
 
 ```ts
 let sum = 0;
-for (const x of [1, 2, 3, 4]) sum = sum + x;
+for (const x of [1, 2, 3, 4]) {
+  sum += x;
+}
 console.log(sum);   // 10
 ```
+
+| pass | x | sum after |
+|---|---|---|
+| 1 | 1 | 1 |
+| 2 | 2 | 3 |
+| 3 | 3 | 6 |
+| 4 | 4 | 10 |
+
+The accumulator lives **outside** the loop — same rule as always.
+
+**When you need positions**, use the indexed form:
+
+```ts
+for (let i = 0; i < nums.length; i++) {
+  console.log(`${i}: ${nums[i]}`);
+}
+```
+
+Use it when you need the index in the output, when you want to compare an
+element with its neighbour (`nums[i - 1]`), or when you're walking backwards.
+
+**The four accumulator shapes**, now over arrays:
+
+```ts
+let sum = 0;                        for (const x of a) sum += x;
+let count = 0;                      for (const x of a) if (x > 10) count++;
+let best = a[0];                    for (const x of a) if (x > best) best = x;
+let out = "";                       for (const x of a) out += x;
+```
+
+**A note on the maximum.** Over an array you can seed `best` with `a[0]` rather
+than `-Infinity`, because a real element is right there. That's better: the
+answer is guaranteed to be a value that actually appeared. It does assume the
+array is non-empty — so if it might be, check first.
+
+**Neighbour comparisons** need indices, and start at 1:
+
+```ts
+let rises = 0;
+for (let i = 1; i < a.length; i++) {
+  if (a[i] > a[i - 1]) rises++;
+}
+```
+
+Starting at `i = 1` is deliberate: element 0 has no predecessor.
+
+> ⚠️ **Common mistakes:** declaring the accumulator inside the loop; seeding a
+> maximum with 0 when the data can be negative; and looking at `a[i - 1]` from
+> `i = 0`, which is `a[-1]` — `undefined`.
 """,
             warmup=[
                 _q("Summing [2,2,2] with a for...of accumulator gives…",
-                   ["2", "6", "3", "222"], 1, "2+2+2 = 6."),
+                   ["2", "6", "3", "222"], 1, "2+2+2."),
+                _q("Why does a neighbour-comparison loop start at i = 1?",
+                   ["style", "element 0 has no previous element", "to skip the first value",
+                    "arrays start at 1"], 1,
+                   "a[-1] would be undefined."),
+                _q("Seeding `best = a[0]` rather than 0 protects against…",
+                   ["empty arrays", "all-negative data", "strings", "nothing"], 1,
+                   "With 0 as the seed, all-negative data would wrongly report 0."),
             ],
             exercises=[
-                _ex("tscourse-w6-it-1", "Sum the list",
+                _ex("tscourse-w6-lp-1", "Sum the list",
                     "Add every number and print the total.",
-                    _FS + 'const nums = fs.readFileSync(0, "utf8").trim().split(" ").map(Number);\nlet sum = 0;\nfor (const x of nums) {\n  sum = sum + x;\n}\nconsole.log(sum);\n',
-                    'sum = sum + x;', [("1 2 3 4", "10"), ("5", "5")],
-                    hints=["Add each x to the running sum."]),
-                _ex("tscourse-w6-it-2", "Largest",
-                    "Track and print the largest number in the list.",
-                    _FS + 'const nums = fs.readFileSync(0, "utf8").trim().split(" ").map(Number);\nlet best = nums[0];\nfor (const x of nums) {\n  if (x > best) {\n    best = x;\n  }\n}\nconsole.log(best);\n',
-                    'x > best', [("3 9 2 7", "9"), ("4", "4")],
-                    hints=["Replace best whenever x is bigger."]),
-                _fix("tscourse-w6-it-fix", "Fix the sum start",
-                     "This sum is always one too big. Fix it so sum(1 2 3)=6.",
-                     _FS + 'const nums = fs.readFileSync(0, "utf8").trim().split(" ").map(Number);\nlet sum = 1;\nfor (const x of nums) {\n  sum = sum + x;\n}\nconsole.log(sum);\n',
-                     _FS + 'const nums = fs.readFileSync(0, "utf8").trim().split(" ").map(Number);\nlet sum = 0;\nfor (const x of nums) {\n  sum = sum + x;\n}\nconsole.log(sum);\n',
-                     [("1 2 3", "6")],
-                     hints=["A running sum must start at 0, not 1."]),
+                    _NUMS + 'let sum = 0;\nfor (const x of nums) {\n  sum += x;\n}\nconsole.log(sum);\n',
+                    'sum += x;', [("1 2 3 4", "10"), ("5", "5")],
+                    hints=["Add each element to the running total."]),
+                _ex("tscourse-w6-lp-2", "Largest",
+                    "Print the largest number, seeding from the first element.",
+                    _NUMS + 'let best = nums[0];\nfor (const x of nums) {\n  if (x > best) {\n    best = x;\n  }\n}\nconsole.log(best);\n',
+                    'let best = nums[0];',
+                    [("3 9 2 7", "9"), ("4", "4"), ("-5 -2 -9", "-2")],
+                    hints=["Seed from a value that is actually in the list.",
+                           "Write let best = nums[0];"]),
+                _ex("tscourse-w6-lp-3", "Count the big ones",
+                    "Count how many numbers are greater than 10.",
+                    _NUMS + 'let count = 0;\nfor (const x of nums) {\n  if (x > 10) {\n    count++;\n  }\n}\nconsole.log(count);\n',
+                    'x > 10', [("5 20 30 1", "2"), ("1 2", "0")],
+                    hints=["Strictly greater, so 10 itself does not count."]),
+                _ex("tscourse-w6-lp-4", "Numbered list",
+                    "Print each element on its own line as `1. value`, numbering from 1.",
+                    _WORDS + 'for (let i = 0; i < words.length; i++) {\n  console.log(`${i + 1}. ${words[i]}`);\n}\n',
+                    '`${i + 1}. ${words[i]}`',
+                    [("a b c", "1. a\n2. b\n3. c"), ("solo", "1. solo")],
+                    hints=["The index starts at 0 but the display starts at 1.",
+                           "Write `${i + 1}. ${words[i]}`."],
+                    difficulty="Medium"),
+                _ex("tscourse-w6-lp-5", "Count the rises",
+                    "Count how many times a number is greater than the one before it.",
+                    _NUMS + 'let rises = 0;\nfor (let i = 1; i < nums.length; i++) {\n  if (nums[i] > nums[i - 1]) {\n    rises++;\n  }\n}\nconsole.log(rises);\n',
+                    'nums[i] > nums[i - 1]',
+                    [("1 3 2 5", "2"), ("5 4 3", "0"), ("1 2 3", "2")],
+                    hints=["Compare each element with its predecessor.",
+                           "Write nums[i] > nums[i - 1]."],
+                    difficulty="Medium"),
+                _ex("tscourse-w6-lp-6", "Average",
+                    "Print the average of the numbers to two decimal places.",
+                    _NUMS + 'let sum = 0;\nfor (const x of nums) {\n  sum += x;\n}\nconsole.log((sum / nums.length).toFixed(2));\n',
+                    '(sum / nums.length).toFixed(2)',
+                    [("2 4 6", "4.00"), ("1 2", "1.50")],
+                    hints=["Total first, then divide by the count — after the loop.",
+                           "Write (sum / nums.length).toFixed(2)."]),
+                _fix("tscourse-w6-lp-fix1", "Fix the sum seed",
+                     "This total is always one too big. Fix it so `1 2 3` gives 6.",
+                     _NUMS + 'let sum = 1;\nfor (const x of nums) {\n  sum += x;\n}\nconsole.log(sum);\n',
+                     _NUMS + 'let sum = 0;\nfor (const x of nums) {\n  sum += x;\n}\nconsole.log(sum);\n',
+                     [("1 2 3", "6"), ("5", "5")],
+                     hints=["What should the sum of an empty list be?",
+                            "A running total starts at 0."]),
+                _fix("tscourse-w6-lp-fix2", "Fix the maximum seed",
+                     "With all-negative input this wrongly prints 0. Fix it so `-5 -2 -9` gives -2.",
+                     _NUMS + 'let best = 0;\nfor (const x of nums) {\n  if (x > best) {\n    best = x;\n  }\n}\nconsole.log(best);\n',
+                     _NUMS + 'let best = nums[0];\nfor (const x of nums) {\n  if (x > best) {\n    best = x;\n  }\n}\nconsole.log(best);\n',
+                     [("-5 -2 -9", "-2"), ("3 9 2", "9")],
+                     hints=["0 beats every negative number, so it is never replaced.",
+                            "Seed from an element that is actually in the array: nums[0]."],
+                     difficulty="Medium"),
+            ],
+            quiz=[
+                _q("Which loop do you need to print `3: value`?",
+                   ["for...of", "an indexed for", "either", "while(true)"], 1,
+                   "Only the indexed form gives you the position."),
+                _q("An accumulator declared inside the loop body…",
+                   ["works fine", "is reset every pass", "is an error", "is faster"], 1,
+                   "It never accumulates anything."),
             ],
         ),
+        # ---- Lesson 4 --------------------------------------------------
         _lesson(
-            "w6-methods", "map & filter",
-            "Transform and select.",
+            "w6-mutate", "Growing, shrinking & copying",
+            "Changing an array in place — and when not to.",
             """
-- `map` makes a new array by transforming each element.
-- `filter` keeps only elements that pass a test.
-- `join` glues an array into a string.
+Four methods change an array **in place**:
+
+```ts
+const a = [1, 2, 3];
+a.push(4);      // [1,2,3,4]   add to the end
+a.pop();        // [1,2,3]     remove from the end, returns 4
+a.unshift(0);   // [0,1,2,3]   add to the front
+a.shift();      // [1,2,3]     remove from the front, returns 0
+```
+
+**`push` is how you build a list in a loop** — the array equivalent of `+=`:
+
+```ts
+const doubled: number[] = [];
+for (const x of nums) {
+  doubled.push(x * 2);
+}
+```
+
+**`const` does not mean frozen.** This surprises everyone once:
+
+```ts
+const a = [1, 2];
+a.push(3);      // ✅ fine — the array's CONTENTS changed
+a = [9];        // ❌ error — the NAME cannot be repointed
+```
+
+`const` fixes what the name points at, not what lives inside it.
+
+**Mutation is shared.** Assigning an array to another name does not copy it —
+both names point at the same array:
+
+```ts
+const a = [1, 2];
+const b = a;
+b.push(3);
+console.log(a);   // [1, 2, 3]   ⚠️ a changed too
+```
+
+That's the single most surprising thing in this lesson, and the cause of bugs
+that look like action at a distance. To get a genuine copy, spread it:
+
+```ts
+const b = [...a];      // a fresh array with the same elements
+b.push(3);             // a is untouched
+```
+
+**Searching:**
+
+```ts
+a.includes(2)     // true / false
+a.indexOf(2)      // 1, or -1 when absent
+```
+
+**`slice` takes a piece without mutating** (unlike its confusable neighbour
+`splice`, which does mutate):
+
+```ts
+a.slice(1, 3)     // elements 1 and 2, as a new array
+a.slice(-2)       // the last two
+```
+
+Same rules as string `slice` — the end is excluded, negatives count from the
+end.
+
+> ⚠️ **Common mistakes:** expecting `const b = a` to copy; expecting `push` to
+> return the new array (it returns the new *length*); and mixing up `slice`
+> (copies) with `splice` (mutates).
+""",
+            warmup=[
+                _q("`const a = [1,2]; a.push(3);` is…",
+                   ["an error, a is const", "fine — contents may change", "a no-op",
+                    "a copy"], 1,
+                   "const fixes the binding, not the contents."),
+                _q("`const a=[1,2]; const b=a; b.push(3); a.length` is…",
+                   ["2", "3", "0", "an error"], 1,
+                   "b is the same array, so a sees the change too."),
+                _q("`[1,2,3].pop()` returns…", ["[1,2]", "3", "1", "3 elements"], 1,
+                   "The removed element."),
+                _q("Which makes a genuine copy?",
+                   ["const b = a", "const b = [...a]", "const b = a.length",
+                    "const b = a.push()"], 1,
+                   "Spreading builds a fresh array."),
+            ],
+            exercises=[
+                _ex("tscourse-w6-mu-1", "Build with push",
+                    "Collect the doubled numbers into a new array, then print them space-separated.",
+                    _NUMS + 'const doubled: number[] = [];\nfor (const x of nums) {\n  doubled.push(x * 2);\n}\nconsole.log(doubled.join(" "));\n',
+                    'doubled.push(x * 2);',
+                    [("1 2 3", "2 4 6"), ("5", "10")],
+                    hints=["push adds to the end of the array.",
+                           "Write doubled.push(x * 2);"]),
+                _ex("tscourse-w6-mu-2", "Add to the end",
+                    "Append 99 to the list, then print it.",
+                    'const a = [1, 2, 3];\na.push(99);\nconsole.log(a.join(" "));\n',
+                    'a.push(99);', [("", "1 2 3 99")],
+                    hints=["push puts it at the end."]),
+                _ex("tscourse-w6-mu-3", "Copy before changing",
+                    "Make `b` a genuine copy so pushing to it leaves `a` alone.",
+                    'const a = [1, 2];\nconst b = [...a];\nb.push(3);\nconsole.log(a.length);\nconsole.log(b.length);\n',
+                    'const b = [...a];', [("", "2\n3")],
+                    hints=["Assignment shares; spreading copies.",
+                           "Write const b = [...a];"],
+                    difficulty="Medium"),
+                _ex("tscourse-w6-mu-4", "Is it in there?",
+                    "Print whether the list of words contains `cat`.",
+                    _WORDS + 'console.log(words.includes("cat"));\n',
+                    'words.includes("cat")',
+                    [("dog cat bird", "true"), ("dog bird", "false")],
+                    hints=["includes answers true or false.",
+                           'Write words.includes("cat").']),
+                _ex("tscourse-w6-mu-5", "Drop the first",
+                    "Print every element except the first, space-separated, without mutating.",
+                    _NUMS + 'console.log(nums.slice(1).join(" "));\n',
+                    'nums.slice(1)',
+                    [("1 2 3", "2 3"), ("9 8", "8")],
+                    hints=["slice from index 1 to the end.",
+                           "Write nums.slice(1)."]),
+                _ex("tscourse-w6-mu-6", "The last two",
+                    "Print the last two elements, space-separated.",
+                    _NUMS + 'console.log(nums.slice(-2).join(" "));\n',
+                    'nums.slice(-2)',
+                    [("1 2 3 4", "3 4"), ("7 8", "7 8")],
+                    hints=["A negative start counts from the end.",
+                           "Write nums.slice(-2)."]),
+                _fix("tscourse-w6-mu-fix1", "Fix the accidental sharing",
+                     "This should print `2` then `3`, but prints `3` then `3` — the copy is not a copy. Fix it.",
+                     'const a = [1, 2];\nconst b = a;\nb.push(3);\nconsole.log(a.length);\nconsole.log(b.length);\n',
+                     'const a = [1, 2];\nconst b = [...a];\nb.push(3);\nconsole.log(a.length);\nconsole.log(b.length);\n',
+                     [("", "2\n3")],
+                     hints=["`const b = a;` gives the same array a second name.",
+                            "Spread to build a fresh one: [...a]."],
+                     difficulty="Medium"),
+            ],
+            quiz=[
+                _q("`const` applied to an array prevents…",
+                   ["adding elements", "reassigning the name", "reading elements",
+                    "sorting"], 1,
+                   "Contents stay mutable."),
+                _q("`slice` and `splice` differ in that…",
+                   ["nothing", "slice copies, splice mutates", "splice copies, slice mutates",
+                    "slice is for strings only"], 1,
+                   "A one-letter difference with opposite consequences."),
+            ],
+        ),
+        # ---- Lesson 5 --------------------------------------------------
+        _lesson(
+            "w6-map", "map — transform every element",
+            "One output for every input.",
+            """
+`map` builds a **new** array by running a function on each element:
 
 ```ts
 const nums = [1, 2, 3];
-nums.map((x) => x * 2).join(" ")     // "2 4 6"
-nums.filter((x) => x % 2 === 1).length // 2
+nums.map((x) => x * 2);          // [2, 4, 6]
+nums.map((x) => `#${x}`);        // ["#1", "#2", "#3"]
 ```
 
-> ⚠️ **Common mistakes:** forgetting `map`/`filter` return a NEW array (they
-> don't change the original), and forgetting to `return`/produce a value in the callback.
+Compare with the loop it replaces:
+
+```ts
+const doubled: number[] = [];
+for (const x of nums) {
+  doubled.push(x * 2);
+}
+```
+
+Five lines become one, and — more importantly — the one-liner *cannot* get the
+bookkeeping wrong. There is no accumulator to seed and no push to forget.
+
+**Three facts about map, in order of how often they matter:**
+
+1. **The length never changes.** Three in, three out, always. If you want fewer,
+   you want `filter`.
+2. **A new array comes back.** The original is untouched. Ignore the return
+   value and you've done nothing.
+3. **The callback must return something.** An arrow with braces and no `return`
+   gives you an array of `undefined` — the arrow trap from week 5, in its
+   natural habitat.
+
+**The index is available** as a second parameter:
+
+```ts
+["a", "b"].map((x, i) => `${i}: ${x}`);   // ["0: a", "1: b"]
+```
+
+**Chaining** is where it gets pleasant, because each step hands an array to the
+next:
+
+```ts
+"1 2 3".split(" ").map(Number).map((x) => x * 10).join(", ");   // "10, 20, 30"
+```
+
+`.map(Number)` deserves a note: you're passing the `Number` function itself
+rather than calling it — exactly the "functions as values" idea from week 5.
+
+> ⚠️ **Common mistakes:** using `map` when you meant `filter` (the length gives
+> it away); forgetting `return` inside a braced callback; and discarding the
+> result — `nums.map(...)` on its own line changes nothing.
 """,
             warmup=[
-                _q("`[1,2,3,4].filter((x)=>x%2===0)` is…",
-                   ["[1,3]", "[2,4]", "[1,2,3,4]", "2"], 1, "Keeps the even numbers."),
+                _q("`[1,2,3].map((x) => x * 2)` is…",
+                   ["[2,4,6]", "[1,2,3]", "12", "6"], 0, "Each element doubled."),
+                _q("`[1,2,3].map((x) => x > 1)` has length…",
+                   ["1", "2", "3", "0"], 2, "map always preserves the length."),
+                _q("`[1,2].map((x) => { x * 2; })` gives…",
+                   ["[2,4]", "[undefined, undefined]", "[]", "an error"], 1,
+                   "A braced callback needs an explicit return."),
+                _q('`["a","b"].map((x, i) => `${i}${x}`)` is…',
+                   ['["0a","1b"]', '["a0","b1"]', '["ab"]', '["1a","2b"]'], 0,
+                   "The second parameter is the index, counting from 0."),
             ],
             exercises=[
-                _ex("tscourse-w6-m-1", "Count evens",
-                    "Keep the even numbers and print how many there are.",
-                    _FS + 'const nums = fs.readFileSync(0, "utf8").trim().split(" ").map(Number);\nconst evens = nums.filter((x) => x % 2 === 0);\nconsole.log(evens.length);\n',
-                    'x % 2 === 0', [("1 2 3 4 5 6", "3"), ("1 3 5", "0")],
-                    hints=["Even means remainder 0 mod 2."]),
-                _ex("tscourse-w6-m-2", "Double them",
+                _ex("tscourse-w6-mp-1", "Double them",
                     "Double every number and print them space-separated.",
-                    _FS + 'const nums = fs.readFileSync(0, "utf8").trim().split(" ").map(Number);\nconst doubled = nums.map((x) => x * 2);\nconsole.log(doubled.join(" "));\n',
-                    'x * 2', [("1 2 3", "2 4 6"), ("10", "20")],
-                    hints=["map transforms each x to x * 2."]),
-                _fix("tscourse-w6-m-fix", "Fix filter vs map",
-                     "This should COUNT the evens, but it doubles instead. Fix it.",
-                     _FS + 'const nums = fs.readFileSync(0, "utf8").trim().split(" ").map(Number);\nconst evens = nums.map((x) => x % 2 === 0);\nconsole.log(evens.length);\n',
-                     _FS + 'const nums = fs.readFileSync(0, "utf8").trim().split(" ").map(Number);\nconst evens = nums.filter((x) => x % 2 === 0);\nconsole.log(evens.length);\n',
-                     [("1 2 3 4 5 6", "3")],
-                     hints=["map keeps every element (so length never changes).",
-                            "To keep only some elements, use filter."],
+                    _NUMS + 'console.log(nums.map((x) => x * 2).join(" "));\n',
+                    'nums.map((x) => x * 2)',
+                    [("1 2 3", "2 4 6"), ("10", "20")],
+                    hints=["map transforms each element.",
+                           "Write nums.map((x) => x * 2)."]),
+                _ex("tscourse-w6-mp-2", "Shout the words",
+                    "Uppercase every word and print them space-separated.",
+                    _WORDS + 'console.log(words.map((w) => w.toUpperCase()).join(" "));\n',
+                    'w.toUpperCase()',
+                    [("a bc", "A BC"), ("hi there", "HI THERE")],
+                    hints=["The callback receives one word at a time.",
+                           "Return w.toUpperCase()."]),
+                _ex("tscourse-w6-mp-3", "Number the words",
+                    "Print each word prefixed by its 1-based position, comma-separated: `1:a, 2:b`.",
+                    _WORDS + 'console.log(words.map((w, i) => `${i + 1}:${w}`).join(", "));\n',
+                    '`${i + 1}:${w}`',
+                    [("a b", "1:a, 2:b"), ("solo", "1:solo")],
+                    hints=["The second callback parameter is the index, from 0.",
+                           "Write `${i + 1}:${w}`."],
+                    difficulty="Medium"),
+                _ex("tscourse-w6-mp-4", "Lengths",
+                    "Print the length of each word, space-separated.",
+                    _WORDS + 'console.log(words.map((w) => w.length).join(" "));\n',
+                    'w.length',
+                    [("a bb ccc", "1 2 3"), ("hello", "5")],
+                    hints=["Return each word's length.", "Write w.length."]),
+                _ex("tscourse-w6-mp-5", "Chain two steps",
+                    "Multiply every number by 10, then print them comma-separated.",
+                    _NUMS + 'console.log(nums.map((x) => x * 10).join(", "));\n',
+                    '.map((x) => x * 10).join(", ")',
+                    [("1 2 3", "10, 20, 30"), ("7", "70")],
+                    hints=["map produces an array, which join then turns into text.",
+                           'Chain .map((x) => x * 10).join(", ").']),
+                _fix("tscourse-w6-mp-fix1", "Fix the missing return",
+                     "This should double the numbers but prints a row of `undefined`. Fix it.",
+                     _NUMS + 'console.log(nums.map((x) => { x * 2; }).join(" "));\n',
+                     _NUMS + 'console.log(nums.map((x) => x * 2).join(" "));\n',
+                     [("1 2 3", "2 4 6")],
+                     hints=["A braced arrow body returns nothing unless you say so.",
+                            "Drop the braces, or add return."],
                      difficulty="Medium"),
+                _fix("tscourse-w6-mp-fix2", "Fix the discarded result",
+                     "This should print the doubled numbers but prints the originals. Fix it.",
+                     _NUMS + 'nums.map((x) => x * 2);\nconsole.log(nums.join(" "));\n',
+                     _NUMS + 'const doubled = nums.map((x) => x * 2);\nconsole.log(doubled.join(" "));\n',
+                     [("1 2 3", "2 4 6"), ("5", "10")],
+                     hints=["map does not change nums — it returns a new array that is being thrown away.",
+                            "Store the result and print that."],
+                     difficulty="Medium"),
+            ],
+            quiz=[
+                _q("`a.map(f)` where a has 5 elements returns an array of length…",
+                   ["0..5", "exactly 5", "1", "it depends on f"], 1,
+                   "map is one-for-one; only filter can shorten."),
+                _q("`nums.map(Number)` passes…",
+                   ["the result of Number", "the Number function itself", "a string",
+                    "nothing"], 1,
+                   "No parentheses — a function as a value, as in week 5."),
+            ],
+        ),
+        # ---- Lesson 6 --------------------------------------------------
+        _lesson(
+            "w6-filter", "filter, find & friends",
+            "Selecting elements, and asking questions about them.",
+            """
+`filter` keeps the elements whose callback returns `true`:
+
+```ts
+const nums = [1, 2, 3, 4, 5, 6];
+nums.filter((x) => x % 2 === 0);    // [2, 4, 6]
+nums.filter((x) => x > 100);        // []          — empty, not undefined
+```
+
+A callback that returns true/false is called a **predicate**. Everything in this
+lesson takes one; they differ only in what they hand back:
+
+| method | question | answer |
+|---|---|---|
+| `filter` | which ones? | a new **array** (possibly empty) |
+| `find` | the first one? | the **element**, or `undefined` |
+| `findIndex` | where is the first one? | the **index**, or `-1` |
+| `some` | any at all? | `true` / `false` |
+| `every` | all of them? | `true` / `false` |
+
+```ts
+nums.find((x) => x > 3);        // 4        the element itself
+nums.findIndex((x) => x > 3);   // 3        its position
+nums.some((x) => x > 5);        // true
+nums.every((x) => x > 0);       // true
+```
+
+**Choose by what you actually need.** Reaching for `filter(...)[0]` when you
+want one element works but scans the whole array and allocates one you throw
+away; `find` says what you mean. `filter(...).length > 0` is `some`.
+
+**Two edge cases worth knowing:**
+
+- `find` returns `undefined` when nothing matches — check for it before using
+  the result.
+- `every` on an **empty** array is `true`. ("Every element passes" is vacuously
+  true when there are no elements.) It's a real source of surprise when a filter
+  upstream emptied the list.
+
+**Chaining filter and map** is the everyday pattern — narrow, then reshape:
+
+```ts
+words.filter((w) => w.length > 3).map((w) => w.toUpperCase()).join(", ")
+```
+
+Filter first when you can: there's less left to transform.
+
+> ⚠️ **Common mistakes:** using `map` when you meant `filter`; forgetting `find`
+> can be `undefined`; and testing `findIndex(...)` for truthiness, when index 0
+> is a real match (the `indexOf` trap from week 2, again).
+""",
+            warmup=[
+                _q("`[1,2,3,4].filter((x) => x % 2 === 0)` is…",
+                   ["[1,3]", "[2,4]", "[1,2,3,4]", "2"], 1, "The even ones."),
+                _q("`[1,2,3].find((x) => x > 1)` is…", ["[2,3]", "2", "1", "true"], 1,
+                   "The first matching element itself."),
+                _q("`[1,2,3].find((x) => x > 9)` is…", ["[]", "-1", "undefined", "0"], 2,
+                   "find has nothing to return."),
+                _q("`[].every((x) => x > 5)` is…", ["true", "false", "undefined", "an error"], 0,
+                   "Vacuously true — there is no element that fails."),
+            ],
+            exercises=[
+                _ex("tscourse-w6-fl-1", "Keep the evens",
+                    "Print the even numbers, space-separated.",
+                    _NUMS + 'console.log(nums.filter((x) => x % 2 === 0).join(" "));\n',
+                    'x % 2 === 0',
+                    [("1 2 3 4 5 6", "2 4 6"), ("1 3", "")],
+                    hints=["Even means remainder 0 mod 2."]),
+                _ex("tscourse-w6-fl-2", "Count the big ones",
+                    "Print how many numbers are greater than 10.",
+                    _NUMS + 'console.log(nums.filter((x) => x > 10).length);\n',
+                    'nums.filter((x) => x > 10).length',
+                    [("5 20 30 1", "2"), ("1 2", "0")],
+                    hints=["Filter first, then take the length.",
+                           "Write nums.filter((x) => x > 10).length."]),
+                _ex("tscourse-w6-fl-3", "First over ten",
+                    "Print the first number greater than 10, or `none` if there isn't one.",
+                    _NUMS + 'const hit = nums.find((x) => x > 10);\n'
+                    'console.log(hit === undefined ? "none" : hit);\n',
+                    'nums.find((x) => x > 10)',
+                    [("5 20 30", "20"), ("1 2", "none")],
+                    hints=["find gives the element or undefined.",
+                           "Write nums.find((x) => x > 10)."],
+                    difficulty="Medium"),
+                _ex("tscourse-w6-fl-4", "Any negatives?",
+                    "Print whether any number is negative.",
+                    _NUMS + 'console.log(nums.some((x) => x < 0));\n',
+                    'nums.some((x) => x < 0)',
+                    [("1 -2 3", "true"), ("1 2", "false")],
+                    hints=["'Any at all' is exactly what some answers.",
+                           "Write nums.some((x) => x < 0)."]),
+                _ex("tscourse-w6-fl-5", "All positive?",
+                    "Print whether every number is greater than 0.",
+                    _NUMS + 'console.log(nums.every((x) => x > 0));\n',
+                    'nums.every((x) => x > 0)',
+                    [("1 2 3", "true"), ("1 -2", "false")],
+                    hints=["every requires all of them to pass.",
+                           "Write nums.every((x) => x > 0)."]),
+                _ex("tscourse-w6-fl-6", "Narrow then reshape",
+                    "Keep the words longer than 3 characters, uppercase them, and join with `, `.",
+                    _WORDS + 'console.log(words.filter((w) => w.length > 3).map((w) => w.toUpperCase()).join(", "));\n',
+                    '.filter((w) => w.length > 3).map((w) => w.toUpperCase())',
+                    [("hi there you all", "THERE"), ("abcd efgh", "ABCD, EFGH")],
+                    hints=["Filter first so there is less to transform.",
+                           "Chain .filter(...) then .map(...)."],
+                    difficulty="Medium"),
+                _fix("tscourse-w6-fl-fix1", "Fix filter vs map",
+                     "This should COUNT the evens (3 of them) but always prints 6. Fix it.",
+                     _NUMS + 'const evens = nums.map((x) => x % 2 === 0);\nconsole.log(evens.length);\n',
+                     _NUMS + 'const evens = nums.filter((x) => x % 2 === 0);\nconsole.log(evens.length);\n',
+                     [("1 2 3 4 5 6", "3"), ("1 3 5", "0")],
+                     hints=["map keeps every element, so its length never changes.",
+                            "To keep only some, use filter."],
+                     difficulty="Medium"),
+            ],
+            quiz=[
+                _q("You need the first matching element. Best choice?",
+                   ["filter(...)[0]", "find(...)", "some(...)", "map(...)"], 1,
+                   "find says what you mean and stops at the first match."),
+                _q("`arr.filter(p).length > 0` can be written as…",
+                   ["arr.every(p)", "arr.some(p)", "arr.find(p)", "arr.map(p)"], 1,
+                   "some asks exactly that question."),
+                _q("`findIndex` returns what when nothing matches?",
+                   ["undefined", "-1", "0", "null"], 1,
+                   "Same sentinel as indexOf — and the same truthiness trap."),
+            ],
+        ),
+        # ---- Lesson 7 --------------------------------------------------
+        _lesson(
+            "w6-sort", "Sorting",
+            "Ordering a list — and the trap that catches everyone.",
+            """
+Start with the trap, because you will hit it:
+
+```ts
+[10, 9, 1].sort();      // [1, 10, 9]   ⚠️ not what you wanted
+```
+
+With no argument, `sort` converts every element to a **string** and orders them
+alphabetically. As text, `"10"` really does come before `"9"`, because `1` comes
+before `9`. This is not a bug; it's a default that suits words and ruins
+numbers.
+
+**Numbers need a comparator** — a function of two elements that returns a
+number:
+
+```ts
+[10, 9, 1].sort((a, b) => a - b);    // [1, 9, 10]    ascending
+[10, 9, 1].sort((a, b) => b - a);    // [10, 9, 1]    descending
+```
+
+The contract is:
+
+| `compare(a, b)` returns | meaning |
+|---|---|
+| negative | `a` comes first |
+| positive | `b` comes first |
+| `0` | leave their order alone |
+
+So `a - b` is negative exactly when `a` is smaller — ascending. Swap to `b - a`
+for descending. You do not need to memorise more than that.
+
+**Strings sort sensibly by default:**
+
+```ts
+["Cy", "Ada", "Bo"].sort();     // ["Ada", "Bo", "Cy"]
+```
+
+Though capitals sort before lowercase (`"Z" < "a"`), so normalise the case first
+if that matters.
+
+**`sort` mutates.** It reorders the array you called it on and returns that same
+array — it does not hand you a sorted copy:
+
+```ts
+const a = [3, 1, 2];
+const b = a.sort((x, y) => x - y);
+console.log(a);          // [1,2,3]  ⚠️ a was reordered
+console.log(b === a);    // true     — the same array
+```
+
+If the original matters, **copy first** — the idiom is worth memorising:
+
+```ts
+const sorted = [...a].sort((x, y) => x - y);
+```
+
+**`reverse` also mutates**, so the same rule applies: `[...a].reverse()`.
+
+**Sorting by a field** is the everyday case, and it's the same comparator with
+the field named:
+
+```ts
+[...people].sort((p, q) => p.age - q.age);
+```
+
+You'll use exactly this next week, on arrays of objects.
+
+> ⚠️ **Common mistakes:** sorting numbers without a comparator; forgetting that
+> `sort` mutates and then wondering why an earlier printout changed; and writing
+> `(a, b) => a > b`, which returns a boolean where a number is required.
+""",
+            warmup=[
+                _q("`[10, 9, 1].sort()` gives…",
+                   ["[1,9,10]", "[1,10,9]", "[10,9,1]", "an error"], 1,
+                   "Default sort compares as text."),
+                _q("`[10, 9, 1].sort((a,b) => a - b)` gives…",
+                   ["[1,9,10]", "[1,10,9]", "[10,9,1]", "[]"], 0, "Ascending numeric."),
+                _q("`(a, b) => b - a` sorts…", ["ascending", "descending", "randomly",
+                                                "alphabetically"], 1,
+                   "The sign is flipped, so bigger comes first."),
+                _q("After `a.sort(...)`, the array `a` is…",
+                   ["unchanged", "reordered in place", "emptied", "copied"], 1,
+                   "sort mutates — copy first if you need the original."),
+            ],
+            exercises=[
+                _ex("tscourse-w6-so-1", "Sort ascending",
+                    "Print the numbers in ascending order, space-separated.",
+                    _NUMS + 'console.log([...nums].sort((a, b) => a - b).join(" "));\n',
+                    '(a, b) => a - b',
+                    [("10 9 1", "1 9 10"), ("3 1 2", "1 2 3")],
+                    hints=["Numbers need a comparator, or they sort as text.",
+                           "Write (a, b) => a - b."]),
+                _ex("tscourse-w6-so-2", "Sort descending",
+                    "Print the numbers largest first, space-separated.",
+                    _NUMS + 'console.log([...nums].sort((a, b) => b - a).join(" "));\n',
+                    '(a, b) => b - a',
+                    [("1 9 10", "10 9 1"), ("3 1 2", "3 2 1")],
+                    hints=["Flip the subtraction to reverse the order.",
+                           "Write (a, b) => b - a."]),
+                _ex("tscourse-w6-so-3", "Alphabetical",
+                    "Print the words in alphabetical order, space-separated.",
+                    _WORDS + 'console.log([...words].sort().join(" "));\n',
+                    '[...words].sort()',
+                    [("cy ada bo", "ada bo cy"), ("b a", "a b")],
+                    hints=["Strings sort sensibly with no comparator at all.",
+                           "Write [...words].sort()."]),
+                _ex("tscourse-w6-so-4", "Keep the original",
+                    "Print the sorted list, then the ORIGINAL list unchanged.",
+                    _NUMS + 'const sorted = [...nums].sort((a, b) => a - b);\n'
+                    'console.log(sorted.join(" "));\nconsole.log(nums.join(" "));\n',
+                    'const sorted = [...nums].sort((a, b) => a - b);',
+                    [("3 1 2", "1 2 3\n3 1 2"), ("2 1", "1 2\n2 1")],
+                    hints=["sort mutates, so sort a copy.",
+                           "Write const sorted = [...nums].sort((a, b) => a - b);"],
+                    difficulty="Medium"),
+                _ex("tscourse-w6-so-5", "The three smallest",
+                    "Print the three smallest numbers in ascending order, space-separated.",
+                    _NUMS + 'console.log([...nums].sort((a, b) => a - b).slice(0, 3).join(" "));\n',
+                    '.slice(0, 3)',
+                    [("5 3 9 1 7", "1 3 5"), ("2 1 4", "1 2 4")],
+                    hints=["Sort ascending, then take the front of the list.",
+                           "Chain .slice(0, 3)."],
+                    difficulty="Medium"),
+                _ex("tscourse-w6-so-6", "Second largest",
+                    "Print the second largest number.",
+                    _NUMS + 'console.log([...nums].sort((a, b) => b - a)[1]);\n',
+                    '[...nums].sort((a, b) => b - a)[1]',
+                    [("5 3 9 1", "5"), ("2 7", "2")],
+                    hints=["Sort descending, then take index 1.",
+                           "Write [...nums].sort((a, b) => b - a)[1]."],
+                    difficulty="Medium"),
+                _fix("tscourse-w6-so-fix1", "Fix the text sort",
+                     "This should sort numbers ascending but gives `1 10 9`. Fix it.",
+                     _NUMS + 'console.log([...nums].sort().join(" "));\n',
+                     _NUMS + 'console.log([...nums].sort((a, b) => a - b).join(" "));\n',
+                     [("10 9 1", "1 9 10"), ("100 20 3", "3 20 100")],
+                     hints=["With no comparator, sort compares string forms.",
+                            "Supply (a, b) => a - b."],
+                     difficulty="Medium"),
+                _fix("tscourse-w6-so-fix2", "Fix the clobbered original",
+                     "The second line should print the ORIGINAL order but prints the sorted one. Fix it.",
+                     _NUMS + 'const sorted = nums.sort((a, b) => a - b);\n'
+                     'console.log(sorted.join(" "));\nconsole.log(nums.join(" "));\n',
+                     _NUMS + 'const sorted = [...nums].sort((a, b) => a - b);\n'
+                     'console.log(sorted.join(" "));\nconsole.log(nums.join(" "));\n',
+                     [("3 1 2", "1 2 3\n3 1 2")],
+                     hints=["sort reordered nums itself, and returned that same array.",
+                            "Sort a copy: [...nums].sort(...)."],
+                     difficulty="Medium"),
+            ],
+            quiz=[
+                _q("A comparator returning a negative number means…",
+                   ["a comes first", "b comes first", "they are equal", "an error"], 0,
+                   "Negative keeps a ahead of b."),
+                _q("`(a, b) => a > b` as a comparator is wrong because…",
+                   ["it is too slow", "it returns a boolean where a number is needed",
+                    "it sorts descending", "it mutates"], 1,
+                   "true/false convert to 1/0, so 'a comes first' can never be expressed."),
+                _q("`[...a].sort()` rather than `a.sort()` because…",
+                   ["it is faster", "sort mutates, and the copy protects the original",
+                    "sort needs an array", "no reason"], 1,
+                   "The spread makes a fresh array for sort to reorder."),
             ],
         ),
     ],
     capstone=_cap_auto(
-        "Budget Buddy #6 — month stats",
+        "Budget Buddy #6 — the month in numbers",
         """
-Read a line of expense **amounts** and print three stats:
+Budget Buddy finally sees a whole month at once. The input is a line of
+expense amounts:
 
 ```
-total 14
-biggest 5
-count 5
+12 3 45 7 3 20
 ```
 
-for input `3 1 4 1 5`.
+Print a six-line summary:
+
+```
+Count:    6
+Total:    $90.00
+Average:  $15.00
+Largest:  $45.00
+Smallest: $3.00
+Top 3:    45, 20, 12
+```
+
+Rules:
+
+- Money is shown to two decimal places.
+- `Top 3` is the three largest amounts, largest first, joined with `, `. If
+  there are fewer than three, show all of them.
+- The input array must be left **unsorted** — sort copies, not the original.
 """,
-        _ch("tscourse-w6-capstone", "Budget Buddy #6", "Easy",
-            "Compute total and the biggest in one pass, then print the report.",
-            _FS + 'const nums = fs.readFileSync(0, "utf8").trim().split(" ").map(Number);\n'
-            'let total = 0;\nlet biggest = nums[0];\nfor (const x of nums) {\n  total = total + x;\n  if (x > biggest) {\n    biggest = x;\n  }\n}\n'
-            'console.log(`total ${total}`);\nconsole.log(`biggest ${biggest}`);\nconsole.log(`count ${nums.length}`);\n',
-            'let total = 0;\nlet biggest = nums[0];\nfor (const x of nums) {\n  total = total + x;\n  if (x > biggest) {\n    biggest = x;\n  }\n}\n'
-            'console.log(`total ${total}`);\nconsole.log(`biggest ${biggest}`);\nconsole.log(`count ${nums.length}`);',
-            [("3 1 4 1 5", "total 14\nbiggest 5\ncount 5"), ("10", "total 10\nbiggest 10\ncount 1")],
-            hints=["Start biggest at nums[0].",
-                   "Update total and biggest together in one loop.",
-                   "count is nums.length."]),
-        example_io="total 14\nbiggest 5\ncount 5",
-        rubric=["Prints total, biggest and count",
-                "Computes total and biggest in a single loop",
-                "biggest starts from the first element"],
+        _ch("tscourse-w6-capstone", "Budget Buddy #6", "Medium",
+            "Compute the six statistics and print them.",
+            _NUMS +
+            'let total = 0;\n'
+            'for (const x of nums) {\n  total += x;\n}\n'
+            'const desc = [...nums].sort((a, b) => b - a);\n'
+            'console.log(`Count:    ${nums.length}`);\n'
+            'console.log(`Total:    $${total.toFixed(2)}`);\n'
+            'console.log(`Average:  $${(total / nums.length).toFixed(2)}`);\n'
+            'console.log(`Largest:  $${desc[0].toFixed(2)}`);\n'
+            'console.log(`Smallest: $${desc[desc.length - 1].toFixed(2)}`);\n'
+            'console.log(`Top 3:    ${desc.slice(0, 3).join(", ")}`);\n',
+            'let total = 0;\n'
+            'for (const x of nums) {\n  total += x;\n}\n'
+            'const desc = [...nums].sort((a, b) => b - a);\n'
+            'console.log(`Count:    ${nums.length}`);\n'
+            'console.log(`Total:    $${total.toFixed(2)}`);\n'
+            'console.log(`Average:  $${(total / nums.length).toFixed(2)}`);\n'
+            'console.log(`Largest:  $${desc[0].toFixed(2)}`);\n'
+            'console.log(`Smallest: $${desc[desc.length - 1].toFixed(2)}`);\n'
+            'console.log(`Top 3:    ${desc.slice(0, 3).join(", ")}`);',
+            [("12 3 45 7 3 20",
+              "Count:    6\nTotal:    $90.00\nAverage:  $15.00\nLargest:  $45.00\nSmallest: $3.00\nTop 3:    45, 20, 12"),
+             ("10", "Count:    1\nTotal:    $10.00\nAverage:  $10.00\nLargest:  $10.00\nSmallest: $10.00\nTop 3:    10"),
+             ("5 1", "Count:    2\nTotal:    $6.00\nAverage:  $3.00\nLargest:  $5.00\nSmallest: $1.00\nTop 3:    5, 1")],
+            hints=["Total needs a loop and an accumulator — reduce arrives in week 8.",
+                   "Sort a COPY descending once, and read largest, smallest and the top three off it.",
+                   "The smallest is the last element of the descending copy: desc[desc.length - 1].",
+                   'Top 3 is desc.slice(0, 3).join(", ") — slice happily returns fewer if there are fewer.']),
+        example_io="Count:    6\nTotal:    $90.00\nAverage:  $15.00\nLargest:  $45.00\nSmallest: $3.00\nTop 3:    45, 20, 12",
+        rubric=["Count, total, average, largest and smallest are all computed from the array",
+                "Money values carry two decimal places",
+                "Top 3 is sorted descending and joined with a comma and a space",
+                "The original array is never mutated — sorting happens on a copy"],
         stretch=_ch("tscourse-w6-capstone-stretch", "Budget Buddy #6 (stretch)", "Medium",
-                    "Also print `average <avg>` where avg = total / count (a decimal is fine).",
-                    _FS + 'const nums = fs.readFileSync(0, "utf8").trim().split(" ").map(Number);\n'
-                    'let total = 0;\nfor (const x of nums) {\n  total = total + x;\n}\n'
-                    'console.log(`total ${total}`);\nconsole.log(`count ${nums.length}`);\nconsole.log(`average ${total / nums.length}`);\n',
-                    'let total = 0;\nfor (const x of nums) {\n  total = total + x;\n}\n'
-                    'console.log(`total ${total}`);\nconsole.log(`count ${nums.length}`);\nconsole.log(`average ${total / nums.length}`);',
-                    [("2 4 6", "total 12\ncount 3\naverage 4"), ("10", "total 10\ncount 1\naverage 10")],
-                    hints=["average is total divided by the count.",
-                           "Use total / nums.length."]),
+                    "Add a seventh line, `Over avg: <n>`, counting how many amounts are strictly above the average.",
+                    _NUMS +
+                    'let total = 0;\n'
+                    'for (const x of nums) {\n  total += x;\n}\n'
+                    'const avg = total / nums.length;\n'
+                    'const desc = [...nums].sort((a, b) => b - a);\n'
+                    'console.log(`Count:    ${nums.length}`);\n'
+                    'console.log(`Total:    $${total.toFixed(2)}`);\n'
+                    'console.log(`Average:  $${avg.toFixed(2)}`);\n'
+                    'console.log(`Largest:  $${desc[0].toFixed(2)}`);\n'
+                    'console.log(`Smallest: $${desc[desc.length - 1].toFixed(2)}`);\n'
+                    'console.log(`Top 3:    ${desc.slice(0, 3).join(", ")}`);\n'
+                    'console.log(`Over avg: ${nums.filter((x) => x > avg).length}`);\n',
+                    'console.log(`Over avg: ${nums.filter((x) => x > avg).length}`);',
+                    [("12 3 45 7 3 20",
+                      "Count:    6\nTotal:    $90.00\nAverage:  $15.00\nLargest:  $45.00\nSmallest: $3.00\nTop 3:    45, 20, 12\nOver avg: 2"),
+                     ("5 1", "Count:    2\nTotal:    $6.00\nAverage:  $3.00\nLargest:  $5.00\nSmallest: $1.00\nTop 3:    5, 1\nOver avg: 1")],
+                    hints=["Name the average once so both the printout and the count can use it.",
+                           "Counting matches is filter then .length.",
+                           "Write nums.filter((x) => x > avg).length."]),
     ),
 ))
 
@@ -6107,204 +7264,1334 @@ for input `3 1 4 1 5`.
 _WEEKS.append(_week(
     7, 2, _M2,
     "Objects",
-    "Model structured data with objects, and combine them with arrays.",
+    "Model a 'thing' as a bundle of named fields, reach into it safely, and process arrays of records.",
     """
-An **object** groups related values under named keys — perfect for a 'thing'
-like an expense or a user. This week: object literals, reading and updating
-properties, and arrays of objects (the shape of most real data).
+An array holds many values in a row. An **object** holds a few values *by name*:
 
 ```ts
-const user = { name: "Ada", age: 36 };
-user.name          // Ada
-user.age = user.age + 1;
+const expense = { desc: "coffee", amount: 3.25, paid: true };
 ```
+
+Arrays answer "which one?" with a number. Objects answer "which one?" with a
+word — and words are what real data is made of. An expense has a description,
+an amount and a paid flag; calling them `e[0]`, `e[1]`, `e[2]` would be
+technically possible and humanly hopeless.
+
+Put the two together and you get **an array of objects** — the shape of very
+nearly every dataset you will ever touch:
+
+```ts
+const expenses = [
+  { desc: "coffee", amount: 3.25, paid: true },
+  { desc: "book",   amount: 12,   paid: false },
+];
+```
+
+This week: building objects, reaching into them (including when a field might
+not be there), passing them around, processing lists of them, the sharing
+behaviour that catches everyone out, and using an object as a **lookup table** —
+which is the single most useful trick in the whole course.
+
+⏱️ Budget about **five hours**.
 """,
     objectives=[
-        "Create objects and read properties with dot access",
-        "Update a property on an object",
-        "Pass objects into functions",
-        "Loop over an array of objects and reach into each one",
+        "Create objects, read fields with dot access, and update or add fields",
+        "Reach a field whose name is decided at runtime, with bracket access",
+        "Handle missing fields with in, optional chaining and ??",
+        "Navigate nested objects and arrays inside objects",
+        "Take objects as parameters and return them, with destructuring",
+        "Filter, map and sort an array of records by a field",
+        "Tell sharing from copying, and make a copy with spread",
+        "Count and group with an object used as a lookup table",
     ],
-    why="Objects model the real world — a product, a user, an expense — as one tidy bundle of fields.",
-    est_minutes=45,
+    why="Objects are how a program talks about the real world — a user, an order, a row, a config. Once you can model data as records and process a list of them, you can write actual applications.",
+    est_minutes=300,
     glossary=[
-        _gloss("object", "A bundle of named values (keys) — { name: \"Ada\" }."),
-        _gloss("property / key", "A named slot on an object."),
-        _gloss("dot access", "Reaching a property: obj.name."),
-        _gloss("array of objects", "A list where each item is an object — the shape of most data."),
+        _gloss("object", "A bundle of named values: { name: \"Ada\" }."),
+        _gloss("property / field / key", "One named slot on an object."),
+        _gloss("value", "What is stored in a slot."),
+        _gloss("dot access", "Reaching a known field: obj.name."),
+        _gloss("bracket access", "Reaching a field by a name computed at runtime: obj[k]."),
+        _gloss("shorthand", "{ name } is short for { name: name }."),
+        _gloss("in", "Tests whether a key exists: \"paid\" in obj."),
+        _gloss("optional chaining (?.)", "Reads a field only if the thing exists, else undefined."),
+        _gloss("?? (nullish coalescing)", "A fallback used only for null/undefined, not for 0 or \"\"."),
+        _gloss("destructuring", "Pulling fields into names: const { desc, amount } = e;"),
+        _gloss("record", "An object used as one row of data."),
+        _gloss("reference", "A name pointing at an object. Two names can point at the same one."),
+        _gloss("aliasing", "Two names sharing one object, so a change through either is seen by both."),
+        _gloss("shallow copy", "{ ...o } — a new top-level object, but nested objects are still shared."),
+        _gloss("lookup table", "An object used as a name-to-value map."),
+        _gloss("Object.keys / values / entries", "Turn an object into an array of its keys, values, or [key, value] pairs."),
     ],
     cheatsheet="""
 ```ts
-const p = { name: "Ada", age: 36 };
-p.name           // "Ada"
-p.age = p.age + 1;  // update
-const people = [{ name: "Ada", age: 36 }, { name: "Bo", age: 20 }];
-for (const q of people) total = total + q.age;
-people.filter((q) => q.age >= 21)
+// ---- create & read ---------------------------------------------------
+const e = { desc: "coffee", amount: 3.25, paid: true };
+e.desc                    // "coffee"
+e.missing                 // undefined  (no error)
+e.amount = 4;             // update
+e.tag = "food";           // add (needs a `let`-style shape or an annotation)
+
+const desc = "tea";
+const f = { desc };       // shorthand for { desc: desc }
+
+// ---- dynamic keys -----------------------------------------------------
+const k = "amount";
+e[k]                      // 3.25   bracket access
+"paid" in e               // true
+Object.keys(e)            // ["desc","amount","paid"]
+Object.values(e)          // ["coffee",3.25,true]
+Object.entries(e)         // [["desc","coffee"], ...]
+
+// ---- possibly missing --------------------------------------------------
+user?.address?.city       // undefined instead of a crash
+e.note ?? "(none)"        // fallback ONLY for null/undefined
+e.count ?? 0              // 0 stays 0; ||  would replace it
+
+// ---- nested ------------------------------------------------------------
+const u = { name: "Ada", address: { city: "London" }, tags: ["a","b"] };
+u.address.city            // "London"
+u.tags[0]                 // "a"
+
+// ---- functions ---------------------------------------------------------
+function total(e: { amount: number; qty: number }): number {
+  return e.amount * e.qty;
+}
+function label({ desc, amount }: { desc: string; amount: number }): string {
+  return `${desc}: ${amount}`;      // destructured parameter
+}
+
+// ---- arrays of records --------------------------------------------------
+const rows = [{ n: "a", v: 2 }, { n: "b", v: 9 }];
+rows.filter((r) => r.v > 5)
+rows.map((r) => r.n)
+[...rows].sort((p, q) => p.v - q.v)
+
+// ---- sharing vs copying --------------------------------------------------
+const b = a;              // ⚠️ same object
+const c = { ...a };       // a fresh shallow copy
+const d = { ...a, v: 9 }; // copy with one field replaced
+
+// ---- lookup table / tally -------------------------------------------------
+const counts: { [key: string]: number } = {};
+for (const w of words) {
+  counts[w] = (counts[w] ?? 0) + 1;
+}
 ```
 """,
     self_check=[
-        "Can you read and update a property on an object?",
-        "Can you write a function that takes an object and returns a field?",
-        "Can you total a field across an array of objects?",
+        "Can you read and update a field on an object?",
+        "Can you say what `obj.nope` gives you, and why that is dangerous?",
+        "Can you reach a field whose name is in a variable?",
+        "Can you total one field across an array of records?",
+        "Can you sort records by a field without mutating the original array?",
+        "Can you explain why `const b = a` then `b.x = 1` changes `a` too?",
+        "Can you count word frequencies with an object?",
     ],
     review=[
         _q("How do you read the `name` of `user`?",
            ["user[name]", "user->name", "user.name", "name(user)"], 2,
-           "Dot notation: user.name."),
-        _q("An object is best for…",
-           ["an ordered list", "grouping related values under keys",
-            "repeating an action", "comparing numbers"], 1,
-           "Objects bundle related fields."),
-        _q("`[{a:1},{a:2}].filter((o)=>o.a>1).length` is…",
-           ["0", "1", "2", "error"], 1, "Only {a:2} passes."),
+           "Dot access for a key you know at write time."),
+        _q("`({a: 1}).b` evaluates to…", ["null", "0", "undefined", "an error"], 2,
+           "Missing fields are undefined, silently."),
+        _q("`const k = \"a\"; ({a: 1})[k]` is…", ["undefined", "1", '"a"', "an error"], 1,
+           "Bracket access uses the VALUE of k as the key."),
+        _q("`obj?.x` when obj is undefined gives…",
+           ["a crash", "undefined", "null", "0"], 1,
+           "Optional chaining short-circuits instead of throwing."),
+        _q("`0 ?? 5` is…", ["5", "0", "undefined", "an error"], 1,
+           "?? only falls back for null/undefined — 0 is a real value. `0 || 5` would give 5."),
+        _q("`const b = a; b.x = 9;` — what is `a.x`?",
+           ["unchanged", "9", "undefined", "an error"], 1,
+           "Both names point at the same object."),
+        _q("`{ ...a }` gives you…",
+           ["the same object", "a shallow copy", "a deep copy", "an array"], 1,
+           "Top level is fresh; nested objects are still shared."),
+        _q("`Object.keys({a:1, b:2})` is…",
+           ["[1,2]", '["a","b"]', "2", '[["a",1],["b",2]]'], 1,
+           "The key names, as an array of strings."),
+        _q("Sorting records by a numeric field uses the comparator…",
+           ["(p, q) => p.v > q.v", "(p, q) => p.v - q.v", "(p, q) => p - q", "none"], 1,
+           "Same rule as week 6 — subtract, don't compare."),
+        _q("`counts[w] = (counts[w] ?? 0) + 1;` — why the `?? 0`?",
+           ["style", "the first time a word appears, counts[w] is undefined",
+            "to reset the count", "it is optional"], 1,
+           "undefined + 1 is NaN, so the first occurrence needs a starting value."),
     ],
-    milestone="Budget Buddy now models each expense as a proper record.",
+    milestone="Budget Buddy now models each expense as a proper record and reports over the whole list — the data shape real applications use.",
     lessons=[
+        # ---- Lesson 1 --------------------------------------------------
         _lesson(
             "w7-basics", "Object basics",
-            "Keys, values, and dot access.",
+            "Keys, values and dot access.",
             """
+An **object literal** is a comma-separated list of `key: value` pairs in braces:
+
 ```ts
 const point = { x: 3, y: 4 };
-point.x            // 3
-point.y = point.y + 1;   // 5
+const user = { name: "Ada", age: 36, admin: true };
 ```
 
-> ⚠️ **Common mistakes:** using `[]` with a bare word (`obj[name]` looks up a
-> *variable* name); for a known key, use dot access `obj.name`.
+Keys are names; values can be anything — numbers, strings, booleans, arrays,
+even other objects.
+
+**Reading** uses a dot:
+
+```ts
+point.x        // 3
+user.name      // "Ada"
+```
+
+**Updating** assigns through the same dot:
+
+```ts
+point.y = point.y + 1;    // 5
+user.age += 1;            // 37
+```
+
+**`const` doesn't freeze it** — same as arrays last week. `const` fixes the
+name, not the contents:
+
+```ts
+const p = { x: 1 };
+p.x = 2;        // ✅ fine
+p = { x: 3 };   // ❌ error — cannot repoint the name
+```
+
+**A missing key gives `undefined`**, quietly:
+
+```ts
+user.email     // undefined — no error, no warning at runtime
+```
+
+This is the object equivalent of reading past the end of an array, and it's why
+a typo like `user.nmae` produces a mystery `undefined` three functions later
+rather than an error at the scene. TypeScript catches this one for you when the
+object's shape is known — one of the clearest wins the language offers.
+
+**Shorthand.** When a variable already has the name you want for the key, say
+it once:
+
+```ts
+const desc = "coffee";
+const e = { desc };          // same as { desc: desc }
+```
+
+> ⚠️ **Common mistakes:** separating pairs with `;` instead of `,` inside the
+> braces; misspelling a key on read (silent `undefined`) or on write (you
+> quietly create a *new* field); and expecting `const` to prevent field updates.
 """,
             warmup=[
                 _q("`const u = { age: 5 }; console.log(u.age);` prints…",
-                   ["age", "5", "u.age", "undefined"], 1, "It reads the property value 5."),
+                   ["age", "5", "u.age", "undefined"], 1, "It reads the value."),
+                _q("`const u = { age: 5 }; console.log(u.name);` prints…",
+                   ["null", "undefined", "an error", '""'], 1,
+                   "Missing keys read as undefined."),
+                _q("`const p = { x: 1 }; p.x = 2;` is…",
+                   ["an error, p is const", "fine", "a no-op", "a copy"], 1,
+                   "const fixes the binding, not the contents."),
+                _q("`const n = 'a'; const o = { n };` gives o the key…",
+                   ['"n"', '"a"', "both", "none"], 0,
+                   'Shorthand uses the VARIABLE NAME as the key: { n: "a" }.'),
             ],
             exercises=[
-                _ex("tscourse-w7-b-1", "Read a property", "Print the user's name.",
+                _ex("tscourse-w7-b-1", "Read a field", "Print the user's name.",
                     'const user = { name: "Ada", age: 36 };\nconsole.log(user.name);\n',
                     'user.name', [("", "Ada")],
-                    hints=["Access it with user.name."]),
-                _ex("tscourse-w7-b-2", "Update a property",
+                    hints=["Reach it with a dot."]),
+                _ex("tscourse-w7-b-2", "Update a field",
                     "Add 5 to counter.value, then print it.",
                     'const counter = { value: 0 };\ncounter.value = counter.value + 5;\nconsole.log(counter.value);\n',
                     'counter.value + 5', [("", "5")],
-                    hints=["Read the current value and add 5."]),
-                _fix("tscourse-w7-b-fix", "Fix the property name",
-                     "This should print the name but prints undefined. Fix the property.",
+                    hints=["Read the current value and add to it."]),
+                _ex("tscourse-w7-b-3", "Build an object",
+                    "Build an expense with desc `coffee` and amount 3, then print the amount.",
+                    'const e = { desc: "coffee", amount: 3 };\nconsole.log(e.amount);\n',
+                    '{ desc: "coffee", amount: 3 }', [("", "3")],
+                    hints=["Pairs are key: value, separated by commas.",
+                           'Write { desc: "coffee", amount: 3 }.']),
+                _ex("tscourse-w7-b-4", "Two fields in a sentence",
+                    "Print `Ada is 36`.",
+                    'const user = { name: "Ada", age: 36 };\nconsole.log(`${user.name} is ${user.age}`);\n',
+                    '`${user.name} is ${user.age}`', [("", "Ada is 36")],
+                    hints=["Two holes, each a dot access.",
+                           "Write `${user.name} is ${user.age}`."]),
+                _ex("tscourse-w7-b-5", "Shorthand",
+                    "Build the object using shorthand so its key is `desc`.",
+                    _FS + 'const desc = fs.readFileSync(0, "utf8").trim();\n'
+                    'const e = { desc };\nconsole.log(e.desc);\n',
+                    '{ desc }', [("coffee", "coffee"), ("rent", "rent")],
+                    hints=["When the variable is already named right, say it once.",
+                           "Write { desc }."]),
+                _fix("tscourse-w7-b-fix1", "Fix the field name",
+                     "This should print the name but prints undefined. Fix it.",
                      'const user = { name: "Ada", age: 36 };\nconsole.log(user.username);\n',
                      'const user = { name: "Ada", age: 36 };\nconsole.log(user.name);\n',
                      [("", "Ada")],
                      hints=["There is no `username` key on this object.",
                             "The key is `name`."]),
+                _fix("tscourse-w7-b-fix2", "Fix the typo'd write",
+                     "This should print 5, but the update lands on the wrong field and it prints 0. Fix it.",
+                     'const counter = { value: 0 };\ncounter.valeu = 5;\nconsole.log(counter.value);\n',
+                     'const counter = { value: 0 };\ncounter.value = 5;\nconsole.log(counter.value);\n',
+                     [("", "5")],
+                     hints=["Writing a misspelled key silently creates a brand-new field.",
+                            "The key is `value`."],
+                     difficulty="Medium"),
+            ],
+            quiz=[
+                _q("Reading a key that does not exist gives…",
+                   ["an error", "null", "undefined", "0"], 2,
+                   "Silently — which is exactly why annotating shapes is worth it."),
+                _q("Objects answer 'which one?' with…",
+                   ["a number", "a name", "an index", "a type"], 1,
+                   "Arrays use positions; objects use names."),
             ],
         ),
+        # ---- Lesson 2 --------------------------------------------------
         _lesson(
-            "w7-funcs", "Objects & functions",
-            "Passing objects around.",
+            "w7-access", "Dynamic keys & missing fields",
+            "Bracket access, in, ?. and ??.",
             """
-Functions can take and return objects.
+Dot access needs the key spelled out when you write the code. When the key is
+only known at **runtime**, use brackets:
 
 ```ts
-function fullName(p: { first: string; last: string }): string {
-  return `${p.first} ${p.last}`;
-}
-fullName({ first: "Ada", last: "Lovelace" });   // Ada Lovelace
+const e = { desc: "coffee", amount: 3 };
+const k = "amount";
+
+e.k        // ⚠️ undefined — looks for a key literally called "k"
+e[k]       // 3            — uses the VALUE of k
 ```
+
+That distinction is the whole lesson: `e.k` is the key `"k"`; `e[k]` is the key
+whose name `k` holds.
+
+**Does the key exist?** `in` asks directly:
+
+```ts
+"amount" in e     // true
+"paid" in e       // false
+```
+
+Why not just check `e.paid === undefined`? Because a key *can* exist and hold
+`undefined`. `in` distinguishes "absent" from "present but empty".
+
+**Optional chaining `?.`** reads through something that might not be there:
+
+```ts
+const u = { name: "Ada" };
+u.address.city      // 💥 crashes — cannot read city of undefined
+u.address?.city     // undefined — stops safely
+```
+
+Read `a?.b` as *"if `a` is null or undefined, the whole thing is `undefined`;
+otherwise carry on"*. It short-circuits the rest of the chain, so
+`u?.address?.city` is safe at every step.
+
+**Nullish coalescing `??`** supplies a fallback:
+
+```ts
+e.note ?? "(none)"      // "(none)" when note is missing
+```
+
+`??` falls back **only** for `null` and `undefined`. Its older cousin `||` falls
+back for every falsy value, which quietly destroys legitimate data:
+
+```ts
+const count = 0;
+count || 10     // 10  ⚠️ a real zero was thrown away
+count ?? 10     // 0   ✅
+```
+
+When the fallback is for *missing*, use `??`. Reserve `||` for genuine
+true/false logic.
+
+> ⚠️ **Common mistakes:** writing `e.k` when you meant `e[k]`; using `||` where
+> `??` was needed and losing zeros and empty strings; and reaching for `?.`
+> everywhere, which hides bugs — use it where a value is *genuinely* optional.
 """,
             warmup=[
-                _q("`fullName({first:\"A\", last:\"B\"})` above returns…",
-                   ["A", "B", "A B", "AB"], 2, "Template joins them with a space."),
+                _q('`const k = "a"; const o = { a: 1 }; o[k]` is…',
+                   ["undefined", "1", '"a"', "an error"], 1, "Bracket access uses k's value."),
+                _q('`const k = "a"; const o = { a: 1 }; o.k` is…',
+                   ["1", "undefined", '"a"', "an error"], 1,
+                   'Dot access looks for a key literally named "k".'),
+                _q("`undefined?.x` is…", ["a crash", "undefined", "null", "0"], 1,
+                   "Optional chaining stops safely."),
+                _q("`0 || 5` and `0 ?? 5` are…", ["5 and 5", "0 and 0", "5 and 0", "0 and 5"], 2,
+                   "|| treats 0 as falsy; ?? only replaces null/undefined."),
             ],
             exercises=[
-                _ex("tscourse-w7-f-1", "Full name",
-                    "Return the first and last name joined by a space.",
-                    'function fullName(p: { first: string; last: string }): string {\n  return `${p.first} ${p.last}`;\n}\nconsole.log(fullName({ first: "Ada", last: "Lovelace" }));\n',
-                    '`${p.first} ${p.last}`', [("", "Ada Lovelace")],
-                    hints=["Template literal with p.first and p.last."]),
-                _ex("tscourse-w7-f-2", "Build from input",
-                    "Store a greeting on the object, then print it.",
-                    _FS + 'const name = fs.readFileSync(0, "utf8").trim();\nconst user = { name: name, greeting: `Hi ${name}` };\nconsole.log(user.greeting);\n',
-                    '`Hi ${name}`', [("Sam", "Hi Sam"), ("Ada", "Hi Ada")],
-                    hints=["The greeting is a template literal using name."]),
-                _fix("tscourse-w7-f-fix", "Fix the field access",
-                     "This should print the first name but reads the wrong field. Fix it.",
-                     'function first(p: { first: string; last: string }): string {\n  return p.last;\n}\nconsole.log(first({ first: "Ada", last: "Lovelace" }));\n',
-                     'function first(p: { first: string; last: string }): string {\n  return p.first;\n}\nconsole.log(first({ first: "Ada", last: "Lovelace" }));\n',
-                     [("", "Ada")],
-                     hints=["It returns p.last but should return the first name.",
-                            "Return p.first."]),
+                _ex("tscourse-w7-ac-1", "Key from a variable",
+                    "Print the value of the field named by `k`.",
+                    'const e = { desc: "coffee", amount: 3 };\nconst k = "amount";\nconsole.log(e[k]);\n',
+                    'e[k]', [("", "3")],
+                    hints=["Brackets use the value held in k.", "Write e[k]."]),
+                _ex("tscourse-w7-ac-2", "Key from input",
+                    "Read a field name from input and print that field's value.",
+                    _FS + 'const e = { desc: "coffee", amount: 3 };\n'
+                    'const k = fs.readFileSync(0, "utf8").trim();\nconsole.log(e[k]);\n',
+                    'e[k]', [("desc", "coffee"), ("amount", "3")],
+                    hints=["The key is only known when the program runs.",
+                           "Write e[k]."]),
+                _ex("tscourse-w7-ac-3", "Does it have one?",
+                    "Print whether the object has a `paid` key.",
+                    'const e = { desc: "coffee", amount: 3 };\nconsole.log("paid" in e);\n',
+                    '"paid" in e', [("", "false")],
+                    hints=["`in` tests for the key's presence.",
+                           'Write "paid" in e.']),
+                _ex("tscourse-w7-ac-4", "Safe deep read",
+                    "Print the city, or `undefined` if there is no address — without crashing.",
+                    'const u: { name: string; address?: { city: string } } = { name: "Ada" };\n'
+                    'console.log(u.address?.city);\n',
+                    'u.address?.city', [("", "undefined")],
+                    hints=["Reading .city off a missing address would crash.",
+                           "Write u.address?.city."],
+                    difficulty="Medium"),
+                _ex("tscourse-w7-ac-5", "A sensible fallback",
+                    "Print the note, or `(none)` when there isn't one.",
+                    'const e: { desc: string; note?: string } = { desc: "coffee" };\n'
+                    'console.log(e.note ?? "(none)");\n',
+                    'e.note ?? "(none)"', [("", "(none)")],
+                    hints=["?? supplies a value only when the left side is null/undefined.",
+                           'Write e.note ?? "(none)".']),
+                _ex("tscourse-w7-ac-6", "Keep a real zero",
+                    "Print the count, defaulting to 10 only when it is genuinely missing. Here it is 0, so 0 must print.",
+                    'const e: { count?: number } = { count: 0 };\nconsole.log(e.count ?? 10);\n',
+                    'e.count ?? 10', [("", "0")],
+                    hints=["|| would throw the zero away.",
+                           "Write e.count ?? 10."],
+                    difficulty="Medium"),
+                _fix("tscourse-w7-ac-fix1", "Fix the dot-versus-bracket",
+                     "This should print 3 but prints undefined. Fix it.",
+                     'const e = { desc: "coffee", amount: 3 };\nconst k = "amount";\nconsole.log(e.k);\n',
+                     'const e = { desc: "coffee", amount: 3 };\nconst k = "amount";\nconsole.log(e[k]);\n',
+                     [("", "3")],
+                     hints=['e.k looks for a key spelled "k", which does not exist.',
+                            "Use brackets so the VALUE of k is the key."],
+                     difficulty="Medium"),
+                _fix("tscourse-w7-ac-fix2", "Fix the swallowed zero",
+                     "A count of 0 is real data, but this prints 10. Fix it.",
+                     'const e: { count?: number } = { count: 0 };\nconsole.log(e.count || 10);\n',
+                     'const e: { count?: number } = { count: 0 };\nconsole.log(e.count ?? 10);\n',
+                     [("", "0")],
+                     hints=["0 is falsy, so || replaces it.",
+                            "?? only falls back for null and undefined."],
+                     difficulty="Medium"),
+            ],
+            quiz=[
+                _q("`obj[k]` uses as the key…",
+                   ['the letter "k"', "the value stored in k", "index k", "nothing"], 1,
+                   "That is the whole point of bracket access."),
+                _q("Prefer `??` over `||` when…",
+                   ["always", "the fallback is for a MISSING value and 0 or \"\" are legitimate",
+                    "never", "comparing booleans"], 1,
+                   "Otherwise real zeros and empty strings get replaced."),
             ],
         ),
+        # ---- Lesson 3 --------------------------------------------------
         _lesson(
-            "w7-arrays", "Arrays of objects",
-            "The shape of real datasets.",
+            "w7-nested", "Nested data",
+            "Objects inside objects, arrays inside objects.",
             """
-Most data is a list of records. Loop over it and reach into each one.
+A field's value can be another object, or an array. Real data nests:
 
 ```ts
-const people = [{ name: "Ada", age: 36 }, { name: "Bo", age: 20 }];
-let total = 0;
-for (const p of people) total = total + p.age;
-console.log(total);   // 56
+const user = {
+  name: "Ada",
+  address: { city: "London", postcode: "E1" },
+  tags: ["engineer", "founder"],
+};
 ```
+
+Read it by chaining, left to right:
+
+```ts
+user.address.city     // "London"
+user.tags[0]          // "engineer"
+user.tags.length      // 2
+```
+
+`user.address.city` means: take `user`, take its `address` (an object), take
+that object's `city`. Each step must actually exist — if `address` were missing,
+the second step crashes, which is exactly what `?.` is for.
+
+**Arrays of objects, with objects inside them**, are entirely normal:
+
+```ts
+const orders = [
+  { id: 1, customer: { name: "Ada" }, items: ["pen", "ink"] },
+  { id: 2, customer: { name: "Bo" },  items: ["pad"] },
+];
+
+orders[0].customer.name     // "Ada"
+orders[1].items.length      // 1
+```
+
+**Building nested data from input** is the everyday task. Given a line per
+record:
+
+```
+coffee 3
+book 12
+```
+
+split into lines, then split each line:
+
+```ts
+const rows = fs.readFileSync(0, "utf8").trim().split("\\n");
+const items = rows.map((line) => {
+  const parts = line.trim().split(" ");
+  return { desc: parts[0], amount: Number(parts[1]) };
+});
+```
+
+That callback has braces, so it needs an explicit `return` — the arrow trap
+again. (An alternative is to wrap the object in parentheses:
+`(line) => ({ desc: ... })`, which tells TypeScript the braces are an *object*
+and not a function body. Both work; the explicit `return` is easier to read.)
+
+**Depth is a cost.** `a.b.c.d.e` is fragile: five things must exist, and one
+rename anywhere breaks it. Pull intermediate values into named variables when a
+chain gets long.
+
+> ⚠️ **Common mistakes:** reading through a missing level and crashing;
+> forgetting `return` in a braced `map` callback that builds an object; and
+> forgetting that a nested array still needs `[i]`, not `.i`.
+""",
+            warmup=[
+                _q('`{a: {b: 2}}.a.b` is…', ["undefined", "2", "{b: 2}", "an error"], 1,
+                   "Chain left to right."),
+                _q('`{tags: ["x","y"]}.tags[1]` is…', ['"x"', '"y"', "1", "undefined"], 1,
+                   "Index the array after reaching it."),
+                _q('`{a: 1}.b.c` does what?',
+                   ["gives undefined", "crashes", "gives null", "gives 1"], 1,
+                   "`.b` is undefined, and reading `.c` off undefined throws."),
+                _q("`(line) => { desc: line }` returns…",
+                   ["an object", "undefined", "a string", "an error"], 1,
+                   "The braces read as a function body, not an object literal."),
+            ],
+            exercises=[
+                _ex("tscourse-w7-ne-1", "Reach into a nested object",
+                    "Print the user's city.",
+                    'const user = { name: "Ada", address: { city: "London" } };\n'
+                    'console.log(user.address.city);\n',
+                    'user.address.city', [("", "London")],
+                    hints=["Chain the dots left to right."]),
+                _ex("tscourse-w7-ne-2", "An array inside an object",
+                    "Print how many tags the user has.",
+                    'const user = { name: "Ada", tags: ["engineer", "founder"] };\n'
+                    'console.log(user.tags.length);\n',
+                    'user.tags.length', [("", "2")],
+                    hints=["Reach the array, then take its length."]),
+                _ex("tscourse-w7-ne-3", "Into a list of records",
+                    "Print the name of the customer on the SECOND order.",
+                    'const orders = [\n'
+                    '  { id: 1, customer: { name: "Ada" } },\n'
+                    '  { id: 2, customer: { name: "Bo" } },\n'
+                    '];\n'
+                    'console.log(orders[1].customer.name);\n',
+                    'orders[1].customer.name', [("", "Bo")],
+                    hints=["Index the array first, then chain the dots.",
+                           "Write orders[1].customer.name."],
+                    difficulty="Medium"),
+                _ex("tscourse-w7-ne-4", "Records from input",
+                    "Each input line is `desc amount`. Build the records and print the first description.",
+                    _FS + 'const rows = fs.readFileSync(0, "utf8").trim().split("\\n");\n'
+                    'const items = rows.map((line) => {\n'
+                    '  const parts = line.trim().split(" ");\n'
+                    '  return { desc: parts[0], amount: Number(parts[1]) };\n'
+                    '});\n'
+                    'console.log(items[0].desc);\n',
+                    'return { desc: parts[0], amount: Number(parts[1]) };',
+                    [("coffee 3\nbook 12", "coffee"), ("rent 900", "rent")],
+                    hints=["The callback has braces, so it needs an explicit return.",
+                           "Return { desc: parts[0], amount: Number(parts[1]) };"],
+                    difficulty="Medium"),
+                _ex("tscourse-w7-ne-5", "Total from built records",
+                    "Each line is `desc amount`. Print the total of the amounts.",
+                    _FS + 'const rows = fs.readFileSync(0, "utf8").trim().split("\\n");\n'
+                    'const items = rows.map((line) => {\n'
+                    '  const parts = line.trim().split(" ");\n'
+                    '  return { desc: parts[0], amount: Number(parts[1]) };\n'
+                    '});\n'
+                    'let total = 0;\nfor (const it of items) {\n  total += it.amount;\n}\n'
+                    'console.log(total);\n',
+                    'total += it.amount;',
+                    [("coffee 3\nbook 12", "15"), ("rent 900", "900")],
+                    hints=["Accumulate the amount field across the records.",
+                           "Write total += it.amount;"],
+                    difficulty="Medium"),
+                _fix("tscourse-w7-ne-fix1", "Fix the object-literal callback",
+                     "This should print `coffee` but prints `undefined` — the callback returns nothing. Fix it.",
+                     _FS + 'const rows = fs.readFileSync(0, "utf8").trim().split("\\n");\n'
+                     'const items = rows.map((line) => {\n'
+                     '  const parts = line.trim().split(" ");\n'
+                     '  ({ desc: parts[0], amount: Number(parts[1]) });\n'
+                     '});\n'
+                     'console.log(items[0]?.desc);\n',
+                     _FS + 'const rows = fs.readFileSync(0, "utf8").trim().split("\\n");\n'
+                     'const items = rows.map((line) => {\n'
+                     '  const parts = line.trim().split(" ");\n'
+                     '  return { desc: parts[0], amount: Number(parts[1]) };\n'
+                     '});\n'
+                     'console.log(items[0]?.desc);\n',
+                     [("coffee 3", "coffee"), ("book 12\nrent 900", "book")],
+                     hints=["The object is built and then thrown away.",
+                            "Add return in front of it."],
+                     difficulty="Medium"),
+            ],
+            quiz=[
+                _q("`a.b.c` crashes when…",
+                   ["c is missing", "b is missing", "a is missing", "b is missing or a is missing"], 3,
+                   "You can read a missing FINAL field safely; reading THROUGH a missing one throws."),
+                _q("To return an object from a braceless arrow you write…",
+                   ["(x) => { a: x }", "(x) => ({ a: x })", "(x) => a: x", "impossible"], 1,
+                   "The parentheses tell TypeScript the braces are an object literal."),
+            ],
+        ),
+        # ---- Lesson 4 --------------------------------------------------
+        _lesson(
+            "w7-funcs", "Objects & functions",
+            "Passing records in, handing records back, destructuring.",
+            """
+Functions take and return objects like any other value. The parameter's type is
+written as the shape itself:
+
+```ts
+function lineTotal(e: { amount: number; qty: number }): number {
+  return e.amount * e.qty;
+}
+lineTotal({ amount: 3, qty: 4 });   // 12
+```
+
+Note the shape uses `;` between fields (a semicolon inside a *type*, a comma
+inside a *value* — an inconsistency worth simply memorising).
+
+**Returning an object** lets a function hand back several values at once:
+
+```ts
+function stats(a: number[]): { count: number; total: number } {
+  let total = 0;
+  for (const x of a) total += x;
+  return { count: a.length, total };
+}
+const s = stats([1, 2, 3]);
+console.log(s.total);    // 6
+```
+
+That's the answer to "how do I return two things?" — return one object with two
+fields.
+
+**Destructuring** pulls fields out into local names:
+
+```ts
+const e = { desc: "coffee", amount: 3 };
+const { desc, amount } = e;
+console.log(desc, amount);      // coffee 3
+```
+
+It works on **parameters** too, which is where it earns its keep — the function
+signature then lists exactly what it uses:
+
+```ts
+function label({ desc, amount }: { desc: string; amount: number }): string {
+  return `${desc}: $${amount}`;
+}
+```
+
+Compare with `e.desc` and `e.amount` repeated through a long body. Destructuring
+names them once.
+
+You can rename and default while destructuring:
+
+```ts
+const { desc: name, note = "(none)" } = e;
+```
+
+**Objects are passed by reference.** A function receives the *same* object, so
+changing a field inside is visible to the caller:
+
+```ts
+function bump(o: { n: number }): void { o.n += 1; }
+const p = { n: 1 };
+bump(p);
+console.log(p.n);    // 2  ⚠️
+```
+
+That's a side effect of exactly the kind week 5 warned about. Prefer returning a
+**new** object:
+
+```ts
+function bumped(o: { n: number }): { n: number } { return { ...o, n: o.n + 1 }; }
+```
+
+> ⚠️ **Common mistakes:** using `,` instead of `;` in an inline shape type;
+> mutating a parameter object and surprising the caller; and forgetting that
+> destructuring copies the *value* — for a nested object, that value is still a
+> shared reference.
+""",
+            warmup=[
+                _q("`function f(e: { a: number }): number { return e.a; } f({a: 7})` is…",
+                   ["7", "undefined", "{a:7}", "an error"], 0, "It reads the field."),
+                _q("`const { a } = { a: 1, b: 2 };` leaves `a` as…",
+                   ["1", "2", "{a:1}", "undefined"], 0, "Destructuring pulls out the field."),
+                _q("A function that mutates its object parameter…",
+                   ["cannot", "changes the caller's object too", "makes a copy",
+                    "returns it"], 1,
+                   "Objects are handed over by reference."),
+                _q("How do you return two values from a function?",
+                   ["you cannot", "return an object with two fields", "return twice",
+                    "use a global"], 1,
+                   "One object, several fields."),
+            ],
+            exercises=[
+                _ex("tscourse-w7-fu-1", "Take an object",
+                    "Return the line total from the record's amount and qty.",
+                    'function lineTotal(e: { amount: number; qty: number }): number {\n'
+                    '  return e.amount * e.qty;\n}\n'
+                    'console.log(lineTotal({ amount: 3, qty: 4 }));\n',
+                    'e.amount * e.qty', [("", "12")],
+                    hints=["Multiply the two fields."]),
+                _ex("tscourse-w7-fu-2", "Return an object",
+                    "Return a record holding the count and the total.",
+                    'function stats(a: number[]): { count: number; total: number } {\n'
+                    '  let total = 0;\n  for (const x of a) {\n    total += x;\n  }\n'
+                    '  return { count: a.length, total };\n}\n'
+                    'const s = stats([1, 2, 3]);\nconsole.log(`${s.count} ${s.total}`);\n',
+                    'return { count: a.length, total };', [("", "3 6")],
+                    hints=["Bundle both answers into one object; `total` can use shorthand.",
+                           "Write return { count: a.length, total };"],
+                    difficulty="Medium"),
+                _ex("tscourse-w7-fu-3", "Destructure a record",
+                    "Pull `desc` and `amount` out of the record in one line, then print them.",
+                    'const e = { desc: "coffee", amount: 3 };\n'
+                    'const { desc, amount } = e;\n'
+                    'console.log(`${desc} ${amount}`);\n',
+                    'const { desc, amount } = e;', [("", "coffee 3")],
+                    hints=["Braces on the LEFT of = destructure.",
+                           "Write const { desc, amount } = e;"]),
+                _ex("tscourse-w7-fu-4", "Destructure a parameter",
+                    "Destructure the parameter so the body can use `desc` and `amount` directly.",
+                    'function label({ desc, amount }: { desc: string; amount: number }): string {\n'
+                    '  return `${desc}: $${amount}`;\n}\n'
+                    'console.log(label({ desc: "coffee", amount: 3 }));\n',
+                    '{ desc, amount }', [("", "coffee: $3")],
+                    hints=["The destructuring pattern goes where the parameter name would.",
+                           "Write { desc, amount } before the type annotation."],
+                    difficulty="Medium"),
+                _ex("tscourse-w7-fu-5", "Return a changed copy",
+                    "Return a NEW record with n increased by one, leaving the original alone.",
+                    'function bumped(o: { n: number }): { n: number } {\n'
+                    '  return { ...o, n: o.n + 1 };\n}\n'
+                    'const p = { n: 1 };\nconst q = bumped(p);\nconsole.log(`${p.n} ${q.n}`);\n',
+                    'return { ...o, n: o.n + 1 };', [("", "1 2")],
+                    hints=["Spread the old fields, then override the one that changes.",
+                           "Write return { ...o, n: o.n + 1 };"],
+                    difficulty="Medium"),
+                _fix("tscourse-w7-fu-fix1", "Fix the field access",
+                     "This should print the first name but reads the wrong field. Fix it.",
+                     'function first(p: { first: string; last: string }): string {\n  return p.last;\n}\n'
+                     'console.log(first({ first: "Ada", last: "Lovelace" }));\n',
+                     'function first(p: { first: string; last: string }): string {\n  return p.first;\n}\n'
+                     'console.log(first({ first: "Ada", last: "Lovelace" }));\n',
+                     [("", "Ada")],
+                     hints=["It returns p.last.", "Return p.first."]),
+                _fix("tscourse-w7-fu-fix2", "Fix the surprise mutation",
+                     "The caller's object should be untouched — expected `1 2` — but this prints `2 2`. Fix it.",
+                     'function bumped(o: { n: number }): { n: number } {\n  o.n = o.n + 1;\n  return o;\n}\n'
+                     'const p = { n: 1 };\nconst q = bumped(p);\nconsole.log(`${p.n} ${q.n}`);\n',
+                     'function bumped(o: { n: number }): { n: number } {\n  return { ...o, n: o.n + 1 };\n}\n'
+                     'const p = { n: 1 };\nconst q = bumped(p);\nconsole.log(`${p.n} ${q.n}`);\n',
+                     [("", "1 2")],
+                     hints=["The function is handed the caller's own object and edits it.",
+                            "Build and return a new one instead: { ...o, n: o.n + 1 }."],
+                     difficulty="Medium"),
+            ],
+            quiz=[
+                _q("Inside an inline shape type, fields are separated by…",
+                   [",", ";", ":", "nothing"], 1,
+                   "Semicolons in a type, commas in a value."),
+                _q("Destructuring a parameter mainly buys you…",
+                   ["speed", "a signature that names exactly what the function uses",
+                    "type safety", "immutability"], 1,
+                   "It documents the function's real dependencies."),
+            ],
+        ),
+        # ---- Lesson 5 --------------------------------------------------
+        _lesson(
+            "w7-records", "Arrays of records",
+            "The shape of real datasets.",
+            """
+Put last week's array methods together with this week's objects and you can
+answer real questions about real data:
+
+```ts
+const people = [
+  { name: "Ada", age: 36 },
+  { name: "Bo",  age: 20 },
+  { name: "Cy",  age: 47 },
+];
+```
+
+**Total a field** — a loop and an accumulator:
+
+```ts
+let total = 0;
+for (const p of people) total += p.age;
+```
+
+**Select rows** — `filter` with a predicate on a field:
+
+```ts
+people.filter((p) => p.age >= 21);      // Ada and Cy
+```
+
+**Pull out one column** — `map` to a field:
+
+```ts
+people.map((p) => p.name);              // ["Ada","Bo","Cy"]
+people.map((p) => p.name).join(", ");   // "Ada, Bo, Cy"
+```
+
+**Find one row:**
+
+```ts
+people.find((p) => p.name === "Bo");        // the record, or undefined
+people.some((p) => p.age > 40);             // true
+```
+
+**Sort by a field** — the week 6 comparator, reading a field from each side:
+
+```ts
+[...people].sort((p, q) => p.age - q.age);            // youngest first
+[...people].sort((p, q) => q.age - p.age);            // oldest first
+[...people].sort((p, q) => p.name.localeCompare(q.name));  // by name
+```
+
+`localeCompare` returns a negative/zero/positive number comparing two strings —
+exactly the comparator contract. And the copy (`[...people]`) matters just as
+much here: sorting in place reorders the array everyone else is holding.
+
+**Chaining reads like a sentence** once you're used to it:
+
+```ts
+people
+  .filter((p) => p.age >= 21)
+  .map((p) => p.name)
+  .join(", ");                    // "Ada, Cy"
+```
+
+Filter, then map, then join: narrow the rows, pick the column, print it.
+
+> ⚠️ **Common mistakes:** reading a field that doesn't exist and totalling
+> `NaN`; sorting in place and corrupting the source array; and mapping before
+> filtering, which does more work than necessary.
 """,
             warmup=[
                 _q("Totalling `age` over [{age:1},{age:2},{age:3}] gives…",
-                   ["3", "6", "123", "error"], 1, "1+2+3 = 6."),
+                   ["3", "6", "123", "an error"], 1, "1+2+3."),
+                _q("`[{a:1},{a:2}].filter((o) => o.a > 1).length` is…",
+                   ["0", "1", "2", "an error"], 1, "Only {a:2} passes."),
+                _q("`[{n:\"x\"},{n:\"y\"}].map((o) => o.n).join(\"-\")` is…",
+                   ['"x-y"', '"xy"', '["x","y"]', '"x, y"'], 0,
+                   "Pull the column, then glue it."),
+                _q("Totalling a MISSPELLED field over records gives…",
+                   ["0", "NaN", "undefined", "an error"], 1,
+                   "undefined + a number is NaN, and NaN spreads."),
             ],
             exercises=[
-                _ex("tscourse-w7-a-1", "Total ages",
+                _ex("tscourse-w7-re-1", "Total a column",
                     "Sum everyone's age and print it.",
-                    'const people = [\n  { name: "Ada", age: 36 },\n  { name: "Bo", age: 20 },\n];\nlet total = 0;\nfor (const p of people) {\n  total = total + p.age;\n}\nconsole.log(total);\n',
-                    'total + p.age', [("", "56")],
-                    hints=["Add each person's age to total."]),
-                _ex("tscourse-w7-a-2", "Count adults",
-                    "Count people aged 21 or older and print the count.",
-                    'const people = [\n  { name: "Ada", age: 36 },\n  { name: "Bo", age: 20 },\n];\nconst adults = people.filter((p) => p.age >= 21);\nconsole.log(adults.length);\n',
-                    'p.age >= 21', [("", "1")],
-                    hints=["Keep people whose age is at least 21."]),
-                _fix("tscourse-w7-a-fix", "Fix the field in the loop",
-                     "This should total ages but totals nothing sensible. Fix the field it reads.",
-                     'const people = [\n  { name: "Ada", age: 36 },\n  { name: "Bo", age: 20 },\n];\nlet total = 0;\nfor (const p of people) {\n  total = total + p.years;\n}\nconsole.log(total);\n',
-                     'const people = [\n  { name: "Ada", age: 36 },\n  { name: "Bo", age: 20 },\n];\nlet total = 0;\nfor (const p of people) {\n  total = total + p.age;\n}\nconsole.log(total);\n',
+                    'const people = [\n  { name: "Ada", age: 36 },\n  { name: "Bo", age: 20 },\n];\n'
+                    'let total = 0;\nfor (const p of people) {\n  total += p.age;\n}\nconsole.log(total);\n',
+                    'total += p.age;', [("", "56")],
+                    hints=["Accumulate the age field."]),
+                _ex("tscourse-w7-re-2", "Count matching rows",
+                    "Count people aged 21 or older.",
+                    'const people = [\n  { name: "Ada", age: 36 },\n  { name: "Bo", age: 20 },\n  { name: "Cy", age: 47 },\n];\n'
+                    'console.log(people.filter((p) => p.age >= 21).length);\n',
+                    'p.age >= 21', [("", "2")],
+                    hints=["21 itself counts, so the test is >=."]),
+                _ex("tscourse-w7-re-3", "Pull a column",
+                    "Print everyone's name, comma-separated.",
+                    'const people = [\n  { name: "Ada", age: 36 },\n  { name: "Bo", age: 20 },\n];\n'
+                    'console.log(people.map((p) => p.name).join(", "));\n',
+                    'people.map((p) => p.name)', [("", "Ada, Bo")],
+                    hints=["map to the field, then join.",
+                           "Write people.map((p) => p.name)."]),
+                _ex("tscourse-w7-re-4", "Find a row",
+                    "Print Bo's age, found by name.",
+                    'const people = [\n  { name: "Ada", age: 36 },\n  { name: "Bo", age: 20 },\n];\n'
+                    'const bo = people.find((p) => p.name === "Bo");\nconsole.log(bo?.age);\n',
+                    'people.find((p) => p.name === "Bo")', [("", "20")],
+                    hints=["find returns the record itself, or undefined.",
+                           'Write people.find((p) => p.name === "Bo").'],
+                    difficulty="Medium"),
+                _ex("tscourse-w7-re-5", "Sort by a field",
+                    "Print the names youngest first, comma-separated.",
+                    'const people = [\n  { name: "Ada", age: 36 },\n  { name: "Bo", age: 20 },\n  { name: "Cy", age: 47 },\n];\n'
+                    'console.log([...people].sort((p, q) => p.age - q.age).map((p) => p.name).join(", "));\n',
+                    '(p, q) => p.age - q.age', [("", "Bo, Ada, Cy")],
+                    hints=["Same comparator rule as week 6, reading a field from each side.",
+                           "Write (p, q) => p.age - q.age."],
+                    difficulty="Medium"),
+                _ex("tscourse-w7-re-6", "Filter then map",
+                    "Print the names of everyone 21 or older, comma-separated.",
+                    'const people = [\n  { name: "Ada", age: 36 },\n  { name: "Bo", age: 20 },\n  { name: "Cy", age: 47 },\n];\n'
+                    'console.log(people.filter((p) => p.age >= 21).map((p) => p.name).join(", "));\n',
+                    '.filter((p) => p.age >= 21).map((p) => p.name)',
+                    [("", "Ada, Cy")],
+                    hints=["Narrow the rows first, then pick the column.",
+                           "Chain .filter(...) then .map(...)."],
+                    difficulty="Medium"),
+                _fix("tscourse-w7-re-fix1", "Fix the wrong field",
+                     "This should total ages (56) but prints NaN. Fix it.",
+                     'const people = [\n  { name: "Ada", age: 36 },\n  { name: "Bo", age: 20 },\n];\n'
+                     'let total = 0;\nfor (const p of people) {\n  total += p.years;\n}\nconsole.log(total);\n',
+                     'const people = [\n  { name: "Ada", age: 36 },\n  { name: "Bo", age: 20 },\n];\n'
+                     'let total = 0;\nfor (const p of people) {\n  total += p.age;\n}\nconsole.log(total);\n',
                      [("", "56")],
-                     hints=["There is no `years` field — it's `age`.",
-                            "Read p.age."]),
+                     hints=["There is no `years` field, so each read is undefined — and 0 + undefined is NaN.",
+                            "The field is `age`."],
+                     difficulty="Medium"),
+            ],
+            quiz=[
+                _q("Which order does less work?",
+                   ["map then filter", "filter then map", "identical", "neither works"], 1,
+                   "Filtering first leaves fewer elements to transform."),
+                _q("`[...rows].sort(...)` rather than `rows.sort(...)` because…",
+                   ["it is faster", "sort mutates, and other code may be holding rows",
+                    "sort needs a copy", "no reason"], 1,
+                   "The same rule as week 6."),
+            ],
+        ),
+        # ---- Lesson 6 --------------------------------------------------
+        _lesson(
+            "w7-copy", "Sharing, copying & spread",
+            "Why changing one object changed another.",
+            """
+An object variable does not hold the object. It holds a **reference** — the
+address of one. Assigning copies the address, not the object:
+
+```ts
+const a = { n: 1 };
+const b = a;        // b points at THE SAME object
+b.n = 9;
+console.log(a.n);   // 9   ⚠️
+```
+
+Both names sit in front of one object. This is called **aliasing**, and it is
+behind a whole family of bugs that feel like magic: a value changes and nothing
+nearby touched it.
+
+**Comparison follows the same rule.** `===` on objects asks "the same object?",
+not "the same contents?":
+
+```ts
+{ n: 1 } === { n: 1 }     // false — two different objects
+const a = { n: 1 }; a === a   // true
+```
+
+**Copying** uses spread:
+
+```ts
+const c = { ...a };            // a fresh object with the same fields
+const d = { ...a, n: 9 };      // copy, with n replaced
+```
+
+`{ ...a, n: 9 }` is the everyday "change one field without mutating" move —
+later fields win, so the override goes last. It's how you'll update state in
+almost any modern framework.
+
+**The copy is shallow.** Spread copies each field's *value* — and for a nested
+object, that value is another reference:
+
+```ts
+const u = { name: "Ada", address: { city: "London" } };
+const v = { ...u };
+v.address.city = "Paris";
+console.log(u.address.city);    // "Paris"  ⚠️ still shared
+```
+
+The top level is fresh; anything nested is not. To copy a level down, spread
+that level too:
+
+```ts
+const v = { ...u, address: { ...u.address } };
+```
+
+For deeply nested data, `structuredClone(u)` copies the whole tree.
+
+**The same is true of arrays of objects.** `[...rows]` gives you a new array
+holding the *same* record objects — reordering it is safe, editing a record
+through it is not.
+
+> ⚠️ **Common mistakes:** expecting `=` to copy; comparing objects with `===`
+> and expecting contents to be compared; and trusting a shallow copy to protect
+> nested data.
+""",
+            warmup=[
+                _q("`const a={n:1}; const b=a; b.n=9; a.n` is…", ["1", "9", "undefined", "an error"], 1,
+                   "One object, two names."),
+                _q("`({n:1}) === ({n:1})` is…", ["true", "false"], 1,
+                   "Different objects, so not identical — contents are not compared."),
+                _q("`{ ...a, n: 9 }` produces…",
+                   ["a mutated a", "a copy with n replaced", "an error", "just {n:9}"], 1,
+                   "Later fields override earlier ones."),
+                _q("After `const v = { ...u }`, changing `v.address.city` affects `u` because…",
+                   ["spread is broken", "the copy is shallow — nested objects are still shared",
+                    "address is const", "it does not"], 1,
+                   "Only the top level was duplicated."),
+            ],
+            exercises=[
+                _ex("tscourse-w7-cp-1", "Make a real copy",
+                    "Copy the object so changing the copy leaves the original at 1.",
+                    'const a = { n: 1 };\nconst b = { ...a };\nb.n = 9;\nconsole.log(`${a.n} ${b.n}`);\n',
+                    'const b = { ...a };', [("", "1 9")],
+                    hints=["Assignment shares; spread copies.",
+                           "Write const b = { ...a };"]),
+                _ex("tscourse-w7-cp-2", "Copy with an override",
+                    "Build a new record with the same fields but amount 9.",
+                    'const e = { desc: "coffee", amount: 3 };\n'
+                    'const f = { ...e, amount: 9 };\n'
+                    'console.log(`${f.desc} ${f.amount} ${e.amount}`);\n',
+                    '{ ...e, amount: 9 }', [("", "coffee 9 3")],
+                    hints=["Spread first, then name the field you want different.",
+                           "Write { ...e, amount: 9 }."],
+                    difficulty="Medium"),
+                _ex("tscourse-w7-cp-3", "Compare identity",
+                    "Print whether the two separately-built objects are the same object.",
+                    'const a = { n: 1 };\nconst b = { n: 1 };\nconsole.log(a === b);\n',
+                    'a === b', [("", "false")],
+                    hints=["=== on objects asks about identity, not contents."]),
+                _ex("tscourse-w7-cp-4", "Copy one level down",
+                    "Copy the user so changing the copy's city leaves the original as London.",
+                    'const u = { name: "Ada", address: { city: "London" } };\n'
+                    'const v = { ...u, address: { ...u.address } };\n'
+                    'v.address.city = "Paris";\n'
+                    'console.log(`${u.address.city} ${v.address.city}`);\n',
+                    '{ ...u, address: { ...u.address } }',
+                    [("", "London Paris")],
+                    hints=["A plain spread leaves address shared.",
+                           "Spread the nested object too: { ...u, address: { ...u.address } }."],
+                    difficulty="Medium"),
+                _ex("tscourse-w7-cp-5", "Copy an array of records",
+                    "Sort a copy by amount so the original order survives.",
+                    'const rows = [{ n: "a", v: 2 }, { n: "b", v: 1 }];\n'
+                    'const sorted = [...rows].sort((p, q) => p.v - q.v);\n'
+                    'console.log(sorted.map((r) => r.n).join(""));\n'
+                    'console.log(rows.map((r) => r.n).join(""));\n',
+                    '[...rows].sort((p, q) => p.v - q.v)', [("", "ba\nab")],
+                    hints=["Spread the array before sorting it.",
+                           "Write [...rows].sort((p, q) => p.v - q.v)."],
+                    difficulty="Medium"),
+                _fix("tscourse-w7-cp-fix1", "Fix the shared object",
+                     "This should print `1 9` but prints `9 9`. Fix it.",
+                     'const a = { n: 1 };\nconst b = a;\nb.n = 9;\nconsole.log(`${a.n} ${b.n}`);\n',
+                     'const a = { n: 1 };\nconst b = { ...a };\nb.n = 9;\nconsole.log(`${a.n} ${b.n}`);\n',
+                     [("", "1 9")],
+                     hints=["`const b = a;` gives the same object a second name.",
+                            "Spread to build a fresh one."],
+                     difficulty="Medium"),
+                _fix("tscourse-w7-cp-fix2", "Fix the shallow copy",
+                     "This should print `London Paris` but prints `Paris Paris`. Fix it.",
+                     'const u = { name: "Ada", address: { city: "London" } };\n'
+                     'const v = { ...u };\nv.address.city = "Paris";\n'
+                     'console.log(`${u.address.city} ${v.address.city}`);\n',
+                     'const u = { name: "Ada", address: { city: "London" } };\n'
+                     'const v = { ...u, address: { ...u.address } };\nv.address.city = "Paris";\n'
+                     'console.log(`${u.address.city} ${v.address.city}`);\n',
+                     [("", "London Paris")],
+                     hints=["Spread copies only the top level; address is still the same object.",
+                            "Spread the nested object as well."],
+                     difficulty="Medium"),
+            ],
+            quiz=[
+                _q("An object variable holds…",
+                   ["the object", "a reference to the object", "a copy", "a name"], 1,
+                   "Which is why assignment shares rather than copies."),
+                _q("`{ ...a, x: 1 }` versus `{ x: 1, ...a }` — the difference is…",
+                   ["none", "which one wins: the LAST mention of a field",
+                    "the first is invalid", "the second is faster"], 1,
+                   "In the second, a's own x would override the 1."),
+            ],
+        ),
+        # ---- Lesson 7 --------------------------------------------------
+        _lesson(
+            "w7-tally", "Objects as lookup tables",
+            "Counting, grouping, and looking things up by name.",
+            """
+So far objects have modelled *one thing* with a fixed set of fields. They have a
+second life: as a **lookup table** from arbitrary names to values.
+
+```ts
+const prices: { [key: string]: number } = {
+  coffee: 3.25,
+  book: 12,
+};
+prices["coffee"];    // 3.25
+```
+
+That annotation — `{ [key: string]: number }` — is an **index signature**. It
+says *"any string key, and every value is a number"*. Use it when the keys are
+data rather than a fixed schema.
+
+**Counting** is the classic use, and worth knowing cold:
+
+```ts
+const counts: { [key: string]: number } = {};
+for (const w of words) {
+  counts[w] = (counts[w] ?? 0) + 1;
+}
+```
+
+The `?? 0` carries the whole idea. The first time a word appears, `counts[w]` is
+`undefined`, and `undefined + 1` is `NaN`. The fallback supplies the starting
+value. (`|| 0` happens to work here too, since a count of 0 never survives, but
+`??` states the intent: *only* when missing.)
+
+**Why an object rather than searching an array?** Looking a key up in an object
+is effectively instant no matter how many keys there are, where scanning an
+array to find a match takes longer as it grows. Counting a million words with an
+array of pairs would be unusably slow; with an object it's immediate. You'll
+give this a name — O(1) versus O(n) — in Month 6.
+
+**Reading a table back out:**
+
+```ts
+Object.keys(counts)      // ["a", "b"]
+Object.values(counts)    // [2, 1]
+Object.entries(counts)   // [["a", 2], ["b", 1]]
+```
+
+`entries` gives an array of `[key, value]` pairs, which you can then sort or map
+like any array:
+
+```ts
+Object.entries(counts)
+  .sort((p, q) => q[1] - p[1])          // by count, descending
+  .map((p) => `${p[0]}:${p[1]}`)
+  .join(", ");
+```
+
+`p[0]` is the key and `p[1]` the value. You can destructure the pair instead,
+which reads better: `.map(([k, v]) => `${k}:${v}`)`.
+
+**Grouping** is the same move with arrays as the values:
+
+```ts
+const byTag: { [key: string]: string[] } = {};
+for (const e of expenses) {
+  if (byTag[e.tag] === undefined) byTag[e.tag] = [];
+  byTag[e.tag].push(e.desc);
+}
+```
+
+Make sure the bucket exists, then push into it. (`Map` — a purpose-built
+alternative — arrives in week 18.)
+
+> ⚠️ **Common mistakes:** forgetting `?? 0` and getting `NaN`; forgetting to
+> create the empty array before pushing; and assuming key order is meaningful
+> (it mostly follows insertion order for string keys, but don't rely on it —
+> sort explicitly).
+""",
+            warmup=[
+                _q("`counts[w] = counts[w] + 1;` on a brand-new word gives…",
+                   ["1", "0", "NaN", "an error"], 2,
+                   "undefined + 1 is NaN — hence the ?? 0."),
+                _q("`Object.keys({a:1,b:2})` is…",
+                   ['["a","b"]', "[1,2]", "2", '[["a",1],["b",2]]'], 0, "The key names."),
+                _q("`Object.entries({a:1})` is…",
+                   ['["a",1]', '[["a",1]]', '{a:1}', '["a"]'], 1,
+                   "An array of [key, value] pairs — one pair here."),
+                _q("Looking a key up in an object versus scanning an array…",
+                   ["the array is faster", "the object stays fast as it grows",
+                    "identical", "objects cannot be searched"], 1,
+                   "Key lookup does not get slower with size."),
+            ],
+            exercises=[
+                _ex("tscourse-w7-ta-1", "A price table",
+                    "Look up the price of the word given on input.",
+                    _FS + 'const prices: { [key: string]: number } = { coffee: 3.25, book: 12 };\n'
+                    'const k = fs.readFileSync(0, "utf8").trim();\n'
+                    'console.log(prices[k]);\n',
+                    'prices[k]', [("coffee", "3.25"), ("book", "12")],
+                    hints=["Bracket access with the runtime key."]),
+                _ex("tscourse-w7-ta-2", "Count the words",
+                    "Count how many times each word appears, then print the count for `a`.",
+                    _WORDS + 'const counts: { [key: string]: number } = {};\n'
+                    'for (const w of words) {\n  counts[w] = (counts[w] ?? 0) + 1;\n}\n'
+                    'console.log(counts["a"] ?? 0);\n',
+                    'counts[w] = (counts[w] ?? 0) + 1;',
+                    [("a b a c a", "3"), ("b c", "0")],
+                    hints=["The first sighting of a word has no existing count.",
+                           "Write counts[w] = (counts[w] ?? 0) + 1;"],
+                    difficulty="Medium"),
+                _ex("tscourse-w7-ta-3", "How many distinct",
+                    "Print how many DISTINCT words the input contains.",
+                    _WORDS + 'const seen: { [key: string]: boolean } = {};\n'
+                    'for (const w of words) {\n  seen[w] = true;\n}\n'
+                    'console.log(Object.keys(seen).length);\n',
+                    'Object.keys(seen).length',
+                    [("a b a c a", "3"), ("x", "1")],
+                    hints=["Each distinct word becomes one key.",
+                           "Count the keys: Object.keys(seen).length."],
+                    difficulty="Medium"),
+                _ex("tscourse-w7-ta-4", "Read the table out",
+                    "Print each word and its count as `a:3` lines, sorted alphabetically by word.",
+                    _WORDS + 'const counts: { [key: string]: number } = {};\n'
+                    'for (const w of words) {\n  counts[w] = (counts[w] ?? 0) + 1;\n}\n'
+                    'for (const k of Object.keys(counts).sort()) {\n  console.log(`${k}:${counts[k]}`);\n}\n',
+                    'Object.keys(counts).sort()',
+                    [("b a a", "a:2\nb:1"), ("x", "x:1")],
+                    hints=["Key order is not guaranteed, so sort the keys explicitly.",
+                           "Write Object.keys(counts).sort()."],
+                    difficulty="Medium"),
+                _ex("tscourse-w7-ta-5", "The most common word",
+                    "Print the most frequent word. On a tie, the alphabetically first wins.",
+                    _WORDS + 'const counts: { [key: string]: number } = {};\n'
+                    'for (const w of words) {\n  counts[w] = (counts[w] ?? 0) + 1;\n}\n'
+                    'const best = Object.keys(counts).sort().sort((p, q) => counts[q] - counts[p])[0];\n'
+                    'console.log(best);\n',
+                    '(p, q) => counts[q] - counts[p]',
+                    [("a b a c a", "a"), ("b b c c", "b"), ("z", "z")],
+                    hints=["Sort alphabetically first, then re-sort by count descending — sort is stable, so ties keep the alphabetical order.",
+                           "The count comparator is (p, q) => counts[q] - counts[p]."],
+                    difficulty="Medium"),
+                _fix("tscourse-w7-ta-fix1", "Fix the NaN count",
+                     "This should print 3 for `a b a c a` but prints NaN. Fix it.",
+                     _WORDS + 'const counts: { [key: string]: number } = {};\n'
+                     'for (const w of words) {\n  counts[w] = counts[w] + 1;\n}\n'
+                     'console.log(counts["a"]);\n',
+                     _WORDS + 'const counts: { [key: string]: number } = {};\n'
+                     'for (const w of words) {\n  counts[w] = (counts[w] ?? 0) + 1;\n}\n'
+                     'console.log(counts["a"]);\n',
+                     [("a b a c a", "3"), ("a", "1")],
+                     hints=["The first time a word is seen, its count is undefined.",
+                            "Supply a starting value: (counts[w] ?? 0) + 1."],
+                     difficulty="Medium"),
+            ],
+            quiz=[
+                _q("`{ [key: string]: number }` describes…",
+                   ["one field called key", "any string key, with number values",
+                    "an array", "a function"], 1,
+                   "An index signature, for tables whose keys are data."),
+                _q("Why `?? 0` in a tally?",
+                   ["style", "the first occurrence has no existing count",
+                    "to reset", "for speed"], 1,
+                   "Otherwise undefined + 1 is NaN."),
+                _q("To group values under a key you must first…",
+                   ["sort", "make sure the bucket array exists", "count them",
+                    "use an array"], 1,
+                   "Pushing onto undefined throws."),
             ],
         ),
     ],
-    capstone=_cap_brief(
-        "Budget Buddy #7 — model your expenses (free build)",
+    capstone=_cap_auto(
+        "Budget Buddy #7 — the expense ledger",
         """
-A **free-build** project — no auto-grader. In the editor, model Budget Buddy's data:
+Budget Buddy grows up: expenses become **records**, and the report is built
+from them.
 
-1. Represent each expense as an object with `desc`, `amount`, and `paid` (a boolean).
-2. Put several expenses in an array.
-3. Write a function that takes the array and prints a report: the number of
-   expenses, the total amount, and the descriptions of the unpaid ones.
+Input is one expense per line — `desc amount paid` — where `paid` is `y` or
+`n`:
 
-Use everything from Weeks 1–7: variables, loops, functions, arrays, objects.
-When you're happy with the output, click **Mark done**. A reference solution is
-below if you want to compare.
+```
+coffee 3.25 y
+book 12 n
+lunch 9.50 n
+rent 900 y
+```
+
+Print:
+
+```
+Entries:  4
+Total:    $924.75
+Unpaid:   $21.50 (book, lunch)
+Biggest:  rent ($900.00)
+```
+
+Rules:
+
+- Build an array of records with `desc` (string), `amount` (number) and `paid`
+  (boolean — `true` when the third field is `y`).
+- `Unpaid` shows the unpaid total, then the unpaid descriptions in **input
+  order**, joined with `, `.
+- `Biggest` is the single largest expense, paid or not.
+- Money always carries two decimal places.
 """,
-        reference="""
-const expenses = [
-  { desc: "coffee", amount: 3, paid: true },
-  { desc: "book", amount: 12, paid: false },
-  { desc: "lunch", amount: 9, paid: false },
-];
-function report(items) {
-  let total = 0;
-  for (const e of items) total = total + e.amount;
-  console.log(`Expenses: ${items.length}`);
-  console.log(`Total: $${total}`);
-  const unpaid = items.filter((e) => !e.paid).map((e) => e.desc);
-  console.log(`Unpaid: ${unpaid.join(", ")}`);
-}
-report(expenses);
-""",
-        rubric=["Each expense is an object with desc, amount, paid",
-                "A function takes the array and prints a report",
-                "The report includes the count, the total, and the unpaid descriptions"],
+        _ch("tscourse-w7-capstone", "Budget Buddy #7", "Medium",
+            "Parse the lines into records, then report on them.",
+            _FS + 'const rows = fs.readFileSync(0, "utf8").trim().split("\\n");\n'
+            'const items = rows.map((line) => {\n'
+            '  const p = line.trim().split(" ");\n'
+            '  return { desc: p[0], amount: Number(p[1]), paid: p[2] === "y" };\n'
+            '});\n'
+            'let total = 0;\n'
+            'for (const it of items) {\n  total += it.amount;\n}\n'
+            'const unpaid = items.filter((it) => !it.paid);\n'
+            'let unpaidTotal = 0;\n'
+            'for (const it of unpaid) {\n  unpaidTotal += it.amount;\n}\n'
+            'const biggest = [...items].sort((p, q) => q.amount - p.amount)[0];\n'
+            'console.log(`Entries:  ${items.length}`);\n'
+            'console.log(`Total:    $${total.toFixed(2)}`);\n'
+            'console.log(`Unpaid:   $${unpaidTotal.toFixed(2)} (${unpaid.map((it) => it.desc).join(", ")})`);\n'
+            'console.log(`Biggest:  ${biggest.desc} ($${biggest.amount.toFixed(2)})`);\n',
+            'const items = rows.map((line) => {\n'
+            '  const p = line.trim().split(" ");\n'
+            '  return { desc: p[0], amount: Number(p[1]), paid: p[2] === "y" };\n'
+            '});\n'
+            'let total = 0;\n'
+            'for (const it of items) {\n  total += it.amount;\n}\n'
+            'const unpaid = items.filter((it) => !it.paid);\n'
+            'let unpaidTotal = 0;\n'
+            'for (const it of unpaid) {\n  unpaidTotal += it.amount;\n}\n'
+            'const biggest = [...items].sort((p, q) => q.amount - p.amount)[0];\n'
+            'console.log(`Entries:  ${items.length}`);\n'
+            'console.log(`Total:    $${total.toFixed(2)}`);\n'
+            'console.log(`Unpaid:   $${unpaidTotal.toFixed(2)} (${unpaid.map((it) => it.desc).join(", ")})`);\n'
+            'console.log(`Biggest:  ${biggest.desc} ($${biggest.amount.toFixed(2)})`);',
+            [("coffee 3.25 y\nbook 12 n\nlunch 9.50 n\nrent 900 y",
+              "Entries:  4\nTotal:    $924.75\nUnpaid:   $21.50 (book, lunch)\nBiggest:  rent ($900.00)"),
+             ("tea 2 n",
+              "Entries:  1\nTotal:    $2.00\nUnpaid:   $2.00 (tea)\nBiggest:  tea ($2.00)"),
+             ("a 5 y\nb 5 y",
+              "Entries:  2\nTotal:    $10.00\nUnpaid:   $0.00 ()\nBiggest:  a ($5.00)")],
+            hints=["Parse first: split into lines, then split each line into three parts.",
+                   'paid is a boolean, so convert it: p[2] === "y".',
+                   "Filter to the unpaid records ONCE and reuse that array for both the total and the names — it keeps input order automatically.",
+                   "Biggest comes from sorting a copy descending by amount and taking element 0.",
+                   "Every money figure ends in .toFixed(2)."]),
+        example_io="Entries:  4\nTotal:    $924.75\nUnpaid:   $21.50 (book, lunch)\nBiggest:  rent ($900.00)",
+        rubric=["Each line becomes a record with desc, amount and a boolean paid",
+                "The unpaid list preserves input order",
+                "Biggest is found without mutating the items array",
+                "All money is formatted to two decimal places"],
+        stretch=_ch("tscourse-w7-capstone-stretch", "Budget Buddy #7 (stretch)", "Medium",
+                    "Add a `By tag:` line. Each line now ends with a tag (`coffee 3.25 y food`); total the amounts per tag and print them sorted alphabetically as `food=$12.75; rent=$900.00`.",
+                    _FS + 'const rows = fs.readFileSync(0, "utf8").trim().split("\\n");\n'
+                    'const items = rows.map((line) => {\n'
+                    '  const p = line.trim().split(" ");\n'
+                    '  return { desc: p[0], amount: Number(p[1]), paid: p[2] === "y", tag: p[3] };\n'
+                    '});\n'
+                    'const byTag: { [key: string]: number } = {};\n'
+                    'for (const it of items) {\n  byTag[it.tag] = (byTag[it.tag] ?? 0) + it.amount;\n}\n'
+                    'const parts = Object.keys(byTag).sort().map((t) => `${t}=$${byTag[t].toFixed(2)}`);\n'
+                    'console.log(`By tag: ${parts.join("; ")}`);\n',
+                    'const byTag: { [key: string]: number } = {};\n'
+                    'for (const it of items) {\n  byTag[it.tag] = (byTag[it.tag] ?? 0) + it.amount;\n}\n'
+                    'const parts = Object.keys(byTag).sort().map((t) => `${t}=$${byTag[t].toFixed(2)}`);\n'
+                    'console.log(`By tag: ${parts.join("; ")}`);',
+                    [("coffee 3.25 y food\nlunch 9.50 n food\nrent 900 y home",
+                      "By tag: food=$12.75; home=$900.00"),
+                     ("tea 2 n drink", "By tag: drink=$2.00")],
+                    hints=["This is the tally pattern, accumulating an amount rather than a count.",
+                           "byTag[it.tag] = (byTag[it.tag] ?? 0) + it.amount;",
+                           "Sort the keys before mapping so the output is deterministic."]),
     ),
 ))
 
@@ -6312,217 +8599,4313 @@ report(expenses);
 _WEEKS.append(_week(
     8, 2, _M2,
     "Types that Describe Your Data",
-    "Annotate values and name shapes with type aliases and interfaces.",
+    "Name the shapes your program works with, let inference do the rest, and fold a list to one value with reduce.",
     """
-You've used TypeScript's types implicitly all along. This week you make them
-explicit: **annotations** on values and functions, and naming reusable shapes
-with **`interface`** and **`type`**. Well-named types are documentation the
-compiler checks for you.
+You have been using types since week 1 — TypeScript worked most of them out
+silently. This week you take the wheel: **naming** the shapes your data has, so
+the compiler can check every place they're used.
 
-Types are erased before the program runs, so the drills still exercise runtime
-logic — the annotations describe it.
+The payoff is not decoration. Once `Expense` is a named type, a misspelled
+`e.amont`, a forgotten field, a string where a number belongs — each becomes a
+red squiggle as you type instead of a wrong number in a report. That is the
+entire reason TypeScript exists.
+
+Two things to keep straight all week:
+
+- **Types are erased before the program runs.** Nothing you write here changes
+  behaviour at runtime. The drills therefore still exercise real logic; the
+  types describe it.
+- **Annotate boundaries, infer the middle.** Function parameters and returns,
+  and empty containers, are worth annotating. Local variables with an obvious
+  initialiser are not — `const n = 5` is already a `number`.
+
+The week closes with **`reduce`**, the last of the big array methods and the one
+that generalises all the others.
+
+⏱️ Budget about **five hours**.
 """,
     objectives=[
-        "Write type annotations on values and functions",
-        "Name a shape with interface or type",
-        "Annotate an array of records (Item[])",
-        "Fold a list to one value with reduce",
+        "Annotate values and functions, and know when inference is enough",
+        "Name a shape with a type alias or an interface, and say which to reach for",
+        "Type arrays of records, and use a tuple for a fixed-length pair",
+        "Mark properties optional, and understand structural typing and excess-property checks",
+        "Write a function type, and type a callback parameter",
+        "Fold a list to a number, a string or an object with reduce",
+        "Design a type for real-world data and process it end to end",
     ],
-    why="Types catch whole classes of bugs before the program ever runs — the reason TypeScript exists.",
-    est_minutes=50,
+    why="A named type is documentation the compiler enforces. It is the cheapest bug prevention available, and it is what makes a codebase survive being edited six months later by someone who has forgotten it.",
+    est_minutes=300,
     glossary=[
         _gloss("annotation", "A written type after a colon: let n: number."),
-        _gloss("inference", "TypeScript working out a type for you."),
+        _gloss("inference", "TypeScript working the type out from the value."),
+        _gloss("type alias", "A name for any type: type ID = string."),
         _gloss("interface", "A name for the shape of an object type."),
-        _gloss("type alias", "Another way to name a type: type User = {...}."),
-        _gloss(".reduce(f, start)", "Folds a list into a single accumulated value."),
+        _gloss("structural typing", "Compatibility by SHAPE, not by name — if it has the right fields, it fits."),
+        _gloss("excess property check", "TypeScript rejects unknown fields on an object literal assigned straight to a typed slot."),
+        _gloss("optional property", "A field marked `?` that may be absent."),
+        _gloss("readonly", "A property that cannot be reassigned after creation."),
+        _gloss("union", "A type that is one of several: string | number."),
+        _gloss("literal type", "A type that is one exact value: \"paid\"."),
+        _gloss("tuple", "A fixed-length array with a type per position: [string, number]."),
+        _gloss("Array<T>", "The long form of T[] — the same type."),
+        _gloss("function type", "(a: number) => string — the shape of a function."),
+        _gloss("void", "The return type of a function that returns nothing useful."),
+        _gloss("any", "Opts out of checking entirely. Almost always the wrong answer."),
+        _gloss("unknown", "Like any, but you must narrow it before use. The safe version."),
+        _gloss(".reduce(f, seed)", "Folds a list into a single accumulated value."),
+        _gloss("accumulator (reduce)", "The value carried from one step to the next."),
     ],
     cheatsheet="""
 ```ts
-const price: number = 10;
-function repeat(s: string, n: number): string { return s.repeat(n); }
-interface Point { x: number; y: number; }
+// ---- annotate & infer -------------------------------------------------
+const price: number = 10;      // annotation (often unnecessary)
+const qty = 3;                 // inferred as number — fine
+let names: string[] = [];      // needed: nothing to infer from
+function f(s: string, n: number): string { return s.repeat(n); }
+
+// ---- name a shape ------------------------------------------------------
+interface Point { x: number; y: number }
 type User = { name: string; admin: boolean };
-const items: Item[] = [...];
-items.reduce((sum, it) => sum + it.price, 0)   // fold to one number
+type ID = string;                       // alias for any type, not just objects
+type Status = "paid" | "unpaid";        // a union of literal types
+
+// ---- arrays & tuples ---------------------------------------------------
+const xs: number[] = [1, 2, 3];
+const ys: Array<number> = [1, 2, 3];    // identical
+const rows: User[] = [];
+const pair: [string, number] = ["a", 1];   // fixed length, typed per slot
+
+// ---- optional & readonly ------------------------------------------------
+interface Expense {
+  desc: string;
+  amount: number;
+  note?: string;              // may be absent -> string | undefined
+  readonly id: string;        // set at creation, never reassigned
+}
+
+// ---- function types ------------------------------------------------------
+type Mapper = (x: number) => number;
+const double: Mapper = (x) => x * 2;        // parameter type inferred from Mapper
+function apply(f: (x: number) => number, x: number): number { return f(x); }
+
+// ---- reduce ---------------------------------------------------------------
+[1, 2, 3].reduce((sum, x) => sum + x, 0)          // 6      fold to a number
+words.reduce((acc, w) => acc + w[0], "")          // fold to a string
+items.reduce((acc, it) => {                        // fold to an object
+  acc[it.tag] = (acc[it.tag] ?? 0) + 1;
+  return acc;
+}, {} as { [key: string]: number })
 ```
 """,
     self_check=[
-        "Can you annotate a function's parameters and return type?",
-        "Can you name an object shape with interface and use it?",
-        "Can you total a field over a typed array with reduce?",
+        "Can you say which annotations are worth writing and which are noise?",
+        "Can you name an object shape and use it on a function parameter?",
+        "Can you explain what 'structural typing' means in one sentence?",
+        "Can you say what `note?: string` does to the type of `e.note`?",
+        "Can you write the type of a function that takes a string and returns a number?",
+        "Can you total a field with reduce, and say what the seed is for?",
+        "Can you say why `any` is worse than `unknown`?",
     ],
     review=[
         _q("What happens to type annotations at runtime?",
-           ["they slow it down", "they're erased (compile-time only)",
-            "they become comments", "they print"], 1,
-           "Types guide you and the compiler, then vanish before running."),
+           ["They slow it down", "They are erased before the program runs",
+            "They become comments", "They are printed"], 1,
+           "Checked while you write, then stripped."),
         _q("`interface` names…",
-           ["a running object", "the shape of an object type", "a loop", "an input"], 1,
-           "It names a reusable object shape."),
-        _q("`[1,2,3].reduce((s,x)=>s+x, 0)` is…", ["0", "6", "123", "3"], 1,
-           "It folds to the sum, 6."),
+           ["a running object", "the shape of an object type", "a loop", "a value"], 1,
+           "A reusable object shape."),
+        _q("Which is TRUE of `type` versus `interface`?",
+           ["type only works for objects", "interface only works for objects",
+            "they are completely identical", "type cannot be exported"], 1,
+           "A type alias can name ANY type — unions, functions, primitives — while an interface names object shapes."),
+        _q("TypeScript decides two types are compatible based on…",
+           ["their names", "their shape", "declaration order", "the file they are in"], 1,
+           "Structural typing: the right fields is enough."),
+        _q("`note?: string` means `e.note` has type…",
+           ["string", "string | undefined", "undefined", "any"], 1,
+           "Optional adds undefined to the type."),
+        _q("`[string, number]` describes…",
+           ["an array of strings and numbers", "a fixed-length pair, typed per position",
+            "a union", "an object"], 1,
+           "A tuple."),
+        _q("`[1,2,3].reduce((s, x) => s + x, 0)` is…", ["0", "6", "123", "3"], 1,
+           "It folds to the sum."),
+        _q("The seed (second argument) of reduce is…",
+           ["the first element", "the starting accumulator", "the length", "optional and pointless"], 1,
+           "It is what the accumulator begins as — and the answer for an empty array."),
+        _q("Why prefer `unknown` to `any`?",
+           ["it is faster", "unknown forces you to narrow before use", "any is deprecated",
+            "no difference"], 1,
+           "any switches checking off entirely; unknown keeps you honest."),
+        _q("Which annotation is genuinely needed?",
+           ["const n: number = 5", "const s: string = \"a\"", "const xs: string[] = []",
+            "const b: boolean = true"], 2,
+           "An empty array gives inference nothing to work from."),
     ],
-    milestone="Budget Buddy is now fully typed — the compiler guards its data. You've finished Month 2!",
+    milestone="Budget Buddy is now fully typed — the compiler guards its data, and reduce folds a whole ledger into a summary. That's Month 2 complete.",
     lessons=[
+        # ---- Lesson 1 --------------------------------------------------
         _lesson(
             "w8-annotations", "Annotations & inference",
-            "Writing types on values and functions.",
+            "Writing types — and knowing when not to.",
             """
+An **annotation** is a type written after a colon:
+
 ```ts
 const price: number = 10;
+const label: string = "Coffee";
+let names: string[] = [];
 function repeat(s: string, n: number): string {
   return s.repeat(n);
 }
 ```
 
-Often you can omit annotations and let TypeScript **infer** them — but writing
-them on function parameters and returns is good practice.
+**Inference** is TypeScript working it out for you:
 
-> ⚠️ **Common mistakes:** thinking annotations change runtime behaviour — they
-> don't; they're checked, then stripped.
+```ts
+const price = 10;            // inferred: number
+const label = "Coffee";      // inferred: string
+const xs = [1, 2, 3];        // inferred: number[]
+```
+
+Both are equally type-safe. `const price: number = 10` adds nothing the compiler
+didn't already know — it's just more to read and more to keep in sync.
+
+**The rule of thumb: annotate the boundaries, infer the middle.**
+
+| annotate | because |
+|---|---|
+| function parameters | there is no value to infer from |
+| function return types | it pins your intent, and catches a wrong branch |
+| empty arrays/objects | `[]` could be an array of anything |
+| a value that should be narrower than its literal | `let s: string` when you'll reassign |
+
+| don't annotate | because |
+|---|---|
+| `const n = 5` | obviously a number |
+| `const xs = [1, 2]` | obviously `number[]` |
+| a local computed from typed things | inference follows the chain |
+
+**Why annotate a return type** when TypeScript can infer it? Because inference
+reports what your code *does*; an annotation states what it's *meant* to do. If
+a branch accidentally returns a string, an annotated function errors at the
+mistake. An unannotated one silently widens its return type and the error
+surfaces somewhere else entirely.
+
+**`any` turns checking off:**
+
+```ts
+let x: any = 5;
+x.foo.bar();     // no complaint — and a crash at runtime
+```
+
+Every `any` is a hole in the net. `unknown` is the honest alternative: it
+accepts anything but makes you check before you use it (week 9's narrowing is
+exactly that skill).
+
+> ⚠️ **Common mistakes:** annotating everything and drowning the code in noise;
+> reaching for `any` to silence an error rather than understanding it; and
+> forgetting that annotations vanish at runtime — they never validate real input.
 """,
             warmup=[
-                _q('`"ab".repeat(3)` is…', ["ababab", "ab3", "6", "aaabbb"], 0,
-                   "repeat concatenates 3 copies."),
+                _q("`const n = 5;` — what type does TypeScript infer?",
+                   ["any", "number", "5", "unknown"], 1, "From the value."),
+                _q("Which annotation is genuinely required?",
+                   ["const a = 1", "const b: number = 1", "const c: string[] = []",
+                    "const d = \"x\""], 2,
+                   "An empty array has nothing to infer from."),
+                _q("`let x: any = 5; x.foo();` at compile time…",
+                   ["errors", "is accepted", "warns", "is impossible"], 1,
+                   "any accepts anything — and then it crashes when it runs."),
+                _q("Annotations at runtime…",
+                   ["validate input", "are erased", "slow things down", "become comments"], 1,
+                   "They never check real data — that is your job."),
             ],
             exercises=[
                 _ex("tscourse-w8-an-1", "Typed total",
                     "Compute price * qty into the annotated total.",
-                    'const price: number = 10;\nconst qty: number = 3;\nconst total: number = price * qty;\nconsole.log(total);\n',
+                    'const price: number = 10;\nconst qty: number = 3;\n'
+                    'const total: number = price * qty;\nconsole.log(total);\n',
                     'price * qty', [("", "30")],
                     hints=["Multiply the two annotated numbers."]),
                 _ex("tscourse-w8-an-2", "Typed repeat",
                     "Return the string repeated n times.",
-                    'function repeat(s: string, n: number): string {\n  return s.repeat(n);\n}\nconsole.log(repeat("ab", 3));\n',
+                    'function repeat(s: string, n: number): string {\n  return s.repeat(n);\n}\n'
+                    'console.log(repeat("ab", 3));\n',
                     's.repeat(n)', [("", "ababab")],
                     hints=["Strings have a .repeat(n) method."]),
-                _fix("tscourse-w8-an-fix", "Fix the annotation mismatch",
-                     "This should print 30, but a wrong operator sneaks in. Fix it.",
-                     'const price: number = 10;\nconst qty: number = 3;\nconst total: number = price + qty;\nconsole.log(total);\n',
-                     'const price: number = 10;\nconst qty: number = 3;\nconst total: number = price * qty;\nconsole.log(total);\n',
+                _ex("tscourse-w8-an-3", "An annotated empty array",
+                    "Collect the doubled numbers into the annotated array and print them.",
+                    _NUMS + 'const out: number[] = [];\n'
+                    'for (const x of nums) {\n  out.push(x * 2);\n}\n'
+                    'console.log(out.join(" "));\n',
+                    'out.push(x * 2);', [("1 2 3", "2 4 6"), ("5", "10")],
+                    hints=["The array is already annotated — just fill it.",
+                           "Write out.push(x * 2);"]),
+                _ex("tscourse-w8-an-4", "Annotate the parameters",
+                    "Fill in the parameter list: a string and a number.",
+                    'function tag(name: string, n: number): string {\n'
+                    '  return `${name}-${n}`;\n}\n'
+                    'console.log(tag("row", 3));\n',
+                    'name: string, n: number', [("", "row-3")],
+                    hints=["Each parameter gets its own annotation, separated by a comma.",
+                           "Write name: string, n: number."]),
+                _ex("tscourse-w8-an-5", "A narrower let",
+                    "Annotate `status` so it can later hold any string, then print it.",
+                    'let status: string = "new";\nstatus = "done";\nconsole.log(status);\n',
+                    ': string = "new"', [("", "done")],
+                    hints=['Without the annotation this would still infer string — but stating it documents the intent.',
+                           'Write : string = "new".']),
+                _fix("tscourse-w8-an-fix1", "Fix the operator",
+                     "This should print 30 but a wrong operator sneaks in. Fix it.",
+                     'const price: number = 10;\nconst qty: number = 3;\n'
+                     'const total: number = price + qty;\nconsole.log(total);\n',
+                     'const price: number = 10;\nconst qty: number = 3;\n'
+                     'const total: number = price * qty;\nconsole.log(total);\n',
                      [("", "30")],
-                     hints=["price + qty is 13, not 30.",
-                            "A total of items uses multiplication."]),
+                     hints=["price + qty is 13.", "A line total multiplies."]),
+                _fix("tscourse-w8-an-fix2", "Fix the any-shaped hole",
+                     "`any` let a string through where a number was meant, so this prints `102` instead of 12. Give the value a real type and convert the input.",
+                     _FS + 'const raw: any = fs.readFileSync(0, "utf8").trim();\n'
+                     'console.log(raw + 2);\n',
+                     _FS + 'const raw: number = Number(fs.readFileSync(0, "utf8").trim());\n'
+                     'console.log(raw + 2);\n',
+                     [("10", "12"), ("5", "7")],
+                     hints=["any silenced the check; the value really is a string, so + joined.",
+                            "Annotate it as number and convert with Number(...)."],
+                     difficulty="Medium"),
+            ],
+            quiz=[
+                _q("'Annotate the boundaries, infer the middle' means…",
+                   ["annotate everything", "annotate parameters, returns and empty containers",
+                    "never annotate", "annotate only locals"], 1,
+                   "Those are the places inference has nothing to work from, or where intent matters."),
+                _q("An annotated return type helps because…",
+                   ["it is faster", "an accidental wrong return errors at the function, not far away",
+                    "it is required", "it changes the value"], 1,
+                   "Inference reports what the code does; the annotation states what it should do."),
             ],
         ),
+        # ---- Lesson 2 --------------------------------------------------
         _lesson(
-            "w8-interfaces", "Interfaces & type aliases",
-            "Naming the shape of your data.",
+            "w8-aliases", "Naming shapes: type & interface",
+            "One name, used everywhere.",
             """
-Name a shape once, use it everywhere:
+Writing the same inline shape three times is how it drifts:
 
 ```ts
-interface Point { x: number; y: number; }
-type User = { name: string; admin: boolean };
+function total(e: { desc: string; amount: number }): number { ... }
+function label(e: { desc: string; amount: number }): string { ... }
+```
 
-function dist(p: Point): number {
-  return Math.abs(p.x) + Math.abs(p.y);
+Name it once instead. Two ways, both fine:
+
+```ts
+interface Expense {
+  desc: string;
+  amount: number;
+}
+
+type Expense = {
+  desc: string;
+  amount: number;
+};
+```
+
+Then use the name:
+
+```ts
+function total(e: Expense): number { return e.amount; }
+const rows: Expense[] = [];
+```
+
+**`type` versus `interface`.** For object shapes they are nearly
+interchangeable. The real difference:
+
+- **`type` can name *any* type**, not just objects:
+
+```ts
+type ID = string;
+type Status = "paid" | "unpaid";              // a union
+type Mapper = (x: number) => number;          // a function
+type Pair = [string, number];                 // a tuple
+```
+
+- **`interface` is only for object shapes**, but it can be *reopened* — declare
+  it twice and the members merge. That's occasionally essential for extending
+  library types, and occasionally a surprise.
+
+A workable convention: **`interface` for object shapes you might extend,
+`type` for everything else.** Pick one and be consistent; a codebase that mixes
+them arbitrarily is just noise.
+
+**Extending:**
+
+```ts
+interface Timestamped { created: string }
+interface Expense extends Timestamped { desc: string; amount: number }
+
+type Expense2 = Timestamped & { desc: string; amount: number };   // & = intersection
+```
+
+**Structural typing** is the deep idea underneath all of this. TypeScript does
+not care what a type is *called* — only what shape it has:
+
+```ts
+interface Point { x: number; y: number }
+const thing = { x: 1, y: 2, z: 3 };
+const p: Point = thing;    // ✅ fine — it has x and y
+```
+
+A value fits if it has the required members. This is why you'll sometimes see a
+function parameter typed with an inline shape listing only the two fields it
+actually needs — anything with those fields can be passed.
+
+> ⚠️ **Common mistakes:** using `,` instead of `;` between interface members
+> (both are actually allowed, but be consistent); expecting an interface to
+> reject extra fields on a variable (it doesn't — see the next lesson); and
+> agonising over `type` versus `interface` when it rarely matters.
+""",
+            warmup=[
+                _q("Which can name a union like `\"a\" | \"b\"`?",
+                   ["interface", "type", "both", "neither"], 1,
+                   "A type alias names any type; an interface names object shapes."),
+                _q("TypeScript decides compatibility by…",
+                   ["the type's name", "the shape", "the file", "declaration order"], 1,
+                   "Structural typing."),
+                _q("`interface A extends B` means A…",
+                   ["replaces B", "has B's members plus its own", "is unrelated to B",
+                    "is a copy of B"], 1,
+                   "Extension adds to the inherited members."),
+                _q("An object with EXTRA fields assigned to a variable of a narrower interface is…",
+                   ["always rejected", "accepted when it comes from a variable",
+                    "an error at runtime", "converted"], 1,
+                   "Structural typing accepts it; only fresh object literals get the excess-property check."),
+            ],
+            exercises=[
+                _ex("tscourse-w8-al-1", "Use a named shape",
+                    "Return the Manhattan distance of the point from the origin.",
+                    'interface Point {\n  x: number;\n  y: number;\n}\n'
+                    'function dist(p: Point): number {\n  return Math.abs(p.x) + Math.abs(p.y);\n}\n'
+                    'console.log(dist({ x: 3, y: -4 }));\n',
+                    'Math.abs(p.x) + Math.abs(p.y)', [("", "7")],
+                    hints=["Add the absolute values of the two coordinates."]),
+                _ex("tscourse-w8-al-2", "A type alias for a record",
+                    "Return `<name> (admin)` when admin is true, otherwise just the name.",
+                    'type User = { name: string; admin: boolean };\n'
+                    'function label(u: User): string {\n'
+                    '  return u.admin ? `${u.name} (admin)` : u.name;\n}\n'
+                    'console.log(label({ name: "Ada", admin: true }));\n'
+                    'console.log(label({ name: "Bo", admin: false }));\n',
+                    'u.admin ? `${u.name} (admin)` : u.name',
+                    [("", "Ada (admin)\nBo")],
+                    hints=["A ternary picks between the two strings."]),
+                _ex("tscourse-w8-al-3", "Name a non-object type",
+                    "Alias `Status` to the two allowed strings, then print the given status.",
+                    _FS + 'type Status = "paid" | "unpaid";\n'
+                    'const s: Status = fs.readFileSync(0, "utf8").trim() === "paid" ? "paid" : "unpaid";\n'
+                    'console.log(s);\n',
+                    '"paid" | "unpaid"', [("paid", "paid"), ("no", "unpaid")],
+                    hints=["A type alias can name a union of exact string values.",
+                           'Write "paid" | "unpaid".'],
+                    difficulty="Medium"),
+                _ex("tscourse-w8-al-4", "Extend an interface",
+                    "Total the amount across the extended records.",
+                    'interface Timestamped {\n  created: string;\n}\n'
+                    'interface Expense extends Timestamped {\n  desc: string;\n  amount: number;\n}\n'
+                    'const rows: Expense[] = [\n'
+                    '  { created: "mon", desc: "coffee", amount: 3 },\n'
+                    '  { created: "tue", desc: "book", amount: 12 },\n'
+                    '];\n'
+                    'let total = 0;\nfor (const r of rows) {\n  total += r.amount;\n}\n'
+                    'console.log(total);\n',
+                    'total += r.amount;', [("", "15")],
+                    hints=["The extended interface has both its own fields and the inherited one.",
+                           "Accumulate r.amount."]),
+                _ex("tscourse-w8-al-5", "Structural fit",
+                    "The value has an extra field, but it still fits Point. Print its distance.",
+                    'interface Point {\n  x: number;\n  y: number;\n}\n'
+                    'const thing = { x: 1, y: 2, z: 3 };\n'
+                    'const p: Point = thing;\n'
+                    'console.log(p.x + p.y);\n',
+                    'const p: Point = thing;', [("", "3")],
+                    hints=["Assigning from a VARIABLE skips the excess-property check.",
+                           "Write const p: Point = thing;"],
+                    difficulty="Medium"),
+                _fix("tscourse-w8-al-fix1", "Fix the distance",
+                     "Negative coordinates break this — dist({x:3,y:-4}) should be 7. Fix it.",
+                     'interface Point {\n  x: number;\n  y: number;\n}\n'
+                     'function dist(p: Point): number {\n  return p.x + p.y;\n}\n'
+                     'console.log(dist({ x: 3, y: -4 }));\n',
+                     'interface Point {\n  x: number;\n  y: number;\n}\n'
+                     'function dist(p: Point): number {\n  return Math.abs(p.x) + Math.abs(p.y);\n}\n'
+                     'console.log(dist({ x: 3, y: -4 }));\n',
+                     [("", "7")],
+                     hints=["3 + (-4) is -1, which is not a distance.",
+                            "Wrap each coordinate in Math.abs."]),
+            ],
+            quiz=[
+                _q("Which CANNOT be expressed with `interface`?",
+                   ["an object shape", "extending another shape",
+                    "a union of two string literals", "a method signature"], 2,
+                   "Unions need a type alias."),
+                _q("Structural typing means a value fits a type when…",
+                   ["it was declared with that type", "it has the required members",
+                    "it is in the same file", "it is a class"], 1,
+                   "Names are irrelevant; shape is everything."),
+            ],
+        ),
+        # ---- Lesson 3 --------------------------------------------------
+        _lesson(
+            "w8-collections", "Typed arrays & tuples",
+            "Describing lists and fixed-length pairs.",
+            """
+An array's type says what's inside it:
+
+```ts
+const xs: number[] = [1, 2, 3];
+const names: string[] = ["Ada"];
+const rows: Expense[] = [];
+```
+
+`Array<number>` is the identical type written the long way:
+
+```ts
+const ys: Array<number> = [1, 2, 3];   // same as number[]
+```
+
+Use whichever your codebase uses. `T[]` is shorter; `Array<T>` occasionally
+reads better for complicated element types.
+
+**Arrays of arrays:**
+
+```ts
+const grid: number[][] = [[1, 2], [3, 4]];
+```
+
+Read `number[][]` from the inside out: an array of (arrays of number).
+
+**An array of a union** versus **a union of arrays** are different, and the
+distinction bites:
+
+```ts
+const a: (string | number)[] = ["x", 1];   // each element is either
+const b: string[] | number[] = ["x", "y"]; // the whole array is one or the other
+```
+
+**Tuples** are fixed-length arrays with a type per position:
+
+```ts
+const pair: [string, number] = ["coffee", 3];
+pair[0].toUpperCase();     // TypeScript knows this one is a string
+pair[1].toFixed(2);        // ...and this one is a number
+```
+
+This is exactly what `Object.entries` gives you — `[key, value]` pairs — which
+is why destructuring them works so neatly:
+
+```ts
+for (const [k, v] of Object.entries(counts)) {
+  console.log(`${k}=${v}`);
 }
 ```
 
-`Math.abs(n)` is the distance of n from zero.
-""",
-            warmup=[
-                _q("`Math.abs(-4)` is…", ["-4", "4", "0", "error"], 1,
-                   "abs gives the magnitude, 4."),
-            ],
-            exercises=[
-                _ex("tscourse-w8-if-1", "Manhattan distance",
-                    "Return |p.x| + |p.y| using Math.abs.",
-                    'interface Point {\n  x: number;\n  y: number;\n}\nfunction dist(p: Point): number {\n  return Math.abs(p.x) + Math.abs(p.y);\n}\nconsole.log(dist({ x: 3, y: -4 }));\n',
-                    'Math.abs(p.x) + Math.abs(p.y)', [("", "7")],
-                    hints=["Add the absolute values of x and y."]),
-                _ex("tscourse-w8-if-2", "Labelled user",
-                    "Return `<name> (admin)` when admin is true, else just the name.",
-                    'type User = { name: string; admin: boolean };\nfunction label(u: User): string {\n  return u.admin ? `${u.name} (admin)` : u.name;\n}\nconsole.log(label({ name: "Ada", admin: true }));\n',
-                    'u.admin ? `${u.name} (admin)` : u.name', [("", "Ada (admin)")],
-                    hints=["A ternary cond ? a : b picks a when cond is true."]),
-                _fix("tscourse-w8-if-fix", "Fix the distance",
-                     "Negative coordinates break this. Fix it so dist({x:3,y:-4}) is 7.",
-                     'interface Point {\n  x: number;\n  y: number;\n}\nfunction dist(p: Point): number {\n  return p.x + p.y;\n}\nconsole.log(dist({ x: 3, y: -4 }));\n',
-                     'interface Point {\n  x: number;\n  y: number;\n}\nfunction dist(p: Point): number {\n  return Math.abs(p.x) + Math.abs(p.y);\n}\nconsole.log(dist({ x: 3, y: -4 }));\n',
-                     [("", "7")],
-                     hints=["3 + (-4) is -1, not a distance.",
-                            "Wrap each coordinate in Math.abs."]),
-            ],
-        ),
-        _lesson(
-            "w8-typed-arrays", "Typed arrays & reduce",
-            "Interfaces over lists, folded with reduce.",
-            """
-Annotate an array of records with `Item[]`, and fold it with `reduce`:
+A tuple is the right tool when a pair genuinely has a fixed shape and order.
+When there are more than two or three slots, or the order isn't obvious, an
+object with names is kinder to read.
+
+**`readonly`** stops reassignment:
 
 ```ts
-interface Item { name: string; price: number; }
-const items: Item[] = [{ name: "A", price: 4 }, { name: "B", price: 6 }];
-const total = items.reduce((sum, it) => sum + it.price, 0);   // 10
+const xs: readonly number[] = [1, 2, 3];
+xs.push(4);       // ❌ compile error
 ```
 
-`reduce` carries an accumulator (`sum`, starting at 0) across the list.
+It's a compile-time promise, not a runtime freeze — but as a signal in a
+function signature ("I will not modify your array") it is genuinely valuable.
+
+> ⚠️ **Common mistakes:** writing `number[]` when you meant a tuple and losing
+> the per-position types; forgetting that an empty array literal needs an
+> annotation; and expecting `readonly` to protect the array at runtime.
 """,
             warmup=[
-                _q("`[2,3,5].reduce((s,x)=>s+x, 0)` is…", ["0", "10", "235", "3"], 1,
-                   "Folds to the sum, 10."),
+                _q("`Array<string>` and `string[]` are…",
+                   ["different", "the same type", "only for classes", "invalid"], 1,
+                   "Two spellings of one type."),
+                _q("`number[][]` describes…",
+                   ["two numbers", "an array of arrays of number", "a tuple",
+                    "a union"], 1, "Read it inside out."),
+                _q("`const p: [string, number] = [\"a\", 1];` — what is `p.length`?",
+                   ["any", "exactly 2", "1", "unknown"], 1, "Tuples are fixed length."),
+                _q("`Object.entries(o)` gives you an array of…",
+                   ["keys", "values", "[key, value] tuples", "objects"], 2,
+                   "Which is why `for (const [k, v] of ...)` works."),
             ],
             exercises=[
-                _ex("tscourse-w8-ta-1", "Total price",
-                    "Reduce the items to the sum of their prices.",
-                    'interface Item {\n  name: string;\n  price: number;\n}\nconst items: Item[] = [\n  { name: "A", price: 4 },\n  { name: "B", price: 6 },\n];\nconst total = items.reduce((sum, it) => sum + it.price, 0);\nconsole.log(total);\n',
+                _ex("tscourse-w8-co-1", "A typed list of records",
+                    "Total the amounts across the typed array.",
+                    'interface Item {\n  name: string;\n  price: number;\n}\n'
+                    'const items: Item[] = [\n  { name: "A", price: 4 },\n  { name: "B", price: 6 },\n];\n'
+                    'let total = 0;\nfor (const it of items) {\n  total += it.price;\n}\n'
+                    'console.log(total);\n',
+                    'total += it.price;', [("", "10")],
+                    hints=["Accumulate the price field."]),
+                _ex("tscourse-w8-co-2", "Array of arrays",
+                    "Print the value at row 1, column 0 of the typed grid.",
+                    'const grid: number[][] = [[1, 2], [3, 4]];\nconsole.log(grid[1][0]);\n',
+                    'grid[1][0]', [("", "3")],
+                    hints=["Index the row, then the column."]),
+                _ex("tscourse-w8-co-3", "A tuple",
+                    "Print the pair as `COFFEE costs 3.00`, using both slots.",
+                    'const pair: [string, number] = ["coffee", 3];\n'
+                    'console.log(`${pair[0].toUpperCase()} costs ${pair[1].toFixed(2)}`);\n',
+                    '${pair[0].toUpperCase()} costs ${pair[1].toFixed(2)}',
+                    [("", "COFFEE costs 3.00")],
+                    hints=["Slot 0 is a string and slot 1 is a number, so each has its own methods.",
+                           "Use pair[0].toUpperCase() and pair[1].toFixed(2)."],
+                    difficulty="Medium"),
+                _ex("tscourse-w8-co-4", "Destructure entries",
+                    "Print each key and value as `k=v` lines, sorted by key.",
+                    'const counts: { [key: string]: number } = { b: 1, a: 2 };\n'
+                    'for (const [k, v] of Object.entries(counts).sort()) {\n'
+                    '  console.log(`${k}=${v}`);\n}\n',
+                    'const [k, v] of', [("", "a=2\nb=1")],
+                    hints=["Each entry is a [key, value] tuple, so destructure it in the loop header.",
+                           "Write const [k, v] of."],
+                    difficulty="Medium"),
+                _ex("tscourse-w8-co-5", "An array of a union",
+                    "The list holds numbers and strings. Print only the numbers, space-separated.",
+                    'const mixed: (string | number)[] = [1, "a", 2, "b", 3];\n'
+                    'const nums = mixed.filter((x) => typeof x === "number");\n'
+                    'console.log(nums.join(" "));\n',
+                    'typeof x === "number"', [("", "1 2 3")],
+                    hints=["typeof reports the runtime type as a string.",
+                           'Write typeof x === "number".'],
+                    difficulty="Medium"),
+                _fix("tscourse-w8-co-fix1", "Fix the grid index",
+                     "This should print 3 (row 1, column 0) but prints 2. Fix it.",
+                     'const grid: number[][] = [[1, 2], [3, 4]];\nconsole.log(grid[0][1]);\n',
+                     'const grid: number[][] = [[1, 2], [3, 4]];\nconsole.log(grid[1][0]);\n',
+                     [("", "3")],
+                     hints=["The row index comes first, then the column.",
+                            "Write grid[1][0]."]),
+            ],
+            quiz=[
+                _q("A tuple differs from an array in that…",
+                   ["it is faster", "it has a fixed length with a type per position",
+                    "it cannot hold objects", "it is immutable"], 1,
+                   "Per-position types are the point."),
+                _q("`(string | number)[]` versus `string[] | number[]`:",
+                   ["identical", "the first allows mixed elements; the second is all-one-or-all-the-other",
+                    "the second allows mixing", "both are invalid"], 1,
+                   "Where the union sits changes everything."),
+            ],
+        ),
+        # ---- Lesson 4 --------------------------------------------------
+        _lesson(
+            "w8-optional", "Optional fields & excess properties",
+            "Describing data that isn't always complete.",
+            """
+Real records have holes. Mark a field with `?` when it may be absent:
+
+```ts
+interface Expense {
+  desc: string;
+  amount: number;
+  note?: string;        // may be missing
+}
+```
+
+`note?: string` means `e.note` has type `string | undefined`. TypeScript then
+**makes you deal with it** before using it as a string:
+
+```ts
+e.note.toUpperCase();          // ❌ 'e.note' is possibly undefined
+e.note?.toUpperCase();         // ✅ undefined when absent
+(e.note ?? "").toUpperCase();  // ✅ a real fallback
+```
+
+That error is the feature. Week 7 taught you `?.` and `??` as runtime tools;
+here the compiler tells you exactly where they are needed.
+
+**Optional versus "present but undefined".** `note?: string` allows the field to
+be missing entirely. `note: string | undefined` requires you to *write* it, even
+if the value is `undefined`. Most of the time you want `?`.
+
+**Default it once** rather than defending everywhere:
+
+```ts
+function describe(e: Expense): string {
+  const note = e.note ?? "(no note)";
+  return `${e.desc}: ${note}`;
+}
+```
+
+**Excess property checks.** TypeScript is structural — extra fields are usually
+fine. But a **fresh object literal** assigned straight to a typed slot gets an
+extra check:
+
+```ts
+interface Point { x: number; y: number }
+
+const p: Point = { x: 1, y: 2, z: 3 };   // ❌ 'z' does not exist in type 'Point'
+
+const t = { x: 1, y: 2, z: 3 };
+const q: Point = t;                       // ✅ fine — not a fresh literal
+```
+
+That inconsistency looks arbitrary and isn't: a literal written *right there*
+with an unknown field is almost always a typo or a misunderstanding, so it's
+worth flagging. A value that came from somewhere else may legitimately carry
+more than this particular function needs.
+
+**`readonly` on a property** prevents reassignment after construction:
+
+```ts
+interface Expense { readonly id: string; amount: number }
+e.id = "x";        // ❌
+e.amount = 5;      // ✅
+```
+
+Again: compile-time only. It documents and enforces intent while you write.
+
+> ⚠️ **Common mistakes:** reading an optional field without handling
+> `undefined`; using `||` instead of `??` and losing legitimate `0`/`""`; and
+> being baffled by the excess-property check when a variable works but the same
+> literal doesn't.
+""",
+            warmup=[
+                _q("`note?: string` gives `e.note` the type…",
+                   ["string", "string | undefined", "undefined", "any"], 1,
+                   "Optional adds undefined."),
+                _q("`const p: Point = { x:1, y:2, z:3 };` where Point has x and y…",
+                   ["is fine", "errors — excess property on a fresh literal",
+                    "drops z silently", "errors at runtime"], 1,
+                   "Fresh literals get the extra check."),
+                _q("`readonly id: string` prevents…",
+                   ["reading id", "reassigning id after creation", "id being a string",
+                    "nothing"], 1,
+                   "Compile-time protection against reassignment."),
+                _q("Which safely uppercases a possibly-missing note?",
+                   ["e.note.toUpperCase()", "(e.note ?? \"\").toUpperCase()",
+                    "e.note!.toUpperCase()", "String(e.note).toUpperCase()"], 1,
+                   "Supply a real fallback before calling the method."),
+            ],
+            exercises=[
+                _ex("tscourse-w8-op-1", "Handle the missing note",
+                    "Print `coffee: (no note)` when the note is absent.",
+                    'interface Expense {\n  desc: string;\n  amount: number;\n  note?: string;\n}\n'
+                    'const e: Expense = { desc: "coffee", amount: 3 };\n'
+                    'console.log(`${e.desc}: ${e.note ?? "(no note)"}`);\n',
+                    'e.note ?? "(no note)"', [("", "coffee: (no note)")],
+                    hints=["?? supplies a value only when the left side is missing.",
+                           'Write e.note ?? "(no note)".']),
+                _ex("tscourse-w8-op-2", "Safely call a method",
+                    "Print the note uppercased, or an empty line when there is none.",
+                    _FS + 'interface Expense {\n  desc: string;\n  note?: string;\n}\n'
+                    'const raw = fs.readFileSync(0, "utf8").trim();\n'
+                    'const e: Expense = raw ? { desc: "x", note: raw } : { desc: "x" };\n'
+                    'console.log((e.note ?? "").toUpperCase());\n',
+                    '(e.note ?? "").toUpperCase()',
+                    [("hi", "HI"), ("", "")],
+                    hints=["Give it a real string first, then call the method.",
+                           'Write (e.note ?? "").toUpperCase().'],
+                    difficulty="Medium"),
+                _ex("tscourse-w8-op-3", "Count the complete records",
+                    "Count how many records actually have a note.",
+                    'interface Expense {\n  desc: string;\n  note?: string;\n}\n'
+                    'const rows: Expense[] = [\n'
+                    '  { desc: "a", note: "x" },\n  { desc: "b" },\n  { desc: "c", note: "y" },\n];\n'
+                    'console.log(rows.filter((r) => r.note !== undefined).length);\n',
+                    'r.note !== undefined', [("", "2")],
+                    hints=["An absent optional field reads as undefined.",
+                           "Write r.note !== undefined."]),
+                _ex("tscourse-w8-op-4", "Default it once",
+                    "Pull the note out with a fallback at the top of the function.",
+                    'interface Expense {\n  desc: string;\n  note?: string;\n}\n'
+                    'function describe(e: Expense): string {\n'
+                    '  const note = e.note ?? "(no note)";\n'
+                    '  return `${e.desc}: ${note}`;\n}\n'
+                    'console.log(describe({ desc: "coffee" }));\n'
+                    'console.log(describe({ desc: "book", note: "gift" }));\n',
+                    'const note = e.note ?? "(no note)";',
+                    [("", "coffee: (no note)\nbook: gift")],
+                    hints=["Handle the absence once, then the rest of the body is simple.",
+                           'Write const note = e.note ?? "(no note)";'],
+                    difficulty="Medium"),
+                _ex("tscourse-w8-op-5", "Avoid the excess-property check",
+                    "Assign the wider value through a variable so it satisfies Point.",
+                    'interface Point {\n  x: number;\n  y: number;\n}\n'
+                    'const t = { x: 1, y: 2, z: 3 };\nconst p: Point = t;\n'
+                    'console.log(p.x + p.y);\n',
+                    'const p: Point = t;', [("", "3")],
+                    hints=["A fresh literal with an unknown field would be rejected; a variable is not.",
+                           "Write const p: Point = t;"],
+                    difficulty="Medium"),
+                _fix("tscourse-w8-op-fix1", "Fix the lost zero",
+                     "A discount of 0 is real, but this prints 5. Fix it.",
+                     'interface Row {\n  discount?: number;\n}\n'
+                     'const r: Row = { discount: 0 };\nconsole.log(r.discount || 5);\n',
+                     'interface Row {\n  discount?: number;\n}\n'
+                     'const r: Row = { discount: 0 };\nconsole.log(r.discount ?? 5);\n',
+                     [("", "0")],
+                     hints=["0 is falsy, so || replaces it.",
+                            "For 'only when missing', use ??."],
+                     difficulty="Medium"),
+            ],
+            quiz=[
+                _q("Why does TypeScript flag `z` in a fresh literal but not via a variable?",
+                   ["a bug", "a literal with an unknown field is almost always a typo",
+                    "variables are special", "it does not"], 1,
+                   "The check targets the case where the mistake is most likely."),
+                _q("`readonly` protects a field…",
+                   ["at runtime", "at compile time only", "always", "never"], 1,
+                   "Like every type feature, it is erased before running."),
+            ],
+        ),
+        # ---- Lesson 5 --------------------------------------------------
+        _lesson(
+            "w8-fntypes", "Typing functions",
+            "The shape of a function, as a type.",
+            """
+A function's type is written like an arrow function with no body:
+
+```ts
+(x: number) => number          // takes a number, returns a number
+(s: string) => void            // takes a string, returns nothing useful
+() => string                   // takes nothing, returns a string
+```
+
+You met this in week 5 as a *parameter* annotation. Now name it:
+
+```ts
+type Mapper = (x: number) => number;
+
+const double: Mapper = (x) => x * 2;
+const square: Mapper = (x) => x * x;
+```
+
+Notice `(x)` with **no annotation** in those arrows. Because the variable is
+already typed as `Mapper`, TypeScript infers `x: number` from the target type.
+This is called **contextual typing**, and it's why callbacks passed to `map` and
+`filter` rarely need annotations:
+
+```ts
+nums.map((x) => x * 2);        // x is known to be number
+```
+
+**Typing a higher-order function:**
+
+```ts
+function applyTwice(f: (x: number) => number, x: number): number {
+  return f(f(x));
+}
+```
+
+**Returning a function** — the closure from week 5, now typed:
+
+```ts
+function multiplier(factor: number): (x: number) => number {
+  return (x) => x * factor;
+}
+```
+
+**`void` deserves care.** It means "the caller should not rely on a return
+value". A function typed `() => void` may actually return something; the type
+just says nobody should use it. That's deliberate, and it's why
+`items.forEach((x) => list.push(x))` type-checks even though `push` returns a
+number.
+
+**Optional and default parameters** appear in the type too:
+
+```ts
+type Fmt = (n: number, digits?: number) => string;
+const fmt: Fmt = (n, digits = 2) => n.toFixed(digits);
+```
+
+The default lives in the implementation, not the type — a type describes what
+callers may do, and callers may omit it either way.
+
+> ⚠️ **Common mistakes:** writing `Function` as a type (it accepts anything and
+> tells you nothing); annotating callback parameters that contextual typing
+> already knows; and confusing a function's *type* `(x: number) => number` with
+> a function *value* `(x) => x * 2`.
+""",
+            warmup=[
+                _q("`(s: string) => number` describes…",
+                   ["a string", "a function taking a string and returning a number",
+                    "a number", "an object"], 1,
+                   "It is the shape of a function."),
+                _q("In `const f: Mapper = (x) => x * 2;` the type of `x` is…",
+                   ["any", "inferred from Mapper", "unknown", "an error"], 1,
+                   "Contextual typing supplies it."),
+                _q("Why do `map` callbacks rarely need annotations?",
+                   ["they are any", "the element type is known, so the parameter is inferred",
+                    "annotations are banned", "map is special"], 1,
+                   "Contextual typing again."),
+                _q("A `() => void` function…",
+                   ["must return undefined", "may return something, but callers should ignore it",
+                    "cannot be called", "returns null"], 1,
+                   "void is about what the caller may rely on."),
+            ],
+            exercises=[
+                _ex("tscourse-w8-fn-1", "Name a function type",
+                    "Alias `Mapper` to a function from number to number, then use it.",
+                    'type Mapper = (x: number) => number;\n'
+                    'const double: Mapper = (x) => x * 2;\n'
+                    'console.log(double(21));\n',
+                    '(x: number) => number', [("", "42")],
+                    hints=["Write it like an arrow function with no body.",
+                           "Write (x: number) => number."]),
+                _ex("tscourse-w8-fn-2", "Rely on contextual typing",
+                    "Fill in the squaring arrow. Its parameter needs no annotation.",
+                    'type Mapper = (x: number) => number;\n'
+                    'const square: Mapper = (x) => x * x;\n'
+                    'console.log(square(7));\n',
+                    '(x) => x * x', [("", "49")],
+                    hints=["Mapper already says x is a number.",
+                           "Write (x) => x * x."]),
+                _ex("tscourse-w8-fn-3", "A typed higher-order function",
+                    "Apply the function to its own result.",
+                    'function applyTwice(f: (x: number) => number, x: number): number {\n'
+                    '  return f(f(x));\n}\n'
+                    'console.log(applyTwice((n) => n + 3, 10));\n',
+                    'return f(f(x));', [("", "16")],
+                    hints=["Call f on x, then call f on that.",
+                           "Write return f(f(x));"],
+                    difficulty="Medium"),
+                _ex("tscourse-w8-fn-4", "A typed factory",
+                    "Return a function that multiplies by the captured factor.",
+                    _FS + 'function multiplier(factor: number): (x: number) => number {\n'
+                    '  return (x) => x * factor;\n}\n'
+                    'const triple = multiplier(3);\n'
+                    'const n = Number(fs.readFileSync(0, "utf8").trim());\nconsole.log(triple(n));\n',
+                    'return (x) => x * factor;', [("5", "15"), ("10", "30")],
+                    hints=["The return type already says what shape to hand back.",
+                           "Write return (x) => x * factor;"],
+                    difficulty="Medium"),
+                _ex("tscourse-w8-fn-5", "Optional parameter in a type",
+                    "Implement the formatter with a default of 2 digits.",
+                    'type Fmt = (n: number, digits?: number) => string;\n'
+                    'const fmt: Fmt = (n, digits = 2) => n.toFixed(digits);\n'
+                    'console.log(fmt(3.14159));\nconsole.log(fmt(3.14159, 3));\n',
+                    '(n, digits = 2) => n.toFixed(digits)',
+                    [("", "3.14\n3.142")],
+                    hints=["The default belongs in the implementation, not the type.",
+                           "Write (n, digits = 2) => n.toFixed(digits)."],
+                    difficulty="Medium"),
+                _fix("tscourse-w8-fn-fix1", "Fix the passed-in call",
+                     "This passes the RESULT where a function was expected, and crashes. Fix it.",
+                     'function applyTwice(f: (x: number) => number, x: number): number {\n'
+                     '  return f(f(x));\n}\n'
+                     'const double = (x: number): number => x * 2;\n'
+                     'console.log(applyTwice(double(2), 5));\n',
+                     'function applyTwice(f: (x: number) => number, x: number): number {\n'
+                     '  return f(f(x));\n}\n'
+                     'const double = (x: number): number => x * 2;\n'
+                     'console.log(applyTwice(double, 5));\n',
+                     [("", "20")],
+                     hints=["double(2) is the number 4; applyTwice needs something callable.",
+                            "Pass the function itself: double."],
+                     difficulty="Medium"),
+            ],
+            quiz=[
+                _q("`Function` as a type annotation is discouraged because…",
+                   ["it is slow", "it accepts any function and describes nothing",
+                    "it is deprecated", "it cannot be called"], 1,
+                   "Write the actual signature instead."),
+                _q("Contextual typing is…",
+                   ["a runtime feature", "TypeScript inferring a parameter's type from where the function is used",
+                    "an annotation", "a union"], 1,
+                   "It is why callbacks stay clean."),
+            ],
+        ),
+        # ---- Lesson 6 --------------------------------------------------
+        _lesson(
+            "w8-reduce", "reduce — fold a list to one value",
+            "The most general array method.",
+            """
+`map` gives one output per input. `filter` gives some of the inputs. **`reduce`
+gives one value for the whole list** — a total, a maximum, a joined string, a
+whole object.
+
+```ts
+[1, 2, 3].reduce((sum, x) => sum + x, 0);    // 6
+```
+
+Two arguments:
+
+1. a **callback** `(accumulator, element) => newAccumulator`
+2. a **seed** — what the accumulator starts as
+
+It walks the list, feeding each result into the next step:
+
+| step | acc in | x | acc out |
+|---|---|---|---|
+| start | — | — | 0 |
+| 1 | 0 | 1 | 1 |
+| 2 | 1 | 2 | 3 |
+| 3 | 3 | 3 | 6 |
+
+That's the accumulator pattern from week 4, with the bookkeeping done for you.
+The loop version is identical in meaning:
+
+```ts
+let sum = 0;
+for (const x of a) sum = sum + x;
+```
+
+**The seed matters, and it is not optional in practice.** It sets both the
+starting value *and* the accumulator's type, and it is the answer for an empty
+array. Leave it out and `reduce` uses the first element instead — which throws
+on an empty array. **Always pass a seed.**
+
+**The accumulator doesn't have to be a number.** This is what makes `reduce`
+general:
+
+```ts
+// to a string
+words.reduce((acc, w) => acc + w[0], "");            // initials
+
+// to a maximum
+nums.reduce((best, x) => (x > best ? x : best), -Infinity);
+
+// to an object — a tally
+items.reduce((acc, it) => {
+  acc[it.tag] = (acc[it.tag] ?? 0) + 1;
+  return acc;
+}, {} as { [key: string]: number });
+```
+
+That last one is week 7's tally, folded. Note the `return acc;` — a braced
+callback must hand the accumulator back, and forgetting it is *the* classic
+reduce bug: the next step receives `undefined`.
+
+**When not to use it.** `reduce` can express `map` and `filter`, but doing so is
+strictly worse — less clear and no faster. Reach for `reduce` when you're
+genuinely collapsing a list to one value; use the specific method when one fits.
+A `reduce` whose body is ten lines usually wants to be a plain loop.
+
+> ⚠️ **Common mistakes:** omitting the seed; forgetting `return acc` in a braced
+> callback; and mutating the seed object across calls (fine here, but a trap when
+> the seed is shared).
+""",
+            warmup=[
+                _q("`[2,3,5].reduce((s, x) => s + x, 0)` is…", ["0", "10", "235", "3"], 1,
+                   "Folds to the sum."),
+                _q("`[].reduce((s, x) => s + x, 0)` is…", ["0", "undefined", "an error", "NaN"], 0,
+                   "The seed is the answer for an empty list."),
+                _q("`[].reduce((s, x) => s + x)` — no seed — does what?",
+                   ["gives 0", "gives undefined", "throws", "gives NaN"], 2,
+                   "With no seed and no elements there is nothing to start from."),
+                _q("A braced reduce callback that forgets `return acc` gives…",
+                   ["the seed", "undefined into the next step", "an error", "the last element"], 1,
+                   "The callback's value IS the next accumulator."),
+            ],
+            exercises=[
+                _ex("tscourse-w8-rd-1", "Total with reduce",
+                    "Fold the numbers to their sum.",
+                    _NUMS + 'console.log(nums.reduce((sum, x) => sum + x, 0));\n',
+                    'nums.reduce((sum, x) => sum + x, 0)',
+                    [("1 2 3 4", "10"), ("5", "5")],
+                    hints=["Callback first, then the seed.",
+                           "Write nums.reduce((sum, x) => sum + x, 0)."]),
+                _ex("tscourse-w8-rd-2", "Total a field",
+                    "Fold the typed records to the sum of their prices.",
+                    'interface Item {\n  name: string;\n  price: number;\n}\n'
+                    'const items: Item[] = [\n  { name: "A", price: 4 },\n  { name: "B", price: 6 },\n];\n'
+                    'console.log(items.reduce((sum, it) => sum + it.price, 0));\n',
                     'sum + it.price', [("", "10")],
-                    hints=["Each step adds it.price to the running sum."]),
-                _fix("tscourse-w8-ta-fix", "Fix the reduce start",
+                    hints=["Each step adds one record's price to the running total."]),
+                _ex("tscourse-w8-rd-3", "Fold to a string",
+                    "Build the initials of the words: `ada bo cy` → `abc`.",
+                    _WORDS + 'console.log(words.reduce((acc, w) => acc + w[0], ""));\n',
+                    'acc + w[0]', [("ada bo cy", "abc"), ("x", "x")],
+                    hints=["The accumulator is a string, seeded empty.",
+                           "Write acc + w[0]."],
+                    difficulty="Medium"),
+                _ex("tscourse-w8-rd-4", "Fold to a maximum",
+                    "Find the largest number with reduce.",
+                    _NUMS + 'console.log(nums.reduce((best, x) => (x > best ? x : best), -Infinity));\n',
+                    '(x > best ? x : best)',
+                    [("3 9 2", "9"), ("-5 -2", "-2"), ("7", "7")],
+                    hints=["Keep whichever of the two is bigger.",
+                           "Write (x > best ? x : best)."],
+                    difficulty="Medium"),
+                _ex("tscourse-w8-rd-5", "Fold to an object",
+                    "Tally the words with reduce, then print the count for `a`.",
+                    _WORDS + 'const counts = words.reduce((acc, w) => {\n'
+                    '  acc[w] = (acc[w] ?? 0) + 1;\n  return acc;\n'
+                    '}, {} as { [key: string]: number });\n'
+                    'console.log(counts["a"] ?? 0);\n',
+                    'acc[w] = (acc[w] ?? 0) + 1;\n  return acc;',
+                    [("a b a c a", "3"), ("b c", "0")],
+                    hints=["Update the accumulator, then hand it back for the next step.",
+                           "Write acc[w] = (acc[w] ?? 0) + 1; then return acc;"],
+                    difficulty="Medium"),
+                _fix("tscourse-w8-rd-fix1", "Fix the reduce seed",
                      "The total is one too high — the seed is wrong. Fix it to 10.",
-                     'interface Item {\n  name: string;\n  price: number;\n}\nconst items: Item[] = [\n  { name: "A", price: 4 },\n  { name: "B", price: 6 },\n];\nconst total = items.reduce((sum, it) => sum + it.price, 1);\nconsole.log(total);\n',
-                     'interface Item {\n  name: string;\n  price: number;\n}\nconst items: Item[] = [\n  { name: "A", price: 4 },\n  { name: "B", price: 6 },\n];\nconst total = items.reduce((sum, it) => sum + it.price, 0);\nconsole.log(total);\n',
+                     'interface Item {\n  name: string;\n  price: number;\n}\n'
+                     'const items: Item[] = [\n  { name: "A", price: 4 },\n  { name: "B", price: 6 },\n];\n'
+                     'console.log(items.reduce((sum, it) => sum + it.price, 1));\n',
+                     'interface Item {\n  name: string;\n  price: number;\n}\n'
+                     'const items: Item[] = [\n  { name: "A", price: 4 },\n  { name: "B", price: 6 },\n];\n'
+                     'console.log(items.reduce((sum, it) => sum + it.price, 0));\n',
                      [("", "10")],
-                     hints=["The reduce seed (last argument) starts the sum.",
-                            "A sum should seed at 0, not 1."]),
+                     hints=["The last argument is the starting accumulator.",
+                            "A sum seeds at 0."]),
+                _fix("tscourse-w8-rd-fix2", "Fix the missing return",
+                     "This tally should print 3 for `a b a c a` but crashes — the callback returns nothing. Fix it.",
+                     _WORDS + 'const counts = words.reduce((acc, w) => {\n'
+                     '  acc[w] = (acc[w] ?? 0) + 1;\n'
+                     '}, {} as { [key: string]: number });\n'
+                     'console.log(counts["a"] ?? 0);\n',
+                     _WORDS + 'const counts = words.reduce((acc, w) => {\n'
+                     '  acc[w] = (acc[w] ?? 0) + 1;\n  return acc;\n'
+                     '}, {} as { [key: string]: number });\n'
+                     'console.log(counts["a"] ?? 0);\n',
+                     [("a b a c a", "3"), ("a", "1")],
+                     hints=["Whatever the callback returns becomes the next accumulator — here that is undefined.",
+                            "Add return acc; at the end of the callback."],
+                     difficulty="Medium"),
+            ],
+            quiz=[
+                _q("The seed of a reduce sets…",
+                   ["only the starting value", "the starting value, the accumulator's type, and the empty-list answer",
+                    "the length", "nothing"], 1,
+                   "All three — which is why you always pass one."),
+                _q("When should you NOT use reduce?",
+                   ["for sums", "when map or filter already says what you mean",
+                    "for objects", "for strings"], 1,
+                   "Expressing map via reduce is less clear and no faster."),
+            ],
+        ),
+        # ---- Lesson 7 --------------------------------------------------
+        _lesson(
+            "w8-modelling", "Modelling real data",
+            "Choosing types that make wrong states hard to write.",
+            """
+Types are a design tool, not paperwork. The question is always: **what shapes
+should be possible?**
+
+Take a payment record. A first attempt:
+
+```ts
+interface Payment {
+  amount: number;
+  status: string;        // "paid" or "pending" or "failed"
+}
+```
+
+`status: string` allows `"pain"`, `"PAID"`, `""` and `"banana"`. Narrow it to
+exactly the values you mean:
+
+```ts
+type Status = "paid" | "pending" | "failed";
+
+interface Payment {
+  amount: number;
+  status: Status;
+}
+```
+
+Now a typo is a compile error, and your editor autocompletes the three options.
+This — **a union of literal types** — is the single highest-value modelling
+trick in TypeScript, and week 9 is built on it.
+
+**Make illegal states unrepresentable.** Compare:
+
+```ts
+interface Job { done: boolean; result?: string; error?: string }
+```
+
+That permits `{ done: false, result: "x", error: "y" }` — finished and failed
+and unfinished at once. Nothing in the type says those fields travel together.
+Week 9's discriminated unions fix this properly; for now, notice the smell:
+**optional fields that are only meaningful in combination.**
+
+**A practical checklist for a new type:**
+
+1. What are the fields, and which are genuinely optional?
+2. Which fields are a **fixed set of values** rather than free text?
+3. Which fields must never change after creation? (`readonly`)
+4. Are any of these fields only valid together?
+
+**A typed pipeline** is what this all pays for. Parse into a named type once, at
+the edge, and everything downstream is checked:
+
+```ts
+interface Row { desc: string; amount: number }
+
+function parse(line: string): Row {
+  const p = line.trim().split(" ");
+  return { desc: p[0], amount: Number(p[1]) };
+}
+
+const rows: Row[] = lines.map(parse);
+const total = rows.reduce((s, r) => s + r.amount, 0);
+```
+
+`parse` is the boundary. Above it is untrusted text; below it, every field has a
+known type. Getting the boundary right is most of what makes a program feel
+solid — and note that the *type* does no validation. `Number("abc")` is `NaN`,
+and the annotation says `number` regardless. Types describe intent; **runtime
+checks enforce it**, and you need both.
+
+> ⚠️ **Common mistakes:** typing a fixed set of values as `string`; scattering
+> optional fields that are only valid in combination; and assuming an annotation
+> validates real input — it never does.
+""",
+            warmup=[
+                _q("`status: string` versus `status: \"paid\" | \"pending\"` — the union…",
+                   ["is slower", "makes typos a compile error and enables autocomplete",
+                    "is the same", "is runtime-checked"], 1,
+                   "Narrow types catch narrow mistakes."),
+                _q("`{ done: boolean; result?: string; error?: string }` allows…",
+                   ["only valid states", "done and error together, nonsensically",
+                    "nothing", "only done: true"], 1,
+                   "Optionals that only make sense in combination are a design smell."),
+                _q("Does `const n: number = Number(\"abc\")` error?",
+                   ["yes, at compile time", "no — the type is number, the value is NaN",
+                    "yes, at runtime", "it returns 0"], 1,
+                   "NaN is a number. Types do not validate input."),
+                _q("Parsing at the boundary means…",
+                   ["parsing everywhere", "converting untrusted text into a named type once, at the edge",
+                    "never parsing", "parsing at the end"], 1,
+                   "Everything downstream then works with known types."),
+            ],
+            exercises=[
+                _ex("tscourse-w8-md-1", "Narrow the status",
+                    "Alias Status to exactly the three allowed values, then print the payment's status.",
+                    'type Status = "paid" | "pending" | "failed";\n'
+                    'interface Payment {\n  amount: number;\n  status: Status;\n}\n'
+                    'const p: Payment = { amount: 10, status: "paid" };\n'
+                    'console.log(p.status);\n',
+                    '"paid" | "pending" | "failed"', [("", "paid")],
+                    hints=["A union of exact string values, separated by |.",
+                           'Write "paid" | "pending" | "failed".']),
+                _ex("tscourse-w8-md-2", "A parse boundary",
+                    "Complete parse so it turns a `desc amount` line into a Row.",
+                    _FS + 'interface Row {\n  desc: string;\n  amount: number;\n}\n'
+                    'function parse(line: string): Row {\n'
+                    '  const p = line.trim().split(" ");\n'
+                    '  return { desc: p[0], amount: Number(p[1]) };\n}\n'
+                    'const rows: Row[] = fs.readFileSync(0, "utf8").trim().split("\\n").map(parse);\n'
+                    'console.log(rows[0].amount);\n',
+                    'return { desc: p[0], amount: Number(p[1]) };',
+                    [("coffee 3", "3"), ("book 12\nrent 900", "12")],
+                    hints=["Build the record, converting the numeric field.",
+                           "Write return { desc: p[0], amount: Number(p[1]) };"],
+                    difficulty="Medium"),
+                _ex("tscourse-w8-md-3", "A typed pipeline",
+                    "Parse the lines, then fold them to a total with reduce.",
+                    _FS + 'interface Row {\n  desc: string;\n  amount: number;\n}\n'
+                    'function parse(line: string): Row {\n'
+                    '  const p = line.trim().split(" ");\n'
+                    '  return { desc: p[0], amount: Number(p[1]) };\n}\n'
+                    'const rows: Row[] = fs.readFileSync(0, "utf8").trim().split("\\n").map(parse);\n'
+                    'console.log(rows.reduce((s, r) => s + r.amount, 0));\n',
+                    'rows.reduce((s, r) => s + r.amount, 0)',
+                    [("coffee 3\nbook 12", "15"), ("rent 900", "900")],
+                    hints=["Fold the parsed records to one number.",
+                           "Write rows.reduce((s, r) => s + r.amount, 0)."],
+                    difficulty="Medium"),
+                _ex("tscourse-w8-md-4", "Validate at runtime",
+                    "The type says number, but the data may be nonsense. Print `invalid` when the amount does not parse.",
+                    _FS + 'interface Row {\n  desc: string;\n  amount: number;\n}\n'
+                    'const p = fs.readFileSync(0, "utf8").trim().split(" ");\n'
+                    'const row: Row = { desc: p[0], amount: Number(p[1]) };\n'
+                    'console.log(Number.isNaN(row.amount) ? "invalid" : row.amount);\n',
+                    'Number.isNaN(row.amount) ? "invalid" : row.amount',
+                    [("coffee abc", "invalid"), ("coffee 3", "3")],
+                    hints=["Annotations never check real input — you must.",
+                           'Write Number.isNaN(row.amount) ? "invalid" : row.amount.'],
+                    difficulty="Medium"),
+                _ex("tscourse-w8-md-5", "readonly identity",
+                    "Mark the id as readonly, then print the record's label.",
+                    'interface Expense {\n  readonly id: string;\n  desc: string;\n}\n'
+                    'const e: Expense = { id: "e1", desc: "coffee" };\n'
+                    'console.log(`${e.id}: ${e.desc}`);\n',
+                    'readonly id: string;', [("", "e1: coffee")],
+                    hints=["readonly goes before the field name.",
+                           "Write readonly id: string;"]),
+                _fix("tscourse-w8-md-fix1", "Fix the unvalidated boundary",
+                     "For `coffee abc` this should print `invalid` but prints `NaN`. Fix it.",
+                     _FS + 'const p = fs.readFileSync(0, "utf8").trim().split(" ");\n'
+                     'const amount: number = Number(p[1]);\n'
+                     'console.log(amount);\n',
+                     _FS + 'const p = fs.readFileSync(0, "utf8").trim().split(" ");\n'
+                     'const amount: number = Number(p[1]);\n'
+                     'console.log(Number.isNaN(amount) ? "invalid" : amount);\n',
+                     [("coffee abc", "invalid"), ("coffee 3", "3")],
+                     hints=["NaN IS a number as far as the type system is concerned.",
+                            "Check it at runtime with Number.isNaN."],
+                     difficulty="Medium"),
+            ],
+            quiz=[
+                _q("The highest-value modelling move in TypeScript is…",
+                   ["annotating every local", "replacing `string` with a union of the literal values you mean",
+                    "using any", "adding readonly everywhere"], 1,
+                   "It turns typos into compile errors and drives autocomplete."),
+                _q("'Make illegal states unrepresentable' means…",
+                   ["validate everything at runtime", "choose types that cannot describe a nonsensical combination",
+                    "use readonly", "avoid optional fields"], 1,
+                   "Design the type so the bad case cannot be written."),
+                _q("Types validate real input…",
+                   ["always", "never — they are erased; runtime checks are still required",
+                    "only for numbers", "only with interfaces"], 1,
+                   "You need both: types for intent, checks for reality."),
             ],
         ),
     ],
     capstone=_cap_auto(
-        "Budget Buddy #8 — typed report",
+        "Budget Buddy #8 — the typed ledger",
         """
-Bring it home: model expenses with an `interface`, then report on them. Given
-three expenses, print:
+Month 2's finale. Everything gets a name, and the report is folded with
+`reduce`.
+
+Input is one expense per line — `desc amount status` — where status is `paid`
+or `unpaid`:
 
 ```
-Count: 3
-Total: $24
-Unpaid: book, lunch
+coffee 3.25 paid
+book 12 unpaid
+lunch 9.50 unpaid
+rent 900 paid
 ```
+
+Print:
+
+```
+Count:   4
+Total:   $924.75
+Paid:    $903.25
+Unpaid:  $21.50
+Largest: rent
+```
+
+Requirements:
+
+- A `type Status = "paid" | "unpaid"` and an `interface Expense` with `desc`,
+  `amount` and `status`.
+- A `parse(line: string): Expense` boundary function.
+- Every total computed with **`reduce`**, not a loop.
+- `Largest` is the description of the biggest expense.
 """,
         _ch("tscourse-w8-capstone", "Budget Buddy #8", "Medium",
-            "Use filter, map, join, reduce and .length over a typed array of records.",
-            'interface Expense {\n  desc: string;\n  amount: number;\n  paid: boolean;\n}\n'
-            'const expenses: Expense[] = [\n  { desc: "coffee", amount: 3, paid: true },\n  { desc: "book", amount: 12, paid: false },\n  { desc: "lunch", amount: 9, paid: false },\n];\n'
-            'const total = expenses.reduce((sum, e) => sum + e.amount, 0);\n'
-            'const unpaid = expenses.filter((e) => !e.paid).map((e) => e.desc);\n'
-            'console.log(`Count: ${expenses.length}`);\nconsole.log(`Total: $${total}`);\nconsole.log(`Unpaid: ${unpaid.join(", ")}`);\n',
-            'const total = expenses.reduce((sum, e) => sum + e.amount, 0);\n'
-            'const unpaid = expenses.filter((e) => !e.paid).map((e) => e.desc);\n'
-            'console.log(`Count: ${expenses.length}`);\nconsole.log(`Total: $${total}`);\nconsole.log(`Unpaid: ${unpaid.join(", ")}`);',
-            [("", "Count: 3\nTotal: $24\nUnpaid: book, lunch")],
-            hints=["reduce sums the amounts (seed 0).",
-                   "Filter to unpaid, then map to descriptions.",
-                   'Join the unpaid descriptions with ", ".']),
-        example_io="Count: 3\nTotal: $24\nUnpaid: book, lunch",
-        rubric=["expenses is typed as Expense[]",
-                "Total uses reduce; count uses .length",
-                "Unpaid list uses filter + map + join"],
+            "Model the data, parse it at the boundary, then fold it three ways.",
+            _FS + 'type Status = "paid" | "unpaid";\n'
+            'interface Expense {\n  desc: string;\n  amount: number;\n  status: Status;\n}\n'
+            'function parse(line: string): Expense {\n'
+            '  const p = line.trim().split(" ");\n'
+            '  return { desc: p[0], amount: Number(p[1]), status: p[2] === "paid" ? "paid" : "unpaid" };\n'
+            '}\n'
+            'const rows: Expense[] = fs.readFileSync(0, "utf8").trim().split("\\n").map(parse);\n'
+            'const total = rows.reduce((s, r) => s + r.amount, 0);\n'
+            'const paid = rows.filter((r) => r.status === "paid").reduce((s, r) => s + r.amount, 0);\n'
+            'const largest = rows.reduce((best, r) => (r.amount > best.amount ? r : best), rows[0]);\n'
+            'console.log(`Count:   ${rows.length}`);\n'
+            'console.log(`Total:   $${total.toFixed(2)}`);\n'
+            'console.log(`Paid:    $${paid.toFixed(2)}`);\n'
+            'console.log(`Unpaid:  $${(total - paid).toFixed(2)}`);\n'
+            'console.log(`Largest: ${largest.desc}`);\n',
+            'function parse(line: string): Expense {\n'
+            '  const p = line.trim().split(" ");\n'
+            '  return { desc: p[0], amount: Number(p[1]), status: p[2] === "paid" ? "paid" : "unpaid" };\n'
+            '}\n'
+            'const rows: Expense[] = fs.readFileSync(0, "utf8").trim().split("\\n").map(parse);\n'
+            'const total = rows.reduce((s, r) => s + r.amount, 0);\n'
+            'const paid = rows.filter((r) => r.status === "paid").reduce((s, r) => s + r.amount, 0);\n'
+            'const largest = rows.reduce((best, r) => (r.amount > best.amount ? r : best), rows[0]);\n'
+            'console.log(`Count:   ${rows.length}`);\n'
+            'console.log(`Total:   $${total.toFixed(2)}`);\n'
+            'console.log(`Paid:    $${paid.toFixed(2)}`);\n'
+            'console.log(`Unpaid:  $${(total - paid).toFixed(2)}`);\n'
+            'console.log(`Largest: ${largest.desc}`);',
+            [("coffee 3.25 paid\nbook 12 unpaid\nlunch 9.50 unpaid\nrent 900 paid",
+              "Count:   4\nTotal:   $924.75\nPaid:    $903.25\nUnpaid:  $21.50\nLargest: rent"),
+             ("tea 2 unpaid",
+              "Count:   1\nTotal:   $2.00\nPaid:    $0.00\nUnpaid:  $2.00\nLargest: tea"),
+             ("a 5 paid\nb 5 paid",
+              "Count:   2\nTotal:   $10.00\nPaid:    $10.00\nUnpaid:  $0.00\nLargest: a")],
+            hints=["parse is the boundary: split the line and build one Expense, converting the amount and narrowing the status.",
+                   'The status field is a union, so derive it: p[2] === "paid" ? "paid" : "unpaid".',
+                   "Total is rows.reduce((s, r) => s + r.amount, 0) — always pass the seed.",
+                   "Paid is a filter followed by the same reduce; unpaid is then just total - paid.",
+                   "Largest folds to a RECORD, not a number: seed with rows[0] and keep whichever has the bigger amount."]),
+        example_io="Count:   4\nTotal:   $924.75\nPaid:    $903.25\nUnpaid:  $21.50\nLargest: rent",
+        rubric=["Status is a union of literal types, not string",
+                "A single parse function converts a line into a typed Expense",
+                "Every total uses reduce with an explicit seed",
+                "Largest folds to a record and reads its desc"],
+        stretch=_ch("tscourse-w8-capstone-stretch", "Budget Buddy #8 (stretch)", "Medium",
+                    "Add a `By status:` line built with a single reduce that folds to an object: `paid=2, unpaid=2` (counts, keys sorted alphabetically).",
+                    _FS + 'type Status = "paid" | "unpaid";\n'
+                    'interface Expense {\n  desc: string;\n  amount: number;\n  status: Status;\n}\n'
+                    'function parse(line: string): Expense {\n'
+                    '  const p = line.trim().split(" ");\n'
+                    '  return { desc: p[0], amount: Number(p[1]), status: p[2] === "paid" ? "paid" : "unpaid" };\n'
+                    '}\n'
+                    'const rows: Expense[] = fs.readFileSync(0, "utf8").trim().split("\\n").map(parse);\n'
+                    'const byStatus = rows.reduce((acc, r) => {\n'
+                    '  acc[r.status] = (acc[r.status] ?? 0) + 1;\n  return acc;\n'
+                    '}, {} as { [key: string]: number });\n'
+                    'const parts = Object.keys(byStatus).sort().map((k) => `${k}=${byStatus[k]}`);\n'
+                    'console.log(`By status: ${parts.join(", ")}`);\n',
+                    'const byStatus = rows.reduce((acc, r) => {\n'
+                    '  acc[r.status] = (acc[r.status] ?? 0) + 1;\n  return acc;\n'
+                    '}, {} as { [key: string]: number });\n'
+                    'const parts = Object.keys(byStatus).sort().map((k) => `${k}=${byStatus[k]}`);\n'
+                    'console.log(`By status: ${parts.join(", ")}`);',
+                    [("coffee 3.25 paid\nbook 12 unpaid\nlunch 9.50 unpaid\nrent 900 paid",
+                      "By status: paid=2, unpaid=2"),
+                     ("tea 2 unpaid", "By status: unpaid=1")],
+                    hints=["This is the tally fold: seed with an empty object and return the accumulator each step.",
+                           "acc[r.status] = (acc[r.status] ?? 0) + 1; then return acc;",
+                           "Sort the keys before mapping so the output is deterministic."]),
+    ),
+))
+
+# ===========================================================================
+# MONTH 3 — The type system, properly
+# ===========================================================================
+_M3 = "The Type System, Properly"
+
+# --- Week 9 ---------------------------------------------------------------
+_LINE = _FS + 'const line = fs.readFileSync(0, "utf8").trim();\n'
+
+_WEEKS.append(_week(
+    9, 3, _M3,
+    "Unions & Narrowing",
+    "Model a value that is 'one of several things', then prove to the compiler which one it is before using it.",
+    """
+Month 2 taught you to describe data that has **one** shape. Month 3 starts with
+the far more common case: data that is **one of several** shapes.
+
+- A parsed field is a `number` **or** the string `"n/a"`.
+- A status is `"paid"` **or** `"pending"` **or** `"failed"`.
+- An API result is a success **or** an error.
+
+That's a **union type**, written with `|`:
+
+```ts
+type Result = number | string;
+```
+
+And immediately you hit the central problem. Given a `number | string`, you
+cannot call `.toFixed(2)` — it might be a string. You cannot call
+`.toUpperCase()` — it might be a number. On a union you may only use what **all**
+the members have in common.
+
+The way out is **narrowing**: writing an ordinary runtime check that TypeScript
+understands, after which it knows which member you have:
+
+```ts
+function show(v: number | string): string {
+  if (typeof v === "number") {
+    return v.toFixed(2);      // here, v is a number
+  }
+  return v.toUpperCase();     // here, it can only be a string
+}
+```
+
+That is the whole week, and it is the moment TypeScript stops feeling like
+annotation and starts feeling like a proof assistant. The checks are all
+JavaScript you already know — `typeof`, `===`, `in`, `Array.isArray`,
+truthiness. What's new is that the *type* changes as you check.
+
+⏱️ Budget about **five hours**.
+""",
+    objectives=[
+        "Write union types and say what you may do with an un-narrowed union",
+        "Model a fixed set of options as a union of literal types",
+        "Narrow with typeof, and know exactly what typeof reports",
+        "Narrow with equality and with switch on a literal union",
+        "Narrow with truthiness, in, Array.isArray and instanceof",
+        "Design and consume a discriminated union",
+        "Prove a switch is exhaustive with never, and combine types with &",
+    ],
+    why="Almost every interesting value in a real program is 'one of several things' — loaded or loading or failed, guest or member, found or missing. Unions plus narrowing are how TypeScript makes those cases impossible to forget.",
+    est_minutes=300,
+    glossary=[
+        _gloss("union", "A type that is one of several: number | string."),
+        _gloss("member (of a union)", "One of the alternatives in a union."),
+        _gloss("literal type", "A type that is one exact value: \"paid\", 42, true."),
+        _gloss("narrowing", "Using a runtime check so the compiler knows which member you have."),
+        _gloss("type guard", "An expression that narrows: typeof x === \"string\"."),
+        _gloss("control-flow analysis", "TypeScript tracking the narrowed type along each branch."),
+        _gloss("typeof", "Reports a value's runtime type as a string."),
+        _gloss("in", "Tests whether a key exists on an object — and narrows by it."),
+        _gloss("Array.isArray(x)", "The reliable array test; typeof an array is \"object\"."),
+        _gloss("instanceof", "Tests against a class or constructor, e.g. Error."),
+        _gloss("discriminated union", "A union of objects sharing a literal 'tag' field that identifies each case."),
+        _gloss("discriminant / tag", "The shared literal field (kind, type, status) that tells the cases apart."),
+        _gloss("exhaustive", "Every case of a union is handled."),
+        _gloss("never", "The type with no values — what remains when every case is handled."),
+        _gloss("intersection (&)", "A type having ALL the members of both: A & B."),
+        _gloss("narrowing by assignment", "Assigning a value narrows the variable's type from then on."),
+    ],
+    cheatsheet="""
+```ts
+// ---- declaring unions --------------------------------------------------
+type Score = number | "n/a";
+type Status = "paid" | "pending" | "failed";
+type Maybe = string | undefined;
+
+// On an un-narrowed union you may only use what ALL members share:
+function f(v: number | string) {
+  v.toString();      // ✅ both have it
+  v.toFixed(2);      // ❌ string does not
+}
+
+// ---- typeof narrowing ---------------------------------------------------
+if (typeof v === "number") { /* v: number */ }
+else                       { /* v: string */ }
+
+typeof 1          // "number"      typeof "a"        // "string"
+typeof true       // "boolean"     typeof undefined  // "undefined"
+typeof {}         // "object"      typeof []         // "object"  ⚠️
+typeof null       // "object"      ⚠️ the famous bug
+typeof (() => 1)  // "function"
+
+// ---- equality & switch ---------------------------------------------------
+if (s === "paid") { /* s: "paid" */ }
+switch (s) {
+  case "paid":    ...; break;
+  case "pending": ...; break;
+  default:        ...;
+}
+
+// ---- other guards ---------------------------------------------------------
+if (x)                    { /* removes null/undefined/""/0 */ }
+if (x !== undefined)      { /* keeps a legitimate 0 or "" */ }
+if (Array.isArray(x))     { /* x: something[] */ }
+if ("radius" in shape)    { /* shape: the member with radius */ }
+if (e instanceof Error)   { /* e: Error */ }
+
+// ---- discriminated union ---------------------------------------------------
+type Shape =
+  | { kind: "circle"; r: number }
+  | { kind: "square"; side: number };
+
+function area(s: Shape): number {
+  switch (s.kind) {
+    case "circle": return 3.14 * s.r * s.r;
+    case "square": return s.side * s.side;
+  }
+}
+
+// ---- exhaustiveness --------------------------------------------------------
+default: {
+  const _exhaustive: never = s;    // errors if a case was forgotten
+  return _exhaustive;
+}
+
+// ---- intersection -----------------------------------------------------------
+type Timestamped = { created: string };
+type Row = Timestamped & { desc: string };   // has BOTH members
+```
+""",
+    self_check=[
+        "Can you say why `v.toFixed(2)` is rejected on a `number | string`?",
+        "Can you narrow a union with typeof and use the member's own methods?",
+        "Can you list what typeof reports for an array and for null?",
+        "Can you narrow a literal union with a switch?",
+        "Can you say when to use `in` rather than `typeof`?",
+        "Can you design a discriminated union for two shapes and write a function over it?",
+        "Can you explain how the `never` trick catches a forgotten case?",
+    ],
+    review=[
+        _q("On an un-narrowed `number | string` you may use…",
+           ["everything on number", "everything on string",
+            "only what BOTH have", "nothing at all"], 2,
+           "The union's usable surface is the intersection of its members' members."),
+        _q("`typeof []` is…", ['"array"', '"object"', '"list"', "undefined"], 1,
+           "Arrays are objects — use Array.isArray."),
+        _q("`typeof null` is…", ['"null"', '"object"', '"undefined"', "an error"], 1,
+           "A famous, permanent JavaScript wart."),
+        _q("After `if (typeof v === \"string\")`, inside the block `v` is…",
+           ["still the union", "string", "any", "unknown"], 1,
+           "TypeScript narrows along the branch."),
+        _q("A discriminated union needs…",
+           ["an interface", "a shared literal field distinguishing the cases",
+            "a class", "an array"], 1,
+           "The discriminant is what makes switch-narrowing work."),
+        _q("`type Shape = {kind:\"a\"} | {kind:\"b\"}` — after `case \"a\":` the value is…",
+           ["Shape", '{kind:"a"}', "never", "any"], 1,
+           "The tag narrows it to exactly one member."),
+        _q("`const _x: never = s;` in a default branch errors when…",
+           ["always", "a union case was not handled", "never", "s is a string"], 1,
+           "If any case remains, s is not never — so it fails to compile."),
+        _q("`A & B` gives you…",
+           ["either A or B", "the members of both", "neither", "an array"], 1,
+           "Intersection combines; union chooses."),
+        _q("Which safely narrows away a legitimate `0`?",
+           ["if (x)", "if (x !== undefined)", "if (!x)", "if (x == null)"], 1,
+           "Truthiness would discard the 0 as well."),
+        _q("`\"r\" in shape` is useful when…",
+           ["the members share a tag", "the members have no tag but different fields",
+            "shape is a number", "never"], 1,
+           "It distinguishes object shapes by the presence of a key."),
+    ],
+    milestone="Budget Buddy can now hold values that are 'a number or not applicable', and expense events that are one of several kinds — with the compiler refusing to let you forget a case.",
+    lessons=[
+        # ---- Lesson 1 --------------------------------------------------
+        _lesson(
+            "w9-unions", "Union types",
+            "One value, several possible types.",
+            """
+A **union** says a value is one of several types:
+
+```ts
+type Score = number | "n/a";
+let s: Score = 42;
+s = "n/a";        // also fine
+s = "banana";     // ❌ not a member
+```
+
+The `|` reads as "or". Members can be any types: primitives, object shapes,
+literal values, arrays, other unions.
+
+**The rule that governs everything else:** on an un-narrowed union you may only
+use what **every** member supports.
+
+```ts
+function f(v: number | string) {
+  v.toString();     // ✅ both numbers and strings have toString
+  v.toFixed(2);     // ❌ Property 'toFixed' does not exist on type 'string'
+  v.length;         // ❌ numbers have no length
+}
+```
+
+This feels restrictive for about a day, and then you realise it is the *point*.
+The compiler is telling you that you haven't decided what to do about the string
+case. `v.toFixed(2)` on a `number | string` isn't unfairly rejected — it is a
+crash waiting to happen, caught early.
+
+**Unions are everywhere in real code**, usually with `undefined` or `null`:
+
+```ts
+type Maybe = string | undefined;      // what `find` returns
+type Id = string | number;            // an API that accepts either
+```
+
+Anything optional is secretly a union: `note?: string` gives `e.note` the type
+`string | undefined`, which is exactly why last week's compiler errors happened.
+
+**A union of object shapes** is legal and useful, though awkward without a tag
+(lesson 6 fixes that):
+
+```ts
+type Contact = { email: string } | { phone: string };
+```
+
+**Where unions come from in practice:** parsing (`Number(x)` may be `NaN`),
+lookups (found or not), external input (any of several shapes), and state
+(loading, loaded, failed).
+
+> ⚠️ **Common mistakes:** trying to use a member-specific method without
+> narrowing; reaching for `any` to silence the error (throwing away the very
+> information you need); and writing `number | any`, which collapses to `any`.
+""",
+            warmup=[
+                _q("`type T = number | string;` — which is allowed on an un-narrowed T?",
+                   ["t.toFixed(2)", "t.toUpperCase()", "t.toString()", "t.length"], 2,
+                   "Only what both members share."),
+                _q("`note?: string` gives the field the type…",
+                   ["string", "string | undefined", "undefined", "any"], 1,
+                   "Optional is a union in disguise."),
+                _q("`let s: \"a\" | \"b\" = \"c\";` is…",
+                   ["fine", "a compile error", "a runtime error", "undefined"], 1,
+                   '"c" is not a member of the union.'),
+                _q("`number | any` collapses to…",
+                   ["number", "any", "unknown", "never"], 1,
+                   "any absorbs everything — which is why it destroys unions."),
+            ],
+            exercises=[
+                _ex("tscourse-w9-un-1", "Declare a union",
+                    "Alias Score so it is either a number or the exact string `n/a`, then print the value.",
+                    'type Score = number | "n/a";\nconst s: Score = "n/a";\nconsole.log(s);\n',
+                    'number | "n/a"', [("", "n/a")],
+                    hints=["Members are separated by |.",
+                           'Write number | "n/a".']),
+                _ex("tscourse-w9-un-2", "Use only the shared surface",
+                    "Print the value using a method BOTH members have.",
+                    'const v: number | string = 42;\nconsole.log(v.toString());\n',
+                    'v.toString()', [("", "42")],
+                    hints=["toFixed and toUpperCase each belong to only one member.",
+                           "Both have toString()."]),
+                _ex("tscourse-w9-un-3", "A union with undefined",
+                    "Print the found element, or `none` when there is none.",
+                    _NUMS + 'const hit: number | undefined = nums.find((x) => x > 10);\n'
+                    'console.log(hit === undefined ? "none" : hit);\n',
+                    'hit === undefined ? "none" : hit',
+                    [("5 20 3", "20"), ("1 2", "none")],
+                    hints=["find's return type is a union with undefined.",
+                           'Write hit === undefined ? "none" : hit.']),
+                _ex("tscourse-w9-un-4", "A union of exact values",
+                    "Alias Status to the three allowed strings and print the chosen one.",
+                    _LINE + 'type Status = "paid" | "pending" | "failed";\n'
+                    'const s: Status = line === "paid" ? "paid" : line === "pending" ? "pending" : "failed";\n'
+                    'console.log(s);\n',
+                    '"paid" | "pending" | "failed"',
+                    [("paid", "paid"), ("pending", "pending"), ("zzz", "failed")],
+                    hints=["Three exact string values, joined by |.",
+                           'Write "paid" | "pending" | "failed".']),
+                _ex("tscourse-w9-un-5", "Union in an array",
+                    "The list holds numbers and strings. Print how many entries are strings.",
+                    'const mixed: (string | number)[] = [1, "a", 2, "b", "c"];\n'
+                    'console.log(mixed.filter((x) => typeof x === "string").length);\n',
+                    'typeof x === "string"', [("", "3")],
+                    hints=["typeof reports the runtime type as a string.",
+                           'Write typeof x === "string".'],
+                    difficulty="Medium"),
+                _fix("tscourse-w9-un-fix1", "Fix the un-narrowed call",
+                     "This crashes when the value is a string. Print the number formatted to 2 decimals, or the string uppercased.",
+                     'const v: number | string = "abc";\nconsole.log((v as number).toFixed(2));\n',
+                     'const v: number | string = "abc";\n'
+                     'console.log(typeof v === "number" ? v.toFixed(2) : v.toUpperCase());\n',
+                     [("", "ABC")],
+                     hints=["The `as number` cast lies to the compiler; at runtime it is still a string.",
+                            "Check with typeof and handle both branches."],
+                     difficulty="Medium"),
+            ],
+            quiz=[
+                _q("The usable methods on a union are…",
+                   ["the union of all members' methods", "the ones common to every member",
+                    "none", "all of the first member's"], 1,
+                   "Anything else would be unsound."),
+                _q("Casting with `as` to silence a union error…",
+                   ["is the right fix", "lies to the compiler and can crash at runtime",
+                    "narrows properly", "is required"], 1,
+                   "A cast asserts; it does not check."),
+            ],
+        ),
+        # ---- Lesson 2 --------------------------------------------------
+        _lesson(
+            "w9-literals", "Literal types",
+            "A type that is one exact value.",
+            """
+A **literal type** is a type whose only value is one specific value:
+
+```ts
+let a: "paid" = "paid";
+a = "pending";     // ❌ not assignable
+```
+
+On its own that's a curiosity. In a union it is the most useful modelling tool
+in the language:
+
+```ts
+type Status = "paid" | "pending" | "failed";
+type Dice = 1 | 2 | 3 | 4 | 5 | 6;
+type Flag = true | false;              // (this is just `boolean`)
+```
+
+Compare `status: string` with `status: Status`:
+
+| | `string` | `Status` |
+|---|---|---|
+| `"paid"` | ✅ | ✅ |
+| `"Paid"` | ✅ 😬 | ❌ caught |
+| `"pian"` | ✅ 😬 | ❌ caught |
+| autocomplete | nothing | the three options |
+| exhaustive switch | impossible | possible (lesson 7) |
+
+**Inference and widening.** TypeScript decides how specific to be based on
+mutability:
+
+```ts
+const a = "paid";      // type is "paid"   — it can never change
+let b = "paid";        // type is string   — it might be reassigned
+```
+
+`const` gets the narrow literal type; `let` gets the **widened** type. That's
+why this fails:
+
+```ts
+let s = "paid";               // s: string
+const st: Status = s;         // ❌ string is not assignable to Status
+```
+
+Three fixes, in ascending order of quality:
+
+```ts
+const s = "paid";             // ✅ keep it const — it is a literal again
+let s: Status = "paid";       // ✅ annotate the variable
+const s = "paid" as const;    // ✅ assert the literal type explicitly
+```
+
+**Literal unions from input** need a runtime check, because input is `string`
+and the compiler cannot know it's one of your three values:
+
+```ts
+const raw = readInput();                 // string
+const s: Status = raw === "paid" ? "paid" : "pending";
+```
+
+That ternary is doing real work: it is the **validation** that justifies the
+narrow type. Types describe intent; the check earns it.
+
+**Numeric and boolean literals** work the same way, and are handy for
+constrained numbers (`type Digit = 0 | 1 | ... | 9`) — though beyond a handful
+of values a runtime range check is usually kinder.
+
+> ⚠️ **Common mistakes:** typing a fixed set of options as `string`; being
+> puzzled that a `let` won't fit a literal union (widening); and assuming the
+> annotation validates input from outside the program.
+""",
+            warmup=[
+                _q('`const a = "paid";` — the inferred type is…',
+                   ["string", '"paid"', "any", "never"], 1,
+                   "const cannot be reassigned, so the literal type survives."),
+                _q('`let b = "paid";` — the inferred type is…',
+                   ["string", '"paid"', "any", "never"], 0,
+                   "let widens, because it might be reassigned."),
+                _q('`type S = "a" | "b"; let x = "a"; const y: S = x;` is…',
+                   ["fine", "an error — x widened to string", "a runtime error", "never"], 1,
+                   "Widening is why `as const` and annotations exist."),
+                _q("`type Flag = true | false` is the same as…",
+                   ["string", "boolean", "never", "any"], 1,
+                   "That union IS boolean."),
+            ],
+            exercises=[
+                _ex("tscourse-w9-li-1", "A literal union",
+                    "Alias Status to the three exact values and print the one chosen.",
+                    'type Status = "paid" | "pending" | "failed";\n'
+                    'const s: Status = "pending";\nconsole.log(s);\n',
+                    '"paid" | "pending" | "failed"', [("", "pending")],
+                    hints=["Exact string values joined by |."]),
+                _ex("tscourse-w9-li-2", "Validate then narrow",
+                    "Turn the raw input into a Status: `paid` stays paid, anything else becomes `failed`.",
+                    _LINE + 'type Status = "paid" | "failed";\n'
+                    'const s: Status = line === "paid" ? "paid" : "failed";\n'
+                    'console.log(s);\n',
+                    'line === "paid" ? "paid" : "failed"',
+                    [("paid", "paid"), ("nonsense", "failed")],
+                    hints=["A runtime check is what makes the narrow type honest.",
+                           'Write line === "paid" ? "paid" : "failed".']),
+                _ex("tscourse-w9-li-3", "Keep the literal with as const",
+                    "Use `as const` so the value keeps its literal type, then print it.",
+                    'type Status = "paid" | "failed";\n'
+                    'const raw = "paid" as const;\nconst s: Status = raw;\nconsole.log(s);\n',
+                    '"paid" as const', [("", "paid")],
+                    hints=["`as const` pins the value's literal type.",
+                           'Write "paid" as const.'],
+                    difficulty="Medium"),
+                _ex("tscourse-w9-li-4", "Numeric literals",
+                    "Alias Dice to the six faces, then print the chosen face.",
+                    _LINE + 'type Dice = 1 | 2 | 3 | 4 | 5 | 6;\n'
+                    'const n = Number(line);\n'
+                    'const d: Dice = n >= 1 && n <= 6 ? (n as Dice) : 1;\n'
+                    'console.log(d);\n',
+                    '1 | 2 | 3 | 4 | 5 | 6', [("4", "4"), ("9", "1")],
+                    hints=["Numeric literal types are written the same way as string ones.",
+                           "Write 1 | 2 | 3 | 4 | 5 | 6."],
+                    difficulty="Medium"),
+                _ex("tscourse-w9-li-5", "Map a literal to a label",
+                    "Print `PAID` for paid, `PENDING` for pending, `FAILED` otherwise.",
+                    _LINE + 'type Status = "paid" | "pending" | "failed";\n'
+                    'const s: Status = line === "paid" ? "paid" : line === "pending" ? "pending" : "failed";\n'
+                    'console.log(s.toUpperCase());\n',
+                    's.toUpperCase()',
+                    [("paid", "PAID"), ("pending", "PENDING"), ("x", "FAILED")],
+                    hints=["Every member of the union is a string, so string methods are available.",
+                           "Write s.toUpperCase()."]),
+                _fix("tscourse-w9-li-fix1", "Fix the widened let",
+                     "This should print `paid`, but the value was declared in a way that loses its literal type. Fix the declaration.",
+                     'type Status = "paid" | "failed";\n'
+                     'let raw = "paid";\nconst s: Status = raw as Status;\nconsole.log(s);\n',
+                     'type Status = "paid" | "failed";\n'
+                     'const raw = "paid";\nconst s: Status = raw;\nconsole.log(s);\n',
+                     [("", "paid")],
+                     hints=["`let` widened the type to string, forcing a cast to paper over it.",
+                            "Declare it with const and the cast becomes unnecessary."],
+                     difficulty="Medium"),
+            ],
+            quiz=[
+                _q("Why does `const` infer a literal type but `let` does not?",
+                   ["a bug", "a let might be reassigned, so the type must allow that",
+                    "const is faster", "they behave identically"], 1,
+                   "Widening follows mutability."),
+                _q("`as const` is used to…",
+                   ["convert at runtime", "keep the narrow literal type", "cast to string",
+                    "make it readonly at runtime"], 1,
+                   "It is a compile-time assertion about specificity."),
+            ],
+        ),
+        # ---- Lesson 3 --------------------------------------------------
+        _lesson(
+            "w9-typeof", "Narrowing with typeof",
+            "The workhorse guard for primitive unions.",
+            """
+`typeof` reports a value's runtime type as a string — and TypeScript
+**understands** it, narrowing the type inside the branch:
+
+```ts
+function show(v: number | string): string {
+  if (typeof v === "number") {
+    return v.toFixed(2);      // v: number   ✅ toFixed allowed
+  }
+  return v.toUpperCase();     // v: string   ✅ the only remaining member
+}
+```
+
+Notice the second `return` needs no check. Having ruled out `number`, only
+`string` remains, and TypeScript knows it. This is **control-flow analysis**:
+the type of `v` differs on each path through the function.
+
+**What typeof actually reports** — memorise this table, including the two
+warts:
+
+| value | `typeof` |
+|---|---|
+| `42` | `"number"` |
+| `"a"` | `"string"` |
+| `true` | `"boolean"` |
+| `undefined` | `"undefined"` |
+| `() => 1` | `"function"` |
+| `{}` | `"object"` |
+| `[1,2]` | `"object"` ⚠️ |
+| `null` | `"object"` ⚠️ |
+
+The last two are the traps. **Arrays are objects** — use `Array.isArray(x)`.
+**`null` is an object** — a bug from 1995 that can never be fixed without
+breaking the web. So this is wrong:
+
+```ts
+if (typeof x === "object") {
+  x.name;      // 💥 x might be null
+}
+```
+
+and the fix is to test for null first:
+
+```ts
+if (x !== null && typeof x === "object") { ... }
+```
+
+**Narrowing works with early returns too**, which pairs perfectly with week 5's
+guard clauses:
+
+```ts
+function len(v: string | number[]): number {
+  if (typeof v === "string") return v.length;
+  return v.length;              // v: number[] — also has length, but a different one
+}
+```
+
+**It narrows variables, not arbitrary expressions.** `typeof obj.v === "string"`
+does narrow `obj.v` for a `const` object, but if anything could reassign it in
+between, TypeScript gives the narrowing up. Pull the value into a local `const`
+first when a check seems mysteriously not to stick.
+
+> ⚠️ **Common mistakes:** using `typeof x === "array"` (there is no such thing);
+> forgetting `null` passes an `"object"` check; and comparing to a misspelled
+> string like `"nunber"` — the comparison is just a string comparison, so it
+> silently never matches. (TypeScript does catch this one for you.)
+""",
+            warmup=[
+                _q('`typeof [1,2]` is…', ['"array"', '"object"', '"list"', '"number"'], 1,
+                   "Arrays are objects at runtime."),
+                _q('`typeof null` is…', ['"null"', '"object"', '"undefined"', '"boolean"'], 1,
+                   "A permanent JavaScript wart."),
+                _q('After `if (typeof v === "number")` with `v: number | string`, the ELSE branch has v as…',
+                   ["number | string", "string", "any", "never"], 1,
+                   "Ruling out one member leaves the other."),
+                _q('`typeof (() => 1)` is…', ['"object"', '"function"', '"arrow"', '"number"'], 1,
+                   "Functions get their own typeof result."),
+            ],
+            exercises=[
+                _ex("tscourse-w9-tf-1", "Narrow a number",
+                    "Format the value with 2 decimals when it is a number, otherwise uppercase it.",
+                    _LINE + 'const v: number | string = line === "x" ? "abc" : 3.14159;\n'
+                    'if (typeof v === "number") {\n  console.log(v.toFixed(2));\n} else {\n  console.log(v.toUpperCase());\n}\n',
+                    'typeof v === "number"',
+                    [("n", "3.14"), ("x", "ABC")],
+                    hints=["Compare typeof against the type name as a string.",
+                           'Write typeof v === "number".']),
+                _ex("tscourse-w9-tf-2", "Guard-clause style",
+                    "Return early for the string case, then handle the number.",
+                    _LINE + 'function show(v: number | string): string {\n'
+                    '  if (typeof v === "string") return v.toUpperCase();\n'
+                    '  return v.toFixed(2);\n}\n'
+                    'console.log(show(line === "x" ? "abc" : 3.14159));\n',
+                    'if (typeof v === "string") return v.toUpperCase();',
+                    [("x", "ABC"), ("n", "3.14")],
+                    hints=["Reject one member up front, and the rest of the body is the other.",
+                           'Write if (typeof v === "string") return v.toUpperCase();'],
+                    difficulty="Medium"),
+                _ex("tscourse-w9-tf-3", "Label it by member",
+                    "Print `chars: 5` for a string and `items: 3` for an array.",
+                    _LINE + 'const v: string | number[] = line === "a" ? [1, 2, 3] : "hello";\n'
+                    'console.log(typeof v === "string" ? `chars: ${v.length}` : `items: ${v.length}`);\n',
+                    'typeof v === "string" ? `chars: ${v.length}` : `items: ${v.length}`',
+                    [("a", "items: 3"), ("b", "chars: 5")],
+                    hints=["Both members have a length, but they mean different things — so the branch decides the wording.",
+                           "Write typeof v === \"string\" ? `chars: ${v.length}` : `items: ${v.length}`."],
+                    difficulty="Medium"),
+                _ex("tscourse-w9-tf-4", "Count by runtime type",
+                    "Print how many entries in the mixed list are numbers.",
+                    'const mixed: (string | number)[] = [1, "a", 2, "b", 3];\n'
+                    'console.log(mixed.filter((x) => typeof x === "number").length);\n',
+                    'typeof x === "number"', [("", "3")],
+                    hints=["Filter by the runtime type of each element."]),
+                _ex("tscourse-w9-tf-5", "Null-safe object check",
+                    "Print `object` only for a real object, `null` for null, `other` otherwise.",
+                    _LINE + 'const v: object | null | string = line === "o" ? {} : line === "z" ? null : "s";\n'
+                    'if (v === null) {\n  console.log("null");\n} else if (typeof v === "object") {\n  console.log("object");\n} else {\n  console.log("other");\n}\n',
+                    'v === null',
+                    [("o", "object"), ("z", "null"), ("q", "other")],
+                    hints=["typeof null is \"object\", so null must be ruled out first.",
+                           "Test v === null before the typeof check."],
+                    difficulty="Medium"),
+                _fix("tscourse-w9-tf-fix1", "Fix the array check",
+                     "There is no `\"array\"` typeof, so this always prints `not`. Fix it so an array prints `array`.",
+                     'const v: string | number[] = [1, 2, 3];\n'
+                     'console.log(typeof v === "array" ? "array" : "not");\n',
+                     'const v: string | number[] = [1, 2, 3];\n'
+                     'console.log(Array.isArray(v) ? "array" : "not");\n',
+                     [("", "array")],
+                     hints=['typeof an array is "object", never "array".',
+                            "Use Array.isArray(v)."],
+                     difficulty="Medium"),
+            ],
+            quiz=[
+                _q("Control-flow analysis means…",
+                   ["the code runs faster", "the type of a variable differs along different branches",
+                    "types are checked at runtime", "loops are unrolled"], 1,
+                   "TypeScript tracks what each check has proved."),
+                _q("`if (typeof x === \"object\") x.name;` is unsafe because…",
+                   ["objects have no name", "null also passes that check", "typeof is slow",
+                    "it is fine"], 1,
+                   "Rule out null explicitly."),
+            ],
+        ),
+        # ---- Lesson 4 --------------------------------------------------
+        _lesson(
+            "w9-equality", "Narrowing by equality & switch",
+            "Comparing against literals, and dispatching on them.",
+            """
+For a union of **literal types**, `typeof` is useless — every member is a
+string. Compare against the values instead:
+
+```ts
+type Status = "paid" | "pending" | "failed";
+
+function label(s: Status): string {
+  if (s === "paid") {
+    return "Settled";       // s: "paid"
+  }
+  return "Outstanding";     // s: "pending" | "failed"
+}
+```
+
+Notice the else branch: TypeScript has removed only the member you ruled out.
+The remaining type is still a union — a smaller one.
+
+**`switch` narrows the same way**, and reads much better with three or more
+cases:
+
+```ts
+switch (s) {
+  case "paid":    return "Settled";      // s: "paid"
+  case "pending": return "Waiting";      // s: "pending"
+  case "failed":  return "Rejected";     // s: "failed"
+}
+```
+
+Each `case` narrows to exactly one member inside its arm. And because every
+member is covered, TypeScript can see the function always returns — no `default`
+needed, and no "not all code paths return a value" error. That's a small miracle
+that only works because the type is a finite union.
+
+**Narrowing by equality between two unions** also works, and is occasionally
+handy:
+
+```ts
+function f(a: string | number, b: string | boolean) {
+  if (a === b) {
+    // both must be string — the only overlap
+  }
+}
+```
+
+**`!==` narrows the negative side**, which is how you strip `undefined`:
+
+```ts
+function g(v: string | undefined): string {
+  if (v === undefined) return "(none)";
+  return v.toUpperCase();      // v: string
+}
+```
+
+**Narrowing survives assignment.** Assigning a value to a union-typed variable
+narrows it from that point on:
+
+```ts
+let v: string | number;
+v = "hi";
+v.toUpperCase();      // ✅ TypeScript knows it is a string right now
+```
+
+> ⚠️ **Common mistakes:** using `==` and getting unexpected coercion; assuming
+> the else branch narrows to a single member when the union had three; and
+> adding a `default` that returns something bogus, which silently disables the
+> exhaustiveness benefit you'll meet in lesson 7.
+""",
+            warmup=[
+                _q('With `s: "a"|"b"|"c"`, after `if (s === "a")` the ELSE branch is…',
+                   ['"a"', '"b" | "c"', "string", "never"], 1,
+                   "Only the tested member is removed."),
+                _q("A switch covering every member of a literal union…",
+                   ["still needs a default to compile", "can omit default and still be seen to always return",
+                    "cannot narrow", "is an error"], 1,
+                   "Exhaustiveness is visible to the compiler."),
+                _q("`if (v === undefined) return; ` then `v` is…",
+                   ["still the union", "the union minus undefined", "any", "never"], 1,
+                   "The negative branch is narrowed too."),
+                _q("`let v: string | number; v = 5; v.toFixed(2)` is…",
+                   ["an error", "fine — assignment narrowed it", "a runtime error", "undefined"], 1,
+                   "Narrowing by assignment."),
+            ],
+            exercises=[
+                _ex("tscourse-w9-eq-1", "Compare to a literal",
+                    "Return `Settled` for paid and `Outstanding` for anything else.",
+                    _LINE + 'type Status = "paid" | "pending" | "failed";\n'
+                    'const s: Status = line === "paid" ? "paid" : line === "pending" ? "pending" : "failed";\n'
+                    'console.log(s === "paid" ? "Settled" : "Outstanding");\n',
+                    's === "paid" ? "Settled" : "Outstanding"',
+                    [("paid", "Settled"), ("pending", "Outstanding"), ("x", "Outstanding")],
+                    hints=["Compare the value against the literal member.",
+                           'Write s === "paid" ? "Settled" : "Outstanding".']),
+                _ex("tscourse-w9-eq-2", "Switch on a union",
+                    "Complete the pending case so it prints `Waiting`.",
+                    _LINE + 'type Status = "paid" | "pending" | "failed";\n'
+                    'const s: Status = line === "paid" ? "paid" : line === "pending" ? "pending" : "failed";\n'
+                    'switch (s) {\n'
+                    '  case "paid":\n    console.log("Settled");\n    break;\n'
+                    '  case "pending":\n    console.log("Waiting");\n    break;\n'
+                    '  case "failed":\n    console.log("Rejected");\n    break;\n'
+                    '}\n',
+                    'case "pending":\n    console.log("Waiting");\n    break;',
+                    [("paid", "Settled"), ("pending", "Waiting"), ("x", "Rejected")],
+                    hints=["A case label, the statement, then break.",
+                           'Write case "pending": console.log("Waiting"); break;'],
+                    difficulty="Medium"),
+                _ex("tscourse-w9-eq-3", "Strip the undefined",
+                    "Return `(none)` when the value is missing, else the value uppercased.",
+                    _LINE + 'function g(v: string | undefined): string {\n'
+                    '  if (v === undefined) return "(none)";\n'
+                    '  return v.toUpperCase();\n}\n'
+                    'console.log(g(line === "z" ? undefined : line));\n',
+                    'if (v === undefined) return "(none)";',
+                    [("z", "(none)"), ("hi", "HI")],
+                    hints=["Reject the undefined case first, and the rest is a plain string.",
+                           'Write if (v === undefined) return "(none)";'],
+                    difficulty="Medium"),
+                _ex("tscourse-w9-eq-4", "Two of three",
+                    "Print `open` for pending or failed, `closed` for paid.",
+                    _LINE + 'type Status = "paid" | "pending" | "failed";\n'
+                    'const s: Status = line === "paid" ? "paid" : line === "pending" ? "pending" : "failed";\n'
+                    'console.log(s === "pending" || s === "failed" ? "open" : "closed");\n',
+                    's === "pending" || s === "failed"',
+                    [("pending", "open"), ("x", "open"), ("paid", "closed")],
+                    hints=["Two members share an outcome, so test for either.",
+                           'Write s === "pending" || s === "failed".']),
+                _ex("tscourse-w9-eq-5", "Narrow by assignment",
+                    "Assign a string, then use a string method with no further checking.",
+                    'let v: string | number;\nv = "hi";\nconsole.log(v.toUpperCase());\n',
+                    'v = "hi";', [("", "HI")],
+                    hints=["Assigning a value narrows the variable from that point on.",
+                           'Write v = "hi";']),
+                _fix("tscourse-w9-eq-fix1", "Fix the missing break",
+                     "For `paid` this prints two lines. Fix it so each status prints exactly one.",
+                     _LINE + 'type Status = "paid" | "pending";\n'
+                     'const s: Status = line === "paid" ? "paid" : "pending";\n'
+                     'switch (s) {\n'
+                     '  case "paid":\n    console.log("Settled");\n'
+                     '  case "pending":\n    console.log("Waiting");\n    break;\n'
+                     '}\n',
+                     _LINE + 'type Status = "paid" | "pending";\n'
+                     'const s: Status = line === "paid" ? "paid" : "pending";\n'
+                     'switch (s) {\n'
+                     '  case "paid":\n    console.log("Settled");\n    break;\n'
+                     '  case "pending":\n    console.log("Waiting");\n    break;\n'
+                     '}\n',
+                     [("paid", "Settled"), ("pending", "Waiting")],
+                     hints=["Without break, execution falls into the next case.",
+                            "Add break; to the paid case."],
+                     difficulty="Medium"),
+            ],
+            quiz=[
+                _q("Why does typeof not help with `\"a\" | \"b\"`?",
+                   ["typeof is broken", "every member is a string, so typeof cannot tell them apart",
+                    "literals have no typeof", "it does help"], 1,
+                   "Compare against the values instead."),
+                _q("A `default` branch that returns a placeholder…",
+                   ["is best practice", "hides a forgotten case from the exhaustiveness check",
+                    "is required", "narrows better"], 1,
+                   "It makes the compiler stop warning you."),
+            ],
+        ),
+        # ---- Lesson 5 --------------------------------------------------
+        _lesson(
+            "w9-guards", "The other guards",
+            "Truthiness, in, Array.isArray and instanceof.",
+            """
+Four more ways to narrow, each for a situation the previous two don't cover.
+
+**Truthiness** removes every falsy member at once:
+
+```ts
+function f(v: string | undefined | null) {
+  if (v) {
+    v.toUpperCase();     // v: string
+  }
+}
+```
+
+Convenient — and it also removes `""`, which may be a legitimate value. When
+the empty string or `0` matters, be explicit:
+
+```ts
+if (v !== undefined && v !== null) { ... }
+if (v != null) { ... }        // the one accepted use of != : catches both
+```
+
+**`Array.isArray`** is the correct array test, because `typeof` says
+`"object"`:
+
+```ts
+function count(v: string | string[]): number {
+  if (Array.isArray(v)) return v.length;    // v: string[]
+  return 1;                                  // v: string
+}
+```
+
+**`in`** distinguishes object shapes by the presence of a key — the tool for a
+union of objects with **no** shared tag:
+
+```ts
+type Contact = { email: string } | { phone: string };
+
+function reach(c: Contact): string {
+  if ("email" in c) {
+    return c.email;      // c: { email: string }
+  }
+  return c.phone;        // c: { phone: string }
+}
+```
+
+**`instanceof`** narrows against a class or constructor. The everyday case is
+error handling:
+
+```ts
+try {
+  risky();
+} catch (e) {
+  if (e instanceof Error) {
+    console.log(e.message);    // e: Error
+  }
+}
+```
+
+(A caught `e` is `unknown` in modern TypeScript, precisely so you're forced to
+check.)
+
+**Choosing a guard:**
+
+| the union is… | use |
+|---|---|
+| primitives (`number \\| string`) | `typeof` |
+| literal values (`"a" \\| "b"`) | `===` or `switch` |
+| maybe-missing (`T \\| undefined`) | `=== undefined`, or truthiness if safe |
+| array or not | `Array.isArray` |
+| object shapes without a tag | `in` |
+| class instances | `instanceof` |
+| object shapes **with** a tag | `switch` on the tag ← next lesson, and the best option |
+
+> ⚠️ **Common mistakes:** using truthiness on a union containing `0` or `""`;
+> using `typeof x === "object"` for arrays; and using `in` with a variable key
+> (`k in obj` narrows nothing useful — it needs a literal).
+""",
+            warmup=[
+                _q("`if (v)` on `string | undefined` also removes…",
+                   ["nothing else", "the empty string", "numbers", "null only"], 1,
+                   '"" is falsy, so a legitimate empty string is excluded too.'),
+                _q("The correct array test is…",
+                   ['typeof x === "array"', "Array.isArray(x)", "x instanceof Array only",
+                    "x.length !== undefined"], 1,
+                   "typeof can never say \"array\"."),
+                _q('`"email" in c` narrows a union of object shapes by…',
+                   ["their names", "the presence of that key", "their length", "typeof"], 1,
+                   "Useful when there is no shared tag."),
+                _q("In modern TypeScript a caught `e` in `catch (e)` has type…",
+                   ["Error", "any", "unknown", "string"], 2,
+                   "Which forces you to narrow before using it."),
+            ],
+            exercises=[
+                _ex("tscourse-w9-gu-1", "Truthiness guard",
+                    "Print the value uppercased, or `(none)` when it is missing or empty.",
+                    _LINE + 'const v: string | undefined = line === "z" ? undefined : line;\n'
+                    'console.log(v ? v.toUpperCase() : "(none)");\n',
+                    'v ? v.toUpperCase() : "(none)"',
+                    [("hi", "HI"), ("z", "(none)")],
+                    hints=["A truthiness test removes undefined (and empty strings).",
+                           'Write v ? v.toUpperCase() : "(none)".']),
+                _ex("tscourse-w9-gu-2", "Keep a legitimate zero",
+                    "Print the number, treating only a genuinely missing value as `(none)`.",
+                    _LINE + 'const v: number | undefined = line === "z" ? undefined : Number(line);\n'
+                    'console.log(v !== undefined ? v : "(none)");\n',
+                    'v !== undefined ? v : "(none)"',
+                    [("0", "0"), ("z", "(none)"), ("7", "7")],
+                    hints=["Truthiness would discard the 0.",
+                           'Write v !== undefined ? v : "(none)".'],
+                    difficulty="Medium"),
+                _ex("tscourse-w9-gu-3", "Array or single",
+                    "Return the number of items: the array's length, or 1 for a lone string.",
+                    _LINE + 'function count(v: string | string[]): number {\n'
+                    '  if (Array.isArray(v)) return v.length;\n'
+                    '  return 1;\n}\n'
+                    'console.log(count(line === "a" ? ["x", "y", "z"] : "solo"));\n',
+                    'if (Array.isArray(v)) return v.length;',
+                    [("a", "3"), ("b", "1")],
+                    hints=["typeof cannot tell an array from an object.",
+                           "Write if (Array.isArray(v)) return v.length;"],
+                    difficulty="Medium"),
+                _ex("tscourse-w9-gu-4", "Narrow with in",
+                    "Return the email when present, otherwise the phone.",
+                    _LINE + 'type Contact = { email: string } | { phone: string };\n'
+                    'function reach(c: Contact): string {\n'
+                    '  if ("email" in c) return c.email;\n'
+                    '  return c.phone;\n}\n'
+                    'console.log(reach(line === "e" ? { email: "a@b.c" } : { phone: "123" }));\n',
+                    'if ("email" in c) return c.email;',
+                    [("e", "a@b.c"), ("p", "123")],
+                    hints=["These shapes share no tag, so test for a key.",
+                           'Write if ("email" in c) return c.email;'],
+                    difficulty="Medium"),
+                _ex("tscourse-w9-gu-5", "Narrow a caught error",
+                    "Print the error's message when it is a real Error, otherwise `unknown error`.",
+                    'function risky(): void {\n  throw new Error("boom");\n}\n'
+                    'try {\n  risky();\n} catch (e) {\n'
+                    '  console.log(e instanceof Error ? e.message : "unknown error");\n}\n',
+                    'e instanceof Error ? e.message : "unknown error"',
+                    [("", "boom")],
+                    hints=["A caught value is unknown until you check it.",
+                           'Write e instanceof Error ? e.message : "unknown error".'],
+                    difficulty="Medium"),
+                _fix("tscourse-w9-gu-fix1", "Fix the discarded zero",
+                     "A value of 0 is real data, but this prints `(none)`. Fix it.",
+                     _LINE + 'const v: number | undefined = line === "z" ? undefined : Number(line);\n'
+                     'console.log(v ? v : "(none)");\n',
+                     _LINE + 'const v: number | undefined = line === "z" ? undefined : Number(line);\n'
+                     'console.log(v !== undefined ? v : "(none)");\n',
+                     [("0", "0"), ("z", "(none)"), ("7", "7")],
+                     hints=["0 is falsy, so the truthiness guard rejects it.",
+                            "Test explicitly against undefined."],
+                     difficulty="Medium"),
+            ],
+            quiz=[
+                _q("`if (v != null)` catches…",
+                   ["only null", "only undefined", "both null and undefined",
+                    "every falsy value"], 2,
+                   "The single defensible use of loose inequality."),
+                _q("You have a union of object shapes with no shared field name. Use…",
+                   ["typeof", "in", "Array.isArray", "==="], 1,
+                   "`in` distinguishes by key presence."),
+            ],
+        ),
+        # ---- Lesson 6 --------------------------------------------------
+        _lesson(
+            "w9-discriminated", "Discriminated unions",
+            "The pattern that makes 'one of several shapes' pleasant.",
+            """
+This is the most important idea in the week, and one of the most important in
+TypeScript.
+
+A **discriminated union** is a union of object types that all carry a **literal
+field in common** — the *discriminant*, or *tag*:
+
+```ts
+type Shape =
+  | { kind: "circle"; r: number }
+  | { kind: "square"; side: number }
+  | { kind: "rect"; w: number; h: number };
+```
+
+Every member has `kind`, and each `kind` is a different literal. Switch on it
+and TypeScript narrows to exactly one member per arm:
+
+```ts
+function area(s: Shape): number {
+  switch (s.kind) {
+    case "circle": return 3.14159 * s.r * s.r;    // s.r exists here
+    case "square": return s.side * s.side;         // s.side exists here
+    case "rect":   return s.w * s.h;
+  }
+}
+```
+
+Inside `case "circle"` you may read `s.r` and **may not** read `s.side` — the
+compiler knows which member you have. No casts, no optional fields, no
+defensive checks.
+
+**Why this beats optional fields.** The alternative people reach for first:
+
+```ts
+interface Shape { kind: string; r?: number; side?: number; w?: number; h?: number }
+```
+
+That type permits `{ kind: "circle", side: 3 }` and `{ kind: "banana" }`, and
+every read needs a `?? 0`. The discriminated union makes those states
+**unrepresentable** — the phrase from week 8, now with teeth.
+
+**The canonical use: results that might fail.**
+
+```ts
+type Result =
+  | { ok: true; value: number }
+  | { ok: false; error: string };
+
+function show(r: Result): string {
+  if (r.ok) {
+    return `= ${r.value}`;     // value exists only on the success member
+  }
+  return `! ${r.error}`;
+}
+```
+
+Note the discriminant here is a **boolean literal** (`true` / `false`), and a
+plain `if (r.ok)` narrows it. The tag doesn't have to be a string.
+
+**Naming the tag.** `kind`, `type`, `status`, `ok` — anything, as long as it is
+consistent and its values are literal types. `type` is common in the wider
+ecosystem; `kind` avoids clashing with the keyword in your own reading.
+
+**Modelling state** is the other everyday use, and it kills a whole class of
+bug:
+
+```ts
+type Load =
+  | { kind: "loading" }
+  | { kind: "loaded"; items: string[] }
+  | { kind: "failed"; error: string };
+```
+
+There is now no way to be loading *and* have items, or failed *and* have no
+error.
+
+> ⚠️ **Common mistakes:** giving the tag a non-literal type (`kind: string`),
+> which disables all narrowing; forgetting the tag on one member; and using a
+> different field name for the tag in different members.
+""",
+            warmup=[
+                _q("A discriminated union's tag must be…",
+                   ["a string", "a literal type", "optional", "a number"], 1,
+                   "`kind: string` would narrow nothing."),
+                _q('In `case "circle":` of a switch on `s.kind`, `s` is…',
+                   ["the whole union", "just the circle member", "any", "never"], 1,
+                   "That is the whole payoff."),
+                _q("`type R = {ok: true; value: number} | {ok: false; error: string}` — after `if (r.ok)`, `r.error` is…",
+                   ["available", "a compile error", "undefined", "any"], 1,
+                   "The success member has no error field."),
+                _q("Compared with optional fields, a discriminated union…",
+                   ["is longer to write only", "makes invalid combinations unrepresentable",
+                    "is slower", "needs classes"], 1,
+                   "The type itself rules out nonsense."),
+            ],
+            exercises=[
+                _ex("tscourse-w9-di-1", "Switch on the tag",
+                    "Complete the square case so it returns side squared.",
+                    _LINE + 'type Shape =\n'
+                    '  | { kind: "circle"; r: number }\n'
+                    '  | { kind: "square"; side: number };\n'
+                    'function area(s: Shape): number {\n'
+                    '  switch (s.kind) {\n'
+                    '    case "circle":\n      return 3 * s.r * s.r;\n'
+                    '    case "square":\n      return s.side * s.side;\n'
+                    '  }\n}\n'
+                    'console.log(area(line === "c" ? { kind: "circle", r: 2 } : { kind: "square", side: 4 }));\n',
+                    'return s.side * s.side;', [("c", "12"), ("s", "16")],
+                    hints=["Inside this case the compiler knows the member has `side`.",
+                           "Write return s.side * s.side;"],
+                    difficulty="Medium"),
+                _ex("tscourse-w9-di-2", "Build a valid member",
+                    "Construct the circle member — it needs the tag AND that member's own field.",
+                    _LINE + 'type Shape =\n'
+                    '  | { kind: "circle"; r: number }\n'
+                    '  | { kind: "square"; side: number };\n'
+                    'const s: Shape = line === "c" ? { kind: "circle", r: 2 } : { kind: "square", side: 4 };\n'
+                    'console.log(s.kind);\n',
+                    '{ kind: "circle", r: 2 }',
+                    [("c", "circle"), ("s", "square")],
+                    hints=["A member must carry its literal tag and exactly the fields that member declares.",
+                           'Write { kind: "circle", r: 2 }.'],
+                    difficulty="Medium"),
+                _ex("tscourse-w9-di-3", "A Result type",
+                    "Print `= <value>` on success and `! <error>` on failure.",
+                    _LINE + 'type Result =\n'
+                    '  | { ok: true; value: number }\n'
+                    '  | { ok: false; error: string };\n'
+                    'const n = Number(line);\n'
+                    'const r: Result = Number.isNaN(n) ? { ok: false, error: "not a number" } : { ok: true, value: n };\n'
+                    'console.log(r.ok ? `= ${r.value}` : `! ${r.error}`);\n',
+                    'r.ok ? `= ${r.value}` : `! ${r.error}`',
+                    [("42", "= 42"), ("abc", "! not a number")],
+                    hints=["A boolean tag narrows with a plain truthiness test.",
+                           "Write r.ok ? `= ${r.value}` : `! ${r.error}`."],
+                    difficulty="Medium"),
+                _ex("tscourse-w9-di-4", "Build the failure case",
+                    "Return the failing Result when the input does not parse.",
+                    _LINE + 'type Result =\n'
+                    '  | { ok: true; value: number }\n'
+                    '  | { ok: false; error: string };\n'
+                    'function parse(s: string): Result {\n'
+                    '  const n = Number(s);\n'
+                    '  if (Number.isNaN(n)) return { ok: false, error: "bad" };\n'
+                    '  return { ok: true, value: n };\n}\n'
+                    'const r = parse(line);\nconsole.log(r.ok ? r.value : r.error);\n',
+                    'return { ok: false, error: "bad" };',
+                    [("7", "7"), ("zz", "bad")],
+                    hints=["The failure member carries the tag AND the error field.",
+                           'Write return { ok: false, error: "bad" };'],
+                    difficulty="Medium"),
+                _ex("tscourse-w9-di-5", "Model a loading state",
+                    "Print `loading`, `n items`, or `error: <msg>` for each state.",
+                    _LINE + 'type Load =\n'
+                    '  | { kind: "loading" }\n'
+                    '  | { kind: "loaded"; items: string[] }\n'
+                    '  | { kind: "failed"; error: string };\n'
+                    'const st: Load =\n'
+                    '  line === "l" ? { kind: "loading" }\n'
+                    '  : line === "d" ? { kind: "loaded", items: ["a", "b"] }\n'
+                    '  : { kind: "failed", error: "oops" };\n'
+                    'switch (st.kind) {\n'
+                    '  case "loading":\n    console.log("loading");\n    break;\n'
+                    '  case "loaded":\n    console.log(`${st.items.length} items`);\n    break;\n'
+                    '  case "failed":\n    console.log(`error: ${st.error}`);\n    break;\n'
+                    '}\n',
+                    'console.log(`${st.items.length} items`);',
+                    [("l", "loading"), ("d", "2 items"), ("f", "error: oops")],
+                    hints=["Only the loaded member has items, and only inside its case.",
+                           "Write console.log(`${st.items.length} items`);"],
+                    difficulty="Medium"),
+                _fix("tscourse-w9-di-fix1", "Fix the untagged union",
+                     "The tag was typed as `string`, so narrowing is impossible and this reads the wrong field. Give each member a literal tag and read the right one.",
+                     _LINE + 'type Shape =\n'
+                     '  | { kind: string; r: number }\n'
+                     '  | { kind: string; side: number };\n'
+                     'const s: Shape = line === "c" ? { kind: "circle", r: 2 } : { kind: "square", side: 4 };\n'
+                     'console.log(s.kind === "circle" ? 12 : 12);\n',
+                     _LINE + 'type Shape =\n'
+                     '  | { kind: "circle"; r: number }\n'
+                     '  | { kind: "square"; side: number };\n'
+                     'const s: Shape = line === "c" ? { kind: "circle", r: 2 } : { kind: "square", side: 4 };\n'
+                     'console.log(s.kind === "circle" ? 3 * s.r * s.r : s.side * s.side);\n',
+                     [("c", "12"), ("s", "16")],
+                     hints=["`kind: string` is not a literal type, so no narrowing happens and the areas had to be hard-coded.",
+                            'Change the tags to the literals "circle" and "square", then compute each area from the member\'s own field.'],
+                     difficulty="Medium"),
+            ],
+            quiz=[
+                _q("The discriminant of a union must be…",
+                   ["named kind", "a literal-typed field present on every member", "a string",
+                    "optional"], 1,
+                   "The name is free; being a literal on every member is not."),
+                _q("A Result union beats returning `number | null` because…",
+                   ["it is shorter", "the failure can carry an explanation, and success cannot be confused with it",
+                    "it is faster", "null is banned"], 1,
+                   "You get the reason, not just the absence."),
+                _q("`{ kind: \"circle\", side: 3 }` against a proper Shape union is…",
+                   ["allowed", "a compile error", "allowed but undefined", "a runtime error"], 1,
+                   "The tag and the fields must agree — that is the whole point."),
+            ],
+        ),
+        # ---- Lesson 7 --------------------------------------------------
+        _lesson(
+            "w9-exhaustive", "Exhaustiveness & intersections",
+            "Making the compiler catch the case you forgot.",
+            """
+Discriminated unions give you one more thing, and it is the reason experienced
+people reach for them: **the compiler can prove you handled every case.**
+
+Start with a `never` refresher. `never` is the type with **no values** — the
+type of a situation that cannot happen. If you've handled every member of a
+union, the value that reaches the `default` branch has type `never`, because
+nothing is left.
+
+```ts
+type Shape =
+  | { kind: "circle"; r: number }
+  | { kind: "square"; side: number };
+
+function area(s: Shape): number {
+  switch (s.kind) {
+    case "circle": return 3.14159 * s.r * s.r;
+    case "square": return s.side * s.side;
+    default: {
+      const _exhaustive: never = s;      // ✅ compiles: s is never here
+      return _exhaustive;
+    }
+  }
+}
+```
+
+Now **add a third member** to `Shape` and forget to handle it. `s` in the
+`default` is no longer `never` — it's the new member — so
+`const _exhaustive: never = s;` **fails to compile**, pointing straight at the
+function you forgot to update.
+
+That is a genuinely powerful property: adding a case to a type produces a list
+of every place that must change. It's why "make the illegal states
+unrepresentable" pays off — the compiler becomes a to-do list.
+
+**Without the trick**, a forgotten case falls through the `default` and returns
+something plausible-but-wrong at runtime. With it, the code doesn't build.
+
+**A note on returns.** If every case returns and you *don't* write a `default`,
+TypeScript already knows the switch is exhaustive and won't complain about a
+missing return. Adding the `never` check makes that guarantee explicit and
+survives someone later adding a member.
+
+---
+
+**Intersections** are the other half of the type algebra. Where `A | B` is
+"either", `A & B` is **both**:
+
+```ts
+type Timestamped = { created: string };
+type Named = { name: string };
+
+type Entry = Timestamped & Named;      // has created AND name
+
+const e: Entry = { created: "mon", name: "coffee" };   // both required
+```
+
+Use them to bolt a common set of fields onto several types:
+
+```ts
+type WithId<T> = T & { id: string };    // (generics arrive next week)
+```
+
+**Union and intersection pull in opposite directions.** A union has *fewer*
+usable members (only the shared ones); an intersection has *more* (all of them).
+Beginners routinely expect the opposite, because "union" sounds bigger. The
+rule: a union is a bigger set of **values**, and therefore a smaller set of
+**guaranteed members**.
+
+Intersecting incompatible primitives gives `never` — no value can be both:
+
+```ts
+type Impossible = string & number;      // never
+```
+
+> ⚠️ **Common mistakes:** adding a `default` that returns a fallback, which
+> silently defeats exhaustiveness; expecting `A | B` to give you the members of
+> both; and forgetting that the `never` check must actually *assign* the value
+> to a `never`-typed name.
+""",
+            warmup=[
+                _q("`never` is the type of…",
+                   ["null", "a value that cannot exist", "undefined", "any value"], 1,
+                   "It has no values at all."),
+                _q("In an exhaustive switch's default, the value has type…",
+                   ["the union", "never", "any", "unknown"], 1,
+                   "Every member was removed by a case."),
+                _q("Adding a member to the union and forgetting a case makes the never check…",
+                   ["still compile", "fail to compile, pointing at the switch", "throw at runtime",
+                    "warn only"], 1,
+                   "Which is exactly the point."),
+                _q("`A & B` gives a value with…",
+                   ["either A's or B's members", "all of A's and B's members", "no members",
+                    "only shared members"], 1,
+                   "Intersection combines; union restricts."),
+            ],
+            exercises=[
+                _ex("tscourse-w9-ex-1", "Add the exhaustiveness check",
+                    "Complete the default branch so a forgotten case would fail to compile.",
+                    _LINE + 'type Shape =\n'
+                    '  | { kind: "circle"; r: number }\n'
+                    '  | { kind: "square"; side: number };\n'
+                    'function area(s: Shape): number {\n'
+                    '  switch (s.kind) {\n'
+                    '    case "circle":\n      return 3 * s.r * s.r;\n'
+                    '    case "square":\n      return s.side * s.side;\n'
+                    '    default: {\n'
+                    '      const _exhaustive: never = s;\n'
+                    '      return _exhaustive;\n'
+                    '    }\n'
+                    '  }\n}\n'
+                    'console.log(area(line === "c" ? { kind: "circle", r: 2 } : { kind: "square", side: 4 }));\n',
+                    'const _exhaustive: never = s;', [("c", "12"), ("s", "16")],
+                    hints=["Assign the leftover value to a name annotated as never.",
+                           "Write const _exhaustive: never = s;"],
+                    difficulty="Medium"),
+                _ex("tscourse-w9-ex-2", "Handle the new case",
+                    "A third shape was added. Handle it so the switch stays exhaustive.",
+                    _LINE + 'type Shape =\n'
+                    '  | { kind: "circle"; r: number }\n'
+                    '  | { kind: "square"; side: number }\n'
+                    '  | { kind: "rect"; w: number; h: number };\n'
+                    'function area(s: Shape): number {\n'
+                    '  switch (s.kind) {\n'
+                    '    case "circle":\n      return 3 * s.r * s.r;\n'
+                    '    case "square":\n      return s.side * s.side;\n'
+                    '    case "rect":\n      return s.w * s.h;\n'
+                    '    default: {\n'
+                    '      const _exhaustive: never = s;\n'
+                    '      return _exhaustive;\n'
+                    '    }\n'
+                    '  }\n}\n'
+                    'console.log(area(line === "r" ? { kind: "rect", w: 2, h: 5 } : { kind: "square", side: 4 }));\n',
+                    'case "rect":\n      return s.w * s.h;', [("r", "10"), ("s", "16")],
+                    hints=["The new member has w and h.",
+                           'Write case "rect": return s.w * s.h;'],
+                    difficulty="Medium"),
+                _ex("tscourse-w9-ex-3", "An intersection",
+                    "Combine the two shapes with & so the value must have both fields.",
+                    'type Timestamped = { created: string };\n'
+                    'type Named = { name: string };\n'
+                    'type Entry = Timestamped & Named;\n'
+                    'const e: Entry = { created: "mon", name: "coffee" };\n'
+                    'console.log(`${e.created} ${e.name}`);\n',
+                    'Timestamped & Named', [("", "mon coffee")],
+                    hints=["& means 'has all the members of both'.",
+                           "Write Timestamped & Named."]),
+                _ex("tscourse-w9-ex-4", "Extend records with a shared field",
+                    "Total the amounts across records that carry both an id and an amount.",
+                    'type WithId = { id: string };\n'
+                    'type Amounted = { amount: number };\n'
+                    'const rows: (WithId & Amounted)[] = [\n'
+                    '  { id: "a", amount: 3 },\n  { id: "b", amount: 12 },\n];\n'
+                    'console.log(rows.reduce((s, r) => s + r.amount, 0));\n',
+                    '(WithId & Amounted)[]', [("", "15")],
+                    hints=["Each element has all the members of both types.",
+                           "Write (WithId & Amounted)[]."],
+                    difficulty="Medium"),
+                _ex("tscourse-w9-ex-5", "Exhaustive over a status",
+                    "Complete the failed case so every Status is handled.",
+                    _LINE + 'type Status = "paid" | "pending" | "failed";\n'
+                    'function label(s: Status): string {\n'
+                    '  switch (s) {\n'
+                    '    case "paid":\n      return "Settled";\n'
+                    '    case "pending":\n      return "Waiting";\n'
+                    '    case "failed":\n      return "Rejected";\n'
+                    '    default: {\n'
+                    '      const _exhaustive: never = s;\n      return _exhaustive;\n'
+                    '    }\n'
+                    '  }\n}\n'
+                    'const s: Status = line === "paid" ? "paid" : line === "pending" ? "pending" : "failed";\n'
+                    'console.log(label(s));\n',
+                    'case "failed":\n      return "Rejected";',
+                    [("paid", "Settled"), ("pending", "Waiting"), ("x", "Rejected")],
+                    hints=["Without this case the never check would not compile.",
+                           'Write case "failed": return "Rejected";'],
+                    difficulty="Medium"),
+                _fix("tscourse-w9-ex-fix1", "Fix the defeated exhaustiveness",
+                     "The default returns a bogus 0, hiding the unhandled `rect` case — so a rect prints 0 instead of 10. Handle rect properly.",
+                     _LINE + 'type Shape =\n'
+                     '  | { kind: "circle"; r: number }\n'
+                     '  | { kind: "square"; side: number }\n'
+                     '  | { kind: "rect"; w: number; h: number };\n'
+                     'function area(s: Shape): number {\n'
+                     '  switch (s.kind) {\n'
+                     '    case "circle":\n      return 3 * s.r * s.r;\n'
+                     '    case "square":\n      return s.side * s.side;\n'
+                     '    default:\n      return 0;\n'
+                     '  }\n}\n'
+                     'console.log(area(line === "r" ? { kind: "rect", w: 2, h: 5 } : { kind: "square", side: 4 }));\n',
+                     _LINE + 'type Shape =\n'
+                     '  | { kind: "circle"; r: number }\n'
+                     '  | { kind: "square"; side: number }\n'
+                     '  | { kind: "rect"; w: number; h: number };\n'
+                     'function area(s: Shape): number {\n'
+                     '  switch (s.kind) {\n'
+                     '    case "circle":\n      return 3 * s.r * s.r;\n'
+                     '    case "square":\n      return s.side * s.side;\n'
+                     '    case "rect":\n      return s.w * s.h;\n'
+                     '    default: {\n'
+                     '      const _exhaustive: never = s;\n      return _exhaustive;\n'
+                     '    }\n'
+                     '  }\n}\n'
+                     'console.log(area(line === "r" ? { kind: "rect", w: 2, h: 5 } : { kind: "square", side: 4 }));\n',
+                     [("r", "10"), ("s", "16")],
+                     hints=["A plausible fallback in default is what let the missing case through silently.",
+                            "Handle rect, and replace the fallback with the never check so the next omission is caught."],
+                     difficulty="Medium"),
+            ],
+            quiz=[
+                _q("The never trick works because…",
+                   ["never is a runtime check", "an unhandled member is not assignable to never",
+                    "it throws", "default always runs"], 1,
+                   "The assignment fails to compile precisely when a case remains."),
+                _q("A union has ____ guaranteed members than any single member.",
+                   ["more", "fewer or equal", "the same", "infinitely many"], 1,
+                   "Only what all members share is usable."),
+                _q("`string & number` is…",
+                   ["string", "number", "never", "any"], 2,
+                   "No value can be both, so the type is empty."),
+            ],
+        ),
+    ],
+    capstone=_cap_auto(
+        "Budget Buddy #9 — the event log",
+        """
+Budget Buddy stops storing rows and starts storing **events**. Each line of
+input is one event, and events come in three kinds:
+
+```
+add coffee 3.25
+remove coffee
+note reviewed the month
+```
+
+Model them as a **discriminated union**:
+
+```ts
+type Event =
+  | { kind: "add"; desc: string; amount: number }
+  | { kind: "remove"; desc: string }
+  | { kind: "note"; text: string };
+```
+
+Process the log in order and print:
+
+```
+Events:  3
+Added:   1 ($3.25)
+Removed: 1 (coffee)
+Notes:   1
+Balance: $0.00
+```
+
+Rules:
+
+- `Balance` is the total of every `add` minus the amount of every `remove` whose
+  description was previously added. (Removing something never added changes
+  nothing.)
+- `Removed` lists the descriptions of removals, in order, joined with `, `.
+- A `note` event's text is everything after the word `note`.
+- Handle every kind with a `switch` on the tag — no optional fields.
+""",
+        _ch("tscourse-w9-capstone", "Budget Buddy #9", "Medium",
+            "Parse each line into a tagged event, then fold the log.",
+            _FS + 'type Event =\n'
+            '  | { kind: "add"; desc: string; amount: number }\n'
+            '  | { kind: "remove"; desc: string }\n'
+            '  | { kind: "note"; text: string };\n'
+            'function parse(line: string): Event {\n'
+            '  const p = line.trim().split(" ");\n'
+            '  if (p[0] === "add") return { kind: "add", desc: p[1], amount: Number(p[2]) };\n'
+            '  if (p[0] === "remove") return { kind: "remove", desc: p[1] };\n'
+            '  return { kind: "note", text: p.slice(1).join(" ") };\n'
+            '}\n'
+            'const events: Event[] = fs.readFileSync(0, "utf8").trim().split("\\n").map(parse);\n'
+            'const prices: { [key: string]: number } = {};\n'
+            'let added = 0;\nlet notes = 0;\nlet balance = 0;\n'
+            'const removed: string[] = [];\n'
+            'for (const e of events) {\n'
+            '  switch (e.kind) {\n'
+            '    case "add":\n'
+            '      added++;\n      balance += e.amount;\n      prices[e.desc] = e.amount;\n      break;\n'
+            '    case "remove":\n'
+            '      removed.push(e.desc);\n      balance -= prices[e.desc] ?? 0;\n      break;\n'
+            '    case "note":\n'
+            '      notes++;\n      break;\n'
+            '  }\n'
+            '}\n'
+            'let addedTotal = 0;\n'
+            'for (const e of events) {\n  if (e.kind === "add") addedTotal += e.amount;\n}\n'
+            'console.log(`Events:  ${events.length}`);\n'
+            'console.log(`Added:   ${added} ($${addedTotal.toFixed(2)})`);\n'
+            'console.log(`Removed: ${removed.length} (${removed.join(", ")})`);\n'
+            'console.log(`Notes:   ${notes}`);\n'
+            'console.log(`Balance: $${balance.toFixed(2)}`);\n',
+            'function parse(line: string): Event {\n'
+            '  const p = line.trim().split(" ");\n'
+            '  if (p[0] === "add") return { kind: "add", desc: p[1], amount: Number(p[2]) };\n'
+            '  if (p[0] === "remove") return { kind: "remove", desc: p[1] };\n'
+            '  return { kind: "note", text: p.slice(1).join(" ") };\n'
+            '}\n'
+            'const events: Event[] = fs.readFileSync(0, "utf8").trim().split("\\n").map(parse);\n'
+            'const prices: { [key: string]: number } = {};\n'
+            'let added = 0;\nlet notes = 0;\nlet balance = 0;\n'
+            'const removed: string[] = [];\n'
+            'for (const e of events) {\n'
+            '  switch (e.kind) {\n'
+            '    case "add":\n'
+            '      added++;\n      balance += e.amount;\n      prices[e.desc] = e.amount;\n      break;\n'
+            '    case "remove":\n'
+            '      removed.push(e.desc);\n      balance -= prices[e.desc] ?? 0;\n      break;\n'
+            '    case "note":\n'
+            '      notes++;\n      break;\n'
+            '  }\n'
+            '}\n'
+            'let addedTotal = 0;\n'
+            'for (const e of events) {\n  if (e.kind === "add") addedTotal += e.amount;\n}\n'
+            'console.log(`Events:  ${events.length}`);\n'
+            'console.log(`Added:   ${added} ($${addedTotal.toFixed(2)})`);\n'
+            'console.log(`Removed: ${removed.length} (${removed.join(", ")})`);\n'
+            'console.log(`Notes:   ${notes}`);\n'
+            'console.log(`Balance: $${balance.toFixed(2)}`);',
+            [("add coffee 3.25\nremove coffee\nnote reviewed the month",
+              "Events:  3\nAdded:   1 ($3.25)\nRemoved: 1 (coffee)\nNotes:   1\nBalance: $0.00"),
+             ("add book 12\nadd tea 2",
+              "Events:  2\nAdded:   2 ($14.00)\nRemoved: 0 ()\nNotes:   0\nBalance: $14.00"),
+             ("remove ghost\nnote nothing here",
+              "Events:  2\nAdded:   0 ($0.00)\nRemoved: 1 (ghost)\nNotes:   1\nBalance: $0.00")],
+            hints=["parse decides the tag from the first word, and builds a DIFFERENT shape for each kind.",
+                   'A note\'s text is the rest of the line: p.slice(1).join(" ").',
+                   "Remember what each amount was: a lookup table from desc to amount, filled on every add.",
+                   "Removing something never added must not change the balance — `prices[e.desc] ?? 0` handles that.",
+                   "Switch on e.kind so each arm can read only its own member's fields."]),
+        example_io="Events:  3\nAdded:   1 ($3.25)\nRemoved: 1 (coffee)\nNotes:   1\nBalance: $0.00",
+        rubric=["Event is a discriminated union with a literal `kind` on every member",
+                "parse builds a different shape per kind — no optional fields",
+                "A switch on the tag handles all three kinds",
+                "Removing a description that was never added leaves the balance unchanged"],
+        stretch=_ch("tscourse-w9-capstone-stretch", "Budget Buddy #9 (stretch)", "Medium",
+                    "Add an exhaustiveness guard: a `default` branch whose `const _exhaustive: never = e;` would stop the build if a fourth event kind were added and left unhandled. Also print the last note's text as `Last note: <text>` (or `Last note: -` when there are none).",
+                    _FS + 'type Event =\n'
+                    '  | { kind: "add"; desc: string; amount: number }\n'
+                    '  | { kind: "remove"; desc: string }\n'
+                    '  | { kind: "note"; text: string };\n'
+                    'function parse(line: string): Event {\n'
+                    '  const p = line.trim().split(" ");\n'
+                    '  if (p[0] === "add") return { kind: "add", desc: p[1], amount: Number(p[2]) };\n'
+                    '  if (p[0] === "remove") return { kind: "remove", desc: p[1] };\n'
+                    '  return { kind: "note", text: p.slice(1).join(" ") };\n'
+                    '}\n'
+                    'const events: Event[] = fs.readFileSync(0, "utf8").trim().split("\\n").map(parse);\n'
+                    'let lastNote = "-";\n'
+                    'for (const e of events) {\n'
+                    '  switch (e.kind) {\n'
+                    '    case "add":\n      break;\n'
+                    '    case "remove":\n      break;\n'
+                    '    case "note":\n      lastNote = e.text;\n      break;\n'
+                    '    default: {\n'
+                    '      const _exhaustive: never = e;\n      throw new Error(_exhaustive);\n'
+                    '    }\n'
+                    '  }\n'
+                    '}\n'
+                    'console.log(`Last note: ${lastNote}`);\n',
+                    'default: {\n'
+                    '      const _exhaustive: never = e;\n      throw new Error(_exhaustive);\n'
+                    '    }',
+                    [("add coffee 3.25\nnote reviewed the month", "Last note: reviewed the month"),
+                     ("add book 12", "Last note: -"),
+                     ("note first\nnote second", "Last note: second")],
+                    hints=["The default branch receives whatever the cases did not cover.",
+                           "Assign it to a name annotated never — that is the whole check.",
+                           "Write default: { const _exhaustive: never = e; throw new Error(_exhaustive); }"]),
+    ),
+))
+
+# --- Week 10 --------------------------------------------------------------
+_WEEKS.append(_week(
+    10, 3, _M3,
+    "Generics",
+    "Write one function or type that works over any type — without losing what the compiler knows about it.",
+    """
+Here is the problem generics exist to solve. You write a helper that returns the
+first element of an array:
+
+```ts
+function firstNumber(a: number[]): number { return a[0]; }
+```
+
+Then you need it for strings. And for records. You have three choices:
+
+1. **Copy it** for every element type — three functions that differ by one word.
+2. **Use `any`** — one function, and every caller loses all type information.
+3. **Make the type a parameter.**
+
+The third is a **generic**:
+
+```ts
+function first<T>(a: T[]): T {
+  return a[0];
+}
+
+first([1, 2, 3]);        // T is number   -> returns number
+first(["a", "b"]);       // T is string   -> returns string
+```
+
+`<T>` declares a **type parameter** — a placeholder filled in at each call site,
+usually inferred so you never write it. One implementation, and the compiler
+still knows that `first(["a"])` gives you a `string` with `.toUpperCase()` on it.
+
+The mental model that makes generics click: **`T` is a variable whose value is a
+type.** Everything else — constraints, `keyof`, generic interfaces — is that one
+idea applied more sharply.
+
+The runtime code in this week's drills is deliberately simple; the difficulty
+lives in the signatures. Read them slowly, and lean on the quizzes.
+
+⏱️ Budget about **five hours**.
+""",
+    objectives=[
+        "Say what problem generics solve, and why `any` is not the answer",
+        "Write a generic function and let TypeScript infer its type argument",
+        "Write generic helpers over arrays that preserve the element type",
+        "Constrain a type parameter with extends so you can use its members",
+        "Use keyof and indexed access to type a field-plucking helper",
+        "Declare generic type aliases and interfaces, including a Result type",
+        "Give a type parameter a default, and recognise when a generic is overkill",
+    ],
+    why="Every array method, every Promise, every collection and every well-typed utility in the ecosystem is generic. Reading them fluently — and writing your own when a helper would otherwise need `any` — is the difference between using TypeScript and fighting it.",
+    est_minutes=300,
+    glossary=[
+        _gloss("generic", "A function, type or interface parameterised by a type."),
+        _gloss("type parameter", "The placeholder declared in angle brackets: <T>."),
+        _gloss("type argument", "The concrete type supplied at a call site: first<string>(...)."),
+        _gloss("inference (of type arguments)", "TypeScript working out T from the values you passed."),
+        _gloss("T", "The conventional name for a type parameter. K, V, E, R are also common."),
+        _gloss("constraint", "extends limits what a type parameter may be: <T extends { id: string }>."),
+        _gloss("keyof T", "The union of T's key names as literal types."),
+        _gloss("indexed access (T[K])", "The type of the property K on T."),
+        _gloss("generic interface", "An interface with its own type parameters: interface Box<T>."),
+        _gloss("default type parameter", "A fallback type argument: <T = string>."),
+        _gloss("Array<T>", "The generic type behind T[]."),
+        _gloss("Promise<T>", "A value of type T that arrives later (week 16)."),
+        _gloss("Record<K, V>", "A built-in generic object type (week 12)."),
+        _gloss("any", "Turns checking off. A generic keeps the information instead."),
+        _gloss("unknown", "Accepts anything but must be narrowed. Safe, but loses the caller's type."),
+    ],
+    cheatsheet="""
+```ts
+// ---- the basic shape --------------------------------------------------
+function first<T>(a: T[]): T { return a[0]; }
+first([1, 2]);            // T inferred as number
+first<string>(["a"]);     // T given explicitly (rarely needed)
+
+function identity<T>(x: T): T { return x; }
+
+// ---- several parameters -------------------------------------------------
+function pair<A, B>(a: A, b: B): [A, B] { return [a, b]; }
+function swap<A, B>(p: [A, B]): [B, A] { return [p[1], p[0]]; }
+
+// ---- constraints ---------------------------------------------------------
+function longest<T extends { length: number }>(a: T, b: T): T {
+  return a.length >= b.length ? a : b;      // .length is now allowed
+}
+longest("abc", "de");        // ✅ strings have length
+longest([1], [2, 3]);        // ✅ arrays do too
+longest(1, 2);               // ❌ numbers do not
+
+// ---- keyof & indexed access ------------------------------------------------
+type User = { id: string; age: number };
+type K = keyof User;              // "id" | "age"
+type A = User["age"];             // number
+
+function pluck<T, K extends keyof T>(o: T, k: K): T[K] {
+  return o[k];
+}
+pluck({ id: "u1", age: 3 }, "age");   // returns number, not any
+
+// ---- generic types ----------------------------------------------------------
+interface Box<T> { value: T }
+type Pair<A, B> = { left: A; right: B };
+type Result<T> = { ok: true; value: T } | { ok: false; error: string };
+
+// ---- defaults ----------------------------------------------------------------
+interface Options<T = string> { items: T[] }
+const o: Options = { items: ["a"] };      // T defaults to string
+```
+""",
+    self_check=[
+        "Can you explain why `any` is a bad substitute for a generic?",
+        "Can you write a function that returns the last element of an array of any type?",
+        "Can you say what TypeScript infers T to be in `first([1, 2])`?",
+        "Can you constrain a type parameter so you may read `.length` off it?",
+        "Can you say what `keyof User` is, for a User with id and age?",
+        "Can you declare a generic interface and use it at two different types?",
+        "Can you name a case where a generic would be pointless?",
+    ],
+    review=[
+        _q("`<T>` in a function signature declares…",
+           ["a value parameter", "a type parameter", "an array", "a constraint"], 1,
+           "A placeholder for a type, filled at the call site."),
+        _q("In `first([1, 2, 3])` where `first<T>(a: T[]): T`, T is…",
+           ["any", "number", "number[]", "unknown"], 1,
+           "Inferred from the argument's element type."),
+        _q("Why not just use `any` instead of a generic?",
+           ["any is slower", "any discards the caller's type, so the RESULT is unchecked too",
+            "any is deprecated", "no difference"], 1,
+           "The generic remembers what came in and hands the same type back."),
+        _q("`function f<T extends { length: number }>(x: T)` lets you…",
+           ["pass anything", "read x.length inside f", "return a number", "skip inference"], 1,
+           "A constraint is what makes a member usable."),
+        _q("`keyof { id: string; age: number }` is…",
+           ["string", '"id" | "age"', "[string, number]", "never"], 1,
+           "A union of the key names as literal types."),
+        _q("`User[\"age\"]` where age is a number is…",
+           ['"age"', "number", "string", "never"], 1,
+           "Indexed access gives the property's TYPE."),
+        _q("`interface Box<T> { value: T }` used as `Box<string>` has value of type…",
+           ["T", "string", "any", "unknown"], 1,
+           "The argument replaces the parameter."),
+        _q("`<T = string>` means…",
+           ["T must be string", "T defaults to string when not supplied", "T is a value",
+            "T is constrained"], 1,
+           "A default type argument."),
+        _q("A generic with a type parameter used exactly ONCE in the signature is usually…",
+           ["ideal", "a sign it should just be a plain parameter type", "faster",
+            "required"], 1,
+           "A parameter that relates nothing to nothing buys you nothing."),
+        _q("`function f<T>(x: T): T` called as `f(\"a\")` returns a value of type…",
+           ["string", '"a"', "any", "unknown"], 0,
+           "Inference widens the literal to string here."),
+    ],
+    milestone="Budget Buddy's helpers now work over any record type at all, and its parser hands back a typed Result — the same shapes real libraries expose. Month 3 is half done.",
+    lessons=[
+        # ---- Lesson 1 --------------------------------------------------
+        _lesson(
+            "w10-why", "Why generics exist",
+            "The gap between duplication and any.",
+            """
+Three ways to write "give me the first element".
+
+**Duplicate per type** — correct, and unmaintainable:
+
+```ts
+function firstNumber(a: number[]): number { return a[0]; }
+function firstString(a: string[]): string { return a[0]; }
+function firstUser(a: User[]): User { return a[0]; }
+```
+
+**Use `any`** — one function, and the type information is destroyed:
+
+```ts
+function first(a: any[]): any { return a[0]; }
+
+const s = first(["a", "b"]);
+s.toUpperCase();     // no error... and no checking either
+s.toFixed(2);        // also no error — and a crash at runtime
+```
+
+`any` doesn't just lose information at the boundary; it *poisons everything
+downstream*. The caller got a value the compiler will never question again.
+
+**Make the type a parameter:**
+
+```ts
+function first<T>(a: T[]): T {
+  return a[0];
+}
+
+const s = first(["a", "b"]);   // s: string
+s.toUpperCase();               // ✅
+s.toFixed(2);                  // ❌ caught
+```
+
+One implementation, full checking at every call site.
+
+**What `<T>` means.** Read `function first<T>(a: T[]): T` as: *"for any type T,
+this takes an array of T and returns a T."* The signature states a
+**relationship** — the output type is tied to the input type — and that
+relationship is exactly what `any` throws away.
+
+**`unknown` is safer than `any` but still wrong here:**
+
+```ts
+function first(a: unknown[]): unknown { return a[0]; }
+const s = first(["a"]);
+s.toUpperCase();      // ❌ must narrow first — but you already KNEW it was a string
+```
+
+`unknown` is honest, and it still makes the caller re-establish something the
+function could have preserved. Use `unknown` for values whose type you genuinely
+don't know (parsed JSON, caught errors). Use a generic when the type is *known
+to the caller* and you're just passing it through.
+
+**The test for whether you need a generic:** does a type appear in **more than
+one place** in the signature — two parameters, or a parameter and the return? If
+yes, a generic ties them together. If a type parameter appears only once, it is
+doing nothing.
+
+> ⚠️ **Common mistakes:** reaching for `any` when a generic was two characters
+> away; adding type parameters that appear only once; and thinking `<T>` has a
+> runtime cost — it is erased like every other type.
+""",
+            warmup=[
+                _q("`function first(a: any[]): any` — what does the caller get?",
+                   ["a checked value", "a value the compiler will never question again",
+                    "an error", "unknown"], 1,
+                   "any propagates outward."),
+                _q("`function first<T>(a: T[]): T` called with `[\"a\"]` returns…",
+                   ["any", "string", "unknown", "T"], 1, "T is inferred as string."),
+                _q("The point of `<T>` in a signature is to…",
+                   ["speed things up", "tie the output type to the input type",
+                    "allow any value", "avoid annotations"], 1,
+                   "It states a relationship."),
+                _q("A type parameter that appears only ONCE in the signature is…",
+                   ["ideal", "pointless — it relates nothing", "required", "faster"], 1,
+                   "Generics exist to connect two places."),
+            ],
+            exercises=[
+                _ex("tscourse-w10-wh-1", "The identity function",
+                    "Return the argument unchanged.",
+                    'function identity<T>(x: T): T {\n  return x;\n}\n'
+                    'console.log(identity("hello"));\nconsole.log(identity(42));\n',
+                    'return x;', [("", "hello\n42")],
+                    hints=["The simplest generic there is — hand back what you were given."]),
+                _ex("tscourse-w10-wh-2", "First element, generically",
+                    "Return the first element of the array.",
+                    'function first<T>(a: T[]): T {\n  return a[0];\n}\n'
+                    'console.log(first([1, 2, 3]));\nconsole.log(first(["a", "b"]));\n',
+                    'return a[0];', [("", "1\na")],
+                    hints=["Index 0, whatever the element type is."]),
+                _ex("tscourse-w10-wh-3", "Declare the parameter",
+                    "Add the type parameter so this works for any element type.",
+                    'function last<T>(a: T[]): T {\n  return a[a.length - 1];\n}\n'
+                    'console.log(last([1, 2, 3]));\nconsole.log(last(["a", "b"]));\n',
+                    '<T>', [("", "3\nb")],
+                    hints=["Angle brackets go right after the function name.",
+                           "Write <T>."]),
+                _ex("tscourse-w10-wh-4", "Use the preserved type",
+                    "The result is a string, so its own methods are available. Uppercase it.",
+                    'function first<T>(a: T[]): T {\n  return a[0];\n}\n'
+                    'const s = first(["hello", "there"]);\nconsole.log(s.toUpperCase());\n',
+                    's.toUpperCase()', [("", "HELLO")],
+                    hints=["Because T was inferred as string, string methods are allowed.",
+                           "Write s.toUpperCase()."]),
+                _ex("tscourse-w10-wh-5", "Generic over records",
+                    "The same helper works on an array of objects. Print the first record's desc.",
+                    'function first<T>(a: T[]): T {\n  return a[0];\n}\n'
+                    'const rows = [{ desc: "coffee" }, { desc: "book" }];\n'
+                    'console.log(first(rows).desc);\n',
+                    'first(rows).desc', [("", "coffee")],
+                    hints=["T is inferred as the record type, so .desc is available.",
+                           "Write first(rows).desc."],
+                    difficulty="Medium"),
+                _fix("tscourse-w10-wh-fix1", "Fix the any-shaped helper",
+                     "This uses `any`, so a genuine mistake goes unnoticed and it crashes at runtime. Make it generic and call the right method.",
+                     'function first(a: any[]): any {\n  return a[0];\n}\n'
+                     'const s = first(["hello"]);\nconsole.log(s.toFixed(2));\n',
+                     'function first<T>(a: T[]): T {\n  return a[0];\n}\n'
+                     'const s = first(["hello"]);\nconsole.log(s.toUpperCase());\n',
+                     [("", "HELLO")],
+                     hints=["With any, calling toFixed on a string raised no complaint at all.",
+                            "Parameterise the type, then call a method the value actually has."],
+                     difficulty="Medium"),
+            ],
+            quiz=[
+                _q("`unknown[]` instead of a generic means the caller must…",
+                   ["nothing extra", "narrow a type it already knew", "cast to any",
+                    "use a loop"], 1,
+                   "Safe, but it discards information the function could have preserved."),
+                _q("Generics at runtime…",
+                   ["add a lookup", "are erased like all types", "create classes",
+                    "slow calls down"], 1,
+                   "There is no runtime representation of T at all."),
+            ],
+        ),
+        # ---- Lesson 2 --------------------------------------------------
+        _lesson(
+            "w10-functions", "Generic functions & inference",
+            "Declaring type parameters, and letting them be worked out.",
+            """
+The type parameter list goes between the name and the value parameters:
+
+```ts
+function wrap<T>(x: T): T[] {
+  return [x];
+}
+```
+
+**You almost never write the type argument.** TypeScript infers it from what you
+pass:
+
+```ts
+wrap("a");        // T = string   -> string[]
+wrap(3);          // T = number   -> number[]
+wrap<boolean>(true);   // explicit — legal, but usually noise
+```
+
+Supply it explicitly only when inference can't help — typically when the type
+appears nowhere in the arguments:
+
+```ts
+function makeEmpty<T>(): T[] { return []; }
+const xs = makeEmpty<string>();     // nothing to infer from, so say it
+```
+
+**Several type parameters** are independent:
+
+```ts
+function pair<A, B>(a: A, b: B): [A, B] {
+  return [a, b];
+}
+pair("x", 1);      // [string, number]
+```
+
+Conventional names: `T` for a single one; `A`/`B` or `T`/`U` for two; `K` for a
+key, `V` for a value, `E` for an error, `R` for a result. Use a descriptive name
+when it helps (`<TRow>`), but short names are the norm and nobody minds.
+
+**Inference follows the values, and widens literals:**
+
+```ts
+function id<T>(x: T): T { return x; }
+const a = id("hello");        // string, not "hello"
+const b = id({ n: 1 });       // { n: number }
+```
+
+**Generic arrow functions** exist too, and are used constantly for callbacks:
+
+```ts
+const wrap = <T>(x: T): T[] => [x];
+```
+
+(In `.tsx` files that clashes with JSX and needs `<T,>`; in a plain `.ts` file
+it's fine.)
+
+**A generic can call another generic**, passing its own parameter through:
+
+```ts
+function firstOrEmpty<T>(a: T[]): T[] {
+  return a.length > 0 ? wrap(first(a)) : [];
+}
+```
+
+That's the payoff: the relationships compose, and the compiler tracks them all
+the way down.
+
+> ⚠️ **Common mistakes:** writing explicit type arguments everywhere (let
+> inference work); declaring `<T>` and then never using it; and expecting `T` to
+> be available at runtime — you cannot write `if (T === string)`.
+""",
+            warmup=[
+                _q("`function wrap<T>(x: T): T[]` called as `wrap(3)` returns type…",
+                   ["number", "number[]", "T[]", "any[]"], 1, "T is number, so T[] is number[]."),
+                _q("When must you write the type argument explicitly?",
+                   ["always", "when nothing in the arguments determines it", "never",
+                    "for strings"], 1,
+                   "e.g. a function taking no parameters."),
+                _q("`const a = id(\"hello\")` where `id<T>(x: T): T` gives a…",
+                   ['"hello"', "string", "any", "never"], 1, "Inference widens the literal."),
+                _q("Can you test `T` at runtime?",
+                   ["yes, with typeof T", "no — type parameters are erased", "yes, with instanceof",
+                    "only for classes"], 1,
+                   "There is nothing left of T when the program runs."),
+            ],
+            exercises=[
+                _ex("tscourse-w10-fn-1", "Wrap a value",
+                    "Return a one-element array holding the argument.",
+                    'function wrap<T>(x: T): T[] {\n  return [x];\n}\n'
+                    'console.log(wrap("a").length);\nconsole.log(wrap(3)[0]);\n',
+                    'return [x];', [("", "1\n3")],
+                    hints=["An array literal containing just the parameter."]),
+                _ex("tscourse-w10-fn-2", "Two type parameters",
+                    "Return the two arguments as a tuple.",
+                    'function pair<A, B>(a: A, b: B): [A, B] {\n  return [a, b];\n}\n'
+                    'const p = pair("x", 1);\nconsole.log(`${p[0]}${p[1]}`);\n',
+                    'return [a, b];', [("", "x1")],
+                    hints=["The tuple holds them in order."]),
+                _ex("tscourse-w10-fn-3", "Declare two parameters",
+                    "Add the type parameter list so both arguments keep their own types.",
+                    'function swap<A, B>(a: A, b: B): [B, A] {\n  return [b, a];\n}\n'
+                    'const s = swap("x", 1);\nconsole.log(`${s[0]}${s[1]}`);\n',
+                    '<A, B>', [("", "1x")],
+                    hints=["Two names, separated by a comma, in angle brackets.",
+                           "Write <A, B>."],
+                    difficulty="Medium"),
+                _ex("tscourse-w10-fn-4", "Swap the tuple",
+                    "Return the pair with its two slots exchanged.",
+                    'function swap<A, B>(p: [A, B]): [B, A] {\n  return [p[1], p[0]];\n}\n'
+                    'const s = swap(["x", 1]);\nconsole.log(`${s[0]}${s[1]}`);\n',
+                    'return [p[1], p[0]];', [("", "1x")],
+                    hints=["Slot 1 first, then slot 0."],
+                    difficulty="Medium"),
+                _ex("tscourse-w10-fn-5", "Compose two generics",
+                    "Return a one-element array holding the first element, or an empty array.",
+                    'function first<T>(a: T[]): T {\n  return a[0];\n}\n'
+                    'function wrap<T>(x: T): T[] {\n  return [x];\n}\n'
+                    'function firstOrEmpty<T>(a: T[]): T[] {\n'
+                    '  return a.length > 0 ? wrap(first(a)) : [];\n}\n'
+                    'console.log(firstOrEmpty([5, 6]).length);\nconsole.log(firstOrEmpty([]).length);\n',
+                    'a.length > 0 ? wrap(first(a)) : []',
+                    [("", "1\n0")],
+                    hints=["Guard the empty case, then pass T straight through both helpers.",
+                           "Write a.length > 0 ? wrap(first(a)) : []."],
+                    difficulty="Medium"),
+                _fix("tscourse-w10-fn-fix1", "Fix the unused parameter",
+                     "The helper declares a type parameter it never uses, and hard-codes a string. Make it actually generic so the number is returned unchanged.",
+                     'function identity<T>(x: string): string {\n  return x;\n}\n'
+                     'console.log(identity("a"));\n',
+                     'function identity<T>(x: T): T {\n  return x;\n}\n'
+                     'console.log(identity("a"));\nconsole.log(identity(42));\n',
+                     [("", "a\n42")],
+                     hints=["<T> is declared but the signature still says string everywhere.",
+                            "Use T for the parameter and the return, then it works for numbers too."],
+                     difficulty="Medium"),
+            ],
+            quiz=[
+                _q("Explicit type arguments are…",
+                   ["always required", "usually unnecessary — inference handles it",
+                    "never allowed", "faster"], 1,
+                   "Write them only when inference has nothing to go on."),
+                _q("`<A, B>` declares…",
+                   ["one parameter", "two independent type parameters", "a constraint",
+                    "a tuple"], 1,
+                   "Each is inferred separately."),
+            ],
+        ),
+        # ---- Lesson 3 --------------------------------------------------
+        _lesson(
+            "w10-arrays", "Generic helpers over arrays",
+            "Where generics earn their keep day to day.",
+            """
+Array helpers are the natural home of generics, because the element type must
+survive the trip.
+
+```ts
+function last<T>(a: T[]): T            { return a[a.length - 1]; }
+function head<T>(a: T[], n: number): T[] { return a.slice(0, n); }
+function reversed<T>(a: T[]): T[]      { return [...a].reverse(); }
+```
+
+Each says something the compiler can use: `last` of a `string[]` is a `string`;
+`reversed` of a `User[]` is a `User[]`.
+
+**Returning "maybe nothing"** needs a union — and this is why the built-in
+`find` returns `T | undefined`:
+
+```ts
+function firstOr<T>(a: T[], fallback: T): T {
+  return a.length > 0 ? a[0] : fallback;
+}
+```
+
+Note the `fallback: T`. That's the whole idea again: the fallback must be the
+*same* type as the elements, and the signature enforces it.
+`firstOr([1, 2], "none")` is a compile error, which is what you want.
+
+**Combining two arrays:**
+
+```ts
+function concat<T>(a: T[], b: T[]): T[] {
+  return [...a, ...b];
+}
+```
+
+Both parameters use the *same* `T`, so mixing element types is rejected. If you
+genuinely want to allow that, say so — `concat<A, B>(a: A[], b: B[]): (A | B)[]`.
+The signature is the design decision.
+
+**Deduplicating:**
+
+```ts
+function unique<T>(a: T[]): T[] {
+  const out: T[] = [];
+  for (const x of a) {
+    if (!out.includes(x)) out.push(x);
+  }
+  return out;
+}
+```
+
+`out: T[]` needs its annotation for the reason you learned in week 8 — an empty
+literal has nothing to infer from.
+
+**Reading the built-ins.** Everything you used in week 6 is generic. Hover over
+`map` and you'll see roughly:
+
+```ts
+map<U>(fn: (value: T, index: number) => U): U[]
+```
+
+`T` is the array's element type; `U` is whatever the callback returns. That is
+why `[1,2,3].map((x) => String(x))` is `string[]` and not `number[]` — the
+signature *derives* the result type from your callback. Once generics read
+easily, the standard library stops being magic.
+
+> ⚠️ **Common mistakes:** forgetting the annotation on an accumulator array;
+> using one `T` where you meant two independent ones (or the reverse); and
+> writing a helper that returns `T` when it can return `undefined` for an empty
+> array.
+""",
+            warmup=[
+                _q("`function last<T>(a: T[]): T` on a `string[]` returns…",
+                   ["T", "string", "any", "string[]"], 1, "T is inferred as string."),
+                _q("`function concat<T>(a: T[], b: T[]): T[]` called with a number[] and a string[]…",
+                   ["works, giving (number|string)[]", "is a compile error", "returns any[]",
+                    "throws"], 1,
+                   "Both parameters share one T, so they must agree."),
+                _q("In `map<U>(fn: (v: T) => U): U[]`, U is…",
+                   ["the element type", "whatever the callback returns", "always string",
+                    "the index"], 1,
+                   "Which is why map can change the array's type."),
+                _q("`const out: T[] = [];` needs its annotation because…",
+                   ["T is special", "an empty literal gives inference nothing", "it is const",
+                    "it does not"], 1,
+                   "Same rule as week 8."),
+            ],
+            exercises=[
+                _ex("tscourse-w10-ar-1", "Last element",
+                    "Return the final element, whatever the element type.",
+                    'function last<T>(a: T[]): T {\n  return a[a.length - 1];\n}\n'
+                    'console.log(last([1, 2, 3]));\nconsole.log(last(["a", "b"]));\n',
+                    'return a[a.length - 1];', [("", "3\nb")],
+                    hints=["The last index is one less than the length."]),
+                _ex("tscourse-w10-ar-2", "Reverse a copy",
+                    "Return a reversed copy, leaving the original alone.",
+                    'function reversed<T>(a: T[]): T[] {\n  return [...a].reverse();\n}\n'
+                    'const xs = [1, 2, 3];\nconsole.log(reversed(xs).join(""));\nconsole.log(xs.join(""));\n',
+                    'return [...a].reverse();', [("", "321\n123")],
+                    hints=["reverse mutates, so spread into a copy first.",
+                           "Write return [...a].reverse();"],
+                    difficulty="Medium"),
+                _ex("tscourse-w10-ar-3", "A typed fallback",
+                    "Return the first element, or the fallback when the array is empty.",
+                    'function firstOr<T>(a: T[], fallback: T): T {\n'
+                    '  return a.length > 0 ? a[0] : fallback;\n}\n'
+                    'console.log(firstOr([5, 6], 0));\nconsole.log(firstOr<number>([], 0));\n',
+                    'a.length > 0 ? a[0] : fallback', [("", "5\n0")],
+                    hints=["Guard the empty case and hand back the fallback.",
+                           "Write a.length > 0 ? a[0] : fallback."],
+                    difficulty="Medium"),
+                _ex("tscourse-w10-ar-4", "Concatenate",
+                    "Return the two arrays joined into one.",
+                    'function concat<T>(a: T[], b: T[]): T[] {\n  return [...a, ...b];\n}\n'
+                    'console.log(concat([1, 2], [3]).join(""));\n',
+                    'return [...a, ...b];', [("", "123")],
+                    hints=["Spread both into a single new array."]),
+                _ex("tscourse-w10-ar-5", "Deduplicate",
+                    "Keep only the first occurrence of each element.",
+                    _WORDS + 'function unique<T>(a: T[]): T[] {\n'
+                    '  const out: T[] = [];\n'
+                    '  for (const x of a) {\n    if (!out.includes(x)) {\n      out.push(x);\n    }\n  }\n'
+                    '  return out;\n}\n'
+                    'console.log(unique(words).join(" "));\n',
+                    'if (!out.includes(x)) {\n      out.push(x);\n    }',
+                    [("a b a c a", "a b c"), ("x y", "x y")],
+                    hints=["Add an element only when it is not already collected.",
+                           "Write if (!out.includes(x)) { out.push(x); }"],
+                    difficulty="Medium"),
+                _ex("tscourse-w10-ar-6", "Generic over records",
+                    "The same unique helper works on records compared by reference. Print how many distinct objects remain.",
+                    'function unique<T>(a: T[]): T[] {\n'
+                    '  const out: T[] = [];\n'
+                    '  for (const x of a) {\n    if (!out.includes(x)) {\n      out.push(x);\n    }\n  }\n'
+                    '  return out;\n}\n'
+                    'const r = { id: 1 };\nconsole.log(unique([r, r, { id: 1 }]).length);\n',
+                    'unique([r, r, { id: 1 }]).length', [("", "2")],
+                    hints=["includes compares objects by identity, so the two separate literals are different.",
+                           "Write unique([r, r, { id: 1 }]).length."],
+                    difficulty="Medium"),
+                _fix("tscourse-w10-ar-fix1", "Fix the mutating reverse",
+                     "The original array should stay `123` but comes back reversed. Fix it.",
+                     'function reversed<T>(a: T[]): T[] {\n  return a.reverse();\n}\n'
+                     'const xs = [1, 2, 3];\nconsole.log(reversed(xs).join(""));\nconsole.log(xs.join(""));\n',
+                     'function reversed<T>(a: T[]): T[] {\n  return [...a].reverse();\n}\n'
+                     'const xs = [1, 2, 3];\nconsole.log(reversed(xs).join(""));\nconsole.log(xs.join(""));\n',
+                     [("", "321\n123")],
+                     hints=["reverse reorders the caller's own array.",
+                            "Copy it first with a spread."],
+                     difficulty="Medium"),
+            ],
+            quiz=[
+                _q("Using the same `T` for two parameters means…",
+                   ["they may differ", "they must be the same type", "one is inferred",
+                    "nothing"], 1,
+                   "Sharing a parameter is how you require agreement."),
+                _q("Why does `[1,2].map((x) => String(x))` give `string[]`?",
+                   ["map always returns strings", "map's signature derives the result type from the callback",
+                    "a cast", "coincidence"], 1,
+                   "The U in map<U> comes from your callback's return type."),
+            ],
+        ),
+        # ---- Lesson 4 --------------------------------------------------
+        _lesson(
+            "w10-constraints", "Constraints with extends",
+            "Requiring a type parameter to have something.",
+            """
+An unconstrained `T` could be *anything*, so you may not touch it:
+
+```ts
+function longest<T>(a: T, b: T): T {
+  return a.length >= b.length ? a : b;   // ❌ Property 'length' does not exist on type 'T'
+}
+```
+
+The compiler is right: `T` might be `number`. **Constrain it** with `extends`:
+
+```ts
+function longest<T extends { length: number }>(a: T, b: T): T {
+  return a.length >= b.length ? a : b;   // ✅
+}
+
+longest("abc", "de");        // ✅ strings have length
+longest([1], [2, 3]);        // ✅ arrays too
+longest(1, 2);               // ❌ numbers do not
+```
+
+Read `T extends { length: number }` as *"T, whatever it is, must at least have a
+numeric length"*. Inside the function you may use exactly what the constraint
+guarantees, and nothing more.
+
+**`extends` here means "is assignable to", not inheritance.** Any type with the
+required shape qualifies — structural typing, from week 8.
+
+**Why not just take `{ length: number }` as the parameter type?**
+
+```ts
+function longestBad(a: { length: number }, b: { length: number }): { length: number }
+```
+
+That works, but the return type has been flattened — the caller gets back
+something with only `length`, having passed in strings. The generic **preserves
+the actual type**:
+
+```ts
+longest("abc", "de").toUpperCase();      // ✅ still a string
+longestBad("abc", "de").toUpperCase();   // ❌ information lost
+```
+
+This is the clearest demonstration of what generics buy you over a plain
+supertype parameter.
+
+**Common constraints:**
+
+```ts
+<T extends string>                      // some kind of string
+<T extends { id: string }>              // anything with an id
+<T extends unknown[]>                   // any array
+<T extends object>                      // any non-primitive
+```
+
+**Constraints compose with defaults and with `keyof`** (next lesson), and they
+are what make a generic *usable* rather than merely general.
+
+> ⚠️ **Common mistakes:** reading `extends` as class inheritance; constraining
+> more tightly than the body needs (which rejects valid callers); and forgetting
+> that inside the function you get only what the constraint promised, never the
+> caller's extra fields.
+""",
+            warmup=[
+                _q("`function f<T>(x: T) { return x.length; }` is…",
+                   ["fine", "an error — T might not have length", "an error at runtime",
+                    "inferred"], 1,
+                   "An unconstrained T guarantees nothing."),
+                _q("`<T extends { length: number }>` allows you to pass…",
+                   ["only strings", "anything with a numeric length", "only arrays", "numbers"], 1,
+                   "Structural, not nominal."),
+                _q("`extends` in a constraint means…",
+                   ["class inheritance", "is assignable to", "equals", "implements"], 1,
+                   "Any type with the required shape qualifies."),
+                _q("Taking `{length: number}` directly instead of a constrained generic loses…",
+                   ["nothing", "the caller's actual type in the return", "speed",
+                    "the constraint"], 1,
+                   "The return type would be flattened."),
+            ],
+            exercises=[
+                _ex("tscourse-w10-cn-1", "Constrain to length",
+                    "Add the constraint so `.length` may be read inside the function.",
+                    'function longest<T extends { length: number }>(a: T, b: T): T {\n'
+                    '  return a.length >= b.length ? a : b;\n}\n'
+                    'console.log(longest("abc", "de"));\n',
+                    'extends { length: number }', [("", "abc")],
+                    hints=["State the minimum shape T must have.",
+                           "Write extends { length: number }."],
+                    difficulty="Medium"),
+                _ex("tscourse-w10-cn-2", "Use the preserved type",
+                    "The result is still a string, so uppercase it.",
+                    'function longest<T extends { length: number }>(a: T, b: T): T {\n'
+                    '  return a.length >= b.length ? a : b;\n}\n'
+                    'console.log(longest("abc", "de").toUpperCase());\n',
+                    'longest("abc", "de").toUpperCase()', [("", "ABC")],
+                    hints=["A generic hands back the caller's own type, not the constraint.",
+                           'Write longest("abc", "de").toUpperCase().'],
+                    difficulty="Medium"),
+                _ex("tscourse-w10-cn-3", "Anything with an id",
+                    "Return the record's id.",
+                    'function idOf<T extends { id: string }>(x: T): string {\n'
+                    '  return x.id;\n}\n'
+                    'console.log(idOf({ id: "u1", age: 3 }));\n',
+                    'return x.id;', [("", "u1")],
+                    hints=["The constraint guarantees the id field exists."]),
+                _ex("tscourse-w10-cn-4", "Constrain to arrays",
+                    "Return how many elements the array-like argument holds.",
+                    'function count<T extends unknown[]>(a: T): number {\n'
+                    '  return a.length;\n}\n'
+                    'console.log(count([1, 2, 3]));\nconsole.log(count(["a"]));\n',
+                    'extends unknown[]', [("", "3\n1")],
+                    hints=["Any array at all satisfies this.",
+                           "Write extends unknown[]."],
+                    difficulty="Medium"),
+                _ex("tscourse-w10-cn-5", "Longest of records",
+                    "The constraint is structural, so a record with a length field qualifies. Print the winner's name.",
+                    'function longest<T extends { length: number }>(a: T, b: T): T {\n'
+                    '  return a.length >= b.length ? a : b;\n}\n'
+                    'const big = { name: "big", length: 10 };\n'
+                    'const small = { name: "small", length: 2 };\n'
+                    'console.log(longest(big, small).name);\n',
+                    'longest(big, small).name', [("", "big")],
+                    hints=["The generic preserved the record type, so .name survives.",
+                           "Write longest(big, small).name."],
+                    difficulty="Medium"),
+                _fix("tscourse-w10-cn-fix1", "Fix the flattened return",
+                     "Taking the constraint directly as the parameter type loses the string, so `.toUpperCase()` is unavailable and this prints the wrong thing. Make it generic.",
+                     'function longest(a: { length: number }, b: { length: number }): { length: number } {\n'
+                     '  return a.length >= b.length ? a : b;\n}\n'
+                     'console.log(longest("abc", "de").length);\n',
+                     'function longest<T extends { length: number }>(a: T, b: T): T {\n'
+                     '  return a.length >= b.length ? a : b;\n}\n'
+                     'console.log(longest("abc", "de").toUpperCase());\n',
+                     [("", "ABC")],
+                     hints=["The caller passed strings but got back something with only a length.",
+                            "Parameterise with T constrained by the shape, then the string survives."],
+                     difficulty="Medium"),
+            ],
+            quiz=[
+                _q("Inside a constrained generic you may use…",
+                   ["everything the caller passed", "exactly what the constraint guarantees",
+                    "nothing", "only length"], 1,
+                   "The body is checked against the constraint, not against any particular caller."),
+                _q("A constraint that is tighter than the body needs…",
+                   ["is safer", "rejects valid callers for no reason", "is faster",
+                    "is required"], 1,
+                   "Ask for the minimum you actually use."),
+            ],
+        ),
+        # ---- Lesson 5 --------------------------------------------------
+        _lesson(
+            "w10-keyof", "keyof & indexed access",
+            "Types computed from other types.",
+            """
+`keyof T` is the union of `T`'s key names, as literal types:
+
+```ts
+type User = { id: string; age: number };
+type K = keyof User;        // "id" | "age"
+```
+
+**Indexed access** `T[K]` is the *type of that property*:
+
+```ts
+type A = User["age"];              // number
+type Either = User[keyof User];    // string | number
+```
+
+Note `User["age"]` uses a **type** in the brackets, not a value — it looks like
+property access but happens entirely at compile time.
+
+Together they type the single most useful generic helper there is:
+
+```ts
+function pluck<T, K extends keyof T>(o: T, k: K): T[K] {
+  return o[k];
+}
+
+const u = { id: "u1", age: 3 };
+pluck(u, "age");      // number   ✅
+pluck(u, "id");       // string   ✅
+pluck(u, "nope");     // ❌ not assignable to "id" | "age"
+```
+
+Read the signature slowly, because it is the pattern:
+
+- `T` — the object's type.
+- `K extends keyof T` — the key must be one of `T`'s actual keys.
+- `T[K]` — the return is the type of *that specific* property.
+
+So a single function returns a `string` for one key and a `number` for another,
+and typos are compile errors. Without generics this would be `any`.
+
+**Sorting by a key** is the everyday application:
+
+```ts
+function sortBy<T, K extends keyof T>(rows: T[], key: K): T[] {
+  return [...rows].sort((a, b) => (a[key] < b[key] ? -1 : a[key] > b[key] ? 1 : 0));
+}
+sortBy(people, "age");      // ✅
+sortBy(people, "aeg");      // ❌ caught
+```
+
+**`keyof` on an index signature** behaves as you'd expect:
+
+```ts
+type Table = { [k: string]: number };
+type TK = keyof Table;      // string | number
+```
+
+**Where you'll see this:** `Pick`, `Omit` and `Record` (week 12) are all built
+from `keyof` and indexed access. Learning to read it now makes that week easy.
+
+> ⚠️ **Common mistakes:** writing `keyof T` where you meant `T[keyof T]` (keys
+> versus value types); forgetting the `extends keyof T` constraint, which makes
+> `o[k]` an error; and expecting `keyof` to work at runtime — use
+> `Object.keys(o)` for that, which returns `string[]`.
+""",
+            warmup=[
+                _q('`keyof { id: string; age: number }` is…',
+                   ["string", '"id" | "age"', "string | number", "never"], 1,
+                   "The key NAMES as literal types."),
+                _q('`{ id: string; age: number }["age"]` is…',
+                   ['"age"', "number", "string", "never"], 1,
+                   "Indexed access gives the property's type."),
+                _q("In `pluck<T, K extends keyof T>(o: T, k: K): T[K]`, the return type is…",
+                   ["always any", "the type of the specific property named by k", "T", "K"], 1,
+                   "Which is why it returns string for one key and number for another."),
+                _q("Does `keyof` exist at runtime?",
+                   ["yes", "no — use Object.keys for that", "only for classes",
+                    "only for arrays"], 1,
+                   "It is a compile-time operator."),
+            ],
+            exercises=[
+                _ex("tscourse-w10-ke-1", "Pluck a field",
+                    "Return the property named by the key.",
+                    'function pluck<T, K extends keyof T>(o: T, k: K): T[K] {\n'
+                    '  return o[k];\n}\n'
+                    'const u = { id: "u1", age: 3 };\n'
+                    'console.log(pluck(u, "id"));\nconsole.log(pluck(u, "age"));\n',
+                    'return o[k];', [("", "u1\n3")],
+                    hints=["Bracket access with the key parameter."]),
+                _ex("tscourse-w10-ke-2", "Constrain the key",
+                    "Add the constraint so only real keys of T are accepted.",
+                    'function pluck<T, K extends keyof T>(o: T, k: K): T[K] {\n'
+                    '  return o[k];\n}\n'
+                    'console.log(pluck({ id: "u1", age: 3 }, "age"));\n',
+                    'K extends keyof T', [("", "3")],
+                    hints=["The key parameter must be one of T's own key names.",
+                           "Write K extends keyof T."],
+                    difficulty="Medium"),
+                _ex("tscourse-w10-ke-3", "Use the specific return type",
+                    "The plucked id is a string, so uppercase it.",
+                    'function pluck<T, K extends keyof T>(o: T, k: K): T[K] {\n'
+                    '  return o[k];\n}\n'
+                    'const u = { id: "u1", age: 3 };\n'
+                    'console.log(pluck(u, "id").toUpperCase());\n',
+                    'pluck(u, "id").toUpperCase()', [("", "U1")],
+                    hints=["T[K] resolved to string for this key.",
+                           'Write pluck(u, "id").toUpperCase().'],
+                    difficulty="Medium"),
+                _ex("tscourse-w10-ke-4", "Sort by a key",
+                    "Complete the comparator so the rows sort by the chosen key.",
+                    'function sortBy<T, K extends keyof T>(rows: T[], key: K): T[] {\n'
+                    '  return [...rows].sort((a, b) => (a[key] < b[key] ? -1 : a[key] > b[key] ? 1 : 0));\n}\n'
+                    'const people = [\n  { name: "Cy", age: 47 },\n  { name: "Bo", age: 20 },\n];\n'
+                    'console.log(sortBy(people, "age").map((p) => p.name).join(","));\n',
+                    'a[key] < b[key] ? -1 : a[key] > b[key] ? 1 : 0',
+                    [("", "Bo,Cy")],
+                    hints=["Return a negative, positive or zero number, comparing the two keyed values.",
+                           "Write a[key] < b[key] ? -1 : a[key] > b[key] ? 1 : 0."],
+                    difficulty="Medium"),
+                _ex("tscourse-w10-ke-5", "Pluck across a list",
+                    "Pull one column out of the records by key.",
+                    'function pluckAll<T, K extends keyof T>(rows: T[], k: K): T[K][] {\n'
+                    '  return rows.map((r) => r[k]);\n}\n'
+                    'const people = [{ name: "Ada", age: 36 }, { name: "Bo", age: 20 }];\n'
+                    'console.log(pluckAll(people, "name").join(","));\n',
+                    'rows.map((r) => r[k])', [("", "Ada,Bo")],
+                    hints=["map each record to the keyed property.",
+                           "Write rows.map((r) => r[k])."],
+                    difficulty="Medium"),
+                _fix("tscourse-w10-ke-fix1", "Fix the any-typed pluck",
+                     "This returns `any`, so the mistyped method call was not caught and it crashes. Type it with keyof and call the right method.",
+                     'function pluck(o: any, k: string): any {\n  return o[k];\n}\n'
+                     'const u = { id: "u1", age: 3 };\nconsole.log(pluck(u, "id").toFixed(2));\n',
+                     'function pluck<T, K extends keyof T>(o: T, k: K): T[K] {\n  return o[k];\n}\n'
+                     'const u = { id: "u1", age: 3 };\nconsole.log(pluck(u, "id").toUpperCase());\n',
+                     [("", "U1")],
+                     hints=["With any, calling toFixed on a string raised no complaint.",
+                            "Parameterise T and K so the return type is the property's real type."],
+                     difficulty="Medium"),
+            ],
+            quiz=[
+                _q("`T[keyof T]` gives you…",
+                   ["the key names", "the union of the property TYPES", "an array", "never"], 1,
+                   "keyof gives names; indexing by them gives value types."),
+                _q("Omitting `extends keyof T` from the key parameter means…",
+                   ["it still works", "o[k] becomes an error, since k might not be a key",
+                    "faster inference", "nothing"], 1,
+                   "The constraint is what licenses the lookup."),
+            ],
+        ),
+        # ---- Lesson 6 --------------------------------------------------
+        _lesson(
+            "w10-types", "Generic types & interfaces",
+            "Parameterising a shape, not just a function.",
+            """
+Types take parameters too:
+
+```ts
+interface Box<T> {
+  value: T;
+}
+
+const a: Box<string> = { value: "hi" };
+const b: Box<number> = { value: 42 };
+```
+
+`Box<string>` is a *different type* from `Box<number>`, produced from one
+declaration. Type aliases work the same way:
+
+```ts
+type Pair<A, B> = { left: A; right: B };
+type List<T> = T[];
+type Lookup<V> = { [key: string]: V };
+```
+
+**The Result type** is the pattern you'll actually reach for, combining week 9's
+discriminated union with a type parameter:
+
+```ts
+type Result<T> =
+  | { ok: true; value: T }
+  | { ok: false; error: string };
+
+function parseNum(s: string): Result<number> {
+  const n = Number(s);
+  if (Number.isNaN(n)) return { ok: false, error: `bad number: ${s}` };
+  return { ok: true, value: n };
+}
+
+const r = parseNum("42");
+if (r.ok) {
+  r.value.toFixed(2);      // r.value: number
+}
+```
+
+One `Result<T>` serves every operation that can fail, and the success type
+changes per use: `Result<number>`, `Result<User>`, `Result<string[]>`. This is
+how serious codebases handle failure without exceptions — and it is the shape
+behind Rust's `Result` and many TypeScript libraries.
+
+**Generic types can be constrained** exactly like generic functions:
+
+```ts
+type Table<T extends { id: string }> = { [id: string]: T };
+```
+
+**Nesting works and reads fine once you're used to it:**
+
+```ts
+Result<Box<string>>
+Pair<string, number[]>
+```
+
+**Recursive generic types** are legal, and are how tree shapes are described:
+
+```ts
+type Tree<T> = { value: T; children: Tree<T>[] };
+```
+
+**The naming convention** for a generic type's parameter mirrors functions: `T`
+for the payload, `K`/`V` for key and value, `E` for an error type. `Result<T, E>`
+with a parameterised error is common in larger codebases.
+
+> ⚠️ **Common mistakes:** writing `Box` without its argument (it needs one
+> unless there's a default); assuming `Box<string>` is assignable to
+> `Box<number>` (it is not); and reaching for a generic type when a plain union
+> would say it more clearly.
+""",
+            warmup=[
+                _q("`interface Box<T> { value: T }` — `Box<string>`'s value has type…",
+                   ["T", "string", "any", "unknown"], 1, "The argument replaces the parameter."),
+                _q("Is `Box<string>` assignable to `Box<number>`?",
+                   ["yes", "no", "only if empty", "only with a cast"], 1,
+                   "They are unrelated types."),
+                _q("`type Result<T> = {ok:true; value:T} | {ok:false; error:string}` — after `if (r.ok)`, `r.value` is…",
+                   ["T | undefined", "T", "string", "never"], 1,
+                   "The discriminant narrowed it to the success member."),
+                _q("Writing `Box` with no type argument is…",
+                   ["fine", "an error unless T has a default", "inferred", "any"], 1,
+                   "A generic type needs its arguments."),
+            ],
+            exercises=[
+                _ex("tscourse-w10-ty-1", "A generic interface",
+                    "Declare Box with a type parameter, then print both boxed values.",
+                    'interface Box<T> {\n  value: T;\n}\n'
+                    'const a: Box<string> = { value: "hi" };\n'
+                    'const b: Box<number> = { value: 42 };\n'
+                    'console.log(`${a.value} ${b.value}`);\n',
+                    'Box<T>', [("", "hi 42")],
+                    hints=["The parameter list goes right after the interface name.",
+                           "Write Box<T>."]),
+                _ex("tscourse-w10-ty-2", "A generic alias",
+                    "Print both sides of the pair.",
+                    'type Pair<A, B> = { left: A; right: B };\n'
+                    'const p: Pair<string, number> = { left: "x", right: 1 };\n'
+                    'console.log(`${p.left}${p.right}`);\n',
+                    '${p.left}${p.right}', [("", "x1")],
+                    hints=["Two holes, no separator.",
+                           "Write ${p.left}${p.right}."]),
+                _ex("tscourse-w10-ty-3", "A Result type",
+                    "Return the failing Result when the input does not parse.",
+                    _LINE + 'type Result<T> =\n'
+                    '  | { ok: true; value: T }\n'
+                    '  | { ok: false; error: string };\n'
+                    'function parseNum(s: string): Result<number> {\n'
+                    '  const n = Number(s);\n'
+                    '  if (Number.isNaN(n)) return { ok: false, error: `bad number: ${s}` };\n'
+                    '  return { ok: true, value: n };\n}\n'
+                    'const r = parseNum(line);\n'
+                    'console.log(r.ok ? r.value.toFixed(2) : r.error);\n',
+                    'return { ok: false, error: `bad number: ${s}` };',
+                    [("42", "42.00"), ("abc", "bad number: abc")],
+                    hints=["The failure member carries the tag and the message.",
+                           "Write return { ok: false, error: `bad number: ${s}` };"],
+                    difficulty="Medium"),
+                _ex("tscourse-w10-ty-4", "Consume a Result",
+                    "Print the value to 2 decimals on success, or the error message.",
+                    _LINE + 'type Result<T> =\n'
+                    '  | { ok: true; value: T }\n'
+                    '  | { ok: false; error: string };\n'
+                    'function parseNum(s: string): Result<number> {\n'
+                    '  const n = Number(s);\n'
+                    '  if (Number.isNaN(n)) return { ok: false, error: "bad" };\n'
+                    '  return { ok: true, value: n };\n}\n'
+                    'const r = parseNum(line);\n'
+                    'console.log(r.ok ? r.value.toFixed(2) : r.error);\n',
+                    'r.ok ? r.value.toFixed(2) : r.error',
+                    [("7", "7.00"), ("zz", "bad")],
+                    hints=["The tag narrows, so value and error are each available in one branch only.",
+                           "Write r.ok ? r.value.toFixed(2) : r.error."],
+                    difficulty="Medium"),
+                _ex("tscourse-w10-ty-5", "A generic lookup",
+                    "Declare a lookup whose values are numbers, then print one.",
+                    'type Lookup<V> = { [key: string]: V };\n'
+                    'const prices: Lookup<number> = { coffee: 3.25, book: 12 };\n'
+                    'console.log(prices["coffee"].toFixed(2));\n',
+                    'Lookup<number>', [("", "3.25")],
+                    hints=["Supply the value type as the argument.",
+                           "Write Lookup<number>."],
+                    difficulty="Medium"),
+                _fix("tscourse-w10-ty-fix1", "Fix the missing type argument",
+                     "`Box` was used without its argument, so the value was left untyped and the wrong method was called. Supply the argument and call the right one.",
+                     'interface Box<T> {\n  value: T;\n}\n'
+                     'const a: Box<any> = { value: "hi" };\n'
+                     'console.log(a.value.toFixed(2));\n',
+                     'interface Box<T> {\n  value: T;\n}\n'
+                     'const a: Box<string> = { value: "hi" };\n'
+                     'console.log(a.value.toUpperCase());\n',
+                     [("", "HI")],
+                     hints=["Box<any> silenced the check; the value really is a string.",
+                            "Use Box<string> and call a string method."],
+                     difficulty="Medium"),
+            ],
+            quiz=[
+                _q("`Result<T>` is useful because…",
+                   ["it is shorter", "one failure-handling shape serves every success type",
+                    "it avoids unions", "it is built in"], 1,
+                   "The success payload varies; the machinery does not."),
+                _q("`type Tree<T> = { value: T; children: Tree<T>[] }` is…",
+                   ["illegal", "a legal recursive generic type", "an interface", "a union"], 1,
+                   "Recursion in type definitions is fine."),
+            ],
+        ),
+        # ---- Lesson 7 --------------------------------------------------
+        _lesson(
+            "w10-defaults", "Defaults & knowing when to stop",
+            "Default type arguments, and generics that aren't worth it.",
+            """
+A type parameter can have a **default**, used when the caller doesn't supply
+one:
+
+```ts
+interface Options<T = string> {
+  items: T[];
+}
+
+const a: Options = { items: ["x"] };            // T defaults to string
+const b: Options<number> = { items: [1, 2] };
+```
+
+Defaults make a generic type usable in the common case without ceremony. They
+follow the same rule as default parameters in week 5: **defaults come last.**
+
+```ts
+type Result<T, E = string> =
+  | { ok: true; value: T }
+  | { ok: false; error: E };
+
+Result<number>              // error is string
+Result<number, Error>       // error is an Error
+```
+
+**Constraints and defaults combine**, in that order:
+
+```ts
+interface Table<T extends { id: string } = { id: string }> { rows: T[] }
+```
+
+---
+
+**Now the more valuable half of this lesson: when *not* to reach for a generic.**
+
+Generics have a real cost — every reader has to hold another variable in their
+head. Three signs you don't need one:
+
+**1. The parameter appears only once.**
+
+```ts
+function log<T>(x: T): void { console.log(x); }     // 🚩
+function log(x: unknown): void { console.log(x); }  // ✅ says the same thing
+```
+
+If `T` doesn't connect two places, it is decoration.
+
+**2. You immediately constrain it to exactly one thing.**
+
+```ts
+function f<T extends string>(x: T): void { ... }    // 🚩 unless you return T
+function f(x: string): void { ... }                 // ✅
+```
+
+The exception is when you *return* `T` — then the constraint preserves literal
+types, which is genuinely useful.
+
+**3. You end up casting inside.** If the body needs `as` to do its work, the
+signature is promising something the implementation can't honour. Rethink the
+types rather than papering over them.
+
+**And the counter-test — when you *do* want one:** a type appears in two or
+more positions and callers would otherwise lose information. `first`, `pluck`,
+`sortBy`, `Result` all pass. `log` does not.
+
+**Reading generics you didn't write** is most of the benefit here. When a
+library signature looks frightening, name the parts:
+
+```ts
+function groupBy<T, K extends keyof T>(rows: T[], key: K): { [k: string]: T[] }
+```
+
+*"For any row type T, and any key K of T, take rows and a key, and give back a
+lookup from key values to arrays of rows."* Once you can do that narration, the
+ecosystem opens up.
+
+> ⚠️ **Common mistakes:** adding type parameters for symmetry; putting a
+> defaulted parameter before a required one; and treating a scary-looking
+> signature as unknowable rather than reading it left to right.
+""",
+            warmup=[
+                _q("`interface Options<T = string>` used as plain `Options` gives T as…",
+                   ["any", "string", "unknown", "an error"], 1, "The default fills in."),
+                _q("Defaulted type parameters must come…",
+                   ["first", "last", "anywhere", "alone"], 1,
+                   "Same rule as default value parameters."),
+                _q("`function log<T>(x: T): void` — is the generic earning its place?",
+                   ["yes", "no — T appears only once", "yes, for speed", "only for arrays"], 1,
+                   "Nothing is connected, so `unknown` says it better."),
+                _q("Needing `as` inside a generic's body usually means…",
+                   ["you are done", "the signature promises more than the body can honour",
+                    "it is optimised", "T is wrong"], 1,
+                   "A cast there is a design smell."),
+            ],
+            exercises=[
+                _ex("tscourse-w10-df-1", "A default type argument",
+                    "Give T a default of string, then use Options with no argument.",
+                    'interface Options<T = string> {\n  items: T[];\n}\n'
+                    'const a: Options = { items: ["x", "y"] };\n'
+                    'console.log(a.items.join(","));\n',
+                    'T = string', [("", "x,y")],
+                    hints=["The default is written with = after the parameter name.",
+                           "Write T = string."]),
+                _ex("tscourse-w10-df-2", "Override the default",
+                    "Use Options at number, then total the items.",
+                    'interface Options<T = string> {\n  items: T[];\n}\n'
+                    'const b: Options<number> = { items: [1, 2, 3] };\n'
+                    'console.log(b.items.reduce((s, x) => s + x, 0));\n',
+                    'Options<number>', [("", "6")],
+                    hints=["Supply the argument explicitly to override the default.",
+                           "Write Options<number>."]),
+                _ex("tscourse-w10-df-3", "Result with a defaulted error",
+                    "Print the value on success, or the error message.",
+                    _LINE + 'type Result<T, E = string> =\n'
+                    '  | { ok: true; value: T }\n'
+                    '  | { ok: false; error: E };\n'
+                    'function parseNum(s: string): Result<number> {\n'
+                    '  const n = Number(s);\n'
+                    '  if (Number.isNaN(n)) return { ok: false, error: "bad" };\n'
+                    '  return { ok: true, value: n };\n}\n'
+                    'const r = parseNum(line);\nconsole.log(r.ok ? r.value : r.error);\n',
+                    'T, E = string', [("5", "5"), ("zz", "bad")],
+                    hints=["The payload type is required; the error type defaults.",
+                           "Write T, E = string."],
+                    difficulty="Medium"),
+                _ex("tscourse-w10-df-4", "Prefer unknown to a pointless generic",
+                    "This helper only prints, so it needs no type parameter. Give it the right one.",
+                    'function show(x: unknown): void {\n  console.log(x);\n}\n'
+                    'show("a");\nshow(1);\n',
+                    'x: unknown', [("", "a\n1")],
+                    hints=["Nothing is returned, so no type needs preserving.",
+                           "Write x: unknown."]),
+                _ex("tscourse-w10-df-5", "Group rows by a key",
+                    "Complete the grouping so each key value collects its rows.",
+                    'function groupBy<T, K extends keyof T>(rows: T[], key: K): { [k: string]: T[] } {\n'
+                    '  const out: { [k: string]: T[] } = {};\n'
+                    '  for (const r of rows) {\n'
+                    '    const k = String(r[key]);\n'
+                    '    if (out[k] === undefined) {\n      out[k] = [];\n    }\n'
+                    '    out[k].push(r);\n'
+                    '  }\n'
+                    '  return out;\n}\n'
+                    'const rows = [\n  { tag: "food", n: 1 },\n  { tag: "home", n: 2 },\n  { tag: "food", n: 3 },\n];\n'
+                    'const g = groupBy(rows, "tag");\n'
+                    'console.log(Object.keys(g).sort().map((k) => `${k}=${g[k].length}`).join(","));\n',
+                    'if (out[k] === undefined) {\n      out[k] = [];\n    }\n'
+                    '    out[k].push(r);',
+                    [("", "food=2,home=1")],
+                    hints=["Create the bucket before pushing into it — week 7's grouping pattern.",
+                           "Write if (out[k] === undefined) { out[k] = []; } then out[k].push(r);"],
+                    difficulty="Medium"),
+                _fix("tscourse-w10-df-fix1", "Fix the default's position",
+                     "A defaulted type parameter sits before a required one, so `Pair<number>` cannot work. Reorder them.",
+                     'type Pair<A = string, B> = { left: A; right: B };\n'
+                     'const p: Pair<string, number> = { left: "x", right: 1 };\n'
+                     'console.log(`${p.left}${p.right}`);\n',
+                     'type Pair<A, B = string> = { left: A; right: B };\n'
+                     'const p: Pair<number, string> = { left: 1, right: "x" };\n'
+                     'console.log(`${p.left}${p.right}`);\n',
+                     [("", "1x")],
+                     hints=["Defaults must come last, or callers could never skip them.",
+                            "Move the default onto B, and swap the arguments at the use site."],
+                     difficulty="Medium"),
+            ],
+            quiz=[
+                _q("Which signature genuinely needs a generic?",
+                   ["log<T>(x: T): void", "pluck<T, K extends keyof T>(o: T, k: K): T[K]",
+                    "print<T>(x: T): void", "warn<T>(x: T): void"], 1,
+                   "Its type parameters connect the arguments to the return type."),
+                _q("The best way to read an intimidating generic signature is…",
+                   ["skip it", "narrate it left to right, naming each parameter",
+                    "look at the body", "assume any"], 1,
+                   "'For any T, and any key K of T, …'"),
+            ],
+        ),
+    ],
+    capstone=_cap_auto(
+        "Budget Buddy #10 — a generic toolkit",
+        """
+Budget Buddy's helpers stop being about expenses and start being about
+**records** — reusable over any row type at all.
+
+Build three generics and use them on an expense ledger. Input is one row per
+line, `desc amount tag`:
+
+```
+coffee 3.25 food
+rent 900 home
+lunch 9.50 food
+book 12 fun
+```
+
+Print:
+
+```
+Rows:     4
+By tag:   food=2, fun=1, home=1
+Dearest:  rent
+Cheapest: coffee
+```
+
+Required signatures — implement these exactly:
+
+```ts
+function groupBy<T, K extends keyof T>(rows: T[], key: K): { [k: string]: T[] }
+function maxBy<T, K extends keyof T>(rows: T[], key: K): T
+function minBy<T, K extends keyof T>(rows: T[], key: K): T
+```
+
+Rules:
+
+- `By tag` lists each tag and its row count, keys sorted alphabetically, joined
+  with `, `.
+- `Dearest` and `Cheapest` are the descriptions of the rows with the largest and
+  smallest amounts. On a tie the **first** such row wins.
+- The helpers must not mention `Expense` anywhere — they work for any record.
+""",
+        _ch("tscourse-w10-capstone", "Budget Buddy #10", "Medium",
+            "Write the three generic helpers, then apply them to the parsed rows.",
+            _FS + 'interface Expense {\n  desc: string;\n  amount: number;\n  tag: string;\n}\n'
+            'function groupBy<T, K extends keyof T>(rows: T[], key: K): { [k: string]: T[] } {\n'
+            '  const out: { [k: string]: T[] } = {};\n'
+            '  for (const r of rows) {\n'
+            '    const k = String(r[key]);\n'
+            '    if (out[k] === undefined) {\n      out[k] = [];\n    }\n'
+            '    out[k].push(r);\n'
+            '  }\n'
+            '  return out;\n}\n'
+            'function maxBy<T, K extends keyof T>(rows: T[], key: K): T {\n'
+            '  let best = rows[0];\n'
+            '  for (const r of rows) {\n    if (r[key] > best[key]) {\n      best = r;\n    }\n  }\n'
+            '  return best;\n}\n'
+            'function minBy<T, K extends keyof T>(rows: T[], key: K): T {\n'
+            '  let best = rows[0];\n'
+            '  for (const r of rows) {\n    if (r[key] < best[key]) {\n      best = r;\n    }\n  }\n'
+            '  return best;\n}\n'
+            'function parse(line: string): Expense {\n'
+            '  const p = line.trim().split(" ");\n'
+            '  return { desc: p[0], amount: Number(p[1]), tag: p[2] };\n}\n'
+            'const rows: Expense[] = fs.readFileSync(0, "utf8").trim().split("\\n").map(parse);\n'
+            'const groups = groupBy(rows, "tag");\n'
+            'const tagParts = Object.keys(groups).sort().map((k) => `${k}=${groups[k].length}`);\n'
+            'console.log(`Rows:     ${rows.length}`);\n'
+            'console.log(`By tag:   ${tagParts.join(", ")}`);\n'
+            'console.log(`Dearest:  ${maxBy(rows, "amount").desc}`);\n'
+            'console.log(`Cheapest: ${minBy(rows, "amount").desc}`);\n',
+            'function groupBy<T, K extends keyof T>(rows: T[], key: K): { [k: string]: T[] } {\n'
+            '  const out: { [k: string]: T[] } = {};\n'
+            '  for (const r of rows) {\n'
+            '    const k = String(r[key]);\n'
+            '    if (out[k] === undefined) {\n      out[k] = [];\n    }\n'
+            '    out[k].push(r);\n'
+            '  }\n'
+            '  return out;\n}\n'
+            'function maxBy<T, K extends keyof T>(rows: T[], key: K): T {\n'
+            '  let best = rows[0];\n'
+            '  for (const r of rows) {\n    if (r[key] > best[key]) {\n      best = r;\n    }\n  }\n'
+            '  return best;\n}\n'
+            'function minBy<T, K extends keyof T>(rows: T[], key: K): T {\n'
+            '  let best = rows[0];\n'
+            '  for (const r of rows) {\n    if (r[key] < best[key]) {\n      best = r;\n    }\n  }\n'
+            '  return best;\n}',
+            [("coffee 3.25 food\nrent 900 home\nlunch 9.50 food\nbook 12 fun",
+              "Rows:     4\nBy tag:   food=2, fun=1, home=1\nDearest:  rent\nCheapest: coffee"),
+             ("tea 2 drink",
+              "Rows:     1\nBy tag:   drink=1\nDearest:  tea\nCheapest: tea"),
+             ("a 5 x\nb 5 x",
+              "Rows:     2\nBy tag:   x=2\nDearest:  a\nCheapest: a")],
+            hints=["All three helpers take `rows: T[]` and `key: K extends keyof T` — they must never mention Expense.",
+                   "groupBy is week 7's grouping pattern: String(r[key]) for the bucket name, create the array before pushing.",
+                   "maxBy and minBy are the best-so-far accumulator, seeded with rows[0] so the answer is always a real row.",
+                   "Use a strict comparison (> and <) so a tie keeps the FIRST row.",
+                   'Call them as maxBy(rows, "amount").desc — the return type is T, so .desc is available.']),
+        example_io="Rows:     4\nBy tag:   food=2, fun=1, home=1\nDearest:  rent\nCheapest: coffee",
+        rubric=["The three helpers are generic over the row type and its keys",
+                "None of them mentions the Expense type",
+                "groupBy creates each bucket before pushing into it",
+                "maxBy and minBy seed from rows[0] and keep the first row on a tie"],
+        stretch=_ch("tscourse-w10-capstone-stretch", "Budget Buddy #10 (stretch)", "Medium",
+                    "Add a generic `sumBy<T, K extends keyof T>(rows: T[], key: K): number` and print `Total:    $924.75` from it. Since T[K] could be anything, convert each value with Number(...) before adding.",
+                    _FS + 'interface Expense {\n  desc: string;\n  amount: number;\n  tag: string;\n}\n'
+                    'function sumBy<T, K extends keyof T>(rows: T[], key: K): number {\n'
+                    '  return rows.reduce((s, r) => s + Number(r[key]), 0);\n}\n'
+                    'function parse(line: string): Expense {\n'
+                    '  const p = line.trim().split(" ");\n'
+                    '  return { desc: p[0], amount: Number(p[1]), tag: p[2] };\n}\n'
+                    'const rows: Expense[] = fs.readFileSync(0, "utf8").trim().split("\\n").map(parse);\n'
+                    'console.log(`Total:    $${sumBy(rows, "amount").toFixed(2)}`);\n',
+                    'function sumBy<T, K extends keyof T>(rows: T[], key: K): number {\n'
+                    '  return rows.reduce((s, r) => s + Number(r[key]), 0);\n}',
+                    [("coffee 3.25 food\nrent 900 home\nlunch 9.50 food\nbook 12 fun",
+                      "Total:    $924.75"),
+                     ("tea 2 drink", "Total:    $2.00")],
+                    hints=["The key could name a non-numeric field, so the compiler will not let you add T[K] directly.",
+                           "Convert at the point of use: Number(r[key]).",
+                           "Fold with reduce and an explicit seed of 0."]),
     ),
 ))
 
 # ===========================================================================
 # MONTHS 3-8 — themed skeletons (authored in later batches).
 # ===========================================================================
-_M3 = "The Type System, Properly"
 _WEEKS += [
-    _skel(9, 3, _M3, "Unions & Narrowing",
-          "Model a value that's 'one of several' and narrow it safely before use."),
-    _skel(10, 3, _M3, "Generics",
-          "Write functions and types that work over any type without losing safety."),
     _skel(11, 3, _M3, "Immutability & readonly",
           "Lock data down with readonly, as const, and pure (copy-don't-mutate) updates."),
     _skel(12, 3, _M3, "Utility Types",
@@ -6613,8 +12996,11 @@ _SCOPE_RULES = [
     ("=> ", 5), ("function ", 5),          # functions
     (".map(", 6), (".filter(", 6),
     (".split(", 6), (".join(", 6),         # array methods
+    (".push(", 6), (".sort(", 6), (".find(", 6),   # array mutation/search
+    ("?.", 7), ("Object.keys(", 7),         # optional chaining, object reflection
     (".reduce(", 8),                        # reduce
     ("interface ", 8), ("type ", 8),        # named types (annotations OK earlier)
+    ("keyof ", 10),                         # keyof / indexed access
 ]
 
 
