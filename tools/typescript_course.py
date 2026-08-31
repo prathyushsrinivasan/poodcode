@@ -4670,7 +4670,7 @@ is where TypeScript really starts to earn its name. The compiler checks every
 call site against that signature, so a wrong argument is caught while you type
 rather than at 3am.
 
-⏱️ Budget about **five hours**.
+⏱️ Budget about **six hours**, spread over several sittings.
 """,
     objectives=[
         "Declare a function with parameters, a return type, and a return value",
@@ -4681,9 +4681,11 @@ rather than at 3am.
         "Explain scope, shadowing, and why a pure function is easier to trust",
         "Pass a function to another function as a value",
         "Return a function from a function, and explain what a closure captures",
+        "Write a function's contract — name, inputs, output, preconditions — before its body",
+        "Trace a nested call by substituting each return value, and extract a helper on the third repetition",
     ],
     why="Functions are how you stop a program growing into an unreadable sheet of statements. Every abstraction you will ever build — modules, classes, components, APIs — is this idea repeated at a larger scale.",
-    est_minutes=330,
+    est_minutes=360,
     glossary=[
         _gloss("function", "Named, reusable logic that takes inputs and returns a value."),
         _gloss("parameter", "A named input, written in the declaration."),
@@ -4705,6 +4707,10 @@ rather than at 3am.
         _gloss("hoisting", "Function declarations are usable before the line that defines them; const arrow functions are not."),
         _gloss("closure", "A function together with the variables it captured from the scope around it."),
         _gloss("factory", "A function whose job is to build and return another function."),
+        _gloss("contract", "The name, inputs, output and preconditions a function promises to honour."),
+        _gloss("stub", "A function body that returns a placeholder so the rest of the program can already call it."),
+        _gloss("tracing", "Working out a result by hand: replace each call with the value it returned."),
+        _gloss("extraction", "Turning a repeated line into a function whose parameter is the part that varied."),
     ],
     cheatsheet="""
 ```ts
@@ -4763,6 +4769,8 @@ applyTwice(cube, 2)   // 512
         "Can you say why a pure function is easier to test than one that prints?",
         "Can you pass one function into another as an argument?",
         "Can you write a function that returns a configured function, and say what it remembers?",
+        "Can you state a function's contract before writing a line of its body?",
+        "Can you trace inc(twice(5)) on paper, and say which guard order a grade() needs?",
     ],
     review=[
         _q("What does `return` do?",
@@ -4798,6 +4806,16 @@ applyTwice(cube, 2)   // 512
            ["as a string", "as a value — the function itself, not its result",
             "by calling it first", "as a number"], 1,
            "Note there are no parentheses after cube — that is the whole point."),
+        _q("What is a function's contract?",
+           ["its length", "its name, inputs, output and preconditions", "its call sites", "its return statement"], 1,
+           "Decide it first and the body usually writes itself."),
+        _q("Tracing `inc(twice(5))`, you first replace…",
+           ["inc with its body", "twice(5) with 10", "5 with 10", "nothing"], 1,
+           "Innermost call first — substitute the value it returned."),
+        _q("Copying a line and changing one number in it is a sign that…",
+           ["the code is fine", "that number wants to be a parameter",
+            "you need a loop", "the function is pure"], 1,
+           "The part that varies between copies is exactly the input."),
     ],
     milestone="Budget Buddy is now built from named helpers instead of one long script — the first version you could hand to somebody else and have them understand.",
     lessons=[
@@ -5948,6 +5966,255 @@ the surrounding scope. You've been relying on closures without naming them.
                    "Scope, not convention, enforces it."),
             ],
         ),
+        # ---- Lesson 9 --------------------------------------------------
+        _lesson(
+            "w5-design", "Designing a function",
+            "Contract first, trace by hand, extract the duplication.",
+            """
+You can now *write* functions. This lesson is about *deciding* which functions
+to write — the judgement that separates code you can live with from code you
+can't.
+
+**1. Write the contract before the body.** A contract is four short answers:
+
+| question | for `shipping` |
+|---|---|
+| What is it called? | `shipping` |
+| What goes in? | `weight: number` — kilograms, never negative |
+| What comes out? | `number` — the cost in dollars |
+| What must be true? | the caller passes kilograms, not grams |
+
+Write the signature first and the body almost writes itself:
+
+```ts
+function shipping(weight: number): number {
+  return 0;   // stub — fill this in once the shape is agreed
+}
+```
+
+A stub that compiles is a real milestone: the rest of the program can already
+call it while you work out the arithmetic.
+
+**2. Trace a call by hand.** When something is wrong, don't guess — substitute.
+
+```ts
+function twice(x: number): number { return x * 2; }
+function inc(x: number): number { return x + 1; }
+console.log(inc(twice(5)));
+```
+
+```
+inc(twice(5))
+inc(10)          // twice(5) returned 10 — the call is REPLACED by its value
+11
+```
+
+Innermost call first, replace it with what it returned, repeat. Nearly every
+debugging session you will ever have is this, done patiently.
+
+**3. Extract on the third repetition.** Two similar lines are a coincidence;
+three are a pattern. When you copy a line and edit one number, that number is a
+parameter and the line is a function:
+
+```ts
+console.log((10 * 1.2).toFixed(2));    // copy…
+console.log((25 * 1.2).toFixed(2));    // …paste…
+console.log((99 * 1.2).toFixed(2));    // …paste again  ← stop.
+
+function withVat(amount: number): string {
+  return (amount * 1.2).toFixed(2);    // the rate now lives in ONE place
+}
+```
+
+**4. One function, one job.** If the name needs an "and" — `validateAndSave` —
+it is two functions wearing one coat. Small named pieces compose; big ones
+don't.
+
+**5. Order guards from most specific to least.** Guards are checked top to
+bottom and the first match wins, so a broad condition placed first swallows the
+narrow ones underneath it. This is the most common logic bug in guarded code.
+
+**6. Choose test cases deliberately.** Before running anything, pick a typical
+value, a boundary value (exactly the limit), and a hostile value (zero,
+negative, empty). A function that survives those three usually survives the
+rest.
+
+> ⚠️ **Common mistakes:** writing the body before deciding what it returns;
+> ordering guards widest-first; and a helper that both computes *and* prints,
+> which makes it unusable anywhere that has to stay quiet.
+""",
+            warmup=[
+                _q("Trace `inc(twice(5))` where `twice` doubles and `inc` adds 1:",
+                   ["11", "12", "10", "6"], 0,
+                   "twice(5) is 10; that call is replaced by 10; inc(10) is 11."),
+                _q("You copy a line and change one number in it. That number should become…",
+                   ["a global", "a parameter", "a comment", "a string"], 1,
+                   "The thing that varies between the copies is exactly the input."),
+                _q("With `if (s >= 50) return 'pass';` placed ABOVE `if (s >= 80) return 'distinction';`, `grade(90)` is…",
+                   ["distinction", "pass", "fail", "undefined"], 1,
+                   "The broad guard matched first and returned, so the narrow one never ran."),
+                _q("A helper that both computes a total and prints it is hard to…",
+                   ["name", "reuse anywhere that must not print", "annotate", "call twice"], 1,
+                   "Printing is a side effect, and it decides for every caller."),
+            ],
+            exercises=[
+                _ex("tscourse-w5-des-1", "Fill in the contract",
+                    "The body is written. Declare the two parameters it needs: an amount and a rate, both numbers.",
+                    'function feeFor(amount: number, rate: number): number {\n'
+                    '  return amount * rate;\n}\n'
+                    'console.log(feeFor(200, 0.015).toFixed(2));\n',
+                    'amount: number, rate: number', [("", "3.00")],
+                    hints=["Read the body: which names does it use?",
+                           "Two parameters, comma-separated, each annotated : number."]),
+                _ex("tscourse-w5-des-2", "Extract the repeated line",
+                    "Three lines each multiplied by 1.2 and formatted became one helper. Fill in its body.",
+                    'function withVat(amount: number): string {\n'
+                    '  return (amount * 1.2).toFixed(2);\n}\n'
+                    'console.log(withVat(10));\n'
+                    'console.log(withVat(25));\n'
+                    'console.log(withVat(99));\n',
+                    'return (amount * 1.2).toFixed(2);',
+                    [("", "12.00\n30.00\n118.80")],
+                    hints=["The part that never changed was `* 1.2` followed by `.toFixed(2)`.",
+                           "The part that did change is now the parameter `amount`."]),
+                _ex("tscourse-w5-des-3", "Guard the upper bound",
+                    "`clamp` pulls any value back inside low..high. The low guard is written; add the high one.",
+                    'function clamp(value: number, low: number, high: number): number {\n'
+                    '  if (value < low) return low;\n'
+                    '  if (value > high) return high;\n'
+                    '  return value;\n}\n'
+                    'console.log(clamp(15, 0, 10));\n'
+                    'console.log(clamp(-4, 0, 10));\n'
+                    'console.log(clamp(7, 0, 10));\n',
+                    'if (value > high) return high;', [("", "10\n0\n7")],
+                    hints=["Mirror the line above it, flipping the comparison.",
+                           "Write if (value > high) return high;"],
+                    difficulty="Easy"),
+                _ex("tscourse-w5-des-4", "Guards in the right order",
+                    "Shipping is free at zero weight, a flat $3 below 1 kg, and $3 plus $2 for every whole extra kilogram beyond that. Fill in the last case.",
+                    _FS +
+                    'function shipping(weight: number): number {\n'
+                    '  if (weight <= 0) return 0;\n'
+                    '  if (weight < 1) return 3;\n'
+                    '  return 3 + Math.ceil(weight - 1) * 2;\n}\n'
+                    'const w = Number(fs.readFileSync(0, "utf8").trim());\n'
+                    'console.log(shipping(w));\n',
+                    'return 3 + Math.ceil(weight - 1) * 2;',
+                    [("0", "0"), ("0.5", "3"), ("1", "3"), ("2.5", "7"), ("4", "9")],
+                    hints=["Anything from 1 kg up pays the base 3 plus 2 per rounded-up extra kilo.",
+                           "Math.ceil(weight - 1) counts those extra kilos.",
+                           "Write return 3 + Math.ceil(weight - 1) * 2;"],
+                    difficulty="Medium"),
+                _ex("tscourse-w5-des-5", "One job each",
+                    "`badge` should not know how initials are built — it should call the helper. Fill in that call.",
+                    'function initials(first: string, last: string): string {\n'
+                    '  return `${first[0]}.${last[0]}.`;\n}\n'
+                    'function badge(first: string, last: string, role: string): string {\n'
+                    '  return `${initials(first, last)} ${role}`;\n}\n'
+                    'console.log(badge("Ada", "Lovelace", "engineer"));\n'
+                    'console.log(badge("Grace", "Hopper", "admiral"));\n',
+                    'initials(first, last)',
+                    [("", "A.L. engineer\nG.H. admiral")],
+                    hints=["Pass badge's own two name parameters straight through.",
+                           "Write initials(first, last) inside the template literal."]),
+                _fix("tscourse-w5-des-fix1", "Fix the guard order",
+                     "This should print distinction, pass, fail — but the broad guard is swallowing the narrow one. Reorder it.",
+                     'function grade(score: number): string {\n'
+                     '  if (score >= 50) return "pass";\n'
+                     '  if (score >= 80) return "distinction";\n'
+                     '  return "fail";\n}\n'
+                     'console.log(grade(90));\n'
+                     'console.log(grade(60));\n'
+                     'console.log(grade(20));\n',
+                     'function grade(score: number): string {\n'
+                     '  if (score >= 80) return "distinction";\n'
+                     '  if (score >= 50) return "pass";\n'
+                     '  return "fail";\n}\n'
+                     'console.log(grade(90));\n'
+                     'console.log(grade(60));\n'
+                     'console.log(grade(20));\n',
+                     [("", "distinction\npass\nfail")],
+                     hints=["90 is also >= 50, so the first guard returns before the second is ever read.",
+                            "Put the most specific test first."],
+                     difficulty="Medium"),
+                _fix("tscourse-w5-des-fix2", "Fix the leaky helper",
+                     "`withFee` adds a flat $2 fee, so both lines should print 12. The second is wrong because the helper accumulates into an outer variable. Make it pure.",
+                     'let running = 0;\n'
+                     'function withFee(amount: number): number {\n'
+                     '  running = running + amount;\n'
+                     '  return running + 2;\n}\n'
+                     'console.log(withFee(10));\n'
+                     'console.log(withFee(10));\n',
+                     'function withFee(amount: number): number {\n'
+                     '  return amount + 2;\n}\n'
+                     'console.log(withFee(10));\n'
+                     'console.log(withFee(10));\n',
+                     [("", "12\n12")],
+                     hints=["The second call remembers the first one — that is a side effect.",
+                            "A pure version needs no outer variable at all: return amount + 2."],
+                     difficulty="Medium"),
+                _fix("tscourse-w5-des-fix3", "Fix the helper that prints",
+                     "`describe` logs instead of returning, so the caller cannot build a sentence from it. It should print `Rating: warm`.",
+                     'function describe(temp: number): void {\n'
+                     '  if (temp > 25) console.log("hot");\n'
+                     '  else if (temp > 15) console.log("warm");\n'
+                     '  else console.log("cold");\n}\n'
+                     'console.log(`Rating: ${describe(20)}`);\n',
+                     'function describe(temp: number): string {\n'
+                     '  if (temp > 25) return "hot";\n'
+                     '  if (temp > 15) return "warm";\n'
+                     '  return "cold";\n}\n'
+                     'console.log(`Rating: ${describe(20)}`);\n',
+                     [("", "Rating: warm")],
+                     hints=["A void helper hands back undefined, which is what the template ends up showing.",
+                            "Return each word instead of logging it, and change the return type to string.",
+                            "With returns you no longer need else — each return already leaves the function."],
+                     difficulty="Medium"),
+                _ch("tscourse-w5-des-ch1", "Build a three-piece toolkit", "Medium",
+                    "Write three helpers. `pct(part, whole)` returns the percentage and 0 when whole is 0; `round1(x)` returns it as a string with one decimal; `bar(value)` returns one `#` per full 10 percent, rounded.",
+                    _FS +
+                    'function pct(part: number, whole: number): number {\n'
+                    '  if (whole === 0) return 0;\n'
+                    '  return (part / whole) * 100;\n}\n'
+                    'function round1(x: number): string {\n'
+                    '  return x.toFixed(1);\n}\n'
+                    'function bar(value: number): string {\n'
+                    '  return "#".repeat(Math.round(value / 10));\n}\n'
+                    'const done = Number(fs.readFileSync(0, "utf8").trim());\n'
+                    'const total = 40;\n'
+                    'const p = pct(done, total);\n'
+                    'console.log(`${round1(p)}%`);\n'
+                    'console.log(bar(p));\n',
+                    'function pct(part: number, whole: number): number {\n'
+                    '  if (whole === 0) return 0;\n'
+                    '  return (part / whole) * 100;\n}\n'
+                    'function round1(x: number): string {\n'
+                    '  return x.toFixed(1);\n}\n'
+                    'function bar(value: number): string {\n'
+                    '  return "#".repeat(Math.round(value / 10));\n}',
+                    [("10", "25.0%\n###"), ("20", "50.0%\n#####"), ("40", "100.0%\n##########")],
+                    hints=["Write the three signatures first, each returning a stub, then fill the bodies one at a time.",
+                           "pct needs a guard: reject whole === 0 before dividing.",
+                           "round1 is a one-liner over toFixed(1).",
+                           'bar uses "#".repeat(n) where n is Math.round(value / 10).']),
+            ],
+            quiz=[
+                _q("What should you decide before writing a function's body?",
+                   ["its length", "its name, inputs, output and preconditions",
+                    "which file it lives in", "whether it is an arrow function"], 1,
+                   "That is the contract — everything else follows from it."),
+                _q("Tracing `inc(twice(5))`, the first step is to…",
+                   ["run inc", "replace twice(5) with 10", "print both", "read right to left"], 1,
+                   "Innermost call first: substitute its return value, then continue."),
+                _q("Guards should be ordered…",
+                   ["alphabetically", "most specific first", "widest first", "any order works"], 1,
+                   "The first matching guard returns, so a wide one placed first hides the rest."),
+                _q("A name like `validateAndSave` hints that…",
+                   ["it is too short", "it is doing two jobs and wants splitting",
+                    "it needs a return type", "it should be an arrow function"], 1,
+                   "The 'and' is the seam where the function wants to be cut in two."),
+            ],
+        ),
     ],
     capstone=_cap_auto(
         "Budget Buddy #5 — refactored into helpers",
@@ -6084,7 +6351,7 @@ want*; the loop that does the same thing says *how to get it*, and you have to
 read all five lines to find out. Learn both — you need the loop when the
 operation doesn't fit a method, and the method every other time.
 
-⏱️ Budget about **five hours**.
+⏱️ Budget about **six hours**, spread over several sittings.
 """,
     objectives=[
         "Create arrays, index them, and reach the last element safely",
@@ -6094,9 +6361,11 @@ operation doesn't fit a method, and the method every other time.
         "Transform every element with map",
         "Select elements with filter, find, findIndex, some and every",
         "Sort numbers and strings correctly with a comparator, without wrecking the original",
+        "Chain split, map, filter, sort, slice and join into one readable pipeline",
+        "Choose the order of a chain, and copy an array before sorting it",
     ],
     why="Every list you will ever process — search results, table rows, log lines, basket items — is an array. The methods in this week are the vocabulary of day-to-day data work.",
-    est_minutes=300,
+    est_minutes=360,
     glossary=[
         _gloss("array", "An ordered list of values: [3, 5, 7]."),
         _gloss("element", "One value inside an array."),
@@ -6117,6 +6386,10 @@ operation doesn't fit a method, and the method every other time.
         _gloss("callback", "The small function you hand to map, filter, sort…"),
         _gloss("predicate", "A callback returning true/false, used to test elements."),
         _gloss("comparator", "The (a, b) function sort uses to order two elements."),
+        _gloss("chain", "Calling one array method on the result of the last, because each returns a new array."),
+        _gloss("pipeline", "A chain read top to bottom, each stage transforming the whole list once."),
+        _gloss("slice", "Takes a section of an array — and with no arguments, copies the whole thing."),
+        _gloss("in-place", "A method that rearranges the array it was called on. sort and reverse are the two."),
     ],
     cheatsheet="""
 ```ts
@@ -6174,6 +6447,8 @@ a.every((x) => x > 0)        // true   all?
         "Can you pick the right one of find, filter, some and includes for a given question?",
         "Can you sort numbers descending, without changing the original array?",
         "Can you explain why [10, 9, 1].sort() gives [1, 10, 9]?",
+        "Can you turn a line of raw input into a ranked report in one chain?",
+        "Can you say why sort needs a slice() in front of it, and when filter should come before map?",
     ],
     review=[
         _q("The first element of an array is at index…", ["1", "0", "-1", "any"], 1,
@@ -6202,6 +6477,15 @@ a.every((x) => x > 0)        // true   all?
         _q("To sort without disturbing the original you…",
            ["cannot", "copy first: [...a].sort(...)", "use map", "use filter"], 1,
            "sort mutates the array it is called on."),
+        _q("Array methods can be chained because…",
+           ["they mutate in place", "each hands back a new array", "TypeScript rewrites them", "they are lazy"], 1,
+           "map, filter and slice all return fresh arrays."),
+        _q("`nums.filter((n) => n > 0);` on a line of its own changes `nums`…",
+           ["to the positives", "not at all — the result was discarded", "to an empty array", "to a copy"], 1,
+           "You must keep what a non-mutating method returns."),
+        _q("Which pair of methods rearranges the original array?",
+           ["map and filter", "sort and reverse", "slice and join", "split and map"], 1,
+           "Copy with slice() first if anyone else is holding that array."),
     ],
     milestone="Budget Buddy can now crunch a whole month of expenses at once — totals, extremes, averages and a ranked list.",
     lessons=[
@@ -7173,6 +7457,240 @@ You'll use exactly this next week, on arrays of objects.
                    "The spread makes a fresh array for sort to reorder."),
             ],
         ),
+        # ---- Lesson 8 --------------------------------------------------
+        _lesson(
+            "w6-pipeline", "Chaining: building a pipeline",
+            "split → filter → map → sort → slice → join, as one readable flow.",
+            """
+You have met `split`, `map`, `filter`, `sort` and `join` one at a time. Real
+programs use them **together**, in a chain, because every one of them *returns a
+new array* — so the next one can start where the last finished.
+
+```ts
+const raw = "5, 12, -3, 8, 20";
+
+const top = raw
+  .split(",")                     // ["5", " 12", " -3", " 8", " 20"]
+  .map((s) => Number(s.trim()))   // [5, 12, -3, 8, 20]
+  .filter((n) => n > 0)           // [5, 12, 8, 20]
+  .sort((a, b) => b - a)          // [20, 12, 8, 5]
+  .slice(0, 3);                   // [20, 12, 8]
+
+console.log(top.join(" "));       // 20 12 8
+```
+
+Read a chain **top to bottom**: each line is one small, total transformation of
+the whole list. That is much easier to hold in your head than one loop doing
+five things at once.
+
+**Order changes the answer.** These two are not the same program:
+
+```ts
+words.filter((w) => w.length > 3).map((w) => w.toUpperCase())   // test the raw value
+words.map((w) => w.toUpperCase()).filter((w) => w.length > 3)   // test the mapped value
+```
+
+The rule of thumb: **filter first when the test works on the original value** —
+you then do the expensive `map` on fewer items. Map first only when the test
+needs the transformed value.
+
+**`slice` is your "take" and your "copy".** `xs.slice(0, 3)` takes the first
+three; a bare `xs.slice()` copies the whole array. That copy matters because
+`sort` and `reverse` are the odd ones out — they **mutate in place** and return
+the *same* array:
+
+```ts
+const scores = [88, 92, 79];
+const ranked = scores.slice().sort((a, b) => b - a);   // copy first, then sort
+console.log(scores.join(","));   // 88,92,79 — untouched
+```
+
+**`map` hands you the index too.** The callback's second parameter is the
+position, which is how you number a list:
+
+```ts
+const names = ["ada", "alan"];
+console.log(names.map((n, i) => `${i + 1}. ${n}`).join("\\n"));
+// 1. ada
+// 2. alan
+```
+
+**Name the middle when the chain gets long.** A chain of three is a sentence; a
+chain of eight is a paragraph with no full stops. Break it:
+
+```ts
+const cleaned = lines.map((l) => l.trim()).filter((l) => l.length > 0);
+const parsed = cleaned.map((l) => l.split(","));
+```
+
+Named steps also give you somewhere to put a `console.log` when the answer comes
+out wrong — inspect `cleaned`, then `parsed`, and the broken stage announces
+itself.
+
+> ⚠️ **Common mistakes:** calling `filter` and throwing the result away (these
+> methods never change the original — you must keep what they return); writing
+> `(n) => { n > 0; }` with braces but no `return`, so every test is `undefined`
+> and the result is empty; and sorting a shared array without copying it first.
+""",
+            warmup=[
+                _q("`[1,2,3,4].filter((n) => n % 2 === 0).map((n) => n * 10)` gives…",
+                   ["[10,20,30,40]", "[20,40]", "[2,4]", "[]"], 1,
+                   "Filter keeps 2 and 4; map then multiplies each by 10."),
+                _q("`nums.filter((n) => n > 0);` on its own line, then printing `nums`, shows…",
+                   ["only the positives", "the original array unchanged", "an empty array", "an error"], 1,
+                   "filter returns a NEW array; ignoring it changes nothing."),
+                _q("`[1,2,3].map((n, i) => n * i)` gives…",
+                   ["[1,2,3]", "[0,2,6]", "[0,1,2]", "[1,4,9]"], 1,
+                   "The second parameter is the index: 1*0, 2*1, 3*2."),
+                _q("Which method changes the array it is called on?",
+                   ["map", "filter", "slice", "sort"], 3,
+                   "sort (and reverse) mutate in place — copy with slice() first."),
+            ],
+            exercises=[
+                _ex("tscourse-w6-pipe-1", "Filter, then map",
+                    "Keep the even numbers, then multiply each by 10. Fill in the filtering stage.",
+                    'const nums = [1, 2, 3, 4, 5, 6];\n'
+                    'const result = nums.filter((n) => n % 2 === 0).map((n) => n * 10);\n'
+                    'console.log(result.join(","));\n',
+                    'filter((n) => n % 2 === 0)', [("", "20,40,60")],
+                    hints=["A number is even when the remainder after dividing by 2 is 0.",
+                           "Write filter((n) => n % 2 === 0)."]),
+                _ex("tscourse-w6-pipe-2", "Map, then filter",
+                    "The test needs the mapped value — the lengths — so map runs first. Add the filter that keeps lengths above 2.",
+                    'const words = ["hi", "there", "ok", "friend"];\n'
+                    'const lens = words.map((w) => w.length).filter((n) => n > 2);\n'
+                    'console.log(lens.join(" "));\n',
+                    '.filter((n) => n > 2)', [("", "5 6")],
+                    hints=["After map you have [2, 5, 2, 6].",
+                           "Chain .filter((n) => n > 2) onto the map."]),
+                _ex("tscourse-w6-pipe-3", "Sort inside a chain",
+                    "Read a comma-separated list, keep the positives, and print the three largest, biggest first. Add the sorting stage.",
+                    _FS +
+                    'const raw = fs.readFileSync(0, "utf8").trim();\n'
+                    'const top = raw\n'
+                    '  .split(",")\n'
+                    '  .map((s) => Number(s.trim()))\n'
+                    '  .filter((n) => n > 0)\n'
+                    '  .sort((a, b) => b - a)\n'
+                    '  .slice(0, 3);\n'
+                    'console.log(top.join(" "));\n',
+                    '.sort((a, b) => b - a)',
+                    [("5, 12, -3, 8, 20, 1", "20 12 8"), ("3,1,2", "3 2 1"), ("-4, 7", "7")],
+                    hints=["Descending order means the comparator subtracts the other way round.",
+                           "Write .sort((a, b) => b - a)."],
+                    difficulty="Easy"),
+                _ex("tscourse-w6-pipe-4", "Name the middle",
+                    "Lines are cleaned into `names`; now build `shouted` from it by upper-casing every name.",
+                    _FS +
+                    'const lines = fs.readFileSync(0, "utf8").trim().split("\\n");\n'
+                    'const names = lines.map((l) => l.trim()).filter((l) => l.length > 0);\n'
+                    'const shouted = names.map((n) => n.toUpperCase());\n'
+                    'console.log(shouted.join(", "));\n',
+                    'names.map((n) => n.toUpperCase())',
+                    [("ada\n  grace \n\nalan", "ADA, GRACE, ALAN"), ("solo", "SOLO")],
+                    hints=["Start from the array the previous line named, not from `lines`.",
+                           "Write names.map((n) => n.toUpperCase())."],
+                    difficulty="Easy"),
+                _ex("tscourse-w6-pipe-5", "Copy before you sort",
+                    "Print the scores sorted ascending, then prove the original is untouched. Fill in the copy.",
+                    'const scores = [88, 92, 79, 95, 61];\n'
+                    'const sorted = scores.slice().sort((a, b) => a - b);\n'
+                    'console.log(sorted.join(","));\n'
+                    'console.log(scores.join(","));\n',
+                    'scores.slice()', [("", "61,79,88,92,95\n88,92,79,95,61")],
+                    hints=["sort rearranges the array it is given, so hand it a copy.",
+                           "A bare slice() with no arguments copies the whole array."],
+                    difficulty="Easy"),
+                _ex("tscourse-w6-pipe-6", "Number the list",
+                    "Print each name on its own line, numbered from 1. Use map's index parameter.",
+                    'const names = ["ada", "alan", "grace"];\n'
+                    'const numbered = names.map((n, i) => `${i + 1}. ${n}`);\n'
+                    'console.log(numbered.join("\\n"));\n',
+                    '(n, i) => `${i + 1}. ${n}`',
+                    [("", "1. ada\n2. alan\n3. grace")],
+                    hints=["The callback can take a second parameter: the index, counting from 0.",
+                           "Add 1 to the index so the list starts at 1."],
+                    difficulty="Medium"),
+                _fix("tscourse-w6-pipe-fix1", "Fix the discarded result",
+                     "This should print only the positive numbers, but prints all of them. The filtered array is being thrown away.",
+                     'const nums = [3, -1, 4, -5, 9];\n'
+                     'nums.filter((n) => n > 0);\n'
+                     'console.log(nums.join(","));\n',
+                     'const nums = [3, -1, 4, -5, 9];\n'
+                     'const positive = nums.filter((n) => n > 0);\n'
+                     'console.log(positive.join(","));\n',
+                     [("", "3,4,9")],
+                     hints=["filter never edits the array it is called on — it hands back a new one.",
+                            "Store the returned array in a const and print that instead."]),
+                _fix("tscourse-w6-pipe-fix2", "Fix the silent predicate",
+                     "This should print 3 (the count of even numbers) but prints 0. The callback has braces but never returns.",
+                     'const nums = [1, 2, 3, 4, 5, 6];\n'
+                     'const evens = nums.filter((n) => { n % 2 === 0; });\n'
+                     'console.log(evens.length);\n',
+                     'const nums = [1, 2, 3, 4, 5, 6];\n'
+                     'const evens = nums.filter((n) => n % 2 === 0);\n'
+                     'console.log(evens.length);\n',
+                     [("", "3")],
+                     hints=["A braced arrow body needs an explicit return; without one every test is undefined.",
+                            "Drop the braces so the expression is returned automatically."],
+                     difficulty="Medium"),
+                _fix("tscourse-w6-pipe-fix3", "Fix the mutated original",
+                     "This should print the top score and then the original order, but sorting rearranged the array everyone shares.",
+                     'const scores = [88, 92, 79];\n'
+                     'const ranked = scores.sort((a, b) => b - a);\n'
+                     'console.log(`Top: ${ranked[0]}`);\n'
+                     'console.log(`Original: ${scores.join(",")}`);\n',
+                     'const scores = [88, 92, 79];\n'
+                     'const ranked = scores.slice().sort((a, b) => b - a);\n'
+                     'console.log(`Top: ${ranked[0]}`);\n'
+                     'console.log(`Original: ${scores.join(",")}`);\n',
+                     [("", "Top: 92\nOriginal: 88,92,79")],
+                     hints=["sort is one of the two array methods that change the array in place.",
+                            "Insert a .slice() before the .sort(...) so it sorts a copy."],
+                     difficulty="Medium"),
+                _ch("tscourse-w6-pipe-ch1", "Leaderboard", "Medium",
+                    "Each input line is `name,score`, and blank lines may appear. Build the pipeline: clean the lines, split each into fields, rank by score highest first, keep the top three, and number them as `1. name (score)`.",
+                    _FS +
+                    'const lines = fs.readFileSync(0, "utf8").trim().split("\\n");\n'
+                    'const rows = lines\n'
+                    '  .map((l) => l.trim())\n'
+                    '  .filter((l) => l.length > 0)\n'
+                    '  .map((l) => l.split(","));\n'
+                    'const ranked = rows.sort((a, b) => Number(b[1]) - Number(a[1])).slice(0, 3);\n'
+                    'const out = ranked.map((r, i) => `${i + 1}. ${r[0]} (${r[1]})`);\n'
+                    'console.log(out.join("\\n"));\n',
+                    'const rows = lines\n'
+                    '  .map((l) => l.trim())\n'
+                    '  .filter((l) => l.length > 0)\n'
+                    '  .map((l) => l.split(","));\n'
+                    'const ranked = rows.sort((a, b) => Number(b[1]) - Number(a[1])).slice(0, 3);\n'
+                    'const out = ranked.map((r, i) => `${i + 1}. ${r[0]} (${r[1]})`);',
+                    [("ada,91\ngrace,88\n\nalan,95\nedsger,70",
+                      "1. alan (95)\n2. ada (91)\n3. grace (88)"),
+                     ("bob,10\nsue,20", "1. sue (20)\n2. bob (10)")],
+                    hints=["Four stages: trim each line, drop the empty ones, split each on the comma, then rank.",
+                           "After the last map, each row is a two-element array: [name, score].",
+                           "The score is text, so compare Number(b[1]) - Number(a[1]) for descending order.",
+                           "slice(0, 3) takes the top three, and map's index gives you the numbering."]),
+            ],
+            quiz=[
+                _q("Why can array methods be chained?",
+                   ["they mutate in place", "each returns a new array for the next one to work on",
+                    "TypeScript rewrites them", "they are asynchronous"], 1,
+                   "map/filter/slice each hand back a fresh array."),
+                _q("`filter` before `map` is usually preferred because…",
+                   ["it reads better", "the map then runs on fewer items",
+                    "map cannot come first", "filter is faster than map"], 1,
+                   "Unless the test needs the mapped value, shrink the list first."),
+                _q("`xs.slice()` with no arguments…",
+                   ["empties the array", "copies the whole array", "sorts it", "is an error"], 1,
+                   "Which is exactly how you protect an array from an in-place sort."),
+                _q("A long chain is worth breaking into named steps because…",
+                   ["it runs faster", "you get somewhere to inspect the middle when it goes wrong",
+                    "chains are limited to three calls", "TypeScript requires it"], 1,
+                   "Named stages turn debugging into reading."),
+            ],
+        ),
     ],
     capstone=_cap_auto(
         "Budget Buddy #6 — the month in numbers",
@@ -7292,7 +7810,7 @@ not be there), passing them around, processing lists of them, the sharing
 behaviour that catches everyone out, and using an object as a **lookup table** —
 which is the single most useful trick in the whole course.
 
-⏱️ Budget about **five hours**.
+⏱️ Budget about **six hours**, spread over several sittings.
 """,
     objectives=[
         "Create objects, read fields with dot access, and update or add fields",
@@ -7303,9 +7821,11 @@ which is the single most useful trick in the whole course.
         "Filter, map and sort an array of records by a field",
         "Tell sharing from copying, and make a copy with spread",
         "Count and group with an object used as a lookup table",
+        "Group records into buckets keyed by any field, in a single pass",
+        "Summarise each bucket and print the report in a stable, sorted order",
     ],
     why="Objects are how a program talks about the real world — a user, an order, a row, a config. Once you can model data as records and process a list of them, you can write actual applications.",
-    est_minutes=300,
+    est_minutes=360,
     glossary=[
         _gloss("object", "A bundle of named values: { name: \"Ada\" }."),
         _gloss("property / field / key", "One named slot on an object."),
@@ -7323,6 +7843,10 @@ which is the single most useful trick in the whole course.
         _gloss("shallow copy", "{ ...o } — a new top-level object, but nested objects are still shared."),
         _gloss("lookup table", "An object used as a name-to-value map."),
         _gloss("Object.keys / values / entries", "Turn an object into an array of its keys, values, or [key, value] pairs."),
+        _gloss("grouping", "Bucketing records under a key so each bucket holds every matching item."),
+        _gloss("bucket", "The array (or running total) stored under one key of a lookup table."),
+        _gloss("accumulator table", "A lookup whose values are running totals rather than arrays."),
+        _gloss("deterministic output", "Output that is identical for identical input — here, by sorting the keys."),
     ],
     cheatsheet="""
 ```ts
@@ -7388,6 +7912,8 @@ for (const w of words) {
         "Can you sort records by a field without mutating the original array?",
         "Can you explain why `const b = a` then `b.x = 1` changes `a` too?",
         "Can you count word frequencies with an object?",
+        "Can you group an array of records by one of their fields without knowing the categories in advance?",
+        "Can you say when to bucket into arrays and when to accumulate straight into numbers?",
     ],
     review=[
         _q("How do you read the `name` of `user`?",
@@ -7418,6 +7944,17 @@ for (const w of words) {
            ["style", "the first time a word appears, counts[w] is undefined",
             "to reset the count", "it is optional"], 1,
            "undefined + 1 is NaN, so the first occurrence needs a starting value."),
+        _q("The two lines at the heart of grouping are…",
+           ["sort then join", "create the bucket if missing, then push",
+            "keys then values", "filter then map"], 1,
+           "Everything else is choosing what the key should be."),
+        _q("`tally[k] = tally[k] + 1` for a brand-new key gives…",
+           ["1", "0", "NaN", "an error"], 2,
+           "undefined + 1 is NaN — start from (tally[k] ?? 0)."),
+        _q("Sorting `Object.keys(groups)` before printing gives you…",
+           ["faster lookup", "a report that is identical for identical input",
+            "sorted buckets", "fewer keys"], 1,
+           "Stable output is what makes a report testable."),
     ],
     milestone="Budget Buddy now models each expense as a proper record and reports over the whole list — the data shape real applications use.",
     lessons=[
@@ -8489,6 +9026,293 @@ alternative — arrives in week 18.)
                    "Pushing onto undefined throws."),
             ],
         ),
+        # ---- Lesson 8 --------------------------------------------------
+        _lesson(
+            "w7-group", "Grouping & summarising",
+            "Bucket records by a key, then report each bucket.",
+            """
+A tally answers *how many of each*. **Grouping** answers the bigger question:
+*which ones, in each bucket* — and once you have the buckets you can summarise
+them any way you like. It is the single most common shape of real reporting
+code, and it is three lines of pattern.
+
+**The bucket pattern.** The table's values are arrays instead of numbers:
+
+```ts
+const byLetter: { [key: string]: string[] } = {};
+
+for (const w of ["ant", "bee", "ape", "bat"]) {
+  const key = w[0];
+  if (!(key in byLetter)) byLetter[key] = [];   // create the bucket once
+  byLetter[key].push(w);                        // then always push
+}
+// { a: ["ant", "ape"], b: ["bee", "bat"] }
+```
+
+Those two lines never change. The only decision you make is **what the key is** —
+`w[0]` here, `expense.category` in Budget Buddy, `user.country` at work.
+
+The same idea with the `??` fallback from the previous lesson:
+
+```ts
+byLetter[key] = byLetter[key] ?? [];
+byLetter[key].push(w);
+```
+
+Both are fine. Pick one and use it everywhere.
+
+**Then walk the buckets.** `Object.keys` gives you the keys, and `.sort()` makes
+the report **deterministic** — the same input always prints in the same order,
+which is what makes output testable:
+
+```ts
+for (const key of Object.keys(byLetter).sort()) {
+  const bucket = byLetter[key];
+  console.log(`${key}: ${bucket.length} — ${bucket.join(", ")}`);
+}
+```
+
+**Summarising a bucket** is ordinary array work on `byLetter[key]`: count with
+`.length`, total with a running sum, best with a running maximum.
+
+```ts
+const totals: { [key: string]: number } = {};
+for (const s of sales) {
+  totals[s.region] = (totals[s.region] ?? 0) + s.amount;   // sum straight in
+}
+```
+
+Notice the choice: bucket into **arrays** when you still need the individual
+items later, and accumulate into **numbers** when you only ever want the total.
+Grouping keeps your options open; accumulating is cheaper.
+
+**Grouping is one pass.** Resist the urge to loop once per category — you'd have
+to know the categories in advance, and you'd read the data as many times as
+there are keys. One pass over the records builds every bucket at once, whatever
+the categories turn out to be.
+
+> ⚠️ **Common mistakes:** pushing into a bucket that was never created (a crash
+> on `undefined.push`); *assigning* `groups[key] = [item]` instead of pushing, so
+> each bucket only ever holds the last item; and adding to a missing numeric
+> bucket, where `undefined + 1` quietly gives you `NaN`.
+""",
+            warmup=[
+                _q("After bucketing `[\"ant\",\"ape\"]` by first letter, `groups[\"a\"]` is…",
+                   ['"ape"', '["ant", "ape"]', '2', 'undefined'], 1,
+                   "The value is an array holding every item that matched the key."),
+                _q("`groups[key].push(w)` without creating the bucket first…",
+                   ["works fine", "crashes, because groups[key] is undefined",
+                    "creates the bucket automatically", "returns NaN"], 1,
+                   "You cannot call .push on undefined."),
+                _q("`totals[k] = totals[k] + 1` on a key seen for the first time gives…",
+                   ["1", "0", "NaN", "undefined"], 2,
+                   "undefined + 1 is NaN — supply a starting value with ?? 0."),
+                _q("Why `.sort()` the keys before printing?",
+                   ["it is faster", "so the report comes out in the same order every time",
+                    "objects cannot be read otherwise", "it removes duplicates"], 1,
+                   "Deterministic output is what makes a report testable."),
+            ],
+            exercises=[
+                _ex("tscourse-w7-grp-1", "Create the bucket",
+                    "Group the words by their first letter. Add the line that creates a bucket the first time a letter is seen.",
+                    'const words = ["ant", "bee", "ape", "bat"];\n'
+                    'const groups: { [key: string]: string[] } = {};\n'
+                    'for (const w of words) {\n'
+                    '  const key = w[0];\n'
+                    '  if (!(key in groups)) groups[key] = [];\n'
+                    '  groups[key].push(w);\n'
+                    '}\n'
+                    'console.log(Object.keys(groups).sort().join(","));\n'
+                    'console.log(groups["a"].join(" "));\n',
+                    'if (!(key in groups)) groups[key] = [];',
+                    [("", "a,b\nant ape")],
+                    hints=["Use the `in` operator to ask whether the key exists yet.",
+                           "Write if (!(key in groups)) groups[key] = [];"]),
+                _ex("tscourse-w7-grp-2", "Push into the bucket",
+                    "The buckets are created; now add each expense's name to the bucket for its category.",
+                    'const expenses = [\n'
+                    '  { name: "coffee", category: "food" },\n'
+                    '  { name: "novel", category: "books" },\n'
+                    '  { name: "bread", category: "food" },\n'
+                    '];\n'
+                    'const groups: { [key: string]: string[] } = {};\n'
+                    'for (const e of expenses) {\n'
+                    '  groups[e.category] = groups[e.category] ?? [];\n'
+                    '  groups[e.category].push(e.name);\n'
+                    '}\n'
+                    'console.log(groups["food"].join(" + "));\n',
+                    'groups[e.category].push(e.name);',
+                    [("", "coffee + bread")],
+                    hints=["The bucket for this record is groups[e.category].",
+                           "Push the name onto it: groups[e.category].push(e.name);"]),
+                _ex("tscourse-w7-grp-3", "Walk the buckets in order",
+                    "Print one line per category, alphabetically. Fill in how the keys are obtained and ordered.",
+                    _FS +
+                    'const lines = fs.readFileSync(0, "utf8").trim().split("\\n");\n'
+                    'const groups: { [key: string]: string[] } = {};\n'
+                    'for (const line of lines) {\n'
+                    '  const parts = line.trim().split(",");\n'
+                    '  const cat = parts[0];\n'
+                    '  groups[cat] = groups[cat] ?? [];\n'
+                    '  groups[cat].push(parts[1]);\n'
+                    '}\n'
+                    'for (const cat of Object.keys(groups).sort()) {\n'
+                    '  console.log(`${cat}: ${groups[cat].join(", ")}`);\n'
+                    '}\n',
+                    'Object.keys(groups).sort()',
+                    [("fruit,apple\nveg,leek\nfruit,fig", "fruit: apple, fig\nveg: leek"),
+                     ("b,two\na,one", "a: one\nb: two")],
+                    hints=["Object.keys gives you the bucket names as an array.",
+                           "Sorting that array makes the report order stable."],
+                    difficulty="Easy"),
+                _ex("tscourse-w7-grp-4", "Accumulate instead of bucketing",
+                    "You only need the totals here, so add straight into a numeric table. Fill in the accumulating line.",
+                    'const sales = [\n'
+                    '  { region: "north", amount: 30 },\n'
+                    '  { region: "south", amount: 20 },\n'
+                    '  { region: "north", amount: 12 },\n'
+                    '];\n'
+                    'const totals: { [key: string]: number } = {};\n'
+                    'for (const s of sales) {\n'
+                    '  totals[s.region] = (totals[s.region] ?? 0) + s.amount;\n'
+                    '}\n'
+                    'for (const r of Object.keys(totals).sort()) {\n'
+                    '  console.log(`${r} ${totals[r]}`);\n'
+                    '}\n',
+                    'totals[s.region] = (totals[s.region] ?? 0) + s.amount;',
+                    [("", "north 42\nsouth 20")],
+                    hints=["The first time a region appears there is no running total yet.",
+                           "Fall back to 0 with ?? before adding the amount."],
+                    difficulty="Easy"),
+                _ex("tscourse-w7-grp-5", "Find the biggest bucket",
+                    "Report which category holds the most items. Fill in the comparison.",
+                    'const groups: { [key: string]: string[] } = {\n'
+                    '  fruit: ["apple", "fig"],\n'
+                    '  veg: ["leek"],\n'
+                    '  drink: ["tea", "coffee", "cocoa"],\n'
+                    '};\n'
+                    'let best = "";\n'
+                    'for (const k of Object.keys(groups).sort()) {\n'
+                    '  if (best === "" || groups[k].length > groups[best].length) best = k;\n'
+                    '}\n'
+                    'console.log(`${best} (${groups[best].length})`);\n',
+                    'groups[k].length > groups[best].length',
+                    [("", "drink (3)")],
+                    hints=["Compare this bucket's length against the best one found so far.",
+                           "Write groups[k].length > groups[best].length."],
+                    difficulty="Medium"),
+                _fix("tscourse-w7-grp-fix1", "Fix the missing bucket",
+                     "This should print `ant ape` but crashes on the first word, because nothing ever creates the bucket.",
+                     'const words = ["ant", "bee", "ape"];\n'
+                     'const groups: { [key: string]: string[] } = {};\n'
+                     'for (const w of words) {\n'
+                     '  groups[w[0]].push(w);\n'
+                     '}\n'
+                     'console.log(groups["a"].join(" "));\n',
+                     'const words = ["ant", "bee", "ape"];\n'
+                     'const groups: { [key: string]: string[] } = {};\n'
+                     'for (const w of words) {\n'
+                     '  groups[w[0]] = groups[w[0]] ?? [];\n'
+                     '  groups[w[0]].push(w);\n'
+                     '}\n'
+                     'console.log(groups["a"].join(" "));\n',
+                     [("", "ant ape")],
+                     hints=["The very first time a letter appears, groups[letter] is undefined.",
+                            "Create an empty array for it before pushing."]),
+                _fix("tscourse-w7-grp-fix2", "Fix the overwritten bucket",
+                     "This should print `ant ape` but prints only `ape`. Each record is replacing the bucket instead of joining it.",
+                     'const groups: { [key: string]: string[] } = {};\n'
+                     'const words = ["ant", "ape", "bee"];\n'
+                     'for (const w of words) {\n'
+                     '  if (!(w[0] in groups)) groups[w[0]] = [];\n'
+                     '  groups[w[0]] = [w];\n'
+                     '}\n'
+                     'console.log(groups["a"].join(" "));\n',
+                     'const groups: { [key: string]: string[] } = {};\n'
+                     'const words = ["ant", "ape", "bee"];\n'
+                     'for (const w of words) {\n'
+                     '  if (!(w[0] in groups)) groups[w[0]] = [];\n'
+                     '  groups[w[0]].push(w);\n'
+                     '}\n'
+                     'console.log(groups["a"].join(" "));\n',
+                     [("", "ant ape")],
+                     hints=["Assigning a fresh one-element array throws away everything already in the bucket.",
+                            "Add to the existing bucket with .push(w) instead."],
+                     difficulty="Medium"),
+                _fix("tscourse-w7-grp-fix3", "Fix the NaN tally",
+                     "This should print `2 1` but prints `NaN NaN`. The first addition has nothing to add to.",
+                     'const tally: { [key: string]: number } = {};\n'
+                     'for (const c of ["a", "b", "a"]) {\n'
+                     '  tally[c] = tally[c] + 1;\n'
+                     '}\n'
+                     'console.log(`${tally["a"]} ${tally["b"]}`);\n',
+                     'const tally: { [key: string]: number } = {};\n'
+                     'for (const c of ["a", "b", "a"]) {\n'
+                     '  tally[c] = (tally[c] ?? 0) + 1;\n'
+                     '}\n'
+                     'console.log(`${tally["a"]} ${tally["b"]}`);\n',
+                     [("", "2 1")],
+                     hints=["A key that has never been seen reads back as undefined.",
+                            "undefined + 1 is NaN — supply 0 with ?? before adding."]),
+                _ch("tscourse-w7-grp-ch1", "Grouped spending report", "Medium",
+                    "Each input line is `category,item,price`. Group the prices by category, then print one line per category in alphabetical order: `category: N item(s), total $X.XX`, singular when the category holds exactly one item.",
+                    _FS +
+                    'const lines = fs.readFileSync(0, "utf8").trim().split("\\n");\n'
+                    'const groups: { [key: string]: number[] } = {};\n'
+                    'for (const line of lines) {\n'
+                    '  const parts = line.trim().split(",");\n'
+                    '  const cat = parts[0];\n'
+                    '  groups[cat] = groups[cat] ?? [];\n'
+                    '  groups[cat].push(Number(parts[2]));\n'
+                    '}\n'
+                    'for (const cat of Object.keys(groups).sort()) {\n'
+                    '  const prices = groups[cat];\n'
+                    '  let total = 0;\n'
+                    '  for (const p of prices) total = total + p;\n'
+                    '  const label = prices.length === 1 ? "item" : "items";\n'
+                    '  console.log(`${cat}: ${prices.length} ${label}, total $${total.toFixed(2)}`);\n'
+                    '}\n',
+                    'const groups: { [key: string]: number[] } = {};\n'
+                    'for (const line of lines) {\n'
+                    '  const parts = line.trim().split(",");\n'
+                    '  const cat = parts[0];\n'
+                    '  groups[cat] = groups[cat] ?? [];\n'
+                    '  groups[cat].push(Number(parts[2]));\n'
+                    '}\n'
+                    'for (const cat of Object.keys(groups).sort()) {\n'
+                    '  const prices = groups[cat];\n'
+                    '  let total = 0;\n'
+                    '  for (const p of prices) total = total + p;\n'
+                    '  const label = prices.length === 1 ? "item" : "items";\n'
+                    '  console.log(`${cat}: ${prices.length} ${label}, total $${total.toFixed(2)}`);\n'
+                    '}',
+                    [("food,apple,1.50\nbooks,novel,29.99\nfood,bread,2.25",
+                      "books: 1 item, total $29.99\nfood: 2 items, total $3.75"),
+                     ("a,x,1\na,y,2\na,z,3", "a: 3 items, total $6.00")],
+                    hints=["One pass builds the buckets; a second pass over the sorted keys prints the report.",
+                           "The bucket here holds numbers, so its annotation is { [key: string]: number[] }.",
+                           "Sum a bucket with a running total in a for..of loop.",
+                           'Pick the word with a ternary: prices.length === 1 ? "item" : "items".']),
+            ],
+            quiz=[
+                _q("The two lines at the heart of grouping are…",
+                   ["sort then join", "create the bucket if missing, then push",
+                    "filter then map", "keys then values"], 1,
+                   "Everything else is deciding what the key should be."),
+                _q("Bucket into arrays rather than accumulating numbers when…",
+                   ["there are many keys", "you still need the individual items later",
+                    "the values are strings", "the input is sorted"], 1,
+                   "Grouping keeps the members; accumulating keeps only the answer."),
+                _q("`Object.keys(groups).sort()` is used so that…",
+                   ["the buckets are sorted", "the report prints in a stable, testable order",
+                    "duplicate keys are removed", "lookup gets faster"], 1,
+                   "The keys are ordered; the buckets themselves are untouched."),
+                _q("How many passes over the records does grouping take?",
+                   ["one per category", "one, whatever the categories turn out to be",
+                    "two per category", "one per record squared"], 1,
+                   "That is exactly why you group rather than loop per category."),
+            ],
+        ),
     ],
     capstone=_cap_auto(
         "Budget Buddy #7 — the expense ledger",
@@ -8622,7 +9446,7 @@ Two things to keep straight all week:
 The week closes with **`reduce`**, the last of the big array methods and the one
 that generalises all the others.
 
-⏱️ Budget about **five hours**.
+⏱️ Budget about **six hours**, spread over several sittings.
 """,
     objectives=[
         "Annotate values and functions, and know when inference is enough",
@@ -8632,9 +9456,11 @@ that generalises all the others.
         "Write a function type, and type a callback parameter",
         "Fold a list to a number, a string or an object with reduce",
         "Design a type for real-world data and process it end to end",
+        "Explain that annotations are erased at runtime, and validate data where it enters",
+        "Write a boundary function that turns untrusted text into a typed, checked record",
     ],
     why="A named type is documentation the compiler enforces. It is the cheapest bug prevention available, and it is what makes a codebase survive being edited six months later by someone who has forgotten it.",
-    est_minutes=300,
+    est_minutes=360,
     glossary=[
         _gloss("annotation", "A written type after a colon: let n: number."),
         _gloss("inference", "TypeScript working the type out from the value."),
@@ -8654,6 +9480,11 @@ that generalises all the others.
         _gloss("unknown", "Like any, but you must narrow it before use. The safe version."),
         _gloss(".reduce(f, seed)", "Folds a list into a single accumulated value."),
         _gloss("accumulator (reduce)", "The value carried from one step to the next."),
+        _gloss("boundary", "The one place where outside data is validated and turned into your types."),
+        _gloss("erasure", "Annotations exist only while compiling; nothing of them survives into the running code."),
+        _gloss("any", "Switches type checking off for a value. Every any is a small debt."),
+        _gloss("assertion (as)", "A promise to the compiler about a type. Checked never, believed always."),
+        _gloss("NaN", "The number you get from a failed conversion. Test for it with Number.isNaN."),
     ],
     cheatsheet="""
 ```ts
@@ -8705,6 +9536,8 @@ items.reduce((acc, it) => {                        // fold to an object
         "Can you write the type of a function that takes a string and returns a number?",
         "Can you total a field with reduce, and say what the seed is for?",
         "Can you say why `any` is worse than `unknown`?",
+        "Can you say what happens to your annotations when the program runs?",
+        "Can you write a parse function that rejects malformed input instead of crashing on it?",
     ],
     review=[
         _q("What happens to type annotations at runtime?",
@@ -8741,6 +9574,15 @@ items.reduce((acc, it) => {                        // fold to an object
            ["const n: number = 5", "const s: string = \"a\"", "const xs: string[] = []",
             "const b: boolean = true"], 2,
            "An empty array gives inference nothing to work from."),
+        _q("At runtime, annotations are…",
+           ["checked on assignment", "erased", "stored with the value", "converted to guards"], 1,
+           "Which is exactly why boundaries need real checks."),
+        _q("`Number(\"oops\")` gives…",
+           ["a type error", "NaN, whose type is number", "0", "undefined"], 1,
+           "The annotation is satisfied and the value is still wrong."),
+        _q("`value as Config` at runtime…",
+           ["validates the shape", "does nothing", "copies the object", "throws on mismatch"], 1,
+           "An assertion silences the compiler; it checks nothing."),
     ],
     milestone="Budget Buddy is now fully typed — the compiler guards its data, and reduce folds a whole ledger into a summary. That's Month 2 complete.",
     lessons=[
@@ -9043,6 +9885,22 @@ actually needs — anything with those fields can be passed.
                      [("", "7")],
                      hints=["3 + (-4) is -1, which is not a distance.",
                             "Wrap each coordinate in Math.abs."]),
+                _fix("tscourse-w8-ali-fix2", "Fix the shape that was only promised",
+                     "This should print `ada <ada@example.com>` but the email comes out undefined. An assertion was used to force an incomplete object into the shape.",
+                     'interface User {\n  name: string;\n  email: string;\n}\n'
+                     'function line(u: User): string {\n'
+                     '  return `${u.name} <${u.email}>`;\n}\n'
+                     'const u = { name: "ada" } as User;\n'
+                     'console.log(line(u));\n',
+                     'interface User {\n  name: string;\n  email: string;\n}\n'
+                     'function line(u: User): string {\n'
+                     '  return `${u.name} <${u.email}>`;\n}\n'
+                     'const u: User = { name: "ada", email: "ada@example.com" };\n'
+                     'console.log(line(u));\n',
+                     [("", "ada <ada@example.com>")],
+                     hints=["`as User` promised a field that was never supplied.",
+                            "Annotate the variable instead of asserting it, and give it every required field."],
+                     difficulty="Medium"),
             ],
             quiz=[
                 _q("Which CANNOT be expressed with `interface`?",
@@ -9189,6 +10047,18 @@ function signature ("I will not modify your array") it is genuinely valuable.
                      [("", "3")],
                      hints=["The row index comes first, then the column.",
                             "Write grid[1][0]."]),
+                _fix("tscourse-w8-col-fix2", "Fix the tuple order",
+                     "Each pair is [name, quantity], so this should print `2 x apple`. The destructuring reads the slots the wrong way round.",
+                     'type Pair = [string, number];\n'
+                     'const items: Pair[] = [["apple", 2], ["fig", 5]];\n'
+                     'for (const [qty, name] of items) console.log(`${qty} x ${name}`);\n',
+                     'type Pair = [string, number];\n'
+                     'const items: Pair[] = [["apple", 2], ["fig", 5]];\n'
+                     'for (const [name, qty] of items) console.log(`${qty} x ${name}`);\n',
+                     [("", "2 x apple\n5 x fig")],
+                     hints=["A tuple's meaning is positional: slot 0 is the name, slot 1 is the quantity.",
+                            "Name the destructured slots in the order the tuple declares them."],
+                     difficulty="Medium"),
             ],
             quiz=[
                 _q("A tuple differs from an array in that…",
@@ -9857,6 +10727,277 @@ checks enforce it**, and you need both.
                    "You need both: types for intent, checks for reality."),
             ],
         ),
+        # ---- Lesson 8 --------------------------------------------------
+        _lesson(
+            "w8-boundary", "Types at the boundary",
+            "Where untrusted text becomes values your types can vouch for.",
+            """
+Here is the fact that reframes everything you learned this week:
+
+> **Types are erased before the program runs.** Not one annotation survives into
+> the running code.
+
+`const n: number = ...` is a promise *you* make to the compiler, checked while
+you write. It is not a guard rail at runtime. So the moment data arrives from
+outside — stdin, a file, a network call, a form — your annotations describe what
+you *hope* is there, and something has to actually check.
+
+```ts
+const raw = fs.readFileSync(0, "utf8").trim();
+const amount: number = Number(raw);   // annotation satisfied…
+console.log(amount + 1);              // …and if raw was "oops", this is NaN
+```
+
+`Number("oops")` is `NaN`, whose type is `number`. The annotation is honest; the
+value is garbage. That is why real programs have a **boundary**.
+
+**The boundary function.** One place converts text into your shape, validating
+as it goes, and everything downstream can then trust its types:
+
+```ts
+interface Entry {
+  name: string;
+  amount: number;
+  ok: boolean;       // did this line survive validation?
+}
+
+function parseEntry(line: string): Entry {
+  const parts = line.split(",");
+  if (parts.length !== 2) return { name: line.trim(), amount: 0, ok: false };
+  const amount = Number(parts[1].trim());
+  if (Number.isNaN(amount)) return { name: parts[0].trim(), amount: 0, ok: false };
+  return { name: parts[0].trim(), amount, ok: true };
+}
+```
+
+Two things to notice. Validation is **guard clauses** again — reject, reject,
+then the happy path. And a rejected line does not crash the program; it comes
+back marked `ok: false` and the caller decides. (Month 4 gives this the name it
+has in the wild: the **Result** pattern.)
+
+**Check the things that actually go wrong.** In practice that is a short list:
+the field count is wrong, a number didn't parse (`Number.isNaN`), a required
+string is empty, or a value is out of range (a negative price).
+
+**`any` switches the compiler off.** It is not "some type" — it is "stop
+checking":
+
+```ts
+const data: any = { amount: "3.25" };   // a STRING, though nobody said so
+console.log(data.amount + 1);           // "3.251" — no error, wrong answer
+```
+
+Every bug `any` lets through is a bug you were paying TypeScript to catch. Treat
+each `any` as a small debt.
+
+**`as` is a promise, not a check.** An assertion tells the compiler you know
+better. Nothing is verified at runtime:
+
+```ts
+const cfg = fromElsewhere as Config;   // if it isn't a Config, nothing complains
+```
+
+Use it only right after a check you performed yourself, and never as a way to
+silence an error you don't understand.
+
+> ⚠️ **Common mistakes:** believing an annotation validates runtime data;
+> forgetting the `Number.isNaN` guard, so one bad row poisons every total with
+> `NaN`; reaching for `any` to make an error go away; and reading fields out of
+> a split line in the wrong order — the types all still line up, and the output
+> is nonsense.
+""",
+            warmup=[
+                _q("`const n: number = Number(\"oops\");` — does this compile?",
+                   ["No, it is a type error", "Yes, and n is NaN", "Yes, and n is 0", "It throws"], 1,
+                   "NaN is a number as far as the type system is concerned."),
+                _q("At runtime, your type annotations are…",
+                   ["checked on every assignment", "erased — they existed only while compiling",
+                    "converted to if-statements", "stored alongside the value"], 1,
+                   "Which is exactly why boundaries need real validation code."),
+                _q("`const data: any = { amount: \"3.25\" }; data.amount + 1` gives…",
+                   ["4.25", '"3.251"', "a type error", "NaN"], 1,
+                   "any turns checking off, so string concatenation happens silently."),
+                _q("`value as Config` does what at runtime?",
+                   ["validates the shape", "nothing at all — it only silences the compiler",
+                    "copies the object", "throws if the shape is wrong"], 1,
+                   "An assertion is a promise you make, not a check you get."),
+            ],
+            exercises=[
+                _ex("tscourse-w8-bnd-1", "Annotate the boundary",
+                    "Give the parsing function the return annotation that says what it hands back.",
+                    'interface Point {\n  x: number;\n  y: number;\n}\n'
+                    'function parsePoint(text: string): Point {\n'
+                    '  const parts = text.split(",");\n'
+                    '  return { x: Number(parts[0]), y: Number(parts[1]) };\n}\n'
+                    'const p = parsePoint("3,4");\n'
+                    'console.log(p.x + p.y);\n',
+                    'Point {\n'
+                    '  const parts = text.split(",");',
+                    [("", "7")],
+                    hints=["The function builds an object with x and y — there is already a name for that shape.",
+                           "Annotate the return as Point."]),
+                _ex("tscourse-w8-bnd-2", "Guard the parse",
+                    "One unparseable value should become 0 rather than poisoning everything. Add the guard.",
+                    _FS +
+                    'function toAmount(text: string): number {\n'
+                    '  const n = Number(text.trim());\n'
+                    '  if (Number.isNaN(n)) return 0;\n'
+                    '  return n;\n}\n'
+                    'const raw = fs.readFileSync(0, "utf8").trim().split(",");\n'
+                    'const amounts: number[] = raw.map(toAmount);\n'
+                    'console.log(amounts.join(" "));\n',
+                    'if (Number.isNaN(n)) return 0;',
+                    [("3, abc, 5", "3 0 5"), ("1,2", "1 2")],
+                    hints=["Number() hands back NaN when the text isn't a number.",
+                           "NaN === NaN is false, so you must test with Number.isNaN.",
+                           "Write if (Number.isNaN(n)) return 0;"],
+                    difficulty="Easy"),
+                _ex("tscourse-w8-bnd-3", "Reject the wrong field count",
+                    "A line must have exactly two fields. Fill in the rejecting guard so a malformed line comes back marked not-ok.",
+                    'interface Parsed {\n  ok: boolean;\n  name: string;\n  amount: number;\n}\n'
+                    'function parseLine(line: string): Parsed {\n'
+                    '  const parts = line.split(",");\n'
+                    '  if (parts.length !== 2) return { ok: false, name: "", amount: 0 };\n'
+                    '  const amount = Number(parts[1]);\n'
+                    '  if (Number.isNaN(amount)) return { ok: false, name: "", amount: 0 };\n'
+                    '  return { ok: true, name: parts[0].trim(), amount };\n}\n'
+                    'console.log(parseLine("coffee, 3.25").ok);\n'
+                    'console.log(parseLine("coffee").ok);\n'
+                    'console.log(parseLine("coffee, abc").ok);\n',
+                    'if (parts.length !== 2) return { ok: false, name: "", amount: 0 };',
+                    [("", "true\nfalse\nfalse")],
+                    hints=["Splitting on the comma should give exactly two pieces.",
+                           'Return { ok: false, name: "", amount: 0 } when it does not.'],
+                    difficulty="Medium"),
+                _ex("tscourse-w8-bnd-4", "The escape hatch",
+                    "Value from elsewhere, shape you are willing to vouch for. Fill in the assertion.",
+                    'interface Config {\n  retries: number;\n  verbose: boolean;\n}\n'
+                    'const fromElsewhere: any = { retries: 3, verbose: true };\n'
+                    'const cfg = fromElsewhere as Config;\n'
+                    'console.log(`${cfg.retries} ${cfg.verbose}`);\n',
+                    'fromElsewhere as Config',
+                    [("", "3 true")],
+                    hints=["The `as` keyword asserts a type — remember it checks nothing at runtime.",
+                           "Write fromElsewhere as Config."],
+                    difficulty="Easy"),
+                _ex("tscourse-w8-bnd-5", "Trust only what passed",
+                    "Total up the rows that survived validation, ignoring the rest. Fill in the fold.",
+                    'interface Row {\n  name: string;\n  amount: number;\n  ok: boolean;\n}\n'
+                    'const rows: Row[] = [\n'
+                    '  { name: "a", amount: 3, ok: true },\n'
+                    '  { name: "b", amount: 99, ok: false },\n'
+                    '  { name: "c", amount: 4, ok: true },\n'
+                    '];\n'
+                    'const total = rows.filter((r) => r.ok).reduce((sum, r) => sum + r.amount, 0);\n'
+                    'console.log(total);\n',
+                    '.reduce((sum, r) => sum + r.amount, 0)',
+                    [("", "7")],
+                    hints=["Filter first so the fold only ever sees good rows.",
+                           "Start the accumulator at 0 and add each row's amount."],
+                    difficulty="Medium"),
+                _fix("tscourse-w8-bnd-fix1", "Fix the any that hid a bug",
+                     "This should print `Total: 4.25`, but `any` let a string through where a number was meant. Type the shape honestly and convert at the boundary.",
+                     'const raw: any = { name: "coffee", amount: "3.25" };\n'
+                     'console.log(`Total: ${raw.amount + 1}`);\n',
+                     'interface RawEntry {\n  name: string;\n  amount: string;\n}\n'
+                     'const raw: RawEntry = { name: "coffee", amount: "3.25" };\n'
+                     'console.log(`Total: ${Number(raw.amount) + 1}`);\n',
+                     [("", "Total: 4.25")],
+                     hints=["`amount` really is text — say so in an interface instead of hiding it under any.",
+                            "Then convert it with Number(...) where you actually do arithmetic."],
+                     difficulty="Medium"),
+                _fix("tscourse-w8-bnd-fix2", "Fix the poisoned total",
+                     "One unparseable value turns the whole total into NaN. It should print 15.00.",
+                     'function toAmount(text: string): number {\n'
+                     '  return Number(text);\n}\n'
+                     'const values = ["10", "oops", "5"];\n'
+                     'let total = 0;\n'
+                     'for (const v of values) total = total + toAmount(v);\n'
+                     'console.log(total.toFixed(2));\n',
+                     'function toAmount(text: string): number {\n'
+                     '  const n = Number(text);\n'
+                     '  if (Number.isNaN(n)) return 0;\n'
+                     '  return n;\n}\n'
+                     'const values = ["10", "oops", "5"];\n'
+                     'let total = 0;\n'
+                     'for (const v of values) total = total + toAmount(v);\n'
+                     'console.log(total.toFixed(2));\n',
+                     [("", "15.00")],
+                     hints=["Anything added to NaN is NaN, so one bad value ruins every later sum.",
+                            "Guard inside toAmount with Number.isNaN and fall back to 0."]),
+                _fix("tscourse-w8-bnd-fix3", "Fix the swapped fields",
+                     "The types all line up, yet this prints `12 costs NaN`. The fields are being read out of the split line in the wrong order.",
+                     'interface Item {\n  name: string;\n  price: number;\n}\n'
+                     'function toItem(line: string): Item {\n'
+                     '  const parts = line.split(",");\n'
+                     '  return { name: parts[1], price: Number(parts[0]) };\n}\n'
+                     'const it = toItem("book,12");\n'
+                     'console.log(`${it.name} costs ${it.price}`);\n',
+                     'interface Item {\n  name: string;\n  price: number;\n}\n'
+                     'function toItem(line: string): Item {\n'
+                     '  const parts = line.split(",");\n'
+                     '  return { name: parts[0], price: Number(parts[1]) };\n}\n'
+                     'const it = toItem("book,12");\n'
+                     'console.log(`${it.name} costs ${it.price}`);\n',
+                     [("", "book costs 12")],
+                     hints=["parts[0] is the text before the comma; parts[1] is after it.",
+                            "The compiler cannot catch this — both fields still receive the right kind of value."],
+                     difficulty="Medium"),
+                _ch("tscourse-w8-bnd-ch1", "A validating boundary", "Hard",
+                    "Each line is `name,amount`. Write the `Entry` shape and `parseEntry`: reject a line that hasn't got exactly two fields, whose amount doesn't parse, or whose amount is negative — marking it `ok: false` with an amount of 0 — and accept everything else with the name trimmed.",
+                    _FS +
+                    'interface Entry {\n  name: string;\n  amount: number;\n  ok: boolean;\n}\n'
+                    'function parseEntry(line: string): Entry {\n'
+                    '  const parts = line.split(",");\n'
+                    '  if (parts.length !== 2) return { name: line.trim(), amount: 0, ok: false };\n'
+                    '  const amount = Number(parts[1].trim());\n'
+                    '  if (Number.isNaN(amount) || amount < 0) {\n'
+                    '    return { name: parts[0].trim(), amount: 0, ok: false };\n'
+                    '  }\n'
+                    '  return { name: parts[0].trim(), amount, ok: true };\n}\n'
+                    'const lines = fs.readFileSync(0, "utf8").trim().split("\\n")\n'
+                    '  .filter((l) => l.trim().length > 0);\n'
+                    'const entries: Entry[] = lines.map((l) => parseEntry(l));\n'
+                    'const good = entries.filter((e) => e.ok);\n'
+                    'const total = good.reduce((sum, e) => sum + e.amount, 0);\n'
+                    'for (const e of good) console.log(`${e.name}: $${e.amount.toFixed(2)}`);\n'
+                    'console.log(`Accepted ${good.length}, rejected ${entries.length - good.length}, total $${total.toFixed(2)}`);\n',
+                    'interface Entry {\n  name: string;\n  amount: number;\n  ok: boolean;\n}\n'
+                    'function parseEntry(line: string): Entry {\n'
+                    '  const parts = line.split(",");\n'
+                    '  if (parts.length !== 2) return { name: line.trim(), amount: 0, ok: false };\n'
+                    '  const amount = Number(parts[1].trim());\n'
+                    '  if (Number.isNaN(amount) || amount < 0) {\n'
+                    '    return { name: parts[0].trim(), amount: 0, ok: false };\n'
+                    '  }\n'
+                    '  return { name: parts[0].trim(), amount, ok: true };\n}',
+                    [("coffee, 3.25\nbroken\nbook, 12\nbad, -4",
+                      "coffee: $3.25\nbook: $12.00\nAccepted 2, rejected 2, total $15.25"),
+                     ("a,1\nb,2", "a: $1.00\nb: $2.00\nAccepted 2, rejected 0, total $3.00"),
+                     ("nope", "Accepted 0, rejected 1, total $0.00")],
+                    hints=["Entry needs three fields: the name, the amount, and whether the line survived.",
+                           "Write the rejections as guard clauses, one per thing that can go wrong.",
+                           "Number.isNaN(amount) catches unparseable text; amount < 0 catches the impossible price.",
+                           "The happy path returns at the end with ok: true and the trimmed name."]),
+            ],
+            quiz=[
+                _q("What survives into the running program?",
+                   ["the annotations", "only the values and the code — annotations are erased",
+                    "interfaces but not type aliases", "everything"], 1,
+                   "Which is why runtime data needs runtime checks."),
+                _q("`Number(\"oops\")` produces…",
+                   ["a type error", "NaN, whose type is number", "0", "undefined"], 1,
+                   "The annotation is satisfied and the value is still wrong."),
+                _q("The point of a single boundary function is that…",
+                   ["it is faster", "everything downstream can trust its types",
+                    "it avoids interfaces", "it removes the need for guards"], 1,
+                   "Validate once, at the edge; trust everywhere inside."),
+                _q("`as` should be used…",
+                   ["whenever the compiler complains", "sparingly, right after a check you performed yourself",
+                    "instead of interfaces", "to convert strings to numbers"], 1,
+                   "It silences the compiler without checking anything."),
+            ],
+        ),
     ],
     capstone=_cap_auto(
         "Budget Buddy #8 — the typed ledger",
@@ -10014,7 +11155,7 @@ annotation and starts feeling like a proof assistant. The checks are all
 JavaScript you already know — `typeof`, `===`, `in`, `Array.isArray`,
 truthiness. What's new is that the *type* changes as you check.
 
-⏱️ Budget about **five hours**.
+⏱️ Budget about **six hours**, spread over several sittings.
 """,
     objectives=[
         "Write union types and say what you may do with an un-narrowed union",
@@ -10024,9 +11165,11 @@ truthiness. What's new is that the *type* changes as you check.
         "Narrow with truthiness, in, Array.isArray and instanceof",
         "Design and consume a discriminated union",
         "Prove a switch is exhaustive with never, and combine types with &",
+        "Write a custom type guard whose return annotation narrows its argument",
+        "Use a predicate with filter to narrow a whole array's element type",
     ],
     why="Almost every interesting value in a real program is 'one of several things' — loaded or loading or failed, guest or member, found or missing. Unions plus narrowing are how TypeScript makes those cases impossible to forget.",
-    est_minutes=300,
+    est_minutes=360,
     glossary=[
         _gloss("union", "A type that is one of several: number | string."),
         _gloss("member (of a union)", "One of the alternatives in a union."),
@@ -10044,6 +11187,10 @@ truthiness. What's new is that the *type* changes as you check.
         _gloss("never", "The type with no values — what remains when every case is handled."),
         _gloss("intersection (&)", "A type having ALL the members of both: A & B."),
         _gloss("narrowing by assignment", "Assigning a value narrows the variable's type from then on."),
+        _gloss("type predicate", "A return annotation of the form `v is T` that tells the compiler what true means."),
+        _gloss("custom type guard", "A function you wrote whose result narrows the value you passed it."),
+        _gloss("assertion function", "`asserts v is T` — narrows from the call site onward, or stops the program."),
+        _gloss("filter narrowing", "Passing a predicate to filter, so the result comes back as the narrower array."),
     ],
     cheatsheet="""
 ```ts
@@ -10114,6 +11261,8 @@ type Row = Timestamped & { desc: string };   // has BOTH members
         "Can you say when to use `in` rather than `typeof`?",
         "Can you design a discriminated union for two shapes and write a function over it?",
         "Can you explain how the `never` trick catches a forgotten case?",
+        "Can you say why a helper annotated `: boolean` fails to narrow, and fix it?",
+        "Can you filter a mixed array into a narrower one using a predicate you wrote?",
     ],
     review=[
         _q("On an un-narrowed `number | string` you may use…",
@@ -10147,6 +11296,16 @@ type Row = Timestamped & { desc: string };   // has BOTH members
            ["the members share a tag", "the members have no tag but different fields",
             "shape is a number", "never"], 1,
            "It distinguishes object shapes by the presence of a key."),
+        _q("A helper annotated `: boolean` used in an `if` narrows the argument to…",
+           ["the matching member", "nothing", "never", "unknown"], 1,
+           "A plain boolean carries no information about which member matched."),
+        _q("The name on the left of `is` in a predicate must be…",
+           ["any identifier", "one of the function's parameters", "a type", "the return value"], 1,
+           "The predicate narrows that particular parameter."),
+        _q("A predicate whose body is wrong is…",
+           ["rejected by the compiler", "believed anyway, which is worse than no guard",
+            "ignored at runtime", "converted to boolean"], 1,
+           "Keep the body an obvious restatement of the type."),
     ],
     milestone="Budget Buddy can now hold values that are 'a number or not applicable', and expense events that are one of several kinds — with the compiler refusing to let you forget a case.",
     lessons=[
@@ -10268,6 +11427,23 @@ lookups (found or not), external input (any of several shapes), and state
                      [("", "ABC")],
                      hints=["The `as number` cast lies to the compiler; at runtime it is still a string.",
                             "Check with typeof and handle both branches."],
+                     difficulty="Medium"),
+                _fix("tscourse-w9-uni-fix2", "Fix the half-handled union",
+                     "This should print `#AB` then `#7`, but it crashes on the number: the code assumed one member and asserted its way past the other.",
+                     'type Id = string | number;\n'
+                     'function show(id: Id): string {\n'
+                     '  return `#${(id as string).toUpperCase()}`;\n}\n'
+                     'console.log(show("ab"));\n'
+                     'console.log(show(7));\n',
+                     'type Id = string | number;\n'
+                     'function show(id: Id): string {\n'
+                     '  if (typeof id === "string") return `#${id.toUpperCase()}`;\n'
+                     '  return `#${id}`;\n}\n'
+                     'console.log(show("ab"));\n'
+                     'console.log(show(7));\n',
+                     [("", "#AB\n#7")],
+                     hints=["A union means you must handle every member, not assert the awkward one away.",
+                            "Narrow with typeof, then handle the number case on its own line."],
                      difficulty="Medium"),
             ],
             quiz=[
@@ -10421,6 +11597,24 @@ of values a runtime range check is usually kinder.
                      [("", "paid")],
                      hints=["`let` widened the type to string, forcing a cast to paper over it.",
                             "Declare it with const and the cast becomes unnecessary."],
+                     difficulty="Medium"),
+                _fix("tscourse-w9-lit-fix2", "Fix the literal typo",
+                     "Both lines come back unticked. The comparison is against a spelling that is not in the union at all — exactly the mistake literal types exist to catch.",
+                     'type Status = "todo" | "done";\n'
+                     'function icon(s: Status): string {\n'
+                     '  if (s === ("Done" as Status)) return "[x]";\n'
+                     '  return "[ ]";\n}\n'
+                     'console.log(icon("done"));\n'
+                     'console.log(icon("todo"));\n',
+                     'type Status = "todo" | "done";\n'
+                     'function icon(s: Status): string {\n'
+                     '  if (s === "done") return "[x]";\n'
+                     '  return "[ ]";\n}\n'
+                     'console.log(icon("done"));\n'
+                     'console.log(icon("todo"));\n',
+                     [("", "[x]\n[ ]")],
+                     hints=["The union has no member spelled with a capital letter.",
+                            "Remove the assertion and compare against the exact literal \"done\"."],
                      difficulty="Medium"),
             ],
             quiz=[
@@ -10736,6 +11930,43 @@ v.toUpperCase();      // ✅ TypeScript knows it is a string right now
                      [("paid", "Settled"), ("pending", "Waiting")],
                      hints=["Without break, execution falls into the next case.",
                             "Add break; to the paid case."],
+                     difficulty="Medium"),
+                _fix("tscourse-w9-eq-fix2", "Fix the fallthrough",
+                     "This should print `1 2 3`. One case forgets to break, so it runs on into the next one and overwrites its own answer.",
+                     'type Level = "low" | "mid" | "high";\n'
+                     'function score(l: Level): number {\n'
+                     '  let n = 0;\n'
+                     '  switch (l) {\n'
+                     '    case "low":\n'
+                     '      n = 1;\n'
+                     '    case "mid":\n'
+                     '      n = 2;\n'
+                     '      break;\n'
+                     '    case "high":\n'
+                     '      n = 3;\n'
+                     '      break;\n'
+                     '  }\n'
+                     '  return n;\n}\n'
+                     'console.log(`${score("low")} ${score("mid")} ${score("high")}`);\n',
+                     'type Level = "low" | "mid" | "high";\n'
+                     'function score(l: Level): number {\n'
+                     '  let n = 0;\n'
+                     '  switch (l) {\n'
+                     '    case "low":\n'
+                     '      n = 1;\n'
+                     '      break;\n'
+                     '    case "mid":\n'
+                     '      n = 2;\n'
+                     '      break;\n'
+                     '    case "high":\n'
+                     '      n = 3;\n'
+                     '      break;\n'
+                     '  }\n'
+                     '  return n;\n}\n'
+                     'console.log(`${score("low")} ${score("mid")} ${score("high")}`);\n',
+                     [("", "1 2 3")],
+                     hints=["A case without break keeps running into the case below it.",
+                            "This is why a switch of returns is safer than a switch of assignments."],
                      difficulty="Medium"),
             ],
             quiz=[
@@ -11349,6 +12580,303 @@ type Impossible = string & number;      // never
                    "No value can be both, so the type is empty."),
             ],
         ),
+        # ---- Lesson 8 --------------------------------------------------
+        _lesson(
+            "w9-predicates", "Custom type guards",
+            "Teach the compiler to narrow through a function you wrote yourself.",
+            """
+Every narrowing you have done so far happened **inline** — `typeof`, `===`, `in`,
+a `switch` on `kind`. The moment you move that test into a helper, the narrowing
+evaporates:
+
+```ts
+function isCircle(s: Shape): boolean {
+  return s.kind === "circle";
+}
+
+if (isCircle(s)) {
+  console.log(s.r);    // ✗ Property 'r' does not exist on type 'Shape'
+}
+```
+
+TypeScript sees a function returning `boolean`. It has no idea *what* that
+boolean means. You have to say so — in the return position:
+
+```ts
+function isCircle(s: Shape): s is Circle {   // ← a type predicate
+  return s.kind === "circle";
+}
+
+if (isCircle(s)) {
+  console.log(s.r);    // ✓ narrowed to Circle
+}
+```
+
+`s is Circle` reads: *"when this returns true, the argument named `s` is a
+`Circle`"*. The parameter name on the left must be one of the function's own
+parameters.
+
+**The payoff is `filter`.** This is the moment custom guards stop being a
+curiosity:
+
+```ts
+const values = ["gold", "wood", "silver"];
+const coins: Coin[] = values.filter(isCoin);   // string[] → Coin[]
+```
+
+Without the predicate, `filter` hands back `string[]` and you are stuck casting.
+With it, the narrowed element type flows out of the filter for free — every
+later line knows it is holding coins.
+
+**You are responsible for the truth of it.** A predicate is an *assertion*, in
+the same family as `as`: the compiler believes the signature and never checks the
+body. A guard whose body is wrong is worse than no guard, because now everything
+downstream is confidently wrong.
+
+```ts
+function isCoin(v: string): v is Coin {
+  return v.length > 0;      // ← compiles. Also completely untrue.
+}
+```
+
+Keep the body a direct, obvious restatement of the type — one comparison per
+member, nothing clever.
+
+**Assertion functions** are the other half. Instead of returning a boolean they
+narrow the caller's variable from that line on, and stop the program if the check
+fails:
+
+```ts
+function assertNumber(v: unknown): asserts v is number {
+  if (typeof v !== "number") throw new Error("not a number");
+}
+
+assertNumber(raw);
+console.log(raw + 1);   // raw is a number from here down
+```
+
+(`throw` gets a proper treatment in Month 4 — for now read it as *"stop, this
+should never have happened"*.) Use `asserts` for conditions that are genuinely
+impossible if the program is correct, and a plain predicate for conditions you
+expect to encounter and handle.
+
+> ⚠️ **Common mistakes:** annotating the helper `: boolean` and wondering why
+> narrowing is lost; naming a different variable on the left of `is`; writing a
+> body that doesn't really establish the type; and reaching for `as` after the
+> guard, which is a sign the predicate should have been written properly.
+""",
+            warmup=[
+                _q("`function isCircle(s: Shape): boolean` used in an `if` narrows `s` to…",
+                   ["Circle", "nothing — it stays Shape", "unknown", "never"], 1,
+                   "A plain boolean carries no information about which member matched."),
+                _q("The correct return annotation for a custom guard is…",
+                   ["boolean", "s is Circle", "Circle", "asserts Circle"], 1,
+                   "The predicate names a parameter and the type it establishes."),
+                _q("`values.filter(isCoin)` where `isCoin` is a predicate returns…",
+                   ["string[]", "Coin[]", "boolean[]", "unknown[]"], 1,
+                   "The narrowed element type flows out of filter."),
+                _q("If a predicate's body is wrong, TypeScript…",
+                   ["reports an error", "believes it anyway", "falls back to boolean", "throws at runtime"], 1,
+                   "It is an assertion — the signature is taken on trust."),
+            ],
+            exercises=[
+                _ex("tscourse-w9-pred-1", "Write the predicate",
+                    "Give `isCoin` a return annotation that narrows a string to a Coin.",
+                    'type Coin = "gold" | "silver";\n'
+                    'function isCoin(v: string): v is Coin {\n'
+                    '  return v === "gold" || v === "silver";\n}\n'
+                    'const values = ["gold", "wood", "silver"];\n'
+                    'const coins: Coin[] = values.filter(isCoin);\n'
+                    'console.log(coins.join(","));\n',
+                    'v is Coin', [("", "gold,silver")],
+                    hints=["Name the parameter, then `is`, then the type it establishes.",
+                           "Write v is Coin."]),
+                _ex("tscourse-w9-pred-2", "Narrow in an if",
+                    "Fill in the body of the guard so each shape takes the right branch.",
+                    'interface Circle {\n  kind: "circle";\n  r: number;\n}\n'
+                    'interface Square {\n  kind: "square";\n  side: number;\n}\n'
+                    'type Shape = Circle | Square;\n'
+                    'function isCircle(s: Shape): s is Circle {\n'
+                    '  return s.kind === "circle";\n}\n'
+                    'const shapes: Shape[] = [{ kind: "circle", r: 2 }, { kind: "square", side: 3 }];\n'
+                    'for (const s of shapes) {\n'
+                    '  if (isCircle(s)) console.log(`circle area ${(Math.PI * s.r * s.r).toFixed(2)}`);\n'
+                    '  else console.log(`square area ${s.side * s.side}`);\n'
+                    '}\n',
+                    'return s.kind === "circle";',
+                    [("", "circle area 12.57\nsquare area 9")],
+                    hints=["The body is the same discriminant check you would write inline.",
+                           'Write return s.kind === "circle";'],
+                    difficulty="Easy"),
+                _ex("tscourse-w9-pred-3", "Guard, then trust",
+                    "`label` should reject anything that isn't a Status before using it. Add the rejecting guard.",
+                    'type Status = "todo" | "doing" | "done";\n'
+                    'function isStatus(v: string): v is Status {\n'
+                    '  return v === "todo" || v === "doing" || v === "done";\n}\n'
+                    'function label(v: string): string {\n'
+                    '  if (!isStatus(v)) return `unknown(${v})`;\n'
+                    '  return v.toUpperCase();\n}\n'
+                    'console.log(label("done"));\n'
+                    'console.log(label("wat"));\n',
+                    'if (!isStatus(v)) return `unknown(${v})`;',
+                    [("", "DONE\nunknown(wat)")],
+                    hints=["A guard clause: reject the bad case first, then the happy path runs narrowed.",
+                           "Negate the predicate and return early."],
+                    difficulty="Easy"),
+                _ex("tscourse-w9-pred-4", "Filter into a narrower array",
+                    "Keep only the published posts, then total their views. Fill in the filtering step.",
+                    'interface Draft {\n  kind: "draft";\n  title: string;\n}\n'
+                    'interface Published {\n  kind: "published";\n  title: string;\n  views: number;\n}\n'
+                    'type Post = Draft | Published;\n'
+                    'function isPublished(p: Post): p is Published {\n'
+                    '  return p.kind === "published";\n}\n'
+                    'const posts: Post[] = [\n'
+                    '  { kind: "draft", title: "a" },\n'
+                    '  { kind: "published", title: "b", views: 10 },\n'
+                    '  { kind: "published", title: "c", views: 5 },\n'
+                    '];\n'
+                    'const live = posts.filter(isPublished);\n'
+                    'const total = live.reduce((sum, p) => sum + p.views, 0);\n'
+                    'console.log(`${live.length} live, ${total} views`);\n',
+                    'posts.filter(isPublished)',
+                    [("", "2 live, 15 views")],
+                    hints=["Pass the predicate itself to filter — no arrow function needed.",
+                           "Because it is a predicate, `live` comes out as Published[], so `.views` is available."],
+                    difficulty="Medium"),
+                _ex("tscourse-w9-pred-5", "An assertion function",
+                    "Fill in the annotation that makes this narrow its argument from the call site onwards.",
+                    'function assertNumber(v: unknown): asserts v is number {\n'
+                    '  if (typeof v !== "number") throw new Error("not a number");\n}\n'
+                    'const raw: unknown = 42;\n'
+                    'assertNumber(raw);\n'
+                    'console.log(raw + 1);\n',
+                    'asserts v is number', [("", "43")],
+                    hints=["An assertion function's return annotation starts with the word asserts.",
+                           "Write asserts v is number."],
+                    difficulty="Medium"),
+                _fix("tscourse-w9-pred-fix1", "Fix the lying predicate",
+                     "This should keep only `gold,silver`, but the guard's body doesn't actually establish the type — it accepts anything non-empty.",
+                     'type Coin = "gold" | "silver";\n'
+                     'function isCoin(v: string): v is Coin {\n'
+                     '  return v.length > 0;\n}\n'
+                     'const values = ["gold", "wood", "silver"];\n'
+                     'console.log(values.filter(isCoin).join(","));\n',
+                     'type Coin = "gold" | "silver";\n'
+                     'function isCoin(v: string): v is Coin {\n'
+                     '  return v === "gold" || v === "silver";\n}\n'
+                     'const values = ["gold", "wood", "silver"];\n'
+                     'console.log(values.filter(isCoin).join(","));\n',
+                     [("", "gold,silver")],
+                     hints=["The compiler believed the signature and never looked at the body.",
+                            "Test the value against each member of the union."],
+                     difficulty="Medium"),
+                _fix("tscourse-w9-pred-fix2", "Fix the impossible condition",
+                     "Every label comes back as unknown. The guard asks for a value that is two things at once.",
+                     'type Status = "todo" | "done";\n'
+                     'function isStatus(v: string): v is Status {\n'
+                     '  return v === "todo" && v === "done";\n}\n'
+                     'function label(v: string): string {\n'
+                     '  if (!isStatus(v)) return `unknown(${v})`;\n'
+                     '  return v.toUpperCase();\n}\n'
+                     'console.log(label("done"));\n'
+                     'console.log(label("todo"));\n'
+                     'console.log(label("wat"));\n',
+                     'type Status = "todo" | "done";\n'
+                     'function isStatus(v: string): v is Status {\n'
+                     '  return v === "todo" || v === "done";\n}\n'
+                     'function label(v: string): string {\n'
+                     '  if (!isStatus(v)) return `unknown(${v})`;\n'
+                     '  return v.toUpperCase();\n}\n'
+                     'console.log(label("done"));\n'
+                     'console.log(label("todo"));\n'
+                     'console.log(label("wat"));\n',
+                     [("", "DONE\nTODO\nunknown(wat)")],
+                     hints=["No single string can equal both members.",
+                            "Membership of a union is an OR, not an AND."]),
+                _fix("tscourse-w9-pred-fix3", "Fix the wrong field",
+                     "This should report `2 live` but reports 0 — the guard is comparing the wrong property against the tag.",
+                     'interface Draft {\n  kind: "draft";\n  title: string;\n}\n'
+                     'interface Published {\n  kind: "published";\n  title: string;\n  views: number;\n}\n'
+                     'type Post = Draft | Published;\n'
+                     'function isPublished(p: Post): p is Published {\n'
+                     '  return p.title === "published";\n}\n'
+                     'const posts: Post[] = [\n'
+                     '  { kind: "draft", title: "a" },\n'
+                     '  { kind: "published", title: "b", views: 10 },\n'
+                     '  { kind: "published", title: "c", views: 5 },\n'
+                     '];\n'
+                     'console.log(`${posts.filter(isPublished).length} live`);\n',
+                     'interface Draft {\n  kind: "draft";\n  title: string;\n}\n'
+                     'interface Published {\n  kind: "published";\n  title: string;\n  views: number;\n}\n'
+                     'type Post = Draft | Published;\n'
+                     'function isPublished(p: Post): p is Published {\n'
+                     '  return p.kind === "published";\n}\n'
+                     'const posts: Post[] = [\n'
+                     '  { kind: "draft", title: "a" },\n'
+                     '  { kind: "published", title: "b", views: 10 },\n'
+                     '  { kind: "published", title: "c", views: 5 },\n'
+                     '];\n'
+                     'console.log(`${posts.filter(isPublished).length} live`);\n',
+                     [("", "2 live")],
+                     hints=["The discriminant is the `kind` field, not the title.",
+                            "Both fields are strings, so the compiler had no way to object."],
+                     difficulty="Medium"),
+                _ch("tscourse-w9-pred-ch1", "Split a stream with guards", "Hard",
+                    "Events arrive as `add,<number>` or `note,<text>`. Write the two predicates `isAdd` and `isNote`, then use them to build the total of every add and the list of every note.",
+                    _FS +
+                    'interface Add {\n  kind: "add";\n  amount: number;\n}\n'
+                    'interface Note {\n  kind: "note";\n  text: string;\n}\n'
+                    'type Event = Add | Note;\n'
+                    'function toEvent(line: string): Event {\n'
+                    '  const parts = line.split(",");\n'
+                    '  if (parts[0].trim() === "add") return { kind: "add", amount: Number(parts[1]) };\n'
+                    '  return { kind: "note", text: parts[1].trim() };\n}\n'
+                    'function isAdd(e: Event): e is Add {\n'
+                    '  return e.kind === "add";\n}\n'
+                    'function isNote(e: Event): e is Note {\n'
+                    '  return e.kind === "note";\n}\n'
+                    'const lines = fs.readFileSync(0, "utf8").trim().split("\\n")\n'
+                    '  .filter((l) => l.trim().length > 0);\n'
+                    'const events: Event[] = lines.map(toEvent);\n'
+                    'const total = events.filter(isAdd).reduce((sum, e) => sum + e.amount, 0);\n'
+                    'const notes = events.filter(isNote).map((e) => e.text);\n'
+                    'console.log(`Total: ${total}`);\n'
+                    'console.log(`Notes: ${notes.join(" | ")}`);\n',
+                    'function isAdd(e: Event): e is Add {\n'
+                    '  return e.kind === "add";\n}\n'
+                    'function isNote(e: Event): e is Note {\n'
+                    '  return e.kind === "note";\n}\n'
+                    'const lines = fs.readFileSync(0, "utf8").trim().split("\\n")\n'
+                    '  .filter((l) => l.trim().length > 0);\n'
+                    'const events: Event[] = lines.map(toEvent);\n'
+                    'const total = events.filter(isAdd).reduce((sum, e) => sum + e.amount, 0);\n'
+                    'const notes = events.filter(isNote).map((e) => e.text);',
+                    [("add,10\nnote,hello\nadd,5\nnote,bye", "Total: 15\nNotes: hello | bye"),
+                     ("note,x\nnote,y", "Total: 0\nNotes: x | y"),
+                     ("add,7", "Total: 7\nNotes:")],
+                    hints=["Each predicate is one line: compare the `kind` tag to its literal.",
+                           "Filtering with a predicate gives you an Add[] and a Note[], so .amount and .text are both safe.",
+                           "reduce over the adds with a starting accumulator of 0.",
+                           "map the notes to their text before joining them."]),
+            ],
+            quiz=[
+                _q("`function isCoin(v: string): v is Coin` differs from `: boolean` because…",
+                   ["it is faster", "it tells the compiler what a true result means",
+                    "it validates at runtime", "it cannot be used in filter"], 1,
+                   "That is the entire content of a type predicate."),
+                _q("The name on the left of `is` must be…",
+                   ["any identifier", "one of the function's own parameters", "the return value", "a type"], 1,
+                   "The predicate narrows that specific parameter."),
+                _q("Passing a predicate to `filter` gives you…",
+                   ["a boolean array", "an array of the narrowed type",
+                    "the original array", "an error"], 1,
+                   "Which is why predicates are worth writing at all."),
+                _q("An `asserts v is number` function…",
+                   ["returns a boolean", "narrows v from the call site on, and stops the program otherwise",
+                    "converts v to a number", "is checked by the compiler"], 1,
+                   "Use it for conditions that should be impossible."),
+            ],
+        ),
     ],
     capstone=_cap_auto(
         "Budget Buddy #9 — the event log",
@@ -11544,7 +13072,7 @@ idea applied more sharply.
 The runtime code in this week's drills is deliberately simple; the difficulty
 lives in the signatures. Read them slowly, and lean on the quizzes.
 
-⏱️ Budget about **five hours**.
+⏱️ Budget about **six hours**, spread over several sittings.
 """,
     objectives=[
         "Say what problem generics solve, and why `any` is not the answer",
@@ -11554,9 +13082,11 @@ lives in the signatures. Read them slowly, and lean on the quizzes.
         "Use keyof and indexed access to type a field-plucking helper",
         "Declare generic type aliases and interfaces, including a Result type",
         "Give a type parameter a default, and recognise when a generic is overkill",
+        "Write a generic helper that takes a callback and changes the type on the way through",
+        "Decide when a second type parameter earns its place — and when it does not",
     ],
     why="Every array method, every Promise, every collection and every well-typed utility in the ecosystem is generic. Reading them fluently — and writing your own when a helper would otherwise need `any` — is the difference between using TypeScript and fighting it.",
-    est_minutes=300,
+    est_minutes=360,
     glossary=[
         _gloss("generic", "A function, type or interface parameterised by a type."),
         _gloss("type parameter", "The placeholder declared in angle brackets: <T>."),
@@ -11573,6 +13103,10 @@ lives in the signatures. Read them slowly, and lean on the quizzes.
         _gloss("Record<K, V>", "A built-in generic object type (week 12)."),
         _gloss("any", "Turns checking off. A generic keeps the information instead."),
         _gloss("unknown", "Accepts anything but must be narrowed. Safe, but loses the caller's type."),
+        _gloss("higher-order generic", "A generic function that takes a function, letting the callback decide the output type."),
+        _gloss("U", "By convention the second type parameter — usually what a callback returns."),
+        _gloss("pinned parameter", "A callback return type fixed to string or number because the helper indexes or compares with it."),
+        _gloss("Array<T>", "The same type as T[], written in the generic form."),
     ],
     cheatsheet="""
 ```ts
@@ -11623,6 +13157,8 @@ const o: Options = { items: ["a"] };      // T defaults to string
         "Can you say what `keyof User` is, for a User with id and age?",
         "Can you declare a generic interface and use it at two different types?",
         "Can you name a case where a generic would be pointless?",
+        "Can you write mapAll, groupBy and maxBy from scratch, with the right type parameters?",
+        "Can you say where each type parameter is inferred from at a call site?",
     ],
     review=[
         _q("`<T>` in a function signature declares…",
@@ -11658,6 +13194,16 @@ const o: Options = { items: ["a"] };      // T defaults to string
         _q("`function f<T>(x: T): T` called as `f(\"a\")` returns a value of type…",
            ["string", '"a"', "any", "unknown"], 0,
            "Inference widens the literal to string here."),
+        _q("In `mapAll<T, U>(xs: T[], f: (x: T) => U): U[]`, `U` is inferred from…",
+           ["the array", "what the callback returns", "the call site only", "the return statement"], 1,
+           "The callback decides the output element type."),
+        _q("`groupBy<T>(xs: T[], key: (x: T) => string)` pins the callback's return to string because…",
+           ["strings are faster", "the helper uses it as an object key", "T must be a string", "generics demand it"], 1,
+           "Object keys are strings, so that position cannot stay open."),
+        _q("A type parameter that appears in exactly one position…",
+           ["is required", "relates nothing, and can usually be a concrete type",
+            "must be constrained", "is inferred last"], 1,
+           "A type parameter earns its keep by tying two positions together."),
     ],
     milestone="Budget Buddy's helpers now work over any record type at all, and its parser hands back a typed Result — the same shapes real libraries expose. Month 3 is half done.",
     lessons=[
@@ -11791,6 +13337,19 @@ doing nothing.
                      hints=["With any, calling toFixed on a string raised no complaint at all.",
                             "Parameterise the type, then call a method the value actually has."],
                      difficulty="Medium"),
+                _fix("tscourse-w10-why-fix2", "Fix the off-by-one helper",
+                     "The generic signature is right, but `first` hands back the second element. It should print 10 then a.",
+                     'function first<T>(xs: T[]): T {\n'
+                     '  return xs[1];\n}\n'
+                     'console.log(first([10, 20, 30]));\n'
+                     'console.log(first(["a", "b"]));\n',
+                     'function first<T>(xs: T[]): T {\n'
+                     '  return xs[0];\n}\n'
+                     'console.log(first([10, 20, 30]));\n'
+                     'console.log(first(["a", "b"]));\n',
+                     [("", "10\na")],
+                     hints=["Generics make the types line up; they cannot make the logic correct.",
+                            "Array positions start at 0."]),
             ],
             quiz=[
                 _q("`unknown[]` instead of a generic means the caller must…",
@@ -11941,6 +13500,18 @@ the way down.
                      [("", "a\n42")],
                      hints=["<T> is declared but the signature still says string everywhere.",
                             "Use T for the parameter and the return, then it works for numbers too."],
+                     difficulty="Medium"),
+                _fix("tscourse-w10-fn-fix2", "Fix the swap that doesn't swap",
+                     "`swap` promises `[B, A]` but hands the pair back untouched — and a double assertion hid it. It should print `1,a`.",
+                     'function swap<A, B>(pair: [A, B]): [B, A] {\n'
+                     '  return [pair[0], pair[1]] as unknown as [B, A];\n}\n'
+                     'console.log(swap(["a", 1]).join(","));\n',
+                     'function swap<A, B>(pair: [A, B]): [B, A] {\n'
+                     '  return [pair[1], pair[0]];\n}\n'
+                     'console.log(swap(["a", 1]).join(","));\n',
+                     [("", "1,a")],
+                     hints=["Without the assertion, the compiler would have rejected this immediately.",
+                            "Return the second slot first: [pair[1], pair[0]]."],
                      difficulty="Medium"),
             ],
             quiz=[
@@ -12259,6 +13830,20 @@ are what make a generic *usable* rather than merely general.
                      [("", "ABC")],
                      hints=["The caller passed strings but got back something with only a length.",
                             "Parameterise with T constrained by the shape, then the string survives."],
+                     difficulty="Medium"),
+                _fix("tscourse-w10-con-fix2", "Fix the reversed comparison",
+                     "`longest` is constrained to things that have a length, but it keeps returning the shorter one. It should print `there` then 3.",
+                     'function longest<T extends { length: number }>(a: T, b: T): T {\n'
+                     '  return a.length < b.length ? a : b;\n}\n'
+                     'console.log(longest("hi", "there"));\n'
+                     'console.log(longest([1, 2, 3], [1]).length);\n',
+                     'function longest<T extends { length: number }>(a: T, b: T): T {\n'
+                     '  return a.length > b.length ? a : b;\n}\n'
+                     'console.log(longest("hi", "there"));\n'
+                     'console.log(longest([1, 2, 3], [1]).length);\n',
+                     [("", "there\n3")],
+                     hints=["The constraint guarantees `.length` exists; it says nothing about which way you compare.",
+                            "Keep a when its length is greater."],
                      difficulty="Medium"),
             ],
             quiz=[
@@ -12778,6 +14363,311 @@ ecosystem opens up.
                    "'For any T, and any key K of T, …'"),
             ],
         ),
+        # ---- Lesson 8 --------------------------------------------------
+        _lesson(
+            "w10-hof", "Generics that take functions",
+            "Two type parameters, with a callback carrying you from one to the other.",
+            """
+Every generic helper you have written so far kept the same type all the way
+through: `T` in, `T` out. The helpers you actually use every day are more
+interesting than that — they **change** the type on the way through, and the
+callback is what decides the new one.
+
+Look at `map`, written out longhand:
+
+```ts
+function mapAll<T, U>(xs: T[], f: (x: T) => U): U[] {
+  const out: U[] = [];
+  for (const x of xs) out.push(f(x));
+  return out;
+}
+
+mapAll([1, 2, 3], (n) => n * 2);        // T = number, U = number  → number[]
+mapAll(["a", "bb"], (s) => s.length);   // T = string, U = number  → number[]
+```
+
+Two parameters, two different jobs:
+
+| parameter | where it comes from |
+|---|---|
+| `T` | inferred from the array you pass |
+| `U` | inferred from **what the callback returns** |
+
+Neither is written at the call site. You describe the *relationship* — "give me
+an array of whatever this function hands back" — and inference fills in the rest.
+This is the whole idea of generics arriving at its most useful form.
+
+**The shape recurs everywhere.** Once you can read `<T, U>` you can write the
+standard toolkit:
+
+```ts
+function groupBy<T>(xs: T[], key: (x: T) => string): { [k: string]: T[] } { … }
+function uniqueBy<T>(xs: T[], key: (x: T) => string): T[] { … }
+function maxBy<T>(xs: T[], score: (x: T) => number): T { … }
+function zip<A, B>(as: A[], bs: B[]): Array<[A, B]> { … }
+```
+
+Note the pattern in the first three: the callback's *return* type is fixed
+(`string`, `number`) because the helper needs to compare or index with it, while
+`T` stays free. That combination — one parameter open, one pinned — is what makes
+them usable on any record shape you invent later.
+
+**`zip` needs two open parameters** because it genuinely relates two independent
+things, and the tuple `[A, B]` records that relationship in the result. `T[]` and
+`Array<T>` are the same notation, by the way; `Array<[A, B]>` is just easier to
+read than `[A, B][]`.
+
+**Naming.** `T` and `U` are fine for a helper that truly works on anything.
+`K`/`V` are conventional for a key and value. Once a parameter means something
+specific to your domain, spell it out — `<Row>` reads far better than `<T>` in a
+function that only makes sense over table rows.
+
+**When inference has nothing to work from, say it yourself:**
+
+```ts
+const nums = emptyOf<number>();   // no argument, so nothing to infer from
+```
+
+Explicit type arguments are the exception, not the rule — needing them on a call
+that *does* pass data usually means the signature is describing the wrong
+relationship.
+
+> ⚠️ **Common mistakes:** pushing the original item instead of the callback's
+> result, so `U` is a lie; forgetting the callback's parameter type is `T` and
+> annotating it `any`; and giving a helper two type parameters when the second
+> one only ever appears once — if `U` shows up in exactly one place, it isn't
+> relating anything and can be a concrete type.
+""",
+            warmup=[
+                _q("In `mapAll<T, U>(xs: T[], f: (x: T) => U): U[]`, where does `U` come from?",
+                   ["the array", "the callback's return type", "the call site, always", "the return statement"], 1,
+                   "Inference reads it off what the callback hands back."),
+                _q("`mapAll([\"a\", \"bb\"], (s) => s.length)` has type…",
+                   ["string[]", "number[]", "unknown[]", "(string | number)[]"], 1,
+                   "T is string, U is number, so the result is number[]."),
+                _q("`Array<[A, B]>` and `[A, B][]` are…",
+                   ["different types", "the same type written two ways", "only valid for tuples", "an error"], 1,
+                   "Pick whichever reads better in context."),
+                _q("A helper whose second type parameter appears only once…",
+                   ["is optimal", "probably doesn't need to be generic there",
+                    "cannot compile", "must be constrained"], 1,
+                   "A type parameter earns its keep by relating two positions."),
+            ],
+            exercises=[
+                _ex("tscourse-w10-hof-1", "Type the callback",
+                    "Fill in the callback's parameter, so `mapAll` takes a `T` and produces a `U`.",
+                    'function mapAll<T, U>(xs: T[], f: (x: T) => U): U[] {\n'
+                    '  const out: U[] = [];\n'
+                    '  for (const x of xs) out.push(f(x));\n'
+                    '  return out;\n}\n'
+                    'console.log(mapAll([1, 2, 3], (n) => n * 2).join(","));\n'
+                    'console.log(mapAll(["a", "bb"], (s) => s.length).join(","));\n',
+                    'f: (x: T) => U', [("", "2,4,6\n1,2")],
+                    hints=["The callback receives an element of the input array and returns an element of the output.",
+                           "Write f: (x: T) => U."]),
+                _ex("tscourse-w10-hof-2", "Generic groupBy",
+                    "Finish the bucket step so any array can be grouped by any key function.",
+                    'function groupBy<T>(xs: T[], key: (x: T) => string): { [k: string]: T[] } {\n'
+                    '  const out: { [k: string]: T[] } = {};\n'
+                    '  for (const x of xs) {\n'
+                    '    const k = key(x);\n'
+                    '    out[k] = out[k] ?? [];\n'
+                    '    out[k].push(x);\n'
+                    '  }\n'
+                    '  return out;\n}\n'
+                    'const words = ["ant", "bee", "ape"];\n'
+                    'const byLetter = groupBy(words, (w) => w[0]);\n'
+                    'console.log(Object.keys(byLetter).sort().join(","));\n'
+                    'console.log(byLetter["a"].join(" "));\n',
+                    'out[k].push(x);', [("", "a,b\nant ape")],
+                    hints=["The bucket already exists by this line — add the item to it.",
+                           "Push the item itself, not the key."],
+                    difficulty="Easy"),
+                _ex("tscourse-w10-hof-3", "Two open parameters",
+                    "`zip` pairs two independent arrays. Fill in its return annotation.",
+                    'function zip<A, B>(as: A[], bs: B[]): Array<[A, B]> {\n'
+                    '  const out: Array<[A, B]> = [];\n'
+                    '  const n = Math.min(as.length, bs.length);\n'
+                    '  for (let i = 0; i < n; i++) out.push([as[i], bs[i]]);\n'
+                    '  return out;\n}\n'
+                    'const pairs = zip(["a", "b", "c"], [1, 2]);\n'
+                    'console.log(pairs.map((p) => `${p[0]}=${p[1]}`).join(","));\n',
+                    'Array<[A, B]> {', [("", "a=1,b=2")],
+                    hints=["Each element pairs one A with one B — that is a two-element tuple.",
+                           "The result is an array of those tuples: Array<[A, B]>."],
+                    difficulty="Medium"),
+                _ex("tscourse-w10-hof-4", "Generic uniqueBy",
+                    "Keep the first record for each key and skip the rest. Add the skipping check.",
+                    'function uniqueBy<T>(xs: T[], key: (x: T) => string): T[] {\n'
+                    '  const seen: { [k: string]: boolean } = {};\n'
+                    '  const out: T[] = [];\n'
+                    '  for (const x of xs) {\n'
+                    '    const k = key(x);\n'
+                    '    if (seen[k]) continue;\n'
+                    '    seen[k] = true;\n'
+                    '    out.push(x);\n'
+                    '  }\n'
+                    '  return out;\n}\n'
+                    'const people = [\n'
+                    '  { name: "ada", city: "london" },\n'
+                    '  { name: "alan", city: "london" },\n'
+                    '  { name: "grace", city: "ny" },\n'
+                    '];\n'
+                    'console.log(uniqueBy(people, (p) => p.city).map((p) => p.name).join(","));\n',
+                    'if (seen[k]) continue;', [("", "ada,grace")],
+                    hints=["If this key has been recorded already, move on to the next item.",
+                           "Write if (seen[k]) continue;"],
+                    difficulty="Medium"),
+                _ex("tscourse-w10-hof-5", "Say it when nothing can be inferred",
+                    "There is no argument to infer from here, so supply the type argument yourself.",
+                    'function emptyOf<T>(): T[] {\n'
+                    '  return [];\n}\n'
+                    'const nums = emptyOf<number>();\n'
+                    'nums.push(1);\n'
+                    'nums.push(2);\n'
+                    'console.log(nums.join(","));\n',
+                    'emptyOf<number>()', [("", "1,2")],
+                    hints=["Type arguments go in angle brackets between the name and the parentheses.",
+                           "Write emptyOf<number>()."],
+                    difficulty="Easy"),
+                _fix("tscourse-w10-hof-fix1", "Fix the ignored callback",
+                     "This should print `2,4,6` but prints the originals — the callback's result is being thrown away.",
+                     'function mapAll<T, U>(xs: T[], f: (x: T) => U): U[] {\n'
+                     '  const out: U[] = [];\n'
+                     '  for (const x of xs) out.push(x as unknown as U);\n'
+                     '  return out;\n}\n'
+                     'console.log(mapAll([1, 2, 3], (n) => n * 2).join(","));\n',
+                     'function mapAll<T, U>(xs: T[], f: (x: T) => U): U[] {\n'
+                     '  const out: U[] = [];\n'
+                     '  for (const x of xs) out.push(f(x));\n'
+                     '  return out;\n}\n'
+                     'console.log(mapAll([1, 2, 3], (n) => n * 2).join(","));\n',
+                     [("", "2,4,6")],
+                     hints=["The double assertion was silencing the very error that would have caught this.",
+                            "Push what the callback returns: out.push(f(x))."],
+                     difficulty="Medium"),
+                _fix("tscourse-w10-hof-fix2", "Fix the overrun",
+                     "Zipping a three-element array with a two-element one should give two pairs, but a third appears with an undefined half.",
+                     'function zip<A, B>(as: A[], bs: B[]): Array<[A, B]> {\n'
+                     '  const out: Array<[A, B]> = [];\n'
+                     '  const n = as.length;\n'
+                     '  for (let i = 0; i < n; i++) out.push([as[i], bs[i]]);\n'
+                     '  return out;\n}\n'
+                     'const pairs = zip(["a", "b", "c"], [1, 2]);\n'
+                     'console.log(pairs.map((p) => `${p[0]}=${p[1]}`).join(","));\n',
+                     'function zip<A, B>(as: A[], bs: B[]): Array<[A, B]> {\n'
+                     '  const out: Array<[A, B]> = [];\n'
+                     '  const n = Math.min(as.length, bs.length);\n'
+                     '  for (let i = 0; i < n; i++) out.push([as[i], bs[i]]);\n'
+                     '  return out;\n}\n'
+                     'const pairs = zip(["a", "b", "c"], [1, 2]);\n'
+                     'console.log(pairs.map((p) => `${p[0]}=${p[1]}`).join(","));\n',
+                     [("", "a=1,b=2")],
+                     hints=["Reading past the end of the shorter array gives undefined.",
+                            "Stop at Math.min(as.length, bs.length)."]),
+                _fix("tscourse-w10-hof-fix3", "Fix the forgetful set",
+                     "This should print `ada,grace` but keeps every record — nothing is ever recorded as seen.",
+                     'function uniqueBy<T>(xs: T[], key: (x: T) => string): T[] {\n'
+                     '  const seen: { [k: string]: boolean } = {};\n'
+                     '  const out: T[] = [];\n'
+                     '  for (const x of xs) {\n'
+                     '    const k = key(x);\n'
+                     '    if (seen[k]) continue;\n'
+                     '    out.push(x);\n'
+                     '  }\n'
+                     '  return out;\n}\n'
+                     'const people = [\n'
+                     '  { name: "ada", city: "london" },\n'
+                     '  { name: "alan", city: "london" },\n'
+                     '  { name: "grace", city: "ny" },\n'
+                     '];\n'
+                     'console.log(uniqueBy(people, (p) => p.city).map((p) => p.name).join(","));\n',
+                     'function uniqueBy<T>(xs: T[], key: (x: T) => string): T[] {\n'
+                     '  const seen: { [k: string]: boolean } = {};\n'
+                     '  const out: T[] = [];\n'
+                     '  for (const x of xs) {\n'
+                     '    const k = key(x);\n'
+                     '    if (seen[k]) continue;\n'
+                     '    seen[k] = true;\n'
+                     '    out.push(x);\n'
+                     '  }\n'
+                     '  return out;\n}\n'
+                     'const people = [\n'
+                     '  { name: "ada", city: "london" },\n'
+                     '  { name: "alan", city: "london" },\n'
+                     '  { name: "grace", city: "ny" },\n'
+                     '];\n'
+                     'console.log(uniqueBy(people, (p) => p.city).map((p) => p.name).join(","));\n',
+                     [("", "ada,grace")],
+                     hints=["The check reads `seen`, but nothing ever writes to it.",
+                            "Mark the key before pushing: seen[k] = true;"],
+                     difficulty="Medium"),
+                _ch("tscourse-w10-hof-ch1", "A generic reporting toolkit", "Hard",
+                    "Write two helpers that work on any record type. `countBy(xs, key)` counts items per key; `maxBy(xs, score)` returns the item with the highest score. The program then reports sales per region and the single biggest sale.",
+                    _FS +
+                    'interface Sale {\n  region: string;\n  amount: number;\n}\n'
+                    'function countBy<T>(xs: T[], key: (x: T) => string): { [k: string]: number } {\n'
+                    '  const out: { [k: string]: number } = {};\n'
+                    '  for (const x of xs) {\n'
+                    '    const k = key(x);\n'
+                    '    out[k] = (out[k] ?? 0) + 1;\n'
+                    '  }\n'
+                    '  return out;\n}\n'
+                    'function maxBy<T>(xs: T[], score: (x: T) => number): T {\n'
+                    '  let best = xs[0];\n'
+                    '  for (const x of xs) {\n'
+                    '    if (score(x) > score(best)) best = x;\n'
+                    '  }\n'
+                    '  return best;\n}\n'
+                    'const sales: Sale[] = fs.readFileSync(0, "utf8").trim().split("\\n")\n'
+                    '  .filter((l) => l.trim().length > 0)\n'
+                    '  .map((l) => {\n'
+                    '    const parts = l.split(",");\n'
+                    '    return { region: parts[0].trim(), amount: Number(parts[1]) };\n'
+                    '  });\n'
+                    'const counts = countBy(sales, (s) => s.region);\n'
+                    'for (const r of Object.keys(counts).sort()) console.log(`${r}: ${counts[r]}`);\n'
+                    'const top = maxBy(sales, (s) => s.amount);\n'
+                    'console.log(`Top: ${top.region} ${top.amount}`);\n',
+                    'function countBy<T>(xs: T[], key: (x: T) => string): { [k: string]: number } {\n'
+                    '  const out: { [k: string]: number } = {};\n'
+                    '  for (const x of xs) {\n'
+                    '    const k = key(x);\n'
+                    '    out[k] = (out[k] ?? 0) + 1;\n'
+                    '  }\n'
+                    '  return out;\n}\n'
+                    'function maxBy<T>(xs: T[], score: (x: T) => number): T {\n'
+                    '  let best = xs[0];\n'
+                    '  for (const x of xs) {\n'
+                    '    if (score(x) > score(best)) best = x;\n'
+                    '  }\n'
+                    '  return best;\n}',
+                    [("north,30\nsouth,20\nnorth,12", "north: 2\nsouth: 1\nTop: north 30"),
+                     ("a,5\nb,9", "a: 1\nb: 1\nTop: b 9"),
+                     ("solo,7", "solo: 1\nTop: solo 7")],
+                    hints=["Both helpers keep T open and pin the callback's return type — string for a key, number for a score.",
+                           "countBy is the tally pattern with (out[k] ?? 0) + 1.",
+                           "maxBy tracks a running best, starting from the first element.",
+                           "Neither helper mentions Sale anywhere — that is the point of writing them generically."]),
+            ],
+            quiz=[
+                _q("In `mapAll<T, U>`, `U` is determined by…",
+                   ["the input array", "what the callback returns", "the call site only", "the return statement's variable"], 1,
+                   "Inference reads U off the callback's result type."),
+                _q("`groupBy<T>(xs: T[], key: (x: T) => string)` pins the callback's return to `string` because…",
+                   ["strings are faster", "the helper uses it as an object key",
+                    "T must be a string", "generics require it"], 1,
+                   "Object keys are strings, so that position cannot stay open."),
+                _q("`zip` needs two type parameters because…",
+                   ["it takes two arguments", "it relates two independent element types in the result",
+                    "tuples require it", "inference fails otherwise"], 1,
+                   "The tuple [A, B] carries both through to the output."),
+                _q("You should write explicit type arguments…",
+                   ["always", "rarely — mainly when there is no argument to infer from",
+                    "never", "whenever there are two parameters"], 1,
+                   "Needing them on a call that does pass data is usually a signature smell."),
+            ],
+        ),
     ],
     capstone=_cap_auto(
         "Budget Buddy #10 — a generic toolkit",
@@ -13029,10 +14919,11 @@ TS_COURSE = {
     "subtitle": (
         "An 8-month, week-by-week course from your very first line of code to "
         "interview-ready — DSA solved in TypeScript and deep type-system mastery. "
-        "Each foundation week is around five hours of study across six or seven "
+        "Each authored week is five to six hours of study across seven to nine "
         "lessons, with a goal, warm-ups that make you predict the output, "
-        "fill-in-the-blank drills, fix-the-bug programs, hint ladders, a "
-        "glossary, a cheat sheet, and a growing capstone project (Budget Buddy). "
+        "fill-in-the-blank drills, fix-the-bug programs, an integrative "
+        "challenge, hint ladders, a glossary, a cheat sheet, and a growing "
+        "capstone project (Budget Buddy). "
         "Nothing ever requires syntax a later week hasn't taught yet."
     ),
     "weeks": _WEEKS,
