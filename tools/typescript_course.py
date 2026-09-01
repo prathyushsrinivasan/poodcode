@@ -156,7 +156,7 @@ you've solved.
         "Name the type of a value, annotate a variable, and convert between text and numbers",
     ],
     why="Every program you will ever write holds values and shows results. Everything later — decisions, loops, functions, whole applications — is built on this floor.",
-    est_minutes=300,
+    est_minutes=280,
     glossary=[
         _gloss("statement", "One instruction. Statements run top to bottom, usually one per line, ending in a semicolon."),
         _gloss("expression", "Anything that produces a value: 2 + 3, \"hi\", price * qty."),
@@ -1102,7 +1102,7 @@ slicing, padding, replacing, and converting text to numbers. None of them is
 hard on its own. The skill is knowing which one to reach for, which comes from
 using each of them a dozen times. That's what this week is.
 
-⏱️ Budget about **five hours**, spread over several sittings.
+⏱️ Budget about **six hours**, spread over several sittings.
 """,
     objectives=[
         "Read a line of input and trim it",
@@ -1114,7 +1114,7 @@ using each of them a dozen times. That's what this week is.
         "Convert text to numbers with Number and parseInt, and spot NaN",
     ],
     why="Every real program has an edge where text comes in — a form field, a filename, a command, a CSV cell. Cleaning and interrogating that text is a daily job, not a beginner exercise.",
-    est_minutes=300,
+    est_minutes=350,
     glossary=[
         _gloss("standard input", "The stream of text a program reads — here, whatever the user types."),
         _gloss("fs.readFileSync(0, \"utf8\")", "Reads all of standard input as one string. The 0 means 'the input stream'."),
@@ -2184,7 +2184,7 @@ the wrong order, an `||` that should be `&&`. So this week leans hard on the
 "fix the bug" drills — the ordering trap in lesson 3 in particular is one you
 will meet in production code for the rest of your career.
 
-⏱️ Budget about **five hours**.
+⏱️ Budget about **seven hours**, spread over several sittings.
 """,
     objectives=[
         "Produce and print booleans with === , !== , < , > , <= , >=",
@@ -2196,7 +2196,7 @@ will meet in production code for the rest of your career.
         "Dispatch on a fixed set of options with switch, including fall-through",
     ],
     why="Access control, pricing tiers, validation, routing, retries — every branch point in every application you will ever work on is one of these constructs. Getting the boundaries right is most of what correctness means.",
-    est_minutes=300,
+    est_minutes=410,
     glossary=[
         _gloss("boolean", "A value that is either true or false."),
         _gloss("condition", "An expression evaluated for its truth, e.g. n > 10."),
@@ -3401,7 +3401,7 @@ Loops are also where you'll meet your first *hang*: a loop whose condition never
 becomes false runs forever. That's normal, it happens to everyone, and lesson 1
 shows you exactly what causes it.
 
-⏱️ Budget about **five hours**.
+⏱️ Budget about **seven hours**, spread over several sittings.
 """,
     objectives=[
         "Write a while loop and trace its variables by hand",
@@ -3414,7 +3414,7 @@ shows you exactly what causes it.
         "Nest loops to produce rows and columns",
     ],
     why="A loop is how you turn one calculation into a report, one comparison into a search, one character into a parser. Everything from summing a column to rendering a frame is this.",
-    est_minutes=300,
+    est_minutes=440,
     glossary=[
         _gloss("loop", "Code that repeats while a condition holds."),
         _gloss("iteration", "One pass through the loop body."),
@@ -4670,7 +4670,7 @@ is where TypeScript really starts to earn its name. The compiler checks every
 call site against that signature, so a wrong argument is caught while you type
 rather than at 3am.
 
-⏱️ Budget about **six hours**, spread over several sittings.
+⏱️ Budget about **nine hours**, spread over several sittings.
 """,
     objectives=[
         "Declare a function with parameters, a return type, and a return value",
@@ -4685,7 +4685,7 @@ rather than at 3am.
         "Trace a nested call by substituting each return value, and extract a helper on the third repetition",
     ],
     why="Functions are how you stop a program growing into an unreadable sheet of statements. Every abstraction you will ever build — modules, classes, components, APIs — is this idea repeated at a larger scale.",
-    est_minutes=360,
+    est_minutes=540,
     glossary=[
         _gloss("function", "Named, reusable logic that takes inputs and returns a value."),
         _gloss("parameter", "A named input, written in the declaration."),
@@ -6351,7 +6351,7 @@ want*; the loop that does the same thing says *how to get it*, and you have to
 read all five lines to find out. Learn both — you need the loop when the
 operation doesn't fit a method, and the method every other time.
 
-⏱️ Budget about **six hours**, spread over several sittings.
+⏱️ Budget about **eight and a half hours**, spread over several sittings.
 """,
     objectives=[
         "Create arrays, index them, and reach the last element safely",
@@ -6365,7 +6365,7 @@ operation doesn't fit a method, and the method every other time.
         "Choose the order of a chain, and copy an array before sorting it",
     ],
     why="Every list you will ever process — search results, table rows, log lines, basket items — is an array. The methods in this week are the vocabulary of day-to-day data work.",
-    est_minutes=360,
+    est_minutes=510,
     glossary=[
         _gloss("array", "An ordered list of values: [3, 5, 7]."),
         _gloss("element", "One value inside an array."),
@@ -7810,7 +7810,7 @@ not be there), passing them around, processing lists of them, the sharing
 behaviour that catches everyone out, and using an object as a **lookup table** —
 which is the single most useful trick in the whole course.
 
-⏱️ Budget about **six hours**, spread over several sittings.
+⏱️ Budget about **nine hours**, spread over several sittings.
 """,
     objectives=[
         "Create objects, read fields with dot access, and update or add fields",
@@ -7825,7 +7825,7 @@ which is the single most useful trick in the whole course.
         "Summarise each bucket and print the report in a stable, sorted order",
     ],
     why="Objects are how a program talks about the real world — a user, an order, a row, a config. Once you can model data as records and process a list of them, you can write actual applications.",
-    est_minutes=360,
+    est_minutes=550,
     glossary=[
         _gloss("object", "A bundle of named values: { name: \"Ada\" }."),
         _gloss("property / field / key", "One named slot on an object."),
@@ -9446,7 +9446,7 @@ Two things to keep straight all week:
 The week closes with **`reduce`**, the last of the big array methods and the one
 that generalises all the others.
 
-⏱️ Budget about **six hours**, spread over several sittings.
+⏱️ Budget about **nine hours**, spread over several sittings.
 """,
     objectives=[
         "Annotate values and functions, and know when inference is enough",
@@ -9460,7 +9460,7 @@ that generalises all the others.
         "Write a boundary function that turns untrusted text into a typed, checked record",
     ],
     why="A named type is documentation the compiler enforces. It is the cheapest bug prevention available, and it is what makes a codebase survive being edited six months later by someone who has forgotten it.",
-    est_minutes=360,
+    est_minutes=550,
     glossary=[
         _gloss("annotation", "A written type after a colon: let n: number."),
         _gloss("inference", "TypeScript working the type out from the value."),
@@ -11155,7 +11155,7 @@ annotation and starts feeling like a proof assistant. The checks are all
 JavaScript you already know — `typeof`, `===`, `in`, `Array.isArray`,
 truthiness. What's new is that the *type* changes as you check.
 
-⏱️ Budget about **six hours**, spread over several sittings.
+⏱️ Budget about **ten hours**, spread over several sittings.
 """,
     objectives=[
         "Write union types and say what you may do with an un-narrowed union",
@@ -11169,7 +11169,7 @@ truthiness. What's new is that the *type* changes as you check.
         "Use a predicate with filter to narrow a whole array's element type",
     ],
     why="Almost every interesting value in a real program is 'one of several things' — loaded or loading or failed, guest or member, found or missing. Unions plus narrowing are how TypeScript makes those cases impossible to forget.",
-    est_minutes=360,
+    est_minutes=590,
     glossary=[
         _gloss("union", "A type that is one of several: number | string."),
         _gloss("member (of a union)", "One of the alternatives in a union."),
@@ -13072,7 +13072,7 @@ idea applied more sharply.
 The runtime code in this week's drills is deliberately simple; the difficulty
 lives in the signatures. Read them slowly, and lean on the quizzes.
 
-⏱️ Budget about **six hours**, spread over several sittings.
+⏱️ Budget about **ten hours**, spread over several sittings.
 """,
     objectives=[
         "Say what problem generics solve, and why `any` is not the answer",
@@ -13086,7 +13086,7 @@ lives in the signatures. Read them slowly, and lean on the quizzes.
         "Decide when a second type parameter earns its place — and when it does not",
     ],
     why="Every array method, every Promise, every collection and every well-typed utility in the ecosystem is generic. Reading them fluently — and writing your own when a helper would otherwise need `any` — is the difference between using TypeScript and fighting it.",
-    est_minutes=360,
+    est_minutes=580,
     glossary=[
         _gloss("generic", "A function, type or interface parameterised by a type."),
         _gloss("type parameter", "The placeholder declared in angle brackets: <T>."),
@@ -14919,7 +14919,7 @@ TS_COURSE = {
     "subtitle": (
         "An 8-month, week-by-week course from your very first line of code to "
         "interview-ready — DSA solved in TypeScript and deep type-system mastery. "
-        "Each authored week is five to six hours of study across seven to nine "
+        "Each authored week is five to ten hours of study across seven to nine "
         "lessons, with a goal, warm-ups that make you predict the output, "
         "fill-in-the-blank drills, fix-the-bug programs, an integrative "
         "challenge, hint ladders, a glossary, a cheat sheet, and a growing "

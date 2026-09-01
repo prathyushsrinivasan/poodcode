@@ -1,7 +1,7 @@
 {
   "key": "typescript",
   "title": "TypeScript: Zero to Interview",
-  "subtitle": "An 8-month, week-by-week course from your very first line of code to interview-ready — DSA solved in TypeScript and deep type-system mastery. Each authored week is five to six hours of study across seven to nine lessons, with a goal, warm-ups that make you predict the output, fill-in-the-blank drills, fix-the-bug programs, an integrative challenge, hint ladders, a glossary, a cheat sheet, and a growing capstone project (Budget Buddy). Nothing ever requires syntax a later week hasn't taught yet.",
+  "subtitle": "An 8-month, week-by-week course from your very first line of code to interview-ready — DSA solved in TypeScript and deep type-system mastery. Each authored week is five to ten hours of study across seven to nine lessons, with a goal, warm-ups that make you predict the output, fill-in-the-blank drills, fix-the-bug programs, an integrative challenge, hint ladders, a glossary, a cheat sheet, and a growing capstone project (Budget Buddy). Nothing ever requires syntax a later week hasn't taught yet.",
   "weeks": [
     {
       "number": 1,
@@ -1552,7 +1552,7 @@
         "Name the type of a value, annotate a variable, and convert between text and numbers"
       ],
       "why": "Every program you will ever write holds values and shows results. Everything later — decisions, loops, functions, whole applications — is built on this floor.",
-      "est_minutes": 300,
+      "est_minutes": 280,
       "glossary": [
         {
           "term": "statement",
@@ -1760,7 +1760,7 @@
       "month_title": "First Steps: Values, Logic & Loops",
       "theme": "Text & Input",
       "goal": "Read what the user types and reshape it: measure it, search it, slice it, pad it, and turn it into a number.",
-      "summary": "Last week your programs always printed the same thing. This week they **react**.\nAlmost every program from here on starts the same way:\n\n```ts\nimport * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n```\n\nThat reads everything the user typed as one string, and `.trim()` shaves off the\nnewline they pressed at the end.\n\nThe rest of the week is the **string toolbox** — the handful of operations you'll\nuse for the rest of your life: measuring, indexing, changing case, searching,\nslicing, padding, replacing, and converting text to numbers. None of them is\nhard on its own. The skill is knowing which one to reach for, which comes from\nusing each of them a dozen times. That's what this week is.\n\n⏱️ Budget about **five hours**, spread over several sittings.\n",
+      "summary": "Last week your programs always printed the same thing. This week they **react**.\nAlmost every program from here on starts the same way:\n\n```ts\nimport * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n```\n\nThat reads everything the user typed as one string, and `.trim()` shaves off the\nnewline they pressed at the end.\n\nThe rest of the week is the **string toolbox** — the handful of operations you'll\nuse for the rest of your life: measuring, indexing, changing case, searching,\nslicing, padding, replacing, and converting text to numbers. None of them is\nhard on its own. The skill is knowing which one to reach for, which comes from\nusing each of them a dozen times. That's what this week is.\n\n⏱️ Budget about **six hours**, spread over several sittings.\n",
       "authored": true,
       "lessons": [
         {
@@ -3701,7 +3701,7 @@
         "Convert text to numbers with Number and parseInt, and spot NaN"
       ],
       "why": "Every real program has an edge where text comes in — a form field, a filename, a command, a CSV cell. Cleaning and interrogating that text is a daily job, not a beginner exercise.",
-      "est_minutes": 300,
+      "est_minutes": 350,
       "glossary": [
         {
           "term": "standard input",
@@ -3897,7 +3897,7 @@
       "month_title": "First Steps: Values, Logic & Loops",
       "theme": "Making Decisions",
       "goal": "Branch on conditions with if/else, combine tests with boolean logic, and pick a value with a conditional expression or switch.",
-      "summary": "So far your programs run every line, every time. This week they start to\n**choose**. That single ability — do this *or* that, depending — is what turns\na calculator into software.\n\nFour things to get solid:\n\n1. **Comparisons** produce a `true`/`false` value you can store and print.\n2. **`if` / `else if` / `else`** picks one block of statements to run.\n3. **`&&`, `||`, `!`** combine conditions.\n4. **The conditional expression `a ? b : c`** and **`switch`** pick a *value*\n   rather than a block, which often reads far better.\n\nMost bugs in real code hide in decisions: a `>` that should be `>=`, branches in\nthe wrong order, an `||` that should be `&&`. So this week leans hard on the\n\"fix the bug\" drills — the ordering trap in lesson 3 in particular is one you\nwill meet in production code for the rest of your career.\n\n⏱️ Budget about **five hours**.\n",
+      "summary": "So far your programs run every line, every time. This week they start to\n**choose**. That single ability — do this *or* that, depending — is what turns\na calculator into software.\n\nFour things to get solid:\n\n1. **Comparisons** produce a `true`/`false` value you can store and print.\n2. **`if` / `else if` / `else`** picks one block of statements to run.\n3. **`&&`, `||`, `!`** combine conditions.\n4. **The conditional expression `a ? b : c`** and **`switch`** pick a *value*\n   rather than a block, which often reads far better.\n\nMost bugs in real code hide in decisions: a `>` that should be `>=`, branches in\nthe wrong order, an `||` that should be `&&`. So this week leans hard on the\n\"fix the bug\" drills — the ordering trap in lesson 3 in particular is one you\nwill meet in production code for the rest of your career.\n\n⏱️ Budget about **seven hours**, spread over several sittings.\n",
       "authored": true,
       "lessons": [
         {
@@ -6042,7 +6042,7 @@
         "Dispatch on a fixed set of options with switch, including fall-through"
       ],
       "why": "Access control, pricing tiers, validation, routing, retries — every branch point in every application you will ever work on is one of these constructs. Getting the boundaries right is most of what correctness means.",
-      "est_minutes": 300,
+      "est_minutes": 410,
       "glossary": [
         {
           "term": "boolean",
@@ -6245,7 +6245,7 @@
       "month_title": "First Steps: Values, Logic & Loops",
       "theme": "Loops",
       "goal": "Repeat work with while, for and for...of; accumulate results; steer with break and continue; and nest loops for grids.",
-      "summary": "Computers are unremarkable at any single instruction and extraordinary at doing\none a million times. This week you learn to say \"again\".\n\nFour ideas, and the third is the one that matters most:\n\n1. **`while`** — repeat while a condition holds.\n2. **`for`** — the same thing, packaged for counting.\n3. **The accumulator** — a variable that survives across iterations and builds\n   the answer: a running total, a counter, a best-so-far, a growing string.\n   Nearly every loop you will ever write is an accumulator loop.\n4. **`for...of`** — hand me each item in turn, no counter needed.\n\nThen `break`/`continue` for steering, and nested loops for anything\ntwo-dimensional.\n\nLoops are also where you'll meet your first *hang*: a loop whose condition never\nbecomes false runs forever. That's normal, it happens to everyone, and lesson 1\nshows you exactly what causes it.\n\n⏱️ Budget about **five hours**.\n",
+      "summary": "Computers are unremarkable at any single instruction and extraordinary at doing\none a million times. This week you learn to say \"again\".\n\nFour ideas, and the third is the one that matters most:\n\n1. **`while`** — repeat while a condition holds.\n2. **`for`** — the same thing, packaged for counting.\n3. **The accumulator** — a variable that survives across iterations and builds\n   the answer: a running total, a counter, a best-so-far, a growing string.\n   Nearly every loop you will ever write is an accumulator loop.\n4. **`for...of`** — hand me each item in turn, no counter needed.\n\nThen `break`/`continue` for steering, and nested loops for anything\ntwo-dimensional.\n\nLoops are also where you'll meet your first *hang*: a loop whose condition never\nbecomes false runs forever. That's normal, it happens to everyone, and lesson 1\nshows you exactly what causes it.\n\n⏱️ Budget about **seven hours**, spread over several sittings.\n",
       "authored": true,
       "lessons": [
         {
@@ -8276,7 +8276,7 @@
         "Nest loops to produce rows and columns"
       ],
       "why": "A loop is how you turn one calculation into a report, one comparison into a search, one character into a parser. Everything from summing a column to rendering a frame is this.",
-      "est_minutes": 300,
+      "est_minutes": 440,
       "glossary": [
         {
           "term": "loop",
@@ -8473,7 +8473,7 @@
       "month_title": "Data & Functions",
       "theme": "Functions",
       "goal": "Package logic into named, reusable functions with parameters, return values, guards, defaults and predictable behaviour.",
-      "summary": "Everything you've written so far has been one long script. This week you learn\nto **name a piece of logic** so you can use it again, test it on its own, and\nread it without re-deriving it.\n\nA **function** takes inputs (**parameters**), does something, and hands back a\n**return value**. That's it. But the consequences are large:\n\n- You write the tricky bit **once** and fix bugs in one place.\n- The name becomes documentation: `withTax(amount)` explains itself.\n- Each piece can be reasoned about alone, which is the only way anything big\n  stays understandable.\n\nYou'll also meet **annotations on the boundary** — `(x: number): number` — which\nis where TypeScript really starts to earn its name. The compiler checks every\ncall site against that signature, so a wrong argument is caught while you type\nrather than at 3am.\n\n⏱️ Budget about **six hours**, spread over several sittings.\n",
+      "summary": "Everything you've written so far has been one long script. This week you learn\nto **name a piece of logic** so you can use it again, test it on its own, and\nread it without re-deriving it.\n\nA **function** takes inputs (**parameters**), does something, and hands back a\n**return value**. That's it. But the consequences are large:\n\n- You write the tricky bit **once** and fix bugs in one place.\n- The name becomes documentation: `withTax(amount)` explains itself.\n- Each piece can be reasoned about alone, which is the only way anything big\n  stays understandable.\n\nYou'll also meet **annotations on the boundary** — `(x: number): number` — which\nis where TypeScript really starts to earn its name. The compiler checks every\ncall site against that signature, so a wrong argument is caught while you type\nrather than at 3am.\n\n⏱️ Budget about **nine hours**, spread over several sittings.\n",
       "authored": true,
       "lessons": [
         {
@@ -10747,7 +10747,7 @@
         "Trace a nested call by substituting each return value, and extract a helper on the third repetition"
       ],
       "why": "Functions are how you stop a program growing into an unreadable sheet of statements. Every abstraction you will ever build — modules, classes, components, APIs — is this idea repeated at a larger scale.",
-      "est_minutes": 360,
+      "est_minutes": 540,
       "glossary": [
         {
           "term": "function",
@@ -11012,7 +11012,7 @@
       "month_title": "Data & Functions",
       "theme": "Arrays",
       "goal": "Hold lists of values, walk them, reshape them with map/filter/find, and sort them correctly.",
-      "summary": "A variable holds one value. An **array** holds an ordered list of them, reached\nby position. Nearly all real data is a list — rows in a report, items in a\nbasket, results from a search — so this is the week your programs start looking\nlike real programs.\n\nTwo halves to it:\n\n1. **The manual half** — creating, indexing, looping, accumulating. This is last\n   week's accumulator pattern applied to lists, and it never stops being useful.\n2. **The method half** — `map`, `filter`, `find`, `some`, `every`, `sort`. Each\n   takes a small function (exactly what you learned to pass in week 5) and\n   describes an operation on the *whole* list in one line.\n\nThe methods are not just shorthand. `nums.filter((x) => x > 10)` says *what you\nwant*; the loop that does the same thing says *how to get it*, and you have to\nread all five lines to find out. Learn both — you need the loop when the\noperation doesn't fit a method, and the method every other time.\n\n⏱️ Budget about **six hours**, spread over several sittings.\n",
+      "summary": "A variable holds one value. An **array** holds an ordered list of them, reached\nby position. Nearly all real data is a list — rows in a report, items in a\nbasket, results from a search — so this is the week your programs start looking\nlike real programs.\n\nTwo halves to it:\n\n1. **The manual half** — creating, indexing, looping, accumulating. This is last\n   week's accumulator pattern applied to lists, and it never stops being useful.\n2. **The method half** — `map`, `filter`, `find`, `some`, `every`, `sort`. Each\n   takes a small function (exactly what you learned to pass in week 5) and\n   describes an operation on the *whole* list in one line.\n\nThe methods are not just shorthand. `nums.filter((x) => x > 10)` says *what you\nwant*; the loop that does the same thing says *how to get it*, and you have to\nread all five lines to find out. Learn both — you need the loop when the\noperation doesn't fit a method, and the method every other time.\n\n⏱️ Budget about **eight and a half hours**, spread over several sittings.\n",
       "authored": true,
       "lessons": [
         {
@@ -13337,7 +13337,7 @@
         "Choose the order of a chain, and copy an array before sorting it"
       ],
       "why": "Every list you will ever process — search results, table rows, log lines, basket items — is an array. The methods in this week are the vocabulary of day-to-day data work.",
-      "est_minutes": 360,
+      "est_minutes": 510,
       "glossary": [
         {
           "term": "array",
@@ -13596,7 +13596,7 @@
       "month_title": "Data & Functions",
       "theme": "Objects",
       "goal": "Model a 'thing' as a bundle of named fields, reach into it safely, and process arrays of records.",
-      "summary": "An array holds many values in a row. An **object** holds a few values *by name*:\n\n```ts\nconst expense = { desc: \"coffee\", amount: 3.25, paid: true };\n```\n\nArrays answer \"which one?\" with a number. Objects answer \"which one?\" with a\nword — and words are what real data is made of. An expense has a description,\nan amount and a paid flag; calling them `e[0]`, `e[1]`, `e[2]` would be\ntechnically possible and humanly hopeless.\n\nPut the two together and you get **an array of objects** — the shape of very\nnearly every dataset you will ever touch:\n\n```ts\nconst expenses = [\n  { desc: \"coffee\", amount: 3.25, paid: true },\n  { desc: \"book\",   amount: 12,   paid: false },\n];\n```\n\nThis week: building objects, reaching into them (including when a field might\nnot be there), passing them around, processing lists of them, the sharing\nbehaviour that catches everyone out, and using an object as a **lookup table** —\nwhich is the single most useful trick in the whole course.\n\n⏱️ Budget about **six hours**, spread over several sittings.\n",
+      "summary": "An array holds many values in a row. An **object** holds a few values *by name*:\n\n```ts\nconst expense = { desc: \"coffee\", amount: 3.25, paid: true };\n```\n\nArrays answer \"which one?\" with a number. Objects answer \"which one?\" with a\nword — and words are what real data is made of. An expense has a description,\nan amount and a paid flag; calling them `e[0]`, `e[1]`, `e[2]` would be\ntechnically possible and humanly hopeless.\n\nPut the two together and you get **an array of objects** — the shape of very\nnearly every dataset you will ever touch:\n\n```ts\nconst expenses = [\n  { desc: \"coffee\", amount: 3.25, paid: true },\n  { desc: \"book\",   amount: 12,   paid: false },\n];\n```\n\nThis week: building objects, reaching into them (including when a field might\nnot be there), passing them around, processing lists of them, the sharing\nbehaviour that catches everyone out, and using an object as a **lookup table** —\nwhich is the single most useful trick in the whole course.\n\n⏱️ Budget about **nine hours**, spread over several sittings.\n",
       "authored": true,
       "lessons": [
         {
@@ -15703,7 +15703,7 @@
         "Summarise each bucket and print the report in a stable, sorted order"
       ],
       "why": "Objects are how a program talks about the real world — a user, an order, a row, a config. Once you can model data as records and process a list of them, you can write actual applications.",
-      "est_minutes": 360,
+      "est_minutes": 550,
       "glossary": [
         {
           "term": "object",
@@ -15951,7 +15951,7 @@
       "month_title": "Data & Functions",
       "theme": "Types that Describe Your Data",
       "goal": "Name the shapes your program works with, let inference do the rest, and fold a list to one value with reduce.",
-      "summary": "You have been using types since week 1 — TypeScript worked most of them out\nsilently. This week you take the wheel: **naming** the shapes your data has, so\nthe compiler can check every place they're used.\n\nThe payoff is not decoration. Once `Expense` is a named type, a misspelled\n`e.amont`, a forgotten field, a string where a number belongs — each becomes a\nred squiggle as you type instead of a wrong number in a report. That is the\nentire reason TypeScript exists.\n\nTwo things to keep straight all week:\n\n- **Types are erased before the program runs.** Nothing you write here changes\n  behaviour at runtime. The drills therefore still exercise real logic; the\n  types describe it.\n- **Annotate boundaries, infer the middle.** Function parameters and returns,\n  and empty containers, are worth annotating. Local variables with an obvious\n  initialiser are not — `const n = 5` is already a `number`.\n\nThe week closes with **`reduce`**, the last of the big array methods and the one\nthat generalises all the others.\n\n⏱️ Budget about **six hours**, spread over several sittings.\n",
+      "summary": "You have been using types since week 1 — TypeScript worked most of them out\nsilently. This week you take the wheel: **naming** the shapes your data has, so\nthe compiler can check every place they're used.\n\nThe payoff is not decoration. Once `Expense` is a named type, a misspelled\n`e.amont`, a forgotten field, a string where a number belongs — each becomes a\nred squiggle as you type instead of a wrong number in a report. That is the\nentire reason TypeScript exists.\n\nTwo things to keep straight all week:\n\n- **Types are erased before the program runs.** Nothing you write here changes\n  behaviour at runtime. The drills therefore still exercise real logic; the\n  types describe it.\n- **Annotate boundaries, infer the middle.** Function parameters and returns,\n  and empty containers, are worth annotating. Local variables with an obvious\n  initialiser are not — `const n = 5` is already a `number`.\n\nThe week closes with **`reduce`**, the last of the big array methods and the one\nthat generalises all the others.\n\n⏱️ Budget about **nine hours**, spread over several sittings.\n",
       "authored": true,
       "lessons": [
         {
@@ -18032,7 +18032,7 @@
         "Write a boundary function that turns untrusted text into a typed, checked record"
       ],
       "why": "A named type is documentation the compiler enforces. It is the cheapest bug prevention available, and it is what makes a codebase survive being edited six months later by someone who has forgotten it.",
-      "est_minutes": 360,
+      "est_minutes": 550,
       "glossary": [
         {
           "term": "annotation",
@@ -18292,7 +18292,7 @@
       "month_title": "The Type System, Properly",
       "theme": "Unions & Narrowing",
       "goal": "Model a value that is 'one of several things', then prove to the compiler which one it is before using it.",
-      "summary": "Month 2 taught you to describe data that has **one** shape. Month 3 starts with\nthe far more common case: data that is **one of several** shapes.\n\n- A parsed field is a `number` **or** the string `\"n/a\"`.\n- A status is `\"paid\"` **or** `\"pending\"` **or** `\"failed\"`.\n- An API result is a success **or** an error.\n\nThat's a **union type**, written with `|`:\n\n```ts\ntype Result = number | string;\n```\n\nAnd immediately you hit the central problem. Given a `number | string`, you\ncannot call `.toFixed(2)` — it might be a string. You cannot call\n`.toUpperCase()` — it might be a number. On a union you may only use what **all**\nthe members have in common.\n\nThe way out is **narrowing**: writing an ordinary runtime check that TypeScript\nunderstands, after which it knows which member you have:\n\n```ts\nfunction show(v: number | string): string {\n  if (typeof v === \"number\") {\n    return v.toFixed(2);      // here, v is a number\n  }\n  return v.toUpperCase();     // here, it can only be a string\n}\n```\n\nThat is the whole week, and it is the moment TypeScript stops feeling like\nannotation and starts feeling like a proof assistant. The checks are all\nJavaScript you already know — `typeof`, `===`, `in`, `Array.isArray`,\ntruthiness. What's new is that the *type* changes as you check.\n\n⏱️ Budget about **six hours**, spread over several sittings.\n",
+      "summary": "Month 2 taught you to describe data that has **one** shape. Month 3 starts with\nthe far more common case: data that is **one of several** shapes.\n\n- A parsed field is a `number` **or** the string `\"n/a\"`.\n- A status is `\"paid\"` **or** `\"pending\"` **or** `\"failed\"`.\n- An API result is a success **or** an error.\n\nThat's a **union type**, written with `|`:\n\n```ts\ntype Result = number | string;\n```\n\nAnd immediately you hit the central problem. Given a `number | string`, you\ncannot call `.toFixed(2)` — it might be a string. You cannot call\n`.toUpperCase()` — it might be a number. On a union you may only use what **all**\nthe members have in common.\n\nThe way out is **narrowing**: writing an ordinary runtime check that TypeScript\nunderstands, after which it knows which member you have:\n\n```ts\nfunction show(v: number | string): string {\n  if (typeof v === \"number\") {\n    return v.toFixed(2);      // here, v is a number\n  }\n  return v.toUpperCase();     // here, it can only be a string\n}\n```\n\nThat is the whole week, and it is the moment TypeScript stops feeling like\nannotation and starts feeling like a proof assistant. The checks are all\nJavaScript you already know — `typeof`, `===`, `in`, `Array.isArray`,\ntruthiness. What's new is that the *type* changes as you check.\n\n⏱️ Budget about **ten hours**, spread over several sittings.\n",
       "authored": true,
       "lessons": [
         {
@@ -20461,7 +20461,7 @@
         "Use a predicate with filter to narrow a whole array's element type"
       ],
       "why": "Almost every interesting value in a real program is 'one of several things' — loaded or loading or failed, guest or member, found or missing. Unions plus narrowing are how TypeScript makes those cases impossible to forget.",
-      "est_minutes": 360,
+      "est_minutes": 590,
       "glossary": [
         {
           "term": "union",
@@ -20709,7 +20709,7 @@
       "month_title": "The Type System, Properly",
       "theme": "Generics",
       "goal": "Write one function or type that works over any type — without losing what the compiler knows about it.",
-      "summary": "Here is the problem generics exist to solve. You write a helper that returns the\nfirst element of an array:\n\n```ts\nfunction firstNumber(a: number[]): number { return a[0]; }\n```\n\nThen you need it for strings. And for records. You have three choices:\n\n1. **Copy it** for every element type — three functions that differ by one word.\n2. **Use `any`** — one function, and every caller loses all type information.\n3. **Make the type a parameter.**\n\nThe third is a **generic**:\n\n```ts\nfunction first<T>(a: T[]): T {\n  return a[0];\n}\n\nfirst([1, 2, 3]);        // T is number   -> returns number\nfirst([\"a\", \"b\"]);       // T is string   -> returns string\n```\n\n`<T>` declares a **type parameter** — a placeholder filled in at each call site,\nusually inferred so you never write it. One implementation, and the compiler\nstill knows that `first([\"a\"])` gives you a `string` with `.toUpperCase()` on it.\n\nThe mental model that makes generics click: **`T` is a variable whose value is a\ntype.** Everything else — constraints, `keyof`, generic interfaces — is that one\nidea applied more sharply.\n\nThe runtime code in this week's drills is deliberately simple; the difficulty\nlives in the signatures. Read them slowly, and lean on the quizzes.\n\n⏱️ Budget about **six hours**, spread over several sittings.\n",
+      "summary": "Here is the problem generics exist to solve. You write a helper that returns the\nfirst element of an array:\n\n```ts\nfunction firstNumber(a: number[]): number { return a[0]; }\n```\n\nThen you need it for strings. And for records. You have three choices:\n\n1. **Copy it** for every element type — three functions that differ by one word.\n2. **Use `any`** — one function, and every caller loses all type information.\n3. **Make the type a parameter.**\n\nThe third is a **generic**:\n\n```ts\nfunction first<T>(a: T[]): T {\n  return a[0];\n}\n\nfirst([1, 2, 3]);        // T is number   -> returns number\nfirst([\"a\", \"b\"]);       // T is string   -> returns string\n```\n\n`<T>` declares a **type parameter** — a placeholder filled in at each call site,\nusually inferred so you never write it. One implementation, and the compiler\nstill knows that `first([\"a\"])` gives you a `string` with `.toUpperCase()` on it.\n\nThe mental model that makes generics click: **`T` is a variable whose value is a\ntype.** Everything else — constraints, `keyof`, generic interfaces — is that one\nidea applied more sharply.\n\nThe runtime code in this week's drills is deliberately simple; the difficulty\nlives in the signatures. Read them slowly, and lean on the quizzes.\n\n⏱️ Budget about **ten hours**, spread over several sittings.\n",
       "authored": true,
       "lessons": [
         {
@@ -22728,7 +22728,7 @@
         "Decide when a second type parameter earns its place — and when it does not"
       ],
       "why": "Every array method, every Promise, every collection and every well-typed utility in the ecosystem is generic. Reading them fluently — and writing your own when a helper would otherwise need `any` — is the difference between using TypeScript and fighting it.",
-      "est_minutes": 360,
+      "est_minutes": 580,
       "glossary": [
         {
           "term": "generic",
