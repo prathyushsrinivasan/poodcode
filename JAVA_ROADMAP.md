@@ -13,9 +13,10 @@ looking it up.
 **Status legend** — ✅ built and shipping in the app · 🚧 partially built ·
 ⬜ planned.
 
-**Built so far:** Parts 1–6 in full (modules 1–20) — **20 modules, 97 lessons,
-422 judged exercises, plus 500 practice problems** in 100 variation families.
-Part 7 is the next thing to author.
+**Built so far:** Parts 1–6 in full (modules 1–20) and Part 7's first three
+modules (21–23) — **23 modules, 109 lessons, 473 judged exercises, plus 575
+practice problems** in 115 variation families. Module 24 (erasure) closes Part 7
+and is the next thing to author.
 
 ---
 
@@ -185,10 +186,49 @@ has to be chosen · grouping and inverting
 `Collections.sort` and `list.sort` · stability and the two-pass sort ·
 comparators in sorted collections · choosing a collection by cost
 
-## Part 7 — Generics ⬜ *(next up)*
+## Part 7 — Generics 🚧
 
-Generic classes · generic methods · type parameters · wildcards (`<?>`,
-`<? extends T>`, `<? super T>`) · why generics exist (and what erasure costs)
+Modules 21–24. Modules 17–20 *used* `List<String>` on every page without ever
+saying what the angle brackets were; this part is the answer, and it is
+sequenced so that each idea is the thing the previous one could not do.
+
+**21. Type parameters and generic classes** ✅
+Why generics exist (an `Object` field, a cast, and a `ClassCastException`) ·
+raw types and what they switch off · `class Box<T>` · type parameter vs type
+argument · the diamond · reference-type arguments only (`Box<int>` is illegal) ·
+`T` as a field, parameter and return type · several parameters (`Pair<A, B>`) ·
+nested type arguments · a container of your own wrapping a `List<T>` ·
+the three things a type parameter cannot do (`static T`, `new T()`, `new T[]`)
+
+**22. Generic methods and bounded type parameters** ✅
+`static <T>` and where the brackets go · type inference at the call site ·
+the type witness · one `T` tying two parameters together · why an unbounded `T`
+can only be moved around · `<T extends Comparable<T>>` · `<T extends Number>` ·
+`extends` meaning implements too · multiple bounds with `&` · bounds on a class
+(`class Range<T extends Comparable<T>>`) · generic interfaces, passing `T`
+through or fixing it · generic class vs generic method · a bound vs a
+`Comparator`
+
+**23. Wildcards** ✅
+Invariance: `List<Integer>` is not a `List<Number>` · array covariance and
+`ArrayStoreException` as the contrast · `List<?>` and why only `null` may be
+added · `<?>` vs a raw type · `? extends T` (producers) · `? super T`
+(consumers) · **PECS** · `copy(List<? super T>, List<? extends T>)` ·
+reading the JDK's own signatures (`sort(Comparator<? super E>)`,
+`addAll(Collection<? extends E>)`) · wildcard vs named type parameter ·
+never a wildcard in a return type
+
+**24. Erasure, and what it costs** ⬜ *(next up)*
+What the compiler actually emits · type arguments erased to their bound ·
+why `new T()`, `new T[]` and `static T` are illegal · `instanceof List<String>`
+and unchecked casts · unchecked warnings and `@SuppressWarnings` · heap
+pollution and `@SafeVarargs` · generic varargs · bridge methods · two overloads
+that erase to the same signature · `Class<T>` type tokens · interoperating with
+legacy raw-typed code
+
+*(The scope linter reserves `<T>`, `<A,`, `<K,` and friends for module 21 and
+`? extends` / `? super` / `<?>` for module 23, so no earlier module can reach
+for either.)*
 
 ## Part 8 — Java 8+ ⬜
 

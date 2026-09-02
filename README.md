@@ -86,7 +86,7 @@ Poodcode/
 │  ├─ tests/verify_java_course.rs     # proves every Java course solution passes
 │  ├─ seeds/problems.json      # the bundled original problem set
 │  ├─ seeds/backend_course.json       # Backend Lab: 7 CRUD-API build projects
-│  └─ seeds/java_course.json          # Java course: 20 modules past the basics
+│  └─ seeds/java_course.json          # Java course: 23 modules past the basics
 │
 ├─ tools/gen_seed.py           # generator that AUTHORS every seeds/*.json
 ├─ tools/backend_course.py     # authors seeds/backend_course.json
@@ -201,15 +201,19 @@ point where syntax knowledge has to turn into fluency. Twenty modules:
   queues, deques, stacks and heaps, then `Comparable`, `Comparator`, sorting,
   and choosing a collection by cost
 
-Parts 7 onwards — generics in depth, Java 8+, I/O, threads — are planned but
-not authored; see [`JAVA_ROADMAP.md`](JAVA_ROADMAP.md).
+- **Generics** — why they exist, writing `class Box<T>` and `Pair<A, B>`,
+  generic methods and bounded type parameters, and wildcards: invariance,
+  `? extends`, `? super` and PECS
+
+Part 7's last module (erasure) and Parts 8 onwards — Java 8+, I/O, threads —
+are planned but not authored; see [`JAVA_ROADMAP.md`](JAVA_ROADMAP.md).
 
 Each module carries a goal, four to six lessons, "predict the output" warm-ups,
 fill-in-the-blank drills, fix-the-bug programs, coding challenges, a glossary,
 a cheat sheet, a self-check, an end-of-module review quiz and a judged capstone
-— **97 lessons and 422 judged exercises** in all, plus a **Practice** section
+— **109 lessons and 473 judged exercises** in all, plus a **Practice** section
 per module: five families of five variations each, where a family drills one
-pattern and twists one dimension at a time, for **500 more problems**. Practice
+pattern and twists one dimension at a time, for **575 more problems**. Practice
 is not required to complete a module. Every exercise runs through
 the same `javac` → `java Main` judge as the rest of the app; Part 4's programs
 declare their own classes above `Main` in the same file, which needed no change
@@ -219,7 +223,8 @@ Two rules shape it, mirroring the TypeScript course. **Nothing before its
 module**: a gen-time linter scans every program and fails the build if it uses
 an idea a later module teaches (no `StringBuilder` before module 8, no helper
 methods before 9, no classes of your own before 11, no `interface` before 14,
-and no collections at all — those belong to a later part of
+no collections before 17, no type parameter of your own before 21, no wildcard
+before 23, and no streams or lambdas at all — those belong to a later part of
 `JAVA_ROADMAP.md`). And **expected outputs are computed, not typed**:
 each test case's output comes from a Python mirror of the intended algorithm
 inside the generator, the same trust model the problem bank uses.

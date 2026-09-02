@@ -16,9 +16,11 @@
 # over it. So Module 1 opens on the memory model and traversal *fluency*, not on
 # `int x = 5;`. The full roadmap (and what each part covers) is JAVA_ROADMAP.md.
 #
-# SHIPPED SCOPE: Parts 1-4 of that roadmap — Arrays (modules 1-5), Strings
-# (6-8), Methods and recursion (9-10), and object-oriented programming (11-14).
-# Everything after that is planned, not authored, and is deliberately absent
+# SHIPPED SCOPE: Parts 1-7 of that roadmap — Arrays (modules 1-5), Strings
+# (6-8), Methods and recursion (9-10), object-oriented programming (11-14),
+# exception handling (15-16), the collections framework (17-20) and generics
+# (21-23). Module 24 (erasure) closes Part 7 and is the next thing to author;
+# everything after that is planned, not authored, and is deliberately absent
 # rather than stubbed.
 #
 # HARD DESIGN RULES
@@ -32,11 +34,12 @@
 #      for the problem bank. Typing an expected output by hand is a bug waiting
 #      to happen, especially for multi-line traces like "print each sorting
 #      pass".
-#   3. NO COLLECTIONS. Parts 1-4 are about arrays, strings, methods and
-#      objects, so HashMap/ArrayList/streams/lambdas are banned outright by the
-#      linter — they belong to Parts 6-8 of the roadmap and would rob those
-#      modules of their point. In particular an interface in module 14 is always
-#      implemented by a NAMED class, never by a lambda.
+#   3. NO COLLECTIONS BEFORE PART 6, AND NO STREAMS AT ALL. Parts 1-4 are about
+#      arrays, strings, methods and objects, so HashMap/ArrayList are banned
+#      until module 17 and streams/lambdas are banned outright — they belong to
+#      Part 8 of the roadmap, which is not authored. In particular an interface
+#      in module 14 is always implemented by a NAMED class, never by a lambda,
+#      and so is a `Comparator` in module 20 or a bound in module 22.
 #
 # EXECUTION MODEL: exercises run through the same stdin/stdout judge as every
 # other track (`javac Main.java` -> `java Main`). Programs read stdin with a
@@ -365,8 +368,11 @@ _MODULE_FILES = (
     "java_m18_setsmaps.py",    #          Set and Map, and their three flavours
     "java_m19_queues.py",      #          Queue, Deque, PriorityQueue, Stack
     "java_m20_ordering.py",    #          Comparable, Comparator, choosing
-    # Parts 7 onwards (generics in depth, Java 8+, I/O, threads) are planned but
-    # not authored - see JAVA_ROADMAP.md.
+    "java_m21_generics.py",    # Part 7 - type parameters and generic classes
+    "java_m22_genmethods.py",  #          generic methods and bounded type parameters
+    "java_m23_wildcards.py",   #          wildcards and PECS
+    # Module 24 (erasure and its consequences) closes Part 7; Parts 8 onwards
+    # (Java 8+, I/O, threads) are planned but not authored - see JAVA_ROADMAP.md.
 )
 
 for _part_file in _MODULE_FILES:
@@ -413,6 +419,9 @@ _PRACTICE_FILES = (
     "java_p18_practice.py",
     "java_p19_practice.py",
     "java_p20_practice.py",
+    "java_p21_practice.py",
+    "java_p22_practice.py",
+    "java_p23_practice.py",
 )
 
 for _prac_file in _PRACTICE_FILES:
@@ -462,6 +471,13 @@ _SCOPE_RULES = [
     ("ArrayDeque", 19), ("PriorityQueue", 19), ("Deque<", 19), ("Queue<", 19),
     ("Stack<", 19),
     ("Comparable", 20), ("Comparator", 20), ("Collections.", 20),
+    # --- Part 7: generics ---------------------------------------------------
+    # DECLARING a type parameter, as opposed to supplying one. Modules 17-20 are
+    # full of `List<String>`; what they may not do is invent `<T>` of their own.
+    ("<T>", 21), ("<T,", 21), ("<T ", 21), ("<E>", 21), ("<K,", 21),
+    ("<V>", 21), ("<A,", 21), ("<U>", 21), ("<R>", 21),
+    # Wildcards are module 23 specifically, so 21 and 22 cannot pre-empt them.
+    ("<?>", 23), ("? extends", 23), ("? super", 23),
 ]
 
 # Text that every program (or many early ones) contains and that would trip a
@@ -541,8 +557,8 @@ JAVA_COURSE = {
     "subtitle": (
         "You know the syntax — variables, if/else, loops, printing. This is the "
         "part that turns that into fluency: arrays in depth, strings in depth, "
-        "methods, object-oriented programming, exceptions and the collections "
-        "framework, in twenty judged modules. "
+        "methods, object-oriented programming, exceptions, the collections "
+        "framework and generics, in twenty-three judged modules. "
         "Each module is a goal, four to six lessons, warm-ups that make you "
         "predict the output, fill-in-the-blank drills, fix-the-bug programs, a "
         "coding challenge, a glossary, a cheat sheet and a project - plus a "
