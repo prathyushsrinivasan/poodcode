@@ -82,7 +82,7 @@ export default function Course() {
   return <CourseView track={TS_TRACK} />;
 }
 
-/** The ten-module Java course (route `/java-course`). */
+/** The topic-laddered Java course (route `/java-course`). */
 export function JavaCourse() {
   return <CourseView track={JAVA_TRACK} />;
 }
@@ -229,6 +229,10 @@ function Overview({
               const soon = !w.authored;
               const nLessons = w.lessons?.length ?? 0;
               const nEx = requiredExerciseIds(w).length;
+              const nPractice = (w.practice ?? []).reduce(
+                (sum, f) => sum + (f.exercises?.length ?? 0),
+                0
+              );
               return (
                 <div
                   key={w.number}
@@ -251,6 +255,11 @@ function Overview({
                       <span className="row" style={{ gap: 4, flexWrap: "wrap", justifyContent: "flex-end" }}>
                         {nLessons > 0 && <span className="badge">{nLessons} lessons</span>}
                         {nEx > 0 && <span className="badge">{nEx} exercises</span>}
+                        {nPractice > 0 && (
+                          <span className="badge" title="Extra variation drilling — optional">
+                            🏋️ +{nPractice} practice
+                          </span>
+                        )}
                         {w.capstone && (
                           <span
                             className="badge"
@@ -322,6 +331,17 @@ function UnitDetail({
   const gradableIds = useMemo(() => requiredExerciseIds(week), [week]);
   const allSolved = gradableIds.every((id) => solvedEx.has(id));
   const solvedCount = gradableIds.filter((id) => solvedEx.has(id)).length;
+
+  // Practice is extra drilling, deliberately outside `requiredExerciseIds`: a
+  // module completes on its lessons and capstone, so adding 25 more problems
+  // never moves the finish line further away.
+  const practice = week.practice ?? [];
+  const practiceIds = useMemo(
+    () => practice.flatMap((f) => (f.exercises ?? []).map((e) => e.id)),
+    [practice]
+  );
+  const practiceCount = practiceIds.length;
+  const practiceSolved = practiceIds.filter((id) => solvedEx.has(id)).length;
 
   function handleSolved(id: string) {
     setSolvedEx(new Set(markExerciseSolved(id)));
@@ -479,6 +499,55 @@ function UnitDetail({
           </Section>
         </div>
       ))}
+
+      {practice.length > 0 && (
+        <>
+          <div className="divider" />
+          <h2 style={{ marginBottom: 4 }}>🏋️ Practice</h2>
+          <p className="dim" style={{ marginTop: -2 }}>
+            {practiceCount} extra problems in {practice.length}{" "}
+            {practice.length === 1 ? "family" : "families"}. Each family drills one pattern and
+            twists a single thing at a time, so no variant is a cold start. These are{" "}
+            <strong>not required</strong> to finish the {labels.unit.toLowerCase()} — come back and
+            grind them whenever you want the reps.
+            {practiceSolved > 0 && ` You've solved ${practiceSolved} of ${practiceCount}.`}
+          </p>
+          {practice.map((fam) => {
+            const ids = (fam.exercises ?? []).map((e) => e.id);
+            const n = ids.filter((id) => solvedEx.has(id)).length;
+            return (
+              <div key={fam.key} id={`practice-${fam.key}`}>
+                <Section
+                  title={`🏋️ ${fam.title}`}
+                  open={sec.isOpen(`practice:${fam.key}`)}
+                  onToggle={() => sec.toggle(`practice:${fam.key}`)}
+                  meta={
+                    <span className="dim" style={{ fontSize: 12 }}>
+                      {n}/{ids.length} solved
+                    </span>
+                  }
+                >
+                  {fam.pattern && (
+                    <p className="dim" style={{ margin: "0 0 8px", fontSize: 13 }}>
+                      {fam.pattern}
+                    </p>
+                  )}
+                  {fam.intro && <Markdown>{fam.intro}</Markdown>}
+                  {(fam.exercises ?? []).map((ex, i) => (
+                    <ExerciseCard
+                      key={ex.id}
+                      index={i + 1}
+                      exercise={ex}
+                      challenge
+                      onSolved={handleSolved}
+                    />
+                  ))}
+                </Section>
+              </div>
+            );
+          })}
+        </>
+      )}
 
       {cap && (
         <>

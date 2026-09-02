@@ -59,15 +59,41 @@ def compile_program(code, workdir):
     return None
 
 
+def hard_kill(proc):
+    """Terminate a runaway child for real.
+
+    `subprocess.run(timeout=...)` is not enough on Windows: when it gives up it
+    calls `Popen.kill()` and then `communicate()` with no deadline, and for a
+    CPU-spinning JVM that second call has been observed to block indefinitely —
+    so a single exercise can wedge the whole run and leave an orphan `java`
+    burning a core. `taskkill /T` takes down the process tree instead.
+
+    This is not hypothetical: module 10's `j10-vs-nomemo` ships a deliberately
+    un-memoized Fibonacci as its buggy starter and is asked for fib(60), so the
+    starter sweep hits it every single run.
+    """
+    if os.name == "nt":
+        subprocess.run(["taskkill", "/F", "/T", "/PID", str(proc.pid)],
+                       capture_output=True)
+    else:
+        proc.kill()
+
+
 def run_program(workdir, stdin):
+    proc = subprocess.Popen(
+        ["java", "-XX:TieredStopAtLevel=1", "Main"], cwd=workdir,
+        stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+        text=True, encoding="utf-8", errors="replace",
+    )
     try:
-        p = subprocess.run(
-            ["java", "-XX:TieredStopAtLevel=1", "Main"], cwd=workdir, input=stdin,
-            capture_output=True, text=True, encoding="utf-8", errors="replace",
-            timeout=RUN_TIMEOUT,
-        )
-        return p.stdout, p.stderr, p.returncode
+        out, err = proc.communicate(stdin, timeout=RUN_TIMEOUT)
+        return out, err, proc.returncode
     except subprocess.TimeoutExpired:
+        hard_kill(proc)
+        try:
+            proc.communicate(timeout=RUN_TIMEOUT)
+        except subprocess.TimeoutExpired:
+            pass
         return "", "TIMEOUT", -1
 
 
@@ -83,6 +109,9 @@ def all_exercises(course):
             for ex in (cap.get("exercise"), cap.get("stretch")):
                 if ex:
                     yield f"{where}/capstone", ex
+        for fam in mod.get("practice", []):
+            for ex in fam["exercises"]:
+                yield f"{where}/practice/{fam['key']}", ex
 
 
 def check_solution(where, ex):
@@ -114,7 +143,13 @@ def check_starter(where, ex):
         if compile_program(ex["starter"], d) is not None:
             return []  # does not compile => cannot pass => the blank matters
         for t in ex["tests"]:
-            out, _, _ = run_program(d, t["input"])
+            out, _stderr, rc = run_program(d, t["input"])
+            # A crash counts as failing, exactly as the real judge scores it: a
+            # nonzero exit is a runtime error, never "accepted". Without this a
+            # starter that prints the right lines and THEN throws would look
+            # like it passes, because only stdout was being compared.
+            if rc != 0:
+                return []
             if normalize(out) != normalize(t["output"]):
                 return []  # fails at least one case => good
     kind = "buggy starter" if ex["kind"] == "fix" else "starter"

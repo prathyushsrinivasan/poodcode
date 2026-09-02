@@ -86,11 +86,11 @@ Poodcode/
 │  ├─ tests/verify_java_course.rs     # proves every Java course solution passes
 │  ├─ seeds/problems.json      # the bundled original problem set
 │  ├─ seeds/backend_course.json       # Backend Lab: 7 CRUD-API build projects
-│  └─ seeds/java_course.json          # Java course: 10 modules past the basics
+│  └─ seeds/java_course.json          # Java course: 20 modules past the basics
 │
 ├─ tools/gen_seed.py           # generator that AUTHORS every seeds/*.json
 ├─ tools/backend_course.py     # authors seeds/backend_course.json
-├─ tools/java_course.py        # authors seeds/java_course.json (+ java_m01…m10)
+├─ tools/java_course.py        # authors seeds/java_course.json (+ java_m01…m20, java_p01…p20)
 ├─ tools/verify_backend.py     # fast Node loop: runs every Backend Lab solution
 └─ tools/verify_java_course.py # fast javac/java loop: runs every Java solution
 ```
@@ -182,7 +182,7 @@ no blank is decorative.
 A **topic-based** track (`seeds/java_course.json`, authored in
 `tools/java_course.py` plus one file per module) for someone who already has
 Java's basics — variables, `if`/`else`, loops, printing — and stalls at the
-point where syntax knowledge has to turn into fluency. Thirteen modules:
+point where syntax knowledge has to turn into fluency. Twenty modules:
 
 - **Arrays**, in depth — memory model, grids, sorting and searching by hand,
   rotation and counting, prefix sums / two pointers / sliding window
@@ -190,14 +190,27 @@ point where syntax knowledge has to turn into fluency. Thirteen modules:
   problems, `StringBuilder`
 - **Methods** — signatures, pass-by-value, overloading, scope, varargs, recursion
 - **Object-oriented programming** — classes and objects, encapsulation and
-  invariants, inheritance, polymorphism and the `equals`/`hashCode` contract
-  *(three of four modules; abstraction and interfaces still to come — see
-  [`JAVA_ROADMAP.md`](JAVA_ROADMAP.md))*
+  invariants, inheritance, polymorphism and the `equals`/`hashCode` contract,
+  then abstraction: abstract classes, interfaces, `default` and `static`
+  interface methods, `final`, and the argument for composition over inheritance
+- **Exception handling** — what an exception is and how to read a stack trace,
+  `try`/`catch`/`finally`, the hierarchy and multi-catch, then `throw`,
+  checked vs unchecked, custom exception types and try-with-resources
+- **The collections framework** — `List` and the boxing traps that come with
+  it, `Set` and `Map` in their hashed, insertion-ordered and sorted flavours,
+  queues, deques, stacks and heaps, then `Comparable`, `Comparator`, sorting,
+  and choosing a collection by cost
+
+Parts 7 onwards — generics in depth, Java 8+, I/O, threads — are planned but
+not authored; see [`JAVA_ROADMAP.md`](JAVA_ROADMAP.md).
 
 Each module carries a goal, four to six lessons, "predict the output" warm-ups,
 fill-in-the-blank drills, fix-the-bug programs, coding challenges, a glossary,
 a cheat sheet, a self-check, an end-of-module review quiz and a judged capstone
-— **68 lessons and 299 judged exercises** in all. Every exercise runs through
+— **97 lessons and 422 judged exercises** in all, plus a **Practice** section
+per module: five families of five variations each, where a family drills one
+pattern and twists one dimension at a time, for **500 more problems**. Practice
+is not required to complete a module. Every exercise runs through
 the same `javac` → `java Main` judge as the rest of the app; Part 4's programs
 declare their own classes above `Main` in the same file, which needed no change
 to the judge.
@@ -240,9 +253,10 @@ helps *this* problem, with a deeper dive, Java-specific guidance, and a link to
 the full lesson) · **Learn** section (a per-concept teaching page with a worked
 example, code, and pitfalls; every section collapsible, and every Java and
 TypeScript chapter pairs its fill-in-the-blank drills with a full coding
-challenge) · **Java course** (thirteen judged modules for someone past the
-basics — arrays, strings, methods and OOP, each with lessons, warm-ups, drills,
-fix-the-bug programs, a glossary, a cheat sheet and a capstone) ·
+challenge) · **Java course** (twenty judged modules for someone past the
+basics — arrays, strings, methods, OOP, exceptions and collections, each with
+lessons, warm-ups, drills, fix-the-bug programs, a glossary, a cheat sheet, a
+capstone and 25 practice variations) ·
 **Backend Lab** (seven build-it-yourself projects taking a CRUD
 HTTP API from `node:http` to routing, validation, persistence, querying, auth
 and a layered, tested service — each with ordered instructions, a checkpoint per

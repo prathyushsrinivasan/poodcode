@@ -13,8 +13,9 @@ looking it up.
 **Status legend** — ✅ built and shipping in the app · 🚧 partially built ·
 ⬜ planned.
 
-**Built so far:** Parts 1–3 in full (modules 1–10) and three quarters of
-Part 4 (modules 11–13) — **13 modules, 68 lessons, 299 judged exercises**.
+**Built so far:** Parts 1–6 in full (modules 1–20) — **20 modules, 97 lessons,
+422 judged exercises, plus 500 practice problems** in 100 variation families.
+Part 7 is the next thing to author.
 
 ---
 
@@ -22,7 +23,7 @@ Part 4 (modules 11–13) — **13 modules, 68 lessons, 299 judged exercises**.
 
 | Piece | Path |
 |---|---|
-| Content generator | `tools/java_course.py` (+ one `java_mNN_*.py` per module) |
+| Content generator | `tools/java_course.py` (+ one `java_mNN_*.py` per module, and one `java_pNN_practice.py` per module's Practice section) |
 | Generated seed | `src-tauri/seeds/java_course.json` |
 | Rust command | `java_course` (`src-tauri/src/commands.rs`) |
 | UI | `src/pages/Course.tsx` (shared with the TypeScript course), route `/java-course` |
@@ -33,6 +34,12 @@ Modules are graded and completed exactly like TypeScript course weeks: every
 judged exercise runs through the same stdin/stdout judge (`javac` → `java Main`),
 and a module marks itself ✓ Done once you've read it through and solved
 everything in it.
+
+Each module also carries a **Practice** section: five families of five
+variations each, where a family drills one pattern and twists a single
+dimension at a time. Practice is deliberately *not* required to complete a
+module — it is a drilling ground to come back to, so adding 25 problems never
+moves the finish line.
 
 ---
 
@@ -105,10 +112,9 @@ recursive binary search · recursion vs iteration · `StackOverflowError`
 
 ---
 
-## Part 4 — Object-oriented programming 🚧
+## Part 4 — Object-oriented programming ✅
 
-The heaviest section in Java, and the one interviews probe hardest. Three of
-its four modules are built; the fourth is not yet written.
+The heaviest section in Java, and the one interviews probe hardest. Complete.
 
 **11. Classes and objects** ✅
 Classes and objects · fields / instance variables · methods inside classes ·
@@ -127,30 +133,59 @@ method overriding (vs overloading) · `@Override` · polymorphism and dynamic
 dispatch · upcasting and downcasting · `instanceof` · `Object` as the root ·
 the `toString` / `equals` / `hashCode` contracts
 
-**14. Abstraction, interfaces and composition** ⬜
-Abstract classes and abstract methods · interfaces · `implements` · multiple
-interfaces · default and static interface methods · abstract class vs
-interface · composition over inheritance · has-a · association ·
-`final` classes and methods
+**14. Abstraction, interfaces and composition** ✅
+Abstract classes and abstract methods · the template method · interfaces ·
+`implements` · why implementing methods must be `public` · programming to an
+interface · multiple interfaces · `default` and `static` interface methods ·
+abstract class vs interface · pairing the two (interface + skeleton) ·
+`final` methods and `final` classes · composition over inheritance · has-a ·
+delegation · aggregation and association · the fragile base class
 
-*(The scope linter already reserves `abstract `, `interface ` and `implements `
-for module 14, so no earlier module can use them.)*
+*(The scope linter reserves `abstract `, `interface ` and `implements ` for this
+module, so no earlier one can reach for them.)*
 
-## Part 5 — Exception handling ⬜
+## Part 5 — Exception handling ✅
 
-What an exception is · `try` · `catch` · `finally` · `throw` vs `throws` ·
-checked vs unchecked · custom exceptions · multiple catch blocks and
-multi-catch · the exception hierarchy · try-with-resources
+Modules 15–16.
 
-## Part 6 — Collections framework ⬜
+**15. What an exception is, and catching it** ✅
+What an exception is · stack unwinding · reading a stack trace · `try` ·
+`catch` · scope and definite assignment · `finally` and its four orderings ·
+the hierarchy · several catch blocks · multi-catch · catching narrowly
 
-In order: `ArrayList` · `LinkedList` · `HashSet` · `LinkedHashSet` ·
-`TreeSet` · `HashMap` · `LinkedHashMap` · `TreeMap` · `Queue` · `Deque` ·
-`PriorityQueue` · `Stack` (and why `ArrayDeque` is the modern answer) ·
-`Iterator`. Plus: generics in collections · `Comparable` · `Comparator` ·
-sorting collections · choosing the right collection.
+**16. Throwing, checked exceptions, and resources** ✅
+`throw` · `IllegalArgumentException` vs `IllegalStateException` · checked vs
+unchecked · `throws` · custom exception types · exceptions that carry data ·
+`AutoCloseable` · try-with-resources · closing order
 
-## Part 7 — Generics ⬜
+## Part 6 — Collections framework ✅
+
+Modules 17–20.
+
+**17. Lists** ✅
+`List` · `ArrayList` · `LinkedList` · generics and the diamond · autoboxing ·
+`remove(int)` vs `remove(Object)` · `==` on wrappers · type erasure ·
+the enhanced `for`, index loops and `Iterator` ·
+`ConcurrentModificationException` and the three safe removals · cost comparison
+
+**18. Sets and Maps** ✅
+`Set` · `HashSet` / `LinkedHashSet` / `TreeSet` · the hashCode/equals contract ·
+`Map` · `HashMap` / `LinkedHashMap` / `TreeMap` · `getOrDefault` and the
+frequency-count idiom · `keySet` / `values` / `entrySet` · why iteration order
+has to be chosen · grouping and inverting
+
+**19. Queues, deques, stacks and heaps** ✅
+`Queue` · the offer/poll/peek and add/remove/element families · `Deque` ·
+`ArrayDeque` · stacks and why not `java.util.Stack` · bracket matching ·
+`PriorityQueue` · heap order vs sorted order · the k-largest idiom
+
+**20. Ordering, sorting, and choosing** ✅
+`Comparable` and `compareTo` · why `Integer.compare` and never subtraction ·
+`Comparator` as a named class · reversing · multi-key tie-breaking ·
+`Collections.sort` and `list.sort` · stability and the two-pass sort ·
+comparators in sorted collections · choosing a collection by cost
+
+## Part 7 — Generics ⬜ *(next up)*
 
 Generic classes · generic methods · type parameters · wildcards (`<?>`,
 `<? extends T>`, `<? super T>`) · why generics exist (and what erasure costs)

@@ -43,6 +43,13 @@ fn all_exercises(course: &WeeklyCourse) -> Vec<(String, &Exercise)> {
                 out.push((format!("M{}/capstone", m.number), ex));
             }
         }
+        // Practice carries the same guarantee as everything else: the reference
+        // solution really passes, and the blank really is load-bearing.
+        for fam in &m.practice {
+            for ex in &fam.exercises {
+                out.push((format!("M{}/practice/{}", m.number, fam.key), ex));
+            }
+        }
     }
     out
 }

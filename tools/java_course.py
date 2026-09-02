@@ -16,9 +16,10 @@
 # over it. So Module 1 opens on the memory model and traversal *fluency*, not on
 # `int x = 5;`. The full roadmap (and what each part covers) is JAVA_ROADMAP.md.
 #
-# SHIPPED SCOPE: Parts 1-3 of that roadmap — Arrays (modules 1-5), Strings
-# (6-8), Methods and recursion (9-10). Everything after that is planned, not
-# authored, and is deliberately absent rather than stubbed.
+# SHIPPED SCOPE: Parts 1-4 of that roadmap — Arrays (modules 1-5), Strings
+# (6-8), Methods and recursion (9-10), and object-oriented programming (11-14).
+# Everything after that is planned, not authored, and is deliberately absent
+# rather than stubbed.
 #
 # HARD DESIGN RULES
 #   1. NOTHING BEFORE ITS MODULE. A module may only require ideas introduced in
@@ -31,10 +32,11 @@
 #      for the problem bank. Typing an expected output by hand is a bug waiting
 #      to happen, especially for multi-line traces like "print each sorting
 #      pass".
-#   3. NO COLLECTIONS. Parts 1-3 are about arrays, strings and methods, so
-#      HashMap/ArrayList/streams/lambdas are banned outright by the linter —
-#      they belong to Parts 6-8 of the roadmap and would rob those modules of
-#      their point.
+#   3. NO COLLECTIONS. Parts 1-4 are about arrays, strings, methods and
+#      objects, so HashMap/ArrayList/streams/lambdas are banned outright by the
+#      linter — they belong to Parts 6-8 of the roadmap and would rob those
+#      modules of their point. In particular an interface in module 14 is always
+#      implemented by a NAMED class, never by a lambda.
 #
 # EXECUTION MODEL: exercises run through the same stdin/stdout judge as every
 # other track (`javac Main.java` -> `java Main`). Programs read stdin with a
@@ -185,6 +187,21 @@ def _s2case(s, t, out):
     return _case(f"{s}\n{t}", out)
 
 
+def _lcase(s, out):
+    """stdin = one line of text, WITH its trailing newline.
+
+    `_scase` omits the newline, which is fine for `sc.next()` but not for
+    `sc.nextLine()`: without it the final (or an empty) line is end-of-input and
+    `nextLine()` throws NoSuchElementException. Use this for line-based reads."""
+    return _case(s + "\n", out)
+
+
+def _l2case(s, t, out):
+    """stdin = two newline-terminated lines, so an EMPTY second line is still a
+    line rather than end-of-input."""
+    return _case(s + "\n" + t + "\n", out)
+
+
 # Reusable stdin-reading snippets, so every array exercise reads its input the
 # same way and the learner stops having to re-read the boilerplate.
 _RD_ARR = (
@@ -272,6 +289,20 @@ def _jfix(eid, title, prompt, buggy, fixed, tests, hints=(), difficulty="Easy"):
     return _jmk(eid, title, prompt, fixed, tests, hints, difficulty, "fix", starter=buggy)
 
 
+def _jfam(key, title, pattern, intro, exercises):
+    """One PRACTICE FAMILY: several variants of a SINGLE pattern, drilled back to
+    back. `pattern` is the one-line name of the motion being drilled; `intro` is
+    a short worked walkthrough of the base case, so the variants that follow are
+    twists on something already shown rather than cold starts.
+
+    Practice is deliberately NOT part of `requiredExerciseIds` in the UI — a
+    module still completes on its lessons and capstone. This is a drilling
+    ground you return to, not a gate."""
+    assert exercises, f"{key}: a family with no variants"
+    return {"key": key, "title": title, "pattern": pattern,
+            "intro": _jp(intro) if intro else "", "exercises": exercises}
+
+
 def _jlesson(key, title, what, lesson_md, exercises, warmup=None, quiz=None):
     return {"key": key, "title": title, "what": what,
             "lesson": _jp(lesson_md) if lesson_md else "",
@@ -298,6 +329,8 @@ def _jmod(number, part, part_title, theme, goal, summary, lessons, capstone=None
         "objectives": objectives or [], "why": why, "est_minutes": est_minutes,
         "glossary": glossary or [], "cheatsheet": _jp(cheatsheet) if cheatsheet else "",
         "self_check": self_check or [], "review": review or [], "milestone": milestone,
+        # Filled in by the practice pass below, keyed on module number.
+        "practice": [],
     }
 
 
@@ -325,10 +358,15 @@ _MODULE_FILES = (
     "java_m11_objects.py",     # Part 4 — classes and objects
     "java_m12_encapsulation.py",  #       encapsulation
     "java_m13_inheritance.py",    #       inheritance and polymorphism
-    # Part 4 is not finished: abstract classes, interfaces, composition and
-    # association are still to be authored (see JAVA_ROADMAP.md). The scope
-    # linter already reserves `abstract `, `interface ` and `implements ` for
-    # that module, so nothing earlier can use them in the meantime.
+    "java_m14_abstraction.py",    #       abstraction, interfaces, composition
+    "java_m15_exceptions.py",  # Part 5 - what an exception is, try/catch/finally
+    "java_m16_throwing.py",    #          throwing, checked vs unchecked, resources
+    "java_m17_lists.py",       # Part 6 - List, ArrayList, LinkedList, Iterator
+    "java_m18_setsmaps.py",    #          Set and Map, and their three flavours
+    "java_m19_queues.py",      #          Queue, Deque, PriorityQueue, Stack
+    "java_m20_ordering.py",    #          Comparable, Comparator, choosing
+    # Parts 7 onwards (generics in depth, Java 8+, I/O, threads) are planned but
+    # not authored - see JAVA_ROADMAP.md.
 )
 
 for _part_file in _MODULE_FILES:
@@ -338,6 +376,53 @@ for _part_file in _MODULE_FILES:
             exec(compile(_f.read(), _path, "exec"))
 
 _MODULES.sort(key=lambda m: m["number"])
+
+
+# ===========================================================================
+# PRACTICE — bulk variation drilling, one file per module.
+#
+# Kept OUT of the module files on purpose: those are the teaching path and are
+# already long. A practice file only ever appends to `_PRACTICE[n]`, so adding
+# practice to a module never touches the module itself.
+#
+# The scope linter treats these exactly like lesson programs (see
+# `_all_programs`), so a module-4 practice problem still cannot reach for a
+# module-8 StringBuilder.
+# ===========================================================================
+
+_PRACTICE = {}
+
+_PRACTICE_FILES = (
+    "java_p01_practice.py",
+    "java_p02_practice.py",
+    "java_p03_practice.py",
+    "java_p04_practice.py",
+    "java_p05_practice.py",
+    "java_p06_practice.py",
+    "java_p07_practice.py",
+    "java_p08_practice.py",
+    "java_p09_practice.py",
+    "java_p10_practice.py",
+    "java_p11_practice.py",
+    "java_p12_practice.py",
+    "java_p13_practice.py",
+    "java_p14_practice.py",
+    "java_p15_practice.py",
+    "java_p16_practice.py",
+    "java_p17_practice.py",
+    "java_p18_practice.py",
+    "java_p19_practice.py",
+    "java_p20_practice.py",
+)
+
+for _prac_file in _PRACTICE_FILES:
+    _path = os.path.join(_HERE, _prac_file)
+    if os.path.exists(_path):
+        with open(_path, encoding="utf-8") as _f:
+            exec(compile(_f.read(), _path, "exec"))
+
+for _m in _MODULES:
+    _m["practice"] = _PRACTICE.get(_m["number"], [])
 
 
 # ===========================================================================
@@ -351,11 +436,8 @@ _MODULES.sort(key=lambda m: m["number"])
 
 # (token, first module it may appear in). 999 = banned in this whole course.
 _SCOPE_RULES = [
-    # --- Parts 6-8 of the roadmap. Using them here would gut those modules. ---
-    ("ArrayList", 999), ("HashMap", 999), ("HashSet", 999), ("TreeMap", 999),
-    ("LinkedList", 999), ("Collections.", 999), (".stream()", 999),
-    ("List<", 999), ("Map<", 999), ("Set<", 999), (" -> ", 999),
-    ("Optional", 999),
+    # --- Part 8 (Java 8+) is not authored, so these stay banned outright. ---
+    (".stream()", 999), (" -> ", 999), ("Optional", 999),
     # --- Ordering within the shipped parts ---------------------------------
     ("Arrays.sort", 3), ("Arrays.binarySearch", 3),
     ("charAt(", 6), ("substring(", 6), (".equals(", 6),
@@ -368,6 +450,18 @@ _SCOPE_RULES = [
     ("class ", 11), ("this.", 11), ("private ", 12), ("protected ", 12),
     ("extends ", 13), ("super", 13), ("@Override", 13),
     ("abstract ", 14), ("interface ", 14), ("implements ", 14),
+    # --- Part 5: exception handling ----------------------------------------
+    ("try {", 15), ("catch (", 15), ("finally", 15),
+    ("throw ", 15), ("throws ", 15),
+    ("try (", 16),           # try-with-resources, module 16 specifically
+    # --- Part 6: the collections framework ---------------------------------
+    # Split by module so a list problem cannot quietly reach for a HashMap.
+    ("ArrayList", 17), ("LinkedList", 17), ("List<", 17), ("Iterator", 17),
+    ("HashSet", 18), ("LinkedHashSet", 18), ("TreeSet", 18), ("Set<", 18),
+    ("HashMap", 18), ("LinkedHashMap", 18), ("TreeMap", 18), ("Map<", 18),
+    ("ArrayDeque", 19), ("PriorityQueue", 19), ("Deque<", 19), ("Queue<", 19),
+    ("Stack<", 19),
+    ("Comparable", 20), ("Comparator", 20), ("Collections.", 20),
 ]
 
 # Text that every program (or many early ones) contains and that would trip a
@@ -402,6 +496,10 @@ def _all_programs(mod):
             if ex:
                 out.append((ex["id"], ex["solution"]))
                 out.append((ex["id"] + ":starter", ex["starter"]))
+    for fam in mod.get("practice", []):
+        for ex in fam["exercises"]:
+            out.append((ex["id"], ex["solution"]))
+            out.append((ex["id"] + ":starter", ex["starter"]))
     return out
 
 
@@ -443,10 +541,12 @@ JAVA_COURSE = {
     "subtitle": (
         "You know the syntax — variables, if/else, loops, printing. This is the "
         "part that turns that into fluency: arrays in depth, strings in depth, "
-        "methods, and object-oriented programming, in thirteen judged modules. "
+        "methods, object-oriented programming, exceptions and the collections "
+        "framework, in twenty judged modules. "
         "Each module is a goal, four to six lessons, warm-ups that make you "
         "predict the output, fill-in-the-blank drills, fix-the-bug programs, a "
-        "coding challenge, a glossary, a cheat sheet and a project. Nothing ever "
+        "coding challenge, a glossary, a cheat sheet and a project - plus a "
+        "Practice section of variation drills you can come back to. Nothing ever "
         "needs an idea a later module hasn't taught yet."
     ),
     # The UI is shared with the TypeScript course, which is a *time* ladder
@@ -468,5 +568,8 @@ if __name__ == "__main__" and os.path.basename(__file__) == "java_course.py":
     n_les = sum(len(m["lessons"]) for m in _MODULES)
     n_ex = sum(len(l["exercises"]) for m in _MODULES for l in m["lessons"])
     n_ex += sum(1 for m in _MODULES if (m.get("capstone") or {}).get("exercise"))
+    n_fam = sum(len(m["practice"]) for m in _MODULES)
+    n_prac = sum(len(f["exercises"]) for m in _MODULES for f in m["practice"])
     print(f"Wrote Java course: {len(_MODULES)} modules, {n_les} lessons, "
-          f"{n_ex} judged exercises to {os.path.relpath(out)}")
+          f"{n_ex} judged exercises (+{n_prac} practice in {n_fam} families) "
+          f"to {os.path.relpath(out)}")

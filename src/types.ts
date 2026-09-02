@@ -186,6 +186,18 @@ export interface CourseLesson {
   exercises: Exercise[];
   quiz: QuizQuestion[];
 }
+/** Several variants of ONE pattern, drilled back to back. `intro` walks through
+ * the base case so each variant is a twist on something already shown. Practice
+ * is not counted towards completing a unit — see `requiredExerciseIds`. */
+export interface PracticeFamily {
+  key: string;
+  title: string;
+  /** One line naming the motion being drilled. */
+  pattern: string;
+  /** Markdown walkthrough of the base pattern, shown above the variants. */
+  intro: string;
+  exercises: Exercise[];
+}
 export interface CourseWeek {
   number: number;
   month: number;
@@ -205,6 +217,8 @@ export interface CourseWeek {
   self_check: string[];
   review: QuizQuestion[];
   milestone: string;
+  /** Optional bulk variation drilling. Empty for tracks that ship none. */
+  practice: PracticeFamily[];
 }
 /** A structured course: numbered units, each with lessons and a capstone.
  * Two ship and share this shape — the TypeScript course (Weeks inside Months)

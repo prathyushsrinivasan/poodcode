@@ -647,6 +647,10 @@ pub struct CourseWeek {
     /// "You can now build…" milestone celebrated on completion.
     #[serde(default)]
     pub milestone: String,
+    /// Optional bulk practice: families of variations on this module's patterns.
+    /// Empty for tracks that ship none, so older seeds keep deserialising.
+    #[serde(default)]
+    pub practice: Vec<PracticeFamily>,
 }
 
 /// One term and its plain-English definition (week glossary).
@@ -675,6 +679,27 @@ pub struct CourseLesson {
     pub exercises: Vec<Exercise>,
     #[serde(default)]
     pub quiz: Vec<QuizQuestion>,
+}
+
+/// A family of practice problems: several variants of ONE pattern, drilled back
+/// to back. `intro` is a short worked walkthrough of the base case, so each
+/// variant is a twist on something already shown rather than a cold start.
+///
+/// Practice is deliberately NOT counted towards completing a module (see
+/// `requiredExerciseIds` in Course.tsx) — it is a drilling ground to come back
+/// to, not a gate that has to be cleared.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct PracticeFamily {
+    pub key: String,
+    pub title: String,
+    /// One line naming the motion being drilled.
+    #[serde(default)]
+    pub pattern: String,
+    /// Markdown walkthrough of the base pattern, shown above the variants.
+    #[serde(default)]
+    pub intro: String,
+    #[serde(default)]
+    pub exercises: Vec<Exercise>,
 }
 
 /// A week's capstone mini-project. `kind = "auto"` carries a judged `exercise`
