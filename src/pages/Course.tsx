@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { api } from "../api";
-import type { CourseLesson, CourseWeek, Exercise, TsCourse } from "../types";
+import type { CourseLesson, CourseWeek, Exercise, WeeklyCourse } from "../types";
 import { Markdown } from "../components/Markdown";
 import { ExerciseCard, QuizSection } from "../components/LearnExercise";
 import { Section, useCollapse } from "../components/Collapsible";
@@ -14,12 +14,53 @@ import {
   markExerciseSolved,
 } from "../lib/learnProgress";
 
-// A course week's completion is tracked in the same SQLite-backed chapter-done
-// set as the Learn tab, under a namespaced key so it never collides with a
-// concept key.
-const weekKey = (n: number) => `ts-course:w${n}`;
+// This page renders both structured courses. They share a data model, a judge
+// and every interaction; they differ only in where the content comes from, how
+// the two levels are named (Week/Month vs Module/Part — the course carries its
+// own labels), and the namespace their progress is stored under.
+type Track = {
+  /** Progress-key namespace. Never change it, or existing progress is orphaned. */
+  key: string;
+  load: () => Promise<WeeklyCourse>;
+  /** Route base; detail pages live at `${base}/${unitNumber}`. */
+  base: string;
+  icon: string;
+  emptyText: string;
+};
 
-// Every judged exercise required to complete a week: all lesson exercises plus
+const TS_TRACK: Track = {
+  key: "ts",
+  load: () => api.tsCourse(),
+  base: "/course",
+  icon: "📗",
+  emptyText: "The TypeScript course isn't built yet.",
+};
+
+const JAVA_TRACK: Track = {
+  key: "java",
+  load: () => api.javaCourse(),
+  base: "/java-course",
+  icon: "☕",
+  emptyText: "The Java course isn't built yet.",
+};
+
+// A unit's completion is tracked in the same SQLite-backed chapter-done set as
+// the Learn tab, under a namespaced key so it collides with neither a concept
+// key nor the other course.
+const unitKey = (track: Track, n: number) => `${track.key}-course:w${n}`;
+
+/** Labels default to the TypeScript course's original time-based wording, so a
+ * course that omits them renders exactly as it always did. */
+function labelsOf(course: WeeklyCourse) {
+  return {
+    unit: course.unit_label || "Week",
+    group: course.group_label || "Month",
+    // "3 weeks" / "3 modules" — every label here is a single capitalised word.
+    units: (course.unit_label || "Week").toLowerCase() + "s",
+  };
+}
+
+// Every judged exercise required to complete a unit: all lesson exercises plus
 // an auto-graded capstone. The optional "stretch" build is NOT required.
 function requiredExerciseIds(week: CourseWeek): string[] {
   const ids: string[] = [];
@@ -28,7 +69,7 @@ function requiredExerciseIds(week: CourseWeek): string[] {
   return ids;
 }
 
-// Weeks are sized in study hours, not minutes — "~5 h" reads as a plan, where
+// Units are sized in study hours, not minutes — "~5 h" reads as a plan, where
 // "~300 min" reads as a wall.
 function studyTime(minutes: number): string {
   if (minutes < 90) return `~${minutes} min`;
@@ -36,19 +77,30 @@ function studyTime(minutes: number): string {
   return `~${Number.isInteger(hours) ? hours : hours.toFixed(1)} h`;
 }
 
+/** The 8-month TypeScript course (route `/course`). */
 export default function Course() {
+  return <CourseView track={TS_TRACK} />;
+}
+
+/** The ten-module Java course (route `/java-course`). */
+export function JavaCourse() {
+  return <CourseView track={JAVA_TRACK} />;
+}
+
+function CourseView({ track }: { track: Track }) {
   const { week } = useParams();
-  const [course, setCourse] = useState<TsCourse | null>(null);
+  const [course, setCourse] = useState<WeeklyCourse | null>(null);
   const [done, setDone] = useState<Set<string>>(new Set());
   const nav = useNavigate();
 
   useEffect(() => {
-    api.tsCourse().then(setCourse).catch(() => setCourse(null));
+    setCourse(null);
+    track.load().then(setCourse).catch(() => setCourse(null));
     loadDoneChapters().then(setDone).catch(() => {});
-  }, []);
+  }, [track]);
 
-  async function setWeekDone(n: number, value: boolean) {
-    const next = await setChapterDone(done, weekKey(n), value);
+  async function setUnitDone(n: number, value: boolean) {
+    const next = await setChapterDone(done, unitKey(track, n), value);
     setDone(next);
   }
 
@@ -56,10 +108,12 @@ export default function Course() {
   if (course.weeks.length === 0) {
     return (
       <div className="page">
-        <Empty icon="📗" text="The TypeScript course isn't built yet." />
+        <Empty icon={track.icon} text={track.emptyText} />
       </div>
     );
   }
+
+  const labels = labelsOf(course);
 
   if (week) {
     const n = Number(week);
@@ -67,33 +121,47 @@ export default function Course() {
     if (!wk) {
       return (
         <div className="page">
-          <Empty icon="📗" text="Week not found." />
-          <button onClick={() => nav("/course")}>Back to course</button>
+          <Empty icon={track.icon} text={`${labels.unit} not found.`} />
+          <button onClick={() => nav(track.base)}>Back to course</button>
         </div>
       );
     }
-    // Neighbours for prev/next nav — only among authored weeks.
+    // Neighbours for prev/next nav — only among authored units.
     const authored = course.weeks.filter((w) => w.authored).sort((a, b) => a.number - b.number);
     const idx = authored.findIndex((w) => w.number === wk.number);
     return (
-      <WeekDetail
+      <UnitDetail
         key={wk.number}
+        track={track}
+        labels={labels}
         week={wk}
-        isDone={done.has(weekKey(wk.number))}
-        onSetDone={(v) => setWeekDone(wk.number, v)}
+        isDone={done.has(unitKey(track, wk.number))}
+        onSetDone={(v) => setUnitDone(wk.number, v)}
         prev={idx > 0 ? authored[idx - 1] : null}
         next={idx >= 0 && idx < authored.length - 1 ? authored[idx + 1] : null}
       />
     );
   }
 
-  return <Overview course={course} done={done} />;
+  return <Overview track={track} labels={labels} course={course} done={done} />;
 }
 
-function Overview({ course, done }: { course: TsCourse; done: Set<string> }) {
+type Labels = ReturnType<typeof labelsOf>;
+
+function Overview({
+  track,
+  labels,
+  course,
+  done,
+}: {
+  track: Track;
+  labels: Labels;
+  course: WeeklyCourse;
+  done: Set<string>;
+}) {
   const nav = useNavigate();
 
-  const months = useMemo(() => {
+  const groups = useMemo(() => {
     const map = new Map<number, { title: string; weeks: CourseWeek[] }>();
     for (const w of course.weeks) {
       if (!map.has(w.month)) map.set(w.month, { title: w.month_title, weeks: [] });
@@ -103,8 +171,8 @@ function Overview({ course, done }: { course: TsCourse; done: Set<string> }) {
   }, [course.weeks]);
 
   const authored = course.weeks.filter((w) => w.authored);
-  const doneCount = authored.filter((w) => done.has(weekKey(w.number))).length;
-  const nextWeek = authored.find((w) => !done.has(weekKey(w.number))) ?? authored[0];
+  const doneCount = authored.filter((w) => done.has(unitKey(track, w.number))).length;
+  const nextUnit = authored.find((w) => !done.has(unitKey(track, w.number))) ?? authored[0];
   const pct = authored.length ? Math.round((doneCount / authored.length) * 100) : 0;
 
   return (
@@ -119,7 +187,7 @@ function Overview({ course, done }: { course: TsCourse; done: Set<string> }) {
               <strong>Your progress</strong>
               <span className="spacer" />
               <span className="dim mono">
-                {doneCount}/{authored.length} weeks
+                {doneCount}/{authored.length} {labels.units}
               </span>
             </div>
             <div className="progress">
@@ -128,33 +196,36 @@ function Overview({ course, done }: { course: TsCourse; done: Set<string> }) {
               />
             </div>
           </div>
-          {nextWeek && (
-            <button className="primary" onClick={() => nav(`/course/${nextWeek.number}`)}>
-              {doneCount === 0 ? "Start Week 1 →" : `Resume · Week ${nextWeek.number} →`}
+          {nextUnit && (
+            <button className="primary" onClick={() => nav(`${track.base}/${nextUnit.number}`)}>
+              {doneCount === 0
+                ? `Start ${labels.unit} ${nextUnit.number} →`
+                : `Resume · ${labels.unit} ${nextUnit.number} →`}
             </button>
           )}
         </div>
         <p className="faint" style={{ fontSize: 12, margin: "10px 0 0" }}>
-          A week auto-completes once you read it through and solve its exercises. You'll never be
-          asked to use syntax or ideas a later week hasn't taught yet.
+          A {labels.unit.toLowerCase()} auto-completes once you read it through and solve its
+          exercises. You'll never be asked to use syntax or ideas a later{" "}
+          {labels.unit.toLowerCase()} hasn't taught yet.
         </p>
       </div>
 
-      {months.map(([m, { title, weeks }]) => (
+      {groups.map(([m, { title, weeks }]) => (
         <div key={m} style={{ marginBottom: 24 }}>
           <div className="row" style={{ marginBottom: 10 }}>
             <h3 style={{ margin: 0 }}>
-              Month {m} — {title}
+              {labels.group} {m} — {title}
             </h3>
             <span className="spacer" />
             <span className="dim" style={{ fontSize: 12 }}>
-              {weeks.filter((w) => done.has(weekKey(w.number))).length}/
+              {weeks.filter((w) => done.has(unitKey(track, w.number))).length}/
               {weeks.filter((w) => w.authored).length} done
             </span>
           </div>
           <div className="grid cols-2">
             {weeks.map((w) => {
-              const isDone = done.has(weekKey(w.number));
+              const isDone = done.has(unitKey(track, w.number));
               const soon = !w.authored;
               const nLessons = w.lessons?.length ?? 0;
               const nEx = requiredExerciseIds(w).length;
@@ -167,12 +238,12 @@ function Overview({ course, done }: { course: TsCourse; done: Set<string> }) {
                     opacity: soon ? 0.55 : 1,
                     borderColor: isDone ? "var(--good)" : undefined,
                   }}
-                  onClick={() => !soon && nav(`/course/${w.number}`)}
+                  onClick={() => !soon && nav(`${track.base}/${w.number}`)}
                 >
                   <div className="row" style={{ justifyContent: "space-between", alignItems: "flex-start" }}>
                     <strong>
                       {isDone && <span style={{ color: "var(--good)" }}>✓ </span>}
-                      Week {w.number}: {w.theme}
+                      {labels.unit} {w.number}: {w.theme}
                     </strong>
                     {soon ? (
                       <span className="badge">soon</span>
@@ -210,13 +281,17 @@ function Overview({ course, done }: { course: TsCourse; done: Set<string> }) {
   );
 }
 
-function WeekDetail({
+function UnitDetail({
+  track,
+  labels,
   week,
   isDone,
   onSetDone,
   prev,
   next,
 }: {
+  track: Track;
+  labels: Labels;
   week: CourseWeek;
   isDone: boolean;
   onSetDone: (done: boolean) => void;
@@ -229,10 +304,10 @@ function WeekDetail({
   const [scrolledToBottom, setScrolledToBottom] = useState(false);
   const bottomRef = useRef<HTMLDivElement | null>(null);
   const celebrated = useRef(false);
-  // Lessons start collapsed: a week now runs to forty-odd exercises, and each
+  // Lessons start collapsed: a unit now runs to forty-odd exercises, and each
   // open lesson mounts a Monaco editor per exercise. The contents card below is
   // how you navigate them.
-  const sec = useCollapse(`course-sec:w${week.number}`, false);
+  const sec = useCollapse(`course-sec:${track.key}:w${week.number}`, false);
   const lessons = week.lessons ?? [];
   const lessonKeys = useMemo(() => lessons.map((l) => l.key), [lessons]);
 
@@ -269,9 +344,10 @@ function WeekDetail({
     if (!isDone && scrolledToBottom && allSolved && !celebrated.current) {
       celebrated.current = true;
       onSetDone(true);
-      toast(week.milestone ? `🎉 Week ${week.number} complete! ${week.milestone}` : `🎉 Week ${week.number} complete!`);
+      const head = `🎉 ${labels.unit} ${week.number} complete!`;
+      toast(week.milestone ? `${head} ${week.milestone}` : head);
     }
-  }, [isDone, scrolledToBottom, allSolved, onSetDone, toast, week.milestone, week.number]);
+  }, [isDone, scrolledToBottom, allSolved, onSetDone, toast, week.milestone, week.number, labels.unit]);
 
   const cap = week.capstone;
 
@@ -279,11 +355,11 @@ function WeekDetail({
     <div className="page">
       <div className="row" style={{ marginBottom: 4, justifyContent: "space-between" }}>
         <div className="row">
-          <button className="ghost" onClick={() => nav("/course")}>
+          <button className="ghost" onClick={() => nav(track.base)}>
             ← Course
           </button>
           <span className="badge">
-            Week {week.number} · Month {week.month}
+            {labels.unit} {week.number} · {labels.group} {week.month}
           </span>
           {week.est_minutes > 0 && <span className="badge">⏱️ {studyTime(week.est_minutes)}</span>}
         </div>
@@ -291,7 +367,7 @@ function WeekDetail({
           className="ghost"
           style={isDone ? { borderColor: "var(--good)", color: "var(--good)" } : undefined}
           onClick={() => onSetDone(!isDone)}
-          title={isDone ? "Marked complete — click to undo" : "Mark this week complete"}
+          title={isDone ? "Marked complete — click to undo" : `Mark this ${labels.unit.toLowerCase()} complete`}
         >
           {isDone ? "✓ Done" : "Mark done"}
         </button>
@@ -303,7 +379,7 @@ function WeekDetail({
 
       <div className="card" style={{ marginBottom: 14, borderColor: "var(--accent)" }}>
         <div className="io-label" style={{ color: "var(--accent)" }}>
-          🎯 This week's goal
+          🎯 This {labels.unit.toLowerCase()}'s goal
         </div>
         <p style={{ marginBottom: week.why ? 8 : 0 }}>{week.goal}</p>
         {week.why && (
@@ -315,7 +391,7 @@ function WeekDetail({
 
       {week.objectives.length > 0 && (
         <div className="card" style={{ marginBottom: 14 }}>
-          <div className="io-label">By the end of this week you can…</div>
+          <div className="io-label">By the end of this {labels.unit.toLowerCase()} you can…</div>
           <ul style={{ margin: "6px 0 0", paddingLeft: 20 }}>
             {week.objectives.map((o, i) => (
               <li key={i} style={{ marginBottom: 2 }}>{o}</li>
@@ -330,7 +406,7 @@ function WeekDetail({
         <div className="card" style={{ marginBottom: 14 }}>
           <div className="row" style={{ marginBottom: 8 }}>
             <div className="io-label" style={{ margin: 0 }}>
-              📚 Lessons in this week
+              📚 Lessons in this {labels.unit.toLowerCase()}
             </div>
             <span className="spacer" />
             <button
@@ -431,8 +507,8 @@ function WeekDetail({
             )}
             {cap.kind === "brief" && (
               <p className="faint" style={{ fontSize: 12, margin: "8px 0 0" }}>
-                This is a free-build project — write it in the editor of your choice, then mark the
-                week done yourself when you're happy with it.
+                This is a free-build project — write it in the editor of your choice, then mark the{" "}
+                {labels.unit.toLowerCase()} done yourself when you're happy with it.
               </p>
             )}
           </div>
@@ -469,9 +545,9 @@ function WeekDetail({
       {week.review.length > 0 && (
         <>
           <div className="divider" />
-          <h3>🔁 End-of-week review</h3>
+          <h3>🔁 End-of-{labels.unit.toLowerCase()} review</h3>
           <p className="dim" style={{ marginTop: -4 }}>
-            A quick mixed quiz — some of these reach back to earlier weeks.
+            A quick mixed quiz — some of these reach back to earlier {labels.units}.
           </p>
           <QuizSection questions={week.review} />
         </>
@@ -514,31 +590,31 @@ function WeekDetail({
       {!isDone && (
         <p className="faint" style={{ fontSize: 12, marginTop: 24, textAlign: "center" }}>
           {gradableIds.length > 0
-            ? `This week marks itself ✓ Done once you've read to here and solved its ${gradableIds.length} exercise${gradableIds.length === 1 ? "" : "s"}${allSolved ? " — all solved!" : ` (${solvedCount}/${gradableIds.length} solved)`}.`
-            : "This week marks itself ✓ Done once you've read to here."}
+            ? `This ${labels.unit.toLowerCase()} marks itself ✓ Done once you've read to here and solved its ${gradableIds.length} exercise${gradableIds.length === 1 ? "" : "s"}${allSolved ? " — all solved!" : ` (${solvedCount}/${gradableIds.length} solved)`}.`
+            : `This ${labels.unit.toLowerCase()} marks itself ✓ Done once you've read to here.`}
         </p>
       )}
 
       <div className="row" style={{ marginTop: 20, justifyContent: "space-between" }}>
         {prev ? (
-          <button className="ghost" onClick={() => nav(`/course/${prev.number}`)}>
-            ← Week {prev.number}: {prev.theme}
+          <button className="ghost" onClick={() => nav(`${track.base}/${prev.number}`)}>
+            ← {labels.unit} {prev.number}: {prev.theme}
           </button>
         ) : (
           <span />
         )}
         {next ? (
-          <button className="primary" onClick={() => nav(`/course/${next.number}`)}>
-            Week {next.number}: {next.theme} →
+          <button className="primary" onClick={() => nav(`${track.base}/${next.number}`)}>
+            {labels.unit} {next.number}: {next.theme} →
           </button>
         ) : (
-          <button className="ghost" onClick={() => nav("/course")}>
+          <button className="ghost" onClick={() => nav(track.base)}>
             Back to course overview
           </button>
         )}
       </div>
 
-      {/* Sentinel: intersecting means the week has been read to the bottom. */}
+      {/* Sentinel: intersecting means the unit has been read to the bottom. */}
       <div ref={bottomRef} style={{ height: 1 }} />
     </div>
   );

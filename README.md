@@ -35,6 +35,8 @@ npm run app:build
 ```bash
 npm test                       # frontend logic (Vitest): revision, filters, complexity
 cd src-tauri && cargo test     # backend: scheduler + live execution/judging pipeline
+python tools/verify_backend.py --starters       # Backend Lab: every solution passes, every starter fails
+python tools/verify_java_course.py --starters   # Java course: same, via javac/java (needs a JDK)
 ```
 
 The first launch seeds **29 original problems** — 8 below-Easy **Intro** problems
@@ -80,9 +82,17 @@ Poodcode/
 │  │  ├─ lib.rs                # app setup, DB open + seed, command registration
 │  │  └─ tests.rs              # backend logic unit tests
 │  ├─ tests/exec_judge.rs      # execution/judging integration tests (real toolchains)
-│  └─ seeds/problems.json      # the bundled original problem set
+│  ├─ tests/verify_backend_course.rs  # proves every Backend Lab solution passes
+│  ├─ tests/verify_java_course.rs     # proves every Java course solution passes
+│  ├─ seeds/problems.json      # the bundled original problem set
+│  ├─ seeds/backend_course.json       # Backend Lab: 7 CRUD-API build projects
+│  └─ seeds/java_course.json          # Java course: 10 modules past the basics
 │
-└─ tools/gen_seed.py           # generator that AUTHORS seeds/problems.json
+├─ tools/gen_seed.py           # generator that AUTHORS every seeds/*.json
+├─ tools/backend_course.py     # authors seeds/backend_course.json
+├─ tools/java_course.py        # authors seeds/java_course.json (+ java_m01…m10)
+├─ tools/verify_backend.py     # fast Node loop: runs every Backend Lab solution
+└─ tools/verify_java_course.py # fast javac/java loop: runs every Java solution
 ```
 
 The **UI never touches the database or the filesystem directly** — it goes
@@ -136,8 +146,66 @@ Test-case correctness is guaranteed by construction: `tools/gen_seed.py` holds a
 hidden tests can't drift from the intended behavior. Regenerate with:
 
 ```bash
-python tools/gen_seed.py       # writes src-tauri/seeds/problems.json
+python tools/gen_seed.py       # writes every src-tauri/seeds/*.json
 ```
+
+### Backend Lab
+
+A **project-based** track (`seeds/backend_course.json`, authored in
+`tools/backend_course.py`) that builds a CRUD HTTP API from nothing, in **seven
+projects**: a bare `node:http` server → CRUD on a resource → validation and
+error contracts → persistence on disk → search/filter/sort/paginate →
+users, tokens and ownership → routers, middleware, an error boundary and a
+test runner. Each project reopens the previous one's code, so it is a build
+ladder rather than a reading list.
+
+Every project ships the same four things: **instructions** (what to do, in
+order), a **checkpoint** per step (the observable result that proves it worked),
+judged **drills / fix-the-bug programs / a final build**, and an **acceptance
+checklist** plus **curl commands** to test the copy running on your own machine.
+
+Two constraints shaped the content. It uses **Node built-ins only** — no
+Express, no `npm install`, matching the offline-first design and making the
+"what is a framework actually doing" question answerable. And every judged
+exercise **boots a real server on port 0** and replays a request script read
+from stdin (`METHOD /path [@token] [json body]` → `<status> <body>`), so a
+routing mistake shows up as a wrong status code rather than a mystery.
+
+Correctness is proved twice: `tools/verify_backend.py` runs every reference
+solution through Node in a fast authoring loop, and
+`src-tauri/tests/verify_backend_course.rs` runs the same programs through the
+**real judge the app uses** — and both also assert that each starter *fails*, so
+no blank is decorative.
+
+### Java course
+
+A **topic-based** track (`seeds/java_course.json`, authored in
+`tools/java_course.py` plus one file per module) for someone who already has
+Java's basics — variables, `if`/`else`, loops, printing — and stalls at the
+point where syntax knowledge has to turn into fluency. Ten modules in three
+parts: **arrays** in depth (memory model, grids, sorting and searching by hand,
+rotation and counting, prefix sums / two pointers / sliding window),
+**strings** (the immutable object behind the text, the API and the classic
+problems, `StringBuilder`), and **methods** (signatures, pass-by-value,
+overloading, scope, varargs, recursion).
+
+Each module carries a goal, five or six lessons, "predict the output" warm-ups,
+fill-in-the-blank drills, fix-the-bug programs, coding challenges, a glossary,
+a cheat sheet, a self-check, an end-of-module review quiz and a judged capstone
+— **55 lessons and 241 judged exercises** in all. Every exercise runs through
+the same `javac` → `java Main` judge as the rest of the app.
+
+Two rules shape it, mirroring the TypeScript course. **Nothing before its
+module**: a gen-time linter scans every program and fails the build if it uses
+an idea a later module teaches (no `StringBuilder` before module 8, no helper
+methods before module 9, and no collections at all — those belong to a later
+part of `JAVA_ROADMAP.md`). And **expected outputs are computed, not typed**:
+each test case's output comes from a Python mirror of the intended algorithm
+inside the generator, the same trust model the problem bank uses.
+
+The full 14-part plan, including what is built and what is still ahead
+(OOP, exceptions, collections, generics, Java 8+, I/O, threads, DSA, Spring),
+lives in [`JAVA_ROADMAP.md`](JAVA_ROADMAP.md).
 
 You own the library. Add your own problems three ways:
 
@@ -164,7 +232,14 @@ helps *this* problem, with a deeper dive, Java-specific guidance, and a link to
 the full lesson) · **Learn** section (a per-concept teaching page with a worked
 example, code, and pitfalls; every section collapsible, and every Java and
 TypeScript chapter pairs its fill-in-the-blank drills with a full coding
-challenge) · **6-Month Mastery** (two tracks — TypeScript and Java — each
+challenge) · **Java course** (ten judged modules for someone past the basics —
+arrays, strings and methods, each with lessons, warm-ups, drills,
+fix-the-bug programs, a glossary, a cheat sheet and a capstone) ·
+**Backend Lab** (seven build-it-yourself projects taking a CRUD
+HTTP API from `node:http` to routing, validation, persistence, querying, auth
+and a layered, tested service — each with ordered instructions, a checkpoint per
+step, judged drills, an acceptance checklist and curl commands to verify your
+own server) · **6-Month Mastery** (two tracks — TypeScript and Java — each
 sequencing the Learn catalog into 26 gated weeks: chapters, curated problems, a
 build project with its own notes + code workspace, a shuffled multiple-choice
 quiz drawn from a per-week bank, and a **judged coding final**; a week unlocks

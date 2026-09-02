@@ -14,6 +14,8 @@ export function Welcome({ onClose }: { onClose: () => void }) {
     { icon: "📚", title: "Problem Library", body: "132 problems ordered easiest → hardest. Start at the top and work down." },
     { icon: "🧭", title: "Learning Paths", body: "Curated tracks (Foundations, Arrays, DP…) that build skills in order." },
     { icon: "📗", title: "TypeScript Course", body: "A full 8-month course, beginner to interview — a themed goal and project every week." },
+    { icon: "☕", title: "Java Course", body: "Ten modules past the basics — arrays, strings and methods, judged all the way." },
+    { icon: "🛠️", title: "Backend Lab", body: "Seven projects that build a CRUD API from scratch — routing to auth, zero dependencies." },
     { icon: "🎓", title: "6-Month Mastery", body: "Structured weekly programme with quizzes, projects, and exams." },
   ];
 

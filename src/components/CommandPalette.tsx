@@ -36,6 +36,8 @@ export function CommandPalette() {
       { id: "lib", label: "Go to Problem Library", run: () => navigate("/library") },
       { id: "learn", label: "Go to Learn", run: () => navigate("/learn") },
       { id: "course", label: "Open the TypeScript Course", run: () => navigate("/course") },
+      { id: "java-course", label: "Open the Java Course", run: () => navigate("/java-course") },
+      { id: "backend", label: "Open the Backend Lab", run: () => navigate("/backend") },
       { id: "mastery", label: "Go to 6-Month Mastery", run: () => navigate("/mastery") },
       { id: "settings", label: "Open Settings", run: () => navigate("/settings") },
       { id: "theme", label: "Toggle Light / Dark Theme", run: () => toggleTheme() },

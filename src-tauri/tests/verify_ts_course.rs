@@ -10,17 +10,17 @@ use std::collections::HashSet;
 use std::time::Duration;
 
 use poodcode_lib::judge::{judge_with, JudgeConfig};
-use poodcode_lib::models::{Exercise, TestCase, TsCourse};
+use poodcode_lib::models::{Exercise, TestCase, WeeklyCourse};
 
 const COURSE: &str = include_str!("../seeds/ts_course.json");
 const T: Duration = Duration::from_secs(10);
 
-fn load_course() -> TsCourse {
+fn load_course() -> WeeklyCourse {
     serde_json::from_str(COURSE).expect("ts_course.json parses")
 }
 
 /// Every judged exercise in the course (lesson exercises + capstone + stretch).
-fn all_exercises(course: &TsCourse) -> Vec<(String, &Exercise)> {
+fn all_exercises(course: &WeeklyCourse) -> Vec<(String, &Exercise)> {
     let mut out = Vec::new();
     for w in &course.weeks {
         for l in &w.lessons {

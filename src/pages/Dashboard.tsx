@@ -173,6 +173,8 @@ export default function Dashboard() {
       <div className="row" style={{ marginTop: 18 }}>
         <button onClick={() => nav("/library")}>Browse Library</button>
         <button onClick={() => nav("/course")}>TypeScript Course</button>
+        <button onClick={() => nav("/java-course")}>Java Course</button>
+        <button onClick={() => nav("/backend")}>Backend Lab</button>
       </div>
     </div>
   );

@@ -23,7 +23,8 @@ import type {
   Flashcard,
   CardReview,
   JpBridge,
-  TsCourse,
+  WeeklyCourse,
+  BackendTrack,
   MasteryTrack,
   MasteryProgress,
   SqlDataset,
@@ -78,7 +79,11 @@ export const api = {
 
   // Learn / concepts
   concepts: () => invoke<Concept[]>("concepts"),
-  tsCourse: () => invoke<TsCourse>("ts_course"),
+  tsCourse: () => invoke<WeeklyCourse>("ts_course"),
+  /** The Java course — arrays, strings and methods in ten topic modules. */
+  javaCourse: () => invoke<WeeklyCourse>("java_course"),
+  /** Backend Lab — project-based CRUD-API builds (read-only content). */
+  backendTrack: () => invoke<BackendTrack>("backend_track"),
 
   // SQL track — the datasets its exercises query, plus the in-process engine
   // that runs SQL against a throwaway in-memory database (see src-tauri/src/sqlexec.rs).

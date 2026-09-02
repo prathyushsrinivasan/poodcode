@@ -6307,6 +6307,63 @@ print(
 )
 
 # ---------------------------------------------------------------------------
+# Backend Lab — project-based CRUD-API builds (seeds/backend_course.json,
+# served by the `backend_track` command). Exec'd HERE, after every other
+# content file, because it reuses short private helper names (_ex/_ch/_fix/_q)
+# that the TypeScript files also define; running it last means it can only
+# shadow names nothing else still needs. It is also runnable standalone
+# (`python tools/backend_course.py`) for the Node verifier.
+# ---------------------------------------------------------------------------
+_be_path = os.path.join(HERE, "backend_course.py")
+if os.path.exists(_be_path):
+    with open(_be_path, encoding="utf-8") as _bef:
+        exec(compile(_bef.read(), _be_path, "exec"))
+
+BACKEND_OUT = os.path.join(HERE, "..", "src-tauri", "seeds", "backend_course.json")
+_backend = globals().get(
+    "BACKEND_TRACK",
+    {"key": "backend", "title": "", "subtitle": "", "intro": "", "harness_note": "", "projects": []},
+)
+with open(BACKEND_OUT, "w", encoding="utf-8", newline="\n") as f:
+    json.dump(_backend, f, indent=2, ensure_ascii=False)
+_be_ex = sum(len(s["exercises"]) for p in _backend["projects"] for s in p["steps"])
+_be_ex += sum(1 for p in _backend["projects"] if p.get("final_build"))
+print(
+    f"Wrote Backend Lab: {len(_backend['projects'])} projects "
+    f"({_be_ex} judged exercises) to {os.path.relpath(BACKEND_OUT)}"
+)
+
+# ---------------------------------------------------------------------------
+# Java course — ten topic modules for someone past the basics (arrays, strings,
+# methods; seeds/java_course.json, served by the `java_course` command).
+# Exec'd LAST, for the same reason as the Backend Lab: it defines short private
+# helpers of its own (_je/_jch/_jfix/_jq and friends), so running it after
+# everything else means it can only shadow names nothing still needs. It reads
+# its content from tools/java_m01_arrays.py … java_m10_recursion.py and is also
+# runnable standalone (`python tools/java_course.py`) for the fast verifier.
+# ---------------------------------------------------------------------------
+_jc_path = os.path.join(HERE, "java_course.py")
+if os.path.exists(_jc_path):
+    with open(_jc_path, encoding="utf-8") as _jcf:
+        exec(compile(_jcf.read(), _jc_path, "exec"))
+
+JAVA_COURSE_OUT = os.path.join(HERE, "..", "src-tauri", "seeds", "java_course.json")
+_java_course = globals().get(
+    "JAVA_COURSE",
+    {"key": "java", "title": "", "subtitle": "", "unit_label": "", "group_label": "",
+     "weeks": []},
+)
+with open(JAVA_COURSE_OUT, "w", encoding="utf-8", newline="\n") as f:
+    json.dump(_java_course, f, indent=2, ensure_ascii=False)
+_jc_lessons = sum(len(m["lessons"]) for m in _java_course["weeks"])
+_jc_ex = sum(len(l["exercises"]) for m in _java_course["weeks"] for l in m["lessons"])
+_jc_ex += sum(1 for m in _java_course["weeks"] if (m.get("capstone") or {}).get("exercise"))
+print(
+    f"Wrote Java course: {len(_java_course['weeks'])} modules, {_jc_lessons} lessons "
+    f"({_jc_ex} judged exercises) to {os.path.relpath(JAVA_COURSE_OUT)}"
+)
+
+# ---------------------------------------------------------------------------
 # Reference solutions — CORRECT, submittable solutions in each shipped language,
 # used by the backend test `verify_seeds` to prove the judging + harness
 # serialization contract end-to-end (a correct solution must be Accepted). This

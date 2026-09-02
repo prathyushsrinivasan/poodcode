@@ -206,11 +206,93 @@ export interface CourseWeek {
   review: QuizQuestion[];
   milestone: string;
 }
-export interface TsCourse {
+/** A structured course: numbered units, each with lessons and a capstone.
+ * Two ship and share this shape — the TypeScript course (Weeks inside Months)
+ * and the Java course (Modules inside Parts) — so the course itself carries
+ * the labels the UI should use. */
+export interface WeeklyCourse {
   key: string;
   title: string;
   subtitle: string;
+  /** What one unit is called; empty means "Week". */
+  unit_label: string;
+  /** What a group of units is called; empty means "Month". */
+  group_label: string;
   weeks: CourseWeek[];
+}
+
+// --- Backend Lab (seeds/backend_course.json) -------------------------------
+// A project-based track: every project is a working CRUD HTTP server you build
+// from scratch with Node built-ins only. Steps carry the instructions and a
+// checkpoint; exercises reuse the same judge as everywhere else.
+
+/** One row of a project's API contract. */
+export interface Endpoint {
+  method: string;
+  path: string;
+  purpose: string;
+  /** Request body shape, or "" for none. */
+  request: string;
+  response: string;
+  /** Status codes this endpoint can return, e.g. "201 · 400". */
+  status: string;
+}
+
+export interface BackendStep {
+  key: string;
+  title: string;
+  what: string;
+  /** Markdown: what to do in this step. */
+  instructions: string;
+  /** Markdown: the observable result that proves the step is done. */
+  checkpoint: string;
+  pitfalls: string[];
+  warmup: QuizQuestion[];
+  exercises: Exercise[];
+  quiz: QuizQuestion[];
+}
+
+export interface BackendProject {
+  key: string;
+  number: number;
+  title: string;
+  tagline: string;
+  /** "Starter" | "Core" | "Advanced". */
+  level: string;
+  goal: string;
+  why: string;
+  /** false = planned placeholder ("coming soon"). */
+  authored: boolean;
+  est_minutes: number;
+  /** Keys of the projects this one continues from. */
+  builds_on: string[];
+  concepts: string[];
+  objectives: string[];
+  brief: string;
+  endpoints: Endpoint[];
+  setup: string;
+  steps: BackendStep[];
+  /** The judged "now build the whole thing" exercise closing the project. */
+  final_build: Exercise | null;
+  acceptance: string[];
+  manual_test: string;
+  reference: string;
+  stretch: string[];
+  glossary: GlossaryItem[];
+  cheatsheet: string;
+  self_check: string[];
+  review: QuizQuestion[];
+  milestone: string;
+}
+
+export interface BackendTrack {
+  key: string;
+  title: string;
+  subtitle: string;
+  intro: string;
+  /** The stdin request-script format the judged exercises are driven by. */
+  harness_note: string;
+  projects: BackendProject[];
 }
 
 // --- 6-Month Mastery programme (seeds/mastery.json) ------------------------

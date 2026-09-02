@@ -568,26 +568,40 @@ pub struct JpBridge {
 }
 
 // ---------------------------------------------------------------------------
-// TypeScript course — an 8-month, week-by-week structured curriculum. Content
-// lives in the embedded seeds/ts_course.json; served by the `ts_course`
-// command. Lessons reuse the same `Exercise` + `QuizQuestion` model (and the
-// same stdin/stdout judge) as the Learn concepts.
+// Structured courses — a sequence of numbered units, each with lessons and a
+// capstone. Two of them ship, sharing this model, the `Exercise` +
+// `QuizQuestion` types and the same stdin/stdout judge as the Learn concepts:
+//
+//   * seeds/ts_course.json   — TypeScript, an 8-month WEEK-by-week curriculum
+//                              (`ts_course` command, tools/typescript_course.py)
+//   * seeds/java_course.json — Java after the basics, ten topic MODULES
+//                              (`java_course` command, tools/java_course.py)
+//
+// The two levels are called Week/Month in one and Module/Part in the other, so
+// the course itself carries the labels the UI should use — see `unit_label`.
 // ---------------------------------------------------------------------------
 
-/// The whole TypeScript course (embedded seeds/ts_course.json).
+/// A whole structured course (embedded seeds/ts_course.json or
+/// seeds/java_course.json).
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct TsCourse {
+pub struct WeeklyCourse {
     #[serde(default)]
     pub key: String,
     #[serde(default)]
     pub title: String,
     #[serde(default)]
     pub subtitle: String,
+    /// What one unit is called — "Week" (default) or "Module".
+    #[serde(default)]
+    pub unit_label: String,
+    /// What a group of units is called — "Month" (default) or "Part".
+    #[serde(default)]
+    pub group_label: String,
     #[serde(default)]
     pub weeks: Vec<CourseWeek>,
 }
 
-/// One themed week of the course: a goal, a set of lessons, and a capstone.
+/// One themed unit of a course: a goal, a set of lessons, and a capstone.
 /// `authored=false` marks a skeleton placeholder shown as "coming soon".
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CourseWeek {
@@ -687,6 +701,154 @@ pub struct Capstone {
     /// An optional harder "stretch" build for fast learners.
     #[serde(default)]
     pub stretch: Option<Exercise>,
+}
+
+// ---------------------------------------------------------------------------
+// Backend Lab — a project-based track that builds CRUD HTTP APIs from scratch.
+// Content lives in the embedded seeds/backend_course.json (authored in
+// tools/backend_course.py); served by the `backend_track` command.
+//
+// Where the TypeScript course is a *time* ladder (weeks), this one is a *build*
+// ladder: each project is a working server you finish and can run, and each
+// project reopens the previous one's code to add the next layer. Steps carry the
+// instructions ("do this, then this") plus a checkpoint that tells you how to
+// know it worked — the thing a beginner is usually missing.
+//
+// Exercises reuse the same `Exercise` model and the same stdin/stdout judge as
+// everything else: each program boots a real `node:http` server on port 0 and
+// replays a request script read from stdin, so a route bug shows up as a wrong
+// status code rather than as a mystery.
+// ---------------------------------------------------------------------------
+
+/// The whole Backend Lab track (embedded seeds/backend_course.json).
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct BackendTrack {
+    #[serde(default)]
+    pub key: String,
+    #[serde(default)]
+    pub title: String,
+    #[serde(default)]
+    pub subtitle: String,
+    /// Markdown shown once on the overview: how to work through the track.
+    #[serde(default)]
+    pub intro: String,
+    /// The stdin request-script format every judged exercise is driven by,
+    /// explained once (Markdown) rather than repeated in every prompt.
+    #[serde(default)]
+    pub harness_note: String,
+    #[serde(default)]
+    pub projects: Vec<BackendProject>,
+}
+
+/// One buildable project: a spec, ordered steps, and a finished reference.
+/// `authored=false` marks a planned project shown as "coming soon".
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct BackendProject {
+    pub key: String,
+    pub number: i64,
+    #[serde(default)]
+    pub title: String,
+    #[serde(default)]
+    pub tagline: String,
+    /// "Starter" | "Core" | "Advanced" — sizing, not gating.
+    #[serde(default)]
+    pub level: String,
+    #[serde(default)]
+    pub goal: String,
+    /// One-line "why a real backend needs this".
+    #[serde(default)]
+    pub why: String,
+    #[serde(default)]
+    pub authored: bool,
+    #[serde(default)]
+    pub est_minutes: i64,
+    /// Keys of the projects this one continues from.
+    #[serde(default)]
+    pub builds_on: Vec<String>,
+    /// Short concept tags shown as badges ("status codes", "routing", …).
+    #[serde(default)]
+    pub concepts: Vec<String>,
+    #[serde(default)]
+    pub objectives: Vec<String>,
+    /// Markdown: what you are building and the shape of the finished thing.
+    #[serde(default)]
+    pub brief: String,
+    /// The API contract as a table — the spec you build against.
+    #[serde(default)]
+    pub endpoints: Vec<Endpoint>,
+    /// Markdown: files to create and the exact command that runs the server.
+    #[serde(default)]
+    pub setup: String,
+    #[serde(default)]
+    pub steps: Vec<BackendStep>,
+    /// The judged "now build the whole thing" exercise closing the project.
+    #[serde(default)]
+    pub final_build: Option<Exercise>,
+    /// "Did I actually do it?" checklist for the finished server.
+    #[serde(default)]
+    pub acceptance: Vec<String>,
+    /// Markdown: curl / fetch commands to try against your own running server.
+    #[serde(default)]
+    pub manual_test: String,
+    /// A complete reference implementation, revealed on request.
+    #[serde(default)]
+    pub reference: String,
+    /// Optional extensions for when the project is done.
+    #[serde(default)]
+    pub stretch: Vec<String>,
+    #[serde(default)]
+    pub glossary: Vec<GlossaryItem>,
+    #[serde(default)]
+    pub cheatsheet: String,
+    #[serde(default)]
+    pub self_check: Vec<String>,
+    #[serde(default)]
+    pub review: Vec<QuizQuestion>,
+    #[serde(default)]
+    pub milestone: String,
+}
+
+/// One row of a project's API contract.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Endpoint {
+    pub method: String,
+    pub path: String,
+    #[serde(default)]
+    pub purpose: String,
+    /// Request body shape, or "" for none.
+    #[serde(default)]
+    pub request: String,
+    /// Success response body shape.
+    #[serde(default)]
+    pub response: String,
+    /// Status codes this endpoint can return, e.g. "201 · 400".
+    #[serde(default)]
+    pub status: String,
+}
+
+/// One step of a project: what to do, how to check it worked, and drills.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct BackendStep {
+    pub key: String,
+    pub title: String,
+    #[serde(default)]
+    pub what: String,
+    /// Markdown: the actual instructions for this step.
+    #[serde(default)]
+    pub instructions: String,
+    /// Markdown: the observable result that proves the step is done.
+    #[serde(default)]
+    pub checkpoint: String,
+    /// Mistakes that cost beginners an hour, named up front.
+    #[serde(default)]
+    pub pitfalls: Vec<String>,
+    /// "What does this request return?" multiple-choice warm-up.
+    #[serde(default)]
+    pub warmup: Vec<QuizQuestion>,
+    #[serde(default)]
+    pub exercises: Vec<Exercise>,
+    #[serde(default)]
+    pub quiz: Vec<QuizQuestion>,
 }
 
 // ---------------------------------------------------------------------------

@@ -87,8 +87,29 @@ pub fn jp_bridge() -> AppResult<crate::models::JpBridge> {
 const TS_COURSE_JSON: &str = include_str!("../seeds/ts_course.json");
 
 #[tauri::command]
-pub fn ts_course() -> AppResult<crate::models::TsCourse> {
+pub fn ts_course() -> AppResult<crate::models::WeeklyCourse> {
     Ok(serde_json::from_str(TS_COURSE_JSON)?)
+}
+
+/// The Java course — ten topic modules covering arrays, strings and methods
+/// for someone who already has the basics (authored in tools/java_course.py,
+/// one file per module). Same model and same judge as the TypeScript course;
+/// completion is tracked in the shared `chapter_progress` table.
+const JAVA_COURSE_JSON: &str = include_str!("../seeds/java_course.json");
+
+#[tauri::command]
+pub fn java_course() -> AppResult<crate::models::WeeklyCourse> {
+    Ok(serde_json::from_str(JAVA_COURSE_JSON)?)
+}
+
+/// The Backend Lab — project-based CRUD-API builds (authored in
+/// tools/backend_course.py). Read-only content; completion is tracked in the
+/// same `chapter_progress` table as every other track.
+const BACKEND_COURSE_JSON: &str = include_str!("../seeds/backend_course.json");
+
+#[tauri::command]
+pub fn backend_track() -> AppResult<crate::models::BackendTrack> {
+    Ok(serde_json::from_str(BACKEND_COURSE_JSON)?)
 }
 
 /// The 6-Month Mastery programme — the concept catalog sequenced into weeks
