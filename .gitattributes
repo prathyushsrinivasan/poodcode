@@ -23,3 +23,6 @@ tools/java_m07_stringapi.py text eol=lf
 tools/java_m08_builder.py text eol=lf
 tools/java_m09_methods.py text eol=lf
 tools/java_m10_recursion.py text eol=lf
+tools/java_m11_objects.py text eol=lf
+tools/java_m12_encapsulation.py text eol=lf
+tools/java_m13_inheritance.py text eol=lf

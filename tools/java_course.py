@@ -91,6 +91,25 @@ def _jcls(members, imports=_IMPORTS):
     return _jp(imports + "\npublic class Main {\n" + members.rstrip("\n") + "\n}")
 
 
+def _joop(types, body, imports=_IMPORTS):
+    """Helper CLASSES above `public class Main`, then a Scanner-opening main —
+    the shape every Part 4 program takes.
+
+    `javac Main.java` compiles every type in the file and `java -cp . Main`
+    runs it (see src-tauri/src/exec.rs), so extra top-level classes need no
+    build changes at all. Only `Main` may be `public`; the rest are
+    package-private, which is exactly right for a single-file exercise."""
+    return _jp(
+        imports + "\n"
+        + types.rstrip("\n") + "\n\n"
+        + "public class Main {\n"
+        + _MAIN_SIG + "\n"
+        + "        Scanner sc = new Scanner(System.in);\n"
+        + body.rstrip("\n") + "\n"
+        + "    }\n}"
+    )
+
+
 # ===========================================================================
 # stdin / stdout builders — the "computed, never typed" half of design rule 2.
 #
@@ -303,6 +322,13 @@ _MODULE_FILES = (
     "java_m08_builder.py",     #          StringBuilder and StringBuffer
     "java_m09_methods.py",     # Part 3 — methods
     "java_m10_recursion.py",   #          recursion basics
+    "java_m11_objects.py",     # Part 4 — classes and objects
+    "java_m12_encapsulation.py",  #       encapsulation
+    "java_m13_inheritance.py",    #       inheritance and polymorphism
+    # Part 4 is not finished: abstract classes, interfaces, composition and
+    # association are still to be authored (see JAVA_ROADMAP.md). The scope
+    # linter already reserves `abstract `, `interface ` and `implements ` for
+    # that module, so nothing earlier can use them in the meantime.
 )
 
 for _part_file in _MODULE_FILES:
@@ -329,7 +355,7 @@ _SCOPE_RULES = [
     ("ArrayList", 999), ("HashMap", 999), ("HashSet", 999), ("TreeMap", 999),
     ("LinkedList", 999), ("Collections.", 999), (".stream()", 999),
     ("List<", 999), ("Map<", 999), ("Set<", 999), (" -> ", 999),
-    ("Optional", 999), ("interface ", 999), ("class ", 999),
+    ("Optional", 999),
     # --- Ordering within the shipped parts ---------------------------------
     ("Arrays.sort", 3), ("Arrays.binarySearch", 3),
     ("charAt(", 6), ("substring(", 6), (".equals(", 6),
@@ -337,6 +363,11 @@ _SCOPE_RULES = [
     ("Character.is", 7), (".toCharArray()", 7),
     ("StringBuilder", 8), ("StringBuffer", 8),
     ("static ", 9),          # a helper method beside main()
+    # --- Part 4: objects. A second top-level class in the file is the tell,
+    # since `public class Main {` is stripped as scaffolding first.
+    ("class ", 11), ("this.", 11), ("private ", 12), ("protected ", 12),
+    ("extends ", 13), ("super", 13), ("@Override", 13),
+    ("abstract ", 14), ("interface ", 14), ("implements ", 14),
 ]
 
 # Text that every program (or many early ones) contains and that would trip a
@@ -412,11 +443,11 @@ JAVA_COURSE = {
     "subtitle": (
         "You know the syntax — variables, if/else, loops, printing. This is the "
         "part that turns that into fluency: arrays in depth, strings in depth, "
-        "and methods, in ten judged modules. Each module is a goal, five or six "
-        "lessons, warm-ups that make you predict the output, fill-in-the-blank "
-        "drills, fix-the-bug programs, a coding challenge, a glossary, a cheat "
-        "sheet and a project. Nothing ever needs an idea a later module hasn't "
-        "taught yet."
+        "methods, and object-oriented programming, in thirteen judged modules. "
+        "Each module is a goal, four to six lessons, warm-ups that make you "
+        "predict the output, fill-in-the-blank drills, fix-the-bug programs, a "
+        "coding challenge, a glossary, a cheat sheet and a project. Nothing ever "
+        "needs an idea a later module hasn't taught yet."
     ),
     # The UI is shared with the TypeScript course, which is a *time* ladder
     # (Month 1, Week 3). This one is a *topic* ladder, so it relabels the same

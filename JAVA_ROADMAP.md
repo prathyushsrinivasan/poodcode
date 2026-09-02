@@ -10,8 +10,11 @@ knowing the syntax but not yet being able to *reach* for the right array
 pattern, the right string method, or the right method signature without
 looking it up.
 
-**Status legend** — ✅ built and shipping in the app · 🚧 in progress ·
+**Status legend** — ✅ built and shipping in the app · 🚧 partially built ·
 ⬜ planned.
+
+**Built so far:** Parts 1–3 in full (modules 1–10) and three quarters of
+Part 4 (modules 11–13) — **13 modules, 68 lessons, 299 judged exercises**.
 
 ---
 
@@ -19,7 +22,7 @@ looking it up.
 
 | Piece | Path |
 |---|---|
-| Content generator | `tools/java_course.py` (+ `java_arrays.py`, `java_strings.py`, `java_methods.py`) |
+| Content generator | `tools/java_course.py` (+ one `java_mNN_*.py` per module) |
 | Generated seed | `src-tauri/seeds/java_course.json` |
 | Rust command | `java_course` (`src-tauri/src/commands.rs`) |
 | UI | `src/pages/Course.tsx` (shared with the TypeScript course), route `/java-course` |
@@ -102,16 +105,36 @@ recursive binary search · recursion vs iteration · `StackOverflowError`
 
 ---
 
-## Part 4 — Object-oriented programming ⬜
+## Part 4 — Object-oriented programming 🚧
 
-The heaviest section in Java, and the one interviews probe hardest.
+The heaviest section in Java, and the one interviews probe hardest. Three of
+its four modules are built; the fourth is not yet written.
 
+**11. Classes and objects** ✅
 Classes and objects · fields / instance variables · methods inside classes ·
-constructors (and constructor chaining) · `this` · `static` fields and
-methods · encapsulation · getters and setters · inheritance · `super` ·
-method overriding (vs overloading) · polymorphism · abstraction ·
-abstract classes · interfaces · composition · association · `final` ·
-`equals`/`hashCode`/`toString` contracts
+`this` · constructors and constructor chaining (`this(...)`) · the default
+constructor · `static` fields and methods · `final` · arrays of objects
+
+**12. Encapsulation** ✅
+Access modifiers · `private` fields · getters and setters · verbs over
+setters · class invariants established in the constructor and preserved by
+every mutator · clamping vs rejecting vs throwing · immutable objects ·
+defensive copying in and out
+
+**13. Inheritance and polymorphism** ✅
+`extends` and the is-a test · `protected` · `super(...)` and `super.method()` ·
+method overriding (vs overloading) · `@Override` · polymorphism and dynamic
+dispatch · upcasting and downcasting · `instanceof` · `Object` as the root ·
+the `toString` / `equals` / `hashCode` contracts
+
+**14. Abstraction, interfaces and composition** ⬜
+Abstract classes and abstract methods · interfaces · `implements` · multiple
+interfaces · default and static interface methods · abstract class vs
+interface · composition over inheritance · has-a · association ·
+`final` classes and methods
+
+*(The scope linter already reserves `abstract `, `interface ` and `implements `
+for module 14, so no earlier module can use them.)*
 
 ## Part 5 — Exception handling ⬜
 

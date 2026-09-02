@@ -182,24 +182,32 @@ no blank is decorative.
 A **topic-based** track (`seeds/java_course.json`, authored in
 `tools/java_course.py` plus one file per module) for someone who already has
 Java's basics — variables, `if`/`else`, loops, printing — and stalls at the
-point where syntax knowledge has to turn into fluency. Ten modules in three
-parts: **arrays** in depth (memory model, grids, sorting and searching by hand,
-rotation and counting, prefix sums / two pointers / sliding window),
-**strings** (the immutable object behind the text, the API and the classic
-problems, `StringBuilder`), and **methods** (signatures, pass-by-value,
-overloading, scope, varargs, recursion).
+point where syntax knowledge has to turn into fluency. Thirteen modules:
 
-Each module carries a goal, five or six lessons, "predict the output" warm-ups,
+- **Arrays**, in depth — memory model, grids, sorting and searching by hand,
+  rotation and counting, prefix sums / two pointers / sliding window
+- **Strings** — the immutable object behind the text, the API and the classic
+  problems, `StringBuilder`
+- **Methods** — signatures, pass-by-value, overloading, scope, varargs, recursion
+- **Object-oriented programming** — classes and objects, encapsulation and
+  invariants, inheritance, polymorphism and the `equals`/`hashCode` contract
+  *(three of four modules; abstraction and interfaces still to come — see
+  [`JAVA_ROADMAP.md`](JAVA_ROADMAP.md))*
+
+Each module carries a goal, four to six lessons, "predict the output" warm-ups,
 fill-in-the-blank drills, fix-the-bug programs, coding challenges, a glossary,
 a cheat sheet, a self-check, an end-of-module review quiz and a judged capstone
-— **55 lessons and 241 judged exercises** in all. Every exercise runs through
-the same `javac` → `java Main` judge as the rest of the app.
+— **68 lessons and 299 judged exercises** in all. Every exercise runs through
+the same `javac` → `java Main` judge as the rest of the app; Part 4's programs
+declare their own classes above `Main` in the same file, which needed no change
+to the judge.
 
 Two rules shape it, mirroring the TypeScript course. **Nothing before its
 module**: a gen-time linter scans every program and fails the build if it uses
 an idea a later module teaches (no `StringBuilder` before module 8, no helper
-methods before module 9, and no collections at all — those belong to a later
-part of `JAVA_ROADMAP.md`). And **expected outputs are computed, not typed**:
+methods before 9, no classes of your own before 11, no `interface` before 14,
+and no collections at all — those belong to a later part of
+`JAVA_ROADMAP.md`). And **expected outputs are computed, not typed**:
 each test case's output comes from a Python mirror of the intended algorithm
 inside the generator, the same trust model the problem bank uses.
 
@@ -232,8 +240,8 @@ helps *this* problem, with a deeper dive, Java-specific guidance, and a link to
 the full lesson) · **Learn** section (a per-concept teaching page with a worked
 example, code, and pitfalls; every section collapsible, and every Java and
 TypeScript chapter pairs its fill-in-the-blank drills with a full coding
-challenge) · **Java course** (ten judged modules for someone past the basics —
-arrays, strings and methods, each with lessons, warm-ups, drills,
+challenge) · **Java course** (thirteen judged modules for someone past the
+basics — arrays, strings, methods and OOP, each with lessons, warm-ups, drills,
 fix-the-bug programs, a glossary, a cheat sheet and a capstone) ·
 **Backend Lab** (seven build-it-yourself projects taking a CRUD
 HTTP API from `node:http` to routing, validation, persistence, querying, auth
