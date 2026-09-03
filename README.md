@@ -86,7 +86,7 @@ Poodcode/
 │  ├─ tests/verify_java_course.rs     # proves every Java course solution passes
 │  ├─ seeds/problems.json      # the bundled original problem set
 │  ├─ seeds/backend_course.json       # Backend Lab: 7 CRUD-API build projects
-│  └─ seeds/java_course.json          # Java course: 23 modules past the basics
+│  └─ seeds/java_course.json          # Java course: 28 modules past the basics
 │
 ├─ tools/gen_seed.py           # generator that AUTHORS every seeds/*.json
 ├─ tools/backend_course.py     # authors seeds/backend_course.json
@@ -182,7 +182,7 @@ no blank is decorative.
 A **topic-based** track (`seeds/java_course.json`, authored in
 `tools/java_course.py` plus one file per module) for someone who already has
 Java's basics — variables, `if`/`else`, loops, printing — and stalls at the
-point where syntax knowledge has to turn into fluency. Twenty modules:
+point where syntax knowledge has to turn into fluency. Twenty-eight modules:
 
 - **Arrays**, in depth — memory model, grids, sorting and searching by hand,
   rotation and counting, prefix sums / two pointers / sliding window
@@ -202,18 +202,33 @@ point where syntax knowledge has to turn into fluency. Twenty modules:
   and choosing a collection by cost
 
 - **Generics** — why they exist, writing `class Box<T>` and `Pair<A, B>`,
-  generic methods and bounded type parameters, and wildcards: invariance,
-  `? extends`, `? super` and PECS
+  generic methods and bounded type parameters, wildcards (invariance,
+  `? extends`, `? super` and PECS), and finally erasure: what the compiler
+  actually emits, why `new T()` and `static T` are illegal, where an unchecked
+  cast's `ClassCastException` really lands, bridge methods, and `Class<T>`
+  type tokens
 
-Part 7's last module (erasure) and Parts 8 onwards — Java 8+, I/O, threads —
-are planned but not authored; see [`JAVA_ROADMAP.md`](JAVA_ROADMAP.md).
+- **Java 8+** — lambdas and the four `java.util.function` shapes, writing your
+  own functional interface, capture and effectively-final, closures, the four
+  kinds of method reference; stream pipelines — laziness, single-use,
+  `filter`/`map`/`sorted`/`distinct`/`limit`/`skip`, and the terminal that
+  actually runs the work; then `collect`, `groupingBy` and its downstream
+  collectors, `partitioningBy`, `toMap`'s duplicate-key trap, `reduce` and its
+  identity, and the primitive streams that avoid boxing; and finally
+  `Optional` — `orElse` vs `orElseGet`, `map`/`filter`/`flatMap`, the stream
+  terminals that return one, and the three places it makes code worse
+
+The track ends there, deliberately: file I/O, Spring and the JDBC/build-tool
+stack are job skills rather than interview material, and the DSA ground is
+already covered by the Problem Library and the Mastery track. See
+[`JAVA_ROADMAP.md`](JAVA_ROADMAP.md).
 
 Each module carries a goal, four to six lessons, "predict the output" warm-ups,
 fill-in-the-blank drills, fix-the-bug programs, coding challenges, a glossary,
 a cheat sheet, a self-check, an end-of-module review quiz and a judged capstone
-— **109 lessons and 473 judged exercises** in all, plus a **Practice** section
+— **132 lessons and 570 judged exercises** in all, plus a **Practice** section
 per module: five families of five variations each, where a family drills one
-pattern and twists one dimension at a time, for **575 more problems**. Practice
+pattern and twists one dimension at a time, for **700 more problems**. Practice
 is not required to complete a module. Every exercise runs through
 the same `javac` → `java Main` judge as the rest of the app; Part 4's programs
 declare their own classes above `Main` in the same file, which needed no change

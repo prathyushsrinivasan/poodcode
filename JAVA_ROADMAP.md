@@ -13,10 +13,20 @@ looking it up.
 **Status legend** — ✅ built and shipping in the app · 🚧 partially built ·
 ⬜ planned.
 
-**Built so far:** Parts 1–6 in full (modules 1–20) and Part 7's first three
-modules (21–23) — **23 modules, 109 lessons, 473 judged exercises, plus 575
-practice problems** in 115 variation families. Module 24 (erasure) closes Part 7
-and is the next thing to author.
+**Built so far:** Parts 1–8, complete (modules 1–28) — **28 modules, 132
+lessons, 570 judged exercises, plus 700 practice problems** in 140 variation
+families.
+
+**The track is finished.** Part 8 was the last part worth authoring for
+interview preparation, and it is done.
+
+**Scope note.** Parts 9, 13 and 14 are deliberately **not planned** — file I/O,
+JDBC/Maven/Spring and the backend stack are job skills rather than
+interview-coding material, and the Backend Lab already covers the transport
+half. Part 11 is folded into earlier modules rather than authored, and Part 12
+is already served by the Problem Library and the Mastery track. The track ends
+at Part 8 plus, possibly, a single senior-level module on the JVM and design
+patterns.
 
 ---
 
@@ -186,11 +196,12 @@ has to be chosen · grouping and inverting
 `Collections.sort` and `list.sort` · stability and the two-pass sort ·
 comparators in sorted collections · choosing a collection by cost
 
-## Part 7 — Generics 🚧
+## Part 7 — Generics ✅
 
 Modules 21–24. Modules 17–20 *used* `List<String>` on every page without ever
 saying what the angle brackets were; this part is the answer, and it is
-sequenced so that each idea is the thing the previous one could not do.
+sequenced so that each idea is the thing the previous one could not do — ending
+on what the compiler does with all of it.
 
 **21. Type parameters and generic classes** ✅
 Why generics exist (an `Object` field, a cast, and a `ClassCastException`) ·
@@ -218,24 +229,72 @@ reading the JDK's own signatures (`sort(Comparator<? super E>)`,
 `addAll(Collection<? extends E>)`) · wildcard vs named type parameter ·
 never a wildcard in a return type
 
-**24. Erasure, and what it costs** ⬜ *(next up)*
-What the compiler actually emits · type arguments erased to their bound ·
-why `new T()`, `new T[]` and `static T` are illegal · `instanceof List<String>`
-and unchecked casts · unchecked warnings and `@SuppressWarnings` · heap
-pollution and `@SafeVarargs` · generic varargs · bridge methods · two overloads
-that erase to the same signature · `Class<T>` type tokens · interoperating with
-legacy raw-typed code
+**24. Erasure, and what it costs** ✅
+What the compiler actually emits · one run-time class per generic type ·
+type arguments erased to their bound · the casts the compiler inserts ·
+why `new T()`, `new T[]` and `static T` are illegal · `instanceof List<?>` vs
+`instanceof List<String>` · the `Object[]` workaround · unchecked casts as a
+promise, and where the `ClassCastException` actually lands · heap pollution ·
+`@SuppressWarnings("unchecked")` · generic varargs and `@SafeVarargs` · two
+overloads that erase to the same signature · bridge methods · `Class<T>` type
+tokens with `isInstance` and `cast` · interoperating with legacy raw-typed code
 
 *(The scope linter reserves `<T>`, `<A,`, `<K,` and friends for module 21 and
 `? extends` / `? super` / `<?>` for module 23, so no earlier module can reach
 for either.)*
 
-## Part 8 — Java 8+ ⬜
+## Part 8 — Java 8+ ✅
 
-Lambda expressions · functional interfaces (`Predicate`, `Consumer`,
-`Function`, `Supplier`) · method references · the Stream API (`filter`,
-`map`, `sorted`, `distinct`, `reduce`, `collect`, `forEach`) · `Optional` ·
-default and static interface methods
+Modules 25–28. The course withheld `->`, `.stream()` and `Optional` for
+twenty-four modules on purpose: every `Comparator` in module 20 and every
+interface implementation in module 14 is a **named class**, so module 25 opens
+by collapsing code the learner has already written by hand.
+
+*(`default` and `static` interface methods are not here — module 14 already
+teaches them.)*
+
+**25. Lambdas, functional interfaces and method references** ✅
+Why a lambda exists (module 20's named `Comparator`, in one line) · the arrow ·
+expression body vs block body · target typing · `Predicate` / `Function` /
+`Consumer` / `Supplier` and their method names · `BiFunction` · declaring your
+own functional interface · `@FunctionalInterface` and what it checks · why
+`default`/`static` methods don't count · capture and **effectively final** ·
+a lambda opens no new scope · `this` inside a lambda · closures and returning a
+lambda · the four kinds of method reference · `Comparator.comparing` ·
+`Iterable.forEach`
+
+**26. Streams: the pipeline** ✅
+Source, intermediate, terminal · a stream is not a collection · **laziness**,
+and element-at-a-time execution · single-use and `IllegalStateException` ·
+the source is never modified · `filter` and `map` · which vs what, and where the
+element type changes · filter early · `sorted` / `sorted(Comparator)` /
+`distinct` / `limit` / `skip` · stateful vs short-circuiting operations ·
+`forEach` / `count` / `anyMatch` / `allMatch` / `noneMatch` · the empty-stream
+answers · the pipeline with no terminal that silently does nothing
+
+**27. Collecting and reducing** ✅
+`collect` and `Collector` · `Collectors.toList` / `toSet` / `joining` (with
+prefix and suffix) / `counting` · why a collected `Set` or a `HashMap` must
+never be printed · `groupingBy` with a **map factory** and a **downstream
+collector** · a frequency table in one line · `partitioningBy` and its
+always-present `false`/`true` keys · `toMap`, duplicate keys, and the merge
+function · `reduce(identity, op)` · why the identity must be neutral · folding
+to a *choice* rather than a combination · primitive streams: `mapToInt`, `sum`,
+`summaryStatistics` and its plain-value getters, `boxed`
+
+*(The one-argument `reduce(op)`, and `average`/`max`/`min`, all return Optionals
+and so are deferred to module 28 — which is the honest reason, not a dodge: an
+empty stream has no answer.)*
+
+**28. `Optional`** ✅
+Why it exists — the signature that cannot lie, not the crash · `of` (an
+assertion) / `ofNullable` / `empty` · `orElse` vs **`orElseGet`** and eager
+argument evaluation · `orElseThrow(Supplier)` · `ifPresent` · `map` / `filter` /
+`flatMap`, and why a chain removes the nested `if` · the terminals that return
+one — `findFirst`, `max`, `min`, identity-free `reduce`, `average` — and the
+single reason they all do · `OptionalInt` / `OptionalDouble` · **where not to
+use it**: fields, parameters, collections · why every unguarded `get()` is the
+`NullPointerException` you were avoiding, renamed
 
 ## Part 9 — File handling and I/O ⬜
 

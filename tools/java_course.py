@@ -16,12 +16,13 @@
 # over it. So Module 1 opens on the memory model and traversal *fluency*, not on
 # `int x = 5;`. The full roadmap (and what each part covers) is JAVA_ROADMAP.md.
 #
-# SHIPPED SCOPE: Parts 1-7 of that roadmap — Arrays (modules 1-5), Strings
-# (6-8), Methods and recursion (9-10), object-oriented programming (11-14),
-# exception handling (15-16), the collections framework (17-20) and generics
-# (21-23). Module 24 (erasure) closes Part 7 and is the next thing to author;
-# everything after that is planned, not authored, and is deliberately absent
-# rather than stubbed.
+# SHIPPED SCOPE: Parts 1-8 of that roadmap, COMPLETE — Arrays (modules 1-5),
+# Strings (6-8), Methods and recursion (9-10), object-oriented programming
+# (11-14), exception handling (15-16), the collections framework (17-20),
+# generics (21-24) and Java 8+ (25-28). The roadmap's Parts 9-14 are
+# deliberately NOT planned: file I/O, JDBC/Maven/Spring and the backend stack
+# are job skills rather than interview-coding material, and the DSA ground is
+# already covered by the Problem Library and the Mastery track.
 #
 # HARD DESIGN RULES
 #   1. NOTHING BEFORE ITS MODULE. A module may only require ideas introduced in
@@ -371,8 +372,13 @@ _MODULE_FILES = (
     "java_m21_generics.py",    # Part 7 - type parameters and generic classes
     "java_m22_genmethods.py",  #          generic methods and bounded type parameters
     "java_m23_wildcards.py",   #          wildcards and PECS
-    # Module 24 (erasure and its consequences) closes Part 7; Parts 8 onwards
-    # (Java 8+, I/O, threads) are planned but not authored - see JAVA_ROADMAP.md.
+    "java_m24_erasure.py",     #          erasure, and what it costs
+    "java_m25_lambdas.py",     # Part 8 - lambdas, functional interfaces, method refs
+    "java_m26_streams.py",     #          streams: the pipeline
+    "java_m27_collect.py",     #          collecting and reducing
+    "java_m28_optional.py",    #          Optional - closes Part 8, and the track
+    # Parts 9-14 are deliberately NOT planned; see JAVA_ROADMAP.md for what was
+    # dropped and why.
 )
 
 for _part_file in _MODULE_FILES:
@@ -422,6 +428,11 @@ _PRACTICE_FILES = (
     "java_p21_practice.py",
     "java_p22_practice.py",
     "java_p23_practice.py",
+    "java_p24_practice.py",
+    "java_p25_practice.py",
+    "java_p26_practice.py",
+    "java_p27_practice.py",
+    "java_p28_practice.py",
 )
 
 for _prac_file in _PRACTICE_FILES:
@@ -445,8 +456,19 @@ for _m in _MODULES:
 
 # (token, first module it may appear in). 999 = banned in this whole course.
 _SCOPE_RULES = [
-    # --- Part 8 (Java 8+) is not authored, so these stay banned outright. ---
-    (".stream()", 999), (" -> ", 999), ("Optional", 999),
+    # --- Part 8: Java 8+ (modules 25-28) ------------------------------------
+    # These were banned outright (999) while Part 8 was unauthored. They are now
+    # ordinary "not before module N" rules. Note what that buys: every
+    # `Comparator` in module 20 and every interface implementation in module 14
+    # is a NAMED class *on purpose*, so module 25 opens by collapsing one the
+    # learner has already written by hand.
+    (" -> ", 25),
+    (".stream()", 26), ("Stream<", 26),
+    # Collecting, reducing and primitive streams are module 27; Optional is 28.
+    # Module 26 is the PIPELINE only, and ends its pipelines with forEach/count.
+    (".collect(", 27), ("Collectors", 27), (".reduce(", 27),
+    ("IntStream", 27), ("mapToInt", 27),
+    ("Optional", 28),
     # --- Ordering within the shipped parts ---------------------------------
     ("Arrays.sort", 3), ("Arrays.binarySearch", 3),
     ("charAt(", 6), ("substring(", 6), (".equals(", 6),
@@ -558,7 +580,9 @@ JAVA_COURSE = {
         "You know the syntax — variables, if/else, loops, printing. This is the "
         "part that turns that into fluency: arrays in depth, strings in depth, "
         "methods, object-oriented programming, exceptions, the collections "
-        "framework and generics, in twenty-three judged modules. "
+        "framework, generics down to erasure and what it costs, then lambdas, "
+        "stream pipelines from `filter` to `groupingBy`, and `Optional`, in "
+        "twenty-eight judged modules. "
         "Each module is a goal, four to six lessons, warm-ups that make you "
         "predict the output, fill-in-the-blank drills, fix-the-bug programs, a "
         "coding challenge, a glossary, a cheat sheet and a project - plus a "
