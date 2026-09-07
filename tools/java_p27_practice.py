@@ -646,8 +646,11 @@ them:
                 "        System.out.println(words.stream()\n"
                 "                .map(String::toUpperCase)\n"
                 "                .collect(Collectors.joining(\", \")));\n"
-                "        System.out.println(words.stream()\n"
-                "                .collect(Collectors.groupingBy(String::length, TreeMap::new, Collectors.counting())));\n"
+                # See java_m27_collect.py: a generic `collect` passed straight to
+                # the overloaded println has no target type to infer M from.
+                "        Map<Integer, Long> byLength = words.stream()\n"
+                "                .collect(Collectors.groupingBy(String::length, TreeMap::new, Collectors.counting()));\n"
+                "        System.out.println(byLength);\n"
                 "        System.out.println(words.stream().reduce(\"\", (a, b) -> a + b));\n"
                 "        System.out.println(words.stream().mapToInt(String::length).sum());\n"
                 "        System.out.println(words.size());",

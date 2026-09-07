@@ -794,8 +794,13 @@ _M27_CAP_BODY = (
       "        System.out.println(words.stream()\n"
       "                .map(String::toUpperCase)\n"
       "                .collect(Collectors.joining(\", \")));\n"
-      "        System.out.println(words.stream()\n"
-      "                .collect(Collectors.groupingBy(String::length, TreeMap::new, Collectors.counting())));\n"
+      # Bound to a local first: passing a generic `collect` straight to the
+      # OVERLOADED println(String)/println(Object) leaves the compiler with
+      # nothing to infer M from, and it reports "incompatible bounds" on the
+      # collector's own type variable. A target type fixes it.
+      "        Map<Integer, Long> byLength = words.stream()\n"
+      "                .collect(Collectors.groupingBy(String::length, TreeMap::new, Collectors.counting()));\n"
+      "        System.out.println(byLength);\n"
       "        System.out.println(words.stream().reduce(\"\", (a, b) -> a + b));\n"
       "        System.out.println(words.stream().mapToInt(String::length).sum());\n"
       "        System.out.println(words.size());"
