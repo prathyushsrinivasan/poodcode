@@ -16,13 +16,22 @@
 # over it. So Module 1 opens on the memory model and traversal *fluency*, not on
 # `int x = 5;`. The full roadmap (and what each part covers) is JAVA_ROADMAP.md.
 #
-# SHIPPED SCOPE: Parts 1-8 of that roadmap, COMPLETE — Arrays (modules 1-5),
+# SHIPPED SCOPE: Parts 1-8 and Part 10 of that roadmap, COMPLETE — Arrays (modules 1-5),
 # Strings (6-8), Methods and recursion (9-10), object-oriented programming
 # (11-14), exception handling (15-16), the collections framework (17-20),
-# generics (21-24) and Java 8+ (25-28). The roadmap's Parts 9-14 are
-# deliberately NOT planned: file I/O, JDBC/Maven/Spring and the backend stack
-# are job skills rather than interview-coding material, and the DSA ground is
-# already covered by the Problem Library and the Mastery track.
+# generics (21-24), Java 8+ (25-28) and multithreading (29-31). The roadmap's
+# Parts 9 and 11-14 are deliberately NOT planned: file I/O, JDBC/Maven/Spring
+# and the backend stack are job skills rather than interview-coding material,
+# and the DSA ground is already covered by the Problem Library and the Mastery
+# track.
+#
+# PART 10 AND THE JUDGE: threads are the one topic where the same program can
+# print different things on different runs, and every exercise here is graded
+# by exact stdout comparison. Modules 29-31 are therefore built only from
+# patterns that are deterministic BY CONSTRUCTION - join/get before every
+# read, one slot per worker, results collected in submission order, and maps
+# printed through a TreeMap. Widening a race window with a sleep was tried and
+# failed; see java_m30_sync.py's header and JAVA_ROADMAP.md.
 #
 # HARD DESIGN RULES
 #   1. NOTHING BEFORE ITS MODULE. A module may only require ideas introduced in
@@ -376,9 +385,12 @@ _MODULE_FILES = (
     "java_m25_lambdas.py",     # Part 8 - lambdas, functional interfaces, method refs
     "java_m26_streams.py",     #          streams: the pipeline
     "java_m27_collect.py",     #          collecting and reducing
-    "java_m28_optional.py",    #          Optional - closes Part 8, and the track
-    # Parts 9-14 are deliberately NOT planned; see JAVA_ROADMAP.md for what was
-    # dropped and why.
+    "java_m28_optional.py",    #          Optional - closes Part 8
+    "java_m29_threads.py",     # Part 10 - threads, and what they cost
+    "java_m30_sync.py",        #          shared state: races, locks, visibility
+    "java_m31_executors.py",   #          executors, tasks and results - closes Part 10
+    # Parts 9 and 11-14 are deliberately NOT planned; see JAVA_ROADMAP.md for
+    # what was dropped and why.
 )
 
 for _part_file in _MODULE_FILES:
@@ -433,6 +445,9 @@ _PRACTICE_FILES = (
     "java_p26_practice.py",
     "java_p27_practice.py",
     "java_p28_practice.py",
+    "java_p29_practice.py",
+    "java_p30_practice.py",
+    "java_p31_practice.py",
 )
 
 for _prac_file in _PRACTICE_FILES:
@@ -500,6 +515,22 @@ _SCOPE_RULES = [
     ("<V>", 21), ("<A,", 21), ("<U>", 21), ("<R>", 21),
     # Wildcards are module 23 specifically, so 21 and 22 cannot pre-empt them.
     ("<?>", 23), ("? extends", 23), ("? super", 23),
+    # --- Part 10: multithreading (modules 29-31) ---------------------------
+    # Note these tokens appear in EARLIER modules' prose - module 8 discusses
+    # StringBuffer being `synchronized`, module 14 names `Runnable` as an
+    # example interface - but the linter only ever scans PROGRAMS, so those are
+    # untouched.
+    ("Thread", 29), ("Runnable", 29),
+    # Module 29 keeps every worker on its own slot with a join between the write
+    # and the read; sharing one variable between threads, and everything needed
+    # to do it safely, is module 30 and may not be pre-empted.
+    ("synchronized", 30), ("volatile", 30),
+    ("Atomic", 30), ("ReentrantLock", 30), ("Lock ", 30),
+    # Pools, tasks that return values, and the thread-safe collections are 31.
+    # "Concurrent" alone is deliberately NOT a rule: module 17 teaches
+    # ConcurrentModificationException, which has nothing to do with any of this.
+    ("ExecutorService", 31), ("Executors.", 31), ("Callable", 31),
+    ("Future", 31), ("ConcurrentHashMap", 31), ("CopyOnWrite", 31),
 ]
 
 # Text that every program (or many early ones) contains and that would trip a
@@ -581,8 +612,8 @@ JAVA_COURSE = {
         "part that turns that into fluency: arrays in depth, strings in depth, "
         "methods, object-oriented programming, exceptions, the collections "
         "framework, generics down to erasure and what it costs, then lambdas, "
-        "stream pipelines from `filter` to `groupingBy`, and `Optional`, in "
-        "twenty-eight judged modules. "
+        "stream pipelines from `filter` to `groupingBy`, `Optional`, and multithreading from `start()` to thread pools, in "
+        "thirty-one judged modules. "
         "Each module is a goal, four to six lessons, warm-ups that make you "
         "predict the output, fill-in-the-blank drills, fix-the-bug programs, a "
         "coding challenge, a glossary, a cheat sheet and a project - plus a "

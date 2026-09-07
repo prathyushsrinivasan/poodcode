@@ -13,20 +13,72 @@ looking it up.
 **Status legend** — ✅ built and shipping in the app · 🚧 partially built ·
 ⬜ planned.
 
-**Built so far:** Parts 1–8, complete (modules 1–28) — **28 modules, 132
-lessons, 570 judged exercises, plus 700 practice problems** in 140 variation
+**Built so far:** Parts 1–8 and Part 10, complete (modules 1–31) — **31 modules,
+147 lessons, 633 judged exercises, plus 775 practice problems** in 155 variation
 families.
-
-**The track is finished.** Part 8 was the last part worth authoring for
-interview preparation, and it is done.
 
 **Scope note.** Parts 9, 13 and 14 are deliberately **not planned** — file I/O,
 JDBC/Maven/Spring and the backend stack are job skills rather than
 interview-coding material, and the Backend Lab already covers the transport
 half. Part 11 is folded into earlier modules rather than authored, and Part 12
-is already served by the Problem Library and the Mastery track. The track ends
-at Part 8 plus, possibly, a single senior-level module on the JVM and design
-patterns.
+is already served by the Problem Library and the Mastery track. What remains is,
+possibly, a single senior-level module on the JVM and design patterns.
+
+---
+
+## Judging concurrency: the constraint that shaped Part 10
+
+Every exercise in this course is graded by exact stdout comparison, and threads
+are the one topic where "run it again, get different output" is the entire
+subject. Nothing in Part 10 may be left to the scheduler, so the three modules
+are built from patterns that are deterministic **by construction**:
+
+* **join / `get()` before you read.** A worker's write and your read are ordered
+  only by a `join()` (module 29) or a `Future.get()` (module 31).
+* **one slot per worker**, printed by main in index order — concurrent work,
+  sequential output. Tasks never print, with one exception: a
+  `newSingleThreadExecutor`, which is documented to run tasks in submission
+  order.
+* **results in submission order** — keep the `List<Future<T>>` and `get()` it in
+  order, or use `invokeAll`, whose result list is in argument order.
+* **a correct answer is a deterministic answer.** A properly synchronised counter
+  driven `k*m` times prints exactly `k*m` on every machine, so most of module 30
+  is simply that.
+* **a lost update is staged with joins** where the wrong number is the answer:
+  one thread reads and stops, others increment cleanly, then the first thread's
+  stale write lands. Real threads, real lost update, fixed output.
+* **maps are printed through a `TreeMap`** — a `ConcurrentHashMap`'s iteration
+  order is as undefined as a `HashMap`'s.
+
+Two approaches were tried and **rejected**, both recorded in the generators'
+headers so nobody reintroduces them:
+
+* **Widening the race window with a 40 ms sleep** between a read and a write, so
+  every thread reads before any writes. It failed verification at k=2, 4 and 5 —
+  the verifier runs exercises in parallel, and thread start-up on a loaded
+  machine outlasts the window.
+* **`fix` exercises whose buggy starter is an unsynchronised counter.**
+  `verify_java_course.py --starters` requires a buggy starter to *fail*, and an
+  unsynchronised counter is only *probably* wrong: `j30-atom-compose` shipped
+  this way and its starter **passed** a full-course run, because the machine was
+  busy enough that its two threads never overlapped. Module 30 therefore
+  contains **no `fix` exercises at all** — the broken code is quoted and
+  dissected in each prompt, and the learner writes the correct version, which is
+  deterministic by virtue of being correct.
+
+Part 10 keeps `fix` exercises only where the bug is deterministic: a thread
+never started, `run()` instead of `start()` (it prints the wrong thread *name*),
+a second `start()` that throws, `execute` where a value is wanted (it does not
+compile), and a pool that is never shut down (it always hangs).
+
+Timing is never a determinism strategy. Where a sleep is still load-bearing —
+three exercises where main must print before a worker wakes — it is a quarter of
+a second, not tens of milliseconds.
+
+The one deliberately slow exercise is `j31-shut-missing`, whose starter never
+calls `shutdown()`, hangs on its non-daemon pool threads, and is killed at the
+verifier's 20-second timeout — which counts as the starter failing, and is worth
+it for the most common real-world `ExecutorService` mistake.
 
 ---
 
@@ -302,11 +354,52 @@ use it**: fields, parameters, collections · why every unguarded `get()` is the
 buffered I/O · `InputStream` / `OutputStream` · serialization basics ·
 `Path` and `Files`
 
-## Part 10 — Multithreading ⬜
+## Part 10 — Multithreading ✅
 
-Processes vs threads · creating threads (`Thread`, `Runnable`) · the thread
-lifecycle · `sleep()` · `join()` · synchronization · race conditions ·
-locks · `ExecutorService` · `Callable` and `Future` · concurrent collections
+Modules 29–31. Sequenced so that each module supplies what the previous one
+deliberately went without: module 29 keeps every worker on its own slot and
+never lets two threads touch one variable, which is exactly the problem module
+30 exists to solve; modules 29 and 30 manage threads by hand, which is what
+module 31 replaces wholesale.
+
+**29. Threads, and what they cost** ✅
+Processes vs threads · what is shared (the heap, statics) and what is not (the
+stack) · concurrency vs parallelism · `Runnable`, extending `Thread`, and the
+lambda · **`start()` vs `run()`** and how to detect the mistake · the six states,
+and the two you can assert on · `IllegalThreadStateException` and single-use
+Thread objects · `sleep` · **`join()` as both a wait and a publish** ·
+interruption as a request, and the flag that clears itself · daemon threads and
+when the JVM exits · priorities as hints · the three patterns that make threaded
+output deterministic
+
+**30. Shared state: races, locks and visibility** ✅
+`count++` as read-modify-write · the lost update · check-then-act ·
+`synchronized` blocks and methods · the intrinsic lock · `this` vs a private
+final lock vs **the `Class` object for statics** · the lock that protects
+nothing · reentrancy · critical-section size · **visibility as a separate
+problem** · `volatile` for visibility, never for atomicity · happens-before, and
+the edges `start`/`join` already gave you · `AtomicInteger`,
+`getAndIncrement` vs `incrementAndGet`, `compareAndSet` and lock-freedom · why
+two atomic calls do not compose · `ReentrantLock`, `tryLock`, `unlock` in a
+`finally` · deadlock and **lock ordering** · confinement and immutability first
+
+**31. Executors, tasks and results** ✅
+Why a thread per task does not scale · `ExecutorService` and the factory
+methods · `execute` vs `submit` · **`Callable<V>`** returning a value and
+throwing checked exceptions · `Future` as a receipt · `ExecutionException` and
+`getCause()` · how a task's exception vanishes entirely · **collecting results in
+submission order**, by future list and by `invokeAll` · `invokeAny` ·
+`shutdown` vs `shutdownNow` · `awaitTermination` · **the pool that keeps the JVM
+alive** · `RejectedExecutionException` · why `synchronizedMap` does not fix
+check-then-act · `ConcurrentHashMap` with `putIfAbsent` / `merge` /
+`computeIfAbsent` · `CopyOnWriteArrayList` · and why a concurrent map is still
+never printed directly
+
+*(The scope linter reserves `Thread` and `Runnable` for module 29,
+`synchronized` / `volatile` / `Atomic` / `ReentrantLock` for 30, and
+`ExecutorService` / `Executors.` / `Callable` / `Future` / `ConcurrentHashMap` /
+`CopyOnWrite` for 31. `Concurrent` alone is deliberately not a rule — module 17
+teaches `ConcurrentModificationException`, which is unrelated.)*
 
 ## Part 11 — The APIs worth knowing cold ⬜
 

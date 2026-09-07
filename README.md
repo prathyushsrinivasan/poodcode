@@ -86,11 +86,11 @@ Poodcode/
 │  ├─ tests/verify_java_course.rs     # proves every Java course solution passes
 │  ├─ seeds/problems.json      # the bundled original problem set
 │  ├─ seeds/backend_course.json       # Backend Lab: 7 CRUD-API build projects
-│  └─ seeds/java_course.json          # Java course: 28 modules past the basics
+│  └─ seeds/java_course.json          # Java course: 31 modules past the basics
 │
 ├─ tools/gen_seed.py           # generator that AUTHORS every seeds/*.json
 ├─ tools/backend_course.py     # authors seeds/backend_course.json
-├─ tools/java_course.py        # authors seeds/java_course.json (+ java_m01…m20, java_p01…p20)
+├─ tools/java_course.py        # authors seeds/java_course.json (+ java_m01…m31, java_p01…p31)
 ├─ tools/verify_backend.py     # fast Node loop: runs every Backend Lab solution
 └─ tools/verify_java_course.py # fast javac/java loop: runs every Java solution
 ```
@@ -218,17 +218,28 @@ point where syntax knowledge has to turn into fluency. Twenty-eight modules:
   `Optional` — `orElse` vs `orElseGet`, `map`/`filter`/`flatMap`, the stream
   terminals that return one, and the three places it makes code worse
 
-The track ends there, deliberately: file I/O, Spring and the JDBC/build-tool
-stack are job skills rather than interview material, and the DSA ground is
-already covered by the Problem Library and the Mastery track. See
-[`JAVA_ROADMAP.md`](JAVA_ROADMAP.md).
+- **Multithreading** — processes vs threads and what they share; `Runnable`,
+  `start()` vs `run()`, the six lifecycle states, and `join()` as both a wait
+  and a *publish*; interruption as a request, and daemon threads; then shared
+  state — the lost update, `synchronized` and which object it locks, why
+  `volatile` gives visibility and never atomicity, atomics and
+  compare-and-set, `ReentrantLock`, and deadlock cured by lock ordering; and
+  finally executors — `Callable` and `Future`, where a failed task's exception
+  goes, collecting results in submission order with `invokeAll`, the forgotten
+  `shutdown()` that hangs the JVM, and `ConcurrentHashMap.merge`
+
+File I/O, Spring and the JDBC/build-tool stack are deliberately left out — they
+are job skills rather than interview material — and the DSA ground is already
+covered by the Problem Library and the Mastery track. See
+[`JAVA_ROADMAP.md`](JAVA_ROADMAP.md), which also records how Part 10's exercises
+are kept deterministic despite being about threads.
 
 Each module carries a goal, four to six lessons, "predict the output" warm-ups,
 fill-in-the-blank drills, fix-the-bug programs, coding challenges, a glossary,
 a cheat sheet, a self-check, an end-of-module review quiz and a judged capstone
-— **132 lessons and 570 judged exercises** in all, plus a **Practice** section
+— **147 lessons and 633 judged exercises** in all, plus a **Practice** section
 per module: five families of five variations each, where a family drills one
-pattern and twists one dimension at a time, for **700 more problems**. Practice
+pattern and twists one dimension at a time, for **775 more problems**. Practice
 is not required to complete a module. Every exercise runs through
 the same `javac` → `java Main` judge as the rest of the app; Part 4's programs
 declare their own classes above `Main` in the same file, which needed no change
