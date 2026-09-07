@@ -328,6 +328,9 @@ fn judge_config_for(conn: &Connection, problem_id: Option<i64>) -> judge::JudgeC
                 function_spec: p.function_spec,
                 checker: if p.checker.is_empty() { None } else { Some(p.checker) },
                 timeout,
+                ts_strictness: String::new(),
+                harness: String::new(),
+                typecheck_only: false,
             };
         }
     }
@@ -348,8 +351,18 @@ pub async fn run_tests(
     language: String,
     code: String,
     cases: Vec<TestCase>,
+    strictness: Option<String>,
+    harness: Option<String>,
+    judge_mode: Option<String>,
 ) -> AppResult<JudgeReport> {
-    let cfg = judge_config_for(&state.conn(), problem_id);
+    let mut cfg = judge_config_for(&state.conn(), problem_id);
+    // TypeScript course exercises carry the strictness their week is taught at;
+    // everything else leaves this empty and gets the `strict` baseline.
+    cfg.ts_strictness = strictness.unwrap_or_default();
+    // …and may ship a hidden harness, and ask to be graded on the type-check
+    // alone. Problems from the bank leave both unset.
+    cfg.harness = harness.unwrap_or_default();
+    cfg.typecheck_only = judge_mode.as_deref() == Some("types");
     tauri::async_runtime::spawn_blocking(move || judge::judge_with(&language, &code, &cases, &cfg))
         .await
         .map_err(|e| AppError::Other(e.to_string()))
@@ -364,8 +377,10 @@ pub async fn run_scratch(
     language: String,
     code: String,
     stdin: String,
+    strictness: Option<String>,
 ) -> AppResult<ProcOut> {
-    let cfg = judge_config_for(&state.conn(), problem_id);
+    let mut cfg = judge_config_for(&state.conn(), problem_id);
+    cfg.ts_strictness = strictness.unwrap_or_default();
     // Preparing and running the program blocks (compile + child process). Offload
     // it so the UI thread doesn't stall — see `run_tests` for the rationale.
     tauri::async_runtime::spawn_blocking(move || {
@@ -376,7 +391,8 @@ pub async fn run_scratch(
         let dir = std::env::temp_dir().join(format!("poodcode-{}", uuid::Uuid::new_v4()));
         std::fs::create_dir_all(&dir)?;
         let result = (|| {
-            let spec = exec::prepare(&language, &effective, &dir).map_err(|e| match e {
+            let opts = exec::PrepareOpts { ts_strictness: cfg.ts_strictness.clone() };
+            let spec = exec::prepare(&language, &effective, &dir, &opts).map_err(|e| match e {
                 exec::PrepareError::NotInstalled { hint } => AppError::Other(hint),
                 exec::PrepareError::Compile { message } => AppError::Other(message),
                 exec::PrepareError::Unknown(id) => AppError::Other(format!("unknown language: {id}")),

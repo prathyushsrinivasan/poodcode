@@ -122,10 +122,34 @@ export const api = {
 
   // Execution
   languages: () => invoke<LangInfo[]>("languages"),
-  runTests: (problemId: number | null, language: string, code: string, cases: TestCase[]) =>
-    invoke<JudgeReport>("run_tests", { problemId, language, code, cases }),
-  runScratch: (problemId: number | null, language: string, code: string, stdin: string) =>
-    invoke<ProcOut>("run_scratch", { problemId, language, code, stdin }),
+  // `opts` is TypeScript-only, and only the course sends it: which type-check
+  // preset to compile at (see src-tauri/src/tscheck.rs), the hidden harness to
+  // append to the learner's program, and whether to grade on the type-check
+  // alone. Omitted everywhere else, where the backend runs its `strict`
+  // baseline against stdout.
+  runTests: (
+    problemId: number | null,
+    language: string,
+    code: string,
+    cases: TestCase[],
+    opts?: { strictness?: string; harness?: string; judgeMode?: string }
+  ) =>
+    invoke<JudgeReport>("run_tests", {
+      problemId,
+      language,
+      code,
+      cases,
+      strictness: opts?.strictness,
+      harness: opts?.harness,
+      judgeMode: opts?.judgeMode,
+    }),
+  runScratch: (
+    problemId: number | null,
+    language: string,
+    code: string,
+    stdin: string,
+    strictness?: string
+  ) => invoke<ProcOut>("run_scratch", { problemId, language, code, stdin, strictness }),
   submit: (
     problemId: number,
     language: string,

@@ -109,8 +109,43 @@ pub struct Exercise {
     /// Empty for plain drills.
     #[serde(default)]
     pub difficulty: String,
+    /// TypeScript only: the strictness preset this exercise is type-checked at
+    /// ("" = `strict`, or `strict+indexed`). The TypeScript course tightens the
+    /// compiler as the syllabus advances, so a week-6 array drill is checked
+    /// under `noUncheckedIndexedAccess` while a week-2 one is not.
+    #[serde(default)]
+    pub strictness: String,
+    /// TypeScript only: hidden source appended to the learner's program before
+    /// it is type-checked and run. It never appears in the editor, so it cannot
+    /// be read around or deleted.
+    ///
+    /// Two uses, told apart by [`Exercise::judge_mode`]:
+    ///
+    /// - **stdout** — a *driver*. It reads the case's stdin, calls the function
+    ///   the exercise asked for, and prints the result in a canonical form. This
+    ///   is what lets an exercise say "implement `twoSum(nums, target)`" and
+    ///   grade the value it returns, instead of forcing every solution to
+    ///   hand-roll `console.log` scaffolding around the real work.
+    /// - **types** — *assertions*. `Expect<Equal<…>>` lines that only have to
+    ///   compile.
+    ///
+    /// Unrelated to the [`crate::harness`] module, which generates I/O glue from
+    /// a [`FunctionSpec`] for the Python/Java problem bank. This one is authored
+    /// text carried in the seed, so the judge and `tools/verify_ts_course.py`
+    /// grade against the same bytes and cannot drift apart.
+    #[serde(default)]
+    pub harness: String,
+    /// How this exercise is graded. `""` / `"stdout"` (the default) runs the
+    /// program and compares stdout against `tests`.
+    ///
+    /// `"types"` never runs it: the program only has to type-check, and `tests`
+    /// is empty. That is the only way to grade a type — `Pick<T, K>` has no
+    /// runtime value to print, so the assertion has to fail at *compile* time.
+    #[serde(default)]
+    pub judge_mode: String,
     pub starter: String,
     pub solution: String,
+    #[serde(default)]
     pub tests: Vec<ExerciseTest>,
     /// Optional Library problem slug this drill leads into (advanced concepts).
     #[serde(default)]

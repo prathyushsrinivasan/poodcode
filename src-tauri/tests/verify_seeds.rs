@@ -123,7 +123,7 @@ fn every_reference_solution_is_accepted() {
                 tolerance: p.float_tolerance,
                 function_spec: p.function_spec.clone(),
                 checker: if p.checker.is_empty() { None } else { Some(p.checker.clone()) },
-                timeout: T,
+                ..JudgeConfig::exact(T)
             };
             let report = judge_with(lang, code, &cases, &cfg);
             if report.status == "not_installed" {

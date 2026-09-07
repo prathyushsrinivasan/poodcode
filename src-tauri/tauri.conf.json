@@ -30,6 +30,12 @@
   "bundle": {
     "active": true,
     "targets": "all",
+    "resources": {
+      "tslib/poodcode-env.d.ts": "tslib/poodcode-env.d.ts",
+      "../node_modules/typescript/lib/tsc.js": "tslib/tsc.js",
+      "../node_modules/typescript/lib/_tsc.js": "tslib/_tsc.js",
+      "../node_modules/typescript/lib/lib.*.d.ts": "tslib/"
+    },
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",

@@ -169,7 +169,7 @@ fn every_java_solution_passes_its_tests() {
         tolerance: 0.0,
         function_spec: None,
         checker: None,
-        timeout: T,
+        ..JudgeConfig::exact(T)
     };
 
     let mut checked = 0;
@@ -217,7 +217,7 @@ fn every_java_starter_fails() {
         tolerance: 0.0,
         function_spec: None,
         checker: None,
-        timeout: T,
+        ..JudgeConfig::exact(T)
     };
 
     let mut checked = 0;

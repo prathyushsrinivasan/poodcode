@@ -1,7 +1,18 @@
 // Shared, judge-backed exercise + quiz widgets for the Learn tab and the
 // TypeScript course. Both surfaces render half-coded drills / coding challenges
-// and grade them the *same* way — via `api.runTests(null, lang, code, cases)`,
-// which uses the exact whitespace-normalized stdin/stdout judge (no harness).
+// and grade them the *same* way — via `api.runTests(null, lang, code, cases)`.
+//
+// Two grading modes, chosen by `exercise.judge_mode`:
+//
+//   ""/"stdout" — run the program and compare stdout against `tests`, using the
+//                 exact whitespace-normalized judge.
+//   "types"     — never run it: the program plus the exercise's hidden harness
+//                 only has to type-check. This is the only way to grade a type,
+//                 which has no runtime value to print.
+//
+// Either mode may carry `exercise.harness`: TypeScript appended to the
+// learner's code before compiling, which lets an exercise ask for a *function*
+// and grade what it returns instead of what it printed.
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { api } from "../api";
@@ -33,6 +44,7 @@ export function ExerciseCard({
   const [err, setErr] = useState("");
   const [hintsShown, setHintsShown] = useState(0);
   const [showSolution, setShowSolution] = useState(false);
+  const [showChecks, setShowChecks] = useState(false);
 
   // Progressive hint ladder (nudge → strategy → near-answer); fall back to the
   // single legacy `hint` when no ladder is authored.
@@ -48,6 +60,9 @@ export function ExerciseCard({
   const isFix = exercise.kind === "fix";
   const big = challenge || isFix;
   const hasBlank = exercise.starter.includes("____");
+  // A type-level exercise is never run: it passes when the compiler accepts the
+  // assertions in its harness. There are no test cases and no output to show.
+  const isTypes = exercise.judge_mode === "types";
 
   const height = Math.min(
     Math.max(exercise.starter.split("\n").length * 20 + 24, big ? 260 : 150),
@@ -80,7 +95,11 @@ export function ExerciseCard({
       ordering: i,
     }));
     try {
-      const r = await api.runTests(null, lang, code, cases);
+      const r = await api.runTests(null, lang, code, cases, {
+        strictness: exercise.strictness,
+        harness: exercise.harness,
+        judgeMode: exercise.judge_mode,
+      });
       setReport(r);
       if (r.status === "accepted") onSolved?.(exercise.id);
     } catch (e) {
@@ -115,6 +134,11 @@ export function ExerciseCard({
               🐞 fix the bug
             </span>
           )}
+          {isTypes && (
+            <span className="badge" style={{ borderColor: "var(--accent)", color: "var(--accent)" }}>
+              🧬 type-level
+            </span>
+          )}
           {exercise.difficulty && (
             <span className={`badge diff ${exercise.difficulty}`}>{exercise.difficulty}</span>
           )}
@@ -136,7 +160,7 @@ export function ExerciseCard({
 
       <div className="row" style={{ marginTop: 10, flexWrap: "wrap", gap: 8 }}>
         <button onClick={check} disabled={running}>
-          {running ? "Checking…" : "Check"}
+          {running ? "Checking…" : isTypes ? "Type-check" : "Check"}
         </button>
         <button className="ghost" onClick={reset} disabled={running}>
           Reset
@@ -153,6 +177,15 @@ export function ExerciseCard({
         <button className="ghost" onClick={() => setShowSolution((s) => !s)}>
           {showSolution ? "Hide solution" : "Reveal solution"}
         </button>
+        {/* A type-level exercise's assertions are worth reading — they say
+            precisely what the type has to do, and unlike hidden stdout tests
+            there is nothing to game: you cannot satisfy `Expect<Equal<…>>`
+            without actually writing the type. */}
+        {isTypes && exercise.harness && (
+          <button className="ghost" onClick={() => setShowChecks((s) => !s)}>
+            {showChecks ? "Hide checks" : "What's being checked?"}
+          </button>
+        )}
         {untouched && !running && (
           <span className="dim" style={{ fontSize: 12, alignSelf: "center" }}>
             Replace the <code>____</code> before checking.
@@ -174,6 +207,13 @@ export function ExerciseCard({
               {h}
             </p>
           ))}
+        </div>
+      )}
+
+      {showChecks && exercise.harness && (
+        <div style={{ marginTop: 10 }}>
+          <div className="io-label">These must compile against your code</div>
+          <Markdown>{"```ts\n" + exercise.harness.trim() + "\n```"}</Markdown>
         </div>
       )}
 
@@ -359,6 +399,19 @@ export function Feedback({ report }: { report: JudgeReport }) {
         <pre style={{ margin: 0, whiteSpace: "pre-wrap", fontSize: 12 }}>
           {report.compile_error}
         </pre>
+      </div>
+    );
+  }
+
+  // A type-level exercise has no cases: the backend reports one synthetic
+  // `typecheck` result, and a failure has already been rendered above as a
+  // compile error. "1/1 tests passed" would be a lie about what happened.
+  if (report.results.length === 1 && report.results[0].kind === "typecheck") {
+    return (
+      <div className="card" style={{ marginTop: 10, marginBottom: 0, borderColor: "var(--good)" }}>
+        <div className="io-label" style={{ color: "var(--good)" }}>
+          Types check out — every assertion compiled 🎉
+        </div>
       </div>
     );
   }

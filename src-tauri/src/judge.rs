@@ -16,6 +16,17 @@ pub struct JudgeConfig {
     /// when `mode == "checker"` to accept any valid answer, not one exact string.
     pub checker: Option<String>,
     pub timeout: Duration,
+    /// TypeScript only: which strictness preset the type-check runs at. Empty
+    /// means `strict`. See [`crate::tscheck`].
+    pub ts_strictness: String,
+    /// TypeScript only: hidden source appended to the learner's program before
+    /// it is compiled. See [`crate::models::Exercise::harness`]. Note this is
+    /// authored text, unrelated to the [`crate::harness`] module below.
+    pub harness: String,
+    /// TypeScript only: grade on the type-check alone and never run the program.
+    /// Set by type-level exercises, whose assertions are conditional types that
+    /// produce no output to compare.
+    pub typecheck_only: bool,
 }
 
 impl JudgeConfig {
@@ -26,6 +37,9 @@ impl JudgeConfig {
             function_spec: None,
             checker: None,
             timeout,
+            ts_strictness: String::new(),
+            harness: String::new(),
+            typecheck_only: false,
         }
     }
 }
@@ -73,6 +87,37 @@ impl JudgeReport {
             compile_error: if status == "error" { msg.clone() } else { String::new() },
             not_installed_hint: if status == "not_installed" { msg } else { String::new() },
             results: vec![],
+        }
+    }
+
+    /// The report for a type-level exercise whose program compiled.
+    ///
+    /// There are no cases to run — the compiler *is* the test — so this reports
+    /// a single synthetic result of kind `typecheck`, which is what the UI keys
+    /// off to say "types check out" rather than "1/1 tests passed".
+    fn typecheck_passed(runtime_ms: i64) -> Self {
+        JudgeReport {
+            status: "accepted".into(),
+            passed: 1,
+            total: 1,
+            runtime_ms,
+            memory_kb: None,
+            compile_error: String::new(),
+            not_installed_hint: String::new(),
+            results: vec![CaseResult {
+                name: "Type-check".into(),
+                kind: "typecheck".into(),
+                input: String::new(),
+                expected: String::new(),
+                actual: String::new(),
+                stderr: String::new(),
+                passed: true,
+                timed_out: false,
+                runtime_ms,
+                memory_kb: None,
+                truncated: false,
+                verdict: "pass".into(),
+            }],
         }
     }
 }
@@ -193,7 +238,39 @@ pub fn judge_with(
         },
         None => code.to_string(),
     };
-    let code = effective_code.as_str();
+
+    // Then append the exercise's own hidden harness, if it has one. The two are
+    // never both set: `function_spec` belongs to the Python/Java problem bank,
+    // `cfg.harness` to the TypeScript course.
+    //
+    // Both halves compile as ONE file, so tsc numbers their lines continuously
+    // and an error in the harness would be reported at a line the learner
+    // cannot see. `user_lines` is how many lines are theirs, so those
+    // diagnostics can be rewritten below.
+    let user_src = effective_code.trim_end();
+    let user_lines = user_src.lines().count();
+    let combined;
+    let code = if cfg.harness.trim().is_empty() {
+        effective_code.as_str()
+    } else {
+        combined = format!("{user_src}\n{}", cfg.harness);
+        combined.as_str()
+    };
+    let relabel = |message: String| {
+        if cfg.harness.trim().is_empty() {
+            return message;
+        }
+        let note = if cfg.typecheck_only {
+            "Your types do not satisfy this exercise's assertions. Each `Expect<…>` \
+             below is one claim the exercise makes about your type; the line number \
+             is the line of the checker, not of your code."
+        } else {
+            "The hidden checks do not compile against your code — usually the \
+             function name, its parameters or its return type are not what the \
+             exercise asked for."
+        };
+        crate::tscheck::relabel_harness_diagnostics(&message, user_lines, note)
+    };
 
     // Isolated working directory per run.
     let dir = std::env::temp_dir().join(format!("poodcode-{}", uuid::Uuid::new_v4()));
@@ -202,19 +279,29 @@ pub fn judge_with(
     }
     let _guard = DirGuard(dir.clone());
 
-    let spec: RunSpec = match exec::prepare(language, code, &dir) {
+    let opts = exec::PrepareOpts { ts_strictness: cfg.ts_strictness.clone() };
+    let started = std::time::Instant::now();
+    let spec: RunSpec = match exec::prepare(language, code, &dir, &opts) {
         Ok(s) => s,
         Err(PrepareError::NotInstalled { hint }) => {
             return JudgeReport::error("not_installed", hint)
         }
         Err(PrepareError::Compile { message }) => {
-            return JudgeReport::error("error", message)
+            return JudgeReport::error("error", relabel(message))
         }
         Err(PrepareError::Unknown(id)) => {
             return JudgeReport::error("error", format!("unknown language: {id}"))
         }
         Err(PrepareError::Io(e)) => return JudgeReport::error("error", e),
     };
+
+    // A type-level exercise is graded entirely by `prepare`: for TypeScript that
+    // step IS the type-check (see exec.rs), so getting here means every
+    // assertion in the harness compiled. There is nothing to run, and no cases
+    // to run it against.
+    if cfg.typecheck_only {
+        return JudgeReport::typecheck_passed(started.elapsed().as_millis() as i64);
+    }
 
     if cases.is_empty() {
         return JudgeReport::error("error", "no test cases to run".into());

@@ -56,6 +56,19 @@ export interface Exercise {
   kind: string;
   /** Suggested difficulty for a challenge: "Intro" | "Easy" | "Medium". */
   difficulty: string;
+  /** TypeScript only: the strictness preset this exercise is type-checked at.
+   * "" means `strict`; the TypeScript course sends `strict+indexed` from week 6
+   * onwards, which types `a[i]` as `T | undefined`. */
+  strictness?: string;
+  /** TypeScript only: hidden source appended to the learner's program before it
+   * is type-checked and run — never shown in the editor. In the default
+   * `stdout` mode it drives the function the exercise asked for and prints the
+   * result; in `types` mode it carries the `Expect<Equal<…>>` assertions. */
+  harness?: string;
+  /** How this exercise is graded. "" / "stdout" (default) runs the program and
+   * compares stdout against `tests`. "types" never runs it — the program only
+   * has to type-check, and `tests` is empty. */
+  judge_mode?: string;
   starter: string;
   solution: string;
   tests: ExerciseTest[];

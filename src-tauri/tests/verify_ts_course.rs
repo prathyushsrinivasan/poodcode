@@ -85,7 +85,29 @@ fn course_structure_is_well_formed() {
             assert!(ex.starter.contains("____"), "{}: starter has no ____ blank", ex.id);
         }
         assert_ne!(ex.starter, ex.solution, "{}: starter equals solution", ex.id);
-        assert!(!ex.tests.is_empty(), "{}: no tests", ex.id);
+        // A type-level exercise is graded by the compiler: its harness carries
+        // the assertions, and there is nothing to run or compare. Every other
+        // exercise still has to ship cases.
+        if ex.judge_mode == "types" {
+            assert!(
+                ex.tests.is_empty(),
+                "{}: a type-level exercise is never run, so its tests can never fire",
+                ex.id
+            );
+            assert!(
+                ex.harness.contains("Expect<"),
+                "{}: a type-level exercise needs Expect<> assertions in its harness",
+                ex.id
+            );
+        } else {
+            assert!(
+                ex.judge_mode.is_empty() || ex.judge_mode == "stdout",
+                "{}: unknown judge_mode {:?}",
+                ex.id,
+                ex.judge_mode
+            );
+            assert!(!ex.tests.is_empty(), "{}: no tests", ex.id);
+        }
         total += 1;
     }
     assert!(total > 0, "no course exercises shipped");
@@ -105,18 +127,20 @@ fn course_structure_is_well_formed() {
 #[test]
 fn every_course_solution_passes_its_tests() {
     let course = load_course();
-    let cfg = JudgeConfig {
-        mode: "exact".into(),
-        tolerance: 0.0,
-        function_spec: None,
-        checker: None,
-        timeout: T,
-    };
 
     let mut checked = 0;
+    let mut typed = 0;
     let mut skipped = 0;
     for (where_, ex) in all_exercises(&course) {
         let lang = if ex.language.is_empty() { "typescript" } else { &ex.language };
+        // Judge each exercise exactly as the app does: its own hidden harness,
+        // its own grading mode. Anything else and this harness stops proving
+        // that what ships actually works.
+        let cfg = JudgeConfig {
+            harness: ex.harness.clone(),
+            typecheck_only: ex.judge_mode == "types",
+            ..JudgeConfig::exact(T)
+        };
         let cases: Vec<TestCase> = ex
             .tests
             .iter()
@@ -143,6 +167,12 @@ fn every_course_solution_passes_its_tests() {
             ex.id, where_, report
         );
         checked += 1;
+        if ex.judge_mode == "types" {
+            typed += 1;
+        }
     }
-    eprintln!("verified {checked} course solutions ({skipped} skipped: Node missing)");
+    eprintln!(
+        "verified {checked} course solutions ({typed} graded by type-check alone, \
+         {skipped} skipped: Node missing)"
+    );
 }

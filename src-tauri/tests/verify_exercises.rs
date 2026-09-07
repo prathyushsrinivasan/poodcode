@@ -77,7 +77,7 @@ fn every_exercise_solution_passes_its_tests() {
         tolerance: 0.0,
         function_spec: None,
         checker: None,
-        timeout: T,
+        ..JudgeConfig::exact(T)
     };
 
     let mut checked = 0;

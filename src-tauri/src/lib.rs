@@ -11,6 +11,7 @@ pub mod models;
 mod repo;
 pub mod sqlexec;
 mod stats;
+pub mod tscheck;
 
 #[cfg(test)]
 mod tests;

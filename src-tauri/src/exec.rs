@@ -170,6 +170,24 @@ pub struct RunSpec {
     cwd: PathBuf,
 }
 
+/// Language-specific knobs for [`prepare`].
+///
+/// Only TypeScript uses one today: which strictness preset its type-check runs
+/// at, since the TypeScript course tightens the compiler as the syllabus
+/// advances (see [`crate::tscheck`]). Everything else ignores it.
+#[derive(Debug, Clone, Default)]
+pub struct PrepareOpts {
+    /// `""` (treated as `strict`), `"strict"`, or `"strict+indexed"`.
+    pub ts_strictness: String,
+}
+
+impl PrepareOpts {
+    /// The baseline every caller gets unless it asks for something tighter.
+    pub fn strict() -> Self {
+        PrepareOpts::default()
+    }
+}
+
 /// Maximum bytes captured from a program's stdout / stderr. A runaway program
 /// that prints forever will fill a pipe and block once we stop reading, then be
 /// killed by the wall-clock timeout — this cap keeps our own memory bounded.
@@ -193,7 +211,12 @@ pub struct ProcOut {
 /// Prepare a program in `dir`: write the source, compile if necessary, and
 /// return the command needed to run it. Compilation happens once so a submit
 /// can reuse the artifact across many test cases.
-pub fn prepare(lang_id: &str, code: &str, dir: &Path) -> Result<RunSpec, PrepareError> {
+pub fn prepare(
+    lang_id: &str,
+    code: &str,
+    dir: &Path,
+    opts: &PrepareOpts,
+) -> Result<RunSpec, PrepareError> {
     let spec = lang(lang_id).ok_or_else(|| PrepareError::Unknown(lang_id.to_string()))?;
     if !spec.installed() {
         return Err(PrepareError::NotInstalled {
@@ -225,6 +248,17 @@ pub fn prepare(lang_id: &str, code: &str, dir: &Path) -> Result<RunSpec, Prepare
             // silently fails *every* TS run, even a correct `console.log`.
             let mut args = ts_node_args()?;
             args.push("main.ts".into());
+            // Type-check BEFORE running, the same way Java compiles before it
+            // runs. Stripping types is not checking them: without this step a
+            // program that assigns a string to a `number` executes happily and
+            // is graded purely on what it printed.
+            let preset = if opts.ts_strictness.is_empty() {
+                crate::tscheck::STRICT
+            } else {
+                opts.ts_strictness.as_str()
+            };
+            crate::tscheck::check(dir, "main.ts", preset)
+                .map_err(|message| PrepareError::Compile { message })?;
             Ok(RunSpec { program: "node".into(), args, cwd })
         }
         "java" => {

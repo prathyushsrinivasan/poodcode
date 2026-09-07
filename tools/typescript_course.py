@@ -43,9 +43,13 @@ def _tests(pairs):
 
 
 def _mk(eid, title, prompt, full, tests, hints, difficulty, kind, starter=None,
-        blank=None):
+        blank=None, harness="", judge_mode=""):
     """Build a course Exercise dict. Either `blank` (a unique substring of `full`
-    replaced by ____ to form the starter) OR an explicit `starter` (for "fix")."""
+    replaced by ____ to form the starter) OR an explicit `starter` (for "fix").
+
+    `harness` is TypeScript appended to the learner's program before it compiles
+    — never shown in the editor. `judge_mode` picks how the result is graded:
+    "" (run it, compare stdout) or "types" (it only has to type-check)."""
     full = _prog(full)
     if starter is None:
         assert blank is not None, f"{eid}: need blank or starter"
@@ -55,13 +59,21 @@ def _mk(eid, title, prompt, full, tests, hints, difficulty, kind, starter=None,
     else:
         starter = _prog(starter)
         assert starter != full, f"{eid}: starter equals solution"
-    assert tests, f"{eid}: needs at least one test"
+    if judge_mode == "types":
+        assert not tests, f"{eid}: a type-level exercise is graded by the compiler, not by tests"
+        assert harness.strip(), f"{eid}: a type-level exercise needs assertions in its harness"
+    else:
+        assert tests, f"{eid}: needs at least one test"
     hints = list(hints or [])
     return {
         "id": eid, "title": title, "prompt": prompt,
         "hint": hints[0] if hints else "",
         "hints": hints, "language": "typescript",
         "kind": kind, "difficulty": difficulty,
+        # Overwritten per week by _apply_strictness() at the end of this file.
+        "strictness": "strict",
+        "harness": _prog(harness) if harness else "",
+        "judge_mode": judge_mode,
         "starter": starter, "solution": full, "tests": _tests(tests),
         "source_slug": "", "dataset": "",
     }
@@ -77,6 +89,141 @@ def _ch(eid, title, difficulty, prompt, full, blank, tests, hints=()):
 
 def _fix(eid, title, prompt, buggy, fixed, tests, hints=(), difficulty="Easy"):
     return _mk(eid, title, prompt, fixed, tests, hints, difficulty, "fix", starter=buggy)
+
+
+# ---------------------------------------------------------------------------
+# FUNCTION EXERCISES — graded on what the function RETURNS
+#
+# A plain drill has to print its own answer, so every solution carries
+# `console.log` scaffolding around the part that is actually being taught. A
+# function exercise moves that scaffolding into a hidden harness: the learner
+# writes only the function, and the driver below reads the case's stdin, calls
+# it, and prints the return value in a canonical form.
+#
+# This is what lets the course pose a problem the way an interviewer does —
+# "implement `twoSum(nums, target)`" — and grade the value that comes back.
+# ---------------------------------------------------------------------------
+
+def _harness_parse(ty, idx):
+    """TypeScript that reads argument `idx` off stdin as `ty`."""
+    src = f"__pcArg({idx})"
+    if ty == "number":
+        return f"Number({src})"
+    if ty == "string":
+        return src
+    if ty == "boolean":
+        return f'({src} === "true")'
+    if ty == "number[]":
+        return f"__pcNums({src})"
+    if ty == "string[]":
+        return f"__pcStrs({src})"
+    raise AssertionError(f"unsupported harness parameter type: {ty!r}")
+
+
+def _harness_print(ty, v):
+    """TypeScript that renders a return value of type `ty` for the judge.
+
+    Scalars and flat arrays print the way the rest of the course prints them
+    (space-separated), so expected outputs read naturally. Anything richer —
+    `number[][]`, a tuple, an object — falls back to JSON, which is canonical
+    without needing a printer per shape."""
+    if ty in ("number", "boolean"):
+        return f"String({v})"
+    if ty == "string":
+        return v
+    if ty in ("number[]", "boolean[]"):
+        return f'{v}.map(String).join(" ")'
+    if ty == "string[]":
+        return f'{v}.join(" ")'
+    return f"JSON.stringify({v})"
+
+
+def _driver_ty(param):
+    """The CONCRETE type the driver parses for a parameter.
+
+    A parameter is `(name, type)`, or `(name, type, driver_type)` when the
+    declared type is not something stdin can be parsed into — a generic `T[]`
+    is driven as `number[]`, and the type argument is inferred from that, just
+    as it would be at a real call site."""
+    return param[2] if len(param) > 2 else param[1]
+
+
+def _fn_harness(name, params, prints):
+    """The hidden driver: one argument per stdin line, in declaration order.
+
+    The call is left un-annotated so a *generic* function can be driven too —
+    the type argument is inferred from what the driver passes, exactly as it
+    would be at a real call site. The printer still pins the shape: a function
+    returning the wrong thing fails to compile here rather than printing
+    nonsense."""
+    lines = [
+        'import * as fs from "fs";',
+        'const __pcLines: string[] = fs.readFileSync(0, "utf8").split("\\n");',
+        # `?? ""` is not decoration: from week 6 these programs compile under
+        # noUncheckedIndexedAccess, where __pcLines[i] is `string | undefined`.
+        'const __pcArg = (i: number): string => (__pcLines[i] ?? "").trim();',
+    ]
+    driven = [_driver_ty(p) for p in params]
+    if "number[]" in driven:
+        lines.append('const __pcNums = (s: string): number[] => (s ? s.split(/\\s+/).map(Number) : []);')
+    if "string[]" in driven:
+        lines.append('const __pcStrs = (s: string): string[] => (s ? s.split(/\\s+/) : []);')
+    args = ", ".join(_harness_parse(t, i) for i, t in enumerate(driven))
+    lines.append(f"const __pcOut = {name}({args});")
+    lines.append(f"console.log({_harness_print(prints, '__pcOut')});")
+    return "\n".join(lines) + "\n"
+
+
+def _fn(eid, title, prompt, name, params, returns, body, tests, hints=(),
+        difficulty="Medium", generics="", prints=None):
+    """A blank-page function exercise: the learner writes the whole body.
+
+    `generics` is the angle-bracket clause for a generic signature ("T" →
+    `function f<T>(…)`), and `prints` is the CONCRETE return type the driver
+    sees once the type arguments are inferred — which differs from `returns`
+    exactly when the signature is generic (`returns="T"`, `prints="number"`).
+    A parameter may likewise carry a third element, the concrete type the
+    driver passes in; see `_driver_ty`.
+
+    The ____ sits where the body goes, so this still satisfies the course's
+    "every starter has a blank" rule — but here the blank is the whole
+    algorithm, not one token."""
+    sig = ", ".join(f"{p[0]}: {p[1]}" for p in params)
+    tp = f"<{generics}>" if generics else ""
+    body = "\n".join("  " + ln if ln.strip() else ln for ln in _prog(body).split("\n"))
+    solution = f"function {name}{tp}({sig}): {returns} {{\n{body.rstrip()}\n}}\n"
+    starter = f"function {name}{tp}({sig}): {returns} {{\n  ____\n}}\n"
+    return _mk(eid, title, prompt, solution, tests, hints, difficulty, "challenge",
+               starter=starter, harness=_fn_harness(name, params, prints or returns))
+
+
+# ---------------------------------------------------------------------------
+# TYPE-LEVEL EXERCISES — graded by the compiler alone
+#
+# `Pick<T, K>` has no runtime value to print, so a type cannot be graded by
+# running anything. These exercises are judged purely on whether the program
+# type-checks: the harness carries `Expect<Equal<…>>` lines, each of which is
+# one claim about the learner's type that fails at COMPILE time when wrong.
+#
+# `Equal` is the standard identity check (Millsap/type-challenges): two types
+# are equal only when the two deferred conditional types are mutually
+# assignable, which — unlike `A extends B ? … : …` — distinguishes `any`,
+# `unknown` and a union from their members.
+# ---------------------------------------------------------------------------
+
+_TYPE_PRELUDE = """\
+// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME
+// type, not merely assignable to each other.
+type Equal<X, Y> =
+  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;
+type Expect<T extends true> = T;
+"""
+
+
+def _types(eid, title, prompt, full, blank, asserts, hints=(), difficulty="Medium"):
+    """A type-level drill. `asserts` is one `type _n = Expect<...>` per claim."""
+    return _mk(eid, title, prompt, full, [], hints, difficulty, "drill", blank=blank,
+               harness=_TYPE_PRELUDE + "\n" + _prog(asserts), judge_mode="types")
 
 
 def _lesson(key, title, what, lesson_md, exercises, warmup=None, quiz=None):
@@ -6527,15 +6674,63 @@ and it catches people just as often here.
 `undefined`, which then flows onward and breaks something far away. When an
 index might be out of range, check it.
 
+**And from this week on, the compiler says so too.** Because `a[i]` can always
+come back empty, TypeScript types every index as *"the element, or nothing"*:
+
+```ts
+const nums = [3, 5, 7];
+nums[0]          // number | undefined   — not just number
+```
+
+That is a real change in what you are allowed to write. This no longer compiles:
+
+```ts
+const first: number = nums[0];   // ✗ Type 'number | undefined' is not
+                                 //   assignable to type 'number'
+```
+
+Which is the point: `nums` might have been empty, and the compiler is refusing
+to let you pretend otherwise. You have two honest answers.
+
+**1. Supply a fallback with `??`** — "use this if there is nothing there":
+
+```ts
+const first = nums[0] ?? 0;      // number
+```
+
+`??` yields the left side unless it is `null` or `undefined`, in which case it
+yields the right. Reach for it when a default genuinely makes sense.
+
+**2. Assert with `!`** — "I have already checked; there is definitely something
+here":
+
+```ts
+if (nums.length > 0) {
+  const first = nums[0]!;        // number
+}
+```
+
+The `!` is a promise *you* make to the compiler, and it is only as good as the
+check in front of it. Used without one it is just a lie that crashes later — so
+prefer `??` unless you can point at the thing that guarantees the element exists.
+
+Printing is the one place you need neither, because `console.log` is happy to
+print `undefined`:
+
+```ts
+console.log(nums[0]);            // fine — prints 3
+```
+
 **Arrays can hold anything**, including other arrays:
 
 ```ts
 const grid = [[1, 2], [3, 4]];
-grid[1][0]     // 3   — row 1, then column 0
+grid[1]![0]    // 3   — row 1 (asserted non-empty), then column 0
 ```
 
-Read `grid[1][0]` left to right: take element 1 (`[3, 4]`), then element 0 of
-that (`3`).
+Read `grid[1]![0]` left to right: take element 1 (`[3, 4]`), then element 0 of
+that (`3`). The `!` is needed because indexing *once* already gave us
+`number[] | undefined`, and you cannot index into nothing.
 
 > ⚠️ **Common mistakes:** thinking `a[1]` is the first element; using
 > `a[a.length]` for the last; and calling `a.length()` — like strings, it is a
@@ -6575,11 +6770,21 @@ that (`3`).
                     hints=["An array of numbers is written number[].",
                            "Write const scores: number[] = [];"]),
                 _ex("tscourse-w6-b-5", "Into the grid",
-                    "Print the value in row 1, column 0 (it should be 3).",
-                    'const grid = [[1, 2], [3, 4]];\nconsole.log(grid[1][0]);\n',
-                    'grid[1][0]', [("", "3")],
+                    "Print the value in row 1, column 0 (it should be 3). "
+                    "Indexing once gives you a row *or nothing*, so you have to "
+                    "promise the row is there before indexing into it.",
+                    'const grid = [[1, 2], [3, 4]];\nconsole.log(grid[1]![0]);\n',
+                    'grid[1]![0]', [("", "3")],
                     hints=["Index the row first, then the column.",
-                           "Write grid[1][0]."]),
+                           "grid[1] is number[] | undefined — assert it with ! "
+                           "before the second index.",
+                           "Write grid[1]![0]."]),
+                _ex("tscourse-w6-b-6", "A safe default",
+                    "The list is empty. Print 0 rather than `undefined`, using ??.",
+                    'const scores: number[] = [];\nconsole.log(scores[0] ?? 0);\n',
+                    'scores[0] ?? 0', [("", "0")],
+                    hints=["?? supplies a value when the left side is undefined.",
+                           "Write scores[0] ?? 0."]),
                 _fix("tscourse-w6-b-fix1", "Fix the index",
                      "This should print the FIRST name but prints the second. Fix it.",
                      'const names = ["Ada", "Bo", "Cy"];\nconsole.log(names[1]);\n',
@@ -6693,11 +6898,13 @@ prints with a stray newline. Trim, then split.
                            'Write words.join(", ").']),
                 _ex("tscourse-w6-in-4", "Sum two numbers from input",
                     "The input is two numbers. Print their sum.",
-                    _NUMS + 'console.log(nums[0] + nums[1]);\n',
-                    'nums[0] + nums[1]',
+                    _NUMS + 'console.log((nums[0] ?? 0) + (nums[1] ?? 0));\n',
+                    '(nums[0] ?? 0) + (nums[1] ?? 0)',
                     [("3 4", "7"), ("10 -2", "8")],
                     hints=["They are already numbers thanks to map(Number).",
-                           "Write nums[0] + nums[1]."]),
+                           "Indexing gives number | undefined, and you cannot add "
+                           "undefined \u2014 supply a fallback with ??.",
+                           "Write (nums[0] ?? 0) + (nums[1] ?? 0)."]),
                 _ex("tscourse-w6-in-5", "Letters of a word",
                     "Split the input into individual characters and print them space-separated.",
                     _FS + 'const s = fs.readFileSync(0, "utf8").trim();\n'
@@ -6710,9 +6917,9 @@ prints with a stray newline. Trim, then split.
                 _fix("tscourse-w6-in-fix1", "Fix the missing conversion",
                      "This should print the sum 7 for `3 4`, but prints `34`. Fix it.",
                      _FS + 'const nums = fs.readFileSync(0, "utf8").trim().split(" ");\n'
-                     'console.log(nums[0] + nums[1]);\n',
+                     'console.log((nums[0] ?? "") + (nums[1] ?? ""));\n',
                      _FS + 'const nums = fs.readFileSync(0, "utf8").trim().split(" ").map(Number);\n'
-                     'console.log(nums[0] + nums[1]);\n',
+                     'console.log((nums[0] ?? 0) + (nums[1] ?? 0));\n',
                      [("3 4", "7"), ("10 5", "15")],
                      hints=["split gives strings, so + is joining them.",
                             "Add .map(Number) after the split."],
@@ -6820,11 +7027,12 @@ Starting at `i = 1` is deliberate: element 0 has no predecessor.
                     hints=["Add each element to the running total."]),
                 _ex("tscourse-w6-lp-2", "Largest",
                     "Print the largest number, seeding from the first element.",
-                    _NUMS + 'let best = nums[0];\nfor (const x of nums) {\n  if (x > best) {\n    best = x;\n  }\n}\nconsole.log(best);\n',
-                    'let best = nums[0];',
+                    _NUMS + 'let best = nums[0]!;\nfor (const x of nums) {\n  if (x > best) {\n    best = x;\n  }\n}\nconsole.log(best);\n',
+                    'let best = nums[0]!;',
                     [("3 9 2 7", "9"), ("4", "4"), ("-5 -2 -9", "-2")],
                     hints=["Seed from a value that is actually in the list.",
-                           "Write let best = nums[0];"]),
+                           "The input always has at least one number, so assert it with !.",
+                           "Write let best = nums[0]!;"]),
                 _ex("tscourse-w6-lp-3", "Count the big ones",
                     "Count how many numbers are greater than 10.",
                     _NUMS + 'let count = 0;\nfor (const x of nums) {\n  if (x > 10) {\n    count++;\n  }\n}\nconsole.log(count);\n',
@@ -6840,11 +7048,12 @@ Starting at `i = 1` is deliberate: element 0 has no predecessor.
                     difficulty="Medium"),
                 _ex("tscourse-w6-lp-5", "Count the rises",
                     "Count how many times a number is greater than the one before it.",
-                    _NUMS + 'let rises = 0;\nfor (let i = 1; i < nums.length; i++) {\n  if (nums[i] > nums[i - 1]) {\n    rises++;\n  }\n}\nconsole.log(rises);\n',
-                    'nums[i] > nums[i - 1]',
+                    _NUMS + 'let rises = 0;\nfor (let i = 1; i < nums.length; i++) {\n  if (nums[i]! > nums[i - 1]!) {\n    rises++;\n  }\n}\nconsole.log(rises);\n',
+                    'nums[i]! > nums[i - 1]!',
                     [("1 3 2 5", "2"), ("5 4 3", "0"), ("1 2 3", "2")],
                     hints=["Compare each element with its predecessor.",
-                           "Write nums[i] > nums[i - 1]."],
+                           "The loop bound guarantees both are in range, so assert both with !.",
+                           "Write nums[i]! > nums[i - 1]!."],
                     difficulty="Medium"),
                 _ex("tscourse-w6-lp-6", "Average",
                     "Print the average of the numbers to two decimal places.",
@@ -6863,10 +7072,10 @@ Starting at `i = 1` is deliberate: element 0 has no predecessor.
                 _fix("tscourse-w6-lp-fix2", "Fix the maximum seed",
                      "With all-negative input this wrongly prints 0. Fix it so `-5 -2 -9` gives -2.",
                      _NUMS + 'let best = 0;\nfor (const x of nums) {\n  if (x > best) {\n    best = x;\n  }\n}\nconsole.log(best);\n',
-                     _NUMS + 'let best = nums[0];\nfor (const x of nums) {\n  if (x > best) {\n    best = x;\n  }\n}\nconsole.log(best);\n',
+                     _NUMS + 'let best = nums[0]!;\nfor (const x of nums) {\n  if (x > best) {\n    best = x;\n  }\n}\nconsole.log(best);\n',
                      [("-5 -2 -9", "-2"), ("3 9 2", "9")],
                      hints=["0 beats every negative number, so it is never replaced.",
-                            "Seed from an element that is actually in the array: nums[0]."],
+                            "Seed from an element that is actually in the array: nums[0]!."],
                      difficulty="Medium"),
             ],
             quiz=[
@@ -7729,8 +7938,8 @@ Rules:
             'console.log(`Count:    ${nums.length}`);\n'
             'console.log(`Total:    $${total.toFixed(2)}`);\n'
             'console.log(`Average:  $${(total / nums.length).toFixed(2)}`);\n'
-            'console.log(`Largest:  $${desc[0].toFixed(2)}`);\n'
-            'console.log(`Smallest: $${desc[desc.length - 1].toFixed(2)}`);\n'
+            'console.log(`Largest:  $${desc[0]!.toFixed(2)}`);\n'
+            'console.log(`Smallest: $${desc[desc.length - 1]!.toFixed(2)}`);\n'
             'console.log(`Top 3:    ${desc.slice(0, 3).join(", ")}`);\n',
             'let total = 0;\n'
             'for (const x of nums) {\n  total += x;\n}\n'
@@ -7738,8 +7947,8 @@ Rules:
             'console.log(`Count:    ${nums.length}`);\n'
             'console.log(`Total:    $${total.toFixed(2)}`);\n'
             'console.log(`Average:  $${(total / nums.length).toFixed(2)}`);\n'
-            'console.log(`Largest:  $${desc[0].toFixed(2)}`);\n'
-            'console.log(`Smallest: $${desc[desc.length - 1].toFixed(2)}`);\n'
+            'console.log(`Largest:  $${desc[0]!.toFixed(2)}`);\n'
+            'console.log(`Smallest: $${desc[desc.length - 1]!.toFixed(2)}`);\n'
             'console.log(`Top 3:    ${desc.slice(0, 3).join(", ")}`);',
             [("12 3 45 7 3 20",
               "Count:    6\nTotal:    $90.00\nAverage:  $15.00\nLargest:  $45.00\nSmallest: $3.00\nTop 3:    45, 20, 12"),
@@ -7747,7 +7956,7 @@ Rules:
              ("5 1", "Count:    2\nTotal:    $6.00\nAverage:  $3.00\nLargest:  $5.00\nSmallest: $1.00\nTop 3:    5, 1")],
             hints=["Total needs a loop and an accumulator — reduce arrives in week 8.",
                    "Sort a COPY descending once, and read largest, smallest and the top three off it.",
-                   "The smallest is the last element of the descending copy: desc[desc.length - 1].",
+                   "The smallest is the last element of the descending copy: desc[desc.length - 1]!.",
                    'Top 3 is desc.slice(0, 3).join(", ") — slice happily returns fewer if there are fewer.']),
         example_io="Count:    6\nTotal:    $90.00\nAverage:  $15.00\nLargest:  $45.00\nSmallest: $3.00\nTop 3:    45, 20, 12",
         rubric=["Count, total, average, largest and smallest are all computed from the array",
@@ -7764,8 +7973,8 @@ Rules:
                     'console.log(`Count:    ${nums.length}`);\n'
                     'console.log(`Total:    $${total.toFixed(2)}`);\n'
                     'console.log(`Average:  $${avg.toFixed(2)}`);\n'
-                    'console.log(`Largest:  $${desc[0].toFixed(2)}`);\n'
-                    'console.log(`Smallest: $${desc[desc.length - 1].toFixed(2)}`);\n'
+                    'console.log(`Largest:  $${desc[0]!.toFixed(2)}`);\n'
+                    'console.log(`Smallest: $${desc[desc.length - 1]!.toFixed(2)}`);\n'
                     'console.log(`Top 3:    ${desc.slice(0, 3).join(", ")}`);\n'
                     'console.log(`Over avg: ${nums.filter((x) => x > avg).length}`);\n',
                     'console.log(`Over avg: ${nums.filter((x) => x > avg).length}`);',
@@ -8166,9 +8375,15 @@ true/false logic.
                     'const e = { desc: "coffee", amount: 3 };\nconst k = "amount";\nconsole.log(e[k]);\n',
                     'e[k]', [("", "3")],
                     hints=["Brackets use the value held in k.", "Write e[k]."]),
+                # The index-signature annotation is load-bearing, not decoration:
+                # `e[k]` where k is only known at run time is a type error on a
+                # plain object literal (TS7053), because the compiler cannot
+                # prove k is one of the declared keys. Saying "this object is
+                # indexed by string" is the honest way to ask for that.
                 _ex("tscourse-w7-ac-2", "Key from input",
                     "Read a field name from input and print that field's value.",
-                    _FS + 'const e = { desc: "coffee", amount: 3 };\n'
+                    _FS + 'const e: { [key: string]: string | number } = '
+                    '{ desc: "coffee", amount: 3 };\n'
                     'const k = fs.readFileSync(0, "utf8").trim();\nconsole.log(e[k]);\n',
                     'e[k]', [("desc", "coffee"), ("amount", "3")],
                     hints=["The key is only known when the program runs.",
@@ -11419,11 +11634,21 @@ lookups (found or not), external input (any of several shapes), and state
                     hints=["typeof reports the runtime type as a string.",
                            'Write typeof x === "string".'],
                     difficulty="Medium"),
+                # The union lives on a PARAMETER, not on a const. `const v:
+                # number | string = "abc"` is narrowed to string by its own
+                # initializer, which makes the `number` branch statically dead
+                # (`v` is `never` there) — so the fixed version would not even
+                # compile, and the exercise could not teach the narrowing it is
+                # named after. A parameter is the honest home for a union the
+                # compiler genuinely cannot resolve.
                 _fix("tscourse-w9-un-fix1", "Fix the un-narrowed call",
                      "This crashes when the value is a string. Print the number formatted to 2 decimals, or the string uppercased.",
-                     'const v: number | string = "abc";\nconsole.log((v as number).toFixed(2));\n',
-                     'const v: number | string = "abc";\n'
-                     'console.log(typeof v === "number" ? v.toFixed(2) : v.toUpperCase());\n',
+                     'function format(v: number | string): string {\n'
+                     '  return (v as number).toFixed(2);\n}\n'
+                     'console.log(format("abc"));\n',
+                     'function format(v: number | string): string {\n'
+                     '  return typeof v === "number" ? v.toFixed(2) : v.toUpperCase();\n}\n'
+                     'console.log(format("abc"));\n',
                      [("", "ABC")],
                      hints=["The `as number` cast lies to the compiler; at runtime it is still a string.",
                             "Check with typeof and handle both branches."],
@@ -13084,15 +13309,19 @@ lives in the signatures. Read them slowly, and lean on the quizzes.
         "Give a type parameter a default, and recognise when a generic is overkill",
         "Write a generic helper that takes a callback and changes the type on the way through",
         "Decide when a second type parameter earns its place — and when it does not",
+        "Prove a type is right with Expect<Equal<…>>, and write a negative test with @ts-expect-error",
     ],
     why="Every array method, every Promise, every collection and every well-typed utility in the ecosystem is generic. Reading them fluently — and writing your own when a helper would otherwise need `any` — is the difference between using TypeScript and fighting it.",
-    est_minutes=580,
+    est_minutes=640,
     glossary=[
         _gloss("generic", "A function, type or interface parameterised by a type."),
         _gloss("type parameter", "The placeholder declared in angle brackets: <T>."),
         _gloss("type argument", "The concrete type supplied at a call site: first<string>(...)."),
         _gloss("inference (of type arguments)", "TypeScript working out T from the values you passed."),
         _gloss("T", "The conventional name for a type parameter. K, V, E, R are also common."),
+        _gloss("Expect<T extends true>", "A type-level assertion: handing it false is a compile error."),
+        _gloss("Equal<X, Y>", "True only when X and Y are the SAME type, not merely assignable."),
+        _gloss("@ts-expect-error", "Asserts the NEXT line must fail to compile; an unused one is itself an error."),
         _gloss("constraint", "extends limits what a type parameter may be: <T extends { id: string }>."),
         _gloss("keyof T", "The union of T's key names as literal types."),
         _gloss("indexed access (T[K])", "The type of the property K on T."),
@@ -13159,6 +13388,8 @@ const o: Options = { items: ["a"] };      // T defaults to string
         "Can you name a case where a generic would be pointless?",
         "Can you write mapAll, groupBy and maxBy from scratch, with the right type parameters?",
         "Can you say where each type parameter is inferred from at a call site?",
+        "Can you write an assertion that fails to COMPILE when a type is wrong?",
+        "Can you say why `X extends Y ? true : false` is not the same check as `Equal<X, Y>`?",
     ],
     review=[
         _q("`<T>` in a function signature declares…",
@@ -14668,6 +14899,198 @@ relationship.
                    "Needing them on a call that does pass data is usually a signature smell."),
             ],
         ),
+        _lesson(
+            "proof", "Proving a generic is right",
+            "Test a type the only way a type can be tested — with the compiler.",
+            """
+Every exercise so far has been graded by **running** it: your program printed
+something, and the judge compared that text. That works because values exist at
+runtime.
+
+Types do not.
+
+```ts
+type Value<T> = T[keyof T];
+```
+
+There is nothing to `console.log`. `Value` is erased before Node ever sees the
+file — so if you get it wrong, *nothing happens*. No crash, no wrong output.
+That is exactly why broken types survive in real codebases for months.
+
+## Make a wrong type an error
+
+The fix is to state what the type should be and let the compiler check it:
+
+```ts
+type Equal<X, Y> =
+  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;
+type Expect<T extends true> = T;
+```
+
+Read `Expect<T extends true>` as a **claim**. Its type parameter is constrained
+to `true`, so handing it `false` is a compile error — the same way passing a
+`string` to a `number` parameter is. And `Equal<X, Y>` produces `true` only when
+`X` and `Y` are the same type.
+
+Put them together and you have a test:
+
+```ts
+type Value<T> = T[keyof T];
+
+type _1 = Expect<Equal<Value<{ a: number }>, number>>;        // compiles ✓
+type _2 = Expect<Equal<Value<{ a: number }>, string>>;        // TS2344 ✗
+```
+
+The second line fails with:
+
+```
+Type 'false' does not satisfy the constraint 'true'.
+```
+
+`_1` and `_2` are never used and never run. They exist purely to be checked.
+
+## Why not just `extends`?
+
+You might reach for the simpler `T extends U ? true : false`. It is not the
+same check, and the difference bites:
+
+```ts
+type Loose<X, Y> = X extends Y ? true : false;
+
+type A = Loose<never, string>;   // true  — never extends everything
+type B = Loose<any, string>;     // boolean — any goes both ways
+```
+
+`Equal` distinguishes all of these because it compares the two conditional
+types *before* either is resolved. You do not need to be able to derive it —
+you need to know it is the honest one, and reach for it.
+
+## Exercises in this lesson are checked, not run
+
+The three below have **no test cases**. You fill the blank, press
+**Type-check**, and either every claim compiles or the compiler tells you which
+one did not. Use *What's being checked?* to read the claims first — unlike a
+hidden output test there is nothing to game, because you cannot satisfy
+`Expect<Equal<…>>` without actually writing the type.
+""",
+            [
+                _types(
+                    "tscourse-w10-prf-1", "Pull out the element type",
+                    "Write ElementOf so it yields the element type of an array type.",
+                    'type ElementOf<T extends unknown[]> = T[number];\n',
+                    "T[number]",
+                    """
+type _1 = Expect<Equal<ElementOf<string[]>, string>>;
+type _2 = Expect<Equal<ElementOf<number[]>, number>>;
+type _3 = Expect<Equal<ElementOf<boolean[][]>, boolean[]>>;
+""",
+                    hints=["Indexed access works on arrays too — the question is which key.",
+                           "Every element of T sits at a numeric index.",
+                           "Write T[number]."],
+                    difficulty="Medium"),
+                _types(
+                    "tscourse-w10-prf-2", "Every value type in an object",
+                    "Write ValueOf so it yields the union of an object type's value types.",
+                    'type ValueOf<T> = T[keyof T];\n',
+                    "T[keyof T]",
+                    """
+type _1 = Expect<Equal<ValueOf<{ a: number; b: number }>, number>>;
+type _2 = Expect<Equal<ValueOf<{ a: number; b: string }>, number | string>>;
+type _3 = Expect<Equal<ValueOf<{ id: string }>, string>>;
+""",
+                    hints=["keyof T is the union of the keys. You want what sits at those keys.",
+                           "Indexed access distributes over a union of keys.",
+                           "Write T[keyof T]."],
+                    difficulty="Medium"),
+                _types(
+                    "tscourse-w10-prf-3", "Constrain the key",
+                    "Field<T, K> should be the type of T's K property — and K must be a real key of T.",
+                    'type Field<T, K extends keyof T> = T[K];\n',
+                    "K extends keyof T",
+                    """
+type User = { id: number; name: string };
+
+type _1 = Expect<Equal<Field<User, "id">, number>>;
+type _2 = Expect<Equal<Field<User, "name">, string>>;
+type _3 = Expect<Equal<Field<User, "id" | "name">, number | string>>;
+
+// The constraint is doing real work: "email" is not a key of User, so this
+// line MUST be an error. If you leave K unconstrained the directive below
+// goes unused and the checker fails on that instead.
+// @ts-expect-error
+type _4 = Field<User, "email">;
+""",
+                    hints=["Without a constraint, T[K] is an error: K might not be a key at all.",
+                           "Say that K has to come from keyof T.",
+                           "Write K extends keyof T."],
+                    difficulty="Medium"),
+                _fn(
+                    "tscourse-w10-prf-4", "lastOf, written blind",
+                    "Return the last element of an array, or undefined when it is empty. "
+                    "You write only the function — the checker calls it and inspects what "
+                    "you return, so there is nothing to print.",
+                    "lastOf",
+                    [("xs", "T[]", "number[]")], "T | undefined",
+                    """
+if (xs.length === 0) return undefined;
+return xs[xs.length - 1];
+""",
+                    [("3 9 4 1", "1"), ("7", "7"), ("", "undefined")],
+                    hints=["The empty case has to come first — there is no last element to read.",
+                           "The last index is length - 1.",
+                           "Under noUncheckedIndexedAccess, xs[i] is already T | undefined, which is exactly the declared return type."],
+                    difficulty="Medium", generics="T", prints="number"),
+                _fn(
+                    "tscourse-w10-prf-5", "countBy, written blind",
+                    "Count how many times each word appears and return the tally as an object. "
+                    "The checker compares the object you return, not text you printed.",
+                    "tally",
+                    [("words", "string[]")], "Record<string, number>",
+                    """
+const out: Record<string, number> = {};
+for (const w of words) {
+  out[w] = (out[w] ?? 0) + 1;
+}
+return out;
+""",
+                    [("red blue red", '{"red":2,"blue":1}'),
+                     ("solo", '{"solo":1}'),
+                     ("a b a b a", '{"a":3,"b":2}')],
+                    hints=["Start from an empty Record<string, number> and walk the array.",
+                           "A key you have not seen yet reads back as undefined, so default it.",
+                           "out[w] = (out[w] ?? 0) + 1;"],
+                    difficulty="Medium"),
+            ],
+            warmup=[
+                _q("`type Expect<T extends true> = T;` rejects `Expect<false>` because…",
+                   ["false is not a type", "the constraint `extends true` is violated",
+                    "Expect runs at runtime", "T is unused"], 1,
+                   "It is the same check as passing a string to a number parameter — just at the type level."),
+                _q("A type-level exercise fails at…",
+                   ["run time", "compile time", "install time", "never"], 1,
+                   "There is no runtime: the assertion is a constraint the compiler enforces."),
+                _q("`Equal<any, string>` is…",
+                   ["true", "false", "boolean", "an error"], 1,
+                   "Equal is exact. `any` is not the same type as `string`, even though it is assignable both ways."),
+            ],
+            quiz=[
+                _q("`type _1 = Expect<Equal<X, Y>>` where the types differ produces…",
+                   ["a runtime throw", "TS2344: Type 'false' does not satisfy the constraint 'true'",
+                    "silent success", "a lint warning"], 1,
+                   "Equal yields false, and Expect's constraint rejects it."),
+                _q("Why can a type not be graded by running the program?",
+                   ["types are slow", "types are erased before the code runs",
+                    "Node lacks a type API", "types have no names"], 1,
+                   "Node strips annotations; nothing about the type survives to inspect."),
+                _q("`// @ts-expect-error` on the line above a type fails the check when…",
+                   ["the line errors", "the line does NOT error", "always", "never"], 1,
+                   "An unused directive is itself reported (TS2578) — which is what makes it a real negative test."),
+                _q("`ElementOf<T extends unknown[]> = T[number]` works because…",
+                   ["number is a key of every array", "arrays are objects",
+                    "T is generic", "number[] is special-cased"], 0,
+                   "Indexed access with `number` reaches every element slot."),
+            ],
+        ),
     ],
     capstone=_cap_auto(
         "Budget Buddy #10 — a generic toolkit",
@@ -14863,6 +15286,19 @@ _WEEKS += [
 # For each authored week, scan every program (drills/fixes/challenges/capstone/
 # stretch) for tokens that belong to a LATER week. Fails generation if violated.
 # ===========================================================================
+def _all_exercises(week):
+    """Every judged Exercise dict in a week — lessons, capstone and stretch."""
+    out = []
+    for l in week["lessons"]:
+        out.extend(l["exercises"])
+    cap = week.get("capstone")
+    if cap:
+        for ex in (cap.get("exercise"), cap.get("stretch")):
+            if ex:
+                out.append(ex)
+    return out
+
+
 def _all_programs(week):
     out = []
     for l in week["lessons"]:
@@ -14877,6 +15313,26 @@ def _all_programs(week):
         if cap.get("reference"):
             out.append((cap["title"] + ":ref", cap["reference"]))
     return out
+
+
+# ===========================================================================
+# STRICTNESS LADDER — which tsc preset each week's programs are judged under.
+#
+# Every judged program is type-checked before it runs (src-tauri/src/tscheck.rs).
+# `noUncheckedIndexedAccess` — which types `a[i]` as `T | undefined` — is the one
+# flag the course cannot switch on from week 1: weeks 1-5 have not yet met the
+# guard, the `??` or the `!` needed to satisfy it, so requiring it there would
+# demand syntax the syllabus has not taught. Week 6 is where arrays are
+# introduced, so that is where it turns on and gets a lesson of its own.
+# ===========================================================================
+INDEXED_FROM_WEEK = 6
+
+
+def _apply_strictness(weeks):
+    for w in weeks:
+        preset = "strict+indexed" if w["number"] >= INDEXED_FROM_WEEK else "strict"
+        for ex in _all_exercises(w):
+            ex["strictness"] = preset
 
 
 # (token substring, first week it's allowed). A program in a week EARLIER than
@@ -14911,6 +15367,7 @@ def _lint_scope(weeks):
 
 
 _lint_scope(_WEEKS)
+_apply_strictness(_WEEKS)
 
 
 TS_COURSE = {
