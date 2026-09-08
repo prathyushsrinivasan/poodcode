@@ -5413,10 +5413,11 @@
             {
               "id": "tscourse-w3-log-fix2",
               "title": "Fix the unguarded index",
-              "prompt": "Empty input should print false, but this reads a character that isn't there. Reorder the test so the length check protects it.",
+              "prompt": "Empty input should print false, but this crashes: it calls a method on a character that isn't there. Reorder the test so the length check protects it.",
               "hint": "&& evaluates left to right and stops at the first false.",
               "hints": [
                 "&& evaluates left to right and stops at the first false.",
+                "On empty input the left side runs first and there is no s[0] to uppercase.",
                 "Put the cheap protective test on the left."
               ],
               "language": "typescript",
@@ -5425,8 +5426,8 @@
               "strictness": "strict",
               "harness": "",
               "judge_mode": "",
-              "starter": "import * as fs from \"fs\";\nconst s = fs.readFileSync(0, \"utf8\").trim();\nconsole.log(s[0] === \"a\" && s.length > 0);\n",
-              "solution": "import * as fs from \"fs\";\nconst s = fs.readFileSync(0, \"utf8\").trim();\nconsole.log(s.length > 0 && s[0] === \"a\");\n",
+              "starter": "import * as fs from \"fs\";\nconst s = fs.readFileSync(0, \"utf8\").trim();\nconsole.log(s[0].toUpperCase() === \"A\" && s.length > 0);\n",
+              "solution": "import * as fs from \"fs\";\nconst s = fs.readFileSync(0, \"utf8\").trim();\nconsole.log(s.length > 0 && s[0].toUpperCase() === \"A\");\n",
               "tests": [
                 {
                   "input": "apple",
@@ -10311,7 +10312,7 @@
               "strictness": "strict",
               "harness": "",
               "judge_mode": "",
-              "starter": "function charge(rate: number = 0.08, amount: number): number {\n  return amount * (1 + rate);\n}\nconsole.log(charge(0.08, 100).toFixed(2));\n",
+              "starter": "function charge(rate: number = 0.08, amount: number): number {\n  return amount * (1 + rate);\n}\nconsole.log(charge(100).toFixed(2));\n",
               "solution": "function charge(amount: number, rate: number = 0.08): number {\n  return amount * (1 + rate);\n}\nconsole.log(charge(100).toFixed(2));\n",
               "tests": [
                 {
@@ -15256,7 +15257,8 @@
               "hint": "Index the array first, then chain the dots.",
               "hints": [
                 "Index the array first, then chain the dots.",
-                "Write orders[1].customer.name."
+                "You can see index 1 is there, so ! is honest here.",
+                "Write orders[1]!.customer.name."
               ],
               "language": "typescript",
               "kind": "drill",
@@ -15265,7 +15267,7 @@
               "harness": "",
               "judge_mode": "",
               "starter": "const orders = [\n  { id: 1, customer: { name: \"Ada\" } },\n  { id: 2, customer: { name: \"Bo\" } },\n];\nconsole.log(____);\n",
-              "solution": "const orders = [\n  { id: 1, customer: { name: \"Ada\" } },\n  { id: 2, customer: { name: \"Bo\" } },\n];\nconsole.log(orders[1].customer.name);\n",
+              "solution": "const orders = [\n  { id: 1, customer: { name: \"Ada\" } },\n  { id: 2, customer: { name: \"Bo\" } },\n];\nconsole.log(orders[1]!.customer.name);\n",
               "tests": [
                 {
                   "input": "",
@@ -15282,7 +15284,8 @@
               "hint": "The callback has braces, so it needs an explicit return.",
               "hints": [
                 "The callback has braces, so it needs an explicit return.",
-                "Return { desc: parts[0], amount: Number(parts[1]) };"
+                "desc must be a string, and parts[0] might be missing — give it a fallback.",
+                "Return { desc: parts[0] ?? \"\", amount: Number(parts[1]) };"
               ],
               "language": "typescript",
               "kind": "drill",
@@ -15290,8 +15293,8 @@
               "strictness": "strict+indexed",
               "harness": "",
               "judge_mode": "",
-              "starter": "import * as fs from \"fs\";\nconst rows = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nconst items = rows.map((line) => {\n  const parts = line.trim().split(\" \");\n  ____\n});\nconsole.log(items[0].desc);\n",
-              "solution": "import * as fs from \"fs\";\nconst rows = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nconst items = rows.map((line) => {\n  const parts = line.trim().split(\" \");\n  return { desc: parts[0], amount: Number(parts[1]) };\n});\nconsole.log(items[0].desc);\n",
+              "starter": "import * as fs from \"fs\";\nconst rows = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nconst items = rows.map((line) => {\n  const parts = line.trim().split(\" \");\n  ____\n});\nconsole.log(items[0]!.desc);\n",
+              "solution": "import * as fs from \"fs\";\nconst rows = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nconst items = rows.map((line) => {\n  const parts = line.trim().split(\" \");\n  return { desc: parts[0] ?? \"\", amount: Number(parts[1]) };\n});\nconsole.log(items[0]!.desc);\n",
               "tests": [
                 {
                   "input": "coffee 3\nbook 12",
@@ -16343,7 +16346,8 @@
               "hint": "Sort alphabetically first, then re-sort by count descending — sort is stable, so ties keep the alphabetical order.",
               "hints": [
                 "Sort alphabetically first, then re-sort by count descending — sort is stable, so ties keep the alphabetical order.",
-                "The count comparator is (p, q) => counts[q] - counts[p]."
+                "A table lookup can always miss, so each count needs a ?? 0 fallback.",
+                "The count comparator is (p, q) => (counts[q] ?? 0) - (counts[p] ?? 0)."
               ],
               "language": "typescript",
               "kind": "drill",
@@ -16352,7 +16356,7 @@
               "harness": "",
               "judge_mode": "",
               "starter": "import * as fs from \"fs\";\nconst words = fs.readFileSync(0, \"utf8\").trim().split(\" \");\nconst counts: { [key: string]: number } = {};\nfor (const w of words) {\n  counts[w] = (counts[w] ?? 0) + 1;\n}\nconst best = Object.keys(counts).sort().sort(____)[0];\nconsole.log(best);\n",
-              "solution": "import * as fs from \"fs\";\nconst words = fs.readFileSync(0, \"utf8\").trim().split(\" \");\nconst counts: { [key: string]: number } = {};\nfor (const w of words) {\n  counts[w] = (counts[w] ?? 0) + 1;\n}\nconst best = Object.keys(counts).sort().sort((p, q) => counts[q] - counts[p])[0];\nconsole.log(best);\n",
+              "solution": "import * as fs from \"fs\";\nconst words = fs.readFileSync(0, \"utf8\").trim().split(\" \");\nconst counts: { [key: string]: number } = {};\nfor (const w of words) {\n  counts[w] = (counts[w] ?? 0) + 1;\n}\nconst best = Object.keys(counts).sort().sort((p, q) => (counts[q] ?? 0) - (counts[p] ?? 0))[0];\nconsole.log(best);\n",
               "tests": [
                 {
                   "input": "a b a c a",
@@ -16496,7 +16500,8 @@
               "hint": "Use the `in` operator to ask whether the key exists yet.",
               "hints": [
                 "Use the `in` operator to ask whether the key exists yet.",
-                "Write if (!(key in groups)) groups[key] = [];"
+                "Write if (!(key in groups)) groups[key] = [];",
+                "The ! on the next line is earned by exactly this check: after it, the bucket is definitely there."
               ],
               "language": "typescript",
               "kind": "drill",
@@ -16504,8 +16509,8 @@
               "strictness": "strict+indexed",
               "harness": "",
               "judge_mode": "",
-              "starter": "const words = [\"ant\", \"bee\", \"ape\", \"bat\"];\nconst groups: { [key: string]: string[] } = {};\nfor (const w of words) {\n  const key = w[0];\n  ____\n  groups[key].push(w);\n}\nconsole.log(Object.keys(groups).sort().join(\",\"));\nconsole.log(groups[\"a\"].join(\" \"));\n",
-              "solution": "const words = [\"ant\", \"bee\", \"ape\", \"bat\"];\nconst groups: { [key: string]: string[] } = {};\nfor (const w of words) {\n  const key = w[0];\n  if (!(key in groups)) groups[key] = [];\n  groups[key].push(w);\n}\nconsole.log(Object.keys(groups).sort().join(\",\"));\nconsole.log(groups[\"a\"].join(\" \"));\n",
+              "starter": "const words = [\"ant\", \"bee\", \"ape\", \"bat\"];\nconst groups: { [key: string]: string[] } = {};\nfor (const w of words) {\n  const key = w[0] ?? \"\";\n  ____\n  groups[key]!.push(w);\n}\nconsole.log(Object.keys(groups).sort().join(\",\"));\nconsole.log(groups[\"a\"]!.join(\" \"));\n",
+              "solution": "const words = [\"ant\", \"bee\", \"ape\", \"bat\"];\nconst groups: { [key: string]: string[] } = {};\nfor (const w of words) {\n  const key = w[0] ?? \"\";\n  if (!(key in groups)) groups[key] = [];\n  groups[key]!.push(w);\n}\nconsole.log(Object.keys(groups).sort().join(\",\"));\nconsole.log(groups[\"a\"]!.join(\" \"));\n",
               "tests": [
                 {
                   "input": "",
@@ -16522,7 +16527,8 @@
               "hint": "The bucket for this record is groups[e.category].",
               "hints": [
                 "The bucket for this record is groups[e.category].",
-                "Push the name onto it: groups[e.category].push(e.name);"
+                "The line above just guaranteed it exists, so ! is earned.",
+                "Push the name onto it: groups[e.category]!.push(e.name);"
               ],
               "language": "typescript",
               "kind": "drill",
@@ -16530,8 +16536,8 @@
               "strictness": "strict+indexed",
               "harness": "",
               "judge_mode": "",
-              "starter": "const expenses = [\n  { name: \"coffee\", category: \"food\" },\n  { name: \"novel\", category: \"books\" },\n  { name: \"bread\", category: \"food\" },\n];\nconst groups: { [key: string]: string[] } = {};\nfor (const e of expenses) {\n  groups[e.category] = groups[e.category] ?? [];\n  ____\n}\nconsole.log(groups[\"food\"].join(\" + \"));\n",
-              "solution": "const expenses = [\n  { name: \"coffee\", category: \"food\" },\n  { name: \"novel\", category: \"books\" },\n  { name: \"bread\", category: \"food\" },\n];\nconst groups: { [key: string]: string[] } = {};\nfor (const e of expenses) {\n  groups[e.category] = groups[e.category] ?? [];\n  groups[e.category].push(e.name);\n}\nconsole.log(groups[\"food\"].join(\" + \"));\n",
+              "starter": "const expenses = [\n  { name: \"coffee\", category: \"food\" },\n  { name: \"novel\", category: \"books\" },\n  { name: \"bread\", category: \"food\" },\n];\nconst groups: { [key: string]: string[] } = {};\nfor (const e of expenses) {\n  groups[e.category] = groups[e.category] ?? [];\n  ____\n}\nconsole.log(groups[\"food\"]!.join(\" + \"));\n",
+              "solution": "const expenses = [\n  { name: \"coffee\", category: \"food\" },\n  { name: \"novel\", category: \"books\" },\n  { name: \"bread\", category: \"food\" },\n];\nconst groups: { [key: string]: string[] } = {};\nfor (const e of expenses) {\n  groups[e.category] = groups[e.category] ?? [];\n  groups[e.category]!.push(e.name);\n}\nconsole.log(groups[\"food\"]!.join(\" + \"));\n",
               "tests": [
                 {
                   "input": "",
@@ -16556,8 +16562,8 @@
               "strictness": "strict+indexed",
               "harness": "",
               "judge_mode": "",
-              "starter": "import * as fs from \"fs\";\nconst lines = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nconst groups: { [key: string]: string[] } = {};\nfor (const line of lines) {\n  const parts = line.trim().split(\",\");\n  const cat = parts[0];\n  groups[cat] = groups[cat] ?? [];\n  groups[cat].push(parts[1]);\n}\nfor (const cat of ____) {\n  console.log(`${cat}: ${groups[cat].join(\", \")}`);\n}\n",
-              "solution": "import * as fs from \"fs\";\nconst lines = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nconst groups: { [key: string]: string[] } = {};\nfor (const line of lines) {\n  const parts = line.trim().split(\",\");\n  const cat = parts[0];\n  groups[cat] = groups[cat] ?? [];\n  groups[cat].push(parts[1]);\n}\nfor (const cat of Object.keys(groups).sort()) {\n  console.log(`${cat}: ${groups[cat].join(\", \")}`);\n}\n",
+              "starter": "import * as fs from \"fs\";\nconst lines = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nconst groups: { [key: string]: string[] } = {};\nfor (const line of lines) {\n  const parts = line.trim().split(\",\");\n  const cat = parts[0] ?? \"\";\n  groups[cat] = groups[cat] ?? [];\n  groups[cat]!.push(parts[1] ?? \"\");\n}\nfor (const cat of ____) {\n  console.log(`${cat}: ${groups[cat]!.join(\", \")}`);\n}\n",
+              "solution": "import * as fs from \"fs\";\nconst lines = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nconst groups: { [key: string]: string[] } = {};\nfor (const line of lines) {\n  const parts = line.trim().split(\",\");\n  const cat = parts[0] ?? \"\";\n  groups[cat] = groups[cat] ?? [];\n  groups[cat]!.push(parts[1] ?? \"\");\n}\nfor (const cat of Object.keys(groups).sort()) {\n  console.log(`${cat}: ${groups[cat]!.join(\", \")}`);\n}\n",
               "tests": [
                 {
                   "input": "fruit,apple\nveg,leek\nfruit,fig",
@@ -16604,7 +16610,8 @@
               "hint": "Compare this bucket's length against the best one found so far.",
               "hints": [
                 "Compare this bucket's length against the best one found so far.",
-                "Write groups[k].length > groups[best].length."
+                "Both keys came out of Object.keys(groups), so both buckets exist — ! says so.",
+                "Write groups[k]!.length > groups[best]!.length."
               ],
               "language": "typescript",
               "kind": "drill",
@@ -16612,8 +16619,8 @@
               "strictness": "strict+indexed",
               "harness": "",
               "judge_mode": "",
-              "starter": "const groups: { [key: string]: string[] } = {\n  fruit: [\"apple\", \"fig\"],\n  veg: [\"leek\"],\n  drink: [\"tea\", \"coffee\", \"cocoa\"],\n};\nlet best = \"\";\nfor (const k of Object.keys(groups).sort()) {\n  if (best === \"\" || ____) best = k;\n}\nconsole.log(`${best} (${groups[best].length})`);\n",
-              "solution": "const groups: { [key: string]: string[] } = {\n  fruit: [\"apple\", \"fig\"],\n  veg: [\"leek\"],\n  drink: [\"tea\", \"coffee\", \"cocoa\"],\n};\nlet best = \"\";\nfor (const k of Object.keys(groups).sort()) {\n  if (best === \"\" || groups[k].length > groups[best].length) best = k;\n}\nconsole.log(`${best} (${groups[best].length})`);\n",
+              "starter": "const groups: { [key: string]: string[] } = {\n  fruit: [\"apple\", \"fig\"],\n  veg: [\"leek\"],\n  drink: [\"tea\", \"coffee\", \"cocoa\"],\n};\nlet best = \"\";\nfor (const k of Object.keys(groups).sort()) {\n  if (best === \"\" || ____) best = k;\n}\nconsole.log(`${best} (${groups[best]!.length})`);\n",
+              "solution": "const groups: { [key: string]: string[] } = {\n  fruit: [\"apple\", \"fig\"],\n  veg: [\"leek\"],\n  drink: [\"tea\", \"coffee\", \"cocoa\"],\n};\nlet best = \"\";\nfor (const k of Object.keys(groups).sort()) {\n  if (best === \"\" || groups[k]!.length > groups[best]!.length) best = k;\n}\nconsole.log(`${best} (${groups[best]!.length})`);\n",
               "tests": [
                 {
                   "input": "",
@@ -16630,6 +16637,7 @@
               "hint": "The very first time a letter appears, groups[letter] is undefined.",
               "hints": [
                 "The very first time a letter appears, groups[letter] is undefined.",
+                "The ! promised the bucket was there. Nothing had made that true yet.",
                 "Create an empty array for it before pushing."
               ],
               "language": "typescript",
@@ -16638,8 +16646,8 @@
               "strictness": "strict+indexed",
               "harness": "",
               "judge_mode": "",
-              "starter": "const words = [\"ant\", \"bee\", \"ape\"];\nconst groups: { [key: string]: string[] } = {};\nfor (const w of words) {\n  groups[w[0]].push(w);\n}\nconsole.log(groups[\"a\"].join(\" \"));\n",
-              "solution": "const words = [\"ant\", \"bee\", \"ape\"];\nconst groups: { [key: string]: string[] } = {};\nfor (const w of words) {\n  groups[w[0]] = groups[w[0]] ?? [];\n  groups[w[0]].push(w);\n}\nconsole.log(groups[\"a\"].join(\" \"));\n",
+              "starter": "const words = [\"ant\", \"bee\", \"ape\"];\nconst groups: { [key: string]: string[] } = {};\nfor (const w of words) {\n  const k = w[0] ?? \"\";\n  groups[k]!.push(w);\n}\nconsole.log(groups[\"a\"]!.join(\" \"));\n",
+              "solution": "const words = [\"ant\", \"bee\", \"ape\"];\nconst groups: { [key: string]: string[] } = {};\nfor (const w of words) {\n  const k = w[0] ?? \"\";\n  groups[k] = groups[k] ?? [];\n  groups[k]!.push(w);\n}\nconsole.log(groups[\"a\"]!.join(\" \"));\n",
               "tests": [
                 {
                   "input": "",
@@ -16664,8 +16672,8 @@
               "strictness": "strict+indexed",
               "harness": "",
               "judge_mode": "",
-              "starter": "const groups: { [key: string]: string[] } = {};\nconst words = [\"ant\", \"ape\", \"bee\"];\nfor (const w of words) {\n  if (!(w[0] in groups)) groups[w[0]] = [];\n  groups[w[0]] = [w];\n}\nconsole.log(groups[\"a\"].join(\" \"));\n",
-              "solution": "const groups: { [key: string]: string[] } = {};\nconst words = [\"ant\", \"ape\", \"bee\"];\nfor (const w of words) {\n  if (!(w[0] in groups)) groups[w[0]] = [];\n  groups[w[0]].push(w);\n}\nconsole.log(groups[\"a\"].join(\" \"));\n",
+              "starter": "const groups: { [key: string]: string[] } = {};\nconst words = [\"ant\", \"ape\", \"bee\"];\nfor (const w of words) {\n  const k = w[0] ?? \"\";\n  if (!(k in groups)) groups[k] = [];\n  groups[k] = [w];\n}\nconsole.log(groups[\"a\"]!.join(\" \"));\n",
+              "solution": "const groups: { [key: string]: string[] } = {};\nconst words = [\"ant\", \"ape\", \"bee\"];\nfor (const w of words) {\n  const k = w[0] ?? \"\";\n  if (!(k in groups)) groups[k] = [];\n  groups[k]!.push(w);\n}\nconsole.log(groups[\"a\"]!.join(\" \"));\n",
               "tests": [
                 {
                   "input": "",
@@ -16719,7 +16727,7 @@
               "harness": "",
               "judge_mode": "",
               "starter": "import * as fs from \"fs\";\nconst lines = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\n____\n",
-              "solution": "import * as fs from \"fs\";\nconst lines = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nconst groups: { [key: string]: number[] } = {};\nfor (const line of lines) {\n  const parts = line.trim().split(\",\");\n  const cat = parts[0];\n  groups[cat] = groups[cat] ?? [];\n  groups[cat].push(Number(parts[2]));\n}\nfor (const cat of Object.keys(groups).sort()) {\n  const prices = groups[cat];\n  let total = 0;\n  for (const p of prices) total = total + p;\n  const label = prices.length === 1 ? \"item\" : \"items\";\n  console.log(`${cat}: ${prices.length} ${label}, total $${total.toFixed(2)}`);\n}\n",
+              "solution": "import * as fs from \"fs\";\nconst lines = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nconst groups: { [key: string]: number[] } = {};\nfor (const line of lines) {\n  const parts = line.trim().split(\",\");\n  const cat = parts[0] ?? \"\";\n  groups[cat] = groups[cat] ?? [];\n  groups[cat]!.push(Number(parts[2]));\n}\nfor (const cat of Object.keys(groups).sort()) {\n  const prices = groups[cat]!;\n  let total = 0;\n  for (const p of prices) total = total + p;\n  const label = prices.length === 1 ? \"item\" : \"items\";\n  console.log(`${cat}: ${prices.length} ${label}, total $${total.toFixed(2)}`);\n}\n",
               "tests": [
                 {
                   "input": "food,apple,1.50\nbooks,novel,29.99\nfood,bread,2.25",
@@ -16805,7 +16813,7 @@
           "harness": "",
           "judge_mode": "",
           "starter": "import * as fs from \"fs\";\nconst rows = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\n____\n",
-          "solution": "import * as fs from \"fs\";\nconst rows = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nconst items = rows.map((line) => {\n  const p = line.trim().split(\" \");\n  return { desc: p[0], amount: Number(p[1]), paid: p[2] === \"y\" };\n});\nlet total = 0;\nfor (const it of items) {\n  total += it.amount;\n}\nconst unpaid = items.filter((it) => !it.paid);\nlet unpaidTotal = 0;\nfor (const it of unpaid) {\n  unpaidTotal += it.amount;\n}\nconst biggest = [...items].sort((p, q) => q.amount - p.amount)[0];\nconsole.log(`Entries:  ${items.length}`);\nconsole.log(`Total:    $${total.toFixed(2)}`);\nconsole.log(`Unpaid:   $${unpaidTotal.toFixed(2)} (${unpaid.map((it) => it.desc).join(\", \")})`);\nconsole.log(`Biggest:  ${biggest.desc} ($${biggest.amount.toFixed(2)})`);\n",
+          "solution": "import * as fs from \"fs\";\nconst rows = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nconst items = rows.map((line) => {\n  const p = line.trim().split(\" \");\n  return { desc: p[0] ?? \"\", amount: Number(p[1]), paid: p[2] === \"y\" };\n});\nlet total = 0;\nfor (const it of items) {\n  total += it.amount;\n}\nconst unpaid = items.filter((it) => !it.paid);\nlet unpaidTotal = 0;\nfor (const it of unpaid) {\n  unpaidTotal += it.amount;\n}\nconst biggest = [...items].sort((p, q) => q.amount - p.amount)[0]!;\nconsole.log(`Entries:  ${items.length}`);\nconsole.log(`Total:    $${total.toFixed(2)}`);\nconsole.log(`Unpaid:   $${unpaidTotal.toFixed(2)} (${unpaid.map((it) => it.desc).join(\", \")})`);\nconsole.log(`Biggest:  ${biggest.desc} ($${biggest.amount.toFixed(2)})`);\n",
           "tests": [
             {
               "input": "coffee 3.25 y\nbook 12 n\nlunch 9.50 n\nrent 900 y",
@@ -16847,8 +16855,8 @@
           "strictness": "strict+indexed",
           "harness": "",
           "judge_mode": "",
-          "starter": "import * as fs from \"fs\";\nconst rows = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nconst items = rows.map((line) => {\n  const p = line.trim().split(\" \");\n  return { desc: p[0], amount: Number(p[1]), paid: p[2] === \"y\", tag: p[3] };\n});\n____\n",
-          "solution": "import * as fs from \"fs\";\nconst rows = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nconst items = rows.map((line) => {\n  const p = line.trim().split(\" \");\n  return { desc: p[0], amount: Number(p[1]), paid: p[2] === \"y\", tag: p[3] };\n});\nconst byTag: { [key: string]: number } = {};\nfor (const it of items) {\n  byTag[it.tag] = (byTag[it.tag] ?? 0) + it.amount;\n}\nconst parts = Object.keys(byTag).sort().map((t) => `${t}=$${byTag[t].toFixed(2)}`);\nconsole.log(`By tag: ${parts.join(\"; \")}`);\n",
+          "starter": "import * as fs from \"fs\";\nconst rows = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nconst items = rows.map((line) => {\n  const p = line.trim().split(\" \");\n  return { desc: p[0] ?? \"\", amount: Number(p[1]), paid: p[2] === \"y\", tag: p[3] ?? \"\" };\n});\n____\n",
+          "solution": "import * as fs from \"fs\";\nconst rows = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nconst items = rows.map((line) => {\n  const p = line.trim().split(\" \");\n  return { desc: p[0] ?? \"\", amount: Number(p[1]), paid: p[2] === \"y\", tag: p[3] ?? \"\" };\n});\nconst byTag: { [key: string]: number } = {};\nfor (const it of items) {\n  byTag[it.tag] = (byTag[it.tag] ?? 0) + it.amount;\n}\nconst parts = Object.keys(byTag).sort().map((t) => `${t}=$${(byTag[t] ?? 0).toFixed(2)}`);\nconsole.log(`By tag: ${parts.join(\"; \")}`);\n",
           "tests": [
             {
               "input": "coffee 3.25 y food\nlunch 9.50 n food\nrent 900 y home",
@@ -17738,7 +17746,8 @@
               "prompt": "Print the value at row 1, column 0 of the typed grid.",
               "hint": "Index the row, then the column.",
               "hints": [
-                "Index the row, then the column."
+                "Index the row, then the column.",
+                "Each index can miss, so each one needs its own !."
               ],
               "language": "typescript",
               "kind": "drill",
@@ -17747,7 +17756,7 @@
               "harness": "",
               "judge_mode": "",
               "starter": "const grid: number[][] = [[1, 2], [3, 4]];\nconsole.log(____);\n",
-              "solution": "const grid: number[][] = [[1, 2], [3, 4]];\nconsole.log(grid[1][0]);\n",
+              "solution": "const grid: number[][] = [[1, 2], [3, 4]];\nconsole.log(grid[1]![0]);\n",
               "tests": [
                 {
                   "input": "",
@@ -17842,7 +17851,7 @@
               "hint": "The row index comes first, then the column.",
               "hints": [
                 "The row index comes first, then the column.",
-                "Write grid[1][0]."
+                "Write grid[1]![0]! — one ! per index, and both are visibly there."
               ],
               "language": "typescript",
               "kind": "fix",
@@ -17850,8 +17859,8 @@
               "strictness": "strict+indexed",
               "harness": "",
               "judge_mode": "",
-              "starter": "const grid: number[][] = [[1, 2], [3, 4]];\nconsole.log(grid[0][1]);\n",
-              "solution": "const grid: number[][] = [[1, 2], [3, 4]];\nconsole.log(grid[1][0]);\n",
+              "starter": "const grid: number[][] = [[1, 2], [3, 4]];\nconsole.log(grid[0]![1]);\n",
+              "solution": "const grid: number[][] = [[1, 2], [3, 4]];\nconsole.log(grid[1]![0]);\n",
               "tests": [
                 {
                   "input": "",
@@ -18676,7 +18685,7 @@
           "key": "w8-modelling",
           "title": "Modelling real data",
           "what": "Choosing types that make wrong states hard to write.",
-          "lesson": "Types are a design tool, not paperwork. The question is always: **what shapes\nshould be possible?**\n\nTake a payment record. A first attempt:\n\n```ts\ninterface Payment {\n  amount: number;\n  status: string;        // \"paid\" or \"pending\" or \"failed\"\n}\n```\n\n`status: string` allows `\"pain\"`, `\"PAID\"`, `\"\"` and `\"banana\"`. Narrow it to\nexactly the values you mean:\n\n```ts\ntype Status = \"paid\" | \"pending\" | \"failed\";\n\ninterface Payment {\n  amount: number;\n  status: Status;\n}\n```\n\nNow a typo is a compile error, and your editor autocompletes the three options.\nThis — **a union of literal types** — is the single highest-value modelling\ntrick in TypeScript, and week 9 is built on it.\n\n**Make illegal states unrepresentable.** Compare:\n\n```ts\ninterface Job { done: boolean; result?: string; error?: string }\n```\n\nThat permits `{ done: false, result: \"x\", error: \"y\" }` — finished and failed\nand unfinished at once. Nothing in the type says those fields travel together.\nWeek 9's discriminated unions fix this properly; for now, notice the smell:\n**optional fields that are only meaningful in combination.**\n\n**A practical checklist for a new type:**\n\n1. What are the fields, and which are genuinely optional?\n2. Which fields are a **fixed set of values** rather than free text?\n3. Which fields must never change after creation? (`readonly`)\n4. Are any of these fields only valid together?\n\n**A typed pipeline** is what this all pays for. Parse into a named type once, at\nthe edge, and everything downstream is checked:\n\n```ts\ninterface Row { desc: string; amount: number }\n\nfunction parse(line: string): Row {\n  const p = line.trim().split(\" \");\n  return { desc: p[0], amount: Number(p[1]) };\n}\n\nconst rows: Row[] = lines.map(parse);\nconst total = rows.reduce((s, r) => s + r.amount, 0);\n```\n\n`parse` is the boundary. Above it is untrusted text; below it, every field has a\nknown type. Getting the boundary right is most of what makes a program feel\nsolid — and note that the *type* does no validation. `Number(\"abc\")` is `NaN`,\nand the annotation says `number` regardless. Types describe intent; **runtime\nchecks enforce it**, and you need both.\n\n> ⚠️ **Common mistakes:** typing a fixed set of values as `string`; scattering\n> optional fields that are only valid in combination; and assuming an annotation\n> validates real input — it never does.\n",
+          "lesson": "Types are a design tool, not paperwork. The question is always: **what shapes\nshould be possible?**\n\nTake a payment record. A first attempt:\n\n```ts\ninterface Payment {\n  amount: number;\n  status: string;        // \"paid\" or \"pending\" or \"failed\"\n}\n```\n\n`status: string` allows `\"pain\"`, `\"PAID\"`, `\"\"` and `\"banana\"`. Narrow it to\nexactly the values you mean:\n\n```ts\ntype Status = \"paid\" | \"pending\" | \"failed\";\n\ninterface Payment {\n  amount: number;\n  status: Status;\n}\n```\n\nNow a typo is a compile error, and your editor autocompletes the three options.\nThis — **a union of literal types** — is the single highest-value modelling\ntrick in TypeScript, and week 9 is built on it.\n\n**Make illegal states unrepresentable.** Compare:\n\n```ts\ninterface Job { done: boolean; result?: string; error?: string }\n```\n\nThat permits `{ done: false, result: \"x\", error: \"y\" }` — finished and failed\nand unfinished at once. Nothing in the type says those fields travel together.\nWeek 9's discriminated unions fix this properly; for now, notice the smell:\n**optional fields that are only meaningful in combination.**\n\n**A practical checklist for a new type:**\n\n1. What are the fields, and which are genuinely optional?\n2. Which fields are a **fixed set of values** rather than free text?\n3. Which fields must never change after creation? (`readonly`)\n4. Are any of these fields only valid together?\n\n**A typed pipeline** is what this all pays for. Parse into a named type once, at\nthe edge, and everything downstream is checked:\n\n```ts\ninterface Row { desc: string; amount: number }\n\nfunction parse(line: string): Row {\n  const p = line.trim().split(\" \");\n  return { desc: p[0] ?? \"\", amount: Number(p[1]) };\n}\n\nconst rows: Row[] = lines.map(parse);\nconst total = rows.reduce((s, r) => s + r.amount, 0);\n```\n\n`parse` is the boundary. Above it is untrusted text; below it, every field has a\nknown type. Getting the boundary right is most of what makes a program feel\nsolid — and note that the *type* does no validation. `Number(\"abc\")` is `NaN`,\nand the annotation says `number` regardless. Types describe intent; **runtime\nchecks enforce it**, and you need both.\n\n> ⚠️ **Common mistakes:** typing a fixed set of values as `string`; scattering\n> optional fields that are only valid in combination; and assuming an annotation\n> validates real input — it never does.\n",
           "warmup": [
             {
               "question": "`status: string` versus `status: \"paid\" | \"pending\"` — the union…",
@@ -18757,7 +18766,7 @@
               "hint": "Build the record, converting the numeric field.",
               "hints": [
                 "Build the record, converting the numeric field.",
-                "Write return { desc: p[0], amount: Number(p[1]) };"
+                "Write return { desc: p[0] ?? , amount: Number(p[1]) };"
               ],
               "language": "typescript",
               "kind": "drill",
@@ -18765,8 +18774,8 @@
               "strictness": "strict+indexed",
               "harness": "",
               "judge_mode": "",
-              "starter": "import * as fs from \"fs\";\ninterface Row {\n  desc: string;\n  amount: number;\n}\nfunction parse(line: string): Row {\n  const p = line.trim().split(\" \");\n  ____\n}\nconst rows: Row[] = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\").map(parse);\nconsole.log(rows[0].amount);\n",
-              "solution": "import * as fs from \"fs\";\ninterface Row {\n  desc: string;\n  amount: number;\n}\nfunction parse(line: string): Row {\n  const p = line.trim().split(\" \");\n  return { desc: p[0], amount: Number(p[1]) };\n}\nconst rows: Row[] = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\").map(parse);\nconsole.log(rows[0].amount);\n",
+              "starter": "import * as fs from \"fs\";\ninterface Row {\n  desc: string;\n  amount: number;\n}\nfunction parse(line: string): Row {\n  const p = line.trim().split(\" \");\n  ____\n}\nconst rows: Row[] = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\").map(parse);\nconsole.log(rows[0]!.amount);\n",
+              "solution": "import * as fs from \"fs\";\ninterface Row {\n  desc: string;\n  amount: number;\n}\nfunction parse(line: string): Row {\n  const p = line.trim().split(\" \");\n  return { desc: p[0] ?? \"\", amount: Number(p[1]) };\n}\nconst rows: Row[] = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\").map(parse);\nconsole.log(rows[0]!.amount);\n",
               "tests": [
                 {
                   "input": "coffee 3",
@@ -18795,8 +18804,8 @@
               "strictness": "strict+indexed",
               "harness": "",
               "judge_mode": "",
-              "starter": "import * as fs from \"fs\";\ninterface Row {\n  desc: string;\n  amount: number;\n}\nfunction parse(line: string): Row {\n  const p = line.trim().split(\" \");\n  return { desc: p[0], amount: Number(p[1]) };\n}\nconst rows: Row[] = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\").map(parse);\nconsole.log(____);\n",
-              "solution": "import * as fs from \"fs\";\ninterface Row {\n  desc: string;\n  amount: number;\n}\nfunction parse(line: string): Row {\n  const p = line.trim().split(\" \");\n  return { desc: p[0], amount: Number(p[1]) };\n}\nconst rows: Row[] = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\").map(parse);\nconsole.log(rows.reduce((s, r) => s + r.amount, 0));\n",
+              "starter": "import * as fs from \"fs\";\ninterface Row {\n  desc: string;\n  amount: number;\n}\nfunction parse(line: string): Row {\n  const p = line.trim().split(\" \");\n  return { desc: p[0] ?? \"\", amount: Number(p[1]) };\n}\nconst rows: Row[] = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\").map(parse);\nconsole.log(____);\n",
+              "solution": "import * as fs from \"fs\";\ninterface Row {\n  desc: string;\n  amount: number;\n}\nfunction parse(line: string): Row {\n  const p = line.trim().split(\" \");\n  return { desc: p[0] ?? \"\", amount: Number(p[1]) };\n}\nconst rows: Row[] = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\").map(parse);\nconsole.log(rows.reduce((s, r) => s + r.amount, 0));\n",
               "tests": [
                 {
                   "input": "coffee 3\nbook 12",
@@ -18825,8 +18834,8 @@
               "strictness": "strict+indexed",
               "harness": "",
               "judge_mode": "",
-              "starter": "import * as fs from \"fs\";\ninterface Row {\n  desc: string;\n  amount: number;\n}\nconst p = fs.readFileSync(0, \"utf8\").trim().split(\" \");\nconst row: Row = { desc: p[0], amount: Number(p[1]) };\nconsole.log(____);\n",
-              "solution": "import * as fs from \"fs\";\ninterface Row {\n  desc: string;\n  amount: number;\n}\nconst p = fs.readFileSync(0, \"utf8\").trim().split(\" \");\nconst row: Row = { desc: p[0], amount: Number(p[1]) };\nconsole.log(Number.isNaN(row.amount) ? \"invalid\" : row.amount);\n",
+              "starter": "import * as fs from \"fs\";\ninterface Row {\n  desc: string;\n  amount: number;\n}\nconst p = fs.readFileSync(0, \"utf8\").trim().split(\" \");\nconst row: Row = { desc: p[0] ?? \"\", amount: Number(p[1]) };\nconsole.log(____);\n",
+              "solution": "import * as fs from \"fs\";\ninterface Row {\n  desc: string;\n  amount: number;\n}\nconst p = fs.readFileSync(0, \"utf8\").trim().split(\" \");\nconst row: Row = { desc: p[0] ?? \"\", amount: Number(p[1]) };\nconsole.log(Number.isNaN(row.amount) ? \"invalid\" : row.amount);\n",
               "tests": [
                 {
                   "input": "coffee abc",
@@ -18937,7 +18946,7 @@
           "key": "w8-boundary",
           "title": "Types at the boundary",
           "what": "Where untrusted text becomes values your types can vouch for.",
-          "lesson": "Here is the fact that reframes everything you learned this week:\n\n> **Types are erased before the program runs.** Not one annotation survives into\n> the running code.\n\n`const n: number = ...` is a promise *you* make to the compiler, checked while\nyou write. It is not a guard rail at runtime. So the moment data arrives from\noutside — stdin, a file, a network call, a form — your annotations describe what\nyou *hope* is there, and something has to actually check.\n\n```ts\nconst raw = fs.readFileSync(0, \"utf8\").trim();\nconst amount: number = Number(raw);   // annotation satisfied…\nconsole.log(amount + 1);              // …and if raw was \"oops\", this is NaN\n```\n\n`Number(\"oops\")` is `NaN`, whose type is `number`. The annotation is honest; the\nvalue is garbage. That is why real programs have a **boundary**.\n\n**The boundary function.** One place converts text into your shape, validating\nas it goes, and everything downstream can then trust its types:\n\n```ts\ninterface Entry {\n  name: string;\n  amount: number;\n  ok: boolean;       // did this line survive validation?\n}\n\nfunction parseEntry(line: string): Entry {\n  const parts = line.split(\",\");\n  if (parts.length !== 2) return { name: line.trim(), amount: 0, ok: false };\n  const amount = Number(parts[1].trim());\n  if (Number.isNaN(amount)) return { name: parts[0].trim(), amount: 0, ok: false };\n  return { name: parts[0].trim(), amount, ok: true };\n}\n```\n\nTwo things to notice. Validation is **guard clauses** again — reject, reject,\nthen the happy path. And a rejected line does not crash the program; it comes\nback marked `ok: false` and the caller decides. (Month 4 gives this the name it\nhas in the wild: the **Result** pattern.)\n\n**Check the things that actually go wrong.** In practice that is a short list:\nthe field count is wrong, a number didn't parse (`Number.isNaN`), a required\nstring is empty, or a value is out of range (a negative price).\n\n**`any` switches the compiler off.** It is not \"some type\" — it is \"stop\nchecking\":\n\n```ts\nconst data: any = { amount: \"3.25\" };   // a STRING, though nobody said so\nconsole.log(data.amount + 1);           // \"3.251\" — no error, wrong answer\n```\n\nEvery bug `any` lets through is a bug you were paying TypeScript to catch. Treat\neach `any` as a small debt.\n\n**`as` is a promise, not a check.** An assertion tells the compiler you know\nbetter. Nothing is verified at runtime:\n\n```ts\nconst cfg = fromElsewhere as Config;   // if it isn't a Config, nothing complains\n```\n\nUse it only right after a check you performed yourself, and never as a way to\nsilence an error you don't understand.\n\n> ⚠️ **Common mistakes:** believing an annotation validates runtime data;\n> forgetting the `Number.isNaN` guard, so one bad row poisons every total with\n> `NaN`; reaching for `any` to make an error go away; and reading fields out of\n> a split line in the wrong order — the types all still line up, and the output\n> is nonsense.\n",
+          "lesson": "Here is the fact that reframes everything you learned this week:\n\n> **Types are erased before the program runs.** Not one annotation survives into\n> the running code.\n\n`const n: number = ...` is a promise *you* make to the compiler, checked while\nyou write. It is not a guard rail at runtime. So the moment data arrives from\noutside — stdin, a file, a network call, a form — your annotations describe what\nyou *hope* is there, and something has to actually check.\n\n```ts\nconst raw = fs.readFileSync(0, \"utf8\").trim();\nconst amount: number = Number(raw);   // annotation satisfied…\nconsole.log(amount + 1);              // …and if raw was \"oops\", this is NaN\n```\n\n`Number(\"oops\")` is `NaN`, whose type is `number`. The annotation is honest; the\nvalue is garbage. That is why real programs have a **boundary**.\n\n**The boundary function.** One place converts text into your shape, validating\nas it goes, and everything downstream can then trust its types:\n\n```ts\ninterface Entry {\n  name: string;\n  amount: number;\n  ok: boolean;       // did this line survive validation?\n}\n\nfunction parseEntry(line: string): Entry {\n  const parts = line.split(\",\");\n  if (parts.length !== 2) return { name: line.trim(), amount: 0, ok: false };\n  const amount = Number((parts[1] ?? \"\").trim());\n  if (Number.isNaN(amount)) return { name: (parts[0] ?? \"\").trim(), amount: 0, ok: false };\n  return { name: (parts[0] ?? \"\").trim(), amount, ok: true };\n}\n```\n\nTwo things to notice. Validation is **guard clauses** again — reject, reject,\nthen the happy path. And a rejected line does not crash the program; it comes\nback marked `ok: false` and the caller decides. (Month 4 gives this the name it\nhas in the wild: the **Result** pattern.)\n\n**Check the things that actually go wrong.** In practice that is a short list:\nthe field count is wrong, a number didn't parse (`Number.isNaN`), a required\nstring is empty, or a value is out of range (a negative price).\n\n**`any` switches the compiler off.** It is not \"some type\" — it is \"stop\nchecking\":\n\n```ts\nconst data: any = { amount: \"3.25\" };   // a STRING, though nobody said so\nconsole.log(data.amount + 1);           // \"3.251\" — no error, wrong answer\n```\n\nEvery bug `any` lets through is a bug you were paying TypeScript to catch. Treat\neach `any` as a small debt.\n\n**`as` is a promise, not a check.** An assertion tells the compiler you know\nbetter. Nothing is verified at runtime:\n\n```ts\nconst cfg = fromElsewhere as Config;   // if it isn't a Config, nothing complains\n```\n\nUse it only right after a check you performed yourself, and never as a way to\nsilence an error you don't understand.\n\n> ⚠️ **Common mistakes:** believing an annotation validates runtime data;\n> forgetting the `Number.isNaN` guard, so one bad row poisons every total with\n> `NaN`; reaching for `any` to make an error go away; and reading fields out of\n> a split line in the wrong order — the types all still line up, and the output\n> is nonsense.\n",
           "warmup": [
             {
               "question": "`const n: number = Number(\"oops\");` — does this compile?",
@@ -19057,8 +19066,8 @@
               "strictness": "strict+indexed",
               "harness": "",
               "judge_mode": "",
-              "starter": "interface Parsed {\n  ok: boolean;\n  name: string;\n  amount: number;\n}\nfunction parseLine(line: string): Parsed {\n  const parts = line.split(\",\");\n  ____\n  const amount = Number(parts[1]);\n  if (Number.isNaN(amount)) return { ok: false, name: \"\", amount: 0 };\n  return { ok: true, name: parts[0].trim(), amount };\n}\nconsole.log(parseLine(\"coffee, 3.25\").ok);\nconsole.log(parseLine(\"coffee\").ok);\nconsole.log(parseLine(\"coffee, abc\").ok);\n",
-              "solution": "interface Parsed {\n  ok: boolean;\n  name: string;\n  amount: number;\n}\nfunction parseLine(line: string): Parsed {\n  const parts = line.split(\",\");\n  if (parts.length !== 2) return { ok: false, name: \"\", amount: 0 };\n  const amount = Number(parts[1]);\n  if (Number.isNaN(amount)) return { ok: false, name: \"\", amount: 0 };\n  return { ok: true, name: parts[0].trim(), amount };\n}\nconsole.log(parseLine(\"coffee, 3.25\").ok);\nconsole.log(parseLine(\"coffee\").ok);\nconsole.log(parseLine(\"coffee, abc\").ok);\n",
+              "starter": "interface Parsed {\n  ok: boolean;\n  name: string;\n  amount: number;\n}\nfunction parseLine(line: string): Parsed {\n  const parts = line.split(\",\");\n  ____\n  const amount = Number(parts[1]);\n  if (Number.isNaN(amount)) return { ok: false, name: \"\", amount: 0 };\n  return { ok: true, name: (parts[0] ?? \"\").trim(), amount };\n}\nconsole.log(parseLine(\"coffee, 3.25\").ok);\nconsole.log(parseLine(\"coffee\").ok);\nconsole.log(parseLine(\"coffee, abc\").ok);\n",
+              "solution": "interface Parsed {\n  ok: boolean;\n  name: string;\n  amount: number;\n}\nfunction parseLine(line: string): Parsed {\n  const parts = line.split(\",\");\n  if (parts.length !== 2) return { ok: false, name: \"\", amount: 0 };\n  const amount = Number(parts[1]);\n  if (Number.isNaN(amount)) return { ok: false, name: \"\", amount: 0 };\n  return { ok: true, name: (parts[0] ?? \"\").trim(), amount };\n}\nconsole.log(parseLine(\"coffee, 3.25\").ok);\nconsole.log(parseLine(\"coffee\").ok);\nconsole.log(parseLine(\"coffee, abc\").ok);\n",
               "tests": [
                 {
                   "input": "",
@@ -19188,7 +19197,7 @@
               "harness": "",
               "judge_mode": "",
               "starter": "interface Item {\n  name: string;\n  price: number;\n}\nfunction toItem(line: string): Item {\n  const parts = line.split(\",\");\n  return { name: parts[1], price: Number(parts[0]) };\n}\nconst it = toItem(\"book,12\");\nconsole.log(`${it.name} costs ${it.price}`);\n",
-              "solution": "interface Item {\n  name: string;\n  price: number;\n}\nfunction toItem(line: string): Item {\n  const parts = line.split(\",\");\n  return { name: parts[0], price: Number(parts[1]) };\n}\nconst it = toItem(\"book,12\");\nconsole.log(`${it.name} costs ${it.price}`);\n",
+              "solution": "interface Item {\n  name: string;\n  price: number;\n}\nfunction toItem(line: string): Item {\n  const parts = line.split(\",\");\n  return { name: parts[0] ?? \"\", price: Number(parts[1]) };\n}\nconst it = toItem(\"book,12\");\nconsole.log(`${it.name} costs ${it.price}`);\n",
               "tests": [
                 {
                   "input": "",
@@ -19216,7 +19225,7 @@
               "harness": "",
               "judge_mode": "",
               "starter": "import * as fs from \"fs\";\n____\nconst lines = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\")\n  .filter((l) => l.trim().length > 0);\nconst entries: Entry[] = lines.map((l) => parseEntry(l));\nconst good = entries.filter((e) => e.ok);\nconst total = good.reduce((sum, e) => sum + e.amount, 0);\nfor (const e of good) console.log(`${e.name}: $${e.amount.toFixed(2)}`);\nconsole.log(`Accepted ${good.length}, rejected ${entries.length - good.length}, total $${total.toFixed(2)}`);\n",
-              "solution": "import * as fs from \"fs\";\ninterface Entry {\n  name: string;\n  amount: number;\n  ok: boolean;\n}\nfunction parseEntry(line: string): Entry {\n  const parts = line.split(\",\");\n  if (parts.length !== 2) return { name: line.trim(), amount: 0, ok: false };\n  const amount = Number(parts[1].trim());\n  if (Number.isNaN(amount) || amount < 0) {\n    return { name: parts[0].trim(), amount: 0, ok: false };\n  }\n  return { name: parts[0].trim(), amount, ok: true };\n}\nconst lines = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\")\n  .filter((l) => l.trim().length > 0);\nconst entries: Entry[] = lines.map((l) => parseEntry(l));\nconst good = entries.filter((e) => e.ok);\nconst total = good.reduce((sum, e) => sum + e.amount, 0);\nfor (const e of good) console.log(`${e.name}: $${e.amount.toFixed(2)}`);\nconsole.log(`Accepted ${good.length}, rejected ${entries.length - good.length}, total $${total.toFixed(2)}`);\n",
+              "solution": "import * as fs from \"fs\";\ninterface Entry {\n  name: string;\n  amount: number;\n  ok: boolean;\n}\nfunction parseEntry(line: string): Entry {\n  const parts = line.split(\",\");\n  if (parts.length !== 2) return { name: line.trim(), amount: 0, ok: false };\n  const amount = Number((parts[1] ?? \"\").trim());\n  if (Number.isNaN(amount) || amount < 0) {\n    return { name: (parts[0] ?? \"\").trim(), amount: 0, ok: false };\n  }\n  return { name: (parts[0] ?? \"\").trim(), amount, ok: true };\n}\nconst lines = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\")\n  .filter((l) => l.trim().length > 0);\nconst entries: Entry[] = lines.map((l) => parseEntry(l));\nconst good = entries.filter((e) => e.ok);\nconst total = good.reduce((sum, e) => sum + e.amount, 0);\nfor (const e of good) console.log(`${e.name}: $${e.amount.toFixed(2)}`);\nconsole.log(`Accepted ${good.length}, rejected ${entries.length - good.length}, total $${total.toFixed(2)}`);\n",
               "tests": [
                 {
                   "input": "coffee, 3.25\nbroken\nbook, 12\nbad, -4",
@@ -19306,7 +19315,7 @@
           "harness": "",
           "judge_mode": "",
           "starter": "import * as fs from \"fs\";\ntype Status = \"paid\" | \"unpaid\";\ninterface Expense {\n  desc: string;\n  amount: number;\n  status: Status;\n}\n____\n",
-          "solution": "import * as fs from \"fs\";\ntype Status = \"paid\" | \"unpaid\";\ninterface Expense {\n  desc: string;\n  amount: number;\n  status: Status;\n}\nfunction parse(line: string): Expense {\n  const p = line.trim().split(\" \");\n  return { desc: p[0], amount: Number(p[1]), status: p[2] === \"paid\" ? \"paid\" : \"unpaid\" };\n}\nconst rows: Expense[] = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\").map(parse);\nconst total = rows.reduce((s, r) => s + r.amount, 0);\nconst paid = rows.filter((r) => r.status === \"paid\").reduce((s, r) => s + r.amount, 0);\nconst largest = rows.reduce((best, r) => (r.amount > best.amount ? r : best), rows[0]);\nconsole.log(`Count:   ${rows.length}`);\nconsole.log(`Total:   $${total.toFixed(2)}`);\nconsole.log(`Paid:    $${paid.toFixed(2)}`);\nconsole.log(`Unpaid:  $${(total - paid).toFixed(2)}`);\nconsole.log(`Largest: ${largest.desc}`);\n",
+          "solution": "import * as fs from \"fs\";\ntype Status = \"paid\" | \"unpaid\";\ninterface Expense {\n  desc: string;\n  amount: number;\n  status: Status;\n}\nfunction parse(line: string): Expense {\n  const p = line.trim().split(\" \");\n  return { desc: p[0] ?? \"\", amount: Number(p[1]), status: p[2] === \"paid\" ? \"paid\" : \"unpaid\" };\n}\nconst rows: Expense[] = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\").map(parse);\nconst total = rows.reduce((s, r) => s + r.amount, 0);\nconst paid = rows.filter((r) => r.status === \"paid\").reduce((s, r) => s + r.amount, 0);\nconst largest = rows.reduce((best, r) => (r.amount > best.amount ? r : best), rows[0]!);\nconsole.log(`Count:   ${rows.length}`);\nconsole.log(`Total:   $${total.toFixed(2)}`);\nconsole.log(`Paid:    $${paid.toFixed(2)}`);\nconsole.log(`Unpaid:  $${(total - paid).toFixed(2)}`);\nconsole.log(`Largest: ${largest.desc}`);\n",
           "tests": [
             {
               "input": "coffee 3.25 paid\nbook 12 unpaid\nlunch 9.50 unpaid\nrent 900 paid",
@@ -19348,8 +19357,8 @@
           "strictness": "strict+indexed",
           "harness": "",
           "judge_mode": "",
-          "starter": "import * as fs from \"fs\";\ntype Status = \"paid\" | \"unpaid\";\ninterface Expense {\n  desc: string;\n  amount: number;\n  status: Status;\n}\nfunction parse(line: string): Expense {\n  const p = line.trim().split(\" \");\n  return { desc: p[0], amount: Number(p[1]), status: p[2] === \"paid\" ? \"paid\" : \"unpaid\" };\n}\nconst rows: Expense[] = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\").map(parse);\n____\n",
-          "solution": "import * as fs from \"fs\";\ntype Status = \"paid\" | \"unpaid\";\ninterface Expense {\n  desc: string;\n  amount: number;\n  status: Status;\n}\nfunction parse(line: string): Expense {\n  const p = line.trim().split(\" \");\n  return { desc: p[0], amount: Number(p[1]), status: p[2] === \"paid\" ? \"paid\" : \"unpaid\" };\n}\nconst rows: Expense[] = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\").map(parse);\nconst byStatus = rows.reduce((acc, r) => {\n  acc[r.status] = (acc[r.status] ?? 0) + 1;\n  return acc;\n}, {} as { [key: string]: number });\nconst parts = Object.keys(byStatus).sort().map((k) => `${k}=${byStatus[k]}`);\nconsole.log(`By status: ${parts.join(\", \")}`);\n",
+          "starter": "import * as fs from \"fs\";\ntype Status = \"paid\" | \"unpaid\";\ninterface Expense {\n  desc: string;\n  amount: number;\n  status: Status;\n}\nfunction parse(line: string): Expense {\n  const p = line.trim().split(\" \");\n  return { desc: p[0] ?? \"\", amount: Number(p[1]), status: p[2] === \"paid\" ? \"paid\" : \"unpaid\" };\n}\nconst rows: Expense[] = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\").map(parse);\n____\n",
+          "solution": "import * as fs from \"fs\";\ntype Status = \"paid\" | \"unpaid\";\ninterface Expense {\n  desc: string;\n  amount: number;\n  status: Status;\n}\nfunction parse(line: string): Expense {\n  const p = line.trim().split(\" \");\n  return { desc: p[0] ?? \"\", amount: Number(p[1]), status: p[2] === \"paid\" ? \"paid\" : \"unpaid\" };\n}\nconst rows: Expense[] = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\").map(parse);\nconst byStatus = rows.reduce((acc, r) => {\n  acc[r.status] = (acc[r.status] ?? 0) + 1;\n  return acc;\n}, {} as { [key: string]: number });\nconst parts = Object.keys(byStatus).sort().map((k) => `${k}=${byStatus[k]}`);\nconsole.log(`By status: ${parts.join(\", \")}`);\n",
           "tests": [
             {
               "input": "coffee 3.25 paid\nbook 12 unpaid\nlunch 9.50 unpaid\nrent 900 paid",
@@ -20123,7 +20132,7 @@
               "strictness": "strict+indexed",
               "harness": "",
               "judge_mode": "",
-              "starter": "type Status = \"paid\" | \"failed\";\nlet raw = \"paid\";\nconst s: Status = raw as Status;\nconsole.log(s);\n",
+              "starter": "type Status = \"paid\" | \"failed\";\nlet raw = \"paid\";\nconst s: Status = raw;\nconsole.log(s);\n",
               "solution": "type Status = \"paid\" | \"failed\";\nconst raw = \"paid\";\nconst s: Status = raw;\nconsole.log(s);\n",
               "tests": [
                 {
@@ -21808,8 +21817,8 @@
               "strictness": "strict+indexed",
               "harness": "",
               "judge_mode": "",
-              "starter": "import * as fs from \"fs\";\ninterface Add {\n  kind: \"add\";\n  amount: number;\n}\ninterface Note {\n  kind: \"note\";\n  text: string;\n}\ntype Event = Add | Note;\nfunction toEvent(line: string): Event {\n  const parts = line.split(\",\");\n  if (parts[0].trim() === \"add\") return { kind: \"add\", amount: Number(parts[1]) };\n  return { kind: \"note\", text: parts[1].trim() };\n}\n____\nconsole.log(`Total: ${total}`);\nconsole.log(`Notes: ${notes.join(\" | \")}`);\n",
-              "solution": "import * as fs from \"fs\";\ninterface Add {\n  kind: \"add\";\n  amount: number;\n}\ninterface Note {\n  kind: \"note\";\n  text: string;\n}\ntype Event = Add | Note;\nfunction toEvent(line: string): Event {\n  const parts = line.split(\",\");\n  if (parts[0].trim() === \"add\") return { kind: \"add\", amount: Number(parts[1]) };\n  return { kind: \"note\", text: parts[1].trim() };\n}\nfunction isAdd(e: Event): e is Add {\n  return e.kind === \"add\";\n}\nfunction isNote(e: Event): e is Note {\n  return e.kind === \"note\";\n}\nconst lines = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\")\n  .filter((l) => l.trim().length > 0);\nconst events: Event[] = lines.map(toEvent);\nconst total = events.filter(isAdd).reduce((sum, e) => sum + e.amount, 0);\nconst notes = events.filter(isNote).map((e) => e.text);\nconsole.log(`Total: ${total}`);\nconsole.log(`Notes: ${notes.join(\" | \")}`);\n",
+              "starter": "import * as fs from \"fs\";\ninterface Add {\n  kind: \"add\";\n  amount: number;\n}\ninterface Note {\n  kind: \"note\";\n  text: string;\n}\ntype Event = Add | Note;\nfunction toEvent(line: string): Event {\n  const parts = line.split(\",\");\n  if ((parts[0] ?? \"\").trim() === \"add\") return { kind: \"add\", amount: Number(parts[1]) };\n  return { kind: \"note\", text: (parts[1] ?? \"\").trim() };\n}\n____\nconsole.log(`Total: ${total}`);\nconsole.log(`Notes: ${notes.join(\" | \")}`);\n",
+              "solution": "import * as fs from \"fs\";\ninterface Add {\n  kind: \"add\";\n  amount: number;\n}\ninterface Note {\n  kind: \"note\";\n  text: string;\n}\ntype Event = Add | Note;\nfunction toEvent(line: string): Event {\n  const parts = line.split(\",\");\n  if ((parts[0] ?? \"\").trim() === \"add\") return { kind: \"add\", amount: Number(parts[1]) };\n  return { kind: \"note\", text: (parts[1] ?? \"\").trim() };\n}\nfunction isAdd(e: Event): e is Add {\n  return e.kind === \"add\";\n}\nfunction isNote(e: Event): e is Note {\n  return e.kind === \"note\";\n}\nconst lines = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\")\n  .filter((l) => l.trim().length > 0);\nconst events: Event[] = lines.map(toEvent);\nconst total = events.filter(isAdd).reduce((sum, e) => sum + e.amount, 0);\nconst notes = events.filter(isNote).map((e) => e.text);\nconsole.log(`Total: ${total}`);\nconsole.log(`Notes: ${notes.join(\" | \")}`);\n",
               "tests": [
                 {
                   "input": "add,10\nnote,hello\nadd,5\nnote,bye",
@@ -21899,7 +21908,7 @@
           "harness": "",
           "judge_mode": "",
           "starter": "import * as fs from \"fs\";\ntype Event =\n  | { kind: \"add\"; desc: string; amount: number }\n  | { kind: \"remove\"; desc: string }\n  | { kind: \"note\"; text: string };\n____\n",
-          "solution": "import * as fs from \"fs\";\ntype Event =\n  | { kind: \"add\"; desc: string; amount: number }\n  | { kind: \"remove\"; desc: string }\n  | { kind: \"note\"; text: string };\nfunction parse(line: string): Event {\n  const p = line.trim().split(\" \");\n  if (p[0] === \"add\") return { kind: \"add\", desc: p[1], amount: Number(p[2]) };\n  if (p[0] === \"remove\") return { kind: \"remove\", desc: p[1] };\n  return { kind: \"note\", text: p.slice(1).join(\" \") };\n}\nconst events: Event[] = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\").map(parse);\nconst prices: { [key: string]: number } = {};\nlet added = 0;\nlet notes = 0;\nlet balance = 0;\nconst removed: string[] = [];\nfor (const e of events) {\n  switch (e.kind) {\n    case \"add\":\n      added++;\n      balance += e.amount;\n      prices[e.desc] = e.amount;\n      break;\n    case \"remove\":\n      removed.push(e.desc);\n      balance -= prices[e.desc] ?? 0;\n      break;\n    case \"note\":\n      notes++;\n      break;\n  }\n}\nlet addedTotal = 0;\nfor (const e of events) {\n  if (e.kind === \"add\") addedTotal += e.amount;\n}\nconsole.log(`Events:  ${events.length}`);\nconsole.log(`Added:   ${added} ($${addedTotal.toFixed(2)})`);\nconsole.log(`Removed: ${removed.length} (${removed.join(\", \")})`);\nconsole.log(`Notes:   ${notes}`);\nconsole.log(`Balance: $${balance.toFixed(2)}`);\n",
+          "solution": "import * as fs from \"fs\";\ntype Event =\n  | { kind: \"add\"; desc: string; amount: number }\n  | { kind: \"remove\"; desc: string }\n  | { kind: \"note\"; text: string };\nfunction parse(line: string): Event {\n  const p = line.trim().split(\" \");\n  if (p[0] === \"add\") return { kind: \"add\", desc: p[1] ?? \"\", amount: Number(p[2]) };\n  if (p[0] === \"remove\") return { kind: \"remove\", desc: p[1] ?? \"\" };\n  return { kind: \"note\", text: p.slice(1).join(\" \") };\n}\nconst events: Event[] = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\").map(parse);\nconst prices: { [key: string]: number } = {};\nlet added = 0;\nlet notes = 0;\nlet balance = 0;\nconst removed: string[] = [];\nfor (const e of events) {\n  switch (e.kind) {\n    case \"add\":\n      added++;\n      balance += e.amount;\n      prices[e.desc] = e.amount;\n      break;\n    case \"remove\":\n      removed.push(e.desc);\n      balance -= prices[e.desc] ?? 0;\n      break;\n    case \"note\":\n      notes++;\n      break;\n  }\n}\nlet addedTotal = 0;\nfor (const e of events) {\n  if (e.kind === \"add\") addedTotal += e.amount;\n}\nconsole.log(`Events:  ${events.length}`);\nconsole.log(`Added:   ${added} ($${addedTotal.toFixed(2)})`);\nconsole.log(`Removed: ${removed.length} (${removed.join(\", \")})`);\nconsole.log(`Notes:   ${notes}`);\nconsole.log(`Balance: $${balance.toFixed(2)}`);\n",
           "tests": [
             {
               "input": "add coffee 3.25\nremove coffee\nnote reviewed the month",
@@ -21941,8 +21950,8 @@
           "strictness": "strict+indexed",
           "harness": "",
           "judge_mode": "",
-          "starter": "import * as fs from \"fs\";\ntype Event =\n  | { kind: \"add\"; desc: string; amount: number }\n  | { kind: \"remove\"; desc: string }\n  | { kind: \"note\"; text: string };\nfunction parse(line: string): Event {\n  const p = line.trim().split(\" \");\n  if (p[0] === \"add\") return { kind: \"add\", desc: p[1], amount: Number(p[2]) };\n  if (p[0] === \"remove\") return { kind: \"remove\", desc: p[1] };\n  return { kind: \"note\", text: p.slice(1).join(\" \") };\n}\nconst events: Event[] = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\").map(parse);\nlet lastNote = \"-\";\nfor (const e of events) {\n  switch (e.kind) {\n    case \"add\":\n      break;\n    case \"remove\":\n      break;\n    case \"note\":\n      lastNote = e.text;\n      break;\n    ____\n  }\n}\nconsole.log(`Last note: ${lastNote}`);\n",
-          "solution": "import * as fs from \"fs\";\ntype Event =\n  | { kind: \"add\"; desc: string; amount: number }\n  | { kind: \"remove\"; desc: string }\n  | { kind: \"note\"; text: string };\nfunction parse(line: string): Event {\n  const p = line.trim().split(\" \");\n  if (p[0] === \"add\") return { kind: \"add\", desc: p[1], amount: Number(p[2]) };\n  if (p[0] === \"remove\") return { kind: \"remove\", desc: p[1] };\n  return { kind: \"note\", text: p.slice(1).join(\" \") };\n}\nconst events: Event[] = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\").map(parse);\nlet lastNote = \"-\";\nfor (const e of events) {\n  switch (e.kind) {\n    case \"add\":\n      break;\n    case \"remove\":\n      break;\n    case \"note\":\n      lastNote = e.text;\n      break;\n    default: {\n      const _exhaustive: never = e;\n      throw new Error(_exhaustive);\n    }\n  }\n}\nconsole.log(`Last note: ${lastNote}`);\n",
+          "starter": "import * as fs from \"fs\";\ntype Event =\n  | { kind: \"add\"; desc: string; amount: number }\n  | { kind: \"remove\"; desc: string }\n  | { kind: \"note\"; text: string };\nfunction parse(line: string): Event {\n  const p = line.trim().split(\" \");\n  if (p[0] === \"add\") return { kind: \"add\", desc: p[1] ?? \"\", amount: Number(p[2]) };\n  if (p[0] === \"remove\") return { kind: \"remove\", desc: p[1] ?? \"\" };\n  return { kind: \"note\", text: p.slice(1).join(\" \") };\n}\nconst events: Event[] = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\").map(parse);\nlet lastNote = \"-\";\nfor (const e of events) {\n  switch (e.kind) {\n    case \"add\":\n      break;\n    case \"remove\":\n      break;\n    case \"note\":\n      lastNote = e.text;\n      break;\n    ____\n  }\n}\nconsole.log(`Last note: ${lastNote}`);\n",
+          "solution": "import * as fs from \"fs\";\ntype Event =\n  | { kind: \"add\"; desc: string; amount: number }\n  | { kind: \"remove\"; desc: string }\n  | { kind: \"note\"; text: string };\nfunction parse(line: string): Event {\n  const p = line.trim().split(\" \");\n  if (p[0] === \"add\") return { kind: \"add\", desc: p[1] ?? \"\", amount: Number(p[2]) };\n  if (p[0] === \"remove\") return { kind: \"remove\", desc: p[1] ?? \"\" };\n  return { kind: \"note\", text: p.slice(1).join(\" \") };\n}\nconst events: Event[] = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\").map(parse);\nlet lastNote = \"-\";\nfor (const e of events) {\n  switch (e.kind) {\n    case \"add\":\n      break;\n    case \"remove\":\n      break;\n    case \"note\":\n      lastNote = e.text;\n      break;\n    default: {\n      const _exhaustive: never = e;\n      throw new Error(_exhaustive);\n    }\n  }\n}\nconsole.log(`Last note: ${lastNote}`);\n",
           "tests": [
             {
               "input": "add coffee 3.25\nnote reviewed the month",
@@ -22221,14 +22230,14 @@
       "month_title": "The Type System, Properly",
       "theme": "Generics",
       "goal": "Write one function or type that works over any type — without losing what the compiler knows about it.",
-      "summary": "Here is the problem generics exist to solve. You write a helper that returns the\nfirst element of an array:\n\n```ts\nfunction firstNumber(a: number[]): number { return a[0]; }\n```\n\nThen you need it for strings. And for records. You have three choices:\n\n1. **Copy it** for every element type — three functions that differ by one word.\n2. **Use `any`** — one function, and every caller loses all type information.\n3. **Make the type a parameter.**\n\nThe third is a **generic**:\n\n```ts\nfunction first<T>(a: T[]): T {\n  return a[0];\n}\n\nfirst([1, 2, 3]);        // T is number   -> returns number\nfirst([\"a\", \"b\"]);       // T is string   -> returns string\n```\n\n`<T>` declares a **type parameter** — a placeholder filled in at each call site,\nusually inferred so you never write it. One implementation, and the compiler\nstill knows that `first([\"a\"])` gives you a `string` with `.toUpperCase()` on it.\n\nThe mental model that makes generics click: **`T` is a variable whose value is a\ntype.** Everything else — constraints, `keyof`, generic interfaces — is that one\nidea applied more sharply.\n\nThe runtime code in this week's drills is deliberately simple; the difficulty\nlives in the signatures. Read them slowly, and lean on the quizzes.\n\n⏱️ Budget about **ten hours**, spread over several sittings.\n",
+      "summary": "Here is the problem generics exist to solve. You write a helper that returns the\nfirst element of an array:\n\n```ts\nfunction firstNumber(a: number[]): number { return a[0]; }\n```\n\nThen you need it for strings. And for records. You have three choices:\n\n1. **Copy it** for every element type — three functions that differ by one word.\n2. **Use `any`** — one function, and every caller loses all type information.\n3. **Make the type a parameter.**\n\nThe third is a **generic**:\n\n```ts\nfunction first<T>(a: T[]): T {\n  if (a.length === 0) throw new Error(\"empty array\");\n  return a[0]!;\n}\n\nfirst([1, 2, 3]);        // T is number   -> returns number\nfirst([\"a\", \"b\"]);       // T is string   -> returns string\n```\n\n`<T>` declares a **type parameter** — a placeholder filled in at each call site,\nusually inferred so you never write it. One implementation, and the compiler\nstill knows that `first([\"a\"])` gives you a `string` with `.toUpperCase()` on it.\n\nThe mental model that makes generics click: **`T` is a variable whose value is a\ntype.** Everything else — constraints, `keyof`, generic interfaces — is that one\nidea applied more sharply.\n\nThe runtime code in this week's drills is deliberately simple; the difficulty\nlives in the signatures. Read them slowly, and lean on the quizzes.\n\n⏱️ Budget about **ten hours**, spread over several sittings.\n",
       "authored": true,
       "lessons": [
         {
           "key": "w10-why",
           "title": "Why generics exist",
           "what": "The gap between duplication and any.",
-          "lesson": "Three ways to write \"give me the first element\".\n\n**Duplicate per type** — correct, and unmaintainable:\n\n```ts\nfunction firstNumber(a: number[]): number { return a[0]; }\nfunction firstString(a: string[]): string { return a[0]; }\nfunction firstUser(a: User[]): User { return a[0]; }\n```\n\n**Use `any`** — one function, and the type information is destroyed:\n\n```ts\nfunction first(a: any[]): any { return a[0]; }\n\nconst s = first([\"a\", \"b\"]);\ns.toUpperCase();     // no error... and no checking either\ns.toFixed(2);        // also no error — and a crash at runtime\n```\n\n`any` doesn't just lose information at the boundary; it *poisons everything\ndownstream*. The caller got a value the compiler will never question again.\n\n**Make the type a parameter:**\n\n```ts\nfunction first<T>(a: T[]): T {\n  return a[0];\n}\n\nconst s = first([\"a\", \"b\"]);   // s: string\ns.toUpperCase();               // ✅\ns.toFixed(2);                  // ❌ caught\n```\n\nOne implementation, full checking at every call site.\n\n**What `<T>` means.** Read `function first<T>(a: T[]): T` as: *\"for any type T,\nthis takes an array of T and returns a T.\"* The signature states a\n**relationship** — the output type is tied to the input type — and that\nrelationship is exactly what `any` throws away.\n\n**`unknown` is safer than `any` but still wrong here:**\n\n```ts\nfunction first(a: unknown[]): unknown { return a[0]; }\nconst s = first([\"a\"]);\ns.toUpperCase();      // ❌ must narrow first — but you already KNEW it was a string\n```\n\n`unknown` is honest, and it still makes the caller re-establish something the\nfunction could have preserved. Use `unknown` for values whose type you genuinely\ndon't know (parsed JSON, caught errors). Use a generic when the type is *known\nto the caller* and you're just passing it through.\n\n**The test for whether you need a generic:** does a type appear in **more than\none place** in the signature — two parameters, or a parameter and the return? If\nyes, a generic ties them together. If a type parameter appears only once, it is\ndoing nothing.\n\n> ⚠️ **Common mistakes:** reaching for `any` when a generic was two characters\n> away; adding type parameters that appear only once; and thinking `<T>` has a\n> runtime cost — it is erased like every other type.\n",
+          "lesson": "Three ways to write \"give me the first element\".\n\n**Duplicate per type** — correct, and unmaintainable:\n\n```ts\nfunction firstNumber(a: number[]): number { return a[0]; }\nfunction firstString(a: string[]): string { return a[0]; }\nfunction firstUser(a: User[]): User { return a[0]; }\n```\n\n**Use `any`** — one function, and the type information is destroyed:\n\n```ts\nfunction first(a: any[]): any { return a[0]; }\n\nconst s = first([\"a\", \"b\"]);\ns.toUpperCase();     // no error... and no checking either\ns.toFixed(2);        // also no error — and a crash at runtime\n```\n\n`any` doesn't just lose information at the boundary; it *poisons everything\ndownstream*. The caller got a value the compiler will never question again.\n\n**Make the type a parameter:**\n\n```ts\nfunction first<T>(a: T[]): T {\n  if (a.length === 0) throw new Error(\"empty array\");\n  return a[0]!;\n}\n\nconst s = first([\"a\", \"b\"]);   // s: string\ns.toUpperCase();               // ✅\ns.toFixed(2);                  // ❌ caught\n```\n\nOne implementation, full checking at every call site.\n\n**What `<T>` means.** Read `function first<T>(a: T[]): T` as: *\"for any type T,\nthis takes an array of T and returns a T.\"* The signature states a\n**relationship** — the output type is tied to the input type — and that\nrelationship is exactly what `any` throws away.\n\n**`unknown` is safer than `any` but still wrong here:**\n\n```ts\nfunction first(a: unknown[]): unknown { return a[0]; }\nconst s = first([\"a\"]);\ns.toUpperCase();      // ❌ must narrow first — but you already KNEW it was a string\n```\n\n`unknown` is honest, and it still makes the caller re-establish something the\nfunction could have preserved. Use `unknown` for values whose type you genuinely\ndon't know (parsed JSON, caught errors). Use a generic when the type is *known\nto the caller* and you're just passing it through.\n\n**The test for whether you need a generic:** does a type appear in **more than\none place** in the signature — two parameters, or a parameter and the return? If\nyes, a generic ties them together. If a type parameter appears only once, it is\ndoing nothing.\n\n> ⚠️ **Common mistakes:** reaching for `any` when a generic was two characters\n> away; adding type parameters that appear only once; and thinking `<T>` has a\n> runtime cost — it is erased like every other type.\n",
           "warmup": [
             {
               "question": "`function first(a: any[]): any` — what does the caller get?",
@@ -22307,7 +22316,8 @@
               "prompt": "Return the first element of the array.",
               "hint": "Index 0, whatever the element type is.",
               "hints": [
-                "Index 0, whatever the element type is."
+                "Index 0, whatever the element type is.",
+                "The guard above is what earns the ! — without it, ! would be a lie."
               ],
               "language": "typescript",
               "kind": "drill",
@@ -22315,8 +22325,8 @@
               "strictness": "strict+indexed",
               "harness": "",
               "judge_mode": "",
-              "starter": "function first<T>(a: T[]): T {\n  ____\n}\nconsole.log(first([1, 2, 3]));\nconsole.log(first([\"a\", \"b\"]));\n",
-              "solution": "function first<T>(a: T[]): T {\n  return a[0];\n}\nconsole.log(first([1, 2, 3]));\nconsole.log(first([\"a\", \"b\"]));\n",
+              "starter": "function first<T>(a: T[]): T {\n  if (a.length === 0) throw new Error(\"empty array\");\n  ____\n}\nconsole.log(first([1, 2, 3]));\nconsole.log(first([\"a\", \"b\"]));\n",
+              "solution": "function first<T>(a: T[]): T {\n  if (a.length === 0) throw new Error(\"empty array\");\n  return a[0]!;\n}\nconsole.log(first([1, 2, 3]));\nconsole.log(first([\"a\", \"b\"]));\n",
               "tests": [
                 {
                   "input": "",
@@ -22341,8 +22351,8 @@
               "strictness": "strict+indexed",
               "harness": "",
               "judge_mode": "",
-              "starter": "function last____(a: T[]): T {\n  return a[a.length - 1];\n}\nconsole.log(last([1, 2, 3]));\nconsole.log(last([\"a\", \"b\"]));\n",
-              "solution": "function last<T>(a: T[]): T {\n  return a[a.length - 1];\n}\nconsole.log(last([1, 2, 3]));\nconsole.log(last([\"a\", \"b\"]));\n",
+              "starter": "function last____(a: T[]): T {\n  if (a.length === 0) throw new Error(\"empty array\");\n  return a[a.length - 1]!;\n}\nconsole.log(last([1, 2, 3]));\nconsole.log(last([\"a\", \"b\"]));\n",
+              "solution": "function last<T>(a: T[]): T {\n  if (a.length === 0) throw new Error(\"empty array\");\n  return a[a.length - 1]!;\n}\nconsole.log(last([1, 2, 3]));\nconsole.log(last([\"a\", \"b\"]));\n",
               "tests": [
                 {
                   "input": "",
@@ -22367,8 +22377,8 @@
               "strictness": "strict+indexed",
               "harness": "",
               "judge_mode": "",
-              "starter": "function first<T>(a: T[]): T {\n  return a[0];\n}\nconst s = first([\"hello\", \"there\"]);\nconsole.log(____);\n",
-              "solution": "function first<T>(a: T[]): T {\n  return a[0];\n}\nconst s = first([\"hello\", \"there\"]);\nconsole.log(s.toUpperCase());\n",
+              "starter": "function first<T>(a: T[]): T {\n  if (a.length === 0) throw new Error(\"empty array\");\n  return a[0]!;\n}\nconst s = first([\"hello\", \"there\"]);\nconsole.log(____);\n",
+              "solution": "function first<T>(a: T[]): T {\n  if (a.length === 0) throw new Error(\"empty array\");\n  return a[0]!;\n}\nconst s = first([\"hello\", \"there\"]);\nconsole.log(s.toUpperCase());\n",
               "tests": [
                 {
                   "input": "",
@@ -22393,8 +22403,8 @@
               "strictness": "strict+indexed",
               "harness": "",
               "judge_mode": "",
-              "starter": "function first<T>(a: T[]): T {\n  return a[0];\n}\nconst rows = [{ desc: \"coffee\" }, { desc: \"book\" }];\nconsole.log(____);\n",
-              "solution": "function first<T>(a: T[]): T {\n  return a[0];\n}\nconst rows = [{ desc: \"coffee\" }, { desc: \"book\" }];\nconsole.log(first(rows).desc);\n",
+              "starter": "function first<T>(a: T[]): T {\n  if (a.length === 0) throw new Error(\"empty array\");\n  return a[0]!;\n}\nconst rows = [{ desc: \"coffee\" }, { desc: \"book\" }];\nconsole.log(____);\n",
+              "solution": "function first<T>(a: T[]): T {\n  if (a.length === 0) throw new Error(\"empty array\");\n  return a[0]!;\n}\nconst rows = [{ desc: \"coffee\" }, { desc: \"book\" }];\nconsole.log(first(rows).desc);\n",
               "tests": [
                 {
                   "input": "",
@@ -22420,7 +22430,7 @@
               "harness": "",
               "judge_mode": "",
               "starter": "function first(a: any[]): any {\n  return a[0];\n}\nconst s = first([\"hello\"]);\nconsole.log(s.toFixed(2));\n",
-              "solution": "function first<T>(a: T[]): T {\n  return a[0];\n}\nconst s = first([\"hello\"]);\nconsole.log(s.toUpperCase());\n",
+              "solution": "function first<T>(a: T[]): T {\n  if (a.length === 0) throw new Error(\"empty array\");\n  return a[0]!;\n}\nconst s = first([\"hello\"]);\nconsole.log(s.toUpperCase());\n",
               "tests": [
                 {
                   "input": "",
@@ -22445,8 +22455,8 @@
               "strictness": "strict+indexed",
               "harness": "",
               "judge_mode": "",
-              "starter": "function first<T>(xs: T[]): T {\n  return xs[1];\n}\nconsole.log(first([10, 20, 30]));\nconsole.log(first([\"a\", \"b\"]));\n",
-              "solution": "function first<T>(xs: T[]): T {\n  return xs[0];\n}\nconsole.log(first([10, 20, 30]));\nconsole.log(first([\"a\", \"b\"]));\n",
+              "starter": "function first<T>(xs: T[]): T {\n  if (xs.length === 0) throw new Error(\"empty array\");\n  return xs[1]!;\n}\nconsole.log(first([10, 20, 30]));\nconsole.log(first([\"a\", \"b\"]));\n",
+              "solution": "function first<T>(xs: T[]): T {\n  if (xs.length === 0) throw new Error(\"empty array\");\n  return xs[0]!;\n}\nconsole.log(first([10, 20, 30]));\nconsole.log(first([\"a\", \"b\"]));\n",
               "tests": [
                 {
                   "input": "",
@@ -22650,8 +22660,8 @@
               "strictness": "strict+indexed",
               "harness": "",
               "judge_mode": "",
-              "starter": "function first<T>(a: T[]): T {\n  return a[0];\n}\nfunction wrap<T>(x: T): T[] {\n  return [x];\n}\nfunction firstOrEmpty<T>(a: T[]): T[] {\n  return ____;\n}\nconsole.log(firstOrEmpty([5, 6]).length);\nconsole.log(firstOrEmpty([]).length);\n",
-              "solution": "function first<T>(a: T[]): T {\n  return a[0];\n}\nfunction wrap<T>(x: T): T[] {\n  return [x];\n}\nfunction firstOrEmpty<T>(a: T[]): T[] {\n  return a.length > 0 ? wrap(first(a)) : [];\n}\nconsole.log(firstOrEmpty([5, 6]).length);\nconsole.log(firstOrEmpty([]).length);\n",
+              "starter": "function first<T>(a: T[]): T {\n  if (a.length === 0) throw new Error(\"empty array\");\n  return a[0]!;\n}\nfunction wrap<T>(x: T): T[] {\n  return [x];\n}\nfunction firstOrEmpty<T>(a: T[]): T[] {\n  return ____;\n}\nconsole.log(firstOrEmpty([5, 6]).length);\nconsole.log(firstOrEmpty([]).length);\n",
+              "solution": "function first<T>(a: T[]): T {\n  if (a.length === 0) throw new Error(\"empty array\");\n  return a[0]!;\n}\nfunction wrap<T>(x: T): T[] {\n  return [x];\n}\nfunction firstOrEmpty<T>(a: T[]): T[] {\n  return a.length > 0 ? wrap(first(a)) : [];\n}\nconsole.log(firstOrEmpty([5, 6]).length);\nconsole.log(firstOrEmpty([]).length);\n",
               "tests": [
                 {
                   "input": "",
@@ -22743,7 +22753,7 @@
           "key": "w10-arrays",
           "title": "Generic helpers over arrays",
           "what": "Where generics earn their keep day to day.",
-          "lesson": "Array helpers are the natural home of generics, because the element type must\nsurvive the trip.\n\n```ts\nfunction last<T>(a: T[]): T            { return a[a.length - 1]; }\nfunction head<T>(a: T[], n: number): T[] { return a.slice(0, n); }\nfunction reversed<T>(a: T[]): T[]      { return [...a].reverse(); }\n```\n\nEach says something the compiler can use: `last` of a `string[]` is a `string`;\n`reversed` of a `User[]` is a `User[]`.\n\n**Returning \"maybe nothing\"** needs a union — and this is why the built-in\n`find` returns `T | undefined`:\n\n```ts\nfunction firstOr<T>(a: T[], fallback: T): T {\n  return a.length > 0 ? a[0] : fallback;\n}\n```\n\nNote the `fallback: T`. That's the whole idea again: the fallback must be the\n*same* type as the elements, and the signature enforces it.\n`firstOr([1, 2], \"none\")` is a compile error, which is what you want.\n\n**Combining two arrays:**\n\n```ts\nfunction concat<T>(a: T[], b: T[]): T[] {\n  return [...a, ...b];\n}\n```\n\nBoth parameters use the *same* `T`, so mixing element types is rejected. If you\ngenuinely want to allow that, say so — `concat<A, B>(a: A[], b: B[]): (A | B)[]`.\nThe signature is the design decision.\n\n**Deduplicating:**\n\n```ts\nfunction unique<T>(a: T[]): T[] {\n  const out: T[] = [];\n  for (const x of a) {\n    if (!out.includes(x)) out.push(x);\n  }\n  return out;\n}\n```\n\n`out: T[]` needs its annotation for the reason you learned in week 8 — an empty\nliteral has nothing to infer from.\n\n**Reading the built-ins.** Everything you used in week 6 is generic. Hover over\n`map` and you'll see roughly:\n\n```ts\nmap<U>(fn: (value: T, index: number) => U): U[]\n```\n\n`T` is the array's element type; `U` is whatever the callback returns. That is\nwhy `[1,2,3].map((x) => String(x))` is `string[]` and not `number[]` — the\nsignature *derives* the result type from your callback. Once generics read\neasily, the standard library stops being magic.\n\n> ⚠️ **Common mistakes:** forgetting the annotation on an accumulator array;\n> using one `T` where you meant two independent ones (or the reverse); and\n> writing a helper that returns `T` when it can return `undefined` for an empty\n> array.\n",
+          "lesson": "Array helpers are the natural home of generics, because the element type must\nsurvive the trip.\n\n```ts\nfunction last<T>(a: T[]): T            { return a[a.length - 1]; }\nfunction head<T>(a: T[], n: number): T[] { return a.slice(0, n); }\nfunction reversed<T>(a: T[]): T[]      { return [...a].reverse(); }\n```\n\nEach says something the compiler can use: `last` of a `string[]` is a `string`;\n`reversed` of a `User[]` is a `User[]`.\n\n**Returning \"maybe nothing\"** needs a union — and this is why the built-in\n`find` returns `T | undefined`:\n\n```ts\nfunction firstOr<T>(a: T[], fallback: T): T {\n  return a.length > 0 ? a[0]! : fallback;\n}\n```\n\nNote the `fallback: T`. That's the whole idea again: the fallback must be the\n*same* type as the elements, and the signature enforces it.\n`firstOr([1, 2], \"none\")` is a compile error, which is what you want.\n\n**Combining two arrays:**\n\n```ts\nfunction concat<T>(a: T[], b: T[]): T[] {\n  return [...a, ...b];\n}\n```\n\nBoth parameters use the *same* `T`, so mixing element types is rejected. If you\ngenuinely want to allow that, say so — `concat<A, B>(a: A[], b: B[]): (A | B)[]`.\nThe signature is the design decision.\n\n**Deduplicating:**\n\n```ts\nfunction unique<T>(a: T[]): T[] {\n  const out: T[] = [];\n  for (const x of a) {\n    if (!out.includes(x)) out.push(x);\n  }\n  return out;\n}\n```\n\n`out: T[]` needs its annotation for the reason you learned in week 8 — an empty\nliteral has nothing to infer from.\n\n**Reading the built-ins.** Everything you used in week 6 is generic. Hover over\n`map` and you'll see roughly:\n\n```ts\nmap<U>(fn: (value: T, index: number) => U): U[]\n```\n\n`T` is the array's element type; `U` is whatever the callback returns. That is\nwhy `[1,2,3].map((x) => String(x))` is `string[]` and not `number[]` — the\nsignature *derives* the result type from your callback. Once generics read\neasily, the standard library stops being magic.\n\n> ⚠️ **Common mistakes:** forgetting the annotation on an accumulator array;\n> using one `T` where you meant two independent ones (or the reverse); and\n> writing a helper that returns `T` when it can return `undefined` for an empty\n> array.\n",
           "warmup": [
             {
               "question": "`function last<T>(a: T[]): T` on a `string[]` returns…",
@@ -22797,7 +22807,8 @@
               "prompt": "Return the final element, whatever the element type.",
               "hint": "The last index is one less than the length.",
               "hints": [
-                "The last index is one less than the length."
+                "The last index is one less than the length.",
+                "The guard above is what earns the ! — without it, ! would be a lie."
               ],
               "language": "typescript",
               "kind": "drill",
@@ -22805,8 +22816,8 @@
               "strictness": "strict+indexed",
               "harness": "",
               "judge_mode": "",
-              "starter": "function last<T>(a: T[]): T {\n  ____\n}\nconsole.log(last([1, 2, 3]));\nconsole.log(last([\"a\", \"b\"]));\n",
-              "solution": "function last<T>(a: T[]): T {\n  return a[a.length - 1];\n}\nconsole.log(last([1, 2, 3]));\nconsole.log(last([\"a\", \"b\"]));\n",
+              "starter": "function last<T>(a: T[]): T {\n  if (a.length === 0) throw new Error(\"empty array\");\n  ____\n}\nconsole.log(last([1, 2, 3]));\nconsole.log(last([\"a\", \"b\"]));\n",
+              "solution": "function last<T>(a: T[]): T {\n  if (a.length === 0) throw new Error(\"empty array\");\n  return a[a.length - 1]!;\n}\nconsole.log(last([1, 2, 3]));\nconsole.log(last([\"a\", \"b\"]));\n",
               "tests": [
                 {
                   "input": "",
@@ -22849,7 +22860,7 @@
               "hint": "Guard the empty case and hand back the fallback.",
               "hints": [
                 "Guard the empty case and hand back the fallback.",
-                "Write a.length > 0 ? a[0] : fallback."
+                "Write a.length > 0 ? a[0]! : fallback — the length check is what makes the ! true."
               ],
               "language": "typescript",
               "kind": "drill",
@@ -22858,7 +22869,7 @@
               "harness": "",
               "judge_mode": "",
               "starter": "function firstOr<T>(a: T[], fallback: T): T {\n  return ____;\n}\nconsole.log(firstOr([5, 6], 0));\nconsole.log(firstOr<number>([], 0));\n",
-              "solution": "function firstOr<T>(a: T[], fallback: T): T {\n  return a.length > 0 ? a[0] : fallback;\n}\nconsole.log(firstOr([5, 6], 0));\nconsole.log(firstOr<number>([], 0));\n",
+              "solution": "function firstOr<T>(a: T[], fallback: T): T {\n  return a.length > 0 ? a[0]! : fallback;\n}\nconsole.log(firstOr([5, 6], 0));\nconsole.log(firstOr<number>([], 0));\n",
               "tests": [
                 {
                   "input": "",
@@ -23672,8 +23683,8 @@
               "strictness": "strict+indexed",
               "harness": "",
               "judge_mode": "",
-              "starter": "type Lookup<V> = { [key: string]: V };\nconst prices: ____ = { coffee: 3.25, book: 12 };\nconsole.log(prices[\"coffee\"].toFixed(2));\n",
-              "solution": "type Lookup<V> = { [key: string]: V };\nconst prices: Lookup<number> = { coffee: 3.25, book: 12 };\nconsole.log(prices[\"coffee\"].toFixed(2));\n",
+              "starter": "type Lookup<V> = { [key: string]: V };\nconst prices: ____ = { coffee: 3.25, book: 12 };\nconsole.log((prices[\"coffee\"] ?? 0).toFixed(2));\n",
+              "solution": "type Lookup<V> = { [key: string]: V };\nconst prices: Lookup<number> = { coffee: 3.25, book: 12 };\nconsole.log((prices[\"coffee\"] ?? 0).toFixed(2));\n",
               "tests": [
                 {
                   "input": "",
@@ -23902,7 +23913,7 @@
               "hint": "Create the bucket before pushing into it — week 7's grouping pattern.",
               "hints": [
                 "Create the bucket before pushing into it — week 7's grouping pattern.",
-                "Write if (out[k] === undefined) { out[k] = []; } then out[k].push(r);"
+                "Write if (out[k] === undefined) { out[k] = []; } then out[k]!.push(r);"
               ],
               "language": "typescript",
               "kind": "drill",
@@ -23910,8 +23921,8 @@
               "strictness": "strict+indexed",
               "harness": "",
               "judge_mode": "",
-              "starter": "function groupBy<T, K extends keyof T>(rows: T[], key: K): { [k: string]: T[] } {\n  const out: { [k: string]: T[] } = {};\n  for (const r of rows) {\n    const k = String(r[key]);\n    ____\n  }\n  return out;\n}\nconst rows = [\n  { tag: \"food\", n: 1 },\n  { tag: \"home\", n: 2 },\n  { tag: \"food\", n: 3 },\n];\nconst g = groupBy(rows, \"tag\");\nconsole.log(Object.keys(g).sort().map((k) => `${k}=${g[k].length}`).join(\",\"));\n",
-              "solution": "function groupBy<T, K extends keyof T>(rows: T[], key: K): { [k: string]: T[] } {\n  const out: { [k: string]: T[] } = {};\n  for (const r of rows) {\n    const k = String(r[key]);\n    if (out[k] === undefined) {\n      out[k] = [];\n    }\n    out[k].push(r);\n  }\n  return out;\n}\nconst rows = [\n  { tag: \"food\", n: 1 },\n  { tag: \"home\", n: 2 },\n  { tag: \"food\", n: 3 },\n];\nconst g = groupBy(rows, \"tag\");\nconsole.log(Object.keys(g).sort().map((k) => `${k}=${g[k].length}`).join(\",\"));\n",
+              "starter": "function groupBy<T, K extends keyof T>(rows: T[], key: K): { [k: string]: T[] } {\n  const out: { [k: string]: T[] } = {};\n  for (const r of rows) {\n    const k = String(r[key]);\n    ____\n  }\n  return out;\n}\nconst rows = [\n  { tag: \"food\", n: 1 },\n  { tag: \"home\", n: 2 },\n  { tag: \"food\", n: 3 },\n];\nconst g = groupBy(rows, \"tag\");\nconsole.log(Object.keys(g).sort().map((k) => `${k}=${g[k]!.length}`).join(\",\"));\n",
+              "solution": "function groupBy<T, K extends keyof T>(rows: T[], key: K): { [k: string]: T[] } {\n  const out: { [k: string]: T[] } = {};\n  for (const r of rows) {\n    const k = String(r[key]);\n    if (out[k] === undefined) {\n      out[k] = [];\n    }\n    out[k]!.push(r);\n  }\n  return out;\n}\nconst rows = [\n  { tag: \"food\", n: 1 },\n  { tag: \"home\", n: 2 },\n  { tag: \"food\", n: 3 },\n];\nconst g = groupBy(rows, \"tag\");\nconsole.log(Object.keys(g).sort().map((k) => `${k}=${g[k]!.length}`).join(\",\"));\n",
               "tests": [
                 {
                   "input": "",
@@ -24066,8 +24077,8 @@
               "strictness": "strict+indexed",
               "harness": "",
               "judge_mode": "",
-              "starter": "function groupBy<T>(xs: T[], key: (x: T) => string): { [k: string]: T[] } {\n  const out: { [k: string]: T[] } = {};\n  for (const x of xs) {\n    const k = key(x);\n    out[k] = out[k] ?? [];\n    ____\n  }\n  return out;\n}\nconst words = [\"ant\", \"bee\", \"ape\"];\nconst byLetter = groupBy(words, (w) => w[0]);\nconsole.log(Object.keys(byLetter).sort().join(\",\"));\nconsole.log(byLetter[\"a\"].join(\" \"));\n",
-              "solution": "function groupBy<T>(xs: T[], key: (x: T) => string): { [k: string]: T[] } {\n  const out: { [k: string]: T[] } = {};\n  for (const x of xs) {\n    const k = key(x);\n    out[k] = out[k] ?? [];\n    out[k].push(x);\n  }\n  return out;\n}\nconst words = [\"ant\", \"bee\", \"ape\"];\nconst byLetter = groupBy(words, (w) => w[0]);\nconsole.log(Object.keys(byLetter).sort().join(\",\"));\nconsole.log(byLetter[\"a\"].join(\" \"));\n",
+              "starter": "function groupBy<T>(xs: T[], key: (x: T) => string): { [k: string]: T[] } {\n  const out: { [k: string]: T[] } = {};\n  for (const x of xs) {\n    const k = key(x);\n    out[k] = out[k] ?? [];\n    ____\n  }\n  return out;\n}\nconst words = [\"ant\", \"bee\", \"ape\"];\nconst byLetter = groupBy(words, (w) => w[0] ?? \"\");\nconsole.log(Object.keys(byLetter).sort().join(\",\"));\nconsole.log(byLetter[\"a\"]!.join(\" \"));\n",
+              "solution": "function groupBy<T>(xs: T[], key: (x: T) => string): { [k: string]: T[] } {\n  const out: { [k: string]: T[] } = {};\n  for (const x of xs) {\n    const k = key(x);\n    out[k] = out[k] ?? [];\n    out[k]!.push(x);\n  }\n  return out;\n}\nconst words = [\"ant\", \"bee\", \"ape\"];\nconst byLetter = groupBy(words, (w) => w[0] ?? \"\");\nconsole.log(Object.keys(byLetter).sort().join(\",\"));\nconsole.log(byLetter[\"a\"]!.join(\" \"));\n",
               "tests": [
                 {
                   "input": "",
@@ -24092,8 +24103,8 @@
               "strictness": "strict+indexed",
               "harness": "",
               "judge_mode": "",
-              "starter": "function zip<A, B>(as: A[], bs: B[]): ____\n  const out: Array<[A, B]> = [];\n  const n = Math.min(as.length, bs.length);\n  for (let i = 0; i < n; i++) out.push([as[i], bs[i]]);\n  return out;\n}\nconst pairs = zip([\"a\", \"b\", \"c\"], [1, 2]);\nconsole.log(pairs.map((p) => `${p[0]}=${p[1]}`).join(\",\"));\n",
-              "solution": "function zip<A, B>(as: A[], bs: B[]): Array<[A, B]> {\n  const out: Array<[A, B]> = [];\n  const n = Math.min(as.length, bs.length);\n  for (let i = 0; i < n; i++) out.push([as[i], bs[i]]);\n  return out;\n}\nconst pairs = zip([\"a\", \"b\", \"c\"], [1, 2]);\nconsole.log(pairs.map((p) => `${p[0]}=${p[1]}`).join(\",\"));\n",
+              "starter": "function zip<A, B>(as: A[], bs: B[]): ____\n  const out: Array<[A, B]> = [];\n  const n = Math.min(as.length, bs.length);\n  for (let i = 0; i < n; i++) out.push([as[i]!, bs[i]!]);\n  return out;\n}\nconst pairs = zip([\"a\", \"b\", \"c\"], [1, 2]);\nconsole.log(pairs.map((p) => `${p[0]}=${p[1]}`).join(\",\"));\n",
+              "solution": "function zip<A, B>(as: A[], bs: B[]): Array<[A, B]> {\n  const out: Array<[A, B]> = [];\n  const n = Math.min(as.length, bs.length);\n  for (let i = 0; i < n; i++) out.push([as[i]!, bs[i]!]);\n  return out;\n}\nconst pairs = zip([\"a\", \"b\", \"c\"], [1, 2]);\nconsole.log(pairs.map((p) => `${p[0]}=${p[1]}`).join(\",\"));\n",
               "tests": [
                 {
                   "input": "",
@@ -24196,8 +24207,8 @@
               "strictness": "strict+indexed",
               "harness": "",
               "judge_mode": "",
-              "starter": "function zip<A, B>(as: A[], bs: B[]): Array<[A, B]> {\n  const out: Array<[A, B]> = [];\n  const n = as.length;\n  for (let i = 0; i < n; i++) out.push([as[i], bs[i]]);\n  return out;\n}\nconst pairs = zip([\"a\", \"b\", \"c\"], [1, 2]);\nconsole.log(pairs.map((p) => `${p[0]}=${p[1]}`).join(\",\"));\n",
-              "solution": "function zip<A, B>(as: A[], bs: B[]): Array<[A, B]> {\n  const out: Array<[A, B]> = [];\n  const n = Math.min(as.length, bs.length);\n  for (let i = 0; i < n; i++) out.push([as[i], bs[i]]);\n  return out;\n}\nconst pairs = zip([\"a\", \"b\", \"c\"], [1, 2]);\nconsole.log(pairs.map((p) => `${p[0]}=${p[1]}`).join(\",\"));\n",
+              "starter": "function zip<A, B>(as: A[], bs: B[]): Array<[A, B]> {\n  const out: Array<[A, B]> = [];\n  const n = as.length;\n  for (let i = 0; i < n; i++) out.push([as[i]!, bs[i]!]);\n  return out;\n}\nconst pairs = zip([\"a\", \"b\", \"c\"], [1, 2]);\nconsole.log(pairs.map((p) => `${p[0]}=${p[1]}`).join(\",\"));\n",
+              "solution": "function zip<A, B>(as: A[], bs: B[]): Array<[A, B]> {\n  const out: Array<[A, B]> = [];\n  const n = Math.min(as.length, bs.length);\n  for (let i = 0; i < n; i++) out.push([as[i]!, bs[i]!]);\n  return out;\n}\nconst pairs = zip([\"a\", \"b\", \"c\"], [1, 2]);\nconsole.log(pairs.map((p) => `${p[0]}=${p[1]}`).join(\",\"));\n",
               "tests": [
                 {
                   "input": "",
@@ -24250,8 +24261,8 @@
               "strictness": "strict+indexed",
               "harness": "",
               "judge_mode": "",
-              "starter": "import * as fs from \"fs\";\ninterface Sale {\n  region: string;\n  amount: number;\n}\n____\nconst sales: Sale[] = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\")\n  .filter((l) => l.trim().length > 0)\n  .map((l) => {\n    const parts = l.split(\",\");\n    return { region: parts[0].trim(), amount: Number(parts[1]) };\n  });\nconst counts = countBy(sales, (s) => s.region);\nfor (const r of Object.keys(counts).sort()) console.log(`${r}: ${counts[r]}`);\nconst top = maxBy(sales, (s) => s.amount);\nconsole.log(`Top: ${top.region} ${top.amount}`);\n",
-              "solution": "import * as fs from \"fs\";\ninterface Sale {\n  region: string;\n  amount: number;\n}\nfunction countBy<T>(xs: T[], key: (x: T) => string): { [k: string]: number } {\n  const out: { [k: string]: number } = {};\n  for (const x of xs) {\n    const k = key(x);\n    out[k] = (out[k] ?? 0) + 1;\n  }\n  return out;\n}\nfunction maxBy<T>(xs: T[], score: (x: T) => number): T {\n  let best = xs[0];\n  for (const x of xs) {\n    if (score(x) > score(best)) best = x;\n  }\n  return best;\n}\nconst sales: Sale[] = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\")\n  .filter((l) => l.trim().length > 0)\n  .map((l) => {\n    const parts = l.split(\",\");\n    return { region: parts[0].trim(), amount: Number(parts[1]) };\n  });\nconst counts = countBy(sales, (s) => s.region);\nfor (const r of Object.keys(counts).sort()) console.log(`${r}: ${counts[r]}`);\nconst top = maxBy(sales, (s) => s.amount);\nconsole.log(`Top: ${top.region} ${top.amount}`);\n",
+              "starter": "import * as fs from \"fs\";\ninterface Sale {\n  region: string;\n  amount: number;\n}\n____\nconst sales: Sale[] = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\")\n  .filter((l) => l.trim().length > 0)\n  .map((l) => {\n    const parts = l.split(\",\");\n    return { region: (parts[0] ?? \"\").trim(), amount: Number(parts[1]) };\n  });\nconst counts = countBy(sales, (s) => s.region);\nfor (const r of Object.keys(counts).sort()) console.log(`${r}: ${counts[r]}`);\nconst top = maxBy(sales, (s) => s.amount);\nconsole.log(`Top: ${top.region} ${top.amount}`);\n",
+              "solution": "import * as fs from \"fs\";\ninterface Sale {\n  region: string;\n  amount: number;\n}\nfunction countBy<T>(xs: T[], key: (x: T) => string): { [k: string]: number } {\n  const out: { [k: string]: number } = {};\n  for (const x of xs) {\n    const k = key(x);\n    out[k] = (out[k] ?? 0) + 1;\n  }\n  return out;\n}\nfunction maxBy<T>(xs: T[], score: (x: T) => number): T {\n  let best: T = xs[0]!;\n  for (const x of xs) {\n    if (score(x) > score(best)) best = x;\n  }\n  return best;\n}\nconst sales: Sale[] = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\")\n  .filter((l) => l.trim().length > 0)\n  .map((l) => {\n    const parts = l.split(\",\");\n    return { region: (parts[0] ?? \"\").trim(), amount: Number(parts[1]) };\n  });\nconst counts = countBy(sales, (s) => s.region);\nfor (const r of Object.keys(counts).sort()) console.log(`${r}: ${counts[r]}`);\nconst top = maxBy(sales, (s) => s.amount);\nconsole.log(`Top: ${top.region} ${top.amount}`);\n",
               "tests": [
                 {
                   "input": "north,30\nsouth,20\nnorth,12",
@@ -24565,8 +24576,8 @@
           "strictness": "strict+indexed",
           "harness": "",
           "judge_mode": "",
-          "starter": "import * as fs from \"fs\";\ninterface Expense {\n  desc: string;\n  amount: number;\n  tag: string;\n}\n____\nfunction parse(line: string): Expense {\n  const p = line.trim().split(\" \");\n  return { desc: p[0], amount: Number(p[1]), tag: p[2] };\n}\nconst rows: Expense[] = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\").map(parse);\nconst groups = groupBy(rows, \"tag\");\nconst tagParts = Object.keys(groups).sort().map((k) => `${k}=${groups[k].length}`);\nconsole.log(`Rows:     ${rows.length}`);\nconsole.log(`By tag:   ${tagParts.join(\", \")}`);\nconsole.log(`Dearest:  ${maxBy(rows, \"amount\").desc}`);\nconsole.log(`Cheapest: ${minBy(rows, \"amount\").desc}`);\n",
-          "solution": "import * as fs from \"fs\";\ninterface Expense {\n  desc: string;\n  amount: number;\n  tag: string;\n}\nfunction groupBy<T, K extends keyof T>(rows: T[], key: K): { [k: string]: T[] } {\n  const out: { [k: string]: T[] } = {};\n  for (const r of rows) {\n    const k = String(r[key]);\n    if (out[k] === undefined) {\n      out[k] = [];\n    }\n    out[k].push(r);\n  }\n  return out;\n}\nfunction maxBy<T, K extends keyof T>(rows: T[], key: K): T {\n  let best = rows[0];\n  for (const r of rows) {\n    if (r[key] > best[key]) {\n      best = r;\n    }\n  }\n  return best;\n}\nfunction minBy<T, K extends keyof T>(rows: T[], key: K): T {\n  let best = rows[0];\n  for (const r of rows) {\n    if (r[key] < best[key]) {\n      best = r;\n    }\n  }\n  return best;\n}\nfunction parse(line: string): Expense {\n  const p = line.trim().split(\" \");\n  return { desc: p[0], amount: Number(p[1]), tag: p[2] };\n}\nconst rows: Expense[] = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\").map(parse);\nconst groups = groupBy(rows, \"tag\");\nconst tagParts = Object.keys(groups).sort().map((k) => `${k}=${groups[k].length}`);\nconsole.log(`Rows:     ${rows.length}`);\nconsole.log(`By tag:   ${tagParts.join(\", \")}`);\nconsole.log(`Dearest:  ${maxBy(rows, \"amount\").desc}`);\nconsole.log(`Cheapest: ${minBy(rows, \"amount\").desc}`);\n",
+          "starter": "import * as fs from \"fs\";\ninterface Expense {\n  desc: string;\n  amount: number;\n  tag: string;\n}\n____\nfunction parse(line: string): Expense {\n  const p = line.trim().split(\" \");\n  return { desc: p[0] ?? \"\", amount: Number(p[1]), tag: p[2] ?? \"\" };\n}\nconst rows: Expense[] = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\").map(parse);\nconst groups = groupBy(rows, \"tag\");\nconst tagParts = Object.keys(groups).sort().map((k) => `${k}=${groups[k]!.length}`);\nconsole.log(`Rows:     ${rows.length}`);\nconsole.log(`By tag:   ${tagParts.join(\", \")}`);\nconsole.log(`Dearest:  ${maxBy(rows, \"amount\").desc}`);\nconsole.log(`Cheapest: ${minBy(rows, \"amount\").desc}`);\n",
+          "solution": "import * as fs from \"fs\";\ninterface Expense {\n  desc: string;\n  amount: number;\n  tag: string;\n}\nfunction groupBy<T, K extends keyof T>(rows: T[], key: K): { [k: string]: T[] } {\n  const out: { [k: string]: T[] } = {};\n  for (const r of rows) {\n    const k = String(r[key]);\n    if (out[k] === undefined) {\n      out[k] = [];\n    }\n    out[k]!.push(r);\n  }\n  return out;\n}\nfunction maxBy<T, K extends keyof T>(rows: T[], key: K): T {\n  let best: T = rows[0]!;\n  for (const r of rows) {\n    if (r[key] > best[key]) {\n      best = r;\n    }\n  }\n  return best;\n}\nfunction minBy<T, K extends keyof T>(rows: T[], key: K): T {\n  let best: T = rows[0]!;\n  for (const r of rows) {\n    if (r[key] < best[key]) {\n      best = r;\n    }\n  }\n  return best;\n}\nfunction parse(line: string): Expense {\n  const p = line.trim().split(\" \");\n  return { desc: p[0] ?? \"\", amount: Number(p[1]), tag: p[2] ?? \"\" };\n}\nconst rows: Expense[] = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\").map(parse);\nconst groups = groupBy(rows, \"tag\");\nconst tagParts = Object.keys(groups).sort().map((k) => `${k}=${groups[k]!.length}`);\nconsole.log(`Rows:     ${rows.length}`);\nconsole.log(`By tag:   ${tagParts.join(\", \")}`);\nconsole.log(`Dearest:  ${maxBy(rows, \"amount\").desc}`);\nconsole.log(`Cheapest: ${minBy(rows, \"amount\").desc}`);\n",
           "tests": [
             {
               "input": "coffee 3.25 food\nrent 900 home\nlunch 9.50 food\nbook 12 fun",
@@ -24608,8 +24619,8 @@
           "strictness": "strict+indexed",
           "harness": "",
           "judge_mode": "",
-          "starter": "import * as fs from \"fs\";\ninterface Expense {\n  desc: string;\n  amount: number;\n  tag: string;\n}\n____\nfunction parse(line: string): Expense {\n  const p = line.trim().split(\" \");\n  return { desc: p[0], amount: Number(p[1]), tag: p[2] };\n}\nconst rows: Expense[] = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\").map(parse);\nconsole.log(`Total:    $${sumBy(rows, \"amount\").toFixed(2)}`);\n",
-          "solution": "import * as fs from \"fs\";\ninterface Expense {\n  desc: string;\n  amount: number;\n  tag: string;\n}\nfunction sumBy<T, K extends keyof T>(rows: T[], key: K): number {\n  return rows.reduce((s, r) => s + Number(r[key]), 0);\n}\nfunction parse(line: string): Expense {\n  const p = line.trim().split(\" \");\n  return { desc: p[0], amount: Number(p[1]), tag: p[2] };\n}\nconst rows: Expense[] = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\").map(parse);\nconsole.log(`Total:    $${sumBy(rows, \"amount\").toFixed(2)}`);\n",
+          "starter": "import * as fs from \"fs\";\ninterface Expense {\n  desc: string;\n  amount: number;\n  tag: string;\n}\n____\nfunction parse(line: string): Expense {\n  const p = line.trim().split(\" \");\n  return { desc: p[0] ?? \"\", amount: Number(p[1]), tag: p[2] ?? \"\" };\n}\nconst rows: Expense[] = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\").map(parse);\nconsole.log(`Total:    $${sumBy(rows, \"amount\").toFixed(2)}`);\n",
+          "solution": "import * as fs from \"fs\";\ninterface Expense {\n  desc: string;\n  amount: number;\n  tag: string;\n}\nfunction sumBy<T, K extends keyof T>(rows: T[], key: K): number {\n  return rows.reduce((s, r) => s + Number(r[key]), 0);\n}\nfunction parse(line: string): Expense {\n  const p = line.trim().split(\" \");\n  return { desc: p[0] ?? \"\", amount: Number(p[1]), tag: p[2] ?? \"\" };\n}\nconst rows: Expense[] = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\").map(parse);\nconsole.log(`Total:    $${sumBy(rows, \"amount\").toFixed(2)}`);\n",
           "tests": [
             {
               "input": "coffee 3.25 food\nrent 900 home\nlunch 9.50 food\nbook 12 fun",
@@ -24728,7 +24739,7 @@
           "def": "The same type as T[], written in the generic form."
         }
       ],
-      "cheatsheet": "```ts\n// ---- the basic shape --------------------------------------------------\nfunction first<T>(a: T[]): T { return a[0]; }\nfirst([1, 2]);            // T inferred as number\nfirst<string>([\"a\"]);     // T given explicitly (rarely needed)\n\nfunction identity<T>(x: T): T { return x; }\n\n// ---- several parameters -------------------------------------------------\nfunction pair<A, B>(a: A, b: B): [A, B] { return [a, b]; }\nfunction swap<A, B>(p: [A, B]): [B, A] { return [p[1], p[0]]; }\n\n// ---- constraints ---------------------------------------------------------\nfunction longest<T extends { length: number }>(a: T, b: T): T {\n  return a.length >= b.length ? a : b;      // .length is now allowed\n}\nlongest(\"abc\", \"de\");        // ✅ strings have length\nlongest([1], [2, 3]);        // ✅ arrays do too\nlongest(1, 2);               // ❌ numbers do not\n\n// ---- keyof & indexed access ------------------------------------------------\ntype User = { id: string; age: number };\ntype K = keyof User;              // \"id\" | \"age\"\ntype A = User[\"age\"];             // number\n\nfunction pluck<T, K extends keyof T>(o: T, k: K): T[K] {\n  return o[k];\n}\npluck({ id: \"u1\", age: 3 }, \"age\");   // returns number, not any\n\n// ---- generic types ----------------------------------------------------------\ninterface Box<T> { value: T }\ntype Pair<A, B> = { left: A; right: B };\ntype Result<T> = { ok: true; value: T } | { ok: false; error: string };\n\n// ---- defaults ----------------------------------------------------------------\ninterface Options<T = string> { items: T[] }\nconst o: Options = { items: [\"a\"] };      // T defaults to string\n```\n",
+      "cheatsheet": "```ts\n// ---- the basic shape --------------------------------------------------\nfunction first<T>(a: T[]): T {\n  if (a.length === 0) throw new Error(\"empty array\");\n  return a[0]!;\n}\nfirst([1, 2]);            // T inferred as number\nfirst<string>([\"a\"]);     // T given explicitly (rarely needed)\n\nfunction identity<T>(x: T): T { return x; }\n\n// ---- several parameters -------------------------------------------------\nfunction pair<A, B>(a: A, b: B): [A, B] { return [a, b]; }\nfunction swap<A, B>(p: [A, B]): [B, A] { return [p[1], p[0]]; }\n\n// ---- constraints ---------------------------------------------------------\nfunction longest<T extends { length: number }>(a: T, b: T): T {\n  return a.length >= b.length ? a : b;      // .length is now allowed\n}\nlongest(\"abc\", \"de\");        // ✅ strings have length\nlongest([1], [2, 3]);        // ✅ arrays do too\nlongest(1, 2);               // ❌ numbers do not\n\n// ---- keyof & indexed access ------------------------------------------------\ntype User = { id: string; age: number };\ntype K = keyof User;              // \"id\" | \"age\"\ntype A = User[\"age\"];             // number\n\nfunction pluck<T, K extends keyof T>(o: T, k: K): T[K] {\n  return o[k];\n}\npluck({ id: \"u1\", age: 3 }, \"age\");   // returns number, not any\n\n// ---- generic types ----------------------------------------------------------\ninterface Box<T> { value: T }\ntype Pair<A, B> = { left: A; right: B };\ntype Result<T> = { ok: true; value: T } | { ok: false; error: string };\n\n// ---- defaults ----------------------------------------------------------------\ninterface Options<T = string> { items: T[] }\nconst o: Options = { items: [\"a\"] };      // T defaults to string\n```\n",
       "self_check": [
         "Can you explain why `any` is a bad substitute for a generic?",
         "Can you write a function that returns the last element of an array of any type?",

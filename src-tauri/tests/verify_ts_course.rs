@@ -40,6 +40,21 @@ fn all_exercises(course: &WeeklyCourse) -> Vec<(String, &Exercise)> {
     out
 }
 
+/// Judge an exercise exactly as the app does.
+///
+/// The ONE place that maps an `Exercise` onto a `JudgeConfig`, so the mapping
+/// cannot be right in one test and wrong in another. It matters most for
+/// `ts_strictness`: `JudgeConfig::exact` leaves it empty, and an empty preset
+/// silently checks every week at plain `strict`.
+fn cfg_for(ex: &Exercise) -> JudgeConfig {
+    JudgeConfig {
+        harness: ex.harness.clone(),
+        typecheck_only: ex.judge_mode == "types",
+        ts_strictness: ex.strictness.clone(),
+        ..JudgeConfig::exact(T)
+    }
+}
+
 /// Validate a quiz's answer indices are all in range.
 fn check_quiz(quiz: &[poodcode_lib::models::QuizQuestion], where_: &str) {
     for q in quiz {
@@ -124,6 +139,70 @@ fn course_structure_is_well_formed() {
     eprintln!("verified {total} well-formed course exercises across 32 weeks");
 }
 
+/// Guard against the hole this file used to have.
+///
+/// `JudgeConfig::exact` leaves `ts_strictness` empty, so a harness that forgets
+/// to set it checks all 32 weeks at plain `strict`. That is not a loud failure —
+/// it is a silent one: the suite goes green while happily accepting content the
+/// app itself rejects, which is exactly how 42 broken exercises shipped past it.
+///
+/// This proves two things cheaply: the course really does ship exercises at the
+/// tighter preset, and the preset really is load-bearing *through the judge*
+/// (not merely inside `tscheck`, which has its own unit test for the same).
+#[test]
+fn the_judge_actually_applies_the_strictness_ladder() {
+    let course = load_course();
+    let all = all_exercises(&course);
+    let indexed: Vec<_> = all
+        .iter()
+        .filter(|(_, ex)| ex.strictness == "strict+indexed")
+        .collect();
+    assert!(!indexed.is_empty(), "no exercise ships at strict+indexed — is the ladder wired up?");
+
+    // The mapping the other test relies on must carry the preset through. This
+    // is the exact line that was wrong: the config was built without it.
+    for (_, ex) in &all {
+        assert_eq!(
+            cfg_for(ex).ts_strictness,
+            ex.strictness,
+            "{}: cfg_for dropped the exercise's strictness",
+            ex.id
+        );
+    }
+
+    // Passes `strict`; rejected by `noUncheckedIndexedAccess`, which types a[0]
+    // as `number | undefined`.
+    let src = "const a: number[] = [1, 2, 3];\nconst first: number = a[0];\nconsole.log(first);\n";
+    let cases = vec![TestCase {
+        id: 0,
+        problem_id: 0,
+        kind: "hidden".into(),
+        name: "case 1".into(),
+        input: String::new(),
+        expected_output: "1".into(),
+        ordering: 0,
+    }];
+
+    let lax = judge_with("typescript", src, &cases, &JudgeConfig::exact(T));
+    if lax.status == "not_installed" {
+        eprintln!("Node missing; skipping");
+        return;
+    }
+    assert_eq!(lax.status, "accepted", "the baseline preset must accept this: {lax:?}");
+
+    let tight = judge_with(
+        "typescript",
+        src,
+        &cases,
+        &JudgeConfig { ts_strictness: "strict+indexed".into(), ..JudgeConfig::exact(T) },
+    );
+    assert_eq!(
+        tight.status, "error",
+        "strict+indexed must REJECT a[0] assigned to number — if this passes, the \
+         strictness field is being dropped somewhere between here and tsc: {tight:?}"
+    );
+}
+
 #[test]
 fn every_course_solution_passes_its_tests() {
     let course = load_course();
@@ -133,14 +212,7 @@ fn every_course_solution_passes_its_tests() {
     let mut skipped = 0;
     for (where_, ex) in all_exercises(&course) {
         let lang = if ex.language.is_empty() { "typescript" } else { &ex.language };
-        // Judge each exercise exactly as the app does: its own hidden harness,
-        // its own grading mode. Anything else and this harness stops proving
-        // that what ships actually works.
-        let cfg = JudgeConfig {
-            harness: ex.harness.clone(),
-            typecheck_only: ex.judge_mode == "types",
-            ..JudgeConfig::exact(T)
-        };
+        let cfg = cfg_for(ex);
         let cases: Vec<TestCase> = ex
             .tests
             .iter()
