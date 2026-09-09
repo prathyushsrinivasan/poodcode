@@ -6364,6 +6364,37 @@ print(
 )
 
 # ---------------------------------------------------------------------------
+# Projects — one real application built module by module in TypeScript
+# (seeds/projects.json, served by the `projects_track` command). Exec'd after
+# every other content file for the same reason as the Backend Lab and the Java
+# course: it defines short private helpers of its own (_pex/_pch/_pfix/_pq and
+# friends), so running it late means it can only shadow names nothing still
+# needs. It reads its content from tools/todo_mNN_*.py and is also runnable
+# standalone (`python tools/projects_track.py`) for the fast verifier.
+# ---------------------------------------------------------------------------
+_pt_path = os.path.join(HERE, "projects_track.py")
+if os.path.exists(_pt_path):
+    with open(_pt_path, encoding="utf-8") as _ptf:
+        exec(compile(_ptf.read(), _pt_path, "exec"))
+
+PROJECTS_OUT = os.path.join(HERE, "..", "src-tauri", "seeds", "projects.json")
+_projects = globals().get(
+    "PROJECT_TRACK",
+    {"key": "projects", "title": "", "subtitle": "", "intro": "",
+     "harness_note": "", "projects": []},
+)
+with open(PROJECTS_OUT, "w", encoding="utf-8", newline="\n") as f:
+    json.dump(_projects, f, indent=2, ensure_ascii=False)
+_pt_mods = sum(1 for p in _projects["projects"] for m in p["modules"] if m["authored"])
+_pt_ex = sum(len(s["exercises"]) for p in _projects["projects"]
+             for m in p["modules"] for s in m["steps"])
+_pt_ex += sum(1 for p in _projects["projects"] for m in p["modules"] if m.get("final_build"))
+print(
+    f"Wrote Projects: {len(_projects['projects'])} project(s), {_pt_mods} authored "
+    f"modules ({_pt_ex} judged exercises) to {os.path.relpath(PROJECTS_OUT)}"
+)
+
+# ---------------------------------------------------------------------------
 # Reference solutions — CORRECT, submittable solutions in each shipped language,
 # used by the backend test `verify_seeds` to prove the judging + harness
 # serialization contract end-to-end (a correct solution must be Accepted). This

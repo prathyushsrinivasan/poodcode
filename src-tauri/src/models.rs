@@ -928,6 +928,219 @@ pub struct BackendStep {
 }
 
 // ---------------------------------------------------------------------------
+// Projects — build one real application, in TypeScript, broken all the way
+// down. Content lives in the embedded seeds/projects.json (authored in
+// tools/projects_track.py plus one file per module); served by the
+// `projects_track` command.
+//
+// HOW THIS DIFFERS FROM THE BACKEND LAB, which is also project-shaped:
+//
+//   * Backend Lab is JavaScript and two levels deep (Project → Step). Its unit
+//     is a whole server you finish in an evening.
+//   * Projects is TypeScript and three levels deep (Project → Module → Step).
+//     Its unit is a MODULE: one 30-60 minute slice that adds exactly one
+//     capability to an application you keep building. A module is small enough
+//     to carry the full development process end to end — why it exists, where
+//     it sits on the roadmap, the syntax it needs, ordered steps with a
+//     checkpoint each, exercises you actually write, and a revealable
+//     reference — which is the whole point of breaking it down this far.
+//
+// Both reuse `BackendStep`, `Endpoint`, `Exercise` and the same stdin/stdout
+// judge, so a module's drills are graded exactly like everything else in the
+// app: boot a real server on port 0, replay a request script, compare stdout.
+// ---------------------------------------------------------------------------
+
+/// The whole Projects track (embedded seeds/projects.json).
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ProjectTrack {
+    #[serde(default)]
+    pub key: String,
+    #[serde(default)]
+    pub title: String,
+    #[serde(default)]
+    pub subtitle: String,
+    /// Markdown shown once on the overview: how to work through a project.
+    #[serde(default)]
+    pub intro: String,
+    /// The stdin request-script format every judged exercise is driven by,
+    /// explained once rather than repeated in every prompt.
+    #[serde(default)]
+    pub harness_note: String,
+    #[serde(default)]
+    pub projects: Vec<Project>,
+}
+
+/// One application built across many modules. `authored=false` marks a planned
+/// project shown as "coming soon".
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Project {
+    pub key: String,
+    pub number: i64,
+    #[serde(default)]
+    pub title: String,
+    #[serde(default)]
+    pub tagline: String,
+    /// Language the whole project is written in ("typescript").
+    #[serde(default)]
+    pub language: String,
+    #[serde(default)]
+    pub goal: String,
+    /// One-line "why anyone builds this".
+    #[serde(default)]
+    pub why: String,
+    #[serde(default)]
+    pub authored: bool,
+    #[serde(default)]
+    pub est_minutes: i64,
+    /// What it is built out of, shown as badges ("TypeScript", "node:http",
+    /// "zero dependencies").
+    #[serde(default)]
+    pub stack: Vec<String>,
+    /// Markdown: what the finished application is.
+    #[serde(default)]
+    pub brief: String,
+    /// The finished application's full API contract — the spec every module
+    /// chips away at, shown up front so the destination is never a mystery.
+    #[serde(default)]
+    pub endpoints: Vec<Endpoint>,
+    /// Markdown: files to create and the exact command that runs it.
+    #[serde(default)]
+    pub setup: String,
+    /// The module map, grouped into phases. This is the "roadmap" the learner
+    /// navigates by; every module names the phase it belongs to.
+    #[serde(default)]
+    pub roadmap: Vec<RoadmapPhase>,
+    #[serde(default)]
+    pub modules: Vec<ProjectModule>,
+    /// "Did I actually build it?" checklist for the finished application.
+    #[serde(default)]
+    pub acceptance: Vec<String>,
+    /// Markdown: curl commands to try against your own running server.
+    #[serde(default)]
+    pub manual_test: String,
+    /// The complete finished source, revealed on request.
+    #[serde(default)]
+    pub reference: String,
+    #[serde(default)]
+    pub stretch: Vec<String>,
+    #[serde(default)]
+    pub milestone: String,
+}
+
+/// One phase of a project's roadmap: a run of consecutive modules that together
+/// deliver something demonstrable.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct RoadmapPhase {
+    pub key: String,
+    pub title: String,
+    /// What the application can do once this phase is finished.
+    #[serde(default)]
+    pub outcome: String,
+    #[serde(default)]
+    pub summary: String,
+}
+
+/// One module: the smallest unit that still runs the whole development
+/// process. Adds exactly one capability to the application.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ProjectModule {
+    pub key: String,
+    pub number: i64,
+    /// Key of the [`RoadmapPhase`] this module belongs to.
+    #[serde(default)]
+    pub phase: String,
+    #[serde(default)]
+    pub title: String,
+    /// One line, shown in the module list.
+    #[serde(default)]
+    pub what: String,
+    #[serde(default)]
+    pub goal: String,
+    /// Why this module exists — the problem the previous module left behind.
+    /// Written to be readable *before* the learner knows the solution.
+    #[serde(default)]
+    pub why: String,
+    #[serde(default)]
+    pub authored: bool,
+    #[serde(default)]
+    pub est_minutes: i64,
+    /// Keys of the modules this one continues from.
+    #[serde(default)]
+    pub builds_on: Vec<String>,
+    /// Short concept badges ("discriminated union", "status codes").
+    #[serde(default)]
+    pub concepts: Vec<String>,
+    #[serde(default)]
+    pub objectives: Vec<String>,
+    /// The one sentence naming what the app can do at the end of this module
+    /// that it could not at the start. The module's reason to exist.
+    #[serde(default)]
+    pub deliverable: String,
+    /// Markdown: the design discussion — what we are about to build and why
+    /// this shape rather than another.
+    #[serde(default)]
+    pub brief: String,
+    /// Every piece of TypeScript syntax this module needs, taught before it is
+    /// used. A module may only rely on syntax it or an earlier module declared
+    /// here — enforced at generation time — so the track never assumes an
+    /// import from the TypeScript course.
+    #[serde(default)]
+    pub syntax: Vec<SyntaxItem>,
+    /// The rows of the project's contract this module implements.
+    #[serde(default)]
+    pub endpoints: Vec<Endpoint>,
+    #[serde(default)]
+    pub steps: Vec<BackendStep>,
+    /// The judged "now put it together" exercise closing the module.
+    #[serde(default)]
+    pub final_build: Option<Exercise>,
+    #[serde(default)]
+    pub acceptance: Vec<String>,
+    /// Markdown: curl commands proving this module's slice works.
+    #[serde(default)]
+    pub manual_test: String,
+    /// The module's finished source, revealed on request — the "reveal
+    /// solution" for the whole module rather than for one exercise.
+    #[serde(default)]
+    pub reference: String,
+    #[serde(default)]
+    pub stretch: Vec<String>,
+    #[serde(default)]
+    pub glossary: Vec<GlossaryItem>,
+    #[serde(default)]
+    pub cheatsheet: String,
+    #[serde(default)]
+    pub self_check: Vec<String>,
+    #[serde(default)]
+    pub review: Vec<QuizQuestion>,
+    #[serde(default)]
+    pub milestone: String,
+}
+
+/// One piece of syntax a module needs, taught in the module that first needs
+/// it. Four fields because the form alone teaches nobody anything: what it
+/// means in words, the smallest example that shows it working, and the thing
+/// that catches people out.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SyntaxItem {
+    /// The syntax itself, e.g. `type Todo = { id: number }`.
+    pub form: String,
+    /// What it means, in one plain sentence.
+    #[serde(default)]
+    pub means: String,
+    /// The smallest complete example that shows it working.
+    #[serde(default)]
+    pub example: String,
+    /// The mistake people make with it.
+    #[serde(default)]
+    pub note: String,
+    /// True when an earlier module already taught this and the module is only
+    /// reminding the reader. Rendered dimmer, and exempt from "new syntax".
+    #[serde(default)]
+    pub recap: bool,
+}
+
+// ---------------------------------------------------------------------------
 // 6-Month Mastery programme (seeds/mastery.json, authored in
 // tools/mastery_defs.py). The Learn catalog is a reference library you can read
 // in any order; a mastery track sequences it into weeks with problems, a build

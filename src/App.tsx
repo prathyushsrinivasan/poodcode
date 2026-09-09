@@ -14,6 +14,7 @@ import ProblemForm from "./pages/ProblemForm";
 import Learn from "./pages/Learn";
 import Course, { JavaCourse } from "./pages/Course";
 import Backend from "./pages/Backend";
+import Projects from "./pages/Projects";
 import Mastery from "./pages/Mastery";
 import JapaneseBridge from "./pages/JapaneseBridge";
 import Paths from "./pages/Paths";
@@ -26,6 +27,7 @@ const NAV = [
   { to: "/course", label: "TypeScript Course", icon: "📗" },
   { to: "/java-course", label: "Java Course", icon: "☕" },
   { to: "/backend", label: "Backend Lab", icon: "🛠️" },
+  { to: "/projects", label: "Projects", icon: "🧱" },
   { to: "/mastery", label: "6-Month Mastery", icon: "🎓" },
   { to: "/jp-bridge", label: "日本語 → Java", icon: "🈁" },
   { to: "/paths", label: "Learning Paths", icon: "🧭" },
@@ -112,6 +114,9 @@ export default function App() {
             <Route path="/java-course/:week" element={<JavaCourse />} />
             <Route path="/backend" element={<Backend />} />
             <Route path="/backend/:project" element={<Backend />} />
+            <Route path="/projects" element={<Projects />} />
+            <Route path="/projects/:project" element={<Projects />} />
+            <Route path="/projects/:project/:module" element={<Projects />} />
             <Route path="/mastery" element={<Mastery />} />
             <Route path="/jp-bridge" element={<JapaneseBridge />} />
             <Route path="/problem/new" element={<ProblemForm />} />

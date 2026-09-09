@@ -25,6 +25,7 @@ import type {
   JpBridge,
   WeeklyCourse,
   BackendTrack,
+  ProjectTrack,
   MasteryTrack,
   MasteryProgress,
   SqlDataset,
@@ -84,6 +85,8 @@ export const api = {
   javaCourse: () => invoke<WeeklyCourse>("java_course"),
   /** Backend Lab — project-based CRUD-API builds (read-only content). */
   backendTrack: () => invoke<BackendTrack>("backend_track"),
+  /** Projects — one real application built module by module in TypeScript. */
+  projectsTrack: () => invoke<ProjectTrack>("projects_track"),
 
   // SQL track — the datasets its exercises query, plus the in-process engine
   // that runs SQL against a throwaway in-memory database (see src-tauri/src/sqlexec.rs).

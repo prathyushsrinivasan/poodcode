@@ -382,6 +382,7 @@ pub fn run() {
             commands::ts_course,
             commands::java_course,
             commands::backend_track,
+            commands::projects_track,
             commands::mastery,
             commands::mastery_progress,
             commands::mastery_record_quiz,

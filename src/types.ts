@@ -338,6 +338,104 @@ export interface BackendTrack {
   projects: BackendProject[];
 }
 
+// --- Projects (seeds/projects.json) ----------------------------------------
+// Build one real application, in TypeScript, broken all the way down. Three
+// levels deep where the Backend Lab is two: Project → Module → Step. A module
+// is one 30-60 minute slice that adds exactly one capability and carries the
+// whole development process — why, roadmap position, syntax primer, ordered
+// steps, judged exercises, and a revealable reference.
+
+/** One piece of syntax a module needs, taught before it is used. */
+export interface SyntaxItem {
+  /** The syntax itself, e.g. `type Todo = { id: number }`. */
+  form: string;
+  /** What it means, in one plain sentence. */
+  means: string;
+  /** The smallest complete example that shows it working. */
+  example: string;
+  /** The mistake people make with it. */
+  note: string;
+  /** True when an earlier module already taught this — rendered dimmer. */
+  recap: boolean;
+}
+
+/** A run of consecutive modules that together deliver something demonstrable. */
+export interface RoadmapPhase {
+  key: string;
+  title: string;
+  /** What the application can do once this phase is finished. */
+  outcome: string;
+  summary: string;
+}
+
+export interface ProjectModule {
+  key: string;
+  number: number;
+  /** Key of the RoadmapPhase this module belongs to. */
+  phase: string;
+  title: string;
+  what: string;
+  goal: string;
+  /** The problem the previous module left behind. */
+  why: string;
+  /** false = planned placeholder ("coming soon"). */
+  authored: boolean;
+  est_minutes: number;
+  builds_on: string[];
+  concepts: string[];
+  objectives: string[];
+  /** What the app can do at the end of this module that it could not before. */
+  deliverable: string;
+  brief: string;
+  syntax: SyntaxItem[];
+  endpoints: Endpoint[];
+  steps: BackendStep[];
+  final_build: Exercise | null;
+  acceptance: string[];
+  manual_test: string;
+  /** The module's finished source — the "reveal solution" for the whole module. */
+  reference: string;
+  stretch: string[];
+  glossary: GlossaryItem[];
+  cheatsheet: string;
+  self_check: string[];
+  review: QuizQuestion[];
+  milestone: string;
+}
+
+export interface Project {
+  key: string;
+  number: number;
+  title: string;
+  tagline: string;
+  language: string;
+  goal: string;
+  why: string;
+  authored: boolean;
+  est_minutes: number;
+  stack: string[];
+  brief: string;
+  endpoints: Endpoint[];
+  setup: string;
+  /** The module map, grouped into phases — the roadmap you navigate by. */
+  roadmap: RoadmapPhase[];
+  modules: ProjectModule[];
+  acceptance: string[];
+  manual_test: string;
+  reference: string;
+  stretch: string[];
+  milestone: string;
+}
+
+export interface ProjectTrack {
+  key: string;
+  title: string;
+  subtitle: string;
+  intro: string;
+  harness_note: string;
+  projects: Project[];
+}
+
 // --- 6-Month Mastery programme (seeds/mastery.json) ------------------------
 // The Learn catalog is a reference library; a mastery track sequences it into
 // weeks. Content is read-only — progress lives in localStorage (lib/mastery.ts).

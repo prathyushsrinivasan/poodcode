@@ -112,6 +112,18 @@ pub fn backend_track() -> AppResult<crate::models::BackendTrack> {
     Ok(serde_json::from_str(BACKEND_COURSE_JSON)?)
 }
 
+/// Projects — one real application built module by module in TypeScript
+/// (authored in tools/projects_track.py plus one file per module). Three levels
+/// deep where the Backend Lab is two: a module is a single 30-60 minute slice
+/// carrying its own why, roadmap position, syntax primer, steps and reference.
+/// Read-only content; completion is tracked in `chapter_progress` like the rest.
+const PROJECTS_JSON: &str = include_str!("../seeds/projects.json");
+
+#[tauri::command]
+pub fn projects_track() -> AppResult<crate::models::ProjectTrack> {
+    Ok(serde_json::from_str(PROJECTS_JSON)?)
+}
+
 /// The 6-Month Mastery programme — the concept catalog sequenced into weeks
 /// (authored in tools/mastery_defs.py, which validates every concept key and
 /// problem slug it references at generation time). Read-only content; the

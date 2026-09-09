@@ -37,6 +37,7 @@ npm test                       # frontend logic (Vitest): revision, filters, com
 cd src-tauri && cargo test     # backend: scheduler + live execution/judging pipeline
 python tools/verify_backend.py --starters       # Backend Lab: every solution passes, every starter fails
 python tools/verify_java_course.py --starters   # Java course: same, via javac/java (needs a JDK)
+python tools/verify_projects.py --starters      # Projects: same, type-checked then run via Node
 ```
 
 The first launch seeds **29 original problems** — 8 below-Easy **Intro** problems
@@ -86,13 +87,16 @@ Poodcode/
 │  ├─ tests/verify_java_course.rs     # proves every Java course solution passes
 │  ├─ seeds/problems.json      # the bundled original problem set
 │  ├─ seeds/backend_course.json       # Backend Lab: 7 CRUD-API build projects
-│  └─ seeds/java_course.json          # Java course: 31 modules past the basics
+│  ├─ seeds/java_course.json          # Java course: 31 modules past the basics
+│  └─ seeds/projects.json             # Projects: the Todo API, 20 TS modules
 │
 ├─ tools/gen_seed.py           # generator that AUTHORS every seeds/*.json
 ├─ tools/backend_course.py     # authors seeds/backend_course.json
 ├─ tools/java_course.py        # authors seeds/java_course.json (+ java_m01…m31, java_p01…p31)
+├─ tools/projects_track.py     # authors seeds/projects.json (+ todo_m01…m20)
 ├─ tools/verify_backend.py     # fast Node loop: runs every Backend Lab solution
-└─ tools/verify_java_course.py # fast javac/java loop: runs every Java solution
+├─ tools/verify_java_course.py # fast javac/java loop: runs every Java solution
+└─ tools/verify_projects.py    # fast tsc+Node loop: runs every Projects solution
 ```
 
 The **UI never touches the database or the filesystem directly** — it goes
@@ -176,6 +180,51 @@ solution through Node in a fast authoring loop, and
 `src-tauri/tests/verify_backend_course.rs` runs the same programs through the
 **real judge the app uses** — and both also assert that each starter *fails*, so
 no blank is decorative.
+
+### Projects
+
+A **build ladder** (`seeds/projects.json`, authored in `tools/projects_track.py`
+plus one file per module) that takes one real application and breaks it down as
+far as it will go. The first — and, for now, only — project is a **Todo API**:
+a complete, validated, persistent CRUD service over plain `node:http`, in
+**TypeScript**, with no dependencies at all. **Twenty modules in five phases:**
+model the data → put it on the network → full CRUD → make it trustworthy →
+make it real. **Modules 1-4 ship today: 16 steps and 29 judged exercises.**
+
+Where the Backend Lab's unit is a *project* you finish in an evening, this
+track's unit is a **module** — one 30-60 minute slice that adds exactly one
+capability and answers five questions in order:
+
+1. **Why does this module exist?** — the problem the previous one left behind.
+2. **Where does it sit?** — its phase on the roadmap, and what the app can do at
+   the end of it that it could not at the start.
+3. **What syntax do I need?** — every piece of TypeScript the module uses, with
+   its meaning, a worked example and the mistake people make, taught *before* it
+   is used.
+4. **What do I do?** — ordered steps, each with a checkpoint that tells you
+   whether it worked, plus the pitfalls that cost people an hour.
+5. **Did I get it?** — judged exercises you write yourself, an acceptance
+   checklist, and a **revealable reference implementation** for the whole module.
+
+The headline claim is that you are never asked to write a line of TypeScript the
+track has not already put in front of you, and it is **enforced at build time
+rather than promised in prose**. Two gen-time lints read one table: `_lint_scope`
+fails the build if a module uses a token a later module introduces, and
+`_lint_syntax_taught` fails it unless the introducing module also *teaches* that
+token in its syntax primer. (It works — module 2's demo reached for `.splice(`,
+which module 12 owns, and the build refused.)
+
+Everything runs under the same judge as the rest of the app, type-checked at
+`strict` plus `noUncheckedIndexedAccess` before it runs — which is content, not
+ceremony: module 10 reads segment 2 of a URL path, and `/todos` has no segment 2.
+Server programs boot a real `node:http` server on port 0 and replay a request
+script from stdin, so a routing bug shows up as a wrong status code. Correctness
+is proved twice, by `tools/verify_projects.py` and
+`src-tauri/tests/verify_projects.rs`, which also assert that every starter
+*fails*.
+
+The plan for the remaining 17 modules, and the six decisions taken before
+authoring, live in [`PROJECTS_ROADMAP.md`](PROJECTS_ROADMAP.md).
 
 ### TypeScript course
 
