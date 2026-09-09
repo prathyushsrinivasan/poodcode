@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { api } from "../api";
 import type { CourseLesson, CourseWeek, Exercise, WeeklyCourse } from "../types";
@@ -712,6 +712,49 @@ function ReferenceReveal({ reference }: { reference: string }) {
   );
 }
 
+// The sections a lesson's exercises are grouped into, in the order they are
+// worked. The order is the teaching order: read code before writing it (predict,
+// diagnose), fill in a blank, repair a whole program (fix, retype), design from
+// a spec, then solve something end to end.
+//
+// A kind missing from this list is not dropped — see `bucket` in LessonBody.
+const KIND_SECTIONS: { kind: string; heading: string; blurb?: string }[] = [
+  {
+    kind: "predict",
+    // Not 🔮 — that belongs to the "Predict the output" warm-up directly above,
+    // and the two sit adjacent in every lesson that has both.
+    heading: "🧠 Predict the type",
+    blurb:
+      "Before you write anything: say what TypeScript infers here. Write the type out in full — the point is to read the inference, not to ask for it.",
+  },
+  {
+    kind: "diagnose",
+    heading: "🩺 Read the error",
+    blurb:
+      "Here is a real compiler error and the code that produced it. Work out what it is telling you, then fix the cause.",
+  },
+  { kind: "drill", heading: "🧩 Practice — fill in the blank" },
+  {
+    kind: "fix",
+    heading: "🐞 Fix the bug",
+    blurb:
+      "This program looks right but doesn't work. Find and fix the bug so the tests pass.",
+  },
+  {
+    kind: "retype",
+    heading: "🚫 Retype the any",
+    blurb:
+      "This program runs, and its types say nothing. Replace every `any` with a type that describes what is actually there — the hidden checks accept nothing vaguer.",
+  },
+  {
+    kind: "design",
+    heading: "📐 Design the type first",
+    blurb:
+      "Write the types before the code. Get the shape right and the implementation nearly falls out of it.",
+  },
+  { kind: "challenge", heading: "🏆 Coding challenge" },
+];
+
 function LessonBody({
   lesson,
   onSolved,
@@ -721,11 +764,17 @@ function LessonBody({
 }) {
   const exercises = lesson.exercises ?? [];
   const kindOf = (e: Exercise) => e.kind || "drill";
-  const drills = exercises.filter((e) => kindOf(e) === "drill");
-  const fixes = exercises.filter((e) => kindOf(e) === "fix");
-  const challenges = exercises.filter((e) => kindOf(e) === "challenge");
   const warmup = lesson.warmup ?? [];
   const quiz = lesson.quiz ?? [];
+
+  // Anything whose kind is not in KIND_SECTIONS is swept into the drill bucket
+  // rather than dropped, so adding a kind to the generator can never make
+  // exercises silently vanish from the page.
+  const known = new Set(KIND_SECTIONS.map((s) => s.kind));
+  const bucket = (kind: string) =>
+    exercises.filter((e) =>
+      kind === "drill" ? !known.has(kindOf(e)) || kindOf(e) === "drill" : kindOf(e) === kind
+    );
 
   return (
     <div>
@@ -746,35 +795,29 @@ function LessonBody({
         </>
       )}
 
-      {drills.length > 0 && (
-        <>
-          <h4>🧩 Practice — fill in the blank</h4>
-          {drills.map((ex, i) => (
-            <ExerciseCard key={ex.id} index={i + 1} exercise={ex} onSolved={onSolved} />
-          ))}
-        </>
-      )}
-
-      {fixes.length > 0 && (
-        <>
-          <h4>🐞 Fix the bug</h4>
-          <p className="dim" style={{ marginTop: -4 }}>
-            This program looks right but doesn't work. Find and fix the bug so the tests pass.
-          </p>
-          {fixes.map((ex, i) => (
-            <ExerciseCard key={ex.id} index={i + 1} exercise={ex} onSolved={onSolved} />
-          ))}
-        </>
-      )}
-
-      {challenges.length > 0 && (
-        <>
-          <h4>🏆 Coding challenge</h4>
-          {challenges.map((ex, i) => (
-            <ExerciseCard key={ex.id} index={i + 1} exercise={ex} challenge onSolved={onSolved} />
-          ))}
-        </>
-      )}
+      {KIND_SECTIONS.map(({ kind, heading, blurb }) => {
+        const group = bucket(kind);
+        if (group.length === 0) return null;
+        return (
+          <React.Fragment key={kind}>
+            <h4>{heading}</h4>
+            {blurb && (
+              <p className="dim" style={{ marginTop: -4 }}>
+                {blurb}
+              </p>
+            )}
+            {group.map((ex, i) => (
+              <ExerciseCard
+                key={ex.id}
+                index={i + 1}
+                exercise={ex}
+                challenge={kind === "challenge"}
+                onSolved={onSolved}
+              />
+            ))}
+          </React.Fragment>
+        );
+      })}
 
       {quiz.length > 0 && (
         <>

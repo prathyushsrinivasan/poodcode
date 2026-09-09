@@ -124,15 +124,15 @@ export const api = {
   languages: () => invoke<LangInfo[]>("languages"),
   // `opts` is TypeScript-only, and only the course sends it: which type-check
   // preset to compile at (see src-tauri/src/tscheck.rs), the hidden harness to
-  // append to the learner's program, and whether to grade on the type-check
-  // alone. Omitted everywhere else, where the backend runs its `strict`
-  // baseline against stdout.
+  // append to the learner's program, whether to grade on the type-check alone,
+  // and any shortcut the exercise bans outright. Omitted everywhere else, where
+  // the backend runs its `strict` baseline against stdout.
   runTests: (
     problemId: number | null,
     language: string,
     code: string,
     cases: TestCase[],
-    opts?: { strictness?: string; harness?: string; judgeMode?: string }
+    opts?: { strictness?: string; harness?: string; judgeMode?: string; forbid?: string[] }
   ) =>
     invoke<JudgeReport>("run_tests", {
       problemId,
@@ -142,6 +142,7 @@ export const api = {
       strictness: opts?.strictness,
       harness: opts?.harness,
       judgeMode: opts?.judgeMode,
+      forbid: opts?.forbid,
     }),
   runScratch: (
     problemId: number | null,

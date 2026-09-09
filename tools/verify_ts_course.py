@@ -30,6 +30,7 @@ trailing whitespace per line, drop trailing blank lines.
 import argparse
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -147,6 +148,50 @@ def compose(code, ex):
     return code.rstrip() + "\n" + harness
 
 
+def check_forbidden(where, ex):
+    """A banned shortcut must not appear in the shipped answer either.
+
+    `forbid` is enforced by the judge against whatever the learner submits (see
+    `forbidden_hit` in src-tauri/src/judge.rs). If the reference solution used
+    the very construct the exercise bans, the exercise would be unsolvable as
+    written and the "Reveal solution" button would hand out a rejected program.
+    """
+    hits = [b for b in (ex.get("forbid") or []) if b and b in ex["solution"]]
+    return [f"{ex['id']} ({where}): the solution uses banned text {b!r}" for b in hits]
+
+
+def expected_error_codes(ex):
+    """The `TSnnnn` codes a 'read the error' exercise quotes in its prompt.
+
+    Four or five digits: most codes are four (TS2322), but the strict-null family
+    the course leans on is five (TS18048, 'possibly undefined').
+    """
+    if ex.get("kind") != "diagnose":
+        return []
+    return re.findall(r"\bTS(\d{4,5})\b", ex.get("prompt") or "")
+
+
+def check_quoted_error(where, ex, starter_diags):
+    """A 'read the error' exercise must show an error the compiler really emits.
+
+    The whole exercise is "here is what tsc told you — work out what it means",
+    so a prompt quoting a code the starter does not actually produce teaches the
+    learner to read a message that does not exist. Unlike the starter checks,
+    this runs unconditionally: a fabricated error is never acceptable.
+    """
+    want = expected_error_codes(ex)
+    if not want:
+        return [f"{ex['id']} ({where}): a 'diagnose' exercise must quote a TSnnnn code in its prompt"]
+    got = {str(d["code"]) for d in starter_diags}
+    missing = [c for c in want if c not in got]
+    if not missing:
+        return []
+    return [
+        f"{ex['id']} ({where}): prompt quotes TS{'/TS'.join(missing)} but the starter emits "
+        f"{('TS' + ', TS'.join(sorted(got))) if got else 'no error at all'}"
+    ]
+
+
 def check_solution(where, ex, args):
     """The solution must pass every case. Returns a list of failures."""
     failures = []
@@ -185,7 +230,12 @@ def check_starter(where, ex, args, type_failed):
             return []
         if normalize(out) != normalize(t["output"]):
             return []
-    kind = "buggy starter" if ex["kind"] == "fix" else "starter"
+    kind = {
+        "fix": "buggy starter",
+        "diagnose": "starter that is supposed to fail to compile",
+        "retype": "any-riddled starter",
+        "design": "starter with the types left out",
+    }.get(ex["kind"], "starter")
     return [f"{ex['id']} ({where}): the {kind} already PASSES — nothing to solve"]
 
 
@@ -235,10 +285,15 @@ def main():
     # grade for a type-level one.
     batch = [(ex["id"], compose(ex["solution"], ex), ex.get("strictness") or "strict")
              for (_w, ex) in work]
-    if args_ns.starters:
-        batch += [(ex["id"] + "\0starter", compose(ex["starter"], ex),
-                   ex.get("strictness") or "strict")
-                  for (_w, ex) in work]
+    # A 'diagnose' starter is type-checked whether or not --starters was passed:
+    # its prompt quotes a compiler error, and that quote has to be real.
+    starters_wanted = [
+        (w, ex) for (w, ex) in work
+        if args_ns.starters or ex.get("kind") == "diagnose"
+    ]
+    batch += [(ex["id"] + "\0starter", compose(ex["starter"], ex),
+               ex.get("strictness") or "strict")
+              for (_w, ex) in starters_wanted]
     diags = typecheck_batch(batch)
 
     starter_type_failed = set()
@@ -251,7 +306,11 @@ def main():
                 f"[{ex.get('strictness') or 'strict'}]\n"
                 + format_diagnostics(compose(ex["solution"], ex), d)
             )
-        if args_ns.starters and (diags.get(ex["id"] + "\0starter") or []):
+        failures.extend(check_forbidden(where, ex))
+        starter_diags = diags.get(ex["id"] + "\0starter") or []
+        if ex.get("kind") == "diagnose":
+            failures.extend(check_quoted_error(where, ex, starter_diags))
+        if args_ns.starters and starter_diags:
             starter_type_failed.add(ex["id"])
             if ex["kind"] == "fix":
                 compile_time_fixes.append(ex["id"])

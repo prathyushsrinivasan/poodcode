@@ -51,8 +51,18 @@ export interface Exercise {
   /** Progressive hint ladder; falls back to `hint` when empty. */
   hints: string[];
   language: string;
-  /** "drill" (fill-in-the-blank, default), "challenge" (full coding problem),
-   * or "fix" (a complete but buggy program the learner corrects). */
+  /** What sort of exercise this is, which decides both how it is presented and
+   * which section of a lesson it lands in:
+   *
+   * - "drill" (fill-in-the-blank, the default)
+   * - "challenge" (a full coding problem)
+   * - "fix" (a complete but buggy program the learner corrects)
+   * - "predict" (name the type the compiler infers)
+   * - "diagnose" (read a real compiler error and repair what caused it)
+   * - "retype" (replace `any` with types that say what is actually there)
+   * - "design" (write the types first, then satisfy them)
+   *
+   * An unrecognised kind still renders — see `KIND_SECTIONS` in Course.tsx. */
   kind: string;
   /** Suggested difficulty for a challenge: "Intro" | "Easy" | "Medium". */
   difficulty: string;
@@ -69,6 +79,12 @@ export interface Exercise {
    * compares stdout against `tests`. "types" never runs it — the program only
    * has to type-check, and `tests` is empty. */
   judge_mode?: string;
+  /** Substrings the learner's source may not contain, rejected before the
+   * program is compiled. Lets an exercise ban the shortcut that would satisfy
+   * its assertions without answering the question — a "predict the type" drill
+   * bans `typeof`, since `type Answer = typeof x` would otherwise pass. The
+   * prompt explains why; the judge only names the banned text. */
+  forbid?: string[];
   starter: string;
   solution: string;
   tests: ExerciseTest[];

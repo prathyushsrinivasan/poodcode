@@ -143,6 +143,22 @@ pub struct Exercise {
     /// runtime value to print, so the assertion has to fail at *compile* time.
     #[serde(default)]
     pub judge_mode: String,
+    /// Substrings the learner's own source may not contain. Checked before the
+    /// program is compiled, so a violation reads as a rejection rather than as a
+    /// confusing pass.
+    ///
+    /// This exists because some exercises are gradeable but trivially dodgeable.
+    /// A "predict the type" drill asks the learner to annotate `check` with the
+    /// type the compiler infers for `x`, and its assertion is
+    /// `Equal<typeof check, typeof x>`; that assertion is honest — and worth
+    /// revealing under "What's being checked?" — but `const check: typeof x = x`
+    /// satisfies it without predicting anything. Banning `typeof` is what makes
+    /// the question real.
+    ///
+    /// The judge only reports *which* substring was used; the exercise's prompt
+    /// is where the reason belongs.
+    #[serde(default)]
+    pub forbid: Vec<String>,
     pub starter: String,
     pub solution: String,
     #[serde(default)]

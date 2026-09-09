@@ -446,6 +446,51 @@ fn typescript_typecheck_mode_honours_a_ts_expect_error_negative_test() {
     );
 }
 
+/// `forbid` is what makes a "predict the type" exercise a real question.
+///
+/// Its assertion is `Equal<typeof check, typeof x>` — honest, and safe to reveal
+/// under "What's being checked?" — but `const check: typeof x = x` satisfies it
+/// without predicting anything. The ban has to be enforced *before* the compiler
+/// sees the program, or the dodge type-checks and is accepted.
+#[test]
+fn typescript_forbid_rejects_the_shortcut_but_not_the_real_answer() {
+    let code_prefix = "const parts = \"a,b\".split(\",\");\nconst first = parts[0];\n";
+    let checks = concat!(
+        "type Equal<X, Y> =\n",
+        "  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\n",
+        "type Expect<T extends true> = T;\n",
+        "type _1 = Expect<Equal<typeof check, typeof first>>;\n",
+    );
+    let cfg = |forbid: Vec<String>| JudgeConfig {
+        harness: checks.into(),
+        typecheck_only: true,
+        forbid,
+        ..JudgeConfig::exact(T)
+    };
+
+    // The dodge type-checks perfectly — which is exactly the problem.
+    let dodge = format!("{code_prefix}const check: typeof first = first;\n");
+    let rep = judge_with("typescript", &dodge, &[], &cfg(vec![]));
+    if rep.status == "not_installed" {
+        return;
+    }
+    assert_eq!(rep.status, "accepted", "unbanned, the dodge compiles: {rep:?}");
+
+    // Banned, it is rejected before compiling, and the message names the text.
+    let rep = judge_with("typescript", &dodge, &[], &cfg(vec!["typeof".into()]));
+    assert_eq!(rep.status, "error", "the banned shortcut must be rejected: {rep:?}");
+    assert!(
+        rep.compile_error.contains("typeof"),
+        "the message must name what was banned: {}",
+        rep.compile_error
+    );
+
+    // The real answer is unaffected by the same ban.
+    let answer = format!("{code_prefix}const check: string | undefined = first;\n");
+    let rep = judge_with("typescript", &answer, &[], &cfg(vec!["typeof".into()]));
+    assert_eq!(rep.status, "accepted", "the honest answer must still pass: {rep:?}");
+}
+
 #[test]
 fn typescript_harness_is_ignored_when_empty() {
     // The default path — no harness, no type-check-only — must be untouched.

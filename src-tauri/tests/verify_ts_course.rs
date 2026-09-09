@@ -36,6 +36,14 @@ fn all_exercises(course: &WeeklyCourse) -> Vec<(String, &Exercise)> {
                 out.push((format!("W{}/stretch", w.number), ex));
             }
         }
+        // Practice is optional to *complete* but not optional to be correct: it
+        // is judged by the same judge as everything else, so it is verified by
+        // the same test. Leaving it out would ship it unproven.
+        for fam in &w.practice {
+            for ex in &fam.exercises {
+                out.push((format!("W{}/practice/{}", w.number, fam.key), ex));
+            }
+        }
     }
     out
 }
@@ -51,6 +59,7 @@ fn cfg_for(ex: &Exercise) -> JudgeConfig {
         harness: ex.harness.clone(),
         typecheck_only: ex.judge_mode == "types",
         ts_strictness: ex.strictness.clone(),
+        forbid: ex.forbid.clone(),
         ..JudgeConfig::exact(T)
     }
 }
@@ -92,12 +101,31 @@ fn course_structure_is_well_formed() {
         assert!(!ex.title.trim().is_empty(), "{}: empty title", ex.id);
         assert!(!ex.prompt.trim().is_empty(), "{}: empty prompt", ex.id);
         assert!(!ex.solution.trim().is_empty(), "{}: empty solution", ex.id);
-        // "fix" exercises hand the learner a complete buggy program (no blank);
-        // every other kind must have a ____ blank to fill.
-        if ex.kind == "fix" {
-            assert!(!ex.starter.contains("____"), "{}: fix starter should have no blank", ex.id);
+        // Some kinds hand the learner a complete program to repair rather than a
+        // line with a hole in it: "fix" (a runtime bug), "diagnose" (a program
+        // the compiler rejects) and "retype" (a program whose types all say
+        // `any`). Every other kind must have a ____ blank to fill.
+        let whole_program = matches!(ex.kind.as_str(), "fix" | "diagnose" | "retype");
+        if whole_program {
+            assert!(
+                !ex.starter.contains("____"),
+                "{}: a whole-program {:?} starter should have no blank",
+                ex.id,
+                ex.kind
+            );
         } else {
             assert!(ex.starter.contains("____"), "{}: starter has no ____ blank", ex.id);
+        }
+        // A banned shortcut must not appear in the answer being shipped, or the
+        // exercise is unsolvable and "Reveal solution" hands out a program the
+        // judge rejects. `tools/verify_ts_course.py` checks the same thing.
+        for banned in &ex.forbid {
+            assert!(
+                !ex.solution.contains(banned.as_str()),
+                "{}: the solution uses its own banned text {:?}",
+                ex.id,
+                banned
+            );
         }
         assert_ne!(ex.starter, ex.solution, "{}: starter equals solution", ex.id);
         // A type-level exercise is graded by the compiler: its harness carries

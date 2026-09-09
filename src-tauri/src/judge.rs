@@ -27,6 +27,10 @@ pub struct JudgeConfig {
     /// Set by type-level exercises, whose assertions are conditional types that
     /// produce no output to compare.
     pub typecheck_only: bool,
+    /// Substrings the submission may not contain. See
+    /// [`crate::models::Exercise::forbid`] — this is the shortcut-ban that lets
+    /// an exercise ask a question its own assertions cannot otherwise protect.
+    pub forbid: Vec<String>,
 }
 
 impl JudgeConfig {
@@ -40,8 +44,21 @@ impl JudgeConfig {
             ts_strictness: String::new(),
             harness: String::new(),
             typecheck_only: false,
+            forbid: Vec::new(),
         }
     }
+}
+
+/// The first banned substring `code` contains, if any.
+///
+/// Deliberately a plain substring scan and not a tokenizer: the bans are
+/// authored against exactly the text the learner types, and a scan cannot
+/// disagree with `tools/verify_ts_course.py`, which checks the same way.
+fn forbidden_hit<'a>(code: &str, forbid: &'a [String]) -> Option<&'a str> {
+    forbid
+        .iter()
+        .find(|banned| !banned.is_empty() && code.contains(banned.as_str()))
+        .map(|s| s.as_str())
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -228,6 +245,19 @@ pub fn judge_with(
     }
 
     let timeout = cfg.timeout;
+
+    // Shortcut bans are checked against what the learner actually wrote, before
+    // anything is wrapped, appended or compiled — so the message names their own
+    // text, and a banned construct can never reach the compiler and "pass".
+    if let Some(banned) = forbidden_hit(code, &cfg.forbid) {
+        return JudgeReport::error(
+            "error",
+            format!(
+                "`{banned}` is not allowed in this exercise — see the prompt for why. \
+                 Remove it and answer the question directly."
+            ),
+        );
+    }
 
     // If this is a function-harness problem, wrap the user's function with
     // generated I/O glue before compiling.

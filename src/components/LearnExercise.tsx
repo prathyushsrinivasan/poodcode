@@ -55,10 +55,21 @@ export function ExerciseCard({
       ? [exercise.hint]
       : [];
 
-  // "fix" = a complete but buggy program to correct; like a challenge, it's a
-  // full program (no ____ blank) so it wants a roomier editor and accent frame.
-  const isFix = exercise.kind === "fix";
-  const big = challenge || isFix;
+  // Per-kind presentation. `badge` labels the card; `whole` marks the kinds that
+  // hand over a complete program rather than a line with a blank in it, which
+  // want the roomier editor and the accent frame a challenge gets.
+  //
+  // Kinds absent from this table (notably "drill" and "challenge") fall through
+  // to the plain treatment, so an unrecognised kind renders rather than breaking.
+  const KIND_STYLE: Record<string, { badge: string; color: string; whole: boolean }> = {
+    fix: { badge: "🐞 fix the bug", color: "var(--bad)", whole: true },
+    diagnose: { badge: "🩺 read the error", color: "var(--bad)", whole: true },
+    retype: { badge: "🚫 retype the any", color: "var(--warn)", whole: true },
+    predict: { badge: "🧠 predict the type", color: "var(--accent)", whole: false },
+    design: { badge: "📐 types first", color: "var(--accent)", whole: true },
+  };
+  const style = KIND_STYLE[exercise.kind];
+  const big = challenge || !!style?.whole;
   const hasBlank = exercise.starter.includes("____");
   // A type-level exercise is never run: it passes when the compiler accepts the
   // assertions in its harness. There are no test cases and no output to show.
@@ -99,6 +110,7 @@ export function ExerciseCard({
         strictness: exercise.strictness,
         harness: exercise.harness,
         judgeMode: exercise.judge_mode,
+        forbid: exercise.forbid,
       });
       setReport(r);
       if (r.status === "accepted") onSolved?.(exercise.id);
@@ -129,9 +141,9 @@ export function ExerciseCard({
           {index}. {exercise.title} {solved && <span style={{ color: "var(--good)" }}>✓</span>}
         </strong>
         <span className="row" style={{ gap: 6 }}>
-          {isFix && (
-            <span className="badge" style={{ borderColor: "var(--bad)", color: "var(--bad)" }}>
-              🐞 fix the bug
+          {style && (
+            <span className="badge" style={{ borderColor: style.color, color: style.color }}>
+              {style.badge}
             </span>
           )}
           {isTypes && (
@@ -145,7 +157,25 @@ export function ExerciseCard({
           <span className="badge">{lang}</span>
         </span>
       </div>
-      <p style={{ margin: "6px 0 10px" }}>{exercise.prompt}</p>
+      {/* pre-wrap so an authored line break survives. A "read the error" prompt
+          quotes the compiler's message on its own indented line, and collapsing
+          that into the running text is exactly the thing being taught. Ordinary
+          single-line prompts are unaffected. */}
+      <p style={{ margin: "6px 0 10px", whiteSpace: "pre-wrap" }}>{exercise.prompt}</p>
+
+      {/* Say the ban up front. Finding out only on submission that `typeof` was
+          never going to be accepted reads as a broken exercise, not as a rule. */}
+      {exercise.forbid && exercise.forbid.length > 0 && (
+        <p className="dim" style={{ margin: "-4px 0 10px", fontSize: 12 }}>
+          Not allowed here:{" "}
+          {exercise.forbid.map((f, i) => (
+            <span key={f}>
+              {i > 0 && ", "}
+              <code>{f}</code>
+            </span>
+          ))}
+        </p>
+      )}
 
       <div
         style={{

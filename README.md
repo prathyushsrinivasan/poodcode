@@ -177,6 +177,43 @@ solution through Node in a fast authoring loop, and
 **real judge the app uses** — and both also assert that each starter *fails*, so
 no blank is decorative.
 
+### TypeScript course
+
+The one track that starts at **zero** (`seeds/ts_course.json`, authored in
+`tools/typescript_course.py`): *TypeScript: Zero to Interview*, an eight-month,
+**32-week** course from a first `console.log` to interview-ready — DSA solved in
+TypeScript plus deep type-system work. **Weeks 1-15 ship today: 119 lessons and
+882 judged exercises**, each week carrying a goal, warm-ups, drills,
+fix-the-bug programs, a coding challenge, hint ladders, a glossary, a cheat
+sheet, a self-check, a review quiz and an instalment of a **capstone project
+that grows across the whole course** (Budget Buddy, from a receipt line in week
+1 to a generic record toolkit in week 10, a class-owned ledger in week 11, a
+branded `Money` type in week 12, an immutable ledger with undo in week 13, a
+derived patch API in week 14 and a validating JSON loader in week 15).
+
+Beyond the usual drill/fix/challenge, the course grades **reading** as well as
+writing, with four kinds aimed at what using TypeScript actually feels like:
+*predict the type* the compiler infers, *read the error* and repair its cause,
+*retype the `any`* until the types say something, and *design the type first*.
+Two of these need no runtime at all — a type has no output to compare, so
+they're graded on the type-check alone (`judge_mode: "types"`), with hidden
+`Expect<Equal<…>>` assertions.
+
+Four constraints shape it. **Nothing before its week** — a gen-time linter
+fails the build if a program uses an idea a later week teaches. **The compiler
+tightens as you go**: every program is type-checked before it runs, and from
+week 6 under `noUncheckedIndexedAccess`, so `a[i]` is `T | undefined` and has to
+be handled. A *read-the-error* exercise must quote an error the compiler
+**really emits** — the verifier re-derives the `TSnnnn` code from the starter
+and fails if the quoted one is invented. And programs must be **erasable
+syntax**: the judge strips types rather than compiling them, so the three
+constructs that emit code — parameter properties (week 11), `enum` (week 12)
+and `namespace` — are taught as type-checked exercises instead, which is itself
+one of the reasons week 12 argues for a literal union over an enum.
+
+The plan for the remaining 17 weeks — including the five decisions worth taking
+before authoring resumes — lives in [`TS_ROADMAP.md`](TS_ROADMAP.md).
+
 ### Java course
 
 A **topic-based** track (`seeds/java_course.json`, authored in

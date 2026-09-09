@@ -331,6 +331,7 @@ fn judge_config_for(conn: &Connection, problem_id: Option<i64>) -> judge::JudgeC
                 ts_strictness: String::new(),
                 harness: String::new(),
                 typecheck_only: false,
+                forbid: Vec::new(),
             };
         }
     }
@@ -354,6 +355,7 @@ pub async fn run_tests(
     strictness: Option<String>,
     harness: Option<String>,
     judge_mode: Option<String>,
+    forbid: Option<Vec<String>>,
 ) -> AppResult<JudgeReport> {
     let mut cfg = judge_config_for(&state.conn(), problem_id);
     // TypeScript course exercises carry the strictness their week is taught at;
@@ -363,6 +365,9 @@ pub async fn run_tests(
     // alone. Problems from the bank leave both unset.
     cfg.harness = harness.unwrap_or_default();
     cfg.typecheck_only = judge_mode.as_deref() == Some("types");
+    // …and may ban a shortcut that would satisfy the assertions without doing
+    // the thinking the exercise is about.
+    cfg.forbid = forbid.unwrap_or_default();
     tauri::async_runtime::spawn_blocking(move || judge::judge_with(&language, &code, &cases, &cfg))
         .await
         .map_err(|e| AppError::Other(e.to_string()))
