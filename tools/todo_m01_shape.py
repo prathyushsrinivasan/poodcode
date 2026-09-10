@@ -6,7 +6,7 @@
 # to `_TODO_MODULES`.
 #
 # THE CONSTRAINT THAT SHAPES THIS MODULE: it is first, so it may assume
-# nothing. Every token in `_SCOPE_RULES` is off-limits except the three
+# nothing. Every token in `_TODO_SCOPE_RULES` is off-limits except the three
 # introduced here (`type `, `JSON.stringify(`, and the object literal), and the
 # ungated basics module 1's own primer covers — `const`, `function`, `return`,
 # `if`, `console.log`, template literals.

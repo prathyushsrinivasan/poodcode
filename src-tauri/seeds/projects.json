@@ -1,9 +1,9 @@
 {
   "key": "projects",
   "title": "Projects",
-  "subtitle": "Build one real application, in TypeScript, broken all the way down.",
-  "intro": "The other tracks teach you TypeScript. This one asks you to **build something\nwith it**, and refuses to skip a step on the way.\n\n### What makes this different\n\nA tutorial hands you finished code and explains it. That feels productive and\nteaches almost nothing, because reading code you did not write is not the skill\nyou are trying to acquire. Here, every module hands you the *reason* first, the\n*syntax* second, and then makes you write it.\n\nEach module answers five questions, in this order:\n\n1. **Why does this module exist?** — the problem the last module left behind.\n2. **Where does it sit?** — its place on the project roadmap, and what the app\n   can do at the end of it that it could not at the start.\n3. **What syntax do I need?** — every piece of TypeScript the module uses,\n   taught before it is used. Never a forward reference.\n4. **What do I do?** — ordered steps, each with a checkpoint that tells you\n   whether it worked, and the mistakes that cost people an hour.\n5. **Did I get it?** — judged exercises you write yourself, then a reference\n   implementation you can reveal and compare against.\n\n### How to work through it\n\nDo the modules in order and **type the code** — the typos are the lesson. Keep\nyour own `server.ts` open in one window and the module in another; the judged\nexercises check your understanding, but only your own running server and a\n`curl` prove you built the thing.\n\nReveal the reference *after* you have something working, and read it as \"here is\nanother way\", not as the answer. Where it differs from yours, work out which of\nyou is right — sometimes it will be you.\n",
-  "harness_note": "Judged exercises in this track come in two shapes.\n\n**Pure logic** — the early modules, before there is a server. Your program\nprints to stdout and is compared line for line.\n\n**A real server** — from module 4 on. Your program boots an actual HTTP server\non a free port and a *replayer* fires a script of requests at it, so you are\ndebugging a real server rather than a simulation.\n\n- **stdin** holds one request per line: `METHOD /path [json body]`\n- **stdout** prints one line per request: `<status> <response body>`\n\nSo the input\n\n```\nPOST /todos {\"title\":\"Buy milk\"}\nGET /todos/1\nGET /todos/99\n```\n\nproduces\n\n```\n201 {\"id\":1,\"title\":\"Buy milk\",\"done\":false}\n200 {\"id\":1,\"title\":\"Buy milk\",\"done\":false}\n404 {\"error\":\"not_found\"}\n```\n\nThe replayer at the bottom of each program is **given** — you never edit it, and\nthe syntax rules do not count it against the module it appears in. Your job is\nalways the code above it.\n\nThree things worth knowing up front:\n\n- **Everything is type-checked before it runs**, under `strict` plus\n  `noUncheckedIndexedAccess`. That second flag means `parts[2]` has type\n  `string | undefined` — because a URL really might not have a third segment.\n  Handling it is not ceremony; it is the bug you are being taught to avoid.\n- **Key order matters.** `JSON.stringify` emits keys in insertion order, so\n  build response objects in the order the expected output shows.\n- **Ids are counters, not UUIDs.** Real services use `crypto.randomUUID()`;\n  these use `1, 2, 3` so the expected output can be written down at all. The\n  modules say so wherever it matters.\n",
+  "subtitle": "Build real applications, in TypeScript, broken all the way down.",
+  "intro": "The other tracks teach you TypeScript. This one asks you to **build something\nwith it**, and refuses to skip a step on the way.\n\n### What makes this different\n\nA tutorial hands you finished code and explains it. That feels productive and\nteaches almost nothing, because reading code you did not write is not the skill\nyou are trying to acquire. Here, every module hands you the *reason* first, the\n*syntax* second, and then makes you write it.\n\nEach module answers five questions, in this order:\n\n1. **Why does this module exist?** — the problem the last module left behind.\n2. **Where does it sit?** — its place on the project roadmap, and what the app\n   can do at the end of it that it could not at the start.\n3. **What syntax do I need?** — every piece of TypeScript the module uses,\n   taught before it is used. Never a forward reference.\n4. **What do I do?** — ordered steps, each with a checkpoint that tells you\n   whether it worked, and the mistakes that cost people an hour.\n5. **Did I get it?** — judged exercises you write yourself, then a reference\n   implementation you can reveal and compare against.\n\n### How to work through it\n\nDo the modules in order and **type the code** — the typos are the lesson. Keep\nyour own copy of the project open in one window and the module in another; the\njudged exercises check your understanding, but only the thing running on your\nown machine proves you built it.\n\nReveal the reference *after* you have something working, and read it as \"here is\nanother way\", not as the answer. Where it differs from yours, work out which of\nyou is right — sometimes it will be you.\n",
+  "harness_note": "Judged exercises in this track come in three shapes. Which one you are looking\nat is obvious from the program: if there is a replayer at the bottom, it is the\nthird.\n\n**Pure logic** — the opening modules of either project, before there is anything\nto drive. Your program prints to stdout and is compared line for line.\n\n**A program on stdin** — Calc, from module 2 on. The source text your language\nhas to process arrives on stdin; what you print is the answer. One test case per\ninput, so a single exercise can be checked against `1 + 2`, `7`, and the empty\nstring at once.\n\n**A real server** — the Todo API, from module 4 on. Your program boots an actual\nHTTP server on a free port and a *replayer* fires a script of requests at it, so\nyou are debugging a real server rather than a simulation.\n\n- **stdin** holds one request per line: `METHOD /path [json body]`\n- **stdout** prints one line per request: `<status> <response body>`\n\nSo the input\n\n```\nPOST /todos {\"title\":\"Buy milk\"}\nGET /todos/1\nGET /todos/99\n```\n\nproduces\n\n```\n201 {\"id\":1,\"title\":\"Buy milk\",\"done\":false}\n200 {\"id\":1,\"title\":\"Buy milk\",\"done\":false}\n404 {\"error\":\"not_found\"}\n```\n\nThe replayer at the bottom of each program is **given** — you never edit it, and\nthe syntax rules do not count it against the module it appears in. Your job is\nalways the code above it.\n\nThree things worth knowing up front:\n\n- **Everything is type-checked before it runs**, under `strict` plus\n  `noUncheckedIndexedAccess`. That second flag means `parts[2]` has type\n  `string | undefined` — because a URL really might not have a third segment.\n  Handling it is not ceremony; it is the bug you are being taught to avoid.\n- **Key order matters.** `JSON.stringify` emits keys in insertion order, so\n  build response objects in the order the expected output shows.\n- **Ids are counters, not UUIDs.** Real services use `crypto.randomUUID()`;\n  these use `1, 2, 3` so the expected output can be written down at all. The\n  modules say so wherever it matters.\n",
   "projects": [
     {
       "key": "todo-api",
@@ -21,6 +21,7 @@
         "node:fs",
         "zero dependencies"
       ],
+      "completion_note": "A module completes once you have read it through and solved its exercises — but the real deliverable is the server running on your own machine.",
       "brief": "### What you are building\n\nA **todo list backend**. Not a UI — the API underneath one. When you are done,\nthis works against a server running on your own machine:\n\n```\n$ curl -s -X POST localhost:3000/todos -d '{\"title\":\"Buy milk\"}'\n{\"id\":1,\"title\":\"Buy milk\",\"done\":false}\n\n$ curl -s localhost:3000/todos\n{\"items\":[{\"id\":1,\"title\":\"Buy milk\",\"done\":false}],\"total\":1}\n\n$ curl -s -X PATCH localhost:3000/todos/1 -d '{\"done\":true}'\n{\"id\":1,\"title\":\"Buy milk\",\"done\":true}\n\n$ curl -s -X POST localhost:3000/todos -d '{\"title\":\"\"}'\n{\"error\":\"validation\",\"fields\":[{\"field\":\"title\",\"message\":\"must not be empty\"}]}\n```\n\nThat last line is the one worth looking at twice. Anyone can return data on the\nhappy path; the difference between an exercise and an API is what happens when\nthe client sends something wrong, and half this track is about that.\n\n### How it is broken up\n\n**20 modules in 5 phases.** A module is one sitting — 30 to 60 minutes — and\nadds exactly one capability. Every module tells you *why it exists* before it\ntells you what to type, teaches every piece of syntax it needs before using it,\nwalks you through the build in ordered steps with a checkpoint each, gives you\njudged exercises to write yourself, and ends with a reference you can reveal and\ncompare against.\n\nYou are never asked to write a line of TypeScript this track has not already put\nin front of you. That is enforced at build time, not promised in prose.\n",
       "endpoints": [
         {
@@ -2570,6 +2571,1278 @@
         "Put a real HTML page in front of it, served from the same server."
       ],
       "milestone": "You have written a complete backend service — model, routes, verbs, validation, error contract, querying and storage — with no framework between you and the request."
+    },
+    {
+      "key": "calc-lang",
+      "number": 2,
+      "title": "Calc",
+      "tagline": "Text in, a number out — a tokenizer, a parser and an evaluator, written from nothing.",
+      "language": "typescript",
+      "goal": "Build a small expression language in TypeScript — scanner, parser, evaluator and error reporting — that runs `let x = 4; x * x` and tells you exactly where you went wrong when it cannot.",
+      "why": "Everything that reads text and does something structured with it is this program with more cases in it: compilers, linters, formatters, query parsers, template engines, config loaders. It is also the shortest route to the half of TypeScript the Todo API never needs — unions you walk recursively, and a compiler that tells you which branch you forgot.",
+      "authored": true,
+      "est_minutes": 720,
+      "stack": [
+        "TypeScript",
+        "node:fs",
+        "zero dependencies",
+        "no framework"
+      ],
+      "completion_note": "A module completes once you have read it through and solved its exercises — but the real deliverable is `calc.ts` on your own machine, evaluating something you typed yourself.",
+      "brief": "### What you are building\n\nA **language**. A small one — arithmetic, variables, comparison and `if` — but a\nreal one, with the three pieces every language has. When you are done, this\nworks against a file on your own machine:\n\n```\n$ echo '1 + 2 * 3' | node calc.ts\n7\n\n$ echo '(1 + 2) * -3' | node calc.ts\n-9\n\n$ echo 'let x = 4; x * x > 10' | node calc.ts\ntrue\n\n$ echo '1 + )' | node calc.ts\nerror: unexpected ')' at 1:5\n  1 + )\n      ^\n```\n\nThat last block is the one worth looking at twice. Any evening gets you a\ncalculator; the difference between a calculator and a language is that the\nlanguage can tell a stranger what they typed wrong and where.\n\n### The three pieces\n\nEvery language processor ever written is the same pipeline, and this project is\none phase per arrow:\n\n```\n  \"1 + 2 * 3\"   →   [num 1, op +, num 2, op *, num 3, eof]   →   (+ 1 (* 2 3))   →   7\n      text            tokens                                       tree             value\n                    ── scanner ──                            ── parser ──      ── evaluator ──\n```\n\nEach arrow throws away something you no longer need and adds something you do.\nThe scanner throws away whitespace and gains types. The parser throws away\norder-of-appearance and gains **structure** — which is where `1 + 2 * 3` stops\nbeing five tokens in a row and becomes an addition whose right-hand side is a\nmultiplication. The evaluator throws away the structure and gains an answer.\n\nNothing here is a simplification of how real ones work. It is how real ones\nwork, with four operators instead of forty.\n\n### What it will teach you that the Todo API cannot\n\nThe Todo API is about contracts between programs. This one is about **data you\ndesigned yourself**, and it leans on the part of TypeScript that exists for\nexactly that:\n\n| Idea | Where it lands | Why it matters outside this project |\n|---|---|---|\n| Discriminated unions | Module 1, and then everywhere | The single most useful modelling tool the language has |\n| Recursive types | Module 5 | Trees, JSON, file systems, comment threads |\n| Exhaustive narrowing with `never` | Module 10 | Adding a case becomes a compile error, not a bug report |\n| Errors as values | Module 4, paid off in 17 | The alternative to exceptions, and usually the better one |\n\n### How it is broken up\n\n**18 modules in 5 phases.** A module is one sitting — 30 to 50 minutes — and\nadds exactly one capability. Every module tells you *why it exists* before it\ntells you what to type, teaches every piece of syntax it needs before using it,\nwalks you through the build in ordered steps with a checkpoint each, gives you\njudged exercises to write yourself, and ends with a reference you can reveal and\ncompare against.\n\nYou are never asked to write a line of TypeScript this project has not already\nput in front of you. That is enforced at build time, not promised in prose.\n",
+      "endpoints": [],
+      "setup": "You need **Node 22 or newer** — it runs `.ts` files directly by stripping the\ntype annotations, so there is no build step and nothing to install.\n\n```bash\nmkdir calc && cd calc\n```\n\nEverything lives in one file until module 18. Create `calc.ts` and feed it a\nprogram on stdin:\n\n```bash\necho '1 + 2' | node calc.ts\n```\n\nOn Windows PowerShell, `echo` behaves differently — use a file instead:\n\n```powershell\n'1 + 2' | node calc.ts\n```\n\n> **A word on the type-check.** Running a `.ts` file *strips* the types; it does\n> not check them. Node will happily run `const n: number = \"seven\"`. The\n> exercises here are type-checked before they run, so they catch it — but on\n> your own machine, install TypeScript (`npm i -D typescript`) and run\n> `npx tsc --noEmit --strict calc.ts` when something surprises you.\n\nTwo flags are worth turning on from the start, because this project is built\naround both: `strict`, and `noUncheckedIndexedAccess`. The second one is why\n`tokens[i]` has type `Token | undefined` here — and a parser that walks off the\nend of its token list is the most common bug in this kind of program, so being\nmade to think about it is the feature.\n",
+      "roadmap": [
+        {
+          "key": "scan",
+          "title": "Phase 1 · Scan the text",
+          "outcome": "`1 + 2 * 3` becomes a list of tokens you can print — and `1 $ 2` becomes an error that says which character and where.",
+          "summary": "Text is a bad thing to compute with. Turn it into a list of small, typed facts first, and every module after this one gets shorter."
+        },
+        {
+          "key": "parse",
+          "title": "Phase 2 · Build the tree",
+          "outcome": "A tree that already knows `1 + 2 * 3` is an addition whose right-hand side is a multiplication.",
+          "summary": "A list of tokens is flat and arithmetic is not. This is where precedence stops being a rule you remember and becomes a shape."
+        },
+        {
+          "key": "eval",
+          "title": "Phase 3 · Evaluate the tree",
+          "outcome": "Text in, a number out. `calc.ts` is a working calculator you can pipe things into.",
+          "summary": "Walking the tree is the easiest phase in the project — which is the whole return on having built the right tree in phase 2."
+        },
+        {
+          "key": "lang",
+          "title": "Phase 4 · A language, not a calculator",
+          "outcome": "`let x = 4; x * x > 10` — variables, statements and booleans, all evaluated in order.",
+          "summary": "Three features, each of which forces a change one layer down. This is where you find out whether the first three phases were built well."
+        },
+        {
+          "key": "usable",
+          "title": "Phase 5 · Make it usable",
+          "outcome": "`error: unexpected ')' at 1:7`, a caret pointing at the character, and a REPL to type into.",
+          "summary": "The difference between a program you wrote and a tool someone else can use is entirely in what it says when they get it wrong."
+        }
+      ],
+      "modules": [
+        {
+          "key": "calc-token",
+          "number": 1,
+          "phase": "scan",
+          "title": "What a token is",
+          "what": "the token union, and why a `kind` field beats an optional payload",
+          "goal": "Define the `Token` type as a discriminated union, and produce tokens as exactly the JSON the rest of the project passes around.",
+          "why": "A language processor is three transformations — text to tokens, tokens to a tree, tree to a value — and every one of them is written in terms of what a token is. Choose the token type badly and the damage is not local: the scanner gets an extra field nobody fills in, the parser grows an `if` for a case that cannot happen, and module 10's exhaustiveness check has nothing to check. Ten minutes of design here is the cheapest ten minutes in the project.",
+          "authored": true,
+          "est_minutes": 40,
+          "builds_on": [],
+          "concepts": [
+            "string literal types",
+            "discriminated union",
+            "narrowing",
+            "factory functions",
+            "JSON.stringify",
+            "insertion order"
+          ],
+          "objectives": [
+            "Derive a set of token kinds from the inputs a language has to handle",
+            "Explain what a union of string literals forbids that `string` does not",
+            "Model per-kind payloads as a discriminated union rather than optional fields",
+            "Narrow a union by comparing its discriminant, and say why that works",
+            "Decide when to split a kind and when to group it behind a payload",
+            "Write factory functions with typed parameters and declared return types",
+            "Predict the exact JSON text a token produces, including key order"
+          ],
+          "deliverable": "A `Token` type the compiler enforces, three factories that build one of each kind, and a `describe` that reads each one's payload safely.",
+          "brief": "### The whole module in one line\n\nDecide what a token is, write it down as a type the compiler will hold you to,\nand print one as exactly the JSON the rest of the project passes around.\n\n### Why start here and not with the scanner\n\nThe instinct is to start scanning, because a loop over characters feels like\nreal progress and a type declaration does not. Resist it for one module.\n\nA scanner is twenty lines and you will write it next. But a scanner *produces*\ntokens, so it cannot be written until you know what one is — and if you decide\nthat while writing the loop, you will decide it badly, because you will be\nthinking about characters rather than about what the parser needs. The parser is\nthe customer here. Design for the customer.\n\n### What a token has to answer\n\nTake the smallest interesting input this project handles:\n\n```\n1 + 2\n```\n\nFive characters, and the scanner will turn them into four tokens: the number 1,\nthe operator `+`, the number 2, and a marker meaning *that was the end*. Look at\nwhat those four have in common and what they do not.\n\n| Token | What kind is it? | What does it carry? |\n|---|---|---|\n| `1` | a number | the value `1` |\n| `+` | an operator | which operator, `+` |\n| `2` | a number | the value `2` |\n| — | end of input | nothing at all |\n\nEvery token answers the first question. **Only some answer the second, and they\nanswer it with different types** — a number carries a `number`, an operator\ncarries one of four symbols, and the end marker carries nothing. That asymmetry\nis the entire design problem, and TypeScript has exactly the right tool for it.\n\n### Why there is an end-of-input token\n\nIt looks like bookkeeping and it is not. Module 6's parser will repeatedly ask\n\"what is the next token?\", and without a real token meaning *the end*, every one\nof those questions has two answers — a token, or nothing — and every place that\nasks has to handle both. One extra token kind now removes a `| undefined` from\nroughly thirty lines of parser later.\n\nThis is the same trade the whole project keeps making: put the awkward case in\nthe data, not in the code that reads it.\n\n### Why `type` and not `interface`\n\nTypeScript will let you write either for a plain shape. This track uses `type`\neverywhere and never mentions `interface` again, for two reasons: `type` also\ndescribes things `interface` cannot — unions, which this module needs in about\nfour paragraphs' time — so there is one keyword to learn rather than two; and\n`interface` silently allows *declaration merging*, where declaring it twice\ncombines the two instead of erroring. That is a feature for library authors and\na trap for everyone else.\n",
+          "syntax": [
+            {
+              "form": "type TokenKind = \"number\" | \"op\" | \"eof\";",
+              "means": "A union of **string literal types**. `TokenKind` now means \"one of exactly these three strings\" — not \"a string\".",
+              "example": "type TokenKind = \"number\" | \"op\" | \"eof\";\n\nconst k: TokenKind = \"op\";\nconsole.log(k);\n",
+              "note": "The `|` is read \"or\". Widening this to `string` would compile just as happily and would catch none of the typos this type exists to catch — which is the argument of step 1.",
+              "recap": false
+            },
+            {
+              "form": "type NumberToken = { kind: \"number\"; value: number };",
+              "means": "An object type where one field's type is a **single literal**. `kind` here is not \"some string\" — it is the string `\"number\"` and nothing else. That is what makes the union below discriminated.",
+              "example": "type NumberToken = { kind: \"number\"; value: number };\n\nconst one: NumberToken = { kind: \"number\", value: 1 };\nconsole.log(one.value);\n",
+              "note": "`{ kind: \"number\", value: 1 }` is a *value*; `{ kind: \"number\"; value: number }` is a *type*. They look almost identical on the page, which is the single most common source of confusion in this module. Types use `;` and name other types; values use `,` and hold data.",
+              "recap": false
+            },
+            {
+              "form": "type Token = NumberToken | OpToken | EofToken;",
+              "means": "A **union of object types**. A `Token` is any one of the three — and until you check which, you may only touch the fields all three have.",
+              "example": "type NumberToken = { kind: \"number\"; value: number };\ntype OpToken = { kind: \"op\"; op: \"+\" | \"-\" };\ntype EofToken = { kind: \"eof\" };\n\ntype Token = NumberToken | OpToken | EofToken;\n\nconst t: Token = { kind: \"op\", op: \"+\" };\nconsole.log(t.kind);\n",
+              "note": "`t.kind` is fine on a bare `Token` because all three members have it. `t.value` is a compile error, because two of the three do not — and that error is the type doing its job, not getting in your way.",
+              "recap": false
+            },
+            {
+              "form": "if (t.kind === \"number\") { … }",
+              "means": "**Narrowing.** Compare the discriminant and TypeScript works out which member of the union you must be holding. Inside the braces, `t` is a `NumberToken` and `t.value` is available.",
+              "example": "function describe(t: Token): string {\n  if (t.kind === \"number\") {\n    return `number ${t.value}`;\n  }\n  return \"something else\";\n}\n",
+              "note": "This only works because every member has a `kind` field with a *literal* type. Declare `kind: string` instead and the comparison compiles, narrows nothing, and `t.value` stays an error — the design and the narrowing are the same decision.",
+              "recap": false
+            },
+            {
+              "form": "function numberToken(value: number): NumberToken { … }",
+              "means": "A factory: typed parameters, a declared return type, and one place that knows how a token of this kind is built.",
+              "example": "function numberToken(value: number): NumberToken {\n  return { kind: \"number\", value: value };\n}\n\nconsole.log(numberToken(12).value);\n",
+              "note": "Writing `: NumberToken` is optional — TypeScript would infer it — and you should write it anyway. An inferred return type reports a mistake at every *call site*; a declared one reports it once, on the line that is actually wrong.",
+              "recap": false
+            },
+            {
+              "form": "JSON.stringify(t)",
+              "means": "Turn a token into text. Every module from 2 onwards prints tokens this way, so it is worth seeing the exact output now.",
+              "example": "const one: NumberToken = { kind: \"number\", value: 1 };\nconsole.log(JSON.stringify(one));\n// {\"kind\":\"number\",\"value\":1}\n",
+              "note": "Keys come out in **insertion order**, not alphabetically — so `kind` first in the object literal means `kind` first in the output. That makes field order part of what these exercises compare, rather than a style choice.",
+              "recap": false
+            },
+            {
+              "form": "console.log(value)",
+              "means": "Print one line to stdout. This is the whole output mechanism for the project, and from module 2 the whole input mechanism is stdin.",
+              "example": "console.log(\"number 1\");\nconsole.log(JSON.stringify({ kind: \"eof\" }));\n",
+              "note": "`console.log` on an object prints Node's debugging view — `{ kind: 'eof' }`, with single quotes and spaces — which is not JSON. Stringify whenever the output is meant to be data.",
+              "recap": false
+            }
+          ],
+          "endpoints": [],
+          "steps": [
+            {
+              "key": "kinds",
+              "title": "Name the kinds",
+              "what": "Read the language off the examples, and write the kinds down as literal types.",
+              "instructions": "Open a new file, `calc.ts`. It will not read anything for another module; name\nit that anyway so you are not renaming things later.\n\nBefore you type, list the kinds. The way to do that is to look at the inputs the\nfinished project has to handle and ask, for each character: *is this a new kind\nof thing, or more of the previous thing?*\n\n```\n1 + 2 * 3\n(1 + 2) * -3\nlet x = 4; x * x > 10\n```\n\nPhase 1 only needs the first line. Walking it: `1` is a number, `+` is an\noperator, `2` is a number, `*` is an operator, `3` is a number, and then the\ninput runs out. So — three kinds:\n\n```ts\ntype TokenKind = \"number\" | \"op\" | \"eof\";\n```\n\nThree, genuinely. The temptation is to add `\"lparen\"`, `\"rparen\"`, `\"let\"`,\n`\"identifier\"` and `\"semicolon\"` now, while the project's full grammar is in\nfront of you. Do not. A kind you add today is a kind the scanner does not\nproduce, the parser does not consume, and every `if` you write between now and\nmodule 8 has to skip. **Add a kind in the module that needs it** — parens in 8,\nnames and `let` in 12, `;` in 13.\n\n### Why literal strings and not just `string`\n\nThis compiles too:\n\n```ts\ntype TokenKind = string;\n```\n\nand it is worth understanding exactly what it costs you, because the difference\nis the reason this project is written in TypeScript at all.\n\n```ts\nconst k: TokenKind = \"opp\";      // with `string`: fine. Ships. Breaks in module 6.\n```\n\nWith the literal union, that line is refused before the program runs, with an\nerror naming the three strings that were allowed. The typo is caught by the same\nmechanism that will, in module 10, catch a whole missing branch of your\nevaluator. It is the same idea at two sizes.\n",
+              "checkpoint": "`calc.ts` declares `type TokenKind` with exactly three members, and this runs:\n\n```ts\nconst k: TokenKind = \"op\";\nconsole.log(k);\n```\n\nNow try `const bad: TokenKind = \"operator\";` and read the error before deleting\nit. It should name all three allowed strings. If it does not complain at all,\nyou have written `string` somewhere.\n",
+              "pitfalls": [
+                "Adding kinds for parentheses, `let` and identifiers now, because the project brief shows them. Every one of them is dead weight until the module that produces it — and a kind with no producer is a branch you write, test and maintain for nothing.",
+                "Declaring `kind: string`. It compiles, it looks like a type, and it turns off both the typo check here and the narrowing in step 3. This is the single most consequential wrong turn available in module 1.",
+                "Using one kind per operator (`\"plus\"`, `\"minus\"`, `\"star\"`, `\"slash\"`). Not wrong, but step 2 argues against it, and switching later means touching the scanner and the parser at once."
+              ],
+              "warmup": [
+                {
+                  "question": "The finished project handles `(1 + 2) * -3`, so parentheses are definitely a kind of token eventually. Why not add `\"lparen\"` and `\"rparen\"` to `TokenKind` right now?",
+                  "options": [
+                    "Nothing produces or consumes them until module 8, so they would be branches that cannot happen",
+                    "A union may only have three members",
+                    "Parentheses are not tokens — the parser reads them straight from the text",
+                    "They would make `JSON.stringify` output non-deterministic"
+                  ],
+                  "answer": 0,
+                  "explanation": "A kind that no scanner emits is a case every reader of a token still has to consider, forever, for nothing. The project adds parens in module 8 — in the same module that teaches the parser what to do with them, which is when the branch starts earning its keep."
+                }
+              ],
+              "exercises": [
+                {
+                  "id": "calc-m1-kind-1",
+                  "title": "Complete the kinds",
+                  "prompt": "The program uses all three token kinds, but `TokenKind` is one member short. Add the missing one — the marker that means the input ran out.",
+                  "hint": "Look at which of the three `const` lines has no matching member in the union.",
+                  "hints": [
+                    "Look at which of the three `const` lines has no matching member in the union.",
+                    "The third kind marks the end of the input, and the project spells it the way compilers usually do — three letters.",
+                    "`type TokenKind = \"number\" | \"op\" | \"eof\";`"
+                  ],
+                  "language": "typescript",
+                  "kind": "drill",
+                  "difficulty": "Intro",
+                  "strictness": "strict+indexed",
+                  "harness": "",
+                  "judge_mode": "",
+                  "forbid": [],
+                  "starter": "type TokenKind = \"number\" | \"op\"____;\n\nconst a: TokenKind = \"number\";\nconst b: TokenKind = \"op\";\nconst c: TokenKind = \"eof\";\n\nconsole.log(a);\nconsole.log(b);\nconsole.log(c);\n",
+                  "solution": "type TokenKind = \"number\" | \"op\" | \"eof\";\n\nconst a: TokenKind = \"number\";\nconst b: TokenKind = \"op\";\nconst c: TokenKind = \"eof\";\n\nconsole.log(a);\nconsole.log(b);\nconsole.log(c);\n",
+                  "tests": [
+                    {
+                      "input": "",
+                      "output": "number\nop\neof"
+                    }
+                  ],
+                  "source_slug": "",
+                  "dataset": ""
+                },
+                {
+                  "id": "calc-m1-kind-fix1",
+                  "title": "The type that protected nothing",
+                  "prompt": "This program compiles and prints `kind is opp`. It should print `kind is op`. The typo is the symptom — fix the cause, so that a typo like it is refused before the program runs.",
+                  "hint": "Correcting `\"opp\"` to `\"op\"` makes the output right and leaves the real problem in place — the next typo is just as welcome.",
+                  "hints": [
+                    "Correcting `\"opp\"` to `\"op\"` makes the output right and leaves the real problem in place — the next typo is just as welcome.",
+                    "`TokenKind` is declared as `string`, which allows every string there has ever been.",
+                    "Declare it as the union of the three literal strings, then fix the value: `type TokenKind = \"number\" | \"op\" | \"eof\";`"
+                  ],
+                  "language": "typescript",
+                  "kind": "fix",
+                  "difficulty": "Intro",
+                  "strictness": "strict+indexed",
+                  "harness": "",
+                  "judge_mode": "",
+                  "forbid": [],
+                  "starter": "type TokenKind = string;\n\nconst k: TokenKind = \"opp\";\nconsole.log(`kind is ${k}`);\n",
+                  "solution": "type TokenKind = \"number\" | \"op\" | \"eof\";\n\nconst k: TokenKind = \"op\";\nconsole.log(`kind is ${k}`);\n",
+                  "tests": [
+                    {
+                      "input": "",
+                      "output": "kind is op"
+                    }
+                  ],
+                  "source_slug": "",
+                  "dataset": ""
+                }
+              ],
+              "quiz": [
+                {
+                  "question": "What does `type TokenKind = \"number\" | \"op\" | \"eof\"` allow that `type TokenKind = string` does not?",
+                  "options": [
+                    "Nothing — the literal union allows strictly less, which is the point",
+                    "It allows any string plus those three",
+                    "It allows the strings to be compared with `===`",
+                    "It allows `TokenKind` to be used as a field type"
+                  ],
+                  "answer": 0,
+                  "explanation": "Types are about what you *forbid*. `string` permits every string ever typed, so it can reject nothing; the union permits three, so it rejects everything else — including `\"opp\"`, `\"Number\"`, and the empty string. A type that allows more is not more powerful, it is less useful."
+                }
+              ]
+            },
+            {
+              "key": "union",
+              "title": "One type per kind, joined into one union",
+              "what": "The payload problem, and the tool TypeScript has for exactly it.",
+              "instructions": "`TokenKind` says what a token *is*. It says nothing about what a token *carries*\n— and that is where the real design decision lives, because the three kinds\ncarry three different things:\n\n| Kind | Carries |\n|---|---|\n| `number` | a `number` — the value |\n| `op` | one of `+ - * /` |\n| `eof` | nothing |\n\n### The design that looks obvious and is wrong\n\nOne type, with the payloads optional:\n\n```ts\ntype Token = {\n  kind: TokenKind;\n  value?: number;\n  op?: string;\n};\n```\n\nIt compiles, it is short, and it makes every line of the next seventeen modules\nslightly worse. Here is the whole problem in one line:\n\n```ts\nconst nonsense: Token = { kind: \"eof\", value: 3, op: \"+\" };\n```\n\nThat is an end-of-input token that is also the number 3 and also a plus sign.\nYour type says it is fine. And on the other side of the same coin, when the\nparser holds a token it knows is a number, `t.value` is still `number |\nundefined` — so it has to check for a case the scanner can never produce, at\nevery single use.\n\n**A type that permits states your program cannot produce is a type that makes\nyou handle them anyway.**\n\n### The design that is right\n\nDeclare one type per kind, each with exactly the fields that kind has, and join\nthem with `|`:\n\n```ts\ntype Op = \"+\" | \"-\" | \"*\" | \"/\";\n\ntype NumberToken = { kind: \"number\"; value: number };\ntype OpToken = { kind: \"op\"; op: Op };\ntype EofToken = { kind: \"eof\" };\n\ntype Token = NumberToken | OpToken | EofToken;\n```\n\nNow `{ kind: \"eof\", value: 3 }` is a compile error. `value` on a `NumberToken`\nis `number`, not `number | undefined`. And — the part that matters most, and\nwhich step 3 is entirely about — checking `kind` tells the compiler which member\nyou are holding.\n\nThis shape has a name: a **discriminated union**. The field they all share, with\na different literal type in each member, is the **discriminant**. It is the most\nuseful modelling tool TypeScript has, and this project is built out of four of\nthem.\n\n### Why `op` is one kind carrying a symbol\n\nThe alternative is one kind per operator — `\"plus\"`, `\"minus\"`, `\"star\"`,\n`\"slash\"` — which is what many hand-written scanners do. Both work. This project\ngroups them, for a reason that is entirely about module 7:\n\nPrecedence is a property of the *operator symbol*. Module 7 will ask \"does this\noperator bind tighter than that one?\", and with a grouped kind that question is\none comparison against `t.op`. With four kinds it is a four-branch `if` in two\ndifferent functions, repeated every time the language gains an operator.\n\nThe rule generalises: **split kinds when the code that reads them differs, group\nthem when it does not.** Numbers and operators are read by completely different\ncode, so they are different kinds. `+` and `*` are read by the same code with a\ndifferent constant, so they are one kind and a payload.\n",
+              "checkpoint": "`calc.ts` declares `Op`, three token types and the `Token` union, and all three\nof these compile:\n\n```ts\nconst one: Token = { kind: \"number\", value: 1 };\nconst star: Token = { kind: \"op\", op: \"*\" };\nconst end: Token = { kind: \"eof\" };\n```\n\nWhile all three of these are refused:\n\n```ts\nconst bad1: Token = { kind: \"eof\", value: 3 };     // eof carries nothing\nconst bad2: Token = { kind: \"number\" };            // where is the value?\nconst bad3: Token = { kind: \"op\", op: \"%\" };       // not one of the four\n```\n\nRead `bad3`'s error in particular. It should name the four operators — which is\nthe same protection step 1 bought for `kind`, now applied to the payload.\n",
+              "pitfalls": [
+                "Writing the union as one type with optional fields. It is shorter today and it costs you a `| undefined` check at every use, plus the ability to narrow at all. This is the decision the whole step exists to make.",
+                "Typing `op` as `string` rather than `Op`. Then `{ kind: \"op\", op: \"%\" }` is a valid token, and the first thing that notices is module 7's precedence table quietly returning the wrong answer.",
+                "Mixing up type syntax and value syntax. `{ kind: \"number\"; value: number }` describes a shape; `{ kind: \"number\", value: 1 }` is one. Semicolons and type names in the first, commas and data in the second."
+              ],
+              "warmup": [
+                {
+                  "question": "With `type Token = { kind: TokenKind; value?: number; op?: string }`, you are holding a `t` you have just checked is `t.kind === \"number\"`. What type is `t.value`?",
+                  "options": [
+                    "`number | undefined` — the check on `kind` tells the compiler nothing about `value`",
+                    "`number` — checking the kind narrows the whole object",
+                    "`undefined` — optional fields are always undefined until assigned",
+                    "It is a compile error to read `value` at all"
+                  ],
+                  "answer": 0,
+                  "explanation": "This is the cost of the optional-field design in one question. `kind` and `value` are unrelated as far as the type is concerned, so you get to write `t.value ?? 0` forever — handling a case your own scanner cannot produce. The union makes the two fields related, which is the whole trick."
+                }
+              ],
+              "exercises": [
+                {
+                  "id": "calc-m1-union-1",
+                  "title": "Type the operator payload",
+                  "prompt": "`OpToken` carries which operator it is, but the field has no type yet. Give it the one that allows exactly the four the language has.",
+                  "hint": "The type you want is already declared on the first line of the program.",
+                  "hints": [
+                    "The type you want is already declared on the first line of the program.",
+                    "The field is named `op`, and its type is named `Op`.",
+                    "`type OpToken = { kind: \"op\"; op: Op };`"
+                  ],
+                  "language": "typescript",
+                  "kind": "drill",
+                  "difficulty": "Intro",
+                  "strictness": "strict+indexed",
+                  "harness": "",
+                  "judge_mode": "",
+                  "forbid": [],
+                  "starter": "type Op = \"+\" | \"-\" | \"*\" | \"/\";\n\ntype NumberToken = { kind: \"number\"; value: number };\ntype OpToken = { kind: \"op\"; ____ };\ntype EofToken = { kind: \"eof\" };\n\nconst plus: OpToken = { kind: \"op\", op: \"+\" };\n\nconsole.log(plus.kind);\nconsole.log(plus.op);\n",
+                  "solution": "type Op = \"+\" | \"-\" | \"*\" | \"/\";\n\ntype NumberToken = { kind: \"number\"; value: number };\ntype OpToken = { kind: \"op\"; op: Op };\ntype EofToken = { kind: \"eof\" };\n\nconst plus: OpToken = { kind: \"op\", op: \"+\" };\n\nconsole.log(plus.kind);\nconsole.log(plus.op);\n",
+                  "tests": [
+                    {
+                      "input": "",
+                      "output": "op\n+"
+                    }
+                  ],
+                  "source_slug": "",
+                  "dataset": ""
+                },
+                {
+                  "id": "calc-m1-union-2",
+                  "title": "Join them into one type",
+                  "prompt": "Three token types are declared. Join them into the single `Token` type the rest of the project will use.",
+                  "hint": "A `Token` is any one of the three types above it.",
+                  "hints": [
+                    "A `Token` is any one of the three types above it.",
+                    "The `|` between two types means \"either of these\".",
+                    "`type Token = NumberToken | OpToken | EofToken;`"
+                  ],
+                  "language": "typescript",
+                  "kind": "drill",
+                  "difficulty": "Intro",
+                  "strictness": "strict+indexed",
+                  "harness": "",
+                  "judge_mode": "",
+                  "forbid": [],
+                  "starter": "type Op = \"+\" | \"-\" | \"*\" | \"/\";\n\ntype NumberToken = { kind: \"number\"; value: number };\ntype OpToken = { kind: \"op\"; op: Op };\ntype EofToken = { kind: \"eof\" };\n\ntype Token = ____\n\nconst one: Token = { kind: \"number\", value: 1 };\nconst star: Token = { kind: \"op\", op: \"*\" };\nconst end: Token = { kind: \"eof\" };\n\nconsole.log(one.kind);\nconsole.log(star.kind);\nconsole.log(end.kind);\n",
+                  "solution": "type Op = \"+\" | \"-\" | \"*\" | \"/\";\n\ntype NumberToken = { kind: \"number\"; value: number };\ntype OpToken = { kind: \"op\"; op: Op };\ntype EofToken = { kind: \"eof\" };\n\ntype Token = NumberToken | OpToken | EofToken;\n\nconst one: Token = { kind: \"number\", value: 1 };\nconst star: Token = { kind: \"op\", op: \"*\" };\nconst end: Token = { kind: \"eof\" };\n\nconsole.log(one.kind);\nconsole.log(star.kind);\nconsole.log(end.kind);\n",
+                  "tests": [
+                    {
+                      "input": "",
+                      "output": "number\nop\neof"
+                    }
+                  ],
+                  "source_slug": "",
+                  "dataset": ""
+                },
+                {
+                  "id": "calc-m1-union-fix1",
+                  "title": "A token that carries the wrong thing",
+                  "prompt": "This program is refused before it runs. One of the three tokens claims a kind whose type does not have the field it is trying to set. Read the error, then fix the value — not the types.",
+                  "hint": "The error is on the `star` line, and it mentions a field that `OpToken` does not declare.",
+                  "hints": [
+                    "The error is on the `star` line, and it mentions a field that `OpToken` does not declare.",
+                    "An operator token carries *which operator it is*, not a numeric value.",
+                    "`const star: Token = { kind: \"op\", op: \"*\" };`"
+                  ],
+                  "language": "typescript",
+                  "kind": "fix",
+                  "difficulty": "Easy",
+                  "strictness": "strict+indexed",
+                  "harness": "",
+                  "judge_mode": "",
+                  "forbid": [],
+                  "starter": "type Op = \"+\" | \"-\" | \"*\" | \"/\";\n\ntype NumberToken = { kind: \"number\"; value: number };\ntype OpToken = { kind: \"op\"; op: Op };\ntype EofToken = { kind: \"eof\" };\n\ntype Token = NumberToken | OpToken | EofToken;\n\nconst one: Token = { kind: \"number\", value: 1 };\nconst star: Token = { kind: \"op\", value: 2 };\nconst end: Token = { kind: \"eof\" };\n\nconsole.log(one.kind);\nconsole.log(star.kind);\nconsole.log(end.kind);\n",
+                  "solution": "type Op = \"+\" | \"-\" | \"*\" | \"/\";\n\ntype NumberToken = { kind: \"number\"; value: number };\ntype OpToken = { kind: \"op\"; op: Op };\ntype EofToken = { kind: \"eof\" };\n\ntype Token = NumberToken | OpToken | EofToken;\n\nconst one: Token = { kind: \"number\", value: 1 };\nconst star: Token = { kind: \"op\", op: \"*\" };\nconst end: Token = { kind: \"eof\" };\n\nconsole.log(one.kind);\nconsole.log(star.kind);\nconsole.log(end.kind);\n",
+                  "tests": [
+                    {
+                      "input": "",
+                      "output": "number\nop\neof"
+                    }
+                  ],
+                  "source_slug": "",
+                  "dataset": ""
+                }
+              ],
+              "quiz": [
+                {
+                  "question": "What makes a union of object types *discriminated*?",
+                  "options": [
+                    "Every member has a field of the same name whose type is a different literal",
+                    "Every member has a different number of fields",
+                    "It was declared with `type` rather than `interface`",
+                    "The members are listed in alphabetical order"
+                  ],
+                  "answer": 0,
+                  "explanation": "The shared field with per-member literal types is the discriminant, and it is what lets `t.kind === \"number\"` tell the compiler which member you hold. Without it — say `kind: string` in every member — you have a union, but comparing the field narrows nothing."
+                },
+                {
+                  "question": "Why does this project use one `op` kind carrying a symbol rather than four kinds, one per operator?",
+                  "options": [
+                    "Precedence is a property of the symbol, so module 7 compares one field instead of branching four ways",
+                    "Four kinds would exceed the number of members a union may have",
+                    "`JSON.stringify` cannot represent four kinds",
+                    "Four kinds would make the scanner slower to run"
+                  ],
+                  "answer": 0,
+                  "explanation": "Split kinds when different code reads them; group them when the same code reads them with a different constant. `+` and `*` go through identical parser and evaluator paths with one value changed, so they are one kind — while numbers and operators are read by entirely different code, so they are not."
+                }
+              ]
+            },
+            {
+              "key": "narrow",
+              "title": "Ask a token what it is",
+              "what": "Checking `kind` is not just an `if` — it changes the type of the thing you are holding.",
+              "instructions": "Here is the payoff. Write a function that turns any token into a description:\n\n```ts\nfunction describe(t: Token): string {\n  if (t.kind === \"number\") {\n    return `number ${t.value}`;\n  }\n  if (t.kind === \"op\") {\n    return `operator ${t.op}`;\n  }\n  return \"end of input\";\n}\n```\n\nRead what happened to `t` on the way down.\n\n**On the first line of the body**, `t` is a `Token` — one of three things. Try\n`t.value` here and it is a compile error: two of the three members have no such\nfield, and the compiler will not guess.\n\n**Inside the first `if`**, `t` is a `NumberToken`. Not \"probably\" — the compiler\nhas worked it out from the comparison, and `t.value` is a plain `number` with no\n`undefined` in sight. This is **narrowing**, and it is the entire reason step 2\ninsisted on the discriminated union.\n\n**Inside the second `if`**, `t` is an `OpToken`, so `t.op` is available and\n`t.value` is not.\n\n**On the last line**, `t` is an `EofToken` — the only member left. You did not\ntell the compiler that; it subtracted the two you handled from the three that\nexisted. Hover it in your editor and confirm, because that subtraction is the\nmechanism module 10 turns into a permanent guarantee.\n\n### The thing to actually notice\n\nNothing above is a runtime check that the compiler happens to tolerate. The\n`if` and the type are the same statement, read twice: once by Node, which\ncompares two strings, and once by the compiler, which uses the comparison to\ndecide what `t` is on each branch. When people say TypeScript \"understands your\ncontrol flow\", this is the thing they mean, and it is worth more than every\nother feature in the language put together.\n\n### What breaks it\n\nNarrowing on `kind` works because of three decisions, and losing any one of them\nloses the narrowing:\n\n- every member has the field (so the comparison is legal at all);\n- the field's type is a **literal** in each member (so the comparison is\n  informative);\n- the literals are **different** (so the comparison is decisive).\n\nDeclare `kind: string` in the members and all three go. The `if` still compiles.\nIt just tells the compiler nothing, and `t.value` stays an error inside it —\nwhich is a confusing five minutes if you do not know why.\n",
+              "checkpoint": "`node calc.ts` runs and prints:\n\n```\nnumber 12\noperator *\nend of input\n```\n\nThen try adding `console.log(t.value)` as the first line of `describe`'s body,\nbefore any `if`. It must be refused, with an error saying `value` does not exist\non `OpToken`. If it compiles, `t` is not the union you think it is.\n",
+              "pitfalls": [
+                "Reading a payload before narrowing. `t.value` at the top of the function is an error, and it is the *correct* error — the token might be an `eof`. Move the read inside the branch that proved which kind it is.",
+                "Reaching for `as NumberToken` to make that error go away. An assertion switches off the check rather than satisfying it, and the first token it lies about is a crash in module 9 with no clue where it came from.",
+                "Comparing against a string that is not one of the kinds — `t.kind === \"operator\"`. TypeScript flags this as a comparison that can never be true, which is a small gift you only get because `kind` has literal types.",
+                "Describing an operator with `t.kind` instead of `t.op`. It compiles, because both are strings — and it prints `operator op` for every operator in the language."
+              ],
+              "warmup": [
+                {
+                  "question": "Inside `if (t.kind === \"number\") { … }`, what type does the compiler give `t`?",
+                  "options": [
+                    "`NumberToken`",
+                    "`Token`",
+                    "`TokenKind`",
+                    "`NumberToken | undefined`"
+                  ],
+                  "answer": 0,
+                  "explanation": "The comparison rules out the two members whose `kind` cannot be `\"number\"`, leaving exactly one. That is why `t.value` is a plain `number` inside the braces and an error outside them."
+                }
+              ],
+              "exercises": [
+                {
+                  "id": "calc-m1-narrow-1",
+                  "title": "Check the discriminant",
+                  "prompt": "`describe` is missing the comparison that tells the compiler it is holding a number token. Fill it in.",
+                  "hint": "The next line reads `t.value`, so this branch has to have proved `t` is a `NumberToken`.",
+                  "hints": [
+                    "The next line reads `t.value`, so this branch has to have proved `t` is a `NumberToken`.",
+                    "Compare the shared field against one of the three literal strings, with `===`.",
+                    "`if (t.kind === \"number\") {`"
+                  ],
+                  "language": "typescript",
+                  "kind": "drill",
+                  "difficulty": "Intro",
+                  "strictness": "strict+indexed",
+                  "harness": "",
+                  "judge_mode": "",
+                  "forbid": [],
+                  "starter": "type Op = \"+\" | \"-\" | \"*\" | \"/\";\n\ntype NumberToken = { kind: \"number\"; value: number };\ntype OpToken = { kind: \"op\"; op: Op };\ntype EofToken = { kind: \"eof\" };\n\ntype Token = NumberToken | OpToken | EofToken;\n\nfunction describe(t: Token): string {\n  if (____) {\n    return `number ${t.value}`;\n  }\n  if (t.kind === \"op\") {\n    return `operator ${t.op}`;\n  }\n  return \"end of input\";\n}\n\nconsole.log(describe({ kind: \"number\", value: 12 }));\nconsole.log(describe({ kind: \"op\", op: \"*\" }));\nconsole.log(describe({ kind: \"eof\" }));\n",
+                  "solution": "type Op = \"+\" | \"-\" | \"*\" | \"/\";\n\ntype NumberToken = { kind: \"number\"; value: number };\ntype OpToken = { kind: \"op\"; op: Op };\ntype EofToken = { kind: \"eof\" };\n\ntype Token = NumberToken | OpToken | EofToken;\n\nfunction describe(t: Token): string {\n  if (t.kind === \"number\") {\n    return `number ${t.value}`;\n  }\n  if (t.kind === \"op\") {\n    return `operator ${t.op}`;\n  }\n  return \"end of input\";\n}\n\nconsole.log(describe({ kind: \"number\", value: 12 }));\nconsole.log(describe({ kind: \"op\", op: \"*\" }));\nconsole.log(describe({ kind: \"eof\" }));\n",
+                  "tests": [
+                    {
+                      "input": "",
+                      "output": "number 12\noperator *\nend of input"
+                    }
+                  ],
+                  "source_slug": "",
+                  "dataset": ""
+                },
+                {
+                  "id": "calc-m1-narrow-2",
+                  "title": "Read the payload",
+                  "prompt": "The operator branch has narrowed `t` to an `OpToken`, so the field saying *which* operator it is can be read. Print it.",
+                  "hint": "Inside this `if`, `t` is an `OpToken` — look at what field that type declares.",
+                  "hints": [
+                    "Inside this `if`, `t` is an `OpToken` — look at what field that type declares.",
+                    "It is not `t.kind`, which would print the word `op` for every operator.",
+                    "`` return `operator ${t.op}`; ``"
+                  ],
+                  "language": "typescript",
+                  "kind": "drill",
+                  "difficulty": "Intro",
+                  "strictness": "strict+indexed",
+                  "harness": "",
+                  "judge_mode": "",
+                  "forbid": [],
+                  "starter": "type Op = \"+\" | \"-\" | \"*\" | \"/\";\n\ntype NumberToken = { kind: \"number\"; value: number };\ntype OpToken = { kind: \"op\"; op: Op };\ntype EofToken = { kind: \"eof\" };\n\ntype Token = NumberToken | OpToken | EofToken;\n\nfunction describe(t: Token): string {\n  if (t.kind === \"number\") {\n    return `number ${t.value}`;\n  }\n  if (t.kind === \"op\") {\n    return `operator ____`;\n  }\n  return \"end of input\";\n}\n\nconsole.log(describe({ kind: \"op\", op: \"+\" }));\nconsole.log(describe({ kind: \"number\", value: 7 }));\n",
+                  "solution": "type Op = \"+\" | \"-\" | \"*\" | \"/\";\n\ntype NumberToken = { kind: \"number\"; value: number };\ntype OpToken = { kind: \"op\"; op: Op };\ntype EofToken = { kind: \"eof\" };\n\ntype Token = NumberToken | OpToken | EofToken;\n\nfunction describe(t: Token): string {\n  if (t.kind === \"number\") {\n    return `number ${t.value}`;\n  }\n  if (t.kind === \"op\") {\n    return `operator ${t.op}`;\n  }\n  return \"end of input\";\n}\n\nconsole.log(describe({ kind: \"op\", op: \"+\" }));\nconsole.log(describe({ kind: \"number\", value: 7 }));\n",
+                  "tests": [
+                    {
+                      "input": "",
+                      "output": "operator +\nnumber 7"
+                    }
+                  ],
+                  "source_slug": "",
+                  "dataset": ""
+                },
+                {
+                  "id": "calc-m1-narrow-fix1",
+                  "title": "Every operator describes itself as `op`",
+                  "prompt": "This program compiles cleanly and prints the wrong thing: every operator comes out as `operator op`. Expected output is `operator *`, `operator +`, `number 3`. Fix it.",
+                  "hint": "Both `t.kind` and `t.op` are strings, so the compiler is happy with either. Only one of them says which operator this is.",
+                  "hints": [
+                    "Both `t.kind` and `t.op` are strings, so the compiler is happy with either. Only one of them says which operator this is.",
+                    "`t.kind` is the same value — `\"op\"` — for every operator token in the language. That is what is being printed.",
+                    "`` return `operator ${t.op}`; ``"
+                  ],
+                  "language": "typescript",
+                  "kind": "fix",
+                  "difficulty": "Easy",
+                  "strictness": "strict+indexed",
+                  "harness": "",
+                  "judge_mode": "",
+                  "forbid": [],
+                  "starter": "type Op = \"+\" | \"-\" | \"*\" | \"/\";\n\ntype NumberToken = { kind: \"number\"; value: number };\ntype OpToken = { kind: \"op\"; op: Op };\ntype EofToken = { kind: \"eof\" };\n\ntype Token = NumberToken | OpToken | EofToken;\n\nfunction describe(t: Token): string {\n  if (t.kind === \"number\") {\n    return `number ${t.value}`;\n  }\n  if (t.kind === \"op\") {\n    return `operator ${t.kind}`;\n  }\n  return \"end of input\";\n}\n\nconsole.log(describe({ kind: \"op\", op: \"*\" }));\nconsole.log(describe({ kind: \"op\", op: \"+\" }));\nconsole.log(describe({ kind: \"number\", value: 3 }));\n",
+                  "solution": "type Op = \"+\" | \"-\" | \"*\" | \"/\";\n\ntype NumberToken = { kind: \"number\"; value: number };\ntype OpToken = { kind: \"op\"; op: Op };\ntype EofToken = { kind: \"eof\" };\n\ntype Token = NumberToken | OpToken | EofToken;\n\nfunction describe(t: Token): string {\n  if (t.kind === \"number\") {\n    return `number ${t.value}`;\n  }\n  if (t.kind === \"op\") {\n    return `operator ${t.op}`;\n  }\n  return \"end of input\";\n}\n\nconsole.log(describe({ kind: \"op\", op: \"*\" }));\nconsole.log(describe({ kind: \"op\", op: \"+\" }));\nconsole.log(describe({ kind: \"number\", value: 3 }));\n",
+                  "tests": [
+                    {
+                      "input": "",
+                      "output": "operator *\noperator +\nnumber 3"
+                    }
+                  ],
+                  "source_slug": "",
+                  "dataset": ""
+                }
+              ],
+              "quiz": [
+                {
+                  "question": "Why is `t.value` a compile error at the top of `describe`, before any `if`?",
+                  "options": [
+                    "`t` is the whole union, and two of its three members have no `value` field",
+                    "`value` is optional, so it must be checked against `undefined` first",
+                    "Fields may only be read inside an `if` in TypeScript",
+                    "It is not an error — `t.value` is `number | undefined` there"
+                  ],
+                  "answer": 0,
+                  "explanation": "On a union you may only touch what every member has. `kind` qualifies; `value` does not, because an `eof` token genuinely does not have one. The fix is to narrow — not to make the field optional, which would put the `undefined` back everywhere."
+                },
+                {
+                  "question": "You change every member to declare `kind: string` instead of a literal. What happens to `if (t.kind === \"number\") { return t.value; }`?",
+                  "options": [
+                    "It still compiles as a comparison, narrows nothing, and `t.value` becomes an error",
+                    "Nothing changes — the comparison narrows either way",
+                    "The comparison itself becomes a compile error",
+                    "`t.value` becomes `number | undefined`"
+                  ],
+                  "answer": 0,
+                  "explanation": "Narrowing needs the discriminant's type to be a literal, so that ruling out `\"number\"` rules out a member. With `string` in every member, the comparison is just a string comparison — true at runtime, meaningless to the compiler, and the payload stays out of reach."
+                }
+              ]
+            },
+            {
+              "key": "json",
+              "title": "Build them in one place, print them the way the scanner will",
+              "what": "Factories, and the exact output text every module after this one produces.",
+              "instructions": "Two small things close the module out.\n\n### Factories\n\nYou are about to write a scanner that produces hundreds of these. Typing the\nobject literal at each site is how `kind: \"numbrer\"` gets in, and how one token\nends up built slightly differently from the rest. Put each one in a function:\n\n```ts\nfunction numberToken(value: number): NumberToken {\n  return { kind: \"number\", value: value };\n}\n\nfunction opToken(op: Op): OpToken {\n  return { kind: \"op\", op: op };\n}\n\nfunction eofToken(): EofToken {\n  return { kind: \"eof\" };\n}\n```\n\nThree things to notice.\n\n**The parameters are typed.** `opToken(\"%\")` is now a compile error rather than\na token the parser meets in module 7 and has no branch for.\n\n**The return types are declared.** Optional — TypeScript would infer them — and\nworth writing anyway. A mistake inside the function is then reported *there*,\ninstead of at each of the fifty places module 3 calls it from.\n\n**`eofToken()` takes nothing and looks pointless.** Call it anyway. When module\n16 gives every token a line and column, this function grows two parameters, and\nthe fifty call sites that went through it get the change for free.\n\n> **On `{ kind: \"number\", value: value }`.** TypeScript has a shorthand —\n> `{ kind: \"number\", value }` — and it is what you would normally write. This\n> project spells it out for now, because the longhand makes it obvious that the\n> *field* `value` and the *parameter* `value` are two different things that\n> happen to share a name. Once that is second nature, use the shorthand.\n\n### The output text\n\nEvery module from here prints tokens with `JSON.stringify`, and the exercises\ncompare that text exactly:\n\n```ts\nconsole.log(JSON.stringify(numberToken(1)));   // {\"kind\":\"number\",\"value\":1}\nconsole.log(JSON.stringify(opToken(\"+\")));     // {\"kind\":\"op\",\"op\":\"+\"}\nconsole.log(JSON.stringify(eofToken()));       // {\"kind\":\"eof\"}\n```\n\n`kind` comes first because you wrote it first. `JSON.stringify` emits keys in\n**insertion order**, not alphabetically, so these two are the same value and\ndifferent text:\n\n```ts\n{ kind: \"number\", value: 1 }   // {\"kind\":\"number\",\"value\":1}\n{ value: 1, kind: \"number\" }   // {\"value\":1,\"kind\":\"number\"}\n```\n\nBoth are valid `NumberToken`s and both type-check. One matches what every\nexercise in this project expects and one does not. Build the literal with `kind`\nfirst — inside the factory, once — and the question never comes up again.\n",
+              "checkpoint": "`node calc.ts` prints exactly these four lines — the token list for `1 + 2`,\nwhich is precisely what module 2's scanner will produce from the text:\n\n```\n{\"kind\":\"number\",\"value\":1}\n{\"kind\":\"op\",\"op\":\"+\"}\n{\"kind\":\"number\",\"value\":2}\n{\"kind\":\"eof\"}\n```\n\nCharacter for character: no spaces after the colons, `kind` first in every\nobject. If yours differs, you are either printing the object rather than the\nJSON, or a factory builds its literal in a different order.\n",
+              "pitfalls": [
+                "`console.log(t)` instead of `console.log(JSON.stringify(t))`. The first prints `{ kind: 'number', value: 1 }` — close enough to JSON to be mistaken for it at a glance, and different in every character that matters.",
+                "Building the literal with the payload first. It type-checks, and the output text no longer matches what every later module expects.",
+                "Skipping `eofToken()` because a function with no parameters that returns a constant looks like ceremony. Module 16 adds a position to every token, and that is the module where the fifty inline `{ kind: \"eof\" }` literals become an afternoon.",
+                "Leaving the return types off the factories. It compiles, and it moves every future error away from the line that caused it."
+              ],
+              "warmup": [
+                {
+                  "question": "`const t: NumberToken = { value: 1, kind: \"number\" };` — what does `JSON.stringify(t)` print?",
+                  "options": [
+                    "{\"value\":1,\"kind\":\"number\"}",
+                    "{\"kind\":\"number\",\"value\":1}",
+                    "{ value: 1, kind: 'number' }",
+                    "The order is unspecified and may vary between runs"
+                  ],
+                  "answer": 0,
+                  "explanation": "Insertion order, exactly as written. The annotation `: NumberToken` says which fields must be present; it says nothing about the order you wrote them in, and `stringify` follows the object rather than the type."
+                }
+              ],
+              "exercises": [
+                {
+                  "id": "calc-m1-json-1",
+                  "title": "Declare what the factory returns",
+                  "prompt": "`numberToken` builds the right object but does not say what it hands back. Add the return type annotation.",
+                  "hint": "The return type goes after the parameter list's closing bracket.",
+                  "hints": [
+                    "The return type goes after the parameter list's closing bracket.",
+                    "A colon, then the name of the type the function hands back.",
+                    "`function numberToken(value: number): NumberToken {`"
+                  ],
+                  "language": "typescript",
+                  "kind": "drill",
+                  "difficulty": "Intro",
+                  "strictness": "strict+indexed",
+                  "harness": "",
+                  "judge_mode": "",
+                  "forbid": [],
+                  "starter": "type NumberToken = { kind: \"number\"; value: number };\n\nfunction numberToken(value: number)____ {\n  return { kind: \"number\", value: value };\n}\n\nconsole.log(JSON.stringify(numberToken(1)));\nconsole.log(JSON.stringify(numberToken(42)));\n",
+                  "solution": "type NumberToken = { kind: \"number\"; value: number };\n\nfunction numberToken(value: number): NumberToken {\n  return { kind: \"number\", value: value };\n}\n\nconsole.log(JSON.stringify(numberToken(1)));\nconsole.log(JSON.stringify(numberToken(42)));\n",
+                  "tests": [
+                    {
+                      "input": "",
+                      "output": "{\"kind\":\"number\",\"value\":1}\n{\"kind\":\"number\",\"value\":42}"
+                    }
+                  ],
+                  "source_slug": "",
+                  "dataset": ""
+                },
+                {
+                  "id": "calc-m1-json-2",
+                  "title": "Print it as data",
+                  "prompt": "The program prints Node's debugging view of each token. Print the JSON the rest of the project passes around instead.",
+                  "hint": "`console.log(opToken(\"*\"))` prints Node's view of the object, quotes and all — but not JSON.",
+                  "hints": [
+                    "`console.log(opToken(\"*\"))` prints Node's view of the object, quotes and all — but not JSON.",
+                    "There is a built-in that turns a value into JSON text, and the second line already uses it.",
+                    "`console.log(JSON.stringify(opToken(\"*\")));`"
+                  ],
+                  "language": "typescript",
+                  "kind": "drill",
+                  "difficulty": "Intro",
+                  "strictness": "strict+indexed",
+                  "harness": "",
+                  "judge_mode": "",
+                  "forbid": [],
+                  "starter": "type Op = \"+\" | \"-\" | \"*\" | \"/\";\n\ntype OpToken = { kind: \"op\"; op: Op };\ntype EofToken = { kind: \"eof\" };\n\nfunction opToken(op: Op): OpToken {\n  return { kind: \"op\", op: op };\n}\n\nfunction eofToken(): EofToken {\n  return { kind: \"eof\" };\n}\n\nconsole.log(____);\nconsole.log(JSON.stringify(eofToken()));\n",
+                  "solution": "type Op = \"+\" | \"-\" | \"*\" | \"/\";\n\ntype OpToken = { kind: \"op\"; op: Op };\ntype EofToken = { kind: \"eof\" };\n\nfunction opToken(op: Op): OpToken {\n  return { kind: \"op\", op: op };\n}\n\nfunction eofToken(): EofToken {\n  return { kind: \"eof\" };\n}\n\nconsole.log(JSON.stringify(opToken(\"*\")));\nconsole.log(JSON.stringify(eofToken()));\n",
+                  "tests": [
+                    {
+                      "input": "",
+                      "output": "{\"kind\":\"op\",\"op\":\"*\"}\n{\"kind\":\"eof\"}"
+                    }
+                  ],
+                  "source_slug": "",
+                  "dataset": ""
+                },
+                {
+                  "id": "calc-m1-json-fix1",
+                  "title": "The token comes out back to front",
+                  "prompt": "This program compiles and every token it builds is a perfectly valid `NumberToken`. The output text is still wrong: this project puts `kind` first in every token. Fix it.",
+                  "hint": "The type is fine and the values are fine. Look only at the output text.",
+                  "hints": [
+                    "The type is fine and the values are fine. Look only at the output text.",
+                    "`JSON.stringify` follows the order the fields were inserted, not the order the type declares them in.",
+                    "`return { kind: \"number\", value: value };`"
+                  ],
+                  "language": "typescript",
+                  "kind": "fix",
+                  "difficulty": "Easy",
+                  "strictness": "strict+indexed",
+                  "harness": "",
+                  "judge_mode": "",
+                  "forbid": [],
+                  "starter": "type NumberToken = { kind: \"number\"; value: number };\n\nfunction numberToken(value: number): NumberToken {\n  return { value: value, kind: \"number\" };\n}\n\nconsole.log(JSON.stringify(numberToken(1)));\nconsole.log(JSON.stringify(numberToken(2)));\n",
+                  "solution": "type NumberToken = { kind: \"number\"; value: number };\n\nfunction numberToken(value: number): NumberToken {\n  return { kind: \"number\", value: value };\n}\n\nconsole.log(JSON.stringify(numberToken(1)));\nconsole.log(JSON.stringify(numberToken(2)));\n",
+                  "tests": [
+                    {
+                      "input": "",
+                      "output": "{\"kind\":\"number\",\"value\":1}\n{\"kind\":\"number\",\"value\":2}"
+                    }
+                  ],
+                  "source_slug": "",
+                  "dataset": ""
+                }
+              ],
+              "quiz": [
+                {
+                  "question": "Why declare `: NumberToken` as `numberToken`'s return type when TypeScript can infer it?",
+                  "options": [
+                    "A mistake inside the function is then reported there, instead of at every place that calls it",
+                    "Without it the function returns `any`",
+                    "Inference does not work on object literals",
+                    "It is required for `JSON.stringify` to emit the fields in order"
+                  ],
+                  "answer": 0,
+                  "explanation": "Inference is accurate but it propagates: get the body wrong and the inferred type quietly changes, so the errors surface wherever the result is *used* — which, by module 3, is fifty places. A declared return type pins the contract at the definition."
+                }
+              ]
+            }
+          ],
+          "final_build": {
+            "id": "calc-m1-build",
+            "title": "Module 1 build — the token",
+            "prompt": "Put the module together. Declare `Op`, the three token types and the `Token` union; write the three factories `numberToken`, `opToken` and `eofToken`; and write `describe(t)` returning `number <value>`, `operator <op>` or `end of input`.\n\nEverything below the blank is already written for you — it prints the token list for `1 + 2`, first described and then as JSON. That is exactly what module 2's scanner will produce from the text.",
+            "hint": "Four things go in the blank: `Op`, the three token types plus the `Token` union, the three factories, and `describe`.",
+            "hints": [
+              "Four things go in the blank: `Op`, the three token types plus the `Token` union, the three factories, and `describe`.",
+              "Each token type pins `kind` to a single literal string — that is what makes `describe`'s `if`s narrow.",
+              "`describe` checks `t.kind` twice and returns `\"end of input\"` on the way out, because `EofToken` is the only member left by then.",
+              "Field order inside each factory decides the JSON: build `kind` first."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "____\n\nconsole.log(describe(numberToken(1)));\nconsole.log(describe(opToken(\"+\")));\nconsole.log(describe(numberToken(2)));\nconsole.log(describe(eofToken()));\nconsole.log(JSON.stringify(numberToken(1)));\nconsole.log(JSON.stringify(opToken(\"+\")));\nconsole.log(JSON.stringify(eofToken()));\n",
+            "solution": "type Op = \"+\" | \"-\" | \"*\" | \"/\";\n\ntype NumberToken = { kind: \"number\"; value: number };\ntype OpToken = { kind: \"op\"; op: Op };\ntype EofToken = { kind: \"eof\" };\n\ntype Token = NumberToken | OpToken | EofToken;\n\nfunction numberToken(value: number): NumberToken {\n  return { kind: \"number\", value: value };\n}\n\nfunction opToken(op: Op): OpToken {\n  return { kind: \"op\", op: op };\n}\n\nfunction eofToken(): EofToken {\n  return { kind: \"eof\" };\n}\n\nfunction describe(t: Token): string {\n  if (t.kind === \"number\") {\n    return `number ${t.value}`;\n  }\n  if (t.kind === \"op\") {\n    return `operator ${t.op}`;\n  }\n  return \"end of input\";\n}\n\nconsole.log(describe(numberToken(1)));\nconsole.log(describe(opToken(\"+\")));\nconsole.log(describe(numberToken(2)));\nconsole.log(describe(eofToken()));\nconsole.log(JSON.stringify(numberToken(1)));\nconsole.log(JSON.stringify(opToken(\"+\")));\nconsole.log(JSON.stringify(eofToken()));\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "number 1\noperator +\nnumber 2\nend of input\n{\"kind\":\"number\",\"value\":1}\n{\"kind\":\"op\",\"op\":\"+\"}\n{\"kind\":\"eof\"}"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          "acceptance": [
+            "`calc.ts` declares `Token` as a union of three types, each pinning `kind` to a single literal string.",
+            "`{ kind: \"eof\", value: 3 }` is refused before the program runs.",
+            "`opToken(\"%\")` is refused before the program runs.",
+            "Inside `if (t.kind === \"number\")`, `t.value` is a `number` — with no `undefined` and no `as`.",
+            "`JSON.stringify(numberToken(1))` gives `{\"kind\":\"number\",\"value\":1}` — that exact text, `kind` first."
+          ],
+          "manual_test": "",
+          "reference": "// calc.ts — module 1\n//\n// The token type, designed before the scanner that produces it. Three kinds,\n// because `1 + 2` needs three and nothing more: a number, an operator, and a\n// marker meaning the input ran out. Parens arrive in module 8, names and `let`\n// in module 12 — each in the module that also teaches the parser to read them.\n\ntype Op = \"+\" | \"-\" | \"*\" | \"/\";\n\n// One type per kind, each carrying exactly what that kind carries. `kind` is a\n// LITERAL type in each of them, not `string` — that is what makes the union\n// below discriminated, and what makes `describe` able to narrow.\ntype NumberToken = { kind: \"number\"; value: number };\ntype OpToken = { kind: \"op\"; op: Op };\ntype EofToken = { kind: \"eof\" };\n\ntype Token = NumberToken | OpToken | EofToken;\n\n// Factories rather than inline literals: one place that decides field order\n// (which is output order — see step 4), and one place to change in module 16\n// when every token grows a line and column.\nfunction numberToken(value: number): NumberToken {\n  return { kind: \"number\", value: value };\n}\n\nfunction opToken(op: Op): OpToken {\n  return { kind: \"op\", op: op };\n}\n\n// Takes nothing today. Takes a position in module 16, and every site that calls\n// it gets that change without being touched.\nfunction eofToken(): EofToken {\n  return { kind: \"eof\" };\n}\n\n// Narrowing: after the two comparisons the compiler knows `t` must be an\n// EofToken, so the final return needs no check of its own. Module 10 turns that\n// subtraction into a guarantee the compiler enforces forever.\nfunction describe(t: Token): string {\n  if (t.kind === \"number\") {\n    return `number ${t.value}`;\n  }\n  if (t.kind === \"op\") {\n    return `operator ${t.op}`;\n  }\n  return \"end of input\";\n}\n\n// The token list for `1 + 2`, built by hand. Module 2 produces this same list\n// from the text itself.\nconsole.log(describe(numberToken(1)));\nconsole.log(describe(opToken(\"+\")));\nconsole.log(describe(numberToken(2)));\nconsole.log(describe(eofToken()));\nconsole.log(JSON.stringify(numberToken(1)));\nconsole.log(JSON.stringify(opToken(\"+\")));\nconsole.log(JSON.stringify(eofToken()));\n",
+          "stretch": [
+            "Add `\"lparen\"` and `\"rparen\"` kinds, then try to justify them from anything module 1 through 7 does. Delete them again — module 8 is where they earn their place.",
+            "Rewrite the union with four operator kinds instead of one `op` kind, and write the function that answers \"does this bind tighter than that?\" both ways. The comparison is the argument in step 2, made concrete.",
+            "Try `type Token = { kind: TokenKind; value?: number; op?: Op }` and rewrite `describe` against it. Count the `undefined` checks you now need for cases no scanner could ever produce.",
+            "Declare `interface Token` twice in one file with different fields, and watch them merge silently rather than error. That is the trap the brief mentioned."
+          ],
+          "glossary": [
+            {
+              "term": "token",
+              "def": "The smallest meaningful piece of a program's text — a number, an operator, a name. What a scanner produces."
+            },
+            {
+              "term": "string literal type",
+              "def": "A type whose only value is one specific string. `\"number\"` as a type allows exactly the string `\"number\"`."
+            },
+            {
+              "term": "union",
+              "def": "`A | B` — a type whose values are those of either member. On a bare union you may only touch what every member has."
+            },
+            {
+              "term": "discriminated union",
+              "def": "A union whose members share a field with a different literal type in each, so comparing that field identifies the member."
+            },
+            {
+              "term": "discriminant",
+              "def": "That shared field. Here it is `kind`."
+            },
+            {
+              "term": "narrowing",
+              "def": "The compiler reducing a value's type on a branch, from what a check on that branch proved. `t.kind === \"op\"` narrows `Token` to `OpToken`."
+            },
+            {
+              "term": "payload",
+              "def": "The per-kind data a token carries beyond its kind — `value` on a number, `op` on an operator, nothing on an eof."
+            },
+            {
+              "term": "eof",
+              "def": "End of input. A real token rather than an absence, so the parser never has to ask whether a token exists."
+            },
+            {
+              "term": "insertion order",
+              "def": "The order keys were added to an object, which is the order `JSON.stringify` writes them out in."
+            }
+          ],
+          "cheatsheet": "```ts\n// Kinds as literal strings — allows exactly these three, nothing else\ntype Op = \"+\" | \"-\" | \"*\" | \"/\";\n\n// One type per kind, each carrying what that kind carries\ntype NumberToken = { kind: \"number\"; value: number };\ntype OpToken     = { kind: \"op\"; op: Op };\ntype EofToken    = { kind: \"eof\" };\n\n// The discriminated union\ntype Token = NumberToken | OpToken | EofToken;\n\n// Narrowing: check the discriminant, get the payload\nif (t.kind === \"number\") {\n  t.value;        // number   — no `undefined`, no `as`\n}\n\n// Factories: typed in, declared out, field order decided once\nfunction numberToken(value: number): NumberToken {\n  return { kind: \"number\", value: value };\n}\n\n// The output text these exercises compare\nJSON.stringify(numberToken(1));   // {\"kind\":\"number\",\"value\":1}\nJSON.stringify(opToken(\"+\"));     // {\"kind\":\"op\",\"op\":\"+\"}\nJSON.stringify(eofToken());       // {\"kind\":\"eof\"}\n```\n\n| Want | Write | Not |\n|---|---|---|\n| A fixed set of kinds | `type K = \"a\" \\| \"b\"` | `type K = string` |\n| Per-kind data | a union of object types | one type with `value?`, `op?` |\n| The payload | narrow first, then read | `(t as NumberToken).value` |\n| JSON text | `JSON.stringify(t)` | `console.log(t)` |\n| `kind` first in the output | build the literal `kind` first | rely on the type's field order |\n",
+          "self_check": [
+            "Can you name the three token kinds and the part of `1 + 2` that produces each?",
+            "Can you say what `string` allows that `\"number\" | \"op\" | \"eof\"` does not, and why allowing less is the point?",
+            "Can you give the concrete cost of modelling payloads as optional fields, in the parser you have not written yet?",
+            "Can you state the three properties a discriminant needs for narrowing to work?",
+            "Can you explain why `+` and `*` share a kind while a number and an operator do not?",
+            "Can you predict the exact JSON text for each of the three token kinds, key order included?"
+          ],
+          "review": [
+            {
+              "question": "Which is the strongest reason not to add a `\"lparen\"` kind in module 1?",
+              "options": [
+                "No module before 8 produces or consumes one, so it would be a branch every reader has to skip",
+                "Parentheses are handled by the scanner without becoming tokens",
+                "A union may not have more than three members",
+                "It would change the JSON output of the other kinds"
+              ],
+              "answer": 0,
+              "explanation": "The rule the whole track runs on: add the thing in the module that needs it. A kind with no producer still has to be considered by everything that reads a token — and it will be half-supported until module 8 arrives to finish the job properly."
+            },
+            {
+              "question": "`const t: Token = { kind: \"eof\", value: 3 };` — why is this refused?",
+              "options": [
+                "`EofToken` declares no `value` field, and `kind: \"eof\"` picks that member",
+                "`value` must be optional to appear on any token",
+                "`Token` is a union, and unions reject all object literals",
+                "It is not refused — `value` is simply ignored"
+              ],
+              "answer": 0,
+              "explanation": "The literal `\"eof\"` selects `EofToken` as the member being built, and that member has exactly one field. This is the payoff of the union over optional fields: a state your scanner can never produce is one your type will not let you write down."
+            },
+            {
+              "question": "`describe` handles `\"number\"` and `\"op\"`, then returns `\"end of input\"` with no check. What is `t`'s type on that last line?",
+              "options": [
+                "`EofToken` — the compiler subtracted the two members already handled",
+                "`Token` — narrowing only applies inside the `if` bodies",
+                "`unknown` — the compiler cannot tell outside a check",
+                "`EofToken | undefined`"
+              ],
+              "answer": 0,
+              "explanation": "Each `if` that returns removes a member from what can still be flowing past it, so by the last line exactly one is left. Module 10 makes the compiler *prove* that leftover is empty when it should be — which is how adding a token kind becomes a compile error rather than a bug report."
+            }
+          ],
+          "milestone": "You have the type every other module in this project is written in terms of — and the modelling tool, the discriminated union, that the tree in module 5 and the values in module 14 are both built out of."
+        },
+        {
+          "key": "calc-scan",
+          "number": 2,
+          "phase": "scan",
+          "title": "The scanner loop",
+          "what": "walk the text one character at a time and push tokens onto a list",
+          "goal": "Turn a line of source into a list of single-character tokens.",
+          "why": "",
+          "authored": false,
+          "est_minutes": 0,
+          "builds_on": [],
+          "concepts": [],
+          "objectives": [],
+          "deliverable": "`+ - * /` come out of the text as tokens, in order.",
+          "brief": "",
+          "syntax": [],
+          "endpoints": [],
+          "steps": [],
+          "final_build": null,
+          "acceptance": [],
+          "manual_test": "",
+          "reference": "",
+          "stretch": [],
+          "glossary": [],
+          "cheatsheet": "",
+          "self_check": [],
+          "review": [],
+          "milestone": ""
+        },
+        {
+          "key": "calc-numbers",
+          "number": 3,
+          "phase": "scan",
+          "title": "Numbers, and tokens longer than one character",
+          "what": "a run of digits is one token, not five",
+          "goal": "Scan `123` as a single number token carrying the value 123.",
+          "why": "",
+          "authored": false,
+          "est_minutes": 0,
+          "builds_on": [],
+          "concepts": [],
+          "objectives": [],
+          "deliverable": "The scanner handles every token the calculator needs.",
+          "brief": "",
+          "syntax": [],
+          "endpoints": [],
+          "steps": [],
+          "final_build": null,
+          "acceptance": [],
+          "manual_test": "",
+          "reference": "",
+          "stretch": [],
+          "glossary": [],
+          "cheatsheet": "",
+          "self_check": [],
+          "review": [],
+          "milestone": ""
+        },
+        {
+          "key": "calc-scan-errors",
+          "number": 4,
+          "phase": "scan",
+          "title": "When the input is not a program",
+          "what": "a failure you return rather than a failure you crash on",
+          "goal": "Report an unexpected character instead of producing nonsense.",
+          "why": "",
+          "authored": false,
+          "est_minutes": 0,
+          "builds_on": [],
+          "concepts": [],
+          "objectives": [],
+          "deliverable": "Bad input produces an error value, and the program still exits cleanly.",
+          "brief": "",
+          "syntax": [],
+          "endpoints": [],
+          "steps": [],
+          "final_build": null,
+          "acceptance": [],
+          "manual_test": "",
+          "reference": "",
+          "stretch": [],
+          "glossary": [],
+          "cheatsheet": "",
+          "self_check": [],
+          "review": [],
+          "milestone": ""
+        },
+        {
+          "key": "calc-tree",
+          "number": 5,
+          "phase": "parse",
+          "title": "What a tree is",
+          "what": "a type that refers to itself, and the shape `1 + 2 * 3` really has",
+          "goal": "Define `Expr` and build one by hand.",
+          "why": "",
+          "authored": false,
+          "est_minutes": 0,
+          "builds_on": [],
+          "concepts": [],
+          "objectives": [],
+          "deliverable": "The tree the parser is going to produce, written down as a type.",
+          "brief": "",
+          "syntax": [],
+          "endpoints": [],
+          "steps": [],
+          "final_build": null,
+          "acceptance": [],
+          "manual_test": "",
+          "reference": "",
+          "stretch": [],
+          "glossary": [],
+          "cheatsheet": "",
+          "self_check": [],
+          "review": [],
+          "milestone": ""
+        },
+        {
+          "key": "calc-cursor",
+          "number": 6,
+          "phase": "parse",
+          "title": "A parser with a cursor",
+          "what": "peek, advance and expect — reading a list of tokens in order",
+          "goal": "Parse a single number token into an `Expr`.",
+          "why": "",
+          "authored": false,
+          "est_minutes": 0,
+          "builds_on": [],
+          "concepts": [],
+          "objectives": [],
+          "deliverable": "The parser can consume tokens and say when it did not get what it wanted.",
+          "brief": "",
+          "syntax": [],
+          "endpoints": [],
+          "steps": [],
+          "final_build": null,
+          "acceptance": [],
+          "manual_test": "",
+          "reference": "",
+          "stretch": [],
+          "glossary": [],
+          "cheatsheet": "",
+          "self_check": [],
+          "review": [],
+          "milestone": ""
+        },
+        {
+          "key": "calc-precedence",
+          "number": 7,
+          "phase": "parse",
+          "title": "Precedence, and why `1 + 2 * 3` is 7",
+          "what": "two functions calling each other is the entire trick",
+          "goal": "Parse `+ - * /` into a tree that binds them in the right order.",
+          "why": "",
+          "authored": false,
+          "est_minutes": 0,
+          "builds_on": [],
+          "concepts": [],
+          "objectives": [],
+          "deliverable": "The tree is correct for any mix of the four operators.",
+          "brief": "",
+          "syntax": [],
+          "endpoints": [],
+          "steps": [],
+          "final_build": null,
+          "acceptance": [],
+          "manual_test": "",
+          "reference": "",
+          "stretch": [],
+          "glossary": [],
+          "cheatsheet": "",
+          "self_check": [],
+          "review": [],
+          "milestone": ""
+        },
+        {
+          "key": "calc-parens",
+          "number": 8,
+          "phase": "parse",
+          "title": "Parentheses and unary minus",
+          "what": "recursion back to the top of the grammar, which closes the loop",
+          "goal": "Parse `(1 + 2) * -3`.",
+          "why": "",
+          "authored": false,
+          "est_minutes": 0,
+          "builds_on": [],
+          "concepts": [],
+          "objectives": [],
+          "deliverable": "The grammar is complete: any arithmetic expression parses.",
+          "brief": "",
+          "syntax": [],
+          "endpoints": [],
+          "steps": [],
+          "final_build": null,
+          "acceptance": [],
+          "manual_test": "",
+          "reference": "",
+          "stretch": [],
+          "glossary": [],
+          "cheatsheet": "",
+          "self_check": [],
+          "review": [],
+          "milestone": ""
+        },
+        {
+          "key": "calc-walk",
+          "number": 9,
+          "phase": "eval",
+          "title": "Walking the tree",
+          "what": "switch on the kind, recurse into the children, return a number",
+          "goal": "Turn an `Expr` into the number it means.",
+          "why": "",
+          "authored": false,
+          "est_minutes": 0,
+          "builds_on": [],
+          "concepts": [],
+          "objectives": [],
+          "deliverable": "`echo '1 + 2 * 3' | node calc.ts` prints 7.",
+          "brief": "",
+          "syntax": [],
+          "endpoints": [],
+          "steps": [],
+          "final_build": null,
+          "acceptance": [],
+          "manual_test": "",
+          "reference": "",
+          "stretch": [],
+          "glossary": [],
+          "cheatsheet": "",
+          "self_check": [],
+          "review": [],
+          "milestone": ""
+        },
+        {
+          "key": "calc-never",
+          "number": 10,
+          "phase": "eval",
+          "title": "Exhaustiveness with `never`",
+          "what": "the compiler proving you handled every node, forever",
+          "goal": "Make a new node kind a compile error everywhere it is not handled.",
+          "why": "",
+          "authored": false,
+          "est_minutes": 0,
+          "builds_on": [],
+          "concepts": [],
+          "objectives": [],
+          "deliverable": "Growing the language can no longer silently break the evaluator.",
+          "brief": "",
+          "syntax": [],
+          "endpoints": [],
+          "steps": [],
+          "final_build": null,
+          "acceptance": [],
+          "manual_test": "",
+          "reference": "",
+          "stretch": [],
+          "glossary": [],
+          "cheatsheet": "",
+          "self_check": [],
+          "review": [],
+          "milestone": ""
+        },
+        {
+          "key": "calc-arithmetic",
+          "number": 11,
+          "phase": "eval",
+          "title": "Division, and the arithmetic that can fail",
+          "what": "what your language says about `1 / 0`, decided rather than inherited",
+          "goal": "Give division a defined answer for every input.",
+          "why": "",
+          "authored": false,
+          "est_minutes": 0,
+          "builds_on": [],
+          "concepts": [],
+          "objectives": [],
+          "deliverable": "No expression evaluates to `Infinity` or `NaN` by accident.",
+          "brief": "",
+          "syntax": [],
+          "endpoints": [],
+          "steps": [],
+          "final_build": null,
+          "acceptance": [],
+          "manual_test": "",
+          "reference": "",
+          "stretch": [],
+          "glossary": [],
+          "cheatsheet": "",
+          "self_check": [],
+          "review": [],
+          "milestone": ""
+        },
+        {
+          "key": "calc-vars",
+          "number": 12,
+          "phase": "lang",
+          "title": "Variables and an environment",
+          "what": "`let x = 4` — a Map, and the name that is not in it",
+          "goal": "Bind a name to a value and read it back.",
+          "why": "",
+          "authored": false,
+          "est_minutes": 0,
+          "builds_on": [],
+          "concepts": [],
+          "objectives": [],
+          "deliverable": "The language has memory.",
+          "brief": "",
+          "syntax": [],
+          "endpoints": [],
+          "steps": [],
+          "final_build": null,
+          "acceptance": [],
+          "manual_test": "",
+          "reference": "",
+          "stretch": [],
+          "glossary": [],
+          "cheatsheet": "",
+          "self_check": [],
+          "review": [],
+          "milestone": ""
+        },
+        {
+          "key": "calc-statements",
+          "number": 13,
+          "phase": "lang",
+          "title": "Statements, and a program",
+          "what": "many expressions separated by `;`, and what a program's value is",
+          "goal": "Run `let x = 4; x * x` as one program.",
+          "why": "",
+          "authored": false,
+          "est_minutes": 0,
+          "builds_on": [],
+          "concepts": [],
+          "objectives": [],
+          "deliverable": "A program is a sequence, not a single expression.",
+          "brief": "",
+          "syntax": [],
+          "endpoints": [],
+          "steps": [],
+          "final_build": null,
+          "acceptance": [],
+          "manual_test": "",
+          "reference": "",
+          "stretch": [],
+          "glossary": [],
+          "cheatsheet": "",
+          "self_check": [],
+          "review": [],
+          "milestone": ""
+        },
+        {
+          "key": "calc-booleans",
+          "number": 14,
+          "phase": "lang",
+          "title": "Booleans and comparison",
+          "what": "the value type stops being `number`, and every layer notices",
+          "goal": "Evaluate `2 < 3` without letting `true * 2` sneak through.",
+          "why": "",
+          "authored": false,
+          "est_minutes": 0,
+          "builds_on": [],
+          "concepts": [],
+          "objectives": [],
+          "deliverable": "Values are `number | boolean`, and the type errors that implies are handled.",
+          "brief": "",
+          "syntax": [],
+          "endpoints": [],
+          "steps": [],
+          "final_build": null,
+          "acceptance": [],
+          "manual_test": "",
+          "reference": "",
+          "stretch": [],
+          "glossary": [],
+          "cheatsheet": "",
+          "self_check": [],
+          "review": [],
+          "milestone": ""
+        },
+        {
+          "key": "calc-if",
+          "number": 15,
+          "phase": "lang",
+          "title": "`if` as an expression",
+          "what": "a conditional that has a value, and the type rule that forces",
+          "goal": "Evaluate `if 2 < 3 then 10 else 20`.",
+          "why": "",
+          "authored": false,
+          "est_minutes": 0,
+          "builds_on": [],
+          "concepts": [],
+          "objectives": [],
+          "deliverable": "The language can make a decision.",
+          "brief": "",
+          "syntax": [],
+          "endpoints": [],
+          "steps": [],
+          "final_build": null,
+          "acceptance": [],
+          "manual_test": "",
+          "reference": "",
+          "stretch": [],
+          "glossary": [],
+          "cheatsheet": "",
+          "self_check": [],
+          "review": [],
+          "milestone": ""
+        },
+        {
+          "key": "calc-positions",
+          "number": 16,
+          "phase": "usable",
+          "title": "Line and column on every token",
+          "what": "carry the position from the scanner, or you can never report it",
+          "goal": "Attach a position to every token and every node.",
+          "why": "",
+          "authored": false,
+          "est_minutes": 0,
+          "builds_on": [],
+          "concepts": [],
+          "objectives": [],
+          "deliverable": "Every token knows where it came from.",
+          "brief": "",
+          "syntax": [],
+          "endpoints": [],
+          "steps": [],
+          "final_build": null,
+          "acceptance": [],
+          "manual_test": "",
+          "reference": "",
+          "stretch": [],
+          "glossary": [],
+          "cheatsheet": "",
+          "self_check": [],
+          "review": [],
+          "milestone": ""
+        },
+        {
+          "key": "calc-messages",
+          "number": 17,
+          "phase": "usable",
+          "title": "Error messages that point at the problem",
+          "what": "a caret under the offending character, and try/catch at the edge",
+          "goal": "Turn every failure into a message a stranger could act on.",
+          "why": "",
+          "authored": false,
+          "est_minutes": 0,
+          "builds_on": [],
+          "concepts": [],
+          "objectives": [],
+          "deliverable": "One error format, one place that prints it, no stack traces.",
+          "brief": "",
+          "syntax": [],
+          "endpoints": [],
+          "steps": [],
+          "final_build": null,
+          "acceptance": [],
+          "manual_test": "",
+          "reference": "",
+          "stretch": [],
+          "glossary": [],
+          "cheatsheet": "",
+          "self_check": [],
+          "review": [],
+          "milestone": ""
+        },
+        {
+          "key": "calc-repl",
+          "number": 18,
+          "phase": "usable",
+          "title": "A REPL, and a test suite you wrote",
+          "what": "read stdin line by line, and prove the whole thing with no framework",
+          "goal": "Leave the language in a shape you would be happy to add a feature to.",
+          "why": "",
+          "authored": false,
+          "est_minutes": 0,
+          "builds_on": [],
+          "concepts": [],
+          "objectives": [],
+          "deliverable": "The finished language — interactive, tested, and yours.",
+          "brief": "",
+          "syntax": [],
+          "endpoints": [],
+          "steps": [],
+          "final_build": null,
+          "acceptance": [],
+          "manual_test": "",
+          "reference": "",
+          "stretch": [],
+          "glossary": [],
+          "cheatsheet": "",
+          "self_check": [],
+          "review": [],
+          "milestone": ""
+        }
+      ],
+      "acceptance": [
+        "`echo '1 + 2 * 3' | node calc.ts` prints `7` — not `9`.",
+        "`echo '(1 + 2) * -3' | node calc.ts` prints `-9`.",
+        "`echo 'let x = 4; x * x' | node calc.ts` prints `16`.",
+        "`echo '2 < 3' | node calc.ts` prints `true`, and `echo 'true * 2'` is a reported error rather than `NaN`.",
+        "`echo '1 $ 2' | node calc.ts` names the character and its column, and exits without printing a stack trace.",
+        "`echo '1 +' | node calc.ts` says the input ended early. It never prints `NaN`.",
+        "`echo 'y + 1' | node calc.ts` says `y` is not defined, rather than quietly treating it as zero.",
+        "Adding a new member to the `Expr` union makes the compiler list every place that now has to handle it."
+      ],
+      "manual_test": "With `calc.ts` finished, drive it from a shell:\n\n```bash\n# arithmetic and precedence\necho '1 + 2 * 3'        | node calc.ts     # 7\necho '(1 + 2) * 3'      | node calc.ts     # 9\necho '10 / 4'           | node calc.ts     # 2.5\necho '-4 + 10'          | node calc.ts     # 6\n\n# it is a language, not a calculator\necho 'let x = 4; x * x'          | node calc.ts     # 16\necho 'let x = 4; x * x > 10'     | node calc.ts     # true\necho 'if 2 < 3 then 10 else 20'  | node calc.ts     # 10\n\n# the failure paths — these matter more\necho '1 $ 2'    | node calc.ts     # unexpected character\necho '1 +'      | node calc.ts     # ended early\necho '1 + )'    | node calc.ts     # unexpected token, with a caret\necho 'y + 1'    | node calc.ts     # undefined variable\necho '1 / 0'    | node calc.ts     # whatever you decided in module 11\n```\n\nThen check the exit codes with `echo $?`. A tool that prints an error and exits\n0 is a tool nobody can put in a script — which is the whole subject of module 17.\n",
+      "stretch": [
+        "Add `%` and `**`, and work out from your own parser where each belongs on the precedence ladder. `**` is right-associative; find out what that costs you.",
+        "Add strings, and a `+` that concatenates them. Then follow the change: the token union, the value union, every comparison, and every error message.",
+        "Add `fn double(n) = n * 2` and calls. You will need a call expression, a scope that nests, and a decision about what happens when the argument count is wrong.",
+        "Print the tree as an indented drawing instead of JSON, so precedence is something you can see rather than something you trust.",
+        "Add a `--tokens` flag that stops after phase 1 and prints the token list. Every real compiler has one, because it is how you find out which phase is lying to you.",
+        "Write a formatter: parse the input and print it back out with canonical spacing and only the parentheses that are needed. It reuses the whole front end and nothing of the evaluator."
+      ],
+      "milestone": "You have written a language — a scanner, a parser, an evaluator, and the error reporting that makes it usable by someone who is not you. Every compiler, linter, formatter, template engine and query parser you will ever open is this program with more cases in it."
     }
   ]
 }

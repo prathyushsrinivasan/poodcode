@@ -4,6 +4,7 @@ import { api } from "../api";
 import type { BackendProject, BackendStep, BackendTrack, Exercise } from "../types";
 import { Markdown } from "../components/Markdown";
 import { ExerciseCard, QuizSection } from "../components/LearnExercise";
+import { ReferenceReveal } from "../components/ReferenceReveal";
 import { Section, useCollapse } from "../components/Collapsible";
 import { Empty } from "../components/common";
 import { useToast } from "../components/Toast";
@@ -13,6 +14,7 @@ import {
   solvedExercises,
   markExerciseSolved,
 } from "../lib/learnProgress";
+import { collectExerciseIds, solvedLabel, studyTime } from "../lib/trackProgress";
 
 // Project completion is tracked in the same SQLite-backed chapter-done set as
 // the Learn tab and the TypeScript course, under a namespaced key so it can
@@ -21,19 +23,7 @@ const projectKey = (key: string) => `backend:${key}`;
 
 // Every judged exercise required to complete a project: all step exercises plus
 // the closing final build.
-function requiredExerciseIds(p: BackendProject): string[] {
-  const ids: string[] = [];
-  for (const s of p.steps ?? []) for (const e of s.exercises ?? []) ids.push(e.id);
-  if (p.final_build) ids.push(p.final_build.id);
-  return ids;
-}
-
-// Projects are sized in study hours, not minutes — "~2.5 h" reads as a plan.
-function studyTime(minutes: number): string {
-  if (minutes < 90) return `~${minutes} min`;
-  const hours = minutes / 60;
-  return `~${Number.isInteger(hours) ? hours : hours.toFixed(1)} h`;
-}
+const requiredExerciseIds = (p: BackendProject) => collectExerciseIds(p.steps, p.final_build);
 
 const LEVEL_COLOR: Record<string, string> = {
   Starter: "var(--good)",
@@ -483,7 +473,7 @@ function ProjectDetail({
             onToggle={() => sec.toggle(step.key)}
             meta={
               <span className="dim" style={{ fontSize: 12 }}>
-                {stepSolvedLabel(step, solvedEx)}
+                {solvedLabel(step.exercises, solvedEx)}
               </span>
             }
           >
@@ -533,7 +523,15 @@ function ProjectDetail({
         </Section>
       )}
 
-      {project.reference && <ReferenceReveal reference={project.reference} />}
+      {/* The Backend Lab is JavaScript, so its reveal is fenced as `js`. */}
+      {project.reference && (
+        <ReferenceReveal
+          reference={project.reference}
+          language="js"
+          revealLabel="Reveal a reference implementation"
+          hideLabel="Hide the reference implementation"
+        />
+      )}
 
       {project.stretch.length > 0 && (
         <Section
@@ -666,33 +664,6 @@ function ProjectDetail({
 
       {/* Sentinel: intersecting means the project has been read to the bottom. */}
       <div ref={bottomRef} style={{ height: 1 }} />
-    </div>
-  );
-}
-
-function stepSolvedLabel(step: BackendStep, solvedEx: Set<string>): string {
-  const ids = (step.exercises ?? []).map((e) => e.id);
-  if (ids.length === 0) return "";
-  const n = ids.filter((id) => solvedEx.has(id)).length;
-  return n === ids.length ? "✓ done" : `${n}/${ids.length}`;
-}
-
-function ReferenceReveal({ reference }: { reference: string }) {
-  const [show, setShow] = useState(false);
-  return (
-    <div style={{ marginTop: 14 }}>
-      <button className="ghost" onClick={() => setShow((s) => !s)}>
-        {show ? "Hide the reference implementation" : "Reveal a reference implementation"}
-      </button>
-      {show && (
-        <div style={{ marginTop: 10 }}>
-          <p className="faint" style={{ fontSize: 12 }}>
-            One way to write it — not the only way. Compare it with yours rather than replacing
-            yours with it.
-          </p>
-          <Markdown>{"```js\n" + reference + "\n```"}</Markdown>
-        </div>
-      )}
     </div>
   );
 }

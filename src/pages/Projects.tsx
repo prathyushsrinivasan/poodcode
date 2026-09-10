@@ -1,9 +1,8 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Navigate, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { api } from "../api";
 import type {
   BackendStep,
-  Exercise,
   Project,
   ProjectModule,
   ProjectTrack,
@@ -11,15 +10,19 @@ import type {
 } from "../types";
 import { Markdown } from "../components/Markdown";
 import { ExerciseCard, QuizSection } from "../components/LearnExercise";
+import { ExerciseSections } from "../components/ExerciseSections";
+import { ReferenceReveal } from "../components/ReferenceReveal";
 import { Section, useCollapse } from "../components/Collapsible";
-import { Empty } from "../components/common";
+import { ClickableRow, Empty } from "../components/common";
 import { useToast } from "../components/Toast";
 import {
   loadDoneChapters,
   setChapterDone,
   solvedExercises,
   markExerciseSolved,
+  unmarkExercisesSolved,
 } from "../lib/learnProgress";
+import { collectExerciseIds, plural, solvedLabel, studyTime } from "../lib/trackProgress";
 
 // Module completion is tracked in the same SQLite-backed chapter-done set as
 // the Learn tab, the courses and the Backend Lab, under a namespaced key so it
@@ -27,33 +30,55 @@ import {
 const moduleKey = (projectKey: string, key: string) => `project:${projectKey}:${key}`;
 
 /** Every judged exercise required to complete a module. */
-function requiredExerciseIds(m: ProjectModule): string[] {
-  const ids: string[] = [];
-  for (const s of m.steps ?? []) for (const e of s.exercises ?? []) ids.push(e.id);
-  if (m.final_build) ids.push(m.final_build.id);
-  return ids;
-}
-
-function studyTime(minutes: number): string {
-  if (minutes <= 0) return "";
-  if (minutes < 90) return `~${minutes} min`;
-  const hours = minutes / 60;
-  return `~${Number.isInteger(hours) ? hours : hours.toFixed(1)} h`;
-}
+const requiredExerciseIds = (m: ProjectModule) => collectExerciseIds(m.steps, m.final_build);
 
 export default function Projects() {
   const { project, module: moduleParam } = useParams();
   const [track, setTrack] = useState<ProjectTrack | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [done, setDone] = useState<Set<string>>(new Set());
   const nav = useNavigate();
 
-  useEffect(() => {
-    api.projectsTrack().then(setTrack).catch(() => setTrack(null));
-    loadDoneChapters().then(setDone).catch(() => {});
+  const load = useCallback(() => {
+    setLoadError(null);
+    api
+      .projectsTrack()
+      .then(setTrack)
+      .catch((e: unknown) =>
+        setLoadError(String((e as { message?: string })?.message ?? e) || "unknown error")
+      );
   }, []);
+
+  useEffect(() => {
+    load();
+    loadDoneChapters().then(setDone).catch(() => {});
+  }, [load]);
 
   async function setModuleDone(projectKey: string, key: string, value: boolean) {
     setDone(await setChapterDone(done, moduleKey(projectKey, key), value));
+  }
+
+  // A failed load used to be indistinguishable from a slow one: the catch set
+  // the track back to null and the page said "Loading…" forever. The realistic
+  // failure is a regenerated seeds/projects.json that no longer deserializes
+  // into `ProjectTrack` after a model change, and the message naming the field
+  // that broke is the single most useful thing on the screen when it happens.
+  if (loadError) {
+    return (
+      <div className="page">
+        <Empty icon="⚠️" text="The Projects track could not be loaded." />
+        <p className="dim mono" style={{ fontSize: 12, textAlign: "center" }}>
+          {loadError}
+        </p>
+        <p className="faint" style={{ fontSize: 12, textAlign: "center" }}>
+          This usually means <code>seeds/projects.json</code> and the Rust model have drifted
+          apart — regenerate the seed with <code>python tools/gen_seed.py</code>.
+        </p>
+        <div className="row" style={{ justifyContent: "center", marginTop: 10 }}>
+          <button onClick={load}>Try again</button>
+        </div>
+      </div>
+    );
   }
 
   if (!track) return <div className="page">Loading…</div>;
@@ -66,10 +91,15 @@ export default function Projects() {
   }
 
   // With one project the track overview would be a single card, so `/projects`
-  // goes straight to it. The overview reappears the moment a second lands.
-  const p =
-    track.projects.find((x) => x.key === project) ??
-    (project === undefined && track.projects.length === 1 ? track.projects[0] : undefined);
+  // redirects to that project rather than rendering the same view at a second
+  // address the rest of the page never links to. The overview reappears — and
+  // this redirect stops — the moment a second project lands.
+  const only = track.projects.length === 1 ? track.projects[0] : undefined;
+  if (project === undefined && only) {
+    return <Navigate to={`/projects/${only.key}`} replace />;
+  }
+
+  const p = track.projects.find((x) => x.key === project);
 
   if (!p) {
     if (project !== undefined) {
@@ -132,11 +162,12 @@ function TrackOverview({ track, done }: { track: ProjectTrack; done: Set<string>
           const authored = p.modules.filter((m) => m.authored);
           const n = authored.filter((m) => done.has(moduleKey(p.key, m.key))).length;
           return (
-            <div
+            <ClickableRow
               key={p.key}
               className="card"
-              style={{ cursor: p.authored ? "pointer" : "default", opacity: p.authored ? 1 : 0.55 }}
-              onClick={() => p.authored && nav(`/projects/${p.key}`)}
+              style={{ opacity: p.authored ? 1 : 0.55 }}
+              disabled={!p.authored}
+              onActivate={() => nav(`/projects/${p.key}`)}
             >
               <strong>
                 {p.number}. {p.title}
@@ -147,7 +178,7 @@ function TrackOverview({ track, done }: { track: ProjectTrack; done: Set<string>
               <p className="faint" style={{ margin: "6px 0 0", fontSize: 12 }}>
                 {n}/{authored.length} modules · {p.stack.join(" · ")}
               </p>
-            </div>
+            </ClickableRow>
           );
         })}
       </div>
@@ -170,6 +201,10 @@ function ProjectDetail({
 }) {
   const nav = useNavigate();
   const sec = useCollapse(`project-overview:${project.key}`, false);
+  // "How to work through this" is orientation, so it opens by default and gets
+  // its own namespace to say so. On a single-project track the overview page
+  // never renders, and this is the only place the track intro is ever shown.
+  const introSec = useCollapse(`project-intro:${project.key}`, true);
 
   const authored = project.modules.filter((m) => m.authored);
   const doneCount = authored.filter((m) => done.has(moduleKey(project.key, m.key))).length;
@@ -210,8 +245,7 @@ function ProjectDetail({
         </div>
         <p className="faint" style={{ fontSize: 12, margin: "10px 0 0" }}>
           {project.stack.join(" · ")} · about {studyTime(project.est_minutes)} of building in
-          total. A module completes once you have read it through and solved its exercises — but
-          the real deliverable is the server running on your own machine.
+          total.{project.completion_note ? ` ${project.completion_note}` : ""}
         </p>
       </div>
 
@@ -227,6 +261,16 @@ function ProjectDetail({
         )}
       </div>
 
+      {track.intro && (
+        <Section
+          title="📌 How to work through this"
+          open={introSec.isOpen("intro")}
+          onToggle={() => introSec.toggle("intro")}
+        >
+          <Markdown>{track.intro}</Markdown>
+        </Section>
+      )}
+
       {project.brief && <Markdown>{project.brief}</Markdown>}
 
       {project.endpoints.length > 0 && <EndpointTable endpoints={project.endpoints} caption="The finished application's contract. Every module below chips away at one or two of these rows." />}
@@ -240,8 +284,9 @@ function ProjectDetail({
 
       <h3 style={{ margin: "22px 0 4px" }}>🗺️ The roadmap</h3>
       <p className="dim" style={{ marginTop: 0, fontSize: 13 }}>
-        Twenty modules in five phases. Each phase ends with something you can demonstrate over
-        curl — that is what makes it a phase rather than an arbitrary grouping.
+        {plural(totalModules, "module")} in {plural(project.roadmap.length, "phase")}. Each phase
+        ends with something you can demonstrate — that is what makes it a phase rather than an
+        arbitrary grouping.
       </p>
 
       {project.roadmap.map((phase) => {
@@ -270,18 +315,19 @@ function ProjectDetail({
             {mods.map((m, i) => {
               const isDone = m.authored && done.has(moduleKey(project.key, m.key));
               return (
-                <div
+                <ClickableRow
                   key={m.key}
                   className="row"
                   style={{
                     gap: 8,
                     padding: "5px 0",
                     alignItems: "flex-start",
-                    cursor: m.authored ? "pointer" : "default",
                     opacity: m.authored ? 1 : 0.5,
                     borderBottom: i < mods.length - 1 ? "1px solid var(--border)" : undefined,
                   }}
-                  onClick={() => m.authored && nav(`/projects/${project.key}/${m.key}`)}
+                  disabled={!m.authored}
+                  title={m.authored ? `Open module ${m.number}` : "Not written yet"}
+                  onActivate={() => nav(`/projects/${project.key}/${m.key}`)}
                 >
                   <span
                     className="mono"
@@ -307,7 +353,7 @@ function ProjectDetail({
                   ) : (
                     <span className="badge">soon</span>
                   )}
-                </div>
+                </ClickableRow>
               );
             })}
           </div>
@@ -322,16 +368,6 @@ function ProjectDetail({
           meta={<span className="badge">read once</span>}
         >
           <Markdown>{track.harness_note}</Markdown>
-        </Section>
-      )}
-
-      {track.intro && (
-        <Section
-          title="📌 How to work through this"
-          open={sec.isOpen("intro")}
-          onToggle={() => sec.toggle("intro")}
-        >
-          <Markdown>{track.intro}</Markdown>
         </Section>
       )}
 
@@ -359,7 +395,9 @@ function ProjectDetail({
           title="🔌 Try the finished thing yourself"
           open={sec.isOpen("manual")}
           onToggle={() => sec.toggle("manual")}
-          meta={<span className="badge">curl</span>}
+          // The badge names the tool the block actually uses. A project with a
+          // contract is driven over HTTP; one without is driven from a shell.
+          meta={<span className="badge">{project.endpoints.length > 0 ? "curl" : "shell"}</span>}
         >
           <Markdown>{project.manual_test}</Markdown>
         </Section>
@@ -396,10 +434,18 @@ function ProjectDetail({
   );
 }
 
-function EndpointTable({ endpoints, caption }: { endpoints: Project["endpoints"]; caption: string }) {
+function EndpointTable({
+  endpoints,
+  caption,
+  heading = "📋 The contract",
+}: {
+  endpoints: Project["endpoints"];
+  caption: string;
+  heading?: string;
+}) {
   return (
     <>
-      <h3 style={{ marginBottom: 6 }}>📋 The contract</h3>
+      <h3 style={{ marginBottom: 6 }}>{heading}</h3>
       <p className="dim" style={{ marginTop: 0, fontSize: 13 }}>
         {caption}
       </p>
@@ -466,30 +512,116 @@ function ModuleDetail({
 }) {
   const nav = useNavigate();
   const toast = useToast();
+  const [params, setParams] = useSearchParams();
   const [solvedEx, setSolvedEx] = useState<Set<string>>(() => solvedExercises());
   const [scrolledToBottom, setScrolledToBottom] = useState(false);
   const bottomRef = useRef<HTMLDivElement | null>(null);
   const celebrated = useRef(false);
   // Steps start collapsed: each open step mounts a Monaco editor per exercise,
-  // and the contents card below is how you navigate them.
-  const sec = useCollapse(`project-sec:${mod.key}`, false);
+  // and the contents card below is how you navigate them. Keyed by project as
+  // well as module, because module keys are only unique within a project.
+  const sec = useCollapse(`project-sec:${project.key}:${mod.key}`, false);
   const steps = mod.steps ?? [];
   const stepKeys = useMemo(() => steps.map((s) => s.key), [steps]);
   const phase = project.roadmap.find((p) => p.key === mod.phase);
 
-  function openStep(key: string) {
-    if (!sec.isOpen(key)) sec.toggle(key);
+  const scrollTo = (id: string) =>
     requestAnimationFrame(() =>
-      document.getElementById(`step-${key}`)?.scrollIntoView({ behavior: "smooth", block: "start" })
+      document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" })
     );
+
+  // Which step the URL points at. A module is a long page, so without this a
+  // reload — or a link to "the bit about routing" — always lands at the top and
+  // you scroll back down hunting for where you were.
+  const stepParam = params.get("step");
+  // The last `?step=` value acted on, so opening a step by hand does not get
+  // undone by the effect below re-applying the URL.
+  const appliedStep = useRef<string | null>(null);
+  const setStepParam = useCallback(
+    (key: string | null) =>
+      setParams(
+        (prev) => {
+          const next = new URLSearchParams(prev);
+          if (key) next.set("step", key);
+          else next.delete("step");
+          return next;
+        },
+        { replace: true }
+      ),
+    [setParams]
+  );
+
+  function openStep(key: string) {
+    appliedStep.current = key; // opened here, so the effect below needn't repeat it
+    if (!sec.isOpen(key)) sec.toggle(key);
+    setStepParam(key);
+    scrollTo(`step-${key}`);
   }
+
+  /** A step's own header was clicked: keep the URL pointing at what is open.
+   *
+   * Closing a step only clears `?step=` when it is the step the URL names —
+   * and `appliedStep` tracks that either way, so folding away some other step
+   * cannot leave the effect below thinking it has a link to re-apply and
+   * yanking the page back up to it. */
+  function toggleStep(key: string) {
+    const opening = !sec.isOpen(key);
+    const nextParam = opening ? key : stepParam === key ? null : stepParam;
+    appliedStep.current = nextParam;
+    sec.toggle(key);
+    setStepParam(nextParam);
+  }
+
+  // Apply `?step=` once per value: open that step and scroll to it. The guard
+  // matters because `sec.isOpen` changes identity whenever any section toggles,
+  // and re-running this would yank the page back to the linked step.
+  useEffect(() => {
+    if (!stepParam || appliedStep.current === stepParam) return;
+    if (!steps.some((s) => s.key === stepParam)) return;
+    appliedStep.current = stepParam;
+    if (!sec.isOpen(stepParam)) sec.toggle(stepParam);
+    scrollTo(`step-${stepParam}`);
+  }, [stepParam, steps, sec]);
 
   const gradableIds = useMemo(() => requiredExerciseIds(mod), [mod]);
   const allSolved = gradableIds.every((id) => solvedEx.has(id));
   const solvedCount = gradableIds.filter((id) => solvedEx.has(id)).length;
 
+  // Where "pick up where I left off" goes: the first step still holding an
+  // unsolved exercise, or the module build if the steps are all done.
+  const firstUnsolvedStep = steps.find((s) =>
+    (s.exercises ?? []).some((e) => !solvedEx.has(e.id))
+  );
+  const finalBuildUnsolved = !!mod.final_build && !solvedEx.has(mod.final_build.id);
+  const canResume = !!firstUnsolvedStep || finalBuildUnsolved;
+
+  function resume() {
+    if (firstUnsolvedStep) openStep(firstUnsolvedStep.key);
+    else scrollTo("module-build");
+  }
+
   function handleSolved(id: string) {
     setSolvedEx(new Set(markExerciseSolved(id)));
+  }
+
+  /** Start the module over: forget its solved exercises and its ✓, so it can be
+   * worked again from scratch. Drafts are deliberately kept — see
+   * `unmarkExercisesSolved`. */
+  function resetModule() {
+    const ok = window.confirm(
+      `Start module ${mod.number} over?\n\n` +
+        `This clears ${plural(solvedCount, "solved exercise")} and its ✓ Done mark. ` +
+        `The code you have written is kept.`
+    );
+    if (!ok) return;
+    setSolvedEx(new Set(unmarkExercisesSolved(gradableIds)));
+    celebrated.current = false; // so finishing it again celebrates again
+    // Auto-completion needs the module read to the bottom *again*. Without this
+    // a module with nothing to solve would re-complete itself the instant it
+    // was reset, since "every exercise solved" is vacuously true for none.
+    setScrolledToBottom(false);
+    if (isDone) onSetDone(false);
+    toast(`Module ${mod.number} reset.`);
   }
 
   useEffect(() => {
@@ -531,20 +663,50 @@ function ModuleDetail({
           {phase && <span className="badge">{phase.title}</span>}
           {mod.est_minutes > 0 && <span className="badge">⏱️ {studyTime(mod.est_minutes)}</span>}
         </div>
-        <button
-          className="ghost"
-          style={isDone ? { borderColor: "var(--good)", color: "var(--good)" } : undefined}
-          onClick={() => onSetDone(!isDone)}
-          title={isDone ? "Marked complete — click to undo" : "Mark this module complete"}
-        >
-          {isDone ? "✓ Done" : "Mark done"}
-        </button>
+        <div className="row">
+          {(isDone || solvedCount > 0) && (
+            <button
+              className="ghost"
+              onClick={resetModule}
+              title="Forget this module's solved exercises so you can work it again"
+            >
+              ↺ Reset
+            </button>
+          )}
+          <button
+            className="ghost"
+            style={isDone ? { borderColor: "var(--good)", color: "var(--good)" } : undefined}
+            onClick={() => onSetDone(!isDone)}
+            title={isDone ? "Marked complete — click to undo" : "Mark this module complete"}
+          >
+            {isDone ? "✓ Done" : "Mark done"}
+          </button>
+        </div>
       </div>
 
       <h1 className="page-title" style={{ marginTop: 6 }}>
         {mod.title}
       </h1>
       <p className="page-sub">{mod.what}</p>
+
+      {/* The same progress bar the project page shows, scoped to this module —
+          previously the only word on how far through you were was a line of
+          small print below the very last section. */}
+      {gradableIds.length > 0 && (
+        <div className="row" style={{ alignItems: "center", gap: 10, margin: "0 0 16px" }}>
+          <div className="progress" style={{ flex: 1 }}>
+            <span
+              style={{
+                width: `${Math.round((solvedCount / gradableIds.length) * 100)}%`,
+                background: allSolved ? "var(--good)" : "var(--accent)",
+              }}
+            />
+          </div>
+          <span className="dim mono" style={{ fontSize: 12, whiteSpace: "nowrap" }}>
+            {solvedCount}/{gradableIds.length} solved
+          </span>
+        </div>
+      )}
 
       {/* 1. WHY — the problem the last module left behind. */}
       {mod.why && (
@@ -591,7 +753,8 @@ function ModuleDetail({
       {mod.endpoints.length > 0 && (
         <EndpointTable
           endpoints={mod.endpoints}
-          caption="The rows of the contract this module implements."
+          heading="📋 This module's rows"
+          caption="The part of the contract this module implements."
         />
       )}
 
@@ -630,6 +793,16 @@ function ModuleDetail({
               🪜 Build it — these are in order
             </div>
             <span className="spacer" />
+            {canResume && solvedCount > 0 && (
+              <button
+                className="ghost"
+                style={{ padding: "2px 8px", fontSize: 12 }}
+                onClick={resume}
+                title="Open the first step with an exercise you haven't solved"
+              >
+                ↳ Pick up where I left off
+              </button>
+            )}
             <button
               className="ghost"
               style={{ padding: "2px 8px", fontSize: 12 }}
@@ -650,16 +823,16 @@ function ModuleDetail({
             const n = ids.filter((id) => solvedEx.has(id)).length;
             const complete = ids.length > 0 && n === ids.length;
             return (
-              <div
+              <ClickableRow
                 key={step.key}
                 className="row"
                 style={{
-                  cursor: "pointer",
                   gap: 8,
                   padding: "5px 0",
                   borderBottom: si < steps.length - 1 ? "1px solid var(--border)" : undefined,
                 }}
-                onClick={() => openStep(step.key)}
+                title={`Jump to step ${si + 1}`}
+                onActivate={() => openStep(step.key)}
               >
                 <span style={{ color: complete ? "var(--good)" : "var(--accent)", width: 18 }}>
                   {complete ? "✓" : si + 1}
@@ -678,7 +851,7 @@ function ModuleDetail({
                     {n}/{ids.length}
                   </span>
                 )}
-              </div>
+              </ClickableRow>
             );
           })}
         </div>
@@ -689,10 +862,10 @@ function ModuleDetail({
           <Section
             title={`Step ${si + 1}. ${step.title}`}
             open={sec.isOpen(step.key)}
-            onToggle={() => sec.toggle(step.key)}
+            onToggle={() => toggleStep(step.key)}
             meta={
               <span className="dim" style={{ fontSize: 12 }}>
-                {stepSolvedLabel(step, solvedEx)}
+                {solvedLabel(step.exercises, solvedEx)}
               </span>
             }
           >
@@ -703,14 +876,14 @@ function ModuleDetail({
 
       {/* 5. DID I GET IT — the module build, then the reveal. */}
       {mod.final_build && (
-        <>
+        <div id="module-build">
           <div className="divider" />
           <h2 style={{ marginBottom: 4 }}>🏁 Module build</h2>
           <p className="dim" style={{ marginTop: 0 }}>
             Everything above, assembled. This is the module.
           </p>
           <ExerciseCard index={1} exercise={mod.final_build} challenge onSolved={handleSolved} />
-        </>
+        </div>
       )}
 
       {mod.acceptance.length > 0 && (
@@ -743,7 +916,14 @@ function ModuleDetail({
         </Section>
       )}
 
-      {mod.reference && <ReferenceReveal reference={mod.reference} />}
+      {mod.reference && (
+        <ReferenceReveal
+          reference={mod.reference}
+          revealLabel="Reveal the solution for this module"
+          hideLabel="Hide the reference implementation"
+          note="One way to write it — not the only way. Compare it with yours rather than replacing yours with it; where it differs, work out which of you is right."
+        />
+      )}
 
       {mod.stretch.length > 0 && (
         <Section
@@ -899,39 +1079,16 @@ function SyntaxCard({ item, dim = false }: { item: SyntaxItem; dim?: boolean }) 
   );
 }
 
-function stepSolvedLabel(step: BackendStep, solvedEx: Set<string>): string {
-  const ids = (step.exercises ?? []).map((e) => e.id);
-  if (ids.length === 0) return "";
-  const n = ids.filter((id) => solvedEx.has(id)).length;
-  return n === ids.length ? "✓ done" : `${n}/${ids.length}`;
-}
-
-function ReferenceReveal({ reference }: { reference: string }) {
-  const [show, setShow] = useState(false);
-  return (
-    <div style={{ marginTop: 14 }}>
-      <button className="ghost" onClick={() => setShow((s) => !s)}>
-        {show ? "Hide the reference implementation" : "Reveal the solution for this module"}
-      </button>
-      {show && (
-        <div style={{ marginTop: 10 }}>
-          <p className="faint" style={{ fontSize: 12 }}>
-            One way to write it — not the only way. Compare it with yours rather than replacing
-            yours with it; where it differs, work out which of you is right.
-          </p>
-          <Markdown>{"```ts\n" + reference + "\n```"}</Markdown>
-        </div>
-      )}
-    </div>
-  );
-}
+// This track's own wording for the shared exercise sections. Only the two that
+// mean something different here are retuned: a challenge is not a puzzle, it is
+// the next piece of the application.
+const STEP_SECTION_WORDING = {
+  fix: { blurb: "This program is wrong. Find the mistake and fix it so the tests pass." },
+  challenge: { heading: "🏗️ Build it" },
+};
 
 function StepBody({ step, onSolved }: { step: BackendStep; onSolved: (id: string) => void }) {
   const exercises = step.exercises ?? [];
-  const kindOf = (e: Exercise) => e.kind || "drill";
-  const drills = exercises.filter((e) => kindOf(e) === "drill");
-  const fixes = exercises.filter((e) => kindOf(e) === "fix");
-  const challenges = exercises.filter((e) => kindOf(e) === "challenge");
   const warmup = step.warmup ?? [];
   const quiz = step.quiz ?? [];
 
@@ -979,35 +1136,11 @@ function StepBody({ step, onSolved }: { step: BackendStep; onSolved: (id: string
         </>
       )}
 
-      {drills.length > 0 && (
-        <>
-          <h4>🧩 Practice — fill in the blank</h4>
-          {drills.map((ex, i) => (
-            <ExerciseCard key={ex.id} index={i + 1} exercise={ex} onSolved={onSolved} />
-          ))}
-        </>
-      )}
-
-      {fixes.length > 0 && (
-        <>
-          <h4>🐞 Fix the bug</h4>
-          <p className="dim" style={{ marginTop: -4 }}>
-            This program is wrong. Find the mistake and fix it so the tests pass.
-          </p>
-          {fixes.map((ex, i) => (
-            <ExerciseCard key={ex.id} index={i + 1} exercise={ex} onSolved={onSolved} />
-          ))}
-        </>
-      )}
-
-      {challenges.length > 0 && (
-        <>
-          <h4>🏗️ Build it</h4>
-          {challenges.map((ex, i) => (
-            <ExerciseCard key={ex.id} index={i + 1} exercise={ex} challenge onSolved={onSolved} />
-          ))}
-        </>
-      )}
+      <ExerciseSections
+        exercises={exercises}
+        onSolved={onSolved}
+        overrides={STEP_SECTION_WORDING}
+      />
 
       {quiz.length > 0 && (
         <>

@@ -27,9 +27,9 @@
 #   1. ZERO DEPENDENCIES. Node built-ins only (`node:http`, `node:fs`). No
 #      Express, no npm install — the app is offline-first and the judge runs a
 #      single file in a scratch directory with no node_modules.
-#   2. NOTHING BEFORE ITS MODULE. `_SCOPE_RULES` maps a token to the module
-#      that introduces it; `_lint_scope` FAILS generation if an earlier
-#      module's program uses it.
+#   2. NOTHING BEFORE ITS MODULE. Each project has a scope table mapping a
+#      token to the module that introduces it; `_lint_scope` FAILS generation
+#      if an earlier module's program uses it.
 #   3. EVERY TOKEN IS TAUGHT. `_lint_syntax_taught` FAILS generation unless the
 #      module that introduces a token also declares it in that module's
 #      `syntax` primer. This is rule 2's other half and the reason the track can
@@ -37,7 +37,7 @@
 #      track uses something it never explained.
 #   4. ERASABLE SYNTAX ONLY. The judge runs TypeScript by STRIPPING types, not
 #      compiling them, so `enum`, `namespace` and parameter properties cannot
-#      run. None of them are needed here; `_lint_scope` bans them outright.
+#      run. None of them are needed here; every scope table bans them outright.
 #   5. EVERY PROGRAM IS DETERMINISTIC. Ids come from counters, not UUIDs;
 #      nothing prints a timestamp. Each module says plainly where the real world
 #      would use randomness instead.
@@ -259,18 +259,23 @@ def _pskel(key, number, phase, title, what, goal, deliverable=""):
 # ---------------------------------------------------------------------------
 # Scope: the module that first introduces each token.
 #
-# Read this table as the syllabus. `_lint_scope` fails generation if a module
-# numbered lower than the value uses the token, and `_lint_syntax_taught` fails
-# if the module at the value does not TEACH it in its syntax primer. Together
-# they are the guarantee the track's pitch rests on.
+# ONE TABLE PER PROJECT, because the syllabus is a property of the project, not
+# of the track: the Todo API introduces `.split(` in module 10 to pull an id out
+# of a path, and Calc introduces it in module 18 to cut stdin into lines. A
+# shared table would have to pick one and lie about the other.
 #
-# Tokens deliberately absent: `const`, `let`, `function`, `return`, `if`,
-# template literals and `.push(` — module 1 uses all of them, so a rule would be
-# a false claim about when the track first shows them. Module 1's syntax primer
-# covers them instead.
+# Read a table as that project's syllabus. `_lint_scope` fails generation if a
+# module numbered lower than the value uses the token, and `_lint_syntax_taught`
+# fails if the module at the value does not TEACH it in its syntax primer.
+# Together they are the guarantee the track's pitch rests on.
+#
+# Tokens deliberately absent from the Todo table: `const`, `let`, `function`,
+# `return`, `if`, template literals and `.push(` — module 1 uses all of them, so
+# a rule would be a false claim about when the track first shows them. Module
+# 1's syntax primer covers them instead.
 # ---------------------------------------------------------------------------
 
-_SCOPE_RULES = [
+_TODO_SCOPE_RULES = [
     # --- Phase 1: model the data -------------------------------------------
     ("type ", 1),
     ("interface ", 99),        # the track uses `type` throughout; see module 1
@@ -368,7 +373,7 @@ def _all_exercises(project):
             yield f"M{m['number']}/final", m["final_build"]
 
 
-def _lint_scope(modules):
+def _lint_scope(modules, rules):
     problems = []
     for m in modules:
         if not m.get("authored"):
@@ -376,7 +381,7 @@ def _lint_scope(modules):
         n = m["number"]
         for pid, prog in _all_programs(m):
             body = _authored_region(prog)
-            for token, allowed_from in _SCOPE_RULES:
+            for token, allowed_from in rules:
                 if n < allowed_from and token in body:
                     problems.append(
                         f"Module {n} program {pid} uses {token!r} "
@@ -386,16 +391,16 @@ def _lint_scope(modules):
         raise AssertionError("Projects scope violations:\n  " + "\n  ".join(problems))
 
 
-def _lint_syntax_taught(modules):
+def _lint_syntax_taught(modules, rules):
     """Design rule 3: the module that introduces a token must teach it.
 
-    Without this, `_SCOPE_RULES` only promises that syntax appears in the right
+    Without this, a scope table only promises that syntax appears in the right
     ORDER — not that it was ever explained. This is the half that makes the
-    track self-contained, and it is why the rules table is worth keeping honest.
+    track self-contained, and it is why the rules tables are worth keeping honest.
     """
     by_number = {m["number"]: m for m in modules}
     problems = []
-    for token, intro in _SCOPE_RULES:
+    for token, intro in rules:
         if intro > 90:            # 99/999 are bans, not introductions
             continue
         m = by_number.get(intro)
@@ -440,7 +445,7 @@ def _lint_structure(project):
 
 
 # ---------------------------------------------------------------------------
-# The Todo API — the track's first (and, for now, only) project.
+# Project 1 — the Todo API.
 #
 # The roadmap is five phases of four modules. Each phase ends with the
 # application able to do something you can demonstrate over curl, which is what
@@ -568,8 +573,8 @@ _TODO_MODULES += [
            "The finished Todo API — structured, tested, and yours."),
 ]
 
-_lint_scope(_TODO_MODULES)
-_lint_syntax_taught(_TODO_MODULES)
+_lint_scope(_TODO_MODULES, _TODO_SCOPE_RULES)
+_lint_syntax_taught(_TODO_MODULES, _TODO_SCOPE_RULES)
 
 _TODO = {
     "key": "todo-api",
@@ -586,6 +591,9 @@ _TODO = {
     "authored": True,
     "est_minutes": 20 * 45,
     "stack": ["TypeScript", "node:http", "node:fs", "zero dependencies"],
+    "completion_note": "A module completes once you have read it through and "
+                       "solved its exercises — but the real deliverable is the "
+                       "server running on your own machine.",
     "brief": _pbp("""
 ### What you are building
 
@@ -696,10 +704,32 @@ right under a status code that is wrong is the most common bug in this track.
 _lint_structure(_TODO)
 
 
+# ---------------------------------------------------------------------------
+# Project 2 — Calc, a small expression language.
+#
+# Authored in its own file for the same reason the Todo modules are: this one is
+# already 800 lines before a single module lands. It defines `_CALC` (and its
+# own scope table), and runs its own lints before handing the project back.
+#
+# WHY AN INTERPRETER SECOND. The Todo API teaches the shape of a service and
+# almost nothing about the type system beyond `type` and narrowing, because HTTP
+# hands you strings and you hand back strings. A language processor is the
+# opposite: it is three transformations over data you designed yourself, and
+# every one of them is a discriminated union walked recursively. Between them
+# the two projects cover the two halves of writing TypeScript for a living, and
+# they share no subject matter at all.
+# ---------------------------------------------------------------------------
+
+_calc_path = os.path.join(HERE, "calc_project.py")
+assert os.path.exists(_calc_path), "missing tools/calc_project.py"
+with open(_calc_path, encoding="utf-8") as _calc_f:
+    exec(compile(_calc_f.read(), _calc_path, "exec"))
+
+
 PROJECT_TRACK = {
     "key": "projects",
     "title": "Projects",
-    "subtitle": "Build one real application, in TypeScript, broken all the way down.",
+    "subtitle": "Build real applications, in TypeScript, broken all the way down.",
     "intro": _pbp("""
 The other tracks teach you TypeScript. This one asks you to **build something
 with it**, and refuses to skip a step on the way.
@@ -726,23 +756,30 @@ Each module answers five questions, in this order:
 ### How to work through it
 
 Do the modules in order and **type the code** — the typos are the lesson. Keep
-your own `server.ts` open in one window and the module in another; the judged
-exercises check your understanding, but only your own running server and a
-`curl` prove you built the thing.
+your own copy of the project open in one window and the module in another; the
+judged exercises check your understanding, but only the thing running on your
+own machine proves you built it.
 
 Reveal the reference *after* you have something working, and read it as "here is
 another way", not as the answer. Where it differs from yours, work out which of
 you is right — sometimes it will be you.
 """),
     "harness_note": _pbp("""
-Judged exercises in this track come in two shapes.
+Judged exercises in this track come in three shapes. Which one you are looking
+at is obvious from the program: if there is a replayer at the bottom, it is the
+third.
 
-**Pure logic** — the early modules, before there is a server. Your program
-prints to stdout and is compared line for line.
+**Pure logic** — the opening modules of either project, before there is anything
+to drive. Your program prints to stdout and is compared line for line.
 
-**A real server** — from module 4 on. Your program boots an actual HTTP server
-on a free port and a *replayer* fires a script of requests at it, so you are
-debugging a real server rather than a simulation.
+**A program on stdin** — Calc, from module 2 on. The source text your language
+has to process arrives on stdin; what you print is the answer. One test case per
+input, so a single exercise can be checked against `1 + 2`, `7`, and the empty
+string at once.
+
+**A real server** — the Todo API, from module 4 on. Your program boots an actual
+HTTP server on a free port and a *replayer* fires a script of requests at it, so
+you are debugging a real server rather than a simulation.
 
 - **stdin** holds one request per line: `METHOD /path [json body]`
 - **stdout** prints one line per request: `<status> <response body>`
@@ -779,7 +816,7 @@ Three things worth knowing up front:
   these use `1, 2, 3` so the expected output can be written down at all. The
   modules say so wherever it matters.
 """),
-    "projects": [_TODO],
+    "projects": [_TODO, _CALC],
 }
 
 

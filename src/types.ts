@@ -414,6 +414,9 @@ export interface Project {
   authored: boolean;
   est_minutes: number;
   stack: string[];
+  /** What finishing the modules does and does not mean, shown under the
+   * progress bar — the real deliverable differs per project. */
+  completion_note: string;
   brief: string;
   endpoints: Endpoint[];
   setup: string;

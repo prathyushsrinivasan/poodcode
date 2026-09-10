@@ -115,7 +115,8 @@ letting it ambush module 10.
 
 ### 5. Two lints, not one ✅
 
-`_SCOPE_RULES` maps a token to the module that introduces it. Two passes read it:
+`_TODO_SCOPE_RULES` maps a token to the module that introduces it. Two passes
+read it:
 
 * **`_lint_scope`** — fails generation if an *earlier* module's program uses the
   token. (This is the Backend Lab's rule, and it works.)
@@ -311,7 +312,7 @@ program shape.
 
 ## Constraints every module must satisfy
 
-* **Nothing before its module.** `_SCOPE_RULES` + `_lint_scope` fail the build
+* **Nothing before its module.** `_TODO_SCOPE_RULES` + `_lint_scope` fail the build
   if a program uses a token a later module introduces. Add the new module's
   tokens as it lands — and check first that no earlier module already uses one,
   or the rule is a false claim.
@@ -320,7 +321,7 @@ program shape.
   makes the track self-contained.
 * **Erasable syntax only.** The judge strips types rather than compiling them,
   so `enum`, `namespace` and parameter properties cannot run. All three are
-  banned outright in `_SCOPE_RULES` (module 999) — unlike the TypeScript course,
+  banned outright in every scope table (module 999) — unlike the TypeScript course,
   this track has no reason to teach them.
 * **Named imports from `node:http`.** See decision 2.
 * **Deterministic by construction.** Counters, not UUIDs. No timestamps. Port 0
@@ -336,7 +337,7 @@ program shape.
    `_TODO_MODULES` and may use any helper from the parent.
 2. Add it to `_TODO_MODULE_FILES` **in module order**, and delete the matching
    `_pskel` line from the skeleton list below it.
-3. Add that module's new syntax to `_SCOPE_RULES`, and make sure the module's
+3. Add that module's new syntax to `_TODO_SCOPE_RULES`, and make sure the module's
    `syntax` primer teaches each token — `_lint_syntax_taught` will tell you if
    not.
 4. `python tools/gen_seed.py && python tools/verify_projects.py --starters`
@@ -356,6 +357,22 @@ One project · 20 modules · 5 phases · roughly 160 judged exercises · a Todo 
 that validates, paginates and persists · and a learner who was never once asked
 to write a line of TypeScript the track had not already taught them.
 
-After that, the track has room for a second project. The model is already
-general — `ProjectTrack.projects` is a list, and `/projects` shows an overview
-the moment there is more than one.
+## The second project
+
+It landed early — see [`CALC_ROADMAP.md`](CALC_ROADMAP.md). **Calc**, an
+expression language: scanner, parser, evaluator, error messages. Module 1 ships,
+2-18 are planned.
+
+It is not a queue-jump so much as a hedge: the Todo API teaches the shape of a
+service and barely touches the type system, because HTTP hands you strings and
+takes strings back. A language processor is three transformations over data you
+designed yourself, every one of them a discriminated union walked recursively,
+and it is where `never`, recursive types and exhaustive narrowing have a reason
+to exist. The two projects share no subject matter at all, so they can be
+authored in either order.
+
+**What that cost this file's assumptions:** `_SCOPE_RULES` is now
+`_TODO_SCOPE_RULES`, and both lints take the table as an argument — a syllabus
+is a property of a project, not of the track. The track-level `harness_note`
+also had to stop claiming that every program boots a server from module 4 on.
+Everything else in the model turned out to be general already.

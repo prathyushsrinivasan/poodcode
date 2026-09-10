@@ -996,6 +996,13 @@ pub struct Project {
     /// "zero dependencies").
     #[serde(default)]
     pub stack: Vec<String>,
+    /// What finishing the modules does and does not mean, shown under the
+    /// progress bar. Project-specific on purpose: ticking every module off is
+    /// never the real deliverable, but what the real deliverable *is* differs
+    /// per project — for the Todo API it is a server running on your own
+    /// machine, and the next project's will be something else entirely.
+    #[serde(default)]
+    pub completion_note: String,
     /// Markdown: what the finished application is.
     #[serde(default)]
     pub brief: String,

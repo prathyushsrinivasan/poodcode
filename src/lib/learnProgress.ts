@@ -90,3 +90,15 @@ export function markExerciseSolved(id: string): Set<string> {
   }
   return s;
 }
+
+/** Forget that a set of exercises was ever solved, so a unit can be worked
+ * again from scratch. Only the solved marks go — the learner's own drafts
+ * (`poodcode:learn-ex:*`) are their writing, not progress, and are left alone
+ * so a reset never destroys work they might still want to read. */
+export function unmarkExercisesSolved(ids: string[]): Set<string> {
+  const s = readSolved();
+  let changed = false;
+  for (const id of ids) changed = s.delete(id) || changed;
+  if (changed) localStorage.setItem(SOLVED_EX_KEY, JSON.stringify([...s]));
+  return s;
+}

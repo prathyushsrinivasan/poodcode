@@ -1,9 +1,11 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { api } from "../api";
-import type { CourseLesson, CourseWeek, Exercise, WeeklyCourse } from "../types";
+import type { CourseLesson, CourseWeek, WeeklyCourse } from "../types";
 import { Markdown } from "../components/Markdown";
 import { ExerciseCard, QuizSection } from "../components/LearnExercise";
+import { ExerciseSections } from "../components/ExerciseSections";
+import { ReferenceReveal } from "../components/ReferenceReveal";
 import { Section, useCollapse } from "../components/Collapsible";
 import { Empty } from "../components/common";
 import { useToast } from "../components/Toast";
@@ -13,6 +15,7 @@ import {
   solvedExercises,
   markExerciseSolved,
 } from "../lib/learnProgress";
+import { collectExerciseIds, solvedLabel, studyTime } from "../lib/trackProgress";
 
 // This page renders both structured courses. They share a data model, a judge
 // and every interaction; they differ only in where the content comes from, how
@@ -61,21 +64,10 @@ function labelsOf(course: WeeklyCourse) {
 }
 
 // Every judged exercise required to complete a unit: all lesson exercises plus
-// an auto-graded capstone. The optional "stretch" build is NOT required.
-function requiredExerciseIds(week: CourseWeek): string[] {
-  const ids: string[] = [];
-  for (const l of week.lessons ?? []) for (const e of l.exercises ?? []) ids.push(e.id);
-  if (week.capstone?.exercise) ids.push(week.capstone.exercise.id);
-  return ids;
-}
-
-// Units are sized in study hours, not minutes — "~5 h" reads as a plan, where
-// "~300 min" reads as a wall.
-function studyTime(minutes: number): string {
-  if (minutes < 90) return `~${minutes} min`;
-  const hours = minutes / 60;
-  return `~${Number.isInteger(hours) ? hours : hours.toFixed(1)} h`;
-}
+// an auto-graded capstone. The optional "stretch" build is NOT required, which
+// is why it is not passed here.
+const requiredExerciseIds = (week: CourseWeek) =>
+  collectExerciseIds(week.lessons, week.capstone?.exercise);
 
 /** The 8-month TypeScript course (route `/course`). */
 export default function Course() {
@@ -491,7 +483,7 @@ function UnitDetail({
             onToggle={() => sec.toggle(lesson.key)}
             meta={
               <span className="dim" style={{ fontSize: 12 }}>
-                {lessonSolvedLabel(lesson, solvedEx)}
+                {solvedLabel(lesson.exercises, solvedEx)}
               </span>
             }
           >
@@ -584,7 +576,10 @@ function UnitDetail({
           {cap.exercise && (
             <ExerciseCard index={1} exercise={cap.exercise} challenge onSolved={handleSolved} />
           )}
-          {cap.reference && <ReferenceReveal reference={cap.reference} />}
+          {/* note="" keeps this reveal exactly as it was before the component
+              was shared — the course capstone has never carried the caveat the
+              other two tracks show. */}
+          {cap.reference && <ReferenceReveal reference={cap.reference} note="" />}
           {cap.stretch && (
             <>
               <h4 style={{ margin: "14px 0 4px" }}>🚀 Stretch goal (optional)</h4>
@@ -689,72 +684,6 @@ function UnitDetail({
   );
 }
 
-function lessonSolvedLabel(lesson: CourseLesson, solvedEx: Set<string>): string {
-  const ids = (lesson.exercises ?? []).map((e) => e.id);
-  if (ids.length === 0) return "";
-  const n = ids.filter((id) => solvedEx.has(id)).length;
-  return n === ids.length ? "✓ done" : `${n}/${ids.length}`;
-}
-
-function ReferenceReveal({ reference }: { reference: string }) {
-  const [show, setShow] = useState(false);
-  return (
-    <div style={{ marginTop: 10 }}>
-      <button className="ghost" onClick={() => setShow((s) => !s)}>
-        {show ? "Hide reference solution" : "Reveal a reference solution"}
-      </button>
-      {show && (
-        <div style={{ marginTop: 10 }}>
-          <Markdown>{"```ts\n" + reference + "\n```"}</Markdown>
-        </div>
-      )}
-    </div>
-  );
-}
-
-// The sections a lesson's exercises are grouped into, in the order they are
-// worked. The order is the teaching order: read code before writing it (predict,
-// diagnose), fill in a blank, repair a whole program (fix, retype), design from
-// a spec, then solve something end to end.
-//
-// A kind missing from this list is not dropped — see `bucket` in LessonBody.
-const KIND_SECTIONS: { kind: string; heading: string; blurb?: string }[] = [
-  {
-    kind: "predict",
-    // Not 🔮 — that belongs to the "Predict the output" warm-up directly above,
-    // and the two sit adjacent in every lesson that has both.
-    heading: "🧠 Predict the type",
-    blurb:
-      "Before you write anything: say what TypeScript infers here. Write the type out in full — the point is to read the inference, not to ask for it.",
-  },
-  {
-    kind: "diagnose",
-    heading: "🩺 Read the error",
-    blurb:
-      "Here is a real compiler error and the code that produced it. Work out what it is telling you, then fix the cause.",
-  },
-  { kind: "drill", heading: "🧩 Practice — fill in the blank" },
-  {
-    kind: "fix",
-    heading: "🐞 Fix the bug",
-    blurb:
-      "This program looks right but doesn't work. Find and fix the bug so the tests pass.",
-  },
-  {
-    kind: "retype",
-    heading: "🚫 Retype the any",
-    blurb:
-      "This program runs, and its types say nothing. Replace every `any` with a type that describes what is actually there — the hidden checks accept nothing vaguer.",
-  },
-  {
-    kind: "design",
-    heading: "📐 Design the type first",
-    blurb:
-      "Write the types before the code. Get the shape right and the implementation nearly falls out of it.",
-  },
-  { kind: "challenge", heading: "🏆 Coding challenge" },
-];
-
 function LessonBody({
   lesson,
   onSolved,
@@ -763,18 +692,8 @@ function LessonBody({
   onSolved: (id: string) => void;
 }) {
   const exercises = lesson.exercises ?? [];
-  const kindOf = (e: Exercise) => e.kind || "drill";
   const warmup = lesson.warmup ?? [];
   const quiz = lesson.quiz ?? [];
-
-  // Anything whose kind is not in KIND_SECTIONS is swept into the drill bucket
-  // rather than dropped, so adding a kind to the generator can never make
-  // exercises silently vanish from the page.
-  const known = new Set(KIND_SECTIONS.map((s) => s.kind));
-  const bucket = (kind: string) =>
-    exercises.filter((e) =>
-      kind === "drill" ? !known.has(kindOf(e)) || kindOf(e) === "drill" : kindOf(e) === kind
-    );
 
   return (
     <div>
@@ -795,29 +714,7 @@ function LessonBody({
         </>
       )}
 
-      {KIND_SECTIONS.map(({ kind, heading, blurb }) => {
-        const group = bucket(kind);
-        if (group.length === 0) return null;
-        return (
-          <React.Fragment key={kind}>
-            <h4>{heading}</h4>
-            {blurb && (
-              <p className="dim" style={{ marginTop: -4 }}>
-                {blurb}
-              </p>
-            )}
-            {group.map((ex, i) => (
-              <ExerciseCard
-                key={ex.id}
-                index={i + 1}
-                exercise={ex}
-                challenge={kind === "challenge"}
-                onSolved={onSolved}
-              />
-            ))}
-          </React.Fragment>
-        );
-      })}
+      <ExerciseSections exercises={exercises} onSolved={onSolved} />
 
       {quiz.length > 0 && (
         <>
