@@ -693,7 +693,7 @@ const server = createServer(handler);
 server.listen(3000, "127.0.0.1", () => console.log("listening on 3000"));
 """,
     stretch=[
-        "Answer with HTML instead: `res.end(\"<h1>hello</h1>\")`, then open localhost:3000 in a browser. Note the browser renders it as text — module 5 explains why, and it is not the browser's fault.",
+        "Answer with HTML instead: `res.end(\"<h1>hello</h1>\")`, then open localhost:3000 in a browser. You never said it was HTML — no `Content-Type` header goes out at all — so whether you get a heading or the raw tags is the browser guessing at the bytes. Module 5 stops the guessing.",
         "Add a second `res.end` after the first and read the error Node gives you. That is the bug a missing `return` causes in module 7.",
         "Start two copies of the server on the same port and read `EADDRINUSE` properly. You will meet it again.",
         "Print `req.method` inside the handler — just to stdout, not to the response — and watch it change as you curl with `-X POST`. That is module 6, one line early.",

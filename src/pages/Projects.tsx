@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Navigate, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { api } from "../api";
 import type {
@@ -8,7 +8,7 @@ import type {
   ProjectTrack,
   SyntaxItem,
 } from "../types";
-import { Markdown } from "../components/Markdown";
+import { InlineMarkdown, Markdown } from "../components/Markdown";
 import { ExerciseCard, QuizSection } from "../components/LearnExercise";
 import { ExerciseSections } from "../components/ExerciseSections";
 import { ReferenceReveal } from "../components/ReferenceReveal";
@@ -23,6 +23,20 @@ import {
   unmarkExercisesSolved,
 } from "../lib/learnProgress";
 import { collectExerciseIds, plural, solvedLabel, studyTime } from "../lib/trackProgress";
+import {
+  buildCheatsheetIndex,
+  buildCheckIndex,
+  buildContractIndex,
+  buildGlossaryIndex,
+  buildPitfallIndex,
+  buildSyntaxIndex,
+  groupByModule,
+  isRetired,
+  matchesQuery,
+  type ContractEntry,
+  type GlossaryEntry,
+  type NoteEntry,
+} from "../lib/projectIndex";
 
 // Module completion is tracked in the same SQLite-backed chapter-done set as
 // the Learn tab, the courses and the Backend Lab, under a namespaced key so it
@@ -32,7 +46,7 @@ const moduleKey = (projectKey: string, key: string) => `project:${projectKey}:${
 /** Every judged exercise required to complete a module. */
 const requiredExerciseIds = (m: ProjectModule) => collectExerciseIds(m.steps, m.final_build);
 
-export default function Projects() {
+export default function Projects({ view }: { view?: "reference" } = {}) {
   const { project, module: moduleParam } = useParams();
   const [track, setTrack] = useState<ProjectTrack | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -112,6 +126,8 @@ export default function Projects() {
     }
     return <TrackOverview track={track} done={done} />;
   }
+
+  if (view === "reference") return <ProjectReference project={p} />;
 
   if (moduleParam) {
     const m = p.modules.find((x) => x.key === moduleParam);
@@ -237,6 +253,13 @@ function ProjectDetail({
               />
             </div>
           </div>
+          <button
+            className="ghost"
+            onClick={() => nav(`/projects/${project.key}/reference`)}
+            title="Every form, term, trap and check this project teaches, in one searchable page"
+          >
+            📚 Handbook
+          </button>
           {nextModule && (
             <button className="primary" onClick={() => nav(`/projects/${project.key}/${nextModule.key}`)}>
               {doneCount === 0 ? "Start module 1 →" : `Resume · module ${nextModule.number} →`}
@@ -486,6 +509,547 @@ function EndpointTable({
         </table>
       </div>
     </>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Reference — the project's handbook: everything four kinds of module writing
+// add up to, gathered into one searchable page.
+//
+// The track's claim is that nothing is used before it is taught, and until now
+// the evidence for that was spread one card at a time across module pages. By
+// module 8 the Todo API teaches around fifty forms, names sixty terms, warns
+// about forty traps and carries sixty acceptance checks — every one of them
+// inside a module you have already finished, half of them inside a collapsed
+// step. Nothing here is new data; see src/lib/projectIndex.ts for the
+// gathering, and note what each tab is FOR, because they are read at different
+// moments:
+//
+//   Syntax     read in order — top to bottom it is the syllabus
+//   Glossary   arrived at with a word in hand — A-Z
+//   Pitfalls   read when something is broken, which is never in the module
+//              that warned you about it
+//   Checks     read when something that used to work has stopped
+//
+// The last two are why this stopped being "the reference" and became the
+// handbook: they are the tabs you open in a hurry.
+// ---------------------------------------------------------------------------
+
+type RefTab = "syntax" | "glossary" | "pitfalls" | "checks" | "contract" | "cheatsheets";
+
+const REF_TABS: {
+  key: RefTab;
+  label: string;
+  /** What one row is, for the "n of m … match" line and the empty state. */
+  unit: string;
+  placeholder: string;
+  blurb: string;
+}[] = [
+  {
+    key: "syntax",
+    label: "🔤 Syntax",
+    unit: "form",
+    placeholder: "Search syntax, meanings, gotchas…",
+    blurb:
+      "Every piece of TypeScript the project teaches, in the order it is introduced. Read top to " +
+      "bottom and this is the exact order the project puts the language in front of you.",
+  },
+  {
+    key: "glossary",
+    label: "📖 Glossary",
+    unit: "term",
+    placeholder: "Search terms and definitions…",
+    blurb:
+      "Every term the project defines, A-Z — because this is the list you arrive at with a word " +
+      "in hand rather than one you read through.",
+  },
+  {
+    key: "pitfalls",
+    label: "⚠️ Pitfalls",
+    unit: "trap",
+    placeholder: "Search by symptom — “hangs”, “headers sent”, “404”…",
+    blurb:
+      "Every mistake the project warns you about, gathered out of the steps they were written in. " +
+      "Search by the symptom you are looking at, not by what you think caused it.",
+  },
+  {
+    key: "checks",
+    label: "✅ Checks",
+    unit: "check",
+    placeholder: "Search the acceptance checks…",
+    blurb:
+      "Every module's acceptance checklist. The project page has the finished application's list; " +
+      "this is what has to be true at each module along the way — the list to walk down when " +
+      "something that used to work has stopped.",
+  },
+  {
+    key: "contract",
+    label: "📋 Contract",
+    unit: "route",
+    placeholder: "Search by path, verb, status or purpose…",
+    blurb:
+      "The contract as it stands today, in the order the project builds it — which module each " +
+      "route arrived in, and which later modules changed it. Rows a module merely re-lists " +
+      "unchanged are not counted as changes.",
+  },
+  {
+    key: "cheatsheets",
+    label: "🧾 Cheat sheets",
+    unit: "sheet",
+    placeholder: "Search every cheat sheet…",
+    blurb:
+      "Every module's cheat sheet, end to end. The one tab meant to be read as a single page — " +
+      "the shortest complete description of everything the project has built so far.",
+  },
+];
+
+function ProjectReference({ project }: { project: Project }) {
+  const nav = useNavigate();
+  const [tab, setTab] = useState<RefTab>("syntax");
+  const [q, setQ] = useState("");
+
+  const syntax = useMemo(() => buildSyntaxIndex(project), [project]);
+  const glossary = useMemo(() => buildGlossaryIndex(project), [project]);
+  const pitfalls = useMemo(() => buildPitfallIndex(project), [project]);
+  const checks = useMemo(() => buildCheckIndex(project), [project]);
+  const contract = useMemo(() => buildContractIndex(project), [project]);
+  const sheets = useMemo(() => buildCheatsheetIndex(project), [project]);
+
+  const shownSyntax = useMemo(() => syntax.filter((e) => matchesQuery(e, q)), [syntax, q]);
+  const shownGlossary = useMemo(() => glossary.filter((e) => matchesQuery(e, q)), [glossary, q]);
+  const shownPitfalls = useMemo(() => pitfalls.filter((e) => matchesQuery(e, q)), [pitfalls, q]);
+  const shownChecks = useMemo(() => checks.filter((e) => matchesQuery(e, q)), [checks, q]);
+  const shownContract = useMemo(() => contract.filter((e) => matchesQuery(e, q)), [contract, q]);
+  const shownSheets = useMemo(() => sheets.filter((e) => matchesQuery(e, q)), [sheets, q]);
+
+  const syntaxGroups = useMemo(() => groupByModule(shownSyntax), [shownSyntax]);
+  const pitfallGroups = useMemo(() => groupByModule(shownPitfalls), [shownPitfalls]);
+  const checkGroups = useMemo(() => groupByModule(shownChecks), [shownChecks]);
+
+  const authored = project.modules.filter((m) => m.authored).length;
+  const total = project.modules.length;
+
+  const counts: Record<RefTab, number> = {
+    syntax: syntax.length,
+    glossary: glossary.length,
+    pitfalls: pitfalls.length,
+    checks: checks.length,
+    contract: contract.length,
+    cheatsheets: sheets.length,
+  };
+  const shownCounts: Record<RefTab, number> = {
+    syntax: shownSyntax.length,
+    glossary: shownGlossary.length,
+    pitfalls: shownPitfalls.length,
+    checks: shownChecks.length,
+    contract: shownContract.length,
+    cheatsheets: shownSheets.length,
+  };
+  const active = REF_TABS.find((t) => t.key === tab) ?? REF_TABS[0]!;
+  const shown = shownCounts[tab];
+  const all = counts[tab];
+  /** Tabs other than this one that the current query also hits. One search box
+   * over four indexes makes these the most useful thing on screen: a query that
+   * finds nothing here is very often sitting in the next tab along. */
+  const elsewhere = REF_TABS.filter((t) => t.key !== tab && shownCounts[t.key] > 0);
+
+  const openModule = (key: string) => nav(`/projects/${project.key}/${key}`);
+  /** Deep-link to the step a pitfall was written in. `ModuleDetail` reads
+   * `?step=` and opens and scrolls to it, so a trap found here lands on the
+   * paragraph that explains it rather than the top of a long module page. */
+  const openStep = (moduleKey: string, stepKey: string) =>
+    nav(`/projects/${project.key}/${moduleKey}${stepKey ? `?step=${stepKey}` : ""}`);
+
+  return (
+    <div className="page">
+      <div className="row" style={{ marginBottom: 4 }}>
+        <button className="ghost" onClick={() => nav(`/projects/${project.key}`)}>
+          ← {project.title}
+        </button>
+        {/* The tab buttons carry the per-tab counts, so this says the thing
+            they cannot: how much of the project is in here at all. */}
+        <span className="badge">
+          {authored}/{total} modules written
+        </span>
+      </div>
+
+      <h1 className="page-title" style={{ marginTop: 6 }}>
+        Handbook
+      </h1>
+      <p className="page-sub">
+        Everything {project.title} teaches, gathered from all {authored} written{" "}
+        {authored === 1 ? "module" : "modules"} — the syllabus, the vocabulary, every trap it warns
+        you about and every check it asks you to run.
+      </p>
+
+      <div className="row" style={{ gap: 8, margin: "0 0 10px", alignItems: "center", flexWrap: "wrap" }}>
+        {REF_TABS.map((t) => (
+          <button
+            key={t.key}
+            className={tab === t.key ? "primary" : "ghost"}
+            onClick={() => setTab(t.key)}
+            aria-pressed={tab === t.key}
+          >
+            {t.label} · {counts[t.key]}
+          </button>
+        ))}
+        <span className="spacer" />
+        <input
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          placeholder={active.placeholder}
+          style={{ minWidth: 240 }}
+          aria-label="Search the handbook"
+        />
+        {q && (
+          <button className="ghost" onClick={() => setQ("")} title="Clear the search">
+            ✕
+          </button>
+        )}
+      </div>
+
+      <p className="dim" style={{ fontSize: 13, margin: "0 0 12px" }}>
+        {active.blurb}
+      </p>
+
+      {q && (
+        <p className="faint" style={{ fontSize: 12, margin: "0 0 10px" }}>
+          {plural(shown, active.unit)} of {all} match “{q}”
+          {elsewhere.length > 0 && (
+            <>
+              {" · also "}
+              {elsewhere.map((t, i) => (
+                <span key={t.key}>
+                  {i > 0 && ", "}
+                  <ClickableRow
+                    style={{
+                      display: "inline",
+                      color: "var(--accent)",
+                      textDecoration: "underline",
+                    }}
+                    title={`Show the ${shownCounts[t.key]} matching under ${t.label}`}
+                    onActivate={() => setTab(t.key)}
+                  >
+                    {shownCounts[t.key]} in {t.label}
+                  </ClickableRow>
+                </span>
+              ))}
+            </>
+          )}
+        </p>
+      )}
+
+      {shown === 0 ? (
+        <Empty
+          icon="🔍"
+          text={
+            q
+              ? `No ${active.unit} in ${active.label} matches “${q}”.`
+              : `This project has not written any ${active.unit}s yet.`
+          }
+        />
+      ) : tab === "syntax" ? (
+        syntaxGroups.map((group) => (
+          <ModuleGroup
+            key={group.ref.moduleKey}
+            group={group}
+            count={group.entries.length}
+            unit="form"
+            onOpenModule={openModule}
+          >
+            {group.entries.map((e) => (
+              <SyntaxCard key={e.form} item={e} />
+            ))}
+          </ModuleGroup>
+        ))
+      ) : tab === "glossary" ? (
+        <div className="card">
+          {shownGlossary.map((e, i) => (
+            <GlossaryRow
+              key={e.term}
+              entry={e}
+              last={i === shownGlossary.length - 1}
+              onOpenModule={openModule}
+            />
+          ))}
+        </div>
+      ) : tab === "pitfalls" ? (
+        pitfallGroups.map((group) => (
+          <ModuleGroup
+            key={group.ref.moduleKey}
+            group={group}
+            count={group.entries.length}
+            unit="trap"
+            onOpenModule={openModule}
+          >
+            <div className="card" style={{ borderColor: "var(--bad)" }}>
+              {group.entries.map((e, i) => (
+                <NoteRow
+                  key={`${e.stepKey}:${i}`}
+                  entry={e}
+                  last={i === group.entries.length - 1}
+                  marker="⚠️"
+                  onOpen={openStep}
+                />
+              ))}
+            </div>
+          </ModuleGroup>
+        ))
+      ) : tab === "checks" ? (
+        checkGroups.map((group) => (
+          <ModuleGroup
+            key={group.ref.moduleKey}
+            group={group}
+            count={group.entries.length}
+            unit="check"
+            onOpenModule={openModule}
+          >
+            <div className="card" style={{ borderColor: "var(--good)" }}>
+              {group.entries.map((e, i) => (
+                <NoteRow
+                  key={i}
+                  entry={e}
+                  last={i === group.entries.length - 1}
+                  marker="☐"
+                  onOpen={openStep}
+                />
+              ))}
+            </div>
+          </ModuleGroup>
+        ))
+      ) : tab === "contract" ? (
+        <ContractTable rows={shownContract} onOpenModule={openModule} />
+      ) : (
+        shownSheets.map((sheet) => (
+          <div key={sheet.moduleKey} style={{ marginBottom: 22 }}>
+            <ClickableRow
+              className="row"
+              style={{ alignItems: "baseline", gap: 8, marginBottom: 6 }}
+              title={`Open module ${sheet.moduleNumber}`}
+              onActivate={() => openModule(sheet.moduleKey)}
+            >
+              <span className="mono" style={{ color: "var(--accent)" }}>
+                {sheet.moduleNumber}
+              </span>
+              <strong>{sheet.moduleTitle}</strong>
+            </ClickableRow>
+            <Markdown>{sheet.text}</Markdown>
+          </div>
+        ))
+      )}
+
+      {authored < total && (
+        <p className="faint" style={{ fontSize: 12, marginTop: 20, textAlign: "center" }}>
+          {authored} of {total} modules are written. This page grows with them.
+        </p>
+      )}
+    </div>
+  );
+}
+
+/** The contract as built so far: every route, when it arrived, and every later
+ * module that changed it.
+ *
+ * This is the one view in the app that reads the project as a *ladder* rather
+ * than a list — the "Added" column in order is the order the API grew. The
+ * "Changed in" column is the part that could not be got any other way: module
+ * 18 replaces `GET /todos`'s bare array with an envelope on purpose, and until
+ * now the only record of that was a paragraph inside module 18. */
+function ContractTable({
+  rows,
+  onOpenModule,
+}: {
+  rows: ContractEntry[];
+  onOpenModule: (key: string) => void;
+}) {
+  return (
+    <div className="card" style={{ overflowX: "auto", padding: 0 }}>
+      <table className="data" style={{ cursor: "default" }}>
+        <thead>
+          <tr>
+            <th style={{ cursor: "default" }}>Method</th>
+            <th style={{ cursor: "default" }}>Path</th>
+            <th style={{ cursor: "default" }}>Purpose</th>
+            <th style={{ cursor: "default" }}>Request</th>
+            <th style={{ cursor: "default" }}>Response</th>
+            <th style={{ cursor: "default" }}>Status</th>
+            <th style={{ cursor: "default" }}>Added</th>
+            <th style={{ cursor: "default" }}>Changed in</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((e) => {
+            // A route a later module removed. Kept in the table rather than
+            // dropped, because "this used to exist and does not any more" is
+            // part of the contract's history and answers a real question.
+            const gone = isRetired(e);
+            return (
+            <tr key={`${e.method} ${e.path}`} style={{ cursor: "default", opacity: gone ? 0.5 : 1 }}>
+              <td className="mono" style={{ color: "var(--accent)", whiteSpace: "nowrap" }}>
+                {e.method}
+              </td>
+              <td
+                className="mono"
+                style={{ whiteSpace: "nowrap", textDecoration: gone ? "line-through" : undefined }}
+              >
+                {e.path}
+              </td>
+              <td>{e.purpose}</td>
+              <td className="mono faint" style={{ fontSize: 12 }}>
+                {e.request || "—"}
+              </td>
+              <td className="mono faint" style={{ fontSize: 12 }}>
+                {e.response || "—"}
+              </td>
+              <td className="mono" style={{ whiteSpace: "nowrap", fontSize: 12 }}>
+                {e.status}
+              </td>
+              <td>
+                <ClickableRow
+                  className="badge"
+                  title={`Added in module ${e.moduleNumber}: ${e.moduleTitle}`}
+                  onActivate={() => onOpenModule(e.moduleKey)}
+                >
+                  M{e.moduleNumber}
+                </ClickableRow>
+              </td>
+              <td>
+                {e.revisions.length === 0 ? (
+                  <span className="faint">—</span>
+                ) : (
+                  e.revisions.map((r) => (
+                    <ClickableRow
+                      key={r.moduleKey}
+                      className="badge"
+                      style={{ marginRight: 4 }}
+                      title={
+                        gone && r === e.revisions[e.revisions.length - 1]
+                          ? `Retired in module ${r.moduleNumber}: ${r.moduleTitle}`
+                          : `Changed in module ${r.moduleNumber}: ${r.moduleTitle}`
+                      }
+                      onActivate={() => onOpenModule(r.moduleKey)}
+                    >
+                      M{r.moduleNumber}
+                    </ClickableRow>
+                  ))
+                )}
+              </td>
+            </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+/** A module heading with its rows underneath — shared by the three tabs that
+ * group by module, so they cannot drift apart in spacing or wording. */
+function ModuleGroup({
+  group,
+  count,
+  unit,
+  onOpenModule,
+  children,
+}: {
+  group: { ref: { moduleKey: string; moduleNumber: number; moduleTitle: string } };
+  count: number;
+  unit: string;
+  onOpenModule: (key: string) => void;
+  children: ReactNode;
+}) {
+  return (
+    <div style={{ marginBottom: 18 }}>
+      <ClickableRow
+        className="row"
+        style={{ alignItems: "baseline", gap: 8, marginBottom: 6 }}
+        title={`Open module ${group.ref.moduleNumber}`}
+        onActivate={() => onOpenModule(group.ref.moduleKey)}
+      >
+        <span className="mono" style={{ color: "var(--accent)" }}>
+          {group.ref.moduleNumber}
+        </span>
+        <strong>{group.ref.moduleTitle}</strong>
+        <span className="spacer" />
+        <span className="dim mono" style={{ fontSize: 12 }}>
+          {plural(count, unit)}
+        </span>
+      </ClickableRow>
+      {children}
+    </div>
+  );
+}
+
+/** One pitfall or acceptance check. A pitfall carries the step it was written
+ * in and links straight to it; a check belongs to the module as a whole. */
+function NoteRow({
+  entry,
+  last,
+  marker,
+  onOpen,
+}: {
+  entry: NoteEntry;
+  last: boolean;
+  marker: string;
+  onOpen: (moduleKey: string, stepKey: string) => void;
+}) {
+  return (
+    <ClickableRow
+      className="row"
+      style={{
+        gap: 8,
+        alignItems: "flex-start",
+        padding: "6px 0",
+        borderBottom: last ? undefined : "1px solid var(--border)",
+      }}
+      title={
+        entry.stepTitle
+          ? `Open module ${entry.moduleNumber}, step “${entry.stepTitle}”`
+          : `Open module ${entry.moduleNumber}`
+      }
+      onActivate={() => onOpen(entry.moduleKey, entry.stepKey)}
+    >
+      <span style={{ width: 18, flexShrink: 0 }}>{marker}</span>
+      <span style={{ flex: 1 }}>
+        <InlineMarkdown>{entry.text}</InlineMarkdown>
+      </span>
+      {entry.stepTitle && (
+        <span className="badge" style={{ flexShrink: 0 }}>
+          {entry.stepTitle}
+        </span>
+      )}
+    </ClickableRow>
+  );
+}
+
+function GlossaryRow({
+  entry,
+  last,
+  onOpenModule,
+}: {
+  entry: GlossaryEntry;
+  last: boolean;
+  onOpenModule: (key: string) => void;
+}) {
+  return (
+    <div
+      style={{
+        padding: "6px 0",
+        borderBottom: last ? undefined : "1px solid var(--border)",
+      }}
+    >
+      <div className="row" style={{ alignItems: "baseline", gap: 8 }}>
+        <code style={{ color: "var(--accent)" }}>{entry.term}</code>
+        <span style={{ flex: 1 }}>— {entry.def}</span>
+        <ClickableRow
+          className="badge"
+          title={`Taught in module ${entry.moduleNumber}`}
+          onActivate={() => onOpenModule(entry.moduleKey)}
+        >
+          M{entry.moduleNumber}
+        </ClickableRow>
+      </div>
+    </div>
   );
 }
 
@@ -1119,7 +1683,7 @@ function StepBody({ step, onSolved }: { step: BackendStep; onSolved: (id: string
           <ul style={{ margin: "4px 0 0", paddingLeft: 20 }}>
             {step.pitfalls.map((p, i) => (
               <li key={i} style={{ marginBottom: 4 }}>
-                {p}
+                <InlineMarkdown>{p}</InlineMarkdown>
               </li>
             ))}
           </ul>

@@ -189,7 +189,10 @@ far as it will go. The first — and, for now, only — project is a **Todo API*
 a complete, validated, persistent CRUD service over plain `node:http`, in
 **TypeScript**, with no dependencies at all. **Twenty modules in five phases:**
 model the data → put it on the network → full CRUD → make it trustworthy →
-make it real. **Modules 1-4 ship today: 16 steps and 29 judged exercises.**
+make it real. **Modules 1-9 ship today — phases 1 and 2 complete and phase 3
+under way: 36 steps and 79 judged exercises**, taking you from "what is a todo"
+to a server that creates them from what a client posts, hands back the id it
+assigned, and 404s everything it does not handle.
 
 Where the Backend Lab's unit is a *project* you finish in an evening, this
 track's unit is a **module** — one 30-60 minute slice that adds exactly one
@@ -223,7 +226,33 @@ is proved twice, by `tools/verify_projects.py` and
 `src-tauri/tests/verify_projects.rs`, which also assert that every starter
 *fails*.
 
-The plan for the remaining 17 modules, and the six decisions taken before
+Because that claim is the track's whole product, each project also has a
+**Handbook** (`/projects/:project/reference`) — one searchable page with six
+tabs, gathered from every written module:
+
+- **🔤 Syntax** — every form the project teaches, in the order it introduces
+  them. Recaps are dropped and the earliest module wins, so read top to bottom
+  this half *is* the syllabus, and every row links to where it was explained.
+- **📖 Glossary** — every term the project defines, A-Z, because that is the
+  list you arrive at with a word in hand.
+- **⚠️ Pitfalls** — every "this will cost you an hour" warning the track has
+  written, lifted out of the collapsed steps they live in. Each row deep-links
+  to the exact step, and you search them by *symptom*: "hangs", "headers sent".
+- **✅ Checks** — every module's acceptance list. The list to walk down when
+  something that used to work has stopped.
+- **📋 Contract** — the API as it stands, in the order the project builds it:
+  which module each route arrived in and which later ones changed it. A route a
+  module retires (module 8's `POST /echo`, spent in module 9) stays in the table
+  struck through, because "this used to exist" is worth keeping. A module merely
+  re-listing an unchanged row is not reported as a change.
+- **🧾 Cheat sheets** — every module's cheat sheet end to end: the shortest
+  complete description of everything built so far, on one page.
+
+One search box covers all six, and tells you where else it hit — a query with
+no match here prints `also 3 in ⚠️ Pitfalls` as a link, which is how searching a
+symptom finds the answer without knowing which tab to look in.
+
+The plan for the remaining 11 modules, and the six decisions taken before
 authoring, live in [`PROJECTS_ROADMAP.md`](PROJECTS_ROADMAP.md).
 
 ### TypeScript course

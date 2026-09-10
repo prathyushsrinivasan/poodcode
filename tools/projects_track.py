@@ -299,13 +299,21 @@ _TODO_SCOPE_RULES = [
     (".listen(", 4),
     ("res.end(", 4),
     ("res.writeHead(", 5),
+    ("req.method", 6),
+    ("req.url", 6),
+    # `??` lands here rather than earlier because module 6 is the first place the
+    # COMPILER forces it: `new URL(req.url, base)` is a type error, since the
+    # target is `string | undefined` and the constructor takes a `string`. The
+    # driver uses it four modules early, which is exactly what `_GIVEN_MARKER`
+    # is for.
+    ("??", 6),
     ("new URL(", 6),
     (".pathname", 6),
-    ("req.method", 6),
     # --- Phase 3: full CRUD ------------------------------------------------
     ('req.on("data"', 8),
     ("setEncoding(", 8),
     ("new Promise", 8),
+    (".then(", 8),
     ("async ", 8),
     ("await ", 8),
     ("JSON.parse(", 9),
@@ -494,6 +502,11 @@ _TODO_MODULE_FILES = (
     "todo_m02_store.py",
     "todo_m03_lookup.py",
     "todo_m04_server.py",
+    "todo_m05_json.py",
+    "todo_m06_request.py",
+    "todo_m07_routing.py",
+    "todo_m08_body.py",
+    "todo_m09_create.py",
 )
 
 _TODO_MODULES = []
@@ -507,26 +520,6 @@ for _fname in _TODO_MODULE_FILES:
 # --- Planned modules ------------------------------------------------------
 # Delete a line here as its file lands in `_TODO_MODULE_FILES` above.
 _TODO_MODULES += [
-    _pskel("todo-json", 5, "network", "Status codes and JSON",
-           "writeHead, Content-Type, and one `send` helper for every response",
-           "Answer with a status code and a JSON body, from a single place.",
-           "Every response is JSON with a deliberate status code."),
-    _pskel("todo-url", 6, "network", "Reading the request",
-           "req.method and the URL, parsed properly rather than by string match",
-           "Tell one request apart from another.",
-           "The server knows which path and which verb it was asked for."),
-    _pskel("todo-routing", 7, "network", "Routing, and 404 as the default",
-           "match method + path, fall through to not_found",
-           "Serve GET /todos from the store, and 404 everything else.",
-           "The list you built in phase 1 is live over HTTP."),
-    _pskel("todo-body", 8, "crud", "Reading a request body",
-           "streams, promises, async/await — the body arrives in chunks",
-           "Collect a request body and hand it back as a string.",
-           "The server can read what the client sent."),
-    _pskel("todo-create", 9, "crud", "POST /todos — create",
-           "parse the body, add to the store, answer 201",
-           "Create a todo over HTTP.",
-           "Todos come from clients rather than from a hard-coded array."),
     _pskel("todo-one", 10, "crud", "GET /todos/:id — dynamic paths",
            "split the pathname, parse the id, 404 when it isn't there",
            "Serve one todo by its id.",

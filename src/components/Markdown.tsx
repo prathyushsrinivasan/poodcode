@@ -9,3 +9,21 @@ export function Markdown({ children }: { children: string }) {
     </div>
   );
 }
+
+/** One line of markdown with no block wrapper around it.
+ *
+ * The content tracks write single-line prose with inline code in it — a
+ * pitfall, an acceptance check, an objective — and rendering those as plain
+ * text leaves the backticks on screen. This drops the `<p>` react-markdown
+ * would otherwise emit, so a line can sit inside a flex row or a list item
+ * without a block element fighting the layout. */
+export function InlineMarkdown({ children }: { children: string }) {
+  return (
+    <ReactMarkdown
+      remarkPlugins={[remarkGfm]}
+      components={{ p: ({ children: c }) => <>{c}</> }}
+    >
+      {children || ""}
+    </ReactMarkdown>
+  );
+}

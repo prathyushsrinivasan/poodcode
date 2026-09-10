@@ -114,16 +114,22 @@ export function CommandPalette() {
           hint: `Backend Lab · ${p.tagline}`,
           run: () => navigate(`/backend/${p.key}`),
         })),
-      ...(tracks.projects?.projects ?? []).flatMap((pr) =>
-        (pr.modules ?? [])
+      ...(tracks.projects?.projects ?? []).flatMap((pr) => [
+        ...(pr.modules ?? [])
           .filter((m) => m.authored)
           .map((m) => ({
             id: `module-${pr.key}-${m.key}`,
             label: `Module ${m.number}. ${m.title}`,
             hint: `${pr.title} · ${m.what}`,
             run: () => navigate(`/projects/${pr.key}/${m.key}`),
-          }))
-      ),
+          })),
+        {
+          id: `reference-${pr.key}`,
+          label: `${pr.title} · Handbook`,
+          hint: "Every form, term, trap and check the project teaches, searchable",
+          run: () => navigate(`/projects/${pr.key}/reference`),
+        },
+      ]),
     ],
     [tracks, navigate]
   );

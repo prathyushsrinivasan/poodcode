@@ -1,8 +1,9 @@
-# Projects Roadmap — the Todo API, modules 5-20
+# Projects Roadmap — the Todo API, modules 10-20
 
 The plan for finishing **Todo API**, the first project in the new **Projects**
-track (`tools/projects_track.py`). Modules 1-4 ship; 5-20 are one-line skeletons
-waiting to be authored.
+track (`tools/projects_track.py`). Modules 1-9 ship — phases 1 and 2 are
+complete and phase 3 is under way — and 10-20 are one-line skeletons waiting to
+be authored.
 
 Where [`TS_ROADMAP.md`](TS_ROADMAP.md) plans a *time* ladder (32 weeks) and
 [`JAVA_ROADMAP.md`](JAVA_ROADMAP.md) plans a *topic* ladder (31 modules), this
@@ -16,10 +17,22 @@ arrive in.
 
 ## Where it stands
 
-**Built:** modules 1-4 — **16 steps, 29 judged exercises**, four revealable
-reference implementations, and the full infrastructure the other sixteen
-modules will drop into. Both program shapes are proven end to end: `_plain`
+**Built:** modules 1-9 — **36 steps, 79 judged exercises**, nine revealable
+reference implementations, and the full infrastructure the other eleven modules
+will drop into. Both program shapes are proven end to end: `_plain`
 (modules 1-3) and `_server` (module 4 on, booting a real server on port 0).
+
+**Phase 2 closed with module 7**, which is the first module where the learner's
+own data goes over HTTP. The application now answers `GET /todos` from the store
+and 404s everything else, behind a router that the remaining twelve modules
+add one `if` to each.
+
+**Phase 3 opened with module 8**, the track's biggest syntax jump, and it landed
+without needing the extra budget the plan set aside. **Module 9 closed the loop
+that started in module 1**: data in the application now comes from outside it,
+the seed calls and the `/echo` route are gone, and the API accepts three things
+it should not — which is the whole argument for phase 4, made from evidence
+rather than assertion.
 
 | | |
 |---|---|
@@ -27,9 +40,10 @@ modules will drop into. Both program shapes are proven end to end: `_plain`
 | Generated seed | `src-tauri/seeds/projects.json` |
 | Rust model | `ProjectTrack` → `Project` → `ProjectModule` → `BackendStep` in `models.rs` |
 | Command | `projects_track` (`commands.rs`), registered in `lib.rs` |
-| UI | `src/pages/Projects.tsx`, routes `/projects`, `/projects/:project`, `/projects/:project/:module` |
-| Fast verifier | `python tools/verify_projects.py --starters` (~40 s at 4 modules) |
-| Judge-level verifier | `cd src-tauri && cargo test --test verify_projects` (~28 s at 4 modules) |
+| UI | `src/pages/Projects.tsx`, routes `/projects`, `/projects/:project`, `/projects/:project/reference`, `/projects/:project/:module` |
+| Handbook index | `src/lib/projectIndex.ts` — six indexes: syntax, glossary, pitfalls, checks, contract, cheat sheets |
+| Fast verifier | `python tools/verify_projects.py --starters` (~110 s at 10 modules) |
+| Judge-level verifier | `cd src-tauri && cargo test --test verify_projects` (~75 s at 10 modules) |
 
 ### The five questions every module answers
 
@@ -44,6 +58,84 @@ a size that fits in one sitting.
 | 3 | What syntax do I need? | `syntax: SyntaxItem[]` — form, meaning, example, gotcha |
 | 4 | What do I do? | `steps[]` — instructions, `checkpoint`, `pitfalls`, warm-up, exercises |
 | 5 | Did I get it? | `final_build` + `acceptance` + `reference` (the reveal) |
+
+### The Handbook — where questions 3, 4 and 5 go to live
+
+`/projects/:project/reference` gathers four kinds of module writing into one
+searchable page (`src/lib/projectIndex.ts`). It started as a syntax-and-glossary
+reference; it grew two more tabs once it became clear the tabs are read at
+completely different *moments*:
+
+| Tab | Source field | Ordered | Read when |
+|---|---|---|---|
+| 🔤 **Syntax** | `syntax[]`, minus recaps | by module | you are learning — top to bottom it *is* the syllabus |
+| 📖 **Glossary** | `glossary[]` | A-Z | you arrive with a word in hand |
+| ⚠️ **Pitfalls** | every step's `pitfalls[]` | by module, then step | **something is broken** |
+| ✅ **Checks** | each module's `acceptance[]` | by module | **something that used to work has stopped** |
+| 📋 **Contract** | each module's `endpoints[]` | by the module that added the row | "when does `DELETE` start working?" · "did `GET /todos` change under me?" |
+| 🧾 **Cheat sheets** | each module's `cheatsheet` | by module | you want the whole project on one page |
+
+The bottom two are the reason the page stopped being called a reference. They
+are the tabs you open in a hurry, and until they existed the forty-odd pitfalls
+the track has written lived inside a *collapsed step* inside a module you had
+already finished — which is exactly the wrong place, because you want that list
+at the one moment you are not reading the module that wrote it.
+
+Three details worth keeping through any rewrite:
+
+* **A pitfall row deep-links to its step**, not to the module — `?step=<key>`,
+  which `ModuleDetail` already opens and scrolls to. Landing on the top of a
+  1,000-line module page would have thrown away half the feature.
+* **Pitfalls are not deduplicated per module.** Two modules warning about the
+  same trap from different angles is the track working. Only a byte-identical
+  repeat is dropped. (Syntax is the opposite: first-taught wins, always.)
+* **One search box, four indexes, and it says where else it hit.** A query with
+  no match in the current tab prints `also 3 in ⚠️ Pitfalls` as a link. This is
+  the cheapest thing on the page and the one that changes how it is used —
+  searching a symptom like `hangs` lands in Pitfalls without knowing to go there.
+
+**The contract tab is the one that reads the project as a ladder**, and two
+rules keep it honest:
+
+* **A rewording is not a revision.** Rows are compared on `request`, `response`
+  and `status` only — never `purpose`, which is prose a later module often puts
+  better. The newest wording wins for display; only a contract change is listed
+  under "Changed in". Building this immediately caught `GET /todos` being
+  reported as changed in modules 8 and 9 when it had not moved since 7, and both
+  modules' rows were corrected.
+* **Retirement is declared in the data, not the schema.** A module that removes
+  a route re-declares it with an **em-dash status**, and the row renders struck
+  through. Module 9 does this for module 8's `POST /echo`. Without it the
+  contract index would go on advertising a route the application no longer has —
+  and "this used to exist" is worth keeping rather than deleting.
+
+**What that asks of a module author.** Six fields stopped being page decoration
+and became index entries. Four of these are new asks:
+
+* **`pitfalls` are now a published index**, so write each one as a *symptom
+  first*, not a cause first — "the request hangs with no error anywhere;
+  `resolve` was never called" rather than the reverse. That is the word the
+  reader searches for.
+* **`acceptance` is now cross-module**, so each check must make sense out of its
+  module's context. Name the command and the expected answer.
+* **`endpoints` rows must be word-for-word identical to the previous module's**
+  when the route has not changed, or the contract tab reports a revision that
+  did not happen. Reword the `purpose` freely; leave `request`/`response`/
+  `status` alone unless you mean it.
+* **`cheatsheet` is read as part of one long page**, so it must stand on its own
+  — no "as above", no pronouns pointing at the module's prose.
+
+* **`recap=True` now means something.** A recap is dropped from the index, on
+  the grounds that it points at an explanation rather than being one. So mark a
+  primer entry `recap` whenever an earlier module introduced the form — module 7
+  recaps the store, the parse and `send` — and do *not* mark the module's own new
+  syntax that way, or it vanishes from the index.
+* **`form` is a key.** Entries are deduplicated by exact `form` string, so write
+  it the way the code writes it (which `_lint_syntax_taught` already required)
+  and keep it identical across a recap and its original.
+
+Nothing about this changes the seed or the Rust model — it is all derived from
+data the modules already carry.
 
 ---
 
@@ -176,7 +268,7 @@ status codes · `noUncheckedIndexedAccess`.
 this `if` with an HTTP response in it, and it is deliberately taught before
 there is any HTTP in the way.
 
-### Phase 2 — Put it on the network (4-7) — 🚧 **4 done, 5-7 outstanding**
+### Phase 2 — Put it on the network (4-7) — ✅ **done**
 
 Ends with: a real server answering `GET /todos`, 404ing everything else.
 
@@ -195,32 +287,131 @@ that unexplained makes the exercises feel like magic. Step 4 also sets up module
 that the point rather than an omission, because a module that half-routes is a
 mess you debug in module 7.
 
-**5. Status codes and JSON** ⬜ · `writeHead`, `Content-Type`, one `send` helper
-*Note:* the `send(res, status, data)` helper introduced here is used unchanged
-for the rest of the project, so it is worth getting the signature right. The
-Backend Lab's version is a good reference.
+**5. Status codes and JSON** ✅ · `todo_m05_json.py` · 4 steps, 10 exercises
+`writeHead` · the header object · `Content-Type` · `JSON.stringify` key order ·
+the `send(res, status, data)` helper · the six status codes and whose fault each
+one is.
+**The decision the plan didn't have to make:** what type `data` is. `unknown` is
+gated to module 13 and a union of today's shapes would need editing in six later
+modules, so it is **`object`** — true of every response this API sends, since an
+array is an object, and it usefully rejects a bare string. Module 13 sharpens it.
+**A gap worth knowing about:** the replayer prints `<status> <body>` and no
+headers, so **no exercise in this module can check `Content-Type`**. Step 2 says
+so outright rather than letting a learner find it; the header is verified by the
+acceptance list and `curl -i`. It is the only place in the track with this hole.
+**The answer is 404, deliberately** — a server that handles no routes yet has
+"there is nothing at this address" as its *correct* answer, and module 7 then
+adds routes above a working default rather than building both at once.
 
-**6. Reading the request** ⬜ · `req.method`, `new URL(req.url ?? "/", base)`
-*Why a `URL` rather than a string compare:* `/todos?done=true` does not equal
-`/todos`, and finding that out in module 17 would mean rewriting the router.
+**6. Reading the request** ✅ · `todo_m06_request.py` · 4 steps, 10 exercises
+`req.method` · `req.url` and why the name lies · `??` · `new URL(target, base)` ·
+`.pathname`.
+**The structure the plan didn't predict** is the method/URL split, and it is
+worth preserving through any re-cut: `req.method` is only ever *compared*
+(`req.method === "GET"` is legal on `string | undefined` with no narrowing), so
+it needs nothing; `req.url` has its value *used*, so it needs the fallback. That
+is why `??` is introduced in step 2 rather than step 1 — it lands at the first
+point the compiler forces it, since `new URL(req.url, base)` is a type error.
+**Two exercises had to be rewritten** because the verifier caught them: a `fix`
+on `||`-vs-`??` and one on the disappearing `undefined` key both only misbehave
+on a *malformed* request, and the replayer only ever sends well-formed ones. Both
+lessons are still taught in prose, pitfalls and quizzes; the graded fixes became
+"the right union, the wrong property" and "parsed once, for every request", which
+fail on ordinary input. **Worth remembering when authoring modules 8-20: if a
+bug needs a broken request to show itself, it cannot be a graded `fix`.**
 
-**7. Routing, and 404 as the default** ⬜ · match method + path, fall through
-*Capstone of the phase:* wires phase 1's store to the network. First module
-where the learner sees their own data over HTTP.
+**7. Routing, and 404 as the default** ✅ · `todo_m07_routing.py` · 4 steps, 8 exercises
+The route as method + path · `&&` not `||` · the `return` after every `send` ·
+serving the store · the fall-through as the last statement · adding a second
+route · 405.
+**Capstone of the phase, and it introduces no new gated syntax at all** — which
+is the mark of a capstone working. Everything is composition: `if`, `&&`,
+`return`, the store from 2-3, `send` from 5, the parse from 6.
+**Seeded at boot:** there is no POST until module 9, so the programs call
+`addTodo` twice before `listen` or `GET /todos` would only ever return `[]`.
+Deleted in module 9.
+**No timeout-based exercise, on purpose.** The signature bug here — a handler
+with no fall-through — *hangs* rather than failing, so grading it would cost a
+25 s Python timeout plus a 30 s Rust one to re-teach what module 4 step 3 already
+covers with a one-line `res.end()` fix. It is taught in the warm-up, the pitfalls
+and a manual test that has you delete the line and watch curl sit there.
+**The 405 question is raised and answered "no":** `POST /todos` is arguably a 405
+rather than a 404, and doing 405 properly needs the set of verbs a path allows
+plus an `Allow` header — which is a routing table, which is module 20. Naming the
+simplification is cheaper than a learner finding it.
 
 ### Phase 3 — Full CRUD (8-12)
 
 Ends with: create, read, update and delete — the complete resource.
 One module per verb, because each has its own status code and its own failure.
 
-**8. Reading a request body** ⬜ · streams → promise, `async`/`await`,
-`setEncoding`
-*Introduces `async`/`await`* (decision 3: `setEncoding` first, so the chunk
-really is a `string`). *Risk:* the biggest single syntax jump in the track.
-Budget a longer module; consider splitting the promise wrapper into its own step
-with its own drills.
+**8. Reading a request body** ✅ · `todo_m08_body.py` · 4 steps, 12 exercises
+`req.on("data")` / `"end"` · `setEncoding` · `new Promise` · `.then` ·
+`async`/`await` · the body inside a route.
+**The plan's advice was right and was taken:** the promise wrapper got its own
+step. What the plan did not predict is that it wanted *three*, not two — the
+module is one idea taught three times, and the ladder is the module:
 
-**9. POST /todos — create** ⬜ · `JSON.parse`, 201, the id the client did not send
+| Step | Shape | What it fixes | What is still wrong |
+|---|---|---|---|
+| 1 | `req.on("end", …)` | first thing that works | the body only exists in a callback |
+| 2 | `readBody(req).then(…)` | collecting becomes a reusable function | still a callback, still cannot `return` |
+| 3 | `await readBody(req)` | the body is a value on a line | nothing |
+| 4 | in the router | module 7's shape, plus one `await` | — |
+
+Teaching `await` first and back-filling the events saves ten minutes and loses
+the reason any of it exists. **`.then(` was added to `_TODO_SCOPE_RULES` at 8**
+so that step 2 is a taught shape rather than a smuggled one.
+
+**A whole family of bugs turned out to be ungradable, and it is worth
+remembering.** Every accumulation bug here — `body = chunk` instead of
+`body = body + chunk`, `resolve` in the `"data"` listener instead of `"end"`,
+answering from the first chunk — is **invisible at test size**, because Node
+delivers a 20-byte body in exactly one chunk. The buggy and correct programs
+print the same thing. This is module 6's rule in a new costume: there, a bug
+needed a *malformed* request; here it needs a *64 KB* one. All three are taught
+in prose, pitfalls and quizzes; the manual test has you post 200 KB and watch one
+of them finally show up.
+
+The two graded `fix`es were chosen because they fail on a five-byte body, and
+both fail at run time rather than compile time:
+* `send` outside the `"end"` listener → answers `{"echo":"","length":0}` instantly
+* a missing `await` → answers `{"echo":{}}` with a 200 and no error anywhere
+
+**No hang is graded**, for module 7's reason: a promise that never resolves is
+this module's signature disaster and costs 25 s + 30 s of timeout per run,
+forever, to re-teach module 4 step 3.
+
+**`/echo` is scaffolding and the module says so.** `JSON.parse` is module 9's, so
+the only honest thing to do with a body today is hand it back — and the reply
+comes back with its quotes escaped, which is the cleanest possible proof that
+you are holding *text*, not an object. Module 9 deletes the route and keeps the
+`await readBody(req)` line verbatim.
+
+**9. POST /todos — create** ✅ · `todo_m09_create.py` · 4 steps, 10 exercises
+`JSON.parse` and the `any` it hands back · 201 Created · the id the client did
+not send · the route, and the empty list.
+**The module where the application stops being yours** — the first data in it
+that came from outside the process, and the first time "what id does it get?"
+has the answer "not the one they sent".
+**The plan's three bullets held, and a fourth was needed:** the deletions.
+The two `addTodo` seed calls (module 7) and the `/echo` route (module 8) both
+come out here, and both had a stated expiry date when they were added, so this
+is a debt being paid rather than a change of mind. `GET /todos` on a fresh
+process now correctly returns `200 []` — which step 4 makes a point of, because
+reaching for 404 there is a real and common misreading of what a collection is.
+**The 500 is graded on purpose.** `POST /todos notjson` produces
+`500 {"error":"server_error"}` through the replayer's boundary, and the module
+build asserts it. It is the cheapest demonstration of what phase 4 is for: the
+API's answer to bad input today is "something broke on our end", which is a lie.
+Grading the lie is what stops it being a surprise in module 14. The manual test
+goes further and shows three requests the route wrongly accepts — `not json`,
+`{}` and `{"title":""}` — with zero crashes between them, which is the whole
+argument for `unknown` in one screen.
+**A technique gets named here** and it is reused in module 11: the client's `id`
+is *ignored, not rejected*, because `addTodo` takes a title and there is no
+parameter an id could travel through. The safest way to ignore input is to write
+code with nowhere to put it.
 
 **10. GET /todos/:id — dynamic paths** ⬜ · `.split("/")`, `Number()`,
 `Number.isInteger`
@@ -299,14 +490,53 @@ Each batch ends green and committable.
 |---|---|---|
 | **A** ✅ | — | Model, command, page, generator, both verifiers, ambient declarations |
 | **B** ✅ | 1-3 | Phase 1 — the data model, with no HTTP in the way |
-| **C** 🚧 | 4 ✅, **5-7 left** | Phase 2 — first server. 4 landed early to prove the `_server` shape |
-| **D** | 8-12 | Phase 3 — CRUD. Module 8 is the syntax jump; budget for it |
+| **C** ✅ | 4-7 | Phase 2 — first server, deliberate responses, routing |
+| **D** 🚧 | 8 ✅ · 9 ✅ · **10-12** ← next | Phase 3 — CRUD. The hard two are done; 10-12 are one verb each |
 | **E** | 13-16 | Phase 4 — the trust story. 13 needs its exercise format decided first |
 | **F** | 17-20 | Phase 5 — polish, persistence, structure |
 
-**Module 8 is the one to think about before starting batch D**, and module 13
-before batch E. Everything else is straightforward once phase 2 establishes the
-program shape.
+**Module 8 was the one to think about before starting batch D**, and it is done.
+Module 13 is the remaining one, before batch E. Modules 10-12 are each one verb —
+a route, a status code and a failure — on top of infrastructure that now exists,
+and 9 has already written the four-line shape all of them reuse.
+
+### What phase 2 established that batch D can rely on
+
+* **`send(res, status, data: object)`** is the only way a response leaves the
+  application. A new response shape is a call, never a `writeHead` pair.
+* **The router is flat** — `if (verb && path) { send(…); return; }` repeated,
+  with an unconditional 404 as the last statement. Adding a verb is adding one
+  `if` above that line, and modules 9-12 are each expected to be exactly that
+  plus their own logic.
+* **`url.pathname`** is what routes match on, so a query string never breaks a
+  route and module 17 is additive.
+* **The seeded `addTodo` calls come out in module 9**, when a client can create
+  its own todos. That is the first thing module 9 should do.
+
+### What modules 8 and 9 add to that list, for modules 10-12
+
+* **`readBody(req)` never changes again.** Module 9 parses what it returns, 11
+  applies it, 13 stops trusting it, 14 validates it. None of them touch the
+  function. Copy it in verbatim as given code above the handler.
+* **The handler is `async` and returns `Promise<void>` from here on.** The given
+  replayer's `Promise.resolve(handler(req, res)).catch(…)` — written in module 4
+  — accepts both shapes, so nothing about the harness changed and nothing about
+  it needs to.
+* **The read goes inside the route that needs it**, never at the top of the
+  handler. Module 8 argues this explicitly, and 17 (query parsing) and 19 (disk
+  reads) inherit the argument rather than re-making it.
+* **`/echo` is deleted in module 9.** It existed in exactly one module, and
+  module 9 declares its retirement in the contract data.
+* **The write route is four lines and the order is forced:** `await readBody`,
+  `JSON.parse`, store, `send`. Modules 11 and 14 are these four lines with
+  something inserted between two of them — a lookup, a validator — never a
+  different shape.
+* **`JSON.parse` returns `any` and modules 9-12 knowingly trust it.** Every one
+  of them should say so where it matters rather than quietly working around it;
+  module 13 is only a good module if the reader arrives already uncomfortable.
+* **The store's `addTodo(title)` signature is load-bearing.** It is why no route
+  needs a check for a client-supplied id. Module 11 wants the same property for
+  the fields a `PATCH` may change.
 
 ---
 
@@ -342,20 +572,56 @@ program shape.
    not.
 4. `python tools/gen_seed.py && python tools/verify_projects.py --starters`
 
-### A trap worth knowing
+### Three traps worth knowing
 
-`_lint_scope` scans **program text, not code** — comments and strings included.
-So a module numbered below 11 may not contain a literal `...` anywhere in a
-program, even in prose inside a comment. Modules 1-3 use the Unicode ellipsis
-`…` in their teaching text for exactly this reason.
+**1. `_lint_scope` scans program text, not code** — comments and strings
+included. So a module numbered below 11 may not contain a literal `...` anywhere
+in a program, even in prose inside a comment. Modules 1-3 use the Unicode
+ellipsis `…` in their teaching text for exactly this reason. The same applies to
+`unknown` and `typeof` (module 13) — say "a path nothing handles", not "an
+unknown path", in a program comment.
+
+**2. A blank must be unique in the whole program, and the program includes the
+replayer.** The driver contains `res.writeHead(500, { "Content-Type":
+"application/json" })`, `??`, `.split(`, `.slice(` and `await`, so a blank of
+`{ "Content-Type": "application/json" }` matches twice and `_pmk` refuses it.
+Widen the blank until it is unique — module 5 blanks `404, { "Content-Type":
+… }` for this reason.
+
+**3. A graded `fix` needs a bug that an ordinary request can expose.** The
+replayer only ever sends valid request lines *and* only ever sends small ones,
+and both halves of that bite:
+
+* **Malformed input is unreachable.** `??` versus `||` on `req.url`, a key
+  dropped because `req.method` was `undefined` — the starter *passes*, and
+  `verify_projects.py --starters` rejects it. Two of module 6's exercises were
+  rewritten for this.
+* **Large input is unreachable.** A 20-byte body arrives in one chunk, so
+  `body = chunk`, a `resolve` in the `"data"` listener and an answer built from
+  the first chunk all behave identically to the correct code. Module 8 hit this
+  with three separate bugs and graded none of them.
+
+Teach those lessons in prose, pitfalls and quizzes; grade something that fails on
+ordinary input. When the lesson genuinely needs a big or broken request, the
+`manual_test` block is where it goes — module 8's posts 200 KB and watches the
+accumulation bug finally appear.
+
+Related: a bug whose symptom is a **hang** (a route with no `res.end`, a handler
+with no fall-through) does fail the starter check, but only by timing out — 25 s
+in the Python verifier plus 30 s in the Rust one, every run, forever. Module 7
+declined to buy that lesson twice; module 4 already grades it cheaply.
 
 ---
 
 ## What "done" looks like
 
-One project · 20 modules · 5 phases · roughly 160 judged exercises · a Todo API
+One project · 20 modules · 5 phases · roughly 170 judged exercises · a Todo API
 that validates, paginates and persists · and a learner who was never once asked
 to write a line of TypeScript the track had not already taught them.
+
+At 9 of 20 the run rate is **8.8 exercises per module** (79 so far), so the 160
+in the original estimate is if anything low — call it 175. Eleven modules and one
+authoring decision (13) remain.
 
 ## The second project
 
