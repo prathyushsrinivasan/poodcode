@@ -119,6 +119,9 @@ export default function App() {
             {/* Static segment, so it out-ranks the `:module` route below it and
                 cannot be shadowed by a module that one day gets this key. */}
             <Route path="/projects/:project/reference" element={<Projects view="reference" />} />
+            <Route path="/projects/:project/history" element={<Projects view="history" />} />
+            <Route path="/projects/:project/workbench" element={<Projects view="workbench" />} />
+            <Route path="/projects/:project/review" element={<Projects view="review" />} />
             <Route path="/projects/:project/:module" element={<Projects />} />
             <Route path="/mastery" element={<Mastery />} />
             <Route path="/jp-bridge" element={<JapaneseBridge />} />

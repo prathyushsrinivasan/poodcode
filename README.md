@@ -88,12 +88,12 @@ Poodcode/
 │  ├─ seeds/problems.json      # the bundled original problem set
 │  ├─ seeds/backend_course.json       # Backend Lab: 7 CRUD-API build projects
 │  ├─ seeds/java_course.json          # Java course: 31 modules past the basics
-│  └─ seeds/projects.json             # Projects: the Todo API, 20 TS modules
+│  └─ seeds/projects.json             # Projects: the Todo API (20 modules) and Calc (18)
 │
 ├─ tools/gen_seed.py           # generator that AUTHORS every seeds/*.json
 ├─ tools/backend_course.py     # authors seeds/backend_course.json
 ├─ tools/java_course.py        # authors seeds/java_course.json (+ java_m01…m31, java_p01…p31)
-├─ tools/projects_track.py     # authors seeds/projects.json (+ todo_m01…m20)
+├─ tools/projects_track.py     # authors seeds/projects.json (+ todo_mNN, calc_project + calc_mNN)
 ├─ tools/verify_backend.py     # fast Node loop: runs every Backend Lab solution
 ├─ tools/verify_java_course.py # fast javac/java loop: runs every Java solution
 └─ tools/verify_projects.py    # fast tsc+Node loop: runs every Projects solution
@@ -184,15 +184,25 @@ no blank is decorative.
 ### Projects
 
 A **build ladder** (`seeds/projects.json`, authored in `tools/projects_track.py`
-plus one file per module) that takes one real application and breaks it down as
-far as it will go. The first — and, for now, only — project is a **Todo API**:
-a complete, validated, persistent CRUD service over plain `node:http`, in
-**TypeScript**, with no dependencies at all. **Twenty modules in five phases:**
-model the data → put it on the network → full CRUD → make it trustworthy →
-make it real. **Modules 1-9 ship today — phases 1 and 2 complete and phase 3
-under way: 36 steps and 79 judged exercises**, taking you from "what is a todo"
-to a server that creates them from what a client posts, hands back the id it
-assigned, and 404s everything it does not handle.
+plus one file per module) that takes a real application and breaks it down as
+far as it will go, in **TypeScript**, with no dependencies at all. Two projects
+ship, deliberately about different things — **17 modules and 166 judged
+exercises** between them:
+
+- **Todo API** — a complete, validated, persistent CRUD service over plain
+  `node:http`. **Twenty modules in five phases:** model the data → put it on the
+  network → full CRUD → make it trustworthy → make it real. **Modules 1-13 ship —
+  phases 1-3 complete and phase 4 under way, 52 steps and 124 judged exercises** —
+  taking you from "what is a todo" to the complete resource (create, list, fetch
+  by id, patch and delete) and then to a boundary where nothing a client sends is
+  used before its shape has been checked.
+- **Calc** — an expression language: scanner, parser, evaluator, error messages.
+  Eighteen modules in five phases, where the Todo API's hard part is contracts
+  and this one's is structure — discriminated unions, recursive types, `never`.
+  **Modules 1-4 ship — phase 1 complete, 16 steps and 42 judged exercises** — the
+  token type, then a scanner reading source from stdin that handles numbers of
+  any length and answers a character it cannot read with
+  `error: unexpected '$' at 1:3`, returned as a value no caller can ignore.
 
 Where the Backend Lab's unit is a *project* you finish in an evening, this
 track's unit is a **module** — one 30-60 minute slice that adds exactly one
@@ -252,8 +262,32 @@ One search box covers all six, and tells you where else it hit — a query with
 no match here prints `also 3 in ⚠️ Pitfalls` as a link, which is how searching a
 symptom finds the answer without knowing which tab to look in.
 
-The plan for the remaining 11 modules, and the six decisions taken before
-authoring, live in [`PROJECTS_ROADMAP.md`](PROJECTS_ROADMAP.md).
+Three more project-level pages sit beside the Handbook, each built from data the
+modules already carried:
+
+- **🕰️ Build history** (`/projects/:project/history`) — every module's reference
+  implementation diffed against the one before it, with a growth chart of the
+  file. The track claims each module adds one capability; this is that claim in
+  code. **Code only** is on by default because the references rewrite their
+  comments as they go — module 9's diff is `+4 −4` in code and `+40 −48` once
+  comments count. Each module page also carries its own "what changed since
+  module N−1" diff.
+- **🧪 Workbench** (`/projects/:project/workbench`) — load any module's build
+  (your version, the reference, or the starter), edit it, and run your own
+  request script through the same judge, type-check included. Replies are paired
+  with the requests that produced them. Nothing is graded; "check against the
+  module's tests" answers "did my experiment break it?".
+- **🔁 Review** (`/projects/:project/review`) — the project's own warm-up, step
+  and module-review questions, asked again out of order and mixed across the
+  modules you have finished. What you get wrong comes back first next time; each
+  miss links to the step that explains it.
+
+Every quiz in the app now shows its options in a shuffled (but stable) order —
+the authored data puts the right answer first, which in the Projects track and
+the Java course is every single question.
+
+The remaining plans live in [`PROJECTS_ROADMAP.md`](PROJECTS_ROADMAP.md) (Todo
+API, modules 14-20) and [`CALC_ROADMAP.md`](CALC_ROADMAP.md) (Calc, 5-18).
 
 ### TypeScript course
 

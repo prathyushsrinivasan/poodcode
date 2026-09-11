@@ -64,6 +64,9 @@ _CALC_SCOPE_RULES = [
     ("for (", 2),
     (".length", 2),
     (".charAt(", 2),
+    # A digit's position in "0123456789" is its value, so module 2 reads single
+    # digits with `.indexOf(` before `Number` and `.slice(` exist (module 3).
+    (".indexOf(", 2),
     ("readFileSync(", 2),
     (".trim(", 2),
     (".slice(", 3),
@@ -72,6 +75,9 @@ _CALC_SCOPE_RULES = [
     # the literal type that makes the result union discriminated, and it is the
     # first boolean literal used as a type in this project.
     ("ok: true", 4),
+    # Columns must be positions in what the user TYPED, and `.trim()` removes
+    # leading spaces too — so module 4 switches the source read to `.trimEnd()`.
+    (".trimEnd(", 4),
     # --- Phase 2: parse (tokens → a tree) ----------------------------------
     # `Expr` is the recursive type module 5 exists to introduce; no earlier
     # program may so much as mention it.
@@ -131,6 +137,9 @@ _CALC_PHASES = [
 # `_lint_structure` checks it positionally.
 _CALC_MODULE_FILES = (
     "calc_m01_token.py",
+    "calc_m02_scan.py",
+    "calc_m03_numbers.py",
+    "calc_m04_errors.py",
 )
 
 _CALC_MODULES = []
@@ -144,18 +153,6 @@ for _cfname in _CALC_MODULE_FILES:
 # --- Planned modules -------------------------------------------------------
 # Delete a line here as its file lands in `_CALC_MODULE_FILES` above.
 _CALC_MODULES += [
-    _pskel("calc-scan", 2, "scan", "The scanner loop",
-           "walk the text one character at a time and push tokens onto a list",
-           "Turn a line of source into a list of single-character tokens.",
-           "`+ - * /` come out of the text as tokens, in order."),
-    _pskel("calc-numbers", 3, "scan", "Numbers, and tokens longer than one character",
-           "a run of digits is one token, not five",
-           "Scan `123` as a single number token carrying the value 123.",
-           "The scanner handles every token the calculator needs."),
-    _pskel("calc-scan-errors", 4, "scan", "When the input is not a program",
-           "a failure you return rather than a failure you crash on",
-           "Report an unexpected character instead of producing nonsense.",
-           "Bad input produces an error value, and the program still exits cleanly."),
     _pskel("calc-tree", 5, "parse", "What a tree is",
            "a type that refers to itself, and the shape `1 + 2 * 3` really has",
            "Define `Expr` and build one by hand.",

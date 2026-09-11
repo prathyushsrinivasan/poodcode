@@ -1,8 +1,8 @@
-# Calc Roadmap — an expression language, modules 2-18
+# Calc Roadmap — an expression language, modules 5-18
 
 The plan for finishing **Calc**, the second project in the **Projects** track
-(`tools/calc_project.py`). Module 1 ships; 2-18 are one-line skeletons waiting to
-be authored.
+(`tools/calc_project.py`). Modules 1-4 ship — phase 1 is complete — and 5-18 are
+one-line skeletons waiting to be authored.
 
 Companion to [`PROJECTS_ROADMAP.md`](PROJECTS_ROADMAP.md), which plans the same
 track's first project. Both are **build** ladders — every module leaves the
@@ -26,9 +26,11 @@ Someone who finishes both has written the two programs most jobs are made of.
 
 ## Where it stands
 
-**Built:** module 1 — **4 steps, 12 judged exercises**, a revealable reference,
-and the project scaffolding (phases, scope table, brief, setup, acceptance,
-manual test). The `_plain` program shape is proven; `_stdin` lands with module 2.
+**Built:** modules 1-4 — **16 steps, 42 judged exercises**, four revealable
+references, and the project scaffolding (phases, scope table, brief, setup,
+acceptance, manual test). Both program shapes are proven: `_plain` (module 1, and
+the steps of 2-3 that have no input) and `_stdin` (module 2 on — every input is
+its own test case, the empty string included).
 
 | | |
 |---|---|
@@ -66,7 +68,7 @@ a contract.
 
 ## The 18 modules
 
-### Phase 1 — Scan (1-4) — 🚧 **1 done, 2-4 outstanding**
+### Phase 1 — Scan (1-4) — ✅ **done**
 
 Ends with: `1 + 2 * 3` becomes a list of tokens you can print, and `1 $ 2`
 becomes an error naming the character and its column.
@@ -84,28 +86,55 @@ four-branch `if` in two functions.
 **Why there is an `eof` token** is stated in the brief rather than left implicit:
 it removes a `| undefined` from roughly thirty lines of module 6's parser.
 
-**2. The scanner loop** ⬜ · `while`, a cursor, `.charAt`, push onto an array
-*Also where stdin arrives* — from here every exercise is driven by real input,
-so a single exercise can be checked against `1 + 2`, `7` and the empty string at
-once. *Worth teaching explicitly:* `src[i]` is `string | undefined` under
-`noUncheckedIndexedAccess` while `src.charAt(i)` is `string`. That is a real
-choice with a real trade-off, not a style preference.
+**2. The scanner loop** ✅ · `calc_m02_scan.py` · 4 steps, 12 exercises
+Arrays and `for … of` · stdin and `.trim()` · a cursor and `while` · `charAt` vs
+`src[i]` · a digit's value from `indexOf` · narrowing a `string` to `Op`.
+**The single-digit problem was solved with `DIGITS.indexOf(ch)`** — a digit's
+position in `"0123456789"` is its value, and `-1` means "not a digit" — because
+`Number` and `.slice` are module 3's. `.indexOf(` was added to the scope table at
+2 for it. The limit is the point: `12` scans as two tokens, graded, and module 3
+opens on it.
+**Every branch moves the cursor itself**, four `i = i + 1`s rather than one at
+the bottom of the loop, and step 3 says it is for module 3's sake.
+**The skipped `$` is graded as today's behaviour**, the way the Todo API's module
+9 grades its dishonest 500. The build's last test is `1 $ 2` → `1`, `2`, `eof`.
+**The trap the module is built around:** `charAt` past the end is `""`, and
+`DIGITS.indexOf("")` is **0**. So `while (i <= src.length)` grows a phantom
+`number 0` before every `eof` — a clean, graded runtime fix, and the setup for
+module 3's worse version of the same fact.
 
-**3. Numbers, and tokens longer than one character** ⬜ · digit runs, `.slice`,
-`Number`
-*The first lookahead in the project.* A scanner that consumes one character per
-iteration cannot read `123`, and the fix — remember where the token started,
-advance while the character is still a digit, slice — is the shape every
-multi-character token uses afterwards.
+**3. Numbers, and tokens longer than one character** ✅ · `calc_m03_numbers.py` · 4 steps, 8 exercises
+`slice` and the exclusive end · `Number` and `NaN` · `isDigit` · start / advance /
+cut · guard order in `&&`.
+**`Number` needs no `NaN` check here, and step 2 says exactly why**: the scanner
+only hands it runs the inner loop accepted. The guarantee is the loop's, not
+`Number`'s — accept a `.` or a `-` and it is gone. Both are in the stretch list.
+**The hang is taught, not graded.** `isDigit("")` is true (module 2's trap), so an
+inner loop with the length check missing or second never ends on an input ending
+in a digit. The manual test has the learner do it on purpose and press Ctrl+C.
+**`slice(start, i + 1)` only fails before an operator**, not before a space:
+`Number("30 ")` is 30, because `Number` trims. The graded fix is `10/4`, where
+the slice is `"10/"` and the value prints as `null` — and the prompt points out
+that the passing inputs are the clue.
 
-**4. When the input is not a program** ⬜ · a result union, not an exception
-*Introduces `ok: true` as a literal type.* **This is the module that decides the
-project's error strategy**, and it decides it against exceptions: failures are
-values until module 17. Two reasons — an uncaught throw in a judged program is a
-crash rather than an answer, and returning failures forces every caller to say
-what it does about them, which is most of what phase 5 is about.
-*Also decides the error text format*, which is then contract for fourteen
-modules. Get `error: unexpected '$' at 1:3` right here.
+**4. When the input is not a program** ✅ · `calc_m04_errors.py` · 4 steps, 10 exercises
+The four ways to fail · `ScanResult` with `ok: true` / `ok: false` · narrowing on
+a boolean tag · the message format · `trimEnd` · the caller that must decide.
+**Errors as values, as planned — and the compiler enforces it.** `result.tokens`
+does not exist on a `ScanResult` until `result.ok` has been checked, so a main
+program that forgets the failure does not compile. Step 4 grades exactly that
+refusal as the module's one compile-time `fix` (`calc-m4-caller-fix1`).
+**The format, now contract:** `error: unexpected '<ch>' at 1:<column>`, columns
+from 1 (`i + 1`), line always `1` until programs have more than one line, first
+error only. Printed on **stdout** so it can be judged; stderr and the exit code
+are module 17's, for every kind of error at once.
+**The column question this roadmap flagged was settled with `.trimEnd()`**,
+gated at 4. `.trim()` removed leading spaces, so `  1 $ 2` would have reported
+column 3 of text the user never typed; the build now grades column 5, and a
+`fix` exercise is the `.trim()` version, which passes every test without leading
+spaces. Module 17's caret depends on this.
+**The skip from module 2 is gone** — graded as a `fix` whose starter is module
+3's scanner.
 
 ### Phase 2 — Parse (5-8)
 
@@ -211,14 +240,44 @@ Each batch ends green and committable.
 |---|---|---|
 | **A** ✅ | — | Project entry, phases, scope table, skeletons, per-project lints |
 | **B** ✅ | 1 | The token union — proves the shape end to end |
-| **C** | 2-4 | Phase 1. Module 2 brings stdin; module 4 fixes the error format |
-| **D** | 5-8 | Phase 2 — the parser. Module 5 is the recursive-type jump |
+| **C** ✅ | 2-4 | Phase 1. Module 2 brought stdin; module 4 fixed the error format |
+| **D** | **5-8** ← next | Phase 2 — the parser. Module 5 is the recursive-type jump |
 | **E** | 9-11 | Phase 3 — short, and module 10 is the project's punchline |
 | **F** | 12-15 | Phase 4. Module 14 is the one to think about first |
 | **G** | 16-18 | Phase 5 — positions, messages, REPL |
 
-**Module 4 is the one to settle before starting batch C** (the error format is
-contract for fourteen modules), and **module 14 before batch F**.
+**Module 14 is the one to settle before batch F.** Batch D can start now.
+
+### What phase 1 established that the parser can rely on
+
+* **`scan` returns a `ScanResult`**, and module 6's parser receives the success
+  member's `tokens` — which always end in exactly one `eof`, so `peek()` can
+  return a `Token`, never `Token | undefined`, exactly as module 1 promised.
+* **The error format is fixed.** A parse error should read the same way —
+  `error: unexpected ')' at 1:5`, `error: expected a number at 1:4` — which means
+  **the parser needs positions**, and tokens do not carry them until module 16.
+  Either module 6 passes the scanner's cursor positions along with the tokens, or
+  parse errors cannot name a column until 16. Decide before module 6.
+* **A generic `Result<T>` is in the stretch list, not the code.** The parser will
+  want `{ ok: true; expr: Expr } | { ok: false; error: string }`, and module 6 is
+  the natural place to notice the two unions have the same shape.
+
+### What modules 2-3 established that module 4 can rely on
+
+* **The scanner's `else` branch is the only place an unknown character goes.**
+  Module 4 replaces exactly that branch; nothing else in `scan` needs to know.
+* **The cursor `i` at that branch is the character's position — in the
+  *trimmed* source.** `main` calls `.trim()`, which removes leading whitespace
+  too, so for `echo '  1 $ 2'` the `$` is at `i + 1 = 3` but column 5 of what the
+  user typed. Module 4 has to decide this before the format becomes contract:
+  trim only the end (`.trimEnd()` is not yet in the scope table), or report
+  columns in the trimmed text and say so. The first is almost certainly right,
+  since module 17 draws a caret under the original line.
+* **Every exercise program ends in `_C2_MAIN`**, printing one JSON token per
+  line. Module 4 changes what `scan` returns, so it is the first module to
+  change `main` as well — it has to print either the tokens or the error.
+* **The trimmed source has no newlines**, so every position is on line 1 until
+  module 13 introduces `;`-separated statements and module 16 carries positions.
 
 ---
 
@@ -258,6 +317,11 @@ Module 1's programs may not contain the word `never` (module 10) or `case `
 (module 9) anywhere, even in prose inside a comment, and the same widens as the
 table grows. Where teaching text inside a program needs an ellipsis, use the
 Unicode `…`, exactly as the Todo API's early modules do.
+
+And **`=>` is gated at 18 in this project**, unlike the Todo API's 3. Every array
+method that takes a callback — `find`, `findIndex`, `filter`, `map` — is out of
+reach until then, which is why modules 2-3 walk arrays and strings with `while`
+and `for … of` and never a callback.
 
 ---
 

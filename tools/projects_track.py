@@ -322,12 +322,20 @@ _TODO_SCOPE_RULES = [
     ("Number.isInteger(", 10),
     ("Partial<", 11),
     ("...", 11),               # object spread, taught with Partial
+    # You have the object `findTodo` returned and want its position, to swap
+    # the patched copy in. Module 12's `.findIndex(` is the other question: you
+    # have only an id.
+    (".indexOf(", 11),
     (".findIndex(", 12),
     (".splice(", 12),
     # --- Phase 4: make it trustworthy --------------------------------------
     ("unknown", 13),
     ("typeof ", 13),
     ("Array.isArray(", 13),
+    # The `in` operator on a property name — `"title" in obj` — which is how an
+    # `object` earns a readable property. Written with the closing quote so it
+    # matches `"title" in obj` and not a `for (const k in xs)` loop.
+    ('" in ', 13),
     (".map(", 14),             # collecting one error per bad field
     ("try {", 16),
     ("catch ", 16),
@@ -507,6 +515,10 @@ _TODO_MODULE_FILES = (
     "todo_m07_routing.py",
     "todo_m08_body.py",
     "todo_m09_create.py",
+    "todo_m10_one.py",
+    "todo_m11_update.py",
+    "todo_m12_delete.py",
+    "todo_m13_unknown.py",
 )
 
 _TODO_MODULES = []
@@ -520,22 +532,6 @@ for _fname in _TODO_MODULE_FILES:
 # --- Planned modules ------------------------------------------------------
 # Delete a line here as its file lands in `_TODO_MODULE_FILES` above.
 _TODO_MODULES += [
-    _pskel("todo-one", 10, "crud", "GET /todos/:id — dynamic paths",
-           "split the pathname, parse the id, 404 when it isn't there",
-           "Serve one todo by its id.",
-           "A todo has its own URL."),
-    _pskel("todo-update", 11, "crud", "PATCH /todos/:id — partial update",
-           "Partial<T>, object spread, and why you replace rather than mutate",
-           "Change a todo's title or done flag without touching the rest.",
-           "A todo can be renamed and ticked off."),
-    _pskel("todo-delete", 12, "crud", "DELETE /todos/:id — and 204",
-           "findIndex, splice, and the response with no body",
-           "Remove a todo and answer correctly when it was never there.",
-           "The resource is complete: every verb works."),
-    _pskel("todo-unknown", 13, "trust", "`unknown` at the boundary",
-           "JSON.parse hands back `any` — the one place types stop protecting you",
-           "Type parsed input honestly, then narrow it.",
-           "Nothing enters the app with a type it hasn't earned."),
     _pskel("todo-validate", 14, "trust", "Validation and a field-level 400",
            "a validator that reports which field was wrong, not just that something was",
            "Reject a bad body with a useful error.",

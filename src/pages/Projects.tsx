@@ -12,7 +12,13 @@ import { InlineMarkdown, Markdown } from "../components/Markdown";
 import { ExerciseCard, QuizSection } from "../components/LearnExercise";
 import { ExerciseSections } from "../components/ExerciseSections";
 import { ReferenceReveal } from "../components/ReferenceReveal";
+import { DiffStatBadge, DiffView } from "../components/DiffView";
 import { Section, useCollapse } from "../components/Collapsible";
+import ProjectHistory from "./ProjectHistory";
+import ProjectReview from "./ProjectReview";
+import ProjectWorkbench from "./ProjectWorkbench";
+import { diffSources, diffStats } from "../lib/lineDiff";
+import { collectQuestions } from "../lib/projectReview";
 import { ClickableRow, Empty } from "../components/common";
 import { useToast } from "../components/Toast";
 import {
@@ -46,11 +52,18 @@ const moduleKey = (projectKey: string, key: string) => `project:${projectKey}:${
 /** Every judged exercise required to complete a module. */
 const requiredExerciseIds = (m: ProjectModule) => collectExerciseIds(m.steps, m.final_build);
 
-export default function Projects({ view }: { view?: "reference" } = {}) {
+/** The project-level pages that are not a module. Each has a static route in
+ * App.tsx, so none can be shadowed by a module that one day takes the key. */
+export type ProjectView = "reference" | "history" | "workbench" | "review";
+
+export default function Projects({ view }: { view?: ProjectView } = {}) {
   const { project, module: moduleParam } = useParams();
   const [track, setTrack] = useState<ProjectTrack | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [done, setDone] = useState<Set<string>>(new Set());
+  // The review page chooses its default scope from what is finished, so it
+  // must not render against the empty set that stands in until this loads.
+  const [doneLoaded, setDoneLoaded] = useState(false);
   const nav = useNavigate();
 
   const load = useCallback(() => {
@@ -65,7 +78,10 @@ export default function Projects({ view }: { view?: "reference" } = {}) {
 
   useEffect(() => {
     load();
-    loadDoneChapters().then(setDone).catch(() => {});
+    loadDoneChapters()
+      .then(setDone)
+      .catch(() => {})
+      .finally(() => setDoneLoaded(true));
   }, [load]);
 
   async function setModuleDone(projectKey: string, key: string, value: boolean) {
@@ -128,6 +144,16 @@ export default function Projects({ view }: { view?: "reference" } = {}) {
   }
 
   if (view === "reference") return <ProjectReference project={p} />;
+  if (view === "history") return <ProjectHistory project={p} />;
+  // Keyed by project: both hold per-project state initialised on mount.
+  if (view === "workbench") return <ProjectWorkbench key={p.key} project={p} />;
+  if (view === "review") {
+    if (!doneLoaded) return <div className="page">Loading…</div>;
+    const doneKeys = new Set(
+      p.modules.filter((m) => done.has(moduleKey(p.key, m.key))).map((m) => m.key)
+    );
+    return <ProjectReview key={p.key} project={p} doneKeys={doneKeys} />;
+  }
 
   if (moduleParam) {
     const m = p.modules.find((x) => x.key === moduleParam);
@@ -253,13 +279,6 @@ function ProjectDetail({
               />
             </div>
           </div>
-          <button
-            className="ghost"
-            onClick={() => nav(`/projects/${project.key}/reference`)}
-            title="Every form, term, trap and check this project teaches, in one searchable page"
-          >
-            📚 Handbook
-          </button>
           {nextModule && (
             <button className="primary" onClick={() => nav(`/projects/${project.key}/${nextModule.key}`)}>
               {doneCount === 0 ? "Start module 1 →" : `Resume · module ${nextModule.number} →`}
@@ -271,6 +290,8 @@ function ProjectDetail({
           total.{project.completion_note ? ` ${project.completion_note}` : ""}
         </p>
       </div>
+
+      <ProjectTools project={project} doneCount={doneCount} />
 
       <div className="card" style={{ marginBottom: 14, borderColor: "var(--accent)" }}>
         <div className="io-label" style={{ color: "var(--accent)" }}>
@@ -453,6 +474,75 @@ function ProjectDetail({
           <p style={{ margin: 0 }}>{project.milestone}</p>
         </div>
       )}
+    </div>
+  );
+}
+
+/** The four project-level pages, each with the one line that says when you
+ * would open it — they are used at very different moments, and a row of bare
+ * icons would not say that. */
+function ProjectTools({ project, doneCount }: { project: Project; doneCount: number }) {
+  const nav = useNavigate();
+  const snapshots = project.modules.filter((m) => m.authored && m.reference.trim()).length;
+  const builds = project.modules.filter((m) => m.authored && m.final_build).length;
+  const questions = useMemo(() => collectQuestions(project).length, [project]);
+  const tools = [
+    {
+      path: "reference",
+      icon: "📚",
+      title: "Handbook",
+      blurb: "Every form, term, trap and check, searchable. Open it when something is broken.",
+      meta: "6 indexes",
+    },
+    {
+      path: "history",
+      icon: "🕰️",
+      title: "Build history",
+      blurb: "What each module changed in the file, as a diff. The build ladder, in code.",
+      meta: `${snapshots} snapshots`,
+    },
+    {
+      path: "workbench",
+      icon: "🧪",
+      title: "Workbench",
+      blurb: "Load any module's build, edit it, and run your own input against it.",
+      meta: `${builds} builds`,
+    },
+    {
+      path: "review",
+      icon: "🔁",
+      title: "Review",
+      blurb:
+        doneCount > 0
+          ? "Mixed questions from the modules you've finished — misses come back first."
+          : "Mixed questions from across the project, asked again out of order.",
+      meta: `${questions} questions`,
+    },
+  ];
+  return (
+    <div className="grid cols-4" style={{ marginBottom: 18 }}>
+      {tools.map((t) => (
+        <ClickableRow
+          key={t.path}
+          className="card"
+          style={{ marginBottom: 0 }}
+          title={`Open ${t.title}`}
+          onActivate={() => nav(`/projects/${project.key}/${t.path}`)}
+        >
+          <div className="row" style={{ alignItems: "baseline" }}>
+            <strong>
+              {t.icon} {t.title}
+            </strong>
+            <span className="spacer" />
+            <span className="faint mono" style={{ fontSize: 11 }}>
+              {t.meta}
+            </span>
+          </div>
+          <p className="dim" style={{ margin: "6px 0 0", fontSize: 12.5 }}>
+            {t.blurb}
+          </p>
+        </ClickableRow>
+      ))}
     </div>
   );
 }
@@ -1442,7 +1532,18 @@ function ModuleDetail({
       {mod.final_build && (
         <div id="module-build">
           <div className="divider" />
-          <h2 style={{ marginBottom: 4 }}>🏁 Module build</h2>
+          <div className="row" style={{ alignItems: "baseline" }}>
+            <h2 style={{ marginBottom: 4 }}>🏁 Module build</h2>
+            <span className="spacer" />
+            <button
+              className="ghost"
+              style={{ padding: "2px 8px", fontSize: 12 }}
+              onClick={() => nav(`/projects/${project.key}/workbench?load=${mod.key}`)}
+              title="Load this build into the workbench and send it requests of your own"
+            >
+              🧪 Open in the workbench
+            </button>
+          </div>
           <p className="dim" style={{ marginTop: 0 }}>
             Everything above, assembled. This is the module.
           </p>
@@ -1477,6 +1578,17 @@ function ModuleDetail({
           meta={<span className="badge">curl</span>}
         >
           <Markdown>{mod.manual_test}</Markdown>
+        </Section>
+      )}
+
+      {mod.reference && prev?.reference && (
+        <Section
+          title={`🔀 What changed since module ${prev.number}`}
+          open={sec.isOpen("changes")}
+          onToggle={() => sec.toggle("changes")}
+          meta={<ChangeBadge before={prev.reference} after={mod.reference} />}
+        >
+          <ModuleChanges project={project} prev={prev} mod={mod} />
         </Section>
       )}
 
@@ -1619,6 +1731,49 @@ function ModuleDetail({
 
       {/* Sentinel: intersecting means the module has been read to the bottom. */}
       <div ref={bottomRef} style={{ height: 1 }} />
+    </div>
+  );
+}
+
+function ChangeBadge({ before, after }: { before: string; after: string }) {
+  const s = useMemo(() => diffStats(diffSources(before, after, { codeOnly: true })), [before, after]);
+  return <DiffStatBadge added={s.added} removed={s.removed} />;
+}
+
+/** This module's reference against the previous module's: the module, stated
+ * as the edit it makes. Mounted only while its section is open, since the
+ * reveal below is the same file in full and most readers want one or other. */
+function ModuleChanges({
+  project,
+  prev,
+  mod,
+}: {
+  project: Project;
+  prev: ProjectModule;
+  mod: ProjectModule;
+}) {
+  const nav = useNavigate();
+  const [codeOnly, setCodeOnly] = useState(true);
+  return (
+    <div>
+      <div className="row" style={{ gap: 10, marginBottom: 8, alignItems: "center", flexWrap: "wrap" }}>
+        <span className="dim" style={{ fontSize: 13, flex: 1 }}>
+          Module {prev.number}'s finished file, edited into module {mod.number}'s. If this module adds
+          exactly one capability, it should be visible here as one thing.
+        </span>
+        <label className="row" style={{ gap: 6, fontSize: 13, cursor: "pointer" }}>
+          <input type="checkbox" checked={codeOnly} onChange={(e) => setCodeOnly(e.target.checked)} />
+          Code only
+        </label>
+        <button
+          className="ghost"
+          style={{ padding: "2px 8px", fontSize: 12 }}
+          onClick={() => nav(`/projects/${project.key}/history?to=${mod.key}`)}
+        >
+          Build history →
+        </button>
+      </div>
+      <DiffView before={prev.reference} after={mod.reference} codeOnly={codeOnly} maxHeight={560} />
     </div>
   );
 }

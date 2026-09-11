@@ -191,6 +191,23 @@ def check_reveals_match(track):
     return problems
 
 
+# A reference is the learner's own file — it `listen`s on a real port rather
+# than handing the server to a replayer — so it cannot be RUN under the judge.
+# It can be type-checked, and it must be: the module page reveals it, the Build
+# History page diffs consecutive ones, and a reference that does not compile is
+# a wrong answer printed under the heading "the solution".
+REFERENCE_PRESET = "strict+indexed"
+
+
+def reference_items(track):
+    """(key, source, preset) for every authored module's reference."""
+    for project in track["projects"]:
+        for m in project["modules"]:
+            if m["authored"] and (m.get("reference") or "").strip():
+                yield (f"{project['key']}/{m['key']}\0reference", m["reference"],
+                       REFERENCE_PRESET)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--starters", action="store_true",
@@ -236,7 +253,17 @@ def main():
         batch += [(ex["id"] + "\0starter", ex["starter"],
                    ex.get("strictness") or "strict")
                   for (_w, ex) in work]
+    refs = list(reference_items(track)) if not args_ns.only else []
+    batch += refs
     diags = typecheck_batch(batch)
+
+    for key, source, preset in refs:
+        d = diags.get(key) or []
+        if d:
+            failures.append(
+                f"{key.split(chr(0))[0]}: REFERENCE DOES NOT TYPE-CHECK [{preset}]\n"
+                + format_diagnostics(source, d)
+            )
 
     starter_type_failed = set()
     compile_time_fixes = []
@@ -284,7 +311,8 @@ def main():
         print("  " + " ".join(sorted(compile_time_fixes)))
 
     mode = "type-checked" if args_ns.types_only else "type-checked and run"
-    print(f"\n{len(work)} exercise solutions {mode}, {len(failures)} failure(s)")
+    print(f"\n{len(work)} exercise solutions {mode}, {len(refs)} module references "
+          f"type-checked, {len(failures)} failure(s)")
     return 1 if failures else 0
 
 

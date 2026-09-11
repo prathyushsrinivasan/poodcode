@@ -129,6 +129,24 @@ export function CommandPalette() {
           hint: "Every form, term, trap and check the project teaches, searchable",
           run: () => navigate(`/projects/${pr.key}/reference`),
         },
+        {
+          id: `history-${pr.key}`,
+          label: `${pr.title} · Build history`,
+          hint: "What each module changed in the file, as a diff",
+          run: () => navigate(`/projects/${pr.key}/history`),
+        },
+        {
+          id: `workbench-${pr.key}`,
+          label: `${pr.title} · Workbench`,
+          hint: "Edit and run a module build against your own requests",
+          run: () => navigate(`/projects/${pr.key}/workbench`),
+        },
+        {
+          id: `review-${pr.key}`,
+          label: `${pr.title} · Review`,
+          hint: "Mixed questions from the modules you have finished",
+          run: () => navigate(`/projects/${pr.key}/review`),
+        },
       ]),
     ],
     [tracks, navigate]

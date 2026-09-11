@@ -13,10 +13,11 @@
 // Either mode may carry `exercise.harness`: TypeScript appended to the
 // learner's code before compiling, which lets an exercise ask for a *function*
 // and grade what it returns instead of what it printed.
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { api } from "../api";
 import type { Exercise, JudgeReport, Problem, QuizQuestion, TestCase } from "../types";
+import { optionOrder } from "../lib/quizShuffle";
 import { Markdown } from "./Markdown";
 import { CodeEditor } from "./CodeEditor";
 
@@ -279,7 +280,12 @@ export function ExerciseCard({
 
 /** A language-agnostic multiple-choice self-check quiz. Graded entirely on the
  * client by comparing the picked option index — no code execution. Tracks a
- * running score across the concept's questions. */
+ * running score across the concept's questions.
+ *
+ * Options are displayed in a shuffled order (see lib/quizShuffle.ts): authors
+ * write the right answer first, and rendering in authored order put it on the
+ * top button every time. `picked` still holds the AUTHORED index, so grading is
+ * unchanged. */
 export function QuizSection({ questions }: { questions: QuizQuestion[] }) {
   // picked[i] = the option index the user chose for question i, or -1 if unanswered.
   const [picked, setPicked] = useState<number[]>(() => questions.map(() => -1));
@@ -334,19 +340,27 @@ export function QuizSection({ questions }: { questions: QuizQuestion[] }) {
   );
 }
 
-function QuizItem({
+export function QuizItem({
   index,
   question,
   picked,
   onPick,
+  salt = "",
 }: {
   index: number;
   question: QuizQuestion;
+  /** The AUTHORED index of the option chosen, or -1. */
   picked: number;
   onPick: (optionIndex: number) => void;
+  /** Varies the display order; the review drill passes its round number. */
+  salt?: string;
 }) {
   const answered = picked >= 0;
   const isRight = picked === question.answer;
+  const order = useMemo(
+    () => optionOrder(question.question, question.options.length, salt),
+    [question.question, question.options.length, salt]
+  );
 
   return (
     <div
@@ -360,7 +374,8 @@ function QuizItem({
         {index}. {question.question}
       </strong>
       <div style={{ display: "flex", flexDirection: "column", gap: 6, marginTop: 10 }}>
-        {question.options.map((opt, oi) => {
+        {order.map((oi) => {
+          const opt = question.options[oi];
           let border: string | undefined;
           let color: string | undefined;
           if (answered) {

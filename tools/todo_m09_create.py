@@ -24,8 +24,8 @@
 # `500 {"error":"server_error"}` through the replayer's boundary, and the module
 # build asserts it. It is the cheapest possible demonstration of what the next
 # three modules are for: the API's answer to bad input today is "something broke
-# on our end", which is a lie, and modules 14 and 16 turn it into a 400 and a
-# deliberate 500 respectively. Grading the lie is what stops it being a
+# on our end", which is a lie, and module 16 — the first with `try`/`catch` —
+# turns it into a 400 and makes the 500 a boundary the learner wrote. Grading the lie is what stops it being a
 # surprise.
 #
 # WHAT GOT DELETED: the two `addTodo` seed calls that have been in every program
@@ -166,8 +166,10 @@ response *claims*: something went wrong on the server. It did not. The client
 sent nonsense and got told the fault was ours.
 
 That is wrong, it is graded in the module build so you cannot miss it, and it
-gets fixed twice: **module 14** makes bad input a `400`, and **module 16** makes
-the 500 a boundary you wrote rather than one you inherited.
+gets fixed in **module 16**, the first with `try`/`catch`: text that is not JSON
+becomes a `400`, and the 500 becomes a boundary you wrote rather than one you
+inherited. (JSON that parses but has the wrong *shape* — `{}`, `{"title":5}` —
+is a different hole, and modules 13 and 14 close that one.)
 
 ### 201, not 200
 
@@ -208,7 +210,7 @@ console.log(data.title);      // Buy milk
         "It returns `any` — the compiler stops checking anything you do with the "
         "result — and it **throws** on text it cannot read. Both holes are real, "
         "both are deliberate today, and both are closed later: the type in "
-        "module 13, the throw in modules 14 and 16.",
+        "module 13, the throw in module 16.",
     ),
     _syn(
         "data.title",
@@ -322,7 +324,7 @@ you read in module 4 — turns it into a 500.
 
 Read what that response *says*: something failed on the server. Nothing failed
 on the server. The client sent junk, and the API blamed itself. Every part of
-that is fixed later (`400` in module 14, a boundary you wrote in module 16) and
+that is fixed later (a `400` and a boundary you wrote, both in module 16) and
 none of it is fixed today, because `try`/`catch` is module 16's and reaching for
 it now would skip the argument.
 
@@ -366,7 +368,7 @@ say exactly why that is a 500 today, and exactly which module makes it a 400.
              "The request hangs"],
             0,
             "And 500 is the wrong answer: it says the fault was the server's. "
-            "Module 14 makes it a 400 and module 16 makes the boundary yours."),
+            "Module 16 makes it a 400 and makes the boundary yours."),
     ],
     exercises=[
         _pex("todo-m9-parse-1", "Text to value",
@@ -479,7 +481,7 @@ You met these in module 5. Here is where the first one lands:
 | `200` | here is what you asked for | 5 |
 | `201` | it now exists, and here it is | **9** |
 | `204` | done, and there is nothing to say | 12 |
-| `400` | your request was wrong | 14 |
+| `400` | your request was wrong | 13 |
 | `404` | there is nothing at this address | 5 |
 | `500` | something broke on my end | 16 |
 
@@ -982,7 +984,7 @@ _M9_FINAL = _pch(
     "10. And `POST /todos notjson` comes back **500**, because `JSON.parse` "
     "throws and nothing in your handler catches it. That 500 is wrong — it "
     "blames the server for the client's mistake — and it is graded here so that "
-    "you know it is wrong before module 14 fixes it.",
+    "you know it is wrong before module 16 fixes it.",
     _M9_FULL,
     _M9_HANDLER.rstrip("\n"),
     [("GET /todos\nPOST /todos {\"title\":\"Buy milk\"}\nPOST /todos {\"id\":99,\"title\":\"Sneaky\"}\nGET /todos\nGET /todos/1\nPOST /todos notjson",
@@ -997,7 +999,7 @@ _M9_FINAL = _pch(
      "Pass the title, not the object — that is why the `id: 99` in the third request comes back as `2`.",
      "Nothing seeds the store any more, so the first request is `200 []`.",
      "You are not meant to handle the last one. `JSON.parse` throws, the replayer's "
-     "boundary answers 500, and modules 14 and 16 are where that becomes honest."],
+     "boundary answers 500, and module 16 is where that becomes honest."],
 )
 
 
@@ -1072,12 +1074,12 @@ bugs in what you wrote; all three are the shape of what is missing:
 ```bash
 curl -s -i -X POST localhost:3000/todos -d 'not json'
 #   → 500 {"error":"server_error"}
-#     The client sent junk and the server took the blame. Module 14 → 400.
+#     The client sent junk and the server took the blame. Module 16 → 400.
 
 curl -s -i -X POST localhost:3000/todos -d '{}'
 #   → 201 {"id":4,"done":false}   … a todo with no title, and no complaint.
 #     `data.title` was undefined, `any` said nothing, JSON.stringify dropped it.
-#     Module 13 makes the type honest; module 14 makes it a 400.
+#     Module 13 makes the type honest and answers 400; module 14 names the field.
 
 curl -s -i -X POST localhost:3000/todos -d '{"title":""}'
 #   → 201 with an empty title. Same story, no error anywhere.
@@ -1223,9 +1225,9 @@ parsing, cannot answer before storing.
 | `{"title":"Buy milk"}` | `201 {"id":1,…}` | the happy path |
 | `{"id":99,"title":"x"}` | `201 {"id":1,…}` | the id was never an input |
 | `{"title":"x","done":true}` | `201 {…,"done":false}` | a create makes an unfinished todo |
-| `{}` | `201` with no title | ⚠️ wrong. `any` said nothing. → module 14 |
+| `{}` | `201` with no title | ⚠️ wrong. `any` said nothing. → modules 13 and 14 |
 | `{"title":""}` | `201` with an empty title | ⚠️ wrong. → module 14 |
-| `not json` | `500` | ⚠️ wrong — blames the server. → 14 and 16 |
+| `not json` | `500` | ⚠️ wrong — blames the server. → module 16 |
 | `GET /todos`, fresh | `200 []` | an empty collection is a success |
 
 | Symptom | Cause |
@@ -1290,15 +1292,17 @@ parsing, cannot answer before storing.
             0,
             "The store is fine; the answer is useless. The id is the only field "
             "in that response the client did not already have."),
-        _pq("Which two modules make `POST /todos` with a malformed body stop "
+        _pq("Which module makes `POST /todos` with a body that is not JSON stop "
             "being a 500?",
-            ["14, which makes bad input a 400 naming the field, and 16, which makes the boundary one you wrote",
-             "10 and 11",
-             "13 alone",
+            ["16 — `JSON.parse` throws, and 16 is the first module with a `catch` to answer 400 from",
+             "13, which makes the parsed type honest",
+             "14, which validates the fields",
              "None; a 500 is correct for unparseable input"],
             0,
-            "13 makes the *type* honest, 14 makes the *status* honest, and 16 "
-            "makes the boundary yours. Today all three holes are open and named."),
+            "Text that is not JSON never becomes a value at all, so no type check "
+            "or field check can see it. 13 and 14 fix JSON with the wrong shape; "
+            "16 fixes text that is not JSON. Today every one of those holes is open "
+            "and named."),
     ],
     milestone="Your API accepts data. The list is no longer something you typed "
               "into the source — it is whatever clients have put there, with ids "

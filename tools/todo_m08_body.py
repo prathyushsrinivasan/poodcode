@@ -1215,6 +1215,12 @@ _TODO_MODULES.append(_pmod(
         # Handbook's contract index reports a differing description as a change.
         _pep("GET", "/todos", "List every todo", "",
              "[Todo] — a bare array until module 18", "200"),
+        # RETIREMENT. Module 7 added /health as its worked example of extending
+        # the router, and this module's programs and reference do not carry it —
+        # it is not part of the todo contract. Declared here, in the module that
+        # dropped it, so the Handbook's contract index stops advertising it.
+        _pep("GET", "/health", "Retired — module 7's example route; the builds from here on carry only the todo contract",
+             "", "—", "—"),
         _pep("*", "anything else", "Fall through", "", '{"error":"not_found"}', "404"),
     ],
     brief=_M8_BRIEF,

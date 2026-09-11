@@ -1,9 +1,9 @@
-# Projects Roadmap — the Todo API, modules 10-20
+# Projects Roadmap — the Todo API, modules 14-20
 
-The plan for finishing **Todo API**, the first project in the new **Projects**
-track (`tools/projects_track.py`). Modules 1-9 ship — phases 1 and 2 are
-complete and phase 3 is under way — and 10-20 are one-line skeletons waiting to
-be authored.
+The plan for finishing **Todo API**, the first project in the **Projects** track
+(`tools/projects_track.py`). Modules 1-13 ship — phases 1, 2 and 3 are complete
+and phase 4 is under way — and 14-20 are one-line skeletons waiting to be
+authored.
 
 Where [`TS_ROADMAP.md`](TS_ROADMAP.md) plans a *time* ladder (32 weeks) and
 [`JAVA_ROADMAP.md`](JAVA_ROADMAP.md) plans a *topic* ladder (31 modules), this
@@ -17,10 +17,18 @@ arrive in.
 
 ## Where it stands
 
-**Built:** modules 1-9 — **36 steps, 79 judged exercises**, nine revealable
-reference implementations, and the full infrastructure the other eleven modules
-will drop into. Both program shapes are proven end to end: `_plain`
-(modules 1-3) and `_server` (module 4 on, booting a real server on port 0).
+**Built:** modules 1-13 — **52 steps, 124 judged exercises**, thirteen revealable
+reference implementations (all type-checked by the verifier since module 12
+landed), and the full infrastructure the other eight modules will drop into.
+Both program shapes are proven end to end: `_plain` (modules 1-3, and the
+function-level steps of 10-12) and `_server` (module 4 on, booting a real server
+on port 0).
+
+**Phase 3 closed with module 12.** Every verb on the resource works — list,
+create, fetch, patch, delete — and the phase ended by paying off two debts from
+phase 1: module 3's `Todo | undefined` became the project's first real 404s
+(module 10), and module 2's id counter was vindicated by grading the collision a
+`todos.length + 1` store causes after a delete (module 12).
 
 **Phase 2 closed with module 7**, which is the first module where the learner's
 own data goes over HTTP. The application now answers `GET /todos` from the store
@@ -40,10 +48,13 @@ rather than assertion.
 | Generated seed | `src-tauri/seeds/projects.json` |
 | Rust model | `ProjectTrack` → `Project` → `ProjectModule` → `BackendStep` in `models.rs` |
 | Command | `projects_track` (`commands.rs`), registered in `lib.rs` |
-| UI | `src/pages/Projects.tsx`, routes `/projects`, `/projects/:project`, `/projects/:project/reference`, `/projects/:project/:module` |
+| UI | `src/pages/Projects.tsx`, routes `/projects`, `/projects/:project`, `/projects/:project/:module`, and four project-level pages — `reference`, `history`, `workbench`, `review` |
 | Handbook index | `src/lib/projectIndex.ts` — six indexes: syntax, glossary, pitfalls, checks, contract, cheat sheets |
-| Fast verifier | `python tools/verify_projects.py --starters` (~110 s at 10 modules) |
-| Judge-level verifier | `cd src-tauri && cargo test --test verify_projects` (~75 s at 10 modules) |
+| Build history | `src/pages/ProjectHistory.tsx` + `src/lib/lineDiff.ts` (the app's one line diff — `lib/diff.ts` wraps it) |
+| Workbench | `src/pages/ProjectWorkbench.tsx` + `src/lib/workbench.ts` — runs through `run_scratch` / `run_tests` |
+| Review | `src/pages/ProjectReview.tsx` + `src/lib/projectReview.ts`; option order from `src/lib/quizShuffle.ts` |
+| Fast verifier | `python tools/verify_projects.py --starters` — every solution, every starter, and every module `reference` type-checked |
+| Judge-level verifier | `cd src-tauri && cargo test --test verify_projects` |
 
 ### The five questions every module answers
 
@@ -136,6 +147,47 @@ and became index entries. Four of these are new asks:
 
 Nothing about this changes the seed or the Rust model — it is all derived from
 data the modules already carry.
+
+### Three more pages, and what each asks of an author
+
+The Handbook indexes the *prose*. Three more project-level pages use the parts
+of a module the Handbook never touched — and like it, none needed a model change.
+
+| Page | Reads | What it is for |
+|---|---|---|
+| 🕰️ **Build history** | every module's `reference` | the ladder as a sequence of diffs — "what did module 9 do?" answered in code |
+| 🧪 **Workbench** | every module's `final_build` | run a build against requests of your own, through the real judge |
+| 🔁 **Review** | every `warmup`, step `quiz` and module `review` | ~170 questions asked again, mixed, misses first |
+
+Details worth keeping:
+
+* **Build history defaults to "code only"**, ignoring whole-line comments and
+  blank lines. The references rewrite their commentary as the project learns
+  more, and it swamps the signal: module 9 is `+4 −4` in code and `+40 −48` with
+  comments. Line numbers stay the original ones either way.
+* **The Workbench never overwrites silently.** "Open in the workbench" on a
+  module page arrives as `?load=<module>` and *offers* the load; loading over
+  code that exists nowhere else — not the reference, the starter or the
+  learner's draft — asks first. It also never marks anything solved.
+* **Replies are only paired with requests when that is provably right**: one
+  `<status> <body>` line per non-blank request line, or the raw output instead.
+  A handler that `console.log`s would otherwise put answers next to the wrong
+  requests.
+* **Every quiz's options are shuffled for display**, stably, seeded by the
+  question text (`quizShuffle.ts`). All 125 Projects questions — and all 717 of
+  the Java course's — had `answer: 0`, so the right option was always the top
+  button. Authors can keep writing the right answer first.
+
+What that asks of a module author:
+
+* **`reference` is now diffed against its predecessor**, so keep unchanged code
+  byte-identical between modules — reordering functions for no reason shows up
+  as churn. And it is now **type-checked** at `strict+indexed` by the verifier;
+  a reference is the learner's file, so it `listen`s on 3000 and is never run.
+* **`final_build.tests[0].input` is the Workbench's default request script.**
+  Make the first test the one worth replaying by hand.
+* **Quiz questions are now read out of context.** A review question that says
+  "the function above" means nothing in the Review page; name the thing.
 
 ---
 
@@ -340,10 +392,15 @@ rather than a 404, and doing 405 properly needs the set of verbs a path allows
 plus an `Allow` header — which is a routing table, which is module 20. Naming the
 simplification is cheaper than a learner finding it.
 
-### Phase 3 — Full CRUD (8-12)
+### Phase 3 — Full CRUD (8-12) — ✅ **done**
 
 Ends with: create, read, update and delete — the complete resource.
 One module per verb, because each has its own status code and its own failure.
+
+*A contract fix found while building phase 3:* module 7 added `GET /health` as
+its example of extending the router, and module 8's programs and reference
+dropped it without declaring a retirement — so the Handbook's contract tab went
+on advertising it. Module 8 now carries the em-dash row that says so.
 
 **8. Reading a request body** ✅ · `todo_m08_body.py` · 4 steps, 12 exercises
 `req.on("data")` / `"end"` · `setEncoding` · `new Promise` · `.then` ·
@@ -413,34 +470,111 @@ is *ignored, not rejected*, because `addTodo` takes a title and there is no
 parameter an id could travel through. The safest way to ignore input is to write
 code with nowhere to put it.
 
-**10. GET /todos/:id — dynamic paths** ⬜ · `.split("/")`, `Number()`,
-`Number.isInteger`
-*This is where decision 4 pays off:* `parts[2]` is `string | undefined`, and
-`/todos` really does hit this handler. Also the first 404 that is a real 404.
+**10. GET /todos/:id — dynamic paths** ✅ · `todo_m10_one.py` · 4 steps, 12 exercises
+`.split("/")` and index 2 · `Number` and the `NaN` it answers instead of failing
+· `Number.isInteger` · `undefined` in a return type · 404 over 400.
+**The design is three functions, one idea each** — `idText` (is the path shaped
+`/todos/<x>`?), `parseId` (is `x` a whole number from 1?) and `todoId` (both).
+Steps 1 and 2 are `_plain` programs that print what each function makes of eight
+inputs, so one exercise checks eight paths and a wrong answer is a wrong line,
+not a wrong status three requests later.
+**Decision 4 paid off exactly as planned — and it is graded at compile time.**
+`return parseId(idText(pathname))` fails with TS2345, because the `undefined`
+from `parts[2]` travels through `idText`'s honest return type to the one function
+that needs a string. `todo-m10-route-fix1` is the only `fix` in the project whose
+starter is *meant* to fail at compile time, and the verifier lists it for that
+reason. Without the flag, `todoId("/todos")` would have been a silent `NaN`
+lookup.
+**`/todos/abc` is a 404**, argued from module 5's definition: a `GET` sends
+nothing that could be wrong. `Number("")` is `0` — the empty piece `/todos/`
+produces — so `id < 1` is load-bearing and graded.
+**Module 9's promise kept:** the `Location` header is in the stretch list, now
+that it would point at something.
 
-**11. PATCH /todos/:id — partial update** ⬜ · `Partial<Todo>`, object spread
-*Introduces `...`*, which means every earlier module's programs must avoid a
-literal `...` even inside a comment — the lint scans program text, not just code.
+**11. PATCH /todos/:id — partial update** ✅ · `todo_m11_update.py` · 4 steps, 12 exercises
+`Partial<Todo>` · `changesFrom` · object spread and "later key wins" · absent vs
+`undefined` · `indexOf` and replacing in the store · lookup before read.
+**Two things the plan did not predict.** Replacing needs a *position*, and
+`.findIndex(` was module 12's — so `.indexOf(` was added to the scope table at
+11: you hold the object `findTodo` returned and want where it is. Module 12's
+`findIndex` then has the other question to itself (you have only an id). And
+`changesFrom` takes **`data: any`, written out loud** — the honest type of what
+`JSON.parse` returned, and the single word module 13 changes to `unknown`, at
+which point every line of the function stops compiling. That is module 13's
+whole argument, set up on purpose.
+**Replace, not mutate, is justified by module 14**, not by style: a new object
+can be validated before it is stored, so a rejected patch leaves the store
+untouched. The step says so; module 14 should cash it.
+**The best graded bug is the explicit `undefined`:** `{ title: data.title, done:
+data.done }` for a `{"done":true}` body makes `title: undefined`, which wins the
+spread, and `JSON.stringify` drops it — the title vanishes and nothing errors.
+**Lookup before read is graded too**: `PATCH /todos/9 notjson` must be a 404, and
+parsing first makes it a 500. (Verified first: answering before reading a body —
+even a 200 KB one — is safe under the replayer.)
 
-**12. DELETE /todos/:id — and 204** ⬜ · `findIndex`, `splice`, the empty body
-*Closes the resource.* Pays off module 2's counter argument: this is the delete
-that would have caused the collision.
+**12. DELETE /todos/:id — and 204** ✅ · `todo_m12_delete.py` · 4 steps, 9 exercises
+`findIndex` and `-1` · `splice(i, 1)` · positions vs ids · `sendEmpty` and 204 ·
+module 2's collision.
+**Closes the resource, and every graded bug is silent data loss** — which is why
+they are worth grading: an unchecked `-1` makes `splice(-1, 1)` delete the *last*
+todo and answer 204; `splice(i)` deletes everything after `i` too. **Module 2 is
+paid off over HTTP**: a `todos.length + 1` store hands out id 3 twice after
+deleting the middle of three.
+**One lesson turned out ungradable, found by testing before authoring:** Node's
+`ServerResponse` silently discards a body sent with a 204, so `send(res, 204, …)`
+prints exactly `204` through the replayer, like the correct `sendEmpty`. Taught
+in prose and in the manual test, where `curl -i` shows the stray
+`Content-Type`. This joins trap 3's list below.
+**A second response helper**, `sendEmpty(res, status)`: module 5's rule — every
+response leaves through a helper — still holds, with one helper per kind.
 
 ### Phase 4 — Make it trustworthy (13-16)
 
 Ends with: bad input gets a specific 400 naming the field — never a 500.
 
-**13. `unknown` at the boundary** ⬜ · `JSON.parse` hands back `any`
-*The pivot of the whole track.* Everything up to here assumed the client sends
-what it promised. Cannot be taught as a "spot the error" exercise, because the
-whole point is that **there is no error** — `any` is silent. The TypeScript
-course's week 15 solved the same problem with its `retype` exercise kind; the
-equivalent here is a `fix` whose starter compiles, runs, and returns nonsense.
+**13. `unknown` at the boundary** ✅ · `todo_m13_unknown.py` · 4 steps, 12 exercises
+`unknown` vs `any` · `typeof` and the three kinds it calls `"object"` ·
+`Array.isArray` · the `in` operator · `objectFrom` / `titleFrom` / `changesFrom` ·
+the first 400.
+**The format problem the plan worried about solved itself.** The plan said this
+module could not be "spot the error" because `any` is silent. Module 11 had
+already written `changesFrom(data: any)`, so the one-word change to `unknown`
+produces a *list* of compile errors — every place the API trusted a client — and
+the brief tells the learner to make that change first and read the list. The
+graded exercises then split cleanly: most mistakes are now compile errors (one
+`fix` is deliberately compile-time, the missing `in` check), and the runtime ones
+are exactly what `unknown` cannot check for you — `typeof null` and arrays being
+`"object"`, and the old trusting route itself, which is the plan's "starter
+compiles, runs, and returns nonsense", graded as `todo-m13-create-fix1`.
+**A decision the plan did not make: the bare 400 arrives here, not in 14.** When
+narrowing fails, the compiler insists on an answer, and a body of the wrong shape
+is the client's fault. So module 13 answers `400 {"error":"invalid_body"}`, and
+module 14 replaces it with one that names the field. Module 9's status table and
+its forward references were corrected to match.
+**Shape here, values in 14** — the split that makes two modules rather than one.
+`{"title":""}` is a string, so module 13 accepts it and says so in its build;
+refusing it is a rule of the application, not a fact about types.
+**`not json` stays a 500**, and module 13 says why: `JSON.parse` throws before
+there is a value to check. Module 9 had claimed module 14 would make it a 400,
+which no module before `try`/`catch` (16) can do; modules 9 and 11 now say 16.
+**A crash removed on the way**: `POST /todos null` was a 500 (reading `.title` off
+`null` throws) and is now a 400. Worth pointing at, because it shows checking the
+shape is not only about quiet wrong answers.
+**Scope table:** `'" in '` added at 13 — written with the closing quote so it
+matches `"title" in obj` and never a `for … in` loop.
 
 **14. Validation and a field-level 400** ⬜ · a validator returning collected
 errors
 *Introduces `.map(`.* Output shape:
 `{"error":"validation","fields":[{"field":"title","message":"must not be empty"}]}`
+*What module 13 left it:* `titleFrom` and `changesFrom` already answer "right
+shape, or `undefined`". Module 14 needs them to say *what* was wrong instead, so
+their return types change again — to a list of field errors, or to module 15's
+union early. Every `{"error":"invalid_body"}` becomes this shape. The empty title
+is the one value rule the project has promised; decide the others (a maximum
+length?) before starting. `updateTodo` already builds before it stores, so a
+patch whose *result* is invalid can be refused with the store untouched — module
+11 set that up for this module.
 
 **15. One error shape, everywhere** ⬜ · a discriminated union, one place that
 renders it
@@ -452,6 +586,9 @@ earlier handler as the build.
 *Note:* the given replayer has always had this boundary in it (that is where its
 500 comes from). This module is where the learner reads the code that has been
 quietly protecting them since module 4 — a nice payoff if the step names it.
+*It also owns `not json`:* the first module with `catch` is the only one that can
+turn `JSON.parse`'s throw into a 400. Modules 9, 11 and 13 all promise that it
+does.
 
 ### Phase 5 — Make it real (17-20)
 
@@ -491,14 +628,29 @@ Each batch ends green and committable.
 | **A** ✅ | — | Model, command, page, generator, both verifiers, ambient declarations |
 | **B** ✅ | 1-3 | Phase 1 — the data model, with no HTTP in the way |
 | **C** ✅ | 4-7 | Phase 2 — first server, deliberate responses, routing |
-| **D** 🚧 | 8 ✅ · 9 ✅ · **10-12** ← next | Phase 3 — CRUD. The hard two are done; 10-12 are one verb each |
-| **E** | 13-16 | Phase 4 — the trust story. 13 needs its exercise format decided first |
+| **D** ✅ | 8-12 | Phase 3 — CRUD, one verb per module |
+| **E** 🚧 | 13 ✅ · **14-16** ← next | Phase 4 — the trust story |
 | **F** | 17-20 | Phase 5 — polish, persistence, structure |
 
-**Module 8 was the one to think about before starting batch D**, and it is done.
-Module 13 is the remaining one, before batch E. Modules 10-12 are each one verb —
-a route, a status code and a failure — on top of infrastructure that now exists,
-and 9 has already written the four-line shape all of them reuse.
+**Module 14 is the one to think about next**: the error *shape* it introduces is
+contract, and module 15 is supposed to turn it into one union for every error the
+API has. Decide the field-error shape with 15 in mind, or 15 rewrites 14.
+
+### What phase 3 established that batch E can rely on
+
+* **The id is parsed once**, at the top of the handler: `const id =
+  todoId(url.pathname)`. Every `:id` route is `if (verb && id !== undefined)`.
+* **Two response helpers**: `send(res, status, data: object)` and
+  `sendEmpty(res, status)`. Module 15's "one error shape" sits on `send`.
+* **Every write route is lookup → read → parse → build → store → answer**, and
+  `updateTodo` already separates *build* from *store*. Module 14's validator goes
+  between them and never touches the store on a 400.
+* **`changesFrom(data: any)` and the create route's `data.title` are the only two
+  places parsed input is read.** Module 13 has exactly two sites to close.
+* **Ids are never reused** and positions are always found by looking —
+  `indexOf` or `findIndex` — never by arithmetic on an id.
+* **`/todos/abc` is a 404.** If module 14 wants to revisit that as a 400, it is
+  the one module that could justify it; otherwise leave it.
 
 ### What phase 2 established that batch D can rely on
 
@@ -600,6 +752,10 @@ and both halves of that bite:
   `body = chunk`, a `resolve` in the `"data"` listener and an answer built from
   the first chunk all behave identically to the correct code. Module 8 hit this
   with three separate bugs and graded none of them.
+* **Headers are unreachable.** The replayer prints the status and the body, and
+  Node itself discards a body sent with a 204 — so `send(res, 204, …)` is
+  indistinguishable from `sendEmpty(res, 204)`. Module 12 teaches it with
+  `curl -i` instead.
 
 Teach those lessons in prose, pitfalls and quizzes; grade something that fails on
 ordinary input. When the lesson genuinely needs a big or broken request, the
@@ -619,15 +775,15 @@ One project · 20 modules · 5 phases · roughly 170 judged exercises · a Todo 
 that validates, paginates and persists · and a learner who was never once asked
 to write a line of TypeScript the track had not already taught them.
 
-At 9 of 20 the run rate is **8.8 exercises per module** (79 so far), so the 160
-in the original estimate is if anything low — call it 175. Eleven modules and one
-authoring decision (13) remain.
+At 13 of 20 the run rate is **9.5 exercises per module** (124 so far) — call the
+finished project 190. Seven modules remain, and one decision: module 14's error
+shape, which module 15 inherits.
 
 ## The second project
 
 It landed early — see [`CALC_ROADMAP.md`](CALC_ROADMAP.md). **Calc**, an
-expression language: scanner, parser, evaluator, error messages. Module 1 ships,
-2-18 are planned.
+expression language: scanner, parser, evaluator, error messages. Modules 1-4
+ship — phase 1 is complete — and 5-18 are planned.
 
 It is not a queue-jump so much as a hedge: the Todo API teaches the shape of a
 service and barely touches the type system, because HTTP hands you strings and
