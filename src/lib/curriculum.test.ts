@@ -1,0 +1,269 @@
+import { describe, expect, it } from "vitest";
+import { findUnit, hydrate, isCleared, neighbours, searchUnits } from "./curriculum";
+import type { CurriculumUnit, DsaCurriculum, Problem, Rung, SolvedStatus } from "../types";
+
+function problem(slug: string, status: SolvedStatus = "unsolved"): Problem {
+  return {
+    id: slug.length,
+    slug,
+    title: slug,
+    difficulty: "Easy",
+    description: "",
+    constraints: "",
+    examples: [],
+    editorial: "",
+    optimal_time: "",
+    optimal_space: "",
+    optimal_explanation: "",
+    starter_code: {},
+    topics: [],
+    subtopics: [],
+    companies: [],
+    patterns: [],
+    hints: [],
+    prerequisites: [],
+    test_cases: [],
+    function_spec: null,
+    judge_mode: "exact",
+    float_tolerance: 0,
+    checker: "",
+    time_limit_ms: 0,
+    editorials: [],
+    follow_ups: [],
+    order: 0,
+    is_favorite: false,
+    solved_status: status,
+    confidence: 0,
+    last_solved_at: null,
+    time_taken_seconds: 0,
+    attempts_count: 0,
+    success_count: 0,
+    created_at: "2024-01-01",
+    updated_at: "2024-01-01",
+  };
+}
+
+function rung(title: string, slugs: string[], notes: Record<string, string> = {}): Rung {
+  return { title, purpose: `do ${title}`, slugs, notes };
+}
+
+function unit(key: string, rungs: Rung[], prereqs: string[] = []): CurriculumUnit {
+  return {
+    key,
+    title: `Unit ${key}`,
+    icon: "🔧",
+    stage: "s1",
+    tagline: `about ${key}`,
+    prereqs,
+    why: "why",
+    model: "model",
+    internals: "",
+    signals: [],
+    skeletons: [],
+    traces: [],
+    costs: [],
+    pitfalls: [],
+    lessons: [],
+    checks: [],
+    interview: "",
+    rungs,
+    build_it: "",
+    next_up: "",
+  };
+}
+
+function curriculum(units: CurriculumUnit[][]): DsaCurriculum {
+  return {
+    key: "dsa",
+    title: "DSA Curriculum",
+    subtitle: "sub",
+    intro: "intro",
+    stages: units.map((us, i) => ({
+      key: `s${i + 1}`,
+      title: `Stage ${i + 1}`,
+      icon: "🌱",
+      tagline: "",
+      goal: "",
+      ordering: i,
+      units: us,
+    })),
+  };
+}
+
+describe("hydrate", () => {
+  it("joins slugs to problems and counts only the ones that resolve", () => {
+    const c = curriculum([[unit("a", [rung("Core", ["x", "y", "ghost"])])]]);
+    const h = hydrate(c, [problem("x", "solved"), problem("y")]);
+
+    const u = h.stages[0].units[0];
+    expect(u.total).toBe(2); // "ghost" is not in the bank and is not counted
+    expect(u.solved).toBe(1);
+    expect(u.rungs[0].items.map((i) => i.slug)).toEqual(["x", "y", "ghost"]);
+    expect(u.rungs[0].items[2].problem).toBeNull();
+  });
+
+  it("carries the authored per-problem note through to the rung item", () => {
+    const c = curriculum([[unit("a", [rung("Core", ["x"], { x: "start here" })])]]);
+    const h = hydrate(c, [problem("x")]);
+    expect(h.stages[0].units[0].rungs[0].items[0].note).toBe("start here");
+    expect(h.stages[0].units[0].rungs[0].items[0]).toMatchObject({ slug: "x" });
+  });
+
+  it("derives unit status from solved counts", () => {
+    const slugs = ["a", "b", "c", "d", "e"];
+    const c = curriculum([[unit("u", [rung("Core", slugs)])]]);
+
+    const status = (solvedCount: number) =>
+      hydrate(
+        c,
+        slugs.map((s, i) => problem(s, i < solvedCount ? "solved" : "unsolved"))
+      ).stages[0].units[0].status;
+
+    expect(status(0)).toBe("new");
+    expect(status(1)).toBe("started");
+    expect(status(2)).toBe("started"); // below the 60% bar
+    expect(status(3)).toBe("solid"); // ceil(5 * 0.6) === 3
+    expect(status(5)).toBe("complete");
+  });
+
+  it("treats an attempted-but-unsolved problem as having started the unit", () => {
+    const c = curriculum([[unit("u", [rung("Core", ["a", "b"])])]]);
+    const h = hydrate(c, [problem("a", "attempted"), problem("b")]);
+    expect(h.stages[0].units[0].status).toBe("started");
+    expect(h.stages[0].units[0].attempted).toBe(1);
+    expect(h.stages[0].units[0].solved).toBe(0);
+  });
+
+  it("picks the next problem by walking the rungs in order", () => {
+    const c = curriculum([
+      [unit("u", [rung("Warm up", ["a"]), rung("Core", ["b", "c"])])],
+    ]);
+    const h = hydrate(c, [problem("a", "solved"), problem("b"), problem("c")]);
+    expect(h.stages[0].units[0].next?.slug).toBe("b");
+  });
+
+  it("marks a unit ready only once every prerequisite is cleared", () => {
+    const c = curriculum([
+      [unit("basics", [rung("Core", ["a", "b"])]), unit("next", [rung("Core", ["c"])], ["basics"])],
+    ]);
+
+    const unready = hydrate(c, [problem("a"), problem("b"), problem("c")]);
+    expect(findUnit(unready, "next")!.ready).toBe(false);
+
+    const ready = hydrate(c, [problem("a", "solved"), problem("b", "solved"), problem("c")]);
+    expect(findUnit(ready, "next")!.ready).toBe(true);
+  });
+
+  it("continues at the first unfinished unit whose prerequisites are met", () => {
+    const c = curriculum([
+      [
+        unit("one", [rung("Core", ["a"])]),
+        unit("two", [rung("Core", ["b"])], ["one"]),
+        unit("three", [rung("Core", ["c"])], ["two"]),
+      ],
+    ]);
+    const h = hydrate(c, [problem("a", "solved"), problem("b"), problem("c")]);
+    expect(h.next?.unit.unit.key).toBe("two");
+    expect(h.next?.problem?.slug).toBe("b");
+  });
+
+  it("falls back to an unready unit rather than losing the Continue target", () => {
+    // "two" is unfinished but not ready, and nothing else is left to do.
+    const c = curriculum([
+      [unit("one", [rung("Core", ["a"])]), unit("two", [rung("Core", ["b"])], ["one"])],
+    ]);
+    const h = hydrate(c, [problem("a"), problem("b")]);
+    expect(h.next?.unit.unit.key).toBe("one");
+  });
+
+  it("returns no Continue target once everything is solved", () => {
+    const c = curriculum([[unit("one", [rung("Core", ["a"])])]]);
+    expect(hydrate(c, [problem("a", "solved")]).next).toBeNull();
+  });
+
+  it("reports problems that no unit schedules, so Browse can surface them", () => {
+    const c = curriculum([[unit("one", [rung("Core", ["a"])])]]);
+    const h = hydrate(c, [problem("a"), problem("mine")]);
+    expect(h.unplaced.map((p) => p.slug)).toEqual(["mine"]);
+    expect(h.unitBySlug.get("a")?.key).toBe("one");
+    expect(h.unitBySlug.has("mine")).toBe(false);
+  });
+
+  it("totals a stage and the whole curriculum from its units", () => {
+    const c = curriculum([
+      [unit("one", [rung("Core", ["a", "b"])])],
+      [unit("two", [rung("Core", ["c"])])],
+    ]);
+    const h = hydrate(c, [problem("a", "solved"), problem("b"), problem("c", "solved")]);
+    expect(h.stages[0]).toMatchObject({ solved: 1, total: 2 });
+    expect(h.stages[1]).toMatchObject({ solved: 1, total: 1 });
+    expect(h).toMatchObject({ solved: 2, total: 3 });
+  });
+
+  it("survives a missing curriculum", () => {
+    const h = hydrate(null, [problem("a")]);
+    expect(h.stages).toEqual([]);
+    expect(h.next).toBeNull();
+    expect(h.unplaced).toHaveLength(1);
+  });
+});
+
+describe("isCleared", () => {
+  it("counts solid and complete, and nothing else", () => {
+    expect(isCleared("solid")).toBe(true);
+    expect(isCleared("complete")).toBe(true);
+    expect(isCleared("started")).toBe(false);
+    expect(isCleared("new")).toBe(false);
+  });
+});
+
+describe("neighbours", () => {
+  it("pages across stage boundaries", () => {
+    const c = curriculum([
+      [unit("one", [rung("Core", ["a"])]), unit("two", [rung("Core", ["b"])])],
+      [unit("three", [rung("Core", ["c"])])],
+    ]);
+    const h = hydrate(c, [problem("a"), problem("b"), problem("c")]);
+
+    expect(neighbours(h, "two").prev?.unit.key).toBe("one");
+    expect(neighbours(h, "two").next?.unit.key).toBe("three");
+    expect(neighbours(h, "one").prev).toBeNull();
+    expect(neighbours(h, "three").next).toBeNull();
+    expect(neighbours(h, "nope")).toEqual({ prev: null, next: null });
+  });
+});
+
+describe("searchUnits", () => {
+  const withSignals = (): CurriculumUnit => ({
+    ...unit("hashing", [rung("Core", ["a"])]),
+    internals: "A bucket array; a long chain becomes a tree at load factor 0.75.",
+    signals: [{ when: "two numbers that sum to target", reach_for: "complement map", why: "" }],
+    pitfalls: [{ symptom: "returns the same index twice", cause: "", fix: "" }],
+    skeletons: [{ name: "Seen-set", when: "", code: "", note: "" }],
+    traces: [
+      { title: "Complement lookup on [2, 7, 11]", intro: "", headers: ["i"], rows: [["0"], ["1"]], takeaway: "" },
+    ],
+  });
+
+  it("matches on titles, signal wording, pitfall symptoms and skeleton names", () => {
+    const h = hydrate(curriculum([[withSignals()]]), [problem("a")]);
+    expect(searchUnits(h, "sum to target")).toHaveLength(1);
+    expect(searchUnits(h, "same index twice")).toHaveLength(1);
+    expect(searchUnits(h, "seen-set")).toHaveLength(1);
+    expect(searchUnits(h, "Unit hashing")).toHaveLength(1);
+    expect(searchUnits(h, "dijkstra")).toHaveLength(0);
+  });
+
+  it("matches on internals prose and trace titles, which is where the nouns are", () => {
+    // "load factor" appears nowhere but the internals, and someone who
+    // half-remembers the term will type that rather than the unit's title.
+    const h = hydrate(curriculum([[withSignals()]]), [problem("a")]);
+    expect(searchUnits(h, "load factor")).toHaveLength(1);
+    expect(searchUnits(h, "complement lookup on")).toHaveLength(1);
+  });
+
+  it("treats a blank query as no search rather than as matching everything", () => {
+    const h = hydrate(curriculum([[withSignals()]]), [problem("a")]);
+    expect(searchUnits(h, "   ")).toEqual([]);
+  });
+});

@@ -33,18 +33,21 @@ npm run app:build
 ### Tests
 
 ```bash
-npm test                       # frontend logic (Vitest): revision, filters, complexity
+npm test                       # frontend logic (Vitest): revision, filters, complexity, curriculum
 cd src-tauri && cargo test     # backend: scheduler + live execution/judging pipeline
 python tools/verify_backend.py --starters       # Backend Lab: every solution passes, every starter fails
 python tools/verify_java_course.py --starters   # Java course: same, via javac/java (needs a JDK)
 python tools/verify_projects.py --starters      # Projects: same, type-checked then run via Node
 ```
 
-The first launch seeds **29 original problems** — 8 below-Easy **Intro** problems
-for someone new to Java, plus 21 across arrays, strings, hashing, sliding window,
-stacks, binary search, graphs, and dynamic programming — and a **Learn** library
-of **37 concept lessons**. **Java is the default language**, and every problem
-ships with a tailored Java starter.
+The first launch seeds **243 original problems** — 28 below-Easy **Intro**
+problems for someone new to Java, then 215 across arrays, strings, hashing,
+two pointers, sliding window, prefix sums, sorting, binary search, maths, bits,
+stacks, linked lists, heaps, design, recursion, trees, backtracking, graphs,
+greedy, intervals, dynamic programming and tries — arranged into a taught
+**DSA Curriculum** (below), plus a **Learn** library of **169 concept lessons**.
+**Java is the default language**, and every problem ships with a tailored Java
+starter.
 
 ---
 
@@ -55,13 +58,15 @@ Clean separation across four layers; everything is modular and offline.
 ```
 Poodcode/
 ├─ src/                        # ── UI layer (React + TypeScript)
-│  ├─ pages/                   # Dashboard, Library, Solve, Statistics, Revision,
-│  │                          #   Timeline, RandomPractice, Companies, Interview,
-│  │                          #   Settings, ProblemForm
+│  ├─ pages/                   # Dashboard, Library (the DSA Curriculum),
+│  │                          #   LibraryBrowse, CurriculumUnit, Solve,
+│  │                          #   Statistics, Revision, Timeline, RandomPractice,
+│  │                          #   Companies, Interview, Settings, ProblemForm
 │  ├─ components/              # Editor, Markdown, TestResults, TestCaseManager,
 │  │                          #   Charts, CommandPalette, common widgets
 │  ├─ lib/                     # ── Pure business logic (unit-tested, framework-free)
 │  │  ├─ revision.ts           #   spaced-repetition ladder (mirrors Rust)
+│  │  ├─ curriculum.ts         #   joins the DSA curriculum to your progress
 │  │  ├─ filters.ts            #   library filtering + sorting
 │  │  ├─ complexity.ts         #   heuristic Big-O analyzer + comparison
 │  │  ├─ templates.ts          #   per-language stdin skeletons
@@ -85,12 +90,15 @@ Poodcode/
 │  ├─ tests/exec_judge.rs      # execution/judging integration tests (real toolchains)
 │  ├─ tests/verify_backend_course.rs  # proves every Backend Lab solution passes
 │  ├─ tests/verify_java_course.rs     # proves every Java course solution passes
+│  ├─ tests/verify_dsa_curriculum.rs  # proves the curriculum places every problem once
 │  ├─ seeds/problems.json      # the bundled original problem set
+│  ├─ seeds/dsa_curriculum.json       # that set, sequenced into 33 taught units
 │  ├─ seeds/backend_course.json       # Backend Lab: 7 CRUD-API build projects
 │  ├─ seeds/java_course.json          # Java course: 31 modules past the basics
 │  └─ seeds/projects.json             # Projects: the Todo API (20 modules) and Calc (18)
 │
 ├─ tools/gen_seed.py           # generator that AUTHORS every seeds/*.json
+├─ tools/dsa_curriculum.py     # authors seeds/dsa_curriculum.json (+ dsa_s1…s6)
 ├─ tools/backend_course.py     # authors seeds/backend_course.json
 ├─ tools/java_course.py        # authors seeds/java_course.json (+ java_m01…m31, java_p01…p31)
 ├─ tools/projects_track.py     # authors seeds/projects.json (+ todo_mNN, calc_project + calc_mNN)
@@ -152,6 +160,95 @@ hidden tests can't drift from the intended behavior. Regenerate with:
 ```bash
 python tools/gen_seed.py       # writes every src-tauri/seeds/*.json
 ```
+
+### DSA Curriculum
+
+The problem bank with a **spine** (`seeds/dsa_curriculum.json`, authored in
+`tools/dsa_curriculum.py` plus one file per stage). The same 243 problems and
+the same judge, arranged as a course that starts at `System.out.println` and
+ends at tries, Dijkstra and 2-D dynamic programming: **six stages, 33 units,
+every problem placed on exactly one teaching ladder.**
+
+It authors no problems and no lessons — that is the point. What it adds is the
+thing a filterable table of 243 problems cannot give you: an **order**, and a
+reason for it. Each unit is one technique, taught in five beats:
+
+1. **Why it exists** — the problem the previous unit leaves behind. A technique
+   nobody needed is a technique nobody remembers.
+2. **The model** — how it works, in the fewest words that still make it
+   predictable.
+3. **The playbook** — the code shape, in Java, you should be able to type from
+   memory. Patterns are muscle memory; prose alone does not build it.
+4. **Signals** — the routing table from the *wording of a prompt* to the
+   technique. This is the most under-taught part of DSA, and the reason people
+   who "know BFS" still fail to see it in a word problem.
+5. **The ladder** — the problems, in rungs (warm up → core → variations →
+   stretch), so the next click is always obvious.
+
+Plus the two things that make a unit revisable: **pitfalls indexed by symptom**
+(so a failing run is searchable — "infinite loop", "returns the same index
+twice") and **self-checks** with revealable answers. Each unit also links the
+full lesson for its technique in **Learn**: the unit page is the map, Learn is
+the terrain.
+
+The **Linear Data Structures** stage carries three more beats that the
+technique stages do not need, because a unit about a *structure* has to answer
+a question a unit about a *technique* does not — **why are these the costs?**
+Quoting "heap insert is O(log n)" without ever seeing the array layout is
+memorisation, and it fails under interview pressure in a way understanding does
+not. So each of its six units also has:
+
+- **🔬 How it works underneath** — the layout and the operations on it, plus
+  which Java class really implements it and which ones look right and are not
+  (`Stack`, `LinkedList`-as-a-queue). `ArrayDeque`'s ring buffer and its
+  doubling; the heap's `2i+1` / `2i+2` arithmetic, sift-up, sift-down and why
+  build-heap is O(n); why a linked list loses to an array on everything except
+  the one case it wins; what a hash map does *not* give you, which is what every
+  design problem bolts a second structure on to supply.
+- **🎞️ Worked traces** — the state, one row per step, because everything hard
+  in that stage is state changing over time and prose is bad at it: the
+  monotonic stack resolving an answer on each pop, all four pointers of a list
+  reversal, both eviction rules of the monotonic deque firing on the same index,
+  the two-heap median rebalancing, an LRU cache evicting the wrong key if the
+  map and the list disagree. Each ends with the sentence the table makes
+  obvious.
+- **🔨 Build it yourself** — write the structure once, on a raw array. Growing a
+  stack by doubling and *counting the copies* is what makes "amortised O(1)"
+  a number you derived rather than a phrase you repeat; swapping with the larger
+  child in a hand-rolled sift-down and watching the output come out *almost*
+  sorted, with no exception anywhere, is why the invariant has to hold by
+  construction.
+
+Four rules are enforced at generation time rather than promised in prose, and
+re-asserted against the committed seed by
+`src-tauri/tests/verify_dsa_curriculum.rs`:
+
+- **Every problem is placed exactly once.** The curriculum and the library are
+  the same 243 problems, so nothing is unreachable and "what is next?" is never
+  ambiguous.
+- **No dangling references** — every problem slug and every concept key must
+  resolve.
+- **Prerequisites point backwards**, so the ladder walks top to bottom.
+- **Rungs climb** — within a unit, difficulty never decreases.
+- **Traces are well-formed** — every row the same width as its header, at least
+  two rows (a one-step trace shows nothing changing), and a takeaway, because
+  the table is never the point.
+- **Structure units explain themselves** — every unit in the linear-structures
+  stage must carry internals, a trace and a build-it exercise.
+
+Nothing is locked. A unit whose prerequisites are unfinished is marked "builds
+on …" and opens anyway, because someone who already knows heaps should not have
+to solve their way past stacks to prove it. There is also **no progress table**:
+a unit's state is derived from the solved status the `problems` table already
+records, so a problem solved from Browse, Random Practice or a Mastery week
+counts here immediately, and the curriculum can be re-sequenced without a
+migration.
+
+The original flat library is still there as **Browse** (`/library/browse`) with
+every filter and the weakness predicates intact, plus one new column — which
+unit teaches each problem — and a filter for the ones that no unit does (yours).
+The Solve page carries the same link back, so a problem you meet from the review
+queue can always find its technique.
 
 ### Backend Lab
 
@@ -379,7 +476,7 @@ point where syntax knowledge has to turn into fluency. Twenty-eight modules:
 
 File I/O, Spring and the JDBC/build-tool stack are deliberately left out — they
 are job skills rather than interview material — and the DSA ground is already
-covered by the Problem Library and the Mastery track. See
+covered by the DSA Curriculum and the Mastery track. See
 [`JAVA_ROADMAP.md`](JAVA_ROADMAP.md), which also records how Part 10's exercises
 are kept deterministic despite being about threads.
 
@@ -410,9 +507,9 @@ lives in [`JAVA_ROADMAP.md`](JAVA_ROADMAP.md).
 
 You own the library. Add your own problems three ways:
 
-1. **Author in-app** — Library → *New Problem* (full editor for statement,
+1. **Author in-app** — Library → *Browse* → *New Problem* (full editor for statement,
    constraints, examples, hidden/example tests, hints, editorial, complexity).
-2. **Import JSON** — Library → *Import* (an array of problems in the same shape
+2. **Import JSON** — Library → *Browse* → *Import* (an array of problems in the same shape
    as `seeds/problems.json`; re-import upserts by `slug` and preserves your
    progress and user-authored test cases).
 3. **Export** the whole library to JSON for backup or editing.
@@ -422,8 +519,11 @@ You own the library. Add your own problems three ways:
 ## Feature coverage (against the spec)
 
 **Fully built:** Dashboard (goals, streak, weakest topic, suggested next) ·
-Problem Library with all filters (difficulty, topics, companies, status,
-favorites, needs-review, weak-confidence, sorts) · Monaco editor (themes, font
+**DSA Curriculum** (the problem bank taught: 6 stages, 33 units, every problem
+placed on exactly one ladder, each unit carrying its why, mental model, Java
+skeletons, signal→technique routing table, cost table, pitfalls-by-symptom,
+self-checks and links into Learn) · Browse with all filters (difficulty, topics,
+companies, status, favorites, needs-review, weak-confidence, sorts) · Monaco editor (themes, font
 size, minimap, word-wrap, find/replace, shortcuts, per-language + intellisense
 toggle) · Code execution (Run/Submit, pass/fail, runtime, expected vs actual) ·
 Test Case Manager (create/edit/delete/import/export + random & edge generators) ·

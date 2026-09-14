@@ -78,7 +78,8 @@ export function CommandPalette() {
   const navCmds = useMemo<Cmd[]>(
     () => [
       { id: "dash", label: "Go to Dashboard", run: () => navigate("/") },
-      { id: "lib", label: "Go to Problem Library", run: () => navigate("/library") },
+      { id: "lib", label: "Go to the DSA Curriculum", run: () => navigate("/library") },
+      { id: "browse", label: "Browse all problems", run: () => navigate("/library/browse") },
       { id: "learn", label: "Go to Learn", run: () => navigate("/learn") },
       { id: "course", label: "Open the TypeScript Course", run: () => navigate("/course") },
       { id: "java-course", label: "Open the Java Course", run: () => navigate("/java-course") },

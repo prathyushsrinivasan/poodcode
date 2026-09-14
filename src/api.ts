@@ -26,6 +26,7 @@ import type {
   WeeklyCourse,
   BackendTrack,
   ProjectTrack,
+  DsaCurriculum,
   MasteryTrack,
   MasteryProgress,
   SqlDataset,
@@ -87,6 +88,8 @@ export const api = {
   backendTrack: () => invoke<BackendTrack>("backend_track"),
   /** Projects — one real application built module by module in TypeScript. */
   projectsTrack: () => invoke<ProjectTrack>("projects_track"),
+  /** The DSA Curriculum — the problem bank sequenced into taught units. */
+  dsaCurriculum: () => invoke<DsaCurriculum>("dsa_curriculum"),
 
   // SQL track — the datasets its exercises query, plus the in-process engine
   // that runs SQL against a throwaway in-memory database (see src-tauri/src/sqlexec.rs).

@@ -10,6 +10,7 @@ import { CodeEditor, type CodeEditorHandle } from "../components/CodeEditor";
 import { TestResults } from "../components/TestResults";
 import { TestCaseManager } from "../components/TestCaseManager";
 import { Confidence, DiffBadge, Stat } from "../components/common";
+import { TaughtIn } from "../components/CurriculumData";
 import { useToast } from "../components/Toast";
 import { formatMemory } from "../lib/format";
 import { lineDiff, diffStats } from "../lib/diff";
@@ -594,6 +595,7 @@ function DescriptionTab({
   return (
     <div>
       <div className="tag-row" style={{ marginBottom: 12 }}>
+        <TaughtIn slug={problem.slug} />
         {problem.patterns.map((t) => (
           <span key={t} className="badge" style={{ borderColor: "var(--accent)", color: "var(--accent)" }}>
             ◆ {t}

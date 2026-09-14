@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 
 /// A teachable concept for the Learn section. Shipped as a bundled catalog
 /// (seeds/concepts.json) and surfaced independently of any single problem.
@@ -1259,6 +1260,193 @@ pub struct MasteryTrack {
     pub exam_language: String,
     #[serde(default)]
     pub weeks: Vec<MasteryWeek>,
+}
+
+// ---------------------------------------------------------------------------
+// The DSA Curriculum — the Problem Library, taught. Content lives in the
+// embedded seeds/dsa_curriculum.json (authored in tools/dsa_curriculum.py plus
+// one file per stage); served read-only by the `dsa_curriculum` command.
+//
+// It authors NO problems and NO lessons: every unit references problems by
+// `slug` (already in the `problems` table) and deep-dives by concept `key`
+// (already in seeds/concepts.json). The generator asserts at build time that
+// each reference resolves and that every problem is placed in exactly one unit,
+// so the UI can hydrate by slug without defensive handling.
+//
+// There is deliberately no progress table. A unit's state is derived from the
+// solved status already recorded per problem, so the curriculum can be
+// re-sequenced in a later release without migrating anything.
+// ---------------------------------------------------------------------------
+
+/// One row of a unit's signal → technique routing table.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Signal {
+    /// The wording in a prompt that identifies this technique.
+    pub when: String,
+    pub reach_for: String,
+    #[serde(default)]
+    pub why: String,
+}
+
+/// A code shape from a unit's playbook — the thing to be able to type from memory.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Skeleton {
+    pub name: String,
+    /// When to reach for this particular shape.
+    #[serde(default)]
+    pub when: String,
+    pub code: String,
+    #[serde(default)]
+    pub note: String,
+}
+
+/// One row of a unit's cost table.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CostRow {
+    pub op: String,
+    pub time: String,
+    #[serde(default)]
+    pub space: String,
+    #[serde(default)]
+    pub note: String,
+}
+
+/// A mistake indexed by its SYMPTOM, so a failing run is searchable.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Pitfall {
+    pub symptom: String,
+    pub cause: String,
+    pub fix: String,
+}
+
+/// A self-check question with a revealable answer.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct UnitCheck {
+    pub q: String,
+    pub a: String,
+}
+
+/// A worked trace: the structure's state, one row per step.
+///
+/// Generic headers + rows rather than a fixed shape, because a monotonic stack
+/// wants (index, value, stack, resolved) and a median stream wants (insert, low
+/// half, high half, median). The generator asserts every row is the same width
+/// as the header, so the UI can render it as a table without checking.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Trace {
+    pub title: String,
+    #[serde(default)]
+    pub intro: String,
+    #[serde(default)]
+    pub headers: Vec<String>,
+    #[serde(default)]
+    pub rows: Vec<Vec<String>>,
+    /// What the trace was supposed to show, said explicitly.
+    #[serde(default)]
+    pub takeaway: String,
+}
+
+/// One step of a unit's problem ladder: a group of problems drilling the same
+/// twist, with the reason they are grouped.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Rung {
+    pub title: String,
+    pub purpose: String,
+    pub slugs: Vec<String>,
+    /// Optional per-problem "why this one is here", keyed by slug.
+    #[serde(default)]
+    pub notes: HashMap<String, String>,
+}
+
+/// One technique, taught: why it exists, how it works, what it costs, and the
+/// ordered problems that drill it.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CurriculumUnit {
+    pub key: String,
+    pub title: String,
+    #[serde(default)]
+    pub icon: String,
+    /// Key of the stage this unit belongs to.
+    #[serde(default)]
+    pub stage: String,
+    #[serde(default)]
+    pub tagline: String,
+    /// Keys of units this one builds on; always earlier in the curriculum.
+    #[serde(default)]
+    pub prereqs: Vec<String>,
+    /// Markdown: the problem the previous unit left behind.
+    #[serde(default)]
+    pub why: String,
+    /// Markdown: how the technique works, in the fewest words that still make
+    /// it predictable.
+    #[serde(default)]
+    pub model: String,
+    /// Markdown: how the structure works underneath, and which Java class really
+    /// implements it. Carried by the data-structure units, where a cost is a
+    /// consequence of a layout and quoting it without the layout is memorisation.
+    #[serde(default)]
+    pub internals: String,
+    #[serde(default)]
+    pub signals: Vec<Signal>,
+    #[serde(default)]
+    pub skeletons: Vec<Skeleton>,
+    /// Worked traces — state, step by step.
+    #[serde(default)]
+    pub traces: Vec<Trace>,
+    #[serde(default)]
+    pub costs: Vec<CostRow>,
+    #[serde(default)]
+    pub pitfalls: Vec<Pitfall>,
+    /// Concept keys in the Learn catalog that go deeper on this unit.
+    #[serde(default)]
+    pub lessons: Vec<String>,
+    #[serde(default)]
+    pub checks: Vec<UnitCheck>,
+    /// Markdown: what interviewers actually probe here.
+    #[serde(default)]
+    pub interview: String,
+    #[serde(default)]
+    pub rungs: Vec<Rung>,
+    /// Markdown: write the structure from scratch — the only thing that turns a
+    /// memorised cost into an understood one.
+    #[serde(default)]
+    pub build_it: String,
+    /// Markdown: the hand-off to the next unit.
+    #[serde(default)]
+    pub next_up: String,
+}
+
+/// A group of units sharing one idea (foundations, patterns, structures …).
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CurriculumStage {
+    pub key: String,
+    pub title: String,
+    #[serde(default)]
+    pub icon: String,
+    #[serde(default)]
+    pub tagline: String,
+    /// Markdown: what this stage is for and when it is finished.
+    #[serde(default)]
+    pub goal: String,
+    #[serde(default)]
+    pub ordering: i64,
+    #[serde(default)]
+    pub units: Vec<CurriculumUnit>,
+}
+
+/// The whole curriculum (embedded seeds/dsa_curriculum.json).
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct DsaCurriculum {
+    #[serde(default)]
+    pub key: String,
+    #[serde(default)]
+    pub title: String,
+    #[serde(default)]
+    pub subtitle: String,
+    #[serde(default)]
+    pub intro: String,
+    #[serde(default)]
+    pub stages: Vec<CurriculumStage>,
 }
 
 /// A review item joined with its problem for the review queue UI.

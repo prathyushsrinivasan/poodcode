@@ -8,6 +8,8 @@ import { Welcome } from "./components/Welcome";
 
 import Dashboard from "./pages/Dashboard";
 import Library from "./pages/Library";
+import LibraryBrowse from "./pages/LibraryBrowse";
+import CurriculumUnit from "./pages/CurriculumUnit";
 import Solve from "./pages/Solve";
 import Settings from "./pages/Settings";
 import ProblemForm from "./pages/ProblemForm";
@@ -22,7 +24,7 @@ import Paths from "./pages/Paths";
 const NAV = [
   { section: "Practice" },
   { to: "/", label: "Dashboard", icon: "🏠", end: true },
-  { to: "/library", label: "Problem Library", icon: "📚" },
+  { to: "/library", label: "DSA Curriculum", icon: "📚" },
   { to: "/learn", label: "Learn", icon: "📘" },
   { to: "/course", label: "TypeScript Course", icon: "📗" },
   { to: "/java-course", label: "Java Course", icon: "☕" },
@@ -106,6 +108,9 @@ export default function App() {
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/library" element={<Library />} />
+            {/* Static segments, so neither can ever be shadowed by a unit key. */}
+            <Route path="/library/browse" element={<LibraryBrowse />} />
+            <Route path="/library/unit/:key" element={<CurriculumUnit />} />
             <Route path="/learn" element={<Learn />} />
             <Route path="/learn/:key" element={<Learn />} />
             <Route path="/course" element={<Course />} />

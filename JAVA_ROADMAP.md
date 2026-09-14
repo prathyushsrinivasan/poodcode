@@ -21,7 +21,7 @@ families.
 JDBC/Maven/Spring and the backend stack are job skills rather than
 interview-coding material, and the Backend Lab already covers the transport
 half. Part 11 is folded into earlier modules rather than authored, and Part 12
-is already served by the Problem Library and the Mastery track. What remains is,
+is already served by the DSA Curriculum and the Mastery track. What remains is,
 possibly, a single senior-level module on the JVM and design patterns.
 
 ---

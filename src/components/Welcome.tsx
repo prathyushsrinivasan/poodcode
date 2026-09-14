@@ -11,7 +11,7 @@ export function Welcome({ onClose }: { onClose: () => void }) {
   };
 
   const items: { icon: string; title: string; body: string }[] = [
-    { icon: "📚", title: "Problem Library", body: "132 problems ordered easiest → hardest. Start at the top and work down." },
+    { icon: "📚", title: "DSA Curriculum", body: "243 problems taught in order — 33 units from printing a line to tries and Dijkstra, each with the why, the code shape and the signals that name it." },
     { icon: "🧭", title: "Learning Paths", body: "Curated tracks (Foundations, Arrays, DP…) that build skills in order." },
     { icon: "📗", title: "TypeScript Course", body: "A full 8-month course, beginner to interview — a themed goal and project every week." },
     { icon: "☕", title: "Java Course", body: "Ten modules past the basics — arrays, strings and methods, judged all the way." },
@@ -47,12 +47,12 @@ export function Welcome({ onClose }: { onClose: () => void }) {
 
         <div className="card" style={{ borderColor: "var(--accent)", marginBottom: 12 }}>
           <strong>New to this?</strong>{" "}
-          <span className="dim">Begin with the Foundations path or the easiest problems — they only need basic Java.</span>
+          <span className="dim">Open the DSA Curriculum and start at stage 1. It begins below Easy — printing a line — and only needs basic Java.</span>
         </div>
 
         <div className="row wrap">
-          <button className="primary" onClick={() => go("/paths")}>🧭 Start with Learning Paths</button>
-          <button onClick={() => go("/library")}>📚 Browse the Library</button>
+          <button className="primary" onClick={() => go("/library")}>📚 Start the DSA Curriculum</button>
+          <button onClick={() => go("/library/browse")}>🔎 Browse all problems</button>
           <span className="spacer" />
           <button className="ghost" onClick={onClose}>Skip for now</button>
         </div>

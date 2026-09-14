@@ -515,6 +515,123 @@ export interface MasteryProgress {
   completed_at: string | null;
 }
 
+// ---------------------------------------------------------------------------
+// The DSA Curriculum — the Problem Library, taught (seeds/dsa_curriculum.json,
+// authored in tools/dsa_curriculum.py plus one file per stage). Mirrors the
+// Rust structs in models.rs.
+//
+// It contains no problems and no lessons of its own: units reference problems
+// by `slug` and Learn deep-dives by concept `key`. The generator proves at
+// build time that every reference resolves and that every problem is placed in
+// exactly one unit, so `src/lib/curriculum.ts` can hydrate by slug without
+// defensive handling. Progress is derived from each problem's solved status —
+// there is no separate curriculum state.
+// ---------------------------------------------------------------------------
+
+/** One row of a unit's signal → technique routing table. */
+export interface Signal {
+  /** The wording in a prompt that identifies this technique. */
+  when: string;
+  reach_for: string;
+  why: string;
+}
+
+/** A code shape from a unit's playbook — the thing to type from memory. */
+export interface Skeleton {
+  name: string;
+  when: string;
+  code: string;
+  note: string;
+}
+
+export interface CostRow {
+  op: string;
+  time: string;
+  space: string;
+  note: string;
+}
+
+/** A mistake indexed by its SYMPTOM, so a failing run is searchable. */
+export interface Pitfall {
+  symptom: string;
+  cause: string;
+  fix: string;
+}
+
+export interface UnitCheck {
+  q: string;
+  a: string;
+}
+
+/** A worked trace: the structure's state, one row per step.
+ *
+ * Generic headers + rows, because a monotonic stack wants (index, value, stack,
+ * resolved) and a median stream wants (insert, low half, high half, median).
+ * The generator asserts every row matches the header width. */
+export interface Trace {
+  title: string;
+  intro: string;
+  headers: string[];
+  rows: string[][];
+  takeaway: string;
+}
+
+/** A group of problems drilling the same twist, with the reason they group. */
+export interface Rung {
+  title: string;
+  purpose: string;
+  slugs: string[];
+  /** Optional per-problem "why this one is here", keyed by slug. */
+  notes: Record<string, string>;
+}
+
+export interface CurriculumUnit {
+  key: string;
+  title: string;
+  icon: string;
+  /** Key of the stage this unit belongs to. */
+  stage: string;
+  tagline: string;
+  /** Keys of units this one builds on; always earlier in the curriculum. */
+  prereqs: string[];
+  why: string;
+  model: string;
+  /** How the structure works underneath, and which Java class implements it.
+   * Carried by the data-structure units; "" elsewhere. */
+  internals: string;
+  signals: Signal[];
+  skeletons: Skeleton[];
+  traces: Trace[];
+  costs: CostRow[];
+  pitfalls: Pitfall[];
+  /** Concept keys in the Learn catalog that go deeper on this unit. */
+  lessons: string[];
+  checks: UnitCheck[];
+  interview: string;
+  rungs: Rung[];
+  /** Write it from scratch — optional depth, same as `internals`. */
+  build_it: string;
+  next_up: string;
+}
+
+export interface CurriculumStage {
+  key: string;
+  title: string;
+  icon: string;
+  tagline: string;
+  goal: string;
+  ordering: number;
+  units: CurriculumUnit[];
+}
+
+export interface DsaCurriculum {
+  key: string;
+  title: string;
+  subtitle: string;
+  intro: string;
+  stages: CurriculumStage[];
+}
+
 export interface CardReview {
   card_id: string;
   ease: number;

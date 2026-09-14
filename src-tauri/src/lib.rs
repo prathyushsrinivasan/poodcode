@@ -383,6 +383,7 @@ pub fn run() {
             commands::java_course,
             commands::backend_track,
             commands::projects_track,
+            commands::dsa_curriculum,
             commands::mastery,
             commands::mastery_progress,
             commands::mastery_record_quiz,

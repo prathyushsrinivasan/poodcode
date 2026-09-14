@@ -6395,6 +6395,34 @@ print(
 )
 
 # ---------------------------------------------------------------------------
+# The DSA Curriculum — the Problem Library, taught: the same 243 problems
+# sequenced into stages and units, each with its own why/model/skeletons/
+# signals/pitfalls and an ordered problem ladder (authored in
+# tools/dsa_curriculum.py plus one file per stage). It references problems and
+# concepts rather than authoring any, so it is exec'd LAST, after both
+# `out` (the problem bank) and CONCEPTS exist — `_check_curriculum` then
+# asserts that every slug and concept key resolves, that every problem is
+# placed exactly once, and that no unit depends on a later one.
+# ---------------------------------------------------------------------------
+_dsa_path = os.path.join(HERE, "dsa_curriculum.py")
+if os.path.exists(_dsa_path):
+    with open(_dsa_path, encoding="utf-8") as _dsaf:
+        exec(compile(_dsaf.read(), _dsa_path, "exec"))
+    _assemble()
+    _dsa_units, _dsa_placed = _check_curriculum(
+        DSA_CURRICULUM,
+        {c["key"]: c for c in concepts},
+        {p["slug"]: p for p in out},
+    )
+    DSA_OUT = os.path.join(HERE, "..", "src-tauri", "seeds", "dsa_curriculum.json")
+    with open(DSA_OUT, "w", encoding="utf-8", newline="\n") as f:
+        json.dump(DSA_CURRICULUM, f, indent=2, ensure_ascii=False)
+    print(
+        f"Wrote DSA curriculum: {len(DSA_CURRICULUM['stages'])} stages, {_dsa_units} units, "
+        f"{_dsa_placed} problems placed to {os.path.relpath(DSA_OUT)}"
+    )
+
+# ---------------------------------------------------------------------------
 # Reference solutions — CORRECT, submittable solutions in each shipped language,
 # used by the backend test `verify_seeds` to prove the judging + harness
 # serialization contract end-to-end (a correct solution must be Accepted). This

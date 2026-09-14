@@ -22,7 +22,7 @@
 # generics (21-24), Java 8+ (25-28) and multithreading (29-31). The roadmap's
 # Parts 9 and 11-14 are deliberately NOT planned: file I/O, JDBC/Maven/Spring
 # and the backend stack are job skills rather than interview-coding material,
-# and the DSA ground is already covered by the Problem Library and the Mastery
+# and the DSA ground is already covered by the DSA Curriculum and the Mastery
 # track.
 #
 # PART 10 AND THE JUDGE: threads are the one topic where the same program can

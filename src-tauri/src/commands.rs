@@ -124,6 +124,19 @@ pub fn projects_track() -> AppResult<crate::models::ProjectTrack> {
     Ok(serde_json::from_str(PROJECTS_JSON)?)
 }
 
+/// The DSA Curriculum — the problem bank sequenced into stages and units, each
+/// teaching one technique (authored in tools/dsa_curriculum.py plus one file
+/// per stage, which assert at build time that every problem slug and concept
+/// key it references exists and that every problem is placed exactly once).
+/// Read-only content: a unit's progress is derived from the solved status the
+/// `problems` table already holds, so there is nothing extra to persist.
+const DSA_CURRICULUM_JSON: &str = include_str!("../seeds/dsa_curriculum.json");
+
+#[tauri::command]
+pub fn dsa_curriculum() -> AppResult<crate::models::DsaCurriculum> {
+    Ok(serde_json::from_str(DSA_CURRICULUM_JSON)?)
+}
+
 /// The 6-Month Mastery programme — the concept catalog sequenced into weeks
 /// (authored in tools/mastery_defs.py, which validates every concept key and
 /// problem slug it references at generation time). Read-only content; the
