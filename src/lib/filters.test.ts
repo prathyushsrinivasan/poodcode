@@ -99,3 +99,44 @@ describe("applyFilter", () => {
     expect(applyFilter(d, { ...emptyFilter, neverOptimal: true }).map((x) => x.id)).toEqual([2]);
   });
 });
+
+describe("curriculum unit / stage filters", () => {
+  const data = [
+    p({ id: 1, slug: "islands" }),
+    p({ id: 2, slug: "dijkstra" }),
+    p({ id: 3, slug: "mine" }), // authored: belongs to no unit
+  ];
+  const lookup = {
+    unitOf: (slug: string) =>
+      ({ islands: "graph-traversal", dijkstra: "shortest-paths" } as Record<string, string>)[slug],
+    stageOf: (slug: string) =>
+      ({ islands: "hierarchies", dijkstra: "hierarchies" } as Record<string, string>)[slug],
+  };
+
+  it("filters to one unit", () => {
+    expect(
+      applyFilter(data, { ...emptyFilter, units: ["graph-traversal"] }, lookup).map((x) => x.id)
+    ).toEqual([1]);
+  });
+
+  it("filters to a stage, which spans several units", () => {
+    expect(
+      applyFilter(data, { ...emptyFilter, stages: ["hierarchies"] }, lookup).map((x) => x.id)
+    ).toEqual([1, 2]);
+  });
+
+  it("excludes problems that belong to no unit", () => {
+    const all = applyFilter(data, { ...emptyFilter, stages: ["hierarchies"] }, lookup);
+    expect(all.map((x) => x.slug)).not.toContain("mine");
+  });
+
+  it("matches nothing rather than everything when the lookup is missing", () => {
+    // "Show me graph-traversal" answered with the whole bank is worse than an
+    // empty result you can see is empty.
+    expect(applyFilter(data, { ...emptyFilter, units: ["graph-traversal"] })).toEqual([]);
+  });
+
+  it("ignores both filters when neither is set", () => {
+    expect(applyFilter(data, emptyFilter, lookup)).toHaveLength(3);
+  });
+});

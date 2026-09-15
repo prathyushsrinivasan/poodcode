@@ -7,7 +7,13 @@ import { Section, useCollapse } from "../components/Collapsible";
 import { ClickableRow, Empty } from "../components/common";
 import { LibrarySkeleton } from "../components/Skeleton";
 import { StatusBadge, UnitProgress, useCurriculumData } from "../components/CurriculumData";
-import { findUnit, readLastUnit, searchUnits, type HydratedUnit } from "../lib/curriculum";
+import {
+  findUnit,
+  readLastUnit,
+  searchUnits,
+  type HydratedUnit,
+  type UnitMatch,
+} from "../lib/curriculum";
 import { reviewLane, type ReviewLane } from "../lib/dsaReview";
 
 /**
@@ -150,8 +156,13 @@ export default function Library() {
             <Empty icon="🔍" text="No unit mentions that. Try the problem search in Browse." />
           ) : (
             <div className="grid cols-2">
-              {hits.map((u) => (
-                <UnitCard key={u.unit.key} u={u} onOpen={() => nav(`/library/unit/${u.unit.key}`)} />
+              {hits.map((m) => (
+                <UnitCard
+                  key={m.unit.unit.key}
+                  u={m.unit}
+                  match={m}
+                  onOpen={() => nav(`/library/unit/${m.unit.unit.key}`)}
+                />
               ))}
             </div>
           )}
@@ -313,7 +324,16 @@ function ReviewLaneCard({ lane, nav }: { lane: ReviewLane; nav: (to: string) => 
   );
 }
 
-function UnitCard({ u, onOpen }: { u: HydratedUnit; onOpen: () => void }) {
+function UnitCard({
+  u,
+  onOpen,
+  match,
+}: {
+  u: HydratedUnit;
+  onOpen: () => void;
+  /** Present in search results: why this unit matched, and the line that did. */
+  match?: UnitMatch;
+}) {
   return (
     <ClickableRow
       onActivate={onOpen}
@@ -330,6 +350,14 @@ function UnitCard({ u, onOpen }: { u: HydratedUnit; onOpen: () => void }) {
       <p className="dim" style={{ margin: "6px 0 0" }}>
         {u.unit.tagline}
       </p>
+      {/* Why it matched, and the line that did — searching "infinite loop" used
+          to return bare unit cards with no hint that the hit was a pitfall. */}
+      {match && match.field !== "title" && match.field !== "tagline" && (
+        <div className="hint" style={{ margin: "8px 0 0", fontSize: 12 }}>
+          <div className="hint-label">matched in {match.label}</div>
+          <div className="dim">{match.snippet}</div>
+        </div>
+      )}
       <UnitProgress solved={u.solved} total={u.total} stale={u.stale} />
       <div className="row" style={{ marginTop: 8 }}>
         <span className="faint" style={{ fontSize: 12 }}>

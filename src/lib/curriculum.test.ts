@@ -390,4 +390,66 @@ describe("searchUnits", () => {
     const h = hydrate(curriculum([[withSignals()]]), [problem("a")]);
     expect(searchUnits(h, "   ")).toEqual([]);
   });
+
+  it("ranks a title match above an incidental prose match", () => {
+    // Searching "stack" used to put the unit that mentions a stack in passing
+    // above the unit *called* Stacks, because every field was one haystack and
+    // the result order was `filter` order.
+    const mentions: CurriculumUnit = {
+      ...unit("recursion", [rung("Core", ["b"])]),
+      model: "Every recursive call pushes a frame onto the call stack.",
+    };
+    const named: CurriculumUnit = { ...unit("stacks", [rung("Core", ["a"])]) };
+    named.title = "Stacks";
+
+    const h = hydrate(curriculum([[mentions, named]]), [problem("a"), problem("b")]);
+    const hits = searchUnits(h, "stack");
+
+    expect(hits.map((m) => m.unit.unit.key)).toEqual(["stacks", "recursion"]);
+    expect(hits[0].field).toBe("title");
+    expect(hits[1].field).toBe("prose");
+  });
+
+  it("reports which field matched, and the line that did", () => {
+    const h = hydrate(curriculum([[withSignals()]]), [problem("a")]);
+    const [hit] = searchUnits(h, "same index twice");
+
+    expect(hit.field).toBe("pitfall");
+    expect(hit.label).toBe("pitfall");
+    expect(hit.snippet).toContain("returns the same index twice");
+  });
+
+  it("searches the fields that were previously invisible", () => {
+    // "load factor" lives in internals, "amortised" in the cost table and
+    // "identity element" in a self-check — none of the last two were searchable.
+    const u: CurriculumUnit = {
+      ...unit("hashing", [rung("Core", ["a"], { a: "the complement trick, twice" })]),
+      costs: [{ op: "insert", time: "O(1) amortised", space: "O(n)", note: "" }],
+      checks: [{ q: "Why initialise a product to 1?", a: "It is the identity element." }],
+      build_it: "Write the bucket array yourself.",
+    };
+    const h = hydrate(curriculum([[u]]), [problem("a")]);
+
+    expect(searchUnits(h, "amortised")[0].field).toBe("cost");
+    expect(searchUnits(h, "identity element")[0].field).toBe("check");
+    expect(searchUnits(h, "bucket array")[0].field).toBe("prose");
+    expect(searchUnits(h, "complement trick")[0].field).toBe("problem");
+  });
+
+  it("reports each unit once, by its most meaningful match", () => {
+    const u: CurriculumUnit = {
+      ...unit("maps", [rung("Core", ["a"])]),
+      // Two pitfalls and the prose all mention it; only the best field is
+      // reported, so the result list has one row per unit rather than per hit.
+      pitfalls: [
+        { symptom: "hash collision", cause: "", fix: "" },
+        { symptom: "hash mismatch", cause: "", fix: "" },
+      ],
+      model: "A hash is a number.",
+    };
+    const h = hydrate(curriculum([[u]]), [problem("a")]);
+    const hits = searchUnits(h, "hash");
+    expect(hits).toHaveLength(1);
+    expect(hits[0].field).toBe("pitfall");
+  });
 });

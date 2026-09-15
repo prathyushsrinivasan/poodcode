@@ -395,31 +395,127 @@ export function neighbours(
 }
 
 /**
- * Search units by title, tagline, signal wording, pitfall symptom, skeleton
- * name — and the internals prose.
+ * Which part of a unit a search matched, ranked by how much it means.
  *
- * Internals is included because it is where the searchable *nouns* live: "ring
- * buffer", "sift down", "sentinel", "load factor". Someone who half-remembers a
- * term is far more likely to type that than the title of the unit that taught
- * it, and matching on it is the difference between finding the page and not.
+ * A title match is almost always the unit you wanted; an incidental hit in the
+ * internals prose almost never is. The old search concatenated every field into
+ * one haystack and returned `filter` order, so "stack" ranked the unit that
+ * mentions a stack in passing above **Stacks**, and the result card never showed
+ * *why* it matched — searching `"infinite loop"` returned unit cards with no hint
+ * that the hit was a pitfall symptom, which is the one line you actually wanted.
  */
-export function searchUnits(c: HydratedCurriculum, query: string): HydratedUnit[] {
+export type MatchField =
+  | "title"
+  | "tagline"
+  | "signal"
+  | "pitfall"
+  | "skeleton"
+  | "check"
+  | "cost"
+  | "trace"
+  | "problem"
+  | "prose";
+
+const FIELD_RANK: Record<MatchField, number> = {
+  title: 0,
+  tagline: 1,
+  signal: 2,
+  pitfall: 3,
+  skeleton: 4,
+  check: 5,
+  cost: 6,
+  trace: 7,
+  problem: 8,
+  prose: 9,
+};
+
+const FIELD_LABEL: Record<MatchField, string> = {
+  title: "title",
+  tagline: "tagline",
+  signal: "signal",
+  pitfall: "pitfall",
+  skeleton: "playbook",
+  check: "self-check",
+  cost: "costs",
+  trace: "trace",
+  problem: "problem",
+  prose: "notes",
+};
+
+export interface UnitMatch {
+  unit: HydratedUnit;
+  field: MatchField;
+  /** Human name for the field, for the result card. */
+  label: string;
+  /** The matching text, trimmed to a readable window around the hit. */
+  snippet: string;
+}
+
+/** A window of `text` around the first occurrence of `q`, with ellipses. */
+function snippetAround(text: string, q: string, width = 130): string {
+  const flat = text.replace(/\s+/g, " ").trim();
+  const at = flat.toLowerCase().indexOf(q);
+  if (at < 0) return flat.slice(0, width);
+  const start = Math.max(0, at - Math.floor((width - q.length) / 2));
+  const end = Math.min(flat.length, start + width);
+  return (start > 0 ? "…" : "") + flat.slice(start, end).trim() + (end < flat.length ? "…" : "");
+}
+
+/**
+ * Search units, ranked, with the reason each one matched.
+ *
+ * The haystack is wider than it was: it now covers `why`, `model`, `build_it`,
+ * the self-check questions, the cost-table operations and the rungs' problem
+ * titles and notes. "Amortised" and "load factor" live in `costs` and `checks`
+ * and were not searchable at all before — which is exactly the kind of
+ * half-remembered term someone types.
+ */
+export function searchUnits(c: HydratedCurriculum, query: string): UnitMatch[] {
   const q = query.trim().toLowerCase();
   if (!q) return [];
-  return c.stages
-    .flatMap((s) => s.units)
-    .filter((u) => {
-      const hay = [
-        u.unit.title,
-        u.unit.tagline,
-        u.unit.internals,
-        ...u.unit.signals.map((s) => `${s.when} ${s.reach_for}`),
-        ...u.unit.pitfalls.map((p) => p.symptom),
-        ...u.unit.skeletons.map((s) => s.name),
-        ...u.unit.traces.map((t) => t.title),
-      ]
-        .join(" ")
-        .toLowerCase();
-      return hay.includes(q);
-    });
+
+  const out: UnitMatch[] = [];
+  for (const u of c.stages.flatMap((s) => s.units)) {
+    // Ordered best-field-first; the first hit wins, so a unit is reported by the
+    // most meaningful place it matched rather than all of them.
+    const fields: [MatchField, string][] = [
+      ["title", u.unit.title],
+      ["tagline", u.unit.tagline],
+      ...u.unit.signals.map(
+        (s) => ["signal", `${s.when} → ${s.reach_for}. ${s.why}`] as [MatchField, string]
+      ),
+      ...u.unit.pitfalls.map(
+        (p) => ["pitfall", `${p.symptom} — ${p.cause} Fix: ${p.fix}`] as [MatchField, string]
+      ),
+      ...u.unit.skeletons.map(
+        (s) => ["skeleton", `${s.name} — ${s.when} ${s.note}`] as [MatchField, string]
+      ),
+      ...u.unit.checks.map((k) => ["check", `${k.q} ${k.a}`] as [MatchField, string]),
+      ...u.unit.costs.map(
+        (k) => ["cost", `${k.op}: ${k.time} / ${k.space}. ${k.note}`] as [MatchField, string]
+      ),
+      ...u.unit.traces.map((t) => ["trace", `${t.title} ${t.takeaway}`] as [MatchField, string]),
+      ...u.rungs.flatMap((r) =>
+        r.items.map(
+          (i) =>
+            [
+              "problem",
+              `${i.problem?.title ?? i.slug}${i.note ? ` — ${i.note}` : ""}`,
+            ] as [MatchField, string]
+        )
+      ),
+      ["prose", `${u.unit.why} ${u.unit.model} ${u.unit.internals} ${u.unit.build_it}`],
+    ];
+
+    for (const [field, text] of fields) {
+      if (text.toLowerCase().includes(q)) {
+        out.push({ unit: u, field, label: FIELD_LABEL[field], snippet: snippetAround(text, q) });
+        break;
+      }
+    }
+  }
+
+  // Within a field, curriculum order — which is also difficulty order, so the
+  // unit you are likelier to be ready for comes first.
+  return out.sort((a, b) => FIELD_RANK[a.field] - FIELD_RANK[b.field]);
 }

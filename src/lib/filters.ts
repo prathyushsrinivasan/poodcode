@@ -8,11 +8,28 @@ export type SortKey =
   | "attempts"
   | "confidence";
 
+/**
+ * Which curriculum unit and stage each problem belongs to.
+ *
+ * Passed in rather than read from the `Problem`, because a problem does not know
+ * — the curriculum owns that relation, and a problem you authored belongs to no
+ * unit at all. Browse gained a unit *column* but no way to filter by it, which
+ * is the obvious query once the column exists.
+ */
+export interface UnitLookup {
+  unitOf: (slug: string) => string | undefined;
+  stageOf: (slug: string) => string | undefined;
+}
+
 export interface ProblemFilter {
   search: string;
   difficulties: Difficulty[];
   topics: string[];
   companies: string[];
+  /** Unit keys; empty means every unit. */
+  units: string[];
+  /** Stage keys; empty means every stage. */
+  stages: string[];
   status: SolvedStatus | "all";
   favoritesOnly: boolean;
   needsReview: boolean; // last_solved_at older than 14 days, or low confidence
@@ -29,6 +46,8 @@ export const emptyFilter: ProblemFilter = {
   difficulties: [],
   topics: [],
   companies: [],
+  units: [],
+  stages: [],
   status: "all",
   favoritesOnly: false,
   needsReview: false,
@@ -50,8 +69,17 @@ function daysSince(iso: string | null): number {
   return (Date.now() - then) / 86_400_000;
 }
 
-/** Pure, testable filtering + sorting of the problem list. */
-export function applyFilter(problems: Problem[], f: ProblemFilter): Problem[] {
+/** Pure, testable filtering + sorting of the problem list.
+ *
+ * `units` supplies the curriculum relation; without it the unit and stage
+ * filters simply match nothing rather than silently matching everything, because
+ * "show me graph-traversal" answered with the whole bank is worse than an empty
+ * result you can see is empty. */
+export function applyFilter(
+  problems: Problem[],
+  f: ProblemFilter,
+  units?: UnitLookup
+): Problem[] {
   const q = f.search.trim().toLowerCase();
   let out = problems.filter((p) => {
     if (q) {
@@ -70,6 +98,14 @@ export function applyFilter(problems: Problem[], f: ProblemFilter): Problem[] {
     if (f.topics.length && !f.topics.some((t) => p.topics.includes(t))) return false;
     if (f.companies.length && !f.companies.some((c) => p.companies.includes(c)))
       return false;
+    if (f.units.length) {
+      const k = units?.unitOf(p.slug);
+      if (!k || !f.units.includes(k)) return false;
+    }
+    if (f.stages.length) {
+      const k = units?.stageOf(p.slug);
+      if (!k || !f.stages.includes(k)) return false;
+    }
     if (f.status !== "all" && p.solved_status !== f.status) return false;
     if (f.favoritesOnly && !p.is_favorite) return false;
     if (f.weakConfidence && !(p.confidence <= 2 && p.solved_status === "solved"))

@@ -3,7 +3,13 @@ import { useNavigate } from "react-router-dom";
 import { open as openDialog, save as saveDialog } from "@tauri-apps/plugin-dialog";
 import { api } from "../api";
 import type { CurriculumUnit, Difficulty, Problem, SolvedStatus } from "../types";
-import { applyFilter, emptyFilter, type ProblemFilter, type SortKey } from "../lib/filters";
+import {
+  applyFilter,
+  emptyFilter,
+  type ProblemFilter,
+  type SortKey,
+  type UnitLookup,
+} from "../lib/filters";
 import { hydrate } from "../lib/curriculum";
 import { loadCurriculumSeed } from "../components/CurriculumData";
 import { Confidence, DiffBadge, Empty } from "../components/common";
@@ -34,6 +40,8 @@ export default function LibraryBrowse() {
   const [topics, setTopics] = useState<string[]>([]);
   const [companies, setCompanies] = useState<string[]>([]);
   const [unitBySlug, setUnitBySlug] = useState<Map<string, CurriculumUnit>>(new Map());
+  const [stages, setStages] = useState<{ key: string; title: string; icon: string }[]>([]);
+  const [unitList, setUnitList] = useState<{ key: string; title: string; icon: string; stage: string }[]>([]);
   const [mineOnly, setMineOnly] = useState(false);
   const [f, setF] = useState<ProblemFilter>(emptyFilter);
   const nav = useNavigate();
@@ -44,7 +52,15 @@ export default function LibraryBrowse() {
       setProblems(ps);
       // The seed comes from the session cache; only the problems are re-fetched.
       loadCurriculumSeed()
-        .then((c) => setUnitBySlug(hydrate(c, ps).unitBySlug))
+        .then((c) => {
+          setUnitBySlug(hydrate(c, ps).unitBySlug);
+          setStages((c?.stages ?? []).map((st) => ({ key: st.key, title: st.title, icon: st.icon })));
+          setUnitList(
+            (c?.stages ?? []).flatMap((st) =>
+              st.units.map((u) => ({ key: u.key, title: u.title, icon: u.icon, stage: st.key }))
+            )
+          );
+        })
         .catch(() => {});
     });
     api.distinctTags("topic").then(setTopics);
@@ -52,10 +68,25 @@ export default function LibraryBrowse() {
   };
   useEffect(load, []);
 
+  const lookup = useMemo<UnitLookup>(
+    () => ({
+      unitOf: (slug) => unitBySlug.get(slug)?.key,
+      stageOf: (slug) => unitBySlug.get(slug)?.stage,
+    }),
+    [unitBySlug]
+  );
+
   const filtered = useMemo(() => {
-    const base = applyFilter(problems, f);
+    const base = applyFilter(problems, f, lookup);
     return mineOnly ? base.filter((p) => !unitBySlug.has(p.slug)) : base;
-  }, [problems, f, mineOnly, unitBySlug]);
+  }, [problems, f, mineOnly, unitBySlug, lookup]);
+
+  // Narrow the unit pills to the chosen stages: 33 pills is a wall, and picking
+  // a stage is the natural way to say which third of them you mean.
+  const unitPills = useMemo(
+    () => (f.stages.length ? unitList.filter((u) => f.stages.includes(u.stage)) : unitList),
+    [unitList, f.stages]
+  );
 
   const unplacedCount = useMemo(
     () => problems.filter((p) => !unitBySlug.has(p.slug)).length,
@@ -200,6 +231,43 @@ export default function LibraryBrowse() {
             </select>
           </div>
         </div>
+        {stages.length > 0 && (
+          <>
+            <div className="io-label" style={{ marginTop: 12 }}>
+              Curriculum stage
+            </div>
+            <div className="pill-toggle">
+              {stages.map((st) => (
+                <span
+                  key={st.key}
+                  className={`pill ${f.stages.includes(st.key) ? "on" : ""}`}
+                  onClick={() =>
+                    setF({ ...f, stages: toggleIn(f.stages, st.key), units: [] })
+                  }
+                >
+                  {st.icon} {st.title}
+                </span>
+              ))}
+            </div>
+            <div className="io-label" style={{ marginTop: 10 }}>
+              Unit
+              {f.stages.length > 0 && (
+                <span className="faint"> — narrowed to the stages above</span>
+              )}
+            </div>
+            <div className="pill-toggle">
+              {unitPills.map((u) => (
+                <span
+                  key={u.key}
+                  className={`pill ${f.units.includes(u.key) ? "on" : ""}`}
+                  onClick={() => setF({ ...f, units: toggleIn(f.units, u.key) })}
+                >
+                  {u.icon} {u.title}
+                </span>
+              ))}
+            </div>
+          </>
+        )}
         {(topics.length > 0 || companies.length > 0) && (
           <>
             <div className="io-label" style={{ marginTop: 12 }}>Topics</div>
