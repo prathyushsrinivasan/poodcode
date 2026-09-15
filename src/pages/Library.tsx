@@ -252,7 +252,7 @@ function UnitCard({ u, onOpen }: { u: HydratedUnit; onOpen: () => void }) {
         <span style={{ fontSize: 20 }}>{u.unit.icon}</span>
         <strong>{u.unit.title}</strong>
         <span className="spacer" />
-        <StatusBadge status={u.status} stale={u.stale} />
+        <StatusBadge status={u.status} stale={u.stale} skipped={u.skipped} />
       </div>
       <p className="dim" style={{ margin: "6px 0 0" }}>
         {u.unit.tagline}

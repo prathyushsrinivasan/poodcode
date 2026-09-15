@@ -23,7 +23,7 @@ import { checkCardId, isCardDue, todayISO, unitChecks } from "../lib/dsaReview";
  */
 export default function CurriculumUnit() {
   const { key = "" } = useParams();
-  const { data } = useCurriculumData();
+  const { data, setSkipped } = useCurriculumData();
   const [concepts, setConcepts] = useState<Concept[]>([]);
   const [reviews, setReviews] = useState<Map<string, CardReview>>(new Map());
   const nav = useNavigate();
@@ -105,7 +105,22 @@ export default function CurriculumUnit() {
           {u.icon} {u.title}
         </h1>
         <span className="spacer" />
-        <StatusBadge status={hydrated.status} stale={hydrated.stale} />
+        <StatusBadge
+          status={hydrated.status}
+          stale={hydrated.stale}
+          skipped={hydrated.skipped}
+        />
+        <button
+          className="ghost"
+          title={
+            hydrated.skipped
+              ? "Put this unit back in the ladder"
+              : "Counts as cleared for what unlocks next, without pretending you solved it here"
+          }
+          onClick={() => setSkipped([key], !hydrated.skipped)}
+        >
+          {hydrated.skipped ? "Un-skip" : "I know this — skip it"}
+        </button>
       </div>
       <p className="page-sub">{u.tagline}</p>
 

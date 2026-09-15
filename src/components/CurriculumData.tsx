@@ -2,26 +2,60 @@ import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { api } from "../api";
 import type { CurriculumUnit } from "../types";
-import { hydrate, type HydratedCurriculum, type UnitStatus } from "../lib/curriculum";
+import {
+  hydrate,
+  parseSkipped,
+  serialiseSkipped,
+  SKIPPED_SETTING,
+  type HydratedCurriculum,
+  type UnitStatus,
+} from "../lib/curriculum";
 
-/** Loads the curriculum and the learner's problems, and joins them.
+/** Loads the curriculum, the learner's problems and the skipped-unit list, and
+ * joins them.
  *
- * All three Library pages need exactly this pair, and the join is cheap (one
+ * All three Library pages need exactly this trio, and the join is cheap (one
  * pass over 271 problems), so each page loads for itself rather than sharing a
  * store. That keeps a solve recorded on another page from showing stale
- * progress here: coming back re-fetches. */
+ * progress here: coming back re-fetches.
+ *
+ * `setSkipped` writes the settings row and re-joins in place, so marking a unit
+ * known updates every badge and the "up next" target without a round trip
+ * through the curriculum fetch. */
 export function useCurriculumData() {
   const [data, setData] = useState<HydratedCurriculum | null>(null);
   const [error, setError] = useState<string>("");
 
   const load = useCallback(() => {
-    Promise.all([api.dsaCurriculum().catch(() => null), api.listProblems()])
-      .then(([c, problems]) => setData(hydrate(c, problems)))
+    Promise.all([
+      api.dsaCurriculum().catch(() => null),
+      api.listProblems(),
+      api.getSettings().catch(() => ({}) as Record<string, string>),
+    ])
+      .then(([c, problems, settings]) =>
+        setData(hydrate(c, problems, parseSkipped(settings[SKIPPED_SETTING])))
+      )
       .catch((e) => setError(String(e)));
   }, []);
 
   useEffect(load, [load]);
-  return { data, error, reload: load };
+
+  const setSkipped = useCallback(
+    async (unitKeys: Iterable<string>, known: boolean) => {
+      const wanted = [...unitKeys];
+      const settings = await api.getSettings().catch(() => ({}) as Record<string, string>);
+      const next = parseSkipped(settings[SKIPPED_SETTING]);
+      for (const k of wanted) {
+        if (known) next.add(k);
+        else next.delete(k);
+      }
+      await api.setSetting(SKIPPED_SETTING, serialiseSkipped(next));
+      load();
+    },
+    [load]
+  );
+
+  return { data, error, reload: load, setSkipped };
 }
 
 const STATUS_META: Record<UnitStatus, { label: string; colour: string; icon: string }> = {
@@ -39,7 +73,27 @@ const STATUS_META: Record<UnitStatus, { label: string; colour: string; icon: str
  * is not a fourth status: the unit *was* cleared, and that is still true. What
  * has expired is the evidence, so the badge keeps its label and loses its
  * colour, which is exactly the claim being made. */
-export function StatusBadge({ status, stale = false }: { status: UnitStatus; stale?: boolean }) {
+export function StatusBadge({
+  status,
+  stale = false,
+  skipped = false,
+}: {
+  status: UnitStatus;
+  stale?: boolean;
+  /** Marked "I already know this" — deliberately not styled as earned green. */
+  skipped?: boolean;
+}) {
+  if (skipped) {
+    return (
+      <span
+        className="badge"
+        style={{ color: "var(--medium)", borderColor: "var(--medium)", borderStyle: "dashed" }}
+        title="You marked this known. It counts as cleared, but the app is not claiming you solved it here."
+      >
+        ✓ Known
+      </span>
+    );
+  }
   const m = STATUS_META[status];
   const colour = stale ? "var(--text-faint)" : m.colour;
   return (

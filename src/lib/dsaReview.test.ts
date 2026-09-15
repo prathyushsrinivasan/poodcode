@@ -118,6 +118,12 @@ function review(cardId: string, dueDate: string, reps = 1): CardReview {
   };
 }
 
+/** `hydrate` pinned to NOW with nothing marked known — every case here is about
+ * decay, not about the skip list. */
+function hy(c: DsaCurriculum, problems: Problem[]) {
+  return hydrate(c, problems, new Set(), NOW);
+}
+
 const CHECKS: UnitCheck[] = [
   { q: "q0", a: "a0" },
   { q: "q1", a: "a1" },
@@ -154,7 +160,7 @@ describe("isCardDue", () => {
 describe("unit decay", () => {
   it("does not mark an unfinished unit stale, however old", () => {
     const c = curriculum([unit("u", [rung("Core", ["a", "b", "c"])])]);
-    const h = hydrate(c, [problem("a", "solved", daysAgo(400)), problem("b"), problem("c")], NOW);
+    const h = hy(c, [problem("a", "solved", daysAgo(400)), problem("b"), problem("c")]);
     const u = h.stages[0].units[0];
     expect(u.status).toBe("started");
     expect(u.staleAfterDays).toBeNull();
@@ -163,17 +169,16 @@ describe("unit decay", () => {
 
   it("gives a solid unit 30 days and a complete one 90", () => {
     const solidC = curriculum([unit("u", [rung("Core", ["a", "b", "c"])])]);
-    const solid = hydrate(
+    const solid = hy(
       solidC,
-      [problem("a", "solved", daysAgo(31)), problem("b", "solved", daysAgo(31)), problem("c")],
-      NOW
+      [problem("a", "solved", daysAgo(31)), problem("b", "solved", daysAgo(31)), problem("c")]
     ).stages[0].units[0];
     expect(solid.status).toBe("solid");
     expect(solid.staleAfterDays).toBe(30);
     expect(solid.stale).toBe(true);
 
     const completeC = curriculum([unit("u", [rung("Core", ["a"])])]);
-    const complete = hydrate(completeC, [problem("a", "solved", daysAgo(31))], NOW).stages[0]
+    const complete = hy(completeC, [problem("a", "solved", daysAgo(31))]).stages[0]
       .units[0];
     expect(complete.status).toBe("complete");
     expect(complete.staleAfterDays).toBe(90);
@@ -184,10 +189,9 @@ describe("unit decay", () => {
     // One problem solved long ago and one solved yesterday is a unit you are
     // still working on, not one that has gone cold.
     const c = curriculum([unit("u", [rung("Core", ["a", "b", "c"])])]);
-    const h = hydrate(
+    const h = hy(
       c,
-      [problem("a", "solved", daysAgo(300)), problem("b", "solved", daysAgo(1)), problem("c")],
-      NOW
+      [problem("a", "solved", daysAgo(300)), problem("b", "solved", daysAgo(1)), problem("c")]
     );
     const u = h.stages[0].units[0];
     expect(u.lastPractisedDays).toBe(1);
@@ -196,7 +200,7 @@ describe("unit decay", () => {
 
   it("refuses to guess when a cleared unit has no solve date", () => {
     const c = curriculum([unit("u", [rung("Core", ["a"])])]);
-    const u = hydrate(c, [problem("a", "solved", null)], NOW).stages[0].units[0];
+    const u = hy(c, [problem("a", "solved", null)]).stages[0].units[0];
     expect(u.lastPractisedDays).toBe(Infinity);
     expect(u.stale).toBe(false);
   });
@@ -205,7 +209,7 @@ describe("unit decay", () => {
 describe("unitChecks", () => {
   it("counts ungraded checks as due and graded-but-future as not", () => {
     const c = curriculum([unit("u", [rung("Core", ["a"])], CHECKS)]);
-    const h = hydrate(c, [problem("a", "solved", daysAgo(1))], NOW);
+    const h = hy(c, [problem("a", "solved", daysAgo(1))]);
     const reviews = new Map([["dsa-check:u:0", review("dsa-check:u:0", "2026-12-01")]]);
 
     expect(unitChecks(h.stages[0].units[0], reviews, "2026-06-01")).toEqual({
@@ -222,7 +226,7 @@ describe("reviewLane", () => {
       unit("cleared", [rung("Core", ["a"])], CHECKS),
       unit("untouched", [rung("Core", ["b"])], CHECKS),
     ]);
-    const h = hydrate(c, [problem("a", "solved", daysAgo(1)), problem("b")], NOW);
+    const h = hy(c, [problem("a", "solved", daysAgo(1)), problem("b")]);
     const lane = reviewLane(h, new Map(), NOW);
 
     expect(lane.units.map((r) => r.unit.unit.key)).toEqual(["cleared"]);
@@ -235,7 +239,7 @@ describe("reviewLane", () => {
       unit("recent", [rung("Core", ["a"])], CHECKS),
       unit("cold", [rung("Core", ["b", "c", "d"])], CHECKS),
     ]);
-    const h = hydrate(
+    const h = hy(
       c,
       [
         problem("a", "solved", daysAgo(1)),
@@ -243,8 +247,7 @@ describe("reviewLane", () => {
         problem("b", "solved", daysAgo(200)),
         problem("c", "solved", daysAgo(200)),
         problem("d"),
-      ],
-      NOW
+      ]
     );
     const lane = reviewLane(h, new Map(), NOW);
 
@@ -255,7 +258,7 @@ describe("reviewLane", () => {
 
   it("leaves a cleared unit out once nothing about it is due", () => {
     const c = curriculum([unit("u", [rung("Core", ["a"])], CHECKS)]);
-    const h = hydrate(c, [problem("a", "solved", daysAgo(1))], NOW);
+    const h = hy(c, [problem("a", "solved", daysAgo(1))]);
     const reviews = new Map([
       ["dsa-check:u:0", review("dsa-check:u:0", "2026-12-01")],
       ["dsa-check:u:1", review("dsa-check:u:1", "2026-12-01")],
@@ -268,7 +271,7 @@ describe("reviewLane", () => {
 
   it("includes a stale unit even when every check is scheduled far out", () => {
     const c = curriculum([unit("u", [rung("Core", ["a"])], CHECKS)]);
-    const h = hydrate(c, [problem("a", "solved", daysAgo(200))], NOW);
+    const h = hy(c, [problem("a", "solved", daysAgo(200))]);
     const reviews = new Map([
       ["dsa-check:u:0", review("dsa-check:u:0", "2026-12-01")],
       ["dsa-check:u:1", review("dsa-check:u:1", "2026-12-01")],

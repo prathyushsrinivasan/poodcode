@@ -116,6 +116,14 @@ export interface HydratedUnit {
    * so this survives a re-sequencing of the curriculum with no migration.
    */
   stale: boolean;
+  /**
+   * Marked "I already know this". Counts as cleared for readiness and for
+   * choosing what is next, and renders distinctly from earned green: someone
+   * who learned heaps elsewhere should not have to re-solve eleven problems or
+   * watch the Library sit at 20% forever, but the display must not claim they
+   * did the work either.
+   */
+  skipped: boolean;
 }
 
 export interface HydratedStage {
@@ -158,6 +166,25 @@ export function isCleared(status: UnitStatus): boolean {
 }
 
 /**
+ * The settings key holding the units marked "I already know this".
+ *
+ * A single comma-separated row in the existing key-value settings table rather
+ * than a curriculum progress table: the no-progress-table property is what lets
+ * the curriculum be re-sequenced without a migration, and one string does not
+ * cost it. A key that no longer names a unit is simply ignored, so deleting a
+ * unit needs no cleanup.
+ */
+export const SKIPPED_SETTING = "dsa.skipped";
+
+export function parseSkipped(raw: string | undefined): Set<string> {
+  return new Set((raw ?? "").split(",").map((s) => s.trim()).filter(Boolean));
+}
+
+export function serialiseSkipped(keys: Iterable<string>): string {
+  return [...new Set(keys)].sort().join(",");
+}
+
+/**
  * Join the curriculum to the learner's problems.
  *
  * Units are processed in curriculum order, which is what makes the single pass
@@ -167,12 +194,14 @@ export function isCleared(status: UnitStatus): boolean {
 export function hydrate(
   curriculum: DsaCurriculum | null,
   problems: Problem[],
+  /** Units marked "I already know this" (see `SKIPPED_SETTING`). */
+  skipped: Set<string> = new Set(),
   /** Injectable so decay is testable; the app never passes it. */
   now: Date = new Date()
 ): HydratedCurriculum {
   const bySlug = new Map(problems.map((p) => [p.slug, p]));
   const unitBySlug = new Map<string, CurriculumUnit>();
-  const statusByUnit = new Map<string, UnitStatus>();
+  const clearedByUnit = new Map<string, boolean>();
   const titleByUnit = new Map<string, string>();
   const placed = new Set<string>();
 
@@ -239,13 +268,14 @@ export function hydrate(
       });
 
       const status = statusOf(solved, total, attempted);
-      statusByUnit.set(unit.key, status);
+      const isSkipped = skipped.has(unit.key);
+      clearedByUnit.set(unit.key, isCleared(status) || isSkipped);
       titleByUnit.set(unit.key, unit.title);
       const unmet = unit.prereqs.filter((k) => {
-        const s = statusByUnit.get(k);
+        const cleared = clearedByUnit.get(k);
         // An unknown prerequisite cannot block: the generator forbids it, and
         // silently locking the whole ladder would be the worse failure.
-        return s !== undefined && !isCleared(s);
+        return cleared === false;
       });
       const ready = unmet.length === 0;
       const prereqTitles = unit.prereqs.map((k) => titleByUnit.get(k) ?? k);
@@ -278,6 +308,7 @@ export function hydrate(
         lastPractisedDays,
         staleAfterDays,
         stale,
+        skipped: isSkipped,
       };
     });
 
@@ -296,7 +327,9 @@ export function hydrate(
   const all = stages.flatMap((s) => s.units);
   // Prefer the first unfinished unit you are ready for; if every ready unit is
   // finished, fall back to the first unfinished one so "Continue" never dies.
-  const unfinished = all.filter((u) => u.status !== "complete");
+  // A skipped unit is never the target — the whole point of saying "I know this"
+  // is not to be sent back to it.
+  const unfinished = all.filter((u) => u.status !== "complete" && !u.skipped);
   const target = unfinished.find((u) => u.ready) ?? unfinished[0] ?? null;
 
   return {

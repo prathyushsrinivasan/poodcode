@@ -1,5 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { findUnit, hydrate, isCleared, neighbours, searchUnits } from "./curriculum";
+import {
+  findUnit,
+  hydrate,
+  isCleared,
+  neighbours,
+  parseSkipped,
+  searchUnits,
+  serialiseSkipped,
+} from "./curriculum";
 import type { CurriculumUnit, DsaCurriculum, Problem, Rung, SolvedStatus } from "../types";
 
 function problem(slug: string, status: SolvedStatus = "unsolved"): Problem {
@@ -276,6 +284,50 @@ describe("hydrate", () => {
     expect(h.stages).toEqual([]);
     expect(h.next).toBeNull();
     expect(h.unplaced).toHaveLength(1);
+  });
+});
+
+describe("marking a unit known", () => {
+  const twoUnits = () =>
+    curriculum([
+      [unit("heaps", [rung("Core", ["a", "b", "c"])]), unit("later", [rung("Core", ["d"])], ["heaps"])],
+    ]);
+  const unsolved = () => [problem("a"), problem("b"), problem("c"), problem("d")];
+
+  it("unblocks what depends on it without claiming the problems were solved", () => {
+    const h = hydrate(twoUnits(), unsolved(), new Set(["heaps"]));
+    const heaps = findUnit(h, "heaps")!;
+    const later = findUnit(h, "later")!;
+
+    expect(heaps.skipped).toBe(true);
+    expect(heaps.solved).toBe(0); // no progress is invented
+    expect(heaps.status).toBe("new");
+    expect(later.ready).toBe(true); // …but the prerequisite is satisfied
+    expect(later.unmetPrereqTitles).toEqual([]);
+  });
+
+  it("is never the Continue target", () => {
+    const h = hydrate(twoUnits(), unsolved(), new Set(["heaps"]));
+    expect(h.next?.unit.unit.key).toBe("later");
+  });
+
+  it("blocks again once un-skipped", () => {
+    const h = hydrate(twoUnits(), unsolved(), new Set());
+    expect(findUnit(h, "later")!.ready).toBe(false);
+    expect(h.next?.unit.unit.key).toBe("heaps");
+  });
+
+  it("round-trips through the settings string, sorted and de-duplicated", () => {
+    expect(serialiseSkipped(["tries", "heaps", "heaps"])).toBe("heaps,tries");
+    expect([...parseSkipped("heaps, tries ,,")]).toEqual(["heaps", "tries"]);
+    expect([...parseSkipped(undefined)]).toEqual([]);
+    expect([...parseSkipped("")]).toEqual([]);
+  });
+
+  it("ignores a skipped key that no longer names a unit", () => {
+    const h = hydrate(twoUnits(), unsolved(), new Set(["a-unit-that-was-deleted"]));
+    expect(findUnit(h, "later")!.ready).toBe(false);
+    expect(h.stages[0].units.every((u) => !u.skipped)).toBe(true);
   });
 });
 
