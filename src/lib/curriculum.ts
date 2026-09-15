@@ -185,6 +185,35 @@ export function serialiseSkipped(keys: Iterable<string>): string {
 }
 
 /**
+ * The last unit you opened, so the curriculum page can offer to resume it.
+ *
+ * `data.next` — the first unfinished *ready* unit — is a reasonable default and
+ * is not the same question. If you spent yesterday evening on Backtracking, "up
+ * next" may well point at Trees, and the thing you actually want is the page you
+ * closed. Both are offered; neither is guessed at.
+ *
+ * localStorage rather than settings: this is a per-device UI convenience like the
+ * collapse state, not progress, and it should not travel in a backup.
+ */
+const LAST_UNIT_KEY = "poodcode:dsa:last-unit";
+
+export function rememberLastUnit(unitKey: string): void {
+  try {
+    localStorage.setItem(LAST_UNIT_KEY, unitKey);
+  } catch {
+    /* a private window with storage blocked loses the convenience, nothing more */
+  }
+}
+
+export function readLastUnit(): string | null {
+  try {
+    return localStorage.getItem(LAST_UNIT_KEY);
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Join the curriculum to the learner's problems.
  *
  * Units are processed in curriculum order, which is what makes the single pass

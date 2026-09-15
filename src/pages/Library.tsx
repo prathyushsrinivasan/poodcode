@@ -7,7 +7,7 @@ import { Section, useCollapse } from "../components/Collapsible";
 import { ClickableRow, Empty } from "../components/common";
 import { LibrarySkeleton } from "../components/Skeleton";
 import { StatusBadge, UnitProgress, useCurriculumData } from "../components/CurriculumData";
-import { searchUnits, type HydratedUnit } from "../lib/curriculum";
+import { findUnit, readLastUnit, searchUnits, type HydratedUnit } from "../lib/curriculum";
 import { reviewLane, type ReviewLane } from "../lib/dsaReview";
 
 /**
@@ -57,6 +57,14 @@ export default function Library() {
   const pct = data.total ? Math.round((data.solved / data.total) * 100) : 0;
   // Derived, not stated: the comment this replaced claimed thirty-two.
   const unitCount = data.stages.reduce((n, s) => n + s.units.length, 0);
+  // "Where was I?" and "what is next?" are different questions. Offer the
+  // remembered unit only when it is neither finished nor already the target.
+  const lastKey = readLastUnit();
+  const lastUnit = lastKey ? findUnit(data, lastKey) : null;
+  const resume =
+    lastUnit && lastUnit.status !== "complete" && lastUnit.unit.key !== data.next?.unit.unit.key
+      ? lastUnit
+      : null;
 
   return (
     <div className="page page-wide">
@@ -98,6 +106,14 @@ export default function Library() {
               <span className="dim"> — {data.next.unit.unit.tagline}</span>
             </div>
             <span className="spacer" />
+            {resume && (
+              <button
+                onClick={() => nav(`/library/unit/${resume.unit.key}`)}
+                title="The last unit you had open — not necessarily the next one"
+              >
+                Resume {resume.unit.title}
+              </button>
+            )}
             <button className="primary" onClick={() => nav(`/library/unit/${data.next!.unit.unit.key}`)}>
               Open the unit →
             </button>

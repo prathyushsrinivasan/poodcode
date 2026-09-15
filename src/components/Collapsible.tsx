@@ -64,7 +64,27 @@ export function useCollapse(namespace: string, defaultOpen = true) {
     [id, defaultOpen]
   );
 
-  return { isOpen, toggle, setAll };
+  /** Force one section open regardless of the remembered state. Used when a URL
+   * hash names a section: arriving at `#pitfalls` and finding it collapsed
+   * because you closed it last week is the link failing to work. */
+  const open = useCallback(
+    (k: string) => {
+      setOverrides((prev) => {
+        // The persisted set holds *deviations* from the default, so "open" means
+        // removing the id when the default is open and adding it when it is not.
+        const wanted = defaultOpen ? false : true;
+        if (prev.has(id(k)) === wanted) return prev;
+        const next = new Set(prev);
+        if (wanted) next.add(id(k));
+        else next.delete(id(k));
+        writeCollapsed(next);
+        return next;
+      });
+    },
+    [id, defaultOpen]
+  );
+
+  return { isOpen, toggle, setAll, open };
 }
 
 /** A section with a clickable header that shows/hides its body.
@@ -78,6 +98,7 @@ export function Section({
   meta,
   level = "h3",
   accent,
+  id,
   children,
 }: {
   title: React.ReactNode;
@@ -88,10 +109,16 @@ export function Section({
   level?: "h3" | "h4";
   /** Tint the header text (e.g. "var(--accent)" for the challenge section). */
   accent?: string;
+  /**
+   * DOM id, so the section can be linked to (`#pitfalls`) and scrolled to.
+   * The pitfalls table is the thing you want to reach mid-debug, from outside
+   * the app, in one click — which needs an anchor to aim at.
+   */
+  id?: string;
   children: React.ReactNode;
 }) {
   return (
-    <div className="collapsible">
+    <div className="collapsible" id={id}>
       <div
         className="collapsible-head"
         role="button"

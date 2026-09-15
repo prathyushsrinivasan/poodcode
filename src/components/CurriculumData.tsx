@@ -147,17 +147,25 @@ export interface TaughtInUnit {
   tagline: string;
 }
 
-let unitIndexPromise: Promise<Map<string, TaughtInUnit>> | null = null;
+export interface SlugPlacement {
+  unit: TaughtInUnit;
+  rungTitle: string;
+  /** Every slug on that rung, in ladder order, so "next in this rung" is a walk. */
+  rungSlugs: string[];
+}
 
-export function loadUnitIndex(): Promise<Map<string, TaughtInUnit>> {
+let unitIndexPromise: Promise<Map<string, SlugPlacement>> | null = null;
+
+export function loadUnitIndex(): Promise<Map<string, SlugPlacement>> {
   if (!unitIndexPromise) {
     unitIndexPromise = loadCurriculumSeed()
       .then((c) => {
-        const index = new Map<string, TaughtInUnit>();
+        const index = new Map<string, SlugPlacement>();
         for (const stage of c?.stages ?? []) {
           for (const u of stage.units) {
-            const entry = { key: u.key, title: u.title, icon: u.icon, tagline: u.tagline };
+            const unit = { key: u.key, title: u.title, icon: u.icon, tagline: u.tagline };
             for (const rung of u.rungs) {
+              const entry = { unit, rungTitle: rung.title, rungSlugs: rung.slugs };
               for (const slug of rung.slugs) index.set(slug, entry);
             }
           }
@@ -179,13 +187,13 @@ export function loadUnitIndex(): Promise<Map<string, TaughtInUnit>> {
  *
  * Renders nothing for a problem you authored, which belongs to no unit. */
 export function TaughtIn({ slug }: { slug: string }) {
-  const [unit, setUnit] = useState<TaughtInUnit | null>(null);
+  const [where, setWhere] = useState<SlugPlacement | null>(null);
 
   useEffect(() => {
     let live = true;
     loadUnitIndex()
       .then((index) => {
-        if (live) setUnit(index.get(slug) ?? null);
+        if (live) setWhere(index.get(slug) ?? null);
       })
       .catch(() => {});
     return () => {
@@ -193,14 +201,67 @@ export function TaughtIn({ slug }: { slug: string }) {
     };
   }, [slug]);
 
-  if (!unit) return null;
+  if (!where) return null;
   return (
-    <span className="badge" title={unit.tagline}>
+    <span className="badge" title={`${where.unit.tagline} · ${where.rungTitle}`}>
       Taught in{" "}
-      <Link to={`/library/unit/${unit.key}`}>
-        {unit.icon} {unit.title}
+      <Link to={`/library/unit/${where.unit.key}`}>
+        {where.unit.icon} {where.unit.title}
       </Link>
     </span>
+  );
+}
+
+/**
+ * "Next in this rung →", on the Solve page.
+ *
+ * After a solve you were left on the Solve page, whose only route onward was
+ * `TaughtIn` → the unit page → re-scanning the rungs for the next unsolved row.
+ * A rung is explicitly "a group of problems drilling the same twist", so the
+ * next one on it is almost always what you wanted; making you navigate two pages
+ * to find it is how a drill loses its momentum.
+ *
+ * Walks the rung in ladder order for the first problem after this one that is
+ * not solved. Falls back to the first unsolved *anywhere* on the rung, so
+ * arriving at the last row still moves you forward rather than dead-ending.
+ */
+export function NextInRung({ slug }: { slug: string }) {
+  const [next, setNext] = useState<{ id: number; title: string; rung: string } | null>(null);
+
+  useEffect(() => {
+    let live = true;
+    Promise.all([loadUnitIndex(), api.listProblems()])
+      .then(([index, problems]) => {
+        if (!live) return;
+        const where = index.get(slug);
+        if (!where) return setNext(null);
+        const bySlug = new Map(problems.map((p) => [p.slug, p]));
+        const unsolved = (s: string) => {
+          const p = bySlug.get(s);
+          return p && p.solved_status !== "solved" && s !== slug ? p : null;
+        };
+        const at = where.rungSlugs.indexOf(slug);
+        const after = where.rungSlugs.slice(at + 1).map(unsolved).find(Boolean);
+        const anywhere = where.rungSlugs.map(unsolved).find(Boolean);
+        const pick = after ?? anywhere ?? null;
+        setNext(pick ? { id: pick.id, title: pick.title, rung: where.rungTitle } : null);
+      })
+      .catch(() => {});
+    return () => {
+      live = false;
+    };
+  }, [slug]);
+
+  if (!next) return null;
+  return (
+    <Link
+      to={`/solve/${next.id}`}
+      className="badge"
+      title={`The next unsolved problem on the "${next.rung}" rung`}
+      style={{ borderColor: "var(--accent)", color: "var(--accent)" }}
+    >
+      Next in {next.rung} → {next.title}
+    </Link>
   );
 }
 

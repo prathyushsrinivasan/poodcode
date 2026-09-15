@@ -2,7 +2,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useStore } from "../store";
 import { api } from "../api";
-import type { BackendTrack, Problem, ProjectTrack, WeeklyCourse } from "../types";
+import type { BackendTrack, DsaCurriculum, Problem, ProjectTrack, WeeklyCourse } from "../types";
+import { loadCurriculumSeed } from "./CurriculumData";
 
 interface Cmd {
   id: string;
@@ -20,9 +21,52 @@ type Tracks = {
   java: WeeklyCourse | null;
   backend: BackendTrack | null;
   projects: ProjectTrack | null;
+  dsa: DsaCurriculum | null;
 };
 
-const NO_TRACKS: Tracks = { ts: null, java: null, backend: null, projects: null };
+const NO_TRACKS: Tracks = { ts: null, java: null, backend: null, projects: null, dsa: null };
+
+/**
+ * One command per DSA unit, plus the mixed set per stage.
+ *
+ * The palette offered exactly two curriculum entries — "Go to the DSA
+ * Curriculum" and "Browse all problems" — while the weekly courses registered a
+ * command per authored week. So the 33 units, which are the things you actually
+ * want to jump to, were reachable only by opening the page and scrolling.
+ *
+ * The hint carries the stage and the tagline, because "Heaps" is searchable by
+ * name and "the smallest element, always" is searchable by what it does — and
+ * half the time you remember the second and not the first.
+ */
+function dsaCmds(c: DsaCurriculum | null, navigate: (to: string) => void): Cmd[] {
+  if (!c) return [];
+  const out: Cmd[] = [];
+  let n = 0;
+  c.stages.forEach((stage, si) => {
+    for (const u of stage.units) {
+      n++;
+      out.push({
+        id: `dsa-unit-${u.key}`,
+        label: `${u.icon} ${u.title} — DSA unit ${n}`,
+        hint: `Stage ${si + 1} · ${stage.title} · ${u.tagline}`,
+        run: () => navigate(`/library/unit/${u.key}`),
+      });
+    }
+    out.push({
+      id: `dsa-mixed-${stage.key}`,
+      label: `🎲 Mixed set — ${stage.title}`,
+      hint: "Unlabelled problems from this stage and earlier: name the technique",
+      run: () => navigate(`/library/mixed/${stage.key}`),
+    });
+  });
+  out.push({
+    id: "dsa-placement",
+    label: "🎯 DSA placement — skip what you already know",
+    hint: "One routing question and one problem per stage",
+    run: () => navigate("/library/placement"),
+  });
+  return out;
+}
 
 /** One command per authored unit of a weekly course. Units are addressed by
  * number, which is what `/course/:week` expects. */
@@ -73,6 +117,7 @@ export function CommandPalette() {
     api.javaCourse().then(put("java")).catch(() => {});
     api.backendTrack().then(put("backend")).catch(() => {});
     api.projectsTrack().then(put("projects")).catch(() => {});
+    loadCurriculumSeed().then(put("dsa")).catch(() => {});
   }, [open]);
 
   const navCmds = useMemo<Cmd[]>(
@@ -105,6 +150,7 @@ export function CommandPalette() {
 
   const trackCmds = useMemo<Cmd[]>(
     () => [
+      ...dsaCmds(tracks.dsa, navigate),
       ...courseCmds(tracks.ts, "/course", navigate),
       ...courseCmds(tracks.java, "/java-course", navigate),
       ...(tracks.backend?.projects ?? [])

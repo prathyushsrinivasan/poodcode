@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { api } from "../api";
 import type { BigOItem, CardReview, Concept, Trace, UnitCheck } from "../types";
 import { Markdown, InlineMarkdown } from "../components/Markdown";
@@ -7,7 +7,12 @@ import { Section, useCollapse } from "../components/Collapsible";
 import { ClickableRow, Confidence, DiffBadge, Empty } from "../components/common";
 import { UnitSkeleton } from "../components/Skeleton";
 import { StatusBadge, UnitProgress, useCurriculumData } from "../components/CurriculumData";
-import { findUnit, neighbours, type HydratedRung } from "../lib/curriculum";
+import {
+  findUnit,
+  neighbours,
+  rememberLastUnit,
+  type HydratedRung,
+} from "../lib/curriculum";
 import {
   bigoCardId,
   cardStats,
@@ -36,11 +41,24 @@ export default function CurriculumUnit() {
   const [concepts, setConcepts] = useState<Concept[]>([]);
   const [reviews, setReviews] = useState<Map<string, CardReview>>(new Map());
   const nav = useNavigate();
-  const { isOpen, toggle } = useCollapse(`dsa-unit:${key}`, true);
+  const { isOpen, toggle, open } = useCollapse(`dsa-unit:${key}`, true);
+  const { hash } = useLocation();
+  // Refs so the key handler is registered once rather than re-bound on every
+  // data change — the listener reads the latest values instead of closing over
+  // stale ones.
+  const dataRef = useRef(data);
+  dataRef.current = data;
+  const keyRef = useRef(key);
+  keyRef.current = key;
 
   useEffect(() => {
     api.concepts().then(setConcepts).catch(() => {});
   }, []);
+
+  // Remembered so /library can offer "Resume Backtracking" beside "Up next".
+  useEffect(() => {
+    if (key) rememberLastUnit(key);
+  }, [key]);
 
   // Self-check scheduling lives in the same `card_reviews` table as the Learn
   // tab's decks, so this is one read and no new storage.
@@ -73,6 +91,69 @@ export default function CurriculumUnit() {
     [grade, key]
   );
 
+  /**
+   * Honour `#pitfalls` and friends: force that section open, then scroll to it.
+   *
+   * Forcing it open matters — sections remember their collapsed state, so
+   * arriving at a link and finding the section shut because you closed it last
+   * week is the link not working. Waits a frame so the section body has rendered
+   * before we measure where to scroll.
+   */
+  useEffect(() => {
+    const target = hash.replace(/^#/, "");
+    if (!target || !data) return;
+    open(target);
+    const id = requestAnimationFrame(() => {
+      document.getElementById(target)?.scrollIntoView({ block: "start", behavior: "smooth" });
+    });
+    return () => cancelAnimationFrame(id);
+  }, [hash, data, open]);
+
+  /**
+   * `[` / `]` page between units, `g l` goes back to the curriculum.
+   *
+   * The prev/next buttons already existed and nothing was bound to them. Skipped
+   * while focus is in an input or a Monaco editor, because `[` is a character
+   * there and stealing it would be worse than the shortcut is good.
+   */
+  useEffect(() => {
+    let gPending = false;
+    const typing = (el: EventTarget | null) => {
+      const node = el as HTMLElement | null;
+      if (!node) return false;
+      const tag = node.tagName;
+      return (
+        tag === "INPUT" ||
+        tag === "TEXTAREA" ||
+        tag === "SELECT" ||
+        node.isContentEditable ||
+        !!node.closest?.(".monaco-editor")
+      );
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.ctrlKey || e.metaKey || e.altKey || typing(e.target)) return;
+      if (gPending && e.key === "l") {
+        gPending = false;
+        e.preventDefault();
+        nav("/library");
+        return;
+      }
+      gPending = e.key === "g";
+      if (e.key === "[" || e.key === "]") {
+        const data0 = dataRef.current;
+        if (!data0) return;
+        const n = neighbours(data0, keyRef.current);
+        const to = e.key === "[" ? n.prev : n.next;
+        if (to) {
+          e.preventDefault();
+          nav(`/library/unit/${to.unit.key}`);
+        }
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [nav]);
+
   // `error` used to be ignored here, so a failed fetch left the page saying
   // "Loading…" forever with no explanation. Library handled it; this did not.
   if (error) {
@@ -102,6 +183,18 @@ export default function CurriculumUnit() {
   const checkStats = unitChecks(hydrated, reviews, today);
   const bigoStats = cardStats(u.bigo.map((_, i) => bigoCardId(key, i)), reviews, today);
   const { prev, next } = neighbours(data, key);
+  const stageIndex = data.stages.findIndex((s) => s.units.some((x) => x.unit.key === key));
+  const stage =
+    stageIndex < 0
+      ? null
+      : {
+          ...data.stages[stageIndex],
+          number: stageIndex + 1,
+          count: data.stages.length,
+          unitNumber:
+            data.stages[stageIndex].units.findIndex((x) => x.unit.key === key) + 1,
+          unitCount: data.stages[stageIndex].units.length,
+        };
   // For a stale unit, "re-practise" means a problem you already solved — the
   // point is to prove the technique is still there, not to meet a new one.
   const firstSolved =
@@ -114,21 +207,47 @@ export default function CurriculumUnit() {
   return (
     <div className="page page-wide">
       <div className="row" style={{ marginBottom: 4 }}>
-        <button className="ghost" onClick={() => nav("/library")}>
+        <button className="ghost" onClick={() => nav("/library")} title="g l">
           ← Curriculum
         </button>
         <span className="spacer" />
         {prev && (
-          <button className="ghost" onClick={() => nav(`/library/unit/${prev.unit.key}`)}>
+          <button
+            className="ghost"
+            onClick={() => nav(`/library/unit/${prev.unit.key}`)}
+            title="[ — previous unit"
+          >
             ← {prev.unit.title}
           </button>
         )}
         {next && (
-          <button className="ghost" onClick={() => nav(`/library/unit/${next.unit.key}`)}>
+          <button
+            className="ghost"
+            onClick={() => nav(`/library/unit/${next.unit.key}`)}
+            title="] — next unit"
+          >
             {next.unit.title} →
           </button>
         )}
       </div>
+
+      {/* Where am I? The header was icon + title + tagline, so you could not
+          tell stage 2 from stage 5 without going back. */}
+      {stage && (
+        <p className="faint" style={{ fontSize: 12, margin: "0 0 2px" }}>
+          <a
+            href="#"
+            onClick={(e) => {
+              e.preventDefault();
+              nav("/library");
+            }}
+          >
+            {stage.icon} Stage {stage.number} of {stage.count} · {stage.title}
+          </a>
+          {" · "}
+          unit {stage.unitNumber} of {stage.unitCount}
+        </p>
+      )}
 
       <div className="row">
         <h1 className="page-title" style={{ marginBottom: 0 }}>
@@ -197,17 +316,18 @@ export default function CurriculumUnit() {
         )}
       </div>
 
-      <Section title="🎯 Why this exists" open={isOpen("why")} onToggle={() => toggle("why")}>
+      <Section title="🎯 Why this exists" id="why" open={isOpen("why")} onToggle={() => toggle("why")}>
         <Markdown>{u.why}</Markdown>
       </Section>
 
-      <Section title="🧠 The model" open={isOpen("model")} onToggle={() => toggle("model")}>
+      <Section title="🧠 The model" id="model" open={isOpen("model")} onToggle={() => toggle("model")}>
         <Markdown>{u.model}</Markdown>
       </Section>
 
       {u.internals && (
         <Section
           title="🔬 How it works underneath"
+          id="internals"
           open={isOpen("internals")}
           onToggle={() => toggle("internals")}
         >
@@ -222,6 +342,7 @@ export default function CurriculumUnit() {
       {u.signals.length > 0 && (
         <Section
           title="🔔 Signals — when to reach for this"
+          id="signals"
           open={isOpen("signals")}
           onToggle={() => toggle("signals")}
           meta={<span className="dim mono">{u.signals.length}</span>}
@@ -254,6 +375,7 @@ export default function CurriculumUnit() {
       {u.skeletons.length > 0 && (
         <Section
           title="⌨️ The playbook"
+          id="skeletons"
           open={isOpen("skeletons")}
           onToggle={() => toggle("skeletons")}
           meta={<span className="dim mono">{u.skeletons.length}</span>}
@@ -282,6 +404,7 @@ export default function CurriculumUnit() {
       {u.traces.length > 0 && (
         <Section
           title="🎞️ Worked traces"
+          id="traces"
           open={isOpen("traces")}
           onToggle={() => toggle("traces")}
           meta={<span className="dim mono">{u.traces.length}</span>}
@@ -297,7 +420,7 @@ export default function CurriculumUnit() {
       )}
 
       {u.costs.length > 0 && (
-        <Section title="⏱️ What it costs" open={isOpen("costs")} onToggle={() => toggle("costs")}>
+        <Section title="⏱️ What it costs" id="costs" open={isOpen("costs")} onToggle={() => toggle("costs")}>
           <table className="data">
             <thead>
               <tr>
@@ -324,6 +447,7 @@ export default function CurriculumUnit() {
       {u.pitfalls.length > 0 && (
         <Section
           title="⚠️ Pitfalls, by symptom"
+          id="pitfalls"
           open={isOpen("pitfalls")}
           onToggle={() => toggle("pitfalls")}
           meta={<span className="dim mono">{u.pitfalls.length}</span>}
@@ -349,6 +473,7 @@ export default function CurriculumUnit() {
       {u.lessons.length > 0 && (
         <Section
           title="📘 Go deeper in Learn"
+          id="lessons"
           open={isOpen("lessons")}
           onToggle={() => toggle("lessons")}
           meta={<span className="dim mono">{u.lessons.length}</span>}
@@ -375,6 +500,7 @@ export default function CurriculumUnit() {
 
       <Section
         title="🧗 Practice"
+        id="ladder"
         open={isOpen("ladder")}
         onToggle={() => toggle("ladder")}
         meta={
@@ -396,6 +522,7 @@ export default function CurriculumUnit() {
       {u.build_it && (
         <Section
           title="🔨 Build it yourself"
+          id="build"
           open={isOpen("build")}
           onToggle={() => toggle("build")}
         >
@@ -406,6 +533,7 @@ export default function CurriculumUnit() {
       {u.checks.length > 0 && (
         <Section
           title="✅ Self-check"
+          id="checks"
           open={isOpen("checks")}
           onToggle={() => toggle("checks")}
           meta={
@@ -435,6 +563,7 @@ export default function CurriculumUnit() {
       {u.bigo.length > 0 && (
         <Section
           title="⏳ Price the snippet"
+          id="bigo"
           open={isOpen("bigo")}
           onToggle={() => toggle("bigo")}
           meta={
@@ -464,6 +593,7 @@ export default function CurriculumUnit() {
       {u.interview && (
         <Section
           title="💼 In an interview"
+          id="interview"
           open={isOpen("interview")}
           onToggle={() => toggle("interview")}
         >
