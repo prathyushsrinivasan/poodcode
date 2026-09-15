@@ -12,7 +12,8 @@
 //! 1. Every problem slug and concept key a unit references really exists.
 //! 2. Every problem is placed in **exactly one** unit — so the curriculum and
 //!    the library are the same set, and "what is next?" is never ambiguous.
-//! 3. Prerequisites point backwards, so the ladder can be walked top to bottom.
+//! 3. Prerequisites point backwards, so the ladder can be walked top to bottom —
+//!    and past the foundations stage they are a graph rather than a chain.
 //! 4. Rungs climb: within a unit, difficulty never decreases.
 //! 5. Every unit is actually taught — a why, a model, a ladder and self-checks.
 
@@ -23,6 +24,9 @@ use poodcode_lib::models::{Concept, DsaCurriculum, Problem};
 const CURRICULUM: &str = include_str!("../seeds/dsa_curriculum.json");
 const PROBLEMS: &str = include_str!("../seeds/problems.json");
 const CONCEPTS: &str = include_str!("../seeds/concepts.json");
+
+/// Mirrors `_MAX_CHAIN_RUN` in tools/dsa_curriculum.py.
+const MAX_CHAIN_RUN: usize = 2;
 
 fn rank(difficulty: &str) -> i32 {
     match difficulty {
@@ -47,15 +51,18 @@ fn curriculum_teaches_every_problem_exactly_once() {
 
     let mut seen_units: HashSet<&str> = HashSet::new();
     let mut owner: HashMap<&str, &str> = HashMap::new();
+    let mut order: Vec<&str> = Vec::new();
+    let mut chain_run = 0usize;
 
     assert!(!curriculum.stages.is_empty(), "no stages shipped");
 
-    for stage in &curriculum.stages {
+    for (si, stage) in curriculum.stages.iter().enumerate() {
         assert!(!stage.units.is_empty(), "stage {}: no units", stage.key);
 
         for unit in &stage.units {
             let k = unit.key.as_str();
             assert!(seen_units.insert(k), "duplicate unit {k}");
+            order.push(k);
 
             // 5 — the unit is actually taught, not just a list of links.
             assert!(!unit.title.trim().is_empty(), "{k}: no title");
@@ -64,12 +71,31 @@ fn curriculum_teaches_every_problem_exactly_once() {
             assert!(!unit.rungs.is_empty(), "{k}: no problem ladder");
             assert!(!unit.checks.is_empty(), "{k}: no self-check questions");
 
-            // 3 — prerequisites point backwards.
+            // 3 — prerequisites point backwards…
             for p in &unit.prereqs {
                 assert!(
                     seen_units.contains(p.as_str()),
                     "{k}: prerequisite {p} is not an earlier unit"
                 );
+            }
+
+            // …and, past foundations, are not merely the chain. A run of units
+            // whose only prereq is the one textually before them is the absence
+            // of a dependency graph rather than a shallow one, and it makes the
+            // "builds on …" banner assert something false. Counted as a run
+            // because one chain link is often the true answer.
+            let chained = order.len() >= 2
+                && unit.prereqs.len() == 1
+                && unit.prereqs[0] == order[order.len() - 2];
+            if si > 0 && chained {
+                chain_run += 1;
+                assert!(
+                    chain_run <= MAX_CHAIN_RUN,
+                    "{k}: {chain_run} units in a row list only the unit before them as a \
+                     prerequisite — that is a chain, not a dependency graph"
+                );
+            } else {
+                chain_run = 0;
             }
 
             // 1 — concept links resolve.

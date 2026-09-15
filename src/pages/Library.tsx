@@ -186,9 +186,9 @@ function UnitCard({ u, onOpen }: { u: HydratedUnit; onOpen: () => void }) {
           {u.attempted > 0 && ` · ${u.attempted} attempted`}
         </span>
         <span className="spacer" />
-        {!u.ready && u.prereqTitles.length > 0 && (
+        {u.unmetPrereqTitles.length > 0 && (
           <span className="faint" style={{ fontSize: 12 }} title="Advisory only — the unit is still open">
-            builds on {u.prereqTitles.join(", ")}
+            builds on {u.unmetPrereqTitles.join(", ")}
           </span>
         )}
       </div>

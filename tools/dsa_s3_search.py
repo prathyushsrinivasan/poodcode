@@ -40,7 +40,7 @@ fast.
 _unit(
     "sorting", "Sorting & Ordering", "🔡", _S3,
     "What sorting costs, what it buys, and how to sort by something else.",
-    prereqs=["strings"],
+    prereqs=["arrays-first-pass", "complexity"],
     why="""
 You will almost never implement a sort. You will constantly *decide whether to
 call one*, and that decision is one of the most reliable dividing lines between
@@ -214,7 +214,7 @@ in it in O(log n).
 _unit(
     "binary-search", "Binary Search", "🎯", _S3,
     "Halve the search space — over an array, or over the answer itself.",
-    prereqs=["sorting"],
+    prereqs=["sorting", "complexity"],
     why="""
 Binary search is the cheapest big win in algorithms: 20 steps to find one value
 among a million, 30 among a billion. Everyone knows the idea. Almost nobody
@@ -392,7 +392,7 @@ rather than a collection of them — first its factors, then its bits.
 _unit(
     "math-number-theory", "Math & Number Theory", "🧮", _S3,
     "Divisors, primes and gcd — in O(√n) and O(log n), not O(n).",
-    prereqs=["binary-search"],
+    prereqs=["loops-and-digits"],
     why="""
 Number-theory problems are the clearest example of the distinction that Big-O
 makes and casual thinking does not: the difference between *how many numbers
@@ -602,7 +602,7 @@ One more representation to go: the bits an integer is actually made of.
 _unit(
     "bit-manipulation", "Bit Manipulation", "🔟", _S3,
     "32 flags in one int, and the XOR trick that cancels pairs.",
-    prereqs=["math-number-theory"],
+    prereqs=["loops-and-digits"],
     why="""
 An `int` is 32 booleans. Once you see it that way, a set of up to 32 elements
 becomes a single number you can compare, hash, store in an array and pass
@@ -784,7 +784,7 @@ the index discipline that grid problems demand.
 _unit(
     "simulation-and-matrix", "Simulation & Matrices", "🎛️", _S3,
     "Follow the rules exactly, on a grid, without breaking your own indices.",
-    prereqs=["bit-manipulation"],
+    prereqs=["arrays-first-pass", "loops-and-digits"],
     why="""
 Some problems have no trick. They describe a process — a robot walking, cells
 updating, a matrix rotating — and the work is to execute it *exactly*, which is

@@ -77,7 +77,7 @@ one you can re-derive at a whiteboard.
 _unit(
     "stacks", "Stacks & Monotonic Stacks", "🥞", _S4,
     "Last in, first out — and the trick that makes “next greater” linear.",
-    prereqs=["simulation-and-matrix"],
+    prereqs=["arrays-first-pass", "strings"],
     why="""
 A stack is the right structure whenever the most recent unfinished thing is the
 one you need next. Bracket matching is the obvious case; the important one is
@@ -405,7 +405,7 @@ and then, by opening its other end, does something a stack cannot.
 _unit(
     "queues-and-deques", "Queues & Deques", "🎟️", _S4,
     "First in, first out — and the deque that answers “max of every window”.",
-    prereqs=["stacks"],
+    prereqs=["arrays-first-pass"],
     why="""
 A stack hands back the most recent item. A **queue** hands back the oldest, and
 that single difference is the whole reason BFS finds shortest paths: processing
@@ -773,7 +773,7 @@ them fast and what fixes their shape. The next structure gives that up.
 _unit(
     "linked-lists", "Linked Lists", "🔗", _S4,
     "Pointer surgery: reversal, fast-and-slow, and the dummy head.",
-    prereqs=["queues-and-deques"],
+    prereqs=["two-pointers"],
     why="""
 Linked lists are rare in production Java and common in interviews, for a reason
 that is actually fair: they test whether you can hold a mutable pointer
@@ -1127,7 +1127,7 @@ Stacks, queues and lists all order by *arrival*. The next structure orders by
 _unit(
     "heaps", "Heaps & Priority Queues", "⛰️", _S4,
     "The smallest element, always, for O(log n) a move.",
-    prereqs=["linked-lists"],
+    prereqs=["sorting", "complexity"],
     why="""
 Sorting gives you every element in order, which is more than most problems need
 and costs O(n log n) to produce. A heap gives you only the extreme one — but
@@ -1508,7 +1508,7 @@ interviewer really wants answered: can you *combine* them?
 _unit(
     "design", "Data Structure Design", "🏗️", _S4,
     "No algorithm — just the right combination, at the right cost.",
-    prereqs=["heaps"],
+    prereqs=["hashing", "linked-lists"],
     why="""
 Design problems give you an interface and a performance target: *"implement
 `get` and `put`, both in O(1)"*. There is no clever insight to find. The work is

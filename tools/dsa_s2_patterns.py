@@ -204,7 +204,7 @@ that and you have the most useful data structure in interview programming.
 _unit(
     "hashing", "Hashing: Trade Space for Time", "🗝️", _S2,
     "“Have I seen this?” in O(1), and everything that follows from it.",
-    prereqs=["complexity"],
+    prereqs=["arrays-first-pass", "complexity"],
     why="""
 The commonest reason code is quadratic is that it searches. *For each element,
 look through the rest* is two nested loops, and the inner one is almost always
@@ -413,7 +413,7 @@ spends no memory at all.
 _unit(
     "two-pointers", "Two Pointers", "↔️", _S2,
     "When the data is sorted, neither index ever needs to go back.",
-    prereqs=["hashing"],
+    prereqs=["arrays-first-pass"],
     why="""
 Hashing costs O(n) memory. When the array is **sorted** — or can be — you can
 often get the same O(n) time for O(1) space, because sortedness tells you which
@@ -598,7 +598,7 @@ run** instead, the two pointers move the same way — and that is a window.
 _unit(
     "sliding-window", "Sliding Window", "🪟", _S2,
     "Every contiguous-subarray question, in one pass.",
-    prereqs=["two-pointers"],
+    prereqs=["two-pointers", "hashing"],
     why="""
 *"The longest substring with …"*, *"the smallest subarray such that …"*,
 *"every window of size k"* — these all look like they need to examine every
@@ -789,7 +789,7 @@ arbitrary — or the values can be negative — you precompute instead.
 _unit(
     "prefix-sums", "Prefix Sums", "➕", _S2,
     "Precompute once, answer any range in O(1).",
-    prereqs=["sliding-window"],
+    prereqs=["arrays-first-pass", "hashing"],
     why="""
 Answering *"what is the sum of `a[l..r]`?"* by looping costs O(n), and a problem
 that asks it many times is quietly quadratic. One preprocessing pass fixes it
@@ -982,7 +982,7 @@ where the data structure is the same but the operations have their own costs.
 _unit(
     "strings", "Strings & Character Work", "🔤", _S2,
     "An array of characters, with an immutability tax.",
-    prereqs=["prefix-sums"],
+    prereqs=["arrays-first-pass", "hashing"],
     why="""
 Strings are arrays of characters, so every pattern in this stage applies
 unchanged. What is new is **cost**: in Java a `String` is immutable, so every

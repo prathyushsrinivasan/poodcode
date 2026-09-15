@@ -44,7 +44,7 @@ algorithm.
 _unit(
     "greedy", "Greedy Algorithms", "💰", _S6,
     "Take the best local move — and be able to prove it was safe.",
-    prereqs=["shortest-paths"],
+    prereqs=["sorting"],
     why="""
 Greedy algorithms are the shortest, fastest solutions in the whole bank, and
 the most dangerous. The code for "best answer" is often one pass with a running
@@ -229,7 +229,7 @@ where the sweep from the prefix-sums unit comes back.
 _unit(
     "intervals", "Intervals", "📅", _S6,
     "Sort by the right endpoint, then sweep.",
-    prereqs=["greedy"],
+    prereqs=["sorting", "greedy"],
     why="""
 Meetings, bookings, ranges, flights, free time — an enormous number of practical
 problems are pairs of numbers with an overlap rule. Almost all of them are
@@ -446,7 +446,7 @@ When no local rule is safe, you have to consider every option — affordably.
 _unit(
     "dp-1d", "Dynamic Programming I: One Dimension", "🧩", _S6,
     "Define the state, write the recurrence, and never compute it twice.",
-    prereqs=["intervals"],
+    prereqs=["recursion", "complexity"],
     why="""
 Dynamic programming is where most people stall, and the reason is almost always
 that it gets taught as a list of problems rather than as a procedure. It is a
@@ -679,7 +679,7 @@ Two sequences, or a value plus a capacity, means two indices — and a table.
 _unit(
     "dp-2d", "Dynamic Programming II: Two Dimensions", "🗺️", _S6,
     "Two indices, a table, and a fill order that respects the recurrence.",
-    prereqs=["dp-1d"],
+    prereqs=["dp-1d", "simulation-and-matrix"],
     why="""
 The step from 1-D to 2-D is smaller than it looks: the procedure is identical,
 and only the state gains an index. What changes is that the fill order now
@@ -932,7 +932,7 @@ One structure left, and it closes the loop: a tree whose paths are prefixes.
 _unit(
     "tries", "Tries (Prefix Trees)", "🌴", _S6,
     "When the structure of the key is the structure of the index.",
-    prereqs=["dp-2d"],
+    prereqs=["trees", "strings"],
     why="""
 A hash map answers *"is this exact key present?"*. It cannot answer *"how many
 keys start with `pre`?"*, because hashing deliberately destroys the relationship

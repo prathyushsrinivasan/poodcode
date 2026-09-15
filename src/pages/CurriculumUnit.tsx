@@ -89,9 +89,9 @@ export default function CurriculumUnit() {
           )}
         </div>
         <UnitProgress solved={hydrated.solved} total={hydrated.total} />
-        {!hydrated.ready && hydrated.prereqTitles.length > 0 && (
+        {hydrated.unmetPrereqTitles.length > 0 && (
           <p className="faint" style={{ fontSize: 12, marginTop: 10, marginBottom: 0 }}>
-            This unit builds on <strong>{hydrated.prereqTitles.join(", ")}</strong>, which
+            This unit builds on <strong>{hydrated.unmetPrereqTitles.join(", ")}</strong>, which
             you have not finished. Nothing is locked — but if something here reads as a leap,
             that is where the missing step is.
           </p>

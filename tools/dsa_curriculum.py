@@ -44,8 +44,13 @@
 #   2. NO DANGLING REFERENCES. Every slug must exist in the problem bank and
 #      every lesson key in the concept catalog — a broken link in a teaching
 #      page is worse than no link.
-#   3. PREREQUISITES POINT BACKWARDS. A unit may only require units that come
-#      before it, so the ladder can be walked top to bottom with no jumps.
+#   3. PREREQUISITES POINT BACKWARDS, AND ARE NOT A CHAIN. A unit may only
+#      require units that come before it, so the ladder can be walked top to
+#      bottom with no jumps — and past the foundations stage, a long run of
+#      units whose only prereq is the unit textually before them is rejected.
+#      That run is not a dependency graph, it is the absence of one: it makes
+#      the "builds on …" banner assert something false (that `tries` builds on
+#      `dp-2d`) and it is invisible unless something checks for it.
 #   4. RUNGS CLIMB. Within a unit the rungs' difficulty never decreases, so
 #      "work down the page" is honest advice.
 #
@@ -230,14 +235,22 @@ def _assemble():
 
 _DIFF_RANK = {"Intro": 0, "Easy": 1, "Medium": 2, "Hard": 3}
 
+# How many units in a row may name nothing but their immediate predecessor
+# before the "prereqs" column stops being a dependency graph. Foundations
+# genuinely chains — you cannot loop before you can branch — so the check is
+# scoped to stages 2+, where a run this long means the field was filled in by
+# position rather than by thought.
+_MAX_CHAIN_RUN = 2
+
 
 def _check_curriculum(cur, concepts, problems):
     """`concepts` maps key → concept; `problems` maps slug → problem dict."""
     seen_units = set()
     seen_slugs = {}
     order = []
+    chain_run = 0  # consecutive units whose prereqs are exactly [previous unit]
 
-    for stage in cur["stages"]:
+    for si, stage in enumerate(cur["stages"]):
         assert stage["units"], f"stage {stage['key']}: no units"
         for u in stage["units"]:
             key = u["key"]
@@ -262,10 +275,24 @@ def _check_curriculum(cur, concepts, problems):
                         f"expected {len(t['headers'])}"
                     )
 
-            # Rule 3 — prerequisites point backwards.
+            # Rule 3 — prerequisites point backwards…
             for p in u["prereqs"]:
                 assert p in seen_units, \
                     f"{key}: prerequisite {p!r} is not an earlier unit"
+
+            # …and, past foundations, are not merely the chain. Counted as a run
+            # rather than per unit because a single chain link is often the true
+            # answer (`trees` really does build on `recursion` alone); it is
+            # several in a row that means nobody wrote the graph down.
+            if si > 0 and len(order) >= 2 and u["prereqs"] == [order[-2]]:
+                chain_run += 1
+                assert chain_run <= _MAX_CHAIN_RUN, (
+                    f"{key}: {chain_run} units in a row list only the unit before them "
+                    f"as a prerequisite. That is a chain, not a dependency graph — give "
+                    f"each of these its real prereqs (see the 'builds on …' banner)."
+                )
+            else:
+                chain_run = 0
 
             # Rule 2 — no dangling references.
             for lk in u["lessons"]:

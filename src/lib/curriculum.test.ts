@@ -154,6 +154,38 @@ describe("hydrate", () => {
     expect(findUnit(ready, "next")!.ready).toBe(true);
   });
 
+  it("names only the prerequisites that are actually unmet", () => {
+    // Prereqs are a graph, not a chain, so a unit can name two and have
+    // cleared one. Saying "builds on A, B, which you have not finished" would
+    // then be false about A — the banner reads `unmetPrereqTitles`.
+    const c = curriculum([
+      [
+        unit("hashing", [rung("Core", ["a"])]),
+        unit("trees", [rung("Core", ["b"])]),
+        unit("tries", [rung("Core", ["c"])], ["hashing", "trees"]),
+      ],
+    ]);
+    const h = hydrate(c, [problem("a", "solved"), problem("b"), problem("c")]);
+    const tries = findUnit(h, "tries")!;
+
+    expect(tries.ready).toBe(false);
+    expect(tries.prereqTitles).toEqual(["Unit hashing", "Unit trees"]);
+    expect(tries.unmetPrereqTitles).toEqual(["Unit trees"]);
+  });
+
+  it("reports no unmet prerequisites once every one is cleared", () => {
+    const c = curriculum([
+      [
+        unit("hashing", [rung("Core", ["a"])]),
+        unit("trees", [rung("Core", ["b"])]),
+        unit("tries", [rung("Core", ["c"])], ["hashing", "trees"]),
+      ],
+    ]);
+    const h = hydrate(c, [problem("a", "solved"), problem("b", "solved"), problem("c")]);
+    expect(findUnit(h, "tries")!.unmetPrereqTitles).toEqual([]);
+    expect(findUnit(h, "tries")!.ready).toBe(true);
+  });
+
   it("continues at the first unfinished unit whose prerequisites are met", () => {
     const c = curriculum([
       [

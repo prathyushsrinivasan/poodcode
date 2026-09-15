@@ -53,6 +53,15 @@ export interface HydratedUnit {
   ready: boolean;
   /** Titles of the prerequisite units, for saying "builds on Hashing" in the UI. */
   prereqTitles: string[];
+  /**
+   * Titles of the prerequisites that are *not* yet cleared.
+   *
+   * Separate from `prereqTitles` because prereqs are a graph rather than a
+   * chain: a unit can name two and have cleared one, and "builds on Trees,
+   * Binary Search, which you have not finished" would then be a false
+   * statement about Trees. The banner names only what is actually missing.
+   */
+  unmetPrereqTitles: string[];
   /** First unsolved problem, walking the rungs in order. */
   next: Problem | null;
 }
@@ -145,15 +154,28 @@ export function hydrate(
       const status = statusOf(solved, total, attempted);
       statusByUnit.set(unit.key, status);
       titleByUnit.set(unit.key, unit.title);
-      const ready = unit.prereqs.every((k) => {
+      const unmet = unit.prereqs.filter((k) => {
         const s = statusByUnit.get(k);
         // An unknown prerequisite cannot block: the generator forbids it, and
         // silently locking the whole ladder would be the worse failure.
-        return s === undefined || isCleared(s);
+        return s !== undefined && !isCleared(s);
       });
+      const ready = unmet.length === 0;
       const prereqTitles = unit.prereqs.map((k) => titleByUnit.get(k) ?? k);
+      const unmetPrereqTitles = unmet.map((k) => titleByUnit.get(k) ?? k);
 
-      return { unit, rungs, solved, total, attempted, status, ready, prereqTitles, next };
+      return {
+        unit,
+        rungs,
+        solved,
+        total,
+        attempted,
+        status,
+        ready,
+        prereqTitles,
+        unmetPrereqTitles,
+        next,
+      };
     });
 
     return {

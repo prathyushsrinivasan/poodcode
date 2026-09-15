@@ -41,7 +41,7 @@ called on whatever the successors happen to be.
 _unit(
     "recursion", "Recursion", "🌀", _S5,
     "Trust the smaller call. Everything in this stage depends on it.",
-    prereqs=["design"],
+    prereqs=["loops-and-digits", "complexity"],
     why="""
 Recursion is not a technique for a family of problems; it is the *notation*
 every remaining unit is written in. Tree traversal, backtracking, DFS, divide
@@ -468,7 +468,7 @@ O(log n).
 _unit(
     "bst", "Binary Search Trees", "🔎", _S5,
     "One invariant, and every operation becomes a descent.",
-    prereqs=["trees"],
+    prereqs=["trees", "binary-search"],
     why="""
 A BST is a binary tree with a promise: everything in the left subtree is
 smaller, everything in the right is larger. That single rule turns search,
@@ -686,7 +686,7 @@ one it *builds* — and has to take apart again.
 _unit(
     "backtracking", "Backtracking", "♟️", _S5,
     "Choose, explore, un-choose — and prune before you descend.",
-    prereqs=["bst"],
+    prereqs=["recursion", "strings"],
     why="""
 Some problems have no formula: you must search the space of possibilities.
 Subsets, permutations, partitions, placements, puzzles — the answer is found by
@@ -916,7 +916,7 @@ structure that can loop back on itself — which changes exactly one thing.
 _unit(
     "graph-traversal", "Graph Traversal: BFS & DFS", "🕸️", _S5,
     "Trees with cycles — so you need a visited set, and BFS gives shortest paths.",
-    prereqs=["backtracking"],
+    prereqs=["queues-and-deques", "recursion"],
     why="""
 A graph is the general case of everything in this stage. A tree is a graph
 without cycles; a grid is a graph whose neighbours are implicit; a dependency
@@ -1376,7 +1376,7 @@ what” — and does it faster than any traversal.
 _unit(
     "union-find", "Union-Find (Disjoint Set Union)", "🧵", _S5,
     "Connectivity as a near-constant-time operation.",
-    prereqs=["topological-sort"],
+    prereqs=["graph-traversal"],
     why="""
 "Are these two nodes connected?" can be answered by a traversal — O(V + E) per
 query, which is hopeless when the edges arrive one at a time and the question is
@@ -1599,7 +1599,7 @@ once the edges stop being equal.
 _unit(
     "shortest-paths", "Weighted Shortest Paths", "🛣️", _S5,
     "When edges cost different amounts, BFS stops working.",
-    prereqs=["union-find"],
+    prereqs=["graph-traversal", "heaps"],
     why="""
 BFS finds shortest paths because every edge costs 1, so layer order is distance
 order. Give the edges different weights and that collapses: a path of two cheap
