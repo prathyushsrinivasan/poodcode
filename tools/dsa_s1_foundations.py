@@ -33,6 +33,7 @@ program before you have finished re-reading the statement.
 _unit(
     "io-and-arithmetic", "Input, Output & Arithmetic", "⌨️", _S1,
     "Read the numbers, do the sum, print the answer.",
+    weight=1,
     why="""
 Every problem in this app speaks one protocol: the grader writes your input to
 **stdin**, your program writes its answer to **stdout**, and the two are
@@ -190,6 +191,7 @@ decision instead of always doing the same thing.
 _unit(
     "branching", "Branching & Conditions", "🔀", _S1,
     "Pick an answer instead of computing one.",
+    weight=1,
     prereqs=["io-and-arithmetic"],
     why="""
 A formula gives the same shape of answer every time. The moment a problem says
@@ -323,6 +325,7 @@ the *digits* of a number becomes possible.
 _unit(
     "loops-and-digits", "Loops & Digit Arithmetic", "🔁", _S1,
     "Repeat until something runs out — including a number's digits.",
+    weight=1,
     prereqs=["branching"],
     why="""
 A loop is the first idea in this curriculum whose *cost depends on the input*,
@@ -481,6 +484,7 @@ arithmetic that comes with them.
 _unit(
     "arrays-first-pass", "Arrays: The First Pass", "📊", _S1,
     "One scan, one accumulator, and the index bugs that come free with them.",
+    weight=3,
     prereqs=["loops-and-digits"],
     why="""
 An array is the first data structure, and *single-pass scanning* is the first

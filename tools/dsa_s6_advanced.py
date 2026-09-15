@@ -44,6 +44,7 @@ algorithm.
 _unit(
     "greedy", "Greedy Algorithms", "💰", _S6,
     "Take the best local move — and be able to prove it was safe.",
+    weight=3,
     prereqs=["sorting"],
     why="""
 Greedy algorithms are the shortest, fastest solutions in the whole bank, and
@@ -213,9 +214,15 @@ is itself the thing being tested.
               ["activity-selection-small"],
               {"activity-selection-small": "The canonical greedy. Produce the counterexamples that kill sorting by start time and by duration — that is how you check a rule you just invented."}),
         _rung("Core", "One pass, one running value, one proof.",
-              ["best-time-buy-sell", "jump-game"],
+              ["best-time-buy-sell", "jump-game", "boats-to-save-people", "gas-station-start"],
               {"best-time-buy-sell": "Say the exchange argument out loud before coding. The code is four lines; the reasoning is the exercise.",
-               "jump-game": "Stays-ahead. Track the furthest reachable index and fail the moment you stand past it."}),
+               "jump-game": "Stays-ahead. Track the furthest reachable index and fail the moment you stand past it.",
+               "boats-to-save-people": "Sort, then converge from both ends. The heaviest person departs on this boat either way — putting `j--` inside the `if` is the bug.",
+               "gas-station-start": "A reset, with a real argument for why the abandoned prefix was already doomed. Same shape as Kadane."}),
+        _rung("Variations", "A rule over a derived quantity, and a rule that is simply wrong.",
+              ["fractional-knapsack", "greedy-coin-change"],
+              {"fractional-knapsack": "The sort key is value *per unit weight*, not value. Then say which property you lose when the items stop being divisible — that is the 0/1 knapsack boundary.",
+               "greedy-coin-change": "The most useful negative example in the unit: on coins {1,3,4} greedy is wrong for 6, and on {3,4} it gets stuck where an answer exists. Nothing is buggy; the rule is false."}),
         _rung("Stretch", "Greedy where the counting is the subtle part.",
               ["jump-game-ii"],
               {"jump-game-ii": "Count a jump only when the current reach is exhausted, and stop before the last index."}),
@@ -232,6 +239,7 @@ where the sweep from the prefix-sums unit comes back.
 _unit(
     "intervals", "Intervals", "📅", _S6,
     "Sort by the right endpoint, then sweep.",
+    weight=3,
     prereqs=["sorting", "greedy"],
     why="""
 Meetings, bookings, ranges, flights, free time — an enormous number of practical
@@ -449,6 +457,7 @@ When no local rule is safe, you have to consider every option — affordably.
 _unit(
     "dp-1d", "Dynamic Programming I: One Dimension", "🧩", _S6,
     "Define the state, write the recurrence, and never compute it twice.",
+    weight=3,
     prereqs=["recursion", "complexity"],
     why="""
 Dynamic programming is where most people stall, and the reason is almost always
@@ -685,6 +694,7 @@ Two sequences, or a value plus a capacity, means two indices — and a table.
 _unit(
     "dp-2d", "Dynamic Programming II: Two Dimensions", "🗺️", _S6,
     "Two indices, a table, and a fill order that respects the recurrence.",
+    weight=2,
     prereqs=["dp-1d", "simulation-and-matrix"],
     why="""
 The step from 1-D to 2-D is smaller than it looks: the procedure is identical,
@@ -941,6 +951,7 @@ One structure left, and it closes the loop: a tree whose paths are prefixes.
 _unit(
     "tries", "Tries (Prefix Trees)", "🌴", _S6,
     "When the structure of the key is the structure of the index.",
+    weight=2,
     prereqs=["trees", "strings"],
     why="""
 A hash map answers *"is this exact key present?"*. It cannot answer *"how many

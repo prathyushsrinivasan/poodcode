@@ -350,7 +350,20 @@ function RungBlock({ rung, onOpen }: { rung: HydratedRung; onOpen: (id: number) 
   return (
     <div style={{ marginBottom: 18 }}>
       <div className="row">
-        <strong>{rung.title}</strong>
+        <strong className={rung.optional ? "dim" : ""}>{rung.title}</strong>
+        {rung.optional && (
+          <span
+            className="badge"
+            style={{ color: "var(--text-faint)", borderColor: "var(--text-faint)" }}
+            title={
+              rung.counted
+                ? "Optional — you have started it, so it now counts toward this unit"
+                : "Optional — skipping it costs you nothing, and it is not counted until you start it"
+            }
+          >
+            optional
+          </span>
+        )}
         <span className="spacer" />
         <span className="dim mono">
           {rung.solved}/{rung.total}

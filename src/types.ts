@@ -583,6 +583,12 @@ export interface Rung {
   slugs: string[];
   /** Optional per-problem "why this one is here", keyed by slug. */
   notes: Record<string, string>;
+  /**
+   * A rung the unit does not *ask* of you: surplus the bank happened to contain,
+   * kept reachable rather than deleted. It counts toward the unit's total only
+   * once you have started it — see `hydrate`. Always last in a unit.
+   */
+  optional: boolean;
 }
 
 export interface CurriculumUnit {
@@ -592,6 +598,12 @@ export interface CurriculumUnit {
   /** Key of the stage this unit belongs to. */
   stage: string;
   tagline: string;
+  /**
+   * Interview yield, 1-3, with a target problem-count band per weight. It exists
+   * so the bank's accidental distribution does not define the syllabus; the band
+   * is reported as a ledger at generation time, never enforced.
+   */
+  weight: number;
   /** Keys of units this one builds on; always earlier in the curriculum. */
   prereqs: string[];
   why: string;

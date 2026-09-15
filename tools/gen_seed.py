@@ -6141,6 +6141,20 @@ if os.path.exists(_onramp_path):
 
 
 # ---------------------------------------------------------------------------
+# Depth problems — authored toward the DSA units' `weight` bands (interview
+# yield, 1-3, with a target problem count per weight). The bands are a printed
+# ledger rather than an assertion; these fill the four most under-served
+# weight-3 units, which are the ones a learner would actually feel thin:
+# sliding-window, binary-search, graph-traversal and greedy. Defines
+# DEPTH_REFS, merged into REFERENCE_SOLUTIONS below.
+# ---------------------------------------------------------------------------
+_depth_path = os.path.join(HERE, "dsa_depth.py")
+if os.path.exists(_depth_path):
+    with open(_depth_path, encoding="utf-8") as _dpf:
+        exec(compile(_dpf.read(), _depth_path, "exec"))
+
+
+# ---------------------------------------------------------------------------
 # Build JSON
 # ---------------------------------------------------------------------------
 
@@ -6412,7 +6426,7 @@ print(
 )
 
 # ---------------------------------------------------------------------------
-# The DSA Curriculum — the Problem Library, taught: the same 257 problems
+# The DSA Curriculum — the Problem Library, taught: the same 271 problems
 # sequenced into stages and units, each with its own why/model/skeletons/
 # signals/pitfalls and an ordered problem ladder (authored in
 # tools/dsa_curriculum.py plus one file per stage). It references problems and
@@ -6535,6 +6549,7 @@ REFERENCE_SOLUTIONS = {
 
 REFERENCE_SOLUTIONS.update(globals().get("EXPANSION_REFS", {}))
 REFERENCE_SOLUTIONS.update(globals().get("ONRAMP_REFS", {}))
+REFERENCE_SOLUTIONS.update(globals().get("DEPTH_REFS", {}))
 
 REFS_OUT = os.path.join(HERE, "..", "src-tauri", "seeds", "reference_solutions.json")
 with open(REFS_OUT, "w", encoding="utf-8", newline="\n") as f:

@@ -41,6 +41,7 @@ called on whatever the successors happen to be.
 _unit(
     "recursion", "Recursion", "🌀", _S5,
     "Trust the smaller call. Everything in this stage depends on it.",
+    weight=2,
     prereqs=["loops-and-digits", "complexity"],
     why="""
 Recursion is not a technique for a family of problems; it is the *notation*
@@ -234,6 +235,7 @@ versions: the left subtree and the right one.
 _unit(
     "trees", "Binary Trees", "🌲", _S5,
     "Two recursive calls and a decision about where to do the work.",
+    weight=3,
     prereqs=["recursion"],
     why="""
 A binary tree is the friendliest recursive structure there is: no cycles, at
@@ -442,10 +444,9 @@ because the stack is real. When the tree could be skewed, mention it.
               ["max-depth-tree", "count-nodes-tree", "invert-binary-tree"],
               {"max-depth-tree": "The template. Everything in this unit is a variation of these three lines."}),
         _rung("Core", "Two-node recursion, and context carried downwards.",
-              ["same-tree", "symmetric-tree", "min-depth-tree", "path-sum-exists",
-               "inorder-traversal", "preorder-traversal"],
+              ["same-tree", "min-depth-tree", "path-sum-exists", "inorder-traversal"],
               {"min-depth-tree": "The one-child case. This is the problem that catches everyone — decide what a leaf is first.",
-               "symmetric-tree": "Same as `same-tree`, but compare left against right."}),
+               "inorder-traversal": "Learn this one properly: it is the walk that comes out sorted on a BST, which is the next unit's whole invariant."}),
         _rung("Variations", "Anything phrased in terms of levels.",
               ["level-order-traversal", "right-side-view", "zigzag-level-order"],
               {"level-order-traversal": "The BFS template. Snapshot the queue size.",
@@ -455,6 +456,10 @@ because the stack is real. When the tree could be skewed, mention it.
               {"balanced-tree": "Return the height and use −1 as a “already unbalanced” signal, so it stays a single O(n) pass.",
                "lca-binary-tree": "Return the node found below; a node that hears back from both sides is the ancestor.",
                "max-path-sum": "The hardest of the shape, and the one worth being able to rebuild from scratch."}),
+        _extra("Extra practice", "The same two recursions with one line moved — reps, not new ideas.",
+               ["preorder-traversal", "symmetric-tree"],
+               {"preorder-traversal": "Identical to the inorder walk with one line relocated. Worth writing once to see that the *order of the visit* is the only difference between the three traversals; not worth waiting on.",
+                "symmetric-tree": "`same-tree` with the recursion crossed over: compare left against right. Genuinely the same problem."}),
     ],
     next_up="""
 Add one invariant to a binary tree — left < node < right — and search becomes
@@ -468,6 +473,7 @@ O(log n).
 _unit(
     "bst", "Binary Search Trees", "🔎", _S5,
     "One invariant, and every operation becomes a descent.",
+    weight=2,
     prereqs=["trees", "binary-search"],
     why="""
 A BST is a binary tree with a promise: everything in the left subtree is
@@ -686,6 +692,7 @@ one it *builds* — and has to take apart again.
 _unit(
     "backtracking", "Backtracking", "♟️", _S5,
     "Choose, explore, un-choose — and prune before you descend.",
+    weight=3,
     prereqs=["recursion", "strings"],
     why="""
 Some problems have no formula: you must search the space of possibilities.
@@ -919,6 +926,7 @@ structure that can loop back on itself — which changes exactly one thing.
 _unit(
     "graph-traversal", "Graph Traversal: BFS & DFS", "🕸️", _S5,
     "Trees with cycles — so you need a visited set, and BFS gives shortest paths.",
+    weight=3,
     prereqs=["queues-and-deques", "recursion"],
     why="""
 A graph is the general case of everything in this stage. A tree is a graph
@@ -1154,10 +1162,16 @@ template. And say why BFS: "edges are unweighted, so BFS layers are distances".
         _rung("Warm up", "One BFS, and the outer loop that turns it into an answer.",
               ["count-connected-components"],
               {"count-connected-components": "The whole unit with nothing else attached: adjacency list, one shared `seen`, and a BFS started from every node you have not reached yet."}),
-        _rung("Core", "Traversal on an implicit graph, then a real one.",
-              ["number-of-islands", "shortest-path-binary-matrix", "bipartite-check"],
+        _rung("Core", "Traversal on an implicit graph, then a real one, then a directed one.",
+              ["number-of-islands", "shortest-path-binary-matrix", "bipartite-check",
+               "directed-path-exists"],
               {"number-of-islands": "One traversal per unvisited land cell. Sink the island as you go.",
-               "shortest-path-binary-matrix": "BFS, because the grid is unweighted — and 8-directional, so check the direction array."}),
+               "shortest-path-binary-matrix": "BFS, because the grid is unweighted — and 8-directional, so check the direction array.",
+               "directed-path-exists": "One-way edges, where every undirected reflex is wrong — and wrong on *some* inputs only, which is worse. Check that swapping `s` and `t` can flip your answer."}),
+        _rung("Variations", "One BFS, many sources — and one BFS that stops early.",
+              ["rotting-oranges", "reachable-within-k"],
+              {"rotting-oranges": "Seed the queue with *every* rotten cell at time 0. The distance-order invariant does not care how many sources there were, only that they started together.",
+               "reachable-within-k": "The cap is a refusal to expand, not a filter at the end — otherwise K bought you nothing and you walked the whole graph anyway."}),
         _rung("Stretch", "A graph you have to build before you can walk it.",
               ["word-ladder-length"],
               {"word-ladder-length": "The nodes are words and the edges are one-letter changes. Building the adjacency efficiently (wildcard buckets) is most of the problem."}),
@@ -1174,6 +1188,7 @@ an order in which everything can be done at all?
 _unit(
     "topological-sort", "Topological Sort & Cycles", "📋", _S5,
     "Order the dependencies — or prove that no order exists.",
+    weight=2,
     prereqs=["graph-traversal"],
     why="""
 Anything with prerequisites is a directed graph: courses, build targets,
@@ -1385,6 +1400,7 @@ what” — and does it faster than any traversal.
 _unit(
     "union-find", "Union-Find (Disjoint Set Union)", "🧵", _S5,
     "Connectivity as a near-constant-time operation.",
+    weight=2,
     prereqs=["graph-traversal"],
     why="""
 "Are these two nodes connected?" can be answered by a traversal — O(V + E) per
@@ -1589,15 +1605,16 @@ query*, which is why DSU wins as soon as there is more than one query.
               {"count-components": "Start at n and decrement on each successful union. Nothing else is needed.",
                "redundant-connection": "The answer is literally the first edge whose union returns false.",
                "graph-valid-tree": "Two conditions, not one: n − 1 edges and no failed union."}),
-        _rung("Variations", "Sizes, weights and orderings layered on top.",
-              ["largest-component-size", "satisfy-equations", "make-network-connected",
-               "earliest-full-connect", "mst-total-weight"],
+        _rung("Variations", "The two layerings that are genuinely new ideas.",
+              ["satisfy-equations", "mst-total-weight"],
               {"satisfy-equations": "Union all the equalities first, then check every inequality. Order matters.",
-               "earliest-full-connect": "Union in timestamp order and stop the moment the component count hits 1.",
-               "mst-total-weight": "Kruskal's. Sort by weight, union greedily, stop at n − 1 edges."}),
+               "mst-total-weight": "Kruskal's. Sort by weight, union greedily, stop at n − 1 edges — and the Stretch problem below is this, on a graph you build yourself."}),
         _rung("Stretch", "Build the edge set yourself, then run Kruskal.",
               ["min-cost-connect-points"],
               {"min-cost-connect-points": "The graph is complete and implicit — all O(n²) pairwise distances. Generate, sort, union."}),
+        _extra("Extra practice", "Sizes and orderings layered on the same union — reps, not new ideas.",
+               ["largest-component-size", "make-network-connected", "earliest-full-connect"],
+               {"earliest-full-connect": "Union in timestamp order and stop the moment the component count hits 1. A nice problem; not one that stands between you and shortest paths."}),
     ],
     next_up="""
 Connectivity is a yes-or-no question. The last unit of the stage asks *how far*,
@@ -1611,6 +1628,7 @@ once the edges stop being equal.
 _unit(
     "shortest-paths", "Weighted Shortest Paths", "🛣️", _S5,
     "When edges cost different amounts, BFS stops working.",
+    weight=2,
     prereqs=["graph-traversal", "heaps"],
     why="""
 BFS finds shortest paths because every edge costs 1, so layer order is distance

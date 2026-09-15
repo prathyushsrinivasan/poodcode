@@ -35,6 +35,18 @@ export interface HydratedRung {
   solved: number;
   /** Counts only problems that resolved to a real row. */
   total: number;
+  /** Surplus the unit does not ask of you. See `counted`. */
+  optional: boolean;
+  /**
+   * Whether this rung's problems are folded into the unit's `solved`/`total`.
+   *
+   * Required rungs always are. An optional rung is counted only once you have
+   * *started* it — touched at least one of its problems — so that ignoring it
+   * costs nothing and working it is still credited. Counting it unconditionally
+   * would make a unit's percentage punish you for skipping what it told you to
+   * skip; excluding it unconditionally would throw away real work.
+   */
+  counted: boolean;
 }
 
 export interface HydratedUnit {
@@ -132,23 +144,49 @@ export function hydrate(
       const rungs: HydratedRung[] = unit.rungs.map((rung) => {
         let rungSolved = 0;
         let rungTotal = 0;
+        let rungTouched = 0;
+        let rungAttempted = 0;
+        let rungNext: Problem | null = null;
         const items: RungItem[] = rung.slugs.map((slug) => {
           const problem = bySlug.get(slug) ?? null;
           unitBySlug.set(slug, unit);
           placed.add(slug);
           if (problem) {
             rungTotal++;
-            if (problem.solved_status === "solved") rungSolved++;
-            else {
-              if (problem.solved_status === "attempted") attempted++;
-              if (!next) next = problem;
+            if (problem.solved_status === "solved") {
+              rungSolved++;
+              rungTouched++;
+            } else {
+              if (problem.solved_status === "attempted") {
+                rungAttempted++;
+                rungTouched++;
+              }
+              if (!rungNext) rungNext = problem;
             }
           }
           return { slug, problem, note: rung.notes[slug] ?? "" };
         });
-        solved += rungSolved;
-        total += rungTotal;
-        return { title: rung.title, purpose: rung.purpose, items, solved: rungSolved, total: rungTotal };
+
+        const counted = !rung.optional || rungTouched > 0;
+        if (counted) {
+          solved += rungSolved;
+          total += rungTotal;
+          attempted += rungAttempted;
+        }
+        // `next` skips an untouched optional rung too: "what should I do now?"
+        // must never point at work the unit has told you to skip. Once you have
+        // started the rung it is ordinary work again and rejoins the walk.
+        if (counted && !next && rungNext) next = rungNext;
+
+        return {
+          title: rung.title,
+          purpose: rung.purpose,
+          items,
+          solved: rungSolved,
+          total: rungTotal,
+          optional: rung.optional,
+          counted,
+        };
       });
 
       const status = statusOf(solved, total, attempted);

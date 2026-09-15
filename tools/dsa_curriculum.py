@@ -14,7 +14,7 @@
 # It is NOT a second problem bank. Every problem it schedules already exists in
 # seeds/problems.json, and every deep-dive it links already exists in
 # seeds/concepts.json. What this file adds is the thing a flat, filterable
-# table of 257 problems cannot give you: an ORDER, and a reason for it.
+# table of 271 problems cannot give you: an ORDER, and a reason for it.
 #
 # The unit of the curriculum is a UNIT: one technique, taught in the five
 # beats that actually move someone from "I have seen this" to "I reach for it
@@ -38,7 +38,7 @@
 # HARD DESIGN RULES, enforced by `_check_curriculum` at generation time:
 #
 #   1. EVERY PROBLEM IS PLACED EXACTLY ONCE. The curriculum and the library are
-#      the same 257 problems; a problem that belongs to no unit is unreachable
+#      the same 271 problems; a problem that belongs to no unit is unreachable
 #      by the teaching path, and a problem in two units makes "what is next?"
 #      ambiguous. Both fail the build.
 #   2. NO DANGLING REFERENCES. Every slug must exist in the problem bank and
@@ -124,16 +124,41 @@ def _trace(title, intro, headers, rows, takeaway=""):
             "rows": [list(r) for r in rows], "takeaway": takeaway}
 
 
-def _rung(title, purpose, slugs, notes=None):
+def _rung(title, purpose, slugs, notes=None, optional=False):
+    """One step of a unit's ladder.
+
+    `optional` marks a rung the unit does not *ask* of you — the surplus a unit
+    accumulated because the bank happened to contain sixteen tree problems, not
+    because sixteen is what learning trees takes. It stays reachable and stays
+    on the page; it just does not count toward the unit's total until you start
+    it (see `hydrate` in src/lib/curriculum.ts). Deleting those problems would
+    be the wrong fix: nothing is wrong with them, they simply should not be what
+    stands between you and the next technique.
+    """
     return {"title": title, "purpose": purpose, "slugs": list(slugs),
-            "notes": notes or {}}
+            "notes": notes or {}, "optional": bool(optional)}
+
+
+def _extra(title, purpose, slugs, notes=None):
+    """An optional rung — `_rung(..., optional=True)`, named so the authoring
+    files read as what they are and the flag cannot be lost in a long call."""
+    return _rung(title, purpose, slugs, notes, optional=True)
 
 
 def _unit(key, title, icon, stage, tagline, why, model,
           prereqs=(), signals=(), skeletons=(), costs=(), pitfalls=(),
           lessons=(), checks=(), interview="", rungs=(), next_up="",
-          internals="", traces=(), build_it=""):
+          internals="", traces=(), build_it="", weight=2):
     """One technique, taught.
+
+    `weight` is **interview yield**, 1-3, and it exists to stop the bank's
+    accidental distribution from defining the syllabus. "Every problem placed
+    exactly once" is the right rule for reachability, but on its own it meant
+    `sliding-window` got two problems and `trees` got sixteen — a ratio that
+    reflects which problems somebody happened to author, not which technique is
+    worth eight times the time. Each weight carries a target problem-count band
+    (`_WEIGHT_BANDS`), reported as a ledger at generation time rather than
+    asserted; see `_check_weight_bands` for why it is a warning.
 
     `internals`, `traces` and `build_it` are optional depth, and they exist
     because a unit about a *data structure* has to answer a question a unit
@@ -148,12 +173,14 @@ def _unit(key, title, icon, stage, tagline, why, model,
       * `build_it`  — write it from scratch, which is the only way the costs
         stop being trivia.
     """
+    assert weight in (1, 2, 3), f"{key}: weight must be 1, 2 or 3 (got {weight!r})"
     _UNITS.append({
         "key": key,
         "title": title,
         "icon": icon,
         "stage": stage,
         "tagline": tagline,
+        "weight": weight,
         "prereqs": list(prereqs),
         "why": _md(why),
         "model": _md(model),
@@ -254,6 +281,12 @@ _RANK_NAME = {v: k for k, v in _DIFF_RANK.items()}
 # lint would be the tail wagging the dog.
 _ONRAMP_MIN_UNIT = 4
 
+# Target problem count per `weight` — how much of a learner's time a technique
+# should get, given how often it decides an interview. Counted over the rungs a
+# unit actually *asks* of you, so an "Extra practice" rung does not paper over
+# a thin unit or inflate an overweight one.
+_WEIGHT_BANDS = {3: (8, 14), 2: (5, 9), 1: (3, 6)}
+
 
 def _check_curriculum(cur, concepts, problems):
     """`concepts` maps key → concept; `problems` maps slug → problem dict."""
@@ -261,6 +294,8 @@ def _check_curriculum(cur, concepts, problems):
     seen_slugs = {}
     order = []
     chain_run = 0  # consecutive units whose prereqs are exactly [previous unit]
+    weights = {}   # unit key -> (weight, required problems, total problems)
+    stage_of = {}  # unit key -> stage index, so the ledger can skip foundations
 
     for si, stage in enumerate(cur["stages"]):
         assert stage["units"], f"stage {stage['key']}: no units"
@@ -269,6 +304,7 @@ def _check_curriculum(cur, concepts, problems):
             assert key not in seen_units, f"duplicate unit {key!r}"
             seen_units.add(key)
             order.append(key)
+            stage_of[key] = si
 
             assert u["why"], f"{key}: no 'why this exists'"
             assert u["model"], f"{key}: no mental model"
@@ -312,8 +348,10 @@ def _check_curriculum(cur, concepts, problems):
 
             last_rank = -1
             first_rung_floor = None   # easiest problem on the opening rung
-            unit_ceiling = -1         # hardest problem anywhere in the unit
-            unit_n = 0
+            unit_n = 0                # every problem in the unit
+            required_n = 0            # what the unit actually asks of you
+            seen_optional = False     # optional rungs must come last
+            misplaced_required = False
             for r in u["rungs"]:
                 assert r["slugs"], f"{key}/{r['title']}: empty rung"
                 assert r["purpose"], f"{key}/{r['title']}: no purpose"
@@ -329,6 +367,22 @@ def _check_curriculum(cur, concepts, problems):
                 for slug in r["notes"]:
                     assert slug in r["slugs"], \
                         f"{key}/{r['title']}: note for {slug!r}, which is not in the rung"
+                unit_n += len(r["slugs"])
+
+                if r["optional"]:
+                    # An optional rung is off the ladder, so Rule 4 does not
+                    # apply to it: it holds a unit's *surplus*, whose difficulty
+                    # has nothing to do with where the required rungs finished.
+                    # Demanding it climb would force the surplus to be sorted
+                    # into the ladder, which is the thing being undone.
+                    seen_optional = True
+                    continue
+                if seen_optional:
+                    misplaced_required = True
+                if first_rung_floor is None:
+                    first_rung_floor = min(ranks)
+                required_n += len(r["slugs"])
+
                 # Rule 4 — rungs climb. Compared on the rung's *hardest*
                 # problem, so a rung may open with an easy warm-up of its own.
                 rank = max(ranks)
@@ -336,10 +390,17 @@ def _check_curriculum(cur, concepts, problems):
                     f"{key}: rung {r['title']!r} is easier than the rung before it"
                 )
                 last_rank = rank
-                unit_ceiling = max(unit_ceiling, rank)
-                unit_n += len(r["slugs"])
-                if first_rung_floor is None:
-                    first_rung_floor = min(ranks)
+
+            # An optional rung belongs after the required ones: "work down the
+            # page" has to stay true, and a skippable rung in the middle makes
+            # the page's order a suggestion rather than a sequence.
+            assert not misplaced_required, (
+                f"{key}: a required rung follows an optional one — put the "
+                f"optional rungs last so the page can still be worked downwards"
+            )
+            assert first_rung_floor is not None, \
+                f"{key}: every rung is optional, so the unit asks nothing"
+            weights[key] = (u["weight"], required_n, unit_n)
 
             # Rule 5 — a substantial unit opens below its ceiling. Expressed as
             # "opens on an Intro or an Easy" rather than "one rank below the
@@ -363,7 +424,51 @@ def _check_curriculum(cur, concepts, problems):
         f"{len(unplaced)} problem(s) belong to no unit: {unplaced[:12]}"
         + (" …" if len(unplaced) > 12 else "")
     )
+    _check_weight_bands(weights, stage_of, order)
     return len(seen_units), len(seen_slugs)
+
+
+def _check_weight_bands(weights, stage_of, order):
+    """Print the content-debt ledger. Deliberately NOT an assertion.
+
+    A unit outside its band is a statement about the *syllabus*, not about the
+    data being malformed: `greedy` having four problems does not make the
+    curriculum broken, it makes it thin in a place worth being thick. Failing
+    the build on it would mean every unrelated change to any unit is blocked
+    until somebody authors four greedy problems — which is how a quality bar
+    turns into a reason to stop running the generator.
+
+    So it prints, every time, and the number going down is the only thing that
+    matters. Structural rules (dangling slugs, a rung that does not climb, a
+    unit that opens at its ceiling) stay assertions, because those are bugs.
+
+    Stage 1 is exempt. Foundations is deliberately broad and cheap — its 28
+    Intro problems exist so the keyboard stops being the bottleneck, and their
+    count is not a claim about interview yield.
+    """
+    rows = []
+    for key in order:
+        if stage_of[key] == 0:
+            continue
+        weight, required, total = weights[key]
+        lo, hi = _WEIGHT_BANDS[weight]
+        if required < lo:
+            rows.append((key, weight, required, total, f"thin, wants {lo - required} more"))
+        elif required > hi:
+            rows.append((key, weight, required, total, f"heavy by {required - hi}"))
+    # ASCII only: this goes to a console whose encoding is not ours to choose
+    # (cp932 on the authoring machine), and a ledger that crashes the generator
+    # on an em-dash is worse than no ledger.
+    if not rows:
+        print("DSA weight bands: every unit past foundations is inside its band.")
+        return
+    print(f"DSA weight bands: {len(rows)} unit(s) outside their band "
+          f"(a ledger, not an error):")
+    for key, weight, required, total, note in rows:
+        lo, hi = _WEIGHT_BANDS[weight]
+        extra = f" (+{total - required} optional)" if total > required else ""
+        print(f"    {key:24s} weight {weight}  {required:2d} problems{extra:16s} "
+              f"band {lo}-{hi}  -> {note}")
 
 
 # Only when run directly. gen_seed.py exec()s this file inside its own

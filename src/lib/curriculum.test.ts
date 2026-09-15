@@ -44,7 +44,11 @@ function problem(slug: string, status: SolvedStatus = "unsolved"): Problem {
 }
 
 function rung(title: string, slugs: string[], notes: Record<string, string> = {}): Rung {
-  return { title, purpose: `do ${title}`, slugs, notes };
+  return { title, purpose: `do ${title}`, slugs, notes, optional: false };
+}
+
+function extra(title: string, slugs: string[]): Rung {
+  return { title, purpose: `do ${title}`, slugs, notes: {}, optional: true };
 }
 
 function unit(key: string, rungs: Rung[], prereqs: string[] = []): CurriculumUnit {
@@ -54,6 +58,7 @@ function unit(key: string, rungs: Rung[], prereqs: string[] = []): CurriculumUni
     icon: "🔧",
     stage: "s1",
     tagline: `about ${key}`,
+    weight: 2,
     prereqs,
     why: "why",
     model: "model",
@@ -152,6 +157,40 @@ describe("hydrate", () => {
 
     const ready = hydrate(c, [problem("a", "solved"), problem("b", "solved"), problem("c")]);
     expect(findUnit(ready, "next")!.ready).toBe(true);
+  });
+
+  it("leaves an untouched optional rung out of the unit's totals", () => {
+    const c = curriculum([[unit("u", [rung("Core", ["a", "b"]), extra("Extra practice", ["c", "d"])])]]);
+    const h = hydrate(c, [problem("a", "solved"), problem("b"), problem("c"), problem("d")]);
+    const u = h.stages[0].units[0];
+
+    expect(u.total).toBe(2); // the optional rung is not asked of you
+    expect(u.solved).toBe(1);
+    expect(u.rungs[1].counted).toBe(false);
+    expect(u.rungs[1].total).toBe(2); // the rung still reports its own size
+  });
+
+  it("counts an optional rung once you have started it", () => {
+    const c = curriculum([[unit("u", [rung("Core", ["a", "b"]), extra("Extra practice", ["c", "d"])])]]);
+    const h = hydrate(c, [
+      problem("a", "solved"),
+      problem("b", "solved"),
+      problem("c", "solved"),
+      problem("d"),
+    ]);
+    const u = h.stages[0].units[0];
+
+    expect(u.rungs[1].counted).toBe(true);
+    expect(u.total).toBe(4);
+    expect(u.solved).toBe(3);
+  });
+
+  it("never points `next` at an optional rung you have not started", () => {
+    const c = curriculum([[unit("u", [rung("Core", ["a"]), extra("Extra practice", ["b"])])]]);
+    const solvedCore = hydrate(c, [problem("a", "solved"), problem("b")]);
+    expect(solvedCore.stages[0].units[0].next).toBeNull();
+    // …and the unit reads as complete, because the optional rung is not asked.
+    expect(solvedCore.stages[0].units[0].status).toBe("complete");
   });
 
   it("names only the prerequisites that are actually unmet", () => {

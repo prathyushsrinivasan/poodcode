@@ -18,6 +18,7 @@
           "icon": "⌨️",
           "stage": "foundations",
           "tagline": "Read the numbers, do the sum, print the answer.",
+          "weight": 1,
           "prereqs": [],
           "why": "Every problem in this app speaks one protocol: the grader writes your input to\n**stdin**, your program writes its answer to **stdout**, and the two are\ncompared as text. No function is called for you and nothing is returned. Until\nthat loop is automatic — read, compute, print — every other idea in the\ncurriculum is blocked behind a plumbing problem.\n\nThis unit also introduces the first bug that will follow you all the way to the\nHard problems: an `int` in Java holds numbers up to about 2.1 billion, and\nquietly wraps around past that.\n",
           "model": "### The shape of every program here\n\n```\nread the input  →  compute  →  print exactly one answer\n```\n\n**Reading.** `Scanner` is the readable choice and fast enough for everything in\nthis stage. `sc.nextInt()` pulls the next whitespace-separated token and parses\nit; `sc.nextLine()` takes the rest of the current line, newline included.\nWhitespace — spaces versus newlines — does not matter to `nextInt()`, which is\nwhy problem statements can describe input loosely.\n\n**Printing.** `System.out.println(x)` writes the value and a newline. The judge\nnormalises trailing whitespace and trailing blank lines, so a stray final\nnewline will not fail you — but a missing digit, an extra word, or different\ncapitalisation will.\n\n**Arithmetic on `int`.** `/` between two `int`s is *integer division*: it\ntruncates toward zero, so `7 / 2` is `3` and `-7 / 2` is `-3`. `%` is the\nremainder and keeps the sign of the left operand, so `-7 % 3` is `-1`, not `2`.\nBoth facts will bite you in the digits unit.\n\n**Overflow.** `int` spans −2,147,483,648 … 2,147,483,647. Multiply two values\nnear 100,000 and you are already outside it — silently, with a wrong answer\nrather than a crash. When a constraint says values reach 10⁹, or when you\nmultiply or sum many of them, compute in `long`.\n",
@@ -136,7 +137,8 @@
               ],
               "notes": {
                 "print-greeting": "The whole program is one `println`. If this passes, your toolchain is live."
-              }
+              },
+              "optional": false
             },
             {
               "title": "Core",
@@ -149,7 +151,8 @@
               ],
               "notes": {
                 "rectangle-area": "The first place `long` is worth a thought: two sides near 10⁵ already exceed `int` when multiplied."
-              }
+              },
+              "optional": false
             },
             {
               "title": "Variations",
@@ -160,7 +163,8 @@
               ],
               "notes": {
                 "seconds-to-clock": "Integer division and `%` doing real work — and zero-padded formatting, which is a printing problem, not a maths one."
-              }
+              },
+              "optional": false
             }
           ],
           "build_it": "",
@@ -172,6 +176,7 @@
           "icon": "🔀",
           "stage": "foundations",
           "tagline": "Pick an answer instead of computing one.",
+          "weight": 1,
           "prereqs": [
             "io-and-arithmetic"
           ],
@@ -282,7 +287,8 @@
               ],
               "notes": {
                 "is-even": "Return the comparison. If you wrote an `if`, rewrite it before moving on."
-              }
+              },
+              "optional": false
             },
             {
               "title": "Core",
@@ -295,7 +301,8 @@
               "notes": {
                 "leap-year": "Three interacting rules — the standard example of a case chain whose order is the whole problem.",
                 "fizzbuzz-value": "Overlapping cases. Most specific first, or it is silently wrong."
-              }
+              },
+              "optional": false
             }
           ],
           "build_it": "",
@@ -307,6 +314,7 @@
           "icon": "🔁",
           "stage": "foundations",
           "tagline": "Repeat until something runs out — including a number's digits.",
+          "weight": 1,
           "prereqs": [
             "branching"
           ],
@@ -433,7 +441,8 @@
               ],
               "notes": {
                 "factorial": "The first problem where the *answer* overflows `int` long before the input does."
-              }
+              },
+              "optional": false
             },
             {
               "title": "Core",
@@ -445,7 +454,8 @@
               ],
               "notes": {
                 "count-digits": "Check your answer for `0` before you submit. Most first attempts print 0 instead of 1."
-              }
+              },
+              "optional": false
             },
             {
               "title": "Variations",
@@ -459,7 +469,8 @@
               "notes": {
                 "collatz-steps": "A `while` whose stopping condition is not obvious from the body — say it out loud before coding.",
                 "reverse-integer": "Accumulate in `long`; the reversed value can leave `int` range."
-              }
+              },
+              "optional": false
             }
           ],
           "build_it": "",
@@ -471,6 +482,7 @@
           "icon": "📊",
           "stage": "foundations",
           "tagline": "One scan, one accumulator, and the index bugs that come free with them.",
+          "weight": 3,
           "prereqs": [
             "loops-and-digits"
           ],
@@ -620,7 +632,8 @@
               ],
               "notes": {
                 "array-maximum": "Try it once with a `0` seed on all-negative input, so the bug is one you have actually seen."
-              }
+              },
+              "optional": false
             },
             {
               "title": "Core",
@@ -633,7 +646,8 @@
               ],
               "notes": {
                 "max-consecutive-ones": "Extend-or-reset. This exact pair of lines returns as Kadane's algorithm."
-              }
+              },
+              "optional": false
             },
             {
               "title": "Variations",
@@ -646,7 +660,8 @@
               "notes": {
                 "is-sorted": "The first problem where the loop must stop at `a.length - 1`, because the body reads `a[i + 1]`.",
                 "is-permutation-1n": "A seen-array indexed by value — the first hint of the hashing idea two units away."
-              }
+              },
+              "optional": false
             }
           ],
           "build_it": "",
@@ -668,6 +683,7 @@
           "icon": "⏱️",
           "stage": "patterns",
           "tagline": "Count the work before you write it, and know when n² is fine.",
+          "weight": 2,
           "prereqs": [
             "arrays-first-pass"
           ],
@@ -818,7 +834,8 @@
                 "second-largest": "Solvable by sorting (O(n log n)) or by two accumulators (O(n)). Write both and compare.",
                 "count-above-average": "The two-pass solution people try to avoid. It is still O(n) — that is the lesson.",
                 "count-equal-pairs": "Every pair is O(n²); counting occurrences first makes it O(n). The gap here is the whole unit in one problem."
-              }
+              },
+              "optional": false
             }
           ],
           "build_it": "",
@@ -830,6 +847,7 @@
           "icon": "🗝️",
           "stage": "patterns",
           "tagline": "“Have I seen this?” in O(1), and everything that follows from it.",
+          "weight": 3,
           "prereqs": [
             "arrays-first-pass",
             "complexity"
@@ -994,7 +1012,8 @@
               ],
               "notes": {
                 "contains-duplicate": "Try it with a nested loop first, then with a set, and time both mentally against n = 10⁵."
-              }
+              },
+              "optional": false
             },
             {
               "title": "Core",
@@ -1009,7 +1028,8 @@
               "notes": {
                 "two-sum-indices": "The canonical interview problem. You should be able to type this from memory.",
                 "valid-anagram": "Counting beats sorting here — and the `int[26]` version is the one to remember."
-              }
+              },
+              "optional": false
             },
             {
               "title": "Variations",
@@ -1020,7 +1040,8 @@
               ],
               "notes": {
                 "majority-element": "Counting solves it in O(n) space; look up Boyer–Moore afterwards for the O(1) version."
-              }
+              },
+              "optional": false
             },
             {
               "title": "Stretch",
@@ -1030,7 +1051,8 @@
               ],
               "notes": {
                 "longest-consecutive": "Sorting makes it easy and O(n log n). The set version is O(n) — and the `continue` is the entire trick."
-              }
+              },
+              "optional": false
             }
           ],
           "build_it": "",
@@ -1042,6 +1064,7 @@
           "icon": "↔️",
           "stage": "patterns",
           "tagline": "When the data is sorted, neither index ever needs to go back.",
+          "weight": 3,
           "prereqs": [
             "arrays-first-pass"
           ],
@@ -1196,7 +1219,8 @@
               ],
               "notes": {
                 "reverse-string": "The swap loop. `l < r`, not `l <= r`."
-              }
+              },
+              "optional": false
             },
             {
               "title": "Core",
@@ -1209,7 +1233,8 @@
               "notes": {
                 "two-sum-sorted": "Compare directly with `two-sum-indices` from the hashing unit — same question, opposite trade.",
                 "merge-sorted-arrays": "Try merging from the back once you have it working forwards; that is the O(1)-space version."
-              }
+              },
+              "optional": false
             },
             {
               "title": "Variations",
@@ -1219,7 +1244,8 @@
               ],
               "notes": {
                 "container-most-water": "Write down why moving the shorter side is safe before you code it."
-              }
+              },
+              "optional": false
             },
             {
               "title": "Stretch",
@@ -1229,7 +1255,8 @@
               ],
               "notes": {
                 "trapping-rain-water": "Do it with two prefix-max arrays first (easier, O(n) space), then collapse it to two pointers."
-              }
+              },
+              "optional": false
             }
           ],
           "build_it": "",
@@ -1241,6 +1268,7 @@
           "icon": "🪟",
           "stage": "patterns",
           "tagline": "Every contiguous-subarray question, in one pass.",
+          "weight": 3,
           "prereqs": [
             "two-pointers",
             "hashing"
@@ -1393,17 +1421,36 @@
               "notes": {
                 "fixed-window-max-sum": "The fixed window: add what entered, subtract what left. Two reads per step no matter how wide `k` is.",
                 "window-covering-letters": "The variable right edge, with the left edge nailed to 0 — so the only new idea is maintaining a summary of what the window holds."
-              }
+              },
+              "optional": false
             },
             {
               "title": "Core",
-              "purpose": "The variable window, in its purest form.",
+              "purpose": "The four window shapes — longest valid, shortest valid, and count them all.",
               "slugs": [
-                "longest-unique-substring"
+                "longest-unique-substring",
+                "longest-k-distinct",
+                "min-window-sum-atleast",
+                "subarray-sum-at-most"
               ],
               "notes": {
-                "longest-unique-substring": "The template problem. Type it from memory, then check where you recorded `best`."
-              }
+                "longest-unique-substring": "The template problem. Type it from memory, then check where you recorded `best`.",
+                "longest-k-distinct": "Grow, then repair: extend the right edge unconditionally and shrink only to restore the invariant. Remove zero counts from the map or `size()` stops meaning anything.",
+                "min-window-sum-atleast": "The mirror image — shrink while the window is *still valid*, and record inside the shrink. Getting this pair backwards is the unit's most common bug.",
+                "subarray-sum-at-most": "Counting all valid windows rather than finding one, which is the shape people never think to look for: `r - left + 1` per step."
+              },
+              "optional": false
+            },
+            {
+              "title": "Variations",
+              "purpose": "A construction problem that turns out to be a window with a budget.",
+              "slugs": [
+                "longest-ones-k-flips"
+              ],
+              "notes": {
+                "longest-ones-k-flips": "Nothing in the code decides *which* zeros to flip — the budget becomes the window invariant and the choices disappear. That reframing is the skill."
+              },
+              "optional": false
             },
             {
               "title": "Stretch",
@@ -1413,7 +1460,8 @@
               ],
               "notes": {
                 "min-window-length": "The *shortest* variant, so the answer is recorded inside the shrink. Track “how many required characters are satisfied” as a single int rather than comparing whole maps."
-              }
+              },
+              "optional": false
             }
           ],
           "build_it": "",
@@ -1425,6 +1473,7 @@
           "icon": "➕",
           "stage": "patterns",
           "tagline": "Precompute once, answer any range in O(1).",
+          "weight": 2,
           "prereqs": [
             "arrays-first-pass",
             "hashing"
@@ -1583,7 +1632,8 @@
               ],
               "notes": {
                 "running-sum": "The prefix array is literally the required output."
-              }
+              },
+              "optional": false
             },
             {
               "title": "Core",
@@ -1595,7 +1645,8 @@
               "notes": {
                 "product-except-self": "Solve it without division. That constraint is the entire problem.",
                 "max-passengers": "A +1/−1 sweep. The same shape returns in the intervals unit as “minimum meeting rooms”."
-              }
+              },
+              "optional": false
             },
             {
               "title": "Stretch",
@@ -1605,7 +1656,8 @@
               ],
               "notes": {
                 "subarray-sum-k": "The hashing unit's complement trick, applied to prefix sums. Seed the map with 0 → 1."
-              }
+              },
+              "optional": false
             }
           ],
           "build_it": "",
@@ -1617,6 +1669,7 @@
           "icon": "🔤",
           "stage": "patterns",
           "tagline": "An array of characters, with an immutability tax.",
+          "weight": 3,
           "prereqs": [
             "arrays-first-pass",
             "hashing"
@@ -1771,7 +1824,8 @@
               ],
               "notes": {
                 "count-words": "Decide what two consecutive spaces mean before you code — that is the bug."
-              }
+              },
+              "optional": false
             },
             {
               "title": "Core",
@@ -1784,7 +1838,8 @@
               "notes": {
                 "caesar-cipher": "Modular arithmetic on `c - 'a'`; watch the wrap and the non-letters.",
                 "run-length-encode": "The run scan, with `StringBuilder` for the output."
-              }
+              },
+              "optional": false
             },
             {
               "title": "Variations",
@@ -1795,7 +1850,8 @@
               ],
               "notes": {
                 "longest-common-prefix": "Vertical scan, column by column — no substring copies needed."
-              }
+              },
+              "optional": false
             }
           ],
           "build_it": "",
@@ -1817,6 +1873,7 @@
           "icon": "🔡",
           "stage": "search-and-sort",
           "tagline": "What sorting costs, what it buys, and how to sort by something else.",
+          "weight": 2,
           "prereqs": [
             "arrays-first-pass",
             "complexity"
@@ -1970,7 +2027,8 @@
               ],
               "notes": {
                 "sort-by-frequency": "Count first, then sort the keys by their count with a tie-break. The comparator is the whole exercise."
-              }
+              },
+              "optional": false
             },
             {
               "title": "Core",
@@ -1983,7 +2041,8 @@
               "notes": {
                 "kth-largest-element": "Solve by sorting first, then come back after the heaps unit and do it in O(n log k).",
                 "top-k-frequent": "Counting plus ordering — the pattern behind almost every “most common” question."
-              }
+              },
+              "optional": false
             }
           ],
           "build_it": "",
@@ -1995,6 +2054,7 @@
           "icon": "🎯",
           "stage": "search-and-sort",
           "tagline": "Halve the search space — over an array, or over the answer itself.",
+          "weight": 3,
           "prereqs": [
             "sorting",
             "complexity"
@@ -2138,29 +2198,38 @@
               "notes": {
                 "lower-bound-index": "Type the `[lo, hi)` loop once with no equality branch. Every other binary search in this unit is this loop with a different comparison.",
                 "first-true-predicate": "The same loop with the array replaced by a predicate — which is what “binary search on the answer” means, written out in full."
-              }
+              },
+              "optional": false
             },
             {
               "title": "Core",
               "purpose": "The template, and the insertion-point reading of it.",
               "slugs": [
                 "binary-search-first",
-                "search-insert-position"
+                "search-insert-position",
+                "count-occurrences-sorted"
               ],
               "notes": {
                 "binary-search-first": "Duplicates are the point: you want the *first* match, which is exactly lower bound.",
-                "search-insert-position": "The same code with nothing removed — the return value already is the insertion point."
-              }
+                "search-insert-position": "The same code with nothing removed — the return value already is the insertion point.",
+                "count-occurrences-sorted": "Upper bound for free: it is lower bound of `x + 1`. Two calls to one template beats two templates."
+              },
+              "optional": false
             },
             {
               "title": "Variations",
-              "purpose": "Searching a space that is not an array.",
+              "purpose": "Searching a space that is not an array — or an array that is not sorted.",
               "slugs": [
-                "integer-sqrt"
+                "integer-sqrt",
+                "rotated-array-minimum",
+                "min-ship-capacity"
               ],
               "notes": {
-                "integer-sqrt": "No array anywhere. The predicate is `mid * mid > n`, and `mid * mid` must be computed in `long`."
-              }
+                "integer-sqrt": "No array anywhere. The predicate is `mid * mid > n`, and `mid * mid` must be computed in `long`.",
+                "rotated-array-minimum": "The array is not sorted and there is no target. What is monotone is the *question* — and that is all the loop ever needed.",
+                "min-ship-capacity": "Binary search on the answer, in full: name the bounds, write `feasible(x)`, argue it is monotone. The array only evaluates the predicate."
+              },
+              "optional": false
             }
           ],
           "build_it": "",
@@ -2172,6 +2241,7 @@
           "icon": "🧮",
           "stage": "search-and-sort",
           "tagline": "Divisors, primes and gcd — in O(√n) and O(log n), not O(n).",
+          "weight": 1,
           "prereqs": [
             "loops-and-digits"
           ],
@@ -2341,7 +2411,8 @@
               "notes": {
                 "count-divisors": "The √n loop, including the perfect-square case that is counted once, not twice.",
                 "us-coins-change": "Greedy works here because the denominations are canonical. Note *why*, because the coin-change DP later is the same problem without that property."
-              }
+              },
+              "optional": false
             },
             {
               "title": "Core",
@@ -2354,11 +2425,12 @@
               "notes": {
                 "is-prime": "Guard `n < 2` first, then loop while `d * d <= n`.",
                 "perfect-number": "A divisor-sum problem: collect both members of each divisor pair in the same √n loop."
-              }
+              },
+              "optional": false
             },
             {
-              "title": "Variations",
-              "purpose": "Batch versions of both.",
+              "title": "Extra practice",
+              "purpose": "Batch versions of the same two ideas — more reps, no new idea.",
               "slugs": [
                 "count-primes",
                 "gcd-of-array"
@@ -2366,7 +2438,8 @@
               "notes": {
                 "count-primes": "The sieve. Testing each number separately is the O(n√n) solution you are replacing.",
                 "gcd-of-array": "A fold. `gcd(0, x) == x` makes 0 the right starting accumulator."
-              }
+              },
+              "optional": true
             }
           ],
           "build_it": "",
@@ -2378,6 +2451,7 @@
           "icon": "🔟",
           "stage": "search-and-sort",
           "tagline": "32 flags in one int, and the XOR trick that cancels pairs.",
+          "weight": 1,
           "prereqs": [
             "loops-and-digits"
           ],
@@ -2534,7 +2608,8 @@
               ],
               "notes": {
                 "number-of-1-bits": "Do it with Kernighan's `x &= x - 1` rather than shifting 32 times."
-              }
+              },
+              "optional": false
             },
             {
               "title": "Core",
@@ -2545,7 +2620,8 @@
               ],
               "notes": {
                 "missing-number": "Two solutions: the sum formula and the XOR fold. XOR cannot overflow, which is the argument for it."
-              }
+              },
+              "optional": false
             },
             {
               "title": "Stretch",
@@ -2555,7 +2631,8 @@
               ],
               "notes": {
                 "count-bits": "`dp[i] = dp[i >> 1] + (i & 1)`. Your first dynamic program, hiding inside a bit problem."
-              }
+              },
+              "optional": false
             }
           ],
           "build_it": "",
@@ -2567,6 +2644,7 @@
           "icon": "🎛️",
           "stage": "search-and-sort",
           "tagline": "Follow the rules exactly, on a grid, without breaking your own indices.",
+          "weight": 2,
           "prereqs": [
             "arrays-first-pass",
             "loops-and-digits"
@@ -2737,7 +2815,8 @@
               ],
               "notes": {
                 "robot-grid-walk": "The direction array, and a bounds check that has to come first."
-              }
+              },
+              "optional": false
             },
             {
               "title": "Core",
@@ -2749,7 +2828,8 @@
               ],
               "notes": {
                 "minesweeper-counts": "Eight neighbours, bounds-checked. This loop is the ancestor of every flood fill in stage 5."
-              }
+              },
+              "optional": false
             },
             {
               "title": "Variations",
@@ -2762,11 +2842,12 @@
               "notes": {
                 "rotate-array": "Three reversals. Try the k-buffer version too and compare the space.",
                 "set-matrix-zeroes": "The marking trap: record which rows and columns to clear *before* clearing any of them."
-              }
+              },
+              "optional": false
             },
             {
-              "title": "Stretch",
-              "purpose": "Index arithmetic with nothing to hide behind.",
+              "title": "Extra practice",
+              "purpose": "More index arithmetic, once you can already do index arithmetic.",
               "slugs": [
                 "rotate-matrix-90",
                 "spiral-order",
@@ -2774,7 +2855,8 @@
               ],
               "notes": {
                 "game-of-life-step": "Do the copy version first. The in-place encoding is the follow-up, not the entry price."
-              }
+              },
+              "optional": true
             }
           ],
           "build_it": "",
@@ -2796,6 +2878,7 @@
           "icon": "🥞",
           "stage": "structures",
           "tagline": "Last in, first out — and the trick that makes “next greater” linear.",
+          "weight": 3,
           "prereqs": [
             "arrays-first-pass",
             "strings"
@@ -3093,7 +3176,8 @@
               ],
               "notes": {
                 "max-bracket-depth": "Notice what a counter can and cannot do: it tracks the stack's *height* but not what is on it, which is exactly why `([)]` needs the real thing."
-              }
+              },
+              "optional": false
             },
             {
               "title": "Core",
@@ -3107,7 +3191,8 @@
                 "valid-parentheses": "Get both failure modes right: closer-on-empty, and openers left over.",
                 "next-greater-element": "The bare template. Solve it first with two nested loops so you can feel what the stack removes.",
                 "daily-temperatures": "The monotonic template with distances. Push indices, not temperatures — and check your answer against the trace above."
-              }
+              },
+              "optional": false
             },
             {
               "title": "Stretch",
@@ -3119,7 +3204,8 @@
               "notes": {
                 "largest-rectangle-histogram": "Push a sentinel 0 at the end so the flush needs no special case, and re-read the width trace before you start — `i − left − 1` is the whole problem.",
                 "longest-valid-parentheses": "Push indices and keep a base index on the stack; the O(n) DP solution is worth writing afterwards for contrast, since the two answer the same question from opposite ends."
-              }
+              },
+              "optional": false
             }
           ],
           "build_it": "**Write a stack on a raw array.** `int[] data; int top = -1;` with `push`, `pop`,\n`peek` and `isEmpty` — twenty lines, no generics, no library.\n\nThen make it grow: when `top + 1 == data.length`, allocate `data.length * 2` and\n`System.arraycopy`. Now add a counter for elements copied, push a million values,\nand print it. You will get **fewer than two million copies for a million pushes**\n— under two per push, no matter how large n gets. That number is what \"amortised\nO(1)\" means, and having produced it yourself is why you will still be able to\nexplain it under pressure.\n\nThen try growth by `+1` instead of `×2` and watch the counter become ~n²/2.\n",
@@ -3131,6 +3217,7 @@
           "icon": "🎟️",
           "stage": "structures",
           "tagline": "First in, first out — and the deque that answers “max of every window”.",
+          "weight": 2,
           "prereqs": [
             "arrays-first-pass"
           ],
@@ -3437,7 +3524,8 @@
               "notes": {
                 "implement-queue-stacks": "The pour reverses the order — that is the whole idea. Be ready to defend “amortised O(1)” with the trace above.",
                 "implement-stack-queues": "The other direction, and deliberately worse: one operation has to be O(n) here, and it is worth working out which and why."
-              }
+              },
+              "optional": false
             },
             {
               "title": "Core",
@@ -3449,7 +3537,8 @@
               "notes": {
                 "design-circular-queue": "Fixed capacity and wrap-around arithmetic. Decide how you distinguish empty from full before writing a line.",
                 "hit-counter": "A queue of timestamps: append on hit, drop from the front while expired. The `while` looks O(n) and is amortised O(1) — same argument, third time."
-              }
+              },
+              "optional": false
             },
             {
               "title": "Stretch",
@@ -3459,7 +3548,8 @@
               ],
               "notes": {
                 "sliding-window-maximum": "The monotonic deque. Solve it with a heap first (O(n log k), and correct) so the deque's O(n) is a comparison rather than a recipe — then check yourself against the trace above."
-              }
+              },
+              "optional": false
             }
           ],
           "build_it": "**Write a circular buffer.** `int[] buf`, `int head`, `int size`, with `offer`,\n`poll`, `isEmpty` and `isFull`. Deliberately try the version with `head` and\n`tail` and no `size` first, fill it completely, and watch `isEmpty()` return\ntrue — the ambiguity is much more memorable once you have shipped it.\n\nThen make it grow when full: allocate double, and **copy the elements in logical\norder, not physical order** (walk `(head + i) % cap` for i in `0…size`). That\none loop is the difference between a working deque and a scrambled one, and it\nis the exact code `ArrayDeque` runs when it doubles.\n",
@@ -3471,6 +3561,7 @@
           "icon": "🔗",
           "stage": "structures",
           "tagline": "Pointer surgery: reversal, fast-and-slow, and the dummy head.",
+          "weight": 3,
           "prereqs": [
             "two-pointers"
           ],
@@ -3787,7 +3878,8 @@
               "notes": {
                 "list-length": "There is no `.size()`. Walking is the only way, and that is the point.",
                 "list-get-nth": "O(k) access, in your hands. This is what “no random access” actually costs."
-              }
+              },
+              "optional": false
             },
             {
               "title": "Core",
@@ -3803,7 +3895,8 @@
                 "middle-of-list": "Fast and slow. Decide up front which of the two middles an even-length list should return.",
                 "remove-duplicates-sorted-list": "The first splice. Note you do *not* need a dummy here — the head can never be removed — and say why.",
                 "merge-two-sorted-lists": "Dummy head plus the stage-2 merge. Attach the remaining tail in one assignment rather than draining it."
-              }
+              },
+              "optional": false
             },
             {
               "title": "Variations",
@@ -3823,7 +3916,8 @@
                 "palindrome-linked-list": "Middle, reverse the second half, compare. Restoring the list afterwards is the detail that separates a good answer from a correct one.",
                 "has-cycle": "Floyd's. The O(n)-space `HashSet` version is also worth writing, so the O(1) claim has something to beat.",
                 "cycle-start-index": "After the meeting, reset one pointer to the head and step both by one. Read the algebra once; it is two lines."
-              }
+              },
+              "optional": false
             },
             {
               "title": "Stretch",
@@ -3835,7 +3929,8 @@
               "notes": {
                 "reorder-list": "Find the middle, reverse the second half, then interleave. Three known pieces — the difficulty is holding them together without losing a tail.",
                 "reverse-k-group": "Reversal with a boundary check in front of it. Do it iteratively with a dummy head, and decide what happens to a final group of fewer than k *before* coding."
-              }
+              },
+              "optional": false
             }
           ],
           "build_it": "**Write a doubly linked list with sentinels.** A `head` and `tail` node that\nnever hold data, wired to each other at construction, plus `addFirst(node)`,\n`remove(node)` and `removeLast()` — each exactly two pointer assignments, with\n**no null checks anywhere**, because the sentinels guarantee every real node has\nboth neighbours.\n\nThat is about fifteen lines, and it is literally half of the LRU cache two units\nfrom now. Write it here, in isolation, where a bug is obvious; then the design\nproblem is only about keeping the map and the list agreeing.\n\nCheck yourself: remove the sentinels and count how many `if (x == null)` branches\nyou have to add back. Four is the usual answer.\n",
@@ -3847,6 +3942,7 @@
           "icon": "⛰️",
           "stage": "structures",
           "tagline": "The smallest element, always, for O(log n) a move.",
+          "weight": 3,
           "prereqs": [
             "sorting",
             "complexity"
@@ -4140,7 +4236,8 @@
               "notes": {
                 "kth-largest-in-stream": "The size-k min-heap, stated as plainly as it ever gets.",
                 "last-stone-weight": "A max-heap greedy loop: poll two, combine, offer the remainder back."
-              }
+              },
+              "optional": false
             },
             {
               "title": "Core",
@@ -4154,7 +4251,8 @@
                 "kth-largest-in-array": "You solved this by sorting in the sorting unit. Redo it in O(n log k) and compare — then look up quickselect for the O(n) third answer.",
                 "k-closest-distances": "The key you order by is not the value itself. Put the computation in the comparator, not in the data.",
                 "top-k-frequent-words": "Count first, then heap by (frequency, word) — the tie-break lives in the comparator, and getting its direction right is the exercise."
-              }
+              },
+              "optional": false
             },
             {
               "title": "Variations",
@@ -4168,7 +4266,8 @@
                 "task-scheduler": "Always schedule the most-remaining task that is legal right now. The heap makes “most remaining” free.",
                 "ugly-number-ii": "A heap generating values in order, with a set to suppress duplicates. The three-pointer O(n) solution afterwards is a good lesson in when a heap is *not* needed.",
                 "reorganize-string": "Greedy by remaining count, holding the previous character back for one round so it cannot repeat."
-              }
+              },
+              "optional": false
             },
             {
               "title": "Stretch",
@@ -4182,7 +4281,8 @@
                 "merge-k-sorted": "O(N log k). Holding only the k heads is what keeps the memory bounded — say that number out loud before coding.",
                 "median-from-stream": "The two-heap pattern. Getting the rebalance right is the whole problem; the trace above is the version to copy.",
                 "smallest-range-k-lists": "Merge-k plus a running maximum — the range is between the heap's minimum and the largest value pushed so far."
-              }
+              },
+              "optional": false
             }
           ],
           "build_it": "**Write a binary min-heap on an `int[]`.** `siftUp`, `siftDown`, `offer`, `poll`,\n`peek` — about forty lines, and the only tricky one is choosing the *smaller*\nchild in `siftDown`.\n\nThen prove it to yourself two ways. Push a thousand random values, poll them all,\nand check the output is sorted — that is heapsort, and it is the strongest test\nthere is. Then deliberately swap with the larger child in `siftDown` and watch\nthe output come out *almost* sorted: no exception, no crash, just wrong. That\nsilence is why the invariant has to be maintained by construction rather than\nchecked.\n\nFinally, use it for top-k over a million values with k = 10 and confirm the array\nnever grows past 10.\n",
@@ -4194,6 +4294,7 @@
           "icon": "🏗️",
           "stage": "structures",
           "tagline": "No algorithm — just the right combination, at the right cost.",
+          "weight": 3,
           "prereqs": [
             "hashing",
             "linked-lists"
@@ -4477,7 +4578,8 @@
               "notes": {
                 "design-hashset": "Buckets and a hash. The simplest version of the structure every other problem in this unit leans on.",
                 "design-hashmap": "Buckets plus chaining. Writing it once explains every “O(1) average” claim you have made since stage 2 — including why a bad hash makes it O(n)."
-              }
+              },
+              "optional": false
             },
             {
               "title": "Core",
@@ -4491,7 +4593,8 @@
                 "min-stack": "The parallel-stack idea, which transfers to far harder problems. Push a duplicate minimum rather than making `pop` conditional.",
                 "design-linked-list": "Every splice case in one class. Use a sentinel and watch the null checks disappear.",
                 "browser-history": "Two stacks, or one list with a cursor. Decide which before you type — and note that a forward history is *discarded* on a new visit, which the two-stack version gets right for free."
-              }
+              },
+              "optional": false
             },
             {
               "title": "Variations",
@@ -4503,7 +4606,8 @@
               "notes": {
                 "stock-spanner": "The monotonic stack from the stacks unit, wrapped in a class and fed one value at a time. Store (price, span) so a popped entry's span is absorbed rather than recomputed.",
                 "time-based-kv": "Timestamps arrive increasing, so each key's list is already sorted — binary-search it. You want the last entry `<= t`, which is upper bound minus one."
-              }
+              },
+              "optional": false
             },
             {
               "title": "Stretch",
@@ -4517,7 +4621,8 @@
                 "lru-cache": "The canonical design problem. Use sentinel nodes, handle `put` on an existing key, and get every operation to worst-case O(1).",
                 "design-twitter": "Merge-k over followees' timelines, truncated at 10. Only the head of each list can be next — that is what stops it being O(total tweets).",
                 "lfu-cache": "LRU with a second dimension: frequency buckets, each an LRU list of its own, plus a minimum-frequency pointer. Draw the three structures and their invariants before coding."
-              }
+              },
+              "optional": false
             }
           ],
           "build_it": "**Build the LRU cache from the pieces you already wrote.** You have the\nsentinel doubly linked list from the linked-list unit; add a `HashMap<Integer,\nNode>` and the two operations.\n\nThen do the thing that actually teaches it: write a `checkInvariants()` method\nthat walks the list, counts the nodes, and asserts that the count equals\n`map.size()`, that every node in the list is in the map, and that every map\nvalue is reachable from `head`. Call it after every `get` and `put` in a test\nwith capacity 2 and a few hundred random operations.\n\nIt will fail, and where it fails is the lesson — almost always the eviction path,\nwhich unlinks the node and forgets the map key. That failure *is* the unit: a\ndesign bug is a missing line in one of several places, not a wrong algorithm.\n",
@@ -4539,6 +4644,7 @@
           "icon": "🌀",
           "stage": "hierarchies",
           "tagline": "Trust the smaller call. Everything in this stage depends on it.",
+          "weight": 2,
           "prereqs": [
             "loops-and-digits",
             "complexity"
@@ -4694,7 +4800,8 @@
               "notes": {
                 "nth-fibonacci": "Write it naively, note it is O(2ⁿ), then memoise. That one edit is the whole DP stage in miniature.",
                 "unique-paths-count": "`paths(i,j) = paths(i-1,j) + paths(i,j-1)`. Same shape, two dimensions."
-              }
+              },
+              "optional": false
             },
             {
               "title": "Variations",
@@ -4704,7 +4811,8 @@
               ],
               "notes": {
                 "fast-power": "Store the half-power. Calling twice is the bug that makes it O(e)."
-              }
+              },
+              "optional": false
             }
           ],
           "build_it": "",
@@ -4716,6 +4824,7 @@
           "icon": "🌲",
           "stage": "hierarchies",
           "tagline": "Two recursive calls and a decision about where to do the work.",
+          "weight": 3,
           "prereqs": [
             "recursion"
           ],
@@ -4874,23 +4983,23 @@
               ],
               "notes": {
                 "max-depth-tree": "The template. Everything in this unit is a variation of these three lines."
-              }
+              },
+              "optional": false
             },
             {
               "title": "Core",
               "purpose": "Two-node recursion, and context carried downwards.",
               "slugs": [
                 "same-tree",
-                "symmetric-tree",
                 "min-depth-tree",
                 "path-sum-exists",
-                "inorder-traversal",
-                "preorder-traversal"
+                "inorder-traversal"
               ],
               "notes": {
                 "min-depth-tree": "The one-child case. This is the problem that catches everyone — decide what a leaf is first.",
-                "symmetric-tree": "Same as `same-tree`, but compare left against right."
-              }
+                "inorder-traversal": "Learn this one properly: it is the walk that comes out sorted on a BST, which is the next unit's whole invariant."
+              },
+              "optional": false
             },
             {
               "title": "Variations",
@@ -4903,7 +5012,8 @@
               "notes": {
                 "level-order-traversal": "The BFS template. Snapshot the queue size.",
                 "zigzag-level-order": "Do not reverse the queue — reverse the collected list on alternate levels."
-              }
+              },
+              "optional": false
             },
             {
               "title": "Stretch",
@@ -4918,7 +5028,21 @@
                 "balanced-tree": "Return the height and use −1 as a “already unbalanced” signal, so it stays a single O(n) pass.",
                 "lca-binary-tree": "Return the node found below; a node that hears back from both sides is the ancestor.",
                 "max-path-sum": "The hardest of the shape, and the one worth being able to rebuild from scratch."
-              }
+              },
+              "optional": false
+            },
+            {
+              "title": "Extra practice",
+              "purpose": "The same two recursions with one line moved — reps, not new ideas.",
+              "slugs": [
+                "preorder-traversal",
+                "symmetric-tree"
+              ],
+              "notes": {
+                "preorder-traversal": "Identical to the inorder walk with one line relocated. Worth writing once to see that the *order of the visit* is the only difference between the three traversals; not worth waiting on.",
+                "symmetric-tree": "`same-tree` with the recursion crossed over: compare left against right. Genuinely the same problem."
+              },
+              "optional": true
             }
           ],
           "build_it": "",
@@ -4930,6 +5054,7 @@
           "icon": "🔎",
           "stage": "hierarchies",
           "tagline": "One invariant, and every operation becomes a descent.",
+          "weight": 2,
           "prereqs": [
             "trees",
             "binary-search"
@@ -5088,7 +5213,8 @@
               ],
               "notes": {
                 "bst-search": "Write it iteratively. There is no reason to spend stack on a straight-line walk."
-              }
+              },
+              "optional": false
             },
             {
               "title": "Variations",
@@ -5102,7 +5228,8 @@
               "notes": {
                 "validate-bst": "Try the naive child-comparison version first and build the counterexample that defeats it.",
                 "kth-smallest-bst": "Iterative in-order with an early exit — O(h + k), not O(n)."
-              }
+              },
+              "optional": false
             }
           ],
           "build_it": "",
@@ -5114,6 +5241,7 @@
           "icon": "♟️",
           "stage": "hierarchies",
           "tagline": "Choose, explore, un-choose — and prune before you descend.",
+          "weight": 3,
           "prereqs": [
             "recursion",
             "strings"
@@ -5281,7 +5409,8 @@
               ],
               "notes": {
                 "all-subsets-small": "Four elements, so every wrong answer is readable. Delete the undo on purpose once and look at what comes out."
-              }
+              },
+              "optional": false
             },
             {
               "title": "Core",
@@ -5294,7 +5423,8 @@
               "notes": {
                 "generate-subsets": "Type the four lines from memory. Everything else in this unit is this with a different guard.",
                 "generate-permutations": "The `used[]` array. Undo both mutations, in mirror order."
-              }
+              },
+              "optional": false
             },
             {
               "title": "Variations",
@@ -5308,7 +5438,8 @@
               "notes": {
                 "combination-sum-count": "Reuse is allowed, so recurse with `i`, not `i + 1`. One character, entirely different problem.",
                 "generate-parentheses": "Pure feasibility pruning: never close more than you have opened."
-              }
+              },
+              "optional": false
             },
             {
               "title": "Stretch",
@@ -5324,7 +5455,8 @@
                 "word-search": "Mark and restore the grid cell. Restoring on the success path too is the bug to avoid.",
                 "n-queens-count": "Track occupied columns and both diagonals as sets, so validity is O(1) rather than O(n).",
                 "sudoku-solvable": "Choose the most-constrained empty cell first — a heuristic that turns minutes into milliseconds."
-              }
+              },
+              "optional": false
             }
           ],
           "build_it": "",
@@ -5336,6 +5468,7 @@
           "icon": "🕸️",
           "stage": "hierarchies",
           "tagline": "Trees with cycles — so you need a visited set, and BFS gives shortest paths.",
+          "weight": 3,
           "prereqs": [
             "queues-and-deques",
             "recursion"
@@ -5510,20 +5643,37 @@
               ],
               "notes": {
                 "count-connected-components": "The whole unit with nothing else attached: adjacency list, one shared `seen`, and a BFS started from every node you have not reached yet."
-              }
+              },
+              "optional": false
             },
             {
               "title": "Core",
-              "purpose": "Traversal on an implicit graph, then a real one.",
+              "purpose": "Traversal on an implicit graph, then a real one, then a directed one.",
               "slugs": [
                 "number-of-islands",
                 "shortest-path-binary-matrix",
-                "bipartite-check"
+                "bipartite-check",
+                "directed-path-exists"
               ],
               "notes": {
                 "number-of-islands": "One traversal per unvisited land cell. Sink the island as you go.",
-                "shortest-path-binary-matrix": "BFS, because the grid is unweighted — and 8-directional, so check the direction array."
-              }
+                "shortest-path-binary-matrix": "BFS, because the grid is unweighted — and 8-directional, so check the direction array.",
+                "directed-path-exists": "One-way edges, where every undirected reflex is wrong — and wrong on *some* inputs only, which is worse. Check that swapping `s` and `t` can flip your answer."
+              },
+              "optional": false
+            },
+            {
+              "title": "Variations",
+              "purpose": "One BFS, many sources — and one BFS that stops early.",
+              "slugs": [
+                "rotting-oranges",
+                "reachable-within-k"
+              ],
+              "notes": {
+                "rotting-oranges": "Seed the queue with *every* rotten cell at time 0. The distance-order invariant does not care how many sources there were, only that they started together.",
+                "reachable-within-k": "The cap is a refusal to expand, not a filter at the end — otherwise K bought you nothing and you walked the whole graph anyway."
+              },
+              "optional": false
             },
             {
               "title": "Stretch",
@@ -5533,7 +5683,8 @@
               ],
               "notes": {
                 "word-ladder-length": "The nodes are words and the edges are one-letter changes. Building the adjacency efficiently (wildcard buckets) is most of the problem."
-              }
+              },
+              "optional": false
             }
           ],
           "build_it": "",
@@ -5545,6 +5696,7 @@
           "icon": "📋",
           "stage": "hierarchies",
           "tagline": "Order the dependencies — or prove that no order exists.",
+          "weight": 2,
           "prereqs": [
             "graph-traversal"
           ],
@@ -5695,7 +5847,8 @@
               ],
               "notes": {
                 "detect-cycle-tiny-dag": "The sort and the cycle check are one algorithm. Be able to say *why* the leftovers must contain a cycle — it is the standard follow-up."
-              }
+              },
+              "optional": false
             },
             {
               "title": "Core",
@@ -5708,7 +5861,8 @@
               "notes": {
                 "course-schedule": "Write one example's edge directions down on paper before coding. That is where the bug lives.",
                 "detect-cycle-directed": "Do it both ways — Kahn's size check and three-colour DFS — and note that they are the same fact."
-              }
+              },
+              "optional": false
             },
             {
               "title": "Stretch",
@@ -5718,7 +5872,8 @@
               ],
               "notes": {
                 "alien-dictionary-order": "Only the first differing character of each adjacent pair is evidence. Handle the invalid-prefix case explicitly."
-              }
+              },
+              "optional": false
             }
           ],
           "build_it": "",
@@ -5730,6 +5885,7 @@
           "icon": "🧵",
           "stage": "hierarchies",
           "tagline": "Connectivity as a near-constant-time operation.",
+          "weight": 2,
           "prereqs": [
             "graph-traversal"
           ],
@@ -5890,7 +6046,8 @@
               ],
               "notes": {
                 "union-by-size-components": "Plain walk to the root, no compression. Union by size already caps the depth at O(log n) — knowing that is what lets you justify compression on the next rung."
-              }
+              },
+              "optional": false
             },
             {
               "title": "Core",
@@ -5906,23 +6063,21 @@
                 "count-components": "Start at n and decrement on each successful union. Nothing else is needed.",
                 "redundant-connection": "The answer is literally the first edge whose union returns false.",
                 "graph-valid-tree": "Two conditions, not one: n − 1 edges and no failed union."
-              }
+              },
+              "optional": false
             },
             {
               "title": "Variations",
-              "purpose": "Sizes, weights and orderings layered on top.",
+              "purpose": "The two layerings that are genuinely new ideas.",
               "slugs": [
-                "largest-component-size",
                 "satisfy-equations",
-                "make-network-connected",
-                "earliest-full-connect",
                 "mst-total-weight"
               ],
               "notes": {
                 "satisfy-equations": "Union all the equalities first, then check every inequality. Order matters.",
-                "earliest-full-connect": "Union in timestamp order and stop the moment the component count hits 1.",
-                "mst-total-weight": "Kruskal's. Sort by weight, union greedily, stop at n − 1 edges."
-              }
+                "mst-total-weight": "Kruskal's. Sort by weight, union greedily, stop at n − 1 edges — and the Stretch problem below is this, on a graph you build yourself."
+              },
+              "optional": false
             },
             {
               "title": "Stretch",
@@ -5932,7 +6087,21 @@
               ],
               "notes": {
                 "min-cost-connect-points": "The graph is complete and implicit — all O(n²) pairwise distances. Generate, sort, union."
-              }
+              },
+              "optional": false
+            },
+            {
+              "title": "Extra practice",
+              "purpose": "Sizes and orderings layered on the same union — reps, not new ideas.",
+              "slugs": [
+                "largest-component-size",
+                "make-network-connected",
+                "earliest-full-connect"
+              ],
+              "notes": {
+                "earliest-full-connect": "Union in timestamp order and stop the moment the component count hits 1. A nice problem; not one that stands between you and shortest paths."
+              },
+              "optional": true
             }
           ],
           "build_it": "",
@@ -5944,6 +6113,7 @@
           "icon": "🛣️",
           "stage": "hierarchies",
           "tagline": "When edges cost different amounts, BFS stops working.",
+          "weight": 2,
           "prereqs": [
             "graph-traversal",
             "heaps"
@@ -6112,7 +6282,8 @@
               ],
               "notes": {
                 "grid-bfs-distance": "All edges cost 1, so a FIFO queue already visits cells in non-decreasing distance order. Make one cell cost 5 and that invariant dies — the heap is what restores it."
-              }
+              },
+              "optional": false
             },
             {
               "title": "Core",
@@ -6126,7 +6297,8 @@
                 "network-delay-time": "Plain Dijkstra: the answer is the maximum finalised distance, and unreachable means −1.",
                 "path-minimum-effort": "Same algorithm, `max` relaxation. Worth doing to prove the template is not about addition.",
                 "cheapest-flights-k-stops": "Bellman-Ford with k + 1 rounds. The snapshot clone is the entire problem."
-              }
+              },
+              "optional": false
             },
             {
               "title": "Stretch",
@@ -6136,7 +6308,8 @@
               ],
               "notes": {
                 "dijkstra-shortest-path": "The full implementation from an edge list, with the stale check and `long` distances."
-              }
+              },
+              "optional": false
             }
           ],
           "build_it": "",
@@ -6158,6 +6331,7 @@
           "icon": "💰",
           "stage": "advanced",
           "tagline": "Take the best local move — and be able to prove it was safe.",
+          "weight": 3,
           "prereqs": [
             "sorting"
           ],
@@ -6314,19 +6488,38 @@
               ],
               "notes": {
                 "activity-selection-small": "The canonical greedy. Produce the counterexamples that kill sorting by start time and by duration — that is how you check a rule you just invented."
-              }
+              },
+              "optional": false
             },
             {
               "title": "Core",
               "purpose": "One pass, one running value, one proof.",
               "slugs": [
                 "best-time-buy-sell",
-                "jump-game"
+                "jump-game",
+                "boats-to-save-people",
+                "gas-station-start"
               ],
               "notes": {
                 "best-time-buy-sell": "Say the exchange argument out loud before coding. The code is four lines; the reasoning is the exercise.",
-                "jump-game": "Stays-ahead. Track the furthest reachable index and fail the moment you stand past it."
-              }
+                "jump-game": "Stays-ahead. Track the furthest reachable index and fail the moment you stand past it.",
+                "boats-to-save-people": "Sort, then converge from both ends. The heaviest person departs on this boat either way — putting `j--` inside the `if` is the bug.",
+                "gas-station-start": "A reset, with a real argument for why the abandoned prefix was already doomed. Same shape as Kadane."
+              },
+              "optional": false
+            },
+            {
+              "title": "Variations",
+              "purpose": "A rule over a derived quantity, and a rule that is simply wrong.",
+              "slugs": [
+                "fractional-knapsack",
+                "greedy-coin-change"
+              ],
+              "notes": {
+                "fractional-knapsack": "The sort key is value *per unit weight*, not value. Then say which property you lose when the items stop being divisible — that is the 0/1 knapsack boundary.",
+                "greedy-coin-change": "The most useful negative example in the unit: on coins {1,3,4} greedy is wrong for 6, and on {3,4} it gets stuck where an answer exists. Nothing is buggy; the rule is false."
+              },
+              "optional": false
             },
             {
               "title": "Stretch",
@@ -6336,7 +6529,8 @@
               ],
               "notes": {
                 "jump-game-ii": "Count a jump only when the current reach is exhausted, and stop before the last index."
-              }
+              },
+              "optional": false
             }
           ],
           "build_it": "",
@@ -6348,6 +6542,7 @@
           "icon": "📅",
           "stage": "advanced",
           "tagline": "Sort by the right endpoint, then sweep.",
+          "weight": 3,
           "prereqs": [
             "sorting",
             "greedy"
@@ -6511,7 +6706,8 @@
               ],
               "notes": {
                 "can-attend-meetings": "Sort by start and compare neighbours. Decide what touching endpoints mean before you code."
-              }
+              },
+              "optional": false
             },
             {
               "title": "Core",
@@ -6524,7 +6720,8 @@
               "notes": {
                 "merge-intervals": "The base operation. `Math.max` on the end, because intervals nest.",
                 "insert-interval": "Three phases. Trying to write it as one loop is how this becomes hard."
-              }
+              },
+              "optional": false
             },
             {
               "title": "Variations",
@@ -6538,7 +6735,8 @@
               "notes": {
                 "min-meeting-rooms": "Solve it twice — a ±1 sweep and a heap of end times — and notice they are the same algorithm.",
                 "non-overlapping-remove": "Sort by end and keep greedily; the removals are everything you did not keep."
-              }
+              },
+              "optional": false
             },
             {
               "title": "Stretch",
@@ -6548,7 +6746,8 @@
               ],
               "notes": {
                 "employee-free-time": "Flatten every schedule, merge, and emit the gaps. A heap-based k-way merge avoids sorting everything."
-              }
+              },
+              "optional": false
             }
           ],
           "build_it": "",
@@ -6560,6 +6759,7 @@
           "icon": "🧩",
           "stage": "advanced",
           "tagline": "Define the state, write the recurrence, and never compute it twice.",
+          "weight": 3,
           "prereqs": [
             "recursion",
             "complexity"
@@ -6732,7 +6932,8 @@
               ],
               "notes": {
                 "stair-ways-table": "Print the whole table, not just the last cell. Seeing `1 1 2 3 5 8` come out is what makes the recurrence yours."
-              }
+              },
+              "optional": false
             },
             {
               "title": "Core",
@@ -6745,7 +6946,8 @@
               "notes": {
                 "climbing-stairs": "Fibonacci wearing a hat. Write the state sentence anyway — the habit is the point.",
                 "house-robber": "Take-or-skip. The template for every “no two adjacent” problem."
-              }
+              },
+              "optional": false
             },
             {
               "title": "Variations",
@@ -6759,7 +6961,8 @@
               "notes": {
                 "maximum-subarray": "Kadane. Note that the answer is a maximum over the whole table, not the last cell.",
                 "coin-change-ways": "Same table as coin-change, summing instead of minimising, base case 1."
-              }
+              },
+              "optional": false
             },
             {
               "title": "Stretch",
@@ -6773,7 +6976,8 @@
                 "maximum-product-subarray": "Track the minimum as well as the maximum: a negative times the smallest becomes the largest.",
                 "decode-ways": "The 0 cases are the whole difficulty. Enumerate them before coding.",
                 "word-break": "`dp[i]` over prefixes with an inner split loop — O(n²), and the same shape as palindrome partitioning."
-              }
+              },
+              "optional": false
             }
           ],
           "build_it": "",
@@ -6785,6 +6989,7 @@
           "icon": "🗺️",
           "stage": "advanced",
           "tagline": "Two indices, a table, and a fill order that respects the recurrence.",
+          "weight": 2,
           "prereqs": [
             "dp-1d",
             "simulation-and-matrix"
@@ -6958,7 +7163,8 @@
               ],
               "notes": {
                 "grid-paths-table": "No obstacles, so the only new idea over 1-D is which orders are legal. Then read the printed table backwards and reconstruct an actual path."
-              }
+              },
+              "optional": false
             },
             {
               "title": "Core",
@@ -6968,7 +7174,8 @@
               ],
               "notes": {
                 "unique-paths": "The gentlest 2-D problem: base row and column of ones, then sum from above and left."
-              }
+              },
+              "optional": false
             },
             {
               "title": "Variations",
@@ -6978,7 +7185,8 @@
               ],
               "notes": {
                 "longest-common-subsequence": "Learn this one properly — edit distance is the same table with a different mismatch branch."
-              }
+              },
+              "optional": false
             },
             {
               "title": "Stretch",
@@ -6994,7 +7202,8 @@
                 "longest-palindrome-length": "Interval DP, filled by length. Also solvable by expanding around each centre — worth writing both.",
                 "partition-equal-subset-sum": "Subset sum for half the total. Odd totals are impossible; return early.",
                 "longest-increasing-subsequence": "Do the O(n²) DP first, then the O(n log n) tails version — and be clear about what the tails array is not."
-              }
+              },
+              "optional": false
             }
           ],
           "build_it": "",
@@ -7006,6 +7215,7 @@
           "icon": "🌴",
           "stage": "advanced",
           "tagline": "When the structure of the key is the structure of the index.",
+          "weight": 2,
           "prereqs": [
             "trees",
             "strings"
@@ -7169,7 +7379,8 @@
               ],
               "notes": {
                 "trie-insert-lookup": "`isWord` is not “has no children”: insert `card` and `car` becomes a node that exists and is not a word. Also be able to say why a HashSet would beat this — the answer is the rest of the unit."
-              }
+              },
+              "optional": false
             },
             {
               "title": "Core",
@@ -7182,7 +7393,8 @@
               "notes": {
                 "implement-trie-ops": "Write the structure once from scratch. Everything else in this unit reuses it verbatim.",
                 "prefix-counts": "Maintain `count` on insert; the query is then the same walk with a different final read."
-              }
+              },
+              "optional": false
             },
             {
               "title": "Variations",
@@ -7194,7 +7406,8 @@
               "notes": {
                 "replace-words-roots": "Return at the first `word` node — that is what makes the root the shortest one.",
                 "longest-buildable-word": "Only descend through nodes that are themselves words, so every prefix is buildable."
-              }
+              },
+              "optional": false
             },
             {
               "title": "Stretch",
@@ -7206,7 +7419,8 @@
               "notes": {
                 "word-dictionary-wildcard": "At a `.`, recurse into every non-null child. The structure is unchanged; only the traversal is.",
                 "max-xor-pair": "A binary trie over the bits, walked greedily from bit 31. The last idea in the curriculum, and a summary of most of it."
-              }
+              },
+              "optional": false
             }
           ],
           "build_it": "",

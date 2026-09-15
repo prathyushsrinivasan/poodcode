@@ -73,6 +73,11 @@ fn curriculum_teaches_every_problem_exactly_once() {
 
             // 6 — the unit is actually taught, not just a list of links.
             assert!(!unit.title.trim().is_empty(), "{k}: no title");
+            assert!(
+                (1..=3).contains(&unit.weight),
+                "{k}: weight is {} — interview yield is 1, 2 or 3",
+                unit.weight
+            );
             assert!(!unit.why.trim().is_empty(), "{k}: no 'why this exists'");
             assert!(!unit.model.trim().is_empty(), "{k}: no mental model");
             assert!(!unit.rungs.is_empty(), "{k}: no problem ladder");
@@ -116,12 +121,14 @@ fn curriculum_teaches_every_problem_exactly_once() {
             let mut last_rank = -1;
             let mut first_rung_floor: Option<i32> = None;
             let mut unit_n = 0usize;
+            let mut seen_optional = false;
             for rung in &unit.rungs {
                 assert!(!rung.slugs.is_empty(), "{k}/{}: empty rung", rung.title);
                 assert!(!rung.purpose.trim().is_empty(), "{k}/{}: no purpose", rung.title);
 
                 let mut hardest = -1;
                 let mut easiest = i32::MAX;
+                let optional = rung.optional;
                 for slug in &rung.slugs {
                     // 1 — problem links resolve.
                     let problem = by_slug
@@ -135,15 +142,29 @@ fn curriculum_teaches_every_problem_exactly_once() {
                     easiest = easiest.min(rank(&problem.difficulty));
                 }
                 unit_n += rung.slugs.len();
-                if first_rung_floor.is_none() {
-                    first_rung_floor = Some(easiest);
-                }
                 for noted in rung.notes.keys() {
                     assert!(
                         rung.slugs.contains(noted),
                         "{k}/{}: note for {noted}, which is not in the rung",
                         rung.title
                     );
+                }
+
+                // An optional rung is off the ladder: it holds a unit's surplus,
+                // so neither the climb rule nor the on-ramp floor applies to it,
+                // and it must come after everything the unit does ask for — or
+                // "work down the page" stops being true.
+                if optional {
+                    seen_optional = true;
+                    continue;
+                }
+                assert!(
+                    !seen_optional,
+                    "{k}: required rung {} follows an optional one — optional rungs go last",
+                    rung.title
+                );
+                if first_rung_floor.is_none() {
+                    first_rung_floor = Some(easiest);
                 }
 
                 // 4 — rungs climb (compared on each rung's hardest problem, so a
@@ -155,6 +176,10 @@ fn curriculum_teaches_every_problem_exactly_once() {
                 );
                 last_rank = hardest;
             }
+            assert!(
+                first_rung_floor.is_some(),
+                "{k}: every rung is optional, so the unit asks nothing"
+            );
 
             // 5 — a substantial unit opens below its ceiling. Rule 4 compares
             // each rung's *hardest* problem, so a unit that is ten Mediums and

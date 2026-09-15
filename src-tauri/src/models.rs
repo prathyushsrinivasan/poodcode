@@ -1356,6 +1356,11 @@ pub struct Rung {
     /// Optional per-problem "why this one is here", keyed by slug.
     #[serde(default)]
     pub notes: HashMap<String, String>,
+    /// A rung the unit does not *ask* of you: surplus the bank happened to
+    /// contain, kept reachable rather than deleted. It counts toward the unit's
+    /// total only once started, and is always last in a unit.
+    #[serde(default)]
+    pub optional: bool,
 }
 
 /// One technique, taught: why it exists, how it works, what it costs, and the
@@ -1371,6 +1376,11 @@ pub struct CurriculumUnit {
     pub stage: String,
     #[serde(default)]
     pub tagline: String,
+    /// Interview yield, 1-3, with a target problem-count band per weight. It
+    /// exists so the bank's accidental distribution does not define the
+    /// syllabus; the band is a generation-time ledger, never enforced.
+    #[serde(default)]
+    pub weight: i64,
     /// Keys of units this one builds on; always earlier in the curriculum.
     #[serde(default)]
     pub prereqs: Vec<String>,

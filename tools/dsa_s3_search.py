@@ -40,6 +40,7 @@ fast.
 _unit(
     "sorting", "Sorting & Ordering", "🔡", _S3,
     "What sorting costs, what it buys, and how to sort by something else.",
+    weight=2,
     prereqs=["arrays-first-pass", "complexity"],
     why="""
 You will almost never implement a sort. You will constantly *decide whether to
@@ -214,6 +215,7 @@ in it in O(log n).
 _unit(
     "binary-search", "Binary Search", "🎯", _S3,
     "Halve the search space — over an array, or over the answer itself.",
+    weight=3,
     prereqs=["sorting", "complexity"],
     why="""
 Binary search is the cheapest big win in algorithms: 20 steps to find one value
@@ -377,12 +379,15 @@ whole interview vocabulary.
               {"lower-bound-index": "Type the `[lo, hi)` loop once with no equality branch. Every other binary search in this unit is this loop with a different comparison.",
                "first-true-predicate": "The same loop with the array replaced by a predicate — which is what “binary search on the answer” means, written out in full."}),
         _rung("Core", "The template, and the insertion-point reading of it.",
-              ["binary-search-first", "search-insert-position"],
+              ["binary-search-first", "search-insert-position", "count-occurrences-sorted"],
               {"binary-search-first": "Duplicates are the point: you want the *first* match, which is exactly lower bound.",
-               "search-insert-position": "The same code with nothing removed — the return value already is the insertion point."}),
-        _rung("Variations", "Searching a space that is not an array.",
-              ["integer-sqrt"],
-              {"integer-sqrt": "No array anywhere. The predicate is `mid * mid > n`, and `mid * mid` must be computed in `long`."}),
+               "search-insert-position": "The same code with nothing removed — the return value already is the insertion point.",
+               "count-occurrences-sorted": "Upper bound for free: it is lower bound of `x + 1`. Two calls to one template beats two templates."}),
+        _rung("Variations", "Searching a space that is not an array — or an array that is not sorted.",
+              ["integer-sqrt", "rotated-array-minimum", "min-ship-capacity"],
+              {"integer-sqrt": "No array anywhere. The predicate is `mid * mid > n`, and `mid * mid` must be computed in `long`.",
+               "rotated-array-minimum": "The array is not sorted and there is no target. What is monotone is the *question* — and that is all the loop ever needed.",
+               "min-ship-capacity": "Binary search on the answer, in full: name the bounds, write `feasible(x)`, argue it is monotone. The array only evaluates the predicate."}),
     ],
     next_up="""
 Both remaining units in this stage are about the *representation* of a number
@@ -396,6 +401,7 @@ rather than a collection of them — first its factors, then its bits.
 _unit(
     "math-number-theory", "Math & Number Theory", "🧮", _S3,
     "Divisors, primes and gcd — in O(√n) and O(log n), not O(n).",
+    weight=1,
     prereqs=["loops-and-digits"],
     why="""
 Number-theory problems are the clearest example of the distinction that Big-O
@@ -590,7 +596,7 @@ distinguishes someone who knows the trick from someone who knows why it works.
               ["gcd", "is-prime", "perfect-number"],
               {"is-prime": "Guard `n < 2` first, then loop while `d * d <= n`.",
                "perfect-number": "A divisor-sum problem: collect both members of each divisor pair in the same √n loop."}),
-        _rung("Variations", "Batch versions of both.",
+        _extra("Extra practice", "Batch versions of the same two ideas — more reps, no new idea.",
               ["count-primes", "gcd-of-array"],
               {"count-primes": "The sieve. Testing each number separately is the O(n√n) solution you are replacing.",
                "gcd-of-array": "A fold. `gcd(0, x) == x` makes 0 the right starting accumulator."}),
@@ -606,6 +612,7 @@ One more representation to go: the bits an integer is actually made of.
 _unit(
     "bit-manipulation", "Bit Manipulation", "🔟", _S3,
     "32 flags in one int, and the XOR trick that cancels pairs.",
+    weight=1,
     prereqs=["loops-and-digits"],
     why="""
 An `int` is 32 booleans. Once you see it that way, a set of up to 32 elements
@@ -788,6 +795,7 @@ the index discipline that grid problems demand.
 _unit(
     "simulation-and-matrix", "Simulation & Matrices", "🎛️", _S3,
     "Follow the rules exactly, on a grid, without breaking your own indices.",
+    weight=2,
     prereqs=["arrays-first-pass", "loops-and-digits"],
     why="""
 Some problems have no trick. They describe a process — a robot walking, cells
@@ -989,7 +997,7 @@ when asked for O(1) space, explain the encoding before writing it.
               ["rotate-array", "rotate-array-right", "set-matrix-zeroes"],
               {"rotate-array": "Three reversals. Try the k-buffer version too and compare the space.",
                "set-matrix-zeroes": "The marking trap: record which rows and columns to clear *before* clearing any of them."}),
-        _rung("Stretch", "Index arithmetic with nothing to hide behind.",
+        _extra("Extra practice", "More index arithmetic, once you can already do index arithmetic.",
               ["rotate-matrix-90", "spiral-order", "game-of-life-step"],
               {"game-of-life-step": "Do the copy version first. The in-place encoding is the follow-up, not the entry price."}),
     ],

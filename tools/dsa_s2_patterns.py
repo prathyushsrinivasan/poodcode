@@ -41,6 +41,7 @@ the stage.
 _unit(
     "complexity", "Cost: Big-O in Practice", "⏱️", _S2,
     "Count the work before you write it, and know when n² is fine.",
+    weight=2,
     prereqs=["arrays-first-pass"],
     why="""
 Every problem you have solved so far was small enough that nothing you wrote
@@ -204,6 +205,7 @@ that and you have the most useful data structure in interview programming.
 _unit(
     "hashing", "Hashing: Trade Space for Time", "🗝️", _S2,
     "“Have I seen this?” in O(1), and everything that follows from it.",
+    weight=3,
     prereqs=["arrays-first-pass", "complexity"],
     why="""
 The commonest reason code is quadratic is that it searches. *For each element,
@@ -413,6 +415,7 @@ spends no memory at all.
 _unit(
     "two-pointers", "Two Pointers", "↔️", _S2,
     "When the data is sorted, neither index ever needs to go back.",
+    weight=3,
     prereqs=["arrays-first-pass"],
     why="""
 Hashing costs O(n) memory. When the array is **sorted** — or can be — you can
@@ -598,6 +601,7 @@ run** instead, the two pointers move the same way — and that is a window.
 _unit(
     "sliding-window", "Sliding Window", "🪟", _S2,
     "Every contiguous-subarray question, in one pass.",
+    weight=3,
     prereqs=["two-pointers", "hashing"],
     why="""
 *"The longest substring with …"*, *"the smallest subarray such that …"*,
@@ -774,9 +778,16 @@ answer is that the window breaks and prefix sums take over.
               ["fixed-window-max-sum", "window-covering-letters"],
               {"fixed-window-max-sum": "The fixed window: add what entered, subtract what left. Two reads per step no matter how wide `k` is.",
                "window-covering-letters": "The variable right edge, with the left edge nailed to 0 — so the only new idea is maintaining a summary of what the window holds."}),
-        _rung("Core", "The variable window, in its purest form.",
-              ["longest-unique-substring"],
-              {"longest-unique-substring": "The template problem. Type it from memory, then check where you recorded `best`."}),
+        _rung("Core", "The four window shapes — longest valid, shortest valid, and count them all.",
+              ["longest-unique-substring", "longest-k-distinct", "min-window-sum-atleast",
+               "subarray-sum-at-most"],
+              {"longest-unique-substring": "The template problem. Type it from memory, then check where you recorded `best`.",
+               "longest-k-distinct": "Grow, then repair: extend the right edge unconditionally and shrink only to restore the invariant. Remove zero counts from the map or `size()` stops meaning anything.",
+               "min-window-sum-atleast": "The mirror image — shrink while the window is *still valid*, and record inside the shrink. Getting this pair backwards is the unit's most common bug.",
+               "subarray-sum-at-most": "Counting all valid windows rather than finding one, which is the shape people never think to look for: `r - left + 1` per step."}),
+        _rung("Variations", "A construction problem that turns out to be a window with a budget.",
+              ["longest-ones-k-flips"],
+              {"longest-ones-k-flips": "Nothing in the code decides *which* zeros to flip — the budget becomes the window invariant and the choices disappear. That reframing is the skill."}),
         _rung("Stretch", "A window whose validity test needs two counters.",
               ["min-window-length"],
               {"min-window-length": "The *shortest* variant, so the answer is recorded inside the shrink. Track “how many required characters are satisfied” as a single int rather than comparing whole maps."}),
@@ -793,6 +804,7 @@ arbitrary — or the values can be negative — you precompute instead.
 _unit(
     "prefix-sums", "Prefix Sums", "➕", _S2,
     "Precompute once, answer any range in O(1).",
+    weight=2,
     prereqs=["arrays-first-pass", "hashing"],
     why="""
 Answering *"what is the sum of `a[l..r]`?"* by looping costs O(n), and a problem
@@ -986,6 +998,7 @@ where the data structure is the same but the operations have their own costs.
 _unit(
     "strings", "Strings & Character Work", "🔤", _S2,
     "An array of characters, with an immutability tax.",
+    weight=3,
     prereqs=["arrays-first-pass", "hashing"],
     why="""
 Strings are arrays of characters, so every pattern in this stage applies

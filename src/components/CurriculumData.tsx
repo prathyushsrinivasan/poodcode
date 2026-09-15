@@ -7,7 +7,7 @@ import { hydrate, type HydratedCurriculum, type UnitStatus } from "../lib/curric
 /** Loads the curriculum and the learner's problems, and joins them.
  *
  * All three Library pages need exactly this pair, and the join is cheap (one
- * pass over 257 problems), so each page loads for itself rather than sharing a
+ * pass over 271 problems), so each page loads for itself rather than sharing a
  * store. That keeps a solve recorded on another page from showing stale
  * progress here: coming back re-fetches. */
 export function useCurriculumData() {

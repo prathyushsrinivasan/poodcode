@@ -898,7 +898,8 @@ ONRAMP_DEFS = [
             ("hidden", "Walled off", "2 3\nS#G\n.#.\n"),
         ],
         example_expl=[
-            "One shortest route is right, down, down, right, right → 5 steps.",
+            "The only route is down, down, then three steps right — the wall at (1,1) blocks "
+            "going right first → 5 steps.",
             "The wall row blocks every path from S to G → -1.",
         ],
     ),
