@@ -537,6 +537,21 @@ The full 14-part plan, including what is built and what is still ahead
 (OOP, exceptions, collections, generics, Java 8+, I/O, threads, DSA, Spring),
 lives in [`JAVA_ROADMAP.md`](JAVA_ROADMAP.md).
 
+### Japanese track
+
+The **日本語** view of Learn, for reading code, problems and interviews in
+Japanese. It opens with **Vocabulary** (`seeds/jp_vocab.json`, authored in
+`tools/jp_vocab_defs.py`): 100 non-katakana words for Java, coding problems and
+TypeScript, filterable by tag and by kanji, kana, rōmaji or English, each a
+flashcard with its reading, a description in English and Japanese, and an
+example sentence. The generator fails the build on a katakana term, a
+non-hiragana reading, or a sentence that doesn't contain its word. Below it,
+**12 glossary sets** (292 cards, `tools/japanese_defs.py`) are studied with
+spaced repetition, and the **日本語 → Java** bridge (`tools/japanese_bridge.py`)
+restates 12 bank problems in Japanese alongside 12 interview Q&A.
+
+The plan for expanding it lives in [`JAPANESE_ROADMAP.md`](JAPANESE_ROADMAP.md).
+
 You own the library. Add your own problems three ways:
 
 1. **Author in-app** — Library → *Browse* → *New Problem* (full editor for statement,
@@ -549,6 +564,9 @@ You own the library. Add your own problems three ways:
 ---
 
 ## Feature coverage (against the spec)
+
+The original build spec was `ProjectOverview.md`; it is fully built and now
+lives only in git history (`git show c87bbeb:ProjectOverview.md`).
 
 **Fully built:** Dashboard (goals, streak, weakest topic, suggested next) ·
 **DSA Curriculum** (the problem bank taught: 6 stages, 33 units, every problem
