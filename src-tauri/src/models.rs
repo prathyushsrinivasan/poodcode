@@ -619,6 +619,45 @@ pub struct JpBridge {
     pub interview: Vec<InterviewQA>,
 }
 
+/// A filter tag for the Japanese vocabulary list (e.g. "java", "problems").
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct JpVocabTag {
+    pub id: String,
+    pub label: String,
+    #[serde(default)]
+    pub label_ja: String,
+}
+
+/// One non-katakana Japanese word, shown as a flashcard with a description in
+/// English and Japanese, its reading, and an example sentence.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct JpVocabWord {
+    pub id: String,
+    pub term: String,
+    pub reading: String,
+    #[serde(default)]
+    pub romaji: String,
+    pub tag: String,
+    pub meaning: String,
+    #[serde(default)]
+    pub desc_en: String,
+    #[serde(default)]
+    pub desc_ja: String,
+    #[serde(default)]
+    pub example_ja: String,
+    #[serde(default)]
+    pub example_en: String,
+}
+
+/// The Japanese core vocabulary list (embedded seeds/jp_vocab.json).
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct JpVocab {
+    #[serde(default)]
+    pub tags: Vec<JpVocabTag>,
+    #[serde(default)]
+    pub words: Vec<JpVocabWord>,
+}
+
 // ---------------------------------------------------------------------------
 // Structured courses — a sequence of numbered units, each with lessons and a
 // capstone. Two of them ship, sharing this model, the `Exercise` +

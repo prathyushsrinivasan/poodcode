@@ -1,9 +1,10 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { api } from "../api";
 import type {
   Concept,
   Exercise,
+  JpVocab,
   JudgeReport,
   Problem,
   QuizQuestion,
@@ -14,6 +15,7 @@ import type {
 import { Markdown } from "../components/Markdown";
 import { CodeEditor } from "../components/CodeEditor";
 import { CardStudy } from "../components/CardStudy";
+import { JpVocabCard, JpVocabMenu } from "../components/JpVocab";
 import { DiffBadge, Empty } from "../components/common";
 import { Section, useCollapse } from "../components/Collapsible";
 import {
@@ -136,6 +138,13 @@ export default function Learn() {
   // "Arrays" under Java doesn't also fold it under another tab.
   const cats = useCollapse(`learn-cat:${lang}`);
   const nav = useNavigate();
+  // 日本語 core vocabulary. The open flashcard lives in the URL (?word=<id>) so
+  // it can be linked to and Back closes it; `vocabList` is the filtered list it
+  // was opened from, which prev/next walk.
+  const [vocab, setVocab] = useState<JpVocab | null>(null);
+  const [vocabList, setVocabList] = useState<string[]>([]);
+  const [params, setParams] = useSearchParams();
+  const openWord = params.get("word");
 
   async function setDoneState(key: string, value: boolean) {
     setDone(await setChapterDone(done, key, value));
@@ -143,6 +152,7 @@ export default function Learn() {
 
   useEffect(() => {
     api.concepts().then(setConcepts).catch(() => {});
+    api.jpVocab().then(setVocab).catch(() => {});
     api.listProblems().then(setProblems).catch(() => {});
     api
       .sqlDatasets()
@@ -152,6 +162,22 @@ export default function Learn() {
     // it an async load rather than a synchronous localStorage read.
     loadDoneChapters().then(setDone).catch(() => {});
   }, []);
+
+  function openVocab(id: string, list: string[]) {
+    setVocabList(list);
+    setParams({ word: id });
+  }
+
+  const navigateVocab = useCallback(
+    (id: string) => setParams({ word: id }, { replace: true }),
+    [setParams]
+  );
+
+  const closeVocab = useCallback(() => {
+    const next = new URLSearchParams(params);
+    next.delete("word");
+    setParams(next, { replace: true });
+  }, [params, setParams]);
 
   function pickLang(id: string) {
     setLang(id);
@@ -259,9 +285,11 @@ export default function Learn() {
           </>
         ) : isJp ? (
           <>
-            {shownCount} Japanese coding-vocabulary sets — the words, readings, and{" "}
-            <strong>example sentences</strong> you'll meet writing Java and doing technical
-            interviews in Japanese. Tap a set to see the full glossary. New here? Start with{" "}
+            Start with <strong>Vocabulary</strong>: {vocab?.words.length || 100} core
+            non-katakana words for Java, coding problems and TypeScript. Filter them by tag,
+            then tap one for a <strong>flashcard</strong> with its reading, a description in
+            English and Japanese, and an <strong>example sentence</strong>. Below it are{" "}
+            {shownCount} vocabulary sets with full glossaries, starting with{" "}
             <strong>JP: Coding Basics</strong>.
           </>
         ) : (
@@ -282,6 +310,21 @@ export default function Learn() {
           </>
         )}
       </p>
+
+      {isJp && vocab && vocab.words.length > 0 && (
+        <Section
+          title="📝 Vocabulary — 語彙"
+          open={cats.isOpen("jp-vocab")}
+          onToggle={() => cats.toggle("jp-vocab")}
+          meta={
+            <span className="dim" style={{ fontSize: 12 }}>
+              {vocab.words.length} words
+            </span>
+          }
+        >
+          <JpVocabMenu vocab={vocab} onOpen={openVocab} />
+        </Section>
+      )}
 
       {isJp && (
         <div
@@ -444,6 +487,16 @@ export default function Learn() {
           </Section>
         );
       })}
+
+      {openWord && vocab && (
+        <JpVocabCard
+          vocab={vocab}
+          id={openWord}
+          list={vocabList}
+          onNavigate={navigateVocab}
+          onClose={closeVocab}
+        />
+      )}
     </div>
   );
 }

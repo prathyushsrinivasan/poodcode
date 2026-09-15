@@ -379,6 +379,7 @@ pub fn run() {
             commands::grade_card,
             commands::reset_cards,
             commands::jp_bridge,
+            commands::jp_vocab,
             commands::ts_course,
             commands::java_course,
             commands::backend_track,

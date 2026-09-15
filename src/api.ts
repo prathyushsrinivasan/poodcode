@@ -23,6 +23,7 @@ import type {
   Flashcard,
   CardReview,
   JpBridge,
+  JpVocab,
   WeeklyCourse,
   BackendTrack,
   ProjectTrack,
@@ -215,6 +216,8 @@ export const api = {
 
   // Japanese → Java bridge (problem statements in Japanese + interview Q&A)
   jpBridge: () => invoke<JpBridge>("jp_bridge"),
+  // Japanese core vocabulary (tagged word flashcards, first on the 日本語 tab)
+  jpVocab: () => invoke<JpVocab>("jp_vocab"),
 
   // Stats / dashboard
   statistics: () => invoke<Stats>("statistics"),

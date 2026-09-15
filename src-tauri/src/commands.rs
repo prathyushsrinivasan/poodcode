@@ -83,6 +83,15 @@ pub fn jp_bridge() -> AppResult<crate::models::JpBridge> {
     Ok(serde_json::from_str(JP_BRIDGE_JSON)?)
 }
 
+/// Japanese core vocabulary — tagged, non-katakana word flashcards, authored in
+/// tools/jp_vocab_defs.py.
+const JP_VOCAB_JSON: &str = include_str!("../seeds/jp_vocab.json");
+
+#[tauri::command]
+pub fn jp_vocab() -> AppResult<crate::models::JpVocab> {
+    Ok(serde_json::from_str(JP_VOCAB_JSON)?)
+}
+
 /// The 8-month structured TypeScript course (authored in tools/typescript_course.py).
 const TS_COURSE_JSON: &str = include_str!("../seeds/ts_course.json");
 

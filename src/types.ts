@@ -189,6 +189,34 @@ export interface JpBridge {
   interview: InterviewQA[];
 }
 
+/** A filter tag for the Japanese vocabulary list (seeds/jp_vocab.json). */
+export interface JpVocabTag {
+  id: string;
+  label: string;
+  label_ja: string;
+}
+
+/** One non-katakana Japanese word, studied as a flashcard. */
+export interface JpVocabWord {
+  id: string;
+  term: string;
+  /** Hiragana reading. */
+  reading: string;
+  romaji: string;
+  tag: string;
+  meaning: string;
+  desc_en: string;
+  desc_ja: string;
+  /** Always contains `term`, so it can be highlighted. */
+  example_ja: string;
+  example_en: string;
+}
+
+export interface JpVocab {
+  tags: JpVocabTag[];
+  words: JpVocabWord[];
+}
+
 // --- TypeScript course (8-month structured curriculum) ---------------------
 export interface GlossaryItem {
   term: string;

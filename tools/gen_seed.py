@@ -6039,6 +6039,14 @@ if os.path.exists(_jpb_path):
     with open(_jpb_path, encoding="utf-8") as _jpbf:
         exec(compile(_jpbf.read(), _jpb_path, "exec"))
 
+# Japanese core vocabulary — the first section of the 日本語 Learn view: 100
+# tagged, non-katakana words, each a flashcard. Defines JP_VOCAB; written to
+# seeds/jp_vocab.json next to the bridge.
+_jpv_path = os.path.join(HERE, "jp_vocab_defs.py")
+if os.path.exists(_jpv_path):
+    with open(_jpv_path, encoding="utf-8") as _jpvf:
+        exec(compile(_jpvf.read(), _jpv_path, "exec"))
+
 
 # ---------------------------------------------------------------------------
 # Language-agnostic Algorithms Learn track — a FOURTH "language" for the Learn
@@ -6325,6 +6333,13 @@ print(
     f"Wrote {len(_bridge['problems'])} bridge problems + "
     f"{len(_bridge['interview'])} interview Q&A to {os.path.relpath(BRIDGE_OUT)}"
 )
+
+# Japanese core vocabulary (tagged word flashcards for the 日本語 Learn view).
+JP_VOCAB_OUT = os.path.join(HERE, "..", "src-tauri", "seeds", "jp_vocab.json")
+_jp_vocab = globals().get("JP_VOCAB", {"tags": [], "words": []})
+with open(JP_VOCAB_OUT, "w", encoding="utf-8", newline="\n") as f:
+    json.dump(_jp_vocab, f, indent=2, ensure_ascii=False)
+print(f"Wrote {len(_jp_vocab['words'])} Japanese vocabulary words to {os.path.relpath(JP_VOCAB_OUT)}")
 
 # The 8-month TypeScript course (weeks / lessons / capstones).
 TS_COURSE_OUT = os.path.join(HERE, "..", "src-tauri", "seeds", "ts_course.json")
