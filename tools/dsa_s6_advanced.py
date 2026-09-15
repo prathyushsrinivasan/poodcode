@@ -209,6 +209,9 @@ could not"*. If neither is available, say so and switch to DP — that judgement
 is itself the thing being tested.
 """,
     rungs=[
+        _rung("Warm up", "A sort order, a local rule, and the exchange argument that joins them.",
+              ["activity-selection-small"],
+              {"activity-selection-small": "The canonical greedy. Produce the counterexamples that kill sorting by start time and by duration — that is how you check a rule you just invented."}),
         _rung("Core", "One pass, one running value, one proof.",
               ["best-time-buy-sell", "jump-game"],
               {"best-time-buy-sell": "Say the exchange argument out loud before coding. The code is four lines; the reasoning is the exercise.",
@@ -654,6 +657,9 @@ exists is worth as much as using it, and the array version is what you can
 actually debug on a whiteboard.
 """,
     rungs=[
+        _rung("Warm up", "The three questions, where all three answers are obvious.",
+              ["stair-ways-table"],
+              {"stair-ways-table": "Print the whole table, not just the last cell. Seeing `1 1 2 3 5 8` come out is what makes the recurrence yours."}),
         _rung("Core", "One state, one choice, O(1) transition.",
               ["climbing-stairs", "min-cost-climbing-stairs", "house-robber"],
               {"climbing-stairs": "Fibonacci wearing a hat. Write the state sentence anyway — the habit is the point.",
@@ -907,6 +913,9 @@ seconds and it proves the recurrence in a way that code cannot. Offer the
 rolled-row space optimisation at the end, after the table is right.
 """,
     rungs=[
+        _rung("Warm up", "The same table, with the fill order made visible.",
+              ["grid-paths-table"],
+              {"grid-paths-table": "No obstacles, so the only new idea over 1-D is which orders are legal. Then read the printed table backwards and reconstruct an actual path."}),
         _rung("Core", "A table filled from two directions.",
               ["unique-paths"],
               {"unique-paths": "The gentlest 2-D problem: base row and column of ones, then sum from above and left."}),
@@ -1178,6 +1187,9 @@ far more memory than a hash set, so it earns its place only when prefixes,
 wildcards or bit-greedy walks are actually needed.
 """,
     rungs=[
+        _rung("Warm up", "Insert and exact lookup, and the flag people forget.",
+              ["trie-insert-lookup"],
+              {"trie-insert-lookup": "`isWord` is not “has no children”: insert `card` and `car` becomes a node that exists and is not a word. Also be able to say why a HashSet would beat this — the answer is the rest of the unit."}),
         _rung("Core", "Build it, walk it, count with it.",
               ["implement-trie-ops", "word-in-dictionary", "prefix-counts"],
               {"implement-trie-ops": "Write the structure once from scratch. Everything else in this unit reuses it verbatim.",

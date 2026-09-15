@@ -1717,7 +1717,7 @@
     ],
     "judge_mode": "exact",
     "checker": "",
-    "order": 104
+    "order": 118
   },
   {
     "slug": "longest-unique-substring",
@@ -1843,7 +1843,7 @@
     "follow_ups": [],
     "judge_mode": "exact",
     "checker": "",
-    "order": 105
+    "order": 119
   },
   {
     "slug": "valid-parentheses",
@@ -1960,7 +1960,7 @@
     "follow_ups": [],
     "judge_mode": "exact",
     "checker": "",
-    "order": 106
+    "order": 120
   },
   {
     "slug": "binary-search-first",
@@ -2083,7 +2083,7 @@
     ],
     "judge_mode": "exact",
     "checker": "",
-    "order": 107
+    "order": 121
   },
   {
     "slug": "maximum-subarray",
@@ -2220,7 +2220,7 @@
     ],
     "judge_mode": "exact",
     "checker": "",
-    "order": 108
+    "order": 122
   },
   {
     "slug": "climbing-stairs",
@@ -2337,7 +2337,7 @@
     "follow_ups": [],
     "judge_mode": "exact",
     "checker": "",
-    "order": 109
+    "order": 123
   },
   {
     "slug": "rotate-array",
@@ -2451,7 +2451,7 @@
     "follow_ups": [],
     "judge_mode": "exact",
     "checker": "",
-    "order": 110
+    "order": 124
   },
   {
     "slug": "number-of-islands",
@@ -2579,7 +2579,7 @@
     "follow_ups": [],
     "judge_mode": "exact",
     "checker": "",
-    "order": 111
+    "order": 125
   },
   {
     "slug": "group-anagrams-count",
@@ -2697,7 +2697,7 @@
     "follow_ups": [],
     "judge_mode": "exact",
     "checker": "",
-    "order": 112
+    "order": 126
   },
   {
     "slug": "course-schedule",
@@ -2823,7 +2823,7 @@
     "follow_ups": [],
     "judge_mode": "exact",
     "checker": "",
-    "order": 113
+    "order": 127
   },
   {
     "slug": "longest-increasing-subsequence",
@@ -2942,7 +2942,7 @@
     "follow_ups": [],
     "judge_mode": "exact",
     "checker": "",
-    "order": 215
+    "order": 229
   },
   {
     "slug": "edit-distance",
@@ -3060,7 +3060,7 @@
     "follow_ups": [],
     "judge_mode": "exact",
     "checker": "",
-    "order": 216
+    "order": 230
   },
   {
     "slug": "trapping-rain-water",
@@ -3179,7 +3179,7 @@
     "follow_ups": [],
     "judge_mode": "exact",
     "checker": "",
-    "order": 217
+    "order": 231
   },
   {
     "slug": "dijkstra-shortest-path",
@@ -3306,7 +3306,7 @@
     "follow_ups": [],
     "judge_mode": "exact",
     "checker": "",
-    "order": 218
+    "order": 232
   },
   {
     "slug": "color-bomb-explosion",
@@ -3867,7 +3867,7 @@
     "follow_ups": [],
     "judge_mode": "exact",
     "checker": "",
-    "order": 114
+    "order": 128
   },
   {
     "slug": "set-matrix-zeroes",
@@ -3978,7 +3978,7 @@
     "follow_ups": [],
     "judge_mode": "exact",
     "checker": "",
-    "order": 115
+    "order": 129
   },
   {
     "slug": "rotate-matrix-90",
@@ -4090,7 +4090,7 @@
     "follow_ups": [],
     "judge_mode": "exact",
     "checker": "",
-    "order": 116
+    "order": 130
   },
   {
     "slug": "spiral-order",
@@ -4202,7 +4202,7 @@
     "follow_ups": [],
     "judge_mode": "exact",
     "checker": "",
-    "order": 117
+    "order": 131
   },
   {
     "slug": "kth-largest-in-stream",
@@ -4395,7 +4395,7 @@
     "follow_ups": [],
     "judge_mode": "exact",
     "checker": "",
-    "order": 219
+    "order": 233
   },
   {
     "slug": "median-from-stream",
@@ -4489,7 +4489,7 @@
     "follow_ups": [],
     "judge_mode": "exact",
     "checker": "",
-    "order": 220
+    "order": 234
   },
   {
     "slug": "smallest-range-k-lists",
@@ -4596,7 +4596,7 @@
     "follow_ups": [],
     "judge_mode": "exact",
     "checker": "",
-    "order": 221
+    "order": 235
   },
   {
     "slug": "min-stack",
@@ -4698,7 +4698,7 @@
     "follow_ups": [],
     "judge_mode": "exact",
     "checker": "",
-    "order": 118
+    "order": 132
   },
   {
     "slug": "implement-queue-stacks",
@@ -5205,7 +5205,7 @@
     "follow_ups": [],
     "judge_mode": "exact",
     "checker": "",
-    "order": 119
+    "order": 133
   },
   {
     "slug": "browser-history",
@@ -5298,7 +5298,7 @@
     "follow_ups": [],
     "judge_mode": "exact",
     "checker": "",
-    "order": 120
+    "order": 134
   },
   {
     "slug": "lru-cache",
@@ -5402,7 +5402,7 @@
     "follow_ups": [],
     "judge_mode": "exact",
     "checker": "",
-    "order": 121
+    "order": 135
   },
   {
     "slug": "lfu-cache",
@@ -5497,7 +5497,7 @@
     "follow_ups": [],
     "judge_mode": "exact",
     "checker": "",
-    "order": 222
+    "order": 236
   },
   {
     "slug": "time-based-kv",
@@ -5601,7 +5601,7 @@
     "follow_ups": [],
     "judge_mode": "exact",
     "checker": "",
-    "order": 122
+    "order": 136
   },
   {
     "slug": "design-linked-list",
@@ -5701,7 +5701,7 @@
     "follow_ups": [],
     "judge_mode": "exact",
     "checker": "",
-    "order": 123
+    "order": 137
   },
   {
     "slug": "design-twitter",
@@ -5804,7 +5804,7 @@
     "follow_ups": [],
     "judge_mode": "exact",
     "checker": "",
-    "order": 124
+    "order": 138
   },
   {
     "slug": "stock-spanner",
@@ -5905,7 +5905,7 @@
     "follow_ups": [],
     "judge_mode": "exact",
     "checker": "",
-    "order": 125
+    "order": 139
   },
   {
     "slug": "hit-counter",
@@ -6008,7 +6008,7 @@
     "follow_ups": [],
     "judge_mode": "exact",
     "checker": "",
-    "order": 126
+    "order": 140
   },
   {
     "slug": "shortest-path-binary-matrix",
@@ -6117,7 +6117,7 @@
     "follow_ups": [],
     "judge_mode": "exact",
     "checker": "",
-    "order": 127
+    "order": 141
   },
   {
     "slug": "path-minimum-effort",
@@ -6227,7 +6227,7 @@
     "follow_ups": [],
     "judge_mode": "exact",
     "checker": "",
-    "order": 128
+    "order": 142
   },
   {
     "slug": "implement-trie-ops",
@@ -6321,7 +6321,7 @@
     "follow_ups": [],
     "judge_mode": "exact",
     "checker": "",
-    "order": 129
+    "order": 143
   },
   {
     "slug": "word-dictionary-wildcard",
@@ -6422,7 +6422,1520 @@
     "follow_ups": [],
     "judge_mode": "exact",
     "checker": "",
-    "order": 223
+    "order": 237
+  },
+  {
+    "slug": "fixed-window-max-sum",
+    "title": "Fixed Window Maximum Sum",
+    "difficulty": "Easy",
+    "description": "Given an array and a window width `k`, find the largest sum of any `k` **consecutive** elements.\n\nThe point is the *slide*: compute the first window's sum by adding `k` values, then move the window one step at a time by adding the element that entered and subtracting the one that left. Recomputing each window from scratch is O(n·k); sliding is O(n).\n\n### Input\n- Line 1: `n k`.\n- Line 2: `n` space-separated integers.\n\n### Output\nA single integer: the maximum window sum.",
+    "constraints": "1 ≤ k ≤ n ≤ 200\n-1000 ≤ a[i] ≤ 1000",
+    "examples": [
+      {
+        "input": "6 3\n1 2 5 1 1 1",
+        "output": "8",
+        "explanation": "The window `2 5 1` sums to 8, which beats every other width-3 window."
+      },
+      {
+        "input": "5 2\n-3 -1 -4 -1 -5",
+        "output": "-4",
+        "explanation": "`-3 -1` sums to -4; every other width-2 window is smaller. A `0` seed would wrongly report 0."
+      }
+    ],
+    "editorial": "## The one thing this teaches\nA window sum is *maintained*, not recomputed.\n\n## Approach\nAdd `a[0..k-1]` to get the first window and record it as the best. Then for each `r` from `k` to `n-1`, do `window += a[r] - a[r-k]` and update the best. Two array reads per step, regardless of how wide the window is.\n\nSeed `best` from the first window, not from `0` — with negative values `0` is a sum no window may ever reach, and the answer comes out wrong silently.",
+    "optimal_time": "O(n)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "Each element enters the window once and leaves once, so the total work is linear; only the running sum and the best sum are stored.",
+    "starter_code": {
+      "java": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt(), k = sc.nextInt();\n        int[] a = new int[n];\n        for (int i = 0; i < n; i++) a[i] = sc.nextInt();\n        // TODO: sum the first k elements, then slide the window one step at a time\n        System.out.println(0);\n    }\n}\n",
+      "python": "import sys\n\ndata = sys.stdin.read().split()\nn, k = int(data[0]), int(data[1])\na = list(map(int, data[2:2 + n]))\n\ndef solve(a, k):\n    # TODO: sum the first window, then slide it\n    return 0\n\nprint(solve(a, k))\n",
+      "javascript": "const d = require('fs').readFileSync(0, 'utf8').split(/\\s+/).filter(Boolean).map(Number);\nconst n = d[0], k = d[1], a = d.slice(2, 2 + n);\n\nfunction solve(a, k) {\n  // TODO: sum the first window, then slide it\n  return 0;\n}\n\nconsole.log(solve(a, k));\n",
+      "typescript": "const d = require('fs').readFileSync(0, 'utf8').split(/\\s+/).filter(Boolean).map(Number);\nconst n = d[0], k = d[1], a = d.slice(2, 2 + n);\n\nfunction solve(a, k) {\n  // TODO: sum the first window, then slide it\n  return 0;\n}\n\nconsole.log(solve(a, k));\n"
+    },
+    "topics": [
+      "Arrays"
+    ],
+    "subtopics": [
+      "Sliding Window",
+      "Fixed Window"
+    ],
+    "companies": [
+      "Amazon"
+    ],
+    "patterns": [
+      "Sliding Window"
+    ],
+    "hints": [
+      "Sum the first k elements to get the starting window.",
+      "Moving right by one adds a[r] and removes a[r - k] — two operations, not k.",
+      "Track the best sum seen after every slide, including the first window.",
+      "`window += a[r] - a[r - k];  best = Math.max(best, window);`"
+    ],
+    "prerequisites": [
+      {
+        "key": "iteration",
+        "name": "Array Iteration",
+        "what": "Walking through elements one at a time while maintaining running state such as a sum, max, or counter.",
+        "deep": "The workhorse of array problems: one for-loop that updates accumulators as it goes. Most linear-time solutions are just one well-chosen pass, so the real skill is deciding what state to carry so a single sweep suffices.",
+        "java": "Use for (int i = 0; i < n; i++) or for (int x : nums). Prefer a primitive int[] over Integer[] to avoid autoboxing overhead.",
+        "how": "One left-to-right pass over the array, carrying a running value."
+      },
+      {
+        "key": "sliding_window",
+        "name": "Sliding Window",
+        "what": "A moving sub-range [left, right] whose bounds expand and contract to maintain an invariant.",
+        "deep": "Turns 'longest/best sub-array meeting a condition' into an amortized O(n) scan: extend the right edge, and when the invariant breaks advance the left edge. Each index enters and leaves the window at most once, which is why it stays linear.",
+        "java": "Two int pointers plus a HashMap<Character,Integer> or an int[128] frequency table to track window contents.",
+        "how": "The window is maintained by adding what entered and subtracting what left, never recomputed."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example 1",
+        "input": "6 3\n1 2 5 1 1 1\n",
+        "expected_output": "8",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Example 2",
+        "input": "5 2\n-3 -1 -4 -1 -5\n",
+        "expected_output": "-4",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Whole array is the window",
+        "input": "4 4\n1 2 3 4\n",
+        "expected_output": "10",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Width one",
+        "input": "5 1\n-2 7 -3 4 0\n",
+        "expected_output": "7",
+        "ordering": 3
+      },
+      {
+        "kind": "hidden",
+        "name": "All negative, width three",
+        "input": "5 3\n-5 -5 -5 -5 -1\n",
+        "expected_output": "-11",
+        "ordering": 4
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "judge_mode": "exact",
+    "checker": "",
+    "order": 44
+  },
+  {
+    "slug": "window-covering-letters",
+    "title": "Prefix Covering a Letter Set",
+    "difficulty": "Easy",
+    "description": "Given a string `s` and a small set of required characters, find the length of the **window starting at index 0** that first contains every required character at least once.\n\nConcretely: grow the right edge from the start of the string until the window covers the set, then print the window's length. The left edge never moves — shrinking it to find the *shortest* such window is the Hard problem this warms up for.\n\n### Input\n- Line 1: the string `s` (lowercase letters, no spaces).\n- Line 2: the required characters, as one string with no repeats.\n\n### Output\nThe length of that window, or `-1` if `s` never covers the set.",
+    "constraints": "1 ≤ |s| ≤ 200\n1 ≤ |required| ≤ 6\nBoth lines are lowercase English letters.",
+    "examples": [
+      {
+        "input": "abcxyz\nxa",
+        "output": "4",
+        "explanation": "`abcx` is the first prefix holding both `x` and `a` → length 4."
+      },
+      {
+        "input": "aabbcc\nabc",
+        "output": "5",
+        "explanation": "`aabbc` is the first prefix holding `a`, `b` and `c` → length 5."
+      }
+    ],
+    "editorial": "## The one thing this teaches\nA window is described by a *summary* of what it holds — here, how many required characters it covers — updated as the edge moves, never rescanned.\n\n## Approach\nCount the required characters into a `need` map. Walk `r` from 0, incrementing `have[s[r]]`; when `have[c]` reaches 1 for a required `c`, increment `satisfied`. The answer is `r + 1` at the first `r` where `satisfied` equals the number of distinct required characters. If the loop ends first, print `-1`.\n\nRescanning the window on every step would also be correct and would also be O(n·26) here — the reason to maintain the summary is that the shortest-window version, where the left edge moves too, has no rescan cheap enough to survive.",
+    "optimal_time": "O(|s|)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "One left-to-right pass; the counts are bounded by the 26-letter alphabet.",
+    "starter_code": {
+      "java": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        String s = sc.next();\n        String req = sc.next();\n        // TODO: grow the right edge until every character of req is inside the window\n        System.out.println(-1);\n    }\n}\n",
+      "python": "import sys\n\nlines = sys.stdin.read().split('\\n')\ns, req = lines[0].strip(), lines[1].strip()\n\ndef solve(s, req):\n    # TODO: grow the right edge until every character of req is inside\n    return -1\n\nprint(solve(s, req))\n",
+      "javascript": "const L = require('fs').readFileSync(0, 'utf8').split('\\n');\nconst s = L[0].trim(), req = L[1].trim();\n\nfunction solve(s, req) {\n  // TODO: grow the right edge until every character of req is inside\n  return -1;\n}\n\nconsole.log(solve(s, req));\n",
+      "typescript": "const L = require('fs').readFileSync(0, 'utf8').split('\\n');\nconst s = L[0].trim(), req = L[1].trim();\n\nfunction solve(s, req) {\n  // TODO: grow the right edge until every character of req is inside\n  return -1;\n}\n\nconsole.log(solve(s, req));\n"
+    },
+    "topics": [
+      "Strings"
+    ],
+    "subtopics": [
+      "Sliding Window"
+    ],
+    "companies": [
+      "Google"
+    ],
+    "patterns": [
+      "Sliding Window"
+    ],
+    "hints": [
+      "Keep a count per character in the current window, and a count of how many required characters are satisfied.",
+      "Extend the right edge one character at a time.",
+      "A character becomes newly satisfied when its count goes from 0 to 1 and it is required.",
+      "Stop the moment satisfied == required.size() and print r + 1."
+    ],
+    "prerequisites": [
+      {
+        "key": "sliding_window",
+        "name": "Sliding Window",
+        "what": "A moving sub-range [left, right] whose bounds expand and contract to maintain an invariant.",
+        "deep": "Turns 'longest/best sub-array meeting a condition' into an amortized O(n) scan: extend the right edge, and when the invariant breaks advance the left edge. Each index enters and leaves the window at most once, which is why it stays linear.",
+        "java": "Two int pointers plus a HashMap<Character,Integer> or an int[128] frequency table to track window contents.",
+        "how": "The right edge grows while a summary of the window's contents is kept up to date."
+      },
+      {
+        "key": "hashing",
+        "name": "Hash Maps & Sets",
+        "what": "Structures giving average O(1) insertion and lookup, trading memory for speed.",
+        "deep": "A hash table answers 'have I seen X?' or 'what maps to X?' in expected constant time, converting many O(n^2) pair scans into O(n) single passes. Worst case is O(n) per op under adversarial hashing, but that is rare in practice.",
+        "java": "HashMap<K,V> and HashSet<E>. Use getOrDefault(k, 0) and merge(k, 1, Integer::sum) for counting, containsKey/add for membership. For dense int keys, an int[] beats a HashMap.",
+        "how": "A count per character, so \"does the window cover the set?\" is O(1) to answer."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example 1",
+        "input": "abcxyz\nxa\n",
+        "expected_output": "4",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Example 2",
+        "input": "aabbcc\nabc\n",
+        "expected_output": "5",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Immediately covered",
+        "input": "z\nz\n",
+        "expected_output": "1",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Never covered",
+        "input": "aaaa\nab\n",
+        "expected_output": "-1",
+        "ordering": 3
+      },
+      {
+        "kind": "hidden",
+        "name": "Last character completes it",
+        "input": "bbbbba\nab\n",
+        "expected_output": "6",
+        "ordering": 4
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "judge_mode": "exact",
+    "checker": "",
+    "order": 45
+  },
+  {
+    "slug": "lower-bound-index",
+    "title": "Lower Bound",
+    "difficulty": "Easy",
+    "description": "Given a **sorted** array and a value `x`, print the index of the first element that is **greater than or equal to** `x`. If no element qualifies, print `n`.\n\nThis is `lower_bound`, and it is the only binary search worth memorising: it answers *\"where does x belong?\"*, which subsumes *\"is x present?\"* (check `a[i] == x` afterwards), *\"how many are smaller?\"* (the index itself) and *\"where do I insert it?\"*\n\n### Input\n- Line 1: integer `n`.\n- Line 2: `n` sorted integers, non-decreasing.\n- Line 3: the value `x`.\n\n### Output\nA single integer index in `0 … n`.",
+    "constraints": "1 ≤ n ≤ 200\n-1000 ≤ a[i], x ≤ 1000\na is sorted non-decreasing and may contain duplicates.",
+    "examples": [
+      {
+        "input": "6\n1 3 3 5 8 9\n3",
+        "output": "1",
+        "explanation": "The first element ≥ 3 is at index 1 — the *first* of the two 3s, which is what lower bound means."
+      },
+      {
+        "input": "5\n2 4 6 8 10\n7",
+        "output": "3",
+        "explanation": "No element equals 7; the first one larger is 8 at index 3."
+      }
+    ],
+    "editorial": "## The one thing this teaches\nBinary search on a **half-open** range `[lo, hi)` has no off-by-one to get wrong: `lo` is the first index that might be the answer, `hi` is one past the last, and the loop ends when they meet.\n\n## Approach\n```java\nint lo = 0, hi = n;\nwhile (lo < hi) {\n    int mid = lo + (hi - lo) / 2;\n    if (a[mid] < x) lo = mid + 1;   // mid cannot be the answer\n    else            hi = mid;       // mid might be\n}\nreturn lo;\n```\n\nNote what is *absent*: no `a[mid] == x` branch. The three-case version is where the classic off-by-one lives, because \"found it\" and \"first one at least as large\" are different questions and mixing them loses duplicates.\n\n`mid = lo + (hi - lo) / 2` rather than `(lo + hi) / 2` — the latter overflows `int` once the indices are large, which is a real bug in real libraries.",
+    "optimal_time": "O(log n)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "Each iteration halves the candidate range; only three indices are stored.",
+    "starter_code": {
+      "java": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] a = new int[n];\n        for (int i = 0; i < n; i++) a[i] = sc.nextInt();\n        int x = sc.nextInt();\n        int lo = 0, hi = n;\n        // TODO: while (lo < hi) narrow the half-open range [lo, hi)\n        System.out.println(lo);\n    }\n}\n",
+      "python": "import sys\n\nd = sys.stdin.read().split()\nn = int(d[0])\na = list(map(int, d[1:1 + n]))\nx = int(d[1 + n])\n\ndef solve(a, x):\n    # TODO: half-open binary search; return the first index with a[i] >= x\n    return len(a)\n\nprint(solve(a, x))\n",
+      "javascript": "const d = require('fs').readFileSync(0, 'utf8').split(/\\s+/).filter(Boolean).map(Number);\nconst n = d[0], a = d.slice(1, 1 + n), x = d[1 + n];\n\nfunction solve(a, x) {\n  // TODO: half-open binary search; return the first index with a[i] >= x\n  return a.length;\n}\n\nconsole.log(solve(a, x));\n",
+      "typescript": "const d = require('fs').readFileSync(0, 'utf8').split(/\\s+/).filter(Boolean).map(Number);\nconst n = d[0], a = d.slice(1, 1 + n), x = d[1 + n];\n\nfunction solve(a, x) {\n  // TODO: half-open binary search; return the first index with a[i] >= x\n  return a.length;\n}\n\nconsole.log(solve(a, x));\n"
+    },
+    "topics": [
+      "Searching"
+    ],
+    "subtopics": [
+      "Binary Search",
+      "Lower Bound"
+    ],
+    "companies": [
+      "Microsoft"
+    ],
+    "patterns": [
+      "Binary Search"
+    ],
+    "hints": [
+      "Search the half-open range [lo, hi) with hi starting at n, not n - 1.",
+      "The answer can legitimately be n, which is why hi starts one past the end.",
+      "If a[mid] < x the answer is right of mid, so lo = mid + 1; otherwise hi = mid.",
+      "Loop while lo < hi and return lo. The loop never needs an equality case."
+    ],
+    "prerequisites": [
+      {
+        "key": "binary_search",
+        "name": "Binary Search",
+        "what": "Halving a sorted search space to find a target or boundary in O(log n).",
+        "deep": "Beyond exact matches it locates boundaries (first/last occurrence, lower/upper bound) and can 'search on the answer' for any monotonic predicate. The subtle parts are the loop invariant and avoiding off-by-one at the boundary.",
+        "java": "Arrays.binarySearch does not give first/last, so hand-roll while (lo <= hi) with mid = lo + (hi - lo) / 2 to avoid overflow.",
+        "how": "The half-open `[lo, hi)` loop with no equality branch — the only binary search worth memorising."
+      },
+      {
+        "key": "sorting",
+        "name": "Sorting",
+        "what": "Ordering elements (usually O(n log n)) so structure like duplicates and order statistics becomes easy.",
+        "deep": "Sorting is a preprocessing multiplier: it enables binary search, two-pointer sweeps, greedy choices, and grouping. The cost is O(n log n) comparisons, though counting/radix sort can beat that for bounded integer keys.",
+        "java": "Arrays.sort(int[]) or Arrays.sort(T[], Comparator) / Collections.sort. For custom order use Comparator.comparingInt(...). Note primitive sort has no comparator overload.",
+        "how": "The array is sorted, which is what licenses discarding half the range on one probe."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example 1",
+        "input": "6\n1 3 3 5 8 9\n3\n",
+        "expected_output": "1",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Example 2",
+        "input": "5\n2 4 6 8 10\n7\n",
+        "expected_output": "3",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Larger than everything",
+        "input": "4\n1 2 3 4\n99\n",
+        "expected_output": "4",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Smaller than everything",
+        "input": "4\n1 2 3 4\n-5\n",
+        "expected_output": "0",
+        "ordering": 3
+      },
+      {
+        "kind": "hidden",
+        "name": "All duplicates of the target",
+        "input": "5\n7 7 7 7 7\n7\n",
+        "expected_output": "0",
+        "ordering": 4
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "judge_mode": "exact",
+    "checker": "",
+    "order": 46
+  },
+  {
+    "slug": "first-true-predicate",
+    "title": "First True in a Monotone Predicate",
+    "difficulty": "Easy",
+    "description": "You are given the values of a predicate `f(0), f(1), … , f(n-1)` as a row of `F` and `T` characters. The predicate is **monotone**: once it turns `T` it never returns to `F`.\n\nPrint the smallest index where it is `T`, or `-1` if it is `F` everywhere.\n\nThis is the shape *every* \"binary search on the answer\" problem reduces to: the array is not the thing you search, the predicate is. Seeing it written out as `FFFTTT` once makes the next ten problems recognisable.\n\n### Input\n- Line 1: integer `n`.\n- Line 2: `n` space-separated characters, each `F` or `T`, non-decreasing in the sense that no `F` follows a `T`.\n\n### Output\nThe first `T` index, or `-1`.",
+    "constraints": "1 ≤ n ≤ 200\nEach token is `F` or `T`; all `F`s precede all `T`s.",
+    "examples": [
+      {
+        "input": "6\nF F F T T T",
+        "output": "3",
+        "explanation": "The predicate first holds at index 3."
+      },
+      {
+        "input": "4\nF F F F",
+        "output": "-1",
+        "explanation": "It never holds, so the answer is -1."
+      }
+    ],
+    "editorial": "## The one thing this teaches\nBinary search needs **monotonicity**, not sortedness. A sorted array is just the most familiar monotone predicate (`a[i] >= x`).\n\n## Approach\nIdentical to lower bound with `a[mid] < x` replaced by `f(mid) == false`:\n\n```java\nint lo = 0, hi = n;\nwhile (lo < hi) {\n    int mid = lo + (hi - lo) / 2;\n    if (!f(mid)) lo = mid + 1;\n    else         hi = mid;\n}\nreturn lo < n ? lo : -1;\n```\n\n## Why it matters later\n\"Smallest capacity that ships in D days\", \"smallest speed that finishes in time\", \"largest minimum gap\" — all of them are this loop with `f` replaced by a feasibility check. The hard part of those problems is never the search; it is noticing that feasibility is monotone.",
+    "optimal_time": "O(log n)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "The monotonicity is what licenses discarding half the range on one probe; without it, no binary search is valid and the answer needs a linear scan.",
+    "starter_code": {
+      "java": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        boolean[] f = new boolean[n];\n        for (int i = 0; i < n; i++) f[i] = sc.next().equals(\"T\");\n        int lo = 0, hi = n;\n        // TODO: same half-open search, with !f[mid] playing the role of a[mid] < x\n        System.out.println(lo < n ? lo : -1);\n    }\n}\n",
+      "python": "import sys\n\nlines = sys.stdin.read().split('\\n')\nn = int(lines[0])\nflags = lines[1].split()\n\ndef f(i):\n    return flags[i] == 'T'\n\ndef solve(n):\n    # TODO: half-open binary search for the first index where f is true\n    return -1\n\nprint(solve(n))\n",
+      "javascript": "const L = require('fs').readFileSync(0, 'utf8').split('\\n');\nconst n = Number(L[0]), flags = L[1].trim().split(/\\s+/);\nconst f = (i) => flags[i] === 'T';\n\nfunction solve(n) {\n  // TODO: half-open binary search for the first index where f is true\n  return -1;\n}\n\nconsole.log(solve(n));\n",
+      "typescript": "const L = require('fs').readFileSync(0, 'utf8').split('\\n');\nconst n = Number(L[0]), flags = L[1].trim().split(/\\s+/);\nconst f = (i) => flags[i] === 'T';\n\nfunction solve(n) {\n  // TODO: half-open binary search for the first index where f is true\n  return -1;\n}\n\nconsole.log(solve(n));\n"
+    },
+    "topics": [
+      "Searching"
+    ],
+    "subtopics": [
+      "Binary Search"
+    ],
+    "companies": [
+      "Meta"
+    ],
+    "patterns": [
+      "Binary Search"
+    ],
+    "hints": [
+      "You are not searching for a value — you are searching for a boundary.",
+      "Use the same half-open range as lower bound: [0, n).",
+      "`F` at mid means the boundary is strictly right: lo = mid + 1. `T` means hi = mid.",
+      "After the loop, lo is n when everything was F — that is the -1 case."
+    ],
+    "prerequisites": [
+      {
+        "key": "binary_search",
+        "name": "Binary Search",
+        "what": "Halving a sorted search space to find a target or boundary in O(log n).",
+        "deep": "Beyond exact matches it locates boundaries (first/last occurrence, lower/upper bound) and can 'search on the answer' for any monotonic predicate. The subtle parts are the loop invariant and avoiding off-by-one at the boundary.",
+        "java": "Arrays.binarySearch does not give first/last, so hand-roll while (lo <= hi) with mid = lo + (hi - lo) / 2 to avoid overflow.",
+        "how": "The same loop with the array replaced by a predicate, which is what \"binary search on the answer\" means."
+      },
+      {
+        "key": "conditionals",
+        "name": "Conditionals (if / else)",
+        "what": "Choosing what to do based on whether a condition is true.",
+        "deep": "if/else branches let your program react to data. The condition is a boolean expression built from comparisons (==, !=, <, >) and logic (&&, ||, !). Chain several with else if when there are more than two outcomes.",
+        "java": "if (n % 2 == 0) { ... } else { ... }. Compare ints with ==, but compare Strings with .equals(), never ==.",
+        "how": "The monotone predicate is a boolean function of the index; reasoning about it is case analysis."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example 1",
+        "input": "6\nF F F T T T\n",
+        "expected_output": "3",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Example 2",
+        "input": "4\nF F F F\n",
+        "expected_output": "-1",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "True from the start",
+        "input": "3\nT T T\n",
+        "expected_output": "0",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Single false",
+        "input": "1\nF\n",
+        "expected_output": "-1",
+        "ordering": 3
+      },
+      {
+        "kind": "hidden",
+        "name": "Boundary at the last index",
+        "input": "5\nF F F F T\n",
+        "expected_output": "4",
+        "ordering": 4
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "judge_mode": "exact",
+    "checker": "",
+    "order": 47
+  },
+  {
+    "slug": "max-bracket-depth",
+    "title": "Maximum Bracket Depth",
+    "difficulty": "Easy",
+    "description": "A string contains only `(` and `)`. Print the maximum nesting depth if the string is balanced, or `-1` if it is not.\n\nWith one bracket type you do not need to store anything — a counter *is* the stack, and seeing that is the point. The moment a second bracket type appears (`[`, `{`) the counter stops working and you need the real stack, which is the next rung.\n\n### Input\nA single line: a string of `(` and `)`, length ≥ 1.\n\n### Output\nThe maximum depth, or `-1` if unbalanced.",
+    "constraints": "1 ≤ |s| ≤ 200\ns contains only the characters `(` and `)`.",
+    "examples": [
+      {
+        "input": "((()))",
+        "output": "3",
+        "explanation": "Three opens before any close → depth 3."
+      },
+      {
+        "input": "()(()",
+        "output": "-1",
+        "explanation": "The final `(` is never closed, so the string is unbalanced."
+      }
+    ],
+    "editorial": "## The one thing this teaches\nA stack answers \"what is the most recent unmatched thing?\" — and when every item on it would be identical, the only information left is its height, which is a single `int`.\n\n## Approach\n`depth++` on `(`, `depth--` on `)`, tracking `best = max(best, depth)` after each open. Two failure conditions, and both are easy to forget:\n\n- `depth` goes negative → a `)` arrived with nothing to match. Return -1 immediately; the rest of the string cannot repair it.\n- `depth != 0` at the end → opens were never closed.\n\n## Why the next rung needs a real stack\nWith `(`, `[` and `{`, the counter cannot tell you that `([)]` is wrong — the height is right at every step and the *identities* are not. That is exactly the information a stack keeps and a counter throws away.",
+    "optimal_time": "O(n)",
+    "optimal_space": "O(1)",
+    "optimal_explanation": "One pass; with a single bracket type the stack's *height* is all that matters, so a counter replaces it and the space drops from O(n) to O(1).",
+    "starter_code": {
+      "java": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        String s = sc.next();\n        // TODO: a counter is the stack here. Track the max, and reject depth < 0\n        System.out.println(-1);\n    }\n}\n",
+      "python": "s = input().strip()\n\ndef solve(s):\n    # TODO: return the maximum depth, or -1 if unbalanced\n    return -1\n\nprint(solve(s))\n",
+      "javascript": "const s = require('fs').readFileSync(0, 'utf8').trim();\n\nfunction solve(s) {\n  // TODO: return the maximum depth, or -1 if unbalanced\n  return -1;\n}\n\nconsole.log(solve(s));\n",
+      "typescript": "const s = require('fs').readFileSync(0, 'utf8').trim();\n\nfunction solve(s) {\n  // TODO: return the maximum depth, or -1 if unbalanced\n  return -1;\n}\n\nconsole.log(solve(s));\n"
+    },
+    "topics": [
+      "Data Structures",
+      "Strings"
+    ],
+    "subtopics": [
+      "Stack"
+    ],
+    "companies": [
+      "Adobe"
+    ],
+    "patterns": [
+      "Stack"
+    ],
+    "hints": [
+      "Walk the string keeping a running depth: `(` increments, `)` decrements.",
+      "Track the largest depth the counter ever reaches.",
+      "A `)` when the depth is already 0 means a close with nothing open — unbalanced.",
+      "Ending with depth > 0 means brackets were left open — also unbalanced."
+    ],
+    "prerequisites": [
+      {
+        "key": "stack",
+        "name": "Stack (LIFO)",
+        "what": "A last-in-first-out structure whose top is always the most recent unmatched item.",
+        "deep": "Ideal when the newest open item must be resolved first: bracket matching, monotonic-stack range queries, expression parsing, or iterative DFS. Push, pop, and peek are all O(1).",
+        "java": "Use ArrayDeque<T> as a stack (push/pop/peek) - it is faster than the legacy Stack class. For brackets use Deque<Character>.",
+        "how": "With one bracket type the only information a stack would hold is its height, so a counter replaces it."
+      },
+      {
+        "key": "char_arrays",
+        "name": "Char Arrays & ASCII",
+        "what": "Manipulating characters via their numeric codes and mutable char arrays.",
+        "deep": "Characters are small integers, so 'a'..'z' map to a 26-slot table via c - 'a'. Because Java strings are immutable, in-place character work needs a char[]. This underlies frequency counts, canonical keys, and in-place edits.",
+        "java": "int idx = c - 'a'; char[] arr = s.toCharArray(); new String(arr) to rebuild. A length-26 or length-128 int[] beats a HashMap for letters.",
+        "how": "Walking a string character by character and branching on each one."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example 1",
+        "input": "((()))\n",
+        "expected_output": "3",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Example 2",
+        "input": "()(()\n",
+        "expected_output": "-1",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Flat pairs",
+        "input": "()()()\n",
+        "expected_output": "1",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Close before open",
+        "input": ")(\n",
+        "expected_output": "-1",
+        "ordering": 3
+      },
+      {
+        "kind": "hidden",
+        "name": "Deep then flat",
+        "input": "(((())))()\n",
+        "expected_output": "4",
+        "ordering": 4
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "judge_mode": "exact",
+    "checker": "",
+    "order": 48
+  },
+  {
+    "slug": "count-connected-components",
+    "title": "Count Connected Components",
+    "difficulty": "Easy",
+    "description": "An undirected graph has `n` nodes numbered `0 … n-1` and `m` edges. Print the number of connected components.\n\nThis is the whole of graph traversal with nothing else attached: build an adjacency list, loop over every node, and start a BFS from each node you have not seen. Each BFS that *starts* is one component.\n\n### Input\n- Line 1: `n m`.\n- Next `m` lines: `u v` — an undirected edge.\n\n### Output\nA single integer: the number of components.",
+    "constraints": "1 ≤ n ≤ 200\n0 ≤ m ≤ 400\n0 ≤ u, v < n\nEdges may repeat; self-loops may appear.",
+    "examples": [
+      {
+        "input": "6 4\n0 1\n1 2\n3 4\n4 5",
+        "output": "2",
+        "explanation": "`{0,1,2}` and `{3,4,5}` → 2 components."
+      },
+      {
+        "input": "4 0",
+        "output": "4",
+        "explanation": "With no edges every node is its own component → 4."
+      }
+    ],
+    "editorial": "## The one thing this teaches\nThe outer loop. A single BFS explores one component; *counting* components needs the `for (s = 0; s < n; s++)` wrapper around it, and forgetting that wrapper is the most common way this is got wrong — it silently reports 1 on a disconnected graph.\n\n## Approach\n```java\nboolean[] seen = new boolean[n];\nint comps = 0;\nfor (int s = 0; s < n; s++) {\n    if (seen[s]) continue;\n    comps++;\n    seen[s] = true;\n    Deque<Integer> q = new ArrayDeque<>();\n    q.add(s);\n    while (!q.isEmpty()) {\n        int u = q.poll();\n        for (int v : g.get(u)) if (!seen[v]) { seen[v] = true; q.add(v); }\n    }\n}\n```\n\n**Mark on enqueue.** If you instead mark when you dequeue, a node reachable from two already-queued nodes gets added twice. On a small graph that is merely wasteful; on a dense one it is exponential blow-up, and the symptom is a timeout rather than a wrong answer.\n\nA self-loop and a repeated edge are both harmless here precisely because `seen` is checked before enqueueing — worth confirming on the hidden tests rather than special-casing.",
+    "optimal_time": "O(n + m)",
+    "optimal_space": "O(n + m)",
+    "optimal_explanation": "Every node is enqueued once and every edge inspected twice (once from each end); the adjacency list dominates the space.",
+    "starter_code": {
+      "java": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt(), m = sc.nextInt();\n        List<List<Integer>> g = new ArrayList<>();\n        for (int i = 0; i < n; i++) g.add(new ArrayList<>());\n        for (int i = 0; i < m; i++) {\n            int u = sc.nextInt(), v = sc.nextInt();\n            g.get(u).add(v);\n            g.get(v).add(u);\n        }\n        boolean[] seen = new boolean[n];\n        int comps = 0;\n        // TODO: for every unseen s, count a component and BFS from it\n        //       (mark a node seen when you ENQUEUE it)\n        System.out.println(comps);\n    }\n}\n",
+      "python": "import sys\nfrom collections import deque\n\nlines = sys.stdin.read().strip().split('\\n')\nn, m = map(int, lines[0].split())\ng = [[] for _ in range(n)]\nfor i in range(m):\n    u, v = map(int, lines[1 + i].split())\n    g[u].append(v)\n    g[v].append(u)\n\ndef solve(n, g):\n    # TODO: BFS from every unseen node; count the starts\n    return 0\n\nprint(solve(n, g))\n",
+      "javascript": "const L = require('fs').readFileSync(0, 'utf8').trim().split('\\n');\nconst [n, m] = L[0].split(/\\s+/).map(Number);\nconst g = Array.from({ length: n }, () => []);\nfor (let i = 0; i < m; i++) {\n  const [u, v] = L[1 + i].split(/\\s+/).map(Number);\n  g[u].push(v); g[v].push(u);\n}\n\nfunction solve(n, g) {\n  // TODO: BFS from every unseen node; count the starts\n  return 0;\n}\n\nconsole.log(solve(n, g));\n",
+      "typescript": "const L = require('fs').readFileSync(0, 'utf8').trim().split('\\n');\nconst [n, m] = L[0].split(/\\s+/).map(Number);\nconst g = Array.from({ length: n }, () => []);\nfor (let i = 0; i < m; i++) {\n  const [u, v] = L[1 + i].split(/\\s+/).map(Number);\n  g[u].push(v); g[v].push(u);\n}\n\nfunction solve(n, g) {\n  // TODO: BFS from every unseen node; count the starts\n  return 0;\n}\n\nconsole.log(solve(n, g));\n"
+    },
+    "topics": [
+      "Graphs"
+    ],
+    "subtopics": [
+      "BFS",
+      "Connected Components"
+    ],
+    "companies": [
+      "Amazon"
+    ],
+    "patterns": [
+      "BFS / DFS"
+    ],
+    "hints": [
+      "Build `List<List<Integer>>` adjacency: each edge is added in BOTH directions.",
+      "Keep one `boolean[] seen` for the whole run — not one per BFS.",
+      "Loop s from 0 to n-1; if `seen[s]` is false, that is a new component: count it and BFS from s.",
+      "Mark a node seen when you ENQUEUE it, not when you dequeue it, or it enters the queue twice."
+    ],
+    "prerequisites": [
+      {
+        "key": "graph_repr",
+        "name": "Graph Representation",
+        "what": "Modeling entities as nodes and relationships as edges, usually an adjacency list.",
+        "deep": "The representation dictates efficiency: adjacency lists are O(V+E) space and iterate neighbors quickly, while adjacency matrices are O(V^2) but give O(1) edge tests. Directed vs undirected and weighted vs unweighted change how you build and traverse it.",
+        "java": "List<List<Integer>> adj, or List<int[]>[] adj = new List[n] storing new int[]{to, w} for weighted edges.",
+        "how": "Build the adjacency list first — each undirected edge is added in both directions."
+      },
+      {
+        "key": "bfs",
+        "name": "Breadth-First Search",
+        "what": "Exploring a graph level by level with a queue; finds shortest paths in unweighted graphs.",
+        "deep": "BFS visits nodes in order of distance from the source, so the first time it reaches a node is via a shortest unweighted path. It needs a queue and a visited marker and runs in O(V+E).",
+        "java": "ArrayDeque<Integer> as the queue (offer/poll) plus a boolean[] visited. Mark visited when enqueuing, not dequeuing, to avoid duplicates.",
+        "how": "One BFS explores one component; the outer loop over unseen nodes is what counts them."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example 1",
+        "input": "6 4\n0 1\n1 2\n3 4\n4 5\n",
+        "expected_output": "2",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Example 2",
+        "input": "4 0\n",
+        "expected_output": "4",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "One chain",
+        "input": "5 4\n0 1\n1 2\n2 3\n3 4\n",
+        "expected_output": "1",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Self loop and duplicate edge",
+        "input": "3 3\n0 0\n1 2\n1 2\n",
+        "expected_output": "2",
+        "ordering": 3
+      },
+      {
+        "kind": "hidden",
+        "name": "Single node",
+        "input": "1 0\n",
+        "expected_output": "1",
+        "ordering": 4
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "judge_mode": "exact",
+    "checker": "",
+    "order": 49
+  },
+  {
+    "slug": "detect-cycle-tiny-dag",
+    "title": "Cycle in a Directed Graph",
+    "difficulty": "Easy",
+    "description": "A directed graph has `n` nodes and `m` edges. Print `YES` if it contains a cycle and `NO` if it is a DAG.\n\nKahn's algorithm answers this as a by-product: repeatedly remove a node with in-degree 0. If you manage to remove all `n`, the graph was acyclic; whatever is left when the queue empties is a cycle, because every remaining node still has an incoming edge from another remaining node.\n\n### Input\n- Line 1: `n m`.\n- Next `m` lines: `u v` — a directed edge `u → v`.\n\n### Output\n`YES` if a cycle exists, otherwise `NO`.",
+    "constraints": "1 ≤ n ≤ 200\n0 ≤ m ≤ 400\n0 ≤ u, v < n\nA self-loop `u u` counts as a cycle.",
+    "examples": [
+      {
+        "input": "3 3\n0 1\n1 2\n2 0",
+        "output": "YES",
+        "explanation": "`0 → 1 → 2 → 0` is a cycle, so nothing ever has in-degree 0 → YES."
+      },
+      {
+        "input": "4 3\n0 1\n0 2\n1 3",
+        "output": "NO",
+        "explanation": "A tree-shaped DAG; all four nodes come out of the queue → NO."
+      }
+    ],
+    "editorial": "## The one thing this teaches\nA topological sort and a cycle check are the same algorithm. You do not need a second traversal to decide acyclicity — you need to count what the first one managed to output.\n\n## Approach\n```java\nint[] indeg = new int[n];\nfor each edge u → v: indeg[v]++;\nDeque<Integer> q = new ArrayDeque<>();\nfor (int i = 0; i < n; i++) if (indeg[i] == 0) q.add(i);\nint removed = 0;\nwhile (!q.isEmpty()) {\n    int u = q.poll();\n    removed++;\n    for (int v : g.get(u)) if (--indeg[v] == 0) q.add(v);\n}\nreturn removed < n;   // true ⇒ cycle\n```\n\n## Why the leftovers are a cycle\nWhen the queue empties, every unremoved node has in-degree ≥ 1, and its incoming edge must come from another unremoved node (removed nodes already decremented their edges). Follow those edges backwards from any leftover node: the set is finite, so you must revisit a node — that is a cycle. This argument is worth being able to say out loud; it is the standard follow-up question.\n\nA self-loop `u → u` gives `u` in-degree 1 that nothing can ever decrement, so it is caught with no special case.",
+    "optimal_time": "O(n + m)",
+    "optimal_space": "O(n + m)",
+    "optimal_explanation": "Each node enters the queue at most once and each edge is decremented once.",
+    "starter_code": {
+      "java": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt(), m = sc.nextInt();\n        List<List<Integer>> g = new ArrayList<>();\n        for (int i = 0; i < n; i++) g.add(new ArrayList<>());\n        int[] indeg = new int[n];\n        for (int i = 0; i < m; i++) {\n            int u = sc.nextInt(), v = sc.nextInt();\n            g.get(u).add(v);\n            indeg[v]++;\n        }\n        // TODO: Kahn — seed the queue with in-degree 0, count how many come out\n        System.out.println(\"NO\");\n    }\n}\n",
+      "python": "import sys\nfrom collections import deque\n\nlines = sys.stdin.read().strip().split('\\n')\nn, m = map(int, lines[0].split())\ng = [[] for _ in range(n)]\nindeg = [0] * n\nfor i in range(m):\n    u, v = map(int, lines[1 + i].split())\n    g[u].append(v)\n    indeg[v] += 1\n\ndef solve(n, g, indeg):\n    # TODO: Kahn's algorithm; return 'YES' if fewer than n nodes come out\n    return 'NO'\n\nprint(solve(n, g, indeg))\n",
+      "javascript": "const L = require('fs').readFileSync(0, 'utf8').trim().split('\\n');\nconst [n, m] = L[0].split(/\\s+/).map(Number);\nconst g = Array.from({ length: n }, () => []);\nconst indeg = new Array(n).fill(0);\nfor (let i = 0; i < m; i++) {\n  const [u, v] = L[1 + i].split(/\\s+/).map(Number);\n  g[u].push(v); indeg[v]++;\n}\n\nfunction solve(n, g, indeg) {\n  // TODO: Kahn's algorithm; return 'YES' if fewer than n nodes come out\n  return 'NO';\n}\n\nconsole.log(solve(n, g, indeg));\n",
+      "typescript": "const L = require('fs').readFileSync(0, 'utf8').trim().split('\\n');\nconst [n, m] = L[0].split(/\\s+/).map(Number);\nconst g = Array.from({ length: n }, () => []);\nconst indeg = new Array(n).fill(0);\nfor (let i = 0; i < m; i++) {\n  const [u, v] = L[1 + i].split(/\\s+/).map(Number);\n  g[u].push(v); indeg[v]++;\n}\n\nfunction solve(n, g, indeg) {\n  // TODO: Kahn's algorithm; return 'YES' if fewer than n nodes come out\n  return 'NO';\n}\n\nconsole.log(solve(n, g, indeg));\n"
+    },
+    "topics": [
+      "Graphs"
+    ],
+    "subtopics": [
+      "Topological Sort",
+      "Cycle Detection"
+    ],
+    "companies": [
+      "Google"
+    ],
+    "patterns": [
+      "Topological Sort"
+    ],
+    "hints": [
+      "Compute in-degree for every node: `indeg[v]++` for each edge u → v.",
+      "Seed a queue with every node whose in-degree is 0.",
+      "Removing u decrements the in-degree of each neighbour; a neighbour reaching 0 joins the queue.",
+      "Count how many nodes you removed. Fewer than n means a cycle."
+    ],
+    "prerequisites": [
+      {
+        "key": "topo",
+        "name": "Topological Sort",
+        "what": "Ordering the nodes of a DAG so every edge points forward; impossible iff there is a cycle.",
+        "deep": "Applies to dependency problems like build order and course scheduling. Two algorithms exist: Kahn's (BFS on in-degrees) and DFS post-order. If not all nodes are emitted, the graph has a cycle.",
+        "java": "Kahn's: an int[] indegree and an ArrayDeque queue of zero-indegree nodes; count how many you pop.",
+        "how": "Kahn's algorithm, run for its by-product: how many nodes it managed to remove."
+      },
+      {
+        "key": "graph_cycle",
+        "name": "Cycle Detection & Topological Sort",
+        "what": "Finding cycles (or a valid ordering) in directed graphs with DFS 3-coloring or Kahn's indegree algorithm.",
+        "deep": "In a DIRECTED graph, DFS colors nodes white/gray/black; an edge to a gray (still-on-the-stack) node is a back-edge — a cycle. Equivalently, Kahn's algorithm repeatedly removes indegree-0 nodes; if some remain, a cycle exists. A graph with no cycle has a topological order (course schedule, build order, alien dictionary). In UNDIRECTED graphs, Union-Find or parent-aware DFS finds cycles.",
+        "java": "Directed: int[] color (0/1/2) DFS. Kahn: int[] indeg, a queue of indegree-0 nodes, count popped == n means acyclic.",
+        "how": "Whatever the queue leaves behind must contain a cycle, and you should be able to say why."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example 1",
+        "input": "3 3\n0 1\n1 2\n2 0\n",
+        "expected_output": "YES",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Example 2",
+        "input": "4 3\n0 1\n0 2\n1 3\n",
+        "expected_output": "NO",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Self loop",
+        "input": "2 1\n1 1\n",
+        "expected_output": "YES",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "No edges",
+        "input": "3 0\n",
+        "expected_output": "NO",
+        "ordering": 3
+      },
+      {
+        "kind": "hidden",
+        "name": "Cycle in one component only",
+        "input": "5 4\n0 1\n2 3\n3 4\n4 2\n",
+        "expected_output": "YES",
+        "ordering": 4
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "judge_mode": "exact",
+    "checker": "",
+    "order": 50
+  },
+  {
+    "slug": "grid-bfs-distance",
+    "title": "Grid Distance by BFS",
+    "difficulty": "Easy",
+    "description": "A grid of `H` rows and `W` columns contains `.` (open), `#` (wall), one `S` (start) and one `G` (goal). Moving one step up, down, left or right onto an open cell costs 1. Print the fewest steps from `S` to `G`, or `-1` if unreachable.\n\nEvery edge here costs the same, which is exactly why plain BFS is optimal and Dijkstra would be wasted: BFS visits cells in non-decreasing distance order for free, because a FIFO queue *is* a priority queue when every priority is one more than the last.\n\n### Input\n- Line 1: `H W`.\n- Next `H` lines: the grid, each a string of length `W`.\n\n### Output\nThe minimum number of steps, or `-1`.",
+    "constraints": "1 ≤ H, W ≤ 50\nExactly one `S` and exactly one `G`.\nOther characters are `.` or `#`.",
+    "examples": [
+      {
+        "input": "3 4\nS..#\n.#..\n...G",
+        "output": "5",
+        "explanation": "One shortest route is right, down, down, right, right → 5 steps."
+      },
+      {
+        "input": "3 3\nS.#\n##.\n..G",
+        "output": "-1",
+        "explanation": "The wall row blocks every path from S to G → -1."
+      }
+    ],
+    "editorial": "## The one thing this teaches\nBFS is the unweighted shortest path, and the reason is worth stating precisely: the queue holds cells in non-decreasing distance order, so the first time a cell is reached is via a shortest path. Nothing needs re-relaxing, and nothing needs a heap.\n\n## Approach\nInitialise `dist` to -1 everywhere, set `dist[S] = 0`, push `S`. Pop a cell, and for each of the four neighbours that is in bounds, not a `#`, and still -1, set its distance to one more and push it. Answer is `dist[G]`, which is still -1 if the goal was never reached.\n\n**The `dist` array is the visited set.** Keeping a separate `boolean[][] visited` is not wrong, but it is a second thing to keep in sync, and the classic bug is setting one and not the other.\n\n## Why weights change the algorithm\nMake one cell cost 5 to enter and the invariant dies: a cell reached early via an expensive route may be reachable more cheaply later, so the first arrival is no longer final. Restoring \"process in non-decreasing distance order\" then needs an actual priority queue — that is Dijkstra, and it is the only difference between it and this loop.",
+    "optimal_time": "O(H·W)",
+    "optimal_space": "O(H·W)",
+    "optimal_explanation": "Each cell is enqueued at most once and has at most four neighbours, so the work is linear in the number of cells.",
+    "starter_code": {
+      "java": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int H = sc.nextInt(), W = sc.nextInt();\n        char[][] g = new char[H][];\n        for (int i = 0; i < H; i++) g[i] = sc.next().toCharArray();\n        int[][] dist = new int[H][W];\n        for (int[] row : dist) Arrays.fill(row, -1);\n        int[] dr = {-1, 1, 0, 0}, dc = {0, 0, -1, 1};\n        // TODO: find S, BFS with dist doubling as the visited marker, print dist at G\n        System.out.println(-1);\n    }\n}\n",
+      "python": "import sys\nfrom collections import deque\n\nL = sys.stdin.read().split('\\n')\nH, W = map(int, L[0].split())\ngrid = [L[1 + i] for i in range(H)]\n\ndef solve(H, W, grid):\n    # TODO: BFS from S; return dist at G, or -1\n    return -1\n\nprint(solve(H, W, grid))\n",
+      "javascript": "const L = require('fs').readFileSync(0, 'utf8').split('\\n');\nconst [H, W] = L[0].split(/\\s+/).map(Number);\nconst grid = [];\nfor (let i = 0; i < H; i++) grid.push(L[1 + i]);\n\nfunction solve(H, W, grid) {\n  // TODO: BFS from S; return dist at G, or -1\n  return -1;\n}\n\nconsole.log(solve(H, W, grid));\n",
+      "typescript": "const L = require('fs').readFileSync(0, 'utf8').split('\\n');\nconst [H, W] = L[0].split(/\\s+/).map(Number);\nconst grid = [];\nfor (let i = 0; i < H; i++) grid.push(L[1 + i]);\n\nfunction solve(H, W, grid) {\n  // TODO: BFS from S; return dist at G, or -1\n  return -1;\n}\n\nconsole.log(solve(H, W, grid));\n"
+    },
+    "topics": [
+      "Graphs",
+      "Matrix"
+    ],
+    "subtopics": [
+      "BFS",
+      "Grid"
+    ],
+    "companies": [
+      "Meta"
+    ],
+    "patterns": [
+      "Grid / Matrix",
+      "BFS / DFS"
+    ],
+    "hints": [
+      "Treat each open cell as a node and each orthogonal step as an edge of weight 1.",
+      "Keep a `dist[H][W]` filled with -1 as both the distance table and the visited marker.",
+      "Set dist when you ENQUEUE a cell: dist[ni][nj] = dist[i][j] + 1.",
+      "The four steps are `{-1,0},{1,0},{0,-1},{0,1}` — check bounds before reading the cell."
+    ],
+    "prerequisites": [
+      {
+        "key": "bfs",
+        "name": "Breadth-First Search",
+        "what": "Exploring a graph level by level with a queue; finds shortest paths in unweighted graphs.",
+        "deep": "BFS visits nodes in order of distance from the source, so the first time it reaches a node is via a shortest unweighted path. It needs a queue and a visited marker and runs in O(V+E).",
+        "java": "ArrayDeque<Integer> as the queue (offer/poll) plus a boolean[] visited. Mark visited when enqueuing, not dequeuing, to avoid duplicates.",
+        "how": "A FIFO queue visits cells in non-decreasing distance order, which is why BFS is optimal when every edge costs 1."
+      },
+      {
+        "key": "graph_repr",
+        "name": "Graph Representation",
+        "what": "Modeling entities as nodes and relationships as edges, usually an adjacency list.",
+        "deep": "The representation dictates efficiency: adjacency lists are O(V+E) space and iterate neighbors quickly, while adjacency matrices are O(V^2) but give O(1) edge tests. Directed vs undirected and weighted vs unweighted change how you build and traverse it.",
+        "java": "List<List<Integer>> adj, or List<int[]>[] adj = new List[n] storing new int[]{to, w} for weighted edges.",
+        "how": "The grid is the graph: cells are nodes and orthogonal steps are the edges."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example 1",
+        "input": "3 4\nS..#\n.#..\n...G\n",
+        "expected_output": "5",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Example 2",
+        "input": "3 3\nS.#\n##.\n..G\n",
+        "expected_output": "-1",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Adjacent",
+        "input": "1 2\nSG\n",
+        "expected_output": "1",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Straight corridor",
+        "input": "1 5\nS...G\n",
+        "expected_output": "4",
+        "ordering": 3
+      },
+      {
+        "kind": "hidden",
+        "name": "Walled off",
+        "input": "2 3\nS#G\n.#.\n",
+        "expected_output": "-1",
+        "ordering": 4
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "judge_mode": "exact",
+    "checker": "",
+    "order": 51
+  },
+  {
+    "slug": "union-by-size-components",
+    "title": "Components with Union by Size",
+    "difficulty": "Easy",
+    "description": "Start with `n` singleton sets `0 … n-1` and apply `m` unions. Print how many sets remain.\n\nWrite `find` as a **plain walk to the root** and `union` with **union by size** only — no path compression. That restriction is the point: with union by size alone the trees are already O(log n) deep, and knowing that is what makes path compression an optimisation rather than a magic incantation you cannot justify.\n\n### Input\n- Line 1: `n m`.\n- Next `m` lines: `u v` — union the sets containing `u` and `v`.\n\n### Output\nThe number of disjoint sets remaining.",
+    "constraints": "1 ≤ n ≤ 200\n0 ≤ m ≤ 400\n0 ≤ u, v < n\nA union of two already-joined elements is a no-op.",
+    "examples": [
+      {
+        "input": "6 3\n0 1\n1 2\n4 5",
+        "output": "3",
+        "explanation": "Sets become `{0,1,2}`, `{3}`, `{4,5}` → 3."
+      },
+      {
+        "input": "4 4\n0 1\n1 0\n0 1\n2 3",
+        "output": "2",
+        "explanation": "Three of the four unions are redundant; only `{0,1}` and `{2,3}` merge → 2."
+      }
+    ],
+    "editorial": "## The one thing this teaches\nThe component count is maintained by the *unions*, not recomputed by a traversal. Start at `n` and decrement exactly once per union that actually merged two different roots.\n\n## Approach\n```java\nint[] parent = new int[n], size = new int[n];\nfor (int i = 0; i < n; i++) { parent[i] = i; size[i] = 1; }\nint comps = n;\n\nint find(int x) { while (parent[x] != x) x = parent[x]; return x; }\n\nfor each edge (u, v) {\n    int a = find(u), b = find(v);\n    if (a == b) continue;                 // already together\n    if (size[a] < size[b]) { int t = a; a = b; b = t; }\n    parent[b] = a;\n    size[a] += size[b];\n    comps--;\n}\n```\n\n## Why by size, and why it is enough\nLink roots arbitrarily and an adversary builds a 200-long chain, making `find` O(n). Always hanging the smaller tree under the larger means an element's depth increases only when its tree merges into one at least as big — so the tree it lives in at least doubles. A tree can double at most log₂n times, so depth stays O(log n) **without any compression at all**.\n\nPath compression then flattens what the walk already found, taking the amortised cost to near-constant. Add it on the next rung, and you will be able to say what it bought.",
+    "optimal_time": "O(m log n)",
+    "optimal_space": "O(n)",
+    "optimal_explanation": "Union by size keeps every tree at depth O(log n) — an element's depth only grows when its tree is merged into one at least as large, which can happen at most log₂n times — so each find costs O(log n).",
+    "starter_code": {
+      "java": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt(), m = sc.nextInt();\n        int[] parent = new int[n], size = new int[n];\n        for (int i = 0; i < n; i++) { parent[i] = i; size[i] = 1; }\n        int comps = n;\n        // TODO: find by plain walk (no compression); union the smaller root under the larger\n        for (int i = 0; i < m; i++) {\n            int u = sc.nextInt(), v = sc.nextInt();\n        }\n        System.out.println(comps);\n    }\n}\n",
+      "python": "import sys\n\nlines = sys.stdin.read().strip().split('\\n')\nn, m = map(int, lines[0].split())\nedges = [tuple(map(int, lines[1 + i].split())) for i in range(m)]\n\ndef solve(n, edges):\n    parent = list(range(n))\n    size = [1] * n\n    # TODO: plain find (no compression) + union by size; return the set count\n    return n\n\nprint(solve(n, edges))\n",
+      "javascript": "const L = require('fs').readFileSync(0, 'utf8').trim().split('\\n');\nconst [n, m] = L[0].split(/\\s+/).map(Number);\nconst edges = [];\nfor (let i = 0; i < m; i++) edges.push(L[1 + i].split(/\\s+/).map(Number));\n\nfunction solve(n, edges) {\n  const parent = Array.from({ length: n }, (_, i) => i);\n  const size = new Array(n).fill(1);\n  // TODO: plain find (no compression) + union by size; return the set count\n  return n;\n}\n\nconsole.log(solve(n, edges));\n",
+      "typescript": "const L = require('fs').readFileSync(0, 'utf8').trim().split('\\n');\nconst [n, m] = L[0].split(/\\s+/).map(Number);\nconst edges = [];\nfor (let i = 0; i < m; i++) edges.push(L[1 + i].split(/\\s+/).map(Number));\n\nfunction solve(n, edges) {\n  const parent = Array.from({ length: n }, (_, i) => i);\n  const size = new Array(n).fill(1);\n  // TODO: plain find (no compression) + union by size; return the set count\n  return n;\n}\n\nconsole.log(solve(n, edges));\n"
+    },
+    "topics": [
+      "Graphs"
+    ],
+    "subtopics": [
+      "Union-Find"
+    ],
+    "companies": [
+      "Amazon"
+    ],
+    "patterns": [
+      "Union-Find"
+    ],
+    "hints": [
+      "`parent[i] = i` and `size[i] = 1` to start; keep a counter at n.",
+      "`find(x)`: `while (parent[x] != x) x = parent[x]; return x;`",
+      "If the two roots are equal, do nothing — including not decrementing the counter.",
+      "Otherwise hang the SMALLER root under the larger, add its size, and decrement the counter."
+    ],
+    "prerequisites": [
+      {
+        "key": "union_find",
+        "name": "Union-Find (DSU)",
+        "what": "A disjoint-set structure that merges groups and answers 'same group?' in near-constant time.",
+        "deep": "Each element points to a parent; a set is a tree with a representative root. `find` follows parents to the root and, with path compression, flattens the tree; `union` links one root under another, and union-by-size/rank keeps trees shallow. Together they give near-O(1) amortized operations — the go-to for connectivity, cycle detection in undirected graphs, and Kruskal's MST.",
+        "java": "int[] parent, size; find flattens: while(parent[x]!=x){ parent[x]=parent[parent[x]]; x=parent[x]; } union links smaller under larger.",
+        "how": "Plain `find` plus union by size — enough on its own to cap the tree depth at O(log n)."
+      },
+      {
+        "key": "iteration",
+        "name": "Array Iteration",
+        "what": "Walking through elements one at a time while maintaining running state such as a sum, max, or counter.",
+        "deep": "The workhorse of array problems: one for-loop that updates accumulators as it goes. Most linear-time solutions are just one well-chosen pass, so the real skill is deciding what state to carry so a single sweep suffices.",
+        "java": "Use for (int i = 0; i < n; i++) or for (int x : nums). Prefer a primitive int[] over Integer[] to avoid autoboxing overhead.",
+        "how": "The component count is maintained by the unions rather than recomputed at the end."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example 1",
+        "input": "6 3\n0 1\n1 2\n4 5\n",
+        "expected_output": "3",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Example 2",
+        "input": "4 4\n0 1\n1 0\n0 1\n2 3\n",
+        "expected_output": "2",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "No unions",
+        "input": "5 0\n",
+        "expected_output": "5",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Everything joined",
+        "input": "4 3\n0 1\n1 2\n2 3\n",
+        "expected_output": "1",
+        "ordering": 3
+      },
+      {
+        "kind": "hidden",
+        "name": "Self union",
+        "input": "3 1\n1 1\n",
+        "expected_output": "3",
+        "ordering": 4
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "judge_mode": "exact",
+    "checker": "",
+    "order": 52
+  },
+  {
+    "slug": "all-subsets-small",
+    "title": "All Subsets of a Tiny Array",
+    "difficulty": "Easy",
+    "description": "Print every subset of an array of at most 4 distinct integers.\n\nEach element is a binary choice — **skip it** or **take it** — so the recursion has exactly two branches and a base case of \"no elements left\". Four elements means 16 subsets, which is few enough to check every line by hand against your own trace.\n\n### Input\n- Line 1: integer `n` (1 ≤ n ≤ 4).\n- Line 2: `n` distinct integers.\n\n### Output\nAll `2^n` subsets, one per line, each as its elements in input order separated by single spaces. Print `-` for the empty subset. **Sort the lines lexicographically as text** before printing, so the output is unique.",
+    "constraints": "1 ≤ n ≤ 4\n-99 ≤ a[i] ≤ 99, all distinct",
+    "examples": [
+      {
+        "input": "2\n1 2",
+        "output": "-\n1\n1 2\n2",
+        "explanation": "Four subsets: the empty one (`-`), `1`, `1 2` and `2`, sorted as text."
+      },
+      {
+        "input": "3\n5 1 9",
+        "output": "-\n1\n1 9\n5\n5 1\n5 1 9\n5 9\n9",
+        "explanation": "Eight subsets of `{5, 1, 9}`, each printed in input order and then sorted as text."
+      }
+    ],
+    "editorial": "## The one thing this teaches\n**The undo.** Backtracking is depth-first search over a tree of partial answers, and it reuses one mutable list for every node of that tree. That only works if each branch leaves the list exactly as it found it:\n\n```java\nvoid rec(int i, List<Integer> chosen) {\n    if (i == n) { emit(chosen); return; }\n    rec(i + 1, chosen);          // skip a[i]\n    chosen.add(a[i]);\n    rec(i + 1, chosen);          // take a[i]\n    chosen.remove(chosen.size() - 1);   // UNDO\n}\n```\n\nDelete that last line and the output is nonsense — every later subset inherits elements from a branch that already finished. Every backtracking bug you will hit for the next ten problems is a missing or misplaced undo.\n\n## Why not just copy the list?\nYou can: pass `new ArrayList<>(chosen)` down and delete the undo. It is easier to get right and it costs O(n) per node instead of O(1), which multiplies the whole search by n. For n=4 nobody cares; for n-queens on an 8×8 board it is the difference between instant and slow. Learn the undo here, where a wrong answer is 16 lines you can read.\n\n## On the sort\nThe recursion emits subsets in a deterministic order already, but *which* order depends on whether you branch skip-first or take-first. Sorting the lines as text means either choice passes, so the problem grades your recursion rather than your branch order.",
+    "optimal_time": "O(2^n · n)",
+    "optimal_space": "O(n)",
+    "optimal_explanation": "There are 2^n subsets and writing one costs O(n); the recursion depth — and so the shared `chosen` list — is only O(n), which is the payoff for undoing instead of copying.",
+    "starter_code": {
+      "java": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] a = new int[n];\n        for (int i = 0; i < n; i++) a[i] = sc.nextInt();\n        List<String> out = new ArrayList<>();\n        // TODO: rec(i, chosen) — skip a[i], then take a[i], then UNDO the take\n        Collections.sort(out);\n        System.out.println(String.join(\"\\n\", out));\n    }\n}\n",
+      "python": "import sys\n\nd = sys.stdin.read().split()\nn = int(d[0])\na = list(map(int, d[1:1 + n]))\n\ndef solve(a):\n    out = []\n    # TODO: rec(i, chosen) with skip / take / UNDO; append one string per subset\n    return sorted(out)\n\nprint('\\n'.join(solve(a)))\n",
+      "javascript": "const d = require('fs').readFileSync(0, 'utf8').split(/\\s+/).filter(Boolean).map(Number);\nconst n = d[0], a = d.slice(1, 1 + n);\n\nfunction solve(a) {\n  const out = [];\n  // TODO: rec(i, chosen) with skip / take / UNDO; push one string per subset\n  return out.sort();\n}\n\nconsole.log(solve(a).join('\\n'));\n",
+      "typescript": "const d = require('fs').readFileSync(0, 'utf8').split(/\\s+/).filter(Boolean).map(Number);\nconst n = d[0], a = d.slice(1, 1 + n);\n\nfunction solve(a) {\n  const out = [];\n  // TODO: rec(i, chosen) with skip / take / UNDO; push one string per subset\n  return out.sort();\n}\n\nconsole.log(solve(a).join('\\n'));\n"
+    },
+    "topics": [
+      "Recursion & DP"
+    ],
+    "subtopics": [
+      "Backtracking"
+    ],
+    "companies": [
+      "Microsoft"
+    ],
+    "patterns": [
+      "Backtracking"
+    ],
+    "hints": [
+      "Recurse on an index: `rec(i, chosen)` decides what to do with a[i].",
+      "Two calls: `rec(i + 1, chosen)` without a[i], then add a[i] and `rec(i + 1, chosen)`.",
+      "The base case i == n emits the current `chosen` list — that is where output happens.",
+      "After the 'take' branch returns, REMOVE a[i] from chosen. That removal is the whole lesson."
+    ],
+    "prerequisites": [
+      {
+        "key": "recursion",
+        "name": "Recursion",
+        "what": "A function that calls itself on smaller inputs, with base cases that stop the descent.",
+        "deep": "Expresses divide-and-conquer and tree/graph walks naturally. Watch the recursion depth against stack limits, and whether subproblems overlap - if they do, add memoization to avoid exponential blow-up.",
+        "java": "A private static helper that calls itself. The JVM stack handles ~10^4 depth; convert to an explicit ArrayDeque if you risk StackOverflowError.",
+        "how": "Each element is a two-branch decision, so the recursion is skip-then-take with a base case at the end of the array."
+      },
+      {
+        "key": "backtracking",
+        "name": "Backtracking",
+        "what": "Systematically building candidates one choice at a time, undoing a choice when it can't lead to a solution.",
+        "deep": "Backtracking is DFS over a decision tree. The template is choose → explore → un-choose: append a choice, recurse, then remove it so the next choice starts clean. It enumerates subsets, permutations, combinations, and constraint solutions (N-queens, Sudoku). Cost is roughly the number of leaves, so it needs small n.",
+        "java": "A recursive helper carrying the partial solution (often a List you add()/remove() from) and the current position/used-set; add to results at a complete state.",
+        "how": "One shared list is reused across the whole search tree, which only works if every branch undoes what it added."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example 1",
+        "input": "2\n1 2\n",
+        "expected_output": "-\n1\n1 2\n2",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Example 2",
+        "input": "3\n5 1 9\n",
+        "expected_output": "-\n1\n1 9\n5\n5 1\n5 1 9\n5 9\n9",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Single element",
+        "input": "1\n7\n",
+        "expected_output": "-\n7",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Four elements",
+        "input": "4\n1 2 3 4\n",
+        "expected_output": "-\n1\n1 2\n1 2 3\n1 2 3 4\n1 2 4\n1 3\n1 3 4\n1 4\n2\n2 3\n2 3 4\n2 4\n3\n3 4\n4",
+        "ordering": 3
+      },
+      {
+        "kind": "hidden",
+        "name": "Negatives",
+        "input": "2\n-3 4\n",
+        "expected_output": "-\n-3\n-3 4\n4",
+        "ordering": 4
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "judge_mode": "exact",
+    "checker": "",
+    "order": 53
+  },
+  {
+    "slug": "stair-ways-table",
+    "title": "Stair Ways — Print the Table",
+    "difficulty": "Easy",
+    "description": "You climb a staircase of `n` steps, moving 1 or 2 steps at a time. Print the number of distinct ways to reach **every** step from 0 to `n`.\n\nPrinting the whole table rather than only `dp[n]` is deliberate: it forces you to fill the array in order and makes the recurrence visible in the output. If your row reads `1 1 2 3 5 8` you can see Fibonacci appear, and you will recognise it in the next six problems.\n\n### Input\nA single integer `n`.\n\n### Output\n`n + 1` space-separated integers: `dp[0] dp[1] … dp[n]`, where `dp[i]` is the number of ways to reach step `i`.",
+    "constraints": "0 ≤ n ≤ 40",
+    "examples": [
+      {
+        "input": "5",
+        "output": "1 1 2 3 5 8",
+        "explanation": "`1 1 2 3 5 8` — Fibonacci, shifted. There are 8 ways to climb 5 steps."
+      },
+      {
+        "input": "0",
+        "output": "1",
+        "explanation": "With no steps to climb the table is just `dp[0] = 1`."
+      }
+    ],
+    "editorial": "## The one thing this teaches\nThe three questions that define every 1-D DP, asked once where the answers are obvious:\n\n1. **What does `dp[i]` mean?** \"The number of ways to reach step i.\" Say it in words before typing. Half of all DP bugs are a table whose meaning changed halfway through the loop.\n2. **What is the recurrence?** The last move was a 1-step or a 2-step, and those cases do not overlap, so the counts add: `dp[i] = dp[i-1] + dp[i-2]`.\n3. **What is the base case, and why?** `dp[0] = 1` — there is exactly one way to stand at the bottom having made no moves. Setting it to 0 makes the whole table 0; this is the single most common error in the unit.\n\n## Approach\n```java\nlong[] dp = new long[n + 1];\ndp[0] = 1;\nfor (int i = 1; i <= n; i++) {\n    dp[i] = dp[i - 1] + (i >= 2 ? dp[i - 2] : 0);\n}\n```\n\n**Order matters and is not arbitrary.** `dp[i]` reads smaller indices, so a left-to-right fill guarantees every value read is already final. That is the whole content of \"bottom-up\".\n\n## From recursion to table\nThe same recurrence written as a function recomputes `stairs(i-2)` exponentially often. Memoising it gives the same numbers in the same order this loop produces them — the table *is* the memo, with the recursion unrolled. Doing that conversion by hand once is the build-it exercise on the unit page.",
+    "optimal_time": "O(n)",
+    "optimal_space": "O(n)",
+    "optimal_explanation": "One pass over the table, each cell computed from two already-final cells; the table itself is the space, and only the last two entries are needed if you do not have to print it.",
+    "starter_code": {
+      "java": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        long[] dp = new long[n + 1];\n        // TODO: dp[0] = 1, then fill i = 1..n from dp[i-1] and dp[i-2]\n        StringBuilder sb = new StringBuilder();\n        for (int i = 0; i <= n; i++) { if (i > 0) sb.append(' '); sb.append(dp[i]); }\n        System.out.println(sb.toString());\n    }\n}\n",
+      "python": "n = int(input())\n\ndef solve(n):\n    dp = [0] * (n + 1)\n    # TODO: dp[0] = 1, then fill left to right\n    return dp\n\nprint(' '.join(map(str, solve(n))))\n",
+      "javascript": "const n = Number(require('fs').readFileSync(0, 'utf8').trim());\n\nfunction solve(n) {\n  const dp = new Array(n + 1).fill(0);\n  // TODO: dp[0] = 1, then fill left to right\n  return dp;\n}\n\nconsole.log(solve(n).join(' '));\n",
+      "typescript": "const n = Number(require('fs').readFileSync(0, 'utf8').trim());\n\nfunction solve(n) {\n  const dp = new Array(n + 1).fill(0);\n  // TODO: dp[0] = 1, then fill left to right\n  return dp;\n}\n\nconsole.log(solve(n).join(' '));\n"
+    },
+    "topics": [
+      "Recursion & DP"
+    ],
+    "subtopics": [
+      "Dynamic Programming",
+      "1D DP"
+    ],
+    "companies": [
+      "Adobe"
+    ],
+    "patterns": [
+      "Dynamic Programming"
+    ],
+    "hints": [
+      "There is exactly one way to be at the bottom before moving: dp[0] = 1.",
+      "To land on step i you arrived from i-1 (a 1-step) or i-2 (a 2-step).",
+      "So dp[i] = dp[i-1] + dp[i-2], with dp[i-2] omitted when i < 2.",
+      "Fill i from 1 upward — every value you read is already final."
+    ],
+    "prerequisites": [
+      {
+        "key": "dp",
+        "name": "Dynamic Programming",
+        "what": "Breaking a problem into overlapping subproblems and reusing their answers.",
+        "deep": "Applies when there is optimal substructure and overlapping subproblems. Two styles exist: top-down memoized recursion and bottom-up tabulation. Defining the state and transition precisely is the whole game, and space can often be rolled down a dimension.",
+        "java": "A memo HashMap or an int[]/int[][] table. For memoization initialize a sentinel with Arrays.fill(dp, -1).",
+        "how": "State, recurrence, base case — asked once where all three answers are obvious."
+      },
+      {
+        "key": "recurrence",
+        "name": "Recurrence Relations",
+        "what": "Expressing an answer in terms of smaller answers, e.g. f(n) = f(n-1) + f(n-2).",
+        "deep": "A recurrence is the mathematical heart of many DP and divide-and-conquer solutions. Once you name the base cases and the transition you can either recurse with memoization or iterate bottom-up, often reducing space to a few rolling variables.",
+        "java": "Iterate bottom-up with a few long variables, or memoize with a long[] dp. Use long when terms grow fast.",
+        "how": "`dp[i] = dp[i-1] + dp[i-2]`, because the last move was a 1-step or a 2-step and those cases do not overlap."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example 1",
+        "input": "5\n",
+        "expected_output": "1 1 2 3 5 8",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Example 2",
+        "input": "0\n",
+        "expected_output": "1",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "One step",
+        "input": "1\n",
+        "expected_output": "1 1",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Two steps",
+        "input": "2\n",
+        "expected_output": "1 1 2",
+        "ordering": 3
+      },
+      {
+        "kind": "hidden",
+        "name": "Forty steps",
+        "input": "40\n",
+        "expected_output": "1 1 2 3 5 8 13 21 34 55 89 144 233 377 610 987 1597 2584 4181 6765 10946 17711 28657 46368 75025 121393 196418 317811 514229 832040 1346269 2178309 3524578 5702887 9227465 14930352 24157817 39088169 63245986 102334155 165580141",
+        "ordering": 4
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "judge_mode": "exact",
+    "checker": "",
+    "order": 54
+  },
+  {
+    "slug": "grid-paths-table",
+    "title": "Grid Paths — Print the Table",
+    "difficulty": "Easy",
+    "description": "You start at the top-left of an `H × W` grid and may only move **right** or **down**. There are no obstacles. Print the full table of path counts: the number of distinct routes from the start to each cell.\n\nPrinting the table rather than one number is the point. A 2-D DP is a 1-D DP with a second index, and the only new question is *the order the cells are filled in* — which the printed grid makes visible.\n\n### Input\nA single line: `H W`.\n\n### Output\n`H` lines of `W` space-separated integers: row `i` holds the path counts for `dp[i][0] … dp[i][W-1]`.",
+    "constraints": "1 ≤ H, W ≤ 15",
+    "examples": [
+      {
+        "input": "3 3",
+        "output": "1 1 1\n1 2 3\n1 3 6",
+        "explanation": "Rows `1 1 1`, `1 2 3`, `1 3 6` — six routes to the far corner."
+      },
+      {
+        "input": "1 4",
+        "output": "1 1 1 1",
+        "explanation": "With one row there is a single route to every cell."
+      }
+    ],
+    "editorial": "## The one thing this teaches\n**Fill order.** In 1-D, \"left to right\" is the only choice. In 2-D there are several, and the recurrence decides which are legal: `dp[i][j]` reads `dp[i-1][j]` and `dp[i][j-1]`, so any order that visits both before `(i, j)` works — row by row, or column by column, but not diagonally outward from the far corner.\n\n## Approach\n```java\nlong[][] dp = new long[H][W];\nfor (int i = 0; i < H; i++)\n    for (int j = 0; j < W; j++) {\n        if (i == 0 && j == 0) { dp[i][j] = 1; continue; }\n        dp[i][j] = (i > 0 ? dp[i - 1][j] : 0) + (j > 0 ? dp[i][j - 1] : 0);\n    }\n```\n\nThe first row and column come out all 1s without being special-cased, because the missing term contributes 0. Pre-filling them by hand is also fine and is arguably clearer — what is *not* fine is pre-filling them and then letting the general loop overwrite them.\n\n## What the table is for\nThe printed grid is not decoration. Reading it *backwards* from the bottom-right reconstructs an actual path: at each cell, the neighbour whose value you came from tells you the last move. Path counting and path reconstruction use the same table, and the unit's trace walks that second read.\n\n## Adding one obstacle\nSet an obstacle's cell to 0 and skip it in the loop, and the recurrence handles the rest — every route through it disappears automatically. That is the next rung.",
+    "optimal_time": "O(H·W)",
+    "optimal_space": "O(H·W)",
+    "optimal_explanation": "Each cell is computed once from two neighbours; the table dominates the space, and can be reduced to one row if only the final value is needed.",
+    "starter_code": {
+      "java": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int H = sc.nextInt(), W = sc.nextInt();\n        long[][] dp = new long[H][W];\n        // TODO: dp[0][0] = 1, then fill row by row from above and from the left\n        StringBuilder sb = new StringBuilder();\n        for (int i = 0; i < H; i++) {\n            for (int j = 0; j < W; j++) { if (j > 0) sb.append(' '); sb.append(dp[i][j]); }\n            sb.append('\\n');\n        }\n        System.out.print(sb);\n    }\n}\n",
+      "python": "H, W = map(int, input().split())\n\ndef solve(H, W):\n    dp = [[0] * W for _ in range(H)]\n    # TODO: dp[0][0] = 1, then fill row by row\n    return dp\n\nfor row in solve(H, W):\n    print(' '.join(map(str, row)))\n",
+      "javascript": "const [H, W] = require('fs').readFileSync(0, 'utf8').trim().split(/\\s+/).map(Number);\n\nfunction solve(H, W) {\n  const dp = Array.from({ length: H }, () => new Array(W).fill(0));\n  // TODO: dp[0][0] = 1, then fill row by row\n  return dp;\n}\n\nconsole.log(solve(H, W).map((r) => r.join(' ')).join('\\n'));\n",
+      "typescript": "const [H, W] = require('fs').readFileSync(0, 'utf8').trim().split(/\\s+/).map(Number);\n\nfunction solve(H, W) {\n  const dp = Array.from({ length: H }, () => new Array(W).fill(0));\n  // TODO: dp[0][0] = 1, then fill row by row\n  return dp;\n}\n\nconsole.log(solve(H, W).map((r) => r.join(' ')).join('\\n'));\n"
+    },
+    "topics": [
+      "Recursion & DP"
+    ],
+    "subtopics": [
+      "Dynamic Programming",
+      "2D DP",
+      "Grid"
+    ],
+    "companies": [
+      "Amazon"
+    ],
+    "patterns": [
+      "Dynamic Programming",
+      "Grid / Matrix"
+    ],
+    "hints": [
+      "dp[0][0] = 1 — one way to be where you started.",
+      "Any other cell is entered from above or from the left, and those routes are distinct.",
+      "dp[i][j] = dp[i-1][j] + dp[i][j-1], dropping a term when the index is off the grid.",
+      "Fill row by row, left to right, so both cells you read are already final."
+    ],
+    "prerequisites": [
+      {
+        "key": "dp2d",
+        "name": "2-D Dynamic Programming",
+        "what": "A table dp[i][j] indexed by two dimensions, filled from smaller states.",
+        "deep": "Used when the state needs two coordinates: prefixes of two sequences, positions in a grid, or index-plus-capacity. The fill order must respect dependencies, and many 2-D DPs compress to one row because dp[i] depends only on dp[i-1].",
+        "java": "int[][] dp = new int[m + 1][n + 1] filled row by row; compress to two int[] rows (prev/cur) to save memory.",
+        "how": "A 1-D table with a second index; the only new question is which fill orders the recurrence permits."
+      },
+      {
+        "key": "dp",
+        "name": "Dynamic Programming",
+        "what": "Breaking a problem into overlapping subproblems and reusing their answers.",
+        "deep": "Applies when there is optimal substructure and overlapping subproblems. Two styles exist: top-down memoized recursion and bottom-up tabulation. Defining the state and transition precisely is the whole game, and space can often be rolled down a dimension.",
+        "java": "A memo HashMap or an int[]/int[][] table. For memoization initialize a sentinel with Arrays.fill(dp, -1).",
+        "how": "The table's meaning has to be stated before the loop is written, exactly as in 1-D."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example 1",
+        "input": "3 3\n",
+        "expected_output": "1 1 1\n1 2 3\n1 3 6",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Example 2",
+        "input": "1 4\n",
+        "expected_output": "1 1 1 1",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Single cell",
+        "input": "1 1\n",
+        "expected_output": "1",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Tall and narrow",
+        "input": "5 1\n",
+        "expected_output": "1\n1\n1\n1\n1",
+        "ordering": 3
+      },
+      {
+        "kind": "hidden",
+        "name": "Largest allowed",
+        "input": "15 15\n",
+        "expected_output": "1 1 1 1 1 1 1 1 1 1 1 1 1 1 1\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15\n1 3 6 10 15 21 28 36 45 55 66 78 91 105 120\n1 4 10 20 35 56 84 120 165 220 286 364 455 560 680\n1 5 15 35 70 126 210 330 495 715 1001 1365 1820 2380 3060\n1 6 21 56 126 252 462 792 1287 2002 3003 4368 6188 8568 11628\n1 7 28 84 210 462 924 1716 3003 5005 8008 12376 18564 27132 38760\n1 8 36 120 330 792 1716 3432 6435 11440 19448 31824 50388 77520 116280\n1 9 45 165 495 1287 3003 6435 12870 24310 43758 75582 125970 203490 319770\n1 10 55 220 715 2002 5005 11440 24310 48620 92378 167960 293930 497420 817190\n1 11 66 286 1001 3003 8008 19448 43758 92378 184756 352716 646646 1144066 1961256\n1 12 78 364 1365 4368 12376 31824 75582 167960 352716 705432 1352078 2496144 4457400\n1 13 91 455 1820 6188 18564 50388 125970 293930 646646 1352078 2704156 5200300 9657700\n1 14 105 560 2380 8568 27132 77520 203490 497420 1144066 2496144 5200300 10400600 20058300\n1 15 120 680 3060 11628 38760 116280 319770 817190 1961256 4457400 9657700 20058300 40116600",
+        "ordering": 4
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "judge_mode": "exact",
+    "checker": "",
+    "order": 55
+  },
+  {
+    "slug": "trie-insert-lookup",
+    "title": "Trie: Insert and Exact Lookup",
+    "difficulty": "Easy",
+    "description": "Insert `n` words into a trie, then answer `q` queries: for each, print `YES` if the **whole word** was inserted and `NO` otherwise.\n\nOnly these two operations — no prefix counting, no wildcards, no deletion. The thing to get right is the one design decision a trie makes: a node is a *position in a set of strings*, and it needs a flag saying whether a word ends there, separate from whether it has children.\n\n### Input\n- Line 1: integer `n`.\n- Next `n` lines: one word each.\n- Next line: integer `q`.\n- Next `q` lines: one query word each.\n\n### Output\n`q` lines of `YES` or `NO`.",
+    "constraints": "1 ≤ n, q ≤ 100\n1 ≤ word length ≤ 20\nWords are lowercase English letters. Words may repeat.",
+    "examples": [
+      {
+        "input": "3\ncar\ncard\ncat\n4\ncar\nca\ncard\ncot",
+        "output": "YES\nNO\nYES\nNO",
+        "explanation": "`car` and `card` were both inserted → YES. `ca` is only a prefix → NO. `cot` leaves the trie at `c` → NO."
+      },
+      {
+        "input": "1\napple\n2\napple\napp",
+        "output": "YES\nNO",
+        "explanation": "`app` is a prefix of `apple` but was never inserted as a word — this is exactly the case `isWord` exists for."
+      }
+    ],
+    "editorial": "## The one thing this teaches\n`isWord` is not the same as \"has no children\". Insert `car` and `card`: the node at `car` has a child, and `car` is still a word. Insert only `card`, and the node at `car` exists but is not a word. Lookup must check the flag, never childlessness.\n\n## Approach\n```java\nclass Node { Node[] next = new Node[26]; boolean isWord; }\n\nvoid insert(String w) {\n    Node cur = root;\n    for (char c : w.toCharArray()) {\n        int k = c - 'a';\n        if (cur.next[k] == null) cur.next[k] = new Node();\n        cur = cur.next[k];\n    }\n    cur.isWord = true;\n}\n\nboolean search(String w) {\n    Node cur = root;\n    for (char c : w.toCharArray()) {\n        int k = c - 'a';\n        if (cur.next[k] == null) return false;\n        cur = cur.next[k];\n    }\n    return cur.isWord;\n}\n```\n\nInserting the same word twice is harmless — the walk finds existing nodes and sets an already-true flag.\n\n## Why not a HashSet?\nFor *exact* lookup, a `HashSet<String>` is better: less code, less memory, O(length) hashing. A trie earns its keep only when the question is about **prefixes** — how many words start with `ca`, what is the longest stored prefix of this string, walk every completion — because those read the shared path a hash set destroys. This problem exists to build the structure, not to justify it; the justification is the next rung.",
+    "optimal_time": "O(total characters)",
+    "optimal_space": "O(total characters · 26)",
+    "optimal_explanation": "Insert and lookup each cost one step per character of the word, independent of how many words the trie holds — that independence is the whole reason to build one.",
+    "starter_code": {
+      "java": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        String[] words = new String[n];\n        for (int i = 0; i < n; i++) words[i] = sc.next();\n        int q = sc.nextInt();\n        String[] queries = new String[q];\n        for (int i = 0; i < q; i++) queries[i] = sc.next();\n        // TODO: build a Node { Node[] next = new Node[26]; boolean isWord; } trie,\n        //       insert every word, then answer each query on isWord\n        StringBuilder sb = new StringBuilder();\n        for (int i = 0; i < q; i++) sb.append(\"NO\").append('\\n');\n        System.out.print(sb);\n    }\n}\n",
+      "python": "import sys\n\nL = sys.stdin.read().strip().split('\\n')\nn = int(L[0])\nwords = L[1:1 + n]\nq = int(L[1 + n])\nqueries = L[2 + n:2 + n + q]\n\ndef solve(words, queries):\n    root = {}\n    # TODO: insert each word (mark the end), then look each query up exactly\n    return ['NO'] * len(queries)\n\nprint('\\n'.join(solve(words, queries)))\n",
+      "javascript": "const L = require('fs').readFileSync(0, 'utf8').trim().split('\\n');\nconst n = Number(L[0]);\nconst words = L.slice(1, 1 + n);\nconst q = Number(L[1 + n]);\nconst queries = L.slice(2 + n, 2 + n + q);\n\nfunction solve(words, queries) {\n  const root = {};\n  // TODO: insert each word (mark the end), then look each query up exactly\n  return queries.map(() => 'NO');\n}\n\nconsole.log(solve(words, queries).join('\\n'));\n",
+      "typescript": "const L = require('fs').readFileSync(0, 'utf8').trim().split('\\n');\nconst n = Number(L[0]);\nconst words = L.slice(1, 1 + n);\nconst q = Number(L[1 + n]);\nconst queries = L.slice(2 + n, 2 + n + q);\n\nfunction solve(words, queries) {\n  const root = {};\n  // TODO: insert each word (mark the end), then look each query up exactly\n  return queries.map(() => 'NO');\n}\n\nconsole.log(solve(words, queries).join('\\n'));\n"
+    },
+    "topics": [
+      "Data Structures",
+      "Strings"
+    ],
+    "subtopics": [
+      "Trie"
+    ],
+    "companies": [
+      "Google"
+    ],
+    "patterns": [
+      "Trie"
+    ],
+    "hints": [
+      "A node holds `Node[] children = new Node[26]` and a `boolean isWord`.",
+      "Insert: walk character by character, creating a child where one is missing; set isWord at the end.",
+      "Search: walk the same way, but return NO the moment a child is missing.",
+      "Reaching the end of the query is not enough — the final node's isWord must be true."
+    ],
+    "prerequisites": [
+      {
+        "key": "trie",
+        "name": "Trie (Prefix Tree)",
+        "what": "A tree where each edge is a character, so shared prefixes share a path — giving O(word length) insert and lookup.",
+        "deep": "Each node has up to 26 children and an is-word flag. Words that share a prefix share the nodes along it, which is what makes tries shine at prefix queries: autocomplete, 'count words with prefix', word search with wildcards, and even maximum-XOR via a binary trie. The cost of any operation is the length of the word, independent of how many words are stored.",
+        "java": "class Node { Node[] ch = new Node[26]; boolean end; } — index by c-'a'; insert walks/creates, search checks end, startsWith checks the path exists.",
+        "how": "Insert and exact lookup, and the `isWord` flag that is not the same as \"has no children\"."
+      },
+      {
+        "key": "char_arrays",
+        "name": "Char Arrays & ASCII",
+        "what": "Manipulating characters via their numeric codes and mutable char arrays.",
+        "deep": "Characters are small integers, so 'a'..'z' map to a 26-slot table via c - 'a'. Because Java strings are immutable, in-place character work needs a char[]. This underlies frequency counts, canonical keys, and in-place edits.",
+        "java": "int idx = c - 'a'; char[] arr = s.toCharArray(); new String(arr) to rebuild. A length-26 or length-128 int[] beats a HashMap for letters.",
+        "how": "Both operations walk the query one character at a time, mapping it to a child index."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example 1",
+        "input": "3\ncar\ncard\ncat\n4\ncar\nca\ncard\ncot\n",
+        "expected_output": "YES\nNO\nYES\nNO",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Example 2",
+        "input": "1\napple\n2\napple\napp\n",
+        "expected_output": "YES\nNO",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Repeated insert",
+        "input": "2\nab\nab\n1\nab\n",
+        "expected_output": "YES",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Query longer than any word",
+        "input": "1\na\n1\nabc\n",
+        "expected_output": "NO",
+        "ordering": 3
+      },
+      {
+        "kind": "hidden",
+        "name": "Single letters",
+        "input": "3\na\nb\nc\n3\nc\nd\na\n",
+        "expected_output": "YES\nNO\nYES",
+        "ordering": 4
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "judge_mode": "exact",
+    "checker": "",
+    "order": 56
+  },
+  {
+    "slug": "activity-selection-small",
+    "title": "Activity Selection",
+    "difficulty": "Easy",
+    "description": "You are given `n` activities, each with a start and an end time. You can only do one at a time, and an activity that starts exactly when another ends is fine. Print the largest number of activities you can complete.\n\n### Input\n- Line 1: integer `n`.\n- Next `n` lines: `s e` with `s < e`.\n\n### Output\nA single integer: the maximum count.",
+    "constraints": "1 ≤ n ≤ 200\n0 ≤ s < e ≤ 10000",
+    "examples": [
+      {
+        "input": "4\n0 100\n1 2\n3 4\n5 6",
+        "output": "3",
+        "explanation": "`(1,2)`, `(3,4)`, `(5,6)` → 3. Sorting by start time would take `(0,100)` and stop at 1."
+      },
+      {
+        "input": "3\n0 5\n4 6\n5 10",
+        "output": "2",
+        "explanation": "`(0,5)` then `(5,10)` → 2. Sorting by duration would take `(4,6)` and stop at 1."
+      }
+    ],
+    "editorial": "## The one thing this teaches\nA greedy algorithm is a **sort order plus a local rule**, and the sort order is the entire algorithm. Get it wrong and no amount of care in the loop recovers.\n\n## Approach\nSort by end time ascending. Walk the list keeping `lastEnd`, initially `-infinity`. Take an activity when `s >= lastEnd`, and set `lastEnd = e`.\n\n## Why earliest-finish is correct\nAmong all activities compatible with what you have taken, the one that ends first leaves the *largest possible remaining time window*, and it occupies exactly one slot like any other choice. So there is always an optimal solution that starts with it — swap the first activity of any optimal solution for the earliest-finishing one and the rest still fits. Induct on what remains.\n\nThat exchange argument is what an interviewer is asking for when they say \"why is greedy correct here?\", and it is the part candidates skip.\n\n## The orders that fail\n- **By start time**: `(0,100), (1,2), (3,4)` takes 1 instead of 2.\n- **By duration**: `(0,5), (4,6), (5,10)` takes the short middle one and gets 1 instead of 2.\n\nBeing able to produce those two counterexamples on demand is worth more than remembering the rule, because it is how you check a greedy rule you have just invented under pressure.",
+    "optimal_time": "O(n log n)",
+    "optimal_space": "O(n)",
+    "optimal_explanation": "The sort dominates; the selection itself is one linear pass with a single variable of state.",
+    "starter_code": {
+      "java": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[][] jobs = new int[n][2];\n        for (int i = 0; i < n; i++) { jobs[i][0] = sc.nextInt(); jobs[i][1] = sc.nextInt(); }\n        // TODO: sort by end time, then take every job starting at or after lastEnd\n        System.out.println(0);\n    }\n}\n",
+      "python": "import sys\n\nlines = sys.stdin.read().strip().split('\\n')\nn = int(lines[0])\njobs = [tuple(map(int, lines[1 + i].split())) for i in range(n)]\n\ndef solve(jobs):\n    # TODO: sort by end time, then take every job starting at or after lastEnd\n    return 0\n\nprint(solve(jobs))\n",
+      "javascript": "const L = require('fs').readFileSync(0, 'utf8').trim().split('\\n');\nconst n = Number(L[0]);\nconst jobs = [];\nfor (let i = 0; i < n; i++) jobs.push(L[1 + i].split(/\\s+/).map(Number));\n\nfunction solve(jobs) {\n  // TODO: sort by end time, then take every job starting at or after lastEnd\n  return 0;\n}\n\nconsole.log(solve(jobs));\n",
+      "typescript": "const L = require('fs').readFileSync(0, 'utf8').trim().split('\\n');\nconst n = Number(L[0]);\nconst jobs = [];\nfor (let i = 0; i < n; i++) jobs.push(L[1 + i].split(/\\s+/).map(Number));\n\nfunction solve(jobs) {\n  // TODO: sort by end time, then take every job starting at or after lastEnd\n  return 0;\n}\n\nconsole.log(solve(jobs));\n"
+    },
+    "topics": [
+      "Greedy",
+      "Intervals"
+    ],
+    "subtopics": [
+      "Earliest Finish"
+    ],
+    "companies": [
+      "Bloomberg"
+    ],
+    "patterns": [
+      "Greedy",
+      "Intervals"
+    ],
+    "hints": [
+      "Sorting by start time does not work — one long early activity blocks the rest.",
+      "Sorting by duration does not work either; find a 3-activity counterexample.",
+      "Sort by END time, then take every activity that starts at or after the last end.",
+      "One pass after the sort: `if (s >= lastEnd) { count++; lastEnd = e; }`"
+    ],
+    "prerequisites": [
+      {
+        "key": "greedy",
+        "name": "Greedy Choice",
+        "what": "Taking the locally-best option at each step when that provably reaches a global optimum.",
+        "deep": "Greedy is fast and simple but correct only when the problem has the greedy-choice property and optimal substructure; otherwise DP is the fallback. Proving correctness (often an exchange argument) matters more than the code.",
+        "java": "Often just Arrays.sort plus a linear scan, or a PriorityQueue to always grab the current best.",
+        "how": "A sort order plus a local rule — and the exchange argument that proves the pair correct."
+      },
+      {
+        "key": "intervals",
+        "name": "Interval Scheduling",
+        "what": "Reasoning about ranges [start, end] by sorting on the right endpoint and testing overlap with a[end] ≥ b[start].",
+        "deep": "Interval problems fall into two moves: sort by START to merge or scan overlaps, or sort by END for greedy 'keep the most / fewest' results (activity selection, arrows, non-overlapping). A sweep line — process all endpoints in order, +1 on a start and −1 on an end — answers 'maximum concurrent' questions like minimum meeting rooms.",
+        "java": "int[][] iv; Arrays.sort(iv, (a,b) -> a[0]-b[0]); // by start, or a[1]-b[1] for greedy by end. Overlap: a[1] >= b[0] (or > for point-touching rules).",
+        "how": "Sorting by end time is the move that makes almost every interval problem tractable."
+      }
+    ],
+    "test_cases": [
+      {
+        "kind": "example",
+        "name": "Example 1",
+        "input": "4\n0 100\n1 2\n3 4\n5 6\n",
+        "expected_output": "3",
+        "ordering": 0
+      },
+      {
+        "kind": "example",
+        "name": "Example 2",
+        "input": "3\n0 5\n4 6\n5 10\n",
+        "expected_output": "2",
+        "ordering": 1
+      },
+      {
+        "kind": "hidden",
+        "name": "Single activity",
+        "input": "1\n0 1\n",
+        "expected_output": "1",
+        "ordering": 2
+      },
+      {
+        "kind": "hidden",
+        "name": "Touching ends are compatible",
+        "input": "3\n0 1\n1 2\n2 3\n",
+        "expected_output": "3",
+        "ordering": 3
+      },
+      {
+        "kind": "hidden",
+        "name": "All overlap",
+        "input": "3\n0 10\n1 9\n2 8\n",
+        "expected_output": "1",
+        "ordering": 4
+      }
+    ],
+    "editorials": [],
+    "follow_ups": [],
+    "judge_mode": "exact",
+    "checker": "",
+    "order": 57
   },
   {
     "slug": "two-sum-fn",
@@ -6552,7 +8065,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 44
+    "order": 58
   },
   {
     "slug": "max-subarray-fn",
@@ -6678,7 +8191,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 130
+    "order": 144
   },
   {
     "slug": "reverse-array-fn",
@@ -6794,7 +8307,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 45
+    "order": 59
   },
   {
     "slug": "is-palindrome-fn",
@@ -6910,7 +8423,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 46
+    "order": 60
   },
   {
     "slug": "is-even",
@@ -7879,7 +9392,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 47
+    "order": 61
   },
   {
     "slug": "single-number",
@@ -7989,7 +9502,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 48
+    "order": 62
   },
   {
     "slug": "majority-element",
@@ -8099,7 +9612,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 49
+    "order": 63
   },
   {
     "slug": "is-prime",
@@ -8212,7 +9725,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 50
+    "order": 64
   },
   {
     "slug": "count-primes",
@@ -8320,7 +9833,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 51
+    "order": 65
   },
   {
     "slug": "valid-anagram",
@@ -8442,7 +9955,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 52
+    "order": 66
   },
   {
     "slug": "first-unique-char",
@@ -8552,7 +10065,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 53
+    "order": 67
   },
   {
     "slug": "move-zeroes",
@@ -8662,7 +10175,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 54
+    "order": 68
   },
   {
     "slug": "running-sum",
@@ -8769,7 +10282,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 55
+    "order": 69
   },
   {
     "slug": "max-consecutive-ones",
@@ -8876,7 +10389,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 56
+    "order": 70
   },
   {
     "slug": "second-largest",
@@ -8983,7 +10496,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 57
+    "order": 71
   },
   {
     "slug": "count-occurrences",
@@ -9085,7 +10598,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 58
+    "order": 72
   },
   {
     "slug": "number-of-1-bits",
@@ -9193,7 +10706,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 59
+    "order": 73
   },
   {
     "slug": "product-except-self",
@@ -9304,7 +10817,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 131
+    "order": 145
   },
   {
     "slug": "best-time-buy-sell",
@@ -9423,7 +10936,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 132
+    "order": 146
   },
   {
     "slug": "container-most-water",
@@ -9533,7 +11046,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 133
+    "order": 147
   },
   {
     "slug": "house-robber",
@@ -9642,7 +11155,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 134
+    "order": 148
   },
   {
     "slug": "jump-game",
@@ -9752,7 +11265,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 135
+    "order": 149
   },
   {
     "slug": "coin-change",
@@ -9866,7 +11379,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 136
+    "order": 150
   },
   {
     "slug": "coin-change-ways",
@@ -9978,7 +11491,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 137
+    "order": 151
   },
   {
     "slug": "longest-common-prefix",
@@ -10085,7 +11598,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 138
+    "order": 152
   },
   {
     "slug": "search-insert-position",
@@ -10199,7 +11712,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 139
+    "order": 153
   },
   {
     "slug": "integer-sqrt",
@@ -10316,7 +11829,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 140
+    "order": 154
   },
   {
     "slug": "min-cost-climbing-stairs",
@@ -10424,7 +11937,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 141
+    "order": 155
   },
   {
     "slug": "daily-temperatures",
@@ -10534,7 +12047,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 142
+    "order": 156
   },
   {
     "slug": "next-greater-element",
@@ -10644,7 +12157,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 143
+    "order": 157
   },
   {
     "slug": "subarray-sum-k",
@@ -10767,7 +12280,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 144
+    "order": 158
   },
   {
     "slug": "longest-consecutive",
@@ -10877,7 +12390,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 145
+    "order": 159
   },
   {
     "slug": "kth-largest-element",
@@ -10991,7 +12504,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 146
+    "order": 160
   },
   {
     "slug": "rotate-array-right",
@@ -11102,7 +12615,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 147
+    "order": 161
   },
   {
     "slug": "word-break",
@@ -11225,7 +12738,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 224
+    "order": 238
   },
   {
     "slug": "decode-ways",
@@ -11343,7 +12856,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 225
+    "order": 239
   },
   {
     "slug": "longest-palindrome-length",
@@ -11454,7 +12967,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 226
+    "order": 240
   },
   {
     "slug": "maximum-product-subarray",
@@ -11564,7 +13077,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 227
+    "order": 241
   },
   {
     "slug": "partition-equal-subset-sum",
@@ -11673,7 +13186,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 228
+    "order": 242
   },
   {
     "slug": "min-of-two",
@@ -12299,7 +13812,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 60
+    "order": 74
   },
   {
     "slug": "power-of-two",
@@ -12416,7 +13929,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 61
+    "order": 75
   },
   {
     "slug": "missing-number",
@@ -12534,7 +14047,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 62
+    "order": 76
   },
   {
     "slug": "count-negatives",
@@ -12632,7 +14145,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 63
+    "order": 77
   },
   {
     "slug": "is-sorted",
@@ -12740,7 +14253,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 64
+    "order": 78
   },
   {
     "slug": "fizzbuzz-value",
@@ -12847,7 +14360,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 65
+    "order": 79
   },
   {
     "slug": "two-sum-sorted",
@@ -12961,7 +14474,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 66
+    "order": 80
   },
   {
     "slug": "merge-sorted-arrays",
@@ -13075,7 +14588,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 148
+    "order": 162
   },
   {
     "slug": "kth-smallest",
@@ -13189,7 +14702,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 149
+    "order": 163
   },
   {
     "slug": "gcd-of-array",
@@ -13295,7 +14808,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 150
+    "order": 164
   },
   {
     "slug": "fast-power",
@@ -13417,7 +14930,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 151
+    "order": 165
   },
   {
     "slug": "unique-paths",
@@ -13530,7 +15043,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 152
+    "order": 166
   },
   {
     "slug": "longest-common-subsequence",
@@ -13645,7 +15158,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 153
+    "order": 167
   },
   {
     "slug": "top-k-frequent",
@@ -13770,7 +15283,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 154
+    "order": 168
   },
   {
     "slug": "count-bits",
@@ -13881,7 +15394,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 155
+    "order": 169
   },
   {
     "slug": "largest-rectangle-histogram",
@@ -13991,7 +15504,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 229
+    "order": 243
   },
   {
     "slug": "sliding-window-maximum",
@@ -14106,7 +15619,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 230
+    "order": 244
   },
   {
     "slug": "jump-game-ii",
@@ -14216,7 +15729,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 231
+    "order": 245
   },
   {
     "slug": "longest-valid-parentheses",
@@ -14328,7 +15841,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 232
+    "order": 246
   },
   {
     "slug": "min-window-length",
@@ -14453,7 +15966,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 233
+    "order": 247
   },
   {
     "slug": "leap-year",
@@ -15104,7 +16617,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 67
+    "order": 81
   },
   {
     "slug": "armstrong-number",
@@ -15210,7 +16723,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 68
+    "order": 82
   },
   {
     "slug": "perfect-number",
@@ -15316,7 +16829,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 69
+    "order": 83
   },
   {
     "slug": "collatz-steps",
@@ -15425,7 +16938,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 70
+    "order": 84
   },
   {
     "slug": "seconds-to-clock",
@@ -15531,7 +17044,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 71
+    "order": 85
   },
   {
     "slug": "count-words",
@@ -15639,7 +17152,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 72
+    "order": 86
   },
   {
     "slug": "mountain-array",
@@ -15748,7 +17261,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 73
+    "order": 87
   },
   {
     "slug": "is-permutation-1n",
@@ -15856,7 +17369,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 74
+    "order": 88
   },
   {
     "slug": "rock-paper-scissors",
@@ -15968,7 +17481,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 75
+    "order": 89
   },
   {
     "slug": "traffic-light",
@@ -16089,7 +17602,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 76
+    "order": 90
   },
   {
     "slug": "max-nesting-depth",
@@ -16198,7 +17711,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 77
+    "order": 91
   },
   {
     "slug": "caesar-cipher",
@@ -16316,7 +17829,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 78
+    "order": 92
   },
   {
     "slug": "run-length-encode",
@@ -16425,7 +17938,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 79
+    "order": 93
   },
   {
     "slug": "password-strength",
@@ -16531,7 +18044,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 80
+    "order": 94
   },
   {
     "slug": "bank-balance",
@@ -16641,7 +18154,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 81
+    "order": 95
   },
   {
     "slug": "max-passengers",
@@ -16751,7 +18264,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 82
+    "order": 96
   },
   {
     "slug": "count-equal-pairs",
@@ -16860,7 +18373,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 83
+    "order": 97
   },
   {
     "slug": "two-sum-any",
@@ -16982,7 +18495,7 @@
     "judge_mode": "checker",
     "float_tolerance": 0,
     "checker": "def check(inp, out):\n    lines = inp.strip().split('\\n')\n    nums = list(map(int, lines[0].split())) if lines and lines[0].strip() else []\n    target = int(lines[1]) if len(lines) > 1 else 0\n    toks = out.split()\n    if len(toks) != 2:\n        return False\n    try:\n        i, j = int(toks[0]), int(toks[1])\n    except ValueError:\n        return False\n    n = len(nums)\n    if not (1 <= i <= n and 1 <= j <= n and i != j):\n        return False\n    return nums[i - 1] + nums[j - 1] == target\n",
-    "order": 84
+    "order": 98
   },
   {
     "slug": "max-depth-tree",
@@ -17099,7 +18612,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 85
+    "order": 99
   },
   {
     "slug": "min-depth-tree",
@@ -17216,7 +18729,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 86
+    "order": 100
   },
   {
     "slug": "count-nodes-tree",
@@ -17324,7 +18837,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 87
+    "order": 101
   },
   {
     "slug": "invert-binary-tree",
@@ -17441,7 +18954,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 88
+    "order": 102
   },
   {
     "slug": "same-tree",
@@ -17553,7 +19066,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 89
+    "order": 103
   },
   {
     "slug": "symmetric-tree",
@@ -17662,7 +19175,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 90
+    "order": 104
   },
   {
     "slug": "inorder-traversal",
@@ -17770,7 +19283,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 91
+    "order": 105
   },
   {
     "slug": "preorder-traversal",
@@ -17878,7 +19391,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 92
+    "order": 106
   },
   {
     "slug": "level-order-traversal",
@@ -17996,7 +19509,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 156
+    "order": 170
   },
   {
     "slug": "right-side-view",
@@ -18105,7 +19618,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 157
+    "order": 171
   },
   {
     "slug": "zigzag-level-order",
@@ -18214,7 +19727,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 158
+    "order": 172
   },
   {
     "slug": "path-sum-exists",
@@ -18334,7 +19847,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 93
+    "order": 107
   },
   {
     "slug": "balanced-tree",
@@ -18443,7 +19956,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 159
+    "order": 173
   },
   {
     "slug": "diameter-of-tree",
@@ -18552,7 +20065,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 160
+    "order": 174
   },
   {
     "slug": "max-path-sum",
@@ -18670,7 +20183,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 234
+    "order": 248
   },
   {
     "slug": "validate-bst",
@@ -18788,7 +20301,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 161
+    "order": 175
   },
   {
     "slug": "bst-search",
@@ -18900,7 +20413,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 94
+    "order": 108
   },
   {
     "slug": "bst-insert",
@@ -19012,7 +20525,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 162
+    "order": 176
   },
   {
     "slug": "kth-smallest-bst",
@@ -19133,7 +20646,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 163
+    "order": 177
   },
   {
     "slug": "lca-bst",
@@ -19250,7 +20763,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 164
+    "order": 178
   },
   {
     "slug": "lca-binary-tree",
@@ -19376,7 +20889,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 165
+    "order": 179
   },
   {
     "slug": "list-length",
@@ -19714,7 +21227,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 95
+    "order": 109
   },
   {
     "slug": "middle-of-list",
@@ -19823,7 +21336,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 96
+    "order": 110
   },
   {
     "slug": "remove-duplicates-sorted-list",
@@ -19931,7 +21444,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 97
+    "order": 111
   },
   {
     "slug": "merge-two-sorted-lists",
@@ -20053,7 +21566,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 98
+    "order": 112
   },
   {
     "slug": "remove-nth-from-end",
@@ -20174,7 +21687,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 166
+    "order": 180
   },
   {
     "slug": "palindrome-linked-list",
@@ -20291,7 +21804,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 167
+    "order": 181
   },
   {
     "slug": "odd-even-list",
@@ -20399,7 +21912,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 168
+    "order": 182
   },
   {
     "slug": "add-two-numbers-list",
@@ -20521,7 +22034,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 169
+    "order": 183
   },
   {
     "slug": "has-cycle",
@@ -20634,7 +22147,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 170
+    "order": 184
   },
   {
     "slug": "cycle-start-index",
@@ -20747,7 +22260,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 171
+    "order": 185
   },
   {
     "slug": "reorder-list",
@@ -20864,7 +22377,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 172
+    "order": 186
   },
   {
     "slug": "reverse-k-group",
@@ -20986,7 +22499,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 235
+    "order": 249
   },
   {
     "slug": "unique-paths-count",
@@ -21107,7 +22620,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 99
+    "order": 113
   },
   {
     "slug": "subset-sum-count",
@@ -21227,7 +22740,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 173
+    "order": 187
   },
   {
     "slug": "combination-sum-count",
@@ -21349,7 +22862,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 174
+    "order": 188
   },
   {
     "slug": "palindrome-partition-count",
@@ -21466,7 +22979,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 175
+    "order": 189
   },
   {
     "slug": "word-search",
@@ -21588,7 +23101,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 176
+    "order": 190
   },
   {
     "slug": "n-queens-count",
@@ -21706,7 +23219,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 236
+    "order": 250
   },
   {
     "slug": "sudoku-solvable",
@@ -21815,7 +23328,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 237
+    "order": 251
   },
   {
     "slug": "generate-subsets",
@@ -21924,7 +23437,7 @@
     "judge_mode": "checker",
     "float_tolerance": 0,
     "checker": "def check(inp, out):\n    import itertools\n    lines = inp.split('\\n')\n    nums = list(map(int, lines[0].split())) if lines and lines[0].strip() else []\n    toks = out.split()\n    got = set()\n    for t in toks:\n        got.add(() if t == '-' else tuple(sorted(map(int, t.split(',')))))\n    exp = set()\n    for r in range(len(nums)+1):\n        for c in itertools.combinations(sorted(nums), r):\n            exp.add(tuple(c))\n    return got == exp and len(toks) == len(exp)\n",
-    "order": 177
+    "order": 191
   },
   {
     "slug": "generate-permutations",
@@ -22033,7 +23546,7 @@
     "judge_mode": "checker",
     "float_tolerance": 0,
     "checker": "def check(inp, out):\n    import itertools\n    lines = inp.split('\\n')\n    nums = list(map(int, lines[0].split())) if lines and lines[0].strip() else []\n    toks = out.split()\n    got = [tuple(map(int, t.split(','))) for t in toks]\n    exp = set(itertools.permutations(nums))\n    return set(got) == exp and len(got) == len(exp)\n",
-    "order": 178
+    "order": 192
   },
   {
     "slug": "combinations-nk",
@@ -22145,7 +23658,7 @@
     "judge_mode": "checker",
     "float_tolerance": 0,
     "checker": "def check(inp, out):\n    import itertools\n    lines = inp.split('\\n')\n    n = int(lines[0]); k = int(lines[1])\n    toks = out.split()\n    got = set(tuple(sorted(map(int, t.split(',')))) for t in toks)\n    exp = set(itertools.combinations(range(1, n+1), k))\n    return got == exp and len(toks) == len(exp)\n",
-    "order": 179
+    "order": 193
   },
   {
     "slug": "generate-parentheses",
@@ -22255,7 +23768,7 @@
     "judge_mode": "checker",
     "float_tolerance": 0,
     "checker": "def check(inp, out):\n    n = int(inp.split('\\n')[0])\n    toks = out.split()\n    res = set()\n    def go(s, o, c):\n        if len(s) == 2*n:\n            res.add(s); return\n        if o < n: go(s+'(', o+1, c)\n        if c < o: go(s+')', o, c+1)\n    go('', 0, 0)\n    return set(toks) == res and len(toks) == len(res)\n",
-    "order": 180
+    "order": 194
   },
   {
     "slug": "letter-combinations-phone",
@@ -22364,7 +23877,7 @@
     "judge_mode": "checker",
     "float_tolerance": 0,
     "checker": "def check(inp, out):\n    import itertools\n    digits = inp.split('\\n')[0].strip()\n    m = {'2':'abc','3':'def','4':'ghi','5':'jkl','6':'mno','7':'pqrs','8':'tuv','9':'wxyz'}\n    toks = out.split()\n    if digits == '':\n        return len(toks) == 0\n    groups = [m[d] for d in digits]\n    exp = set(''.join(p) for p in itertools.product(*groups))\n    return set(toks) == exp and len(toks) == len(exp)\n",
-    "order": 181
+    "order": 195
   },
   {
     "slug": "restore-ip-addresses",
@@ -22482,7 +23995,7 @@
     "judge_mode": "checker",
     "float_tolerance": 0,
     "checker": "def check(inp, out):\n    s = inp.split('\\n')[0].strip()\n    toks = out.split()\n    exp = set(); n = len(s)\n    def ok(seg):\n        if not seg or len(seg) > 3: return False\n        if len(seg) > 1 and seg[0] == '0': return False\n        return 0 <= int(seg) <= 255\n    for a in range(1,4):\n        for b in range(1,4):\n            for c in range(1,4):\n                d = n - a - b - c\n                if d < 1 or d > 3: continue\n                p = [s[:a], s[a:a+b], s[a+b:a+b+c], s[a+b+c:]]\n                if all(ok(x) for x in p): exp.add('.'.join(p))\n    return set(toks) == exp and len(toks) == len(exp)\n",
-    "order": 182
+    "order": 196
   },
   {
     "slug": "last-stone-weight",
@@ -22598,7 +24111,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 100
+    "order": 114
   },
   {
     "slug": "kth-largest-in-array",
@@ -22719,7 +24232,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 183
+    "order": 197
   },
   {
     "slug": "k-closest-distances",
@@ -22844,7 +24357,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 184
+    "order": 198
   },
   {
     "slug": "sort-by-frequency",
@@ -22964,7 +24477,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 101
+    "order": 115
   },
   {
     "slug": "top-k-frequent-words",
@@ -23088,7 +24601,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 185
+    "order": 199
   },
   {
     "slug": "task-scheduler",
@@ -23211,7 +24724,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 186
+    "order": 200
   },
   {
     "slug": "ugly-number-ii",
@@ -23328,7 +24841,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 187
+    "order": 201
   },
   {
     "slug": "reorganize-string",
@@ -23448,7 +24961,7 @@
     "judge_mode": "checker",
     "float_tolerance": 0,
     "checker": "def check(inp, out):\n    from collections import Counter\n    s = inp.split('\\n')[0].strip()\n    o = out.strip()\n    n = len(s)\n    feasible = (max(Counter(s).values()) <= (n + 1) // 2) if s else True\n    if not feasible:\n        return o == ''\n    if Counter(o) != Counter(s):\n        return False\n    for i in range(1, len(o)):\n        if o[i] == o[i-1]:\n            return False\n    return True\n",
-    "order": 188
+    "order": 202
   },
   {
     "slug": "can-attend-meetings",
@@ -23571,7 +25084,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 102
+    "order": 116
   },
   {
     "slug": "merge-intervals",
@@ -23687,7 +25200,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 189
+    "order": 203
   },
   {
     "slug": "insert-interval",
@@ -23808,7 +25321,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 190
+    "order": 204
   },
   {
     "slug": "min-meeting-rooms",
@@ -23931,7 +25444,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 191
+    "order": 205
   },
   {
     "slug": "non-overlapping-remove",
@@ -24054,7 +25567,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 192
+    "order": 206
   },
   {
     "slug": "min-arrows-balloons",
@@ -24176,7 +25689,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 193
+    "order": 207
   },
   {
     "slug": "interval-intersections",
@@ -24307,7 +25820,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 194
+    "order": 208
   },
   {
     "slug": "car-pooling",
@@ -24436,7 +25949,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 195
+    "order": 209
   },
   {
     "slug": "employee-free-time",
@@ -24550,7 +26063,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 238
+    "order": 252
   },
   {
     "slug": "count-components",
@@ -24675,7 +26188,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 196
+    "order": 210
   },
   {
     "slug": "number-of-provinces",
@@ -24791,7 +26304,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 197
+    "order": 211
   },
   {
     "slug": "graph-valid-tree",
@@ -24916,7 +26429,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 198
+    "order": 212
   },
   {
     "slug": "redundant-connection",
@@ -25029,7 +26542,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 199
+    "order": 213
   },
   {
     "slug": "largest-component-size",
@@ -25145,7 +26658,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 200
+    "order": 214
   },
   {
     "slug": "earliest-full-connect",
@@ -25273,7 +26786,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 201
+    "order": 215
   },
   {
     "slug": "satisfy-equations",
@@ -25389,7 +26902,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 202
+    "order": 216
   },
   {
     "slug": "make-network-connected",
@@ -25505,7 +27018,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 203
+    "order": 217
   },
   {
     "slug": "network-delay-time",
@@ -25638,7 +27151,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 204
+    "order": 218
   },
   {
     "slug": "cheapest-flights-k-stops",
@@ -25771,7 +27284,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 205
+    "order": 219
   },
   {
     "slug": "mst-total-weight",
@@ -25900,7 +27413,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 206
+    "order": 220
   },
   {
     "slug": "min-cost-connect-points",
@@ -26021,7 +27534,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 239
+    "order": 253
   },
   {
     "slug": "detect-cycle-directed",
@@ -26138,7 +27651,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 207
+    "order": 221
   },
   {
     "slug": "detect-cycle-undirected",
@@ -26254,7 +27767,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 208
+    "order": 222
   },
   {
     "slug": "course-schedule-possible",
@@ -26381,7 +27894,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 209
+    "order": 223
   },
   {
     "slug": "bipartite-check",
@@ -26506,7 +28019,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 210
+    "order": 224
   },
   {
     "slug": "word-ladder-length",
@@ -26633,7 +28146,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 240
+    "order": 254
   },
   {
     "slug": "alien-dictionary-order",
@@ -26752,7 +28265,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 241
+    "order": 255
   },
   {
     "slug": "longest-common-prefix-strs",
@@ -26869,7 +28382,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 103
+    "order": 117
   },
   {
     "slug": "word-in-dictionary",
@@ -26982,7 +28495,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 211
+    "order": 225
   },
   {
     "slug": "prefix-counts",
@@ -27096,7 +28609,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 212
+    "order": 226
   },
   {
     "slug": "replace-words-roots",
@@ -27209,7 +28722,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 213
+    "order": 227
   },
   {
     "slug": "longest-buildable-word",
@@ -27326,7 +28839,7 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 214
+    "order": 228
   },
   {
     "slug": "max-xor-pair",
@@ -27445,6 +28958,6 @@
     "judge_mode": "exact",
     "float_tolerance": 0,
     "checker": "",
-    "order": 242
+    "order": 256
   }
 ]

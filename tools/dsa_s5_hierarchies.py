@@ -888,6 +888,9 @@ pruning: *"I will sort first so I can break early, and skip equal values at the
 same depth to avoid duplicates"* covers everything they were going to ask.
 """,
     rungs=[
+        _rung("Warm up", "Sixteen answers you can check by hand, and one line that matters.",
+              ["all-subsets-small"],
+              {"all-subsets-small": "Four elements, so every wrong answer is readable. Delete the undo on purpose once and look at what comes out."}),
         _rung("Core", "The template, with the three choice-set variants.",
               ["generate-subsets", "combinations-nk", "generate-permutations"],
               {"generate-subsets": "Type the four lines from memory. Everything else in this unit is this with a different guard.",
@@ -1148,6 +1151,9 @@ before touching the traversal. Once that sentence exists, the code is a
 template. And say why BFS: "edges are unweighted, so BFS layers are distances".
 """,
     rungs=[
+        _rung("Warm up", "One BFS, and the outer loop that turns it into an answer.",
+              ["count-connected-components"],
+              {"count-connected-components": "The whole unit with nothing else attached: adjacency list, one shared `seen`, and a BFS started from every node you have not reached yet."}),
         _rung("Core", "Traversal on an implicit graph, then a real one.",
               ["number-of-islands", "shortest-path-binary-matrix", "bipartite-check"],
               {"number-of-islands": "One traversal per unvisited land cell. Sink the island as you go.",
@@ -1356,6 +1362,9 @@ that the size check is the cycle detection. That is a complete answer in three
 minutes.
 """,
     rungs=[
+        _rung("Warm up", "Kahn on six nodes, asking only whether it finished.",
+              ["detect-cycle-tiny-dag"],
+              {"detect-cycle-tiny-dag": "The sort and the cycle check are one algorithm. Be able to say *why* the leftovers must contain a cycle — it is the standard follow-up."}),
         _rung("Core", "Build the graph, count in-degrees, drain the queue.",
               ["course-schedule", "course-schedule-possible", "detect-cycle-directed"],
               {"course-schedule": "Write one example's edge directions down on paper before coding. That is where the bug lives.",
@@ -1571,6 +1580,9 @@ for the comparison: a traversal answers the same question in O(V + E) *per
 query*, which is why DSU wins as soon as there is more than one query.
 """,
     rungs=[
+        _rung("Warm up", "Union by size alone, so path compression is an optimisation rather than an incantation.",
+              ["union-by-size-components"],
+              {"union-by-size-components": "Plain walk to the root, no compression. Union by size already caps the depth at O(log n) — knowing that is what lets you justify compression on the next rung."}),
         _rung("Core", "Counting components, and the boolean return.",
               ["count-components", "number-of-provinces", "graph-valid-tree",
                "redundant-connection", "detect-cycle-undirected"],
@@ -1815,6 +1827,9 @@ limit (Bellman-Ford with k + 1 rounds and a snapshot). Knowing that Dijkstra is
 pressure.
 """,
     rungs=[
+        _rung("Warm up", "Dijkstra with the priority queue deleted.",
+              ["grid-bfs-distance"],
+              {"grid-bfs-distance": "All edges cost 1, so a FIFO queue already visits cells in non-decreasing distance order. Make one cell cost 5 and that invariant dies — the heap is what restores it."}),
         _rung("Core", "Dijkstra, and the two relaxation variants.",
               ["network-delay-time", "path-minimum-effort", "cheapest-flights-k-stops"],
               {"network-delay-time": "Plain Dijkstra: the answer is the maximum finalised distance, and unreachable means −1.",

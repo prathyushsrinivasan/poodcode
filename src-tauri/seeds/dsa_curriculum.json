@@ -1384,6 +1384,18 @@
           "interview": "This pattern is asked by name, and the follow-up is always the complexity of\nthe nested loop. \"O(n), because the left pointer only moves forward and each\nelement enters and leaves the window exactly once\" is the answer being fished\nfor. Then be ready for *\"what if there are negative numbers?\"* — the honest\nanswer is that the window breaks and prefix sums take over.\n",
           "rungs": [
             {
+              "title": "Warm up",
+              "purpose": "The slide itself, with nothing else attached.",
+              "slugs": [
+                "fixed-window-max-sum",
+                "window-covering-letters"
+              ],
+              "notes": {
+                "fixed-window-max-sum": "The fixed window: add what entered, subtract what left. Two reads per step no matter how wide `k` is.",
+                "window-covering-letters": "The variable right edge, with the left edge nailed to 0 — so the only new idea is maintaining a summary of what the window holds."
+              }
+            },
+            {
               "title": "Core",
               "purpose": "The variable window, in its purest form.",
               "slugs": [
@@ -2116,6 +2128,18 @@
           ],
           "interview": "Binary search is where interviewers watch you handle boundaries under mild\npressure, so having one memorised template that you never modify is worth more\nthan cleverness. And when a problem says *\"minimum X such that it is possible\"*,\nsaying \"that predicate looks monotone, so I can binary-search the answer and\njust write the feasibility check\" is one of the highest-signal sentences in the\nwhole interview vocabulary.\n",
           "rungs": [
+            {
+              "title": "Warm up",
+              "purpose": "The half-open template, on the two questions it was built for.",
+              "slugs": [
+                "lower-bound-index",
+                "first-true-predicate"
+              ],
+              "notes": {
+                "lower-bound-index": "Type the `[lo, hi)` loop once with no equality branch. Every other binary search in this unit is this loop with a different comparison.",
+                "first-true-predicate": "The same loop with the array replaced by a predicate — which is what “binary search on the answer” means, written out in full."
+              }
+            },
             {
               "title": "Core",
               "purpose": "The template, and the insertion-point reading of it.",
@@ -3061,6 +3085,16 @@
           ],
           "interview": "The monotonic stack is one of the few patterns an interviewer will accept as a\ncomplete answer the moment you name it — but only with the amortisation\nargument attached. \"Each index enters and leaves the stack once, so the pass is\nO(n)\" is the sentence. Without it, the nested `while` reads as O(n²) and you\nwill be asked to defend it anyway. The same sentence, in its other form —\n\"`ArrayDeque` doubles and copies, so push is amortised O(1)\" — is the answer to\nthe follow-up about the structure itself.\n",
           "rungs": [
+            {
+              "title": "Warm up",
+              "purpose": "One bracket type, where the stack collapses to a counter.",
+              "slugs": [
+                "max-bracket-depth"
+              ],
+              "notes": {
+                "max-bracket-depth": "Notice what a counter can and cannot do: it tracks the stack's *height* but not what is on it, which is exactly why `([)]` needs the real thing."
+              }
+            },
             {
               "title": "Core",
               "purpose": "Nesting, then the monotonic pass.",
@@ -5240,6 +5274,16 @@
           "interview": "Backtracking is graded on structure, not cleverness. Write the four lines —\nchoose, explore, un-choose, record — before filling in any logic, and the\ninterviewer can follow you. Then volunteer the complexity (2ⁿ or n!) and the\npruning: *\"I will sort first so I can break early, and skip equal values at the\nsame depth to avoid duplicates\"* covers everything they were going to ask.\n",
           "rungs": [
             {
+              "title": "Warm up",
+              "purpose": "Sixteen answers you can check by hand, and one line that matters.",
+              "slugs": [
+                "all-subsets-small"
+              ],
+              "notes": {
+                "all-subsets-small": "Four elements, so every wrong answer is readable. Delete the undo on purpose once and look at what comes out."
+              }
+            },
+            {
               "title": "Core",
               "purpose": "The template, with the three choice-set variants.",
               "slugs": [
@@ -5459,6 +5503,16 @@
           "interview": "Graph questions are usually disguised: \"can these courses be finished\", \"how\nmany groups\", \"fewest moves\". The interview skill is *modelling* — saying out\nloud what the nodes are, what the edges are, and whether they are directed —\nbefore touching the traversal. Once that sentence exists, the code is a\ntemplate. And say why BFS: \"edges are unweighted, so BFS layers are distances\".\n",
           "rungs": [
             {
+              "title": "Warm up",
+              "purpose": "One BFS, and the outer loop that turns it into an answer.",
+              "slugs": [
+                "count-connected-components"
+              ],
+              "notes": {
+                "count-connected-components": "The whole unit with nothing else attached: adjacency list, one shared `seen`, and a BFS started from every node you have not reached yet."
+              }
+            },
+            {
               "title": "Core",
               "purpose": "Traversal on an implicit graph, then a real one.",
               "slugs": [
@@ -5633,6 +5687,16 @@
           ],
           "interview": "Course-schedule questions are the most common graph problem in interviews, and\nthey are graded on the modelling sentence, not the algorithm: *\"nodes are\ncourses, an edge from prerequisite to dependent, and the question is whether a\ntopological order covering all nodes exists\"*. Say that, write Kahn's, then note\nthat the size check is the cycle detection. That is a complete answer in three\nminutes.\n",
           "rungs": [
+            {
+              "title": "Warm up",
+              "purpose": "Kahn on six nodes, asking only whether it finished.",
+              "slugs": [
+                "detect-cycle-tiny-dag"
+              ],
+              "notes": {
+                "detect-cycle-tiny-dag": "The sort and the cycle check are one algorithm. Be able to say *why* the leftovers must contain a cycle — it is the standard follow-up."
+              }
+            },
             {
               "title": "Core",
               "purpose": "Build the graph, count in-degrees, drain the queue.",
@@ -5818,6 +5882,16 @@
           ],
           "interview": "Union-find is a strong signal precisely because it is not the obvious answer.\nWhen edges arrive incrementally and the question is connectivity, naming DSU\nand quoting \"effectively constant, α(n) amortised\" reads as fluency. Be ready\nfor the comparison: a traversal answers the same question in O(V + E) *per\nquery*, which is why DSU wins as soon as there is more than one query.\n",
           "rungs": [
+            {
+              "title": "Warm up",
+              "purpose": "Union by size alone, so path compression is an optimisation rather than an incantation.",
+              "slugs": [
+                "union-by-size-components"
+              ],
+              "notes": {
+                "union-by-size-components": "Plain walk to the root, no compression. Union by size already caps the depth at O(log n) — knowing that is what lets you justify compression on the next rung."
+              }
+            },
             {
               "title": "Core",
               "purpose": "Counting components, and the boolean return.",
@@ -6031,6 +6105,16 @@
           "interview": "Say which algorithm and *why the cheaper one does not apply*: \"weights differ,\nso BFS would not be correct — Dijkstra, O(E log V)\". Then have the two follow-ups\nready, because they are always the same: negative edges (Bellman-Ford) and a hop\nlimit (Bellman-Ford with k + 1 rounds and a snapshot). Knowing that Dijkstra is\n\"BFS with a priority queue\" is also the cleanest way to explain it under time\npressure.\n",
           "rungs": [
             {
+              "title": "Warm up",
+              "purpose": "Dijkstra with the priority queue deleted.",
+              "slugs": [
+                "grid-bfs-distance"
+              ],
+              "notes": {
+                "grid-bfs-distance": "All edges cost 1, so a FIFO queue already visits cells in non-decreasing distance order. Make one cell cost 5 and that invariant dies — the heap is what restores it."
+              }
+            },
+            {
               "title": "Core",
               "purpose": "Dijkstra, and the two relaxation variants.",
               "slugs": [
@@ -6222,6 +6306,16 @@
           ],
           "interview": "The trap is that greedy code is short, so it is tempting to write it and move\non. Interviewers are listening for the justification. Two sentences settle it:\n*\"sorting by end time is safe because the earliest finish leaves the most room\"*,\nor *\"I tried to construct a case where a worse local choice pays off later and\ncould not\"*. If neither is available, say so and switch to DP — that judgement\nis itself the thing being tested.\n",
           "rungs": [
+            {
+              "title": "Warm up",
+              "purpose": "A sort order, a local rule, and the exchange argument that joins them.",
+              "slugs": [
+                "activity-selection-small"
+              ],
+              "notes": {
+                "activity-selection-small": "The canonical greedy. Produce the counterexamples that kill sorting by start time and by duration — that is how you check a rule you just invented."
+              }
+            },
             {
               "title": "Core",
               "purpose": "One pass, one running value, one proof.",
@@ -6631,6 +6725,16 @@
           "interview": "Say the state definition out loud before writing anything: *\"`dp[i]` is the\nmaximum sum of a subarray ending at index i\"*. Interviewers accept a correct\nrecurrence immediately and reject a correct-looking table with no stated\nmeaning, because the second cannot be checked. Then offer the space\noptimisation as a follow-up rather than writing it first — showing you know it\nexists is worth as much as using it, and the array version is what you can\nactually debug on a whiteboard.\n",
           "rungs": [
             {
+              "title": "Warm up",
+              "purpose": "The three questions, where all three answers are obvious.",
+              "slugs": [
+                "stair-ways-table"
+              ],
+              "notes": {
+                "stair-ways-table": "Print the whole table, not just the last cell. Seeing `1 1 2 3 5 8` come out is what makes the recurrence yours."
+              }
+            },
+            {
               "title": "Core",
               "purpose": "One state, one choice, O(1) transition.",
               "slugs": [
@@ -6847,6 +6951,16 @@
           "interview": "Two-sequence DP is asked constantly and is one of the few places where being\nable to *draw the table* wins the interview. Fill a 3×3 example by hand while\nexplaining the three neighbours as replace, delete and insert; it takes ninety\nseconds and it proves the recurrence in a way that code cannot. Offer the\nrolled-row space optimisation at the end, after the table is right.\n",
           "rungs": [
             {
+              "title": "Warm up",
+              "purpose": "The same table, with the fill order made visible.",
+              "slugs": [
+                "grid-paths-table"
+              ],
+              "notes": {
+                "grid-paths-table": "No obstacles, so the only new idea over 1-D is which orders are legal. Then read the printed table backwards and reconstruct an actual path."
+              }
+            },
+            {
               "title": "Core",
               "purpose": "A table filled from two directions.",
               "slugs": [
@@ -7047,6 +7161,16 @@
           ],
           "interview": "Naming the trie is most of the marks — it is the expected answer for\nautocomplete and dictionary problems, and candidates who have not met it tend to\npropose scanning every word. Be ready for the trade-off question: a trie costs\nfar more memory than a hash set, so it earns its place only when prefixes,\nwildcards or bit-greedy walks are actually needed.\n",
           "rungs": [
+            {
+              "title": "Warm up",
+              "purpose": "Insert and exact lookup, and the flag people forget.",
+              "slugs": [
+                "trie-insert-lookup"
+              ],
+              "notes": {
+                "trie-insert-lookup": "`isWord` is not “has no children”: insert `card` and `car` becomes a node that exists and is not a word. Also be able to say why a HashSet would beat this — the answer is the rest of the unit."
+              }
+            },
             {
               "title": "Core",
               "purpose": "Build it, walk it, count with it.",

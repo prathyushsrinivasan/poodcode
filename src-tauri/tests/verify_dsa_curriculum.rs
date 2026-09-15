@@ -15,7 +15,10 @@
 //! 3. Prerequisites point backwards, so the ladder can be walked top to bottom —
 //!    and past the foundations stage they are a graph rather than a chain.
 //! 4. Rungs climb: within a unit, difficulty never decreases.
-//! 5. Every unit is actually taught — a why, a model, a ladder and self-checks.
+//! 5. Every substantial unit opens below its ceiling — a unit of more than four
+//!    problems starts on an Intro or an Easy, so "Warm up" is a description
+//!    rather than a label.
+//! 6. Every unit is actually taught — a why, a model, a ladder and self-checks.
 
 use std::collections::{HashMap, HashSet};
 
@@ -27,6 +30,10 @@ const CONCEPTS: &str = include_str!("../seeds/concepts.json");
 
 /// Mirrors `_MAX_CHAIN_RUN` in tools/dsa_curriculum.py.
 const MAX_CHAIN_RUN: usize = 2;
+
+/// Mirrors `_ONRAMP_MIN_UNIT` in tools/dsa_curriculum.py — a unit this short is
+/// exempt from needing an on-ramp, being over before it can wall anyone off.
+const ONRAMP_MIN_UNIT: usize = 4;
 
 fn rank(difficulty: &str) -> i32 {
     match difficulty {
@@ -64,7 +71,7 @@ fn curriculum_teaches_every_problem_exactly_once() {
             assert!(seen_units.insert(k), "duplicate unit {k}");
             order.push(k);
 
-            // 5 — the unit is actually taught, not just a list of links.
+            // 6 — the unit is actually taught, not just a list of links.
             assert!(!unit.title.trim().is_empty(), "{k}: no title");
             assert!(!unit.why.trim().is_empty(), "{k}: no 'why this exists'");
             assert!(!unit.model.trim().is_empty(), "{k}: no mental model");
@@ -107,11 +114,14 @@ fn curriculum_teaches_every_problem_exactly_once() {
             }
 
             let mut last_rank = -1;
+            let mut first_rung_floor: Option<i32> = None;
+            let mut unit_n = 0usize;
             for rung in &unit.rungs {
                 assert!(!rung.slugs.is_empty(), "{k}/{}: empty rung", rung.title);
                 assert!(!rung.purpose.trim().is_empty(), "{k}/{}: no purpose", rung.title);
 
                 let mut hardest = -1;
+                let mut easiest = i32::MAX;
                 for slug in &rung.slugs {
                     // 1 — problem links resolve.
                     let problem = by_slug
@@ -122,6 +132,11 @@ fn curriculum_teaches_every_problem_exactly_once() {
                         panic!("{slug} is in both {prev} and {k}");
                     }
                     hardest = hardest.max(rank(&problem.difficulty));
+                    easiest = easiest.min(rank(&problem.difficulty));
+                }
+                unit_n += rung.slugs.len();
+                if first_rung_floor.is_none() {
+                    first_rung_floor = Some(easiest);
                 }
                 for noted in rung.notes.keys() {
                     assert!(
@@ -139,6 +154,22 @@ fn curriculum_teaches_every_problem_exactly_once() {
                     rung.title
                 );
                 last_rank = hardest;
+            }
+
+            // 5 — a substantial unit opens below its ceiling. Rule 4 compares
+            // each rung's *hardest* problem, so a unit that is ten Mediums and
+            // two Hards satisfies it while opening at its own maximum. Stated
+            // as "opens on an Intro or an Easy" because that is the property a
+            // learner meeting the technique for the first time needs.
+            if unit_n > ONRAMP_MIN_UNIT {
+                let floor = first_rung_floor.unwrap_or(0);
+                assert!(
+                    floor <= rank("Easy"),
+                    "{k}: {unit_n} problems and the first rung ({}) opens at {} — a first \
+                     rung at the unit's ceiling is a wall with a warm-up's label on it",
+                    unit.rungs[0].title,
+                    if floor == 2 { "Medium" } else { "Hard" }
+                );
             }
         }
     }

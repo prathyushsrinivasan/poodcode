@@ -6124,6 +6124,23 @@ if os.path.exists(_sql_path):
 
 
 # ---------------------------------------------------------------------------
+# On-ramps — one honestly-Easy entry problem per starved DSA unit. Authored in
+# a separate file and exec'd here (last, so it can see every earlier problem)
+# so it can extend DEFS / JAVA_STARTERS in place. Defines ONRAMP_REFS, merged
+# into REFERENCE_SOLUTIONS below.
+#
+# These exist because the curriculum's `warm up` lint (tools/dsa_curriculum.py)
+# now fails the build for any substantial unit whose first rung opens at the
+# unit's own ceiling — a dozen units did, because the bank's accidental
+# difficulty distribution was deciding where each technique began.
+# ---------------------------------------------------------------------------
+_onramp_path = os.path.join(HERE, "dsa_onramps.py")
+if os.path.exists(_onramp_path):
+    with open(_onramp_path, encoding="utf-8") as _orf:
+        exec(compile(_orf.read(), _onramp_path, "exec"))
+
+
+# ---------------------------------------------------------------------------
 # Build JSON
 # ---------------------------------------------------------------------------
 
@@ -6395,7 +6412,7 @@ print(
 )
 
 # ---------------------------------------------------------------------------
-# The DSA Curriculum — the Problem Library, taught: the same 243 problems
+# The DSA Curriculum — the Problem Library, taught: the same 257 problems
 # sequenced into stages and units, each with its own why/model/skeletons/
 # signals/pitfalls and an ordered problem ladder (authored in
 # tools/dsa_curriculum.py plus one file per stage). It references problems and
@@ -6517,6 +6534,7 @@ REFERENCE_SOLUTIONS = {
 }
 
 REFERENCE_SOLUTIONS.update(globals().get("EXPANSION_REFS", {}))
+REFERENCE_SOLUTIONS.update(globals().get("ONRAMP_REFS", {}))
 
 REFS_OUT = os.path.join(HERE, "..", "src-tauri", "seeds", "reference_solutions.json")
 with open(REFS_OUT, "w", encoding="utf-8", newline="\n") as f:

@@ -372,6 +372,10 @@ just write the feasibility check" is one of the highest-signal sentences in the
 whole interview vocabulary.
 """,
     rungs=[
+        _rung("Warm up", "The half-open template, on the two questions it was built for.",
+              ["lower-bound-index", "first-true-predicate"],
+              {"lower-bound-index": "Type the `[lo, hi)` loop once with no equality branch. Every other binary search in this unit is this loop with a different comparison.",
+               "first-true-predicate": "The same loop with the array replaced by a predicate — which is what “binary search on the answer” means, written out in full."}),
         _rung("Core", "The template, and the insertion-point reading of it.",
               ["binary-search-first", "search-insert-position"],
               {"binary-search-first": "Duplicates are the point: you want the *first* match, which is exactly lower bound.",

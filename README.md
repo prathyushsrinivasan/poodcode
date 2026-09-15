@@ -40,8 +40,8 @@ python tools/verify_java_course.py --starters   # Java course: same, via javac/j
 python tools/verify_projects.py --starters      # Projects: same, type-checked then run via Node
 ```
 
-The first launch seeds **243 original problems** — 28 below-Easy **Intro**
-problems for someone new to Java, then 215 across arrays, strings, hashing,
+The first launch seeds **257 original problems** — 28 below-Easy **Intro**
+problems for someone new to Java, then 229 across arrays, strings, hashing,
 two pointers, sliding window, prefix sums, sorting, binary search, maths, bits,
 stacks, linked lists, heaps, design, recursion, trees, backtracking, graphs,
 greedy, intervals, dynamic programming and tries — arranged into a taught
@@ -164,13 +164,13 @@ python tools/gen_seed.py       # writes every src-tauri/seeds/*.json
 ### DSA Curriculum
 
 The problem bank with a **spine** (`seeds/dsa_curriculum.json`, authored in
-`tools/dsa_curriculum.py` plus one file per stage). The same 243 problems and
+`tools/dsa_curriculum.py` plus one file per stage). The same 257 problems and
 the same judge, arranged as a course that starts at `System.out.println` and
 ends at tries, Dijkstra and 2-D dynamic programming: **six stages, 33 units,
 every problem placed on exactly one teaching ladder.**
 
 It authors no problems and no lessons — that is the point. What it adds is the
-thing a filterable table of 243 problems cannot give you: an **order**, and a
+thing a filterable table of 257 problems cannot give you: an **order**, and a
 reason for it. Each unit is one technique, taught in five beats:
 
 1. **Why it exists** — the problem the previous unit leaves behind. A technique
@@ -224,7 +224,7 @@ re-asserted against the committed seed by
 `src-tauri/tests/verify_dsa_curriculum.rs`:
 
 - **Every problem is placed exactly once.** The curriculum and the library are
-  the same 243 problems, so nothing is unreachable and "what is next?" is never
+  the same 257 problems, so nothing is unreachable and "what is next?" is never
   ambiguous.
 - **No dangling references** — every problem slug and every concept key must
   resolve.

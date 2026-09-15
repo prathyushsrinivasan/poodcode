@@ -383,6 +383,9 @@ explain it under pressure.
 Then try growth by `+1` instead of `×2` and watch the counter become ~n²/2.
 """,
     rungs=[
+        _rung("Warm up", "One bracket type, where the stack collapses to a counter.",
+              ["max-bracket-depth"],
+              {"max-bracket-depth": "Notice what a counter can and cannot do: it tracks the stack's *height* but not what is on it, which is exactly why `([)]` needs the real thing."}),
         _rung("Core", "Nesting, then the monotonic pass.",
               ["valid-parentheses", "next-greater-element", "daily-temperatures"],
               {"valid-parentheses": "Get both failure modes right: closer-on-empty, and openers left over.",

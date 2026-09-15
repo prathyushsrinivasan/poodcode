@@ -770,6 +770,10 @@ for. Then be ready for *"what if there are negative numbers?"* — the honest
 answer is that the window breaks and prefix sums take over.
 """,
     rungs=[
+        _rung("Warm up", "The slide itself, with nothing else attached.",
+              ["fixed-window-max-sum", "window-covering-letters"],
+              {"fixed-window-max-sum": "The fixed window: add what entered, subtract what left. Two reads per step no matter how wide `k` is.",
+               "window-covering-letters": "The variable right edge, with the left edge nailed to 0 — so the only new idea is maintaining a summary of what the window holds."}),
         _rung("Core", "The variable window, in its purest form.",
               ["longest-unique-substring"],
               {"longest-unique-substring": "The template problem. Type it from memory, then check where you recorded `best`."}),

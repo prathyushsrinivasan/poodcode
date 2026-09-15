@@ -14,7 +14,7 @@
 # It is NOT a second problem bank. Every problem it schedules already exists in
 # seeds/problems.json, and every deep-dive it links already exists in
 # seeds/concepts.json. What this file adds is the thing a flat, filterable
-# table of 243 problems cannot give you: an ORDER, and a reason for it.
+# table of 257 problems cannot give you: an ORDER, and a reason for it.
 #
 # The unit of the curriculum is a UNIT: one technique, taught in the five
 # beats that actually move someone from "I have seen this" to "I reach for it
@@ -38,7 +38,7 @@
 # HARD DESIGN RULES, enforced by `_check_curriculum` at generation time:
 #
 #   1. EVERY PROBLEM IS PLACED EXACTLY ONCE. The curriculum and the library are
-#      the same 243 problems; a problem that belongs to no unit is unreachable
+#      the same 257 problems; a problem that belongs to no unit is unreachable
 #      by the teaching path, and a problem in two units makes "what is next?"
 #      ambiguous. Both fail the build.
 #   2. NO DANGLING REFERENCES. Every slug must exist in the problem bank and
@@ -53,6 +53,11 @@
 #      `dp-2d`) and it is invisible unless something checks for it.
 #   4. RUNGS CLIMB. Within a unit the rungs' difficulty never decreases, so
 #      "work down the page" is honest advice.
+#   5. EVERY SUBSTANTIAL UNIT OPENS BELOW ITS CEILING. Rule 4 compares each
+#      rung's *hardest* problem, so a unit that starts at Medium and stays
+#      there passes it cleanly — which is how a dozen units came to label their
+#      first rung "Warm up" while opening at their own maximum difficulty. A
+#      unit with more than four problems must open with an Intro or an Easy.
 #
 # Progress is NOT stored here and needs no new table: a unit's state is derived
 # from the solved status the app already records per problem.
@@ -242,6 +247,13 @@ _DIFF_RANK = {"Intro": 0, "Easy": 1, "Medium": 2, "Hard": 3}
 # position rather than by thought.
 _MAX_CHAIN_RUN = 2
 
+_RANK_NAME = {v: k for k, v in _DIFF_RANK.items()}
+
+# A unit with this many problems or fewer is exempt from the on-ramp rule: it
+# is too short to wall anyone off, and inventing an Easy problem to satisfy a
+# lint would be the tail wagging the dog.
+_ONRAMP_MIN_UNIT = 4
+
 
 def _check_curriculum(cur, concepts, problems):
     """`concepts` maps key → concept; `problems` maps slug → problem dict."""
@@ -299,6 +311,9 @@ def _check_curriculum(cur, concepts, problems):
                 assert lk in concepts, f"{key}: unknown concept key {lk!r}"
 
             last_rank = -1
+            first_rung_floor = None   # easiest problem on the opening rung
+            unit_ceiling = -1         # hardest problem anywhere in the unit
+            unit_n = 0
             for r in u["rungs"]:
                 assert r["slugs"], f"{key}/{r['title']}: empty rung"
                 assert r["purpose"], f"{key}/{r['title']}: no purpose"
@@ -321,6 +336,26 @@ def _check_curriculum(cur, concepts, problems):
                     f"{key}: rung {r['title']!r} is easier than the rung before it"
                 )
                 last_rank = rank
+                unit_ceiling = max(unit_ceiling, rank)
+                unit_n += len(r["slugs"])
+                if first_rung_floor is None:
+                    first_rung_floor = min(ranks)
+
+            # Rule 5 — a substantial unit opens below its ceiling. Expressed as
+            # "opens on an Intro or an Easy" rather than "one rank below the
+            # hardest", because the latter is satisfied by a unit that is ten
+            # Mediums and two Hards — which is precisely the shape being
+            # rejected. Scoped to units with more than four problems: a
+            # three-problem unit has no room for an on-ramp and does not need
+            # one, since it is over before it can wall anybody off.
+            if unit_n > _ONRAMP_MIN_UNIT and first_rung_floor > _DIFF_RANK["Easy"]:
+                floor_name = _RANK_NAME[first_rung_floor]
+                raise AssertionError(
+                    f"{key}: {unit_n} problems and the first rung "
+                    f"({u['rungs'][0]['title']!r}) opens at {floor_name}. A first rung "
+                    f"at the unit's ceiling is a wall with a warm-up's label on it — "
+                    f"author an Intro or Easy entry problem (see tools/dsa_onramps.py)."
+                )
 
     # Rule 1, the other half — every problem is reachable from the curriculum.
     unplaced = sorted(set(problems) - set(seen_slugs))
