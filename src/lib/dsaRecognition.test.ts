@@ -91,6 +91,7 @@ function unit(key: string, title: string, slugs: string[], signals: Signal[] = [
     pitfalls: [],
     lessons: [],
     checks: [],
+    bigo: [],
     interview: "",
     rungs: [rung("Core", slugs)],
     build_it: "",

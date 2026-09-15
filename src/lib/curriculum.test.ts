@@ -78,6 +78,7 @@ function unit(key: string, rungs: Rung[], prereqs: string[] = []): CurriculumUni
     pitfalls: [],
     lessons: [],
     checks: [],
+    bigo: [],
     interview: "",
     rungs,
     build_it: "",

@@ -159,7 +159,127 @@ for (char c : s.toCharArray()) freq[c - 'a']++;
              "Sorting is O(n log n); a single call can dominate everything around it.",
              "State the complexity of every library call you make, not just your loops."),
     ],
-    lessons=["big_o", "alg_big_o", "alg_analyzing", "alg_space"],
+    lessons=["big_o", "alg_big_o", "alg_analyzing", "alg_space",
+             "alg_pattern_recognition"],
+    bigo=[
+        _bigo(
+            """
+long sum = 0;
+for (int i = 0; i < n; i++) sum += a[i];
+""",
+            "O(n)", ["O(1)", "O(log n)", "O(n)", "O(n log n)"],
+            "One pass, one constant-time body. The floor for any problem that has to look "
+            "at every element.",
+        ),
+        _bigo(
+            """
+for (int i = 0; i < n; i++)
+    for (int j = i + 1; j < n; j++)
+        if (a[i] + a[j] == target) count++;
+""",
+            "O(n²)", ["O(n)", "O(n log n)", "O(n²)", "O(2ⁿ)"],
+            "n(n−1)/2 pairs. Starting the inner loop at `i + 1` halves the work and changes "
+            "nothing asymptotically — a constant factor is not a complexity.",
+        ),
+        _bigo(
+            """
+while (n > 0) {
+    total += n % 10;
+    n /= 10;
+}
+""",
+            "O(log n)", ["O(1)", "O(log n)", "O(n)", "O(√n)"],
+            "One iteration per *digit*, so ⌊log₁₀ n⌋ + 1 — at most 10 for an `int`. Note that "
+            "this is log in the **value** of n, not in the size of a collection. Calling it "
+            "O(1) because it never exceeds 10 is defensible in conversation and wrong on "
+            "paper; say which you mean.",
+        ),
+        _bigo(
+            """
+Arrays.sort(a);
+for (int x : a) if (set.contains(x)) hits++;
+""",
+            "O(n log n)", ["O(n)", "O(n log n)", "O(n²)", "O(log n)"],
+            "The sort dominates: O(n log n) + O(n) = O(n log n). The library call is where "
+            "the cost is, which is exactly the habit this unit is for — price the calls, not "
+            "just your own loops.",
+        ),
+        _bigo(
+            """
+for (int x : a)
+    if (list.contains(x)) hits++;   // list is an ArrayList
+""",
+            "O(n²)", ["O(n)", "O(n log n)", "O(n²)", "O(1)"],
+            "`ArrayList.contains` is a linear scan, so an O(n) operation is nested inside an "
+            "O(n) loop. This is the single most common accidental quadratic in real code, and "
+            "it does not *look* nested. Swap the list for a `HashSet` and it is O(n).",
+        ),
+        _bigo(
+            """
+for (int i = 1; i < n; i *= 2)
+    for (int j = 0; j < n; j++)
+        work++;
+""",
+            "O(n log n)", ["O(n)", "O(n log n)", "O(n²)", "O(log n)"],
+            "The outer loop *multiplies*, so it runs log₂ n times; the inner one runs n. "
+            "Nesting does not always mean squaring — read what the update does to the "
+            "counter, not how many `for`s there are.",
+        ),
+        _bigo(
+            """
+static int f(int n) {
+    if (n <= 1) return n;
+    return f(n - 1) + f(n - 2);
+}
+""",
+            "O(2ⁿ)", ["O(n)", "O(n²)", "O(2ⁿ)", "O(n log n)"],
+            "Two branches per call and depth n, so the call tree is exponential — about 1.6ⁿ "
+            "to be precise, since it is the Fibonacci recurrence. Memoise it and the same "
+            "function is O(n), which is the whole DP stage in one edit.",
+        ),
+        _bigo(
+            """
+static int g(int n) {
+    if (n == 0) return 0;
+    return 1 + g(n - 1);
+}
+""",
+            "O(n) time, O(n) space",
+            ["O(n) time, O(1) space", "O(n) time, O(n) space",
+             "O(log n) time, O(1) space", "O(1) time, O(1) space"],
+            "Linear time, and linear **space** — every pending call holds a stack frame. "
+            "Deep recursion is a memory cost that looks free, and at n = 10⁶ it is a "
+            "`StackOverflowError` rather than a slow answer.",
+        ),
+        _bigo(
+            """
+for (int i = 0; i < n; i++) {
+    for (int j = 0; j < n; j++) sum += grid[i][j];
+}
+// n is the side length of an n × n grid
+""",
+            "O(n²), which is linear in the input size",
+            ["O(n)", "O(n²), which is linear in the input size", "O(n²), and unavoidably quadratic",
+             "O(n log n)"],
+            "Both readings are right and the distinction matters. The grid holds n² cells, so "
+            "reading all of them is O(n²) in n and O(size) in the actual input. Saying "
+            "\"quadratic\" without saying *in what* is how a linear-time grid scan gets "
+            "mistaken for something to optimise.",
+        ),
+        _bigo(
+            """
+int lo = 0, hi = n;
+while (lo < hi) {
+    int mid = lo + (hi - lo) / 2;
+    if (a[mid] < x) lo = mid + 1; else hi = mid;
+}
+""",
+            "O(log n)", ["O(1)", "O(log n)", "O(n)", "O(n log n)"],
+            "The range halves every iteration, so ⌈log₂ n⌉ iterations — 17 for 100,000 "
+            "elements. The cost of *getting* the array sorted is not counted here, and "
+            "forgetting to mention it is a common way to overstate a solution.",
+        ),
+    ],
     checks=[
         _chk("A problem says `1 ≤ n ≤ 200000`. Is an O(n²) solution acceptable?",
              "No — that is 4×10¹⁰ operations. The constraint is telling you to find an "

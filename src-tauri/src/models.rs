@@ -1326,6 +1326,24 @@ pub struct UnitCheck {
     pub a: String,
 }
 
+/// "What is the Big-O of this snippet?" — a graded drill, not a problem.
+///
+/// The complexity unit teaches pricing code and had no way to practise it: every
+/// problem in it can be solved without once *stating* a complexity. Reading a
+/// snippet and pricing it has nothing to submit to a judge, so it lives on the
+/// unit page and is scheduled like a self-check.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct BigOItem {
+    pub code: String,
+    pub answer: String,
+    /// Includes `answer`; at least three, so it is not a coin toss.
+    #[serde(default)]
+    pub options: Vec<String>,
+    /// Markdown. Required — the answers are memorable without the understanding.
+    #[serde(default)]
+    pub why: String,
+}
+
 /// A worked trace: the structure's state, one row per step.
 ///
 /// Generic headers + rows rather than a fixed shape, because a monotonic stack
@@ -1412,6 +1430,9 @@ pub struct CurriculumUnit {
     pub lessons: Vec<String>,
     #[serde(default)]
     pub checks: Vec<UnitCheck>,
+    /// Graded Big-O drill items. Carried by the complexity unit; empty elsewhere.
+    #[serde(default)]
+    pub bigo: Vec<BigOItem>,
     /// Markdown: what interviewers actually probe here.
     #[serde(default)]
     pub interview: String,

@@ -146,7 +146,7 @@ System.out.println(total);
              "Integer division truncates toward zero rather than rounding.",
              "For a ceiling of `a / b` with positive values, write `(a + b - 1) / b`."),
     ],
-    lessons=["io_basics", "variables", "arithmetic", "overflow"],
+    lessons=["alg_what_is", "io_basics", "variables", "arithmetic", "overflow"],
     checks=[
         _chk("What does `7 / 2` evaluate to in Java, and what about `-7 / 2`?",
              "`3` and `-3`. Integer division truncates **toward zero**, so the negative "

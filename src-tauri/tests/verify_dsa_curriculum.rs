@@ -206,6 +206,29 @@ fn curriculum_teaches_every_problem_exactly_once() {
         }
     }
 
+    // The mirror of rule 2, for lessons. Every problem is reachable from the
+    // curriculum; so should every *algorithms* concept be. `alg_*` and `ds_*`
+    // are the algorithm-and-structure lessons this curriculum is a path
+    // through, and one no unit links is reachable only by browsing Learn and
+    // guessing. Language concepts are deliberately excluded — the DSA
+    // curriculum is not the Java course.
+    let linked: HashSet<&str> = curriculum
+        .stages
+        .iter()
+        .flat_map(|s| &s.units)
+        .flat_map(|u| u.lessons.iter().map(|l| l.as_str()))
+        .collect();
+    let unlinked: Vec<&str> = concepts
+        .iter()
+        .map(|c| c.key.as_str())
+        .filter(|k| (k.starts_with("alg_") || k.starts_with("ds_")) && !linked.contains(k))
+        .collect();
+    assert!(
+        unlinked.is_empty(),
+        "{} algorithm concept(s) are linked by no unit: {unlinked:?}",
+        unlinked.len()
+    );
+
     // 2, the other half — no problem is unreachable from the curriculum.
     let unplaced: Vec<&str> = problems
         .iter()
@@ -247,6 +270,23 @@ fn every_unit_carries_its_teaching_surface() {
             }
             for c in &u.checks {
                 assert!(!c.a.trim().is_empty(), "{k}: check '{}' has no answer", c.q);
+            }
+            for (i, b) in u.bigo.iter().enumerate() {
+                assert!(!b.code.trim().is_empty(), "{k}: Big-O item {i} has no snippet");
+                assert!(
+                    b.options.len() >= 3,
+                    "{k}: Big-O item {i} has {} options — fewer than three is a coin toss",
+                    b.options.len()
+                );
+                assert!(
+                    b.options.contains(&b.answer),
+                    "{k}: Big-O item {i} answer is not among its options"
+                );
+                assert!(
+                    !b.why.trim().is_empty(),
+                    "{k}: Big-O item {i} has no explanation — the answers are memorable \
+                     enough to survive without the understanding, which is the failure"
+                );
             }
         }
     }

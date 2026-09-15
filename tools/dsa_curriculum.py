@@ -107,6 +107,25 @@ def _chk(q, a):
     return {"q": q, "a": a}
 
 
+def _bigo(code, answer, options, why):
+    """One "what is the Big-O of this snippet?" item, graded.
+
+    The complexity unit had three problems and no way to practise the thing it
+    teaches: you can solve every problem in it without ever once *stating* a
+    complexity, which is the opposite of the skill. Reading a snippet and
+    pricing it is a drill, not a problem — it takes fifteen seconds and there is
+    nothing to submit to a judge — so it lives on the unit page and is scheduled
+    like a self-check.
+
+    `why` is required. An answer without the reason it is the answer teaches the
+    answer, and the answers are memorable enough to survive without the
+    understanding.
+    """
+    assert answer in options, f"Big-O item answer {answer!r} is not among its options"
+    return {"code": code.lstrip("\n").rstrip() + "\n", "answer": answer,
+            "options": list(options), "why": _md(why)}
+
+
 def _trace(title, intro, headers, rows, takeaway=""):
     """A worked trace: the structure's state, one step per row.
 
@@ -148,7 +167,7 @@ def _extra(title, purpose, slugs, notes=None):
 def _unit(key, title, icon, stage, tagline, why, model,
           prereqs=(), signals=(), skeletons=(), costs=(), pitfalls=(),
           lessons=(), checks=(), interview="", rungs=(), next_up="",
-          internals="", traces=(), build_it="", weight=2):
+          internals="", traces=(), build_it="", weight=2, bigo=()):
     """One technique, taught.
 
     `weight` is **interview yield**, 1-3, and it exists to stop the bank's
@@ -192,6 +211,7 @@ def _unit(key, title, icon, stage, tagline, why, model,
         "pitfalls": list(pitfalls),
         "lessons": list(lessons),
         "checks": list(checks),
+        "bigo": list(bigo),
         "interview": _md(interview),
         "rungs": list(rungs),
         "build_it": _md(build_it),
@@ -324,6 +344,7 @@ def _check_curriculum(cur, concepts, problems):
     chain_run = 0  # consecutive units whose prereqs are exactly [previous unit]
     weights = {}   # unit key -> (weight, required problems, total problems)
     stage_of = {}  # unit key -> stage index, so the ledger can skip foundations
+    linked_concepts = set()
 
     for si, stage in enumerate(cur["stages"]):
         assert stage["units"], f"stage {stage['key']}: no units"
@@ -385,6 +406,22 @@ def _check_curriculum(cur, concepts, problems):
             # Rule 2 — no dangling references.
             for lk in u["lessons"]:
                 assert lk in concepts, f"{key}: unknown concept key {lk!r}"
+                linked_concepts.add(lk)
+
+            # Big-O drill items, where a unit carries them.
+            for i, b in enumerate(u["bigo"]):
+                assert b["code"].strip(), f"{key}: Big-O item {i} has no snippet"
+                assert len(b["options"]) >= 3, \
+                    f"{key}: Big-O item {i} has {len(b['options'])} options — fewer than " \
+                    f"three is a coin toss"
+                assert len(set(b["options"])) == len(b["options"]), \
+                    f"{key}: Big-O item {i} repeats an option"
+                assert b["answer"] in b["options"], \
+                    f"{key}: Big-O item {i} answer is not among its options"
+                assert b["why"].strip(), (
+                    f"{key}: Big-O item {i} has no explanation. The answers are memorable "
+                    f"enough to survive without the understanding, which is the failure."
+                )
 
             # Authored depth cannot regress.
             if key in _NEEDS_INTERNALS:
@@ -477,6 +514,21 @@ def _check_curriculum(cur, concepts, problems):
         f"{len(unplaced)} problem(s) belong to no unit: {unplaced[:12]}"
         + (" …" if len(unplaced) > 12 else "")
     )
+    # The mirror of Rule 1, for lessons. Every problem is reachable from the
+    # curriculum; so should every *algorithms* concept be. `alg_*` and `ds_*`
+    # are the algorithm-and-structure lessons — the ones this curriculum is a
+    # path through — and one no unit links is a lesson only reachable by
+    # browsing the Learn tab and guessing. (Language concepts are deliberately
+    # not covered: the DSA curriculum is not the Java course.)
+    unlinked = sorted(
+        k for k in concepts
+        if k.startswith(("alg_", "ds_")) and k not in linked_concepts
+    )
+    assert not unlinked, (
+        f"{len(unlinked)} algorithm concept(s) are linked by no unit: {unlinked}. "
+        f"Add each to the `lessons` of the unit that teaches it."
+    )
+
     _check_weight_bands(weights, stage_of, order)
     return len(seen_units), len(seen_slugs)
 

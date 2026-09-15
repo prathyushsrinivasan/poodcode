@@ -28,6 +28,12 @@ export function checkCardId(unitKey: string, index: number): string {
   return `dsa-check:${unitKey}:${index}`;
 }
 
+/** Stable card id for one Big-O drill item, namespaced apart from the checks so
+ * the two decks schedule independently. */
+export function bigoCardId(unitKey: string, index: number): string {
+  return `dsa-bigo:${unitKey}:${index}`;
+}
+
 /** Today as `YYYY-MM-DD` in the *local* zone, matching what the backend stores. */
 export function todayISO(now: Date = new Date()): string {
   const y = now.getFullYear();
@@ -49,19 +55,33 @@ export interface UnitChecks {
   total: number;
 }
 
-export function unitChecks(
-  u: HydratedUnit,
+/** Due / started / total over any set of card ids. */
+export function cardStats(
+  ids: string[],
   reviews: Map<string, CardReview>,
   today: string
 ): UnitChecks {
   let due = 0;
   let started = 0;
-  u.unit.checks.forEach((_, i) => {
-    const r = reviews.get(checkCardId(u.unit.key, i));
-    if (r && r.reps > 0) started++;
+  for (const id of ids) {
+    const r = reviews.get(id);
+    // `reps` resets to 0 on a lapse, so a card you have failed is still started.
+    if (r && (r.reps > 0 || r.lapses > 0)) started++;
     if (isCardDue(r, today)) due++;
-  });
-  return { due, started, total: u.unit.checks.length };
+  }
+  return { due, started, total: ids.length };
+}
+
+export function unitChecks(
+  u: HydratedUnit,
+  reviews: Map<string, CardReview>,
+  today: string
+): UnitChecks {
+  return cardStats(
+    u.unit.checks.map((_, i) => checkCardId(u.unit.key, i)),
+    reviews,
+    today
+  );
 }
 
 /**

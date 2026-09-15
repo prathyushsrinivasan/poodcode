@@ -844,7 +844,7 @@ for (int mask = 0; mask < (1 << n); mask++) {
              "XOR cancels *pairs*; a triple leaves one copy behind.",
              "Use counting (or bitwise counts mod 3) when the multiplicity is not two."),
     ],
-    lessons=["bit_manip"],
+    lessons=["bit_manip", "math_digits", "arithmetic", "overflow"],
     checks=[
         _chk("Why does XOR-ing an array where every value appears twice leave the loner?",
              "XOR is commutative and associative and `x ^ x == 0`, so order is irrelevant "

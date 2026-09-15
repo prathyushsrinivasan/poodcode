@@ -563,6 +563,21 @@ export interface UnitCheck {
   a: string;
 }
 
+/** "What is the Big-O of this snippet?" — a graded drill, not a problem.
+ *
+ * The complexity unit teaches pricing code and had no way to practise it: you
+ * can solve every problem in it without once *stating* a complexity. Reading a
+ * snippet and pricing it takes fifteen seconds and has nothing to submit, so it
+ * lives on the unit page and is scheduled like a self-check. */
+export interface BigOItem {
+  code: string;
+  answer: string;
+  /** Includes `answer`; at least three, so it is not a coin toss. */
+  options: string[];
+  /** Markdown. Required — the answers are memorable without the understanding. */
+  why: string;
+}
+
 /** A worked trace: the structure's state, one row per step.
  *
  * Generic headers + rows, because a monotonic stack wants (index, value, stack,
@@ -619,6 +634,8 @@ export interface CurriculumUnit {
   /** Concept keys in the Learn catalog that go deeper on this unit. */
   lessons: string[];
   checks: UnitCheck[];
+  /** Graded Big-O drill items. Carried by the complexity unit; `[]` elsewhere. */
+  bigo: BigOItem[];
   interview: string;
   rungs: Rung[];
   /** Write it from scratch — optional depth, same as `internals`. */

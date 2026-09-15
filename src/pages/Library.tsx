@@ -15,12 +15,15 @@ import { reviewLane, type ReviewLane } from "../lib/dsaReview";
  * The old page was a filterable table of every problem — perfect for "find the
  * one I mean", useless for "what should I learn next". That table has not gone
  * anywhere (it is `/library/browse`); this page is the answer to the second
- * question: six stages, thirty-two units, every problem in the bank placed on
- * exactly one teaching ladder, from `System.out.println` to tries and Dijkstra.
+ * question: every problem in the bank placed on exactly one teaching ladder, in
+ * stages, from `System.out.println` to tries and Dijkstra. The stage and unit
+ * counts are rendered from the seed rather than stated here — the previous
+ * version of this comment said "thirty-two units" while shipping 33.
  *
  * Nothing here is locked. A unit whose prerequisites are unfinished is marked
  * "builds on …" and is still openable, because someone who already knows heaps
- * should not have to solve their way past stacks to prove it.
+ * should not have to solve their way past stacks to prove it. A unit can also be
+ * marked known outright, which reads as cleared without claiming it was earned.
  */
 export default function Library() {
   const { data, error } = useCurriculumData();
@@ -51,6 +54,8 @@ export default function Library() {
   if (!data) return <div className="empty" style={{ paddingTop: "20vh" }}>Loading…</div>;
 
   const pct = data.total ? Math.round((data.solved / data.total) * 100) : 0;
+  // Derived, not stated: the comment this replaced claimed thirty-two.
+  const unitCount = data.stages.reduce((n, s) => n + s.units.length, 0);
 
   return (
     <div className="page page-wide">
@@ -59,7 +64,17 @@ export default function Library() {
         <span className="spacer" />
         <button onClick={() => nav("/library/browse")}>🔎 Browse all problems</button>
       </div>
-      <p className="page-sub">{data.subtitle}</p>
+      <p className="page-sub">
+        {data.subtitle}
+        {data.stages.length > 0 && (
+          <>
+            {" "}
+            <span className="faint">
+              — {data.stages.length} stages, {unitCount} units, {data.total} problems.
+            </span>
+          </>
+        )}
+      </p>
 
       {/* Overall progress + where to go next. */}
       <div className="card" style={{ marginBottom: 16 }}>

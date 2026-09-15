@@ -219,30 +219,62 @@ not. So each of its six units also has:
   sorted, with no exception anywhere, is why the invariant has to hold by
   construction.
 
-Four rules are enforced at generation time rather than promised in prose, and
+These rules are enforced at generation time rather than promised in prose, and
 re-asserted against the committed seed by
 `src-tauri/tests/verify_dsa_curriculum.rs`:
 
 - **Every problem is placed exactly once.** The curriculum and the library are
   the same 271 problems, so nothing is unreachable and "what is next?" is never
   ambiguous.
+- **Every `alg_*`/`ds_*` lesson is linked by some unit** — the mirror of the
+  above for Learn: an algorithms lesson no unit points at is reachable only by
+  browsing and guessing.
 - **No dangling references** — every problem slug and every concept key must
-  resolve.
-- **Prerequisites point backwards**, so the ladder walks top to bottom.
+  resolve, and unit titles must be unique (the recognition drill offers them as
+  multiple-choice answers).
+- **Prerequisites point backwards, and are not a chain** — past foundations, a
+  run of units whose only prereq is the one before them is rejected: that is the
+  absence of a dependency graph rather than a shallow one.
 - **Rungs climb** — within a unit, difficulty never decreases.
+- **Every substantial unit opens below its ceiling** — a unit of more than four
+  problems starts on an Intro or an Easy, so "Warm up" is a description rather
+  than a label. Optional "Extra practice" rungs are exempt and must come last.
 - **Traces are well-formed** — every row the same width as its header, at least
   two rows (a one-step trace shows nothing changing), and a takeaway, because
   the table is never the point.
-- **Structure units explain themselves** — every unit in the linear-structures
-  stage must carry internals, a trace and a build-it exercise.
+- **Authored depth cannot regress** — the units that carry internals, traces or
+  a build-it exercise are named explicitly, and losing one fails the build.
+
+One rule is deliberately *not* an assertion. Each unit carries a `weight` (1-3,
+interview yield) with a target problem-count band, and units outside their band
+are **printed as a ledger** at generation time. A thin unit is a statement about
+the syllabus, not malformed data; failing the build on it would block every
+unrelated change until somebody authored four greedy problems.
 
 Nothing is locked. A unit whose prerequisites are unfinished is marked "builds
 on …" and opens anyway, because someone who already knows heaps should not have
-to solve their way past stacks to prove it. There is also **no progress table**:
-a unit's state is derived from the solved status the `problems` table already
-records, so a problem solved from Browse, Random Practice or a Mastery week
-counts here immediately, and the curriculum can be re-sequenced without a
-migration.
+to solve their way past stacks to prove it — and a unit can be marked **known**
+outright, which reads as cleared without claiming it was earned. There is also
+**no progress table**: a unit's state is derived from the solved status the
+`problems` table already records, so a problem solved from Browse, Random
+Practice or a Mastery week counts here immediately, and the curriculum can be
+re-sequenced without a migration.
+
+Three things keep it from becoming a checklist you clear once:
+
+- **The self-checks are scheduled.** Each of the ~150 authored questions is a
+  card in the same `card_reviews` table the Learn decks use, graded had-it /
+  forgot. The complexity unit adds graded "price this snippet" items.
+- **Cleared units decay.** Clearing buys 30 days and finishing buys 90; past
+  that a unit renders muted with its last-practised date, because at month three
+  a green unit and a *remembered* unit are otherwise indistinguishable. The
+  review lane on `/library` says what is due.
+- **Recognition is drilled separately from implementation.** A per-stage mixed
+  set (`/library/mixed/:stage`) draws unlabelled problems from that stage and
+  every earlier one and asks which technique the prompt wants, with distractors
+  from sibling units — then shows the signals row you should have spotted. A
+  placement diagnostic (`/library/placement`) is the same pair of questions used
+  to skip a stage you already know.
 
 The original flat library is still there as **Browse** (`/library/browse`) with
 every filter and the weakness predicates intact, plus one new column — which

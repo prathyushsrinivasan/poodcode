@@ -1,13 +1,21 @@
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { api } from "../api";
-import type { CardReview, Concept, Trace, UnitCheck } from "../types";
+import type { BigOItem, CardReview, Concept, Trace, UnitCheck } from "../types";
 import { Markdown, InlineMarkdown } from "../components/Markdown";
 import { Section, useCollapse } from "../components/Collapsible";
 import { ClickableRow, Confidence, DiffBadge, Empty } from "../components/common";
 import { StatusBadge, UnitProgress, useCurriculumData } from "../components/CurriculumData";
 import { findUnit, neighbours, type HydratedRung } from "../lib/curriculum";
-import { checkCardId, isCardDue, isSlowSolve, todayISO, unitChecks } from "../lib/dsaReview";
+import {
+  bigoCardId,
+  cardStats,
+  checkCardId,
+  isCardDue,
+  isSlowSolve,
+  todayISO,
+  unitChecks,
+} from "../lib/dsaReview";
 
 /**
  * One unit of the DSA curriculum: a technique, taught, then drilled.
@@ -42,8 +50,7 @@ export default function CurriculumUnit() {
       .catch(() => {});
   }, []);
 
-  const gradeCheck = useCallback(async (index: number, remembered: boolean) => {
-    const id = checkCardId(key, index);
+  const grade = useCallback(async (id: string, remembered: boolean) => {
     try {
       // Remembered → "Good" (2), forgot → "Again" (0). Two buttons rather than
       // four: a self-check you had to think about is not a different outcome
@@ -54,7 +61,16 @@ export default function CurriculumUnit() {
     } catch {
       /* grading is a convenience; a failed write must not eat the answer */
     }
-  }, [key]);
+  }, []);
+
+  const gradeCheck = useCallback(
+    (index: number, remembered: boolean) => grade(checkCardId(key, index), remembered),
+    [grade, key]
+  );
+  const gradeBigO = useCallback(
+    (index: number, right: boolean) => grade(bigoCardId(key, index), right),
+    [grade, key]
+  );
 
   if (!data) return <div className="empty" style={{ paddingTop: "20vh" }}>Loading…</div>;
 
@@ -71,6 +87,7 @@ export default function CurriculumUnit() {
   const u = hydrated.unit;
   const today = todayISO();
   const checkStats = unitChecks(hydrated, reviews, today);
+  const bigoStats = cardStats(u.bigo.map((_, i) => bigoCardId(key, i)), reviews, today);
   const { prev, next } = neighbours(data, key);
   // For a stale unit, "re-practise" means a problem you already solved — the
   // point is to prove the technique is still there, not to meet a new one.
@@ -402,6 +419,35 @@ export default function CurriculumUnit() {
         </Section>
       )}
 
+      {u.bigo.length > 0 && (
+        <Section
+          title="⏳ Price the snippet"
+          open={isOpen("bigo")}
+          onToggle={() => toggle("bigo")}
+          meta={
+            <span className="dim mono">
+              {bigoStats.due > 0 ? `${bigoStats.due} due · ` : ""}
+              {bigoStats.started}/{bigoStats.total}
+            </span>
+          }
+        >
+          <p className="dim" style={{ marginTop: 0 }}>
+            You can solve every problem in this unit without once <em>stating</em> a
+            complexity, which is the opposite of the skill. Read, price, then check —
+            these are scheduled like the self-checks.
+          </p>
+          {u.bigo.map((b, i) => (
+            <BigOCard
+              key={i}
+              item={b}
+              review={reviews.get(bigoCardId(key, i))}
+              today={today}
+              onGrade={(right) => gradeBigO(i, right)}
+            />
+          ))}
+        </Section>
+      )}
+
       {u.interview && (
         <Section
           title="💼 In an interview"
@@ -543,6 +589,83 @@ function TraceTable({ trace }: { trace: Trace }) {
         <p className="dim" style={{ marginTop: 8 }}>
           <InlineMarkdown>{trace.takeaway}</InlineMarkdown>
         </p>
+      )}
+    </div>
+  );
+}
+
+/** One Big-O drill item: a snippet, four prices, and the reason.
+ *
+ * Unlike a self-check there is no "did you have it?" to self-report — the answer
+ * is multiple choice, so the grade is the choice. Self-grading a question with
+ * one right answer would only add a way to lie to yourself. */
+function BigOCard({
+  item,
+  review,
+  today,
+  onGrade,
+}: {
+  item: BigOItem;
+  review: CardReview | undefined;
+  today: string;
+  onGrade: (right: boolean) => void;
+}) {
+  const [picked, setPicked] = useState<string | null>(null);
+  const right = picked === item.answer;
+  const due = isCardDue(review, today);
+  const graded = (review?.reps ?? 0) > 0 || (review?.lapses ?? 0) > 0;
+
+  return (
+    <div className="card" style={{ marginBottom: 12, background: "var(--bg-elev-2)" }}>
+      <div className="row">
+        <span className="dim" style={{ fontSize: 13 }}>
+          What is the complexity?
+        </span>
+        <span className="spacer" />
+        {graded && !due && (
+          <span className="faint mono" style={{ fontSize: 12 }} title="Next review">
+            due {review!.due_date}
+          </span>
+        )}
+        {graded && due && (
+          <span className="badge" style={{ color: "var(--accent)", borderColor: "var(--accent)" }}>
+            due
+          </span>
+        )}
+      </div>
+      <Markdown>{"```java\n" + item.code + "```"}</Markdown>
+      <div className="grid cols-2">
+        {item.options.map((opt) => {
+          let border: string | undefined;
+          if (picked !== null) {
+            if (opt === item.answer) border = "var(--good)";
+            else if (opt === picked) border = "var(--bad)";
+          }
+          return (
+            <button
+              key={opt}
+              className="ghost"
+              style={{ textAlign: "left", borderColor: border, color: border, padding: "8px 10px" }}
+              disabled={picked !== null}
+              onClick={() => {
+                setPicked(opt);
+                onGrade(opt === item.answer);
+              }}
+            >
+              <span className="mono">{opt}</span>
+            </button>
+          );
+        })}
+      </div>
+      {picked !== null && (
+        <div style={{ marginTop: 10 }}>
+          <strong style={{ color: right ? "var(--good)" : "var(--bad)" }}>
+            {right ? "Correct." : `Not quite — it is ${item.answer}.`}
+          </strong>
+          <div className="dim" style={{ marginTop: 4 }}>
+            <Markdown>{item.why}</Markdown>
+          </div>
+        </div>
       )}
     </div>
   );

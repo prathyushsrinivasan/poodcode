@@ -103,6 +103,7 @@
             }
           ],
           "lessons": [
+            "alg_what_is",
             "io_basics",
             "variables",
             "arithmetic",
@@ -126,6 +127,7 @@
               "a": "Fail. The judge normalises trailing whitespace only — the text itself is compared exactly, capitalisation included."
             }
           ],
+          "bigo": [],
           "interview": "Nobody asks \"add two numbers\" in an interview — but every interview starts with\nyou restating the input format, and roughly a third of failed phone screens are\nreally *\"I never confirmed what the input looked like\"*. The habit this unit\nbuilds is the one that matters: read the format out loud, name the types, and\nsay where overflow could happen, before writing a line.\n",
           "rungs": [
             {
@@ -274,6 +276,7 @@
               "a": "`return n % 2 == 0;` — the comparison already produces the boolean."
             }
           ],
+          "bigo": [],
           "interview": "Interviewers read your case analysis as a proxy for your rigour. Saying *\"three\ncases: empty, single element, and the general one\"* before you type buys more\ncredit than any clever line you write afterwards — and it is the same habit that\ncatches the empty-array bug in the array unit.\n",
           "rungs": [
             {
@@ -429,6 +432,7 @@
               "a": "`-1` — the remainder keeps the sign of the left operand. A digit loop on a negative number therefore produces negative digits unless you `Math.abs` first."
             }
           ],
+          "bigo": [],
           "interview": "\"What is the complexity?\" gets asked about the code you just wrote, and a digit\nloop is the first place the honest answer is not O(n). Saying *O(log n) in the\nvalue of n, which is at most 10 iterations here* is a small thing that signals\nyou distinguish the size of the input from the size of the number in it.\n",
           "rungs": [
             {
@@ -619,6 +623,7 @@
               "a": "`a[i]` is O(1) address arithmetic; searching is O(n). Confusing the two is the root of most accidental O(n²) code."
             }
           ],
+          "bigo": [],
           "interview": "Every array interview opens with the same three questions, and asking them\nyourself scores the points: *Can it be empty? Can values be negative? How large\ncan the sum get?* Each maps directly onto a pitfall above — and each is a real\nbug in the code most candidates write when they skip them.\n",
           "rungs": [
             {
@@ -796,7 +801,8 @@
             "big_o",
             "alg_big_o",
             "alg_analyzing",
-            "alg_space"
+            "alg_space",
+            "alg_pattern_recognition"
           ],
           "checks": [
             {
@@ -818,6 +824,118 @@
             {
               "q": "`n ≤ 22` and the problem asks for every possible selection. What does that hint?",
               "a": "That 2ⁿ ≈ 4 million is the intended cost — enumerate the subsets, and do not hunt for a polynomial trick that probably does not exist."
+            }
+          ],
+          "bigo": [
+            {
+              "code": "long sum = 0;\nfor (int i = 0; i < n; i++) sum += a[i];\n",
+              "answer": "O(n)",
+              "options": [
+                "O(1)",
+                "O(log n)",
+                "O(n)",
+                "O(n log n)"
+              ],
+              "why": "One pass, one constant-time body. The floor for any problem that has to look at every element.\n"
+            },
+            {
+              "code": "for (int i = 0; i < n; i++)\n    for (int j = i + 1; j < n; j++)\n        if (a[i] + a[j] == target) count++;\n",
+              "answer": "O(n²)",
+              "options": [
+                "O(n)",
+                "O(n log n)",
+                "O(n²)",
+                "O(2ⁿ)"
+              ],
+              "why": "n(n−1)/2 pairs. Starting the inner loop at `i + 1` halves the work and changes nothing asymptotically — a constant factor is not a complexity.\n"
+            },
+            {
+              "code": "while (n > 0) {\n    total += n % 10;\n    n /= 10;\n}\n",
+              "answer": "O(log n)",
+              "options": [
+                "O(1)",
+                "O(log n)",
+                "O(n)",
+                "O(√n)"
+              ],
+              "why": "One iteration per *digit*, so ⌊log₁₀ n⌋ + 1 — at most 10 for an `int`. Note that this is log in the **value** of n, not in the size of a collection. Calling it O(1) because it never exceeds 10 is defensible in conversation and wrong on paper; say which you mean.\n"
+            },
+            {
+              "code": "Arrays.sort(a);\nfor (int x : a) if (set.contains(x)) hits++;\n",
+              "answer": "O(n log n)",
+              "options": [
+                "O(n)",
+                "O(n log n)",
+                "O(n²)",
+                "O(log n)"
+              ],
+              "why": "The sort dominates: O(n log n) + O(n) = O(n log n). The library call is where the cost is, which is exactly the habit this unit is for — price the calls, not just your own loops.\n"
+            },
+            {
+              "code": "for (int x : a)\n    if (list.contains(x)) hits++;   // list is an ArrayList\n",
+              "answer": "O(n²)",
+              "options": [
+                "O(n)",
+                "O(n log n)",
+                "O(n²)",
+                "O(1)"
+              ],
+              "why": "`ArrayList.contains` is a linear scan, so an O(n) operation is nested inside an O(n) loop. This is the single most common accidental quadratic in real code, and it does not *look* nested. Swap the list for a `HashSet` and it is O(n).\n"
+            },
+            {
+              "code": "for (int i = 1; i < n; i *= 2)\n    for (int j = 0; j < n; j++)\n        work++;\n",
+              "answer": "O(n log n)",
+              "options": [
+                "O(n)",
+                "O(n log n)",
+                "O(n²)",
+                "O(log n)"
+              ],
+              "why": "The outer loop *multiplies*, so it runs log₂ n times; the inner one runs n. Nesting does not always mean squaring — read what the update does to the counter, not how many `for`s there are.\n"
+            },
+            {
+              "code": "static int f(int n) {\n    if (n <= 1) return n;\n    return f(n - 1) + f(n - 2);\n}\n",
+              "answer": "O(2ⁿ)",
+              "options": [
+                "O(n)",
+                "O(n²)",
+                "O(2ⁿ)",
+                "O(n log n)"
+              ],
+              "why": "Two branches per call and depth n, so the call tree is exponential — about 1.6ⁿ to be precise, since it is the Fibonacci recurrence. Memoise it and the same function is O(n), which is the whole DP stage in one edit.\n"
+            },
+            {
+              "code": "static int g(int n) {\n    if (n == 0) return 0;\n    return 1 + g(n - 1);\n}\n",
+              "answer": "O(n) time, O(n) space",
+              "options": [
+                "O(n) time, O(1) space",
+                "O(n) time, O(n) space",
+                "O(log n) time, O(1) space",
+                "O(1) time, O(1) space"
+              ],
+              "why": "Linear time, and linear **space** — every pending call holds a stack frame. Deep recursion is a memory cost that looks free, and at n = 10⁶ it is a `StackOverflowError` rather than a slow answer.\n"
+            },
+            {
+              "code": "for (int i = 0; i < n; i++) {\n    for (int j = 0; j < n; j++) sum += grid[i][j];\n}\n// n is the side length of an n × n grid\n",
+              "answer": "O(n²), which is linear in the input size",
+              "options": [
+                "O(n)",
+                "O(n²), which is linear in the input size",
+                "O(n²), and unavoidably quadratic",
+                "O(n log n)"
+              ],
+              "why": "Both readings are right and the distinction matters. The grid holds n² cells, so reading all of them is O(n²) in n and O(size) in the actual input. Saying \"quadratic\" without saying *in what* is how a linear-time grid scan gets mistaken for something to optimise.\n"
+            },
+            {
+              "code": "int lo = 0, hi = n;\nwhile (lo < hi) {\n    int mid = lo + (hi - lo) / 2;\n    if (a[mid] < x) lo = mid + 1; else hi = mid;\n}\n",
+              "answer": "O(log n)",
+              "options": [
+                "O(1)",
+                "O(log n)",
+                "O(n)",
+                "O(n log n)"
+              ],
+              "why": "The range halves every iteration, so ⌈log₂ n⌉ iterations — 17 for 100,000 elements. The cost of *getting* the array sorted is not counted here, and forgetting to mention it is a common way to overstate a solution.\n"
             }
           ],
           "interview": "\"What is the time and space complexity?\" is asked in essentially every\ninterview, and the high-scoring version of the answer has three parts: the\ncomplexity, *why* (the loops that produce it), and whether it is optimal\n*given the constraints*. Volunteering the third part — \"this is O(n log n)\nbecause of the sort; O(n) is possible with counting since the values are\nbounded\" — is what separates a pass from a strong pass.\n",
@@ -1001,6 +1119,7 @@
               "a": "O(n) if every key collides. With well-distributed hashes it is O(1) average, and Java's map switches long buckets to trees, capping it at O(log n)."
             }
           ],
+          "bigo": [],
           "interview": "Hashing is the expected answer often enough that the interesting follow-up is\nalways *\"now do it without extra space\"*. That is your cue to look for sorting,\ntwo pointers, or an in-place marking trick — and to say out loud what you are\ngiving up: sorting costs O(n log n), and marking usually destroys the input.\n",
           "rungs": [
             {
@@ -1207,6 +1326,7 @@
               "a": "The area is `min(height) × width`. Narrowing loses width, so the only way to gain is a taller minimum — impossible while the short side stays."
             }
           ],
+          "bigo": [],
           "interview": "Two pointers is the canonical *\"optimise it\"* answer, and the points are in the\njustification, not the code. Interviewers listen for the invariant — \"if a\nsolution exists it lies within the window, and this comparison proves the\nelement I am dropping cannot be part of one\". Say that and the follow-up\nusually stops.\n",
           "rungs": [
             {
@@ -1409,6 +1529,7 @@
               "a": "One — `r - l + 1`. Getting this wrong is the most common off-by-one in the whole pattern."
             }
           ],
+          "bigo": [],
           "interview": "This pattern is asked by name, and the follow-up is always the complexity of\nthe nested loop. \"O(n), because the left pointer only moves forward and each\nelement enters and leaves the window exactly once\" is the answer being fished\nfor. Then be ready for *\"what if there are negative numbers?\"* — the honest\nanswer is that the window breaks and prefix sums take over.\n",
           "rungs": [
             {
@@ -1621,6 +1742,7 @@
               "a": "A single zero makes division undefined, and two zeros make every answer zero. Prefix × suffix handles both without a special case."
             }
           ],
+          "bigo": [],
           "interview": "Prefix sums are rarely the headline of a question — they are the step that makes\nthe headline tractable, which is why interviewers like them. The tell you are\nexpected to show is recognising that *\"many range queries\"* or *\"count the\nsubarrays\"* means preprocessing, and being able to say why the hash-map variant\nsurvives negative numbers when a sliding window does not.\n",
           "rungs": [
             {
@@ -1812,6 +1934,7 @@
               "a": "Sort both and compare: O(n log n). Count characters into `int[26]` and compare the tables: O(n). The second is preferred and also generalises to grouping."
             }
           ],
+          "bigo": [],
           "interview": "String questions are rarely about strings — they are array questions wearing a\ncostume, plus one Java-specific trap the interviewer is watching for. Reaching\nfor `StringBuilder` unprompted, and saying \"`substring` copies, so I will\ncompare in place\", both register as production instincts rather than\ncompetitive-programming ones.\n",
           "rungs": [
             {
@@ -2017,6 +2140,7 @@
               "a": "Equal elements keep their input order. You need it when you sort by one key and rely on a previous sort to break ties."
             }
           ],
+          "bigo": [],
           "interview": "The sorting question in an interview is almost never \"implement quicksort\" — it\nis \"you sorted; did you need to?\". Have the three alternatives ready: counting\nsort when the range is small, a heap when you want the top k, quickselect when\nyou want exactly the k-th. Naming the trade-off unprompted is the answer they\nare listening for.\n",
           "rungs": [
             {
@@ -2290,6 +2414,7 @@
               "a": "The feasibility predicate must be monotone: once it becomes true it stays true as the candidate grows (or the reverse, consistently)."
             }
           ],
+          "bigo": [],
           "interview": "Binary search is where interviewers watch you handle boundaries under mild\npressure, so having one memorised template that you never modify is worth more\nthan cleverness. And when a problem says *\"minimum X such that it is possible\"*,\nsaying \"that predicate looks monotone, so I can binary-search the answer and\njust write the feasibility check\" is one of the highest-signal sentences in the\nwhole interview vocabulary.\n",
           "rungs": [
             {
@@ -2502,6 +2627,7 @@
               "a": "Only for canonical denomination systems such as `{1, 5, 10, 25}`. For arbitrary coin sets it can be wrong, and dynamic programming is required."
             }
           ],
+          "bigo": [],
           "interview": "Pure number theory is rare in interviews, but √n and gcd show up as *steps*\ninside larger problems — and the follow-up is always \"why is that enough?\".\nBoth proofs above are one sentence long, and being able to produce them\ndistinguishes someone who knows the trick from someone who knows why it works.\n",
           "rungs": [
             {
@@ -2681,7 +2807,10 @@
             }
           ],
           "lessons": [
-            "bit_manip"
+            "bit_manip",
+            "math_digits",
+            "arithmetic",
+            "overflow"
           ],
           "checks": [
             {
@@ -2701,6 +2830,7 @@
               "a": "`i >> 1` is i without its lowest bit — a smaller, already-computed value — and `i & 1` adds that bit back. It is a recurrence, i.e. dynamic programming."
             }
           ],
+          "bigo": [],
           "interview": "Bit tricks are a bonus, not a core competency: the wrong move is opening with\none where a hash map is clearer. The right move is offering it as the follow-up\n— *\"if you want O(1) space and each value appears exactly twice, XOR does it\"* —\nand being able to say why the algebra works.\n",
           "rungs": [
             {
@@ -2907,6 +3037,7 @@
               "a": "Without re-checking `top <= bot` before the bottom edge, the same row is emitted twice — once left-to-right, once right-to-left."
             }
           ],
+          "bigo": [],
           "interview": "Simulation questions look easy and eliminate people, because the grader is\nexact and the specification has more cases than it first appears. The winning\napproach is visible discipline: restate the rule, name the update order,\nenumerate the edge cases (first row, last column, 1×n grid), *then* type. And\nwhen asked for O(1) space, explain the encoding before writing it.\n",
           "rungs": [
             {
@@ -3270,6 +3401,7 @@
               "a": "Bar j's rectangle extends left past j, over every bar already popped because it was taller. The new stack top is the first bar too short to be included, so the span is everything strictly between it and i."
             }
           ],
+          "bigo": [],
           "interview": "The monotonic stack is one of the few patterns an interviewer will accept as a\ncomplete answer the moment you name it — but only with the amortisation\nargument attached. \"Each index enters and leaves the stack once, so the pass is\nO(n)\" is the sentence. Without it, the nested `while` reads as O(n²) and you\nwill be asked to defend it anyway. The same sentence, in its other form —\n\"`ArrayDeque` doubles and copies, so push is amortised O(1)\" — is the answer to\nthe follow-up about the structure itself.\n",
           "rungs": [
             {
@@ -3616,6 +3748,7 @@
               "a": "O(n) in the worst case for a single pop, O(1) **amortised**, because each element is poured from `in` to `out` at most once in its lifetime."
             }
           ],
+          "bigo": [],
           "interview": "Two sentences carry this unit. For BFS: *\"a queue returns things in arrival\norder, and arrival order is distance order — that is why the first time we\nreach a node is via a shortest path.\"* For the window maximum: *\"an element\nthat is smaller and older than the one arriving can never be the answer again,\nso I drop it from the back; the front only ever leaves because it expired.\"*\n\nInterviewers also like the `ArrayDeque`-versus-`LinkedList` question precisely\nbecause both are O(1) — it separates people who read the complexity table from\npeople who know what the structure is made of.\n",
           "rungs": [
             {
@@ -3970,6 +4103,7 @@
               "a": "When something else already hands you the node — a hash map, say — and you need to splice or move it in O(1). That is the LRU cache, and it needs the list to be doubly linked."
             }
           ],
+          "bigo": [],
           "interview": "Linked-list questions are about care, not insight, and interviewers watch for\none specific habit: drawing the pointers. Sketch three nodes, execute your loop\non them by hand, and say which pointer is where after each line — the reversal\ntrace above is exactly what they want to see you produce. Candidates who do\nthis get the code right the first time; candidates who type from memory spend\nthe rest of the slot debugging.\n",
           "rungs": [
             {
@@ -4328,6 +4462,7 @@
               "a": "Every element enters through the opposite heap before rebalancing, which guarantees every value in the low half is ≤ every value in the high half."
             }
           ],
+          "bigo": [],
           "interview": "Heaps are the standard answer to \"k largest\" and the standard *follow-up* to a\nsorting solution, so the cleanest thing you can do is offer both and price them:\n\"sorting is O(n log n); a size-k min-heap is O(n log k) and streams\". Then be\nready for the third step — quickselect at O(n) average — and for why you might\nstill not choose it (worst-case O(n²), and it needs the whole array in memory).\n\nIf asked how a heap works, answer with the array, not with a picture of a tree:\n`2i+1`, `2i+2`, sift up, sift down, height log n. That answer also gets you the\nO(n) build-heap question for free, which is a common follow-up precisely because\nmost candidates assume it is O(n log n).\n",
           "rungs": [
             {
@@ -4670,6 +4805,7 @@
               "a": "No ordering, no minimum, no range queries. Each is supplied by bolting on a second structure that holds references into the map's data — a list for recency, a heap for extremes, a sorted list for time."
             }
           ],
+          "bigo": [],
           "interview": "Design questions are where the interview stops being a quiz. Talk through the\noperation/cost table out loud before writing anything — it is the reasoning\nbeing assessed, and it is also how you catch the impossible requirement early.\nThree sentences worth having ready: *\"a hash map gives me O(1) lookup and a\ndoubly linked list gives me O(1) reordering, so together they give me both\"*,\n*\"that is amortised O(1), because each element moves at most once\"*, and — for\nthe LRU itself — *\"this one is worst-case O(1), not amortised\"*.\n",
           "rungs": [
             {
@@ -4892,6 +5028,7 @@
               "a": "Calling it twice doubles the work at every level, collapsing O(log e) back to O(e). Storing it is the entire optimisation."
             }
           ],
+          "bigo": [],
           "interview": "Interviewers probe recursion by asking for the complexity and then for the\niterative version. Have both ready: the recurrence that gives the time bound,\nand the observation that depth is memory. And when a recursive solution is\nexponential, say *why* — \"the same subproblem appears on both branches, so I\nwill memoise\" is the sentence that turns a rejected answer into an accepted one.\n",
           "rungs": [
             {
@@ -5075,6 +5212,7 @@
               "a": "A path through a node may use both children, but a path that continues to the parent may use only one. So the record considers `l + r + val` while the return is `val + max(l, r)`."
             }
           ],
+          "bigo": [],
           "interview": "Trees are the most-asked structure in interviews, and the questions are\ndeliberately shallow — they want to see whether you can write a clean recursion\nunder mild pressure. Two habits score: stating the base case before the\nrecursive one, and saying the space complexity as O(h) rather than O(1),\nbecause the stack is real. When the tree could be skewed, mention it.\n",
           "rungs": [
             {
@@ -5307,6 +5445,7 @@
               "a": "When it is unbalanced. Sorted insertions produce a chain, making every operation O(n). Balanced variants (or `TreeMap`) restore the bound."
             }
           ],
+          "bigo": [],
           "interview": "The BST question that separates candidates is validation, and the tell is\nwhether you reach for bounds or for local comparisons. Offer both correct\napproaches — the range recursion and \"in-order must be increasing\" — and then\nnote the practical point: in production this is a `TreeMap`, because a hand-rolled\nBST degenerates on sorted input.\n",
           "rungs": [
             {
@@ -5665,6 +5804,7 @@
               "a": "Once sorted, if the current candidate already exceeds what remains, so does every later one — the whole tail of the loop is dead."
             }
           ],
+          "bigo": [],
           "interview": "Backtracking is graded on structure, not cleverness. Write the four lines —\nchoose, explore, un-choose, record — before filling in any logic, and the\ninterviewer can follow you. Then volunteer the complexity (2ⁿ or n!) and the\npruning: *\"I will sort first so I can break early, and skip equal values at the\nsame depth to avoid duplicates\"* covers everything they were going to ask.\n",
           "rungs": [
             {
@@ -5899,6 +6039,7 @@
               "a": "That an odd-length cycle exists, and therefore the graph is not bipartite."
             }
           ],
+          "bigo": [],
           "interview": "Graph questions are usually disguised: \"can these courses be finished\", \"how\nmany groups\", \"fewest moves\". The interview skill is *modelling* — saying out\nloud what the nodes are, what the edges are, and whether they are directed —\nbefore touching the traversal. Once that sentence exists, the code is a\ntemplate. And say why BFS: \"edges are unweighted, so BFS layers are distances\".\n",
           "rungs": [
             {
@@ -6103,6 +6244,7 @@
               "a": "Whenever more than one node has in-degree 0 at the same time. A priority queue then selects the lexicographically smallest valid order."
             }
           ],
+          "bigo": [],
           "interview": "Course-schedule questions are the most common graph problem in interviews, and\nthey are graded on the modelling sentence, not the algorithm: *\"nodes are\ncourses, an edge from prerequisite to dependent, and the question is whether a\ntopological order covering all nodes exists\"*. Say that, write Kahn's, then note\nthat the size check is the cycle detection. That is a complete answer in three\nminutes.\n",
           "rungs": [
             {
@@ -6387,6 +6529,7 @@
               "a": "When sets must be split, when direction matters, or when the question is about the path between nodes rather than mere membership."
             }
           ],
+          "bigo": [],
           "interview": "Union-find is a strong signal precisely because it is not the obvious answer.\nWhen edges arrive incrementally and the question is connectivity, naming DSU\nand quoting \"effectively constant, α(n) amortised\" reads as fluency. Be ready\nfor the comparison: a traversal answers the same question in O(V + E) *per\nquery*, which is why DSU wins as soon as there is more than one query.\n",
           "rungs": [
             {
@@ -6680,6 +6823,7 @@
               "a": "Replace the relaxation `d + w` with `max(d, w)`. The algorithm only requires that the combining function be monotone."
             }
           ],
+          "bigo": [],
           "interview": "Say which algorithm and *why the cheaper one does not apply*: \"weights differ,\nso BFS would not be correct — Dijkstra, O(E log V)\". Then have the two follow-ups\nready, because they are always the same: negative edges (Bellman-Ford) and a hop\nlimit (Bellman-Ford with k + 1 rounds and a snapshot). Knowing that Dijkstra is\n\"BFS with a priority queue\" is also the cleanest way to explain it under time\npressure.\n",
           "rungs": [
             {
@@ -6886,6 +7030,7 @@
               "a": "Switch to dynamic programming — and read the counterexample for the state: whatever the greedy step could not see is usually the missing dimension."
             }
           ],
+          "bigo": [],
           "interview": "The trap is that greedy code is short, so it is tempting to write it and move\non. Interviewers are listening for the justification. Two sentences settle it:\n*\"sorting by end time is safe because the earliest finish leaves the most room\"*,\nor *\"I tried to construct a case where a worse local choice pays off later and\ncould not\"*. If neither is available, say so and switch to DP — that judgement\nis itself the thing being tested.\n",
           "rungs": [
             {
@@ -7104,6 +7249,7 @@
               "a": "Merge all the busy intervals, then emit the gaps between consecutive merged blocks."
             }
           ],
+          "bigo": [],
           "interview": "Interval questions are a gift when you state the sort rule first: *\"merging, so\nI sort by start\"* or *\"maximum non-overlapping, so I sort by end — earliest\nfinish leaves the most room\"*. Then raise the endpoint question before the\ninterviewer does — does a meeting ending at 2 clash with one starting at 2? —\nbecause it is the ambiguity the test cases are built around.\n",
           "rungs": [
             {
@@ -7442,6 +7588,7 @@
               "a": "Only after the array version is correct, and only when the recurrence reads a fixed number of recent entries. It saves space and costs debuggability."
             }
           ],
+          "bigo": [],
           "interview": "Say the state definition out loud before writing anything: *\"`dp[i]` is the\nmaximum sum of a subarray ending at index i\"*. Interviewers accept a correct\nrecurrence immediately and reject a correct-looking table with no stated\nmeaning, because the second cannot be checked. Then offer the space\noptimisation as a follow-up rather than writing it first — showing you know it\nexists is worth as much as using it, and the array version is what you can\nactually debug on a whiteboard.\n",
           "rungs": [
             {
@@ -7748,6 +7895,7 @@
               "a": "Ascending lets an item be reused within the same pass (unbounded); descending reads only the previous item's values, enforcing one use (0/1)."
             }
           ],
+          "bigo": [],
           "interview": "Two-sequence DP is asked constantly and is one of the few places where being\nable to *draw the table* wins the interview. Fill a 3×3 example by hand while\nexplaining the three neighbours as replace, delete and insert; it takes ninety\nseconds and it proves the recurrence in a way that code cannot. Offer the\nrolled-row space optimisation at the end, after the table is right.\n",
           "rungs": [
             {
@@ -7964,6 +8112,7 @@
               "a": "Bits are inserted most-significant first, and a single higher bit outweighs every lower bit combined. So taking the opposite bit whenever it exists is always optimal."
             }
           ],
+          "bigo": [],
           "interview": "Naming the trie is most of the marks — it is the expected answer for\nautocomplete and dictionary problems, and candidates who have not met it tend to\npropose scanning every word. Be ready for the trade-off question: a trie costs\nfar more memory than a hash set, so it earns its place only when prefixes,\nwildcards or bit-greedy walks are actually needed.\n",
           "rungs": [
             {
