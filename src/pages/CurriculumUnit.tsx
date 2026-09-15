@@ -6,6 +6,7 @@ import { Markdown, InlineMarkdown } from "../components/Markdown";
 import { Section, useCollapse } from "../components/Collapsible";
 import { ClickableRow, Confidence, DiffBadge, Empty } from "../components/common";
 import { UnitSkeleton } from "../components/Skeleton";
+import { SkeletonBlock } from "../components/UnitPractice";
 import { StatusBadge, UnitProgress, useCurriculumData } from "../components/CurriculumData";
 import {
   findUnit,
@@ -40,6 +41,8 @@ export default function CurriculumUnit() {
   const { data, error, setSkipped } = useCurriculumData();
   const [concepts, setConcepts] = useState<Concept[]>([]);
   const [reviews, setReviews] = useState<Map<string, CardReview>>(new Map());
+  // null = each card decides for itself; true = the whole section is open.
+  const [revealAll, setRevealAll] = useState<boolean | null>(null);
   const nav = useNavigate();
   // The third argument is a shared namespace: a section with no per-unit
   // opinion falls back to the preference for its *type*, so "always show me
@@ -395,21 +398,11 @@ export default function CurriculumUnit() {
         >
           <p className="dim" style={{ marginTop: 0 }}>
             Copy each of these out by hand once. Patterns are muscle memory, and
-            reading them is not how that gets built.
+            reading them is not how that gets built — so each one has a pad that
+            hides the original, compiles what you type, then diffs the two.
           </p>
           {u.skeletons.map((s, i) => (
-            <div key={i} style={{ marginBottom: 18 }}>
-              <div className="row">
-                <strong>{s.name}</strong>
-                {s.when && <span className="dim"> — {s.when}</span>}
-              </div>
-              <Markdown>{"```java\n" + s.code + "```"}</Markdown>
-              {s.note && (
-                <p className="faint" style={{ fontSize: 12, marginTop: -6 }}>
-                  <InlineMarkdown>{s.note}</InlineMarkdown>
-                </p>
-              )}
-            </div>
+            <SkeletonBlock key={i} skeleton={s} />
           ))}
         </Section>
       )}
@@ -558,16 +551,30 @@ export default function CurriculumUnit() {
           open={isOpen("checks")}
           onToggle={() => toggle("checks")}
           meta={
-            <span className="dim mono">
-              {checkStats.due > 0 ? `${checkStats.due} due · ` : ""}
-              {checkStats.started}/{checkStats.total}
-            </span>
+            <>
+              <button
+                className="ghost"
+                style={{ fontSize: 11, padding: "1px 6px" }}
+                title="Individually revealable is right for study and wrong for the month-later scan"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setRevealAll((v) => (v === true ? null : true));
+                }}
+              >
+                {revealAll === true ? "hide all" : "reveal all"}
+              </button>
+              <span className="dim mono">
+                {checkStats.due > 0 ? `${checkStats.due} due · ` : ""}
+                {checkStats.started}/{checkStats.total}
+              </span>
+            </>
           }
         >
           <p className="dim" style={{ marginTop: 0 }}>
             Answer out loud, reveal, then say whether you had it. Each of these is
             a scheduled card — grading it here is what makes it come back in a
-            month instead of never.
+            month instead of never. “Reveal all” is for reading them as a set,
+            which is a different job from testing yourself on one.
           </p>
           {u.checks.map((c, i) => (
             <Check
@@ -575,6 +582,7 @@ export default function CurriculumUnit() {
               check={c}
               review={reviews.get(checkCardId(key, i))}
               today={today}
+              forceShow={revealAll}
               onGrade={(remembered) => gradeCheck(i, remembered)}
             />
           ))}
@@ -638,6 +646,15 @@ export default function CurriculumUnit() {
 }
 
 function RungBlock({ rung, onOpen }: { rung: HydratedRung; onOpen: (id: number) => void }) {
+  // A rung is explicitly "a group of problems drilling the same twist", and there
+  // was no way to work it as one: you clicked a row, solved it, came back, and
+  // re-scanned for the next unsolved line. The first unsolved problem is what
+  // "work this rung" means, and the Solve page now carries the rest of the walk.
+  const unsolved = rung.items
+    .map((i) => i.problem)
+    .filter((p) => p && p.solved_status !== "solved");
+  const first = unsolved[0] ?? null;
+
   return (
     <div style={{ marginBottom: 18 }}>
       <div className="row">
@@ -656,6 +673,16 @@ function RungBlock({ rung, onOpen }: { rung: HydratedRung; onOpen: (id: number) 
           </span>
         )}
         <span className="spacer" />
+        {first && (
+          <button
+            className="ghost"
+            style={{ fontSize: 12, padding: "2px 8px" }}
+            title={`Start at ${first.title}; the Solve page carries you to the next one`}
+            onClick={() => onOpen(first.id)}
+          >
+            Work this rung ({unsolved.length} left) →
+          </button>
+        )}
         <span className="dim mono">
           {rung.solved}/{rung.total}
         </span>
@@ -719,9 +746,38 @@ function RungBlock({ rung, onOpen }: { rung: HydratedRung; onOpen: (id: number) 
  * never the table — it is the sentence the table makes obvious. State columns
  * are monospaced so successive rows line up and the change is visible. */
 function TraceTable({ trace }: { trace: Trace }) {
+  /**
+   * `null` shows the whole table; a number shows the first `n` rows.
+   *
+   * A static trace *shows*; a step-through *tests*. Revealing one row at a time
+   * with the next state hidden turns reading into predicting, which is the
+   * difference between recognising the algorithm and being able to run it. The
+   * whole table stays one click away, because during a first read predicting is
+   * not the job.
+   */
+  const [shown, setShown] = useState<number | null>(null);
+  const stepping = shown !== null;
+  const visible = stepping ? trace.rows.slice(0, shown!) : trace.rows;
+  const done = stepping && shown! >= trace.rows.length;
+
   return (
     <div style={{ marginBottom: 22 }}>
-      <strong>{trace.title}</strong>
+      <div className="row">
+        <strong>{trace.title}</strong>
+        <span className="spacer" />
+        <button
+          className="ghost"
+          style={{ fontSize: 11, padding: "1px 6px" }}
+          title={
+            stepping
+              ? "Show the whole table"
+              : "Reveal one row at a time and predict the next state"
+          }
+          onClick={() => setShown(stepping ? null : 1)}
+        >
+          {stepping ? "show all" : "▶ step through"}
+        </button>
+      </div>
       {trace.intro && (
         <p className="dim" style={{ margin: "4px 0 8px" }}>
           <InlineMarkdown>{trace.intro}</InlineMarkdown>
@@ -737,7 +793,7 @@ function TraceTable({ trace }: { trace: Trace }) {
             </tr>
           </thead>
           <tbody>
-            {trace.rows.map((row, i) => (
+            {visible.map((row, i) => (
               <tr key={i}>
                 {row.map((cell, j) => (
                   <td key={j} className={j === 0 ? "" : "mono"} style={{ whiteSpace: "nowrap" }}>
@@ -746,10 +802,38 @@ function TraceTable({ trace }: { trace: Trace }) {
                 ))}
               </tr>
             ))}
+            {stepping && !done && (
+              <tr>
+                <td colSpan={trace.headers.length} className="faint" style={{ textAlign: "center" }}>
+                  … say the next row out loud, then reveal it
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
-      {trace.takeaway && (
+      {stepping && (
+        <div className="row" style={{ marginTop: 8, gap: 8 }}>
+          <button
+            className="ghost"
+            disabled={shown! <= 1}
+            onClick={() => setShown((n) => Math.max(1, (n ?? 1) - 1))}
+          >
+            ← Back
+          </button>
+          <button disabled={done} onClick={() => setShown((n) => (n ?? 0) + 1)}>
+            Reveal the next row →
+          </button>
+          <span className="spacer" />
+          <span className="faint mono" style={{ fontSize: 12 }}>
+            {Math.min(shown!, trace.rows.length)}/{trace.rows.length}
+          </span>
+        </div>
+      )}
+      {/* The takeaway is the point of the trace, so it waits until the trace has
+          actually been walked — reading the conclusion first would give the
+          prediction away. */}
+      {trace.takeaway && (!stepping || done) && (
         <p className="dim" style={{ marginTop: 8 }}>
           <InlineMarkdown>{trace.takeaway}</InlineMarkdown>
         </p>
@@ -869,14 +953,22 @@ function Check({
   check,
   review,
   today,
+  forceShow,
   onGrade,
 }: {
   check: UnitCheck;
   review: CardReview | undefined;
   today: string;
+  /** Section-wide reveal: `true` shows every answer, `null` returns control to
+   * the per-card button. A revision scan wants all of them at once; a study
+   * session wants one at a time, and neither should win permanently. */
+  forceShow: boolean | null;
   onGrade: (remembered: boolean) => void;
 }) {
-  const [show, setShow] = useState(false);
+  const [own, setOwn] = useState(false);
+  const show = forceShow ?? own;
+  const setShow = (v: boolean | ((p: boolean) => boolean)) =>
+    setOwn(typeof v === "function" ? v(show) : v);
   const due = isCardDue(review, today);
   const graded = (review?.reps ?? 0) > 0 || (review?.lapses ?? 0) > 0;
 
