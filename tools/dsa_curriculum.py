@@ -318,6 +318,7 @@ _NEEDS_BUILD_IT = {
 def _check_curriculum(cur, concepts, problems):
     """`concepts` maps key → concept; `problems` maps slug → problem dict."""
     seen_units = set()
+    seen_titles = {}
     seen_slugs = {}
     order = []
     chain_run = 0  # consecutive units whose prereqs are exactly [previous unit]
@@ -332,6 +333,18 @@ def _check_curriculum(cur, concepts, problems):
             seen_units.add(key)
             order.append(key)
             stage_of[key] = si
+
+            # Titles must be unique, not merely keys. The recognition drill
+            # (src/lib/dsaRecognition.ts) uses a unit's title as its answer in a
+            # multiple-choice routing question, so two units sharing one would
+            # make that question unanswerable — a failure that would show up as
+            # a confusing quiz rather than as an error.
+            assert u["title"] not in seen_titles, (
+                f"{key}: title {u['title']!r} is also used by "
+                f"{seen_titles[u['title']]!r} — the recognition drill offers titles as "
+                f"answers, so they have to identify a unit on their own"
+            )
+            seen_titles[u["title"]] = key
 
             assert u["why"], f"{key}: no 'why this exists'"
             assert u["model"], f"{key}: no mental model"

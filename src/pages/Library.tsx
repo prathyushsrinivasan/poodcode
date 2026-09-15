@@ -130,6 +130,23 @@ export default function Library() {
             <Markdown>{data.intro}</Markdown>
           </div>
 
+          {/* Placement sits above the stage list because that is where someone
+              who does not need stage 1 will look for permission to leave it. */}
+          <div className="card" style={{ marginBottom: 16 }}>
+            <div className="row">
+              <div>
+                <strong>🎯 Already know some of this?</strong>
+                <span className="dim">
+                  {" "}
+                  — one routing question and one problem per stage. Clear both and its
+                  units are marked known.
+                </span>
+              </div>
+              <span className="spacer" />
+              <button onClick={() => nav("/library/placement")}>Take the placement →</button>
+            </div>
+          </div>
+
           {data.stages.map((stage, i) => (
             <Section
               key={stage.key}
@@ -154,6 +171,16 @@ export default function Library() {
                     onOpen={() => nav(`/library/unit/${u.unit.key}`)}
                   />
                 ))}
+              </div>
+              <div className="row" style={{ marginTop: 12 }}>
+                <span className="dim" style={{ fontSize: 13 }}>
+                  Finished the stage? The mixed set draws from it and every earlier one,
+                  unlabelled — which is the only way prompt → technique routing gets tested.
+                </span>
+                <span className="spacer" />
+                <button className="ghost" onClick={() => nav(`/library/mixed/${stage.key}`)}>
+                  🎲 Mixed set
+                </button>
               </div>
             </Section>
           ))}
@@ -190,6 +217,9 @@ function ReviewLaneCard({ lane, nav }: { lane: ReviewLane; nav: (to: string) => 
   if (lane.staleUnits > 0) {
     parts.push(`${lane.staleUnits} unit${lane.staleUnits === 1 ? "" : "s"} gone stale`);
   }
+  if (lane.slowSolves > 0) {
+    parts.push(`${lane.slowSolves} solved slowly`);
+  }
 
   return (
     <div className="card" style={{ marginBottom: 16, borderColor: "var(--accent)" }}>
@@ -219,15 +249,26 @@ function ReviewLaneCard({ lane, nav }: { lane: ReviewLane; nav: (to: string) => 
               borderColor: r.stale ? "var(--text-faint)" : "var(--accent)",
             }}
             title={
-              r.stale
-                ? `Last practised ${r.lastPractisedDays} days ago`
-                : `${r.checksDue} self-check${r.checksDue === 1 ? "" : "s"} due`
+              [
+                r.stale ? `Last practised ${r.lastPractisedDays} days ago` : "",
+                r.checksDue > 0
+                  ? `${r.checksDue} self-check${r.checksDue === 1 ? "" : "s"} due`
+                  : "",
+                r.slow.length > 0
+                  ? `${r.slow.length} solved slowly (${r.slow[0].title} took ${Math.round(
+                      r.slow[0].time_taken_seconds / 60
+                    )} min)`
+                  : "",
+              ]
+                .filter(Boolean)
+                .join(" · ")
             }
             onClick={() => nav(`/library/unit/${r.unit.unit.key}`)}
           >
             {r.unit.unit.icon} {r.unit.unit.title}
             {r.checksDue > 0 && ` · ${r.checksDue}`}
             {r.stale && " · stale"}
+            {r.slow.length > 0 && " · 🐢"}
           </span>
         ))}
         {lane.units.length > 8 && (

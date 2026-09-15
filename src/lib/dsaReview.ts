@@ -1,4 +1,4 @@
-import type { CardReview } from "../types";
+import type { CardReview, Difficulty, Problem } from "../types";
 import { isCleared, type HydratedCurriculum, type HydratedUnit } from "./curriculum";
 
 /**
@@ -64,18 +64,62 @@ export function unitChecks(
   return { due, started, total: u.unit.checks.length };
 }
 
+/**
+ * How long a solve should take before it stops counting as fluent, per
+ * difficulty, in seconds.
+ *
+ * The curriculum's own thesis is reflex speed — *"your hands start typing a
+ * sliding window before you have finished the sentence"* — but `solid` counts
+ * correctness alone, so a problem you ground out over forty minutes and one you
+ * typed in four are indistinguishable afterwards. They are not the same thing,
+ * and the slow one is the one worth doing again.
+ *
+ * Generous on purpose. These are "you have not internalised this yet" lines,
+ * not interview pace: the point is to surface a re-practice candidate, and a
+ * threshold that fires on everything surfaces nothing.
+ */
+export const SLOW_AFTER_SECONDS: Record<Difficulty, number> = {
+  Intro: 10 * 60,
+  Easy: 20 * 60,
+  Medium: 40 * 60,
+  Hard: 60 * 60,
+};
+
+/** A solved problem that took longer than its difficulty's budget. Unrecorded
+ * time (0) is not slow — it means the timer never ran, not that it ran fast. */
+export function isSlowSolve(p: Problem): boolean {
+  return (
+    p.solved_status === "solved" &&
+    p.time_taken_seconds > 0 &&
+    p.time_taken_seconds > SLOW_AFTER_SECONDS[p.difficulty]
+  );
+}
+
+/** Solved-but-slow problems in a unit, hardest-won first. */
+export function slowSolves(u: HydratedUnit): Problem[] {
+  return u.rungs
+    .flatMap((r) => r.items)
+    .map((i) => i.problem)
+    .filter((p): p is Problem => p !== null && isSlowSolve(p))
+    .sort((a, b) => b.time_taken_seconds - a.time_taken_seconds);
+}
+
 export interface ReviewLaneUnit {
   unit: HydratedUnit;
   checksDue: number;
   /** True when the unit was cleared and its interval has run out. */
   stale: boolean;
   lastPractisedDays: number;
+  /** Problems solved correctly but slowly — a re-practice signal on their own. */
+  slow: Problem[];
 }
 
 export interface ReviewLane {
   checksDue: number;
   /** Cleared units whose practice has gone stale. */
   staleUnits: number;
+  /** Problems solved correctly but slowly, across cleared units. */
+  slowSolves: number;
   /**
    * Units with something to do, most-overdue first. Only *cleared* units
    * appear: revision is for what you have learned, and putting a unit you have
@@ -101,19 +145,25 @@ export function reviewLane(
   const units: ReviewLaneUnit[] = [];
   let checksDue = 0;
   let staleUnits = 0;
+  let slowCount = 0;
 
   for (const stage of c.stages) {
     for (const u of stage.units) {
-      if (!isCleared(u.status)) continue;
+      // A unit marked known is excluded: you told the app you know it, and
+      // handing it back as revision would be arguing with you.
+      if (u.skipped || !isCleared(u.status)) continue;
       const { due } = unitChecks(u, reviews, today);
+      const slow = slowSolves(u);
       checksDue += due;
+      slowCount += slow.length;
       if (u.stale) staleUnits++;
-      if (due > 0 || u.stale) {
+      if (due > 0 || u.stale || slow.length > 0) {
         units.push({
           unit: u,
           checksDue: due,
           stale: u.stale,
           lastPractisedDays: u.lastPractisedDays,
+          slow,
         });
       }
     }
@@ -123,9 +173,10 @@ export function reviewLane(
     (a, b) =>
       overdueBy(b) - overdueBy(a) ||
       b.checksDue - a.checksDue ||
+      b.slow.length - a.slow.length ||
       a.unit.unit.title.localeCompare(b.unit.unit.title)
   );
-  return { checksDue, staleUnits, units };
+  return { checksDue, staleUnits, slowSolves: slowCount, units };
 }
 
 /** Days past a unit's freshness window; 0 when it is not stale. Finite, so it

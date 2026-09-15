@@ -7,7 +7,7 @@ import { Section, useCollapse } from "../components/Collapsible";
 import { ClickableRow, Confidence, DiffBadge, Empty } from "../components/common";
 import { StatusBadge, UnitProgress, useCurriculumData } from "../components/CurriculumData";
 import { findUnit, neighbours, type HydratedRung } from "../lib/curriculum";
-import { checkCardId, isCardDue, todayISO, unitChecks } from "../lib/dsaReview";
+import { checkCardId, isCardDue, isSlowSolve, todayISO, unitChecks } from "../lib/dsaReview";
 
 /**
  * One unit of the DSA curriculum: a technique, taught, then drilled.
@@ -468,11 +468,21 @@ function RungBlock({ rung, onOpen }: { rung: HydratedRung; onOpen: (id: number) 
                 );
               }
               const solved = p.solved_status === "solved";
+              const slow = isSlowSolve(p);
               return (
                 <tr key={item.slug} onClick={() => onOpen(p.id)}>
                   <td style={{ width: 28 }}>{solved ? "✅" : p.solved_status === "attempted" ? "◐" : "○"}</td>
                   <td>
                     <strong className={solved ? "dim" : ""}>{p.title}</strong>
+                    {slow && (
+                      <span
+                        className="faint"
+                        style={{ fontSize: 12, marginLeft: 6 }}
+                        title={`Solved, but it took ${Math.round(p.time_taken_seconds / 60)} minutes. Correct is not the same as fluent.`}
+                      >
+                        🐢 {Math.round(p.time_taken_seconds / 60)}m
+                      </span>
+                    )}
                     {item.note && (
                       <div className="faint" style={{ fontSize: 12 }}>
                         <InlineMarkdown>{item.note}</InlineMarkdown>

@@ -10,6 +10,7 @@ import Dashboard from "./pages/Dashboard";
 import Library from "./pages/Library";
 import LibraryBrowse from "./pages/LibraryBrowse";
 import CurriculumUnit from "./pages/CurriculumUnit";
+import CurriculumDrill from "./pages/CurriculumDrill";
 import Solve from "./pages/Solve";
 import Settings from "./pages/Settings";
 import ProblemForm from "./pages/ProblemForm";
@@ -111,6 +112,8 @@ export default function App() {
             {/* Static segments, so neither can ever be shadowed by a unit key. */}
             <Route path="/library/browse" element={<LibraryBrowse />} />
             <Route path="/library/unit/:key" element={<CurriculumUnit />} />
+            <Route path="/library/placement" element={<CurriculumDrill view="placement" />} />
+            <Route path="/library/mixed/:stage" element={<CurriculumDrill view="mixed" />} />
             <Route path="/learn" element={<Learn />} />
             <Route path="/learn/:key" element={<Learn />} />
             <Route path="/course" element={<Course />} />

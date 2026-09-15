@@ -57,6 +57,7 @@ fn curriculum_teaches_every_problem_exactly_once() {
     let concept_keys: HashSet<&str> = concepts.iter().map(|c| c.key.as_str()).collect();
 
     let mut seen_units: HashSet<&str> = HashSet::new();
+    let mut titles: HashMap<&str, &str> = HashMap::new();
     let mut owner: HashMap<&str, &str> = HashMap::new();
     let mut order: Vec<&str> = Vec::new();
     let mut chain_run = 0usize;
@@ -70,6 +71,12 @@ fn curriculum_teaches_every_problem_exactly_once() {
             let k = unit.key.as_str();
             assert!(seen_units.insert(k), "duplicate unit {k}");
             order.push(k);
+            // Titles must identify a unit on their own: the recognition drill
+            // offers them as answers in a multiple-choice routing question, so
+            // two units sharing one would make that question unanswerable.
+            if let Some(prev) = titles.insert(unit.title.as_str(), k) {
+                panic!("{k}: title {:?} is also used by {prev}", unit.title);
+            }
 
             // 6 — the unit is actually taught, not just a list of links.
             assert!(!unit.title.trim().is_empty(), "{k}: no title");
