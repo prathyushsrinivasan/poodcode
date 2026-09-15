@@ -4,6 +4,7 @@ import { api } from "../api";
 import type { CardReview, Problem } from "../types";
 import { InlineMarkdown, Markdown } from "../components/Markdown";
 import { DiffBadge, Empty } from "../components/common";
+import { LibrarySkeleton } from "../components/Skeleton";
 import { useCurriculumData } from "../components/CurriculumData";
 import { findUnit } from "../lib/curriculum";
 import {
@@ -52,7 +53,7 @@ export default function CurriculumDrill({ view }: { view: "mixed" | "placement" 
       </div>
     );
   }
-  if (!data) return <div className="empty" style={{ paddingTop: "20vh" }}>Loading…</div>;
+  if (!data) return <LibrarySkeleton />;
 
   return view === "placement" ? (
     <Placement data={data} nav={nav} setSkipped={setSkipped} />

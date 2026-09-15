@@ -5,6 +5,7 @@ import { api } from "../api";
 import type { CurriculumUnit, Difficulty, Problem, SolvedStatus } from "../types";
 import { applyFilter, emptyFilter, type ProblemFilter, type SortKey } from "../lib/filters";
 import { hydrate } from "../lib/curriculum";
+import { loadCurriculumSeed } from "../components/CurriculumData";
 import { Confidence, DiffBadge, Empty } from "../components/common";
 import { relativeDate } from "../lib/format";
 import { useToast } from "../components/Toast";
@@ -41,8 +42,8 @@ export default function LibraryBrowse() {
   const load = () => {
     api.listProblems().then((ps) => {
       setProblems(ps);
-      api
-        .dsaCurriculum()
+      // The seed comes from the session cache; only the problems are re-fetched.
+      loadCurriculumSeed()
         .then((c) => setUnitBySlug(hydrate(c, ps).unitBySlug))
         .catch(() => {});
     });

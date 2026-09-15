@@ -877,3 +877,34 @@ table.sqlgrid tbody tr.diff td {
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: 10px;
 }
+
+/* ---- Loading skeletons ----------------------------------------------- */
+/* A 480 KB seed parse is long enough that a bare "Loading…" at 20vh reads as a
+   broken page. A skeleton of the shape that is coming costs nothing and answers
+   the only question the user has: is anything happening? */
+.skel {
+  background: linear-gradient(
+    90deg,
+    var(--bg-elev-2) 25%,
+    var(--border) 37%,
+    var(--bg-elev-2) 63%
+  );
+  background-size: 400% 100%;
+  animation: skel-shimmer 1.4s ease-in-out infinite;
+  border-radius: 4px;
+}
+@keyframes skel-shimmer {
+  0% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0 50%;
+  }
+}
+/* Respect a stated preference for less motion: the shimmer is decoration, and
+   the grey block already says "loading". */
+@media (prefers-reduced-motion: reduce) {
+  .skel {
+    animation: none;
+  }
+}

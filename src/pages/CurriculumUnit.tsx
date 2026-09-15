@@ -5,6 +5,7 @@ import type { BigOItem, CardReview, Concept, Trace, UnitCheck } from "../types";
 import { Markdown, InlineMarkdown } from "../components/Markdown";
 import { Section, useCollapse } from "../components/Collapsible";
 import { ClickableRow, Confidence, DiffBadge, Empty } from "../components/common";
+import { UnitSkeleton } from "../components/Skeleton";
 import { StatusBadge, UnitProgress, useCurriculumData } from "../components/CurriculumData";
 import { findUnit, neighbours, type HydratedRung } from "../lib/curriculum";
 import {
@@ -31,7 +32,7 @@ import {
  */
 export default function CurriculumUnit() {
   const { key = "" } = useParams();
-  const { data, setSkipped } = useCurriculumData();
+  const { data, error, setSkipped } = useCurriculumData();
   const [concepts, setConcepts] = useState<Concept[]>([]);
   const [reviews, setReviews] = useState<Map<string, CardReview>>(new Map());
   const nav = useNavigate();
@@ -72,7 +73,19 @@ export default function CurriculumUnit() {
     [grade, key]
   );
 
-  if (!data) return <div className="empty" style={{ paddingTop: "20vh" }}>Loading…</div>;
+  // `error` used to be ignored here, so a failed fetch left the page saying
+  // "Loading…" forever with no explanation. Library handled it; this did not.
+  if (error) {
+    return (
+      <div className="page page-wide">
+        <button className="ghost" onClick={() => nav("/library")}>
+          ← Curriculum
+        </button>
+        <Empty icon="⚠️" text={`Could not load the curriculum: ${error}`} />
+      </div>
+    );
+  }
+  if (!data) return <UnitSkeleton />;
 
   const hydrated = findUnit(data, key);
   if (!hydrated) {

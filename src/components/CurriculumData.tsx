@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { api } from "../api";
-import type { CurriculumUnit } from "../types";
+import type { DsaCurriculum } from "../types";
 import {
   hydrate,
   parseSkipped,
@@ -11,24 +11,47 @@ import {
   type UnitStatus,
 } from "../lib/curriculum";
 
+/**
+ * The curriculum seed, fetched once per session.
+ *
+ * The seed is embedded in the binary and cannot change while the app is running,
+ * so re-fetching and re-parsing 480 KB of JSON on every mount of every Library
+ * page was work with no possible benefit. The learner's *problems* are a
+ * different matter and are still re-fetched every time — that is what keeps a
+ * solve recorded elsewhere from showing stale progress here.
+ *
+ * A module-level promise rather than a store: there is nothing to invalidate, no
+ * subscribers to notify, and a failed fetch should be retried rather than
+ * cached, which is why the promise is cleared on rejection.
+ */
+let curriculumPromise: Promise<DsaCurriculum | null> | null = null;
+
+export function loadCurriculumSeed(): Promise<DsaCurriculum | null> {
+  if (!curriculumPromise) {
+    curriculumPromise = api.dsaCurriculum().catch((e) => {
+      curriculumPromise = null; // a transient failure must not be permanent
+      throw e;
+    });
+  }
+  return curriculumPromise;
+}
+
 /** Loads the curriculum, the learner's problems and the skipped-unit list, and
  * joins them.
  *
  * All three Library pages need exactly this trio, and the join is cheap (one
- * pass over 271 problems), so each page loads for itself rather than sharing a
- * store. That keeps a solve recorded on another page from showing stale
- * progress here: coming back re-fetches.
+ * pass over 271 problems). The curriculum comes from the session-wide cache; the
+ * problems and settings are re-fetched, because those do change.
  *
  * `setSkipped` writes the settings row and re-joins in place, so marking a unit
- * known updates every badge and the "up next" target without a round trip
- * through the curriculum fetch. */
+ * known updates every badge and the "up next" target immediately. */
 export function useCurriculumData() {
   const [data, setData] = useState<HydratedCurriculum | null>(null);
   const [error, setError] = useState<string>("");
 
   const load = useCallback(() => {
     Promise.all([
-      api.dsaCurriculum().catch(() => null),
+      loadCurriculumSeed().catch(() => null),
       api.listProblems(),
       api.getSettings().catch(() => ({}) as Record<string, string>),
     ])
@@ -108,23 +131,61 @@ export function StatusBadge({
   );
 }
 
+/**
+ * Slug → the unit that teaches it, built once and kept.
+ *
+ * `TaughtIn` used to fetch the whole seed and run a full `hydrate()` — building
+ * all 33 units, every rung, every trace — to render one badge, on every Solve
+ * page open. The badge needs four strings, so the index holds four strings:
+ * walking the rungs directly skips the hydration entirely, and the seed itself
+ * now comes from the session cache.
+ */
+export interface TaughtInUnit {
+  key: string;
+  title: string;
+  icon: string;
+  tagline: string;
+}
+
+let unitIndexPromise: Promise<Map<string, TaughtInUnit>> | null = null;
+
+export function loadUnitIndex(): Promise<Map<string, TaughtInUnit>> {
+  if (!unitIndexPromise) {
+    unitIndexPromise = loadCurriculumSeed()
+      .then((c) => {
+        const index = new Map<string, TaughtInUnit>();
+        for (const stage of c?.stages ?? []) {
+          for (const u of stage.units) {
+            const entry = { key: u.key, title: u.title, icon: u.icon, tagline: u.tagline };
+            for (const rung of u.rungs) {
+              for (const slug of rung.slugs) index.set(slug, entry);
+            }
+          }
+        }
+        return index;
+      })
+      .catch((e) => {
+        unitIndexPromise = null;
+        throw e;
+      });
+  }
+  return unitIndexPromise;
+}
+
 /** "Taught in <unit>" — the way back from a problem to the technique.
  *
  * Rendered on the Solve page, where you may well have arrived from the review
  * queue or a random pick with no idea which pattern the problem is drilling.
- * Hydrating against an empty problem list is deliberate: the slug → unit map is
- * built from the curriculum alone, so this costs one read and no join.
  *
  * Renders nothing for a problem you authored, which belongs to no unit. */
 export function TaughtIn({ slug }: { slug: string }) {
-  const [unit, setUnit] = useState<CurriculumUnit | null>(null);
+  const [unit, setUnit] = useState<TaughtInUnit | null>(null);
 
   useEffect(() => {
     let live = true;
-    api
-      .dsaCurriculum()
-      .then((c) => {
-        if (live) setUnit(hydrate(c, []).unitBySlug.get(slug) ?? null);
+    loadUnitIndex()
+      .then((index) => {
+        if (live) setUnit(index.get(slug) ?? null);
       })
       .catch(() => {});
     return () => {

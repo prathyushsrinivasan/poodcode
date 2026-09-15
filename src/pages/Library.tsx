@@ -5,6 +5,7 @@ import type { CardReview } from "../types";
 import { Markdown } from "../components/Markdown";
 import { Section, useCollapse } from "../components/Collapsible";
 import { ClickableRow, Empty } from "../components/common";
+import { LibrarySkeleton } from "../components/Skeleton";
 import { StatusBadge, UnitProgress, useCurriculumData } from "../components/CurriculumData";
 import { searchUnits, type HydratedUnit } from "../lib/curriculum";
 import { reviewLane, type ReviewLane } from "../lib/dsaReview";
@@ -51,7 +52,7 @@ export default function Library() {
       </div>
     );
   }
-  if (!data) return <div className="empty" style={{ paddingTop: "20vh" }}>Loading…</div>;
+  if (!data) return <LibrarySkeleton />;
 
   const pct = data.total ? Math.round((data.solved / data.total) * 100) : 0;
   // Derived, not stated: the comment this replaced claimed thirty-two.
