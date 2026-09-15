@@ -25,20 +25,43 @@ function writeCollapsed(s: Set<string>) {
  * stores its expanded sections. Default-closed matters where a section body is
  * expensive — a course lesson mounts a Monaco editor per exercise, and a week
  * has dozens, so opening them all at once would stall the page. */
-export function useCollapse(namespace: string, defaultOpen = true) {
+export function useCollapse(namespace: string, defaultOpen = true, fallback?: string) {
   const [overrides, setOverrides] = useState<Set<string>>(readCollapsed);
 
   const id = useCallback((k: string) => `${namespace}:${k}`, [namespace]);
+  const shared = useCallback(
+    (k: string) => (fallback ? `${fallback}:${k}` : null),
+    [fallback]
+  );
 
+  /**
+   * `fallback` is a second, *shared* namespace consulted when this one has no
+   * opinion.
+   *
+   * Collapse state on a unit page is keyed `dsa-unit:<key>:<section>`, so "I
+   * always want pitfalls open and motivation closed" had to be re-expressed 33
+   * times, once per unit. With a fallback of `dsa-section` the preference can be
+   * stated by *section type* and still be overridden for a single unit — the
+   * per-unit key is checked first, so closing one unit's pitfalls does not close
+   * them everywhere.
+   */
   const isOpen = useCallback(
-    (k: string) => (overrides.has(id(k)) ? !defaultOpen : defaultOpen),
-    [overrides, id, defaultOpen]
+    (k: string) => {
+      if (overrides.has(id(k))) return !defaultOpen;
+      const s = shared(k);
+      if (s && overrides.has(s)) return !defaultOpen;
+      return defaultOpen;
+    },
+    [overrides, id, shared, defaultOpen]
   );
 
   const toggle = useCallback(
     (k: string) => {
       setOverrides((prev) => {
         const next = new Set(prev);
+        // Toggling writes the per-unit key, never the shared one: an explicit
+        // click is about this page. `toggleEverywhere` is the opt-in for the
+        // "always" version.
         if (next.has(id(k))) next.delete(id(k));
         else next.add(id(k));
         writeCollapsed(next);
@@ -46,6 +69,24 @@ export function useCollapse(namespace: string, defaultOpen = true) {
       });
     },
     [id]
+  );
+
+  /** Set the *shared* preference for a section type, and clear any per-unit
+   * override so the new default actually takes effect here too. */
+  const toggleEverywhere = useCallback(
+    (k: string, open: boolean) => {
+      const s = shared(k);
+      if (!s) return;
+      setOverrides((prev) => {
+        const next = new Set(prev);
+        next.delete(id(k));
+        if (open === defaultOpen) next.delete(s);
+        else next.add(s);
+        writeCollapsed(next);
+        return next;
+      });
+    },
+    [id, shared, defaultOpen]
   );
 
   /** Collapse or expand every section in this namespace at once. */
@@ -84,7 +125,7 @@ export function useCollapse(namespace: string, defaultOpen = true) {
     [id, defaultOpen]
   );
 
-  return { isOpen, toggle, setAll, open };
+  return { isOpen, toggle, setAll, open, toggleEverywhere };
 }
 
 /** A section with a clickable header that shows/hides its body.

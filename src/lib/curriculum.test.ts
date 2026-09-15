@@ -156,6 +156,46 @@ describe("hydrate", () => {
     expect(h.stages[0].units[0].next?.slug).toBe("b");
   });
 
+  it("prefers an attempted problem over an earlier untouched one", () => {
+    // A problem you fought with yesterday and one you have never opened are not
+    // interchangeable: the attempted one still has your context loaded.
+    const c = curriculum([[unit("u", [rung("Core", ["a", "b", "c"])])]]);
+    const h = hydrate(c, [problem("a"), problem("b", "attempted"), problem("c")]);
+    expect(h.stages[0].units[0].next?.slug).toBe("b");
+  });
+
+  it("falls back to the first untouched problem when nothing is attempted", () => {
+    const c = curriculum([[unit("u", [rung("Core", ["a", "b"])])]]);
+    const h = hydrate(c, [problem("a"), problem("b")]);
+    expect(h.stages[0].units[0].next?.slug).toBe("a");
+  });
+
+  it("reports the difficulty mix and a rough time, over required rungs only", () => {
+    const c = curriculum([
+      [unit("u", [rung("Core", ["easy", "med"]), extra("Extra practice", ["hard"])])],
+    ]);
+    const h = hydrate(c, [
+      { ...problem("easy"), difficulty: "Easy" as const },
+      { ...problem("med"), difficulty: "Medium" as const },
+      { ...problem("hard"), difficulty: "Hard" as const },
+    ]);
+    const u = h.stages[0].units[0];
+
+    expect(u.mix).toEqual({ Intro: 0, Easy: 1, Medium: 1, Hard: 0 });
+    expect(u.estimatedMinutes).toBe(32); // 10 + 22; the optional Hard is not asked
+  });
+
+  it("counts an optional rung into the mix once it is started", () => {
+    const c = curriculum([
+      [unit("u", [rung("Core", ["easy"]), extra("Extra practice", ["hard"])])],
+    ]);
+    const h = hydrate(c, [
+      { ...problem("easy"), difficulty: "Easy" as const },
+      { ...problem("hard", "solved"), difficulty: "Hard" as const },
+    ]);
+    expect(h.stages[0].units[0].mix).toEqual({ Intro: 0, Easy: 1, Medium: 0, Hard: 1 });
+  });
+
   it("marks a unit ready only once every prerequisite is cleared", () => {
     const c = curriculum([
       [unit("basics", [rung("Core", ["a", "b"])]), unit("next", [rung("Core", ["c"])], ["basics"])],

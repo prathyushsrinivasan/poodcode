@@ -1,5 +1,22 @@
-import type { CurriculumUnit, DsaCurriculum, Problem } from "../types";
+import type { CurriculumUnit, Difficulty, DsaCurriculum, Problem } from "../types";
 import { intervalDays } from "./revision";
+
+/**
+ * Minutes a problem of each difficulty takes when you know the technique.
+ *
+ * A unit card showing "11 problems" reads identically for 11 Intro problems and
+ * for 10 Medium + 2 Hard, which is a five-fold difference in what it is asking
+ * of you. These are estimates for a fluent solve, not a first encounter — the
+ * card's job is to let you compare two units, not to predict your evening.
+ */
+const MINUTES_PER: Record<Difficulty, number> = {
+  Intro: 4,
+  Easy: 10,
+  Medium: 22,
+  Hard: 40,
+};
+
+const NO_MIX: Record<Difficulty, number> = { Intro: 0, Easy: 0, Medium: 0, Hard: 0 };
 
 /**
  * Hydrating the DSA curriculum: joining the authored teaching spine
@@ -101,8 +118,20 @@ export interface HydratedUnit {
    * statement about Trees. The banner names only what is actually missing.
    */
   unmetPrereqTitles: string[];
-  /** First unsolved problem, walking the rungs in order. */
+  /**
+   * What to do next. The first *attempted* unsolved problem if there is one,
+   * otherwise the first untouched one, walking the rungs in order.
+   *
+   * Preferring the attempted one is not arbitrary: it is the problem whose
+   * context you still have loaded, and the walk previously treated "I fought
+   * with this yesterday" and "I have never opened this" as interchangeable.
+   */
   next: Problem | null;
+  /** The difficulty mix, so "11 problems" stops reading the same for 11 Intros
+   * and for 10 Medium + 2 Hard. Counts only the rungs the unit asks of you. */
+  mix: Record<Difficulty, number>;
+  /** Rough minutes the unit's required problems would take at fluent pace. */
+  estimatedMinutes: number;
   /**
    * Days since the most recent solve anywhere in this unit, or `Infinity` if
    * nothing here has ever been solved.
@@ -240,7 +269,11 @@ export function hydrate(
       let total = 0;
       let attempted = 0;
       let next: Problem | null = null;
+      // Tracked separately so an attempted problem can win over an earlier
+      // untouched one without a second pass over the rungs.
+      let nextAttempted: Problem | null = null;
       let lastPractisedDays = Infinity;
+      const mix: Record<Difficulty, number> = { ...NO_MIX };
 
       const rungs: HydratedRung[] = unit.rungs.map((rung) => {
         let rungSolved = 0;
@@ -248,12 +281,15 @@ export function hydrate(
         let rungTouched = 0;
         let rungAttempted = 0;
         let rungNext: Problem | null = null;
+        let rungNextAttempted: Problem | null = null;
+        const rungMix: Record<Difficulty, number> = { ...NO_MIX };
         const items: RungItem[] = rung.slugs.map((slug) => {
           const problem = bySlug.get(slug) ?? null;
           unitBySlug.set(slug, unit);
           placed.add(slug);
           if (problem) {
             rungTotal++;
+            rungMix[problem.difficulty]++;
             if (problem.solved_status === "solved") {
               rungSolved++;
               rungTouched++;
@@ -267,6 +303,7 @@ export function hydrate(
               if (problem.solved_status === "attempted") {
                 rungAttempted++;
                 rungTouched++;
+                if (!rungNextAttempted) rungNextAttempted = problem;
               }
               if (!rungNext) rungNext = problem;
             }
@@ -279,11 +316,13 @@ export function hydrate(
           solved += rungSolved;
           total += rungTotal;
           attempted += rungAttempted;
+          for (const d of Object.keys(rungMix) as Difficulty[]) mix[d] += rungMix[d];
         }
         // `next` skips an untouched optional rung too: "what should I do now?"
         // must never point at work the unit has told you to skip. Once you have
         // started the rung it is ordinary work again and rejoins the walk.
         if (counted && !next && rungNext) next = rungNext;
+        if (counted && !nextAttempted && rungNextAttempted) nextAttempted = rungNextAttempted;
 
         return {
           title: rung.title,
@@ -295,6 +334,11 @@ export function hydrate(
           counted,
         };
       });
+
+      const estimatedMinutes = (Object.keys(mix) as Difficulty[]).reduce(
+        (n, d) => n + mix[d] * MINUTES_PER[d],
+        0
+      );
 
       const status = statusOf(solved, total, attempted);
       const isSkipped = skipped.has(unit.key);
@@ -333,7 +377,9 @@ export function hydrate(
         ready,
         prereqTitles,
         unmetPrereqTitles,
-        next,
+        next: nextAttempted ?? next,
+        mix,
+        estimatedMinutes,
         lastPractisedDays,
         staleAfterDays,
         stale,

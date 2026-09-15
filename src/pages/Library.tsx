@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { api } from "../api";
-import type { CardReview } from "../types";
+import type { CardReview, Difficulty } from "../types";
 import { Markdown } from "../components/Markdown";
 import { Section, useCollapse } from "../components/Collapsible";
 import { ClickableRow, Empty } from "../components/common";
@@ -38,7 +38,10 @@ export default function Library() {
   const [reviews, setReviews] = useState<Map<string, CardReview>>(new Map());
   const nav = useNavigate();
   const stageKeys = useMemo(() => (data?.stages ?? []).map((s) => s.key), [data]);
-  const { isOpen, toggle } = useCollapse("dsa-stage", true);
+  // Default-closed, with the stage you are working in opened below. Every stage
+  // open on first paint rendered all 33 unit cards in a two-column grid, so the
+  // page opened several screens tall and the unit you wanted was rarely visible.
+  const { isOpen, toggle, open: openStage } = useCollapse("dsa-stage", false);
 
   useEffect(() => {
     api
@@ -49,6 +52,29 @@ export default function Library() {
 
   const hits = useMemo(() => (data ? searchUnits(data, query) : []), [data, query]);
   const lane = useMemo(() => (data ? reviewLane(data, reviews) : null), [data, reviews]);
+
+  /**
+   * The stage holding "up next" — the one you are working in.
+   *
+   * Opened once, the first time this page is seen in a session, rather than on
+   * every render: after that the remembered collapse state wins, because a page
+   * that re-opens a section you deliberately closed is arguing with you.
+   */
+  const currentStage = useMemo(
+    () =>
+      data?.next
+        ? data.stages.find((s) =>
+            s.units.some((u) => u.unit.key === data.next!.unit.unit.key)
+          )?.key ?? null
+        : null,
+    [data]
+  );
+  const opened = useRef(false);
+  useEffect(() => {
+    if (!currentStage || opened.current) return;
+    opened.current = true;
+    openStage(currentStage);
+  }, [currentStage, openStage]);
 
   if (error) {
     return (
@@ -324,6 +350,55 @@ function ReviewLaneCard({ lane, nav }: { lane: ReviewLane; nav: (to: string) => 
   );
 }
 
+const DIFF_COLOUR: Record<Difficulty, string> = {
+  Intro: "var(--text-faint)",
+  Easy: "var(--good)",
+  Medium: "var(--medium)",
+  Hard: "var(--bad)",
+};
+
+/** The difficulty mix as a stacked bar plus `E2 · M6 · H3`, and a rough time.
+ *
+ * The bar is for scanning a two-column grid of cards; the letters are for
+ * knowing what it actually says. Neither alone does both jobs. */
+function DifficultyMix({
+  mix,
+  minutes,
+}: {
+  mix: Record<Difficulty, number>;
+  minutes: number;
+}) {
+  const order: Difficulty[] = ["Intro", "Easy", "Medium", "Hard"];
+  const total = order.reduce((n, d) => n + mix[d], 0);
+  if (total === 0) return null;
+  const hours = minutes >= 90 ? `~${Math.round(minutes / 60)}h` : `~${minutes}m`;
+
+  return (
+    <div style={{ marginTop: 8 }}>
+      <div
+        style={{ display: "flex", height: 4, borderRadius: 2, overflow: "hidden" }}
+        title={order.filter((d) => mix[d]).map((d) => `${mix[d]} ${d}`).join(" · ")}
+      >
+        {order
+          .filter((d) => mix[d] > 0)
+          .map((d) => (
+            <span
+              key={d}
+              style={{ width: `${(mix[d] / total) * 100}%`, background: DIFF_COLOUR[d] }}
+            />
+          ))}
+      </div>
+      <div className="faint mono" style={{ fontSize: 11, marginTop: 4 }}>
+        {order
+          .filter((d) => mix[d] > 0)
+          .map((d) => `${d[0]}${mix[d]}`)
+          .join(" · ")}{" "}
+        <span title="Rough time at fluent pace, not a first encounter">· {hours}</span>
+      </div>
+    </div>
+  );
+}
+
 function UnitCard({
   u,
   onOpen,
@@ -359,6 +434,9 @@ function UnitCard({
         </div>
       )}
       <UnitProgress solved={u.solved} total={u.total} stale={u.stale} />
+      {/* "11 problems" reads the same for 11 Intros and for 10 Medium + 2 Hard.
+          The mix is what tells you which unit is an evening and which is a week. */}
+      <DifficultyMix mix={u.mix} minutes={u.estimatedMinutes} />
       <div className="row" style={{ marginTop: 8 }}>
         <span className="faint" style={{ fontSize: 12 }}>
           {u.solved}/{u.total} problems

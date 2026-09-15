@@ -41,7 +41,14 @@ export default function CurriculumUnit() {
   const [concepts, setConcepts] = useState<Concept[]>([]);
   const [reviews, setReviews] = useState<Map<string, CardReview>>(new Map());
   const nav = useNavigate();
-  const { isOpen, toggle, open } = useCollapse(`dsa-unit:${key}`, true);
+  // The third argument is a shared namespace: a section with no per-unit
+  // opinion falls back to the preference for its *type*, so "always show me
+  // pitfalls, never the motivation" is stated once rather than 33 times.
+  const { isOpen, toggle, open, toggleEverywhere } = useCollapse(
+    `dsa-unit:${key}`,
+    true,
+    "dsa-section"
+  );
   const { hash } = useLocation();
   // Refs so the key handler is registered once rather than re-bound on every
   // data change — the listener reads the latest values instead of closing over
@@ -316,7 +323,13 @@ export default function CurriculumUnit() {
         )}
       </div>
 
-      <Section title="🎯 Why this exists" id="why" open={isOpen("why")} onToggle={() => toggle("why")}>
+      <Section
+        title="🎯 Why this exists"
+        id="why"
+        open={isOpen("why")}
+        onToggle={() => toggle("why")}
+        meta={<EverywhereToggle open={isOpen("why")} onSet={(v) => toggleEverywhere("why", v)} />}
+      >
         <Markdown>{u.why}</Markdown>
       </Section>
 
@@ -450,7 +463,15 @@ export default function CurriculumUnit() {
           id="pitfalls"
           open={isOpen("pitfalls")}
           onToggle={() => toggle("pitfalls")}
-          meta={<span className="dim mono">{u.pitfalls.length}</span>}
+          meta={
+            <>
+              <EverywhereToggle
+                open={isOpen("pitfalls")}
+                onSet={(v) => toggleEverywhere("pitfalls", v)}
+              />
+              <span className="dim mono">{u.pitfalls.length}</span>
+            </>
+          }
         >
           <p className="dim" style={{ marginTop: 0 }}>
             Indexed by what you will actually see, so a failing run is searchable.
@@ -734,6 +755,32 @@ function TraceTable({ trace }: { trace: Trace }) {
         </p>
       )}
     </div>
+  );
+}
+
+/** "Do this on every unit" — sets the shared, section-type preference.
+ *
+ * Collapse state is per unit, which is right for a one-off and wrong for a
+ * standing preference: "I always want pitfalls open and the motivation closed"
+ * had to be re-expressed 33 times. This writes the shared key instead, and a
+ * later per-unit toggle still wins over it. */
+function EverywhereToggle({ open, onSet }: { open: boolean; onSet: (open: boolean) => void }) {
+  return (
+    <button
+      className="ghost"
+      style={{ fontSize: 11, padding: "1px 6px" }}
+      title={
+        open
+          ? "Keep this section open on every unit"
+          : "Keep this section closed on every unit"
+      }
+      onClick={(e) => {
+        e.stopPropagation(); // the header itself is the collapse toggle
+        onSet(open);
+      }}
+    >
+      {open ? "open everywhere" : "closed everywhere"}
+    </button>
   );
 }
 
