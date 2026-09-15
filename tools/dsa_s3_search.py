@@ -373,6 +373,98 @@ saying "that predicate looks monotone, so I can binary-search the answer and
 just write the feasibility check" is one of the highest-signal sentences in the
 whole interview vocabulary.
 """,
+    internals="""
+### `lo + (hi - lo) / 2`, and the bug it avoids
+
+`(lo + hi) / 2` is the obvious midpoint and it is wrong. With `lo` and `hi`
+both near `Integer.MAX_VALUE`, the *sum* overflows to a negative number before
+the division, and `mid` lands outside the array — an
+`ArrayIndexOutOfBoundsException` on inputs that are otherwise fine.
+
+`lo + (hi - lo) / 2` computes the same value and never forms the large sum:
+`hi - lo` is at most the array's length. This is not a hypothetical. It was a
+live bug in `java.util.Arrays.binarySearch` for nine years, and in the binary
+search in Jon Bentley's *Programming Pearls* for twenty.
+
+You will not hit it on an array of 10⁵ elements. You will hit it the moment you
+binary-search a *value* range — "smallest capacity between 1 and 10⁹", "largest
+gap" — where `lo` and `hi` are magnitudes rather than indices.
+
+### Half-open `[lo, hi)` versus closed `[lo, hi]`
+
+Two conventions, and mixing them is where every off-by-one lives.
+
+| | Half-open `[lo, hi)` | Closed `[lo, hi]` |
+|---|---|---|
+| `hi` starts at | `n` | `n - 1` |
+| `hi` is | one past the last candidate | a real index, readable |
+| loop while | `lo < hi` | `lo < hi` (converging) or `lo <= hi` (searching) |
+| narrowing | `hi = mid` | `hi = mid - 1` |
+| answer | `lo` | `lo` |
+
+Prefer half-open for *lower bound* questions: `hi = n` is exactly the "belongs
+past the end" answer, so there is no absent case to special-case. Use closed
+when `hi` is a value you actually read — `rotated-array-minimum` compares
+`a[mid]` against `a[hi]`, which is meaningless if `hi` is one past the end.
+
+### Why the loop terminates
+
+The range shrinks every iteration, and that has to be *checked*, not assumed:
+
+- `lo = mid + 1` always moves `lo` past `mid`. Safe.
+- `hi = mid` only shrinks if `mid < hi`, which holds because
+  `mid = lo + (hi - lo) / 2 < hi` whenever `lo < hi`. Safe.
+- `lo = mid` — the shape people write by accident — does **not** shrink when
+  `mid == lo`, which is the infinite loop. If a binary search hangs, this is
+  the line.
+
+### The cost, precisely
+
+Each iteration halves the range, so the loop runs ⌈log₂ n⌉ times: 17 for
+100,000 elements, 30 for a billion. The constant is a comparison and a
+division. It is one of the few algorithms where the theoretical bound and the
+wall-clock behaviour are effectively the same thing — the work is so small that
+cache behaviour dominates, which is why a linear scan beats binary search below
+roughly 64 elements.
+""",
+    traces=[
+        _trace(
+            "Lower bound for a MISSING value: 7 in [1, 3, 5, 9, 11, 13]",
+            "The half-open range `[lo, hi)` with `hi` starting at `n = 6`. Watch that "
+            "there is no equality branch — and that the loop still ends somewhere useful "
+            "even though 7 is not in the array.",
+            ["Iter", "[lo, hi)", "mid", "a[mid]", "a[mid] < 7 ?", "New range"],
+            [
+                ["1", "[0, 6)", "0 + 3 = 3", "9", "no", "hi = 3 → [0, 3)"],
+                ["2", "[0, 3)", "0 + 1 = 1", "3", "**yes**", "lo = 2 → [2, 3)"],
+                ["3", "[2, 3)", "2 + 0 = 2", "5", "**yes**", "lo = 3 → [3, 3)"],
+                ["end", "[3, 3)", "—", "—", "—", "lo == hi → return **3**"],
+            ],
+            "Three iterations for six elements, and the answer is 3 — the index 7 *would* "
+            "occupy. `a[3] == 9 != 7` tells you it is absent; the 3 tells you where it "
+            "belongs and that exactly three elements are smaller. One loop, three "
+            "questions answered.",
+        ),
+        _trace(
+            "Binary search on the ANSWER: smallest ship capacity for 1…10 in 5 days",
+            "Nothing here indexes the array. The search space is the capacity, bounded "
+            "below by `max(w) = 10` (one package must fit) and above by `sum(w) = 55` "
+            "(one day for everything). `days(cap)` is the predicate.",
+            ["[lo, hi)", "mid capacity", "days(mid)", "≤ 5 days?", "New range"],
+            [
+                ["[10, 55]", "32", "2", "**yes** — feasible", "hi = 32"],
+                ["[10, 32]", "21", "3", "**yes**", "hi = 21"],
+                ["[10, 21]", "15", "5", "**yes** — exactly on budget", "hi = 15"],
+                ["[10, 15]", "12", "6", "no — too slow", "lo = 13"],
+                ["[13, 15]", "14", "6", "no", "lo = 15"],
+                ["[15, 15]", "—", "—", "—", "return **15**"],
+            ],
+            "The predicate reads `no no no yes yes yes` as capacity grows, which is the "
+            "only property the loop needs — and the whole difficulty of these problems is "
+            "noticing that feasibility *is* monotone. Five probes over a range of 46, each "
+            "costing one linear pass.",
+        ),
+    ],
     rungs=[
         _rung("Warm up", "The half-open template, on the two questions it was built for.",
               ["lower-bound-index", "first-true-predicate"],

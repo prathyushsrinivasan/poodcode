@@ -665,6 +665,119 @@ optimisation as a follow-up rather than writing it first — showing you know it
 exists is worth as much as using it, and the array version is what you can
 actually debug on a whiteboard.
 """,
+    traces=[
+        _trace(
+            "House Robber on [2, 7, 9, 3, 1] — the two candidates, per cell",
+            "`dp[i]` = the best total using only houses `0…i`. The two middle columns are "
+            "the recurrence written out: at every house you either skip it and keep what "
+            "you had, or take it and add what you had two houses ago.",
+            ["i", "a[i]", "skip = dp[i−1]", "take = dp[i−2] + a[i]", "dp[i] = max", "Table"],
+            [
+                ["0", "2", "— (nothing before)", "0 + 2 = 2", "**2**", "[2]"],
+                ["1", "7", "2", "0 + 7 = 7", "**7**", "[2, 7]"],
+                ["2", "9", "7", "2 + 9 = 11", "**11**", "[2, 7, 11]"],
+                ["3", "3", "11", "7 + 3 = 10", "**11**", "[2, 7, 11, 11]"],
+                ["4", "1", "11", "11 + 1 = 12", "**12**", "[2, 7, 11, 11, 12]"],
+            ],
+            "Row 3 is the one worth staring at: taking house 3 *loses*, so `dp[3]` repeats "
+            "`dp[2]`. A 1-D table whose values never decrease is not a bug — it is the "
+            "\"skip\" branch winning. And note that only `dp[i-1]` and `dp[i-2]` are ever "
+            "read, so two variables would do; the array exists so you can see it.",
+        ),
+        _trace(
+            "Coin change table for coins {1, 3, 4}, amount 6 — every last coin",
+            "`dp[a]` = fewest coins making exactly `a`. One column per coin, because the "
+            "recurrence considers *every* possible last coin rather than committing to "
+            "one. This is the table the greedy algorithm refuses to build.",
+            ["a", "last = 1 → dp[a−1]+1", "last = 3 → dp[a−3]+1", "last = 4 → dp[a−4]+1", "dp[a]"],
+            [
+                ["1", "dp[0]+1 = **1**", "—", "—", "**1**"],
+                ["2", "dp[1]+1 = **2**", "—", "—", "**2**"],
+                ["3", "dp[2]+1 = 3", "dp[0]+1 = **1**", "—", "**1**"],
+                ["4", "dp[3]+1 = 2", "dp[1]+1 = 2", "dp[0]+1 = **1**", "**1**"],
+                ["5", "dp[4]+1 = **2**", "dp[2]+1 = 3", "dp[1]+1 = **2**", "**2**"],
+                ["6", "dp[5]+1 = 3", "dp[3]+1 = **2**", "dp[2]+1 = 3", "**2**"],
+            ],
+            "`dp[6] = 2`, via 3 + 3. Greedy takes the 4 first and finishes at three coins, "
+            "because it committed to a last coin it could not reconsider. The cost of the "
+            "table is exactly the price of that reconsideration: O(amount × coins) instead "
+            "of O(coins log coins), for an answer that is actually right.",
+        ),
+    ],
+    build_it="""
+### Convert a memoised recursion into a table, by hand, once
+
+Bottom-up DP looks like a different technique from recursion, and it is not:
+the table *is* the memo, with the call stack unrolled into a loop. Doing that
+conversion by hand once makes every later "should this be top-down or
+bottom-up?" question answerable in a sentence.
+
+Take Climbing Stairs. Start from the honest recursion:
+
+```java
+static long ways(int n) {
+    if (n == 0) return 1;      // one way to have made no moves
+    if (n < 0)  return 0;      // overshot the top
+    return ways(n - 1) + ways(n - 2);
+}
+```
+
+**Step 1 — measure the damage.** Add a counter to `ways` and call it for
+n = 30. You will see roughly 2.7 million calls for a function with 31 distinct
+inputs. That ratio is the whole motivation.
+
+**Step 2 — memoise.** One array and two lines:
+
+```java
+static long[] memo;            // sized n + 1, filled with -1
+
+static long ways(int n) {
+    if (n == 0) return 1;
+    if (n < 0)  return 0;
+    if (memo[n] != -1) return memo[n];     // ← added
+    return memo[n] = ways(n - 1) + ways(n - 2);   // ← added
+}
+```
+
+Count the calls again: 31 distinct computations. Same answer, exponential to
+linear, two lines.
+
+**Step 3 — write down the order the memo was filled in.** Instrument the
+assignment to print `n` as each cell is written. You will see
+`1, 2, 3, …, n` — increasing, every time. That is not a coincidence: `ways(n)`
+cannot return until the smaller values have, so the memo is *necessarily*
+completed from small to large.
+
+**Step 4 — delete the recursion.** If the order is always increasing, write the
+loop that produces it and the function calls become array reads:
+
+```java
+long[] dp = new long[n + 1];
+dp[0] = 1;
+for (int i = 1; i <= n; i++) {
+    dp[i] = dp[i - 1] + (i >= 2 ? dp[i - 2] : 0);
+}
+```
+
+The `n < 0` base case became the `i >= 2` guard — the same fact, relocated from
+"a call that returns 0" to "a term that is not added".
+
+### What you now know, that you did not before
+
+- **Top-down and bottom-up compute identical tables.** They differ only in who
+  decides the order: the call stack, or you.
+- **Bottom-up needs you to know the order in advance.** When you cannot state
+  it — a DP over subsets, a game tree, a graph with no obvious layering —
+  memoised recursion is not the lazy option, it is the correct one.
+- **Top-down costs stack depth.** n = 10⁶ overflows recursively and is fine
+  iteratively; that alone decides some problems.
+- **Bottom-up makes space optimisation visible.** The loop above reads only two
+  cells back, so two `long`s replace the array. You cannot see that from the
+  recursion, which is one reason to convert.
+
+Do this same four-step walk on `house-robber` before you move on. It is the
+last time it will feel like work.
+""",
     rungs=[
         _rung("Warm up", "The three questions, where all three answers are obvious.",
               ["stair-ways-table"],
@@ -922,6 +1035,45 @@ explaining the three neighbours as replace, delete and insert; it takes ninety
 seconds and it proves the recurrence in a way that code cannot. Offer the
 rolled-row space optimisation at the end, after the table is right.
 """,
+    traces=[
+        _trace(
+            "Grid paths, one row at a time, on a 3 × 4 grid",
+            "`dp[i][j]` = routes from the top-left to `(i, j)` moving only right or down. "
+            "Each cell reads the one above and the one to the left, which is what makes "
+            "row-by-row a legal fill order — and diagonal-outward not.",
+            ["Row", "j = 0", "j = 1", "j = 2", "j = 3", "Rule in play"],
+            [
+                ["i = 0", "**1**", "0 + 1 = **1**", "0 + 1 = **1**", "0 + 1 = **1**",
+                 "nothing above; only from the left"],
+                ["i = 1", "1 + 0 = **1**", "1 + 1 = **2**", "1 + 2 = **3**", "1 + 3 = **4**",
+                 "above + left"],
+                ["i = 2", "1 + 0 = **1**", "1 + 2 = **3**", "3 + 3 = **6**", "4 + 6 = **10**",
+                 "above + left"],
+            ],
+            "The first row and column come out all 1s with no special case, because the "
+            "missing term contributes 0. And notice what row `i = 2` reads: only row "
+            "`i = 1` and the cell to its own left — so if you only want the final number, "
+            "**one row of storage is enough** and the O(H·W) space collapses to O(W).",
+        ),
+        _trace(
+            "Reading the table BACKWARDS: recovering the LCS of \"ABC\" and \"BC\"",
+            "The length was one cell. The *answer* is a walk back through the whole table "
+            "from the bottom-right, and this is the half that gets skipped — which is why "
+            "\"how long is it?\" and \"which one is it?\" need different amounts of memory.",
+            ["At (i, j)", "s[i−1], t[j−1]", "dp[i][j]", "Move", "Subsequence so far"],
+            [
+                ["(3, 2)", "C, C", "2", "match → take it, go to (2, 1)", "C"],
+                ["(2, 1)", "B, B", "1", "match → take it, go to (1, 0)", "BC"],
+                ["(1, 0)", "A, —", "0", "j = 0 → stop", "**BC**"],
+            ],
+            "Built backwards, so reverse it at the end. When the characters do *not* "
+            "match you step toward whichever of `dp[i-1][j]` / `dp[i][j-1]` the value came "
+            "from — that is the same comparison the forward pass made, replayed. The "
+            "consequence for space is concrete: the one-row trick works for the length and "
+            "is useless for reconstruction, because the walk needs cells the row-reuse "
+            "already overwrote.",
+        ),
+    ],
     rungs=[
         _rung("Warm up", "The same table, with the fill order made visible.",
               ["grid-paths-table"],
@@ -1196,6 +1348,183 @@ autocomplete and dictionary problems, and candidates who have not met it tend to
 propose scanning every word. Be ready for the trade-off question: a trie costs
 far more memory than a hash set, so it earns its place only when prefixes,
 wildcards or bit-greedy walks are actually needed.
+""",
+    internals="""
+### The node is the whole design decision
+
+```java
+class Node {
+    Node[] next = new Node[26];   // array of children
+    boolean isWord;
+}
+```
+
+versus
+
+```java
+class Node {
+    Map<Character, Node> next = new HashMap<>();
+    boolean isWord;
+}
+```
+
+Same trie, very different memory. The array version allocates **26 references
+per node whether or not they are used** — 26 × 8 bytes ≈ 208 bytes of pointers,
+plus the array header, plus the object header: call it ~240 bytes per node even
+for a node with one child. The map version pays a `HashMap` (its own object,
+plus a bucket array, plus one `Entry` per child ≈ 32 bytes each) but only for
+children that exist.
+
+| | `Node[26]` | `HashMap<Character, Node>` |
+|---|---|---|
+| child lookup | one array index — a few ns | hash + bucket walk — tens of ns |
+| memory, dense node (20 children) | ~240 B | ~800 B |
+| memory, sparse node (1 child) | ~240 B | ~130 B |
+| alphabet size | fixed at compile time | any, including Unicode |
+| iterate children in order | free — index order is alphabetical | needs sorting |
+
+The rule that falls out: **arrays win when the alphabet is small and known and
+the trie is dense**; maps win when the alphabet is large, or when most nodes
+have one or two children — which is what a trie of long, dissimilar words looks
+like near its leaves.
+
+For lowercase-only interview problems, take the array. It is faster, it is less
+code, and `c - 'a'` is self-documenting. Say the trade-off out loud anyway; it
+is the follow-up question, and "26 pointers per node regardless of use" is the
+sentence that answers it.
+
+### Where the memory actually goes
+
+A trie's node count is the number of **distinct prefixes** across all inserted
+words, not the number of words. Insert `car`, `card`, `care`, `cart` and you get
+7 nodes, not 15 — the shared `car` path is stored once. That sharing is the
+entire reason the structure exists, and it is also why a trie over random
+strings is a disaster: nothing shares, so you allocate one node per character
+and a `HashSet` beats you on every axis.
+
+Rough arithmetic worth being able to do at a whiteboard: 10⁵ words averaging 10
+characters with little sharing is ~10⁶ nodes; at 240 bytes each that is **240
+MB** with the array layout, and a heap that does not fit. Switching to
+`HashMap` children, or to one of the compressed variants below, is not a
+micro-optimisation at that scale — it is the difference between running and
+not.
+
+### Why lookup does not depend on how much is stored
+
+`insert` and `search` walk one node per character of the *query*, and that walk
+is unaffected by how many other words the trie holds. A `HashSet<String>` is
+also O(length) — it has to hash the whole string — so for exact lookup the trie
+buys nothing.
+
+What the trie buys is everything **prefix**-shaped, because the shared path is
+still there to be read:
+
+- how many stored words start with `ca` → one counter per node, maintained on
+  insert
+- the longest stored word that is a prefix of this string → stop at the last
+  `isWord` you passed
+- every completion of `ca` → the subtree under that node
+
+A hash set destroys all of that when it hashes, which is the honest answer to
+"why not just use a set?"
+
+### The compressed variants, named
+
+- **Radix tree / Patricia trie** — collapse any chain of single-child nodes into
+  one edge holding the whole substring. Same queries, far fewer nodes; the code
+  gets substantially harder because edges must be split on insert.
+- **Ternary search tree** — three children per node (`<`, `=`, `>`) instead of
+  26. Much less memory, slightly slower, and handles any alphabet.
+- **DAWG / DAFSA** — also merge identical *suffixes*, turning the tree into a
+  DAG. Minimal for a fixed dictionary, and effectively unmodifiable afterwards.
+
+Nobody is asking you to implement these. Knowing the first one exists, and that
+the problem it solves is "my trie is mostly single-child chains", is the useful
+part.
+""",
+    build_it="""
+### Write it from scratch, in about thirty lines
+
+A trie is short enough that there is no excuse for not owning it, and every
+other problem in this unit is this class with one method added.
+
+```java
+class Trie {
+    private static class Node {
+        Node[] next = new Node[26];
+        boolean isWord;
+        int passing;     // words whose path goes through here (this node included)
+    }
+
+    private final Node root = new Node();
+
+    void insert(String w) {
+        Node cur = root;
+        cur.passing++;
+        for (char c : w.toCharArray()) {
+            int k = c - 'a';
+            if (cur.next[k] == null) cur.next[k] = new Node();
+            cur = cur.next[k];
+            cur.passing++;
+        }
+        cur.isWord = true;
+    }
+
+    /** The node reached by walking `s`, or null if the path leaves the trie. */
+    private Node walk(String s) {
+        Node cur = root;
+        for (char c : s.toCharArray()) {
+            cur = cur.next[c - 'a'];
+            if (cur == null) return null;
+        }
+        return cur;
+    }
+
+    boolean contains(String w) {
+        Node n = walk(w);
+        return n != null && n.isWord;
+    }
+
+    int countWithPrefix(String p) {
+        Node n = walk(p);
+        return n == null ? 0 : n.passing;
+    }
+}
+```
+
+### Four things to notice while typing it
+
+1. **`walk` is the whole structure.** `contains`, `countWithPrefix`,
+   `startsWith`, autocomplete — all of them are `walk` plus one read of the node
+   it returns. Factor it out and the rest of the unit is three-line methods.
+2. **`isWord` is not "has no children".** After inserting `car` and `card`, the
+   node at `car` has a child *and* is a word. After inserting only `card`, the
+   node at `car` exists and is not. `contains` must read the flag; nothing else
+   is equivalent to it.
+3. **`passing` is maintained on insert, never counted on query.** That is what
+   makes `countWithPrefix` O(length) instead of O(subtree). Maintaining a
+   counter during the write so the read stays cheap is the same move as
+   Union-Find's component count.
+4. **The root increments too.** `countWithPrefix("")` should be the total number
+   of inserted words, and it is — for free — only if `root.passing` is bumped
+   before the loop.
+
+### Then extend it, in the order the rungs do
+
+- **`longestPrefixOf(s)`** — walk `s`, remembering the depth of the last node
+  with `isWord` set. Three lines, and it is the whole of the replace-words
+  problem.
+- **Wildcard search** — at a `.`, recurse into every non-null child. The
+  *structure* does not change at all; only the traversal does, which is the
+  point worth internalising.
+- **Deletion** — insert `car` and `card`, then delete `card`. You must unset
+  `isWord`, decrement `passing` along the path, and free only the nodes whose
+  `passing` reached 0. Get this right and you understand why most interview
+  tries do not support delete.
+- **A binary trie over bits.** Replace 26 children with 2, and insert each
+  number's 32 bits from the top. Walking greedily toward the *opposite* bit at
+  each step gives the maximum XOR against a stored number — the last problem in
+  the curriculum, and a trie with the alphabet set to `{0, 1}`.
 """,
     rungs=[
         _rung("Warm up", "Insert and exact lookup, and the flag people forget.",

@@ -285,25 +285,66 @@ fn every_trace_is_a_well_formed_table() {
     }
 }
 
-/// The data-structure stage carries depth the technique stages do not need, and
-/// it is asserted rather than left to the author's discretion: a unit about a
-/// *structure* must explain the layout its costs come from, show the state
-/// changing, and ask you to build the thing once.
+/// Depth that is no longer optional, unit by unit.
+///
+/// `internals` / `traces` / `build_it` began as a linear-structures-stage thing,
+/// on the argument that a unit about a *structure* has to answer "why are these
+/// the costs?" while a unit about a technique does not. That is only half right:
+/// what a trace answers is "what is the state, step by step", and the places
+/// where the state is hardest to hold in prose are Dijkstra's priority queue, a
+/// DP table, a backtracking stack and a DSU forest — none of them in that stage.
+///
+/// Listed rather than derived, because which units benefit is a pedagogical
+/// judgement; the point of the list is that authored depth cannot silently
+/// disappear. Mirrors `_NEEDS_*` in tools/dsa_curriculum.py.
+const NEEDS_INTERNALS: &[&str] = &[
+    "hashing", "binary-search", "stacks", "queues-and-deques", "linked-lists", "heaps",
+    "design", "trees", "tries",
+];
+const NEEDS_TRACES: &[&str] = &[
+    "binary-search", "stacks", "queues-and-deques", "linked-lists", "heaps", "design",
+    "backtracking", "union-find", "shortest-paths", "dp-1d", "dp-2d",
+];
+const NEEDS_BUILD_IT: &[&str] = &[
+    "stacks", "queues-and-deques", "linked-lists", "heaps", "design", "union-find",
+    "tries", "dp-1d",
+];
+
 #[test]
-fn structure_units_explain_their_internals() {
+fn units_that_need_depth_carry_it() {
     let curriculum: DsaCurriculum =
         serde_json::from_str(CURRICULUM).expect("dsa_curriculum.json parses");
 
-    let stage = curriculum
-        .stages
-        .iter()
-        .find(|s| s.key == "structures")
-        .expect("the linear-structures stage exists");
+    let mut by_key: HashMap<&str, &poodcode_lib::models::CurriculumUnit> = HashMap::new();
+    for stage in &curriculum.stages {
+        for u in &stage.units {
+            by_key.insert(u.key.as_str(), u);
+        }
+    }
 
-    for u in &stage.units {
-        let k = &u.key;
-        assert!(!u.internals.trim().is_empty(), "{k}: no internals — what are its costs made of?");
-        assert!(!u.build_it.trim().is_empty(), "{k}: no build-it-yourself exercise");
-        assert!(!u.traces.is_empty(), "{k}: no worked trace");
+    // A name in one of the lists that is not a unit is a typo that would
+    // otherwise make the assertion silently vacuous.
+    for k in NEEDS_INTERNALS.iter().chain(NEEDS_TRACES).chain(NEEDS_BUILD_IT) {
+        assert!(by_key.contains_key(k), "depth list names unknown unit {k}");
+    }
+
+    for k in NEEDS_INTERNALS {
+        assert!(
+            !by_key[k].internals.trim().is_empty(),
+            "{k}: no internals — what layout are its costs a consequence of?"
+        );
+    }
+    for k in NEEDS_TRACES {
+        assert!(
+            !by_key[k].traces.is_empty(),
+            "{k}: no worked trace. This unit is state changing over time, which is the \
+             one thing prose cannot show and a table can."
+        );
+    }
+    for k in NEEDS_BUILD_IT {
+        assert!(
+            !by_key[k].build_it.trim().is_empty(),
+            "{k}: no build-it-yourself exercise"
+        );
     }
 }

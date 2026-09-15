@@ -854,7 +854,7 @@
           ],
           "why": "The commonest reason code is quadratic is that it searches. *For each element,\nlook through the rest* is two nested loops, and the inner one is almost always\nasking a question a hash table can answer instantly: **have I seen this value,\nand if so, where or how often?**\n\nHashing is the single highest-return pattern in this curriculum. It turns a\nwhole tier of O(n²) solutions into O(n) with a few lines, and the cost is memory\n— which is nearly always the right trade.\n",
           "model": "### Three structures, three questions\n\n| You need to know | Use | Cost |\n| --- | --- | --- |\n| *Have I seen x?* | `HashSet<T>` | O(1) add / contains |\n| *How many times have I seen x?* | `HashMap<T, Integer>` | O(1) get / put |\n| *Where did I see x?* | `HashMap<T, Integer>` value = index | O(1) |\n\nAll three are the same structure underneath. Choosing is just naming what the\nvalue means.\n\n### The complement trick\n\nTwo-sum is the archetype, and it generalises: **as you scan, ask whether the\npartner you need has already gone past.**\n\n```java\nfor (int i = 0; i < n; i++) {\n    int need = target - a[i];\n    if (seen.containsKey(need)) return new int[]{ seen.get(need), i };\n    seen.put(a[i], i);          // AFTER the check, never before\n}\n```\n\nChecking before inserting is what stops an element pairing with itself. That one\nline ordering is the whole difference between right and wrong.\n\n### Canonical forms\n\n*Group the anagrams* is the same question as *are these equal?* once you can\nreduce each item to a **canonical form** — a representative that is identical\nfor everything in a group. Sorted letters (`\"eat\"` → `\"aet\"`) is one; a\n26-length count signature is another, and is O(n) rather than O(n log n).\n\nThe pattern is worth naming because it is how you hash something that is not\nalready a key: reduce it to something equal-when-equivalent, then hash *that*.\n\n### Counting when the keys are small\n\nIf the keys are letters or small integers, an `int[]` beats a `HashMap` on every\naxis — no boxing, no hashing, cache friendly:\n\n```java\nint[] freq = new int[26];\nfreq[c - 'a']++;\n```\n\nReach for the map only when the key space is large or not an integer.\n",
-          "internals": "",
+          "internals": "### What `HashMap` actually is\n\nA **bucket array**, plus a rule for turning a key into an index into it.\n\n```\nhash = key.hashCode()\nhash ^= (hash >>> 16)          // spread the high bits down\nindex = hash & (table.length - 1)   // cheap modulo, because length is a power of 2\n```\n\nEach bucket holds the entries whose keys landed on that index — a **collision**.\nJava keeps them in a short linked list, and once a single bucket reaches **8**\nentries (with a table of at least 64) it converts that list into a red-black\ntree, so a pathological bucket degrades to O(log k) rather than O(k). That is\nthe entire reason `get` can be called O(1) with a straight face: the average\nbucket is tiny, and the worst bucket is bounded.\n\n### Load factor, and why the cost is *amortised*\n\n`HashMap` grows when `size > capacity × 0.75`. Growing means allocating a table\nof twice the length and re-indexing **every** entry, because the index depends\non `table.length`. That single insert costs O(n).\n\nSpread over the n inserts that led to it, the cost per insert is still O(1) —\nthe same amortisation argument as `ArrayList` growth. It is worth being able to\nsay out loud, because \"insert is O(1)\" is false about *that* insert and true\nabout the sequence.\n\nIf you know the final size, `new HashMap<>(expectedSize / 0.75f + 1)` skips the\nresizes entirely. Rarely decisive, occasionally the difference between passing\nand timing out on 10⁶ insertions.\n\n### What `HashMap` does *not* promise\n\n**Any order at all.** Not insertion order, not key order, and not a stable\norder across runs or across JDK versions. Code that iterates a `HashMap` and\nprints is code whose output is not specified, and the judge compares text — so\nthis is a correctness bug, not a style one.\n\nWhen order matters, say which order you mean:\n\n| You want | Use |\n|---|---|\n| insertion order | `LinkedHashMap` |\n| sorted by key | `TreeMap` — O(log n) per op, not O(1) |\n| no order, fastest | `HashMap` |\n\n### `hashCode` and `equals` are a pair\n\nTwo keys that are `equals` **must** have the same `hashCode`, or the map will\nstore both and find neither reliably. Java's `Integer`, `Long`, `String` and\n`List` all honour this. A custom key class that overrides `equals` and forgets\n`hashCode` is the classic silent bug — and an `int[]` used as a key is the same\nbug with no override in sight, because arrays hash by identity. Use a\n`List<Integer>` or a joined string instead.\n",
           "signals": [
             {
               "when": "“does it contain a duplicate?”",
@@ -2061,7 +2061,7 @@
           ],
           "why": "Binary search is the cheapest big win in algorithms: 20 steps to find one value\namong a million, 30 among a billion. Everyone knows the idea. Almost nobody\nwrites it correctly first time, because the bugs are all in the boundaries —\n`<` versus `<=`, `mid` versus `mid + 1`, and the loop that never terminates.\n\nThe reason it deserves a unit rather than a paragraph is the second form:\n**binary search on the answer**. When a problem asks for the smallest value\nthat satisfies a monotone predicate, you can binary-search the answer space\neven when there is no array at all. That reframing turns a family of apparently\nhard problems into ten-line solutions.\n",
           "model": "### Stop writing \"find the target\"\n\nWrite **lower bound** instead: *the first index whose value is ≥ target*. It\nanswers \"does it exist?\", \"where would I insert it?\", \"how many are smaller?\"\nand \"what is the first one ≥ x?\" — all with one template that has no special\ncases.\n\n```java\nint lo = 0, hi = n;                 // hi is EXCLUSIVE\nwhile (lo < hi) {\n    int mid = lo + (hi - lo) / 2;   // overflow-safe midpoint\n    if (a[mid] < target) lo = mid + 1;   // mid cannot be the answer\n    else                 hi = mid;       // mid might be the answer\n}\nreturn lo;                          // in [0, n]; n means \"all are smaller\"\n```\n\nWhy it terminates: `mid < hi` always, so `hi = mid` strictly shrinks the range,\nand `lo = mid + 1` obviously does. Why it is correct: the invariant is\n*\"everything before `lo` is < target, everything from `hi` on is ≥ target\"*,\nwhich is preserved by both branches and, at `lo == hi`, is the answer.\n\nHalf-open bounds (`hi = n`, not `n - 1`) are what remove the special cases. Use\nthem.\n\n### Binary search on the answer\n\nIf a predicate `ok(x)` is **monotone** — false, false, …, false, true, true, …\n— you can binary-search x itself:\n\n```java\nlong lo = 0, hi = UPPER_BOUND;\nwhile (lo < hi) {\n    long mid = lo + (hi - lo) / 2;\n    if (ok(mid)) hi = mid;          // mid works: look for something smaller\n    else         lo = mid + 1;      // mid fails: the answer is larger\n}\nreturn lo;                          // the smallest x with ok(x)\n```\n\nInteger square root is the toy case: `ok(x)` is `x * x > n`, and the answer is\none before the first x that satisfies it. The pattern scales to \"minimum\ncapacity\", \"minimum speed\", \"minimum time\" problems — anything where checking a\ncandidate is easy but constructing the optimum is not.\n\nThe only question worth asking is: **is the predicate really monotone?** If\n`ok(5)` is true but `ok(6)` is false, the search is invalid.\n",
-          "internals": "",
+          "internals": "### `lo + (hi - lo) / 2`, and the bug it avoids\n\n`(lo + hi) / 2` is the obvious midpoint and it is wrong. With `lo` and `hi`\nboth near `Integer.MAX_VALUE`, the *sum* overflows to a negative number before\nthe division, and `mid` lands outside the array — an\n`ArrayIndexOutOfBoundsException` on inputs that are otherwise fine.\n\n`lo + (hi - lo) / 2` computes the same value and never forms the large sum:\n`hi - lo` is at most the array's length. This is not a hypothetical. It was a\nlive bug in `java.util.Arrays.binarySearch` for nine years, and in the binary\nsearch in Jon Bentley's *Programming Pearls* for twenty.\n\nYou will not hit it on an array of 10⁵ elements. You will hit it the moment you\nbinary-search a *value* range — \"smallest capacity between 1 and 10⁹\", \"largest\ngap\" — where `lo` and `hi` are magnitudes rather than indices.\n\n### Half-open `[lo, hi)` versus closed `[lo, hi]`\n\nTwo conventions, and mixing them is where every off-by-one lives.\n\n| | Half-open `[lo, hi)` | Closed `[lo, hi]` |\n|---|---|---|\n| `hi` starts at | `n` | `n - 1` |\n| `hi` is | one past the last candidate | a real index, readable |\n| loop while | `lo < hi` | `lo < hi` (converging) or `lo <= hi` (searching) |\n| narrowing | `hi = mid` | `hi = mid - 1` |\n| answer | `lo` | `lo` |\n\nPrefer half-open for *lower bound* questions: `hi = n` is exactly the \"belongs\npast the end\" answer, so there is no absent case to special-case. Use closed\nwhen `hi` is a value you actually read — `rotated-array-minimum` compares\n`a[mid]` against `a[hi]`, which is meaningless if `hi` is one past the end.\n\n### Why the loop terminates\n\nThe range shrinks every iteration, and that has to be *checked*, not assumed:\n\n- `lo = mid + 1` always moves `lo` past `mid`. Safe.\n- `hi = mid` only shrinks if `mid < hi`, which holds because\n  `mid = lo + (hi - lo) / 2 < hi` whenever `lo < hi`. Safe.\n- `lo = mid` — the shape people write by accident — does **not** shrink when\n  `mid == lo`, which is the infinite loop. If a binary search hangs, this is\n  the line.\n\n### The cost, precisely\n\nEach iteration halves the range, so the loop runs ⌈log₂ n⌉ times: 17 for\n100,000 elements, 30 for a billion. The constant is a comparison and a\ndivision. It is one of the few algorithms where the theoretical bound and the\nwall-clock behaviour are effectively the same thing — the work is so small that\ncache behaviour dominates, which is why a linear scan beats binary search below\nroughly 64 elements.\n",
           "signals": [
             {
               "when": "“sorted array” + “find / count / insert”",
@@ -2109,7 +2109,111 @@
               "note": "One character apart from lower bound, and that is the whole difference."
             }
           ],
-          "traces": [],
+          "traces": [
+            {
+              "title": "Lower bound for a MISSING value: 7 in [1, 3, 5, 9, 11, 13]",
+              "intro": "The half-open range `[lo, hi)` with `hi` starting at `n = 6`. Watch that there is no equality branch — and that the loop still ends somewhere useful even though 7 is not in the array.",
+              "headers": [
+                "Iter",
+                "[lo, hi)",
+                "mid",
+                "a[mid]",
+                "a[mid] < 7 ?",
+                "New range"
+              ],
+              "rows": [
+                [
+                  "1",
+                  "[0, 6)",
+                  "0 + 3 = 3",
+                  "9",
+                  "no",
+                  "hi = 3 → [0, 3)"
+                ],
+                [
+                  "2",
+                  "[0, 3)",
+                  "0 + 1 = 1",
+                  "3",
+                  "**yes**",
+                  "lo = 2 → [2, 3)"
+                ],
+                [
+                  "3",
+                  "[2, 3)",
+                  "2 + 0 = 2",
+                  "5",
+                  "**yes**",
+                  "lo = 3 → [3, 3)"
+                ],
+                [
+                  "end",
+                  "[3, 3)",
+                  "—",
+                  "—",
+                  "—",
+                  "lo == hi → return **3**"
+                ]
+              ],
+              "takeaway": "Three iterations for six elements, and the answer is 3 — the index 7 *would* occupy. `a[3] == 9 != 7` tells you it is absent; the 3 tells you where it belongs and that exactly three elements are smaller. One loop, three questions answered."
+            },
+            {
+              "title": "Binary search on the ANSWER: smallest ship capacity for 1…10 in 5 days",
+              "intro": "Nothing here indexes the array. The search space is the capacity, bounded below by `max(w) = 10` (one package must fit) and above by `sum(w) = 55` (one day for everything). `days(cap)` is the predicate.",
+              "headers": [
+                "[lo, hi)",
+                "mid capacity",
+                "days(mid)",
+                "≤ 5 days?",
+                "New range"
+              ],
+              "rows": [
+                [
+                  "[10, 55]",
+                  "32",
+                  "2",
+                  "**yes** — feasible",
+                  "hi = 32"
+                ],
+                [
+                  "[10, 32]",
+                  "21",
+                  "3",
+                  "**yes**",
+                  "hi = 21"
+                ],
+                [
+                  "[10, 21]",
+                  "15",
+                  "5",
+                  "**yes** — exactly on budget",
+                  "hi = 15"
+                ],
+                [
+                  "[10, 15]",
+                  "12",
+                  "6",
+                  "no — too slow",
+                  "lo = 13"
+                ],
+                [
+                  "[13, 15]",
+                  "14",
+                  "6",
+                  "no",
+                  "lo = 15"
+                ],
+                [
+                  "[15, 15]",
+                  "—",
+                  "—",
+                  "—",
+                  "return **15**"
+                ]
+              ],
+              "takeaway": "The predicate reads `no no no yes yes yes` as capacity grows, which is the only property the loop needs — and the whole difficulty of these problems is noticing that feasibility *is* monotone. Five probes over a range of 46, each costing one linear pass."
+            }
+          ],
           "costs": [
             {
               "op": "Binary search",
@@ -4830,7 +4934,7 @@
           ],
           "why": "A binary tree is the friendliest recursive structure there is: no cycles, at\nmost two children, and a natural base case at `null`. That is why it dominates\ninterview question banks — it tests recursion without any of the bookkeeping a\ngraph demands.\n\nAlmost every tree problem is one of two shapes. Either you ask each subtree for\na value and combine the answers (**bottom-up**), or you carry information down\nfrom the root as you descend (**top-down**). Being able to say which one a\nproblem needs, before writing anything, is the skill this unit builds.\n",
           "model": "### The shape\n\n```java\nclass TreeNode { int val; TreeNode left, right; }\n```\n\n`null` is the empty tree and the base case of essentially every function here.\n\n### Bottom-up: ask the children\n\n```java\nstatic int height(TreeNode n) {\n    if (n == null) return 0;\n    return 1 + Math.max(height(n.left), height(n.right));\n}\n```\n\nThe recursion returns a value that the parent combines. Height, node count,\nbalance, diameter and maximum path sum are all this shape — and the harder ones\nshare a trick: **return one thing and record another**. Diameter needs the\nheight from each call, but the answer is the best path *seen anywhere*, so the\nfunction returns height and updates a field for the answer.\n\n### Top-down: carry context down\n\n```java\nstatic boolean hasPath(TreeNode n, int remaining) {\n    if (n == null) return false;\n    remaining -= n.val;\n    if (n.left == null && n.right == null) return remaining == 0;\n    return hasPath(n.left, remaining) || hasPath(n.right, remaining);\n}\n```\n\nHere the parameter carries what the parent knew. Path sums, depth tracking and\nBST range validation are all top-down.\n\nA leaf is `left == null && right == null` — **not** `n == null`. Conflating\nthem is the reason min-depth is the most-failed easy tree problem: a node with\none child is not a leaf, and returning `min(0, depth(other))` gives 0.\n\n### The three depth-first orders\n\n```java\nvisit(n); go(left); go(right);      // pre-order  — root first  (copy, serialise)\ngo(left); visit(n); go(right);      // in-order   — sorted, for a BST\ngo(left); go(right); visit(n);      // post-order — children first (delete, aggregate)\n```\n\nSame traversal, three positions for the work. Choose by asking *when* the node's\nvalue is needed relative to its children's.\n\n### Breadth-first: level order\n\nEverything phrased in terms of **levels** — level order, right-side view,\nzigzag, minimum depth on a wide tree — is a queue, not recursion:\n\n```java\nQueue<TreeNode> q = new ArrayDeque<>();\nq.add(root);\nwhile (!q.isEmpty()) {\n    int size = q.size();               // freeze this level's width\n    for (int i = 0; i < size; i++) {\n        TreeNode n = q.poll();\n        if (n.left != null) q.add(n.left);\n        if (n.right != null) q.add(n.right);\n    }\n}\n```\n\nCapturing `q.size()` before the inner loop is what separates one level from the\nnext. Without it you cannot tell where a level ends.\n",
-          "internals": "",
+          "internals": "### A tree's cost is its *shape*, not its size\n\nEvery recursion in this unit visits each node once, so the **time** is O(n) no\nmatter what. What the shape decides is the **stack depth**, and that is the\nnumber that bites:\n\n```\nbalanced (n = 15)            skewed (n = 15)\n      8                      1\n   4     12                   2\n 2  6  10  14                  3\n1 3 5 7 9 11 13 15              4  …  15\n\nheight 4 = ⌊log₂ n⌋ + 1      height 15 = n\n```\n\nA recursive traversal uses one JVM stack frame per level. At height 15 nobody\nnotices; at height 10⁵ — a linked-list-shaped tree, which is what you get by\ninserting sorted keys into an unbalanced BST — you get a\n`StackOverflowError`, not a wrong answer and not a timeout. The default thread\nstack holds roughly 10⁴–10⁵ frames depending on frame size, so this is a real\nlimit at competitive-programming sizes.\n\nThe fix when it matters is an explicit stack (`Deque<TreeNode>`), which moves\nthe frames onto the heap. Worth knowing you *can*; not worth doing by default,\nbecause the recursive version is three lines and the iterative one is twelve.\n\n### What balancing buys, and what it costs\n\nA **self-balancing** tree does extra work on insert and delete to keep the\nheight at O(log n): AVL rotates aggressively and stays very balanced; red-black\nrotates less and allows up to 2× the minimum height. Java's `TreeMap` and\n`TreeSet` are red-black trees.\n\n| | Unbalanced BST | Balanced BST (`TreeMap`) | `HashMap` |\n|---|---|---|---|\n| search / insert | O(h) — O(log n) typical, **O(n) worst** | O(log n) guaranteed | O(1) average |\n| in-order = sorted | yes | yes | **no order at all** |\n| first / last / floor / ceiling | O(h) | O(log n) | not supported |\n| overhead | pointers only | pointers + a colour bit + rotations | bucket array |\n\nThe trade is stated in one line: a hash map is faster and forgets order; a\nbalanced tree is slower and remembers it. Choose on whether you will ever ask\n*\"what is the next key after this one?\"*\n\n### Why a binary tree at all\n\nThe branching factor is what makes the height logarithmic — `log₂ n` levels to\nreach n nodes. Widening the node to hold many keys gives `log_B n` levels,\nwhich barely helps in memory (log₂ 10⁶ = 20, log₁₀₀ 10⁶ = 3) but matters\nenormously on disk, where each level is a seek. That is a B-tree, and it is why\nevery database index is one and no in-memory `Map` is.\n",
           "signals": [
             {
               "when": "“depth”, “count”, “sum of the subtree”",
@@ -5307,7 +5411,169 @@
               "note": "Restore on *every* exit path, including the successful one."
             }
           ],
-          "traces": [],
+          "traces": [
+            {
+              "title": "Every frame of subsets([5, 1]) — including the undos",
+              "intro": "One row per *event*, not per call, so the push / explore / undo cycle is visible. `chosen` is a single mutable list shared by the whole search tree, which is the only reason the space is O(n) instead of O(2ⁿ · n).",
+              "headers": [
+                "#",
+                "Frame",
+                "Action",
+                "`chosen` after",
+                "Emitted"
+              ],
+              "rows": [
+                [
+                  "1",
+                  "rec(0)",
+                  "skip a[0] = 5 → recurse",
+                  "[]",
+                  "—"
+                ],
+                [
+                  "2",
+                  "rec(1)",
+                  "skip a[1] = 1 → recurse",
+                  "[]",
+                  "—"
+                ],
+                [
+                  "3",
+                  "rec(2)",
+                  "i == n → emit",
+                  "[]",
+                  "`-`"
+                ],
+                [
+                  "4",
+                  "rec(1)",
+                  "take a[1] = 1 → **add**",
+                  "[1]",
+                  "—"
+                ],
+                [
+                  "5",
+                  "rec(2)",
+                  "i == n → emit",
+                  "[1]",
+                  "`1`"
+                ],
+                [
+                  "6",
+                  "rec(1)",
+                  "**UNDO** — pop 1",
+                  "[]",
+                  "—"
+                ],
+                [
+                  "7",
+                  "rec(0)",
+                  "take a[0] = 5 → **add**",
+                  "[5]",
+                  "—"
+                ],
+                [
+                  "8",
+                  "rec(1)",
+                  "skip a[1] → recurse",
+                  "[5]",
+                  "—"
+                ],
+                [
+                  "9",
+                  "rec(2)",
+                  "i == n → emit",
+                  "[5]",
+                  "`5`"
+                ],
+                [
+                  "10",
+                  "rec(1)",
+                  "take a[1] = 1 → **add**",
+                  "[5, 1]",
+                  "—"
+                ],
+                [
+                  "11",
+                  "rec(2)",
+                  "i == n → emit",
+                  "[5, 1]",
+                  "`5 1`"
+                ],
+                [
+                  "12",
+                  "rec(1)",
+                  "**UNDO** — pop 1",
+                  "[5]",
+                  "—"
+                ],
+                [
+                  "13",
+                  "rec(0)",
+                  "**UNDO** — pop 5",
+                  "[]",
+                  "—"
+                ]
+              ],
+              "takeaway": "Four subsets, two adds per element, and **one undo for every add** — always at the moment the take-branch returns, never anywhere else. Note row 13: the final undo restores `chosen` for a caller that does not exist, and leaving it out would still pass this test. Write it anyway; the frame above you in a real problem is not always the root."
+            },
+            {
+              "title": "The same run with the undo DELETED",
+              "intro": "This is the bug, executed. Nothing crashes and the output length is even right — the *contents* are quietly wrong, which is why a missing undo can survive a casual read of the code.",
+              "headers": [
+                "#",
+                "Frame",
+                "Action",
+                "`chosen` after",
+                "Emitted"
+              ],
+              "rows": [
+                [
+                  "1-3",
+                  "rec(0) → rec(1) → rec(2)",
+                  "skip, skip, emit",
+                  "[]",
+                  "`-`"
+                ],
+                [
+                  "4-5",
+                  "rec(1) → rec(2)",
+                  "take 1, emit",
+                  "[1]",
+                  "`1`"
+                ],
+                [
+                  "6",
+                  "rec(1)",
+                  "returns — **1 is never popped**",
+                  "[1]",
+                  "—"
+                ],
+                [
+                  "7",
+                  "rec(0)",
+                  "take 5 → add, onto a dirty list",
+                  "[1, 5]",
+                  "—"
+                ],
+                [
+                  "8-9",
+                  "rec(1) → rec(2)",
+                  "skip, emit",
+                  "[1, 5]",
+                  "`1 5` ← wrong"
+                ],
+                [
+                  "10-11",
+                  "rec(1) → rec(2)",
+                  "take 1 again, emit",
+                  "[1, 5, 1]",
+                  "`1 5 1` ← wrong"
+                ]
+              ],
+              "takeaway": "`5` alone never appears, `1` appears twice in one subset, and the output is `-`, `1`, `1 5`, `1 5 1` — four lines, as expected, two of them nonsense. Every backtracking bug for the next ten problems is this, and the symptom is always an answer that contains something from a branch that already finished."
+            }
+          ],
           "costs": [
             {
               "op": "All subsets",
@@ -5944,7 +6210,92 @@
               "note": "Flattening the coordinates is the only adaptation needed."
             }
           ],
-          "traces": [],
+          "traces": [
+            {
+              "title": "Union by size on 6 nodes: (0,1), (2,3), (1,3), (4,5)",
+              "intro": "`parent[i] == i` means i is a root. No path compression yet — `find` is a plain walk, so the depth column is exactly what each later `find` will cost.",
+              "headers": [
+                "Union",
+                "find(u), find(v)",
+                "size[a], size[b]",
+                "Smaller hangs under larger",
+                "parent[] after",
+                "Sets"
+              ],
+              "rows": [
+                [
+                  "(0, 1)",
+                  "0, 1",
+                  "1, 1",
+                  "tie → 1 under 0; size[0] = 2",
+                  "[0, **0**, 2, 3, 4, 5]",
+                  "5"
+                ],
+                [
+                  "(2, 3)",
+                  "2, 3",
+                  "1, 1",
+                  "tie → 3 under 2; size[2] = 2",
+                  "[0, 0, 2, **2**, 4, 5]",
+                  "4"
+                ],
+                [
+                  "(1, 3)",
+                  "**0**, **2**",
+                  "2, 2",
+                  "tie → 2 under 0; size[0] = 4",
+                  "[0, 0, **0**, 2, 4, 5]",
+                  "3"
+                ],
+                [
+                  "(4, 5)",
+                  "4, 5",
+                  "1, 1",
+                  "tie → 5 under 4; size[4] = 2",
+                  "[0, 0, 0, 2, 4, **4**]",
+                  "2"
+                ]
+              ],
+              "takeaway": "Union (1,3) is the interesting one: neither 1 nor 3 is a root, so the work is on their *roots*. The count starts at n and drops by one per union that actually merged — never recomputed by a traversal. Node 3 now sits two hops from its root, which is the most this forest ever gets: union by size alone caps depth at O(log n), with no compression anywhere."
+            },
+            {
+              "title": "The same forest, then find(3) with and without compression",
+              "intro": "Forest: `0 ← {1, 2}` and `2 ← {3}`. Path compression is not a different algorithm — it is the same walk, which then repoints everything it passed directly at the root. Watch the array flatten.",
+              "headers": [
+                "find(3)",
+                "Nodes visited",
+                "parent[] afterwards",
+                "Next find(3) visits"
+              ],
+              "rows": [
+                [
+                  "no compression, 1st call",
+                  "3 → 2 → 0",
+                  "[0, 0, 0, **2**, 4, 4]",
+                  "3 nodes"
+                ],
+                [
+                  "no compression, 2nd call",
+                  "3 → 2 → 0",
+                  "[0, 0, 0, **2**, 4, 4]",
+                  "3 nodes — forever"
+                ],
+                [
+                  "with compression, 1st call",
+                  "3 → 2 → 0, then repoint 3",
+                  "[0, 0, 0, **0**, 4, 4]",
+                  "2 nodes"
+                ],
+                [
+                  "with compression, 2nd call",
+                  "3 → 0",
+                  "[0, 0, 0, 0, 4, 4]",
+                  "2 nodes"
+                ]
+              ],
+              "takeaway": "The flattening is a value in an array changing — `parent[3]` going from 2 to 0 — not a claim in a comment. Compression charges the first `find` for a walk it was doing anyway and makes every later one on that path shorter, which is why the bound is *amortised* α(n) rather than per-operation constant."
+            }
+          ],
           "costs": [
             {
               "op": "find / union (both optimisations)",
@@ -6104,7 +6455,7 @@
               "optional": true
             }
           ],
-          "build_it": "",
+          "build_it": "### Write it from scratch, in about thirty lines\n\nDo not skip this one. Union-Find is the smallest structure in the curriculum\nwhose costs are genuinely surprising, and typing it is the only thing that\nturns \"near-constant amortised\" from a phrase into a fact you own.\n\n```java\nclass DSU {\n    private final int[] parent;\n    private final int[] size;\n    private int components;\n\n    DSU(int n) {\n        parent = new int[n];\n        size = new int[n];\n        for (int i = 0; i < n; i++) { parent[i] = i; size[i] = 1; }\n        components = n;\n    }\n\n    int find(int x) {\n        while (parent[x] != x) {\n            parent[x] = parent[parent[x]];   // path halving\n            x = parent[x];\n        }\n        return x;\n    }\n\n    boolean union(int a, int b) {\n        int ra = find(a), rb = find(b);\n        if (ra == rb) return false;          // already together\n        if (size[ra] < size[rb]) { int t = ra; ra = rb; rb = t; }\n        parent[rb] = ra;\n        size[ra] += size[rb];\n        components--;\n        return true;\n    }\n\n    boolean connected(int a, int b) { return find(a) == find(b); }\n    int components() { return components; }\n    int sizeOf(int x) { return size[find(x)]; }\n}\n```\n\n### Four things to notice while typing it\n\n1. **`union` returns a boolean.** `false` means the two were already joined, and\n   several problems in this unit *are* that return value —\n   `redundant-connection` is literally the first edge whose union returns false.\n   A `void union` throws the answer away.\n2. **`size` is only meaningful at a root.** `sizeOf` therefore calls `find`\n   first. Reading `size[x]` for a non-root x is the bug that makes\n   `largest-component-size` wrong on exactly the inputs where it matters.\n3. **Path halving, not full compression.** `parent[x] = parent[parent[x]]`\n   flattens the path as it walks, in one pass and with no recursion. Full\n   compression needs either a second pass or a recursive `find` — and the\n   asymptotics are the same. Write the loop.\n4. **`components` is maintained, never computed.** Start at n, decrement inside\n   the successful branch of `union`. Any code that counts distinct roots with a\n   loop over all n nodes has turned an O(1) query into an O(n) one.\n\n### Then break it deliberately\n\n- Delete the size comparison and always link `rb` under `ra`. Then union\n  `(0,1), (1,2), (2,3), …` in order and print the depth of the deepest node:\n  you have built a linked list, and `find` is O(n).\n- Delete the path halving but keep union by size. The depth stays O(log n) —\n  which is the point of the warm-up problem, and the reason compression is an\n  optimisation you can justify rather than a ritual you copy.\n",
           "next_up": "Connectivity is a yes-or-no question. The last unit of the stage asks *how far*,\nonce the edges stop being equal.\n"
         },
         {
@@ -6179,7 +6530,64 @@
               "note": "The `k` loop must be outermost — it is the set of allowed intermediates."
             }
           ],
-          "traces": [],
+          "traces": [
+            {
+              "title": "Dijkstra on 0→1 (4), 0→2 (1), 2→1 (2), 1→3 (1), 2→3 (5)",
+              "intro": "The queue holds `(distance, node)` pairs, smallest first. The column that matters is the third one: an entry is **stale** when the distance it carries is worse than the best already known for that node, and skipping those is what keeps the loop correct without any ability to delete from the heap.",
+              "headers": [
+                "Pop",
+                "d vs dist[u]",
+                "Verdict",
+                "Relaxations",
+                "Queue after (d, node)"
+              ],
+              "rows": [
+                [
+                  "(0, 0)",
+                  "0 = dist[0]",
+                  "settle 0",
+                  "dist[1] = 4, dist[2] = 1",
+                  "(1,2), (4,1)"
+                ],
+                [
+                  "(1, 2)",
+                  "1 = dist[2]",
+                  "settle 2",
+                  "1 → 1+2 = **3** < 4; 3 → 1+5 = **6**",
+                  "(3,1), (4,1), (6,3)"
+                ],
+                [
+                  "(3, 1)",
+                  "3 = dist[1]",
+                  "settle 1",
+                  "3 → 3+1 = **4** < 6",
+                  "(4,1), (4,3), (6,3)"
+                ],
+                [
+                  "(4, 1)",
+                  "4 > dist[1] = 3",
+                  "**STALE — skip**",
+                  "none",
+                  "(4,3), (6,3)"
+                ],
+                [
+                  "(4, 3)",
+                  "4 = dist[3]",
+                  "settle 3",
+                  "no outgoing edges",
+                  "(6,3)"
+                ],
+                [
+                  "(6, 3)",
+                  "6 > dist[3] = 4",
+                  "**STALE — skip**",
+                  "none",
+                  "(empty)"
+                ]
+              ],
+              "takeaway": "Six pops for four nodes: two of them were obsolete entries left behind when a shorter route was found later. Java's `PriorityQueue` has no decrease-key, so the standard move is to push a *second* entry and let the stale one be discarded on arrival — which is why the queue can hold O(E) entries rather than O(V), and why the bound is O(E log E). Delete the staleness check and you re-settle node 1 with a worse distance and relax from it again; on a larger graph that is a wrong answer, not just wasted work."
+            }
+          ],
           "costs": [
             {
               "op": "BFS (unweighted)",
@@ -6830,7 +7238,119 @@
               "note": "`dp[i]` is about the first i characters, so the answer is `dp[n]`."
             }
           ],
-          "traces": [],
+          "traces": [
+            {
+              "title": "House Robber on [2, 7, 9, 3, 1] — the two candidates, per cell",
+              "intro": "`dp[i]` = the best total using only houses `0…i`. The two middle columns are the recurrence written out: at every house you either skip it and keep what you had, or take it and add what you had two houses ago.",
+              "headers": [
+                "i",
+                "a[i]",
+                "skip = dp[i−1]",
+                "take = dp[i−2] + a[i]",
+                "dp[i] = max",
+                "Table"
+              ],
+              "rows": [
+                [
+                  "0",
+                  "2",
+                  "— (nothing before)",
+                  "0 + 2 = 2",
+                  "**2**",
+                  "[2]"
+                ],
+                [
+                  "1",
+                  "7",
+                  "2",
+                  "0 + 7 = 7",
+                  "**7**",
+                  "[2, 7]"
+                ],
+                [
+                  "2",
+                  "9",
+                  "7",
+                  "2 + 9 = 11",
+                  "**11**",
+                  "[2, 7, 11]"
+                ],
+                [
+                  "3",
+                  "3",
+                  "11",
+                  "7 + 3 = 10",
+                  "**11**",
+                  "[2, 7, 11, 11]"
+                ],
+                [
+                  "4",
+                  "1",
+                  "11",
+                  "11 + 1 = 12",
+                  "**12**",
+                  "[2, 7, 11, 11, 12]"
+                ]
+              ],
+              "takeaway": "Row 3 is the one worth staring at: taking house 3 *loses*, so `dp[3]` repeats `dp[2]`. A 1-D table whose values never decrease is not a bug — it is the \"skip\" branch winning. And note that only `dp[i-1]` and `dp[i-2]` are ever read, so two variables would do; the array exists so you can see it."
+            },
+            {
+              "title": "Coin change table for coins {1, 3, 4}, amount 6 — every last coin",
+              "intro": "`dp[a]` = fewest coins making exactly `a`. One column per coin, because the recurrence considers *every* possible last coin rather than committing to one. This is the table the greedy algorithm refuses to build.",
+              "headers": [
+                "a",
+                "last = 1 → dp[a−1]+1",
+                "last = 3 → dp[a−3]+1",
+                "last = 4 → dp[a−4]+1",
+                "dp[a]"
+              ],
+              "rows": [
+                [
+                  "1",
+                  "dp[0]+1 = **1**",
+                  "—",
+                  "—",
+                  "**1**"
+                ],
+                [
+                  "2",
+                  "dp[1]+1 = **2**",
+                  "—",
+                  "—",
+                  "**2**"
+                ],
+                [
+                  "3",
+                  "dp[2]+1 = 3",
+                  "dp[0]+1 = **1**",
+                  "—",
+                  "**1**"
+                ],
+                [
+                  "4",
+                  "dp[3]+1 = 2",
+                  "dp[1]+1 = 2",
+                  "dp[0]+1 = **1**",
+                  "**1**"
+                ],
+                [
+                  "5",
+                  "dp[4]+1 = **2**",
+                  "dp[2]+1 = 3",
+                  "dp[1]+1 = **2**",
+                  "**2**"
+                ],
+                [
+                  "6",
+                  "dp[5]+1 = 3",
+                  "dp[3]+1 = **2**",
+                  "dp[2]+1 = 3",
+                  "**2**"
+                ]
+              ],
+              "takeaway": "`dp[6] = 2`, via 3 + 3. Greedy takes the 4 first and finishes at three coins, because it committed to a last coin it could not reconsider. The cost of the table is exactly the price of that reconsideration: O(amount × coins) instead of O(coins log coins), for an answer that is actually right."
+            }
+          ],
           "costs": [
             {
               "op": "1-D DP, O(1) transition",
@@ -6980,7 +7500,7 @@
               "optional": false
             }
           ],
-          "build_it": "",
+          "build_it": "### Convert a memoised recursion into a table, by hand, once\n\nBottom-up DP looks like a different technique from recursion, and it is not:\nthe table *is* the memo, with the call stack unrolled into a loop. Doing that\nconversion by hand once makes every later \"should this be top-down or\nbottom-up?\" question answerable in a sentence.\n\nTake Climbing Stairs. Start from the honest recursion:\n\n```java\nstatic long ways(int n) {\n    if (n == 0) return 1;      // one way to have made no moves\n    if (n < 0)  return 0;      // overshot the top\n    return ways(n - 1) + ways(n - 2);\n}\n```\n\n**Step 1 — measure the damage.** Add a counter to `ways` and call it for\nn = 30. You will see roughly 2.7 million calls for a function with 31 distinct\ninputs. That ratio is the whole motivation.\n\n**Step 2 — memoise.** One array and two lines:\n\n```java\nstatic long[] memo;            // sized n + 1, filled with -1\n\nstatic long ways(int n) {\n    if (n == 0) return 1;\n    if (n < 0)  return 0;\n    if (memo[n] != -1) return memo[n];     // ← added\n    return memo[n] = ways(n - 1) + ways(n - 2);   // ← added\n}\n```\n\nCount the calls again: 31 distinct computations. Same answer, exponential to\nlinear, two lines.\n\n**Step 3 — write down the order the memo was filled in.** Instrument the\nassignment to print `n` as each cell is written. You will see\n`1, 2, 3, …, n` — increasing, every time. That is not a coincidence: `ways(n)`\ncannot return until the smaller values have, so the memo is *necessarily*\ncompleted from small to large.\n\n**Step 4 — delete the recursion.** If the order is always increasing, write the\nloop that produces it and the function calls become array reads:\n\n```java\nlong[] dp = new long[n + 1];\ndp[0] = 1;\nfor (int i = 1; i <= n; i++) {\n    dp[i] = dp[i - 1] + (i >= 2 ? dp[i - 2] : 0);\n}\n```\n\nThe `n < 0` base case became the `i >= 2` guard — the same fact, relocated from\n\"a call that returns 0\" to \"a term that is not added\".\n\n### What you now know, that you did not before\n\n- **Top-down and bottom-up compute identical tables.** They differ only in who\n  decides the order: the call stack, or you.\n- **Bottom-up needs you to know the order in advance.** When you cannot state\n  it — a DP over subsets, a game tree, a graph with no obvious layering —\n  memoised recursion is not the lazy option, it is the correct one.\n- **Top-down costs stack depth.** n = 10⁶ overflows recursively and is fine\n  iteratively; that alone decides some problems.\n- **Bottom-up makes space optimisation visible.** The loop above reads only two\n  cells back, so two `long`s replace the array. You cannot see that from the\n  recursion, which is one reason to convert.\n\nDo this same four-step walk on `house-robber` before you move on. It is the\nlast time it will feel like work.\n",
           "next_up": "Two sequences, or a value plus a capacity, means two indices — and a table.\n"
         },
         {
@@ -7061,7 +7581,82 @@
               "note": "`tails` is not a valid subsequence — only its size is meaningful."
             }
           ],
-          "traces": [],
+          "traces": [
+            {
+              "title": "Grid paths, one row at a time, on a 3 × 4 grid",
+              "intro": "`dp[i][j]` = routes from the top-left to `(i, j)` moving only right or down. Each cell reads the one above and the one to the left, which is what makes row-by-row a legal fill order — and diagonal-outward not.",
+              "headers": [
+                "Row",
+                "j = 0",
+                "j = 1",
+                "j = 2",
+                "j = 3",
+                "Rule in play"
+              ],
+              "rows": [
+                [
+                  "i = 0",
+                  "**1**",
+                  "0 + 1 = **1**",
+                  "0 + 1 = **1**",
+                  "0 + 1 = **1**",
+                  "nothing above; only from the left"
+                ],
+                [
+                  "i = 1",
+                  "1 + 0 = **1**",
+                  "1 + 1 = **2**",
+                  "1 + 2 = **3**",
+                  "1 + 3 = **4**",
+                  "above + left"
+                ],
+                [
+                  "i = 2",
+                  "1 + 0 = **1**",
+                  "1 + 2 = **3**",
+                  "3 + 3 = **6**",
+                  "4 + 6 = **10**",
+                  "above + left"
+                ]
+              ],
+              "takeaway": "The first row and column come out all 1s with no special case, because the missing term contributes 0. And notice what row `i = 2` reads: only row `i = 1` and the cell to its own left — so if you only want the final number, **one row of storage is enough** and the O(H·W) space collapses to O(W)."
+            },
+            {
+              "title": "Reading the table BACKWARDS: recovering the LCS of \"ABC\" and \"BC\"",
+              "intro": "The length was one cell. The *answer* is a walk back through the whole table from the bottom-right, and this is the half that gets skipped — which is why \"how long is it?\" and \"which one is it?\" need different amounts of memory.",
+              "headers": [
+                "At (i, j)",
+                "s[i−1], t[j−1]",
+                "dp[i][j]",
+                "Move",
+                "Subsequence so far"
+              ],
+              "rows": [
+                [
+                  "(3, 2)",
+                  "C, C",
+                  "2",
+                  "match → take it, go to (2, 1)",
+                  "C"
+                ],
+                [
+                  "(2, 1)",
+                  "B, B",
+                  "1",
+                  "match → take it, go to (1, 0)",
+                  "BC"
+                ],
+                [
+                  "(1, 0)",
+                  "A, —",
+                  "0",
+                  "j = 0 → stop",
+                  "**BC**"
+                ]
+              ],
+              "takeaway": "Built backwards, so reverse it at the end. When the characters do *not* match you step toward whichever of `dp[i-1][j]` / `dp[i][j-1]` the value came from — that is the same comparison the forward pass made, replayed. The consequence for space is concrete: the one-row trick works for the length and is useless for reconstruction, because the walk needs cells the row-reuse already overwrote."
+            }
+          ],
           "costs": [
             {
               "op": "Two-sequence DP",
@@ -7222,7 +7817,7 @@
           ],
           "why": "A hash map answers *\"is this exact key present?\"*. It cannot answer *\"how many\nkeys start with `pre`?\"*, because hashing deliberately destroys the relationship\nbetween similar keys. A trie keeps it: the path from the root spells the key, so\nevery prefix is a node and prefix questions become a walk.\n\nIt is the final unit because it makes the curriculum's closing point — that\nchoosing the right structure *is* the algorithm. Autocomplete, dictionary\nlookup, wildcard matching and even maximum-XOR (a trie over bits) are all the\nsame fifteen lines with a different walk.\n",
           "model": "### The node\n\n```java\nclass Node {\n    Node[] next = new Node[26];    // one slot per letter\n    boolean word;                  // does a key END here?\n    int count;                     // how many keys pass through (for prefix counts)\n}\n```\n\nThe `word` flag is essential: without it, inserting \"car\" would make \"ca\" appear\nto be a stored word. A node marks *a place in the tree*, not necessarily a key.\n\n### Insert and search\n\n```java\nvoid insert(String s) {\n    Node cur = root;\n    for (char c : s.toCharArray()) {\n        int i = c - 'a';\n        if (cur.next[i] == null) cur.next[i] = new Node();\n        cur = cur.next[i];\n        cur.count++;                       // keys passing through this prefix\n    }\n    cur.word = true;\n}\n\nboolean search(String s, boolean prefixOnly) {\n    Node cur = root;\n    for (char c : s.toCharArray()) {\n        cur = cur.next[c - 'a'];\n        if (cur == null) return false;\n    }\n    return prefixOnly || cur.word;         // the ONLY difference between the two\n}\n```\n\nBoth are O(length of the key) — **independent of how many keys are stored**.\nThat is the headline property: a million words do not slow a lookup down.\n\n### Wildcards need backtracking\n\n`.` matching any character turns the walk into a search: at a `.`, recurse into\nevery non-null child. Worst case O(26^dots), which is why these problems bound\nthe number of wildcards.\n\n```java\nboolean match(String s, int i, Node cur) {\n    if (cur == null) return false;\n    if (i == s.length()) return cur.word;\n    char c = s.charAt(i);\n    if (c != '.') return match(s, i + 1, cur.next[c - 'a']);\n    for (Node child : cur.next)\n        if (match(s, i + 1, child)) return true;\n    return false;\n}\n```\n\n### The bit trie\n\nReplace 26 children with 2 and insert the bits of each number from the most\nsignificant down. To maximise `x XOR y`, walk the trie taking the **opposite**\nbit of x wherever it exists — each opposite bit taken contributes 2ᵏ, and the\nhigher bits dominate, so the greedy walk is optimal. That gives O(32n) for the\nmaximum XOR pair instead of O(n²).\n\nThis is the last idea in the curriculum, and it is a fair summary of it: a\ngreedy walk (stage 6) over a tree (stage 5) indexed by bits (stage 3).\n\n### Trie or hash map?\n\n| Need | Use |\n| --- | --- |\n| Exact lookup only | Hash map — less memory, simpler |\n| Prefix counting, autocomplete | Trie |\n| Wildcards inside the key | Trie |\n| Longest matching prefix (routing, roots) | Trie |\n| Maximum XOR pair | Bit trie |\n\nA trie costs up to 26 pointers per node, which is substantial. Use a\n`Map<Character, Node>` when the alphabet is large or sparse.\n",
-          "internals": "",
+          "internals": "### The node is the whole design decision\n\n```java\nclass Node {\n    Node[] next = new Node[26];   // array of children\n    boolean isWord;\n}\n```\n\nversus\n\n```java\nclass Node {\n    Map<Character, Node> next = new HashMap<>();\n    boolean isWord;\n}\n```\n\nSame trie, very different memory. The array version allocates **26 references\nper node whether or not they are used** — 26 × 8 bytes ≈ 208 bytes of pointers,\nplus the array header, plus the object header: call it ~240 bytes per node even\nfor a node with one child. The map version pays a `HashMap` (its own object,\nplus a bucket array, plus one `Entry` per child ≈ 32 bytes each) but only for\nchildren that exist.\n\n| | `Node[26]` | `HashMap<Character, Node>` |\n|---|---|---|\n| child lookup | one array index — a few ns | hash + bucket walk — tens of ns |\n| memory, dense node (20 children) | ~240 B | ~800 B |\n| memory, sparse node (1 child) | ~240 B | ~130 B |\n| alphabet size | fixed at compile time | any, including Unicode |\n| iterate children in order | free — index order is alphabetical | needs sorting |\n\nThe rule that falls out: **arrays win when the alphabet is small and known and\nthe trie is dense**; maps win when the alphabet is large, or when most nodes\nhave one or two children — which is what a trie of long, dissimilar words looks\nlike near its leaves.\n\nFor lowercase-only interview problems, take the array. It is faster, it is less\ncode, and `c - 'a'` is self-documenting. Say the trade-off out loud anyway; it\nis the follow-up question, and \"26 pointers per node regardless of use\" is the\nsentence that answers it.\n\n### Where the memory actually goes\n\nA trie's node count is the number of **distinct prefixes** across all inserted\nwords, not the number of words. Insert `car`, `card`, `care`, `cart` and you get\n7 nodes, not 15 — the shared `car` path is stored once. That sharing is the\nentire reason the structure exists, and it is also why a trie over random\nstrings is a disaster: nothing shares, so you allocate one node per character\nand a `HashSet` beats you on every axis.\n\nRough arithmetic worth being able to do at a whiteboard: 10⁵ words averaging 10\ncharacters with little sharing is ~10⁶ nodes; at 240 bytes each that is **240\nMB** with the array layout, and a heap that does not fit. Switching to\n`HashMap` children, or to one of the compressed variants below, is not a\nmicro-optimisation at that scale — it is the difference between running and\nnot.\n\n### Why lookup does not depend on how much is stored\n\n`insert` and `search` walk one node per character of the *query*, and that walk\nis unaffected by how many other words the trie holds. A `HashSet<String>` is\nalso O(length) — it has to hash the whole string — so for exact lookup the trie\nbuys nothing.\n\nWhat the trie buys is everything **prefix**-shaped, because the shared path is\nstill there to be read:\n\n- how many stored words start with `ca` → one counter per node, maintained on\n  insert\n- the longest stored word that is a prefix of this string → stop at the last\n  `isWord` you passed\n- every completion of `ca` → the subtree under that node\n\nA hash set destroys all of that when it hashes, which is the honest answer to\n\"why not just use a set?\"\n\n### The compressed variants, named\n\n- **Radix tree / Patricia trie** — collapse any chain of single-child nodes into\n  one edge holding the whole substring. Same queries, far fewer nodes; the code\n  gets substantially harder because edges must be split on insert.\n- **Ternary search tree** — three children per node (`<`, `=`, `>`) instead of\n  26. Much less memory, slightly slower, and handles any alphabet.\n- **DAWG / DAFSA** — also merge identical *suffixes*, turning the tree into a\n  DAG. Minimal for a fixed dictionary, and effectively unmodifiable afterwards.\n\nNobody is asking you to implement these. Knowing the first one exists, and that\nthe problem it solves is \"my trie is mostly single-child chains\", is the useful\npart.\n",
           "signals": [
             {
               "when": "“words starting with …”, “autocomplete”",
@@ -7423,7 +8018,7 @@
               "optional": false
             }
           ],
-          "build_it": "",
+          "build_it": "### Write it from scratch, in about thirty lines\n\nA trie is short enough that there is no excuse for not owning it, and every\nother problem in this unit is this class with one method added.\n\n```java\nclass Trie {\n    private static class Node {\n        Node[] next = new Node[26];\n        boolean isWord;\n        int passing;     // words whose path goes through here (this node included)\n    }\n\n    private final Node root = new Node();\n\n    void insert(String w) {\n        Node cur = root;\n        cur.passing++;\n        for (char c : w.toCharArray()) {\n            int k = c - 'a';\n            if (cur.next[k] == null) cur.next[k] = new Node();\n            cur = cur.next[k];\n            cur.passing++;\n        }\n        cur.isWord = true;\n    }\n\n    /** The node reached by walking `s`, or null if the path leaves the trie. */\n    private Node walk(String s) {\n        Node cur = root;\n        for (char c : s.toCharArray()) {\n            cur = cur.next[c - 'a'];\n            if (cur == null) return null;\n        }\n        return cur;\n    }\n\n    boolean contains(String w) {\n        Node n = walk(w);\n        return n != null && n.isWord;\n    }\n\n    int countWithPrefix(String p) {\n        Node n = walk(p);\n        return n == null ? 0 : n.passing;\n    }\n}\n```\n\n### Four things to notice while typing it\n\n1. **`walk` is the whole structure.** `contains`, `countWithPrefix`,\n   `startsWith`, autocomplete — all of them are `walk` plus one read of the node\n   it returns. Factor it out and the rest of the unit is three-line methods.\n2. **`isWord` is not \"has no children\".** After inserting `car` and `card`, the\n   node at `car` has a child *and* is a word. After inserting only `card`, the\n   node at `car` exists and is not. `contains` must read the flag; nothing else\n   is equivalent to it.\n3. **`passing` is maintained on insert, never counted on query.** That is what\n   makes `countWithPrefix` O(length) instead of O(subtree). Maintaining a\n   counter during the write so the read stays cheap is the same move as\n   Union-Find's component count.\n4. **The root increments too.** `countWithPrefix(\"\")` should be the total number\n   of inserted words, and it is — for free — only if `root.passing` is bumped\n   before the loop.\n\n### Then extend it, in the order the rungs do\n\n- **`longestPrefixOf(s)`** — walk `s`, remembering the depth of the last node\n  with `isWord` set. Three lines, and it is the whole of the replace-words\n  problem.\n- **Wildcard search** — at a `.`, recurse into every non-null child. The\n  *structure* does not change at all; only the traversal does, which is the\n  point worth internalising.\n- **Deletion** — insert `car` and `card`, then delete `card`. You must unset\n  `isWord`, decrement `passing` along the path, and free only the nodes whose\n  `passing` reached 0. Get this right and you understand why most interview\n  tries do not support delete.\n- **A binary trie over bits.** Replace 26 children with 2, and insert each\n  number's 32 bits from the top. Walking greedily toward the *opposite* bit at\n  each step gives the maximum XOR against a stored number — the last problem in\n  the curriculum, and a trie with the alphabet set to `{0, 1}`.\n",
           "next_up": "That is the curriculum. Every technique in the bank has been taught and every\nproblem placed — so from here the work is **revision**: the spaced-repetition\nqueue, the weakness filters in Browse, and re-solving the stretch rungs from\nmemory rather than from notes.\n"
         }
       ]

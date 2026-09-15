@@ -287,6 +287,33 @@ _ONRAMP_MIN_UNIT = 4
 # a thin unit or inflate an overweight one.
 _WEIGHT_BANDS = {3: (8, 14), 2: (5, 9), 1: (3, 6)}
 
+# Units whose optional-depth fields are no longer optional.
+#
+# `internals`, `traces` and `build_it` started as a linear-structures-stage
+# thing, on the argument that a unit about a *structure* has to answer "why are
+# these the costs?" while a unit about a technique does not. That argument is
+# only half right: the question a trace answers is "what is the state, step by
+# step", and the places where the state is hardest to hold in prose are
+# Dijkstra's queue, a DP table, a backtracking stack and a DSU forest — none of
+# which are in that stage.
+#
+# Listed explicitly rather than derived, because "which units need a trace" is a
+# pedagogical judgement, and a rule that guessed it would either miss units or
+# demand traces of units that do not benefit (`io-and-arithmetic` has no state).
+# The point of the list is that authored depth cannot silently disappear.
+_NEEDS_INTERNALS = {
+    "hashing", "binary-search", "stacks", "queues-and-deques", "linked-lists",
+    "heaps", "design", "trees", "tries",
+}
+_NEEDS_TRACES = {
+    "binary-search", "stacks", "queues-and-deques", "linked-lists", "heaps",
+    "design", "backtracking", "union-find", "shortest-paths", "dp-1d", "dp-2d",
+}
+_NEEDS_BUILD_IT = {
+    "stacks", "queues-and-deques", "linked-lists", "heaps", "design",
+    "union-find", "tries", "dp-1d",
+}
+
 
 def _check_curriculum(cur, concepts, problems):
     """`concepts` maps key → concept; `problems` maps slug → problem dict."""
@@ -345,6 +372,19 @@ def _check_curriculum(cur, concepts, problems):
             # Rule 2 — no dangling references.
             for lk in u["lessons"]:
                 assert lk in concepts, f"{key}: unknown concept key {lk!r}"
+
+            # Authored depth cannot regress.
+            if key in _NEEDS_INTERNALS:
+                assert u["internals"].strip(), \
+                    f"{key}: no internals — what layout are its costs a consequence of?"
+            if key in _NEEDS_TRACES:
+                assert u["traces"], (
+                    f"{key}: no worked trace. This unit is state changing over time, "
+                    f"which is the one thing prose cannot show and a table can."
+                )
+            if key in _NEEDS_BUILD_IT:
+                assert u["build_it"].strip(), \
+                    f"{key}: no build-it-yourself exercise"
 
             last_rank = -1
             first_rung_floor = None   # easiest problem on the opening rung

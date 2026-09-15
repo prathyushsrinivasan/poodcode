@@ -439,6 +439,60 @@ under mild pressure. Two habits score: stating the base case before the
 recursive one, and saying the space complexity as O(h) rather than O(1),
 because the stack is real. When the tree could be skewed, mention it.
 """,
+    internals="""
+### A tree's cost is its *shape*, not its size
+
+Every recursion in this unit visits each node once, so the **time** is O(n) no
+matter what. What the shape decides is the **stack depth**, and that is the
+number that bites:
+
+```
+balanced (n = 15)            skewed (n = 15)
+      8                      1
+   4     12                   2
+ 2  6  10  14                  3
+1 3 5 7 9 11 13 15              4  …  15
+
+height 4 = ⌊log₂ n⌋ + 1      height 15 = n
+```
+
+A recursive traversal uses one JVM stack frame per level. At height 15 nobody
+notices; at height 10⁵ — a linked-list-shaped tree, which is what you get by
+inserting sorted keys into an unbalanced BST — you get a
+`StackOverflowError`, not a wrong answer and not a timeout. The default thread
+stack holds roughly 10⁴–10⁵ frames depending on frame size, so this is a real
+limit at competitive-programming sizes.
+
+The fix when it matters is an explicit stack (`Deque<TreeNode>`), which moves
+the frames onto the heap. Worth knowing you *can*; not worth doing by default,
+because the recursive version is three lines and the iterative one is twelve.
+
+### What balancing buys, and what it costs
+
+A **self-balancing** tree does extra work on insert and delete to keep the
+height at O(log n): AVL rotates aggressively and stays very balanced; red-black
+rotates less and allows up to 2× the minimum height. Java's `TreeMap` and
+`TreeSet` are red-black trees.
+
+| | Unbalanced BST | Balanced BST (`TreeMap`) | `HashMap` |
+|---|---|---|---|
+| search / insert | O(h) — O(log n) typical, **O(n) worst** | O(log n) guaranteed | O(1) average |
+| in-order = sorted | yes | yes | **no order at all** |
+| first / last / floor / ceiling | O(h) | O(log n) | not supported |
+| overhead | pointers only | pointers + a colour bit + rotations | bucket array |
+
+The trade is stated in one line: a hash map is faster and forgets order; a
+balanced tree is slower and remembers it. Choose on whether you will ever ask
+*"what is the next key after this one?"*
+
+### Why a binary tree at all
+
+The branching factor is what makes the height logarithmic — `log₂ n` levels to
+reach n nodes. Widening the node to hold many keys gives `log_B n` levels,
+which barely helps in memory (log₂ 10⁶ = 20, log₁₀₀ 10⁶ = 3) but matters
+enormously on disk, where each level is a seek. That is a B-tree, and it is why
+every database index is one and no in-memory `Map` is.
+""",
     rungs=[
         _rung("Warm up", "One value, computed from the children.",
               ["max-depth-tree", "count-nodes-tree", "invert-binary-tree"],
@@ -894,6 +948,54 @@ interviewer can follow you. Then volunteer the complexity (2ⁿ or n!) and the
 pruning: *"I will sort first so I can break early, and skip equal values at the
 same depth to avoid duplicates"* covers everything they were going to ask.
 """,
+    traces=[
+        _trace(
+            "Every frame of subsets([5, 1]) — including the undos",
+            "One row per *event*, not per call, so the push / explore / undo cycle is "
+            "visible. `chosen` is a single mutable list shared by the whole search tree, "
+            "which is the only reason the space is O(n) instead of O(2ⁿ · n).",
+            ["#", "Frame", "Action", "`chosen` after", "Emitted"],
+            [
+                ["1", "rec(0)", "skip a[0] = 5 → recurse", "[]", "—"],
+                ["2", "rec(1)", "skip a[1] = 1 → recurse", "[]", "—"],
+                ["3", "rec(2)", "i == n → emit", "[]", "`-`"],
+                ["4", "rec(1)", "take a[1] = 1 → **add**", "[1]", "—"],
+                ["5", "rec(2)", "i == n → emit", "[1]", "`1`"],
+                ["6", "rec(1)", "**UNDO** — pop 1", "[]", "—"],
+                ["7", "rec(0)", "take a[0] = 5 → **add**", "[5]", "—"],
+                ["8", "rec(1)", "skip a[1] → recurse", "[5]", "—"],
+                ["9", "rec(2)", "i == n → emit", "[5]", "`5`"],
+                ["10", "rec(1)", "take a[1] = 1 → **add**", "[5, 1]", "—"],
+                ["11", "rec(2)", "i == n → emit", "[5, 1]", "`5 1`"],
+                ["12", "rec(1)", "**UNDO** — pop 1", "[5]", "—"],
+                ["13", "rec(0)", "**UNDO** — pop 5", "[]", "—"],
+            ],
+            "Four subsets, two adds per element, and **one undo for every add** — always "
+            "at the moment the take-branch returns, never anywhere else. Note row 13: the "
+            "final undo restores `chosen` for a caller that does not exist, and leaving it "
+            "out would still pass this test. Write it anyway; the frame above you in a "
+            "real problem is not always the root.",
+        ),
+        _trace(
+            "The same run with the undo DELETED",
+            "This is the bug, executed. Nothing crashes and the output length is even "
+            "right — the *contents* are quietly wrong, which is why a missing undo can "
+            "survive a casual read of the code.",
+            ["#", "Frame", "Action", "`chosen` after", "Emitted"],
+            [
+                ["1-3", "rec(0) → rec(1) → rec(2)", "skip, skip, emit", "[]", "`-`"],
+                ["4-5", "rec(1) → rec(2)", "take 1, emit", "[1]", "`1`"],
+                ["6", "rec(1)", "returns — **1 is never popped**", "[1]", "—"],
+                ["7", "rec(0)", "take 5 → add, onto a dirty list", "[1, 5]", "—"],
+                ["8-9", "rec(1) → rec(2)", "skip, emit", "[1, 5]", "`1 5` ← wrong"],
+                ["10-11", "rec(1) → rec(2)", "take 1 again, emit", "[1, 5, 1]", "`1 5 1` ← wrong"],
+            ],
+            "`5` alone never appears, `1` appears twice in one subset, and the output is "
+            "`-`, `1`, `1 5`, `1 5 1` — four lines, as expected, two of them nonsense. "
+            "Every backtracking bug for the next ten problems is this, and the symptom is "
+            "always an answer that contains something from a branch that already finished.",
+        ),
+    ],
     rungs=[
         _rung("Warm up", "Sixteen answers you can check by hand, and one line that matters.",
               ["all-subsets-small"],
@@ -1595,6 +1697,117 @@ and quoting "effectively constant, α(n) amortised" reads as fluency. Be ready
 for the comparison: a traversal answers the same question in O(V + E) *per
 query*, which is why DSU wins as soon as there is more than one query.
 """,
+    traces=[
+        _trace(
+            "Union by size on 6 nodes: (0,1), (2,3), (1,3), (4,5)",
+            "`parent[i] == i` means i is a root. No path compression yet — `find` is a "
+            "plain walk, so the depth column is exactly what each later `find` will cost.",
+            ["Union", "find(u), find(v)", "size[a], size[b]", "Smaller hangs under larger",
+             "parent[] after", "Sets"],
+            [
+                ["(0, 1)", "0, 1", "1, 1", "tie → 1 under 0; size[0] = 2",
+                 "[0, **0**, 2, 3, 4, 5]", "5"],
+                ["(2, 3)", "2, 3", "1, 1", "tie → 3 under 2; size[2] = 2",
+                 "[0, 0, 2, **2**, 4, 5]", "4"],
+                ["(1, 3)", "**0**, **2**", "2, 2", "tie → 2 under 0; size[0] = 4",
+                 "[0, 0, **0**, 2, 4, 5]", "3"],
+                ["(4, 5)", "4, 5", "1, 1", "tie → 5 under 4; size[4] = 2",
+                 "[0, 0, 0, 2, 4, **4**]", "2"],
+            ],
+            "Union (1,3) is the interesting one: neither 1 nor 3 is a root, so the work is "
+            "on their *roots*. The count starts at n and drops by one per union that "
+            "actually merged — never recomputed by a traversal. Node 3 now sits two hops "
+            "from its root, which is the most this forest ever gets: union by size alone "
+            "caps depth at O(log n), with no compression anywhere.",
+        ),
+        _trace(
+            "The same forest, then find(3) with and without compression",
+            "Forest: `0 ← {1, 2}` and `2 ← {3}`. Path compression is not a different "
+            "algorithm — it is the same walk, which then repoints everything it passed "
+            "directly at the root. Watch the array flatten.",
+            ["find(3)", "Nodes visited", "parent[] afterwards", "Next find(3) visits"],
+            [
+                ["no compression, 1st call", "3 → 2 → 0", "[0, 0, 0, **2**, 4, 4]", "3 nodes"],
+                ["no compression, 2nd call", "3 → 2 → 0", "[0, 0, 0, **2**, 4, 4]", "3 nodes — forever"],
+                ["with compression, 1st call", "3 → 2 → 0, then repoint 3", "[0, 0, 0, **0**, 4, 4]", "2 nodes"],
+                ["with compression, 2nd call", "3 → 0", "[0, 0, 0, 0, 4, 4]", "2 nodes"],
+            ],
+            "The flattening is a value in an array changing — `parent[3]` going from 2 to "
+            "0 — not a claim in a comment. Compression charges the first `find` for a walk "
+            "it was doing anyway and makes every later one on that path shorter, which is "
+            "why the bound is *amortised* α(n) rather than per-operation constant.",
+        ),
+    ],
+    build_it="""
+### Write it from scratch, in about thirty lines
+
+Do not skip this one. Union-Find is the smallest structure in the curriculum
+whose costs are genuinely surprising, and typing it is the only thing that
+turns "near-constant amortised" from a phrase into a fact you own.
+
+```java
+class DSU {
+    private final int[] parent;
+    private final int[] size;
+    private int components;
+
+    DSU(int n) {
+        parent = new int[n];
+        size = new int[n];
+        for (int i = 0; i < n; i++) { parent[i] = i; size[i] = 1; }
+        components = n;
+    }
+
+    int find(int x) {
+        while (parent[x] != x) {
+            parent[x] = parent[parent[x]];   // path halving
+            x = parent[x];
+        }
+        return x;
+    }
+
+    boolean union(int a, int b) {
+        int ra = find(a), rb = find(b);
+        if (ra == rb) return false;          // already together
+        if (size[ra] < size[rb]) { int t = ra; ra = rb; rb = t; }
+        parent[rb] = ra;
+        size[ra] += size[rb];
+        components--;
+        return true;
+    }
+
+    boolean connected(int a, int b) { return find(a) == find(b); }
+    int components() { return components; }
+    int sizeOf(int x) { return size[find(x)]; }
+}
+```
+
+### Four things to notice while typing it
+
+1. **`union` returns a boolean.** `false` means the two were already joined, and
+   several problems in this unit *are* that return value —
+   `redundant-connection` is literally the first edge whose union returns false.
+   A `void union` throws the answer away.
+2. **`size` is only meaningful at a root.** `sizeOf` therefore calls `find`
+   first. Reading `size[x]` for a non-root x is the bug that makes
+   `largest-component-size` wrong on exactly the inputs where it matters.
+3. **Path halving, not full compression.** `parent[x] = parent[parent[x]]`
+   flattens the path as it walks, in one pass and with no recursion. Full
+   compression needs either a second pass or a recursive `find` — and the
+   asymptotics are the same. Write the loop.
+4. **`components` is maintained, never computed.** Start at n, decrement inside
+   the successful branch of `union`. Any code that counts distinct roots with a
+   loop over all n nodes has turned an O(1) query into an O(n) one.
+
+### Then break it deliberately
+
+- Delete the size comparison and always link `rb` under `ra`. Then union
+  `(0,1), (1,2), (2,3), …` in order and print the depth of the deepest node:
+  you have built a linked list, and `find` is O(n).
+- Delete the path halving but keep union by size. The depth stays O(log n) —
+  which is the point of the warm-up problem, and the reason compression is an
+  optimisation you can justify rather than a ritual you copy.
+""",
     rungs=[
         _rung("Warm up", "Union by size alone, so path compression is an optimisation rather than an incantation.",
               ["union-by-size-components"],
@@ -1844,6 +2057,34 @@ limit (Bellman-Ford with k + 1 rounds and a snapshot). Knowing that Dijkstra is
 "BFS with a priority queue" is also the cleanest way to explain it under time
 pressure.
 """,
+    traces=[
+        _trace(
+            "Dijkstra on 0→1 (4), 0→2 (1), 2→1 (2), 1→3 (1), 2→3 (5)",
+            "The queue holds `(distance, node)` pairs, smallest first. The column that "
+            "matters is the third one: an entry is **stale** when the distance it carries "
+            "is worse than the best already known for that node, and skipping those is "
+            "what keeps the loop correct without any ability to delete from the heap.",
+            ["Pop", "d vs dist[u]", "Verdict", "Relaxations", "Queue after (d, node)"],
+            [
+                ["(0, 0)", "0 = dist[0]", "settle 0", "dist[1] = 4, dist[2] = 1",
+                 "(1,2), (4,1)"],
+                ["(1, 2)", "1 = dist[2]", "settle 2", "1 → 1+2 = **3** < 4; 3 → 1+5 = **6**",
+                 "(3,1), (4,1), (6,3)"],
+                ["(3, 1)", "3 = dist[1]", "settle 1", "3 → 3+1 = **4** < 6",
+                 "(4,1), (4,3), (6,3)"],
+                ["(4, 1)", "4 > dist[1] = 3", "**STALE — skip**", "none", "(4,3), (6,3)"],
+                ["(4, 3)", "4 = dist[3]", "settle 3", "no outgoing edges", "(6,3)"],
+                ["(6, 3)", "6 > dist[3] = 4", "**STALE — skip**", "none", "(empty)"],
+            ],
+            "Six pops for four nodes: two of them were obsolete entries left behind when a "
+            "shorter route was found later. Java's `PriorityQueue` has no decrease-key, so "
+            "the standard move is to push a *second* entry and let the stale one be "
+            "discarded on arrival — which is why the queue can hold O(E) entries rather "
+            "than O(V), and why the bound is O(E log E). Delete the staleness check and "
+            "you re-settle node 1 with a worse distance and relax from it again; on a "
+            "larger graph that is a wrong answer, not just wasted work.",
+        ),
+    ],
     rungs=[
         _rung("Warm up", "Dijkstra with the priority queue deleted.",
               ["grid-bfs-distance"],

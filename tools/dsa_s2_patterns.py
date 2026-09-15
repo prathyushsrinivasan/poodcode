@@ -388,6 +388,63 @@ always *"now do it without extra space"*. That is your cue to look for sorting,
 two pointers, or an in-place marking trick — and to say out loud what you are
 giving up: sorting costs O(n log n), and marking usually destroys the input.
 """,
+    internals="""
+### What `HashMap` actually is
+
+A **bucket array**, plus a rule for turning a key into an index into it.
+
+```
+hash = key.hashCode()
+hash ^= (hash >>> 16)          // spread the high bits down
+index = hash & (table.length - 1)   // cheap modulo, because length is a power of 2
+```
+
+Each bucket holds the entries whose keys landed on that index — a **collision**.
+Java keeps them in a short linked list, and once a single bucket reaches **8**
+entries (with a table of at least 64) it converts that list into a red-black
+tree, so a pathological bucket degrades to O(log k) rather than O(k). That is
+the entire reason `get` can be called O(1) with a straight face: the average
+bucket is tiny, and the worst bucket is bounded.
+
+### Load factor, and why the cost is *amortised*
+
+`HashMap` grows when `size > capacity × 0.75`. Growing means allocating a table
+of twice the length and re-indexing **every** entry, because the index depends
+on `table.length`. That single insert costs O(n).
+
+Spread over the n inserts that led to it, the cost per insert is still O(1) —
+the same amortisation argument as `ArrayList` growth. It is worth being able to
+say out loud, because "insert is O(1)" is false about *that* insert and true
+about the sequence.
+
+If you know the final size, `new HashMap<>(expectedSize / 0.75f + 1)` skips the
+resizes entirely. Rarely decisive, occasionally the difference between passing
+and timing out on 10⁶ insertions.
+
+### What `HashMap` does *not* promise
+
+**Any order at all.** Not insertion order, not key order, and not a stable
+order across runs or across JDK versions. Code that iterates a `HashMap` and
+prints is code whose output is not specified, and the judge compares text — so
+this is a correctness bug, not a style one.
+
+When order matters, say which order you mean:
+
+| You want | Use |
+|---|---|
+| insertion order | `LinkedHashMap` |
+| sorted by key | `TreeMap` — O(log n) per op, not O(1) |
+| no order, fastest | `HashMap` |
+
+### `hashCode` and `equals` are a pair
+
+Two keys that are `equals` **must** have the same `hashCode`, or the map will
+store both and find neither reliably. Java's `Integer`, `Long`, `String` and
+`List` all honour this. A custom key class that overrides `equals` and forgets
+`hashCode` is the classic silent bug — and an `int[]` used as a key is the same
+bug with no override in sight, because arrays hash by identity. Use a
+`List<Integer>` or a joined string instead.
+""",
     rungs=[
         _rung("Warm up", "One set, one question: have I seen this before?",
               ["contains-duplicate", "two-sum-exists"],
