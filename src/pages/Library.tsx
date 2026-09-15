@@ -1,10 +1,13 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { api } from "../api";
+import type { CardReview } from "../types";
 import { Markdown } from "../components/Markdown";
 import { Section, useCollapse } from "../components/Collapsible";
 import { ClickableRow, Empty } from "../components/common";
 import { StatusBadge, UnitProgress, useCurriculumData } from "../components/CurriculumData";
 import { searchUnits, type HydratedUnit } from "../lib/curriculum";
+import { reviewLane, type ReviewLane } from "../lib/dsaReview";
 
 /**
  * The Problem Library, as a curriculum.
@@ -22,11 +25,20 @@ import { searchUnits, type HydratedUnit } from "../lib/curriculum";
 export default function Library() {
   const { data, error } = useCurriculumData();
   const [query, setQuery] = useState("");
+  const [reviews, setReviews] = useState<Map<string, CardReview>>(new Map());
   const nav = useNavigate();
   const stageKeys = useMemo(() => (data?.stages ?? []).map((s) => s.key), [data]);
   const { isOpen, toggle } = useCollapse("dsa-stage", true);
 
+  useEffect(() => {
+    api
+      .cardReviews()
+      .then((rs) => setReviews(new Map(rs.map((r) => [r.card_id, r]))))
+      .catch(() => {});
+  }, []);
+
   const hits = useMemo(() => (data ? searchUnits(data, query) : []), [data, query]);
+  const lane = useMemo(() => (data ? reviewLane(data, reviews) : null), [data, reviews]);
 
   if (error) {
     return (
@@ -87,6 +99,8 @@ export default function Library() {
           </p>
         )}
       </div>
+
+      {lane && lane.units.length > 0 && <ReviewLaneCard lane={lane} nav={nav} />}
 
       <input
         style={{ width: "100%", marginBottom: 16 }}
@@ -162,6 +176,70 @@ export default function Library() {
   );
 }
 
+/** What is due today, from the units you have already cleared.
+ *
+ * Only cleared units appear. A review queue that offered you units you have
+ * never opened would be a second copy of the curriculum, and would stop meaning
+ * "this is slipping away". */
+function ReviewLaneCard({ lane, nav }: { lane: ReviewLane; nav: (to: string) => void }) {
+  const first = lane.units[0];
+  const parts: string[] = [];
+  if (lane.checksDue > 0) {
+    parts.push(`${lane.checksDue} self-check${lane.checksDue === 1 ? "" : "s"}`);
+  }
+  if (lane.staleUnits > 0) {
+    parts.push(`${lane.staleUnits} unit${lane.staleUnits === 1 ? "" : "s"} gone stale`);
+  }
+
+  return (
+    <div className="card" style={{ marginBottom: 16, borderColor: "var(--accent)" }}>
+      <div className="row">
+        <div>
+          <div className="io-label">Due today</div>
+          <strong>{parts.join(" · ")}</strong>
+          <span className="dim">
+            {" "}
+            — from the {lane.units.length} unit{lane.units.length === 1 ? "" : "s"} you have
+            cleared
+          </span>
+        </div>
+        <span className="spacer" />
+        <button className="primary" onClick={() => nav(`/library/unit/${first.unit.unit.key}`)}>
+          Start with {first.unit.unit.title} →
+        </button>
+      </div>
+      <div className="row wrap" style={{ marginTop: 10, gap: 6 }}>
+        {lane.units.slice(0, 8).map((r) => (
+          <span
+            key={r.unit.unit.key}
+            className="badge"
+            style={{
+              cursor: "pointer",
+              color: r.stale ? "var(--text-faint)" : "var(--accent)",
+              borderColor: r.stale ? "var(--text-faint)" : "var(--accent)",
+            }}
+            title={
+              r.stale
+                ? `Last practised ${r.lastPractisedDays} days ago`
+                : `${r.checksDue} self-check${r.checksDue === 1 ? "" : "s"} due`
+            }
+            onClick={() => nav(`/library/unit/${r.unit.unit.key}`)}
+          >
+            {r.unit.unit.icon} {r.unit.unit.title}
+            {r.checksDue > 0 && ` · ${r.checksDue}`}
+            {r.stale && " · stale"}
+          </span>
+        ))}
+        {lane.units.length > 8 && (
+          <span className="faint" style={{ fontSize: 12, alignSelf: "center" }}>
+            +{lane.units.length - 8} more
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function UnitCard({ u, onOpen }: { u: HydratedUnit; onOpen: () => void }) {
   return (
     <ClickableRow
@@ -174,16 +252,17 @@ function UnitCard({ u, onOpen }: { u: HydratedUnit; onOpen: () => void }) {
         <span style={{ fontSize: 20 }}>{u.unit.icon}</span>
         <strong>{u.unit.title}</strong>
         <span className="spacer" />
-        <StatusBadge status={u.status} />
+        <StatusBadge status={u.status} stale={u.stale} />
       </div>
       <p className="dim" style={{ margin: "6px 0 0" }}>
         {u.unit.tagline}
       </p>
-      <UnitProgress solved={u.solved} total={u.total} />
+      <UnitProgress solved={u.solved} total={u.total} stale={u.stale} />
       <div className="row" style={{ marginTop: 8 }}>
         <span className="faint" style={{ fontSize: 12 }}>
           {u.solved}/{u.total} problems
           {u.attempted > 0 && ` · ${u.attempted} attempted`}
+          {u.stale && ` · last practised ${u.lastPractisedDays}d ago`}
         </span>
         <span className="spacer" />
         {u.unmetPrereqTitles.length > 0 && (

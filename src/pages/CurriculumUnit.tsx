@@ -1,12 +1,13 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { api } from "../api";
-import type { Concept, Trace, UnitCheck } from "../types";
+import type { CardReview, Concept, Trace, UnitCheck } from "../types";
 import { Markdown, InlineMarkdown } from "../components/Markdown";
 import { Section, useCollapse } from "../components/Collapsible";
 import { ClickableRow, Confidence, DiffBadge, Empty } from "../components/common";
 import { StatusBadge, UnitProgress, useCurriculumData } from "../components/CurriculumData";
 import { findUnit, neighbours, type HydratedRung } from "../lib/curriculum";
+import { checkCardId, isCardDue, todayISO, unitChecks } from "../lib/dsaReview";
 
 /**
  * One unit of the DSA curriculum: a technique, taught, then drilled.
@@ -24,12 +25,36 @@ export default function CurriculumUnit() {
   const { key = "" } = useParams();
   const { data } = useCurriculumData();
   const [concepts, setConcepts] = useState<Concept[]>([]);
+  const [reviews, setReviews] = useState<Map<string, CardReview>>(new Map());
   const nav = useNavigate();
   const { isOpen, toggle } = useCollapse(`dsa-unit:${key}`, true);
 
   useEffect(() => {
     api.concepts().then(setConcepts).catch(() => {});
   }, []);
+
+  // Self-check scheduling lives in the same `card_reviews` table as the Learn
+  // tab's decks, so this is one read and no new storage.
+  useEffect(() => {
+    api
+      .cardReviews()
+      .then((rs) => setReviews(new Map(rs.map((r) => [r.card_id, r]))))
+      .catch(() => {});
+  }, []);
+
+  const gradeCheck = useCallback(async (index: number, remembered: boolean) => {
+    const id = checkCardId(key, index);
+    try {
+      // Remembered → "Good" (2), forgot → "Again" (0). Two buttons rather than
+      // four: a self-check you had to think about is not a different outcome
+      // from one you knew, and asking for a confidence grade on top of recall
+      // is how a revision pass turns into a chore nobody does.
+      const r = await api.gradeCard(id, remembered ? 2 : 0);
+      setReviews((m) => new Map(m).set(id, r));
+    } catch {
+      /* grading is a convenience; a failed write must not eat the answer */
+    }
+  }, [key]);
 
   if (!data) return <div className="empty" style={{ paddingTop: "20vh" }}>Loading…</div>;
 
@@ -44,7 +69,15 @@ export default function CurriculumUnit() {
   }
 
   const u = hydrated.unit;
+  const today = todayISO();
+  const checkStats = unitChecks(hydrated, reviews, today);
   const { prev, next } = neighbours(data, key);
+  // For a stale unit, "re-practise" means a problem you already solved — the
+  // point is to prove the technique is still there, not to meet a new one.
+  const firstSolved =
+    hydrated.rungs
+      .flatMap((r) => r.items)
+      .find((i) => i.problem?.solved_status === "solved")?.problem ?? null;
   const conceptName = (k: string) => concepts.find((c) => c.key === k)?.name ?? k;
   const conceptWhat = (k: string) => concepts.find((c) => c.key === k)?.what ?? "";
 
@@ -72,7 +105,7 @@ export default function CurriculumUnit() {
           {u.icon} {u.title}
         </h1>
         <span className="spacer" />
-        <StatusBadge status={hydrated.status} />
+        <StatusBadge status={hydrated.status} stale={hydrated.stale} />
       </div>
       <p className="page-sub">{u.tagline}</p>
 
@@ -88,7 +121,28 @@ export default function CurriculumUnit() {
             </button>
           )}
         </div>
-        <UnitProgress solved={hydrated.solved} total={hydrated.total} />
+        <UnitProgress solved={hydrated.solved} total={hydrated.total} stale={hydrated.stale} />
+        {hydrated.stale && (
+          <p className="faint" style={{ fontSize: 12, marginTop: 10, marginBottom: 0 }}>
+            You cleared this {hydrated.lastPractisedDays} days ago and have not touched it
+            since — past the {hydrated.staleAfterDays}-day window a cleared unit buys. Green
+            and <em>remembered</em> are not the same thing.{" "}
+            {firstSolved && (
+              <a
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  nav(`/solve/${firstSolved.id}`);
+                }}
+              >
+                Re-practise {firstSolved.title}
+              </a>
+            )}
+            {u.checks.length > 0 && checkStats.due > 0 && (
+              <> · {checkStats.due} self-check{checkStats.due === 1 ? "" : "s"} due below.</>
+            )}
+          </p>
+        )}
         {hydrated.unmetPrereqTitles.length > 0 && (
           <p className="faint" style={{ fontSize: 12, marginTop: 10, marginBottom: 0 }}>
             This unit builds on <strong>{hydrated.unmetPrereqTitles.join(", ")}</strong>, which
@@ -309,14 +363,26 @@ export default function CurriculumUnit() {
           title="✅ Self-check"
           open={isOpen("checks")}
           onToggle={() => toggle("checks")}
-          meta={<span className="dim mono">{u.checks.length}</span>}
+          meta={
+            <span className="dim mono">
+              {checkStats.due > 0 ? `${checkStats.due} due · ` : ""}
+              {checkStats.started}/{checkStats.total}
+            </span>
+          }
         >
           <p className="dim" style={{ marginTop: 0 }}>
-            Answer out loud before revealing. These are the questions worth coming
-            back to in a month.
+            Answer out loud, reveal, then say whether you had it. Each of these is
+            a scheduled card — grading it here is what makes it come back in a
+            month instead of never.
           </p>
           {u.checks.map((c, i) => (
-            <Check key={i} check={c} />
+            <Check
+              key={i}
+              check={c}
+              review={reviews.get(checkCardId(key, i))}
+              today={today}
+              onGrade={(remembered) => gradeCheck(i, remembered)}
+            />
           ))}
         </Section>
       )}
@@ -457,8 +523,25 @@ function TraceTable({ trace }: { trace: Trace }) {
   );
 }
 
-function Check({ check }: { check: UnitCheck }) {
+/** One self-check, revealable and gradeable.
+ *
+ * The grade buttons appear only after the answer is revealed, because grading
+ * your recall before seeing the answer is not a measurement of anything. */
+function Check({
+  check,
+  review,
+  today,
+  onGrade,
+}: {
+  check: UnitCheck;
+  review: CardReview | undefined;
+  today: string;
+  onGrade: (remembered: boolean) => void;
+}) {
   const [show, setShow] = useState(false);
+  const due = isCardDue(review, today);
+  const graded = (review?.reps ?? 0) > 0 || (review?.lapses ?? 0) > 0;
+
   return (
     <div className="card" style={{ marginBottom: 8, background: "var(--bg-elev-2)" }}>
       <div className="row">
@@ -466,14 +549,55 @@ function Check({ check }: { check: UnitCheck }) {
           <InlineMarkdown>{check.q}</InlineMarkdown>
         </div>
         <span className="spacer" />
+        {graded && !due && (
+          <span className="faint mono" style={{ fontSize: 12 }} title="Next review">
+            due {review!.due_date}
+          </span>
+        )}
+        {graded && due && (
+          <span className="badge" style={{ color: "var(--accent)", borderColor: "var(--accent)" }}>
+            due
+          </span>
+        )}
         <button className="ghost" onClick={() => setShow((s) => !s)}>
           {show ? "Hide" : "Reveal"}
         </button>
       </div>
       {show && (
-        <div className="dim" style={{ marginTop: 8 }}>
-          <InlineMarkdown>{check.a}</InlineMarkdown>
-        </div>
+        <>
+          <div className="dim" style={{ marginTop: 8 }}>
+            <InlineMarkdown>{check.a}</InlineMarkdown>
+          </div>
+          <div className="row" style={{ marginTop: 10, gap: 8 }}>
+            <button
+              className="ghost"
+              style={{ borderColor: "var(--bad)", color: "var(--bad)" }}
+              onClick={() => {
+                onGrade(false);
+                setShow(false);
+              }}
+            >
+              Forgot
+            </button>
+            <button
+              className="ghost"
+              style={{ borderColor: "var(--good)", color: "var(--good)" }}
+              onClick={() => {
+                onGrade(true);
+                setShow(false);
+              }}
+            >
+              Had it
+            </button>
+            <span className="spacer" />
+            {review && review.reps > 0 && (
+              <span className="faint" style={{ fontSize: 12 }}>
+                {review.reps} correct in a row
+                {review.lapses > 0 && ` · ${review.lapses} lapse${review.lapses === 1 ? "" : "s"}`}
+              </span>
+            )}
+          </div>
+        </>
       )}
     </div>
   );

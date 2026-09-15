@@ -1,4 +1,5 @@
 import type { CurriculumUnit, DsaCurriculum, Problem } from "../types";
+import { intervalDays } from "./revision";
 
 /**
  * Hydrating the DSA curriculum: joining the authored teaching spine
@@ -19,6 +20,32 @@ import type { CurriculumUnit, DsaCurriculum, Problem } from "../types";
 export const SOLID_RATIO = 0.6;
 
 export type UnitStatus = "new" | "started" | "solid" | "complete";
+
+/**
+ * How long a cleared unit stays trustworthy before it should be re-practised,
+ * as indices into `revision.LADDER` (= [1, 3, 7, 14, 30, 90] days).
+ *
+ * Without this, a unit reaches `solid` at 60% and is green forever, so at month
+ * three a green unit and a *remembered* unit look identical — which is the one
+ * thing a progress display exists to distinguish. Clearing a unit buys 30 days;
+ * finishing every problem in it buys 90, because having solved all of them is
+ * evidence of a stronger memory and not merely more of it.
+ *
+ * Deliberately long. A unit that greys out a fortnight after you cleared it
+ * would be noise, and noise is how a staleness signal gets ignored.
+ */
+const STALE_LADDER_INDEX: Record<"solid" | "complete", number> = {
+  solid: 4,     // 30 days
+  complete: 5,  // 90 days
+};
+
+/** Whole days between an ISO timestamp and `now`; `Infinity` for null/unparseable. */
+export function daysSince(iso: string | null, now: Date = new Date()): number {
+  if (!iso) return Infinity;
+  const then = new Date(iso.replace(" ", "T")).getTime();
+  if (Number.isNaN(then)) return Infinity;
+  return Math.floor((now.getTime() - then) / 86_400_000);
+}
 
 export interface RungItem {
   slug: string;
@@ -76,6 +103,19 @@ export interface HydratedUnit {
   unmetPrereqTitles: string[];
   /** First unsolved problem, walking the rungs in order. */
   next: Problem | null;
+  /**
+   * Days since the most recent solve anywhere in this unit, or `Infinity` if
+   * nothing here has ever been solved.
+   */
+  lastPractisedDays: number;
+  /** Days a cleared unit stays fresh, or null when it is not cleared. */
+  staleAfterDays: number | null;
+  /**
+   * A unit that was cleared and has not been touched since its interval ran
+   * out. Derived, like everything else here — there is still no progress table,
+   * so this survives a re-sequencing of the curriculum with no migration.
+   */
+  stale: boolean;
 }
 
 export interface HydratedStage {
@@ -126,7 +166,9 @@ export function isCleared(status: UnitStatus): boolean {
  */
 export function hydrate(
   curriculum: DsaCurriculum | null,
-  problems: Problem[]
+  problems: Problem[],
+  /** Injectable so decay is testable; the app never passes it. */
+  now: Date = new Date()
 ): HydratedCurriculum {
   const bySlug = new Map(problems.map((p) => [p.slug, p]));
   const unitBySlug = new Map<string, CurriculumUnit>();
@@ -140,6 +182,7 @@ export function hydrate(
       let total = 0;
       let attempted = 0;
       let next: Problem | null = null;
+      let lastPractisedDays = Infinity;
 
       const rungs: HydratedRung[] = unit.rungs.map((rung) => {
         let rungSolved = 0;
@@ -156,6 +199,12 @@ export function hydrate(
             if (problem.solved_status === "solved") {
               rungSolved++;
               rungTouched++;
+              // The *most recent* solve, because staleness asks "when did I last
+              // touch this technique", not "when did I start it".
+              lastPractisedDays = Math.min(
+                lastPractisedDays,
+                daysSince(problem.last_solved_at, now)
+              );
             } else {
               if (problem.solved_status === "attempted") {
                 rungAttempted++;
@@ -202,6 +251,19 @@ export function hydrate(
       const prereqTitles = unit.prereqs.map((k) => titleByUnit.get(k) ?? k);
       const unmetPrereqTitles = unmet.map((k) => titleByUnit.get(k) ?? k);
 
+      const staleAfterDays =
+        status === "solid" || status === "complete"
+          ? intervalDays(STALE_LADDER_INDEX[status])
+          : null;
+      // `lastPractisedDays === Infinity` cannot coexist with a cleared status —
+      // clearing requires solves — but a seed whose problems carry no
+      // `last_solved_at` would produce it, and calling that unit stale would be
+      // a guess. Require a real date.
+      const stale =
+        staleAfterDays !== null &&
+        Number.isFinite(lastPractisedDays) &&
+        lastPractisedDays > staleAfterDays;
+
       return {
         unit,
         rungs,
@@ -213,6 +275,9 @@ export function hydrate(
         prereqTitles,
         unmetPrereqTitles,
         next,
+        lastPractisedDays,
+        staleAfterDays,
+        stale,
       };
     });
 

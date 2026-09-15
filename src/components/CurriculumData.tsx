@@ -33,12 +33,23 @@ const STATUS_META: Record<UnitStatus, { label: string; colour: string; icon: str
 
 /** A unit's state, as a badge. "Solid" deliberately arrives before every
  * problem is solved — the bar for moving on is knowing the technique, not
- * clearing the list. */
-export function StatusBadge({ status }: { status: UnitStatus }) {
+ * clearing the list.
+ *
+ * `stale` mutes a cleared unit whose practice has aged out of its interval. It
+ * is not a fourth status: the unit *was* cleared, and that is still true. What
+ * has expired is the evidence, so the badge keeps its label and loses its
+ * colour, which is exactly the claim being made. */
+export function StatusBadge({ status, stale = false }: { status: UnitStatus; stale?: boolean }) {
   const m = STATUS_META[status];
+  const colour = stale ? "var(--text-faint)" : m.colour;
   return (
-    <span className="badge" style={{ color: m.colour, borderColor: m.colour }}>
+    <span
+      className="badge"
+      style={{ color: colour, borderColor: colour }}
+      title={stale ? `${m.label}, but not practised recently` : m.label}
+    >
       {m.icon} {m.label}
+      {stale && " · stale"}
     </span>
   );
 }
@@ -78,16 +89,32 @@ export function TaughtIn({ slug }: { slug: string }) {
   );
 }
 
-export function UnitProgress({ solved, total }: { solved: number; total: number }) {
+export function UnitProgress({
+  solved,
+  total,
+  stale = false,
+}: {
+  solved: number;
+  total: number;
+  /** Mute the bar for a cleared unit whose practice has aged out. */
+  stale?: boolean;
+}) {
   const pct = total ? (solved / total) * 100 : 0;
   return (
-    <div className="progress-track" title={`${solved} of ${total} solved`}>
+    <div
+      className="progress-track"
+      title={stale ? `${solved} of ${total} solved, but not recently` : `${solved} of ${total} solved`}
+    >
       <span
         className="progress-fill"
         style={{
           display: "block",
           width: `${pct}%`,
-          background: pct === 100 ? "var(--good)" : "var(--accent)",
+          background: stale
+            ? "var(--text-faint)"
+            : pct === 100
+              ? "var(--good)"
+              : "var(--accent)",
         }}
       />
     </div>
