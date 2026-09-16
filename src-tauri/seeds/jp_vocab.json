@@ -924,6 +924,171 @@
       "example_en": "High coverage doesn't mean the tests are good."
     },
     {
+      "id": "taju-keisho",
+      "term": "多重継承",
+      "reading": "たじゅうけいしょう",
+      "romaji": "tajū keishō",
+      "tags": [
+        "java"
+      ],
+      "level": 3,
+      "meaning": "multiple inheritance",
+      "desc_en": "Inheriting implementation from more than one parent. Java forbids it for classes, which is why interfaces exist in the shape they do.",
+      "desc_ja": "複数の親から実装を受け継ぐことです。Javaはクラスでこれを禁じており、インターフェースが今の形をしているのはそのためです。",
+      "example_ja": "Javaはクラスの多重継承を認めていません。",
+      "example_en": "Java does not allow multiple inheritance of classes."
+    },
+    {
+      "id": "hanka",
+      "term": "汎化",
+      "reading": "はんか",
+      "romaji": "hanka",
+      "tags": [
+        "java"
+      ],
+      "level": 3,
+      "meaning": "generalization",
+      "desc_en": "Pulling what several classes share up into a common parent — the direction that creates a superclass.",
+      "desc_ja": "複数のクラスに共通するものを親にまとめ上げることです。上位のクラスを作る方向の設計です。",
+      "example_ja": "共通の振る舞いを汎化して親クラスにまとめます。",
+      "example_en": "We generalize the shared behaviour into a parent class."
+    },
+    {
+      "id": "tokushuka",
+      "term": "特殊化",
+      "reading": "とくしゅか",
+      "romaji": "tokushuka",
+      "tags": [
+        "java"
+      ],
+      "level": 3,
+      "meaning": "specialization",
+      "desc_en": "The opposite direction: a subclass narrowing a general type to a particular case.",
+      "desc_ja": "汎化の逆で、一般的な型を特定の場合に絞り込む子クラスを作ることです。",
+      "example_ja": "DogはAnimalを特殊化したクラスです。",
+      "example_en": "Dog is a specialization of Animal."
+    },
+    {
+      "id": "doteki-sokubaku",
+      "term": "動的束縛",
+      "reading": "どうてきそくばく",
+      "romaji": "dōteki sokubaku",
+      "tags": [
+        "java"
+      ],
+      "level": 3,
+      "meaning": "dynamic binding",
+      "desc_en": "Deciding at run time which overridden method actually runs, based on the object's real class. The machinery polymorphism rests on.",
+      "desc_ja": "どの再定義されたメソッドを実行するかを、オブジェクトの実際のクラスに基づいて実行時に決めることです。多態性はこの仕組みの上に成り立ちます。",
+      "example_ja": "動的束縛によって、実際の型のメソッドが呼ばれます。",
+      "example_en": "Dynamic binding means the actual type's method is the one called."
+    },
+    {
+      "id": "tokasei",
+      "term": "等価性",
+      "reading": "とうかせい",
+      "romaji": "tōkasei",
+      "tags": [
+        "java"
+      ],
+      "level": 2,
+      "meaning": "equality (of contents)",
+      "desc_en": "Whether two objects hold the same value, tested with equals — as against 同一性, which asks whether they are the same object.",
+      "desc_ja": "二つのオブジェクトが同じ値を持つかどうかで、equalsで判定します。同じオブジェクトかを問う同一性とは区別します。",
+      "example_ja": "equalsは等価性を判定します。",
+      "example_en": "equals tests equality."
+    },
+    {
+      "id": "junjozuke",
+      "term": "順序付け",
+      "reading": "じゅんじょづけ",
+      "romaji": "junjozuke",
+      "tags": [
+        "java"
+      ],
+      "level": 2,
+      "meaning": "ordering",
+      "desc_en": "Defining which of two objects comes first, so they can be sorted — Comparable for a type's own rule, Comparator for any other.",
+      "desc_ja": "二つのオブジェクトのどちらが先かを定めることで、整列が可能になります。型自身の規則はComparable、それ以外はComparatorで与えます。",
+      "example_ja": "Comparatorで独自の順序付けを与えます。",
+      "example_en": "We supply our own ordering with a Comparator."
+    },
+    {
+      "id": "shizen-junjo",
+      "term": "自然順序",
+      "reading": "しぜんじゅんじょ",
+      "romaji": "shizen junjo",
+      "tags": [
+        "java"
+      ],
+      "level": 3,
+      "meaning": "natural ordering",
+      "desc_en": "The order a type considers its own — numbers ascending, strings lexicographic — given by compareTo.",
+      "desc_ja": "その型が本来の順序とみなすものです。数値なら昇順、文字列なら辞書順で、compareToが定めます。",
+      "example_ja": "Stringの自然順序は辞書順です。",
+      "example_en": "String's natural ordering is lexicographic."
+    },
+    {
+      "id": "jaku-sansho",
+      "term": "弱参照",
+      "reading": "じゃくさんしょう",
+      "romaji": "jaku sanshō",
+      "tags": [
+        "java"
+      ],
+      "level": 3,
+      "meaning": "weak reference",
+      "desc_en": "A reference that does not stop the collector reclaiming the object, used for caches that should not keep things alive.",
+      "desc_ja": "そのオブジェクトの回収を妨げない参照です。生かし続けてはいけないキャッシュなどに使います。",
+      "example_ja": "キャッシュには弱参照を使うことがあります。",
+      "example_en": "A cache may use weak references."
+    },
+    {
+      "id": "ireko",
+      "term": "入れ子",
+      "reading": "いれこ",
+      "romaji": "ireko",
+      "tags": [
+        "java"
+      ],
+      "level": 2,
+      "meaning": "nested",
+      "desc_en": "One structure written inside another — a nested class, a nested loop, a nested condition.",
+      "desc_ja": "ある構造の中に別の構造が入っていることです。入れ子のクラス、ループ、条件などに使います。",
+      "example_ja": "入れ子のループは計算量に注意が必要です。",
+      "example_en": "Watch the complexity of nested loops."
+    },
+    {
+      "id": "modorigata",
+      "term": "戻り型",
+      "reading": "もどりがた",
+      "romaji": "modorigata",
+      "tags": [
+        "java"
+      ],
+      "level": 2,
+      "meaning": "return type",
+      "desc_en": "The type a method declares it will give back; void means it gives nothing.",
+      "desc_ja": "メソッドが返すと宣言した型です。voidの場合は何も返しません。",
+      "example_ja": "このメソッドの戻り型はintです。",
+      "example_en": "This method's return type is int."
+    },
+    {
+      "id": "kahencho-hikisu",
+      "term": "可変長引数",
+      "reading": "かへんちょうひきすう",
+      "romaji": "kahenchō hikisū",
+      "tags": [
+        "java"
+      ],
+      "level": 3,
+      "meaning": "varargs",
+      "desc_en": "A parameter written int... that accepts any number of arguments and arrives as an array.",
+      "desc_ja": "int...のように書き、いくつでも引数を受け取れる仮引数です。中では配列として扱われます。",
+      "example_ja": "可変長引数を使えば、引数の数を決めずに済みます。",
+      "example_en": "With varargs you don't have to fix the number of arguments."
+    },
+    {
       "id": "hairetsu",
       "term": "配列",
       "reading": "はいれつ",
@@ -1798,6 +1963,186 @@
       "desc_ja": "多数回の操作全体でならした一回あたりの計算量です。たまに重い操作があっても平均は小さくなり得ます。",
       "example_ja": "ArrayListの追加は償却計算量がO(1)です。",
       "example_en": "Appending to an ArrayList is O(1) amortized."
+    },
+    {
+      "id": "saicho",
+      "term": "最長",
+      "reading": "さいちょう",
+      "romaji": "saichō",
+      "tags": [
+        "problems"
+      ],
+      "level": 1,
+      "meaning": "longest",
+      "desc_en": "The greatest length among the candidates — the word opening a great many problem statements.",
+      "desc_ja": "候補の中で最も長いものです。非常に多くの問題文がこの語で始まります。",
+      "example_ja": "最長の部分文字列の長さを求めてください。",
+      "example_en": "Find the length of the longest substring."
+    },
+    {
+      "id": "saitan",
+      "term": "最短",
+      "reading": "さいたん",
+      "romaji": "saitan",
+      "tags": [
+        "problems"
+      ],
+      "level": 1,
+      "meaning": "shortest",
+      "desc_en": "The least length or cost among the candidates.",
+      "desc_ja": "候補の中で最も短い、あるいは費用の小さいものです。",
+      "example_ja": "最短の手数を出力してください。",
+      "example_en": "Output the shortest number of moves."
+    },
+    {
+      "id": "kukan",
+      "term": "区間",
+      "reading": "くかん",
+      "romaji": "kukan",
+      "tags": [
+        "problems"
+      ],
+      "level": 2,
+      "meaning": "interval / range",
+      "desc_en": "A contiguous stretch from one index to another, inclusive or exclusive as the problem says.",
+      "desc_ja": "ある添字から別の添字までの連続した範囲です。両端を含むかどうかは問題の指定によります。",
+      "example_ja": "各区間の和を求めてください。",
+      "example_en": "Find the sum of each interval."
+    },
+    {
+      "id": "sowa",
+      "term": "総和",
+      "reading": "そうわ",
+      "romaji": "sōwa",
+      "tags": [
+        "problems"
+      ],
+      "level": 2,
+      "meaning": "summation",
+      "desc_en": "The result of adding every element together.",
+      "desc_ja": "すべての要素を足し合わせた結果です。",
+      "example_ja": "配列の総和を求めます。",
+      "example_en": "We find the summation of the array."
+    },
+    {
+      "id": "yososu",
+      "term": "要素数",
+      "reading": "ようそすう",
+      "romaji": "yōsosū",
+      "tags": [
+        "problems"
+      ],
+      "level": 1,
+      "meaning": "number of elements",
+      "desc_en": "How many items a collection holds — the N a problem's constraints are stated in.",
+      "desc_ja": "コレクションに入っている項目の個数です。問題の制約でNとして示される値です。",
+      "example_ja": "1行目に要素数が与えられます。",
+      "example_en": "The number of elements is given on the first line."
+    },
+    {
+      "id": "han-i",
+      "term": "範囲",
+      "reading": "はんい",
+      "romaji": "han'i",
+      "tags": [
+        "problems"
+      ],
+      "level": 1,
+      "meaning": "range",
+      "desc_en": "The span of values something may take, or the region being examined.",
+      "desc_ja": "とりうる値の幅、または調べている領域のことです。",
+      "example_ja": "添字が範囲を超えていないか確認します。",
+      "example_en": "We check that the index hasn't gone out of range."
+    },
+    {
+      "id": "gyakujun",
+      "term": "逆順",
+      "reading": "ぎゃくじゅん",
+      "romaji": "gyakujun",
+      "tags": [
+        "problems"
+      ],
+      "level": 1,
+      "meaning": "reverse order",
+      "desc_en": "Back to front. Distinct from 降順, which specifically means largest-to-smallest.",
+      "desc_ja": "前後を入れ替えた順番です。大きい順を指す降順とは区別します。",
+      "example_ja": "リストを逆順に出力してください。",
+      "example_en": "Output the list in reverse order."
+    },
+    {
+      "id": "chuochi",
+      "term": "中央値",
+      "reading": "ちゅうおうち",
+      "romaji": "chūōchi",
+      "tags": [
+        "problems"
+      ],
+      "level": 2,
+      "meaning": "median",
+      "desc_en": "The middle value once sorted — less easily skewed by an outlier than the average.",
+      "desc_ja": "整列したときに真ん中に来る値です。平均より外れ値の影響を受けにくい指標です。",
+      "example_ja": "二つの配列の中央値を求めてください。",
+      "example_en": "Find the median of the two arrays."
+    },
+    {
+      "id": "hanpuku",
+      "term": "反復",
+      "reading": "はんぷく",
+      "romaji": "hanpuku",
+      "tags": [
+        "problems"
+      ],
+      "level": 2,
+      "meaning": "iteration",
+      "desc_en": "Repeating a step — the loop-shaped alternative to recursion.",
+      "desc_ja": "処理を繰り返すことです。再帰に対する、ループの形の解き方です。",
+      "example_ja": "再帰ではなく反復で書き直します。",
+      "example_en": "We rewrite it with iteration rather than recursion."
+    },
+    {
+      "id": "tansaku-kukan",
+      "term": "探索空間",
+      "reading": "たんさくくうかん",
+      "romaji": "tansaku kūkan",
+      "tags": [
+        "problems"
+      ],
+      "level": 3,
+      "meaning": "search space",
+      "desc_en": "The set of all candidates a search could examine. Making it smaller is usually the whole trick.",
+      "desc_ja": "探索が調べうるすべての候補の集まりです。これを小さくすることが解法の要点であることが多いです。",
+      "example_ja": "制約を使って探索空間を狭めます。",
+      "example_en": "We use the constraints to narrow the search space."
+    },
+    {
+      "id": "edakari",
+      "term": "枝刈り",
+      "reading": "えだかり",
+      "romaji": "edakari",
+      "tags": [
+        "problems"
+      ],
+      "level": 3,
+      "meaning": "pruning",
+      "desc_en": "Abandoning a branch of the search as soon as it cannot lead to an answer — what makes backtracking fast enough.",
+      "desc_ja": "答えにつながらないと分かった時点で、その枝を打ち切ることです。バックトラックが現実的な速さになる理由です。",
+      "example_ja": "枝刈りを入れると探索が大幅に速くなります。",
+      "example_en": "Adding pruning speeds the search up enormously."
+    },
+    {
+      "id": "jotai-sen-i",
+      "term": "状態遷移",
+      "reading": "じょうたいせんい",
+      "romaji": "jōtai sen'i",
+      "tags": [
+        "problems"
+      ],
+      "level": 3,
+      "meaning": "state transition",
+      "desc_en": "The rule taking one state of a DP or automaton to the next — what you write down after the recurrence.",
+      "desc_ja": "動的計画法やオートマトンで、ある状態から次の状態へ移る規則です。漸化式の次に書き下すものです。",
+      "example_ja": "状態遷移を表にまとめます。",
+      "example_en": "We lay the state transitions out in a table."
     },
     {
       "id": "kata-chushaku",
@@ -2675,6 +3020,186 @@
       "example_en": "Even a tail call will overflow if the recursion is deep."
     },
     {
+      "id": "kata-teigi",
+      "term": "型定義",
+      "reading": "かたていぎ",
+      "romaji": "kata teigi",
+      "tags": [
+        "typescript"
+      ],
+      "level": 1,
+      "meaning": "type definition",
+      "desc_en": "A named type you declared yourself, with type or interface.",
+      "desc_ja": "typeやinterfaceを使って自分で宣言した、名前の付いた型です。",
+      "example_ja": "共通の型定義を別のファイルにまとめます。",
+      "example_en": "We gather the shared type definitions into a separate file."
+    },
+    {
+      "id": "betsumei",
+      "term": "別名",
+      "reading": "べつめい",
+      "romaji": "betsumei",
+      "tags": [
+        "typescript"
+      ],
+      "level": 2,
+      "meaning": "type alias",
+      "desc_en": "A second name for an existing type, given with type — it creates no new type, only a shorter way to say one.",
+      "desc_ja": "typeで既存の型に付ける別の名前です。新しい型ができるわけではなく、短く書けるようになるだけです。",
+      "example_ja": "長い合併型には別名を付けると読みやすくなります。",
+      "example_en": "Giving a long union type an alias makes it readable."
+    },
+    {
+      "id": "hanpuku-shori",
+      "term": "反復処理",
+      "reading": "はんぷくしょり",
+      "romaji": "hanpuku shori",
+      "tags": [
+        "typescript"
+      ],
+      "level": 2,
+      "meaning": "iteration",
+      "desc_en": "Walking a collection element by element, with for...of or a method like forEach.",
+      "desc_ja": "コレクションの要素を一つずつたどることです。for...ofやforEachなどで行います。",
+      "example_ja": "配列を反復処理します。",
+      "example_en": "We iterate over the array."
+    },
+    {
+      "id": "hanpuku-kano",
+      "term": "反復可能",
+      "reading": "はんぷくかのう",
+      "romaji": "hanpuku kanō",
+      "tags": [
+        "typescript"
+      ],
+      "level": 3,
+      "meaning": "iterable",
+      "desc_en": "Able to be walked by for...of — anything implementing the iterator protocol, not only arrays.",
+      "desc_ja": "for...ofでたどれる性質です。配列に限らず、反復子の約束を満たすものすべてが該当します。",
+      "example_ja": "MapもSetも反復可能です。",
+      "example_en": "Both Map and Set are iterable."
+    },
+    {
+      "id": "seiseiki",
+      "term": "生成器",
+      "reading": "せいせいき",
+      "romaji": "seiseiki",
+      "tags": [
+        "typescript"
+      ],
+      "level": 3,
+      "meaning": "generator",
+      "desc_en": "A function that can pause and resume with yield, producing values one at a time rather than all at once.",
+      "desc_ja": "yieldで中断と再開ができる関数です。値を一度にすべてではなく、一つずつ取り出せます。",
+      "example_ja": "生成器を使えば無限の列も扱えます。",
+      "example_en": "With a generator you can work with an infinite sequence."
+    },
+    {
+      "id": "kozoka-fukusei",
+      "term": "構造化複製",
+      "reading": "こうぞうかふくせい",
+      "romaji": "kōzōka fukusei",
+      "tags": [
+        "typescript"
+      ],
+      "level": 3,
+      "meaning": "structured clone",
+      "desc_en": "The built-in deep copy, structuredClone — it handles nesting, Maps and Dates, where JSON round-tripping loses them.",
+      "desc_ja": "structuredCloneによる組み込みの深い複製です。入れ子やMap、Dateも扱えます。JSONを経由する方法では失われるものです。",
+      "example_ja": "構造化複製なら日付もそのまま複製できます。",
+      "example_en": "A structured clone copies dates correctly too."
+    },
+    {
+      "id": "genmitsu-toka",
+      "term": "厳密等価",
+      "reading": "げんみつとうか",
+      "romaji": "genmitsu tōka",
+      "tags": [
+        "typescript"
+      ],
+      "level": 2,
+      "meaning": "strict equality",
+      "desc_en": "=== — compares without converting types, and is what you should almost always use.",
+      "desc_ja": "===のことです。型変換をせずに比較するもので、ほとんどの場合こちらを使うべきです。",
+      "example_ja": "比較には厳密等価を使ってください。",
+      "example_en": "Please use strict equality for comparisons."
+    },
+    {
+      "id": "yurui-toka",
+      "term": "緩い等価",
+      "reading": "ゆるいとうか",
+      "romaji": "yurui tōka",
+      "tags": [
+        "typescript"
+      ],
+      "level": 3,
+      "meaning": "loose equality",
+      "desc_en": "== — converts types before comparing, which is why \"\" == 0 is true and why it is avoided.",
+      "desc_ja": "==のことです。比較の前に型変換を行うため、\"\" == 0がtrueになります。避けられるのはこのためです。",
+      "example_ja": "緩い等価は予想外の結果になることがあります。",
+      "example_en": "Loose equality can give surprising results."
+    },
+    {
+      "id": "shinchi",
+      "term": "真値",
+      "reading": "しんち",
+      "romaji": "shinchi",
+      "tags": [
+        "typescript"
+      ],
+      "level": 2,
+      "meaning": "truthy",
+      "desc_en": "A value that counts as true in a condition without being true — a non-empty string, any non-zero number.",
+      "desc_ja": "trueそのものではないのに、条件の中でtrueとして扱われる値です。空でない文字列や0以外の数値が該当します。",
+      "example_ja": "空でない文字列は真値です。",
+      "example_en": "A non-empty string is truthy."
+    },
+    {
+      "id": "gichi",
+      "term": "偽値",
+      "reading": "ぎち",
+      "romaji": "gichi",
+      "tags": [
+        "typescript"
+      ],
+      "level": 2,
+      "meaning": "falsy",
+      "desc_en": "A value that counts as false in a condition: 0, \"\", null, undefined and NaN.",
+      "desc_ja": "条件の中でfalseとして扱われる値です。0、空文字列、null、undefined、NaNが該当します。",
+      "example_ja": "0は偽値なので、条件が成立しません。",
+      "example_en": "0 is falsy, so the condition doesn't hold."
+    },
+    {
+      "id": "hokan",
+      "term": "補完",
+      "reading": "ほかん",
+      "romaji": "hokan",
+      "tags": [
+        "typescript"
+      ],
+      "level": 2,
+      "meaning": "completion",
+      "desc_en": "The editor offering the names available at the cursor — much of what having types is for day to day.",
+      "desc_ja": "カーソル位置で使える名前を編集器が示してくれることです。日々の作業で型があることの利点の多くはこれです。",
+      "example_ja": "型を書いておくと補完が効きます。",
+      "example_en": "Writing the types out makes completion work."
+    },
+    {
+      "id": "shoryaku-kiho",
+      "term": "省略記法",
+      "reading": "しょうりゃくきほう",
+      "romaji": "shōryaku kihō",
+      "tags": [
+        "typescript"
+      ],
+      "level": 2,
+      "meaning": "shorthand",
+      "desc_en": "A shorter way to write something — { x } for { x: x }, for instance.",
+      "desc_ja": "同じことをより短く書ける記法です。{ x: x }を{ x }と書けるのがその例です。",
+      "example_ja": "省略記法で書くと短くなります。",
+      "example_en": "It gets shorter written in shorthand."
+    },
+    {
       "id": "ketsugo",
       "term": "結合",
       "reading": "けつごう",
@@ -3048,6 +3573,81 @@
       "desc_ja": "ある列の値が二つの行で重複してはならないという規則です。データベース自身が守らせます。",
       "example_ja": "メールアドレスの列に一意制約を付けます。",
       "example_en": "We put a unique constraint on the email column."
+    },
+    {
+      "id": "jufukugyo",
+      "term": "重複行",
+      "reading": "じゅうふくぎょう",
+      "romaji": "jūfukugyō",
+      "tags": [
+        "sql"
+      ],
+      "level": 2,
+      "meaning": "duplicate rows",
+      "desc_en": "Rows that repeat, which DISTINCT removes and a join can accidentally create.",
+      "desc_ja": "同じ内容が繰り返される行です。DISTINCTで取り除けますが、結合によって意図せず生まれることもあります。",
+      "example_ja": "結合の結果に重複行が出ていませんか。",
+      "example_en": "Isn't the join producing duplicate rows?"
+    },
+    {
+      "id": "shugo-enzan",
+      "term": "集合演算",
+      "reading": "しゅうごうえんざん",
+      "romaji": "shūgō enzan",
+      "tags": [
+        "sql"
+      ],
+      "level": 3,
+      "meaning": "set operation",
+      "desc_en": "Combining two result sets as sets — UNION, INTERSECT and EXCEPT.",
+      "desc_ja": "二つの結果を集合として組み合わせる操作です。UNION、INTERSECT、EXCEPTが該当します。",
+      "example_ja": "UNIONは集合演算の一つです。",
+      "example_en": "UNION is one of the set operations."
+    },
+    {
+      "id": "sokan-fuku-toiawase",
+      "term": "相関副問い合わせ",
+      "reading": "そうかんふくといあわせ",
+      "romaji": "sōkan fuku toiawase",
+      "tags": [
+        "sql"
+      ],
+      "level": 3,
+      "meaning": "correlated subquery",
+      "desc_en": "A subquery referring to the outer row, so it is evaluated once per row — correct, and often the reason a query is slow.",
+      "desc_ja": "外側の行を参照する副問い合わせです。行ごとに評価されるため正しく動きますが、問い合わせが遅い原因になりがちです。",
+      "example_ja": "相関副問い合わせは行ごとに実行されます。",
+      "example_en": "A correlated subquery runs once per row."
+    },
+    {
+      "id": "sansho-seigosei",
+      "term": "参照整合性",
+      "reading": "さんしょうせいごうせい",
+      "romaji": "sanshō seigōsei",
+      "tags": [
+        "sql"
+      ],
+      "level": 3,
+      "meaning": "referential integrity",
+      "desc_en": "The guarantee that a foreign key always points at a row that exists.",
+      "desc_ja": "外部キーが必ず存在する行を指していることの保証です。",
+      "example_ja": "参照整合性のおかげで、孤立した行は生まれません。",
+      "example_en": "Referential integrity means no orphaned rows can appear."
+    },
+    {
+      "id": "zenpyo-sosa",
+      "term": "全表走査",
+      "reading": "ぜんぴょうそうさ",
+      "romaji": "zenpyō sōsa",
+      "tags": [
+        "sql"
+      ],
+      "level": 3,
+      "meaning": "full table scan",
+      "desc_en": "Reading every row because no usable index exists — what you hope not to find in an execution plan.",
+      "desc_ja": "使える索引がないため、すべての行を読むことです。実行計画の中に見つけたくないものです。",
+      "example_ja": "索引がないので全表走査になっています。",
+      "example_en": "With no index, it's doing a full table scan."
     },
     {
       "id": "ninsho",
@@ -3425,6 +4025,81 @@
       "example_en": "When latency is high, the interface feels sluggish."
     },
     {
+      "id": "jotai-kanri",
+      "term": "状態管理",
+      "reading": "じょうたいかんり",
+      "romaji": "jōtai kanri",
+      "tags": [
+        "web"
+      ],
+      "level": 2,
+      "meaning": "state management",
+      "desc_en": "Deciding where state lives and who may change it, once passing it down by hand stops scaling.",
+      "desc_ja": "状態をどこに置き、誰が変更してよいかを決めることです。手渡しで済まなくなった規模で必要になります。",
+      "example_ja": "画面が増えたので状態管理を見直します。",
+      "example_en": "With more screens, we're revisiting state management."
+    },
+    {
+      "id": "bekito",
+      "term": "冪等",
+      "reading": "べきとう",
+      "romaji": "bekitō",
+      "tags": [
+        "web"
+      ],
+      "level": 3,
+      "meaning": "idempotent",
+      "desc_en": "Safe to repeat: doing it twice leaves the same result as doing it once, which is what makes a retry safe.",
+      "desc_ja": "繰り返しても安全なことです。二回行っても一回と同じ結果になり、再試行を安全にします。",
+      "example_ja": "この操作は冪等なので、再試行しても問題ありません。",
+      "example_en": "This operation is idempotent, so retrying is fine."
+    },
+    {
+      "id": "saishiko",
+      "term": "再試行",
+      "reading": "さいしこう",
+      "romaji": "saishikō",
+      "tags": [
+        "web"
+      ],
+      "level": 2,
+      "meaning": "retry",
+      "desc_en": "Attempting a failed request again, usually after a growing delay.",
+      "desc_ja": "失敗した要求をもう一度試すことです。多くは待ち時間を延ばしながら行います。",
+      "example_ja": "通信に失敗したら再試行します。",
+      "example_en": "If the request fails, we retry."
+    },
+    {
+      "id": "fuka-bunsan",
+      "term": "負荷分散",
+      "reading": "ふかぶんさん",
+      "romaji": "fuka bunsan",
+      "tags": [
+        "web"
+      ],
+      "level": 3,
+      "meaning": "load balancing",
+      "desc_en": "Spreading requests across several servers so no one of them is overwhelmed.",
+      "desc_ja": "要求を複数のサーバーに分けて、一台に偏らないようにすることです。",
+      "example_ja": "負荷分散で一台あたりの負荷を下げます。",
+      "example_en": "Load balancing lowers the load on each machine."
+    },
+    {
+      "id": "oto-jikan",
+      "term": "応答時間",
+      "reading": "おうとうじかん",
+      "romaji": "ōtō jikan",
+      "tags": [
+        "web"
+      ],
+      "level": 2,
+      "meaning": "response time",
+      "desc_en": "How long a request takes end to end — what a user actually experiences.",
+      "desc_ja": "要求が始まってから終わるまでにかかる時間です。利用者が実際に体感するものです。",
+      "example_ja": "応答時間を計測して改善します。",
+      "example_en": "We measure the response time and improve it."
+    },
+    {
       "id": "shiyo",
       "term": "仕様",
       "reading": "しよう",
@@ -3798,6 +4473,81 @@
       "desc_ja": "人や要素の間の食い違いを合わせることです。日程、範囲、数値などについて使います。",
       "example_ja": "関係者と日程を調整します。",
       "example_en": "I'll coordinate the schedule with everyone involved."
+    },
+    {
+      "id": "hikitsugi",
+      "term": "引き継ぎ",
+      "reading": "ひきつぎ",
+      "romaji": "hikitsugi",
+      "tags": [
+        "workplace"
+      ],
+      "level": 2,
+      "meaning": "handover",
+      "desc_en": "Passing work to someone else with enough context that they can actually continue it.",
+      "desc_ja": "他の人が続けられるだけの背景とともに、作業を引き渡すことです。",
+      "example_ja": "来週から担当が変わるので引き継ぎをします。",
+      "example_en": "The owner changes next week, so I'm doing a handover."
+    },
+    {
+      "id": "kigen",
+      "term": "期限",
+      "reading": "きげん",
+      "romaji": "kigen",
+      "tags": [
+        "workplace"
+      ],
+      "level": 1,
+      "meaning": "due date",
+      "desc_en": "The point by which something is expected. The general word behind both 納期 and 締め切り.",
+      "desc_ja": "それまでに終わっていることが期待される時点です。納期や締め切りの土台になる一般的な語です。",
+      "example_ja": "期限までに終わりそうにありません。",
+      "example_en": "It doesn't look like it'll be done by the due date."
+    },
+    {
+      "id": "konpon-gen-in",
+      "term": "根本原因",
+      "reading": "こんぽんげんいん",
+      "romaji": "konpon gen'in",
+      "tags": [
+        "workplace"
+      ],
+      "level": 3,
+      "meaning": "root cause",
+      "desc_en": "The underlying reason a defect happened, as against the symptom that was reported.",
+      "desc_ja": "報告された症状ではなく、不具合が起きた本当の理由のことです。",
+      "example_ja": "根本原因を調べてから修正します。",
+      "example_en": "We investigate the root cause before fixing it."
+    },
+    {
+      "id": "saihatsu-boshi",
+      "term": "再発防止",
+      "reading": "さいはつぼうし",
+      "romaji": "saihatsu bōshi",
+      "tags": [
+        "workplace"
+      ],
+      "level": 3,
+      "meaning": "recurrence prevention",
+      "desc_en": "The change that stops the same defect happening again — a test, a check, a changed process. Expected after any serious incident.",
+      "desc_ja": "同じ不具合が二度と起きないようにする対策です。試験や確認、手順の変更などで、重大な障害の後には必ず求められます。",
+      "example_ja": "再発防止のために試験を追加しました。",
+      "example_en": "We added a test to prevent a recurrence."
+    },
+    {
+      "id": "dandori",
+      "term": "段取り",
+      "reading": "だんどり",
+      "romaji": "dandori",
+      "tags": [
+        "workplace"
+      ],
+      "level": 2,
+      "meaning": "planning / preparation",
+      "desc_en": "Arranging the order and the prerequisites of work before starting it, so it runs without stalling.",
+      "desc_ja": "作業を始める前に、順序と前提を整えておくことです。途中で止まらずに進められます。",
+      "example_ja": "作業の段取りを決めてから始めます。",
+      "example_en": "We settle the plan before starting the work."
     }
   ]
 }
