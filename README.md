@@ -540,17 +540,47 @@ lives in [`JAVA_ROADMAP.md`](JAVA_ROADMAP.md).
 ### Japanese track
 
 The **日本語** view of Learn, for reading code, problems and interviews in
-Japanese. It opens with **Vocabulary** (`seeds/jp_vocab.json`, authored in
-`tools/jp_vocab_defs.py`): 100 non-katakana words for Java, coding problems and
-TypeScript, filterable by tag and by kanji, kana, rōmaji or English, each a
-flashcard with its reading, a description in English and Japanese, and an
-example sentence. The generator fails the build on a katakana term, a
-non-hiragana reading, or a sentence that doesn't contain its word. Below it,
-**12 glossary sets** (292 cards, `tools/japanese_defs.py`) are studied with
-spaced repetition, and the **日本語 → Java** bridge (`tools/japanese_bridge.py`)
-restates 12 bank problems in Japanese alongside 12 interview Q&A.
+Japanese.
 
-The plan for expanding it lives in [`JAPANESE_ROADMAP.md`](JAPANESE_ROADMAP.md).
+It opens with **Vocabulary** (`seeds/jp_vocab.json`, authored in
+`tools/jp_vocab_defs.py`): **300 non-katakana words** across six tags — Java,
+coding problems, TypeScript, SQL, Web and Workplace — each at one of three
+levels, from everyday to specialist. A word can carry more than one tag, because
+計算量 is a Java-interview word and a coding-problem word at once. Filter by tag,
+level, or by kanji, kana, rōmaji or English; every word is a flashcard with its
+reading, a description in both languages, and an example sentence carrying
+**furigana** you can toggle off and a 🔊 button that reads it aloud through the
+OS's own voices.
+
+Words are **studied, not just read**: four modes (flip, reverse, type the
+reading in rōmaji *or* kana, and cloze) on the same SM-2 scheduler as everything
+else, with a due count and a per-word state dot.
+
+Below it, **13 glossary sets** (284 cards, `tools/japanese_defs.py`) — including
+one **カタカナ Loanwords** set holding all 64 borrowed words, where the
+type-the-reading mode is switched off because a katakana word *is* its own
+reading. Each set ends in a generated six-question self-check you must pass to
+mark it done. Where a glossary term is also a vocabulary word, the vocabulary
+entry is canonical and the two share one card id, so 配列 is one schedule rather
+than two. A single **日本語 review** lane pulls every due card, from the word
+list and all 13 sets, into one session.
+
+The **日本語 → Java** bridge (`tools/japanese_bridge.py`) restates **40 bank
+problems** in Japanese — Intro through Medium, chosen unit by unit across the
+DSA curriculum — alongside **40 interview questions** filed by stage (自己紹介 ·
+コーディング · 設計 · 振り返り), each answered in both languages with its key
+terms linked back to their cards.
+
+The generator is what keeps this honest. It fails the build on a katakana term,
+a non-hiragana reading, a sentence that doesn't contain its word, a word with no
+level, a tag with no entry-level words, furigana that would alter the sentence it
+annotates, a bridge problem naming a slug that isn't in the bank, and an
+interview question naming a term that isn't in the vocabulary list.
+
+The design reasoning — including why the vocabulary list won over the glossary
+sets, and why single kanji are deliberately left without furigana — is kept in
+[`JAPANESE_ROADMAP.md`](JAPANESE_ROADMAP.md), whose twelve steps have all
+shipped.
 
 You own the library. Add your own problems three ways:
 

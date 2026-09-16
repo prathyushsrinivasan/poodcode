@@ -12,6 +12,19 @@ gets managed (see [Rules](#rules-that-every-step-keeps)).
 
 **Status legend** — ✅ built and shipping · 🚧 partially built · ⬜ planned.
 
+> **All twelve steps have shipped**, in the order the sequencing notes set out.
+>
+> This file is kept for the reasoning rather than the plan: why the vocabulary
+> list won over the glossary sets, why a single kanji in a verb stem is never
+> given furigana, why the review-id migration had to merge rather than rename.
+>
+> Two things in it are now historical. **"Where it stands"** below describes the
+> track as it was *before* this work — where it says 100 words, 292 cards and 12
+> bridge problems, the track now has **300 words, 284 cards across 13 sets, and
+> 40 bridge problems with 40 interview questions**. And the audit's nine findings
+> are the case for the work, not a description of the code: every one of them has
+> been addressed.
+
 ---
 
 ## Where it stands
@@ -64,11 +77,11 @@ per-card review state lives in `card_reviews`):
 
 ---
 
-## Phase 1 — make the vocabulary studyable ⬜
+## Phase 1 — make the vocabulary studyable ✅
 
 Cheap, UI-only, no schema change. The highest value per hour on this page.
 
-### Step 1 — Spaced repetition for vocabulary ⬜
+### Step 1 — Spaced repetition for vocabulary ✅
 
 **Work.**
 
@@ -82,7 +95,7 @@ Cheap, UI-only, no schema change. The highest value per hour on this page.
 
 **Payoff.** The 100 words come back on a schedule instead of being read once.
 
-### Step 2 — Study modes ⬜
+### Step 2 — Study modes ✅
 
 **Work.** Reuse `CardStudy`'s ideas without its deck coupling:
 
@@ -93,7 +106,7 @@ Cheap, UI-only, no schema change. The highest value per hour on this page.
 - **Cloze** — blank the term out of `example_ja`. The generator already
   guarantees the term appears in the sentence, so every word supports it.
 
-### Step 3 — Multiple tags per word ⬜
+### Step 3 — Multiple tags per word ✅
 
 **Work.** `tag: string` → `tags: string[]` in the seed, `models.rs` and
 `types.ts`; a filter matches if any tag does; `tagCounts` counts a word once per
@@ -102,9 +115,9 @@ declared in `JP_VOCAB_TAGS`.
 
 ---
 
-## Phase 2 — one source of truth ⬜
+## Phase 2 — one source of truth ✅
 
-### Step 4 — Reconcile the 46 overlapping words ⬜
+### Step 4 — Reconcile the 46 overlapping words ✅
 
 **Work.**
 
@@ -119,7 +132,7 @@ declared in `JP_VOCAB_TAGS`.
    `jp-vocab#hairetsu`). Carry existing review state across in a one-off
    migration, or accept a reset — decide before merging, not after.
 
-### Step 5 — Separate the loanwords ⬜
+### Step 5 — Separate the loanwords ✅
 
 **Work.** Move the 64 katakana cards into one dedicated set,
 **カタカナ Loanwords**, grouped by domain, with the Type-reading mode turned off
@@ -128,9 +141,9 @@ The remaining sets become kanji-first, matching the vocabulary list's rule.
 
 ---
 
-## Phase 3 — more words ⬜
+## Phase 3 — more words ✅
 
-### Step 6 — Grow the vocabulary from 100 to 300 ⬜
+### Step 6 — Grow the vocabulary from 100 to 300 ✅
 
 Batches of **50 words per commit**, so each batch can be reviewed as a unit.
 The `== 100` assertion in `_jpv_build` becomes a per-tag floor.
@@ -150,7 +163,7 @@ katakana:
 Watch for near-collisions with existing entries: a merge conflict is also
 競合, which the list already has as part of 競合状態 (race condition).
 
-### Step 7 — Difficulty ⬜
+### Step 7 — Difficulty ✅
 
 **Work.** Add `level: 1 | 2 | 3` (everyday → textbook → specialist) to each
 word, a sort and a filter on it, and a lint that each tag has words at every
@@ -158,9 +171,9 @@ level. Study sessions default to level 1 first.
 
 ---
 
-## Phase 4 — reading support ⬜
+## Phase 4 — reading support ✅
 
-### Step 8 — Readings for sentences ⬜
+### Step 8 — Readings for sentences ✅
 
 **Work.**
 
@@ -173,7 +186,7 @@ level. Study sessions default to level 1 first.
    ruby must stay out of glossary *tables* — the card view is the place for it.)
 4. Do the same for `desc_ja`, lower priority.
 
-### Step 9 — Pronunciation ⬜
+### Step 9 — Pronunciation ✅
 
 **Work.** A speaker button on the card using the Web Speech API
 (`speechSynthesis`, `lang: "ja-JP"`), reading the headword and then the
@@ -183,9 +196,9 @@ an explanation when none is present. No bundled audio.
 
 ---
 
-## Phase 5 — put it to work ⬜
+## Phase 5 — put it to work ✅
 
-### Step 10 — A deeper bridge ⬜
+### Step 10 — A deeper bridge ✅
 
 **Work.**
 
@@ -196,13 +209,13 @@ an explanation when none is present. No bundled audio.
 3. When a bridge vocabulary chip's term is in the vocabulary list, link it to
    `/learn?word=<id>`.
 
-### Step 11 — A wider interview bank ⬜
+### Step 11 — A wider interview bank ✅
 
 **Work.** 12 → 40 questions, tagged by interview stage — 自己紹介, coding round,
 設計 (system design), 振り返り (behavioural) — each with a model answer in
 Japanese and English and the key terms linked to their cards.
 
-### Step 12 — One review lane and palette entries ⬜
+### Step 12 — One review lane and palette entries ✅
 
 **Work.**
 
