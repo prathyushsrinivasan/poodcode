@@ -8,9 +8,9 @@ import {
   filterVocab,
   levelCounts,
   LEVELS,
+  parseRuby,
   readyWords,
   shuffleWith,
-  splitOnTerm,
   stateCounts,
   tagCounts,
   vocabCardId,
@@ -651,7 +651,34 @@ export function JpVocabCard({
   );
 }
 
+const RUBY_STORE_KEY = "poodcode:jp-vocab-ruby";
+
+function readRuby(): boolean {
+  try {
+    return localStorage.getItem(RUBY_STORE_KEY) !== "0";
+  } catch {
+    return true;
+  }
+}
+
 function CardDetails({ word }: { word: JpVocabWord }) {
+  // On by default, and remembered: furigana is training wheels you take off
+  // once, not a per-card decision.
+  const [ruby, setRuby] = useState(readRuby);
+  const segments = parseRuby(word.example_ruby || word.example_ja);
+
+  function toggleRuby() {
+    setRuby((r) => {
+      const next = !r;
+      try {
+        localStorage.setItem(RUBY_STORE_KEY, next ? "1" : "0");
+      } catch {
+        /* a remembered preference is a convenience, not state */
+      }
+      return next;
+    });
+  }
+
   return (
     <div className="jpv-details">
       <div className="jpv-block">
@@ -665,13 +692,37 @@ function CardDetails({ word }: { word: JpVocabWord }) {
         <p lang="ja">{word.desc_ja}</p>
       </div>
       <div className="jpv-block jpv-example">
-        <div className="io-label" lang="ja">
-          例文 · Example
+        <div className="row" style={{ justifyContent: "space-between", alignItems: "center" }}>
+          <div className="io-label" lang="ja">
+            例文 · Example
+          </div>
+          <button
+            className="ghost"
+            style={{ padding: "1px 8px", fontSize: 11 }}
+            onClick={toggleRuby}
+            title="Show or hide the readings above the kanji"
+          >
+            ふりがな {ruby ? "ON" : "OFF"}
+          </button>
         </div>
-        <p lang="ja" className="jpv-example-ja">
-          {splitOnTerm(word.example_ja, word.term).map((p, i) =>
-            p.hit ? <mark key={i}>{p.text}</mark> : <span key={i}>{p.text}</span>
-          )}
+        <p lang="ja" className={`jpv-example-ja${ruby ? "" : " jpv-ruby-off"}`}>
+          {segments.map((s, i) => {
+            const body = s.reading ? (
+              <ruby>
+                {s.text}
+                <rt>{s.reading}</rt>
+              </ruby>
+            ) : (
+              s.text
+            );
+            // The headword is always annotated, so its segment is exactly the
+            // term — which is what gets highlighted, readings shown or not.
+            return s.text === word.term ? (
+              <mark key={i}>{body}</mark>
+            ) : (
+              <span key={i}>{body}</span>
+            );
+          })}
         </p>
         <p className="dim jpv-example-en">{word.example_en}</p>
       </div>

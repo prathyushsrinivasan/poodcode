@@ -45,6 +45,7 @@
       "desc_en": "A class taking on the fields and methods of another class with extends, so the subclass can reuse and extend its parent's behavior.",
       "desc_ja": "extendsを使って、あるクラスが別のクラスのフィールドやメソッドを引き継ぐ仕組みです。子クラスは親クラスの機能を再利用できます。",
       "example_ja": "DogクラスはAnimalクラスを継承しています。",
+      "example_ruby": "DogクラスはAnimalクラスを[継承|けいしょう]しています。",
       "example_en": "The Dog class inherits from the Animal class."
     },
     {
@@ -60,6 +61,7 @@
       "desc_en": "Hiding the details of how something works and exposing only what callers need — in Java, through abstract classes and interfaces.",
       "desc_ja": "内部の細かい仕組みを隠し、利用者に必要な部分だけを見せる考え方です。Javaでは抽象クラスやインターフェースで表現します。",
       "example_ja": "共通の処理をインターフェースに抽象化しました。",
+      "example_ruby": "[共通|きょうつう]の[処理|しょり]をインターフェースに[抽象化|ちゅうしょうか]しました。",
       "example_en": "I abstracted the shared logic into an interface."
     },
     {
@@ -75,6 +77,7 @@
       "desc_en": "One reference type standing for many concrete classes, with the method that actually runs chosen at runtime by the object's real class.",
       "desc_ja": "同じ型の変数で異なるクラスのオブジェクトを扱い、実行時に実際のクラスのメソッドが呼ばれる性質です。",
       "example_ja": "多態性のおかげで、Shape型のリストに円も四角形も入れられます。",
+      "example_ruby": "[多態性|たたいせい]のおかげで、Shape型のリストに円も四角形も入れられます。",
       "example_en": "Thanks to polymorphism, a list of Shape can hold both circles and squares."
     },
     {
@@ -90,6 +93,7 @@
       "desc_en": "Keeping an object's fields private and allowing access only through methods, so its internal state can't be broken from outside.",
       "desc_ja": "フィールドをprivateにして、メソッド経由でしか操作できないようにすることです。外部から内部状態を壊されるのを防ぎます。",
       "example_ja": "情報隠蔽のために、フィールドはすべてprivateにしてください。",
+      "example_ruby": "[情報隠蔽|じょうほういんぺい]のために、フィールドはすべてprivateにしてください。",
       "example_en": "For information hiding, please make all fields private."
     },
     {
@@ -105,6 +109,7 @@
       "desc_en": "A keyword placed before a declaration that changes its meaning or visibility, such as public, private, static or final.",
       "desc_ja": "宣言の前に付けて、意味や公開範囲を変えるキーワードです。public、private、static、finalなどがあります。",
       "example_ja": "このメソッドにはアクセス修飾子が付いていません。",
+      "example_ruby": "このメソッドにはアクセス[修飾子|しゅうしょくし]が付いていません。",
       "example_en": "This method has no access modifier."
     },
     {
@@ -120,6 +125,7 @@
       "desc_en": "Belonging to the class itself rather than to any one instance; a static member is shared and can be used without creating an object.",
       "desc_ja": "インスタンスではなくクラスそのものに属することです。静的メンバーはオブジェクトを作らなくても使えます。",
       "example_ja": "mainメソッドは静的メソッドなので、インスタンスなしで呼び出せます。",
+      "example_ruby": "mainメソッドは[静的|せいてき]メソッドなので、インスタンスなしで呼び出せます。",
       "example_en": "main is a static method, so it can be called without an instance."
     },
     {
@@ -135,6 +141,7 @@
       "desc_en": "A type whose variables hold a reference to an object rather than the value itself — classes, arrays, interfaces and String.",
       "desc_ja": "変数に値そのものではなく、オブジェクトへの参照を持つ型です。クラス、配列、インターフェース、Stringなどが該当します。",
       "example_ja": "Stringは参照型なので、比較にはequalsを使います。",
+      "example_ruby": "Stringは[参照型|さんしょうがた]なので、[比較|ひかく]にはequalsを使います。",
       "example_en": "String is a reference type, so use equals to compare."
     },
     {
@@ -150,6 +157,7 @@
       "desc_en": "One of Java's eight built-in value types (int, long, double, boolean, char, byte, short, float) that store the value directly.",
       "desc_ja": "int、double、booleanなど、値を直接保持するJavaの8つの組み込み型です。",
       "example_ja": "intは基本型なので、nullを代入できません。",
+      "example_ruby": "intは[基本型|きほんがた]なので、nullを[代入|だいにゅう]できません。",
       "example_en": "int is a primitive type, so you can't assign null to it."
     },
     {
@@ -165,6 +173,7 @@
       "desc_en": "An object representing an error or unusual condition that interrupts the normal flow of a program until something handles it.",
       "desc_ja": "エラーや想定外の状況を表すオブジェクトです。処理されるまでプログラムの通常の流れを中断します。",
       "example_ja": "配列の範囲外にアクセスすると例外が発生します。",
+      "example_ruby": "配列の[範囲外|はんいがい]にアクセスすると[例外|れいがい]が[発生|はっせい]します。",
       "example_en": "Accessing outside an array's bounds raises an exception."
     },
     {
@@ -180,6 +189,7 @@
       "desc_en": "An exception the compiler forces you to deal with — either catch it or declare it with throws. IOException is the classic example.",
       "desc_ja": "コンパイラが処理を強制する例外です。catchするか、throwsで宣言しなければなりません。IOExceptionが代表例です。",
       "example_ja": "ファイル読み込みは検査例外を投げるので、try-catchが必要です。",
+      "example_ruby": "ファイル読み込みは[検査例外|けんされいがい]を投げるので、try-catchが[必要|ひつよう]です。",
       "example_en": "Reading a file throws a checked exception, so you need try-catch."
     },
     {
@@ -195,6 +205,7 @@
       "desc_en": "Raising an exception with the throw keyword so that control jumps to the nearest matching catch block.",
       "desc_ja": "throwキーワードで例外を発生させることです。制御は最も近い対応するcatchブロックへ移ります。",
       "example_ja": "引数が負の数ならIllegalArgumentExceptionを送出します。",
+      "example_ruby": "[引数|ひきすう]が負の数ならIllegalArgumentExceptionを[送出|そうしゅつ]します。",
       "example_en": "If the argument is negative, it throws IllegalArgumentException."
     },
     {
@@ -210,6 +221,7 @@
       "desc_en": "Intercepting a thrown exception in a catch block so the program can recover instead of crashing.",
       "desc_ja": "発生した例外をcatchブロックで受け取ることです。プログラムを停止させずに回復できます。",
       "example_ja": "NumberFormatExceptionを捕捉して、エラーメッセージを表示します。",
+      "example_ruby": "NumberFormatExceptionを[捕捉|ほそく]して、エラーメッセージを表示します。",
       "example_en": "We catch the NumberFormatException and show an error message."
     },
     {
@@ -225,6 +237,7 @@
       "desc_en": "Introducing a name — a variable, method or class — together with its type, before it is used.",
       "desc_ja": "変数、メソッド、クラスなどの名前を、その型と一緒にコードに導入することです。",
       "example_ja": "変数は使う前に宣言する必要があります。",
+      "example_ruby": "[変数|へんすう]は使う前に[宣言|せんげん]する[必要|ひつよう]があります。",
       "example_en": "A variable must be declared before it is used."
     },
     {
@@ -240,6 +253,7 @@
       "desc_en": "Giving a variable or object its first value. Local variables in Java must be initialized before they are read.",
       "desc_ja": "変数やオブジェクトに最初の値を与えることです。Javaのローカル変数は、読み取る前に初期化が必要です。",
       "example_ja": "カウンターを0で初期化してからループを始めます。",
+      "example_ruby": "カウンターを0で[初期化|しょきか]してからループを始めます。",
       "example_en": "Initialize the counter to 0, then start the loop."
     },
     {
@@ -255,6 +269,7 @@
       "desc_en": "Making a new object from a class with the new keyword, which allocates memory and runs a constructor.",
       "desc_ja": "newキーワードでクラスから新しいオブジェクトを作ることです。メモリが確保され、コンストラクタが実行されます。",
       "example_ja": "newでArrayListのインスタンスを生成します。",
+      "example_ruby": "newでArrayListのインスタンスを[生成|せいせい]します。",
       "example_en": "Create an ArrayList instance with new."
     },
     {
@@ -271,6 +286,7 @@
       "desc_en": "A class or interface with type parameters, like List<T>, so the same code works for many types while staying type-safe.",
       "desc_ja": "List<T>のように型パラメータを持つクラスやインターフェースです。型安全を保ったまま、さまざまな型で同じコードを使えます。",
       "example_ja": "総称型を使えば、キャストなしで要素を取り出せます。",
+      "example_ruby": "[総称型|そうしょうがた]を使えば、キャストなしで要素を取り出せます。",
       "example_en": "With generics you can take elements out without casting."
     },
     {
@@ -286,6 +302,7 @@
       "desc_en": "The compiler removing generic type arguments after checking them, so at runtime a List<String> is just a List.",
       "desc_ja": "コンパイラが総称型の型引数をチェックした後に取り除くことです。実行時にはList<String>も単なるListになります。",
       "example_ja": "型消去があるため、実行時にList<Integer>かどうかは判定できません。",
+      "example_ruby": "[型消去|かたしょうきょ]があるため、[実行|じっこう]時にList<Integer>かどうかは[判定|はんてい]できません。",
       "example_en": "Because of type erasure, you can't check at runtime whether something is a List<Integer>."
     },
     {
@@ -302,6 +319,7 @@
       "desc_en": "Unable to change after creation. String is immutable; methods that seem to modify it actually return a new object.",
       "desc_ja": "生成後に状態を変更できないことです。Stringは不変なので、変更しているように見えるメソッドも新しいオブジェクトを返します。",
       "example_ja": "不変オブジェクトはスレッド間で安全に共有できます。",
+      "example_ruby": "[不変|ふへん]オブジェクトはスレッド間で[安全|あんぜん]に共有できます。",
       "example_en": "Immutable objects can be shared safely between threads."
     },
     {
@@ -317,6 +335,7 @@
       "desc_en": "Coordinating threads so only one at a time runs a critical section, typically with synchronized or a Lock.",
       "desc_ja": "複数のスレッドのうち、一度に一つだけが重要な処理を実行するよう調整することです。synchronizedやLockを使います。",
       "example_ja": "このメソッドは同期されているので、同時に一つのスレッドしか入れません。",
+      "example_ruby": "このメソッドは[同期|どうき]されているので、同時に一つのスレッドしか入れません。",
       "example_en": "This method is synchronized, so only one thread can enter at a time."
     },
     {
@@ -332,6 +351,7 @@
       "desc_en": "Guaranteeing that a shared resource is used by only one thread at a time so concurrent updates don't corrupt it.",
       "desc_ja": "共有資源を同時に一つのスレッドだけが使えるように保証することです。同時更新によるデータの破損を防ぎます。",
       "example_ja": "残高の更新には排他制御が必要です。",
+      "example_ruby": "[残高|ざんだか]の更新には[排他制御|はいたせいぎょ]が[必要|ひつよう]です。",
       "example_en": "Updating the balance requires mutual exclusion."
     },
     {
@@ -347,6 +367,7 @@
       "desc_en": "Structuring a program so several tasks make progress during overlapping time periods, e.g. with threads or an ExecutorService.",
       "desc_ja": "複数のタスクが重なり合う時間の中で進むようにプログラムを組むことです。スレッドやExecutorServiceを使います。",
       "example_ja": "並行処理でダウンロードを高速化しました。",
+      "example_ruby": "[並行処理|へいこうしょり]でダウンロードを高速化しました。",
       "example_en": "We sped up the downloads with concurrency."
     },
     {
@@ -362,6 +383,7 @@
       "desc_en": "A bug where the result depends on the unpredictable timing of threads, such as two threads incrementing the same counter.",
       "desc_ja": "スレッドの実行タイミングによって結果が変わってしまう不具合です。二つのスレッドが同時にカウンターを増やす場合などに起きます。",
       "example_ja": "count++はアトミックではないため、競合状態が発生します。",
+      "example_ruby": "count++はアトミックではないため、[競合状態|きょうごうじょうたい]が[発生|はっせい]します。",
       "example_en": "count++ isn't atomic, so a race condition occurs."
     },
     {
@@ -377,6 +399,7 @@
       "desc_en": "Having no name — an anonymous class is defined and instantiated in one expression, and is often replaced today by a lambda.",
       "desc_ja": "名前を持たないことです。匿名クラスは一つの式で定義と生成を同時に行い、現在はラムダ式で置き換えられることが多いです。",
       "example_ja": "匿名クラスの代わりにラムダ式で書けます。",
+      "example_ruby": "[匿名|とくめい]クラスの代わりにラムダ式で書けます。",
       "example_en": "You can write it as a lambda instead of an anonymous class."
     },
     {
@@ -392,6 +415,7 @@
       "desc_en": "A subclass providing its own version of a method inherited from its parent, with the same name and parameters (@Override).",
       "desc_ja": "子クラスが親クラスから継承したメソッドを、同じ名前と引数で書き直すことです。@Overrideを付けます。",
       "example_ja": "toStringメソッドを再定義して、中身が読みやすく表示されるようにしました。",
+      "example_ruby": "toStringメソッドを[再定義|さいていぎ]して、中身が読みやすく表示されるようにしました。",
       "example_en": "I overrode toString so the contents print readably."
     },
     {
@@ -407,6 +431,7 @@
       "desc_en": "Defining several methods with the same name but different parameter lists; the compiler picks one from the arguments.",
       "desc_ja": "同じ名前で引数の型や数が異なるメソッドを複数定義することです。どれが呼ばれるかはコンパイル時に引数で決まります。",
       "example_ja": "printメソッドはintとString用に多重定義されています。",
+      "example_ruby": "printメソッドはintとString用に[多重定義|たじゅうていぎ]されています。",
       "example_en": "The print method is overloaded for int and String."
     },
     {
@@ -423,6 +448,7 @@
       "desc_en": "Turning a value of one type into another, either automatically (widening) or explicitly with a cast like (int) 3.7.",
       "desc_ja": "ある型の値を別の型に変えることです。自動で行われる場合と、(int) 3.7のように明示的にキャストする場合があります。",
       "example_ja": "doubleからintへの型変換で小数点以下が切り捨てられます。",
+      "example_ruby": "doubleからintへの[型変換|かたへんかん]で小数点以下が切り捨てられます。",
       "example_en": "Converting from double to int truncates the decimal part."
     },
     {
@@ -438,6 +464,7 @@
       "desc_en": "A type with a fixed set of named constants, declared with enum, such as the days of the week or order statuses.",
       "desc_ja": "enumで宣言する、決まった名前付き定数の集まりを表す型です。曜日や注文の状態などに使います。",
       "example_ja": "信号の色を列挙型で表しました。",
+      "example_ruby": "信号の色を[列挙型|れっきょがた]で表しました。",
       "example_en": "I represented the traffic-light colors with an enum."
     },
     {
@@ -453,6 +480,7 @@
       "desc_en": "Metadata attached to code with @, such as @Override or @Deprecated, read by the compiler, tools or frameworks.",
       "desc_ja": "@Overrideや@Deprecatedのように、@でコードに付けるメタデータです。コンパイラやツール、フレームワークが読み取ります。",
       "example_ja": "@Override注釈を付けると、再定義のミスをコンパイラが見つけてくれます。",
+      "example_ruby": "@Override[注釈|ちゅうしゃく]を付けると、再定義のミスをコンパイラが見つけてくれます。",
       "example_en": "With the @Override annotation, the compiler catches overriding mistakes for you."
     },
     {
@@ -468,6 +496,7 @@
       "desc_en": "A value that never changes after it is set, usually declared static final with an UPPER_SNAKE_CASE name.",
       "desc_ja": "一度設定したら変わらない値です。通常はstatic finalで宣言し、大文字のスネークケースで名前を付けます。",
       "example_ja": "最大人数をMAX_USERSという定数にしました。",
+      "example_ruby": "[最大|さいだい]人数をMAX_USERSという[定数|ていすう]にしました。",
       "example_en": "I made the maximum number of users a constant called MAX_USERS."
     },
     {
@@ -483,6 +512,7 @@
       "desc_en": "Whether two references point to the very same object, tested with ==, as opposed to equality of contents tested with equals.",
       "desc_ja": "二つの参照がまったく同じオブジェクトを指しているかどうかです。==で判定し、内容の等しさを調べるequalsとは区別します。",
       "example_ja": "==は同一性を比べ、equalsは等価性を比べます。",
+      "example_ruby": "==は[同一性|どういつせい]を比べ、equalsは等価性を比べます。",
       "example_en": "== compares identity; equals compares equality."
     },
     {
@@ -498,6 +528,7 @@
       "desc_en": "The variable named in a method's declaration that receives a value when the method is called.",
       "desc_ja": "メソッドの宣言に書かれ、呼び出し時に値を受け取る変数です。",
       "example_ja": "add(int a, int b)のaとbが仮引数です。",
+      "example_ruby": "add(int a, int b)のaとbが[仮引数|かりひきすう]です。",
       "example_en": "In add(int a, int b), a and b are the parameters."
     },
     {
@@ -513,6 +544,7 @@
       "desc_en": "The actual value passed in when a method is called, which is copied into the corresponding parameter.",
       "desc_ja": "メソッドを呼び出すときに実際に渡す値です。対応する仮引数にコピーされます。",
       "example_ja": "add(2, 3)の2と3が実引数です。",
+      "example_ruby": "add(2, 3)の2と3が[実引数|じつひきすう]です。",
       "example_en": "In add(2, 3), 2 and 3 are the arguments."
     },
     {
@@ -528,6 +560,7 @@
       "desc_en": "A Stream operation like filter or map that returns another Stream and does no work until a terminal operation runs.",
       "desc_ja": "filterやmapのように新しいStreamを返すStream操作です。終端操作が実行されるまで処理は行われません。",
       "example_ja": "mapは中間操作なので、それだけでは何も実行されません。",
+      "example_ruby": "mapは[中間操作|ちゅうかんそうさ]なので、それだけでは何も[実行|じっこう]されません。",
       "example_en": "map is an intermediate operation, so on its own nothing runs."
     },
     {
@@ -543,6 +576,7 @@
       "desc_en": "A Stream operation like collect, count or forEach that produces a result and actually runs the whole pipeline.",
       "desc_ja": "collect、count、forEachのように結果を生み出し、パイプライン全体を実際に実行するStream操作です。",
       "example_ja": "collectなどの終端操作を呼ぶと、ストリームが処理されます。",
+      "example_ruby": "collectなどの[終端操作|しゅうたんそうさ]を呼ぶと、ストリームが[処理|しょり]されます。",
       "example_en": "Calling a terminal operation such as collect processes the stream."
     },
     {
@@ -558,6 +592,7 @@
       "desc_en": "Passing a copy of the value, so changes inside the method don't touch the caller's variable. Java always does this — even for objects, where the copied value is the reference.",
       "desc_ja": "値の複製を渡す方式です。メソッドの中で変更しても呼び出し元の変数は変わりません。Javaは常にこの方式で、オブジェクトの場合は参照が複製されます。",
       "example_ja": "Javaの引数はすべて値渡しです。",
+      "example_ruby": "Javaの[引数|ひきすう]はすべて[値渡し|あたいわたし]です。",
       "example_en": "All arguments in Java are passed by value."
     },
     {
@@ -573,6 +608,7 @@
       "desc_en": "Passing the variable itself, so the callee can reassign it. Java does NOT do this — a common interview trap.",
       "desc_ja": "変数そのものを渡し、呼ばれた側が代入し直せる方式です。Javaにはこの方式はなく、面接でよく問われる点です。",
       "example_ja": "Javaには参照渡しはありません。",
+      "example_ruby": "Javaには[参照渡し|さんしょうわたし]はありません。",
       "example_en": "Java does not have pass by reference."
     },
     {
@@ -588,6 +624,7 @@
       "desc_en": "A statement about an object that must be true before and after every method — the thing encapsulation exists to protect.",
       "desc_ja": "どのメソッドの前後でも必ず成り立っていなければならない条件です。カプセル化が守ろうとしているものです。",
       "example_ja": "残高が負にならないことがこのクラスの不変条件です。",
+      "example_ruby": "[残高|ざんだか]が負にならないことがこのクラスの[不変条件|ふへんじょうけん]です。",
       "example_en": "That the balance is never negative is this class's invariant."
     },
     {
@@ -604,6 +641,7 @@
       "desc_en": "Turning an object into a stream of bytes that can be stored or sent, and read back into an object later.",
       "desc_ja": "オブジェクトを保存や送信のできるバイトの並びに変換することです。後で元のオブジェクトに戻せます。",
       "example_ja": "オブジェクトを直列化してファイルに保存します。",
+      "example_ruby": "オブジェクトを[直列化|ちょくれつか]してファイルに[保存|ほぞん]します。",
       "example_en": "We serialize the object and save it to a file."
     },
     {
@@ -620,6 +658,7 @@
       "desc_en": "Not computing a value until it is actually needed — how Stream's intermediate operations avoid doing work nobody asked for.",
       "desc_ja": "実際に必要になるまで値を計算しない方式です。Streamの中間操作が無駄な処理を避けている仕組みです。",
       "example_ja": "Streamは遅延評価なので、終端操作まで何も起きません。",
+      "example_ruby": "Streamは[遅延評価|ちえんひょうか]なので、終端[操作|そうさ]まで何も起きません。",
       "example_en": "Streams are lazily evaluated, so nothing happens until a terminal operation."
     },
     {
@@ -635,6 +674,7 @@
       "desc_en": "An object that walks a collection one element at a time, without exposing how the collection is stored.",
       "desc_ja": "コレクションの要素を一つずつ取り出す役割のオブジェクトです。内部の持ち方を知らなくても走査できます。",
       "example_ja": "反復子を使えば、リストでも集合でも同じように回せます。",
+      "example_ruby": "[反復子|はんぷくし]を使えば、リストでも集合でも同じように回せます。",
       "example_en": "With an iterator you can loop over a list and a set the same way."
     },
     {
@@ -650,6 +690,7 @@
       "desc_en": "Visiting every element of a structure once, in some defined order.",
       "desc_ja": "構造の中のすべての要素を、決まった順で一度ずつ訪れることです。",
       "example_ja": "配列を一度だけ走査して合計を求めます。",
+      "example_ruby": "配列を一度だけ[走査|そうさ]して合計を求めます。",
       "example_en": "We traverse the array once to find the total."
     },
     {
@@ -665,6 +706,7 @@
       "desc_en": "The try / catch / finally machinery for dealing with an exception instead of letting it end the program.",
       "desc_ja": "try・catch・finallyを使って、例外をプログラムの終了ではなく回復として扱う仕組みです。",
       "example_ja": "ファイル操作には例外処理が必要です。",
+      "example_ruby": "ファイル[操作|そうさ]には[例外処理|れいがいしょり]が[必要|ひつよう]です。",
       "example_en": "File operations need exception handling."
     },
     {
@@ -680,6 +722,7 @@
       "desc_en": "Work that must happen however a block exits — closing a file, releasing a lock — which finally or try-with-resources guarantees.",
       "desc_ja": "どのような終わり方をしても必ず行う後始末です。ファイルを閉じる、ロックを解放するなど、finallyやtry-with-resourcesが保証します。",
       "example_ja": "finallyブロックで終了処理を行います。",
+      "example_ruby": "finallyブロックで[終了処理|しゅうりょうしょり]を行います。",
       "example_en": "We do the cleanup in a finally block."
     },
     {
@@ -695,6 +738,7 @@
       "desc_en": "Something finite the program holds and must give back — a file handle, a socket, a connection.",
       "desc_ja": "プログラムが確保し、返さなければならない有限のものです。ファイルやソケット、接続などが該当します。",
       "example_ja": "使い終わった資源は必ず閉じてください。",
+      "example_ruby": "使い終わった[資源|しげん]は必ず閉じてください。",
       "example_en": "Always close a resource when you're done with it."
     },
     {
@@ -710,6 +754,7 @@
       "desc_en": "Giving a held resource back so something else can use it.",
       "desc_ja": "確保していた資源を手放し、他から使えるようにすることです。",
       "example_ja": "ロックを解放しないと、他のスレッドが進めません。",
+      "example_ruby": "ロックを[解放|かいほう]しないと、他のスレッドが進めません。",
       "example_en": "If you don't release the lock, other threads can't proceed."
     },
     {
@@ -725,6 +770,7 @@
       "desc_en": "The JVM reclaiming memory held by objects nothing refers to any more, without you freeing anything by hand.",
       "desc_ja": "どこからも参照されなくなったオブジェクトのメモリを、JVMが自動的に取り戻す仕組みです。手動で解放する必要はありません。",
       "example_ja": "参照が切れたオブジェクトは自動的に回収されます。",
+      "example_ruby": "参照が切れたオブジェクトは自動的に[回収|かいしゅう]されます。",
       "example_en": "An object with no remaining references is collected automatically."
     },
     {
@@ -740,6 +786,7 @@
       "desc_en": "The age bucket the collector sorts objects into — most die young, so the young generation is swept far more often.",
       "desc_ja": "回収の際にオブジェクトを分ける年齢の区分です。多くは早く不要になるため、若い世代ほど頻繁に調べられます。",
       "example_ja": "若い世代の回収は短時間で終わります。",
+      "example_ruby": "若い[世代|せだい]の回収は短[時間|じかん]で終わります。",
       "example_en": "Collecting the young generation finishes quickly."
     },
     {
@@ -755,6 +802,7 @@
       "desc_en": "The chain of method calls in progress — what a stack trace prints, innermost first.",
       "desc_ja": "実行中のメソッド呼び出しの連なりです。スタックトレースが内側から順に表示するものです。",
       "example_ja": "例外が出たら呼び出し履歴を確認します。",
+      "example_ruby": "例外が出たら[呼び出し履歴|よびだしりれき]を[確認|かくにん]します。",
       "example_en": "When an exception comes up, check the call stack."
     },
     {
@@ -770,6 +818,7 @@
       "desc_en": "Safe to enter again while an earlier call is still in progress — a reentrant lock lets the thread holding it lock again.",
       "desc_ja": "前の呼び出しが終わる前に、もう一度入っても安全なことです。再入可能なロックは、保持中のスレッドが再び取得できます。",
       "example_ja": "synchronizedのロックは再入可能です。",
+      "example_ruby": "synchronizedのロックは[再入可能|さいにゅうかのう]です。",
       "example_en": "A synchronized lock is reentrant."
     },
     {
@@ -785,6 +834,7 @@
       "desc_en": "Happening completely or not at all, with no state in between that another thread could observe.",
       "desc_ja": "完全に行われるか、まったく行われないかのどちらかで、途中の状態を他のスレッドから見られないことです。",
       "example_ja": "AtomicIntegerの増加は不可分な操作です。",
+      "example_ruby": "AtomicIntegerの増加は[不可分|ふかぶん]な[操作|そうさ]です。",
       "example_en": "Incrementing an AtomicInteger is an atomic operation."
     },
     {
@@ -800,6 +850,7 @@
       "desc_en": "Whether one thread's write is actually seen by another — the problem volatile and synchronized exist to solve.",
       "desc_ja": "あるスレッドの書き込みが他のスレッドから見えるかどうかの問題です。volatileやsynchronizedはこれを解決します。",
       "example_ja": "volatileを付けると可視性が保証されます。",
+      "example_ruby": "volatileを付けると[可視性|かしせい]が保証されます。",
       "example_en": "Marking it volatile guarantees visibility."
     },
     {
@@ -815,6 +866,7 @@
       "desc_en": "What a method promises callers and demands of them — equals and hashCode have one you can actually break.",
       "desc_ja": "メソッドが呼び出し側に約束すること、また求めることです。equalsとhashCodeには破ってしまえる契約があります。",
       "example_ja": "equalsを再定義するときは、hashCodeとの契約を守ってください。",
+      "example_ruby": "equalsを再定義するときは、hashCodeとの[契約|けいやく]を守ってください。",
       "example_en": "When you override equals, honour its contract with hashCode."
     },
     {
@@ -830,6 +882,7 @@
       "desc_en": "What must already be true when a method is called; if it isn't, the caller is at fault.",
       "desc_ja": "メソッドを呼ぶ時点で成り立っていなければならない条件です。破られた場合は呼び出し側の誤りです。",
       "example_ja": "引数が正であることがこのメソッドの事前条件です。",
+      "example_ruby": "[引数|ひきすう]が正であることがこのメソッドの[事前条件|じぜんじょうけん]です。",
       "example_en": "That the argument is positive is this method's precondition."
     },
     {
@@ -845,6 +898,7 @@
       "desc_en": "What the method guarantees is true once it returns.",
       "desc_ja": "メソッドが返った時点で成り立っていることを保証する条件です。",
       "example_ja": "戻り値が整列済みであることが事後条件です。",
+      "example_ruby": "戻り値が整列済みであることが[事後条件|じごじょうけん]です。",
       "example_en": "That the returned value is sorted is the postcondition."
     },
     {
@@ -860,6 +914,7 @@
       "desc_en": "Handing work to a held object rather than inheriting it — usually the better answer to \"reuse this behaviour\".",
       "desc_ja": "継承する代わりに、保持しているオブジェクトに処理を任せることです。振る舞いの再利用では多くの場合こちらが適します。",
       "example_ja": "継承ではなく委譲で実装しました。",
+      "example_ruby": "継承ではなく[委譲|いじょう]で[実装|じっそう]しました。",
       "example_en": "I implemented it with delegation rather than inheritance."
     },
     {
@@ -875,6 +930,7 @@
       "desc_en": "Building a class out of other objects it owns — the \"has-a\" relationship, as against inheritance's \"is-a\".",
       "desc_ja": "他のオブジェクトを部品として持つことでクラスを組み立てる方法です。継承の「is-a」に対して「has-a」の関係です。",
       "example_ja": "継承より合成を選ぶほうが柔軟です。",
+      "example_ruby": "継承より[合成|ごうせい]を選ぶほうが柔軟です。",
       "example_en": "Choosing composition over inheritance is more flexible."
     },
     {
@@ -890,6 +946,7 @@
       "desc_en": "Handing a class what it needs from outside instead of letting it construct its own, which is what makes it testable.",
       "desc_ja": "クラスが必要とするものを内部で生成せず、外から渡す設計です。これによって試験がしやすくなります。",
       "example_ja": "依存性注入のおかげで、試験では偽の実装を渡せます。",
+      "example_ruby": "[依存性注入|いぞんせいちゅうにゅう]のおかげで、[試験|しけん]では偽の[実装|じっそう]を渡せます。",
       "example_en": "Thanks to dependency injection, tests can pass in a fake implementation."
     },
     {
@@ -906,6 +963,7 @@
       "desc_en": "A test of one small piece in isolation, fast enough to run on every change.",
       "desc_ja": "小さな部品を切り離して確かめる試験です。変更のたびに実行できるほど速いのが条件です。",
       "example_ja": "このメソッドの単体試験を書きました。",
+      "example_ruby": "このメソッドの[単体試験|たんたいしけん]を書きました。",
       "example_en": "I wrote a unit test for this method."
     },
     {
@@ -921,6 +979,7 @@
       "desc_en": "How much of the code the tests actually execute — useful as a warning when low, misleading as a target when high.",
       "desc_ja": "試験が実際に実行したコードの割合です。低いときの警告としては有用ですが、高さそのものを目標にすると誤解を招きます。",
       "example_ja": "網羅率が高くても、試験が正しいとは限りません。",
+      "example_ruby": "[網羅率|もうらりつ]が高くても、[試験|しけん]が正しいとは限りません。",
       "example_en": "High coverage doesn't mean the tests are good."
     },
     {
@@ -936,6 +995,7 @@
       "desc_en": "Inheriting implementation from more than one parent. Java forbids it for classes, which is why interfaces exist in the shape they do.",
       "desc_ja": "複数の親から実装を受け継ぐことです。Javaはクラスでこれを禁じており、インターフェースが今の形をしているのはそのためです。",
       "example_ja": "Javaはクラスの多重継承を認めていません。",
+      "example_ruby": "Javaはクラスの[多重継承|たじゅうけいしょう]を認めていません。",
       "example_en": "Java does not allow multiple inheritance of classes."
     },
     {
@@ -951,6 +1011,7 @@
       "desc_en": "Pulling what several classes share up into a common parent — the direction that creates a superclass.",
       "desc_ja": "複数のクラスに共通するものを親にまとめ上げることです。上位のクラスを作る方向の設計です。",
       "example_ja": "共通の振る舞いを汎化して親クラスにまとめます。",
+      "example_ruby": "[共通|きょうつう]の振る舞いを[汎化|はんか]して親クラスにまとめます。",
       "example_en": "We generalize the shared behaviour into a parent class."
     },
     {
@@ -966,6 +1027,7 @@
       "desc_en": "The opposite direction: a subclass narrowing a general type to a particular case.",
       "desc_ja": "汎化の逆で、一般的な型を特定の場合に絞り込む子クラスを作ることです。",
       "example_ja": "DogはAnimalを特殊化したクラスです。",
+      "example_ruby": "DogはAnimalを[特殊化|とくしゅか]したクラスです。",
       "example_en": "Dog is a specialization of Animal."
     },
     {
@@ -981,6 +1043,7 @@
       "desc_en": "Deciding at run time which overridden method actually runs, based on the object's real class. The machinery polymorphism rests on.",
       "desc_ja": "どの再定義されたメソッドを実行するかを、オブジェクトの実際のクラスに基づいて実行時に決めることです。多態性はこの仕組みの上に成り立ちます。",
       "example_ja": "動的束縛によって、実際の型のメソッドが呼ばれます。",
+      "example_ruby": "[動的束縛|どうてきそくばく]によって、実際の型のメソッドが呼ばれます。",
       "example_en": "Dynamic binding means the actual type's method is the one called."
     },
     {
@@ -996,6 +1059,7 @@
       "desc_en": "Whether two objects hold the same value, tested with equals — as against 同一性, which asks whether they are the same object.",
       "desc_ja": "二つのオブジェクトが同じ値を持つかどうかで、equalsで判定します。同じオブジェクトかを問う同一性とは区別します。",
       "example_ja": "equalsは等価性を判定します。",
+      "example_ruby": "equalsは[等価性|とうかせい]を[判定|はんてい]します。",
       "example_en": "equals tests equality."
     },
     {
@@ -1011,6 +1075,7 @@
       "desc_en": "Defining which of two objects comes first, so they can be sorted — Comparable for a type's own rule, Comparator for any other.",
       "desc_ja": "二つのオブジェクトのどちらが先かを定めることで、整列が可能になります。型自身の規則はComparable、それ以外はComparatorで与えます。",
       "example_ja": "Comparatorで独自の順序付けを与えます。",
+      "example_ruby": "Comparatorで独自の[順序付け|じゅんじょづけ]を与えます。",
       "example_en": "We supply our own ordering with a Comparator."
     },
     {
@@ -1026,6 +1091,7 @@
       "desc_en": "The order a type considers its own — numbers ascending, strings lexicographic — given by compareTo.",
       "desc_ja": "その型が本来の順序とみなすものです。数値なら昇順、文字列なら辞書順で、compareToが定めます。",
       "example_ja": "Stringの自然順序は辞書順です。",
+      "example_ruby": "Stringの[自然順序|しぜんじゅんじょ]は辞書順です。",
       "example_en": "String's natural ordering is lexicographic."
     },
     {
@@ -1041,6 +1107,7 @@
       "desc_en": "A reference that does not stop the collector reclaiming the object, used for caches that should not keep things alive.",
       "desc_ja": "そのオブジェクトの回収を妨げない参照です。生かし続けてはいけないキャッシュなどに使います。",
       "example_ja": "キャッシュには弱参照を使うことがあります。",
+      "example_ruby": "キャッシュには[弱参照|じゃくさんしょう]を使うことがあります。",
       "example_en": "A cache may use weak references."
     },
     {
@@ -1056,6 +1123,7 @@
       "desc_en": "One structure written inside another — a nested class, a nested loop, a nested condition.",
       "desc_ja": "ある構造の中に別の構造が入っていることです。入れ子のクラス、ループ、条件などに使います。",
       "example_ja": "入れ子のループは計算量に注意が必要です。",
+      "example_ruby": "[入れ子|いれこ]のループは計算量に注意が[必要|ひつよう]です。",
       "example_en": "Watch the complexity of nested loops."
     },
     {
@@ -1071,6 +1139,7 @@
       "desc_en": "The type a method declares it will give back; void means it gives nothing.",
       "desc_ja": "メソッドが返すと宣言した型です。voidの場合は何も返しません。",
       "example_ja": "このメソッドの戻り型はintです。",
+      "example_ruby": "このメソッドの[戻り型|もどりがた]はintです。",
       "example_en": "This method's return type is int."
     },
     {
@@ -1086,6 +1155,7 @@
       "desc_en": "A parameter written int... that accepts any number of arguments and arrives as an array.",
       "desc_ja": "int...のように書き、いくつでも引数を受け取れる仮引数です。中では配列として扱われます。",
       "example_ja": "可変長引数を使えば、引数の数を決めずに済みます。",
+      "example_ruby": "[可変長引数|かへんちょうひきすう]を使えば、[引数|ひきすう]の数を決めずに済みます。",
       "example_en": "With varargs you don't have to fix the number of arguments."
     },
     {
@@ -1102,6 +1172,7 @@
       "desc_en": "A fixed-length sequence of elements of the same type stored side by side, accessed by index in constant time.",
       "desc_ja": "同じ型の要素を連続して並べた固定長のデータ構造です。添字を使って定数時間でアクセスできます。",
       "example_ja": "整数の配列が与えられます。",
+      "example_ruby": "[整数|せいすう]の[配列|はいれつ]が与えられます。",
       "example_en": "You are given an array of integers."
     },
     {
@@ -1117,6 +1188,7 @@
       "desc_en": "The position number used to access an element, starting from 0 in Java and TypeScript.",
       "desc_ja": "要素にアクセスするための位置を表す番号です。JavaやTypeScriptでは0から始まります。",
       "example_ja": "添字が配列の長さ以上になると範囲外です。",
+      "example_ruby": "[添字|そえじ]が配列の長さ以上になると[範囲外|はんいがい]です。",
       "example_en": "An index at or beyond the array's length is out of bounds."
     },
     {
@@ -1132,6 +1204,7 @@
       "desc_en": "A single item stored in an array, list, set or other collection.",
       "desc_ja": "配列やリスト、集合などに格納されている一つひとつの値です。",
       "example_ja": "配列の中で最大の要素を返してください。",
+      "example_ruby": "配列の中で[最大|さいだい]の[要素|ようそ]を返してください。",
       "example_en": "Return the largest element in the array."
     },
     {
@@ -1147,6 +1220,7 @@
       "desc_en": "Looking through data to find a target value, or a state that satisfies a condition.",
       "desc_ja": "データの中から目的の値や、条件を満たす状態を見つけることです。",
       "example_ja": "目的の値が見つかるまで探索を続けます。",
+      "example_ruby": "目的の値が見つかるまで[探索|たんさく]を続けます。",
       "example_en": "Keep searching until the target value is found."
     },
     {
@@ -1162,6 +1236,7 @@
       "desc_en": "Searching a sorted range by repeatedly halving it, comparing the middle element with the target — O(log n).",
       "desc_ja": "整列済みの範囲を、中央の要素と比べながら半分ずつ絞っていく探索です。計算量はO(log n)です。",
       "example_ja": "配列は整列されているので、二分探索が使えます。",
+      "example_ruby": "配列は整列されているので、[二分探索|にぶんたんさく]が使えます。",
       "example_en": "The array is sorted, so binary search can be used."
     },
     {
@@ -1177,6 +1252,7 @@
       "desc_en": "Rearranging elements into order, ascending or descending — the textbook word alongside the loanword ソート.",
       "desc_ja": "要素を昇順や降順などの順番に並べ替えることです。「ソート」とも言います。",
       "example_ja": "まず配列を整列してから重複を取り除きます。",
+      "example_ruby": "まず配列を[整列|せいれつ]してから重複を取り除きます。",
       "example_en": "First sort the array, then remove the duplicates."
     },
     {
@@ -1192,6 +1268,7 @@
       "desc_en": "Ordered from smallest to largest (1, 2, 3 or A to Z).",
       "desc_ja": "小さいものから大きいものへ並んだ順番です（1, 2, 3やAからZ）。",
       "example_ja": "結果を昇順で出力してください。",
+      "example_ruby": "[結果|けっか]を[昇順|しょうじゅん]で出力してください。",
       "example_en": "Output the results in ascending order."
     },
     {
@@ -1207,6 +1284,7 @@
       "desc_en": "Ordered from largest to smallest (3, 2, 1 or Z to A).",
       "desc_ja": "大きいものから小さいものへ並んだ順番です（3, 2, 1やZからA）。",
       "example_ja": "点数の降順に並べ替えます。",
+      "example_ruby": "[点数|てんすう]の[降順|こうじゅん]に並べ替えます。",
       "example_en": "Sort in descending order of score."
     },
     {
@@ -1223,6 +1301,7 @@
       "desc_en": "How the time or memory an algorithm needs grows with the input size, written in Big-O notation such as O(n log n).",
       "desc_ja": "入力サイズが大きくなるにつれて、アルゴリズムに必要な時間やメモリがどう増えるかを表すものです。O(n log n)のように書きます。",
       "example_ja": "この解法の時間計算量はO(n)です。",
+      "example_ruby": "この[解法|かいほう]の[時間|じかん][計算量|けいさんりょう]はO(n)です。",
       "example_en": "This solution's time complexity is O(n)."
     },
     {
@@ -1239,6 +1318,7 @@
       "desc_en": "A function solving a problem by calling itself on a smaller version of it, stopping at a base case.",
       "desc_ja": "関数が自分自身を、より小さな問題に対して呼び出して解く方法です。基底ケースで停止します。",
       "example_ja": "階乗は再帰で簡単に書けます。",
+      "example_ruby": "階乗は[再帰|さいき]で[簡単|かんたん]に書けます。",
       "example_en": "Factorial is easy to write with recursion."
     },
     {
@@ -1254,6 +1334,7 @@
       "desc_en": "Solving a problem by breaking it into overlapping subproblems and storing each answer so it is computed only once.",
       "desc_ja": "問題を重なり合う部分問題に分け、それぞれの答えを記録して一度だけ計算する手法です。",
       "example_ja": "動的計画法を使えば、指数時間の解法がO(n²)になります。",
+      "example_ruby": "[動的計画法|どうてきけいかくほう]を使えば、指数[時間|じかん]の[解法|かいほう]がO(n²)になります。",
       "example_en": "With dynamic programming, an exponential-time solution becomes O(n²)."
     },
     {
@@ -1269,6 +1350,7 @@
       "desc_en": "Building a solution by always taking the choice that looks best right now — correct only for problems with the right structure.",
       "desc_ja": "その時点で最も良く見える選択を毎回行って解を作る手法です。問題の性質によっては正しい答えになりません。",
       "example_ja": "区間スケジューリングは貪欲法で解けます。",
+      "example_ruby": "区間スケジューリングは[貪欲法|どんよくほう]で解けます。",
       "example_en": "Interval scheduling can be solved with a greedy algorithm."
     },
     {
@@ -1284,6 +1366,7 @@
       "desc_en": "Trying every possible candidate and checking each one — simple and correct, but often too slow for large inputs.",
       "desc_ja": "考えられる候補をすべて試して確かめる方法です。単純で確実ですが、入力が大きいと遅すぎることがあります。",
       "example_ja": "制約が小さいので全探索で間に合います。",
+      "example_ruby": "制約が小さいので[全探索|ぜんたんさく]で間に合います。",
       "example_en": "The constraints are small, so brute force is fast enough."
     },
     {
@@ -1299,6 +1382,7 @@
       "desc_en": "Exploring a graph level by level with a queue, which finds the shortest path when every edge has the same cost.",
       "desc_ja": "キューを使って、グラフを近い順に一層ずつ調べる探索です。辺の重みがすべて同じなら最短経路が求まります。",
       "example_ja": "迷路の最短手数は幅優先探索で求めます。",
+      "example_ruby": "迷路の最短手数は[幅優先探索|はばゆうせんたんさく]で求めます。",
       "example_en": "Find the fewest moves through a maze with breadth-first search."
     },
     {
@@ -1314,6 +1398,7 @@
       "desc_en": "Exploring a graph by going as deep as possible along one path before backtracking, using recursion or a stack.",
       "desc_ja": "一つの道をできるだけ深く進んでから戻る探索です。再帰やスタックを使って実装します。",
       "example_ja": "連結成分の数を深さ優先探索で数えます。",
+      "example_ruby": "連結成分の数を[深さ優先探索|ふかさゆうせんたんさく]で数えます。",
       "example_en": "Count the connected components with depth-first search."
     },
     {
@@ -1329,6 +1414,7 @@
       "desc_en": "A connected graph with no cycles, usually drawn with the root at the top and children below.",
       "desc_ja": "閉路のない連結なグラフです。通常は根を上に、子を下に描きます。",
       "example_ja": "二分木の高さを求めてください。",
+      "example_ruby": "二分[木|き]の高さを求めてください。",
       "example_en": "Find the height of the binary tree."
     },
     {
@@ -1344,6 +1430,7 @@
       "desc_en": "The single top node of a rooted tree — the one node that has no parent.",
       "desc_ja": "根付き木の一番上にある、親を持たない唯一の節点です。",
       "example_ja": "根から葉までの最長の経路を求めます。",
+      "example_ruby": "[根|ね]から葉までの最長の経路を求めます。",
       "example_en": "Find the longest path from the root to a leaf."
     },
     {
@@ -1359,6 +1446,7 @@
       "desc_en": "One of the points in a graph that edges connect.",
       "desc_ja": "グラフで、辺によって結ばれる点のことです。",
       "example_ja": "頂点の数はN、辺の数はMです。",
+      "example_ruby": "[頂点|ちょうてん]の数はN、辺の数はMです。",
       "example_en": "There are N vertices and M edges."
     },
     {
@@ -1374,6 +1462,7 @@
       "desc_en": "A connection between two vertices in a graph, which may have a direction or a weight.",
       "desc_ja": "グラフの二つの頂点を結ぶつながりです。向きや重みを持つことがあります。",
       "example_ja": "各辺には重みが付いています。",
+      "example_ruby": "各[辺|へん]には重みが付いています。",
       "example_en": "Each edge has a weight."
     },
     {
@@ -1389,6 +1478,7 @@
       "desc_en": "Two vertices being directly connected by an edge; an adjacency list stores each vertex's neighbors.",
       "desc_ja": "二つの頂点が辺で直接つながっていることです。隣接リストは各頂点の隣を記録します。",
       "example_ja": "グラフを隣接リストで表現します。",
+      "example_ruby": "グラフを[隣接|りんせつ]リストで表現します。",
       "example_en": "Represent the graph with an adjacency list."
     },
     {
@@ -1404,6 +1494,7 @@
       "desc_en": "The route between two vertices with the fewest edges or the smallest total weight, found with BFS or Dijkstra's algorithm.",
       "desc_ja": "二つの頂点の間で、辺の数や重みの合計が最小になる道のりです。幅優先探索やダイクストラ法で求めます。",
       "example_ja": "始点から各頂点への最短経路の長さを出力してください。",
+      "example_ruby": "始点から各頂点への[最短経路|さいたんけいろ]の長さを出力してください。",
       "example_en": "Output the shortest-path length from the start to each vertex."
     },
     {
@@ -1420,6 +1511,7 @@
       "desc_en": "A contiguous run of characters taken from inside a string.",
       "desc_ja": "文字列の中から連続して取り出した一部分です。",
       "example_ja": "同じ文字を含まない最長の部分文字列を求めてください。",
+      "example_ruby": "同じ[文字|もじ]を含まない最長の[部分文字列|ぶぶんもじれつ]を求めてください。",
       "example_en": "Find the longest substring without repeating characters."
     },
     {
@@ -1435,6 +1527,7 @@
       "desc_en": "A contiguous run of elements from an array — unlike a subsequence, the elements must be next to each other.",
       "desc_ja": "配列の中の連続した要素の並びです。部分列と違い、要素は隣り合っていなければなりません。",
       "example_ja": "和が最大になる部分配列を見つけてください。",
+      "example_ruby": "和が[最大|さいだい]になる[部分配列|ぶぶんはいれつ]を見つけてください。",
       "example_en": "Find the subarray with the largest sum."
     },
     {
@@ -1450,6 +1543,7 @@
       "desc_en": "An array where each position holds the total of all elements up to it, so any range sum can be answered in O(1).",
       "desc_ja": "各位置にそこまでの要素の合計を記録した配列です。任意の区間の和をO(1)で求められます。",
       "example_ja": "累積和を前計算しておけば、区間の和がすぐに分かります。",
+      "example_ruby": "[累積和|るいせきわ]を前計算しておけば、区間の和がすぐに分かります。",
       "example_en": "If you precompute prefix sums, range sums are instant."
     },
     {
@@ -1465,6 +1559,7 @@
       "desc_en": "Advancing a left and a right pointer over an array to maintain a window — the usual Japanese competitive-programming name for the technique.",
       "desc_ja": "左端と右端の二つのポインタを前に進めながら区間を管理する手法です。競技プログラミングでよく使われる名前です。",
       "example_ja": "尺取り法を使うとO(n)で解けます。",
+      "example_ruby": "[尺取り法|しゃくとりほう]を使うとO(n)で解けます。",
       "example_en": "Using two pointers, it can be solved in O(n)."
     },
     {
@@ -1480,6 +1575,7 @@
       "desc_en": "The data a program receives; in a problem statement, the section describing the format read from standard input.",
       "desc_ja": "プログラムが受け取るデータです。問題文では、標準入力から読み込む形式を説明する部分を指します。",
       "example_ja": "入力は一行目に整数Nが与えられます。",
+      "example_ruby": "[入力|にゅうりょく]は一行目に[整数|せいすう]Nが与えられます。",
       "example_en": "In the input, an integer N is given on the first line."
     },
     {
@@ -1495,6 +1591,7 @@
       "desc_en": "The result a program produces; in a problem statement, the exact format your answer must be printed in.",
       "desc_ja": "プログラムが生み出す結果です。問題文では、答えを表示する正確な形式を指します。",
       "example_ja": "答えを一行で出力してください。",
+      "example_ruby": "答えを一行で[出力|しゅつりょく]してください。",
       "example_en": "Output the answer on one line."
     },
     {
@@ -1510,6 +1607,7 @@
       "desc_en": "The limits on input sizes and values stated in a problem, which tell you how fast your solution needs to be.",
       "desc_ja": "問題に書かれた入力の大きさや値の範囲です。解法にどれくらいの速さが必要かの手がかりになります。",
       "example_ja": "制約はN ≤ 10⁵なので、O(n²)では間に合いません。",
+      "example_ruby": "[制約|せいやく]はN ≤ 10⁵なので、O(n²)では間に合いません。",
       "example_en": "The constraint is N ≤ 10⁵, so O(n²) is too slow."
     },
     {
@@ -1525,6 +1623,7 @@
       "desc_en": "An input at the very edge of what is allowed — empty, zero, one element, or the maximum — where bugs most often hide.",
       "desc_ja": "空、0、要素が一つ、最大値など、許される範囲のぎりぎりの入力です。不具合が最も起きやすいところです。",
       "example_ja": "空の配列などの境界値もテストしてください。",
+      "example_ruby": "空の配列などの[境界値|きょうかいち]もテストしてください。",
       "example_en": "Please also test boundary values such as an empty array."
     },
     {
@@ -1540,6 +1639,7 @@
       "desc_en": "The same value appearing more than once; problems often ask you to detect, count or remove duplicates.",
       "desc_ja": "同じ値が二回以上現れることです。重複を見つける、数える、取り除くといった問題がよく出ます。",
       "example_ja": "配列に重複する要素があればtrueを返してください。",
+      "example_ruby": "配列に[重複|ちょうふく]する要素があればtrueを返してください。",
       "example_en": "Return true if the array contains any duplicate elements."
     },
     {
@@ -1556,6 +1656,7 @@
       "desc_en": "A string that reads the same forwards and backwards, like \"level\" or \"しんぶんし\".",
       "desc_ja": "前から読んでも後ろから読んでも同じになる文字列です。「level」や「しんぶんし」などがあります。",
       "example_ja": "与えられた文字列が回文かどうか判定してください。",
+      "example_ruby": "与えられた[文字列|もじれつ]が[回文|かいぶん]かどうか[判定|はんてい]してください。",
       "example_en": "Determine whether the given string is a palindrome."
     },
     {
@@ -1571,6 +1672,7 @@
       "desc_en": "One particular ordering of a set of items; n distinct items have n! permutations.",
       "desc_ja": "いくつかのものを一列に並べた、ある一つの並べ方です。異なるn個のものにはn!通りの順列があります。",
       "example_ja": "1からNまでのすべての順列を列挙してください。",
+      "example_ruby": "1からNまでのすべての[順列|じゅんれつ]を列挙してください。",
       "example_en": "List all permutations of 1 to N."
     },
     {
@@ -1586,6 +1688,7 @@
       "desc_en": "What is left over after integer division, computed with %; answers are often required modulo 10⁹+7.",
       "desc_ja": "整数の割り算で割り切れずに残る数です。%で計算します。答えを10⁹+7で割った余りを求める問題もよくあります。",
       "example_ja": "答えを1,000,000,007で割った余りを出力してください。",
+      "example_ruby": "答えを1,000,000,007で割った[余り|あまり]を出力してください。",
       "example_en": "Output the answer modulo 1,000,000,007."
     },
     {
@@ -1601,6 +1704,7 @@
       "desc_en": "A whole number greater than 1 divisible only by 1 and itself.",
       "desc_ja": "1より大きく、1と自分自身でしか割り切れない整数です。",
       "example_ja": "Nまでの素数をすべて求めてください。",
+      "example_ruby": "Nまでの[素数|そすう]をすべて求めてください。",
       "example_en": "Find all the prime numbers up to N."
     },
     {
@@ -1616,6 +1720,7 @@
       "desc_en": "A number that divides another with no remainder. Checking up to the square root is enough to find them all.",
       "desc_ja": "ある数を割り切ることのできる数です。平方根まで調べればすべて見つけられます。",
       "example_ja": "12の約数は1, 2, 3, 4, 6, 12です。",
+      "example_ruby": "12の[約数|やくすう]は1, 2, 3, 4, 6, 12です。",
       "example_en": "The divisors of 12 are 1, 2, 3, 4, 6 and 12."
     },
     {
@@ -1631,6 +1736,7 @@
       "desc_en": "The largest number dividing two numbers evenly, found quickly by the Euclidean algorithm.",
       "desc_ja": "二つの数をともに割り切る最大の数です。ユークリッドの互除法で素早く求められます。",
       "example_ja": "二つの数の最大公約数を求めてください。",
+      "example_ruby": "二つの数の[最大公約数|さいだいこうやくすう]を求めてください。",
       "example_en": "Find the greatest common divisor of the two numbers."
     },
     {
@@ -1646,6 +1752,7 @@
       "desc_en": "n! — the product of every whole number from 1 to n. It grows fast enough to overflow an int by 13.",
       "desc_ja": "1からnまでのすべての整数を掛けた値です。増え方が速く、13でintの範囲を超えます。",
       "example_ja": "5の階乗は120です。",
+      "example_ruby": "5の[階乗|かいじょう]は120です。",
       "example_en": "The factorial of 5 is 120."
     },
     {
@@ -1662,6 +1769,7 @@
       "desc_en": "A result too large for its type, which wraps silently rather than failing — the reason a sum is often held in a long.",
       "desc_ja": "計算結果が型の範囲を超えることです。エラーにならず静かに値が回り込むため、合計にはlongを使うことが多いです。",
       "example_ja": "合計がintの範囲を超えると桁あふれが起きます。",
+      "example_ruby": "合計がintの範囲を超えると[桁あふれ|けたあふれ]が起きます。",
       "example_en": "If the total exceeds the int range, an overflow occurs."
     },
     {
@@ -1677,6 +1785,7 @@
       "desc_en": "A collection with no duplicates and no order you should rely on.",
       "desc_ja": "重複がなく、順序をあてにしてはいけないデータの集まりです。",
       "example_ja": "重複を消すには集合を使います。",
+      "example_ruby": "重複を消すには[集合|しゅうごう]を使います。",
       "example_en": "Use a set to remove duplicates."
     },
     {
@@ -1692,6 +1801,7 @@
       "desc_en": "Elements taken from a sequence in order but not necessarily adjacent — unlike a 部分配列, gaps are allowed.",
       "desc_ja": "順番は保ったまま取り出した要素の並びです。部分配列と違い、間を飛ばしてもかまいません。",
       "example_ja": "最長増加部分列の長さを求めてください。",
+      "example_ruby": "最長増加[部分列|ぶぶんれつ]の長さを求めてください。",
       "example_en": "Find the length of the longest increasing subsequence."
     },
     {
@@ -1707,6 +1817,7 @@
       "desc_en": "How many edges lie between the root and a given node.",
       "desc_ja": "根からある節点までに通る辺の数です。",
       "example_ja": "この節点の深さは3です。",
+      "example_ruby": "この節点の[深さ|ふかさ]は3です。",
       "example_en": "The depth of this node is 3."
     },
     {
@@ -1722,6 +1833,7 @@
       "desc_en": "The length of the longest path from a node down to a leaf; a tree's height is its root's.",
       "desc_ja": "ある節点から葉までの最も長い道のりの長さです。木の高さは根から測ります。",
       "example_ja": "平衡木の高さはO(log n)です。",
+      "example_ruby": "平衡木の[高さ|たかさ]はO(log n)です。",
       "example_en": "A balanced tree's height is O(log n)."
     },
     {
@@ -1737,6 +1849,7 @@
       "desc_en": "A node with no children — where a downward traversal stops.",
       "desc_ja": "子を持たない節点です。下向きの走査はここで止まります。",
       "example_ja": "葉の数を数えてください。",
+      "example_ruby": "[葉|は]の数を数えてください。",
       "example_en": "Count the number of leaves."
     },
     {
@@ -1752,6 +1865,7 @@
       "desc_en": "The node one step above another. Every node has exactly one, except the root.",
       "desc_ja": "ある節点の一つ上にある節点です。根を除き、どの節点にも必ず一つあります。",
       "example_ja": "各節点の親を配列で持ちます。",
+      "example_ruby": "各節点の[親|おや]を配列で持ちます。",
       "example_en": "We hold each node's parent in an array."
     },
     {
@@ -1767,6 +1881,7 @@
       "desc_en": "A node directly below another. A binary tree node has at most two.",
       "desc_ja": "ある節点の直下にある節点です。二分木では最大で二つです。",
       "example_ja": "左の子と右の子を順に調べます。",
+      "example_ruby": "左の[子|こ]と右の[子|こ]を順に調べます。",
       "example_en": "We examine the left child and the right child in turn."
     },
     {
@@ -1782,6 +1897,7 @@
       "desc_en": "A tree keeping smaller keys left and larger keys right, so lookup follows one path down — O(log n) only while it stays balanced.",
       "desc_ja": "小さい鍵を左、大きい鍵を右に置く木です。探索は一本の道をたどるだけで済みますが、O(log n)なのは平衡が保たれている間だけです。",
       "example_ja": "二分探索木は整列されています。",
+      "example_ruby": "[二分探索木|にぶんたんさくぎ]は整列されています。",
       "example_en": "A binary search tree is kept sorted."
     },
     {
@@ -1797,6 +1913,7 @@
       "desc_en": "Kept shallow enough that operations stay logarithmic, rather than degenerating into a list.",
       "desc_ja": "操作が対数時間のままでいられる程度に浅さが保たれていることです。崩れると連結リストと変わらなくなります。",
       "example_ja": "平衡が崩れると探索がO(n)になります。",
+      "example_ruby": "[平衡|へいこう]が崩れると探索がO(n)になります。",
       "example_en": "If the balance is lost, search becomes O(n)."
     },
     {
@@ -1812,6 +1929,7 @@
       "desc_en": "First in, first out — the textbook word beside the loanword キュー.",
       "desc_ja": "先に入れたものから先に出る構造です。「キュー」に対する漢語の言い方です。",
       "example_ja": "幅優先探索では待ち行列を使います。",
+      "example_ruby": "幅優先探索では[待ち行列|まちぎょうれつ]を使います。",
       "example_en": "Breadth-first search uses a queue."
     },
     {
@@ -1827,6 +1945,7 @@
       "desc_en": "A path through a graph that returns to where it started. A tree is exactly a connected graph with none.",
       "desc_ja": "出発した頂点に戻ってくる経路です。木とは、閉路のない連結なグラフのことです。",
       "example_ja": "このグラフに閉路があるか判定してください。",
+      "example_ruby": "このグラフに[閉路|へいろ]があるか[判定|はんてい]してください。",
       "example_en": "Determine whether this graph contains a cycle."
     },
     {
@@ -1842,6 +1961,7 @@
       "desc_en": "A maximal group of vertices all reachable from one another.",
       "desc_ja": "互いに行き来できる頂点の、これ以上広げられないまとまりです。",
       "example_ja": "連結成分の数を数えてください。",
+      "example_ruby": "[連結成分|れんけつせいぶん]の数を数えてください。",
       "example_en": "Count the number of connected components."
     },
     {
@@ -1857,6 +1977,7 @@
       "desc_en": "An ordering of a directed graph in which every edge points forwards — possible only when there is no cycle.",
       "desc_ja": "すべての辺が前向きになるように有向グラフを並べることです。閉路がない場合にのみ可能です。",
       "example_ja": "依存関係の順序は位相整列で求めます。",
+      "example_ruby": "依存関係の順序は[位相整列|いそうせいれつ]で求めます。",
       "example_en": "We find the order of dependencies with a topological sort."
     },
     {
@@ -1872,6 +1993,7 @@
       "desc_en": "The cheapest set of edges connecting every vertex without forming a cycle.",
       "desc_ja": "すべての頂点を閉路なしにつなぐ、重みの合計が最小の辺の集まりです。",
       "example_ja": "最小全域木の重みの合計を出力してください。",
+      "example_ruby": "[最小全域木|さいしょうぜんいきぎ]の重みの合計を出力してください。",
       "example_en": "Output the total weight of the minimum spanning tree."
     },
     {
@@ -1887,6 +2009,7 @@
       "desc_en": "A rule defining each term from earlier ones — the thing you write down before turning it into a DP table.",
       "desc_ja": "各項を前の項から定める式です。動的計画法の表に変える前に、まず書き下すものです。",
       "example_ja": "この問題の漸化式を立てます。",
+      "example_ruby": "この[問題|もんだい]の[漸化式|ぜんかしき]を立てます。",
       "example_en": "We set up the recurrence relation for this problem."
     },
     {
@@ -1902,6 +2025,7 @@
       "desc_en": "Never decreasing, or never increasing — the property that makes binary search and the monotonic stack work.",
       "desc_ja": "減ることがない、あるいは増えることがない性質です。二分探索や単調スタックが成り立つ根拠になります。",
       "example_ja": "配列が単調なら二分探索が使えます。",
+      "example_ruby": "配列が[単調|たんちょう]なら二分探索が使えます。",
       "example_en": "If the array is monotonic, binary search can be used."
     },
     {
@@ -1917,6 +2041,7 @@
       "desc_en": "A correspondence sending each input to exactly one output.",
       "desc_ja": "それぞれの入力を、ただ一つの出力に対応させる関係です。",
       "example_ja": "文字から個数への写像を作ります。",
+      "example_ruby": "[文字|もじ]から個数への[写像|しゃぞう]を作ります。",
       "example_en": "We build a mapping from character to count."
     },
     {
@@ -1932,6 +2057,7 @@
       "desc_en": "An extra value placed at a boundary so the loop needs no special case for the end.",
       "desc_ja": "端に置いておく余分な値です。ループの終わりを特別扱いせずに済みます。",
       "example_ja": "番兵を置くと境界の処理が簡単になります。",
+      "example_ruby": "[番兵|ばんぺい]を置くと境界の[処理|しょり]が[簡単|かんたん]になります。",
       "example_en": "Adding a sentinel makes the boundary handling simpler."
     },
     {
@@ -1947,6 +2073,7 @@
       "desc_en": "Splitting a problem into independent halves, solving each, then combining — how merge sort works.",
       "desc_ja": "問題を互いに独立な部分に分け、それぞれ解いてから組み合わせる手法です。マージソートがこの形です。",
       "example_ja": "マージソートは分割統治の代表例です。",
+      "example_ruby": "マージソートは[分割統治|ぶんかつとうち]の代表例です。",
       "example_en": "Merge sort is the classic example of divide and conquer."
     },
     {
@@ -1962,6 +2089,7 @@
       "desc_en": "The average cost per operation across a long run, which can be low even when one operation is occasionally expensive.",
       "desc_ja": "多数回の操作全体でならした一回あたりの計算量です。たまに重い操作があっても平均は小さくなり得ます。",
       "example_ja": "ArrayListの追加は償却計算量がO(1)です。",
+      "example_ruby": "ArrayListの[追加|ついか]は[償却計算量|しょうきゃくけいさんりょう]がO(1)です。",
       "example_en": "Appending to an ArrayList is O(1) amortized."
     },
     {
@@ -1977,6 +2105,7 @@
       "desc_en": "The greatest length among the candidates — the word opening a great many problem statements.",
       "desc_ja": "候補の中で最も長いものです。非常に多くの問題文がこの語で始まります。",
       "example_ja": "最長の部分文字列の長さを求めてください。",
+      "example_ruby": "[最長|さいちょう]の部分[文字列|もじれつ]の長さを求めてください。",
       "example_en": "Find the length of the longest substring."
     },
     {
@@ -1992,6 +2121,7 @@
       "desc_en": "The least length or cost among the candidates.",
       "desc_ja": "候補の中で最も短い、あるいは費用の小さいものです。",
       "example_ja": "最短の手数を出力してください。",
+      "example_ruby": "[最短|さいたん]の手数を出力してください。",
       "example_en": "Output the shortest number of moves."
     },
     {
@@ -2007,6 +2137,7 @@
       "desc_en": "A contiguous stretch from one index to another, inclusive or exclusive as the problem says.",
       "desc_ja": "ある添字から別の添字までの連続した範囲です。両端を含むかどうかは問題の指定によります。",
       "example_ja": "各区間の和を求めてください。",
+      "example_ruby": "各[区間|くかん]の和を求めてください。",
       "example_en": "Find the sum of each interval."
     },
     {
@@ -2022,6 +2153,7 @@
       "desc_en": "The result of adding every element together.",
       "desc_ja": "すべての要素を足し合わせた結果です。",
       "example_ja": "配列の総和を求めます。",
+      "example_ruby": "配列の[総和|そうわ]を求めます。",
       "example_en": "We find the summation of the array."
     },
     {
@@ -2037,6 +2169,7 @@
       "desc_en": "How many items a collection holds — the N a problem's constraints are stated in.",
       "desc_ja": "コレクションに入っている項目の個数です。問題の制約でNとして示される値です。",
       "example_ja": "1行目に要素数が与えられます。",
+      "example_ruby": "1行目に[要素数|ようそすう]が与えられます。",
       "example_en": "The number of elements is given on the first line."
     },
     {
@@ -2052,6 +2185,7 @@
       "desc_en": "The span of values something may take, or the region being examined.",
       "desc_ja": "とりうる値の幅、または調べている領域のことです。",
       "example_ja": "添字が範囲を超えていないか確認します。",
+      "example_ruby": "添字が[範囲|はんい]を超えていないか[確認|かくにん]します。",
       "example_en": "We check that the index hasn't gone out of range."
     },
     {
@@ -2067,6 +2201,7 @@
       "desc_en": "Back to front. Distinct from 降順, which specifically means largest-to-smallest.",
       "desc_ja": "前後を入れ替えた順番です。大きい順を指す降順とは区別します。",
       "example_ja": "リストを逆順に出力してください。",
+      "example_ruby": "リストを[逆順|ぎゃくじゅん]に出力してください。",
       "example_en": "Output the list in reverse order."
     },
     {
@@ -2082,6 +2217,7 @@
       "desc_en": "The middle value once sorted — less easily skewed by an outlier than the average.",
       "desc_ja": "整列したときに真ん中に来る値です。平均より外れ値の影響を受けにくい指標です。",
       "example_ja": "二つの配列の中央値を求めてください。",
+      "example_ruby": "二つの配列の[中央値|ちゅうおうち]を求めてください。",
       "example_en": "Find the median of the two arrays."
     },
     {
@@ -2097,6 +2233,7 @@
       "desc_en": "Repeating a step — the loop-shaped alternative to recursion.",
       "desc_ja": "処理を繰り返すことです。再帰に対する、ループの形の解き方です。",
       "example_ja": "再帰ではなく反復で書き直します。",
+      "example_ruby": "再帰ではなく[反復|はんぷく]で書き直します。",
       "example_en": "We rewrite it with iteration rather than recursion."
     },
     {
@@ -2112,6 +2249,7 @@
       "desc_en": "The set of all candidates a search could examine. Making it smaller is usually the whole trick.",
       "desc_ja": "探索が調べうるすべての候補の集まりです。これを小さくすることが解法の要点であることが多いです。",
       "example_ja": "制約を使って探索空間を狭めます。",
+      "example_ruby": "制約を使って[探索空間|たんさくくうかん]を狭めます。",
       "example_en": "We use the constraints to narrow the search space."
     },
     {
@@ -2127,6 +2265,7 @@
       "desc_en": "Abandoning a branch of the search as soon as it cannot lead to an answer — what makes backtracking fast enough.",
       "desc_ja": "答えにつながらないと分かった時点で、その枝を打ち切ることです。バックトラックが現実的な速さになる理由です。",
       "example_ja": "枝刈りを入れると探索が大幅に速くなります。",
+      "example_ruby": "[枝刈り|えだかり]を入れると探索が大幅に速くなります。",
       "example_en": "Adding pruning speeds the search up enormously."
     },
     {
@@ -2142,6 +2281,7 @@
       "desc_en": "The rule taking one state of a DP or automaton to the next — what you write down after the recurrence.",
       "desc_ja": "動的計画法やオートマトンで、ある状態から次の状態へ移る規則です。漸化式の次に書き下すものです。",
       "example_ja": "状態遷移を表にまとめます。",
+      "example_ruby": "[状態遷移|じょうたいせんい]を表にまとめます。",
       "example_en": "We lay the state transitions out in a table."
     },
     {
@@ -2157,6 +2297,7 @@
       "desc_en": "Writing a type explicitly after a name with a colon, as in let count: number = 0.",
       "desc_ja": "let count: number = 0のように、名前の後ろにコロンを付けて型を明示的に書くことです。",
       "example_ja": "関数の引数には型注釈を付けましょう。",
+      "example_ruby": "[関数|かんすう]の[引数|ひきすう]には[型注釈|かたちゅうしゃく]を付けましょう。",
       "example_en": "Let's add type annotations to function parameters."
     },
     {
@@ -2172,6 +2313,7 @@
       "desc_en": "The compiler working out a type on its own from the value or context, so you don't have to annotate everything.",
       "desc_ja": "値や文脈からコンパイラが自動的に型を判断することです。すべてに型注釈を書く必要はありません。",
       "example_ja": "let x = 5と書くと、型推論でxはnumber型になります。",
+      "example_ruby": "let x = 5と書くと、[型推論|かたすいろん]でxはnumber型になります。",
       "example_en": "Write let x = 5 and type inference makes x a number."
     },
     {
@@ -2187,6 +2329,7 @@
       "desc_en": "A guarantee that values are only used in ways their types allow, so whole classes of bugs are caught before the code runs.",
       "desc_ja": "値がその型で許された方法でしか使われないことの保証です。多くの不具合を実行前に見つけられます。",
       "example_ja": "anyを使うと型安全が失われます。",
+      "example_ruby": "anyを使うと[型安全|かたあんぜん]が失われます。",
       "example_en": "Using any gives up type safety."
     },
     {
@@ -2202,6 +2345,7 @@
       "desc_en": "Verifying that every expression is used consistently with its type; tsc does this at compile time.",
       "desc_ja": "すべての式が型に合った使われ方をしているか確かめることです。tscがコンパイル時に行います。",
       "example_ja": "tsc --noEmitで型検査だけを実行します。",
+      "example_ruby": "tsc --noEmitで[型検査|かたけんさ]だけを[実行|じっこう]します。",
       "example_en": "Run only the type check with tsc --noEmit."
     },
     {
@@ -2217,6 +2361,7 @@
       "desc_en": "Types being checked before the program runs, as in TypeScript and Java, rather than while it runs.",
       "desc_ja": "プログラムの実行前に型をチェックする方式です。TypeScriptやJavaが該当します。",
       "example_ja": "TypeScriptはJavaScriptに静的型付けを加えた言語です。",
+      "example_ruby": "TypeScriptはJavaScriptに[静的型付け|せいてきかたづけ]を加えた言語です。",
       "example_en": "TypeScript is JavaScript with static typing added."
     },
     {
@@ -2232,6 +2377,7 @@
       "desc_en": "Types being attached to values and checked only while the program runs, as in plain JavaScript or Python.",
       "desc_ja": "型が値に結び付き、実行中にだけチェックされる方式です。JavaScriptやPythonが該当します。",
       "example_ja": "JavaScriptは動的型付けなので、実行するまで型の誤りに気づきません。",
+      "example_ruby": "JavaScriptは[動的型付け|どうてきかたづけ]なので、[実行|じっこう]するまで型の誤りに気づきません。",
       "example_en": "JavaScript is dynamically typed, so you don't notice type mistakes until it runs."
     },
     {
@@ -2247,6 +2393,7 @@
       "desc_en": "Two types being compatible when they have the same shape, regardless of their names — how TypeScript compares types.",
       "desc_ja": "名前に関係なく、同じ形（プロパティの構成）を持っていれば互換とみなす方式です。TypeScriptはこの方式で型を比較します。",
       "example_ja": "構造的型付けなので、同じプロパティを持つオブジェクトなら代入できます。",
+      "example_ruby": "[構造的型付け|こうぞうてきかたづけ]なので、同じプロパティを持つオブジェクトなら[代入|だいにゅう]できます。",
       "example_en": "Because of structural typing, any object with the same properties can be assigned."
     },
     {
@@ -2262,6 +2409,7 @@
       "desc_en": "Types being compatible only when they share the same declared name, as in Java; TypeScript imitates it with branded types.",
       "desc_ja": "宣言された名前が同じ場合にだけ互換とみなす方式です。Javaが該当し、TypeScriptではブランド型で真似します。",
       "example_ja": "Javaは公称型なので、同じ形のクラスでも別の型として扱われます。",
+      "example_ruby": "Javaは[公称型|こうしょうがた]なので、同じ形のクラスでも別の型として扱われます。",
       "example_en": "Java uses nominal typing, so classes with the same shape are still different types."
     },
     {
@@ -2277,6 +2425,7 @@
       "desc_en": "A type that can be any one of several types, written with |, as in string | number.",
       "desc_ja": "string | numberのように|で書き、いくつかの型のうちどれか一つになれる型です。「ユニオン型」とも言います。",
       "example_ja": "IDは文字列か数値の合併型にしました。",
+      "example_ruby": "IDは[文字列|もじれつ]か[数値|すうち]の[合併型|がっぺいがた]にしました。",
       "example_en": "I made the ID a union type of string or number."
     },
     {
@@ -2292,6 +2441,7 @@
       "desc_en": "A type that has all the members of several types at once, written with &, as in A & B.",
       "desc_ja": "A & Bのように&で書き、複数の型のメンバーをすべて併せ持つ型です。",
       "example_ja": "交差型を使ってUserとTimestampsを一つにまとめます。",
+      "example_ruby": "[交差型|こうさがた]を使ってUserとTimestampsを一つにまとめます。",
       "example_en": "Use an intersection type to combine User and Timestamps."
     },
     {
@@ -2307,6 +2457,7 @@
       "desc_en": "A type that can be used wherever another type is expected, because it has at least everything that type requires.",
       "desc_ja": "別の型に必要なものをすべて持っているため、その型が期待される場所で使える型です。",
       "example_ja": "{ name: string; age: number }は{ name: string }の部分型です。",
+      "example_ruby": "{ name: string; age: number }は{ name: string }の[部分型|ぶぶんがた]です。",
       "example_en": "{ name: string; age: number } is a subtype of { name: string }."
     },
     {
@@ -2322,6 +2473,7 @@
       "desc_en": "Whether a value of one type may be assigned to another; the compiler reports an error when the types aren't compatible.",
       "desc_ja": "ある型の値を別の型に代入できるかどうかです。互換性がなければコンパイラがエラーを出します。",
       "example_ja": "型に互換性がないため、代入でエラーになりました。",
+      "example_ruby": "型に[互換性|ごかんせい]がないため、[代入|だいにゅう]でエラーになりました。",
       "example_en": "The types aren't compatible, so the assignment is an error."
     },
     {
@@ -2337,6 +2489,7 @@
       "desc_en": "The compiler refining a broad type to a more specific one inside a branch, after a check like typeof or in.",
       "desc_ja": "typeofやinなどのチェックの後、分岐の中で広い型をより具体的な型にすることです。",
       "example_ja": "typeofで型を絞り込み、文字列の場合だけtoUpperCaseを呼びます。",
+      "example_ruby": "typeofで型を[絞り込み|しぼりこみ]、[文字列|もじれつ]の場合だけtoUpperCaseを呼びます。",
       "example_en": "Narrow the type with typeof, and call toUpperCase only for strings."
     },
     {
@@ -2352,6 +2505,7 @@
       "desc_en": "A return type of the form value is Type, telling the compiler the argument's type whenever the function returns true.",
       "desc_ja": "value is Typeという形の戻り値の型です。関数がtrueを返したとき、引数の型をコンパイラに伝えます。",
       "example_ja": "isFish(pet): pet is Fishは型述語を使った関数です。",
+      "example_ruby": "isFish(pet): pet is Fishは[型述語|かたじゅつご]を使った[関数|かんすう]です。",
       "example_en": "isFish(pet): pet is Fish is a function that uses a type predicate."
     },
     {
@@ -2367,6 +2521,7 @@
       "desc_en": "Every possible case of a union being handled; assigning the leftover value to never makes the compiler check it.",
       "desc_ja": "合併型のすべての場合を処理していることです。残りの値をnever型に代入すると、コンパイラが確認してくれます。",
       "example_ja": "neverを使ってswitch文の網羅性をチェックします。",
+      "example_ruby": "neverを使ってswitch文の[網羅性|もうらせい]をチェックします。",
       "example_en": "Use never to check that the switch statement is exhaustive."
     },
     {
@@ -2382,6 +2537,7 @@
       "desc_en": "Describes a union whose members share a literal tag property, like kind, so checking that property narrows to one member.",
       "desc_ja": "kindのような共通のリテラル型プロパティを持つ合併型のことです。そのプロパティを調べると一つの型に絞り込めます。",
       "example_ja": "kindプロパティを持つ判別可能な合併型で図形を表します。",
+      "example_ruby": "kindプロパティを持つ[判別可能|はんべつかのう]な合併型で図形を表します。",
       "example_en": "Represent shapes with a discriminated union that has a kind property."
     },
     {
@@ -2397,6 +2553,7 @@
       "desc_en": "A type that chooses between two types based on a test, written T extends U ? X : Y.",
       "desc_ja": "T extends U ? X : Yと書き、条件によって二つの型のどちらかを選ぶ型です。",
       "example_ja": "条件型を使って、配列なら要素の型を取り出します。",
+      "example_ruby": "[条件型|じょうけんがた]を使って、配列なら要素の型を取り出します。",
       "example_en": "Use a conditional type to extract the element type when it's an array."
     },
     {
@@ -2413,6 +2570,7 @@
       "desc_en": "The concrete type supplied to a generic, as in Array<string> or useState<number>(0).",
       "desc_ja": "Array<string>やuseState<number>(0)のように、総称型に渡す具体的な型です。",
       "example_ja": "型引数を省略すると、TypeScriptが推論します。",
+      "example_ruby": "[型引数|かたひきすう]を省略すると、TypeScriptが推論します。",
       "example_en": "If you leave out the type argument, TypeScript infers it."
     },
     {
@@ -2428,6 +2586,7 @@
       "desc_en": "Telling the compiler to treat a value as a specific type with as — it overrides checking and can hide real mistakes.",
       "desc_ja": "asを使って、値を特定の型として扱うようコンパイラに伝えることです。型検査を上書きするため、誤りを隠すことがあります。",
       "example_ja": "型表明は最後の手段にしてください。",
+      "example_ruby": "[型表明|かたひょうめい]は最後の手段にしてください。",
       "example_en": "Please treat type assertions as a last resort."
     },
     {
@@ -2443,6 +2602,7 @@
       "desc_en": "A property or array that can't be reassigned after creation, marked with readonly or ReadonlyArray.",
       "desc_ja": "readonlyやReadonlyArrayで指定する、生成後に書き換えられないプロパティや配列です。",
       "example_ja": "idプロパティは読み取り専用なので変更できません。",
+      "example_ruby": "idプロパティは[読み取り専用|よみとりせんよう]なので[変更|へんこう]できません。",
       "example_en": "The id property is read-only, so it can't be changed."
     },
     {
@@ -2458,6 +2618,7 @@
       "desc_en": "A property or parameter that may be left out, marked with ?, whose type then includes undefined.",
       "desc_ja": "?を付けて指定する、省略してもよいプロパティや引数です。型にはundefinedが含まれます。",
       "example_ja": "emailは省略可能なプロパティです。",
+      "example_ruby": "emailは[省略可能|しょうりゃくかのう]なプロパティです。",
       "example_en": "email is an optional property."
     },
     {
@@ -2473,6 +2634,7 @@
       "desc_en": "The state of having no value assigned yet; in TypeScript, the value and type undefined.",
       "desc_ja": "値がまだ設定されていない状態です。TypeScriptではundefinedという値と型で表します。",
       "example_ja": "存在しないキーにアクセスすると未定義になります。",
+      "example_ruby": "[存在|そんざい]しないキーにアクセスすると[未定義|みていぎ]になります。",
       "example_en": "Accessing a key that doesn't exist gives undefined."
     },
     {
@@ -2488,6 +2650,7 @@
       "desc_en": "Stricter compiler checking, turned on with \"strict\": true in tsconfig, which enables null checks and forbids implicit any.",
       "desc_ja": "tsconfigで\"strict\": trueにすると有効になる、より厳しい型チェックです。nullチェックや暗黙のanyの禁止などが含まれます。",
       "example_ja": "新しいプロジェクトでは厳格モードを有効にしましょう。",
+      "example_ruby": "新しいプロジェクトでは[厳格|げんかく]モードを有効にしましょう。",
       "example_en": "Let's turn on strict mode in new projects."
     },
     {
@@ -2504,6 +2667,7 @@
       "desc_en": "Work that finishes later without blocking the rest of the program, handled with Promises and async/await.",
       "desc_ja": "他の処理を止めずに、後で完了する処理のことです。Promiseやasync/awaitで扱います。",
       "example_ja": "fetchは非同期に実行されます。",
+      "example_ruby": "fetchは[非同期|ひどうき]に[実行|じっこう]されます。",
       "example_en": "fetch runs asynchronously."
     },
     {
@@ -2519,6 +2683,7 @@
       "desc_en": "Pausing an async function until a Promise settles, with the await keyword, without blocking the thread.",
       "desc_ja": "awaitキーワードで、Promiseが完了するまで非同期関数の実行を一時停止することです。スレッドはブロックされません。",
       "example_ja": "awaitでレスポンスを待機してから画面に表示します。",
+      "example_ruby": "awaitでレスポンスを[待機|たいき]してから[画面|がめん]に表示します。",
       "example_en": "Await the response, then show it on screen."
     },
     {
@@ -2535,6 +2700,7 @@
       "desc_en": "Several tasks running at the same time; Promise.all starts async work together instead of one after another.",
       "desc_ja": "複数の処理を同時に進めることです。Promise.allを使うと、非同期処理を順番ではなく一緒に開始できます。",
       "example_ja": "Promise.allで三つのリクエストを並列に送ります。",
+      "example_ruby": "Promise.allで三つのリクエストを[並列|へいれつ]に送ります。",
       "example_en": "Send three requests in parallel with Promise.all."
     },
     {
@@ -2550,6 +2716,7 @@
       "desc_en": "Unpacking the properties of an object or the items of an array into separate variables, as in const { id, name } = user.",
       "desc_ja": "const { id, name } = userのように、オブジェクトのプロパティや配列の要素を個別の変数に取り出すことです。",
       "example_ja": "分割代入でpropsから必要な値だけを取り出します。",
+      "example_ruby": "[分割代入|ぶんかつだいにゅう]でpropsから[必要|ひつよう]な値だけを取り出します。",
       "example_en": "Use destructuring to pull just the values you need out of props."
     },
     {
@@ -2565,6 +2732,7 @@
       "desc_en": "Using ... to expand an array or object into individual elements or properties, as in [...a, ...b].",
       "desc_ja": "[...a, ...b]のように...を使って、配列やオブジェクトを個々の要素やプロパティに展開する構文です。",
       "example_ja": "展開構文を使って、元のオブジェクトを変えずにコピーを作ります。",
+      "example_ruby": "[展開構文|てんかいこうぶん]を使って、元のオブジェクトを変えずにコピーを作ります。",
       "example_en": "Use spread syntax to make a copy without changing the original object."
     },
     {
@@ -2580,6 +2748,7 @@
       "desc_en": "A final parameter written ...args that gathers any number of remaining arguments into an array.",
       "desc_ja": "...argsのように最後の引数に書き、残りの引数をすべて配列にまとめるものです。",
       "example_ja": "残余引数を使えば、いくつでも数値を受け取れます。",
+      "example_ruby": "[残余引数|ざんよひきすう]を使えば、いくつでも[数値|すうち]を受け取れます。",
       "example_en": "With rest parameters, you can accept any number of numbers."
     },
     {
@@ -2595,6 +2764,7 @@
       "desc_en": "The value a parameter or property takes when none is supplied, as in function greet(name = \"world\").",
       "desc_ja": "値が渡されなかったときに使われる値です。function greet(name = \"world\")のように書きます。",
       "example_ja": "pageの既定値は1にしました。",
+      "example_ruby": "pageの[既定値|きていち]は1にしました。",
       "example_en": "I set page's default value to 1."
     },
     {
@@ -2610,6 +2780,7 @@
       "desc_en": "A named scope that groups related declarations to avoid name collisions; modern TypeScript mostly uses ES modules instead.",
       "desc_ja": "関連する宣言をまとめて名前の衝突を避けるための範囲です。現在のTypeScriptでは主にESモジュールが使われます。",
       "example_ja": "名前空間が違えば、同じ名前の関数を定義できます。",
+      "example_ruby": "[名前空間|なまえくうかん]が違えば、同じ[名前|なまえ]の[関数|かんすう]を定義できます。",
       "example_en": "In different namespaces, you can define functions with the same name."
     },
     {
@@ -2626,6 +2797,7 @@
       "desc_en": "The packages a project needs, listed in package.json under dependencies and devDependencies.",
       "desc_ja": "プロジェクトが必要とするパッケージのことです。package.jsonのdependenciesとdevDependenciesに書かれます。",
       "example_ja": "npm installで依存関係をインストールします。",
+      "example_ruby": "npm installで[依存関係|いぞんかんけい]をインストールします。",
       "example_en": "Install the dependencies with npm install."
     },
     {
@@ -2642,6 +2814,7 @@
       "desc_en": "While the program is actually running. TypeScript's types are erased by then, so runtime checks need real JavaScript code.",
       "desc_ja": "プログラムが実際に動いている間のことです。TypeScriptの型はその時点で消えているため、実行時のチェックにはJavaScriptのコードが必要です。",
       "example_ja": "型は実行時には存在しません。",
+      "example_ruby": "型は[実行時|じっこうじ]には[存在|そんざい]しません。",
       "example_en": "Types don't exist at runtime."
     },
     {
@@ -2657,6 +2830,7 @@
       "desc_en": "Anything a function does beyond returning a value — writing a field, logging, calling an API.",
       "desc_ja": "値を返す以外に関数が行うことすべてです。フィールドの書き換え、出力、APIの呼び出しなどが該当します。",
       "example_ja": "この関数には副作用がありません。",
+      "example_ruby": "この[関数|かんすう]には[副作用|ふくさよう]がありません。",
       "example_en": "This function has no side effects."
     },
     {
@@ -2672,6 +2846,7 @@
       "desc_en": "A function whose result depends only on its arguments and which has no side effects, so it is trivially testable.",
       "desc_ja": "結果が引数だけで決まり、副作用を持たない関数です。そのため試験がとても簡単になります。",
       "example_ja": "純粋関数は同じ引数なら必ず同じ結果を返します。",
+      "example_ruby": "[純粋関数|じゅんすいかんすう]は同じ[引数|ひきすう]なら必ず同じ[結果|けっか]を返します。",
       "example_en": "A pure function always returns the same result for the same arguments."
     },
     {
@@ -2687,6 +2862,7 @@
       "desc_en": "A function taking or returning another function — map, filter and reduce are the ones you meet first.",
       "desc_ja": "関数を引数に取る、あるいは関数を返す関数です。map、filter、reduceが代表例です。",
       "example_ja": "mapは高階関数です。",
+      "example_ruby": "mapは[高階関数|こうかいかんすう]です。",
       "example_en": "map is a higher-order function."
     },
     {
@@ -2702,6 +2878,7 @@
       "desc_en": "A function written without a name, usually passed straight into something else as an arrow function.",
       "desc_ja": "名前を付けずに書く関数です。多くはアロー関数として、そのまま他の関数に渡します。",
       "example_ja": "コールバックには無名関数をよく使います。",
+      "example_ruby": "コールバックには[無名関数|むめいかんすう]をよく使います。",
       "example_en": "We often use an anonymous function for a callback."
     },
     {
@@ -2717,6 +2894,7 @@
       "desc_en": "Declarations being moved to the top of their scope before the code runs — why a var is undefined rather than an error.",
       "desc_ja": "実行前に宣言がスコープの先頭へ移される挙動です。varがエラーではなくundefinedになるのはこのためです。",
       "example_ja": "letは巻き上げられますが、初期化前には使えません。",
+      "example_ruby": "letは[巻き上げ|まきあげ]られますが、初期化前には使えません。",
       "example_en": "let is hoisted, but can't be used before it's initialized."
     },
     {
@@ -2732,6 +2910,7 @@
       "desc_en": "Nicer syntax for something the language could already express — class over prototypes, async/await over Promises.",
       "desc_ja": "既に書けることを、より読みやすく書けるようにした構文です。classやasync/awaitがこれにあたります。",
       "example_ja": "classは糖衣構文で、内部はプロトタイプです。",
+      "example_ruby": "classは[糖衣構文|とういこうぶん]で、内部はプロトタイプです。",
       "example_en": "class is syntactic sugar; underneath it's prototypes."
     },
     {
@@ -2747,6 +2926,7 @@
       "desc_en": "A function defined and called in one expression, historically used to make a private scope.",
       "desc_ja": "定義と同時に呼び出す関数です。かつては私的なスコープを作るために使われました。",
       "example_ja": "モジュールがない時代は即時関数で変数を隠しました。",
+      "example_ruby": "モジュールがない時代は[即時関数|そくじかんすう]で[変数|へんすう]を隠しました。",
       "example_en": "Before modules, an immediately-invoked function hid the variables."
     },
     {
@@ -2762,6 +2942,7 @@
       "desc_en": "Stopping as soon as the answer is known — && skips its right side when the left is false.",
       "desc_ja": "答えが決まった時点で評価をやめることです。&&は左が偽なら右を評価しません。",
       "example_ja": "短絡評価のおかげでnullチェックが安全に書けます。",
+      "example_ruby": "[短絡評価|たんらくひょうか]のおかげでnullチェックが[安全|あんぜん]に書けます。",
       "example_en": "Short-circuit evaluation lets you write a null check safely."
     },
     {
@@ -2777,6 +2958,7 @@
       "desc_en": "The placeholder name in a generic — the T in Array<T> — standing for a type supplied later.",
       "desc_ja": "総称型の中の仮の名前です。Array<T>のTがこれにあたり、後から与えられる型を表します。",
       "example_ja": "型変数には慣習的にTを使います。",
+      "example_ruby": "[型変数|かたへんすう]には慣習的にTを使います。",
       "example_en": "By convention the type variable is called T."
     },
     {
@@ -2792,6 +2974,7 @@
       "desc_en": "A type built by walking the keys of another and transforming each — how Partial and Readonly are defined.",
       "desc_ja": "別の型のキーを一つずつたどって作る型です。PartialやReadonlyはこの仕組みで定義されています。",
       "example_ja": "型写像を使えばすべてのプロパティを省略可能にできます。",
+      "example_ruby": "[型写像|かたしゃぞう]を使えばすべてのプロパティを省略可能にできます。",
       "example_en": "With a mapped type you can make every property optional."
     },
     {
@@ -2807,6 +2990,7 @@
       "desc_en": "A declaration saying \"any key of this type maps to that type\", for objects whose keys aren't known in advance.",
       "desc_ja": "「この型のどんなキーでもこの型の値になる」と宣言するものです。キーが事前に分からないオブジェクトに使います。",
       "example_ja": "添字型を使うと任意のキーを許せます。",
+      "example_ruby": "[添字型|そえじがた]を使うと任意のキーを許せます。",
       "example_en": "An index signature lets you allow arbitrary keys."
     },
     {
@@ -2822,6 +3006,7 @@
       "desc_en": "A type defined in terms of itself — the natural way to describe JSON or a tree.",
       "desc_ja": "自分自身を使って定義される型です。JSONや木構造を表すのに向いています。",
       "example_ja": "JSONの値は再帰型で表せます。",
+      "example_ruby": "JSONの値は[再帰型|さいきがた]で表せます。",
       "example_en": "A JSON value can be described with a recursive type."
     },
     {
@@ -2837,6 +3022,7 @@
       "desc_en": "Listing every case explicitly — as against leaving the set open.",
       "desc_ja": "すべての場合を明示的に並べ上げることです。範囲を開いたままにしないという意味合いです。",
       "example_ja": "取りうる状態を列挙します。",
+      "example_ruby": "取りうる状態を[列挙|れっきょ]します。",
       "example_en": "We enumerate the possible states."
     },
     {
@@ -2852,6 +3038,7 @@
       "desc_en": "How a type's assignability follows that of its parameter — whether Box<Dog> counts as a Box<Animal>.",
       "desc_ja": "型引数の関係が、その型自身の代入可能性にどう伝わるかという性質です。Box<Dog>をBox<Animal>として使えるかという話です。",
       "example_ja": "配列の変性はTypeScriptでは緩やかです。",
+      "example_ruby": "配列の[変性|へんせい]はTypeScriptでは緩やかです。",
       "example_en": "Array variance is loose in TypeScript."
     },
     {
@@ -2867,6 +3054,7 @@
       "desc_en": "Varying the same way: if Dog is a subtype of Animal, a covariant container of Dog is a subtype of one of Animal.",
       "desc_ja": "同じ向きに変わることです。DogがAnimalの部分型なら、共変な入れ物でもDogの方が部分型になります。",
       "example_ja": "戻り値の型は共変です。",
+      "example_ruby": "戻り値の型は[共変|きょうへん]です。",
       "example_en": "Return types are covariant."
     },
     {
@@ -2882,6 +3070,7 @@
       "desc_en": "Varying the opposite way — which is how function parameter types behave.",
       "desc_ja": "逆向きに変わることです。関数の引数の型がこの性質を持ちます。",
       "example_ja": "引数の型は反変です。",
+      "example_ruby": "[引数|ひきすう]の型は[反変|はんぺん]です。",
       "example_en": "Parameter types are contravariant."
     },
     {
@@ -2897,6 +3086,7 @@
       "desc_en": "Making an object reject changes at runtime, as against readonly, which only stops them at compile time.",
       "desc_ja": "実行時にオブジェクトの変更を受け付けなくすることです。コンパイル時にだけ効くreadonlyとは異なります。",
       "example_ja": "設定オブジェクトを凍結します。",
+      "example_ruby": "設定オブジェクトを[凍結|とうけつ]します。",
       "example_en": "We freeze the configuration object."
     },
     {
@@ -2912,6 +3102,7 @@
       "desc_en": "A copy one level deep: nested objects are still shared with the original.",
       "desc_ja": "一段だけの複製です。入れ子になったオブジェクトは元と共有されたままになります。",
       "example_ja": "展開構文で作れるのは浅い複製です。",
+      "example_ruby": "展開構文で作れるのは[浅い複製|あさいふくせい]です。",
       "example_en": "Spread syntax gives you a shallow copy."
     },
     {
@@ -2927,6 +3118,7 @@
       "desc_en": "A copy all the way down, sharing nothing with the original.",
       "desc_ja": "入れ子の奥まで複製し、元と何も共有しないものです。",
       "example_ja": "深い複製にはstructuredCloneが使えます。",
+      "example_ruby": "[深い複製|ふかいふくせい]にはstructuredCloneが使えます。",
       "example_en": "You can use structuredClone for a deep copy."
     },
     {
@@ -2942,6 +3134,7 @@
       "desc_en": "A type holding several values at once — an object or a tuple, an \"and\" of its parts.",
       "desc_ja": "複数の値を同時に持つ型です。オブジェクトやタプルがこれにあたり、各部分の「かつ」を表します。",
       "example_ja": "オブジェクトは直積型の一種です。",
+      "example_ruby": "オブジェクトは[直積型|ちょくせきがた]の一種です。",
       "example_en": "An object is a kind of product type."
     },
     {
@@ -2957,6 +3150,7 @@
       "desc_en": "A type that is one of several alternatives — an \"or\", which in TypeScript is a discriminated union.",
       "desc_ja": "いくつかの候補のうちどれか一つになる型です。「または」を表し、TypeScriptでは判別可能な合併型がこれにあたります。",
       "example_ja": "判別可能な合併型は直和型です。",
+      "example_ruby": "判別可能な合併型は[直和型|ちょくわがた]です。",
       "example_en": "A discriminated union is a sum type."
     },
     {
@@ -2972,6 +3166,7 @@
       "desc_en": "Fixing some of a function's arguments now and getting back a function wanting the rest.",
       "desc_ja": "関数の引数の一部だけを先に決め、残りを受け取る関数を得ることです。",
       "example_ja": "部分適用で設定済みの関数を作ります。",
+      "example_ruby": "[部分適用|ぶぶんてきよう]で設定済みの[関数|かんすう]を作ります。",
       "example_en": "We use partial application to make a pre-configured function."
     },
     {
@@ -2987,6 +3182,7 @@
       "desc_en": "Chaining functions so one's output is the next one's input.",
       "desc_ja": "ある関数の出力を次の関数の入力にしてつなげることです。",
       "example_ja": "小さな関数を関数合成で組み立てます。",
+      "example_ruby": "小さな[関数|かんすう]を[関数合成|かんすうごうせい]で組み立てます。",
       "example_en": "We build it up from small functions by composition."
     },
     {
@@ -3002,6 +3198,7 @@
       "desc_en": "The property that an expression can be replaced by its value without changing the program — what purity buys you.",
       "desc_ja": "式をその値で置き換えてもプログラムの意味が変わらない性質です。純粋であることの利点です。",
       "example_ja": "純粋関数の呼び出しには参照透過性があります。",
+      "example_ruby": "純粋[関数|かんすう]の呼び出しには[参照透過性|さんしょうとうかせい]があります。",
       "example_en": "A call to a pure function is referentially transparent."
     },
     {
@@ -3017,6 +3214,7 @@
       "desc_en": "A call in the very last position of a function, which in principle can reuse the stack frame — though JavaScript engines mostly don't.",
       "desc_ja": "関数の最後の位置で行う呼び出しです。原理的にはスタックを再利用できますが、多くのJavaScriptエンジンは実装していません。",
       "example_ja": "末尾呼び出しでも再帰が深いと停止します。",
+      "example_ruby": "[末尾呼び出し|まつびよびだし]でも再帰が深いと停止します。",
       "example_en": "Even a tail call will overflow if the recursion is deep."
     },
     {
@@ -3032,6 +3230,7 @@
       "desc_en": "A named type you declared yourself, with type or interface.",
       "desc_ja": "typeやinterfaceを使って自分で宣言した、名前の付いた型です。",
       "example_ja": "共通の型定義を別のファイルにまとめます。",
+      "example_ruby": "[共通|きょうつう]の[型定義|かたていぎ]を別のファイルにまとめます。",
       "example_en": "We gather the shared type definitions into a separate file."
     },
     {
@@ -3047,6 +3246,7 @@
       "desc_en": "A second name for an existing type, given with type — it creates no new type, only a shorter way to say one.",
       "desc_ja": "typeで既存の型に付ける別の名前です。新しい型ができるわけではなく、短く書けるようになるだけです。",
       "example_ja": "長い合併型には別名を付けると読みやすくなります。",
+      "example_ruby": "長い合併型には[別名|べつめい]を付けると読みやすくなります。",
       "example_en": "Giving a long union type an alias makes it readable."
     },
     {
@@ -3062,6 +3262,7 @@
       "desc_en": "Walking a collection element by element, with for...of or a method like forEach.",
       "desc_ja": "コレクションの要素を一つずつたどることです。for...ofやforEachなどで行います。",
       "example_ja": "配列を反復処理します。",
+      "example_ruby": "配列を[反復処理|はんぷくしょり]します。",
       "example_en": "We iterate over the array."
     },
     {
@@ -3077,6 +3278,7 @@
       "desc_en": "Able to be walked by for...of — anything implementing the iterator protocol, not only arrays.",
       "desc_ja": "for...ofでたどれる性質です。配列に限らず、反復子の約束を満たすものすべてが該当します。",
       "example_ja": "MapもSetも反復可能です。",
+      "example_ruby": "MapもSetも[反復可能|はんぷくかのう]です。",
       "example_en": "Both Map and Set are iterable."
     },
     {
@@ -3092,6 +3294,7 @@
       "desc_en": "A function that can pause and resume with yield, producing values one at a time rather than all at once.",
       "desc_ja": "yieldで中断と再開ができる関数です。値を一度にすべてではなく、一つずつ取り出せます。",
       "example_ja": "生成器を使えば無限の列も扱えます。",
+      "example_ruby": "[生成器|せいせいき]を使えば無限の列も扱えます。",
       "example_en": "With a generator you can work with an infinite sequence."
     },
     {
@@ -3107,6 +3310,7 @@
       "desc_en": "The built-in deep copy, structuredClone — it handles nesting, Maps and Dates, where JSON round-tripping loses them.",
       "desc_ja": "structuredCloneによる組み込みの深い複製です。入れ子やMap、Dateも扱えます。JSONを経由する方法では失われるものです。",
       "example_ja": "構造化複製なら日付もそのまま複製できます。",
+      "example_ruby": "[構造化複製|こうぞうかふくせい]なら[日付|ひづけ]もそのまま[複製|ふくせい]できます。",
       "example_en": "A structured clone copies dates correctly too."
     },
     {
@@ -3122,6 +3326,7 @@
       "desc_en": "=== — compares without converting types, and is what you should almost always use.",
       "desc_ja": "===のことです。型変換をせずに比較するもので、ほとんどの場合こちらを使うべきです。",
       "example_ja": "比較には厳密等価を使ってください。",
+      "example_ruby": "[比較|ひかく]には[厳密等価|げんみつとうか]を使ってください。",
       "example_en": "Please use strict equality for comparisons."
     },
     {
@@ -3137,6 +3342,7 @@
       "desc_en": "== — converts types before comparing, which is why \"\" == 0 is true and why it is avoided.",
       "desc_ja": "==のことです。比較の前に型変換を行うため、\"\" == 0がtrueになります。避けられるのはこのためです。",
       "example_ja": "緩い等価は予想外の結果になることがあります。",
+      "example_ruby": "[緩い等価|ゆるいとうか]は予想外の[結果|けっか]になることがあります。",
       "example_en": "Loose equality can give surprising results."
     },
     {
@@ -3152,6 +3358,7 @@
       "desc_en": "A value that counts as true in a condition without being true — a non-empty string, any non-zero number.",
       "desc_ja": "trueそのものではないのに、条件の中でtrueとして扱われる値です。空でない文字列や0以外の数値が該当します。",
       "example_ja": "空でない文字列は真値です。",
+      "example_ruby": "空でない[文字列|もじれつ]は[真値|しんち]です。",
       "example_en": "A non-empty string is truthy."
     },
     {
@@ -3167,6 +3374,7 @@
       "desc_en": "A value that counts as false in a condition: 0, \"\", null, undefined and NaN.",
       "desc_ja": "条件の中でfalseとして扱われる値です。0、空文字列、null、undefined、NaNが該当します。",
       "example_ja": "0は偽値なので、条件が成立しません。",
+      "example_ruby": "0は[偽値|ぎち]なので、[条件|じょうけん]が成立しません。",
       "example_en": "0 is falsy, so the condition doesn't hold."
     },
     {
@@ -3182,6 +3390,7 @@
       "desc_en": "The editor offering the names available at the cursor — much of what having types is for day to day.",
       "desc_ja": "カーソル位置で使える名前を編集器が示してくれることです。日々の作業で型があることの利点の多くはこれです。",
       "example_ja": "型を書いておくと補完が効きます。",
+      "example_ruby": "型を書いておくと[補完|ほかん]が効きます。",
       "example_en": "Writing the types out makes completion work."
     },
     {
@@ -3197,6 +3406,7 @@
       "desc_en": "A shorter way to write something — { x } for { x: x }, for instance.",
       "desc_ja": "同じことをより短く書ける記法です。{ x: x }を{ x }と書けるのがその例です。",
       "example_ja": "省略記法で書くと短くなります。",
+      "example_ruby": "[省略記法|しょうりゃくきほう]で書くと短くなります。",
       "example_en": "It gets shorter written in shorthand."
     },
     {
@@ -3212,6 +3422,7 @@
       "desc_en": "Combining rows from two tables by matching a column they have in common — the operation most SQL questions are really about.",
       "desc_ja": "共通する列の値を手がかりに、二つの表の行を組み合わせる操作です。SQLの問題の多くはこれが中心になります。",
       "example_ja": "顧客表と注文表を顧客IDで結合します。",
+      "example_ruby": "[顧客|こきゃく]表と[注文|ちゅうもん]表を[顧客|こきゃく]IDで[結合|けつごう]します。",
       "example_en": "We join the customer table and the order table on the customer ID."
     },
     {
@@ -3227,6 +3438,7 @@
       "desc_en": "A join that keeps only the rows matching on both sides, dropping anything with no partner.",
       "desc_ja": "両方の表で条件に一致した行だけを残す結合です。相手のない行は取り除かれます。",
       "example_ja": "内部結合では、注文のない顧客は結果に現れません。",
+      "example_ruby": "[内部結合|ないぶけつごう]では、[注文|ちゅうもん]のない[顧客|こきゃく]は[結果|けっか]に現れません。",
       "example_en": "With an inner join, customers with no orders don't appear in the result."
     },
     {
@@ -3242,6 +3454,7 @@
       "desc_en": "A join that keeps rows from one side even when nothing matches, filling the missing columns with NULL.",
       "desc_ja": "一致する行がなくても片方の表の行を残す結合です。足りない列はNULLで埋められます。",
       "example_ja": "外部結合を使えば、注文のない顧客も一覧に残ります。",
+      "example_ruby": "[外部結合|がいぶけつごう]を使えば、[注文|ちゅうもん]のない[顧客|こきゃく]も[一覧|いちらん]に残ります。",
       "example_en": "With an outer join, customers with no orders stay in the list."
     },
     {
@@ -3257,6 +3470,7 @@
       "desc_en": "Reducing many rows to one summary value — a count, a total, an average — usually per group.",
       "desc_ja": "多くの行を、件数や合計、平均といった一つの値にまとめることです。普通はグループごとに行います。",
       "example_ja": "部署ごとに給与を集計します。",
+      "example_ruby": "部署ごとに[給与|きゅうよ]を[集計|しゅうけい]します。",
       "example_en": "We aggregate salaries by department."
     },
     {
@@ -3272,6 +3486,7 @@
       "desc_en": "A function such as COUNT, SUM or AVG that takes a group of rows and returns a single value.",
       "desc_ja": "COUNTやSUM、AVGのように、行のグループを受け取って一つの値を返す関数です。",
       "example_ja": "COUNTは最もよく使う集約関数です。",
+      "example_ruby": "COUNTは最もよく使う[集約関数|しゅうやくかんすう]です。",
       "example_en": "COUNT is the most commonly used aggregate function."
     },
     {
@@ -3287,6 +3502,7 @@
       "desc_en": "A query written inside another query, whose result the outer query uses as a value, a list or a table.",
       "desc_ja": "別の問い合わせの中に書く問い合わせです。その結果を外側が値や一覧、表として使います。",
       "example_ja": "平均より高い給与を探すには副問い合わせが便利です。",
+      "example_ruby": "平均より高い[給与|きゅうよ]を探すには[副問い合わせ|ふくといあわせ]が便利です。",
       "example_en": "A subquery is handy for finding salaries above the average."
     },
     {
@@ -3302,6 +3518,7 @@
       "desc_en": "A separate structure the database keeps so it can find rows by a column's value without scanning the whole table.",
       "desc_ja": "列の値から行を素早く見つけるために、データベースが別に持つ仕組みです。表全体を調べずに済みます。",
       "example_ja": "検索が遅いので、その列に索引を作りました。",
+      "example_ruby": "検索が遅いので、その列に[索引|さくいん]を作りました。",
       "example_en": "The search was slow, so I created an index on that column."
     },
     {
@@ -3317,6 +3534,7 @@
       "desc_en": "Splitting data across tables so each fact is stored exactly once, which removes the update anomalies duplication causes.",
       "desc_ja": "同じ事実が一度だけ保存されるように、データを複数の表に分ける設計です。重複による更新の矛盾を防げます。",
       "example_ja": "住所を別の表に分けて正規化しました。",
+      "example_ruby": "住所を別の表に分けて[正規化|せいきか]しました。",
       "example_en": "I normalized it by moving the address into its own table."
     },
     {
@@ -3332,6 +3550,7 @@
       "desc_en": "The guarantee that a transaction moves the database from one valid state to another, never leaving it half-updated.",
       "desc_ja": "取引の前後でデータベースが常に正しい状態であることの保証です。途中の状態が残ることはありません。",
       "example_ja": "取引によってデータの一貫性が保たれます。",
+      "example_ruby": "取引によってデータの[一貫性|いっかんせい]が保たれます。",
       "example_en": "A transaction keeps the data consistent."
     },
     {
@@ -3347,6 +3566,7 @@
       "desc_en": "A group of statements that either all take effect or none do, so a failure part-way through leaves nothing behind.",
       "desc_ja": "まとめて全部成功するか、全部なかったことになるかのどちらかになる処理の単位です。途中で失敗しても中途半端な結果は残りません。",
       "example_ja": "送金は一つの取引として実行します。",
+      "example_ruby": "送金は一つの[取引|とりひき]として[実行|じっこう]します。",
       "example_en": "A transfer runs as a single transaction."
     },
     {
@@ -3362,6 +3582,7 @@
       "desc_en": "One record in a table — a single set of values, one per column.",
       "desc_ja": "表の中の一件のデータです。各列に一つずつ値を持ちます。",
       "example_ja": "この表には千件の行があります。",
+      "example_ruby": "この表には千件の[行|ぎょう]があります。",
       "example_en": "This table has a thousand rows."
     },
     {
@@ -3377,6 +3598,7 @@
       "desc_en": "One named field of a table, with a type, holding the same kind of value for every row.",
       "desc_ja": "表の中の名前と型を持つ項目です。どの行でも同じ種類の値が入ります。",
       "example_ja": "名前を保存する列を追加しました。",
+      "example_ruby": "[名前|なまえ]を[保存|ほぞん]する[列|れつ]を[追加|ついか]しました。",
       "example_en": "I added a column to store the name."
     },
     {
@@ -3392,6 +3614,7 @@
       "desc_en": "The basic container of a relational database: named columns, and any number of rows.",
       "desc_ja": "関係データベースの基本的な入れ物です。名前の付いた列と、任意の数の行から成ります。",
       "example_ja": "利用者の情報は別の表に保存します。",
+      "example_ruby": "[利用者|りようしゃ]の情報は別の[表|ひょう]に[保存|ほぞん]します。",
       "example_en": "We store the user information in a separate table."
     },
     {
@@ -3407,6 +3630,7 @@
       "desc_en": "Taking just the rows and columns you want out of a table — what a SELECT statement does.",
       "desc_ja": "表から必要な行と列だけを取り出すことです。SELECT文が行う処理を指します。",
       "example_ja": "条件に合う行だけを抽出します。",
+      "example_ruby": "[条件|じょうけん]に合う行だけを[抽出|ちゅうしゅつ]します。",
       "example_en": "We extract only the rows matching the condition."
     },
     {
@@ -3422,6 +3646,7 @@
       "desc_en": "Adding a new row to a table, with INSERT.",
       "desc_ja": "INSERTで表に新しい行を追加することです。",
       "example_ja": "新しい利用者を表に挿入します。",
+      "example_ruby": "新しい[利用者|りようしゃ]を表に[挿入|そうにゅう]します。",
       "example_en": "We insert the new user into the table."
     },
     {
@@ -3437,6 +3662,7 @@
       "desc_en": "Removing rows from a table with DELETE — usually with a WHERE clause, since without one it removes them all.",
       "desc_ja": "DELETEで表から行を取り除くことです。WHEREを付けないとすべての行が消えるので注意が必要です。",
       "example_ja": "古いデータを削除してください。",
+      "example_ruby": "古いデータを[削除|さくじょ]してください。",
       "example_en": "Please delete the old data."
     },
     {
@@ -3452,6 +3678,7 @@
       "desc_en": "Changing the values in rows that already exist, with UPDATE.",
       "desc_ja": "UPDATEで既にある行の値を変更することです。",
       "example_ja": "在庫の数を更新します。",
+      "example_ruby": "在庫の数を[更新|こうしん]します。",
       "example_en": "We update the stock count."
     },
     {
@@ -3467,6 +3694,7 @@
       "desc_en": "Putting the result rows in a stated order; without it a database is free to return them in any order at all.",
       "desc_ja": "結果の行を指定した順番に並べることです。指定しなければ、どの順で返ってくるかは決まっていません。",
       "example_ja": "日付の新しい順に並べ替えます。",
+      "example_ruby": "[日付|ひづけ]の新しい順に[並べ替え|ならべかえ]ます。",
       "example_en": "We order them by date, newest first."
     },
     {
@@ -3482,6 +3710,7 @@
       "desc_en": "How many rows something produced — the answer COUNT gives.",
       "desc_ja": "行がいくつあるかという数です。COUNTが返す値を指します。",
       "example_ja": "条件に合う件数を数えます。",
+      "example_ruby": "[条件|じょうけん]に合う[件数|けんすう]を数えます。",
       "example_en": "We count how many rows match the condition."
     },
     {
@@ -3497,6 +3726,7 @@
       "desc_en": "The sum of a numeric column across the rows of a group.",
       "desc_ja": "グループの中で、数値の列を足し合わせた値です。",
       "example_ja": "月ごとの売上の合計を求めます。",
+      "example_ruby": "月ごとの売上の[合計|ごうけい]を求めます。",
       "example_en": "We find the total sales per month."
     },
     {
@@ -3512,6 +3742,7 @@
       "desc_en": "The mean of a numeric column — the total divided by the number of rows counted.",
       "desc_ja": "数値の列の平均値です。合計を行数で割った値になります。",
       "example_ja": "平均の点数を計算します。",
+      "example_ruby": "[平均|へいきん]の[点数|てんすう]を計算します。",
       "example_en": "We calculate the average score."
     },
     {
@@ -3527,6 +3758,7 @@
       "desc_en": "The largest value in a column across a group of rows.",
       "desc_ja": "グループの中で列の値が最も大きいものです。",
       "example_ja": "各部署の給与の最大値を求めます。",
+      "example_ruby": "各部署の[給与|きゅうよ]の[最大値|さいだいち]を求めます。",
       "example_en": "We find the maximum salary in each department."
     },
     {
@@ -3542,6 +3774,7 @@
       "desc_en": "The smallest value in a column across a group of rows.",
       "desc_ja": "グループの中で列の値が最も小さいものです。",
       "example_ja": "最小値と最大値の両方を出力します。",
+      "example_ruby": "[最小値|さいしょうち]と[最大|さいだい]値の両方を出力します。",
       "example_en": "We output both the minimum and the maximum value."
     },
     {
@@ -3557,6 +3790,7 @@
       "desc_en": "The steps the database decided to take to answer a query — the first thing to read when a query is slow.",
       "desc_ja": "問い合わせに答えるためにデータベースが選んだ手順です。遅い問い合わせを調べるとき最初に見ます。",
       "example_ja": "実行計画を見ると、索引が使われていませんでした。",
+      "example_ruby": "[実行計画|じっこうけいかく]を見ると、索引が使われていませんでした。",
       "example_en": "Looking at the execution plan, the index wasn't being used."
     },
     {
@@ -3572,6 +3806,7 @@
       "desc_en": "A rule that no two rows may share a value in a column, which the database itself enforces.",
       "desc_ja": "ある列の値が二つの行で重複してはならないという規則です。データベース自身が守らせます。",
       "example_ja": "メールアドレスの列に一意制約を付けます。",
+      "example_ruby": "メールアドレスの列に[一意制約|いちいせいやく]を付けます。",
       "example_en": "We put a unique constraint on the email column."
     },
     {
@@ -3587,6 +3822,7 @@
       "desc_en": "Rows that repeat, which DISTINCT removes and a join can accidentally create.",
       "desc_ja": "同じ内容が繰り返される行です。DISTINCTで取り除けますが、結合によって意図せず生まれることもあります。",
       "example_ja": "結合の結果に重複行が出ていませんか。",
+      "example_ruby": "結合の[結果|けっか]に[重複行|じゅうふくぎょう]が出ていませんか。",
       "example_en": "Isn't the join producing duplicate rows?"
     },
     {
@@ -3602,6 +3838,7 @@
       "desc_en": "Combining two result sets as sets — UNION, INTERSECT and EXCEPT.",
       "desc_ja": "二つの結果を集合として組み合わせる操作です。UNION、INTERSECT、EXCEPTが該当します。",
       "example_ja": "UNIONは集合演算の一つです。",
+      "example_ruby": "UNIONは[集合演算|しゅうごうえんざん]の一つです。",
       "example_en": "UNION is one of the set operations."
     },
     {
@@ -3617,6 +3854,7 @@
       "desc_en": "A subquery referring to the outer row, so it is evaluated once per row — correct, and often the reason a query is slow.",
       "desc_ja": "外側の行を参照する副問い合わせです。行ごとに評価されるため正しく動きますが、問い合わせが遅い原因になりがちです。",
       "example_ja": "相関副問い合わせは行ごとに実行されます。",
+      "example_ruby": "[相関副問い合わせ|そうかんふくといあわせ]は行ごとに[実行|じっこう]されます。",
       "example_en": "A correlated subquery runs once per row."
     },
     {
@@ -3632,6 +3870,7 @@
       "desc_en": "The guarantee that a foreign key always points at a row that exists.",
       "desc_ja": "外部キーが必ず存在する行を指していることの保証です。",
       "example_ja": "参照整合性のおかげで、孤立した行は生まれません。",
+      "example_ruby": "[参照整合性|さんしょうせいごうせい]のおかげで、孤立した行は生まれません。",
       "example_en": "Referential integrity means no orphaned rows can appear."
     },
     {
@@ -3647,6 +3886,7 @@
       "desc_en": "Reading every row because no usable index exists — what you hope not to find in an execution plan.",
       "desc_ja": "使える索引がないため、すべての行を読むことです。実行計画の中に見つけたくないものです。",
       "example_ja": "索引がないので全表走査になっています。",
+      "example_ruby": "索引がないので[全表走査|ぜんぴょうそうさ]になっています。",
       "example_en": "With no index, it's doing a full table scan."
     },
     {
@@ -3662,6 +3902,7 @@
       "desc_en": "Establishing who a user is — checking a password, a token or a key. Distinct from deciding what they may do.",
       "desc_ja": "利用者が誰であるかを確かめることです。パスワードやトークンを検査します。何ができるかを決める認可とは別の話です。",
       "example_ja": "ログイン画面で利用者の認証を行います。",
+      "example_ruby": "ログイン[画面|がめん]で[利用者|りようしゃ]の[認証|にんしょう]を行います。",
       "example_en": "We authenticate the user on the login screen."
     },
     {
@@ -3677,6 +3918,7 @@
       "desc_en": "Deciding what an already-identified user is allowed to do. Authentication comes first; this is the separate second question.",
       "desc_ja": "誰であるかが分かった利用者に、何を許すかを決めることです。認証の後に来る別の判断です。",
       "example_ja": "認証は通りましたが、認可されていない操作です。",
+      "example_ruby": "認証は通りましたが、[認可|にんか]されていない[操作|そうさ]です。",
       "example_en": "They authenticated fine, but this operation isn't authorized."
     },
     {
@@ -3692,6 +3934,7 @@
       "desc_en": "What a client sends to a server: a method, a path, headers and sometimes a body.",
       "desc_ja": "クライアントがサーバーへ送るものです。メソッド、パス、ヘッダー、場合によっては本文から成ります。",
       "example_ja": "サーバーに要求を送ります。",
+      "example_ruby": "サーバーに[要求|ようきゅう]を送ります。",
       "example_en": "We send a request to the server."
     },
     {
@@ -3707,6 +3950,7 @@
       "desc_en": "What the server sends back: a status code, headers and usually a body.",
       "desc_ja": "サーバーが返すものです。状態コードとヘッダー、多くの場合は本文から成ります。",
       "example_ja": "サーバーからの応答を待ちます。",
+      "example_ruby": "サーバーからの[応答|おうとう]を待ちます。",
       "example_en": "We wait for the server's response."
     },
     {
@@ -3722,6 +3966,7 @@
       "desc_en": "Data moving between two machines over a network.",
       "desc_ja": "ネットワークを通じて機械の間でデータをやり取りすることです。",
       "example_ja": "サーバーと通信します。",
+      "example_ruby": "サーバーと[通信|つうしん]します。",
       "example_en": "We communicate with the server."
     },
     {
@@ -3737,6 +3982,7 @@
       "desc_en": "Writing state somewhere it survives the process ending — a database or a file, rather than memory.",
       "desc_ja": "処理が終わっても残る場所に状態を保存することです。メモリではなくデータベースやファイルに書きます。",
       "example_ja": "入力された内容をデータベースに永続化します。",
+      "example_ruby": "入力された[内容|ないよう]をデータベースに[永続化|えいぞくか]します。",
       "example_en": "We persist the entered content to the database."
     },
     {
@@ -3752,6 +3998,7 @@
       "desc_en": "A specific right granted to a user or role — to read a file, to delete a record.",
       "desc_ja": "利用者や役割に与えられる個別の権利です。ファイルを読む、記録を消すといった単位で与えます。",
       "example_ja": "管理者の権限が必要です。",
+      "example_ruby": "管理者の[権限|けんげん]が[必要|ひつよう]です。",
       "example_en": "Admin permission is required."
     },
     {
@@ -3767,6 +4014,7 @@
       "desc_en": "The data a component or a system is currently holding, which changes over time and drives what is shown.",
       "desc_ja": "部品やシステムがその時点で持っているデータです。時間とともに変わり、表示の内容を決めます。",
       "example_ja": "コンポーネントの状態を管理します。",
+      "example_ruby": "コンポーネントの[状態|じょうたい]を管理します。",
       "example_en": "We manage the component's state."
     },
     {
@@ -3782,6 +4030,7 @@
       "desc_en": "Asking another system for data and receiving it back.",
       "desc_ja": "別のシステムにデータを求めて受け取ることです。",
       "example_ja": "APIからデータを取得します。",
+      "example_ruby": "APIからデータを[取得|しゅとく]します。",
       "example_en": "We fetch data from the API."
     },
     {
@@ -3797,6 +4046,7 @@
       "desc_en": "Putting something on screen where the user can see it.",
       "desc_ja": "利用者が見えるように画面に出すことです。",
       "example_ja": "結果を画面に表示します。",
+      "example_ruby": "[結果|けっか]を[画面|がめん]に[表示|ひょうじ]します。",
       "example_en": "We display the result on the screen."
     },
     {
@@ -3812,6 +4062,7 @@
       "desc_en": "The act of turning state and markup into what is actually drawn on screen.",
       "desc_ja": "状態やマークアップを、実際に画面に描かれるものへ変える処理です。",
       "example_ja": "状態が変わると画面が描画されます。",
+      "example_ruby": "状態が変わると[画面|がめん]が[描画|びょうが]されます。",
       "example_en": "When the state changes, the screen is rendered."
     },
     {
@@ -3827,6 +4078,7 @@
       "desc_en": "The text console you type commands into — and, in other contexts, a user's device.",
       "desc_ja": "コマンドを入力する文字の画面です。文脈によっては利用者の機器そのものを指すこともあります。",
       "example_ja": "端末でコマンドを実行します。",
+      "example_ruby": "[端末|たんまつ]でコマンドを[実行|じっこう]します。",
       "example_en": "We run commands in the terminal."
     },
     {
@@ -3842,6 +4094,7 @@
       "desc_en": "The path part of a URL, and the rule that maps it to the code handling it.",
       "desc_ja": "URLのパスの部分と、それを担当する処理に結び付ける規則のことです。",
       "example_ja": "新しい経路を追加して画面を増やします。",
+      "example_ruby": "新しい[経路|けいろ]を[追加|ついか]して[画面|がめん]を増やします。",
       "example_en": "We add a new route to add another screen."
     },
     {
@@ -3857,6 +4110,7 @@
       "desc_en": "A title marking the start of a section, which on the web also gives a page its outline for screen readers.",
       "desc_ja": "節の始まりを示す題名です。Webでは読み上げソフトのための構造にもなります。",
       "example_ja": "各節に見出しを付けてください。",
+      "example_ruby": "各節に[見出し|みだし]を付けてください。",
       "example_en": "Please put a heading on each section."
     },
     {
@@ -3872,6 +4126,7 @@
       "desc_en": "Structure in which items contain other items — nested components, nested routes, a tree of elements.",
       "desc_ja": "要素が別の要素を含む入れ子の構造です。部品や経路、要素の木がこれにあたります。",
       "example_ja": "コンポーネントの階層が深くなりすぎました。",
+      "example_ruby": "コンポーネントの[階層|かいそう]が深くなりすぎました。",
       "example_en": "The component hierarchy got too deep."
     },
     {
@@ -3887,6 +4142,7 @@
       "desc_en": "Moving from one screen or state to another.",
       "desc_ja": "ある画面や状態から別の画面や状態へ移ることです。",
       "example_ja": "ボタンを押すと次の画面に遷移します。",
+      "example_ruby": "ボタンを押すと次の[画面|がめん]に[遷移|せんい]します。",
       "example_en": "Pressing the button navigates to the next screen."
     },
     {
@@ -3902,6 +4158,7 @@
       "desc_en": "A value that names one thing uniquely — an id on a record, on an element, or in a URL.",
       "desc_ja": "一つのものを他と区別して指し示す値です。記録や要素、URLに付ける識別のための値です。",
       "example_ja": "各要素に一意の識別子を付けます。",
+      "example_ruby": "各要素に一意の[識別子|しきべつし]を付けます。",
       "example_en": "We give each element a unique identifier."
     },
     {
@@ -3917,6 +4174,7 @@
       "desc_en": "The secrets proving who you are — a password, a token, a key. Never to be written into source code.",
       "desc_ja": "本人であることを示す秘密の情報です。パスワードやトークン、鍵などが該当し、ソースコードに書いてはいけません。",
       "example_ja": "資格情報をコードに書かないでください。",
+      "example_ruby": "[資格情報|しかくじょうほう]をコードに書かないでください。",
       "example_en": "Please don't write credentials into the code."
     },
     {
@@ -3932,6 +4190,7 @@
       "desc_en": "Transforming data so only a holder of the key can read it.",
       "desc_ja": "鍵を持つ人だけが読めるようにデータを変換することです。",
       "example_ja": "通信は暗号化されています。",
+      "example_ruby": "通信は[暗号化|あんごうか]されています。",
       "example_en": "The communication is encrypted."
     },
     {
@@ -3947,6 +4206,7 @@
       "desc_en": "Turning encrypted data back into the original, using the key.",
       "desc_ja": "鍵を使って、暗号化されたデータを元に戻すことです。",
       "example_ja": "受け取った内容を復号します。",
+      "example_ruby": "受け取った[内容|ないよう]を[復号|ふくごう]します。",
       "example_en": "We decrypt the content we received."
     },
     {
@@ -3962,6 +4222,7 @@
       "desc_en": "A weakness an attacker can use — an unescaped input, a missing permission check.",
       "desc_ja": "攻撃者に利用されうる弱点です。入力の処理漏れや権限確認の不足などが該当します。",
       "example_ja": "この脆弱性は早く直す必要があります。",
+      "example_ruby": "この[脆弱性|ぜいじゃくせい]は早く直す[必要|ひつよう]があります。",
       "example_en": "This vulnerability needs fixing quickly."
     },
     {
@@ -3977,6 +4238,7 @@
       "desc_en": "How much work a system is being asked to do at once.",
       "desc_ja": "システムが同時に処理を求められている量のことです。",
       "example_ja": "アクセスが増えてサーバーの負荷が高くなりました。",
+      "example_ruby": "アクセスが増えてサーバーの[負荷|ふか]が高くなりました。",
       "example_en": "Traffic rose and the load on the server got high."
     },
     {
@@ -3992,6 +4254,7 @@
       "desc_en": "How much data a connection can carry per second.",
       "desc_ja": "接続が一秒あたりに運べるデータの量です。",
       "example_ja": "画像を小さくして帯域幅を節約します。",
+      "example_ruby": "画像を小さくして[帯域幅|たいいきはば]を節約します。",
       "example_en": "We shrink the images to save bandwidth."
     },
     {
@@ -4007,6 +4270,7 @@
       "desc_en": "Moving data from one place to another over a connection.",
       "desc_ja": "接続を通じてデータをある場所から別の場所へ移すことです。",
       "example_ja": "大きなファイルの転送には時間がかかります。",
+      "example_ruby": "大きなファイルの[転送|てんそう]には[時間|じかん]がかかります。",
       "example_en": "Transferring a large file takes time."
     },
     {
@@ -4022,6 +4286,7 @@
       "desc_en": "The delay before a response starts coming back — distinct from how fast it then arrives.",
       "desc_ja": "応答が返り始めるまでの遅れのことです。その後の速さとは別の指標です。",
       "example_ja": "待ち時間が長いと操作が重く感じます。",
+      "example_ruby": "[待ち時間|まちじかん]が長いと[操作|そうさ]が重く感じます。",
       "example_en": "When latency is high, the interface feels sluggish."
     },
     {
@@ -4037,6 +4302,7 @@
       "desc_en": "Deciding where state lives and who may change it, once passing it down by hand stops scaling.",
       "desc_ja": "状態をどこに置き、誰が変更してよいかを決めることです。手渡しで済まなくなった規模で必要になります。",
       "example_ja": "画面が増えたので状態管理を見直します。",
+      "example_ruby": "[画面|がめん]が増えたので[状態管理|じょうたいかんり]を見直します。",
       "example_en": "With more screens, we're revisiting state management."
     },
     {
@@ -4052,6 +4318,7 @@
       "desc_en": "Safe to repeat: doing it twice leaves the same result as doing it once, which is what makes a retry safe.",
       "desc_ja": "繰り返しても安全なことです。二回行っても一回と同じ結果になり、再試行を安全にします。",
       "example_ja": "この操作は冪等なので、再試行しても問題ありません。",
+      "example_ruby": "この[操作|そうさ]は[冪等|べきとう]なので、再試行しても[問題|もんだい]ありません。",
       "example_en": "This operation is idempotent, so retrying is fine."
     },
     {
@@ -4067,6 +4334,7 @@
       "desc_en": "Attempting a failed request again, usually after a growing delay.",
       "desc_ja": "失敗した要求をもう一度試すことです。多くは待ち時間を延ばしながら行います。",
       "example_ja": "通信に失敗したら再試行します。",
+      "example_ruby": "通信に失敗したら[再試行|さいしこう]します。",
       "example_en": "If the request fails, we retry."
     },
     {
@@ -4082,6 +4350,7 @@
       "desc_en": "Spreading requests across several servers so no one of them is overwhelmed.",
       "desc_ja": "要求を複数のサーバーに分けて、一台に偏らないようにすることです。",
       "example_ja": "負荷分散で一台あたりの負荷を下げます。",
+      "example_ruby": "[負荷分散|ふかぶんさん]で一台あたりの負荷を下げます。",
       "example_en": "Load balancing lowers the load on each machine."
     },
     {
@@ -4097,6 +4366,7 @@
       "desc_en": "How long a request takes end to end — what a user actually experiences.",
       "desc_ja": "要求が始まってから終わるまでにかかる時間です。利用者が実際に体感するものです。",
       "example_ja": "応答時間を計測して改善します。",
+      "example_ruby": "[応答時間|おうとうじかん]を計測して改善します。",
       "example_en": "We measure the response time and improve it."
     },
     {
@@ -4112,6 +4382,7 @@
       "desc_en": "The agreed description of what something should do — the thing you check your work against when you think you're finished.",
       "desc_ja": "何をどう作るべきかを定めた合意された記述です。完成したと思ったときに照らし合わせるものです。",
       "example_ja": "仕様を確認してから実装を始めます。",
+      "example_ruby": "[仕様|しよう]を[確認|かくにん]してから[実装|じっそう]を始めます。",
       "example_en": "I check the specification before starting to implement."
     },
     {
@@ -4127,6 +4398,7 @@
       "desc_en": "Something the finished work must satisfy, stated before the design rather than discovered after it.",
       "desc_ja": "完成したものが満たすべき条件です。設計の前に定めるもので、後から気づくものではありません。",
       "example_ja": "この機能の要件をまとめてください。",
+      "example_ruby": "この[機能|きのう]の[要件|ようけん]をまとめてください。",
       "example_en": "Please write up the requirements for this feature."
     },
     {
@@ -4142,6 +4414,7 @@
       "desc_en": "How long a piece of work is expected to take — a forecast, not a promise.",
       "desc_ja": "ある作業にどれくらいかかるかの予想です。約束ではなく見通しです。",
       "example_ja": "この作業の見積もりは三日です。",
+      "example_ruby": "この[作業|さぎょう]の[見積もり|みつもり]は三日です。",
       "example_en": "The estimate for this work is three days."
     },
     {
@@ -4157,6 +4430,7 @@
       "desc_en": "Behaviour that differs from the specification. The everyday written word where speech would often use バグ.",
       "desc_ja": "仕様と違う動きのことです。話し言葉では「バグ」と言うところを、文書ではこちらを使います。",
       "example_ja": "報告された不具合を修正しました。",
+      "example_ruby": "報告された[不具合|ふぐあい]を[修正|しゅうせい]しました。",
       "example_en": "I fixed the reported defect."
     },
     {
@@ -4172,6 +4446,7 @@
       "desc_en": "What changed between two versions — what a reviewer actually reads.",
       "desc_ja": "二つの版の間で変わった部分です。レビューで実際に読まれるものです。",
       "example_ja": "差分を見れば変更点がすぐ分かります。",
+      "example_ruby": "[差分|さぶん]を見れば[変更|へんこう]点がすぐ分かります。",
       "example_en": "Looking at the diff shows the changes at once."
     },
     {
@@ -4187,6 +4462,7 @@
       "desc_en": "Checking that something actually holds, rather than assuming it does.",
       "desc_ja": "本当にそうなっているかを、仮定せずに確かめることです。",
       "example_ja": "入力データを検証します。",
+      "example_ruby": "入力データを[検証|けんしょう]します。",
       "example_en": "We validate the input data."
     },
     {
@@ -4202,6 +4478,7 @@
       "desc_en": "Deciding the shape of a solution — the pieces and how they fit — before writing it.",
       "desc_ja": "書き始める前に、解決策の形（どんな部品をどう組むか）を決めることです。",
       "example_ja": "実装の前に設計を見直しましょう。",
+      "example_ruby": "[実装|じっそう]の前に[設計|せっけい]を見直しましょう。",
       "example_en": "Let's review the design before implementing."
     },
     {
@@ -4217,6 +4494,7 @@
       "desc_en": "The meeting after a piece of work where the team asks what to keep doing and what to change.",
       "desc_ja": "ある区切りの後で、続けることと変えることをチームで話し合う場です。",
       "example_ja": "毎週金曜日に振り返りを行います。",
+      "example_ruby": "毎週金曜日に[振り返り|ふりかえり]を行います。",
       "example_en": "We hold a retrospective every Friday."
     },
     {
@@ -4232,6 +4510,7 @@
       "desc_en": "Something known to need resolving — tracked rather than forgotten. Broader than a bug.",
       "desc_ja": "解決が必要だと分かっていることです。忘れずに管理します。不具合よりも広い意味を持ちます。",
       "example_ja": "残っている課題を一覧にまとめます。",
+      "example_ruby": "残っている[課題|かだい]を[一覧|いちらん]にまとめます。",
       "example_en": "We list up the remaining issues."
     },
     {
@@ -4247,6 +4526,7 @@
       "desc_en": "How far along a piece of work is — the standing question in a standup.",
       "desc_ja": "作業がどこまで進んだかということです。朝会で必ず聞かれることです。",
       "example_ja": "今週の進捗を報告してください。",
+      "example_ruby": "[今週|こんしゅう]の[進捗|しんちょく]を報告してください。",
       "example_en": "Please report this week's progress."
     },
     {
@@ -4262,6 +4542,7 @@
       "desc_en": "Whose work an item is — named, so it has an owner rather than being everyone's.",
       "desc_ja": "その項目を誰が受け持つかということです。名前を決めることで、誰のものでもない状態を防ぎます。",
       "example_ja": "この機能は私が担当します。",
+      "example_ruby": "この[機能|きのう]は私が[担当|たんとう]します。",
       "example_en": "I'll be in charge of this feature."
     },
     {
@@ -4277,6 +4558,7 @@
       "desc_en": "The date something is due to be delivered to whoever is waiting for it.",
       "desc_ja": "待っている相手に届けると決めた期日です。",
       "example_ja": "納期に間に合うか確認してください。",
+      "example_ruby": "[納期|のうき]に間に合うか[確認|かくにん]してください。",
       "example_en": "Please check whether we'll make the delivery deadline."
     },
     {
@@ -4292,6 +4574,7 @@
       "desc_en": "The point at which everyone involved actually accepts a decision — distinct from having announced it.",
       "desc_ja": "関係者が実際に決定を受け入れた状態です。伝えただけの状態とは違います。",
       "example_ja": "設計について合意が取れました。",
+      "example_ruby": "設計について[合意|ごうい]が取れました。",
       "example_en": "We reached agreement on the design."
     },
     {
@@ -4307,6 +4590,7 @@
       "desc_en": "Telling the people who need to know — the standard verb for circulating information in a Japanese workplace.",
       "desc_ja": "知っておくべき人に伝えることです。日本の職場で情報を回すときの標準的な言い方です。",
       "example_ja": "結果をチームに共有します。",
+      "example_ruby": "[結果|けっか]をチームに[共有|きょうゆう]します。",
       "example_en": "I'll share the results with the team."
     },
     {
@@ -4322,6 +4606,7 @@
       "desc_en": "Which of several things should be done first.",
       "desc_ja": "複数あるうち、どれを先に行うべきかの度合いです。",
       "example_ja": "この不具合は優先度が高いです。",
+      "example_ruby": "この不具合は[優先度|ゆうせんど]が高いです。",
       "example_en": "This defect is high priority."
     },
     {
@@ -4337,6 +4622,7 @@
       "desc_en": "The time by which something must be done. The general word; 納期 is specifically a delivery date.",
       "desc_ja": "それまでに終わらせなければならない時点です。一般的な言い方で、納期は特に納品の期日を指します。",
       "example_ja": "締め切りは今週の金曜日です。",
+      "example_ruby": "[締め切り|しめきり]は[今週|こんしゅう]の金曜日です。",
       "example_en": "The deadline is this Friday."
     },
     {
@@ -4352,6 +4638,7 @@
       "desc_en": "The amount of person-time a task costs — the unit estimates are argued in.",
       "desc_ja": "ある作業にかかる人の時間の量です。見積もりで話題になる単位です。",
       "example_ja": "この変更は工数がかかりすぎます。",
+      "example_ruby": "この[変更|へんこう]は[工数|こうすう]がかかりすぎます。",
       "example_en": "This change takes too much effort."
     },
     {
@@ -4367,6 +4654,7 @@
       "desc_en": "Telling someone the state of things, especially upwards. One of the 報・連・相 trio.",
       "desc_ja": "状況を、特に上司に伝えることです。「報・連・相」の一つです。",
       "example_ja": "進捗を報告します。",
+      "example_ruby": "進捗を[報告|ほうこく]します。",
       "example_en": "I'll report on the progress."
     },
     {
@@ -4382,6 +4670,7 @@
       "desc_en": "Asking someone before deciding — the third of 報・連・相, and the one that prevents the most rework.",
       "desc_ja": "決める前に誰かに相談することです。「報・連・相」の一つで、手戻りを最も防ぎます。",
       "example_ja": "設計について相談したいです。",
+      "example_ruby": "設計について[相談|そうだん]したいです。",
       "example_en": "I'd like to consult you about the design."
     },
     {
@@ -4397,6 +4686,7 @@
       "desc_en": "The written record of what a meeting decided, and who will do what next.",
       "desc_ja": "会議で何が決まり、誰が次に何をするかを書き残したものです。",
       "example_ja": "会議の議事録を共有します。",
+      "example_ruby": "会議の[議事録|ぎじろく]を共有します。",
       "example_en": "I'll share the minutes of the meeting."
     },
     {
@@ -4412,6 +4702,7 @@
       "desc_en": "What a person or a class is answerable for — the word behind the single-responsibility principle.",
       "desc_ja": "人やクラスが負うべき役割のことです。単一責任の原則の「責任」です。",
       "example_ja": "このクラスは責任を持ちすぎています。",
+      "example_ruby": "このクラスは[責任|せきにん]を持ちすぎています。",
       "example_en": "This class has too many responsibilities."
     },
     {
@@ -4427,6 +4718,7 @@
       "desc_en": "The sign-off that lets something proceed — a review approving a change, for instance.",
       "desc_ja": "先に進んでよいという許可です。レビューで変更が認められることなどを指します。",
       "example_ja": "レビューの承認を待っています。",
+      "example_ruby": "レビューの[承認|しょうにん]を待っています。",
       "example_en": "I'm waiting for the review approval."
     },
     {
@@ -4442,6 +4734,7 @@
       "desc_en": "Making something incrementally better on purpose — the ordinary Japanese word that English borrowed.",
       "desc_ja": "意識して少しずつ良くしていくことです。英語がそのまま借用した語です。",
       "example_ja": "手順の改善を提案します。",
+      "example_ruby": "手順の[改善|かいぜん]を提案します。",
       "example_en": "I'd like to propose an improvement to the process."
     },
     {
@@ -4457,6 +4750,7 @@
       "desc_en": "Doing whatever a situation requires — an enormously common word covering fixing, supporting and responding.",
       "desc_ja": "状況に応じて必要なことを行うことです。修正、支援、返答まで幅広く使われる非常によく使う語です。",
       "example_ja": "この不具合には明日対応します。",
+      "example_ruby": "この不具合には明日[対応|たいおう]します。",
       "example_en": "I'll deal with this defect tomorrow."
     },
     {
@@ -4472,6 +4766,7 @@
       "desc_en": "Working out the differences between people or parts so they fit — of schedules, of scope, of numbers.",
       "desc_ja": "人や要素の間の食い違いを合わせることです。日程、範囲、数値などについて使います。",
       "example_ja": "関係者と日程を調整します。",
+      "example_ruby": "関係者と日程を[調整|ちょうせい]します。",
       "example_en": "I'll coordinate the schedule with everyone involved."
     },
     {
@@ -4487,6 +4782,7 @@
       "desc_en": "Passing work to someone else with enough context that they can actually continue it.",
       "desc_ja": "他の人が続けられるだけの背景とともに、作業を引き渡すことです。",
       "example_ja": "来週から担当が変わるので引き継ぎをします。",
+      "example_ruby": "来週から担当が変わるので[引き継ぎ|ひきつぎ]をします。",
       "example_en": "The owner changes next week, so I'm doing a handover."
     },
     {
@@ -4502,6 +4798,7 @@
       "desc_en": "The point by which something is expected. The general word behind both 納期 and 締め切り.",
       "desc_ja": "それまでに終わっていることが期待される時点です。納期や締め切りの土台になる一般的な語です。",
       "example_ja": "期限までに終わりそうにありません。",
+      "example_ruby": "[期限|きげん]までに終わりそうにありません。",
       "example_en": "It doesn't look like it'll be done by the due date."
     },
     {
@@ -4517,6 +4814,7 @@
       "desc_en": "The underlying reason a defect happened, as against the symptom that was reported.",
       "desc_ja": "報告された症状ではなく、不具合が起きた本当の理由のことです。",
       "example_ja": "根本原因を調べてから修正します。",
+      "example_ruby": "[根本原因|こんぽんげんいん]を調べてから[修正|しゅうせい]します。",
       "example_en": "We investigate the root cause before fixing it."
     },
     {
@@ -4532,6 +4830,7 @@
       "desc_en": "The change that stops the same defect happening again — a test, a check, a changed process. Expected after any serious incident.",
       "desc_ja": "同じ不具合が二度と起きないようにする対策です。試験や確認、手順の変更などで、重大な障害の後には必ず求められます。",
       "example_ja": "再発防止のために試験を追加しました。",
+      "example_ruby": "[再発防止|さいはつぼうし]のために[試験|しけん]を[追加|ついか]しました。",
       "example_en": "We added a test to prevent a recurrence."
     },
     {
@@ -4547,6 +4846,7 @@
       "desc_en": "Arranging the order and the prerequisites of work before starting it, so it runs without stalling.",
       "desc_ja": "作業を始める前に、順序と前提を整えておくことです。途中で止まらずに進められます。",
       "example_ja": "作業の段取りを決めてから始めます。",
+      "example_ruby": "[作業|さぎょう]の[段取り|だんどり]を決めてから始めます。",
       "example_en": "We settle the plan before starting the work."
     }
   ]

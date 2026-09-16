@@ -215,6 +215,9 @@ export interface JpVocabWord {
   desc_ja: string;
   /** Always contains `term`, so it can be highlighted. */
   example_ja: string;
+  /** `example_ja` with readings marked as `[漢字|かな]`. Stripping the markup
+   * reproduces `example_ja` exactly — asserted at generation. */
+  example_ruby: string;
   example_en: string;
 }
 

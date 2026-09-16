@@ -656,6 +656,10 @@ pub struct JpVocabWord {
     pub desc_ja: String,
     #[serde(default)]
     pub example_ja: String,
+    /// `example_ja` with readings marked inline as `[漢字|かな]`, for the card's
+    /// <ruby> rendering. The plain form above is what everything else uses.
+    #[serde(default)]
+    pub example_ruby: String,
     #[serde(default)]
     pub example_en: String,
 }

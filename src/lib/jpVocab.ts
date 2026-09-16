@@ -103,6 +103,40 @@ export function splitOnTerm(sentence: string, term: string): { text: string; hit
   return parts;
 }
 
+/* ------------------------------------------------------------------- ruby */
+
+/** One run of an example sentence. `reading` is present only where the
+ * generator knew the reading for certain. */
+export interface RubySegment {
+  text: string;
+  reading?: string;
+}
+
+const RUBY_RE = /\[([^|[\]]+)\|([^|[\]]+)\]/g;
+
+/**
+ * Parse `[漢字|かな]` markup into segments. Anything outside the brackets is a
+ * plain segment with no reading, and malformed input is simply treated as
+ * plain text — a sentence always renders, with or without its readings.
+ */
+export function parseRuby(s: string): RubySegment[] {
+  const out: RubySegment[] = [];
+  let last = 0;
+  for (const m of s.matchAll(RUBY_RE)) {
+    const at = m.index ?? 0;
+    if (at > last) out.push({ text: s.slice(last, at) });
+    out.push({ text: m[1], reading: m[2] });
+    last = at + m[0].length;
+  }
+  if (last < s.length) out.push({ text: s.slice(last) });
+  return out;
+}
+
+/** The sentence with its markup removed. */
+export function stripRuby(s: string): string {
+  return s.replace(RUBY_RE, "$1");
+}
+
 /* ------------------------------------------------------------ study modes */
 
 /** What a cloze prompt puts where the term was. */

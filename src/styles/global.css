@@ -1030,6 +1030,19 @@ table.sqlgrid tbody tr.diff td {
 .jpv-example-ja {
   font-size: 16px;
 }
+/* Furigana. `ruby-position` keeps the readings above the line in every engine,
+   and hiding <rt> collapses them without reflowing the sentence. */
+.jpv-example-ja ruby {
+  ruby-position: over;
+}
+.jpv-example-ja rt {
+  font-size: 0.55em;
+  color: var(--accent);
+  user-select: none;
+}
+.jpv-example-ja.jpv-ruby-off rt {
+  display: none;
+}
 .jpv-example-ja mark {
   padding: 0 2px;
   border-radius: 3px;

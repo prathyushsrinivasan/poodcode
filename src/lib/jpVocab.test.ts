@@ -7,8 +7,10 @@ import {
   filterVocab,
   levelCounts,
   matchesQuery,
+  parseRuby,
   readyWords,
   shuffleWith,
+  stripRuby,
   splitOnTerm,
   stateCounts,
   tagCounts,
@@ -29,6 +31,7 @@ const word = (over: Partial<JpVocabWord>): JpVocabWord => ({
   desc_en: "",
   desc_ja: "",
   example_ja: "",
+  example_ruby: "",
   example_en: "",
   ...over,
 });
@@ -201,6 +204,37 @@ describe("stateCounts", () => {
       learning: 1,
       ready: 2,
     });
+  });
+});
+
+describe("parseRuby", () => {
+  it("splits annotated runs from plain ones", () => {
+    expect(parseRuby("[配列|はいれつ]が与えられます。")).toEqual([
+      { text: "配列", reading: "はいれつ" },
+      { text: "が与えられます。" },
+    ]);
+  });
+
+  it("treats a sentence with no markup as one plain segment", () => {
+    expect(parseRuby("型は実行時には存在しません。")).toEqual([
+      { text: "型は実行時には存在しません。" },
+    ]);
+  });
+
+  it("keeps several annotations in order", () => {
+    const segs = parseRuby("[関数|かんすう]に[引数|ひきすう]を渡します。");
+    expect(segs.filter((s) => s.reading).map((s) => s.text)).toEqual(["関数", "引数"]);
+    expect(segs[segs.length - 1]).toEqual({ text: "を渡します。" });
+  });
+});
+
+describe("stripRuby", () => {
+  it("reproduces the plain sentence exactly", () => {
+    expect(stripRuby("[配列|はいれつ]が[与|あた]えられます。")).toBe("配列が与えられます。");
+  });
+
+  it("is a no-op on text that carries no markup", () => {
+    expect(stripRuby("答えを一行で出力してください。")).toBe("答えを一行で出力してください。");
   });
 });
 

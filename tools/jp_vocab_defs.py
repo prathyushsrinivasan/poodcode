@@ -1262,6 +1262,77 @@ _JPV_KATAKANA = _jpv_re.compile(r"[゠-ヿㇰ-ㇿｦ-ﾟ]")
 _JPV_HIRAGANA = _jpv_re.compile(r"^[ぁ-ゟ]+$")
 
 
+# ---------------------------------------------------------------------------
+# Ruby (furigana) for the example sentences.
+#
+# `example_ruby` is `example_ja` with readings marked inline as [漢字|かな]. The
+# flashcard renders it as <ruby>; the glossary tables, the term-containment
+# guard and search all keep using the plain `example_ja`. That is why they are
+# two fields rather than one: the Markdown renderer has no rehype-raw, so ruby
+# must never reach a glossary table.
+#
+# WHAT GETS ANNOTATED — and deliberately nothing else:
+#   * the word's own term, whose reading is authoritative: it is the headword
+#   * the compounds in _JPV_RUBY below, each one authored or taken from a
+#     glossary reading the Step 4a guard already holds to agree with this list
+#
+# WHAT DOES NOT: a single kanji standing in a verb stem. 使 is つか in 使います
+# but しよう in 使用; 生 is せい in 生成 and う in 生まれる. Guessing those is
+# exactly how a reading track teaches somebody something false, so an
+# unannotated kanji renders plain — degraded, never wrong.
+# ---------------------------------------------------------------------------
+_JPV_RUBY = {
+    # -- taken from the glossary sets' own readings --
+    "引数": "ひきすう", "実行": "じっこう", "画面": "がめん", "関数": "かんすう",
+    "判定": "はんてい", "実装": "じっそう", "文字列": "もじれつ", "処理": "しょり",
+    "代入": "だいにゅう", "複製": "ふくせい", "条件": "じょうけん", "比較": "ひかく",
+    "発生": "はっせい", "変数": "へんすう", "整数": "せいすう", "問題": "もんだい",
+    "数値": "すうち", "変更": "へんこう", "機能": "きのう", "修正": "しゅうせい",
+    # -- authored here --
+    "必要": "ひつよう", "結果": "けっか", "操作": "そうさ", "確認": "かくにん",
+    "追加": "ついか", "共通": "きょうつう", "保存": "ほぞん", "試験": "しけん",
+    "顧客": "こきゃく", "給与": "きゅうよ", "利用者": "りようしゃ",
+    "範囲外": "はんいがい", "安全": "あんぜん", "残高": "ざんだか",
+    "最大": "さいだい", "点数": "てんすう", "解法": "かいほう", "簡単": "かんたん",
+    "文字": "もじ", "存在": "そんざい", "名前": "なまえ", "日付": "ひづけ",
+    "注文": "ちゅうもん", "一覧": "いちらん", "内容": "ないよう", "時間": "じかん",
+    "作業": "さぎょう", "今週": "こんしゅう",
+}
+
+_JPV_RUBY_RE = _jpv_re.compile(r"\[([^|\[\]]+)\|([^|\[\]]+)\]")
+_JPV_KANJI_ONLY = _jpv_re.compile(r"^[一-龥々]+$")
+
+
+def _jpv_strip_ruby(s):
+    """[配列|はいれつ]が -> 配列が"""
+    return _JPV_RUBY_RE.sub(r"\1", s)
+
+
+def _jpv_ruby(sentence, term, reading):
+    """Annotate a sentence with [漢字|かな], longest match first so 利用者 wins
+    over 利用. The headword's own reading is added to the table for this call,
+    so the term is always annotated and always from its own entry."""
+    table = dict(_JPV_RUBY)
+    table[term] = reading
+    keys = sorted(table, key=len, reverse=True)
+    out, i = [], 0
+    while i < len(sentence):
+        for k in keys:
+            if sentence.startswith(k, i):
+                out.append(f"[{k}|{table[k]}]")
+                i += len(k)
+                break
+        else:
+            out.append(sentence[i])
+            i += 1
+    return "".join(out)
+
+
+for _rk, _rv in _JPV_RUBY.items():
+    assert _JPV_KANJI_ONLY.match(_rk), f"ruby key must be kanji only: {_rk!r}"
+    assert _JPV_HIRAGANA.match(_rv), f"ruby reading must be hiragana: {_rk!r} -> {_rv!r}"
+
+
 def _jpv_slug(romaji):
     """"kata hikisū" -> "kata-hikisu" — a stable, ASCII, URL-safe id."""
     s = _jpv_ud.normalize("NFKD", romaji)
@@ -1421,6 +1492,19 @@ def _jpv_build():
             assert not _JPV_KATAKANA.search(term), f"vocab term must not be katakana: {term!r}"
             assert _JPV_HIRAGANA.match(reading), f"vocab reading must be hiragana: {term!r} -> {reading!r}"
             assert term in ex_ja, f"example sentence must contain the term {term!r}: {ex_ja!r}"
+            # Ruby markup uses [ | ], so the plain sentence may not contain them.
+            for ch in "[]|":
+                assert ch not in ex_ja, f"{ch!r} in an example sentence breaks ruby markup: {ex_ja!r}"
+            ruby = _jpv_ruby(ex_ja, term, reading)
+            # The one invariant that makes ruby safe: annotating never changes
+            # the sentence, it only records how to read parts of it.
+            assert _jpv_strip_ruby(ruby) == ex_ja, (
+                f"ruby markup altered the sentence for {term!r}:\n  {ex_ja!r}\n  {ruby!r}"
+            )
+            for _surface, _read in _JPV_RUBY_RE.findall(ruby):
+                assert _JPV_HIRAGANA.match(_read), (
+                    f"ruby reading must be hiragana: {term!r} -> {_surface!r}/{_read!r}"
+                )
             wid = _jpv_slug(romaji)
             assert term not in seen_terms, f"duplicate vocab term {term!r}"
             assert wid not in seen_ids, f"duplicate vocab id {wid!r} ({term!r})"
@@ -1451,6 +1535,7 @@ def _jpv_build():
                 "desc_en": desc_en,
                 "desc_ja": desc_ja,
                 "example_ja": ex_ja,
+                "example_ruby": ruby,
                 "example_en": ex_en,
             })
 
