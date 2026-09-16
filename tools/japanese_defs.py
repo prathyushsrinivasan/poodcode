@@ -40,30 +40,83 @@ def _jp_table(rows):
     return "\n".join(out) + "\n"
 
 
-def _jp_cards(rows):
+# ---------------------------------------------------------------------------
+# One source per word.
+#
+# ~46 of the terms below are ALSO authored as vocabulary words in
+# jp_vocab_defs.py, which gen_seed.py runs first. Where a term appears in both,
+# the vocabulary entry wins: the glossary row becomes a view of it, showing that
+# word's reading, meaning and example, and its card carries the vocabulary
+# word's card id — so studying 配列 here and in the vocabulary list advances one
+# schedule instead of two under different ids.
+#
+# gen_seed.py separately asserts that the readings in both files agree, which is
+# what makes substituting silently safe.
+# ---------------------------------------------------------------------------
+_JPV_BY_TERM = {w["term"]: w for w in globals().get("JP_VOCAB", {}).get("words", [])}
+
+# (concept, term) pairs where this set genuinely means something ELSE by the
+# word, so the vocabulary entry must not be substituted:
+#   同期 here is "synchronous", in the TypeScript async chapter. The vocabulary
+#   word is Java's 同期 — thread synchronization. Same kanji, different idea.
+_JPV_NOT_SHARED = {
+    ("jp_ts_functions", "同期"),
+}
+_JPV_NOT_SHARED_SEEN = set()
+
+
+def _jp_share(key, rows):
+    """Rewrite each row whose term is also a vocabulary word into a view of that
+    word. Returns the rows to display, and the card id for each — an empty id
+    meaning "key this card the usual way, by concept key and front"."""
+    out_rows, card_ids = [], []
+    for row in rows:
+        term = row[0]
+        word = _JPV_BY_TERM.get(term)
+        if word is not None and (key, term) in _JPV_NOT_SHARED:
+            _JPV_NOT_SHARED_SEEN.add((key, term))
+            word = None
+        if word is None:
+            out_rows.append(row)
+            card_ids.append("")
+            continue
+        out_rows.append((
+            term,
+            f"{word['reading']} ({word['romaji']})",
+            word["meaning"],
+            word["example_ja"],
+            word["example_en"],
+        ))
+        card_ids.append(f"jp-vocab#{word['id']}")
+    return out_rows, card_ids
+
+
+def _jp_cards(rows, card_ids):
     """Structured flashcard data for a concept — the same rows the glossary
     table shows, so the Learn tab can offer a card-study mode over them."""
     return [
         {
             "front": term,
+            "card_id": card_id,
             "reading": reading,
             "meaning": meaning,
             "example_ja": ja,
             "example_en": en,
         }
-        for (term, reading, meaning, ja, en) in rows
+        for (term, reading, meaning, ja, en), card_id in zip(rows, card_ids)
     ]
 
 
 def _jp_concept(key, name, category, what, deep, note, rows, intro=""):
     """Register one Japanese vocabulary concept (lesson = intro + table)."""
+    rows, card_ids = _jp_share(key, rows)
     CONCEPTS[key] = {
         "name": name,
         "what": what,
         "deep": deep,
         "java": note,          # repurposed: shown under the dynamic "How to read this" card
         "language": JP_LANG,
-        "cards": _jp_cards(rows),   # structured cards for flashcard study mode
+        "cards": _jp_cards(rows, card_ids),  # structured cards for flashcard study mode
     }
     CATEGORY[key] = category
     lesson = (intro.strip() + "\n\n") if intro else ""
@@ -567,4 +620,11 @@ _jp_concept(
         ("再利用", "さいりよう (sairiyō)", "reuse", "コンポーネントを再利用します。", "We reuse the component."),
         ("端末", "たんまつ (tanmatsu)", "terminal", "端末でコマンドを実行します。", "We run commands in the terminal."),
     ],
+)
+
+# An opt-out that no longer matches anything is a stale claim about the content,
+# so it fails the build rather than sitting here being quietly wrong.
+assert _JPV_NOT_SHARED_SEEN == _JPV_NOT_SHARED, (
+    "_JPV_NOT_SHARED entries never matched a row: "
+    f"{sorted(_JPV_NOT_SHARED - _JPV_NOT_SHARED_SEEN)}"
 )

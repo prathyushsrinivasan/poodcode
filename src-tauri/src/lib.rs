@@ -376,6 +376,7 @@ pub fn run() {
             commands::grade_flashcard,
             commands::delete_flashcard,
             commands::card_reviews,
+            commands::merge_card_reviews,
             commands::grade_card,
             commands::reset_cards,
             commands::jp_bridge,

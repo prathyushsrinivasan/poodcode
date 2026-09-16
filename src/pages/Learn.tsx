@@ -26,6 +26,7 @@ import {
 } from "../components/SqlGrid";
 import {
   loadDoneChapters,
+  migrateVocabCardIds,
   setChapterDone,
   solvedExercises,
   markExerciseSolved,
@@ -154,7 +155,15 @@ export default function Learn() {
   }
 
   useEffect(() => {
-    api.concepts().then(setConcepts).catch(() => {});
+    api
+      .concepts()
+      .then((cs) => {
+        setConcepts(cs);
+        // Fold any pre-existing glossary review rows onto the vocabulary card
+        // ids that replaced them. Guarded internally, so this runs once.
+        migrateVocabCardIds(cs).catch(() => {});
+      })
+      .catch(() => {});
     api.jpVocab().then(setVocab).catch(() => {});
     api.listProblems().then(setProblems).catch(() => {});
     api

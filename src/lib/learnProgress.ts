@@ -12,6 +12,7 @@
 // repetition in SQLite (the `card_reviews` table + api.cardReviews/gradeCard).
 
 import { api } from "../api";
+import type { Concept } from "../types";
 
 const LEGACY_DONE_KEY = "poodcode:learn-done"; // pre-migration JSON array
 const MIGRATED_KEY = "poodcode:learn-done-migrated";
@@ -61,6 +62,31 @@ export async function setChapterDone(
 /** Stable id for a vocabulary card: concept key + the term on its front. */
 export function cardId(conceptKey: string, front: string): string {
   return `${conceptKey}#${front}`;
+}
+
+const VOCAB_IDS_MIGRATED_KEY = "poodcode:jp-vocab-ids-migrated";
+
+/**
+ * One-off: a glossary card for a term that is also a 日本語 vocabulary word used
+ * to schedule under `<concept>#<term>`. It now carries the vocabulary word's id
+ * so the two are one card rather than two schedules for one word — which means
+ * the old rows would otherwise be orphaned and the learner's history would
+ * silently reset.
+ *
+ * Several old ids can land on the same new one (継承 was a card in two sets), so
+ * the backend merges rather than renames. The flag is set only after the call
+ * succeeds, so a failed run is simply retried on the next launch.
+ */
+export async function migrateVocabCardIds(concepts: Concept[]): Promise<void> {
+  if (localStorage.getItem(VOCAB_IDS_MIGRATED_KEY) === "1") return;
+  const moves: [string, string][] = [];
+  for (const c of concepts) {
+    for (const card of c.cards ?? []) {
+      if (card.card_id) moves.push([cardId(c.key, card.front), card.card_id]);
+    }
+  }
+  if (moves.length > 0) await api.mergeCardReviews(moves);
+  localStorage.setItem(VOCAB_IDS_MIGRATED_KEY, "1");
 }
 
 // Per-exercise "solved once" marks. Like the exercise DRAFTS above, this is a

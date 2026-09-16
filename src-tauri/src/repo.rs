@@ -1193,6 +1193,66 @@ pub fn grade_card(conn: &Connection, card_id: &str, quality: i64) -> AppResult<C
     })
 }
 
+/// Fold one card's review history onto another card id, keeping whichever has
+/// been studied more, and delete the old row. Returns how many rows moved.
+///
+/// Used once, when a glossary card became a view of a 日本語 vocabulary word and
+/// the two schedules collapsed into one. It MERGES rather than renames because
+/// several old ids can land on the same new one — 継承 was a card in both the
+/// Java Language and the TS Types set — and a plain rename would collide on the
+/// primary key and lose whichever came second.
+pub fn merge_card_reviews(conn: &Connection, moves: &[(String, String)]) -> AppResult<usize> {
+    let tx = conn.unchecked_transaction()?;
+    let mut moved = 0usize;
+    for (from, to) in moves {
+        if from == to {
+            continue;
+        }
+        let src: Option<(f64, i64, i64, i64, String, i64)> = tx
+            .query_row(
+                "SELECT ease, reps, lapses, interval_days, due_date, last_quality
+                 FROM card_reviews WHERE card_id = ?1",
+                params![from],
+                |r| {
+                    Ok((
+                        r.get(0)?,
+                        r.get(1)?,
+                        r.get(2)?,
+                        r.get(3)?,
+                        r.get(4)?,
+                        r.get(5)?,
+                    ))
+                },
+            )
+            .optional()?;
+        let Some((ease, reps, lapses, interval, due, quality)) = src else {
+            continue;
+        };
+        let dst_reps: Option<i64> = tx
+            .query_row(
+                "SELECT reps FROM card_reviews WHERE card_id = ?1",
+                params![to],
+                |r| r.get(0),
+            )
+            .optional()?;
+        // The destination keeps its own history unless the row being folded in
+        // has been studied more often.
+        if dst_reps.map_or(true, |d| reps > d) {
+            tx.execute(
+                "INSERT INTO card_reviews(card_id, ease, reps, lapses, interval_days, due_date, last_quality)
+                 VALUES(?1,?2,?3,?4,?5,?6,?7)
+                 ON CONFLICT(card_id) DO UPDATE SET
+                   ease=?2, reps=?3, lapses=?4, interval_days=?5, due_date=?6, last_quality=?7",
+                params![to, ease, reps, lapses, interval, due, quality],
+            )?;
+        }
+        tx.execute("DELETE FROM card_reviews WHERE card_id = ?1", params![from])?;
+        moved += 1;
+    }
+    tx.commit()?;
+    Ok(moved)
+}
+
 /// Forget all scheduling for a set of cards (used by "reset progress").
 pub fn reset_cards(conn: &Connection, card_ids: &[String]) -> AppResult<()> {
     let tx = conn.unchecked_transaction()?;

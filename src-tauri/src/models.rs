@@ -67,6 +67,11 @@ pub struct PracticeRef {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Card {
     pub front: String,
+    /// Set when this card is a view of a vocabulary word, so the two schedule
+    /// as one card instead of twice under different ids. Empty means the card
+    /// is keyed the usual way, by concept key and front.
+    #[serde(default)]
+    pub card_id: String,
     #[serde(default)]
     pub reading: String,
     #[serde(default)]

@@ -648,6 +648,16 @@ pub fn reset_cards(state: State<'_, AppState>, card_ids: Vec<String>) -> AppResu
     repo::reset_cards(&state.conn(), &card_ids)
 }
 
+/// One-off: fold old `<concept>#<term>` review rows onto the vocabulary card
+/// ids that replaced them. Idempotent — a second run finds nothing to move.
+#[tauri::command]
+pub fn merge_card_reviews(
+    state: State<'_, AppState>,
+    moves: Vec<(String, String)>,
+) -> AppResult<usize> {
+    repo::merge_card_reviews(&state.conn(), &moves)
+}
+
 #[tauri::command]
 pub fn reschedule_review(
     state: State<'_, AppState>,

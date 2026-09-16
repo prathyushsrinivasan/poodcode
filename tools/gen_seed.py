@@ -6027,6 +6027,18 @@ if os.path.exists(_tsc_path):
 # marked "language": "japanese". Extends CONCEPTS / CATEGORY / LESSONS in
 # place. No SEED_VERSION / SQLite impact — concepts are embedded JSON.
 # ---------------------------------------------------------------------------
+# Japanese core vocabulary — the first section of the 日本語 Learn view: tagged,
+# non-katakana words, each a flashcard. Defines JP_VOCAB; written to
+# seeds/jp_vocab.json.
+#
+# MUST run before japanese_defs.py: the vocabulary list is the canonical source
+# for any word the two share, and the glossary sets read JP_VOCAB to build
+# themselves (see _jp_share there).
+_jpv_path = os.path.join(HERE, "jp_vocab_defs.py")
+if os.path.exists(_jpv_path):
+    with open(_jpv_path, encoding="utf-8") as _jpvf:
+        exec(compile(_jpvf.read(), _jpv_path, "exec"))
+
 _jp_path = os.path.join(HERE, "japanese_defs.py")
 if os.path.exists(_jp_path):
     with open(_jp_path, encoding="utf-8") as _jpf:
@@ -6038,14 +6050,6 @@ _jpb_path = os.path.join(HERE, "japanese_bridge.py")
 if os.path.exists(_jpb_path):
     with open(_jpb_path, encoding="utf-8") as _jpbf:
         exec(compile(_jpbf.read(), _jpb_path, "exec"))
-
-# Japanese core vocabulary — the first section of the 日本語 Learn view: 100
-# tagged, non-katakana words, each a flashcard. Defines JP_VOCAB; written to
-# seeds/jp_vocab.json next to the bridge.
-_jpv_path = os.path.join(HERE, "jp_vocab_defs.py")
-if os.path.exists(_jpv_path):
-    with open(_jpv_path, encoding="utf-8") as _jpvf:
-        exec(compile(_jpvf.read(), _jpv_path, "exec"))
 
 
 # ---------------------------------------------------------------------------

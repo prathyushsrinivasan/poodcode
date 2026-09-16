@@ -213,6 +213,9 @@ export const api = {
   gradeCard: (cardId: string, quality: number) =>
     invoke<CardReview>("grade_card", { cardId, quality }),
   resetCards: (cardIds: string[]) => invoke<void>("reset_cards", { cardIds }),
+  /** One-off: fold old card ids onto the ones that replaced them. */
+  mergeCardReviews: (moves: [string, string][]) =>
+    invoke<number>("merge_card_reviews", { moves }),
 
   // Japanese → Java bridge (problem statements in Japanese + interview Q&A)
   jpBridge: () => invoke<JpBridge>("jp_bridge"),

@@ -148,6 +148,9 @@ export interface SqlTable {
 
 export interface Card {
   front: string;
+  /** Set when the card is a view of a 日本語 vocabulary word, so the two
+   * schedule as one card. Absent means "key it by concept and front". */
+  card_id?: string;
   reading: string;
   meaning: string;
   example_ja: string;

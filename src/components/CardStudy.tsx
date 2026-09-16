@@ -76,7 +76,13 @@ export function CardStudy({
   variant?: StudyVariant;
 }) {
   const modes = variant === "vocab" ? VOCAB_MODES : JP_MODES;
-  const ids = useMemo(() => cards.map((c) => cardId(conceptKey, c.front)), [cards, conceptKey]);
+  // A card that is a view of a 日本語 vocabulary word carries that word's id, so
+  // studying it here and in the vocabulary list advances one schedule, not two.
+  const idOf = useCallback(
+    (c: Card) => c.card_id || cardId(conceptKey, c.front),
+    [conceptKey]
+  );
+  const ids = useMemo(() => cards.map(idOf), [cards, idOf]);
   const [reviews, setReviews] = useState<Map<string, CardReview>>(new Map());
   const [loading, setLoading] = useState(true);
   const [mode, setMode] = useState<Mode>("flip");
@@ -105,7 +111,7 @@ export function CardStudy({
       const m = new Map(list.map((r) => [r.card_id, r]));
       const today = todayISO();
       const pool = cards.filter((c) => {
-        const r = m.get(cardId(conceptKey, c.front));
+        const r = m.get(idOf(c));
         return includeAll || !r || r.due_date <= today;
       });
       setReviews(m);
@@ -119,7 +125,7 @@ export function CardStudy({
       setAnswered(false);
       setLoading(false);
     },
-    [cards, conceptKey]
+    [cards, idOf]
   );
 
   useEffect(() => {
@@ -139,7 +145,7 @@ export function CardStudy({
   const grade = useCallback(
     async (quality: number) => {
       if (!current) return;
-      const id = cardId(conceptKey, current.front);
+      const id = idOf(current);
       try {
         const cr = await api.gradeCard(id, quality);
         setReviews((m) => new Map(m).set(id, cr));
@@ -160,7 +166,7 @@ export function CardStudy({
         return arr;
       });
     },
-    [conceptKey, current]
+    [idOf, current]
   );
 
   // Build the question for the current card + mode (stable until either changes)
