@@ -6049,6 +6049,57 @@ if os.path.exists(_jpv_path):
 
 
 # ---------------------------------------------------------------------------
+# One reading per word.
+#
+# ~46 terms are authored twice — once as a vocabulary word in jp_vocab_defs.py
+# and once as a glossary card in japanese_defs.py — and nothing stopped the two
+# drifting apart: an edit to one silently disagreed with the other. This asserts
+# they still agree, and lives here because it is the first point at which both
+# files have been loaded.
+#
+# A glossary reading is written "へんすう (hensū)" while a vocabulary word keeps
+# the kana and the rōmaji in separate fields, so the two halves are compared
+# separately. Katakana loanwords carry rōmaji only and never appear in the
+# vocabulary list, so they are never reached.
+# ---------------------------------------------------------------------------
+def _jp_check_readings():
+    _vocab = {w["term"]: w for w in globals().get("JP_VOCAB", {}).get("words", [])}
+    if not _vocab:
+        return 0
+    checked = 0
+    for key, concept in CONCEPTS.items():
+        if concept.get("language") != "japanese":
+            continue
+        for card in concept.get("cards") or []:
+            word = _vocab.get(card["front"])
+            if word is None:
+                continue
+            m = re.match(r"^(.*?)\s*\(([^)]+)\)\s*$", card["reading"])
+            assert m, (
+                f"{key}: {card['front']!r} is also a vocabulary word, so its glossary "
+                f"reading must read 'かな (rōmaji)' — got {card['reading']!r}"
+            )
+            kana, romaji = m.group(1), m.group(2)
+            assert kana == word["reading"], (
+                f"{key}: kana for {card['front']!r} disagrees with the vocabulary list — "
+                f"{kana!r} vs {word['reading']!r}"
+            )
+            assert romaji.replace(" ", "").lower() == word["romaji"].replace(" ", "").lower(), (
+                f"{key}: rōmaji for {card['front']!r} disagrees with the vocabulary list — "
+                f"{romaji!r} vs {word['romaji']!r}"
+            )
+            checked += 1
+    return checked
+
+
+_jp_shared_readings = _jp_check_readings()
+print(
+    f"Checked {_jp_shared_readings} readings shared by the vocabulary list "
+    f"and the glossary sets"
+)
+
+
+# ---------------------------------------------------------------------------
 # Language-agnostic Algorithms Learn track — a FOURTH "language" for the Learn
 # tab. Concepts teach the algorithm itself (pseudocode, complexity, worked
 # trace tables) plus multiple-choice quizzes and curated practice-problem

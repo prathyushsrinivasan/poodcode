@@ -235,7 +235,7 @@ _jp_concept(
         ("ハッシュマップ", "hasshu mappu", "hash map", "ハッシュマップで高速に検索します。", "We search quickly with a hash map."),
         ("連想配列", "れんそうはいれつ (rensō hairetsu)", "associative array (map)", "連想配列はキーと値を持ちます。", "An associative array has keys and values."),
         ("探索", "たんさく (tansaku)", "search", "二分探索で要素を探します。", "We find the element with binary search."),
-        ("整列", "せいれつ (seiretsu) / ソート", "sorting", "配列をソートします。", "We sort the array."),
+        ("整列", "せいれつ (seiretsu)", "sorting (also ソート)", "配列をソートします。", "We sort the array."),
         ("昇順", "しょうじゅん (shōjun)", "ascending order", "昇順に並べ替えます。", "We sort in ascending order."),
         ("降順", "こうじゅん (kōjun)", "descending order", "降順に並べ替えます。", "We sort in descending order."),
         ("計算量", "けいさんりょう (keisanryō)", "computational complexity", "このアルゴリズムの計算量はO(n)です。", "This algorithm's complexity is O(n)."),
