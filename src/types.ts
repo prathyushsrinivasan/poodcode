@@ -184,7 +184,10 @@ export interface InterviewQA {
   q_en: string;
   a_ja: string;
   a_en: string;
+  /** Interview stage first, then a topical tag. */
   tags: string[];
+  /** Vocabulary words the answer leans on, each linkable to its card. */
+  terms: string[];
 }
 
 export interface JpBridge {

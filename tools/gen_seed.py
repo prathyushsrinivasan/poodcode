@@ -6399,6 +6399,24 @@ assert len(_bridge_slugs) == len(set(_bridge_slugs)), (
     "jp_bridge restates the same problem twice: "
     f"{sorted({s for s in _bridge_slugs if _bridge_slugs.count(s) > 1})}"
 )
+
+# Interview questions are filed by the stage of the interview they belong to,
+# and name vocabulary words the answer leans on. A term that isn't in the list
+# would render as a chip that quietly fails to link, so it fails the build.
+_JP_STAGES = ("自己紹介", "コーディング", "設計", "振り返り")
+_jp_vocab_terms = {w["term"] for w in globals().get("JP_VOCAB", {}).get("words", [])}
+for _qa in _bridge["interview"]:
+    assert _qa["tags"] and _qa["tags"][0] in _JP_STAGES, (
+        f"interview question must be tagged with its stage first "
+        f"({'/'.join(_JP_STAGES)}): {_qa['q_ja']!r} has {_qa['tags']!r}"
+    )
+    for _term in _qa.get("terms", []):
+        assert _term in _jp_vocab_terms, (
+            f"interview question names {_term!r}, which is not a vocabulary word: {_qa['q_ja']!r}"
+        )
+_jp_stage_counts = {s: sum(1 for q in _bridge["interview"] if q["tags"][0] == s) for s in _JP_STAGES}
+for _stage, _n in _jp_stage_counts.items():
+    assert _n > 0, f"no interview questions for the {_stage!r} stage"
 with open(BRIDGE_OUT, "w", encoding="utf-8", newline="\n") as f:
     json.dump(_bridge, f, indent=2, ensure_ascii=False)
 print(

@@ -611,8 +611,13 @@ pub struct InterviewQA {
     pub a_ja: String,
     #[serde(default)]
     pub a_en: String,
+    /// Interview stage first (自己紹介 / コーディング / 設計 / 振り返り), then a
+    /// topical tag.
     #[serde(default)]
     pub tags: Vec<String>,
+    /// Vocabulary words the answer leans on, each linkable to its card.
+    #[serde(default)]
+    pub terms: Vec<String>,
 }
 
 /// The whole Japanese → Java bridge catalog (embedded seeds/jp_bridge.json).

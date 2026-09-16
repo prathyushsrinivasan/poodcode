@@ -4,6 +4,15 @@ import { api } from "../api";
 import type { BridgeProblem, InterviewQA, JpBridge, Problem } from "../types";
 import { Empty } from "../components/common";
 
+/** The four stages a Japanese technical interview is actually made of. Every
+ * question carries its stage as its first tag — asserted at generation. */
+const INTERVIEW_STAGES = [
+  { id: "自己紹介", hint: "Introducing yourself, your experience and your questions" },
+  { id: "コーディング", hint: "The coding round — complexity, edge cases, testing" },
+  { id: "設計", hint: "System design — data, scale, security, trade-offs" },
+  { id: "振り返り", hint: "Behavioural — failure, disagreement, handover" },
+];
+
 /**
  * Japanese → Java bridge: read a real problem stated in Japanese and open it in
  * the normal solver, plus a bank of Japanese technical-interview Q&A. Content
@@ -15,6 +24,7 @@ export default function JapaneseBridge() {
   // term -> vocabulary word id, so a chip can link to the card that teaches it.
   const [wordIds, setWordIds] = useState<Map<string, string>>(new Map());
   const [tab, setTab] = useState<"solve" | "interview">("solve");
+  const [stage, setStage] = useState<string>("all");
 
   useEffect(() => {
     api.jpBridge().then(setBridge).catch(() => setBridge({ problems: [], interview: [] }));
@@ -32,6 +42,22 @@ export default function JapaneseBridge() {
     for (const p of problems) m.set(p.slug, p.id);
     return m;
   }, [problems]);
+
+  // Questions are filed by the stage of the interview they belong to, so you
+  // can practise the one you're actually about to sit.
+  const shownQA = useMemo(() => {
+    const all = bridge?.interview ?? [];
+    return stage === "all" ? all : all.filter((q) => q.tags[0] === stage);
+  }, [bridge, stage]);
+
+  const stageCounts = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const q of bridge?.interview ?? []) {
+      const s = q.tags[0] ?? "";
+      counts.set(s, (counts.get(s) ?? 0) + 1);
+    }
+    return counts;
+  }, [bridge]);
 
   if (!bridge) return <div className="page">Loading…</div>;
 
@@ -71,11 +97,33 @@ export default function JapaneseBridge() {
       ) : bridge.interview.length === 0 ? (
         <Empty icon="🗣" text="No interview questions yet." />
       ) : (
-        <div className="grid cols-2">
-          {bridge.interview.map((qa, i) => (
-            <InterviewCard key={i} qa={qa} />
-          ))}
-        </div>
+        <>
+          <div className="row" style={{ gap: 6, flexWrap: "wrap", marginBottom: 14 }}>
+            <button
+              className={stage === "all" ? "" : "ghost"}
+              style={{ padding: "2px 10px", fontSize: 12 }}
+              onClick={() => setStage("all")}
+            >
+              すべて <span className="dim">{bridge.interview.length}</span>
+            </button>
+            {INTERVIEW_STAGES.map((s) => (
+              <button
+                key={s.id}
+                className={stage === s.id ? "" : "ghost"}
+                style={{ padding: "2px 10px", fontSize: 12 }}
+                onClick={() => setStage(s.id)}
+                title={s.hint}
+              >
+                {s.id} <span className="dim">{stageCounts.get(s.id) ?? 0}</span>
+              </button>
+            ))}
+          </div>
+          <div className="grid cols-2">
+            {shownQA.map((qa, i) => (
+              <InterviewCard key={`${stage}-${i}`} qa={qa} wordIds={wordIds} />
+            ))}
+          </div>
+        </>
       )}
     </div>
   );
@@ -173,7 +221,7 @@ function BridgeCard({
   );
 }
 
-function InterviewCard({ qa }: { qa: InterviewQA }) {
+function InterviewCard({ qa, wordIds }: { qa: InterviewQA; wordIds: Map<string, string> }) {
   const [show, setShow] = useState(false);
   return (
     <div className="card" style={{ display: "flex", flexDirection: "column" }}>
@@ -211,6 +259,29 @@ function InterviewCard({ qa }: { qa: InterviewQA }) {
         <button className="ghost" style={{ marginTop: 10, alignSelf: "flex-start" }} onClick={() => setShow(true)}>
           模範解答を見る
         </button>
+      )}
+
+      {qa.terms.length > 0 && (
+        <div
+          className="row"
+          style={{ gap: 5, flexWrap: "wrap", marginTop: "auto", paddingTop: 10, alignItems: "center" }}
+        >
+          <span className="io-label" style={{ margin: 0 }}>
+            語彙
+          </span>
+          {qa.terms.map((t) => {
+            const id = wordIds.get(t);
+            return id ? (
+              <Link key={t} to={`/learn?word=${id}`} className="badge" title={`${t} を単語帳で開く`}>
+                {t}
+              </Link>
+            ) : (
+              <span key={t} className="badge">
+                {t}
+              </span>
+            );
+          })}
+        </div>
       )}
     </div>
   );
