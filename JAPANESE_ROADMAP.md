@@ -20,10 +20,14 @@ gets managed (see [Rules](#rules-that-every-step-keeps)).
 >
 > Two things in it are now historical. **"Where it stands"** below describes the
 > track as it was *before* this work — where it says 100 words, 292 cards and 12
-> bridge problems, the track now has **300 words, 284 cards across 13 sets, and
+> bridge problems, the track now has **400 words, 284 cards across 13 sets, and
 > 40 bridge problems with 40 interview questions**. And the audit's nine findings
 > are the case for the work, not a description of the code: every one of them has
 > been addressed.
+>
+> Step 6's title below still reads "100 to 300" because that is what that step
+> was, and it shipped exactly that. The list has since grown past its target in
+> two further batches of 50, on the same per-tag floors and the same guards.
 
 ---
 

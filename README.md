@@ -543,7 +543,7 @@ The **日本語** view of Learn, for reading code, problems and interviews in
 Japanese.
 
 It opens with **Vocabulary** (`seeds/jp_vocab.json`, authored in
-`tools/jp_vocab_defs.py`): **300 non-katakana words** across six tags — Java,
+`tools/jp_vocab_defs.py`): **400 non-katakana words** across six tags — Java,
 coding problems, TypeScript, SQL, Web and Workplace — each at one of three
 levels, from everyday to specialist. A word can carry more than one tag, because
 計算量 is a Java-interview word and a coding-problem word at once. Filter by tag,
