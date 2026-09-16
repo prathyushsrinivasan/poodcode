@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { api } from "../api";
 import type { BridgeProblem, InterviewQA, JpBridge, Problem } from "../types";
 import { Empty } from "../components/common";
@@ -12,11 +12,19 @@ import { Empty } from "../components/common";
 export default function JapaneseBridge() {
   const [bridge, setBridge] = useState<JpBridge | null>(null);
   const [problems, setProblems] = useState<Problem[]>([]);
+  // term -> vocabulary word id, so a chip can link to the card that teaches it.
+  const [wordIds, setWordIds] = useState<Map<string, string>>(new Map());
   const [tab, setTab] = useState<"solve" | "interview">("solve");
 
   useEffect(() => {
     api.jpBridge().then(setBridge).catch(() => setBridge({ problems: [], interview: [] }));
     api.listProblems().then(setProblems).catch(() => {});
+    api
+      .jpVocab()
+      .then((v) => setWordIds(new Map(v.words.map((w) => [w.term, w.id]))))
+      .catch(() => {
+        /* without the list the chips simply stay plain text */
+      });
   }, []);
 
   const idBySlug = useMemo(() => {
@@ -51,7 +59,12 @@ export default function JapaneseBridge() {
         ) : (
           <div className="grid cols-2">
             {bridge.problems.map((p) => (
-              <BridgeCard key={p.slug} problem={p} problemId={idBySlug.get(p.slug)} />
+              <BridgeCard
+                key={p.slug}
+                problem={p}
+                problemId={idBySlug.get(p.slug)}
+                wordIds={wordIds}
+              />
             ))}
           </div>
         )
@@ -68,7 +81,15 @@ export default function JapaneseBridge() {
   );
 }
 
-function BridgeCard({ problem, problemId }: { problem: BridgeProblem; problemId?: number }) {
+function BridgeCard({
+  problem,
+  problemId,
+  wordIds,
+}: {
+  problem: BridgeProblem;
+  problemId?: number;
+  wordIds: Map<string, string>;
+}) {
   const nav = useNavigate();
   const [showHint, setShowHint] = useState(false);
 
@@ -101,12 +122,23 @@ function BridgeCard({ problem, problemId }: { problem: BridgeProblem; problemId?
         <div style={{ marginBottom: 10 }}>
           <div className="io-label">語彙 · Vocabulary</div>
           <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
-            {problem.vocab.map((v, i) => (
-              <div key={i} style={{ fontSize: 13 }}>
-                <strong>{v[0]}</strong>{" "}
-                <span className="dim">（{v[1]}）</span> — {v[2]}
-              </div>
-            ))}
+            {problem.vocab.map((v, i) => {
+              // The same word is taught as a flashcard next door; when it is,
+              // the chip becomes the way in rather than a dead repetition.
+              const id = wordIds.get(v[0]);
+              return (
+                <div key={i} style={{ fontSize: 13 }}>
+                  {id ? (
+                    <Link to={`/learn?word=${id}`} title={`${v[0]} を単語帳で開く`}>
+                      <strong>{v[0]}</strong>
+                    </Link>
+                  ) : (
+                    <strong>{v[0]}</strong>
+                  )}{" "}
+                  <span className="dim">（{v[1]}）</span> — {v[2]}
+                </div>
+              );
+            })}
           </div>
         </div>
       )}

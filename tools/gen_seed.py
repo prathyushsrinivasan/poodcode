@@ -6382,6 +6382,23 @@ print(f"Wrote {len(_flashcards)} flashcards to {os.path.relpath(FLASHCARDS_OUT)}
 # Japanese → Java bridge (problem statements in Japanese + interview Q&A).
 BRIDGE_OUT = os.path.join(HERE, "..", "src-tauri", "seeds", "jp_bridge.json")
 _bridge = globals().get("JP_BRIDGE", {"problems": [], "interview": []})
+# A bridge problem opens in the normal solver by slug, so a slug that isn't in
+# the bank is a card that looks fine and does nothing when clicked. Catch it
+# here rather than in the UI.
+_bridge_slugs = [p["slug"] for p in _bridge["problems"]]
+# `out` is the list actually written to problems.json just above — NOT the raw
+# `problems` accumulator, which is empty by this point. Checked explicitly, so
+# that a future rename fails saying the bank looks empty rather than accusing
+# every bridge problem of naming a missing slug.
+assert out, "the problem bank is empty here — has the variable holding it been renamed?"
+_missing_slugs = sorted(set(_bridge_slugs) - {p["slug"] for p in out})
+assert not _missing_slugs, (
+    f"jp_bridge names {len(_missing_slugs)} problem(s) that are not in the bank: {_missing_slugs}"
+)
+assert len(_bridge_slugs) == len(set(_bridge_slugs)), (
+    "jp_bridge restates the same problem twice: "
+    f"{sorted({s for s in _bridge_slugs if _bridge_slugs.count(s) > 1})}"
+)
 with open(BRIDGE_OUT, "w", encoding="utf-8", newline="\n") as f:
     json.dump(_bridge, f, indent=2, ensure_ascii=False)
 print(
