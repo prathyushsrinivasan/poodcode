@@ -1,11 +1,23 @@
-import type { JpVocabWord } from "../types";
+import type { CardReview, JpVocabWord } from "../types";
+import { isCardDue } from "./srs";
 
 // Pure helpers for the 日本語 vocabulary section: the menu's tag + text filter,
-// per-tag counts, and splitting an example sentence around the term so the
-// flashcard can highlight it. Framework-free so it can be unit-tested.
+// per-tag counts, splitting an example sentence around the term so the
+// flashcard can highlight it, and where each word sits in its review schedule.
+// Framework-free so it can be unit-tested.
 
 /** "all", or one of the tag ids from seeds/jp_vocab.json. */
 export type VocabTagFilter = string;
+
+/** The deck every vocabulary review is filed under. Never change it — the
+ * `card_reviews` rows in SQLite are keyed by the id it builds. */
+export const VOCAB_DECK = "jp-vocab";
+
+/** `jp-vocab#hairetsu` — the same `<deck>#<front>` shape `learnProgress.cardId`
+ * builds for glossary cards, kept here so this module stays dependency-free. */
+export function vocabCardId(wordId: string): string {
+  return `${VOCAB_DECK}#${wordId}`;
+}
 
 /** Lowercase and fold rōmaji long-vowel marks, so "hensu" finds "hensū". */
 export function foldLatin(s: string): string {
@@ -65,4 +77,40 @@ export function splitOnTerm(sentence: string, term: string): { text: string; hit
 export function wrapIndex(i: number, step: number, length: number): number {
   if (length <= 0) return -1;
   return (((i + step) % length) + length) % length;
+}
+
+/* ------------------------------------------------------- review scheduling */
+
+/** Where a word sits in its cycle: never graded, graded and ready again, or
+ * graded and scheduled for a later day. */
+export type VocabState = "new" | "due" | "learning";
+
+export function wordState(review: CardReview | undefined, today: string): VocabState {
+  if (!review || review.reps <= 0) return "new";
+  return isCardDue(review, today) ? "due" : "learning";
+}
+
+/** The words that can be studied right now — never seen, or scheduled for today
+ * or earlier. The same pool `CardStudy` draws from for the glossary sets. */
+export function readyWords(
+  words: JpVocabWord[],
+  reviews: Map<string, CardReview>,
+  today: string
+): JpVocabWord[] {
+  return words.filter((w) => isCardDue(reviews.get(vocabCardId(w.id)), today));
+}
+
+/** How many words sit in each state, plus `ready` (new + due) for the Due chip. */
+export function stateCounts(
+  words: JpVocabWord[],
+  reviews: Map<string, CardReview>,
+  today: string
+): Record<VocabState, number> & { ready: number } {
+  const out = { new: 0, due: 0, learning: 0, ready: 0 };
+  for (const w of words) {
+    const s = wordState(reviews.get(vocabCardId(w.id)), today);
+    out[s]++;
+    if (s !== "learning") out.ready++;
+  }
+  return out;
 }

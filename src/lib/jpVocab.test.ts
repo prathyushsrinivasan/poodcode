@@ -1,6 +1,16 @@
 import { describe, it, expect } from "vitest";
-import { filterVocab, matchesQuery, splitOnTerm, tagCounts, wrapIndex } from "./jpVocab";
-import type { JpVocabWord } from "../types";
+import {
+  filterVocab,
+  matchesQuery,
+  readyWords,
+  splitOnTerm,
+  stateCounts,
+  tagCounts,
+  vocabCardId,
+  wordState,
+  wrapIndex,
+} from "./jpVocab";
+import type { CardReview, JpVocabWord } from "../types";
 
 const word = (over: Partial<JpVocabWord>): JpVocabWord => ({
   id: "x",
@@ -72,6 +82,57 @@ describe("splitOnTerm", () => {
       { text: "と", hit: false },
       { text: "木", hit: true },
     ]);
+  });
+});
+
+const review = (wordId: string, dueDate: string, reps = 1): CardReview => ({
+  card_id: vocabCardId(wordId),
+  ease: 2.5,
+  reps,
+  lapses: 0,
+  interval_days: 3,
+  due_date: dueDate,
+  last_quality: 2,
+});
+
+const reviewMap = (...rs: CardReview[]) => new Map(rs.map((r) => [r.card_id, r]));
+
+describe("wordState", () => {
+  it("calls a word never graded new, even if a row exists with no reps", () => {
+    expect(wordState(undefined, "2026-06-01")).toBe("new");
+    expect(wordState(review("keisho", "2026-06-01", 0), "2026-06-01")).toBe("new");
+  });
+
+  it("splits graded words on their due date", () => {
+    expect(wordState(review("keisho", "2026-06-01"), "2026-06-01")).toBe("due");
+    expect(wordState(review("keisho", "2026-05-20"), "2026-06-01")).toBe("due");
+    expect(wordState(review("keisho", "2026-06-02"), "2026-06-01")).toBe("learning");
+  });
+});
+
+describe("readyWords", () => {
+  it("keeps the new and the overdue, and drops what is scheduled ahead", () => {
+    const reviews = reviewMap(
+      review("keisho", "2026-06-02"), // learning
+      review("hairetsu", "2026-05-30") // due
+    );
+    // kata-hikisu has no review at all, so it is new — and studiable.
+    expect(readyWords(all, reviews, "2026-06-01").map((w) => w.id)).toEqual([
+      "kata-hikisu",
+      "hairetsu",
+    ]);
+  });
+});
+
+describe("stateCounts", () => {
+  it("counts each state, with ready spanning new and due", () => {
+    const reviews = reviewMap(review("keisho", "2026-06-02"), review("hairetsu", "2026-05-30"));
+    expect(stateCounts(all, reviews, "2026-06-01")).toEqual({
+      new: 1,
+      due: 1,
+      learning: 1,
+      ready: 2,
+    });
   });
 });
 

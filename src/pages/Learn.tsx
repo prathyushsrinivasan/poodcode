@@ -15,7 +15,7 @@ import type {
 import { Markdown } from "../components/Markdown";
 import { CodeEditor } from "../components/CodeEditor";
 import { CardStudy } from "../components/CardStudy";
-import { JpVocabCard, JpVocabMenu } from "../components/JpVocab";
+import { JpVocabCard, JpVocabMenu, useVocabReviews } from "../components/JpVocab";
 import { DiffBadge, Empty } from "../components/common";
 import { Section, useCollapse } from "../components/Collapsible";
 import {
@@ -143,6 +143,9 @@ export default function Learn() {
   // was opened from, which prev/next walk.
   const [vocab, setVocab] = useState<JpVocab | null>(null);
   const [vocabList, setVocabList] = useState<string[]>([]);
+  // Review state is shared by the menu (which shows the counts) and the card
+  // (which does the grading), so it is owned here rather than by either.
+  const vocabReviews = useVocabReviews();
   const [params, setParams] = useSearchParams();
   const openWord = params.get("word");
 
@@ -322,7 +325,7 @@ export default function Learn() {
             </span>
           }
         >
-          <JpVocabMenu vocab={vocab} onOpen={openVocab} />
+          <JpVocabMenu vocab={vocab} reviews={vocabReviews} onOpen={openVocab} />
         </Section>
       )}
 
@@ -493,6 +496,7 @@ export default function Learn() {
           vocab={vocab}
           id={openWord}
           list={vocabList}
+          reviews={vocabReviews}
           onNavigate={navigateVocab}
           onClose={closeVocab}
         />

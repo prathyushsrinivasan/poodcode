@@ -2,6 +2,8 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { api } from "../api";
 import type { Card, CardReview } from "../types";
 import { cardId } from "../lib/learnProgress";
+import { acceptsReading } from "../lib/romaji";
+import { todayISO } from "../lib/srs";
 
 /* ------------------------------------------------------------------ helpers */
 
@@ -12,33 +14,6 @@ function shuffle<T>(xs: T[]): T[] {
     [a[i], a[j]] = [a[j], a[i]];
   }
   return a;
-}
-
-function todayStr(): string {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(
-    d.getDate()
-  ).padStart(2, "0")}`;
-}
-
-/** The romaji portion of a reading like "へんすう (hensū)" → "hensū"; a
- * katakana loanword reading (e.g. "kōdo") is already romaji. */
-function romajiOf(reading: string): string {
-  const m = reading.match(/\(([^)]+)\)/);
-  return (m ? m[1] : reading).trim();
-}
-
-/** Normalize romaji for lenient typed grading: lowercase, fold long-vowel
- * macrons, drop anything that isn't a latin letter. */
-function normRomaji(s: string): string {
-  return s
-    .toLowerCase()
-    .replace(/[āáàâ]/g, "a")
-    .replace(/[īíìî]/g, "i")
-    .replace(/[ūúùû]/g, "u")
-    .replace(/[ēéèê]/g, "e")
-    .replace(/[ōóòô]/g, "o")
-    .replace(/[^a-z]/g, "");
 }
 
 /** Pick up to n random items from xs excluding `not`. */
@@ -128,7 +103,7 @@ export function CardStudy({
         list = [];
       }
       const m = new Map(list.map((r) => [r.card_id, r]));
-      const today = todayStr();
+      const today = todayISO();
       const pool = cards.filter((c) => {
         const r = m.get(cardId(conceptKey, c.front));
         return includeAll || !r || r.due_date <= today;
@@ -193,7 +168,7 @@ export function CardStudy({
     if (!current || mode === "flip") return null;
     const others = cards;
     if (mode === "type") {
-      return { kind: "type" as const, accepted: normRomaji(romajiOf(current.reading)) };
+      return { kind: "type" as const, reading: current.reading };
     }
     if (mode === "cloze" && current.example_ja.includes(current.front)) {
       const distract = sample(others, 3, (c) => c.front === current.front).map((c) => c.front);
@@ -219,13 +194,17 @@ export function CardStudy({
     };
   }, [current?.front, mode, cards]);
 
+  // One grader for the typed answer, shared with the 日本語 vocabulary deck:
+  // the rōmaji however its long vowels are typed, or the reading in kana.
+  const typedOk = quiz?.kind === "type" ? acceptsReading(typed, quiz.reading) : false;
+
   function submitTyped() {
     if (!quiz || quiz.kind !== "type") return;
     setAnswered(true);
   }
 
   const nextDue = useMemo(() => {
-    const today = todayStr();
+    const today = todayISO();
     const future = ids
       .map((id) => reviews.get(id)?.due_date)
       .filter((d): d is string => !!d && d > today)
@@ -390,7 +369,7 @@ export function CardStudy({
           <div className="card" style={{ textAlign: "center", padding: "24px 18px" }}>
             <div style={{ fontSize: 40, fontWeight: 600 }}>{current.front}</div>
             <p className="dim" style={{ margin: "6px 0 14px", fontSize: 13 }}>
-              Type the reading in rōmaji
+              Type the reading — rōmaji or kana
             </p>
             <input
               autoFocus
@@ -398,7 +377,7 @@ export function CardStudy({
               disabled={answered}
               onChange={(e) => setTyped(e.target.value)}
               onKeyDown={(e) => {
-                if (e.key === "Enter") (answered ? grade(normRomaji(typed) === quiz.accepted ? 2 : 0) : submitTyped());
+                if (e.key === "Enter") (answered ? grade(typedOk ? 2 : 0) : submitTyped());
               }}
               placeholder="e.g. hensuu"
               style={{
@@ -410,7 +389,7 @@ export function CardStudy({
                 borderRadius: 8,
                 border: `1px solid ${
                   answered
-                    ? normRomaji(typed) === quiz.accepted
+                    ? typedOk
                       ? "var(--good)"
                       : "var(--bad)"
                     : "var(--border)"
@@ -423,11 +402,11 @@ export function CardStudy({
               <div style={{ marginTop: 12 }}>
                 <div
                   style={{
-                    color: normRomaji(typed) === quiz.accepted ? "var(--good)" : "var(--bad)",
+                    color: typedOk ? "var(--good)" : "var(--bad)",
                     fontWeight: 600,
                   }}
                 >
-                  {normRomaji(typed) === quiz.accepted ? "Correct!" : "Not quite"}
+                  {typedOk ? "Correct!" : "Not quite"}
                 </div>
                 <CardBack card={current} variant={variant} />
               </div>
@@ -439,7 +418,7 @@ export function CardStudy({
                 Check
               </button>
             ) : (
-              <button onClick={() => grade(normRomaji(typed) === quiz.accepted ? 2 : 0)}>
+              <button onClick={() => grade(typedOk ? 2 : 0)}>
                 Next →
               </button>
             )}

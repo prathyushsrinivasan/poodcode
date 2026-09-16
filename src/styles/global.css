@@ -916,6 +916,7 @@ table.sqlgrid tbody tr.diff td {
   gap: 10px;
 }
 .jpv-tile {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -925,6 +926,26 @@ table.sqlgrid tbody tr.diff td {
   padding: 10px 12px;
   text-align: left;
   white-space: normal;
+}
+/* Where a word sits in its review schedule, so the menu doubles as a progress
+   view: hollow = never studied, amber = due now, green = scheduled ahead. */
+.jpv-dot {
+  position: absolute;
+  top: 9px;
+  right: 9px;
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+.jpv-dot-new {
+  border: 1px solid var(--text-dim);
+}
+.jpv-dot-due {
+  background: var(--medium);
+}
+.jpv-dot-learning {
+  background: var(--good);
 }
 .jpv-tile-term {
   font-size: 22px;

@@ -1,6 +1,18 @@
-import { useEffect, useMemo, useState } from "react";
-import type { JpVocab, JpVocabTag, JpVocabWord } from "../types";
-import { filterVocab, splitOnTerm, tagCounts, wrapIndex } from "../lib/jpVocab";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { api } from "../api";
+import type { CardReview, JpVocab, JpVocabTag, JpVocabWord } from "../types";
+import {
+  filterVocab,
+  readyWords,
+  splitOnTerm,
+  stateCounts,
+  tagCounts,
+  vocabCardId,
+  wordState,
+  wrapIndex,
+  type VocabState,
+} from "../lib/jpVocab";
+import { todayISO } from "../lib/srs";
 
 const TAG_STORE_KEY = "poodcode:jp-vocab-tag";
 
@@ -20,30 +32,115 @@ function writeTag(tag: string) {
   }
 }
 
+/* --------------------------------------------------------------- reviews */
+
+const GRADES: { q: number; label: string; hint: string; color?: string }[] = [
+  { q: 0, label: "Again", hint: "today", color: "var(--bad)" },
+  { q: 1, label: "Hard", hint: "sooner" },
+  { q: 2, label: "Good", hint: "on schedule" },
+  { q: 3, label: "Easy", hint: "much later", color: "var(--good)" },
+];
+
+const STATE_LABEL: Record<VocabState, string> = {
+  new: "New — never studied",
+  due: "Due — ready for review",
+  learning: "Learning — scheduled ahead",
+};
+
+/** The vocabulary list's slice of the shared `card_reviews` table.
+ *
+ * Owned by the page rather than by either component below, because the menu
+ * shows the counts and the card does the grading — they have to agree without a
+ * round trip. Grading a word here is the same `api.gradeCard` (SM-2) the
+ * glossary decks use; only the card id differs (`jp-vocab#<word id>`). */
+export interface VocabReviews {
+  reviews: Map<string, CardReview>;
+  today: string;
+  grade: (wordId: string, quality: number) => Promise<void>;
+  reset: (wordIds: string[]) => Promise<void>;
+}
+
+export function useVocabReviews(): VocabReviews {
+  const [reviews, setReviews] = useState<Map<string, CardReview>>(new Map());
+  // Pinned for the session: a date that changed mid-session would silently
+  // reshuffle what counts as due while the learner is part-way through.
+  const [today] = useState(todayISO);
+
+  useEffect(() => {
+    api
+      .cardReviews()
+      .then((list) => setReviews(new Map(list.map((r) => [r.card_id, r]))))
+      .catch(() => {
+        /* no history yet is the same as no history loaded — everything is new */
+      });
+  }, []);
+
+  const grade = useCallback(async (wordId: string, quality: number) => {
+    const id = vocabCardId(wordId);
+    try {
+      const cr = await api.gradeCard(id, quality);
+      setReviews((m) => new Map(m).set(id, cr));
+    } catch {
+      /* a dropped grade is not worth interrupting the session over */
+    }
+  }, []);
+
+  const reset = useCallback(async (wordIds: string[]) => {
+    const ids = wordIds.map(vocabCardId);
+    try {
+      await api.resetCards(ids);
+      setReviews((m) => {
+        const next = new Map(m);
+        for (const id of ids) next.delete(id);
+        return next;
+      });
+    } catch {
+      /* leave the counts as they were */
+    }
+  }, []);
+
+  return { reviews, today, grade, reset };
+}
+
+/* ------------------------------------------------------------------- menu */
+
 /**
- * The 日本語 view's first section: 100 tagged, non-katakana words
- * (seeds/jp_vocab.json). The menu filters by tag and free text; clicking a
- * word opens it as a flashcard, and prev/next walk the *filtered* list.
+ * The 日本語 view's first section: the tagged, non-katakana vocabulary
+ * (seeds/jp_vocab.json). The menu filters by tag, by free text and by whether a
+ * word is ready for review; clicking a word opens it as a flashcard, and
+ * prev/next walk the *filtered* list.
  *
  * `openId` / `onOpen` are owned by the page so the open card lives in the URL
  * (?word=<id>) — a card can be linked to, and Back closes it.
  */
 export function JpVocabMenu({
   vocab,
+  reviews: rev,
   onOpen,
 }: {
   vocab: JpVocab;
+  reviews: VocabReviews;
   onOpen: (id: string, list: string[]) => void;
 }) {
+  const { reviews, today } = rev;
   const [tag, setTag] = useState<string>(readTag);
   const [query, setQuery] = useState("");
+  const [dueOnly, setDueOnly] = useState(false);
   const counts = useMemo(() => tagCounts(vocab.words), [vocab.words]);
+  const states = useMemo(
+    () => stateCounts(vocab.words, reviews, today),
+    [vocab.words, reviews, today]
+  );
   // A tag remembered from an older seed that no longer exists shows everything.
   const activeTag = tag === "all" || vocab.tags.some((t) => t.id === tag) ? tag : "all";
-  const shown = useMemo(
+  const matching = useMemo(
     () => filterVocab(vocab.words, activeTag, query),
     [vocab.words, activeTag, query]
   );
+  // "Study due" walks what the current filter shows, not the whole list, so
+  // narrowing to one tag and studying it is a single click.
+  const ready = useMemo(() => readyWords(matching, reviews, today), [matching, reviews, today]);
+  const shown = dueOnly ? ready : matching;
   const tagById = useMemo(() => new Map(vocab.tags.map((t) => [t.id, t])), [vocab.tags]);
 
   function pick(id: string) {
@@ -67,6 +164,13 @@ export function JpVocabMenu({
             {t.label} <span className="jpv-count">{counts[t.id] ?? 0}</span>
           </button>
         ))}
+        <button
+          className={dueOnly ? "" : "ghost"}
+          onClick={() => setDueOnly((d) => !d)}
+          title="New and overdue words — everything you can study right now"
+        >
+          ⏱ Due <span className="jpv-count">{states.ready}</span>
+        </button>
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
@@ -76,29 +180,44 @@ export function JpVocabMenu({
         />
       </div>
 
+      <div className="row" style={{ gap: 8, flexWrap: "wrap", marginBottom: 10 }}>
+        <button onClick={() => onOpen(ready[0].id, ready.map((w) => w.id))} disabled={ready.length === 0}>
+          🎴 Study due ({ready.length})
+        </button>
+        <span className="dim" style={{ fontSize: 12, alignSelf: "center" }}>
+          {states.learning} learning · {states.new} new · {states.due} due
+        </span>
+      </div>
+
       {shown.length === 0 ? (
         <p className="dim" style={{ margin: "8px 0 0" }}>
-          No words match{query.trim() ? ` “${query.trim()}”` : ""}.
+          {dueOnly
+            ? "Nothing due here — every word in this filter is scheduled for a later day."
+            : `No words match${query.trim() ? ` “${query.trim()}”` : ""}.`}
         </p>
       ) : (
         <div className="jpv-grid">
-          {shown.map((w) => (
-            <button
-              key={w.id}
-              className="ghost jpv-tile"
-              onClick={() => onOpen(w.id, shown.map((s) => s.id))}
-              title={`${w.reading} — ${w.meaning}`}
-            >
-              <span className="jpv-tile-term" lang="ja">
-                {w.term}
-              </span>
-              <span className="jpv-tile-reading" lang="ja">
-                {w.reading}
-              </span>
-              <span className="jpv-tile-meaning">{w.meaning}</span>
-              <TagBadge tag={tagById.get(w.tag)} id={w.tag} />
-            </button>
-          ))}
+          {shown.map((w) => {
+            const state = wordState(reviews.get(vocabCardId(w.id)), today);
+            return (
+              <button
+                key={w.id}
+                className="ghost jpv-tile"
+                onClick={() => onOpen(w.id, shown.map((s) => s.id))}
+                title={`${w.reading} — ${w.meaning}`}
+              >
+                <span className={`jpv-dot jpv-dot-${state}`} title={STATE_LABEL[state]} />
+                <span className="jpv-tile-term" lang="ja">
+                  {w.term}
+                </span>
+                <span className="jpv-tile-reading" lang="ja">
+                  {w.reading}
+                </span>
+                <span className="jpv-tile-meaning">{w.meaning}</span>
+                <TagBadge tag={tagById.get(w.tag)} id={w.tag} />
+              </button>
+            );
+          })}
         </div>
       )}
     </div>
@@ -109,15 +228,22 @@ function TagBadge({ tag, id }: { tag?: JpVocabTag; id: string }) {
   return <span className={`badge jpv-tag jpv-tag-${id}`}>{tag?.label ?? id}</span>;
 }
 
+/* ------------------------------------------------------------------- card */
+
 /**
  * One word as a flashcard. The front is the bare term; flipping reveals the
  * reading, meaning, both descriptions and the example sentence with the term
- * highlighted. Space/Enter flips, ←/→ move through `list`, Esc closes.
+ * highlighted, and then asks you to grade yourself — which schedules the word
+ * through the same SM-2 engine as every other deck.
+ *
+ * Space/Enter flips, 1–4 grade once flipped, ←/→ move through `list`, Esc
+ * closes.
  */
 export function JpVocabCard({
   vocab,
   id,
   list,
+  reviews: rev,
   onNavigate,
   onClose,
 }: {
@@ -125,9 +251,11 @@ export function JpVocabCard({
   id: string;
   /** The ids prev/next walk through — the menu's filtered list when opened from it. */
   list: string[];
+  reviews: VocabReviews;
   onNavigate: (id: string) => void;
   onClose: () => void;
 }) {
+  const { reviews, today, grade } = rev;
   const byId = useMemo(() => new Map(vocab.words.map((w) => [w.id, w])), [vocab.words]);
   const word = byId.get(id);
   // Opened from a link, the id may not be in the remembered list; walk everything.
@@ -135,15 +263,33 @@ export function JpVocabCard({
   const index = ids.indexOf(id);
   const tag = vocab.tags.find((t) => t.id === word?.tag);
   const [flipped, setFlipped] = useState(false);
+  const review = reviews.get(vocabCardId(id));
+  const state = wordState(review, today);
 
   useEffect(() => setFlipped(false), [id]);
+
+  /** Grade, then move to the next card in the list — the loop a study session
+   * is actually made of. On the last card there is nowhere to go, so it just
+   * folds shut again. */
+  const gradeAndAdvance = useCallback(
+    async (quality: number) => {
+      await grade(id, quality);
+      const next = ids[wrapIndex(index, 1, ids.length)];
+      if (next && next !== id) onNavigate(next);
+      else setFlipped(false);
+    },
+    [grade, id, ids, index, onNavigate]
+  );
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       if (e.key === "Escape") onClose();
       else if (e.key === "ArrowRight") onNavigate(ids[wrapIndex(index, 1, ids.length)]);
       else if (e.key === "ArrowLeft") onNavigate(ids[wrapIndex(index, -1, ids.length)]);
-      else if (e.key === " " || e.key === "Enter") {
+      else if (flipped && e.key >= "1" && e.key <= "4") {
+        e.preventDefault();
+        gradeAndAdvance(Number(e.key) - 1);
+      } else if (e.key === " " || e.key === "Enter") {
         // A focused control inside the card (Prev, Next, Close) keeps its own
         // Enter/Space; anywhere else it flips the card.
         if ((e.target as HTMLElement | null)?.closest?.(".jpv-card button")) return;
@@ -153,7 +299,7 @@ export function JpVocabCard({
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [ids, index, onNavigate, onClose]);
+  }, [ids, index, flipped, gradeAndAdvance, onNavigate, onClose]);
 
   if (!word) return null;
 
@@ -202,15 +348,42 @@ export function JpVocabCard({
 
         {flipped && <CardDetails word={word} />}
 
-        <div className="row" style={{ justifyContent: "space-between", marginTop: 16, gap: 8 }}>
-          <button className="ghost" onClick={() => onNavigate(ids[wrapIndex(index, -1, ids.length)])}>
-            ← Prev
-          </button>
-          <button onClick={() => setFlipped((f) => !f)}>{flipped ? "Hide" : "Reveal"}</button>
-          <button className="ghost" onClick={() => onNavigate(ids[wrapIndex(index, 1, ids.length)])}>
-            Next →
-          </button>
-        </div>
+        {flipped ? (
+          <>
+            <div className="row" style={{ marginTop: 14, gap: 8, flexWrap: "wrap" }}>
+              {GRADES.map((g) => (
+                <button
+                  key={g.q}
+                  className="ghost"
+                  style={{ flex: "1 1 0", minWidth: 80, borderColor: g.color, color: g.color }}
+                  onClick={() => gradeAndAdvance(g.q)}
+                  title={`${g.label} — ${g.hint} (press ${g.q + 1})`}
+                >
+                  <div>{g.label}</div>
+                  <div className="dim" style={{ fontSize: 11 }}>
+                    {g.hint}
+                  </div>
+                </button>
+              ))}
+            </div>
+            <p className="dim" style={{ margin: "8px 0 0", fontSize: 12, textAlign: "center" }}>
+              <span className={`jpv-dot jpv-dot-${state}`} style={{ position: "static", marginRight: 6 }} />
+              {review
+                ? `${review.reps} review${review.reps === 1 ? "" : "s"} · next due ${review.due_date}`
+                : "Not studied yet — grading schedules it."}
+            </p>
+          </>
+        ) : (
+          <div className="row" style={{ justifyContent: "space-between", marginTop: 16, gap: 8 }}>
+            <button className="ghost" onClick={() => onNavigate(ids[wrapIndex(index, -1, ids.length)])}>
+              ← Prev
+            </button>
+            <button onClick={() => setFlipped(true)}>Reveal</button>
+            <button className="ghost" onClick={() => onNavigate(ids[wrapIndex(index, 1, ids.length)])}>
+              Next →
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

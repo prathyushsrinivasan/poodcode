@@ -1,5 +1,6 @@
 import type { CardReview, Difficulty, Problem } from "../types";
 import { isCleared, type HydratedCurriculum, type HydratedUnit } from "./curriculum";
+import { isCardDue, todayISO } from "./srs";
 
 /**
  * Retention for the DSA curriculum: spacing the self-checks, and deciding what
@@ -34,18 +35,10 @@ export function bigoCardId(unitKey: string, index: number): string {
   return `dsa-bigo:${unitKey}:${index}`;
 }
 
-/** Today as `YYYY-MM-DD` in the *local* zone, matching what the backend stores. */
-export function todayISO(now: Date = new Date()): string {
-  const y = now.getFullYear();
-  const m = String(now.getMonth() + 1).padStart(2, "0");
-  const d = String(now.getDate()).padStart(2, "0");
-  return `${y}-${m}-${d}`;
-}
-
-/** A never-graded card is due; a graded one is due on or after its due date. */
-export function isCardDue(review: CardReview | undefined, today: string): boolean {
-  return !review || review.due_date <= today;
-}
+// `todayISO` and `isCardDue` moved to ./srs once the 日本語 vocabulary list
+// became a third deck on this same table — one answer to "what is today" for
+// all of them. Re-exported here so existing call sites keep their import.
+export { isCardDue, todayISO };
 
 export interface UnitChecks {
   /** Checks never graded or due today or earlier. */
