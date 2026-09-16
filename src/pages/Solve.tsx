@@ -86,12 +86,30 @@ export default function Solve({ onProgress }: { onProgress?: () => void }) {
   // Load problem + related data.
   useEffect(() => {
     if (!pid) return;
+    let cancelled = false;
     api.getProblem(pid).then((p) => {
+      if (cancelled) return;
       setProblem(p);
       setCases(p.test_cases);
     });
-    api.getHintsRevealed(pid).then(setRevealed).catch(() => setRevealed(0));
-    api.knownPrereqs(pid).then((keys) => setKnownPrereqs(new Set(keys)));
+    // Hints revealed only ever goes UP. Taking the max means a slow load can
+    // never walk back a hint the user has already opened this session, and a
+    // failed load leaves their reveals alone instead of forcing them shut —
+    // which is what `.catch(() => setRevealed(0))` used to do.
+    api
+      .getHintsRevealed(pid)
+      .then((n) => {
+        if (!cancelled) setRevealed((cur) => Math.max(cur, n));
+      })
+      .catch(() => {
+        /* keep whatever has been revealed in this session */
+      });
+    api.knownPrereqs(pid).then((keys) => {
+      if (!cancelled) setKnownPrereqs(new Set(keys));
+    });
+    return () => {
+      cancelled = true;
+    };
   }, [pid]);
 
   const togglePrereq = async (key: string) => {
@@ -272,7 +290,11 @@ export default function Solve({ onProgress }: { onProgress?: () => void }) {
   const revealHint = () => {
     const n = revealed + 1;
     setRevealed(n);
-    api.setHintsRevealed(pid, n).catch(() => {});
+    // Saving is best-effort, but it is not allowed to fail *silently*: a
+    // swallowed error here is indistinguishable from the button doing nothing.
+    api
+      .setHintsRevealed(pid, n)
+      .catch((e) => toast(`Hint shown, but saving progress failed: ${e}`));
   };
 
   const setConfidence = async (v: number) => {
