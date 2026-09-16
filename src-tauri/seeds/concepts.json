@@ -13405,7 +13405,7 @@
       },
       {
         "front": "二分探索木",
-        "card_id": "",
+        "card_id": "jp-vocab#nibun-tansakugi",
         "reading": "にぶんたんさくぎ (nibun tansakugi)",
         "meaning": "binary search tree",
         "example_ja": "二分探索木は整列されています。",
@@ -14346,7 +14346,7 @@
     "deep": "Functions and asynchronous code are where a lot of TypeScript work happens. Learn 非同期 (async), プロミス (Promise), 待機 (await), and the words for arguments, return values and callbacks.",
     "java": "The **Reading** column gives the kana pronunciation and a romaji gloss so you can say the word out loud. Loanwords written in katakana already *are* their reading, so only the romaji is shown. Example sentences are polite (です・ます) form — exactly how you'd hear them in a standup or an interview.",
     "language": "japanese",
-    "lesson": "| 用語 (Term) | 読み方 (Reading) | 意味 (Meaning) | 例文 (Example) |\n|---|---|---|---|\n| 関数 | かんすう (kansū) | function | 関数を定義します。 — *We define a function.* |\n| アロー関数 | アローかんすう (arō kansū) | arrow function | アロー関数で短く書けます。 — *We can write it shorter with an arrow function.* |\n| 引数 | ひきすう (hikisū) | argument | 関数に引数を渡します。 — *We pass an argument to the function.* |\n| 仮引数 | かりひきすう (kari hikisū) | parameter (formal parameter) | add(int a, int b)のaとbが仮引数です。 — *In add(int a, int b), a and b are the parameters.* |\n| 戻り値 | もどりち (modorichi) | return value | 関数の戻り値の型を指定します。 — *We specify the function's return type.* |\n| 高階関数 | こうかいかんすう (kōkai kansū) | higher-order function | mapは高階関数です。 — *`map` is a higher-order function.* |\n| 無名関数 | むめいかんすう (mumei kansū) | anonymous function | 無名関数をその場で渡します。 — *We pass an anonymous function inline.* |\n| 非同期 | ひどうき (hidōki) | asynchronous | fetchは非同期に実行されます。 — *fetch runs asynchronously.* |\n| 同期 | どうき (dōki) | synchronous | この処理は同期的に実行されます。 — *This runs synchronously.* |\n| 待機 | たいき (taiki) | waiting (await) | awaitでレスポンスを待機してから画面に表示します。 — *Await the response, then show it on screen.* |\n| 解決 | かいけつ (kaiketsu) | resolve | プロミスが値で解決します。 — *The promise resolves with a value.* |\n| 拒否 | きょひ (kyohi) | reject | エラーでプロミスが拒否されます。 — *The promise is rejected with an error.* |\n| 副作用 | ふくさよう (fukusayō) | side effect | この関数は副作用がありません。 — *This function has no side effects.* |\n| 純粋関数 | じゅんすいかんすう (junsui kansū) | pure function | 純粋関数はテストしやすいです。 — *Pure functions are easy to test.* |\n| デフォルト引数 | デフォルトひきすう (deforuto hikisū) | default parameter | デフォルト引数を設定します。 — *We set a default parameter.* |\n| 残余引数 | ざんよひきすう (zan'yo hikisū) | rest parameters | 残余引数を使えば、いくつでも数値を受け取れます。 — *With rest parameters, you can accept any number of numbers.* |\n| 再帰 | さいき (saiki) | recursion | 階乗は再帰で簡単に書けます。 — *Factorial is easy to write with recursion.* |\n| 並行処理 | へいこうしょり (heikō shori) | concurrency | 並行処理でダウンロードを高速化しました。 — *We sped up the downloads with concurrency.* |\n| 例外処理 | れいがいしょり (reigai shori) | exception handling | ファイル操作には例外処理が必要です。 — *File operations need exception handling.* |\n| 呼び出し | よびだし (yobidashi) | call / invocation | 関数の呼び出しを確認します。 — *We check the function call.* |\n| 遅延評価 | ちえんひょうか (chien hyōka) | lazy evaluation | Streamは遅延評価なので、終端操作まで何も起きません。 — *Streams are lazily evaluated, so nothing happens until a terminal operation.* |\n",
+    "lesson": "| 用語 (Term) | 読み方 (Reading) | 意味 (Meaning) | 例文 (Example) |\n|---|---|---|---|\n| 関数 | かんすう (kansū) | function | 関数を定義します。 — *We define a function.* |\n| アロー関数 | アローかんすう (arō kansū) | arrow function | アロー関数で短く書けます。 — *We can write it shorter with an arrow function.* |\n| 引数 | ひきすう (hikisū) | argument | 関数に引数を渡します。 — *We pass an argument to the function.* |\n| 仮引数 | かりひきすう (kari hikisū) | parameter (formal parameter) | add(int a, int b)のaとbが仮引数です。 — *In add(int a, int b), a and b are the parameters.* |\n| 戻り値 | もどりち (modorichi) | return value | 関数の戻り値の型を指定します。 — *We specify the function's return type.* |\n| 高階関数 | こうかいかんすう (kōkai kansū) | higher-order function | mapは高階関数です。 — *map is a higher-order function.* |\n| 無名関数 | むめいかんすう (mumei kansū) | anonymous function | コールバックには無名関数をよく使います。 — *We often use an anonymous function for a callback.* |\n| 非同期 | ひどうき (hidōki) | asynchronous | fetchは非同期に実行されます。 — *fetch runs asynchronously.* |\n| 同期 | どうき (dōki) | synchronous | この処理は同期的に実行されます。 — *This runs synchronously.* |\n| 待機 | たいき (taiki) | waiting (await) | awaitでレスポンスを待機してから画面に表示します。 — *Await the response, then show it on screen.* |\n| 解決 | かいけつ (kaiketsu) | resolve | プロミスが値で解決します。 — *The promise resolves with a value.* |\n| 拒否 | きょひ (kyohi) | reject | エラーでプロミスが拒否されます。 — *The promise is rejected with an error.* |\n| 副作用 | ふくさよう (fukusayō) | side effect | この関数には副作用がありません。 — *This function has no side effects.* |\n| 純粋関数 | じゅんすいかんすう (junsui kansū) | pure function | 純粋関数は同じ引数なら必ず同じ結果を返します。 — *A pure function always returns the same result for the same arguments.* |\n| デフォルト引数 | デフォルトひきすう (deforuto hikisū) | default parameter | デフォルト引数を設定します。 — *We set a default parameter.* |\n| 残余引数 | ざんよひきすう (zan'yo hikisū) | rest parameters | 残余引数を使えば、いくつでも数値を受け取れます。 — *With rest parameters, you can accept any number of numbers.* |\n| 再帰 | さいき (saiki) | recursion | 階乗は再帰で簡単に書けます。 — *Factorial is easy to write with recursion.* |\n| 並行処理 | へいこうしょり (heikō shori) | concurrency | 並行処理でダウンロードを高速化しました。 — *We sped up the downloads with concurrency.* |\n| 例外処理 | れいがいしょり (reigai shori) | exception handling | ファイル操作には例外処理が必要です。 — *File operations need exception handling.* |\n| 呼び出し | よびだし (yobidashi) | call / invocation | 関数の呼び出しを確認します。 — *We check the function call.* |\n| 遅延評価 | ちえんひょうか (chien hyōka) | lazy evaluation | Streamは遅延評価なので、終端操作まで何も起きません。 — *Streams are lazily evaluated, so nothing happens until a terminal operation.* |\n",
     "exercises": [],
     "cards": [
       {
@@ -14391,19 +14391,19 @@
       },
       {
         "front": "高階関数",
-        "card_id": "",
+        "card_id": "jp-vocab#kokai-kansu",
         "reading": "こうかいかんすう (kōkai kansū)",
         "meaning": "higher-order function",
         "example_ja": "mapは高階関数です。",
-        "example_en": "`map` is a higher-order function."
+        "example_en": "map is a higher-order function."
       },
       {
         "front": "無名関数",
-        "card_id": "",
+        "card_id": "jp-vocab#mumei-kansu",
         "reading": "むめいかんすう (mumei kansū)",
         "meaning": "anonymous function",
-        "example_ja": "無名関数をその場で渡します。",
-        "example_en": "We pass an anonymous function inline."
+        "example_ja": "コールバックには無名関数をよく使います。",
+        "example_en": "We often use an anonymous function for a callback."
       },
       {
         "front": "非同期",
@@ -14447,19 +14447,19 @@
       },
       {
         "front": "副作用",
-        "card_id": "",
+        "card_id": "jp-vocab#fukusayo",
         "reading": "ふくさよう (fukusayō)",
         "meaning": "side effect",
-        "example_ja": "この関数は副作用がありません。",
+        "example_ja": "この関数には副作用がありません。",
         "example_en": "This function has no side effects."
       },
       {
         "front": "純粋関数",
-        "card_id": "",
+        "card_id": "jp-vocab#junsui-kansu",
         "reading": "じゅんすいかんすう (junsui kansū)",
         "meaning": "pure function",
-        "example_ja": "純粋関数はテストしやすいです。",
-        "example_en": "Pure functions are easy to test."
+        "example_ja": "純粋関数は同じ引数なら必ず同じ結果を返します。",
+        "example_en": "A pure function always returns the same result for the same arguments."
       },
       {
         "front": "デフォルト引数",

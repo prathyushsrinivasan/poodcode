@@ -1424,6 +1424,382 @@
       "example_en": "Output the answer modulo 1,000,000,007."
     },
     {
+      "id": "sosu",
+      "term": "素数",
+      "reading": "そすう",
+      "romaji": "sosū",
+      "tags": [
+        "problems"
+      ],
+      "level": 1,
+      "meaning": "prime number",
+      "desc_en": "A whole number greater than 1 divisible only by 1 and itself.",
+      "desc_ja": "1より大きく、1と自分自身でしか割り切れない整数です。",
+      "example_ja": "Nまでの素数をすべて求めてください。",
+      "example_en": "Find all the prime numbers up to N."
+    },
+    {
+      "id": "yakusu",
+      "term": "約数",
+      "reading": "やくすう",
+      "romaji": "yakusū",
+      "tags": [
+        "problems"
+      ],
+      "level": 2,
+      "meaning": "divisor",
+      "desc_en": "A number that divides another with no remainder. Checking up to the square root is enough to find them all.",
+      "desc_ja": "ある数を割り切ることのできる数です。平方根まで調べればすべて見つけられます。",
+      "example_ja": "12の約数は1, 2, 3, 4, 6, 12です。",
+      "example_en": "The divisors of 12 are 1, 2, 3, 4, 6 and 12."
+    },
+    {
+      "id": "saidai-koyakusu",
+      "term": "最大公約数",
+      "reading": "さいだいこうやくすう",
+      "romaji": "saidai kōyakusū",
+      "tags": [
+        "problems"
+      ],
+      "level": 2,
+      "meaning": "greatest common divisor",
+      "desc_en": "The largest number dividing two numbers evenly, found quickly by the Euclidean algorithm.",
+      "desc_ja": "二つの数をともに割り切る最大の数です。ユークリッドの互除法で素早く求められます。",
+      "example_ja": "二つの数の最大公約数を求めてください。",
+      "example_en": "Find the greatest common divisor of the two numbers."
+    },
+    {
+      "id": "kaijo",
+      "term": "階乗",
+      "reading": "かいじょう",
+      "romaji": "kaijō",
+      "tags": [
+        "problems"
+      ],
+      "level": 2,
+      "meaning": "factorial",
+      "desc_en": "n! — the product of every whole number from 1 to n. It grows fast enough to overflow an int by 13.",
+      "desc_ja": "1からnまでのすべての整数を掛けた値です。増え方が速く、13でintの範囲を超えます。",
+      "example_ja": "5の階乗は120です。",
+      "example_en": "The factorial of 5 is 120."
+    },
+    {
+      "id": "keta-afure",
+      "term": "桁あふれ",
+      "reading": "けたあふれ",
+      "romaji": "keta afure",
+      "tags": [
+        "problems",
+        "java"
+      ],
+      "level": 2,
+      "meaning": "overflow",
+      "desc_en": "A result too large for its type, which wraps silently rather than failing — the reason a sum is often held in a long.",
+      "desc_ja": "計算結果が型の範囲を超えることです。エラーにならず静かに値が回り込むため、合計にはlongを使うことが多いです。",
+      "example_ja": "合計がintの範囲を超えると桁あふれが起きます。",
+      "example_en": "If the total exceeds the int range, an overflow occurs."
+    },
+    {
+      "id": "shugo",
+      "term": "集合",
+      "reading": "しゅうごう",
+      "romaji": "shūgō",
+      "tags": [
+        "problems"
+      ],
+      "level": 1,
+      "meaning": "set",
+      "desc_en": "A collection with no duplicates and no order you should rely on.",
+      "desc_ja": "重複がなく、順序をあてにしてはいけないデータの集まりです。",
+      "example_ja": "重複を消すには集合を使います。",
+      "example_en": "Use a set to remove duplicates."
+    },
+    {
+      "id": "bubunretsu",
+      "term": "部分列",
+      "reading": "ぶぶんれつ",
+      "romaji": "bubunretsu",
+      "tags": [
+        "problems"
+      ],
+      "level": 2,
+      "meaning": "subsequence",
+      "desc_en": "Elements taken from a sequence in order but not necessarily adjacent — unlike a 部分配列, gaps are allowed.",
+      "desc_ja": "順番は保ったまま取り出した要素の並びです。部分配列と違い、間を飛ばしてもかまいません。",
+      "example_ja": "最長増加部分列の長さを求めてください。",
+      "example_en": "Find the length of the longest increasing subsequence."
+    },
+    {
+      "id": "fukasa",
+      "term": "深さ",
+      "reading": "ふかさ",
+      "romaji": "fukasa",
+      "tags": [
+        "problems"
+      ],
+      "level": 1,
+      "meaning": "depth",
+      "desc_en": "How many edges lie between the root and a given node.",
+      "desc_ja": "根からある節点までに通る辺の数です。",
+      "example_ja": "この節点の深さは3です。",
+      "example_en": "The depth of this node is 3."
+    },
+    {
+      "id": "takasa",
+      "term": "高さ",
+      "reading": "たかさ",
+      "romaji": "takasa",
+      "tags": [
+        "problems"
+      ],
+      "level": 1,
+      "meaning": "height",
+      "desc_en": "The length of the longest path from a node down to a leaf; a tree's height is its root's.",
+      "desc_ja": "ある節点から葉までの最も長い道のりの長さです。木の高さは根から測ります。",
+      "example_ja": "平衡木の高さはO(log n)です。",
+      "example_en": "A balanced tree's height is O(log n)."
+    },
+    {
+      "id": "ha",
+      "term": "葉",
+      "reading": "は",
+      "romaji": "ha",
+      "tags": [
+        "problems"
+      ],
+      "level": 1,
+      "meaning": "leaf",
+      "desc_en": "A node with no children — where a downward traversal stops.",
+      "desc_ja": "子を持たない節点です。下向きの走査はここで止まります。",
+      "example_ja": "葉の数を数えてください。",
+      "example_en": "Count the number of leaves."
+    },
+    {
+      "id": "oya",
+      "term": "親",
+      "reading": "おや",
+      "romaji": "oya",
+      "tags": [
+        "problems"
+      ],
+      "level": 1,
+      "meaning": "parent (node)",
+      "desc_en": "The node one step above another. Every node has exactly one, except the root.",
+      "desc_ja": "ある節点の一つ上にある節点です。根を除き、どの節点にも必ず一つあります。",
+      "example_ja": "各節点の親を配列で持ちます。",
+      "example_en": "We hold each node's parent in an array."
+    },
+    {
+      "id": "ko",
+      "term": "子",
+      "reading": "こ",
+      "romaji": "ko",
+      "tags": [
+        "problems"
+      ],
+      "level": 1,
+      "meaning": "child (node)",
+      "desc_en": "A node directly below another. A binary tree node has at most two.",
+      "desc_ja": "ある節点の直下にある節点です。二分木では最大で二つです。",
+      "example_ja": "左の子と右の子を順に調べます。",
+      "example_en": "We examine the left child and the right child in turn."
+    },
+    {
+      "id": "nibun-tansakugi",
+      "term": "二分探索木",
+      "reading": "にぶんたんさくぎ",
+      "romaji": "nibun tansakugi",
+      "tags": [
+        "problems"
+      ],
+      "level": 2,
+      "meaning": "binary search tree",
+      "desc_en": "A tree keeping smaller keys left and larger keys right, so lookup follows one path down — O(log n) only while it stays balanced.",
+      "desc_ja": "小さい鍵を左、大きい鍵を右に置く木です。探索は一本の道をたどるだけで済みますが、O(log n)なのは平衡が保たれている間だけです。",
+      "example_ja": "二分探索木は整列されています。",
+      "example_en": "A binary search tree is kept sorted."
+    },
+    {
+      "id": "heiko",
+      "term": "平衡",
+      "reading": "へいこう",
+      "romaji": "heikō",
+      "tags": [
+        "problems"
+      ],
+      "level": 3,
+      "meaning": "balanced",
+      "desc_en": "Kept shallow enough that operations stay logarithmic, rather than degenerating into a list.",
+      "desc_ja": "操作が対数時間のままでいられる程度に浅さが保たれていることです。崩れると連結リストと変わらなくなります。",
+      "example_ja": "平衡が崩れると探索がO(n)になります。",
+      "example_en": "If the balance is lost, search becomes O(n)."
+    },
+    {
+      "id": "machi-gyoretsu",
+      "term": "待ち行列",
+      "reading": "まちぎょうれつ",
+      "romaji": "machi gyōretsu",
+      "tags": [
+        "problems"
+      ],
+      "level": 2,
+      "meaning": "queue",
+      "desc_en": "First in, first out — the textbook word beside the loanword キュー.",
+      "desc_ja": "先に入れたものから先に出る構造です。「キュー」に対する漢語の言い方です。",
+      "example_ja": "幅優先探索では待ち行列を使います。",
+      "example_en": "Breadth-first search uses a queue."
+    },
+    {
+      "id": "heiro",
+      "term": "閉路",
+      "reading": "へいろ",
+      "romaji": "heiro",
+      "tags": [
+        "problems"
+      ],
+      "level": 3,
+      "meaning": "cycle",
+      "desc_en": "A path through a graph that returns to where it started. A tree is exactly a connected graph with none.",
+      "desc_ja": "出発した頂点に戻ってくる経路です。木とは、閉路のない連結なグラフのことです。",
+      "example_ja": "このグラフに閉路があるか判定してください。",
+      "example_en": "Determine whether this graph contains a cycle."
+    },
+    {
+      "id": "renketsu-seibun",
+      "term": "連結成分",
+      "reading": "れんけつせいぶん",
+      "romaji": "renketsu seibun",
+      "tags": [
+        "problems"
+      ],
+      "level": 3,
+      "meaning": "connected component",
+      "desc_en": "A maximal group of vertices all reachable from one another.",
+      "desc_ja": "互いに行き来できる頂点の、これ以上広げられないまとまりです。",
+      "example_ja": "連結成分の数を数えてください。",
+      "example_en": "Count the number of connected components."
+    },
+    {
+      "id": "iso-seiretsu",
+      "term": "位相整列",
+      "reading": "いそうせいれつ",
+      "romaji": "isō seiretsu",
+      "tags": [
+        "problems"
+      ],
+      "level": 3,
+      "meaning": "topological sort",
+      "desc_en": "An ordering of a directed graph in which every edge points forwards — possible only when there is no cycle.",
+      "desc_ja": "すべての辺が前向きになるように有向グラフを並べることです。閉路がない場合にのみ可能です。",
+      "example_ja": "依存関係の順序は位相整列で求めます。",
+      "example_en": "We find the order of dependencies with a topological sort."
+    },
+    {
+      "id": "saisho-zen-ikigi",
+      "term": "最小全域木",
+      "reading": "さいしょうぜんいきぎ",
+      "romaji": "saishō zen'ikigi",
+      "tags": [
+        "problems"
+      ],
+      "level": 3,
+      "meaning": "minimum spanning tree",
+      "desc_en": "The cheapest set of edges connecting every vertex without forming a cycle.",
+      "desc_ja": "すべての頂点を閉路なしにつなぐ、重みの合計が最小の辺の集まりです。",
+      "example_ja": "最小全域木の重みの合計を出力してください。",
+      "example_en": "Output the total weight of the minimum spanning tree."
+    },
+    {
+      "id": "zenkashiki",
+      "term": "漸化式",
+      "reading": "ぜんかしき",
+      "romaji": "zenkashiki",
+      "tags": [
+        "problems"
+      ],
+      "level": 3,
+      "meaning": "recurrence relation",
+      "desc_en": "A rule defining each term from earlier ones — the thing you write down before turning it into a DP table.",
+      "desc_ja": "各項を前の項から定める式です。動的計画法の表に変える前に、まず書き下すものです。",
+      "example_ja": "この問題の漸化式を立てます。",
+      "example_en": "We set up the recurrence relation for this problem."
+    },
+    {
+      "id": "tancho",
+      "term": "単調",
+      "reading": "たんちょう",
+      "romaji": "tanchō",
+      "tags": [
+        "problems"
+      ],
+      "level": 3,
+      "meaning": "monotonic",
+      "desc_en": "Never decreasing, or never increasing — the property that makes binary search and the monotonic stack work.",
+      "desc_ja": "減ることがない、あるいは増えることがない性質です。二分探索や単調スタックが成り立つ根拠になります。",
+      "example_ja": "配列が単調なら二分探索が使えます。",
+      "example_en": "If the array is monotonic, binary search can be used."
+    },
+    {
+      "id": "shazo",
+      "term": "写像",
+      "reading": "しゃぞう",
+      "romaji": "shazō",
+      "tags": [
+        "problems"
+      ],
+      "level": 3,
+      "meaning": "mapping",
+      "desc_en": "A correspondence sending each input to exactly one output.",
+      "desc_ja": "それぞれの入力を、ただ一つの出力に対応させる関係です。",
+      "example_ja": "文字から個数への写像を作ります。",
+      "example_en": "We build a mapping from character to count."
+    },
+    {
+      "id": "banpei",
+      "term": "番兵",
+      "reading": "ばんぺい",
+      "romaji": "banpei",
+      "tags": [
+        "problems"
+      ],
+      "level": 3,
+      "meaning": "sentinel",
+      "desc_en": "An extra value placed at a boundary so the loop needs no special case for the end.",
+      "desc_ja": "端に置いておく余分な値です。ループの終わりを特別扱いせずに済みます。",
+      "example_ja": "番兵を置くと境界の処理が簡単になります。",
+      "example_en": "Adding a sentinel makes the boundary handling simpler."
+    },
+    {
+      "id": "bunkatsu-tochi",
+      "term": "分割統治",
+      "reading": "ぶんかつとうち",
+      "romaji": "bunkatsu tōchi",
+      "tags": [
+        "problems"
+      ],
+      "level": 3,
+      "meaning": "divide and conquer",
+      "desc_en": "Splitting a problem into independent halves, solving each, then combining — how merge sort works.",
+      "desc_ja": "問題を互いに独立な部分に分け、それぞれ解いてから組み合わせる手法です。マージソートがこの形です。",
+      "example_ja": "マージソートは分割統治の代表例です。",
+      "example_en": "Merge sort is the classic example of divide and conquer."
+    },
+    {
+      "id": "shokyaku-keisanryo",
+      "term": "償却計算量",
+      "reading": "しょうきゃくけいさんりょう",
+      "romaji": "shōkyaku keisanryō",
+      "tags": [
+        "problems"
+      ],
+      "level": 3,
+      "meaning": "amortized complexity",
+      "desc_en": "The average cost per operation across a long run, which can be low even when one operation is occasionally expensive.",
+      "desc_ja": "多数回の操作全体でならした一回あたりの計算量です。たまに重い操作があっても平均は小さくなり得ます。",
+      "example_ja": "ArrayListの追加は償却計算量がO(1)です。",
+      "example_en": "Appending to an ArrayList is O(1) amortized."
+    },
+    {
       "id": "kata-chushaku",
       "term": "型注釈",
       "reading": "かたちゅうしゃく",
@@ -1922,6 +2298,381 @@
       "desc_ja": "プログラムが実際に動いている間のことです。TypeScriptの型はその時点で消えているため、実行時のチェックにはJavaScriptのコードが必要です。",
       "example_ja": "型は実行時には存在しません。",
       "example_en": "Types don't exist at runtime."
+    },
+    {
+      "id": "fukusayo",
+      "term": "副作用",
+      "reading": "ふくさよう",
+      "romaji": "fukusayō",
+      "tags": [
+        "typescript"
+      ],
+      "level": 2,
+      "meaning": "side effect",
+      "desc_en": "Anything a function does beyond returning a value — writing a field, logging, calling an API.",
+      "desc_ja": "値を返す以外に関数が行うことすべてです。フィールドの書き換え、出力、APIの呼び出しなどが該当します。",
+      "example_ja": "この関数には副作用がありません。",
+      "example_en": "This function has no side effects."
+    },
+    {
+      "id": "junsui-kansu",
+      "term": "純粋関数",
+      "reading": "じゅんすいかんすう",
+      "romaji": "junsui kansū",
+      "tags": [
+        "typescript"
+      ],
+      "level": 2,
+      "meaning": "pure function",
+      "desc_en": "A function whose result depends only on its arguments and which has no side effects, so it is trivially testable.",
+      "desc_ja": "結果が引数だけで決まり、副作用を持たない関数です。そのため試験がとても簡単になります。",
+      "example_ja": "純粋関数は同じ引数なら必ず同じ結果を返します。",
+      "example_en": "A pure function always returns the same result for the same arguments."
+    },
+    {
+      "id": "kokai-kansu",
+      "term": "高階関数",
+      "reading": "こうかいかんすう",
+      "romaji": "kōkai kansū",
+      "tags": [
+        "typescript"
+      ],
+      "level": 3,
+      "meaning": "higher-order function",
+      "desc_en": "A function taking or returning another function — map, filter and reduce are the ones you meet first.",
+      "desc_ja": "関数を引数に取る、あるいは関数を返す関数です。map、filter、reduceが代表例です。",
+      "example_ja": "mapは高階関数です。",
+      "example_en": "map is a higher-order function."
+    },
+    {
+      "id": "mumei-kansu",
+      "term": "無名関数",
+      "reading": "むめいかんすう",
+      "romaji": "mumei kansū",
+      "tags": [
+        "typescript"
+      ],
+      "level": 2,
+      "meaning": "anonymous function",
+      "desc_en": "A function written without a name, usually passed straight into something else as an arrow function.",
+      "desc_ja": "名前を付けずに書く関数です。多くはアロー関数として、そのまま他の関数に渡します。",
+      "example_ja": "コールバックには無名関数をよく使います。",
+      "example_en": "We often use an anonymous function for a callback."
+    },
+    {
+      "id": "makiage",
+      "term": "巻き上げ",
+      "reading": "まきあげ",
+      "romaji": "makiage",
+      "tags": [
+        "typescript"
+      ],
+      "level": 3,
+      "meaning": "hoisting",
+      "desc_en": "Declarations being moved to the top of their scope before the code runs — why a var is undefined rather than an error.",
+      "desc_ja": "実行前に宣言がスコープの先頭へ移される挙動です。varがエラーではなくundefinedになるのはこのためです。",
+      "example_ja": "letは巻き上げられますが、初期化前には使えません。",
+      "example_en": "let is hoisted, but can't be used before it's initialized."
+    },
+    {
+      "id": "toi-kobun",
+      "term": "糖衣構文",
+      "reading": "とういこうぶん",
+      "romaji": "tōi kōbun",
+      "tags": [
+        "typescript"
+      ],
+      "level": 3,
+      "meaning": "syntactic sugar",
+      "desc_en": "Nicer syntax for something the language could already express — class over prototypes, async/await over Promises.",
+      "desc_ja": "既に書けることを、より読みやすく書けるようにした構文です。classやasync/awaitがこれにあたります。",
+      "example_ja": "classは糖衣構文で、内部はプロトタイプです。",
+      "example_en": "class is syntactic sugar; underneath it's prototypes."
+    },
+    {
+      "id": "sokuji-kansu",
+      "term": "即時関数",
+      "reading": "そくじかんすう",
+      "romaji": "sokuji kansū",
+      "tags": [
+        "typescript"
+      ],
+      "level": 3,
+      "meaning": "immediately-invoked function",
+      "desc_en": "A function defined and called in one expression, historically used to make a private scope.",
+      "desc_ja": "定義と同時に呼び出す関数です。かつては私的なスコープを作るために使われました。",
+      "example_ja": "モジュールがない時代は即時関数で変数を隠しました。",
+      "example_en": "Before modules, an immediately-invoked function hid the variables."
+    },
+    {
+      "id": "tanraku-hyoka",
+      "term": "短絡評価",
+      "reading": "たんらくひょうか",
+      "romaji": "tanraku hyōka",
+      "tags": [
+        "typescript"
+      ],
+      "level": 3,
+      "meaning": "short-circuit evaluation",
+      "desc_en": "Stopping as soon as the answer is known — && skips its right side when the left is false.",
+      "desc_ja": "答えが決まった時点で評価をやめることです。&&は左が偽なら右を評価しません。",
+      "example_ja": "短絡評価のおかげでnullチェックが安全に書けます。",
+      "example_en": "Short-circuit evaluation lets you write a null check safely."
+    },
+    {
+      "id": "kata-hensu",
+      "term": "型変数",
+      "reading": "かたへんすう",
+      "romaji": "kata hensū",
+      "tags": [
+        "typescript"
+      ],
+      "level": 2,
+      "meaning": "type variable",
+      "desc_en": "The placeholder name in a generic — the T in Array<T> — standing for a type supplied later.",
+      "desc_ja": "総称型の中の仮の名前です。Array<T>のTがこれにあたり、後から与えられる型を表します。",
+      "example_ja": "型変数には慣習的にTを使います。",
+      "example_en": "By convention the type variable is called T."
+    },
+    {
+      "id": "kata-shazo",
+      "term": "型写像",
+      "reading": "かたしゃぞう",
+      "romaji": "kata shazō",
+      "tags": [
+        "typescript"
+      ],
+      "level": 3,
+      "meaning": "mapped type",
+      "desc_en": "A type built by walking the keys of another and transforming each — how Partial and Readonly are defined.",
+      "desc_ja": "別の型のキーを一つずつたどって作る型です。PartialやReadonlyはこの仕組みで定義されています。",
+      "example_ja": "型写像を使えばすべてのプロパティを省略可能にできます。",
+      "example_en": "With a mapped type you can make every property optional."
+    },
+    {
+      "id": "soejigata",
+      "term": "添字型",
+      "reading": "そえじがた",
+      "romaji": "soejigata",
+      "tags": [
+        "typescript"
+      ],
+      "level": 3,
+      "meaning": "index signature",
+      "desc_en": "A declaration saying \"any key of this type maps to that type\", for objects whose keys aren't known in advance.",
+      "desc_ja": "「この型のどんなキーでもこの型の値になる」と宣言するものです。キーが事前に分からないオブジェクトに使います。",
+      "example_ja": "添字型を使うと任意のキーを許せます。",
+      "example_en": "An index signature lets you allow arbitrary keys."
+    },
+    {
+      "id": "saikigata",
+      "term": "再帰型",
+      "reading": "さいきがた",
+      "romaji": "saikigata",
+      "tags": [
+        "typescript"
+      ],
+      "level": 3,
+      "meaning": "recursive type",
+      "desc_en": "A type defined in terms of itself — the natural way to describe JSON or a tree.",
+      "desc_ja": "自分自身を使って定義される型です。JSONや木構造を表すのに向いています。",
+      "example_ja": "JSONの値は再帰型で表せます。",
+      "example_en": "A JSON value can be described with a recursive type."
+    },
+    {
+      "id": "rekkyo",
+      "term": "列挙",
+      "reading": "れっきょ",
+      "romaji": "rekkyo",
+      "tags": [
+        "typescript"
+      ],
+      "level": 2,
+      "meaning": "enumeration",
+      "desc_en": "Listing every case explicitly — as against leaving the set open.",
+      "desc_ja": "すべての場合を明示的に並べ上げることです。範囲を開いたままにしないという意味合いです。",
+      "example_ja": "取りうる状態を列挙します。",
+      "example_en": "We enumerate the possible states."
+    },
+    {
+      "id": "hensei",
+      "term": "変性",
+      "reading": "へんせい",
+      "romaji": "hensei",
+      "tags": [
+        "typescript"
+      ],
+      "level": 3,
+      "meaning": "variance",
+      "desc_en": "How a type's assignability follows that of its parameter — whether Box<Dog> counts as a Box<Animal>.",
+      "desc_ja": "型引数の関係が、その型自身の代入可能性にどう伝わるかという性質です。Box<Dog>をBox<Animal>として使えるかという話です。",
+      "example_ja": "配列の変性はTypeScriptでは緩やかです。",
+      "example_en": "Array variance is loose in TypeScript."
+    },
+    {
+      "id": "kyohen",
+      "term": "共変",
+      "reading": "きょうへん",
+      "romaji": "kyōhen",
+      "tags": [
+        "typescript"
+      ],
+      "level": 3,
+      "meaning": "covariant",
+      "desc_en": "Varying the same way: if Dog is a subtype of Animal, a covariant container of Dog is a subtype of one of Animal.",
+      "desc_ja": "同じ向きに変わることです。DogがAnimalの部分型なら、共変な入れ物でもDogの方が部分型になります。",
+      "example_ja": "戻り値の型は共変です。",
+      "example_en": "Return types are covariant."
+    },
+    {
+      "id": "hanpen",
+      "term": "反変",
+      "reading": "はんぺん",
+      "romaji": "hanpen",
+      "tags": [
+        "typescript"
+      ],
+      "level": 3,
+      "meaning": "contravariant",
+      "desc_en": "Varying the opposite way — which is how function parameter types behave.",
+      "desc_ja": "逆向きに変わることです。関数の引数の型がこの性質を持ちます。",
+      "example_ja": "引数の型は反変です。",
+      "example_en": "Parameter types are contravariant."
+    },
+    {
+      "id": "toketsu",
+      "term": "凍結",
+      "reading": "とうけつ",
+      "romaji": "tōketsu",
+      "tags": [
+        "typescript"
+      ],
+      "level": 2,
+      "meaning": "freezing (Object.freeze)",
+      "desc_en": "Making an object reject changes at runtime, as against readonly, which only stops them at compile time.",
+      "desc_ja": "実行時にオブジェクトの変更を受け付けなくすることです。コンパイル時にだけ効くreadonlyとは異なります。",
+      "example_ja": "設定オブジェクトを凍結します。",
+      "example_en": "We freeze the configuration object."
+    },
+    {
+      "id": "asai-fukusei",
+      "term": "浅い複製",
+      "reading": "あさいふくせい",
+      "romaji": "asai fukusei",
+      "tags": [
+        "typescript"
+      ],
+      "level": 2,
+      "meaning": "shallow copy",
+      "desc_en": "A copy one level deep: nested objects are still shared with the original.",
+      "desc_ja": "一段だけの複製です。入れ子になったオブジェクトは元と共有されたままになります。",
+      "example_ja": "展開構文で作れるのは浅い複製です。",
+      "example_en": "Spread syntax gives you a shallow copy."
+    },
+    {
+      "id": "fukai-fukusei",
+      "term": "深い複製",
+      "reading": "ふかいふくせい",
+      "romaji": "fukai fukusei",
+      "tags": [
+        "typescript"
+      ],
+      "level": 2,
+      "meaning": "deep copy",
+      "desc_en": "A copy all the way down, sharing nothing with the original.",
+      "desc_ja": "入れ子の奥まで複製し、元と何も共有しないものです。",
+      "example_ja": "深い複製にはstructuredCloneが使えます。",
+      "example_en": "You can use structuredClone for a deep copy."
+    },
+    {
+      "id": "chokusekigata",
+      "term": "直積型",
+      "reading": "ちょくせきがた",
+      "romaji": "chokusekigata",
+      "tags": [
+        "typescript"
+      ],
+      "level": 3,
+      "meaning": "product type",
+      "desc_en": "A type holding several values at once — an object or a tuple, an \"and\" of its parts.",
+      "desc_ja": "複数の値を同時に持つ型です。オブジェクトやタプルがこれにあたり、各部分の「かつ」を表します。",
+      "example_ja": "オブジェクトは直積型の一種です。",
+      "example_en": "An object is a kind of product type."
+    },
+    {
+      "id": "chokuwagata",
+      "term": "直和型",
+      "reading": "ちょくわがた",
+      "romaji": "chokuwagata",
+      "tags": [
+        "typescript"
+      ],
+      "level": 3,
+      "meaning": "sum type",
+      "desc_en": "A type that is one of several alternatives — an \"or\", which in TypeScript is a discriminated union.",
+      "desc_ja": "いくつかの候補のうちどれか一つになる型です。「または」を表し、TypeScriptでは判別可能な合併型がこれにあたります。",
+      "example_ja": "判別可能な合併型は直和型です。",
+      "example_en": "A discriminated union is a sum type."
+    },
+    {
+      "id": "bubun-tekiyo",
+      "term": "部分適用",
+      "reading": "ぶぶんてきよう",
+      "romaji": "bubun tekiyō",
+      "tags": [
+        "typescript"
+      ],
+      "level": 3,
+      "meaning": "partial application",
+      "desc_en": "Fixing some of a function's arguments now and getting back a function wanting the rest.",
+      "desc_ja": "関数の引数の一部だけを先に決め、残りを受け取る関数を得ることです。",
+      "example_ja": "部分適用で設定済みの関数を作ります。",
+      "example_en": "We use partial application to make a pre-configured function."
+    },
+    {
+      "id": "kansu-gosei",
+      "term": "関数合成",
+      "reading": "かんすうごうせい",
+      "romaji": "kansū gōsei",
+      "tags": [
+        "typescript"
+      ],
+      "level": 3,
+      "meaning": "function composition",
+      "desc_en": "Chaining functions so one's output is the next one's input.",
+      "desc_ja": "ある関数の出力を次の関数の入力にしてつなげることです。",
+      "example_ja": "小さな関数を関数合成で組み立てます。",
+      "example_en": "We build it up from small functions by composition."
+    },
+    {
+      "id": "sansho-tokasei",
+      "term": "参照透過性",
+      "reading": "さんしょうとうかせい",
+      "romaji": "sanshō tōkasei",
+      "tags": [
+        "typescript"
+      ],
+      "level": 3,
+      "meaning": "referential transparency",
+      "desc_en": "The property that an expression can be replaced by its value without changing the program — what purity buys you.",
+      "desc_ja": "式をその値で置き換えてもプログラムの意味が変わらない性質です。純粋であることの利点です。",
+      "example_ja": "純粋関数の呼び出しには参照透過性があります。",
+      "example_en": "A call to a pure function is referentially transparent."
+    },
+    {
+      "id": "matsubi-yobidashi",
+      "term": "末尾呼び出し",
+      "reading": "まつびよびだし",
+      "romaji": "matsubi yobidashi",
+      "tags": [
+        "typescript"
+      ],
+      "level": 3,
+      "meaning": "tail call",
+      "desc_en": "A call in the very last position of a function, which in principle can reuse the stack frame — though JavaScript engines mostly don't.",
+      "desc_ja": "関数の最後の位置で行う呼び出しです。原理的にはスタックを再利用できますが、多くのJavaScriptエンジンは実装していません。",
+      "example_ja": "末尾呼び出しでも再帰が深いと停止します。",
+      "example_en": "Even a tail call will overflow if the recursion is deep."
     },
     {
       "id": "ketsugo",
