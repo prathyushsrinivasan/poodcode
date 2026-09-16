@@ -14,6 +14,16 @@
       "id": "typescript",
       "label": "TypeScript",
       "label_ja": "TypeScript"
+    },
+    {
+      "id": "sql",
+      "label": "SQL",
+      "label_ja": "データベース"
+    },
+    {
+      "id": "web",
+      "label": "Web",
+      "label_ja": "Webと通信"
     }
   ],
   "words": [
@@ -1529,6 +1539,756 @@
       "desc_ja": "プログラムが実際に動いている間のことです。TypeScriptの型はその時点で消えているため、実行時のチェックにはJavaScriptのコードが必要です。",
       "example_ja": "型は実行時には存在しません。",
       "example_en": "Types don't exist at runtime."
+    },
+    {
+      "id": "ketsugo",
+      "term": "結合",
+      "reading": "けつごう",
+      "romaji": "ketsugō",
+      "tags": [
+        "sql"
+      ],
+      "level": 2,
+      "meaning": "join",
+      "desc_en": "Combining rows from two tables by matching a column they have in common — the operation most SQL questions are really about.",
+      "desc_ja": "共通する列の値を手がかりに、二つの表の行を組み合わせる操作です。SQLの問題の多くはこれが中心になります。",
+      "example_ja": "顧客表と注文表を顧客IDで結合します。",
+      "example_en": "We join the customer table and the order table on the customer ID."
+    },
+    {
+      "id": "naibu-ketsugo",
+      "term": "内部結合",
+      "reading": "ないぶけつごう",
+      "romaji": "naibu ketsugō",
+      "tags": [
+        "sql"
+      ],
+      "level": 3,
+      "meaning": "inner join",
+      "desc_en": "A join that keeps only the rows matching on both sides, dropping anything with no partner.",
+      "desc_ja": "両方の表で条件に一致した行だけを残す結合です。相手のない行は取り除かれます。",
+      "example_ja": "内部結合では、注文のない顧客は結果に現れません。",
+      "example_en": "With an inner join, customers with no orders don't appear in the result."
+    },
+    {
+      "id": "gaibu-ketsugo",
+      "term": "外部結合",
+      "reading": "がいぶけつごう",
+      "romaji": "gaibu ketsugō",
+      "tags": [
+        "sql"
+      ],
+      "level": 3,
+      "meaning": "outer join",
+      "desc_en": "A join that keeps rows from one side even when nothing matches, filling the missing columns with NULL.",
+      "desc_ja": "一致する行がなくても片方の表の行を残す結合です。足りない列はNULLで埋められます。",
+      "example_ja": "外部結合を使えば、注文のない顧客も一覧に残ります。",
+      "example_en": "With an outer join, customers with no orders stay in the list."
+    },
+    {
+      "id": "shukei",
+      "term": "集計",
+      "reading": "しゅうけい",
+      "romaji": "shūkei",
+      "tags": [
+        "sql"
+      ],
+      "level": 2,
+      "meaning": "aggregation",
+      "desc_en": "Reducing many rows to one summary value — a count, a total, an average — usually per group.",
+      "desc_ja": "多くの行を、件数や合計、平均といった一つの値にまとめることです。普通はグループごとに行います。",
+      "example_ja": "部署ごとに給与を集計します。",
+      "example_en": "We aggregate salaries by department."
+    },
+    {
+      "id": "shuyaku-kansu",
+      "term": "集約関数",
+      "reading": "しゅうやくかんすう",
+      "romaji": "shūyaku kansū",
+      "tags": [
+        "sql"
+      ],
+      "level": 3,
+      "meaning": "aggregate function",
+      "desc_en": "A function such as COUNT, SUM or AVG that takes a group of rows and returns a single value.",
+      "desc_ja": "COUNTやSUM、AVGのように、行のグループを受け取って一つの値を返す関数です。",
+      "example_ja": "COUNTは最もよく使う集約関数です。",
+      "example_en": "COUNT is the most commonly used aggregate function."
+    },
+    {
+      "id": "fuku-toiawase",
+      "term": "副問い合わせ",
+      "reading": "ふくといあわせ",
+      "romaji": "fuku toiawase",
+      "tags": [
+        "sql"
+      ],
+      "level": 3,
+      "meaning": "subquery",
+      "desc_en": "A query written inside another query, whose result the outer query uses as a value, a list or a table.",
+      "desc_ja": "別の問い合わせの中に書く問い合わせです。その結果を外側が値や一覧、表として使います。",
+      "example_ja": "平均より高い給与を探すには副問い合わせが便利です。",
+      "example_en": "A subquery is handy for finding salaries above the average."
+    },
+    {
+      "id": "sakuin",
+      "term": "索引",
+      "reading": "さくいん",
+      "romaji": "sakuin",
+      "tags": [
+        "sql"
+      ],
+      "level": 2,
+      "meaning": "index",
+      "desc_en": "A separate structure the database keeps so it can find rows by a column's value without scanning the whole table.",
+      "desc_ja": "列の値から行を素早く見つけるために、データベースが別に持つ仕組みです。表全体を調べずに済みます。",
+      "example_ja": "検索が遅いので、その列に索引を作りました。",
+      "example_en": "The search was slow, so I created an index on that column."
+    },
+    {
+      "id": "seikika",
+      "term": "正規化",
+      "reading": "せいきか",
+      "romaji": "seikika",
+      "tags": [
+        "sql"
+      ],
+      "level": 3,
+      "meaning": "normalization",
+      "desc_en": "Splitting data across tables so each fact is stored exactly once, which removes the update anomalies duplication causes.",
+      "desc_ja": "同じ事実が一度だけ保存されるように、データを複数の表に分ける設計です。重複による更新の矛盾を防げます。",
+      "example_ja": "住所を別の表に分けて正規化しました。",
+      "example_en": "I normalized it by moving the address into its own table."
+    },
+    {
+      "id": "ikkansei",
+      "term": "一貫性",
+      "reading": "いっかんせい",
+      "romaji": "ikkansei",
+      "tags": [
+        "sql"
+      ],
+      "level": 3,
+      "meaning": "consistency",
+      "desc_en": "The guarantee that a transaction moves the database from one valid state to another, never leaving it half-updated.",
+      "desc_ja": "取引の前後でデータベースが常に正しい状態であることの保証です。途中の状態が残ることはありません。",
+      "example_ja": "取引によってデータの一貫性が保たれます。",
+      "example_en": "A transaction keeps the data consistent."
+    },
+    {
+      "id": "torihiki",
+      "term": "取引",
+      "reading": "とりひき",
+      "romaji": "torihiki",
+      "tags": [
+        "sql"
+      ],
+      "level": 2,
+      "meaning": "transaction",
+      "desc_en": "A group of statements that either all take effect or none do, so a failure part-way through leaves nothing behind.",
+      "desc_ja": "まとめて全部成功するか、全部なかったことになるかのどちらかになる処理の単位です。途中で失敗しても中途半端な結果は残りません。",
+      "example_ja": "送金は一つの取引として実行します。",
+      "example_en": "A transfer runs as a single transaction."
+    },
+    {
+      "id": "gyo",
+      "term": "行",
+      "reading": "ぎょう",
+      "romaji": "gyō",
+      "tags": [
+        "sql"
+      ],
+      "level": 1,
+      "meaning": "row",
+      "desc_en": "One record in a table — a single set of values, one per column.",
+      "desc_ja": "表の中の一件のデータです。各列に一つずつ値を持ちます。",
+      "example_ja": "この表には千件の行があります。",
+      "example_en": "This table has a thousand rows."
+    },
+    {
+      "id": "retsu",
+      "term": "列",
+      "reading": "れつ",
+      "romaji": "retsu",
+      "tags": [
+        "sql"
+      ],
+      "level": 1,
+      "meaning": "column",
+      "desc_en": "One named field of a table, with a type, holding the same kind of value for every row.",
+      "desc_ja": "表の中の名前と型を持つ項目です。どの行でも同じ種類の値が入ります。",
+      "example_ja": "名前を保存する列を追加しました。",
+      "example_en": "I added a column to store the name."
+    },
+    {
+      "id": "hyo",
+      "term": "表",
+      "reading": "ひょう",
+      "romaji": "hyō",
+      "tags": [
+        "sql"
+      ],
+      "level": 1,
+      "meaning": "table",
+      "desc_en": "The basic container of a relational database: named columns, and any number of rows.",
+      "desc_ja": "関係データベースの基本的な入れ物です。名前の付いた列と、任意の数の行から成ります。",
+      "example_ja": "利用者の情報は別の表に保存します。",
+      "example_en": "We store the user information in a separate table."
+    },
+    {
+      "id": "chushutsu",
+      "term": "抽出",
+      "reading": "ちゅうしゅつ",
+      "romaji": "chūshutsu",
+      "tags": [
+        "sql"
+      ],
+      "level": 2,
+      "meaning": "extraction (SELECT)",
+      "desc_en": "Taking just the rows and columns you want out of a table — what a SELECT statement does.",
+      "desc_ja": "表から必要な行と列だけを取り出すことです。SELECT文が行う処理を指します。",
+      "example_ja": "条件に合う行だけを抽出します。",
+      "example_en": "We extract only the rows matching the condition."
+    },
+    {
+      "id": "sonyu",
+      "term": "挿入",
+      "reading": "そうにゅう",
+      "romaji": "sōnyū",
+      "tags": [
+        "sql"
+      ],
+      "level": 2,
+      "meaning": "insert",
+      "desc_en": "Adding a new row to a table, with INSERT.",
+      "desc_ja": "INSERTで表に新しい行を追加することです。",
+      "example_ja": "新しい利用者を表に挿入します。",
+      "example_en": "We insert the new user into the table."
+    },
+    {
+      "id": "sakujo",
+      "term": "削除",
+      "reading": "さくじょ",
+      "romaji": "sakujo",
+      "tags": [
+        "sql"
+      ],
+      "level": 1,
+      "meaning": "delete",
+      "desc_en": "Removing rows from a table with DELETE — usually with a WHERE clause, since without one it removes them all.",
+      "desc_ja": "DELETEで表から行を取り除くことです。WHEREを付けないとすべての行が消えるので注意が必要です。",
+      "example_ja": "古いデータを削除してください。",
+      "example_en": "Please delete the old data."
+    },
+    {
+      "id": "koshin",
+      "term": "更新",
+      "reading": "こうしん",
+      "romaji": "kōshin",
+      "tags": [
+        "sql"
+      ],
+      "level": 1,
+      "meaning": "update",
+      "desc_en": "Changing the values in rows that already exist, with UPDATE.",
+      "desc_ja": "UPDATEで既にある行の値を変更することです。",
+      "example_ja": "在庫の数を更新します。",
+      "example_en": "We update the stock count."
+    },
+    {
+      "id": "narabekae",
+      "term": "並べ替え",
+      "reading": "ならべかえ",
+      "romaji": "narabekae",
+      "tags": [
+        "sql"
+      ],
+      "level": 2,
+      "meaning": "ordering (ORDER BY)",
+      "desc_en": "Putting the result rows in a stated order; without it a database is free to return them in any order at all.",
+      "desc_ja": "結果の行を指定した順番に並べることです。指定しなければ、どの順で返ってくるかは決まっていません。",
+      "example_ja": "日付の新しい順に並べ替えます。",
+      "example_en": "We order them by date, newest first."
+    },
+    {
+      "id": "kensu",
+      "term": "件数",
+      "reading": "けんすう",
+      "romaji": "kensū",
+      "tags": [
+        "sql"
+      ],
+      "level": 2,
+      "meaning": "row count",
+      "desc_en": "How many rows something produced — the answer COUNT gives.",
+      "desc_ja": "行がいくつあるかという数です。COUNTが返す値を指します。",
+      "example_ja": "条件に合う件数を数えます。",
+      "example_en": "We count how many rows match the condition."
+    },
+    {
+      "id": "gokei",
+      "term": "合計",
+      "reading": "ごうけい",
+      "romaji": "gōkei",
+      "tags": [
+        "sql"
+      ],
+      "level": 1,
+      "meaning": "total (SUM)",
+      "desc_en": "The sum of a numeric column across the rows of a group.",
+      "desc_ja": "グループの中で、数値の列を足し合わせた値です。",
+      "example_ja": "月ごとの売上の合計を求めます。",
+      "example_en": "We find the total sales per month."
+    },
+    {
+      "id": "heikin",
+      "term": "平均",
+      "reading": "へいきん",
+      "romaji": "heikin",
+      "tags": [
+        "sql"
+      ],
+      "level": 1,
+      "meaning": "average (AVG)",
+      "desc_en": "The mean of a numeric column — the total divided by the number of rows counted.",
+      "desc_ja": "数値の列の平均値です。合計を行数で割った値になります。",
+      "example_ja": "平均の点数を計算します。",
+      "example_en": "We calculate the average score."
+    },
+    {
+      "id": "saidaichi",
+      "term": "最大値",
+      "reading": "さいだいち",
+      "romaji": "saidaichi",
+      "tags": [
+        "sql"
+      ],
+      "level": 2,
+      "meaning": "maximum value (MAX)",
+      "desc_en": "The largest value in a column across a group of rows.",
+      "desc_ja": "グループの中で列の値が最も大きいものです。",
+      "example_ja": "各部署の給与の最大値を求めます。",
+      "example_en": "We find the maximum salary in each department."
+    },
+    {
+      "id": "saishochi",
+      "term": "最小値",
+      "reading": "さいしょうち",
+      "romaji": "saishōchi",
+      "tags": [
+        "sql"
+      ],
+      "level": 2,
+      "meaning": "minimum value (MIN)",
+      "desc_en": "The smallest value in a column across a group of rows.",
+      "desc_ja": "グループの中で列の値が最も小さいものです。",
+      "example_ja": "最小値と最大値の両方を出力します。",
+      "example_en": "We output both the minimum and the maximum value."
+    },
+    {
+      "id": "jikko-keikaku",
+      "term": "実行計画",
+      "reading": "じっこうけいかく",
+      "romaji": "jikkō keikaku",
+      "tags": [
+        "sql"
+      ],
+      "level": 3,
+      "meaning": "execution plan",
+      "desc_en": "The steps the database decided to take to answer a query — the first thing to read when a query is slow.",
+      "desc_ja": "問い合わせに答えるためにデータベースが選んだ手順です。遅い問い合わせを調べるとき最初に見ます。",
+      "example_ja": "実行計画を見ると、索引が使われていませんでした。",
+      "example_en": "Looking at the execution plan, the index wasn't being used."
+    },
+    {
+      "id": "ichii-seiyaku",
+      "term": "一意制約",
+      "reading": "いちいせいやく",
+      "romaji": "ichii seiyaku",
+      "tags": [
+        "sql"
+      ],
+      "level": 3,
+      "meaning": "unique constraint",
+      "desc_en": "A rule that no two rows may share a value in a column, which the database itself enforces.",
+      "desc_ja": "ある列の値が二つの行で重複してはならないという規則です。データベース自身が守らせます。",
+      "example_ja": "メールアドレスの列に一意制約を付けます。",
+      "example_en": "We put a unique constraint on the email column."
+    },
+    {
+      "id": "ninsho",
+      "term": "認証",
+      "reading": "にんしょう",
+      "romaji": "ninshō",
+      "tags": [
+        "web"
+      ],
+      "level": 2,
+      "meaning": "authentication",
+      "desc_en": "Establishing who a user is — checking a password, a token or a key. Distinct from deciding what they may do.",
+      "desc_ja": "利用者が誰であるかを確かめることです。パスワードやトークンを検査します。何ができるかを決める認可とは別の話です。",
+      "example_ja": "ログイン画面で利用者の認証を行います。",
+      "example_en": "We authenticate the user on the login screen."
+    },
+    {
+      "id": "ninka",
+      "term": "認可",
+      "reading": "にんか",
+      "romaji": "ninka",
+      "tags": [
+        "web"
+      ],
+      "level": 3,
+      "meaning": "authorization",
+      "desc_en": "Deciding what an already-identified user is allowed to do. Authentication comes first; this is the separate second question.",
+      "desc_ja": "誰であるかが分かった利用者に、何を許すかを決めることです。認証の後に来る別の判断です。",
+      "example_ja": "認証は通りましたが、認可されていない操作です。",
+      "example_en": "They authenticated fine, but this operation isn't authorized."
+    },
+    {
+      "id": "yokyu",
+      "term": "要求",
+      "reading": "ようきゅう",
+      "romaji": "yōkyū",
+      "tags": [
+        "web"
+      ],
+      "level": 1,
+      "meaning": "request",
+      "desc_en": "What a client sends to a server: a method, a path, headers and sometimes a body.",
+      "desc_ja": "クライアントがサーバーへ送るものです。メソッド、パス、ヘッダー、場合によっては本文から成ります。",
+      "example_ja": "サーバーに要求を送ります。",
+      "example_en": "We send a request to the server."
+    },
+    {
+      "id": "oto",
+      "term": "応答",
+      "reading": "おうとう",
+      "romaji": "ōtō",
+      "tags": [
+        "web"
+      ],
+      "level": 1,
+      "meaning": "response",
+      "desc_en": "What the server sends back: a status code, headers and usually a body.",
+      "desc_ja": "サーバーが返すものです。状態コードとヘッダー、多くの場合は本文から成ります。",
+      "example_ja": "サーバーからの応答を待ちます。",
+      "example_en": "We wait for the server's response."
+    },
+    {
+      "id": "tsushin",
+      "term": "通信",
+      "reading": "つうしん",
+      "romaji": "tsūshin",
+      "tags": [
+        "web"
+      ],
+      "level": 2,
+      "meaning": "communication",
+      "desc_en": "Data moving between two machines over a network.",
+      "desc_ja": "ネットワークを通じて機械の間でデータをやり取りすることです。",
+      "example_ja": "サーバーと通信します。",
+      "example_en": "We communicate with the server."
+    },
+    {
+      "id": "eizokuka",
+      "term": "永続化",
+      "reading": "えいぞくか",
+      "romaji": "eizokuka",
+      "tags": [
+        "web"
+      ],
+      "level": 3,
+      "meaning": "persistence",
+      "desc_en": "Writing state somewhere it survives the process ending — a database or a file, rather than memory.",
+      "desc_ja": "処理が終わっても残る場所に状態を保存することです。メモリではなくデータベースやファイルに書きます。",
+      "example_ja": "入力された内容をデータベースに永続化します。",
+      "example_en": "We persist the entered content to the database."
+    },
+    {
+      "id": "kengen",
+      "term": "権限",
+      "reading": "けんげん",
+      "romaji": "kengen",
+      "tags": [
+        "web"
+      ],
+      "level": 2,
+      "meaning": "permission",
+      "desc_en": "A specific right granted to a user or role — to read a file, to delete a record.",
+      "desc_ja": "利用者や役割に与えられる個別の権利です。ファイルを読む、記録を消すといった単位で与えます。",
+      "example_ja": "管理者の権限が必要です。",
+      "example_en": "Admin permission is required."
+    },
+    {
+      "id": "jotai",
+      "term": "状態",
+      "reading": "じょうたい",
+      "romaji": "jōtai",
+      "tags": [
+        "web"
+      ],
+      "level": 1,
+      "meaning": "state",
+      "desc_en": "The data a component or a system is currently holding, which changes over time and drives what is shown.",
+      "desc_ja": "部品やシステムがその時点で持っているデータです。時間とともに変わり、表示の内容を決めます。",
+      "example_ja": "コンポーネントの状態を管理します。",
+      "example_en": "We manage the component's state."
+    },
+    {
+      "id": "shutoku",
+      "term": "取得",
+      "reading": "しゅとく",
+      "romaji": "shutoku",
+      "tags": [
+        "web"
+      ],
+      "level": 1,
+      "meaning": "fetch / get",
+      "desc_en": "Asking another system for data and receiving it back.",
+      "desc_ja": "別のシステムにデータを求めて受け取ることです。",
+      "example_ja": "APIからデータを取得します。",
+      "example_en": "We fetch data from the API."
+    },
+    {
+      "id": "hyoji",
+      "term": "表示",
+      "reading": "ひょうじ",
+      "romaji": "hyōji",
+      "tags": [
+        "web"
+      ],
+      "level": 1,
+      "meaning": "display",
+      "desc_en": "Putting something on screen where the user can see it.",
+      "desc_ja": "利用者が見えるように画面に出すことです。",
+      "example_ja": "結果を画面に表示します。",
+      "example_en": "We display the result on the screen."
+    },
+    {
+      "id": "byoga",
+      "term": "描画",
+      "reading": "びょうが",
+      "romaji": "byōga",
+      "tags": [
+        "web"
+      ],
+      "level": 2,
+      "meaning": "render",
+      "desc_en": "The act of turning state and markup into what is actually drawn on screen.",
+      "desc_ja": "状態やマークアップを、実際に画面に描かれるものへ変える処理です。",
+      "example_ja": "状態が変わると画面が描画されます。",
+      "example_en": "When the state changes, the screen is rendered."
+    },
+    {
+      "id": "tanmatsu",
+      "term": "端末",
+      "reading": "たんまつ",
+      "romaji": "tanmatsu",
+      "tags": [
+        "web"
+      ],
+      "level": 2,
+      "meaning": "terminal",
+      "desc_en": "The text console you type commands into — and, in other contexts, a user's device.",
+      "desc_ja": "コマンドを入力する文字の画面です。文脈によっては利用者の機器そのものを指すこともあります。",
+      "example_ja": "端末でコマンドを実行します。",
+      "example_en": "We run commands in the terminal."
+    },
+    {
+      "id": "keiro",
+      "term": "経路",
+      "reading": "けいろ",
+      "romaji": "keiro",
+      "tags": [
+        "web"
+      ],
+      "level": 2,
+      "meaning": "route",
+      "desc_en": "The path part of a URL, and the rule that maps it to the code handling it.",
+      "desc_ja": "URLのパスの部分と、それを担当する処理に結び付ける規則のことです。",
+      "example_ja": "新しい経路を追加して画面を増やします。",
+      "example_en": "We add a new route to add another screen."
+    },
+    {
+      "id": "midashi",
+      "term": "見出し",
+      "reading": "みだし",
+      "romaji": "midashi",
+      "tags": [
+        "web"
+      ],
+      "level": 1,
+      "meaning": "heading",
+      "desc_en": "A title marking the start of a section, which on the web also gives a page its outline for screen readers.",
+      "desc_ja": "節の始まりを示す題名です。Webでは読み上げソフトのための構造にもなります。",
+      "example_ja": "各節に見出しを付けてください。",
+      "example_en": "Please put a heading on each section."
+    },
+    {
+      "id": "kaiso",
+      "term": "階層",
+      "reading": "かいそう",
+      "romaji": "kaisō",
+      "tags": [
+        "web"
+      ],
+      "level": 2,
+      "meaning": "hierarchy",
+      "desc_en": "Structure in which items contain other items — nested components, nested routes, a tree of elements.",
+      "desc_ja": "要素が別の要素を含む入れ子の構造です。部品や経路、要素の木がこれにあたります。",
+      "example_ja": "コンポーネントの階層が深くなりすぎました。",
+      "example_en": "The component hierarchy got too deep."
+    },
+    {
+      "id": "sen-i",
+      "term": "遷移",
+      "reading": "せんい",
+      "romaji": "sen'i",
+      "tags": [
+        "web"
+      ],
+      "level": 3,
+      "meaning": "transition (navigation)",
+      "desc_en": "Moving from one screen or state to another.",
+      "desc_ja": "ある画面や状態から別の画面や状態へ移ることです。",
+      "example_ja": "ボタンを押すと次の画面に遷移します。",
+      "example_en": "Pressing the button navigates to the next screen."
+    },
+    {
+      "id": "shikibetsushi",
+      "term": "識別子",
+      "reading": "しきべつし",
+      "romaji": "shikibetsushi",
+      "tags": [
+        "web"
+      ],
+      "level": 2,
+      "meaning": "identifier",
+      "desc_en": "A value that names one thing uniquely — an id on a record, on an element, or in a URL.",
+      "desc_ja": "一つのものを他と区別して指し示す値です。記録や要素、URLに付ける識別のための値です。",
+      "example_ja": "各要素に一意の識別子を付けます。",
+      "example_en": "We give each element a unique identifier."
+    },
+    {
+      "id": "shikaku-joho",
+      "term": "資格情報",
+      "reading": "しかくじょうほう",
+      "romaji": "shikaku jōhō",
+      "tags": [
+        "web"
+      ],
+      "level": 3,
+      "meaning": "credentials",
+      "desc_en": "The secrets proving who you are — a password, a token, a key. Never to be written into source code.",
+      "desc_ja": "本人であることを示す秘密の情報です。パスワードやトークン、鍵などが該当し、ソースコードに書いてはいけません。",
+      "example_ja": "資格情報をコードに書かないでください。",
+      "example_en": "Please don't write credentials into the code."
+    },
+    {
+      "id": "angoka",
+      "term": "暗号化",
+      "reading": "あんごうか",
+      "romaji": "angōka",
+      "tags": [
+        "web"
+      ],
+      "level": 3,
+      "meaning": "encryption",
+      "desc_en": "Transforming data so only a holder of the key can read it.",
+      "desc_ja": "鍵を持つ人だけが読めるようにデータを変換することです。",
+      "example_ja": "通信は暗号化されています。",
+      "example_en": "The communication is encrypted."
+    },
+    {
+      "id": "fukugo",
+      "term": "復号",
+      "reading": "ふくごう",
+      "romaji": "fukugō",
+      "tags": [
+        "web"
+      ],
+      "level": 3,
+      "meaning": "decryption",
+      "desc_en": "Turning encrypted data back into the original, using the key.",
+      "desc_ja": "鍵を使って、暗号化されたデータを元に戻すことです。",
+      "example_ja": "受け取った内容を復号します。",
+      "example_en": "We decrypt the content we received."
+    },
+    {
+      "id": "zeijakusei",
+      "term": "脆弱性",
+      "reading": "ぜいじゃくせい",
+      "romaji": "zeijakusei",
+      "tags": [
+        "web"
+      ],
+      "level": 3,
+      "meaning": "vulnerability",
+      "desc_en": "A weakness an attacker can use — an unescaped input, a missing permission check.",
+      "desc_ja": "攻撃者に利用されうる弱点です。入力の処理漏れや権限確認の不足などが該当します。",
+      "example_ja": "この脆弱性は早く直す必要があります。",
+      "example_en": "This vulnerability needs fixing quickly."
+    },
+    {
+      "id": "fuka",
+      "term": "負荷",
+      "reading": "ふか",
+      "romaji": "fuka",
+      "tags": [
+        "web"
+      ],
+      "level": 2,
+      "meaning": "load",
+      "desc_en": "How much work a system is being asked to do at once.",
+      "desc_ja": "システムが同時に処理を求められている量のことです。",
+      "example_ja": "アクセスが増えてサーバーの負荷が高くなりました。",
+      "example_en": "Traffic rose and the load on the server got high."
+    },
+    {
+      "id": "taiikihaba",
+      "term": "帯域幅",
+      "reading": "たいいきはば",
+      "romaji": "taiikihaba",
+      "tags": [
+        "web"
+      ],
+      "level": 3,
+      "meaning": "bandwidth",
+      "desc_en": "How much data a connection can carry per second.",
+      "desc_ja": "接続が一秒あたりに運べるデータの量です。",
+      "example_ja": "画像を小さくして帯域幅を節約します。",
+      "example_en": "We shrink the images to save bandwidth."
+    },
+    {
+      "id": "tenso",
+      "term": "転送",
+      "reading": "てんそう",
+      "romaji": "tensō",
+      "tags": [
+        "web"
+      ],
+      "level": 2,
+      "meaning": "transfer",
+      "desc_en": "Moving data from one place to another over a connection.",
+      "desc_ja": "接続を通じてデータをある場所から別の場所へ移すことです。",
+      "example_ja": "大きなファイルの転送には時間がかかります。",
+      "example_en": "Transferring a large file takes time."
+    },
+    {
+      "id": "machi-jikan",
+      "term": "待ち時間",
+      "reading": "まちじかん",
+      "romaji": "machi jikan",
+      "tags": [
+        "web"
+      ],
+      "level": 2,
+      "meaning": "latency",
+      "desc_en": "The delay before a response starts coming back — distinct from how fast it then arrives.",
+      "desc_ja": "応答が返り始めるまでの遅れのことです。その後の速さとは別の指標です。",
+      "example_ja": "待ち時間が長いと操作が重く感じます。",
+      "example_en": "When latency is high, the interface feels sluggish."
     }
   ]
 }

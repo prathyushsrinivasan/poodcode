@@ -980,6 +980,14 @@ table.sqlgrid tbody tr.diff td {
   border-color: var(--accent);
   color: var(--accent);
 }
+.jpv-tag-sql {
+  border-color: var(--hard);
+  color: var(--hard);
+}
+.jpv-tag-web {
+  border-color: var(--intro);
+  color: var(--intro);
+}
 .jpv-card {
   width: 580px;
 }

@@ -13686,7 +13686,7 @@
     "deep": "Daily engineering runs on these. Git verbs are katakana loanwords (コミット, プッシュ, マージ), while process words tend to be kanji (変更, 差分, 依存関係, 設定).",
     "java": "The **Reading** column gives the kana pronunciation and a romaji gloss so you can say the word out loud. Loanwords written in katakana already *are* their reading, so only the romaji is shown. Example sentences are polite (です・ます) form — exactly how you'd hear them in a standup or an interview.",
     "language": "japanese",
-    "lesson": "| 用語 (Term) | 読み方 (Reading) | 意味 (Meaning) | 例文 (Example) |\n|---|---|---|---|\n| 変更 | へんこう (henkō) | change | この変更をレビューします。 — *We review this change.* |\n| 差分 | さぶん (sabun) | diff / difference | コミット前に差分を確認します。 — *We check the diff before committing.* |\n| 競合 | きょうごう (kyōgō) | (merge) conflict | マージで競合が起きました。 — *A conflict happened during the merge.* |\n| 解決 | かいけつ (kaiketsu) | resolve | 競合を解決します。 — *We resolve the conflict.* |\n| 単体テスト | たんたいテスト (tantai tesuto) | unit test | この関数に単体テストを追加します。 — *We add a unit test for this function.* |\n| 依存関係 | いぞんかんけい (izon kankei) | dependencies | npm installで依存関係をインストールします。 — *Install the dependencies with npm install.* |\n| 環境 | かんきょう (kankyō) | environment | 開発環境を用意します。 — *We set up the development environment.* |\n| 設定 | せってい (settei) | configuration / settings | 設定ファイルを編集します。 — *We edit the config file.* |\n| 導入 | どうにゅう (dōnyū) | adopt / introduce | このツールを導入します。 — *We adopt this tool.* |\n| 更新 | こうしん (kōshin) | update | ライブラリを最新版に更新します。 — *We update the library to the latest version.* |\n| バージョン管理 | バージョンかんり (bājon kanri) | version control | Gitでバージョン管理します。 — *We manage versions with Git.* |\n| 反映 | はんえい (han'ei) | reflect / apply | 変更を本番環境に反映します。 — *We apply the changes to production.* |\n",
+    "lesson": "| 用語 (Term) | 読み方 (Reading) | 意味 (Meaning) | 例文 (Example) |\n|---|---|---|---|\n| 変更 | へんこう (henkō) | change | この変更をレビューします。 — *We review this change.* |\n| 差分 | さぶん (sabun) | diff / difference | コミット前に差分を確認します。 — *We check the diff before committing.* |\n| 競合 | きょうごう (kyōgō) | (merge) conflict | マージで競合が起きました。 — *A conflict happened during the merge.* |\n| 解決 | かいけつ (kaiketsu) | resolve | 競合を解決します。 — *We resolve the conflict.* |\n| 単体テスト | たんたいテスト (tantai tesuto) | unit test | この関数に単体テストを追加します。 — *We add a unit test for this function.* |\n| 依存関係 | いぞんかんけい (izon kankei) | dependencies | npm installで依存関係をインストールします。 — *Install the dependencies with npm install.* |\n| 環境 | かんきょう (kankyō) | environment | 開発環境を用意します。 — *We set up the development environment.* |\n| 設定 | せってい (settei) | configuration / settings | 設定ファイルを編集します。 — *We edit the config file.* |\n| 導入 | どうにゅう (dōnyū) | adopt / introduce | このツールを導入します。 — *We adopt this tool.* |\n| 更新 | こうしん (kōshin) | update | 在庫の数を更新します。 — *We update the stock count.* |\n| バージョン管理 | バージョンかんり (bājon kanri) | version control | Gitでバージョン管理します。 — *We manage versions with Git.* |\n| 反映 | はんえい (han'ei) | reflect / apply | 変更を本番環境に反映します。 — *We apply the changes to production.* |\n",
     "exercises": [],
     "cards": [
       {
@@ -13763,11 +13763,11 @@
       },
       {
         "front": "更新",
-        "card_id": "",
+        "card_id": "jp-vocab#koshin",
         "reading": "こうしん (kōshin)",
         "meaning": "update",
-        "example_ja": "ライブラリを最新版に更新します。",
-        "example_en": "We update the library to the latest version."
+        "example_ja": "在庫の数を更新します。",
+        "example_en": "We update the stock count."
       },
       {
         "front": "バージョン管理",
@@ -14664,12 +14664,12 @@
     "deep": "The surrounding world TypeScript is written for: フロントエンド / バックエンド, コンポーネント and 状態 (state), and the request/response cycle with a server and database.",
     "java": "The **Reading** column gives the kana pronunciation and a romaji gloss so you can say the word out loud. Loanwords written in katakana already *are* their reading, so only the romaji is shown. Example sentences are polite (です・ます) form — exactly how you'd hear them in a standup or an interview.",
     "language": "japanese",
-    "lesson": "| 用語 (Term) | 読み方 (Reading) | 意味 (Meaning) | 例文 (Example) |\n|---|---|---|---|\n| 状態 | じょうたい (jōtai) | state | コンポーネントの状態を管理します。 — *We manage the component's state.* |\n| 描画 | びょうが (byōga) | render | 画面を描画します。 — *We render the screen.* |\n| 再描画 | さいびょうが (sai byōga) | re-render | 状態が変わると再描画されます。 — *It re-renders when the state changes.* |\n| 要求 | ようきゅう (yōkyū) | request | サーバーに要求を送ります。 — *We send a request to the server.* |\n| 応答 | おうとう (ōtō) | response | サーバーからの応答を待ちます。 — *We wait for the server's response.* |\n| 取得 | しゅとく (shutoku) | fetch / get | APIからデータを取得します。 — *We fetch data from the API.* |\n| 更新 | こうしん (kōshin) | update | 画面を最新の状態に更新します。 — *We update the screen to the latest state.* |\n| 読み込み | よみこみ (yomikomi) | loading | データの読み込み中です。 — *The data is loading.* |\n| 表示 | ひょうじ (hyōji) | display | 結果を画面に表示します。 — *We display the result on the screen.* |\n| 入力欄 | にゅうりょくらん (nyūryoku ran) | input field | 入力欄に名前を入れます。 — *We type a name into the input field.* |\n| 画面 | がめん (gamen) | screen | 画面のレイアウトを整えます。 — *We arrange the screen layout.* |\n| 認証 | にんしょう (ninshō) | authentication | ユーザー認証を実装します。 — *We implement user authentication.* |\n| 権限 | けんげん (kengen) | permission | 管理者の権限が必要です。 — *Admin permission is required.* |\n| 通信 | つうしん (tsūshin) | communication | サーバーと通信します。 — *We communicate with the server.* |\n| 非同期通信 | ひどうきつうしん (hidōki tsūshin) | async communication | 非同期通信でページを更新します。 — *We update the page with async communication.* |\n| 再利用 | さいりよう (sairiyō) | reuse | コンポーネントを再利用します。 — *We reuse the component.* |\n| 端末 | たんまつ (tanmatsu) | terminal | 端末でコマンドを実行します。 — *We run commands in the terminal.* |\n",
+    "lesson": "| 用語 (Term) | 読み方 (Reading) | 意味 (Meaning) | 例文 (Example) |\n|---|---|---|---|\n| 状態 | じょうたい (jōtai) | state | コンポーネントの状態を管理します。 — *We manage the component's state.* |\n| 描画 | びょうが (byōga) | render | 状態が変わると画面が描画されます。 — *When the state changes, the screen is rendered.* |\n| 再描画 | さいびょうが (sai byōga) | re-render | 状態が変わると再描画されます。 — *It re-renders when the state changes.* |\n| 要求 | ようきゅう (yōkyū) | request | サーバーに要求を送ります。 — *We send a request to the server.* |\n| 応答 | おうとう (ōtō) | response | サーバーからの応答を待ちます。 — *We wait for the server's response.* |\n| 取得 | しゅとく (shutoku) | fetch / get | APIからデータを取得します。 — *We fetch data from the API.* |\n| 更新 | こうしん (kōshin) | update | 在庫の数を更新します。 — *We update the stock count.* |\n| 読み込み | よみこみ (yomikomi) | loading | データの読み込み中です。 — *The data is loading.* |\n| 表示 | ひょうじ (hyōji) | display | 結果を画面に表示します。 — *We display the result on the screen.* |\n| 入力欄 | にゅうりょくらん (nyūryoku ran) | input field | 入力欄に名前を入れます。 — *We type a name into the input field.* |\n| 画面 | がめん (gamen) | screen | 画面のレイアウトを整えます。 — *We arrange the screen layout.* |\n| 認証 | にんしょう (ninshō) | authentication | ログイン画面で利用者の認証を行います。 — *We authenticate the user on the login screen.* |\n| 権限 | けんげん (kengen) | permission | 管理者の権限が必要です。 — *Admin permission is required.* |\n| 通信 | つうしん (tsūshin) | communication | サーバーと通信します。 — *We communicate with the server.* |\n| 非同期通信 | ひどうきつうしん (hidōki tsūshin) | async communication | 非同期通信でページを更新します。 — *We update the page with async communication.* |\n| 再利用 | さいりよう (sairiyō) | reuse | コンポーネントを再利用します。 — *We reuse the component.* |\n| 端末 | たんまつ (tanmatsu) | terminal | 端末でコマンドを実行します。 — *We run commands in the terminal.* |\n",
     "exercises": [],
     "cards": [
       {
         "front": "状態",
-        "card_id": "",
+        "card_id": "jp-vocab#jotai",
         "reading": "じょうたい (jōtai)",
         "meaning": "state",
         "example_ja": "コンポーネントの状態を管理します。",
@@ -14677,11 +14677,11 @@
       },
       {
         "front": "描画",
-        "card_id": "",
+        "card_id": "jp-vocab#byoga",
         "reading": "びょうが (byōga)",
         "meaning": "render",
-        "example_ja": "画面を描画します。",
-        "example_en": "We render the screen."
+        "example_ja": "状態が変わると画面が描画されます。",
+        "example_en": "When the state changes, the screen is rendered."
       },
       {
         "front": "再描画",
@@ -14693,7 +14693,7 @@
       },
       {
         "front": "要求",
-        "card_id": "",
+        "card_id": "jp-vocab#yokyu",
         "reading": "ようきゅう (yōkyū)",
         "meaning": "request",
         "example_ja": "サーバーに要求を送ります。",
@@ -14701,7 +14701,7 @@
       },
       {
         "front": "応答",
-        "card_id": "",
+        "card_id": "jp-vocab#oto",
         "reading": "おうとう (ōtō)",
         "meaning": "response",
         "example_ja": "サーバーからの応答を待ちます。",
@@ -14709,7 +14709,7 @@
       },
       {
         "front": "取得",
-        "card_id": "",
+        "card_id": "jp-vocab#shutoku",
         "reading": "しゅとく (shutoku)",
         "meaning": "fetch / get",
         "example_ja": "APIからデータを取得します。",
@@ -14717,11 +14717,11 @@
       },
       {
         "front": "更新",
-        "card_id": "",
+        "card_id": "jp-vocab#koshin",
         "reading": "こうしん (kōshin)",
         "meaning": "update",
-        "example_ja": "画面を最新の状態に更新します。",
-        "example_en": "We update the screen to the latest state."
+        "example_ja": "在庫の数を更新します。",
+        "example_en": "We update the stock count."
       },
       {
         "front": "読み込み",
@@ -14733,7 +14733,7 @@
       },
       {
         "front": "表示",
-        "card_id": "",
+        "card_id": "jp-vocab#hyoji",
         "reading": "ひょうじ (hyōji)",
         "meaning": "display",
         "example_ja": "結果を画面に表示します。",
@@ -14757,15 +14757,15 @@
       },
       {
         "front": "認証",
-        "card_id": "",
+        "card_id": "jp-vocab#ninsho",
         "reading": "にんしょう (ninshō)",
         "meaning": "authentication",
-        "example_ja": "ユーザー認証を実装します。",
-        "example_en": "We implement user authentication."
+        "example_ja": "ログイン画面で利用者の認証を行います。",
+        "example_en": "We authenticate the user on the login screen."
       },
       {
         "front": "権限",
-        "card_id": "",
+        "card_id": "jp-vocab#kengen",
         "reading": "けんげん (kengen)",
         "meaning": "permission",
         "example_ja": "管理者の権限が必要です。",
@@ -14773,7 +14773,7 @@
       },
       {
         "front": "通信",
-        "card_id": "",
+        "card_id": "jp-vocab#tsushin",
         "reading": "つうしん (tsūshin)",
         "meaning": "communication",
         "example_ja": "サーバーと通信します。",
@@ -14797,7 +14797,7 @@
       },
       {
         "front": "端末",
-        "card_id": "",
+        "card_id": "jp-vocab#tanmatsu",
         "reading": "たんまつ (tanmatsu)",
         "meaning": "terminal",
         "example_ja": "端末でコマンドを実行します。",
