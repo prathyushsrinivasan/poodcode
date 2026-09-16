@@ -2,8 +2,11 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { api } from "../api";
 import type { CardReview, JpVocab, JpVocabTag, JpVocabWord } from "../types";
 import {
+  clozePrompt,
+  distractors,
   filterVocab,
   readyWords,
+  shuffleWith,
   splitOnTerm,
   stateCounts,
   tagCounts,
@@ -12,9 +15,39 @@ import {
   wrapIndex,
   type VocabState,
 } from "../lib/jpVocab";
+import { acceptsReading, joinReading } from "../lib/romaji";
 import { todayISO } from "../lib/srs";
 
 const TAG_STORE_KEY = "poodcode:jp-vocab-tag";
+const MODE_STORE_KEY = "poodcode:jp-vocab-mode";
+
+/** How a word is put to you. `flip` and `reverse` you grade yourself; `type`
+ * and `cloze` know the answer and grade it for you. */
+type VocabMode = "flip" | "reverse" | "type" | "cloze";
+
+const MODES: { id: VocabMode; label: string; ask: string }[] = [
+  { id: "flip", label: "🔄 Flip", ask: "Can you read it? Click or press Space to reveal." },
+  { id: "reverse", label: "🇬🇧 Reverse", ask: "Say it in Japanese, then reveal." },
+  { id: "type", label: "⌨️ Type", ask: "Type the reading — rōmaji or kana." },
+  { id: "cloze", label: "✍️ Cloze", ask: "Which word fills the blank?" },
+];
+
+function readMode(): VocabMode {
+  try {
+    const m = localStorage.getItem(MODE_STORE_KEY);
+    return MODES.some((x) => x.id === m) ? (m as VocabMode) : "flip";
+  } catch {
+    return "flip";
+  }
+}
+
+function writeMode(m: VocabMode) {
+  try {
+    localStorage.setItem(MODE_STORE_KEY, m);
+  } catch {
+    /* a remembered mode is a convenience, not state */
+  }
+}
 
 function readTag(): string {
   try {
@@ -231,13 +264,17 @@ function TagBadge({ tag, id }: { tag?: JpVocabTag; id: string }) {
 /* ------------------------------------------------------------------- card */
 
 /**
- * One word as a flashcard. The front is the bare term; flipping reveals the
- * reading, meaning, both descriptions and the example sentence with the term
- * highlighted, and then asks you to grade yourself — which schedules the word
- * through the same SM-2 engine as every other deck.
+ * One word as a study card, in whichever mode is selected: read the kanji
+ * (flip), produce the Japanese from the English (reverse), type the reading
+ * (type), or put the term back into its own example sentence (cloze).
  *
- * Space/Enter flips, 1–4 grade once flipped, ←/→ move through `list`, Esc
- * closes.
+ * Flip and reverse you grade yourself. Type and cloze know the answer and grade
+ * it for you — correct is Good, wrong is Again, the rule `CardStudy` already
+ * uses next door. Either way the word is scheduled through the same SM-2 engine
+ * and the card advances, so a session is a loop rather than a lookup.
+ *
+ * Space/Enter reveals, 1–4 grade a revealed self-graded card, ←/→ move through
+ * `list`, Esc closes.
  */
 export function JpVocabCard({
   vocab,
@@ -262,11 +299,38 @@ export function JpVocabCard({
   const ids = list.includes(id) ? list : vocab.words.map((w) => w.id);
   const index = ids.indexOf(id);
   const tag = vocab.tags.find((t) => t.id === word?.tag);
-  const [flipped, setFlipped] = useState(false);
+  const [mode, setMode] = useState<VocabMode>(readMode);
+  const [revealed, setRevealed] = useState(false);
+  const [typed, setTyped] = useState("");
+  const [picked, setPicked] = useState<string | null>(null);
   const review = reviews.get(vocabCardId(id));
   const state = wordState(review, today);
+  const autoGraded = mode === "type" || mode === "cloze";
 
-  useEffect(() => setFlipped(false), [id]);
+  // Fixed for as long as the card is on screen, so a re-render never moves the
+  // answer out from under the pointer.
+  const options = useMemo(
+    () =>
+      word ? shuffleWith([word, ...distractors(vocab.words, word.id, 3)]).map((w) => w.term) : [],
+    [word, vocab.words]
+  );
+
+  const correct =
+    mode === "type"
+      ? !!word && acceptsReading(typed, joinReading(word.reading, word.romaji))
+      : picked === word?.term;
+
+  // A new card — or a new way of being asked — starts unanswered.
+  useEffect(() => {
+    setRevealed(false);
+    setTyped("");
+    setPicked(null);
+  }, [id, mode]);
+
+  function pickMode(m: VocabMode) {
+    setMode(m);
+    writeMode(m);
+  }
 
   /** Grade, then move to the next card in the list — the loop a study session
    * is actually made of. On the last card there is nowhere to go, so it just
@@ -276,7 +340,7 @@ export function JpVocabCard({
       await grade(id, quality);
       const next = ids[wrapIndex(index, 1, ids.length)];
       if (next && next !== id) onNavigate(next);
-      else setFlipped(false);
+      else setRevealed(false);
     },
     [grade, id, ids, index, onNavigate]
   );
@@ -286,20 +350,21 @@ export function JpVocabCard({
       if (e.key === "Escape") onClose();
       else if (e.key === "ArrowRight") onNavigate(ids[wrapIndex(index, 1, ids.length)]);
       else if (e.key === "ArrowLeft") onNavigate(ids[wrapIndex(index, -1, ids.length)]);
-      else if (flipped && e.key >= "1" && e.key <= "4") {
+      else if (revealed && !autoGraded && e.key >= "1" && e.key <= "4") {
         e.preventDefault();
         gradeAndAdvance(Number(e.key) - 1);
       } else if (e.key === " " || e.key === "Enter") {
-        // A focused control inside the card (Prev, Next, Close) keeps its own
-        // Enter/Space; anywhere else it flips the card.
-        if ((e.target as HTMLElement | null)?.closest?.(".jpv-card button")) return;
+        // A focused control inside the card (Prev, Next, Close) and the Type
+        // mode's input keep their own Enter/Space; anywhere else it reveals.
+        if ((e.target as HTMLElement | null)?.closest?.(".jpv-card button, .jpv-card input")) return;
         e.preventDefault();
-        setFlipped((f) => !f);
+        if (revealed && autoGraded) gradeAndAdvance(correct ? 2 : 0);
+        else if (!autoGraded) setRevealed((f) => !f);
       }
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [ids, index, flipped, gradeAndAdvance, onNavigate, onClose]);
+  }, [ids, index, revealed, autoGraded, correct, gradeAndAdvance, onNavigate, onClose]);
 
   if (!word) return null;
 
@@ -323,49 +388,173 @@ export function JpVocabCard({
         </div>
 
         <div
+          className="row"
+          style={{ gap: 4, flexWrap: "wrap", justifyContent: "center", margin: "10px 0 0" }}
+        >
+          {MODES.map((m) => (
+            <button
+              key={m.id}
+              className={mode === m.id ? "" : "ghost"}
+              style={{ padding: "2px 8px", fontSize: 12 }}
+              onClick={() => pickMode(m.id)}
+            >
+              {m.label}
+            </button>
+          ))}
+        </div>
+
+        <div
           className="jpv-face"
           role="button"
           tabIndex={-1}
-          onClick={() => setFlipped((f) => !f)}
-          title={flipped ? "Click to hide" : "Click to reveal"}
+          onClick={() => !autoGraded && setRevealed((f) => !f)}
+          title={autoGraded ? undefined : revealed ? "Click to hide" : "Click to reveal"}
+          style={autoGraded ? { cursor: "default" } : undefined}
         >
-          <div className="jpv-term" lang="ja">
-            {word.term}
-          </div>
-          {flipped ? (
+          {mode === "reverse" ? (
             <>
-              <div className="jpv-reading" lang="ja">
-                {word.reading} <span className="dim">· {word.romaji}</span>
+              <div className="jpv-meaning" style={{ fontSize: 24, marginTop: 6 }}>
+                {word.meaning}
               </div>
-              <div className="jpv-meaning">{word.meaning}</div>
+              {revealed && (
+                <>
+                  <div className="jpv-term" lang="ja" style={{ fontSize: 44, marginTop: 12 }}>
+                    {word.term}
+                  </div>
+                  <div className="jpv-reading" lang="ja">
+                    {word.reading} <span className="dim">· {word.romaji}</span>
+                  </div>
+                </>
+              )}
             </>
+          ) : mode === "cloze" ? (
+            <p
+              lang="ja"
+              className="jpv-example-ja"
+              style={{ margin: "6px 0 0", fontSize: 19, lineHeight: 1.9 }}
+            >
+              {clozePrompt(word.example_ja, word.term)}
+            </p>
           ) : (
+            <>
+              <div className="jpv-term" lang="ja">
+                {word.term}
+              </div>
+              {revealed && mode === "flip" && (
+                <>
+                  <div className="jpv-reading" lang="ja">
+                    {word.reading} <span className="dim">· {word.romaji}</span>
+                  </div>
+                  <div className="jpv-meaning">{word.meaning}</div>
+                </>
+              )}
+            </>
+          )}
+          {!revealed && (
             <p className="dim" style={{ margin: "14px 0 0", fontSize: 13 }}>
-              Can you read it? Click or press Space to reveal.
+              {MODES.find((m) => m.id === mode)?.ask}
             </p>
           )}
         </div>
 
-        {flipped && <CardDetails word={word} />}
+        {mode === "type" && (
+          <div style={{ textAlign: "center", marginTop: 12 }}>
+            <input
+              autoFocus
+              value={typed}
+              disabled={revealed}
+              onChange={(e) => setTyped(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key !== "Enter") return;
+                e.preventDefault();
+                if (revealed) gradeAndAdvance(correct ? 2 : 0);
+                else if (typed.trim()) setRevealed(true);
+              }}
+              placeholder="e.g. hairetsu / はいれつ"
+              aria-label="Type the reading"
+              style={{
+                fontSize: 18,
+                textAlign: "center",
+                padding: "8px 12px",
+                width: "100%",
+                maxWidth: 320,
+                borderRadius: 8,
+                border: `1px solid ${
+                  revealed ? (correct ? "var(--good)" : "var(--bad)") : "var(--border)"
+                }`,
+                background: "var(--bg-elev-2)",
+                color: "var(--text)",
+              }}
+            />
+          </div>
+        )}
 
-        {flipped ? (
-          <>
-            <div className="row" style={{ marginTop: 14, gap: 8, flexWrap: "wrap" }}>
-              {GRADES.map((g) => (
+        {mode === "cloze" && (
+          <div className="grid cols-2" style={{ marginTop: 12 }}>
+            {options.map((opt) => {
+              let border: string | undefined;
+              if (revealed) {
+                if (opt === word.term) border = "var(--good)";
+                else if (opt === picked) border = "var(--bad)";
+              }
+              return (
                 <button
-                  key={g.q}
+                  key={opt}
                   className="ghost"
-                  style={{ flex: "1 1 0", minWidth: 80, borderColor: g.color, color: g.color }}
-                  onClick={() => gradeAndAdvance(g.q)}
-                  title={`${g.label} — ${g.hint} (press ${g.q + 1})`}
+                  lang="ja"
+                  style={{ borderColor: border, color: border, padding: "10px 12px" }}
+                  disabled={revealed}
+                  onClick={() => {
+                    setPicked(opt);
+                    setRevealed(true);
+                  }}
                 >
-                  <div>{g.label}</div>
-                  <div className="dim" style={{ fontSize: 11 }}>
-                    {g.hint}
-                  </div>
+                  {opt}
                 </button>
-              ))}
-            </div>
+              );
+            })}
+          </div>
+        )}
+
+        {revealed && autoGraded && (
+          <div
+            style={{
+              marginTop: 12,
+              textAlign: "center",
+              fontWeight: 600,
+              color: correct ? "var(--good)" : "var(--bad)",
+            }}
+          >
+            {correct ? "Correct!" : `Not quite — ${mode === "type" ? word.reading : word.term}`}
+          </div>
+        )}
+
+        {revealed && <CardDetails word={word} />}
+
+        {revealed ? (
+          <>
+            {autoGraded ? (
+              <div className="row" style={{ marginTop: 14 }}>
+                <button onClick={() => gradeAndAdvance(correct ? 2 : 0)}>Next →</button>
+              </div>
+            ) : (
+              <div className="row" style={{ marginTop: 14, gap: 8, flexWrap: "wrap" }}>
+                {GRADES.map((g) => (
+                  <button
+                    key={g.q}
+                    className="ghost"
+                    style={{ flex: "1 1 0", minWidth: 80, borderColor: g.color, color: g.color }}
+                    onClick={() => gradeAndAdvance(g.q)}
+                    title={`${g.label} — ${g.hint} (press ${g.q + 1})`}
+                  >
+                    <div>{g.label}</div>
+                    <div className="dim" style={{ fontSize: 11 }}>
+                      {g.hint}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
             <p className="dim" style={{ margin: "8px 0 0", fontSize: 12, textAlign: "center" }}>
               <span className={`jpv-dot jpv-dot-${state}`} style={{ position: "static", marginRight: 6 }} />
               {review
@@ -378,7 +567,17 @@ export function JpVocabCard({
             <button className="ghost" onClick={() => onNavigate(ids[wrapIndex(index, -1, ids.length)])}>
               ← Prev
             </button>
-            <button onClick={() => setFlipped(true)}>Reveal</button>
+            {mode === "type" ? (
+              <button onClick={() => setRevealed(true)} disabled={!typed.trim()}>
+                Check
+              </button>
+            ) : mode === "cloze" ? (
+              <span className="dim" style={{ fontSize: 12, alignSelf: "center" }}>
+                Pick an answer
+              </span>
+            ) : (
+              <button onClick={() => setRevealed(true)}>Reveal</button>
+            )}
             <button className="ghost" onClick={() => onNavigate(ids[wrapIndex(index, 1, ids.length)])}>
               Next →
             </button>

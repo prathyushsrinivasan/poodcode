@@ -73,6 +73,43 @@ export function splitOnTerm(sentence: string, term: string): { text: string; hit
   return parts;
 }
 
+/* ------------------------------------------------------------ study modes */
+
+/** What a cloze prompt puts where the term was. */
+export const BLANK = "＿＿＿";
+
+/** The example sentence with every occurrence of the term blanked out. The
+ * generator guarantees the term appears in it, so every word supports cloze. */
+export function clozePrompt(sentence: string, term: string): string {
+  return splitOnTerm(sentence, term)
+    .map((p) => (p.hit ? BLANK : p.text))
+    .join("");
+}
+
+/** Fisher-Yates with an injectable source of randomness, so the UI can shuffle
+ * and a test can assert. */
+export function shuffleWith<T>(xs: T[], rand: () => number = Math.random): T[] {
+  const a = [...xs];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(rand() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+/** Up to `n` other words, to sit beside the answer as the wrong options. */
+export function distractors(
+  words: JpVocabWord[],
+  answerId: string,
+  n: number,
+  rand: () => number = Math.random
+): JpVocabWord[] {
+  return shuffleWith(
+    words.filter((w) => w.id !== answerId),
+    rand
+  ).slice(0, n);
+}
+
 /** Index of the neighbour `step` places away, wrapping at both ends. */
 export function wrapIndex(i: number, step: number, length: number): number {
   if (length <= 0) return -1;

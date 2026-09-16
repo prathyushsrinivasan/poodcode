@@ -1,8 +1,12 @@
 import { describe, it, expect } from "vitest";
 import {
+  BLANK,
+  clozePrompt,
+  distractors,
   filterVocab,
   matchesQuery,
   readyWords,
+  shuffleWith,
   splitOnTerm,
   stateCounts,
   tagCounts,
@@ -82,6 +86,32 @@ describe("splitOnTerm", () => {
       { text: "と", hit: false },
       { text: "木", hit: true },
     ]);
+  });
+});
+
+describe("clozePrompt", () => {
+  it("blanks every occurrence of the term", () => {
+    expect(clozePrompt("DogはAnimalを継承しています。", "継承")).toBe(
+      `DogはAnimalを${BLANK}しています。`
+    );
+    expect(clozePrompt("木と木", "木")).toBe(`${BLANK}と${BLANK}`);
+  });
+});
+
+describe("shuffleWith", () => {
+  it("keeps every item and leaves the input alone", () => {
+    const xs = [1, 2, 3, 4];
+    // rand() === 0 sends every swap to index 0 — a fixed, checkable permutation.
+    expect(shuffleWith(xs, () => 0).sort()).toEqual([1, 2, 3, 4]);
+    expect(xs).toEqual([1, 2, 3, 4]);
+  });
+});
+
+describe("distractors", () => {
+  it("never offers the answer as a wrong option", () => {
+    const picked = distractors(all, "hairetsu", 3, () => 0);
+    expect(picked.map((w) => w.id)).not.toContain("hairetsu");
+    expect(picked).toHaveLength(2); // only two other words exist
   });
 });
 
