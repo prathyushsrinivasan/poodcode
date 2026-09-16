@@ -13559,7 +13559,7 @@
     "deep": "When something breaks, you'll need to describe it fast: what エラー (error) came up, its 原因 (cause), and how you 修正 (fixed) it. Verbs matter here — 直す (to fix), 再現する (to reproduce), 確認する (to check).",
     "java": "The **Reading** column gives the kana pronunciation and a romaji gloss so you can say the word out loud. Loanwords written in katakana already *are* their reading, so only the romaji is shown. Example sentences are polite (です・ます) form — exactly how you'd hear them in a standup or an interview.",
     "language": "japanese",
-    "lesson": "| 用語 (Term) | 読み方 (Reading) | 意味 (Meaning) | 例文 (Example) |\n|---|---|---|---|\n| 例外 | れいがい (reigai) | exception | 配列の範囲外にアクセスすると例外が発生します。 — *Accessing outside an array's bounds raises an exception.* |\n| 例外処理 | れいがいしょり (reigai shori) | exception handling | try-catchで例外処理をします。 — *We handle exceptions with try-catch.* |\n| 発生 | はっせい (hassei) | occurrence | 特定の入力でエラーが発生します。 — *An error occurs on certain input.* |\n| 修正 | しゅうせい (shūsei) | fix / correction | バグを修正しました。 — *I fixed the bug.* |\n| 直す | なおす (naosu) | to fix | この問題を直してください。 — *Please fix this problem.* |\n| 原因 | げんいん (gen'in) | cause | エラーの原因を調べます。 — *We investigate the cause of the error.* |\n| 動作 | どうさ (dōsa) | behavior / operation | プログラムは正しく動作します。 — *The program works correctly.* |\n| 再現 | さいげん (saigen) | reproduce | そのバグを再現できません。 — *I can't reproduce that bug.* |\n| ヌルポインタ例外 | ヌルポインタれいがい (nuru pointa reigai) | null pointer exception | ヌルポインタ例外に注意してください。 — *Watch out for null pointer exceptions.* |\n| 例外を投げる | れいがいをなげる (reigai o nageru) | to throw an exception | 不正な入力なら例外を投げます。 — *If the input is invalid, we throw an exception.* |\n| 警告 | けいこく (keikoku) | warning | コンパイラが警告を出します。 — *The compiler gives a warning.* |\n| 想定外 | そうていがい (sōteigai) | unexpected | 想定外の値が入りました。 — *An unexpected value came in.* |\n| 確認する | かくにんする (kakunin suru) | to check / confirm | 出力を確認します。 — *We check the output.* |\n| 試す | ためす (tamesu) | to try / test out | もう一度試してください。 — *Please try it again.* |\n",
+    "lesson": "| 用語 (Term) | 読み方 (Reading) | 意味 (Meaning) | 例文 (Example) |\n|---|---|---|---|\n| 例外 | れいがい (reigai) | exception | 配列の範囲外にアクセスすると例外が発生します。 — *Accessing outside an array's bounds raises an exception.* |\n| 例外処理 | れいがいしょり (reigai shori) | exception handling | ファイル操作には例外処理が必要です。 — *File operations need exception handling.* |\n| 発生 | はっせい (hassei) | occurrence | 特定の入力でエラーが発生します。 — *An error occurs on certain input.* |\n| 修正 | しゅうせい (shūsei) | fix / correction | バグを修正しました。 — *I fixed the bug.* |\n| 直す | なおす (naosu) | to fix | この問題を直してください。 — *Please fix this problem.* |\n| 原因 | げんいん (gen'in) | cause | エラーの原因を調べます。 — *We investigate the cause of the error.* |\n| 動作 | どうさ (dōsa) | behavior / operation | プログラムは正しく動作します。 — *The program works correctly.* |\n| 再現 | さいげん (saigen) | reproduce | そのバグを再現できません。 — *I can't reproduce that bug.* |\n| ヌルポインタ例外 | ヌルポインタれいがい (nuru pointa reigai) | null pointer exception | ヌルポインタ例外に注意してください。 — *Watch out for null pointer exceptions.* |\n| 例外を投げる | れいがいをなげる (reigai o nageru) | to throw an exception | 不正な入力なら例外を投げます。 — *If the input is invalid, we throw an exception.* |\n| 警告 | けいこく (keikoku) | warning | コンパイラが警告を出します。 — *The compiler gives a warning.* |\n| 想定外 | そうていがい (sōteigai) | unexpected | 想定外の値が入りました。 — *An unexpected value came in.* |\n| 確認する | かくにんする (kakunin suru) | to check / confirm | 出力を確認します。 — *We check the output.* |\n| 試す | ためす (tamesu) | to try / test out | もう一度試してください。 — *Please try it again.* |\n",
     "exercises": [],
     "cards": [
       {
@@ -13572,11 +13572,11 @@
       },
       {
         "front": "例外処理",
-        "card_id": "",
+        "card_id": "jp-vocab#reigai-shori",
         "reading": "れいがいしょり (reigai shori)",
         "meaning": "exception handling",
-        "example_ja": "try-catchで例外処理をします。",
-        "example_en": "We handle exceptions with try-catch."
+        "example_ja": "ファイル操作には例外処理が必要です。",
+        "example_en": "File operations need exception handling."
       },
       {
         "front": "発生",
@@ -13686,7 +13686,7 @@
     "deep": "Daily engineering runs on these. Git verbs are katakana loanwords (コミット, プッシュ, マージ), while process words tend to be kanji (変更, 差分, 依存関係, 設定).",
     "java": "The **Reading** column gives the kana pronunciation and a romaji gloss so you can say the word out loud. Loanwords written in katakana already *are* their reading, so only the romaji is shown. Example sentences are polite (です・ます) form — exactly how you'd hear them in a standup or an interview.",
     "language": "japanese",
-    "lesson": "| 用語 (Term) | 読み方 (Reading) | 意味 (Meaning) | 例文 (Example) |\n|---|---|---|---|\n| 変更 | へんこう (henkō) | change | この変更をレビューします。 — *We review this change.* |\n| 差分 | さぶん (sabun) | diff / difference | コミット前に差分を確認します。 — *We check the diff before committing.* |\n| 競合 | きょうごう (kyōgō) | (merge) conflict | マージで競合が起きました。 — *A conflict happened during the merge.* |\n| 解決 | かいけつ (kaiketsu) | resolve | 競合を解決します。 — *We resolve the conflict.* |\n| 単体テスト | たんたいテスト (tantai tesuto) | unit test | この関数に単体テストを追加します。 — *We add a unit test for this function.* |\n| 依存関係 | いぞんかんけい (izon kankei) | dependencies | npm installで依存関係をインストールします。 — *Install the dependencies with npm install.* |\n| 環境 | かんきょう (kankyō) | environment | 開発環境を用意します。 — *We set up the development environment.* |\n| 設定 | せってい (settei) | configuration / settings | 設定ファイルを編集します。 — *We edit the config file.* |\n| 導入 | どうにゅう (dōnyū) | adopt / introduce | このツールを導入します。 — *We adopt this tool.* |\n| 更新 | こうしん (kōshin) | update | 在庫の数を更新します。 — *We update the stock count.* |\n| バージョン管理 | バージョンかんり (bājon kanri) | version control | Gitでバージョン管理します。 — *We manage versions with Git.* |\n| 反映 | はんえい (han'ei) | reflect / apply | 変更を本番環境に反映します。 — *We apply the changes to production.* |\n",
+    "lesson": "| 用語 (Term) | 読み方 (Reading) | 意味 (Meaning) | 例文 (Example) |\n|---|---|---|---|\n| 変更 | へんこう (henkō) | change | この変更をレビューします。 — *We review this change.* |\n| 差分 | さぶん (sabun) | diff / difference | 差分を見れば変更点がすぐ分かります。 — *Looking at the diff shows the changes at once.* |\n| 競合 | きょうごう (kyōgō) | (merge) conflict | マージで競合が起きました。 — *A conflict happened during the merge.* |\n| 解決 | かいけつ (kaiketsu) | resolve | 競合を解決します。 — *We resolve the conflict.* |\n| 単体テスト | たんたいテスト (tantai tesuto) | unit test | この関数に単体テストを追加します。 — *We add a unit test for this function.* |\n| 依存関係 | いぞんかんけい (izon kankei) | dependencies | npm installで依存関係をインストールします。 — *Install the dependencies with npm install.* |\n| 環境 | かんきょう (kankyō) | environment | 開発環境を用意します。 — *We set up the development environment.* |\n| 設定 | せってい (settei) | configuration / settings | 設定ファイルを編集します。 — *We edit the config file.* |\n| 導入 | どうにゅう (dōnyū) | adopt / introduce | このツールを導入します。 — *We adopt this tool.* |\n| 更新 | こうしん (kōshin) | update | 在庫の数を更新します。 — *We update the stock count.* |\n| バージョン管理 | バージョンかんり (bājon kanri) | version control | Gitでバージョン管理します。 — *We manage versions with Git.* |\n| 反映 | はんえい (han'ei) | reflect / apply | 変更を本番環境に反映します。 — *We apply the changes to production.* |\n",
     "exercises": [],
     "cards": [
       {
@@ -13699,11 +13699,11 @@
       },
       {
         "front": "差分",
-        "card_id": "",
+        "card_id": "jp-vocab#sabun",
         "reading": "さぶん (sabun)",
         "meaning": "diff / difference",
-        "example_ja": "コミット前に差分を確認します。",
-        "example_en": "We check the diff before committing."
+        "example_ja": "差分を見れば変更点がすぐ分かります。",
+        "example_en": "Looking at the diff shows the changes at once."
       },
       {
         "front": "競合",
@@ -13797,7 +13797,7 @@
     "deep": "Beyond the tech words, you need the conversation itself: solving a 問題 (problem), explaining your 考え方 (approach), talking about 要件 (requirements) and 締め切り (deadlines). These carry a whole interview.",
     "java": "The **Reading** column gives the kana pronunciation and a romaji gloss so you can say the word out loud. Loanwords written in katakana already *are* their reading, so only the romaji is shown. Example sentences are polite (です・ます) form — exactly how you'd hear them in a standup or an interview.",
     "language": "japanese",
-    "lesson": "| 用語 (Term) | 読み方 (Reading) | 意味 (Meaning) | 例文 (Example) |\n|---|---|---|---|\n| 面接 | めんせつ (mensetsu) | interview | 明日、技術面接があります。 — *I have a technical interview tomorrow.* |\n| 技術面接 | ぎじゅつめんせつ (gijutsu mensetsu) | technical interview | 技術面接でアルゴリズムを聞かれます。 — *In a technical interview, they ask about algorithms.* |\n| 問題 | もんだい (mondai) | problem | この問題を解いてください。 — *Please solve this problem.* |\n| 解く | とく (toku) | to solve | コーディング問題を解きます。 — *We solve a coding problem.* |\n| 解答 | かいとう (kaitō) | answer / solution | 解答を説明してください。 — *Please explain your solution.* |\n| 説明する | せつめいする (setsumei suru) | to explain | まず考え方を説明します。 — *First I'll explain my approach.* |\n| 要件 | ようけん (yōken) | requirement | 要件を確認します。 — *We confirm the requirements.* |\n| 仕様 | しよう (shiyō) | specification | 仕様書をよく読みます。 — *We read the spec carefully.* |\n| 設計 | せっけい (sekkei) | design | システムを設計します。 — *We design the system.* |\n| 実装する | じっそうする (jissō suru) | to implement | この機能を実装します。 — *We implement this feature.* |\n| 最適化 | さいてきか (saitekika) | optimization | コードを最適化します。 — *We optimize the code.* |\n| 改善 | かいぜん (kaizen) | improvement | パフォーマンスを改善します。 — *We improve the performance.* |\n| 締め切り | しめきり (shimekiri) | deadline | 締め切りは金曜日です。 — *The deadline is Friday.* |\n| 納期 | のうき (nōki) | delivery deadline | 納期に間に合わせます。 — *We'll make the delivery deadline.* |\n| 会議 | かいぎ (kaigi) | meeting | 朝に短い会議があります。 — *There's a short meeting in the morning.* |\n| 進捗 | しんちょく (shinchoku) | progress | 毎日、進捗を報告します。 — *I report progress every day.* |\n| 質問 | しつもん (shitsumon) | question | 一つ質問してもいいですか。 — *May I ask one question?* |\n| 考え方 | かんがえかた (kangaekata) | approach / way of thinking | まず考え方を整理します。 — *First, let me organize my approach.* |\n| 担当 | たんとう (tantō) | in charge of | 私がこの機能を担当します。 — *I'm in charge of this feature.* |\n| 期待 | きたい (kitai) | expectation | コードは期待通りに動きます。 — *The code works as expected.* |\n| 報告 | ほうこく (hōkoku) | report | 結果を上司に報告します。 — *I report the results to my manager.* |\n| お疲れ様です | おつかれさまです (otsukaresama desu) | (standard workplace greeting) | お疲れ様です、レビューありがとうございます。 — *Thanks for your work — and thanks for the review.* |\n",
+    "lesson": "| 用語 (Term) | 読み方 (Reading) | 意味 (Meaning) | 例文 (Example) |\n|---|---|---|---|\n| 面接 | めんせつ (mensetsu) | interview | 明日、技術面接があります。 — *I have a technical interview tomorrow.* |\n| 技術面接 | ぎじゅつめんせつ (gijutsu mensetsu) | technical interview | 技術面接でアルゴリズムを聞かれます。 — *In a technical interview, they ask about algorithms.* |\n| 問題 | もんだい (mondai) | problem | この問題を解いてください。 — *Please solve this problem.* |\n| 解く | とく (toku) | to solve | コーディング問題を解きます。 — *We solve a coding problem.* |\n| 解答 | かいとう (kaitō) | answer / solution | 解答を説明してください。 — *Please explain your solution.* |\n| 説明する | せつめいする (setsumei suru) | to explain | まず考え方を説明します。 — *First I'll explain my approach.* |\n| 要件 | ようけん (yōken) | requirement | この機能の要件をまとめてください。 — *Please write up the requirements for this feature.* |\n| 仕様 | しよう (shiyō) | specification | 仕様を確認してから実装を始めます。 — *I check the specification before starting to implement.* |\n| 設計 | せっけい (sekkei) | design | 実装の前に設計を見直しましょう。 — *Let's review the design before implementing.* |\n| 実装する | じっそうする (jissō suru) | to implement | この機能を実装します。 — *We implement this feature.* |\n| 最適化 | さいてきか (saitekika) | optimization | コードを最適化します。 — *We optimize the code.* |\n| 改善 | かいぜん (kaizen) | improvement | 手順の改善を提案します。 — *I'd like to propose an improvement to the process.* |\n| 締め切り | しめきり (shimekiri) | deadline | 締め切りは今週の金曜日です。 — *The deadline is this Friday.* |\n| 納期 | のうき (nōki) | delivery deadline | 納期に間に合うか確認してください。 — *Please check whether we'll make the delivery deadline.* |\n| 会議 | かいぎ (kaigi) | meeting | 朝に短い会議があります。 — *There's a short meeting in the morning.* |\n| 進捗 | しんちょく (shinchoku) | progress | 今週の進捗を報告してください。 — *Please report this week's progress.* |\n| 質問 | しつもん (shitsumon) | question | 一つ質問してもいいですか。 — *May I ask one question?* |\n| 考え方 | かんがえかた (kangaekata) | approach / way of thinking | まず考え方を整理します。 — *First, let me organize my approach.* |\n| 担当 | たんとう (tantō) | in charge of | この機能は私が担当します。 — *I'll be in charge of this feature.* |\n| 期待 | きたい (kitai) | expectation | コードは期待通りに動きます。 — *The code works as expected.* |\n| 報告 | ほうこく (hōkoku) | report | 進捗を報告します。 — *I'll report on the progress.* |\n| お疲れ様です | おつかれさまです (otsukaresama desu) | (standard workplace greeting) | お疲れ様です、レビューありがとうございます。 — *Thanks for your work — and thanks for the review.* |\n",
     "exercises": [],
     "cards": [
       {
@@ -13850,27 +13850,27 @@
       },
       {
         "front": "要件",
-        "card_id": "",
+        "card_id": "jp-vocab#yoken",
         "reading": "ようけん (yōken)",
         "meaning": "requirement",
-        "example_ja": "要件を確認します。",
-        "example_en": "We confirm the requirements."
+        "example_ja": "この機能の要件をまとめてください。",
+        "example_en": "Please write up the requirements for this feature."
       },
       {
         "front": "仕様",
-        "card_id": "",
+        "card_id": "jp-vocab#shiyo",
         "reading": "しよう (shiyō)",
         "meaning": "specification",
-        "example_ja": "仕様書をよく読みます。",
-        "example_en": "We read the spec carefully."
+        "example_ja": "仕様を確認してから実装を始めます。",
+        "example_en": "I check the specification before starting to implement."
       },
       {
         "front": "設計",
-        "card_id": "",
+        "card_id": "jp-vocab#sekkei",
         "reading": "せっけい (sekkei)",
         "meaning": "design",
-        "example_ja": "システムを設計します。",
-        "example_en": "We design the system."
+        "example_ja": "実装の前に設計を見直しましょう。",
+        "example_en": "Let's review the design before implementing."
       },
       {
         "front": "実装する",
@@ -13890,27 +13890,27 @@
       },
       {
         "front": "改善",
-        "card_id": "",
+        "card_id": "jp-vocab#kaizen",
         "reading": "かいぜん (kaizen)",
         "meaning": "improvement",
-        "example_ja": "パフォーマンスを改善します。",
-        "example_en": "We improve the performance."
+        "example_ja": "手順の改善を提案します。",
+        "example_en": "I'd like to propose an improvement to the process."
       },
       {
         "front": "締め切り",
-        "card_id": "",
+        "card_id": "jp-vocab#shimekiri",
         "reading": "しめきり (shimekiri)",
         "meaning": "deadline",
-        "example_ja": "締め切りは金曜日です。",
-        "example_en": "The deadline is Friday."
+        "example_ja": "締め切りは今週の金曜日です。",
+        "example_en": "The deadline is this Friday."
       },
       {
         "front": "納期",
-        "card_id": "",
+        "card_id": "jp-vocab#noki",
         "reading": "のうき (nōki)",
         "meaning": "delivery deadline",
-        "example_ja": "納期に間に合わせます。",
-        "example_en": "We'll make the delivery deadline."
+        "example_ja": "納期に間に合うか確認してください。",
+        "example_en": "Please check whether we'll make the delivery deadline."
       },
       {
         "front": "会議",
@@ -13922,11 +13922,11 @@
       },
       {
         "front": "進捗",
-        "card_id": "",
+        "card_id": "jp-vocab#shinchoku",
         "reading": "しんちょく (shinchoku)",
         "meaning": "progress",
-        "example_ja": "毎日、進捗を報告します。",
-        "example_en": "I report progress every day."
+        "example_ja": "今週の進捗を報告してください。",
+        "example_en": "Please report this week's progress."
       },
       {
         "front": "質問",
@@ -13946,11 +13946,11 @@
       },
       {
         "front": "担当",
-        "card_id": "",
+        "card_id": "jp-vocab#tanto",
         "reading": "たんとう (tantō)",
         "meaning": "in charge of",
-        "example_ja": "私がこの機能を担当します。",
-        "example_en": "I'm in charge of this feature."
+        "example_ja": "この機能は私が担当します。",
+        "example_en": "I'll be in charge of this feature."
       },
       {
         "front": "期待",
@@ -13962,11 +13962,11 @@
       },
       {
         "front": "報告",
-        "card_id": "",
+        "card_id": "jp-vocab#hokoku",
         "reading": "ほうこく (hōkoku)",
         "meaning": "report",
-        "example_ja": "結果を上司に報告します。",
-        "example_en": "I report the results to my manager."
+        "example_ja": "進捗を報告します。",
+        "example_en": "I'll report on the progress."
       },
       {
         "front": "お疲れ様です",
@@ -14346,7 +14346,7 @@
     "deep": "Functions and asynchronous code are where a lot of TypeScript work happens. Learn 非同期 (async), プロミス (Promise), 待機 (await), and the words for arguments, return values and callbacks.",
     "java": "The **Reading** column gives the kana pronunciation and a romaji gloss so you can say the word out loud. Loanwords written in katakana already *are* their reading, so only the romaji is shown. Example sentences are polite (です・ます) form — exactly how you'd hear them in a standup or an interview.",
     "language": "japanese",
-    "lesson": "| 用語 (Term) | 読み方 (Reading) | 意味 (Meaning) | 例文 (Example) |\n|---|---|---|---|\n| 関数 | かんすう (kansū) | function | 関数を定義します。 — *We define a function.* |\n| アロー関数 | アローかんすう (arō kansū) | arrow function | アロー関数で短く書けます。 — *We can write it shorter with an arrow function.* |\n| 引数 | ひきすう (hikisū) | argument | 関数に引数を渡します。 — *We pass an argument to the function.* |\n| 仮引数 | かりひきすう (kari hikisū) | parameter (formal parameter) | add(int a, int b)のaとbが仮引数です。 — *In add(int a, int b), a and b are the parameters.* |\n| 戻り値 | もどりち (modorichi) | return value | 関数の戻り値の型を指定します。 — *We specify the function's return type.* |\n| 高階関数 | こうかいかんすう (kōkai kansū) | higher-order function | mapは高階関数です。 — *`map` is a higher-order function.* |\n| 無名関数 | むめいかんすう (mumei kansū) | anonymous function | 無名関数をその場で渡します。 — *We pass an anonymous function inline.* |\n| 非同期 | ひどうき (hidōki) | asynchronous | fetchは非同期に実行されます。 — *fetch runs asynchronously.* |\n| 同期 | どうき (dōki) | synchronous | この処理は同期的に実行されます。 — *This runs synchronously.* |\n| 待機 | たいき (taiki) | waiting (await) | awaitでレスポンスを待機してから画面に表示します。 — *Await the response, then show it on screen.* |\n| 解決 | かいけつ (kaiketsu) | resolve | プロミスが値で解決します。 — *The promise resolves with a value.* |\n| 拒否 | きょひ (kyohi) | reject | エラーでプロミスが拒否されます。 — *The promise is rejected with an error.* |\n| 副作用 | ふくさよう (fukusayō) | side effect | この関数は副作用がありません。 — *This function has no side effects.* |\n| 純粋関数 | じゅんすいかんすう (junsui kansū) | pure function | 純粋関数はテストしやすいです。 — *Pure functions are easy to test.* |\n| デフォルト引数 | デフォルトひきすう (deforuto hikisū) | default parameter | デフォルト引数を設定します。 — *We set a default parameter.* |\n| 残余引数 | ざんよひきすう (zan'yo hikisū) | rest parameters | 残余引数を使えば、いくつでも数値を受け取れます。 — *With rest parameters, you can accept any number of numbers.* |\n| 再帰 | さいき (saiki) | recursion | 階乗は再帰で簡単に書けます。 — *Factorial is easy to write with recursion.* |\n| 並行処理 | へいこうしょり (heikō shori) | concurrency | 並行処理でダウンロードを高速化しました。 — *We sped up the downloads with concurrency.* |\n| 例外処理 | れいがいしょり (reigai shori) | exception handling | try-catchで例外処理をします。 — *We handle exceptions with try-catch.* |\n| 呼び出し | よびだし (yobidashi) | call / invocation | 関数の呼び出しを確認します。 — *We check the function call.* |\n| 遅延評価 | ちえんひょうか (chien hyōka) | lazy evaluation | 遅延評価で計算を後回しにします。 — *Lazy evaluation defers the computation.* |\n",
+    "lesson": "| 用語 (Term) | 読み方 (Reading) | 意味 (Meaning) | 例文 (Example) |\n|---|---|---|---|\n| 関数 | かんすう (kansū) | function | 関数を定義します。 — *We define a function.* |\n| アロー関数 | アローかんすう (arō kansū) | arrow function | アロー関数で短く書けます。 — *We can write it shorter with an arrow function.* |\n| 引数 | ひきすう (hikisū) | argument | 関数に引数を渡します。 — *We pass an argument to the function.* |\n| 仮引数 | かりひきすう (kari hikisū) | parameter (formal parameter) | add(int a, int b)のaとbが仮引数です。 — *In add(int a, int b), a and b are the parameters.* |\n| 戻り値 | もどりち (modorichi) | return value | 関数の戻り値の型を指定します。 — *We specify the function's return type.* |\n| 高階関数 | こうかいかんすう (kōkai kansū) | higher-order function | mapは高階関数です。 — *`map` is a higher-order function.* |\n| 無名関数 | むめいかんすう (mumei kansū) | anonymous function | 無名関数をその場で渡します。 — *We pass an anonymous function inline.* |\n| 非同期 | ひどうき (hidōki) | asynchronous | fetchは非同期に実行されます。 — *fetch runs asynchronously.* |\n| 同期 | どうき (dōki) | synchronous | この処理は同期的に実行されます。 — *This runs synchronously.* |\n| 待機 | たいき (taiki) | waiting (await) | awaitでレスポンスを待機してから画面に表示します。 — *Await the response, then show it on screen.* |\n| 解決 | かいけつ (kaiketsu) | resolve | プロミスが値で解決します。 — *The promise resolves with a value.* |\n| 拒否 | きょひ (kyohi) | reject | エラーでプロミスが拒否されます。 — *The promise is rejected with an error.* |\n| 副作用 | ふくさよう (fukusayō) | side effect | この関数は副作用がありません。 — *This function has no side effects.* |\n| 純粋関数 | じゅんすいかんすう (junsui kansū) | pure function | 純粋関数はテストしやすいです。 — *Pure functions are easy to test.* |\n| デフォルト引数 | デフォルトひきすう (deforuto hikisū) | default parameter | デフォルト引数を設定します。 — *We set a default parameter.* |\n| 残余引数 | ざんよひきすう (zan'yo hikisū) | rest parameters | 残余引数を使えば、いくつでも数値を受け取れます。 — *With rest parameters, you can accept any number of numbers.* |\n| 再帰 | さいき (saiki) | recursion | 階乗は再帰で簡単に書けます。 — *Factorial is easy to write with recursion.* |\n| 並行処理 | へいこうしょり (heikō shori) | concurrency | 並行処理でダウンロードを高速化しました。 — *We sped up the downloads with concurrency.* |\n| 例外処理 | れいがいしょり (reigai shori) | exception handling | ファイル操作には例外処理が必要です。 — *File operations need exception handling.* |\n| 呼び出し | よびだし (yobidashi) | call / invocation | 関数の呼び出しを確認します。 — *We check the function call.* |\n| 遅延評価 | ちえんひょうか (chien hyōka) | lazy evaluation | Streamは遅延評価なので、終端操作まで何も起きません。 — *Streams are lazily evaluated, so nothing happens until a terminal operation.* |\n",
     "exercises": [],
     "cards": [
       {
@@ -14495,11 +14495,11 @@
       },
       {
         "front": "例外処理",
-        "card_id": "",
+        "card_id": "jp-vocab#reigai-shori",
         "reading": "れいがいしょり (reigai shori)",
         "meaning": "exception handling",
-        "example_ja": "try-catchで例外処理をします。",
-        "example_en": "We handle exceptions with try-catch."
+        "example_ja": "ファイル操作には例外処理が必要です。",
+        "example_en": "File operations need exception handling."
       },
       {
         "front": "呼び出し",
@@ -14511,11 +14511,11 @@
       },
       {
         "front": "遅延評価",
-        "card_id": "",
+        "card_id": "jp-vocab#chien-hyoka",
         "reading": "ちえんひょうか (chien hyōka)",
         "meaning": "lazy evaluation",
-        "example_ja": "遅延評価で計算を後回しにします。",
-        "example_en": "Lazy evaluation defers the computation."
+        "example_ja": "Streamは遅延評価なので、終端操作まで何も起きません。",
+        "example_en": "Streams are lazily evaluated, so nothing happens until a terminal operation."
       }
     ],
     "quiz": [],
@@ -14529,7 +14529,7 @@
     "deep": "Structuring and moving data around: オブジェクト and プロパティ, 分割代入 (destructuring), スプレッド構文 (spread), and how code is organized into モジュール and packages, then built with a バンドラー.",
     "java": "The **Reading** column gives the kana pronunciation and a romaji gloss so you can say the word out loud. Loanwords written in katakana already *are* their reading, so only the romaji is shown. Example sentences are polite (です・ます) form — exactly how you'd hear them in a standup or an interview.",
     "language": "japanese",
-    "lesson": "| 用語 (Term) | 読み方 (Reading) | 意味 (Meaning) | 例文 (Example) |\n|---|---|---|---|\n| 値 | あたい (atai) | value | キーに対応する値を更新します。 — *We update the value for the key.* |\n| 配列 | はいれつ (hairetsu) | array | 整数の配列が与えられます。 — *You are given an array of integers.* |\n| 分割代入 | ぶんかつだいにゅう (bunkatsu dainyū) | destructuring assignment | 分割代入でpropsから必要な値だけを取り出します。 — *Use destructuring to pull just the values you need out of props.* |\n| スプレッド構文 | スプレッドこうぶん (supureddo kōbun) | spread syntax | スプレッド構文で配列を複製します。 — *We copy an array with spread syntax.* |\n| 不変 | ふへん (fuhen) | immutable | 不変オブジェクトはスレッド間で安全に共有できます。 — *Immutable objects can be shared safely between threads.* |\n| 可変 | かへん (kahen) | mutable | 可変のオブジェクトは変更できます。 — *A mutable object can be changed.* |\n| 参照 | さんしょう (sanshō) | reference | オブジェクトは参照で渡されます。 — *Objects are passed by reference.* |\n| 複製 | ふくせい (fukusei) | copy / clone | オブジェクトを複製します。 — *We clone the object.* |\n| 名前空間 | なまえくうかん (namae kūkan) | namespace | 名前空間が違えば、同じ名前の関数を定義できます。 — *In different namespaces, you can define functions with the same name.* |\n| 依存関係 | いぞんかんけい (izon kankei) | dependencies | npm installで依存関係をインストールします。 — *Install the dependencies with npm install.* |\n| 反復処理 | はんぷくしょり (hanpuku shori) | iteration | 配列を反復処理します。 — *We iterate over the array.* |\n| JSON形式 | JSONけいしき (JSON keishiki) | JSON format | データをJSON形式で保存します。 — *We save the data in JSON format.* |\n| 直列化 | ちょくれつか (chokuretsuka) | serialization | オブジェクトを直列化します。 — *We serialize the object.* |\n| 検証 | けんしょう (kenshō) | validation | 入力データを検証します。 — *We validate the input data.* |\n| 設定ファイル | せっていファイル (settei fairu) | config file | tsconfigは設定ファイルです。 — *`tsconfig` is a config file.* |\n",
+    "lesson": "| 用語 (Term) | 読み方 (Reading) | 意味 (Meaning) | 例文 (Example) |\n|---|---|---|---|\n| 値 | あたい (atai) | value | キーに対応する値を更新します。 — *We update the value for the key.* |\n| 配列 | はいれつ (hairetsu) | array | 整数の配列が与えられます。 — *You are given an array of integers.* |\n| 分割代入 | ぶんかつだいにゅう (bunkatsu dainyū) | destructuring assignment | 分割代入でpropsから必要な値だけを取り出します。 — *Use destructuring to pull just the values you need out of props.* |\n| スプレッド構文 | スプレッドこうぶん (supureddo kōbun) | spread syntax | スプレッド構文で配列を複製します。 — *We copy an array with spread syntax.* |\n| 不変 | ふへん (fuhen) | immutable | 不変オブジェクトはスレッド間で安全に共有できます。 — *Immutable objects can be shared safely between threads.* |\n| 可変 | かへん (kahen) | mutable | 可変のオブジェクトは変更できます。 — *A mutable object can be changed.* |\n| 参照 | さんしょう (sanshō) | reference | オブジェクトは参照で渡されます。 — *Objects are passed by reference.* |\n| 複製 | ふくせい (fukusei) | copy / clone | オブジェクトを複製します。 — *We clone the object.* |\n| 名前空間 | なまえくうかん (namae kūkan) | namespace | 名前空間が違えば、同じ名前の関数を定義できます。 — *In different namespaces, you can define functions with the same name.* |\n| 依存関係 | いぞんかんけい (izon kankei) | dependencies | npm installで依存関係をインストールします。 — *Install the dependencies with npm install.* |\n| 反復処理 | はんぷくしょり (hanpuku shori) | iteration | 配列を反復処理します。 — *We iterate over the array.* |\n| JSON形式 | JSONけいしき (JSON keishiki) | JSON format | データをJSON形式で保存します。 — *We save the data in JSON format.* |\n| 直列化 | ちょくれつか (chokuretsuka) | serialization | オブジェクトを直列化してファイルに保存します。 — *We serialize the object and save it to a file.* |\n| 検証 | けんしょう (kenshō) | validation | 入力データを検証します。 — *We validate the input data.* |\n| 設定ファイル | せっていファイル (settei fairu) | config file | tsconfigは設定ファイルです。 — *`tsconfig` is a config file.* |\n",
     "exercises": [],
     "cards": [
       {
@@ -14630,15 +14630,15 @@
       },
       {
         "front": "直列化",
-        "card_id": "",
+        "card_id": "jp-vocab#chokuretsuka",
         "reading": "ちょくれつか (chokuretsuka)",
         "meaning": "serialization",
-        "example_ja": "オブジェクトを直列化します。",
-        "example_en": "We serialize the object."
+        "example_ja": "オブジェクトを直列化してファイルに保存します。",
+        "example_en": "We serialize the object and save it to a file."
       },
       {
         "front": "検証",
-        "card_id": "",
+        "card_id": "jp-vocab#kensho",
         "reading": "けんしょう (kenshō)",
         "meaning": "validation",
         "example_ja": "入力データを検証します。",

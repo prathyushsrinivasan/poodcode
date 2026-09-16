@@ -24,6 +24,11 @@
       "id": "web",
       "label": "Web",
       "label_ja": "Webと通信"
+    },
+    {
+      "id": "workplace",
+      "label": "Workplace",
+      "label_ja": "仕事の現場"
     }
   ],
   "words": [
@@ -539,6 +544,384 @@
       "desc_ja": "collect、count、forEachのように結果を生み出し、パイプライン全体を実際に実行するStream操作です。",
       "example_ja": "collectなどの終端操作を呼ぶと、ストリームが処理されます。",
       "example_en": "Calling a terminal operation such as collect processes the stream."
+    },
+    {
+      "id": "atai-watashi",
+      "term": "値渡し",
+      "reading": "あたいわたし",
+      "romaji": "atai watashi",
+      "tags": [
+        "java"
+      ],
+      "level": 2,
+      "meaning": "pass by value",
+      "desc_en": "Passing a copy of the value, so changes inside the method don't touch the caller's variable. Java always does this — even for objects, where the copied value is the reference.",
+      "desc_ja": "値の複製を渡す方式です。メソッドの中で変更しても呼び出し元の変数は変わりません。Javaは常にこの方式で、オブジェクトの場合は参照が複製されます。",
+      "example_ja": "Javaの引数はすべて値渡しです。",
+      "example_en": "All arguments in Java are passed by value."
+    },
+    {
+      "id": "sansho-watashi",
+      "term": "参照渡し",
+      "reading": "さんしょうわたし",
+      "romaji": "sanshō watashi",
+      "tags": [
+        "java"
+      ],
+      "level": 2,
+      "meaning": "pass by reference",
+      "desc_en": "Passing the variable itself, so the callee can reassign it. Java does NOT do this — a common interview trap.",
+      "desc_ja": "変数そのものを渡し、呼ばれた側が代入し直せる方式です。Javaにはこの方式はなく、面接でよく問われる点です。",
+      "example_ja": "Javaには参照渡しはありません。",
+      "example_en": "Java does not have pass by reference."
+    },
+    {
+      "id": "fuhen-joken",
+      "term": "不変条件",
+      "reading": "ふへんじょうけん",
+      "romaji": "fuhen jōken",
+      "tags": [
+        "java"
+      ],
+      "level": 3,
+      "meaning": "invariant",
+      "desc_en": "A statement about an object that must be true before and after every method — the thing encapsulation exists to protect.",
+      "desc_ja": "どのメソッドの前後でも必ず成り立っていなければならない条件です。カプセル化が守ろうとしているものです。",
+      "example_ja": "残高が負にならないことがこのクラスの不変条件です。",
+      "example_en": "That the balance is never negative is this class's invariant."
+    },
+    {
+      "id": "chokuretsuka",
+      "term": "直列化",
+      "reading": "ちょくれつか",
+      "romaji": "chokuretsuka",
+      "tags": [
+        "java",
+        "typescript"
+      ],
+      "level": 2,
+      "meaning": "serialization",
+      "desc_en": "Turning an object into a stream of bytes that can be stored or sent, and read back into an object later.",
+      "desc_ja": "オブジェクトを保存や送信のできるバイトの並びに変換することです。後で元のオブジェクトに戻せます。",
+      "example_ja": "オブジェクトを直列化してファイルに保存します。",
+      "example_en": "We serialize the object and save it to a file."
+    },
+    {
+      "id": "chien-hyoka",
+      "term": "遅延評価",
+      "reading": "ちえんひょうか",
+      "romaji": "chien hyōka",
+      "tags": [
+        "java",
+        "typescript"
+      ],
+      "level": 3,
+      "meaning": "lazy evaluation",
+      "desc_en": "Not computing a value until it is actually needed — how Stream's intermediate operations avoid doing work nobody asked for.",
+      "desc_ja": "実際に必要になるまで値を計算しない方式です。Streamの中間操作が無駄な処理を避けている仕組みです。",
+      "example_ja": "Streamは遅延評価なので、終端操作まで何も起きません。",
+      "example_en": "Streams are lazily evaluated, so nothing happens until a terminal operation."
+    },
+    {
+      "id": "hanpukushi",
+      "term": "反復子",
+      "reading": "はんぷくし",
+      "romaji": "hanpukushi",
+      "tags": [
+        "java"
+      ],
+      "level": 2,
+      "meaning": "iterator",
+      "desc_en": "An object that walks a collection one element at a time, without exposing how the collection is stored.",
+      "desc_ja": "コレクションの要素を一つずつ取り出す役割のオブジェクトです。内部の持ち方を知らなくても走査できます。",
+      "example_ja": "反復子を使えば、リストでも集合でも同じように回せます。",
+      "example_en": "With an iterator you can loop over a list and a set the same way."
+    },
+    {
+      "id": "sosa",
+      "term": "走査",
+      "reading": "そうさ",
+      "romaji": "sōsa",
+      "tags": [
+        "java"
+      ],
+      "level": 2,
+      "meaning": "traversal",
+      "desc_en": "Visiting every element of a structure once, in some defined order.",
+      "desc_ja": "構造の中のすべての要素を、決まった順で一度ずつ訪れることです。",
+      "example_ja": "配列を一度だけ走査して合計を求めます。",
+      "example_en": "We traverse the array once to find the total."
+    },
+    {
+      "id": "reigai-shori",
+      "term": "例外処理",
+      "reading": "れいがいしょり",
+      "romaji": "reigai shori",
+      "tags": [
+        "java"
+      ],
+      "level": 1,
+      "meaning": "exception handling",
+      "desc_en": "The try / catch / finally machinery for dealing with an exception instead of letting it end the program.",
+      "desc_ja": "try・catch・finallyを使って、例外をプログラムの終了ではなく回復として扱う仕組みです。",
+      "example_ja": "ファイル操作には例外処理が必要です。",
+      "example_en": "File operations need exception handling."
+    },
+    {
+      "id": "shuryo-shori",
+      "term": "終了処理",
+      "reading": "しゅうりょうしょり",
+      "romaji": "shūryō shori",
+      "tags": [
+        "java"
+      ],
+      "level": 2,
+      "meaning": "cleanup",
+      "desc_en": "Work that must happen however a block exits — closing a file, releasing a lock — which finally or try-with-resources guarantees.",
+      "desc_ja": "どのような終わり方をしても必ず行う後始末です。ファイルを閉じる、ロックを解放するなど、finallyやtry-with-resourcesが保証します。",
+      "example_ja": "finallyブロックで終了処理を行います。",
+      "example_en": "We do the cleanup in a finally block."
+    },
+    {
+      "id": "shigen",
+      "term": "資源",
+      "reading": "しげん",
+      "romaji": "shigen",
+      "tags": [
+        "java"
+      ],
+      "level": 1,
+      "meaning": "resource",
+      "desc_en": "Something finite the program holds and must give back — a file handle, a socket, a connection.",
+      "desc_ja": "プログラムが確保し、返さなければならない有限のものです。ファイルやソケット、接続などが該当します。",
+      "example_ja": "使い終わった資源は必ず閉じてください。",
+      "example_en": "Always close a resource when you're done with it."
+    },
+    {
+      "id": "kaiho",
+      "term": "解放",
+      "reading": "かいほう",
+      "romaji": "kaihō",
+      "tags": [
+        "java"
+      ],
+      "level": 2,
+      "meaning": "release",
+      "desc_en": "Giving a held resource back so something else can use it.",
+      "desc_ja": "確保していた資源を手放し、他から使えるようにすることです。",
+      "example_ja": "ロックを解放しないと、他のスレッドが進めません。",
+      "example_en": "If you don't release the lock, other threads can't proceed."
+    },
+    {
+      "id": "kaishu",
+      "term": "回収",
+      "reading": "かいしゅう",
+      "romaji": "kaishū",
+      "tags": [
+        "java"
+      ],
+      "level": 2,
+      "meaning": "garbage collection",
+      "desc_en": "The JVM reclaiming memory held by objects nothing refers to any more, without you freeing anything by hand.",
+      "desc_ja": "どこからも参照されなくなったオブジェクトのメモリを、JVMが自動的に取り戻す仕組みです。手動で解放する必要はありません。",
+      "example_ja": "参照が切れたオブジェクトは自動的に回収されます。",
+      "example_en": "An object with no remaining references is collected automatically."
+    },
+    {
+      "id": "sedai",
+      "term": "世代",
+      "reading": "せだい",
+      "romaji": "sedai",
+      "tags": [
+        "java"
+      ],
+      "level": 3,
+      "meaning": "generation (GC)",
+      "desc_en": "The age bucket the collector sorts objects into — most die young, so the young generation is swept far more often.",
+      "desc_ja": "回収の際にオブジェクトを分ける年齢の区分です。多くは早く不要になるため、若い世代ほど頻繁に調べられます。",
+      "example_ja": "若い世代の回収は短時間で終わります。",
+      "example_en": "Collecting the young generation finishes quickly."
+    },
+    {
+      "id": "yobidashi-rireki",
+      "term": "呼び出し履歴",
+      "reading": "よびだしりれき",
+      "romaji": "yobidashi rireki",
+      "tags": [
+        "java"
+      ],
+      "level": 2,
+      "meaning": "call stack",
+      "desc_en": "The chain of method calls in progress — what a stack trace prints, innermost first.",
+      "desc_ja": "実行中のメソッド呼び出しの連なりです。スタックトレースが内側から順に表示するものです。",
+      "example_ja": "例外が出たら呼び出し履歴を確認します。",
+      "example_en": "When an exception comes up, check the call stack."
+    },
+    {
+      "id": "sainyu-kano",
+      "term": "再入可能",
+      "reading": "さいにゅうかのう",
+      "romaji": "sainyū kanō",
+      "tags": [
+        "java"
+      ],
+      "level": 3,
+      "meaning": "reentrant",
+      "desc_en": "Safe to enter again while an earlier call is still in progress — a reentrant lock lets the thread holding it lock again.",
+      "desc_ja": "前の呼び出しが終わる前に、もう一度入っても安全なことです。再入可能なロックは、保持中のスレッドが再び取得できます。",
+      "example_ja": "synchronizedのロックは再入可能です。",
+      "example_en": "A synchronized lock is reentrant."
+    },
+    {
+      "id": "fukabun",
+      "term": "不可分",
+      "reading": "ふかぶん",
+      "romaji": "fukabun",
+      "tags": [
+        "java"
+      ],
+      "level": 3,
+      "meaning": "atomic",
+      "desc_en": "Happening completely or not at all, with no state in between that another thread could observe.",
+      "desc_ja": "完全に行われるか、まったく行われないかのどちらかで、途中の状態を他のスレッドから見られないことです。",
+      "example_ja": "AtomicIntegerの増加は不可分な操作です。",
+      "example_en": "Incrementing an AtomicInteger is an atomic operation."
+    },
+    {
+      "id": "kashisei",
+      "term": "可視性",
+      "reading": "かしせい",
+      "romaji": "kashisei",
+      "tags": [
+        "java"
+      ],
+      "level": 3,
+      "meaning": "visibility",
+      "desc_en": "Whether one thread's write is actually seen by another — the problem volatile and synchronized exist to solve.",
+      "desc_ja": "あるスレッドの書き込みが他のスレッドから見えるかどうかの問題です。volatileやsynchronizedはこれを解決します。",
+      "example_ja": "volatileを付けると可視性が保証されます。",
+      "example_en": "Marking it volatile guarantees visibility."
+    },
+    {
+      "id": "keiyaku",
+      "term": "契約",
+      "reading": "けいやく",
+      "romaji": "keiyaku",
+      "tags": [
+        "java"
+      ],
+      "level": 2,
+      "meaning": "contract",
+      "desc_en": "What a method promises callers and demands of them — equals and hashCode have one you can actually break.",
+      "desc_ja": "メソッドが呼び出し側に約束すること、また求めることです。equalsとhashCodeには破ってしまえる契約があります。",
+      "example_ja": "equalsを再定義するときは、hashCodeとの契約を守ってください。",
+      "example_en": "When you override equals, honour its contract with hashCode."
+    },
+    {
+      "id": "jizen-joken",
+      "term": "事前条件",
+      "reading": "じぜんじょうけん",
+      "romaji": "jizen jōken",
+      "tags": [
+        "java"
+      ],
+      "level": 3,
+      "meaning": "precondition",
+      "desc_en": "What must already be true when a method is called; if it isn't, the caller is at fault.",
+      "desc_ja": "メソッドを呼ぶ時点で成り立っていなければならない条件です。破られた場合は呼び出し側の誤りです。",
+      "example_ja": "引数が正であることがこのメソッドの事前条件です。",
+      "example_en": "That the argument is positive is this method's precondition."
+    },
+    {
+      "id": "jigo-joken",
+      "term": "事後条件",
+      "reading": "じごじょうけん",
+      "romaji": "jigo jōken",
+      "tags": [
+        "java"
+      ],
+      "level": 3,
+      "meaning": "postcondition",
+      "desc_en": "What the method guarantees is true once it returns.",
+      "desc_ja": "メソッドが返った時点で成り立っていることを保証する条件です。",
+      "example_ja": "戻り値が整列済みであることが事後条件です。",
+      "example_en": "That the returned value is sorted is the postcondition."
+    },
+    {
+      "id": "ijo",
+      "term": "委譲",
+      "reading": "いじょう",
+      "romaji": "ijō",
+      "tags": [
+        "java"
+      ],
+      "level": 3,
+      "meaning": "delegation",
+      "desc_en": "Handing work to a held object rather than inheriting it — usually the better answer to \"reuse this behaviour\".",
+      "desc_ja": "継承する代わりに、保持しているオブジェクトに処理を任せることです。振る舞いの再利用では多くの場合こちらが適します。",
+      "example_ja": "継承ではなく委譲で実装しました。",
+      "example_en": "I implemented it with delegation rather than inheritance."
+    },
+    {
+      "id": "gosei",
+      "term": "合成",
+      "reading": "ごうせい",
+      "romaji": "gōsei",
+      "tags": [
+        "java"
+      ],
+      "level": 2,
+      "meaning": "composition",
+      "desc_en": "Building a class out of other objects it owns — the \"has-a\" relationship, as against inheritance's \"is-a\".",
+      "desc_ja": "他のオブジェクトを部品として持つことでクラスを組み立てる方法です。継承の「is-a」に対して「has-a」の関係です。",
+      "example_ja": "継承より合成を選ぶほうが柔軟です。",
+      "example_en": "Choosing composition over inheritance is more flexible."
+    },
+    {
+      "id": "izonsei-chunyu",
+      "term": "依存性注入",
+      "reading": "いぞんせいちゅうにゅう",
+      "romaji": "izonsei chūnyū",
+      "tags": [
+        "java"
+      ],
+      "level": 3,
+      "meaning": "dependency injection",
+      "desc_en": "Handing a class what it needs from outside instead of letting it construct its own, which is what makes it testable.",
+      "desc_ja": "クラスが必要とするものを内部で生成せず、外から渡す設計です。これによって試験がしやすくなります。",
+      "example_ja": "依存性注入のおかげで、試験では偽の実装を渡せます。",
+      "example_en": "Thanks to dependency injection, tests can pass in a fake implementation."
+    },
+    {
+      "id": "tantai-shiken",
+      "term": "単体試験",
+      "reading": "たんたいしけん",
+      "romaji": "tantai shiken",
+      "tags": [
+        "java",
+        "workplace"
+      ],
+      "level": 2,
+      "meaning": "unit test",
+      "desc_en": "A test of one small piece in isolation, fast enough to run on every change.",
+      "desc_ja": "小さな部品を切り離して確かめる試験です。変更のたびに実行できるほど速いのが条件です。",
+      "example_ja": "このメソッドの単体試験を書きました。",
+      "example_en": "I wrote a unit test for this method."
+    },
+    {
+      "id": "moraritsu",
+      "term": "網羅率",
+      "reading": "もうらりつ",
+      "romaji": "mōraritsu",
+      "tags": [
+        "java"
+      ],
+      "level": 2,
+      "meaning": "coverage",
+      "desc_en": "How much of the code the tests actually execute — useful as a warning when low, misleading as a target when high.",
+      "desc_ja": "試験が実際に実行したコードの割合です。低いときの警告としては有用ですが、高さそのものを目標にすると誤解を招きます。",
+      "example_ja": "網羅率が高くても、試験が正しいとは限りません。",
+      "example_en": "High coverage doesn't mean the tests are good."
     },
     {
       "id": "hairetsu",
@@ -2289,6 +2672,381 @@
       "desc_ja": "応答が返り始めるまでの遅れのことです。その後の速さとは別の指標です。",
       "example_ja": "待ち時間が長いと操作が重く感じます。",
       "example_en": "When latency is high, the interface feels sluggish."
+    },
+    {
+      "id": "shiyo",
+      "term": "仕様",
+      "reading": "しよう",
+      "romaji": "shiyō",
+      "tags": [
+        "workplace"
+      ],
+      "level": 2,
+      "meaning": "specification",
+      "desc_en": "The agreed description of what something should do — the thing you check your work against when you think you're finished.",
+      "desc_ja": "何をどう作るべきかを定めた合意された記述です。完成したと思ったときに照らし合わせるものです。",
+      "example_ja": "仕様を確認してから実装を始めます。",
+      "example_en": "I check the specification before starting to implement."
+    },
+    {
+      "id": "yoken",
+      "term": "要件",
+      "reading": "ようけん",
+      "romaji": "yōken",
+      "tags": [
+        "workplace"
+      ],
+      "level": 2,
+      "meaning": "requirement",
+      "desc_en": "Something the finished work must satisfy, stated before the design rather than discovered after it.",
+      "desc_ja": "完成したものが満たすべき条件です。設計の前に定めるもので、後から気づくものではありません。",
+      "example_ja": "この機能の要件をまとめてください。",
+      "example_en": "Please write up the requirements for this feature."
+    },
+    {
+      "id": "mitsumori",
+      "term": "見積もり",
+      "reading": "みつもり",
+      "romaji": "mitsumori",
+      "tags": [
+        "workplace"
+      ],
+      "level": 2,
+      "meaning": "estimate",
+      "desc_en": "How long a piece of work is expected to take — a forecast, not a promise.",
+      "desc_ja": "ある作業にどれくらいかかるかの予想です。約束ではなく見通しです。",
+      "example_ja": "この作業の見積もりは三日です。",
+      "example_en": "The estimate for this work is three days."
+    },
+    {
+      "id": "fuguai",
+      "term": "不具合",
+      "reading": "ふぐあい",
+      "romaji": "fuguai",
+      "tags": [
+        "workplace"
+      ],
+      "level": 2,
+      "meaning": "defect / bug",
+      "desc_en": "Behaviour that differs from the specification. The everyday written word where speech would often use バグ.",
+      "desc_ja": "仕様と違う動きのことです。話し言葉では「バグ」と言うところを、文書ではこちらを使います。",
+      "example_ja": "報告された不具合を修正しました。",
+      "example_en": "I fixed the reported defect."
+    },
+    {
+      "id": "sabun",
+      "term": "差分",
+      "reading": "さぶん",
+      "romaji": "sabun",
+      "tags": [
+        "workplace"
+      ],
+      "level": 2,
+      "meaning": "diff / difference",
+      "desc_en": "What changed between two versions — what a reviewer actually reads.",
+      "desc_ja": "二つの版の間で変わった部分です。レビューで実際に読まれるものです。",
+      "example_ja": "差分を見れば変更点がすぐ分かります。",
+      "example_en": "Looking at the diff shows the changes at once."
+    },
+    {
+      "id": "kensho",
+      "term": "検証",
+      "reading": "けんしょう",
+      "romaji": "kenshō",
+      "tags": [
+        "workplace"
+      ],
+      "level": 2,
+      "meaning": "validation",
+      "desc_en": "Checking that something actually holds, rather than assuming it does.",
+      "desc_ja": "本当にそうなっているかを、仮定せずに確かめることです。",
+      "example_ja": "入力データを検証します。",
+      "example_en": "We validate the input data."
+    },
+    {
+      "id": "sekkei",
+      "term": "設計",
+      "reading": "せっけい",
+      "romaji": "sekkei",
+      "tags": [
+        "workplace"
+      ],
+      "level": 1,
+      "meaning": "design",
+      "desc_en": "Deciding the shape of a solution — the pieces and how they fit — before writing it.",
+      "desc_ja": "書き始める前に、解決策の形（どんな部品をどう組むか）を決めることです。",
+      "example_ja": "実装の前に設計を見直しましょう。",
+      "example_en": "Let's review the design before implementing."
+    },
+    {
+      "id": "furikaeri",
+      "term": "振り返り",
+      "reading": "ふりかえり",
+      "romaji": "furikaeri",
+      "tags": [
+        "workplace"
+      ],
+      "level": 2,
+      "meaning": "retrospective",
+      "desc_en": "The meeting after a piece of work where the team asks what to keep doing and what to change.",
+      "desc_ja": "ある区切りの後で、続けることと変えることをチームで話し合う場です。",
+      "example_ja": "毎週金曜日に振り返りを行います。",
+      "example_en": "We hold a retrospective every Friday."
+    },
+    {
+      "id": "kadai",
+      "term": "課題",
+      "reading": "かだい",
+      "romaji": "kadai",
+      "tags": [
+        "workplace"
+      ],
+      "level": 1,
+      "meaning": "issue / open question",
+      "desc_en": "Something known to need resolving — tracked rather than forgotten. Broader than a bug.",
+      "desc_ja": "解決が必要だと分かっていることです。忘れずに管理します。不具合よりも広い意味を持ちます。",
+      "example_ja": "残っている課題を一覧にまとめます。",
+      "example_en": "We list up the remaining issues."
+    },
+    {
+      "id": "shinchoku",
+      "term": "進捗",
+      "reading": "しんちょく",
+      "romaji": "shinchoku",
+      "tags": [
+        "workplace"
+      ],
+      "level": 2,
+      "meaning": "progress",
+      "desc_en": "How far along a piece of work is — the standing question in a standup.",
+      "desc_ja": "作業がどこまで進んだかということです。朝会で必ず聞かれることです。",
+      "example_ja": "今週の進捗を報告してください。",
+      "example_en": "Please report this week's progress."
+    },
+    {
+      "id": "tanto",
+      "term": "担当",
+      "reading": "たんとう",
+      "romaji": "tantō",
+      "tags": [
+        "workplace"
+      ],
+      "level": 1,
+      "meaning": "in charge of",
+      "desc_en": "Whose work an item is — named, so it has an owner rather than being everyone's.",
+      "desc_ja": "その項目を誰が受け持つかということです。名前を決めることで、誰のものでもない状態を防ぎます。",
+      "example_ja": "この機能は私が担当します。",
+      "example_en": "I'll be in charge of this feature."
+    },
+    {
+      "id": "noki",
+      "term": "納期",
+      "reading": "のうき",
+      "romaji": "nōki",
+      "tags": [
+        "workplace"
+      ],
+      "level": 2,
+      "meaning": "delivery deadline",
+      "desc_en": "The date something is due to be delivered to whoever is waiting for it.",
+      "desc_ja": "待っている相手に届けると決めた期日です。",
+      "example_ja": "納期に間に合うか確認してください。",
+      "example_en": "Please check whether we'll make the delivery deadline."
+    },
+    {
+      "id": "goi",
+      "term": "合意",
+      "reading": "ごうい",
+      "romaji": "gōi",
+      "tags": [
+        "workplace"
+      ],
+      "level": 2,
+      "meaning": "agreement",
+      "desc_en": "The point at which everyone involved actually accepts a decision — distinct from having announced it.",
+      "desc_ja": "関係者が実際に決定を受け入れた状態です。伝えただけの状態とは違います。",
+      "example_ja": "設計について合意が取れました。",
+      "example_en": "We reached agreement on the design."
+    },
+    {
+      "id": "kyoyu",
+      "term": "共有",
+      "reading": "きょうゆう",
+      "romaji": "kyōyū",
+      "tags": [
+        "workplace"
+      ],
+      "level": 1,
+      "meaning": "sharing (information)",
+      "desc_en": "Telling the people who need to know — the standard verb for circulating information in a Japanese workplace.",
+      "desc_ja": "知っておくべき人に伝えることです。日本の職場で情報を回すときの標準的な言い方です。",
+      "example_ja": "結果をチームに共有します。",
+      "example_en": "I'll share the results with the team."
+    },
+    {
+      "id": "yusendo",
+      "term": "優先度",
+      "reading": "ゆうせんど",
+      "romaji": "yūsendo",
+      "tags": [
+        "workplace"
+      ],
+      "level": 1,
+      "meaning": "priority",
+      "desc_en": "Which of several things should be done first.",
+      "desc_ja": "複数あるうち、どれを先に行うべきかの度合いです。",
+      "example_ja": "この不具合は優先度が高いです。",
+      "example_en": "This defect is high priority."
+    },
+    {
+      "id": "shimekiri",
+      "term": "締め切り",
+      "reading": "しめきり",
+      "romaji": "shimekiri",
+      "tags": [
+        "workplace"
+      ],
+      "level": 1,
+      "meaning": "deadline",
+      "desc_en": "The time by which something must be done. The general word; 納期 is specifically a delivery date.",
+      "desc_ja": "それまでに終わらせなければならない時点です。一般的な言い方で、納期は特に納品の期日を指します。",
+      "example_ja": "締め切りは今週の金曜日です。",
+      "example_en": "The deadline is this Friday."
+    },
+    {
+      "id": "kosu",
+      "term": "工数",
+      "reading": "こうすう",
+      "romaji": "kōsū",
+      "tags": [
+        "workplace"
+      ],
+      "level": 3,
+      "meaning": "man-hours / effort",
+      "desc_en": "The amount of person-time a task costs — the unit estimates are argued in.",
+      "desc_ja": "ある作業にかかる人の時間の量です。見積もりで話題になる単位です。",
+      "example_ja": "この変更は工数がかかりすぎます。",
+      "example_en": "This change takes too much effort."
+    },
+    {
+      "id": "hokoku",
+      "term": "報告",
+      "reading": "ほうこく",
+      "romaji": "hōkoku",
+      "tags": [
+        "workplace"
+      ],
+      "level": 1,
+      "meaning": "report",
+      "desc_en": "Telling someone the state of things, especially upwards. One of the 報・連・相 trio.",
+      "desc_ja": "状況を、特に上司に伝えることです。「報・連・相」の一つです。",
+      "example_ja": "進捗を報告します。",
+      "example_en": "I'll report on the progress."
+    },
+    {
+      "id": "sodan",
+      "term": "相談",
+      "reading": "そうだん",
+      "romaji": "sōdan",
+      "tags": [
+        "workplace"
+      ],
+      "level": 1,
+      "meaning": "consultation",
+      "desc_en": "Asking someone before deciding — the third of 報・連・相, and the one that prevents the most rework.",
+      "desc_ja": "決める前に誰かに相談することです。「報・連・相」の一つで、手戻りを最も防ぎます。",
+      "example_ja": "設計について相談したいです。",
+      "example_en": "I'd like to consult you about the design."
+    },
+    {
+      "id": "gijiroku",
+      "term": "議事録",
+      "reading": "ぎじろく",
+      "romaji": "gijiroku",
+      "tags": [
+        "workplace"
+      ],
+      "level": 3,
+      "meaning": "meeting minutes",
+      "desc_en": "The written record of what a meeting decided, and who will do what next.",
+      "desc_ja": "会議で何が決まり、誰が次に何をするかを書き残したものです。",
+      "example_ja": "会議の議事録を共有します。",
+      "example_en": "I'll share the minutes of the meeting."
+    },
+    {
+      "id": "sekinin",
+      "term": "責任",
+      "reading": "せきにん",
+      "romaji": "sekinin",
+      "tags": [
+        "workplace"
+      ],
+      "level": 2,
+      "meaning": "responsibility",
+      "desc_en": "What a person or a class is answerable for — the word behind the single-responsibility principle.",
+      "desc_ja": "人やクラスが負うべき役割のことです。単一責任の原則の「責任」です。",
+      "example_ja": "このクラスは責任を持ちすぎています。",
+      "example_en": "This class has too many responsibilities."
+    },
+    {
+      "id": "shonin",
+      "term": "承認",
+      "reading": "しょうにん",
+      "romaji": "shōnin",
+      "tags": [
+        "workplace"
+      ],
+      "level": 2,
+      "meaning": "approval",
+      "desc_en": "The sign-off that lets something proceed — a review approving a change, for instance.",
+      "desc_ja": "先に進んでよいという許可です。レビューで変更が認められることなどを指します。",
+      "example_ja": "レビューの承認を待っています。",
+      "example_en": "I'm waiting for the review approval."
+    },
+    {
+      "id": "kaizen",
+      "term": "改善",
+      "reading": "かいぜん",
+      "romaji": "kaizen",
+      "tags": [
+        "workplace"
+      ],
+      "level": 2,
+      "meaning": "improvement",
+      "desc_en": "Making something incrementally better on purpose — the ordinary Japanese word that English borrowed.",
+      "desc_ja": "意識して少しずつ良くしていくことです。英語がそのまま借用した語です。",
+      "example_ja": "手順の改善を提案します。",
+      "example_en": "I'd like to propose an improvement to the process."
+    },
+    {
+      "id": "taio",
+      "term": "対応",
+      "reading": "たいおう",
+      "romaji": "taiō",
+      "tags": [
+        "workplace"
+      ],
+      "level": 2,
+      "meaning": "handling / dealing with",
+      "desc_en": "Doing whatever a situation requires — an enormously common word covering fixing, supporting and responding.",
+      "desc_ja": "状況に応じて必要なことを行うことです。修正、支援、返答まで幅広く使われる非常によく使う語です。",
+      "example_ja": "この不具合には明日対応します。",
+      "example_en": "I'll deal with this defect tomorrow."
+    },
+    {
+      "id": "chosei",
+      "term": "調整",
+      "reading": "ちょうせい",
+      "romaji": "chōsei",
+      "tags": [
+        "workplace"
+      ],
+      "level": 3,
+      "meaning": "coordination / adjustment",
+      "desc_en": "Working out the differences between people or parts so they fit — of schedules, of scope, of numbers.",
+      "desc_ja": "人や要素の間の食い違いを合わせることです。日程、範囲、数値などについて使います。",
+      "example_ja": "関係者と日程を調整します。",
+      "example_en": "I'll coordinate the schedule with everyone involved."
     }
   ]
 }
