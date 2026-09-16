@@ -13047,7 +13047,74 @@
         "example_en": "Output the answer on one line."
       }
     ],
-    "quiz": [],
+    "quiz": [
+      {
+        "question": "「variable」を表す用語はどれですか。",
+        "options": [
+          "変数",
+          "入力",
+          "引数",
+          "値"
+        ],
+        "answer": 0,
+        "explanation": "変数（へんすう (hensū)）＝ variable"
+      },
+      {
+        "question": "実行 の読み方はどれですか。",
+        "options": [
+          "かた (kata)",
+          "きのう (kinō)",
+          "じっこう (jikkō)",
+          "せいすう (seisū)"
+        ],
+        "answer": 2,
+        "explanation": "実行 は じっこう (jikkō) と読みます（execution / run）。"
+      },
+      {
+        "question": "「input」を表す用語はどれですか。",
+        "options": [
+          "実装",
+          "入力",
+          "機能",
+          "変数"
+        ],
+        "answer": 1,
+        "explanation": "入力（にゅうりょく (nyūryoku)）＝ input"
+      },
+      {
+        "question": "出力 の読み方はどれですか。",
+        "options": [
+          "じょうけんぶんき (jōken bunki)",
+          "へんすう (hensū)",
+          "しゅつりょく (shutsuryoku)",
+          "もじれつ (mojiretsu)"
+        ],
+        "answer": 2,
+        "explanation": "出力 は しゅつりょく (shutsuryoku) と読みます（output）。"
+      },
+      {
+        "question": "「implementation」を表す用語はどれですか。",
+        "options": [
+          "実装",
+          "代入",
+          "返す",
+          "呼び出す"
+        ],
+        "answer": 0,
+        "explanation": "実装（じっそう (jissō)）＝ implementation"
+      },
+      {
+        "question": "真偽値 の読み方はどれですか。",
+        "options": [
+          "かんすう (kansū)",
+          "しんぎち (shingichi)",
+          "くりかえし (kurikaeshi)",
+          "へんすう (hensū)"
+        ],
+        "answer": 1,
+        "explanation": "真偽値 は しんぎち (shingichi) と読みます（boolean）。"
+      }
+    ],
     "practice": []
   },
   {
@@ -13158,7 +13225,74 @@
         "example_en": "We check the class parent-child relationship."
       }
     ],
-    "quiz": [],
+    "quiz": [
+      {
+        "question": "「initialization」を表す用語はどれですか。",
+        "options": [
+          "継承",
+          "継承関係",
+          "初期化",
+          "静的"
+        ],
+        "answer": 2,
+        "explanation": "初期化（しょきか (shokika)）＝ initialization"
+      },
+      {
+        "question": "親子関係 の読み方はどれですか。",
+        "options": [
+          "せんげん (sengen)",
+          "おやクラス (oya kurasu)",
+          "おやこかんけい (oyako kankei)",
+          "たたいせい (tataisei)"
+        ],
+        "answer": 2,
+        "explanation": "親子関係 は おやこかんけい (oyako kankei) と読みます（parent-child relationship）。"
+      },
+      {
+        "question": "「constant」を表す用語はどれですか。",
+        "options": [
+          "継承関係",
+          "宣言",
+          "定数",
+          "多態性"
+        ],
+        "answer": 2,
+        "explanation": "定数（ていすう (teisū)）＝ constant"
+      },
+      {
+        "question": "継承関係 の読み方はどれですか。",
+        "options": [
+          "しょきか (shokika)",
+          "ていすう (teisū)",
+          "おやこかんけい (oyako kankei)",
+          "けいしょうかんけい (keishō kankei)"
+        ],
+        "answer": 3,
+        "explanation": "継承関係 は けいしょうかんけい (keishō kankei) と読みます（inheritance relationship）。"
+      },
+      {
+        "question": "「static」を表す用語はどれですか。",
+        "options": [
+          "定数",
+          "継承",
+          "静的",
+          "宣言"
+        ],
+        "answer": 2,
+        "explanation": "静的（せいてき (seiteki)）＝ static"
+      },
+      {
+        "question": "親クラス の読み方はどれですか。",
+        "options": [
+          "せんげん (sengen)",
+          "しょきか (shokika)",
+          "けいしょう (keishō)",
+          "おやクラス (oya kurasu)"
+        ],
+        "answer": 3,
+        "explanation": "親クラス は おやクラス (oya kurasu) と読みます（parent / superclass）。"
+      }
+    ],
     "practice": []
   },
   {
@@ -13349,7 +13483,74 @@
         "example_en": "We check the truth of the condition."
       }
     ],
-    "quiz": [],
+    "quiz": [
+      {
+        "question": "「equal」を表す用語はどれですか。",
+        "options": [
+          "等しい",
+          "反復",
+          "再帰",
+          "初期値"
+        ],
+        "answer": 0,
+        "explanation": "等しい（ひとしい (hitoshii)）＝ equal"
+      },
+      {
+        "question": "続ける の読み方はどれですか。",
+        "options": [
+          "じょうけん (jōken)",
+          "つづける (tsuzukeru)",
+          "ぎ (gi)",
+          "はんてい (hantei)"
+        ],
+        "answer": 1,
+        "explanation": "続ける は つづける (tsuzukeru) と読みます（to continue）。"
+      },
+      {
+        "question": "「case」を表す用語はどれですか。",
+        "options": [
+          "場合",
+          "以上",
+          "偽",
+          "抜ける"
+        ],
+        "answer": 0,
+        "explanation": "場合（ばあい (baai)）＝ case"
+      },
+      {
+        "question": "反復 の読み方はどれですか。",
+        "options": [
+          "ひかく (hikaku)",
+          "じょうけん (jōken)",
+          "かさん (kasan)",
+          "はんぷく (hanpuku)"
+        ],
+        "answer": 3,
+        "explanation": "反復 は はんぷく (hanpuku) と読みます（iteration）。"
+      },
+      {
+        "question": "「true」を表す用語はどれですか。",
+        "options": [
+          "無限ループ",
+          "論理演算",
+          "真",
+          "条件"
+        ],
+        "answer": 2,
+        "explanation": "真（しん (shin)）＝ true"
+      },
+      {
+        "question": "加算 の読み方はどれですか。",
+        "options": [
+          "はんぷく (hanpuku)",
+          "かさん (kasan)",
+          "じょうけん (jōken)",
+          "ろんりえんざん (ronri enzan)"
+        ],
+        "answer": 1,
+        "explanation": "加算 は かさん (kasan) と読みます（addition）。"
+      }
+    ],
     "practice": []
   },
   {
@@ -13548,7 +13749,74 @@
         "example_en": "With dynamic programming, an exponential-time solution becomes O(n²)."
       }
     ],
-    "quiz": [],
+    "quiz": [
+      {
+        "question": "「associative array (map)」を表す用語はどれですか。",
+        "options": [
+          "整列",
+          "連想配列",
+          "二分木",
+          "時間計算量"
+        ],
+        "answer": 1,
+        "explanation": "連想配列（れんそうはいれつ (rensō hairetsu)）＝ associative array (map)"
+      },
+      {
+        "question": "時間計算量 の読み方はどれですか。",
+        "options": [
+          "こうりつ (kōritsu)",
+          "たんさく (tansaku)",
+          "じかんけいさんりょう (jikan keisanryō)",
+          "へん (hen)"
+        ],
+        "answer": 2,
+        "explanation": "時間計算量 は じかんけいさんりょう (jikan keisanryō) と読みます（time complexity）。"
+      },
+      {
+        "question": "「array」を表す用語はどれですか。",
+        "options": [
+          "配列",
+          "要素",
+          "頂点",
+          "木構造"
+        ],
+        "answer": 0,
+        "explanation": "配列（はいれつ (hairetsu)）＝ array"
+      },
+      {
+        "question": "計算量 の読み方はどれですか。",
+        "options": [
+          "けいさんりょう (keisanryō)",
+          "こうりつ (kōritsu)",
+          "せいれつ (seiretsu)",
+          "じかんけいさんりょう (jikan keisanryō)"
+        ],
+        "answer": 0,
+        "explanation": "計算量 は けいさんりょう (keisanryō) と読みます（computational complexity）。"
+      },
+      {
+        "question": "「binary search tree」を表す用語はどれですか。",
+        "options": [
+          "辺",
+          "二分探索木",
+          "頂点",
+          "添字"
+        ],
+        "answer": 1,
+        "explanation": "二分探索木（にぶんたんさくぎ (nibun tansakugi)）＝ binary search tree"
+      },
+      {
+        "question": "整列 の読み方はどれですか。",
+        "options": [
+          "くうかんけいさんりょう (kūkan keisanryō)",
+          "どうてきけいかくほう (dōteki keikakuhō)",
+          "せいれつ (seiretsu)",
+          "れんけつリスト (renketsu risuto)"
+        ],
+        "answer": 2,
+        "explanation": "整列 は せいれつ (seiretsu) と読みます（sorting）。"
+      }
+    ],
     "practice": []
   },
   {
@@ -13675,7 +13943,74 @@
         "example_en": "Please try it again."
       }
     ],
-    "quiz": [],
+    "quiz": [
+      {
+        "question": "「occurrence」を表す用語はどれですか。",
+        "options": [
+          "発生",
+          "修正",
+          "例外処理",
+          "ヌルポインタ例外"
+        ],
+        "answer": 0,
+        "explanation": "発生（はっせい (hassei)）＝ occurrence"
+      },
+      {
+        "question": "警告 の読み方はどれですか。",
+        "options": [
+          "ヌルポインタれいがい (nuru pointa reigai)",
+          "はっせい (hassei)",
+          "けいこく (keikoku)",
+          "かくにんする (kakunin suru)"
+        ],
+        "answer": 2,
+        "explanation": "警告 は けいこく (keikoku) と読みます（warning）。"
+      },
+      {
+        "question": "「unexpected」を表す用語はどれですか。",
+        "options": [
+          "修正",
+          "ヌルポインタ例外",
+          "想定外",
+          "警告"
+        ],
+        "answer": 2,
+        "explanation": "想定外（そうていがい (sōteigai)）＝ unexpected"
+      },
+      {
+        "question": "直す の読み方はどれですか。",
+        "options": [
+          "げんいん (gen'in)",
+          "なおす (naosu)",
+          "はっせい (hassei)",
+          "かくにんする (kakunin suru)"
+        ],
+        "answer": 1,
+        "explanation": "直す は なおす (naosu) と読みます（to fix）。"
+      },
+      {
+        "question": "「behavior / operation」を表す用語はどれですか。",
+        "options": [
+          "警告",
+          "発生",
+          "例外を投げる",
+          "動作"
+        ],
+        "answer": 3,
+        "explanation": "動作（どうさ (dōsa)）＝ behavior / operation"
+      },
+      {
+        "question": "試す の読み方はどれですか。",
+        "options": [
+          "ためす (tamesu)",
+          "ヌルポインタれいがい (nuru pointa reigai)",
+          "どうさ (dōsa)",
+          "れいがいしょり (reigai shori)"
+        ],
+        "answer": 0,
+        "explanation": "試す は ためす (tamesu) と読みます（to try / test out）。"
+      }
+    ],
     "practice": []
   },
   {
@@ -13786,7 +14121,74 @@
         "example_en": "We apply the changes to production."
       }
     ],
-    "quiz": [],
+    "quiz": [
+      {
+        "question": "「resolve」を表す用語はどれですか。",
+        "options": [
+          "更新",
+          "競合",
+          "バージョン管理",
+          "解決"
+        ],
+        "answer": 3,
+        "explanation": "解決（かいけつ (kaiketsu)）＝ resolve"
+      },
+      {
+        "question": "設定 の読み方はどれですか。",
+        "options": [
+          "せってい (settei)",
+          "かいけつ (kaiketsu)",
+          "たんたいテスト (tantai tesuto)",
+          "どうにゅう (dōnyū)"
+        ],
+        "answer": 0,
+        "explanation": "設定 は せってい (settei) と読みます（configuration / settings）。"
+      },
+      {
+        "question": "「adopt / introduce」を表す用語はどれですか。",
+        "options": [
+          "依存関係",
+          "導入",
+          "反映",
+          "バージョン管理"
+        ],
+        "answer": 1,
+        "explanation": "導入（どうにゅう (dōnyū)）＝ adopt / introduce"
+      },
+      {
+        "question": "環境 の読み方はどれですか。",
+        "options": [
+          "いぞんかんけい (izon kankei)",
+          "こうしん (kōshin)",
+          "きょうごう (kyōgō)",
+          "かんきょう (kankyō)"
+        ],
+        "answer": 3,
+        "explanation": "環境 は かんきょう (kankyō) と読みます（environment）。"
+      },
+      {
+        "question": "「update」を表す用語はどれですか。",
+        "options": [
+          "更新",
+          "導入",
+          "競合",
+          "差分"
+        ],
+        "answer": 0,
+        "explanation": "更新（こうしん (kōshin)）＝ update"
+      },
+      {
+        "question": "依存関係 の読み方はどれですか。",
+        "options": [
+          "いぞんかんけい (izon kankei)",
+          "どうにゅう (dōnyū)",
+          "きょうごう (kyōgō)",
+          "せってい (settei)"
+        ],
+        "answer": 0,
+        "explanation": "依存関係 は いぞんかんけい (izon kankei) と読みます（dependencies）。"
+      }
+    ],
     "practice": []
   },
   {
@@ -13977,7 +14379,74 @@
         "example_en": "Thanks for your work — and thanks for the review."
       }
     ],
-    "quiz": [],
+    "quiz": [
+      {
+        "question": "「specification」を表す用語はどれですか。",
+        "options": [
+          "会議",
+          "実装する",
+          "解答",
+          "仕様"
+        ],
+        "answer": 3,
+        "explanation": "仕様（しよう (shiyō)）＝ specification"
+      },
+      {
+        "question": "解く の読み方はどれですか。",
+        "options": [
+          "かいぜん (kaizen)",
+          "とく (toku)",
+          "じっそうする (jissō suru)",
+          "もんだい (mondai)"
+        ],
+        "answer": 1,
+        "explanation": "解く は とく (toku) と読みます（to solve）。"
+      },
+      {
+        "question": "「expectation」を表す用語はどれですか。",
+        "options": [
+          "納期",
+          "期待",
+          "技術面接",
+          "会議"
+        ],
+        "answer": 1,
+        "explanation": "期待（きたい (kitai)）＝ expectation"
+      },
+      {
+        "question": "技術面接 の読み方はどれですか。",
+        "options": [
+          "せつめいする (setsumei suru)",
+          "ぎじゅつめんせつ (gijutsu mensetsu)",
+          "もんだい (mondai)",
+          "たんとう (tantō)"
+        ],
+        "answer": 1,
+        "explanation": "技術面接 は ぎじゅつめんせつ (gijutsu mensetsu) と読みます（technical interview）。"
+      },
+      {
+        "question": "「to explain」を表す用語はどれですか。",
+        "options": [
+          "納期",
+          "担当",
+          "設計",
+          "説明する"
+        ],
+        "answer": 3,
+        "explanation": "説明する（せつめいする (setsumei suru)）＝ to explain"
+      },
+      {
+        "question": "質問 の読み方はどれですか。",
+        "options": [
+          "ぎじゅつめんせつ (gijutsu mensetsu)",
+          "しつもん (shitsumon)",
+          "せっけい (sekkei)",
+          "かいとう (kaitō)"
+        ],
+        "answer": 1,
+        "explanation": "質問 は しつもん (shitsumon) と読みます（question）。"
+      }
+    ],
     "practice": []
   },
   {
@@ -14144,7 +14613,74 @@
         "example_en": "The TypeScript extension is `.ts`."
       }
     ],
-    "quiz": [],
+    "quiz": [
+      {
+        "question": "「development environment」を表す用語はどれですか。",
+        "options": [
+          "型安全",
+          "開発環境",
+          "変数",
+          "型注釈"
+        ],
+        "answer": 1,
+        "explanation": "開発環境（かいはつかんきょう (kaihatsu kankyō)）＝ development environment"
+      },
+      {
+        "question": "TypeScript の読み方はどれですか。",
+        "options": [
+          "かたちゅうしゃく (kata chūshaku)",
+          "TypeScript",
+          "すうち (sūchi)",
+          "かたすいろん (kata suiron)"
+        ],
+        "answer": 1,
+        "explanation": "TypeScript は TypeScript と読みます（TypeScript）。"
+      },
+      {
+        "question": "「static typing」を表す用語はどれですか。",
+        "options": [
+          "数値",
+          "型注釈",
+          "静的型付け",
+          "変数"
+        ],
+        "answer": 2,
+        "explanation": "静的型付け（せいてきかたづけ (seiteki katazuke)）＝ static typing"
+      },
+      {
+        "question": "真偽値 の読み方はどれですか。",
+        "options": [
+          "ていすう (teisū)",
+          "かくちょうし (kakuchōshi)",
+          "さいだいにゅう (sai dainyū)",
+          "しんぎち (shingichi)"
+        ],
+        "answer": 3,
+        "explanation": "真偽値 は しんぎち (shingichi) と読みます（boolean）。"
+      },
+      {
+        "question": "「number」を表す用語はどれですか。",
+        "options": [
+          "真偽値",
+          "数値",
+          "構文",
+          "変数"
+        ],
+        "answer": 1,
+        "explanation": "数値（すうち (sūchi)）＝ number"
+      },
+      {
+        "question": "拡張子 の読み方はどれですか。",
+        "options": [
+          "ていすう (teisū)",
+          "すうち (sūchi)",
+          "かくちょうし (kakuchōshi)",
+          "せいてきかたづけ (seiteki katazuke)"
+        ],
+        "answer": 2,
+        "explanation": "拡張子 は かくちょうし (kakuchōshi) と読みます（file extension）。"
+      }
+    ],
     "practice": []
   },
   {
@@ -14335,7 +14871,74 @@
         "example_en": "The constraint is N ≤ 10⁵, so O(n²) is too slow."
       }
     ],
-    "quiz": [],
+    "quiz": [
+      {
+        "question": "「type definition」を表す用語はどれですか。",
+        "options": [
+          "列挙型",
+          "any型",
+          "型定義",
+          "型ガード"
+        ],
+        "answer": 2,
+        "explanation": "型定義（かたていぎ (kata teigi)）＝ type definition"
+      },
+      {
+        "question": "制約 の読み方はどれですか。",
+        "options": [
+          "こうぞうてきかたづけ (kōzōteki katazuke)",
+          "かた (kata)",
+          "けいしょう (keishō)",
+          "せいやく (seiyaku)"
+        ],
+        "answer": 3,
+        "explanation": "制約 は せいやく (seiyaku) と読みます（constraints）。"
+      },
+      {
+        "question": "「nullable」を表す用語はどれですか。",
+        "options": [
+          "null許容",
+          "unknown型",
+          "省略可能",
+          "網羅性チェック"
+        ],
+        "answer": 0,
+        "explanation": "null許容（ヌルきょよう (nuru kyoyō)）＝ nullable"
+      },
+      {
+        "question": "省略可能 の読み方はどれですか。",
+        "options": [
+          "よみとりせんよう (yomitori sen'yō)",
+          "かたていぎ (kata teigi)",
+          "ユニオンがた (yunion gata)",
+          "しょうりゃくかのう (shōryaku kanō)"
+        ],
+        "answer": 3,
+        "explanation": "省略可能 は しょうりゃくかのう (shōryaku kanō) と読みます（optional）。"
+      },
+      {
+        "question": "「exhaustiveness check」を表す用語はどれですか。",
+        "options": [
+          "リテラル型",
+          "任意",
+          "網羅性チェック",
+          "定義"
+        ],
+        "answer": 2,
+        "explanation": "網羅性チェック（もうらせいチェック (mōrasei chekku)）＝ exhaustiveness check"
+      },
+      {
+        "question": "型変換 の読み方はどれですか。",
+        "options": [
+          "かたへんかん (kata henkan)",
+          "かたアサーション (kata asāshon)",
+          "にんい (nin'i)",
+          "アンノウンがた (announ gata)"
+        ],
+        "answer": 0,
+        "explanation": "型変換 は かたへんかん (kata henkan) と読みます（type conversion (casting)）。"
+      }
+    ],
     "practice": []
   },
   {
@@ -14518,7 +15121,74 @@
         "example_en": "Streams are lazily evaluated, so nothing happens until a terminal operation."
       }
     ],
-    "quiz": [],
+    "quiz": [
+      {
+        "question": "「exception handling」を表す用語はどれですか。",
+        "options": [
+          "解決",
+          "呼び出し",
+          "純粋関数",
+          "例外処理"
+        ],
+        "answer": 3,
+        "explanation": "例外処理（れいがいしょり (reigai shori)）＝ exception handling"
+      },
+      {
+        "question": "無名関数 の読み方はどれですか。",
+        "options": [
+          "よびだし (yobidashi)",
+          "ひきすう (hikisū)",
+          "かりひきすう (kari hikisū)",
+          "むめいかんすう (mumei kansū)"
+        ],
+        "answer": 3,
+        "explanation": "無名関数 は むめいかんすう (mumei kansū) と読みます（anonymous function）。"
+      },
+      {
+        "question": "「lazy evaluation」を表す用語はどれですか。",
+        "options": [
+          "デフォルト引数",
+          "関数",
+          "遅延評価",
+          "拒否"
+        ],
+        "answer": 2,
+        "explanation": "遅延評価（ちえんひょうか (chien hyōka)）＝ lazy evaluation"
+      },
+      {
+        "question": "仮引数 の読み方はどれですか。",
+        "options": [
+          "たいき (taiki)",
+          "かりひきすう (kari hikisū)",
+          "ちえんひょうか (chien hyōka)",
+          "よびだし (yobidashi)"
+        ],
+        "answer": 1,
+        "explanation": "仮引数 は かりひきすう (kari hikisū) と読みます（parameter (formal parameter)）。"
+      },
+      {
+        "question": "「pure function」を表す用語はどれですか。",
+        "options": [
+          "純粋関数",
+          "再帰",
+          "解決",
+          "並行処理"
+        ],
+        "answer": 0,
+        "explanation": "純粋関数（じゅんすいかんすう (junsui kansū)）＝ pure function"
+      },
+      {
+        "question": "呼び出し の読み方はどれですか。",
+        "options": [
+          "どうき (dōki)",
+          "ふくさよう (fukusayō)",
+          "よびだし (yobidashi)",
+          "へいこうしょり (heikō shori)"
+        ],
+        "answer": 2,
+        "explanation": "呼び出し は よびだし (yobidashi) と読みます（call / invocation）。"
+      }
+    ],
     "practice": []
   },
   {
@@ -14653,7 +15323,74 @@
         "example_en": "`tsconfig` is a config file."
       }
     ],
-    "quiz": [],
+    "quiz": [
+      {
+        "question": "「JSON format」を表す用語はどれですか。",
+        "options": [
+          "スプレッド構文",
+          "JSON形式",
+          "依存関係",
+          "分割代入"
+        ],
+        "answer": 1,
+        "explanation": "JSON形式（JSONけいしき (JSON keishiki)）＝ JSON format"
+      },
+      {
+        "question": "名前空間 の読み方はどれですか。",
+        "options": [
+          "ちょくれつか (chokuretsuka)",
+          "あたい (atai)",
+          "なまえくうかん (namae kūkan)",
+          "ふへん (fuhen)"
+        ],
+        "answer": 2,
+        "explanation": "名前空間 は なまえくうかん (namae kūkan) と読みます（namespace）。"
+      },
+      {
+        "question": "「value」を表す用語はどれですか。",
+        "options": [
+          "値",
+          "名前空間",
+          "不変",
+          "可変"
+        ],
+        "answer": 0,
+        "explanation": "値（あたい (atai)）＝ value"
+      },
+      {
+        "question": "参照 の読み方はどれですか。",
+        "options": [
+          "けんしょう (kenshō)",
+          "あたい (atai)",
+          "ぶんかつだいにゅう (bunkatsu dainyū)",
+          "さんしょう (sanshō)"
+        ],
+        "answer": 3,
+        "explanation": "参照 は さんしょう (sanshō) と読みます（reference）。"
+      },
+      {
+        "question": "「dependencies」を表す用語はどれですか。",
+        "options": [
+          "名前空間",
+          "依存関係",
+          "不変",
+          "値"
+        ],
+        "answer": 1,
+        "explanation": "依存関係（いぞんかんけい (izon kankei)）＝ dependencies"
+      },
+      {
+        "question": "複製 の読み方はどれですか。",
+        "options": [
+          "さんしょう (sanshō)",
+          "いぞんかんけい (izon kankei)",
+          "ふくせい (fukusei)",
+          "かへん (kahen)"
+        ],
+        "answer": 2,
+        "explanation": "複製 は ふくせい (fukusei) と読みます（copy / clone）。"
+      }
+    ],
     "practice": []
   },
   {
@@ -14804,7 +15541,74 @@
         "example_en": "We run commands in the terminal."
       }
     ],
-    "quiz": [],
+    "quiz": [
+      {
+        "question": "「request」を表す用語はどれですか。",
+        "options": [
+          "再描画",
+          "端末",
+          "要求",
+          "権限"
+        ],
+        "answer": 2,
+        "explanation": "要求（ようきゅう (yōkyū)）＝ request"
+      },
+      {
+        "question": "状態 の読み方はどれですか。",
+        "options": [
+          "たんまつ (tanmatsu)",
+          "じょうたい (jōtai)",
+          "さいびょうが (sai byōga)",
+          "ようきゅう (yōkyū)"
+        ],
+        "answer": 1,
+        "explanation": "状態 は じょうたい (jōtai) と読みます（state）。"
+      },
+      {
+        "question": "「screen」を表す用語はどれですか。",
+        "options": [
+          "要求",
+          "画面",
+          "状態",
+          "応答"
+        ],
+        "answer": 1,
+        "explanation": "画面（がめん (gamen)）＝ screen"
+      },
+      {
+        "question": "非同期通信 の読み方はどれですか。",
+        "options": [
+          "さいりよう (sairiyō)",
+          "よみこみ (yomikomi)",
+          "ひどうきつうしん (hidōki tsūshin)",
+          "がめん (gamen)"
+        ],
+        "answer": 2,
+        "explanation": "非同期通信 は ひどうきつうしん (hidōki tsūshin) と読みます（async communication）。"
+      },
+      {
+        "question": "「terminal」を表す用語はどれですか。",
+        "options": [
+          "取得",
+          "端末",
+          "入力欄",
+          "状態"
+        ],
+        "answer": 1,
+        "explanation": "端末（たんまつ (tanmatsu)）＝ terminal"
+      },
+      {
+        "question": "再利用 の読み方はどれですか。",
+        "options": [
+          "よみこみ (yomikomi)",
+          "さいりよう (sairiyō)",
+          "ひどうきつうしん (hidōki tsūshin)",
+          "けんげん (kengen)"
+        ],
+        "answer": 1,
+        "explanation": "再利用 は さいりよう (sairiyō) と読みます（reuse）。"
+      }
+    ],
     "practice": []
   },
   {
@@ -15331,7 +16135,74 @@
         "example_en": "We save it to the database."
       }
     ],
-    "quiz": [],
+    "quiz": [
+      {
+        "question": "「algorithm」を表す用語はどれですか。",
+        "options": [
+          "キャッチ",
+          "ブレークポイント",
+          "テスト",
+          "アルゴリズム"
+        ],
+        "answer": 3,
+        "explanation": "アルゴリズム（arugorizumu）＝ algorithm"
+      },
+      {
+        "question": "アノテーション の読み方はどれですか。",
+        "options": [
+          "erā",
+          "anotēshon",
+          "fīrudo",
+          "bandorā"
+        ],
+        "answer": 1,
+        "explanation": "アノテーション は anotēshon と読みます（annotation）。"
+      },
+      {
+        "question": "「database」を表す用語はどれですか。",
+        "options": [
+          "ビルド",
+          "データベース",
+          "アルゴリズム",
+          "バグ"
+        ],
+        "answer": 1,
+        "explanation": "データベース（dētabēsu）＝ database"
+      },
+      {
+        "question": "オブジェクト の読み方はどれですか。",
+        "options": [
+          "kyacchi",
+          "obujekuto",
+          "erā",
+          "tapuru"
+        ],
+        "answer": 1,
+        "explanation": "オブジェクト は obujekuto と読みます（object）。"
+      },
+      {
+        "question": "「instance」を表す用語はどれですか。",
+        "options": [
+          "ボタン",
+          "プロパティ",
+          "キュー",
+          "インスタンス"
+        ],
+        "answer": 3,
+        "explanation": "インスタンス（insutansu）＝ instance"
+      },
+      {
+        "question": "モジュール の読み方はどれですか。",
+        "options": [
+          "puromisu",
+          "mojūru",
+          "komento",
+          "puroguramu"
+        ],
+        "answer": 1,
+        "explanation": "モジュール は mojūru と読みます（module）。"
+      }
+    ],
     "practice": []
   },
   {

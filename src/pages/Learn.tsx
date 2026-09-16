@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { api } from "../api";
 import type {
+  Card,
   Concept,
   Exercise,
   JpVocab,
@@ -16,6 +17,8 @@ import { Markdown } from "../components/Markdown";
 import { CodeEditor } from "../components/CodeEditor";
 import { CardStudy, type StudyVariant } from "../components/CardStudy";
 import { JpVocabCard, JpVocabMenu, useVocabReviews } from "../components/JpVocab";
+import { vocabCardId } from "../lib/jpVocab";
+import { joinReading } from "../lib/romaji";
 import { DiffBadge, Empty } from "../components/common";
 import { Section, useCollapse } from "../components/Collapsible";
 import {
@@ -226,6 +229,46 @@ export default function Learn() {
     [concepts, lang]
   );
 
+  /**
+   * One deck for the whole 日本語 tab: the vocabulary list plus every glossary
+   * set, de-duplicated by card id.
+   *
+   * The two used to schedule separately, so "what should I review today?" had
+   * fourteen different answers and no way to ask it once. Step 4b gave the words
+   * that exist in both places a single id, which is what makes merging them here
+   * honest: 配列 is one card in this deck, not one from each source.
+   */
+  const reviewDeck = useMemo<Card[]>(() => {
+    const out: Card[] = [];
+    const seen = new Set<string>();
+    const push = (card: Card, id: string) => {
+      if (seen.has(id)) return;
+      seen.add(id);
+      out.push(card);
+    };
+    for (const w of vocab?.words ?? []) {
+      const id = vocabCardId(w.id);
+      push(
+        {
+          front: w.term,
+          card_id: id,
+          reading: joinReading(w.reading, w.romaji),
+          meaning: w.meaning,
+          example_ja: w.example_ja,
+          example_en: w.example_en,
+        },
+        id
+      );
+    }
+    for (const c of concepts) {
+      if (conceptLang(c) !== "japanese") continue;
+      for (const card of c.cards ?? []) {
+        push(card, card.card_id || `${c.key}#${card.front}`);
+      }
+    }
+    return out;
+  }, [vocab, concepts]);
+
   if (key) {
     const concept = concepts.find((c) => c.key === key);
     if (concepts.length === 0) return <div className="page">Loading…</div>;
@@ -329,6 +372,26 @@ export default function Learn() {
           </>
         )}
       </p>
+
+      {isJp && reviewDeck.length > 0 && (
+        <Section
+          title="🎴 日本語 review — まとめて復習"
+          open={cats.isOpen("jp-review")}
+          onToggle={() => cats.toggle("jp-review")}
+          meta={
+            <span className="dim" style={{ fontSize: 12 }}>
+              {reviewDeck.length} cards
+            </span>
+          }
+        >
+          <p className="dim" style={{ margin: "0 0 12px", fontSize: 13 }}>
+            The vocabulary list and every glossary set in <strong>one session</strong> —
+            whatever is due today, wherever it happens to live. A word that appears in
+            both is one card here, not two.
+          </p>
+          <CardStudy conceptKey="jp-review" cards={reviewDeck} variant="japanese" />
+        </Section>
+      )}
 
       {isJp && vocab && vocab.words.length > 0 && (
         <Section
@@ -570,11 +633,17 @@ function ConceptDetail({
     return () => obs.disconnect();
   }, [concept.key]);
 
-  useEffect(() => {
-    if (!isDone && scrolledToBottom && allSolved) onSetDone(true);
-  }, [isDone, scrolledToBottom, allSolved, onSetDone]);
   const cards = concept.cards ?? [];
   const quiz = concept.quiz ?? [];
+  // A chapter with a self-check has to be *passed*, not merely scrolled past.
+  // The glossary sets have no exercises, so `allSolved` is vacuously true for
+  // them and reaching the bottom used to be the whole bar.
+  const [quizCorrect, setQuizCorrect] = useState(0);
+  const quizPassed = quiz.length === 0 || quizCorrect === quiz.length;
+
+  useEffect(() => {
+    if (!isDone && scrolledToBottom && allSolved && quizPassed) onSetDone(true);
+  }, [isDone, scrolledToBottom, allSolved, quizPassed, onSetDone]);
   const practiceRefs = (concept.practice ?? [])
     .map((pr) => ({ note: pr.note, problem: bySlug.get(pr.slug) }))
     .filter((x): x is { note: string; problem: Problem } => !!x.problem);
@@ -742,7 +811,7 @@ function ConceptDetail({
             {quiz.length} quick questions. Pick an answer to see whether it&rsquo;s right and{" "}
             <strong>why</strong>. No code to run — just recall.
           </p>
-          <QuizSection questions={quiz} />
+          <QuizSection questions={quiz} onScore={setQuizCorrect} />
         </Section>
       )}
 
@@ -1107,12 +1176,24 @@ function ExerciseCard({
 /** A language-agnostic multiple-choice self-check quiz. Graded entirely on the
  * client by comparing the picked option index — no code execution. Tracks a
  * running score across the concept's questions. */
-function QuizSection({ questions }: { questions: QuizQuestion[] }) {
+function QuizSection({
+  questions,
+  onScore,
+}: {
+  questions: QuizQuestion[];
+  /** Reports how many are currently right, so the page can decide whether the
+   * chapter has been passed rather than merely read. */
+  onScore?: (correct: number) => void;
+}) {
   // picked[i] = the option index the user chose for question i, or -1 if unanswered.
   const [picked, setPicked] = useState<number[]>(() => questions.map(() => -1));
 
   const answered = picked.filter((p) => p >= 0).length;
   const correct = picked.filter((p, i) => p === questions[i].answer).length;
+
+  useEffect(() => {
+    onScore?.(correct);
+  }, [correct, onScore]);
 
   return (
     <div>

@@ -2,7 +2,14 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useStore } from "../store";
 import { api } from "../api";
-import type { BackendTrack, DsaCurriculum, Problem, ProjectTrack, WeeklyCourse } from "../types";
+import type {
+  BackendTrack,
+  Concept,
+  DsaCurriculum,
+  Problem,
+  ProjectTrack,
+  WeeklyCourse,
+} from "../types";
 import { loadCurriculumSeed } from "./CurriculumData";
 
 interface Cmd {
@@ -87,6 +94,39 @@ function courseCmds(
     }));
 }
 
+/**
+ * One command per 日本語 surface.
+ *
+ * The tab had no palette entries at all: the vocabulary list, the thirteen
+ * glossary sets and the bridge were reachable only by opening Learn, switching
+ * the language toggle and scrolling. A set is searchable by its Japanese name
+ * and by its English one, because the card says both.
+ */
+function japaneseCmds(concepts: Concept[], navigate: (to: string) => void): Cmd[] {
+  const sets = concepts.filter((c) => c.language === "japanese");
+  if (sets.length === 0) return [];
+  return [
+    {
+      id: "jp-vocab",
+      label: "📝 日本語 Vocabulary — 語彙",
+      hint: "Tagged words with readings and example sentences, on spaced repetition",
+      run: () => navigate("/learn"),
+    },
+    {
+      id: "jp-bridge",
+      label: "🈁 日本語 → Java — solve and interview in Japanese",
+      hint: "Problems stated in Japanese, plus interview questions by stage",
+      run: () => navigate("/jp-bridge"),
+    },
+    ...sets.map((c) => ({
+      id: `jp-set-${c.key}`,
+      label: c.name,
+      hint: `日本語 · ${c.cards?.length ?? 0} cards · ${c.what}`,
+      run: () => navigate(`/learn/${c.key}`),
+    })),
+  ];
+}
+
 export function CommandPalette() {
   const open = useStore((s) => s.paletteOpen);
   const setOpen = useStore((s) => s.setPalette);
@@ -96,6 +136,7 @@ export function CommandPalette() {
   const [sel, setSel] = useState(0);
   const [problems, setProblems] = useState<Problem[]>([]);
   const [tracks, setTracks] = useState<Tracks>(NO_TRACKS);
+  const [concepts, setConcepts] = useState<Concept[]>([]);
   const tracksRequested = useRef(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -118,6 +159,7 @@ export function CommandPalette() {
     api.backendTrack().then(put("backend")).catch(() => {});
     api.projectsTrack().then(put("projects")).catch(() => {});
     loadCurriculumSeed().then(put("dsa")).catch(() => {});
+    api.concepts().then(setConcepts).catch(() => {});
   }, [open]);
 
   const navCmds = useMemo<Cmd[]>(
@@ -151,6 +193,7 @@ export function CommandPalette() {
   const trackCmds = useMemo<Cmd[]>(
     () => [
       ...dsaCmds(tracks.dsa, navigate),
+      ...japaneseCmds(concepts, navigate),
       ...courseCmds(tracks.ts, "/course", navigate),
       ...courseCmds(tracks.java, "/java-course", navigate),
       ...(tracks.backend?.projects ?? [])
@@ -196,7 +239,7 @@ export function CommandPalette() {
         },
       ]),
     ],
-    [tracks, navigate]
+    [tracks, concepts, navigate]
   );
 
   const filtered = useMemo(() => {

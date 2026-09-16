@@ -24,6 +24,8 @@
 #   one line, separated by an em dash. No cell may contain a literal '|'.
 # ---------------------------------------------------------------------------
 
+import random as _jp_random
+
 JP_LANG = "japanese"
 
 
@@ -141,6 +143,50 @@ def _jp_take_loanwords(key, rows):
     return kept
 
 
+def _jp_quiz(key, rows, n=6):
+    """A multiple-choice self-check built from the set's own rows.
+
+    Generated rather than authored, because the rows already ARE the answer key:
+    a row knows its term, its reading and its meaning, so asking "which term
+    means X" and "how is Y read" needs no new content and cannot drift from the
+    table above it. Questions alternate between the two directions.
+
+    Seeded from the concept key, so the same set always produces the same quiz
+    — a self-check that reshuffled on every build would make the seed diff noise.
+    """
+    if len(rows) < 4:
+        return []
+    rng = _jp_random.Random(key)
+    order = list(range(len(rows)))
+    rng.shuffle(order)
+    out = []
+    for slot, i in enumerate(order[:n]):
+        term, reading, meaning, _ja, _en = rows[i]
+        others = [r for j, r in enumerate(rows) if j != i]
+        wrong = rng.sample(others, 3)
+        if slot % 2 == 0:
+            question = f"「{meaning}」を表す用語はどれですか。"
+            answer_text = term
+            options = [answer_text] + [w[0] for w in wrong]
+            explanation = f"{term}（{reading}）＝ {meaning}"
+        else:
+            question = f"{term} の読み方はどれですか。"
+            answer_text = reading
+            options = [answer_text] + [w[1] for w in wrong]
+            explanation = f"{term} は {reading} と読みます（{meaning}）。"
+        # Options must be distinct, or two of them would both be right.
+        if len(set(options)) != 4:
+            continue
+        rng.shuffle(options)
+        out.append({
+            "question": question,
+            "options": options,
+            "answer": options.index(answer_text),
+            "explanation": explanation,
+        })
+    return out
+
+
 def _jp_concept(key, name, category, what, deep, note, rows, intro=""):
     """Register one Japanese vocabulary concept (lesson = intro + table)."""
     rows = _jp_take_loanwords(key, rows)
@@ -152,6 +198,7 @@ def _jp_concept(key, name, category, what, deep, note, rows, intro=""):
         "java": note,          # repurposed: shown under the dynamic "How to read this" card
         "language": JP_LANG,
         "cards": _jp_cards(rows, card_ids),  # structured cards for flashcard study mode
+        "quiz": _jp_quiz(key, rows),         # self-check, so "done" can be earned
     }
     CATEGORY[key] = category
     lesson = (intro.strip() + "\n\n") if intro else ""
@@ -735,6 +782,7 @@ CONCEPTS["jp_katakana"] = {
     "java": _KATAKANA_NOTE,
     "language": JP_LANG,
     "cards": _jp_cards(_kata_rows, [""] * len(_kata_rows)),
+    "quiz": _jp_quiz("jp_katakana", _kata_rows),
 }
 CATEGORY["jp_katakana"] = "JP: カタカナ Loanwords"
 LESSONS["jp_katakana"] = "\n".join(_kata_lesson)
