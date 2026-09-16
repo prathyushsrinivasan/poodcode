@@ -455,6 +455,64 @@ def _jpv_slug(romaji):
     return _jpv_re.sub(r"[^a-z0-9]+", "-", s).strip("-")
 
 
+# ---------------------------------------------------------------------------
+# Difficulty, keyed by word id: 1 everyday · 2 textbook · 3 specialist.
+#
+# Kept beside the rows rather than inside them so adding a level to 100 existing
+# words stayed a reviewable table instead of 100 edited tuples. It is NOT a
+# second source of truth: _jpv_build asserts that every word has an entry and
+# that every entry names a real word, so a word added without a level fails the
+# build rather than quietly defaulting.
+# ---------------------------------------------------------------------------
+_JPV_LEVEL = {
+    # --- java ---
+    "keisho": 2, "chushoka": 2, "tataisei": 3, "joho-inpei": 3, "shushokushi": 2,
+    "seiteki": 2, "sanshogata": 2, "kihongata": 2, "reigai": 1, "kensa-reigai": 3,
+    "soshutsu": 2, "hosoku": 2, "sengen": 1, "shokika": 1, "seisei": 1,
+    "soshogata": 3, "kata-shokyo": 3, "fuhen": 2, "doki": 2, "haita-seigyo": 3,
+    "heiko-shori": 2, "kyogo-jotai": 3, "tokumei": 2, "saiteigi": 2, "taju-teigi": 3,
+    "kata-henkan": 2, "rekkyogata": 2, "chushaku": 2, "teisu": 1, "doitsusei": 3,
+    "kari-hikisu": 2, "jitsu-hikisu": 2, "chukan-sosa": 3, "shutan-sosa": 3,
+    # --- problems ---
+    "hairetsu": 1, "soeji": 2, "yoso": 1, "tansaku": 1, "nibun-tansaku": 2,
+    "seiretsu": 1, "shojun": 2, "kojun": 2, "keisanryo": 2, "saiki": 2,
+    "doteki-keikakuho": 3, "don-yokuho": 3, "zentansaku": 2, "haba-yusen-tansaku": 3,
+    "fukasa-yusen-tansaku": 3, "ki": 1, "ne": 1, "choten": 2, "hen": 1,
+    "rinsetsu": 3, "saitan-keiro": 2, "bubun-mojiretsu": 2, "bubun-hairetsu": 2,
+    "ruisekiwa": 3, "shakutoriho": 3, "nyuryoku": 1, "shutsuryoku": 1,
+    "seiyaku": 2, "kyokaichi": 3, "chofuku": 2, "kaibun": 2, "junretsu": 3,
+    "amari": 1,
+    # --- typescript ---
+    "kata-chushaku": 2, "kata-suiron": 2, "kata-anzen": 2, "kata-kensa": 2,
+    "seiteki-katazuke": 2, "doteki-katazuke": 2, "kozoteki-katazuke": 3,
+    "koshogata": 3, "gappeigata": 2, "kosagata": 3, "bubungata": 3, "gokansei": 2,
+    "shiborikomi": 3, "kata-jutsugo": 3, "morasei": 3, "hanbetsu-kano": 3,
+    "jokengata": 3, "kata-hikisu": 2, "kata-hyomei": 3, "yomitori-sen-yo": 2,
+    "shoryaku-kano": 2, "miteigi": 1, "genkaku": 2, "hidoki": 2, "taiki": 2,
+    "heiretsu": 1, "bunkatsu-dainyu": 2, "tenkai-kobun": 2, "zan-yo-hikisu": 3,
+    "kiteichi": 2, "namae-kukan": 3, "izon-kankei": 2, "jikkoji": 1,
+}
+
+# Words that genuinely live under more than one tag, beyond the list they are
+# authored in. 計算量 is as much a Java-interview word as a coding-problem one,
+# and the filter should find it under both.
+_JPV_EXTRA_TAGS = {
+    "keisanryo": ["java"],
+    "saiki": ["java"],
+    "hairetsu": ["java"],
+    "kaibun": ["java"],
+    "hidoki": ["java"],
+    "heiretsu": ["java"],
+    "kata-henkan": ["typescript"],
+    "fuhen": ["typescript"],
+    "soshogata": ["typescript"],
+    "kata-hikisu": ["java"],
+    "izon-kankei": ["java"],
+    "jikkoji": ["java"],
+    "bubun-mojiretsu": ["typescript"],
+}
+
+
 def _jpv_build():
     tag_ids = {t["id"] for t in JP_VOCAB_TAGS}
     words, seen_terms, seen_ids = [], set(), set()
@@ -474,19 +532,48 @@ def _jpv_build():
             assert wid not in seen_ids, f"duplicate vocab id {wid!r} ({term!r})"
             seen_terms.add(term)
             seen_ids.add(wid)
+
+            # The tag the word is authored under comes first; any extra tags
+            # follow, de-duplicated and checked against the declared set.
+            tags = [tag]
+            for extra in _JPV_EXTRA_TAGS.get(wid, []):
+                assert extra in tag_ids, f"unknown extra tag {extra!r} on {term!r}"
+                assert extra != tag, f"redundant extra tag {extra!r} on {term!r}"
+                if extra not in tags:
+                    tags.append(extra)
+
+            assert wid in _JPV_LEVEL, f"no level for {term!r} (id {wid!r}) — add one to _JPV_LEVEL"
+            level = _JPV_LEVEL[wid]
+            assert level in (1, 2, 3), f"level must be 1, 2 or 3: {term!r} -> {level!r}"
+
             words.append({
                 "id": wid,
                 "term": term,
                 "reading": reading,
                 "romaji": romaji,
-                "tag": tag,
+                "tags": tags,
+                "level": level,
                 "meaning": meaning,
                 "desc_en": desc_en,
                 "desc_ja": desc_ja,
                 "example_ja": ex_ja,
                 "example_en": ex_en,
             })
+
     assert len(words) == 100, f"expected 100 vocabulary words, got {len(words)}"
+
+    # No stale levels: every entry must name a word that still exists.
+    unknown = set(_JPV_LEVEL) - seen_ids
+    assert not unknown, f"_JPV_LEVEL names words that don't exist: {sorted(unknown)}"
+    unknown = set(_JPV_EXTRA_TAGS) - seen_ids
+    assert not unknown, f"_JPV_EXTRA_TAGS names words that don't exist: {sorted(unknown)}"
+
+    # Every tag is learnable from the ground up: a tag that only has specialist
+    # words has no entry point, and one with no specialist words is thin.
+    for t in tag_ids:
+        have = {w["level"] for w in words if t in w["tags"]}
+        assert have == {1, 2, 3}, f"tag {t!r} is missing words at level(s) {sorted({1, 2, 3} - have)}"
+
     return {"tags": JP_VOCAB_TAGS, "words": words}
 
 

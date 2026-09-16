@@ -1,9 +1,11 @@
 import { describe, it, expect } from "vitest";
 import {
   BLANK,
+  byLevel,
   clozePrompt,
   distractors,
   filterVocab,
+  levelCounts,
   matchesQuery,
   readyWords,
   shuffleWith,
@@ -21,7 +23,8 @@ const word = (over: Partial<JpVocabWord>): JpVocabWord => ({
   term: "",
   reading: "",
   romaji: "",
-  tag: "java",
+  tags: ["java"],
+  level: 2,
   meaning: "",
   desc_en: "",
   desc_ja: "",
@@ -30,9 +33,9 @@ const word = (over: Partial<JpVocabWord>): JpVocabWord => ({
   ...over,
 });
 
-const inherit = word({ id: "keisho", term: "継承", reading: "けいしょう", romaji: "keishō", tag: "java", meaning: "inheritance" });
-const typeArg = word({ id: "kata-hikisu", term: "型引数", reading: "かたひきすう", romaji: "kata hikisū", tag: "typescript", meaning: "type argument" });
-const array = word({ id: "hairetsu", term: "配列", reading: "はいれつ", romaji: "hairetsu", tag: "problems", meaning: "array" });
+const inherit = word({ id: "keisho", term: "継承", reading: "けいしょう", romaji: "keishō", tags: ["java"], level: 2, meaning: "inheritance" });
+const typeArg = word({ id: "kata-hikisu", term: "型引数", reading: "かたひきすう", romaji: "kata hikisū", tags: ["typescript", "java"], level: 2, meaning: "type argument" });
+const array = word({ id: "hairetsu", term: "配列", reading: "はいれつ", romaji: "hairetsu", tags: ["problems", "java"], level: 1, meaning: "array" });
 const all = [inherit, typeArg, array];
 
 describe("matchesQuery", () => {
@@ -60,14 +63,49 @@ describe("filterVocab", () => {
   });
 
   it("applies the tag and the search together", () => {
-    expect(filterVocab(all, "java", "array")).toEqual([]);
     expect(filterVocab(all, "typescript", "type").map((w) => w.id)).toEqual(["kata-hikisu"]);
+  });
+
+  it("matches a word on any of its tags, not just the first", () => {
+    // 配列 is authored under "problems" but also carries "java".
+    expect(filterVocab(all, "java", "").map((w) => w.id)).toEqual([
+      "keisho",
+      "kata-hikisu",
+      "hairetsu",
+    ]);
+    expect(filterVocab(all, "problems", "").map((w) => w.id)).toEqual(["hairetsu"]);
+  });
+
+  it("narrows by level", () => {
+    expect(filterVocab(all, "all", "", 1).map((w) => w.id)).toEqual(["hairetsu"]);
+    expect(filterVocab(all, "all", "", 3)).toEqual([]);
+    expect(filterVocab(all, "java", "", 2).map((w) => w.id)).toEqual(["keisho", "kata-hikisu"]);
   });
 });
 
 describe("tagCounts", () => {
-  it("counts each tag and the total", () => {
-    expect(tagCounts(all)).toEqual({ all: 3, java: 1, typescript: 1, problems: 1 });
+  it("counts a word once under each tag it carries", () => {
+    // The per-tag counts total more than the list — two words carry "java"
+    // as a second tag, and that is the point of the field.
+    expect(tagCounts(all)).toEqual({ all: 3, java: 3, typescript: 1, problems: 1 });
+  });
+});
+
+describe("levelCounts", () => {
+  it("counts each level and the total", () => {
+    expect(levelCounts(all)).toEqual({ all: 3, 1: 1, 2: 2 });
+  });
+});
+
+describe("byLevel", () => {
+  it("puts the easiest first and keeps seed order within a level", () => {
+    expect(byLevel(all).map((w) => w.id)).toEqual(["hairetsu", "keisho", "kata-hikisu"]);
+  });
+
+  it("leaves the input alone", () => {
+    const xs = [...all];
+    byLevel(xs);
+    expect(xs.map((w) => w.id)).toEqual(["keisho", "kata-hikisu", "hairetsu"]);
   });
 });
 

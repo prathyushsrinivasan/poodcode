@@ -637,7 +637,13 @@ pub struct JpVocabWord {
     pub reading: String,
     #[serde(default)]
     pub romaji: String,
-    pub tag: String,
+    /// Every tag the word carries — 計算量 is a Java-interview word *and* a
+    /// coding-problem word, and the filter should find it under both.
+    #[serde(default)]
+    pub tags: Vec<String>,
+    /// 1 everyday · 2 textbook · 3 specialist.
+    #[serde(default)]
+    pub level: u8,
     pub meaning: String,
     #[serde(default)]
     pub desc_en: String,

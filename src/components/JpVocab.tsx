@@ -2,9 +2,12 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { api } from "../api";
 import type { CardReview, JpVocab, JpVocabTag, JpVocabWord } from "../types";
 import {
+  byLevel,
   clozePrompt,
   distractors,
   filterVocab,
+  levelCounts,
+  LEVELS,
   readyWords,
   shuffleWith,
   splitOnTerm,
@@ -13,6 +16,7 @@ import {
   vocabCardId,
   wordState,
   wrapIndex,
+  type LevelFilter,
   type VocabState,
 } from "../lib/jpVocab";
 import { acceptsReading, joinReading } from "../lib/romaji";
@@ -159,7 +163,12 @@ export function JpVocabMenu({
   const [tag, setTag] = useState<string>(readTag);
   const [query, setQuery] = useState("");
   const [dueOnly, setDueOnly] = useState(false);
+  // Deliberately not remembered: the tag is how you pick a track and persists,
+  // but a level is a within-session drill choice, and a remembered one would
+  // look like half the list had gone missing next time.
+  const [level, setLevel] = useState<LevelFilter>("all");
   const counts = useMemo(() => tagCounts(vocab.words), [vocab.words]);
+  const levels = useMemo(() => levelCounts(vocab.words), [vocab.words]);
   const states = useMemo(
     () => stateCounts(vocab.words, reviews, today),
     [vocab.words, reviews, today]
@@ -167,12 +176,16 @@ export function JpVocabMenu({
   // A tag remembered from an older seed that no longer exists shows everything.
   const activeTag = tag === "all" || vocab.tags.some((t) => t.id === tag) ? tag : "all";
   const matching = useMemo(
-    () => filterVocab(vocab.words, activeTag, query),
-    [vocab.words, activeTag, query]
+    () => filterVocab(vocab.words, activeTag, query, level),
+    [vocab.words, activeTag, query, level]
   );
   // "Study due" walks what the current filter shows, not the whole list, so
-  // narrowing to one tag and studying it is a single click.
-  const ready = useMemo(() => readyWords(matching, reviews, today), [matching, reviews, today]);
+  // narrowing to one tag and studying it is a single click — easiest first,
+  // so a session starts on the words you can actually get right.
+  const ready = useMemo(
+    () => byLevel(readyWords(matching, reviews, today)),
+    [matching, reviews, today]
+  );
   const shown = dueOnly ? ready : matching;
   const tagById = useMemo(() => new Map(vocab.tags.map((t) => [t.id, t])), [vocab.tags]);
 
@@ -213,11 +226,40 @@ export function JpVocabMenu({
         />
       </div>
 
-      <div className="row" style={{ gap: 8, flexWrap: "wrap", marginBottom: 10 }}>
-        <button onClick={() => onOpen(ready[0].id, ready.map((w) => w.id))} disabled={ready.length === 0}>
+      <div
+        className="row"
+        style={{ gap: 6, flexWrap: "wrap", marginBottom: 10, alignItems: "center" }}
+      >
+        <span className="dim" style={{ fontSize: 12 }}>
+          Level
+        </span>
+        <button
+          className={level === "all" ? "" : "ghost"}
+          style={{ padding: "2px 8px", fontSize: 12 }}
+          onClick={() => setLevel("all")}
+          title="Every level"
+        >
+          All
+        </button>
+        {LEVELS.map((l) => (
+          <button
+            key={l.id}
+            className={level === l.id ? "" : "ghost"}
+            style={{ padding: "2px 8px", fontSize: 12 }}
+            onClick={() => setLevel(l.id)}
+            title={l.hint}
+          >
+            {l.label} <span className="jpv-count">{levels[l.id] ?? 0}</span>
+          </button>
+        ))}
+        <button
+          style={{ marginLeft: 6 }}
+          onClick={() => onOpen(ready[0].id, ready.map((w) => w.id))}
+          disabled={ready.length === 0}
+        >
           🎴 Study due ({ready.length})
         </button>
-        <span className="dim" style={{ fontSize: 12, alignSelf: "center" }}>
+        <span className="dim" style={{ fontSize: 12 }}>
           {states.learning} learning · {states.new} new · {states.due} due
         </span>
       </div>
@@ -247,7 +289,7 @@ export function JpVocabMenu({
                   {w.reading}
                 </span>
                 <span className="jpv-tile-meaning">{w.meaning}</span>
-                <TagBadge tag={tagById.get(w.tag)} id={w.tag} />
+                <TagBadges ids={w.tags} tagById={tagById} level={w.level} />
               </button>
             );
           })}
@@ -257,8 +299,29 @@ export function JpVocabMenu({
   );
 }
 
-function TagBadge({ tag, id }: { tag?: JpVocabTag; id: string }) {
-  return <span className={`badge jpv-tag jpv-tag-${id}`}>{tag?.label ?? id}</span>;
+/** Every tag the word carries, then its level. A word that is both a Java and a
+ * coding-problem word says so here rather than picking one. */
+function TagBadges({
+  ids,
+  tagById,
+  level,
+}: {
+  ids: string[];
+  tagById: Map<string, JpVocabTag>;
+  level: number;
+}) {
+  return (
+    <span className="row" style={{ gap: 3, flexWrap: "wrap" }}>
+      {ids.map((id) => (
+        <span key={id} className={`badge jpv-tag jpv-tag-${id}`}>
+          {tagById.get(id)?.label ?? id}
+        </span>
+      ))}
+      <span className="badge" title={LEVELS.find((l) => l.id === level)?.hint}>
+        L{level}
+      </span>
+    </span>
+  );
 }
 
 /* ------------------------------------------------------------------- card */
@@ -298,7 +361,7 @@ export function JpVocabCard({
   // Opened from a link, the id may not be in the remembered list; walk everything.
   const ids = list.includes(id) ? list : vocab.words.map((w) => w.id);
   const index = ids.indexOf(id);
-  const tag = vocab.tags.find((t) => t.id === word?.tag);
+  const tagById = useMemo(() => new Map(vocab.tags.map((t) => [t.id, t])), [vocab.tags]);
   const [mode, setMode] = useState<VocabMode>(readMode);
   const [revealed, setRevealed] = useState(false);
   const [typed, setTyped] = useState("");
@@ -378,7 +441,7 @@ export function JpVocabCard({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="row" style={{ justifyContent: "space-between", alignItems: "center" }}>
-          <TagBadge tag={tag} id={word.tag} />
+          <TagBadges ids={word.tags} tagById={tagById} level={word.level} />
           <span className="dim" style={{ fontSize: 12 }}>
             {index + 1} / {ids.length}
           </span>

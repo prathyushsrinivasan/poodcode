@@ -22,7 +22,10 @@
       "term": "継承",
       "reading": "けいしょう",
       "romaji": "keishō",
-      "tag": "java",
+      "tags": [
+        "java"
+      ],
+      "level": 2,
       "meaning": "inheritance",
       "desc_en": "A class taking on the fields and methods of another class with extends, so the subclass can reuse and extend its parent's behavior.",
       "desc_ja": "extendsを使って、あるクラスが別のクラスのフィールドやメソッドを引き継ぐ仕組みです。子クラスは親クラスの機能を再利用できます。",
@@ -34,7 +37,10 @@
       "term": "抽象化",
       "reading": "ちゅうしょうか",
       "romaji": "chūshōka",
-      "tag": "java",
+      "tags": [
+        "java"
+      ],
+      "level": 2,
       "meaning": "abstraction",
       "desc_en": "Hiding the details of how something works and exposing only what callers need — in Java, through abstract classes and interfaces.",
       "desc_ja": "内部の細かい仕組みを隠し、利用者に必要な部分だけを見せる考え方です。Javaでは抽象クラスやインターフェースで表現します。",
@@ -46,7 +52,10 @@
       "term": "多態性",
       "reading": "たたいせい",
       "romaji": "tataisei",
-      "tag": "java",
+      "tags": [
+        "java"
+      ],
+      "level": 3,
       "meaning": "polymorphism",
       "desc_en": "One reference type standing for many concrete classes, with the method that actually runs chosen at runtime by the object's real class.",
       "desc_ja": "同じ型の変数で異なるクラスのオブジェクトを扱い、実行時に実際のクラスのメソッドが呼ばれる性質です。",
@@ -58,7 +67,10 @@
       "term": "情報隠蔽",
       "reading": "じょうほういんぺい",
       "romaji": "jōhō inpei",
-      "tag": "java",
+      "tags": [
+        "java"
+      ],
+      "level": 3,
       "meaning": "information hiding (encapsulation)",
       "desc_en": "Keeping an object's fields private and allowing access only through methods, so its internal state can't be broken from outside.",
       "desc_ja": "フィールドをprivateにして、メソッド経由でしか操作できないようにすることです。外部から内部状態を壊されるのを防ぎます。",
@@ -70,7 +82,10 @@
       "term": "修飾子",
       "reading": "しゅうしょくし",
       "romaji": "shūshokushi",
-      "tag": "java",
+      "tags": [
+        "java"
+      ],
+      "level": 2,
       "meaning": "modifier",
       "desc_en": "A keyword placed before a declaration that changes its meaning or visibility, such as public, private, static or final.",
       "desc_ja": "宣言の前に付けて、意味や公開範囲を変えるキーワードです。public、private、static、finalなどがあります。",
@@ -82,7 +97,10 @@
       "term": "静的",
       "reading": "せいてき",
       "romaji": "seiteki",
-      "tag": "java",
+      "tags": [
+        "java"
+      ],
+      "level": 2,
       "meaning": "static",
       "desc_en": "Belonging to the class itself rather than to any one instance; a static member is shared and can be used without creating an object.",
       "desc_ja": "インスタンスではなくクラスそのものに属することです。静的メンバーはオブジェクトを作らなくても使えます。",
@@ -94,7 +112,10 @@
       "term": "参照型",
       "reading": "さんしょうがた",
       "romaji": "sanshōgata",
-      "tag": "java",
+      "tags": [
+        "java"
+      ],
+      "level": 2,
       "meaning": "reference type",
       "desc_en": "A type whose variables hold a reference to an object rather than the value itself — classes, arrays, interfaces and String.",
       "desc_ja": "変数に値そのものではなく、オブジェクトへの参照を持つ型です。クラス、配列、インターフェース、Stringなどが該当します。",
@@ -106,7 +127,10 @@
       "term": "基本型",
       "reading": "きほんがた",
       "romaji": "kihongata",
-      "tag": "java",
+      "tags": [
+        "java"
+      ],
+      "level": 2,
       "meaning": "primitive type",
       "desc_en": "One of Java's eight built-in value types (int, long, double, boolean, char, byte, short, float) that store the value directly.",
       "desc_ja": "int、double、booleanなど、値を直接保持するJavaの8つの組み込み型です。",
@@ -118,7 +142,10 @@
       "term": "例外",
       "reading": "れいがい",
       "romaji": "reigai",
-      "tag": "java",
+      "tags": [
+        "java"
+      ],
+      "level": 1,
       "meaning": "exception",
       "desc_en": "An object representing an error or unusual condition that interrupts the normal flow of a program until something handles it.",
       "desc_ja": "エラーや想定外の状況を表すオブジェクトです。処理されるまでプログラムの通常の流れを中断します。",
@@ -130,7 +157,10 @@
       "term": "検査例外",
       "reading": "けんされいがい",
       "romaji": "kensa reigai",
-      "tag": "java",
+      "tags": [
+        "java"
+      ],
+      "level": 3,
       "meaning": "checked exception",
       "desc_en": "An exception the compiler forces you to deal with — either catch it or declare it with throws. IOException is the classic example.",
       "desc_ja": "コンパイラが処理を強制する例外です。catchするか、throwsで宣言しなければなりません。IOExceptionが代表例です。",
@@ -142,7 +172,10 @@
       "term": "送出",
       "reading": "そうしゅつ",
       "romaji": "sōshutsu",
-      "tag": "java",
+      "tags": [
+        "java"
+      ],
+      "level": 2,
       "meaning": "throwing (an exception)",
       "desc_en": "Raising an exception with the throw keyword so that control jumps to the nearest matching catch block.",
       "desc_ja": "throwキーワードで例外を発生させることです。制御は最も近い対応するcatchブロックへ移ります。",
@@ -154,7 +187,10 @@
       "term": "捕捉",
       "reading": "ほそく",
       "romaji": "hosoku",
-      "tag": "java",
+      "tags": [
+        "java"
+      ],
+      "level": 2,
       "meaning": "catching (an exception)",
       "desc_en": "Intercepting a thrown exception in a catch block so the program can recover instead of crashing.",
       "desc_ja": "発生した例外をcatchブロックで受け取ることです。プログラムを停止させずに回復できます。",
@@ -166,7 +202,10 @@
       "term": "宣言",
       "reading": "せんげん",
       "romaji": "sengen",
-      "tag": "java",
+      "tags": [
+        "java"
+      ],
+      "level": 1,
       "meaning": "declaration",
       "desc_en": "Introducing a name — a variable, method or class — together with its type, before it is used.",
       "desc_ja": "変数、メソッド、クラスなどの名前を、その型と一緒にコードに導入することです。",
@@ -178,7 +217,10 @@
       "term": "初期化",
       "reading": "しょきか",
       "romaji": "shokika",
-      "tag": "java",
+      "tags": [
+        "java"
+      ],
+      "level": 1,
       "meaning": "initialization",
       "desc_en": "Giving a variable or object its first value. Local variables in Java must be initialized before they are read.",
       "desc_ja": "変数やオブジェクトに最初の値を与えることです。Javaのローカル変数は、読み取る前に初期化が必要です。",
@@ -190,7 +232,10 @@
       "term": "生成",
       "reading": "せいせい",
       "romaji": "seisei",
-      "tag": "java",
+      "tags": [
+        "java"
+      ],
+      "level": 1,
       "meaning": "creation (instantiation)",
       "desc_en": "Making a new object from a class with the new keyword, which allocates memory and runs a constructor.",
       "desc_ja": "newキーワードでクラスから新しいオブジェクトを作ることです。メモリが確保され、コンストラクタが実行されます。",
@@ -202,7 +247,11 @@
       "term": "総称型",
       "reading": "そうしょうがた",
       "romaji": "sōshōgata",
-      "tag": "java",
+      "tags": [
+        "java",
+        "typescript"
+      ],
+      "level": 3,
       "meaning": "generic type (generics)",
       "desc_en": "A class or interface with type parameters, like List<T>, so the same code works for many types while staying type-safe.",
       "desc_ja": "List<T>のように型パラメータを持つクラスやインターフェースです。型安全を保ったまま、さまざまな型で同じコードを使えます。",
@@ -214,7 +263,10 @@
       "term": "型消去",
       "reading": "かたしょうきょ",
       "romaji": "kata shōkyo",
-      "tag": "java",
+      "tags": [
+        "java"
+      ],
+      "level": 3,
       "meaning": "type erasure",
       "desc_en": "The compiler removing generic type arguments after checking them, so at runtime a List<String> is just a List.",
       "desc_ja": "コンパイラが総称型の型引数をチェックした後に取り除くことです。実行時にはList<String>も単なるListになります。",
@@ -226,7 +278,11 @@
       "term": "不変",
       "reading": "ふへん",
       "romaji": "fuhen",
-      "tag": "java",
+      "tags": [
+        "java",
+        "typescript"
+      ],
+      "level": 2,
       "meaning": "immutable",
       "desc_en": "Unable to change after creation. String is immutable; methods that seem to modify it actually return a new object.",
       "desc_ja": "生成後に状態を変更できないことです。Stringは不変なので、変更しているように見えるメソッドも新しいオブジェクトを返します。",
@@ -238,7 +294,10 @@
       "term": "同期",
       "reading": "どうき",
       "romaji": "dōki",
-      "tag": "java",
+      "tags": [
+        "java"
+      ],
+      "level": 2,
       "meaning": "synchronization",
       "desc_en": "Coordinating threads so only one at a time runs a critical section, typically with synchronized or a Lock.",
       "desc_ja": "複数のスレッドのうち、一度に一つだけが重要な処理を実行するよう調整することです。synchronizedやLockを使います。",
@@ -250,7 +309,10 @@
       "term": "排他制御",
       "reading": "はいたせいぎょ",
       "romaji": "haita seigyo",
-      "tag": "java",
+      "tags": [
+        "java"
+      ],
+      "level": 3,
       "meaning": "mutual exclusion",
       "desc_en": "Guaranteeing that a shared resource is used by only one thread at a time so concurrent updates don't corrupt it.",
       "desc_ja": "共有資源を同時に一つのスレッドだけが使えるように保証することです。同時更新によるデータの破損を防ぎます。",
@@ -262,7 +324,10 @@
       "term": "並行処理",
       "reading": "へいこうしょり",
       "romaji": "heikō shori",
-      "tag": "java",
+      "tags": [
+        "java"
+      ],
+      "level": 2,
       "meaning": "concurrency",
       "desc_en": "Structuring a program so several tasks make progress during overlapping time periods, e.g. with threads or an ExecutorService.",
       "desc_ja": "複数のタスクが重なり合う時間の中で進むようにプログラムを組むことです。スレッドやExecutorServiceを使います。",
@@ -274,7 +339,10 @@
       "term": "競合状態",
       "reading": "きょうごうじょうたい",
       "romaji": "kyōgō jōtai",
-      "tag": "java",
+      "tags": [
+        "java"
+      ],
+      "level": 3,
       "meaning": "race condition",
       "desc_en": "A bug where the result depends on the unpredictable timing of threads, such as two threads incrementing the same counter.",
       "desc_ja": "スレッドの実行タイミングによって結果が変わってしまう不具合です。二つのスレッドが同時にカウンターを増やす場合などに起きます。",
@@ -286,7 +354,10 @@
       "term": "匿名",
       "reading": "とくめい",
       "romaji": "tokumei",
-      "tag": "java",
+      "tags": [
+        "java"
+      ],
+      "level": 2,
       "meaning": "anonymous",
       "desc_en": "Having no name — an anonymous class is defined and instantiated in one expression, and is often replaced today by a lambda.",
       "desc_ja": "名前を持たないことです。匿名クラスは一つの式で定義と生成を同時に行い、現在はラムダ式で置き換えられることが多いです。",
@@ -298,7 +369,10 @@
       "term": "再定義",
       "reading": "さいていぎ",
       "romaji": "saiteigi",
-      "tag": "java",
+      "tags": [
+        "java"
+      ],
+      "level": 2,
       "meaning": "overriding",
       "desc_en": "A subclass providing its own version of a method inherited from its parent, with the same name and parameters (@Override).",
       "desc_ja": "子クラスが親クラスから継承したメソッドを、同じ名前と引数で書き直すことです。@Overrideを付けます。",
@@ -310,7 +384,10 @@
       "term": "多重定義",
       "reading": "たじゅうていぎ",
       "romaji": "tajū teigi",
-      "tag": "java",
+      "tags": [
+        "java"
+      ],
+      "level": 3,
       "meaning": "overloading",
       "desc_en": "Defining several methods with the same name but different parameter lists; the compiler picks one from the arguments.",
       "desc_ja": "同じ名前で引数の型や数が異なるメソッドを複数定義することです。どれが呼ばれるかはコンパイル時に引数で決まります。",
@@ -322,7 +399,11 @@
       "term": "型変換",
       "reading": "かたへんかん",
       "romaji": "kata henkan",
-      "tag": "java",
+      "tags": [
+        "java",
+        "typescript"
+      ],
+      "level": 2,
       "meaning": "type conversion (casting)",
       "desc_en": "Turning a value of one type into another, either automatically (widening) or explicitly with a cast like (int) 3.7.",
       "desc_ja": "ある型の値を別の型に変えることです。自動で行われる場合と、(int) 3.7のように明示的にキャストする場合があります。",
@@ -334,7 +415,10 @@
       "term": "列挙型",
       "reading": "れっきょがた",
       "romaji": "rekkyogata",
-      "tag": "java",
+      "tags": [
+        "java"
+      ],
+      "level": 2,
       "meaning": "enum type",
       "desc_en": "A type with a fixed set of named constants, declared with enum, such as the days of the week or order statuses.",
       "desc_ja": "enumで宣言する、決まった名前付き定数の集まりを表す型です。曜日や注文の状態などに使います。",
@@ -346,7 +430,10 @@
       "term": "注釈",
       "reading": "ちゅうしゃく",
       "romaji": "chūshaku",
-      "tag": "java",
+      "tags": [
+        "java"
+      ],
+      "level": 2,
       "meaning": "annotation",
       "desc_en": "Metadata attached to code with @, such as @Override or @Deprecated, read by the compiler, tools or frameworks.",
       "desc_ja": "@Overrideや@Deprecatedのように、@でコードに付けるメタデータです。コンパイラやツール、フレームワークが読み取ります。",
@@ -358,7 +445,10 @@
       "term": "定数",
       "reading": "ていすう",
       "romaji": "teisū",
-      "tag": "java",
+      "tags": [
+        "java"
+      ],
+      "level": 1,
       "meaning": "constant",
       "desc_en": "A value that never changes after it is set, usually declared static final with an UPPER_SNAKE_CASE name.",
       "desc_ja": "一度設定したら変わらない値です。通常はstatic finalで宣言し、大文字のスネークケースで名前を付けます。",
@@ -370,7 +460,10 @@
       "term": "同一性",
       "reading": "どういつせい",
       "romaji": "dōitsusei",
-      "tag": "java",
+      "tags": [
+        "java"
+      ],
+      "level": 3,
       "meaning": "identity",
       "desc_en": "Whether two references point to the very same object, tested with ==, as opposed to equality of contents tested with equals.",
       "desc_ja": "二つの参照がまったく同じオブジェクトを指しているかどうかです。==で判定し、内容の等しさを調べるequalsとは区別します。",
@@ -382,7 +475,10 @@
       "term": "仮引数",
       "reading": "かりひきすう",
       "romaji": "kari hikisū",
-      "tag": "java",
+      "tags": [
+        "java"
+      ],
+      "level": 2,
       "meaning": "parameter (formal parameter)",
       "desc_en": "The variable named in a method's declaration that receives a value when the method is called.",
       "desc_ja": "メソッドの宣言に書かれ、呼び出し時に値を受け取る変数です。",
@@ -394,7 +490,10 @@
       "term": "実引数",
       "reading": "じつひきすう",
       "romaji": "jitsu hikisū",
-      "tag": "java",
+      "tags": [
+        "java"
+      ],
+      "level": 2,
       "meaning": "argument (actual argument)",
       "desc_en": "The actual value passed in when a method is called, which is copied into the corresponding parameter.",
       "desc_ja": "メソッドを呼び出すときに実際に渡す値です。対応する仮引数にコピーされます。",
@@ -406,7 +505,10 @@
       "term": "中間操作",
       "reading": "ちゅうかんそうさ",
       "romaji": "chūkan sōsa",
-      "tag": "java",
+      "tags": [
+        "java"
+      ],
+      "level": 3,
       "meaning": "intermediate operation",
       "desc_en": "A Stream operation like filter or map that returns another Stream and does no work until a terminal operation runs.",
       "desc_ja": "filterやmapのように新しいStreamを返すStream操作です。終端操作が実行されるまで処理は行われません。",
@@ -418,7 +520,10 @@
       "term": "終端操作",
       "reading": "しゅうたんそうさ",
       "romaji": "shūtan sōsa",
-      "tag": "java",
+      "tags": [
+        "java"
+      ],
+      "level": 3,
       "meaning": "terminal operation",
       "desc_en": "A Stream operation like collect, count or forEach that produces a result and actually runs the whole pipeline.",
       "desc_ja": "collect、count、forEachのように結果を生み出し、パイプライン全体を実際に実行するStream操作です。",
@@ -430,7 +535,11 @@
       "term": "配列",
       "reading": "はいれつ",
       "romaji": "hairetsu",
-      "tag": "problems",
+      "tags": [
+        "problems",
+        "java"
+      ],
+      "level": 1,
       "meaning": "array",
       "desc_en": "A fixed-length sequence of elements of the same type stored side by side, accessed by index in constant time.",
       "desc_ja": "同じ型の要素を連続して並べた固定長のデータ構造です。添字を使って定数時間でアクセスできます。",
@@ -442,7 +551,10 @@
       "term": "添字",
       "reading": "そえじ",
       "romaji": "soeji",
-      "tag": "problems",
+      "tags": [
+        "problems"
+      ],
+      "level": 2,
       "meaning": "index (subscript)",
       "desc_en": "The position number used to access an element, starting from 0 in Java and TypeScript.",
       "desc_ja": "要素にアクセスするための位置を表す番号です。JavaやTypeScriptでは0から始まります。",
@@ -454,7 +566,10 @@
       "term": "要素",
       "reading": "ようそ",
       "romaji": "yōso",
-      "tag": "problems",
+      "tags": [
+        "problems"
+      ],
+      "level": 1,
       "meaning": "element",
       "desc_en": "A single item stored in an array, list, set or other collection.",
       "desc_ja": "配列やリスト、集合などに格納されている一つひとつの値です。",
@@ -466,7 +581,10 @@
       "term": "探索",
       "reading": "たんさく",
       "romaji": "tansaku",
-      "tag": "problems",
+      "tags": [
+        "problems"
+      ],
+      "level": 1,
       "meaning": "search",
       "desc_en": "Looking through data to find a target value, or a state that satisfies a condition.",
       "desc_ja": "データの中から目的の値や、条件を満たす状態を見つけることです。",
@@ -478,7 +596,10 @@
       "term": "二分探索",
       "reading": "にぶんたんさく",
       "romaji": "nibun tansaku",
-      "tag": "problems",
+      "tags": [
+        "problems"
+      ],
+      "level": 2,
       "meaning": "binary search",
       "desc_en": "Searching a sorted range by repeatedly halving it, comparing the middle element with the target — O(log n).",
       "desc_ja": "整列済みの範囲を、中央の要素と比べながら半分ずつ絞っていく探索です。計算量はO(log n)です。",
@@ -490,7 +611,10 @@
       "term": "整列",
       "reading": "せいれつ",
       "romaji": "seiretsu",
-      "tag": "problems",
+      "tags": [
+        "problems"
+      ],
+      "level": 1,
       "meaning": "sorting",
       "desc_en": "Rearranging elements into order, ascending or descending — the textbook word alongside the loanword ソート.",
       "desc_ja": "要素を昇順や降順などの順番に並べ替えることです。「ソート」とも言います。",
@@ -502,7 +626,10 @@
       "term": "昇順",
       "reading": "しょうじゅん",
       "romaji": "shōjun",
-      "tag": "problems",
+      "tags": [
+        "problems"
+      ],
+      "level": 2,
       "meaning": "ascending order",
       "desc_en": "Ordered from smallest to largest (1, 2, 3 or A to Z).",
       "desc_ja": "小さいものから大きいものへ並んだ順番です（1, 2, 3やAからZ）。",
@@ -514,7 +641,10 @@
       "term": "降順",
       "reading": "こうじゅん",
       "romaji": "kōjun",
-      "tag": "problems",
+      "tags": [
+        "problems"
+      ],
+      "level": 2,
       "meaning": "descending order",
       "desc_en": "Ordered from largest to smallest (3, 2, 1 or Z to A).",
       "desc_ja": "大きいものから小さいものへ並んだ順番です（3, 2, 1やZからA）。",
@@ -526,7 +656,11 @@
       "term": "計算量",
       "reading": "けいさんりょう",
       "romaji": "keisanryō",
-      "tag": "problems",
+      "tags": [
+        "problems",
+        "java"
+      ],
+      "level": 2,
       "meaning": "computational complexity",
       "desc_en": "How the time or memory an algorithm needs grows with the input size, written in Big-O notation such as O(n log n).",
       "desc_ja": "入力サイズが大きくなるにつれて、アルゴリズムに必要な時間やメモリがどう増えるかを表すものです。O(n log n)のように書きます。",
@@ -538,7 +672,11 @@
       "term": "再帰",
       "reading": "さいき",
       "romaji": "saiki",
-      "tag": "problems",
+      "tags": [
+        "problems",
+        "java"
+      ],
+      "level": 2,
       "meaning": "recursion",
       "desc_en": "A function solving a problem by calling itself on a smaller version of it, stopping at a base case.",
       "desc_ja": "関数が自分自身を、より小さな問題に対して呼び出して解く方法です。基底ケースで停止します。",
@@ -550,7 +688,10 @@
       "term": "動的計画法",
       "reading": "どうてきけいかくほう",
       "romaji": "dōteki keikakuhō",
-      "tag": "problems",
+      "tags": [
+        "problems"
+      ],
+      "level": 3,
       "meaning": "dynamic programming",
       "desc_en": "Solving a problem by breaking it into overlapping subproblems and storing each answer so it is computed only once.",
       "desc_ja": "問題を重なり合う部分問題に分け、それぞれの答えを記録して一度だけ計算する手法です。",
@@ -562,7 +703,10 @@
       "term": "貪欲法",
       "reading": "どんよくほう",
       "romaji": "don'yokuhō",
-      "tag": "problems",
+      "tags": [
+        "problems"
+      ],
+      "level": 3,
       "meaning": "greedy algorithm",
       "desc_en": "Building a solution by always taking the choice that looks best right now — correct only for problems with the right structure.",
       "desc_ja": "その時点で最も良く見える選択を毎回行って解を作る手法です。問題の性質によっては正しい答えになりません。",
@@ -574,7 +718,10 @@
       "term": "全探索",
       "reading": "ぜんたんさく",
       "romaji": "zentansaku",
-      "tag": "problems",
+      "tags": [
+        "problems"
+      ],
+      "level": 2,
       "meaning": "brute force (exhaustive search)",
       "desc_en": "Trying every possible candidate and checking each one — simple and correct, but often too slow for large inputs.",
       "desc_ja": "考えられる候補をすべて試して確かめる方法です。単純で確実ですが、入力が大きいと遅すぎることがあります。",
@@ -586,7 +733,10 @@
       "term": "幅優先探索",
       "reading": "はばゆうせんたんさく",
       "romaji": "haba yūsen tansaku",
-      "tag": "problems",
+      "tags": [
+        "problems"
+      ],
+      "level": 3,
       "meaning": "breadth-first search (BFS)",
       "desc_en": "Exploring a graph level by level with a queue, which finds the shortest path when every edge has the same cost.",
       "desc_ja": "キューを使って、グラフを近い順に一層ずつ調べる探索です。辺の重みがすべて同じなら最短経路が求まります。",
@@ -598,7 +748,10 @@
       "term": "深さ優先探索",
       "reading": "ふかさゆうせんたんさく",
       "romaji": "fukasa yūsen tansaku",
-      "tag": "problems",
+      "tags": [
+        "problems"
+      ],
+      "level": 3,
       "meaning": "depth-first search (DFS)",
       "desc_en": "Exploring a graph by going as deep as possible along one path before backtracking, using recursion or a stack.",
       "desc_ja": "一つの道をできるだけ深く進んでから戻る探索です。再帰やスタックを使って実装します。",
@@ -610,7 +763,10 @@
       "term": "木",
       "reading": "き",
       "romaji": "ki",
-      "tag": "problems",
+      "tags": [
+        "problems"
+      ],
+      "level": 1,
       "meaning": "tree",
       "desc_en": "A connected graph with no cycles, usually drawn with the root at the top and children below.",
       "desc_ja": "閉路のない連結なグラフです。通常は根を上に、子を下に描きます。",
@@ -622,7 +778,10 @@
       "term": "根",
       "reading": "ね",
       "romaji": "ne",
-      "tag": "problems",
+      "tags": [
+        "problems"
+      ],
+      "level": 1,
       "meaning": "root (of a tree)",
       "desc_en": "The single top node of a rooted tree — the one node that has no parent.",
       "desc_ja": "根付き木の一番上にある、親を持たない唯一の節点です。",
@@ -634,7 +793,10 @@
       "term": "頂点",
       "reading": "ちょうてん",
       "romaji": "chōten",
-      "tag": "problems",
+      "tags": [
+        "problems"
+      ],
+      "level": 2,
       "meaning": "vertex (node)",
       "desc_en": "One of the points in a graph that edges connect.",
       "desc_ja": "グラフで、辺によって結ばれる点のことです。",
@@ -646,7 +808,10 @@
       "term": "辺",
       "reading": "へん",
       "romaji": "hen",
-      "tag": "problems",
+      "tags": [
+        "problems"
+      ],
+      "level": 1,
       "meaning": "edge",
       "desc_en": "A connection between two vertices in a graph, which may have a direction or a weight.",
       "desc_ja": "グラフの二つの頂点を結ぶつながりです。向きや重みを持つことがあります。",
@@ -658,7 +823,10 @@
       "term": "隣接",
       "reading": "りんせつ",
       "romaji": "rinsetsu",
-      "tag": "problems",
+      "tags": [
+        "problems"
+      ],
+      "level": 3,
       "meaning": "adjacency (adjacent)",
       "desc_en": "Two vertices being directly connected by an edge; an adjacency list stores each vertex's neighbors.",
       "desc_ja": "二つの頂点が辺で直接つながっていることです。隣接リストは各頂点の隣を記録します。",
@@ -670,7 +838,10 @@
       "term": "最短経路",
       "reading": "さいたんけいろ",
       "romaji": "saitan keiro",
-      "tag": "problems",
+      "tags": [
+        "problems"
+      ],
+      "level": 2,
       "meaning": "shortest path",
       "desc_en": "The route between two vertices with the fewest edges or the smallest total weight, found with BFS or Dijkstra's algorithm.",
       "desc_ja": "二つの頂点の間で、辺の数や重みの合計が最小になる道のりです。幅優先探索やダイクストラ法で求めます。",
@@ -682,7 +853,11 @@
       "term": "部分文字列",
       "reading": "ぶぶんもじれつ",
       "romaji": "bubun mojiretsu",
-      "tag": "problems",
+      "tags": [
+        "problems",
+        "typescript"
+      ],
+      "level": 2,
       "meaning": "substring",
       "desc_en": "A contiguous run of characters taken from inside a string.",
       "desc_ja": "文字列の中から連続して取り出した一部分です。",
@@ -694,7 +869,10 @@
       "term": "部分配列",
       "reading": "ぶぶんはいれつ",
       "romaji": "bubun hairetsu",
-      "tag": "problems",
+      "tags": [
+        "problems"
+      ],
+      "level": 2,
       "meaning": "subarray",
       "desc_en": "A contiguous run of elements from an array — unlike a subsequence, the elements must be next to each other.",
       "desc_ja": "配列の中の連続した要素の並びです。部分列と違い、要素は隣り合っていなければなりません。",
@@ -706,7 +884,10 @@
       "term": "累積和",
       "reading": "るいせきわ",
       "romaji": "ruisekiwa",
-      "tag": "problems",
+      "tags": [
+        "problems"
+      ],
+      "level": 3,
       "meaning": "prefix sum",
       "desc_en": "An array where each position holds the total of all elements up to it, so any range sum can be answered in O(1).",
       "desc_ja": "各位置にそこまでの要素の合計を記録した配列です。任意の区間の和をO(1)で求められます。",
@@ -718,7 +899,10 @@
       "term": "尺取り法",
       "reading": "しゃくとりほう",
       "romaji": "shakutorihō",
-      "tag": "problems",
+      "tags": [
+        "problems"
+      ],
+      "level": 3,
       "meaning": "two pointers (sliding window)",
       "desc_en": "Advancing a left and a right pointer over an array to maintain a window — the usual Japanese competitive-programming name for the technique.",
       "desc_ja": "左端と右端の二つのポインタを前に進めながら区間を管理する手法です。競技プログラミングでよく使われる名前です。",
@@ -730,7 +914,10 @@
       "term": "入力",
       "reading": "にゅうりょく",
       "romaji": "nyūryoku",
-      "tag": "problems",
+      "tags": [
+        "problems"
+      ],
+      "level": 1,
       "meaning": "input",
       "desc_en": "The data a program receives; in a problem statement, the section describing the format read from standard input.",
       "desc_ja": "プログラムが受け取るデータです。問題文では、標準入力から読み込む形式を説明する部分を指します。",
@@ -742,7 +929,10 @@
       "term": "出力",
       "reading": "しゅつりょく",
       "romaji": "shutsuryoku",
-      "tag": "problems",
+      "tags": [
+        "problems"
+      ],
+      "level": 1,
       "meaning": "output",
       "desc_en": "The result a program produces; in a problem statement, the exact format your answer must be printed in.",
       "desc_ja": "プログラムが生み出す結果です。問題文では、答えを表示する正確な形式を指します。",
@@ -754,7 +944,10 @@
       "term": "制約",
       "reading": "せいやく",
       "romaji": "seiyaku",
-      "tag": "problems",
+      "tags": [
+        "problems"
+      ],
+      "level": 2,
       "meaning": "constraints",
       "desc_en": "The limits on input sizes and values stated in a problem, which tell you how fast your solution needs to be.",
       "desc_ja": "問題に書かれた入力の大きさや値の範囲です。解法にどれくらいの速さが必要かの手がかりになります。",
@@ -766,7 +959,10 @@
       "term": "境界値",
       "reading": "きょうかいち",
       "romaji": "kyōkaichi",
-      "tag": "problems",
+      "tags": [
+        "problems"
+      ],
+      "level": 3,
       "meaning": "boundary value (edge case)",
       "desc_en": "An input at the very edge of what is allowed — empty, zero, one element, or the maximum — where bugs most often hide.",
       "desc_ja": "空、0、要素が一つ、最大値など、許される範囲のぎりぎりの入力です。不具合が最も起きやすいところです。",
@@ -778,7 +974,10 @@
       "term": "重複",
       "reading": "ちょうふく",
       "romaji": "chōfuku",
-      "tag": "problems",
+      "tags": [
+        "problems"
+      ],
+      "level": 2,
       "meaning": "duplicate",
       "desc_en": "The same value appearing more than once; problems often ask you to detect, count or remove duplicates.",
       "desc_ja": "同じ値が二回以上現れることです。重複を見つける、数える、取り除くといった問題がよく出ます。",
@@ -790,7 +989,11 @@
       "term": "回文",
       "reading": "かいぶん",
       "romaji": "kaibun",
-      "tag": "problems",
+      "tags": [
+        "problems",
+        "java"
+      ],
+      "level": 2,
       "meaning": "palindrome",
       "desc_en": "A string that reads the same forwards and backwards, like \"level\" or \"しんぶんし\".",
       "desc_ja": "前から読んでも後ろから読んでも同じになる文字列です。「level」や「しんぶんし」などがあります。",
@@ -802,7 +1005,10 @@
       "term": "順列",
       "reading": "じゅんれつ",
       "romaji": "junretsu",
-      "tag": "problems",
+      "tags": [
+        "problems"
+      ],
+      "level": 3,
       "meaning": "permutation",
       "desc_en": "One particular ordering of a set of items; n distinct items have n! permutations.",
       "desc_ja": "いくつかのものを一列に並べた、ある一つの並べ方です。異なるn個のものにはn!通りの順列があります。",
@@ -814,7 +1020,10 @@
       "term": "余り",
       "reading": "あまり",
       "romaji": "amari",
-      "tag": "problems",
+      "tags": [
+        "problems"
+      ],
+      "level": 1,
       "meaning": "remainder (modulo)",
       "desc_en": "What is left over after integer division, computed with %; answers are often required modulo 10⁹+7.",
       "desc_ja": "整数の割り算で割り切れずに残る数です。%で計算します。答えを10⁹+7で割った余りを求める問題もよくあります。",
@@ -826,7 +1035,10 @@
       "term": "型注釈",
       "reading": "かたちゅうしゃく",
       "romaji": "kata chūshaku",
-      "tag": "typescript",
+      "tags": [
+        "typescript"
+      ],
+      "level": 2,
       "meaning": "type annotation",
       "desc_en": "Writing a type explicitly after a name with a colon, as in let count: number = 0.",
       "desc_ja": "let count: number = 0のように、名前の後ろにコロンを付けて型を明示的に書くことです。",
@@ -838,7 +1050,10 @@
       "term": "型推論",
       "reading": "かたすいろん",
       "romaji": "kata suiron",
-      "tag": "typescript",
+      "tags": [
+        "typescript"
+      ],
+      "level": 2,
       "meaning": "type inference",
       "desc_en": "The compiler working out a type on its own from the value or context, so you don't have to annotate everything.",
       "desc_ja": "値や文脈からコンパイラが自動的に型を判断することです。すべてに型注釈を書く必要はありません。",
@@ -850,7 +1065,10 @@
       "term": "型安全",
       "reading": "かたあんぜん",
       "romaji": "kata anzen",
-      "tag": "typescript",
+      "tags": [
+        "typescript"
+      ],
+      "level": 2,
       "meaning": "type safety",
       "desc_en": "A guarantee that values are only used in ways their types allow, so whole classes of bugs are caught before the code runs.",
       "desc_ja": "値がその型で許された方法でしか使われないことの保証です。多くの不具合を実行前に見つけられます。",
@@ -862,7 +1080,10 @@
       "term": "型検査",
       "reading": "かたけんさ",
       "romaji": "kata kensa",
-      "tag": "typescript",
+      "tags": [
+        "typescript"
+      ],
+      "level": 2,
       "meaning": "type checking",
       "desc_en": "Verifying that every expression is used consistently with its type; tsc does this at compile time.",
       "desc_ja": "すべての式が型に合った使われ方をしているか確かめることです。tscがコンパイル時に行います。",
@@ -874,7 +1095,10 @@
       "term": "静的型付け",
       "reading": "せいてきかたづけ",
       "romaji": "seiteki katazuke",
-      "tag": "typescript",
+      "tags": [
+        "typescript"
+      ],
+      "level": 2,
       "meaning": "static typing",
       "desc_en": "Types being checked before the program runs, as in TypeScript and Java, rather than while it runs.",
       "desc_ja": "プログラムの実行前に型をチェックする方式です。TypeScriptやJavaが該当します。",
@@ -886,7 +1110,10 @@
       "term": "動的型付け",
       "reading": "どうてきかたづけ",
       "romaji": "dōteki katazuke",
-      "tag": "typescript",
+      "tags": [
+        "typescript"
+      ],
+      "level": 2,
       "meaning": "dynamic typing",
       "desc_en": "Types being attached to values and checked only while the program runs, as in plain JavaScript or Python.",
       "desc_ja": "型が値に結び付き、実行中にだけチェックされる方式です。JavaScriptやPythonが該当します。",
@@ -898,7 +1125,10 @@
       "term": "構造的型付け",
       "reading": "こうぞうてきかたづけ",
       "romaji": "kōzōteki katazuke",
-      "tag": "typescript",
+      "tags": [
+        "typescript"
+      ],
+      "level": 3,
       "meaning": "structural typing",
       "desc_en": "Two types being compatible when they have the same shape, regardless of their names — how TypeScript compares types.",
       "desc_ja": "名前に関係なく、同じ形（プロパティの構成）を持っていれば互換とみなす方式です。TypeScriptはこの方式で型を比較します。",
@@ -910,7 +1140,10 @@
       "term": "公称型",
       "reading": "こうしょうがた",
       "romaji": "kōshōgata",
-      "tag": "typescript",
+      "tags": [
+        "typescript"
+      ],
+      "level": 3,
       "meaning": "nominal typing",
       "desc_en": "Types being compatible only when they share the same declared name, as in Java; TypeScript imitates it with branded types.",
       "desc_ja": "宣言された名前が同じ場合にだけ互換とみなす方式です。Javaが該当し、TypeScriptではブランド型で真似します。",
@@ -922,7 +1155,10 @@
       "term": "合併型",
       "reading": "がっぺいがた",
       "romaji": "gappeigata",
-      "tag": "typescript",
+      "tags": [
+        "typescript"
+      ],
+      "level": 2,
       "meaning": "union type",
       "desc_en": "A type that can be any one of several types, written with |, as in string | number.",
       "desc_ja": "string | numberのように|で書き、いくつかの型のうちどれか一つになれる型です。「ユニオン型」とも言います。",
@@ -934,7 +1170,10 @@
       "term": "交差型",
       "reading": "こうさがた",
       "romaji": "kōsagata",
-      "tag": "typescript",
+      "tags": [
+        "typescript"
+      ],
+      "level": 3,
       "meaning": "intersection type",
       "desc_en": "A type that has all the members of several types at once, written with &, as in A & B.",
       "desc_ja": "A & Bのように&で書き、複数の型のメンバーをすべて併せ持つ型です。",
@@ -946,7 +1185,10 @@
       "term": "部分型",
       "reading": "ぶぶんがた",
       "romaji": "bubungata",
-      "tag": "typescript",
+      "tags": [
+        "typescript"
+      ],
+      "level": 3,
       "meaning": "subtype",
       "desc_en": "A type that can be used wherever another type is expected, because it has at least everything that type requires.",
       "desc_ja": "別の型に必要なものをすべて持っているため、その型が期待される場所で使える型です。",
@@ -958,7 +1200,10 @@
       "term": "互換性",
       "reading": "ごかんせい",
       "romaji": "gokansei",
-      "tag": "typescript",
+      "tags": [
+        "typescript"
+      ],
+      "level": 2,
       "meaning": "compatibility (assignability)",
       "desc_en": "Whether a value of one type may be assigned to another; the compiler reports an error when the types aren't compatible.",
       "desc_ja": "ある型の値を別の型に代入できるかどうかです。互換性がなければコンパイラがエラーを出します。",
@@ -970,7 +1215,10 @@
       "term": "絞り込み",
       "reading": "しぼりこみ",
       "romaji": "shiborikomi",
-      "tag": "typescript",
+      "tags": [
+        "typescript"
+      ],
+      "level": 3,
       "meaning": "narrowing",
       "desc_en": "The compiler refining a broad type to a more specific one inside a branch, after a check like typeof or in.",
       "desc_ja": "typeofやinなどのチェックの後、分岐の中で広い型をより具体的な型にすることです。",
@@ -982,7 +1230,10 @@
       "term": "型述語",
       "reading": "かたじゅつご",
       "romaji": "kata jutsugo",
-      "tag": "typescript",
+      "tags": [
+        "typescript"
+      ],
+      "level": 3,
       "meaning": "type predicate",
       "desc_en": "A return type of the form value is Type, telling the compiler the argument's type whenever the function returns true.",
       "desc_ja": "value is Typeという形の戻り値の型です。関数がtrueを返したとき、引数の型をコンパイラに伝えます。",
@@ -994,7 +1245,10 @@
       "term": "網羅性",
       "reading": "もうらせい",
       "romaji": "mōrasei",
-      "tag": "typescript",
+      "tags": [
+        "typescript"
+      ],
+      "level": 3,
       "meaning": "exhaustiveness",
       "desc_en": "Every possible case of a union being handled; assigning the leftover value to never makes the compiler check it.",
       "desc_ja": "合併型のすべての場合を処理していることです。残りの値をnever型に代入すると、コンパイラが確認してくれます。",
@@ -1006,7 +1260,10 @@
       "term": "判別可能",
       "reading": "はんべつかのう",
       "romaji": "hanbetsu kanō",
-      "tag": "typescript",
+      "tags": [
+        "typescript"
+      ],
+      "level": 3,
       "meaning": "discriminated (union)",
       "desc_en": "Describes a union whose members share a literal tag property, like kind, so checking that property narrows to one member.",
       "desc_ja": "kindのような共通のリテラル型プロパティを持つ合併型のことです。そのプロパティを調べると一つの型に絞り込めます。",
@@ -1018,7 +1275,10 @@
       "term": "条件型",
       "reading": "じょうけんがた",
       "romaji": "jōkengata",
-      "tag": "typescript",
+      "tags": [
+        "typescript"
+      ],
+      "level": 3,
       "meaning": "conditional type",
       "desc_en": "A type that chooses between two types based on a test, written T extends U ? X : Y.",
       "desc_ja": "T extends U ? X : Yと書き、条件によって二つの型のどちらかを選ぶ型です。",
@@ -1030,7 +1290,11 @@
       "term": "型引数",
       "reading": "かたひきすう",
       "romaji": "kata hikisū",
-      "tag": "typescript",
+      "tags": [
+        "typescript",
+        "java"
+      ],
+      "level": 2,
       "meaning": "type argument",
       "desc_en": "The concrete type supplied to a generic, as in Array<string> or useState<number>(0).",
       "desc_ja": "Array<string>やuseState<number>(0)のように、総称型に渡す具体的な型です。",
@@ -1042,7 +1306,10 @@
       "term": "型表明",
       "reading": "かたひょうめい",
       "romaji": "kata hyōmei",
-      "tag": "typescript",
+      "tags": [
+        "typescript"
+      ],
+      "level": 3,
       "meaning": "type assertion",
       "desc_en": "Telling the compiler to treat a value as a specific type with as — it overrides checking and can hide real mistakes.",
       "desc_ja": "asを使って、値を特定の型として扱うようコンパイラに伝えることです。型検査を上書きするため、誤りを隠すことがあります。",
@@ -1054,7 +1321,10 @@
       "term": "読み取り専用",
       "reading": "よみとりせんよう",
       "romaji": "yomitori sen'yō",
-      "tag": "typescript",
+      "tags": [
+        "typescript"
+      ],
+      "level": 2,
       "meaning": "read-only",
       "desc_en": "A property or array that can't be reassigned after creation, marked with readonly or ReadonlyArray.",
       "desc_ja": "readonlyやReadonlyArrayで指定する、生成後に書き換えられないプロパティや配列です。",
@@ -1066,7 +1336,10 @@
       "term": "省略可能",
       "reading": "しょうりゃくかのう",
       "romaji": "shōryaku kanō",
-      "tag": "typescript",
+      "tags": [
+        "typescript"
+      ],
+      "level": 2,
       "meaning": "optional",
       "desc_en": "A property or parameter that may be left out, marked with ?, whose type then includes undefined.",
       "desc_ja": "?を付けて指定する、省略してもよいプロパティや引数です。型にはundefinedが含まれます。",
@@ -1078,7 +1351,10 @@
       "term": "未定義",
       "reading": "みていぎ",
       "romaji": "miteigi",
-      "tag": "typescript",
+      "tags": [
+        "typescript"
+      ],
+      "level": 1,
       "meaning": "undefined",
       "desc_en": "The state of having no value assigned yet; in TypeScript, the value and type undefined.",
       "desc_ja": "値がまだ設定されていない状態です。TypeScriptではundefinedという値と型で表します。",
@@ -1090,7 +1366,10 @@
       "term": "厳格",
       "reading": "げんかく",
       "romaji": "genkaku",
-      "tag": "typescript",
+      "tags": [
+        "typescript"
+      ],
+      "level": 2,
       "meaning": "strict",
       "desc_en": "Stricter compiler checking, turned on with \"strict\": true in tsconfig, which enables null checks and forbids implicit any.",
       "desc_ja": "tsconfigで\"strict\": trueにすると有効になる、より厳しい型チェックです。nullチェックや暗黙のanyの禁止などが含まれます。",
@@ -1102,7 +1381,11 @@
       "term": "非同期",
       "reading": "ひどうき",
       "romaji": "hidōki",
-      "tag": "typescript",
+      "tags": [
+        "typescript",
+        "java"
+      ],
+      "level": 2,
       "meaning": "asynchronous",
       "desc_en": "Work that finishes later without blocking the rest of the program, handled with Promises and async/await.",
       "desc_ja": "他の処理を止めずに、後で完了する処理のことです。Promiseやasync/awaitで扱います。",
@@ -1114,7 +1397,10 @@
       "term": "待機",
       "reading": "たいき",
       "romaji": "taiki",
-      "tag": "typescript",
+      "tags": [
+        "typescript"
+      ],
+      "level": 2,
       "meaning": "waiting (await)",
       "desc_en": "Pausing an async function until a Promise settles, with the await keyword, without blocking the thread.",
       "desc_ja": "awaitキーワードで、Promiseが完了するまで非同期関数の実行を一時停止することです。スレッドはブロックされません。",
@@ -1126,7 +1412,11 @@
       "term": "並列",
       "reading": "へいれつ",
       "romaji": "heiretsu",
-      "tag": "typescript",
+      "tags": [
+        "typescript",
+        "java"
+      ],
+      "level": 1,
       "meaning": "parallel",
       "desc_en": "Several tasks running at the same time; Promise.all starts async work together instead of one after another.",
       "desc_ja": "複数の処理を同時に進めることです。Promise.allを使うと、非同期処理を順番ではなく一緒に開始できます。",
@@ -1138,7 +1428,10 @@
       "term": "分割代入",
       "reading": "ぶんかつだいにゅう",
       "romaji": "bunkatsu dainyū",
-      "tag": "typescript",
+      "tags": [
+        "typescript"
+      ],
+      "level": 2,
       "meaning": "destructuring assignment",
       "desc_en": "Unpacking the properties of an object or the items of an array into separate variables, as in const { id, name } = user.",
       "desc_ja": "const { id, name } = userのように、オブジェクトのプロパティや配列の要素を個別の変数に取り出すことです。",
@@ -1150,7 +1443,10 @@
       "term": "展開構文",
       "reading": "てんかいこうぶん",
       "romaji": "tenkai kōbun",
-      "tag": "typescript",
+      "tags": [
+        "typescript"
+      ],
+      "level": 2,
       "meaning": "spread syntax",
       "desc_en": "Using ... to expand an array or object into individual elements or properties, as in [...a, ...b].",
       "desc_ja": "[...a, ...b]のように...を使って、配列やオブジェクトを個々の要素やプロパティに展開する構文です。",
@@ -1162,7 +1458,10 @@
       "term": "残余引数",
       "reading": "ざんよひきすう",
       "romaji": "zan'yo hikisū",
-      "tag": "typescript",
+      "tags": [
+        "typescript"
+      ],
+      "level": 3,
       "meaning": "rest parameters",
       "desc_en": "A final parameter written ...args that gathers any number of remaining arguments into an array.",
       "desc_ja": "...argsのように最後の引数に書き、残りの引数をすべて配列にまとめるものです。",
@@ -1174,7 +1473,10 @@
       "term": "既定値",
       "reading": "きていち",
       "romaji": "kiteichi",
-      "tag": "typescript",
+      "tags": [
+        "typescript"
+      ],
+      "level": 2,
       "meaning": "default value",
       "desc_en": "The value a parameter or property takes when none is supplied, as in function greet(name = \"world\").",
       "desc_ja": "値が渡されなかったときに使われる値です。function greet(name = \"world\")のように書きます。",
@@ -1186,7 +1488,10 @@
       "term": "名前空間",
       "reading": "なまえくうかん",
       "romaji": "namae kūkan",
-      "tag": "typescript",
+      "tags": [
+        "typescript"
+      ],
+      "level": 3,
       "meaning": "namespace",
       "desc_en": "A named scope that groups related declarations to avoid name collisions; modern TypeScript mostly uses ES modules instead.",
       "desc_ja": "関連する宣言をまとめて名前の衝突を避けるための範囲です。現在のTypeScriptでは主にESモジュールが使われます。",
@@ -1198,7 +1503,11 @@
       "term": "依存関係",
       "reading": "いぞんかんけい",
       "romaji": "izon kankei",
-      "tag": "typescript",
+      "tags": [
+        "typescript",
+        "java"
+      ],
+      "level": 2,
       "meaning": "dependencies",
       "desc_en": "The packages a project needs, listed in package.json under dependencies and devDependencies.",
       "desc_ja": "プロジェクトが必要とするパッケージのことです。package.jsonのdependenciesとdevDependenciesに書かれます。",
@@ -1210,7 +1519,11 @@
       "term": "実行時",
       "reading": "じっこうじ",
       "romaji": "jikkōji",
-      "tag": "typescript",
+      "tags": [
+        "typescript",
+        "java"
+      ],
+      "level": 1,
       "meaning": "runtime",
       "desc_en": "While the program is actually running. TypeScript's types are erased by then, so runtime checks need real JavaScript code.",
       "desc_ja": "プログラムが実際に動いている間のことです。TypeScriptの型はその時点で消えているため、実行時のチェックにはJavaScriptのコードが必要です。",

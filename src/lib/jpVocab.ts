@@ -44,20 +44,50 @@ export function matchesQuery(w: JpVocabWord, query: string): boolean {
   );
 }
 
-/** The words the menu shows for a tag filter and a search string, in seed order. */
+/** "all", or one of the three difficulty levels. */
+export type LevelFilter = "all" | 1 | 2 | 3;
+
+export const LEVELS: { id: 1 | 2 | 3; label: string; hint: string }[] = [
+  { id: 1, label: "1", hint: "Everyday — the words you meet first" },
+  { id: 2, label: "2", hint: "Textbook — the standard technical vocabulary" },
+  { id: 3, label: "3", hint: "Specialist — interview and deep-reading words" },
+];
+
+/** The words the menu shows for a tag, a level and a search string, in seed
+ * order. A word matches the tag filter if *any* of its tags does. */
 export function filterVocab(
   words: JpVocabWord[],
   tag: VocabTagFilter,
-  query: string
+  query: string,
+  level: LevelFilter = "all"
 ): JpVocabWord[] {
-  return words.filter((w) => (tag === "all" || w.tag === tag) && matchesQuery(w, query));
+  return words.filter(
+    (w) =>
+      (tag === "all" || w.tags.includes(tag)) &&
+      (level === "all" || w.level === level) &&
+      matchesQuery(w, query)
+  );
 }
 
-/** How many words carry each tag, plus an "all" total. */
+/** How many words carry each tag, plus an "all" total. A word with two tags is
+ * counted once under each — the counts total more than the list, on purpose. */
 export function tagCounts(words: JpVocabWord[]): Record<string, number> {
   const out: Record<string, number> = { all: words.length };
-  for (const w of words) out[w.tag] = (out[w.tag] ?? 0) + 1;
+  for (const w of words) for (const t of w.tags) out[t] = (out[t] ?? 0) + 1;
   return out;
+}
+
+/** How many words sit at each level, plus an "all" total. */
+export function levelCounts(words: JpVocabWord[]): Record<string, number> {
+  const out: Record<string, number> = { all: words.length };
+  for (const w of words) out[w.level] = (out[w.level] ?? 0) + 1;
+  return out;
+}
+
+/** Easiest first, seed order preserved within a level — what a study session
+ * hands you when you have expressed no other preference. */
+export function byLevel(words: JpVocabWord[]): JpVocabWord[] {
+  return [...words].sort((a, b) => a.level - b.level);
 }
 
 /** Split a sentence around every occurrence of `term`, marking which pieces are

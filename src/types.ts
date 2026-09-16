@@ -203,7 +203,10 @@ export interface JpVocabWord {
   /** Hiragana reading. */
   reading: string;
   romaji: string;
-  tag: string;
+  /** Every tag the word carries; a word can sit under more than one. */
+  tags: string[];
+  /** 1 everyday · 2 textbook · 3 specialist. */
+  level: number;
   meaning: string;
   desc_en: string;
   desc_ja: string;
