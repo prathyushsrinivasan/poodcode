@@ -1159,6 +1159,280 @@
       "example_en": "With varargs you don't have to fix the number of arguments."
     },
     {
+      "id": "kyokusho-hensu",
+      "term": "局所変数",
+      "reading": "きょくしょへんすう",
+      "romaji": "kyokusho hensū",
+      "tags": [
+        "java"
+      ],
+      "level": 2,
+      "meaning": "local variable",
+      "desc_en": "A variable declared inside a method, which exists only while that call is running and must be assigned before it is read.",
+      "desc_ja": "メソッドの中で宣言される変数です。その呼び出しの間だけ存在し、読む前に必ず代入しておく必要があります。",
+      "example_ja": "局所変数はスレッド間で共有されません。",
+      "example_ruby": "[局所変数|きょくしょへんすう]はスレッド間で共有されません。",
+      "example_en": "Local variables are not shared between threads."
+    },
+    {
+      "id": "jittai",
+      "term": "実体",
+      "reading": "じったい",
+      "romaji": "jittai",
+      "tags": [
+        "java"
+      ],
+      "level": 2,
+      "meaning": "instance (the actual object)",
+      "desc_en": "The concrete object a reference points at, as opposed to the declared type of the variable holding it.",
+      "desc_ja": "参照が指している具体的なオブジェクトのことです。それを保持する変数の宣言された型とは区別します。",
+      "example_ja": "変数の型ではなく実体の型でメソッドが選ばれます。",
+      "example_ruby": "[変数|へんすう]の型ではなく[実体|じったい]の型でメソッドが選ばれます。",
+      "example_en": "The method is chosen by the instance's type, not the variable's."
+    },
+    {
+      "id": "keisho-kaiso",
+      "term": "継承階層",
+      "reading": "けいしょうかいそう",
+      "romaji": "keishō kaisō",
+      "tags": [
+        "java"
+      ],
+      "level": 2,
+      "meaning": "inheritance hierarchy",
+      "desc_en": "The tree of classes formed by extends. Deep ones are hard to follow, which is a large part of why composition is usually preferred.",
+      "desc_ja": "extendsによって作られるクラスの木です。深くなると追いにくくなり、合成が好まれる理由の一つになっています。",
+      "example_ja": "継承階層が深すぎて、どこで再定義されたのか分かりません。",
+      "example_ruby": "[継承階層|けいしょうかいそう]が深すぎて、どこで再定義されたのか分かりません。",
+      "example_en": "The inheritance hierarchy is so deep you can't tell where it was overridden."
+    },
+    {
+      "id": "jogen-kyokai",
+      "term": "上限境界",
+      "reading": "じょうげんきょうかい",
+      "romaji": "jōgen kyōkai",
+      "tags": [
+        "java"
+      ],
+      "level": 3,
+      "meaning": "upper bound",
+      "desc_en": "A limit on a type parameter written <T extends Number>, so the code may use what that type guarantees.",
+      "desc_ja": "<T extends Number>のように型引数に付ける制限です。その型が保証するものをコードの中で使えるようになります。",
+      "example_ja": "上限境界を付ければ、Tの比較ができます。",
+      "example_ruby": "[上限境界|じょうげんきょうかい]を付ければ、Tの[比較|ひかく]ができます。",
+      "example_en": "With an upper bound you can compare values of T."
+    },
+    {
+      "id": "kagen-kyokai",
+      "term": "下限境界",
+      "reading": "かげんきょうかい",
+      "romaji": "kagen kyōkai",
+      "tags": [
+        "java"
+      ],
+      "level": 3,
+      "meaning": "lower bound",
+      "desc_en": "The opposite limit, written <? super T> — a container you can safely write a T into.",
+      "desc_ja": "<? super T>と書く逆向きの制限です。Tを安全に書き込める入れ物であることを表します。",
+      "example_ja": "下限境界は書き込み側に使います。",
+      "example_ruby": "[下限境界|かげんきょうかい]は書き込み側に使います。",
+      "example_en": "A lower bound is for the writing side."
+    },
+    {
+      "id": "mugen-saiki",
+      "term": "無限再帰",
+      "reading": "むげんさいき",
+      "romaji": "mugen saiki",
+      "tags": [
+        "java"
+      ],
+      "level": 2,
+      "meaning": "infinite recursion",
+      "desc_en": "Recursion with no reachable base case, which runs until the call stack is exhausted.",
+      "desc_ja": "基底ケースに到達しない再帰です。呼び出し履歴を使い切るまで動き続けます。",
+      "example_ja": "基底ケースを忘れると無限再帰になります。",
+      "example_ruby": "基底ケースを忘れると[無限再帰|むげんさいき]になります。",
+      "example_en": "Forget the base case and you get infinite recursion."
+    },
+    {
+      "id": "jikkoji-reigai",
+      "term": "実行時例外",
+      "reading": "じっこうじれいがい",
+      "romaji": "jikkōji reigai",
+      "tags": [
+        "java"
+      ],
+      "level": 2,
+      "meaning": "runtime exception",
+      "desc_en": "An exception the compiler does not force you to handle — usually a bug, such as dereferencing null or indexing out of bounds.",
+      "desc_ja": "コンパイラが処理を強制しない例外です。nullの参照や範囲外の添字など、多くは不具合そのものを表します。",
+      "example_ja": "実行時例外は捕捉するより、起きないように直します。",
+      "example_ruby": "[実行時例外|じっこうじれいがい]は捕捉するより、起きないように直します。",
+      "example_en": "A runtime exception is better prevented than caught."
+    },
+    {
+      "id": "hikensa-reigai",
+      "term": "非検査例外",
+      "reading": "ひけんされいがい",
+      "romaji": "hikensa reigai",
+      "tags": [
+        "java"
+      ],
+      "level": 3,
+      "meaning": "unchecked exception",
+      "desc_en": "The formal name for that group — RuntimeException and its subclasses, which need no throws clause.",
+      "desc_ja": "実行時例外のまとまりを指す正式な呼び方です。RuntimeExceptionとその子クラスで、throws宣言は不要です。",
+      "example_ja": "非検査例外にはthrowsを書かなくてかまいません。",
+      "example_ruby": "[非検査例外|ひけんされいがい]にはthrowsを書かなくてかまいません。",
+      "example_en": "You don't have to declare an unchecked exception with throws."
+    },
+    {
+      "id": "reigai-rensa",
+      "term": "例外連鎖",
+      "reading": "れいがいれんさ",
+      "romaji": "reigai rensa",
+      "tags": [
+        "java"
+      ],
+      "level": 3,
+      "meaning": "exception chaining",
+      "desc_en": "Wrapping a caught exception in another while keeping the original as its cause, so the stack trace still shows where it began.",
+      "desc_ja": "捕捉した例外を別の例外で包み、元の例外を原因として保持することです。呼び出し履歴に最初の発生場所が残ります。",
+      "example_ja": "例外連鎖を使えば、元の原因を失いません。",
+      "example_ruby": "[例外連鎖|れいがいれんさ]を使えば、元の原因を失いません。",
+      "example_en": "Exception chaining means you don't lose the original cause."
+    },
+    {
+      "id": "shokikashi",
+      "term": "初期化子",
+      "reading": "しょきかし",
+      "romaji": "shokikashi",
+      "tags": [
+        "java"
+      ],
+      "level": 3,
+      "meaning": "initializer block",
+      "desc_en": "A braced block that runs when an instance is created, before the constructor body.",
+      "desc_ja": "インスタンスの生成時に、コンストラクタの本体より先に実行される波括弧のブロックです。",
+      "example_ja": "初期化子は全てのコンストラクタで実行されます。",
+      "example_ruby": "[初期化子|しょきかし]は全てのコンストラクタで[実行|じっこう]されます。",
+      "example_en": "An initializer block runs for every constructor."
+    },
+    {
+      "id": "seiteki-shokika",
+      "term": "静的初期化",
+      "reading": "せいてきしょきか",
+      "romaji": "seiteki shokika",
+      "tags": [
+        "java"
+      ],
+      "level": 3,
+      "meaning": "static initialization",
+      "desc_en": "Work done once when the class is first loaded, rather than per instance.",
+      "desc_ja": "インスタンスごとではなく、クラスが最初に読み込まれるときに一度だけ行われる処理です。",
+      "example_ja": "定数表は静的初期化で一度だけ作ります。",
+      "example_ruby": "定数表は[静的初期化|せいてきしょきか]で一度だけ作ります。",
+      "example_en": "The constant table is built once in static initialization."
+    },
+    {
+      "id": "gyoshudo",
+      "term": "凝集度",
+      "reading": "ぎょうしゅうど",
+      "romaji": "gyōshūdo",
+      "tags": [
+        "java"
+      ],
+      "level": 3,
+      "meaning": "cohesion",
+      "desc_en": "How closely the parts of one class belong together. High cohesion means the class does one thing.",
+      "desc_ja": "一つのクラスの要素がどれだけ密接に関係しているかです。凝集度が高いとは、そのクラスが一つのことだけをしているということです。",
+      "example_ja": "凝集度の高いクラスは説明が一文で済みます。",
+      "example_ruby": "[凝集度|ぎょうしゅうど]の高いクラスは説明が一文で済みます。",
+      "example_en": "A class with high cohesion can be described in one sentence."
+    },
+    {
+      "id": "ketsugodo",
+      "term": "結合度",
+      "reading": "けつごうど",
+      "romaji": "ketsugōdo",
+      "tags": [
+        "java"
+      ],
+      "level": 3,
+      "meaning": "coupling",
+      "desc_en": "How much one class depends on the internals of another. Low coupling is what lets you change one without breaking the other.",
+      "desc_ja": "あるクラスが別のクラスの内部にどれだけ依存しているかです。結合度が低いほど、片方を変えても壊れません。",
+      "example_ja": "結合度を下げるために、実装ではなく型に依存させます。",
+      "example_ruby": "[結合度|けつごうど]を下げるために、[実装|じっそう]ではなく型に依存させます。",
+      "example_en": "To lower coupling, depend on the type rather than the implementation."
+    },
+    {
+      "id": "tan-itsu-sekinin",
+      "term": "単一責任",
+      "reading": "たんいつせきにん",
+      "romaji": "tan'itsu sekinin",
+      "tags": [
+        "java"
+      ],
+      "level": 2,
+      "meaning": "single responsibility",
+      "desc_en": "The principle that a class should have one reason to change — the practical test being whether you can name what it does without \"and\".",
+      "desc_ja": "クラスが変更される理由は一つであるべきだという原則です。「〜と〜をする」と言わずに説明できるかが目安になります。",
+      "example_ja": "単一責任の原則から、このクラスは分けるべきです。",
+      "example_ruby": "[単一責任|たんいつせきにん]の原則から、このクラスは分けるべきです。",
+      "example_en": "By the single-responsibility principle, this class should be split."
+    },
+    {
+      "id": "kadokusei",
+      "term": "可読性",
+      "reading": "かどくせい",
+      "romaji": "kadokusei",
+      "tags": [
+        "java",
+        "workplace"
+      ],
+      "level": 1,
+      "meaning": "readability",
+      "desc_en": "How easily the next person can tell what the code does. Usually worth more than brevity.",
+      "desc_ja": "次に読む人がコードの意図をどれだけ簡単に理解できるかです。多くの場合、短さより価値があります。",
+      "example_ja": "短く書くより可読性を優先してください。",
+      "example_ruby": "短く書くより[可読性|かどくせい]を優先してください。",
+      "example_en": "Please prefer readability over writing it short."
+    },
+    {
+      "id": "hoshusei",
+      "term": "保守性",
+      "reading": "ほしゅせい",
+      "romaji": "hoshusei",
+      "tags": [
+        "java",
+        "workplace"
+      ],
+      "level": 2,
+      "meaning": "maintainability",
+      "desc_en": "How cheaply the code can be changed later — which is most of what it costs over its life.",
+      "desc_ja": "後から変更するのがどれだけ容易かということです。コードの一生にかかる費用の大半はここです。",
+      "example_ja": "試験があると保守性が大きく上がります。",
+      "example_ruby": "[試験|しけん]があると[保守性|ほしゅせい]が大きく上がります。",
+      "example_en": "Having tests raises maintainability a great deal."
+    },
+    {
+      "id": "sairiyosei",
+      "term": "再利用性",
+      "reading": "さいりようせい",
+      "romaji": "sairiyōsei",
+      "tags": [
+        "java"
+      ],
+      "level": 2,
+      "meaning": "reusability",
+      "desc_en": "How readily a piece can be used again elsewhere — helped by narrow dependencies, hurt by hidden assumptions.",
+      "desc_ja": "ある部品を別の場所でどれだけ使い回せるかです。依存が少ないほど高まり、隠れた前提があるほど下がります。",
+      "example_ja": "この処理は汎用的で再利用性が高いです。",
+      "example_ruby": "この[処理|しょり]は汎用的で[再利用性|さいりようせい]が高いです。",
+      "example_en": "This routine is general, so its reusability is high."
+    },
+    {
       "id": "hairetsu",
       "term": "配列",
       "reading": "はいれつ",
@@ -2285,6 +2559,278 @@
       "example_en": "We lay the state transitions out in a table."
     },
     {
+      "id": "kumiawase",
+      "term": "組み合わせ",
+      "reading": "くみあわせ",
+      "romaji": "kumiawase",
+      "tags": [
+        "problems"
+      ],
+      "level": 2,
+      "meaning": "combination",
+      "desc_en": "A selection where order does not matter — n things taken k at a time, written C(n, k).",
+      "desc_ja": "順序を区別しない選び方です。n個からk個を選ぶ場合の数をC(n, k)と書きます。",
+      "example_ja": "順列と違い、組み合わせでは順序を区別しません。",
+      "example_ruby": "順列と違い、[組み合わせ|くみあわせ]では順序を区別しません。",
+      "example_en": "Unlike a permutation, order doesn't matter in a combination."
+    },
+    {
+      "id": "niko-keisu",
+      "term": "二項係数",
+      "reading": "にこうけいすう",
+      "romaji": "nikō keisū",
+      "tags": [
+        "problems"
+      ],
+      "level": 3,
+      "meaning": "binomial coefficient",
+      "desc_en": "The number of combinations C(n, k), which is also each entry of Pascal's triangle.",
+      "desc_ja": "組み合わせの数C(n, k)のことです。パスカルの三角形の各項でもあります。",
+      "example_ja": "二項係数は前計算しておくと速くなります。",
+      "example_ruby": "[二項係数|にこうけいすう]は前計算しておくと速くなります。",
+      "example_en": "Precomputing the binomial coefficients makes it fast."
+    },
+    {
+      "id": "soinsu-bunkai",
+      "term": "素因数分解",
+      "reading": "そいんすうぶんかい",
+      "romaji": "soinsū bunkai",
+      "tags": [
+        "problems"
+      ],
+      "level": 3,
+      "meaning": "prime factorization",
+      "desc_en": "Writing a number as a product of primes — found by trial division up to the square root.",
+      "desc_ja": "ある数を素数の積の形に表すことです。平方根までの試し割りで求められます。",
+      "example_ja": "素因数分解は平方根までで十分です。",
+      "example_ruby": "[素因数分解|そいんすうぶんかい]は平方根までで十分です。",
+      "example_en": "For prime factorization, going up to the square root is enough."
+    },
+    {
+      "id": "saisho-kobaisu",
+      "term": "最小公倍数",
+      "reading": "さいしょうこうばいすう",
+      "romaji": "saishō kōbaisū",
+      "tags": [
+        "problems"
+      ],
+      "level": 2,
+      "meaning": "least common multiple",
+      "desc_en": "The smallest number both values divide into, computed as a * b / gcd(a, b).",
+      "desc_ja": "二つの数のどちらでも割り切れる最小の数です。a * b / 最大公約数で求められます。",
+      "example_ja": "最小公倍数は最大公約数から計算できます。",
+      "example_ruby": "[最小公倍数|さいしょうこうばいすう]は[最大|さいだい]公約数から計算できます。",
+      "example_en": "The least common multiple follows from the greatest common divisor."
+    },
+    {
+      "id": "tagai-ni-so",
+      "term": "互いに素",
+      "reading": "たがいにそ",
+      "romaji": "tagai ni so",
+      "tags": [
+        "problems"
+      ],
+      "level": 3,
+      "meaning": "coprime",
+      "desc_en": "Sharing no common divisor beyond 1 — that is, having a greatest common divisor of 1.",
+      "desc_ja": "1以外に共通の約数を持たないことです。つまり最大公約数が1である関係です。",
+      "example_ja": "分数を約分すると分子と分母は互いに素になります。",
+      "example_ruby": "分数を約分すると分子と分母は[互いに素|たがいにそ]になります。",
+      "example_en": "Reducing a fraction leaves the numerator and denominator coprime."
+    },
+    {
+      "id": "joyo",
+      "term": "剰余",
+      "reading": "じょうよ",
+      "romaji": "jōyo",
+      "tags": [
+        "problems"
+      ],
+      "level": 2,
+      "meaning": "modulo",
+      "desc_en": "The remainder operation itself, written %. The formal counterpart of the everyday 余り.",
+      "desc_ja": "%で表される剰余算のことです。日常語の「余り」に対する、より形式的な言い方です。",
+      "example_ja": "剰余を取ると値が範囲内に収まります。",
+      "example_ruby": "[剰余|じょうよ]を取ると値が範囲内に収まります。",
+      "example_en": "Taking the modulo keeps the value inside the range."
+    },
+    {
+      "id": "yuko",
+      "term": "有向",
+      "reading": "ゆうこう",
+      "romaji": "yūkō",
+      "tags": [
+        "problems"
+      ],
+      "level": 2,
+      "meaning": "directed",
+      "desc_en": "Describes a graph whose edges have a direction: an edge from a to b need not allow b to a.",
+      "desc_ja": "辺に向きがあるグラフを指します。aからbへの辺があっても、bからaへ行けるとは限りません。",
+      "example_ja": "有向グラフでは閉路の判定方法が変わります。",
+      "example_ruby": "[有向|ゆうこう]グラフでは閉路の[判定|はんてい]方法が変わります。",
+      "example_en": "Cycle detection works differently in a directed graph."
+    },
+    {
+      "id": "muko",
+      "term": "無向",
+      "reading": "むこう",
+      "romaji": "mukō",
+      "tags": [
+        "problems"
+      ],
+      "level": 2,
+      "meaning": "undirected",
+      "desc_en": "Describes a graph whose edges go both ways.",
+      "desc_ja": "辺に向きがなく、どちらの方向にも進めるグラフを指します。",
+      "example_ja": "無向グラフの連結成分は素集合で数えられます。",
+      "example_ruby": "[無向|むこう]グラフの連結成分は素集合で数えられます。",
+      "example_en": "Connected components of an undirected graph can be counted with a disjoint set."
+    },
+    {
+      "id": "omomi",
+      "term": "重み",
+      "reading": "おもみ",
+      "romaji": "omomi",
+      "tags": [
+        "problems"
+      ],
+      "level": 1,
+      "meaning": "weight",
+      "desc_en": "A cost attached to an edge. With weights, the shortest path is no longer simply the fewest edges.",
+      "desc_ja": "辺に付いている費用のことです。重みがある場合、最短経路は辺の本数が最も少ない道とは限りません。",
+      "example_ja": "重みがあるので幅優先探索では解けません。",
+      "example_ruby": "[重み|おもみ]があるので幅優先探索では解けません。",
+      "example_en": "There are weights, so breadth-first search won't solve it."
+    },
+    {
+      "id": "jokai",
+      "term": "上界",
+      "reading": "じょうかい",
+      "romaji": "jōkai",
+      "tags": [
+        "problems"
+      ],
+      "level": 3,
+      "meaning": "upper bound (of a value)",
+      "desc_en": "A value nothing in a set exceeds — the ceiling a binary search over answers narrows down from.",
+      "desc_ja": "その集合のどの値も超えない値です。答えを二分探索するとき、上から絞っていく側の端になります。",
+      "example_ja": "答えの上界を決めてから二分探索します。",
+      "example_ruby": "答えの[上界|じょうかい]を決めてから二分探索します。",
+      "example_en": "Fix an upper bound for the answer, then binary search."
+    },
+    {
+      "id": "kakai",
+      "term": "下界",
+      "reading": "かかい",
+      "romaji": "kakai",
+      "tags": [
+        "problems"
+      ],
+      "level": 3,
+      "meaning": "lower bound (of a value)",
+      "desc_en": "The matching floor — the smallest value worth considering.",
+      "desc_ja": "反対側の端で、考える必要のある最小の値です。",
+      "example_ja": "下界は1、上界は配列の最大値にします。",
+      "example_ruby": "[下界|かかい]は1、上界は配列の[最大|さいだい]値にします。",
+      "example_en": "Take 1 as the lower bound and the array's maximum as the upper."
+    },
+    {
+      "id": "heigo",
+      "term": "併合",
+      "reading": "へいごう",
+      "romaji": "heigō",
+      "tags": [
+        "problems"
+      ],
+      "level": 2,
+      "meaning": "merging",
+      "desc_en": "Combining two ordered sequences into one that is still ordered — the step merge sort is named for.",
+      "desc_ja": "整列済みの二つの並びを、順序を保ったまま一つにまとめることです。マージソートの名前の由来になっている操作です。",
+      "example_ja": "二つの整列済み配列を併合します。",
+      "example_ruby": "二つの整列済み配列を[併合|へいごう]します。",
+      "example_en": "We merge the two sorted arrays."
+    },
+    {
+      "id": "tentosu",
+      "term": "転倒数",
+      "reading": "てんとうすう",
+      "romaji": "tentōsū",
+      "tags": [
+        "problems"
+      ],
+      "level": 3,
+      "meaning": "inversion count",
+      "desc_en": "How many pairs are out of order — a measure of how far a sequence is from sorted, countable while merging.",
+      "desc_ja": "順序が逆になっている組の個数です。並びが整列状態からどれだけ離れているかを表し、併合の途中で数えられます。",
+      "example_ja": "転倒数はマージソートの過程で数えられます。",
+      "example_ruby": "[転倒数|てんとうすう]はマージソートの過程で数えられます。",
+      "example_en": "The inversion count can be tallied during merge sort."
+    },
+    {
+      "id": "bunshi-gentei",
+      "term": "分枝限定",
+      "reading": "ぶんしげんてい",
+      "romaji": "bunshi gentei",
+      "tags": [
+        "problems"
+      ],
+      "level": 3,
+      "meaning": "branch and bound",
+      "desc_en": "Searching with a running best answer, abandoning any branch whose bound proves it cannot beat it.",
+      "desc_ja": "その時点での最良の答えを持ちながら探索し、それを超えられないと分かった枝を打ち切る方法です。",
+      "example_ja": "分枝限定法は枝刈りを費用の評価で行います。",
+      "example_ruby": "[分枝限定|ぶんしげんてい]法は枝刈りを費用の評価で行います。",
+      "example_en": "Branch and bound prunes using an estimate of the cost."
+    },
+    {
+      "id": "zahyo-asshuku",
+      "term": "座標圧縮",
+      "reading": "ざひょうあっしゅく",
+      "romaji": "zahyō asshuku",
+      "tags": [
+        "problems"
+      ],
+      "level": 3,
+      "meaning": "coordinate compression",
+      "desc_en": "Replacing large or sparse values with their rank, so an array can be indexed by them.",
+      "desc_ja": "大きな値や飛び飛びの値を順位に置き換え、配列の添字として使えるようにすることです。",
+      "example_ja": "値が大きいので座標圧縮してから数えます。",
+      "example_ruby": "値が大きいので[座標圧縮|ざひょうあっしゅく]してから数えます。",
+      "example_en": "The values are large, so we compress the coordinates before counting."
+    },
+    {
+      "id": "keiro-asshuku",
+      "term": "経路圧縮",
+      "reading": "けいろあっしゅく",
+      "romaji": "keiro asshuku",
+      "tags": [
+        "problems"
+      ],
+      "level": 3,
+      "meaning": "path compression",
+      "desc_en": "Pointing every node visited during a find straight at the root, which is what makes union-find nearly constant time.",
+      "desc_ja": "検索の途中で通った節点を直接根に繋ぎ直すことです。素集合データ構造がほぼ定数時間になる理由です。",
+      "example_ja": "経路圧縮を入れると素集合の操作が速くなります。",
+      "example_ruby": "[経路圧縮|けいろあっしゅく]を入れると素集合の[操作|そうさ]が速くなります。",
+      "example_en": "With path compression, disjoint-set operations get fast."
+    },
+    {
+      "id": "chien-denpa",
+      "term": "遅延伝播",
+      "reading": "ちえんでんぱ",
+      "romaji": "chien denpa",
+      "tags": [
+        "problems"
+      ],
+      "level": 3,
+      "meaning": "lazy propagation",
+      "desc_en": "Recording a pending update on a segment-tree node and pushing it down only when that part is actually visited.",
+      "desc_ja": "区間に対する更新を節点に保留として記録し、その部分を実際に訪れたときにだけ子へ押し下げる手法です。",
+      "example_ja": "区間更新には遅延伝播が必要です。",
+      "example_ruby": "区間更新には[遅延伝播|ちえんでんぱ]が[必要|ひつよう]です。",
+      "example_en": "Range updates need lazy propagation."
+    },
+    {
       "id": "kata-chushaku",
       "term": "型注釈",
       "reading": "かたちゅうしゃく",
@@ -3408,6 +3954,262 @@
       "example_ja": "省略記法で書くと短くなります。",
       "example_ruby": "[省略記法|しょうりゃくきほう]で書くと短くなります。",
       "example_en": "It gets shorter written in shorthand."
+    },
+    {
+      "id": "bunmyaku-katazuke",
+      "term": "文脈型付け",
+      "reading": "ぶんみゃくかたづけ",
+      "romaji": "bunmyaku katazuke",
+      "tags": [
+        "typescript"
+      ],
+      "level": 3,
+      "meaning": "contextual typing",
+      "desc_en": "The compiler taking a type from where an expression is used rather than from the expression itself — why a callback's parameters need no annotation.",
+      "desc_ja": "式そのものではなく、それが使われている場所から型を決めることです。コールバックの引数に型注釈が要らないのはこのためです。",
+      "example_ja": "文脈型付けのおかげで引数の型を書かずに済みます。",
+      "example_ruby": "[文脈型付け|ぶんみゃくかたづけ]のおかげで[引数|ひきすう]の型を書かずに済みます。",
+      "example_en": "Thanks to contextual typing you don't have to write the parameter types."
+    },
+    {
+      "id": "totatsu-kanosei",
+      "term": "到達可能性",
+      "reading": "とうたつかのうせい",
+      "romaji": "tōtatsu kanōsei",
+      "tags": [
+        "typescript"
+      ],
+      "level": 3,
+      "meaning": "reachability",
+      "desc_en": "Whether control can actually reach a piece of code. The compiler uses it to spot code after a return, and to check exhaustiveness.",
+      "desc_ja": "ある箇所に制御が実際に到達しうるかということです。returnの後のコードの検出や、網羅性の確認に使われます。",
+      "example_ja": "到達可能性の解析で、この分岐が無駄だと分かります。",
+      "example_ruby": "[到達可能性|とうたつかのうせい]の解析で、この分岐が無駄だと分かります。",
+      "example_en": "Reachability analysis shows this branch is dead."
+    },
+    {
+      "id": "kakudai-henkan",
+      "term": "拡大変換",
+      "reading": "かくだいへんかん",
+      "romaji": "kakudai henkan",
+      "tags": [
+        "typescript"
+      ],
+      "level": 3,
+      "meaning": "widening",
+      "desc_en": "The compiler generalizing an inferred type — a literal becoming its base type, so let x = \"a\" is string rather than \"a\".",
+      "desc_ja": "推論された型をより広い型にすることです。リテラルが基の型になるため、let x = \"a\" の型は \"a\" ではなく string になります。",
+      "example_ja": "拡大変換を止めたいときはas constを使います。",
+      "example_ruby": "[拡大変換|かくだいへんかん]を止めたいときはas constを使います。",
+      "example_en": "Use as const when you want to stop the widening."
+    },
+    {
+      "id": "teisu-hyomei",
+      "term": "定数表明",
+      "reading": "ていすうひょうめい",
+      "romaji": "teisū hyōmei",
+      "tags": [
+        "typescript"
+      ],
+      "level": 3,
+      "meaning": "const assertion",
+      "desc_en": "Writing as const so a value keeps its literal type and becomes deeply read-only.",
+      "desc_ja": "as constと書くことで、値がリテラル型のまま保たれ、深く読み取り専用になります。",
+      "example_ja": "定数表明を付けると配列がタプルになります。",
+      "example_ruby": "[定数表明|ていすうひょうめい]を付けると配列がタプルになります。",
+      "example_en": "A const assertion turns the array into a tuple."
+    },
+    {
+      "id": "sai-dainyu",
+      "term": "再代入",
+      "reading": "さいだいにゅう",
+      "romaji": "sai dainyū",
+      "tags": [
+        "typescript"
+      ],
+      "level": 2,
+      "meaning": "reassignment",
+      "desc_en": "Giving an already-declared variable a new value. const forbids it — which is not the same as the value being immutable.",
+      "desc_ja": "既に宣言された変数に新しい値を入れることです。constはこれを禁じますが、値そのものが不変になるわけではありません。",
+      "example_ja": "constは再代入を禁じるだけです。",
+      "example_ruby": "constは[再代入|さいだいにゅう]を禁じるだけです。",
+      "example_en": "const only forbids reassignment."
+    },
+    {
+      "id": "tan-igata",
+      "term": "単位型",
+      "reading": "たんいがた",
+      "romaji": "tan'igata",
+      "tags": [
+        "typescript"
+      ],
+      "level": 3,
+      "meaning": "unit type",
+      "desc_en": "A type with exactly one value — a single literal type such as \"ok\", which is what makes a discriminant work.",
+      "desc_ja": "値をちょうど一つだけ持つ型です。\"ok\"のような単一のリテラル型で、判別可能な合併型の目印になります。",
+      "example_ja": "判別に使うkindは単位型の集まりです。",
+      "example_ruby": "判別に使うkindは[単位型|たんいがた]の集まりです。",
+      "example_en": "The kind used for discrimination is a set of unit types."
+    },
+    {
+      "id": "teigata",
+      "term": "底型",
+      "reading": "ていがた",
+      "romaji": "teigata",
+      "tags": [
+        "typescript"
+      ],
+      "level": 3,
+      "meaning": "bottom type",
+      "desc_en": "The type with no values at all — never, which is assignable to everything and is what an exhaustive switch leaves over.",
+      "desc_ja": "値を一つも持たない型、つまりneverです。あらゆる型に代入でき、網羅的なswitchの後に残る型です。",
+      "example_ja": "neverは底型なので、どの型にも代入できます。",
+      "example_ruby": "neverは[底型|ていがた]なので、どの型にも[代入|だいにゅう]できます。",
+      "example_en": "never is the bottom type, so it's assignable to anything."
+    },
+    {
+      "id": "chogata",
+      "term": "頂型",
+      "reading": "ちょうがた",
+      "romaji": "chōgata",
+      "tags": [
+        "typescript"
+      ],
+      "level": 3,
+      "meaning": "top type",
+      "desc_en": "The type every value belongs to — unknown, which unlike any forces you to narrow before use.",
+      "desc_ja": "あらゆる値が属する型、つまりunknownです。anyと違い、使う前に必ず絞り込みを求められます。",
+      "example_ja": "anyではなく頂型のunknownを使いましょう。",
+      "example_ruby": "anyではなく[頂型|ちょうがた]のunknownを使いましょう。",
+      "example_en": "Use the top type unknown rather than any."
+    },
+    {
+      "id": "kata-kaiso",
+      "term": "型階層",
+      "reading": "かたかいそう",
+      "romaji": "kata kaisō",
+      "tags": [
+        "typescript"
+      ],
+      "level": 2,
+      "meaning": "type hierarchy",
+      "desc_en": "The ordering of types by assignability, from the top type down to the bottom type.",
+      "desc_ja": "代入できるかどうかで型を並べた順序関係です。頂型から底型までが含まれます。",
+      "example_ja": "型階層の一番下にあるのがneverです。",
+      "example_ruby": "[型階層|かたかいそう]の一番下にあるのがneverです。",
+      "example_en": "never sits at the bottom of the type hierarchy."
+    },
+    {
+      "id": "seiteki-kaiseki",
+      "term": "静的解析",
+      "reading": "せいてきかいせき",
+      "romaji": "seiteki kaiseki",
+      "tags": [
+        "typescript"
+      ],
+      "level": 2,
+      "meaning": "static analysis",
+      "desc_en": "Examining code without running it — what the type checker and the linter both do.",
+      "desc_ja": "コードを実行せずに調べることです。型検査も構文検査も、これにあたります。",
+      "example_ja": "静的解析で多くの不具合を実行前に見つけられます。",
+      "example_ruby": "[静的解析|せいてきかいせき]で多くの不具合を[実行|じっこう]前に見つけられます。",
+      "example_en": "Static analysis finds many defects before the code runs."
+    },
+    {
+      "id": "jikkoji-kensa",
+      "term": "実行時検査",
+      "reading": "じっこうじけんさ",
+      "romaji": "jikkōji kensa",
+      "tags": [
+        "typescript"
+      ],
+      "level": 2,
+      "meaning": "runtime check",
+      "desc_en": "Verifying something while the program runs, which types alone cannot do because they are erased — how you validate data arriving from outside.",
+      "desc_ja": "プログラムの実行中に確かめることです。型は消えているため型だけでは行えず、外部から届くデータの検証に必要になります。",
+      "example_ja": "外部のデータには実行時検査が必要です。",
+      "example_ruby": "外部のデータには[実行時検査|じっこうじけんさ]が[必要|ひつよう]です。",
+      "example_en": "Data from outside needs a runtime check."
+    },
+    {
+      "id": "junkan-sansho",
+      "term": "循環参照",
+      "reading": "じゅんかんさんしょう",
+      "romaji": "junkan sanshō",
+      "tags": [
+        "typescript"
+      ],
+      "level": 2,
+      "meaning": "circular reference",
+      "desc_en": "Two things referring to each other. Types tolerate it; module imports and JSON serialization generally do not.",
+      "desc_ja": "二つのものが互いを参照している状態です。型では許されますが、モジュールの取り込みやJSONへの変換では問題になります。",
+      "example_ja": "循環参照があるとJSONに変換できません。",
+      "example_ruby": "[循環参照|じゅんかんさんしょう]があるとJSONに変換できません。",
+      "example_en": "A circular reference can't be converted to JSON."
+    },
+    {
+      "id": "hidoki-hanpuku",
+      "term": "非同期反復",
+      "reading": "ひどうきはんぷく",
+      "romaji": "hidōki hanpuku",
+      "tags": [
+        "typescript"
+      ],
+      "level": 3,
+      "meaning": "async iteration",
+      "desc_en": "Walking values that arrive over time, with for await...of — how a stream is consumed.",
+      "desc_ja": "時間をかけて届く値を、for await...ofでたどることです。ストリームを読むときの形です。",
+      "example_ja": "非同期反復で届いた行を順に処理します。",
+      "example_ruby": "[非同期反復|ひどうきはんぷく]で届いた行を順に[処理|しょり]します。",
+      "example_en": "We process the arriving lines with async iteration."
+    },
+    {
+      "id": "taiki-kano",
+      "term": "待機可能",
+      "reading": "たいきかのう",
+      "romaji": "taiki kanō",
+      "tags": [
+        "typescript"
+      ],
+      "level": 3,
+      "meaning": "awaitable",
+      "desc_en": "Able to be awaited — anything with a then method, not only a real Promise.",
+      "desc_ja": "awaitできる性質です。thenメソッドを持つものであればよく、本物のPromiseに限りません。",
+      "example_ja": "thenを持つ値は待機可能です。",
+      "example_ruby": "thenを持つ値は[待機可能|たいきかのう]です。",
+      "example_en": "A value with a then method is awaitable."
+    },
+    {
+      "id": "chikuji",
+      "term": "逐次",
+      "reading": "ちくじ",
+      "romaji": "chikuji",
+      "tags": [
+        "typescript"
+      ],
+      "level": 2,
+      "meaning": "sequential",
+      "desc_en": "One after another, each waiting for the last — the accidental result of awaiting inside a loop when the work could have run in parallel.",
+      "desc_ja": "前の処理の完了を待って一つずつ進むことです。ループの中でawaitすると、並列にできた処理が意図せずこうなります。",
+      "example_ja": "ループ内のawaitは逐次実行になります。",
+      "example_ruby": "ループ内のawaitは[逐次|ちくじ][実行|じっこう]になります。",
+      "example_en": "Awaiting inside a loop makes it run sequentially."
+    },
+    {
+      "id": "bunpai-hosoku",
+      "term": "分配法則",
+      "reading": "ぶんぱいほうそく",
+      "romaji": "bunpai hōsoku",
+      "tags": [
+        "typescript"
+      ],
+      "level": 3,
+      "meaning": "distributivity",
+      "desc_en": "The rule that a conditional type applies to each member of a union separately, rather than to the union as a whole.",
+      "desc_ja": "条件型が合併型に対して、全体ではなく各要素それぞれに適用されるという規則です。",
+      "example_ja": "条件型の分配法則で、合併型が展開されます。",
+      "example_ruby": "[条件|じょうけん]型の[分配法則|ぶんぱいほうそく]で、合併型が展開されます。",
+      "example_en": "By the distributivity of conditional types, the union is expanded."
     },
     {
       "id": "ketsugo",
