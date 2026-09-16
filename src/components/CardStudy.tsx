@@ -27,7 +27,7 @@ type Mode = "flip" | "choice" | "cloze" | "type";
  * example sentences; "vocab" decks (e.g. the Java vocabulary track) instead
  * carry a textbook line, a plain-English line, and a code snippet, so the
  * rōmaji Type mode is dropped and the card back is laid out differently. */
-export type StudyVariant = "japanese" | "vocab";
+export type StudyVariant = "japanese" | "vocab" | "loanword";
 
 const JP_MODES: { id: Mode; label: string }[] = [
   { id: "flip", label: "🔄 Flip" },
@@ -40,6 +40,14 @@ const VOCAB_MODES: { id: Mode; label: string }[] = [
   { id: "flip", label: "🔄 Flip" },
   { id: "choice", label: "🔘 Choice" },
   { id: "cloze", label: "✍️ Code cloze" },
+];
+
+// A katakana word IS its own reading, so Type-the-reading would be asking you
+// to transliterate クラス into "kurasu" — a spelling test, not a Japanese one.
+const LOANWORD_MODES: { id: Mode; label: string }[] = [
+  { id: "flip", label: "🔄 Flip" },
+  { id: "choice", label: "🔘 Choice" },
+  { id: "cloze", label: "✍️ Cloze" },
 ];
 
 const GRADES: { q: number; label: string; hint: string; color?: string }[] = [
@@ -75,7 +83,8 @@ export function CardStudy({
   cards: Card[];
   variant?: StudyVariant;
 }) {
-  const modes = variant === "vocab" ? VOCAB_MODES : JP_MODES;
+  const modes =
+    variant === "vocab" ? VOCAB_MODES : variant === "loanword" ? LOANWORD_MODES : JP_MODES;
   // A card that is a view of a 日本語 vocabulary word carries that word's id, so
   // studying it here and in the vocabulary list advances one schedule, not two.
   const idOf = useCallback(

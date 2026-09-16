@@ -14,7 +14,7 @@ import type {
 } from "../types";
 import { Markdown } from "../components/Markdown";
 import { CodeEditor } from "../components/CodeEditor";
-import { CardStudy } from "../components/CardStudy";
+import { CardStudy, type StudyVariant } from "../components/CardStudy";
 import { JpVocabCard, JpVocabMenu, useVocabReviews } from "../components/JpVocab";
 import { DiffBadge, Empty } from "../components/common";
 import { Section, useCollapse } from "../components/Collapsible";
@@ -68,6 +68,7 @@ const CATEGORY_ORDER = [
   "JP: TS Functions",
   "JP: TS Objects & Tooling",
   "JP: Web & Frontend",
+  "JP: カタカナ Loanwords",
   // Language-agnostic Algorithms track (shown under the 🧠 Algorithms toggle)
   "Algo: Foundations",
   "Algo: Searching & Scanning",
@@ -101,6 +102,12 @@ const CATEGORY_ORDER = [
 
 // A concept with no explicit language is legacy Java content.
 const conceptLang = (c: Concept) => c.language || "java";
+
+/** Which study layout a concept's cards want. The katakana set drops the
+ * Type-the-reading mode: a loanword is its own reading, so typing it back would
+ * test transliteration rather than Japanese. */
+const studyVariant = (c: Concept): StudyVariant =>
+  c.key === "jp_katakana" ? "loanword" : conceptLang(c) === "japanese" ? "japanese" : "vocab";
 
 const LANG_TABS: { id: string; label: string }[] = [
   { id: "java", label: "Java" },
@@ -680,7 +687,7 @@ function ConceptDetail({
           <CardStudy
             conceptKey={concept.key}
             cards={cards}
-            variant={conceptLang(concept) === "japanese" ? "japanese" : "vocab"}
+            variant={studyVariant(concept)}
           />
         ) : (
           <Markdown>{concept.lesson}</Markdown>

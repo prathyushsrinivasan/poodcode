@@ -107,8 +107,43 @@ def _jp_cards(rows, card_ids):
     ]
 
 
+# ---------------------------------------------------------------------------
+# Loanwords live in one place.
+#
+# A term written purely in katakana IS its own reading: クラス is "kurasu" and
+# nothing more. Mixed in with the kanji sets it inflated them while teaching the
+# least — and the Type-the-reading mode on such a card tests rōmaji, not
+# Japanese. Every katakana-only row is therefore pulled out of its set here and
+# collected into one カタカナ Loanwords set, registered at the bottom of this
+# file, grouped by the set it came from so the domains stay legible.
+#
+# 8 terms were in two sets at once (インターフェース in Java Language and TS
+# Types, ビルド in Dev Tools and TS Objects, ...), so the collection keeps the
+# FIRST occurrence and drops the rest: 72 card-slots become 64 distinct cards.
+# ---------------------------------------------------------------------------
+_JP_KATAKANA_ONLY = re.compile(r"^[゠-ヿーｦ-ﾟ・]+$")
+
+_JP_LOANWORDS = []        # [(origin concept key, row)] in first-seen order
+_JP_LOANWORD_TERMS = set()
+
+
+def _jp_take_loanwords(key, rows):
+    """Split rows into the ones this set keeps and the katakana it hands over."""
+    kept = []
+    for row in rows:
+        term = row[0]
+        if not _JP_KATAKANA_ONLY.match(term):
+            kept.append(row)
+            continue
+        if term not in _JP_LOANWORD_TERMS:
+            _JP_LOANWORD_TERMS.add(term)
+            _JP_LOANWORDS.append((key, row))
+    return kept
+
+
 def _jp_concept(key, name, category, what, deep, note, rows, intro=""):
     """Register one Japanese vocabulary concept (lesson = intro + table)."""
+    rows = _jp_take_loanwords(key, rows)
     rows, card_ids = _jp_share(key, rows)
     CONCEPTS[key] = {
         "name": name,
@@ -628,3 +663,79 @@ assert _JPV_NOT_SHARED_SEEN == _JPV_NOT_SHARED, (
     "_JPV_NOT_SHARED entries never matched a row: "
     f"{sorted(_JPV_NOT_SHARED - _JPV_NOT_SHARED_SEEN)}"
 )
+
+
+# ===========================================================================
+# 13) カタカナ Loanwords — 外来語
+#
+# Registered last, because it is built from what the twelve sets above handed
+# over (see _jp_take_loanwords). Grouped by the set each word came from: the
+# domain is the only thing that distinguishes one loanword from another, since
+# the reading carries no information.
+# ===========================================================================
+_JP_LOANWORD_GROUPS = [
+    ("jp_coding_basics", "プログラミングの基礎 · Coding basics"),
+    ("jp_java_lang", "Java"),
+    ("jp_data_structures", "データ構造 · Data structures"),
+    ("jp_errors_debug", "エラーとデバッグ · Errors & debugging"),
+    ("jp_dev_tools", "開発ツールとGit · Dev tools & Git"),
+    ("jp_ts_basics", "TypeScriptの基礎 · TypeScript basics"),
+    ("jp_ts_types", "型 · Types"),
+    ("jp_ts_functions", "関数と非同期 · Functions & async"),
+    ("jp_ts_objects", "オブジェクトとモジュール · Objects & modules"),
+    ("jp_web_frontend", "Webとフロントエンド · Web & frontend"),
+]
+
+_KATAKANA_NOTE = (
+    "There is no **Reading** column to learn here: a katakana word *is* its "
+    "reading, so only the romaji gloss is given. What these cards actually test "
+    "is the other direction — seeing コンストラクタ and reaching for "
+    "*constructor* fast enough to keep up with the sentence around it. For that "
+    "reason the Type-the-reading study mode is switched off for this set; it "
+    "would only ask you to transliterate."
+)
+
+_kata_seen = set()
+for _k, _row in _JP_LOANWORDS:
+    assert _JP_KATAKANA_ONLY.match(_row[0]), f"non-katakana in loanwords: {_row[0]!r}"
+    assert _row[0] not in _kata_seen, f"duplicate loanword {_row[0]!r}"
+    _kata_seen.add(_row[0])
+
+_kata_grouped = {k: [r for (origin, r) in _JP_LOANWORDS if origin == k] for k, _ in _JP_LOANWORD_GROUPS}
+_kata_placed = sum(len(v) for v in _kata_grouped.values())
+assert _kata_placed == len(_JP_LOANWORDS), (
+    f"{len(_JP_LOANWORDS) - _kata_placed} loanword(s) came from a set with no "
+    f"heading in _JP_LOANWORD_GROUPS"
+)
+assert _JP_LOANWORDS, "no loanwords were collected — has the katakana test broken?"
+
+_kata_rows = [r for (_k, r) in _JP_LOANWORDS]
+
+_kata_lesson = [
+    "Every katakana term from the other 日本語 sets, in one place. These are the "
+    "words you can already say — the work is hearing them as *English* without "
+    "stopping to decode.\n",
+]
+for _key, _label in _JP_LOANWORD_GROUPS:
+    _rows = _kata_grouped[_key]
+    if _rows:
+        _kata_lesson.append(f"### {_label}\n")
+        _kata_lesson.append(_jp_table(_rows))
+
+CONCEPTS["jp_katakana"] = {
+    "name": "カタカナ Loanwords — 外来語",
+    "what": f"The {len(_kata_rows)} borrowed words, gathered out of the other sets.",
+    "deep": (
+        "Japanese technical writing borrows heavily, and a borrowed word is "
+        "written in katakana and pronounced roughly like the English it came "
+        "from. That makes them the easiest words to read aloud and the easiest "
+        "to stumble over in a sentence, because ブレークポイント only becomes "
+        "*breakpoint* once you stop sounding it out."
+    ),
+    "java": _KATAKANA_NOTE,
+    "language": JP_LANG,
+    "cards": _jp_cards(_kata_rows, [""] * len(_kata_rows)),
+}
+CATEGORY["jp_katakana"] = "JP: カタカナ Loanwords"
+LESSONS["jp_katakana"] = "\n".join(_kata_lesson)
+EXERCISES.setdefault("jp_katakana", [])

@@ -12875,33 +12875,9 @@
     "deep": "Start here. These are the words that show up in every conversation about code regardless of language — writing it, running it, and the pieces every program is built from (variables, values, functions, types).",
     "java": "The **Reading** column gives the kana pronunciation and a romaji gloss so you can say the word out loud. Loanwords written in katakana already *are* their reading, so only the romaji is shown. Example sentences are polite (です・ます) form — exactly how you'd hear them in a standup or an interview.",
     "language": "japanese",
-    "lesson": "| 用語 (Term) | 読み方 (Reading) | 意味 (Meaning) | 例文 (Example) |\n|---|---|---|---|\n| プログラミング | puroguramingu | programming | 毎日プログラミングを練習しています。 — *I practice programming every day.* |\n| コード | kōdo | code | このコードを読んでください。 — *Please read this code.* |\n| プログラム | puroguramu | program | プログラムを実行します。 — *I'll run the program.* |\n| 開発 | かいはつ (kaihatsu) | development | 新しいアプリを開発しています。 — *I'm developing a new app.* |\n| 実装 | じっそう (jissō) | implementation | この機能を実装してください。 — *Please implement this feature.* |\n| 機能 | きのう (kinō) | feature / function | この機能はまだできていません。 — *This feature isn't done yet.* |\n| 変数 | へんすう (hensū) | variable | 変数に値を代入します。 — *We assign a value to a variable.* |\n| 値 | あたい (atai) | value | この変数の値は10です。 — *This variable's value is 10.* |\n| 代入 | だいにゅう (dainyū) | assignment | 変数xに5を代入します。 — *Assign 5 to variable x.* |\n| 関数 | かんすう (kansū) | function | この関数は合計を返します。 — *This function returns the sum.* |\n| 引数 | ひきすう (hikisū) | argument / parameter | 関数に引数を渡します。 — *We pass an argument to the function.* |\n| 戻り値 | もどりち (modorichi) | return value | 戻り値は整数です。 — *The return value is an integer.* |\n| 返す | かえす (kaesu) | to return (a value) | 結果を返してください。 — *Please return the result.* |\n| 呼び出す | よびだす (yobidasu) | to call / invoke | この関数を呼び出します。 — *We call this function.* |\n| 型 | かた (kata) | type | この変数の型は文字列です。 — *This variable's type is string.* |\n| 整数 | せいすう (seisū) | integer | 整数を入力してください。 — *Please enter an integer.* |\n| 文字列 | もじれつ (mojiretsu) | string | 二つの文字列を連結します。 — *We concatenate the two strings.* |\n| 真偽値 | しんぎち (shingichi) | boolean | 真偽値はtrueかfalseです。 — *A boolean is true or false.* |\n| 条件分岐 | じょうけんぶんき (jōken bunki) | conditional branch | 条件分岐でif文を使います。 — *We use an if statement for branching.* |\n| 繰り返し | くりかえし (kurikaeshi) | loop / iteration | 繰り返しで配列を処理します。 — *We process the array with a loop.* |\n| 処理 | しょり (shori) | processing | このデータを処理します。 — *We process this data.* |\n| 実行 | じっこう (jikkō) | execution / run | プログラムを実行しました。 — *I ran the program.* |\n| コンパイル | konpairu | compile | ソースコードをコンパイルします。 — *We compile the source code.* |\n| コメント | komento | comment | コードにコメントを書きます。 — *I write comments in the code.* |\n| 入力 | にゅうりょく (nyūryoku) | input | 入力は一行目に整数Nが与えられます。 — *In the input, an integer N is given on the first line.* |\n| 出力 | しゅつりょく (shutsuryoku) | output | 答えを一行で出力してください。 — *Output the answer on one line.* |\n",
+    "lesson": "| 用語 (Term) | 読み方 (Reading) | 意味 (Meaning) | 例文 (Example) |\n|---|---|---|---|\n| 開発 | かいはつ (kaihatsu) | development | 新しいアプリを開発しています。 — *I'm developing a new app.* |\n| 実装 | じっそう (jissō) | implementation | この機能を実装してください。 — *Please implement this feature.* |\n| 機能 | きのう (kinō) | feature / function | この機能はまだできていません。 — *This feature isn't done yet.* |\n| 変数 | へんすう (hensū) | variable | 変数に値を代入します。 — *We assign a value to a variable.* |\n| 値 | あたい (atai) | value | この変数の値は10です。 — *This variable's value is 10.* |\n| 代入 | だいにゅう (dainyū) | assignment | 変数xに5を代入します。 — *Assign 5 to variable x.* |\n| 関数 | かんすう (kansū) | function | この関数は合計を返します。 — *This function returns the sum.* |\n| 引数 | ひきすう (hikisū) | argument / parameter | 関数に引数を渡します。 — *We pass an argument to the function.* |\n| 戻り値 | もどりち (modorichi) | return value | 戻り値は整数です。 — *The return value is an integer.* |\n| 返す | かえす (kaesu) | to return (a value) | 結果を返してください。 — *Please return the result.* |\n| 呼び出す | よびだす (yobidasu) | to call / invoke | この関数を呼び出します。 — *We call this function.* |\n| 型 | かた (kata) | type | この変数の型は文字列です。 — *This variable's type is string.* |\n| 整数 | せいすう (seisū) | integer | 整数を入力してください。 — *Please enter an integer.* |\n| 文字列 | もじれつ (mojiretsu) | string | 二つの文字列を連結します。 — *We concatenate the two strings.* |\n| 真偽値 | しんぎち (shingichi) | boolean | 真偽値はtrueかfalseです。 — *A boolean is true or false.* |\n| 条件分岐 | じょうけんぶんき (jōken bunki) | conditional branch | 条件分岐でif文を使います。 — *We use an if statement for branching.* |\n| 繰り返し | くりかえし (kurikaeshi) | loop / iteration | 繰り返しで配列を処理します。 — *We process the array with a loop.* |\n| 処理 | しょり (shori) | processing | このデータを処理します。 — *We process this data.* |\n| 実行 | じっこう (jikkō) | execution / run | プログラムを実行しました。 — *I ran the program.* |\n| 入力 | にゅうりょく (nyūryoku) | input | 入力は一行目に整数Nが与えられます。 — *In the input, an integer N is given on the first line.* |\n| 出力 | しゅつりょく (shutsuryoku) | output | 答えを一行で出力してください。 — *Output the answer on one line.* |\n",
     "exercises": [],
     "cards": [
-      {
-        "front": "プログラミング",
-        "card_id": "",
-        "reading": "puroguramingu",
-        "meaning": "programming",
-        "example_ja": "毎日プログラミングを練習しています。",
-        "example_en": "I practice programming every day."
-      },
-      {
-        "front": "コード",
-        "card_id": "",
-        "reading": "kōdo",
-        "meaning": "code",
-        "example_ja": "このコードを読んでください。",
-        "example_en": "Please read this code."
-      },
-      {
-        "front": "プログラム",
-        "card_id": "",
-        "reading": "puroguramu",
-        "meaning": "program",
-        "example_ja": "プログラムを実行します。",
-        "example_en": "I'll run the program."
-      },
       {
         "front": "開発",
         "card_id": "",
@@ -13055,22 +13031,6 @@
         "example_en": "I ran the program."
       },
       {
-        "front": "コンパイル",
-        "card_id": "",
-        "reading": "konpairu",
-        "meaning": "compile",
-        "example_ja": "ソースコードをコンパイルします。",
-        "example_en": "We compile the source code."
-      },
-      {
-        "front": "コメント",
-        "card_id": "",
-        "reading": "komento",
-        "meaning": "comment",
-        "example_ja": "コードにコメントを書きます。",
-        "example_en": "I write comments in the code."
-      },
-      {
         "front": "入力",
         "card_id": "jp-vocab#nyuryoku",
         "reading": "にゅうりょく (nyūryoku)",
@@ -13098,57 +13058,9 @@
     "deep": "Java's building blocks have standard Japanese names. Note that many are katakana loanwords (クラス, メソッド, オブジェクト) while the OOP concepts tend to be kanji compounds (継承, 多態性, 抽象).",
     "java": "The **Reading** column gives the kana pronunciation and a romaji gloss so you can say the word out loud. Loanwords written in katakana already *are* their reading, so only the romaji is shown. Example sentences are polite (です・ます) form — exactly how you'd hear them in a standup or an interview.",
     "language": "japanese",
-    "lesson": "| 用語 (Term) | 読み方 (Reading) | 意味 (Meaning) | 例文 (Example) |\n|---|---|---|---|\n| クラス | kurasu | class | 新しいクラスを作ります。 — *We create a new class.* |\n| メソッド | mesoddo | method | このメソッドを呼び出します。 — *We call this method.* |\n| オブジェクト | obujekuto | object | オブジェクトを生成します。 — *We instantiate an object.* |\n| インスタンス | insutansu | instance | クラスのインスタンスを作ります。 — *We create an instance of the class.* |\n| フィールド | fīrudo | field (member variable) | このクラスには三つのフィールドがあります。 — *This class has three fields.* |\n| コンストラクタ | konsutorakuta | constructor | コンストラクタで初期化します。 — *We initialize in the constructor.* |\n| 継承 | けいしょう (keishō) | inheritance | DogクラスはAnimalクラスを継承しています。 — *The Dog class inherits from the Animal class.* |\n| 親クラス | おやクラス (oya kurasu) | parent / superclass | 親クラスのメソッドを使います。 — *We use the parent class's method.* |\n| インターフェース | intāfēsu | interface | インターフェースを実装します。 — *We implement the interface.* |\n| 抽象クラス | ちゅうしょうクラス (chūshō kurasu) | abstract class | 抽象クラスはインスタンス化できません。 — *An abstract class can't be instantiated.* |\n| カプセル化 | カプセルか (kapuseru-ka) | encapsulation | カプセル化でデータを守ります。 — *Encapsulation protects the data.* |\n| 多態性 | たたいせい (tataisei) | polymorphism | 多態性のおかげで、Shape型のリストに円も四角形も入れられます。 — *Thanks to polymorphism, a list of Shape can hold both circles and squares.* |\n| オーバーライド | ōbāraido | override | メソッドをオーバーライドします。 — *We override the method.* |\n| ジェネリクス | jenerikusu | generics | ジェネリクスで型を指定します。 — *We specify the type with generics.* |\n| 修飾子 | しゅうしょくし (shūshokushi) | modifier | このメソッドにはアクセス修飾子が付いていません。 — *This method has no access modifier.* |\n| 静的 | せいてき (seiteki) | static | mainメソッドは静的メソッドなので、インスタンスなしで呼び出せます。 — *main is a static method, so it can be called without an instance.* |\n| パッケージ | pakkēji | package | このクラスは同じパッケージにあります。 — *This class is in the same package.* |\n| インポート | inpōto | import | ライブラリをインポートします。 — *We import the library.* |\n| アノテーション | anotēshon | annotation | @Overrideはアノテーションです。 — *`@Override` is an annotation.* |\n| ライブラリ | raiburari | library | 標準ライブラリを使います。 — *We use the standard library.* |\n| フレームワーク | furēmuwāku | framework | このフレームワークは便利です。 — *This framework is convenient.* |\n| 定数 | ていすう (teisū) | constant | 最大人数をMAX_USERSという定数にしました。 — *I made the maximum number of users a constant called MAX_USERS.* |\n| 宣言 | せんげん (sengen) | declaration | 変数は使う前に宣言する必要があります。 — *A variable must be declared before it is used.* |\n| 初期化 | しょきか (shokika) | initialization | カウンターを0で初期化してからループを始めます。 — *Initialize the counter to 0, then start the loop.* |\n| 継承関係 | けいしょうかんけい (keishō kankei) | inheritance relationship | 二つのクラスは継承関係にあります。 — *The two classes have an inheritance relationship.* |\n| 親子関係 | おやこかんけい (oyako kankei) | parent-child relationship | クラスの親子関係を確認します。 — *We check the class parent-child relationship.* |\n",
+    "lesson": "| 用語 (Term) | 読み方 (Reading) | 意味 (Meaning) | 例文 (Example) |\n|---|---|---|---|\n| 継承 | けいしょう (keishō) | inheritance | DogクラスはAnimalクラスを継承しています。 — *The Dog class inherits from the Animal class.* |\n| 親クラス | おやクラス (oya kurasu) | parent / superclass | 親クラスのメソッドを使います。 — *We use the parent class's method.* |\n| 抽象クラス | ちゅうしょうクラス (chūshō kurasu) | abstract class | 抽象クラスはインスタンス化できません。 — *An abstract class can't be instantiated.* |\n| カプセル化 | カプセルか (kapuseru-ka) | encapsulation | カプセル化でデータを守ります。 — *Encapsulation protects the data.* |\n| 多態性 | たたいせい (tataisei) | polymorphism | 多態性のおかげで、Shape型のリストに円も四角形も入れられます。 — *Thanks to polymorphism, a list of Shape can hold both circles and squares.* |\n| 修飾子 | しゅうしょくし (shūshokushi) | modifier | このメソッドにはアクセス修飾子が付いていません。 — *This method has no access modifier.* |\n| 静的 | せいてき (seiteki) | static | mainメソッドは静的メソッドなので、インスタンスなしで呼び出せます。 — *main is a static method, so it can be called without an instance.* |\n| 定数 | ていすう (teisū) | constant | 最大人数をMAX_USERSという定数にしました。 — *I made the maximum number of users a constant called MAX_USERS.* |\n| 宣言 | せんげん (sengen) | declaration | 変数は使う前に宣言する必要があります。 — *A variable must be declared before it is used.* |\n| 初期化 | しょきか (shokika) | initialization | カウンターを0で初期化してからループを始めます。 — *Initialize the counter to 0, then start the loop.* |\n| 継承関係 | けいしょうかんけい (keishō kankei) | inheritance relationship | 二つのクラスは継承関係にあります。 — *The two classes have an inheritance relationship.* |\n| 親子関係 | おやこかんけい (oyako kankei) | parent-child relationship | クラスの親子関係を確認します。 — *We check the class parent-child relationship.* |\n",
     "exercises": [],
     "cards": [
-      {
-        "front": "クラス",
-        "card_id": "",
-        "reading": "kurasu",
-        "meaning": "class",
-        "example_ja": "新しいクラスを作ります。",
-        "example_en": "We create a new class."
-      },
-      {
-        "front": "メソッド",
-        "card_id": "",
-        "reading": "mesoddo",
-        "meaning": "method",
-        "example_ja": "このメソッドを呼び出します。",
-        "example_en": "We call this method."
-      },
-      {
-        "front": "オブジェクト",
-        "card_id": "",
-        "reading": "obujekuto",
-        "meaning": "object",
-        "example_ja": "オブジェクトを生成します。",
-        "example_en": "We instantiate an object."
-      },
-      {
-        "front": "インスタンス",
-        "card_id": "",
-        "reading": "insutansu",
-        "meaning": "instance",
-        "example_ja": "クラスのインスタンスを作ります。",
-        "example_en": "We create an instance of the class."
-      },
-      {
-        "front": "フィールド",
-        "card_id": "",
-        "reading": "fīrudo",
-        "meaning": "field (member variable)",
-        "example_ja": "このクラスには三つのフィールドがあります。",
-        "example_en": "This class has three fields."
-      },
-      {
-        "front": "コンストラクタ",
-        "card_id": "",
-        "reading": "konsutorakuta",
-        "meaning": "constructor",
-        "example_ja": "コンストラクタで初期化します。",
-        "example_en": "We initialize in the constructor."
-      },
       {
         "front": "継承",
         "card_id": "jp-vocab#keisho",
@@ -13164,14 +13076,6 @@
         "meaning": "parent / superclass",
         "example_ja": "親クラスのメソッドを使います。",
         "example_en": "We use the parent class's method."
-      },
-      {
-        "front": "インターフェース",
-        "card_id": "",
-        "reading": "intāfēsu",
-        "meaning": "interface",
-        "example_ja": "インターフェースを実装します。",
-        "example_en": "We implement the interface."
       },
       {
         "front": "抽象クラス",
@@ -13198,22 +13102,6 @@
         "example_en": "Thanks to polymorphism, a list of Shape can hold both circles and squares."
       },
       {
-        "front": "オーバーライド",
-        "card_id": "",
-        "reading": "ōbāraido",
-        "meaning": "override",
-        "example_ja": "メソッドをオーバーライドします。",
-        "example_en": "We override the method."
-      },
-      {
-        "front": "ジェネリクス",
-        "card_id": "",
-        "reading": "jenerikusu",
-        "meaning": "generics",
-        "example_ja": "ジェネリクスで型を指定します。",
-        "example_en": "We specify the type with generics."
-      },
-      {
         "front": "修飾子",
         "card_id": "jp-vocab#shushokushi",
         "reading": "しゅうしょくし (shūshokushi)",
@@ -13228,46 +13116,6 @@
         "meaning": "static",
         "example_ja": "mainメソッドは静的メソッドなので、インスタンスなしで呼び出せます。",
         "example_en": "main is a static method, so it can be called without an instance."
-      },
-      {
-        "front": "パッケージ",
-        "card_id": "",
-        "reading": "pakkēji",
-        "meaning": "package",
-        "example_ja": "このクラスは同じパッケージにあります。",
-        "example_en": "This class is in the same package."
-      },
-      {
-        "front": "インポート",
-        "card_id": "",
-        "reading": "inpōto",
-        "meaning": "import",
-        "example_ja": "ライブラリをインポートします。",
-        "example_en": "We import the library."
-      },
-      {
-        "front": "アノテーション",
-        "card_id": "",
-        "reading": "anotēshon",
-        "meaning": "annotation",
-        "example_ja": "@Overrideはアノテーションです。",
-        "example_en": "`@Override` is an annotation."
-      },
-      {
-        "front": "ライブラリ",
-        "card_id": "",
-        "reading": "raiburari",
-        "meaning": "library",
-        "example_ja": "標準ライブラリを使います。",
-        "example_en": "We use the standard library."
-      },
-      {
-        "front": "フレームワーク",
-        "card_id": "",
-        "reading": "furēmuwāku",
-        "meaning": "framework",
-        "example_ja": "このフレームワークは便利です。",
-        "example_en": "This framework is convenient."
       },
       {
         "front": "定数",
@@ -13512,7 +13360,7 @@
     "deep": "This is the heart of a technical interview in Japanese. You'll be asked to pick a データ構造 (data structure), describe an アルゴリズム (algorithm), and state its 計算量 (complexity). These are the exact words for that.",
     "java": "The **Reading** column gives the kana pronunciation and a romaji gloss so you can say the word out loud. Loanwords written in katakana already *are* their reading, so only the romaji is shown. Example sentences are polite (です・ます) form — exactly how you'd hear them in a standup or an interview.",
     "language": "japanese",
-    "lesson": "| 用語 (Term) | 読み方 (Reading) | 意味 (Meaning) | 例文 (Example) |\n|---|---|---|---|\n| データ構造 | dēta kōzō | data structure | 適切なデータ構造を選びます。 — *We choose the right data structure.* |\n| アルゴリズム | arugorizumu | algorithm | 効率の良いアルゴリズムを考えます。 — *We think of an efficient algorithm.* |\n| 配列 | はいれつ (hairetsu) | array | 整数の配列が与えられます。 — *You are given an array of integers.* |\n| 連結リスト | れんけつリスト (renketsu risuto) | linked list | 連結リストにノードを追加します。 — *We add a node to the linked list.* |\n| スタック | sutakku | stack | スタックは後入れ先出しです。 — *A stack is last-in, first-out.* |\n| キュー | kyū | queue | キューは先入れ先出しです。 — *A queue is first-in, first-out.* |\n| 木構造 | きこうぞう (ki kōzō) | tree (structure) | 木構造を再帰で探索します。 — *We traverse the tree recursively.* |\n| 二分木 | にぶんぎ (nibungi) | binary tree | 二分木には左と右の子があります。 — *A binary tree has left and right children.* |\n| 二分探索木 | にぶんたんさくぎ (nibun tansakugi) | binary search tree | 二分探索木は整列されています。 — *A binary search tree is kept sorted.* |\n| グラフ | gurafu | graph | グラフを幅優先で探索します。 — *We traverse the graph breadth-first.* |\n| ノード | nōdo | node | 各ノードは値を持ちます。 — *Each node holds a value.* |\n| 頂点 | ちょうてん (chōten) | vertex (node) | 頂点の数はN、辺の数はMです。 — *There are N vertices and M edges.* |\n| 辺 | へん (hen) | edge | 各辺には重みが付いています。 — *Each edge has a weight.* |\n| ハッシュマップ | hasshu mappu | hash map | ハッシュマップで高速に検索します。 — *We search quickly with a hash map.* |\n| 連想配列 | れんそうはいれつ (rensō hairetsu) | associative array (map) | 連想配列はキーと値を持ちます。 — *An associative array has keys and values.* |\n| 探索 | たんさく (tansaku) | search | 目的の値が見つかるまで探索を続けます。 — *Keep searching until the target value is found.* |\n| 整列 | せいれつ (seiretsu) | sorting | まず配列を整列してから重複を取り除きます。 — *First sort the array, then remove the duplicates.* |\n| 昇順 | しょうじゅん (shōjun) | ascending order | 結果を昇順で出力してください。 — *Output the results in ascending order.* |\n| 降順 | こうじゅん (kōjun) | descending order | 点数の降順に並べ替えます。 — *Sort in descending order of score.* |\n| 計算量 | けいさんりょう (keisanryō) | computational complexity | この解法の時間計算量はO(n)です。 — *This solution's time complexity is O(n).* |\n| 時間計算量 | じかんけいさんりょう (jikan keisanryō) | time complexity | 時間計算量を見積もります。 — *We estimate the time complexity.* |\n| 空間計算量 | くうかんけいさんりょう (kūkan keisanryō) | space complexity | 空間計算量を減らします。 — *We reduce the space complexity.* |\n| 効率 | こうりつ (kōritsu) | efficiency | コードの効率を上げます。 — *We improve the code's efficiency.* |\n| 要素 | ようそ (yōso) | element | 配列の中で最大の要素を返してください。 — *Return the largest element in the array.* |\n| 添字 | そえじ (soeji) | index (subscript) | 添字が配列の長さ以上になると範囲外です。 — *An index at or beyond the array's length is out of bounds.* |\n| 再帰呼び出し | さいきよびだし (saiki yobidashi) | recursive call | 再帰呼び出しで木をたどります。 — *We traverse the tree with recursive calls.* |\n| 幅優先探索 | はばゆうせんたんさく (haba yūsen tansaku) | breadth-first search (BFS) | 迷路の最短手数は幅優先探索で求めます。 — *Find the fewest moves through a maze with breadth-first search.* |\n| 深さ優先探索 | ふかさゆうせんたんさく (fukasa yūsen tansaku) | depth-first search (DFS) | 連結成分の数を深さ優先探索で数えます。 — *Count the connected components with depth-first search.* |\n| 動的計画法 | どうてきけいかくほう (dōteki keikakuhō) | dynamic programming | 動的計画法を使えば、指数時間の解法がO(n²)になります。 — *With dynamic programming, an exponential-time solution becomes O(n²).* |\n",
+    "lesson": "| 用語 (Term) | 読み方 (Reading) | 意味 (Meaning) | 例文 (Example) |\n|---|---|---|---|\n| データ構造 | dēta kōzō | data structure | 適切なデータ構造を選びます。 — *We choose the right data structure.* |\n| 配列 | はいれつ (hairetsu) | array | 整数の配列が与えられます。 — *You are given an array of integers.* |\n| 連結リスト | れんけつリスト (renketsu risuto) | linked list | 連結リストにノードを追加します。 — *We add a node to the linked list.* |\n| 木構造 | きこうぞう (ki kōzō) | tree (structure) | 木構造を再帰で探索します。 — *We traverse the tree recursively.* |\n| 二分木 | にぶんぎ (nibungi) | binary tree | 二分木には左と右の子があります。 — *A binary tree has left and right children.* |\n| 二分探索木 | にぶんたんさくぎ (nibun tansakugi) | binary search tree | 二分探索木は整列されています。 — *A binary search tree is kept sorted.* |\n| 頂点 | ちょうてん (chōten) | vertex (node) | 頂点の数はN、辺の数はMです。 — *There are N vertices and M edges.* |\n| 辺 | へん (hen) | edge | 各辺には重みが付いています。 — *Each edge has a weight.* |\n| 連想配列 | れんそうはいれつ (rensō hairetsu) | associative array (map) | 連想配列はキーと値を持ちます。 — *An associative array has keys and values.* |\n| 探索 | たんさく (tansaku) | search | 目的の値が見つかるまで探索を続けます。 — *Keep searching until the target value is found.* |\n| 整列 | せいれつ (seiretsu) | sorting | まず配列を整列してから重複を取り除きます。 — *First sort the array, then remove the duplicates.* |\n| 昇順 | しょうじゅん (shōjun) | ascending order | 結果を昇順で出力してください。 — *Output the results in ascending order.* |\n| 降順 | こうじゅん (kōjun) | descending order | 点数の降順に並べ替えます。 — *Sort in descending order of score.* |\n| 計算量 | けいさんりょう (keisanryō) | computational complexity | この解法の時間計算量はO(n)です。 — *This solution's time complexity is O(n).* |\n| 時間計算量 | じかんけいさんりょう (jikan keisanryō) | time complexity | 時間計算量を見積もります。 — *We estimate the time complexity.* |\n| 空間計算量 | くうかんけいさんりょう (kūkan keisanryō) | space complexity | 空間計算量を減らします。 — *We reduce the space complexity.* |\n| 効率 | こうりつ (kōritsu) | efficiency | コードの効率を上げます。 — *We improve the code's efficiency.* |\n| 要素 | ようそ (yōso) | element | 配列の中で最大の要素を返してください。 — *Return the largest element in the array.* |\n| 添字 | そえじ (soeji) | index (subscript) | 添字が配列の長さ以上になると範囲外です。 — *An index at or beyond the array's length is out of bounds.* |\n| 再帰呼び出し | さいきよびだし (saiki yobidashi) | recursive call | 再帰呼び出しで木をたどります。 — *We traverse the tree with recursive calls.* |\n| 幅優先探索 | はばゆうせんたんさく (haba yūsen tansaku) | breadth-first search (BFS) | 迷路の最短手数は幅優先探索で求めます。 — *Find the fewest moves through a maze with breadth-first search.* |\n| 深さ優先探索 | ふかさゆうせんたんさく (fukasa yūsen tansaku) | depth-first search (DFS) | 連結成分の数を深さ優先探索で数えます。 — *Count the connected components with depth-first search.* |\n| 動的計画法 | どうてきけいかくほう (dōteki keikakuhō) | dynamic programming | 動的計画法を使えば、指数時間の解法がO(n²)になります。 — *With dynamic programming, an exponential-time solution becomes O(n²).* |\n",
     "exercises": [],
     "cards": [
       {
@@ -13522,14 +13370,6 @@
         "meaning": "data structure",
         "example_ja": "適切なデータ構造を選びます。",
         "example_en": "We choose the right data structure."
-      },
-      {
-        "front": "アルゴリズム",
-        "card_id": "",
-        "reading": "arugorizumu",
-        "meaning": "algorithm",
-        "example_ja": "効率の良いアルゴリズムを考えます。",
-        "example_en": "We think of an efficient algorithm."
       },
       {
         "front": "配列",
@@ -13546,22 +13386,6 @@
         "meaning": "linked list",
         "example_ja": "連結リストにノードを追加します。",
         "example_en": "We add a node to the linked list."
-      },
-      {
-        "front": "スタック",
-        "card_id": "",
-        "reading": "sutakku",
-        "meaning": "stack",
-        "example_ja": "スタックは後入れ先出しです。",
-        "example_en": "A stack is last-in, first-out."
-      },
-      {
-        "front": "キュー",
-        "card_id": "",
-        "reading": "kyū",
-        "meaning": "queue",
-        "example_ja": "キューは先入れ先出しです。",
-        "example_en": "A queue is first-in, first-out."
       },
       {
         "front": "木構造",
@@ -13588,22 +13412,6 @@
         "example_en": "A binary search tree is kept sorted."
       },
       {
-        "front": "グラフ",
-        "card_id": "",
-        "reading": "gurafu",
-        "meaning": "graph",
-        "example_ja": "グラフを幅優先で探索します。",
-        "example_en": "We traverse the graph breadth-first."
-      },
-      {
-        "front": "ノード",
-        "card_id": "",
-        "reading": "nōdo",
-        "meaning": "node",
-        "example_ja": "各ノードは値を持ちます。",
-        "example_en": "Each node holds a value."
-      },
-      {
         "front": "頂点",
         "card_id": "jp-vocab#choten",
         "reading": "ちょうてん (chōten)",
@@ -13618,14 +13426,6 @@
         "meaning": "edge",
         "example_ja": "各辺には重みが付いています。",
         "example_en": "Each edge has a weight."
-      },
-      {
-        "front": "ハッシュマップ",
-        "card_id": "",
-        "reading": "hasshu mappu",
-        "meaning": "hash map",
-        "example_ja": "ハッシュマップで高速に検索します。",
-        "example_en": "We search quickly with a hash map."
       },
       {
         "front": "連想配列",
@@ -13759,33 +13559,9 @@
     "deep": "When something breaks, you'll need to describe it fast: what エラー (error) came up, its 原因 (cause), and how you 修正 (fixed) it. Verbs matter here — 直す (to fix), 再現する (to reproduce), 確認する (to check).",
     "java": "The **Reading** column gives the kana pronunciation and a romaji gloss so you can say the word out loud. Loanwords written in katakana already *are* their reading, so only the romaji is shown. Example sentences are polite (です・ます) form — exactly how you'd hear them in a standup or an interview.",
     "language": "japanese",
-    "lesson": "| 用語 (Term) | 読み方 (Reading) | 意味 (Meaning) | 例文 (Example) |\n|---|---|---|---|\n| エラー | erā | error | エラーが発生しました。 — *An error occurred.* |\n| バグ | bagu | bug | このバグを直します。 — *I'll fix this bug.* |\n| デバッグ | debaggu | debugging | コードをデバッグします。 — *We debug the code.* |\n| 例外 | れいがい (reigai) | exception | 配列の範囲外にアクセスすると例外が発生します。 — *Accessing outside an array's bounds raises an exception.* |\n| 例外処理 | れいがいしょり (reigai shori) | exception handling | try-catchで例外処理をします。 — *We handle exceptions with try-catch.* |\n| 発生 | はっせい (hassei) | occurrence | 特定の入力でエラーが発生します。 — *An error occurs on certain input.* |\n| 修正 | しゅうせい (shūsei) | fix / correction | バグを修正しました。 — *I fixed the bug.* |\n| 直す | なおす (naosu) | to fix | この問題を直してください。 — *Please fix this problem.* |\n| 原因 | げんいん (gen'in) | cause | エラーの原因を調べます。 — *We investigate the cause of the error.* |\n| 動作 | どうさ (dōsa) | behavior / operation | プログラムは正しく動作します。 — *The program works correctly.* |\n| 再現 | さいげん (saigen) | reproduce | そのバグを再現できません。 — *I can't reproduce that bug.* |\n| ヌルポインタ例外 | ヌルポインタれいがい (nuru pointa reigai) | null pointer exception | ヌルポインタ例外に注意してください。 — *Watch out for null pointer exceptions.* |\n| スタックトレース | sutakku torēsu | stack trace | スタックトレースを確認します。 — *We check the stack trace.* |\n| ログ | rogu | log | ログを出力してデバッグします。 — *We debug by printing logs.* |\n| ブレークポイント | burēkupointo | breakpoint | この行にブレークポイントを設定します。 — *We set a breakpoint on this line.* |\n| 例外を投げる | れいがいをなげる (reigai o nageru) | to throw an exception | 不正な入力なら例外を投げます。 — *If the input is invalid, we throw an exception.* |\n| キャッチ | kyacchi | to catch | 例外をキャッチして処理します。 — *We catch and handle the exception.* |\n| 警告 | けいこく (keikoku) | warning | コンパイラが警告を出します。 — *The compiler gives a warning.* |\n| 想定外 | そうていがい (sōteigai) | unexpected | 想定外の値が入りました。 — *An unexpected value came in.* |\n| 確認する | かくにんする (kakunin suru) | to check / confirm | 出力を確認します。 — *We check the output.* |\n| 試す | ためす (tamesu) | to try / test out | もう一度試してください。 — *Please try it again.* |\n",
+    "lesson": "| 用語 (Term) | 読み方 (Reading) | 意味 (Meaning) | 例文 (Example) |\n|---|---|---|---|\n| 例外 | れいがい (reigai) | exception | 配列の範囲外にアクセスすると例外が発生します。 — *Accessing outside an array's bounds raises an exception.* |\n| 例外処理 | れいがいしょり (reigai shori) | exception handling | try-catchで例外処理をします。 — *We handle exceptions with try-catch.* |\n| 発生 | はっせい (hassei) | occurrence | 特定の入力でエラーが発生します。 — *An error occurs on certain input.* |\n| 修正 | しゅうせい (shūsei) | fix / correction | バグを修正しました。 — *I fixed the bug.* |\n| 直す | なおす (naosu) | to fix | この問題を直してください。 — *Please fix this problem.* |\n| 原因 | げんいん (gen'in) | cause | エラーの原因を調べます。 — *We investigate the cause of the error.* |\n| 動作 | どうさ (dōsa) | behavior / operation | プログラムは正しく動作します。 — *The program works correctly.* |\n| 再現 | さいげん (saigen) | reproduce | そのバグを再現できません。 — *I can't reproduce that bug.* |\n| ヌルポインタ例外 | ヌルポインタれいがい (nuru pointa reigai) | null pointer exception | ヌルポインタ例外に注意してください。 — *Watch out for null pointer exceptions.* |\n| 例外を投げる | れいがいをなげる (reigai o nageru) | to throw an exception | 不正な入力なら例外を投げます。 — *If the input is invalid, we throw an exception.* |\n| 警告 | けいこく (keikoku) | warning | コンパイラが警告を出します。 — *The compiler gives a warning.* |\n| 想定外 | そうていがい (sōteigai) | unexpected | 想定外の値が入りました。 — *An unexpected value came in.* |\n| 確認する | かくにんする (kakunin suru) | to check / confirm | 出力を確認します。 — *We check the output.* |\n| 試す | ためす (tamesu) | to try / test out | もう一度試してください。 — *Please try it again.* |\n",
     "exercises": [],
     "cards": [
-      {
-        "front": "エラー",
-        "card_id": "",
-        "reading": "erā",
-        "meaning": "error",
-        "example_ja": "エラーが発生しました。",
-        "example_en": "An error occurred."
-      },
-      {
-        "front": "バグ",
-        "card_id": "",
-        "reading": "bagu",
-        "meaning": "bug",
-        "example_ja": "このバグを直します。",
-        "example_en": "I'll fix this bug."
-      },
-      {
-        "front": "デバッグ",
-        "card_id": "",
-        "reading": "debaggu",
-        "meaning": "debugging",
-        "example_ja": "コードをデバッグします。",
-        "example_en": "We debug the code."
-      },
       {
         "front": "例外",
         "card_id": "jp-vocab#reigai",
@@ -13859,44 +13635,12 @@
         "example_en": "Watch out for null pointer exceptions."
       },
       {
-        "front": "スタックトレース",
-        "card_id": "",
-        "reading": "sutakku torēsu",
-        "meaning": "stack trace",
-        "example_ja": "スタックトレースを確認します。",
-        "example_en": "We check the stack trace."
-      },
-      {
-        "front": "ログ",
-        "card_id": "",
-        "reading": "rogu",
-        "meaning": "log",
-        "example_ja": "ログを出力してデバッグします。",
-        "example_en": "We debug by printing logs."
-      },
-      {
-        "front": "ブレークポイント",
-        "card_id": "",
-        "reading": "burēkupointo",
-        "meaning": "breakpoint",
-        "example_ja": "この行にブレークポイントを設定します。",
-        "example_en": "We set a breakpoint on this line."
-      },
-      {
         "front": "例外を投げる",
         "card_id": "",
         "reading": "れいがいをなげる (reigai o nageru)",
         "meaning": "to throw an exception",
         "example_ja": "不正な入力なら例外を投げます。",
         "example_en": "If the input is invalid, we throw an exception."
-      },
-      {
-        "front": "キャッチ",
-        "card_id": "",
-        "reading": "kyacchi",
-        "meaning": "to catch",
-        "example_ja": "例外をキャッチして処理します。",
-        "example_en": "We catch and handle the exception."
       },
       {
         "front": "警告",
@@ -13942,57 +13686,9 @@
     "deep": "Daily engineering runs on these. Git verbs are katakana loanwords (コミット, プッシュ, マージ), while process words tend to be kanji (変更, 差分, 依存関係, 設定).",
     "java": "The **Reading** column gives the kana pronunciation and a romaji gloss so you can say the word out loud. Loanwords written in katakana already *are* their reading, so only the romaji is shown. Example sentences are polite (です・ます) form — exactly how you'd hear them in a standup or an interview.",
     "language": "japanese",
-    "lesson": "| 用語 (Term) | 読み方 (Reading) | 意味 (Meaning) | 例文 (Example) |\n|---|---|---|---|\n| リポジトリ | ripojitori | repository | リポジトリをクローンします。 — *We clone the repository.* |\n| コミット | komitto | commit | 変更をコミットします。 — *We commit the changes.* |\n| プッシュ | pusshu | push | リモートにプッシュします。 — *We push to the remote.* |\n| プル | puru | pull | 最新の変更をプルします。 — *We pull the latest changes.* |\n| マージ | māji | merge | ブランチをマージします。 — *We merge the branch.* |\n| ブランチ | buranchi | branch | 新しいブランチを作ります。 — *We create a new branch.* |\n| 変更 | へんこう (henkō) | change | この変更をレビューします。 — *We review this change.* |\n| 差分 | さぶん (sabun) | diff / difference | コミット前に差分を確認します。 — *We check the diff before committing.* |\n| 競合 | きょうごう (kyōgō) | (merge) conflict | マージで競合が起きました。 — *A conflict happened during the merge.* |\n| 解決 | かいけつ (kaiketsu) | resolve | 競合を解決します。 — *We resolve the conflict.* |\n| ビルド | birudo | build | プロジェクトをビルドします。 — *We build the project.* |\n| デプロイ | depuroi | deploy | サーバーにデプロイします。 — *We deploy to the server.* |\n| テスト | tesuto | test | テストを書いて実行します。 — *We write and run the tests.* |\n| 単体テスト | たんたいテスト (tantai tesuto) | unit test | この関数に単体テストを追加します。 — *We add a unit test for this function.* |\n| 依存関係 | いぞんかんけい (izon kankei) | dependencies | npm installで依存関係をインストールします。 — *Install the dependencies with npm install.* |\n| 環境 | かんきょう (kankyō) | environment | 開発環境を用意します。 — *We set up the development environment.* |\n| 設定 | せってい (settei) | configuration / settings | 設定ファイルを編集します。 — *We edit the config file.* |\n| 導入 | どうにゅう (dōnyū) | adopt / introduce | このツールを導入します。 — *We adopt this tool.* |\n| 更新 | こうしん (kōshin) | update | ライブラリを最新版に更新します。 — *We update the library to the latest version.* |\n| コードレビュー | kōdo rebyū | code review | コードレビューをお願いします。 — *Please review my code.* |\n| バージョン管理 | バージョンかんり (bājon kanri) | version control | Gitでバージョン管理します。 — *We manage versions with Git.* |\n| 反映 | はんえい (han'ei) | reflect / apply | 変更を本番環境に反映します。 — *We apply the changes to production.* |\n",
+    "lesson": "| 用語 (Term) | 読み方 (Reading) | 意味 (Meaning) | 例文 (Example) |\n|---|---|---|---|\n| 変更 | へんこう (henkō) | change | この変更をレビューします。 — *We review this change.* |\n| 差分 | さぶん (sabun) | diff / difference | コミット前に差分を確認します。 — *We check the diff before committing.* |\n| 競合 | きょうごう (kyōgō) | (merge) conflict | マージで競合が起きました。 — *A conflict happened during the merge.* |\n| 解決 | かいけつ (kaiketsu) | resolve | 競合を解決します。 — *We resolve the conflict.* |\n| 単体テスト | たんたいテスト (tantai tesuto) | unit test | この関数に単体テストを追加します。 — *We add a unit test for this function.* |\n| 依存関係 | いぞんかんけい (izon kankei) | dependencies | npm installで依存関係をインストールします。 — *Install the dependencies with npm install.* |\n| 環境 | かんきょう (kankyō) | environment | 開発環境を用意します。 — *We set up the development environment.* |\n| 設定 | せってい (settei) | configuration / settings | 設定ファイルを編集します。 — *We edit the config file.* |\n| 導入 | どうにゅう (dōnyū) | adopt / introduce | このツールを導入します。 — *We adopt this tool.* |\n| 更新 | こうしん (kōshin) | update | ライブラリを最新版に更新します。 — *We update the library to the latest version.* |\n| バージョン管理 | バージョンかんり (bājon kanri) | version control | Gitでバージョン管理します。 — *We manage versions with Git.* |\n| 反映 | はんえい (han'ei) | reflect / apply | 変更を本番環境に反映します。 — *We apply the changes to production.* |\n",
     "exercises": [],
     "cards": [
-      {
-        "front": "リポジトリ",
-        "card_id": "",
-        "reading": "ripojitori",
-        "meaning": "repository",
-        "example_ja": "リポジトリをクローンします。",
-        "example_en": "We clone the repository."
-      },
-      {
-        "front": "コミット",
-        "card_id": "",
-        "reading": "komitto",
-        "meaning": "commit",
-        "example_ja": "変更をコミットします。",
-        "example_en": "We commit the changes."
-      },
-      {
-        "front": "プッシュ",
-        "card_id": "",
-        "reading": "pusshu",
-        "meaning": "push",
-        "example_ja": "リモートにプッシュします。",
-        "example_en": "We push to the remote."
-      },
-      {
-        "front": "プル",
-        "card_id": "",
-        "reading": "puru",
-        "meaning": "pull",
-        "example_ja": "最新の変更をプルします。",
-        "example_en": "We pull the latest changes."
-      },
-      {
-        "front": "マージ",
-        "card_id": "",
-        "reading": "māji",
-        "meaning": "merge",
-        "example_ja": "ブランチをマージします。",
-        "example_en": "We merge the branch."
-      },
-      {
-        "front": "ブランチ",
-        "card_id": "",
-        "reading": "buranchi",
-        "meaning": "branch",
-        "example_ja": "新しいブランチを作ります。",
-        "example_en": "We create a new branch."
-      },
       {
         "front": "変更",
         "card_id": "",
@@ -14024,30 +13720,6 @@
         "meaning": "resolve",
         "example_ja": "競合を解決します。",
         "example_en": "We resolve the conflict."
-      },
-      {
-        "front": "ビルド",
-        "card_id": "",
-        "reading": "birudo",
-        "meaning": "build",
-        "example_ja": "プロジェクトをビルドします。",
-        "example_en": "We build the project."
-      },
-      {
-        "front": "デプロイ",
-        "card_id": "",
-        "reading": "depuroi",
-        "meaning": "deploy",
-        "example_ja": "サーバーにデプロイします。",
-        "example_en": "We deploy to the server."
-      },
-      {
-        "front": "テスト",
-        "card_id": "",
-        "reading": "tesuto",
-        "meaning": "test",
-        "example_ja": "テストを書いて実行します。",
-        "example_en": "We write and run the tests."
       },
       {
         "front": "単体テスト",
@@ -14096,14 +13768,6 @@
         "meaning": "update",
         "example_ja": "ライブラリを最新版に更新します。",
         "example_en": "We update the library to the latest version."
-      },
-      {
-        "front": "コードレビュー",
-        "card_id": "",
-        "reading": "kōdo rebyū",
-        "meaning": "code review",
-        "example_ja": "コードレビューをお願いします。",
-        "example_en": "Please review my code."
       },
       {
         "front": "バージョン管理",
@@ -14324,7 +13988,7 @@
     "deep": "TypeScript adds types on top of JavaScript. These are the words for the language itself — 型注釈 (annotation), 型推論 (inference), コンパイル — and the basic building blocks you declare and initialize.",
     "java": "The **Reading** column gives the kana pronunciation and a romaji gloss so you can say the word out loud. Loanwords written in katakana already *are* their reading, so only the romaji is shown. Example sentences are polite (です・ます) form — exactly how you'd hear them in a standup or an interview.",
     "language": "japanese",
-    "lesson": "| 用語 (Term) | 読み方 (Reading) | 意味 (Meaning) | 例文 (Example) |\n|---|---|---|---|\n| TypeScript | TypeScript | TypeScript | TypeScriptはJavaScriptに型を追加した言語です。 — *TypeScript is a language that adds types to JavaScript.* |\n| JavaScript | JavaScript | JavaScript | TypeScriptは最終的にJavaScriptに変換されます。 — *TypeScript is ultimately converted to JavaScript.* |\n| 型注釈 | かたちゅうしゃく (kata chūshaku) | type annotation | 関数の引数には型注釈を付けましょう。 — *Let's add type annotations to function parameters.* |\n| 型推論 | かたすいろん (kata suiron) | type inference | let x = 5と書くと、型推論でxはnumber型になります。 — *Write let x = 5 and type inference makes x a number.* |\n| コンパイル | konpairu | compile | TypeScriptをコンパイルします。 — *We compile the TypeScript.* |\n| トランスパイル | toransupairu | transpile | tscがTypeScriptをJavaScriptにトランスパイルします。 — *tsc transpiles TypeScript to JavaScript.* |\n| 静的型付け | せいてきかたづけ (seiteki katazuke) | static typing | TypeScriptはJavaScriptに静的型付けを加えた言語です。 — *TypeScript is JavaScript with static typing added.* |\n| 型安全 | かたあんぜん (kata anzen) | type safety | anyを使うと型安全が失われます。 — *Using any gives up type safety.* |\n| 変数 | へんすう (hensū) | variable | letで変数を宣言します。 — *We declare a variable with `let`.* |\n| 定数 | ていすう (teisū) | constant | 最大人数をMAX_USERSという定数にしました。 — *I made the maximum number of users a constant called MAX_USERS.* |\n| 再代入 | さいだいにゅう (sai dainyū) | reassignment | constは再代入できません。 — *A `const` cannot be reassigned.* |\n| スコープ | sukōpu | scope | 変数のスコープに注意します。 — *We pay attention to the variable's scope.* |\n| ブロックスコープ | burokku sukōpu | block scope | letはブロックスコープを持ちます。 — *`let` has block scope.* |\n| 宣言 | せんげん (sengen) | declaration | 変数は使う前に宣言する必要があります。 — *A variable must be declared before it is used.* |\n| 初期化 | しょきか (shokika) | initialization | カウンターを0で初期化してからループを始めます。 — *Initialize the counter to 0, then start the loop.* |\n| プリミティブ型 | プリミティブがた (purimitibu gata) | primitive type | numberはプリミティブ型です。 — *`number` is a primitive type.* |\n| 数値 | すうち (sūchi) | number | numberは数値を表します。 — *`number` represents a numeric value.* |\n| 文字列 | もじれつ (mojiretsu) | string | stringは文字列を表します。 — *`string` represents text.* |\n| 真偽値 | しんぎち (shingichi) | boolean | booleanはtrueかfalseです。 — *A boolean is true or false.* |\n| テンプレートリテラル | tenpurēto riteraru | template literal | テンプレートリテラルで文字列を組み立てます。 — *We build strings with template literals.* |\n| 実行環境 | じっこうかんきょう (jikkō kankyō) | runtime environment | Node.jsはJavaScriptの実行環境です。 — *Node.js is a JavaScript runtime.* |\n| 開発環境 | かいはつかんきょう (kaihatsu kankyō) | development environment | 開発環境を整えます。 — *We set up the development environment.* |\n| 構文 | こうぶん (kōbun) | syntax | TypeScriptの構文を学びます。 — *We learn TypeScript's syntax.* |\n| 拡張子 | かくちょうし (kakuchōshi) | file extension | TypeScriptの拡張子は.tsです。 — *The TypeScript extension is `.ts`.* |\n",
+    "lesson": "| 用語 (Term) | 読み方 (Reading) | 意味 (Meaning) | 例文 (Example) |\n|---|---|---|---|\n| TypeScript | TypeScript | TypeScript | TypeScriptはJavaScriptに型を追加した言語です。 — *TypeScript is a language that adds types to JavaScript.* |\n| JavaScript | JavaScript | JavaScript | TypeScriptは最終的にJavaScriptに変換されます。 — *TypeScript is ultimately converted to JavaScript.* |\n| 型注釈 | かたちゅうしゃく (kata chūshaku) | type annotation | 関数の引数には型注釈を付けましょう。 — *Let's add type annotations to function parameters.* |\n| 型推論 | かたすいろん (kata suiron) | type inference | let x = 5と書くと、型推論でxはnumber型になります。 — *Write let x = 5 and type inference makes x a number.* |\n| 静的型付け | せいてきかたづけ (seiteki katazuke) | static typing | TypeScriptはJavaScriptに静的型付けを加えた言語です。 — *TypeScript is JavaScript with static typing added.* |\n| 型安全 | かたあんぜん (kata anzen) | type safety | anyを使うと型安全が失われます。 — *Using any gives up type safety.* |\n| 変数 | へんすう (hensū) | variable | letで変数を宣言します。 — *We declare a variable with `let`.* |\n| 定数 | ていすう (teisū) | constant | 最大人数をMAX_USERSという定数にしました。 — *I made the maximum number of users a constant called MAX_USERS.* |\n| 再代入 | さいだいにゅう (sai dainyū) | reassignment | constは再代入できません。 — *A `const` cannot be reassigned.* |\n| 宣言 | せんげん (sengen) | declaration | 変数は使う前に宣言する必要があります。 — *A variable must be declared before it is used.* |\n| 初期化 | しょきか (shokika) | initialization | カウンターを0で初期化してからループを始めます。 — *Initialize the counter to 0, then start the loop.* |\n| プリミティブ型 | プリミティブがた (purimitibu gata) | primitive type | numberはプリミティブ型です。 — *`number` is a primitive type.* |\n| 数値 | すうち (sūchi) | number | numberは数値を表します。 — *`number` represents a numeric value.* |\n| 文字列 | もじれつ (mojiretsu) | string | stringは文字列を表します。 — *`string` represents text.* |\n| 真偽値 | しんぎち (shingichi) | boolean | booleanはtrueかfalseです。 — *A boolean is true or false.* |\n| 実行環境 | じっこうかんきょう (jikkō kankyō) | runtime environment | Node.jsはJavaScriptの実行環境です。 — *Node.js is a JavaScript runtime.* |\n| 開発環境 | かいはつかんきょう (kaihatsu kankyō) | development environment | 開発環境を整えます。 — *We set up the development environment.* |\n| 構文 | こうぶん (kōbun) | syntax | TypeScriptの構文を学びます。 — *We learn TypeScript's syntax.* |\n| 拡張子 | かくちょうし (kakuchōshi) | file extension | TypeScriptの拡張子は.tsです。 — *The TypeScript extension is `.ts`.* |\n",
     "exercises": [],
     "cards": [
       {
@@ -14358,22 +14022,6 @@
         "meaning": "type inference",
         "example_ja": "let x = 5と書くと、型推論でxはnumber型になります。",
         "example_en": "Write let x = 5 and type inference makes x a number."
-      },
-      {
-        "front": "コンパイル",
-        "card_id": "",
-        "reading": "konpairu",
-        "meaning": "compile",
-        "example_ja": "TypeScriptをコンパイルします。",
-        "example_en": "We compile the TypeScript."
-      },
-      {
-        "front": "トランスパイル",
-        "card_id": "",
-        "reading": "toransupairu",
-        "meaning": "transpile",
-        "example_ja": "tscがTypeScriptをJavaScriptにトランスパイルします。",
-        "example_en": "tsc transpiles TypeScript to JavaScript."
       },
       {
         "front": "静的型付け",
@@ -14414,22 +14062,6 @@
         "meaning": "reassignment",
         "example_ja": "constは再代入できません。",
         "example_en": "A `const` cannot be reassigned."
-      },
-      {
-        "front": "スコープ",
-        "card_id": "",
-        "reading": "sukōpu",
-        "meaning": "scope",
-        "example_ja": "変数のスコープに注意します。",
-        "example_en": "We pay attention to the variable's scope."
-      },
-      {
-        "front": "ブロックスコープ",
-        "card_id": "",
-        "reading": "burokku sukōpu",
-        "meaning": "block scope",
-        "example_ja": "letはブロックスコープを持ちます。",
-        "example_en": "`let` has block scope."
       },
       {
         "front": "宣言",
@@ -14480,14 +14112,6 @@
         "example_en": "A boolean is true or false."
       },
       {
-        "front": "テンプレートリテラル",
-        "card_id": "",
-        "reading": "tenpurēto riteraru",
-        "meaning": "template literal",
-        "example_ja": "テンプレートリテラルで文字列を組み立てます。",
-        "example_en": "We build strings with template literals."
-      },
-      {
         "front": "実行環境",
         "card_id": "",
         "reading": "じっこうかんきょう (jikkō kankyō)",
@@ -14531,7 +14155,7 @@
     "deep": "The heart of TypeScript. You describe the shape of data with インターフェース and 型エイリアス, combine types with ユニオン型 / 交差型, and make them reusable with ジェネリクス. This is where interviews about TypeScript live.",
     "java": "The **Reading** column gives the kana pronunciation and a romaji gloss so you can say the word out loud. Loanwords written in katakana already *are* their reading, so only the romaji is shown. Example sentences are polite (です・ます) form — exactly how you'd hear them in a standup or an interview.",
     "language": "japanese",
-    "lesson": "| 用語 (Term) | 読み方 (Reading) | 意味 (Meaning) | 例文 (Example) |\n|---|---|---|---|\n| 型 | かた (kata) | type | すべての値に型があります。 — *Every value has a type.* |\n| 型エイリアス | かたエイリアス (kata eiriasu) | type alias | typeで型エイリアスを作ります。 — *We make a type alias with `type`.* |\n| インターフェース | intāfēsu | interface | インターフェースでオブジェクトの形を定義します。 — *We define an object's shape with an interface.* |\n| ユニオン型 | ユニオンがた (yunion gata) | union type | ユニオン型で複数の型を許可します。 — *A union type allows several types.* |\n| 交差型 | こうさがた (kōsagata) | intersection type | 交差型を使ってUserとTimestampsを一つにまとめます。 — *Use an intersection type to combine User and Timestamps.* |\n| ジェネリクス | jenerikusu | generics | ジェネリクスで再利用できる型を書きます。 — *We write reusable types with generics.* |\n| 型引数 | かたひきすう (kata hikisū) | type argument | 型引数を省略すると、TypeScriptが推論します。 — *If you leave out the type argument, TypeScript infers it.* |\n| 型ガード | かたガード (kata gādo) | type guard | 型ガードで型を絞り込みます。 — *We narrow the type with a type guard.* |\n| 型アサーション | かたアサーション (kata asāshon) | type assertion | asで型アサーションを行います。 — *We do a type assertion with `as`.* |\n| リテラル型 | リテラルがた (riteraru gata) | literal type | リテラル型で特定の値だけを許可します。 — *A literal type allows only specific values.* |\n| タプル | tapuru | tuple | タプルは長さと型が固定です。 — *A tuple has a fixed length and element types.* |\n| 列挙型 | れっきょがた (rekkyogata) | enum type | 信号の色を列挙型で表しました。 — *I represented the traffic-light colors with an enum.* |\n| 読み取り専用 | よみとりせんよう (yomitori sen'yō) | read-only | idプロパティは読み取り専用なので変更できません。 — *The id property is read-only, so it can't be changed.* |\n| 任意 | にんい (nin'i) | optional | 任意のプロパティは省略できます。 — *An optional property can be omitted.* |\n| null許容 | ヌルきょよう (nuru kyoyō) | nullable | null許容の値はnullになり得ます。 — *A nullable value may be null.* |\n| any型 | エニーがた (enī gata) | the any type | any型は型チェックを無効にします。 — *The `any` type disables type checking.* |\n| unknown型 | アンノウンがた (announ gata) | the unknown type | unknown型は使う前に型を確認します。 — *The `unknown` type must be checked before use.* |\n| プロパティ | puropati | property | オブジェクトのプロパティにアクセスします。 — *We access the object's property.* |\n| 型定義 | かたていぎ (kata teigi) | type definition | ライブラリの型定義を読み込みます。 — *We load the library's type definitions.* |\n| 構造的型付け | こうぞうてきかたづけ (kōzōteki katazuke) | structural typing | 構造的型付けなので、同じプロパティを持つオブジェクトなら代入できます。 — *Because of structural typing, any object with the same properties can be assigned.* |\n| 網羅性チェック | もうらせいチェック (mōrasei chekku) | exhaustiveness check | switch文で網羅性チェックをします。 — *We do an exhaustiveness check in a switch.* |\n| 継承 | けいしょう (keishō) | inheritance | DogクラスはAnimalクラスを継承しています。 — *The Dog class inherits from the Animal class.* |\n| 型変換 | かたへんかん (kata henkan) | type conversion (casting) | doubleからintへの型変換で小数点以下が切り捨てられます。 — *Converting from double to int truncates the decimal part.* |\n| 省略可能 | しょうりゃくかのう (shōryaku kanō) | optional | emailは省略可能なプロパティです。 — *email is an optional property.* |\n| 定義 | ていぎ (teigi) | definition | 型の定義を確認します。 — *We check the type definition.* |\n| 制約 | せいやく (seiyaku) | constraints | 制約はN ≤ 10⁵なので、O(n²)では間に合いません。 — *The constraint is N ≤ 10⁵, so O(n²) is too slow.* |\n",
+    "lesson": "| 用語 (Term) | 読み方 (Reading) | 意味 (Meaning) | 例文 (Example) |\n|---|---|---|---|\n| 型 | かた (kata) | type | すべての値に型があります。 — *Every value has a type.* |\n| 型エイリアス | かたエイリアス (kata eiriasu) | type alias | typeで型エイリアスを作ります。 — *We make a type alias with `type`.* |\n| ユニオン型 | ユニオンがた (yunion gata) | union type | ユニオン型で複数の型を許可します。 — *A union type allows several types.* |\n| 交差型 | こうさがた (kōsagata) | intersection type | 交差型を使ってUserとTimestampsを一つにまとめます。 — *Use an intersection type to combine User and Timestamps.* |\n| 型引数 | かたひきすう (kata hikisū) | type argument | 型引数を省略すると、TypeScriptが推論します。 — *If you leave out the type argument, TypeScript infers it.* |\n| 型ガード | かたガード (kata gādo) | type guard | 型ガードで型を絞り込みます。 — *We narrow the type with a type guard.* |\n| 型アサーション | かたアサーション (kata asāshon) | type assertion | asで型アサーションを行います。 — *We do a type assertion with `as`.* |\n| リテラル型 | リテラルがた (riteraru gata) | literal type | リテラル型で特定の値だけを許可します。 — *A literal type allows only specific values.* |\n| 列挙型 | れっきょがた (rekkyogata) | enum type | 信号の色を列挙型で表しました。 — *I represented the traffic-light colors with an enum.* |\n| 読み取り専用 | よみとりせんよう (yomitori sen'yō) | read-only | idプロパティは読み取り専用なので変更できません。 — *The id property is read-only, so it can't be changed.* |\n| 任意 | にんい (nin'i) | optional | 任意のプロパティは省略できます。 — *An optional property can be omitted.* |\n| null許容 | ヌルきょよう (nuru kyoyō) | nullable | null許容の値はnullになり得ます。 — *A nullable value may be null.* |\n| any型 | エニーがた (enī gata) | the any type | any型は型チェックを無効にします。 — *The `any` type disables type checking.* |\n| unknown型 | アンノウンがた (announ gata) | the unknown type | unknown型は使う前に型を確認します。 — *The `unknown` type must be checked before use.* |\n| 型定義 | かたていぎ (kata teigi) | type definition | ライブラリの型定義を読み込みます。 — *We load the library's type definitions.* |\n| 構造的型付け | こうぞうてきかたづけ (kōzōteki katazuke) | structural typing | 構造的型付けなので、同じプロパティを持つオブジェクトなら代入できます。 — *Because of structural typing, any object with the same properties can be assigned.* |\n| 網羅性チェック | もうらせいチェック (mōrasei chekku) | exhaustiveness check | switch文で網羅性チェックをします。 — *We do an exhaustiveness check in a switch.* |\n| 継承 | けいしょう (keishō) | inheritance | DogクラスはAnimalクラスを継承しています。 — *The Dog class inherits from the Animal class.* |\n| 型変換 | かたへんかん (kata henkan) | type conversion (casting) | doubleからintへの型変換で小数点以下が切り捨てられます。 — *Converting from double to int truncates the decimal part.* |\n| 省略可能 | しょうりゃくかのう (shōryaku kanō) | optional | emailは省略可能なプロパティです。 — *email is an optional property.* |\n| 定義 | ていぎ (teigi) | definition | 型の定義を確認します。 — *We check the type definition.* |\n| 制約 | せいやく (seiyaku) | constraints | 制約はN ≤ 10⁵なので、O(n²)では間に合いません。 — *The constraint is N ≤ 10⁵, so O(n²) is too slow.* |\n",
     "exercises": [],
     "cards": [
       {
@@ -14551,14 +14175,6 @@
         "example_en": "We make a type alias with `type`."
       },
       {
-        "front": "インターフェース",
-        "card_id": "",
-        "reading": "intāfēsu",
-        "meaning": "interface",
-        "example_ja": "インターフェースでオブジェクトの形を定義します。",
-        "example_en": "We define an object's shape with an interface."
-      },
-      {
         "front": "ユニオン型",
         "card_id": "",
         "reading": "ユニオンがた (yunion gata)",
@@ -14573,14 +14189,6 @@
         "meaning": "intersection type",
         "example_ja": "交差型を使ってUserとTimestampsを一つにまとめます。",
         "example_en": "Use an intersection type to combine User and Timestamps."
-      },
-      {
-        "front": "ジェネリクス",
-        "card_id": "",
-        "reading": "jenerikusu",
-        "meaning": "generics",
-        "example_ja": "ジェネリクスで再利用できる型を書きます。",
-        "example_en": "We write reusable types with generics."
       },
       {
         "front": "型引数",
@@ -14613,14 +14221,6 @@
         "meaning": "literal type",
         "example_ja": "リテラル型で特定の値だけを許可します。",
         "example_en": "A literal type allows only specific values."
-      },
-      {
-        "front": "タプル",
-        "card_id": "",
-        "reading": "tapuru",
-        "meaning": "tuple",
-        "example_ja": "タプルは長さと型が固定です。",
-        "example_en": "A tuple has a fixed length and element types."
       },
       {
         "front": "列挙型",
@@ -14669,14 +14269,6 @@
         "meaning": "the unknown type",
         "example_ja": "unknown型は使う前に型を確認します。",
         "example_en": "The `unknown` type must be checked before use."
-      },
-      {
-        "front": "プロパティ",
-        "card_id": "",
-        "reading": "puropati",
-        "meaning": "property",
-        "example_ja": "オブジェクトのプロパティにアクセスします。",
-        "example_en": "We access the object's property."
       },
       {
         "front": "型定義",
@@ -14754,7 +14346,7 @@
     "deep": "Functions and asynchronous code are where a lot of TypeScript work happens. Learn 非同期 (async), プロミス (Promise), 待機 (await), and the words for arguments, return values and callbacks.",
     "java": "The **Reading** column gives the kana pronunciation and a romaji gloss so you can say the word out loud. Loanwords written in katakana already *are* their reading, so only the romaji is shown. Example sentences are polite (です・ます) form — exactly how you'd hear them in a standup or an interview.",
     "language": "japanese",
-    "lesson": "| 用語 (Term) | 読み方 (Reading) | 意味 (Meaning) | 例文 (Example) |\n|---|---|---|---|\n| 関数 | かんすう (kansū) | function | 関数を定義します。 — *We define a function.* |\n| アロー関数 | アローかんすう (arō kansū) | arrow function | アロー関数で短く書けます。 — *We can write it shorter with an arrow function.* |\n| 引数 | ひきすう (hikisū) | argument | 関数に引数を渡します。 — *We pass an argument to the function.* |\n| 仮引数 | かりひきすう (kari hikisū) | parameter (formal parameter) | add(int a, int b)のaとbが仮引数です。 — *In add(int a, int b), a and b are the parameters.* |\n| 戻り値 | もどりち (modorichi) | return value | 関数の戻り値の型を指定します。 — *We specify the function's return type.* |\n| コールバック | kōrubakku | callback | 関数にコールバックを渡します。 — *We pass a callback to the function.* |\n| 高階関数 | こうかいかんすう (kōkai kansū) | higher-order function | mapは高階関数です。 — *`map` is a higher-order function.* |\n| 無名関数 | むめいかんすう (mumei kansū) | anonymous function | 無名関数をその場で渡します。 — *We pass an anonymous function inline.* |\n| 非同期 | ひどうき (hidōki) | asynchronous | fetchは非同期に実行されます。 — *fetch runs asynchronously.* |\n| 同期 | どうき (dōki) | synchronous | この処理は同期的に実行されます。 — *This runs synchronously.* |\n| プロミス | puromisu | Promise | プロミスは非同期の結果を表します。 — *A Promise represents an async result.* |\n| 待機 | たいき (taiki) | waiting (await) | awaitでレスポンスを待機してから画面に表示します。 — *Await the response, then show it on screen.* |\n| 解決 | かいけつ (kaiketsu) | resolve | プロミスが値で解決します。 — *The promise resolves with a value.* |\n| 拒否 | きょひ (kyohi) | reject | エラーでプロミスが拒否されます。 — *The promise is rejected with an error.* |\n| 副作用 | ふくさよう (fukusayō) | side effect | この関数は副作用がありません。 — *This function has no side effects.* |\n| 純粋関数 | じゅんすいかんすう (junsui kansū) | pure function | 純粋関数はテストしやすいです。 — *Pure functions are easy to test.* |\n| デフォルト引数 | デフォルトひきすう (deforuto hikisū) | default parameter | デフォルト引数を設定します。 — *We set a default parameter.* |\n| 残余引数 | ざんよひきすう (zan'yo hikisū) | rest parameters | 残余引数を使えば、いくつでも数値を受け取れます。 — *With rest parameters, you can accept any number of numbers.* |\n| クロージャ | kurōja | closure | クロージャは外側の変数を覚えています。 — *A closure remembers outer variables.* |\n| 再帰 | さいき (saiki) | recursion | 階乗は再帰で簡単に書けます。 — *Factorial is easy to write with recursion.* |\n| 並行処理 | へいこうしょり (heikō shori) | concurrency | 並行処理でダウンロードを高速化しました。 — *We sped up the downloads with concurrency.* |\n| 例外処理 | れいがいしょり (reigai shori) | exception handling | try-catchで例外処理をします。 — *We handle exceptions with try-catch.* |\n| 呼び出し | よびだし (yobidashi) | call / invocation | 関数の呼び出しを確認します。 — *We check the function call.* |\n| 遅延評価 | ちえんひょうか (chien hyōka) | lazy evaluation | 遅延評価で計算を後回しにします。 — *Lazy evaluation defers the computation.* |\n",
+    "lesson": "| 用語 (Term) | 読み方 (Reading) | 意味 (Meaning) | 例文 (Example) |\n|---|---|---|---|\n| 関数 | かんすう (kansū) | function | 関数を定義します。 — *We define a function.* |\n| アロー関数 | アローかんすう (arō kansū) | arrow function | アロー関数で短く書けます。 — *We can write it shorter with an arrow function.* |\n| 引数 | ひきすう (hikisū) | argument | 関数に引数を渡します。 — *We pass an argument to the function.* |\n| 仮引数 | かりひきすう (kari hikisū) | parameter (formal parameter) | add(int a, int b)のaとbが仮引数です。 — *In add(int a, int b), a and b are the parameters.* |\n| 戻り値 | もどりち (modorichi) | return value | 関数の戻り値の型を指定します。 — *We specify the function's return type.* |\n| 高階関数 | こうかいかんすう (kōkai kansū) | higher-order function | mapは高階関数です。 — *`map` is a higher-order function.* |\n| 無名関数 | むめいかんすう (mumei kansū) | anonymous function | 無名関数をその場で渡します。 — *We pass an anonymous function inline.* |\n| 非同期 | ひどうき (hidōki) | asynchronous | fetchは非同期に実行されます。 — *fetch runs asynchronously.* |\n| 同期 | どうき (dōki) | synchronous | この処理は同期的に実行されます。 — *This runs synchronously.* |\n| 待機 | たいき (taiki) | waiting (await) | awaitでレスポンスを待機してから画面に表示します。 — *Await the response, then show it on screen.* |\n| 解決 | かいけつ (kaiketsu) | resolve | プロミスが値で解決します。 — *The promise resolves with a value.* |\n| 拒否 | きょひ (kyohi) | reject | エラーでプロミスが拒否されます。 — *The promise is rejected with an error.* |\n| 副作用 | ふくさよう (fukusayō) | side effect | この関数は副作用がありません。 — *This function has no side effects.* |\n| 純粋関数 | じゅんすいかんすう (junsui kansū) | pure function | 純粋関数はテストしやすいです。 — *Pure functions are easy to test.* |\n| デフォルト引数 | デフォルトひきすう (deforuto hikisū) | default parameter | デフォルト引数を設定します。 — *We set a default parameter.* |\n| 残余引数 | ざんよひきすう (zan'yo hikisū) | rest parameters | 残余引数を使えば、いくつでも数値を受け取れます。 — *With rest parameters, you can accept any number of numbers.* |\n| 再帰 | さいき (saiki) | recursion | 階乗は再帰で簡単に書けます。 — *Factorial is easy to write with recursion.* |\n| 並行処理 | へいこうしょり (heikō shori) | concurrency | 並行処理でダウンロードを高速化しました。 — *We sped up the downloads with concurrency.* |\n| 例外処理 | れいがいしょり (reigai shori) | exception handling | try-catchで例外処理をします。 — *We handle exceptions with try-catch.* |\n| 呼び出し | よびだし (yobidashi) | call / invocation | 関数の呼び出しを確認します。 — *We check the function call.* |\n| 遅延評価 | ちえんひょうか (chien hyōka) | lazy evaluation | 遅延評価で計算を後回しにします。 — *Lazy evaluation defers the computation.* |\n",
     "exercises": [],
     "cards": [
       {
@@ -14798,14 +14390,6 @@
         "example_en": "We specify the function's return type."
       },
       {
-        "front": "コールバック",
-        "card_id": "",
-        "reading": "kōrubakku",
-        "meaning": "callback",
-        "example_ja": "関数にコールバックを渡します。",
-        "example_en": "We pass a callback to the function."
-      },
-      {
         "front": "高階関数",
         "card_id": "",
         "reading": "こうかいかんすう (kōkai kansū)",
@@ -14836,14 +14420,6 @@
         "meaning": "synchronous",
         "example_ja": "この処理は同期的に実行されます。",
         "example_en": "This runs synchronously."
-      },
-      {
-        "front": "プロミス",
-        "card_id": "",
-        "reading": "puromisu",
-        "meaning": "Promise",
-        "example_ja": "プロミスは非同期の結果を表します。",
-        "example_en": "A Promise represents an async result."
       },
       {
         "front": "待機",
@@ -14902,14 +14478,6 @@
         "example_en": "With rest parameters, you can accept any number of numbers."
       },
       {
-        "front": "クロージャ",
-        "card_id": "",
-        "reading": "kurōja",
-        "meaning": "closure",
-        "example_ja": "クロージャは外側の変数を覚えています。",
-        "example_en": "A closure remembers outer variables."
-      },
-      {
         "front": "再帰",
         "card_id": "jp-vocab#saiki",
         "reading": "さいき (saiki)",
@@ -14961,33 +14529,9 @@
     "deep": "Structuring and moving data around: オブジェクト and プロパティ, 分割代入 (destructuring), スプレッド構文 (spread), and how code is organized into モジュール and packages, then built with a バンドラー.",
     "java": "The **Reading** column gives the kana pronunciation and a romaji gloss so you can say the word out loud. Loanwords written in katakana already *are* their reading, so only the romaji is shown. Example sentences are polite (です・ます) form — exactly how you'd hear them in a standup or an interview.",
     "language": "japanese",
-    "lesson": "| 用語 (Term) | 読み方 (Reading) | 意味 (Meaning) | 例文 (Example) |\n|---|---|---|---|\n| オブジェクト | obujekuto | object | オブジェクトにデータをまとめます。 — *We group data in an object.* |\n| プロパティ | puropati | property | オブジェクトにプロパティを追加します。 — *We add a property to the object.* |\n| キー | kī | key | オブジェクトのキーで値を取り出します。 — *We get the value by the object's key.* |\n| 値 | あたい (atai) | value | キーに対応する値を更新します。 — *We update the value for the key.* |\n| 配列 | はいれつ (hairetsu) | array | 整数の配列が与えられます。 — *You are given an array of integers.* |\n| 分割代入 | ぶんかつだいにゅう (bunkatsu dainyū) | destructuring assignment | 分割代入でpropsから必要な値だけを取り出します。 — *Use destructuring to pull just the values you need out of props.* |\n| スプレッド構文 | スプレッドこうぶん (supureddo kōbun) | spread syntax | スプレッド構文で配列を複製します。 — *We copy an array with spread syntax.* |\n| 不変 | ふへん (fuhen) | immutable | 不変オブジェクトはスレッド間で安全に共有できます。 — *Immutable objects can be shared safely between threads.* |\n| 可変 | かへん (kahen) | mutable | 可変のオブジェクトは変更できます。 — *A mutable object can be changed.* |\n| 参照 | さんしょう (sanshō) | reference | オブジェクトは参照で渡されます。 — *Objects are passed by reference.* |\n| 複製 | ふくせい (fukusei) | copy / clone | オブジェクトを複製します。 — *We clone the object.* |\n| モジュール | mojūru | module | コードをモジュールに分けます。 — *We split code into modules.* |\n| インポート | inpōto | import | 別のファイルから関数をインポートします。 — *We import a function from another file.* |\n| エクスポート | ekusupōto | export | 関数をエクスポートします。 — *We export the function.* |\n| 名前空間 | なまえくうかん (namae kūkan) | namespace | 名前空間が違えば、同じ名前の関数を定義できます。 — *In different namespaces, you can define functions with the same name.* |\n| パッケージ | pakkēji | package | npmでパッケージをインストールします。 — *We install a package with npm.* |\n| 依存関係 | いぞんかんけい (izon kankei) | dependencies | npm installで依存関係をインストールします。 — *Install the dependencies with npm install.* |\n| バンドラー | bandorā | bundler | バンドラーがファイルを一つにまとめます。 — *A bundler combines the files into one.* |\n| ビルド | birudo | build | プロジェクトをビルドします。 — *We build the project.* |\n| 反復処理 | はんぷくしょり (hanpuku shori) | iteration | 配列を反復処理します。 — *We iterate over the array.* |\n| マップ | mappu | Map | マップはキーと値の対を保持します。 — *A Map holds key-value pairs.* |\n| セット | setto | Set | セットは重複を許しません。 — *A Set does not allow duplicates.* |\n| JSON形式 | JSONけいしき (JSON keishiki) | JSON format | データをJSON形式で保存します。 — *We save the data in JSON format.* |\n| 直列化 | ちょくれつか (chokuretsuka) | serialization | オブジェクトを直列化します。 — *We serialize the object.* |\n| 検証 | けんしょう (kenshō) | validation | 入力データを検証します。 — *We validate the input data.* |\n| 設定ファイル | せっていファイル (settei fairu) | config file | tsconfigは設定ファイルです。 — *`tsconfig` is a config file.* |\n",
+    "lesson": "| 用語 (Term) | 読み方 (Reading) | 意味 (Meaning) | 例文 (Example) |\n|---|---|---|---|\n| 値 | あたい (atai) | value | キーに対応する値を更新します。 — *We update the value for the key.* |\n| 配列 | はいれつ (hairetsu) | array | 整数の配列が与えられます。 — *You are given an array of integers.* |\n| 分割代入 | ぶんかつだいにゅう (bunkatsu dainyū) | destructuring assignment | 分割代入でpropsから必要な値だけを取り出します。 — *Use destructuring to pull just the values you need out of props.* |\n| スプレッド構文 | スプレッドこうぶん (supureddo kōbun) | spread syntax | スプレッド構文で配列を複製します。 — *We copy an array with spread syntax.* |\n| 不変 | ふへん (fuhen) | immutable | 不変オブジェクトはスレッド間で安全に共有できます。 — *Immutable objects can be shared safely between threads.* |\n| 可変 | かへん (kahen) | mutable | 可変のオブジェクトは変更できます。 — *A mutable object can be changed.* |\n| 参照 | さんしょう (sanshō) | reference | オブジェクトは参照で渡されます。 — *Objects are passed by reference.* |\n| 複製 | ふくせい (fukusei) | copy / clone | オブジェクトを複製します。 — *We clone the object.* |\n| 名前空間 | なまえくうかん (namae kūkan) | namespace | 名前空間が違えば、同じ名前の関数を定義できます。 — *In different namespaces, you can define functions with the same name.* |\n| 依存関係 | いぞんかんけい (izon kankei) | dependencies | npm installで依存関係をインストールします。 — *Install the dependencies with npm install.* |\n| 反復処理 | はんぷくしょり (hanpuku shori) | iteration | 配列を反復処理します。 — *We iterate over the array.* |\n| JSON形式 | JSONけいしき (JSON keishiki) | JSON format | データをJSON形式で保存します。 — *We save the data in JSON format.* |\n| 直列化 | ちょくれつか (chokuretsuka) | serialization | オブジェクトを直列化します。 — *We serialize the object.* |\n| 検証 | けんしょう (kenshō) | validation | 入力データを検証します。 — *We validate the input data.* |\n| 設定ファイル | せっていファイル (settei fairu) | config file | tsconfigは設定ファイルです。 — *`tsconfig` is a config file.* |\n",
     "exercises": [],
     "cards": [
-      {
-        "front": "オブジェクト",
-        "card_id": "",
-        "reading": "obujekuto",
-        "meaning": "object",
-        "example_ja": "オブジェクトにデータをまとめます。",
-        "example_en": "We group data in an object."
-      },
-      {
-        "front": "プロパティ",
-        "card_id": "",
-        "reading": "puropati",
-        "meaning": "property",
-        "example_ja": "オブジェクトにプロパティを追加します。",
-        "example_en": "We add a property to the object."
-      },
-      {
-        "front": "キー",
-        "card_id": "",
-        "reading": "kī",
-        "meaning": "key",
-        "example_ja": "オブジェクトのキーで値を取り出します。",
-        "example_en": "We get the value by the object's key."
-      },
       {
         "front": "値",
         "card_id": "",
@@ -15053,44 +14597,12 @@
         "example_en": "We clone the object."
       },
       {
-        "front": "モジュール",
-        "card_id": "",
-        "reading": "mojūru",
-        "meaning": "module",
-        "example_ja": "コードをモジュールに分けます。",
-        "example_en": "We split code into modules."
-      },
-      {
-        "front": "インポート",
-        "card_id": "",
-        "reading": "inpōto",
-        "meaning": "import",
-        "example_ja": "別のファイルから関数をインポートします。",
-        "example_en": "We import a function from another file."
-      },
-      {
-        "front": "エクスポート",
-        "card_id": "",
-        "reading": "ekusupōto",
-        "meaning": "export",
-        "example_ja": "関数をエクスポートします。",
-        "example_en": "We export the function."
-      },
-      {
         "front": "名前空間",
         "card_id": "jp-vocab#namae-kukan",
         "reading": "なまえくうかん (namae kūkan)",
         "meaning": "namespace",
         "example_ja": "名前空間が違えば、同じ名前の関数を定義できます。",
         "example_en": "In different namespaces, you can define functions with the same name."
-      },
-      {
-        "front": "パッケージ",
-        "card_id": "",
-        "reading": "pakkēji",
-        "meaning": "package",
-        "example_ja": "npmでパッケージをインストールします。",
-        "example_en": "We install a package with npm."
       },
       {
         "front": "依存関係",
@@ -15101,44 +14613,12 @@
         "example_en": "Install the dependencies with npm install."
       },
       {
-        "front": "バンドラー",
-        "card_id": "",
-        "reading": "bandorā",
-        "meaning": "bundler",
-        "example_ja": "バンドラーがファイルを一つにまとめます。",
-        "example_en": "A bundler combines the files into one."
-      },
-      {
-        "front": "ビルド",
-        "card_id": "",
-        "reading": "birudo",
-        "meaning": "build",
-        "example_ja": "プロジェクトをビルドします。",
-        "example_en": "We build the project."
-      },
-      {
         "front": "反復処理",
         "card_id": "",
         "reading": "はんぷくしょり (hanpuku shori)",
         "meaning": "iteration",
         "example_ja": "配列を反復処理します。",
         "example_en": "We iterate over the array."
-      },
-      {
-        "front": "マップ",
-        "card_id": "",
-        "reading": "mappu",
-        "meaning": "Map",
-        "example_ja": "マップはキーと値の対を保持します。",
-        "example_en": "A Map holds key-value pairs."
-      },
-      {
-        "front": "セット",
-        "card_id": "",
-        "reading": "setto",
-        "meaning": "Set",
-        "example_ja": "セットは重複を許しません。",
-        "example_en": "A Set does not allow duplicates."
       },
       {
         "front": "JSON形式",
@@ -15184,33 +14664,9 @@
     "deep": "The surrounding world TypeScript is written for: フロントエンド / バックエンド, コンポーネント and 状態 (state), and the request/response cycle with a server and database.",
     "java": "The **Reading** column gives the kana pronunciation and a romaji gloss so you can say the word out loud. Loanwords written in katakana already *are* their reading, so only the romaji is shown. Example sentences are polite (です・ます) form — exactly how you'd hear them in a standup or an interview.",
     "language": "japanese",
-    "lesson": "| 用語 (Term) | 読み方 (Reading) | 意味 (Meaning) | 例文 (Example) |\n|---|---|---|---|\n| フロントエンド | furonto endo | frontend | フロントエンドの開発を担当します。 — *I'm in charge of frontend development.* |\n| バックエンド | bakku endo | backend | バックエンドとAPIでやり取りします。 — *We communicate with the backend via an API.* |\n| コンポーネント | konpōnento | component | UIをコンポーネントに分けます。 — *We split the UI into components.* |\n| 状態 | じょうたい (jōtai) | state | コンポーネントの状態を管理します。 — *We manage the component's state.* |\n| 描画 | びょうが (byōga) | render | 画面を描画します。 — *We render the screen.* |\n| 再描画 | さいびょうが (sai byōga) | re-render | 状態が変わると再描画されます。 — *It re-renders when the state changes.* |\n| イベント | ibento | event | クリックイベントを処理します。 — *We handle the click event.* |\n| 要求 | ようきゅう (yōkyū) | request | サーバーに要求を送ります。 — *We send a request to the server.* |\n| 応答 | おうとう (ōtō) | response | サーバーからの応答を待ちます。 — *We wait for the server's response.* |\n| 取得 | しゅとく (shutoku) | fetch / get | APIからデータを取得します。 — *We fetch data from the API.* |\n| 更新 | こうしん (kōshin) | update | 画面を最新の状態に更新します。 — *We update the screen to the latest state.* |\n| 読み込み | よみこみ (yomikomi) | loading | データの読み込み中です。 — *The data is loading.* |\n| 表示 | ひょうじ (hyōji) | display | 結果を画面に表示します。 — *We display the result on the screen.* |\n| 入力欄 | にゅうりょくらん (nyūryoku ran) | input field | 入力欄に名前を入れます。 — *We type a name into the input field.* |\n| ボタン | botan | button | ボタンを押すと送信されます。 — *Pressing the button submits it.* |\n| 画面 | がめん (gamen) | screen | 画面のレイアウトを整えます。 — *We arrange the screen layout.* |\n| サーバー | sābā | server | サーバーを起動します。 — *We start the server.* |\n| データベース | dētabēsu | database | データベースに保存します。 — *We save it to the database.* |\n| 認証 | にんしょう (ninshō) | authentication | ユーザー認証を実装します。 — *We implement user authentication.* |\n| 権限 | けんげん (kengen) | permission | 管理者の権限が必要です。 — *Admin permission is required.* |\n| 通信 | つうしん (tsūshin) | communication | サーバーと通信します。 — *We communicate with the server.* |\n| 非同期通信 | ひどうきつうしん (hidōki tsūshin) | async communication | 非同期通信でページを更新します。 — *We update the page with async communication.* |\n| 再利用 | さいりよう (sairiyō) | reuse | コンポーネントを再利用します。 — *We reuse the component.* |\n| 端末 | たんまつ (tanmatsu) | terminal | 端末でコマンドを実行します。 — *We run commands in the terminal.* |\n",
+    "lesson": "| 用語 (Term) | 読み方 (Reading) | 意味 (Meaning) | 例文 (Example) |\n|---|---|---|---|\n| 状態 | じょうたい (jōtai) | state | コンポーネントの状態を管理します。 — *We manage the component's state.* |\n| 描画 | びょうが (byōga) | render | 画面を描画します。 — *We render the screen.* |\n| 再描画 | さいびょうが (sai byōga) | re-render | 状態が変わると再描画されます。 — *It re-renders when the state changes.* |\n| 要求 | ようきゅう (yōkyū) | request | サーバーに要求を送ります。 — *We send a request to the server.* |\n| 応答 | おうとう (ōtō) | response | サーバーからの応答を待ちます。 — *We wait for the server's response.* |\n| 取得 | しゅとく (shutoku) | fetch / get | APIからデータを取得します。 — *We fetch data from the API.* |\n| 更新 | こうしん (kōshin) | update | 画面を最新の状態に更新します。 — *We update the screen to the latest state.* |\n| 読み込み | よみこみ (yomikomi) | loading | データの読み込み中です。 — *The data is loading.* |\n| 表示 | ひょうじ (hyōji) | display | 結果を画面に表示します。 — *We display the result on the screen.* |\n| 入力欄 | にゅうりょくらん (nyūryoku ran) | input field | 入力欄に名前を入れます。 — *We type a name into the input field.* |\n| 画面 | がめん (gamen) | screen | 画面のレイアウトを整えます。 — *We arrange the screen layout.* |\n| 認証 | にんしょう (ninshō) | authentication | ユーザー認証を実装します。 — *We implement user authentication.* |\n| 権限 | けんげん (kengen) | permission | 管理者の権限が必要です。 — *Admin permission is required.* |\n| 通信 | つうしん (tsūshin) | communication | サーバーと通信します。 — *We communicate with the server.* |\n| 非同期通信 | ひどうきつうしん (hidōki tsūshin) | async communication | 非同期通信でページを更新します。 — *We update the page with async communication.* |\n| 再利用 | さいりよう (sairiyō) | reuse | コンポーネントを再利用します。 — *We reuse the component.* |\n| 端末 | たんまつ (tanmatsu) | terminal | 端末でコマンドを実行します。 — *We run commands in the terminal.* |\n",
     "exercises": [],
     "cards": [
-      {
-        "front": "フロントエンド",
-        "card_id": "",
-        "reading": "furonto endo",
-        "meaning": "frontend",
-        "example_ja": "フロントエンドの開発を担当します。",
-        "example_en": "I'm in charge of frontend development."
-      },
-      {
-        "front": "バックエンド",
-        "card_id": "",
-        "reading": "bakku endo",
-        "meaning": "backend",
-        "example_ja": "バックエンドとAPIでやり取りします。",
-        "example_en": "We communicate with the backend via an API."
-      },
-      {
-        "front": "コンポーネント",
-        "card_id": "",
-        "reading": "konpōnento",
-        "meaning": "component",
-        "example_ja": "UIをコンポーネントに分けます。",
-        "example_en": "We split the UI into components."
-      },
       {
         "front": "状態",
         "card_id": "",
@@ -15234,14 +14690,6 @@
         "meaning": "re-render",
         "example_ja": "状態が変わると再描画されます。",
         "example_en": "It re-renders when the state changes."
-      },
-      {
-        "front": "イベント",
-        "card_id": "",
-        "reading": "ibento",
-        "meaning": "event",
-        "example_ja": "クリックイベントを処理します。",
-        "example_en": "We handle the click event."
       },
       {
         "front": "要求",
@@ -15300,36 +14748,12 @@
         "example_en": "We type a name into the input field."
       },
       {
-        "front": "ボタン",
-        "card_id": "",
-        "reading": "botan",
-        "meaning": "button",
-        "example_ja": "ボタンを押すと送信されます。",
-        "example_en": "Pressing the button submits it."
-      },
-      {
         "front": "画面",
         "card_id": "",
         "reading": "がめん (gamen)",
         "meaning": "screen",
         "example_ja": "画面のレイアウトを整えます。",
         "example_en": "We arrange the screen layout."
-      },
-      {
-        "front": "サーバー",
-        "card_id": "",
-        "reading": "sābā",
-        "meaning": "server",
-        "example_ja": "サーバーを起動します。",
-        "example_en": "We start the server."
-      },
-      {
-        "front": "データベース",
-        "card_id": "",
-        "reading": "dētabēsu",
-        "meaning": "database",
-        "example_ja": "データベースに保存します。",
-        "example_en": "We save it to the database."
       },
       {
         "front": "認証",
@@ -15378,6 +14802,533 @@
         "meaning": "terminal",
         "example_ja": "端末でコマンドを実行します。",
         "example_en": "We run commands in the terminal."
+      }
+    ],
+    "quiz": [],
+    "practice": []
+  },
+  {
+    "key": "jp_katakana",
+    "name": "カタカナ Loanwords — 外来語",
+    "category": "JP: カタカナ Loanwords",
+    "what": "The 64 borrowed words, gathered out of the other sets.",
+    "deep": "Japanese technical writing borrows heavily, and a borrowed word is written in katakana and pronounced roughly like the English it came from. That makes them the easiest words to read aloud and the easiest to stumble over in a sentence, because ブレークポイント only becomes *breakpoint* once you stop sounding it out.",
+    "java": "There is no **Reading** column to learn here: a katakana word *is* its reading, so only the romaji gloss is given. What these cards actually test is the other direction — seeing コンストラクタ and reaching for *constructor* fast enough to keep up with the sentence around it. For that reason the Type-the-reading study mode is switched off for this set; it would only ask you to transliterate.",
+    "language": "japanese",
+    "lesson": "Every katakana term from the other 日本語 sets, in one place. These are the words you can already say — the work is hearing them as *English* without stopping to decode.\n\n### プログラミングの基礎 · Coding basics\n\n| 用語 (Term) | 読み方 (Reading) | 意味 (Meaning) | 例文 (Example) |\n|---|---|---|---|\n| プログラミング | puroguramingu | programming | 毎日プログラミングを練習しています。 — *I practice programming every day.* |\n| コード | kōdo | code | このコードを読んでください。 — *Please read this code.* |\n| プログラム | puroguramu | program | プログラムを実行します。 — *I'll run the program.* |\n| コンパイル | konpairu | compile | ソースコードをコンパイルします。 — *We compile the source code.* |\n| コメント | komento | comment | コードにコメントを書きます。 — *I write comments in the code.* |\n\n### Java\n\n| 用語 (Term) | 読み方 (Reading) | 意味 (Meaning) | 例文 (Example) |\n|---|---|---|---|\n| クラス | kurasu | class | 新しいクラスを作ります。 — *We create a new class.* |\n| メソッド | mesoddo | method | このメソッドを呼び出します。 — *We call this method.* |\n| オブジェクト | obujekuto | object | オブジェクトを生成します。 — *We instantiate an object.* |\n| インスタンス | insutansu | instance | クラスのインスタンスを作ります。 — *We create an instance of the class.* |\n| フィールド | fīrudo | field (member variable) | このクラスには三つのフィールドがあります。 — *This class has three fields.* |\n| コンストラクタ | konsutorakuta | constructor | コンストラクタで初期化します。 — *We initialize in the constructor.* |\n| インターフェース | intāfēsu | interface | インターフェースを実装します。 — *We implement the interface.* |\n| オーバーライド | ōbāraido | override | メソッドをオーバーライドします。 — *We override the method.* |\n| ジェネリクス | jenerikusu | generics | ジェネリクスで型を指定します。 — *We specify the type with generics.* |\n| パッケージ | pakkēji | package | このクラスは同じパッケージにあります。 — *This class is in the same package.* |\n| インポート | inpōto | import | ライブラリをインポートします。 — *We import the library.* |\n| アノテーション | anotēshon | annotation | @Overrideはアノテーションです。 — *`@Override` is an annotation.* |\n| ライブラリ | raiburari | library | 標準ライブラリを使います。 — *We use the standard library.* |\n| フレームワーク | furēmuwāku | framework | このフレームワークは便利です。 — *This framework is convenient.* |\n\n### データ構造 · Data structures\n\n| 用語 (Term) | 読み方 (Reading) | 意味 (Meaning) | 例文 (Example) |\n|---|---|---|---|\n| アルゴリズム | arugorizumu | algorithm | 効率の良いアルゴリズムを考えます。 — *We think of an efficient algorithm.* |\n| スタック | sutakku | stack | スタックは後入れ先出しです。 — *A stack is last-in, first-out.* |\n| キュー | kyū | queue | キューは先入れ先出しです。 — *A queue is first-in, first-out.* |\n| グラフ | gurafu | graph | グラフを幅優先で探索します。 — *We traverse the graph breadth-first.* |\n| ノード | nōdo | node | 各ノードは値を持ちます。 — *Each node holds a value.* |\n| ハッシュマップ | hasshu mappu | hash map | ハッシュマップで高速に検索します。 — *We search quickly with a hash map.* |\n\n### エラーとデバッグ · Errors & debugging\n\n| 用語 (Term) | 読み方 (Reading) | 意味 (Meaning) | 例文 (Example) |\n|---|---|---|---|\n| エラー | erā | error | エラーが発生しました。 — *An error occurred.* |\n| バグ | bagu | bug | このバグを直します。 — *I'll fix this bug.* |\n| デバッグ | debaggu | debugging | コードをデバッグします。 — *We debug the code.* |\n| スタックトレース | sutakku torēsu | stack trace | スタックトレースを確認します。 — *We check the stack trace.* |\n| ログ | rogu | log | ログを出力してデバッグします。 — *We debug by printing logs.* |\n| ブレークポイント | burēkupointo | breakpoint | この行にブレークポイントを設定します。 — *We set a breakpoint on this line.* |\n| キャッチ | kyacchi | to catch | 例外をキャッチして処理します。 — *We catch and handle the exception.* |\n\n### 開発ツールとGit · Dev tools & Git\n\n| 用語 (Term) | 読み方 (Reading) | 意味 (Meaning) | 例文 (Example) |\n|---|---|---|---|\n| リポジトリ | ripojitori | repository | リポジトリをクローンします。 — *We clone the repository.* |\n| コミット | komitto | commit | 変更をコミットします。 — *We commit the changes.* |\n| プッシュ | pusshu | push | リモートにプッシュします。 — *We push to the remote.* |\n| プル | puru | pull | 最新の変更をプルします。 — *We pull the latest changes.* |\n| マージ | māji | merge | ブランチをマージします。 — *We merge the branch.* |\n| ブランチ | buranchi | branch | 新しいブランチを作ります。 — *We create a new branch.* |\n| ビルド | birudo | build | プロジェクトをビルドします。 — *We build the project.* |\n| デプロイ | depuroi | deploy | サーバーにデプロイします。 — *We deploy to the server.* |\n| テスト | tesuto | test | テストを書いて実行します。 — *We write and run the tests.* |\n| コードレビュー | kōdo rebyū | code review | コードレビューをお願いします。 — *Please review my code.* |\n\n### TypeScriptの基礎 · TypeScript basics\n\n| 用語 (Term) | 読み方 (Reading) | 意味 (Meaning) | 例文 (Example) |\n|---|---|---|---|\n| トランスパイル | toransupairu | transpile | tscがTypeScriptをJavaScriptにトランスパイルします。 — *tsc transpiles TypeScript to JavaScript.* |\n| スコープ | sukōpu | scope | 変数のスコープに注意します。 — *We pay attention to the variable's scope.* |\n| ブロックスコープ | burokku sukōpu | block scope | letはブロックスコープを持ちます。 — *`let` has block scope.* |\n| テンプレートリテラル | tenpurēto riteraru | template literal | テンプレートリテラルで文字列を組み立てます。 — *We build strings with template literals.* |\n\n### 型 · Types\n\n| 用語 (Term) | 読み方 (Reading) | 意味 (Meaning) | 例文 (Example) |\n|---|---|---|---|\n| タプル | tapuru | tuple | タプルは長さと型が固定です。 — *A tuple has a fixed length and element types.* |\n| プロパティ | puropati | property | オブジェクトのプロパティにアクセスします。 — *We access the object's property.* |\n\n### 関数と非同期 · Functions & async\n\n| 用語 (Term) | 読み方 (Reading) | 意味 (Meaning) | 例文 (Example) |\n|---|---|---|---|\n| コールバック | kōrubakku | callback | 関数にコールバックを渡します。 — *We pass a callback to the function.* |\n| プロミス | puromisu | Promise | プロミスは非同期の結果を表します。 — *A Promise represents an async result.* |\n| クロージャ | kurōja | closure | クロージャは外側の変数を覚えています。 — *A closure remembers outer variables.* |\n\n### オブジェクトとモジュール · Objects & modules\n\n| 用語 (Term) | 読み方 (Reading) | 意味 (Meaning) | 例文 (Example) |\n|---|---|---|---|\n| キー | kī | key | オブジェクトのキーで値を取り出します。 — *We get the value by the object's key.* |\n| モジュール | mojūru | module | コードをモジュールに分けます。 — *We split code into modules.* |\n| エクスポート | ekusupōto | export | 関数をエクスポートします。 — *We export the function.* |\n| バンドラー | bandorā | bundler | バンドラーがファイルを一つにまとめます。 — *A bundler combines the files into one.* |\n| マップ | mappu | Map | マップはキーと値の対を保持します。 — *A Map holds key-value pairs.* |\n| セット | setto | Set | セットは重複を許しません。 — *A Set does not allow duplicates.* |\n\n### Webとフロントエンド · Web & frontend\n\n| 用語 (Term) | 読み方 (Reading) | 意味 (Meaning) | 例文 (Example) |\n|---|---|---|---|\n| フロントエンド | furonto endo | frontend | フロントエンドの開発を担当します。 — *I'm in charge of frontend development.* |\n| バックエンド | bakku endo | backend | バックエンドとAPIでやり取りします。 — *We communicate with the backend via an API.* |\n| コンポーネント | konpōnento | component | UIをコンポーネントに分けます。 — *We split the UI into components.* |\n| イベント | ibento | event | クリックイベントを処理します。 — *We handle the click event.* |\n| ボタン | botan | button | ボタンを押すと送信されます。 — *Pressing the button submits it.* |\n| サーバー | sābā | server | サーバーを起動します。 — *We start the server.* |\n| データベース | dētabēsu | database | データベースに保存します。 — *We save it to the database.* |\n",
+    "exercises": [],
+    "cards": [
+      {
+        "front": "プログラミング",
+        "card_id": "",
+        "reading": "puroguramingu",
+        "meaning": "programming",
+        "example_ja": "毎日プログラミングを練習しています。",
+        "example_en": "I practice programming every day."
+      },
+      {
+        "front": "コード",
+        "card_id": "",
+        "reading": "kōdo",
+        "meaning": "code",
+        "example_ja": "このコードを読んでください。",
+        "example_en": "Please read this code."
+      },
+      {
+        "front": "プログラム",
+        "card_id": "",
+        "reading": "puroguramu",
+        "meaning": "program",
+        "example_ja": "プログラムを実行します。",
+        "example_en": "I'll run the program."
+      },
+      {
+        "front": "コンパイル",
+        "card_id": "",
+        "reading": "konpairu",
+        "meaning": "compile",
+        "example_ja": "ソースコードをコンパイルします。",
+        "example_en": "We compile the source code."
+      },
+      {
+        "front": "コメント",
+        "card_id": "",
+        "reading": "komento",
+        "meaning": "comment",
+        "example_ja": "コードにコメントを書きます。",
+        "example_en": "I write comments in the code."
+      },
+      {
+        "front": "クラス",
+        "card_id": "",
+        "reading": "kurasu",
+        "meaning": "class",
+        "example_ja": "新しいクラスを作ります。",
+        "example_en": "We create a new class."
+      },
+      {
+        "front": "メソッド",
+        "card_id": "",
+        "reading": "mesoddo",
+        "meaning": "method",
+        "example_ja": "このメソッドを呼び出します。",
+        "example_en": "We call this method."
+      },
+      {
+        "front": "オブジェクト",
+        "card_id": "",
+        "reading": "obujekuto",
+        "meaning": "object",
+        "example_ja": "オブジェクトを生成します。",
+        "example_en": "We instantiate an object."
+      },
+      {
+        "front": "インスタンス",
+        "card_id": "",
+        "reading": "insutansu",
+        "meaning": "instance",
+        "example_ja": "クラスのインスタンスを作ります。",
+        "example_en": "We create an instance of the class."
+      },
+      {
+        "front": "フィールド",
+        "card_id": "",
+        "reading": "fīrudo",
+        "meaning": "field (member variable)",
+        "example_ja": "このクラスには三つのフィールドがあります。",
+        "example_en": "This class has three fields."
+      },
+      {
+        "front": "コンストラクタ",
+        "card_id": "",
+        "reading": "konsutorakuta",
+        "meaning": "constructor",
+        "example_ja": "コンストラクタで初期化します。",
+        "example_en": "We initialize in the constructor."
+      },
+      {
+        "front": "インターフェース",
+        "card_id": "",
+        "reading": "intāfēsu",
+        "meaning": "interface",
+        "example_ja": "インターフェースを実装します。",
+        "example_en": "We implement the interface."
+      },
+      {
+        "front": "オーバーライド",
+        "card_id": "",
+        "reading": "ōbāraido",
+        "meaning": "override",
+        "example_ja": "メソッドをオーバーライドします。",
+        "example_en": "We override the method."
+      },
+      {
+        "front": "ジェネリクス",
+        "card_id": "",
+        "reading": "jenerikusu",
+        "meaning": "generics",
+        "example_ja": "ジェネリクスで型を指定します。",
+        "example_en": "We specify the type with generics."
+      },
+      {
+        "front": "パッケージ",
+        "card_id": "",
+        "reading": "pakkēji",
+        "meaning": "package",
+        "example_ja": "このクラスは同じパッケージにあります。",
+        "example_en": "This class is in the same package."
+      },
+      {
+        "front": "インポート",
+        "card_id": "",
+        "reading": "inpōto",
+        "meaning": "import",
+        "example_ja": "ライブラリをインポートします。",
+        "example_en": "We import the library."
+      },
+      {
+        "front": "アノテーション",
+        "card_id": "",
+        "reading": "anotēshon",
+        "meaning": "annotation",
+        "example_ja": "@Overrideはアノテーションです。",
+        "example_en": "`@Override` is an annotation."
+      },
+      {
+        "front": "ライブラリ",
+        "card_id": "",
+        "reading": "raiburari",
+        "meaning": "library",
+        "example_ja": "標準ライブラリを使います。",
+        "example_en": "We use the standard library."
+      },
+      {
+        "front": "フレームワーク",
+        "card_id": "",
+        "reading": "furēmuwāku",
+        "meaning": "framework",
+        "example_ja": "このフレームワークは便利です。",
+        "example_en": "This framework is convenient."
+      },
+      {
+        "front": "アルゴリズム",
+        "card_id": "",
+        "reading": "arugorizumu",
+        "meaning": "algorithm",
+        "example_ja": "効率の良いアルゴリズムを考えます。",
+        "example_en": "We think of an efficient algorithm."
+      },
+      {
+        "front": "スタック",
+        "card_id": "",
+        "reading": "sutakku",
+        "meaning": "stack",
+        "example_ja": "スタックは後入れ先出しです。",
+        "example_en": "A stack is last-in, first-out."
+      },
+      {
+        "front": "キュー",
+        "card_id": "",
+        "reading": "kyū",
+        "meaning": "queue",
+        "example_ja": "キューは先入れ先出しです。",
+        "example_en": "A queue is first-in, first-out."
+      },
+      {
+        "front": "グラフ",
+        "card_id": "",
+        "reading": "gurafu",
+        "meaning": "graph",
+        "example_ja": "グラフを幅優先で探索します。",
+        "example_en": "We traverse the graph breadth-first."
+      },
+      {
+        "front": "ノード",
+        "card_id": "",
+        "reading": "nōdo",
+        "meaning": "node",
+        "example_ja": "各ノードは値を持ちます。",
+        "example_en": "Each node holds a value."
+      },
+      {
+        "front": "ハッシュマップ",
+        "card_id": "",
+        "reading": "hasshu mappu",
+        "meaning": "hash map",
+        "example_ja": "ハッシュマップで高速に検索します。",
+        "example_en": "We search quickly with a hash map."
+      },
+      {
+        "front": "エラー",
+        "card_id": "",
+        "reading": "erā",
+        "meaning": "error",
+        "example_ja": "エラーが発生しました。",
+        "example_en": "An error occurred."
+      },
+      {
+        "front": "バグ",
+        "card_id": "",
+        "reading": "bagu",
+        "meaning": "bug",
+        "example_ja": "このバグを直します。",
+        "example_en": "I'll fix this bug."
+      },
+      {
+        "front": "デバッグ",
+        "card_id": "",
+        "reading": "debaggu",
+        "meaning": "debugging",
+        "example_ja": "コードをデバッグします。",
+        "example_en": "We debug the code."
+      },
+      {
+        "front": "スタックトレース",
+        "card_id": "",
+        "reading": "sutakku torēsu",
+        "meaning": "stack trace",
+        "example_ja": "スタックトレースを確認します。",
+        "example_en": "We check the stack trace."
+      },
+      {
+        "front": "ログ",
+        "card_id": "",
+        "reading": "rogu",
+        "meaning": "log",
+        "example_ja": "ログを出力してデバッグします。",
+        "example_en": "We debug by printing logs."
+      },
+      {
+        "front": "ブレークポイント",
+        "card_id": "",
+        "reading": "burēkupointo",
+        "meaning": "breakpoint",
+        "example_ja": "この行にブレークポイントを設定します。",
+        "example_en": "We set a breakpoint on this line."
+      },
+      {
+        "front": "キャッチ",
+        "card_id": "",
+        "reading": "kyacchi",
+        "meaning": "to catch",
+        "example_ja": "例外をキャッチして処理します。",
+        "example_en": "We catch and handle the exception."
+      },
+      {
+        "front": "リポジトリ",
+        "card_id": "",
+        "reading": "ripojitori",
+        "meaning": "repository",
+        "example_ja": "リポジトリをクローンします。",
+        "example_en": "We clone the repository."
+      },
+      {
+        "front": "コミット",
+        "card_id": "",
+        "reading": "komitto",
+        "meaning": "commit",
+        "example_ja": "変更をコミットします。",
+        "example_en": "We commit the changes."
+      },
+      {
+        "front": "プッシュ",
+        "card_id": "",
+        "reading": "pusshu",
+        "meaning": "push",
+        "example_ja": "リモートにプッシュします。",
+        "example_en": "We push to the remote."
+      },
+      {
+        "front": "プル",
+        "card_id": "",
+        "reading": "puru",
+        "meaning": "pull",
+        "example_ja": "最新の変更をプルします。",
+        "example_en": "We pull the latest changes."
+      },
+      {
+        "front": "マージ",
+        "card_id": "",
+        "reading": "māji",
+        "meaning": "merge",
+        "example_ja": "ブランチをマージします。",
+        "example_en": "We merge the branch."
+      },
+      {
+        "front": "ブランチ",
+        "card_id": "",
+        "reading": "buranchi",
+        "meaning": "branch",
+        "example_ja": "新しいブランチを作ります。",
+        "example_en": "We create a new branch."
+      },
+      {
+        "front": "ビルド",
+        "card_id": "",
+        "reading": "birudo",
+        "meaning": "build",
+        "example_ja": "プロジェクトをビルドします。",
+        "example_en": "We build the project."
+      },
+      {
+        "front": "デプロイ",
+        "card_id": "",
+        "reading": "depuroi",
+        "meaning": "deploy",
+        "example_ja": "サーバーにデプロイします。",
+        "example_en": "We deploy to the server."
+      },
+      {
+        "front": "テスト",
+        "card_id": "",
+        "reading": "tesuto",
+        "meaning": "test",
+        "example_ja": "テストを書いて実行します。",
+        "example_en": "We write and run the tests."
+      },
+      {
+        "front": "コードレビュー",
+        "card_id": "",
+        "reading": "kōdo rebyū",
+        "meaning": "code review",
+        "example_ja": "コードレビューをお願いします。",
+        "example_en": "Please review my code."
+      },
+      {
+        "front": "トランスパイル",
+        "card_id": "",
+        "reading": "toransupairu",
+        "meaning": "transpile",
+        "example_ja": "tscがTypeScriptをJavaScriptにトランスパイルします。",
+        "example_en": "tsc transpiles TypeScript to JavaScript."
+      },
+      {
+        "front": "スコープ",
+        "card_id": "",
+        "reading": "sukōpu",
+        "meaning": "scope",
+        "example_ja": "変数のスコープに注意します。",
+        "example_en": "We pay attention to the variable's scope."
+      },
+      {
+        "front": "ブロックスコープ",
+        "card_id": "",
+        "reading": "burokku sukōpu",
+        "meaning": "block scope",
+        "example_ja": "letはブロックスコープを持ちます。",
+        "example_en": "`let` has block scope."
+      },
+      {
+        "front": "テンプレートリテラル",
+        "card_id": "",
+        "reading": "tenpurēto riteraru",
+        "meaning": "template literal",
+        "example_ja": "テンプレートリテラルで文字列を組み立てます。",
+        "example_en": "We build strings with template literals."
+      },
+      {
+        "front": "タプル",
+        "card_id": "",
+        "reading": "tapuru",
+        "meaning": "tuple",
+        "example_ja": "タプルは長さと型が固定です。",
+        "example_en": "A tuple has a fixed length and element types."
+      },
+      {
+        "front": "プロパティ",
+        "card_id": "",
+        "reading": "puropati",
+        "meaning": "property",
+        "example_ja": "オブジェクトのプロパティにアクセスします。",
+        "example_en": "We access the object's property."
+      },
+      {
+        "front": "コールバック",
+        "card_id": "",
+        "reading": "kōrubakku",
+        "meaning": "callback",
+        "example_ja": "関数にコールバックを渡します。",
+        "example_en": "We pass a callback to the function."
+      },
+      {
+        "front": "プロミス",
+        "card_id": "",
+        "reading": "puromisu",
+        "meaning": "Promise",
+        "example_ja": "プロミスは非同期の結果を表します。",
+        "example_en": "A Promise represents an async result."
+      },
+      {
+        "front": "クロージャ",
+        "card_id": "",
+        "reading": "kurōja",
+        "meaning": "closure",
+        "example_ja": "クロージャは外側の変数を覚えています。",
+        "example_en": "A closure remembers outer variables."
+      },
+      {
+        "front": "キー",
+        "card_id": "",
+        "reading": "kī",
+        "meaning": "key",
+        "example_ja": "オブジェクトのキーで値を取り出します。",
+        "example_en": "We get the value by the object's key."
+      },
+      {
+        "front": "モジュール",
+        "card_id": "",
+        "reading": "mojūru",
+        "meaning": "module",
+        "example_ja": "コードをモジュールに分けます。",
+        "example_en": "We split code into modules."
+      },
+      {
+        "front": "エクスポート",
+        "card_id": "",
+        "reading": "ekusupōto",
+        "meaning": "export",
+        "example_ja": "関数をエクスポートします。",
+        "example_en": "We export the function."
+      },
+      {
+        "front": "バンドラー",
+        "card_id": "",
+        "reading": "bandorā",
+        "meaning": "bundler",
+        "example_ja": "バンドラーがファイルを一つにまとめます。",
+        "example_en": "A bundler combines the files into one."
+      },
+      {
+        "front": "マップ",
+        "card_id": "",
+        "reading": "mappu",
+        "meaning": "Map",
+        "example_ja": "マップはキーと値の対を保持します。",
+        "example_en": "A Map holds key-value pairs."
+      },
+      {
+        "front": "セット",
+        "card_id": "",
+        "reading": "setto",
+        "meaning": "Set",
+        "example_ja": "セットは重複を許しません。",
+        "example_en": "A Set does not allow duplicates."
+      },
+      {
+        "front": "フロントエンド",
+        "card_id": "",
+        "reading": "furonto endo",
+        "meaning": "frontend",
+        "example_ja": "フロントエンドの開発を担当します。",
+        "example_en": "I'm in charge of frontend development."
+      },
+      {
+        "front": "バックエンド",
+        "card_id": "",
+        "reading": "bakku endo",
+        "meaning": "backend",
+        "example_ja": "バックエンドとAPIでやり取りします。",
+        "example_en": "We communicate with the backend via an API."
+      },
+      {
+        "front": "コンポーネント",
+        "card_id": "",
+        "reading": "konpōnento",
+        "meaning": "component",
+        "example_ja": "UIをコンポーネントに分けます。",
+        "example_en": "We split the UI into components."
+      },
+      {
+        "front": "イベント",
+        "card_id": "",
+        "reading": "ibento",
+        "meaning": "event",
+        "example_ja": "クリックイベントを処理します。",
+        "example_en": "We handle the click event."
+      },
+      {
+        "front": "ボタン",
+        "card_id": "",
+        "reading": "botan",
+        "meaning": "button",
+        "example_ja": "ボタンを押すと送信されます。",
+        "example_en": "Pressing the button submits it."
+      },
+      {
+        "front": "サーバー",
+        "card_id": "",
+        "reading": "sābā",
+        "meaning": "server",
+        "example_ja": "サーバーを起動します。",
+        "example_en": "We start the server."
+      },
+      {
+        "front": "データベース",
+        "card_id": "",
+        "reading": "dētabēsu",
+        "meaning": "database",
+        "example_ja": "データベースに保存します。",
+        "example_en": "We save it to the database."
       }
     ],
     "quiz": [],
