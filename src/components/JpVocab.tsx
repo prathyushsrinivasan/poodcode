@@ -20,6 +20,13 @@ import {
   type VocabState,
 } from "../lib/jpVocab";
 import { acceptsReading, joinReading } from "../lib/romaji";
+import {
+  currentVoices,
+  onVoicesChanged,
+  pickJapaneseVoice,
+  speakJapanese,
+  speechSupported,
+} from "../lib/speech";
 import { todayISO } from "../lib/srs";
 
 const TAG_STORE_KEY = "poodcode:jp-vocab-tag";
@@ -651,6 +658,46 @@ export function JpVocabCard({
   );
 }
 
+/**
+ * The Japanese voice the OS offers, or null if it offers none.
+ *
+ * Chrome and Edge return an empty list from `getVoices()` on the first call and
+ * fill it in later, so this listens for `voiceschanged` too — and gives up
+ * after a moment, because on a machine with no voices at all the event never
+ * fires and the button would otherwise wait forever.
+ */
+function useJapaneseVoice(): { ready: boolean; voice: SpeechSynthesisVoice | null } {
+  const [voice, setVoice] = useState<SpeechSynthesisVoice | null>(null);
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    if (!speechSupported()) {
+      setReady(true);
+      return;
+    }
+    let alive = true;
+    const apply = () => {
+      if (!alive) return;
+      const voices = currentVoices();
+      if (voices.length === 0) return; // not populated yet
+      setVoice((pickJapaneseVoice(voices) as SpeechSynthesisVoice | undefined) ?? null);
+      setReady(true);
+    };
+    apply();
+    const off = onVoicesChanged(apply);
+    const timer = setTimeout(() => {
+      if (alive) setReady(true);
+    }, 1500);
+    return () => {
+      alive = false;
+      clearTimeout(timer);
+      off();
+    };
+  }, []);
+
+  return { ready, voice };
+}
+
 const RUBY_STORE_KEY = "poodcode:jp-vocab-ruby";
 
 function readRuby(): boolean {
@@ -666,6 +713,7 @@ function CardDetails({ word }: { word: JpVocabWord }) {
   // once, not a per-card decision.
   const [ruby, setRuby] = useState(readRuby);
   const segments = parseRuby(word.example_ruby || word.example_ja);
+  const { ready: voiceReady, voice } = useJapaneseVoice();
 
   function toggleRuby() {
     setRuby((r) => {
@@ -696,14 +744,35 @@ function CardDetails({ word }: { word: JpVocabWord }) {
           <div className="io-label" lang="ja">
             例文 · Example
           </div>
-          <button
-            className="ghost"
-            style={{ padding: "1px 8px", fontSize: 11 }}
-            onClick={toggleRuby}
-            title="Show or hide the readings above the kanji"
-          >
-            ふりがな {ruby ? "ON" : "OFF"}
-          </button>
+          <span className="row" style={{ gap: 6 }}>
+            {voiceReady &&
+              (voice ? (
+                <button
+                  className="ghost"
+                  style={{ padding: "1px 8px", fontSize: 11 }}
+                  onClick={() => speakJapanese([word.term, word.example_ja], voice)}
+                  title={`Read the word and the sentence aloud (${voice.name})`}
+                >
+                  🔊 聞く
+                </button>
+              ) : (
+                <span
+                  className="dim"
+                  style={{ fontSize: 11 }}
+                  title="Speech uses voices installed in your operating system; no Japanese voice was found. Adding one in the OS language settings enables this."
+                >
+                  no Japanese voice
+                </span>
+              ))}
+            <button
+              className="ghost"
+              style={{ padding: "1px 8px", fontSize: 11 }}
+              onClick={toggleRuby}
+              title="Show or hide the readings above the kanji"
+            >
+              ふりがな {ruby ? "ON" : "OFF"}
+            </button>
+          </span>
         </div>
         <p lang="ja" className={`jpv-example-ja${ruby ? "" : " jpv-ruby-off"}`}>
           {segments.map((s, i) => {
