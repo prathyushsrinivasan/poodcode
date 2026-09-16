@@ -4612,10 +4612,10 @@
       "example_en": "We put a unique constraint on the email column."
     },
     {
-      "id": "jufukugyo",
+      "id": "chofukugyo",
       "term": "重複行",
-      "reading": "じゅうふくぎょう",
-      "romaji": "jūfukugyō",
+      "reading": "ちょうふくぎょう",
+      "romaji": "chōfukugyō",
       "tags": [
         "sql"
       ],
@@ -4624,7 +4624,7 @@
       "desc_en": "Rows that repeat, which DISTINCT removes and a join can accidentally create.",
       "desc_ja": "同じ内容が繰り返される行です。DISTINCTで取り除けますが、結合によって意図せず生まれることもあります。",
       "example_ja": "結合の結果に重複行が出ていませんか。",
-      "example_ruby": "結合の[結果|けっか]に[重複行|じゅうふくぎょう]が出ていませんか。",
+      "example_ruby": "結合の[結果|けっか]に[重複行|ちょうふくぎょう]が出ていませんか。",
       "example_en": "Isn't the join producing duplicate rows?"
     },
     {

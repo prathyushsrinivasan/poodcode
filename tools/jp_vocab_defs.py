@@ -1376,7 +1376,7 @@ _JPV_SQL = [
      "A rule that no two rows may share a value in a column, which the database itself enforces.",
      "ある列の値が二つの行で重複してはならないという規則です。データベース自身が守らせます。",
      "メールアドレスの列に一意制約を付けます。", "We put a unique constraint on the email column."),
-    ("重複行", "じゅうふくぎょう", "jūfukugyō", "duplicate rows",
+    ("重複行", "ちょうふくぎょう", "chōfukugyō", "duplicate rows",
      "Rows that repeat, which DISTINCT removes and a join can accidentally create.",
      "同じ内容が繰り返される行です。DISTINCTで取り除けますが、結合によって意図せず生まれることもあります。",
      "結合の結果に重複行が出ていませんか。", "Isn't the join producing duplicate rows?"),
@@ -1661,6 +1661,92 @@ _JPV_WEB = [
 _JPV_KATAKANA = _jpv_re.compile(r"[゠-ヿㇰ-ㇿｦ-ﾟ]")
 _JPV_HIRAGANA = _jpv_re.compile(r"^[ぁ-ゟ]+$")
 
+# ---------------------------------------------------------------------------
+# Checking the Japanese without a Japanese reader.
+#
+# Naturalness needs a human. Two things that don't:
+#
+#  1. Every reading is stored TWICE — once as kana, once as romaji — and the two
+#     were authored separately. Transliterating the kana and comparing catches a
+#     slip in either, which is the single highest-value check available here,
+#     because a wrong reading teaches something false rather than merely clumsy.
+#
+#  2. The track's own rule that every example sentence is in polite form. It was
+#     written down in the roadmap and never enforced, which is how a rule quietly
+#     stops being true.
+#
+# Neither proves a reading is the RIGHT reading for its kanji — if a compound
+# were misread, both fields would likely be misread together. What they do is
+# remove the whole class of errors that are mechanical, so a human read-through,
+# whenever it happens, is spent on the part that actually needs judgement.
+# ---------------------------------------------------------------------------
+_JPV_KANA = {
+    "きゃ": "kya", "きゅ": "kyu", "きょ": "kyo", "しゃ": "sha", "しゅ": "shu", "しょ": "sho",
+    "ちゃ": "cha", "ちゅ": "chu", "ちょ": "cho", "にゃ": "nya", "にゅ": "nyu", "にょ": "nyo",
+    "ひゃ": "hya", "ひゅ": "hyu", "ひょ": "hyo", "みゃ": "mya", "みゅ": "myu", "みょ": "myo",
+    "りゃ": "rya", "りゅ": "ryu", "りょ": "ryo", "ぎゃ": "gya", "ぎゅ": "gyu", "ぎょ": "gyo",
+    "じゃ": "ja", "じゅ": "ju", "じょ": "jo", "びゃ": "bya", "びゅ": "byu", "びょ": "byo",
+    "ぴゃ": "pya", "ぴゅ": "pyu", "ぴょ": "pyo", "ぢゃ": "ja", "ぢゅ": "ju", "ぢょ": "jo",
+    "あ": "a", "い": "i", "う": "u", "え": "e", "お": "o",
+    "か": "ka", "き": "ki", "く": "ku", "け": "ke", "こ": "ko",
+    "さ": "sa", "し": "shi", "す": "su", "せ": "se", "そ": "so",
+    "た": "ta", "ち": "chi", "つ": "tsu", "て": "te", "と": "to",
+    "な": "na", "に": "ni", "ぬ": "nu", "ね": "ne", "の": "no",
+    "は": "ha", "ひ": "hi", "ふ": "fu", "へ": "he", "ほ": "ho",
+    "ま": "ma", "み": "mi", "む": "mu", "め": "me", "も": "mo",
+    "や": "ya", "ゆ": "yu", "よ": "yo", "ら": "ra", "り": "ri", "る": "ru", "れ": "re", "ろ": "ro",
+    "わ": "wa", "を": "o", "ん": "n",
+    "が": "ga", "ぎ": "gi", "ぐ": "gu", "げ": "ge", "ご": "go",
+    "ざ": "za", "じ": "ji", "ず": "zu", "ぜ": "ze", "ぞ": "zo",
+    "だ": "da", "ぢ": "ji", "づ": "zu", "で": "de", "ど": "do",
+    "ば": "ba", "び": "bi", "ぶ": "bu", "べ": "be", "ぼ": "bo",
+    "ぱ": "pa", "ぴ": "pi", "ぷ": "pu", "ぺ": "pe", "ぽ": "po",
+    "ぁ": "a", "ぃ": "i", "ぅ": "u", "ぇ": "e", "ぉ": "o",
+    "ゃ": "ya", "ゅ": "yu", "ょ": "yo",
+}
+
+# Polite form, including the -mashita past and a trailing particle. Written out
+# because the obvious pattern — "ends in です or ます" — rejects 実装しました,
+# which is about as polite as Japanese gets.
+_JPV_POLITE = _jpv_re.compile(
+    r"(ます|ました|ません|ませんでした|ましょう|です|でした|でしょう|ください)(か|ね|よ)?。$"
+)
+
+
+def _jpv_kana_to_romaji(kana):
+    """Hepburn, or None if a character isn't in the table — never a guess."""
+    out, i = [], 0
+    while i < len(kana):
+        if kana[i] == "っ":  # gemination doubles the following consonant
+            nxt = _jpv_kana_to_romaji(kana[i + 1:i + 3]) or _jpv_kana_to_romaji(kana[i + 1:i + 2])
+            if nxt:
+                out.append(nxt[0])
+            i += 1
+            continue
+        if kana[i:i + 2] in _JPV_KANA:
+            out.append(_JPV_KANA[kana[i:i + 2]])
+            i += 2
+            continue
+        if kana[i:i + 1] in _JPV_KANA:
+            out.append(_JPV_KANA[kana[i:i + 1]])
+            i += 1
+            continue
+        return None
+    return "".join(out)
+
+
+def _jpv_norm_romaji(s):
+    """Fold both spellings to one form: macrons, spacing and the three ways a
+    long vowel gets written. えい stays two vowels, as Hepburn has it."""
+    s = s.lower()
+    for group, plain in (("āáàâ", "a"), ("īíìî", "i"), ("ūúùû", "u"),
+                         ("ēéèê", "e"), ("ōóòô", "o")):
+        for ch in group:
+            s = s.replace(ch, plain)
+    s = _jpv_re.sub(r"[^a-z]", "", s)
+    s = s.replace("ou", "o")
+    return _jpv_re.sub(r"([aiueo])\1+", r"\1", s)
+
 
 # ---------------------------------------------------------------------------
 # Ruby (furigana) for the example sentences.
@@ -1831,7 +1917,7 @@ _JPV_LEVEL = {
     "seiseiki": 3, "kozoka-fukusei": 3, "genmitsu-toka": 2, "yurui-toka": 3,
     "shinchi": 2, "gichi": 2, "hokan": 2, "shoryaku-kiho": 2,
     # --- batch 4: sql ---
-    "jufukugyo": 2, "shugo-enzan": 3, "sokan-fuku-toiawase": 3,
+    "chofukugyo": 2, "shugo-enzan": 3, "sokan-fuku-toiawase": 3,
     "sansho-seigosei": 3, "zenpyo-sosa": 3,
     # --- batch 4: web ---
     "jotai-kanri": 2, "bekito": 3, "saishiko": 2, "fuka-bunsan": 3,
@@ -1934,6 +2020,19 @@ def _jpv_build():
             assert not _JPV_KATAKANA.search(term), f"vocab term must not be katakana: {term!r}"
             assert _JPV_HIRAGANA.match(reading), f"vocab reading must be hiragana: {term!r} -> {reading!r}"
             assert term in ex_ja, f"example sentence must contain the term {term!r}: {ex_ja!r}"
+
+            # The kana and the romaji were authored separately; they must agree.
+            _from_kana = _jpv_kana_to_romaji(reading)
+            assert _from_kana is not None, (
+                f"reading for {term!r} contains kana the transliterator doesn't know: {reading!r}"
+            )
+            assert _jpv_norm_romaji(_from_kana) == _jpv_norm_romaji(romaji), (
+                f"kana and romaji disagree for {term!r}: {reading!r} reads "
+                f"{_jpv_norm_romaji(_from_kana)!r}, but the romaji says {romaji!r}"
+            )
+            assert _JPV_POLITE.search(ex_ja), (
+                f"example sentence for {term!r} is not in です・ます form: {ex_ja!r}"
+            )
             # Ruby markup uses [ | ], so the plain sentence may not contain them.
             for ch in "[]|":
                 assert ch not in ex_ja, f"{ch!r} in an example sentence breaks ruby markup: {ex_ja!r}"
@@ -2001,6 +2100,25 @@ def _jpv_build():
     for t in tag_ids:
         have = {w["level"] for w in words if t in w["tags"]}
         assert have == {1, 2, 3}, f"tag {t!r} is missing words at level(s) {sorted({1, 2, 3} - have)}"
+
+    # A term inside a longer term should normally be read the same way inside it
+    # — 結合 けつごう stays けつごう in 内部結合. Where it doesn't, that is either
+    # rendaku (correct) or a misreading (not), and only a reader can tell which.
+    # So this is a ledger, in the manner of the DSA weight bands, rather than an
+    # assertion: it keeps the judgement calls visible instead of silent.
+    _by_term = {w["term"]: w["reading"] for w in words}
+    _carry = []
+    for _small in sorted(_by_term, key=len):
+        if len(_small) < 2:
+            continue
+        for _big in _by_term:
+            if len(_big) > len(_small) and _small in _big and _by_term[_small] not in _by_term[_big]:
+                _carry.append((_small, _by_term[_small], _big, _by_term[_big]))
+    if _carry:
+        print(f"Japanese readings: {len(_carry)} component reading(s) that don't carry through "
+              f"(rendaku or misreading — a ledger, not an error):")
+        for _s, _sr, _b, _br in _carry:
+            print(f"    {_s} ({_sr}) inside {_b} ({_br})")
 
     return {"tags": JP_VOCAB_TAGS, "words": words}
 
