@@ -189,6 +189,30 @@ fn chapter_progress_round_trips_and_is_idempotent() {
     assert_eq!(repo::done_chapters(&c).unwrap(), vec!["ts_generics"]);
 }
 
+#[test]
+fn exercise_progress_round_trips_and_is_idempotent() {
+    let c = conn();
+    assert!(repo::solved_exercises(&c).unwrap().is_empty());
+
+    let batch = vec!["todo_m4_s1_e1".to_string(), "todo_m4_s1_e2".to_string()];
+    repo::set_exercises_solved(&c, &batch, true).unwrap();
+    // Re-marking the same batch must not error or duplicate rows.
+    repo::set_exercises_solved(&c, &batch, true).unwrap();
+    assert_eq!(
+        repo::solved_exercises(&c).unwrap(),
+        vec!["todo_m4_s1_e1", "todo_m4_s1_e2"]
+    );
+
+    // A module reset clears only the ids it required, leaving the rest.
+    repo::set_exercises_solved(&c, &["todo_m4_s1_e1".to_string()], false).unwrap();
+    assert_eq!(repo::solved_exercises(&c).unwrap(), vec!["todo_m4_s1_e2"]);
+
+    // Un-marking something never marked, and an empty batch, are both no-ops.
+    repo::set_exercises_solved(&c, &["never_seen".to_string()], false).unwrap();
+    repo::set_exercises_solved(&c, &[], true).unwrap();
+    assert_eq!(repo::solved_exercises(&c).unwrap(), vec!["todo_m4_s1_e2"]);
+}
+
 fn week_row(c: &rusqlite::Connection, track: &str, week: i64) -> MasteryProgress {
     repo::mastery_progress(c)
         .unwrap()

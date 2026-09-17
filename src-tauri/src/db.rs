@@ -255,6 +255,25 @@ CREATE TABLE IF NOT EXISTS chapter_progress (
   done_at      TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
+-- Per-exercise "solved once" marks, for every track that judges exercises: the
+-- Learn tab, the two courses, the Backend Lab and the Projects track.
+--
+-- These were localStorage for the same reason `chapter_progress` once was, and
+-- under the same wrong assumption: that they are a UI convenience rather than
+-- progress. In the Projects track they ARE the progress — a module's bar is
+-- solved/required, "Resume" jumps to the first unsolved exercise, and a module
+-- auto-completes when the last one lands. Clearing site data used to zero all
+-- of that while leaving the `chapter_progress` ✓ marks standing, which is the
+-- exact split-brain moving chapters here was meant to end.
+--
+-- Only the id is stored. Exercise CONTENT stays in the embedded seeds, and
+-- exercise DRAFTS stay in localStorage — those are scratch text, rewritten on
+-- every keystroke, and genuinely are a convenience.
+CREATE TABLE IF NOT EXISTS exercise_progress (
+  exercise_id  TEXT PRIMARY KEY,
+  solved_at    TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
 -- 6-Month Mastery progress, one row per (track, week). The curriculum itself is
 -- embedded content (seeds/mastery.json); this is purely the learner's state, so
 -- it is covered by backup/restore like every other kind of progress.

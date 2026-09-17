@@ -25,6 +25,7 @@ import {
   loadDoneChapters,
   setChapterDone,
   solvedExercises,
+  loadSolvedExercises,
   markExerciseSolved,
   unmarkExercisesSolved,
 } from "../lib/learnProgress";
@@ -1277,6 +1278,13 @@ function ModuleDetail({
     if (isDone) onSetDone(false);
     toast(`Module ${mod.number} reset.`);
   }
+
+  // Hydrate the solved set from SQLite. The initialiser above reads a
+  // module-level cache — warm after the first load of the session — and this
+  // is what fills it on a cold start.
+  useEffect(() => {
+    loadSolvedExercises().then(setSolvedEx).catch(() => {});
+  }, []);
 
   useEffect(() => {
     const el = bottomRef.current;

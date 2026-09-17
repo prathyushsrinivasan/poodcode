@@ -396,6 +396,8 @@ pub fn run() {
             commands::mastery_start_contest,
             commands::done_chapters,
             commands::set_chapter_done,
+            commands::solved_exercises,
+            commands::set_exercises_solved,
             commands::statistics,
             commands::dashboard,
             commands::get_settings,

@@ -32,6 +32,7 @@ import {
   migrateVocabCardIds,
   setChapterDone,
   solvedExercises,
+  loadSolvedExercises,
   markExerciseSolved,
 } from "../lib/learnProgress";
 
@@ -619,6 +620,13 @@ function ConceptDetail({
   const gradableIds = exercises.map((e) => e.id);
   const allSolved = gradableIds.every((id) => solvedEx.has(id));
   const onSolved = (id: string) => setSolvedEx(new Set(markExerciseSolved(id)));
+
+  // Hydrate the solved set from SQLite. The initialiser above reads a
+  // module-level cache — warm after the first load of the session — and this
+  // is what fills it on a cold start.
+  useEffect(() => {
+    loadSolvedExercises().then(setSolvedEx).catch(() => {});
+  }, []);
 
   useEffect(() => {
     const el = bottomRef.current;

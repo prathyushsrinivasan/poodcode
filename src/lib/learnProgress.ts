@@ -89,32 +89,79 @@ export async function migrateVocabCardIds(concepts: Concept[]): Promise<void> {
   localStorage.setItem(VOCAB_IDS_MIGRATED_KEY, "1");
 }
 
-// Per-exercise "solved once" marks. Like the exercise DRAFTS above, this is a
-// lightweight UI convenience (used to decide when a lesson/week has had all its
-// problems solved so it can auto-complete), so it stays in localStorage.
-const SOLVED_EX_KEY = "poodcode:learn-ex-solved";
+// Per-exercise "solved once" marks, for every track that judges exercises.
+//
+// These lived in localStorage on the theory that they were a UI convenience.
+// That was true when only the Learn tab used them; it stopped being true when
+// the Projects track arrived, where they ARE the progress — a module's bar is
+// solved/required, "Resume" jumps to the first unsolved exercise, and a module
+// auto-completes when the last one lands. Clearing site data zeroed all of it
+// while leaving the SQLite chapter ✓ marks standing.
+//
+// So they now live in `exercise_progress`, covered by backup/restore like the
+// chapter marks above. DRAFTS (`poodcode:learn-ex:*`) stay in localStorage —
+// those are scratch text, rewritten on every keystroke, and genuinely are a
+// convenience.
+//
+// READS STAY SYNCHRONOUS. Call sites read this set while rendering (a module
+// page asks "is this exercise solved?" once per card), so the ids are held in
+// a module-level cache that `loadSolvedExercises` hydrates and every write
+// updates. `solvedExercises()` reads that cache; it is warm for the rest of
+// the session after the first load, so navigating between modules never
+// flashes an empty set.
 
-function readSolved(): Set<string> {
+const SOLVED_EX_KEY = "poodcode:learn-ex-solved"; // pre-migration JSON array
+const SOLVED_MIGRATED_KEY = "poodcode:learn-ex-solved-migrated";
+
+/** Hydrated by `loadSolvedExercises`, then kept in step by the writers below. */
+let solvedCache = new Set<string>();
+
+function readLegacySolved(): string[] {
   try {
     const raw = JSON.parse(localStorage.getItem(SOLVED_EX_KEY) || "[]");
-    return new Set(Array.isArray(raw) ? raw : []);
+    return Array.isArray(raw) ? raw.filter((id) => typeof id === "string") : [];
   } catch {
-    return new Set();
+    return [];
   }
+}
+
+/** Push any pre-existing localStorage marks into SQLite, once. The legacy key
+ * is left in place: it costs nothing, and a failed migration that has already
+ * flipped the flag would otherwise have thrown the marks away. */
+async function migrateLegacySolved(): Promise<void> {
+  if (localStorage.getItem(SOLVED_MIGRATED_KEY) === "1") return;
+  const ids = readLegacySolved();
+  if (ids.length > 0) await api.setExercisesSolved(ids, true);
+  localStorage.setItem(SOLVED_MIGRATED_KEY, "1");
+}
+
+/** Load the solved set from SQLite into the cache. Call once per page mount,
+ * alongside `loadDoneChapters`. */
+export async function loadSolvedExercises(): Promise<Set<string>> {
+  try {
+    await migrateLegacySolved();
+  } catch {
+    // Best-effort, retried next launch — same as the chapter migration.
+  }
+  solvedCache = new Set(await api.solvedExercises());
+  return new Set(solvedCache);
 }
 
 /** Exercise ids the learner has solved (judged Accepted) at least once. */
 export function solvedExercises(): Set<string> {
-  return readSolved();
+  return new Set(solvedCache);
 }
 
+/** Record a solve. The cache updates immediately so the caller can re-render
+ * from the returned set; the SQLite write follows and is best-effort, since
+ * blocking an Accepted verdict on a disk write would be worse than losing a
+ * mark that the next solve re-adds. */
 export function markExerciseSolved(id: string): Set<string> {
-  const s = readSolved();
-  if (!s.has(id)) {
-    s.add(id);
-    localStorage.setItem(SOLVED_EX_KEY, JSON.stringify([...s]));
+  if (!solvedCache.has(id)) {
+    solvedCache.add(id);
+    void api.setExercisesSolved([id], true).catch(() => {});
   }
-  return s;
+  return new Set(solvedCache);
 }
 
 /** Forget that a set of exercises was ever solved, so a unit can be worked
@@ -122,9 +169,7 @@ export function markExerciseSolved(id: string): Set<string> {
  * (`poodcode:learn-ex:*`) are their writing, not progress, and are left alone
  * so a reset never destroys work they might still want to read. */
 export function unmarkExercisesSolved(ids: string[]): Set<string> {
-  const s = readSolved();
-  let changed = false;
-  for (const id of ids) changed = s.delete(id) || changed;
-  if (changed) localStorage.setItem(SOLVED_EX_KEY, JSON.stringify([...s]));
-  return s;
+  const gone = ids.filter((id) => solvedCache.delete(id));
+  if (gone.length > 0) void api.setExercisesSolved(gone, false).catch(() => {});
+  return new Set(solvedCache);
 }

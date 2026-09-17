@@ -1146,6 +1146,20 @@ pub fn set_chapter_done(
 }
 
 #[tauri::command]
+pub fn solved_exercises(state: State<'_, AppState>) -> AppResult<Vec<String>> {
+    repo::solved_exercises(&state.conn())
+}
+
+#[tauri::command]
+pub fn set_exercises_solved(
+    state: State<'_, AppState>,
+    ids: Vec<String>,
+    solved: bool,
+) -> AppResult<()> {
+    repo::set_exercises_solved(&state.conn(), &ids, solved)
+}
+
+#[tauri::command]
 pub fn mastery_progress(state: State<'_, AppState>) -> AppResult<Vec<MasteryProgress>> {
     repo::mastery_progress(&state.conn())
 }

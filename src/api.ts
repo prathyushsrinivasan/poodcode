@@ -105,6 +105,12 @@ export const api = {
   setChapterDone: (key: string, done: boolean) =>
     invoke<void>("set_chapter_done", { key, done }),
 
+  // Per-exercise solved marks, shared by Learn, the courses, the Backend Lab
+  // and the Projects track. Also SQLite, for the same reason.
+  solvedExercises: () => invoke<string[]>("solved_exercises"),
+  setExercisesSolved: (ids: string[], solved: boolean) =>
+    invoke<void>("set_exercises_solved", { ids, solved }),
+
   // 6-Month Mastery programme — read-only curriculum plus per-week progress
   mastery: () => invoke<MasteryTrack[]>("mastery"),
   masteryProgress: () => invoke<MasteryProgress[]>("mastery_progress"),

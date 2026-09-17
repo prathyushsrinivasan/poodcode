@@ -1291,6 +1291,40 @@ pub fn set_chapter_done(conn: &Connection, concept_key: &str, done: bool) -> App
 }
 
 // ---------------------------------------------------------------------------
+// Per-exercise solved marks
+// ---------------------------------------------------------------------------
+
+/// Exercise ids the learner has had judged Accepted at least once.
+pub fn solved_exercises(conn: &Connection) -> AppResult<Vec<String>> {
+    let mut stmt = conn.prepare("SELECT exercise_id FROM exercise_progress ORDER BY exercise_id")?;
+    let rows = stmt.query_map([], |r| r.get::<_, String>(0))?;
+    Ok(rows.collect::<Result<Vec<_>, _>>()?)
+}
+
+/// Mark or unmark a batch of exercises in one transaction.
+///
+/// Batched rather than one-at-a-time because both callers are batches: the
+/// one-time migration of a localStorage set, and a module reset clearing every
+/// exercise it required. Marking a single exercise is just a batch of one.
+pub fn set_exercises_solved(conn: &Connection, ids: &[String], solved: bool) -> AppResult<()> {
+    let sql = if solved {
+        "INSERT INTO exercise_progress(exercise_id) VALUES(?1)
+         ON CONFLICT(exercise_id) DO NOTHING"
+    } else {
+        "DELETE FROM exercise_progress WHERE exercise_id = ?1"
+    };
+    let tx = conn.unchecked_transaction()?;
+    {
+        let mut stmt = tx.prepare(sql)?;
+        for id in ids {
+            stmt.execute(params![id])?;
+        }
+    }
+    tx.commit()?;
+    Ok(())
+}
+
+// ---------------------------------------------------------------------------
 // 6-Month Mastery progress
 // ---------------------------------------------------------------------------
 
