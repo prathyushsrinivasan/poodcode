@@ -20,57 +20,80 @@ function Bar({ w, h = 12, mb = 8 }: { w: number | string; h?: number; mb?: numbe
   );
 }
 
-/** The curriculum front page: heading, progress card, search box, stage rows. */
+/** The curriculum front page: heading, the continue panel, search, then the
+ * stage rail beside one stage's path of units. */
 export function LibrarySkeleton() {
   return (
-    <div className="page page-wide" role="status" aria-label="Loading the curriculum">
-      <Bar w={40} h={26} mb={6} />
-      <Bar w={60} h={12} mb={18} />
+    <div className="page cur-page" role="status" aria-label="Loading the curriculum">
+      <Bar w={30} h={26} mb={6} />
+      <Bar w={45} h={12} mb={22} />
 
-      <div className="card" style={{ marginBottom: 16 }}>
-        <Bar w={30} h={14} />
-        <Bar w="100%" h={6} mb={16} />
-        <Bar w={45} h={12} mb={0} />
+      <div className="cur-hero">
+        <div className="cur-hero-main">
+          <Bar w={15} h={10} />
+          <Bar w={45} h={20} />
+          <Bar w={65} h={12} mb={18} />
+          <Bar w={35} h={30} mb={0} />
+        </div>
+        <div className="cur-hero-side">
+          <Bar w={25} h={24} mb={0} />
+          <Bar w="100%" h={6} mb={0} />
+          <Bar w={60} h={12} mb={0} />
+        </div>
       </div>
 
-      <Bar w="100%" h={30} mb={18} />
+      <Bar w="100%" h={40} mb={24} />
 
-      {[0, 1, 2].map((i) => (
-        <div key={i} className="card" style={{ marginBottom: 12 }}>
-          <Bar w={35} h={16} mb={12} />
-          <div className="grid cols-2">
-            {[0, 1].map((j) => (
-              <div key={j} className="card" style={{ marginBottom: 0 }}>
-                <Bar w={55} h={14} />
-                <Bar w={80} h={10} />
-                <Bar w="100%" h={6} mb={0} />
-              </div>
-            ))}
-          </div>
+      <div className="cur-layout">
+        <div className="cur-stages">
+          {[0, 1, 2, 3, 4, 5].map((i) => (
+            <Bar key={i} w="100%" h={48} mb={6} />
+          ))}
         </div>
-      ))}
+        <div>
+          <Bar w={25} h={10} />
+          <Bar w={40} h={24} />
+          <Bar w={55} h={14} mb={22} />
+          {[0, 1, 2].map((i) => (
+            <div key={i} className="cur-unit">
+              <Bar w={35} h={16} />
+              <Bar w={60} h={12} />
+              <Bar w={40} h={8} mb={0} />
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
 
-/** A unit page: title, progress card, then a stack of collapsed sections. */
+/** A unit page: breadcrumb, the unit header, the tab bar, then prose. */
 export function UnitSkeleton() {
   return (
-    <div className="page page-wide" role="status" aria-label="Loading the unit">
-      <Bar w={20} h={20} mb={14} />
-      <Bar w={45} h={26} mb={6} />
-      <Bar w={55} h={12} mb={18} />
-
-      <div className="card" style={{ marginBottom: 16 }}>
-        <Bar w={30} h={12} />
-        <Bar w="100%" h={6} mb={0} />
+    <div className="page cur-page" role="status" aria-label="Loading the unit">
+      <Bar w={30} h={12} mb={0} />
+      <div className="cu-hero">
+        <div className="cu-hero-icon" />
+        <div>
+          <Bar w={40} h={24} />
+          <Bar w={60} h={14} />
+          <Bar w={35} h={6} mb={0} />
+        </div>
+        <Bar w="180px" h={32} mb={0} />
       </div>
 
-      {[0, 1, 2, 3, 4, 5].map((i) => (
-        <div key={i} style={{ marginBottom: 10 }}>
-          <Bar w={`${28 + (i % 3) * 8}%`} h={18} mb={0} />
-        </div>
-      ))}
+      <div className="cu-tabs" style={{ position: "static", paddingBottom: 10 }}>
+        {[0, 1, 2, 3].map((i) => (
+          <Bar key={i} w="150px" h={34} mb={0} />
+        ))}
+      </div>
+
+      <div className="cu-main">
+        <Bar w={30} h={20} mb={14} />
+        {[0, 1, 2, 3, 4].map((i) => (
+          <Bar key={i} w={92 - (i % 3) * 9} h={12} />
+        ))}
+      </div>
     </div>
   );
 }

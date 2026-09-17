@@ -1053,3 +1053,646 @@ table.sqlgrid tbody tr.diff td {
   font-size: 13px;
   font-style: italic;
 }
+
+/* ---- DSA curriculum (/library and /library/unit/:key) ------------------ */
+/* Both pages used to be one long column of cards and collapsible sections at
+   full window width: the overview put five cards above the first stage, and a
+   unit page stacked fourteen open sections into ~5000px of 150-character lines.
+   The layout below divides instead of stacking — one stage at a time on the
+   overview, one tab of a unit at a time — and caps prose at a readable width. */
+.cur-page {
+  max-width: 1320px;
+}
+.cur-eyebrow {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-faint);
+}
+.cur-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+.cur-head .page-sub {
+  margin: 0;
+}
+.cur-head-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-left: auto;
+}
+.cur-panel {
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 20px 22px;
+}
+.cur-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+/* Continue panel: what to do now on the left, where you stand on the right. */
+.cur-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  margin-bottom: 28px;
+}
+.cur-hero-main {
+  padding: 20px 24px;
+}
+.cur-hero-side {
+  padding: 20px 24px;
+  border-left: 1px solid var(--border);
+  background: color-mix(in srgb, var(--bg-elev-2) 55%, var(--bg-elev));
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.cur-hero-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 8px 0 2px;
+}
+.cur-hero-tagline {
+  color: var(--text-dim);
+  margin: 0 0 16px;
+}
+.cur-big-stat {
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+.cur-chips {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.cur-chip {
+  cursor: pointer;
+}
+.cur-chip:hover {
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+/* Stage rail + the selected stage. */
+.cur-layout {
+  display: grid;
+  grid-template-columns: 270px minmax(0, 1fr);
+  gap: 32px;
+  align-items: start;
+}
+.cur-stages {
+  position: sticky;
+  top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.cur-stages-label {
+  padding: 0 12px 6px;
+}
+.cur-stage-btn {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+  width: 100%;
+  padding: 10px 12px;
+  text-align: left;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  background: transparent;
+}
+.cur-stage-btn:hover:not(:disabled) {
+  background: var(--bg-elev);
+  border-color: var(--border);
+}
+.cur-stage-btn.active,
+.cur-stage-btn.active:hover:not(:disabled) {
+  background: var(--bg-elev);
+  border-color: var(--accent);
+}
+.cur-num {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--bg-elev-2);
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-dim);
+}
+.cur-num.started {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.cur-num.solid {
+  border-color: var(--medium);
+  color: var(--medium);
+}
+.cur-num.complete {
+  border-color: var(--good);
+  background: var(--good);
+  color: #fff;
+}
+.cur-num.known {
+  border: 1px dashed var(--medium);
+  color: var(--medium);
+}
+.cur-num.stale {
+  border-color: var(--text-faint);
+  background: var(--bg-elev-2);
+  color: var(--text-faint);
+}
+.cur-stage-name {
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--text);
+}
+.cur-stage-meta {
+  display: flex;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--text-faint);
+}
+.cur-here {
+  color: var(--accent);
+  font-weight: 600;
+}
+.cur-minibar {
+  height: 3px;
+  margin-top: 6px;
+  border-radius: 2px;
+  background: var(--bg-elev-2);
+  overflow: hidden;
+}
+.cur-minibar > span {
+  display: block;
+  height: 100%;
+  border-radius: 2px;
+  background: var(--accent);
+}
+.cur-stage-foot {
+  margin-top: 14px;
+  padding: 12px;
+  font-size: 12px;
+  color: var(--text-faint);
+  border-top: 1px solid var(--border);
+}
+
+.cur-stage-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 4px 0 4px;
+}
+.cur-stage-tagline {
+  font-size: 15px;
+  color: var(--text-dim);
+  margin: 0 0 10px;
+}
+.cur-goal {
+  max-width: 780px;
+  margin: 12px 0 0;
+  padding: 4px 18px;
+  border-left: 3px solid var(--accent);
+  color: var(--text-dim);
+}
+.cur-link-btn {
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--accent);
+  font-size: 13px;
+}
+.cur-link-btn:hover:not(:disabled) {
+  background: none;
+  text-decoration: underline;
+}
+
+/* A stage's units as a numbered path: the rail says "this is an order". */
+.cur-path {
+  margin-top: 22px;
+}
+.cur-step {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr);
+  gap: 16px;
+}
+.cur-step-rail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 16px;
+}
+.cur-step-line {
+  flex: 1;
+  width: 2px;
+  margin-top: 6px;
+  background: var(--border);
+}
+.cur-step:last-child .cur-step-line {
+  visibility: hidden;
+}
+.cur-unit {
+  margin-bottom: 12px;
+  padding: 16px 18px;
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  transition: border-color 0.12s, background 0.12s;
+}
+.cur-unit:hover {
+  border-color: var(--accent);
+}
+.cur-unit:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.cur-unit.is-next {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 7%, var(--bg-elev));
+}
+.cur-unit-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.cur-unit-icon {
+  font-size: 20px;
+  line-height: 1;
+}
+.cur-unit-title {
+  font-size: 15px;
+  font-weight: 600;
+}
+.cur-unit-tagline {
+  margin: 4px 0 0;
+  color: var(--text-dim);
+}
+.cur-unit-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px 18px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+  font-size: 12px;
+  color: var(--text-faint);
+}
+.cur-unit-meta .cur-minibar {
+  width: 120px;
+  margin: 0;
+  height: 4px;
+}
+.cur-pill-next {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #fff;
+  background: var(--accent);
+  border-radius: 20px;
+  padding: 1px 8px;
+}
+.cur-mix {
+  display: inline-flex;
+  gap: 6px;
+  font-family: var(--font-mono);
+}
+.cur-stage-end {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin: 18px 0 0 48px;
+  padding: 16px 18px;
+  border: 1px dashed var(--border);
+  border-radius: 12px;
+}
+.cur-stage-nav {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 18px 0 0 48px;
+}
+
+/* ---- One unit ----------------------------------------------------------- */
+.cu-topbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 12px;
+  color: var(--text-faint);
+}
+.cu-topbar a {
+  color: var(--text-dim);
+}
+.cu-hero {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 20px;
+  align-items: center;
+  margin-top: 12px;
+  padding: 20px 24px;
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+}
+.cu-hero-icon {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  font-size: 34px;
+  border-radius: 16px;
+  background: var(--bg-elev-2);
+  border: 1px solid var(--border);
+}
+.cu-hero h1 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 2px 0 2px;
+  font-size: 24px;
+  letter-spacing: -0.02em;
+}
+.cu-hero-progress {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+  font-size: 12px;
+  color: var(--text-dim);
+}
+.cu-hero-progress .progress-track {
+  flex: 1;
+  max-width: 320px;
+  margin: 0;
+}
+.cu-hero-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+}
+.cu-notice {
+  margin-top: 10px;
+  padding: 10px 14px;
+  font-size: 13px;
+  color: var(--text-dim);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--medium);
+  border-radius: 8px;
+  background: var(--bg-elev);
+}
+
+/* Sticky inside `.main`, which is the scroll container. */
+.cu-tabs {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  gap: 4px;
+  margin: 20px 0 28px;
+  padding-top: 6px;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto;
+}
+.cu-tab {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px 11px;
+  text-align: left;
+  white-space: nowrap;
+  border: none;
+  border-bottom: 2px solid transparent;
+  border-radius: 8px 8px 0 0;
+  background: transparent;
+  color: var(--text-dim);
+}
+.cu-tab:hover:not(:disabled) {
+  border-color: transparent;
+  background: var(--bg-elev);
+  color: var(--text);
+}
+.cu-tab.active,
+.cu-tab.active:hover:not(:disabled) {
+  color: var(--text);
+  border-bottom-color: var(--accent);
+}
+.cu-tab-icon {
+  font-size: 18px;
+}
+.cu-tab-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+}
+.cu-tab-hint {
+  display: block;
+  font-size: 11px;
+  color: var(--text-faint);
+}
+.cu-tab-count {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 1px 7px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+}
+.cu-tab-count.due {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.cu-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 240px;
+  gap: 48px;
+  align-items: start;
+}
+.cu-main {
+  min-width: 0;
+  max-width: 880px;
+}
+.cu-aside {
+  position: sticky;
+  top: 90px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  font-size: 13px;
+}
+.cu-aside-list {
+  display: flex;
+  flex-direction: column;
+  margin-top: 6px;
+  border-left: 2px solid var(--border);
+}
+.cu-aside-link {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  width: 100%;
+  margin-left: -2px;
+  padding: 5px 10px;
+  text-align: left;
+  font-size: 13px;
+  color: var(--text-dim);
+  background: none;
+  border: none;
+  border-left: 2px solid transparent;
+  border-radius: 0;
+}
+.cu-aside-link:hover:not(:disabled) {
+  background: none;
+  color: var(--text);
+  border-left-color: var(--accent);
+}
+.cu-aside-count {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-faint);
+}
+
+.cu-section {
+  margin-bottom: 44px;
+  scroll-margin-top: 90px;
+}
+.cu-section-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+.cu-section-head h2 {
+  margin: 0;
+  font-size: 19px;
+  letter-spacing: -0.01em;
+}
+.cu-lead {
+  margin: 0 0 16px;
+  color: var(--text-dim);
+}
+.cu-pitfall {
+  margin-bottom: 12px;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--bad);
+  border-radius: 10px;
+  background: var(--bg-elev);
+}
+.cu-pitfall-symptom {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.cu-rung {
+  margin-bottom: 18px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg-elev);
+  overflow: hidden;
+}
+.cu-rung-head {
+  padding: 14px 16px 12px;
+  border-bottom: 1px solid var(--border);
+}
+/* Fixed, so the columns of every rung line up down the page. */
+.cu-rung table.data {
+  table-layout: fixed;
+}
+.cu-rung table.data td {
+  padding: 10px 16px;
+}
+.cu-rung table.data tbody tr:last-child td {
+  border-bottom: none;
+}
+.cu-tab-end {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 18px 20px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg-elev);
+}
+
+@media (max-width: 1150px) {
+  .cu-body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .cu-aside {
+    position: static;
+  }
+}
+@media (max-width: 980px) {
+  .cur-hero,
+  .cur-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .cur-hero-side {
+    border-left: none;
+    border-top: 1px solid var(--border);
+  }
+  .cur-stages {
+    position: static;
+    flex-direction: row;
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+  .cur-stage-btn {
+    min-width: 220px;
+  }
+  .cur-stage-foot,
+  .cur-stages-label {
+    display: none;
+  }
+  .cur-stage-end,
+  .cur-stage-nav {
+    margin-left: 0;
+  }
+  .cu-hero {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+  .cu-hero-actions {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  .cu-tab-hint {
+    display: none;
+  }
+}

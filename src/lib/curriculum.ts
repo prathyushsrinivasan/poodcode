@@ -243,6 +243,38 @@ export function readLastUnit(): string | null {
 }
 
 /**
+ * The tab each unit was last left on (Learn / Toolkit / Practice / Review).
+ *
+ * The second visit to a unit wants the ladder, not the motivation you have
+ * already read — and coming back from a Solve page should land where you left.
+ * One JSON map rather than a key per unit, for the same reason as the last-unit
+ * key: a per-device convenience, not progress.
+ */
+const UNIT_TAB_KEY = "poodcode:dsa:unit-tab";
+
+function readUnitTabs(): Record<string, string> {
+  try {
+    const raw = JSON.parse(localStorage.getItem(UNIT_TAB_KEY) || "{}");
+    return raw && typeof raw === "object" && !Array.isArray(raw) ? raw : {};
+  } catch {
+    return {};
+  }
+}
+
+export function rememberUnitTab(unitKey: string, tab: string): void {
+  try {
+    localStorage.setItem(UNIT_TAB_KEY, JSON.stringify({ ...readUnitTabs(), [unitKey]: tab }));
+  } catch {
+    /* storage blocked: the unit opens on its first tab, nothing more */
+  }
+}
+
+export function readUnitTab(unitKey: string): string | null {
+  const tab = readUnitTabs()[unitKey];
+  return typeof tab === "string" ? tab : null;
+}
+
+/**
  * Join the curriculum to the learner's problems.
  *
  * Units are processed in curriculum order, which is what makes the single pass

@@ -40,7 +40,7 @@ export function loadCurriculumSeed(): Promise<DsaCurriculum | null> {
  * joins them.
  *
  * All three Library pages need exactly this trio, and the join is cheap (one
- * pass over 271 problems). The curriculum comes from the session-wide cache; the
+ * pass over 615 problems). The curriculum comes from the session-wide cache; the
  * problems and settings are re-fetched, because those do change.
  *
  * `setSkipped` writes the settings row and re-joins in place, so marking a unit
