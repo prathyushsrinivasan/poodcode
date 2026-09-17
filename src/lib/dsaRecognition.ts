@@ -214,7 +214,9 @@ export function placement(c: HydratedCurriculum, seed: number): PlacementStage[]
   // may well know all of them) and less discriminating — and for stage 1 it
   // leaves too few siblings to build a question from at all.
   const everything = c.stages.flatMap((s) => s.units);
-  return c.stages.map((stage) => {
+  // Placement is for skipping ahead through the core. An optional stage has
+  // nothing to skip to — nobody is sent there before the core is done.
+  return c.stages.filter((stage) => !stage.optional).map((stage) => {
     const units = stage.units;
     const last = units[units.length - 1];
     const q = last ? routingQuestion(last, everything, rand, false) : null;

@@ -28,7 +28,7 @@ program before you have finished re-reading the statement.
 """)
 
 
-# --- Unit 1 — Input, output, arithmetic -------------------------------------
+# --- Unit 1 — Input, output, arithmetic --------------------------------------
 
 _unit(
     "io-and-arithmetic", "Input, Output & Arithmetic", "⌨️", _S1,
@@ -186,7 +186,7 @@ decision instead of always doing the same thing.
 )
 
 
-# --- Unit 2 — Branching -----------------------------------------------------
+# --- Unit 2 — Branching ------------------------------------------------------
 
 _unit(
     "branching", "Branching & Conditions", "🔀", _S1,
@@ -320,7 +320,7 @@ the *digits* of a number becomes possible.
 )
 
 
-# --- Unit 3 — Loops and digits ----------------------------------------------
+# --- Unit 3 — Loops and digits -----------------------------------------------
 
 _unit(
     "loops-and-digits", "Loops & Digit Arithmetic", "🔁", _S1,
@@ -479,7 +479,7 @@ arithmetic that comes with them.
 )
 
 
-# --- Unit 4 — Arrays, first pass --------------------------------------------
+# --- Unit 4 — Arrays, first pass ---------------------------------------------
 
 _unit(
     "arrays-first-pass", "Arrays: The First Pass", "📊", _S1,

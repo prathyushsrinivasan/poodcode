@@ -293,6 +293,12 @@ describe("placement", () => {
     expect(placement(h, 4).every((s) => s.alreadyCleared)).toBe(true);
   });
 
+  it("skips an optional stage — there is nothing to place into", () => {
+    const c: DsaCurriculum = { ...FOUR, stages: FOUR.stages.map((s, i) => ({ ...s, optional: i === 1 })) };
+    const stages = placement(hydrate(c, PROBLEMS), 4);
+    expect(stages.map((s) => s.stageKey)).toEqual([FOUR.stages[0].key]);
+  });
+
   it("counts a unit marked known toward the stage being cleared", () => {
     const h = hydrate(FOUR, PROBLEMS, new Set(["hashing", "two-pointers"]));
     expect(placement(h, 4)[0].alreadyCleared).toBe(true);

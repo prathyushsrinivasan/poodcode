@@ -77,9 +77,14 @@ def _md(s):
     return s.lstrip("\n").rstrip() + "\n" if s else ""
 
 
-def _stage(key, title, icon, tagline, goal):
+def _stage(key, title, icon, tagline, goal, optional=False):
+    """One stage. `optional` marks a stage beyond the interview core: the app
+    leaves it out of the course's overall progress and does not send "Continue"
+    into it until the core is done. Optional stages must come last (see
+    `_check_curriculum`), so the core can always be walked top to bottom without
+    stepping through one."""
     _STAGES.append({"key": key, "title": title, "icon": icon,
-                    "tagline": tagline, "goal": _md(goal)})
+                    "tagline": tagline, "goal": _md(goal), "optional": bool(optional)})
     return key
 
 
@@ -229,9 +234,11 @@ for _name in (
     "dsa_s1_foundations.py",
     "dsa_s2_patterns.py",
     "dsa_s3_search.py",
-    "dsa_s4_structures.py",
-    "dsa_s5_hierarchies.py",
-    "dsa_s6_advanced.py",
+    "dsa_s4_numbers.py",
+    "dsa_s5_structures.py",
+    "dsa_s6_hierarchies.py",
+    "dsa_s7_dp.py",
+    "dsa_s8_beyond.py",
 ):
     _p = os.path.join(_HERE, _name)
     if os.path.exists(_p):
@@ -242,7 +249,7 @@ for _name in (
 # to units by key: where the batched problems sit on each ladder, the Big-O
 # drills every unit carries, and the worked traces. Required, not optional — the
 # lints below fail the build if a unit loses them.
-for _name in ("dsa_placements.py", "dsa_bigo.py", "dsa_traces.py"):
+for _name in ("dsa_placements.py", "dsa_syllabus.py", "dsa_bigo.py", "dsa_traces.py"):
     _p = os.path.join(_HERE, _name)
     with open(_p, encoding="utf-8") as _f:
         exec(compile(_f.read(), _p, "exec"))
@@ -358,8 +365,18 @@ def _check_curriculum(cur, concepts, problems):
     stage_of = {}  # unit key -> stage index, so the ledger can skip foundations
     linked_concepts = set()
 
+    seen_optional_stage = None
     for si, stage in enumerate(cur["stages"]):
         assert stage["units"], f"stage {stage['key']}: no units"
+        # Optional stages sit after the whole core. A core stage after an optional
+        # one would make "finish the core" require walking through optional work.
+        if stage.get("optional"):
+            seen_optional_stage = stage["key"]
+        else:
+            assert seen_optional_stage is None, (
+                f"stage {stage['key']}: a core stage follows the optional stage "
+                f"{seen_optional_stage!r} — optional stages must come last"
+            )
         for u in stage["units"]:
             key = u["key"]
             assert key not in seen_units, f"duplicate unit {key!r}"

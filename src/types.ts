@@ -690,6 +690,9 @@ export interface CurriculumStage {
   tagline: string;
   goal: string;
   ordering: number;
+  /** Beyond the interview core: left out of overall progress, and never the
+   * Continue target while core work remains. Always after every core stage. */
+  optional?: boolean;
   units: CurriculumUnit[];
 }
 

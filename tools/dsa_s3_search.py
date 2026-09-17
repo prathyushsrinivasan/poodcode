@@ -1,24 +1,26 @@
 # -*- coding: utf-8 -*-
 # ---------------------------------------------------------------------------
-# Stage 3 — Order, numbers and bits.
+# Stage 3 — Order, and what it buys.
 #
 # exec()'d by tools/dsa_curriculum.py inside its namespace.
 #
 # Stage 2 removed nested loops by reusing work. This stage removes them by
-# imposing ORDER — sorting, then exploiting sortedness with binary search — and
-# then covers the two "small" topics that are really about representation:
-# number theory (what you can compute from a number without looking at it
-# digit by digit) and bit manipulation (the same array patterns, on 32 slots
-# that live inside a single int).
+# imposing ORDER — and it opens with recursion, because the two sorts whose
+# ideas outlive the library call (merge sort and quickselect) are divide and
+# conquer, and the sorting unit cannot teach them to someone who does not yet
+# trust a recursive call.
 #
-# The matrix/simulation unit closes the stage because it needs no new
-# technique at all: it is index arithmetic under pressure, and the discipline
-# it teaches — write the transformation down before you code it — is what
-# makes the grid traversals in stage 5 tractable.
+# ORDERING: recursion → sorting → binary search → greedy → intervals.
+#
+# Greedy and intervals used to close the curriculum, after every graph unit,
+# although neither needs anything past sorting. That placed "merge intervals"
+# — one of the commonest Medium questions there is — behind Dijkstra. They now
+# sit where their only prerequisite is: directly after the sort that makes
+# their greedy rules provable.
 # ---------------------------------------------------------------------------
 
 _S3 = _stage(
-    "search-and-sort", "Order, Numbers & Bits", "🔢",
+    "order-and-search", "Order & Search", "🔢",
     "Impose order, then exploit it.",
     """
 Sorting costs O(n log n) and buys you an enormous amount: binary search, two
@@ -26,31 +28,274 @@ pointers, greedy sweeps, duplicate detection and interval merging all become
 available the moment the data is in order. This stage is about knowing what
 that purchase is worth and when to make it.
 
-It closes with two units that look like trivia and are not. **Number theory**
-is where an O(√n) or O(log n) idea replaces a loop over every value — the first
-time the *size of a number* and the *size of the input* clearly part ways. And
-**bit manipulation** is the same set of array patterns applied to 32 flags
-packed into one `int`, which is how sets get represented when they have to be
-fast.
+It opens with **recursion**, because the sorts worth understanding are
+recursive: merge sort splits and merges, quickselect partitions and recurses
+into one side. It closes with **greedy** and **intervals** — the families where
+"sort, then take the best local move" is provably right, and where you learn
+to check that it is.
 """)
 
 
-# --- Unit 11 — Sorting ------------------------------------------------------
+# --- Unit 11 — Recursion -----------------------------------------------------
+
+_unit(
+    "recursion", "Recursion", "🌀", _S3,
+    "Trust the smaller call. Every branching technique depends on it.",
+    weight=2,
+    prereqs=["loops-and-digits", "complexity"],
+    why="""
+Recursion is not a technique for a family of problems; it is the *notation*
+every remaining unit is written in. Tree traversal, backtracking, DFS, divide
+and conquer and the top-down half of dynamic programming are all one pattern:
+express the answer in terms of the same function on a smaller input.
+
+The block people hit is almost never syntax. It is refusing to **trust the
+recursive call** — trying to trace the whole stack in their head instead of
+assuming the smaller call is already correct and asking only what to do with its
+result.
+""",
+    model="""
+### The contract
+
+Write a recursive function by answering three questions, in this order:
+
+1. **What does this function promise?** One sentence, for *any* valid input.
+   "`depth(node)` returns the height of the subtree rooted at `node`." If you
+   cannot write that sentence, no amount of tracing will help.
+2. **Base case.** The smallest input, answered without recursion. It is almost
+   always `null`, empty, or zero — and it is almost always where the bug is.
+3. **Recursive case.** Assume the promise holds for smaller inputs. Call, and
+   combine. Do not trace.
+
+```java
+static int depth(Node node) {
+    if (node == null) return 0;                       // base
+    return 1 + Math.max(depth(node.left), depth(node.right));   // combine
+}
+```
+
+### The cost
+
+Each call keeps a stack frame, so a recursion n deep costs O(n) **memory** even
+if it allocates nothing. Java's default stack overflows around 10,000 frames —
+which is why a recursive walk over a 10⁵-long linked list crashes and an
+iterative one does not.
+
+The time cost comes from the recurrence:
+
+| Recurrence | Solves to | Example |
+| --- | --- | --- |
+| `T(n) = T(n−1) + O(1)` | O(n) | Walking a list |
+| `T(n) = 2T(n−1) + O(1)` | O(2ⁿ) | Naive Fibonacci |
+| `T(n) = T(n/2) + O(1)` | O(log n) | Binary search, fast power |
+| `T(n) = 2T(n/2) + O(n)` | O(n log n) | Merge sort |
+
+### Halving
+
+Fast exponentiation makes one call on half the exponent:
+
+```java
+static long power(long b, long e) {
+    if (e == 0) return 1;
+    long half = power(b, e / 2);      // ONE call, not two
+    return (e % 2 == 0) ? half * half : half * half * b;
+}
+```
+
+Calling `power(b, e/2)` twice instead of storing it turns O(log e) into O(e).
+That single line is the difference, and it is the same insight as memoisation:
+never compute the same thing twice.
+
+### Divide and conquer
+
+Split into **independent** parts, solve each, combine. Merge sort is the
+canonical example, and the one the sorting unit builds on:
+
+```java
+static void sort(int[] a, int[] buf, int lo, int hi) {   // sorts [lo, hi)
+    if (hi - lo < 2) return;                             // base: 0 or 1 element
+    int mid = (lo + hi) >>> 1;
+    sort(a, buf, lo, mid);                               // trust it
+    sort(a, buf, mid, hi);                               // trust it
+    merge(a, buf, lo, mid, hi);                          // two-pointer merge, O(n)
+}
+```
+
+Read the cost off the code: two calls on halves plus linear work is
+`T(n) = 2T(n/2) + O(n)`. The recursion tree has log n levels and the merges on
+each level touch every element once, so the total is O(n log n).
+
+The halves do not have to be halves. *Different ways to add parentheses* splits
+at every operator, solves both sides, and combines every pair of results — the
+same three steps with a different split.
+
+### When recursion repeats itself
+
+Naive Fibonacci is O(2ⁿ) because `fib(n−2)` is recomputed on both branches. Two
+fixes, and the whole DP stage is built on them:
+
+- **Memoise**: cache each answer by argument. Top-down DP.
+- **Iterate**: compute the small answers first. Bottom-up DP.
+
+Recognising the overlap is the skill. The DP unit later is this observation with
+a syllabus attached.
+""",
+    signals=[
+        _sig("“the same problem on a smaller input”", "Recursion",
+             "Subtrees, suffixes, “with one more item chosen”."),
+        _sig("A tree or nested structure", "Recursion over the children",
+             "The structure is already recursive; mirror it."),
+        _sig("“combine the halves”", "Divide and conquer",
+             "Two independent halves, then a merge step."),
+        _sig("Exponent or range halves each step", "O(log n) recursion",
+             "Compute the half once and reuse it."),
+        _sig("The same sub-input recurs on different branches", "Memoise",
+             "Overlapping subproblems is the definition of DP."),
+        _sig("Depth could reach 10⁵", "Convert to iteration",
+             "The call stack, not the algorithm, is what will fail."),
+    ],
+    skeletons=[
+        _sk("The three-part shape",
+            "Every recursive function you will write from here on.",
+            """
+static R solve(Input x) {
+    if (isBase(x)) return baseAnswer(x);      // 1. smallest case
+    R sub = solve(smaller(x));                // 2. trust the call
+    return combine(x, sub);                   // 3. use the result
+}
+""",
+            "Write the one-sentence promise above the function before the body."),
+        _sk("Fast exponentiation",
+            "Powers, matrix powers, repeated doubling.",
+            """
+static long power(long b, long e, long mod) {
+    if (e == 0) return 1;
+    long half = power(b, e / 2, mod);      // computed ONCE
+    long sq = half * half % mod;
+    return (e % 2 == 0) ? sq : sq * b % mod;
+}
+""",
+            "Two recursive calls here would make it O(e) instead of O(log e)."),
+        _sk("Divide and conquer (merge sort)",
+            "Sort, count across a midpoint, combine independent halves.",
+            """
+static void sort(int[] a, int[] buf, int lo, int hi) {    // [lo, hi)
+    if (hi - lo < 2) return;
+    int mid = (lo + hi) >>> 1;
+    sort(a, buf, lo, mid);
+    sort(a, buf, mid, hi);
+    int i = lo, j = mid, k = lo;
+    while (i < mid && j < hi) buf[k++] = a[i] <= a[j] ? a[i++] : a[j++];
+    while (i < mid) buf[k++] = a[i++];
+    while (j < hi)  buf[k++] = a[j++];
+    System.arraycopy(buf, lo, a, lo, hi - lo);
+}
+""",
+            "One buffer allocated by the caller. `<=` keeps equal elements in order — that is stability."),
+        _sk("Memoised recursion",
+            "Whenever the same argument recurs across branches.",
+            """
+long[] memo = new long[n + 1];
+Arrays.fill(memo, -1);
+
+static long fib(int n) {
+    if (n < 2) return n;
+    if (memo[n] != -1) return memo[n];
+    return memo[n] = fib(n - 1) + fib(n - 2);
+}
+""",
+            "O(2ⁿ) → O(n) by adding two lines. This is top-down DP."),
+    ],
+    costs=[
+        _cost("Linear recursion", "O(n)", "O(n) stack", "Depth is the space cost."),
+        _cost("Binary recursion, no memo", "O(2ⁿ)", "O(n) stack", "Naive Fibonacci."),
+        _cost("Halving recursion", "O(log n)", "O(log n)", "Fast power, binary search."),
+        _cost("Divide and conquer with a linear merge", "O(n log n)", "O(n)", "Merge sort."),
+        _cost("Memoised recursion", "O(states × work)", "O(states)", "Top-down DP."),
+    ],
+    pitfalls=[
+        _pit("`StackOverflowError`",
+             "Either no base case, or a legitimate recursion deeper than ~10,000 frames.",
+             "Check the base case first; if the depth is genuinely large, rewrite iteratively."),
+        _pit("The base case returns the wrong identity",
+             "`return 0` where the combination multiplies, or `return 1` where it sums.",
+             "Ask what the answer for an empty input *must* be for the combination to work."),
+        _pit("An exponential runtime in something that looks linear",
+             "A sub-answer is recomputed on multiple branches.",
+             "Memoise, or restructure so each sub-answer is computed once."),
+        _pit("Fast power is O(e) instead of O(log e)",
+             "`power(b, e/2)` was written twice rather than stored.",
+             "Call once, store in a local, square it."),
+        _pit("A shared mutable structure leaks between branches",
+             "State was modified before the call and never restored after it.",
+             "Either pass immutable arguments, or undo the change — see backtracking."),
+    ],
+    lessons=["recursion", "alg_recursion", "alg_recurrences", "recurrence"],
+    checks=[
+        _chk("What are the three parts of writing a recursive function?",
+             "A one-sentence promise about what it returns for any input; a base case that "
+             "needs no recursion; and a recursive case that trusts the promise and combines."),
+        _chk("Why does naive Fibonacci take exponential time?",
+             "`fib(n-2)` is recomputed under both `fib(n-1)` and `fib(n-2)`, so the call "
+             "tree branches twice at nearly every level: T(n) = T(n−1) + T(n−2)."),
+        _chk("What is the space complexity of a recursion n levels deep that allocates "
+             "nothing?",
+             "O(n) — every pending frame stays on the call stack until it returns."),
+        _chk("Why must fast exponentiation store the half-power in a variable?",
+             "Calling it twice doubles the work at every level, collapsing O(log e) back to "
+             "O(e). Storing it is the entire optimisation."),
+        _chk("Why is merge sort O(n log n), read straight from its code?",
+             "Two calls on halves plus a linear merge: T(n) = 2T(n/2) + O(n). There are log n "
+             "levels of halving, and the merges on each level handle all n elements once."),
+    ],
+    interview="""
+Interviewers probe recursion by asking for the complexity and then for the
+iterative version. Have both ready: the recurrence that gives the time bound,
+and the observation that depth is memory. And when a recursive solution is
+exponential, say *why* — "the same subproblem appears on both branches, so I
+will memoise" is the sentence that turns a rejected answer into an accepted one.
+""",
+    rungs=[
+        _rung("Core", "A recurrence you can write in one line.",
+              ["nth-fibonacci", "binomial-coefficient", "unique-paths-count"],
+              {"nth-fibonacci": "Write it naively, note it is O(2ⁿ), then memoise. That one edit is the whole DP stage in miniature.",
+               "binomial-coefficient": "Pascal's rule, word for word. Count the calls for C(20, 10), then ask what C(60, 30) would cost.",
+               "unique-paths-count": "`paths(i,j) = paths(i-1,j) + paths(i,j-1)`. Same shape, two dimensions."}),
+        _rung("Variations", "Recursion that halves rather than decrements.",
+              ["fast-power"],
+              {"fast-power": "Store the half-power. Calling twice is the bug that makes it O(e)."}),
+        _rung("Two calls", "Recursion that branches, where the exponential cost is the answer's own size.",
+              ["tower-of-hanoi"],
+              {"tower-of-hanoi": "Trust the smaller call. Then compare with `nth-fibonacci`: both make two calls, and only one of them can be fixed by a memo."}),
+    ],
+    next_up="""
+Merge sort is the first algorithm here you could not write without trusting a
+recursive call. The next unit asks what sorting costs, what it buys — and which
+two recursive ideas are worth more than the library call.
+""",
+)
+
+
+# --- Unit 12 — Sorting -------------------------------------------------------
 
 _unit(
     "sorting", "Sorting & Ordering", "🔡", _S3,
-    "What sorting costs, what it buys, and how to sort by something else.",
+    "What sorting costs, what it buys, and the two sorting ideas worth more than the call.",
     weight=2,
-    prereqs=["arrays-first-pass", "complexity"],
+    prereqs=["arrays-first-pass", "complexity", "recursion"],
     why="""
-You will almost never implement a sort. You will constantly *decide whether to
-call one*, and that decision is one of the most reliable dividing lines between
-an O(n²) solution and an O(n log n) one.
+You will rarely ship your own sort. You will constantly *decide whether to call
+one*, and that decision is one of the most reliable dividing lines between an
+O(n²) solution and an O(n log n) one. Sorting by a **derived key** — by
+frequency, by the second element, with a tie-break — is the part of that call
+interviews test directly, and writing the `Comparator` correctly is a small
+skill with a large payoff.
 
-The other half of this unit is the part interviews actually test: sorting by a
-**derived key** — by frequency, by the second element, by a rule with a
-tie-break. That is a `Comparator`, and writing one correctly (including not
-writing `a - b` for large values) is a small skill with a large payoff.
+But two sorting *algorithms* are worth knowing from the inside, because their
+ideas solve problems no library call does. **Quickselect** is quicksort that
+recurses into one side only, and finds the k-th element in O(n) average. **Merge
+sort's merge** sees every pair that crosses the midpoint, so it can *count*
+them — inversions, smaller-to-the-right, pairs with a condition — in O(n log n).
 """,
     model="""
 ### What a sort costs
@@ -96,10 +341,48 @@ produce a wrong order — Java detects some cases and throws.
 
 ### When not to sort
 
-If the values are small integers, counting sort is O(n) and beats it. If you
-only need the k largest, a heap is O(n log k). If you only need the k-th,
-quickselect is O(n) average. Sorting is the general answer, not always the best
-one — and saying so is worth points.
+If the values are small integers, counting sort is O(n) and beats it: the
+O(n log n) lower bound only binds sorts that learn from comparisons, and using a
+value as an array index learns more. If you only need the k largest, a heap is
+O(n log k). If you only need the k-th, quickselect is O(n) average. Sorting is
+the general answer, not always the best one — and saying so is worth points.
+
+### Quickselect
+
+Partition around a pivot the way quicksort does, so everything smaller is on
+the left and everything larger on the right. The pivot is now at its final
+sorted index p. If p is the index you want, stop; otherwise recurse into **one**
+side only.
+
+```java
+int select(int[] a, int lo, int hi, int k) {        // k-th smallest, 0-based, in [lo, hi]
+    while (true) {
+        int p = partition(a, lo, hi);                 // random pivot → its sorted index
+        if (p == k) return a[p];
+        if (p < k) lo = p + 1; else hi = p - 1;       // discard the other side
+    }
+}
+```
+
+Each round discards a constant fraction on average, so the work is
+n + n/2 + n/4 + … = O(n). A pivot that is always the smallest element makes it
+O(n²) — which is why the pivot is **random**.
+
+### Merge sort, reused
+
+The recursion unit's merge takes elements from two sorted halves. When it takes
+from the **right** half while `mid − i` elements are still waiting in the left,
+each of those is larger and comes earlier: `mid − i` inversions, counted in O(1).
+
+```java
+while (i < mid && j < hi) {
+    if (a[i] <= a[j]) buf[k++] = a[i++];
+    else { inversions += mid - i; buf[k++] = a[j++]; }
+}
+```
+
+Every cross-midpoint pair is seen exactly once across the recursion, so the
+count costs nothing beyond the sort itself.
 """,
     signals=[
         _sig("“k-th largest / smallest”", "Sort, or a heap, or quickselect",
@@ -146,6 +429,45 @@ for (int v = 0; v <= MAX; v++)
     while (count[v]-- > 0) a[i++] = v;
 """,
             "Only viable when the value range is comparable to n."),
+        _sk("Quickselect",
+            "The k-th smallest or largest, without sorting everything.",
+            """
+static final Random RNG = new Random();
+
+static int kthSmallest(int[] a, int k) {             // 0-based k
+    int lo = 0, hi = a.length - 1;
+    while (true) {
+        int r = lo + RNG.nextInt(hi - lo + 1);
+        swap(a, r, hi);                               // random pivot, moved to the end
+        int p = lo;
+        for (int i = lo; i < hi; i++)
+            if (a[i] < a[hi]) swap(a, i, p++);        // Lomuto partition
+        swap(a, p, hi);                               // pivot lands at its sorted index
+        if (p == k) return a[p];
+        if (p < k) lo = p + 1; else hi = p - 1;
+    }
+}
+""",
+            "k-th largest is `kthSmallest(a, n − k)`. The random pivot is what makes O(n) the expected case."),
+        _sk("Count while merging",
+            "Inversions, and any \"pairs i < j with a[i] > a[j]\" count.",
+            """
+static long sortCount(int[] a, int[] buf, int lo, int hi) {   // [lo, hi)
+    if (hi - lo < 2) return 0;
+    int mid = (lo + hi) >>> 1;
+    long c = sortCount(a, buf, lo, mid) + sortCount(a, buf, mid, hi);
+    int i = lo, j = mid, k = lo;
+    while (i < mid && j < hi) {
+        if (a[i] <= a[j]) buf[k++] = a[i++];
+        else { c += mid - i; buf[k++] = a[j++]; }     // a[j] jumps every a[i..mid)
+    }
+    while (i < mid) buf[k++] = a[i++];
+    while (j < hi)  buf[k++] = a[j++];
+    System.arraycopy(buf, lo, a, lo, hi - lo);
+    return c;
+}
+""",
+            "`<=`, not `<`: equal values are not an inversion. The count can reach n²/2 — use `long`."),
     ],
     costs=[
         _cost("`Arrays.sort(int[])`", "O(n log n)", "O(log n)", "Quicksort; not stable."),
@@ -153,6 +475,7 @@ for (int v = 0; v <= MAX; v++)
         _cost("Counting sort", "O(n + k)", "O(k)", "k = value range."),
         _cost("k-th largest via heap", "O(n log k)", "O(k)", "Better than sorting when k ≪ n."),
         _cost("k-th largest via quickselect", "O(n) average", "O(1)", "O(n²) worst case."),
+        _cost("Merge sort, counting inversions", "O(n log n)", "O(n)", "The count rides along with the merge."),
     ],
     pitfalls=[
         _pit("The sorted order is subtly wrong on extreme values",
@@ -171,6 +494,13 @@ for (int v = 0; v <= MAX; v++)
         _pit("Sorting to find one element",
              "O(n log n) spent where a single O(n) pass — or a size-k heap — would do.",
              "Ask what you actually need: the max, the top k, or the whole order."),
+        _pit("Quickselect times out on sorted input",
+             "The pivot is always the first or last element, so each partition removes one "
+             "element and the total is O(n²).",
+             "Pick the pivot at random (or shuffle once first)."),
+        _pit("The inversion count is too high on inputs with duplicates",
+             "The merge takes from the right half when values are equal, counting equal pairs.",
+             "Take from the left on ties: `a[i] <= a[j]`."),
     ],
     lessons=["sorting", "alg_sorting_basics", "alg_efficient_sorts", "alg_non_comparison_sorts"],
     checks=[
@@ -186,23 +516,32 @@ for (int v = 0; v <= MAX; v++)
         _chk("What does stability mean, and when do you need it?",
              "Equal elements keep their input order. You need it when you sort by one key "
              "and rely on a previous sort to break ties."),
+        _chk("Why is quickselect O(n) on average when quicksort is O(n log n)?",
+             "After partitioning, quickselect recurses into one side only. The sizes shrink "
+             "geometrically — n + n/2 + n/4 + … < 2n — instead of every level processing all n."),
+        _chk("During merge sort's merge, a[j] from the right half is taken while i < mid. "
+             "How many inversions does that reveal?",
+             "`mid − i`: every element still waiting in the left half is larger than a[j] and "
+             "sits before it in the original array."),
     ],
     interview="""
-The sorting question in an interview is almost never "implement quicksort" — it
-is "you sorted; did you need to?". Have the three alternatives ready: counting
-sort when the range is small, a heap when you want the top k, quickselect when
-you want exactly the k-th. Naming the trade-off unprompted is the answer they
-are listening for.
+The sorting question in an interview is usually "you sorted; did you need to?".
+Have the three alternatives ready: counting sort when the range is small, a heap
+when you want the top k, quickselect when you want exactly the k-th — and be
+able to *write* quickselect, because "the k-th largest in O(n)" is a common
+follow-up. When a problem asks to count pairs that are out of order, say
+"merge sort, counting at the merge" before anything else.
 """,
     rungs=[
         _rung("Warm up", "Order by something other than the value itself.",
               ["leaderboard-ranks", "sort-by-frequency"],
               {"leaderboard-ranks": "Two keys, one descending, and ranks that are shared on ties and then skip. Write the comparator with `Integer.compare`.",
                "sort-by-frequency": "Count first, then sort the keys by their count with a tie-break. The comparator is the whole exercise."}),
-        _rung("Core", "Selection problems, where sorting is the baseline and not the best answer.",
+        _rung("Core", "Sort by a rule, then read the answer off the order.",
               ["kth-largest-element", "kth-smallest", "top-k-frequent"],
-              {"kth-largest-element": "Solve by sorting first, then come back after the heaps unit and do it in O(n log k).",
-               "top-k-frequent": "Counting plus ordering — the pattern behind almost every “most common” question."}),
+              # kth-largest-element and kth-smallest move to the Quickselect rung, and
+              # top-k-frequent to the heaps unit, in tools/dsa_syllabus.py.
+              {}),
     ],
     next_up="""
 Sorted data has a superpower this unit has not used yet: you can find anything
@@ -211,7 +550,7 @@ in it in O(log n).
 )
 
 
-# --- Unit 12 — Binary search ------------------------------------------------
+# --- Unit 13 — Binary search -------------------------------------------------
 
 _unit(
     "binary-search", "Binary Search", "🎯", _S3,
@@ -483,620 +822,423 @@ roughly 64 elements.
                "min-ship-capacity": "Binary search on the answer, in full: name the bounds, write `feasible(x)`, argue it is monotone. The array only evaluates the predicate."}),
     ],
     next_up="""
-Both remaining units in this stage are about the *representation* of a number
-rather than a collection of them — first its factors, then its bits.
+Search finds *an* answer fast. The last two units of the stage ask for the
+*best* one — and whether a single local decision, made in sorted order, can be
+trusted to find it.
 """,
 )
 
 
-# --- Unit 13 — Math and number theory ---------------------------------------
+# --- Unit 14 — Greedy --------------------------------------------------------
 
 _unit(
-    "math-number-theory", "Math & Number Theory", "🧮", _S3,
-    "Divisors, primes and gcd — in O(√n) and O(log n), not O(n).",
-    weight=1,
-    prereqs=["loops-and-digits"],
+    "greedy", "Greedy Algorithms", "💰", _S3,
+    "Take the best local move — and be able to prove it was safe.",
+    weight=3,
+    prereqs=["sorting"],
     why="""
-Number-theory problems are the clearest example of the distinction that Big-O
-makes and casual thinking does not: the difference between *how many numbers
-you have* and *how large a number is*. Testing whether n is prime by trying
-every candidate below it is O(n); stopping at √n is O(√n), and for n = 10⁹ that
-is the difference between a billion operations and thirty thousand.
+Greedy algorithms are the shortest, fastest solutions in the whole bank, and
+the most dangerous. The code for "best answer" is often one pass with a running
+maximum; the difficulty is entirely in knowing whether that is *correct*, because
+a greedy algorithm that is wrong is wrong silently and usually passes the small
+tests.
 
-The two facts this unit is built on — trial division up to √n, and Euclid's
-algorithm — carry a surprising amount of weight, and both have one-line proofs
-worth knowing.
+So this unit is mostly about the proof obligation. Two arguments cover almost
+every case, and if you cannot make one of them, the answer is dynamic
+programming.
 """,
     model="""
-### Divisors come in pairs
+### The two proof patterns
 
-If `d` divides `n`, so does `n / d`, and one of the pair is always ≤ √n. So
-every divisor question is answered by a loop to √n:
+**Exchange argument.** Take any optimal solution. Show that you can swap one of
+its choices for the greedy choice without making it worse. Therefore some
+optimal solution contains the greedy choice, so taking it loses nothing.
 
-```java
-for (long d = 1; d * d <= n; d++) {
-    if (n % d == 0) {
-        count += (d == n / d) ? 1 : 2;     // perfect square counts once
-    }
-}
-```
+*Buy and sell a stock*: the best profit ending today uses the lowest price seen
+so far. Any optimal pair `(buy, sell)` can have its buy moved to the minimum
+before `sell` without reducing the profit.
 
-**Primality** is the same loop with an early exit: n is prime if nothing in
-`2 … √n` divides it. Handle `n < 2` first — 0 and 1 are not prime, and that
-special case is the most common wrong answer.
+**Stays-ahead argument.** Show that after each step, the greedy solution is at
+least as far along as any other. *Jump game*: track the furthest index
+reachable; no other strategy can be further ahead after the same number of
+indices, so if greedy cannot reach the end, nothing can.
 
-`d * d <= n` rather than `d <= Math.sqrt(n)`: exact integer arithmetic, no
-floating-point rounding at the boundary.
+### When greedy fails
 
-### Counting primes: the sieve
+The moment a choice that looks worse now enables something better later. Coin
+change with `{1, 3, 4}` and amount 6: greedy takes 4, then 1, then 1 — three
+coins. The optimum is 3 + 3 — two. Nothing in the greedy step could have seen
+that, which is why the honest test is **construct a counterexample**. If you
+cannot, and you can make one of the two arguments above, proceed.
 
-For *all* primes below n, trial division per number is O(n√n). The Sieve of
-Eratosthenes is O(n log log n) — effectively linear:
+### The usual shapes
 
-```java
-boolean[] composite = new boolean[n];
-for (int i = 2; (long) i * i < n; i++)
-    if (!composite[i])
-        for (long j = (long) i * i; j < n; j += i)
-            composite[(int) j] = true;
-```
-
-Start crossing out at `i * i`, because every smaller multiple of `i` already has
-a smaller prime factor and was crossed out earlier. Note the `long` in the inner
-loop: `i * i` overflows `int` for i beyond ~46,000.
-
-### Euclid's algorithm
-
-```java
-static long gcd(long a, long b) { return b == 0 ? a : gcd(b, a % b); }
-```
-
-Correct because any common divisor of `a` and `b` also divides `a % b`, so the
-set of common divisors never changes. Fast because the remainder at least halves
-every two steps: O(log min(a, b)).
-
-From it: `lcm(a, b) = a / gcd(a, b) * b` — **divide before multiplying**, or the
-product overflows on the way.
-
-`gcd` over an array is a fold: `g = gcd(g, x)` starting from 0, since
-`gcd(0, x) = x`.
-
-### Modular arithmetic
-
-Addition and multiplication distribute over `%`, so you can reduce at every step
-and never overflow:
-
-```java
-result = (result * base) % MOD;      // both operands must be long
-```
-
-Subtraction needs care: `(a - b) % MOD` can be negative in Java, so write
-`((a - b) % MOD + MOD) % MOD`.
-""",
-    signals=[
-        _sig("“is it prime?”, “how many divisors?”", "Loop to √n",
-             "Divisors pair up around the square root."),
-        _sig("“all primes below n”", "Sieve of Eratosthenes",
-             "O(n log log n) beats n separate primality tests."),
-        _sig("“simplify the fraction”, “common divisor”", "Euclid's gcd",
-             "O(log n), and lcm follows from it."),
-        _sig("“answer modulo 10⁹+7”", "Reduce at every step",
-             "Keeps everything inside `long` with no overflow."),
-        _sig("“fewest coins” with standard denominations", "Greedy, largest first",
-             "Only valid for canonical systems — otherwise it is a DP problem."),
-        _sig("“a^b with huge b”", "Fast exponentiation by squaring",
-             "O(log b); see the recursion unit."),
-    ],
-    skeletons=[
-        _sk("Trial division to √n",
-            "Primality, divisor counting, divisor sums.",
-            """
-static boolean isPrime(long n) {
-    if (n < 2) return false;
-    for (long d = 2; d * d <= n; d++)
-        if (n % d == 0) return false;
-    return true;
-}
-""",
-            "`d * d <= n` keeps it in exact integer arithmetic."),
-        _sk("Sieve of Eratosthenes",
-            "Every prime below n, once.",
-            """
-boolean[] composite = new boolean[n];
-int count = 0;
-for (int i = 2; i < n; i++) {
-    if (composite[i]) continue;
-    count++;
-    for (long j = (long) i * i; j < n; j += i) composite[(int) j] = true;
-}
-""",
-            "Start at `i * i`, and compute it in `long`."),
-        _sk("Euclid's gcd (and lcm)",
-            "Fractions, common periods, array-wide gcd.",
-            """
-static long gcd(long a, long b) { return b == 0 ? a : gcd(b, a % b); }
-
-long lcm = a / gcd(a, b) * b;      // divide FIRST to avoid overflow
-""",
-            "Fold with `g = gcd(g, x)` from 0 to get the gcd of a whole array."),
-        _sk("Greedy change with canonical coins",
-            "US/EU denominations, where greedy is provably optimal.",
-            """
-int[] coins = {25, 10, 5, 1};
-int used = 0;
-for (int c : coins) { used += amount / c; amount %= c; }
-""",
-            "Valid only for canonical systems — `{1, 3, 4}` and amount 6 defeats it."),
-    ],
-    costs=[
-        _cost("Trial division", "O(√n)", "O(1)", "~31,623 steps at n = 10⁹."),
-        _cost("Sieve to n", "O(n log log n)", "O(n)", "Effectively linear."),
-        _cost("Euclid's gcd", "O(log min(a, b))", "O(1)", "O(log n) stack if recursive."),
-        _cost("Fast exponentiation", "O(log b)", "O(1)", "See the recursion unit."),
-        _cost("Naive primality to n", "O(n)", "O(1)", "The version to stop writing."),
-    ],
-    pitfalls=[
-        _pit("1 is reported as prime",
-             "The `n < 2` guard is missing.",
-             "Handle 0 and 1 before the loop; both are non-prime by definition."),
-        _pit("The divisor count is one too high for perfect squares",
-             "`d` and `n / d` are the same number when `d * d == n`, and both were counted.",
-             "Add 1 rather than 2 in that case."),
-        _pit("The sieve overflows or silently skips",
-             "`i * i` computed in `int` wraps negative for i beyond ~46,340.",
-             "Compute the inner start in `long`."),
-        _pit("`lcm` overflows",
-             "`a * b` was computed before dividing by the gcd.",
-             "`a / gcd(a, b) * b` — the division is exact, so ordering is safe."),
-        _pit("A modular result comes out negative",
-             "Java's `%` keeps the sign of the left operand after a subtraction.",
-             "`((x % MOD) + MOD) % MOD`."),
-        _pit("Greedy change returns too many coins",
-             "The denominations are not canonical, so greedy is not optimal.",
-             "Use the coin-change DP from the DP unit."),
-    ],
-    lessons=["number_theory", "math_digits", "modulo"],
-    checks=[
-        _chk("Why is it enough to test divisors up to √n?",
-             "Divisors pair as `d × n/d`, and in every pair one member is ≤ √n. A factor "
-             "above √n therefore implies one below it, already tested."),
-        _chk("Why does the sieve's inner loop start at `i * i`?",
-             "Every multiple `i·k` with `k < i` has a prime factor smaller than `i` and was "
-             "crossed out when that factor was processed."),
-        _chk("Why is `gcd(a, b) == gcd(b, a % b)`?",
-             "Any common divisor of `a` and `b` divides `a - qb = a % b`, and conversely, so "
-             "the set of common divisors is unchanged. The remainder shrinks fast, giving "
-             "O(log n)."),
-        _chk("Why compute `lcm` as `a / gcd * b` rather than `a * b / gcd`?",
-             "`a * b` can overflow before the division happens. Dividing first is exact "
-             "because the gcd divides `a`."),
-        _chk("When is greedy coin change correct?",
-             "Only for canonical denomination systems such as `{1, 5, 10, 25}`. For "
-             "arbitrary coin sets it can be wrong, and dynamic programming is required."),
-    ],
-    interview="""
-Pure number theory is rare in interviews, but √n and gcd show up as *steps*
-inside larger problems — and the follow-up is always "why is that enough?".
-Both proofs above are one sentence long, and being able to produce them
-distinguishes someone who knows the trick from someone who knows why it works.
-""",
-    rungs=[
-        _rung("Warm up", "Divisibility, and a greedy that happens to be optimal.",
-              ["is-multiple", "count-divisors", "us-coins-change"],
-              {"count-divisors": "The √n loop, including the perfect-square case that is counted once, not twice.",
-               "us-coins-change": "Greedy works here because the denominations are canonical. Note *why*, because the coin-change DP later is the same problem without that property."}),
-        _rung("Core", "Trial division and Euclid.",
-              ["gcd", "is-prime", "perfect-number"],
-              {"is-prime": "Guard `n < 2` first, then loop while `d * d <= n`.",
-               "perfect-number": "A divisor-sum problem: collect both members of each divisor pair in the same √n loop."}),
-        _extra("Extra practice", "Batch versions of the same two ideas — more reps, no new idea.",
-              ["count-primes", "gcd-of-array"],
-              {"count-primes": "The sieve. Testing each number separately is the O(n√n) solution you are replacing.",
-               "gcd-of-array": "A fold. `gcd(0, x) == x` makes 0 the right starting accumulator."}),
-    ],
-    next_up="""
-One more representation to go: the bits an integer is actually made of.
-""",
-)
-
-
-# --- Unit 14 — Bit manipulation ---------------------------------------------
-
-_unit(
-    "bit-manipulation", "Bit Manipulation", "🔟", _S3,
-    "32 flags in one int, and the XOR trick that cancels pairs.",
-    weight=1,
-    prereqs=["loops-and-digits"],
-    why="""
-An `int` is 32 booleans. Once you see it that way, a set of up to 32 elements
-becomes a single number you can compare, hash, store in an array and pass
-around for free — which is the foundation of bitmask dynamic programming later,
-and the reason subset enumeration is written the way it is.
-
-The immediate payoff is smaller and sharper: **XOR cancels pairs**. Problems
-that look like they need a hash map — "every element appears twice except one" —
-collapse to a single accumulator and O(1) space.
-""",
-    model="""
-### The operators
-
-| Expression | Meaning |
+| Shape | Greedy rule |
 | --- | --- |
-| `a & b` | 1 where **both** are 1 — masking, testing |
-| `a \\| b` | 1 where **either** is 1 — setting |
-| `a ^ b` | 1 where they **differ** — toggling, cancelling |
-| `~a` | flip every bit |
-| `a << k` | multiply by 2ᵏ |
-| `a >> k` | divide by 2ᵏ, **sign-extending** |
-| `a >>> k` | divide by 2ᵏ, shifting in zeros |
+| Best profit / best difference | Track the running minimum (or maximum) |
+| Reachability | Track the furthest point reachable |
+| Scheduling non-overlapping items | Sort by **end** time, take greedily |
+| Fewest groups covering everything | Sort by end, extend while it still covers |
+| Repeatedly take the extreme | A heap (the heaps unit, stage 5) |
 
-### The four idioms
+Sorting by **end** time rather than start is the classic result: finishing
+earliest leaves the most room for everything after it.
 
-```java
-boolean isSet = (x & (1 << i)) != 0;   // test bit i
-x |= (1 << i);                         // set bit i
-x &= ~(1 << i);                        // clear bit i
-x ^= (1 << i);                         // toggle bit i
-```
+### Greedy versus DP, in practice
 
-### Why XOR is special
-
-Three properties, and every XOR trick follows from them:
-
-- `x ^ x == 0` — a value cancels itself
-- `x ^ 0 == x` — zero is the identity
-- it is commutative and associative — **order does not matter**
-
-So XOR-ing an entire array where every value appears twice except one leaves
-exactly the odd one out. Same idea for the missing number in `0…n`: XOR the
-indices and the values together and everything pairs off but the absentee.
-
-### Two more worth memorising
-
-```java
-x & (x - 1)     // clears the lowest set bit
-x & -x          // isolates the lowest set bit
-```
-
-`x & (x - 1) == 0` tests for a power of two (plus a `x > 0` guard, because 0
-passes and is not one). Repeatedly clearing the lowest set bit counts the bits
-in O(number of set bits) — Kernighan's algorithm.
-
-### Counting bits for every number
-
-`countBits[i] = countBits[i >> 1] + (i & 1)`: i without its last bit, plus that
-bit. That is a one-line DP, and it is the bridge to the DP stage.
-
-### The traps
-
-Shifts on `int` use only the low 5 bits of the count, so `1 << 32` is `1`, not
-0. Use `1L << k` whenever k can reach 32. And `>>` sign-extends, so a negative
-value shifted right stays negative forever — use `>>>` when you are treating
-the int as raw bits.
+Try greedy first — it is O(n) and simple. Spend sixty seconds trying to break
+it. If you find a counterexample, the failure usually tells you the DP state:
+*"the choice depends on how much is left"* means the remaining amount is a
+dimension of the table.
 """,
     signals=[
-        _sig("“every element appears twice except one”", "XOR the whole array",
-             "Pairs cancel; the survivor is the answer. O(1) space."),
-        _sig("“the missing number from 0…n”", "XOR indices with values",
-             "Or use the sum formula — XOR cannot overflow."),
-        _sig("“count the set bits”", "`x & (x - 1)` in a loop, or `Integer.bitCount`",
-             "Clears one set bit per iteration."),
-        _sig("“is it a power of two?”", "`x > 0 && (x & (x - 1)) == 0`",
-             "A power of two has exactly one set bit."),
-        _sig("“all subsets”, n ≤ 20ish", "Iterate masks `0 … (1 << n) - 1`",
-             "Each mask is one subset; bit i means element i is in."),
-        _sig("“for every i from 0 to n, count bits”", "`dp[i] = dp[i >> 1] + (i & 1)`",
-             "One pass, and your first DP recurrence."),
+        _sig("“maximum profit from one buy and one sell”", "Running minimum",
+             "Best sale today uses the cheapest day so far."),
+        _sig("“can you reach the end?”", "Furthest reachable index",
+             "Stays-ahead: nothing can be further along."),
+        _sig("“maximum non-overlapping …”", "Sort by end time, take greedily",
+             "Finishing earliest preserves the most room."),
+        _sig("“fewest jumps / groups / arrows”", "Extend the current reach; count when forced",
+             "Take a new group only when the current one cannot cover."),
+        _sig("“repeatedly take the largest”", "Heap-driven greedy",
+             "The heaps unit's loop — stage 5 covers the structure itself."),
+        _sig("A local choice can be regretted later", "Not greedy — DP",
+             "Construct the counterexample; it names the DP state."),
     ],
     skeletons=[
-        _sk("XOR fold",
-            "The unpaired element; the missing number.",
+        _sk("Running extreme",
+            "Best profit, largest gap, maximum difference.",
             """
-int x = 0;
-for (int v : a) x ^= v;      // pairs cancel, the loner remains
-""",
-            "For “missing from 0…n”, also XOR in every index."),
-        _sk("Kernighan bit count",
-            "Population count, Hamming weight.",
-            """
-int count = 0;
-while (x != 0) { x &= (x - 1); count++; }   // clears the lowest set bit
-""",
-            "Loops once per *set* bit, not once per bit."),
-        _sk("Test / set / clear",
-            "Using an int as a set of up to 32 elements.",
-            """
-boolean has = (mask & (1 << i)) != 0;
-mask |= (1 << i);
-mask &= ~(1 << i);
-""",
-            "`1L << i` when i may reach 32 or beyond."),
-        _sk("Enumerate all subsets",
-            "Brute force over subsets when n ≤ ~20.",
-            """
-for (int mask = 0; mask < (1 << n); mask++) {
-    for (int i = 0; i < n; i++)
-        if ((mask & (1 << i)) != 0) { /* element i is in this subset */ }
+int minSoFar = a[0], best = 0;
+for (int x : a) {
+    best = Math.max(best, x - minSoFar);     // sell today, having bought at the min
+    minSoFar = Math.min(minSoFar, x);
 }
 """,
-            "2ⁿ · n total. The backtracking unit builds the same subsets recursively."),
+            "Evaluate before updating: you cannot buy and sell on the same tick."),
+        _sk("Furthest reach",
+            "Jump game, reachability, coverage.",
+            """
+int reach = 0;
+for (int i = 0; i < n; i++) {
+    if (i > reach) return false;             // a gap nothing can cross
+    reach = Math.max(reach, i + a[i]);
+}
+return true;
+""",
+            "One pass, no memory — the stays-ahead argument in four lines."),
+        _sk("Fewest groups (interval jumps)",
+            "Minimum jumps, fewest arrows, fewest refuels.",
+            """
+int jumps = 0, curEnd = 0, farthest = 0;
+for (int i = 0; i < n - 1; i++) {
+    farthest = Math.max(farthest, i + a[i]);
+    if (i == curEnd) { jumps++; curEnd = farthest; }   // forced to commit
+}
+""",
+            "Count only when the current group is exhausted — that is what makes it minimal."),
+        _sk("Schedule by end time",
+            "Maximum non-overlapping intervals; minimum removals.",
+            """
+Arrays.sort(iv, (x, y) -> Integer.compare(x[1], y[1]));   // by END
+int end = Integer.MIN_VALUE, kept = 0;
+for (int[] v : iv)
+    if (v[0] >= end) { kept++; end = v[1]; }
+""",
+            "By end, not by start. Sorting by start is the classic wrong answer."),
     ],
     costs=[
-        _cost("Any single bit operation", "O(1)", "O(1)", "One machine instruction."),
-        _cost("XOR fold over an array", "O(n)", "O(1)", "Beats a hash map's O(n) space."),
-        _cost("Kernighan count", "O(set bits)", "O(1)", "≤ 32 iterations."),
-        _cost("`dp[i] = dp[i >> 1] + (i & 1)` for all i ≤ n", "O(n)", "O(n)", "One pass."),
-        _cost("Enumerating all subsets", "O(2ⁿ · n)", "O(1)", "Only for n ≤ ~20."),
+        _cost("Single-pass greedy", "O(n)", "O(1)", "Running extreme, furthest reach."),
+        _cost("Sort-then-greedy", "O(n log n)", "O(1)", "Scheduling, intervals."),
+        _cost("Heap-driven greedy", "O(n log n)", "O(n)", "Repeatedly take the extreme."),
+        _cost("The DP alternative", "O(n · states)", "O(states)", "What you fall back to when the proof fails."),
     ],
     pitfalls=[
-        _pit("`1 << 32` gives 1 instead of 0",
-             "Java masks the shift count to 5 bits for `int` (6 for `long`).",
-             "Use `1L << k` whenever k can reach 32."),
-        _pit("A right shift of a negative number never reaches 0",
-             "`>>` sign-extends, so the sign bit keeps refilling.",
-             "Use `>>>` when treating the value as raw bits."),
-        _pit("A test of `x & mask == 0` behaves oddly",
-             "`==` binds tighter than `&` in Java, so it parses as `x & (mask == 0)`.",
-             "Parenthesise: `(x & mask) == 0`."),
-        _pit("0 is reported as a power of two",
-             "`(x & (x - 1)) == 0` is true for 0.",
-             "Add the `x > 0` guard."),
-        _pit("XOR gives the wrong answer when values repeat three times",
-             "XOR cancels *pairs*; a triple leaves one copy behind.",
-             "Use counting (or bitwise counts mod 3) when the multiplicity is not two."),
+        _pit("Correct on the examples, wrong on a hidden test",
+             "The greedy rule is not actually optimal; no counterexample was sought.",
+             "Spend a minute trying to break it. Failing that, state which of the two "
+             "arguments applies."),
+        _pit("Intervals were sorted by start time",
+             "Scheduling optimality depends on finishing earliest.",
+             "Sort by end time for maximum non-overlapping selection."),
+        _pit("Profit of 0 where a loss was expected (or vice versa)",
+             "The problem allows no transaction, or requires exactly one — the two have "
+             "different answers.",
+             "Re-read whether doing nothing is permitted."),
+        _pit("The running minimum is updated before it is used",
+             "Buying and selling collapse onto the same element.",
+             "Evaluate the candidate answer first, then update the running extreme."),
+        _pit("Greedy coin change gives too many coins",
+             "The denominations are not canonical.",
+             "Use the coin-change DP in the knapsack unit (stage 7)."),
+        _pit("Jump counting is one too many",
+             "The loop ran to `n` rather than `n - 1`, counting an arrival at the end.",
+             "Stop before the last index: reaching it needs no further jump."),
     ],
-    lessons=["bit_manip", "math_digits", "arithmetic", "overflow"],
+    lessons=["greedy", "intervals", "heap_greedy"],
     checks=[
-        _chk("Why does XOR-ing an array where every value appears twice leave the loner?",
-             "XOR is commutative and associative and `x ^ x == 0`, so order is irrelevant "
-             "and every pair annihilates, leaving `0 ^ loner`."),
-        _chk("What does `x & (x - 1)` do, and what does it test?",
-             "It clears the lowest set bit. Being 0 afterwards means x had exactly one set "
-             "bit — a power of two, given `x > 0`."),
-        _chk("Why is `1 << 32` equal to 1 in Java?",
-             "Shift counts on `int` are taken modulo 32, so 32 becomes 0. Use `1L << 32`."),
-        _chk("Explain `dp[i] = dp[i >> 1] + (i & 1)`.",
-             "`i >> 1` is i without its lowest bit — a smaller, already-computed value — and "
-             "`i & 1` adds that bit back. It is a recurrence, i.e. dynamic programming."),
+        _chk("What are the two standard ways to justify a greedy algorithm?",
+             "An exchange argument (any optimal solution can be modified to contain the "
+             "greedy choice without getting worse) and a stays-ahead argument (greedy is "
+             "never behind any alternative after the same number of steps)."),
+        _chk("Give a coin system where greedy change is wrong.",
+             "`{1, 3, 4}` for amount 6: greedy gives 4+1+1 = three coins; the optimum is "
+             "3+3 = two."),
+        _chk("Why sort by end time rather than start time when scheduling?",
+             "The interval that finishes earliest leaves the largest remaining window, so "
+             "choosing it never rules out a better solution."),
+        _chk("What should you do when you find a counterexample to your greedy rule?",
+             "Switch to dynamic programming — and read the counterexample for the state: "
+             "whatever the greedy step could not see is usually the missing dimension."),
     ],
     interview="""
-Bit tricks are a bonus, not a core competency: the wrong move is opening with
-one where a hash map is clearer. The right move is offering it as the follow-up
-— *"if you want O(1) space and each value appears exactly twice, XOR does it"* —
-and being able to say why the algebra works.
+The trap is that greedy code is short, so it is tempting to write it and move
+on. Interviewers are listening for the justification. Two sentences settle it:
+*"sorting by end time is safe because the earliest finish leaves the most room"*,
+or *"I tried to construct a case where a worse local choice pays off later and
+could not"*. If neither is available, say so and switch to DP — that judgement
+is itself the thing being tested.
 """,
     rungs=[
-        _rung("Warm up", "Read the bits of a single number.",
-              ["number-of-1-bits", "power-of-two"],
-              {"number-of-1-bits": "Do it with Kernighan's `x &= x - 1` rather than shifting 32 times."}),
-        _rung("Core", "XOR as a cancelling accumulator.",
-              ["single-number", "missing-number"],
-              {"missing-number": "Two solutions: the sum formula and the XOR fold. XOR cannot overflow, which is the argument for it."}),
-        _rung("Stretch", "Bits as a recurrence.",
-              ["count-bits"],
-              {"count-bits": "`dp[i] = dp[i >> 1] + (i & 1)`. Your first dynamic program, hiding inside a bit problem."}),
+        _rung("Warm up", "A sort order, a local rule, and the exchange argument that joins them.",
+              ["activity-selection-small"],
+              {"activity-selection-small": "The canonical greedy. Produce the counterexamples that kill sorting by start time and by duration — that is how you check a rule you just invented."}),
+        _rung("Core", "One pass, one running value, one proof.",
+              ["best-time-buy-sell", "jump-game", "boats-to-save-people", "gas-station-start"],
+              {"best-time-buy-sell": "Say the exchange argument out loud before coding. The code is four lines; the reasoning is the exercise.",
+               "jump-game": "Stays-ahead. Track the furthest reachable index and fail the moment you stand past it.",
+               "boats-to-save-people": "Sort, then converge from both ends. The heaviest person departs on this boat either way — putting `j--` inside the `if` is the bug.",
+               "gas-station-start": "A reset, with a real argument for why the abandoned prefix was already doomed. Same shape as Kadane."}),
+        _rung("Variations", "A rule over a derived quantity, and a rule that is simply wrong.",
+              ["fractional-knapsack", "greedy-coin-change"],
+              {"fractional-knapsack": "The sort key is value *per unit weight*, not value. Then say which property you lose when the items stop being divisible — that is the 0/1 knapsack boundary.",
+               "greedy-coin-change": "The most useful negative example in the unit: on coins {1,3,4} greedy is wrong for 6, and on {3,4} it gets stuck where an answer exists. Nothing is buggy; the rule is false."}),
+        _rung("Stretch", "Greedy where the counting is the subtle part.",
+              ["jump-game-ii"],
+              {"jump-game-ii": "Count a jump only when the current reach is exhausted, and stop before the last index."}),
     ],
     next_up="""
-One unit left in this stage, and it introduces no new technique at all — only
-the index discipline that grid problems demand.
+Intervals are the family where “sort, then be greedy” is provably right — and
+where the sweep from the prefix-sums unit comes back.
 """,
 )
 
 
-# --- Unit 15 — Simulation and matrices --------------------------------------
+# --- Unit 15 — Intervals -----------------------------------------------------
 
 _unit(
-    "simulation-and-matrix", "Simulation & Matrices", "🎛️", _S3,
-    "Follow the rules exactly, on a grid, without breaking your own indices.",
-    weight=2,
-    prereqs=["arrays-first-pass", "loops-and-digits"],
+    "intervals", "Intervals", "📅", _S3,
+    "Sort by the right endpoint, then sweep.",
+    weight=3,
+    prereqs=["sorting", "greedy"],
     why="""
-Some problems have no trick. They describe a process — a robot walking, cells
-updating, a matrix rotating — and the work is to execute it *exactly*, which is
-harder than it sounds because the failure mode is subtle: you overwrite a value
-you still needed, or you update a cell and then read it again in the same step.
+Meetings, bookings, ranges, flights, free time — an enormous number of practical
+problems are pairs of numbers with an overlap rule. Almost all of them are
+solved by one decision (**sort by start, or sort by end?**) followed by a single
+pass, and getting that decision right is the difference between three lines and
+an hour.
 
-This unit is also where 2-D index arithmetic becomes automatic. The neighbour
-loop, the bounds check and the transpose-then-reverse identity are the
-vocabulary that every grid traversal in stage 5 assumes you already have.
+The family also contains the cleanest example of the sweep from the prefix-sums
+unit: turning each interval into a `+1` at its start and a `−1` at its end
+answers every "how many at once" question without ever comparing intervals to
+one another.
 """,
     model="""
-### Grid vocabulary
+### The one decision
+
+| Question | Sort by | Then |
+| --- | --- | --- |
+| Merge overlapping | **start** | Extend the current interval, or emit and restart |
+| Maximum non-overlapping / fewest removals | **end** | Keep if it starts after the last kept end |
+| How many overlap at once | either — use a **sweep** | `+1` at start, `−1` at end, in time order |
+| Insert one interval | already sorted | Three phases: before, merged, after |
+| Intersect two sorted lists | already sorted | Two pointers |
+
+Merging wants earliest **start** because you build left to right. Scheduling
+wants earliest **end** because finishing early leaves the most room. These are
+different questions and the wrong sort is the single most common interval bug.
+
+### Merging
 
 ```java
-int rows = g.length, cols = g[0].length;
-
-int[][] DIRS = {{-1,0},{1,0},{0,-1},{0,1}};        // 4-directional
-for (int[] d : DIRS) {
-    int ni = i + d[0], nj = j + d[1];
-    if (ni < 0 || ni >= rows || nj < 0 || nj >= cols) continue;   // bounds FIRST
-    ...
+Arrays.sort(iv, (a, b) -> Integer.compare(a[0], b[0]));
+List<int[]> out = new ArrayList<>();
+for (int[] cur : iv) {
+    int[] last = out.isEmpty() ? null : out.get(out.size() - 1);
+    if (last != null && cur[0] <= last[1]) last[1] = Math.max(last[1], cur[1]);
+    else out.add(cur.clone());
 }
 ```
 
-The bounds check comes **before** the read, always. Eight neighbours is the same
-loop with `{-1,0,1} × {-1,0,1}` minus the `(0,0)` centre.
+`Math.max` matters: the current interval may be entirely inside the previous
+one, and overwriting the end would shrink it.
 
-### The in-place trap
+### The overlap test
 
-When the update rule reads neighbours, updating a cell immediately corrupts the
-reads of its neighbours. Three ways out, in increasing order of cleverness:
+Two intervals `[a1, a2]` and `[b1, b2]` overlap iff `a1 <= b2 && b1 <= a2`.
+Whether touching endpoints count is a specification question — `[1,2]` and
+`[2,3]`. Decide it from the problem statement (a meeting ending at 2 usually
+does *not* clash with one starting at 2) and keep the comparison consistent.
 
-1. **Write to a copy**, then swap. Always correct, costs O(n·m).
-2. **Two passes with an encoding**: store both old and new state in one cell
-   (e.g. old value + 2 × new value), then divide out on a second pass. O(1)
-   extra space.
-3. **Mark in the margins**: use row 0 and column 0 as flags, as in
-   `set-matrix-zeroes`. Cheapest and the easiest to get wrong.
+### The sweep
 
-Start with the copy. Do the clever version only when asked for O(1) space, and
-say why it works before you write it.
-
-### Rotation
-
-Rotating a square matrix 90° clockwise:
-
-```
-transpose (swap a[i][j] with a[j][i], j > i)  →  reverse each row
+```java
+// minimum meeting rooms: the maximum number concurrently active
+int[] starts = ..., ends = ...;
+Arrays.sort(starts); Arrays.sort(ends);
+int rooms = 0, best = 0, j = 0;
+for (int i = 0; i < n; i++) {
+    while (j < n && ends[j] <= starts[i]) { rooms--; j++; }   // frees first
+    rooms++;
+    best = Math.max(best, rooms);
+}
 ```
 
-Writing the two-step identity down is far more reliable than trying to derive
-`a[j][n-1-i]` under pressure.
+Process an ending **before** a start at the same instant, or a room is counted
+twice. The heap version — a min-heap of end times, polled while the earliest end
+is ≤ the current start — is equivalent and often easier to explain.
 
-### Spiral traversal
+### Two sorted lists: intersect with two pointers
 
-Keep four boundaries — `top`, `bottom`, `left`, `right` — walk one edge, then
-move that boundary inward. The subtlety is that after the top row and right
-column, you must re-check `top <= bottom` and `left <= right` before walking
-back, or a single remaining row is emitted twice.
-
-### Rotating an array by k
-
-Three reversals: reverse the whole thing, reverse the first k, reverse the rest.
-O(1) space and no modular index juggling. Normalise `k %= n` first, or the
-reversal bounds go out of range.
+The intersection of `[a1,a2]` and `[b1,b2]` is
+`[max(a1,b1), min(a2,b2)]`, valid when the start is ≤ the end. Then advance
+whichever interval **ends first**, because it can have no further intersections.
 """,
     signals=[
-        _sig("“each step, every cell becomes …”", "Copy, or encode two states in one cell",
-             "Simultaneous updates cannot be done in place naively."),
-        _sig("“rotate the matrix 90°”", "Transpose, then reverse each row",
-             "Two simple steps beat one hard index formula."),
-        _sig("“spiral order”", "Four shrinking boundaries",
-             "Re-check the bounds between the two return edges."),
-        _sig("“rotate the array by k”", "Three reversals",
-             "O(1) space; normalise `k %= n` first."),
-        _sig("“count neighbours”, “adjacent cells”", "A direction array + bounds check",
-             "Same loop for 4- and 8-connectivity."),
-        _sig("“simulate n steps”, n large", "Look for a cycle",
-             "States repeat; simulating 10⁹ steps directly will not finish."),
+        _sig("“merge overlapping”", "Sort by start",
+             "Build left to right, extending with `max`."),
+        _sig("“maximum meetings”, “fewest removals”", "Sort by end",
+             "Earliest finish leaves the most room."),
+        _sig("“minimum rooms / platforms / servers”", "Sweep or a min-heap of end times",
+             "The answer is the peak concurrency."),
+        _sig("“insert into a sorted list of intervals”", "Three phases",
+             "Everything before, the merged block, everything after."),
+        _sig("“intersection of two interval lists”", "Two pointers",
+             "Advance whichever ends first."),
+        _sig("“free time”, “gaps”", "Merge everything, then read the gaps",
+             "The complement of the merged set."),
     ],
     skeletons=[
-        _sk("Neighbour scan",
-            "Counting mines, flood fills, any adjacency rule.",
+        _sk("Merge overlapping",
+            "The base operation almost everything else builds on.",
             """
-static final int[][] DIRS = {{-1,0},{1,0},{0,-1},{0,1}};
-
-for (int[] d : DIRS) {
-    int ni = i + d[0], nj = j + d[1];
-    if (ni < 0 || ni >= rows || nj < 0 || nj >= cols) continue;
-    // safe to read g[ni][nj]
+Arrays.sort(iv, (a, b) -> Integer.compare(a[0], b[0]));
+List<int[]> out = new ArrayList<>();
+for (int[] cur : iv) {
+    if (!out.isEmpty() && cur[0] <= out.get(out.size() - 1)[1])
+        out.get(out.size() - 1)[1] = Math.max(out.get(out.size() - 1)[1], cur[1]);
+    else out.add(cur.clone());
 }
 """,
-            "Bounds before access, every time. This exact loop reappears in every grid BFS."),
-        _sk("Simultaneous update via a copy",
-            "Game of Life and every “all cells update at once” rule.",
+            "`max` on the end — the new interval may be nested inside the last."),
+        _sk("Insert one interval",
+            "Into an already-sorted, non-overlapping list.",
             """
-int[][] next = new int[rows][cols];
-for (int i = 0; i < rows; i++)
-    for (int j = 0; j < cols; j++)
-        next[i][j] = rule(g, i, j);      // reads ONLY the old grid
-g = next;
+int i = 0, n = iv.length;
+while (i < n && iv[i][1] < ni[0]) out.add(iv[i++]);          // strictly before
+while (i < n && iv[i][0] <= ni[1]) {                         // overlapping
+    ni[0] = Math.min(ni[0], iv[i][0]);
+    ni[1] = Math.max(ni[1], iv[i][1]);
+    i++;
+}
+out.add(ni);
+while (i < n) out.add(iv[i++]);                              // strictly after
 """,
-            "Correct by construction. Optimise to in-place encoding only if asked."),
-        _sk("Rotate 90° clockwise",
-            "Square matrix rotation, in place.",
+            "Three loops, each with a clear job. Do not try to fuse them."),
+        _sk("Peak concurrency (heap)",
+            "Minimum meeting rooms, maximum simultaneous anything.",
             """
-for (int i = 0; i < n; i++)                     // transpose
-    for (int j = i + 1; j < n; j++) {
-        int t = a[i][j]; a[i][j] = a[j][i]; a[j][i] = t;
-    }
-for (int[] row : a) {                           // reverse each row
-    for (int l = 0, r = n - 1; l < r; l++, r--) {
-        int t = row[l]; row[l] = row[r]; row[r] = t;
-    }
+Arrays.sort(iv, (a, b) -> Integer.compare(a[0], b[0]));
+PriorityQueue<Integer> ends = new PriorityQueue<>();
+for (int[] v : iv) {
+    if (!ends.isEmpty() && ends.peek() <= v[0]) ends.poll();  // a room freed
+    ends.offer(v[1]);
+}
+int rooms = ends.size();
+""",
+            "The heap size is the number of rooms in use; its peak is the answer. Only `offer`, `peek` and `poll` are needed here — the heaps unit (stage 5) explains why each is cheap."),
+        _sk("Intersect two sorted lists",
+            "Overlap of two schedules.",
+            """
+int i = 0, j = 0;
+while (i < a.length && j < b.length) {
+    int lo = Math.max(a[i][0], b[j][0]), hi = Math.min(a[i][1], b[j][1]);
+    if (lo <= hi) out.add(new int[]{ lo, hi });
+    if (a[i][1] < b[j][1]) i++; else j++;         // advance the earlier end
 }
 """,
-            "`j = i + 1` — transposing the whole square swaps everything back."),
-        _sk("Rotate an array by k",
-            "Cyclic shift, O(1) space.",
-            """
-k %= n;
-reverse(a, 0, n - 1);
-reverse(a, 0, k - 1);
-reverse(a, k, n - 1);
-""",
-            "Without `k %= n` the second reversal can run off the end."),
-        _sk("Spiral boundaries",
-            "Spiral order, layer-by-layer traversal.",
-            """
-int top = 0, bot = rows - 1, left = 0, right = cols - 1;
-while (top <= bot && left <= right) {
-    for (int j = left; j <= right; j++) out.add(a[top][j]);
-    top++;
-    for (int i = top; i <= bot; i++) out.add(a[i][right]);
-    right--;
-    if (top <= bot) { for (int j = right; j >= left; j--) out.add(a[bot][j]); bot--; }
-    if (left <= right) { for (int i = bot; i >= top; i--) out.add(a[i][left]); left++; }
-}
-""",
-            "The two guarded edges are where single-row and single-column matrices break."),
+            "Advancing the earlier end is what makes the single pass sufficient."),
     ],
     costs=[
-        _cost("Full grid pass", "O(rows · cols)", "O(1)", "The floor for grid problems."),
-        _cost("Neighbour scan per cell", "O(rows · cols · 8)", "O(1)", "The 8 is a constant."),
-        _cost("Simultaneous update with a copy", "O(rows · cols)", "O(rows · cols)", "Always correct."),
-        _cost("Same, encoded in place", "O(rows · cols)", "O(1)", "Two passes, one encoding trick."),
-        _cost("Array rotation by three reversals", "O(n)", "O(1)", "Versus O(n) extra with a buffer."),
+        _cost("Sort", "O(n log n)", "O(n)", "Dominates every interval algorithm."),
+        _cost("Merge / greedy scan after sorting", "O(n)", "O(n)", "One pass."),
+        _cost("Sweep of ±1 events", "O(n log n)", "O(n)", "Sorting the events."),
+        _cost("Heap of end times", "O(n log n)", "O(n)", "Same bound, easier to explain."),
+        _cost("Insert into a sorted list", "O(n)", "O(n)", "No sort needed — it is already ordered."),
     ],
     pitfalls=[
-        _pit("`ArrayIndexOutOfBoundsException` at an edge cell",
-             "A neighbour was read before its coordinates were bounds-checked.",
-             "Check `ni`/`nj` first, then access."),
-        _pit("The simulation drifts after the first step",
-             "Cells were updated in place, so later cells read already-updated neighbours.",
-             "Write into a copy, or encode old and new state in the same cell."),
-        _pit("The rotated matrix is a mirror image",
-             "The transpose loop ran over all `j` rather than `j > i`, swapping twice.",
-             "Start the inner loop at `i + 1`."),
-        _pit("Spiral order repeats the middle row",
-             "The bottom and left edges were walked without re-checking the shrunk bounds.",
-             "Guard both return edges with `if (top <= bot)` and `if (left <= right)`."),
-        _pit("Rotating by k crashes or does nothing",
-             "`k` was larger than `n`, or negative.",
-             "`k = ((k % n) + n) % n` before the reversals."),
-        _pit("Simulating a huge step count times out",
-             "The process was executed literally when it is eventually periodic.",
-             "Detect the repeated state and jump ahead by whole cycles."),
+        _pit("Maximum non-overlapping selection is too small",
+             "The intervals were sorted by start time.",
+             "Sort by end. This is the single most common interval mistake."),
+        _pit("A merged interval is shorter than one it contains",
+             "The end was overwritten rather than maximised.",
+             "`last[1] = Math.max(last[1], cur[1])` — nested intervals are real."),
+        _pit("One room too many",
+             "A start was processed before an end at the same timestamp.",
+             "Release first: use `ends[j] <= starts[i]` in the sweep."),
+        _pit("Touching intervals are treated inconsistently",
+             "`[1,2]` and `[2,3]` were merged in one place and separated in another.",
+             "Decide from the statement whether contact counts, and use the same comparison "
+             "everywhere."),
+        _pit("Sorting an already-sorted input",
+             "An extra O(n log n) where the list was given in order.",
+             "Insert-into-sorted is O(n); check what the input guarantees."),
+        _pit("The sort comparator overflows",
+             "`(a, b) -> a[0] - b[0]` with coordinates near `Integer.MAX_VALUE`.",
+             "`Integer.compare(a[0], b[0])`."),
     ],
-    lessons=["grid", "simulation"],
+    lessons=["intervals", "sorting", "heap"],
     checks=[
-        _chk("Why can Game of Life not be updated in place naively?",
-             "The rule reads a cell's neighbours; overwriting a cell makes later cells read "
-             "the new value instead of the old. Every cell must see the same generation."),
-        _chk("Give the two-step identity for a 90° clockwise rotation.",
-             "Transpose (swap `a[i][j]` with `a[j][i]` for `j > i`), then reverse each row."),
-        _chk("Why does rotating an array by k use three reversals?",
-             "Reversing the whole array puts the last k elements at the front but backwards; "
-             "reversing each of the two blocks restores their internal order. O(1) space."),
-        _chk("What breaks in a spiral traversal of a single-row matrix?",
-             "Without re-checking `top <= bot` before the bottom edge, the same row is "
-             "emitted twice — once left-to-right, once right-to-left."),
+        _chk("Merging wants one sort order and scheduling wants another. Which and why?",
+             "Merging sorts by **start**, because it builds the result left to right. "
+             "Maximum non-overlapping scheduling sorts by **end**, because finishing "
+             "earliest leaves the most room for what follows."),
+        _chk("Write the overlap test for [a1,a2] and [b1,b2].",
+             "`a1 <= b2 && b1 <= a2`. Whether the endpoints touching counts as overlap is a "
+             "specification decision and must be applied consistently."),
+        _chk("Why must an end event be processed before a start at the same time?",
+             "Otherwise a resource that is being released at that instant is not yet "
+             "available, and the peak count is one too high."),
+        _chk("How do you compute free time across many busy intervals?",
+             "Merge all the busy intervals, then emit the gaps between consecutive merged "
+             "blocks."),
     ],
     interview="""
-Simulation questions look easy and eliminate people, because the grader is
-exact and the specification has more cases than it first appears. The winning
-approach is visible discipline: restate the rule, name the update order,
-enumerate the edge cases (first row, last column, 1×n grid), *then* type. And
-when asked for O(1) space, explain the encoding before writing it.
+Interval questions are a gift when you state the sort rule first: *"merging, so
+I sort by start"* or *"maximum non-overlapping, so I sort by end — earliest
+finish leaves the most room"*. Then raise the endpoint question before the
+interviewer does — does a meeting ending at 2 clash with one starting at 2? —
+because it is the ambiguity the test cases are built around.
 """,
     rungs=[
-        _rung("Warm up", "Follow a small rule exactly.",
-              ["rock-paper-scissors", "traffic-light", "robot-grid-walk"],
-              {"robot-grid-walk": "The direction array, and a bounds check that has to come first."}),
-        _rung("Core", "Neighbour counting on a grid.",
-              ["minesweeper-counts", "color-bomb-explosion", "territory-capture"],
-              {"minesweeper-counts": "Eight neighbours, bounds-checked. This loop is the ancestor of every flood fill in stage 5."}),
-        _rung("Variations", "Transform the whole structure without corrupting it.",
-              ["rotate-array", "rotate-array-right", "set-matrix-zeroes"],
-              {"rotate-array": "Three reversals. Try the k-buffer version too and compare the space.",
-               "set-matrix-zeroes": "The marking trap: record which rows and columns to clear *before* clearing any of them."}),
-        _extra("Extra practice", "More index arithmetic, once you can already do index arithmetic.",
-              ["rotate-matrix-90", "spiral-order", "game-of-life-step"],
-              {"game-of-life-step": "Do the copy version first. The in-place encoding is the follow-up, not the entry price."}),
+        _rung("Warm up", "The overlap test, applied once.",
+              ["can-attend-meetings"],
+              {"can-attend-meetings": "Sort by start and compare neighbours. Decide what touching endpoints mean before you code."}),
+        _rung("Core", "Merging, and the two-pointer intersection.",
+              ["merge-intervals", "insert-interval", "interval-intersections"],
+              {"merge-intervals": "The base operation. `Math.max` on the end, because intervals nest.",
+               "insert-interval": "Three phases. Trying to write it as one loop is how this becomes hard."}),
+        _rung("Variations", "Sweeps and end-time greed.",
+              ["min-meeting-rooms", "car-pooling", "non-overlapping-remove", "min-arrows-balloons"],
+              {"min-meeting-rooms": "Solve it twice — a ±1 sweep and a heap of end times — and notice they are the same algorithm.",
+               "non-overlapping-remove": "Sort by end and keep greedily; the removals are everything you did not keep."}),
+        _rung("Stretch", "Merge first, then read the complement.",
+              ["employee-free-time"],
+              {"employee-free-time": "Flatten every schedule, merge, and emit the gaps. A heap-based k-way merge avoids sorting everything."}),
     ],
     next_up="""
-Every technique so far has worked on data laid out in a line. The next stage
-introduces structures that impose their own shape — and with it, their own
-operations.
+Order is done. The next stage looks inside the numbers themselves — their
+factors, their remainders, their bits — and at grids, where the index
+arithmetic is the whole problem.
 """,
 )

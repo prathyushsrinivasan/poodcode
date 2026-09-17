@@ -79,7 +79,9 @@ export default function Library() {
     );
   }
 
-  const unitCount = data.stages.reduce((n, s) => n + s.units.length, 0);
+  const coreStages = data.stages.filter((s) => !s.optional);
+  const optionalStages = data.stages.length - coreStages.length;
+  const unitCount = coreStages.reduce((n, s) => n + s.units.length, 0);
   const nextKey = data.next?.unit.unit.key ?? null;
   // The stage holding "up next" is the one you are working in, and the default
   // selection when the URL does not name one.
@@ -111,7 +113,9 @@ export default function Library() {
           <p className="page-sub">
             {data.subtitle}{" "}
             <span className="faint">
-              {data.stages.length} stages · {unitCount} units · {data.total} problems
+              {coreStages.length} stages · {unitCount} units · {data.total} problems
+              {optionalStages > 0 &&
+                ` · plus ${optionalStages === 1 ? "an optional stage" : `${optionalStages} optional stages`}`}
             </span>
           </p>
         </div>
@@ -213,7 +217,7 @@ export default function Library() {
           <StagePanel
             stage={stage}
             number={selectedIndex + 1}
-            count={data.stages.length}
+            count={coreStages.length}
             nextKey={nextKey}
             goalOpen={fold.isOpen(`goal:${stage.key}`)}
             onToggleGoal={() => fold.toggle(`goal:${stage.key}`)}
@@ -248,7 +252,9 @@ function ContinuePanel({
   onShowIntro: (() => void) | null;
 }) {
   const pct = data.total ? Math.round((data.solved / data.total) * 100) : 0;
-  const all = data.stages.flatMap((s) => s.units);
+  // Core units only, to match `data.solved / data.total`: an optional stage is
+  // not part of finishing the course.
+  const all = data.stages.filter((s) => !s.optional).flatMap((s) => s.units);
   const cleared = all.filter((u) => isCleared(u.status) || u.skipped).length;
   const next = data.next;
 
@@ -257,8 +263,8 @@ function ContinuePanel({
       <div className="cur-hero-main">
         {next ? (
           <>
-            <div className="cur-eyebrow" style={{ color: "var(--accent)" }}>
-              ▶ Up next
+            <div className="cur-eyebrow" style={{ color: data.coreComplete ? "var(--good)" : "var(--accent)" }}>
+              {data.coreComplete ? "🎉 Core complete · optional next" : "▶ Up next"}
             </div>
             <div className="cur-hero-title">
               <span>{next.unit.unit.icon}</span>
@@ -301,8 +307,9 @@ function ContinuePanel({
               🎉 Curriculum complete
             </div>
             <p style={{ marginBottom: 0 }}>
-              Every problem in the curriculum is solved. The work from here is revision — the
-              review queue, and re-solving the stretch rungs from memory rather than from notes.
+              Every unit in the curriculum is done, the optional stage included. The work from
+              here is revision — the mixed sets, and re-solving the stretch rungs from memory
+              rather than from notes.
             </p>
           </>
         )}
@@ -438,7 +445,7 @@ function StageButton({
       aria-current={active ? "true" : undefined}
     >
       <span className={`cur-num ${done ? "complete" : started ? "started" : ""}`}>
-        {done ? "✓" : number}
+        {done ? "✓" : stage.optional ? "+" : number}
       </span>
       <span style={{ minWidth: 0 }}>
         <span className="cur-stage-name" style={{ display: "block" }}>
@@ -448,6 +455,7 @@ function StageButton({
           <span>
             {clearedUnits}/{stage.units.length} units
           </span>
+          {stage.optional && <span>· optional</span>}
           {current && <span className="cur-here">· you are here</span>}
         </span>
         <span className="cur-minibar">
@@ -488,8 +496,8 @@ function StagePanel({
   return (
     <section aria-label={`Stage ${number}: ${stage.title}`} style={{ minWidth: 0 }}>
       <div className="cur-eyebrow">
-        Stage {number} of {count} · {stage.units.length} units · {stage.solved}/{stage.total}{" "}
-        problems · {formatMinutes(minutes)}
+        {stage.optional ? "Optional stage" : `Stage ${number} of ${count}`} · {stage.units.length}{" "}
+        units · {stage.solved}/{stage.total} problems · {formatMinutes(minutes)}
       </div>
       <h2 className="cur-stage-title">
         <span>{stage.icon}</span>
@@ -570,7 +578,8 @@ function SearchResults({
 }) {
   const stageOf = (key: string) => {
     const i = stages.findIndex((s) => s.units.some((u) => u.unit.key === key));
-    return i < 0 ? "" : `Stage ${i + 1} · ${stages[i].title}`;
+    if (i < 0) return "";
+    return stages[i].optional ? `Optional · ${stages[i].title}` : `Stage ${i + 1} · ${stages[i].title}`;
   };
 
   return (

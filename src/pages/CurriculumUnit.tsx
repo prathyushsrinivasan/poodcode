@@ -579,7 +579,7 @@ function UnitView({
                 nav(libraryUrl);
               }}
             >
-              {stage.icon} Stage {stageIndex + 1} · {stage.title}
+              {stage.icon} {stage.optional ? "Optional stage" : `Stage ${stageIndex + 1}`} · {stage.title}
             </a>
             <span>›</span>
             <span>

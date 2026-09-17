@@ -55,7 +55,7 @@ function dsaCmds(c: DsaCurriculum | null, navigate: (to: string) => void): Cmd[]
       out.push({
         id: `dsa-unit-${u.key}`,
         label: `${u.icon} ${u.title} — DSA unit ${n}`,
-        hint: `Stage ${si + 1} · ${stage.title} · ${u.tagline}`,
+        hint: `${stage.optional ? "Optional stage" : `Stage ${si + 1}`} · ${stage.title} · ${u.tagline}`,
         run: () => navigate(`/library/unit/${u.key}`),
       });
     }

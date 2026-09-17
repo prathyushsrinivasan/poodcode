@@ -19,6 +19,7 @@
 //!    problems starts on an Intro or an Easy, so "Warm up" is a description
 //!    rather than a label.
 //! 6. Every unit is actually taught — a why, a model, a ladder and self-checks.
+//! 7. Optional stages (beyond the interview core) come after every core stage.
 
 use std::collections::{HashMap, HashSet};
 
@@ -63,9 +64,25 @@ fn curriculum_teaches_every_problem_exactly_once() {
     let mut chain_run = 0usize;
 
     assert!(!curriculum.stages.is_empty(), "no stages shipped");
+    assert!(
+        curriculum.stages.iter().any(|s| !s.optional),
+        "every stage is optional, so there is no core course"
+    );
 
+    let mut optional_seen: Option<&str> = None;
     for (si, stage) in curriculum.stages.iter().enumerate() {
         assert!(!stage.units.is_empty(), "stage {}: no units", stage.key);
+
+        // 7 — optional stages come after the whole core. Otherwise "finish the
+        // core" would mean walking through optional work to reach the rest.
+        if stage.optional {
+            optional_seen = Some(stage.key.as_str());
+        } else if let Some(opt) = optional_seen {
+            panic!(
+                "stage {}: a core stage follows the optional stage {opt} — optional stages must come last",
+                stage.key
+            );
+        }
 
         for unit in &stage.units {
             let k = unit.key.as_str();

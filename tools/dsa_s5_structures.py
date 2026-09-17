@@ -1,16 +1,17 @@
 # -*- coding: utf-8 -*-
 # ---------------------------------------------------------------------------
-# Stage 4 — Linear data structures.
+# Stage 5 — Linear data structures.
 #
 # exec()'d by tools/dsa_curriculum.py inside its namespace.
 #
-# Stages 1-3 used exactly one container: the array. This stage adds the four
+# Stages 1-4 used exactly one container: the array. This stage adds the four
 # that change what is cheap — a stack (last in, first out), a queue/deque
 # (both ends, O(1)), a linked list (O(1) splice, O(n) access) and a heap (O(1)
-# minimum) — and then closes with DESIGN, the only unit in the curriculum whose
-# problems have no algorithm at all. Their difficulty is entirely in choosing
-# and composing the structures from the four units before it, which is why it
-# sits last and is the best rehearsal for a real interview.
+# minimum).
+#
+# DESIGN used to close this stage. It moved to the end of the curriculum: its
+# problems lean on binary search over versions, heaps, and ordered maps, which
+# the BST unit in stage 6 teaches, so here it could only be half-solved.
 #
 # WHY THIS STAGE TEACHES INTERNALS AND THE OTHERS DO NOT.
 #
@@ -34,14 +35,13 @@
 #     thing that converts a memorised cost into an understood one, and each
 #     one here is deliberately small enough for a single sitting.
 #
-# ORDERING: stacks → queues/deques → linked lists → heaps → design. Queues
-# come second because BFS in stage 5 depends on them and because the monotonic
-# DEQUE is the direct sequel to the monotonic STACK — teaching them apart
-# would hide that they are one idea. Design comes last because it composes all
-# four.
+# ORDERING: stacks → queues/deques → linked lists → heaps. Queues come second
+# because BFS in stage 6 depends on them and because the monotonic DEQUE is the
+# direct sequel to the monotonic STACK — teaching them apart would hide that
+# they are one idea.
 # ---------------------------------------------------------------------------
 
-_S4 = _stage(
+_S5 = _stage(
     "structures", "Linear Data Structures", "🧰",
     "Pick the container whose costs match the question.",
     """
@@ -52,7 +52,7 @@ gets the minimum for almost nothing.
 
 The recurring exam question is therefore not "how does a heap work?" but
 **"which one, and what does it cost?"** — and the design unit at the end of the
-stage is that question asked five different ways.
+curriculum is that question asked a dozen different ways.
 
 | Structure | O(1) | O(log n) | O(n) | Java |
 | --- | --- | --- | --- | --- |
@@ -72,10 +72,10 @@ one you can re-derive at a whiteboard.
 """)
 
 
-# --- Unit 16 — Stacks -------------------------------------------------------
+# --- Unit 19 — Stacks --------------------------------------------------------
 
 _unit(
-    "stacks", "Stacks & Monotonic Stacks", "🥞", _S4,
+    "stacks", "Stacks & Monotonic Stacks", "🥞", _S5,
     "Last in, first out — and the trick that makes “next greater” linear.",
     weight=3,
     prereqs=["arrays-first-pass", "strings"],
@@ -194,7 +194,7 @@ immediate `NullPointerException` at the `push` rather than a mystery later.
 ### The stack you did not declare
 
 The **call stack** is this structure — one frame pushed per call, popped on
-return. That is why recursion depth is a memory cost (stage 5), and why *any*
+return. That is why recursion depth is a memory cost (the recursion unit), and why *any*
 recursion can be rewritten with an explicit stack: you are just taking over the
 bookkeeping the JVM was doing. When a recursive DFS overflows on 10⁵ nodes,
 that rewrite is the fix.
@@ -406,10 +406,10 @@ and then, by opening its other end, does something a stack cannot.
 )
 
 
-# --- Unit 17 — Queues and deques --------------------------------------------
+# --- Unit 20 — Queues and deques ---------------------------------------------
 
 _unit(
-    "queues-and-deques", "Queues & Deques", "🎟️", _S4,
+    "queues-and-deques", "Queues & Deques", "🎟️", _S5,
     "First in, first out — and the deque that answers “max of every window”.",
     weight=2,
     prereqs=["arrays-first-pass"],
@@ -417,7 +417,7 @@ _unit(
 A stack hands back the most recent item. A **queue** hands back the oldest, and
 that single difference is the whole reason BFS finds shortest paths: processing
 in arrival order means processing in distance order. Every graph traversal in
-stage 5 runs on this structure, so the cost of getting it wrong compounds.
+stage 6 runs on this structure, so the cost of getting it wrong compounds.
 
 A **deque** — a double-ended queue — opens both ends, and unlocks the pattern
 this unit exists for: the **monotonic deque**, which gives you the maximum of
@@ -775,10 +775,10 @@ them fast and what fixes their shape. The next structure gives that up.
 )
 
 
-# --- Unit 18 — Linked lists -------------------------------------------------
+# --- Unit 21 — Linked lists --------------------------------------------------
 
 _unit(
-    "linked-lists", "Linked Lists", "🔗", _S4,
+    "linked-lists", "Linked Lists", "🔗", _S5,
     "Pointer surgery: reversal, fast-and-slow, and the dummy head.",
     weight=3,
     prereqs=["two-pointers"],
@@ -857,6 +857,33 @@ Merging two sorted lists is the two-pointer merge from stage 2, with `next`
 assignments instead of array writes — and a dummy head to hold the result. The
 inverse, splitting a list in half, is the fast/slow midpoint. Both appear inside
 reorder-list, palindrome checks and merge sort on lists.
+
+### Copying a structure: map old to new
+
+Copying a plain list is one walk. Copying one whose nodes point *sideways* — a
+`random` pointer to any node, or a `child` pointer to another list — is not,
+because when you create a node's copy, the copy of its target may not exist yet.
+
+Separate creating from linking. Walk once creating every copy and recording
+`original → copy` in a map; walk again and set every pointer through the map:
+
+```java
+Map<Node, Node> copy = new HashMap<>();
+for (Node p = head; p != null; p = p.next) copy.put(p, new Node(p.val));
+for (Node p = head; p != null; p = p.next) {
+    copy.get(p).next   = copy.get(p.next);      // get(null) is null
+    copy.get(p).random = copy.get(p.random);
+}
+```
+
+The map can even live in the list: weave each copy in right after its original
+(`A → A' → B → B'`) and the copy of `x` is `x.next` — O(1) extra space, at the
+cost of unweaving afterwards. The same map is what cloning a graph needs in
+stage 6, where it doubles as the visited set.
+
+**Splicing** a list into another — flattening a multilevel list — needs both ends
+of the inserted piece: parent → child head … child tail → parent's old next. A
+recursive flatten that *returns the tail* of what it flattened gives you both.
 """,
     internals="""
 ### What a node costs
@@ -982,6 +1009,20 @@ while (a != null && b != null) {
 tail.next = (a != null) ? a : b;      // attach the whole remaining tail
 """,
             "The final line replaces the two drain loops an array merge needs."),
+        _sk("Deep copy through a map",
+            "Lists with random or child pointers; any structure copied node by node.",
+            """
+Map<Node, Node> copy = new HashMap<>();
+for (Node p = head; p != null; p = p.next)       // pass 1: create
+    copy.put(p, new Node(p.val));
+for (Node p = head; p != null; p = p.next) {     // pass 2: link
+    Node c = copy.get(p);
+    c.next = copy.get(p.next);
+    c.random = copy.get(p.random);
+}
+return copy.get(head);
+""",
+            "Create first, link second — then a pointer to a node not yet visited is just a lookup."),
     ],
     traces=[
         _trace(
@@ -1050,6 +1091,12 @@ tail.next = (a != null) ? a : b;      // attach the whole remaining tail
         _pit("A `LinkedList` loop is unexpectedly quadratic",
              "`for (int i…) list.get(i)` walks from the head on every call.",
              "Iterate with the iterator or a `for-each`, or use `ArrayList`."),
+        _pit("A copied list still points into the original",
+             "A copy's `random` was set to `p.random` instead of `p.random`'s copy.",
+             "Every pointer in the copy goes through the original → copy map."),
+        _pit("A flattened list has broken `prev` links or leftover children",
+             "The splice set `next` but not the child head's `prev`, the old next's `prev`, or `child = null`.",
+             "A splice is four pointer writes plus clearing `child`; list them before coding."),
     ],
     lessons=["list_basics", "list_reversal", "fast_slow"],
     checks=[
@@ -1074,6 +1121,9 @@ tail.next = (a != null) ? a : b;      // attach the whole remaining tail
              "When something else already hands you the node — a hash map, say — and you "
              "need to splice or move it in O(1). That is the LRU cache, and it needs the "
              "list to be doubly linked."),
+        _chk("Copying a list with random pointers: why two passes?",
+             "When a node is copied, its random target's copy may not exist yet. Creating every "
+             "copy first (recording original → copy) makes every pointer a lookup in the second pass."),
     ],
     interview="""
 Linked-list questions are about care, not insight, and interviewers watch for
@@ -1130,10 +1180,10 @@ Stacks, queues and lists all order by *arrival*. The next structure orders by
 )
 
 
-# --- Unit 19 — Heaps --------------------------------------------------------
+# --- Unit 22 — Heaps ---------------------------------------------------------
 
 _unit(
-    "heaps", "Heaps & Priority Queues", "⛰️", _S4,
+    "heaps", "Heaps & Priority Queues", "⛰️", _S5,
     "The smallest element, always, for O(log n) a move.",
     weight=3,
     prereqs=["sorting", "complexity"],
@@ -1506,347 +1556,7 @@ never grows past 10.
                "smallest-range-k-lists": "Merge-k plus a running maximum — the range is between the heap's minimum and the largest value pushed so far."}),
     ],
     next_up="""
-You now have six containers. The last unit of the stage asks the question an
-interviewer really wants answered: can you *combine* them?
-""",
-)
-
-
-# --- Unit 20 — Design -------------------------------------------------------
-
-_unit(
-    "design", "Data Structure Design", "🏗️", _S4,
-    "No algorithm — just the right combination, at the right cost.",
-    weight=3,
-    prereqs=["hashing", "linked-lists"],
-    why="""
-Design problems give you an interface and a performance target: *"implement
-`get` and `put`, both in O(1)"*. There is no clever insight to find. The work is
-choosing structures whose costs add up to the target, and keeping them
-consistent with one another as the data changes.
-
-This is the closest thing in the problem bank to real engineering, and it is why
-these questions are so common in interviews — they test whether you know what
-your tools cost, not whether you have seen a trick.
-""",
-    model="""
-### The method
-
-1. **Write the operations and their required costs.** That table is the spec.
-2. **For each operation, name a structure that achieves it alone.** O(1) lookup
-   by key → hash map. Ordered by value → heap or tree. O(1) insert/remove at a
-   known position → doubly linked list.
-3. **Combine them, and decide what each one stores.** Usually one structure owns
-   the data and the others hold *references into it*.
-4. **Check every operation again** against the combined design — the failure is
-   almost always an operation that now has to update two structures and only
-   updates one.
-
-### The canonical combination
-
-**Hash map + doubly linked list** gives O(1) lookup *and* O(1) reordering, which
-is exactly what an LRU cache needs:
-
-- the list holds entries in recency order, most-recent at the head;
-- the map holds `key → node`, so any node can be found instantly;
-- a doubly linked list is required because unlinking a node in O(1) needs its
-  *predecessor*, which a singly linked list cannot give you.
-
-`get` moves a node to the front; `put` inserts at the front and, if over
-capacity, drops the tail. Every step is O(1), and the tail is the least recently
-used item by construction. The trace below is a capacity-2 cache, operation by
-operation.
-
-LFU is the same idea one level up: map by key, plus buckets keyed by frequency,
-plus a pointer to the minimum frequency.
-
-### Carrying an auxiliary invariant
-
-Min-stack keeps a second stack of "minimum at or below this depth", pushed in
-lockstep with the main one. Popping drops both, so the minimum is always on top:
-an extra O(n) memory buys an O(1) query. That "store the answer alongside the
-data" move is the most transferable idea in the unit — the same trick turns
-`stock-spanner` into the monotonic stack you already know, wrapped in a class
-and fed one value at a time.
-
-### Time-ordered data
-
-When entries are appended with non-decreasing timestamps, the list per key is
-already sorted — so *"the value at time t"* is a binary search, and no extra
-ordering structure is needed. Recognising that the data arrives sorted is the
-insight; the rest is the stage-3 template.
-
-### Two rules that prevent most of the bugs
-
-**One owner.** Exactly one structure holds the real data; the others hold keys
-or references into it. Two structures that both think they own an entry will
-eventually disagree.
-
-**Every mutation touches every structure.** Write the list down — "an eviction
-must: unlink the node, remove the map key, decrement the size" — and check each
-operation against it. Design bugs are almost never wrong algorithms; they are a
-missing line in one of three places.
-""",
-    internals="""
-### Why sentinels, always
-
-Splice code without sentinel nodes is a thicket of null checks: removing the
-head is special, removing the tail is special, removing the only node is
-special. With a permanent `head` and `tail` that never hold data, **every real
-node is guaranteed to have both a predecessor and a successor**, and `remove`
-becomes two unconditional assignments:
-
-```java
-n.prev.next = n.next;
-n.next.prev = n.prev;
-```
-
-No branches, no null checks, no special cases. This is the same idea as the
-dummy head from the linked-list unit, applied at both ends — and it is worth
-building the habit, because the LRU cache is where a missed null check is
-hardest to debug.
-
-### What "O(1) amortised" means to an interviewer
-
-Three different structures in this stage claim O(1) for slightly different
-reasons, and being able to separate them is a real signal:
-
-| Claim | Kind | Why |
-| --- | --- | --- |
-| `ArrayDeque.push` | amortised | doubling spreads the copy over n pushes |
-| `HashMap.get` | average case | good hash distribution; O(n) if everything collides |
-| LRU `get`/`put` | genuinely worst-case | a fixed number of pointer writes, no resize, no search |
-
-The LRU cache is the strongest of the three, and saying so — "this is worst-case
-O(1), not amortised" — is the kind of precision that ends the follow-up
-questions.
-
-### Hash maps, the part that matters here
-
-A `HashMap` is an array of buckets; a key's hash picks the bucket, and
-collisions chain within it (Java converts a long chain to a balanced tree, so
-the pathological case is O(log n) rather than O(n)). Load factor 0.75 triggers a
-resize and a full rehash — O(n), amortised away like the deque's doubling.
-
-The consequence for design problems: `HashMap` gives you **O(1) lookup by key
-and nothing else**. No order, no minimum, no range. Every structure you bolt
-onto it in this unit exists to supply exactly one of those missing properties.
-""",
-    signals=[
-        _sig("“O(1) get and put with eviction”", "Hash map + doubly linked list",
-             "The map finds the node; the list orders it."),
-        _sig("“get the minimum in O(1)” alongside push/pop", "A parallel stack of minima",
-             "Store the answer next to the data."),
-        _sig("“implement X using only Y”", "Two of Y, and an amortised argument",
-             "Pouring between two stacks reverses the order."),
-        _sig("“value at a given timestamp”", "Map to a sorted list + binary search",
-             "Appends arrive in time order, so the list is already sorted."),
-        _sig("“most recent k”, “feed”, “top posts”", "Heap over per-user lists",
-             "Merge-k, restricted to k results."),
-        _sig("“span”, “consecutive smaller before this one”", "A monotonic stack in a class",
-             "The stacks unit's pattern, fed one value at a time."),
-        _sig("Two operations want two different orders", "Two structures, one owner",
-             "One holds the data; the other holds references into it."),
-    ],
-    skeletons=[
-        _sk("Hash map + doubly linked list (LRU)",
-            "Any cache with O(1) access and eviction by recency.",
-            """
-class Node { int key, val; Node prev, next; }
-Map<Integer, Node> map = new HashMap<>();
-Node head = new Node(), tail = new Node();      // sentinels
-{ head.next = tail; tail.prev = head; }
-
-void remove(Node n) { n.prev.next = n.next; n.next.prev = n.prev; }
-void addFirst(Node n) {
-    n.next = head.next; n.prev = head;
-    head.next.prev = n; head.next = n;
-}
-// get: remove(n); addFirst(n);
-// put over capacity: Node lru = tail.prev; remove(lru); map.remove(lru.key);
-""",
-            "Sentinel head and tail nodes remove every null check from the splice code."),
-        _sk("Parallel minimum stack",
-            "Min-stack, max-stack, any “extreme so far” query.",
-            """
-Deque<Integer> st = new ArrayDeque<>(), mins = new ArrayDeque<>();
-
-void push(int x) {
-    st.push(x);
-    mins.push(mins.isEmpty() ? x : Math.min(x, mins.peek()));
-}
-void pop() { st.pop(); mins.pop(); }
-int getMin() { return mins.peek(); }
-""",
-            "Push to both, pop from both — the invariant maintains itself."),
-        _sk("Time-keyed store",
-            "Versioned values, “state at time t”.",
-            """
-Map<String, List<int[]>> store = new HashMap<>();   // key → [(time, value)…]
-
-void set(String k, int v, int t) {
-    store.computeIfAbsent(k, x -> new ArrayList<>()).add(new int[]{ t, v });
-}
-// get: binary-search the list for the LAST entry with time <= t
-""",
-            "Appends come in increasing time order, so the list is sorted for free."),
-        _sk("A pattern, wrapped in a class",
-            "Stock spanner, streaming versions of an offline algorithm.",
-            """
-Deque<int[]> st = new ArrayDeque<>();        // {price, span}, prices decreasing
-
-int next(int price) {
-    int span = 1;
-    while (!st.isEmpty() && st.peek()[0] <= price) span += st.pop()[1];
-    st.push(new int[]{ price, span });
-    return span;
-}
-""",
-            "The monotonic stack, fed one element at a time — popped spans are absorbed."),
-    ],
-    traces=[
-        _trace(
-            "LRU cache, capacity 2: put(1,A), put(2,B), get(1), put(3,C)",
-            "The list is recency order, most-recent first. Watch the last row: 2 is evicted "
-            "because `get(1)` moved 1 to the front, which is the entire behaviour being "
-            "tested.",
-            ["Operation", "List (front → back)", "Map keys", "Returned", "Evicted"],
-            [
-                ["put(1, A)", "1", "{1}", "—", "—"],
-                ["put(2, B)", "2, 1", "{1, 2}", "—", "—"],
-                ["get(1)", "1, 2", "{1, 2}", "**A**", "— (1 moved to the front)"],
-                ["put(3, C)", "3, 1", "{1, 3}", "—", "**2** — now the tail"],
-                ["get(2)", "3, 1", "{1, 3}", "**−1**", "— (already evicted)"],
-            ],
-            "Two structures changed on every row and had to agree on every row. The eviction "
-            "step is where they usually stop agreeing: unlinking the tail node without also "
-            "removing its map key leaves a key pointing at a node no longer in the list.",
-        ),
-        _trace(
-            "Min-stack: push 5, push 2, push 7, pop, getMin",
-            "The two stacks move in lockstep, so `mins.peek()` is always the minimum of "
-            "exactly the elements currently in `st`.",
-            ["Operation", "st (top →)", "mins (top →)", "getMin"],
-            [
-                ["push 5", "5", "5", "5"],
-                ["push 2", "2, 5", "2, 5", "2"],
-                ["push 7", "7, 2, 5", "**2**, 2, 5", "2 — 7 pushes min(7, 2) = 2"],
-                ["pop", "2, 5", "2, 5", "2"],
-                ["pop", "5", "5", "**5** — restored automatically"],
-            ],
-            "The third row is the one to understand: `mins` stores a *duplicate* 2 rather "
-            "than skipping the push. That is what makes `pop` a plain pop from both stacks "
-            "instead of a conditional — and conditionals are where this problem goes wrong.",
-        ),
-    ],
-    costs=[
-        _cost("Hash map + linked list (LRU)", "O(1) worst case", "O(capacity)", "No search, no resize on the hot path."),
-        _cost("Min-stack", "O(1) all operations", "O(n)", "Extra stack of minima."),
-        _cost("Time-keyed get", "O(log n)", "O(n)", "Binary search over the key's history."),
-        _cost("Feed of k most recent over u sources", "O(u log u + k log u)", "O(u)", "Merge-k, truncated at k."),
-        _cost("LFU cache", "O(1) get/put", "O(capacity)", "Frequency buckets plus a minimum-frequency pointer."),
-        _cost("Stock spanner", "O(1) amortised", "O(n)", "Each price pushed once, popped once."),
-    ],
-    pitfalls=[
-        _pit("The cache returns stale or missing entries",
-             "One structure was updated and the other was not — usually an eviction that "
-             "unlinked the node but left the map key.",
-             "Write the mutation checklist down: every change must touch *every* structure "
-             "that references the entry."),
-        _pit("Unlinking a node is O(n)",
-             "A singly linked list cannot reach a node's predecessor.",
-             "Use a doubly linked list; that requirement is the reason for the design."),
-        _pit("Null-pointer errors all over the splice code",
-             "Head and tail are real nodes, so every operation special-cases the ends.",
-             "Use sentinel head and tail nodes that never hold data."),
-        _pit("`put` on an existing key inserts a duplicate",
-             "The update path assumed the key was new.",
-             "On `put`, check for the key first: update the value and move the node, rather "
-             "than inserting a second one."),
-        _pit("Min-stack's `pop` corrupts the minimum",
-             "`mins` was only pushed when a new minimum appeared, so the two stacks no "
-             "longer align.",
-             "Push to `mins` on every push, duplicating the current minimum when necessary."),
-        _pit("The heap-based feed is rebuilt on every query",
-             "All posts are re-merged instead of only the k most recent per source.",
-             "Bound the work by k: only the head of each source can be next."),
-        _pit("Binary search returns the wrong version",
-             "An upper-bound search was needed but a lower-bound one was written.",
-             "You want the last entry with `time <= t` — `upperBound(t) - 1`."),
-    ],
-    lessons=["design_ds", "stack", "queue", "hashing"],
-    checks=[
-        _chk("Why must an LRU cache use a *doubly* linked list?",
-             "Eviction and reordering unlink a node in O(1), which requires its predecessor. "
-             "A singly linked list would need an O(n) scan to find it."),
-        _chk("Is an LRU cache's `get` amortised O(1) or worst-case O(1)?",
-             "Worst case. It is a fixed number of pointer writes plus a hash lookup — no "
-             "resize, no search, no doubling. That distinguishes it from `ArrayDeque.push`, "
-             "which is amortised."),
-        _chk("Why does min-stack push a duplicate minimum instead of skipping the push?",
-             "So the two stacks stay the same height and `pop` can be unconditional. Pushing "
-             "only on a new minimum means `pop` must decide whether to pop `mins` too, which "
-             "is exactly where the bug appears."),
-        _chk("What do sentinel nodes buy you?",
-             "Every real node has both neighbours, so `remove` and `addFirst` are "
-             "unconditional two-line assignments with no null checks and no special cases "
-             "for the first or last element."),
-        _chk("What is the method when a design problem gives you cost targets?",
-             "List the operations with their required costs, pick a structure that achieves "
-             "each one alone, combine them with one owning the data, then re-check every "
-             "operation against the combination."),
-        _chk("A `HashMap` gives O(1) lookup. What does it *not* give you, and how is that "
-             "usually fixed?",
-             "No ordering, no minimum, no range queries. Each is supplied by bolting on a "
-             "second structure that holds references into the map's data — a list for "
-             "recency, a heap for extremes, a sorted list for time."),
-    ],
-    interview="""
-Design questions are where the interview stops being a quiz. Talk through the
-operation/cost table out loud before writing anything — it is the reasoning
-being assessed, and it is also how you catch the impossible requirement early.
-Three sentences worth having ready: *"a hash map gives me O(1) lookup and a
-doubly linked list gives me O(1) reordering, so together they give me both"*,
-*"that is amortised O(1), because each element moves at most once"*, and — for
-the LRU itself — *"this one is worst-case O(1), not amortised"*.
-""",
-    build_it="""
-**Build the LRU cache from the pieces you already wrote.** You have the
-sentinel doubly linked list from the linked-list unit; add a `HashMap<Integer,
-Node>` and the two operations.
-
-Then do the thing that actually teaches it: write a `checkInvariants()` method
-that walks the list, counts the nodes, and asserts that the count equals
-`map.size()`, that every node in the list is in the map, and that every map
-value is reachable from `head`. Call it after every `get` and `put` in a test
-with capacity 2 and a few hundred random operations.
-
-It will fail, and where it fails is the lesson — almost always the eviction path,
-which unlinks the node and forgets the map key. That failure *is* the unit: a
-design bug is a missing line in one of several places, not a wrong algorithm.
-""",
-    rungs=[
-        _rung("Warm up", "Build the primitives themselves.",
-              ["design-hashset", "design-hashmap"],
-              {"design-hashset": "Buckets and a hash. The simplest version of the structure every other problem in this unit leans on.",
-               "design-hashmap": "Buckets plus chaining. Writing it once explains every “O(1) average” claim you have made since stage 2 — including why a bad hash makes it O(n)."}),
-        _rung("Core", "Carry an extra invariant alongside the data.",
-              ["min-stack", "design-linked-list", "browser-history"],
-              {"min-stack": "The parallel-stack idea, which transfers to far harder problems. Push a duplicate minimum rather than making `pop` conditional.",
-               "design-linked-list": "Every splice case in one class. Use a sentinel and watch the null checks disappear.",
-               "browser-history": "Two stacks, or one list with a cursor. Decide which before you type — and note that a forward history is *discarded* on a new visit, which the two-stack version gets right for free."}),
-        _rung("Variations", "A structure chosen because the data arrives in a helpful order.",
-              ["stock-spanner", "time-based-kv"],
-              {"stock-spanner": "The monotonic stack from the stacks unit, wrapped in a class and fed one value at a time. Store (price, span) so a popped entry's span is absorbed rather than recomputed.",
-               "time-based-kv": "Timestamps arrive increasing, so each key's list is already sorted — binary-search it. You want the last entry `<= t`, which is upper bound minus one."}),
-        _rung("Stretch", "Two or three structures kept consistent with each other.",
-              ["lru-cache", "design-twitter", "lfu-cache"],
-              {"lru-cache": "The canonical design problem. Use sentinel nodes, handle `put` on an existing key, and get every operation to worst-case O(1).",
-               "design-twitter": "Merge-k over followees' timelines, truncated at 10. Only the head of each list can be next — that is what stops it being O(total tweets).",
-               "lfu-cache": "LRU with a second dimension: frequency buckets, each an LRU list of its own, plus a minimum-frequency pointer. Draw the three structures and their invariants before coding."}),
-    ],
-    next_up="""
-Linear structures are done — six of them, and the judgement to pick between
+Linear structures are done — four of them, and the judgement to pick between
 them. The next stage is about structures, and problems, that branch.
 """,
 )

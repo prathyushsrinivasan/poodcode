@@ -1,28 +1,28 @@
 # -*- coding: utf-8 -*-
 # ---------------------------------------------------------------------------
-# Stage 5 — Things that branch.
+# Stage 6 — Things that branch.
 #
 # exec()'d by tools/dsa_curriculum.py inside its namespace.
 #
 # Everything so far has been linear. This stage covers the structures where an
-# element has SEVERAL successors, and the one idea that makes them tractable:
-# recursion. It opens with recursion on its own, deliberately, because trees,
-# backtracking and DFS are all the same skill and teaching them separately is
-# why people can write a tree traversal but freeze on a permutation generator.
+# element has SEVERAL successors. The idea that makes them tractable, recursion,
+# is taught in stage 3 — it moved there because merge sort and quickselect need
+# it — so this stage opens straight on trees.
 #
 # Order within the stage is a dependency chain, not a difficulty ramp: trees
 # are recursion with two successors; backtracking is recursion that undoes;
 # graphs are trees with cycles, which is precisely why they need a visited set;
-# and the four graph units after that are the four questions worth asking about
-# a graph — can I reach it, in what order, is it connected, how far is it.
+# and the graph units after that are the questions worth asking about a graph —
+# can I reach it, in what order, is it connected, what is the cheapest way to
+# connect it, how far is it.
 # ---------------------------------------------------------------------------
 
-_S5 = _stage(
-    "hierarchies", "Recursion, Trees & Graphs", "🌳",
+_S6 = _stage(
+    "hierarchies", "Trees & Graphs", "🌳",
     "One idea — solve a smaller version — applied to everything that branches.",
     """
-This is the conceptual centre of the curriculum. Every unit in it is the same
-sentence with a different noun:
+This is the conceptual centre of the curriculum, and it runs on the recursion
+from stage 3. Every unit in it is the same sentence with a different noun:
 
 > Solve the smaller version, then combine.
 
@@ -36,208 +36,10 @@ called on whatever the successors happen to be.
 """)
 
 
-# --- Unit 20 — Recursion ----------------------------------------------------
+# --- Unit 23 — Binary trees --------------------------------------------------
 
 _unit(
-    "recursion", "Recursion", "🌀", _S5,
-    "Trust the smaller call. Everything in this stage depends on it.",
-    weight=2,
-    prereqs=["loops-and-digits", "complexity"],
-    why="""
-Recursion is not a technique for a family of problems; it is the *notation*
-every remaining unit is written in. Tree traversal, backtracking, DFS, divide
-and conquer and the top-down half of dynamic programming are all one pattern:
-express the answer in terms of the same function on a smaller input.
-
-The block people hit is almost never syntax. It is refusing to **trust the
-recursive call** — trying to trace the whole stack in their head instead of
-assuming the smaller call is already correct and asking only what to do with its
-result.
-""",
-    model="""
-### The contract
-
-Write a recursive function by answering three questions, in this order:
-
-1. **What does this function promise?** One sentence, for *any* valid input.
-   "`depth(node)` returns the height of the subtree rooted at `node`." If you
-   cannot write that sentence, no amount of tracing will help.
-2. **Base case.** The smallest input, answered without recursion. It is almost
-   always `null`, empty, or zero — and it is almost always where the bug is.
-3. **Recursive case.** Assume the promise holds for smaller inputs. Call, and
-   combine. Do not trace.
-
-```java
-static int depth(Node node) {
-    if (node == null) return 0;                       // base
-    return 1 + Math.max(depth(node.left), depth(node.right));   // combine
-}
-```
-
-### The cost
-
-Each call keeps a stack frame, so a recursion n deep costs O(n) **memory** even
-if it allocates nothing. Java's default stack overflows around 10,000 frames —
-which is why a recursive walk over a 10⁵-long linked list crashes and an
-iterative one does not.
-
-The time cost comes from the recurrence:
-
-| Recurrence | Solves to | Example |
-| --- | --- | --- |
-| `T(n) = T(n−1) + O(1)` | O(n) | Walking a list |
-| `T(n) = 2T(n−1) + O(1)` | O(2ⁿ) | Naive Fibonacci |
-| `T(n) = T(n/2) + O(1)` | O(log n) | Binary search, fast power |
-| `T(n) = 2T(n/2) + O(n)` | O(n log n) | Merge sort |
-
-### Divide and conquer
-
-Split into independent halves, solve both, combine. Fast exponentiation is the
-cleanest example:
-
-```java
-static long power(long b, long e) {
-    if (e == 0) return 1;
-    long half = power(b, e / 2);      // ONE call, not two
-    return (e % 2 == 0) ? half * half : half * half * b;
-}
-```
-
-Calling `power(b, e/2)` twice instead of storing it turns O(log e) into O(e).
-That single line is the difference, and it is the same insight as memoisation:
-never compute the same thing twice.
-
-### When recursion repeats itself
-
-Naive Fibonacci is O(2ⁿ) because `fib(n−2)` is recomputed on both branches. Two
-fixes, and the whole DP stage is built on them:
-
-- **Memoise**: cache each answer by argument. Top-down DP.
-- **Iterate**: compute the small answers first. Bottom-up DP.
-
-Recognising the overlap is the skill. The DP unit later is this observation with
-a syllabus attached.
-""",
-    signals=[
-        _sig("“the same problem on a smaller input”", "Recursion",
-             "Subtrees, suffixes, “with one more item chosen”."),
-        _sig("A tree or nested structure", "Recursion over the children",
-             "The structure is already recursive; mirror it."),
-        _sig("“combine the halves”", "Divide and conquer",
-             "Two independent halves, then a merge step."),
-        _sig("Exponent or range halves each step", "O(log n) recursion",
-             "Compute the half once and reuse it."),
-        _sig("The same sub-input recurs on different branches", "Memoise",
-             "Overlapping subproblems is the definition of DP."),
-        _sig("Depth could reach 10⁵", "Convert to iteration",
-             "The call stack, not the algorithm, is what will fail."),
-    ],
-    skeletons=[
-        _sk("The three-part shape",
-            "Every recursive function you will write in this stage.",
-            """
-static R solve(Input x) {
-    if (isBase(x)) return baseAnswer(x);      // 1. smallest case
-    R sub = solve(smaller(x));                // 2. trust the call
-    return combine(x, sub);                   // 3. use the result
-}
-""",
-            "Write the one-sentence promise above the function before the body."),
-        _sk("Fast exponentiation",
-            "Powers, matrix powers, repeated doubling.",
-            """
-static long power(long b, long e, long mod) {
-    if (e == 0) return 1;
-    long half = power(b, e / 2, mod);      // computed ONCE
-    long sq = half * half % mod;
-    return (e % 2 == 0) ? sq : sq * b % mod;
-}
-""",
-            "Two recursive calls here would make it O(e) instead of O(log e)."),
-        _sk("Memoised recursion",
-            "Whenever the same argument recurs across branches.",
-            """
-long[] memo = new long[n + 1];
-Arrays.fill(memo, -1);
-
-static long fib(int n) {
-    if (n < 2) return n;
-    if (memo[n] != -1) return memo[n];
-    return memo[n] = fib(n - 1) + fib(n - 2);
-}
-""",
-            "O(2ⁿ) → O(n) by adding two lines. This is top-down DP."),
-    ],
-    costs=[
-        _cost("Linear recursion", "O(n)", "O(n) stack", "Depth is the space cost."),
-        _cost("Binary recursion, no memo", "O(2ⁿ)", "O(n) stack", "Naive Fibonacci."),
-        _cost("Halving recursion", "O(log n)", "O(log n)", "Fast power, binary search."),
-        _cost("Divide and conquer with a linear merge", "O(n log n)", "O(n)", "Merge sort."),
-        _cost("Memoised recursion", "O(states × work)", "O(states)", "Top-down DP."),
-    ],
-    pitfalls=[
-        _pit("`StackOverflowError`",
-             "Either no base case, or a legitimate recursion deeper than ~10,000 frames.",
-             "Check the base case first; if the depth is genuinely large, rewrite iteratively."),
-        _pit("The base case returns the wrong identity",
-             "`return 0` where the combination multiplies, or `return 1` where it sums.",
-             "Ask what the answer for an empty input *must* be for the combination to work."),
-        _pit("An exponential runtime in something that looks linear",
-             "A sub-answer is recomputed on multiple branches.",
-             "Memoise, or restructure so each sub-answer is computed once."),
-        _pit("Fast power is O(e) instead of O(log e)",
-             "`power(b, e/2)` was written twice rather than stored.",
-             "Call once, store in a local, square it."),
-        _pit("A shared mutable structure leaks between branches",
-             "State was modified before the call and never restored after it.",
-             "Either pass immutable arguments, or undo the change — see backtracking."),
-    ],
-    lessons=["recursion", "alg_recursion", "alg_recurrences", "recurrence"],
-    checks=[
-        _chk("What are the three parts of writing a recursive function?",
-             "A one-sentence promise about what it returns for any input; a base case that "
-             "needs no recursion; and a recursive case that trusts the promise and combines."),
-        _chk("Why does naive Fibonacci take exponential time?",
-             "`fib(n-2)` is recomputed under both `fib(n-1)` and `fib(n-2)`, so the call "
-             "tree branches twice at nearly every level: T(n) = T(n−1) + T(n−2)."),
-        _chk("What is the space complexity of a recursion n levels deep that allocates "
-             "nothing?",
-             "O(n) — every pending frame stays on the call stack until it returns."),
-        _chk("Why must fast exponentiation store the half-power in a variable?",
-             "Calling it twice doubles the work at every level, collapsing O(log e) back to "
-             "O(e). Storing it is the entire optimisation."),
-    ],
-    interview="""
-Interviewers probe recursion by asking for the complexity and then for the
-iterative version. Have both ready: the recurrence that gives the time bound,
-and the observation that depth is memory. And when a recursive solution is
-exponential, say *why* — "the same subproblem appears on both branches, so I
-will memoise" is the sentence that turns a rejected answer into an accepted one.
-""",
-    rungs=[
-        _rung("Core", "A recurrence you can write in one line.",
-              ["nth-fibonacci", "binomial-coefficient", "unique-paths-count"],
-              {"nth-fibonacci": "Write it naively, note it is O(2ⁿ), then memoise. That one edit is the whole DP stage in miniature.",
-               "binomial-coefficient": "Pascal's rule, word for word. Count the calls for C(20, 10), then ask what C(60, 30) would cost.",
-               "unique-paths-count": "`paths(i,j) = paths(i-1,j) + paths(i,j-1)`. Same shape, two dimensions."}),
-        _rung("Variations", "Recursion that halves rather than decrements.",
-              ["fast-power"],
-              {"fast-power": "Store the half-power. Calling twice is the bug that makes it O(e)."}),
-        _rung("Two calls", "Recursion that branches, where the exponential cost is the answer's own size.",
-              ["tower-of-hanoi"],
-              {"tower-of-hanoi": "Trust the smaller call. Then compare with `nth-fibonacci`: both make two calls, and only one of them can be fixed by a memo."}),
-    ],
-    next_up="""
-The most common recursive structure in interviews has exactly two smaller
-versions: the left subtree and the right one.
-""",
-)
-
-
-# --- Unit 21 — Binary trees -------------------------------------------------
-
-_unit(
-    "trees", "Binary Trees", "🌲", _S5,
+    "trees", "Binary Trees", "🌲", _S6,
     "Two recursive calls and a decision about where to do the work.",
     weight=3,
     prereqs=["recursion"],
@@ -325,6 +127,33 @@ while (!q.isEmpty()) {
 
 Capturing `q.size()` before the inner loop is what separates one level from the
 next. Without it you cannot tell where a level ends.
+
+### Building and serialising
+
+A traversal of *values* loses the shape: preorder `1 2` could be 2-as-left or
+2-as-right. Two ways to keep it:
+
+- **Write the nulls.** A preorder walk that writes `#` for every missing child is
+  unambiguous, because every subtree then says where it ends. Reading it back is
+  the same walk, consuming one token per call:
+
+  ```java
+  TreeNode read(String[] t) {          // pos is a shared index
+      String tok = t[pos++];
+      if (tok.equals("#")) return null;
+      TreeNode n = new TreeNode(Integer.parseInt(tok));
+      n.left = read(t);                  // consumes exactly the left subtree
+      n.right = read(t);
+      return n;
+  }
+  ```
+
+- **Use two traversals.** With distinct values, preorder names the root and
+  inorder splits everything else around it. A value → inorder-index map makes
+  each split O(1), so the rebuild is O(n).
+
+Both are recursion that *builds* rather than inspects — and both depend on the
+left subtree being handled completely before the right one starts.
 """,
     signals=[
         _sig("“depth”, “count”, “sum of the subtree”", "Bottom-up recursion",
@@ -389,6 +218,22 @@ static boolean same(TreeNode a, TreeNode b) {
 }
 """,
             "For symmetry, compare `a.left` with `b.right` instead."),
+        _sk("Rebuild from preorder + inorder",
+            "Construct a tree from two traversals (distinct values).",
+            """
+int preIdx = 0;
+Map<Integer, Integer> pos = new HashMap<>();      // value -> inorder index
+
+TreeNode build(int[] pre, int lo, int hi) {        // inorder range [lo, hi]
+    if (lo > hi) return null;
+    TreeNode root = new TreeNode(pre[preIdx++]);
+    int m = pos.get(root.val);
+    root.left = build(pre, lo, m - 1);            // LEFT first: preorder order
+    root.right = build(pre, m + 1, hi);
+    return root;
+}
+""",
+            "Without the map, finding each root in the inorder makes it O(n²) on a skewed tree."),
     ],
     costs=[
         _cost("Any full traversal", "O(n)", "O(h)", "h = height; the recursion stack."),
@@ -435,6 +280,13 @@ static boolean same(TreeNode a, TreeNode b) {
              "A path through a node may use both children, but a path that continues to the "
              "parent may use only one. So the record considers `l + r + val` while the "
              "return is `val + max(l, r)`."),
+        _chk("Why does a serialisation need a marker for every null child?",
+             "Values alone do not fix the shape — `1 2` could put 2 on either side. With a "
+             "marker for each null, every subtree's tokens end unambiguously, so one "
+             "preorder walk can read the tree back."),
+        _chk("When rebuilding from preorder and inorder, why must the left subtree be built first?",
+             "The preorder lists root, then the entire left subtree, then the right. A shared "
+             "preorder index only lines up if the recursion consumes them in that order."),
     ],
     interview="""
 Trees are the most-asked structure in interviews, and the questions are
@@ -526,10 +378,10 @@ O(log n).
 )
 
 
-# --- Unit 22 — Binary search trees ------------------------------------------
+# --- Unit 24 — Binary search trees -------------------------------------------
 
 _unit(
-    "bst", "Binary Search Trees", "🔎", _S5,
+    "bst", "Binary Search Trees", "🔎", _S6,
     "One invariant, and every operation becomes a descent.",
     weight=2,
     prereqs=["trees", "binary-search"],
@@ -619,6 +471,30 @@ All of this is O(h), and h is O(log n) only if the tree is balanced. Insert
 sorted data into a plain BST and you get a linked list with O(n) operations.
 Self-balancing trees (red-black, AVL) fix it — in Java, `TreeMap` is that
 structure, and is what you should reach for in practice.
+
+### Pausing an in-order walk: the iterator
+
+The iterative in-order loop above keeps its place on an explicit stack, so it
+can stop after one value and resume later. That is a BST iterator: push the left
+spine of the root; `next()` pops a node and pushes the left spine of its right
+child. Each node is pushed and popped once over the whole iteration, so `next`
+is O(1) *amortised* and the stack never holds more than one path — O(h) memory.
+
+### `TreeMap` and `TreeSet` as tools
+
+A balanced BST you do not write answers the question a hash map cannot: *what is
+nearest?*
+
+| Call | Returns | Cost |
+| --- | --- | --- |
+| `floor(x)` / `floorKey(x)` | largest ≤ x, or null | O(log n) |
+| `ceiling(x)` / `ceilingKey(x)` | smallest ≥ x, or null | O(log n) |
+| `lower(x)` / `higher(x)` | strictly below / above | O(log n) |
+| `first()` / `last()` | the extremes | O(log n) |
+
+Use it whenever a problem needs a sorted collection *and* inserts or deletes
+between queries: a sliding window you must search ("is any value within t?"),
+bookings you must check for overlap, a leaderboard that keeps changing.
 """,
     signals=[
         _sig("“search / insert in a BST”", "Descend by comparison",
@@ -680,6 +556,34 @@ while (root != null) {
 }
 """,
             "O(h), no recursion, no extra memory."),
+        _sk("BST iterator",
+            "Sorted values one at a time, O(h) memory.",
+            """
+class BSTIterator {
+    private final Deque<TreeNode> st = new ArrayDeque<>();
+    BSTIterator(TreeNode root) { pushLeft(root); }
+    private void pushLeft(TreeNode n) { for (; n != null; n = n.left) st.push(n); }
+    boolean hasNext() { return !st.isEmpty(); }
+    int next() {
+        TreeNode n = st.pop();
+        pushLeft(n.right);                 // the successor's subtree
+        return n.val;
+    }
+}
+""",
+            "Amortised O(1): every node is pushed once and popped once in total."),
+        _sk("Nearest values with TreeSet",
+            "Floor/ceiling queries; searching a changing window.",
+            """
+TreeSet<Long> window = new TreeSet<>();
+for (int j = 0; j < n; j++) {
+    Long c = window.ceiling((long) a[j] - t);    // smallest value >= a[j] - t
+    if (c != null && c <= (long) a[j] + t) return true;
+    window.add((long) a[j]);
+    if (j >= k) window.remove((long) a[j - k]);  // keep the last k
+}
+""",
+            "`long`, because `a[j] - t` overflows `int` at the extremes."),
     ],
     costs=[
         _cost("Search / insert / delete", "O(h)", "O(1) iterative", "h = log n when balanced."),
@@ -721,6 +625,12 @@ while (root != null) {
         _chk("When is a BST *not* O(log n)?",
              "When it is unbalanced. Sorted insertions produce a chain, making every "
              "operation O(n). Balanced variants (or `TreeMap`) restore the bound."),
+        _chk("Why is a BST iterator's `next()` O(1) amortised when one call can push a long spine?",
+             "Across a full iteration every node is pushed exactly once and popped exactly "
+             "once — 2n stack operations for n calls."),
+        _chk("What can a `TreeSet` answer that a `HashSet` cannot?",
+             "Order questions: the nearest value at or below x (`floor`), at or above x "
+             "(`ceiling`), and the extremes — each in O(log n), with inserts and deletes in between."),
     ],
     interview="""
 The BST question that separates candidates is validation, and the tell is
@@ -745,10 +655,10 @@ one it *builds* — and has to take apart again.
 )
 
 
-# --- Unit 23 — Backtracking -------------------------------------------------
+# --- Unit 25 — Backtracking --------------------------------------------------
 
 _unit(
-    "backtracking", "Backtracking", "♟️", _S5,
+    "backtracking", "Backtracking", "♟️", _S6,
     "Choose, explore, un-choose — and prune before you descend.",
     weight=3,
     prereqs=["recursion", "strings"],
@@ -1027,10 +937,10 @@ structure that can loop back on itself — which changes exactly one thing.
 )
 
 
-# --- Unit 24 — Graph traversal ----------------------------------------------
+# --- Unit 26 — Graph traversal -----------------------------------------------
 
 _unit(
-    "graph-traversal", "Graph Traversal: BFS & DFS", "🕸️", _S5,
+    "graph-traversal", "Graph Traversal: BFS & DFS", "🕸️", _S6,
     "Trees with cycles — so you need a visited set, and BFS gives shortest paths.",
     weight=3,
     prereqs=["queues-and-deques", "recursion"],
@@ -1133,6 +1043,13 @@ source to every cell, at no extra cost.
 Two-colour the graph during a traversal: colour each neighbour the opposite of
 the current node. A conflict means an odd-length cycle, so the graph is not
 bipartite. It is BFS with an `int[] colour` instead of a `boolean[] seen`.
+
+### Cloning a graph
+
+Copy every node reachable from a start node, with neighbour lists pointing at
+copies. The traversal needs a visited set; the copy needs an old → new map. They
+are the same map: *create a node's copy the first time you see it*, and a cycle
+finds the existing copy instead of recursing forever.
 """,
     signals=[
         _sig("“shortest path”, “fewest steps”, unweighted", "BFS",
@@ -1212,6 +1129,22 @@ while (!q.isEmpty()) {
 }
 """,
             "Run it from every uncoloured node — the graph may be disconnected."),
+        _sk("Clone a graph",
+            "Deep copy of everything reachable from one node.",
+            """
+Map<Node, Node> copy = new HashMap<>();          // also the visited set
+copy.put(start, new Node(start.val));
+Deque<Node> q = new ArrayDeque<>(List.of(start));
+while (!q.isEmpty()) {
+    Node u = q.poll();
+    for (Node v : u.neighbors) {
+        if (!copy.containsKey(v)) { copy.put(v, new Node(v.val)); q.add(v); }
+        copy.get(u).neighbors.add(copy.get(v));
+    }
+}
+return copy.get(start);
+""",
+            "Record the copy before exploring from it — otherwise a cycle copies forever."),
     ],
     costs=[
         _cost("BFS / DFS", "O(V + E)", "O(V)", "Each node and edge handled once."),
@@ -1256,6 +1189,9 @@ while (!q.isEmpty()) {
              "each node at the minimum distance over all of them."),
         _chk("What does a colour conflict during two-colouring prove?",
              "That an odd-length cycle exists, and therefore the graph is not bipartite."),
+        _chk("Cloning a graph: why is the old → new map enough to stop cycles?",
+             "A node's copy is recorded the first time it is seen, so meeting it again along a "
+             "cycle finds the existing copy and links to it instead of copying again."),
     ],
     interview="""
 Graph questions are usually disguised: "can these courses be finished", "how
@@ -1289,10 +1225,10 @@ an order in which everything can be done at all?
 )
 
 
-# --- Unit 25 — Topological sort ---------------------------------------------
+# --- Unit 27 — Topological sort ----------------------------------------------
 
 _unit(
-    "topological-sort", "Topological Sort & Cycles", "📋", _S5,
+    "topological-sort", "Topological Sort & Cycles", "📋", _S6,
     "Order the dependencies — or prove that no order exists.",
     weight=2,
     prereqs=["graph-traversal"],
@@ -1501,10 +1437,10 @@ what” — and does it faster than any traversal.
 )
 
 
-# --- Unit 26 — Union-find ---------------------------------------------------
+# --- Unit 28 — Union-find ----------------------------------------------------
 
 _unit(
-    "union-find", "Union-Find (Disjoint Set Union)", "🧵", _S5,
+    "union-find", "Union-Find (Disjoint Set Union)", "🧵", _S6,
     "Connectivity as a near-constant-time operation.",
     weight=2,
     prereqs=["graph-traversal"],
@@ -1569,7 +1505,8 @@ closes a cycle. That single return value answers:
 ### Kruskal's MST
 
 Sort the edges by weight and add each one whose `union` returns true. Because
-edges arrive cheapest-first, every accepted edge is safe:
+edges arrive cheapest-first, every accepted edge is safe (the next unit,
+*Minimum Spanning Trees*, proves why and compares it with Prim):
 
 ```java
 Arrays.sort(edges, (x, y) -> Integer.compare(x[2], y[2]));
@@ -1822,28 +1759,353 @@ class DSU {
               {"count-components": "Start at n and decrement on each successful union. Nothing else is needed.",
                "redundant-connection": "The answer is literally the first edge whose union returns false.",
                "graph-valid-tree": "Two conditions, not one: n − 1 edges and no failed union."}),
-        _rung("Variations", "The two layerings that are genuinely new ideas.",
-              ["satisfy-equations", "mst-total-weight"],
-              {"satisfy-equations": "Union all the equalities first, then check every inequality. Order matters.",
-               "mst-total-weight": "Kruskal's. Sort by weight, union greedily, stop at n − 1 edges — and the Stretch problem below is this, on a graph you build yourself."}),
-        _rung("Stretch", "Build the edge set yourself, then run Kruskal.",
-              ["min-cost-connect-points"],
-              {"min-cost-connect-points": "The graph is complete and implicit — all O(n²) pairwise distances. Generate, sort, union."}),
+        _rung("Variations", "A layering that is genuinely a new idea.",
+              ["satisfy-equations"],
+              {"satisfy-equations": "Union all the equalities first, then check every inequality. Order matters."}),
         _extra("Extra practice", "Sizes and orderings layered on the same union — reps, not new ideas.",
                ["largest-component-size", "make-network-connected", "earliest-full-connect"],
                {"earliest-full-connect": "Union in timestamp order and stop the moment the component count hits 1. A nice problem; not one that stands between you and shortest paths."}),
     ],
     next_up="""
-Connectivity is a yes-or-no question. The last unit of the stage asks *how far*,
-once the edges stop being equal.
+A failed `union` rejects an edge that would close a cycle. Feed the edges in
+order of weight and that one rule builds the cheapest network connecting
+everything — the next unit.
 """,
 )
 
 
-# --- Unit 27 — Shortest paths -----------------------------------------------
+# --- Unit 29 — Minimum spanning trees ----------------------------------------
 
 _unit(
-    "shortest-paths", "Weighted Shortest Paths", "🛣️", _S5,
+    "mst", "Minimum Spanning Trees", "🌉", _S6,
+    "Connect everything as cheaply as possible — and know why the cheap edge is safe.",
+    weight=1,
+    prereqs=["union-find", "heaps"],
+    why="""
+*"Connect every city with the least total road"*, *"wire every building"*,
+*"cheapest network that reaches every node"* — a minimum spanning tree is the
+answer, and two short algorithms find it: Kruskal, which you have already half
+written in the union-find unit, and Prim, which is Dijkstra with a different
+number in the heap.
+
+What deserves a unit is not the code but the **reason it works**. Both are
+greedy, and greedy is only safe with a proof. The proof here — the cut property —
+is one sentence, it answers every "why is this edge allowed?" question, and it
+tells you which of the two algorithms to use on a given graph.
+""",
+    model="""
+### What a spanning tree is
+
+A connected, undirected graph with V vertices has many spanning trees: subsets of
+exactly V − 1 edges that connect everything with no cycle. A **minimum** spanning
+tree is one with the smallest total weight. It exists only if the graph is
+connected; otherwise you get a minimum spanning *forest*.
+
+### The cut property — why greedy is safe
+
+Split the vertices into any two groups. Among the edges crossing between them,
+the cheapest one belongs to some minimum spanning tree.
+
+Why: take an MST that does not use that edge e. Adding e creates a cycle, and
+that cycle must cross the split a second time, through some edge f that is no
+cheaper than e. Swap f for e: still a spanning tree, no heavier. So some MST
+contains e. This is the exchange argument from the greedy unit, with a graph in it.
+
+### Kruskal: cheapest edge that joins two groups
+
+Sort all edges by weight. Take each one whose endpoints are in *different*
+components, merging them; skip the ones that would close a cycle. The union-find
+`union` returning false is exactly "would close a cycle".
+
+```java
+Arrays.sort(edges, Comparator.comparingInt(e -> e[2]));
+long total = 0; int used = 0;
+for (int[] e : edges)
+    if (dsu.union(e[0], e[1])) { total += e[2]; if (++used == n - 1) break; }
+return used == n - 1 ? total : -1;        // -1: the graph was not connected
+```
+
+Each accepted edge is the cheapest one crossing the cut between its two
+components, so the cut property says it is safe.
+
+### Prim: grow one tree
+
+Start from any vertex. Repeatedly add the cheapest edge leaving the tree. The cut
+is \"tree versus everything else\", so every edge Prim adds is safe for the same
+reason.
+
+With a heap (sparse graphs) it is Dijkstra's loop with the edge weight in place
+of the path length:
+
+```java
+pq.add(new int[]{0, start});                         // {weight to join, vertex}
+while (!pq.isEmpty()) {
+    int[] top = pq.poll();
+    int w = top[0], u = top[1];
+    if (inTree[u]) continue;                         // stale entry — skip it
+    inTree[u] = true; total += w;
+    for (int[] e : adj.get(u))
+        if (!inTree[e[0]]) pq.add(new int[]{e[1], e[0]});
+}
+```
+
+With a plain array (dense graphs, every pair an edge) keep `best[v]` — the
+cheapest edge from v to the tree — scan for the minimum and update from the new
+vertex's row. That is O(V²) with no heap at all.
+
+### Which one
+
+| Graph | Use | Cost |
+| --- | --- | --- |
+| Edge list, sparse | Kruskal | O(E log E) |
+| Adjacency lists, sparse | Prim with a heap | O(E log V) |
+| Complete or dense (E ≈ V²) | Prim with an array | O(V²) |
+
+On a complete graph of points, Kruskal sorts V²/2 edges — O(V² log V) — while
+array Prim is O(V²), which is as fast as reading the edges at all.
+
+### Questions about edges, not just the total
+
+*Is this edge in every MST? In some?* Change the input and re-run: an edge is
+**critical** if the best tree without it is heavier; **pseudo-critical** if
+forcing it in still achieves the minimum. Two Kruskal passes per edge, over a
+list sorted once.
+""",
+    signals=[
+        _sig("“connect all …, minimum total cost”", "Minimum spanning tree",
+             "Not shortest paths: MST minimises the sum of all chosen edges, not a route."),
+        _sig("An edge list", "Kruskal with union-find",
+             "Sort once; `union` returning false is the cycle check."),
+        _sig("Points in the plane, every pair allowed", "Prim with an array, O(V²)",
+             "The graph is complete — do not generate and sort V²/2 edges."),
+        _sig("“is this edge necessary / usable?”", "Exclude it, force it, compare the weight",
+             "Critical: excluding raises the weight. Pseudo-critical: forcing keeps it."),
+        _sig("Some connections are already built (cost 0)", "Union them first, then Kruskal",
+             "Pre-merged components are just a head start for the same loop."),
+        _sig("“shortest route from A to B”", "Not an MST — Dijkstra",
+             "The MST path between two vertices is not the shortest path between them."),
+    ],
+    skeletons=[
+        _sk("Kruskal",
+            "Edge lists; the default MST.",
+            """
+long kruskal(int n, int[][] edges) {             // edges: {u, v, w}
+    Arrays.sort(edges, Comparator.comparingInt(e -> e[2]));
+    DSU dsu = new DSU(n);
+    long total = 0;
+    int used = 0;
+    for (int[] e : edges) {
+        if (dsu.union(e[0], e[1])) {
+            total += e[2];
+            if (++used == n - 1) break;
+        }
+    }
+    return used == n - 1 ? total : -1;           // -1: disconnected
+}
+""",
+            "The DSU from the union-find unit, unchanged. `long` total: V − 1 weights can overflow `int`."),
+        _sk("Prim with a heap",
+            "Adjacency lists, sparse graphs.",
+            """
+long prim(List<List<int[]>> adj, int n) {        // adj.get(u): {v, w}
+    boolean[] in = new boolean[n];
+    PriorityQueue<int[]> pq = new PriorityQueue<>(Comparator.comparingInt(x -> x[0]));
+    pq.add(new int[]{0, 0});
+    long total = 0;
+    int added = 0;
+    while (!pq.isEmpty() && added < n) {
+        int[] top = pq.poll();
+        int u = top[1];
+        if (in[u]) continue;                     // lazy deletion
+        in[u] = true;
+        total += top[0];
+        added++;
+        for (int[] e : adj.get(u)) if (!in[e[0]]) pq.add(new int[]{e[1], e[0]});
+    }
+    return added == n ? total : -1;
+}
+""",
+            "Dijkstra's loop with `w` where Dijkstra has `dist[u] + w`."),
+        _sk("Prim with an array",
+            "Complete or dense graphs: O(V²), no heap.",
+            """
+long primDense(long[][] cost, int n) {
+    long[] best = new long[n];
+    boolean[] in = new boolean[n];
+    Arrays.fill(best, Long.MAX_VALUE);
+    best[0] = 0;
+    long total = 0;
+    for (int round = 0; round < n; round++) {
+        int u = -1;
+        for (int v = 0; v < n; v++)
+            if (!in[v] && (u == -1 || best[v] < best[u])) u = v;
+        in[u] = true;
+        total += best[u];
+        for (int v = 0; v < n; v++)
+            if (!in[v] && cost[u][v] < best[v]) best[v] = cost[u][v];
+    }
+    return total;
+}
+""",
+            "Compute `cost[u][v]` on the fly for points instead of storing the matrix."),
+    ],
+    traces=[
+        _trace(
+            "Kruskal on 5 vertices",
+            "Edges sorted by weight: 0–2 (1), 1–2 (2), 3–4 (3), 0–1 (4), 1–3 (5), 2–3 (8), "
+            "2–4 (9). Each row is one edge considered; the groups are the union-find "
+            "components after it.",
+            ["Edge", "Weight", "Endpoints already joined?", "Action", "Groups after", "Total"],
+            [
+                ["0–2", "1", "no", "take", "{0,2} {1} {3} {4}", "1"],
+                ["1–2", "2", "no", "take", "{0,1,2} {3} {4}", "3"],
+                ["3–4", "3", "no", "take", "{0,1,2} {3,4}", "6"],
+                ["0–1", "4", "**yes** — both in {0,1,2}", "skip (would close 0–1–2)", "{0,1,2} {3,4}", "6"],
+                ["1–3", "5", "no", "take — 4 edges = V − 1, stop", "{0,1,2,3,4}", "**11**"],
+            ],
+            "Edge 0–1 is cheaper than 1–3 and still rejected: it only connects vertices that "
+            "are already connected. The 8 and 9 edges are never looked at, because the tree "
+            "was complete after V − 1 acceptances.",
+        ),
+        _trace(
+            "Prim from vertex 0, same graph",
+            "`best[v]` is the cheapest edge from v into the tree so far (∞ if none). Each round "
+            "adds the cheapest outside vertex, then lowers its neighbours' `best`.",
+            ["Round", "Added (via weight)", "best[1]", "best[2]", "best[3]", "best[4]", "Total"],
+            [
+                ["start", "0 (0)", "4", "1", "∞", "∞", "0"],
+                ["1", "2 (1)", "**2**", "—", "**8**", "**9**", "1"],
+                ["2", "1 (2)", "—", "—", "**5**", "9", "3"],
+                ["3", "3 (5)", "—", "—", "—", "**3**", "8"],
+                ["4", "4 (3)", "—", "—", "—", "—", "**11**"],
+            ],
+            "Same total, different order: Prim adds the weight-5 edge before the weight-3 one, "
+            "because 3–4 does not touch the tree until vertex 3 is in it. Kruskal thinks in "
+            "global edge order, Prim in \"cheapest way out of the tree I have\" — and the cut "
+            "property makes both correct.",
+        ),
+    ],
+    costs=[
+        _cost("Kruskal", "O(E log E)", "O(V + E)", "The sort dominates; the unions are ≈ O(E)."),
+        _cost("Prim, binary heap", "O(E log V)", "O(V + E)", "Lazy deletion: up to E heap entries."),
+        _cost("Prim, array", "O(V²)", "O(V)", "Best for complete graphs."),
+        _cost("Kruskal on n points, all pairs", "O(n² log n)", "O(n²)", "Why array Prim wins there."),
+        _cost("Critical / pseudo-critical edges", "O(E² · α(V))", "O(V + E)", "Two Kruskal passes per edge, sorted once."),
+    ],
+    pitfalls=[
+        _pit("The MST weight is too small",
+             "The graph is disconnected, and the loop added fewer than V − 1 edges without noticing.",
+             "Count accepted edges; fewer than V − 1 means no spanning tree exists."),
+        _pit("Prim adds a vertex twice",
+             "A stale heap entry for an already-added vertex was not skipped.",
+             "`if (inTree[u]) continue;` straight after polling."),
+        _pit("Minimum spanning tree used for a shortest path",
+             "The path between two vertices inside an MST is not the shortest path between them.",
+             "MST minimises total edge weight; for A-to-B distance use Dijkstra."),
+        _pit("Time limit on a complete graph of points",
+             "All V²/2 edges were generated and sorted for Kruskal.",
+             "Array Prim, computing each distance when it is needed: O(V²)."),
+        _pit("The total overflows",
+             "V − 1 weights summed in an `int`.",
+             "Accumulate in `long`."),
+        _pit("An edge that is in every MST is reported as merely usable",
+             "The \"forced\" test ran before the \"excluded\" test, and a critical edge passes both.",
+             "Test critical (exclude it) first; only a non-critical edge can be pseudo-critical."),
+    ],
+    lessons=["mst", "union_find", "greedy", "heap"],
+    checks=[
+        _chk("State the cut property, and explain why it makes Kruskal and Prim correct.",
+             "For any split of the vertices, the cheapest edge crossing it is in some MST. "
+             "Kruskal's accepted edge is the cheapest crossing the cut between its two "
+             "components; Prim's is the cheapest crossing tree-versus-rest."),
+        _chk("Kruskal or Prim for 2,000 points where every pair can be connected?",
+             "Array Prim: O(V²) ≈ 4·10⁶. Kruskal would sort ~2·10⁶ edges for O(V² log V), and "
+             "has to store them all."),
+        _chk("How is heap-based Prim different from Dijkstra?",
+             "Only in the key pushed: Prim pushes the edge weight w, Dijkstra pushes "
+             "dist[u] + w. Same loop, same stale-entry skip."),
+        _chk("How do you tell that a graph has no spanning tree?",
+             "Kruskal accepts fewer than V − 1 edges, or Prim adds fewer than V vertices."),
+        _chk("How do you decide whether an edge is in every MST?",
+             "Run Kruskal without it. If the weight rises (or the graph disconnects), every MST "
+             "needs it."),
+    ],
+    bigo=[
+        _bigo(r"""
+Arrays.sort(edges, Comparator.comparingInt(e -> e[2]));   // E edges, V vertices
+for (int[] e : edges)
+    if (dsu.union(e[0], e[1])) total += e[2];            // path compression + union by size
+""", "O(E log E)", ["O(E log E)", "O(E · V)", "O(E · α(V))", "O(V²)"],
+            "The unions are nearly free — O(E · α(V)) together — so the sort dominates. "
+            "O(E log E) and O(E log V) are the same class, since E ≤ V²."),
+        _bigo(r"""
+for (int round = 0; round < n; round++) {        // n vertices, complete graph
+    int u = argminOutside(best, in);             // scans all n
+    in[u] = true;
+    for (int v = 0; v < n; v++) best[v] = Math.min(best[v], dist(u, v));
+}
+""", "O(n²)", ["O(n²)", "O(n² log n)", "O(n³)", "O(n log n)"],
+            "n rounds, each two O(n) scans. No heap and no sort: for a complete graph this is "
+            "optimal, since there are n²/2 edges to consider at all."),
+        _bigo(r"""
+List<int[]> edges = new ArrayList<>();           // n points
+for (int i = 0; i < n; i++)
+    for (int j = i + 1; j < n; j++)
+        edges.add(new int[]{i, j, manhattan(i, j)});
+edges.sort(Comparator.comparingInt(e -> e[2]));
+""", "O(n² log n)", ["O(n² log n)", "O(n²)", "O(n log n)", "O(n³)"],
+            "n²/2 edges, sorted: O(n² log n²) = O(n² log n) time, plus O(n²) memory. Array "
+            "Prim avoids both."),
+        _bigo(r"""
+// edges pre-sorted once; kruskal(skip, force) is one pass with a fresh DSU
+for (int e = 0; e < m; e++) {
+    if (kruskal(e, -1) > base) critical.add(e);
+    else if (kruskal(-1, e) == base) pseudo.add(e);
+}
+""", "O(m² · α(n))", ["O(m² · α(n))", "O(m log m)", "O(m² log m)", "O(n · m)"],
+            "Up to two linear Kruskal passes per edge. Sorting inside `kruskal` would make it "
+            "O(m² log m) — sort once, outside the loop."),
+        _bigo(r"""
+PriorityQueue<int[]> pq = ...;                   // lazy Prim: V vertices, E edges
+while (!pq.isEmpty()) {
+    int[] top = pq.poll();
+    if (in[top[1]]) continue;
+    in[top[1]] = true;
+    for (int[] e : adj.get(top[1])) if (!in[e[0]]) pq.add(new int[]{e[1], e[0]});
+}
+""", "O(E log V)", ["O(E log V)", "O(V log V)", "O(V · E)", "O(E + V)"],
+            "Every edge can be pushed once from each end, so the heap sees O(E) operations of "
+            "O(log E) = O(log V) each. Stale entries cost a poll, not a wrong answer."),
+    ],
+    interview="""
+Name the problem before the algorithm: "this is a minimum spanning tree, not a
+shortest path — we pay for every edge we build, not for one route". Then pick by
+density out loud: Kruskal for an edge list, array Prim when every pair is an
+edge. The follow-up is almost always "why is the greedy choice safe?", and the
+cut property is the one-sentence answer.
+""",
+    rungs=[
+        _rung("Core", "Kruskal and Prim, each where it fits best.",
+              ["mst-total-weight", "prim-dense-graph"],
+              {"mst-total-weight": "Kruskal with the DSU from the last unit. Count accepted edges: fewer than n − 1 means no tree.",
+               "prim-dense-graph": "Every pair is an edge, so skip the heap: an array of best costs, an O(n) scan and an O(n) update per round."}),
+        _rung("Stretch", "An implicit graph, and questions about individual edges.",
+              ["min-cost-connect-points", "mst-critical-edges"],
+              {"min-cost-connect-points": "The graph is complete and implicit. Kruskal works; array Prim is O(n²) and never builds the edge list — try both.",
+               "mst-critical-edges": "Sort once, then exclude each edge and force each edge. Test critical before pseudo-critical."}),
+    ],
+    next_up="""
+Spanning trees pay for every edge. The last unit of the stage pays only for the
+route from one vertex to another — and the weights decide which algorithm is
+even correct.
+""",
+)
+
+
+# --- Unit 30 — Shortest paths ------------------------------------------------
+
+_unit(
+    "shortest-paths", "Weighted Shortest Paths", "🛣️", _S6,
     "When edges cost different amounts, BFS stops working.",
     weight=2,
     prereqs=["graph-traversal", "heaps"],
@@ -2103,8 +2365,8 @@ pressure.
               {"dijkstra-shortest-path": "The full implementation from an edge list, with the stale check and `long` distances."}),
     ],
     next_up="""
-One stage left. It covers the two remaining ways to make a hard problem
-tractable — commit to a local choice (greedy), or remember every subproblem
-(dynamic programming) — plus the structure that makes prefixes searchable.
+One core stage left. When no greedy choice is safe, the only affordable way to
+consider every option is to never solve the same subproblem twice — dynamic
+programming — and the stage ends by combining every structure so far in design.
 """,
 )

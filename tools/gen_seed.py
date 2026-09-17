@@ -6241,6 +6241,7 @@ if os.path.exists(_fill_path):
 EXTRA_REFS = {}
 DSA_MORE_FILES = (
     "dsa_more_kit.py",
+    "dsa_more_kit2.py",
     "dsa_more_01.py",
     "dsa_more_02.py",
     "dsa_more_03.py",
@@ -6275,6 +6276,10 @@ DSA_MORE_FILES = (
     "dsa_more_32.py",
     "dsa_more_33.py",
     "dsa_more_34.py",
+    "dsa_more_35.py",
+    "dsa_more_36.py",
+    "dsa_more_37.py",
+    "dsa_more_38.py",
 )
 for _more_name in DSA_MORE_FILES:
     _more_path = os.path.join(HERE, _more_name)

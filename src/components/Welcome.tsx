@@ -11,7 +11,7 @@ export function Welcome({ onClose }: { onClose: () => void }) {
   };
 
   const items: { icon: string; title: string; body: string }[] = [
-    { icon: "📚", title: "DSA Curriculum", body: "615 problems taught in order — 33 units from printing a line to tries and Dijkstra, each with the why, the code shape and the signals that name it." },
+    { icon: "📚", title: "DSA Curriculum", body: "653 problems taught in order — 36 core units from printing a line to dynamic programming and design, plus an optional stage beyond the core. Each unit has the why, the code shape and the signals that name it." },
     { icon: "🧭", title: "Learning Paths", body: "Curated tracks (Foundations, Arrays, DP…) that build skills in order." },
     { icon: "📗", title: "TypeScript Course", body: "A full 8-month course, beginner to interview — a themed goal and project every week." },
     { icon: "☕", title: "Java Course", body: "Ten modules past the basics — arrays, strings and methods, judged all the way." },

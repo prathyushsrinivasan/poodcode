@@ -40,11 +40,13 @@ python tools/verify_java_course.py --starters   # Java course: same, via javac/j
 python tools/verify_projects.py --starters      # Projects: same, type-checked then run via Node
 ```
 
-The first launch seeds **615 original problems** — 28 below-Easy **Intro**
-problems for someone new to Java, then 587 across arrays, strings, hashing,
-two pointers, sliding window, prefix sums, sorting, binary search, maths, bits,
-stacks, linked lists, heaps, design, recursion, trees, backtracking, graphs,
-greedy, intervals, dynamic programming and tries — arranged into a taught
+The first launch seeds **653 original problems** — 28 below-Easy **Intro**
+problems for someone new to Java, then 625 across arrays, strings, hashing,
+two pointers, sliding window, prefix sums, recursion, sorting, binary search,
+greedy, intervals, maths, bits, stacks, linked lists, heaps, trees,
+backtracking, graphs, spanning trees, dynamic programming, tries and design —
+plus an optional set on string hashing, range-query trees, advanced graphs and
+bitmask DP — arranged into a taught
 **DSA Curriculum** (below), plus a **Learn** library of **169 concept lessons**.
 **Java is the default language**, and every problem ships with a tailored Java
 starter.
@@ -92,13 +94,13 @@ Poodcode/
 │  ├─ tests/verify_java_course.rs     # proves every Java course solution passes
 │  ├─ tests/verify_dsa_curriculum.rs  # proves the curriculum places every problem once
 │  ├─ seeds/problems.json      # the bundled original problem set
-│  ├─ seeds/dsa_curriculum.json       # that set, sequenced into 33 taught units
+│  ├─ seeds/dsa_curriculum.json       # that set, taught: 36 core units + an optional stage
 │  ├─ seeds/backend_course.json       # Backend Lab: 7 CRUD-API build projects
 │  ├─ seeds/java_course.json          # Java course: 31 modules past the basics
 │  └─ seeds/projects.json             # Projects: the Todo API (20 modules) and Calc (18)
 │
 ├─ tools/gen_seed.py           # generator that AUTHORS every seeds/*.json
-├─ tools/dsa_curriculum.py     # authors seeds/dsa_curriculum.json (+ dsa_s1…s6)
+├─ tools/dsa_curriculum.py     # authors seeds/dsa_curriculum.json (+ dsa_s1…s8, dsa_syllabus.py)
 ├─ tools/backend_course.py     # authors seeds/backend_course.json
 ├─ tools/java_course.py        # authors seeds/java_course.json (+ java_m01…m31, java_p01…p31)
 ├─ tools/projects_track.py     # authors seeds/projects.json (+ todo_mNN, calc_project + calc_mNN)
@@ -164,14 +166,38 @@ python tools/gen_seed.py       # writes every src-tauri/seeds/*.json
 ### DSA Curriculum
 
 The problem bank with a **spine** (`seeds/dsa_curriculum.json`, authored in
-`tools/dsa_curriculum.py` plus one file per stage). The same 615 problems and
+`tools/dsa_curriculum.py` plus one file per stage). The same 653 problems and
 the same judge, arranged as a course that starts at `System.out.println` and
-ends at tries, Dijkstra and 2-D dynamic programming: **six stages, 33 units,
-every problem placed on exactly one teaching ladder.**
+ends at dynamic programming and data-structure design: **seven core stages and
+36 units, plus one optional stage of 4 units — every problem placed on exactly
+one teaching ladder.**
 
-It authors no problems and no lessons — that is the point. What it adds is the
-thing a filterable table of 615 problems cannot give you: an **order**, and a
-reason for it. Each unit is one technique, taught in five beats:
+| Stage | Units |
+| --- | --- |
+| 1. Foundations | input & arithmetic · branching · loops & digits · arrays |
+| 2. Cost & core patterns | complexity · hashing · two pointers · sliding window · prefix sums · strings (incl. palindromes & KMP) |
+| 3. Order & search | recursion (incl. divide & conquer) · sorting (incl. quickselect, counting with merge sort) · binary search · greedy · intervals |
+| 4. Numbers, bits & grids | math (incl. counting modulo a prime) · bit manipulation · simulation & matrices |
+| 5. Linear structures | stacks · queues & deques · linked lists (incl. pointer mapping) · heaps |
+| 6. Trees & graphs | trees (incl. build & serialise) · BSTs (incl. iterators & `TreeMap`) · backtracking · graph traversal · topological sort · union-find · minimum spanning trees · shortest paths (incl. all pairs) |
+| 7. DP & design | DP: linear · DP: knapsack & subsets · DP: grids & two sequences · DP: intervals & state machines · tries · design |
+| 8. *Beyond the core (optional)* | string matching & hashing · range queries (Fenwick, segment trees) · advanced graphs (low-links, SCCs, Euler paths) · bitmask DP |
+
+The **optional stage** is outside the interview core, so the app leaves it out of
+the course's overall progress and only offers it as "Continue" once every core
+unit is done. Its units are otherwise ordinary: the same teaching beats, lints
+and verified references.
+
+The current syllabus came from an audit (`DSA_ROADMAP.md`) that moved greedy and
+intervals up beside sorting, moved recursion ahead of the sorts that need it,
+split DP by the shape of its state, and gave every technique a problem placed
+in the unit that teaches it. The re-homing is recorded as one list of moves in
+`tools/dsa_syllabus.py`; the 38 problems it needed are in
+`tools/dsa_more_35.py` … `dsa_more_38.py`.
+
+It authors no lessons — that is the point. What it adds is the thing a
+filterable table of 653 problems cannot give you: an **order**, and a reason for
+it. Each unit is one technique, taught in five beats:
 
 1. **Why it exists** — the problem the previous unit leaves behind. A technique
    nobody needed is a technique nobody remembers.
@@ -210,12 +236,13 @@ Two beats are on **every** unit:
   so a row cannot disagree with the code it shows; only the prose around them is
   written by hand.
 
-The **Linear Data Structures** stage goes deepest, with three beats the
-technique stages do not all need, because a unit about a *structure* has to
-answer a question a unit about a *technique* does not — **why are these the costs?**
-Quoting "heap insert is O(log n)" without ever seeing the array layout is
-memorisation, and it fails under interview pressure in a way understanding does
-not. So each of its six units also has:
+The **Linear Data Structures** stage goes deepest — together with the design
+unit that closes the core — with three beats the technique stages do not all
+need, because a unit about a *structure* has to answer a question a unit about a
+*technique* does not — **why are these the costs?** Quoting "heap insert is
+O(log n)" without ever seeing the array layout is memorisation, and it fails
+under interview pressure in a way understanding does not. So each of those units
+also has:
 
 - **🔬 How it works underneath** — the layout and the operations on it, plus
   which Java class really implements it and which ones look right and are not
@@ -243,7 +270,7 @@ re-asserted against the committed seed by
 `src-tauri/tests/verify_dsa_curriculum.rs`:
 
 - **Every problem is placed exactly once.** The curriculum and the library are
-  the same 615 problems, so nothing is unreachable and "what is next?" is never
+  the same 653 problems, so nothing is unreachable and "what is next?" is never
   ambiguous.
 - **Every `alg_*`/`ds_*` lesson is linked by some unit** — the mirror of the
   above for Learn: an algorithms lesson no unit points at is reachable only by
@@ -264,6 +291,8 @@ re-asserted against the committed seed by
 - **Authored depth cannot regress** — the units that carry internals or a
   build-it exercise are named explicitly, every unit must carry a worked trace
   and at least four Big-O drills, and losing any of them fails the build.
+- **Optional stages come last** — a core stage after an optional one would make
+  "finish the core" mean walking through optional work.
 
 One rule is deliberately *not* an assertion. Each unit carries a `weight` (1-3,
 interview yield) with a target problem-count band, and units outside their band
@@ -619,7 +648,7 @@ The original build spec was `ProjectOverview.md`; it is fully built and now
 lives only in git history (`git show c87bbeb:ProjectOverview.md`).
 
 **Fully built:** Dashboard (goals, streak, weakest topic, suggested next) ·
-**DSA Curriculum** (the problem bank taught: 6 stages, 33 units, every problem
+**DSA Curriculum** (the problem bank taught: 7 core stages and 36 units plus an optional stage, every problem
 placed on exactly one ladder, each unit carrying its why, mental model, Java
 skeletons, signal→technique routing table, cost table, pitfalls-by-symptom,
 self-checks and links into Learn) · Browse with all filters (difficulty, topics,

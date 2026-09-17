@@ -1514,16 +1514,6 @@ for (int x : a) {                         // tails[i]: smallest tail of an incre
             "The same LIS length by patience sorting: `tails` stays sorted, so the look-back "
             "becomes a binary search. Same answer, a log instead of a linear factor per state."),
         _bigo(r"""
-Arrays.fill(dp, INF);
-dp[0] = 0;
-for (int x = 1; x <= A; x++)              // amount A
-    for (int c : coins)                   // k coins
-        if (c <= x && dp[x - c] + 1 < dp[x]) dp[x] = dp[x - c] + 1;
-""", "O(A·k)", ["O(A + k)", "O(A·k)", "O(kᴬ)", "O(A log k)"],
-            "Coin change: A states, k transitions each. It is *pseudo-polynomial* — polynomial "
-            "in the amount's value, exponential in the number of digits needed to write it. "
-            "A = 10⁹ is 30 bits of input and a table you cannot build."),
-        _bigo(r"""
 dp[0] = true;                             // word break; s has length n
 for (int i = 1; i <= n; i++)
     for (int j = 0; j < i; j++)
@@ -1563,6 +1553,33 @@ for (int i = 0; i < r; i++)
             "which is astronomically larger than the work — counting paths never requires listing "
             "them."),
         _bigo(r"""
+int[] dp = new int[m + 1];                // edit distance, strings of length n and m
+for (int j = 0; j <= m; j++) dp[j] = j;
+for (int i = 1; i <= n; i++) {
+    int diag = dp[0];
+    dp[0] = i;
+    for (int j = 1; j <= m; j++) {
+        int up = dp[j];
+        dp[j] = a.charAt(i - 1) == b.charAt(j - 1) ? diag : 1 + Math.min(diag, Math.min(up, dp[j - 1]));
+        diag = up;                        // the old dp[j] is the next cell's diagonal
+    }
+}
+""", "O(n·m)", ["O(n·m)", "O(n + m)", "O(m)", "O(3^(n+m))"],
+            "Rolling to one row changes the *space* to O(m) and leaves the time at n·m. O(m) is the "
+            "memory, not the work — and the saved `diag` is what keeps the rolled version correct."),
+    ],
+    "dp-knapsack": [
+        _bigo(r"""
+Arrays.fill(dp, INF);
+dp[0] = 0;
+for (int x = 1; x <= A; x++)              // amount A
+    for (int c : coins)                   // k coins
+        if (c <= x && dp[x - c] + 1 < dp[x]) dp[x] = dp[x - c] + 1;
+""", "O(A·k)", ["O(A + k)", "O(A·k)", "O(kᴬ)", "O(A log k)"],
+            "Coin change: A states, k transitions each. It is *pseudo-polynomial* — polynomial "
+            "in the amount's value, exponential in the number of digits needed to write it. "
+            "A = 10⁹ is 30 bits of input and a table you cannot build."),
+        _bigo(r"""
 for (int i = 1; i <= n; i++)              // n items, capacity W
     for (int w = 0; w <= W; w++) {
         dp[i][w] = dp[i - 1][w];
@@ -1572,6 +1589,8 @@ for (int i = 1; i <= n; i++)              // n items, capacity W
             "0/1 knapsack: pseudo-polynomial again. When W is small this beats trying all 2ⁿ "
             "subsets; when W is 10⁹ the 2ⁿ approach (or meet-in-the-middle) is the one that "
             "runs."),
+    ],
+    "dp-intervals-states": [
         _bigo(r"""
 for (int len = 2; len <= n; len++)        // interval DP
     for (int i = 0; i + len - 1 < n; i++) {

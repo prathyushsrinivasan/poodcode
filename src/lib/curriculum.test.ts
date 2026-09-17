@@ -320,6 +320,41 @@ describe("hydrate", () => {
     expect(h).toMatchObject({ solved: 2, total: 3 });
   });
 
+  it("leaves an optional stage out of the overall progress", () => {
+    const c = curriculum([
+      [unit("one", [rung("Core", ["a", "b"])])],
+      [unit("extra", [rung("Core", ["c", "d"])])],
+    ]);
+    c.stages[1].optional = true;
+    const h = hydrate(c, [problem("a", "solved"), problem("b"), problem("c", "solved"), problem("d")]);
+    expect(h.stages[1]).toMatchObject({ optional: true, solved: 1, total: 2 });
+    expect(h).toMatchObject({ solved: 1, total: 2 });
+  });
+
+  it("does not send Continue into an optional stage while core work remains", () => {
+    // The optional unit is ready and the core one is not — core still wins.
+    const c = curriculum([
+      [unit("one", [rung("Core", ["a"])]), unit("two", [rung("Core", ["b"])], ["one"])],
+      [unit("extra", [rung("Core", ["c"])])],
+    ]);
+    c.stages[1].optional = true;
+    const h = hydrate(c, [problem("a", "solved"), problem("b"), problem("c")]);
+    expect(h.next?.unit.unit.key).toBe("two");
+    expect(h.coreComplete).toBe(false);
+  });
+
+  it("offers the optional stage once the core is complete", () => {
+    const c = curriculum([
+      [unit("one", [rung("Core", ["a"])])],
+      [unit("extra", [rung("Core", ["c"])])],
+    ]);
+    c.stages[1].optional = true;
+    const h = hydrate(c, [problem("a", "solved"), problem("c")]);
+    expect(h.coreComplete).toBe(true);
+    expect(h.next?.unit.unit.key).toBe("extra");
+    expect(hydrate(c, [problem("a", "solved"), problem("c", "solved")]).next).toBeNull();
+  });
+
   it("survives a missing curriculum", () => {
     const h = hydrate(null, [problem("a")]);
     expect(h.stages).toEqual([]);

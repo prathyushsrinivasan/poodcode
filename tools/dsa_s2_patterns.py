@@ -36,7 +36,7 @@ the stage.
 """)
 
 
-# --- Unit 5 — Complexity ----------------------------------------------------
+# --- Unit 5 — Complexity -----------------------------------------------------
 
 _unit(
     "complexity", "Cost: Big-O in Practice", "⏱️", _S2,
@@ -324,7 +324,7 @@ that and you have the most useful data structure in interview programming.
 )
 
 
-# --- Unit 6 — Hashing -------------------------------------------------------
+# --- Unit 6 — Hashing --------------------------------------------------------
 
 _unit(
     "hashing", "Hashing: Trade Space for Time", "🗝️", _S2,
@@ -591,7 +591,7 @@ spends no memory at all.
 )
 
 
-# --- Unit 7 — Two pointers --------------------------------------------------
+# --- Unit 7 — Two pointers ---------------------------------------------------
 
 _unit(
     "two-pointers", "Two Pointers", "↔️", _S2,
@@ -777,7 +777,7 @@ run** instead, the two pointers move the same way — and that is a window.
 )
 
 
-# --- Unit 8 — Sliding window ------------------------------------------------
+# --- Unit 8 — Sliding window -------------------------------------------------
 
 _unit(
     "sliding-window", "Sliding Window", "🪟", _S2,
@@ -980,7 +980,7 @@ arbitrary — or the values can be negative — you precompute instead.
 )
 
 
-# --- Unit 9 — Prefix sums ---------------------------------------------------
+# --- Unit 9 — Prefix sums ----------------------------------------------------
 
 _unit(
     "prefix-sums", "Prefix Sums", "➕", _S2,
@@ -1174,7 +1174,7 @@ where the data structure is the same but the operations have their own costs.
 )
 
 
-# --- Unit 10 — Strings ------------------------------------------------------
+# --- Unit 10 — Strings -------------------------------------------------------
 
 _unit(
     "strings", "Strings & Character Work", "🔤", _S2,
@@ -1234,6 +1234,53 @@ the same underlying reason — each call flushes.
 Anagrams, case-insensitive comparison and "ignore punctuation" are all the same
 move: reduce each string to a canonical form and compare *those*. That is the
 hashing unit's idea, and text is where it earns its keep.
+
+### Palindromes: expand around a centre
+
+Every palindrome has a centre, and growing outwards from it meets every
+palindrome with that centre, shortest first — each one confirmed in O(1), because
+the inner part was confirmed one step earlier. There are **2n − 1** centres: each
+character (odd lengths) and each gap between neighbours (even lengths).
+
+```java
+for (int c = 0; c < 2 * n - 1; c++) {
+    int l = c / 2, r = l + c % 2;              // even c: a letter; odd c: a gap
+    while (l >= 0 && r < n && s.charAt(l) == s.charAt(r)) { /* s[l..r] is a palindrome */ l--; r++; }
+}
+```
+
+O(n²) in total, O(1) memory — versus O(n³) for checking every substring. Count
+inside the loop for *how many*; keep the widest for *the longest*.
+
+### Matching: the KMP prefix function
+
+Searching for a pattern by restarting after every mismatch is O(n·m). But after
+matching k characters, the text's last k characters *are* the pattern's first k,
+so a mismatch need not throw them away.
+
+`pi[i]` = the length of the longest proper prefix of `t[0..i]` that is also a
+suffix of it (a **border**). On a mismatch, fall back to the next shorter border,
+`k = pi[k − 1]`, instead of to 0:
+
+```java
+int[] pi = new int[m];
+for (int i = 1, k = 0; i < m; i++) {                 // the pattern against itself
+    while (k > 0 && t.charAt(i) != t.charAt(k)) k = pi[k - 1];
+    if (t.charAt(i) == t.charAt(k)) k++;
+    pi[i] = k;
+}
+for (int i = 0, k = 0; i < n; i++) {                 // the pattern against the text
+    while (k > 0 && s.charAt(i) != t.charAt(k)) k = pi[k - 1];
+    if (s.charAt(i) == t.charAt(k)) k++;
+    if (k == m) return i - m + 1;                     // or count, and set k = pi[k - 1]
+}
+```
+
+The text pointer never moves back, and `k` falls at most as often as it rose, so
+the search is O(n + m). The same array answers questions about one string:
+`pi[n − 1]` is its longest border (*longest happy prefix*), and running it on
+`s + "#" + reverse(s)` finds the longest palindromic prefix (*shortest
+palindrome*).
 """,
     signals=[
         _sig("“count the …” over characters", "`int[26]` or `int[128]` frequency array",
@@ -1246,6 +1293,12 @@ hashing unit's idea, and text is where it earns its keep.
              "Canonical form, then compare or hash."),
         _sig("“run-length”, “consecutive equal characters”", "One pass with a run counter",
              "Extend-or-reset, from the arrays unit."),
+        _sig("“palindromic substrings”, “longest palindrome inside”", "Expand around 2n − 1 centres",
+             "O(n²) time, O(1) memory — no table needed."),
+        _sig("“find the pattern”, “first occurrence”, n and m large", "KMP prefix function",
+             "O(n + m); the text pointer never moves back."),
+        _sig("“longest prefix that is also a suffix”", "`pi[n − 1]`",
+             "The prefix function of the string itself."),
         _sig("“words”, “split on spaces”", "One pass counting transitions, or `split`",
              "Beware of repeated and leading spaces when counting manually."),
     ],
@@ -1291,6 +1344,35 @@ for (int i = 0; i < first.length(); i++) {
 return first;
 """,
             "Compare column by column; stop at the first disagreement."),
+        _sk("Expand around centre",
+            "Count palindromic substrings, or find the longest.",
+            """
+int bestStart = 0, bestLen = 0;
+for (int c = 0; c < 2 * n - 1; c++) {
+    int l = c / 2, r = l + c % 2;
+    while (l >= 0 && r < n && s.charAt(l) == s.charAt(r)) { l--; r++; }
+    if (r - l - 1 > bestLen) { bestLen = r - l - 1; bestStart = l + 1; }
+}
+return s.substring(bestStart, bestStart + bestLen);
+""",
+            "After the loop, `l` and `r` are one step past the palindrome: its length is r − l − 1."),
+        _sk("KMP search",
+            "First (or every) occurrence of a pattern in O(n + m).",
+            """
+int[] pi = new int[m];
+for (int i = 1, k = 0; i < m; i++) {
+    while (k > 0 && t.charAt(i) != t.charAt(k)) k = pi[k - 1];
+    if (t.charAt(i) == t.charAt(k)) k++;
+    pi[i] = k;
+}
+for (int i = 0, k = 0; i < n; i++) {
+    while (k > 0 && s.charAt(i) != t.charAt(k)) k = pi[k - 1];
+    if (s.charAt(i) == t.charAt(k)) k++;
+    if (k == m) return i - m + 1;
+}
+return -1;
+""",
+            "Building `pi` is the same loop as searching — the pattern matched against itself."),
     ],
     costs=[
         _cost("One pass over characters", "O(n)", "O(1)", "With an `int[26]` counter."),
@@ -1298,6 +1380,8 @@ return first;
               "The canonical form for anagram grouping — count signatures are O(n)."),
         _cost("Building with `+=` in a loop", "O(n²)", "O(n²) churn", "The bug. Use `StringBuilder`."),
         _cost("`substring(i, j)`", "O(j − i)", "O(j − i)", "A copy, not a view."),
+        _cost("Expand around every centre", "O(n²)", "O(1)", "Checking every substring separately is O(n³)."),
+        _cost("KMP search", "O(n + m)", "O(m)", "Naive restart-on-mismatch is O(n · m)."),
     ],
     pitfalls=[
         _pit("String building is inexplicably slow on large input",
@@ -1317,6 +1401,12 @@ return first;
         _pit("A substring comparison loop is O(n³)",
              "Each `substring` call copies before the comparison even starts.",
              "Compare with `charAt` in place, or use indices rather than copies."),
+        _pit("Even-length palindromes are missing",
+             "Only the n letters were used as centres, not the n − 1 gaps.",
+             "Loop over 2n − 1 centres: `l = c / 2, r = l + c % 2`."),
+        _pit("KMP is still O(n · m), or misses overlapping matches",
+             "On a mismatch `k` was reset to 0, or after a full match it was not set to `pi[k − 1]`.",
+             "Fall back through `pi`; after a match continue from `k = pi[m − 1]`."),
     ],
     lessons=["string_basics", "canonical", "char_arrays"],
     checks=[
@@ -1332,6 +1422,13 @@ return first;
         _chk("Two ways to test whether two words are anagrams — and their costs?",
              "Sort both and compare: O(n log n). Count characters into `int[26]` and compare "
              "the tables: O(n). The second is preferred and also generalises to grouping."),
+        _chk("Why are there 2n − 1 centres for palindromes, not n?",
+             "Odd-length palindromes centre on a letter; even-length ones centre on the gap "
+             "between two letters. n letters plus n − 1 gaps."),
+        _chk("What does the KMP prefix function store, and why does it make the search linear?",
+             "pi[i] is the longest proper prefix of t[0..i] that is also its suffix. On a "
+             "mismatch the search falls back to that border instead of restarting, so the text "
+             "pointer never moves back and k falls at most as often as it rose."),
     ],
     interview="""
 String questions are rarely about strings — they are array questions wearing a
@@ -1354,7 +1451,7 @@ competitive-programming ones.
     ],
     next_up="""
 That is the pattern toolkit for linear data. The next stage adds **order** —
-sorting and binary search — and the number-theory and bit tricks that sit
-beside them.
+sorting, binary search, and the greedy rules that sorted data makes provable —
+starting with the recursion that the best sorting ideas are built on.
 """,
 )

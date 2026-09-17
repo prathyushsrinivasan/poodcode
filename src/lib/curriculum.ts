@@ -161,6 +161,8 @@ export interface HydratedStage {
   icon: string;
   tagline: string;
   goal: string;
+  /** See `CurriculumStage.optional`. */
+  optional: boolean;
   units: HydratedUnit[];
   solved: number;
   total: number;
@@ -171,9 +173,14 @@ export interface HydratedCurriculum {
   subtitle: string;
   intro: string;
   stages: HydratedStage[];
+  /** Progress over the core stages only — an optional stage is not part of
+   * "finishing the course", so it must not hold the percentage down. */
   solved: number;
   total: number;
-  /** Where the "Continue" button goes: the first unfinished, ready unit. */
+  /** Every core unit is complete or marked known. */
+  coreComplete: boolean;
+  /** Where the "Continue" button goes: the first unfinished, ready unit —
+   * core units first, optional ones only once the core is done. */
   next: { unit: HydratedUnit; problem: Problem | null } | null;
   /** Slug → unit, for showing which unit teaches a problem in Browse. */
   unitBySlug: Map<string, CurriculumUnit>;
@@ -425,27 +432,35 @@ export function hydrate(
       icon: stage.icon,
       tagline: stage.tagline,
       goal: stage.goal,
+      optional: !!stage.optional,
       units,
       solved: units.reduce((n, u) => n + u.solved, 0),
       total: units.reduce((n, u) => n + u.total, 0),
     };
   });
 
-  const all = stages.flatMap((s) => s.units);
   // Prefer the first unfinished unit you are ready for; if every ready unit is
   // finished, fall back to the first unfinished one so "Continue" never dies.
   // A skipped unit is never the target — the whole point of saying "I know this"
-  // is not to be sent back to it.
-  const unfinished = all.filter((u) => u.status !== "complete" && !u.skipped);
-  const target = unfinished.find((u) => u.ready) ?? unfinished[0] ?? null;
+  // is not to be sent back to it. Core units come first: an optional stage is
+  // offered only once there is no core work left, never as a detour from it.
+  const pick = (units: HydratedUnit[]): HydratedUnit | null => {
+    const unfinished = units.filter((u) => u.status !== "complete" && !u.skipped);
+    return unfinished.find((u) => u.ready) ?? unfinished[0] ?? null;
+  };
+  const core = stages.filter((s) => !s.optional);
+  const coreUnits = core.flatMap((s) => s.units);
+  const coreTarget = pick(coreUnits);
+  const target = coreTarget ?? pick(stages.filter((s) => s.optional).flatMap((s) => s.units));
 
   return {
     title: curriculum?.title ?? "",
     subtitle: curriculum?.subtitle ?? "",
     intro: curriculum?.intro ?? "",
     stages,
-    solved: stages.reduce((n, s) => n + s.solved, 0),
-    total: stages.reduce((n, s) => n + s.total, 0),
+    solved: core.reduce((n, s) => n + s.solved, 0),
+    total: core.reduce((n, s) => n + s.total, 0),
+    coreComplete: coreUnits.length > 0 && coreTarget === null,
     next: target ? { unit: target, problem: target.next } : null,
     unitBySlug,
     unplaced: problems.filter((p) => !placed.has(p.slug)),

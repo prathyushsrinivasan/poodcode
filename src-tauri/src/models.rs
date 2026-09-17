@@ -1520,6 +1520,12 @@ pub struct CurriculumStage {
     pub goal: String,
     #[serde(default)]
     pub ordering: i64,
+    /// Beyond the interview core: the app leaves it out of overall progress and
+    /// never makes it the Continue target while core work remains. Optional
+    /// stages always come after every core stage (asserted by the generator and
+    /// by tests/verify_dsa_curriculum.rs).
+    #[serde(default)]
+    pub optional: bool,
     #[serde(default)]
     pub units: Vec<CurriculumUnit>,
 }
