@@ -14,7 +14,7 @@
 # It is NOT a second problem bank. Every problem it schedules already exists in
 # seeds/problems.json, and every deep-dive it links already exists in
 # seeds/concepts.json. What this file adds is the thing a flat, filterable
-# table of 271 problems cannot give you: an ORDER, and a reason for it.
+# table of 615 problems cannot give you: an ORDER, and a reason for it.
 #
 # The unit of the curriculum is a UNIT: one technique, taught in the five
 # beats that actually move someone from "I have seen this" to "I reach for it
@@ -38,7 +38,7 @@
 # HARD DESIGN RULES, enforced by `_check_curriculum` at generation time:
 #
 #   1. EVERY PROBLEM IS PLACED EXACTLY ONCE. The curriculum and the library are
-#      the same 271 problems; a problem that belongs to no unit is unreachable
+#      the same 615 problems; a problem that belongs to no unit is unreachable
 #      by the teaching path, and a problem in two units makes "what is next?"
 #      ambiguous. Both fail the build.
 #   2. NO DANGLING REFERENCES. Every slug must exist in the problem bank and
@@ -238,6 +238,15 @@ for _name in (
         with open(_p, encoding="utf-8") as _f:
             exec(compile(_f.read(), _p, "exec"))
 
+# Cross-cutting content, authored per concern rather than per stage and attached
+# to units by key: where the batched problems sit on each ladder, the Big-O
+# drills every unit carries, and the worked traces. Required, not optional — the
+# lints below fail the build if a unit loses them.
+for _name in ("dsa_placements.py", "dsa_bigo.py", "dsa_traces.py"):
+    _p = os.path.join(_HERE, _name)
+    with open(_p, encoding="utf-8") as _f:
+        exec(compile(_f.read(), _p, "exec"))
+
 
 DSA_CURRICULUM = {
     "key": "dsa",
@@ -307,6 +316,9 @@ _ONRAMP_MIN_UNIT = 4
 # a thin unit or inflate an overweight one.
 _WEIGHT_BANDS = {3: (8, 14), 2: (5, 9), 1: (3, 6)}
 
+# The fewest Big-O drill items a unit may carry.
+_MIN_BIGO = 4
+
 # Units whose optional-depth fields are no longer optional.
 #
 # `internals`, `traces` and `build_it` started as a linear-structures-stage
@@ -317,17 +329,17 @@ _WEIGHT_BANDS = {3: (8, 14), 2: (5, 9), 1: (3, 6)}
 # Dijkstra's queue, a DP table, a backtracking stack and a DSU forest — none of
 # which are in that stage.
 #
-# Listed explicitly rather than derived, because "which units need a trace" is a
-# pedagogical judgement, and a rule that guessed it would either miss units or
-# demand traces of units that do not benefit (`io-and-arithmetic` has no state).
-# The point of the list is that authored depth cannot silently disappear.
+# Listed explicitly rather than derived, because "which units need internals" is
+# a pedagogical judgement. The point of the list is that authored depth cannot
+# silently disappear.
+#
+# Traces are the exception: every unit now has at least one (tools/dsa_traces.py
+# covers the ones the stage files did not), including `io-and-arithmetic`, whose
+# state turned out to be the *type* of each intermediate result. So the rule is
+# simply "every unit", checked where the lint runs.
 _NEEDS_INTERNALS = {
     "hashing", "binary-search", "stacks", "queues-and-deques", "linked-lists",
     "heaps", "design", "trees", "tries",
-}
-_NEEDS_TRACES = {
-    "binary-search", "stacks", "queues-and-deques", "linked-lists", "heaps",
-    "design", "backtracking", "union-find", "shortest-paths", "dp-1d", "dp-2d",
 }
 _NEEDS_BUILD_IT = {
     "stacks", "queues-and-deques", "linked-lists", "heaps", "design",
@@ -408,7 +420,12 @@ def _check_curriculum(cur, concepts, problems):
                 assert lk in concepts, f"{key}: unknown concept key {lk!r}"
                 linked_concepts.add(lk)
 
-            # Big-O drill items, where a unit carries them.
+            # Big-O drill items. Every unit prices its own snippets (see
+            # tools/dsa_bigo.py for why this is not just the complexity unit).
+            assert len(u["bigo"]) >= _MIN_BIGO, (
+                f"{key}: {len(u['bigo'])} Big-O item(s), fewer than {_MIN_BIGO} — every "
+                f"unit's Review tab prices the traps specific to its technique"
+            )
             for i, b in enumerate(u["bigo"]):
                 assert b["code"].strip(), f"{key}: Big-O item {i} has no snippet"
                 assert len(b["options"]) >= 3, \
@@ -427,11 +444,10 @@ def _check_curriculum(cur, concepts, problems):
             if key in _NEEDS_INTERNALS:
                 assert u["internals"].strip(), \
                     f"{key}: no internals — what layout are its costs a consequence of?"
-            if key in _NEEDS_TRACES:
-                assert u["traces"], (
-                    f"{key}: no worked trace. This unit is state changing over time, "
-                    f"which is the one thing prose cannot show and a table can."
-                )
+            assert u["traces"], (
+                f"{key}: no worked trace. Every unit is state changing over time, "
+                f"which is the one thing prose cannot show and a table can."
+            )
             if key in _NEEDS_BUILD_IT:
                 assert u["build_it"].strip(), \
                     f"{key}: no build-it-yourself exercise"

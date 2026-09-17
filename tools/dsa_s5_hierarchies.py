@@ -216,12 +216,16 @@ will memoise" is the sentence that turns a rejected answer into an accepted one.
 """,
     rungs=[
         _rung("Core", "A recurrence you can write in one line.",
-              ["nth-fibonacci", "unique-paths-count"],
+              ["nth-fibonacci", "binomial-coefficient", "unique-paths-count"],
               {"nth-fibonacci": "Write it naively, note it is O(2ⁿ), then memoise. That one edit is the whole DP stage in miniature.",
+               "binomial-coefficient": "Pascal's rule, word for word. Count the calls for C(20, 10), then ask what C(60, 30) would cost.",
                "unique-paths-count": "`paths(i,j) = paths(i-1,j) + paths(i,j-1)`. Same shape, two dimensions."}),
         _rung("Variations", "Recursion that halves rather than decrements.",
               ["fast-power"],
               {"fast-power": "Store the half-power. Calling twice is the bug that makes it O(e)."}),
+        _rung("Two calls", "Recursion that branches, where the exponential cost is the answer's own size.",
+              ["tower-of-hanoi"],
+              {"tower-of-hanoi": "Trust the smaller call. Then compare with `nth-fibonacci`: both make two calls, and only one of them can be fixed by a memo."}),
     ],
     next_up="""
 The most common recursive structure in interviews has exactly two smaller

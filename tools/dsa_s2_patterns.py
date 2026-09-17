@@ -308,10 +308,14 @@ bounded" — is what separates a pass from a strong pass.
 """,
     rungs=[
         _rung("Core", "Feel the difference between a quadratic and a linear solution on the same problem.",
-              ["second-largest", "count-above-average", "count-equal-pairs"],
+              ["second-largest", "count-above-average", "count-equal-pairs", "sum-of-pair-products"],
               {"second-largest": "Solvable by sorting (O(n log n)) or by two accumulators (O(n)). Write both and compare.",
                "count-above-average": "The two-pass solution people try to avoid. It is still O(n) — that is the lesson.",
-               "count-equal-pairs": "Every pair is O(n²); counting occurrences first makes it O(n). The gap here is the whole unit in one problem."}),
+               "count-equal-pairs": "Every pair is O(n²); counting occurrences first makes it O(n). The gap here is the whole unit in one problem.",
+               "sum-of-pair-products": "The nested loops are right and 5·10⁹ steps at the limit. Read the inner loop as a sum you could carry instead."}),
+        _rung("Stretch", "Pay O(n log n) once to turn an O(n²) question into a linear pass.",
+              ["sum-abs-differences"],
+              {"sum-abs-differences": "The answer does not depend on the order of the array — so pick the order that deletes the absolute value."}),
     ],
     next_up="""
 `count-equal-pairs` became linear by *counting what it had seen*. Generalise

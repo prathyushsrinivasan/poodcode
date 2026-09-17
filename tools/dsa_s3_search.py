@@ -196,8 +196,9 @@ are listening for.
 """,
     rungs=[
         _rung("Warm up", "Order by something other than the value itself.",
-              ["sort-by-frequency"],
-              {"sort-by-frequency": "Count first, then sort the keys by their count with a tie-break. The comparator is the whole exercise."}),
+              ["leaderboard-ranks", "sort-by-frequency"],
+              {"leaderboard-ranks": "Two keys, one descending, and ranks that are shared on ties and then skip. Write the comparator with `Integer.compare`.",
+               "sort-by-frequency": "Count first, then sort the keys by their count with a tie-break. The comparator is the whole exercise."}),
         _rung("Core", "Selection problems, where sorting is the baseline and not the best answer.",
               ["kth-largest-element", "kth-smallest", "top-k-frequent"],
               {"kth-largest-element": "Solve by sorting first, then come back after the heaps unit and do it in O(n log k).",

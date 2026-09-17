@@ -344,14 +344,16 @@ fn every_trace_is_a_well_formed_table() {
 /// Listed rather than derived, because which units benefit is a pedagogical
 /// judgement; the point of the list is that authored depth cannot silently
 /// disappear. Mirrors `_NEEDS_*` in tools/dsa_curriculum.py.
+///
+/// Traces and Big-O drills are not listed: every unit carries both
+/// (tools/dsa_traces.py and tools/dsa_bigo.py), so the rule is "all of them".
 const NEEDS_INTERNALS: &[&str] = &[
     "hashing", "binary-search", "stacks", "queues-and-deques", "linked-lists", "heaps",
     "design", "trees", "tries",
 ];
-const NEEDS_TRACES: &[&str] = &[
-    "binary-search", "stacks", "queues-and-deques", "linked-lists", "heaps", "design",
-    "backtracking", "union-find", "shortest-paths", "dp-1d", "dp-2d",
-];
+
+/// Mirrors `_MIN_BIGO` in tools/dsa_curriculum.py.
+const MIN_BIGO: usize = 4;
 const NEEDS_BUILD_IT: &[&str] = &[
     "stacks", "queues-and-deques", "linked-lists", "heaps", "design", "union-find",
     "tries", "dp-1d",
@@ -371,7 +373,7 @@ fn units_that_need_depth_carry_it() {
 
     // A name in one of the lists that is not a unit is a typo that would
     // otherwise make the assertion silently vacuous.
-    for k in NEEDS_INTERNALS.iter().chain(NEEDS_TRACES).chain(NEEDS_BUILD_IT) {
+    for k in NEEDS_INTERNALS.iter().chain(NEEDS_BUILD_IT) {
         assert!(by_key.contains_key(k), "depth list names unknown unit {k}");
     }
 
@@ -381,11 +383,16 @@ fn units_that_need_depth_carry_it() {
             "{k}: no internals — what layout are its costs a consequence of?"
         );
     }
-    for k in NEEDS_TRACES {
+    for (k, u) in &by_key {
         assert!(
-            !by_key[k].traces.is_empty(),
-            "{k}: no worked trace. This unit is state changing over time, which is the \
+            !u.traces.is_empty(),
+            "{k}: no worked trace. Every unit is state changing over time, which is the \
              one thing prose cannot show and a table can."
+        );
+        assert!(
+            u.bigo.len() >= MIN_BIGO,
+            "{k}: {} Big-O item(s), fewer than {MIN_BIGO}",
+            u.bigo.len()
         );
     }
     for k in NEEDS_BUILD_IT {

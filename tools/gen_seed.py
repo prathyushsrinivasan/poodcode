@@ -6218,6 +6218,71 @@ if os.path.exists(_depth_path):
 
 
 # ---------------------------------------------------------------------------
+# Fill problems — the last four DSA units under their weight band (complexity,
+# sorting, stacks, recursion), each problem chosen for the idea its unit was
+# missing. Defines FILL_REFS, merged into REFERENCE_SOLUTIONS below.
+# ---------------------------------------------------------------------------
+_fill_path = os.path.join(HERE, "dsa_fill.py")
+if os.path.exists(_fill_path):
+    with open(_fill_path, encoding="utf-8") as _flf:
+        exec(compile(_flf.read(), _fill_path, "exec"))
+
+
+# ---------------------------------------------------------------------------
+# More DSA problems, in batches, authored with tools/dsa_more_kit.py (input
+# shapes shared across problems; expected outputs produced by running the
+# Python reference). Each batch registers its references in EXTRA_REFS, merged
+# into REFERENCE_SOLUTIONS below, and is placed on the ladder by
+# tools/dsa_placements.py.
+#
+# A batch is listed here only once its references pass every case in both
+# languages — an unlisted batch file is work in progress and ships nothing.
+# ---------------------------------------------------------------------------
+EXTRA_REFS = {}
+DSA_MORE_FILES = (
+    "dsa_more_kit.py",
+    "dsa_more_01.py",
+    "dsa_more_02.py",
+    "dsa_more_03.py",
+    "dsa_more_04.py",
+    "dsa_more_05.py",
+    "dsa_more_06.py",
+    "dsa_more_07.py",
+    "dsa_more_08.py",
+    "dsa_more_09.py",
+    "dsa_more_10.py",
+    "dsa_more_11.py",
+    "dsa_more_12.py",
+    "dsa_more_13.py",
+    "dsa_more_14.py",
+    "dsa_more_15.py",
+    "dsa_more_16.py",
+    "dsa_more_17.py",
+    "dsa_more_18.py",
+    "dsa_more_19.py",
+    "dsa_more_20.py",
+    "dsa_more_21.py",
+    "dsa_more_22.py",
+    "dsa_more_23.py",
+    "dsa_more_24.py",
+    "dsa_more_25.py",
+    "dsa_more_26.py",
+    "dsa_more_27.py",
+    "dsa_more_28.py",
+    "dsa_more_29.py",
+    "dsa_more_30.py",
+    "dsa_more_31.py",
+    "dsa_more_32.py",
+    "dsa_more_33.py",
+    "dsa_more_34.py",
+)
+for _more_name in DSA_MORE_FILES:
+    _more_path = os.path.join(HERE, _more_name)
+    with open(_more_path, encoding="utf-8") as _mf:
+        exec(compile(_mf.read(), _more_path, "exec"))
+
+
+# ---------------------------------------------------------------------------
 # Build JSON
 # ---------------------------------------------------------------------------
 
@@ -6531,7 +6596,7 @@ print(
 )
 
 # ---------------------------------------------------------------------------
-# The DSA Curriculum — the Problem Library, taught: the same 271 problems
+# The DSA Curriculum — the Problem Library, taught: the same 615 problems
 # sequenced into stages and units, each with its own why/model/skeletons/
 # signals/pitfalls and an ordered problem ladder (authored in
 # tools/dsa_curriculum.py plus one file per stage). It references problems and
@@ -6655,6 +6720,8 @@ REFERENCE_SOLUTIONS = {
 REFERENCE_SOLUTIONS.update(globals().get("EXPANSION_REFS", {}))
 REFERENCE_SOLUTIONS.update(globals().get("ONRAMP_REFS", {}))
 REFERENCE_SOLUTIONS.update(globals().get("DEPTH_REFS", {}))
+REFERENCE_SOLUTIONS.update(globals().get("FILL_REFS", {}))
+REFERENCE_SOLUTIONS.update(EXTRA_REFS)
 
 REFS_OUT = os.path.join(HERE, "..", "src-tauri", "seeds", "reference_solutions.json")
 with open(REFS_OUT, "w", encoding="utf-8", newline="\n") as f:
