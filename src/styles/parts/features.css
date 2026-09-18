@@ -1,0 +1,309 @@
+.collapsible {
+  margin-bottom: 18px;
+}
+.collapsible-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  padding: 6px 8px 6px 2px;
+  border-radius: 8px;
+  user-select: none;
+}
+.collapsible-head:hover {
+  background: var(--bg-elev-2);
+}
+.collapsible-head:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.collapsible-head .caret {
+  display: inline-block;
+  width: 14px;
+  flex: none;
+  color: var(--text-faint);
+  transition: transform 0.12s ease;
+}
+.collapsible-head .caret.open {
+  transform: rotate(90deg);
+}
+.collapsible-body {
+  padding-top: 8px;
+}
+
+/* ---- Mastery programme ---------------------------------------------- */
+.progress-track {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--bg-elev-2);
+  overflow: hidden;
+  margin-top: 12px;
+}
+.progress-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.25s ease;
+}
+.week-card {
+  margin-bottom: 12px;
+}
+.week-card.locked {
+  opacity: 0.55;
+  border-style: dashed;
+}
+.week-num {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--bg-elev-2);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+
+/* SQL result grids -------------------------------------------------------- */
+/* The SQL track's output is a table, so it gets a table: monospace and compact,
+   scrollable in both directions so a wide join never pushes the page sideways,
+   with a sticky header row that survives vertical scrolling. */
+.sqlgrid-wrap {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: auto;
+  max-height: 340px;
+  background: var(--bg-elev);
+}
+table.sqlgrid {
+  border-collapse: collapse;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  width: max-content;
+  min-width: 100%;
+}
+table.sqlgrid th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  text-align: left;
+  white-space: nowrap;
+  padding: 6px 10px;
+  background: var(--bg-elev-2);
+  border-bottom: 1px solid var(--border);
+  color: var(--accent);
+  font-weight: 600;
+}
+table.sqlgrid td {
+  padding: 4px 10px;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+table.sqlgrid tbody tr:last-child td {
+  border-bottom: none;
+}
+table.sqlgrid tbody tr:nth-child(even) {
+  background: color-mix(in srgb, var(--bg-elev-2) 45%, transparent);
+}
+/* The row that differs from what was expected. */
+table.sqlgrid tbody tr.diff td {
+  background: color-mix(in srgb, var(--bad) 16%, transparent);
+}
+/* NULL and the empty string look identical in a plain grid and behave nothing
+   alike, so the track renders them differently on purpose. */
+.sql-null {
+  color: var(--text-faint);
+  font-style: italic;
+}
+.sql-empty {
+  color: var(--text-faint);
+  opacity: 0.7;
+}
+/* Expected-vs-actual, side by side on a wide screen and stacked on a narrow one. */
+.sql-compare {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 10px;
+}
+
+/* ---- Loading skeletons ----------------------------------------------- */
+/* A 480 KB seed parse is long enough that a bare "Loading…" at 20vh reads as a
+   broken page. A skeleton of the shape that is coming costs nothing and answers
+   the only question the user has: is anything happening? */
+.skel {
+  background: linear-gradient(
+    90deg,
+    var(--bg-elev-2) 25%,
+    var(--border) 37%,
+    var(--bg-elev-2) 63%
+  );
+  background-size: 400% 100%;
+  animation: skel-shimmer 1.4s ease-in-out infinite;
+  border-radius: 4px;
+}
+@keyframes skel-shimmer {
+  0% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0 50%;
+  }
+}
+/* Respect a stated preference for less motion: the shimmer is decoration, and
+   the grey block already says "loading". */
+@media (prefers-reduced-motion: reduce) {
+  .skel {
+    animation: none;
+  }
+}
+
+/* Japanese vocabulary (Learn → 日本語, first section) ---------------------- */
+.jpv-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 10px;
+}
+.jpv-tile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 2px;
+  height: 100%;
+  padding: 10px 12px;
+  text-align: left;
+  white-space: normal;
+}
+/* Where a word sits in its review schedule, so the menu doubles as a progress
+   view: hollow = never studied, amber = due now, green = scheduled ahead. */
+.jpv-dot {
+  position: absolute;
+  top: 9px;
+  right: 9px;
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+.jpv-dot-new {
+  border: 1px solid var(--text-dim);
+}
+.jpv-dot-due {
+  background: var(--medium);
+}
+.jpv-dot-learning {
+  background: var(--good);
+}
+.jpv-tile-term {
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--text);
+}
+.jpv-tile-reading {
+  font-size: 12px;
+  color: var(--accent);
+}
+.jpv-tile-meaning {
+  flex: 1;
+  margin-bottom: 6px;
+  font-size: 12px;
+  color: var(--text-dim);
+}
+.jpv-count {
+  margin-left: 2px;
+  font-size: 11px;
+  opacity: 0.7;
+}
+.jpv-tag-java {
+  border-color: var(--medium);
+  color: var(--medium);
+}
+.jpv-tag-problems {
+  border-color: var(--good);
+  color: var(--good);
+}
+.jpv-tag-typescript {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.jpv-tag-sql {
+  border-color: var(--hard);
+  color: var(--hard);
+}
+.jpv-tag-web {
+  border-color: var(--intro);
+  color: var(--intro);
+}
+.jpv-tag-workplace {
+  border-color: var(--text-dim);
+  color: var(--text-dim);
+}
+.jpv-card {
+  width: 580px;
+}
+.jpv-face {
+  padding: 22px 8px 6px;
+  text-align: center;
+  cursor: pointer;
+  user-select: none;
+}
+.jpv-term {
+  font-size: 52px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+.jpv-reading {
+  margin-top: 8px;
+  font-size: 18px;
+  color: var(--accent);
+}
+.jpv-meaning {
+  margin-top: 4px;
+  font-size: 17px;
+}
+.jpv-details {
+  margin-top: 14px;
+  padding-top: 2px;
+  border-top: 1px solid var(--border);
+}
+.jpv-block {
+  margin-top: 12px;
+}
+.jpv-block p {
+  margin: 2px 0 0;
+  line-height: 1.7;
+}
+.jpv-example-ja {
+  font-size: 16px;
+}
+/* Furigana. `ruby-position` keeps the readings above the line in every engine,
+   and hiding <rt> collapses them without reflowing the sentence. */
+.jpv-example-ja ruby {
+  ruby-position: over;
+}
+.jpv-example-ja rt {
+  font-size: 0.55em;
+  color: var(--accent);
+  user-select: none;
+}
+.jpv-example-ja.jpv-ruby-off rt {
+  display: none;
+}
+.jpv-example-ja mark {
+  padding: 0 2px;
+  border-radius: 3px;
+  background: var(--accent-dim);
+  color: var(--text);
+}
+.jpv-example-en {
+  font-size: 13px;
+  font-style: italic;
+}
+
+/* ---- DSA curriculum (/library and /library/unit/:key) ------------------ */

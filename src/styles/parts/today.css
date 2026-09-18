@@ -1,0 +1,261 @@
+/* ======================================================================
+   Today
+   ====================================================================== */
+
+.today-page {
+  max-width: var(--page-max);
+}
+.today-h2 {
+  font-size: var(--text-lg);
+  margin: 0 0 var(--space-3);
+}
+.today-section {
+  margin-top: var(--space-6);
+}
+.today-stats {
+  margin-bottom: var(--space-5);
+}
+
+/* ---- Stat tiles with a seven-day shape ---- */
+.stat-tile-top {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+.stat-tile-top > div:first-child {
+  flex: 1;
+  min-width: 0;
+}
+.spark {
+  flex: none;
+  width: 72px;
+  height: 22px;
+  color: var(--accent);
+  opacity: 0.85;
+}
+.stat-trend {
+  margin-top: var(--space-2);
+  font-size: var(--text-xs);
+  color: var(--text-dim);
+}
+.stat-trend.up {
+  color: var(--good);
+}
+.stat-trend.down {
+  color: var(--text-dim);
+}
+
+/* ---- Due now ---- */
+.today-due {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.today-due-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: inherit;
+  text-decoration: none;
+  transition: border-color var(--dur-1) var(--ease-out),
+    background var(--dur-1) var(--ease-out);
+}
+.today-due-row:hover {
+  text-decoration: none;
+  border-color: var(--accent);
+  background: var(--bg-elev-2);
+}
+.today-due-count {
+  flex: none;
+  min-width: 38px;
+  height: 38px;
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-sm);
+  background: var(--accent-dim);
+  color: var(--accent);
+  display: grid;
+  place-items: center;
+  font-weight: var(--weight-bold);
+  font-variant-numeric: tabular-nums;
+}
+.today-due-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.today-due-label {
+  font-weight: var(--weight-medium);
+}
+.today-due-hint {
+  font-size: var(--text-xs);
+  color: var(--text-dim);
+}
+.today-due-go {
+  flex: none;
+  color: var(--text-faint);
+}
+
+/* ---- Continue cards ---- */
+.today-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: var(--space-3);
+}
+.today-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.today-card-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.today-card-icon {
+  font-size: var(--text-lg);
+  line-height: 1;
+}
+.today-card-track {
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-dim);
+}
+.today-card-position {
+  font-size: var(--text-lg);
+  font-weight: var(--weight-bold);
+  line-height: var(--leading-tight);
+}
+.today-card-progress {
+  margin: 0;
+}
+.today-card-detail {
+  font-size: var(--text-xs);
+  color: var(--text-dim);
+}
+.today-card-action {
+  margin-top: auto;
+  align-self: flex-start;
+  padding: 6px var(--space-3);
+  border-radius: var(--radius-sm);
+  background: var(--accent);
+  color: var(--on-accent);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+}
+.today-card-action:hover {
+  text-decoration: none;
+  filter: brightness(1.08);
+}
+
+/* ---- Lower grid ---- */
+.today-lower {
+  margin-top: var(--space-6);
+  align-items: start;
+}
+.today-suggest {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.today-suggest .card {
+  margin: 0;
+}
+.today-suggest-title {
+  margin-top: var(--space-2);
+  gap: var(--space-2);
+}
+.today-suggest-title strong {
+  font-size: var(--text-lg);
+}
+.today-suggest-go {
+  margin-top: var(--space-3);
+}
+.today-weak {
+  display: inline-block;
+  margin-top: var(--space-1);
+  font-size: var(--text-xl);
+  font-weight: var(--weight-bold);
+}
+.today-weak-note {
+  font-size: var(--text-xs);
+}
+.goal-row {
+  margin-bottom: var(--space-3);
+}
+.goal-row .row {
+  margin-bottom: 5px;
+}
+.today-goal-foot {
+  font-size: var(--text-xs);
+  margin-top: var(--space-2);
+}
+.today-heat-note {
+  font-size: var(--text-xs);
+  margin-top: var(--space-3);
+}
+.card-title {
+  margin-top: 0;
+  font-size: var(--text-lg);
+}
+.card-intro {
+  font-size: var(--text-xs);
+  margin-top: 0;
+}
+.rec-row {
+  margin-bottom: var(--space-4);
+}
+.rec-tags {
+  margin-top: 6px;
+}
+.rec-tags-label {
+  font-size: var(--text-xs);
+}
+/* Recommendation chips were `span`s with onClick — unreachable by keyboard.
+   They are links now, so they need the badge look without the link colour. */
+.chip-link {
+  color: inherit;
+  cursor: pointer;
+}
+.chip-link:hover {
+  text-decoration: none;
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* ---- Shared states ---- */
+.error-state {
+  border-color: var(--bad);
+}
+.error-state-detail {
+  font-size: var(--text-xs);
+  margin: var(--space-2) 0 var(--space-3);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.empty-state {
+  text-align: center;
+  padding: var(--space-5);
+}
+
+/* Visually hidden, still announced. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

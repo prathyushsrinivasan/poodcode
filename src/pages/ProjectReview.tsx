@@ -18,6 +18,8 @@ import {
   type ReviewHistory,
   type ReviewQuestion,
 } from "../lib/projectReview";
+import { ConfirmDialog } from "../components/ui/Modal";
+import { useToast } from "../components/Toast";
 import { plural } from "../lib/trackProgress";
 
 const historyKey = (projectKey: string) => `poodcode:project-review:${projectKey}`;
@@ -66,6 +68,8 @@ export default function ProjectReview({
   const [scope, setScope] = useState<string>(finishedCount > 0 ? "done" : "all");
   const [size, setSize] = useState<number>(10);
   const [stage, setStage] = useState<Stage>({ kind: "setup" });
+  const [confirmForget, setConfirmForget] = useState(false);
+  const toast = useToast();
 
   const pool = useMemo(
     () =>
@@ -102,10 +106,22 @@ export default function ProjectReview({
     else setStage({ kind: "done", questions: stage.questions, picked: stage.picked, round: stage.round });
   }
 
+  /** Undo-able: the answers are handed back to the toast so a misfire costs
+   * one click rather than the whole history. */
   function forget() {
-    if (!window.confirm("Forget which questions you have got right and wrong in this project's review?")) return;
+    const previous = history;
     setHistory({});
     writeHistory(project.key, {});
+    setConfirmForget(false);
+    toast("Review answers forgotten.", {
+      action: {
+        label: "Undo",
+        onClick: () => {
+          setHistory(previous);
+          writeHistory(project.key, previous);
+        },
+      },
+    });
   }
 
   const openStep = (q: ReviewQuestion) =>
@@ -315,12 +331,27 @@ export default function ProjectReview({
           </button>
           <span className="spacer" />
           {Object.keys(history).length > 0 && (
-            <button className="ghost" style={{ fontSize: 12 }} onClick={forget}>
+            <button className="ghost" style={{ fontSize: 12 }} onClick={() => setConfirmForget(true)}>
               Forget my answers
             </button>
           )}
         </div>
       </div>
+
+      <ConfirmDialog
+        open={confirmForget}
+        onClose={() => setConfirmForget(false)}
+        onConfirm={forget}
+        title="Forget your review answers?"
+        consequence={
+          <>
+            This clears which of {project.title}'s {all.length} questions you have
+            got right and wrong, so the next round stops asking your weak ones
+            first. Your module progress is not affected.
+          </>
+        }
+        confirmLabel="Forget answers"
+      />
     </div>
   );
 }

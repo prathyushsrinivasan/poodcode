@@ -41,6 +41,19 @@ pub fn languages() -> Vec<LangInfo> {
         .collect()
 }
 
+/// Forget every cached tool probe, so the next `languages()` call re-runs them.
+///
+/// Toolchain availability is cached for the life of the process (see
+/// `tool_available`), which is the right trade for judging — it would otherwise
+/// spawn `java -version` on every submit. It does mean that installing a
+/// compiler while the app is open had no effect until a restart, which is what
+/// the Settings "re-detect" link now calls this to fix.
+pub fn forget_tool_cache() {
+    if let Ok(mut cache) = availability_cache().lock() {
+        cache.clear();
+    }
+}
+
 struct LangSpec {
     id: &'static str,
     label: &'static str,

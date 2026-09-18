@@ -1,0 +1,161 @@
+/* ========================================================================
+   Design tokens
+   ========================================================================
+
+   Every value the UI is allowed to choose from lives here. Before this block
+   existed there were colour variables, one radius, and about 1,500 inline
+   style objects each picking their own 10, 12, 14 or 16 — which is why nothing
+   lined up. The rule now: a component reaches for a token, never a number.
+
+   Contrast is enforced, not hoped for: `node tools/contrast.mjs` checks every
+   foreground/background pair the UI actually renders against WCAG AA and fails
+   CI if one slips. The colours below are the values that check produced, which
+   is why several are not round numbers.
+   ======================================================================== */
+
+:root {
+  /* ---- Spacing: a 4px grid. `--space-3` (12px) is the default gutter. ---- */
+  --space-0: 0;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+
+  /* ---- Type: 12/13/14/16/20/28, per UI_ROADMAP C7. ----
+     `--text-xs` is for dense chrome only (badges, table meta). Anything
+     carrying information starts at `--text-sm`. */
+  --text-xs: 12px;
+  --text-sm: 13px;
+  --text-md: 14px;
+  --text-lg: 16px;
+  --text-xl: 20px;
+  --text-2xl: 28px;
+
+  --leading-tight: 1.25;
+  --leading-normal: 1.5;
+  --leading-loose: 1.7;
+
+  --weight-normal: 400;
+  --weight-medium: 500;
+  --weight-bold: 700;
+
+  /* ---- Radius ---- */
+  --radius-sm: 6px;
+  --radius: 10px;
+  --radius-lg: 14px;
+  --radius-pill: 999px;
+
+  /* ---- Layout ---- */
+  --sidebar-w: 220px;
+  --sidebar-w-collapsed: 56px;
+  --topbar-h: 44px;
+  --page-max: 1100px;
+
+  /* ---- Elevation: 1 rests on the page, 3 floats above everything. ---- */
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.16);
+  --shadow-2: 0 4px 12px rgba(0, 0, 0, 0.22);
+  --shadow-3: 0 12px 32px rgba(0, 0, 0, 0.34);
+
+  /* ---- Stacking. Anything that overlaps names its layer here. ---- */
+  --z-base: 0;
+  --z-sticky: 10;
+  --z-topbar: 20;
+  --z-dropdown: 30;
+  --z-overlay: 40;
+  --z-modal: 50;
+  --z-toast: 60;
+
+  /* ---- Motion. Every transition uses one of these; all of it is disabled
+         under `prefers-reduced-motion` further down. ---- */
+  --dur-1: 90ms;
+  --dur-2: 160ms;
+  --dur-3: 260ms;
+  --ease-out: cubic-bezier(0.22, 0.75, 0.35, 1);
+  --ease-in-out: cubic-bezier(0.5, 0, 0.3, 1);
+
+  /* ---- Fonts ----
+     Only families that are actually present are named: nothing is bundled and
+     the CSP blocks font CDNs, so listing "Inter" first just meant Windows
+     silently rendered Segoe UI while the stylesheet claimed otherwise
+     (UI_ROADMAP C5). These are the real stacks. */
+  --font-sans: system-ui, -apple-system, "Segoe UI Variable Text", "Segoe UI",
+    Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "Cascadia Code", "Cascadia Mono", ui-monospace, "SF Mono",
+    Menlo, Consolas, "Liberation Mono", monospace;
+}
+
+:root[data-theme="dark"] {
+  --bg: #0e1116;
+  --bg-elev: #161b22;
+  --bg-elev-2: #1c232d;
+  --border: #2a323d;
+  --border-strong: #3d4854;
+  --text: #e6edf3;
+  --text-dim: #9aa7b4;
+  /* Was #6b7684 — 3.75:1 on a card, which failed AA at the 11-12px sizes it
+     was used at. */
+  --text-faint: #7b8694;
+  --accent: #4c8dff;
+  --accent-dim: #21385f;
+  --shadow: 0 8px 30px rgba(0, 0, 0, 0.45);
+  --good: #2bb673;
+  --bad: #e15b64;
+  /* Neither pass nor fail: something that compiles but is dishonest, such as an
+     `any` a "retype the any" exercise asks you to replace. */
+  --warn: #d99a2b;
+
+  /* Labels on a filled button. White on these fills reaches only 2.4-3.6:1;
+     the fills are bright in this theme, so the label goes dark instead and
+     lands at 5.3-7.8:1. */
+  --on-accent: #0e1116;
+  --on-good: #0e1116;
+  --on-bad: #0e1116;
+  --on-warn: #0e1116;
+
+  --focus-ring: #7aa8ff;
+
+  /* Difficulty. These used to be defined once for both themes, which left
+     "Medium" at 2.19:1 in light. Each theme now carries its own. */
+  --intro: #6b9bff;
+  --easy: #2bb673;
+  --medium: #e6a23c;
+  --hard: #e15b64;
+}
+
+:root[data-theme="light"] {
+  --bg: #f6f8fa;
+  --bg-elev: #ffffff;
+  --bg-elev-2: #f0f3f6;
+  --border: #d7dee6;
+  --border-strong: #b4c0cd;
+  --text: #1b2430;
+  --text-dim: #57636f;
+  /* Was #8a94a0 — 2.89:1 on the page. */
+  --text-faint: #687380;
+  /* Was #2f6fed — 4.27:1 on the page background. */
+  --accent: #286aec;
+  --accent-dim: #d9e5ff;
+  --shadow: 0 8px 24px rgba(20, 30, 50, 0.12);
+  /* Was #1f9d57 — 3.49:1 as text on a card, and the same as a white-label fill. */
+  --good: #1b864a;
+  --bad: #d23f49;
+  /* Was #b8770f — 3.69:1 on a card. */
+  --warn: #a2690d;
+
+  /* These fills are dark enough to carry a white label at AA. */
+  --on-accent: #ffffff;
+  --on-good: #ffffff;
+  --on-bad: #ffffff;
+  --on-warn: #ffffff;
+
+  --focus-ring: #1a5fd6;
+
+  --intro: #216aff;
+  --easy: #208554;
+  --medium: #a26915;
+  --hard: #da353f;
+}

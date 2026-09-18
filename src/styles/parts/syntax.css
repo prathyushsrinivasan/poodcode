@@ -1,0 +1,108 @@
+/* ======================================================================
+   Syntax highlighting in lessons
+   ======================================================================
+   Keyed to the same colours Monaco uses, so a snippet in a lesson and the same
+   code in the editor read as one thing. Both themes are defined; the tokens
+   below are the only place highlight.js class names appear. */
+
+:root[data-theme="dark"] {
+  --hl-keyword: #c586c0;
+  --hl-string: #ce9178;
+  --hl-number: #b5cea8;
+  --hl-comment: #6a9955;
+  --hl-function: #dcdcaa;
+  --hl-type: #4ec9b0;
+  --hl-variable: #9cdcfe;
+  --hl-attr: #9cdcfe;
+  --hl-literal: #569cd6;
+}
+
+:root[data-theme="light"] {
+  --hl-keyword: #a2158a;
+  --hl-string: #9d3b15;
+  --hl-number: #0b6a33;
+  --hl-comment: #4f7a43;
+  --hl-function: #6a5300;
+  --hl-type: #00696b;
+  --hl-variable: #0b4f9e;
+  --hl-attr: #0b4f9e;
+  --hl-literal: #0d4fa8;
+}
+
+.md-pre {
+  position: relative;
+}
+.md-copy {
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-2);
+  z-index: var(--z-base);
+  padding: 2px var(--space-2);
+  font-size: var(--text-xs);
+  color: var(--text-dim);
+  background: var(--bg-elev);
+  opacity: 0;
+  transition: opacity var(--dur-1) var(--ease-out);
+}
+.md-pre:hover .md-copy,
+.md-copy:focus-visible {
+  opacity: 1;
+}
+
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-built_in.hljs-keyword {
+  color: var(--hl-keyword);
+}
+.hljs-string,
+.hljs-meta .hljs-string,
+.hljs-regexp {
+  color: var(--hl-string);
+}
+.hljs-number,
+.hljs-symbol {
+  color: var(--hl-number);
+}
+.hljs-comment,
+.hljs-quote {
+  color: var(--hl-comment);
+  font-style: italic;
+}
+.hljs-title,
+.hljs-title.function_,
+.hljs-section {
+  color: var(--hl-function);
+}
+.hljs-type,
+.hljs-title.class_,
+.hljs-built_in {
+  color: var(--hl-type);
+}
+.hljs-variable,
+.hljs-params,
+.hljs-property {
+  color: var(--hl-variable);
+}
+.hljs-attr,
+.hljs-attribute,
+.hljs-name {
+  color: var(--hl-attr);
+}
+.hljs-literal,
+.hljs-meta {
+  color: var(--hl-literal);
+}
+.hljs-emphasis {
+  font-style: italic;
+}
+.hljs-strong {
+  font-weight: var(--weight-bold);
+}
+/* Anything the grammar did not classify stays the ordinary code colour rather
+   than inheriting a token colour by accident. */
+.hljs-deletion {
+  color: var(--bad);
+}
+.hljs-addition {
+  color: var(--good);
+}

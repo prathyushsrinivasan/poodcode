@@ -1,0 +1,123 @@
+/* ======================================================================
+   Appearance variants
+   ======================================================================
+   Theme choice, high contrast, and interface density/scale. These override the
+   tokens, so this file must be imported after tokens.css but before anything
+   that reads them — see the index in ../global.css.
+
+   The app offered dark and light and nothing else: no "follow system", no
+   high-contrast mode, and the interface could not be scaled (UI_ROADMAP
+   C8/C11). "system" is resolved in the store and reaches the DOM as an ordinary
+   data-theme, so nothing below has to know about it.
+   ====================================================================== */
+
+/* ---- High contrast ----------------------------------------------------
+   Not a different palette — the same one, pushed to the edges. Text goes to
+   pure black or white, borders become visible rather than suggestive, and the
+   dimmed text tiers collapse toward the body colour, because "de-emphasised"
+   and "hard to read" are the same thing for anyone who needs this mode. */
+
+:root[data-theme="dark"][data-contrast="high"] {
+  --bg: #000000;
+  --bg-elev: #0d1117;
+  --bg-elev-2: #161b22;
+  --text: #ffffff;
+  --text-dim: #d5dde5;
+  --text-faint: #b6c1cc;
+  --border: #5a6673;
+  --border-strong: #8b97a4;
+  --accent: #7fb4ff;
+  --good: #4ad98d;
+  --bad: #ff8a8a;
+  --warn: #ffc247;
+  --on-accent: #000000;
+  --on-good: #000000;
+  --on-bad: #000000;
+  --on-warn: #000000;
+  --focus-ring: #ffd400;
+  --intro: #8fb6ff;
+  --easy: #4ad98d;
+  --medium: #ffc247;
+  --hard: #ff8a8a;
+}
+
+:root[data-theme="light"][data-contrast="high"] {
+  --bg: #ffffff;
+  --bg-elev: #ffffff;
+  --bg-elev-2: #eef1f5;
+  --text: #000000;
+  --text-dim: #23303d;
+  --text-faint: #3b4856;
+  --border: #6a7683;
+  --border-strong: #3d4854;
+  --accent: #0b46b8;
+  --good: #0f6634;
+  --bad: #a3121c;
+  --warn: #71470a;
+  --on-accent: #ffffff;
+  --on-good: #ffffff;
+  --on-bad: #ffffff;
+  --on-warn: #ffffff;
+  --focus-ring: #0b46b8;
+  --intro: #0b46b8;
+  --easy: #0f6634;
+  --medium: #71470a;
+  --hard: #a3121c;
+}
+
+/* A card needs an edge when its background matches the page. */
+:root[data-contrast="high"] .card,
+:root[data-contrast="high"] .today-card,
+:root[data-contrast="high"] .today-due-row {
+  border-color: var(--border-strong);
+}
+:root[data-contrast="high"] .focus-ring,
+:root[data-contrast="high"] :where(a, button, input, textarea, select, summary, [tabindex]):focus-visible {
+  outline-width: 3px;
+}
+
+/* ---- Density ----------------------------------------------------------
+   Compact trims the vertical padding of the repeating things — rows, cards,
+   list items — and leaves type size alone, which is what makes it useful
+   rather than just smaller. */
+
+:root[data-density="compact"] {
+  --space-3: 9px;
+  --space-4: 12px;
+  --space-5: 18px;
+  --space-6: 24px;
+}
+:root[data-density="compact"] .card {
+  padding: var(--space-3);
+}
+:root[data-density="compact"] table.data td,
+:root[data-density="compact"] table.data th {
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+:root[data-density="compact"] .nav-item {
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+:root[data-density="compact"] .today-card {
+  gap: var(--space-1);
+}
+:root[data-density="compact"] .result-head {
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+/* ---- Reduced motion ---------------------------------------------------
+   The skeleton shimmer already respected this; now everything does. A user who
+   has asked the OS to stop animations should not have panels sliding, toasts
+   flying in, or a pulsing verdict dot. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -11,7 +11,8 @@ function gridLine(theme: "dark" | "light") {
 }
 
 export function Chart({ option, height = 260 }: { option: any; height?: number }) {
-  const theme = useStore((s) => s.prefs.theme);
+  // "system" resolves to the theme actually on screen.
+  const theme = useStore((s) => s.resolvedTheme());
   const t = axisText(theme);
   const g = gridLine(theme);
   const base = {

@@ -16,6 +16,13 @@ import {
   markExerciseSolved,
 } from "../lib/learnProgress";
 import { collectExerciseIds, solvedLabel, studyTime } from "../lib/trackProgress";
+import { TrackSkeleton } from "../components/Skeleton";
+import {
+  TrackOverview,
+  UnitPager,
+  type TrackGroup,
+  type TrackSpec,
+} from "../components/track/TrackShell";
 
 // Project completion is tracked in the same SQLite-backed chapter-done set as
 // the Learn tab and the TypeScript course, under a namespaced key so it can
@@ -47,7 +54,7 @@ export default function Backend() {
     setDone(await setChapterDone(done, projectKey(key), value));
   }
 
-  if (!track) return <div className="page">Loading…</div>;
+  if (!track) return <TrackSkeleton cards={4} />;
   if (track.projects.length === 0) {
     return (
       <div className="page">
@@ -84,62 +91,62 @@ export default function Backend() {
   return <Overview track={track} done={done} />;
 }
 
+/**
+ * The Backend Lab overview, on the shared track template.
+ *
+ * Its projects group by level — Starter, Core, Advanced — which is the rail.
+ * Everything else (the hero, the progress arithmetic, the unit rows) is the
+ * same code the courses use (UI_ROADMAP G1).
+ */
 function Overview({ track, done }: { track: BackendTrack; done: Set<string> }) {
-  const nav = useNavigate();
   const sec = useCollapse("backend-overview", false);
 
-  const authored = track.projects.filter((p) => p.authored);
-  const doneCount = authored.filter((p) => done.has(projectKey(p.key))).length;
-  const nextProject = authored.find((p) => !done.has(projectKey(p.key))) ?? authored[0];
-  const pct = authored.length ? Math.round((doneCount / authored.length) * 100) : 0;
-  const totalMinutes = authored.reduce((n, p) => n + p.est_minutes, 0);
+  const spec = useMemo<TrackSpec>(() => {
+    // Levels, in the order they first appear, so the rail follows the ladder
+    // rather than an alphabetical accident.
+    const groups: TrackGroup[] = [];
+    const seen = new Set<string>();
+    for (const p of track.projects) {
+      const level = p.level || "Projects";
+      if (seen.has(level)) continue;
+      seen.add(level);
+      groups.push({ key: level, title: level });
+    }
 
-  return (
-    <div className="page">
-      <h1 className="page-title">{track.title}</h1>
-      <p className="page-sub">{track.subtitle}</p>
-
-      <div className="card" style={{ marginBottom: 18 }}>
-        <div className="row" style={{ alignItems: "center", gap: 12 }}>
-          <div style={{ flex: 1 }}>
-            <div className="row" style={{ marginBottom: 6 }}>
-              <strong>Your progress</strong>
-              <span className="spacer" />
-              <span className="dim mono">
-                {doneCount}/{authored.length} projects
+    return {
+      title: track.title,
+      subtitle: track.subtitle,
+      base: "/backend",
+      unitLabel: "Project",
+      groupLabel: "Level",
+      intro: track.intro,
+      groups,
+      units: track.projects.map((p) => ({
+        slug: p.key,
+        number: p.number,
+        title: p.title,
+        tagline: p.goal || p.tagline,
+        group: p.level || "Projects",
+        done: done.has(projectKey(p.key)),
+        authored: p.authored,
+        estMinutes: p.est_minutes,
+        badges: (
+          <>
+            {(p.steps?.length ?? 0) > 0 && (
+              <span className="badge">{p.steps.length} steps</span>
+            )}
+            {requiredExerciseIds(p).length > 0 && (
+              <span className="badge">{requiredExerciseIds(p).length} exercises</span>
+            )}
+            {p.concepts.slice(0, 3).map((c) => (
+              <span key={c} className="badge tag">
+                {c}
               </span>
-            </div>
-            <div className="progress">
-              <span
-                style={{
-                  width: `${pct}%`,
-                  background: pct === 100 ? "var(--good)" : "var(--accent)",
-                }}
-              />
-            </div>
-          </div>
-          {nextProject && (
-            <button className="primary" onClick={() => nav(`/backend/${nextProject.key}`)}>
-              {doneCount === 0
-                ? "Start Project 1 →"
-                : `Resume · Project ${nextProject.number} →`}
-            </button>
-          )}
-        </div>
-        <p className="faint" style={{ fontSize: 12, margin: "10px 0 0" }}>
-          {studyTime(totalMinutes)} of building in total. A project completes once you've read it
-          through and solved its exercises — but the real deliverable is the server running on
-          your own machine.
-        </p>
-      </div>
-
-      {track.intro && (
-        <div className="card" style={{ marginBottom: 14 }}>
-          <Markdown>{track.intro}</Markdown>
-        </div>
-      )}
-
-      {track.harness_note && (
+            ))}
+          </>
+        ),
+      })),
+      children: track.harness_note ? (
         <Section
           title="🧪 How the drills are judged"
           open={sec.isOpen("harness")}
@@ -148,75 +155,11 @@ function Overview({ track, done }: { track: BackendTrack; done: Set<string> }) {
         >
           <Markdown>{track.harness_note}</Markdown>
         </Section>
-      )}
+      ) : undefined,
+    };
+  }, [track, done, sec]);
 
-      <h3 style={{ margin: "22px 0 10px" }}>The build ladder</h3>
-      <div className="grid cols-2">
-        {track.projects.map((p) => {
-          const isDone = done.has(projectKey(p.key));
-          const soon = !p.authored;
-          const nSteps = p.steps?.length ?? 0;
-          const nEx = requiredExerciseIds(p).length;
-          return (
-            <div
-              key={p.key}
-              className="card"
-              style={{
-                cursor: soon ? "default" : "pointer",
-                opacity: soon ? 0.55 : 1,
-                borderColor: isDone ? "var(--good)" : undefined,
-              }}
-              onClick={() => !soon && nav(`/backend/${p.key}`)}
-            >
-              <div
-                className="row"
-                style={{ justifyContent: "space-between", alignItems: "flex-start" }}
-              >
-                <strong>
-                  {isDone && <span style={{ color: "var(--good)" }}>✓ </span>}
-                  {p.number}. {p.title}
-                </strong>
-                {soon ? (
-                  <span className="badge">soon</span>
-                ) : (
-                  <span
-                    className="row"
-                    style={{ gap: 4, flexWrap: "wrap", justifyContent: "flex-end" }}
-                  >
-                    {p.level && (
-                      <span
-                        className="badge"
-                        style={{
-                          borderColor: LEVEL_COLOR[p.level],
-                          color: LEVEL_COLOR[p.level],
-                        }}
-                      >
-                        {p.level}
-                      </span>
-                    )}
-                    {nSteps > 0 && <span className="badge">{nSteps} steps</span>}
-                    {nEx > 0 && <span className="badge">{nEx} exercises</span>}
-                  </span>
-                )}
-              </div>
-              <p className="dim" style={{ margin: "6px 0 0", fontSize: 13 }}>
-                {p.tagline}
-              </p>
-              <p className="dim" style={{ margin: "6px 0 0", fontSize: 13 }}>
-                🎯 {p.goal}
-              </p>
-              {!soon && (
-                <p className="faint" style={{ margin: "6px 0 0", fontSize: 12 }}>
-                  ⏱️ about {studyTime(p.est_minutes)}
-                  {p.concepts.length > 0 && ` · ${p.concepts.join(" · ")}`}
-                </p>
-              )}
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
+  return <TrackOverview spec={spec} />;
 }
 
 function ProjectDetail({
@@ -651,24 +594,14 @@ function ProjectDetail({
         </p>
       )}
 
-      <div className="row" style={{ marginTop: 20, justifyContent: "space-between" }}>
-        {prev ? (
-          <button className="ghost" onClick={() => nav(`/backend/${prev.key}`)}>
-            ← {prev.number}. {prev.title}
-          </button>
-        ) : (
-          <span />
-        )}
-        {next ? (
-          <button className="primary" onClick={() => nav(`/backend/${next.key}`)}>
-            {next.number}. {next.title} →
-          </button>
-        ) : (
-          <button className="ghost" onClick={() => nav("/backend")}>
-            Back to the Backend Lab
-          </button>
-        )}
-      </div>
+      <UnitPager
+        base="/backend"
+        unitLabel="Project"
+        prev={prev ? { slug: prev.key, number: prev.number, title: prev.title } : null}
+        next={next ? { slug: next.key, number: next.number, title: next.title } : null}
+        backTo="/backend"
+        backLabel="All projects"
+      />
 
       {/* Sentinel: intersecting means the project has been read to the bottom. */}
       <div ref={bottomRef} style={{ height: 1 }} />

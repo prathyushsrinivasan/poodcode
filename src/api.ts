@@ -135,6 +135,9 @@ export const api = {
 
   // Execution
   languages: () => invoke<LangInfo[]>("languages"),
+  /** Drop the cached toolchain probes and run them again. Installing a
+   * compiler while the app is open otherwise has no effect until restart. */
+  redetectLanguages: () => invoke<LangInfo[]>("redetect_languages"),
   // `opts` is TypeScript-only, and only the course sends it: which type-check
   // preset to compile at (see src-tauri/src/tscheck.rs), the hidden harness to
   // append to the learner's program, whether to grade on the type-check alone,

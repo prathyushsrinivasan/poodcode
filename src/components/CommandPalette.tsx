@@ -11,11 +11,14 @@ import type {
   WeeklyCourse,
 } from "../types";
 import { loadCurriculumSeed } from "./CurriculumData";
+import { clearRecents, readRecents } from "../lib/recents";
 
 interface Cmd {
   id: string;
   label: string;
   hint?: string;
+  /** Rendered as a group heading above the first command carrying it. */
+  group?: string;
   run: () => void;
 }
 
@@ -131,10 +134,12 @@ export function CommandPalette() {
   const open = useStore((s) => s.paletteOpen);
   const setOpen = useStore((s) => s.setPalette);
   const toggleTheme = useStore((s) => s.toggleTheme);
+  const toggleSidebar = useStore((s) => s.toggleSidebar);
   const navigate = useNavigate();
   const [q, setQ] = useState("");
   const [sel, setSel] = useState(0);
   const [problems, setProblems] = useState<Problem[]>([]);
+  const [recents, setRecents] = useState<ReturnType<typeof readRecents>>([]);
   const [tracks, setTracks] = useState<Tracks>(NO_TRACKS);
   const [concepts, setConcepts] = useState<Concept[]>([]);
   const tracksRequested = useRef(false);
@@ -144,6 +149,7 @@ export function CommandPalette() {
     if (!open) return;
     setQ("");
     setSel(0);
+    setRecents(readRecents());
     api.listProblems().then(setProblems).catch(() => {});
     setTimeout(() => inputRef.current?.focus(), 10);
 
@@ -162,21 +168,87 @@ export function CommandPalette() {
     api.concepts().then(setConcepts).catch(() => {});
   }, [open]);
 
+  /** Things the palette can *do*, as opposed to places it can go. The palette
+   * was navigation-only, so every one of these needed a trip to Settings or a
+   * shortcut you had no way to discover. */
+  const actionCmds = useMemo<Cmd[]>(
+    () => [
+      {
+        id: "act-new-problem",
+        group: "Actions",
+        label: "New problem",
+        hint: "Write your own, with test cases",
+        run: () => navigate("/problem/new"),
+      },
+      {
+        id: "act-theme",
+        group: "Actions",
+        label: "Toggle light / dark theme",
+        run: () => toggleTheme(),
+      },
+      {
+        id: "act-sidebar",
+        group: "Actions",
+        label: "Collapse or expand the sidebar",
+        hint: "Ctrl+B",
+        run: () => toggleSidebar(),
+      },
+      {
+        id: "act-shortcuts",
+        group: "Actions",
+        label: "? Keyboard shortcuts",
+        hint: "Every shortcut in the app",
+        run: () => window.dispatchEvent(new Event("poodcode:show-shortcuts")),
+      },
+      {
+        id: "act-tour",
+        group: "Actions",
+        label: "Show the welcome tour",
+        run: () => window.dispatchEvent(new Event("poodcode:show-welcome")),
+      },
+      {
+        id: "act-backup",
+        group: "Actions",
+        label: "Back up the database",
+        hint: "Opens Settings → Data",
+        run: () => navigate("/settings"),
+      },
+      {
+        id: "act-clear-recents",
+        group: "Actions",
+        label: "Clear recently opened",
+        run: () => clearRecents(),
+      },
+    ],
+    [navigate, toggleTheme, toggleSidebar]
+  );
+
+  const recentCmds = useMemo<Cmd[]>(
+    () =>
+      recents.map((r) => ({
+        id: `recent-${r.to}`,
+        group: "Recent",
+        label: r.label,
+        hint: r.hint,
+        run: () => navigate(r.to),
+      })),
+    [recents, navigate]
+  );
+
   const navCmds = useMemo<Cmd[]>(
     () => [
-      { id: "dash", label: "Go to Dashboard", run: () => navigate("/") },
-      { id: "lib", label: "Go to the DSA Curriculum", run: () => navigate("/library") },
+      { id: "dash", label: "Today", group: "Go to", run: () => navigate("/") },
+      { id: "lib", label: "DSA Curriculum", run: () => navigate("/library") },
       { id: "browse", label: "Browse all problems", run: () => navigate("/library/browse") },
-      { id: "learn", label: "Go to Learn", run: () => navigate("/learn") },
-      { id: "course", label: "Open the TypeScript Course", run: () => navigate("/course") },
-      { id: "java-course", label: "Open the Java Course", run: () => navigate("/java-course") },
-      { id: "backend", label: "Open the Backend Lab", run: () => navigate("/backend") },
-      { id: "projects", label: "Open Projects", run: () => navigate("/projects") },
-      { id: "mastery", label: "Go to 6-Month Mastery", run: () => navigate("/mastery") },
-      { id: "settings", label: "Open Settings", run: () => navigate("/settings") },
-      { id: "theme", label: "Toggle Light / Dark Theme", run: () => toggleTheme() },
+      { id: "learn", label: "Learn", run: () => navigate("/learn") },
+      { id: "course", label: "TypeScript Course", run: () => navigate("/course") },
+      { id: "java-course", label: "Java Course", run: () => navigate("/java-course") },
+      { id: "backend", label: "Backend Lab", run: () => navigate("/backend") },
+      { id: "projects", label: "Projects", run: () => navigate("/projects") },
+      { id: "mastery", label: "6-Month Mastery", run: () => navigate("/mastery") },
+      { id: "settings", label: "Settings", run: () => navigate("/settings") },
     ],
-    [navigate, toggleTheme]
+    [navigate]
   );
 
   const probCmds = useMemo<Cmd[]>(
@@ -244,15 +316,15 @@ export function CommandPalette() {
 
   const filtered = useMemo(() => {
     const s = q.trim().toLowerCase();
-    // With nothing typed the palette is a shortcut list, so it stays what it
-    // always was: the pages, then the problems. Track units are hundreds of
-    // entries and would push everything else past the 40-row cut — they are
-    // what you search *for*, not what you browse.
-    if (!s) return [...navCmds, ...probCmds].slice(0, 40);
-    return [...navCmds, ...trackCmds, ...probCmds]
+    // With nothing typed, the useful answer is almost always something opened
+    // recently — then what the palette can do, then where it can go. Problems
+    // and track units are hundreds of entries: they are what you search *for*,
+    // not what you browse, so they only appear once something is typed.
+    if (!s) return [...recentCmds, ...actionCmds, ...navCmds].slice(0, 40);
+    return [...actionCmds, ...navCmds, ...trackCmds, ...probCmds]
       .filter((c) => (c.label + " " + (c.hint ?? "")).toLowerCase().includes(s))
       .slice(0, 40);
-  }, [q, navCmds, probCmds, trackCmds]);
+  }, [q, recentCmds, actionCmds, navCmds, probCmds, trackCmds]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -298,16 +370,22 @@ export function CommandPalette() {
             }
           }}
         />
-        <div className="palette-list">
+        <div className="palette-list" role="listbox" aria-label="Commands">
           {filtered.map((c, i) => (
-            <div
-              key={c.id}
-              className={`palette-item ${i === sel ? "sel" : ""}`}
-              onMouseEnter={() => setSel(i)}
-              onClick={() => choose(c)}
-            >
-              <span>{c.label}</span>
-              {c.hint && <span className="dim" style={{ fontSize: 12 }}>&nbsp;— {c.hint}</span>}
+            <div key={c.id}>
+              {c.group && c.group !== filtered[i - 1]?.group && (
+                <div className="palette-group">{c.group}</div>
+              )}
+              <div
+                className={`palette-item ${i === sel ? "sel" : ""}`}
+                role="option"
+                aria-selected={i === sel}
+                onMouseEnter={() => setSel(i)}
+                onClick={() => choose(c)}
+              >
+                <span>{c.label}</span>
+                {c.hint && <span className="dim palette-hint">— {c.hint}</span>}
+              </div>
             </div>
           ))}
           {filtered.length === 0 && <div className="palette-item dim">No matches</div>}

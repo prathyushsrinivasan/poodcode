@@ -1,0 +1,105 @@
+/* Layout ------------------------------------------------------------------ */
+.app {
+  display: grid;
+  grid-template-columns: var(--sidebar-w) 1fr;
+  height: 100vh;
+}
+.sidebar {
+  background: var(--bg-elev);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  padding: 14px 10px;
+  gap: 2px;
+  overflow-y: auto;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-weight: 700;
+  font-size: 16px;
+  padding: 6px 8px 14px;
+  letter-spacing: -0.02em;
+}
+.brand .logo {
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  background: linear-gradient(135deg, var(--accent), #7b5cff);
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font-weight: 800;
+  font-size: 15px;
+}
+.nav-section {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-faint);
+  padding: 12px 10px 4px;
+}
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 10px;
+  border-radius: 8px;
+  color: var(--text-dim);
+  font-size: 13px;
+  cursor: pointer;
+  user-select: none;
+}
+.nav-item:hover {
+  background: var(--bg-elev-2);
+  text-decoration: none;
+  color: var(--text);
+}
+.nav-item.active {
+  background: var(--accent-dim);
+  color: var(--text);
+  font-weight: 600;
+}
+.nav-item .ico {
+  width: 18px;
+  text-align: center;
+  opacity: 0.9;
+}
+.nav-badge {
+  margin-left: auto;
+  background: var(--accent);
+  color: #fff;
+  font-size: 11px;
+  padding: 0 7px;
+  border-radius: 10px;
+  min-width: 20px;
+  text-align: center;
+}
+
+.main {
+  overflow: auto;
+  /* The frame is a grid with a top-bar row, so the content row is already the
+     right height — `100vh` here pushed it a top bar's worth off the bottom.
+     `min-height: 0` is what lets a grid item actually scroll. */
+  min-height: 0;
+  position: relative;
+}
+.page {
+  padding: 26px 32px 60px;
+  max-width: 1180px;
+  margin: 0 auto;
+}
+.page-wide {
+  max-width: none;
+}
+.page-title {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 0 0 4px;
+}
+.page-sub {
+  color: var(--text-dim);
+  margin: 0 0 22px;
+}

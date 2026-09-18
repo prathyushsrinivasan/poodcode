@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Navigate, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { api } from "../api";
+import { useCrumb } from "../store";
 import type {
   BackendStep,
   Project,
@@ -18,6 +19,15 @@ import ProjectHistory from "./ProjectHistory";
 import ProjectReview from "./ProjectReview";
 import ProjectWorkbench from "./ProjectWorkbench";
 import { diffSources, diffStats } from "../lib/lineDiff";
+import { ConfirmDialog } from "../components/ui/Modal";
+import {
+  TrackBody,
+  TrackHero,
+  UnitPager,
+  trackProgress,
+  type TrackGroup,
+  type TrackSpec,
+} from "../components/track/TrackShell";
 import { collectQuestions } from "../lib/projectReview";
 import { ClickableRow, Empty } from "../components/common";
 import { useToast } from "../components/Toast";
@@ -30,6 +40,7 @@ import {
   unmarkExercisesSolved,
 } from "../lib/learnProgress";
 import { collectExerciseIds, plural, solvedLabel, studyTime } from "../lib/trackProgress";
+import { TrackSkeleton } from "../components/Skeleton";
 import {
   buildCheatsheetIndex,
   buildCheckIndex,
@@ -112,7 +123,7 @@ export default function Projects({ view }: { view?: ProjectView } = {}) {
     );
   }
 
-  if (!track) return <div className="page">Loading…</div>;
+  if (!track) return <TrackSkeleton cards={4} />;
   if (track.projects.length === 0) {
     return (
       <div className="page">
@@ -242,7 +253,7 @@ function ProjectDetail({
   project: Project;
   done: Set<string>;
 }) {
-  const nav = useNavigate();
+  useCrumb(project.title, "Project");
   const sec = useCollapse(`project-overview:${project.key}`, false);
   // "How to work through this" is orientation, so it opens by default and gets
   // its own namespace to say so. On a single-project track the overview page
@@ -251,46 +262,48 @@ function ProjectDetail({
 
   const authored = project.modules.filter((m) => m.authored);
   const doneCount = authored.filter((m) => done.has(moduleKey(project.key, m.key))).length;
-  const nextModule =
-    authored.find((m) => !done.has(moduleKey(project.key, m.key))) ?? authored[0];
-  const pct = authored.length ? Math.round((doneCount / authored.length) * 100) : 0;
   const totalModules = project.modules.length;
+
+  /* A project *is* a track: its modules are the units and its roadmap phases
+     are the groups. Describing it that way gets the same hero, rail and rows
+     the courses use (UI_ROADMAP G1). */
+  const spec = useMemo<TrackSpec>(
+    () => ({
+      title: project.title,
+      subtitle: project.tagline,
+      base: `/projects/${project.key}`,
+      unitLabel: "Module",
+      groupLabel: "Phase",
+      groups: project.roadmap.map<TrackGroup>((ph) => ({ key: ph.key, title: ph.title })),
+      units: project.modules.map((m) => ({
+        slug: m.key,
+        number: m.number,
+        title: m.title,
+        tagline: m.what,
+        group: m.phase,
+        done: m.authored && done.has(moduleKey(project.key, m.key)),
+        authored: m.authored,
+        estMinutes: m.est_minutes,
+      })),
+    }),
+    [project, done]
+  );
+  const progress = useMemo(() => trackProgress(spec.units), [spec.units]);
 
   return (
     <div className="page">
       <h1 className="page-title">{project.title}</h1>
       <p className="page-sub">{project.tagline}</p>
 
-      <div className="card" style={{ marginBottom: 18 }}>
-        <div className="row" style={{ alignItems: "center", gap: 12 }}>
-          <div style={{ flex: 1 }}>
-            <div className="row" style={{ marginBottom: 6 }}>
-              <strong>Your progress</strong>
-              <span className="spacer" />
-              <span className="dim mono">
-                {doneCount}/{authored.length} built · {totalModules} planned
-              </span>
-            </div>
-            <div className="progress">
-              <span
-                style={{
-                  width: `${pct}%`,
-                  background: pct === 100 ? "var(--good)" : "var(--accent)",
-                }}
-              />
-            </div>
-          </div>
-          {nextModule && (
-            <button className="primary" onClick={() => nav(`/projects/${project.key}/${nextModule.key}`)}>
-              {doneCount === 0 ? "Start module 1 →" : `Resume · module ${nextModule.number} →`}
-            </button>
-          )}
-        </div>
-        <p className="faint" style={{ fontSize: 12, margin: "10px 0 0" }}>
-          {project.stack.join(" · ")} · about {studyTime(project.est_minutes)} of building in
-          total.{project.completion_note ? ` ${project.completion_note}` : ""}
-        </p>
-      </div>
+      <TrackHero spec={spec} progress={progress} />
+
+      <p className="faint project-stack">
+        {project.stack.join(" · ")} · {studyTime(project.est_minutes)} of building.{" "}
+        {authored.length < totalModules
+          ? `${authored.length} of ${totalModules} planned modules are written.`
+          : `${plural(totalModules, "module")}.`}
+        {project.completion_note ? ` ${project.completion_note}` : ""}
+      </p>
 
       <ProjectTools project={project} doneCount={doneCount} />
 
@@ -327,83 +340,14 @@ function ProjectDetail({
         </>
       )}
 
-      <h3 style={{ margin: "22px 0 4px" }}>🗺️ The roadmap</h3>
-      <p className="dim" style={{ marginTop: 0, fontSize: 13 }}>
+      <h3 className="project-roadmap-head">🗺️ The roadmap</h3>
+      <p className="dim project-roadmap-note">
         {plural(totalModules, "module")} in {plural(project.roadmap.length, "phase")}. Each phase
         ends with something you can demonstrate — that is what makes it a phase rather than an
         arbitrary grouping.
       </p>
 
-      {project.roadmap.map((phase) => {
-        const mods = project.modules.filter((m) => m.phase === phase.key);
-        const phaseDone = mods.filter(
-          (m) => m.authored && done.has(moduleKey(project.key, m.key))
-        ).length;
-        const phaseAuthored = mods.filter((m) => m.authored).length;
-        return (
-          <div key={phase.key} className="card" style={{ marginBottom: 12 }}>
-            <div className="row" style={{ alignItems: "flex-start", marginBottom: 4 }}>
-              <strong>{phase.title}</strong>
-              <span className="spacer" />
-              {phaseAuthored > 0 && (
-                <span className="dim mono" style={{ fontSize: 12 }}>
-                  {phaseDone}/{phaseAuthored}
-                </span>
-              )}
-            </div>
-            <p className="dim" style={{ margin: "0 0 6px", fontSize: 13 }}>
-              {phase.summary}
-            </p>
-            <p className="faint" style={{ margin: "0 0 10px", fontSize: 12 }}>
-              🏁 Ends with: {phase.outcome}
-            </p>
-            {mods.map((m, i) => {
-              const isDone = m.authored && done.has(moduleKey(project.key, m.key));
-              return (
-                <ClickableRow
-                  key={m.key}
-                  className="row"
-                  style={{
-                    gap: 8,
-                    padding: "5px 0",
-                    alignItems: "flex-start",
-                    opacity: m.authored ? 1 : 0.5,
-                    borderBottom: i < mods.length - 1 ? "1px solid var(--border)" : undefined,
-                  }}
-                  disabled={!m.authored}
-                  title={m.authored ? `Open module ${m.number}` : "Not written yet"}
-                  onActivate={() => nav(`/projects/${project.key}/${m.key}`)}
-                >
-                  <span
-                    className="mono"
-                    style={{ color: isDone ? "var(--good)" : "var(--accent)", width: 24 }}
-                  >
-                    {isDone ? "✓" : m.number}
-                  </span>
-                  <span style={{ flex: 1 }}>
-                    {m.title}
-                    {m.what && (
-                      <span className="faint" style={{ fontSize: 12 }}>
-                        {" "}
-                        — {m.what}
-                      </span>
-                    )}
-                  </span>
-                  {m.authored ? (
-                    m.est_minutes > 0 && (
-                      <span className="dim mono" style={{ fontSize: 12 }}>
-                        {studyTime(m.est_minutes)}
-                      </span>
-                    )
-                  ) : (
-                    <span className="badge">soon</span>
-                  )}
-                </ClickableRow>
-              );
-            })}
-          </div>
-        );
-      })}
+      <TrackBody spec={spec} progress={progress} />
 
       {track.harness_note && (
         <Section
@@ -1241,6 +1185,7 @@ function ModuleDetail({
   const gradableIds = useMemo(() => requiredExerciseIds(mod), [mod]);
   const allSolved = gradableIds.every((id) => solvedEx.has(id));
   const solvedCount = gradableIds.filter((id) => solvedEx.has(id)).length;
+  const [confirmReset, setConfirmReset] = useState(false);
 
   // Where "pick up where I left off" goes: the first step still holding an
   // unsolved exercise, or the module build if the steps are all done.
@@ -1263,12 +1208,7 @@ function ModuleDetail({
    * worked again from scratch. Drafts are deliberately kept — see
    * `unmarkExercisesSolved`. */
   function resetModule() {
-    const ok = window.confirm(
-      `Start module ${mod.number} over?\n\n` +
-        `This clears ${plural(solvedCount, "solved exercise")} and its ✓ Done mark. ` +
-        `The code you have written is kept.`
-    );
-    if (!ok) return;
+    setConfirmReset(false);
     setSolvedEx(new Set(unmarkExercisesSolved(gradableIds)));
     celebrated.current = false; // so finishing it again celebrates again
     // Auto-completion needs the module read to the bottom *again*. Without this
@@ -1329,7 +1269,7 @@ function ModuleDetail({
           {(isDone || solvedCount > 0) && (
             <button
               className="ghost"
-              onClick={resetModule}
+              onClick={() => setConfirmReset(true)}
               title="Forget this module's solved exercises so you can work it again"
             >
               ↺ Reset
@@ -1718,27 +1658,32 @@ function ModuleDetail({
         </p>
       )}
 
-      <div className="row" style={{ marginTop: 20, justifyContent: "space-between" }}>
-        {prev ? (
-          <button className="ghost" onClick={() => nav(`/projects/${project.key}/${prev.key}`)}>
-            ← {prev.number}. {prev.title}
-          </button>
-        ) : (
-          <span />
-        )}
-        {next ? (
-          <button className="primary" onClick={() => nav(`/projects/${project.key}/${next.key}`)}>
-            {next.number}. {next.title} →
-          </button>
-        ) : (
-          <button className="ghost" onClick={() => nav(`/projects/${project.key}`)}>
-            Back to the roadmap
-          </button>
-        )}
-      </div>
+      <UnitPager
+        base={`/projects/${project.key}`}
+        unitLabel="Module"
+        prev={prev ? { slug: prev.key, number: prev.number, title: prev.title } : null}
+        next={next ? { slug: next.key, number: next.number, title: next.title } : null}
+        backTo={`/projects/${project.key}`}
+        backLabel="The roadmap"
+      />
 
       {/* Sentinel: intersecting means the module has been read to the bottom. */}
       <div ref={bottomRef} style={{ height: 1 }} />
+
+      <ConfirmDialog
+        open={confirmReset}
+        onClose={() => setConfirmReset(false)}
+        onConfirm={resetModule}
+        title={`Start module ${mod.number} over?`}
+        consequence={
+          <>
+            This clears {plural(solvedCount, "solved exercise")} and this module's
+            ✓ Done mark, so it can be worked again from scratch.{" "}
+            <strong>The code you have written is kept.</strong>
+          </>
+        }
+        confirmLabel="Start over"
+      />
     </div>
   );
 }

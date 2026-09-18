@@ -1,0 +1,33 @@
+# CI guard wiring, held back from the push.
+#
+# GitHub refused a push that touches .github/workflows/ without the `workflow`
+# OAuth scope, so this step is not in the commit. It adds the two design-system
+# guards to the frontend job; both already work locally:
+#
+#   npm run check:contrast   every token pair against WCAG AA
+#   npm run check:styles     the inline-style ratchet
+#
+# To apply, once your token has the scope:
+#
+#   git apply ci-guards.patch
+#   git add .github/workflows/ci.yml && git commit -m "CI: contrast and inline-style guards"
+#   rm ci-guards.patch
+#
+diff --git a/.github/workflows/ci.yml b/.github/workflows/ci.yml
+index 305d200..03eb975 100644
+--- a/.github/workflows/ci.yml
++++ b/.github/workflows/ci.yml
+@@ -25,6 +25,13 @@ jobs:
+         run: npx tsc -b --noEmit
+       - name: Unit tests
+         run: npm run test
++      # Design-system guards. Contrast checks every token pair the UI renders
++      # against WCAG AA; the style check is a ratchet that stops the ~1,100
++      # inline style objects growing back (see UI_ROADMAP L4/L6).
++      - name: Contrast (WCAG AA)
++        run: npm run check:contrast
++      - name: Inline styles do not grow
++        run: npm run check:styles
+       - name: Build
+         run: npm run build
+ 

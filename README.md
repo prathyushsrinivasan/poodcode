@@ -61,9 +61,10 @@ Clean separation across four layers; everything is modular and offline.
 Poodcode/
 ├─ src/                        # ── UI layer (React + TypeScript)
 │  ├─ pages/                   # Dashboard, Library (the DSA Curriculum),
-│  │                          #   LibraryBrowse, CurriculumUnit, Solve,
-│  │                          #   Statistics, Revision, Timeline, RandomPractice,
-│  │                          #   Companies, Interview, Settings, ProblemForm
+│  │                          #   LibraryBrowse, CurriculumUnit, CurriculumDrill,
+│  │                          #   Solve, Learn, Course, Backend, Projects,
+│  │                          #   Mastery, JapaneseBridge, Paths, Settings,
+│  │                          #   ProblemForm
 │  ├─ components/              # Editor, Markdown, TestResults, TestCaseManager,
 │  │                          #   Charts, CommandPalette, common widgets
 │  ├─ lib/                     # ── Pure business logic (unit-tested, framework-free)
@@ -680,18 +681,18 @@ into the heatmap, and pacing is tracked against a start date) ·
 Spaced-Repetition Revision
 (1→3→7→14→30→90 ladder, grade/snooze/manual) · Attempt History + Code
 Comparison (first vs latest) · Progressive Hint System · Complexity Analyzer
-(heuristic estimate vs optimal, with explanation) · Statistics (per
-difficulty/topic, avg time, acceptance rate, heatmap, weekly/monthly, language
-usage, weakest/strongest) · Learning Timeline + Recommendations · Interview Mode
-(45-min timer, no hints/editorial, suggestions off, lock on expiry) · Random
-Practice (weakness predicates) · Company Prep (grouped lists) · Solution Library
+(heuristic estimate vs optimal, with explanation) · Solution Library
 (multiple approaches with complexity) · full Offline Mode · Command palette
 (Ctrl/Cmd+K) · dark/light themes · autosave & session restore.
 
-**Scaffolded/extensible** (architecture supports; deferred by the agreed
-"deep core + scaffold rest" scope): step-by-step Visual Debugger and Contest
-Mode. The data model, execution seam, and tag system are designed so these slot
-in without disruption.
+**Removed.** Nine pages — Statistics, Learning Timeline, Random Practice,
+Company Prep, Interview Mode, Contest Mode, Pattern Drill, Flashcards and the
+Visual Debugger — were built, then left without routes when the navigation was
+reorganized, and have now been deleted along with the Solve modes that only
+they could launch (`?mode=interview`, `?contest=`, `?drill=1`). They are
+recoverable from git history; the per-track insights that replace them are
+tracked in `UI_ROADMAP.md` (§I). The Rust commands and database tables they
+used are still in place.
 
 ---
 

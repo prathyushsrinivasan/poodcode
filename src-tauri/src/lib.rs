@@ -350,6 +350,7 @@ pub fn run() {
             commands::delete_solution,
             commands::list_attempts,
             commands::languages,
+            commands::redetect_languages,
             commands::concepts,
             commands::sql_datasets,
             commands::sql_query,

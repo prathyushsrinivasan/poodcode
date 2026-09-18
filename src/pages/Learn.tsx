@@ -27,6 +27,7 @@ import {
   TextGrid,
   differingRows,
 } from "../components/SqlGrid";
+import { TrackSkeleton } from "../components/Skeleton";
 import {
   loadDoneChapters,
   migrateVocabCardIds,
@@ -272,7 +273,7 @@ export default function Learn() {
 
   if (key) {
     const concept = concepts.find((c) => c.key === key);
-    if (concepts.length === 0) return <div className="page">Loading…</div>;
+    if (concepts.length === 0) return <TrackSkeleton cards={6} />;
     if (!concept) {
       return (
         <div className="page">

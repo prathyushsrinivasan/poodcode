@@ -8,6 +8,12 @@ import { ExerciseSections } from "../components/ExerciseSections";
 import { ReferenceReveal } from "../components/ReferenceReveal";
 import { Section, useCollapse } from "../components/Collapsible";
 import { Empty } from "../components/common";
+import {
+  TrackOverview,
+  UnitPager,
+  type TrackGroup,
+  type TrackSpec,
+} from "../components/track/TrackShell";
 import { useToast } from "../components/Toast";
 import {
   loadDoneChapters,
@@ -17,6 +23,7 @@ import {
   markExerciseSolved,
 } from "../lib/learnProgress";
 import { collectExerciseIds, solvedLabel, studyTime } from "../lib/trackProgress";
+import { TrackSkeleton } from "../components/Skeleton";
 
 // This page renders both structured courses. They share a data model, a judge
 // and every interaction; they differ only in where the content comes from, how
@@ -97,7 +104,7 @@ function CourseView({ track }: { track: Track }) {
     setDone(next);
   }
 
-  if (!course) return <div className="page">Loading…</div>;
+  if (!course) return <TrackSkeleton cards={6} />;
   if (course.weeks.length === 0) {
     return (
       <div className="page">
@@ -141,6 +148,15 @@ function CourseView({ track }: { track: Track }) {
 
 type Labels = ReturnType<typeof labelsOf>;
 
+/**
+ * The course overview, on the shared track template.
+ *
+ * This used to be a bespoke progress card above a stack of month headings, each
+ * with a two-column grid of week cards — so a 31-module course was one very long
+ * page and the month you were working in was wherever you had scrolled to. The
+ * template gives it the curriculum's hero and a rail of months beside one month
+ * at a time (UI_ROADMAP G1).
+ */
 function Overview({
   track,
   labels,
@@ -152,135 +168,61 @@ function Overview({
   course: WeeklyCourse;
   done: Set<string>;
 }) {
-  const nav = useNavigate();
-
-  const groups = useMemo(() => {
-    const map = new Map<number, { title: string; weeks: CourseWeek[] }>();
+  const spec = useMemo<TrackSpec>(() => {
+    const groups: TrackGroup[] = [];
+    const seen = new Set<number>();
     for (const w of course.weeks) {
-      if (!map.has(w.month)) map.set(w.month, { title: w.month_title, weeks: [] });
-      map.get(w.month)!.weeks.push(w);
+      if (!w.authored || seen.has(w.month)) continue;
+      seen.add(w.month);
+      groups.push({ key: String(w.month), title: w.month_title || `${labels.group} ${w.month}` });
     }
-    return [...map.entries()].sort((a, b) => a[0] - b[0]);
-  }, [course.weeks]);
+    groups.sort((a, b) => Number(a.key) - Number(b.key));
 
-  const authored = course.weeks.filter((w) => w.authored);
-  const doneCount = authored.filter((w) => done.has(unitKey(track, w.number))).length;
-  const nextUnit = authored.find((w) => !done.has(unitKey(track, w.number))) ?? authored[0];
-  const pct = authored.length ? Math.round((doneCount / authored.length) * 100) : 0;
+    return {
+      title: course.title,
+      subtitle: course.subtitle,
+      base: track.base,
+      unitLabel: labels.unit,
+      groupLabel: labels.group,
+      groups,
+      units: course.weeks.map((w) => {
+        const nLessons = w.lessons?.length ?? 0;
+        const nEx = requiredExerciseIds(w).length;
+        const nPractice = (w.practice ?? []).reduce(
+          (sum, f) => sum + (f.exercises?.length ?? 0),
+          0
+        );
+        return {
+          slug: String(w.number),
+          number: w.number,
+          title: w.theme,
+          tagline: w.goal,
+          group: String(w.month),
+          done: done.has(unitKey(track, w.number)),
+          authored: w.authored,
+          estMinutes: w.est_minutes,
+          badges: (
+            <>
+              {nLessons > 0 && <span className="badge">{nLessons} lessons</span>}
+              {nEx > 0 && <span className="badge">{nEx} exercises</span>}
+              {nPractice > 0 && (
+                <span className="badge" title="Extra variation drilling — optional">
+                  🏋️ +{nPractice} practice
+                </span>
+              )}
+              {w.capstone && (
+                <span className="badge accent" title={w.capstone.title}>
+                  🏆 project
+                </span>
+              )}
+            </>
+          ),
+        };
+      }),
+    };
+  }, [course, track, labels, done]);
 
-  return (
-    <div className="page">
-      <h1 className="page-title">{course.title}</h1>
-      <p className="page-sub">{course.subtitle}</p>
-
-      <div className="card" style={{ marginBottom: 18 }}>
-        <div className="row" style={{ alignItems: "center", gap: 12 }}>
-          <div style={{ flex: 1 }}>
-            <div className="row" style={{ marginBottom: 6 }}>
-              <strong>Your progress</strong>
-              <span className="spacer" />
-              <span className="dim mono">
-                {doneCount}/{authored.length} {labels.units}
-              </span>
-            </div>
-            <div className="progress">
-              <span
-                style={{ width: `${pct}%`, background: pct === 100 ? "var(--good)" : "var(--accent)" }}
-              />
-            </div>
-          </div>
-          {nextUnit && (
-            <button className="primary" onClick={() => nav(`${track.base}/${nextUnit.number}`)}>
-              {doneCount === 0
-                ? `Start ${labels.unit} ${nextUnit.number} →`
-                : `Resume · ${labels.unit} ${nextUnit.number} →`}
-            </button>
-          )}
-        </div>
-        <p className="faint" style={{ fontSize: 12, margin: "10px 0 0" }}>
-          A {labels.unit.toLowerCase()} auto-completes once you read it through and solve its
-          exercises. You'll never be asked to use syntax or ideas a later{" "}
-          {labels.unit.toLowerCase()} hasn't taught yet.
-        </p>
-      </div>
-
-      {groups.map(([m, { title, weeks }]) => (
-        <div key={m} style={{ marginBottom: 24 }}>
-          <div className="row" style={{ marginBottom: 10 }}>
-            <h3 style={{ margin: 0 }}>
-              {labels.group} {m} — {title}
-            </h3>
-            <span className="spacer" />
-            <span className="dim" style={{ fontSize: 12 }}>
-              {weeks.filter((w) => done.has(unitKey(track, w.number))).length}/
-              {weeks.filter((w) => w.authored).length} done
-            </span>
-          </div>
-          <div className="grid cols-2">
-            {weeks.map((w) => {
-              const isDone = done.has(unitKey(track, w.number));
-              const soon = !w.authored;
-              const nLessons = w.lessons?.length ?? 0;
-              const nEx = requiredExerciseIds(w).length;
-              const nPractice = (w.practice ?? []).reduce(
-                (sum, f) => sum + (f.exercises?.length ?? 0),
-                0
-              );
-              return (
-                <div
-                  key={w.number}
-                  className="card"
-                  style={{
-                    cursor: soon ? "default" : "pointer",
-                    opacity: soon ? 0.55 : 1,
-                    borderColor: isDone ? "var(--good)" : undefined,
-                  }}
-                  onClick={() => !soon && nav(`${track.base}/${w.number}`)}
-                >
-                  <div className="row" style={{ justifyContent: "space-between", alignItems: "flex-start" }}>
-                    <strong>
-                      {isDone && <span style={{ color: "var(--good)" }}>✓ </span>}
-                      {labels.unit} {w.number}: {w.theme}
-                    </strong>
-                    {soon ? (
-                      <span className="badge">soon</span>
-                    ) : (
-                      <span className="row" style={{ gap: 4, flexWrap: "wrap", justifyContent: "flex-end" }}>
-                        {nLessons > 0 && <span className="badge">{nLessons} lessons</span>}
-                        {nEx > 0 && <span className="badge">{nEx} exercises</span>}
-                        {nPractice > 0 && (
-                          <span className="badge" title="Extra variation drilling — optional">
-                            🏋️ +{nPractice} practice
-                          </span>
-                        )}
-                        {w.capstone && (
-                          <span
-                            className="badge"
-                            style={{ borderColor: "var(--accent)", color: "var(--accent)" }}
-                            title={w.capstone.title}
-                          >
-                            🏆 project
-                          </span>
-                        )}
-                      </span>
-                    )}
-                  </div>
-                  <p className="dim" style={{ margin: "6px 0 0", fontSize: 13 }}>
-                    🎯 {w.goal}
-                  </p>
-                  {!soon && w.est_minutes > 0 && (
-                    <p className="faint" style={{ margin: "6px 0 0", fontSize: 12 }}>
-                      ⏱️ about {studyTime(w.est_minutes)} of study
-                    </p>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      ))}
-    </div>
-  );
+  return <TrackOverview spec={spec} />;
 }
 
 function UnitDetail({
@@ -667,24 +609,14 @@ function UnitDetail({
         </p>
       )}
 
-      <div className="row" style={{ marginTop: 20, justifyContent: "space-between" }}>
-        {prev ? (
-          <button className="ghost" onClick={() => nav(`${track.base}/${prev.number}`)}>
-            ← {labels.unit} {prev.number}: {prev.theme}
-          </button>
-        ) : (
-          <span />
-        )}
-        {next ? (
-          <button className="primary" onClick={() => nav(`${track.base}/${next.number}`)}>
-            {labels.unit} {next.number}: {next.theme} →
-          </button>
-        ) : (
-          <button className="ghost" onClick={() => nav(track.base)}>
-            Back to course overview
-          </button>
-        )}
-      </div>
+      <UnitPager
+        base={track.base}
+        unitLabel={labels.unit}
+        prev={prev ? { slug: String(prev.number), number: prev.number, title: prev.theme } : null}
+        next={next ? { slug: String(next.number), number: next.number, title: next.theme } : null}
+        backTo={track.base}
+        backLabel={`All ${labels.group.toLowerCase()}s`}
+      />
 
       {/* Sentinel: intersecting means the unit has been read to the bottom. */}
       <div ref={bottomRef} style={{ height: 1 }} />

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { api } from "../api";
-import { useStore } from "../store";
+import { useCrumb, useStore } from "../store";
 import { starterFor } from "../lib/templates";
 import { formatClock } from "../lib/format";
 import { analyzeComplexity, compareComplexity } from "../lib/complexity";
@@ -9,14 +9,17 @@ import { Markdown } from "../components/Markdown";
 import { CodeEditor, type CodeEditorHandle } from "../components/CodeEditor";
 import { TestResults } from "../components/TestResults";
 import { TestCaseManager } from "../components/TestCaseManager";
-import { Confidence, DiffBadge, Stat } from "../components/common";
+import { Confidence, DiffBadge } from "../components/common";
 import { NextInRung, TaughtIn } from "../components/CurriculumData";
 import { useToast } from "../components/Toast";
+import { Tabs, TabPanel, type TabSpec } from "../components/ui/Tabs";
+import { SplitPane } from "../components/solve/SplitPane";
+import { VerdictBar } from "../components/solve/VerdictBar";
+import { RungPager, useRungPosition } from "../components/solve/RungPager";
+import { SaveIndicator, useSaveState } from "../components/SaveState";
 import { formatMemory } from "../lib/format";
 import { lineDiff, diffStats } from "../lib/diff";
 import type { Attempt, JudgeReport, Mistake, Note, Problem, Solution, TestCase } from "../types";
-
-const INTERVIEW_SECONDS = 45 * 60;
 
 type LeftTab =
   | "description"
@@ -27,45 +30,105 @@ type LeftTab =
   | "reflect"
   | "editorial";
 
+/* Seven tabs in a half-width pane overflowed and scrolled sideways, so the
+   ones on the right were invisible until you found the scroll. They split
+   cleanly in two by who wrote them: the problem's material, and yours. */
+type TabGroup = "problem" | "work";
+
+/* Pane sizes, the open tab and focus mode are remembered per-viewer. The
+   curriculum already remembered its last tab per unit; UI_ROADMAP J3 asks for
+   the same everywhere, and Solve is where it is felt most. */
+const LAYOUT_KEY = "poodcode:solve-layout";
+
+interface Layout {
+  percent: number;
+  collapsed: boolean;
+  focus: boolean;
+  tab: LeftTab;
+}
+
+const DEFAULT_LAYOUT: Layout = { percent: 50, collapsed: false, focus: false, tab: "description" };
+
+function readLayout(): Layout {
+  try {
+    const raw = localStorage.getItem(LAYOUT_KEY);
+    return raw ? { ...DEFAULT_LAYOUT, ...JSON.parse(raw) } : DEFAULT_LAYOUT;
+  } catch {
+    return DEFAULT_LAYOUT;
+  }
+}
+
+function writeLayout(l: Layout) {
+  try {
+    localStorage.setItem(LAYOUT_KEY, JSON.stringify(l));
+  } catch {
+    /* a remembered pane width is not worth failing over */
+  }
+}
+
+const GROUPS: Record<TabGroup, { label: string; tabs: LeftTab[] }> = {
+  problem: { label: "Problem", tabs: ["description", "prerequisites", "editorial"] },
+  work: { label: "My work", tabs: ["notes", "attempts", "solutions", "reflect"] },
+};
+
+const TAB_LABEL: Record<LeftTab, string> = {
+  description: "Description",
+  prerequisites: "Prerequisites",
+  editorial: "Editorial",
+  notes: "Notes",
+  attempts: "Attempts",
+  solutions: "Solutions",
+  reflect: "Reflect",
+};
+
 export default function Solve({ onProgress }: { onProgress?: () => void }) {
   const { id } = useParams();
   const pid = Number(id);
   const nav = useNavigate();
   const toast = useToast();
-  const [params] = useSearchParams();
-  const interview = params.get("mode") === "interview";
-  const contestId = params.get("contest") ? Number(params.get("contest")) : null;
-  const drill = params.get("drill") === "1";
   const languages = useStore((s) => s.languages);
   const prefs = useStore((s) => s.prefs);
 
   const [problem, setProblem] = useState<Problem | null>(null);
   const [cases, setCases] = useState<TestCase[]>([]);
-  const [tab, setTab] = useState<LeftTab>("description");
+  const [layout, setLayoutState] = useState<Layout>(readLayout);
+  const setLayout = useCallback((patch: Partial<Layout>) => {
+    setLayoutState((l) => {
+      const next = { ...l, ...patch };
+      writeLayout(next);
+      return next;
+    });
+  }, []);
+  const tab = layout.tab;
+  const setTab = useCallback((t: LeftTab) => setLayout({ tab: t }), [setLayout]);
   const [langId, setLangId] = useState(prefs.defaultLanguage);
   const [codeByLang, setCodeByLang] = useState<Record<string, string>>({});
   const [split, setSplit] = useState(false);
   const [splitLangId, setSplitLangId] = useState(prefs.defaultLanguage);
   const [report, setReport] = useState<JudgeReport | null>(null);
   const [running, setRunning] = useState(false);
+  const [runCount, setRunCount] = useState(0);
   const [rightTab, setRightTab] = useState<"results" | "tests" | "complexity">("results");
   const [customStdin, setCustomStdin] = useState("");
+  const [showStdin, setShowStdin] = useState(false);
   const [revealed, setRevealed] = useState(0);
   const [showEditorial, setShowEditorial] = useState(false);
   const [knownPrereqs, setKnownPrereqs] = useState<Set<string>>(new Set());
-  const [showSummary, setShowSummary] = useState(false);
-  const [drillLocked, setDrillLocked] = useState(drill);
-  const [approach, setApproach] = useState("");
-  const [plannedComplexity, setPlannedComplexity] = useState("");
+  const [group, setGroup] = useState<TabGroup>(
+    GROUPS.problem.tabs.includes(readLayout().tab) ? "problem" : "work"
+  );
+  useCrumb(problem?.title, problem ? `${problem.difficulty} problem` : undefined);
+  const rung = useRungPosition(problem?.slug);
+  const draftSave = useSaveState();
+  const [counts, setCounts] = useState({ attempts: 0, solutions: 0, mistakes: 0, notes: 0 });
   const leftEditor = useRef<CodeEditorHandle>(null);
   const draftTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
 
-  // Timer for time-on-problem + interview countdown (wall-clock based so it
-  // stays accurate even when the window is backgrounded / interval-throttled).
+  // Timer for time-on-problem (wall-clock based so it stays accurate even when
+  // the window is backgrounded / interval-throttled).
   const [elapsed, setElapsed] = useState(0);
   const startRef = useRef(Date.now());
   const creditedRef = useRef(0);
-  const [locked, setLocked] = useState(false);
 
   const langInfo = useMemo(
     () => languages.find((l) => l.id === langId) ?? languages[0],
@@ -112,6 +175,34 @@ export default function Solve({ onProgress }: { onProgress?: () => void }) {
     };
   }, [pid]);
 
+  // Counts shown in the tabs, so an empty tab is not worth clicking. These are
+  // decoration: if a count fails to load the tab still opens and loads its own
+  // data, so a failure here is deliberately not surfaced.
+  const loadCounts = useCallback(() => {
+    if (!pid) return;
+    Promise.all([
+      api.listAttempts(pid),
+      api.listSolutions(pid),
+      api.listMistakes(pid),
+      api.getNote(pid),
+    ])
+      .then(([attempts, solutions, mistakes, note]) =>
+        setCounts({
+          attempts: attempts.length,
+          solutions: solutions.length,
+          mistakes: mistakes.length,
+          notes: note && note.content.trim() ? 1 : 0,
+        })
+      )
+      .catch(() => {
+        /* the tabs work without their counts */
+      });
+  }, [pid]);
+
+  useEffect(() => {
+    loadCounts();
+  }, [loadCounts]);
+
   const togglePrereq = async (key: string) => {
     const known = !knownPrereqs.has(key);
     setKnownPrereqs((prev) => {
@@ -157,15 +248,6 @@ export default function Solve({ onProgress }: { onProgress?: () => void }) {
     return () => clearInterval(t);
   }, [pid]);
 
-  // Interview lock on expiry — also surface the end-of-interview summary.
-  useEffect(() => {
-    if (interview && elapsed >= INTERVIEW_SECONDS && !locked) {
-      setLocked(true);
-      setShowSummary(true);
-      toast("⏰ Time's up! Editor locked.");
-    }
-  }, [interview, elapsed, locked, toast]);
-
   // Keep a ref of the latest elapsed value for the unmount handler below.
   const elapsedRef = useRef(0);
   elapsedRef.current = elapsed;
@@ -187,10 +269,12 @@ export default function Solve({ onProgress }: { onProgress?: () => void }) {
       const timers = draftTimers.current;
       if (timers[lang]) clearTimeout(timers[lang]);
       timers[lang] = setTimeout(() => {
-        api.saveDraft(pid, lang, v).catch(() => {});
+        // Was `.catch(() => {})`: a draft that failed to save looked exactly
+        // like one that saved (UI_ROADMAP E2/E4).
+        void draftSave.track(() => api.saveDraft(pid, lang, v));
       }, 500);
     },
-    [pid]
+    [pid, draftSave]
   );
 
   const writeCode = useCallback(
@@ -211,11 +295,34 @@ export default function Solve({ onProgress }: { onProgress?: () => void }) {
     };
   }, [pid]);
 
+  // Workspace shortcuts. The editor owns Ctrl+Enter and Ctrl+Shift+Enter
+  // (see CodeEditor); these are the ones about the workspace around it.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "F11") {
+        e.preventDefault();
+        setLayout({ focus: !readLayout().focus });
+        return;
+      }
+      if (!(e.ctrlKey || e.metaKey)) return;
+      if (e.key === ".") {
+        e.preventDefault();
+        setLayout({ collapsed: !readLayout().collapsed });
+      } else if (e.key.toLowerCase() === "e") {
+        e.preventDefault();
+        leftEditor.current?.focus();
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [setLayout]);
+
   const nonHidden = cases.filter((c) => c.kind !== "hidden");
 
   const run = useCallback(async () => {
-    if (!langInfo || running || locked || drillLocked) return;
+    if (!langInfo || running) return;
     setRunning(true);
+    setRunCount((n) => n + 1);
     setRightTab("results");
     try {
       if (nonHidden.some((c) => c.expected_output.trim() !== "")) {
@@ -250,14 +357,14 @@ export default function Solve({ onProgress }: { onProgress?: () => void }) {
         });
       }
     } catch (e) {
-      toast(`Run error: ${e}`);
+      toast.error("Run failed", { detail: String(e) });
     } finally {
       setRunning(false);
     }
-  }, [langInfo, running, locked, drillLocked, nonHidden, code, customStdin, toast, pid]);
+  }, [langInfo, running, nonHidden, code, customStdin, toast, pid]);
 
   const submit = useCallback(async () => {
-    if (!langInfo || running || locked || drillLocked || !problem) return;
+    if (!langInfo || running || !problem) return;
     setRunning(true);
     setRightTab("results");
     const delta = Math.max(1, elapsed - creditedRef.current);
@@ -276,16 +383,14 @@ export default function Solve({ onProgress }: { onProgress?: () => void }) {
       } else {
         toast(`${rep.passed}/${rep.total} tests passed — tag the mistake in Reflect.`);
       }
-      if (contestId) {
-        api.recordContestResult(contestId, problem.id, rep.status === "accepted").catch(() => {});
-      }
+      loadCounts();
       onProgress?.();
     } catch (e) {
-      toast(`Submit error: ${e}`);
+      toast.error("Submit failed", { detail: String(e) });
     } finally {
       setRunning(false);
     }
-  }, [langInfo, running, locked, drillLocked, problem, elapsed, code, toast, onProgress, contestId]);
+  }, [langInfo, running, problem, elapsed, code, toast, onProgress, loadCounts]);
 
   const revealHint = () => {
     const n = revealed + 1;
@@ -310,71 +415,79 @@ export default function Solve({ onProgress }: { onProgress?: () => void }) {
 
   if (!problem) return <div className="page">Loading problem…</div>;
 
-  const overtime = interview && elapsed >= INTERVIEW_SECONDS;
-  const remaining = INTERVIEW_SECONDS - elapsed;
-
-  return (
-    <div className="solve">
-      {/* LEFT PANE */}
-      <div className="solve-pane">
+  const leftPane = (
+    <div className="solve-pane">
         <div className="solve-toolbar">
-          <button className="ghost" onClick={() => nav(-1)}>
+          <button className="ghost" onClick={() => nav(-1)} aria-label="Back">
             ←
           </button>
           <strong>{problem.title}</strong>
           <DiffBadge d={problem.difficulty} />
-          <span className={`star ${problem.is_favorite ? "on" : ""}`} onClick={toggleFav} style={{ cursor: "pointer" }}>
+          <button
+            className={`ghost star ${problem.is_favorite ? "on" : ""}`}
+            onClick={toggleFav}
+            aria-pressed={problem.is_favorite}
+            aria-label={problem.is_favorite ? "Remove from favorites" : "Add to favorites"}
+          >
             {problem.is_favorite ? "★" : "☆"}
-          </span>
+          </button>
           <span className="spacer" />
-          {interview ? (
-            <>
-              <span className={`timer ${remaining < 300 ? "warn" : ""}`}>
-                ⏱ {formatClock(Math.max(0, remaining))}
-              </span>
-              {!locked && (
-                <button
-                  className="ghost"
-                  title="End the interview now and see your summary"
-                  onClick={() => {
-                    setLocked(true);
-                    setShowSummary(true);
-                  }}
-                >
-                  ⏹ End
-                </button>
-              )}
-            </>
-          ) : (
-            <span className="timer dim">⏱ {formatClock(elapsed)}</span>
-          )}
-          {!interview && (
-            <button className="ghost" onClick={() => nav(`/problem/${problem.id}/edit`)}>
-              ✎ Edit
+          <span className="timer dim">⏱ {formatClock(elapsed)}</span>
+          <button
+            className="ghost"
+            onClick={() => setLayout({ collapsed: true })}
+            title="Hide the description (Ctrl+.)"
+            aria-label="Hide the description"
+          >
+            ‹
+          </button>
+          <button className="ghost" onClick={() => nav(`/problem/${problem.id}/edit`)}>
+            ✎ Edit
+          </button>
+        </div>
+
+        <RungPager pos={rung} />
+
+        <div className="pill-toggle solve-groups" role="group" aria-label="Which panel">
+          {(Object.keys(GROUPS) as TabGroup[]).map((g) => (
+            <button
+              key={g}
+              className={`pill ${group === g ? "on" : ""}`}
+              aria-pressed={group === g}
+              onClick={() => {
+                setGroup(g);
+                if (!GROUPS[g].tabs.includes(tab)) setTab(GROUPS[g].tabs[0]);
+              }}
+            >
+              {GROUPS[g].label}
             </button>
-          )}
+          ))}
         </div>
 
-        <div className="tabs">
-          {(["description", "prerequisites", "notes", "solutions", "attempts", "reflect", "editorial"] as LeftTab[]).map((t) => {
-            const unknown =
-              t === "prerequisites" && !interview
+        <Tabs
+          idBase="solve-left"
+          active={tab}
+          onChange={setTab}
+          tabs={GROUPS[group].tabs.map<TabSpec<LeftTab>>((t) => ({
+            key: t,
+            label: TAB_LABEL[t],
+            count:
+              t === "prerequisites"
                 ? problem.prerequisites.filter((p) => !knownPrereqs.has(p.key)).length
-                : 0;
-            return (
-              <div key={t} className={`tab ${tab === t ? "active" : ""}`} onClick={() => setTab(t)}>
-                {t[0].toUpperCase() + t.slice(1)}
-                {unknown > 0 && <span className="nav-badge" style={{ marginLeft: 6 }}>{unknown}</span>}
-              </div>
-            );
-          })}
-        </div>
+                : t === "attempts"
+                ? counts.attempts
+                : t === "solutions"
+                ? counts.solutions
+                : t === "reflect"
+                ? counts.mistakes
+                : undefined,
+          }))}
+        />
 
-        <div className="pane-body">
+        <TabPanel idBase="solve-left" active={tab}>
           {tab === "description" && (
             <DescriptionTab
               problem={problem}
-              interview={interview}
               revealed={revealed}
               onReveal={revealHint}
               confidence={problem.confidence}
@@ -384,7 +497,6 @@ export default function Solve({ onProgress }: { onProgress?: () => void }) {
           {tab === "prerequisites" && (
             <PrerequisitesTab
               problem={problem}
-              interview={interview}
               known={knownPrereqs}
               onToggle={togglePrereq}
             />
@@ -396,13 +508,15 @@ export default function Solve({ onProgress }: { onProgress?: () => void }) {
           {tab === "attempts" && <AttemptsTab problemId={problem.id} />}
           {tab === "reflect" && <ReflectTab problemId={problem.id} />}
           {tab === "editorial" && (
-            <EditorialTab problem={problem} interview={interview} showEditorial={showEditorial} onShow={() => setShowEditorial(true)} />
+            <EditorialTab problem={problem} showEditorial={showEditorial} onShow={() => setShowEditorial(true)} />
           )}
-        </div>
-      </div>
+        </TabPanel>
+    </div>
+  );
 
-      {/* RIGHT PANE */}
-      <div className="solve-pane" style={{ borderRight: "none" }}>
+  const rightPane = (
+
+    <div className="solve-pane solve-pane-right">
         <div className="solve-toolbar">
           <select value={langId} onChange={(e) => setLangId(e.target.value)}>
             {languages.map((l) => (
@@ -426,27 +540,65 @@ export default function Solve({ onProgress }: { onProgress?: () => void }) {
             </div>
           )}
           <span className="spacer" />
-          <button onClick={() => leftEditor.current?.format()} title="Format document">
-            ⌗ Format
+          <SaveIndicator
+            status={draftSave.status}
+            at={draftSave.at}
+            error={draftSave.error}
+            onRetry={() => void draftSave.track(() => api.saveDraft(pid, langId, code))}
+          />
+          <button
+            onClick={() => leftEditor.current?.format()}
+            title="Format document (Alt+Shift+F)"
+            aria-label="Format document"
+          >
+            ⌗
           </button>
           <button
             className={split ? "primary" : ""}
             onClick={() => setSplit((s) => !s)}
-            title="Split editor (edit two language buffers side by side)"
+            title="Split editor — edit two language buffers side by side"
+            aria-label="Split editor"
+            aria-pressed={split}
           >
-            ⊟ Split
+            ⊟
           </button>
           <button
             onClick={() => setCode(starterFor(problem.starter_code, langId))}
-            title="Reset to starter code"
+            title="Reset to the starter code"
+            aria-label="Reset to the starter code"
           >
-            ↺ Reset
+            ↺
           </button>
-          <button onClick={run} disabled={running || locked}>
-            ▶ Run
-          </button>
-          <button className="primary" onClick={submit} disabled={running || locked}>
+          {/* "Custom stdin (for Run)" used to live at the bottom of the
+              results tabs, which is the last place anyone looks for it. */}
+          <div className="split-button">
+            <button onClick={run} disabled={running}>
+              ▶ Run
+            </button>
+            <button
+              className={customStdin ? "primary" : ""}
+              onClick={() => {
+                setRightTab("results");
+                setShowStdin((v) => !v);
+              }}
+              title="Run with your own input"
+              aria-label="Run with my own input"
+              aria-pressed={showStdin}
+            >
+              ⌨
+            </button>
+          </div>
+          <button className="primary" onClick={submit} disabled={running}>
             ⏎ Submit
+          </button>
+          <button
+            className="ghost"
+            onClick={() => setLayout({ focus: !layout.focus })}
+            title="Focus mode — hide everything but the editor (F11)"
+            aria-label="Toggle focus mode"
+            aria-pressed={layout.focus}
+          >
+            {layout.focus ? "⤢" : "⛶"}
           </button>
         </div>
 
@@ -457,45 +609,6 @@ export default function Solve({ onProgress }: { onProgress?: () => void }) {
           </div>
         )}
 
-        {drillLocked && (
-          <div className="card" style={{ margin: 10, borderColor: "var(--accent)" }}>
-            <strong>🧠 Explain-first drill.</strong>
-            <p className="dim" style={{ marginTop: 4 }}>
-              Before the editor unlocks, state your plan out loud (in writing). This builds the
-              interview habit of thinking before coding.
-            </p>
-            <div className="io-label">Your approach</div>
-            <textarea
-              rows={3}
-              style={{ width: "100%" }}
-              placeholder="Which pattern? What are the steps?"
-              value={approach}
-              onChange={(e) => setApproach(e.target.value)}
-            />
-            <div className="io-label" style={{ marginTop: 6 }}>
-              Target complexity
-            </div>
-            <input
-              style={{ width: 200 }}
-              placeholder="e.g. O(n) time, O(1) space"
-              value={plannedComplexity}
-              onChange={(e) => setPlannedComplexity(e.target.value)}
-            />
-            <div className="row" style={{ marginTop: 8 }}>
-              <button
-                className="primary"
-                disabled={approach.trim().length < 10}
-                onClick={() => setDrillLocked(false)}
-              >
-                Unlock editor →
-              </button>
-              <span className="faint" style={{ fontSize: 12 }}>
-                {approach.trim().length < 10 ? "Write at least a sentence." : "Looks good."}
-              </span>
-            </div>
-          </div>
-        )}
-
         <div className="editor-host" style={{ display: "flex", minHeight: 0 }}>
           <div style={{ flex: 1, minWidth: 0, height: "100%" }}>
             <CodeEditor
@@ -503,8 +616,6 @@ export default function Solve({ onProgress }: { onProgress?: () => void }) {
               language={monacoLang}
               value={code}
               onChange={setCode}
-              readOnly={locked || drillLocked}
-              disableIntellisense={interview}
               onRun={run}
               onSubmit={submit}
             />
@@ -537,8 +648,6 @@ export default function Solve({ onProgress }: { onProgress?: () => void }) {
                   language={splitMonacoLang}
                   value={splitCode}
                   onChange={(v) => writeCode(splitLangId, v)}
-                  readOnly={locked}
-                  disableIntellisense={interview}
                   onRun={run}
                   onSubmit={submit}
                 />
@@ -547,37 +656,50 @@ export default function Solve({ onProgress }: { onProgress?: () => void }) {
           )}
         </div>
 
-        <div className="tabs">
-          {(["results", "tests", "complexity"] as const).map((t) => (
-            <div key={t} className={`tab ${rightTab === t ? "active" : ""}`} onClick={() => setRightTab(t)}>
-              {t === "results" ? "Results" : t === "tests" ? "Test Cases" : "Complexity"}
-            </div>
-          ))}
-          <span className="spacer" />
-          <span className="dim" style={{ padding: "9px 12px", fontSize: 12 }}>
-            Ctrl+Enter run · Ctrl+Shift+Enter submit
-          </span>
-        </div>
+        <VerdictBar
+          report={report}
+          running={running}
+          runCount={runCount}
+          onJumpToFailure={() => {
+            setRightTab("results");
+            const i = report?.results.findIndex((r) => !r.passed) ?? -1;
+            if (i >= 0) {
+              // The results list renders one `.result` per case in order.
+              requestAnimationFrame(() => {
+                document
+                  .querySelectorAll(".pane-body .result")
+                  [i]?.scrollIntoView({ block: "center", behavior: "smooth" });
+              });
+            }
+          }}
+        />
 
-        <div className="pane-body" style={{ maxHeight: "34vh" }}>
-          {interview && showSummary && (
-            <InterviewSummary
-              problemId={problem.id}
-              elapsed={elapsed}
-              expired={overtime}
-              onGoAttempts={() => setTab("attempts")}
-              onGoNotes={() => setTab("notes")}
-              onClose={() => setShowSummary(false)}
-            />
-          )}
+        <Tabs
+          idBase="solve-right"
+          active={rightTab}
+          onChange={setRightTab}
+          tabs={[
+            { key: "results", label: "Results" },
+            { key: "tests", label: "Test Cases", count: cases.length },
+            { key: "complexity", label: "Complexity" },
+          ]}
+        >
+          <span className="spacer" />
+          <span className="dim tabs-hint">
+            <span className="kbd">Ctrl</span>+<span className="kbd">Enter</span> run ·{" "}
+            <span className="kbd">Ctrl</span>+<span className="kbd">Shift</span>+
+            <span className="kbd">Enter</span> submit
+          </span>
+        </Tabs>
+
+        <TabPanel idBase="solve-right" active={rightTab}>
           {rightTab === "results" && (
             <>
-              {nonHidden.every((c) => c.expected_output.trim() === "") && (
-                <div style={{ marginBottom: 10 }}>
-                  <div className="io-label">Custom stdin (for Run)</div>
+              {(showStdin || nonHidden.every((c) => c.expected_output.trim() === "")) && (
+                <div className="stdin-box">
+                  <div className="io-label">Your own input (stdin, used by Run)</div>
                   <textarea
                     rows={3}
-                    style={{ width: "100%" }}
                     value={customStdin}
                     onChange={(e) => setCustomStdin(e.target.value)}
                     placeholder="Type input to feed your program on stdin…"
@@ -591,9 +713,25 @@ export default function Solve({ onProgress }: { onProgress?: () => void }) {
             <TestCaseManager problemId={problem.id} cases={cases} onChange={setCases} />
           )}
           {rightTab === "complexity" && <ComplexityTab code={code} problem={problem} />}
-        </div>
-      </div>
+        </TabPanel>
     </div>
+  );
+
+  // Focus mode drops everything but the editor column — the app shell is
+  // hidden by `body[data-solve-focus]` (see global.css).
+  if (layout.focus) {
+    return <div className="solve solve-focus">{rightPane}</div>;
+  }
+
+  return (
+    <SplitPane
+      left={leftPane}
+      right={rightPane}
+      percent={layout.percent}
+      onPercent={(percent) => setLayout({ percent })}
+      collapsed={layout.collapsed}
+      onExpand={() => setLayout({ collapsed: false })}
+    />
   );
 }
 
@@ -601,14 +739,12 @@ export default function Solve({ onProgress }: { onProgress?: () => void }) {
 
 function DescriptionTab({
   problem,
-  interview,
   revealed,
   onReveal,
   confidence,
   onConfidence,
 }: {
   problem: Problem;
-  interview: boolean;
   revealed: number;
   onReveal: () => void;
   confidence: number;
@@ -691,7 +827,7 @@ function DescriptionTab({
         <Confidence value={confidence} onChange={onConfidence} />
       </div>
 
-      {!interview && problem.hints.length > 0 && (
+      {problem.hints.length > 0 && (
         <>
           <div className="divider" />
           <h3>Hints</h3>
@@ -706,28 +842,22 @@ function DescriptionTab({
           )}
         </>
       )}
-      {interview && <p className="faint" style={{ marginTop: 16 }}>Hints are disabled in interview mode.</p>}
     </div>
   );
 }
 
 function PrerequisitesTab({
   problem,
-  interview,
   known,
   onToggle,
 }: {
   problem: Problem;
-  interview: boolean;
   known: Set<string>;
   onToggle: (key: string) => void;
 }) {
   const [open, setOpen] = useState<string | null>(null);
   const nav = useNavigate();
 
-  if (interview) {
-    return <p className="faint">Prerequisites are hidden during interview mode.</p>;
-  }
   if (problem.prerequisites.length === 0) {
     return <div className="dim">No prerequisites listed for this problem.</div>;
   }
@@ -1152,75 +1282,6 @@ function CodeDiff({
   );
 }
 
-/** End-of-interview recap: time, submissions, last result, and next steps. */
-function InterviewSummary({
-  problemId,
-  elapsed,
-  expired,
-  onGoAttempts,
-  onGoNotes,
-  onClose,
-}: {
-  problemId: number;
-  elapsed: number;
-  expired: boolean;
-  onGoAttempts: () => void;
-  onGoNotes: () => void;
-  onClose: () => void;
-}) {
-  const [attempts, setAttempts] = useState<Attempt[]>([]);
-  useEffect(() => {
-    api.listAttempts(problemId).then(setAttempts);
-  }, [problemId]);
-
-  const accepted = attempts.filter((a) => a.status === "accepted").length;
-  const last = attempts[0];
-  const lastLabel = last
-    ? last.status === "accepted"
-      ? "Accepted"
-      : last.status === "wrong"
-      ? "Wrong answer"
-      : "Runtime error"
-    : "—";
-
-  return (
-    <div className="card" style={{ marginBottom: 10, borderColor: "var(--hard)" }}>
-      <div className="row">
-        <strong style={{ fontSize: 15 }}>
-          {expired ? "⏰ Interview finished — time expired" : "⏹ Interview ended"}
-        </strong>
-        <span className="spacer" />
-        <button className="ghost" onClick={onClose}>
-          Dismiss
-        </button>
-      </div>
-      <div className="grid cols-4" style={{ margin: "10px 0" }}>
-        <Stat value={formatClock(elapsed)} label="Time spent" />
-        <Stat value={attempts.length} label="Submissions" />
-        <Stat value={accepted} label="Accepted" />
-        <Stat value={last ? `${last.passed}/${last.total}` : "—"} label="Last result" />
-      </div>
-      {last && (
-        <div className="dim" style={{ marginBottom: 8 }}>
-          Last submission: {lastLabel} · {last.runtime_ms ?? 0} ms
-          {last.memory_kb ? ` · ${formatMemory(last.memory_kb)}` : ""}.
-        </div>
-      )}
-      <p className="dim" style={{ marginTop: 0 }}>
-        {accepted > 0
-          ? "Nice — you solved it under interview conditions. Capture what made it click."
-          : "You didn't land an accepted solution — that's the most valuable kind of practice. Write down where you got stuck."}
-      </p>
-      <div className="row">
-        <button onClick={onGoAttempts}>Review attempts</button>
-        <button className="primary" onClick={onGoNotes}>
-          Write a retro note
-        </button>
-      </div>
-    </div>
-  );
-}
-
 const MISTAKE_CATEGORIES = [
   "off-by-one",
   "wrong-data-structure",
@@ -1312,18 +1373,13 @@ function ReflectTab({ problemId }: { problemId: number }) {
 
 function EditorialTab({
   problem,
-  interview,
   showEditorial,
   onShow,
 }: {
   problem: Problem;
-  interview: boolean;
   showEditorial: boolean;
   onShow: () => void;
 }) {
-  if (interview) {
-    return <p className="faint">The editorial is hidden during interview mode.</p>;
-  }
   return (
     <div>
       <div className="card" style={{ marginBottom: 12 }}>

@@ -8,7 +8,7 @@ interface Props {
   language: string; // monaco language id
   value: string;
   onChange: (v: string) => void;
-  /** Interview mode disables suggestions/autocomplete. */
+  /** Turn off suggestions and autocomplete. */
   disableIntellisense?: boolean;
   readOnly?: boolean;
   onRun?: () => void;
@@ -20,6 +20,8 @@ export interface CodeEditorHandle {
   format: () => void;
   find: () => void;
   replace: () => void;
+  /** Put the caret back in the code — what Ctrl+E on the Solve page does. */
+  focus: () => void;
 }
 
 /** Monaco wrapper honoring user editor preferences and app theme. */
@@ -39,6 +41,7 @@ export const CodeEditor = forwardRef<CodeEditorHandle, Props>(function CodeEdito
     find: () => editorRef.current?.getAction("actions.find")?.run(),
     replace: () =>
       editorRef.current?.getAction("editor.action.startFindReplaceAction")?.run(),
+    focus: () => editorRef.current?.focus(),
   }));
 
   const onMount: OnMount = (editor, monaco) => {

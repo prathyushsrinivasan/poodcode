@@ -1,0 +1,193 @@
+/* ======================================================================
+   Solve workspace
+   ====================================================================== */
+
+/* The grid columns are set inline by SplitPane (the width is data), so this
+   only carries the fallback and the variants. */
+.solve {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 6px minmax(0, 1fr);
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+.solve.dragging {
+  cursor: col-resize;
+}
+.solve-pane-right {
+  border-right: none;
+}
+
+/* ---- The divider ---- */
+.solve-divider {
+  position: relative;
+  cursor: col-resize;
+  background: var(--border);
+  display: grid;
+  place-items: center;
+  transition: background var(--dur-1) var(--ease-out);
+}
+.solve-divider:hover,
+.solve.dragging .solve-divider {
+  background: var(--accent);
+}
+.solve-divider-grip {
+  width: 2px;
+  height: 26px;
+  border-radius: var(--radius-pill);
+  background: var(--bg-elev-2);
+  opacity: 0.8;
+}
+.solve-divider:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: -1px;
+}
+
+/* ---- Collapsed description ---- */
+.solve-collapsed {
+  grid-template-columns: 28px minmax(0, 1fr);
+}
+.solve-rail {
+  border: 0;
+  border-right: 1px solid var(--border);
+  border-radius: 0;
+  background: var(--bg-elev);
+  color: var(--text-dim);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) 0;
+  cursor: pointer;
+}
+.solve-rail:hover {
+  background: var(--bg-elev-2);
+  color: var(--text);
+  border-color: var(--border);
+}
+.solve-rail-text {
+  writing-mode: vertical-rl;
+  font-size: var(--text-xs);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* ---- Stacked, for narrow windows ---- */
+.solve-stacked {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(0, 2fr) minmax(0, 3fr);
+}
+.solve-stacked .solve-pane {
+  border-right: none;
+  border-bottom: 1px solid var(--border);
+}
+
+/* ---- Focus mode ---- */
+.solve-focus {
+  grid-template-columns: minmax(0, 1fr);
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-overlay);
+  background: var(--bg);
+}
+
+/* ---- Verdict bar ---- */
+.verdict-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 6px var(--space-3);
+  border-top: 1px solid var(--border);
+  background: var(--bg-elev);
+  font-size: var(--text-xs);
+  border-left: 3px solid transparent;
+  flex: none;
+}
+.verdict-bar.good {
+  border-left-color: var(--good);
+}
+.verdict-bar.bad {
+  border-left-color: var(--bad);
+}
+.verdict-bar.warn {
+  border-left-color: var(--warn);
+}
+.verdict-bar.good .verdict-label {
+  color: var(--good);
+}
+.verdict-bar.bad .verdict-label {
+  color: var(--bad);
+}
+.verdict-bar.warn .verdict-label {
+  color: var(--warn);
+}
+.verdict-count {
+  font-variant-numeric: tabular-nums;
+}
+.verdict-jump {
+  padding: 1px var(--space-2);
+  font-size: var(--text-xs);
+  color: var(--accent);
+}
+.verdict-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+  animation: pulse 1s var(--ease-in-out) infinite;
+}
+@keyframes pulse {
+  50% {
+    opacity: 0.25;
+  }
+}
+
+/* ---- Rung pager ---- */
+.rung-pager {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-3);
+  border-bottom: 1px solid var(--border);
+  font-size: var(--text-xs);
+  flex: none;
+}
+.rung-unit {
+  font-weight: var(--weight-medium);
+}
+.rung-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rung-pos {
+  margin-left: auto;
+  color: var(--text-faint);
+  font-variant-numeric: tabular-nums;
+}
+.rung-pager button {
+  padding: 0 var(--space-2);
+  line-height: 1.4;
+}
+
+/* ---- Run split button ---- */
+.split-button {
+  display: inline-flex;
+}
+.split-button button:first-child {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.split-button button:last-child {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  margin-left: -1px;
+  padding-left: var(--space-2);
+  padding-right: var(--space-2);
+}
+.stdin-box {
+  margin-bottom: var(--space-3);
+}
+.stdin-box textarea {
+  width: 100%;
+}

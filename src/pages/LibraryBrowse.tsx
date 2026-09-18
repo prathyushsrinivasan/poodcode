@@ -35,6 +35,19 @@ const STATUS_LABEL: Record<SolvedStatus, string> = {
  * problem, so a problem you meet here has a way back to its technique. A
  * problem with no unit is one you added yourself, and can be filtered for.
  */
+const FILTER_KEY = "poodcode:browse-filter";
+
+/** The last filter, or a clean one. Merged onto `emptyFilter` so a stored
+ * filter from an older shape cannot leave a field undefined. */
+function readFilter(): ProblemFilter {
+  try {
+    const raw = localStorage.getItem(FILTER_KEY);
+    return raw ? { ...emptyFilter, ...JSON.parse(raw) } : emptyFilter;
+  } catch {
+    return emptyFilter;
+  }
+}
+
 export default function LibraryBrowse() {
   const [problems, setProblems] = useState<Problem[]>([]);
   const [topics, setTopics] = useState<string[]>([]);
@@ -43,7 +56,10 @@ export default function LibraryBrowse() {
   const [stages, setStages] = useState<{ key: string; title: string; icon: string }[]>([]);
   const [unitList, setUnitList] = useState<{ key: string; title: string; icon: string; stage: string }[]>([]);
   const [mineOnly, setMineOnly] = useState(false);
-  const [f, setF] = useState<ProblemFilter>(emptyFilter);
+  // Filters survive leaving the page. Coming back from a problem to a table you
+  // had narrowed to nine rows, only to find all 653 again, is the single most
+  // annoying thing about a list view (UI_ROADMAP H1/J3).
+  const [f, setF] = useState<ProblemFilter>(readFilter);
   const nav = useNavigate();
   const toast = useToast();
 
@@ -67,6 +83,14 @@ export default function LibraryBrowse() {
     api.distinctTags("company").then(setCompanies);
   };
   useEffect(load, []);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(FILTER_KEY, JSON.stringify(f));
+    } catch {
+      /* a remembered filter is a convenience, not a requirement */
+    }
+  }, [f]);
 
   const lookup = useMemo<UnitLookup>(
     () => ({

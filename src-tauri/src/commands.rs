@@ -346,6 +346,20 @@ pub async fn languages() -> Vec<LangInfo> {
         .unwrap_or_default()
 }
 
+/// Re-probe every toolchain and return the fresh list.
+///
+/// Availability is cached process-wide, so a compiler installed while the app
+/// was running stayed invisible until a restart. This drops the cache first.
+#[tauri::command]
+pub async fn redetect_languages() -> Vec<LangInfo> {
+    tauri::async_runtime::spawn_blocking(|| {
+        exec::forget_tool_cache();
+        exec::languages()
+    })
+    .await
+    .unwrap_or_default()
+}
+
 /// Build the judging configuration (compare mode, tolerance, harness spec, time
 /// limit) for a problem, falling back to plain exact-match defaults.
 fn judge_config_for(conn: &Connection, problem_id: Option<i64>) -> judge::JudgeConfig {

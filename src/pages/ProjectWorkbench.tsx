@@ -18,6 +18,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { ConfirmDialog } from "../components/ui/Modal";
 import { api } from "../api";
 import type { Exercise, JudgeReport, ProcOut, Project, ProjectModule, TestCase } from "../types";
 import { CodeEditor } from "../components/CodeEditor";
@@ -85,6 +86,11 @@ export default function ProjectWorkbench({ project }: { project: Project }) {
   );
   const latest = builds[builds.length - 1];
 
+  /** A load waiting on confirmation, because it would overwrite unsaved code. */
+  const [pendingLoad, setPendingLoad] = useState<{
+    module: ProjectModule & { final_build: Exercise };
+    which: "mine" | "reference" | "starter";
+  } | null>(null);
   const [bench, setBench] = useState<BenchState>(() => {
     const saved = readBench(project.key);
     if (saved) return saved;
@@ -156,12 +162,8 @@ export default function ProjectWorkbench({ project }: { project: Project }) {
         bench.code
       );
     if (bench.code.trim() && !recoverable) {
-      const ok = window.confirm(
-        `Replace the code on the workbench with module ${m.number}'s ` +
-          `${which === "mine" ? "build (your version)" : which === "reference" ? "reference build" : "starter"}?\n\n` +
-          "What is there now will be lost."
-      );
-      if (!ok) return;
+      setPendingLoad({ module: m, which });
+      return;
     }
     load(m, which);
   }
@@ -478,6 +480,30 @@ export default function ProjectWorkbench({ project }: { project: Project }) {
           )}
         </div>
       )}
+    <ConfirmDialog
+        open={pendingLoad !== null}
+        onClose={() => setPendingLoad(null)}
+        onConfirm={() => {
+          if (pendingLoad) load(pendingLoad.module, pendingLoad.which);
+          setPendingLoad(null);
+        }}
+        title="Replace the code on the workbench?"
+        consequence={
+          pendingLoad && (
+            <>
+              This loads module {pendingLoad.module.number}'s{" "}
+              {pendingLoad.which === "mine"
+                ? "build (your version)"
+                : pendingLoad.which === "reference"
+                ? "reference build"
+                : "starter"}{" "}
+              over what is on the workbench now. What is there has not been saved
+              anywhere else, so it will be lost.
+            </>
+          )
+        }
+        confirmLabel="Replace it"
+      />
     </div>
   );
 }

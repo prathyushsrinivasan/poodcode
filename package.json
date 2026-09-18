@@ -6,6 +6,7 @@
   "description": "Personal offline coding-interview & algorithm practice desktop app",
   "scripts": {
     "dev": "vite",
+    "dev:mock": "vite --mode mock",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "tauri": "tauri",
@@ -13,7 +14,9 @@
     "app:build": "tauri build",
     "test": "vitest run",
     "test:watch": "vitest",
-    "typecheck": "tsc -b --noEmit"
+    "typecheck": "tsc -b --noEmit",
+    "check:contrast": "node tools/contrast.mjs",
+    "check:styles": "node tools/inline-styles.mjs"
   },
   "dependencies": {
     "@monaco-editor/react": "^4.6.0",

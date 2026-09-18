@@ -97,3 +97,49 @@ export function UnitSkeleton() {
     </div>
   );
 }
+
+/** A track overview: hero, progress panel, then a grid of unit cards.
+ *
+ * Shared by the TypeScript and Java courses, the Backend Lab, Projects and
+ * Mastery — five pages that each showed a bare "Loading…" while a 2-5 MB seed
+ * parsed, which on a cold start is several seconds of blank page reading as a
+ * broken app (UI_ROADMAP E3). */
+export function TrackSkeleton({ cards = 6 }: { cards?: number }) {
+  return (
+    <div className="page" role="status" aria-label="Loading">
+      <Bar w={35} h={26} mb={6} />
+      <Bar w={55} h={12} mb={22} />
+
+      <div className="card skel-hero">
+        <Bar w={20} h={12} />
+        <Bar w={45} h={20} />
+        <Bar w="100%" h={8} mb={10} />
+        <Bar w={30} h={30} mb={0} />
+      </div>
+
+      <Bar w={25} h={16} mb={12} />
+      <div className="grid cols-2">
+        {Array.from({ length: cards }).map((_, i) => (
+          <div key={i} className="card">
+            <Bar w={60} h={16} />
+            <Bar w={85} h={12} />
+            <Bar w={40} h={10} mb={0} />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/** A long reading page: title, then paragraphs. */
+export function ReadingSkeleton() {
+  return (
+    <div className="page" role="status" aria-label="Loading">
+      <Bar w={40} h={26} mb={6} />
+      <Bar w={60} h={12} mb={24} />
+      {[92, 86, 95, 78, 90, 83, 70].map((w, i) => (
+        <Bar key={i} w={w} h={12} />
+      ))}
+    </div>
+  );
+}

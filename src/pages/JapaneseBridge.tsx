@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { api } from "../api";
 import type { BridgeProblem, InterviewQA, JpBridge, Problem } from "../types";
 import { Empty } from "../components/common";
+import { ReadingSkeleton } from "../components/Skeleton";
 
 /** The four stages a Japanese technical interview is actually made of. Every
  * question carries its stage as its first tag — asserted at generation. */
@@ -59,7 +60,7 @@ export default function JapaneseBridge() {
     return counts;
   }, [bridge]);
 
-  if (!bridge) return <div className="page">Loading…</div>;
+  if (!bridge) return <ReadingSkeleton />;
 
   return (
     <div className="page">

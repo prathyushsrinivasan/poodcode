@@ -14,9 +14,15 @@ import type {
 import { Markdown } from "../components/Markdown";
 import { CodeEditor } from "../components/CodeEditor";
 import { DiffBadge, Empty } from "../components/common";
-import { Section, useCollapse } from "../components/Collapsible";
 import { loadDoneChapters, setChapterDone } from "../lib/learnProgress";
 import { useToast } from "../components/Toast";
+import { TrackSkeleton } from "../components/Skeleton";
+import {
+  TrackBody,
+  trackProgress,
+  type TrackGroup,
+  type TrackSpec,
+} from "../components/track/TrackShell";
 import {
   drawExamPaper,
   formatStudyTime,
@@ -132,7 +138,6 @@ export default function Mastery() {
     return [...map.entries()];
   }, [track]);
 
-  const phaseFold = useCollapse(`mastery-phase:${track?.key ?? ""}`);
 
   // A week that has just become complete gets stamped server-side, which is
   // also what seeds its flashcards and review entries — once.
@@ -153,7 +158,7 @@ export default function Mastery() {
     })().catch(() => {});
   }, [track, perWeek, progress, refreshProgress, toast]);
 
-  if (loading) return <div className="page">Loading…</div>;
+  if (loading) return <TrackSkeleton cards={6} />;
   if (!track) {
     return (
       <div className="page">
@@ -172,6 +177,44 @@ export default function Mastery() {
     ? pacing(new Date(startedRaw), currentWeek, track.weeks.length)
     : null;
   const finished = completedWeeks === track.weeks.length;
+
+  /* The programme as a track: phases are the rail, weeks are the units. They
+     expand in place rather than navigating, so `renderUnit` supplies the card
+     and `base` is never used for a link (UI_ROADMAP G1). */
+  const spec: TrackSpec = {
+    title: track.title,
+    subtitle: track.subtitle,
+    base: "/mastery",
+    unitLabel: "Week",
+    groupLabel: "Phase",
+    groups: phases.map<TrackGroup>(([phase]) => ({ key: phase, title: phase })),
+    units: track.weeks.map((w) => ({
+      slug: String(w.week),
+      number: w.week,
+      title: w.title,
+      group: w.phase,
+      done: perWeek[w.week - 1].complete,
+      authored: true,
+    })),
+    renderUnit: (u) => {
+      const w = track.weeks.find((x) => x.week === u.number);
+      if (!w) return null;
+      return (
+        <WeekCard
+          week={w}
+          track={track}
+          row={progress.get(w.week)}
+          progress={perWeek[w.week - 1]}
+          locked={!unlocked.has(w.week)}
+          conceptByKey={conceptByKey}
+          problemBySlug={problemBySlug}
+          done={done}
+          onToggleChapter={toggleChapter}
+          onChanged={refreshProgress}
+        />
+      );
+    },
+  };
 
   async function pickTrack(key: string) {
     setTrackKey(key);
@@ -262,41 +305,7 @@ export default function Mastery() {
 
       {finished && <CompletionSummary track={track} perWeek={perWeek} totalStudy={totalStudy} />}
 
-      {phases.map(([phase, weeks]) => {
-        const doneHere = weeks.filter((w) => perWeek[w.week - 1].complete).length;
-        return (
-          <Section
-            key={phase}
-            title={phase}
-            open={phaseFold.isOpen(phase)}
-            onToggle={() => phaseFold.toggle(phase)}
-            meta={
-              <span
-                className="dim"
-                style={{ fontSize: 12, color: doneHere === weeks.length ? "var(--good)" : undefined }}
-              >
-                {doneHere}/{weeks.length} weeks
-              </span>
-            }
-          >
-            {weeks.map((w) => (
-              <WeekCard
-                key={w.week}
-                week={w}
-                track={track}
-                row={progress.get(w.week)}
-                progress={perWeek[w.week - 1]}
-                locked={!unlocked.has(w.week)}
-                conceptByKey={conceptByKey}
-                problemBySlug={problemBySlug}
-                done={done}
-                onToggleChapter={toggleChapter}
-                onChanged={refreshProgress}
-              />
-            ))}
-          </Section>
-        );
-      })}
+      <TrackBody spec={spec} progress={trackProgress(spec.units)} />
     </div>
   );
 }
@@ -383,7 +392,6 @@ function WeekCard({
   onChanged: () => Promise<void>;
 }) {
   const nav = useNavigate();
-  const toast = useToast();
   const [open, setOpen] = useState(!locked && !progress.complete);
 
   // Study time is accumulated only while this week is expanded, then flushed
@@ -423,15 +431,6 @@ function WeekCard({
         </div>
       </div>
     );
-  }
-
-  async function startContest() {
-    try {
-      const id = await api.masteryStartContest(track.key, week.week);
-      toast(`Checkpoint contest ready (#${id}) — open it from Contests`);
-    } catch (e) {
-      toast(String(e));
-    }
   }
 
   return (
@@ -560,18 +559,7 @@ function WeekCard({
 
           {week.problems.length > 0 && (
             <>
-              <div className="row" style={{ justifyContent: "space-between", alignItems: "center" }}>
-                <div className="io-label">🎯 Problems to solve</div>
-                {week.contest && (
-                  <button
-                    className="ghost"
-                    style={{ padding: "2px 10px", fontSize: 12 }}
-                    onClick={startContest}
-                  >
-                    ⏱ Run as a timed checkpoint
-                  </button>
-                )}
-              </div>
+              <div className="io-label">🎯 Problems to solve</div>
               <div className="grid cols-2" style={{ marginBottom: 14 }}>
                 {week.problems.map((ref) => {
                   const p = problemBySlug.get(ref.slug);

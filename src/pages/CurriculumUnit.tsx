@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { api } from "../api";
+import { useCrumb } from "../store";
 import type { BigOItem, CardReview, Concept, Trace, UnitCheck } from "../types";
 import { Markdown, InlineMarkdown } from "../components/Markdown";
 import { Confidence, DiffBadge, Empty } from "../components/common";
@@ -176,6 +177,7 @@ function UnitView({
 
   const u = hydrated.unit;
   const key = u.key;
+  useCrumb(u.title, "DSA unit");
   const today = todayISO();
   const checkStats = unitChecks(hydrated, reviews, today);
   const bigoStats = cardStats(u.bigo.map((_, i) => bigoCardId(key, i)), reviews, today);

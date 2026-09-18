@@ -21,6 +21,57 @@ Most of the rest of the app predates that work.
 
 ---
 
+## Status, 2026-09-18
+
+Steps 1-6 of the order of work below are **done**, plus most of the guards in
+§L and the contained items from §C, §J and §K. The measures at the top of this
+file are the *original* audit; the current numbers are in the table beneath it.
+
+**Done:** A1 A2 A4 A5 A6 A7 A8 A9 A10 · B1 B2 B3 B4 B5 · C1 C5 C7 C8 C9 C10 C11
+· D1 D2 D4 D5 D6 D7 D8 · E1 E3 E4 E5 · F1 F2 F3 F4 F5 F6 F8 · **G1** G2 G3 G5 ·
+I2 · J2 J3 · K1 K2 K3 K4 K5 · L1 L2 L3 L4 L5 L6.
+
+**Not done, and why:**
+
+| Item | Why it is still open |
+|---|---|
+| A3 | Learning Paths vs the curriculum is a content decision, not a UI one. |
+| C2 C3 | The component set exists (`components/ui/`, `Toast`, `Skeleton`, `SaveState`) and the shell, Today, Solve and Settings are on it. The five track pages in §G still carry their own layouts. |
+| C4 | The exercise card is still implemented five ways. G1 unified the *layouts*; this is the card inside them. |
+| C6 | Emoji are still the icon set. Replacing them is a whole-app sweep, and it is cosmetic next to everything above. |
+| C12 | Brand mark, app icon and custom title bar — design work, not a code change. |
+| D3 D9 | The clickable `div`s on Solve, the Dashboard and the course cards are converted; Projects, Learn and Mastery still have theirs. Landmark/heading audit is per page and belongs with G6/G7. |
+| E2 E6 | 42 silent catches: the ones on Solve, Settings and the draft writes now report. The rest are in the pages G6/G7 will rewrite. |
+| F7 | Gone: the modes it describes were deleted under A1. |
+| G4 G6 G7 G8 | Lesson wayfinding, and the Learn and Projects file splits. G1 put all five tracks on one template (`components/track/TrackShell.tsx`): one hero, one group rail, one set of unit rows, one pager. What remains is the *contents* of a unit page, not its frame. |
+| H1 H2 H3 H4 | Browse keeps its filters and has a sticky header; presets, virtualisation, the column chooser, keyboard rows and the problem form are open. |
+| I1 | Statistics was deleted under A1. Per-track insights need rebuilding from scratch. |
+| J1 J4 | The layout contract between 960 and 1400px, and multiple windows. |
+
+### Current numbers
+
+| Measure | Audit | Now |
+|---|---|---|
+| Inline `style={{…}}` objects | ~1,500 | **1,071** (ratcheted by `tools/inline-styles.mjs`) |
+| Token pairs failing WCAG AA | 21 of 42 | **0 of 84** (both themes, plus high contrast) |
+| Tab bars with `role="tab"` | 1 | every one |
+| Pages with a loading skeleton | 3 of 27 | 9 of 19 |
+| `window.confirm` for destructive actions | 4 | **0** |
+| Built pages with no route | 9 | **0** |
+| `global.css` | 1,698 lines, one file | 13 files behind an index |
+| Track overview layouts | 5 | **1** (`TrackShell`) |
+
+### New tooling
+
+- `npm run dev:mock` — the whole app in a browser, on JSON fixtures
+  (`src/dev/mockBackend.ts`). Deterministic, so screenshots mean something.
+- `/ui` — the component gallery, in that mode.
+- `npm run check:contrast` — every token pair against WCAG AA. In CI.
+- `npm run check:styles` — the inline-style ratchet. In CI.
+- `node tools/screenshots.mjs` — visual regression, both themes.
+
+---
+
 ## The numbers behind this list
 
 | Measure | Value |

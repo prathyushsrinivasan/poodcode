@@ -15,3 +15,8 @@ src-tauri/gen
 
 # Python bytecode from the tools/ generators
 __pycache__/
+
+# Visual-regression output (tools/screenshots.mjs). The baseline is regenerated
+# on the machine that checks it — antialiasing differs between machines, so a
+# committed baseline would fail everywhere but where it was made.
+screenshots/
