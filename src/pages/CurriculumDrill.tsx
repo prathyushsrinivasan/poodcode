@@ -254,6 +254,27 @@ function RoutingCard({
               </div>
             </div>
           )}
+          {/* The signal above says "this technique applies when…", which is the
+              question you ask *after* choosing — and someone who chose wrongly
+              never got that far. The stage's routing rule is what would have
+              sent them here in the first place, and `not` names the near miss
+              they most likely confused it with. */}
+          {q.routeHint && (
+            <div className="hint" style={{ marginTop: 10 }}>
+              <div className="hint-label">The routing rule</div>
+              <div>
+                <InlineMarkdown>{q.routeHint.when}</InlineMarkdown> →{" "}
+                <strong>{q.answerLabel}</strong>.{" "}
+                <span className="dim"><InlineMarkdown>{q.routeHint.why}</InlineMarkdown></span>
+              </div>
+              {q.routeHint.notWhen && (
+                <div className="cur-router-not" style={{ marginTop: 6 }}>
+                  <span className="cur-router-not-tag">not</span>{" "}
+                  <InlineMarkdown>{q.routeHint.notWhen}</InlineMarkdown>
+                </div>
+              )}
+            </div>
+          )}
         </>
       )}
     </div>

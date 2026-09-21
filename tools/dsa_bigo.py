@@ -208,6 +208,35 @@ for (int q = 0; q < Q; q++) {
     # ---------------------------------------------------------------- stage 2
     "hashing": [
         _bigo(r"""
+Map<Integer, Integer> seen = new HashMap<>();     // two-sum, one pass
+for (int i = 0; i < n; i++) {
+    Integer j = seen.get(target - a[i]);
+    if (j != null) return new int[]{ j, i };
+    seen.put(a[i], i);
+}
+""", "O(n)", ["O(n)", "O(n log n)", "O(n²)", "O(1)"],
+            "One lookup and one insert per element, both O(1) on average. The nested-loop "
+            "version asks the same question by scanning — and note the space went the "
+            "other way, O(1) to O(n)."),
+        _bigo(r"""
+for (String w : words) {                          // n words of length m, grouped by anagram
+    char[] c = w.toCharArray();
+    Arrays.sort(c);
+    groups.computeIfAbsent(new String(c), k -> new ArrayList<>()).add(w);
+}
+""", "O(n·m log m)", ["O(n·m log m)", "O(n·m)", "O(n log n)", "O(n²·m)"],
+            "The sort is inside the loop, so it is paid per word. Replacing the key with a "
+            "26-slot count signature makes each key O(m) and the whole pass O(n·m) — "
+            "the same grouping, a cheaper canonical form."),
+        _bigo(r"""
+Map<Character, Integer> freq = new HashMap<>();   // fixed 26-letter alphabet
+for (char ch : s.toCharArray()) freq.merge(ch, 1, Integer::sum);
+""", "O(m) time, O(1) space", ["O(m) time, O(1) space", "O(m) time, O(m) space",
+                              "O(m log m) time, O(1) space", "O(m²) time, O(1) space"],
+            "The map holds at most 26 entries whatever m is, so the space is bounded by the "
+            "**alphabet** and not by the input — a constant, however large it feels. An "
+            "`int[26]` is the same bound with a far smaller constant and no boxing."),
+        _bigo(r"""
 Set<Integer> seen = new HashSet<>();
 for (int x : a) {
     if (seen.contains(target - x)) return true;
@@ -253,6 +282,38 @@ for (int i = 0; i < 26; i++) if (count[i] > 0) distinct++;
             "extra memory matters."),
     ],
     "two-pointers": [
+        _bigo(r"""
+Arrays.sort(a);                                  // n elements
+int l = 0, r = n - 1;
+while (l < r) {
+    int sum = a[l] + a[r];
+    if (sum == target) return true;
+    if (sum < target) l++; else r--;
+}
+""", "O(n log n)", ["O(n)", "O(n log n)", "O(n²)", "O(log n)"],
+            "The scan is O(n) and the **sort** is not. Quoting this as “O(n), two "
+            "pointers” is the most common overstatement in the unit — the "
+            "two-pointer part is linear, and the precondition it needs costs n log n unless "
+            "the input arrived sorted."),
+        _bigo(r"""
+Arrays.sort(a);                                  // three-sum
+for (int i = 0; i < n; i++) {
+    int l = i + 1, r = n - 1;
+    while (l < r) { /* O(1) decision, exactly one pointer moves */ }
+}
+""", "O(n²)", ["O(n²)", "O(n log n)", "O(n³)", "O(n² log n)"],
+            "n outer iterations, each running a linear convergence — and the sort is "
+            "dominated by them rather than the other way round. Brute force over every triple "
+            "is O(n³), so fixing one index and converging the other two removes exactly "
+            "one factor of n."),
+        _bigo(r"""
+int write = 0;                                   // compaction in place
+for (int read = 0; read < n; read++)
+    if (keep(a[read])) a[write++] = a[read];
+""", "O(n)", ["O(n)", "O(n²)", "O(n log n)", "O(1)"],
+            "Two pointers, one loop: `read` advances every iteration and `write` at most as "
+            "often. The `list.remove(i)` version of the same logic shifts the tail on every "
+            "removal, which is O(n·k) for k removals and reads as linear."),
         _bigo(r"""
 int l = 0, r = n - 1;                     // a is sorted
 while (l < r) {
@@ -300,6 +361,36 @@ while (j < m) out[k++] = b[j++];
             "sorted sequences is linear — that is the step merge sort is built on."),
     ],
     "sliding-window": [
+        _bigo(r"""
+int lo = 0;                                       // longest window with at most k distinct
+for (int hi = 0; hi < n; hi++) {
+    freq.merge(s.charAt(hi), 1, Integer::sum);
+    while (freq.size() > k) freq.merge(s.charAt(lo++), -1, Integer::sum);
+    best = Math.max(best, hi - lo + 1);
+}
+""", "O(n)", ["O(n)", "O(n·k)", "O(n²)", "O(n log n)"],
+            "A `while` inside a `for`, and still linear: `lo` only ever moves right, so it "
+            "advances at most n times over the **whole** loop rather than n times per "
+            "iteration. That is the amortized argument, and stating it is exactly what the "
+            "follow-up question is fishing for."),
+        _bigo(r"""
+long count = atMostKDistinct(s, k)                // count subarrays with EXACTLY k distinct
+            - atMostKDistinct(s, k - 1);          // each call is one O(n) window
+""", "O(n)", ["O(n)", "O(n²)", "O(n log n)", "O(n·k)"],
+            "Two linear passes are still linear. The reason there must be two is not cost, it "
+            "is correctness: “exactly k” is not preserved by shrinking a window, so "
+            "no single window can maintain it — but “at most k” is, twice."),
+        _bigo(r"""
+Deque<Integer> dq = new ArrayDeque<>();           // maximum of every window of size k
+for (int i = 0; i < n; i++) {
+    while (!dq.isEmpty() && a[dq.peekLast()] <= a[i]) dq.pollLast();
+    dq.addLast(i);
+    if (dq.peekFirst() <= i - k) dq.pollFirst();
+}
+""", "O(n)", ["O(n)", "O(n·k)", "O(n log k)", "O(n²)"],
+            "Each index is pushed once and popped once, so both `while`s together run at most "
+            "2n times. A `TreeMap` of the window's contents also works and costs O(n log k) — "
+            "the deque wins because it never needs the order, only the maximum."),
         _bigo(r"""
 for (int i = 0; i + k <= n; i++) {
     int s = 0;
@@ -361,6 +452,33 @@ for (int r = 0; r < s.length(); r++) {
     ],
     "prefix-sums": [
         _bigo(r"""
+long[] prefix = new long[n + 1];                  // built once
+for (int i = 0; i < n; i++) prefix[i + 1] = prefix[i] + a[i];
+for (int[] q : queries)                           // then q range queries
+    out += prefix[q[1] + 1] - prefix[q[0]];
+""", "O(n + q)", ["O(n + q)", "O(n·q)", "O(q log n)", "O(n log n)"],
+            "One pass to build, one subtraction per query. Re-adding each range instead is "
+            "O(n·q) — at n = q = 10⁵ that is the difference between "
+            "2·10⁵ steps and 10¹⁰."),
+        _bigo(r"""
+int[] diff = new int[n + 1];                      // q range updates
+for (int[] u : updates) { diff[u[0]] += u[2]; diff[u[1] + 1] -= u[2]; }
+for (int i = 1; i < n; i++) diff[i] += diff[i - 1];
+""", "O(n + q)", ["O(n + q)", "O(n·q)", "O(q log n)", "O(n²)"],
+            "Two writes per update however **wide** the range is, then one integration pass. "
+            "Applying each update directly is O(n·q), and the gap grows with the width of "
+            "the ranges rather than with how many there are."),
+        _bigo(r"""
+int[][] P = new int[r + 1][c + 1];                // 2-D prefix sums over an r x c grid
+for (int i = 0; i < r; i++)
+    for (int j = 0; j < c; j++)
+        P[i+1][j+1] = g[i][j] + P[i][j+1] + P[i+1][j] - P[i][j];
+""", "O(r·c)", ["O(r·c)", "O(r·c log(r·c))", "O((r·c)²)", "O(r + c)"],
+            "One constant-time expression per cell, so the build is linear **in the size of "
+            "the grid** — worth phrasing that way, because “quadratic” is true "
+            "of r and c and false of the input. Every rectangle query afterwards is O(1) by the "
+            "same four-term inclusion–exclusion."),
+        _bigo(r"""
 long[] pre = new long[n + 1];
 for (int i = 0; i < n; i++) pre[i + 1] = pre[i] + a[i];
 for (int[] qr : queries)                  // q queries
@@ -408,6 +526,29 @@ for (int i = 1; i <= r; i++)
             "The subtraction of `P[i-1][j-1]` is the corner that was added twice."),
     ],
     "strings": [
+        _bigo(r"""
+String out = "";                                  // n parts
+for (String part : parts) out += part;
+""", "O(n²)", ["O(n)", "O(n²)", "O(n log n)", "O(1)"],
+            "Java strings are immutable, so `+=` allocates and copies everything accumulated so "
+            "far: 1 + 2 + 3 + … characters. Quadratic **in the total length**, from a loop "
+            "that reads as linear. `StringBuilder` makes it O(n) amortized."),
+        _bigo(r"""
+for (int i = 0; i + m <= n; i++)                  // text n, pattern m
+    if (s.substring(i, i + m).equals(t)) return i;
+""", "O(n·m)", ["O(n·m)", "O(n + m)", "O(n)", "O(m log n)"],
+            "Two costs of the same order, and one of them is invisible: `substring` **copies** "
+            "m characters before `equals` compares them. `regionMatches` removes the allocation "
+            "without changing the bound; KMP removes the bound, at O(n + m)."),
+        _bigo(r"""
+for (int centre = 0; centre < 2 * m - 1; centre++) {
+    int lo = centre / 2, hi = lo + (centre % 2);
+    while (lo >= 0 && hi < m && s.charAt(lo) == s.charAt(hi)) { lo--; hi++; }
+}
+""", "O(m²)", ["O(m²)", "O(m)", "O(m log m)", "O(m³)"],
+            "2m − 1 centres, each expanding up to m/2 steps — `aaaa…a` reaches "
+            "the bound. O(1) space, which is the trade against a DP table. Manacher does the "
+            "same job in O(m) and is rarely expected."),
         _bigo(r"""
 for (int i = 0; i < n; i++)               // s has n chars, p has m ≤ n
     if (s.substring(i).startsWith(p)) count++;

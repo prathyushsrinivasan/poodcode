@@ -27,17 +27,28 @@ _S8 = _stage(
 **This stage is optional.** Finishing stages 1–7 is finishing the interview
 core; nothing here is needed for it, and the course's progress does not count it.
 
-What is here are four techniques that turn up in harder rounds and in contests,
+What is here are ten techniques that turn up in harder rounds and in contests,
 each solving something the core toolkit cannot do efficiently:
 
 | Unit | What it adds |
 | --- | --- |
-| **String matching** | every occurrence in linear time; comparing substrings by hash |
-| **Range queries** | prefix sums that survive updates; minimum over a changing range |
+| **String matching** | every occurrence in linear time; substrings compared by hash; suffix and LCP arrays |
+| **Range queries** | prefix sums that survive updates; range *updates* by lazy propagation; O(1) static minimums |
 | **Advanced graphs** | cut vertices, strongly connected components, Euler paths |
 | **Bitmask DP** | a subset of up to ~20 things as the state |
+| **Tree queries** | a fixed tree, preprocessed: Euler tour, binary lifting, LCA |
+| **Advanced bits** | an order where one bit changes; a basis for everything a set can XOR to |
+| **Advanced DP** | a state made of digits; a transition made cheaper; an exponent halved |
+| **Flows & matching** | pairing things up, and the max-flow min-cut duality |
+| **Geometry** | one integer expression, and orientation, area, intersection and hulls from it |
+| **Randomized** | expected versus worst case, Las Vegas versus Monte Carlo, and sampling |
 
 Each opens with an easier problem and builds to a hard one, like every other unit.
+
+The first four came from the syllabus audit — techniques whose problems were
+already in the bank, stranded in units that never taught them. The last six came
+from the 107-topic audit in `DSA_ROADMAP.md`, and their problems were authored
+for them.
 """,
     optional=True,
 )
@@ -110,6 +121,62 @@ each, so a 10-letter window is a 20-bit integer with no collisions at all.
 "Longest substring that occurs twice" is monotone: a repeat of length L contains
 a repeat of length L − 1. Binary-search L; test each L with one rolling-hash pass.
 O(n log n) expected.
+
+### Suffix arrays
+
+All of the above answer questions about *one* pattern, or about one length. The
+**suffix array** answers questions about every substring at once: it is the n
+suffixes of `s`, sorted, stored as their starting positions.
+
+It is built by **doubling**. Sort the suffixes by their first character and give
+each a rank. Now the first *two* characters of suffix i are the pair
+`(rank[i], rank[i+1])` — so sorting by that pair ranks every suffix by its first
+two characters, in one sort of integers, with no string comparison at all. Repeat
+and the compared length doubles: 1, 2, 4, 8 … `⌈log₂ n⌉` rounds in total.
+
+```java
+for (int k = 1; k < n; k <<= 1) {
+    // key(i) = (rank[i], i + k < n ? rank[i + k] : -1)
+    sort sa by key;                 // O(n log n), or O(n) with a radix sort
+    rank = ranksFrom(sa, key);      // equal keys MUST get equal ranks
+}
+```
+
+The `-1` for a suffix that runs off the end is what makes a shorter suffix sort
+before a longer one that extends it: `an` before `ana`.
+
+### The LCP array, and Kasai
+
+`lcp[i]` is the length of the longest common prefix of `sa[i-1]` and `sa[i]` —
+adjacent suffixes in sorted order. Kasai computes all of them in **one linear
+pass**, by walking the suffixes in order of *starting position* rather than rank:
+
+```java
+int h = 0;
+for (int i = 0; i < n; i++) {
+    if (pos[i] == 0) { h = 0; continue; }
+    int j = sa[pos[i] - 1];
+    while (i + h < n && j + h < n && s.charAt(i + h) == s.charAt(j + h)) h++;
+    lcp[pos[i]] = h;
+    if (h > 0) h--;                 // dropping a character costs at most one
+}
+```
+
+That last line is the whole argument: `h` falls by at most 1 per step and rises
+at most n times in total, so the inner loop is O(1) amortized.
+
+### What the LCP array is for
+
+| Question | Answer |
+| --- | --- |
+| Longest repeated substring | `max(lcp)` |
+| Number of distinct substrings | `n(n+1)/2 − Σ lcp[i]` |
+| Longest substring common to k strings | sliding window over the LCP of their concatenation |
+| Does pattern t occur in s? | two binary searches over the suffix array, O(|t| log n) |
+
+The distinct-substring count is the cleanest of these: every substring is a
+prefix of some suffix, there are n(n+1)/2 of those, and the ones counted twice
+are exactly the shared prefixes of *adjacent* sorted suffixes.
 """,
     signals=[
         _sig("“count all occurrences”, overlapping allowed", "Z-function on pattern + $ + text",
@@ -124,6 +191,11 @@ O(n log n) expected.
              "No collisions to worry about."),
         _sig("Comparing many substring pairs for equality", "Prefix hashes",
              "`hash(l, r)` in O(1) after an O(n) precomputation."),
+        _sig("“how many distinct substrings”, “longest repeated substring”, exactly",
+             "Suffix array + LCP array",
+             "One structure answers the whole family, with no collision caveat."),
+        _sig("Many patterns against one fixed text", "Suffix array, binary searched",
+             "O(|t| log n) per pattern after an O(n log n) build."),
     ],
     skeletons=[
         _sk("Z-function",
@@ -169,6 +241,41 @@ for (int i = 0; ; i++) {
 }
 """,
             "Verify matching windows by comparing characters when the answer must be exact."),
+        _sk("Suffix array by doubling",
+            "Every substring question at once, exactly.",
+            """
+Integer[] sa = indicesSortedBy(i -> s.charAt(i));
+int[] rank = ranksFrom(sa);                       // equal characters -> equal ranks
+
+for (int k = 1; k < n; k <<= 1) {
+    final int kk = k;
+    Arrays.sort(sa, (x, y) -> {
+        if (rank[x] != rank[y]) return Integer.compare(rank[x], rank[y]);
+        int rx = x + kk < n ? rank[x + kk] : -1;   // -1: a shorter suffix sorts first
+        int ry = y + kk < n ? rank[y + kk] : -1;
+        return Integer.compare(rx, ry);
+    });
+    rank = ranksFrom(sa, kk);
+    if (rank[sa[n - 1]] == n - 1) break;           // all distinct, nothing left to separate
+}
+""",
+            "`ranksFrom` must give equal ranks to equal keys, or the next round's pairs are wrong."),
+        _sk("LCP array (Kasai)",
+            "Distinct substrings, longest repeat, longest common substring.",
+            """
+int[] pos = new int[n];                            // inverse of sa
+for (int i = 0; i < n; i++) pos[sa[i]] = i;
+
+int h = 0;
+for (int i = 0; i < n; i++) {
+    if (pos[i] == 0) { h = 0; continue; }
+    int j = sa[pos[i] - 1];
+    while (i + h < n && j + h < n && s.charAt(i + h) == s.charAt(j + h)) h++;
+    lcp[pos[i]] = h;
+    if (h > 0) h--;
+}
+""",
+            "Linear because `h` drops by at most one per step. Remove the `h--` and it is quadratic."),
     ],
     traces=[
         _trace(
@@ -197,6 +304,10 @@ for (int i = 0; ; i++) {
         _cost("Rolling hash over all windows", "O(n)", "O(1)", "Plus verification when hashes match."),
         _cost("Longest repeated substring", "O(n log n) expected", "O(n)", "Binary search over L, one hash pass each."),
         _cost("Naive matching", "O(n · m)", "O(1)", "What all of these replace."),
+        _cost("Suffix array (doubling)", "O(n log² n)", "O(n)", "O(n log n) with a radix sort."),
+        _cost("LCP array (Kasai)", "O(n)", "O(n)", "Given the suffix array."),
+        _cost("Distinct substrings", "O(n log² n)", "O(n)", "n(n+1)/2 − Σ lcp; never builds a substring."),
+        _cost("Pattern search in a suffix array", "O(|t| log n)", "O(1)", "Two binary searches for the range of matches."),
     ],
     pitfalls=[
         _pit("A match is reported that runs past the pattern",
@@ -214,6 +325,19 @@ for (int i = 0; ; i++) {
         _pit("Binary search on the length finds nothing",
              "The search range started at 0 and the check for length 0 always succeeds, or ended at n.",
              "Search L in [1, n − 1]: a repeat is at most n − 1 long."),
+        _pit("A suffix array is subtly out of order on strings like `aab`",
+             "The doubling round gave each position a fresh rank instead of giving equal keys "
+             "equal ranks — or the off-the-end sentinel was 0 rather than −1.",
+             "Ranks come from comparing consecutive keys, and the sentinel must be below every "
+             "real rank so `an` sorts before `ana`."),
+        _pit("Kasai's LCP pass is quadratic",
+             "The `if (h > 0) h--;` at the end of the loop is missing, so `h` restarts at 0 "
+             "for every suffix.",
+             "That one line is the amortized argument. Without it the inner `while` re-reads "
+             "the same characters n times."),
+        _pit("The distinct-substring count overflows",
+             "n(n+1)/2 at n = 10⁵ is 5·10⁹, past `int`.",
+             "Accumulate in a `long`, and cast before the multiplication, not after."),
     ],
     lessons=["string_basics", "hashing", "binary_search"],
     checks=[
@@ -229,6 +353,20 @@ for (int i = 0; ; i++) {
         _chk("Why is \"a repeated substring of length L exists\" monotone in L?",
              "Dropping the last character of a repeated substring leaves a repeated substring "
              "one shorter. So the answer is the boundary a binary search can find."),
+        _chk("Why does the doubling construction never compare two suffixes character by "
+             "character after the first round?",
+             "Because after a round ranking by the first k characters, the first 2k characters "
+             "of suffix i are the *pair* (rank[i], rank[i+k]) — two integers. Comparing "
+             "integers replaces comparing strings, which is what removes the factor of n."),
+        _chk("Why is the number of distinct substrings n(n+1)/2 − Σ lcp?",
+             "Every substring is a prefix of some suffix, and the suffixes have n(n+1)/2 "
+             "prefixes in total. Sorting puts identical prefixes next to each other, so the "
+             "duplicates are exactly the lcp[i] prefixes each suffix shares with the one before "
+             "it in sorted order."),
+        _chk("Kasai's inner `while` can run n times. Why is the whole pass O(n)?",
+             "`h` increases by one per successful comparison and decreases by at most one per "
+             "outer step, so there are at most n decreases and therefore at most 2n increases "
+             "in total — the amortized argument, with `h` as the potential."),
     ],
     bigo=[
         _bigo(r"""
@@ -264,6 +402,29 @@ for (int i = 0; i + m <= n; i++)
 """, "O(n·m)", ["O(n·m)", "O(n + m)", "O(n)", "O(m log n)"],
             "Up to m comparisons at each of n − m + 1 starts — `aaaa…a` against `aa…ab` hits "
             "the bound. The Z-function answers the same question in O(n + m)."),
+        _bigo(r"""
+int h = 0;                                       // Kasai, given the suffix array
+for (int i = 0; i < n; i++) {
+    if (pos[i] == 0) { h = 0; continue; }
+    int j = sa[pos[i] - 1];
+    while (i + h < n && j + h < n && c[i + h] == c[j + h]) h++;
+    lcp[pos[i]] = h;
+    if (h > 0) h--;
+}
+""", "O(n)", ["O(n)", "O(n log n)", "O(n²)", "O(n√n)"],
+            "The inner `while` looks like it can run n times, and on one step it can. But `h` "
+            "only ever falls by one per outer step, so there are at most n decreases and "
+            "therefore at most 2n increases over the whole loop. Delete the `if (h > 0) h--;` "
+            "and the same code really is O(n²)."),
+        _bigo(r"""
+for (int k = 1; k < n; k <<= 1) {                // suffix array by doubling
+    Arrays.sort(sa, byRankPair(k));              // comparison sort of n integers pairs
+    rank = ranksFrom(sa, k);
+}
+""", "O(n log² n)", ["O(n log n)", "O(n log² n)", "O(n²)", "O(n² log n)"],
+            "log n doubling rounds, each an O(n log n) sort — the two logs come from different "
+            "places and multiply. Replacing the comparison sort with a two-pass radix sort "
+            "makes each round O(n) and the whole build O(n log n)."),
     ],
     interview="""
 These come up as follow-ups: "your solution compares substrings — can you make
@@ -279,9 +440,13 @@ is a two-line answer that sounds like it took a week to learn.
               ["string-period", "repeated-dna-sequences"],
               {"string-period": "One prefix-function pass; the answer is n − pi[n − 1]. Check it against brute force on `abaabaabb`.",
                "repeated-dna-sequences": "Two bits per letter make the window code exact. Shift, mask, count."}),
-        _rung("Stretch", "Binary search on the answer, with a hash as the check.",
-              ["longest-duplicate-substring"],
-              {"longest-duplicate-substring": "Search L in [1, n − 1]. Group windows by hash, verify characters, keep the smallest match at the final length."}),
+        _rung("Suffix arrays", "Sort every suffix once, and stop answering one question at a time.",
+              ["suffix-array-order"],
+              {"suffix-array-order": "Build it by doubling. Write out the ranks for `banana` after k = 1, 2 and 4 by hand before you code it — the sentinel −1 is the part that will bite."}),
+        _rung("Stretch", "The two hardest substring questions, from the two directions.",
+              ["longest-duplicate-substring", "distinct-substrings-large"],
+              {"longest-duplicate-substring": "Search L in [1, n − 1]. Group windows by hash, verify characters, keep the smallest match at the final length.",
+               "distinct-substrings-large": "The trie version of this is in `tries`; it is O(n²) and dies at n = 10⁵. Here it is n(n+1)/2 minus the LCP sum — solve it both ways and compare the two shapes."}),
     ],
     next_up="""
 Strings compared by precomputation. The next unit precomputes over arrays — and
@@ -295,7 +460,7 @@ keeps the precomputation valid while the array changes.
 _unit(
     "range-queries", "Range Queries: Fenwick & Segment Trees", "📏", _S8,
     "Prefix sums that survive updates, and ranges combined in O(log n).",
-    weight=1,
+    weight=2,
     prereqs=["prefix-sums", "bit-manipulation", "trees"],
     why="""
 Prefix sums answer any range sum in O(1) — until the array changes, and the whole
@@ -356,8 +521,65 @@ two ordinary ones — two Fenwick trees:
 
 `prefix(i) = (i + 1) · Σ d[j] − Σ d[j] · j`
 
-For range *assignment*, or range update with range minimum, a segment tree with
-**lazy propagation** is the general tool.
+### Lazy propagation
+
+The difference-array trick works because addition is *linear in the update*: the
+effect of "add v to [l, r]" on a prefix is a linear function of v. **Assignment
+is not** — "set [l, r] to v" destroys whatever was there, and how much it
+destroys depends on the current contents. So no pair of Fenwick trees can do it.
+
+A segment tree can, by being lazy: when a node's range lies entirely inside the
+update range, **apply the update to that node and stop**, leaving a note that its
+children still owe the change.
+
+```java
+void apply(int node, int lo, int hi, long v) {   // assign v to this whole range
+    sum[node]     = v * (hi - lo + 1);
+    lazyVal[node] = v;
+    lazy[node]    = true;                        // a boolean, NOT a sentinel value
+}
+
+void push(int node, int lo, int hi) {            // pay the children before descending
+    if (!lazy[node]) return;
+    int mid = (lo + hi) >>> 1;
+    apply(2 * node,     lo,      mid, lazyVal[node]);
+    apply(2 * node + 1, mid + 1, hi,  lazyVal[node]);
+    lazy[node] = false;
+}
+```
+
+`push` goes at the top of **both** `update` and `query`, before either descends.
+Only the O(log n) nodes on the path are ever pushed, which is why a range update
+costs the same as a point update.
+
+The boolean matters: `v` may legitimately be 0, so a sentinel cannot tell
+"assign 0" from "nothing pending".
+
+Two pending *assignments* do not combine — the later one wins, so `apply`
+overwrites. Two pending *additions* must be summed, and a tree carrying both
+needs a defined order (an assignment cancels every addition beneath it). That
+composition rule is where lazy trees actually go wrong.
+
+### Sparse table: O(1), when nothing changes
+
+For a static array and an **idempotent** combine — `min`, `max`, `gcd`, where
+`f(x, x) = x` — you can do better than a segment tree's O(log n).
+
+Precompute `table[j][i]`, the combine of the block of length 2^j starting at i,
+each level from the one below. Then cover `[l, r]` with **two overlapping**
+blocks of the largest power that fits:
+
+```java
+int j = 31 - Integer.numberOfLeadingZeros(r - l + 1);      // floor(log2(len))
+return Math.min(table[j][l], table[j][r - (1 << j) + 1]);
+```
+
+The overlap is free precisely because the operation is idempotent — which is
+also why there is no O(1) sparse table for *sums*: counting the middle twice
+would be wrong.
+
+This is binary lifting's jump table with `min` in place of "follow the pointer".
+Same build, same query, same reason it works.
 
 ### Counting with ranks
 
@@ -374,8 +596,12 @@ positions). Each element queries the ranks below its own, then adds itself.
              "Or a lazy segment tree."),
         _sig("“how many smaller elements after / before i”", "Fenwick tree over value ranks",
              "Scan in the right direction; compress the values first."),
-        _sig("No updates at all", "Prefix sums (or a sparse table for min)",
-             "Do not build a tree you do not need."),
+        _sig("No updates at all, and the question is a sum", "Prefix sums",
+             "O(n) to build, O(1) to answer. Do not build a tree you do not need."),
+        _sig("No updates at all, and the question is a min / max / gcd", "Sparse table",
+             "O(1) per query, because the combine is idempotent so blocks may overlap."),
+        _sig("“set every element of [l, r] to v”, then range sums", "Lazy segment tree",
+             "Assignment is not linear in the update, so the two-Fenwick trick cannot express it."),
         _sig("Counting inversions with updates, or online", "Fenwick tree of counts",
              "Merge sort only works offline."),
     ],
@@ -430,6 +656,45 @@ long prefix(int i) {                             // a[0] + … + a[i]
 }
 """,
             "Guard `r + 1 < n` if the trees are sized exactly n."),
+        _sk("Lazy segment tree (range assign, range sum)",
+            "A range UPDATE, where the update is not linear in its argument.",
+            """
+void update(int node, int lo, int hi, int l, int r, long v) {
+    if (r < lo || hi < l) return;                      // disjoint
+    if (l <= lo && hi <= r) { apply(node, lo, hi, v); return; }   // fully inside: stop here
+    push(node, lo, hi);                                // pay the children first
+    int mid = (lo + hi) >>> 1;
+    update(2 * node,     lo,      mid, l, r, v);
+    update(2 * node + 1, mid + 1, hi,  l, r, v);
+    sum[node] = sum[2 * node] + sum[2 * node + 1];     // and pull back up
+}
+
+long query(int node, int lo, int hi, int l, int r) {
+    if (r < lo || hi < l) return 0;
+    if (l <= lo && hi <= r) return sum[node];
+    push(node, lo, hi);                                // the line people forget
+    int mid = (lo + hi) >>> 1;
+    return query(2 * node, lo, mid, l, r) + query(2 * node + 1, mid + 1, hi, l, r);
+}
+""",
+            "`push` in `query` too. Leaving it out is correct until the first range update and "
+            "silently wrong afterwards."),
+        _sk("Sparse table (static range min)",
+            "No updates, and an idempotent combine.",
+            """
+int[][] table = new int[LOG][n];
+table[0] = a.clone();
+for (int j = 1; j < LOG; j++)
+    for (int i = 0; i + (1 << j) <= n; i++)
+        table[j][i] = Math.min(table[j - 1][i], table[j - 1][i + (1 << (j - 1))]);
+
+int query(int l, int r) {                              // inclusive
+    int j = logs[r - l + 1];                           // floor(log2(len)), precomputed
+    return Math.min(table[j][l], table[j][r - (1 << j) + 1]);
+}
+""",
+            "Precompute `logs[i] = logs[i >> 1] + 1`; `Math.log` per query is slower and rounds "
+            "wrongly at exact powers of two."),
     ],
     traces=[
         _trace(
@@ -457,6 +722,10 @@ long prefix(int i) {                             // a[0] + … + a[i]
         _cost("Two-Fenwick range add + range sum", "O(log n) each", "O(n)", "Four point updates per range add."),
         _cost("Count smaller after self", "O(n log n)", "O(n)", "Sort for ranks, then n Fenwick operations."),
         _cost("Prefix-sum array with updates", "O(n) per update", "O(n)", "What the trees replace."),
+        _cost("Lazy segment tree range update / query", "O(log n)", "O(n)", "Only the O(log n) nodes on the path are pushed."),
+        _cost("Sparse table build", "O(n log n)", "O(n log n)", "log n levels of n blocks."),
+        _cost("Sparse table query", "O(1)", "—", "Two lookups and one combine — needs idempotence."),
+        _cost("Static prefix sums", "O(1) query, O(n) build", "O(n)", "The baseline; unbeatable when nothing changes."),
     ],
     pitfalls=[
         _pit("A Fenwick tree loops forever or skips elements",
@@ -474,6 +743,23 @@ long prefix(int i) {                             // a[0] + … + a[i]
         _pit("Range sums overflow",
              "Sums of 10⁵ values up to 10⁹ were kept in `int`.",
              "Store the trees as `long[]`."),
+        _pit("A lazy tree is right until the first range update, then wrong",
+             "`push` is called in `update` but not in `query`, so a query descends through a "
+             "node with a pending change and reads stale children.",
+             "`push` at the top of every recursive call that descends — both of them."),
+        _pit("“Assign 0” behaves as “no update pending”",
+             "The pending value doubles as the flag, with 0 or −1 meaning “nothing”.",
+             "Keep a separate `boolean[] lazy`. The value and the fact that there is a value "
+             "are two different pieces of state."),
+        _pit("A lazy tree mixing range-add and range-assign gives nonsense",
+             "The two pending kinds were composed in the wrong order — an assignment arriving "
+             "on top of a pending addition must cancel it, not add to it.",
+             "Define composition explicitly: assign clears any pending add; add accumulates "
+             "onto a pending assign's value."),
+        _pit("A sparse table gives wrong sums",
+             "It was built for `+`, so the overlap between the two blocks is counted twice.",
+             "Sparse tables need an idempotent combine (min, max, gcd). For sums, use prefix "
+             "sums if static or a Fenwick tree if not."),
     ],
     lessons=["prefix_sum", "bit_manip", "tree_basics"],
     checks=[
@@ -489,6 +775,22 @@ long prefix(int i) {                             // a[0] + … + a[i]
         _chk("How does \"count smaller elements to the right\" become a Fenwick problem?",
              "Scan right to left so the elements to the right are the ones already inserted; "
              "index the tree by value rank and query how many inserted ranks are below the current one."),
+        _chk("Why can the two-Fenwick trick do range *addition* but not range *assignment*?",
+             "Because the effect of \"+v on [l, r]\" on any prefix is a linear function of v, so "
+             "it can be recorded as two point updates on a difference array. Assignment's effect "
+             "depends on what was already there, which no difference array records. That is what "
+             "lazy propagation is for."),
+        _chk("Where must `push` be called in a lazy segment tree, and what breaks if you miss one?",
+             "At the top of both `update` and `query`, before either descends. Missing it in "
+             "`query` gives correct answers until the first range update and stale ones after — "
+             "a bug small tests do not reach."),
+        _chk("Why does a sparse table answer in O(1) while a segment tree needs O(log n)?",
+             "Because it covers the range with two *overlapping* blocks instead of a disjoint "
+             "decomposition, and `min(x, x) = x` makes the overlap harmless. Sums are not "
+             "idempotent, so the same trick would double-count."),
+        _chk("Given a static array and 10⁶ range-sum queries, which structure?",
+             "Prefix sums. O(n) to build and O(1) per query, with no tree at all — building a "
+             "Fenwick or segment tree here is more code for a worse constant."),
     ],
     bigo=[
         _bigo(r"""
@@ -531,14 +833,19 @@ operation is a minimum, say that a Fenwick tree cannot do it and why — that
 distinction is what shows you understand the structure rather than its code.
 """,
     rungs=[
-        _rung("Core", "Point updates with range sums, then range minimums.",
-              ["range-sum-point-update", "range-min-queries"],
+        _rung("Warm up", "The baseline every structure here is measured against.",
+              ["static-range-sums"],
+              {"static-range-sums": "Prefix sums, O(1) per query. Then ask what one update would cost — that answer is the reason for the rest of this unit."}),
+        _rung("Core", "Point updates with range sums, range minimums, and the static shortcut.",
+              ["range-sum-point-update", "range-min-queries", "sparse-table-range-min"],
               {"range-sum-point-update": "A Fenwick tree. `set` is an add of the difference, so keep the plain array too.",
-               "range-min-queries": "A segment tree, because minimum has no inverse. Write the iterative version."}),
+               "range-min-queries": "A segment tree, because minimum has no inverse. Write the iterative version.",
+               "sparse-table-range-min": "The same question as the one above with the updates removed — and removing them buys O(1). Say out loud why the two blocks may overlap."}),
         _rung("Stretch", "Counting by rank, and updates to whole ranges.",
-              ["count-smaller-after-self", "range-add-range-sum"],
+              ["count-smaller-after-self", "range-add-range-sum", "range-assign-range-sum"],
               {"count-smaller-after-self": "Right to left, a Fenwick tree over value ranks, and query strictly below your own rank.",
-               "range-add-range-sum": "A difference array in two Fenwick trees. Derive `(i + 1)·Σd − Σd·j` before coding."}),
+               "range-add-range-sum": "A difference array in two Fenwick trees. Derive `(i + 1)·Σd − Σd·j` before coding.",
+               "range-assign-range-sum": "The one the Fenwick trick cannot reach. Write `apply` and `push` first, then the two recursions — and put `push` in the query."}),
     ],
     next_up="""
 Trees over arrays. The next unit returns to graphs, for the questions a plain
@@ -1074,7 +1381,8 @@ visited set)" before anything else; it is the step people miss.
               {"shortest-path-visit-all": "BFS over (node, mask), seeded from every node. The same node with a different mask is a different state."}),
     ],
     next_up="""
-That is everything beyond the core. From here the curriculum is revision: the
-stage-end mixed sets, and the stretch rungs re-solved from memory.
+A subset as the state. The next unit keeps the tree fixed instead and moves the
+work out of the query — the same bargain as a precomputed table, on a different
+object.
 """,
 )

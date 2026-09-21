@@ -1,4 +1,4 @@
-import type { CurriculumUnit, Difficulty, DsaCurriculum, Problem } from "../types";
+import type { CurriculumUnit, Difficulty, DsaCurriculum, Problem, StageRoute } from "../types";
 import { intervalDays } from "./revision";
 
 /**
@@ -163,6 +163,9 @@ export interface HydratedStage {
   goal: string;
   /** See `CurriculumStage.optional`. */
   optional: boolean;
+  /** The stage's routing table — which of its units a prompt belongs to.
+   * Passed through unchanged; nothing about it depends on progress. */
+  router: StageRoute[];
   units: HydratedUnit[];
   solved: number;
   total: number;
@@ -433,6 +436,7 @@ export function hydrate(
       tagline: stage.tagline,
       goal: stage.goal,
       optional: !!stage.optional,
+      router: stage.router ?? [],
       units,
       solved: units.reduce((n, u) => n + u.solved, 0),
       total: units.reduce((n, u) => n + u.total, 0),
@@ -501,8 +505,10 @@ export type MatchField =
   | "title"
   | "tagline"
   | "signal"
+  | "variant"
   | "pitfall"
   | "skeleton"
+  | "rewrite"
   | "check"
   | "cost"
   | "trace"
@@ -513,21 +519,28 @@ const FIELD_RANK: Record<MatchField, number> = {
   title: 0,
   tagline: 1,
   signal: 2,
-  pitfall: 3,
-  skeleton: 4,
-  check: 5,
-  cost: 6,
-  trace: 7,
-  problem: 8,
-  prose: 9,
+  // A family row is a routing answer in the same way a signal is — "count
+  // subarrays with exactly k distinct" reaches the right unit through the
+  // variant table, not through the prose — so it ranks beside one.
+  variant: 3,
+  pitfall: 4,
+  skeleton: 5,
+  rewrite: 6,
+  check: 7,
+  cost: 8,
+  trace: 9,
+  problem: 10,
+  prose: 11,
 };
 
 const FIELD_LABEL: Record<MatchField, string> = {
   title: "title",
   tagline: "tagline",
   signal: "signal",
+  variant: "family",
   pitfall: "pitfall",
   skeleton: "playbook",
+  rewrite: "slow vs fast",
   check: "self-check",
   cost: "costs",
   trace: "trace",
@@ -577,11 +590,21 @@ export function searchUnits(c: HydratedCurriculum, query: string): UnitMatch[] {
       ...u.unit.signals.map(
         (s) => ["signal", `${s.when} → ${s.reach_for}. ${s.why}`] as [MatchField, string]
       ),
+      ...u.unit.variants.map(
+        (v) =>
+          [
+            "variant",
+            `${v.name} — ${v.change} Use it for: ${v.when} (${v.cost}) ${v.gotcha}`,
+          ] as [MatchField, string]
+      ),
       ...u.unit.pitfalls.map(
         (p) => ["pitfall", `${p.symptom} — ${p.cause} Fix: ${p.fix}`] as [MatchField, string]
       ),
       ...u.unit.skeletons.map(
         (s) => ["skeleton", `${s.name} — ${s.when} ${s.note}`] as [MatchField, string]
+      ),
+      ...u.unit.rewrites.map(
+        (r) => ["rewrite", `${r.title} — ${r.edit}`] as [MatchField, string]
       ),
       ...u.unit.checks.map((k) => ["check", `${k.q} ${k.a}`] as [MatchField, string]),
       ...u.unit.costs.map(
@@ -597,7 +620,14 @@ export function searchUnits(c: HydratedCurriculum, query: string): UnitMatch[] {
             ] as [MatchField, string]
         )
       ),
-      ["prose", `${u.unit.why} ${u.unit.model} ${u.unit.internals} ${u.unit.build_it}`],
+      [
+        "prose",
+        `${u.unit.why} ${u.unit.model} ${u.unit.internals} ${u.unit.build_it} ` +
+          (u.unit.invariant
+            ? `${u.unit.invariant.statement} ${u.unit.invariant.established} ` +
+              `${u.unit.invariant.maintained} ${u.unit.invariant.at_exit} ${u.unit.invariant.note}`
+            : ""),
+      ],
     ];
 
     for (const [field, text] of fields) {

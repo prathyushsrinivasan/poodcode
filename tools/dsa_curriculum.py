@@ -77,15 +77,36 @@ def _md(s):
     return s.lstrip("\n").rstrip() + "\n" if s else ""
 
 
-def _stage(key, title, icon, tagline, goal, optional=False):
+def _stage(key, title, icon, tagline, goal, optional=False, router=()):
     """One stage. `optional` marks a stage beyond the interview core: the app
     leaves it out of the course's overall progress and does not send "Continue"
     into it until the core is done. Optional stages must come last (see
     `_check_curriculum`), so the core can always be walked top to bottom without
-    stepping through one."""
+    stepping through one.
+
+    `router` is the stage's own routing table (see `_route`). A unit's `signals`
+    answer "does THIS technique apply?", which is the question you can only ask
+    once you have guessed the technique. The stage router answers the question
+    that actually comes first: *given this prompt, which of these units is it?*
+    Nothing else in the curriculum answers that, and on a stage whose six units
+    all take an array and return a number, it is the entire difficulty.
+    """
     _STAGES.append({"key": key, "title": title, "icon": icon,
-                    "tagline": tagline, "goal": _md(goal), "optional": bool(optional)})
+                    "tagline": tagline, "goal": _md(goal), "optional": bool(optional),
+                    "router": list(router)})
     return key
+
+
+def _route(when, unit, why, not_when=""):
+    """One row of a stage's routing table: a prompt shape → the unit that owns it.
+
+    `not_when` is the near miss — the phrasing that looks like this row and is
+    not. Confusable pairs are where the time actually goes ("longest substring
+    with at most k distinct" is a window; "count substrings with exactly k
+    distinct" is two windows subtracted), so the row that does not say what it
+    excludes is only half a routing rule.
+    """
+    return {"when": when, "unit": unit, "why": why, "not_when": not_when}
 
 
 def _sk(name, when, code, note=""):
@@ -97,6 +118,65 @@ def _sk(name, when, code, note=""):
 def _sig(when, reach_for, why=""):
     """One row of the signal → technique routing table."""
     return {"when": when, "reach_for": reach_for, "why": why}
+
+
+def _inv(statement, established, maintained, at_exit, note=""):
+    """A unit's loop invariant, stated as the four parts that make it a proof.
+
+    Every technique in the patterns stage is a loop that refuses to re-read what
+    it has already seen, and the *reason* each one is allowed to is an invariant
+    — a sentence that is true before the loop, stays true across one iteration,
+    and at exit is strong enough to be the answer. That sentence is what the
+    units currently assert in passing and never state.
+
+    It is four fields rather than a paragraph because the paragraph is where the
+    parts go missing, and the missing part is always the same one: people can
+    state the invariant and cannot say why moving the pointer *preserves* it,
+    which is exactly the step that makes discarding half the search space legal.
+
+      * `statement`   — the sentence, precisely, in terms of the variables.
+      * `established` — why it is true before the first iteration.
+      * `maintained`  — why one iteration leaves it true. The load-bearing part.
+      * `at_exit`     — what it gives you once the loop condition fails.
+    """
+    return {"statement": statement, "established": established,
+            "maintained": maintained, "at_exit": at_exit, "note": note}
+
+
+def _var(name, change, when, cost, gotcha=""):
+    """One member of a technique's family: the skeleton with ONE thing changed.
+
+    The patterns stage does not really teach six techniques. It teaches six
+    skeletons and about thirty problems that are each of those skeletons with a
+    single line different — and a learner who has solved "longest substring with
+    at most k distinct" has *not* thereby learned "count substrings with exactly
+    k distinct", because nothing told them the second is the first, run twice,
+    subtracted.
+
+    `change` is the edit, stated as an edit. That is the whole point of the
+    field: a table of related problems is a reading list, while a table of
+    *diffs* is a technique.
+    """
+    return {"name": name, "change": change, "when": when, "cost": cost,
+            "gotcha": gotcha}
+
+
+def _rw(title, slow, fast, edit, why):
+    """The slow version, the fast version, and the one edit between them.
+
+    This stage's thesis is "stop re-reading what you have already seen", and the
+    honest way to teach it is to show the re-reading and then delete it. A
+    learner shown only the fast version has no idea which part of it is the
+    trick; shown both, the diff *is* the lesson, and it is one line often
+    enough that seeing it once is worth a page of prose.
+
+    `edit` is that line, named in words. `why` is the complexity argument for
+    why the edit is allowed — not that it is faster, but why it does not lose
+    an answer.
+    """
+    return {"title": title, "slow": slow.lstrip("\n").rstrip() + "\n",
+            "fast": fast.lstrip("\n").rstrip() + "\n", "edit": edit,
+            "why": _md(why)}
 
 
 def _cost(op, time, space, note=""):
@@ -172,7 +252,8 @@ def _extra(title, purpose, slugs, notes=None):
 def _unit(key, title, icon, stage, tagline, why, model,
           prereqs=(), signals=(), skeletons=(), costs=(), pitfalls=(),
           lessons=(), checks=(), interview="", rungs=(), next_up="",
-          internals="", traces=(), build_it="", weight=2, bigo=()):
+          internals="", traces=(), build_it="", weight=2, bigo=(),
+          invariant=None, variants=(), rewrites=()):
     """One technique, taught.
 
     `weight` is **interview yield**, 1-3, and it exists to stop the bank's
@@ -221,6 +302,11 @@ def _unit(key, title, icon, stage, tagline, why, model,
         "rungs": list(rungs),
         "build_it": _md(build_it),
         "next_up": _md(next_up),
+        # `None` rather than {} so the frontend's "does this unit have one?"
+        # test is a null check and not a key count.
+        "invariant": dict(invariant) if invariant else None,
+        "variants": list(variants),
+        "rewrites": list(rewrites),
     })
 
 
@@ -239,6 +325,7 @@ for _name in (
     "dsa_s6_hierarchies.py",
     "dsa_s7_dp.py",
     "dsa_s8_beyond.py",
+    "dsa_s8_more.py",
 ):
     _p = os.path.join(_HERE, _name)
     if os.path.exists(_p):
@@ -347,11 +434,42 @@ _MIN_BIGO = 4
 _NEEDS_INTERNALS = {
     "hashing", "binary-search", "stacks", "queues-and-deques", "linked-lists",
     "heaps", "design", "trees", "tries",
+    # Not a data structure, but the unit with the most machinery hidden behind
+    # ordinary-looking syntax: immutability, a copying `substring`, `+=` that is
+    # quadratic, and a `char` that is not a character.
+    "strings",
 }
 _NEEDS_BUILD_IT = {
     "stacks", "queues-and-deques", "linked-lists", "heaps", "design",
     "union-find", "tries", "dp-1d",
+    # The patterns stage: every one of these is a loop you should be able to
+    # write from an empty file, and "I have read it" is not that.
+    "complexity", "hashing", "two-pointers", "sliding-window", "prefix-sums",
+    "strings",
 }
+
+# Units whose whole correctness argument is a loop invariant (see `_inv`).
+#
+# Scoped deliberately rather than applied everywhere: a unit about a *structure*
+# is explained by its layout (`internals`), and a unit about a *table* by its
+# recurrence. These are the ones where the question "why is it allowed to skip
+# the rest of the search space?" has no other answer, and where leaving it
+# unstated is how people end up moving the wrong pointer.
+_NEEDS_INVARIANT = {"two-pointers", "sliding-window", "prefix-sums", "hashing"}
+
+# Units that must carry a family table (see `_var`) and a slow-vs-fast rewrite
+# (see `_rw`). The patterns stage is where both pay most: its six skeletons
+# account for most Easy/Medium array problems, and the difference between two
+# of its problems is usually one line.
+_NEEDS_VARIANTS = {
+    "complexity", "hashing", "two-pointers", "sliding-window", "prefix-sums",
+    "strings",
+}
+_NEEDS_REWRITES = dict.fromkeys(_NEEDS_VARIANTS)
+
+# The fewest family rows a unit carrying a family table may have. Two is a
+# comparison; one is a claim.
+_MIN_VARIANTS = 3
 
 
 def _check_curriculum(cur, concepts, problems):
@@ -368,6 +486,23 @@ def _check_curriculum(cur, concepts, problems):
     seen_optional_stage = None
     for si, stage in enumerate(cur["stages"]):
         assert stage["units"], f"stage {stage['key']}: no units"
+
+        # The stage router. Its rows must point at units of *this* stage: a row
+        # sending you to a unit three stages away is not a routing rule for the
+        # stage, it is a cross-reference, and it would render as a dead chip.
+        stage_unit_keys = {x["key"] for x in stage["units"]}
+        seen_routes = set()
+        for r in stage.get("router", []):
+            assert r["unit"] in stage_unit_keys, (
+                f"stage {stage['key']}: router row {r['when']!r} points at "
+                f"{r['unit']!r}, which is not a unit of this stage"
+            )
+            for part in ("when", "why"):
+                assert r.get(part, "").strip(), \
+                    f"stage {stage['key']}: router row for {r['unit']!r} has no {part!r}"
+            assert r["when"] not in seen_routes, \
+                f"stage {stage['key']}: two router rows for {r['when']!r}"
+            seen_routes.add(r["when"])
         # Optional stages sit after the whole core. A core stage after an optional
         # one would make "finish the core" require walking through optional work.
         if stage.get("optional"):
@@ -468,6 +603,57 @@ def _check_curriculum(cur, concepts, problems):
             if key in _NEEDS_BUILD_IT:
                 assert u["build_it"].strip(), \
                     f"{key}: no build-it-yourself exercise"
+
+            # The loop invariant. Checked field by field, because the part that
+            # goes missing is always `maintained` — and a unit that states the
+            # invariant without saying why one iteration preserves it has
+            # asserted the conclusion and skipped the proof.
+            inv = u["invariant"]
+            if key in _NEEDS_INVARIANT:
+                assert inv, (
+                    f"{key}: no loop invariant. This unit's correctness argument IS an "
+                    f"invariant; without it the rule for which pointer to move is a "
+                    f"memorised coin flip."
+                )
+            if inv:
+                for part in ("statement", "established", "maintained", "at_exit"):
+                    assert inv.get(part, "").strip(), (
+                        f"{key}: invariant is missing {part!r} — all four parts or none, "
+                        f"since three of them do not prove anything"
+                    )
+
+            # The family table.
+            if key in _NEEDS_VARIANTS:
+                assert len(u["variants"]) >= _MIN_VARIANTS, (
+                    f"{key}: {len(u['variants'])} variant(s), fewer than {_MIN_VARIANTS}. "
+                    f"Most problems in this unit are its skeleton with one line changed; "
+                    f"a table of fewer than three is not a family."
+                )
+            seen_variants = set()
+            for v in u["variants"]:
+                for part in ("name", "change", "when", "cost"):
+                    assert v.get(part, "").strip(), \
+                        f"{key}: variant {v.get('name', '?')!r} has no {part!r}"
+                assert v["name"] not in seen_variants, \
+                    f"{key}: two variants named {v['name']!r}"
+                seen_variants.add(v["name"])
+
+            # Slow-vs-fast rewrites.
+            if key in _NEEDS_REWRITES:
+                assert u["rewrites"], (
+                    f"{key}: no slow-vs-fast rewrite. This stage exists to delete a "
+                    f"re-scan; showing only the fast version hides which part is the trick."
+                )
+            for rw in u["rewrites"]:
+                for part in ("title", "slow", "fast", "edit"):
+                    assert rw.get(part, "").strip(), \
+                        f"{key}: rewrite {rw.get('title', '?')!r} has no {part!r}"
+                assert rw["why"].strip(), (
+                    f"{key}: rewrite {rw['title']!r} has no 'why'. \"It is faster\" is the "
+                    f"observation; the explanation is why the edit cannot lose an answer."
+                )
+                assert rw["slow"].strip() != rw["fast"].strip(), \
+                    f"{key}: rewrite {rw['title']!r} has identical slow and fast versions"
 
             last_rank = -1
             first_rung_floor = None   # easiest problem on the opening rung

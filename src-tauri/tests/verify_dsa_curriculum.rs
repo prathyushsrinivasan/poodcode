@@ -366,7 +366,7 @@ fn every_trace_is_a_well_formed_table() {
 /// (tools/dsa_traces.py and tools/dsa_bigo.py), so the rule is "all of them".
 const NEEDS_INTERNALS: &[&str] = &[
     "hashing", "binary-search", "stacks", "queues-and-deques", "linked-lists", "heaps",
-    "design", "trees", "tries",
+    "design", "trees", "tries", "strings",
 ];
 
 /// Mirrors `_MIN_BIGO` in tools/dsa_curriculum.py.
@@ -374,7 +374,21 @@ const MIN_BIGO: usize = 4;
 const NEEDS_BUILD_IT: &[&str] = &[
     "stacks", "queues-and-deques", "linked-lists", "heaps", "design", "union-find",
     "tries", "dp-1d",
+    "complexity", "hashing", "two-pointers", "sliding-window", "prefix-sums", "strings",
 ];
+
+/// Mirrors `_NEEDS_INVARIANT` in tools/dsa_curriculum.py — the units whose whole
+/// correctness argument is a loop invariant.
+const NEEDS_INVARIANT: &[&str] = &["two-pointers", "sliding-window", "prefix-sums", "hashing"];
+
+/// Mirrors `_NEEDS_VARIANTS` / `_NEEDS_REWRITES` — the patterns stage, where most
+/// problems are the unit's skeleton with one line different.
+const NEEDS_FAMILY: &[&str] = &[
+    "complexity", "hashing", "two-pointers", "sliding-window", "prefix-sums", "strings",
+];
+
+/// Mirrors `_MIN_VARIANTS`.
+const MIN_VARIANTS: usize = 3;
 
 #[test]
 fn units_that_need_depth_carry_it() {
@@ -417,5 +431,103 @@ fn units_that_need_depth_carry_it() {
             !by_key[k].build_it.trim().is_empty(),
             "{k}: no build-it-yourself exercise"
         );
+    }
+
+    for k in NEEDS_INVARIANT.iter().chain(NEEDS_FAMILY) {
+        assert!(by_key.contains_key(k), "depth list names unknown unit {k}");
+    }
+
+    // The invariant, field by field. `maintained` is the one that goes missing:
+    // a unit that states the invariant without saying why one iteration
+    // preserves it has asserted the conclusion and skipped the proof.
+    for k in NEEDS_INVARIANT {
+        let inv = by_key[k]
+            .invariant
+            .as_ref()
+            .unwrap_or_else(|| panic!("{k}: no loop invariant"));
+        for (name, text) in [
+            ("statement", &inv.statement),
+            ("established", &inv.established),
+            ("maintained", &inv.maintained),
+            ("at_exit", &inv.at_exit),
+        ] {
+            assert!(
+                !text.trim().is_empty(),
+                "{k}: invariant is missing {name} — all four parts or none"
+            );
+        }
+    }
+
+    for k in NEEDS_FAMILY {
+        let u = &by_key[k];
+        assert!(
+            u.variants.len() >= MIN_VARIANTS,
+            "{k}: {} variant(s), fewer than {MIN_VARIANTS} — a table of two is not a family",
+            u.variants.len()
+        );
+        let mut seen = HashSet::new();
+        for v in &u.variants {
+            assert!(!v.name.trim().is_empty(), "{k}: a variant has no name");
+            assert!(!v.change.trim().is_empty(), "{k}: variant '{}' has no change", v.name);
+            assert!(!v.when.trim().is_empty(), "{k}: variant '{}' has no 'when'", v.name);
+            assert!(!v.cost.trim().is_empty(), "{k}: variant '{}' has no cost", v.name);
+            assert!(seen.insert(&v.name), "{k}: two variants named '{}'", v.name);
+        }
+
+        assert!(
+            !u.rewrites.is_empty(),
+            "{k}: no slow-vs-fast rewrite. This stage exists to delete a re-scan; showing              only the fast version hides which part is the trick."
+        );
+        for r in &u.rewrites {
+            assert!(!r.title.trim().is_empty(), "{k}: a rewrite has no title");
+            assert!(!r.slow.trim().is_empty(), "{k}: rewrite '{}' has no slow version", r.title);
+            assert!(!r.fast.trim().is_empty(), "{k}: rewrite '{}' has no fast version", r.title);
+            assert!(!r.edit.trim().is_empty(), "{k}: rewrite '{}' does not name the edit", r.title);
+            assert!(!r.why.trim().is_empty(), "{k}: rewrite '{}' has no 'why'", r.title);
+            assert_ne!(
+                r.slow.trim(),
+                r.fast.trim(),
+                "{k}: rewrite '{}' has identical slow and fast versions",
+                r.title
+            );
+        }
+    }
+}
+
+/// A stage's routing table must route to that stage's own units.
+///
+/// A row pointing at a unit three stages away is not a routing rule for the
+/// stage, it is a cross-reference — and it renders as a chip that navigates
+/// somewhere the reader was not offered.
+#[test]
+fn stage_routers_point_at_their_own_units() {
+    let curriculum: DsaCurriculum =
+        serde_json::from_str(CURRICULUM).expect("dsa_curriculum.json parses");
+
+    for stage in &curriculum.stages {
+        let keys: HashSet<&str> = stage.units.iter().map(|u| u.key.as_str()).collect();
+        let mut seen = HashSet::new();
+        for r in &stage.router {
+            assert!(
+                keys.contains(r.unit.as_str()),
+                "stage {}: router row '{}' points at '{}', which is not a unit of this stage",
+                stage.key,
+                r.when,
+                r.unit
+            );
+            assert!(!r.when.trim().is_empty(), "stage {}: a router row has no 'when'", stage.key);
+            assert!(
+                !r.why.trim().is_empty(),
+                "stage {}: router row '{}' has no 'why'",
+                stage.key,
+                r.when
+            );
+            assert!(
+                seen.insert(&r.when),
+                "stage {}: two router rows for '{}'",
+                stage.key,
+                r.when
+            );
+        }
     }
 }

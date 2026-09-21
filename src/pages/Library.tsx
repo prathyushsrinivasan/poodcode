@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { api } from "../api";
 import type { CardReview, Difficulty } from "../types";
-import { Markdown } from "../components/Markdown";
+import { Markdown, InlineMarkdown } from "../components/Markdown";
 import { useCollapse } from "../components/Collapsible";
 import { ClickableRow, Empty } from "../components/common";
 import { LibrarySkeleton } from "../components/Skeleton";
@@ -221,6 +221,8 @@ export default function Library() {
             nextKey={nextKey}
             goalOpen={fold.isOpen(`goal:${stage.key}`)}
             onToggleGoal={() => fold.toggle(`goal:${stage.key}`)}
+            routerOpen={fold.isOpen(`router:${stage.key}`)}
+            onToggleRouter={() => fold.toggle(`router:${stage.key}`)}
             prev={data.stages[selectedIndex - 1] ?? null}
             next={data.stages[selectedIndex + 1] ?? null}
             onSelectStage={selectStage}
@@ -466,6 +468,93 @@ function StageButton({
   );
 }
 
+/**
+ * The stage's routing table: which of its units a given prompt belongs to.
+ *
+ * A unit's `signals` answer "does THIS technique apply?" — a question you can
+ * only ask once you have already guessed the technique. On a stage whose six
+ * units all take an array and return a number, guessing *is* the difficulty,
+ * and nothing else in the curriculum addresses it.
+ *
+ * `not_when` is rendered as prominently as `why`, because the confusable pairs
+ * are where the time goes: "longest substring with at most k distinct" is a
+ * window and "count substrings with exactly k distinct" is two windows
+ * subtracted, and a routing rule that does not say what it excludes is half a
+ * rule.
+ *
+ * Collapsed by default and remembered, like the stage goal — it is reference
+ * text, useful before the stage and again after, and in the way during.
+ */
+function StageRouter({
+  stage,
+  open,
+  onToggle,
+  onOpenUnit,
+}: {
+  stage: HydratedStage;
+  open: boolean;
+  onToggle: () => void;
+  onOpenUnit: (key: string) => void;
+}) {
+  const titleOf = (key: string) =>
+    stage.units.find((u) => u.unit.key === key)?.unit.title ?? key;
+  const iconOf = (key: string) => stage.units.find((u) => u.unit.key === key)?.unit.icon ?? "";
+
+  return (
+    <>
+      <button className="cur-link-btn" onClick={onToggle} aria-expanded={open}>
+        {open ? "▾ Hide the routing table" : "▸ Which unit is this prompt?"}
+      </button>
+      {open && (
+        <div className="cur-router">
+          <p className="dim" style={{ marginTop: 0 }}>
+            Every unit in this stage takes an array and returns a number, so telling them apart
+            from the prompt is the real skill. Read this before the stage, and again after.
+          </p>
+          <div className="card" style={{ padding: 0, overflowX: "auto" }}>
+            <table className="data">
+              <thead>
+                <tr>
+                  <th>When the prompt says…</th>
+                  <th style={{ width: 200 }}>Go to</th>
+                  <th>Why, and what it is not</th>
+                </tr>
+              </thead>
+              <tbody>
+                {stage.router.map((r, i) => (
+                  <tr key={i} style={{ cursor: "default" }}>
+                    <td>
+                      <InlineMarkdown>{r.when}</InlineMarkdown>
+                    </td>
+                    <td>
+                      <button
+                        className="cur-link-btn"
+                        style={{ whiteSpace: "nowrap" }}
+                        onClick={() => onOpenUnit(r.unit)}
+                      >
+                        {iconOf(r.unit)} {titleOf(r.unit)}
+                      </button>
+                    </td>
+                    <td className="dim">
+                      <InlineMarkdown>{r.why}</InlineMarkdown>
+                      {r.not_when && (
+                        <div className="cur-router-not">
+                          <span className="cur-router-not-tag">not</span>{" "}
+                          <InlineMarkdown>{r.not_when}</InlineMarkdown>
+                        </div>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
 function StagePanel({
   stage,
   number,
@@ -473,6 +562,8 @@ function StagePanel({
   nextKey,
   goalOpen,
   onToggleGoal,
+  routerOpen,
+  onToggleRouter,
   prev,
   next,
   onSelectStage,
@@ -485,6 +576,8 @@ function StagePanel({
   nextKey: string | null;
   goalOpen: boolean;
   onToggleGoal: () => void;
+  routerOpen: boolean;
+  onToggleRouter: () => void;
   prev: HydratedStage | null;
   next: HydratedStage | null;
   onSelectStage: (key: string) => void;
@@ -517,6 +610,15 @@ function StagePanel({
         </>
       )}
 
+      {stage.router.length > 0 && (
+        <StageRouter
+          stage={stage}
+          open={routerOpen}
+          onToggle={onToggleRouter}
+          onOpenUnit={onOpenUnit}
+        />
+      )}
+
       <div className="cur-path">
         {stage.units.map((u, i) => (
           <div key={u.unit.key} className="cur-step">
@@ -531,7 +633,7 @@ function StagePanel({
         ))}
       </div>
 
-      <div className="cur-stage-end">
+      <div className="cur-stage-end" data-stage-end>
         <span style={{ fontSize: 22 }}>🎲</span>
         <div style={{ flex: 1, minWidth: 220 }}>
           <strong>Finished the stage? Try the mixed set.</strong>

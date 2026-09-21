@@ -1,273 +1,234 @@
-# DSA Curriculum — syllabus roadmap, round 2
+# DSA Curriculum — the topic list, all 107 covered
 
-**Scope:** what the curriculum teaches and in what order — not the judge, the UI
-or the practice mechanics.
+Your list, marked against what the app's **DSA Curriculum** (Library tab,
+`seeds/dsa_curriculum.json`) teaches. It was **85 taught, 7 partial, 14 absent**
+when you handed it over; it is now **8 stages, 46 units,
+682 problems** and every line is checked.
 
-**Round 1 is done** (2026-09-17). It:
-- moved greedy and intervals next to sorting, and recursion ahead of the sorts;
-- split DP into four units and added MST;
-- added rungs for KMP and palindromes, tree building, `TreeMap`, pointer mapping,
-  all-pairs shortest paths and modular counting;
-- added an optional stage 8 (string matching, range queries, advanced graphs,
-  bitmask DP);
-- added 38 problems and re-homed 7.
+| Mark | Meaning |
+| --- | --- |
+| ☑ | **Taught** — the unit has a model, a skeleton, signals and a rung of problems for it |
 
-The moves are recorded in `tools/dsa_syllabus.py`.
-
-**This round** audits the result: 7 core stages, 36 units, an optional stage of
-4 units, 653 problems (`dsa_curriculum.json`, 2026-09-18). The evidence comes
-from three checks:
-- every rung's problems against the unit's own teaching text
-  (`why`, `model`, `skeletons`, `signals`, `checks`);
-- a slug search for staple interview topics;
-- per-unit counts of difficulty, rungs, checks and on-ramps.
-
-The same generator lints apply to every change: each problem is placed once,
-prerequisites point backwards, rungs climb, and optional stages come last.
+Your list has 107 lines and **106 distinct topics** — *Tree DP* is written
+twice, once under the graph group and once under DP, and it is checked in both
+places. Lines in **bold** are the ones that were open and have just been built;
+[What changed](#what-changed) has the detail.
 
 ---
 
-## 1. Order
+## The list
 
-### 1.1 Tries sit in the DP stage, and stages 6–7 are overloaded
+☑ Big O — `complexity` (stage 2) — plus a Big-O drill set in every one of the 40 units
+☑ Space complexity — `complexity` — recursion stack vs auxiliary array
+☑ Arrays — `arrays-first-pass` (stage 1), 19 problems
+☑ Strings — `strings` (stage 2), 22 problems
+☑ HashMap — `hashing` (stage 2)
+☑ HashSet — `hashing`
+☑ Sorting — `sorting` (stage 3) — comparators, counting sort, quickselect
+☑ Two pointers — `two-pointers` (stage 2), 21 problems
+☑ Sliding window — `sliding-window` (stage 2), 21 problems
+☑ Prefix sum — `prefix-sums` (stage 2)
+☑ Difference array — `prefix-sums` — “Difference arrays and sweeps”
+☑ Binary search — `binary-search` (stage 3), 23 problems
+☑ Binary search on answer — `binary-search` — the whole “Variations” rung is built on it
+☑ Recursion — `recursion` (stage 3)
+☑ Backtracking — `backtracking` (stage 6), 22 problems
+☑ Linked list — `linked-lists` (stage 5), 25 problems
+☑ Fast/slow pointers — `linked-lists` — cycle detection, middle, k-th from the end
+☑ Stack — `stacks` (stage 5)
+☑ Queue — `queues-and-deques` (stage 5)
+☑ Deque — `queues-and-deques`
+☑ Monotonic stack — `stacks` — next greater, spans, contribution counting
+☑ Monotonic queue — `queues-and-deques` + `sliding-window`
+☑ Heap — `heaps` (stage 5), 23 problems
+☑ PriorityQueue — `heaps` — internals, sift up/down, build-it-yourself
+☑ Binary tree — `trees` (stage 6), 30 problems
+☑ Tree DFS — `trees` — pre/in/post order, bottom-up aggregates
+☑ Tree BFS — `trees` — level order, right side view, max width
+☑ BST — `bst` (stage 6)
+☑ Balanced BST — `bst` — the balance caveat, and the `TreeMap`/`TreeSet` rung
+☑ Trie — `tries` (stage 7), 16 problems
 
-`tries` is unit 35 of 36, in "Dynamic Programming & Design", but its only
-prerequisites are `trees` and `strings`. It has nothing to do with DP. Its
-Extra-practice problem `word-search-ii` is trie **plus backtracking**, which
-makes backtracking its natural neighbour.
+☑ Graph representation — `graph-traversal` (stage 6) — adjacency list vs matrix
+☑ Directed graphs — `graph-traversal`, `topological-sort`
+☑ Undirected graphs — `graph-traversal`, `union-find`
+☑ Weighted graphs — `shortest-paths`, `mst`
+☑ DFS — `graph-traversal`
+☑ BFS — `graph-traversal`
+☑ Grid DFS — `graph-traversal` — flood fill; `simulation-and-matrix` for the indexing
+☑ Grid BFS — `graph-traversal` — shortest hops on a grid
+☑ Multi-source BFS — `graph-traversal` — seed the queue with every source
+☑ **0-1 BFS** — `shortest-paths` — a model section, a skeleton, and `min-obstacle-removal`, which was already on the Core rung
+☑ Dijkstra — `shortest-paths` (stage 6)
+☑ Bellman-Ford — `shortest-paths` — negatives and hop limits
+☑ Floyd-Warshall — `shortest-paths` — the “All pairs” rung
+☑ DSU — `union-find` (stage 6), 16 problems
+☑ Kruskal — `mst` (stage 6)
+☑ Prim — `mst`
+☑ Topological sort — `topological-sort` (stage 6) — Kahn and DFS colouring
+☑ DAG DP — `topological-sort` — relax in topological order
+☑ SCC — `advanced-graphs` (stage 8) — Tarjan low-links and Kosaraju
+☑ Bridges — `advanced-graphs`
+☑ Articulation points — `advanced-graphs`
+☑ **LCA** — `trees` (the O(n) recursion), `bst` (the O(h) descent) and **`tree-queries`** for repeated queries on a fixed tree
+☑ **Binary lifting** — **`tree-queries`** — the 2^j jump table, used for k-th ancestor, LCA and path distance
+☑ **Euler tour** — **`tree-queries`** — tin/tout stamping, so a subtree becomes a contiguous range
+☑ Tree diameter — `trees` — two-pass, and the one-pass return-vs-record shape
+☑ Tree DP — `trees` — the (take, skip) pair return
 
-The two stages around it are also the largest in the course:
+☑ DP fundamentals — `dp-1d` (stage 7) — state, transition, order, base case
+☑ 1D DP — `dp-1d`, 18 problems
+☑ 2D DP — `dp-2d` (stage 7)
+☑ Knapsack — `dp-knapsack` (stage 7)
+☑ Subset sum — `dp-knapsack`
+☑ Coin change — `dp-knapsack` — bounded vs unbounded, and the loop order that separates them
+☑ LCS — `dp-2d`
+☑ LIS — `dp-1d` — the O(n²) table and the O(n log n) patience version
+☑ Edit distance — `dp-2d`
+☑ Interval DP — `dp-intervals-states` (stage 7)
+☑ Tree DP — `trees` — the (take, skip) pair return
+☑ Bitmask DP — `bitmask-dp` (stage 8)
+☑ **Digit DP** — **`dp-advanced`** — (position, tight, what the condition needs), over two problems
+☑ Game DP — `dp-intervals-states` — score *difference*, not score
+☑ **DP optimization** — **`dp-advanced`** — monotonic-deque DP and meet in the middle, with convex-hull trick and divide-and-conquer optimisation named and given their conditions
 
-| Stage | Units | Contents |
-|---|---|---|
-| 6. Trees & Graphs | 8 | two tree families and five graph units |
-| 7. DP & Design | 6 | four DP units, tries, design |
+☑ Greedy — `greedy` (stage 3), 26 problems
+☑ Interval scheduling — `intervals` (stage 3) — earliest finish time
+☑ Sweep line — `intervals` + `prefix-sums`
+☑ Fenwick Tree — `range-queries` (stage 8)
+☑ Segment Tree — `range-queries`
+☑ **Lazy Segment Tree** — `range-queries` — a model section, `apply`/`push` skeletons, and `range-assign-range-sum`
+☑ **Sparse Table** — `range-queries` — a model section, a skeleton, and `sparse-table-range-min`
 
-**Split stage 6** into:
-- **Trees & Search:** trees · bst · tries · backtracking
-- **Graphs:** graph traversal · topological sort · union-find · MST · shortest paths
+☑ Bit manipulation — `bit-manipulation` (stage 4), 15 problems
+☑ XOR — `bit-manipulation` — self-inverse, prefix XOR, pairing off
+☑ Bitmask — `bit-manipulation`, `backtracking`, `bitmask-dp`
+☑ Subsets — `bit-manipulation` — enumerate 0 … 2ⁿ−1
+☑ Submasks — `bit-manipulation` + `bitmask-dp` — `s = (s - 1) & m`
+☑ **Gray code** — **`advanced-bits`** — the reflected construction, `i ^ (i >> 1)`, and the prefix-XOR inverse
+☑ **XOR basis** — **`advanced-bits`** — Gaussian elimination over GF(2): maximum, rank, membership, k-th smallest
 
-This leaves stage 8 as DP ×4 + design. The core becomes **8 stages** with the
-same 36 units, and no stage has more than 6.
+☑ GCD — `math-number-theory` (stage 4)
+☑ LCM — `math-number-theory`
+☑ Sieve — `math-number-theory`
+☑ Prime factorization — `math-number-theory` — trial division to √n
+☑ Modular arithmetic — `math-number-theory` — the “Counting modulo a prime” rung
+☑ Fast exponentiation — `math-number-theory` + `recursion`
+☑ Modular inverse — `math-number-theory` — Fermat, x^(p−2)
+☑ Combinatorics — `math-number-theory` — factorial tables, nCr mod p
 
-### 1.2 Stage 2 requires two Hard KMP problems before any Medium stage 3 material
+☑ KMP — `strings` (the prefix function) + `string-matching` (stage 8)
+☑ Z algorithm — `string-matching`
+☑ Rolling hash — `string-matching`
+☑ **Suffix array** — `string-matching` — construction by doubling, practised by `suffix-array-order`
+☑ **LCP** — `string-matching` — the LCP array and Kasai's linear pass, practised by `distinct-substrings-large`
 
-The strings unit's "Palindromes & matching" rung makes `longest-happy-prefix`
-(Hard) and `shortest-palindrome` (Hard) **required**, in stage 2, just after the
-first sliding-window unit. The technique is taught there and the lints pass, but
-this is the steepest wall on the whole early path.
+☑ **Computational geometry** — **`geometry`** — a unit built entirely on the integer cross product
+☑ **Cross product** — **`geometry`** — sign for orientation, magnitude for area; `turn-directions`
+☑ **Line intersection** — **`geometry`** — four orientation signs plus the collinear cases; `count-crossing-segments`
+☑ **Convex hull** — **`geometry`** — Andrew's monotone chain; `convex-hull-points`
 
-**Keep** `find-pattern-index`, `count-palindromic-substrings` and
-`longest-palindromic-substring` required. **Move** the two Hards to Extra
-practice, where they stay reachable and taught.
+☑ **Max flow** — **`flows-and-matching`** — Edmonds–Karp, with paired reverse edges
+☑ **Min cut** — **`flows-and-matching`** — max-flow min-cut, both directions of the proof; `min-cut-capacity` is stated as a cut and solved as a flow
+☑ **Bipartite matching** — **`flows-and-matching`** — augmenting paths, Kuhn, König, and the DAG path-cover reduction
 
-### 1.3 Problems placed before their prerequisites
-
-| Problem | Placed in | Needs | Taught in | Fix |
-|---|---|---|---|---|
-| `hand-of-straights` | greedy (stage 3), extra | ordered map (`TreeMap`) | bst, stage 6 | move to bst · Extra practice |
-| `data-stream-disjoint-intervals` | intervals (stage 3), extra | ordered map | bst, stage 6 | move to bst · Extra practice |
-| `meeting-rooms-iii` | intervals (stage 3), extra | two heaps | heaps, stage 5 | move to heaps · Extra practice |
-| `num-subsequences-sum-condition` | two pointers (stage 2), extra | powers of two mod p | math, stage 4 | move to math · Extra practice |
-| `min-meeting-rooms` | intervals (stage 3), **required** | a min-heap *or* a ±1 sweep | sweep: prefix sums; heap: stage 5 | keep, and make the sweep the taught answer in the intervals model; the heap version stays a note |
-
----
-
-## 2. Practised but never taught
-
-Each of these problems needs a named technique that its unit's text never
-mentions (checked by searching the unit's teaching fields). The first two are on
-**required** rungs.
-
-| Problem | Unit · rung | Technique | Fix |
-|---|---|---|---|
-| `majority-element` | hashing · Variations (**required**) | Boyer–Moore voting | model section + skeleton + check in hashing |
-| `sum-subarray-minimums` | stacks · Stretch (**required**) | contribution counting: previous/next smaller × span | model section in stacks — it is the monotonic stack's best use and is never named |
-| `sum-subarray-ranges`, `sum-odd-length-subarrays` | complexity · extra | contribution counting | a short "count each element's contribution" section in complexity; point forward to stacks |
-| `house-robber-iii` | trees · extra | tree DP returning a pair (take, skip) | a tree-DP rung in trees (see 3.4) |
-| `longest-path-dag`, `largest-color-value` | topological sort · extra | DP in topological order | model section + skeleton in topo: relax `dp[v]` as vertices come off the queue |
-| `range-sum-2d` | prefix sums · extra | 2-D prefix sums and inclusion–exclusion | model section + skeleton in prefix sums |
-| `xor-queries-subarray` | bit manipulation · extra | prefix XOR | one paragraph in bits (XOR is its own inverse, so prefix XOR works like prefix sums) |
-| `next-permutation` | two pointers · extra | find the pivot, swap with its successor, reverse the suffix | model section in two pointers |
-| `unique-bst-count` | bst · extra | Catalan recurrence (choose the root, multiply the sides) | a check + note in bst, linked forward to DP |
-| `median-two-sorted-arrays` | binary search · extra | binary search on a partition | model section in binary search |
-| `all-nodes-distance-k` | trees · extra | tree → graph via a parent map, then BFS | model paragraph in trees |
-
-Two **signals name techniques that are taught nowhere**:
-- **Meet in the middle.** Bitmask DP's routing table says "n up to 40 → meet in
-  the middle".
-- **Matrix powers.** The recursion unit's fast-power skeleton lists "matrix
-  powers" as a use.
-
-Either teach them (§5) or remove the claims.
-
----
-
-## 3. Topics missing from the core
-
-### 3.1 BFS with extra state
-
-Stateful search appears only in the *optional* bitmask unit
-(`shortest-path-visit-all`). The core graph units never put anything besides the
-vertex in a BFS or Dijkstra state. That is a staple Medium/Hard pattern:
-- a grid where you may break k walls: state `(cell, walls left)`
-- a maze with keys and doors
-- the cheapest route with k discounts: state `(city, discounts used)`
-
-`cheapest-trip-with-discounts` is already in shortest paths' Extra practice,
-untaught.
-
-**Add** a "Search with extra state" rung to `graph-traversal`:
-- a new Medium: shortest grid path with k wall-breaks;
-- a new Hard: keys and doors.
-
-**Promote** `cheapest-trip-with-discounts` to a shortest-paths rung, and teach
-"the state is everything the future depends on" in both units.
-
-### 3.2 Randomised structures and sampling
-
-There is no randomised problem anywhere. Design's Big-O drill even explains
-"how an O(1) `getRandom` set is built", with no problem that builds one. Three
-are staples:
-- **Randomised set:** insert/delete/getRandom in O(1) — a hash map plus an
-  array with swap-delete. Belongs in design.
-- **Random pick with weight:** prefix sums + binary search. Belongs in binary
-  search or prefix sums.
-- **Reservoir sampling:** pick uniformly from a stream of unknown length.
-  Belongs in the optional stage or linked lists.
-
-**Judging constraint:** the random draws must be part of the *input*, so the
-expected output stays deterministic (for example "the next draws are r₁ … r_k").
-
-### 3.3 BST deletion and balanced construction
-
-- **Deletion.** The bst unit's `why` promises "search, insertion and deletion",
-  but there is no deletion problem and no skeleton for the two-children case
-  (replace with the in-order successor).
-- **Balanced construction.** There is no "sorted array → height-balanced BST",
-  the natural divide-and-conquer bridge from stage 3.
-
-**Add** both problems (Medium and Easy) and a deletion skeleton.
-
-### 3.4 Tree patterns without a rung
-
-- **Tree DP.** Returning two values per subtree (take/skip, or "best through
-  me" vs "best ending at me") is the idea behind `diameter-of-tree`,
-  `max-path-sum` and `house-robber-iii`. The first two sit in a generic
-  "Stretch" rung and the third in Extra practice. **Name it:** a "Tree DP" rung
-  with a skeleton that returns a pair.
-- **N-ary trees.** No problem uses them. One Easy (N-ary level order or max
-  depth) shows the recursion does not care how many children there are.
-- **Tree as a graph.** A parent map turns a tree into an undirected graph
-  (`all-nodes-distance-k`) — see §2.
-
-### 3.5 Iterator and stream designs
-
-The design unit has no iterator problem (`bst-iterator` is the only one in the
-bank). **Add** a peeking iterator and a flatten-nested-list iterator: "hold the
-next element before it is asked for" is a standard design pattern.
-
-### 3.6 Expression evaluation with precedence
-
-The stacks unit signals "operand stack, operator stack", and `basic-calculator`
-(Hard, extra) needs it, but nothing teaches operator precedence.
-
-**Add:**
-- a Medium calculator with `+ − × ÷` and no parentheses;
-- a model section on handling precedence with a pending term.
+☑ **Amortized analysis** — `complexity` (stage 2) — a model section, a doubling-array trace, two drills, a skeleton, pitfalls and four self-checks
+☑ **Randomized algorithms** — **`randomized`** — expected vs amortized vs average, Las Vegas vs Monte Carlo, shuffling, weighted sampling, reservoir sampling, Miller–Rabin
 
 ---
 
-## 4. Balance and depth inside units
+## What changed
 
-### 4.1 Units with no easy way in
+The gap was not random: with one exception it was the **outer ring** of
+competitive programming, which is what the optional stage 8 (*Beyond the Core*)
+exists to hold. The seven core stages were already complete, so nothing in them
+was reshuffled — stage 8 grew from 4 units to 10, and the one genuinely-core
+item went where it belonged.
 
-`mst` (2 Medium + 2 Hard) and `range-queries` (2 Medium + 2 Hard) open straight
-at Medium. The four-problem exemption keeps the lint quiet, but a first
-Kruskal or Fenwick problem should be small.
+### One correction to the audit
 
-**Add** one Easy opener each:
-- Kruskal on a handful of cities;
-- Fenwick with point updates and prefix sums on a tiny array.
+**0-1 BFS** was marked ◪ “no problem to practise it on”. That was
+wrong: `min-obstacle-removal` was already on `shortest-paths`' **Core** rung, and
+its editorial teaches 0-1 BFS properly. The real gap was only the unit page,
+which named the technique in two tables and never gave it a model section or a
+skeleton. Both are now there, with two self-checks — and no new problem was
+needed.
 
-### 4.2 The round-1 splits left thin teaching
+### Amortized analysis → `complexity` (stage 2)
 
-| Unit | Checks | Signals | Internals / build-it |
-|---|---|---|---|
-| `dp-1d` | **3** (lost 2 to the knapsack unit) | 5 | build-it only |
-| `dp-2d` | 4 | **4** | none |
-| `dp-knapsack`, `dp-intervals-states` | 5 | 6 | none |
-| `mst` | 5 | 6 | none |
+The one item that was not stage-8 material. Every later unit already leaned on
+it — the monotonic stack's “each element is pushed and popped once”,
+union-find's inverse Ackermann, the dynamic array's doubling — and the word
+appeared in no unit. It is a *cost* idea, so it went in the cost unit: a model
+section, an `ArrayList`-doubling trace showing total-work-÷-calls flattening
+out, a skeleton for writing the accounting argument, two Big-O drills, three
+pitfalls (including amortized-vs-average) and four self-checks. **No new
+problems** — it re-prices problems already solved.
 
-The target for each:
-- at least **5 checks** and **6 signals** per unit;
-- a **build-it** for each new DP unit — fill the table by hand on the unit's
-  trace example, then roll it to one row;
-- **internals** for MST: why union-find makes Kruskal near-linear after the sort,
-  and why array Prim beats heap Prim on dense graphs.
+### Stage 8, from 4 units to 10
 
-### 4.3 The optional units have no surplus
+| # | Unit | | Covers |
+| --- | --- | --- | --- |
+| 1 | `string-matching` | **extended** | + suffix array (doubling), + LCP array (Kasai) |
+| 2 | `range-queries` | **extended** | + sparse table, + lazy propagation, + an Easy on-ramp; weight 1 → 2 |
+| 3 | `advanced-graphs` | unchanged | SCC, bridges, articulation points, Euler paths |
+| 4 | `bitmask-dp` | unchanged | subsets as state |
+| 5 | `tree-queries` | **new** | Euler tour, binary lifting, LCA, path distance |
+| 6 | `advanced-bits` | **new** | Gray code, XOR basis |
+| 7 | `dp-advanced` | **new** | digit DP, monotonic-deque DP, meet in the middle |
+| 8 | `flows-and-matching` | **new** | augmenting paths, Kuhn, Edmonds–Karp, max-flow min-cut, König |
+| 9 | `geometry` | **new** | cross product, shoelace, segment intersection, convex hull |
+| 10 | `randomized` | **new** | expected vs amortized, Las Vegas vs Monte Carlo, sampling, Miller–Rabin |
 
-Each optional unit has 4–5 problems and **zero** Extra practice. One technique
-with one Hard is not enough reps to make it stick.
+### 29 new problems
 
-**Add** 2–3 Extra-practice problems per optional unit, for example:
-- **String matching:** repeated substring via Z, string periods.
-- **Range queries:** count of range sums, 2-D Fenwick.
-- **Advanced graphs:** bridges as their own problem, 2-SAT-lite SCC.
-- **Bitmask DP:** fair distribution, TSP returning to start.
+The curriculum is not a second problem bank — `_check_curriculum` asserts
+that every problem it schedules exists in `seeds/problems.json` and is placed
+exactly once. So a new unit is **problems first**, each fully authored
+(description, constraints, three hints, editorial, Python *and* Java references,
+six to nine test cases whose expected output is the Python reference *run*).
 
----
+| Batch | Problems |
+| --- | --- |
+| `dsa_more_39.py` | `ancestor-queries`, `kth-ancestor-queries`, `tree-lca-queries`, `tree-path-distance` |
+| `dsa_more_40.py` | `gray-code-sequence`, `max-xor-subset`, `count-distinct-xor-values`, `kth-smallest-subset-xor` |
+| `dsa_more_41.py` | `count-digit-free-numbers`, `digit-sum-divisible-count`, `min-cost-jump-window`, `subset-sum-closest-below` |
+| `dsa_more_42.py` | `assign-all-workers`, `bipartite-max-matching`, `min-cut-capacity`, `min-path-cover-dag` |
+| `dsa_more_43.py` | `turn-directions`, `polygon-area-doubled`, `count-crossing-segments`, `convex-hull-points` |
+| `dsa_more_44.py` | `weighted-random-picks`, `shuffle-fisher-yates`, `reservoir-sample-stream`, `miller-rabin-primality` |
+| `dsa_more_45.py` | `static-range-sums`, `sparse-table-range-min`, `range-assign-range-sum`, `suffix-array-order`, `distinct-substrings-large` |
 
-## 5. The optional stage: what else belongs there
+Bank **653 → 682**; curriculum **40 → 46 units**; reference solution sets
+**466 → 495**.
 
-Still optional — rare in interviews, but each closes a claim the core already
-makes (§2) or a well-known gap:
+Four new input shapes in `tools/dsa_more_kit3.py`: `tree_q` and `wtree_q` (a
+tree reads n − 1 edges, so `m` is not input and cannot be got wrong),
+`bipartite` (one number cannot say where the split is) and `larr` (the `arr`
+shape reads with `sc.nextInt()`, which silently refuses the 10¹⁸ values
+Miller–Rabin needs).
 
-| Unit (new) | Covers | Evidence |
-|---|---|---|
-| **Advanced trees** | LCA by binary lifting, k-th ancestor, Euler tour for subtree queries | nothing in the bank; `lca-binary-tree` is O(n) per query only |
-| **Math beyond the core** | matrix exponentiation (linear recurrences), cross-product geometry basics, expected value | "matrix powers" named in recursion and practised nowhere; no geometry or probability anywhere |
+### Judging randomness
 
-**Add to existing optional units:**
-- meet in the middle, as a rung in `bitmask-dp` (its own signal promises it);
-- digit DP, as a rung in `bitmask-dp` or a small unit of its own.
+A judge cannot check a random answer, so the four `randomized` problems pin the
+generator — a fixed LCG with a fixed seed, written into each statement:
 
----
+```
+s = (s * 1103515245 + 12345) mod 2^31,   s starts at 12345,   next() = s
+```
 
-## 6. Proposed map
+The algorithms and the reasoning about them are unchanged; only the coin flips
+are reproducible. That is also how you would test randomized code at work, and
+the unit says so: inject the generator.
 
-Legend: **new** = new unit · *moved* = existing unit in a new place ·
-+ = new rung or teaching in an existing unit.
+### Also worth knowing
 
-| Stage | Units |
-|---|---|
-| 1. Foundations | io-and-arithmetic · branching · loops-and-digits · arrays-first-pass |
-| 2. Cost & core patterns | complexity (+ contribution counting) · hashing (+ Boyer–Moore) · two-pointers (+ next permutation) · sliding-window · prefix-sums (+ 2-D, + weighted random pick) · strings (KMP Hards → extra) |
-| 3. Order & search | recursion · sorting · binary-search (+ partition search) · greedy · intervals (sweep-first rooms) |
-| 4. Numbers, bits & grids | math-number-theory · bit-manipulation (+ prefix XOR) · simulation-and-matrix |
-| 5. Linear structures | stacks (+ contribution, + precedence) · queues-and-deques · linked-lists · heaps |
-| 6. Trees & search | trees (+ tree DP, + N-ary, + parent map) · bst (+ deletion, + balanced build) · *tries* · backtracking |
-| 7. Graphs | graph-traversal (+ state BFS) · topological-sort (+ DAG DP) · union-find · mst (+ Easy opener, + internals) · shortest-paths (+ state Dijkstra) |
-| 8. DP & design | dp-1d · dp-knapsack · dp-2d · dp-intervals-states *(each + checks, build-it)* · design (+ randomised set, + iterators) |
-| 9. Beyond the core *(optional)* | string-matching · range-queries (+ Easy opener) · advanced-graphs · bitmask-dp (+ meet in the middle) · **advanced trees** · **math beyond the core** *(each + Extra practice)* |
-
-The core stays at 36 units, now in 8 stages; the optional stage grows from 4
-units to 6.
-
-**New problems:** about **14 core** (§3: 2 state search, 3 randomised, 2 BST,
-1 tree DP, 1 N-ary, 2 iterators, 1 calculator; §4.1: 2 openers) and about
-**14 optional** (§4.3 extras, §5 units). Every one needs Python and Java
-references run through the real judge.
-
-## Order of work
-
-1. **Moves only:** 1.1, 1.2, 1.3. These are stage split, re-homing and
-   demotions — no new content, no new problems. `dsa_syllabus.py` plus one new
-   stage file.
-2. **Teach the orphans (§2).** Text, skeletons and checks in existing units; no
-   new problems. Start with the two on required rungs.
-3. **Deepen the thin units (§4.2)**, while the DP and MST units are fresh.
-4. **Add the missing core topics (§3)**, with their problems — state search and
-   BST deletion first, since they are the most asked.
-5. **Openers and the optional stage (§4.1, §4.3, §5).**
+- `range-queries` had **7 problems and opened at Medium**, which trips the
+  on-ramp lint (a unit with more than four problems must open Intro or Easy).
+  `static-range-sums` is the on-ramp, and it earns its place: it is the baseline
+  every other structure in the unit is measured against.
+- `count-distinct-substrings` already existed as a **trie** problem, O(n²).
+  It was not moved. `distinct-substrings-large` is the same question at
+  |s| ≤ 10⁵, where the trie dies, and each problem points at the other.
+- Every generator lint still passes unchanged: each problem placed exactly once,
+  prerequisites pointing backwards, rungs climbing, optional stages last, every
+  unit inside its weight band.

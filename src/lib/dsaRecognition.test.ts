@@ -8,6 +8,8 @@ import {
   routingQuestion,
   shuffled,
   techniqueLabel,
+  variantCardId,
+  variantQuestions,
 } from "./dsaRecognition";
 import type {
   CurriculumUnit,
@@ -17,6 +19,8 @@ import type {
   Rung,
   Signal,
   SolvedStatus,
+  StageRoute,
+  Variant,
 } from "../types";
 
 function problem(
@@ -96,10 +100,15 @@ function unit(key: string, title: string, slugs: string[], signals: Signal[] = [
     rungs: [rung("Core", slugs)],
     build_it: "",
     next_up: "",
+    invariant: null,
+    variants: [],
+    rewrites: [],
   };
 }
 
-function curriculum(stages: { key: string; units: CurriculumUnit[] }[]): DsaCurriculum {
+function curriculum(
+  stages: { key: string; units: CurriculumUnit[]; router?: StageRoute[] }[]
+): DsaCurriculum {
   return {
     key: "dsa",
     title: "DSA Curriculum",
@@ -112,6 +121,7 @@ function curriculum(stages: { key: string; units: CurriculumUnit[] }[]): DsaCurr
       tagline: "",
       goal: "",
       ordering: i,
+      router: s.router ?? [],
       units: s.units,
     })),
   };
@@ -310,5 +320,189 @@ describe("routeCardId", () => {
   it("is namespaced apart from the self-check cards", () => {
     expect(routeCardId("heaps")).toBe("dsa-route:heaps");
     expect(routeCardId("heaps")).not.toBe("dsa-check:heaps:0");
+  });
+});
+
+function variant(name: string, when: string): Variant {
+  return { name, change: `change for ${name}`, when, cost: "O(n)", gotcha: `watch ${name}` };
+}
+
+/** A hydrated unit carrying a family table, with no problems needed — the
+ * family drill is derived from authored variants alone. */
+function unitWithVariants(key: string, variants: Variant[]) {
+  const u = unit(key, `Unit ${key}`, ["p1"]);
+  const c = hydrate(curriculum([{ key: "s1", units: [{ ...u, variants }] }]), [
+    problem("p1", "Easy"),
+  ]);
+  return c.stages[0].units[0];
+}
+
+describe("variantQuestions", () => {
+  it("asks one question per variant, prompting with its `when`", () => {
+    const hu = unitWithVariants("sw", [
+      variant("Fixed width", "every window of size k"),
+      variant("Longest valid", "longest substring with at most k distinct"),
+      variant("Shortest valid", "smallest subarray with sum at least target"),
+      variant("Exactly k", "count subarrays with exactly k distinct"),
+    ]);
+    const qs = variantQuestions(hu);
+    expect(qs).toHaveLength(4);
+    expect(qs.map((q) => q.prompt)).toEqual([
+      "every window of size k",
+      "longest substring with at most k distinct",
+      "smallest subarray with sum at least target",
+      "count subarrays with exactly k distinct",
+    ]);
+    expect(qs.map((q) => q.answerLabel)).toEqual([
+      "Fixed width",
+      "Longest valid",
+      "Shortest valid",
+      "Exactly k",
+    ]);
+  });
+
+  it("draws every distractor from the SAME unit, so each is plausible", () => {
+    const names = ["Fixed width", "Longest valid", "Shortest valid", "Exactly k"];
+    const hu = unitWithVariants("sw", names.map((n, i) => variant(n, `prompt ${i}`)));
+    for (const q of variantQuestions(hu)) {
+      expect(q.options).toContain(q.answerLabel);
+      for (const o of q.options) expect(names).toContain(o);
+      // No duplicate options — a repeated label makes the question unanswerable.
+      expect(new Set(q.options).size).toBe(q.options.length);
+    }
+  });
+
+  it("carries the edit and the caveat, so a wrong answer teaches", () => {
+    const hu = unitWithVariants("sw", [
+      variant("A", "prompt a"),
+      variant("B", "prompt b"),
+      variant("C", "prompt c"),
+    ]);
+    const q = variantQuestions(hu)[0];
+    expect(q.change).toBe("change for A");
+    expect(q.gotcha).toBe("watch A");
+    expect(q.unitKey).toBe("sw");
+  });
+
+  it("returns nothing below three variants — two options is a coin toss", () => {
+    expect(variantQuestions(unitWithVariants("x", []))).toEqual([]);
+    expect(variantQuestions(unitWithVariants("x", [variant("A", "a")]))).toEqual([]);
+    expect(
+      variantQuestions(unitWithVariants("x", [variant("A", "a"), variant("B", "b")]))
+    ).toEqual([]);
+  });
+
+  it("skips variants with no prompt to ask about", () => {
+    const hu = unitWithVariants("x", [
+      variant("A", "a"),
+      variant("B", "b"),
+      variant("C", "c"),
+      { name: "D", change: "d", when: "   ", cost: "O(1)", gotcha: "" },
+    ]);
+    const qs = variantQuestions(hu);
+    expect(qs.map((q) => q.answerLabel)).toEqual(["A", "B", "C"]);
+  });
+
+  it("is stable for a given seed, so a card id keeps meaning the same question", () => {
+    const hu = unitWithVariants("x", [
+      variant("A", "a"),
+      variant("B", "b"),
+      variant("C", "c"),
+      variant("D", "d"),
+    ]);
+    expect(variantQuestions(hu, 7)).toEqual(variantQuestions(hu, 7));
+  });
+});
+
+describe("variantCardId", () => {
+  it("is unique per unit and index", () => {
+    expect(variantCardId("sliding-window", 0)).toBe("dsa-variant:sliding-window:0");
+    expect(variantCardId("sliding-window", 1)).not.toBe(variantCardId("sliding-window", 0));
+    expect(variantCardId("two-pointers", 0)).not.toBe(variantCardId("sliding-window", 0));
+  });
+});
+
+function route(unit: string, when: string, notWhen = ""): StageRoute {
+  return { when, unit, why: `why ${unit}`, not_when: notWhen };
+}
+
+describe("routeHint", () => {
+  it("is null when the stage has no routing table", () => {
+    // Three units, because a routing question needs at least two distractors.
+    const c = hydrate(
+      curriculum([
+        {
+          key: "s1",
+          units: [unit("a", "Alpha", ["p1"]), unit("b", "Beta", ["p2"]), unit("c", "Gamma", ["p3"])],
+        },
+      ]),
+      [problem("p1"), problem("p2"), problem("p3")]
+    );
+    const q = routingQuestion(c.stages[0].units[0], c.stages[0].units, rng(1));
+    expect(q).not.toBeNull();
+    expect(q!.routeHint).toBeNull();
+  });
+
+  it("carries the stage's rule for the answer unit", () => {
+    const c = hydrate(
+      curriculum([
+        {
+          key: "s1",
+          units: [unit("a", "Alpha", ["p1"]), unit("b", "Beta", ["p2"]), unit("c", "Gamma", ["p3"])],
+          router: [route("b", "when the prompt says beta", "not when it says gamma")],
+        },
+      ]),
+      [problem("p1"), problem("p2"), problem("p3")]
+    );
+    const qs = mixedSet(c, "s1", 5, 6);
+    const beta = qs.find((q) => q.answerUnit === "b");
+    expect(beta?.routeHint).toEqual({
+      when: "when the prompt says beta",
+      why: "why b",
+      notWhen: "not when it says gamma",
+    });
+    // A unit the table says nothing about gets no rule rather than someone else's.
+    expect(qs.find((q) => q.answerUnit === "a")?.routeHint).toBeNull();
+  });
+
+  it("prefers a row that names a near miss", () => {
+    const c = hydrate(
+      curriculum([
+        {
+          key: "s1",
+          units: [unit("a", "Alpha", ["p1"]), unit("b", "Beta", ["p2"]), unit("c", "Gamma", ["p3"])],
+          router: [
+            route("b", "plain rule with no near miss"),
+            route("b", "rule that names one", "the confusable phrasing"),
+          ],
+        },
+      ]),
+      [problem("p1"), problem("p2"), problem("p3")]
+    );
+    const beta = mixedSet(c, "s1", 5, 6).find((q) => q.answerUnit === "b");
+    expect(beta?.routeHint?.when).toBe("rule that names one");
+  });
+
+  it("looks the rule up in the stage that owns the unit, not the one being drilled", () => {
+    // A mixed set for stage 2 draws from stage 1 as well; a stage-1 question
+    // must still get stage 1's rule.
+    const c = hydrate(
+      curriculum([
+        {
+          key: "s1",
+          units: [unit("a", "Alpha", ["p1"])],
+          router: [route("a", "stage one rule")],
+        },
+        {
+          key: "s2",
+          units: [unit("b", "Beta", ["p2"]), unit("c", "Gamma", ["p3"])],
+          router: [route("b", "stage two rule")],
+        },
+      ]),
+      [problem("p1"), problem("p2"), problem("p3")]
+    );
+    const qs = mixedSet(c, "s2", 3, 6);
+    expect(qs.find((q) => q.answerUnit === "a")?.routeHint?.when).toBe("stage one rule");
+    expect(qs.find((q) => q.answerUnit === "b")?.routeHint?.when).toBe("stage two rule");
   });
 });

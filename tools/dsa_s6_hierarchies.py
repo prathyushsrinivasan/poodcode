@@ -2193,12 +2193,50 @@ monotone. Swap the relaxation rule and you get a different problem:
 | `max(d, w)` | Minimise the **largest** edge on the path (minimum effort) |
 | `d × p` | Maximise a probability (with a max-heap) |
 
+### 0-1 BFS: when the only weights are 0 and 1
+
+A heap exists to keep the frontier sorted by distance. With weights of only 0
+and 1 a **deque** does that for free, because every reachable distance is either
+`d` or `d + 1` and the queue only ever holds those two values:
+
+```java
+Deque<Integer> dq = new ArrayDeque<>();
+dist[src] = 0;
+dq.addFirst(src);
+while (!dq.isEmpty()) {
+    int u = dq.pollFirst();
+    for (Edge e : g[u]) {
+        int nd = dist[u] + e.w;                  // e.w is 0 or 1
+        if (nd < dist[e.to]) {
+            dist[e.to] = nd;
+            if (e.w == 0) dq.addFirst(e.to);     // same distance -> front
+            else          dq.addLast(e.to);      // one more   -> back
+        }
+    }
+}
+```
+
+A zero-weight edge goes to the **front** because it joins the group already at
+the current distance; a one-weight edge goes to the **back** because it belongs
+to the next group. The deque therefore stays sorted by distance without ever
+comparing anything, and the whole thing is **O(V + E)** rather than
+O(E log V) — a heap for two distinct values is a heap doing nothing.
+
+A vertex can be pushed more than once (up to twice), which is fine: the
+`nd < dist[...]` guard makes the extra visits no-ops.
+
+The tell is any grid or graph where some moves are free and others cost one:
+*"walk through open cells freely, pay 1 to break a wall"*, *"flip at most k
+edges"*, *"this door is free if you have the key"*. Any other weight, even 0 and
+2, breaks the invariant — scale them to 0 and 1 if you can, otherwise use
+Dijkstra.
+
 ### Choosing
 
 | Situation | Use |
 | --- | --- |
 | Unweighted | BFS — O(V + E), no heap needed |
-| Weights 0 or 1 | 0-1 BFS with a deque |
+| Weights 0 or 1 | 0-1 BFS with a deque — O(V + E) |
 | Non-negative weights | Dijkstra — O(E log V) |
 | Negative edges | Bellman-Ford — O(V · E) |
 | At most k edges | Bellman-Ford, k + 1 rounds, with a snapshot |
@@ -2239,6 +2277,29 @@ while (!pq.isEmpty()) {
 }
 """,
             "The stale check replaces decrease-key, which a binary heap cannot do cheaply."),
+        _sk("0-1 BFS",
+            "Every edge costs 0 or 1 — free moves and paid moves.",
+            """
+int[] dist = new int[n];
+Arrays.fill(dist, Integer.MAX_VALUE);
+Deque<Integer> dq = new ArrayDeque<>();
+dist[src] = 0;
+dq.addFirst(src);
+
+while (!dq.isEmpty()) {
+    int u = dq.pollFirst();
+    for (int[] e : g.get(u)) {                      // e = { to, weight in {0,1} }
+        int nd = dist[u] + e[1];
+        if (nd < dist[e[0]]) {
+            dist[e[0]] = nd;
+            if (e[1] == 0) dq.addFirst(e[0]);       // same distance group
+            else           dq.addLast(e[0]);        // the next distance group
+        }
+    }
+}
+""",
+            "O(V + E): the deque holds at most two distinct distances, so it is sorted without "
+            "a heap. Any weight other than 0 or 1 breaks that and needs Dijkstra."),
         _sk("Dijkstra on a grid with a different cost rule",
             "Minimum effort: the path's cost is its worst step.",
             """
@@ -2314,6 +2375,15 @@ for (int k = 0; k < n; k++)
         _chk("How do you adapt Dijkstra to minimise the *largest* edge on a path?",
              "Replace the relaxation `d + w` with `max(d, w)`. The algorithm only requires "
              "that the combining function be monotone."),
+        _chk("Every edge costs 0 or 1. Why is a heap unnecessary?",
+             "Because the frontier only ever holds two distinct distances, d and d + 1. A "
+             "deque keeps them in order for free: a 0-edge goes to the front (same distance "
+             "group), a 1-edge to the back (next group). That is O(V + E) instead of "
+             "O(E log V) — 0-1 BFS."),
+        _chk("Would 0-1 BFS still work with weights of 0 and 2?",
+             "Not as written. The invariant is that the deque holds at most two *adjacent* "
+             "distance values; weights of 0 and 2 break it. Scale them to 0 and 1 if the "
+             "weights are all multiples of the same number, otherwise use Dijkstra."),
     ],
     interview="""
 Say which algorithm and *why the cheaper one does not apply*: "weights differ,

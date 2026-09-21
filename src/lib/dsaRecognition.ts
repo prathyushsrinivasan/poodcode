@@ -1,4 +1,4 @@
-import type { Problem } from "../types";
+import type { Problem, StageRoute } from "../types";
 import { isCleared, type HydratedCurriculum, type HydratedUnit } from "./curriculum";
 
 /**
@@ -86,6 +86,19 @@ export interface RoutingQuestion {
    * the wording you failed to notice.
    */
   signalHint: { when: string; reachFor: string } | null;
+  /**
+   * The stage's own routing rule for this unit, revealed after answering.
+   *
+   * `signalHint` comes from the unit you should have picked and says "this
+   * technique applies when…". That answers the question you ask *after*
+   * choosing, and a learner who chose wrongly never got that far. The router
+   * row is the rule that would have sent them here in the first place — and it
+   * carries `notWhen`, the near miss, which is usually the thing they actually
+   * confused it with.
+   *
+   * Null when the stage has no routing table, or has no row for this unit.
+   */
+  routeHint: { when: string; why: string; notWhen: string } | null;
 }
 
 /** Stable card id for a unit's routing score, graded like a self-check.
@@ -111,7 +124,9 @@ export function routingQuestion(
   pool: HydratedUnit[],
   rand: () => number,
   /** Restrict to problems the learner has not solved, when any remain. */
-  preferUnsolved = true
+  preferUnsolved = true,
+  /** The routing table of the stage `target` belongs to, when it has one. */
+  router: StageRoute[] = []
 ): RoutingQuestion | null {
   const items = target.rungs.flatMap((r) => r.items).filter((i) => i.problem);
   if (items.length === 0) return null;
@@ -133,12 +148,18 @@ export function routingQuestion(
   const signals = target.unit.signals.filter((s) => s.when.trim() && s.reach_for.trim());
   const sig = signals.length > 0 ? signals[Math.floor(rand() * signals.length)] : null;
 
+  // Prefer a router row that names a near miss: those are the rows that explain
+  // an actual wrong answer rather than merely restating the right one.
+  const rows = router.filter((r) => r.unit === target.unit.key);
+  const route = rows.find((r) => r.not_when.trim()) ?? rows[0] ?? null;
+
   return {
     problem,
     answerUnit: target.unit.key,
     answerLabel,
     options: shuffled([answerLabel, ...distractors], rand),
     signalHint: sig ? { when: sig.when, reachFor: sig.reach_for } : null,
+    routeHint: route ? { when: route.when, why: route.why, notWhen: route.not_when } : null,
   };
 }
 
@@ -166,12 +187,17 @@ export function mixedSet(
     .filter((u) => u.total > 0 || u.rungs.some((r) => r.items.some((i) => i.problem)));
   if (pool.length === 0) return [];
 
+  // A mixed set draws from earlier stages too, so a question's routing rule
+  // lives in whichever stage owns that unit — not in the one being drilled.
+  const routerOf = new Map<string, StageRoute[]>();
+  for (const st of c.stages) for (const u of st.units) routerOf.set(u.unit.key, st.router);
+
   const rand = rng(seed);
   const out: RoutingQuestion[] = [];
   const used = new Set<string>();
   for (const u of shuffled(pool, rand)) {
     if (out.length >= size) break;
-    const q = routingQuestion(u, pool, rand);
+    const q = routingQuestion(u, pool, rand, true, routerOf.get(u.unit.key) ?? []);
     if (!q || used.has(q.problem.slug)) continue;
     used.add(q.problem.slug);
     out.push(q);
@@ -219,7 +245,7 @@ export function placement(c: HydratedCurriculum, seed: number): PlacementStage[]
   return c.stages.filter((stage) => !stage.optional).map((stage) => {
     const units = stage.units;
     const last = units[units.length - 1];
-    const q = last ? routingQuestion(last, everything, rand, false) : null;
+    const q = last ? routingQuestion(last, everything, rand, false, stage.router) : null;
 
     const candidates = units
       .flatMap((u) => u.rungs.filter((r) => !r.optional).flatMap((r) => r.items))
@@ -240,6 +266,75 @@ export function placement(c: HydratedCurriculum, seed: number): PlacementStage[]
       problem: representative,
       unitKeys: units.map((u) => u.unit.key),
       alreadyCleared: units.every((u) => u.skipped || isCleared(u.status)),
+    };
+  });
+}
+
+/**
+ * A second kind of routing question: discrimination *within* one technique.
+ *
+ * `routingQuestion` asks "which unit is this?", which is the first question and
+ * not the hard one. On the patterns stage the expensive confusions are one
+ * level down and entirely inside a single unit: longest versus shortest, at
+ * most k versus exactly k, fixed width versus variable. Someone who has solved
+ * "longest substring with at most k distinct" will answer "Sliding Window"
+ * instantly and still not know that "count substrings with exactly k distinct"
+ * is that same window run twice and subtracted.
+ *
+ * So the prompt here is a variant's `when` — a problem shape — and the options
+ * are the *sibling variants of the same unit*. Every distractor is therefore a
+ * technique the learner genuinely might reach for, and getting it wrong points
+ * at the specific line they would have written incorrectly.
+ *
+ * Derived from the family table rather than authored, for the same reason
+ * `routingQuestion` is derived from the signals table: a hand-written drill
+ * drifts from the content it is meant to test.
+ */
+export interface VariantQuestion {
+  /** Key of the unit whose family this is drawn from. */
+  unitKey: string;
+  unitTitle: string;
+  /** The problem shape being routed — a variant's `when`. */
+  prompt: string;
+  /** Option labels, shuffled; exactly one matches `answerLabel`. */
+  options: string[];
+  answerLabel: string;
+  /** The edit that defines the right answer, revealed after answering. */
+  change: string;
+  /** The authored caveat on that edit, or "". */
+  gotcha: string;
+}
+
+/** Stable card id for a unit's family drill, graded like a self-check. */
+export function variantCardId(unitKey: string, index: number): string {
+  return `dsa-variant:${unitKey}:${index}`;
+}
+
+/**
+ * Every answerable family question for a unit, in the family table's own order.
+ *
+ * Returns `[]` for a unit with fewer than three variants: two options is a coin
+ * toss, and the generator already refuses to ship a family table that small.
+ *
+ * Order is deliberate rather than shuffled — the table is authored roughly
+ * simplest-first, and a drill that reorders it every render cannot be graded
+ * against a stable card id.
+ */
+export function variantQuestions(u: HydratedUnit, seed = 1): VariantQuestion[] {
+  const vs = u.unit.variants.filter((v) => v.when.trim() && v.name.trim());
+  if (vs.length < 3) return [];
+  const rand = rng(seed);
+  return vs.map((v) => {
+    const others = vs.filter((o) => o.name !== v.name).map((o) => o.name);
+    const distractors = shuffled(others, rand).slice(0, 3);
+    return {
+      unitKey: u.unit.key,
+      unitTitle: u.unit.title,
+      prompt: v.when,
+      answerLabel: v.name,
+      options: shuffled([v.name, ...distractors], rand),
+      change: v.change,
+      gotcha: v.gotcha,
     };
   });
 }

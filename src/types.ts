@@ -681,6 +681,70 @@ export interface CurriculumUnit {
   /** Write it from scratch — optional depth, same as `internals`. */
   build_it: string;
   next_up: string;
+  /** The loop invariant, in four parts. `null` on units whose correctness
+   * argument is a layout or a recurrence rather than a loop. */
+  invariant: Invariant | null;
+  /** The technique's family: the same skeleton with one thing changed. */
+  variants: Variant[];
+  /** The slow version, the fast one, and the edit between them. */
+  rewrites: Rewrite[];
+}
+
+/** A loop invariant, split into the four parts that make it a proof.
+ *
+ * Four fields rather than a paragraph because the paragraph is where a part
+ * goes missing, and it is always `maintained` — people can state an invariant
+ * and not say why one iteration preserves it, which is the step that makes
+ * discarding the rest of the search space legal. */
+export interface Invariant {
+  /** The sentence, in terms of the loop's variables. */
+  statement: string;
+  /** Why it holds before the first iteration. */
+  established: string;
+  /** Why one iteration leaves it true. The load-bearing part. */
+  maintained: string;
+  /** What it gives you once the loop condition fails. */
+  at_exit: string;
+  note: string;
+}
+
+/** One member of a technique's family: the skeleton with ONE thing changed.
+ *
+ * `change` is stated as an edit on purpose. A table of related problems is a
+ * reading list; a table of diffs is a technique. */
+export interface Variant {
+  name: string;
+  change: string;
+  when: string;
+  cost: string;
+  gotcha: string;
+}
+
+/** A slow version beside a fast one, with the single edit named.
+ *
+ * The patterns stage exists to delete a re-scan, and showing only the fast
+ * version hides which part of it is the trick. */
+export interface Rewrite {
+  title: string;
+  slow: string;
+  fast: string;
+  /** The edit, in words. */
+  edit: string;
+  /** Markdown. Not "it is faster" — why the edit cannot lose an answer. */
+  why: string;
+}
+
+/** One row of a stage's routing table: a prompt shape → the unit that owns it.
+ *
+ * A unit's `signals` answer "does THIS technique apply?", which you can only
+ * ask once you have guessed the technique. This answers what comes first. */
+export interface StageRoute {
+  when: string;
+  /** Key of a unit in the same stage. */
+  unit: string;
+  why: string;
+  /** The near miss: the phrasing that looks like this row and is not. */
+  not_when: string;
 }
 
 export interface CurriculumStage {
@@ -693,6 +757,9 @@ export interface CurriculumStage {
   /** Beyond the interview core: left out of overall progress, and never the
    * Continue target while core work remains. Always after every core stage. */
   optional?: boolean;
+  /** The stage's own routing table: which of its units a prompt belongs to.
+   * Empty on stages whose units are not easily confused with each other. */
+  router: StageRoute[];
   units: CurriculumUnit[];
 }
 

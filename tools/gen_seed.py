@@ -6242,6 +6242,7 @@ EXTRA_REFS = {}
 DSA_MORE_FILES = (
     "dsa_more_kit.py",
     "dsa_more_kit2.py",
+    "dsa_more_kit3.py",
     "dsa_more_01.py",
     "dsa_more_02.py",
     "dsa_more_03.py",
@@ -6280,6 +6281,13 @@ DSA_MORE_FILES = (
     "dsa_more_36.py",
     "dsa_more_37.py",
     "dsa_more_38.py",
+    "dsa_more_39.py",
+    "dsa_more_40.py",
+    "dsa_more_41.py",
+    "dsa_more_42.py",
+    "dsa_more_43.py",
+    "dsa_more_44.py",
+    "dsa_more_45.py",
 )
 for _more_name in DSA_MORE_FILES:
     _more_path = os.path.join(HERE, _more_name)

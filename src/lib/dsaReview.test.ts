@@ -94,6 +94,9 @@ function unit(key: string, rungs: Rung[], checks: UnitCheck[] = []): CurriculumU
     rungs,
     build_it: "",
     next_up: "",
+    invariant: null,
+    variants: [],
+    rewrites: [],
   };
 }
 
@@ -103,7 +106,9 @@ function curriculum(units: CurriculumUnit[]): DsaCurriculum {
     title: "DSA Curriculum",
     subtitle: "",
     intro: "",
-    stages: [{ key: "s1", title: "Stage 1", icon: "🌱", tagline: "", goal: "", ordering: 0, units }],
+    stages: [
+      { key: "s1", title: "Stage 1", icon: "🌱", tagline: "", goal: "", ordering: 0, router: [], units },
+    ],
   };
 }
 

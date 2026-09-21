@@ -83,6 +83,9 @@ function unit(key: string, rungs: Rung[], prereqs: string[] = []): CurriculumUni
     rungs,
     build_it: "",
     next_up: "",
+    invariant: null,
+    variants: [],
+    rewrites: [],
   };
 }
 
@@ -99,6 +102,7 @@ function curriculum(units: CurriculumUnit[][]): DsaCurriculum {
       tagline: "",
       goal: "",
       ordering: i,
+      router: [],
       units: us,
     })),
   };

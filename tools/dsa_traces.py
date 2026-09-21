@@ -194,6 +194,40 @@ def _t_complexity():
     )
 
 
+def _t_amortized():
+    """Where the "O(1) amortized" of a doubling array comes from.
+
+    The claim is one sentence and completely unconvincing as prose, because the
+    expensive step really is O(n) and it really does happen again and again. The
+    table makes the two columns visible side by side: the cost of *this* add,
+    and the running total divided by the number of adds. The second column stops
+    climbing, and that is the proof."""
+    rows = []
+    cap, size, copied = 1, 0, 0
+    for add in range(1, 17):
+        if size == cap:
+            copied += size          # the resize copies everything already stored
+            cap *= 2
+            cost = f"**{size + 1}** (resize)"
+        else:
+            cost = "1"
+        size += 1
+        total = copied + add        # every add also writes its own element
+        rows.append([str(add), str(cap), cost, str(total), f"{total / add:.2f}"])
+    return _trace(
+        "Why `ArrayList.add` is O(1) amortized",
+        "An array that doubles when full. Column 3 is what *this* call costs; column 5 is "
+        "the total work so far divided by the number of calls — the amortized cost.",
+        ["add #", "capacity after", "cost of this add", "total work", "total ÷ adds"],
+        rows,
+        "The expensive calls never go away — add 17 would copy 16 elements — but they get "
+        "rarer at exactly the rate they get costlier, so the last column stays under 3 "
+        "forever. The copies happen at sizes 1, 2, 4, 8, 16 …, and 1 + 2 + 4 + … + n < 2n. "
+        "Growing by a fixed +1 instead would make column 5 climb without limit: that is the "
+        "same loop, genuinely O(n²).",
+    )
+
+
 def _t_hashing():
     nums, target = [3, 8, 11, 4, 7], 15
     seen = {}
@@ -216,6 +250,228 @@ def _t_hashing():
         "Four lookups, and the pair (11, 4) is found at the moment its second half arrives. "
         "Checking before inserting is what stops a value pairing with itself — with target 8, "
         "x = 4 must not find its own entry.",
+    )
+
+
+def _t_buckets():
+    """Where a hash map's costs come from, made visible.
+
+    The `internals` section says "bucket array, collisions chain, resize at 75%".
+    All three are claims about a picture nobody has drawn, and the one that
+    stays abstract longest is the resize — specifically the fact that entries
+    cannot be *moved* across, because an index depends on the table length.
+    Watching key 6 land in bucket 2 and then in bucket 6 is the whole argument."""
+    keys = [7, 3, 11, 6, 15, 2]
+    cap = 4
+    table = {}
+    rows = []
+    for k in keys:
+        idx = k % cap
+        before = table.get(idx, [])
+        table.setdefault(idx, []).append(k)
+        size = sum(len(v) for v in table.values())
+        note = "collision" if before else "empty slot"
+        resized = ""
+        if size > 0.75 * cap:
+            old_cap = cap
+            cap *= 2
+            moved = sorted(x for v in table.values() for x in v)
+            table = {}
+            for x in moved:
+                table.setdefault(x % cap, []).append(x)
+            resized = f" → **resize {old_cap}→{cap}**, all {len(moved)} re-hashed"
+        shown = ", ".join(
+            f"{b}: [{', '.join(str(x) for x in table[b])}]" for b in sorted(table)
+        )
+        rows.append([str(k), f"{k} % {cap if not resized else old_cap} = {idx}",
+                     note + resized, shown])
+    return _trace(
+        "A hash map with 4 buckets, filling up and resizing",
+        "Index is `key % capacity`. Two keys landing on one index is a **collision**, and they "
+        "chain in that bucket. The table doubles once it is more than 75% full.",
+        ["Insert", "Index", "What happened", "Buckets after"],
+        rows,
+        "Two things the costs depend on are visible here. **Collisions are normal**, not "
+        "failures — 7 and 11 share bucket 3 and both are still found, just with one extra "
+        "comparison; O(1) is average, and it degrades exactly as buckets get long. And a "
+        "**resize cannot copy buckets across**: an entry's index is `key % capacity`, so "
+        "doubling the table moves almost everything. That O(n) rehash is why insertion is "
+        "O(1) *amortized* rather than O(1) — the same doubling argument as `ArrayList`.",
+    )
+
+
+def _t_compaction():
+    """The read/write pair, and the `write <= read` invariant it depends on.
+
+    People accept "overwrite in place" and then worry, correctly, about
+    clobbering. The table answers the worry: the gap between the pointers is
+    exactly the elements already discarded, so every cell `write` touches has
+    been read."""
+    a = [0, 3, 0, 5, 1, 0, 2]
+    buf = list(a)
+    write = 0
+    rows = []
+    for read in range(len(buf)):
+        val = buf[read]
+        if val != 0:
+            buf[write] = val
+            write += 1
+            action = f"keep → a[{write - 1}] = {val}"
+        else:
+            action = "skip (a zero)"
+        rows.append([str(read), str(a[read]), action, str(write),
+                     f"[{', '.join(str(x) for x in buf)}]", str(read - write)])
+    pad = list(buf)
+    for i in range(write, len(pad)):
+        pad[i] = 0
+    rows.append(["—", "—", f"pad {len(pad) - write} zero(s)", str(write),
+                 f"**[{', '.join(str(x) for x in pad)}]**", str(len(pad) - write)])
+    return _trace(
+        "Compaction in place: move the zeroes out of [0, 3, 0, 5, 1, 0, 2]",
+        "`read` advances every step; `write` advances only when an element is kept. The last "
+        "column is the gap between them — the number of zeroes discarded so far.",
+        ["read", "a[read]", "Action", "write", "Array", "Gap"],
+        rows,
+        "`write` never overtakes `read`, because it only moves on an element `read` has "
+        "already passed. That is what makes writing to `a[write]` safe: the gap is never "
+        "negative, so every cell being overwritten holds something already copied or "
+        "discarded. Relative order is preserved for free — if it did not matter, swapping "
+        "with the last element would do fewer writes.",
+    )
+
+
+def _t_longest_window():
+    """The *longest* window, beside the unit's existing *shortest* one.
+
+    These two are eight identical lines with the `while` condition negated and
+    the measurement moved by one line, and confusing them is the most expensive
+    mistake in the unit. Two traces of the same shape, with the difference
+    visible in the same column, is the only way to make that land."""
+    s, k = "aabbbcad", 2
+    freq = {}
+    lo = 0
+    best = 0
+    rows = []
+    for hi, ch in enumerate(s):
+        freq[ch] = freq.get(ch, 0) + 1
+        shrinks = []
+        while len(freq) > k:
+            out = s[lo]
+            freq[out] -= 1
+            if freq[out] == 0:
+                del freq[out]
+            lo += 1
+            shrinks.append(out)
+        best = max(best, hi - lo + 1)
+        shown = "{" + ", ".join(f"{c}:{n}" for c, n in sorted(freq.items())) + "}"
+        rows.append([
+            f"+{ch}",
+            ", ".join(f"−{c}" for c in shrinks) if shrinks else "none",
+            f"[{lo}, {hi}] = `{s[lo:hi + 1]}`",
+            shown,
+            str(hi - lo + 1),
+            f"**{best}**",
+        ])
+    return _trace(
+        "Longest window with at most 2 distinct letters: \"aabbbcad\"",
+        "The same eight lines as the *shortest* trace above, with two edits: the `while` "
+        "shrinks **while invalid** instead of while valid, and the measurement happens "
+        "**after** the loop instead of inside it.",
+        ["Absorb", "Shrunk by", "Window", "Counts", "Length", "Best"],
+        rows,
+        "The answer is 5 — `aabbb`. Compare this with the shortest-window trace: there, the "
+        "`while` runs while the window is *valid* and measures before each removal; here it "
+        "runs while it is *invalid* and measures once after. Absorbing `c` at index 5 forces "
+        "two removals in one step, which is why it is a `while` and not an `if`. And note "
+        "that `lo` only ever moves right — 6 absorbs and 4 removals over the whole run, "
+        "which is the O(n) bound.",
+    )
+
+
+def _t_difference_array():
+    """Range updates, inverted: mark the edges, integrate once.
+
+    The idea reads as a trick until you watch the diff array stay almost empty
+    while three overlapping ranges are applied to it. The 'almost empty' is the
+    point: q updates touch 2q cells no matter how wide the ranges are."""
+    n = 6
+    updates = [(1, 3, 5), (0, 4, 2), (2, 2, -1)]
+    diff = [0] * (n + 1)
+    rows = []
+    for l, r, v in updates:
+        diff[l] += v
+        diff[r + 1] -= v
+        rows.append([
+            f"add {v:+d} to [{l}, {r}]",
+            f"diff[{l}] {v:+d}, diff[{r + 1}] {-v:+d}",
+            f"[{', '.join(str(x) for x in diff)}]",
+            "2",
+        ])
+    run = 0
+    final = []
+    for i in range(n):
+        run += diff[i]
+        final.append(run)
+    rows.append([
+        "one prefix pass",
+        "integrate the edges",
+        f"**[{', '.join(str(x) for x in final)}]**",
+        str(n),
+    ])
+    return _trace(
+        "Three range updates on six zeros, by difference array",
+        "Rather than touching every index in a range, record `+v` where it starts and "
+        "`−v` one past where it ends. The real array appears at the end, from one "
+        "prefix-sum pass.",
+        ["Update", "Edges marked", "diff (7 slots)", "Cells touched"],
+        rows,
+        "Three updates cost 6 writes instead of 3 + 5 + 1 = 9, and the gap grows with the "
+        "*width* of the ranges — a single update covering 10⁵ indices still costs two "
+        "writes. Note the array has **n + 1 = 7** slots: `diff[r + 1]` for `r = 4` needs "
+        "index 5, and an update ending at the last index needs index n. Sizing it n and "
+        "guarding with an `if` is where the off-by-one lives.",
+    )
+
+
+def _t_centres():
+    """Why it is 2m − 1 centres and not m.
+
+    The even-length case is invisible in prose and obvious in a table: half the
+    rows have a centre that is not a character."""
+    s = "abaab"
+    rows = []
+    total = 0
+    for c in range(2 * len(s) - 1):
+        lo, hi = c // 2, c // 2 + (c % 2)
+        kind = "letter" if lo == hi else "gap"
+        found = []
+        while lo >= 0 and hi < len(s) and s[lo] == s[hi]:
+            found.append(s[lo:hi + 1])
+            lo -= 1
+            hi += 1
+        total += len(found)
+        rows.append([
+            str(c),
+            f"{kind} at {c // 2}" if kind == "letter" else f"gap {c // 2}–{c // 2 + 1}",
+            ", ".join(f"`{f}`" for f in found) if found else "—",
+            str(len(found)),
+            str(total),
+        ])
+    return _trace(
+        "Every palindrome in \"abaab\", by expanding around 2m − 1 centres",
+        "A palindrome is symmetric about a centre, and that centre is either a letter "
+        "(odd length) or the gap between two letters (even length). Five letters means "
+        "**nine** centres, not five.",
+        ["Centre #", "Centre", "Palindromes found", "Count", "Running total"],
+        rows,
+        # Interpolated, not typed. The first draft of this takeaway said "six"
+        # against a table that totals eight — exactly the drift this file exists
+        # to prevent, so the number comes from the same run as the rows.
+        f"{total} palindromic substrings. The `aa` at centre 5 is the row that matters: it sits "
+        "between two letters, so expanding only from letters would never find it — and "
+        "the bug shows up as an answer that is right on every odd-length example. Each "
+        "expansion costs O(m) in the worst case, so the whole scan is O(m²) with O(1) "
+        "space, which is the trade against building a table.",
     )
 
 
@@ -755,12 +1011,12 @@ _TRACES_BY_UNIT = {
     "branching": [_t_branching()],
     "loops-and-digits": [_t_digits()],
     "arrays-first-pass": [_t_arrays()],
-    "complexity": [_t_complexity()],
-    "hashing": [_t_hashing()],
-    "two-pointers": [_t_two_pointers()],
-    "sliding-window": [_t_sliding_window()],
-    "prefix-sums": [_t_prefix_sums()],
-    "strings": [_t_strings()],
+    "complexity": [_t_complexity(), _t_amortized()],
+    "hashing": [_t_hashing(), _t_buckets()],
+    "two-pointers": [_t_two_pointers(), _t_compaction()],
+    "sliding-window": [_t_sliding_window(), _t_longest_window()],
+    "prefix-sums": [_t_prefix_sums(), _t_difference_array()],
+    "strings": [_t_strings(), _t_centres()],
     "sorting": [_t_sorting()],
     "math-number-theory": [_t_gcd(), _t_fast_pow()],
     "bit-manipulation": [_t_kernighan(), _t_xor()],

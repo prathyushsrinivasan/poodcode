@@ -2,7 +2,16 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { api } from "../api";
 import { useCrumb } from "../store";
-import type { BigOItem, CardReview, Concept, Trace, UnitCheck } from "../types";
+import type {
+  BigOItem,
+  CardReview,
+  Concept,
+  Invariant,
+  Rewrite,
+  Trace,
+  UnitCheck,
+  Variant,
+} from "../types";
 import { Markdown, InlineMarkdown } from "../components/Markdown";
 import { Confidence, DiffBadge, Empty } from "../components/common";
 import { UnitSkeleton } from "../components/Skeleton";
@@ -28,21 +37,27 @@ import {
   unitChecks,
 } from "../lib/dsaReview";
 import { optionOrder } from "../lib/quizShuffle";
+import {
+  variantCardId,
+  variantQuestions,
+  type VariantQuestion,
+} from "../lib/dsaRecognition";
 
 /**
  * One unit of the DSA curriculum: a technique, taught, then drilled.
  *
- * The generator authors up to thirteen parts per unit — why, the model,
- * internals, traces, signals, the playbook, costs, pitfalls, the ladder, a
- * build-it exercise, self-checks, Big-O drills and interview notes. They used to
- * render as one column of collapsible sections, all open, at full window width:
- * a mid-sized unit ran past 5000px, and the thing you came back for (the ladder)
- * sat below everything you had already read.
+ * The generator authors up to sixteen parts per unit — why, the model, the loop
+ * invariant, internals, traces, signals, the playbook, the family table, the
+ * slow-vs-fast rewrites, costs, pitfalls, the ladder, a build-it exercise,
+ * self-checks, Big-O drills and interview notes. They used to render as one
+ * column of collapsible sections, all open, at full window width: a mid-sized
+ * unit ran past 5000px, and the thing you came back for (the ladder) sat below
+ * everything you had already read.
  *
  * They are now four tabs, in the order a unit is worked:
  *
- *   📖 Learn     — why it exists, the model, what is underneath, traces
- *   🧰 Toolkit   — signals, the playbook, costs, pitfalls
+ *   📖 Learn     — why it exists, the model, the invariant, what is underneath, traces
+ *   🧰 Toolkit   — signals, the playbook, the family, slow vs fast, costs, pitfalls
  *   🧗 Practice  — the problem ladder, and building it yourself
  *   🔁 Review    — self-checks, pricing snippets, interview notes
  *
@@ -131,7 +146,7 @@ type TabKey = "learn" | "toolkit" | "practice" | "review";
 
 const TABS: { key: TabKey; icon: string; label: string; hint: string }[] = [
   { key: "learn", icon: "📖", label: "Learn", hint: "Why it exists and how it works" },
-  { key: "toolkit", icon: "🧰", label: "Toolkit", hint: "Signals, code shapes, costs, pitfalls" },
+  { key: "toolkit", icon: "🧰", label: "Toolkit", hint: "Signals, code shapes, the family, costs, pitfalls" },
   { key: "practice", icon: "🧗", label: "Practice", hint: "The problem ladder" },
   { key: "review", icon: "🔁", label: "Review", hint: "Self-checks and interview prep" },
 ];
@@ -181,6 +196,14 @@ function UnitView({
   const today = todayISO();
   const checkStats = unitChecks(hydrated, reviews, today);
   const bigoStats = cardStats(u.bigo.map((_, i) => bigoCardId(key, i)), reviews, today);
+  // Derived from the family table, so a unit that gains a variant gains a
+  // question without anything else being authored. Empty below three variants.
+  const familyQuestions = variantQuestions(hydrated);
+  const familyStats = cardStats(
+    familyQuestions.map((_, i) => variantCardId(key, i)),
+    reviews,
+    today
+  );
   const { prev, next } = neighbours(data, key);
   const stageIndex = data.stages.findIndex((s) => s.units.some((x) => x.unit.key === key));
   const stage = stageIndex < 0 ? null : data.stages[stageIndex];
@@ -226,6 +249,17 @@ function UnitView({
     short: "The model",
     body: <Markdown>{u.model}</Markdown>,
   });
+  add(
+    u.invariant && {
+      id: "invariant",
+      tab: "learn",
+      icon: "🔒",
+      title: "Why it is allowed to skip the rest",
+      short: "The invariant",
+      lead: "Every technique here is a loop that refuses to re-read what it has already seen. This is the sentence that makes that legal — and the part people cannot produce under pressure is never the statement, it is why one iteration preserves it.",
+      body: <InvariantBlock inv={u.invariant} />,
+    }
+  );
   add(
     u.internals && {
       id: "internals",
@@ -292,6 +326,30 @@ function UnitView({
       count: String(u.skeletons.length),
       lead: "Copy each of these out by hand once. Patterns are muscle memory, and reading them is not how that gets built — so each one has a pad that hides the original, compiles what you type, then diffs the two.",
       body: u.skeletons.map((s, i) => <SkeletonBlock key={i} skeleton={s} />),
+    }
+  );
+  add(
+    u.variants.length > 0 && {
+      id: "variants",
+      tab: "toolkit",
+      icon: "🌿",
+      title: "The family — one change each",
+      short: "Family",
+      count: String(u.variants.length),
+      lead: "Most problems in this unit are the skeleton above with a single line different. Learning them as a list of problems is a reading list; learning them as a list of diffs is the technique.",
+      body: <VariantTable variants={u.variants} />,
+    }
+  );
+  add(
+    u.rewrites.length > 0 && {
+      id: "rewrites",
+      tab: "toolkit",
+      icon: "⚡",
+      title: "Slow beside fast",
+      short: "Slow vs fast",
+      count: String(u.rewrites.length),
+      lead: "The re-scan, and then the same code with it deleted. Seeing only the fast version hides which part of it is the trick — and the edit is usually one line.",
+      body: u.rewrites.map((r, i) => <RewriteBlock key={i} rewrite={r} />),
     }
   );
   add(
@@ -425,6 +483,32 @@ function UnitView({
           review={reviews.get(bigoCardId(key, i))}
           today={today}
           onGrade={(right) => onGrade(bigoCardId(key, i), right)}
+        />
+      )),
+    }
+  );
+  add(
+    familyQuestions.length > 0 && {
+      id: "family-drill",
+      tab: "review",
+      icon: "🌿",
+      title: "Which variant is this?",
+      short: "Family drill",
+      count: deckCount(familyStats),
+      lead: (
+        <>
+          Routing <em>within</em> the technique. Knowing this unit is the right one is the easy
+          half; the expensive confusions — longest versus shortest, at most versus exactly — are
+          all one level down, and this is the only place that tests them.
+        </>
+      ),
+      body: familyQuestions.map((q, i) => (
+        <VariantCard
+          key={i}
+          question={q}
+          review={reviews.get(variantCardId(key, i))}
+          today={today}
+          onGrade={(right) => onGrade(variantCardId(key, i), right)}
         />
       )),
     }
@@ -949,6 +1033,141 @@ function RungBlock({
 /** A trace renders as a table with a takeaway, because the point of a trace is
  * never the table — it is the sentence the table makes obvious. State columns
  * are monospaced so successive rows line up and the change is visible. */
+/** The four parts of a loop invariant, with the load-bearing one marked.
+ *
+ * `maintained` is called out rather than rendered as just another row because
+ * it is the part that is always missing when someone half-knows a technique:
+ * they can state the invariant and cannot say why moving the pointer preserves
+ * it, which is exactly the step that licenses throwing away the rest of the
+ * search space. Labelling it is a small nudge toward reading that one twice. */
+function InvariantBlock({ inv }: { inv: Invariant }) {
+  const parts: { label: string; text: string; key: keyof Invariant; hint?: string }[] = [
+    { label: "The claim", key: "statement", text: inv.statement },
+    {
+      label: "True before the loop",
+      key: "established",
+      text: inv.established,
+      hint: "The base case",
+    },
+    {
+      label: "Still true after one step",
+      key: "maintained",
+      text: inv.maintained,
+      hint: "The part that does the work",
+    },
+    { label: "What it gives you at the end", key: "at_exit", text: inv.at_exit },
+  ];
+  return (
+    <div>
+      <div className="cu-inv-claim">
+        <Markdown>{inv.statement}</Markdown>
+      </div>
+      {parts.slice(1).map((p) => (
+        <div key={p.key} className={"cu-inv" + (p.key === "maintained" ? " cu-inv-key" : "")}>
+          <div className="cu-inv-label">
+            {p.label}
+            {p.hint && <span className="faint"> — {p.hint}</span>}
+          </div>
+          <Markdown>{p.text}</Markdown>
+        </div>
+      ))}
+      {inv.note && (
+        <div className="cu-inv-note">
+          <Markdown>{inv.note}</Markdown>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/** The technique's family, as a table of diffs.
+ *
+ * `change` gets its own column and comes first because that is the field that
+ * makes this a technique rather than a reading list: every row is the same
+ * skeleton, and the column says what to edit. */
+function VariantTable({ variants }: { variants: Variant[] }) {
+  return (
+    <div className="card" style={{ padding: 0, overflowX: "auto" }}>
+      <table className="data">
+        <thead>
+          <tr>
+            <th style={{ width: 180 }}>Variant</th>
+            <th>The one change</th>
+            <th>Reach for it when</th>
+            <th style={{ width: 150 }}>Cost</th>
+          </tr>
+        </thead>
+        <tbody>
+          {variants.map((v, i) => (
+            <tr key={i} style={{ cursor: "default" }}>
+              <td>
+                <strong>{v.name}</strong>
+              </td>
+              <td>
+                <InlineMarkdown>{v.change}</InlineMarkdown>
+                {v.gotcha && (
+                  <div className="cu-var-gotcha">
+                    <span className="cu-var-gotcha-tag">watch</span>{" "}
+                    <InlineMarkdown>{v.gotcha}</InlineMarkdown>
+                  </div>
+                )}
+              </td>
+              <td className="dim">
+                <InlineMarkdown>{v.when}</InlineMarkdown>
+              </td>
+              <td className="mono">{v.cost}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+/** The slow version and the fast one, side by side.
+ *
+ * The slow version is shown FIRST and by default, which is the whole point:
+ * the lesson is the diff, and a reader who never sees what was deleted has to
+ * take on faith which part of the fast version is doing the work. `why` stays
+ * collapsed until asked for, so the code can be compared before being
+ * explained. */
+function RewriteBlock({ rewrite }: { rewrite: Rewrite }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="cu-rewrite">
+      <div className="row" style={{ marginBottom: 10 }}>
+        <strong>{rewrite.title}</strong>
+      </div>
+      <div className="cu-rewrite-pair">
+        <div>
+          <div className="cu-rewrite-label cu-rewrite-slow">Before — the re-scan</div>
+          <pre className="cu-rewrite-code">
+            <code>{rewrite.slow}</code>
+          </pre>
+        </div>
+        <div>
+          <div className="cu-rewrite-label cu-rewrite-fast">After</div>
+          <pre className="cu-rewrite-code">
+            <code>{rewrite.fast}</code>
+          </pre>
+        </div>
+      </div>
+      <p className="cu-rewrite-edit">
+        <span className="cu-rewrite-edit-tag">the edit</span>{" "}
+        <InlineMarkdown>{rewrite.edit}</InlineMarkdown>
+      </p>
+      <button className="ghost" style={{ fontSize: 12 }} onClick={() => setOpen((o) => !o)}>
+        {open ? "Hide why" : "Why the edit cannot lose an answer →"}
+      </button>
+      {open && (
+        <div style={{ marginTop: 10 }}>
+          <Markdown>{rewrite.why}</Markdown>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function TraceTable({ trace }: { trace: Trace }) {
   /**
    * `null` shows the whole table; a number shows the first `n` rows.
@@ -1119,6 +1338,92 @@ function BigOCard({
           <div className="dim" style={{ marginTop: 4 }}>
             <Markdown>{item.why}</Markdown>
           </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/** One family question: a problem shape, and which variant of this unit it is.
+ *
+ * Deliberately shaped like `BigOCard` rather than like `Check` — the answer is
+ * one of a fixed set, so a multiple choice measures something a "did you
+ * remember?" button cannot. The reveal shows the *edit* rather than restating
+ * the answer, because the useful correction to "I said longest, it was
+ * shortest" is the line that differs, not the label. */
+function VariantCard({
+  question,
+  review,
+  today,
+  onGrade,
+}: {
+  question: VariantQuestion;
+  review: CardReview | undefined;
+  today: string;
+  onGrade: (right: boolean) => void;
+}) {
+  const [picked, setPicked] = useState<string | null>(null);
+  const right = picked === question.answerLabel;
+  const due = isCardDue(review, today);
+  const graded = (review?.reps ?? 0) > 0 || (review?.lapses ?? 0) > 0;
+
+  return (
+    <div className="card" style={{ marginBottom: 12 }}>
+      <div className="row">
+        <span className="dim" style={{ fontSize: 13 }}>
+          The prompt asks for…
+        </span>
+        <span className="spacer" />
+        {graded && !due && (
+          <span className="faint mono" style={{ fontSize: 12 }} title="Next review">
+            due {review!.due_date}
+          </span>
+        )}
+        {graded && due && (
+          <span className="badge" style={{ color: "var(--accent)", borderColor: "var(--accent)" }}>
+            due
+          </span>
+        )}
+      </div>
+      <p style={{ margin: "6px 0 12px", fontSize: 15 }}>
+        <InlineMarkdown>{question.prompt}</InlineMarkdown>
+      </p>
+      <div className="grid cols-2">
+        {question.options.map((opt) => {
+          let border: string | undefined;
+          if (picked !== null) {
+            if (opt === question.answerLabel) border = "var(--good)";
+            else if (opt === picked) border = "var(--bad)";
+          }
+          return (
+            <button
+              key={opt}
+              style={{ textAlign: "left", borderColor: border, color: border, padding: "8px 10px" }}
+              disabled={picked !== null}
+              onClick={() => {
+                setPicked(opt);
+                onGrade(opt === question.answerLabel);
+              }}
+            >
+              {opt}
+            </button>
+          );
+        })}
+      </div>
+      {picked !== null && (
+        <div style={{ marginTop: 10 }}>
+          <strong style={{ color: right ? "var(--good)" : "var(--bad)" }}>
+            {right ? "Correct." : `Not quite — it is ${question.answerLabel}.`}
+          </strong>
+          <div className="dim" style={{ marginTop: 4 }}>
+            <InlineMarkdown>{question.change}</InlineMarkdown>
+          </div>
+          {question.gotcha && (
+            <div className="cu-var-gotcha" style={{ marginTop: 8 }}>
+              <span className="cu-var-gotcha-tag">watch</span>{" "}
+              <InlineMarkdown>{question.gotcha}</InlineMarkdown>
+            </div>
+          )}
         </div>
       )}
     </div>

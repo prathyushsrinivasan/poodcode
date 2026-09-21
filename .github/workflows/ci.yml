@@ -36,11 +36,30 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      # For the curriculum's Java fragments, below. The seed regeneration
+      # itself does not need a JDK.
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
       - name: Regenerate seeds and check they are committed
         run: |
           python tools/gen_seed.py
           git diff --exit-code src-tauri/seeds/ \
             || (echo "::error::seeds are stale — run 'python tools/gen_seed.py' and commit" && exit 1)
+      # The teaching pages ship hundreds of Java fragments that nothing ever
+      # executes — `verify_seeds` proves the reference *solutions* are accepted
+      # and says nothing about the code in the skeletons and rewrites. This
+      # compiles them, which is how a fragment that is not valid Java at all
+      # gets caught before it ships.
+      #
+      # Scoped to the stages that are clean today rather than the whole
+      # curriculum: 80 of the later fragments still need context the checker's
+      # ambient table does not supply, and a gate that is red on arrival is a
+      # gate somebody deletes. Add a stage here once
+      # `python tools/verify_snippets.py <stage>` passes for it.
+      - name: Curriculum Java fragments compile
+        run: python tools/verify_snippets.py foundations patterns
 
   backend:
     name: Backend (tests + verification + clippy)

@@ -1504,6 +1504,92 @@ pub struct CurriculumUnit {
     /// Markdown: the hand-off to the next unit.
     #[serde(default)]
     pub next_up: String,
+    /// The loop invariant. `None` on units whose correctness argument is a
+    /// layout (`internals`) or a recurrence rather than a loop.
+    #[serde(default)]
+    pub invariant: Option<Invariant>,
+    /// The technique's family: the same skeleton with one thing changed.
+    #[serde(default)]
+    pub variants: Vec<Variant>,
+    /// The slow version, the fast one, and the edit between them.
+    #[serde(default)]
+    pub rewrites: Vec<Rewrite>,
+}
+
+/// A loop invariant, split into the four parts that make it a proof.
+///
+/// Four fields rather than one paragraph because the paragraph is where a part
+/// goes missing, and it is always `maintained` — the step that makes discarding
+/// the rest of the search space legal.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Invariant {
+    /// The sentence, in terms of the loop's variables.
+    #[serde(default)]
+    pub statement: String,
+    /// Why it holds before the first iteration.
+    #[serde(default)]
+    pub established: String,
+    /// Why one iteration leaves it true. The load-bearing part.
+    #[serde(default)]
+    pub maintained: String,
+    /// What it gives you once the loop condition fails.
+    #[serde(default)]
+    pub at_exit: String,
+    #[serde(default)]
+    pub note: String,
+}
+
+/// One member of a technique's family: the skeleton with ONE thing changed.
+///
+/// `change` is stated as an edit deliberately — a table of related problems is
+/// a reading list, a table of diffs is a technique.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Variant {
+    #[serde(default)]
+    pub name: String,
+    #[serde(default)]
+    pub change: String,
+    #[serde(default)]
+    pub when: String,
+    #[serde(default)]
+    pub cost: String,
+    #[serde(default)]
+    pub gotcha: String,
+}
+
+/// A slow version beside a fast one, with the single edit named.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Rewrite {
+    #[serde(default)]
+    pub title: String,
+    #[serde(default)]
+    pub slow: String,
+    #[serde(default)]
+    pub fast: String,
+    /// The edit, in words.
+    #[serde(default)]
+    pub edit: String,
+    /// Markdown. Not "it is faster" — why the edit cannot lose an answer.
+    #[serde(default)]
+    pub why: String,
+}
+
+/// One row of a stage's routing table: a prompt shape → the unit that owns it.
+///
+/// A unit's `signals` answer "does THIS technique apply?", which you can only
+/// ask once you have guessed the technique. This answers what comes first.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct StageRoute {
+    #[serde(default)]
+    pub when: String,
+    /// Key of a unit in the same stage.
+    #[serde(default)]
+    pub unit: String,
+    #[serde(default)]
+    pub why: String,
+    /// The near miss: the phrasing that looks like this row and is not.
+    #[serde(default)]
+    pub not_when: String,
 }
 
 /// A group of units sharing one idea (foundations, patterns, structures …).
@@ -1526,6 +1612,10 @@ pub struct CurriculumStage {
     /// by tests/verify_dsa_curriculum.rs).
     #[serde(default)]
     pub optional: bool,
+    /// The stage's own routing table: which of its units a prompt belongs to.
+    /// Empty on stages whose units are not easily confused with each other.
+    #[serde(default)]
+    pub router: Vec<StageRoute>,
     #[serde(default)]
     pub units: Vec<CurriculumUnit>,
 }
