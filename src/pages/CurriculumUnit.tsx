@@ -6,11 +6,13 @@ import type {
   BigOItem,
   CardReview,
   Concept,
+  EdgeCase,
   Invariant,
   Rewrite,
   Trace,
   UnitCheck,
   Variant,
+  Walkthrough,
 } from "../types";
 import { Markdown, InlineMarkdown } from "../components/Markdown";
 import { Confidence, DiffBadge, Empty } from "../components/common";
@@ -33,6 +35,7 @@ import {
   checkCardId,
   isCardDue,
   isSlowSolve,
+  quizCardId,
   todayISO,
   unitChecks,
 } from "../lib/dsaReview";
@@ -196,6 +199,7 @@ function UnitView({
   const today = todayISO();
   const checkStats = unitChecks(hydrated, reviews, today);
   const bigoStats = cardStats(u.bigo.map((_, i) => bigoCardId(key, i)), reviews, today);
+  const quizStats = cardStats(u.quizzes.map((_, i) => quizCardId(key, i)), reviews, today);
   // Derived from the family table, so a unit that gains a variant gains a
   // question without anything else being authored. Empty below three variants.
   const familyQuestions = variantQuestions(hydrated);
@@ -284,6 +288,26 @@ function UnitView({
     }
   );
   add(
+    u.walkthrough && {
+      id: "walkthrough",
+      tab: "learn",
+      icon: "🧭",
+      title: "One problem, start to finish",
+      short: "Worked solution",
+      lead: "The model explains the technique and the ladder hands you problems. This is the road between them: one problem taken from the prompt to a tested, priced solution, in the same six steps every time.",
+      body: (
+        <WalkthroughBlock
+          walk={u.walkthrough}
+          problemId={
+            hydrated.rungs.flatMap((r) => r.items).find((i) => i.slug === u.walkthrough!.slug)
+              ?.problem?.id ?? null
+          }
+          onOpen={(id) => nav(`/solve/${id}`)}
+        />
+      ),
+    }
+  );
+  add(
     u.signals.length > 0 && {
       id: "signals",
       tab: "toolkit",
@@ -308,6 +332,37 @@ function UnitView({
                   <td><InlineMarkdown>{s.when}</InlineMarkdown></td>
                   <td><strong><InlineMarkdown>{s.reach_for}</InlineMarkdown></strong></td>
                   <td className="dim"><InlineMarkdown>{s.why}</InlineMarkdown></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ),
+    }
+  );
+  add(
+    u.stuck.length > 0 && {
+      id: "stuck",
+      tab: "toolkit",
+      icon: "🪜",
+      title: "Stuck before the first line?",
+      short: "Stuck?",
+      count: String(u.stuck.length),
+      lead: "Pitfalls are for after a failed run. This is for before any code exists — not answers, but the question that tends to produce one.",
+      body: (
+        <div className="card" style={{ padding: 0, overflowX: "auto" }}>
+          <table className="data">
+            <thead>
+              <tr>
+                <th style={{ width: "40%" }}>If you are stuck on…</th>
+                <th>Ask yourself</th>
+              </tr>
+            </thead>
+            <tbody>
+              {u.stuck.map((r, i) => (
+                <tr key={i} style={{ cursor: "default" }}>
+                  <td><InlineMarkdown>{r.when}</InlineMarkdown></td>
+                  <td><InlineMarkdown>{r.ask}</InlineMarkdown></td>
                 </tr>
               ))}
             </tbody>
@@ -421,6 +476,18 @@ function UnitView({
     )),
   });
   add(
+    u.edge_cases.length > 0 && {
+      id: "edge-cases",
+      tab: "practice",
+      icon: "🧪",
+      title: "Test before you submit",
+      short: "Edge cases",
+      count: String(u.edge_cases.length),
+      lead: "The hidden tests are built from cases like these. Each one names the bug it catches — paste the input into the custom-test box before you press Submit.",
+      body: u.edge_cases.map((e, i) => <EdgeCaseRow key={i} edge={e} />),
+    }
+  );
+  add(
     u.build_it && {
       id: "build",
       tab: "practice",
@@ -483,6 +550,39 @@ function UnitView({
           review={reviews.get(bigoCardId(key, i))}
           today={today}
           onGrade={(right) => onGrade(bigoCardId(key, i), right)}
+        />
+      )),
+    }
+  );
+  add(
+    u.quizzes.length > 0 && {
+      id: "quizzes",
+      tab: "review",
+      icon: "🐞",
+      title: "Spot the bug, predict the result",
+      short: "Spot the bug",
+      count: deckCount(quizStats),
+      lead: (
+        <>
+          The code in this unit is short, so its bugs are small: one comparison, one rounding,
+          one missing <code>max</code>. Reading code and finding the line is a separate skill from
+          writing it, and it is the one a failing hidden test demands. Scheduled like the other
+          cards.
+        </>
+      ),
+      body: u.quizzes.map((q, i) => (
+        <ChoiceCard
+          key={i}
+          label={q.kind === "bug" ? "Spot the bug" : "Predict the result"}
+          prompt={q.prompt}
+          code={q.code}
+          options={q.options}
+          answer={q.answer}
+          why={q.why}
+          mono={false}
+          review={reviews.get(quizCardId(key, i))}
+          today={today}
+          onGrade={(right) => onGrade(quizCardId(key, i), right)}
         />
       )),
     }
@@ -628,9 +728,9 @@ function UnitView({
   const tabIndex = tabs.findIndex((t) => t.key === tab);
   const nextTab = tabs[tabIndex + 1] ?? null;
   const reviewDeck = {
-    due: checkStats.due + bigoStats.due,
-    started: checkStats.started + bigoStats.started,
-    total: checkStats.total + bigoStats.total,
+    due: checkStats.due + bigoStats.due + quizStats.due,
+    started: checkStats.started + bigoStats.started + quizStats.started,
+    total: checkStats.total + bigoStats.total + quizStats.total,
   };
 
   const tabCount = (t: TabKey): { text: string; due: boolean } | null => {
@@ -1281,8 +1381,50 @@ function BigOCard({
   today: string;
   onGrade: (right: boolean) => void;
 }) {
+  return (
+    <ChoiceCard
+      label="What is the complexity?"
+      code={item.code}
+      options={item.options}
+      answer={item.answer}
+      why={item.why}
+      mono
+      review={review}
+      today={today}
+      onGrade={onGrade}
+    />
+  );
+}
+
+/** A graded multiple choice over a code fragment — the shape shared by the
+ * Big-O drill and the spot-the-bug / predict drill. Grading on the first pick
+ * is deliberate: a second guess after seeing red is not recall. */
+function ChoiceCard({
+  label,
+  prompt,
+  code,
+  options,
+  answer,
+  why,
+  mono,
+  review,
+  today,
+  onGrade,
+}: {
+  label: string;
+  prompt?: string;
+  code: string;
+  options: string[];
+  answer: string;
+  why: string;
+  /** Options are code-ish (complexities) rather than sentences. */
+  mono: boolean;
+  review: CardReview | undefined;
+  today: string;
+  onGrade: (right: boolean) => void;
+}) {
   const [picked, setPicked] = useState<string | null>(null);
-  const right = picked === item.answer;
+  const right = picked === answer;
   const due = isCardDue(review, today);
   const graded = (review?.reps ?? 0) > 0 || (review?.lapses ?? 0) > 0;
 
@@ -1290,7 +1432,7 @@ function BigOCard({
     <div className="card" style={{ marginBottom: 12 }}>
       <div className="row">
         <span className="dim" style={{ fontSize: 13 }}>
-          What is the complexity?
+          {label}
         </span>
         <span className="spacer" />
         {graded && !due && (
@@ -1304,15 +1446,20 @@ function BigOCard({
           </span>
         )}
       </div>
-      <Markdown>{"```java\n" + item.code + "```"}</Markdown>
-      <div className="grid cols-2">
+      {prompt && (
+        <div style={{ margin: "6px 0" }}>
+          <InlineMarkdown>{prompt}</InlineMarkdown>
+        </div>
+      )}
+      <Markdown>{"```java\n" + code + "```"}</Markdown>
+      <div className={mono ? "grid cols-2" : "grid"}>
         {/* Authors list the answer early — across the seed it was never the last
             option — so the authored order would be a tell. Shuffled per snippet,
             deterministically, like every other multiple-choice question. */}
-        {optionOrder(item.code, item.options.length).map((i) => item.options[i]).map((opt) => {
+        {optionOrder(code, options.length).map((i) => options[i]).map((opt) => {
           let border: string | undefined;
           if (picked !== null) {
-            if (opt === item.answer) border = "var(--good)";
+            if (opt === answer) border = "var(--good)";
             else if (opt === picked) border = "var(--bad)";
           }
           return (
@@ -1322,10 +1469,10 @@ function BigOCard({
               disabled={picked !== null}
               onClick={() => {
                 setPicked(opt);
-                onGrade(opt === item.answer);
+                onGrade(opt === answer);
               }}
             >
-              <span className="mono">{opt}</span>
+              {mono ? <span className="mono">{opt}</span> : <InlineMarkdown>{opt}</InlineMarkdown>}
             </button>
           );
         })}
@@ -1333,13 +1480,93 @@ function BigOCard({
       {picked !== null && (
         <div style={{ marginTop: 10 }}>
           <strong style={{ color: right ? "var(--good)" : "var(--bad)" }}>
-            {right ? "Correct." : `Not quite — it is ${item.answer}.`}
+            {right ? "Correct." : mono ? `Not quite — it is ${answer}.` : "Not quite."}
           </strong>
+          {!right && !mono && (
+            <div style={{ marginTop: 4 }}>
+              The answer: <InlineMarkdown>{answer}</InlineMarkdown>
+            </div>
+          )}
           <div className="dim" style={{ marginTop: 4 }}>
-            <Markdown>{item.why}</Markdown>
+            <Markdown>{why}</Markdown>
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+/** One edge case: what it is, the bug it catches, and its input with a copy
+ * button — the point is to paste it into the custom-test box, not to read it. */
+function EdgeCaseRow({ edge }: { edge: EdgeCase }) {
+  const [copied, setCopied] = useState(false);
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(edge.input);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {
+      /* a clipboard the browser refuses is not worth an error dialog */
+    }
+  };
+  return (
+    <div className="cu-pitfall">
+      <div className="row">
+        <div className="cu-pitfall-symptom">
+          <InlineMarkdown>{edge.case}</InlineMarkdown>
+        </div>
+        <span className="spacer" />
+        <span className="faint mono" style={{ fontSize: 12 }} title="The problem this input is for">
+          {edge.slug}
+        </span>
+        <button className="ghost" style={{ fontSize: 12, padding: "2px 8px" }} onClick={copy}>
+          {copied ? "Copied" : "Copy input"}
+        </button>
+      </div>
+      <div className="dim" style={{ marginBottom: 6 }}>
+        <strong>Catches: </strong>
+        <InlineMarkdown>{edge.breaks}</InlineMarkdown>
+      </div>
+      <pre className="mono" style={{ margin: 0, fontSize: 12, whiteSpace: "pre-wrap" }}>
+        {edge.input}
+      </pre>
+    </div>
+  );
+}
+
+/** A worked solution: six fixed steps, numbered, with a way into the problem. */
+function WalkthroughBlock({
+  walk,
+  problemId,
+  onOpen,
+}: {
+  walk: Walkthrough;
+  problemId: number | null;
+  onOpen: (id: number) => void;
+}) {
+  return (
+    <div className="card">
+      <div className="row" style={{ marginBottom: 8 }}>
+        <strong>{walk.title}</strong>
+        <span className="spacer" />
+        {problemId !== null && (
+          <button
+            className="ghost"
+            style={{ fontSize: 12, padding: "2px 8px" }}
+            onClick={() => onOpen(problemId)}
+          >
+            Open the problem →
+          </button>
+        )}
+      </div>
+      {walk.steps.map((st, i) => (
+        <div key={i} style={{ marginTop: i ? 14 : 0 }}>
+          <div className="dim" style={{ fontSize: 13, fontWeight: 600 }}>
+            {i + 1}. {st.name}
+          </div>
+          <Markdown>{st.body}</Markdown>
+        </div>
+      ))}
     </div>
   );
 }

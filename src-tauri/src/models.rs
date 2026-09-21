@@ -1514,6 +1514,82 @@ pub struct CurriculumUnit {
     /// The slow version, the fast one, and the edit between them.
     #[serde(default)]
     pub rewrites: Vec<Rewrite>,
+    /// Graded "spot the bug" / "predict the result" drills.
+    #[serde(default)]
+    pub quizzes: Vec<Quiz>,
+    /// Triage for the moment before any code exists: if you cannot see X, ask Y.
+    #[serde(default)]
+    pub stuck: Vec<StuckRow>,
+    /// Inputs worth testing before you submit, and the bug each one exposes.
+    #[serde(default)]
+    pub edge_cases: Vec<EdgeCase>,
+    /// One problem solved start to finish, in fixed steps.
+    #[serde(default)]
+    pub walkthrough: Option<Walkthrough>,
+}
+
+/// A multiple-choice drill over a code fragment. `kind` is `bug` (the code is
+/// wrong: which change fixes it?) or `predict` (the code is right: what does it
+/// produce?). Scheduled like the Big-O cards.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Quiz {
+    #[serde(default)]
+    pub kind: String,
+    #[serde(default)]
+    pub prompt: String,
+    #[serde(default)]
+    pub code: String,
+    #[serde(default)]
+    pub answer: String,
+    #[serde(default)]
+    pub options: Vec<String>,
+    /// Markdown.
+    #[serde(default)]
+    pub why: String,
+}
+
+/// One row of a unit's "stuck?" triage.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct StuckRow {
+    #[serde(default)]
+    pub when: String,
+    #[serde(default)]
+    pub ask: String,
+}
+
+/// An edge case with a ready-to-paste stdin input and the bug it exposes.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct EdgeCase {
+    /// The problem whose input format `input` follows; on the unit's ladder.
+    #[serde(default)]
+    pub slug: String,
+    #[serde(default)]
+    pub case: String,
+    #[serde(default)]
+    pub input: String,
+    #[serde(default)]
+    pub breaks: String,
+}
+
+/// One problem, solved start to finish.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Walkthrough {
+    /// A problem on this unit's ladder.
+    #[serde(default)]
+    pub slug: String,
+    #[serde(default)]
+    pub title: String,
+    #[serde(default)]
+    pub steps: Vec<WalkStep>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct WalkStep {
+    #[serde(default)]
+    pub name: String,
+    /// Markdown.
+    #[serde(default)]
+    pub body: String,
 }
 
 /// A loop invariant, split into the four parts that make it a proof.
@@ -1616,6 +1692,9 @@ pub struct CurriculumStage {
     /// Empty on stages whose units are not easily confused with each other.
     #[serde(default)]
     pub router: Vec<StageRoute>,
+    /// Markdown: the stage's templates on one page. Empty on most stages.
+    #[serde(default)]
+    pub cheatsheet: String,
     #[serde(default)]
     pub units: Vec<CurriculumUnit>,
 }

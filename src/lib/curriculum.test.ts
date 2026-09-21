@@ -86,6 +86,10 @@ function unit(key: string, rungs: Rung[], prereqs: string[] = []): CurriculumUni
     invariant: null,
     variants: [],
     rewrites: [],
+    quizzes: [],
+    stuck: [],
+    edge_cases: [],
+    walkthrough: null,
   };
 }
 

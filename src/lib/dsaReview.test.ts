@@ -97,6 +97,10 @@ function unit(key: string, rungs: Rung[], checks: UnitCheck[] = []): CurriculumU
     invariant: null,
     variants: [],
     rewrites: [],
+    quizzes: [],
+    stuck: [],
+    edge_cases: [],
+    walkthrough: null,
   };
 }
 

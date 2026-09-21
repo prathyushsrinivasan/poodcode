@@ -100,9 +100,23 @@ fn every_reference_solution_is_accepted() {
     let references: HashMap<String, HashMap<String, String>> =
         serde_json::from_str(REFERENCES).expect("reference_solutions.json parses");
 
+    // `VERIFY_SLUGS=a,b,c` judges only those problems. The full run is hours of
+    // compile-and-run; a new batch only needs its own references proven.
+    let only: Option<HashSet<String>> = std::env::var("VERIFY_SLUGS")
+        .ok()
+        .map(|s| s.split(',').map(|x| x.trim().to_string()).filter(|x| !x.is_empty()).collect());
+    if let Some(o) = &only {
+        for s in o {
+            assert!(references.contains_key(s), "VERIFY_SLUGS names {s}, which has no reference");
+        }
+    }
+
     let mut checked = 0;
     let mut skipped = 0;
     for (slug, langs) in &references {
+        if only.as_ref().is_some_and(|o| !o.contains(slug)) {
+            continue;
+        }
         let p = by_slug
             .get(slug.as_str())
             .unwrap_or_else(|| panic!("reference for unknown slug: {slug}"));

@@ -77,7 +77,7 @@ def _md(s):
     return s.lstrip("\n").rstrip() + "\n" if s else ""
 
 
-def _stage(key, title, icon, tagline, goal, optional=False, router=()):
+def _stage(key, title, icon, tagline, goal, optional=False, router=(), cheatsheet=""):
     """One stage. `optional` marks a stage beyond the interview core: the app
     leaves it out of the course's overall progress and does not send "Continue"
     into it until the core is done. Optional stages must come last (see
@@ -93,7 +93,7 @@ def _stage(key, title, icon, tagline, goal, optional=False, router=()):
     """
     _STAGES.append({"key": key, "title": title, "icon": icon,
                     "tagline": tagline, "goal": _md(goal), "optional": bool(optional),
-                    "router": list(router)})
+                    "router": list(router), "cheatsheet": _md(cheatsheet)})
     return key
 
 
@@ -228,6 +228,66 @@ def _trace(title, intro, headers, rows, takeaway=""):
             "rows": [list(r) for r in rows], "takeaway": takeaway}
 
 
+_QUIZ_KINDS = {"bug": "Spot the bug", "predict": "Predict the result"}
+
+
+def _quiz(kind, prompt, code, answer, options, why):
+    """A graded multiple-choice drill over a code fragment.
+
+    The other drills ask you to recall (self-checks), to price (Big-O) or to
+    classify (the family drill). None of them hands you *broken* code — and the
+    commonest failure in a technique whose code is eight lines long is a
+    one-character boundary bug. Two kinds:
+
+      * `bug`     — the snippet is wrong; which change fixes it?
+      * `predict` — the snippet is right; what does it return or leave behind?
+
+    Scheduled like the Big-O cards (`dsa-quiz:<unit>:<i>`), and `why` is
+    required for the same reason.
+    """
+    assert kind in _QUIZ_KINDS, f"quiz kind {kind!r} is not one of {sorted(_QUIZ_KINDS)}"
+    assert answer in options, f"quiz answer {answer!r} is not among its options"
+    return {"kind": kind, "prompt": prompt, "code": code.lstrip("\n").rstrip() + "\n",
+            "answer": answer, "options": list(options), "why": _md(why)}
+
+
+def _stuck(when, ask):
+    """One row of a unit's "stuck?" triage: the moment BEFORE any code exists.
+
+    Pitfalls are indexed by the symptom of a failed run, which presumes a run.
+    The learner this serves has read the prompt and has no idea — and the help
+    that works then is not an answer but the question that produces one.
+    """
+    return {"when": when, "ask": ask}
+
+
+def _edge(slug, case, input, breaks):
+    """An edge case worth testing before you submit: a ready-to-paste stdin
+    `input` for the problem `slug` (on this unit's ladder, so the input format
+    is real and the case can be run against its reference), and the bug it
+    `breaks`. The hidden tests are built from exactly these, and naming them
+    beforehand is cheaper than a wrong submission."""
+    return {"slug": slug, "case": case, "input": input.lstrip("\n"), "breaks": breaks}
+
+
+_WALK_STEPS = ("Read", "Route", "Brute force", "Insight", "Code", "Test and price")
+
+
+def _walk(slug, title, steps):
+    """One problem solved start to finish, in six fixed steps.
+
+    The model explains the technique and the ladder hands you problems; nothing
+    in between shows one problem travelling the whole road — prompt, routing,
+    the slow version, the observation, the code, and the test cases and cost.
+    The steps are fixed so every walkthrough is read the same way. `steps` is a
+    list of markdown bodies, one per name in `_WALK_STEPS`.
+    """
+    assert len(steps) == len(_WALK_STEPS), \
+        f"walkthrough {slug}: {len(steps)} steps, expected {len(_WALK_STEPS)}"
+    return {"slug": slug, "title": title,
+            "steps": [{"name": n, "body": _md(b)} for n, b in zip(_WALK_STEPS, steps)]}
+
+
 def _rung(title, purpose, slugs, notes=None, optional=False):
     """One step of a unit's ladder.
 
@@ -253,7 +313,8 @@ def _unit(key, title, icon, stage, tagline, why, model,
           prereqs=(), signals=(), skeletons=(), costs=(), pitfalls=(),
           lessons=(), checks=(), interview="", rungs=(), next_up="",
           internals="", traces=(), build_it="", weight=2, bigo=(),
-          invariant=None, variants=(), rewrites=()):
+          invariant=None, variants=(), rewrites=(), quizzes=(), stuck=(),
+          edge_cases=(), walkthrough=None):
     """One technique, taught.
 
     `weight` is **interview yield**, 1-3, and it exists to stop the bank's
@@ -307,6 +368,10 @@ def _unit(key, title, icon, stage, tagline, why, model,
         "invariant": dict(invariant) if invariant else None,
         "variants": list(variants),
         "rewrites": list(rewrites),
+        "quizzes": list(quizzes),
+        "stuck": list(stuck),
+        "edge_cases": list(edge_cases),
+        "walkthrough": dict(walkthrough) if walkthrough else None,
     })
 
 
@@ -336,7 +401,8 @@ for _name in (
 # to units by key: where the batched problems sit on each ladder, the Big-O
 # drills every unit carries, and the worked traces. Required, not optional — the
 # lints below fail the build if a unit loses them.
-for _name in ("dsa_placements.py", "dsa_syllabus.py", "dsa_bigo.py", "dsa_traces.py"):
+for _name in ("dsa_placements.py", "dsa_syllabus.py", "dsa_bigo.py", "dsa_traces.py",
+              "dsa_s3_depth.py", "dsa_s3_help.py"):
     _p = os.path.join(_HERE, _name)
     with open(_p, encoding="utf-8") as _f:
         exec(compile(_f.read(), _p, "exec"))
@@ -438,6 +504,9 @@ _NEEDS_INTERNALS = {
     # ordinary-looking syntax: immutability, a copying `substring`, `+=` that is
     # quadratic, and a `char` that is not a character.
     "strings",
+    # Order & Search: the call stack is recursion's hidden cost, and "which
+    # algorithm does Arrays.sort run" decides stability and the worst case.
+    "recursion", "sorting",
 }
 _NEEDS_BUILD_IT = {
     "stacks", "queues-and-deques", "linked-lists", "heaps", "design",
@@ -446,6 +515,7 @@ _NEEDS_BUILD_IT = {
     # write from an empty file, and "I have read it" is not that.
     "complexity", "hashing", "two-pointers", "sliding-window", "prefix-sums",
     "strings",
+    "recursion", "sorting", "binary-search", "greedy", "intervals",
 }
 
 # Units whose whole correctness argument is a loop invariant (see `_inv`).
@@ -455,7 +525,10 @@ _NEEDS_BUILD_IT = {
 # recurrence. These are the ones where the question "why is it allowed to skip
 # the rest of the search space?" has no other answer, and where leaving it
 # unstated is how people end up moving the wrong pointer.
-_NEEDS_INVARIANT = {"two-pointers", "sliding-window", "prefix-sums", "hashing"}
+_NEEDS_INVARIANT = {"two-pointers", "sliding-window", "prefix-sums", "hashing",
+                    # Order & Search: induction, the partition regions, the
+                    # half-open search, stays-ahead, and merge's "last block".
+                    "recursion", "sorting", "binary-search", "greedy", "intervals"}
 
 # Units that must carry a family table (see `_var`) and a slow-vs-fast rewrite
 # (see `_rw`). The patterns stage is where both pay most: its six skeletons
@@ -464,8 +537,17 @@ _NEEDS_INVARIANT = {"two-pointers", "sliding-window", "prefix-sums", "hashing"}
 _NEEDS_VARIANTS = {
     "complexity", "hashing", "two-pointers", "sliding-window", "prefix-sums",
     "strings",
+    # Order & Search. Each unit is a handful of skeletons whose problems differ
+    # by one line — first-true vs last-true, sort by start vs by end.
+    "recursion", "sorting", "binary-search", "greedy", "intervals",
 }
 _NEEDS_REWRITES = dict.fromkeys(_NEEDS_VARIANTS)
+
+# Units that must carry the round-2 help layer: spot-the-bug / predict drills,
+# a "stuck?" triage, an edge-case checklist and one worked solution. Started on
+# Order & Search, where boundary bugs are the commonest failure.
+_NEEDS_HELP = {"recursion", "sorting", "binary-search", "greedy", "intervals"}
+_MIN_HELP = 4
 
 # The fewest family rows a unit carrying a family table may have. Two is a
 # comparison; one is a claim.
@@ -654,6 +736,33 @@ def _check_curriculum(cur, concepts, problems):
                 )
                 assert rw["slow"].strip() != rw["fast"].strip(), \
                     f"{key}: rewrite {rw['title']!r} has identical slow and fast versions"
+
+            # The help layer.
+            if key in _NEEDS_HELP:
+                for field in ("quizzes", "stuck", "edge_cases"):
+                    assert len(u[field]) >= _MIN_HELP, \
+                        f"{key}: {len(u[field])} {field}, fewer than {_MIN_HELP}"
+                assert u["walkthrough"], f"{key}: no worked solution"
+            for i, q in enumerate(u["quizzes"]):
+                assert q["prompt"].strip() and q["code"].strip(), f"{key}: quiz {i} is empty"
+                assert len(q["options"]) >= 3 and len(set(q["options"])) == len(q["options"]), \
+                    f"{key}: quiz {i} needs three or more distinct options"
+                assert q["why"].strip(), f"{key}: quiz {i} has no explanation"
+            ladder = {sl for r in u["rungs"] for sl in r["slugs"]}
+            for i, e in enumerate(u["edge_cases"]):
+                assert e["slug"] in ladder, \
+                    f"{key}: edge case {i} names {e['slug']!r}, which is not on this unit's ladder"
+                assert e["case"].strip() and e["input"].strip() and e["breaks"].strip(), \
+                    f"{key}: edge case {i} is incomplete"
+            for i, st in enumerate(u["stuck"]):
+                assert st["when"].strip() and st["ask"].strip(), f"{key}: stuck row {i} is incomplete"
+            w = u["walkthrough"]
+            if w:
+                assert w["slug"] in problems, f"{key}: walkthrough names unknown problem {w['slug']!r}"
+                assert w["slug"] in {sl for r in u["rungs"] for sl in r["slugs"]}, \
+                    f"{key}: walkthrough problem {w['slug']!r} is not on this unit's ladder"
+                assert all(st["body"].strip() for st in w["steps"]), \
+                    f"{key}: walkthrough has an empty step"
 
             last_rank = -1
             first_rung_floor = None   # easiest problem on the opening rung

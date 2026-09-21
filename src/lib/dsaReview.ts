@@ -35,6 +35,12 @@ export function bigoCardId(unitKey: string, index: number): string {
   return `dsa-bigo:${unitKey}:${index}`;
 }
 
+/** Stable card id for one spot-the-bug / predict drill. Its own namespace, so
+ * adding quizzes never reschedules a Big-O card. */
+export function quizCardId(unitKey: string, index: number): string {
+  return `dsa-quiz:${unitKey}:${index}`;
+}
+
 // `todayISO` and `isCardDue` moved to ./srs once the 日本語 vocabulary list
 // became a third deck on this same table — one answer to "what is today" for
 // all of them. Re-exported here so existing call sites keep their import.

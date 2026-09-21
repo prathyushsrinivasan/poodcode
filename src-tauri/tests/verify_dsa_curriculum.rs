@@ -366,7 +366,7 @@ fn every_trace_is_a_well_formed_table() {
 /// (tools/dsa_traces.py and tools/dsa_bigo.py), so the rule is "all of them".
 const NEEDS_INTERNALS: &[&str] = &[
     "hashing", "binary-search", "stacks", "queues-and-deques", "linked-lists", "heaps",
-    "design", "trees", "tries", "strings",
+    "design", "trees", "tries", "strings", "recursion", "sorting",
 ];
 
 /// Mirrors `_MIN_BIGO` in tools/dsa_curriculum.py.
@@ -375,16 +375,21 @@ const NEEDS_BUILD_IT: &[&str] = &[
     "stacks", "queues-and-deques", "linked-lists", "heaps", "design", "union-find",
     "tries", "dp-1d",
     "complexity", "hashing", "two-pointers", "sliding-window", "prefix-sums", "strings",
+    "recursion", "sorting", "binary-search", "greedy", "intervals",
 ];
 
 /// Mirrors `_NEEDS_INVARIANT` in tools/dsa_curriculum.py — the units whose whole
 /// correctness argument is a loop invariant.
-const NEEDS_INVARIANT: &[&str] = &["two-pointers", "sliding-window", "prefix-sums", "hashing"];
+const NEEDS_INVARIANT: &[&str] = &[
+    "two-pointers", "sliding-window", "prefix-sums", "hashing",
+    "recursion", "sorting", "binary-search", "greedy", "intervals",
+];
 
 /// Mirrors `_NEEDS_VARIANTS` / `_NEEDS_REWRITES` — the patterns stage, where most
 /// problems are the unit's skeleton with one line different.
 const NEEDS_FAMILY: &[&str] = &[
     "complexity", "hashing", "two-pointers", "sliding-window", "prefix-sums", "strings",
+    "recursion", "sorting", "binary-search", "greedy", "intervals",
 ];
 
 /// Mirrors `_MIN_VARIANTS`.
@@ -528,6 +533,42 @@ fn stage_routers_point_at_their_own_units() {
                 stage.key,
                 r.when
             );
+        }
+    }
+}
+
+/// Mirrors `_NEEDS_HELP` / `_MIN_HELP` in tools/dsa_curriculum.py — the units
+/// that carry the help layer: spot-the-bug drills, a "stuck?" triage, an
+/// edge-case checklist and one worked solution.
+const NEEDS_HELP: &[&str] = &["recursion", "sorting", "binary-search", "greedy", "intervals"];
+const MIN_HELP: usize = 4;
+
+#[test]
+fn units_that_need_help_carry_it() {
+    let curriculum: DsaCurriculum =
+        serde_json::from_str(CURRICULUM).expect("dsa_curriculum.json parses");
+    let mut by_key: HashMap<&str, &poodcode_lib::models::CurriculumUnit> = HashMap::new();
+    for stage in &curriculum.stages {
+        for u in &stage.units {
+            by_key.insert(u.key.as_str(), u);
+        }
+    }
+    for k in NEEDS_HELP {
+        let u = by_key.get(k).unwrap_or_else(|| panic!("help list names unknown unit {k}"));
+        assert!(u.quizzes.len() >= MIN_HELP, "{k}: {} quizzes", u.quizzes.len());
+        assert!(u.stuck.len() >= MIN_HELP, "{k}: {} stuck rows", u.stuck.len());
+        assert!(u.edge_cases.len() >= MIN_HELP, "{k}: {} edge cases", u.edge_cases.len());
+        let w = u.walkthrough.as_ref().unwrap_or_else(|| panic!("{k}: no worked solution"));
+        let on_ladder = u.rungs.iter().any(|r| r.slugs.contains(&w.slug));
+        assert!(on_ladder, "{k}: walkthrough problem {} is not on its ladder", w.slug);
+        assert!(w.steps.iter().all(|s| !s.body.trim().is_empty()), "{k}: empty walkthrough step");
+    }
+    for (k, u) in &by_key {
+        for (i, q) in u.quizzes.iter().enumerate() {
+            assert!(q.kind == "bug" || q.kind == "predict", "{k}: quiz {i} kind {}", q.kind);
+            assert!(q.options.contains(&q.answer), "{k}: quiz {i} answer not among options");
+            assert!(q.options.len() >= 3, "{k}: quiz {i} is a coin toss");
+            assert!(!q.why.trim().is_empty(), "{k}: quiz {i} has no explanation");
         }
     }
 }

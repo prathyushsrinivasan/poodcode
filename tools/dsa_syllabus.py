@@ -241,4 +241,123 @@ _move("partition-k-equal-subsets", "bitmask-dp", "Core",
       "dp[mask] = fill of the group being built; add an item only if it fits, and wrap to 0 when a group completes.")
 
 
+# ================================================== Order & Search, round 2
+# Batches 46–48 add 22 problems that teach what the expanded stage-3 units now
+# model: work after the call, a recursion too deep for the stack, divide and
+# conquer's crossing term, radix passes, merge-counting with a condition,
+# last-true and count-≤-x searches, exchange-argument orderings, and weighted
+# interval scheduling. Each unit's required ladder stays inside its weight band
+# by moving the problem each new one supersedes to Extra practice — nothing is
+# deleted, and every move keeps its note.
+
+def _extras(unit, *slugs):
+    for _slug in slugs:
+        _move(_slug, unit, "Extra practice")
+
+
+# --- recursion (9 required)
+_add_rung("recursion", "Warm up",
+          "Where the work sits relative to the call decides the order it happens in.",
+          before="Core")
+_place("recursion", "Warm up", "to-base-recursive",
+       "Append the last digit *after* the recursive call and the digits come out in order. Move the line above the call and watch them reverse.")
+_place("recursion", "Variations", "mulmod-by-halving",
+       "Fast power with × replaced by +. Write the one-line overflow argument — every value stays below 2m — before the code.")
+_add_rung("recursion", "Too deep for the stack",
+          "A correct recursion n frames deep, and the loop that computes the same thing.",
+          before="Divide and conquer")
+_place("recursion", "Too deep for the stack", "josephus-survivor",
+       "The recurrence is one line. Write it recursively, run n = 10⁶, read the StackOverflowError — then compute the same values smallest-first in a loop.")
+_place("recursion", "Divide and conquer", "closest-pair-points",
+       "Trust both halves; the whole algorithm is the strip. Say why each point checks only a handful of neighbours above it.")
+_extras("recursion", "unique-paths-count", "kth-symbol-grammar", "gray-code", "ways-to-add-parentheses")
+
+# --- sorting (9 required)
+_place("sorting", "Warm up", "rank-transform",
+       "Sort a copy, dedupe, binary-search each original value. Compare with leaderboard-ranks: dense ranks versus competition ranks.")
+_move("kth-smallest", "sorting", "Extra practice")
+_place("sorting", "Quickselect", "moves-to-median",
+       "Prove the median is optimal first (moving the target up helps while more values are above it). Then find it with quickselect.")
+_add_rung("sorting", "Non-comparison sorts",
+          "Sorting without comparing: the value, or one digit of it, is the index.",
+          before="Merge sort, reused")
+_place("sorting", "Non-comparison sorts", "radix-pass-by-pass",
+       "Each pass is a stable counting sort on one digit. Print after every pass and check the invariant: sorted by the last p digits.")
+_place("sorting", "Merge sort, reused", "important-reverse-pairs",
+       "Count in a separate two-pointer pass before merging — the merge compares a[i] with a[j], not with 2·a[j]. And 2·a[j] needs a long.")
+_extras("sorting", "leaderboard-ranks", "custom-sort-string", "h-index")
+
+# --- binary search (14 required)
+_place("binary-search", "Core", "min-time-for-trips",
+       "The first search on the answer: `enough(T)` is a sum of T / time[i]. Stop the sum at k, or it overflows a long.")
+_move("search-rotated-array", "binary-search", "Variations")
+_place("binary-search", "Variations", "sqrt-to-six-places",
+       "Scale the question until the answer is an integer: ⌊√(n·10¹²)⌋. No doubles anywhere, and the output is exact.")
+_add_rung("binary-search", "Maximise the minimum, minimise the maximum",
+          "The predicate runs the other way, or the answer is the last true — same loop, one branch changed.",
+          before="Extra practice")
+_place("binary-search", "Maximise the minimum, minimise the maximum", "max-equal-portions",
+       "Last true: `lo = mid` on success, so `mid` must round up. Or find the first failing length and subtract one.")
+_move("magnetic-force-between-balls", "binary-search", "Maximise the minimum, minimise the maximum",
+      "Place balls greedily left to right inside `ok(d)`. Feasible gaps form a prefix; you want its last element.")
+_move("split-array-largest-sum", "binary-search", "Maximise the minimum, minimise the maximum",
+      "The mirror image: minimise the largest part. `ok(cap)` = the greedy split needs ≤ k parts, which gets easier as cap grows.")
+_add_rung("binary-search", "Count ≤ x over values",
+          "The k-th of something too large to list: count how many are ≤ x, and search x.",
+          before="Extra practice")
+_place("binary-search", "Count ≤ x over values", "nth-divisible-number",
+       "count(x) = x/a + x/b − x/lcm. The answer is the smallest x with count ≥ N — never stop early on == N.")
+_place("binary-search", "Count ≤ x over values", "kth-in-multiplication-table",
+       "Row i holds min(m, x / i) entries ≤ x. The table has 10¹⁰ cells and is never built.")
+_extras("binary-search", "peak-of-mountain", "search-insert-position", "count-occurrences-sorted",
+        "integer-sqrt", "min-days-for-bouquets", "find-k-closest")
+
+# --- greedy (14 required)
+_place("greedy", "Warm up", "cheapest-first-budget",
+       "Say the exchange argument before coding: swap any pricier item for a skipped cheaper one and the basket still fits.")
+_place("greedy", "Variations", "make-values-unique",
+       "Sort, then raise each value only as far as its predecessor forces. Raising further never helps anything after it.")
+_add_rung("greedy", "Order by exchange argument",
+          "“In what order?” — compare two adjacent items, and sort by whichever order the swap proves is never worse.",
+          before="Stretch")
+_place("greedy", "Order by exchange argument", "weighted-completion-order",
+       "Derive the comparator from the adjacent swap: x first iff t_x·w_y < t_y·w_x. Cross-multiply in long.")
+_place("greedy", "Order by exchange argument", "min-max-lateness",
+       "Shortest-first is the wrong key. Show that swapping an inverted pair of deadlines never raises the maximum.")
+_place("greedy", "Order by exchange argument", "job-deadlines-profit",
+       "Profit order, and the LATEST free slot. Then solve it again with a heap of kept profits and compare.")
+_extras("greedy", "lemonade-change", "partition-labels", "two-city-scheduling",
+        "valid-parenthesis-star", "wiggle-subsequence")
+
+# --- intervals (13 required)
+_place("intervals", "Warm up", "covered-length-union",
+       "Merge, then add the blocks. `max` on the end, and remember the last block after the loop.")
+_place("intervals", "Core", "subtract-interval",
+       "Insert-interval turned inside out: keep [a, min(b, x)) and [max(a, y), b) when non-empty. No sort — the input is already ordered.")
+_place("intervals", "Variations", "busiest-moment",
+       "The ±1 sweep, recording the time whenever the count sets a new record. Pack (time, type) into one long so ends sort first.")
+_add_rung("intervals", "When greedy stops working",
+          "Weights break every local rule. Keep the sort by end; replace the greedy choice with a max.",
+          before="Extra practice")
+_place("intervals", "When greedy stops working", "weighted-job-scheduling",
+       "best[i] = max(best[i−1], w_i + best[p(i)]), with p(i) an upper bound over the sorted ends. Upper, so back-to-back bookings combine.")
+_extras("intervals", "summary-ranges", "remove-covered-intervals", "video-stitching",
+        "my-calendar", "min-interval-per-query")
+
+
+# --- round 2 (batch 49). Every required ladder is at or near its weight band,
+# so four of the five join Extra practice; `covered-by-two` takes the one free
+# required slot in intervals.
+_place("recursion", "Extra practice", "sierpinski-cell",
+       "Recurse on the quadrant the cell is in. Then look at which bits each level tested — the answer collapses to `(r & c) == 0`.")
+_place("sorting", "Extra practice", "count-range-sums",
+       "Subarrays are pairs of prefix sums. Merge-count them, with a *window* of valid partners per left element instead of a single pointer.")
+_place("binary-search", "Extra practice", "min-max-after-splits",
+       "Search the cap: a crate of weight w needs (w − 1) / x splits. Halving the heaviest crate greedily is the wrong answer — find the counterexample.")
+_place("intervals", "Variations", "covered-by-two",
+       "The sweep again, measuring the gaps where the count is at least 2. Change the threshold and the same loop gives the union or the intersection.")
+_place("greedy", "Extra practice", "patch-to-cover-range",
+       "Invariant: every amount below `miss` is payable. A coin ≤ miss extends it; otherwise add a coin worth `miss` and double it.")
+
+
 _drop_empty_rungs()

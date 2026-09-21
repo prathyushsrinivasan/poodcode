@@ -688,6 +688,53 @@ export interface CurriculumUnit {
   variants: Variant[];
   /** The slow version, the fast one, and the edit between them. */
   rewrites: Rewrite[];
+  /** Graded "spot the bug" / "predict the result" drills. */
+  quizzes: Quiz[];
+  /** Triage for the moment before any code exists. */
+  stuck: StuckRow[];
+  /** Inputs worth testing before you submit, and the bug each exposes. */
+  edge_cases: EdgeCase[];
+  /** One problem solved start to finish, in fixed steps. */
+  walkthrough: Walkthrough | null;
+}
+
+/** A multiple-choice drill over a code fragment: `bug` (which change fixes
+ * it?) or `predict` (what does it produce?). Scheduled like the Big-O cards. */
+export interface Quiz {
+  kind: "bug" | "predict";
+  prompt: string;
+  code: string;
+  answer: string;
+  options: string[];
+  /** Markdown. */
+  why: string;
+}
+
+export interface StuckRow {
+  when: string;
+  ask: string;
+}
+
+export interface EdgeCase {
+  /** The problem whose input format `input` follows; on the unit's ladder. */
+  slug: string;
+  case: string;
+  /** Ready-to-paste stdin. */
+  input: string;
+  breaks: string;
+}
+
+export interface WalkStep {
+  name: string;
+  /** Markdown. */
+  body: string;
+}
+
+export interface Walkthrough {
+  /** A problem on this unit's ladder. */
+  slug: string;
+  title: string;
+  steps: WalkStep[];
 }
 
 /** A loop invariant, split into the four parts that make it a proof.
@@ -760,6 +807,8 @@ export interface CurriculumStage {
   /** The stage's own routing table: which of its units a prompt belongs to.
    * Empty on stages whose units are not easily confused with each other. */
   router: StageRoute[];
+  /** Markdown: the stage's templates on one page. Empty on most stages. */
+  cheatsheet?: string;
   units: CurriculumUnit[];
 }
 

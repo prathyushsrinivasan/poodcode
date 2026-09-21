@@ -166,6 +166,8 @@ export interface HydratedStage {
   /** The stage's routing table — which of its units a prompt belongs to.
    * Passed through unchanged; nothing about it depends on progress. */
   router: StageRoute[];
+  /** The stage's templates on one page; "" when none is authored. */
+  cheatsheet: string;
   units: HydratedUnit[];
   solved: number;
   total: number;
@@ -437,6 +439,7 @@ export function hydrate(
       goal: stage.goal,
       optional: !!stage.optional,
       router: stage.router ?? [],
+      cheatsheet: stage.cheatsheet ?? "",
       units,
       solved: units.reduce((n, u) => n + u.solved, 0),
       total: units.reduce((n, u) => n + u.total, 0),

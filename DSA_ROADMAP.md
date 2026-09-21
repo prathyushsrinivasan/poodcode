@@ -24,12 +24,12 @@ places. Lines in **bold** are the ones that were open and have just been built;
 ☑ Strings — `strings` (stage 2), 22 problems
 ☑ HashMap — `hashing` (stage 2)
 ☑ HashSet — `hashing`
-☑ Sorting — `sorting` (stage 3) — comparators, counting sort, quickselect
+☑ Sorting — `sorting` (stage 3) — comparators, counting and radix sort, quickselect, merge-counting
 ☑ Two pointers — `two-pointers` (stage 2), 21 problems
 ☑ Sliding window — `sliding-window` (stage 2), 21 problems
 ☑ Prefix sum — `prefix-sums` (stage 2)
 ☑ Difference array — `prefix-sums` — “Difference arrays and sweeps”
-☑ Binary search — `binary-search` (stage 3), 23 problems
+☑ Binary search — `binary-search` (stage 3), 28 problems — lower bound, search on the answer, maximise-the-minimum, count ≤ x
 ☑ Binary search on answer — `binary-search` — the whole “Variations” rung is built on it
 ☑ Recursion — `recursion` (stage 3)
 ☑ Backtracking — `backtracking` (stage 6), 22 problems
@@ -92,8 +92,8 @@ places. Lines in **bold** are the ones that were open and have just been built;
 ☑ Game DP — `dp-intervals-states` — score *difference*, not score
 ☑ **DP optimization** — **`dp-advanced`** — monotonic-deque DP and meet in the middle, with convex-hull trick and divide-and-conquer optimisation named and given their conditions
 
-☑ Greedy — `greedy` (stage 3), 26 problems
-☑ Interval scheduling — `intervals` (stage 3) — earliest finish time
+☑ Greedy — `greedy` (stage 3), 31 problems — including exchange-argument orderings
+☑ Interval scheduling — `intervals` (stage 3) — earliest finish time, and weighted scheduling (DP)
 ☑ Sweep line — `intervals` + `prefix-sums`
 ☑ Fenwick Tree — `range-queries` (stage 8)
 ☑ Segment Tree — `range-queries`

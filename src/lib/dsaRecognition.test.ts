@@ -103,6 +103,10 @@ function unit(key: string, title: string, slugs: string[], signals: Signal[] = [
     invariant: null,
     variants: [],
     rewrites: [],
+    quizzes: [],
+    stuck: [],
+    edge_cases: [],
+    walkthrough: null,
   };
 }
 

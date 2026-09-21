@@ -585,6 +585,9 @@ function StagePanel({
   onMixed: () => void;
 }) {
   const minutes = stage.units.reduce((n, u) => n + u.estimatedMinutes, 0);
+  // Per visit rather than remembered: the sheet is something you open to look
+  // one thing up, not a panel you live with.
+  const [sheetOpen, setSheetOpen] = useState(false);
 
   return (
     <section aria-label={`Stage ${number}: ${stage.title}`} style={{ minWidth: 0 }}>
@@ -617,6 +620,23 @@ function StagePanel({
           onToggle={onToggleRouter}
           onOpenUnit={onOpenUnit}
         />
+      )}
+
+      {stage.cheatsheet && (
+        <>
+          <button
+            className="cur-link-btn"
+            onClick={() => setSheetOpen((v) => !v)}
+            aria-expanded={sheetOpen}
+          >
+            {sheetOpen ? "▾ Hide the cheat sheet" : "▸ The whole stage on one page"}
+          </button>
+          {sheetOpen && (
+            <div className="cur-goal">
+              <Markdown>{stage.cheatsheet}</Markdown>
+            </div>
+          )}
+        </>
       )}
 
       <div className="cur-path">
