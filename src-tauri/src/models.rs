@@ -1526,6 +1526,50 @@ pub struct CurriculumUnit {
     /// One problem solved start to finish, in fixed steps.
     #[serde(default)]
     pub walkthrough: Option<Walkthrough>,
+    /// An interactive playground computed in the page (`bits`, `modular`, `grid`).
+    #[serde(default)]
+    pub lab: Option<Lab>,
+    /// "Work it out by hand" cards: type the answer, graded exactly.
+    #[serde(default)]
+    pub drills: Vec<CalcDrill>,
+}
+
+/// A unit's interactive lab. `kind` picks the page component; `presets` are the
+/// author's one-click starting points, each a map of the lab's input fields.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Lab {
+    #[serde(default)]
+    pub kind: String,
+    /// Markdown.
+    #[serde(default)]
+    pub intro: String,
+    #[serde(default)]
+    pub presets: Vec<LabPreset>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct LabPreset {
+    #[serde(default)]
+    pub label: String,
+    #[serde(default)]
+    pub values: std::collections::BTreeMap<String, String>,
+}
+
+/// A typed-answer card. `answer` and every `accept` alternative are compared
+/// after normalising case and whitespace. Scheduled as `dsa-calc:<unit>:<i>`.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CalcDrill {
+    #[serde(default)]
+    pub prompt: String,
+    #[serde(default)]
+    pub code: String,
+    #[serde(default)]
+    pub answer: String,
+    #[serde(default)]
+    pub accept: Vec<String>,
+    /// Markdown.
+    #[serde(default)]
+    pub why: String,
 }
 
 /// A multiple-choice drill over a code fragment. `kind` is `bug` (the code is

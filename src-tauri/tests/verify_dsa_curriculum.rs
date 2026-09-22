@@ -367,6 +367,7 @@ fn every_trace_is_a_well_formed_table() {
 const NEEDS_INTERNALS: &[&str] = &[
     "hashing", "binary-search", "stacks", "queues-and-deques", "linked-lists", "heaps",
     "design", "trees", "tries", "strings", "recursion", "sorting",
+    "math-number-theory", "bit-manipulation", "simulation-and-matrix",
 ];
 
 /// Mirrors `_MIN_BIGO` in tools/dsa_curriculum.py.
@@ -376,6 +377,7 @@ const NEEDS_BUILD_IT: &[&str] = &[
     "tries", "dp-1d",
     "complexity", "hashing", "two-pointers", "sliding-window", "prefix-sums", "strings",
     "recursion", "sorting", "binary-search", "greedy", "intervals",
+    "math-number-theory", "bit-manipulation", "simulation-and-matrix",
 ];
 
 /// Mirrors `_NEEDS_INVARIANT` in tools/dsa_curriculum.py — the units whose whole
@@ -383,6 +385,7 @@ const NEEDS_BUILD_IT: &[&str] = &[
 const NEEDS_INVARIANT: &[&str] = &[
     "two-pointers", "sliding-window", "prefix-sums", "hashing",
     "recursion", "sorting", "binary-search", "greedy", "intervals",
+    "math-number-theory", "bit-manipulation", "simulation-and-matrix",
 ];
 
 /// Mirrors `_NEEDS_VARIANTS` / `_NEEDS_REWRITES` — the patterns stage, where most
@@ -390,6 +393,7 @@ const NEEDS_INVARIANT: &[&str] = &[
 const NEEDS_FAMILY: &[&str] = &[
     "complexity", "hashing", "two-pointers", "sliding-window", "prefix-sums", "strings",
     "recursion", "sorting", "binary-search", "greedy", "intervals",
+    "math-number-theory", "bit-manipulation", "simulation-and-matrix",
 ];
 
 /// Mirrors `_MIN_VARIANTS`.
@@ -540,7 +544,10 @@ fn stage_routers_point_at_their_own_units() {
 /// Mirrors `_NEEDS_HELP` / `_MIN_HELP` in tools/dsa_curriculum.py — the units
 /// that carry the help layer: spot-the-bug drills, a "stuck?" triage, an
 /// edge-case checklist and one worked solution.
-const NEEDS_HELP: &[&str] = &["recursion", "sorting", "binary-search", "greedy", "intervals"];
+const NEEDS_HELP: &[&str] = &[
+    "recursion", "sorting", "binary-search", "greedy", "intervals",
+    "math-number-theory", "bit-manipulation", "simulation-and-matrix",
+];
 const MIN_HELP: usize = 4;
 
 #[test]
@@ -569,6 +576,55 @@ fn units_that_need_help_carry_it() {
             assert!(q.options.contains(&q.answer), "{k}: quiz {i} answer not among options");
             assert!(q.options.len() >= 3, "{k}: quiz {i} is a coin toss");
             assert!(!q.why.trim().is_empty(), "{k}: quiz {i} has no explanation");
+        }
+    }
+}
+
+/// Mirrors `_NEEDS_LAB` / `_NEEDS_DRILLS` / `_MIN_DRILLS` and `_LAB_KINDS` in
+/// tools/dsa_curriculum.py — the units whose skills are computations, which
+/// carry an interactive lab and typed "work it out" cards.
+const NEEDS_LAB: &[&str] = &["math-number-theory", "bit-manipulation", "simulation-and-matrix"];
+const MIN_DRILLS: usize = 6;
+const LAB_KINDS: &[(&str, &[&str])] = &[
+    ("bits", &["a", "b", "k"]),
+    ("modular", &["a", "b", "m"]),
+    ("grid", &["rows", "cols", "i", "j"]),
+];
+
+#[test]
+fn units_that_need_a_lab_carry_one() {
+    let curriculum: DsaCurriculum =
+        serde_json::from_str(CURRICULUM).expect("dsa_curriculum.json parses");
+    let mut by_key: HashMap<&str, &poodcode_lib::models::CurriculumUnit> = HashMap::new();
+    for stage in &curriculum.stages {
+        for u in &stage.units {
+            by_key.insert(u.key.as_str(), u);
+        }
+    }
+    for k in NEEDS_LAB {
+        let u = by_key.get(k).unwrap_or_else(|| panic!("lab list names unknown unit {k}"));
+        assert!(u.lab.is_some(), "{k}: no interactive lab");
+        assert!(u.drills.len() >= MIN_DRILLS, "{k}: {} work-it-out cards", u.drills.len());
+    }
+    for (k, u) in &by_key {
+        if let Some(lab) = &u.lab {
+            let fields = LAB_KINDS
+                .iter()
+                .find(|(kind, _)| *kind == lab.kind)
+                .unwrap_or_else(|| panic!("{k}: unknown lab kind {}", lab.kind))
+                .1;
+            assert!(!lab.presets.is_empty(), "{k}: lab has no presets");
+            for p in &lab.presets {
+                for f in fields {
+                    assert!(p.values.contains_key(*f), "{k}: lab preset {} lacks {f}", p.label);
+                }
+            }
+        }
+        let mut prompts = HashSet::new();
+        for (i, d) in u.drills.iter().enumerate() {
+            assert!(!d.prompt.trim().is_empty() && !d.answer.trim().is_empty(), "{k}: drill {i} is empty");
+            assert!(!d.why.trim().is_empty(), "{k}: drill {i} has no explanation");
+            assert!(prompts.insert(d.prompt.as_str()), "{k}: drill {i} repeats a prompt");
         }
     }
 }

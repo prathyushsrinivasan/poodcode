@@ -4,6 +4,7 @@ import { api } from "../api";
 import { useCrumb } from "../store";
 import type {
   BigOItem,
+  CalcDrill,
   CardReview,
   Concept,
   EdgeCase,
@@ -40,6 +41,8 @@ import {
   unitChecks,
 } from "../lib/dsaReview";
 import { optionOrder } from "../lib/quizShuffle";
+import { calcCardId, calcIsCorrect } from "../lib/unitLab";
+import { UnitLab } from "../components/UnitLab";
 import {
   variantCardId,
   variantQuestions,
@@ -200,6 +203,7 @@ function UnitView({
   const checkStats = unitChecks(hydrated, reviews, today);
   const bigoStats = cardStats(u.bigo.map((_, i) => bigoCardId(key, i)), reviews, today);
   const quizStats = cardStats(u.quizzes.map((_, i) => quizCardId(key, i)), reviews, today);
+  const calcStats = cardStats(u.drills.map((_, i) => calcCardId(key, i)), reviews, today);
   // Derived from the family table, so a unit that gains a variant gains a
   // question without anything else being authored. Empty below three variants.
   const familyQuestions = variantQuestions(hydrated);
@@ -262,6 +266,17 @@ function UnitView({
       short: "The invariant",
       lead: "Every technique here is a loop that refuses to re-read what it has already seen. This is the sentence that makes that legal — and the part people cannot produce under pressure is never the statement, it is why one iteration preserves it.",
       body: <InvariantBlock inv={u.invariant} />,
+    }
+  );
+  add(
+    u.lab && {
+      id: "lab",
+      tab: "learn",
+      icon: "🧪",
+      title: "Try it: the lab",
+      short: "The lab",
+      lead: "Everything in this unit is a computation, and the fastest way to believe a rule is to poke it. Change the numbers; nothing here is graded.",
+      body: <UnitLab lab={u.lab} />,
     }
   );
   add(
@@ -588,6 +603,32 @@ function UnitView({
     }
   );
   add(
+    u.drills.length > 0 && {
+      id: "drills",
+      tab: "review",
+      icon: "✍️",
+      title: "Work it out by hand",
+      short: "Work it out",
+      count: deckCount(calcStats),
+      lead: (
+        <>
+          Multiple choice lets you recognise an answer. These make you produce it — a bitwise AND, a
+          modular inverse, where a cell lands — which is what an interviewer watches you do on a
+          whiteboard. Type the answer; graded on the first try, and scheduled like the other cards.
+        </>
+      ),
+      body: u.drills.map((d, i) => (
+        <CalcCard
+          key={i}
+          drill={d}
+          review={reviews.get(calcCardId(key, i))}
+          today={today}
+          onGrade={(right) => onGrade(calcCardId(key, i), right)}
+        />
+      )),
+    }
+  );
+  add(
     familyQuestions.length > 0 && {
       id: "family-drill",
       tab: "review",
@@ -728,9 +769,9 @@ function UnitView({
   const tabIndex = tabs.findIndex((t) => t.key === tab);
   const nextTab = tabs[tabIndex + 1] ?? null;
   const reviewDeck = {
-    due: checkStats.due + bigoStats.due + quizStats.due,
-    started: checkStats.started + bigoStats.started + quizStats.started,
-    total: checkStats.total + bigoStats.total + quizStats.total,
+    due: checkStats.due + bigoStats.due + quizStats.due + calcStats.due,
+    started: checkStats.started + bigoStats.started + quizStats.started + calcStats.started,
+    total: checkStats.total + bigoStats.total + quizStats.total + calcStats.total,
   };
 
   const tabCount = (t: TabKey): { text: string; due: boolean } | null => {
@@ -1489,6 +1530,85 @@ function ChoiceCard({
           )}
           <div className="dim" style={{ marginTop: 4 }}>
             <Markdown>{why}</Markdown>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/** A "work it out by hand" card: type the answer, graded on the first
+ * submission (a second try after seeing red is not recall). */
+function CalcCard({
+  drill,
+  review,
+  today,
+  onGrade,
+}: {
+  drill: CalcDrill;
+  review: CardReview | undefined;
+  today: string;
+  onGrade: (right: boolean) => void;
+}) {
+  const [typed, setTyped] = useState("");
+  const [result, setResult] = useState<boolean | null>(null);
+  const due = isCardDue(review, today);
+  const graded = (review?.reps ?? 0) > 0 || (review?.lapses ?? 0) > 0;
+  const submit = () => {
+    if (result !== null || !typed.trim()) return;
+    const right = calcIsCorrect(drill, typed);
+    setResult(right);
+    onGrade(right);
+  };
+  return (
+    <div className="card" style={{ marginBottom: 12 }}>
+      <div className="row">
+        <span className="dim" style={{ fontSize: 13 }}>Work it out</span>
+        <span className="spacer" />
+        {graded && !due && (
+          <span className="faint mono" style={{ fontSize: 12 }} title="Next review">
+            due {review!.due_date}
+          </span>
+        )}
+        {graded && due && (
+          <span className="badge" style={{ color: "var(--accent)", borderColor: "var(--accent)" }}>
+            due
+          </span>
+        )}
+      </div>
+      <div style={{ margin: "6px 0" }}>
+        <InlineMarkdown>{drill.prompt}</InlineMarkdown>
+      </div>
+      {drill.code && <Markdown>{"```java\n" + drill.code + "```"}</Markdown>}
+      <div className="row" style={{ gap: 8 }}>
+        <input
+          className="mono"
+          aria-label="Your answer"
+          value={typed}
+          disabled={result !== null}
+          placeholder="Your answer"
+          onChange={(e) => setTyped(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") submit();
+          }}
+          style={{ width: 200 }}
+        />
+        <button onClick={submit} disabled={result !== null || !typed.trim()}>
+          Check
+        </button>
+      </div>
+      {result !== null && (
+        <div style={{ marginTop: 10 }}>
+          <strong style={{ color: result ? "var(--good)" : "var(--bad)" }}>
+            {result ? "Correct." : "Not quite."}
+          </strong>{" "}
+          {!result && (
+            <span>
+              The answer: <span className="mono">{drill.answer}</span>
+            </span>
+          )}
+          <div className="dim" style={{ marginTop: 4 }}>
+            <Markdown>{drill.why}</Markdown>
           </div>
         </div>
       )}

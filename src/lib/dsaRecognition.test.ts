@@ -104,6 +104,8 @@ function unit(key: string, title: string, slugs: string[], signals: Signal[] = [
     variants: [],
     rewrites: [],
     quizzes: [],
+    lab: null,
+    drills: [],
     stuck: [],
     edge_cases: [],
     walkthrough: null,

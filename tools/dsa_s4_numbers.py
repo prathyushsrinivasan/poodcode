@@ -32,7 +32,97 @@ same set of array patterns applied to 32 flags packed into one `int`, which is h
 sets get represented when they have to be fast. **Simulation** needs no new idea
 at all: only the index discipline that every grid problem in the trees-and-graphs
 stage assumes you already have.
-""")
+
+| Unit | What it looks inside | The idea that pays for it |
+| --- | --- | --- |
+| **Math & number theory** | A number's divisors, primes and residues | Divisors pair around √n; Euclid keeps the gcd unchanged; reduce mod p after every step |
+| **Bit manipulation** | A number's 32 (or 64) binary digits | An int is a set; XOR cancels pairs; each bit position can be counted on its own |
+| **Simulation & matrices** | A grid's indices | Every transformation is a rule "(i, j) → (i′, j′)"; every step reads one generation |
+
+**The hard part is the near misses.** *Is n prime?* is a √n loop — but *every
+prime below n* is a sieve, and *factorise a million numbers* is a
+smallest-prime-factor sieve. *Modulo 10⁹ + 7* lets you divide with Fermat — *modulo
+m* for a composite m needs extended Euclid. *Every value appears twice but one*
+is an XOR fold — *three times but one* is not. *Simulate n steps* is a loop —
+until n is 10¹⁸, and then it is cycle detection. Each unit teaches all of these,
+and every one of them carries an **interactive lab** and **work-it-out cards**:
+the skills here are computations, and the only proof you can do one is producing
+the number.
+""",
+    router=[
+        _route("“is n prime?”, “how many divisors does n have?”, one n up to 10¹²",
+               "math-number-theory",
+               "Trial division to √n: divisors pair as d × n/d.",
+               "**Every** number below n → a sieve. **Many** n up to 10⁶ → a "
+               "smallest-prime-factor sieve, then O(log n) each."),
+        _route("“all primes below n”, “count primes up to n”",
+               "math-number-theory",
+               "Sieve of Eratosthenes, O(n log log n).",
+               "Primes in a window [L, R] with R up to 10¹² → a segmented sieve with primes up to √R."),
+        _route("“factorise”, “prime factors”, “φ(n)”, “how many k ≤ n are coprime to n”",
+               "math-number-theory",
+               "Divide each factor out as you find it; φ comes from the distinct primes.",
+               ""),
+        _route("“return the answer modulo 10⁹ + 7”",
+               "math-number-theory",
+               "Reduce after every + and ×; divide by multiplying with x^(p−2).",
+               "If the modulus is **not prime**, Fermat's inverse is wrong — use extended "
+               "Euclid, and check gcd(x, m) = 1 first."),
+        _route("“x ≡ a (mod m) and x ≡ b (mod n)”, “when do the two cycles line up?”",
+               "math-number-theory",
+               "Chinese remainder: write x = a + m·t and solve for t modulo n/g.",
+               "When gcd(m, n) does not divide b − a there is no answer — say so before computing."),
+        _route("“Σ n / i”, “sum over divisors”, n up to 10¹²",
+               "math-number-theory",
+               "Group i by the value of n / i: fewer than 2√n blocks.",
+               ""),
+        _route("“every element appears twice except one”, “the missing number”",
+               "bit-manipulation",
+               "XOR fold: pairs cancel, O(1) space.",
+               "Appears **three** times except one → count each bit mod 3. Two unknowns "
+               "(missing and duplicate) → XOR, then split by a differing bit."),
+        _route("“all subsets”, n ≤ 20",
+               "bit-manipulation",
+               "Iterate masks 0 … 2ⁿ − 1; build each subset's value from `mask & (mask − 1)`.",
+               "n around 40 → meet in the middle. A subset **choice per step** with a "
+               "recurrence → bitmask DP (stage 7)."),
+        _route("“count set bits”, “power of two”, “lowest set bit”",
+               "bit-manipulation",
+               "`x & (x − 1)` and `x & −x`, or `Integer.bitCount`.",
+               "Set bits summed over **1…n** for huge n → count per bit position, not per number."),
+        _route("“sum over all pairs of a ^ b (or &, |)”",
+               "bit-manipulation",
+               "Contribution per bit: ones × zeros × 2ᵇ.",
+               "The **maximum** pair XOR is a greedy over bits with a trie (tries unit)."),
+        _route("“maximum AND / OR / XOR” over some choice",
+               "bit-manipulation",
+               "Decide bits from the top: a higher bit outweighs all lower ones.",
+               ""),
+        _route("“XOR of a range”, “prefix XOR”",
+               "bit-manipulation",
+               "XOR(l..r) = f(r) ^ f(l − 1), like a prefix sum.",
+               ""),
+        _route("“rotate the matrix”, “transpose”, “flip”",
+               "simulation-and-matrix",
+               "Compose from transpose and reverse; state each as (i, j) → (i′, j′).",
+               "Rotating **rings** by k → flatten each ring and shift by k mod its length."),
+        _route("“each step, every cell becomes …”",
+               "simulation-and-matrix",
+               "Read one generation, write the next: a copy, or two states encoded per cell.",
+               "Asked for the state after **10⁹** steps → the state space is finite; find the cycle."),
+        _route("“spiral order”, “layer by layer”, “diagonal order”",
+               "simulation-and-matrix",
+               "Four shrinking boundaries, or keys i − j / i + j for diagonals.",
+               ""),
+        _route("“stones fall”, “tilt”, “gravity”, “move zeroes to one side of each row”",
+               "simulation-and-matrix",
+               "A stable compaction with a write pointer, reset at each wall.",
+               ""),
+        _route("“snake”, “robot”, “play the game and report”",
+               "simulation-and-matrix",
+               "State the rules in order, then pick a structure for each question they ask.",
+               "If a rule asks “is this cell occupied?” every step, keep a set, not a scan."),
+    ])
 
 
 # --- Unit 16 — Math and number theory ----------------------------------------

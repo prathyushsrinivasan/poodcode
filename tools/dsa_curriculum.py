@@ -288,6 +288,49 @@ def _walk(slug, title, steps):
             "steps": [{"name": n, "body": _md(b)} for n, b in zip(_WALK_STEPS, steps)]}
 
 
+_LAB_KINDS = {
+    # kind -> the preset fields the page reads (src/components/UnitLab.tsx)
+    "bits": ("a", "b", "k"),
+    "modular": ("a", "b", "m"),
+    "grid": ("rows", "cols", "i", "j"),
+}
+
+
+def _lab(kind, intro, presets):
+    """An interactive playground for the unit, computed live in the page.
+
+    Some techniques are best learned by poking them: what does `x & -x` leave
+    behind for twenty different x, where does cell (1, 3) go when a 4×5 grid is
+    rotated, what does extended Euclid carry at each step. A table of worked
+    examples answers the questions its author thought of; a lab answers the
+    reader's. `kind` picks one of the built-in labs, and `presets` are
+    `(label, {field: value})` pairs the page offers as one-click starting points
+    — the interesting cases, chosen by the author.
+    """
+    assert kind in _LAB_KINDS, f"lab kind {kind!r} is not one of {sorted(_LAB_KINDS)}"
+    out = []
+    for label, values in presets:
+        missing = [f for f in _LAB_KINDS[kind] if f not in values]
+        assert not missing, f"lab preset {label!r} is missing {missing}"
+        out.append({"label": label, "values": {k: str(v) for k, v in values.items()}})
+    return {"kind": kind, "intro": _md(intro), "presets": out}
+
+
+def _calc(prompt, answer, why, accept=(), code=""):
+    """A "work it out by hand" card: type the answer, graded exactly.
+
+    Multiple choice lets you recognise an answer; this stage's skills are
+    *computations* — a bitwise AND, a modular inverse, where an index lands —
+    and the only proof you can do one is producing the number. Graded after
+    normalising case and whitespace, against `answer` and any `accept`
+    alternatives (`"(3, 1)"` and `"3 1"` are the same cell). Scheduled like
+    the other cards as `dsa-calc:<unit>:<i>`.
+    """
+    assert str(answer).strip(), "a calc card needs an answer"
+    return {"prompt": prompt, "code": code.lstrip("\n").rstrip() + ("\n" if code.strip() else ""),
+            "answer": str(answer), "accept": [str(a) for a in accept], "why": _md(why)}
+
+
 def _rung(title, purpose, slugs, notes=None, optional=False):
     """One step of a unit's ladder.
 
@@ -314,7 +357,7 @@ def _unit(key, title, icon, stage, tagline, why, model,
           lessons=(), checks=(), interview="", rungs=(), next_up="",
           internals="", traces=(), build_it="", weight=2, bigo=(),
           invariant=None, variants=(), rewrites=(), quizzes=(), stuck=(),
-          edge_cases=(), walkthrough=None):
+          edge_cases=(), walkthrough=None, lab=None, drills=()):
     """One technique, taught.
 
     `weight` is **interview yield**, 1-3, and it exists to stop the bank's
@@ -372,6 +415,8 @@ def _unit(key, title, icon, stage, tagline, why, model,
         "stuck": list(stuck),
         "edge_cases": list(edge_cases),
         "walkthrough": dict(walkthrough) if walkthrough else None,
+        "lab": dict(lab) if lab else None,
+        "drills": list(drills),
     })
 
 
@@ -402,7 +447,7 @@ for _name in (
 # drills every unit carries, and the worked traces. Required, not optional — the
 # lints below fail the build if a unit loses them.
 for _name in ("dsa_placements.py", "dsa_syllabus.py", "dsa_bigo.py", "dsa_traces.py",
-              "dsa_s3_depth.py", "dsa_s3_help.py"):
+              "dsa_s3_depth.py", "dsa_s3_help.py", "dsa_s4_depth.py", "dsa_s4_help.py"):
     _p = os.path.join(_HERE, _name)
     with open(_p, encoding="utf-8") as _f:
         exec(compile(_f.read(), _p, "exec"))
@@ -507,6 +552,9 @@ _NEEDS_INTERNALS = {
     # Order & Search: the call stack is recursion's hidden cost, and "which
     # algorithm does Arrays.sort run" decides stability and the worst case.
     "recursion", "sorting",
+    # Numbers, Bits & Grids: `long` versus (10^9 + 7)^2, two's complement and
+    # shift masking, and row-major layout are the machinery behind every cost.
+    "math-number-theory", "bit-manipulation", "simulation-and-matrix",
 }
 _NEEDS_BUILD_IT = {
     "stacks", "queues-and-deques", "linked-lists", "heaps", "design",
@@ -516,6 +564,7 @@ _NEEDS_BUILD_IT = {
     "complexity", "hashing", "two-pointers", "sliding-window", "prefix-sums",
     "strings",
     "recursion", "sorting", "binary-search", "greedy", "intervals",
+    "math-number-theory", "bit-manipulation", "simulation-and-matrix",
 }
 
 # Units whose whole correctness argument is a loop invariant (see `_inv`).
@@ -528,7 +577,10 @@ _NEEDS_BUILD_IT = {
 _NEEDS_INVARIANT = {"two-pointers", "sliding-window", "prefix-sums", "hashing",
                     # Order & Search: induction, the partition regions, the
                     # half-open search, stays-ahead, and merge's "last block".
-                    "recursion", "sorting", "binary-search", "greedy", "intervals"}
+                    "recursion", "sorting", "binary-search", "greedy", "intervals",
+                    # Numbers, Bits & Grids: Euclid's unchanged gcd, Kernighan's
+                    # one-bit-per-step, and the spiral's emitted border.
+                    "math-number-theory", "bit-manipulation", "simulation-and-matrix"}
 
 # Units that must carry a family table (see `_var`) and a slow-vs-fast rewrite
 # (see `_rw`). The patterns stage is where both pay most: its six skeletons
@@ -540,14 +592,23 @@ _NEEDS_VARIANTS = {
     # Order & Search. Each unit is a handful of skeletons whose problems differ
     # by one line — first-true vs last-true, sort by start vs by end.
     "recursion", "sorting", "binary-search", "greedy", "intervals",
+    "math-number-theory", "bit-manipulation", "simulation-and-matrix",
 }
 _NEEDS_REWRITES = dict.fromkeys(_NEEDS_VARIANTS)
 
 # Units that must carry the round-2 help layer: spot-the-bug / predict drills,
 # a "stuck?" triage, an edge-case checklist and one worked solution. Started on
 # Order & Search, where boundary bugs are the commonest failure.
-_NEEDS_HELP = {"recursion", "sorting", "binary-search", "greedy", "intervals"}
+_NEEDS_HELP = {"recursion", "sorting", "binary-search", "greedy", "intervals",
+               "math-number-theory", "bit-manipulation", "simulation-and-matrix"}
 _MIN_HELP = 4
+
+# Units that must carry an interactive lab (see `_lab`) and "work it out by
+# hand" cards (see `_calc`). Started on Numbers, Bits & Grids, whose skills are
+# computations: a lab is how you poke them, a typed card is how you prove them.
+_NEEDS_LAB = {"math-number-theory", "bit-manipulation", "simulation-and-matrix"}
+_NEEDS_DRILLS = dict.fromkeys(_NEEDS_LAB)
+_MIN_DRILLS = 6
 
 # The fewest family rows a unit carrying a family table may have. Two is a
 # comparison; one is a claim.
@@ -754,6 +815,25 @@ def _check_curriculum(cur, concepts, problems):
                     f"{key}: edge case {i} names {e['slug']!r}, which is not on this unit's ladder"
                 assert e["case"].strip() and e["input"].strip() and e["breaks"].strip(), \
                     f"{key}: edge case {i} is incomplete"
+            # The lab and the typed drills.
+            if key in _NEEDS_LAB:
+                assert u["lab"], f"{key}: no interactive lab"
+            lab = u["lab"]
+            if lab:
+                assert lab["kind"] in _LAB_KINDS, f"{key}: unknown lab kind {lab['kind']!r}"
+                assert lab["intro"].strip(), f"{key}: lab has no intro"
+                assert lab["presets"], f"{key}: lab has no presets"
+                assert len({p["label"] for p in lab["presets"]}) == len(lab["presets"]), \
+                    f"{key}: two lab presets share a label"
+            if key in _NEEDS_DRILLS:
+                assert len(u["drills"]) >= _MIN_DRILLS, \
+                    f"{key}: {len(u['drills'])} work-it-out card(s), fewer than {_MIN_DRILLS}"
+            seen_prompts = set()
+            for i, dr in enumerate(u["drills"]):
+                assert dr["prompt"].strip() and dr["answer"].strip(), f"{key}: drill {i} is empty"
+                assert dr["why"].strip(), f"{key}: drill {i} has no explanation"
+                assert dr["prompt"] not in seen_prompts, f"{key}: drill {i} repeats a prompt"
+                seen_prompts.add(dr["prompt"])
             for i, st in enumerate(u["stuck"]):
                 assert st["when"].strip() and st["ask"].strip(), f"{key}: stuck row {i} is incomplete"
             w = u["walkthrough"]

@@ -6292,6 +6292,9 @@ DSA_MORE_FILES = (
     "dsa_more_47.py",
     "dsa_more_48.py",
     "dsa_more_49.py",
+    "dsa_more_50.py",
+    "dsa_more_51.py",
+    "dsa_more_52.py",
 )
 for _more_name in DSA_MORE_FILES:
     _more_path = os.path.join(HERE, _more_name)

@@ -696,6 +696,34 @@ export interface CurriculumUnit {
   edge_cases: EdgeCase[];
   /** One problem solved start to finish, in fixed steps. */
   walkthrough: Walkthrough | null;
+  /** An interactive playground computed in the page. */
+  lab: Lab | null;
+  /** "Work it out by hand" cards: typed answers, graded exactly. */
+  drills: CalcDrill[];
+}
+
+export type LabKind = "bits" | "modular" | "grid";
+
+/** A unit's interactive lab. `presets` are the author's one-click starting
+ * points; `values` holds the lab's input fields as strings (bits: a, b, k;
+ * modular: a, b, m; grid: rows, cols, i, j). */
+export interface Lab {
+  kind: LabKind;
+  /** Markdown. */
+  intro: string;
+  presets: { label: string; values: Record<string, string> }[];
+}
+
+/** A typed-answer card, scheduled as `dsa-calc:<unit>:<i>`. */
+export interface CalcDrill {
+  prompt: string;
+  /** Optional code fragment shown with the prompt. */
+  code: string;
+  answer: string;
+  /** Other spellings of the same answer. */
+  accept: string[];
+  /** Markdown. */
+  why: string;
 }
 
 /** A multiple-choice drill over a code fragment: `bug` (which change fixes
