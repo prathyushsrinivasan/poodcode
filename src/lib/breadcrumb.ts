@@ -81,6 +81,12 @@ const TREE: Record<string, RouteNode> = {
     },
   },
   mastery: { label: "6-Month Mastery" },
+  flashcards: { label: "Flashcards" },
+  "ts-errors": { label: "TypeScript errors" },
+  contest: {
+    label: "Checkpoint",
+    children: { ":": { label: "", dynamicLabel: "Checkpoint" } },
+  },
   "jp-bridge": { label: "日本語 → Java" },
   paths: { label: "Learning Paths" },
   settings: { label: "Settings" },

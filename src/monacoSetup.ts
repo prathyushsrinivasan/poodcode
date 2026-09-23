@@ -8,6 +8,9 @@ import tsWorker from "monaco-editor/esm/vs/language/typescript/ts.worker?worker"
 import jsonWorker from "monaco-editor/esm/vs/language/json/json.worker?worker";
 import cssWorker from "monaco-editor/esm/vs/language/css/css.worker?worker";
 import htmlWorker from "monaco-editor/esm/vs/language/html/html.worker?worker";
+// The judge's own ambient declarations (`fs`, `console`, `setTimeout`, …), so
+// the editor and the judge resolve exactly the same host API.
+import poodcodeEnvDts from "../src-tauri/tslib/poodcode-env.d.ts?raw";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 (self as any).MonacoEnvironment = {
@@ -56,6 +59,59 @@ export function defineThemes() {
     },
   });
 }
+
+// ---------------------------------------------------------------------------
+// TypeScript: make the editor agree with the judge.
+//
+// The judge type-checks every TypeScript run at `--strict` against a small
+// hand-written stand-in for @types/node (src-tauri/src/tscheck.rs). Monaco's
+// defaults are the opposite on both counts — non-strict, with the DOM lib and
+// no `fs` — so out of the box the editor underlined `import * as fs from "fs"`
+// (which the judge accepts) and stayed silent about implicit `any` parameters
+// (which the judge rejects). These options mirror `tsconfig_json()` in
+// tscheck.rs and `optionsFor()` in tools/ts_typecheck.mjs, and load the same
+// ambient declarations, so a red squiggle means what a failed run would mean,
+// and hovering a name shows the type the judge will see.
+//
+// One known gap: Monaco bundles TypeScript 5.4 and the judge runs 5.9, so a
+// few newer inferences (e.g. `filter` inferring a type predicate, 5.5) pass
+// the judge while the editor still flags them.
+// ---------------------------------------------------------------------------
+
+const tsLang = monaco.languages.typescript;
+
+/** Mirrors the judge's presets: "" / "strict", or "strict+indexed". */
+function judgeCompilerOptions(strictness: string) {
+  return {
+    target: 9, // ES2022 — not in Monaco's ScriptTarget enum, but TS accepts it
+    lib: ["lib.es2022.d.ts"],
+    module: tsLang.ModuleKind.ESNext,
+    moduleResolution: tsLang.ModuleResolutionKind.NodeJs,
+    // Every editor is its own module, so two open editors that both declare
+    // `function solve` do not collide in one shared global scope.
+    moduleDetection: 3, // ts.ModuleDetectionKind.Force
+    strict: true,
+    noUncheckedIndexedAccess: strictness === "strict+indexed",
+    noEmit: true,
+    allowNonTsExtensions: true,
+    types: [],
+  };
+}
+
+let appliedStrictness: string | null = null;
+
+/** Point the TypeScript service at a strictness preset. The service is global
+ * to the page, so the editor that has focus decides; switching is cheap and a
+ * no-op when nothing changes. */
+export function setTypeScriptStrictness(strictness = "") {
+  const preset = strictness || "strict";
+  if (preset === appliedStrictness) return;
+  appliedStrictness = preset;
+  tsLang.typescriptDefaults.setCompilerOptions(judgeCompilerOptions(preset));
+}
+
+tsLang.typescriptDefaults.addExtraLib(poodcodeEnvDts, "file:///poodcode-env.d.ts");
+setTypeScriptStrictness("strict");
 
 loader.config({ monaco });
 

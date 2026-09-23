@@ -1248,17 +1248,8 @@ pub fn mastery_complete_week(
         return Ok(true);
     };
 
-    // One card per concept: the chapter name on the front, its one-line summary
-    // on the back. Seeded idempotently by (front, source).
     let concepts: Vec<Concept> = serde_json::from_str(CONCEPTS_JSON)?;
-    let source = format!("mastery:{track_key}:w{week}");
-    for key in &w.concepts {
-        if let Some(c) = concepts.iter().find(|c| &c.key == key) {
-            if !c.what.trim().is_empty() {
-                repo::seed_flashcard_if_absent(&conn, &c.name, &c.what, &source)?;
-            }
-        }
-    }
+    seed_week_cards(&conn, &track_key, w, &concepts)?;
 
     // Put the week's solved problems into the revision queue. Unsolved ones are
     // skipped — scheduling a review for something never solved would just
@@ -1279,6 +1270,50 @@ pub fn mastery_complete_week(
     }
 
     Ok(true)
+}
+
+/// A completed week's cards: one per chapter studied (its name on the front,
+/// its one-line summary on the back) plus the week's authored cards. Seeded
+/// idempotently by (front, source), so calling this again is harmless.
+fn seed_week_cards(
+    conn: &Connection,
+    track_key: &str,
+    w: &MasteryWeek,
+    concepts: &[Concept],
+) -> AppResult<()> {
+    let source = format!("mastery:{track_key}:w{}", w.week);
+    for key in &w.concepts {
+        if let Some(c) = concepts.iter().find(|c| &c.key == key) {
+            if !c.what.trim().is_empty() {
+                repo::seed_flashcard_if_absent(conn, &c.name, &c.what, &source)?;
+            }
+        }
+    }
+    for card in &w.flashcards {
+        repo::seed_flashcard_if_absent(conn, &card.front, &card.back, &source)?;
+    }
+    Ok(())
+}
+
+/// Give every already-completed week the cards it would get if it were
+/// completed today. Run at launch: weeks finished before a week gained authored
+/// cards would otherwise never receive them, because completion seeds once.
+pub fn backfill_mastery_cards(conn: &Connection) -> AppResult<()> {
+    let tracks: Vec<MasteryTrack> = serde_json::from_str(MASTERY_JSON)?;
+    let concepts: Vec<Concept> = serde_json::from_str(CONCEPTS_JSON)?;
+    for row in repo::mastery_progress(conn)? {
+        if row.completed_at.is_none() {
+            continue;
+        }
+        let week = tracks
+            .iter()
+            .find(|t| t.key == row.track_key)
+            .and_then(|t| t.weeks.iter().find(|w| w.week == row.week));
+        if let Some(w) = week {
+            seed_week_cards(conn, &row.track_key, w, &concepts)?;
+        }
+    }
+    Ok(())
 }
 
 /// Create (once) the timed checkpoint contest attached to a week, and return
@@ -1306,11 +1341,11 @@ pub fn mastery_start_contest(
         .as_ref()
         .ok_or_else(|| AppError::NotFound("week checkpoint contest".into()))?;
 
-    // Reuse an existing contest with the same title rather than piling up a new
-    // one on every click.
+    // Resume a checkpoint that is still running rather than piling up a new one
+    // on every click. A finished one is not reused: starting again is a retake.
     if let Some(id) = conn
         .query_row(
-            "SELECT id FROM contests WHERE title = ?1 ORDER BY id DESC LIMIT 1",
+            "SELECT id FROM contests WHERE title = ?1 AND status = 'running' ORDER BY id DESC LIMIT 1",
             rusqlite::params![&contest.title],
             |r| r.get::<_, i64>(0),
         )
@@ -1319,9 +1354,14 @@ pub fn mastery_start_contest(
         return Ok(id);
     }
 
+    let slugs: Vec<&str> = if contest.slugs.is_empty() {
+        w.problems.iter().map(|p| p.slug.as_str()).collect()
+    } else {
+        contest.slugs.iter().map(String::as_str).collect()
+    };
     let mut ids = Vec::new();
-    for p in &w.problems {
-        if let Some(id) = repo::problem_id_for_slug(&conn, &p.slug)? {
+    for slug in slugs {
+        if let Some(id) = repo::problem_id_for_slug(&conn, slug)? {
             ids.push(id);
         }
     }

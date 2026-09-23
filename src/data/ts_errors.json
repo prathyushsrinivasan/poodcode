@@ -1,0 +1,492 @@
+[
+ {
+  "code": 1016,
+  "title": "A required parameter cannot follow an optional parameter",
+  "meaning": "An optional parameter comes before a required one.",
+  "cause": "Callers can only leave off trailing arguments, so optional and defaulted parameters must come last. Reorder them, or take an options object.",
+  "bad": "function pad(width?: number, text: string): string {\n  return text.padStart(width ?? 8);\n}\n",
+  "good": "function pad(text: string, width?: number): string {\n  return text.padStart(width ?? 8);\n}\n",
+  "week": 5,
+  "preset": "strict"
+ },
+ {
+  "code": 1308,
+  "title": "'await' expressions are only allowed within async functions and at the top levels of modules",
+  "meaning": "You used `await` inside a function that isn't `async`.",
+  "cause": "Mark the enclosing function `async` (its return type becomes a `Promise`).",
+  "bad": "function load(): number {\n  const v = await Promise.resolve(1);\n  return v;\n}\n",
+  "good": "async function load(): Promise<number> {\n  const v = await Promise.resolve(1);\n  return v;\n}\nload().then(console.log);\n",
+  "week": 25,
+  "preset": "strict"
+ },
+ {
+  "code": 1360,
+  "title": "Type 'A' does not satisfy the expected type 'B'",
+  "meaning": "A `satisfies` check failed.",
+  "cause": "The expression before `satisfies` doesn't match the type after it. Note that for an object literal the compiler usually points at the offending property instead, as TS2322 — TS1360 is what you get when the whole value is wrong.",
+  "bad": "const port = \"8080\" satisfies number;\n",
+  "good": "const port = 8080 satisfies number;\nconsole.log(port);\n",
+  "week": 15,
+  "preset": "strict"
+ },
+ {
+  "code": 2300,
+  "title": "Duplicate identifier 'x'",
+  "meaning": "Something is declared twice where only one declaration is allowed.",
+  "cause": "Type aliases can't be reopened (interfaces can — that's declaration merging). Use one alias, or combine two with `&`.",
+  "bad": "type Point = { x: number };\ntype Point = { y: number };\n",
+  "good": "type Point = { x: number; y: number };\n",
+  "week": 8,
+  "preset": "strict"
+ },
+ {
+  "code": 2304,
+  "title": "Cannot find name 'x'",
+  "meaning": "You used a name that isn't declared anywhere the compiler can see.",
+  "cause": "A typo, a missing declaration, or a variable declared in a different scope (inside another block or function).",
+  "bad": "console.log(totl);\n",
+  "good": "const total = 3;\nconsole.log(total);\n",
+  "week": 1,
+  "preset": "strict"
+ },
+ {
+  "code": 2322,
+  "title": "Type 'A' is not assignable to type 'B'",
+  "meaning": "You put a value somewhere whose declared type doesn't allow it.",
+  "cause": "The most common error there is. Read it right to left: the thing on the right of the message is what the slot accepts; the thing on the left is what you tried to put in. Either the value is wrong, or the declared type is too narrow.",
+  "bad": "let count = 0;\ncount = \"zero\";\n",
+  "good": "let count = 0;\ncount = 0;\n",
+  "week": 1,
+  "preset": "strict"
+ },
+ {
+  "code": 2339,
+  "title": "Property 'x' does not exist on type 'A'",
+  "meaning": "You read a property the type doesn't have.",
+  "cause": "Either a typo, or the value's type is wider than you think — e.g. a union where only one member has the property. Narrow first (`if (\"x\" in v)`, a tag check) or fix the name.",
+  "bad": "type Circle = { kind: \"circle\"; radius: number };\ntype Square = { kind: \"square\"; side: number };\nfunction size(s: Circle | Square): number {\n  return s.radius;\n}\n",
+  "good": "type Circle = { kind: \"circle\"; radius: number };\ntype Square = { kind: \"square\"; side: number };\nfunction size(s: Circle | Square): number {\n  return s.kind === \"circle\" ? s.radius : s.side;\n}\n",
+  "week": 12,
+  "preset": "strict"
+ },
+ {
+  "code": 2341,
+  "title": "Property 'x' is private and only accessible within class 'C'",
+  "meaning": "Code outside a class touched a `private` member.",
+  "cause": "Go through a public method or getter instead. Note that `private` is compile-time only; `#x` is enforced at runtime too.",
+  "bad": "class Counter {\n  private count = 0;\n}\nconst c = new Counter();\nconsole.log(c.count);\n",
+  "good": "class Counter {\n  private count = 0;\n  get value(): number { return this.count; }\n}\nconst c = new Counter();\nconsole.log(c.value);\n",
+  "week": 23,
+  "preset": "strict"
+ },
+ {
+  "code": 2344,
+  "title": "Type 'A' does not satisfy the constraint 'B'",
+  "meaning": "A type argument doesn't meet its type parameter's constraint.",
+  "cause": "Common with `Pick<T, K>` when `K` isn't a key of `T` — which is exactly the typo protection `Pick` gives you (and `Omit`, whose keys are unconstrained, doesn't).",
+  "bad": "type User = { name: string; age: number };\ntype Preview = Pick<User, \"nmae\">;\n",
+  "good": "type User = { name: string; age: number };\ntype Preview = Pick<User, \"name\">;\n",
+  "week": 17,
+  "preset": "strict"
+ },
+ {
+  "code": 2345,
+  "title": "Argument of type 'A' is not assignable to parameter of type 'B'",
+  "meaning": "A function was called with an argument its parameter doesn't accept.",
+  "cause": "The same rule as TS2322, applied at a call. Check the argument's real type (hover it) against the parameter's declared type.",
+  "bad": "function double(n: number): number {\n  return n * 2;\n}\ndouble(\"4\");\n",
+  "good": "function double(n: number): number {\n  return n * 2;\n}\ndouble(Number(\"4\"));\n",
+  "week": 5,
+  "preset": "strict"
+ },
+ {
+  "code": 2349,
+  "title": "This expression is not callable",
+  "meaning": "You called something that isn't a function.",
+  "cause": "Often a property that's a value, not a method (`s.length()`), or a union where not every member is callable.",
+  "bad": "const word = \"hi\";\nconsole.log(word.length());\n",
+  "good": "const word = \"hi\";\nconsole.log(word.length);\n",
+  "week": 4,
+  "preset": "strict"
+ },
+ {
+  "code": 2352,
+  "title": "Conversion of type 'A' to type 'B' may be a mistake",
+  "meaning": "An `as` assertion between types that don't overlap enough.",
+  "cause": "`as` never converts anything; it only makes a claim. For a real conversion call `Number(...)`, `String(...)` or a parser. (`as unknown as T` forces it — and makes the danger obvious.)",
+  "bad": "const n = \"5\" as number;\n",
+  "good": "const n = Number(\"5\");\nconsole.log(n);\n",
+  "week": 15,
+  "preset": "strict"
+ },
+ {
+  "code": 2353,
+  "title": "Object literal may only specify known properties",
+  "meaning": "An object literal has a property its target type doesn't declare.",
+  "cause": "This excess-property check applies only to fresh object literals, where an extra key is almost always a typo. Remove it, or add it to the type.",
+  "bad": "type Point = { x: number; y: number };\nconst p: Point = { x: 1, y: 2, label: \"origin\" };\n",
+  "good": "type Point = { x: number; y: number; label?: string };\nconst p: Point = { x: 1, y: 2, label: \"origin\" };\n",
+  "week": 8,
+  "preset": "strict"
+ },
+ {
+  "code": 2355,
+  "title": "A function whose declared type is neither 'undefined', 'void', nor 'any' must return a value",
+  "meaning": "A function with a declared return type never returns anything.",
+  "cause": "Usually a forgotten `return` — often inside a braced arrow function, where the value of the last expression is not returned automatically.",
+  "bad": "function total(xs: number[]): number {\n  xs.reduce((a, b) => a + b, 0);\n}\n",
+  "good": "function total(xs: number[]): number {\n  return xs.reduce((a, b) => a + b, 0);\n}\n",
+  "week": 5,
+  "preset": "strict"
+ },
+ {
+  "code": 2362,
+  "title": "The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type",
+  "meaning": "You did arithmetic (`-`, `*`, `/`, `%`) with a non-number on the left.",
+  "cause": "JavaScript would coerce a string silently; TypeScript refuses. Convert with `Number(...)` first.",
+  "bad": "const input = \"10\";\nconsole.log(input - 1);\n",
+  "good": "const input = \"10\";\nconsole.log(Number(input) - 1);\n",
+  "week": 2,
+  "preset": "strict"
+ },
+ {
+  "code": 2365,
+  "title": "Operator 'op' cannot be applied to types 'A' and 'B'",
+  "meaning": "An operator was used between types it doesn't support.",
+  "cause": "Often mixing `bigint` with `number`, or comparing values that can't be ordered. Convert one side so both match.",
+  "bad": "const big = 10n;\nconsole.log(big + 1);\n",
+  "good": "const big = 10n;\nconsole.log(big + 1n);\n",
+  "week": 3,
+  "preset": "strict"
+ },
+ {
+  "code": 2366,
+  "title": "Function lacks ending return statement and return type does not include 'undefined'",
+  "meaning": "Some path through a function falls off the end without returning.",
+  "cause": "You declared a return type, but one branch doesn't return. Add the missing `return` — or, for a switch over a union, handle every member.",
+  "bad": "function sign(n: number): string {\n  if (n > 0) return \"positive\";\n  if (n < 0) return \"negative\";\n}\n",
+  "good": "function sign(n: number): string {\n  if (n > 0) return \"positive\";\n  if (n < 0) return \"negative\";\n  return \"zero\";\n}\n",
+  "week": 12,
+  "preset": "strict"
+ },
+ {
+  "code": 2367,
+  "title": "This comparison appears to be unintentional because the types 'A' and 'B' have no overlap",
+  "meaning": "You compared two values that can never be equal.",
+  "cause": "Usually a misspelled literal, or a value whose type was narrowed earlier so it can't be the thing you're checking for.",
+  "bad": "type Status = \"idle\" | \"loading\" | \"done\";\nfunction isFinished(s: Status): boolean {\n  return s === \"finished\";\n}\n",
+  "good": "type Status = \"idle\" | \"loading\" | \"done\";\nfunction isFinished(s: Status): boolean {\n  return s === \"done\";\n}\n",
+  "week": 10,
+  "preset": "strict"
+ },
+ {
+  "code": 2393,
+  "title": "Duplicate function implementation",
+  "meaning": "Two function bodies share a name.",
+  "cause": "TypeScript allows several overload *signatures* but only one implementation. Rename one function, or merge them.",
+  "bad": "function area(w: number): number { return w * w; }\nfunction area(w: number, h: number): number { return w * h; }\n",
+  "good": "function area(w: number, h: number = w): number { return w * h; }\n",
+  "week": 5,
+  "preset": "strict"
+ },
+ {
+  "code": 2448,
+  "title": "Block-scoped variable 'x' used before its declaration",
+  "meaning": "You used a `let`/`const` on a line above where it's declared.",
+  "cause": "`let` and `const` exist only from their declaration onward (the temporal dead zone). Move the declaration up.",
+  "bad": "console.log(limit);\nconst limit = 10;\n",
+  "good": "const limit = 10;\nconsole.log(limit);\n",
+  "week": 5,
+  "preset": "strict"
+ },
+ {
+  "code": 2451,
+  "title": "Cannot redeclare block-scoped variable 'x'",
+  "meaning": "The same name is declared twice in one scope.",
+  "cause": "Rename one, or reuse the existing variable instead of declaring it again.",
+  "bad": "let x = 1;\nlet x = 2;\n",
+  "good": "let x = 1;\nx = 2;\n",
+  "week": 1,
+  "preset": "strict"
+ },
+ {
+  "code": 2454,
+  "title": "Variable 'x' is used before being assigned",
+  "meaning": "A variable is read on a path where nothing has assigned it yet.",
+  "cause": "Declared with `let x: T;` and assigned only in some branches. Initialise it, or assign it on every path.",
+  "bad": "let label: string;\nif (Math.random() > 0.5) label = \"heads\";\nconsole.log(label);\n",
+  "good": "let label = \"tails\";\nif (Math.random() > 0.5) label = \"heads\";\nconsole.log(label);\n",
+  "week": 2,
+  "preset": "strict"
+ },
+ {
+  "code": 2488,
+  "title": "Type 'A' must have a '[Symbol.iterator]()' method that returns an iterator",
+  "meaning": "You used `for…of` or spread on something that isn't iterable.",
+  "cause": "Plain objects aren't iterable. Iterate `Object.entries(obj)` (or keys/values), or give your class a `[Symbol.iterator]` method.",
+  "bad": "const scores = { ada: 3, bob: 5 };\nfor (const s of scores) console.log(s);\n",
+  "good": "const scores = { ada: 3, bob: 5 };\nfor (const [name, s] of Object.entries(scores)) console.log(name, s);\n",
+  "week": 24,
+  "preset": "strict"
+ },
+ {
+  "code": 2493,
+  "title": "Tuple type '[A, B]' of length '2' has no element at index '2'",
+  "meaning": "You indexed past the end of a tuple.",
+  "cause": "Tuples have a fixed length, so the compiler knows index 2 doesn't exist on a pair.",
+  "bad": "const pair: [string, number] = [\"a\", 1];\nconsole.log(pair[2]);\n",
+  "good": "const pair: [string, number] = [\"a\", 1];\nconsole.log(pair[1]);\n",
+  "week": 7,
+  "preset": "strict"
+ },
+ {
+  "code": 2511,
+  "title": "Cannot create an instance of an abstract class",
+  "meaning": "You used `new` on an `abstract` class.",
+  "cause": "Abstract classes exist to be extended. Instantiate a concrete subclass.",
+  "bad": "abstract class Shape {\n  abstract area(): number;\n}\nconst s = new Shape();\n",
+  "good": "abstract class Shape {\n  abstract area(): number;\n}\nclass Square extends Shape {\n  side: number;\n  constructor(side: number) {\n    super();\n    this.side = side;\n  }\n  area(): number { return this.side ** 2; }\n}\nconst s = new Square(2);\nconsole.log(s.area());\n",
+  "week": 23,
+  "preset": "strict"
+ },
+ {
+  "code": 2531,
+  "title": "Object is possibly 'null'",
+  "meaning": "An expression — not a plain name — might be `null`.",
+  "cause": "TS18047 for an unnamed expression: `\"abc\".match(/z/)[0]` reads from something that may be `null`.",
+  "bad": "console.log(\"abc\".match(/z/)[0]);\n",
+  "good": "console.log(\"abc\".match(/z/)?.[0] ?? \"none\");\n",
+  "week": 11,
+  "preset": "strict"
+ },
+ {
+  "code": 2532,
+  "title": "Object is possibly 'undefined'",
+  "meaning": "An expression — not a plain name — might be `undefined`.",
+  "cause": "The same problem as TS18048, but on something with no name to quote, like an element access `xs[0]` under `noUncheckedIndexedAccess`. Guard it or give a default.",
+  "bad": "const xs: number[] = [3, 1, 2];\nconsole.log(xs[0].toFixed(1));\n",
+  "good": "const xs: number[] = [3, 1, 2];\nconsole.log((xs[0] ?? 0).toFixed(1));\n",
+  "week": 14,
+  "preset": "strict+indexed"
+ },
+ {
+  "code": 2536,
+  "title": "Type 'K' cannot be used to index type 'T'",
+  "meaning": "You indexed a type with a key the compiler can't prove belongs to it.",
+  "cause": "Constrain the key: `K extends keyof T` lets `obj[key]` be typed `T[K]`.",
+  "bad": "function get<T, K extends string>(obj: T, key: K) {\n  return obj[key];\n}\n",
+  "good": "function get<T, K extends keyof T>(obj: T, key: K): T[K] {\n  return obj[key];\n}\n",
+  "week": 19,
+  "preset": "strict"
+ },
+ {
+  "code": 2540,
+  "title": "Cannot assign to 'x' because it is a read-only property",
+  "meaning": "You wrote to a `readonly` property (or a getter with no setter).",
+  "cause": "The type says this can't change after construction. Build a new object with the new value, or remove `readonly` if mutation is really intended.",
+  "bad": "type Point = { readonly x: number; readonly y: number };\nconst p: Point = { x: 1, y: 2 };\np.x = 5;\n",
+  "good": "type Point = { readonly x: number; readonly y: number };\nconst p: Point = { x: 1, y: 2 };\nconst moved: Point = { ...p, x: 5 };\nconsole.log(moved.x);\n",
+  "week": 16,
+  "preset": "strict"
+ },
+ {
+  "code": 2551,
+  "title": "Property 'x' does not exist on type 'A'. Did you mean 'y'?",
+  "meaning": "A misspelled property that is close to a real one.",
+  "cause": "TS2339 with a suggestion. Take it.",
+  "bad": "const word = \"hello\";\nconsole.log(word.lenght);\n",
+  "good": "const word = \"hello\";\nconsole.log(word.length);\n",
+  "week": 4,
+  "preset": "strict"
+ },
+ {
+  "code": 2552,
+  "title": "Cannot find name 'x'. Did you mean 'y'?",
+  "meaning": "An undeclared name that looks like a declared one.",
+  "cause": "The compiler found a close match in scope — it is almost always a typo.",
+  "bad": "const total = 3;\nconsole.log(totl);\n",
+  "good": "const total = 3;\nconsole.log(total);\n",
+  "week": 1,
+  "preset": "strict"
+ },
+ {
+  "code": 2554,
+  "title": "Expected N arguments, but got M",
+  "meaning": "A call passes the wrong number of arguments.",
+  "cause": "Count the parameters. If an argument should be optional, mark the parameter with `?` or give it a default.",
+  "bad": "function greet(name: string, greeting: string): string {\n  return greeting + \", \" + name;\n}\ngreet(\"Ada\");\n",
+  "good": "function greet(name: string, greeting = \"Hello\"): string {\n  return greeting + \", \" + name;\n}\ngreet(\"Ada\");\n",
+  "week": 5,
+  "preset": "strict"
+ },
+ {
+  "code": 2561,
+  "title": "Object literal may only specify known properties, but 'x' does not exist. Did you mean 'y'?",
+  "meaning": "An excess property whose name is close to a real one — almost certainly a typo.",
+  "cause": "The same check as TS2353, but the compiler found a property with a similar name and suggests it. You'd guess TS2353; the near-miss spelling is what changes the code.",
+  "bad": "type Options = { width: number };\nconst o: Options = { widht: 8 };\n",
+  "good": "type Options = { width: number };\nconst o: Options = { width: 8 };\n",
+  "week": 15,
+  "preset": "strict"
+ },
+ {
+  "code": 2564,
+  "title": "Property 'x' has no initializer and is not definitely assigned in the constructor",
+  "meaning": "A class field isn't guaranteed a value when the object is created.",
+  "cause": "Initialise it where it's declared, assign it in the constructor, or make it optional (`x?: T`).",
+  "bad": "class User {\n  name: string;\n}\n",
+  "good": "class User {\n  name: string;\n  constructor(name: string) {\n    this.name = name;\n  }\n}\n",
+  "week": 23,
+  "preset": "strict"
+ },
+ {
+  "code": 2578,
+  "title": "Unused '@ts-expect-error' directive",
+  "meaning": "A `// @ts-expect-error` comment sits above a line that no longer has an error.",
+  "cause": "That's the directive doing its job: whatever it was suppressing got fixed. Delete the comment.",
+  "bad": "// @ts-expect-error\nconst n: number = 5;\n",
+  "good": "const n: number = 5;\nconsole.log(n);\n",
+  "week": 14,
+  "preset": "strict"
+ },
+ {
+  "code": 2580,
+  "title": "Cannot find name 'require'",
+  "meaning": "`require` is CommonJS, and the judge's TypeScript declares only ES module imports.",
+  "cause": "Use `import * as fs from \"fs\";` at the top of the file instead of `require(\"fs\")`. (Depending on configuration the code is TS2580 or TS2591; the fix is the same.)",
+  "bad": "const fs = require(\"fs\");\n",
+  "good": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\");\nconsole.log(input.length);\n",
+  "week": 1,
+  "preset": "strict"
+ },
+ {
+  "code": 2584,
+  "title": "Cannot find name 'document'. Do you need to change your target library?",
+  "meaning": "You used a browser API in a program that runs in Node.",
+  "cause": "The judge type-checks against the ES library only — no DOM. `document`, `window` and `alert` don't exist; read stdin and write with `console.log` instead.",
+  "bad": "document.write(\"hi\");\n",
+  "good": "console.log(\"hi\");\n",
+  "week": 1,
+  "preset": "strict"
+ },
+ {
+  "code": 2588,
+  "title": "Cannot assign to 'x' because it is a constant",
+  "meaning": "You reassigned a `const`.",
+  "cause": "`const` bindings can't be reassigned. Use `let` if the value really changes — or build a new value instead of changing the old one.",
+  "bad": "const total = 0;\ntotal = 5;\n",
+  "good": "let total = 0;\ntotal = 5;\n",
+  "week": 1,
+  "preset": "strict"
+ },
+ {
+  "code": 2739,
+  "title": "Type 'A' is missing the following properties from type 'B': x, y",
+  "meaning": "Several required properties are missing at once.",
+  "cause": "TS2741's plural form. The list tells you exactly which properties to add.",
+  "bad": "type Point = { x: number; y: number; z: number };\nconst p: Point = { x: 1 };\n",
+  "good": "type Point = { x: number; y: number; z: number };\nconst p: Point = { x: 1, y: 2, z: 3 };\n",
+  "week": 8,
+  "preset": "strict"
+ },
+ {
+  "code": 2741,
+  "title": "Property 'x' is missing in type 'A' but required in type 'B'",
+  "meaning": "An object is missing a property its type requires.",
+  "cause": "Assigning an object literal to a declared type checks that every required property is present. Add the property, or mark it optional with `?` in the type if it really can be absent.",
+  "bad": "type User = { name: string; age: number };\nconst u: User = { name: \"Ada\" };\n",
+  "good": "type User = { name: string; age: number };\nconst u: User = { name: \"Ada\", age: 36 };\n",
+  "week": 8,
+  "preset": "strict"
+ },
+ {
+  "code": 2769,
+  "title": "No overload matches this call",
+  "meaning": "None of a function's overload signatures accepts these arguments.",
+  "cause": "The message lists each overload and why it failed; read the last one first — it is usually the one you meant. Common with built-ins that have several signatures, like `replace`.",
+  "bad": "const dashed = \"a-b\".replace(\"-\", 5);\n",
+  "good": "const dashed = \"a-b\".replace(\"-\", \"5\");\nconsole.log(dashed);\n",
+  "week": 4,
+  "preset": "strict"
+ },
+ {
+  "code": 2783,
+  "title": "'x' is specified more than once, so this usage will be overwritten",
+  "meaning": "A property written before a spread that always sets it too.",
+  "cause": "In `{ x: 1, ...o }`, if `o` always has `x`, your `x: 1` is dead. Put it after the spread to override, or drop it.",
+  "bad": "const base = { x: 5, y: 6 };\nconst moved = { x: 1, ...base };\n",
+  "good": "const base = { x: 5, y: 6 };\nconst moved = { ...base, x: 1 };\n",
+  "week": 8,
+  "preset": "strict"
+ },
+ {
+  "code": 7006,
+  "title": "Parameter 'x' implicitly has an 'any' type",
+  "meaning": "A parameter has no type and nothing lets the compiler infer one.",
+  "cause": "Under `strict` a parameter's type can't silently fall back to `any`. Annotate it. (Callback parameters are exempt when the call site supplies the type.)",
+  "bad": "function double(n) {\n  return n * 2;\n}\n",
+  "good": "function double(n: number): number {\n  return n * 2;\n}\n",
+  "week": 5,
+  "preset": "strict"
+ },
+ {
+  "code": 7053,
+  "title": "Element implicitly has an 'any' type because expression of type 'string' can't be used to index type 'T'",
+  "meaning": "You indexed an object with an arbitrary string, and its type has no index signature.",
+  "cause": "Either narrow the key to `keyof typeof obj`, or give the object a type that allows any string key, like `Record<string, number>`.",
+  "bad": "const prices = { apple: 3, pear: 4 };\nfunction price(fruit: string): number {\n  return prices[fruit];\n}\n",
+  "good": "const prices: Record<string, number> = { apple: 3, pear: 4 };\nfunction price(fruit: string): number {\n  return prices[fruit] ?? 0;\n}\n",
+  "week": 19,
+  "preset": "strict"
+ },
+ {
+  "code": 17009,
+  "title": "'super' must be called before accessing 'this' in the constructor of a derived class",
+  "meaning": "A subclass constructor used `this` before calling `super(...)`.",
+  "cause": "The object doesn't exist until the parent constructor has run. Call `super(...)` first.",
+  "bad": "class Animal {}\nclass Dog extends Animal {\n  name: string;\n  constructor(name: string) {\n    this.name = name;\n    super();\n  }\n}\n",
+  "good": "class Animal {}\nclass Dog extends Animal {\n  name: string;\n  constructor(name: string) {\n    super();\n    this.name = name;\n  }\n}\n",
+  "week": 23,
+  "preset": "strict"
+ },
+ {
+  "code": 18013,
+  "title": "Property '#x' is not accessible outside class 'C' because it has a private identifier",
+  "meaning": "Code outside a class touched a `#private` field.",
+  "cause": "`#` fields are truly private, enforced by JavaScript itself. Expose what callers need through a method or getter.",
+  "bad": "class Account {\n  #balance = 0;\n}\nconsole.log(new Account().#balance);\n",
+  "good": "class Account {\n  #balance = 0;\n  get balance(): number { return this.#balance; }\n}\nconsole.log(new Account().balance);\n",
+  "week": 23,
+  "preset": "strict"
+ },
+ {
+  "code": 18046,
+  "title": "'x' is of type 'unknown'",
+  "meaning": "You used a value of type `unknown` before narrowing it.",
+  "cause": "`unknown` blocks every operation until you prove what the value is. Narrow with `typeof`, `instanceof`, `in`, or a type predicate — this is exactly what `unknown` is for.",
+  "bad": "const data: unknown = JSON.parse(\"{\\\"id\\\": 1}\");\nconsole.log(data.id);\n",
+  "good": "const data: unknown = JSON.parse(\"{\\\"id\\\": 1}\");\nif (typeof data === \"object\" && data !== null && \"id\" in data) {\n  console.log(data.id);\n}\n",
+  "week": 11,
+  "preset": "strict"
+ },
+ {
+  "code": 18047,
+  "title": "'x' is possibly 'null'",
+  "meaning": "A named value might be `null`, and you used it as if it weren't.",
+  "cause": "`String.prototype.match` returns `null` when nothing matches — the classic source. Check for `null` before using it.",
+  "bad": "const m = \"abc\".match(/z/);\nconsole.log(m.length);\n",
+  "good": "const m = \"abc\".match(/z/);\nconsole.log(m === null ? 0 : m.length);\n",
+  "week": 11,
+  "preset": "strict"
+ },
+ {
+  "code": 18048,
+  "title": "'x' is possibly 'undefined'",
+  "meaning": "A named value might be `undefined`, and you used it as if it weren't.",
+  "cause": "Optional parameters, `find`, `Map.get` and optional properties all produce `T | undefined`. Check first (`if (x !== undefined)`), supply a default with `??`, or use `?.`.",
+  "bad": "function shout(text?: string): string {\n  return text.toUpperCase();\n}\n",
+  "good": "function shout(text?: string): string {\n  return (text ?? \"\").toUpperCase();\n}\n",
+  "week": 14,
+  "preset": "strict"
+ }
+]

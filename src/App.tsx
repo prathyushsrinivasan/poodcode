@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, Route, Routes, useLocation, useNavigate } from "react-router-dom";
+import { Link, Route, Routes, useLocation, useNavigate, useParams } from "react-router-dom";
 import { useStore } from "./store";
 import { api } from "./api";
 import { ToastProvider } from "./components/Toast";
@@ -23,6 +23,9 @@ import Course, { JavaCourse } from "./pages/Course";
 import Backend from "./pages/Backend";
 import Projects from "./pages/Projects";
 import Mastery from "./pages/Mastery";
+import Flashcards from "./pages/Flashcards";
+import TsErrors from "./pages/TsErrors";
+import Contest from "./pages/Contest";
 import JapaneseBridge from "./pages/JapaneseBridge";
 import Paths from "./pages/Paths";
 import Gallery from "./pages/Gallery";
@@ -84,10 +87,13 @@ function Shell() {
           <Route path="/projects/:project/review" element={<Projects view="review" />} />
           <Route path="/projects/:project/:module" element={<Projects />} />
           <Route path="/mastery" element={<Mastery />} />
+          <Route path="/flashcards" element={<Flashcards />} />
+          <Route path="/ts-errors" element={<TsErrors />} />
+          <Route path="/contest/:id" element={<Contest />} />
           <Route path="/jp-bridge" element={<JapaneseBridge />} />
           <Route path="/problem/new" element={<ProblemForm />} />
           <Route path="/problem/:id/edit" element={<ProblemForm />} />
-          <Route path="/solve/:id" element={<Solve />} />
+          <Route path="/solve/:id" element={<SolveRoute />} />
           <Route path="/paths" element={<Paths />} />
           <Route path="/settings" element={<Settings />} />
           {DEV_UI && <Route path="/ui" element={<Gallery />} />}
@@ -151,6 +157,15 @@ export default function App() {
       <Welcome open={showWelcome} onClose={dismissWelcome} />
     </ToastProvider>
   );
+}
+
+/** One Solve page per problem. React Router keeps the same element mounted
+ * when only `:id` changes, so "Next in …" used to carry the previous problem's
+ * code, run report and stdin into the next one — and autosave then wrote that
+ * code as the new problem's draft. Keying by id gives each problem fresh state. */
+function SolveRoute() {
+  const { id } = useParams();
+  return <Solve key={id} />;
 }
 
 /** A 404 that helps. It used to be a 🤔 and a button home — no search, and no

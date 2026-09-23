@@ -15,6 +15,7 @@ import type {
 } from "../types";
 import { Markdown } from "../components/Markdown";
 import { CodeEditor } from "../components/CodeEditor";
+import { TsErrorLinks } from "../components/TsErrorLinks";
 import { CardStudy, type StudyVariant } from "../components/CardStudy";
 import { JpVocabCard, JpVocabMenu, useVocabReviews } from "../components/JpVocab";
 import { vocabCardId } from "../lib/jpVocab";
@@ -1098,7 +1099,13 @@ function ExerciseCard({
           overflow: "hidden",
         }}
       >
-        <CodeEditor language={lang} value={code} onChange={update} onRun={check} />
+        <CodeEditor
+          language={lang}
+          value={code}
+          onChange={update}
+          onRun={check}
+          tsStrictness={exercise.strictness}
+        />
       </div>
 
       <div className="row" style={{ marginTop: 10, flexWrap: "wrap", gap: 8 }}>
@@ -1446,6 +1453,7 @@ function Feedback({ report, isSql = false }: { report: JudgeReport; isSql?: bool
         <pre style={{ margin: 0, whiteSpace: "pre-wrap", fontSize: 12 }}>
           {report.compile_error}
         </pre>
+        <TsErrorLinks text={report.compile_error} />
       </div>
     );
   }

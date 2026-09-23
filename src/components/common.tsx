@@ -1,5 +1,11 @@
 import type { Difficulty } from "../types";
 
+/** `like this` → <code>like this</code>, for one-line text where a whole
+ * Markdown block (with its paragraph margins) would be too much. */
+export function inlineCode(text: string): React.ReactNode[] {
+  return text.split(/`([^`]+)`/).map((part, i) => (i % 2 === 1 ? <code key={i}>{part}</code> : part));
+}
+
 export function DiffBadge({ d }: { d: Difficulty }) {
   return <span className={`badge diff ${d}`}>{d}</span>;
 }

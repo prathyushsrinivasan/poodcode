@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { JudgeReport } from "../types";
 import { formatMemory } from "../lib/format";
 import { lineDiff } from "../lib/diff";
+import { TsErrorLinks } from "./TsErrorLinks";
 
 function IOBlock({ label, value }: { label: string; value: string }) {
   return (
@@ -66,6 +67,7 @@ export function TestResults({ report }: { report: JudgeReport | null }) {
         <pre className="io-block" style={{ marginTop: 8 }}>
           {report.compile_error || "Unknown error"}
         </pre>
+        <TsErrorLinks text={report.compile_error} />
       </div>
     );
   }

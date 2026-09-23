@@ -270,7 +270,7 @@ pub fn judge_with(
     };
 
     // Then append the exercise's own hidden harness, if it has one. The two are
-    // never both set: `function_spec` belongs to the Python/Java problem bank,
+    // never both set: `function_spec` belongs to the problem bank,
     // `cfg.harness` to the TypeScript course.
     //
     // Both halves compile as ONE file, so tsc numbers their lines continuously

@@ -65,6 +65,53 @@
   font-weight: 600;
   font-size: 13px;
 }
+.quiz-actions {
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.quiz-note {
+  font-size: var(--text-sm);
+}
+
+/* ---- Flashcards ------------------------------------------------------ */
+.flash-card {
+  margin-bottom: 16px;
+  min-height: 180px;
+}
+.flash-meta {
+  font-size: var(--text-xs);
+  justify-content: space-between;
+}
+.flash-front {
+  font-size: var(--text-lg);
+  margin: 8px 0 14px;
+}
+.flash-back {
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
+  margin-bottom: 14px;
+}
+.flash-grades {
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.flash-grades kbd {
+  margin-left: 6px;
+  opacity: 0.7;
+}
+.flash-list-row {
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+}
+.flash-list-row .flash-due {
+  font-size: var(--text-xs);
+  white-space: nowrap;
+}
+.flash-new textarea,
+.flash-new input {
+  width: 100%;
+  margin-bottom: 8px;
+}
 
 
 /* SQL result grids -------------------------------------------------------- */
@@ -307,3 +354,93 @@ table.sqlgrid tbody tr.diff td {
 }
 
 /* ---- DSA curriculum (/library and /library/unit/:key) ------------------ */
+
+/* ---- TypeScript error glossary --------------------------------------- */
+.ts-error-search {
+  width: 100%;
+  margin-bottom: 14px;
+}
+.ts-error-entry {
+  margin-bottom: 10px;
+}
+.ts-error-entry.highlight {
+  border-color: var(--accent);
+}
+.ts-error-entry summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+.ts-error-code {
+  font-family: var(--font-mono);
+  color: var(--accent);
+  margin-right: 6px;
+}
+.ts-error-meaning {
+  font-weight: 400;
+  margin-top: 2px;
+}
+.ts-error-pair {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 12px;
+}
+.ts-error-foot {
+  font-size: var(--text-sm);
+  margin-bottom: 0;
+}
+.ts-error-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  font-size: var(--text-sm);
+}
+.ts-error-chip {
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 2px 10px;
+  text-decoration: none;
+}
+.ts-error-chip:hover {
+  border-color: var(--accent);
+}
+.mastery-practice {
+  margin-bottom: 14px;
+}
+.mastery-practice > summary {
+  cursor: pointer;
+}
+
+/* ---- Checkpoint contests --------------------------------------------- */
+.contest-clock {
+  font-family: var(--font-mono);
+  font-size: var(--text-xl);
+  font-variant-numeric: tabular-nums;
+}
+.contest-clock.warn {
+  color: var(--bad);
+}
+.contest-final {
+  color: var(--good);
+  border-color: var(--good);
+}
+.contest-table {
+  padding: 4px 14px;
+  margin-bottom: 14px;
+}
+.contest-row {
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+}
+.contest-row:last-child {
+  border-bottom: none;
+}
+.contest-banner {
+  margin-bottom: 12px;
+  border-color: var(--accent);
+}
+.mastery-checkpoint {
+  margin-bottom: 14px;
+  border-color: var(--accent);
+}

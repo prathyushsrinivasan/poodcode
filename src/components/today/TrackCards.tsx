@@ -14,7 +14,8 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { api } from "../../api";
 import { loadDoneChapters } from "../../lib/learnProgress";
-import type { WeeklyCourse } from "../../types";
+import { masteryResume, pacing, startDateKey } from "../../lib/mastery";
+import type { MasteryProgress, MasteryTrack, WeeklyCourse } from "../../types";
 
 export interface TrackCard {
   key: string;
@@ -67,6 +68,37 @@ function courseCard(
   };
 }
 
+/** A 6-Month Mastery track's resume point, with pacing when a start date is set. */
+function masteryCard(
+  track: MasteryTrack,
+  rows: MasteryProgress[],
+  settings: Record<string, string>
+): TrackCard | null {
+  const startedAt = settings[startDateKey(track.key)];
+  const r = masteryResume(track, rows, startedAt);
+  if (!r) return null;
+  let pace = "";
+  if (startedAt && !r.finished) {
+    const p = pacing(new Date(startedAt), r.week.week, r.total);
+    pace =
+      p.weeksBehind > 0
+        ? ` · ${p.weeksBehind} ${p.weeksBehind === 1 ? "week" : "weeks"} behind`
+        : p.weeksBehind < 0
+        ? ` · ${-p.weeksBehind} ahead`
+        : " · on pace";
+  }
+  return {
+    key: `mastery-${track.key}`,
+    icon: "🎓",
+    track: track.title,
+    position: `Week ${r.week.week} · ${r.week.title}`,
+    action: r.finished ? "Programme complete — review" : `Continue week ${r.week.week}`,
+    href: "/mastery",
+    progress: r.completed / r.total,
+    detail: `${r.completed}/${r.total} weeks complete${pace}`,
+  };
+}
+
 /** Loads every track's position. Returns `null` while loading. */
 export function useTrackCards() {
   const [cards, setCards] = useState<TrackCard[] | null>(null);
@@ -74,10 +106,13 @@ export function useTrackCards() {
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const [ts, java, done] = await Promise.all([
+      const [ts, java, done, mastery, masteryRows, settings] = await Promise.all([
         api.tsCourse().catch(() => null),
         api.javaCourse().catch(() => null),
         loadDoneChapters().catch(() => new Set<string>()),
+        api.mastery().catch(() => [] as MasteryTrack[]),
+        api.masteryProgress().catch(() => [] as MasteryProgress[]),
+        api.getSettings().catch(() => ({}) as Record<string, string>),
       ]);
       if (cancelled) return;
       const list: TrackCard[] = [];
@@ -87,6 +122,10 @@ export function useTrackCards() {
       }
       if (java) {
         const c = courseCard(java, "java", done, "☕", "/java-course");
+        if (c) list.push(c);
+      }
+      for (const t of mastery) {
+        const c = masteryCard(t, masteryRows, settings);
         if (c) list.push(c);
       }
       setCards(list);

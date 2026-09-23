@@ -20,6 +20,7 @@ import type { Exercise, JudgeReport, Problem, QuizQuestion, TestCase } from "../
 import { optionOrder } from "../lib/quizShuffle";
 import { Markdown } from "./Markdown";
 import { CodeEditor } from "./CodeEditor";
+import { TsErrorLinks } from "./TsErrorLinks";
 
 export function ExerciseCard({
   index,
@@ -186,7 +187,13 @@ export function ExerciseCard({
           overflow: "hidden",
         }}
       >
-        <CodeEditor language={lang} value={code} onChange={update} onRun={check} />
+        <CodeEditor
+          language={lang}
+          value={code}
+          onChange={update}
+          onRun={check}
+          tsStrictness={exercise.strictness}
+        />
       </div>
 
       <div className="row" style={{ marginTop: 10, flexWrap: "wrap", gap: 8 }}>
@@ -444,6 +451,7 @@ export function Feedback({ report }: { report: JudgeReport }) {
         <pre style={{ margin: 0, whiteSpace: "pre-wrap", fontSize: 12 }}>
           {report.compile_error}
         </pre>
+        <TsErrorLinks text={report.compile_error} />
       </div>
     );
   }

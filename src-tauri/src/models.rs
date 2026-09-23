@@ -1238,6 +1238,11 @@ pub struct MasteryExam {
     pub solution: String,
     #[serde(default)]
     pub tests: Vec<ExerciseTest>,
+    /// TypeScript only: the judge preset the final is type-checked at ("" =
+    /// `strict`, or `strict+indexed`). The TypeScript track switches to
+    /// `strict+indexed` from the week that teaches `noUncheckedIndexedAccess`.
+    #[serde(default)]
+    pub strictness: String,
 }
 
 /// An optional timed checkpoint contest attached to a week, built from that
@@ -1246,6 +1251,10 @@ pub struct MasteryExam {
 pub struct MasteryContest {
     pub title: String,
     pub duration_seconds: i64,
+    /// The problems to draw on. Empty means the week's own curated problems;
+    /// a monthly checkpoint lists problems from across the whole month.
+    #[serde(default)]
+    pub slugs: Vec<String>,
 }
 
 /// One week of a mastery track.
@@ -1280,6 +1289,21 @@ pub struct MasteryWeek {
     pub exam: Option<MasteryExam>,
     /// A timed checkpoint contest, on consolidation weeks.
     pub contest: Option<MasteryContest>,
+    /// Review cards authored for the week, seeded into the flashcard deck when
+    /// the week is completed (alongside one card per chapter studied).
+    #[serde(default)]
+    pub flashcards: Vec<MasteryCard>,
+    /// Optional graded practice — e.g. the type workshops of the type-level
+    /// weeks, judged on the type-check alone. Outside the week's gate.
+    #[serde(default)]
+    pub practice: Vec<Exercise>,
+}
+
+/// One authored review card: a prompt, and the answer to recall.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MasteryCard {
+    pub front: String,
+    pub back: String,
 }
 
 /// The learner's state for one week of one track (table `mastery_progress`).
@@ -1526,12 +1550,28 @@ pub struct CurriculumUnit {
     /// One problem solved start to finish, in fixed steps.
     #[serde(default)]
     pub walkthrough: Option<Walkthrough>,
-    /// An interactive playground computed in the page (`bits`, `modular`, `grid`).
+    /// An interactive playground computed in the page (`bits`, `modular`, `grid`,
+    /// `tree`, `graph`, `search`, `maze`).
     #[serde(default)]
     pub lab: Option<Lab>,
     /// "Work it out by hand" cards: type the answer, graded exactly.
     #[serde(default)]
     pub drills: Vec<CalcDrill>,
+    /// Further labs after the first — a unit about grids *and* graphs wants both.
+    #[serde(default)]
+    pub extra_labs: Vec<Lab>,
+    /// The interviewer's "what if…?" twists, each with its answer.
+    #[serde(default)]
+    pub followups: Vec<Followup>,
+}
+
+/// A "what if…?" follow-up question and its answer (markdown).
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Followup {
+    #[serde(default)]
+    pub q: String,
+    #[serde(default)]
+    pub a: String,
 }
 
 /// A unit's interactive lab. `kind` picks the page component; `presets` are the

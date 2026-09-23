@@ -57,6 +57,12 @@ export const KIND_SECTIONS: KindSection[] = [
     blurb:
       "Write the types before the code. Get the shape right and the implementation nearly falls out of it.",
   },
+  {
+    kind: "typelevel",
+    heading: "🧬 Type challenge",
+    blurb:
+      "Write the type. Nothing runs: hidden `Expect<Equal<…>>` claims about your type must all compile, and `@ts-expect-error` lines check it rejects what it should.",
+  },
   { kind: "challenge", heading: "🏆 Coding challenge" },
 ];
 

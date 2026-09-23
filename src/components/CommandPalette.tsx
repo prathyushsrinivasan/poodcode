@@ -246,6 +246,8 @@ export function CommandPalette() {
       { id: "backend", label: "Backend Lab", run: () => navigate("/backend") },
       { id: "projects", label: "Projects", run: () => navigate("/projects") },
       { id: "mastery", label: "6-Month Mastery", run: () => navigate("/mastery") },
+      { id: "flashcards", label: "Flashcards", run: () => navigate("/flashcards") },
+      { id: "ts-errors", label: "TypeScript errors, explained", run: () => navigate("/ts-errors") },
       { id: "settings", label: "Settings", run: () => navigate("/settings") },
     ],
     [navigate]

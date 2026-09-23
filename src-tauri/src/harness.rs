@@ -7,8 +7,12 @@
 //! line); the wrapper parses them, calls the function, and prints the return in
 //! a canonical form the generator's expected outputs match.
 //!
-//! Supported languages: Python and Java (the app's reference + default). Other
+//! Supported languages: Python, Java, TypeScript and JavaScript. Other
 //! languages return a clear error for harness problems.
+//!
+//! The TypeScript glue is appended AFTER the learner's code and imports `fs`
+//! under a private alias, so compiler diagnostics keep the learner's own line
+//! numbers and a program that already imports `fs` does not collide.
 
 use crate::models::FunctionSpec;
 
@@ -22,15 +26,17 @@ pub fn wrap(language: &str, user_code: &str, spec: &FunctionSpec) -> Result<Stri
     match language {
         "python" => Ok(wrap_python(user_code, spec)),
         "java" => Ok(wrap_java(user_code, spec)),
+        "typescript" => Ok(wrap_node(user_code, spec, true)),
+        "javascript" => Ok(wrap_node(user_code, spec, false)),
         other => Err(format!(
-            "This problem uses the function harness, which isn't available for {other} yet — switch to Python or Java."
+            "This problem uses the function harness, which isn't available for {other} yet — switch to Python, Java, TypeScript or JavaScript."
         )),
     }
 }
 
 /// Whether a problem's harness can run in the given language.
 pub fn supports(language: &str) -> bool {
-    matches!(language, "python" | "java")
+    matches!(language, "python" | "java" | "typescript" | "javascript")
 }
 
 // --------------------------------------------------------------------------
@@ -74,6 +80,63 @@ fn wrap_python(user: &str, spec: &FunctionSpec) -> String {
     }
     s.push_str(&format!("_res = {}({})\n", spec.name, args.join(", ")));
     s.push_str(&py_print(&spec.returns, "_res"));
+    s.push('\n');
+    s
+}
+
+// --------------------------------------------------------------------------
+// TypeScript / JavaScript
+// --------------------------------------------------------------------------
+
+/// Parse argument line `i` exactly as the Python glue does: numbers default to
+/// 0 on an empty line, arrays split on any whitespace, strings keep their
+/// spaces but lose a Windows carriage return.
+fn node_parse(ty: &str, i: usize) -> String {
+    let line = format!("__pcLine({i})");
+    match ty {
+        "int" | "long" | "double" => format!(r#"Number({line}.trim() || "0")"#),
+        "bool" => format!(r#"["true", "1"].includes({line}.trim().toLowerCase())"#),
+        "string" => line,
+        "int[]" | "long[]" | "double[]" => format!(r"{line}.split(/\s+/).filter(Boolean).map(Number)"),
+        "string[]" => format!(r"{line}.split(/\s+/).filter(Boolean)"),
+        _ => line,
+    }
+}
+
+/// Print the return value the way `_ser` in tools/gen_seed.py serialises it.
+fn node_print(ty: &str) -> &'static str {
+    match ty {
+        "bool" => r#"console.log(__pcRes ? "true" : "false");"#,
+        t if is_array(t) => r#"console.log(__pcRes.join(" "));"#,
+        _ => "console.log(String(__pcRes));",
+    }
+}
+
+/// `typed` selects TypeScript (an `import`, annotated glue) over JavaScript
+/// (`require`, which is what a `.js` file run as CommonJS needs).
+fn wrap_node(user: &str, spec: &FunctionSpec, typed: bool) -> String {
+    let mut s = String::new();
+    s.push_str(user);
+    s.push_str("\n\n// ---- harness: reads the arguments, calls your function, prints the result ----\n");
+    if typed {
+        s.push_str("import * as __pcFs from \"fs\";\n");
+        s.push_str(r#"const __pcLines: string[] = __pcFs.readFileSync(0, "utf8").split("\n");"#);
+        s.push('\n');
+        s.push_str(r#"const __pcLine = (i: number): string => (__pcLines[i] ?? "").replace(/\r$/, "");"#);
+        s.push('\n');
+    } else {
+        s.push_str(r#"const __pcLines = require("fs").readFileSync(0, "utf8").split("\n");"#);
+        s.push('\n');
+        s.push_str(r#"const __pcLine = (i) => (__pcLines[i] ?? "").replace(/\r$/, "");"#);
+        s.push('\n');
+    }
+    let mut args = Vec::new();
+    for (i, p) in spec.params.iter().enumerate() {
+        s.push_str(&format!("const __pcA{i} = {};\n", node_parse(&p.ty, i)));
+        args.push(format!("__pcA{i}"));
+    }
+    s.push_str(&format!("const __pcRes = {}({});\n", spec.name, args.join(", ")));
+    s.push_str(node_print(&spec.returns));
     s.push('\n');
     s
 }

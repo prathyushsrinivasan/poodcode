@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { api } from "../api";
 import type {
   Concept,
@@ -13,8 +13,16 @@ import type {
 } from "../types";
 import { Markdown } from "../components/Markdown";
 import { CodeEditor } from "../components/CodeEditor";
+import { TsErrorLinks } from "../components/TsErrorLinks";
 import { DiffBadge, Empty } from "../components/common";
-import { loadDoneChapters, setChapterDone } from "../lib/learnProgress";
+import {
+  loadDoneChapters,
+  loadSolvedExercises,
+  markExerciseSolved,
+  setChapterDone,
+  solvedExercises,
+} from "../lib/learnProgress";
+import { ExerciseSections } from "../components/ExerciseSections";
 import { useToast } from "../components/Toast";
 import { TrackSkeleton } from "../components/Skeleton";
 import {
@@ -151,7 +159,7 @@ export default function Mastery() {
       for (const w of newly) {
         const first = await api.masteryCompleteWeek(track.key, w.week);
         if (first) {
-          toast(`Week ${w.week} complete — its chapters are now in your review queue`);
+          toast(`Week ${w.week} complete — its review cards are now in Flashcards`);
         }
       }
       await refreshProgress();
@@ -392,7 +400,18 @@ function WeekCard({
   onChanged: () => Promise<void>;
 }) {
   const nav = useNavigate();
+  const toast = useToast();
   const [open, setOpen] = useState(!locked && !progress.complete);
+  const practice = week.practice ?? [];
+  const [solvedEx, setSolvedEx] = useState<Set<string>>(() => solvedExercises());
+  const practiceSolved = practice.filter((ex) => solvedEx.has(ex.id)).length;
+
+  // Practice solved-state lives in SQLite; the initialiser reads the warm
+  // session cache and this fills it on a cold start.
+  useEffect(() => {
+    if (practice.length === 0) return;
+    loadSolvedExercises().then(setSolvedEx).catch(() => {});
+  }, [practice.length]);
 
   // Study time is accumulated only while this week is expanded, then flushed
   // periodically and on collapse. It also lands in daily_sessions, so mastery
@@ -608,6 +627,69 @@ function WeekCard({
             />
           )}
 
+          {week.contest && (
+            <div className="card mastery-checkpoint">
+              <div className="row wrap">
+                <div>
+                  <strong>⏱ {week.contest.title}</strong>
+                  <div className="dim quiz-note">
+                    {Math.round(week.contest.duration_seconds / 60)} minutes ·{" "}
+                    {(week.contest.slugs?.length ?? 0) > 0
+                      ? `${week.contest.slugs!.length} problems from across the month`
+                      : `this week's ${week.problems.length} problems`}{" "}
+                    · optional, timed, and retakeable
+                  </div>
+                </div>
+                <span className="spacer" />
+                <button
+                  onClick={async () => {
+                    try {
+                      const id = await api.masteryStartContest(track.key, week.week);
+                      nav(`/contest/${id}`);
+                    } catch (e) {
+                      toast(`Could not start the checkpoint: ${e}`);
+                    }
+                  }}
+                >
+                  Start the checkpoint
+                </button>
+              </div>
+            </div>
+          )}
+
+          {practice.length > 0 && (
+            <details className="card mastery-practice">
+              <summary>
+                <strong>🧩 Practice</strong>{" "}
+                <span className="dim quiz-note">
+                  {practiceSolved}/{practice.length} solved · optional — not part of the week's gate
+                </span>
+              </summary>
+              <p className="dim quiz-note">
+                Short, judged exercises on this week's ideas — reading an inference, reading a real
+                compiler error, repairing code that runs wrong, and on the type-level weeks, writing types
+                the compiler checks.
+              </p>
+              <ExerciseSections
+                exercises={practice}
+                onSolved={(id) => setSolvedEx(new Set(markExerciseSolved(id)))}
+              />
+            </details>
+          )}
+
+          {(week.flashcards?.length ?? 0) > 0 && (
+            <p className="dim quiz-note">
+              🃏 {progress.complete ? (
+                <>
+                  This week's {week.flashcards!.length} review cards are in{" "}
+                  <Link to="/flashcards">Flashcards</Link>.
+                </>
+              ) : (
+                <>{week.flashcards!.length} review cards join your Flashcards when you finish this week.</>
+              )}
+            </p>
+          )}
+
           <QuizPanel
             week={week}
             track={track}
@@ -743,11 +825,16 @@ function QuizPanel({
   const [paper, setPaper] = useState<ExamQuestion[]>(() => drawExamPaper(week));
   const [picked, setPicked] = useState<number[]>(() => paper.map(() => -1));
   const [submitted, setSubmitted] = useState(false);
+  /** How many misses were turned into flashcards this sitting, once saved. */
+  const [savedMisses, setSavedMisses] = useState<number | null>(null);
+  const [savingMisses, setSavingMisses] = useState(false);
+  const toast = useToast();
 
   const answered = picked.filter((p) => p >= 0).length;
   const correct = picked.filter((p, i) => p === paper[i].answer).length;
   const percent = Math.round((correct / paper.length) * 100);
   const passedNow = submitted && percent >= track.pass_mark;
+  const missed = submitted ? paper.filter((q, i) => picked[i] !== q.answer) : [];
 
   function submit() {
     setSubmitted(true);
@@ -759,6 +846,31 @@ function QuizPanel({
     setPaper(next);
     setPicked(next.map(() => -1));
     setSubmitted(false);
+    setSavedMisses(null);
+  }
+
+  /** A wrong answer is the most useful card there is: it is exactly what you
+   * do not know yet. Each miss becomes a card — question on the front, the
+   * right answer and its explanation on the back — skipping any question
+   * already in the deck, so a retake does not pile up duplicates. */
+  async function saveMisses() {
+    setSavingMisses(true);
+    try {
+      const existing = new Set((await api.listFlashcards()).map((c) => c.front));
+      const source = `${track.title} · Week ${week.week} quiz`;
+      let added = 0;
+      for (const q of missed) {
+        if (existing.has(q.question)) continue;
+        await api.addFlashcard(q.question, `${q.options[q.answer]}\n\n${q.explanation}`, source);
+        existing.add(q.question);
+        added++;
+      }
+      setSavedMisses(added);
+    } catch {
+      toast("Could not save those flashcards — try again");
+    } finally {
+      setSavingMisses(false);
+    }
   }
 
   return (
@@ -820,9 +932,25 @@ function QuizPanel({
               ? "Now clear the coding final below to unlock the next week."
               : "Read the explanations, revisit the chapters, and take a fresh paper — only your best score counts."}
           </p>
-          <button className="ghost" onClick={retake}>
-            Draw a new paper
-          </button>
+          <div className="row quiz-actions">
+            <button className="ghost" onClick={retake}>
+              Draw a new paper
+            </button>
+            {missed.length > 0 && savedMisses === null && (
+              <button className="ghost" onClick={saveMisses} disabled={savingMisses}>
+                {savingMisses
+                  ? "Saving…"
+                  : `Save ${missed.length} missed ${missed.length === 1 ? "question" : "questions"} as flashcards`}
+              </button>
+            )}
+            {savedMisses !== null && (
+              <span className="dim quiz-note">
+                {savedMisses === 0
+                  ? "Those questions are already in your flashcards."
+                  : `Added ${savedMisses} ${savedMisses === 1 ? "card" : "cards"} to your review queue.`}
+              </span>
+            )}
+          </div>
         </div>
       )}
     </div>
@@ -942,7 +1070,9 @@ function ExamPanel({
       ordering: i,
     }));
     try {
-      const r = await api.runTests(null, exam.language, code, cases);
+      const r = await api.runTests(null, exam.language, code, cases, {
+        strictness: exam.strictness,
+      });
       setReport(r);
       await onResult(r.status === "accepted", code);
     } catch (e) {
@@ -976,7 +1106,13 @@ function ExamPanel({
           overflow: "hidden",
         }}
       >
-        <CodeEditor language={exam.language} value={code} onChange={setCode} onRun={submit} />
+        <CodeEditor
+          language={exam.language}
+          value={code}
+          onChange={setCode}
+          onRun={submit}
+          tsStrictness={exam.strictness}
+        />
       </div>
 
       <div className="row" style={{ marginTop: 10, flexWrap: "wrap", gap: 8 }}>
@@ -999,6 +1135,11 @@ function ExamPanel({
         {untouched && !running && (
           <span className="dim" style={{ fontSize: 12, alignSelf: "center" }}>
             Replace the <code>____</code> before submitting.
+          </span>
+        )}
+        {exam.strictness === "strict+indexed" && (
+          <span className="dim quiz-note" title="Every a[i] and record[key] read is typed T | undefined until you handle the missing case.">
+            Checked with <code>noUncheckedIndexedAccess</code>
           </span>
         )}
       </div>
@@ -1053,6 +1194,7 @@ function ExamFeedback({
       <div className="card" style={{ marginTop: 10, marginBottom: 0, borderColor: "var(--bad)" }}>
         <div className="io-label" style={{ color: "var(--bad)" }}>Compile error</div>
         <pre style={{ margin: 0, whiteSpace: "pre-wrap", fontSize: 12 }}>{report.compile_error}</pre>
+        <TsErrorLinks text={report.compile_error} />
       </div>
     );
   }

@@ -26,7 +26,7 @@ use models::Problem;
 
 /// Bump when the bundled seed problems change so existing installs pick up new
 /// content on next launch (existing user progress is preserved via upsert).
-const SEED_VERSION: i64 = 15;
+const SEED_VERSION: i64 = 19;
 
 /// Original starter problems, authored for this app (no third-party content).
 const SEED_PROBLEMS: &str = include_str!("../seeds/problems.json");
@@ -319,6 +319,9 @@ pub fn run() {
             seed_if_needed(&conn);
             seed_paths(&conn);
             seed_flashcards(&conn);
+            if let Err(e) = commands::backfill_mastery_cards(&conn) {
+                eprintln!("[mastery] failed to backfill review cards: {e}");
+            }
             seed_contests(&conn);
             app.manage(AppState {
                 db: Mutex::new(conn),

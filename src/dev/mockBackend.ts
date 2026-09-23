@@ -25,12 +25,14 @@ import type {
   Attempt,
   CardReview,
   CaseResult,
+  Contest,
   CountPair,
   Dashboard,
   Goals,
   JudgeReport,
   LangInfo,
   MasteryProgress,
+  MasteryTrack,
   Mistake,
   Note,
   Problem,
@@ -91,6 +93,8 @@ interface MockState {
   chapters: string[];
   exercises: string[];
   mastery: Record<string, MasteryProgress>;
+  /** Checkpoint contests started this session, by id. */
+  contests: Record<number, Contest>;
   studySeconds: number;
   nextId: number;
 }
@@ -118,6 +122,7 @@ function blankState(): MockState {
     chapters: [],
     exercises: [],
     mastery: {},
+    contests: {},
     studySeconds: 41 * 60,
     nextId: 1000,
   };
@@ -715,6 +720,65 @@ const handlers: Record<string, (a: Args) => any | Promise<any>> = {
     row.completed_at = isoStamp(0);
     save();
     return first;
+  },
+  // Checkpoints: the same resume-a-running-one rule as the real command.
+  mastery_start_contest: async ({ trackKey, week }) => {
+    const track = ((await seed("mastery")) as MasteryTrack[]).find((t) => t.key === trackKey);
+    const w = track?.weeks.find((x) => x.week === week);
+    if (!w?.contest) throw new Error("week checkpoint contest not found");
+    const running = Object.values(state.contests).find(
+      (c) => c.title === w.contest!.title && c.status === "running"
+    );
+    if (running) return running.id;
+    const slugs = w.contest.slugs?.length ? w.contest.slugs : w.problems.map((p) => p.slug);
+    const all = await problems();
+    const picked = slugs
+      .map((s) => all.find((p) => p.slug === s))
+      .filter((p): p is Problem => p !== undefined);
+    const id = state.nextId++;
+    state.contests[id] = {
+      id,
+      title: w.contest.title,
+      problem_ids: picked.map((p) => p.id),
+      duration_seconds: w.contest.duration_seconds,
+      status: "running",
+      started_at: new Date().toISOString().slice(0, 19).replace("T", " "),
+      ended_at: null,
+      results: picked.map((p) => ({
+        problem_id: p.id,
+        title: p.title,
+        difficulty: p.difficulty,
+        solved: false,
+        solved_at: null,
+        wrong_tries: 0,
+      })),
+    };
+    save();
+    return id;
+  },
+  contest: ({ id }) => {
+    const c = state.contests[id];
+    if (!c) throw new Error("contest not found");
+    return c;
+  },
+  record_contest_result: ({ contestId, problemId, solved }) => {
+    const r = state.contests[contestId]?.results.find((x) => x.problem_id === problemId);
+    if (!r) return;
+    if (solved) {
+      r.solved = true;
+      r.solved_at = r.solved_at ?? new Date().toISOString();
+    } else if (!r.solved) {
+      r.wrong_tries += 1;
+    }
+    save();
+  },
+  finish_contest: ({ id }) => {
+    const c = state.contests[id];
+    if (c) {
+      c.status = "finished";
+      c.ended_at = new Date().toISOString();
+      save();
+    }
   },
 
   /* ---- aggregates ---- */

@@ -1,7 +1,7 @@
 import Editor, { type OnMount } from "@monaco-editor/react";
 import { forwardRef, useImperativeHandle, useRef } from "react";
 import type { editor } from "monaco-editor";
-import { defineThemes } from "../monacoSetup";
+import { defineThemes, setTypeScriptStrictness } from "../monacoSetup";
 import { useStore } from "../store";
 
 interface Props {
@@ -13,6 +13,9 @@ interface Props {
   readOnly?: boolean;
   onRun?: () => void;
   onSubmit?: () => void;
+  /** TypeScript only: the judge preset this code is checked at ("" = strict,
+   * or "strict+indexed"), so the editor's squiggles match the judge's verdict. */
+  tsStrictness?: string;
 }
 
 /** Imperative actions callers can trigger on the editor (format, find, replace). */
@@ -26,12 +29,14 @@ export interface CodeEditorHandle {
 
 /** Monaco wrapper honoring user editor preferences and app theme. */
 export const CodeEditor = forwardRef<CodeEditorHandle, Props>(function CodeEditor(
-  { language, value, onChange, disableIntellisense, readOnly, onRun, onSubmit },
+  { language, value, onChange, disableIntellisense, readOnly, onRun, onSubmit, tsStrictness },
   ref
 ) {
   const prefs = useStore((s) => s.prefs);
   const runRef = useRef(onRun);
   const submitRef = useRef(onSubmit);
+  const strictnessRef = useRef(tsStrictness);
+  strictnessRef.current = tsStrictness;
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
   runRef.current = onRun;
   submitRef.current = onSubmit;
@@ -48,6 +53,12 @@ export const CodeEditor = forwardRef<CodeEditorHandle, Props>(function CodeEdito
     editorRef.current = editor;
     defineThemes();
     monaco.editor.setTheme(prefs.editorTheme);
+    // The TypeScript service is shared by every editor on the page, so the one
+    // being typed in sets the strictness it is checked at.
+    if (language === "typescript") {
+      setTypeScriptStrictness(strictnessRef.current);
+      editor.onDidFocusEditorText(() => setTypeScriptStrictness(strictnessRef.current));
+    }
     // Keyboard shortcuts: Ctrl/Cmd+Enter runs, Ctrl/Cmd+Shift+Enter submits.
     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, () =>
       runRef.current?.()

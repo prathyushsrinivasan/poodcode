@@ -9,6 +9,7 @@ IO model (app-wide): programs read from stdin and write to stdout. Each problem
 documents its own input/output contract.
 """
 
+import hashlib
 import json
 import math
 import os
@@ -1371,6 +1372,7 @@ INTRO_DEFS = [
         editorial="## Approach\nThere is no input to read. Just print the fixed string with `System.out.println(\"Hello, World!\")`. This warms up the read-nothing / print-something shape used everywhere.",
         ref=sol_print_greeting,
         starter_py="# TODO: print exactly:  Hello, World!\n",
+        starter_js='// TODO: print exactly:  Hello, World!\n',
         cases=[
             ("example", "Only case", ""),
             ("hidden", "Grader check", ""),
@@ -1392,6 +1394,7 @@ INTRO_DEFS = [
         editorial="## Approach\nRead the line with `nextLine()` (or `readLine()`), then print it. This teaches reading text input versus numbers.",
         ref=sol_echo_line,
         starter_py="# TODO: read one line and print it\n",
+        starter_js="const line = require('fs').readFileSync(0, 'utf8').split('\\n')[0];\n// TODO: print line\n",
         cases=[
             ("example", "Word", "hello\n"),
             ("hidden", "Sentence", "Java is fun\n"),
@@ -1414,6 +1417,7 @@ INTRO_DEFS = [
         editorial="## Approach\nRead `a` and `b`, then print `a + b`. The sum of two values up to 10^9 stays within int here, but using long is a safe habit.",
         ref=sol_add_two,
         starter_py="a, b = map(int, input().split())\n# TODO: print a + b\n",
+        starter_js="const [a, b] = require('fs').readFileSync(0, 'utf8').trim().split(/\\s+/).map(Number);\n// TODO: print a + b\n",
         cases=[
             ("example", "Positives", "2 3\n"),
             ("example", "Negative", "-4 10\n"),
@@ -1438,6 +1442,7 @@ INTRO_DEFS = [
         editorial="## Approach\nRead `w` and `h` and print `w * h`. A gentle introduction to multiplication and reading two values.",
         ref=sol_rectangle_area,
         starter_py="w, h = map(int, input().split())\n# TODO: print w * h\n",
+        starter_js="const [w, h] = require('fs').readFileSync(0, 'utf8').trim().split(/\\s+/).map(Number);\n// TODO: print w * h\n",
         cases=[
             ("example", "3 by 4", "3 4\n"),
             ("hidden", "Square", "5 5\n"),
@@ -1461,6 +1466,7 @@ INTRO_DEFS = [
         editorial="## Approach\nCompute `n % 2`. If it is 0 print `Even`, otherwise print `Odd`. This is your first conditional.",
         ref=sol_even_or_odd,
         starter_py="n = int(input())\n# TODO: print 'Even' or 'Odd'\n",
+        starter_js="const n = Number(require('fs').readFileSync(0, 'utf8').trim());\n// TODO: print 'Even' or 'Odd'\n",
         cases=[
             ("example", "Even", "4\n"),
             ("example", "Odd", "7\n"),
@@ -1485,6 +1491,7 @@ INTRO_DEFS = [
         editorial="## Approach\nCompare `a` and `b` with an if/else, or simply print `Math.max(a, b)`.",
         ref=sol_larger_of_two,
         starter_py="a, b = map(int, input().split())\n# TODO: print the larger of a and b\n",
+        starter_js="const [a, b] = require('fs').readFileSync(0, 'utf8').trim().split(/\\s+/).map(Number);\n// TODO: print the larger of a and b\n",
         cases=[
             ("example", "Second larger", "3 8\n"),
             ("hidden", "First larger", "10 2\n"),
@@ -1508,6 +1515,7 @@ INTRO_DEFS = [
         editorial="## Approach\nLoop `i` from 1 to n adding to a running `sum`, then print it. Or use the closed form `n*(n+1)/2`. Your first loop that accumulates a result.",
         ref=sol_sum_to_n,
         starter_py="n = int(input())\n# TODO: add 1..n and print the total\n",
+        starter_js="const n = Number(require('fs').readFileSync(0, 'utf8').trim());\n// TODO: add 1..n and print the total\n",
         cases=[
             ("example", "Five", "5\n"),
             ("example", "One", "1\n"),
@@ -1532,6 +1540,7 @@ INTRO_DEFS = [
         editorial="## Approach\nLoop `i` from n down to 1, appending each to a StringBuilder with spaces, then print. Practice with a decreasing loop.",
         ref=sol_countdown,
         starter_py="n = int(input())\n# TODO: print n, n-1, ..., 1 on one line separated by spaces\n",
+        starter_js="const n = Number(require('fs').readFileSync(0, 'utf8').trim());\n// TODO: print n, n-1, ..., 1 on one line separated by spaces\n",
         cases=[
             ("example", "Five", "5\n"),
             ("example", "One", "1\n"),
@@ -3618,6 +3627,35 @@ def stub_java(spec):
     return (
         f"class Solution {{\n    {_JAVA_TY[spec['returns']]} {spec['name']}({params}) {{\n"
         f"        // TODO: implement\n        return {_java_default(spec['returns'])};\n    }}\n}}\n"
+    )
+
+
+_TS_TY = {
+    "int": "number", "long": "number", "double": "number", "bool": "boolean",
+    "string": "string", "int[]": "number[]", "long[]": "number[]",
+    "double[]": "number[]", "string[]": "string[]",
+}
+
+
+def _ts_default(ty):
+    if ty.endswith("[]"):
+        return "[]"
+    return {"bool": "false", "string": '""'}.get(ty, "0")
+
+
+def stub_ts(spec):
+    params = ", ".join(f"{p['name']}: {_TS_TY[p['type']]}" for p in spec["params"])
+    return (
+        f"function {spec['name']}({params}): {_TS_TY[spec['returns']]} {{\n"
+        f"  // TODO: implement\n  return {_ts_default(spec['returns'])};\n}}\n"
+    )
+
+
+def stub_js(spec):
+    params = ", ".join(p["name"] for p in spec["params"])
+    return (
+        f"function {spec['name']}({params}) {{\n"
+        f"  // TODO: implement\n  return {_ts_default(spec['returns'])};\n}}\n"
     )
 
 
@@ -6012,6 +6050,12 @@ if os.path.exists(_tsm_path):
     with open(_tsm_path, encoding="utf-8") as _tmf:
         exec(compile(_tmf.read(), _tsm_path, "exec"))
 
+# "In an interview" — three questions with model answers appended to every
+# TypeScript chapter's lesson. Runs after every TypeScript chapter exists.
+_tsi_path = os.path.join(HERE, "ts_lesson_interview.py")
+with open(_tsi_path, encoding="utf-8") as _tif:
+    exec(compile(_tif.read(), _tsi_path, "exec"))
+
 # The 8-month structured TypeScript COURSE (weeks/themes/goals/lessons/capstones).
 # Runs after the other TypeScript files so it can reuse tsx/tsc/_P. Defines
 # TS_COURSE; written to seeds/ts_course.json near the concepts.
@@ -6295,6 +6339,17 @@ DSA_MORE_FILES = (
     "dsa_more_50.py",
     "dsa_more_51.py",
     "dsa_more_52.py",
+    # Trees & Graphs expansion (TREES_GRAPHS_ROADMAP.md): trees, BSTs and
+    # backtracking, traversal and topological order, union-find and spanning
+    # trees, weighted shortest paths.
+    "dsa_more_53.py",
+    "dsa_more_54.py",
+    "dsa_more_55.py",
+    "dsa_more_56.py",
+    "dsa_more_57.py",
+    "dsa_more_58.py",
+    "dsa_more_59.py",
+    "dsa_more_60.py",
 )
 for _more_name in DSA_MORE_FILES:
     _more_path = os.path.join(HERE, _more_name)
@@ -6305,6 +6360,16 @@ for _more_name in DSA_MORE_FILES:
 # ---------------------------------------------------------------------------
 # Build JSON
 # ---------------------------------------------------------------------------
+
+with open(os.path.join(HERE, "ts_starters.json"), encoding="utf-8") as _tsf:
+    TS_STARTERS = json.load(_tsf)
+TS_STARTERS_STALE = []
+
+
+def _js_sha(js):
+    """Must match sha() in tools/gen_ts_starters.mjs."""
+    return hashlib.sha256(js.encode("utf-8")).hexdigest()[:16]
+
 
 out = []
 for d in DEFS:
@@ -6335,8 +6400,15 @@ for d in DEFS:
         starter["python"] = d["starter_py"]
     if d.get("starter_js"):
         starter["javascript"] = d["starter_js"]
-        # TypeScript can reuse the JS skeleton (Node strips types; plain JS is valid TS).
-        starter["typescript"] = d["starter_js"]
+        # NOT the JS skeleton: the judge type-checks TypeScript at --strict, and
+        # untyped JS fails it (implicit any, undeclared `require`). The typed
+        # version is converted by tools/gen_ts_starters.mjs and pinned to the
+        # JS it came from — a stale one is left out rather than shipped.
+        ts_starter = TS_STARTERS.get(d["slug"])
+        if ts_starter and ts_starter["js_sha"] == _js_sha(d["starter_js"]):
+            starter["typescript"] = ts_starter["ts"]
+        else:
+            TS_STARTERS_STALE.append(d["slug"])
 
     out.append({
         "slug": d["slug"],
@@ -6393,6 +6465,8 @@ for d in HARNESS_DEFS:
         "starter_code": {
             "python": d.get("starter_py") or stub_py(spec),
             "java": d.get("starter_java") or stub_java(spec),
+            "typescript": stub_ts(spec),
+            "javascript": stub_js(spec),
         },
         "topics": d["topics"], "subtopics": d.get("subtopics", []),
         "companies": d.get("companies", []), "patterns": derive_patterns(d),
@@ -6415,6 +6489,10 @@ os.makedirs(os.path.dirname(OUT), exist_ok=True)
 with open(OUT, "w", encoding="utf-8", newline="\n") as f:
     json.dump(out, f, indent=2, ensure_ascii=False)
 print(f"Wrote {len(out)} problems to {os.path.relpath(OUT)}")
+if TS_STARTERS_STALE:
+    print(f"WARNING: {len(TS_STARTERS_STALE)} problem(s) ship without a TypeScript starter because their "
+          f"JavaScript starter changed or is new: {', '.join(TS_STARTERS_STALE[:8])}"
+          f"{' ...' if len(TS_STARTERS_STALE) > 8 else ''} — run `node tools/gen_ts_starters.mjs`, then gen_seed.py again.")
 
 CONCEPTS_OUT = os.path.join(HERE, "..", "src-tauri", "seeds", "concepts.json")
 concepts = build_concepts()
@@ -6445,8 +6523,15 @@ _mst_path = os.path.join(HERE, "mastery_defs.py")
 if os.path.exists(_mst_path):
     with open(_mst_path, encoding="utf-8") as _mf:
         exec(compile(_mf.read(), _mst_path, "exec"))
+    # Review cards, the deeper quiz banks and the type workshops for the
+    # TypeScript track, attached to TS_WEEKS in place before the chapter
+    # questions are merged in.
+    for _mst_extra in ("mastery_ts_cards.py", "mastery_ts_quiz.py", "mastery_ts_practice.py"):
+        _mstc_path = os.path.join(HERE, _mst_extra)
+        with open(_mstc_path, encoding="utf-8") as _mf:
+            exec(compile(_mf.read(), _mstc_path, "exec"))
     _finalize_mastery(MASTERY, CONCEPTS)
-    _check_mastery(MASTERY, CONCEPTS, {p["slug"] for p in out})
+    _check_mastery(MASTERY, CONCEPTS, {p["slug"]: p for p in out})
     MASTERY_OUT = os.path.join(HERE, "..", "src-tauri", "seeds", "mastery.json")
     with open(MASTERY_OUT, "w", encoding="utf-8", newline="\n") as f:
         json.dump(MASTERY, f, indent=2, ensure_ascii=False)

@@ -148,6 +148,40 @@ export function unlockedWeeks(
 }
 
 // ---------------------------------------------------------------------------
+// Resume point — what the Today page shows for a track in progress.
+// ---------------------------------------------------------------------------
+
+export interface MasteryResume {
+  /** The first week without a completion stamp (the last week once finished). */
+  week: MasteryWeek;
+  completed: number;
+  total: number;
+  finished: boolean;
+}
+
+/** Where a learner is in a track, from the completion stamps the backend writes
+ * (`mastery_complete_week`). Cheap on purpose — Today shouldn't need the whole
+ * problem bank to say "you're on week 7". Returns null for a track that hasn't
+ * been touched: no progress rows and no start date. */
+export function masteryResume(
+  track: MasteryTrack,
+  rows: MasteryProgress[],
+  startedAt: string | undefined
+): MasteryResume | null {
+  if (track.weeks.length === 0) return null;
+  const mine = rows.filter((r) => r.track_key === track.key);
+  if (mine.length === 0 && !startedAt) return null;
+  const done = new Set(mine.filter((r) => r.completed_at).map((r) => r.week));
+  const next = track.weeks.find((w) => !done.has(w.week));
+  return {
+    week: next ?? track.weeks[track.weeks.length - 1],
+    completed: track.weeks.filter((w) => done.has(w.week)).length,
+    total: track.weeks.length,
+    finished: next === undefined,
+  };
+}
+
+// ---------------------------------------------------------------------------
 // Pacing — "6 months" only means something against a start date.
 // ---------------------------------------------------------------------------
 

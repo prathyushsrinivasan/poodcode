@@ -48,6 +48,11 @@ def _w(week, phase, title, goal, concepts, problems, project, quiz):
         "quiz_sample": 4,
         "exam": None,
         "contest": None,
+        # Authored review cards, seeded into the flashcard deck when the week
+        # is completed. Filled per track after the tables (mastery_ts_cards.py).
+        "flashcards": [],
+        # Optional graded practice (mastery_ts_practice.py); never gates.
+        "practice": [],
     }
 
 
@@ -497,10 +502,10 @@ TS_WEEKS = [
         "No new concepts. Re-solve, re-read and prove the first three months stuck.",
         [],
         [("longest-unique-substring", "Sliding window over a string — Weeks 4, 7, 9."),
-         ("group-anagrams-count", "Canonical keys and a Map — Week 9."),
+         ("group-anagrams-count", "Review — canonical keys and a Map, first met in Week 9."),
          ("merge-two-sorted-lists", "Careful pointer work and narrowing — Weeks 11, 12."),
          ("subarray-sum-k", "Prefix sums in a Map — Weeks 7, 9."),
-         ("valid-anagram", "Fast recap of the string toolkit — Week 4.")],
+         ("valid-anagram", "Review — a fast recap of the string toolkit, first met in Week 11.")],
         "Re-implement your Week 8 config reader from scratch without looking at it. Then diff the two and write down every difference you can justify.",
         [("`const nums = [3, 1, 2]; const sorted = nums.sort();` — what is `nums` afterwards?",
           ["[1, 2, 3] — sort mutates, and sorted is the same array",
@@ -746,8 +751,8 @@ TS_WEEKS = [
         "Conditional Types & infer",
         "Branch on types and pattern-match their structure.",
         ["ts_conditional_types"],
-        [("subarray-sum-k", "A hashing problem worth revisiting with better types."),
-         ("longest-unique-substring", "Sliding window, cleanly typed.")],
+        [("nested-list-depth-sum", "Nested data is the runtime shape a recursive `Unwrap<T>` describes — peel one layer per level."),
+         ("decode-string", "`k[...]` nests arbitrarily deep: unwrap the inner layer before the outer one, as `infer` does.")],
         "Write a `types.ts` implementing `ReturnType`, `Parameters`, `Awaited` and `Exclude` yourself, with a comment on each explaining where `infer` binds.",
         [("What does `infer` do?",
           ["Binds a fresh type variable to whatever matched at that position",
@@ -1295,13 +1300,13 @@ const lines = input.split("\\n");
 const n = Number(lines[0]);
 const table = new Map<string, string>();
 for (let i = 1; i <= n; i++) {
-  const parts = lines[i].trim().split(/\\s+/);
+  const parts = (lines[i] ?? "").trim().split(/\\s+/);
   const key: string | undefined = parts[0];
   const value: string | undefined = parts[1];
   if (key !== undefined && value !== undefined) table.set(key, value);
 }
 let missed = 0;
-for (const query of lines[n + 1].trim().split(/\\s+/)) {
+for (const query of (lines[n + 1] ?? "").trim().split(/\\s+/)) {
   const found = table.get(query);
   if (found === undefined) missed++;
   console.log(query + "=" + (found ?? "(missing)"));
@@ -1326,15 +1331,15 @@ const routes = {
 } satisfies Record<string, string>;
 type RouteName = keyof typeof routes;
 for (let i = 1; i <= n; i++) {
-  const name = lines[i].trim();
-  console.log(name in routes ? routes[name as RouteName] : "404");
+  const name = (lines[i] ?? "").trim();
+  console.log(Object.hasOwn(routes, name) ? routes[name as RouteName] : "404");
 }
 console.log(Object.keys(routes).length);
 ''',
         [("3\nhome\ndocs\nnope", "/\n/docs\n404\n3"),
          ("1\nabout", "/about\n3"),
          ("2\nx\ny", "404\n404\n3")],
-        hint="`satisfies` keeps the keys literal, so `keyof typeof routes` is the three names rather than plain string."),
+        hint="`satisfies` keeps the keys literal, so `keyof typeof routes` is the three names rather than plain string. Test membership with `Object.hasOwn` — `name in routes` is also true for `toString`, which every object inherits."),
 
     16: _ts_exam(
         "Branded money",
@@ -1353,7 +1358,7 @@ function toDollars(c: Cents): Dollars {
 }
 let total = 0;
 for (let i = 1; i <= n; i++) {
-  const cents = toCents(Number(lines[i].trim()));
+  const cents = toCents(Number((lines[i] ?? "").trim()));
   if (cents === null) {
     console.log("invalid");
     continue;
@@ -1378,7 +1383,7 @@ const n = Number(lines[0]);
 type Interval = { start: number; end: number };
 const intervals: Interval[] = [];
 for (let i = 1; i <= n; i++) {
-  const [start, end] = lines[i].trim().split(/\\s+/).map(Number);
+  const [start = 0, end = 0] = (lines[i] ?? "").trim().split(/\\s+/).map(Number);
   intervals.push({ start, end });
 }
 intervals.sort((a, b) => a.start - b.start);
@@ -1424,7 +1429,7 @@ function sortBy<T>(items: T[], score: (item: T) => number): T[] {
 }
 const rows: Row[] = [];
 for (let i = 1; i <= n; i++) {
-  const [category, value] = lines[i].trim().split(/\\s+/);
+  const [category = "", value = "0"] = (lines[i] ?? "").trim().split(/\\s+/);
   rows.push({ category, value: Number(value) });
 }
 const groups = groupBy(rows, "category");
@@ -1452,8 +1457,8 @@ function read<K extends Setting>(key: K): Profile[K] {
   return defaults[key];
 }
 for (let i = 1; i <= n; i++) {
-  const name = lines[i].trim();
-  console.log(name in defaults ? String(read(name as Setting)) : "unknown");
+  const name = (lines[i] ?? "").trim();
+  console.log(Object.hasOwn(defaults, name) ? String(read(name as Setting)) : "unknown");
 }
 const booleans = (Object.keys(defaults) as Setting[])
   .filter((k) => typeof defaults[k] === "boolean")
@@ -1463,7 +1468,7 @@ console.log(booleans.join(" "));
         [("3\ntheme\nsize\nnope", "dark\n14\nunknown\nwrap"),
          ("1\nwrap", "true\nwrap"),
          ("2\nsize\ntheme", "14\ndark\nwrap")],
-        hint="One object drives the values, the key union and the getter's return type — adding a setting should need exactly one edit."),
+        hint="One object drives the values, the key union and the getter's return type — adding a setting should need exactly one edit. Check a runtime name with `Object.hasOwn`, not `in`, or inherited keys like `toString` slip through."),
 
     20: _ts_exam(
         "Build what the mapped type describes",
@@ -1474,7 +1479,7 @@ const source = { name: input, size: 5 };
 function makeGetters<T extends object>(obj: T): Getters<T> {
   const out: { [k: string]: () => unknown } = {};
   for (const key of Object.keys(obj)) {
-    out["get" + key[0].toUpperCase() + key.slice(1)] = () =>
+    out["get" + key.charAt(0).toUpperCase() + key.slice(1)] = () =>
       (obj as { [k: string]: unknown })[key];
   }
   return out as Getters<T>;
@@ -1528,7 +1533,7 @@ for (const entity of entities) {
 }
 const known = new Set<string>(catalogue);
 for (let i = 1; i <= n; i++) {
-  console.log(known.has(lines[i].trim()) ? "ok" : "bad");
+  console.log(known.has((lines[i] ?? "").trim()) ? "ok" : "bad");
 }
 console.log(catalogue.length);
 console.log(catalogue.filter((e) => e.startsWith("user:")).sort().join(" "));
@@ -1560,7 +1565,7 @@ class BankAccount {
 }
 const account = new BankAccount();
 for (let i = 1; i <= n; i++) {
-  const [op, amountRaw] = lines[i].trim().split(/\\s+/);
+  const [op, amountRaw] = (lines[i] ?? "").trim().split(/\\s+/);
   const amount = Number(amountRaw);
   if (op === "deposit") {
     account.deposit(amount);
@@ -1580,7 +1585,7 @@ console.log(account.balance);
         "Lazy pipeline over an infinite source",
         "Write generators `naturals`, `filter`, `map` and `take`. The input is `count divisor`. Take the first `count` naturals divisible by `divisor`, square them, and print them space-separated (or `(none)`), then their sum. Nothing infinite may be materialised.",
         '''
-const [count, divisor] = input.split(/\\s+/).map(Number);
+const [count = 0, divisor = 1] = input.split(/\\s+/).map(Number);
 function* naturals(): Generator<number> {
   let i = 1;
   while (true) yield i++;
@@ -1674,7 +1679,7 @@ class Store<T> {
 }
 const store = new Store<string>();
 for (let i = 1; i <= n; i++) {
-  const line = lines[i].trim();
+  const line = (lines[i] ?? "").trim();
   const [idRaw, value] = line.split(/\\s+/);
   const parsed = parseId(idRaw ?? "");
   if (parsed.ok && value !== undefined) {
@@ -1865,11 +1870,227 @@ TS_QUIZ_EXTRA = {
 }
 
 TS_CONTESTS = {
+    4: ("Checkpoint — Month 1: language foundations", 60 * 60),
+    8: ("Checkpoint — Month 2: functions & data", 75 * 60),
     13: ("Mastery checkpoint — Months 1–3", 90 * 60),
+    17: ("Checkpoint — Month 4: rigor", 90 * 60),
+    22: ("Checkpoint — Month 5: generics & type-level", 90 * 60),
     26: ("Mastery finale — the whole programme", 120 * 60),
 }
 
+# The monthly checkpoints draw on the whole month, not just their own week — a
+# timed set that mixes weeks is what shows whether the month has stuck. Weeks
+# 13 and 26 keep drawing on their own (already cross-month) curated problems.
+TS_CONTEST_SLUGS = {
+    4: ["leap-year", "is-prime", "count-words", "caesar-cipher"],
+    8: ["fizzbuzz-value", "sort-by-frequency", "second-largest", "run-length-encode"],
+    17: ["missing-number", "product-except-self", "longest-common-prefix-strs", "merge-intervals"],
+    22: ["kth-largest-element", "time-based-kv", "top-k-frequent", "implement-trie-ops"],
+}
+
+# ---------------------------------------------------------------------------
+# More tests for the TypeScript finals. The originals had 2-5 each, which is
+# too few to gate a week on: a final with two tests can be passed by special-
+# casing them. These bring every final to at least 8, and aim at the edges the
+# originals skipped — empty and single-item input, duplicates, boundaries,
+# unsorted input, and (weeks 15 and 19) inherited keys like `toString`, which
+# `name in obj` wrongly accepts.
+#
+# Every expected output here was produced by running the week's reference
+# solution, not typed by hand, and tests/verify_mastery.rs re-proves all of
+# them against the real judge.
+# ---------------------------------------------------------------------------
+
+TS_EXAM_MORE_TESTS = {
+    1: [
+        ('0', '0=32\n1'),
+        ('-10 -20', '-10=14\n-20=-4\n2'),
+        ('1000', '1000=1832\n1'),
+        ('5 15 25 35', '5=41\n15=59\n25=77\n35=95\n4'),
+    ],
+    2: [
+        ('13 no', '20\nguest'),
+        ('64 yes', '15\nmember'),
+        ('0 yes', '5\nmember'),
+        ('100 no', '15\nguest'),
+    ],
+    3: [
+        ('2', '3\n2\ntrue\n1'),
+        ('10', '55\n4\nfalse\n2'),
+        ('36', '666\n9\nfalse\n2'),
+        ('1000', '500500\n16\nfalse\n4'),
+    ],
+    4: [
+        ('x', 'X\nX\n1'),
+        ('hello world again', 'Hello World Again\nHWA\n5'),
+        ('zebra apple', 'Zebra Apple\nZA\n5'),
+        ('i am here now', 'I Am Here Now\nIAHN\n4'),
+    ],
+    5: [
+        ('abcdefgh 8 -', 'abcdefgh\nabcdefgh'),
+        ('a 1 none', 'a\n.......a'),
+        ('toolongvalue 20 #', '########toolongvalue\ntoolongvalue'),
+        ('q 2 0', '0q\n.......q'),
+    ],
+    6: [
+        ('x  y', 'X Y\n2'),
+        ('a b c d e', 'A B C D E\n5'),
+        ('UPPER lower', 'UPPER LOWER\n2'),
+        ('one', 'ONE\n1'),
+    ],
+    7: [
+        ('10 -10', '0\n10\n1\n10 -10'),
+        ('0 0 0 1', '1\n1\n1\n1 0 0 0'),
+        ('5 1 4 2 3', '15\n5\n2\n5 4 3 2 1'),
+        ('-5 -1 -3', '-9\n-1\n1\n-1 -3 -5'),
+    ],
+    8: [
+        ('2\n{"name":"a"}\n{"name":"a"}', 'a:'),
+        ('3\n{"name":"m","tags":["b","a"]}\n{"name":"k","tags":[]}\n{"name":"m","tags":["c"]}', 'k:\nm: a,b,c'),
+        ('1\n{"name":"only"}', 'only:'),
+        ('4\n{"name":"b","tags":["z"]}\n{"name":"a","tags":["y"]}\n{"name":"c"}\n{"name":"a","tags":["x","y"]}', 'a: x,y\nb: z\nc:'),
+        ('2\n{"name":"dup","tags":["t","t","s"]}\n{"name":"dup","tags":["s"]}', 'dup: s,t'),
+    ],
+    9: [
+        ('1\nd1 a a a\na', 'a: d1'),
+        ('3\nx one\ny two\nz one two\none two three', 'one: x z\ntwo: y z\nthree: -'),
+        ('2\ndocA w\ndocB v\nv w', 'v: docB\nw: docA'),
+        ('1\nd hello\nbye hello', 'bye: -\nhello: d'),
+        ('2\nd2 k\nd1 k\nk', 'k: d2 d1'),
+    ],
+    10: [
+        ('green 3', 'amber\nred\ngreen'),
+        ('amber 1', 'red'),
+        ('red 6', 'green\namber\nred\ngreen\namber\nred'),
+        ('green 0', ''),
+    ],
+    11: [
+        ('1\n{"id":"abcd","score":100}', 'ok abcd\n100'),
+        ('2\n{"id":"abc","score":-1}\n{"id":"abc","score":"50"}', 'bad\nbad\n0'),
+        ('2\nnull\n[1,2]', 'bad\nbad\n0'),
+        ('3\n{"id":"aaa","score":1}\n{"id":"bbb","score":2}\n{"score":3}', 'ok aaa\nok bbb\nbad\n1'),
+        ('1\n"text"', 'bad\n0'),
+    ],
+    12: [
+        ('1\npop', '(empty)\n0'),
+        ('3\npush 7\ndup\nmul', '49\n1'),
+        ('2\npush -3\npush 4', '-3 4\n2'),
+        ('6\npush 2\ndup\ndup\nmul\nmul\npush 1', '8 1\n2'),
+    ],
+    13: [
+        ('b a', 'a=1\nb=1\n2'),
+        ('the cat the dog the cat', 'the=3\ncat=2\ndog=1\n3'),
+        ('q q q q', 'q=4\n1'),
+        ('c b a c b a d', 'a=2\nb=2\nc=2\n4'),
+    ],
+    14: [
+        ('0\na', 'a=(missing)\n1'),
+        ('3\nx 1\ny 2\nx 3\nx y', 'x=3\ny=2\n0'),
+        ('2\na 1\nb\na b', 'a=1\nb=(missing)\n1'),
+        ('1\nkey value\nkey key', 'key=value\nkey=value\n0'),
+        ('2\np q\nr s\nr p z', 'r=s\np=q\nz=(missing)\n1'),
+    ],
+    15: [
+        ('3\nhome\nabout\ndocs', '/\n/about\n/docs\n3'),
+        ('1\nHOME', '404\n3'),
+        ('2\ndocs\ndocs', '/docs\n/docs\n3'),
+        ('1\ntoString', '404\n3'),
+        ('0', '3'),
+    ],
+    16: [
+        ('1\n-1', 'invalid\n0'),
+        ('2\n12.5\n10', 'invalid\n10\n0.1'),
+        ('3\n1\n2\n3', '1\n3\n6\n0.06'),
+        ('1\n99999', '99999\n999.99'),
+    ],
+    17: [
+        ('3\n8 10\n1 3\n2 6', '1 6\n8 10\n1'),
+        ('2\n1 2\n3 4', '1 2\n3 4\n0'),
+        ('3\n1 5\n1 5\n1 5', '1 5\n2'),
+        ('4\n5 6\n1 2\n2 3\n6 7', '1 3\n5 7\n2'),
+    ],
+    18: [
+        ('2\nb 10\nb 9', 'b: 9 10\n1'),
+        ('3\nc 1\na 1\nb 1', 'a: 1\nb: 1\nc: 1\n3'),
+        ('4\nx -1\nx 5\nx -1\ny 0', 'x: -1 5\ny: 0\n2'),
+        ('1\ncat 100', 'cat: 100\n1'),
+        ('5\nm 3\nm 1\nm 2\nm 3\nm 1', 'm: 1 2 3\n1'),
+    ],
+    19: [
+        ('3\nwrap\nsize\ntheme', 'true\n14\ndark\nwrap'),
+        ('1\ntoString', 'unknown\nwrap'),
+        ('2\nTheme\nsize', 'unknown\n14\nwrap'),
+        ('1\nconstructor', 'unknown\nwrap'),
+        ('0', 'wrap'),
+    ],
+    20: [
+        ('x', 'x\n5\ngetName,getSize'),
+        ('Grace', 'Grace\n5\ngetName,getSize'),
+        ('longer-name', 'longer-name\n5\ngetName,getSize'),
+        ('Z', 'Z\n5\ngetName,getSize'),
+        ('123', '123\n5\ngetName,getSize'),
+        ('two words', 'two words\n5\ngetName,getSize'),
+    ],
+    21: [
+        ('-', '(none)\n(none)\n1'),
+        ('a', 'a\na\n0'),
+        ('- - x', 'x\nx\n2'),
+        ('p q r -', 'p\np q r\n1'),
+    ],
+    22: [
+        ('3\norder:created\norder:updated\nuser:deleted', 'ok\nok\nok\n6\nuser:created user:deleted user:updated'),
+        ('2\nUser:created\nuser:Created', 'bad\nbad\n6\nuser:created user:deleted user:updated'),
+        ('1\nuser:', 'bad\n6\nuser:created user:deleted user:updated'),
+        ('2\norder:deleted\norder:deleted', 'ok\nok\n6\nuser:created user:deleted user:updated'),
+        ('0', '6\nuser:created user:deleted user:updated'),
+    ],
+    23: [
+        ('2\nwithdraw 0\ndeposit 0', 'refused\n0\n0'),
+        ('3\ndeposit 50\nwithdraw 50\nwithdraw 1', '50\n0\nrefused\n0'),
+        ('2\ndeposit -5\nwithdraw 1', '0\nrefused\n0'),
+        ('4\ndeposit 10\nwithdraw 3\nwithdraw 3\nwithdraw 3', '10\n7\n4\n1\n1'),
+        ('1\ndeposit 1000000', '1000000\n1000000'),
+    ],
+    24: [
+        ('5 1', '1 4 9 16 25\n55'),
+        ('4 7', '49 196 441 784\n1470'),
+        ('1 100', '10000\n10000'),
+        ('3 3', '9 36 81\n126'),
+    ],
+    25: [
+        ('5 1 3', '5=50\n1=10\n3=30\n3 90'),
+        ('-5', '-5=failed\n0 0'),
+        ('0', '0=0\n1 0'),
+        ('2 -3 4 -1', '2=20\n-3=failed\n4=40\n-1=failed\n2 60'),
+    ],
+    26: [
+        ('1\nr-10', 'rejected r-10\n(empty)\n0'),
+        ('3\nr-1 a\nr-2 b\nr-3 c', 'added r-1\nadded r-2\nadded r-3\nr-1 r-2 r-3\n3'),
+        ('2\nR-1 x\nr-x y', 'rejected R-1 x\nrejected r-x y\n(empty)\n0'),
+        ('3\nr-2 b\nr-1 a\nr-2 c', 'added r-2\nadded r-1\nadded r-2\nr-2 r-1\n2'),
+    ],
+}
+
+for _wk, _pairs in TS_EXAM_MORE_TESTS.items():
+    TS_EXAMS[_wk]["tests"].extend({"input": i, "output": o} for (i, o) in _pairs)
+
+# The strictness ladder. Week 14 teaches `noUncheckedIndexedAccess`, and its own
+# final is "treat every index and map access as possibly missing" — which used
+# to be graded at plain `strict`, where `lines[i]` is a `string` and nothing
+# needs treating. From week 14 on, every final is checked the way the week
+# teaches: an index read is `T | undefined` until you handle it.
+TS_INDEXED_FROM_WEEK = 14
+for _wk, _exam in TS_EXAMS.items():
+    _exam["strictness"] = "strict+indexed" if _wk >= TS_INDEXED_FROM_WEEK else ""
+TS_EXAMS[TS_INDEXED_FROM_WEEK]["prompt"] += (
+    " This final — and every one after it — is checked with `noUncheckedIndexedAccess` on,"
+    " so `lines[i]` is `string | undefined` until you deal with the missing case."
+)
+
 _attach(TS_WEEKS, TS_EXAMS, extra_quiz=TS_QUIZ_EXTRA, contests=TS_CONTESTS, sample=4)
+for _tsw in TS_WEEKS:
+    if _tsw["contest"] is not None:
+        _tsw["contest"]["slugs"] = list(TS_CONTEST_SLUGS.get(_tsw["week"], []))
 
 
 
@@ -3795,8 +4016,25 @@ MASTERY = [
 # Invariants — a broken curriculum is worse than no curriculum, so fail the
 # build rather than shipping dangling references.
 # ---------------------------------------------------------------------------
-def _check_mastery(tracks, concepts, problem_slugs):
+# Stricter rules, per track. They start with TypeScript, which was brought up to
+# them first (TS_MASTERY_ROADMAP.md, batch A); the Java track still has finals
+# with 3 tests and repeats slots outside its checkpoint week, so it joins once
+# it has been brought up too.
+#   min_exam_tests           — a final is a gate; 2-3 tests can be special-cased.
+#   starter_required         — every curated problem opens in the track's language.
+#   repeats_need_review_note — a slug may reappear only as a labelled review.
+#   min_quiz_bank            — distinct questions per week, so retakes differ.
+_TRACK_RULES = {
+    "typescript": {"min_exam_tests": 8, "starter_required": True,
+                   "repeats_need_review_note": True, "min_quiz_bank": 16},
+}
+
+
+def _check_mastery(tracks, concepts, problems):
+    """`problems` maps slug -> the generated problem (for its starter languages)."""
     for track in tracks:
+        rules = _TRACK_RULES.get(track["key"], {})
+        first_seen = {}
         lang = track["language"]
         in_language = {k for k, c in concepts.items() if c.get("language", "java") == lang}
         scheduled = []
@@ -3809,9 +4047,20 @@ def _check_mastery(tracks, concepts, problem_slugs):
                 assert key in in_language, f"week {week['week']}: {key!r} is not a {lang} concept"
                 scheduled.append(key)
             for ref in week["problems"]:
-                assert ref["slug"] in problem_slugs, \
+                assert ref["slug"] in problems, \
                     f"week {week['week']}: unknown problem slug {ref['slug']!r}"
+                if rules.get("starter_required"):
+                    assert track["exam_language"] in problems[ref["slug"]]["starter_code"], \
+                        f"week {week['week']}: {ref['slug']!r} has no {track['exam_language']} starter"
+                if ref["slug"] in first_seen and rules.get("repeats_need_review_note"):
+                    assert ref["note"].startswith("Review"), \
+                        f"week {week['week']}: {ref['slug']!r} was already curated in week " \
+                        f"{first_seen[ref['slug']]} — pick another problem, or label it a review"
+                first_seen.setdefault(ref["slug"], week["week"])
             assert week["quiz"], f"week {week['week']}: no end-of-week quiz"
+            assert len(week["quiz"]) >= rules.get("min_quiz_bank", 1), \
+                f"week {week['week']}: quiz bank has {len(week['quiz'])} questions; " \
+                f"this track needs at least {rules['min_quiz_bank']}"
             for q in week["quiz"]:
                 assert 0 <= q["answer"] < len(q["options"]), \
                     f"week {week['week']}: answer index out of range for {q['question']!r}"
@@ -3827,6 +4076,12 @@ def _check_mastery(tracks, concepts, problem_slugs):
             assert exam["starter"] != exam["solution"], \
                 f"week {week['week']}: exam starter equals its solution"
             assert exam["tests"], f"week {week['week']}: exam has no tests"
+            assert len(exam["tests"]) >= rules.get("min_exam_tests", 1), \
+                f"week {week['week']}: the final has {len(exam['tests'])} tests; " \
+                f"this track needs at least {rules['min_exam_tests']}"
+            inputs = [t["input"] for t in exam["tests"]]
+            assert len(set(inputs)) == len(inputs), \
+                f"week {week['week']}: the final repeats a test input"
             assert exam["language"] == track["exam_language"], \
                 f"week {week['week']}: exam language does not match the track"
 
@@ -3835,6 +4090,12 @@ def _check_mastery(tracks, concepts, problem_slugs):
                     f"week {week['week']}: a checkpoint contest needs problems to draw from"
                 assert week["contest"]["duration_seconds"] > 0, \
                     f"week {week['week']}: contest needs a positive duration"
+                for slug in week["contest"].get("slugs", []):
+                    assert slug in problems, \
+                        f"week {week['week']}: checkpoint slug {slug!r} is not a problem"
+                    if rules.get("starter_required"):
+                        assert track["exam_language"] in problems[slug]["starter_code"], \
+                            f"week {week['week']}: checkpoint slug {slug!r} has no {track['exam_language']} starter"
 
         assert sorted(seen_weeks) == list(range(1, len(track["weeks"]) + 1)), \
             f"{track['key']}: weeks must be numbered 1..N with no gaps"

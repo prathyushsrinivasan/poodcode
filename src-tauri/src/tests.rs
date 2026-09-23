@@ -213,6 +213,37 @@ fn exercise_progress_round_trips_and_is_idempotent() {
     assert_eq!(repo::solved_exercises(&c).unwrap(), vec!["todo_m4_s1_e2"]);
 }
 
+#[test]
+fn completed_mastery_weeks_get_their_review_cards_once() {
+    let c = conn();
+    let cards_from = |c: &rusqlite::Connection, source: &str| -> Vec<String> {
+        repo::list_flashcards(c)
+            .unwrap()
+            .into_iter()
+            .filter(|f| f.source == source)
+            .map(|f| f.front)
+            .collect()
+    };
+
+    // An unfinished week gets nothing.
+    repo::mastery_record_quiz(&c, "typescript", 1, 100).unwrap();
+    crate::commands::backfill_mastery_cards(&c).unwrap();
+    assert!(cards_from(&c, "mastery:typescript:w1").is_empty());
+
+    // A completed week gets its chapter cards plus every authored card —
+    // including weeks completed before cards were authored, which is what the
+    // launch-time backfill is for.
+    repo::mastery_mark_complete(&c, "typescript", 1).unwrap();
+    crate::commands::backfill_mastery_cards(&c).unwrap();
+    let first = cards_from(&c, "mastery:typescript:w1");
+    assert!(first.len() >= 12 + 3, "expected chapter + authored cards, got {}", first.len());
+    assert!(first.iter().any(|f| f.contains("const x = 5")), "authored card missing: {first:?}");
+
+    // Idempotent: running it again at the next launch adds nothing.
+    crate::commands::backfill_mastery_cards(&c).unwrap();
+    assert_eq!(cards_from(&c, "mastery:typescript:w1").len(), first.len());
+}
+
 fn week_row(c: &rusqlite::Connection, track: &str, week: i64) -> MasteryProgress {
     repo::mastery_progress(c)
         .unwrap()

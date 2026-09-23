@@ -1,6 +1,7 @@
 import React from "react";
 import type { Exercise } from "../types";
 import { ExerciseCard } from "./LearnExercise";
+import { inlineCode } from "./common";
 import { groupByKind, type KindSection } from "../lib/exerciseKinds";
 
 /** Every exercise, grouped into its sections and rendered in teaching order.
@@ -29,7 +30,7 @@ export function ExerciseSections({
             <h4>{heading}</h4>
             {blurb && (
               <p className="dim" style={{ marginTop: -4 }}>
-                {blurb}
+                {inlineCode(blurb)}
               </p>
             )}
             {group.map((ex, i) => (

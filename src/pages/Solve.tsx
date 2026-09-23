@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { api } from "../api";
 import { useCrumb, useStore } from "../store";
 import { starterFor } from "../lib/templates";
@@ -81,9 +81,17 @@ const TAB_LABEL: Record<LeftTab, string> = {
   reflect: "Reflect",
 };
 
+/** The language last picked on any problem this session. Each problem gets a
+ * fresh Solve (see SolveRoute in App.tsx), so without this, moving to the next
+ * problem would drop a learner working in TypeScript back to their default. */
+let sessionLanguage: string | null = null;
+
 export default function Solve({ onProgress }: { onProgress?: () => void }) {
   const { id } = useParams();
   const pid = Number(id);
+  // Opened from a checkpoint contest's scoreboard: submissions also score there.
+  const [search] = useSearchParams();
+  const contestId = Number(search.get("contest")) || null;
   const nav = useNavigate();
   const toast = useToast();
   const languages = useStore((s) => s.languages);
@@ -101,7 +109,11 @@ export default function Solve({ onProgress }: { onProgress?: () => void }) {
   }, []);
   const tab = layout.tab;
   const setTab = useCallback((t: LeftTab) => setLayout({ tab: t }), [setLayout]);
-  const [langId, setLangId] = useState(prefs.defaultLanguage);
+  const [langId, setLangIdState] = useState(() => sessionLanguage ?? prefs.defaultLanguage);
+  const setLangId = useCallback((l: string) => {
+    sessionLanguage = l;
+    setLangIdState(l);
+  }, []);
   const [codeByLang, setCodeByLang] = useState<Record<string, string>>({});
   const [split, setSplit] = useState(false);
   const [splitLangId, setSplitLangId] = useState(prefs.defaultLanguage);
@@ -123,6 +135,8 @@ export default function Solve({ onProgress }: { onProgress?: () => void }) {
   const [counts, setCounts] = useState({ attempts: 0, solutions: 0, mistakes: 0, notes: 0 });
   const leftEditor = useRef<CodeEditorHandle>(null);
   const draftTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
+  /** Drafts typed but not yet saved (the 500 ms debounce), by language. */
+  const pendingDrafts = useRef<Record<string, string>>({});
 
   // Timer for time-on-problem (wall-clock based so it stays accurate even when
   // the window is backgrounded / interval-throttled).
@@ -268,7 +282,9 @@ export default function Solve({ onProgress }: { onProgress?: () => void }) {
     (lang: string, v: string) => {
       const timers = draftTimers.current;
       if (timers[lang]) clearTimeout(timers[lang]);
+      pendingDrafts.current[lang] = v;
       timers[lang] = setTimeout(() => {
+        delete pendingDrafts.current[lang];
         // Was `.catch(() => {})`: a draft that failed to save looked exactly
         // like one that saved (UI_ROADMAP E2/E4).
         void draftSave.track(() => api.saveDraft(pid, lang, v));
@@ -287,11 +303,17 @@ export default function Solve({ onProgress }: { onProgress?: () => void }) {
 
   const setCode = useCallback((v: string) => writeCode(langId, v), [writeCode, langId]);
 
-  // Flush any pending draft writes when leaving the problem.
+  // Flush any pending draft writes when leaving the problem. This used to only
+  // cancel them, so the last half-second of typing before "Next" was lost.
   useEffect(() => {
     const timers = draftTimers.current;
+    const pending = pendingDrafts.current;
     return () => {
       for (const t of Object.values(timers)) clearTimeout(t);
+      for (const [lang, v] of Object.entries(pending)) {
+        api.saveDraft(pid, lang, v).catch(() => {});
+        delete pending[lang];
+      }
     };
   }, [pid]);
 
@@ -372,6 +394,11 @@ export default function Solve({ onProgress }: { onProgress?: () => void }) {
     try {
       const rep = await api.submit(problem.id, langInfo.id, code, delta);
       setReport(rep);
+      if (contestId && rep.status !== "not_installed") {
+        // Best-effort: a scoreboard that misses one update is not worth an error
+        // toast on top of the verdict the learner is reading.
+        api.recordContestResult(contestId, problem.id, rep.status === "accepted").catch(() => {});
+      }
       if (rep.status === "accepted") {
         toast("✅ Accepted! Added to revision schedule.");
         const fresh = await api.getProblem(problem.id);
@@ -390,7 +417,7 @@ export default function Solve({ onProgress }: { onProgress?: () => void }) {
     } finally {
       setRunning(false);
     }
-  }, [langInfo, running, problem, elapsed, code, toast, onProgress, loadCounts]);
+  }, [langInfo, running, problem, elapsed, code, toast, onProgress, loadCounts, contestId]);
 
   const revealHint = () => {
     const n = revealed + 1;
@@ -492,6 +519,7 @@ export default function Solve({ onProgress }: { onProgress?: () => void }) {
               onReveal={revealHint}
               confidence={problem.confidence}
               onConfidence={setConfidence}
+              contestId={contestId}
             />
           )}
           {tab === "prerequisites" && (
@@ -743,12 +771,15 @@ function DescriptionTab({
   onReveal,
   confidence,
   onConfidence,
+  contestId,
 }: {
   problem: Problem;
   revealed: number;
   onReveal: () => void;
   confidence: number;
   onConfidence: (v: number) => void;
+  /** Set when the problem was opened from a checkpoint's scoreboard. */
+  contestId: number | null;
 }) {
   return (
     <div>
@@ -777,13 +808,21 @@ function DescriptionTab({
         ))}
       </div>
 
+      {contestId && (
+        <div className="card contest-banner">
+          ⏱ <strong>Checkpoint in progress.</strong>{" "}
+          <span className="dim">Submitting here scores on the checkpoint.</span>{" "}
+          <Link to={`/contest/${contestId}`}>Back to the scoreboard →</Link>
+        </div>
+      )}
+
       {problem.function_spec && (
         <div className="card" style={{ marginBottom: 12, borderColor: "var(--accent)" }}>
           <strong>ƒ Function mode.</strong>{" "}
           <span className="dim">
             Implement <span className="mono">{problem.function_spec.name}(
             {problem.function_spec.params.map((p) => `${p.name}: ${p.type}`).join(", ")}) → {problem.function_spec.returns}</span>
-            . The app parses input and reads your return value — no I/O boilerplate. Available in Python and Java.
+            . The app parses input and reads your return value — no I/O boilerplate. Available in Python, Java, TypeScript and JavaScript.
           </span>
         </div>
       )}

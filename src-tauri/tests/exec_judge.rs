@@ -193,6 +193,98 @@ fn java_harness_handles_array_return() {
     assert_eq!(rep.status, "accepted", "report: {rep:?}");
 }
 
+// ---------------------------------------------------------------------------
+// Function harness in TypeScript and JavaScript. Between them these cover every
+// argument type the problem bank uses (int, int[], string, string[]) and every
+// return type (int, long, bool, string, int[], string[]).
+// ---------------------------------------------------------------------------
+
+fn spec(params: &[(&str, &str)], returns: &str) -> FunctionSpec {
+    FunctionSpec {
+        name: "solve".into(),
+        params: params.iter().map(|(n, t)| Param { name: (*n).into(), ty: (*t).into() }).collect(),
+        returns: returns.into(),
+    }
+}
+
+fn harness_cfg(spec: FunctionSpec) -> JudgeConfig {
+    JudgeConfig { function_spec: Some(spec), ..JudgeConfig::exact(T) }
+}
+
+fn assert_harness(language: &str, code: &str, spec: FunctionSpec, cases: &[TestCase]) {
+    let rep = judge_with(language, code, cases, &harness_cfg(spec));
+    if rep.status == "not_installed" {
+        return;
+    }
+    assert_eq!(rep.status, "accepted", "report: {rep:?}");
+}
+
+#[test]
+fn typescript_function_harness_int_array_and_int_to_int_array() {
+    let code = "function solve(nums: number[], target: number): number[] {\n  const pos = new Map<number, number>();\n  for (let i = 0; i < nums.length; i++) {\n    const x = nums[i];\n    const j = pos.get(target - x);\n    if (j !== undefined) return [j + 1, i + 1];\n    pos.set(x, i);\n  }\n  return [-1];\n}\n";
+    let s = spec(&[("nums", "int[]"), ("target", "int")], "int[]");
+    assert_harness("typescript", code, s, &[tc("2 7 11 15\n9\n", "1 2"), tc("3 2 4\n6\n", "2 3")]);
+}
+
+#[test]
+fn typescript_function_harness_string_to_bool() {
+    let code = "function solve(s: string): boolean {\n  return s === [...s].reverse().join(\"\");\n}\n";
+    let s = spec(&[("s", "string")], "bool");
+    // A string argument keeps its inner spaces: "a b a" is a palindrome.
+    assert_harness("typescript", code, s, &[tc("racecar\n", "true"), tc("ab\n", "false"), tc("a b a\n", "true")]);
+}
+
+#[test]
+fn typescript_function_harness_string_array_to_string_array_and_empty_line() {
+    let code = "function solve(words: string[]): string[] {\n  return words.filter((w) => w.length > 2).map((w) => w.toUpperCase());\n}\n";
+    let s = spec(&[("words", "string[]")], "string[]");
+    assert_harness("typescript", code, s, &[tc("hi there  you\n", "THERE YOU"), tc("\n", "")]);
+}
+
+#[test]
+fn typescript_function_harness_string_and_int_to_string_and_long() {
+    let repeat = "function solve(s: string, k: number): string {\n  return s.repeat(k);\n}\n";
+    assert_harness("typescript", repeat, spec(&[("s", "string"), ("k", "int")], "string"), &[tc("ab\n3\n", "ababab")]);
+    let square = "function solve(n: number): number {\n  return n * n;\n}\n";
+    assert_harness("typescript", square, spec(&[("n", "int")], "long"), &[tc("100000\n", "10000000000")]);
+}
+
+#[test]
+fn typescript_function_harness_tolerates_the_learners_own_fs_import() {
+    // The glue imports `fs` under a private alias, so this cannot collide.
+    let code = "import * as fs from \"fs\";\nfunction solve(nums: number[]): number {\n  return nums.reduce((a, b) => a + b, 0);\n}\n";
+    assert_harness("typescript", code, spec(&[("nums", "int[]")], "int"), &[tc("1 2 3\n", "6")]);
+}
+
+#[test]
+fn typescript_function_harness_rejects_a_mistyped_signature() {
+    // The glue passes a number[]; a solution declared over string[] must not
+    // type-check, exactly as a Java solution with the wrong signature won't compile.
+    let code = "function solve(nums: string[]): number {\n  return nums.length;\n}\n";
+    let rep = judge_with("typescript", code, &[tc("1 2 3\n", "3")], &harness_cfg(spec(&[("nums", "int[]")], "int")));
+    if rep.status == "not_installed" {
+        return;
+    }
+    assert_eq!(rep.status, "error", "report: {rep:?}");
+    assert!(rep.compile_error.contains("TS2345"), "report: {rep:?}");
+}
+
+#[test]
+fn typescript_function_harness_accepts_the_generated_stub_shape() {
+    // What stub_ts in tools/gen_seed.py emits — it must compile and run as-is.
+    let stub = "function solve(nums: number[], k: number): boolean {\n  // TODO: implement\n  return false;\n}\n";
+    let s = spec(&[("nums", "int[]"), ("k", "int")], "bool");
+    assert_harness("typescript", stub, s, &[tc("1 2\n3\n", "false")]);
+}
+
+#[test]
+fn javascript_function_harness_accepts_correct_solution() {
+    let code = "function solve(nums) {\n  let best = nums[0], cur = nums[0];\n  for (let i = 1; i < nums.length; i++) { cur = Math.max(nums[i], cur + nums[i]); best = Math.max(best, cur); }\n  return best;\n}\n";
+    assert_harness("javascript", code, spec(&[("nums", "int[]")], "int"), &[tc("-2 1 -3 4 -1 2 1 -5 4\n", "6"), tc("1\n", "1")]);
+    let flags = "function solve(s) {\n  return [...s].map((c) => c === 'a' ? 1 : 0);\n}\n";
+    assert_harness("javascript", flags, spec(&[("s", "string")], "int[]"), &[tc("abca\n", "1 0 0 1")]);
+}
+
 #[test]
 fn float_compare_mode_tolerates_small_error() {
     let code = "print(3.14159)\n";

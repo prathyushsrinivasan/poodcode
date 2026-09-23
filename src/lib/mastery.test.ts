@@ -3,6 +3,7 @@ import type { MasteryProgress, MasteryTrack, MasteryWeek } from "../types";
 import {
   drawExamPaper,
   formatStudyTime,
+  masteryResume,
   MS_PER_WEEK,
   pacing,
   progressByWeek,
@@ -262,5 +263,38 @@ describe("formatStudyTime", () => {
     expect(formatStudyTime(600)).toBe("10m");
     expect(formatStudyTime(3600)).toBe("1h 0m");
     expect(formatStudyTime(5400)).toBe("1h 30m");
+  });
+});
+
+describe("masteryResume", () => {
+  it("is null for a track never touched", () => {
+    expect(masteryResume(track, [], undefined)).toBeNull();
+  });
+
+  it("starts at week 1 once a start date is set", () => {
+    const r = masteryResume(track, [], "2026-09-01T00:00:00Z");
+    expect(r?.week.week).toBe(1);
+    expect(r?.completed).toBe(0);
+    expect(r?.finished).toBe(false);
+  });
+
+  it("resumes at the first week without a completion stamp", () => {
+    const rows = [row({ week: 1, completed_at: "x" }), row({ week: 2, best_quiz: 50 })];
+    const r = masteryResume(track, rows, undefined);
+    expect(r?.week.week).toBe(2);
+    expect(r?.completed).toBe(1);
+  });
+
+  it("ignores other tracks' rows", () => {
+    const other = { ...row({ week: 1, completed_at: "x" }), track_key: "java" };
+    expect(masteryResume(track, [other], undefined)).toBeNull();
+  });
+
+  it("reports a finished track on its last week", () => {
+    const rows = [1, 2, 3].map((n) => row({ week: n, completed_at: "x" }));
+    const r = masteryResume(track, rows, undefined);
+    expect(r?.finished).toBe(true);
+    expect(r?.week.week).toBe(3);
+    expect(r?.completed).toBe(3);
   });
 });

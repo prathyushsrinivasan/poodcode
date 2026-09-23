@@ -81,7 +81,7 @@ export function pairSeries(pairs: CountPair[], days: number): number[] {
 
 /* --------------------------------------------------------------- due now */
 
-export type DueSource = "curriculum" | "vocab" | "slow";
+export type DueSource = "curriculum" | "vocab" | "slow" | "flashcards";
 
 export interface DueGroup {
   source: DueSource;

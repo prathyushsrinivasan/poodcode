@@ -160,6 +160,7 @@ export default function Today() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [recs, setRecs] = useState<TopicRecommendation[]>([]);
   const [reviews, setReviews] = useState<Map<string, CardReview>>(new Map());
+  const [cardsDue, setCardsDue] = useState(0);
   const [reload, setReload] = useState(0);
   const nav = useNavigate();
 
@@ -183,6 +184,10 @@ export default function Today() {
       .cardReviews()
       .then((rs) => setReviews(new Map(rs.map((r) => [r.card_id, r]))))
       .catch(() => setReviews(new Map()));
+    api
+      .dueFlashcards()
+      .then((cs) => setCardsDue(cs.length))
+      .catch(() => setCardsDue(0));
   }, [reload]);
 
   const lane = useMemo(
@@ -208,8 +213,15 @@ export default function Today() {
         hint: "Problems you got right, but not quickly. Worth solving again from memory.",
       });
     }
+    groups.push({
+      source: "flashcards",
+      label: "Flashcards",
+      count: cardsDue,
+      href: "/flashcards",
+      hint: "Cards from finished Mastery weeks, missed quiz questions and your own.",
+    });
     return mergeDue(groups);
-  }, [lane]);
+  }, [lane, cardsDue]);
 
   const solvedSeries = stats ? heatSeries(stats.heatmap, 14) : [];
 

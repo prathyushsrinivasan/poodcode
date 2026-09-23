@@ -1344,7 +1344,7 @@ console.log(numeric.join(" "));
             "explanation": "`as const` makes the tuple's elements literal types, and indexing the tuple type by `number` unions every element — the standard way to derive a union from a runtime list.",
         },
         {
-            "question": "Drop the `as const`. What does `(typeof levels)[number]` become?",
+            "question": "`const levels = [\"a\", \"b\"];` — with no `as const` — what is `(typeof levels)[number]`?",
             "options": [
                 "string",
                 "\"a\" | \"b\"",

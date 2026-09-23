@@ -497,12 +497,16 @@ export interface MasteryExam {
   starter: string;
   solution: string;
   tests: ExerciseTest[];
+  /** TypeScript only: "" (strict) or "strict+indexed" — the judge preset. */
+  strictness?: string;
 }
 
 /** An optional timed checkpoint built from the week's problems. */
 export interface MasteryContest {
   title: string;
   duration_seconds: number;
+  /** Problems to draw on; empty means the week's own curated problems. */
+  slugs?: string[];
 }
 
 export interface MasteryWeek {
@@ -523,6 +527,10 @@ export interface MasteryWeek {
   quiz_sample: number;
   exam: MasteryExam | null;
   contest: MasteryContest | null;
+  /** Review cards seeded into Flashcards when the week is completed. */
+  flashcards?: { front: string; back: string }[];
+  /** Optional graded practice (type workshops); outside the week's gate. */
+  practice?: Exercise[];
 }
 
 export interface MasteryTrack {
@@ -700,13 +708,24 @@ export interface CurriculumUnit {
   lab: Lab | null;
   /** "Work it out by hand" cards: typed answers, graded exactly. */
   drills: CalcDrill[];
+  /** Further labs after the first. */
+  extra_labs: Lab[];
+  /** The interviewer's "what if…?" twists. */
+  followups: Followup[];
 }
 
-export type LabKind = "bits" | "modular" | "grid";
+/** A "what if…?" follow-up; `a` is markdown. */
+export interface Followup {
+  q: string;
+  a: string;
+}
+
+export type LabKind = "bits" | "modular" | "grid" | "tree" | "graph" | "search" | "maze";
 
 /** A unit's interactive lab. `presets` are the author's one-click starting
  * points; `values` holds the lab's input fields as strings (bits: a, b, k;
- * modular: a, b, m; grid: rows, cols, i, j). */
+ * modular: a, b, m; grid: rows, cols, i, j; tree: tree, value; graph: n,
+ * edges, directed, source, algo; search: items, k, target, mode). */
 export interface Lab {
   kind: LabKind;
   /** Markdown. */
@@ -727,9 +746,11 @@ export interface CalcDrill {
 }
 
 /** A multiple-choice drill over a code fragment: `bug` (which change fixes
- * it?) or `predict` (what does it produce?). Scheduled like the Big-O cards. */
+ * it?), `predict` (what does it produce?) or `model` (which graph / search
+ * model fits this story? — the fragment is a sketch of the input, not Java).
+ * Scheduled like the Big-O cards. */
 export interface Quiz {
-  kind: "bug" | "predict";
+  kind: "bug" | "predict" | "model";
   prompt: string;
   code: string;
   answer: string;
