@@ -26,6 +26,16 @@
    "Celsius: 21.50\nFahrenheit: 70.70\nKelvin: 294.65\nRounded: 22C / 71F"
   ]
  },
+ "project-w10": {
+  "hash": "3dc5897033d298870d30",
+  "outputs": [
+   "downloading 0%\ndownloading 40%\npaused at 40%\nillegal progress in paused\ndownloading 40%\ndownloading 100%\ndone\nidle",
+   "illegal pause in idle\ndownloading 0%\nfailed: disk full\nillegal resume in failed\nidle\ndownloading 0%\nillegal finish in downloading",
+   "downloading 0%\ndownloading 50%\nillegal finish in downloading\ndownloading 100%\ndone",
+   "downloading 0%\ndownloading 30%\ndownloading 100%\ndone\nidle\nillegal reset in idle",
+   "downloading 0%\npaused at 0%\nfailed: unknown\nidle\ndownloading 0%\ndownloading 5%\npaused at 5%\ndownloading 5%\ndownloading 100%\ndone"
+  ]
+ },
  "project-w2": {
   "hash": "881c40ff67b8d1ec20d0",
   "outputs": [
@@ -64,6 +74,374 @@
    "unicode-slugs",
    "already-a-slug",
    "a-b-c"
+  ]
+ },
+ "project-w5": {
+  "hash": "fb6234339c4a2faa84b1",
+  "outputs": [
+   "$1,234.50",
+   "€1,234.50",
+   "$1,235",
+   "£1234.50",
+   "-$0.99",
+   "$0.05",
+   "$1000000",
+   "-¥1,234,567.89"
+  ]
+ },
+ "project-w6": {
+  "hash": "62fa469b60fdfb786fbe",
+  "outputs": [
+   "[hello there]\n[ok]",
+   "[hello-world-2026]\n[typescript-rocks]",
+   "[The Quick Brown Fox]",
+   "unknown step nope",
+   "[]\n[ABC]"
+  ]
+ },
+ "project-w7": {
+  "hash": "88960037f784b05fc362",
+  "outputs": [
+   "name | score | city\n-----+-------+-------\nada  |    95 | London\ncy   |    95 | Paris\nbo   |    80 | Oslo\n3 rows",
+   "name  | qty\n------+----\napple |  12\nfig   |   7\npear  |   3\n3 rows",
+   "name | city\n-----+-------\ny    | Athens\nx    | Zurich\nz    | Zurich\n3 rows",
+   "no column nope",
+   "  n\n---\n100\n 10\n  9\n3 rows"
+  ]
+ },
+ "project-w8": {
+  "hash": "cae6ab2155306b414e3e",
+  "outputs": [
+   "db.host = \"localhost\"\ndb.pool = 5\ndebug = false\nname = \"app\"\nport = 8080",
+   "db.host = \"localhost\"\ndb.pool = 20\ndebug = true\nname = \"app\"\nport = 3000",
+   "error: name must be a non-empty string\nerror: port must be an integer 1-65535\nerror: db.pool must be an integer 1-100\ndb.host = \"db.internal\"\ndb.pool = 5\ndebug = false\nname = \"app\"\nport = 8080",
+   "error: port must be an integer 1-65535\nwarning: unknown key colour\nwarning: unknown key verbose\ndb.host = \"localhost\"\ndb.pool = 5\ndebug = false\nname = \"app\"\nport = 8080",
+   "error: debug must be a boolean\ndb.host = \"localhost\"\ndb.pool = 5\ndebug = false\nname = \"app\"\nport = 8080",
+   "db.host = \"x\"\ndb.pool = 5\ndebug = false\nname = \"svc\"\nport = 8080"
+  ]
+ },
+ "project-w9": {
+  "hash": "f9a72b93c81d34ee8e12",
+  "outputs": [
+   "d1 d3\n(none)\nd1 d2 d3\nd3\n(none)\n7 words indexed",
+   "a b\n(none)\n(none)\n3 words indexed",
+   "only\nonly\n2 words indexed",
+   "n2\nn1 n2\nn1 n3\n4 words indexed",
+   "d\nd\n(none)\n3 words indexed"
+  ]
+ },
+ "ts_array_modern-copy": {
+  "hash": "c84ff4eb9e16d9b74d56",
+  "outputs": [
+   "3 2 1\n3 1 2",
+   "100 10 9\n10 9 100",
+   "5\n5"
+  ]
+ },
+ "ts_array_modern-error1": {
+  "hash": "6bc2b9c388cb230f693c",
+  "diagnostics": [
+   {
+    "code": 2532,
+    "line": 2,
+    "msg": "Object is possibly 'undefined'."
+   }
+  ]
+ },
+ "ts_array_modern-error2": {
+  "hash": "26dd931f50f594695f2d",
+  "diagnostics": [
+   {
+    "code": 2339,
+    "line": 2,
+    "msg": "Property 'sort' does not exist on type 'readonly number[]'."
+   }
+  ]
+ },
+ "ts_array_modern-example1": {
+  "hash": "7ab010477bea73202a33",
+  "outputs": [
+   "input order: 7 3 9 1 5\nranked:      9 7 5 3 1\nmedian: 5 last: 5",
+   "input order: 2 2 1\nranked:      2 2 1\nmedian: 2 last: 1"
+  ]
+ },
+ "ts_array_modern-example2": {
+  "hash": "4b64adf2552bf6d03fd9",
+  "outputs": [
+   "1: a\n2: on\n3: the, cat, sat, mat\n15 letters, 9 distinct",
+   "2: Aa, Bb, Cc\n6 letters, 3 distinct"
+  ]
+ },
+ "ts_array_modern-example3": {
+  "hash": "ba5e6d6f4d749110fe08",
+  "outputs": [
+   "5 5 99\n-1 1 4 9 16 | 0 1 4 9 16"
+  ]
+ },
+ "ts_array_modern-group": {
+  "hash": "f6cb20520d8095ecf7fa",
+  "outputs": [
+   "a: apple avocado\nb: Banana blueberry\nc: cherry\na",
+   "x: x\nx",
+   "o: one\nt: two three Three\nt"
+  ]
+ },
+ "ts_array_modern-last": {
+  "hash": "a8a14450853fd218910a",
+  "outputs": [
+   "6",
+   "0",
+   "-8"
+  ]
+ },
+ "ts_array_modern-pitfall1-right": {
+  "hash": "35857cc25c13197f9396",
+  "outputs": [
+   "5 9 1 5"
+  ]
+ },
+ "ts_array_modern-pitfall1-wrong": {
+  "hash": "b0abdc3965c2f403bf86",
+  "outputs": [
+   "5 1 5 9"
+  ]
+ },
+ "ts_array_modern-pitfall2-right": {
+  "hash": "91985ed51fafa8c447ab",
+  "outputs": [
+   "4 0,1,4,9"
+  ]
+ },
+ "ts_array_modern-pitfall2-wrong": {
+  "hash": "f4aba827b4317b839fd3",
+  "outputs": [
+   "4 ,,,"
+  ]
+ },
+ "ts_array_modern-pitfall3-right": {
+  "hash": "1b5c8ac955f0862ca0ea",
+  "outputs": [
+   "1 9 10 100"
+  ]
+ },
+ "ts_array_modern-pitfall3-wrong": {
+  "hash": "c83871affb8797f6c3ba",
+  "outputs": [
+   "1 10 100 9"
+  ]
+ },
+ "ts_closures_scope-counter": {
+  "hash": "b4eb1e4fc9e07a396893",
+  "outputs": [
+   "1 2 3",
+   "95 90 85 80",
+   "7 7"
+  ]
+ },
+ "ts_closures_scope-error1": {
+  "hash": "0f2b50a7b129676cbae2",
+  "diagnostics": [
+   {
+    "code": 2304,
+    "line": 4,
+    "msg": "Cannot find name 'doubled'."
+   }
+  ]
+ },
+ "ts_closures_scope-error2": {
+  "hash": "d4b1feca653cc367f061",
+  "diagnostics": [
+   {
+    "code": 2448,
+    "line": 1,
+    "msg": "Block-scoped variable 'total' used before its declaration."
+   },
+   {
+    "code": 2454,
+    "line": 1,
+    "msg": "Variable 'total' is used before being assigned."
+   }
+  ]
+ },
+ "ts_closures_scope-example1": {
+  "hash": "221082ed22bb53255095",
+  "outputs": [
+   "1 2 3\n110 120\n4"
+  ]
+ },
+ "ts_closures_scope-example2": {
+  "hash": "fa612e8b066e58dcc267",
+  "outputs": [
+   "45 after +20 -30 refused 100 +5",
+   "0 after -50 refused 1"
+  ]
+ },
+ "ts_closures_scope-example3": {
+  "hash": "6a38128ab5b79b95cfa7",
+  "outputs": [
+   "9 16 9 9 25 16\n3 computed, 3 cached"
+  ]
+ },
+ "ts_closures_scope-loop": {
+  "hash": "887ceca5995b0046912a",
+  "outputs": [
+   "0 1 4",
+   "0 1 4 9 16",
+   "0"
+  ]
+ },
+ "ts_closures_scope-once": {
+  "hash": "fabdb19e26f7347a2616",
+  "outputs": [
+   "9 9 9 calls=1",
+   "49 calls=1\n4 4 calls=1",
+   "0 0 0 calls=1"
+  ]
+ },
+ "ts_closures_scope-pitfall1-right": {
+  "hash": "213b2fafbc3f80d3873b",
+  "outputs": [
+   "item 0, item 1, item 2"
+  ]
+ },
+ "ts_closures_scope-pitfall1-wrong": {
+  "hash": "eced2e30311b384a15ff",
+  "outputs": [
+   "item 3, item 3, item 3"
+  ]
+ },
+ "ts_closures_scope-pitfall2-right": {
+  "hash": "5a4e28cb0d3fcd9b92a5",
+  "outputs": [
+   "a=3 b=1"
+  ]
+ },
+ "ts_closures_scope-pitfall2-wrong": {
+  "hash": "eb4ce277e6946a53a4e4",
+  "outputs": [
+   "a=3 b=4"
+  ]
+ },
+ "ts_closures_scope-pitfall3-right": {
+  "hash": "b1b3e80a013b558a6ce9",
+  "outputs": [
+   "110.00"
+  ]
+ },
+ "ts_closures_scope-pitfall3-wrong": {
+  "hash": "13445b9eb36ec89cf3fe",
+  "outputs": [
+   "120.00"
+  ]
+ },
+ "ts_control_flow-early": {
+  "hash": "8192d39c2e9ccec03eff",
+  "outputs": [
+   "hello, ada\nanonymous\nanonymous\nhello, bo"
+  ]
+ },
+ "ts_control_flow-error1": {
+  "hash": "012ce87d3936c94a19c3",
+  "diagnostics": [
+   {
+    "code": 18048,
+    "line": 3,
+    "msg": "'prefix' is possibly 'undefined'."
+   }
+  ]
+ },
+ "ts_control_flow-error2": {
+  "hash": "e0b7b27cfb148da8290d",
+  "diagnostics": [
+   {
+    "code": 2775,
+    "line": 4,
+    "msg": "Assertions require every name in the call target to be declared with an explicit type annotation."
+   }
+  ]
+ },
+ "ts_control_flow-error3": {
+  "hash": "cff018da76c9a4507b03",
+  "diagnostics": [
+   {
+    "code": 2339,
+    "line": 4,
+    "msg": "Property 'radius' does not exist on type 'Circle | Square'.   Property 'radius' does not exist on type 'Square'."
+   }
+  ]
+ },
+ "ts_control_flow-example1": {
+  "hash": "c936909f2ed94a5c3be4",
+  "outputs": [
+   "Ada <ada@x.io>\nBo (no email)\nno user"
+  ]
+ },
+ "ts_control_flow-example2": {
+  "hash": "6ed07492421202576a3a",
+  "outputs": [
+   "3 numbers, total 5, 2 skipped",
+   "0 numbers, total 0, 2 skipped"
+  ]
+ },
+ "ts_control_flow-example3": {
+  "hash": "11403db1095feb79e83e",
+  "outputs": [
+   "a1: 6 units\nrejected: bad id\nrejected: bad id\nrejected: bad qty"
+  ]
+ },
+ "ts_control_flow-filter": {
+  "hash": "09ba0889399858295985",
+  "outputs": [
+   "3 9",
+   "0 -Infinity",
+   "1 -1"
+  ]
+ },
+ "ts_control_flow-mixed": {
+  "hash": "a7c1721b4eaa975587a3",
+  "outputs": [
+   "null\narray(2)\nobject(2)\nstring(2)\nnumber\nboolean\nbig numbers: 1",
+   "number\nnumber\narray(0)\nbig numbers: 1"
+  ]
+ },
+ "ts_control_flow-pitfall1-right": {
+  "hash": "f6267205f961fae95403",
+  "outputs": [
+   "3.0"
+  ]
+ },
+ "ts_control_flow-pitfall1-wrong": {
+  "hash": "751cf1c2fecb5a3386ee",
+  "outputs": [
+   "3.0\nNaN"
+  ]
+ },
+ "ts_control_flow-pitfall2-right": {
+  "hash": "73e1b6034a772d930b58",
+  "outputs": [
+   "object with 1 keys; null; array of 2"
+  ]
+ },
+ "ts_control_flow-pitfall2-wrong": {
+  "hash": "4565962001bd5d82aca9",
+  "outputs": [
+   "object with 1 keys; object with 0 keys; object with 2 keys"
+  ]
+ },
+ "ts_control_flow-pitfall3-right": {
+  "hash": "eae0a060854267551e76",
+  "outputs": [
+   "TOTAL 1"
+  ]
+ },
+ "ts_control_flow-pitfall3-wrong": {
+  "hash": "5c1572688b6e41a3bc82",
+  "diagnostics": [
+   {
+    "code": 18048,
+    "line": 2,
+    "msg": "'label' is possibly 'undefined'."
+   }
   ]
  },
  "ts_equality-classify": {
@@ -339,6 +717,323 @@
    "#a x1\n#b x2\n#c x3"
   ]
  },
+ "ts_index_signatures-count": {
+  "hash": "0992582a0a5dfbf8de58",
+  "outputs": [
+   "a=2 b=1",
+   "x=1",
+   "ok=1 toString=2"
+  ]
+ },
+ "ts_index_signatures-error1": {
+  "hash": "aeafeb76bc7f46042592",
+  "diagnostics": [
+   {
+    "code": 7053,
+    "line": 3,
+    "msg": "Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{ small: number; large: number; }'.   No index signature with a parameter of type 'string' was found on type '{ small: number; large: number; }'."
+   }
+  ]
+ },
+ "ts_index_signatures-error2": {
+  "hash": "40f06c10c6ef0cbf5a06",
+  "diagnostics": [
+   {
+    "code": 2741,
+    "line": 2,
+    "msg": "Property 'error' is missing in type '{ info: string; warn: string; }' but required in type 'Record<Level, string>'."
+   }
+  ]
+ },
+ "ts_index_signatures-error3": {
+  "hash": "d5af23ddb0f3739db552",
+  "diagnostics": [
+   {
+    "code": 2353,
+    "line": 1,
+    "msg": "Object literal may only specify known properties, and 'fontSize' does not exist in type 'Record<\"theme\" | \"lang\", string>'."
+   }
+  ]
+ },
+ "ts_index_signatures-example1": {
+  "hash": "7430189a8a6eeda8ce71",
+  "outputs": [
+   "the 3\nand 2\nbat 1",
+   "a 1\nb 1\nc 1"
+  ]
+ },
+ "ts_index_signatures-example2": {
+  "hash": "84e8818d71b3ec4c67fb",
+  "outputs": [
+   "[i] started\n[!] disk at 91%\n[?] verbose ignored\n[x] stopped"
+  ]
+ },
+ "ts_index_signatures-example3": {
+  "hash": "39c208d99a0074366633",
+  "outputs": [
+   "Ada false false (none)\nBo true true (none)"
+  ]
+ },
+ "ts_index_signatures-inventory": {
+  "hash": "c87eba58124531eac1e3",
+  "outputs": [
+   "short figs\napples=3 pears=1",
+   "constructor=1",
+   "short x\n(empty)"
+  ]
+ },
+ "ts_index_signatures-pitfall1-right": {
+  "hash": "1cc07ba89d00475df753",
+  "outputs": [
+   "{\"a\":2,\"b\":1}"
+  ]
+ },
+ "ts_index_signatures-pitfall1-wrong": {
+  "hash": "4e83fe63a821f65c3632",
+  "outputs": [
+   "{\"a\":null,\"b\":null}"
+  ]
+ },
+ "ts_index_signatures-pitfall2-right": {
+  "hash": "6653e6c331152d423591",
+  "outputs": [
+   "number number 1"
+  ]
+ },
+ "ts_index_signatures-pitfall2-wrong": {
+  "hash": "9ba94746290406fbd5e5",
+  "outputs": [
+   "string string 1"
+  ]
+ },
+ "ts_index_signatures-pitfall3-right": {
+  "hash": "7e3de801d814a9604f9d",
+  "outputs": [
+   "b 10 2 a"
+  ]
+ },
+ "ts_index_signatures-pitfall3-wrong": {
+  "hash": "68d7c7acc079a2422b60",
+  "outputs": [
+   "2 10 b a"
+  ]
+ },
+ "ts_index_signatures-table": {
+  "hash": "903e93fa1c35353abb50",
+  "outputs": [
+   "green\namber\nred",
+   "amber\nred"
+  ]
+ },
+ "ts_interfaces_types-error1": {
+  "hash": "3042b79428cc0b451877",
+  "diagnostics": [
+   {
+    "code": 2430,
+    "line": 4,
+    "msg": "Interface 'Record2' incorrectly extends interface 'Base'.   Types of property 'id' are incompatible.     Type 'string' is not assignable to type 'number'."
+   }
+  ]
+ },
+ "ts_interfaces_types-error2": {
+  "hash": "e8325624d0f2b7d0b1fc",
+  "diagnostics": [
+   {
+    "code": 2300,
+    "line": 1,
+    "msg": "Duplicate identifier 'User'."
+   },
+   {
+    "code": 2300,
+    "line": 2,
+    "msg": "Duplicate identifier 'User'."
+   }
+  ]
+ },
+ "ts_interfaces_types-example1": {
+  "hash": "e139cc9920c0c608c7ae",
+  "outputs": [
+   "at (1, 2), area 40"
+  ]
+ },
+ "ts_interfaces_types-example2": {
+  "hash": "35d9856a7ee15bedabd3",
+  "outputs": [
+   "Rex the collie\nBubbles the fish"
+  ]
+ },
+ "ts_interfaces_types-example3": {
+  "hash": "77232bbf0abc29576146",
+  "outputs": [
+   "theme, fontSize"
+  ]
+ },
+ "ts_interfaces_types-extend": {
+  "hash": "b93bdd40feb50b88fe71",
+  "outputs": [
+   "ada earns 100\ngrace earns 120",
+   "linus earns 1"
+  ]
+ },
+ "ts_interfaces_types-pitfall1-right": {
+  "hash": "c0b8f9cb6b24a89cd71c",
+  "outputs": [
+   "a1"
+  ]
+ },
+ "ts_interfaces_types-pitfall1-wrong": {
+  "hash": "e069ba6338a8a68fb34f",
+  "diagnostics": [
+   {
+    "code": 2322,
+    "line": 3,
+    "msg": "Type 'string' is not assignable to type 'never'."
+   }
+  ]
+ },
+ "ts_interfaces_types-pitfall2-right": {
+  "hash": "e753bb5f4126cb478859",
+  "outputs": [
+   "{\"id\":1,\"name\":\"ada\"}"
+  ]
+ },
+ "ts_interfaces_types-pitfall2-wrong": {
+  "hash": "3c804a22bcf881c0b494",
+  "outputs": [
+   "{\"id\":1,\"name\":\"ada\",\"passwordHash\":\"x9f\"}"
+  ]
+ },
+ "ts_interfaces_types-pitfall3-right": {
+  "hash": "3b16b6d0a1e334b0b05e",
+  "outputs": [
+   "2 true"
+  ]
+ },
+ "ts_interfaces_types-pitfall3-wrong": {
+  "hash": "380247d4cda2ae6a729a",
+  "outputs": [
+   "1 unset"
+  ]
+ },
+ "ts_interfaces_types-public": {
+  "hash": "713ed6036d3a10d628c7",
+  "outputs": [
+   "{\"id\":1,\"name\":\"ada\"}\n{\"id\":2,\"name\":\"bo\",\"email\":\"b@x.io\"}",
+   "{\"id\":3,\"name\":\"cy\",\"email\":\"c@y.io\"}"
+  ]
+ },
+ "ts_interfaces_types-union": {
+  "hash": "d3871e46a69be124879a",
+  "outputs": [
+   "#42\nABC\n#7",
+   "X"
+  ]
+ },
+ "ts_literal_inference-check": {
+  "hash": "8f6a49c517cac6f948e0",
+  "outputs": [
+   "2000.0 g\n2268.0 g\nbad unit oz",
+   "100.0 g"
+  ]
+ },
+ "ts_literal_inference-derive": {
+  "hash": "d998f230d6b3c4b33fcc",
+  "outputs": [
+   "#f00\n#00f",
+   "pink?\n#0f0"
+  ]
+ },
+ "ts_literal_inference-error1": {
+  "hash": "d59683deba7345ffde50",
+  "diagnostics": [
+   {
+    "code": 2345,
+    "line": 6,
+    "msg": "Argument of type 'string' is not assignable to parameter of type 'Direction'."
+   }
+  ]
+ },
+ "ts_literal_inference-error2": {
+  "hash": "3a404ca2b8e1998b8615",
+  "diagnostics": [
+   {
+    "code": 2540,
+    "line": 2,
+    "msg": "Cannot assign to 'max' because it is a read-only property."
+   }
+  ]
+ },
+ "ts_literal_inference-example1": {
+  "hash": "ec744bb52a2bcf01c90d",
+  "outputs": [
+   "M: 98 cm\nXL: 114 cm\nS: 90 cm",
+   "XXL: unknown size\nL: 106 cm"
+  ]
+ },
+ "ts_literal_inference-example2": {
+  "hash": "1b6fe46dea993e36b006",
+  "outputs": [
+   "GET /health\nPOST /items\nGET /"
+  ]
+ },
+ "ts_literal_inference-example3": {
+  "hash": "b41bb86e84a55ac9cd20",
+  "outputs": [
+   "2,-2"
+  ]
+ },
+ "ts_literal_inference-http": {
+  "hash": "05bbbf74c879eb681989",
+  "outputs": [
+   "GET=2 POST=1 PUT=0 DELETE=0\nother=2",
+   "GET=0 POST=0 PUT=0 DELETE=1\nother=0",
+   "GET=0 POST=0 PUT=2 DELETE=0\nother=0"
+  ]
+ },
+ "ts_literal_inference-pitfall1-right": {
+  "hash": "19e872d49c8f6799d30a",
+  "outputs": [
+   "[warn] disk almost full"
+  ]
+ },
+ "ts_literal_inference-pitfall1-wrong": {
+  "hash": "7db0f224b2f0b4a47ea3",
+  "diagnostics": [
+   {
+    "code": 2345,
+    "line": 6,
+    "msg": "Argument of type '{ level: string; text: string; }' is not assignable to parameter of type '{ level: Level; text: string; }'.   Types of property 'level' are incompatible.     Type 'string' is not assignable to type 'Level'."
+   }
+  ]
+ },
+ "ts_literal_inference-pitfall2-right": {
+  "hash": "17fe3e25c1f15a848805",
+  "outputs": [
+   "invalid mode"
+  ]
+ },
+ "ts_literal_inference-pitfall2-wrong": {
+  "hash": "7d8ab0a2615e39a4d9a3",
+  "outputs": [
+   "unreachable?"
+  ]
+ },
+ "ts_literal_inference-pitfall3-right": {
+  "hash": "d13cb3d02a29c7a3fcac",
+  "outputs": [
+   "a,b,c 2"
+  ]
+ },
+ "ts_literal_inference-pitfall3-wrong": {
+  "hash": "e801843fc9362c47a6ca",
+  "diagnostics": [
+   {
+    "code": 2345,
+    "line": 6,
+    "msg": "Argument of type 'readonly [\"a\", \"b\"]' is not assignable to parameter of type 'string[]'.   The type 'readonly [\"a\", \"b\"]' is 'readonly' and cannot be assigned to the mutable type 'string[]'."
+   }
+  ]
+ },
  "ts_number_format-big": {
   "hash": "5210f7ef6323a54c76aa",
   "outputs": [
@@ -470,6 +1165,112 @@
   "hash": "014568ed1b46cd8e1ddf",
   "outputs": [
    "1.5511210043330986e+25"
+  ]
+ },
+ "ts_overloads-error1": {
+  "hash": "ffac0e6667ffe3bd295b",
+  "diagnostics": [
+   {
+    "code": 2769,
+    "line": 7,
+    "msg": "No overload matches this call.   Overload 1 of 2, '(input: string): number', gave the following error.     Argument of type 'string | string[]' is not assignable to parameter of type 'string'.       Type 'string[]' is not assignable to type 'string'.   Overload 2 of 2, '(input: string[]): number[]', gave the following error.     Argument of type 'string | string[]' is not assignable to parameter of type 'string[]'.       Type 'string' is not assignable to type 'string[]'."
+   }
+  ]
+ },
+ "ts_overloads-error2": {
+  "hash": "e7f50d6d00597e8938e0",
+  "diagnostics": [
+   {
+    "code": 2394,
+    "line": 2,
+    "msg": "This overload signature is not compatible with its implementation signature."
+   }
+  ]
+ },
+ "ts_overloads-example1": {
+  "hash": "22b7a7f349caefffaef5",
+  "outputs": [
+   "42.0\n6"
+  ]
+ },
+ "ts_overloads-example2": {
+  "hash": "77f0c3e82e2e6c179679",
+  "outputs": [
+   "1h 2m 5s\n1h 2m 0s\n1h 2m 5s"
+  ]
+ },
+ "ts_overloads-example3": {
+  "hash": "dc06df907edf1a9b3f5c",
+  "outputs": [
+   "string: hi\nnumber: 3\nboolean: true"
+  ]
+ },
+ "ts_overloads-fmt": {
+  "hash": "527e727fcd6e1dcbcb32",
+  "outputs": [
+   "3.14\nEUR 5.00\n1.00, 2.50, 3.00",
+   "0.00\n7.00",
+   "USD 12.35\n-1.00"
+  ]
+ },
+ "ts_overloads-parse": {
+  "hash": "9f8dd6e8b6605be1183c",
+  "outputs": [
+   "42\n3",
+   "10\n0",
+   "0\n1"
+  ]
+ },
+ "ts_overloads-pitfall1-right": {
+  "hash": "d527f9b11c54d8225458",
+  "outputs": [
+   "5 kg\n5"
+  ]
+ },
+ "ts_overloads-pitfall1-wrong": {
+  "hash": "154cbf40a9e2264bd80d",
+  "outputs": [
+   "5 kg\n5 undefined"
+  ]
+ },
+ "ts_overloads-pitfall2-right": {
+  "hash": "3c904303817c67f1c339",
+  "outputs": [
+   "5.00"
+  ]
+ },
+ "ts_overloads-pitfall2-wrong": {
+  "hash": "3c3e5b02b043e689cd18",
+  "diagnostics": [
+   {
+    "code": 2531,
+    "line": 6,
+    "msg": "Object is possibly 'null'."
+   }
+  ]
+ },
+ "ts_overloads-pitfall3-right": {
+  "hash": "15261ed6570419e87bf4",
+  "outputs": [
+   "1\n1"
+  ]
+ },
+ "ts_overloads-pitfall3-wrong": {
+  "hash": "a1a89c1853db40d00c17",
+  "diagnostics": [
+   {
+    "code": 2769,
+    "line": 7,
+    "msg": "No overload matches this call.   Overload 1 of 2, '(x: string): string[]', gave the following error.     Argument of type 'string | number' is not assignable to parameter of type 'string'.       Type 'number' is not assignable to type 'string'.   Overload 2 of 2, '(x: number): number[]', gave the following error.     Argument of type 'string | number' is not assignable to parameter of type 'number'.       Type 'string' is not assignable to type 'number'."
+   }
+  ]
+ },
+ "ts_overloads-time": {
+  "hash": "4a0a761a4156df60c5d9",
+  "outputs": [
+   "2:05\n2:05",
+   "0:59\n0:59",
+   "60:00\n60:00"
   ]
  },
  "ts_program_io-double": {
@@ -614,6 +1415,120 @@
    "gum x3 = $2.97\navg $0.99"
   ]
  },
+ "ts_recursion-digits": {
+  "hash": "b8b8f045fb4b584ae567",
+  "outputs": [
+   "10\n7\n0",
+   "54",
+   "1\n2"
+  ]
+ },
+ "ts_recursion-error1": {
+  "hash": "2ca6a3492d3d027a6ad6",
+  "diagnostics": [
+   {
+    "code": 7023,
+    "line": 1,
+    "msg": "'depth' implicitly has return type 'any' because it does not have a return type annotation and is referenced directly or indirectly in one of its return expressions."
+   },
+   {
+    "code": 7024,
+    "line": 4,
+    "msg": "Function implicitly has return type 'any' because it does not have a return type annotation and is referenced directly or indirectly in one of its return expressions."
+   }
+  ]
+ },
+ "ts_recursion-error2": {
+  "hash": "1a0d1490733590fd09c6",
+  "diagnostics": [
+   {
+    "code": 2366,
+    "line": 1,
+    "msg": "Function lacks ending return statement and return type does not include 'undefined'."
+   }
+  ]
+ },
+ "ts_recursion-example1": {
+  "hash": "29364b732545d5f51e92",
+  "outputs": [
+   "total 10, depth 3",
+   "total 7, depth 0",
+   "total 5, depth 3"
+  ]
+ },
+ "ts_recursion-example2": {
+  "hash": "0bfad619dba2a6491157",
+  "outputs": [
+   "abc acb bac bca cab cba\n6 orderings",
+   "xy yx\n2 orderings",
+   "z\n1 orderings"
+  ]
+ },
+ "ts_recursion-example3": {
+  "hash": "6abf0ac16130eb7d8afc",
+  "outputs": [
+   "75025 242785 calls\n75025 49 calls"
+  ]
+ },
+ "ts_recursion-example4": {
+  "hash": "cf47d464f5cb1df4c0be",
+  "outputs": [
+   "RangeError: stack exhausted\n1000000"
+  ]
+ },
+ "ts_recursion-flatten": {
+  "hash": "a0abceed8602f7df1897",
+  "outputs": [
+   "1 2 3 4 5\nmax depth 3",
+   "(empty)\nmax depth 1\n(empty)\nmax depth 3",
+   "1 2 3\nmax depth 3\n7\nmax depth 1"
+  ]
+ },
+ "ts_recursion-pitfall1-right": {
+  "hash": "6f8af2f54b68c96e3d2c",
+  "outputs": [
+   "10 0"
+  ]
+ },
+ "ts_recursion-pitfall1-wrong": {
+  "hash": "df35b4b0cfec6c79a346",
+  "outputs": [
+   "stack overflow"
+  ]
+ },
+ "ts_recursion-pitfall2-right": {
+  "hash": "5b415822930437432503",
+  "outputs": [
+   "10946 calls=39"
+  ]
+ },
+ "ts_recursion-pitfall2-wrong": {
+  "hash": "295721f07a99882f927c",
+  "outputs": [
+   "10946 calls=21891"
+  ]
+ },
+ "ts_recursion-pitfall3-right": {
+  "hash": "0889b772a43813f59688",
+  "outputs": [
+   "[] [1] [1,2] [2]"
+  ]
+ },
+ "ts_recursion-pitfall3-wrong": {
+  "hash": "ca0a762fb59791aae10e",
+  "outputs": [
+   "[] [] [] []"
+  ]
+ },
+ "ts_recursion-power": {
+  "hash": "d0c434fe3184b2878276",
+  "outputs": [
+   "1024 calls=6",
+   "1 calls=1",
+   "1073741824 calls=9",
+   "100000 calls=5"
+  ]
+ },
  "ts_regex-count": {
   "hash": "9b06dc48cc3686fbae12",
   "outputs": [
@@ -646,7 +1561,7 @@
  "ts_regex-example1": {
   "hash": "1b023382aa29dd22f0ce",
   "outputs": [
-   "123\n: contains true, is false\nabc123\n: contains true, is false\nabc: contains false, is false"
+   "123: contains true, is true\nabc123: contains true, is false\nabc: contains false, is false"
   ]
  },
  "ts_regex-example2": {
@@ -720,6 +1635,301 @@
    "valid\ninvalid\ninvalid\ninvalid",
    "valid",
    "invalid"
+  ]
+ },
+ "ts_set_algebra-both": {
+  "hash": "ab2e6a9e29c70073bb56",
+  "outputs": [
+   "blue green",
+   "(none)",
+   "x y"
+  ]
+ },
+ "ts_set_algebra-error1": {
+  "hash": "2abb28dd77a4c0f9ff29",
+  "diagnostics": [
+   {
+    "code": 2345,
+    "line": 3,
+    "msg": "Argument of type 'string[]' is not assignable to parameter of type 'ReadonlySetLike<unknown>'.   Type 'string[]' is missing the following properties from type 'ReadonlySetLike<unknown>': has, size"
+   }
+  ]
+ },
+ "ts_set_algebra-error2": {
+  "hash": "7e867a3cf4a23948a579",
+  "diagnostics": [
+   {
+    "code": 2344,
+    "line": 1,
+    "msg": "Type 'string' does not satisfy the constraint 'WeakKey'."
+   }
+  ]
+ },
+ "ts_set_algebra-example1": {
+  "hash": "6cd249b7946755078a6b",
+  "outputs": [
+   "both:      js web\neither:    ts js web css\nonly a:    ts\nonly one:  ts css\na within b? false | share nothing? false",
+   "both:      x\neither:    x y\nonly a:    (none)\nonly one:  y\na within b? true | share nothing? false"
+  ]
+ },
+ "ts_set_algebra-example2": {
+  "hash": "06ccd3eee98d6c70fb59",
+  "outputs": [
+   "90s: 91 99\n80s: 85 88\n70s: 78 70\n60s: 62"
+  ]
+ },
+ "ts_set_algebra-example3": {
+  "hash": "382bb28c618aad2cc069",
+  "outputs": [
+   "4 4 computed 3"
+  ]
+ },
+ "ts_set_algebra-missing": {
+  "hash": "44a8bdadf2c22b1dc4ff",
+  "outputs": [
+   "missing write\nfalse",
+   "all granted\ntrue",
+   "missing a b c\nfalse"
+  ]
+ },
+ "ts_set_algebra-pitfall1-right": {
+  "hash": "9c5c781235679ddee3a8",
+  "outputs": [
+   "2"
+  ]
+ },
+ "ts_set_algebra-pitfall1-wrong": {
+  "hash": "93321875c9f73254d925",
+  "outputs": [
+   "3"
+  ]
+ },
+ "ts_set_algebra-pitfall2-right": {
+  "hash": "0f9eaa46402aaab74f8e",
+  "outputs": [
+   "true 1"
+  ]
+ },
+ "ts_set_algebra-pitfall2-wrong": {
+  "hash": "4560e051d2a1b15342a1",
+  "outputs": [
+   "false 5"
+  ]
+ },
+ "ts_set_algebra-pitfall3-right": {
+  "hash": "87a47f2876f93a95922c",
+  "outputs": [
+   "{\"tags\":[\"a\",\"b\"]}"
+  ]
+ },
+ "ts_set_algebra-pitfall3-wrong": {
+  "hash": "b4a3eeabacde6f855298",
+  "outputs": [
+   "{\"tags\":{}}"
+  ]
+ },
+ "ts_set_algebra-roster": {
+  "hash": "295ee5676367327052e0",
+  "outputs": [
+   "joined: dee\nleft: ada\nstayed: bo cy\nchanged",
+   "joined: (none)\nleft: (none)\nstayed: x y\nsame roster",
+   "joined: (none)\nleft: new\nstayed: (none)\nchanged"
+  ]
+ },
+ "ts_top_bottom-error1": {
+  "hash": "641d4b09de1f1c2db64a",
+  "diagnostics": [
+   {
+    "code": 2322,
+    "line": 9,
+    "msg": "Type '\"closed\"' is not assignable to type 'never'."
+   }
+  ]
+ },
+ "ts_top_bottom-error2": {
+  "hash": "87d550996bce04c770a4",
+  "diagnostics": [
+   {
+    "code": 18046,
+    "line": 2,
+    "msg": "'data' is of type 'unknown'."
+   }
+  ]
+ },
+ "ts_top_bottom-events": {
+  "hash": "5d438007b75fa00ac923",
+  "outputs": [
+   "click at 3,4\nkey Enter\nscroll up 120\nignored drag",
+   "scroll down 40"
+  ]
+ },
+ "ts_top_bottom-example1": {
+  "hash": "480077cc21accc1738e9",
+  "outputs": [
+   "3.14 9.00 10.00"
+  ]
+ },
+ "ts_top_bottom-example2": {
+  "hash": "9a16aeeec55ef359ffab",
+  "outputs": [
+   "8080\nbad port 0\nbad port abc\n443"
+  ]
+ },
+ "ts_top_bottom-example3": {
+  "hash": "475ca9f6cedf303c77fa",
+  "outputs": [
+   "number string object\nobject with 2 keys | array with 3 keys"
+  ]
+ },
+ "ts_top_bottom-exhaustive": {
+  "hash": "183a3dd1b8c6e642a7e8",
+  "outputs": [
+   "5\n20\n-8"
+  ]
+ },
+ "ts_top_bottom-fail": {
+  "hash": "d8f2280200920398062b",
+  "outputs": [
+   "31\nbad age -1\nbad age x\n1"
+  ]
+ },
+ "ts_top_bottom-pitfall1-right": {
+  "hash": "1f76b8af8351d695496e",
+  "outputs": [
+   "6.0"
+  ]
+ },
+ "ts_top_bottom-pitfall1-wrong": {
+  "hash": "2e00ae66320d6d6b65f6",
+  "outputs": [
+   "0.0"
+  ]
+ },
+ "ts_top_bottom-pitfall2-right": {
+  "hash": "94a8352d52cab27ca718",
+  "outputs": [
+   "ADA,BO"
+  ]
+ },
+ "ts_top_bottom-pitfall2-wrong": {
+  "hash": "37648148ffa68950dc38",
+  "outputs": [
+   "undefined"
+  ]
+ },
+ "ts_top_bottom-pitfall3-right": {
+  "hash": "fcb8d5980b61c569ed44",
+  "outputs": [
+   "1 0"
+  ]
+ },
+ "ts_top_bottom-pitfall3-wrong": {
+  "hash": "137cbb8c7e69bd71c777",
+  "outputs": [
+   "crashed: TypeError"
+  ]
+ },
+ "ts_tuples-divmod": {
+  "hash": "0aa31c3ec9176091c636",
+  "outputs": [
+   "7 = 2*3 + 1\n-7 = 2*-4 + 1",
+   "7 = -2*-4 + -1\n0 = 3*0 + 0",
+   "100 = 7*14 + 2"
+  ]
+ },
+ "ts_tuples-error1": {
+  "hash": "63f0f05e0d2fa51884ad",
+  "diagnostics": [
+   {
+    "code": 2493,
+    "line": 2,
+    "msg": "Tuple type '[string, number]' of length '2' has no element at index '2'."
+   }
+  ]
+ },
+ "ts_tuples-error2": {
+  "hash": "22e51e808524a6aecd45",
+  "diagnostics": [
+   {
+    "code": 2322,
+    "line": 3,
+    "msg": "Type 'number[]' is not assignable to type '[number, number]'.   Target requires 2 element(s) but source may have fewer."
+   }
+  ]
+ },
+ "ts_tuples-example1": {
+  "hash": "d0ad71a18a5e49913bee",
+  "outputs": [
+   "low -2, high 9, spread 11",
+   "low 5, high 5, spread 0"
+  ]
+ },
+ "ts_tuples-example2": {
+  "hash": "1f1aca5b73f9778b7058",
+  "outputs": [
+   "ada: 3 scores, best 99\ngrace: 1 scores, best 70\nlinus: 0 scores, best none"
+  ]
+ },
+ "ts_tuples-example3": {
+  "hash": "40551ecad43fe3428368",
+  "outputs": [
+   "figs   12\napples 3\npears  0\n12"
+  ]
+ },
+ "ts_tuples-minmax": {
+  "hash": "b21086510fd731ccae2f",
+  "outputs": [
+   "1 3",
+   "-5 5",
+   "7 7"
+  ]
+ },
+ "ts_tuples-pitfall1-right": {
+  "hash": "efde28e06ddbcf2df778",
+  "outputs": [
+   "3 pen"
+  ]
+ },
+ "ts_tuples-pitfall1-wrong": {
+  "hash": "a5f3006062e2aef5ff53",
+  "diagnostics": [
+   {
+    "code": 2345,
+    "line": 5,
+    "msg": "Argument of type '(string | number)[]' is not assignable to parameter of type '[string, number]'.   Target requires 2 element(s) but source may have fewer."
+   }
+  ]
+ },
+ "ts_tuples-pitfall2-right": {
+  "hash": "39e6d615222e72a71f73",
+  "outputs": [
+   "3 4 2 3"
+  ]
+ },
+ "ts_tuples-pitfall2-wrong": {
+  "hash": "59691546a2abdce14a32",
+  "outputs": [
+   "3 4 3"
+  ]
+ },
+ "ts_tuples-pitfall3-right": {
+  "hash": "495de05f0553335f4770",
+  "outputs": [
+   "4 1"
+  ]
+ },
+ "ts_tuples-pitfall3-wrong": {
+  "hash": "28ec0613aa5d35cfe266",
+  "outputs": [
+   "4 NaN"
+  ]
+ },
+ "ts_tuples-swap": {
+  "hash": "dac12a27a2eb5a388ebc",
+  "outputs": [
+   "right left",
+   "2 1",
+   "y x"
   ]
  },
  "ts_type_testing-check": {
@@ -1038,6 +2248,72 @@
    "A $2.00\nB $2.00\nbest $2.00\nsave $0.00",
    "A $1.00\nB $1.11\nbest $1.00\nsave $0.11",
    "A $1.10\nB $0.95\nbest $0.95\nsave $0.14"
+  ]
+ },
+ "tsm-w10-card": {
+  "hash": "5921b8e47ee05f84ff3a",
+  "outputs": [
+   "Queen of Hearts\nTen of Spades\nAce of Clubs\ninvalid 1D\ninvalid KX",
+   "Two of Diamonds\nJack of Spades"
+  ]
+ },
+ "tsm-w10-compass": {
+  "hash": "c39de61f6b5d286d0af6",
+  "outputs": [
+   "E S E",
+   "S N S N",
+   "W S E",
+   "(no turns)"
+  ]
+ },
+ "tsm-w10-lock": {
+  "hash": "e72f9ed021c08a900290",
+  "outputs": [
+   "locked\nopen\nlocked\nlocked\nlocked\nalarm\nalarm",
+   "open\nlocked\nlocked\nopen\nopen\nopen\nopen"
+  ]
+ },
+ "tsm-w10-playlist": {
+  "hash": "aa1c6f3ba9181f92cf1a",
+  "outputs": [
+   "b\nc\nend\nall\na\nc\nb\none\nb",
+   "end\nall\nsolo\noff\nend"
+  ]
+ },
+ "tsm-w10-quantities": {
+  "hash": "fa5ae0a925345b654044",
+  "outputs": [
+   "3.107 mi\n30.48 cm\n0.914 m\n1.609 km",
+   "1 m\nbad unit yd\nbad unit furlong\nbad input"
+  ]
+ },
+ "tsm-w10-robot": {
+  "hash": "05d68a257ea25828d689",
+  "outputs": [
+   "2,2\nE\n4",
+   "1,-1\nE\n2",
+   "0,0\nN\n0",
+   "0,0\nE\n2"
+  ]
+ },
+ "tsm-w10-rps-league": {
+  "hash": "ab2c30276ff7e5140c64",
+  "outputs": [
+   "ann 6\nbob 1\ncy 1",
+   "x 1\ny 1"
+  ]
+ },
+ "tsm-w10-sizes": {
+  "hash": "bcef881c4b033ca4b291",
+  "outputs": [
+   "48\nL\n42\nunknown size\nunknown size"
+  ]
+ },
+ "tsm-w10-status": {
+  "hash": "eb3c198f9a8fabb8fb71",
+  "outputs": [
+   "200 success\n404 client error\n503 server error\n301 redirect\n100 informational",
+   "99 invalid\n600 invalid\n2.5 invalid\nabc invalid"
   ]
  },
  "tsm-w2-clamp": {
@@ -1377,6 +2653,434 @@
    "O'neill's Café (2 words)",
    "12 Monkeys, 3 Dogs (2 words)",
    "Ça Va Très Bien (4 words)"
+  ]
+ },
+ "tsm-w5-args": {
+  "hash": "da1e15b4f040006ec047",
+  "outputs": [
+   "{\"verbose\":true,\"level\":3,\"name\":\"ada\"}\n\"missing name\"\n\"bad level 9\"\n\"bad level x\"\n\"bad flag --fast\"",
+   "{\"verbose\":true,\"level\":1,\"name\":\"bo\"}\n\"bad flag -v\""
+  ]
+ },
+ "tsm-w5-counter": {
+  "hash": "d242f0cdd51147c479a3",
+  "outputs": [
+   "11\n16\n14\n10\n9",
+   "3\n0\n1"
+  ]
+ },
+ "tsm-w5-duration": {
+  "hash": "4bb919db20d53ae7e309",
+  "outputs": [
+   "1h 2m 5s\n1 hour, 2 minutes, 5 seconds\n0s\n0 seconds",
+   "1 minute, 1 second\n1h\n2 hours\n59s"
+  ]
+ },
+ "tsm-w5-greet": {
+  "hash": "9fe39008ff2647149e89",
+  "outputs": [
+   "Hi, Ada!\nHey, world!\nHello, Bo!\nHello, world!",
+   "Hello, Grace!"
+  ]
+ },
+ "tsm-w5-limiter": {
+  "hash": "ad2f8ed90970372eb250",
+  "outputs": [
+   "allow allow deny allow allow deny",
+   "allow deny allow deny allow",
+   "allow allow allow deny allow"
+  ]
+ },
+ "tsm-w5-memoize": {
+  "hash": "bcf5b3d0b2dc9f6cba2b",
+  "outputs": [
+   "10 17 10 10 26\nhits=2 misses=3\nreal=3",
+   "2\nhits=0 misses=1\nreal=1",
+   "5 5 5 5\nhits=3 misses=1\nreal=1"
+  ]
+ },
+ "tsm-w5-plural": {
+  "hash": "d1b8b1654ba46a3761bb",
+  "outputs": [
+   "1 cat\n2 cats\n0 geese\n1 goose\n-1 points"
+  ]
+ },
+ "tsm-w5-range": {
+  "hash": "71d34e8fcc10ca05b9ac",
+  "outputs": [
+   "0 1 2 3 4\n2 3 4 5\n10 7 4 1\n0 4 8",
+   "(empty)\n(empty)\n(empty)\n(empty)"
+  ]
+ },
+ "tsm-w5-safe-divide": {
+  "hash": "f4b85c7c640ff4aedc99",
+  "outputs": [
+   "2.500\nnull\n-3.000",
+   "0.000\n-3.500"
+  ]
+ },
+ "tsm-w5-sum-rest": {
+  "hash": "5f4eb3bd38aa32d24919",
+  "outputs": [
+   "food: 12 (3 items)\nrent: 900 (1 items)\nnothing: 0 (0 items)"
+  ]
+ },
+ "tsm-w6-big-fib": {
+  "hash": "1523b96f48e401deea23",
+  "outputs": [
+   "55\n0\n1\ncomputed 9",
+   "2880067194370816120\n354224848179261915075\ncomputed 99",
+   "139423224561697880139724382870407283950070256587697307264108962948325571622863290691557658876222521294125\n86168291600238450732788312165664788095941068326060883324529903470149056115823592713458328176574447204501\ncomputed 499"
+  ]
+ },
+ "tsm-w6-count-by": {
+  "hash": "e1f0b6ed5647ff7822fe",
+  "outputs": [
+   "3 0 2 3",
+   "2 2 3 1",
+   "0 0 0 0"
+  ]
+ },
+ "tsm-w6-debounce": {
+  "hash": "0ffdc1dc0dd235224b1b",
+  "outputs": [
+   "15: b\n49: d\n59: e",
+   "6: x",
+   "3: a\n6: b\n9: c\n12: d"
+  ]
+ },
+ "tsm-w6-find-from": {
+  "hash": "408fd1b34915ae62f18a",
+  "outputs": [
+   "0\n4\n-1\n0"
+  ]
+ },
+ "tsm-w6-hanoi": {
+  "hash": "f97c4fb93c4767abcb3d",
+  "outputs": [
+   "disk 1: A -> C\n1 moves",
+   "disk 1: A -> B\ndisk 2: A -> C\ndisk 1: B -> C\n3 moves",
+   "disk 1: A -> C\ndisk 2: A -> B\ndisk 1: C -> B\ndisk 3: A -> C\ndisk 1: B -> A\ndisk 2: B -> C\ndisk 1: A -> C\n7 moves",
+   "disk 1: A -> C\ndisk 2: A -> B\ndisk 1: C -> B\ndisk 3: A -> C\ndisk 1: B -> A\ndisk 2: B -> C\ndisk 1: A -> C\ndisk 4: A -> B\ndisk 1: C -> B\ndisk 2: C -> A\ndisk 1: B -> A\ndisk 3: C -> B\ndisk 1: A -> C\ndisk 2: A -> B\ndisk 1: C -> B\ndisk 5: A -> C\ndisk 1: B -> A\ndisk 2: B -> C\ndisk 1: A -> C\ndisk 3: B -> A\ndisk 1: C -> B\ndisk 2: C -> A\ndisk 1: B -> A\ndisk 4: B -> C\ndisk 1: A -> C\ndisk 2: A -> B\ndisk 1: C -> B\ndisk 3: A -> C\ndisk 1: B -> A\ndisk 2: B -> C\ndisk 1: A -> C\n31 moves"
+  ]
+ },
+ "tsm-w6-json-walk": {
+  "hash": "48493ab6954cd838eac1",
+  "outputs": [
+   "numbers 3 sum 6\nstrings 1\ndepth 3",
+   "numbers 1 sum 42\nstrings 0\ndepth 0",
+   "numbers 0 sum 0\nstrings 1\ndepth 3",
+   "numbers 0 sum 0\nstrings 0\ndepth 1"
+  ]
+ },
+ "tsm-w6-no-11": {
+  "hash": "e4f0111a2e2a745c9d92",
+  "outputs": [
+   "0 1\n2",
+   "000 001 010 100 101\n5",
+   "0000 0001 0010 0100 0101 1000 1001 1010\n8",
+   "000000000000 000000000001 000000000010 000000000100 000000000101 000000001000 000000001001 000000001010 000000010000 000000010001 000000010010 000000010100 000000010101 000000100000 000000100001 000000100010 000000100100 000000100101 000000101000 000000101001 000000101010 000001000000 000001000001 000001000010 000001000100 000001000101 000001001000 000001001001 000001001010 000001010000 000001010001 000001010010 000001010100 000001010101 000010000000 000010000001 000010000010 000010000100 000010000101 000010001000 000010001001 000010001010 000010010000 000010010001 000010010010 000010010100 000010010101 000010100000 000010100001 000010100010 000010100100 000010100101 000010101000 000010101001 000010101010 000100000000 000100000001 000100000010 000100000100 000100000101 000100001000 000100001001 000100001010 000100010000 000100010001 000100010010 000100010100 000100010101 000100100000 000100100001 000100100010 000100100100 000100100101 000100101000 000100101001 000100101010 000101000000 000101000001 000101000010 000101000100 000101000101 000101001000 000101001001 000101001010 000101010000 000101010001 000101010010 000101010100 000101010101 001000000000 001000000001 001000000010 001000000100 001000000101 001000001000 001000001001 001000001010 001000010000 001000010001 001000010010 001000010100 001000010101 001000100000 001000100001 001000100010 001000100100 001000100101 001000101000 001000101001 001000101010 001001000000 001001000001 001001000010 001001000100 001001000101 001001001000 001001001001 001001001010 001001010000 001001010001 001001010010 001001010100 001001010101 001010000000 001010000001 001010000010 001010000100 001010000101 001010001000 001010001001 001010001010 001010010000 001010010001 001010010010 001010010100 001010010101 001010100000 001010100001 001010100010 001010100100 001010100101 001010101000 001010101001 001010101010 010000000000 010000000001 010000000010 010000000100 010000000101 010000001000 010000001001 010000001010 010000010000 010000010001 010000010010 010000010100 010000010101 010000100000 010000100001 010000100010 010000100100 010000100101 010000101000 010000101001 010000101010 010001000000 010001000001 010001000010 010001000100 010001000101 010001001000 010001001001 010001001010 010001010000 010001010001 010001010010 010001010100 010001010101 010010000000 010010000001 010010000010 010010000100 010010000101 010010001000 010010001001 010010001010 010010010000 010010010001 010010010010 010010010100 010010010101 010010100000 010010100001 010010100010 010010100100 010010100101 010010101000 010010101001 010010101010 010100000000 010100000001 010100000010 010100000100 010100000101 010100001000 010100001001 010100001010 010100010000 010100010001 010100010010 010100010100 010100010101 010100100000 010100100001 010100100010 010100100100 010100100101 010100101000 010100101001 010100101010 010101000000 010101000001 010101000010 010101000100 010101000101 010101001000 010101001001 010101001010 010101010000 010101010001 010101010010 010101010100 010101010101 100000000000 100000000001 100000000010 100000000100 100000000101 100000001000 100000001001 100000001010 100000010000 100000010001 100000010010 100000010100 100000010101 100000100000 100000100001 100000100010 100000100100 100000100101 100000101000 100000101001 100000101010 100001000000 100001000001 100001000010 100001000100 100001000101 100001001000 100001001001 100001001010 100001010000 100001010001 100001010010 100001010100 100001010101 100010000000 100010000001 100010000010 100010000100 100010000101 100010001000 100010001001 100010001010 100010010000 100010010001 100010010010 100010010100 100010010101 100010100000 100010100001 100010100010 100010100100 100010100101 100010101000 100010101001 100010101010 100100000000 100100000001 100100000010 100100000100 100100000101 100100001000 100100001001 100100001010 100100010000 100100010001 100100010010 100100010100 100100010101 100100100000 100100100001 100100100010 100100100100 100100100101 100100101000 100100101001 100100101010 100101000000 100101000001 100101000010 100101000100 100101000101 100101001000 100101001001 100101001010 100101010000 100101010001 100101010010 100101010100 100101010101 101000000000 101000000001 101000000010 101000000100 101000000101 101000001000 101000001001 101000001010 101000010000 101000010001 101000010010 101000010100 101000010101 101000100000 101000100001 101000100010 101000100100 101000100101 101000101000 101000101001 101000101010 101001000000 101001000001 101001000010 101001000100 101001000101 101001001000 101001001001 101001001010 101001010000 101001010001 101001010010 101001010100 101001010101 101010000000 101010000001 101010000010 101010000100 101010000101 101010001000 101010001001 101010001010 101010010000 101010010001 101010010010 101010010100 101010010101 101010100000 101010100001 101010100010 101010100100 101010100101 101010101000 101010101001 101010101010\n377"
+  ]
+ },
+ "tsm-w6-ops": {
+  "hash": "fdeb0ea95d9be861f67c",
+  "outputs": [
+   "6 7 49",
+   "5 2 -2 -3",
+   "6\nunknown cube",
+   "unknown toString"
+  ]
+ },
+ "tsm-w6-pipe": {
+  "hash": "d8d3d265bdfe675c62b4",
+  "outputs": [
+   "[hello world]\n[a b]",
+   "[CBA]\n[ZYX]",
+   "[keep]"
+  ]
+ },
+ "tsm-w6-quantifiers": {
+  "hash": "59b7b945952c30713d59",
+  "outputs": [
+   "all even: true\nany negative: false\nnone zero: true\nsorted: true",
+   "all even: false\nany negative: true\nnone zero: false\nsorted: false",
+   "all even: false\nany negative: false\nnone zero: true\nsorted: true",
+   "all even: true\nany negative: false\nnone zero: false\nsorted: true"
+  ]
+ },
+ "tsm-w6-unique-perms": {
+  "hash": "7a59143481843dce1496",
+  "outputs": [
+   "aab aba baa\n3\nabc acb bac bca cab cba\n6",
+   "zz\n1",
+   "aabb abab abba baab baba bbaa\n6\nx\n1"
+  ]
+ },
+ "tsm-w7-chunk": {
+  "hash": "c3484957ab419b158044",
+  "outputs": [
+   "a b\nc d\ne",
+   "1 2 3",
+   "x y"
+  ]
+ },
+ "tsm-w7-dedupe": {
+  "hash": "68df883a5edf0ff54d96",
+  "outputs": [
+   "3 1 2\n2 removed",
+   "a\n2 removed",
+   "x y z\n0 removed"
+  ]
+ },
+ "tsm-w7-dense-rank": {
+  "hash": "b531fcbd07e30b2dced4",
+  "outputs": [
+   "#1 90 (x2)\n#2 85 (x2)\n#3 70 (x1)",
+   "#1 5 (x3)",
+   "#1 -1 (x1)"
+  ]
+ },
+ "tsm-w7-diffs": {
+  "hash": "29fcf4c1b1e02f66abb5",
+  "outputs": [
+   "2 3 4\nincreasing",
+   "-2 0\nmixed",
+   "0 0\nconstant",
+   "(none)\nconstant",
+   "-5 -4\ndecreasing"
+  ]
+ },
+ "tsm-w7-group-length": {
+  "hash": "3bbc486eca8dd9f39e96",
+  "outputs": [
+   "1: a\n2: on\n3: the cat sat big mat\n3",
+   "5: hello\n5",
+   "1: b d\n2: aa cc\n3: eee\n1"
+  ]
+ },
+ "tsm-w7-interleave": {
+  "hash": "4f6b2eb422e10a36b166",
+  "outputs": [
+   "a 1 x b 2 y c z w\n4",
+   "only list\n1",
+   "1 2 3\n3"
+  ]
+ },
+ "tsm-w7-rotate": {
+  "hash": "ea79fc5dec05338ceece",
+  "outputs": [
+   "3 4 5 1 2",
+   "b c a",
+   "4 1 2 3",
+   "z"
+  ]
+ },
+ "tsm-w7-spiral": {
+  "hash": "f03dc21aa4c41b564a55",
+  "outputs": [
+   "1 2 3 6 9 8 7 4 5",
+   "1 2 3 4 8 12 11 10 9 5 6 7",
+   "1 2 3",
+   "a b c"
+  ]
+ },
+ "tsm-w7-transpose": {
+  "hash": "d50abd1651b7e4a510ee",
+  "outputs": [
+   "1 4\n2 5\n3 6",
+   "a b c",
+   "7"
+  ]
+ },
+ "tsm-w7-two-keys": {
+  "hash": "a9c94be1d13463f30498",
+  "outputs": [
+   "ada 95\nal 95\nbo 80\ncy 80\nfirst was cy",
+   "solo 1\nfirst was solo",
+   "c 2\na 1\nb 1\nfirst was b"
+  ]
+ },
+ "tsm-w7-zip": {
+  "hash": "1afe4e014f2bf1275d78",
+  "outputs": [
+   "a:1 b:2 c:3\n3 pairs, 0 left over",
+   "x:1 y:2\n2 pairs, 2 left over",
+   "solo:many\n1 pairs, 2 left over"
+  ]
+ },
+ "tsm-w8-count-by-key": {
+  "hash": "cf08a01808faf9254ee1",
+  "outputs": [
+   "Oslo: 2\n(missing): 1\nRome: 1",
+   "true: 2\nfalse: 1",
+   "(none)"
+  ]
+ },
+ "tsm-w8-deep-merge": {
+  "hash": "459e96c730f57aa39546",
+  "outputs": [
+   "{\n  \"debug\": false,\n  \"server\": {\n    \"host\": \"x\",\n    \"port\": 8080\n  },\n  \"tags\": [\n    \"b\",\n    \"c\"\n  ]\n}",
+   "{\n  \"a\": 1,\n  \"d\": {\n    \"e\": 3\n  }\n}",
+   "{}"
+  ]
+ },
+ "tsm-w8-diff": {
+  "hash": "b43bc5d7a2bb0c44dcf7",
+  "outputs": [
+   "~ b: 2 -> 20\n- c: 3\n+ d: 4",
+   "no changes",
+   "+ k: \"v\"",
+   "~ n: 1 -> \"1\""
+  ]
+ },
+ "tsm-w8-flatten": {
+  "hash": "751b25cf647cb9b0dab3",
+  "outputs": [
+   "a.b = 1\na.c[0] = true\na.c[1].d = null\ne = \"x\"",
+   "k = {}\nl = []",
+   "a.y = 2\nz = 1"
+  ]
+ },
+ "tsm-w8-get": {
+  "hash": "52e1ec5cefa567256efb",
+  "outputs": [
+   "\"ada\"\nnone\nout of range\n[{\"name\":\"ada\",\"tags\":[\"x\"]},{\"name\":\"bo\"}]",
+   "2\nno"
+  ]
+ },
+ "tsm-w8-invert": {
+  "hash": "49a3dd62ab14ae43b17b",
+  "outputs": [
+   "{\"x\":\"c\",\"y\":\"b\"}\n1",
+   "{\"1\":\"one\",\"2\":\"two\"}\n0",
+   "{}\n0"
+  ]
+ },
+ "tsm-w8-pick": {
+  "hash": "785f3702391922fb7844",
+  "outputs": [
+   "{\"name\":\"ada\",\"id\":1}\n{\"name\":\"bo\"}",
+   "{}",
+   "{\"b\":[2],\"a\":1}"
+  ]
+ },
+ "tsm-w8-query": {
+  "hash": "674f63daa8f1b774ef3f",
+  "outputs": [
+   "page=2&q=type%20script&tags=a&tags=b%26c",
+   "(empty)",
+   "a%20b=x%3Dy&z=true"
+  ]
+ },
+ "tsm-w8-rename": {
+  "hash": "8f32ba81d966d37c4990",
+  "outputs": [
+   "{\"first\":\"Ada\",\"last\":\"L\",\"age\":36}",
+   "{\"a\":1}",
+   "{\"b\":1,\"c\":[1,2]}"
+  ]
+ },
+ "tsm-w8-unflatten": {
+  "hash": "7348b608053e8190600b",
+  "outputs": [
+   "{\n  \"a\": {\n    \"b\": 1,\n    \"c\": true\n  },\n  \"d\": \"hello\"\n}",
+   "{\n  \"x\": {\n    \"y\": {\n      \"z\": [\n        1,\n        2\n      ],\n      \"w\": null\n    }\n  }\n}",
+   "conflict at a.b\n{\n  \"a\": 1,\n  \"c\": {\n    \"d\": \"quoted\"\n  }\n}"
+  ]
+ },
+ "tsm-w8-validate": {
+  "hash": "04b5d4118daf560cd0db",
+  "outputs": [
+   "ok\nage should be number; unexpected admin\nmissing name; email should be string",
+   "ok\nmissing on\non should be boolean; unexpected x"
+  ]
+ },
+ "tsm-w9-anagrams": {
+  "hash": "17c30b841d1e53585878",
+  "outputs": [
+   "listen silent enlist Tinsel\n2 singletons",
+   "abc bca cab\nxyz zyx\n1 singletons",
+   "1 singletons"
+  ]
+ },
+ "tsm-w9-common": {
+  "hash": "00bb78e72b42081ba0ab",
+  "outputs": [
+   "2 4\n6",
+   "(none)\n2",
+   "7 8 9\n3"
+  ]
+ },
+ "tsm-w9-first-repeat": {
+  "hash": "e6a8b74b7add2f812932",
+  "outputs": [
+   "the\nnone\nit",
+   "b"
+  ]
+ },
+ "tsm-w9-happy": {
+  "hash": "ed8c9d132ba33e26c4a3",
+  "outputs": [
+   "19 82 68 100 1\nhappy\n2 4 16 37 58 89 145 42 20 4\ncycle",
+   "1\nhappy\n7 49 97 130 10 1\nhappy",
+   "4 16 37 58 89 145 42 20 4\ncycle"
+  ]
+ },
+ "tsm-w9-harmony": {
+  "hash": "e01e0c1a3fae26508f4a",
+  "outputs": [
+   "5\n2 3",
+   "0",
+   "4\n5 6",
+   "0"
+  ]
+ },
+ "tsm-w9-lru": {
+  "hash": "81e02c18b68ecad21ab2",
+  "outputs": [
+   "1\nevict b\nmiss\n1\n3",
+   "8\nevict x\nmiss"
+  ]
+ },
+ "tsm-w9-pairs-k": {
+  "hash": "43d0081944a67f078b95",
+  "outputs": [
+   "1:3 3:5\n2",
+   "1:1 2:2\n2",
+   "1:2 2:3 3:4 4:5\n4",
+   "(none)\n0"
+  ]
+ },
+ "tsm-w9-ransom": {
+  "hash": "9c13e3f4197199edc766",
+  "outputs": [
+   "yes",
+   "missing e1 o2 z2",
+   "yes"
+  ]
+ },
+ "tsm-w9-same-shape": {
+  "hash": "07e12bfc2250e12b8d7b",
+  "outputs": [
+   "yes\nno\nyes\nno",
+   "yes\nyes"
+  ]
+ },
+ "tsm-w9-tags": {
+  "hash": "08f2a9b6d18f24fa3d6c",
+  "outputs": [
+   "shared: js web\neither: css js ts web\nonly first: ts\nonly second: css\nin exactly one: css ts\nfirst ⊆ second: false",
+   "shared: a\neither: a b\nonly first: (none)\nonly second: b\nin exactly one: b\nfirst ⊆ second: true",
+   "shared: (none)\neither: x y\nonly first: x y\nonly second: (none)\nin exactly one: x y\nfirst ⊆ second: false"
+  ]
+ },
+ "tsm-w9-window-distinct": {
+  "hash": "424d42a63688cee7f222",
+  "outputs": [
+   "2 3 3 3 3",
+   "1 1 1",
+   "1 2",
+   "(none)"
   ]
  }
 }

@@ -55,6 +55,10 @@ declare function setTimeout(handler: () => void, ms?: number): number;
 declare function clearTimeout(handle: number): void;
 declare function queueMicrotask(callback: () => void): void;
 
+// The TypeScript Mastery "modern arrays" chapter (week 7) teaches deep copies.
+// A host global in Node 17+, typed as the DOM lib types it.
+declare function structuredClone<T>(value: T, options?: { transfer?: unknown[] }): T;
+
 // ---------------------------------------------------------------------------
 // HTTP — used by the Projects track, whose programs boot a real server on port
 // 0 and replay a request script through `fetch`.

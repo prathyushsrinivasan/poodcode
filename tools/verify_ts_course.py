@@ -124,16 +124,21 @@ def format_diagnostics(source, diags, limit=3):
 # --------------------------------------------------------------------------
 
 def run_program(code, stdin, args):
+    """Run `code` with `stdin` exactly as the judge does. The pipes are binary on
+    purpose: in text mode Python on Windows writes every "\\n" to the child's
+    stdin as "\\r\\n" and reads a lone "\\r" back as a newline, so a program that
+    doesn't trim each line saw different input here than in the app."""
     with tempfile.TemporaryDirectory() as d:
         path = os.path.join(d, "main.ts")
         with open(path, "w", encoding="utf-8", newline="\n") as f:
             f.write(code)
         try:
             p = subprocess.run(
-                ["node", *args, "main.ts"], cwd=d, input=stdin, capture_output=True,
-                text=True, encoding="utf-8", errors="replace", timeout=RUN_TIMEOUT,
+                ["node", *args, "main.ts"], cwd=d, input=stdin.encode("utf-8"),
+                capture_output=True, timeout=RUN_TIMEOUT,
             )
-            return p.stdout, p.stderr, p.returncode
+            return (p.stdout.decode("utf-8", errors="replace"),
+                    p.stderr.decode("utf-8", errors="replace"), p.returncode)
         except subprocess.TimeoutExpired:
             return "", "TIMEOUT", -1
 

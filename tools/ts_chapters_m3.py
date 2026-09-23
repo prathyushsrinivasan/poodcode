@@ -696,3 +696,1052 @@ console.log(passed + "/" + total);
          "It swallows any error, so a test can pass for the wrong reason — a typo in the call is an error too. Keep each negative test to one small line, and prefer `@ts-expect-error` over `@ts-ignore`, which never complains when the error goes away."),
     ],
 )
+
+
+_chapter(
+    "ts_set_algebra", "TS: Data Structures",
+    "Set Algebra, Grouping & Weak Collections",
+    "The ES2025 `Set` methods — `union`, `intersection`, `difference`, `symmetricDifference`, `isSubsetOf` and friends — `Map.groupBy`, and `WeakMap`/`WeakSet` for data keyed by object identity.",
+    "Sets answer membership questions in constant time, and until recently combining two of them meant hand-written loops. Modern runtimes ship the whole algebra as methods: `a.union(b)`, `a.intersection(b)`, `a.difference(b)`, and the subset tests. `Map.groupBy` buckets values under any kind of key. And `WeakMap`/`WeakSet` attach data to objects without keeping those objects alive — the right tool for caches and metadata keyed by identity.",
+    "`Set.retainAll` and `addAll` mutate the set in place; the new JavaScript methods return new sets and leave both inputs alone. `WeakMap` is Java's `WeakHashMap`, except that its keys must be objects and it can't be iterated at all.",
+    why=r"""
+"Which tags do both articles share?", "which users are in the old list but not
+the new one?", "is every required permission granted?" — these are set
+questions, and writing them as nested loops is both slower and harder to read
+than the one-word answer.
+
+Node 24 runs the ES2025 set methods natively and the judge's `lib` types them,
+so this programme can use them from week 9 on. Alongside them this chapter
+covers grouping by non-string keys and the weak collections, which exist for
+one job the others can't do: remembering something about an object without
+preventing it from being garbage-collected.
+""",
+    idea=r"""
+**The algebra.** Each returns a **new** `Set`; neither operand changes.
+
+| method | contains |
+|---|---|
+| `a.union(b)` | everything in either |
+| `a.intersection(b)` | only what's in both |
+| `a.difference(b)` | what's in `a` but not `b` |
+| `a.symmetricDifference(b)` | what's in exactly one |
+
+And three questions that return a `boolean`: `a.isSubsetOf(b)`,
+`a.isSupersetOf(b)`, `a.isDisjointFrom(b)`.
+
+The argument must be *set-like* — it needs `size`, `has` and `keys` — so pass a
+`Set` or a `Map`, not an array: `a.union(new Set(array))`.
+
+**Equality inside sets and maps** is *SameValueZero*: like `===`, except that
+`NaN` equals `NaN`. Objects are compared by identity — two different objects
+with the same contents are two members.
+
+**Order.** Sets and maps iterate in insertion order. The results of the
+algebra methods follow the order of the receiver, then the argument.
+
+**`Map.groupBy(items, keyFn)`** groups into a `Map`, so the key can be a
+number, an object, anything — unlike `Object.groupBy`, whose keys become
+strings.
+
+**Weak collections.** `WeakMap<K, V>` and `WeakSet<T>` only accept objects (or
+non-registered symbols) as keys, hold them *weakly* — an entry disappears when
+nothing else references the key — and so cannot be iterated or sized. Use them
+to attach private data or a cached result to objects you don't own.
+""",
+    examples=[
+        ("Tag algebra",
+         r"""
+import * as fs from "fs";
+const [first = "", second = ""] = fs.readFileSync(0, "utf8").trim().split("\n");
+const a = new Set(first.trim().split(/\s+/));
+const b = new Set(second.trim().split(/\s+/));
+const show = (s: Set<string>) => [...s].join(" ") || "(none)";
+console.log("both:     ", show(a.intersection(b)));
+console.log("either:   ", show(a.union(b)));
+console.log("only a:   ", show(a.difference(b)));
+console.log("only one: ", show(a.symmetricDifference(b)));
+console.log("a within b?", a.isSubsetOf(b), "| share nothing?", a.isDisjointFrom(b));
+""", ["ts js web\njs web css", "x\nx y"],
+         "Five questions, five method calls — and `a` and `b` are untouched by all of them."),
+        ("Grouping by a numeric key",
+         r"""
+const scores = [91, 78, 85, 62, 99, 70, 88];
+const byDecade = Map.groupBy(scores, (s) => Math.floor(s / 10) * 10);
+for (const [decade, group] of [...byDecade].sort((x, y) => y[0] - x[0])) {
+  console.log(`${decade}s: ${group.join(" ")}`);
+}
+""", [""],
+         "`Map.groupBy` keeps the keys as numbers, so the buckets sort numerically without converting strings back."),
+        ("Remembering things about objects",
+         r"""
+type Node = { id: string; children: Node[] };
+const sizeCache = new WeakMap<Node, number>();
+let computed = 0;
+function size(node: Node): number {
+  const cached = sizeCache.get(node);
+  if (cached !== undefined) return cached;
+  computed++;
+  let total = 1;
+  for (const child of node.children) total += size(child);
+  sizeCache.set(node, total);
+  return total;
+}
+const leaf = { id: "leaf", children: [] };
+const tree: Node = { id: "root", children: [{ id: "a", children: [leaf] }, leaf] };
+console.log(size(tree), size(tree), `computed ${computed}`);
+""", [""],
+         "The cache is keyed by the node object itself. `leaf` appears twice but is sized once, and if the tree is dropped the cache entries go with it — a `Map` would keep every node alive forever."),
+    ],
+    errors=[
+        (2345, r"""
+const tags = new Set(["a", "b"]);
+const more = ["b", "c"];
+console.log(tags.union(more));
+""", "The set methods need a set-like argument (`size`, `has`, `keys`). An array has none of them; wrap it: `tags.union(new Set(more))`."),
+        (2344, r"""
+const seen = new WeakMap<string, number>();
+seen.set("id", 1);
+console.log(seen.has("id"));
+""", "Weak collections only hold objects (and non-registered symbols) — a string can't be held weakly. Use a `Map` for primitive keys."),
+    ],
+    pitfalls=[
+        ("Objects are members by identity",
+         r"""
+const visited = new Set<{ x: number; y: number }>();
+for (const [x, y] of [[0, 0], [1, 0], [0, 0]]) visited.add({ x, y });
+console.log(visited.size);
+""",
+         r"""
+const visited = new Set<string>();
+for (const [x, y] of [[0, 0], [1, 0], [0, 0]]) visited.add(`${x},${y}`);
+console.log(visited.size);
+""",
+         "Every `{ x, y }` literal is a new object, so the \"duplicate\" point is a third member. For value semantics, key the set by a string (or number) that encodes the value."),
+        ("`new Set(\"word\")` is a set of letters",
+         r"""
+const allowed = new Set("admin");
+console.log(allowed.has("admin"), allowed.size);
+""",
+         r"""
+const allowed = new Set(["admin"]);
+console.log(allowed.has("admin"), allowed.size);
+""",
+         "The constructor iterates its argument, and iterating a string yields characters. Wrap a single value in an array."),
+        ("A `Set` serialises as `{}`",
+         r"""
+const tags = new Set(["a", "b"]);
+console.log(JSON.stringify({ tags }));
+""",
+         r"""
+const tags = new Set(["a", "b"]);
+console.log(JSON.stringify({ tags: [...tags] }));
+""",
+         "`JSON.stringify` only sees own enumerable properties, and a `Set` has none. Convert to an array first (the same goes for `Map` — use `Object.fromEntries` or an array of entries)."),
+    ],
+    later=[
+        "**Week 12 — Discriminated unions.** A `Set` of visited states in a state machine.",
+        "**Week 17 — Utility types.** `Exclude` and `Extract` are set difference and intersection on *types*.",
+        "**Week 24 — Generic data structures.** Building your own collections with the same iteration protocol.",
+    ],
+    exercises=[
+        _drill("ts_set_algebra-both", "What both lists share",
+               "The input is two lines of words. Replace `____` with the set of words that appear on both lines.",
+               r"""
+import * as fs from "fs";
+const [x = "", y = ""] = fs.readFileSync(0, "utf8").trim().split("\n");
+const a = new Set(x.trim().split(/\s+/));
+const b = new Set(y.trim().split(/\s+/));
+const both = a.intersection(b);
+console.log([...both].sort().join(" ") || "(none)");
+""", ["a.intersection(b)"], ["red green blue\ngreen blue pink", "a\nb", "x y\ny x"],
+               hint="One method call on `a`, with `b` as its argument."),
+        _drill("ts_set_algebra-missing", "What's missing",
+               "The first line lists required permissions, the second the granted ones. Replace `____` with the set of required permissions that were not granted.",
+               r"""
+import * as fs from "fs";
+const [req = "", got = ""] = fs.readFileSync(0, "utf8").trim().split("\n");
+const required = new Set(req.trim().split(/\s+/));
+const granted = new Set(got.trim().split(/\s+/));
+const missing = required.difference(granted);
+console.log(missing.size === 0 ? "all granted" : `missing ${[...missing].join(" ")}`);
+console.log(required.isSubsetOf(granted));
+""", ["required.difference(granted)"], ["read write\nread", "read\nread write admin", "a b c\nx"],
+               hint="Required minus granted."),
+        _chal("ts_set_algebra-roster", "Roster changes", "Medium",
+              "The first line is last term's roster, the second this term's (names separated by spaces; a name may repeat by mistake). Print `joined: …`, `left: …` and `stayed: …` — each sorted, `(none)` if empty — then `same roster` or `changed`.",
+              r"""
+const [before = "", after = ""] = input.split("\n");
+const old = new Set(before.trim().split(/\s+/).filter((n) => n !== ""));
+const now = new Set(after.trim().split(/\s+/).filter((n) => n !== ""));
+const list = (s: Set<string>) => [...s].sort().join(" ") || "(none)";
+console.log(`joined: ${list(now.difference(old))}`);
+console.log(`left: ${list(old.difference(now))}`);
+console.log(`stayed: ${list(old.intersection(now))}`);
+console.log(old.symmetricDifference(now).size === 0 ? "same roster" : "changed");
+""", ["ada bo cy\nbo cy dee", "x y\ny x x", "\nnew"],
+              hint="Joined is new minus old; left is old minus new; unchanged means the symmetric difference is empty."),
+    ],
+    quiz=[
+        _cq("What does `a.difference(b)` return?", "A new set of the members of `a` that are not in `b`",
+            ["It removes `b`'s members from `a` in place", "Members in exactly one of the two", "A boolean"],
+            "The set methods never mutate either operand."),
+        _cq("Why can't you write `set.union([1, 2])`?", "The argument must be set-like (`size`, `has`, `keys`), and an array isn't",
+            ["Arrays can't contain numbers", "`union` takes two sets", "You can; it's fine"],
+            "Wrap it: `set.union(new Set([1, 2]))`."),
+        _cq("How are keys compared in a `Set`?", "SameValueZero — like `===`, but `NaN` equals `NaN`; objects by identity",
+            ["Deep equality", "By `JSON.stringify`", "By `==`"],
+            "Two equal-looking objects are two different members."),
+        _cq("When do you need a `WeakMap` rather than a `Map`?", "To attach data to objects without keeping them alive",
+            ["For string keys", "When you need to iterate the entries", "For better ordering"],
+            "Entries disappear with their key; the price is no iteration and no `size`."),
+        _cq("`Map.groupBy` versus `Object.groupBy`?", "`Map.groupBy` keeps keys of any type; `Object.groupBy` turns them into property keys",
+            ["They're identical", "`Map.groupBy` sorts the groups", "`Object.groupBy` is faster"],
+            "Numbers, objects or booleans as keys call for the `Map` version."),
+    ],
+    interview=[
+        ("How would you find the items common to two large lists?",
+         "Put one in a `Set` and filter the other by `has` — O(n + m) rather than nested loops — or, with ES2025, `new Set(a).intersection(new Set(b))`. For objects I'd key by an id, since sets compare objects by identity."),
+        ("What's a `WeakMap` good for?",
+         "Associating data with objects you don't own without leaking them: caches of computed results, private per-instance state, metadata on DOM nodes. Keys must be objects, entries vanish when the key is collected, and you can't iterate or size it."),
+        ("Why does `new Set([{a: 1}, {a: 1}]).size` equal 2?",
+         "Sets use SameValueZero, which compares objects by reference. Two literals are two objects. Use a primitive key — an id or a serialised form — for value semantics."),
+    ],
+)
+
+
+_chapter(
+    "ts_literal_inference", "TS: Type System",
+    "Literal Types, Widening & `as const`",
+    "When TypeScript keeps a literal type and when it widens it, how `as const` freezes a value's type, and deriving a union from a list of values with `typeof xs[number]`.",
+    "Write `\"up\"` and TypeScript can give it the type `\"up\"` — or just `string`. Which one it picks follows a few rules: `const` bindings keep literals, `let` bindings and object properties widen them, and `as const` stops all widening at once. Those rules decide whether a value can be passed where a union like `\"up\" | \"down\"` is expected, and they let one array of values be the single source of truth for both the runtime list and the type.",
+    "Java would reach for an enum here. The TypeScript idiom is a union of string literals — erased at runtime, checked at compile time — often derived from an `as const` array so the list of values exists exactly once.",
+    why=r"""
+You declare `type Direction = "up" | "down"` and a function that takes one. Then
+`let dir = "up"; move(dir)` fails to compile, while `move("up")` works. A config
+object `{ method: "GET" }` is rejected by a function that wants
+`"GET" | "POST"`. And the list of valid values lives twice — once in the union,
+once in an array for validation — and they drift.
+
+All three come from literal inference. Once you know when a literal widens,
+the errors make sense; and `as const` with `typeof xs[number]` turns the two
+lists into one.
+""",
+    idea=r"""
+**Widening rules.**
+
+| declaration | inferred type |
+|---|---|
+| `const d = "up"` | `"up"` — a `const` can never change |
+| `let d = "up"` | `string` — it might be reassigned |
+| `const o = { d: "up" }` | `{ d: string }` — properties are mutable |
+| `const xs = ["up", "down"]` | `string[]` — arrays are mutable |
+
+The same goes for numbers and booleans.
+
+**Contextual typing prevents widening.** If the value is written where a
+literal type is expected — `move("up")`, or `const d: Direction = "up"` — it
+stays literal.
+
+**`as const`** makes a whole expression as narrow as possible: literals stay
+literals, arrays become `readonly` tuples, object properties become `readonly`:
+
+```ts
+const SIZES = ["S", "M", "L"] as const;   // readonly ["S", "M", "L"]
+type Size = (typeof SIZES)[number];        // "S" | "M" | "L"
+```
+
+`typeof SIZES[number]` asks "what is the type of any element?" — the union of
+the literals. Now the array is the single source of truth: add `"XL"` and the
+type follows.
+
+**Validation still needs runtime code.** `as const` only affects types. A
+string read from input is `string` until you check it against the list —
+`SIZES.find((s) => s === text)` narrows it properly.
+
+**Enums** (next chapter, in the same week) are the older, non-erasable way to
+name a set of values; literal unions are preferred today, and they run under
+Node's type stripping, which enums don't.
+""",
+    examples=[
+        ("One list, the values and the type",
+         r"""
+import * as fs from "fs";
+const SIZES = ["S", "M", "L", "XL"] as const;
+type Size = (typeof SIZES)[number];
+const chest: Record<Size, number> = { S: 90, M: 98, L: 106, XL: 114 };
+
+function parseSize(text: string): Size | undefined {
+  return SIZES.find((s) => s === text);
+}
+
+for (const token of fs.readFileSync(0, "utf8").trim().split(/\s+/)) {
+  const size = parseSize(token.toUpperCase());
+  console.log(size === undefined ? `${token}: unknown size` : `${size}: ${chest[size]} cm`);
+}
+""", ["m xl s", "XXL L"],
+         "`Size` is derived from `SIZES`; `Record<Size, number>` must cover every size; `find` turns a string into a checked `Size`. Adding a size to the array updates all three."),
+        ("Where a literal widens",
+         r"""
+type Method = "GET" | "POST";
+function send(method: Method, path: string): string {
+  return `${method} ${path}`;
+}
+
+const fixed = "GET";
+const request = { method: "POST", path: "/items" } as const;
+const table = { method: "GET" as Method, path: "/" };
+
+console.log(send(fixed, "/health"));
+console.log(send(request.method, request.path));
+console.log(send(table.method, table.path));
+""", [""],
+         "`fixed` is `\"GET\"` because it's a `const`. The object needs help: `as const` on the whole literal, or an annotation on the one property. Without either, `method` would be `string` and `send` would refuse it."),
+        ("Readonly tuples from `as const`",
+         r"""
+const ORIGIN = [0, 0] as const;
+const STEPS = { N: [0, 1], E: [1, 0], S: [0, -1], W: [-1, 0] } as const;
+type Heading = keyof typeof STEPS;
+
+function move([x, y]: readonly [number, number], heading: Heading, n: number): [number, number] {
+  const [dx, dy] = STEPS[heading];
+  return [x + dx * n, y + dy * n];
+}
+
+let at = move(ORIGIN, "N", 3);
+at = move(at, "E", 2);
+at = move(at, "S", 5);
+console.log(at.join(","));
+""", [""],
+         "`as const` makes each step a `readonly [number, number]` and the object's keys a literal union — `keyof typeof STEPS` is `\"N\" | \"E\" | \"S\" | \"W\"` with no separate declaration."),
+    ],
+    errors=[
+        (2345, r"""
+type Direction = "up" | "down";
+function move(d: Direction): string {
+  return d === "up" ? "^" : "v";
+}
+let current = "up";
+console.log(move(current));
+""", "`let current = \"up\"` widens to `string`, because a `let` can be reassigned to any string. Declare it `const`, or annotate it `let current: Direction = \"up\"`."),
+        (2540, r"""
+const LIMITS = { min: 1, max: 10 } as const;
+LIMITS.max = 20;
+console.log(LIMITS.max);
+""", "`as const` made every property `readonly`. (At runtime nothing is frozen — the check is compile-time only.)"),
+    ],
+    pitfalls=[
+        ("An object property widens",
+         (r"""
+type Level = "info" | "warn";
+function log(entry: { level: Level; text: string }): string {
+  return `[${entry.level}] ${entry.text}`;
+}
+const entry = { level: "warn", text: "disk almost full" };
+console.log(log(entry));
+""", 2345),
+         r"""
+type Level = "info" | "warn";
+function log(entry: { level: Level; text: string }): string {
+  return `[${entry.level}] ${entry.text}`;
+}
+const entry = { level: "warn", text: "disk almost full" } as const;
+console.log(log(entry));
+""",
+         "Object properties are mutable, so `level: \"warn\"` is inferred as `string`. `as const` (or annotating `entry` with the parameter's type) keeps the literal."),
+        ("A cast is not a check",
+         r"""
+import * as fs from "fs";
+const MODES = ["fast", "safe"] as const;
+type Mode = (typeof MODES)[number];
+const mode = fs.readFileSync(0, "utf8").trim() as Mode;
+console.log(mode === "fast" ? "fast path" : mode === "safe" ? "safe path" : "unreachable?");
+""",
+         r"""
+import * as fs from "fs";
+const MODES = ["fast", "safe"] as const;
+type Mode = (typeof MODES)[number];
+const text = fs.readFileSync(0, "utf8").trim();
+const mode: Mode | undefined = MODES.find((m) => m === text);
+console.log(mode === undefined ? "invalid mode" : mode === "fast" ? "fast path" : "safe path");
+""",
+         "`as Mode` tells the compiler to believe it; the program then reaches a branch its own types say is impossible. Check input against the list and carry `undefined` when it isn't there.",
+         ["turbo"]),
+        ("`as const` arrays can't go where mutable arrays are expected",
+         (r"""
+const DEFAULTS = ["a", "b"] as const;
+function addTag(tags: string[], tag: string): string[] {
+  tags.push(tag);
+  return tags;
+}
+console.log(addTag(DEFAULTS, "c").join(","));
+""", 2345),
+         r"""
+const DEFAULTS = ["a", "b"] as const;
+function addTag(tags: readonly string[], tag: string): string[] {
+  return [...tags, tag];
+}
+console.log(addTag(DEFAULTS, "c").join(","), DEFAULTS.length);
+""",
+         "A `readonly` tuple can't be passed as `string[]`, because the function might mutate it — and this one does. Accept `readonly string[]` and return a new array; that function now works with both."),
+    ],
+    later=[
+        "**Week 15 — `satisfies`.** Check a value against a type *without* widening it — the other half of this chapter.",
+        "**Week 18 — `const` type parameters.** A generic function that infers literal types from its arguments, as if the caller wrote `as const`.",
+        "**Week 19 — `keyof` and indexed access.** `keyof typeof obj` and `T[number]` in depth.",
+    ],
+    exercises=[
+        _drill("ts_literal_inference-derive", "One list, one type",
+               "Replace `____` with the type of any element of `COLORS` — the union of its literals.",
+               r"""
+import * as fs from "fs";
+const COLORS = ["red", "green", "blue"] as const;
+type Color = (typeof COLORS)[number];
+const hex: Record<Color, string> = { red: "#f00", green: "#0f0", blue: "#00f" };
+for (const t of fs.readFileSync(0, "utf8").trim().split(/\s+/)) {
+  const c = COLORS.find((x) => x === t);
+  console.log(c === undefined ? `${t}?` : hex[c]);
+}
+""", ["(typeof COLORS)[number]"], ["red blue", "pink green"],
+               hint="`typeof COLORS` is a readonly tuple; indexing it with `number` gives the element type."),
+        _drill("ts_literal_inference-check", "Earn the literal type",
+               "Replace `____` so `unit` is a checked `Unit`, or `undefined` when the input isn't one of the units.",
+               r"""
+import * as fs from "fs";
+const UNITS = ["kg", "g", "lb"] as const;
+type Unit = (typeof UNITS)[number];
+const toGrams: Record<Unit, number> = { kg: 1000, g: 1, lb: 453.592 };
+for (const line of fs.readFileSync(0, "utf8").trim().split("\n")) {
+  const [amount = "0", text = ""] = line.trim().split(/\s+/);
+  const unit = UNITS.find((u) => u === text);
+  console.log(unit === undefined ? `bad unit ${text}` : `${(Number(amount) * toGrams[unit]).toFixed(1)} g`);
+}
+""", ["UNITS.find((u) => u === text)"], ["2 kg\n5 lb\n3 oz", "100 g"],
+               hint="`find` with an equality test narrows a `string` to the element type."),
+        _chal("ts_literal_inference-http", "Route by method", "Medium",
+              "Declare `const METHODS = [\"GET\", \"POST\", \"PUT\", \"DELETE\"] as const` and derive `Method` from it. Each input line is `METHOD /path`. Count the requests per method in a `Record<Method, number>` (methods are case-sensitive; anything else counts as `other`). Print the four counts in declaration order as `GET=n`, then `other=n`.",
+              r"""
+const METHODS = ["GET", "POST", "PUT", "DELETE"] as const;
+type Method = (typeof METHODS)[number];
+const counts: Record<Method, number> = { GET: 0, POST: 0, PUT: 0, DELETE: 0 };
+let other = 0;
+for (const line of input.split("\n")) {
+  const [text = ""] = line.trim().split(/\s+/);
+  const method = METHODS.find((m) => m === text);
+  if (method === undefined) other++;
+  else counts[method]++;
+}
+console.log(METHODS.map((m) => `${m}=${counts[m]}`).join(" "));
+console.log(`other=${other}`);
+""", ["GET /a\nPOST /b\nGET /c\nget /d\nPATCH /e", "DELETE /x", "PUT /y\nPUT /z"],
+              hint="`find` turns each token into a `Method | undefined`; the record then indexes safely."),
+    ],
+    quiz=[
+        _cq("`let d = \"up\"` — what type is `d`?", "`string`", ["`\"up\"`", "`any`", "`readonly \"up\"`"],
+            "A `let` can be reassigned, so its literal widens."),
+        _cq("`const o = { d: \"up\" }` — what is `o.d`?", "`string`", ["`\"up\"`", "`readonly \"up\"`", "`never`"],
+            "Object properties are mutable and widen unless you use `as const` or annotate."),
+        _cq("What does `as const` do to `[1, 2]`?", "Makes it `readonly [1, 2]`",
+            ["Freezes it at runtime", "Makes it `number[]`", "Makes it `[number, number]`"],
+            "Literal element types, fixed length, readonly — and nothing at runtime."),
+        _cq("`const SIZES = [\"S\", \"M\"] as const` — what is `(typeof SIZES)[number]`?", "`\"S\" | \"M\"`",
+            ["`string`", "`2`", "`readonly string[]`"],
+            "Indexing a tuple type with `number` gives the union of its element types."),
+        _cq("Is `const x = input as Size` a validation?", "No — it only tells the compiler to assume it",
+            ["Yes, it throws on bad values", "Yes, at compile time", "Only under `strict`"],
+            "Check the value against the list at runtime to earn the type."),
+    ],
+    interview=[
+        ("Why does `let x = \"a\"` get type `string` but `const x = \"a\"` get `\"a\"`?",
+         "Widening: a `let` can be reassigned, so TypeScript picks the general type; a `const` can't, so the literal is safe. Object properties and array elements widen too, because they're mutable."),
+        ("How do you keep a list of allowed values and a matching type in sync?",
+         "Declare the values once with `as const` and derive the type: `const ROLES = [\"admin\", \"user\"] as const; type Role = (typeof ROLES)[number];`. Validation uses the array at runtime, the type follows automatically."),
+        ("Literal unions or enums?",
+         "Literal unions: they're erased, need no import to use a value, work with Node's type stripping and `erasableSyntaxOnly`, and derive nicely from `as const` arrays. Enums add a runtime object and some odd semantics (numeric reverse mappings)."),
+    ],
+)
+
+
+_chapter(
+    "ts_control_flow", "TS: Type System",
+    "Control-Flow Analysis",
+    "How the compiler follows your code to narrow types: assignments, early returns, `in`, `instanceof`, `Array.isArray`, inferred type predicates in `filter`, assertion functions, aliased conditions — and where narrowing stops.",
+    "TypeScript doesn't give a variable one type for its whole life. It tracks what each branch has proved: after `if (!user) return;` the rest of the function knows `user` is defined; inside `if (typeof x === \"string\")` it knows `x` is a string. This control-flow analysis is why most narrowing needs no annotations. Knowing its rules — and the few places it deliberately gives up — explains nearly every \"possibly undefined\" error you'll meet.",
+    "Java's pattern matching (`if (o instanceof String s)`) binds a new variable. TypeScript narrows the *same* variable in place, following returns, throws, assignments and boolean conditions across the whole function.",
+    why=r"""
+Real code checks things in many ways: an early return for a missing value, a
+`typeof` on a union, an `in` test on an object, a `filter` that removes
+`undefined`s, a helper that throws if something is invalid. If the compiler
+couldn't follow all of that, you'd be writing casts after every check — and
+casts are where bugs hide.
+
+Control-flow analysis is what lets checked code stay cast-free. Its limits —
+callbacks, mutable variables, conditions split across functions — are exactly
+where you'll still see errors after "obviously" checking, and each has a
+standard fix.
+""",
+    idea=r"""
+**Narrowing follows the code.** Each of these narrows the variable for the
+code it guards:
+
+- `typeof x === "string"`, `x instanceof Date`, `Array.isArray(x)`
+- `"radius" in shape` — for object unions
+- `x === null`, `x !== undefined`, `x == null`, truthiness (`if (x)`)
+- an **early return or throw**: after `if (!user) return;` the rest of the
+  function has a defined `user`
+- **assignment**: after `x = 5`, `x` is a `number` until reassigned
+
+**Inferred type predicates (TS 5.5).** A function like
+`(x) => x !== undefined` is inferred to return `x is T`. So
+`items.filter((x) => x !== undefined)` really returns `T[]`, with no annotation.
+
+**User-defined guards.** `function isUser(v: unknown): v is User` narrows its
+argument where it returns `true` (week 11's other chapter).
+
+**Assertion functions** narrow by *throwing*:
+
+```ts
+function assertDefined<T>(v: T | undefined, what: string): asserts v is T {
+  if (v === undefined) throw new Error(`${what} is missing`);
+}
+```
+
+After `assertDefined(user, "user")`, `user` is defined for the rest of the
+scope. An assertion function must be declared with an explicit type annotation
+— a plain `function` declaration, or a `const` with an annotated function type.
+
+**Aliased conditions (TS 4.4).** `const isText = typeof x === "string";
+if (isText) …` narrows `x` too — as long as both `isText` and `x` are `const`
+(or never reassigned).
+
+**Where narrowing stops.**
+
+- **Callbacks.** Since TypeScript 5.4 a callback keeps a variable's narrowing
+  if it's created after the variable's *last* assignment. If the variable is
+  assigned again later, the callback might run after that, so the narrowing is
+  dropped. Copy the narrowed value into a `const` first.
+- **Properties after calls.** Narrowing of `obj.prop` can be reset by a function
+  call that might have changed `obj`.
+- **Across functions.** A check in one function doesn't narrow in another
+  unless it's a type predicate or an assertion function.
+""",
+    examples=[
+        ("Early returns narrow the rest of the function",
+         r"""
+import * as fs from "fs";
+type User = { name: string; email?: string };
+
+function contact(user: User | undefined): string {
+  if (user === undefined) return "no user";
+  if (user.email === undefined) return `${user.name} (no email)`;
+  return `${user.name} <${user.email.toLowerCase()}>`;
+}
+
+const users: (User | undefined)[] = JSON.parse(fs.readFileSync(0, "utf8").trim());
+for (const u of users) console.log(contact(u ?? undefined));
+""", ['[{"name":"Ada","email":"ADA@X.IO"},{"name":"Bo"},null]'],
+         "Each `return` removes a case, so by the last line `user` and `user.email` are both known to be defined — no `!` anywhere."),
+        ("`filter` that narrows by itself",
+         r"""
+import * as fs from "fs";
+const raw = fs.readFileSync(0, "utf8").trim().split(/\s+/);
+const parsed = raw.map((t) => (/^-?\d+$/.test(t) ? Number(t) : undefined));
+const numbers = parsed.filter((n) => n !== undefined);
+const total = numbers.reduce((a, b) => a + b, 0);
+console.log(`${numbers.length} numbers, total ${total}, ${parsed.length - numbers.length} skipped`);
+""", ["3 x 4 -2 y", "a b"],
+         "`parsed` is `(number | undefined)[]`. The arrow `(n) => n !== undefined` is inferred as a type predicate, so `numbers` is a plain `number[]` and `reduce` needs no casts."),
+        ("An assertion function",
+         r"""
+import * as fs from "fs";
+type Order = { id: string; qty: number };
+
+function assertOrder(value: unknown): asserts value is Order {
+  if (typeof value !== "object" || value === null) throw new Error("not an object");
+  if (!("id" in value) || typeof value.id !== "string") throw new Error("bad id");
+  if (!("qty" in value) || typeof value.qty !== "number") throw new Error("bad qty");
+}
+
+for (const line of fs.readFileSync(0, "utf8").trim().split("\n")) {
+  const data: unknown = JSON.parse(line);
+  try {
+    assertOrder(data);
+    console.log(`${data.id}: ${data.qty * 2} units`);
+  } catch (e) {
+    console.log(`rejected: ${e instanceof Error ? e.message : String(e)}`);
+  }
+}
+""", ['{"id":"a1","qty":3}\n{"id":7,"qty":1}\n["x"]\n{"id":"b2"}'],
+         "Past `assertOrder(data)` the compiler treats `data` as an `Order`. The `in` checks narrow `unknown` step by step inside the assertion itself."),
+    ],
+    errors=[
+        (18048, r"""
+function shout(items: string[], prefix: string | undefined): string[] {
+  if (prefix === undefined) prefix = ">";
+  const out = items.map((item) => prefix.toUpperCase() + item);
+  prefix = undefined;
+  return out;
+}
+console.log(shout(["a"], undefined));
+""", "Because `prefix` is assigned again *after* the arrow is created, the compiler can't be sure which value the callback will see, so the narrowing isn't carried inside. Copy the narrowed value into a `const` and use that: `const p = prefix;`."),
+        (2775, r"""
+const assertPositive = (n: number): asserts n is number => {
+  if (n <= 0) throw new Error("not positive");
+};
+assertPositive(5);
+console.log("ok");
+""", "An assertion function called through a name must have an *explicitly* typed declaration. A `const` initialised with an arrow isn't one; write `function assertPositive(...)` or annotate the constant's type."),
+        (2339, r"""
+type Circle = { radius: number };
+type Square = { side: number };
+function area(s: Circle | Square): number {
+  return s.radius ** 2 * Math.PI;
+}
+console.log(area({ radius: 1 }));
+""", "Only properties present on *every* member of a union can be read before narrowing. Check first: `if (\"radius\" in s) …`."),
+    ],
+    pitfalls=[
+        ("A type predicate that lies",
+         r"""
+type Point = { x: number; y: number };
+function isPoint(v: unknown): v is Point {
+  return typeof v === "object" && v !== null;
+}
+const data: unknown[] = [{ x: 1, y: 2 }, { name: "not a point" }];
+for (const d of data) {
+  if (isPoint(d)) console.log((d.x + d.y).toFixed(1));
+}
+""",
+         r"""
+type Point = { x: number; y: number };
+function isPoint(v: unknown): v is Point {
+  return typeof v === "object" && v !== null && "x" in v && typeof v.x === "number" && "y" in v && typeof v.y === "number";
+}
+const data: unknown[] = [{ x: 1, y: 2 }, { name: "not a point" }];
+for (const d of data) {
+  if (isPoint(d)) console.log((d.x + d.y).toFixed(1));
+}
+""",
+         "The compiler trusts a predicate's body completely. This one only checks \"is an object\", so the second value is treated as a `Point` and `undefined + undefined` prints `NaN`. A predicate must check everything its type claims."),
+        ("`typeof null === \"object\"`",
+         r"""
+function describe(v: unknown): string {
+  if (typeof v === "object") return `object with ${Object.keys(v ?? {}).length} keys`;
+  return typeof v;
+}
+console.log([{ a: 1 }, null, [1, 2]].map(describe).join("; "));
+""",
+         r"""
+function describe(v: unknown): string {
+  if (v === null) return "null";
+  if (Array.isArray(v)) return `array of ${v.length}`;
+  if (typeof v === "object") return `object with ${Object.keys(v).length} keys`;
+  return typeof v;
+}
+console.log([{ a: 1 }, null, [1, 2]].map(describe).join("; "));
+""",
+         "`typeof` reports `\"object\"` for `null` and for arrays too. Rule both out first — and notice that the fixed version needs no `?? {}`, because the checks have narrowed `v` properly."),
+        ("Narrowing doesn't survive into a callback if the variable changes later",
+         (r"""
+let label: string | undefined = "total";
+const format = (n: number) => `${label.toUpperCase()} ${n}`;
+label = undefined;
+console.log(format(1));
+""", 18048),
+         r"""
+let label: string | undefined = "total";
+const fixed = label;
+const format = (n: number) => `${fixed.toUpperCase()} ${n}`;
+label = undefined;
+console.log(format(1));
+""",
+         "The arrow runs *after* `label` becomes `undefined` — so the compiler was right not to trust its narrowing inside the callback. Capturing the narrowed value in a `const` fixes both the error and the crash it predicted."),
+    ],
+    later=[
+        "**Week 12 — Discriminated unions.** Narrowing by a tag field, and exhaustiveness.",
+        "**Week 15 — Assertions.** `as` versus assertion functions: claiming versus proving.",
+        "**Week 25 — Errors.** Narrowing the `unknown` in `catch (e)`.",
+    ],
+    exercises=[
+        _drill("ts_control_flow-filter", "Drop the undefineds",
+               "Replace `____` with a `filter` whose arrow the compiler infers as a type predicate, so `values` is a plain `number[]`.",
+               r"""
+import * as fs from "fs";
+const tokens = fs.readFileSync(0, "utf8").trim().split(/\s+/);
+const maybe = tokens.map((t) => (Number.isNaN(Number(t)) ? undefined : Number(t)));
+const values = maybe.filter((v) => v !== undefined);
+console.log(values.length, Math.max(...values, -Infinity));
+""", ["maybe.filter((v) => v !== undefined)"], ["3 x 9 y 4", "a", "-1"],
+               hint="An arrow that returns `v !== undefined` is inferred as `v is number`."),
+        _drill("ts_control_flow-early", "Return early, then use it",
+               "Replace `____` with an early return of `\"anonymous\"` when `name` is missing, so the last line can use `name` directly.",
+               r"""
+import * as fs from "fs";
+function greeting(name: string | undefined): string {
+  if (name === undefined || name.trim() === "") return "anonymous";
+  return `hello, ${name.trim()}`;
+}
+for (const line of fs.readFileSync(0, "utf8").split("\n").slice(0, -1)) {
+  console.log(greeting(line === "-" ? undefined : line));
+}
+""", ['if (name === undefined || name.trim() === "") return "anonymous";'], ["ada\n-\n  \nbo\n"],
+               hint="After the `if` returns, the compiler knows `name` is a `string`."),
+        _chal("ts_control_flow-mixed", "Classify JSON values", "Medium",
+              "Each input line is a JSON value. Print its kind — `null`, `array(<length>)`, `object(<keys>)`, `string(<length>)`, `number` or `boolean` — using narrowing on an `unknown`, no casts. Then print how many lines were numbers greater than 10.",
+              r"""
+let bigNumbers = 0;
+function kind(value: unknown): string {
+  if (value === null) return "null";
+  if (Array.isArray(value)) return `array(${value.length})`;
+  if (typeof value === "object") return `object(${Object.keys(value).length})`;
+  if (typeof value === "string") return `string(${value.length})`;
+  if (typeof value === "number") {
+    if (value > 10) bigNumbers++;
+    return "number";
+  }
+  return typeof value;
+}
+for (const line of input.split("\n")) console.log(kind(JSON.parse(line)));
+console.log(`big numbers: ${bigNumbers}`);
+""", ['null\n[1,2]\n{"a":1,"b":2}\n"hi"\n42\ntrue', "3\n11\n[]"],
+              hint="Rule out `null` and arrays before testing for `\"object\"`."),
+    ],
+    quiz=[
+        _cq("After `if (!user) return;`, what does the compiler know about `user`?", "That it's truthy — `null` and `undefined` are gone",
+            ["Nothing", "That it's an object", "That it's `any`"],
+            "Early returns narrow everything after them."),
+        _cq("What is `[1, undefined, 2].filter((x) => x !== undefined)` typed as (TS 5.5+)?", "`number[]`",
+            ["`(number | undefined)[]`", "`unknown[]`", "`never[]`"],
+            "The arrow is inferred as a type predicate."),
+        _cq("What does `asserts v is T` mean in a return type?", "If the function returns at all, `v` is a `T` from then on",
+            ["It returns a boolean", "It casts `v`", "It only works in tests"],
+            "It narrows by throwing on failure."),
+        _cq("When is a narrowed `let` NOT narrowed inside a callback (TS 5.4+)?", "When the variable is assigned again after the callback is created",
+            ["Always", "Never", "Only under `strict`"],
+            "The callback might run after that later assignment. Copy the narrowed value to a `const`."),
+        _cq("`typeof null` is…", "`\"object\"`", ["`\"null\"`", "`\"undefined\"`", "`\"unknown\"`"],
+            "Check `v === null` before trusting a `typeof v === \"object\"` test."),
+    ],
+    interview=[
+        ("What is control-flow narrowing?",
+         "The compiler tracks what each branch has proved and gives a variable a narrower type there: after `typeof x === \"string\"`, an early return, an `in` check or an assignment. It's why checked code rarely needs casts."),
+        ("Type predicate or assertion function?",
+         "A predicate (`v is T`) returns a boolean you branch on — good for filtering and optional handling. An assertion function (`asserts v is T`) throws when the check fails and narrows everything after the call — good at trust boundaries where invalid data should stop processing."),
+        ("When does narrowing not apply?",
+         "Inside callbacks for variables that are reassigned after the callback is created (TS 5.4 keeps it otherwise), for object properties after an intervening call, and across function boundaries unless the function is a type predicate or assertion. The fix is usually capturing the narrowed value in a `const`."),
+    ],
+)
+
+
+_chapter(
+    "ts_top_bottom", "TS: Type System",
+    "`unknown`, `never`, `void` & Exhaustiveness",
+    "The top and bottom of the type system: `unknown` as the safe \"anything\", `never` as \"impossible\", `void` as \"ignore the result\", the three flavours of object type, and using `never` to make a `switch` exhaustive.",
+    "Every type sits between two extremes. `unknown` is the top: any value fits, and you must narrow before using it. `never` is the bottom: no value fits, which makes it the type of code that can't run — a function that always throws, the `default` branch after every case is handled. Using `never` on purpose turns \"did I handle every variant?\" into a compile error the moment a new variant is added.",
+    "`unknown` is `Object` done right: you can store anything but must check before use. `never` has no Java counterpart — it's closest to a method that always throws. The exhaustiveness check does what Java's sealed interfaces plus a pattern-matching `switch` do.",
+    why=r"""
+You add a variant to a union — a new shape, a new event, a new state — and
+somewhere a `switch` doesn't handle it. With a `default` branch it silently
+returns 0 or does nothing; without one, it returns `undefined`. The bug turns
+up in production.
+
+`never` makes that impossible: a line that only compiles if every case was
+handled. And its opposite, `unknown`, is how you accept untrusted data honestly.
+Together they bracket every other type in the language.
+""",
+    idea=r"""
+**`unknown` — the top type.** Every value is assignable to `unknown`, and you
+can do nothing with an `unknown` until you narrow it. It's the right type for
+parsed JSON, `catch` variables and anything from outside the program.
+
+**`never` — the bottom type.** No value is a `never`. It appears as:
+
+- the return type of a function that never returns (`throw`, infinite loop)
+- the type left in a variable after every possibility has been narrowed away
+- the empty union: `Exclude<"a", "a">` is `never`
+
+**Exhaustiveness.** At the end of a `switch` over a union, every case has been
+removed from the variable's type, so what's left is `never`:
+
+```ts
+function area(s: Shape): number {
+  switch (s.kind) {
+    case "circle": return Math.PI * s.radius ** 2;
+    case "square": return s.side ** 2;
+    default: {
+      const unhandled: never = s;   // fails to compile if a case is missing
+      throw new Error(`unhandled shape ${JSON.stringify(unhandled)}`);
+    }
+  }
+}
+```
+
+Add `{ kind: "triangle" }` to `Shape` and the `default` branch no longer
+compiles — the compiler lists every `switch` you must update. `s satisfies
+never` does the same check without a variable.
+
+**`void`** means "the return value isn't meant to be used". A function typed
+`() => void` may still return something; callers just ignore it. That's why a
+`forEach` callback may return a value. Don't use `void` for a value you store.
+
+**Three object types.** `object` is any non-primitive. `{}` is anything that
+isn't `null` or `undefined` — including `5` and `"text"`! `Object` (capital O)
+is nearly the same as `{}` and is almost never what you want.
+""",
+    examples=[
+        ("An exhaustive switch",
+         r"""
+import * as fs from "fs";
+type Shape =
+  | { kind: "circle"; radius: number }
+  | { kind: "square"; side: number }
+  | { kind: "rect"; width: number; height: number };
+
+function area(s: Shape): number {
+  switch (s.kind) {
+    case "circle":
+      return Math.PI * s.radius ** 2;
+    case "square":
+      return s.side ** 2;
+    case "rect":
+      return s.width * s.height;
+    default: {
+      const unhandled: never = s;
+      throw new Error(`unhandled ${JSON.stringify(unhandled)}`);
+    }
+  }
+}
+
+const shapes = JSON.parse(fs.readFileSync(0, "utf8").trim()) as Shape[];
+console.log(shapes.map((s) => area(s).toFixed(2)).join(" "));
+""", ['[{"kind":"circle","radius":1},{"kind":"square","side":3},{"kind":"rect","width":2,"height":5}]'],
+         "Every case returns, so the `default` branch can only be reached by a value of type `never`. If the JSON sneaks in a shape the type doesn't know, the `throw` reports it at runtime too."),
+        ("`never` as a function that doesn't return",
+         r"""
+import * as fs from "fs";
+function fail(message: string): never {
+  throw new Error(message);
+}
+
+function parsePort(text: string): number {
+  const n = Number(text);
+  return Number.isInteger(n) && n > 0 && n < 65536 ? n : fail(`bad port ${text}`);
+}
+
+for (const t of fs.readFileSync(0, "utf8").trim().split(/\s+/)) {
+  try {
+    console.log(parsePort(t));
+  } catch (e) {
+    console.log(e instanceof Error ? e.message : String(e));
+  }
+}
+""", ["8080 0 abc 443"],
+         "Because `fail` returns `never`, the conditional's type is just `number` — `never` disappears from any union it joins."),
+        ("`{}` versus `object`",
+         r"""
+function describeLoose(v: {}): string {
+  return `${typeof v}`;
+}
+function describeObject(v: object): string {
+  return `${Array.isArray(v) ? "array" : "object"} with ${Object.keys(v).length} keys`;
+}
+console.log([describeLoose(5), describeLoose("x"), describeLoose({ a: 1 })].join(" "));
+console.log(describeObject({ a: 1, b: 2 }), "|", describeObject([1, 2, 3]));
+""", [""],
+         "`{}` accepts numbers and strings — it only excludes `null` and `undefined`. When you mean \"a real object\", the type is `object`."),
+    ],
+    errors=[
+        (2322, r"""
+type Status = "active" | "paused" | "closed";
+function label(s: Status): string {
+  switch (s) {
+    case "active":
+      return "Active";
+    case "paused":
+      return "Paused";
+    default: {
+      const unhandled: never = s;
+      return unhandled;
+    }
+  }
+}
+console.log(label("closed"));
+""", "`\"closed\"` reaches the `default` branch, so `s` there is `\"closed\"`, not `never`. This is the exhaustiveness check doing its job: add the missing case."),
+        (18046, r"""
+const data: unknown = JSON.parse('{"name":"ada"}');
+console.log(data.name);
+""", "Nothing can be done with an `unknown` until it's narrowed — which is the point. Check it's an object with a `name` first (or validate it into a real type)."),
+    ],
+    pitfalls=[
+        ("`default:` swallows new variants",
+         r"""
+type Shape = { kind: "circle"; r: number } | { kind: "square"; s: number } | { kind: "triangle"; b: number; h: number };
+function area(shape: Shape): number {
+  switch (shape.kind) {
+    case "circle":
+      return Math.PI * shape.r ** 2;
+    case "square":
+      return shape.s ** 2;
+    default:
+      return 0;
+  }
+}
+console.log(area({ kind: "triangle", b: 4, h: 3 }).toFixed(1));
+""",
+         r"""
+type Shape = { kind: "circle"; r: number } | { kind: "square"; s: number } | { kind: "triangle"; b: number; h: number };
+function area(shape: Shape): number {
+  switch (shape.kind) {
+    case "circle":
+      return Math.PI * shape.r ** 2;
+    case "square":
+      return shape.s ** 2;
+    case "triangle":
+      return (shape.b * shape.h) / 2;
+    default: {
+      const unhandled: never = shape;
+      throw new Error(`unhandled ${JSON.stringify(unhandled)}`);
+    }
+  }
+}
+console.log(area({ kind: "triangle", b: 4, h: 3 }).toFixed(1));
+""",
+         "A catch-all `default` compiles no matter which variants exist, so the new triangle silently has area 0. With the `never` check, forgetting the `triangle` case is a compile error."),
+        ("Storing a `void` result",
+         r"""
+const names = ["ada", "bo"];
+const upper = names.forEach((n) => n.toUpperCase());
+console.log(String(upper));
+""",
+         r"""
+const names = ["ada", "bo"];
+const upper = names.map((n) => n.toUpperCase());
+console.log(String(upper));
+""",
+         "`forEach` returns `void` — there is nothing to keep. TypeScript lets you store it (as `undefined`), which is why this compiles. `map` is the method that returns results."),
+        ("`typeof v === \"object\"` includes `null`",
+         r"""
+function keyCount(v: unknown): number {
+  if (typeof v === "object") return Object.keys(v as object).length;
+  return 0;
+}
+try {
+  console.log([{ a: 1 }, null].map(keyCount).join(" "));
+} catch (e) {
+  console.log("crashed:", e instanceof Error ? e.constructor.name : "?");
+}
+""",
+         r"""
+function keyCount(v: unknown): number {
+  if (typeof v === "object" && v !== null) return Object.keys(v).length;
+  return 0;
+}
+console.log([{ a: 1 }, null].map(keyCount).join(" "));
+""",
+         "The compiler was right to keep `v` as `object | null` — the `as object` cast silenced it, and `Object.keys(null)` throws. Narrow properly and no cast is needed."),
+    ],
+    later=[
+        "**Week 12 — Discriminated unions.** The tag-and-switch pattern the `never` check guards.",
+        "**Week 21 — Conditional types.** `never` as the empty union: how `Exclude` removes members.",
+        "**Week 25 — Errors.** `catch (e)` gives `e: unknown` — narrowing it is the first thing every handler does.",
+    ],
+    exercises=[
+        _drill("ts_top_bottom-exhaustive", "Make the switch exhaustive",
+               "Replace `____` with the line that makes this `switch` fail to compile if a new `Op` is added without a case — assign `op` to a variable of type `never`.",
+               r"""
+import * as fs from "fs";
+type Op = "add" | "sub" | "mul";
+function apply(op: Op, a: number, b: number): number {
+  switch (op) {
+    case "add":
+      return a + b;
+    case "sub":
+      return a - b;
+    case "mul":
+      return a * b;
+    default: {
+      const unhandled: never = op;
+      throw new Error(`unhandled ${unhandled}`);
+    }
+  }
+}
+for (const line of fs.readFileSync(0, "utf8").trim().split("\n")) {
+  const [op = "add", a = "0", b = "0"] = line.trim().split(/\s+/);
+  console.log(apply(op as Op, Number(a), Number(b)));
+}
+""", ["const unhandled: never = op;"], ["add 2 3\nmul 4 5\nsub 1 9"],
+               hint="After every case, what type is left for `op`?"),
+        _drill("ts_top_bottom-fail", "A function that never returns",
+               "Replace `____` with the return type of `fail`, so the ternary in `parseAge` has type `number`.",
+               r"""
+import * as fs from "fs";
+function fail(message: string): never {
+  throw new Error(message);
+}
+function parseAge(text: string): number {
+  const n = Number(text);
+  return Number.isInteger(n) && n >= 0 ? n : fail(`bad age ${text}`);
+}
+for (const t of fs.readFileSync(0, "utf8").trim().split(/\s+/)) {
+  try {
+    console.log(parseAge(t) + 1);
+  } catch (e) {
+    console.log(e instanceof Error ? e.message : "?");
+  }
+}
+""", ["never"], ["30 -1 x 0"],
+               hint="The type with no values — for a function that always throws."),
+        _chal("ts_top_bottom-events", "An exhaustive event handler", "Medium",
+              "Each input line is a JSON event: `{\"type\":\"click\",\"x\":…,\"y\":…}`, `{\"type\":\"key\",\"key\":…}` or `{\"type\":\"scroll\",\"dy\":…}`. Model them as a union, handle each in an exhaustive `switch` (with a `never` check), and print `click at x,y`, `key <k>`, or `scroll up|down <|dy|>`. A line whose type is none of these prints `ignored <type>` — check that at runtime before trusting the union.",
+              r"""
+type Event =
+  | { type: "click"; x: number; y: number }
+  | { type: "key"; key: string }
+  | { type: "scroll"; dy: number };
+const KNOWN = ["click", "key", "scroll"];
+function describe(e: Event): string {
+  switch (e.type) {
+    case "click":
+      return `click at ${e.x},${e.y}`;
+    case "key":
+      return `key ${e.key}`;
+    case "scroll":
+      return `scroll ${e.dy < 0 ? "up" : "down"} ${Math.abs(e.dy)}`;
+    default: {
+      const unhandled: never = e;
+      return String(unhandled);
+    }
+  }
+}
+for (const line of input.split("\n")) {
+  const raw = JSON.parse(line) as { type: string };
+  console.log(KNOWN.includes(raw.type) ? describe(raw as Event) : `ignored ${raw.type}`);
+}
+""", ['{"type":"click","x":3,"y":4}\n{"type":"key","key":"Enter"}\n{"type":"scroll","dy":-120}\n{"type":"drag"}',
+      '{"type":"scroll","dy":40}'],
+              hint="Switch on the tag; the `default` branch assigns the event to `never`."),
+    ],
+    quiz=[
+        _cq("What can you do with a value of type `unknown` before narrowing it?", "Pass it around or store it — nothing that reads from it",
+            ["Anything, like `any`", "Only read its properties", "Nothing; it can't even be stored"],
+            "It's the safe top type: everything fits in, nothing comes out unchecked."),
+        _cq("What is the return type of a function that always throws?", "`never`", ["`void`", "`undefined`", "`unknown`"],
+            "It never produces a value."),
+        _cq("Why does `const unhandled: never = s` in a `default` branch catch missing cases?", "If a case is missing, `s` isn't `never` there, and the assignment fails to compile",
+            ["It throws at runtime", "It only works with enums", "It disables the switch"],
+            "The type left after all narrowing must be empty."),
+        _cq("Which values does the type `{}` accept?", "Anything except `null` and `undefined` — including numbers and strings",
+            ["Only empty objects", "Only objects", "Nothing"],
+            "Use `object` for non-primitives, `Record<string, never>` for truly empty objects."),
+        _cq("A slot typed `() => void` receives `() => 5`. Is that allowed?", "Yes — `void` means the result is ignored",
+            ["No, it must return `undefined`", "Only with a cast", "Only for async functions"],
+            "That's why `forEach` callbacks can return things."),
+    ],
+    interview=[
+        ("`any` vs `unknown` vs `never`?",
+         "`any` switches checking off in both directions. `unknown` is the type-safe top: anything can be assigned to it, but you must narrow before using it. `never` is the bottom: nothing can be assigned to it — it's the type of impossible code and the empty union."),
+        ("How do you make a `switch` over a union exhaustive?",
+         "Handle every case and, in `default`, assign the value to a `never` variable (or `satisfies never`). If someone adds a variant, that line stops compiling and points at every switch to update."),
+        ("What's the difference between `object`, `{}` and `Object`?",
+         "`object` is any non-primitive. `{}` is any value that isn't `null` or `undefined`, primitives included. `Object` behaves almost like `{}`. For \"some object\" use `object`; for a dictionary use `Record<string, unknown>`."),
+    ],
+)
