@@ -3,8 +3,9 @@
 Your list, marked against what the app's **DSA Curriculum** (Library tab,
 `seeds/dsa_curriculum.json`) teaches. It was **85 taught, 7 partial, 14 absent**
 when you handed it over; it is now **8 stages, 46 units,
-731 problems** and every line is checked. Stages 3 and 4 have since been
-expanded in depth — see `ORDER_SEARCH_ROADMAP.md` and `NUMBERS_BITS_GRIDS_ROADMAP.md`.
+799 problems** and every line is checked. Stages 3, 4 and 6 have since been
+expanded in depth — see `ORDER_SEARCH_ROADMAP.md`, `NUMBERS_BITS_GRIDS_ROADMAP.md` and
+`TREES_GRAPHS_ROADMAP.md`.
 
 | Mark | Meaning |
 | --- | --- |

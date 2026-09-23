@@ -228,7 +228,7 @@ def _trace(title, intro, headers, rows, takeaway=""):
             "rows": [list(r) for r in rows], "takeaway": takeaway}
 
 
-_QUIZ_KINDS = {"bug": "Spot the bug", "predict": "Predict the result"}
+_QUIZ_KINDS = {"bug": "Spot the bug", "predict": "Predict the result", "model": "Model it"}
 
 
 def _quiz(kind, prompt, code, answer, options, why):
@@ -241,6 +241,9 @@ def _quiz(kind, prompt, code, answer, options, why):
 
       * `bug`     — the snippet is wrong; which change fixes it?
       * `predict` — the snippet is right; what does it return or leave behind?
+      * `model`   — the prompt is a word problem and the snippet a sketch of its
+                    input; which graph (or search) model fits? Recognising the
+                    graph in a story is the step the graph units assume.
 
     Scheduled like the Big-O cards (`dsa-quiz:<unit>:<i>`), and `why` is
     required for the same reason.
@@ -293,6 +296,24 @@ _LAB_KINDS = {
     "bits": ("a", "b", "k"),
     "modular": ("a", "b", "m"),
     "grid": ("rows", "cols", "i", "j"),
+    # Trees & Graphs (src/lib/graphLab.ts)
+    "tree": ("tree", "value"),
+    "graph": ("n", "edges", "directed", "source", "algo"),
+    "search": ("items", "k", "target", "mode"),
+    "maze": ("grid", "walk"),
+}
+
+# Allowed values for the lab fields that are choices rather than numbers —
+# mirrored by GRAPH_ALGOS / SEARCH_MODES / TREE_NOTES / MAZE_WALKS in
+# src/lib/graphLab.ts. `note` is an optional tree-lab field (the per-node
+# annotation shown first).
+_LAB_CHOICES = {
+    "algo": ("bfs", "dfs", "bipartite", "kahn", "dsu", "kruskal", "prim", "dijkstra", "zeroone",
+             "bellman", "floyd"),
+    "mode": ("subsets", "combinations", "permutations", "subsetsum", "combsum"),
+    "directed": ("yes", "no"),
+    "note": ("none", "depth", "height", "size", "sum", "gain", "rob", "camera"),
+    "walk": ("bfs", "multi", "flood"),
 }
 
 
@@ -312,6 +333,10 @@ def _lab(kind, intro, presets):
     for label, values in presets:
         missing = [f for f in _LAB_KINDS[kind] if f not in values]
         assert not missing, f"lab preset {label!r} is missing {missing}"
+        for f, allowed in _LAB_CHOICES.items():
+            if f in values:
+                assert str(values[f]) in allowed, \
+                    f"lab preset {label!r}: {f}={values[f]!r} is not one of {allowed}"
         out.append({"label": label, "values": {k: str(v) for k, v in values.items()}})
     return {"kind": kind, "intro": _md(intro), "presets": out}
 
@@ -329,6 +354,16 @@ def _calc(prompt, answer, why, accept=(), code=""):
     assert str(answer).strip(), "a calc card needs an answer"
     return {"prompt": prompt, "code": code.lstrip("\n").rstrip() + ("\n" if code.strip() else ""),
             "answer": str(answer), "accept": [str(a) for a in accept], "why": _md(why)}
+
+
+def _follow(q, a):
+    """A "what if…?" follow-up: the twist an interviewer adds once the problem is
+    solved — the tree is huge, the weights go negative, the edges are deleted
+    instead of added — and the answer. The skill it trains is the one a
+    finished solution hides: knowing which assumption the solution rests on, and
+    what replaces it when the assumption goes."""
+    assert q.strip() and a.strip(), "a follow-up needs a question and an answer"
+    return {"q": q, "a": _md(a)}
 
 
 def _rung(title, purpose, slugs, notes=None, optional=False):
@@ -357,7 +392,7 @@ def _unit(key, title, icon, stage, tagline, why, model,
           lessons=(), checks=(), interview="", rungs=(), next_up="",
           internals="", traces=(), build_it="", weight=2, bigo=(),
           invariant=None, variants=(), rewrites=(), quizzes=(), stuck=(),
-          edge_cases=(), walkthrough=None, lab=None, drills=()):
+          edge_cases=(), walkthrough=None, lab=None, drills=(), extra_labs=(), followups=()):
     """One technique, taught.
 
     `weight` is **interview yield**, 1-3, and it exists to stop the bank's
@@ -417,6 +452,10 @@ def _unit(key, title, icon, stage, tagline, why, model,
         "walkthrough": dict(walkthrough) if walkthrough else None,
         "lab": dict(lab) if lab else None,
         "drills": list(drills),
+        # Further labs after the first (a unit about grids *and* graphs wants
+        # both playgrounds), and the interviewer's "what if…?" twists.
+        "extra_labs": list(extra_labs),
+        "followups": list(followups),
     })
 
 
@@ -447,7 +486,9 @@ for _name in (
 # drills every unit carries, and the worked traces. Required, not optional — the
 # lints below fail the build if a unit loses them.
 for _name in ("dsa_placements.py", "dsa_syllabus.py", "dsa_bigo.py", "dsa_traces.py",
-              "dsa_s3_depth.py", "dsa_s3_help.py", "dsa_s4_depth.py", "dsa_s4_help.py"):
+              "dsa_s3_depth.py", "dsa_s3_help.py", "dsa_s4_depth.py", "dsa_s4_help.py",
+              "dsa_s6_depth.py", "dsa_s6_depth2.py", "dsa_s6_help.py", "dsa_s6_help2.py",
+              "dsa_s6_round2.py"):
     _p = os.path.join(_HERE, _name)
     with open(_p, encoding="utf-8") as _f:
         exec(compile(_f.read(), _p, "exec"))
@@ -555,6 +596,11 @@ _NEEDS_INTERNALS = {
     # Numbers, Bits & Grids: `long` versus (10^9 + 7)^2, two's complement and
     # shift masking, and row-major layout are the machinery behind every cost.
     "math-number-theory", "bit-manipulation", "simulation-and-matrix",
+    # Trees & Graphs: a TreeMap's colour bit, graph layouts and ArrayDeque, the
+    # recursion tree's size, the in-degree array, α(n), the cut property, and
+    # PriorityQueue without decrease-key.
+    "bst", "backtracking", "graph-traversal", "topological-sort", "union-find",
+    "mst", "shortest-paths",
 }
 _NEEDS_BUILD_IT = {
     "stacks", "queues-and-deques", "linked-lists", "heaps", "design",
@@ -565,7 +611,14 @@ _NEEDS_BUILD_IT = {
     "strings",
     "recursion", "sorting", "binary-search", "greedy", "intervals",
     "math-number-theory", "bit-manipulation", "simulation-and-matrix",
+    # Trees & Graphs (union-find was already listed above).
+    "trees", "bst", "backtracking", "graph-traversal", "topological-sort", "mst",
+    "shortest-paths",
 }
+
+# The eight Trees & Graphs units, which carry every depth and help layer.
+_S6_UNITS = ("trees", "bst", "backtracking", "graph-traversal", "topological-sort",
+             "union-find", "mst", "shortest-paths")
 
 # Units whose whole correctness argument is a loop invariant (see `_inv`).
 #
@@ -580,7 +633,12 @@ _NEEDS_INVARIANT = {"two-pointers", "sliding-window", "prefix-sums", "hashing",
                     "recursion", "sorting", "binary-search", "greedy", "intervals",
                     # Numbers, Bits & Grids: Euclid's unchanged gcd, Kernighan's
                     # one-bit-per-step, and the spiral's emitted border.
-                    "math-number-theory", "bit-manipulation", "simulation-and-matrix"}
+                    "math-number-theory", "bit-manipulation", "simulation-and-matrix",
+                    # Trees & Graphs: structural induction, the BST interval,
+                    # the backtracking path, BFS's two-level queue, Kahn's
+                    # freed vertices, the DSU partition, the cut property and
+                    # Dijkstra's finished set.
+                    *_S6_UNITS}
 
 # Units that must carry a family table (see `_var`) and a slow-vs-fast rewrite
 # (see `_rw`). The patterns stage is where both pay most: its six skeletons
@@ -593,6 +651,7 @@ _NEEDS_VARIANTS = {
     # by one line — first-true vs last-true, sort by start vs by end.
     "recursion", "sorting", "binary-search", "greedy", "intervals",
     "math-number-theory", "bit-manipulation", "simulation-and-matrix",
+    *_S6_UNITS,
 }
 _NEEDS_REWRITES = dict.fromkeys(_NEEDS_VARIANTS)
 
@@ -600,15 +659,23 @@ _NEEDS_REWRITES = dict.fromkeys(_NEEDS_VARIANTS)
 # a "stuck?" triage, an edge-case checklist and one worked solution. Started on
 # Order & Search, where boundary bugs are the commonest failure.
 _NEEDS_HELP = {"recursion", "sorting", "binary-search", "greedy", "intervals",
-               "math-number-theory", "bit-manipulation", "simulation-and-matrix"}
+               "math-number-theory", "bit-manipulation", "simulation-and-matrix",
+               *_S6_UNITS}
 _MIN_HELP = 4
 
 # Units that must carry an interactive lab (see `_lab`) and "work it out by
 # hand" cards (see `_calc`). Started on Numbers, Bits & Grids, whose skills are
 # computations: a lab is how you poke them, a typed card is how you prove them.
-_NEEDS_LAB = {"math-number-theory", "bit-manipulation", "simulation-and-matrix"}
+_NEEDS_LAB = {"math-number-theory", "bit-manipulation", "simulation-and-matrix",
+              # Trees & Graphs: a tree drawn from its level order, a graph
+              # algorithm scrubbed step by step, a search's event log.
+              *_S6_UNITS}
 _NEEDS_DRILLS = dict.fromkeys(_NEEDS_LAB)
 _MIN_DRILLS = 6
+
+# Units that must carry "what if…?" follow-ups (see `_follow`).
+_NEEDS_FOLLOWUPS = set(_S6_UNITS)
+_MIN_FOLLOWUPS = 5
 
 # The fewest family rows a unit carrying a family table may have. Two is a
 # comparison; one is a claim.
@@ -818,13 +885,23 @@ def _check_curriculum(cur, concepts, problems):
             # The lab and the typed drills.
             if key in _NEEDS_LAB:
                 assert u["lab"], f"{key}: no interactive lab"
-            lab = u["lab"]
-            if lab:
+            if u["extra_labs"]:
+                assert u["lab"], f"{key}: extra labs but no first lab"
+            for lab in ([u["lab"]] if u["lab"] else []) + u["extra_labs"]:
                 assert lab["kind"] in _LAB_KINDS, f"{key}: unknown lab kind {lab['kind']!r}"
                 assert lab["intro"].strip(), f"{key}: lab has no intro"
                 assert lab["presets"], f"{key}: lab has no presets"
                 assert len({p["label"] for p in lab["presets"]}) == len(lab["presets"]), \
                     f"{key}: two lab presets share a label"
+            # The follow-ups.
+            if key in _NEEDS_FOLLOWUPS:
+                assert len(u["followups"]) >= _MIN_FOLLOWUPS, \
+                    f"{key}: {len(u['followups'])} follow-up(s), fewer than {_MIN_FOLLOWUPS}"
+            seen_follow = set()
+            for f in u["followups"]:
+                assert f["q"].strip() and f["a"].strip(), f"{key}: a follow-up is incomplete"
+                assert f["q"] not in seen_follow, f"{key}: follow-up {f['q']!r} repeated"
+                seen_follow.add(f["q"])
             if key in _NEEDS_DRILLS:
                 assert len(u["drills"]) >= _MIN_DRILLS, \
                     f"{key}: {len(u['drills'])} work-it-out card(s), fewer than {_MIN_DRILLS}"

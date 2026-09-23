@@ -99,6 +99,8 @@ function unit(key: string, rungs: Rung[], checks: UnitCheck[] = []): CurriculumU
     rewrites: [],
     quizzes: [],
     lab: null,
+    extra_labs: [],
+    followups: [],
     drills: [],
     stuck: [],
     edge_cases: [],

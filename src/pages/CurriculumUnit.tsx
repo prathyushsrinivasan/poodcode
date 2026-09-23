@@ -276,7 +276,16 @@ function UnitView({
       title: "Try it: the lab",
       short: "The lab",
       lead: "Everything in this unit is a computation, and the fastest way to believe a rule is to poke it. Change the numbers; nothing here is graded.",
-      body: <UnitLab lab={u.lab} />,
+      body: (
+        <>
+          <UnitLab lab={u.lab} />
+          {u.extra_labs.map((l, i) => (
+            <div key={i} className="cu-extra-lab">
+              <UnitLab lab={l} />
+            </div>
+          ))}
+        </>
+      ),
     }
   );
   add(
@@ -544,6 +553,26 @@ function UnitView({
     }
   );
   add(
+    u.followups.length > 0 && {
+      id: "followups",
+      tab: "review",
+      icon: "🔀",
+      title: "What if…? The interviewer's twist",
+      short: "What if…?",
+      lead: "Solving it is where the interview starts. Each of these changes one assumption the solution rests on — say what breaks and what replaces it before you open the answer.",
+      body: (
+        <div className="cu-followups">
+          {u.followups.map((f, i) => (
+            <details key={i} className="cu-followup">
+              <summary>{f.q}</summary>
+              <Markdown>{f.a}</Markdown>
+            </details>
+          ))}
+        </div>
+      ),
+    }
+  );
+  add(
     u.bigo.length > 0 && {
       id: "bigo",
       tab: "review",
@@ -588,7 +617,8 @@ function UnitView({
       body: u.quizzes.map((q, i) => (
         <ChoiceCard
           key={i}
-          label={q.kind === "bug" ? "Spot the bug" : "Predict the result"}
+          label={q.kind === "bug" ? "Spot the bug" : q.kind === "model" ? "Model it" : "Predict the result"}
+          lang={q.kind === "model" ? "text" : "java"}
           prompt={q.prompt}
           code={q.code}
           options={q.options}
@@ -1451,10 +1481,13 @@ function ChoiceCard({
   review,
   today,
   onGrade,
+  lang = "java",
 }: {
   label: string;
   prompt?: string;
   code: string;
+  /** Fence language for `code` — "text" for a model quiz's input sketch. */
+  lang?: string;
   options: string[];
   answer: string;
   why: string;
@@ -1492,7 +1525,7 @@ function ChoiceCard({
           <InlineMarkdown>{prompt}</InlineMarkdown>
         </div>
       )}
-      <Markdown>{"```java\n" + code + "```"}</Markdown>
+      <Markdown>{"```" + lang + "\n" + code + "```"}</Markdown>
       <div className={mono ? "grid cols-2" : "grid"}>
         {/* Authors list the answer early — across the seed it was never the last
             option — so the authored order would be a tell. Shuffled per snippet,

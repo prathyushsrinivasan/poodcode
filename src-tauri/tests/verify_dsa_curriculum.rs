@@ -368,6 +368,8 @@ const NEEDS_INTERNALS: &[&str] = &[
     "hashing", "binary-search", "stacks", "queues-and-deques", "linked-lists", "heaps",
     "design", "trees", "tries", "strings", "recursion", "sorting",
     "math-number-theory", "bit-manipulation", "simulation-and-matrix",
+    "bst", "backtracking", "graph-traversal", "topological-sort", "union-find", "mst",
+    "shortest-paths",
 ];
 
 /// Mirrors `_MIN_BIGO` in tools/dsa_curriculum.py.
@@ -378,10 +380,19 @@ const NEEDS_BUILD_IT: &[&str] = &[
     "complexity", "hashing", "two-pointers", "sliding-window", "prefix-sums", "strings",
     "recursion", "sorting", "binary-search", "greedy", "intervals",
     "math-number-theory", "bit-manipulation", "simulation-and-matrix",
+    "trees", "bst", "backtracking", "graph-traversal", "topological-sort", "mst",
+    "shortest-paths",
+];
+
+/// The eight Trees & Graphs units, which carry every depth and help layer —
+/// mirrors `_S6_UNITS` in tools/dsa_curriculum.py.
+const S6_UNITS: &[&str] = &[
+    "trees", "bst", "backtracking", "graph-traversal", "topological-sort", "union-find",
+    "mst", "shortest-paths",
 ];
 
 /// Mirrors `_NEEDS_INVARIANT` in tools/dsa_curriculum.py — the units whose whole
-/// correctness argument is a loop invariant.
+/// correctness argument is a loop invariant (plus `S6_UNITS`).
 const NEEDS_INVARIANT: &[&str] = &[
     "two-pointers", "sliding-window", "prefix-sums", "hashing",
     "recursion", "sorting", "binary-search", "greedy", "intervals",
@@ -389,7 +400,7 @@ const NEEDS_INVARIANT: &[&str] = &[
 ];
 
 /// Mirrors `_NEEDS_VARIANTS` / `_NEEDS_REWRITES` — the patterns stage, where most
-/// problems are the unit's skeleton with one line different.
+/// problems are the unit's skeleton with one line different (plus `S6_UNITS`).
 const NEEDS_FAMILY: &[&str] = &[
     "complexity", "hashing", "two-pointers", "sliding-window", "prefix-sums", "strings",
     "recursion", "sorting", "binary-search", "greedy", "intervals",
@@ -442,14 +453,14 @@ fn units_that_need_depth_carry_it() {
         );
     }
 
-    for k in NEEDS_INVARIANT.iter().chain(NEEDS_FAMILY) {
+    for k in NEEDS_INVARIANT.iter().chain(NEEDS_FAMILY).chain(S6_UNITS) {
         assert!(by_key.contains_key(k), "depth list names unknown unit {k}");
     }
 
     // The invariant, field by field. `maintained` is the one that goes missing:
     // a unit that states the invariant without saying why one iteration
     // preserves it has asserted the conclusion and skipped the proof.
-    for k in NEEDS_INVARIANT {
+    for k in NEEDS_INVARIANT.iter().chain(S6_UNITS) {
         let inv = by_key[k]
             .invariant
             .as_ref()
@@ -467,7 +478,7 @@ fn units_that_need_depth_carry_it() {
         }
     }
 
-    for k in NEEDS_FAMILY {
+    for k in NEEDS_FAMILY.iter().chain(S6_UNITS) {
         let u = &by_key[k];
         assert!(
             u.variants.len() >= MIN_VARIANTS,
@@ -560,7 +571,7 @@ fn units_that_need_help_carry_it() {
             by_key.insert(u.key.as_str(), u);
         }
     }
-    for k in NEEDS_HELP {
+    for k in NEEDS_HELP.iter().chain(S6_UNITS) {
         let u = by_key.get(k).unwrap_or_else(|| panic!("help list names unknown unit {k}"));
         assert!(u.quizzes.len() >= MIN_HELP, "{k}: {} quizzes", u.quizzes.len());
         assert!(u.stuck.len() >= MIN_HELP, "{k}: {} stuck rows", u.stuck.len());
@@ -572,7 +583,11 @@ fn units_that_need_help_carry_it() {
     }
     for (k, u) in &by_key {
         for (i, q) in u.quizzes.iter().enumerate() {
-            assert!(q.kind == "bug" || q.kind == "predict", "{k}: quiz {i} kind {}", q.kind);
+            assert!(
+                q.kind == "bug" || q.kind == "predict" || q.kind == "model",
+                "{k}: quiz {i} kind {}",
+                q.kind
+            );
             assert!(q.options.contains(&q.answer), "{k}: quiz {i} answer not among options");
             assert!(q.options.len() >= 3, "{k}: quiz {i} is a coin toss");
             assert!(!q.why.trim().is_empty(), "{k}: quiz {i} has no explanation");
@@ -583,12 +598,20 @@ fn units_that_need_help_carry_it() {
 /// Mirrors `_NEEDS_LAB` / `_NEEDS_DRILLS` / `_MIN_DRILLS` and `_LAB_KINDS` in
 /// tools/dsa_curriculum.py — the units whose skills are computations, which
 /// carry an interactive lab and typed "work it out" cards.
-const NEEDS_LAB: &[&str] = &["math-number-theory", "bit-manipulation", "simulation-and-matrix"];
+const NEEDS_LAB: &[&str] = &[
+    "math-number-theory", "bit-manipulation", "simulation-and-matrix",
+    "trees", "bst", "backtracking", "graph-traversal", "topological-sort", "union-find",
+    "mst", "shortest-paths",
+];
 const MIN_DRILLS: usize = 6;
 const LAB_KINDS: &[(&str, &[&str])] = &[
     ("bits", &["a", "b", "k"]),
     ("modular", &["a", "b", "m"]),
     ("grid", &["rows", "cols", "i", "j"]),
+    ("tree", &["tree", "value"]),
+    ("graph", &["n", "edges", "directed", "source", "algo"]),
+    ("search", &["items", "k", "target", "mode"]),
+    ("maze", &["grid", "walk"]),
 ];
 
 #[test]
@@ -607,7 +630,11 @@ fn units_that_need_a_lab_carry_one() {
         assert!(u.drills.len() >= MIN_DRILLS, "{k}: {} work-it-out cards", u.drills.len());
     }
     for (k, u) in &by_key {
-        if let Some(lab) = &u.lab {
+        assert!(
+            u.extra_labs.is_empty() || u.lab.is_some(),
+            "{k}: extra labs but no first lab"
+        );
+        for lab in u.lab.iter().chain(u.extra_labs.iter()) {
             let fields = LAB_KINDS
                 .iter()
                 .find(|(kind, _)| *kind == lab.kind)
@@ -625,6 +652,33 @@ fn units_that_need_a_lab_carry_one() {
             assert!(!d.prompt.trim().is_empty() && !d.answer.trim().is_empty(), "{k}: drill {i} is empty");
             assert!(!d.why.trim().is_empty(), "{k}: drill {i} has no explanation");
             assert!(prompts.insert(d.prompt.as_str()), "{k}: drill {i} repeats a prompt");
+        }
+    }
+}
+
+/// Mirrors `_NEEDS_FOLLOWUPS` / `_MIN_FOLLOWUPS` in tools/dsa_curriculum.py — the
+/// units that carry the interviewer's "what if…?" twists.
+const MIN_FOLLOWUPS: usize = 5;
+
+#[test]
+fn units_that_need_followups_carry_them() {
+    let curriculum: DsaCurriculum =
+        serde_json::from_str(CURRICULUM).expect("dsa_curriculum.json parses");
+    let mut by_key: HashMap<&str, &poodcode_lib::models::CurriculumUnit> = HashMap::new();
+    for stage in &curriculum.stages {
+        for u in &stage.units {
+            by_key.insert(u.key.as_str(), u);
+        }
+    }
+    for k in S6_UNITS {
+        let u = by_key.get(k).unwrap_or_else(|| panic!("follow-up list names unknown unit {k}"));
+        assert!(u.followups.len() >= MIN_FOLLOWUPS, "{k}: {} follow-ups", u.followups.len());
+    }
+    for (k, u) in &by_key {
+        let mut seen = HashSet::new();
+        for f in &u.followups {
+            assert!(!f.q.trim().is_empty() && !f.a.trim().is_empty(), "{k}: an incomplete follow-up");
+            assert!(seen.insert(f.q.as_str()), "{k}: follow-up '{}' repeated", f.q);
         }
     }
 }

@@ -815,3 +815,226 @@ button.star.on {
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
+
+/* Trees & Graphs labs (UnitLab.tsx: TreeLab, GraphLab, SearchLab). */
+.lab-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  align-items: center;
+  margin-bottom: var(--space-3);
+}
+.lab-label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--text-dim);
+}
+.lab-text {
+  font-family: var(--font-mono);
+}
+.lab-text-wide {
+  width: min(460px, 100%);
+}
+.lab-text-mid {
+  width: 90px;
+}
+.lab-text-bad {
+  border-color: var(--bad);
+}
+.lab-edges {
+  width: min(260px, 100%);
+  min-height: 110px;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+}
+.lab-split {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  align-items: flex-start;
+}
+.lab-split > * {
+  min-width: 0;
+}
+.lab-grow {
+  flex: 1;
+  min-width: 260px;
+}
+.lab-svg {
+  display: block;
+  max-width: 100%;
+  background: var(--bg-elev-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.lab-svg .edge {
+  stroke: var(--border-strong);
+  stroke-width: 1.5;
+}
+.lab-svg .edge-on {
+  stroke: var(--accent);
+  stroke-width: 3;
+}
+.lab-svg .edge-label {
+  fill: var(--text-dim);
+  font-size: 11px;
+  font-family: var(--font-mono);
+}
+.lab-svg .node {
+  fill: var(--bg-elev);
+  stroke: var(--border-strong);
+  stroke-width: 1.5;
+  cursor: pointer;
+}
+.lab-svg .node-done {
+  fill: var(--accent-dim);
+}
+.lab-svg .node-focus {
+  stroke: var(--accent);
+  stroke-width: 3;
+}
+.lab-svg .node-bad {
+  stroke: var(--bad);
+  stroke-width: 3;
+}
+.lab-svg .node-path {
+  fill: var(--accent-dim);
+}
+.lab-svg .node-text {
+  fill: var(--text);
+  font-size: 12px;
+  font-family: var(--font-mono);
+  text-anchor: middle;
+  dominant-baseline: central;
+  pointer-events: none;
+}
+.lab-steps {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: var(--space-2) 0;
+  font-size: var(--text-sm);
+}
+.lab-steps input[type="range"] {
+  flex: 1;
+}
+.lab-note {
+  margin: var(--space-2) 0;
+  padding: var(--space-2) var(--space-3);
+  border-left: 3px solid var(--accent);
+  background: var(--bg-elev-2);
+  font-size: var(--text-sm);
+}
+.lab-log {
+  max-height: 260px;
+  overflow: auto;
+  margin: 0;
+  padding: var(--space-2);
+  background: var(--bg-elev-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  line-height: var(--leading-normal);
+  white-space: pre;
+}
+.lab-log .ev-emit {
+  color: var(--good);
+  font-weight: var(--weight-bold);
+}
+.lab-log .ev-prune {
+  color: var(--warn);
+}
+.lab-log .ev-undo {
+  color: var(--text-faint);
+}
+.lab-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+.lab-stat {
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-elev);
+}
+.lab-stat-k {
+  font-size: var(--text-xs);
+  color: var(--text-dim);
+}
+.lab-stat-v {
+  font-family: var(--font-mono);
+  word-break: break-all;
+}
+
+/* A unit's second lab, and the "what if…?" follow-ups. */
+.cu-extra-lab {
+  margin-top: var(--space-4);
+}
+.cu-followups {
+  display: grid;
+  gap: var(--space-2);
+}
+.cu-followup {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-elev);
+  padding: var(--space-2) var(--space-3);
+}
+.cu-followup > summary {
+  cursor: pointer;
+  font-weight: var(--weight-medium);
+}
+.cu-followup[open] > summary {
+  margin-bottom: var(--space-2);
+}
+.lab-ops {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+  margin: var(--space-2) 0;
+  font-size: var(--text-sm);
+}
+.lab-svg .node-note {
+  fill: var(--accent);
+  font-size: 10px;
+  font-family: var(--font-mono);
+  text-anchor: middle;
+  pointer-events: none;
+}
+.maze {
+  display: inline-grid;
+  gap: 2px;
+}
+.maze-cell {
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  border-radius: 3px;
+  background: var(--bg-elev);
+  color: var(--text-dim);
+}
+.maze-wall {
+  background: var(--border-strong);
+}
+.maze-seen {
+  background: var(--accent-dim);
+  color: var(--text);
+}
+.maze-front {
+  outline: 2px solid var(--accent);
+}
+.maze-path {
+  background: var(--good);
+  color: var(--bg);
+  font-weight: var(--weight-bold);
+}

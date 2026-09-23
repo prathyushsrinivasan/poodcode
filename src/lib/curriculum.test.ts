@@ -88,6 +88,8 @@ function unit(key: string, rungs: Rung[], prereqs: string[] = []): CurriculumUni
     rewrites: [],
     quizzes: [],
     lab: null,
+    extra_labs: [],
+    followups: [],
     drills: [],
     stuck: [],
     edge_cases: [],
