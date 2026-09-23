@@ -1212,6 +1212,16 @@ pub fn mastery_save_project(
 }
 
 #[tauri::command]
+pub fn mastery_save_rubric(
+    state: State<'_, AppState>,
+    track_key: String,
+    week: i64,
+    ticked: Vec<i64>,
+) -> AppResult<()> {
+    repo::mastery_save_rubric(&state.conn(), &track_key, week, &ticked)
+}
+
+#[tauri::command]
 pub fn mastery_log_time(
     state: State<'_, AppState>,
     track_key: String,

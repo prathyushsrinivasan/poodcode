@@ -87,18 +87,77 @@ fn judge_all(
     results.into_inner().unwrap()
 }
 
-/// Every practice exercise, labelled.
+/// Every practice exercise and problem-set problem, labelled. Both are judged
+/// the same way — by the exercise's own settings, exactly as `ExerciseCard`
+/// sends them.
 fn all_practice(tracks: &[MasteryTrack]) -> Vec<(String, Exercise)> {
     tracks
         .iter()
         .flat_map(|t| {
             t.weeks.iter().flat_map(move |w| {
-                w.practice
+                let practice = w
+                    .practice
                     .iter()
-                    .map(move |ex| (format!("{} week {} practice {}", t.key, w.week, ex.id), ex.clone()))
+                    .map(move |ex| (format!("{} week {} practice {}", t.key, w.week, ex.id), ex.clone()));
+                let problems = w
+                    .problem_set
+                    .iter()
+                    .map(move |ex| (format!("{} week {} problem {}", t.key, w.week, ex.id), ex.clone()));
+                practice.chain(problems)
             })
         })
         .collect()
+}
+
+/// Every runnable project, as a final-shaped value so `judge_all` can run it.
+fn all_projects(tracks: &[MasteryTrack]) -> Vec<(String, MasteryExam)> {
+    tracks
+        .iter()
+        .flat_map(|t| {
+            t.weeks.iter().filter_map(move |w| {
+                w.project_spec.as_ref().map(|p| {
+                    (
+                        format!("{} week {} project ({})", t.key, w.week, p.title),
+                        MasteryExam {
+                            title: p.title.clone(),
+                            prompt: p.goal.clone(),
+                            hint: String::new(),
+                            language: p.language.clone(),
+                            starter: p.starter.clone(),
+                            solution: p.solution.clone(),
+                            tests: p.tests.clone(),
+                            strictness: p.strictness.clone(),
+                        },
+                    )
+                })
+            })
+        })
+        .collect()
+}
+
+/// A project's acceptance tests are what "shipped" means, so its reference must
+/// pass them and the starter workspace must not.
+#[test]
+fn every_project_reference_passes_and_every_starter_fails() {
+    let tracks = load_tracks();
+    let projects = all_projects(&tracks);
+    if projects.is_empty() {
+        return;
+    }
+    for (label, p) in &projects {
+        assert!(p.tests.len() >= 5, "{label}: a project needs 5+ acceptance tests");
+    }
+    let solved = judge_all(&projects, |e| &e.solution);
+    let failures: Vec<String> = solved
+        .iter()
+        .filter(|(_, s, _)| s != "accepted" && s != "not_installed")
+        .map(|(label, _, report)| format!("{label}: {report}"))
+        .collect();
+    assert!(failures.is_empty(), "project references that FAIL:\n{}", failures.join("\n\n"));
+    let started = judge_all(&projects, |e| &e.starter);
+    let passing: Vec<&String> = started.iter().filter(|(_, s, _)| s == "accepted").map(|(l, _, _)| l).collect();
+    assert!(passing.is_empty(), "project starters that already PASS: {passing:?}");
+    eprintln!("verified {} projects", projects.len());
 }
 
 /// The judge settings an exercise carries — exactly what `ExerciseCard` sends.
@@ -275,6 +334,12 @@ fn mastery_structure_is_well_formed() {
         let numbers: Vec<i64> = track.weeks.iter().map(|w| w.week).collect();
         let expected: Vec<i64> = (1..=track.weeks.len() as i64).collect();
         assert_eq!(numbers, expected, "{}: weeks must be 1..N with no gaps", track.key);
+        // Optional weeks sit after the programme proper, never inside it: the
+        // UI measures totals and pace over the core weeks only.
+        let flags: Vec<bool> = track.weeks.iter().map(|w| w.optional).collect();
+        let mut ordered = flags.clone();
+        ordered.sort();
+        assert_eq!(flags, ordered, "{}: optional weeks must come after every core week", track.key);
 
         for week in &track.weeks {
             let at = format!("{} week {}", track.key, week.week);

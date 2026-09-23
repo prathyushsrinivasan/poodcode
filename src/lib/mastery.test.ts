@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { MasteryProgress, MasteryTrack, MasteryWeek } from "../types";
 import {
+  coreWeeks,
   drawExamPaper,
   formatStudyTime,
   masteryResume,
@@ -295,6 +296,19 @@ describe("masteryResume", () => {
     const r = masteryResume(track, rows, undefined);
     expect(r?.finished).toBe(true);
     expect(r?.week.week).toBe(3);
+    expect(r?.completed).toBe(3);
+  });
+
+  it("finishes without the optional week after the programme", () => {
+    const withCapstone: MasteryTrack = {
+      ...track,
+      weeks: [...track.weeks, { ...week(4, [], ["p5"]), optional: true }],
+    };
+    expect(coreWeeks(withCapstone).map((w) => w.week)).toEqual([1, 2, 3]);
+    const rows = [1, 2, 3].map((n) => row({ week: n, completed_at: "x" }));
+    const r = masteryResume(withCapstone, rows, undefined);
+    expect(r?.finished).toBe(true);
+    expect(r?.total).toBe(3);
     expect(r?.completed).toBe(3);
   });
 });

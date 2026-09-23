@@ -84,7 +84,17 @@ const tsLang = monaco.languages.typescript;
 function judgeCompilerOptions(strictness: string) {
   return {
     target: 9, // ES2022 — not in Monaco's ScriptTarget enum, but TS accepts it
-    lib: ["lib.es2022.d.ts"],
+    // The judge's list (tscheck.rs). Monaco's bundled 5.4 predates the iterator
+    // helpers and the ES2025 Set methods, so those two stay unsquiggled-but-
+    // unknown in the editor; the judge still checks them.
+    lib: [
+      "lib.es2024.d.ts",
+      "lib.esnext.array.d.ts",
+      "lib.esnext.collection.d.ts",
+      "lib.esnext.iterator.d.ts",
+      "lib.esnext.disposable.d.ts",
+      "lib.esnext.promise.d.ts",
+    ],
     module: tsLang.ModuleKind.ESNext,
     moduleResolution: tsLang.ModuleResolutionKind.NodeJs,
     // Every editor is its own module, so two open editors that both declare

@@ -12,7 +12,8 @@
 // course never teaches gets a clear "Cannot find name" rather than silently
 // type-checking against an API the judge would then have to support.
 //
-// `lib` in the generated tsconfig is ES2022 only — no DOM — which is why
+// `lib` in the generated tsconfig is ES2024 plus a few esnext libraries — no DOM
+// and no Node host APIs (see tscheck.rs) — which is why
 // `console` and `setTimeout` have to be declared here at all.
 //
 // The Projects track (tools/projects_track.py) added the second group below:

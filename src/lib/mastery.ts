@@ -168,17 +168,24 @@ export function masteryResume(
   rows: MasteryProgress[],
   startedAt: string | undefined
 ): MasteryResume | null {
-  if (track.weeks.length === 0) return null;
+  const core = coreWeeks(track);
+  if (core.length === 0) return null;
   const mine = rows.filter((r) => r.track_key === track.key);
   if (mine.length === 0 && !startedAt) return null;
   const done = new Set(mine.filter((r) => r.completed_at).map((r) => r.week));
-  const next = track.weeks.find((w) => !done.has(w.week));
+  const next = core.find((w) => !done.has(w.week));
   return {
-    week: next ?? track.weeks[track.weeks.length - 1],
-    completed: track.weeks.filter((w) => done.has(w.week)).length,
-    total: track.weeks.length,
+    week: next ?? core[core.length - 1],
+    completed: core.filter((w) => done.has(w.week)).length,
+    total: core.length,
     finished: next === undefined,
   };
+}
+
+/** The programme proper: every week except the optional ones after it. Totals,
+ * pacing and "finished" are measured against these. */
+export function coreWeeks(track: MasteryTrack): MasteryWeek[] {
+  return track.weeks.filter((w) => !w.optional);
 }
 
 // ---------------------------------------------------------------------------

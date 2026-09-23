@@ -289,6 +289,8 @@ CREATE TABLE IF NOT EXISTS mastery_progress (
   project_notes  TEXT    NOT NULL DEFAULT '',
   project_code   TEXT    NOT NULL DEFAULT '',
   project_done   INTEGER NOT NULL DEFAULT 0,
+  -- The project's self-review: a JSON array of the rubric items ticked.
+  project_rubric TEXT    NOT NULL DEFAULT '[]',
   -- Time spent with this week open, mirrored into daily_sessions for the stats
   -- heatmap so mastery study counts towards the streak like everything else.
   study_seconds  INTEGER NOT NULL DEFAULT 0,
@@ -344,6 +346,8 @@ fn migrate(conn: &Connection) -> AppResult<()> {
     add_col("reviews", "lapses", "INTEGER NOT NULL DEFAULT 0")?;
     add_col("reviews", "interval_days", "INTEGER NOT NULL DEFAULT 0")?;
     add_col("reviews", "last_quality", "INTEGER NOT NULL DEFAULT 0")?;
+    // Mastery project self-review ticks (TS_MASTERY_ROADMAP X-42).
+    add_col("mastery_progress", "project_rubric", "TEXT NOT NULL DEFAULT '[]'")?;
     Ok(())
 }
 

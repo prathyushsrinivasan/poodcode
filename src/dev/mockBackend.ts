@@ -488,6 +488,7 @@ function masteryRow(trackKey: string, week: number): MasteryProgress {
       project_notes: "",
       project_code: "",
       project_done: false,
+      project_rubric: "[]",
       study_seconds: 0,
       started_at: isoStamp(0),
       completed_at: null,
@@ -708,6 +709,10 @@ const handlers: Record<string, (a: Args) => any | Promise<any>> = {
     row.project_notes = notes;
     row.project_code = code;
     row.project_done = done;
+    save();
+  },
+  mastery_save_rubric: ({ trackKey, week, ticked }) => {
+    masteryRow(trackKey, week).project_rubric = JSON.stringify(ticked ?? []);
     save();
   },
   mastery_log_time: ({ trackKey, week, seconds }) => {

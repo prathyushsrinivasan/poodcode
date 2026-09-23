@@ -6,6 +6,7 @@ import type {
   JudgeReport,
   MasteryExam,
   MasteryProgress,
+  MasteryProjectSpec,
   MasteryTrack,
   MasteryWeek,
   Problem,
@@ -14,7 +15,7 @@ import type {
 import { Markdown } from "../components/Markdown";
 import { CodeEditor } from "../components/CodeEditor";
 import { TsErrorLinks } from "../components/TsErrorLinks";
-import { DiffBadge, Empty } from "../components/common";
+import { DiffBadge, Empty, inlineCode } from "../components/common";
 import {
   loadDoneChapters,
   loadSolvedExercises,
@@ -36,6 +37,7 @@ import {
   formatStudyTime,
   migrateLegacyQuizScores,
   pacing,
+  coreWeeks,
   progressByWeek,
   startDateKey,
   unlockedWeeks,
@@ -175,16 +177,20 @@ export default function Mastery() {
     );
   }
 
-  const completedWeeks = perWeek.filter((p) => p.complete).length;
+  // Totals, pace and "finished" count the programme proper; an optional week
+  // after it (the capstone) is extra credit.
+  const core = coreWeeks(track);
+  const corePerWeek = core.map((w) => perWeek[w.week - 1]);
+  const completedWeeks = corePerWeek.filter((p) => p.complete).length;
   const currentWeek =
-    track.weeks.find((w) => unlocked.has(w.week) && !perWeek[w.week - 1].complete)?.week ??
-    track.weeks.length;
+    core.find((w) => unlocked.has(w.week) && !perWeek[w.week - 1].complete)?.week ??
+    core.length;
   const totalStudy = perWeek.reduce((sum, p) => sum + p.studySeconds, 0);
   const startedRaw = settings[startDateKey(track.key)];
   const pace = startedRaw
-    ? pacing(new Date(startedRaw), currentWeek, track.weeks.length)
+    ? pacing(new Date(startedRaw), currentWeek, core.length)
     : null;
-  const finished = completedWeeks === track.weeks.length;
+  const finished = completedWeeks === core.length;
 
   /* The programme as a track: phases are the rail, weeks are the units. They
      expand in place rather than navigating, so `renderUnit` supplies the card
@@ -265,7 +271,7 @@ export default function Mastery() {
         <div className="row" style={{ gap: 22, flexWrap: "wrap", marginTop: 12 }}>
           <span>
             <strong style={{ fontSize: 22 }}>{completedWeeks}</strong>
-            <span className="dim"> / {track.weeks.length} weeks done</span>
+            <span className="dim"> / {core.length} weeks done</span>
           </span>
           <span>
             <strong style={{ fontSize: 22 }}>{currentWeek}</strong>
@@ -280,7 +286,7 @@ export default function Mastery() {
             <span className="dim"> pass mark</span>
           </span>
         </div>
-        <Bar percent={Math.round((completedWeeks / track.weeks.length) * 100)} />
+        <Bar percent={Math.round((completedWeeks / core.length) * 100)} />
 
         {pace ? (
           <p className="dim" style={{ margin: "12px 0 0", fontSize: 13 }}>
@@ -311,7 +317,7 @@ export default function Mastery() {
         )}
       </div>
 
-      {finished && <CompletionSummary track={track} perWeek={perWeek} totalStudy={totalStudy} />}
+      {finished && <CompletionSummary track={track} perWeek={corePerWeek} totalStudy={totalStudy} />}
 
       <TrackBody spec={spec} progress={trackProgress(spec.units)} />
     </div>
@@ -352,11 +358,11 @@ function CompletionSummary({
       </div>
       <p style={{ marginTop: 0 }}>
         Every week of <strong>{track.title}</strong> is finished — all{" "}
-        {track.weeks.length} chapters sets studied, both exams passed each week.
+        {perWeek.length} weeks of chapters studied, both exams passed each week.
       </p>
       <div className="grid cols-4">
         <div className="card" style={{ marginBottom: 0 }}>
-          <div className="stat-value">{track.weeks.length}</div>
+          <div className="stat-value">{perWeek.length}</div>
           <div className="stat-label">weeks completed</div>
         </div>
         <div className="card" style={{ marginBottom: 0 }}>
@@ -403,15 +409,17 @@ function WeekCard({
   const toast = useToast();
   const [open, setOpen] = useState(!locked && !progress.complete);
   const practice = week.practice ?? [];
+  const problemSet = week.problem_set ?? [];
   const [solvedEx, setSolvedEx] = useState<Set<string>>(() => solvedExercises());
   const practiceSolved = practice.filter((ex) => solvedEx.has(ex.id)).length;
+  const setSolved = problemSet.filter((ex) => solvedEx.has(ex.id)).length;
 
   // Practice solved-state lives in SQLite; the initialiser reads the warm
   // session cache and this fills it on a cold start.
   useEffect(() => {
-    if (practice.length === 0) return;
+    if (practice.length === 0 && problemSet.length === 0) return;
     loadSolvedExercises().then(setSolvedEx).catch(() => {});
-  }, [practice.length]);
+  }, [practice.length, problemSet.length]);
 
   // Study time is accumulated only while this week is expanded, then flushed
   // periodically and on collapse. It also lands in daily_sessions, so mastery
@@ -476,6 +484,11 @@ function WeekCard({
           <strong>
             Week {week.week} — {week.title}
           </strong>
+          {week.optional && (
+            <span className="badge" style={{ marginLeft: 8 }} title="After the programme proper — it never counts toward your total or pace.">
+              optional
+            </span>
+          )}
           <p className="dim" style={{ margin: "3px 0 0", fontSize: 13 }}>
             {week.goal}
           </p>
@@ -614,9 +627,32 @@ function WeekCard({
             </>
           )}
 
+          {problemSet.length > 0 && (
+            <details className="card mastery-practice">
+              <summary>
+                <strong>🏋️ Problem set</strong>{" "}
+                <span className="dim quiz-note">
+                  {setSolved}/{problemSet.length} solved · warm-up, core and stretch · optional —
+                  not part of the week's gate
+                </span>
+              </summary>
+              <p className="dim quiz-note">
+                Original problems on exactly this week&rsquo;s ideas, written for TypeScript and
+                judged at this week&rsquo;s strictness. Easy is a warm-up, Medium is the core of
+                the week, Hard is a stretch.
+              </p>
+              <ExerciseSections
+                exercises={problemSet}
+                onSolved={(id) => setSolvedEx(new Set(markExerciseSolved(id)))}
+                overrides={{ challenge: { heading: "🎯 Problems" } }}
+              />
+            </details>
+          )}
+
           {week.project && (
             <ProjectPanel
               brief={week.project}
+              spec={week.project_spec ?? null}
               row={row}
               language={track.exam_language}
               onSave={(notes, code, done) =>
@@ -624,6 +660,7 @@ function WeekCard({
                   .masterySaveProject(track.key, week.week, notes, code, done)
                   .then(onChanged)
               }
+              onRubric={(ticked) => api.masterySaveRubric(track.key, week.week, ticked)}
             />
           )}
 
@@ -716,34 +753,94 @@ function WeekCard({
   );
 }
 
-/** The week's build brief, plus somewhere to actually record having done it. */
+/** Rubric ticks are stored as a JSON array of item indices. */
+function parseTicks(raw: string | undefined): Set<number> {
+  try {
+    const v: unknown = JSON.parse(raw || "[]");
+    return new Set(Array.isArray(v) ? v.filter((x): x is number => typeof x === "number") : []);
+  } catch {
+    return new Set();
+  }
+}
+
+/** The week's build project. With a `spec` it is a structured brief whose
+ * acceptance tests run through the judge, and "shipped" needs them green; the
+ * reference implementation opens only after shipping (TS_MASTERY_ROADMAP
+ * X-40 to X-43). Without one it is the older free-form brief. */
 function ProjectPanel({
   brief,
+  spec,
   row,
   language,
   onSave,
+  onRubric,
 }: {
   brief: string;
+  spec: MasteryProjectSpec | null;
   row: MasteryProgress | undefined;
   language: string;
   onSave: (notes: string, code: string, done: boolean) => Promise<void>;
+  onRubric: (ticked: number[]) => Promise<void>;
 }) {
   const [notes, setNotes] = useState(row?.project_notes ?? "");
-  const [code, setCode] = useState(row?.project_code ?? "");
+  const [code, setCode] = useState(row?.project_code || spec?.starter || "");
   const [shipped, setShipped] = useState(row?.project_done ?? false);
   const [saving, setSaving] = useState(false);
   const [expanded, setExpanded] = useState(false);
+  const [report, setReport] = useState<JudgeReport | null>(null);
+  const [running, setRunning] = useState(false);
+  const [runErr, setRunErr] = useState("");
+  const [showReference, setShowReference] = useState(false);
+  const [ticked, setTicked] = useState<Set<number>>(() => parseTicks(row?.project_rubric));
   const toast = useToast();
+  const green = report?.status === "accepted";
+  // With acceptance tests, shipping means they pass. Un-shipping is always allowed.
+  const canShip = shipped || !spec || green;
 
   async function save(nextShipped = shipped) {
     setSaving(true);
     try {
       await onSave(notes, code, nextShipped);
       setShipped(nextShipped);
-      toast("Project saved");
+      toast(nextShipped && !shipped ? "Project shipped" : "Project saved");
     } finally {
       setSaving(false);
     }
+  }
+
+  async function runTests() {
+    if (!spec) return;
+    setRunning(true);
+    setRunErr("");
+    setReport(null);
+    const cases: TestCase[] = spec.tests.map((t, i) => ({
+      id: 0,
+      problem_id: 0,
+      kind: "hidden",
+      name: `Acceptance test ${i + 1}`,
+      input: t.input,
+      expected_output: t.output,
+      ordering: i,
+    }));
+    try {
+      const r = await api.runTests(null, spec.language, code, cases, {
+        strictness: spec.strictness,
+      });
+      setReport(r);
+      await onSave(notes, code, shipped);
+    } catch (e) {
+      setRunErr(String(e));
+    } finally {
+      setRunning(false);
+    }
+  }
+
+  function toggleTick(i: number) {
+    const next = new Set(ticked);
+    if (next.has(i)) next.delete(i);
+    else next.add(i);
+    setTicked(next);
+    onRubric([...next].sort((a, b) => a - b)).catch(() => toast("Could not save the checklist"));
   }
 
   return (
@@ -757,7 +854,7 @@ function ProjectPanel({
     >
       <div className="row" style={{ justifyContent: "space-between", alignItems: "flex-start" }}>
         <div className="io-label" style={{ color: shipped ? "var(--good)" : "var(--accent)" }}>
-          🔨 Build it yourself {shipped && "— shipped"}
+          🔨 {spec ? `Build it: ${spec.title}` : "Build it yourself"} {shipped && "— shipped"}
         </div>
         <button
           className="ghost"
@@ -767,7 +864,36 @@ function ProjectPanel({
           {expanded ? "Hide workspace" : "Open workspace"}
         </button>
       </div>
-      <p style={{ margin: "0 0 10px" }}>{brief}</p>
+      {spec ? (
+        <>
+          <Markdown>{spec.goal}</Markdown>
+          <div className="io-label">Requirements</div>
+          <ol style={{ marginTop: 0 }}>
+            {spec.requirements.map((r, i) => (
+              <li key={i}>
+                <Markdown>{r}</Markdown>
+              </li>
+            ))}
+          </ol>
+          {spec.stretch.length > 0 && (
+            <>
+              <div className="io-label">Stretch (not tested)</div>
+              <ul style={{ marginTop: 0 }}>
+                {spec.stretch.map((r, i) => (
+                  <li key={i}>
+                    <Markdown>{r}</Markdown>
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+          <p className="dim quiz-note" style={{ marginTop: 0 }}>
+            Done when all {spec.tests.length} acceptance tests pass — then mark it shipped.
+          </p>
+        </>
+      ) : (
+        <p style={{ margin: "0 0 10px" }}>{brief}</p>
+      )}
 
       {expanded && (
         <>
@@ -781,33 +907,98 @@ function ProjectPanel({
           <div className="io-label">Code</div>
           <div
             style={{
-              height: 260,
+              height: spec ? 360 : 260,
               border: "1px solid var(--border)",
               borderRadius: 6,
               overflow: "hidden",
               marginBottom: 10,
             }}
           >
-            <CodeEditor language={language} value={code} onChange={setCode} />
+            <CodeEditor
+              language={language}
+              value={code}
+              onChange={setCode}
+              onRun={spec ? runTests : undefined}
+              tsStrictness={spec?.strictness}
+            />
           </div>
           <div className="row" style={{ gap: 8, flexWrap: "wrap" }}>
-            <button onClick={() => save()} disabled={saving}>
+            {spec && (
+              <button onClick={runTests} disabled={running}>
+                {running ? "Running…" : `Run ${spec.tests.length} acceptance tests`}
+              </button>
+            )}
+            <button className={spec ? "ghost" : undefined} onClick={() => save()} disabled={saving}>
               {saving ? "Saving…" : "Save"}
             </button>
             <button
               className="ghost"
               style={shipped ? { borderColor: "var(--good)", color: "var(--good)" } : undefined}
               onClick={() => save(!shipped)}
-              disabled={saving}
+              disabled={saving || !canShip}
+              title={canShip ? undefined : "Run the acceptance tests — shipping needs them all green."}
             >
               {shipped ? "✓ Shipped — undo" : "Mark shipped"}
             </button>
+            {spec && shipped && (
+              <button className="ghost" onClick={() => setShowReference((s) => !s)}>
+                {showReference ? "Hide reference" : "Reference implementation"}
+              </button>
+            )}
+            {spec?.strictness === "strict+indexed" && (
+              <span className="dim quiz-note">
+                Checked with <code>noUncheckedIndexedAccess</code>
+              </span>
+            )}
           </div>
+
+          {runErr && (
+            <div className="card" style={{ marginTop: 10, marginBottom: 0, borderColor: "var(--bad)" }}>
+              <div className="io-label" style={{ color: "var(--bad)" }}>Couldn&rsquo;t run</div>
+              <pre style={{ margin: 0, whiteSpace: "pre-wrap", fontSize: 12 }}>{runErr}</pre>
+            </div>
+          )}
+          {report && (
+            <ExamFeedback
+              report={report}
+              accepted={green}
+              acceptedNote={
+                shipped
+                  ? "Still green."
+                  : "Every acceptance test passes. Tick the self-review below, then mark it shipped."
+              }
+            />
+          )}
+
+          {spec && spec.rubric.length > 0 && (
+            <div style={{ marginTop: 12 }}>
+              <div className="io-label">Self-review</div>
+              {spec.rubric.map((item, i) => (
+                <label
+                  key={i}
+                  style={{ display: "flex", gap: 8, alignItems: "baseline", fontSize: 13, margin: "4px 0" }}
+                >
+                  <input type="checkbox" checked={ticked.has(i)} onChange={() => toggleTick(i)} />
+                  <span>{inlineCode(item)}</span>
+                </label>
+              ))}
+            </div>
+          )}
+
+          {showReference && spec && shipped && (
+            <div style={{ marginTop: 10 }}>
+              <p className="dim quiz-note">
+                One way to meet the brief — compare it with yours rather than copying it.
+              </p>
+              <Markdown>{"```" + spec.language + "\n" + spec.solution + "\n```"}</Markdown>
+            </div>
+          )}
         </>
       )}
     </div>
   );
 }
+
 
 /** The multiple-choice half of the week's exam. Each sitting is a fresh draw
  * from the week's bank with the options shuffled. */
@@ -1169,14 +1360,18 @@ function ExamPanel({
   );
 }
 
+/** A judge report for the coding final — or, with `acceptedNote`, for a
+ * project's acceptance tests, which say something different on a pass. */
 function ExamFeedback({
   report,
-  weekNumber,
+  weekNumber = 0,
   accepted,
+  acceptedNote,
 }: {
   report: JudgeReport;
-  weekNumber: number;
+  weekNumber?: number;
   accepted: boolean;
+  acceptedNote?: string;
 }) {
   if (report.status === "not_installed") {
     return (
@@ -1212,8 +1407,12 @@ function ExamFeedback({
       </div>
       {accepted ? (
         <p style={{ margin: 0 }}>
-          Week {weekNumber}&rsquo;s coding final is done. With the quiz passed and every
-          chapter marked, the next week unlocks.
+          {acceptedNote ?? (
+            <>
+              Week {weekNumber}&rsquo;s coding final is done. With the quiz passed and every
+              chapter marked, the next week unlocks.
+            </>
+          )}
         </p>
       ) : (
         failing.slice(0, 3).map((r, i) => (

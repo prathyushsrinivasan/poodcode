@@ -1245,6 +1245,33 @@ pub struct MasteryExam {
     pub strictness: String,
 }
 
+/// A week's build project as a structured, runnable brief (TS_MASTERY_ROADMAP
+/// X-40/X-41). The learner's code runs against `tests` — stdin/stdout
+/// acceptance tests whose expected outputs were computed from `solution` — and
+/// "shipped" requires them green. `solution` is revealed only after shipping.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MasteryProjectSpec {
+    pub title: String,
+    /// One paragraph: what is being built and why it matters this week.
+    pub goal: String,
+    /// Numbered requirements, each checkable against the tests.
+    #[serde(default)]
+    pub requirements: Vec<String>,
+    /// Optional extensions, not tested.
+    #[serde(default)]
+    pub stretch: Vec<String>,
+    /// Self-review checklist (typing quality, error handling, naming…).
+    #[serde(default)]
+    pub rubric: Vec<String>,
+    pub language: String,
+    pub starter: String,
+    pub solution: String,
+    #[serde(default)]
+    pub tests: Vec<ExerciseTest>,
+    #[serde(default)]
+    pub strictness: String,
+}
+
 /// An optional timed checkpoint contest attached to a week, built from that
 /// week's problems through the existing Contest machinery.
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -1297,6 +1324,20 @@ pub struct MasteryWeek {
     /// weeks, judged on the type-check alone. Outside the week's gate.
     #[serde(default)]
     pub practice: Vec<Exercise>,
+    /// An optional week after the programme proper (the TypeScript capstone
+    /// week). It opens like any other week but never counts toward the
+    /// programme's total, its pace or its completion. Optional weeks come last.
+    #[serde(default)]
+    pub optional: bool,
+    /// The week's own problem set: original TypeScript problems (stdin/stdout
+    /// or type-graded) tiered Easy / Medium / Hard as warm-up, core and
+    /// stretch. Outside the gate, like `practice`.
+    #[serde(default)]
+    pub problem_set: Vec<Exercise>,
+    /// The build project as a runnable brief with acceptance tests. `project`
+    /// stays as the one-line summary.
+    #[serde(default)]
+    pub project_spec: Option<MasteryProjectSpec>,
 }
 
 /// One authored review card: a prompt, and the answer to recall.
@@ -1321,6 +1362,9 @@ pub struct MasteryProgress {
     pub study_seconds: i64,
     pub started_at: Option<String>,
     pub completed_at: Option<String>,
+    /// JSON array of the project rubric items the learner has ticked.
+    #[serde(default)]
+    pub project_rubric: String,
 }
 
 /// A full programme — currently one track (TypeScript), built to hold more.

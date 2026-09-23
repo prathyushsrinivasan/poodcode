@@ -137,6 +137,14 @@ fn binary_runs(program: &str) -> bool {
 /// setting reports the 2 that are genuine content bugs. Renaming the file to
 /// `.mts` scores the same but would flip every program in the app from CommonJS
 /// to ESM *at runtime*, which this does not.
+///
+/// `lib` is ES2024 plus the individual `esnext.*` libraries whose runtime Node 24
+/// already ships: `Array.fromAsync`, the ES2025 `Set` methods, iterator helpers,
+/// `using`/`DisposableStack` and `Promise.try`. It is a list and not `esnext`
+/// because `esnext` would also declare APIs Node does not have, and a program
+/// that type-checks and then throws "is not a function" is worse than a clear
+/// compile error. The TypeScript Mastery chapters teach every one of these.
+/// Mirror any change in `LIBS` in tools/ts_typecheck.mjs and in src/monacoSetup.ts.
 fn tsconfig_json(preset: &str, env_dts: &Path, file: &str) -> String {
     let indexed = preset == STRICT_INDEXED;
     // JSON-escape the path: Windows separators would otherwise be escapes.
@@ -145,7 +153,7 @@ fn tsconfig_json(preset: &str, env_dts: &Path, file: &str) -> String {
         r#"{{
   "compilerOptions": {{
     "target": "es2022",
-    "lib": ["es2022"],
+    "lib": ["es2024", "esnext.array", "esnext.collection", "esnext.iterator", "esnext.disposable", "esnext.promise"],
     "module": "esnext",
     "moduleResolution": "bundler",
     "moduleDetection": "force",

@@ -6050,6 +6050,17 @@ if os.path.exists(_tsm_path):
     with open(_tsm_path, encoding="utf-8") as _tmf:
         exec(compile(_tmf.read(), _tsm_path, "exec"))
 
+# Computed outputs (ts_outputs_kit.py), the templated-chapter helpers
+# (ts_chapter_kit.py) and the chapters the TypeScript Mastery roadmap adds,
+# one file per programme month. Every lesson output and compiler message in
+# them comes from actually running the code — see ts_outputs_kit.py.
+for _tsx_file in ["ts_outputs_kit.py", "ts_chapter_kit.py"] + [
+        f"ts_chapters_m{_n}.py" for _n in range(1, 7)]:
+    _tsx_path = os.path.join(HERE, _tsx_file)
+    if os.path.exists(_tsx_path):
+        with open(_tsx_path, encoding="utf-8") as _tsxf:
+            exec(compile(_tsxf.read(), _tsx_path, "exec"))
+
 # "In an interview" — three questions with model answers appended to every
 # TypeScript chapter's lesson. Runs after every TypeScript chapter exists.
 _tsi_path = os.path.join(HERE, "ts_lesson_interview.py")
@@ -6526,8 +6537,15 @@ if os.path.exists(_mst_path):
     # Review cards, the deeper quiz banks and the type workshops for the
     # TypeScript track, attached to TS_WEEKS in place before the chapter
     # questions are merged in.
-    for _mst_extra in ("mastery_ts_cards.py", "mastery_ts_quiz.py", "mastery_ts_practice.py"):
+    # Then the roadmap's problem sets, runnable projects and extra practice
+    # (mastery_ts_kit.py helpers, one content file per month, attached and
+    # checked by mastery_ts_attach.py).
+    for _mst_extra in ["mastery_ts_cards.py", "mastery_ts_quiz.py", "mastery_ts_practice.py",
+                       "mastery_ts_kit.py"] + [f"mastery_ts_more_m{_n}.py" for _n in range(1, 7)] + [
+                       "mastery_ts_attach.py"]:
         _mstc_path = os.path.join(HERE, _mst_extra)
+        if not os.path.exists(_mstc_path):
+            continue
         with open(_mstc_path, encoding="utf-8") as _mf:
             exec(compile(_mf.read(), _mstc_path, "exec"))
     _finalize_mastery(MASTERY, CONCEPTS)
@@ -6832,3 +6850,7 @@ REFS_OUT = os.path.join(HERE, "..", "src-tauri", "seeds", "reference_solutions.j
 with open(REFS_OUT, "w", encoding="utf-8", newline="\n") as f:
     json.dump(REFERENCE_SOLUTIONS, f, indent=2, ensure_ascii=False)
 print(f"Wrote {len(REFERENCE_SOLUTIONS)} reference solution sets to {os.path.relpath(REFS_OUT)}")
+
+# tools/gen_ts_outputs.py runs this build in collect mode to learn which
+# computed outputs are missing or stale (ts_outputs_kit.py). A no-op otherwise.
+_tso_dump_pending()

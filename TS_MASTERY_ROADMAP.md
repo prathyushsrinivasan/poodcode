@@ -56,6 +56,14 @@ the gap stays visible. This is what has landed since.
 | Interview preparation in the chapters | none | **150 interview questions with model answers** — an "In an interview" section on all 50 TypeScript chapters | `tools/ts_lesson_interview.py` |
 | Mastery on Today | absent from "Continue" — the longest track had no resume card | 🎓 card per started track: current week, weeks complete, pace against the start date | `masteryResume` in `src/lib/mastery.ts`, `TrackCards.tsx` |
 | Moving to the next problem | carried the previous problem's code, report and stdin over — and autosaved it as the new problem's draft | fresh state per problem; last language kept; pending drafts flushed | `SolveRoute` in `App.tsx`, `Solve.tsx` |
+| Week tables | one 4,100-line `mastery_defs.py` | **one file per month** (`mastery_ts_m1.py` … `m6.py`); the split was proven byte-identical | X-01 |
+| Back half of the programme | week 25 carried four chapters; week 13 none; modules met in the capstone week | **D-2 rebalance**: nullish → 11; function types + type testing → 13; toolchain week 14; errors 25; async 26; **optional capstone week 27** (ungated, excluded from totals and pace) | `optional` on `MasteryWeek`, `coreWeeks()` in `mastery.ts` |
+| What the checker knows | `lib: es2022` — `toSorted`, `Object.groupBy`, Set methods, iterator helpers and `using` all failed to compile though Node 24 runs them | **ES2024 + the esnext libraries Node 24 ships** (array, collection, iterator, disposable, promise) — judge, verifier and editor in step | `tscheck.rs`, `ts_typecheck.mjs`, `monacoSetup.ts` |
+| Expected outputs | pasted in by hand after running the reference | **computed**: content names its inputs; `python tools/gen_ts_outputs.py` runs every reference (type-checked first) and caches the outputs, hash-pinned — a stale entry fails the build | `tools/ts_outputs_kit.py`, `tools/ts_outputs.json` |
+| Lesson template (X-02) | 1-2k-character lessons, prose only | new chapters are **structured data rendered into a fixed spine** — why, idea, worked examples *with the output they really print*, real compiler errors *as tsc prints them*, pitfalls (wrong vs right, both run), interview, forward links; 4k+ characters enforced | `tools/ts_chapter_kit.py`; chapters in `tools/ts_chapters_m*.py` |
+| Build projects (F-08) | a sentence; code saved but never run; "shipped" self-declared | **structured brief + acceptance tests** run through the judge; *shipping needs them green*; reference revealed after shipping; saved self-review rubric | `project_spec`, `ProjectPanel`, `project_rubric` column |
+| Problems inside a week | 2-5 Library links | **a tiered problem set per week** (warm-up / core / stretch), original, judged at the week's strictness | `problem_set`, `tools/mastery_ts_more_m*.py` |
+| Fast authoring loop (X-102) | none for Mastery | `python tools/verify_ts_mastery.py --weeks 11-14` / `--only ts_regex` — type-checks and runs chapters, practice, problems, finals and projects in seconds | `tools/verify_ts_mastery.py` |
 
 ---
 
@@ -110,8 +118,8 @@ reaches the Mastery track.
 | ✅ F-05 | **32 of 50 chapters contribute no quiz questions.** The week bank for weeks 1–8 is *only* the 6 authored questions, so with 4 sampled per sitting a learner sees the whole bank in two retakes. | `quiz` per concept | ≥ 8 questions per chapter, ≥ 40 per week bank (X-30). | P1 |
 | ✅ F-06 | **No flashcards on any TypeScript chapter.** Completing a week is supposed to feed flashcards and revision, but TS chapters carry `cards: []`. | concepts.json | ≥ 12 cards per chapter (X-50). | P1 |
 | ✅ F-07 | **Only two exercise kinds.** 176 exercises, all `drill` or `challenge`. `predict`, `diagnose`, `retype`, `design`, `fix` and `judge_mode: "types"` exist in the same codebase and the same judge. | concepts.json kinds | X-10 to X-14. | P1 |
-| ⬜ F-08 | **Projects are never executed.** The brief is one sentence; the code box is saved but never run, and "shipped" is a self-declared tick. | `ProjectPanel` | X-40 to X-46. | P1 |
-| ⬜ F-09 | **Week 26 has the smallest quiz bank (5)** and it is the capstone week. Week 25 packs **four** chapters into one week (errors, error types, async, async patterns). | `TS_WEEKS` | Decision D-2. | P1 |
+| 🚧 F-08 | **Projects are never executed.** The brief is one sentence; the code box is saved but never run, and "shipped" is a self-declared tick. | `ProjectPanel` | X-40 to X-46. | P1 |
+| ✅ F-09 | **Week 26 has the smallest quiz bank (5)** and it is the capstone week. Week 25 packs **four** chapters into one week (errors, error types, async, async patterns). | `TS_WEEKS` | Decision D-2. | P1 |
 | ✅ F-10 | **Week 14's project asks you to turn on `noUncheckedIndexedAccess` "in your head".** The judge already supports per-exercise strictness presets (`strictness: "strict+indexed"`). | week 14 `project` | Make it real: the week-14 final and exercises run under `strict+indexed`. | P2 |
 | ✅ F-11 | **Week 13 schedules no chapters**, so its bank has no chapter questions to draw on beyond the 6 authored ones. | week 13 `concepts: []` | Use `quiz_from` to pull from weeks 9–12 (the mechanism already exists). | P2 |
 | ⬜ F-12 | **Lessons stop at the syntax.** 0.9–2.1k characters is a page. There is no "why this exists", no failure-mode gallery, no interview angle, no "what the compiler actually says". | concepts.json `lesson` | Lesson template X-02. | P1 |
@@ -127,7 +135,7 @@ and make Mastery *reuse* Course exercises by reference** rather than re-authorin
 them (X-90). A Mastery week gets a "From the course" practice section pointing
 at the matching course lessons and practice families.
 
-### D-2. Rebalance the back half without changing 26
+### ✅ D-2. Rebalance the back half without changing 26
 Week 25 carries four chapters; week 13 carries none; modules and declaration
 files are squeezed into the capstone week. **Recommended shape:**
 
@@ -174,8 +182,8 @@ Everything here is built once and then used by every week in Part B.
 
 | # | Item | P | Size |
 |---|---|---|---|
-| X-01 | Split `mastery_defs.py`'s TS weeks into `tools/mastery_ts_m1.py` … `mastery_ts_m6.py` (one per month), exec'd in order — the same split that took `typescript_course.py` from 15,900 lines to 672. Verify by hashing `mastery.json` before/after: must be byte-identical. | P1 | M |
-| X-02 | **Lesson template** for every chapter, enforced by a lint: *Why it exists* → *The core idea* → *Worked example* → *What the compiler says* (a real `TSnnnn` message, verified) → *Pitfalls* (≥ 3) → *In an interview* → *Where it shows up later* (forward links). | P1 | L |
+| ✅ X-01 | Split `mastery_defs.py`'s TS weeks into `tools/mastery_ts_m1.py` … `mastery_ts_m6.py` (one per month), exec'd in order — the same split that took `typescript_course.py` from 15,900 lines to 672. Verify by hashing `mastery.json` before/after: must be byte-identical. | P1 | M |
+| 🚧 X-02 | **Lesson template** for every chapter, enforced by a lint: *Why it exists* → *The core idea* → *Worked example* → *What the compiler says* (a real `TSnnnn` message, verified) → *Pitfalls* (≥ 3) → *In an interview* → *Where it shows up later* (forward links). | P1 | L |
 | X-03 | Raise every lesson to **4–8k characters** — roughly 15–25 minutes of reading. Today's lessons are a quarter of that. | P1 | L |
 | X-04 | `examples` field per chapter: 3–6 runnable worked examples, each openable in a scratch editor with one click ("Run this"). | P1 | M |
 | X-05 | `pitfalls` field per chapter: short "this looks right but…" cases, each with the wrong code, the symptom, and the fix. Rendered as collapsible cards. | P1 | M |
@@ -204,7 +212,7 @@ Everything here is built once and then used by every week in Part B.
 | # | Item | P | Size |
 |---|---|---|---|
 | ✅ X-20 | TS starters for all 81 curated slugs (F-01), then the other ~110 library problems still missing one. | **P0** | M |
-| X-21 | Raise curated problems to **12–16 per week** (from 2–5), tiered *Warm-up / Core / Stretch*, ~380 slots total. Month-by-month lists in Part B. | P1 | L |
+| 🚧 X-21 | Raise curated problems to **12–16 per week** (from 2–5), tiered *Warm-up / Core / Stretch*, ~380 slots total. Month-by-month lists in Part B. | P1 | L |
 | X-22 | **"Idiomatic TypeScript" editorial** on every curated problem: not just the algorithm, but the types — how `Map<K,V>` vs `Record`, `readonly` inputs, a discriminated-union result, `noUncheckedIndexedAccess`-safe indexing would look in a model answer. | P1 | L |
 | ✅ X-23 | **Function-harness problems for TypeScript** — `harness.rs` generates I/O glue for Python and Java only. Add TS so a problem can say "implement `groupBy(xs, key)`" without stdin parsing. The TS course's hidden `harness` driver is the model. | P1 | L |
 | 🚧 X-24 | **Type-challenge bank** (with X-12): ~120 original type-level puzzles, easy → extreme, used by weeks 15–22 and as optional daily reps. | P1 | L |
@@ -229,10 +237,10 @@ Everything here is built once and then used by every week in Part B.
 
 | # | Item | P | Size |
 |---|---|---|---|
-| X-40 | Replace one-sentence briefs with **structured briefs**: goal · requirements (numbered) · stretch goals · "done when" checklist · sample input/output. | P1 | L |
-| X-41 | **Run the project** — the code box gets Run and Test buttons backed by `run_scratch`, with 5–10 acceptance tests per project. "Shipped" requires them green. | P1 | M |
-| X-42 | **Self-review rubric** per project (typing quality, no `any`, error handling, naming) — tick-boxes saved with the project. | P2 | S |
-| X-43 | **Reference implementation** revealable after shipping, with a side-by-side diff against the learner's code (`src/lib/diff.ts` already does LCS). | P2 | M |
+| 🚧 X-40 | Replace one-sentence briefs with **structured briefs**: goal · requirements (numbered) · stretch goals · "done when" checklist · sample input/output. | P1 | L |
+| 🚧 X-41 | **Run the project** — the code box gets Run and Test buttons backed by `run_scratch`, with 5–10 acceptance tests per project. "Shipped" requires them green. | P1 | M |
+| ✅ X-42 | **Self-review rubric** per project (typing quality, no `any`, error handling, naming) — tick-boxes saved with the project. | P2 | S |
+| 🚧 X-43 | **Reference implementation** revealable after shipping, with a side-by-side diff against the learner's code (`src/lib/diff.ts` already does LCS). | P2 | M |
 | X-44 | **Project continuity** — a single running project that grows each month (like the Course's Budget Buddy): *Ledger → typed CLI → validated store → type-safe event system → async loader*. The monthly "arc" projects are listed in Part B. | P1 | L |
 | X-45 | **Multi-file projects** in the project workspace (tabs for several `.ts` files, bundled into one file for the judge by concatenation with `export` stripped). Required for months 4 and 6. | P2 | L |
 | X-46 | Project history — keep every saved version, not just the latest (ProjectHistory.tsx exists for the Projects track and can be reused). | P3 | M |
@@ -294,7 +302,7 @@ Everything here is built once and then used by every week in Part B.
 |---|---|---|---|
 | 🚧 X-100 | **Build asserts** in `mastery_defs.py`: TS starter exists for every curated slug; ≥ 6 final tests; ≥ 40-question bank; ≥ 12 cards per chapter; no slug curated twice except where `note` starts with "review"; every lesson passes the template lint. | **P0** | S |
 | ✅ X-101 | **A Mastery verifier** — `cargo test --test verify_mastery`: runs every final's reference solution through the real judge, every exercise's solution, every project's reference, every type-graded assertion. Mirrors `verify_ts_course.rs`. | **P0** | M |
-| X-102 | `--only=wNN` fast path for authoring, as the course verifier has. | P1 | S |
+| ✅ X-102 | `--only=wNN` fast path for authoring, as the course verifier has. | P1 | S |
 | ✅ X-103 | Diagnose-prompt checker: every quoted `TSnnnn` is re-derived from the starter (the course's verifier caught four wrong codes on first try — see the table in `TS_ROADMAP.md`). | P1 | S |
 | X-104 | Scope lint for Mastery — nothing may use a construct a later week teaches (port `_SCOPE_RULES`). | P1 | M |
 | X-105 | Upgrade the checker to TypeScript 6.x (D-4), re-run every verifier, record deltas. | P2 | M |

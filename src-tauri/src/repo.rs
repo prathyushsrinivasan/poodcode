@@ -1341,11 +1341,13 @@ fn row_to_mastery(row: &rusqlite::Row<'_>) -> rusqlite::Result<MasteryProgress> 
         study_seconds: row.get(8)?,
         started_at: row.get(9)?,
         completed_at: row.get(10)?,
+        project_rubric: row.get(11)?,
     })
 }
 
 const MASTERY_COLS: &str = "track_key, week, best_quiz, exam_passed, exam_code, \
-     project_notes, project_code, project_done, study_seconds, started_at, completed_at";
+     project_notes, project_code, project_done, study_seconds, started_at, completed_at, \
+     project_rubric";
 
 pub fn mastery_progress(conn: &Connection) -> AppResult<Vec<MasteryProgress>> {
     let sql = format!(
@@ -1419,6 +1421,17 @@ pub fn mastery_save_project(
             SET project_notes = ?3, project_code = ?4, project_done = ?5
           WHERE track_key = ?1 AND week = ?2",
         params![track_key, week, notes, code, done as i64],
+    )?;
+    Ok(())
+}
+
+/// Save the project's self-review ticks (the rubric item indices), as JSON.
+pub fn mastery_save_rubric(conn: &Connection, track_key: &str, week: i64, ticked: &[i64]) -> AppResult<()> {
+    ensure_week(conn, track_key, week)?;
+    let json = serde_json::to_string(ticked).unwrap_or_else(|_| "[]".into());
+    conn.execute(
+        "UPDATE mastery_progress SET project_rubric = ?3 WHERE track_key = ?1 AND week = ?2",
+        params![track_key, week, json],
     )?;
     Ok(())
 }

@@ -415,6 +415,11 @@ TS_INTERVIEW = {
     ],
 }
 
+# Chapters built with ts_chapter_kit.py carry their interview questions inline.
+for _key, _qas in TS_INTERVIEW_MORE.items():
+    assert _key not in TS_INTERVIEW, f"{_key}: interview questions defined twice"
+    TS_INTERVIEW[_key] = _qas
+
 # Attach to the lessons, and make sure every TypeScript chapter has its three.
 _ts_keys = {k for k, c in CONCEPTS.items() if c.get("language") == "typescript"}
 _missing = sorted(_ts_keys - set(TS_INTERVIEW))

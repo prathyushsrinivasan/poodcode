@@ -125,6 +125,8 @@ export const api = {
     code: string,
     done: boolean
   ) => invoke<void>("mastery_save_project", { trackKey, week, notes, code, done }),
+  masterySaveRubric: (trackKey: string, week: number, ticked: number[]) =>
+    invoke<void>("mastery_save_rubric", { trackKey, week, ticked }),
   masteryLogTime: (trackKey: string, week: number, seconds: number) =>
     invoke<void>("mastery_log_time", { trackKey, week, seconds }),
   /** Stamp a week complete and, the first time, seed its flashcards + reviews. */

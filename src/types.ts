@@ -501,6 +501,22 @@ export interface MasteryExam {
   strictness?: string;
 }
 
+/** A week's build project as a runnable brief. The learner's code runs against
+ * `tests` (outputs computed from `solution`); "shipped" needs them green, and
+ * `solution` is shown only after shipping. */
+export interface MasteryProjectSpec {
+  title: string;
+  goal: string;
+  requirements: string[];
+  stretch: string[];
+  rubric: string[];
+  language: string;
+  starter: string;
+  solution: string;
+  tests: ExerciseTest[];
+  strictness?: string;
+}
+
 /** An optional timed checkpoint built from the week's problems. */
 export interface MasteryContest {
   title: string;
@@ -531,6 +547,13 @@ export interface MasteryWeek {
   flashcards?: { front: string; back: string }[];
   /** Optional graded practice (type workshops); outside the week's gate. */
   practice?: Exercise[];
+  /** A week after the programme proper (e.g. the TypeScript capstone). It opens
+   * like any other but never counts toward the total, pace or completion. */
+  optional?: boolean;
+  /** The week's own tiered problem set (Easy/Medium/Hard = warm-up/core/stretch). */
+  problem_set?: Exercise[];
+  /** The build project as a runnable brief; `project` is its one-line summary. */
+  project_spec?: MasteryProjectSpec | null;
 }
 
 export interface MasteryTrack {
@@ -561,6 +584,8 @@ export interface MasteryProgress {
   study_seconds: number;
   started_at: string | null;
   completed_at: string | null;
+  /** JSON array of the project rubric items ticked. */
+  project_rubric?: string;
 }
 
 // ---------------------------------------------------------------------------

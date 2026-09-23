@@ -12868,6 +12868,1342 @@
     "practice": []
   },
   {
+    "key": "ts_program_io",
+    "name": "Program I/O — stdin and stdout",
+    "category": "TS: Language Basics",
+    "what": "How a judged program reads its input and prints its answer: `readFileSync(0)`, `trim`, `split`, `Number`, and exactly what `console.log` writes.",
+    "deep": "Every program in this app talks to the judge through text: the test's input arrives on standard input, and whatever the program prints on standard output is compared with the expected answer. Reading that text reliably — all of it, trimmed, split into lines and tokens, converted to numbers — and printing exactly the expected characters is the first skill, and most \"wrong answer\" verdicts in week 1 come from it rather than from the logic.",
+    "java": "Java reads with a `Scanner` and prints with `System.out.println`. Here the whole input is read at once as one string (`fs.readFileSync(0, \"utf8\")`) and cut up with string methods; `console.log` is `println`, but it joins several arguments with spaces.",
+    "language": "typescript",
+    "lesson": "### Why it exists\nA judged program is a black box with one input and one output. The judge\nwrites the test's input to your program's **standard input**, runs it, and\ncompares everything it printed to **standard output** with the expected text.\nIt does not call your functions and does not look at your variables.\n\nThat makes the edges of the program matter more than they look. Read only part\nof the input, keep a stray newline, print a value with an extra space or one\ndecimal too many, and a correct algorithm scores zero. Every week of this\nprogramme uses the same few lines to read and print; this chapter is those lines,\nand what each one really does.\n\n### The core idea\n**Reading.** Node gives a program its standard input as file descriptor `0`:\n\n```ts\nimport * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n```\n\n- `readFileSync(0, \"utf8\")` reads **all** of standard input into one string.\n  Without the `\"utf8\"` you would get raw bytes, not text.\n- `.trim()` drops the whitespace at both ends — above all the final newline,\n  and the `\\r` that Windows line endings leave behind.\n\n**Cutting it up.** The input is text; the structure is yours to recover.\n\n| input looks like | read it with |\n|---|---|\n| one value | `input` |\n| several tokens on a line | `input.split(/\\s+/)` |\n| several lines | `input.split(\"\\n\")` |\n| a line of numbers | `input.split(/\\s+/).map(Number)` |\n\n`/\\s+/` splits on any run of spaces or tabs, so `\"3   4\"` still gives two\ntokens where `split(\" \")` would give an empty string between them.\n\n**Converting.** Everything read is a `string` — TypeScript knows it, and will\nnot let you do arithmetic on it. Convert on purpose:\n\n- `Number(text)` — the whole string must be a number: `Number(\"12\")` is `12`,\n  `Number(\"12px\")` is `NaN`, and `Number(\"\")` is `0`.\n- `parseInt(text, 10)` / `parseFloat(text)` — read a number off the *front*\n  and ignore the rest: `parseInt(\"12px\", 10)` is `12`.\n\n**Printing.** `console.log` writes its arguments and a newline:\n\n- several arguments are joined with **one space**: `console.log(\"a\", 1)`\n  prints `a 1`;\n- a number prints in its shortest form: `2.50` is printed as `2.5`, so use\n  `toFixed(2)` when the format demands two decimals;\n- an array of values is best printed with `join`: `xs.join(\" \")`.\n\n**What the judge forgives.** Trailing spaces at the end of a line, `\\r`\ncharacters and trailing blank lines are ignored. Everything else — a missing\nspace, an extra decimal, `2.5` for `2.50` — is a wrong answer.\n\n### Worked examples\n#### One number in, one number out\n```ts\nimport * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst n = Number(input);\nconsole.log(n * 2);\n```\n\nInput:\n```text\n21\n```\n\nPrints:\n```text\n42\n```\n\nInput:\n```text\n-4\n```\n\nPrints:\n```text\n-8\n```\n\nThe second input ends in a newline, as real input usually does; `trim` removes it before `Number` sees it.\n\n#### Two numbers on one line\n```ts\nimport * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst parts = input.split(/\\s+/);\nconst width = Number(parts[0]);\nconst height = Number(parts[1]);\nconsole.log(\"area\", width * height);\nconsole.log(`perimeter ${2 * (width + height)}`);\n```\n\nInput:\n```text\n3 4\n```\n\nPrints:\n```text\narea 12\nperimeter 14\n```\n\nInput:\n```text\n10    2\n```\n\nPrints:\n```text\narea 20\nperimeter 24\n```\n\n`console.log(\"area\", 12)` prints `area 12` — the two arguments are joined with one space. The template string gives you full control instead.\n\n#### Several lines\n```ts\nimport * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst lines = input.split(\"\\n\");\nconst name = lines[0].trim();\nconst age = Number(lines[1]);\nconsole.log(`Hello, ${name}. Next year you will be ${age + 1}.`);\n```\n\nInput:\n```text\nAda\n36\n```\n\nPrints:\n```text\nHello, Ada. Next year you will be 37.\n```\n\nInput:\n```text\nGrace\r\n85\n```\n\nPrints:\n```text\nHello, Grace. Next year you will be 86.\n```\n\nThe second input has Windows line endings. `trim()` on the whole input and on each line removes the `\\r` characters that would otherwise end up inside `name`.\n\n#### Printing exactly two decimals\n```ts\nimport * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst price = Number(input);\nconsole.log(price);\nconsole.log(price.toFixed(2));\nconsole.log(\"$\" + (price * 3).toFixed(2));\n```\n\nInput:\n```text\n2.5\n```\n\nPrints:\n```text\n2.5\n2.50\n$7.50\n```\n\nInput:\n```text\n10\n```\n\nPrints:\n```text\n10\n10.00\n$30.00\n```\n\n`console.log(2.5)` prints `2.5`. When the expected output says `2.50`, only `toFixed(2)` produces it — and `toFixed` returns a *string*, ready to print.\n\n### What the compiler says\n```ts\nimport * as fs from \"fs\";\nconst input = fs.readFileSync(0);\nconsole.log(input);\n```\n```text\nline 2: error TS2554: Expected 2 arguments, but got 1.\n```\n\nWithout an encoding `readFileSync` returns raw bytes, not text, and the judge's declarations only offer the text form — so the compiler wants the second argument, `\"utf8\"`.\n\n```ts\nimport * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconsole.log(input * 2);\n```\n```text\nline 3: error TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.\n```\n\n`input` is a `string`. TypeScript refuses arithmetic on it rather than guessing what you meant; convert with `Number(input)` first.\n\n```ts\nimport * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst n: number = input;\nconsole.log(n + 1);\n```\n```text\nline 3: error TS2322: Type 'string' is not assignable to type 'number'.\n```\n\nAn annotation does not convert anything. Reading gives you a `string`; `Number(...)` is the conversion, and the annotation only checks you did it.\n\n### Pitfalls\n#### Forgetting to trim\n```ts\nimport * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\");\nconsole.log(\"[\" + input + \"]\");\n```\nPrints:\n```text\n[hello\n]\n```\n\nThe raw input still carries its final newline, so it ends up *inside* the brackets. With a number it is harmless — `Number(\"5\\n\")` is `5` — but compare or print the string and the stray newline breaks the answer.\n\n```ts\nimport * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconsole.log(\"[\" + input + \"]\");\n```\nPrints:\n```text\n[hello]\n```\n\n#### `+` on two strings concatenates\n```ts\nimport * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst parts = input.split(/\\s+/);\nconsole.log(parts[0] + parts[1]);\n```\nPrints:\n```text\n23\n```\n\nBoth tokens are strings, and `+` with strings joins them: `\"2\" + \"3\"` is `\"23\"`. The compiler allows it because string concatenation is legal — only converting first makes it addition.\n\n```ts\nimport * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst parts = input.split(/\\s+/);\nconsole.log(Number(parts[0]) + Number(parts[1]));\n```\nPrints:\n```text\n5\n```\n\n#### `console.log` adds a space between arguments\n```ts\nimport * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst total = Number(input) * 2;\nconsole.log(\"total:\", total);\n```\nPrints:\n```text\ntotal: 10\n```\n\nIf the expected output is `total:10`, passing two arguments prints `total: 10` — one space too many. Build the exact string yourself when spacing matters.\n\n```ts\nimport * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst total = Number(input) * 2;\nconsole.log(`total:${total}`);\n```\nPrints:\n```text\ntotal:10\n```\n\n#### `split(\" \")` and double spaces\n```ts\nimport * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst words = input.split(\" \");\nconsole.log(words.length);\n```\nPrints:\n```text\n6\n```\n\nTwo spaces in a row give an empty string between them, so `split(\" \")` counts three words in `a  b`… plus one more for every extra space. Split on the pattern `/\\s+/` instead.\n\n```ts\nimport * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst words = input.split(/\\s+/);\nconsole.log(words.length);\n```\nPrints:\n```text\n3\n```\n\n### Where it shows up later\n- **Week 2 — Operators & control flow.** Comparing what you read: `===` on strings versus numbers.\n- **Week 3 — Numbers.** Why `toFixed` rounds the way it does, and printing money exactly.\n- **Week 7 — Arrays.** `split(...).map(Number)` properly, plus `reduce` for totals.\n- **Week 11 — Narrowing.** `JSON.parse` hands you `any`; turning untrusted input into a real type.\n\n### In an interview\n\n**How do you read input in a Node program that is fed through stdin?**\n\n`fs.readFileSync(0, \"utf8\")` reads all of standard input as one string; then `trim()` and `split` it into lines or tokens. For a long-running program you'd use a stream (`process.stdin` with `readline`), but for a batch program reading it at once is simplest.\n\n**What's the difference between `Number()` and `parseInt()`?**\n\n`Number` converts the whole string or gives `NaN` (and treats `\"\"` as 0); `parseInt` reads an integer off the front and ignores the rest, and should always get its radix: `parseInt(s, 10)`. For validation, `Number` plus `Number.isNaN` is stricter.\n\n**Your output looks right but the judge says wrong answer. What do you check?**\n\nFormatting before logic: extra or missing spaces (`console.log` joins arguments with spaces), decimals (`2.5` vs `2.50`), a stray `\\r` or newline in a printed string, and whether I printed every line the format asks for, in order.",
+    "exercises": [
+      {
+        "id": "ts_program_io-double",
+        "title": "Read, convert, print",
+        "prompt": "The input is one number. Replace `____` so `n` holds that number — converted, not the string.",
+        "hint": "Everything read from stdin is a string. `Number(...)` converts the whole thing.",
+        "language": "typescript",
+        "kind": "drill",
+        "difficulty": "",
+        "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst n = ____;\nconsole.log(n * 2);\nconsole.log(n + 1);\n",
+        "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst n = Number(input);\nconsole.log(n * 2);\nconsole.log(n + 1);\n",
+        "tests": [
+          {
+            "input": "21",
+            "output": "42\n22"
+          },
+          {
+            "input": "0",
+            "output": "0\n1"
+          },
+          {
+            "input": "-3.5",
+            "output": "-7\n-2.5"
+          },
+          {
+            "input": "100\n",
+            "output": "200\n101"
+          }
+        ],
+        "source_slug": ""
+      },
+      {
+        "id": "ts_program_io-pair",
+        "title": "Two tokens on a line",
+        "prompt": "The input is two numbers separated by one or more spaces. Replace `____` with the expression that splits the line into its tokens, however many spaces sit between them.",
+        "hint": "Split on a pattern that matches any run of whitespace: `/\\s+/`.",
+        "language": "typescript",
+        "kind": "drill",
+        "difficulty": "",
+        "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst parts = ____;\nconst a = Number(parts[0]);\nconst b = Number(parts[1]);\nconsole.log(a + b);\nconsole.log(a * b);\n",
+        "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst parts = input.split(/\\s+/);\nconst a = Number(parts[0]);\nconst b = Number(parts[1]);\nconsole.log(a + b);\nconsole.log(a * b);\n",
+        "tests": [
+          {
+            "input": "2 3",
+            "output": "5\n6"
+          },
+          {
+            "input": "10     4",
+            "output": "14\n40"
+          },
+          {
+            "input": "-1 1",
+            "output": "0\n-1"
+          },
+          {
+            "input": "7\t8",
+            "output": "15\n56"
+          }
+        ],
+        "source_slug": ""
+      },
+      {
+        "id": "ts_program_io-money",
+        "title": "Exactly two decimals",
+        "prompt": "The input is a price and a quantity on two lines. Print the total with exactly two decimals, prefixed by `$`. Replace `____` with the expression that formats `total`.",
+        "hint": "`console.log(7.5)` prints `7.5`; the expected output wants `7.50`. `toFixed(2)` returns the string you need.",
+        "language": "typescript",
+        "kind": "drill",
+        "difficulty": "",
+        "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst lines = input.split(\"\\n\");\nconst price = Number(lines[0]);\nconst quantity = Number(lines[1]);\nconst total = price * quantity;\nconsole.log(\"$\" + ____);\n",
+        "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst lines = input.split(\"\\n\");\nconst price = Number(lines[0]);\nconst quantity = Number(lines[1]);\nconst total = price * quantity;\nconsole.log(\"$\" + total.toFixed(2));\n",
+        "tests": [
+          {
+            "input": "2.5\n3",
+            "output": "$7.50"
+          },
+          {
+            "input": "10\n1",
+            "output": "$10.00"
+          },
+          {
+            "input": "0.1\n3",
+            "output": "$0.30"
+          },
+          {
+            "input": "19.99\r\n2\r\n",
+            "output": "$39.98"
+          }
+        ],
+        "source_slug": ""
+      },
+      {
+        "id": "ts_program_io-receipt",
+        "title": "A receipt line",
+        "prompt": "The input is three lines: an item name, a unit price, and a quantity. Print `<name> x<quantity> = $<total>` with the total to exactly two decimals, then on a second line `avg $<price>` with the unit price to two decimals. Names may have spaces; ignore spaces around every line.",
+        "hint": "Read the three lines, trim what you print, convert what you compute with, and format with `toFixed(2)`.",
+        "language": "typescript",
+        "kind": "challenge",
+        "difficulty": "Easy",
+        "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+        "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst lines = input.split(\"\\n\");\nconst name = lines[0].trim();\nconst price = Number(lines[1]);\nconst quantity = Number(lines[2]);\nconst total = price * quantity;\nconsole.log(`${name} x${quantity} = $${total.toFixed(2)}`);\nconsole.log(`avg $${price.toFixed(2)}`);\n",
+        "tests": [
+          {
+            "input": "pen\n1.5\n4",
+            "output": "pen x4 = $6.00\navg $1.50"
+          },
+          {
+            "input": "coffee beans\n12\n1",
+            "output": "coffee beans x1 = $12.00\navg $12.00"
+          },
+          {
+            "input": "  tea  \n 3.25 \n 10 ",
+            "output": "tea x10 = $32.50\navg $3.25"
+          },
+          {
+            "input": "gum\n0.99\n3",
+            "output": "gum x3 = $2.97\navg $0.99"
+          }
+        ],
+        "source_slug": ""
+      }
+    ],
+    "cards": [],
+    "quiz": [
+      {
+        "question": "What does `fs.readFileSync(0, \"utf8\")` read?",
+        "options": [
+          "All of standard input, as one string",
+          "The first line of standard input",
+          "The file named `0`",
+          "Standard output"
+        ],
+        "answer": 0,
+        "explanation": "File descriptor 0 is standard input. The whole input arrives at once; splitting it is up to you."
+      },
+      {
+        "question": "Why call `.trim()` on the input?",
+        "options": [
+          "To drop the trailing newline and any `\\r` from Windows line endings",
+          "To convert it to a string",
+          "To remove every space inside it",
+          "It is required by TypeScript"
+        ],
+        "answer": 0,
+        "explanation": "Input almost always ends in a newline; leaving it on makes comparisons and printed strings wrong."
+      },
+      {
+        "question": "`Number(\"12px\")`, `parseInt(\"12px\", 10)` — what do they give?",
+        "options": [
+          "`NaN` and `12`",
+          "`12` and `12`",
+          "`NaN` and `NaN`",
+          "`12` and `NaN`"
+        ],
+        "answer": 0,
+        "explanation": "`Number` needs the whole string to be numeric; `parseInt` reads the leading digits and stops."
+      },
+      {
+        "question": "What does `console.log(\"sum\", 5)` print?",
+        "options": [
+          "`sum 5`",
+          "`sum5`",
+          "`sum, 5`",
+          "`[\"sum\", 5]`"
+        ],
+        "answer": 0,
+        "explanation": "Several arguments are joined with a single space."
+      },
+      {
+        "question": "`const n = 2.5; console.log(n)` prints `2.5`. How do you print `2.50`?",
+        "options": [
+          "`console.log(n.toFixed(2))`",
+          "`console.log(n, 2)`",
+          "`console.log(Number(n.toFixed(2)))`",
+          "`console.log(n * 1.00)`"
+        ],
+        "answer": 0,
+        "explanation": "`toFixed` returns a string with exactly that many decimals. Converting it back to a number loses the trailing zero again."
+      },
+      {
+        "question": "Why does `input.split(\" \")` miscount words in `\"a  b\"`?",
+        "options": [
+          "Two spaces produce an empty string between them",
+          "`split` ignores the second word",
+          "It counts characters, not words",
+          "It doesn't; it returns two words"
+        ],
+        "answer": 0,
+        "explanation": "`\"a  b\".split(\" \")` is `[\"a\", \"\", \"b\"]`. Splitting on `/\\s+/` treats any run of whitespace as one separator."
+      }
+    ],
+    "practice": []
+  },
+  {
+    "key": "ts_equality",
+    "name": "Equality & Truthiness",
+    "category": "TS: Language Basics",
+    "what": "`===` versus `==`, why `NaN !== NaN`, `Object.is`, the full truthiness table, and when `??` beats `||`.",
+    "deep": "Two questions decide every branch: are these equal, and is this value truthy? JavaScript answers both with rules that are easy to half-remember — `==` coerces, `NaN` is not equal to itself, `0` and `\"\"` are falsy, objects compare by identity. TypeScript catches some of the traps (comparing a string with a number) and not others (a `0` treated as missing). This chapter makes the rules exact.",
+    "java": "Java's `==` on objects compares references and `.equals` compares values; JavaScript objects and arrays likewise compare by reference with `===`, but strings compare by value. There is no `.equals` — deep comparison is something you write (or `JSON.stringify` for plain data).",
+    "language": "typescript",
+    "lesson": "### Why it exists\nMost wrong branches are not wrong logic — they are the wrong idea of what\n\"equal\" or \"present\" means. `if (count)` skips a legitimate zero. `value || 10`\noverwrites an empty string the user typed on purpose. `input == 0` is `true` for\nan empty line. `[1] === [1]` is `false`.\n\nJavaScript's rules here are fixed and learnable, and TypeScript helps with some\nof them — it rejects `===` between types that can never be equal. The rest you\nhave to know. Knowing them is the difference between a condition that is right\nand one that is right for the inputs you happened to try.\n\n### The core idea\n**Strict equality.** `a === b` is `true` when both have the same type and the\nsame value — no conversion. Use it everywhere. `!==` is its negation.\n\n**Loose equality.** `a == b` first *converts* its operands by a table almost\nnobody remembers: `\"\" == 0`, `\"1\" == 1`, `null == undefined`, `false == \"0\"`\nare all `true`. The one idiomatic use is `x == null`, which matches both\n`null` and `undefined`.\n\n**The odd numbers.** `NaN` is not equal to anything, including itself:\n`NaN === NaN` is `false`, so test with `Number.isNaN(x)`. `0 === -0` is `true`.\n`Object.is(a, b)` is `===` with those two corners fixed:\n`Object.is(NaN, NaN)` is `true` and `Object.is(0, -0)` is `false`.\n\n**Objects compare by identity.** Two arrays or objects are `===` only if they\nare the *same* object. `[1, 2] === [1, 2]` is `false`. Compare contents\nyourself — element by element, or with `JSON.stringify` for plain data.\n\n**Truthiness.** In a condition, eight values count as false:\n\n| falsy | |\n|---|---|\n| `false` | the boolean |\n| `0`, `-0`, `0n` | zero |\n| `\"\"` | the empty string |\n| `null`, `undefined` | absence |\n| `NaN` | not-a-number |\n\nEverything else is truthy — including `\"0\"`, `\"false\"`, `[]` and `{}`.\n\n**Defaults: `||` versus `??`.** `a || b` falls back to `b` whenever `a` is\n*falsy*; `a ?? b` only when `a` is `null` or `undefined`. For \"use the default\nif nothing was given\", `??` is almost always what you mean, because `0` and\n`\"\"` are real values.\n\n**What TypeScript adds.** Comparing values whose types can never overlap —\na `number` with a `string` — is a compile error (TS2367), which catches many\n`===` mistakes that `==` would have silently coerced.\n\n### Worked examples\n#### `===` does not convert; `==` does\n```ts\nimport * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst asNumber = Number(input);\nconsole.log(asNumber === 0);\nconsole.log(input === \"0\");\nconsole.log(Object.is(asNumber, -0));\n```\n\nInput:\n```text\n0\n```\n\nPrints:\n```text\ntrue\ntrue\nfalse\n```\n\nPrints:\n```text\ntrue\nfalse\nfalse\n```\n\nInput:\n```text\n-0\n```\n\nPrints:\n```text\ntrue\nfalse\ntrue\n```\n\nAn empty line becomes `0` through `Number(\"\")`, which is why checking the *text* is sometimes the honest test. `Object.is` can even tell `-0` from `0`.\n\n#### `NaN` is never equal to itself\n```ts\nconst values = [Number(\"12\"), Number(\"12px\"), Number(\"\")];\nfor (const v of values) {\n  console.log(v, v === v, Number.isNaN(v));\n}\n```\n\nPrints:\n```text\n12 true false\nNaN false true\n0 true false\n```\n\n`v === v` is `false` only for `NaN` — an old trick, but `Number.isNaN` says what you mean.\n\n#### Identity, not contents\n```ts\nconst a = [1, 2];\nconst b = [1, 2];\nconst c = a;\nconsole.log(a === b, a === c);\nconsole.log(JSON.stringify(a) === JSON.stringify(b));\nc.push(3);\nconsole.log(a.length);\n```\n\nPrints:\n```text\nfalse true\ntrue\n3\n```\n\n`a` and `b` are two arrays with the same contents; `a` and `c` are one array with two names — which is why pushing through `c` changes `a`.\n\n#### `??` keeps the zero `||` throws away\n```ts\nimport * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst typed = input === \"\" ? undefined : Number(input);\nconsole.log(\"with ||:\", typed || 10);\nconsole.log(\"with ??:\", typed ?? 10);\n```\n\nInput:\n```text\n0\n```\n\nPrints:\n```text\nwith ||: 10\nwith ??: 0\n```\n\nPrints:\n```text\nwith ||: 10\nwith ??: 10\n```\n\nInput:\n```text\n7\n```\n\nPrints:\n```text\nwith ||: 7\nwith ??: 7\n```\n\nWhen the user typed `0`, `||` replaces it with the default; `??` keeps it. Only when nothing was typed do both fall back.\n\n### What the compiler says\n```ts\nconst count: number = 3;\nconst label: string = \"3\";\nconsole.log(count === label);\n```\n```text\nline 3: error TS2367: This comparison appears to be unintentional because the types 'number' and 'string' have no overlap.\n```\n\nA `number` and a `string` can never be `===`, so the comparison is always `false` — almost certainly a bug. Convert one side on purpose first.\n\n```ts\nconst a: number | undefined = undefined;\nconst b = 0;\nconsole.log(a ?? b || 5);\n```\n```text\nline 3: error TS5076: '??' and '||' operations cannot be mixed without parentheses.\n```\n\nMixing `??` with `||` or `&&` without parentheses is rejected outright, because the precedence is too easy to misread. Say which you mean: `(a ?? b) || 5`.\n\n### Pitfalls\n#### `if (count)` skips a real zero\n```ts\nimport * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst count = Number(input);\nif (count) console.log(`${count} items`);\nelse console.log(\"no count given\");\n```\nPrints:\n```text\nno count given\n```\n\n`0` is falsy, so a genuine count of zero takes the \"missing\" branch. Test for what you actually mean — here, whether anything was typed.\n\n```ts\nimport * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nif (input !== \"\") console.log(`${Number(input)} items`);\nelse console.log(\"no count given\");\n```\nPrints:\n```text\n0 items\n```\n\n#### `||` overwrites a legitimate empty string\n```ts\nconst settings: { nickname?: string } = { nickname: \"\" };\nconst shown = settings.nickname || \"anonymous\";\nconsole.log(`[${shown}]`);\n```\nPrints:\n```text\n[anonymous]\n```\n\nThe user deliberately cleared their nickname; `||` treats that as missing. `??` only falls back for `null` and `undefined`.\n\n```ts\nconst settings: { nickname?: string } = { nickname: \"\" };\nconst shown = settings.nickname ?? \"anonymous\";\nconsole.log(`[${shown}]`);\n```\nPrints:\n```text\n[]\n```\n\n#### Comparing arrays with `===`\n```ts\nconst expected = [1, 2, 3];\nconst actual = [3, 2, 1].sort();\nconsole.log(actual === expected ? \"match\" : \"different\");\n```\nPrints:\n```text\ndifferent\n```\n\nTwo separate arrays are never `===`, whatever they contain. Compare element by element (or `JSON.stringify` both for plain data).\n\n```ts\nconst expected = [1, 2, 3];\nconst actual = [3, 2, 1].sort();\nconst same = actual.length === expected.length && actual.every((v, i) => v === expected[i]);\nconsole.log(same ? \"match\" : \"different\");\n```\nPrints:\n```text\nmatch\n```\n\n#### `=== NaN` can never be true\n```ts\nimport * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst n = Number(input);\nconsole.log(n === NaN ? \"not a number\" : `ok: ${n}`);\n```\nThe compiler says:\n```text\nline 4: error TS2845: This condition will always return 'false'.\n```\n\n`n === NaN` is always `false` — even when `n` is `NaN` — and TypeScript knows it, so it refuses the comparison outright. In plain JavaScript this bug runs silently. `Number.isNaN` is the reliable test.\n\n```ts\nimport * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst n = Number(input);\nconsole.log(Number.isNaN(n) ? \"not a number\" : `ok: ${n}`);\n```\nPrints:\n```text\nnot a number\n```\n\n### Where it shows up later\n- **Week 3 — Numbers.** Floating-point equality: why `0.1 + 0.2 !== 0.3`, and comparing with a tolerance.\n- **Week 9 — Maps & Sets.** Keys are compared with SameValueZero — like `===` but with `NaN` equal to itself — and objects by identity.\n- **Week 11 — Narrowing.** `===` checks, `typeof` and truthiness all *narrow* types; the falsy table decides what each branch knows.\n\n### In an interview\n\n**`==` or `===`?**\n\n`===`, always, except `x == null` to catch both `null` and `undefined`. `==` coerces by a table that makes `\"\" == 0` true, and TypeScript's overlap check (TS2367) only works when you compare like with like.\n\n**How do you compare two arrays or objects for equality?**\n\nNot with `===` — that's identity. For arrays: same length and `every` element equal; for nested plain data, a recursive deep-equal or `JSON.stringify` if key order is controlled. Libraries like `node:util`'s `isDeepStrictEqual` exist too.\n\n**Why is `??` usually better than `||` for defaults?**\n\n`||` replaces every falsy value, so a real `0`, `\"\"` or `false` gets overwritten. `??` only replaces `null`/`undefined`, which is what \"not provided\" means.",
+    "exercises": [
+      {
+        "id": "ts_equality-default",
+        "title": "Keep the zero",
+        "prompt": "The input is a line that may be empty. Replace `____` with a default that falls back to `1` only when nothing was typed — a typed `0` must stay `0`.",
+        "hint": "`||` would replace the zero. Which operator only replaces `null` and `undefined`?",
+        "language": "typescript",
+        "kind": "drill",
+        "difficulty": "",
+        "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst typed = input === \"\" ? undefined : Number(input);\nconst quantity = ____;\nconsole.log(`quantity ${quantity}`);\n",
+        "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst typed = input === \"\" ? undefined : Number(input);\nconst quantity = typed ?? 1;\nconsole.log(`quantity ${quantity}`);\n",
+        "tests": [
+          {
+            "input": "0",
+            "output": "quantity 0"
+          },
+          {
+            "input": "",
+            "output": "quantity 1"
+          },
+          {
+            "input": "5",
+            "output": "quantity 5"
+          }
+        ],
+        "source_slug": ""
+      },
+      {
+        "id": "ts_equality-nan",
+        "title": "Spot the not-a-number",
+        "prompt": "Each input line should be a number. Replace `____` with the test that is `true` exactly when `n` is `NaN`.",
+        "hint": "`n === NaN` is never true. There is a function for exactly this.",
+        "language": "typescript",
+        "kind": "drill",
+        "difficulty": "",
+        "starter": "import * as fs from \"fs\";\nconst lines = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nfor (const line of lines) {\n  const n = Number(line);\n  console.log(____ ? `bad: ${line.trim()}` : `ok: ${n}`);\n}\n",
+        "solution": "import * as fs from \"fs\";\nconst lines = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nfor (const line of lines) {\n  const n = Number(line);\n  console.log(Number.isNaN(n) ? `bad: ${line.trim()}` : `ok: ${n}`);\n}\n",
+        "tests": [
+          {
+            "input": "12\nabc\n3.5",
+            "output": "ok: 12\nbad: abc\nok: 3.5"
+          },
+          {
+            "input": "x",
+            "output": "bad: x"
+          },
+          {
+            "input": "0\n-1",
+            "output": "ok: 0\nok: -1"
+          }
+        ],
+        "source_slug": ""
+      },
+      {
+        "id": "ts_equality-same",
+        "title": "Same contents?",
+        "prompt": "The input is two lines of numbers. Replace `____` with a check that is `true` when both lines hold the same numbers in the same order.",
+        "hint": "`a === b` compares identity. Compare the lengths, then every element.",
+        "language": "typescript",
+        "kind": "drill",
+        "difficulty": "",
+        "starter": "import * as fs from \"fs\";\nconst lines = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nconst a = lines[0].trim().split(/\\s+/).map(Number);\nconst b = lines[1].trim().split(/\\s+/).map(Number);\nconst same = ____;\nconsole.log(same ? \"same\" : \"different\");\n",
+        "solution": "import * as fs from \"fs\";\nconst lines = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nconst a = lines[0].trim().split(/\\s+/).map(Number);\nconst b = lines[1].trim().split(/\\s+/).map(Number);\nconst same = a.length === b.length && a.every((v, i) => v === b[i]);\nconsole.log(same ? \"same\" : \"different\");\n",
+        "tests": [
+          {
+            "input": "1 2 3\n1 2 3",
+            "output": "same"
+          },
+          {
+            "input": "1 2 3\n3 2 1",
+            "output": "different"
+          },
+          {
+            "input": "1 2\n1 2 3",
+            "output": "different"
+          },
+          {
+            "input": "5\n5",
+            "output": "same"
+          }
+        ],
+        "source_slug": ""
+      },
+      {
+        "id": "ts_equality-classify",
+        "title": "Classify the value",
+        "prompt": "Each input line is one raw value. Print `empty` for an empty or all-space line, `nan` if it is not a number, `zero` if it equals zero (including `-0` and `0.0`), and otherwise `positive` or `negative`.",
+        "hint": "Check emptiness on the text before converting — `Number(\"\")` is `0`. `-0 === 0` is `true`, which is what you want here.",
+        "language": "typescript",
+        "kind": "challenge",
+        "difficulty": "Easy",
+        "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+        "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nfor (const raw of input.split(\"\\n\")) {\n  const text = raw.trim();\n  if (text === \"\") {\n    console.log(\"empty\");\n    continue;\n  }\n  const n = Number(text);\n  if (Number.isNaN(n)) console.log(\"nan\");\n  else if (n === 0) console.log(\"zero\");\n  else console.log(n > 0 ? \"positive\" : \"negative\");\n}\n",
+        "tests": [
+          {
+            "input": "5\n-2\n0",
+            "output": "positive\nnegative\nzero"
+          },
+          {
+            "input": "abc\n-0\n0.0",
+            "output": "nan\nzero\nzero"
+          },
+          {
+            "input": "  \n7",
+            "output": "positive"
+          },
+          {
+            "input": "1e3\n-0.5\nNaN",
+            "output": "positive\nnegative\nnan"
+          }
+        ],
+        "source_slug": ""
+      }
+    ],
+    "cards": [],
+    "quiz": [
+      {
+        "question": "Which comparison is `true`?",
+        "options": [
+          "`null == undefined`",
+          "`null === undefined`",
+          "`NaN === NaN`",
+          "`[1] === [1]`"
+        ],
+        "answer": 0,
+        "explanation": "Loose equality treats `null` and `undefined` as equal to each other and nothing else — the one widely accepted use of `==`."
+      },
+      {
+        "question": "How do you test whether `x` is `NaN`?",
+        "options": [
+          "`Number.isNaN(x)`",
+          "`x === NaN`",
+          "`x == NaN`",
+          "`typeof x === \"NaN\"`"
+        ],
+        "answer": 0,
+        "explanation": "`NaN` is not equal to anything, itself included."
+      },
+      {
+        "question": "Which value is truthy?",
+        "options": [
+          "`\"false\"`",
+          "`0`",
+          "`\"\"`",
+          "`NaN`"
+        ],
+        "answer": 0,
+        "explanation": "Any non-empty string is truthy, whatever it says."
+      },
+      {
+        "question": "`const n = 0; n || 10` and `n ?? 10` give…",
+        "options": [
+          "`10` and `0`",
+          "`0` and `10`",
+          "`10` and `10`",
+          "`0` and `0`"
+        ],
+        "answer": 0,
+        "explanation": "`||` falls back on any falsy value; `??` only on `null`/`undefined`."
+      },
+      {
+        "question": "What does TypeScript say about `3 === \"3\"` with those declared types?",
+        "options": [
+          "It's a compile error: the types have no overlap",
+          "`true`",
+          "`false`, with no error",
+          "A warning only"
+        ],
+        "answer": 0,
+        "explanation": "TS2367: comparing a `number` and a `string` is always `false`, so the compiler flags it."
+      },
+      {
+        "question": "`Object.is(0, -0)` and `Object.is(NaN, NaN)`?",
+        "options": [
+          "`false` and `true`",
+          "`true` and `false`",
+          "`true` and `true`",
+          "`false` and `false`"
+        ],
+        "answer": 0,
+        "explanation": "`Object.is` is `===` with the two corners fixed the other way."
+      }
+    ],
+    "practice": []
+  },
+  {
+    "key": "ts_number_format",
+    "name": "Numbers in Practice — Precision, Money & Formatting",
+    "category": "TS: Language Basics",
+    "what": "Floating-point surprises, `toFixed` and rounding, money as integer cents, `Number.isInteger`, the safe-integer limit, `bigint`, and `Intl.NumberFormat`.",
+    "deep": "`number` is a 64-bit binary float. That is why `0.1 + 0.2` is `0.30000000000000004`, why `(1.005).toFixed(2)` is `\"1.00\"`, and why integers stop being exact past 2^53. None of this is a TypeScript quirk — it is IEEE-754 arithmetic, shared by almost every language. Knowing where it bites tells you when to compare with a tolerance, when to count money in whole cents, when to reach for `bigint`, and how to print a number the way a human expects.",
+    "java": "Java has `int`, `long`, `double` and `BigDecimal`. TypeScript has only `number` (a Java `double`) and `bigint` (a `BigInteger`). There is no fixed-point decimal type, so money is conventionally stored as an integer number of cents.",
+    "language": "typescript",
+    "lesson": "### Why it exists\nWeek 3's problems print averages, totals and prices, and the first time a\nprogram prints `0.30000000000000004` or rounds a price the wrong way it looks\nlike a bug in your logic. It isn't — it is the number type doing exactly what\nit was designed to do, with a finite number of binary digits.\n\nThe fixes are all simple once you know which problem you have: compare with a\ntolerance, keep money in integer cents, format only at the moment of printing,\nand switch to `bigint` when a count outgrows 2^53. This chapter is that map.\n\n### The core idea\n**One number type.** `number` covers integers and fractions alike, stored as\na binary floating-point value with about 15-17 significant decimal digits.\nMost decimal fractions — `0.1`, `0.2`, `1.005` — have no exact binary form, so\nwhat is stored is the nearest representable value.\n\n- `0.1 + 0.2 === 0.3` is `false`. Compare with a tolerance when fractions are\n  involved: `Math.abs(a - b) < 1e-9`.\n- `toFixed(n)` rounds the *stored* value, which can sit just below the decimal\n  you wrote: `(1.005).toFixed(2)` is `\"1.00\"`.\n- `Math.round` rounds halves **up**, towards +∞: `Math.round(2.5)` is `3` but\n  `Math.round(-2.5)` is `-2`.\n\n**Money in cents.** Store prices as integers — `1999`, not `19.99` — and\ninteger arithmetic stays exact. Convert to a decimal string only when printing:\n`(cents / 100).toFixed(2)`.\n\n**Integers, and their limit.** Integer values are exact up to\n`Number.MAX_SAFE_INTEGER` (2^53 − 1, about 9·10^15). `Number.isInteger(x)` asks\nwhether a value has no fractional part; `Number.isSafeInteger(x)` also checks it\nis within that range. Beyond it, consecutive integers collapse together.\n\n**`bigint`.** For exact integers of any size: a literal ends in `n` (`123n`),\nor convert with `BigInt(\"123\")`. `bigint` and `number` do not mix in\narithmetic — the compiler rejects `1n + 1` — and `bigint` division truncates.\n\n**Formatting for people.** `toFixed` for a fixed number of decimals.\n`Intl.NumberFormat` for grouping and currency, in a fixed locale so the output\nis deterministic:\n\n```ts\nnew Intl.NumberFormat(\"en-US\").format(1234567.891);                       // \"1,234,567.891\"\nnew Intl.NumberFormat(\"en-US\", { style: \"currency\", currency: \"USD\" }).format(19.5); // \"$19.50\"\n```\n\n### Worked examples\n#### Where the float shows\n```ts\nconst sum = 0.1 + 0.2;\nconsole.log(sum);\nconsole.log(sum === 0.3);\nconsole.log(Math.abs(sum - 0.3) < 1e-9);\nconsole.log((1.005).toFixed(2), (1.015).toFixed(2));\nconsole.log(Math.round(2.5), Math.round(-2.5));\n```\n\nPrints:\n```text\n0.30000000000000004\nfalse\ntrue\n1.00 1.01\n3 -2\n```\n\nEvery line is the same story: the stored value is a hair away from the decimal on the page, and each operation sees the stored value.\n\n#### Money as integer cents\n```ts\nimport * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst prices = input.split(/\\s+/).map((p) => Math.round(Number(p) * 100));\nlet totalCents = 0;\nfor (const cents of prices) totalCents += cents;\nconsole.log(\"items:\", prices.join(\" \"));\nconsole.log(\"total: $\" + (totalCents / 100).toFixed(2));\n```\n\nInput:\n```text\n0.10 0.20\n```\n\nPrints:\n```text\nitems: 10 20\ntotal: $0.30\n```\n\nInput:\n```text\n19.99 5.01 0.10\n```\n\nPrints:\n```text\nitems: 1999 501 10\ntotal: $25.10\n```\n\nInput:\n```text\n0.1 0.2 0.3\n```\n\nPrints:\n```text\nitems: 10 20 30\ntotal: $0.60\n```\n\nConverting each price to cents once — rounding at that moment — keeps every later sum exact. Only the final print turns cents back into dollars.\n\n#### Past 2^53, and `bigint`\n```ts\nconst big = Number.MAX_SAFE_INTEGER;\nconsole.log(big, Number.isSafeInteger(big + 1));\nconsole.log(big + 1 === big + 2);\nlet factorial = 1n;\nfor (let i = 1n; i <= 25n; i++) factorial *= i;\nconsole.log(factorial.toString());\nconsole.log(7n / 2n);\n```\n\nPrints:\n```text\n9007199254740991 false\ntrue\n15511210043330985984000000\n3n\n```\n\n`big + 1` and `big + 2` are the same double — the integers have run out of bits. The `bigint` factorial is exact, and `bigint` division truncates towards zero.\n\n#### Formatting for people\n```ts\nimport * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst n = Number(input);\nconst grouped = new Intl.NumberFormat(\"en-US\");\nconst money = new Intl.NumberFormat(\"en-US\", { style: \"currency\", currency: \"USD\" });\nconst percent = new Intl.NumberFormat(\"en-US\", { style: \"percent\", maximumFractionDigits: 1 });\nconsole.log(grouped.format(n));\nconsole.log(money.format(n));\nconsole.log(percent.format(n / 100));\n```\n\nInput:\n```text\n1234567.891\n```\n\nPrints:\n```text\n1,234,567.891\n$1,234,567.89\n1,234,567.9%\n```\n\nInput:\n```text\n19.5\n```\n\nPrints:\n```text\n19.5\n$19.50\n19.5%\n```\n\nInput:\n```text\n-0.25\n```\n\nPrints:\n```text\n-0.25\n-$0.25\n-0.3%\n```\n\nPassing an explicit locale (`\"en-US\"`) makes the output the same on every machine — the default locale varies.\n\n### What the compiler says\n```ts\nconst count = 10n;\nconst total = count + 1;\nconsole.log(total);\n```\n```text\nline 2: error TS2365: Operator '+' cannot be applied to types '10n' and '1'.\n```\n\n`bigint` and `number` never mix in arithmetic — not even `+ 1`. Write `count + 1n`, or convert one side on purpose with `Number(...)` / `BigInt(...)`.\n\n```ts\nconst price = \"19.99\";\nconst doubled = price * 2;\nconsole.log(doubled);\n```\n```text\nline 2: error TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.\n```\n\nA string that *looks* like a number is still a string. Convert it first; TypeScript will not do it implicitly the way JavaScript's `*` would.\n\n### Pitfalls\n#### Summing decimal prices directly\n```ts\nimport * as fs from \"fs\";\nconst prices = fs.readFileSync(0, \"utf8\").trim().split(/\\s+/).map(Number);\nlet total = 0;\nfor (const p of prices) total += p;\nconsole.log(total);\n```\nPrints:\n```text\n0.6000000000000001\n```\n\nFloat errors accumulate with every addition and then get printed. Add integer cents instead, and format once.\n\n```ts\nimport * as fs from \"fs\";\nconst prices = fs.readFileSync(0, \"utf8\").trim().split(/\\s+/).map(Number);\nlet cents = 0;\nfor (const p of prices) cents += Math.round(p * 100);\nconsole.log((cents / 100).toFixed(2));\n```\nPrints:\n```text\n0.60\n```\n\n#### `toFixed` rounds the stored value\n```ts\nimport * as fs from \"fs\";\nconst price = Number(fs.readFileSync(0, \"utf8\").trim());\nconsole.log(price.toFixed(2));\n```\nPrints:\n```text\n1.00\n```\n\n`1.005` is stored as `1.00499999…`, so `toFixed(2)` rounds it down — and so does `Math.round(1.005 * 100)`, because the multiplication inherits the same error. Shifting the decimal point *in the text* (`\"1.005e2\"` is exactly `100.5`) rounds the number the person actually typed.\n\n```ts\nimport * as fs from \"fs\";\nconst text = fs.readFileSync(0, \"utf8\").trim();\nconst cents = Math.round(Number(text + \"e2\"));\nconsole.log((cents / 100).toFixed(2));\n```\nPrints:\n```text\n1.01\n```\n\n#### `Math.round` and negative halves\n```ts\nconst values = [2.5, -2.5, -0.5];\nconsole.log(values.map((v) => Math.round(v)).join(\" \"));\n```\nPrints:\n```text\n3 -2 0\n```\n\n`Math.round` rounds halves towards +∞, so `-2.5` becomes `-2` and `-0.5` becomes `-0` (printed `0`). If the task says \"round half away from zero\", apply it to the magnitude and restore the sign.\n\n```ts\nconst roundHalfAway = (v: number) => Math.sign(v) * Math.round(Math.abs(v));\nconst values = [2.5, -2.5, -0.5];\nconsole.log(values.map(roundHalfAway).join(\" \"));\n```\nPrints:\n```text\n3 -3 -1\n```\n\n#### A count that outgrows `number`\n```ts\nlet ways = 1;\nfor (let i = 1; i <= 25; i++) ways *= i;\nconsole.log(ways);\n```\nPrints:\n```text\n1.5511210043330986e+25\n```\n\n25! is about 1.55·10^25 — far past 2^53 — so the `number` result is only an approximation printed in exponent form. `bigint` keeps every digit.\n\n```ts\nlet ways = 1n;\nfor (let i = 1n; i <= 25n; i++) ways *= i;\nconsole.log(ways.toString());\n```\nPrints:\n```text\n15511210043330985984000000\n```\n\n### Where it shows up later\n- **Week 7 — Arrays.** `reduce` for totals — with the same cents discipline.\n- **Week 16 — Branded types.** A `Cents` brand so a dollar amount can never be passed where cents are expected.\n- **Week 25 — Errors.** Parsing numbers from untrusted text into a `Result` instead of a silent `NaN`.\n\n### In an interview\n\n**Why shouldn't you use floating point for money?**\n\nMost decimal amounts aren't exactly representable in binary, so sums drift (`0.1 + 0.2`) and rounding surprises you (`1.005.toFixed(2)`). Store integer minor units — cents — and format at the edge, or use a decimal library when you need arbitrary precision.\n\n**When do you reach for `bigint`?**\n\nWhen integers can exceed 2^53 − 1: IDs from other systems, factorials and combinatorics, cryptography. It's exact but slower, can't mix with `number` without explicit conversion, and `JSON.stringify` refuses it by default.\n\n**How do you compare two floating-point results?**\n\nWith a tolerance scaled to the problem — `Math.abs(a - b) < 1e-9`, or relative to the magnitude for large values — never with `===` after arithmetic.",
+    "exercises": [
+      {
+        "id": "ts_number_format-cents",
+        "title": "Add money in cents",
+        "prompt": "The input is a line of prices like `19.99`. Replace `____` so each price becomes a whole number of cents, rounding once, before it is added.",
+        "hint": "`p * 100` is nearly an integer; `Math.round` makes it one.",
+        "language": "typescript",
+        "kind": "drill",
+        "difficulty": "",
+        "starter": "import * as fs from \"fs\";\nconst prices = fs.readFileSync(0, \"utf8\").trim().split(/\\s+/).map(Number);\nlet cents = 0;\nfor (const p of prices) cents += ____;\nconsole.log(cents);\nconsole.log((cents / 100).toFixed(2));\n",
+        "solution": "import * as fs from \"fs\";\nconst prices = fs.readFileSync(0, \"utf8\").trim().split(/\\s+/).map(Number);\nlet cents = 0;\nfor (const p of prices) cents += Math.round(p * 100);\nconsole.log(cents);\nconsole.log((cents / 100).toFixed(2));\n",
+        "tests": [
+          {
+            "input": "0.1 0.2 0.3",
+            "output": "60\n0.60"
+          },
+          {
+            "input": "19.99 0.01",
+            "output": "2000\n20.00"
+          },
+          {
+            "input": "1.10 2.20 3.30",
+            "output": "660\n6.60"
+          },
+          {
+            "input": "5",
+            "output": "500\n5.00"
+          }
+        ],
+        "source_slug": ""
+      },
+      {
+        "id": "ts_number_format-big",
+        "title": "Exact big factorials",
+        "prompt": "The input is `n` (up to 40). Replace `____` so the loop multiplies `bigint` values and the factorial stays exact.",
+        "hint": "Every operand must be a `bigint`: start the counter at `2n`.",
+        "language": "typescript",
+        "kind": "drill",
+        "difficulty": "",
+        "starter": "import * as fs from \"fs\";\nconst n = BigInt(fs.readFileSync(0, \"utf8\").trim());\nlet result = 1n;\n____\nconsole.log(result.toString());\nconsole.log(result.toString().length);\n",
+        "solution": "import * as fs from \"fs\";\nconst n = BigInt(fs.readFileSync(0, \"utf8\").trim());\nlet result = 1n;\nfor (let i = 2n; i <= n; i++) result *= i;\nconsole.log(result.toString());\nconsole.log(result.toString().length);\n",
+        "tests": [
+          {
+            "input": "5",
+            "output": "120\n3"
+          },
+          {
+            "input": "25",
+            "output": "15511210043330985984000000\n26"
+          },
+          {
+            "input": "40",
+            "output": "815915283247897734345611269596115894272000000000\n48"
+          },
+          {
+            "input": "0",
+            "output": "1\n1"
+          }
+        ],
+        "source_slug": ""
+      },
+      {
+        "id": "ts_number_format-grouped",
+        "title": "Print it for people",
+        "prompt": "The input is a number. Replace `____` with a formatter that groups thousands in the `en-US` locale.",
+        "hint": "`Intl.NumberFormat` with an explicit locale.",
+        "language": "typescript",
+        "kind": "drill",
+        "difficulty": "",
+        "starter": "import * as fs from \"fs\";\nconst n = Number(fs.readFileSync(0, \"utf8\").trim());\nconst grouped = ____;\nconsole.log(grouped.format(n));\n",
+        "solution": "import * as fs from \"fs\";\nconst n = Number(fs.readFileSync(0, \"utf8\").trim());\nconst grouped = new Intl.NumberFormat(\"en-US\");\nconsole.log(grouped.format(n));\n",
+        "tests": [
+          {
+            "input": "1234567",
+            "output": "1,234,567"
+          },
+          {
+            "input": "999",
+            "output": "999"
+          },
+          {
+            "input": "-1000000.5",
+            "output": "-1,000,000.5"
+          },
+          {
+            "input": "0.125",
+            "output": "0.125"
+          }
+        ],
+        "source_slug": ""
+      },
+      {
+        "id": "ts_number_format-bill",
+        "title": "Split the bill",
+        "prompt": "The input is `total people tipPercent` on one line, e.g. `100.00 3 15`. Work in whole cents: the tip is `total × tipPercent / 100` rounded to the nearest cent, the grand total is the sum, and each person pays the grand total divided by the number of people **rounded up** to the next cent. Print `tip $x.xx`, `total $x.xx` and `each $x.xx`, then `extra $x.xx` — how much rounding up collects beyond the grand total.",
+        "hint": "Convert the total to cents once, do integer arithmetic, and use `Math.ceil` for the per-person share.",
+        "language": "typescript",
+        "kind": "challenge",
+        "difficulty": "Medium",
+        "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+        "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst [totalText = \"0\", peopleText = \"1\", tipText = \"0\"] = input.split(/\\s+/);\nconst baseCents = Math.round(Number(totalText) * 100);\nconst people = Number(peopleText);\nconst tipCents = Math.round((baseCents * Number(tipText)) / 100);\nconst grandCents = baseCents + tipCents;\nconst eachCents = Math.ceil(grandCents / people);\nconst money = (cents: number) => \"$\" + (cents / 100).toFixed(2);\nconsole.log(\"tip \" + money(tipCents));\nconsole.log(\"total \" + money(grandCents));\nconsole.log(\"each \" + money(eachCents));\nconsole.log(\"extra \" + money(eachCents * people - grandCents));\n",
+        "tests": [
+          {
+            "input": "100.00 3 15",
+            "output": "tip $15.00\ntotal $115.00\neach $38.34\nextra $0.02"
+          },
+          {
+            "input": "10 1 0",
+            "output": "tip $0.00\ntotal $10.00\neach $10.00\nextra $0.00"
+          },
+          {
+            "input": "59.99 4 20",
+            "output": "tip $12.00\ntotal $71.99\neach $18.00\nextra $0.01"
+          },
+          {
+            "input": "0.10 3 10",
+            "output": "tip $0.01\ntotal $0.11\neach $0.04\nextra $0.01"
+          },
+          {
+            "input": "250 7 12.5",
+            "output": "tip $31.25\ntotal $281.25\neach $40.18\nextra $0.01"
+          }
+        ],
+        "source_slug": ""
+      }
+    ],
+    "cards": [],
+    "quiz": [
+      {
+        "question": "Why is `0.1 + 0.2 === 0.3` false?",
+        "options": [
+          "Neither 0.1 nor 0.2 has an exact binary representation",
+          "TypeScript rounds decimals",
+          "`===` compares references for numbers",
+          "It is true under `strict`"
+        ],
+        "answer": 0,
+        "explanation": "The stored values are the nearest doubles; their sum is a hair above 0.3."
+      },
+      {
+        "question": "How should an app store a price of $19.99?",
+        "options": [
+          "As the integer `1999` (cents)",
+          "As the number `19.99`",
+          "As the string `\"19.99\"` and parse it every time",
+          "As a `bigint`"
+        ],
+        "answer": 0,
+        "explanation": "Integer arithmetic is exact; format to dollars only when printing."
+      },
+      {
+        "question": "`Math.round(-2.5)`?",
+        "options": [
+          "`-2`",
+          "`-3`",
+          "`-2.5`",
+          "`NaN`"
+        ],
+        "answer": 0,
+        "explanation": "`Math.round` rounds halves towards +∞."
+      },
+      {
+        "question": "`1n + 1`?",
+        "options": [
+          "A compile error: `bigint` and `number` can't be mixed",
+          "`2n`",
+          "`2`",
+          "`\"11\"`"
+        ],
+        "answer": 0,
+        "explanation": "Mixing needs an explicit conversion (TS2365 at compile time, a TypeError at runtime)."
+      },
+      {
+        "question": "What is `Number.MAX_SAFE_INTEGER`?",
+        "options": [
+          "2^53 − 1, the largest integer every smaller integer is exact below",
+          "The largest `number` at all",
+          "2^31 − 1",
+          "2^64 − 1"
+        ],
+        "answer": 0,
+        "explanation": "Past it, adjacent integers share one double. `Number.MAX_VALUE` is the largest finite number, a different thing."
+      },
+      {
+        "question": "Why pass `\"en-US\"` to `Intl.NumberFormat` in a judged program?",
+        "options": [
+          "So the output doesn't depend on the machine's locale",
+          "It's required",
+          "It's faster",
+          "Other locales can't format currency"
+        ],
+        "answer": 0,
+        "explanation": "The default locale varies between machines; tests need one fixed format."
+      }
+    ],
+    "practice": []
+  },
+  {
+    "key": "ts_regex",
+    "name": "Regular Expressions",
+    "category": "TS: Language Basics",
+    "what": "Pattern matching on text: literals and `new RegExp`, flags, `test`, `match`, `matchAll`, `replace` and `replaceAll`, capture groups and named groups.",
+    "deep": "A regular expression describes a *shape* of text — \"one or more digits\", \"a word followed by an equals sign\" — and lets you test for it, find every occurrence, pull out the parts, or replace them. Most text-processing problems that take twenty lines of index arithmetic take one pattern. TypeScript types the results precisely: a failed `match` is `null`, a capture group may be `undefined`, and the compiler makes you handle both.",
+    "java": "`java.util.regex` puts patterns in strings (`\"\\\\d+\"`), compiles them with `Pattern.compile` and walks them with a `Matcher`. JavaScript has regex *literals* — `/\\d+/g` — with the same syntax, and the string methods (`match`, `replace`, `split`) take them directly.",
+    "language": "typescript",
+    "lesson": "### Why it exists\nText in the wild has structure that fixed indexes can't see: a date that may be\n`2026-9-4` or `2026-09-04`, words separated by any mix of spaces and\npunctuation, `key=value` pairs with optional spaces around the `=`. Code that\nwalks such text character by character is long and fragile.\n\nA regular expression states the structure once, and the engine does the\nwalking. The cost is a small, dense language — and a few traps that this\nchapter points out before they cost you a wrong answer.\n\n### The core idea\n**Writing one.** A literal between slashes, optionally followed by flags:\n`/\\d+/g`. Or build one from a string at runtime: `new RegExp(\"\\\\d+\", \"g\")` —\nnote the doubled backslash, because the string needs escaping first.\n\n**The pieces you'll use most.**\n\n| pattern | matches |\n|---|---|\n| `\\d` `\\w` `\\s` | a digit, a word character (`[A-Za-z0-9_]`), whitespace |\n| `.` | any character except a newline |\n| `[aeiou]` `[^,]` | one of these / anything but these |\n| `x*` `x+` `x?` `x{2,4}` | 0+, 1+, 0-1, 2-4 repetitions |\n| `^` `$` | start and end of the string (of each line with `m`) |\n| `(…)` `(?<name>…)` | a capture group / a named capture group |\n| `a\\|b` | either alternative |\n\n**Flags.** `g` finds *every* match rather than the first; `i` ignores case;\n`m` makes `^`/`$` match at line boundaries; `u` treats the pattern as\nUnicode code points.\n\n**Using one.**\n\n- `re.test(s)` — does it match anywhere? A `boolean`.\n- `s.match(re)` — without `g`: the first match with its groups, or `null`.\n  With `g`: every matched string, or `null`.\n- `s.matchAll(re)` — with `g`: an iterator of full match objects, groups and\n  all. The tool for \"extract every key=value pair\".\n- `s.replace(re, replacement)` / `s.replaceAll(...)` — the replacement can use\n  `$1` or `$<name>`, or be a function of the match.\n- `s.split(re)` — split on a pattern, e.g. `/\\s+/` or `/[,;]\\s*/`.\n\n**What the types say.** `match` returns `RegExpMatchArray | null`, so you must\nhandle \"no match\" before reading it. A group is `string | undefined` under\n`noUncheckedIndexedAccess`, and named groups live in `m.groups`, which may be\n`undefined` too.\n\n**Anchor when you validate.** `/\\d+/.test(\"abc123\")` is `true` — it found\ndigits somewhere. To require the *whole* string to be digits, anchor it:\n`/^\\d+$/`.\n\n### Worked examples\n#### Test, and the anchoring trap\n```ts\nimport * as fs from \"fs\";\nconst lines = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nfor (const line of lines) {\n  const hasDigits = /\\d+/.test(line);\n  const allDigits = /^\\d+$/.test(line);\n  console.log(`${line}: contains ${hasDigits}, is ${allDigits}`);\n}\n```\n\nInput:\n```text\n123\nabc123\nabc\n```\n\nPrints:\n```text\n123\n: contains true, is false\nabc123\n: contains true, is false\nabc: contains false, is false\n```\n\nWithout `^` and `$`, a pattern matches anywhere — fine for searching, wrong for validating.\n\n#### Every key=value pair, with named groups\n```ts\nimport * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst pair = /(?<key>\\w+)\\s*=\\s*(?<value>[^;]*)/g;\nfor (const m of input.matchAll(pair)) {\n  const key = m.groups?.key ?? \"?\";\n  const value = (m.groups?.value ?? \"\").trim();\n  console.log(`${key} -> [${value}]`);\n}\n```\n\nInput:\n```text\nhost=example.com; port = 8080;debug=true\n```\n\nPrints:\n```text\nhost -> [example.com]\nport -> [8080]\ndebug -> [true]\n```\n\nInput:\n```text\nname = Ada Lovelace\n```\n\nPrints:\n```text\nname -> [Ada Lovelace]\n```\n\n`matchAll` needs the `g` flag and yields one full match per pair. `m.groups` is typed as possibly `undefined`, so the lookups carry a fallback.\n\n#### Replacing with groups and functions\n```ts\nimport * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconsole.log(input.replace(/(\\d{4})-(\\d{2})-(\\d{2})/g, \"$3/$2/$1\"));\nconsole.log(input.replaceAll(/\\d+/g, (digits) => String(Number(digits) * 2)));\nconsole.log(input.split(/[\\s,;]+/).length);\n```\n\nInput:\n```text\ndue 2026-09-24, paid 2026-10-01\n```\n\nPrints:\n```text\ndue 24/09/2026, paid 01/10/2026\ndue 4052-18-48, paid 4052-20-2\n4\n```\n\n`$1`… refer to capture groups in a replacement string; a function receives each match and returns its replacement.\n\n### What the compiler says\n```ts\nimport * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst m = input.match(/(\\d+)-(\\d+)/);\nconsole.log(m.length);\n```\n```text\nline 4: error TS18047: 'm' is possibly 'null'.\n```\n\nA match can fail, and then `match` returns `null`. Check it — `if (m === null) …` — or use `?.` before reading anything from it.\n\n```ts\nconst m = \"a=1\".match(/(\\w+)=(\\w+)/);\nif (m !== null) {\n  const value: string = m[2].toUpperCase();\n  console.log(value);\n}\n```\n```text\nline 3: error TS2532: Object is possibly 'undefined'.\n```\n\n(with `noUncheckedIndexedAccess`)\n\nWith `noUncheckedIndexedAccess`, `m[2]` is `string | undefined`: the compiler can't know the group took part in the match. Handle the `undefined` (`m[2] ?? \"\"`) or check it.\n\n### Pitfalls\n#### `replace` with a string replaces only the first\n```ts\nconst text = \"a-b-c-d\";\nconsole.log(text.replace(\"-\", \"+\"));\n```\nPrints:\n```text\na+b-c-d\n```\n\nA string pattern (or a regex without `g`) replaces one occurrence. `replaceAll`, or a regex with the `g` flag, replaces every one.\n\n```ts\nconst text = \"a-b-c-d\";\nconsole.log(text.replaceAll(\"-\", \"+\"));\n```\nPrints:\n```text\na+b+c+d\n```\n\n#### A `g` regex remembers where it stopped\n```ts\nconst digits = /\\d/g;\nconst inputs = [\"7\", \"8\", \"9\"];\nconsole.log(inputs.map((s) => digits.test(s)).join(\" \"));\n```\nPrints:\n```text\ntrue false true\n```\n\nWith `g`, `test` starts from `lastIndex` and updates it, so reusing one regex across strings gives alternating answers. Don't use `g` for plain testing.\n\n```ts\nconst digits = /\\d/;\nconst inputs = [\"7\", \"8\", \"9\"];\nconsole.log(inputs.map((s) => digits.test(s)).join(\" \"));\n```\nPrints:\n```text\ntrue true true\n```\n\n#### Special characters in a pattern built from text\n```ts\nconst price = \"1.5\";\nconst re = new RegExp(price);\nconsole.log(re.test(\"125\"));\n```\nPrints:\n```text\ntrue\n```\n\n`.` means \"any character\", so a pattern built from `\"1.5\"` matches `125`. Escape user text before turning it into a pattern.\n\n```ts\nconst escape = (s: string) => s.replace(/[.*+?^${}()|[\\]\\\\]/g, \"\\\\$&\");\nconst price = \"1.5\";\nconst re = new RegExp(escape(price));\nconsole.log(re.test(\"125\"));\n```\nPrints:\n```text\nfalse\n```\n\n### Where it shows up later\n- **Week 4 — Unicode.** The `u` flag, and why `.` can split an emoji in half without it.\n- **Week 22 — Template literal types.** Parsing strings at the *type* level — a cousin of the patterns here.\n- **Week 25 — Errors.** Validating input with anchored patterns and reporting *which* line failed.\n\n### In an interview\n\n**When would you use a regex, and when not?**\n\nFor recognising or extracting simple shapes in text — tokens, dates, key/value pairs, validation of a format. Not for nested structure (HTML, JSON, balanced parentheses): that needs a real parser. And a clear string method beats a clever pattern.\n\n**`match` versus `matchAll`?**\n\n`match` with `g` gives just the matched strings; without `g`, the first match with its groups. `matchAll` (which requires `g`) gives every match *with* its groups and index — what you want for extraction.\n\n**What is the `lastIndex` gotcha?**\n\nA regex with `g` or `y` is stateful: `test` and `exec` continue from `lastIndex`. Reusing one across calls gives alternating results. Use a non-global regex for testing, or reset `lastIndex`.",
+    "exercises": [
+      {
+        "id": "ts_regex-valid",
+        "title": "Validate the whole string",
+        "prompt": "Each input line should be a US-style ZIP code: exactly five digits. Replace `____` with a pattern that accepts only that — not five digits *somewhere* in the line.",
+        "hint": "Anchor both ends with `^` and `$`, and count with `{5}`.",
+        "language": "typescript",
+        "kind": "drill",
+        "difficulty": "",
+        "starter": "import * as fs from \"fs\";\nconst lines = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nconst zip = ____;\nfor (const line of lines) console.log(zip.test(line.trim()) ? \"valid\" : \"invalid\");\n",
+        "solution": "import * as fs from \"fs\";\nconst lines = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nconst zip = /^\\d{5}$/;\nfor (const line of lines) console.log(zip.test(line.trim()) ? \"valid\" : \"invalid\");\n",
+        "tests": [
+          {
+            "input": "12345\n1234\n123456\nabcde",
+            "output": "valid\ninvalid\ninvalid\ninvalid"
+          },
+          {
+            "input": "90210",
+            "output": "valid"
+          },
+          {
+            "input": "x12345",
+            "output": "invalid"
+          }
+        ],
+        "source_slug": ""
+      },
+      {
+        "id": "ts_regex-count",
+        "title": "Count every number",
+        "prompt": "Replace `____` with a pattern that, with `match`, finds every run of digits in the line (so `a12b3` has two numbers).",
+        "hint": "One or more digits, and the flag that finds every match.",
+        "language": "typescript",
+        "kind": "drill",
+        "difficulty": "",
+        "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst found = input.match(____) ?? [];\nconsole.log(found.length);\nconsole.log(found.join(\" \") || \"(none)\");\n",
+        "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst found = input.match(/\\d+/g) ?? [];\nconsole.log(found.length);\nconsole.log(found.join(\" \") || \"(none)\");\n",
+        "tests": [
+          {
+            "input": "a12b3",
+            "output": "2\n12 3"
+          },
+          {
+            "input": "no digits",
+            "output": "0\n(none)"
+          },
+          {
+            "input": "10 20 30",
+            "output": "3\n10 20 30"
+          },
+          {
+            "input": "007x",
+            "output": "1\n007"
+          }
+        ],
+        "source_slug": ""
+      },
+      {
+        "id": "ts_regex-swap",
+        "title": "Reorder with groups",
+        "prompt": "Each line is `Last, First`. Replace `____` with the replacement string that turns it into `First Last`, using the two capture groups.",
+        "hint": "`$1` is the first group, `$2` the second.",
+        "language": "typescript",
+        "kind": "drill",
+        "difficulty": "",
+        "starter": "import * as fs from \"fs\";\nconst lines = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nfor (const line of lines) console.log(line.trim().replace(/^(\\w+),\\s*(\\w+)$/, ____));\n",
+        "solution": "import * as fs from \"fs\";\nconst lines = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nfor (const line of lines) console.log(line.trim().replace(/^(\\w+),\\s*(\\w+)$/, \"$2 $1\"));\n",
+        "tests": [
+          {
+            "input": "Lovelace, Ada\nHopper,Grace",
+            "output": "Ada Lovelace\nGrace Hopper"
+          },
+          {
+            "input": "Turing, Alan",
+            "output": "Alan Turing"
+          }
+        ],
+        "source_slug": ""
+      },
+      {
+        "id": "ts_regex-log",
+        "title": "Parse a log",
+        "prompt": "Each input line is a log entry like `2026-09-24 12:05:33 ERROR [db] connection lost`. Lines that don't have that shape are ignored. Print one line per level that occurs, in the order ERROR, WARN, INFO, as `<LEVEL> <count>`, skipping levels that never occur; then print the distinct components in square brackets, sorted, space-separated (or `(none)`).",
+        "hint": "Anchor the pattern, capture the level and the component, and skip lines where `match` returns `null`.",
+        "language": "typescript",
+        "kind": "challenge",
+        "difficulty": "Medium",
+        "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+        "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst entry = /^(\\d{4}-\\d{2}-\\d{2}) (\\d{2}:\\d{2}:\\d{2}) (ERROR|WARN|INFO) \\[(\\w+)\\] (.*)$/;\nconst counts = new Map<string, number>();\nconst components = new Set<string>();\nfor (const line of input.split(\"\\n\")) {\n  const m = line.trim().match(entry);\n  if (m === null) continue;\n  const level = m[3] ?? \"\";\n  counts.set(level, (counts.get(level) ?? 0) + 1);\n  components.add(m[4] ?? \"\");\n}\nfor (const level of [\"ERROR\", \"WARN\", \"INFO\"]) {\n  const n = counts.get(level);\n  if (n !== undefined) console.log(level + \" \" + n);\n}\nconsole.log([...components].sort().join(\" \") || \"(none)\");\n",
+        "tests": [
+          {
+            "input": "2026-09-24 12:05:33 ERROR [db] connection lost\n2026-09-24 12:05:34 INFO [api] retrying\n2026-09-24 12:05:35 ERROR [db] still down",
+            "output": "ERROR 2\nINFO 1\napi db"
+          },
+          {
+            "input": "garbage\n2026-01-01 00:00:00 WARN [cache] cold start",
+            "output": "WARN 1\ncache"
+          },
+          {
+            "input": "nothing to see",
+            "output": "(none)"
+          },
+          {
+            "input": "2026-09-24 1:05:33 ERROR [db] bad time\n2026-09-24 01:05:33 DEBUG [db] unknown level\n2026-09-24 01:05:33 INFO [auth] ok",
+            "output": "INFO 1\nauth"
+          }
+        ],
+        "source_slug": ""
+      }
+    ],
+    "cards": [],
+    "quiz": [
+      {
+        "question": "What does `/\\d+/.test(\"abc123\")` return?",
+        "options": [
+          "`true` — it matches digits anywhere",
+          "`false` — the string isn't all digits",
+          "`\"123\"`",
+          "`null`"
+        ],
+        "answer": 0,
+        "explanation": "Unanchored patterns match anywhere. `^…$` makes it about the whole string."
+      },
+      {
+        "question": "What does `\"a1b22\".match(/\\d+/g)` return?",
+        "options": [
+          "`[\"1\", \"22\"]`",
+          "`[\"1\"]`",
+          "`true`",
+          "An iterator of match objects"
+        ],
+        "answer": 0,
+        "explanation": "With `g`, `match` returns every matched string (or `null` when there are none)."
+      },
+      {
+        "question": "Why is `m[1]` typed `string | undefined` under `noUncheckedIndexedAccess`?",
+        "options": [
+          "The compiler can't know a group took part in the match",
+          "Because regexes are untyped",
+          "Because `match` returns `any`",
+          "It isn't; it's `string`"
+        ],
+        "answer": 0,
+        "explanation": "Optional groups really can be `undefined`, and index reads are honest under that flag."
+      },
+      {
+        "question": "In a replacement string, what is `$<year>`?",
+        "options": [
+          "The text of the named group `year`",
+          "A template literal",
+          "The whole match",
+          "A literal dollar sign"
+        ],
+        "answer": 0,
+        "explanation": "Named groups can be referenced by name in replacements and read from `m.groups`."
+      },
+      {
+        "question": "Which flag makes `^` and `$` match at each line?",
+        "options": [
+          "`m`",
+          "`g`",
+          "`i`",
+          "`s`"
+        ],
+        "answer": 0,
+        "explanation": "`m` is multiline; `s` makes `.` match newlines."
+      },
+      {
+        "question": "Why build patterns from user text carefully?",
+        "options": [
+          "Characters like `.` and `*` have special meaning and must be escaped",
+          "`new RegExp` can't take variables",
+          "It's slower",
+          "User text can't contain letters"
+        ],
+        "answer": 0,
+        "explanation": "Unescaped, `\"1.5\"` becomes a pattern where `.` matches any character."
+      }
+    ],
+    "practice": []
+  },
+  {
+    "key": "ts_unicode",
+    "name": "Unicode — Code Units, Code Points & Graphemes",
+    "category": "TS: Language Basics",
+    "what": "Why `\"😀\".length` is 2: UTF-16 code units, iterating by code point with `for…of`, user-perceived characters with `Intl.Segmenter`, the `u` regex flag, and comparing text with `localeCompare`.",
+    "deep": "A JavaScript string is a sequence of UTF-16 code units. Most characters are one unit, but emoji and many historic scripts take two (a surrogate pair), and what a reader sees as one character — an accented letter, a flag, a family emoji — can be several code points joined together. `length`, indexing, `split(\"\")` and `reverse` all work in code units and will cut these apart. This chapter shows which operation counts what, and how to count what the user sees.",
+    "java": "Java's `String` is UTF-16 too, with the same surrogate-pair traps (`length()` versus `codePointCount`). Here `for…of` and `[...s]` walk code points, and `Intl.Segmenter` gives grapheme clusters — the closest thing to \"characters\" a user would count.",
+    "language": "typescript",
+    "lesson": "### Why it exists\n\"Reverse the string\", \"count the letters\", \"truncate to 10 characters\" — they\nall seem to need no thought, and they all break on real text. A name with an\naccent written as two code points, an emoji in a chat message, a flag made of\ntwo regional-indicator letters: code-unit operations split them and print\ngarbage or a replacement character.\n\nYou don't need to know Unicode in depth. You need to know which of three\n\"character\" counts an operation uses, and which one the task means.\n\n### The core idea\n**Three levels.**\n\n| level | example `\"é\"` written as `e` + combining accent | `\"😀\"` |\n|---|---|---|\n| UTF-16 code units — `length`, `s[i]`, `split(\"\")` | 2 | 2 |\n| code points — `for…of`, `[...s]`, `codePointAt` | 2 | 1 |\n| graphemes (what a reader sees) — `Intl.Segmenter` | 1 | 1 |\n\n**Code units.** `s.length` and `s[i]` count 16-bit units. Characters outside\nthe Basic Multilingual Plane — most emoji — take two, a *surrogate pair*;\nsplitting between them leaves two meaningless halves.\n\n**Code points.** `for (const ch of s)` and `[...s]` iterate by code point,\nso an emoji stays whole. `s.codePointAt(i)` reads one, and\n`String.fromCodePoint(n)` builds one.\n\n**Graphemes.** A user-perceived character can be several code points: a\nletter plus combining marks, a flag (two regional indicators), a skin-tone or\nfamily emoji joined with zero-width joiners. `Intl.Segmenter` splits text the\nway a cursor moves:\n\n```ts\nconst seg = new Intl.Segmenter(\"en\", { granularity: \"grapheme\" });\nconst chars = [...seg.segment(text)].map((s) => s.segment);\n```\n\n**Normalisation.** `\"é\"` can be one code point (U+00E9) or two (`e` + U+0301).\nThey *look* identical and are not `===`. `s.normalize(\"NFC\")` puts both in\nthe composed form before you compare or count.\n\n**Regex and sorting.** Add the `u` flag so `.` and character classes work on\ncode points. Sort human text with `a.localeCompare(b)` rather than `<`, which\ncompares code units.\n\n### Worked examples\n#### Three answers to \"how long is it?\"\n```ts\nconst words = [\"cat\", \"café\", \"😀\", \"🇯🇵\"];\nconst seg = new Intl.Segmenter(\"en\", { granularity: \"grapheme\" });\nfor (const w of words) {\n  const units = w.length;\n  const points = [...w].length;\n  const graphemes = [...seg.segment(w)].length;\n  console.log(`${w}: ${units} units, ${points} points, ${graphemes} graphemes`);\n}\n```\n\nPrints:\n```text\ncat: 3 units, 3 points, 3 graphemes\ncafé: 4 units, 4 points, 4 graphemes\n😀: 2 units, 1 points, 1 graphemes\n🇯🇵: 4 units, 2 points, 1 graphemes\n```\n\nThe flag is two code points (regional indicators J and P), each a surrogate pair — four code units that a reader sees as one character.\n\n#### Reversing without breaking emoji\n```ts\nimport * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst byUnits = input.split(\"\").reverse().join(\"\");\nconst byPoints = [...input].reverse().join(\"\");\nconsole.log(byPoints);\nconsole.log(byUnits === byPoints ? \"same either way\" : \"units version is broken\");\n```\n\nInput:\n```text\nhello\n```\n\nPrints:\n```text\nolleh\nsame either way\n```\n\nInput:\n```text\nhi 😀!\n```\n\nPrints:\n```text\n!😀 ih\nunits version is broken\n```\n\nReversing code units swaps the two halves of the emoji's surrogate pair, producing invalid text. Spreading into code points keeps it whole.\n\n#### Same look, different strings\n```ts\nconst composed: string = \"café\";\nconst decomposed: string = \"café\";\nconsole.log(composed.length, decomposed.length);\nconsole.log(composed === decomposed);\nconsole.log(composed.normalize(\"NFC\") === decomposed.normalize(\"NFC\"));\nconsole.log([\"b\", \"a\", \"Z\", \"é\"].sort().join(\" \"));\nconsole.log([\"b\", \"a\", \"Z\", \"é\"].sort((x, y) => x.localeCompare(y, \"en\")).join(\" \"));\n```\n\nPrints:\n```text\n4 5\nfalse\ntrue\nZ a b é\na b é Z\n```\n\nNormalise before comparing text that came from different sources. (The `: string` annotations matter: as `const` literals the two would have different literal types, and the compiler would flag the comparison as impossible — which, for text arriving at runtime, it isn't.) And `sort()` orders by code unit — uppercase before lowercase, accented letters after `z` — while `localeCompare` sorts the way a dictionary does.\n\n### What the compiler says\n```ts\nconst first: string = \"😀\".codePointAt(0);\nconsole.log(first);\n```\n```text\nline 1: error TS2322: Type 'number | undefined' is not assignable to type 'string'.\n  Type 'undefined' is not assignable to type 'string'.\n```\n\n`codePointAt` returns a `number` — the code point — and `undefined` when the index is out of range. Convert back with `String.fromCodePoint(...)` if you want the character.\n\n```ts\nconst s = \"héllo\";\nconsole.log(s.normalize(\"NFC\", \"strict\"));\n```\n```text\nline 2: error TS2554: Expected 0-1 arguments, but got 2.\n```\n\n`normalize` takes at most one argument: the form (`\"NFC\"`, `\"NFD\"`, `\"NFKC\"` or `\"NFKD\"`).\n\n### Pitfalls\n#### Truncating by `slice` cuts an emoji\n```ts\nconst message = \"ok 👍👍\";\nconst preview = message.slice(0, 4);\nconsole.log(preview, preview.length, preview.isWellFormed());\n```\nPrints:\n```text\nok � 4 false\n```\n\n`slice(0, 4)` keeps four code *units*: `o`, `k`, space, and half of the first thumbs-up. `isWellFormed()` reports the broken surrogate. Slicing the code-point array keeps characters whole.\n\n```ts\nconst message = \"ok 👍👍\";\nconst preview = [...message].slice(0, 4).join(\"\");\nconsole.log(preview, preview.length, preview.isWellFormed());\n```\nPrints:\n```text\nok 👍 5 true\n```\n\n#### Counting letters with `length`\n```ts\nconst name = \"Zoë 🙂\";\nconsole.log(`${name.length} characters`);\n```\nPrints:\n```text\n6 characters\n```\n\n`length` counts code units, so the emoji counts twice. For \"how many characters would a person count\", segment into graphemes.\n\n```ts\nconst name = \"Zoë 🙂\";\nconst seg = new Intl.Segmenter(\"en\", { granularity: \"grapheme\" });\nconsole.log(`${[...seg.segment(name)].length} characters`);\n```\nPrints:\n```text\n5 characters\n```\n\n#### Sorting names with `sort()`\n```ts\nconst names = [\"émile\", \"Zoe\", \"adam\", \"Bea\"];\nconsole.log(names.sort().join(\" \"));\n```\nPrints:\n```text\nBea Zoe adam émile\n```\n\nThe default sort compares UTF-16 code units: every uppercase letter comes before every lowercase one, and `é` after `z`. `localeCompare` with a fixed locale sorts like a dictionary.\n\n```ts\nconst names = [\"émile\", \"Zoe\", \"adam\", \"Bea\"];\nconsole.log(names.sort((a, b) => a.localeCompare(b, \"en\")).join(\" \"));\n```\nPrints:\n```text\nadam Bea émile Zoe\n```\n\n### Where it shows up later\n- **Week 7 — Arrays.** `Array.from(s)` and the spread operator as the code-point-safe way to turn text into an array.\n- **Week 9 — Maps & Sets.** Counting characters with a `Map` — by code point, so emoji count once.\n- **Week 22 — Template literal types.** String manipulation at the type level works on code units too.\n\n### In an interview\n\n**Why can `\"😀\".length` be 2?**\n\nJavaScript strings are UTF-16, and characters outside the Basic Multilingual Plane take two code units — a surrogate pair. `length` and indexing count code units; `for…of` and spread count code points.\n\n**How would you count the characters a user sees?**\n\nWith `Intl.Segmenter` at grapheme granularity. Code points still split flags, combining accents and ZWJ emoji sequences; grapheme clusters are what a cursor moves over.\n\n**Two strings render the same but compare unequal. Why?**\n\nUsually normalisation: `é` as one code point versus `e` plus a combining accent. Normalise both to NFC before comparing, hashing or using them as keys.",
+    "exercises": [
+      {
+        "id": "ts_unicode-points",
+        "title": "Count code points",
+        "prompt": "Replace `____` so `points` is the number of code points in the input — emoji count once.",
+        "hint": "Spreading a string iterates it by code point.",
+        "language": "typescript",
+        "kind": "drill",
+        "difficulty": "",
+        "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst points = ____;\nconsole.log(input.length, points);\n",
+        "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst points = [...input].length;\nconsole.log(input.length, points);\n",
+        "tests": [
+          {
+            "input": "hello",
+            "output": "5 5"
+          },
+          {
+            "input": "hi 😀",
+            "output": "5 4"
+          },
+          {
+            "input": "🇯🇵",
+            "output": "4 2"
+          },
+          {
+            "input": "日本語",
+            "output": "3 3"
+          }
+        ],
+        "source_slug": ""
+      },
+      {
+        "id": "ts_unicode-reverse",
+        "title": "Reverse safely",
+        "prompt": "Replace `____` with an expression that reverses the input by code point, keeping emoji intact.",
+        "hint": "Spread into code points, reverse the array, join it back.",
+        "language": "typescript",
+        "kind": "drill",
+        "difficulty": "",
+        "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst reversed = ____;\nconsole.log(reversed);\nconsole.log(reversed.isWellFormed());\n",
+        "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst reversed = [...input].reverse().join(\"\");\nconsole.log(reversed);\nconsole.log(reversed.isWellFormed());\n",
+        "tests": [
+          {
+            "input": "stressed",
+            "output": "desserts\ntrue"
+          },
+          {
+            "input": "a😀b",
+            "output": "b😀a\ntrue"
+          },
+          {
+            "input": "🙂🙃",
+            "output": "🙃🙂\ntrue"
+          }
+        ],
+        "source_slug": ""
+      },
+      {
+        "id": "ts_unicode-sort",
+        "title": "Sort like a dictionary",
+        "prompt": "The input is a line of words. Replace `____` with the comparator that sorts them the way an English dictionary would, ignoring the uppercase-first rule of the default sort.",
+        "hint": "`localeCompare` with a fixed locale, returning a number for `sort`.",
+        "language": "typescript",
+        "kind": "drill",
+        "difficulty": "",
+        "starter": "import * as fs from \"fs\";\nconst words = fs.readFileSync(0, \"utf8\").trim().split(/\\s+/);\nconst sorted = [...words].sort(____);\nconsole.log(sorted.join(\" \"));\n",
+        "solution": "import * as fs from \"fs\";\nconst words = fs.readFileSync(0, \"utf8\").trim().split(/\\s+/);\nconst sorted = [...words].sort((a, b) => a.localeCompare(b, \"en\"));\nconsole.log(sorted.join(\" \"));\n",
+        "tests": [
+          {
+            "input": "banana Apple cherry",
+            "output": "Apple banana cherry"
+          },
+          {
+            "input": "Zed apple Émile",
+            "output": "apple Émile Zed"
+          },
+          {
+            "input": "b a",
+            "output": "a b"
+          }
+        ],
+        "source_slug": ""
+      },
+      {
+        "id": "ts_unicode-truncate",
+        "title": "Truncate for a preview",
+        "prompt": "Each input line is `n text…`: a width `n` and a message. Print the message truncated to at most `n` user-perceived characters (graphemes); when it had to be cut, replace its last kept grapheme with `…` so the result is still `n` graphemes long. Messages that already fit are printed unchanged.",
+        "hint": "Segment into graphemes first; then it's ordinary array slicing.",
+        "language": "typescript",
+        "kind": "challenge",
+        "difficulty": "Medium",
+        "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+        "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst seg = new Intl.Segmenter(\"en\", { granularity: \"grapheme\" });\nfor (const line of input.split(\"\\n\")) {\n  const space = line.indexOf(\" \");\n  const width = Number(line.slice(0, space));\n  const text = line.slice(space + 1);\n  const graphemes = [...seg.segment(text)].map((s) => s.segment);\n  if (graphemes.length <= width) {\n    console.log(text);\n  } else {\n    console.log(graphemes.slice(0, width - 1).join(\"\") + \"…\");\n  }\n}\n",
+        "tests": [
+          {
+            "input": "5 hello world\n20 short enough",
+            "output": "hell…\nshort enough"
+          },
+          {
+            "input": "3 👍👍👍👍",
+            "output": "👍👍…"
+          },
+          {
+            "input": "4 🇯🇵🇫🇷🇩🇪🇮🇹🇪🇸",
+            "output": "🇯🇵🇫🇷🇩🇪…"
+          },
+          {
+            "input": "6 Zoë says hi",
+            "output": "Zoë s…"
+          }
+        ],
+        "source_slug": ""
+      }
+    ],
+    "cards": [],
+    "quiz": [
+      {
+        "question": "What is `\"😀\".length`?",
+        "options": [
+          "2",
+          "1",
+          "4",
+          "It depends on the font"
+        ],
+        "answer": 0,
+        "explanation": "`length` counts UTF-16 code units, and this emoji is a surrogate pair."
+      },
+      {
+        "question": "Which walks a string by code point?",
+        "options": [
+          "`for (const ch of s)`",
+          "`for (let i = 0; i < s.length; i++)`",
+          "`s.split(\"\")`",
+          "`s.charAt(i)`"
+        ],
+        "answer": 0,
+        "explanation": "String iteration is by code point; indexing and `split(\"\")` are by code unit."
+      },
+      {
+        "question": "What splits text into user-perceived characters?",
+        "options": [
+          "`Intl.Segmenter` with `granularity: \"grapheme\"`",
+          "`[...s]`",
+          "`s.split(\"\")`",
+          "`Array.from(s)`"
+        ],
+        "answer": 0,
+        "explanation": "Code points aren't enough for flags or accented letters written with combining marks."
+      },
+      {
+        "question": "Two strings look identical but aren't `===`. What's a likely cause?",
+        "options": [
+          "Different Unicode normalisation — composed vs decomposed accents",
+          "Trailing zeros",
+          "Different fonts",
+          "The `u` flag"
+        ],
+        "answer": 0,
+        "explanation": "Normalise both with `s.normalize(\"NFC\")` before comparing."
+      },
+      {
+        "question": "Why sort names with `localeCompare` rather than the default `sort()`?",
+        "options": [
+          "The default compares code units, putting uppercase first and accents last",
+          "`sort()` can't sort strings",
+          "`localeCompare` is faster",
+          "The default sort is random"
+        ],
+        "answer": 0,
+        "explanation": "`localeCompare` orders text the way a reader expects."
+      },
+      {
+        "question": "What does the `u` flag change in a regex?",
+        "options": [
+          "It treats the pattern and input as code points",
+          "It makes the match case-insensitive",
+          "It finds every match",
+          "Nothing in modern engines"
+        ],
+        "answer": 0,
+        "explanation": "Without `u`, `.` matches a single code unit and can split an emoji."
+      }
+    ],
+    "practice": []
+  },
+  {
+    "key": "ts_function_types",
+    "name": "Function Types in Depth",
+    "category": "TS: Functions & Types",
+    "what": "Call and construct signatures, typing `this`, and the rules for when one function type fits another.",
+    "deep": "A function's type is its signature: what it accepts and what it gives back. TypeScript can describe a plain callback, a function that also carries properties, a class you call with `new`, and a function that needs a particular `this`. Knowing when one function type is assignable to another — fewer parameters is fine, a narrower parameter is not — is what makes callbacks, handlers and plugin tables type-safe.",
+    "java": "Java needs a functional interface for every shape of callback. Here any matching signature fits structurally, a constructor is just a `new (…) => T` signature, and parameter types are checked contravariantly for function-typed properties (bivariantly for methods — a deliberate hole this chapter shows).",
+    "language": "typescript",
+    "lesson": "### Why it exists\nFunctions are values in TypeScript. You store them in tables, pass them to other\nfunctions, hand them to event emitters and receive them back from factories.\nEvery one of those moves asks the compiler the same question: *does this\nfunction fit that slot?*\n\nAnswer it wrongly and you get the bugs this chapter is about: a handler that is\ncalled with an argument it never expected, a method that loses its `this` when\npassed around, a constructor called without `new`. A function *type* is how you\nwrite the slot down precisely enough for the compiler to answer for you.\n\n### The core idea\n**Four kinds of signature.** A function type can be written in four ways, and\nthey cover everything you will meet:\n\n```ts\ntype Parse = (text: string) => number;            // call signature (arrow form)\ntype Labelled = { (x: number): string; label: string }; // callable object with a property\ntype Maker = new (size: number) => Shape;         // construct signature — called with `new`\nfunction show(this: Account, prefix: string) {}   // a `this` parameter (erased at runtime)\n```\n\n**When does one function fit another?** Suppose a slot expects\n`(value: number, index: number) => void`.\n\n- **Fewer parameters is fine.** `(value) => …` fits: extra arguments are simply\n  ignored. That is why `xs.forEach((x) => …)` compiles although `forEach`\n  passes three arguments.\n- **More *required* parameters is not.** `(value, index, extra) => …` would be\n  called without `extra`.\n- **Parameters are checked contravariantly.** A function that only handles\n  `\"click\"` cannot sit in a slot that will pass it any `string`. With `strict`\n  on (`strictFunctionTypes`) this is an error — *except* for methods declared\n  with method syntax in an interface, which are checked bivariantly for\n  historical reasons.\n- **Return types are covariant**, and a `void` slot accepts any return type —\n  the value is just not used.\n\n**`this` is a parameter too.** Writing `this: Account` first in the parameter\nlist costs nothing at runtime — it is erased — but every call is now checked:\ncalling the function detached, where `this` would be `undefined`, is a compile\nerror instead of a crash.\n\n**Reading function types back.** `ReturnType<typeof f>` and\n`Parameters<typeof f>` turn a function's signature into types you can reuse,\nso a factory stays the single source of truth for what it builds. You will\nrebuild both yourself with `infer` in week 21.\n\n### Worked examples\n#### A function that carries a property\n```ts\ntype Formatter = {\n  (value: number): string;\n  label: string;\n};\n\nconst money = (value: number) => \"$\" + value.toFixed(2);\nmoney.label = \"money\";\n\nconst percent = (value: number) => (value * 100).toFixed(0) + \"%\";\npercent.label = \"percent\";\n\nconst formatters: Formatter[] = [money, percent];\nfor (const f of formatters) {\n  console.log(f.label + \": \" + f(0.256));\n}\n```\n\nPrints:\n```text\nmoney: $0.26\npercent: 26%\n```\n\nAssigning `money.label` right after a `const` arrow function is recognised by the compiler: `money`'s type becomes the call signature *plus* a `label: string` property, so it fits `Formatter` with no cast.\n\n#### A construct signature\n```ts\ninterface Shape {\n  area(): number;\n}\ntype ShapeMaker = new (size: number) => Shape;\n\nclass Square implements Shape {\n  size: number;\n  constructor(size: number) {\n    this.size = size;\n  }\n  area() {\n    return this.size * this.size;\n  }\n}\nclass Circle implements Shape {\n  radius: number;\n  constructor(radius: number) {\n    this.radius = radius;\n  }\n  area() {\n    return Math.round(Math.PI * this.radius * this.radius);\n  }\n}\n\nfunction build(maker: ShapeMaker, sizes: number[]): Shape[] {\n  return sizes.map((size) => new maker(size));\n}\n\nfor (const shape of [...build(Square, [2, 3]), ...build(Circle, [1])]) {\n  console.log(shape.area());\n}\n```\n\nPrints:\n```text\n4\n9\n3\n```\n\n`build` does not care which class it gets — only that calling it with `new` and a number produces a `Shape`. A class *is* a value with a construct signature.\n\n#### Fewer parameters fit; `void` accepts anything\n```ts\ntype Visit = (value: number, index: number) => void;\n\nfunction each(xs: number[], visit: Visit): void {\n  for (const [index, value] of xs.entries()) visit(value, index);\n}\n\neach([30, 10, 20], (value, index) => console.log(index + \": \" + value));\n\nconst seen: number[] = [];\neach([30, 10, 20], (value) => seen.push(value)); // one parameter, returns a number\nconsole.log(seen.join(\",\"));\n```\n\nPrints:\n```text\n0: 30\n1: 10\n2: 20\n30,10,20\n```\n\nThe second callback takes one parameter where two are offered, and returns `push`'s number where `void` is expected. Both are fine: nothing is ever missing, and a `void` result is simply not used.\n\n#### A `this` parameter\n```ts\ninterface Account {\n  owner: string;\n  balance: number;\n}\n\nfunction describe(this: Account, prefix: string): string {\n  return prefix + \" \" + this.owner + \" has \" + this.balance;\n}\n\nconst ana = { owner: \"Ana\", balance: 30, describe };\nconsole.log(ana.describe(\"->\"));\nconsole.log(describe.call({ owner: \"Bo\", balance: 5 }, \"*\"));\n```\n\nPrints:\n```text\n-> Ana has 30\n* Bo has 5\n```\n\n`this: Account` is not a real parameter — `describe` still takes one argument. It tells the compiler what `this` must be at every call site, and `.call` supplies it explicitly.\n\n#### Types read back from a function\n```ts\nfunction parsePoint(text: string, separator = \",\") {\n  const [x = 0, y = 0] = text.split(separator).map(Number);\n  return { x, y };\n}\n\ntype Point = ReturnType<typeof parsePoint>;\ntype ParseArgs = Parameters<typeof parsePoint>;\n\nconst args: ParseArgs = [\"3;4\", \";\"];\nconst p: Point = parsePoint(...args);\nconsole.log(p.x + p.y);\n```\n\nPrints:\n```text\n7\n```\n\n`Point` is `{ x: number; y: number }` and `ParseArgs` is `[text: string, separator?: string]`, both derived — change `parsePoint` and they follow. `typeof` is needed because `parsePoint` is a value, and these utilities take types.\n\n### What the compiler says\n```ts\ntype Visit = (value: number) => void;\nfunction each(xs: number[], visit: Visit) {\n  for (const x of xs) visit(x);\n}\neach([1, 2], (value: number, index: number) => console.log(value, index));\n```\n```text\nline 5: error TS2345: Argument of type '(value: number, index: number) => void' is not assignable to parameter of type 'Visit'.\n  Target signature provides too few arguments. Expected 2 or more, but got 1.\n```\n\nThe callback demands an `index` that `each` never passes. Fewer parameters are always safe; more *required* ones never are.\n\n```ts\ntype Handler = (event: string) => void;\nconst onlyClicks = (event: \"click\") => console.log(event);\nconst handler: Handler = onlyClicks;\n```\n```text\nline 3: error TS2322: Type '(event: \"click\") => void' is not assignable to type 'Handler'.\n  Types of parameters 'event' and 'event' are incompatible.\n    Type 'string' is not assignable to type '\"click\"'.\n```\n\nA `Handler` will be called with *any* string, and `onlyClicks` only handles one. Parameter types flow the opposite way to values — this is contravariance, enforced by `strictFunctionTypes`.\n\n```ts\ninterface Account {\n  owner: string;\n}\nfunction greet(this: Account) {\n  return \"hi \" + this.owner;\n}\nconsole.log(greet());\n```\n```text\nline 7: error TS2684: The 'this' context of type 'void' is not assignable to method's 'this' of type 'Account'.\n```\n\nCalled on its own, `greet` would run with `this` undefined. Declaring the `this` parameter turns that crash into a compile error.\n\n```ts\nclass Point {\n  x = 0;\n}\nconst p = Point();\n```\n```text\nline 4: error TS2348: Value of type 'typeof Point' is not callable. Did you mean to include 'new'?\n```\n\nA class has a construct signature, not a call signature. The fix is `new Point()`.\n\n### Pitfalls\n#### `map(parseInt)` passes more than you think\n```ts\nconst parsed = [\"10\", \"10\", \"10\"].map(parseInt);\nconsole.log(parsed.join(\",\"));\n```\nPrints:\n```text\n10,NaN,2\n```\n\n`parseInt(text, radix?)` fits `map`'s callback slot `(value, index) => …` perfectly — so the element's *index* arrives as the radix. `parseInt(\"10\", 1)` is `NaN` and `parseInt(\"10\", 2)` is `2`. The types agree, and the program is still wrong: pass only what you mean to.\n\n```ts\nconst parsed = [\"10\", \"10\", \"10\"].map((s) => parseInt(s, 10));\nconsole.log(parsed.join(\",\"));\n```\nPrints:\n```text\n10,10,10\n```\n\n#### Method syntax is checked bivariantly\n```ts\ninterface Box {\n  accept(value: string | number): void;\n}\nconst shout: Box = {\n  accept(value: string) {\n    console.log(value.toUpperCase());\n  },\n};\ntry {\n  shout.accept(\"hi\");\n  shout.accept(42);\n} catch (e) {\n  console.log(\"crashed: \" + (e instanceof Error ? e.message : String(e)));\n}\n```\nPrints:\n```text\nHI\ncrashed: value.toUpperCase is not a function\n```\n\nDeclared with *method* syntax, `accept(value: string)` is allowed to stand in for `accept(value: string | number)` — a known unsoundness kept for compatibility. Declared as a *property* with a function type, the same mismatch is a compile error, which forces the handler to cope with numbers.\n\n```ts\ninterface Box {\n  accept: (value: string | number) => void;\n}\nconst shout: Box = {\n  accept: (value) => console.log(String(value).toUpperCase()),\n};\nshout.accept(\"hi\");\nshout.accept(42);\n```\nPrints:\n```text\nHI\n42\n```\n\n#### A detached method loses `this`\n```ts\nclass Counter {\n  count = 0;\n  increment() {\n    this.count++;\n    return this.count;\n  }\n}\nconst counter = new Counter();\nconst step = counter.increment;\ntry {\n  step();\n} catch (e) {\n  console.log(\"crashed: \" + (e instanceof Error ? e.message : String(e)));\n}\nconsole.log(counter.count);\n```\nPrints:\n```text\ncrashed: Cannot read properties of undefined (reading 'count')\n0\n```\n\n`counter.increment` is a plain function value; calling it on its own runs with `this` undefined. Wrap the call in an arrow (or `bind`), so `this` is fixed where it is created. Writing `increment(this: Counter)` would have made the compiler reject `step()` outright.\n\n```ts\nclass Counter {\n  count = 0;\n  increment() {\n    this.count++;\n    return this.count;\n  }\n}\nconst counter = new Counter();\nconst step = () => counter.increment();\nstep();\nconsole.log(counter.count);\n```\nPrints:\n```text\n1\n```\n\n### Where it shows up later\n- **Week 15 — Variance.** Contravariant parameters and the method-bivariance hole, in general form, with `in`/`out` annotations.\n- **Week 18 — Generics.** Generic call signatures: `<T>(xs: T[]) => T | undefined`.\n- **Week 21 — Conditional types.** You rebuild `ReturnType` and `Parameters` with `infer`.\n- **Week 23 — Classes.** `this` in methods, arrow-function fields, and why a class is also a value with a construct signature.\n\n### In an interview\n\n**How do you type a function that also has properties?**\n\nWith an object type that has a call signature: `{ (x: number): string; label: string }`. TypeScript also recognises property assignments right after a function declaration or `const` arrow function, so `fn.label = \"x\"` extends the inferred type without a cast.\n\n**What does `strictFunctionTypes` change?**\n\nIt checks function-typed parameters contravariantly: a handler for `\"click\"` is not a handler for any `string`. Method-syntax members are exempt and stay bivariant, which is a known hole — declaring members as properties closes it.\n\n**What is a `this` parameter for?**\n\nDeclaring what `this` must be inside a standalone function. It's erased at runtime, but every call is checked, so calling it detached — where `this` would be `undefined` — becomes a compile error instead of a crash.",
+    "exercises": [
+      {
+        "id": "ts_function_types-construct",
+        "title": "Build with whatever maker you are given",
+        "prompt": "`ShapeMaker` is a construct signature. Replace `____` so `build` creates one shape per size with the maker it was given.",
+        "hint": "A construct signature is called with `new`.",
+        "language": "typescript",
+        "kind": "drill",
+        "difficulty": "",
+        "starter": "import * as fs from \"fs\";\ninterface Shape {\n  area(): number;\n}\ntype ShapeMaker = new (size: number) => Shape;\nclass Square implements Shape {\n  size: number;\n  constructor(size: number) {\n    this.size = size;\n  }\n  area() {\n    return this.size * this.size;\n  }\n}\nfunction build(maker: ShapeMaker, sizes: number[]): Shape[] {\n  return sizes.map((size) => ____);\n}\nconst sizes = fs.readFileSync(0, \"utf8\").trim().split(/\\s+/).map(Number);\nconsole.log(build(Square, sizes).map((s) => s.area()).join(\" \"));\n",
+        "solution": "import * as fs from \"fs\";\ninterface Shape {\n  area(): number;\n}\ntype ShapeMaker = new (size: number) => Shape;\nclass Square implements Shape {\n  size: number;\n  constructor(size: number) {\n    this.size = size;\n  }\n  area() {\n    return this.size * this.size;\n  }\n}\nfunction build(maker: ShapeMaker, sizes: number[]): Shape[] {\n  return sizes.map((size) => new maker(size));\n}\nconst sizes = fs.readFileSync(0, \"utf8\").trim().split(/\\s+/).map(Number);\nconsole.log(build(Square, sizes).map((s) => s.area()).join(\" \"));\n",
+        "tests": [
+          {
+            "input": "1 2 3",
+            "output": "1 4 9"
+          },
+          {
+            "input": "5",
+            "output": "25"
+          },
+          {
+            "input": "10 0",
+            "output": "100 0"
+          }
+        ],
+        "source_slug": ""
+      },
+      {
+        "id": "ts_function_types-radix",
+        "title": "Pass only what you mean",
+        "prompt": "The input is a line of numbers in any base-10 spelling (`007`, `12`). Replace `____` with the callback that parses each one in base 10 — `map(parseInt)` would pass the index as the radix.",
+        "hint": "Write the arrow explicitly and give `parseInt` its radix.",
+        "language": "typescript",
+        "kind": "drill",
+        "difficulty": "",
+        "starter": "import * as fs from \"fs\";\nconst words = fs.readFileSync(0, \"utf8\").trim().split(/\\s+/);\nconst values = words.map(____);\nconsole.log(values.join(\" \"));\nconsole.log(values.reduce((a, b) => a + b, 0));\n",
+        "solution": "import * as fs from \"fs\";\nconst words = fs.readFileSync(0, \"utf8\").trim().split(/\\s+/);\nconst values = words.map((w) => parseInt(w, 10));\nconsole.log(values.join(\" \"));\nconsole.log(values.reduce((a, b) => a + b, 0));\n",
+        "tests": [
+          {
+            "input": "10 10 10",
+            "output": "10 10 10\n30"
+          },
+          {
+            "input": "007 12 3",
+            "output": "7 12 3\n22"
+          },
+          {
+            "input": "1",
+            "output": "1\n1"
+          }
+        ],
+        "source_slug": ""
+      },
+      {
+        "id": "ts_function_types-this",
+        "title": "Call it with the right `this`",
+        "prompt": "`label` needs a `this` of type `Item`. Replace `____` so each item is described by calling `label` with that item as `this` and `\"#\"` as the prefix.",
+        "hint": "`fn.call(thisValue, ...args)` supplies `this` explicitly.",
+        "language": "typescript",
+        "kind": "drill",
+        "difficulty": "",
+        "starter": "import * as fs from \"fs\";\ninterface Item {\n  name: string;\n  qty: number;\n}\nfunction label(this: Item, prefix: string): string {\n  return prefix + this.name + \" x\" + this.qty;\n}\nconst items: Item[] = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\").map((line) => {\n  const [name = \"\", qty = \"0\"] = line.trim().split(/\\s+/);\n  return { name, qty: Number(qty) };\n});\nfor (const item of items) console.log(____);\n",
+        "solution": "import * as fs from \"fs\";\ninterface Item {\n  name: string;\n  qty: number;\n}\nfunction label(this: Item, prefix: string): string {\n  return prefix + this.name + \" x\" + this.qty;\n}\nconst items: Item[] = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\").map((line) => {\n  const [name = \"\", qty = \"0\"] = line.trim().split(/\\s+/);\n  return { name, qty: Number(qty) };\n});\nfor (const item of items) console.log(label.call(item, \"#\"));\n",
+        "tests": [
+          {
+            "input": "pen 2\ncup 1",
+            "output": "#pen x2\n#cup x1"
+          },
+          {
+            "input": "ink 10",
+            "output": "#ink x10"
+          },
+          {
+            "input": "a 1\nb 2\nc 3",
+            "output": "#a x1\n#b x2\n#c x3"
+          }
+        ],
+        "source_slug": ""
+      },
+      {
+        "id": "ts_function_types-ops",
+        "title": "An operator table",
+        "prompt": "Each input line is `op a b`. Keep a table from operator name to `(a: number, b: number) => number` for `add`, `sub`, `mul`, `max` and `min`. For each line print the result, or `unknown op <op>` when the name is not in the table. Finish with how many lines were computed.",
+        "hint": "`Math.max` fits `BinaryOp`: it takes any number of numbers, and two is a fine number. Guard lookups with `Object.hasOwn` so `toString` is not mistaken for an operator.",
+        "language": "typescript",
+        "kind": "challenge",
+        "difficulty": "Medium",
+        "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+        "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype BinaryOp = (a: number, b: number) => number;\nconst ops: Record<string, BinaryOp> = {\n  add: (a, b) => a + b,\n  sub: (a, b) => a - b,\n  mul: (a, b) => a * b,\n  max: Math.max,\n  min: Math.min,\n};\nlet computed = 0;\nfor (const line of input.split(\"\\n\")) {\n  const [name = \"\", a = \"0\", b = \"0\"] = line.trim().split(/\\s+/);\n  const op = Object.hasOwn(ops, name) ? ops[name] : undefined;\n  if (op === undefined) {\n    console.log(\"unknown op \" + name);\n    continue;\n  }\n  console.log(op(Number(a), Number(b)));\n  computed++;\n}\nconsole.log(computed);\n",
+        "tests": [
+          {
+            "input": "add 2 3\nmul 4 5\npow 2 3",
+            "output": "5\n20\nunknown op pow\n2"
+          },
+          {
+            "input": "max 7 9\nmin 7 9",
+            "output": "9\n7\n2"
+          },
+          {
+            "input": "sub 1 10",
+            "output": "-9\n1"
+          },
+          {
+            "input": "toString 1 2\nadd 0 0",
+            "output": "unknown op toString\n0\n1"
+          }
+        ],
+        "source_slug": ""
+      }
+    ],
+    "cards": [],
+    "quiz": [
+      {
+        "question": "Which type describes something you call with `new`?",
+        "options": [
+          "`new (size: number) => Shape`",
+          "`(size: number) => Shape`",
+          "`{ new: (size: number) => Shape }`",
+          "`typeof Shape`, and nothing else can"
+        ],
+        "answer": 0,
+        "explanation": "A construct signature is written with `new` in front. A class value has one, and so can any object type."
+      },
+      {
+        "question": "A slot expects `(value: number, index: number) => void`. Why does `(value) => …` fit?",
+        "options": [
+          "Passing extra arguments to a function that ignores them is harmless",
+          "The compiler adds the missing parameter",
+          "It doesn't fit; you must declare both",
+          "Only because `void` disables checking"
+        ],
+        "answer": 0,
+        "explanation": "A function that takes fewer parameters can always be called with more arguments; the rest are ignored."
+      },
+      {
+        "question": "What does `this: Account` in a parameter list do at runtime?",
+        "options": [
+          "Nothing — it is erased; it only checks what `this` is at each call site",
+          "Binds `this` to an `Account` automatically",
+          "Adds a first parameter the caller must pass",
+          "Creates a new `Account` for each call"
+        ],
+        "answer": 0,
+        "explanation": "The `this` parameter is purely a type annotation. `describe(\"x\")` still takes one argument."
+      },
+      {
+        "question": "Under `strict`, why can't `(e: \"click\") => void` be assigned to `(e: string) => void`?",
+        "options": [
+          "The slot may pass any string, and the handler only accepts one",
+          "Literal types can't appear in parameters",
+          "Arrow functions can't be assigned to type aliases",
+          "It can; parameters are compared bivariantly"
+        ],
+        "answer": 0,
+        "explanation": "Parameters are checked contravariantly: the function must accept everything the slot might pass it."
+      },
+      {
+        "question": "What is different about an interface method declared as `accept(v: string): void` compared with `accept: (v: string) => void`?",
+        "options": [
+          "The method form's parameters are checked bivariantly, so a narrower implementation slips through",
+          "Nothing at all",
+          "The property form can't be implemented by a class",
+          "The method form is always `readonly`"
+        ],
+        "answer": 0,
+        "explanation": "Method syntax keeps an old, deliberate unsoundness. Property syntax gets the strict, contravariant check."
+      },
+      {
+        "question": "Why is it `ReturnType<typeof parse>` and not `ReturnType<parse>`?",
+        "options": [
+          "`parse` is a value; `typeof` lifts it into the type world",
+          "`ReturnType` requires `typeof` for arrow functions only",
+          "`typeof` calls the function to find its result",
+          "Both are valid"
+        ],
+        "answer": 0,
+        "explanation": "Utility types take types. `typeof parse` is the function's type."
+      }
+    ],
+    "practice": []
+  },
+  {
+    "key": "ts_type_testing",
+    "name": "Testing Types",
+    "category": "TS: Type System",
+    "what": "Writing tests for types: `Expect<Equal<A, B>>`, `@ts-expect-error`, and the traps that make a type test pass for the wrong reason.",
+    "deep": "A type is code, and code without tests rots. A type test is a line that only compiles when the type is right — `type _ = Expect<Equal<ReturnType<typeof parse>, Point>>` — and a `// @ts-expect-error` line that only compiles when a misuse is rejected. They run at compile time, cost nothing at runtime, and are how every serious TypeScript library keeps its types honest. Months 4 and 5 of this programme are graded exactly this way.",
+    "java": "Java has no equivalent: its types cannot compute, so there is nothing to test. The closest analogue is a compile-fail test in a build tool. In TypeScript, where types are derived from other types, a refactor can silently widen a type to `any` — only a type test notices.",
+    "language": "typescript",
+    "lesson": "### Why it exists\nRuntime tests catch wrong *values*. They cannot catch wrong *types*: a function\nwhose return type silently became `any` still returns the right values, every\nruntime test still passes, and every caller has quietly lost its type checking.\n\nThat happens more than you'd think once types are *derived* — from\n`ReturnType`, from a mapped type, from a schema. Change one line upstream and a\ntype fifty lines away changes shape. A type test pins it down, so the change\nshows up as a compile error at the place that states the intent.\n\nThe second half of this programme is graded this way: from week 15 on, your\ntypes are checked by hidden `Expect<Equal<…>>` lines. This chapter is how those\nwork, so a failed check reads as information rather than noise.\n\n### The core idea\n**Two helpers are the whole toolkit.**\n\n```ts\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<ReturnType<typeof parse>, { x: number; y: number }>>;\n```\n\n`Expect<T extends true>` only accepts `true`, so a line that uses it compiles\nonly when the claim inside is true. `Equal<X, Y>` is the identity check from\nthe type-challenges project: it compares how the compiler *itself* treats the\ntwo types, so `any`, `readonly` differences and near-miss unions all fail it.\n\n**Why not `A extends B ? B extends A ? … : … : …`?** Mutual assignability is not\nidentity. `any` is assignable both ways to everything, and `readonly` does not\naffect assignability at all — so the naive check calls `{ readonly id: number }`\nand `{ id: number }` equal. The pitfalls below show both.\n\n**Testing that something is rejected.** `// @ts-expect-error` on the line\nabove a statement means \"this line must fail to compile\". If it does, the\nerror is swallowed and the file compiles. If it doesn't — because your type\naccepts too much — the directive itself is an error (TS2578). That is a\nnegative test: \"a square has no radius\".\n\n**Where type tests live.** They must be *compiled* but need not *run*. Type\naliases like `type _1 = …` erase to nothing. A misuse under\n`@ts-expect-error` should sit inside a function that is never called, so the\nbad call never executes:\n\n```ts\nfunction _typeTests() {\n  // @ts-expect-error — a square has no radius\n  area({ kind: \"square\", radius: 2 });\n}\n```\n\n**What a type test cannot tell you:** whether the values are right. Pair type\ntests with ordinary runtime checks; each catches what the other cannot.\n\n### Worked examples\n#### Pinning a derived type\n```ts\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\nfunction parsePoint(text: string) {\n  const [x = 0, y = 0] = text.split(\",\").map(Number);\n  return { x, y };\n}\n\ntype _1 = Expect<Equal<ReturnType<typeof parsePoint>, { x: number; y: number }>>;\ntype _2 = Expect<Equal<Parameters<typeof parsePoint>, [text: string]>>;\n\nconsole.log(parsePoint(\"3,4\").x + parsePoint(\"3,4\").y);\n```\n\nPrints:\n```text\n7\n```\n\nThe program printing `7` is the runtime half. That it *compiled at all* is the type half: both `Expect` lines hold. Change `parsePoint` to return `{ x, y, z: 0 }` and line `_1` stops compiling.\n\n#### A negative test: the misuse must be rejected\n```ts\ntype Shape = { kind: \"square\"; size: number } | { kind: \"circle\"; radius: number };\n\nfunction area(shape: Shape): number {\n  return shape.kind === \"square\" ? shape.size * shape.size : Math.round(3.14159 * shape.radius ** 2);\n}\n\nfunction _typeTests() {\n  // @ts-expect-error — a square has no radius\n  area({ kind: \"square\", radius: 2 });\n  // @ts-expect-error — \"triangle\" is not a kind\n  area({ kind: \"triangle\", size: 1 });\n}\n\nconsole.log(area({ kind: \"square\", size: 3 }));\nconsole.log(area({ kind: \"circle\", radius: 1 }));\n```\n\nPrints:\n```text\n9\n3\n```\n\nBoth directives are satisfied — each line really is an error — so the file compiles. `_typeTests` is never called, so the bad calls never run. If `Shape` were loosened to accept `radius` on a square, the first directive would become TS2578 and the build would fail.\n\n#### Type tests beside runtime tests\n```ts\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\nfunction unique<T>(xs: readonly T[]): T[] {\n  return [...new Set(xs)];\n}\n\n// type tests: the element type survives, and readonly input is accepted\ntype _1 = Expect<Equal<ReturnType<typeof unique<string>>, string[]>>;\nconst frozen: readonly number[] = [3, 1, 3];\ntype _2 = Expect<Equal<typeof frozen, readonly number[]>>;\n\n// runtime tests: the values are right\nlet passed = 0;\nfunction check(name: string, actual: string, expected: string) {\n  if (actual === expected) passed++;\n  else console.log(\"FAIL \" + name + \": \" + actual + \" !== \" + expected);\n}\ncheck(\"dedupes\", unique(frozen).join(\",\"), \"3,1\");\ncheck(\"keeps order\", unique([\"b\", \"a\", \"b\"]).join(\",\"), \"b,a\");\ncheck(\"empty\", unique([]).join(\",\"), \"\");\nconsole.log(passed + \" runtime checks passed; the type checks passed by compiling\");\n```\n\nPrints:\n```text\n3 runtime checks passed; the type checks passed by compiling\n```\n\n`typeof unique<string>` is an *instantiation expression* — the function's type with `T` fixed — so `ReturnType` can be tested for a specific element type.\n\n### What the compiler says\n```ts\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\nfunction total(xs: number[]) {\n  return xs.reduce((a, b) => a + b, 0).toFixed(2);\n}\ntype _1 = Expect<Equal<ReturnType<typeof total>, number>>;\n```\n```text\nline 8: error TS2344: Type 'false' does not satisfy the constraint 'true'.\n```\n\nThis is what a failing type test looks like: `Equal` produced `false`, and `Expect` only accepts `true`. Here the test caught a real change — `toFixed` returns a `string`.\n\n```ts\nfunction setPort(port: number | string) {\n  return Number(port);\n}\nfunction _typeTests() {\n  // @ts-expect-error — a port must be a number\n  setPort(\"8080\");\n}\n```\n```text\nline 5: error TS2578: Unused '@ts-expect-error' directive.\n```\n\nThe directive promised an error on the next line and there wasn't one: `setPort` accepts strings. An unused `@ts-expect-error` is itself an error, which is what makes it a real negative test.\n\n### Pitfalls\n#### Mutual `extends` lets `any` through\n```ts\ntype NaiveEqual<A, B> = [A] extends [B] ? ([B] extends [A] ? true : false) : false;\ntype Expect<T extends true> = T;\n\nfunction load(text: string) {\n  return JSON.parse(text); // any\n}\ntype _1 = Expect<NaiveEqual<ReturnType<typeof load>, { id: number }>>;\nconsole.log(\"type test passed\");\n```\nPrints:\n```text\ntype test passed\n```\n\n`any` is assignable to and from everything, so the naive check calls `any` equal to `{ id: number }` — the test passes while `load` has no useful type at all. The identity-based `Equal` refuses.\n\n```ts\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\nfunction load(text: string) {\n  return JSON.parse(text); // any\n}\ntype _1 = Expect<Equal<ReturnType<typeof load>, { id: number }>>;\nconsole.log(\"type test passed\");\n```\nThe compiler says:\n```text\nline 8: error TS2344: Type 'false' does not satisfy the constraint 'true'.\n```\n\n#### Mutual `extends` ignores `readonly`\n```ts\ntype NaiveEqual<A, B> = [A] extends [B] ? ([B] extends [A] ? true : false) : false;\ntype Expect<T extends true> = T;\n\ntype Config = { id: number };  // someone dropped `readonly`\ntype _1 = Expect<NaiveEqual<Config, { readonly id: number }>>;\nconsole.log(\"type test passed\");\n```\nPrints:\n```text\ntype test passed\n```\n\n`readonly` does not change assignability, so mutual `extends` cannot see it. A test meant to guarantee immutability has to use an identity check.\n\n```ts\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype Config = { id: number };  // someone dropped `readonly`\ntype _1 = Expect<Equal<Config, { readonly id: number }>>;\nconsole.log(\"type test passed\");\n```\nThe compiler says:\n```text\nline 6: error TS2344: Type 'false' does not satisfy the constraint 'true'.\n```\n\n#### A typo satisfies `@ts-expect-error`\n```ts\nfunction setPort(port: number | string) {\n  return Number(port);\n}\nfunction _typeTests() {\n  // @ts-expect-error — a port must be a number\n  setPrt(\"8080\");\n}\nconsole.log(setPort(80));\n```\nPrints:\n```text\n80\n```\n\nThe directive swallows *any* error, including \"cannot find name `setPrt`\". The test looked green for the wrong reason; with the typo fixed it fails, revealing that `setPort` really does accept strings. Keep negative tests to one small line each, so the only possible error is the one you meant.\n\n```ts\nfunction setPort(port: number | string) {\n  return Number(port);\n}\nfunction _typeTests() {\n  // @ts-expect-error — a port must be a number\n  setPort(\"8080\");\n}\nconsole.log(setPort(80));\n```\nThe compiler says:\n```text\nline 5: error TS2578: Unused '@ts-expect-error' directive.\n```\n\n### Where it shows up later\n- **Weeks 14-22 — every Type workshop** is graded by hidden `Expect<Equal<…>>` lines, the helpers from this chapter.\n- **Week 15 — `satisfies`**, a lightweight check that a value fits a type without changing its inferred type.\n- **Week 21 — Conditional types.** You'll see why `Equal` is written with generic functions: it is the one comparison `any` cannot fool.\n\n### In an interview\n\n**How would you test a type?**\n\nWith compile-time assertions: `type _ = Expect<Equal<Actual, Expected>>` for positive claims and `// @ts-expect-error` above a line that must be rejected. They run as part of `tsc`, so CI fails when a type drifts. Libraries often use `expectTypeOf` from Vitest, which is the same idea with a nicer API.\n\n**Why is the `Equal` type written with generic functions?**\n\nBecause mutual `extends` is too weak — `any` passes both ways and `readonly` doesn't affect assignability. Comparing `<T>() => T extends X ? 1 : 2` for X and Y makes the compiler compare the types by identity, which catches both.\n\n**What's the risk with `@ts-expect-error`?**\n\nIt swallows any error, so a test can pass for the wrong reason — a typo in the call is an error too. Keep each negative test to one small line, and prefer `@ts-expect-error` over `@ts-ignore`, which never complains when the error goes away.",
+    "exercises": [
+      {
+        "id": "ts_type_testing-check",
+        "title": "A tiny runtime check",
+        "prompt": "Type tests prove types; runtime checks prove values. Replace `____` so `check` counts a pass when `actual` equals `expected`, and otherwise prints `FAIL <name>`. The input is `name actual expected` per line.",
+        "hint": "Two branches: count the pass, or print the failure.",
+        "language": "typescript",
+        "kind": "drill",
+        "difficulty": "",
+        "starter": "import * as fs from \"fs\";\nlet passed = 0;\nfunction check(name: string, actual: string, expected: string): void {\n  ____\n}\nfor (const line of fs.readFileSync(0, \"utf8\").trim().split(\"\\n\")) {\n  const [name = \"\", actual = \"\", expected = \"\"] = line.trim().split(/\\s+/);\n  check(name, actual, expected);\n}\nconsole.log(passed + \" passed\");\n",
+        "solution": "import * as fs from \"fs\";\nlet passed = 0;\nfunction check(name: string, actual: string, expected: string): void {\n  if (actual === expected) passed++;\n  else console.log(\"FAIL \" + name);\n}\nfor (const line of fs.readFileSync(0, \"utf8\").trim().split(\"\\n\")) {\n  const [name = \"\", actual = \"\", expected = \"\"] = line.trim().split(/\\s+/);\n  check(name, actual, expected);\n}\nconsole.log(passed + \" passed\");\n",
+        "tests": [
+          {
+            "input": "a 1 1\nb 2 3",
+            "output": "FAIL b\n1 passed"
+          },
+          {
+            "input": "only x x",
+            "output": "1 passed"
+          },
+          {
+            "input": "p 1 2\nq 3 4\nr 5 5",
+            "output": "FAIL p\nFAIL q\n1 passed"
+          }
+        ],
+        "source_slug": ""
+      },
+      {
+        "id": "ts_type_testing-unique",
+        "title": "The runtime half of a type-tested helper",
+        "prompt": "`unique` is type-tested for its signature; now make its values right. Replace `____` so it returns the distinct items in first-seen order.",
+        "hint": "A `Set` keeps insertion order; spread it back into an array.",
+        "language": "typescript",
+        "kind": "drill",
+        "difficulty": "",
+        "starter": "import * as fs from \"fs\";\nfunction unique<T>(xs: readonly T[]): T[] {\n  return ____;\n}\nconst words = fs.readFileSync(0, \"utf8\").trim().split(/\\s+/);\nconst out = unique(words);\nconsole.log(out.join(\" \"));\nconsole.log(out.length);\n",
+        "solution": "import * as fs from \"fs\";\nfunction unique<T>(xs: readonly T[]): T[] {\n  return [...new Set(xs)];\n}\nconst words = fs.readFileSync(0, \"utf8\").trim().split(/\\s+/);\nconst out = unique(words);\nconsole.log(out.join(\" \"));\nconsole.log(out.length);\n",
+        "tests": [
+          {
+            "input": "b a b c a",
+            "output": "b a c\n3"
+          },
+          {
+            "input": "x",
+            "output": "x\n1"
+          },
+          {
+            "input": "q q q",
+            "output": "q\n1"
+          }
+        ],
+        "source_slug": ""
+      },
+      {
+        "id": "ts_type_testing-report",
+        "title": "A test report",
+        "prompt": "Each input line is `PASS name` or `FAIL name reason…`. Print every failure as `✗ name: reason` in input order, then a summary `passed/total`. A line with any other status counts as a failure with reason `bad status <status>`.",
+        "hint": "Destructure `status`, `name` and a rest array for the reason.",
+        "language": "typescript",
+        "kind": "challenge",
+        "difficulty": "Easy",
+        "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+        "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nlet passed = 0;\nlet total = 0;\nfor (const line of input.split(\"\\n\")) {\n  const [status = \"\", name = \"\", ...reason] = line.trim().split(/\\s+/);\n  total++;\n  if (status === \"PASS\") {\n    passed++;\n  } else if (status === \"FAIL\") {\n    console.log(\"✗ \" + name + \": \" + reason.join(\" \"));\n  } else {\n    console.log(\"✗ \" + name + \": bad status \" + status);\n  }\n}\nconsole.log(passed + \"/\" + total);\n",
+        "tests": [
+          {
+            "input": "PASS a\nFAIL b expected 2 got 3\nPASS c",
+            "output": "✗ b: expected 2 got 3\n2/3"
+          },
+          {
+            "input": "PASS only",
+            "output": "1/1"
+          },
+          {
+            "input": "SKIP x\nFAIL y timeout",
+            "output": "✗ x: bad status SKIP\n✗ y: timeout\n0/2"
+          }
+        ],
+        "source_slug": ""
+      }
+    ],
+    "cards": [],
+    "quiz": [
+      {
+        "question": "When does `type _ = Expect<Equal<A, B>>` compile?",
+        "options": [
+          "Only when A and B are the same type",
+          "When A is assignable to B",
+          "Always — it's erased",
+          "When B is a subtype of A"
+        ],
+        "answer": 0,
+        "explanation": "`Expect` requires `true`, and `Equal` is true only for identical types."
+      },
+      {
+        "question": "What does an unused `// @ts-expect-error` do?",
+        "options": [
+          "It is itself a compile error (TS2578)",
+          "Nothing",
+          "It disables checking for the whole file",
+          "It becomes a runtime assertion"
+        ],
+        "answer": 0,
+        "explanation": "That is what makes it a negative test: if the next line compiles, the directive fails."
+      },
+      {
+        "question": "Why do misuses under `@ts-expect-error` usually sit inside a function that is never called?",
+        "options": [
+          "The line must compile-fail but must not run",
+          "The directive only works inside functions",
+          "It makes the test faster",
+          "Top-level code is not type-checked"
+        ],
+        "answer": 0,
+        "explanation": "The type checker sees the line; the runtime never executes it."
+      },
+      {
+        "question": "Why is `[A] extends [B] ? [B] extends [A] ? true : false : false` not an identity check?",
+        "options": [
+          "`any` and `readonly` differences pass mutual assignability",
+          "It distributes over unions",
+          "It is, for every type",
+          "It rejects every object type"
+        ],
+        "answer": 0,
+        "explanation": "Mutual assignability is weaker than identity; the generic-function trick in `Equal` is not."
+      },
+      {
+        "question": "What can a type test NOT tell you?",
+        "options": [
+          "Whether the function returns the right values",
+          "Whether a type is `any`",
+          "Whether a misuse is rejected",
+          "Whether a property is `readonly`"
+        ],
+        "answer": 0,
+        "explanation": "Types are erased. Values need runtime tests."
+      },
+      {
+        "question": "What is `typeof unique<string>`?",
+        "options": [
+          "The type of `unique` with its type parameter fixed to `string` (an instantiation expression)",
+          "A call to `unique`",
+          "A syntax error",
+          "The string `\"function\"`"
+        ],
+        "answer": 0,
+        "explanation": "Instantiation expressions (TS 4.7) let you test a generic function at a specific type."
+      }
+    ],
+    "practice": []
+  },
+  {
     "key": "jp_coding_basics",
     "name": "Coding Basics — プログラミングの基礎",
     "category": "JP: Coding Basics",
