@@ -635,6 +635,80 @@
    "different"
   ]
  },
+ "ts_assertions-error1": {
+  "hash": "bb8fec74e309e5befd4a",
+  "diagnostics": [
+   {
+    "code": 2352,
+    "line": 1,
+    "msg": "Conversion of type 'string' to type 'number' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first."
+   }
+  ]
+ },
+ "ts_assertions-error2": {
+  "hash": "c0b3d61e605f02f58235",
+  "diagnostics": [
+   {
+    "code": 18048,
+    "line": 3,
+    "msg": "'long' is possibly 'undefined'."
+   }
+  ]
+ },
+ "ts_assertions-example1": {
+  "hash": "9db5f8169cff0b4a2adb",
+  "outputs": [
+   "2 9 7"
+  ]
+ },
+ "ts_assertions-example2": {
+  "hash": "70f8a9696d6b5afa150a",
+  "outputs": [
+   "pen: 2 left | no ink"
+  ]
+ },
+ "ts_assertions-example3": {
+  "hash": "f4db39b9c9c972f40a7d",
+  "outputs": [
+   "3\nnot a point: {\"x\":1}"
+  ]
+ },
+ "ts_assertions-pitfall1-right": {
+  "hash": "9c99814597d13ed58cbe",
+  "outputs": [
+   "4"
+  ]
+ },
+ "ts_assertions-pitfall1-wrong": {
+  "hash": "f3bc4d54e802b7d52936",
+  "outputs": [
+   "31"
+  ]
+ },
+ "ts_assertions-pitfall2-right": {
+  "hash": "f52284e23b3736b169ac",
+  "outputs": [
+   "no such user"
+  ]
+ },
+ "ts_assertions-pitfall2-wrong": {
+  "hash": "6dba29bedcbef441d643",
+  "outputs": [
+   "failed: Cannot read properties of undefined (reading 'name')"
+  ]
+ },
+ "ts_assertions-pitfall3-right": {
+  "hash": "8fb968eb7aea32eb8c0c",
+  "outputs": [
+   "not a number"
+  ]
+ },
+ "ts_assertions-pitfall3-wrong": {
+  "hash": "ca97b3da4e090221aedc",
+  "outputs": [
+   "NaN"
+  ]
+ },
  "ts_async_iteration-error1": {
   "hash": "59b0e51358c8202d33e9",
   "diagnostics": [
@@ -744,6 +818,84 @@
     "code": 2769,
     "line": 5,
     "msg": "No overload matches this call.   Overload 1 of 4, '(iterable: Iterable<unknown> | ArrayLike<unknown>): unknown[]', gave the following error.     Argument of type 'AsyncGenerator<number, any, any>' is not assignable to parameter of type 'Iterable<unknown> | ArrayLike<unknown>'.   Overload 2 of 4, '(arrayLike: ArrayLike<unknown>): unknown[]', gave the following error.     Argument of type 'AsyncGenerator<number, any, any>' is not assignable to parameter of type 'ArrayLike<unknown>'.       Property 'length' is missing in type 'AsyncGenerator<number, any, any>' but required in type 'ArrayLike<unknown>'."
+   }
+  ]
+ },
+ "ts_branded_types-error1": {
+  "hash": "cd99897138dffa849107",
+  "diagnostics": [
+   {
+    "code": 2345,
+    "line": 4,
+    "msg": "Argument of type 'string' is not assignable to parameter of type 'Email'.   Type 'string' is not assignable to type '{ readonly [brand]: \"Email\"; }'."
+   }
+  ]
+ },
+ "ts_branded_types-error2": {
+  "hash": "142fe8fd653780348918",
+  "diagnostics": [
+   {
+    "code": 2322,
+    "line": 5,
+    "msg": "Type 'number' is not assignable to type 'Cents'.   Type 'number' is not assignable to type '{ readonly [brand]: \"Cents\"; }'."
+   }
+  ]
+ },
+ "ts_branded_types-example1": {
+  "hash": "8594379f4379775e0c37",
+  "outputs": [
+   "200.0"
+  ]
+ },
+ "ts_branded_types-example2": {
+  "hash": "b11b15a4810711b22d73",
+  "outputs": [
+   "published \"Hello world\"\nrejected\nrejected"
+  ]
+ },
+ "ts_branded_types-example3": {
+  "hash": "c01269b56e022b2efe88",
+  "outputs": [
+   "u1=ana u2=cy"
+  ]
+ },
+ "ts_branded_types-pitfall1-right": {
+  "hash": "db2be1ec6dfd94b4801e",
+  "outputs": [
+   "total distance 5366"
+  ]
+ },
+ "ts_branded_types-pitfall1-wrong": {
+  "hash": "19e925fbb3400ca305e3",
+  "outputs": [
+   "total distance 6200"
+  ]
+ },
+ "ts_branded_types-pitfall2-right": {
+  "hash": "3c8ea792528133b3f511",
+  "outputs": [
+   "user u1, user u3"
+  ]
+ },
+ "ts_branded_types-pitfall2-wrong": {
+  "hash": "b5a53b516bff5e2a85d3",
+  "outputs": [
+   "user u1, user DROP TABLE, user u3"
+  ]
+ },
+ "ts_branded_types-pitfall3-right": {
+  "hash": "dc8c4c74ea69194276ac",
+  "outputs": [
+   "true"
+  ]
+ },
+ "ts_branded_types-pitfall3-wrong": {
+  "hash": "5d0a6c8b734857b1b35f",
+  "diagnostics": [
+   {
+    "code": 2367,
+    "line": 6,
+    "msg": "This comparison appears to be unintentional because the types 'UserId' and 'OrderId' have no overlap."
    }
   ]
  },
@@ -1069,6 +1221,80 @@
    "120.00"
   ]
  },
+ "ts_compose-error1": {
+  "hash": "4ff4be232a97d46bebe6",
+  "diagnostics": [
+   {
+    "code": 2322,
+    "line": 3,
+    "msg": "Type 'number' is not assignable to type 'never'."
+   }
+  ]
+ },
+ "ts_compose-error2": {
+  "hash": "d531c26dc3b67ca5bb56",
+  "diagnostics": [
+   {
+    "code": 2312,
+    "line": 2,
+    "msg": "An interface can only extend an object type or intersection of object types with statically known members."
+   }
+  ]
+ },
+ "ts_compose-example1": {
+  "hash": "1821930ca0fb02304af7",
+  "outputs": [
+   "5 pen #1"
+  ]
+ },
+ "ts_compose-example2": {
+  "hash": "350f0c6f451dc33665a6",
+  "outputs": [
+   "{\"id\":7,\"name\":\"ana\",\"createdAt\":\"2026-09-26\",\"updatedAt\":\"2026-09-26\"}"
+  ]
+ },
+ "ts_compose-example3": {
+  "hash": "cb152e91714485b851da",
+  "outputs": [
+   "cube:24 square:4 8"
+  ]
+ },
+ "ts_compose-pitfall1-right": {
+  "hash": "c851bc45413cfaa5a574",
+  "outputs": [
+   "{\"theme\":\"dark\",\"fontSize\":14}"
+  ]
+ },
+ "ts_compose-pitfall1-wrong": {
+  "hash": "3d7bd48949f96dd2c479",
+  "outputs": [
+   "{\"theme\":\"light\",\"fontSize\":14}"
+  ]
+ },
+ "ts_compose-pitfall2-right": {
+  "hash": "8c25dace7046575ab98d",
+  "outputs": [
+   "{\"db\":{\"host\":\"db.local\",\"port\":5432},\"debug\":false}"
+  ]
+ },
+ "ts_compose-pitfall2-wrong": {
+  "hash": "5e1eb1c3f8160bb620f2",
+  "outputs": [
+   "{\"db\":{\"host\":\"db.local\"},\"debug\":false}"
+  ]
+ },
+ "ts_compose-pitfall3-right": {
+  "hash": "696888169151d9a3463a",
+  "outputs": [
+   "5 3 3"
+  ]
+ },
+ "ts_compose-pitfall3-wrong": {
+  "hash": "26fa6d412aebe3be65a0",
+  "outputs": [
+   "5 5 5"
+  ]
+ },
  "ts_conditionals-error1": {
   "hash": "c968be7e213ed5f0737a",
   "diagnostics": [
@@ -1251,6 +1477,80 @@
     "line": 2,
     "msg": "'label' is possibly 'undefined'."
    }
+  ]
+ },
+ "ts_declaration_files-error1": {
+  "hash": "4193c5373479fb3df5df",
+  "diagnostics": [
+   {
+    "code": 2304,
+    "line": 1,
+    "msg": "Cannot find name 'BUILD_ID'."
+   }
+  ]
+ },
+ "ts_declaration_files-error2": {
+  "hash": "6ff6df2ddf3d402bab3a",
+  "diagnostics": [
+   {
+    "code": 1039,
+    "line": 1,
+    "msg": "Initializers are not allowed in ambient contexts."
+   }
+  ]
+ },
+ "ts_declaration_files-example1": {
+  "hash": "643d8c9669d852d0c876",
+  "outputs": [
+   "11"
+  ]
+ },
+ "ts_declaration_files-example2": {
+  "hash": "0687885e5f5a7d1b882d",
+  "outputs": [
+   "ENOSPC: disk full"
+  ]
+ },
+ "ts_declaration_files-example3": {
+  "hash": "1a3a64ad2fc8140334f9",
+  "outputs": [
+   "retries=3 timeoutMs=500 verbose=false"
+  ]
+ },
+ "ts_declaration_files-pitfall1-right": {
+  "hash": "266b46115e57d54e159c",
+  "outputs": [
+   "calling https://api.example.com"
+  ]
+ },
+ "ts_declaration_files-pitfall1-wrong": {
+  "hash": "843b475195c19c19682a",
+  "outputs": [
+   "failed: API_URL is not defined"
+  ]
+ },
+ "ts_declaration_files-pitfall2-right": {
+  "hash": "e471a968d92def17e456",
+  "outputs": [
+   "3.0"
+  ]
+ },
+ "ts_declaration_files-pitfall2-wrong": {
+  "hash": "a5d45456cbacb6ae8a43",
+  "outputs": [
+   "failed: lib.add(...).toUpperCase is not a function"
+  ]
+ },
+ "ts_declaration_files-pitfall3-right": {
+  "hash": "37dbeebb1efb5eeedc63",
+  "outputs": [
+   "empty"
+  ]
+ },
+ "ts_declaration_files-pitfall3-wrong": {
+  "hash": "651329f4cda8c42d5468",
+  "outputs": [
+   "failed: Cannot read properties of undefined (reading 'toFixed')"
   ]
  },
  "ts_decorators-error1": {
@@ -2708,6 +3008,80 @@
    "add one, then double: 7"
   ]
  },
+ "ts_immutability-error1": {
+  "hash": "d6994fed3c1fbda8f694",
+  "diagnostics": [
+   {
+    "code": 2540,
+    "line": 3,
+    "msg": "Cannot assign to 'port' because it is a read-only property."
+   }
+  ]
+ },
+ "ts_immutability-error2": {
+  "hash": "c37377e536b04c9713a9",
+  "diagnostics": [
+   {
+    "code": 4104,
+    "line": 2,
+    "msg": "The type 'readonly number[]' is 'readonly' and cannot be assigned to the mutable type 'number[]'."
+   }
+  ]
+ },
+ "ts_immutability-example1": {
+  "hash": "6aef8c56de3bfb87b671",
+  "outputs": [
+   "95,82 | original: 70,95,82"
+  ]
+ },
+ "ts_immutability-example2": {
+  "hash": "a49220ac4260fe07a80c",
+  "outputs": [
+   "dark light false"
+  ]
+ },
+ "ts_immutability-example3": {
+  "hash": "728faaa44cd9a5998008",
+  "outputs": [
+   "refused: frozen\n10 true"
+  ]
+ },
+ "ts_immutability-pitfall1-right": {
+  "hash": "d4a0c97d2b375538f144",
+  "outputs": [
+   "original done: false"
+  ]
+ },
+ "ts_immutability-pitfall1-wrong": {
+  "hash": "5ef5bebc32f328c4049a",
+  "outputs": [
+   "original done: true"
+  ]
+ },
+ "ts_immutability-pitfall2-right": {
+  "hash": "5396104912a880fb6745",
+  "outputs": [
+   "2"
+  ]
+ },
+ "ts_immutability-pitfall2-wrong": {
+  "hash": "2289de83f5e10090f167",
+  "outputs": [
+   "3"
+  ]
+ },
+ "ts_immutability-pitfall3-right": {
+  "hash": "bc9c045b4d36895e8d20",
+  "outputs": [
+   "localhost"
+  ]
+ },
+ "ts_immutability-pitfall3-wrong": {
+  "hash": "c7cc6791d0c90435e212",
+  "outputs": [
+   "prod-db"
+  ]
+ },
  "ts_index_signatures-count": {
   "hash": "0992582a0a5dfbf8de58",
   "outputs": [
@@ -3660,6 +4034,92 @@
   "hash": "2fd4a4141bea39a5ea93",
   "outputs": [
    "ana,31,bo,25"
+  ]
+ },
+ "ts_modules-error1": {
+  "hash": "473a61d0b34af7d85878",
+  "diagnostics": [
+   {
+    "code": 2307,
+    "line": 1,
+    "msg": "Cannot find module './math' or its corresponding type declarations."
+   }
+  ]
+ },
+ "ts_modules-error2": {
+  "hash": "d48c2bc2f2f0a3c1f89c",
+  "diagnostics": [
+   {
+    "code": 2305,
+    "line": 1,
+    "msg": "Module '\"fs\"' has no exported member 'readFile'."
+   }
+  ]
+ },
+ "ts_modules-example1": {
+  "hash": "91d7c17cc1d3f875b7fe",
+  "outputs": [
+   "\"\" function"
+  ]
+ },
+ "ts_modules-example2": {
+  "hash": "d578bef08b37ca3bbcfe",
+  "outputs": [
+   "readFileSync,writeFileSync"
+  ]
+ },
+ "ts_modules-example3": {
+  "hash": "72b84bfb4b55b3768cc6",
+  "outputs": [
+   "function function"
+  ]
+ },
+ "ts_modules-pitfall1-right": {
+  "hash": "608fd8b01f910780714e",
+  "outputs": [
+   "function"
+  ]
+ },
+ "ts_modules-pitfall1-wrong": {
+  "hash": "05aa4fcf1ccc83fde378",
+  "diagnostics": [
+   {
+    "code": 2339,
+    "line": 2,
+    "msg": "Property 'readFileSync' does not exist on type 'Promise<{ default: typeof import(\"fs\"); readFileSync(target: string | number, encoding: \"utf8\" | \"utf-8\"): string; readFileSync(target: string | number, options: { encoding: \"utf8\" | \"utf-8\"; flag?: string | undefined; }): string; writeFileSync(target: string | number, data: string, encoding?: \"utf8\" | ... 1 more .....'."
+   }
+  ]
+ },
+ "ts_modules-pitfall2-right": {
+  "hash": "e5252b507cbd7de89b4e",
+  "outputs": [
+   "function"
+  ]
+ },
+ "ts_modules-pitfall2-wrong": {
+  "hash": "1f0ce145755006201eb9",
+  "diagnostics": [
+   {
+    "code": 2591,
+    "line": 1,
+    "msg": "Cannot find name 'require'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig."
+   }
+  ]
+ },
+ "ts_modules-pitfall3-right": {
+  "hash": "25016d7a5152c9d768d7",
+  "outputs": [
+   "mocked function"
+  ]
+ },
+ "ts_modules-pitfall3-wrong": {
+  "hash": "96389a4ce0f01daa3c14",
+  "diagnostics": [
+   {
+    "code": 2540,
+    "line": 2,
+    "msg": "Cannot assign to 'readFileSync' because it is a read-only property."
+   }
   ]
  },
  "ts_narrowing-error1": {
@@ -5026,6 +5486,88 @@
    "ink $2.00 []"
   ]
  },
+ "ts_satisfies-error1": {
+  "hash": "e385641b6ad9cee76125",
+  "diagnostics": [
+   {
+    "code": 2322,
+    "line": 1,
+    "msg": "Type 'string' is not assignable to type 'number'."
+   }
+  ]
+ },
+ "ts_satisfies-error2": {
+  "hash": "625260416e762d3ba1f8",
+  "diagnostics": [
+   {
+    "code": 1360,
+    "line": 1,
+    "msg": "Type 'number' does not satisfy the expected type 'string'."
+   }
+  ]
+ },
+ "ts_satisfies-example1": {
+  "hash": "d3ff7ec0fd2a684667a6",
+  "outputs": [
+   "settings,billing"
+  ]
+ },
+ "ts_satisfies-example2": {
+  "hash": "7f1ff2684bb5062aa3cd",
+  "outputs": [
+   "20 150"
+  ]
+ },
+ "ts_satisfies-example3": {
+  "hash": "ab1496bad68e11e1e622",
+  "outputs": [
+   "Done / To do"
+  ]
+ },
+ "ts_satisfies-pitfall1-right": {
+  "hash": "dafd887ace103a0e389b",
+  "diagnostics": [
+   {
+    "code": 2551,
+    "line": 2,
+    "msg": "Property 'hme' does not exist on type '{ home: string; about: string; }'. Did you mean 'home'?"
+   }
+  ]
+ },
+ "ts_satisfies-pitfall1-wrong": {
+  "hash": "990664f4509cf608d84e",
+  "outputs": [
+   "go to undefined"
+  ]
+ },
+ "ts_satisfies-pitfall2-right": {
+  "hash": "54e25f458381db857215",
+  "outputs": [
+   "light"
+  ]
+ },
+ "ts_satisfies-pitfall2-wrong": {
+  "hash": "18bf98f3e2c4fd7cde26",
+  "diagnostics": [
+   {
+    "code": 2322,
+    "line": 2,
+    "msg": "Type '\"light\"' is not assignable to type '\"dark\"'."
+   }
+  ]
+ },
+ "ts_satisfies-pitfall3-right": {
+  "hash": "7aa4e07824877c16ce83",
+  "outputs": [
+   "4"
+  ]
+ },
+ "ts_satisfies-pitfall3-wrong": {
+  "hash": "b61c719ec20b02b75f5a",
+  "outputs": [
+   "31"
+  ]
+ },
  "ts_set_algebra-both": {
   "hash": "ab2e6a9e29c70073bb56",
   "outputs": [
@@ -5273,6 +5815,88 @@
    "Cherry,apple,banana"
   ]
  },
+ "ts_structural_typing-error1": {
+  "hash": "98c895106c13aba18ca8",
+  "diagnostics": [
+   {
+    "code": 2353,
+    "line": 2,
+    "msg": "Object literal may only specify known properties, and 'z' does not exist in type 'Point'."
+   }
+  ]
+ },
+ "ts_structural_typing-error2": {
+  "hash": "446287f7725ad7055960",
+  "diagnostics": [
+   {
+    "code": 2741,
+    "line": 2,
+    "msg": "Property 'y' is missing in type '{ x: number; }' but required in type 'Point'."
+   }
+  ]
+ },
+ "ts_structural_typing-example1": {
+  "hash": "2c3853bcb5e8483a617b",
+  "outputs": [
+   "5 5"
+  ]
+ },
+ "ts_structural_typing-example2": {
+  "hash": "7314bf7d2ecfd22d8f5b",
+  "outputs": [
+   "length 5 | length 3 | length 7"
+  ]
+ },
+ "ts_structural_typing-example3": {
+  "hash": "a6055c7789ddea47170d",
+  "outputs": [
+   "40 false true"
+  ]
+ },
+ "ts_structural_typing-pitfall1-right": {
+  "hash": "103fe051202301f8eaae",
+  "outputs": [
+   "21.1"
+  ]
+ },
+ "ts_structural_typing-pitfall1-wrong": {
+  "hash": "c869b1f0aa36faa0c6eb",
+  "outputs": [
+   "-6.1"
+  ]
+ },
+ "ts_structural_typing-pitfall2-right": {
+  "hash": "4cebf6d0f1c398c734a1",
+  "diagnostics": [
+   {
+    "code": 2559,
+    "line": 7,
+    "msg": "Type '42' has no properties in common with type 'Options'."
+   }
+  ]
+ },
+ "ts_structural_typing-pitfall2-wrong": {
+  "hash": "302223f3000a3734e4fc",
+  "outputs": [
+   "configured with 42"
+  ]
+ },
+ "ts_structural_typing-pitfall3-right": {
+  "hash": "4c79c0e973585cffec9d",
+  "outputs": [
+   "10"
+  ]
+ },
+ "ts_structural_typing-pitfall3-wrong": {
+  "hash": "695dea0e0cefc759f218",
+  "diagnostics": [
+   {
+    "code": 2345,
+    "line": 11,
+    "msg": "Argument of type '{ deposit: (n: number) => number; }' is not assignable to parameter of type 'Account'.   Property '#balance' is missing in type '{ deposit: (n: number) => number; }' but required in type 'Account'."
+   }
+  ]
+ },
  "ts_top_bottom-error1": {
   "hash": "641d4b09de1f1c2db64a",
   "diagnostics": [
@@ -5364,6 +5988,85 @@
   "hash": "137cbb8c7e69bd71c777",
   "outputs": [
    "crashed: TypeError"
+  ]
+ },
+ "ts_tsconfig-error1": {
+  "hash": "c3e1381f0825a93131f2",
+  "diagnostics": [
+   {
+    "code": 2532,
+    "line": 2,
+    "msg": "Object is possibly 'undefined'."
+   }
+  ]
+ },
+ "ts_tsconfig-error2": {
+  "hash": "43487ed2ec481f0d58de",
+  "diagnostics": [
+   {
+    "code": 7031,
+    "line": 1,
+    "msg": "Binding element 'name' implicitly has an 'any' type."
+   },
+   {
+    "code": 7031,
+    "line": 1,
+    "msg": "Binding element 'age' implicitly has an 'any' type."
+   }
+  ]
+ },
+ "ts_tsconfig-example1": {
+  "hash": "423591369f481d0d485d",
+  "outputs": [
+   "name 0: ANA\nname 1: BO\nno name at 5"
+  ]
+ },
+ "ts_tsconfig-example2": {
+  "hash": "aec30a1fd697c52d1428",
+  "outputs": [
+   "false true\n{} {}"
+  ]
+ },
+ "ts_tsconfig-example3": {
+  "hash": "42280f69321f47d4c528",
+  "outputs": [
+   "6"
+  ]
+ },
+ "ts_tsconfig-pitfall1-right": {
+  "hash": "ff0599a19bd3f3a9a3d9",
+  "outputs": [
+   "average of present: 81"
+  ]
+ },
+ "ts_tsconfig-pitfall1-wrong": {
+  "hash": "bccf9690d55a8288ac09",
+  "outputs": [
+   "average with third: NaN"
+  ]
+ },
+ "ts_tsconfig-pitfall2-right": {
+  "hash": "47f581402812162b37f1",
+  "outputs": [
+   "6"
+  ]
+ },
+ "ts_tsconfig-pitfall2-wrong": {
+  "hash": "226f016eaddcb9baee82",
+  "outputs": [
+   "51"
+  ]
+ },
+ "ts_tsconfig-pitfall3-right": {
+  "hash": "15765ee2d187b7753c84",
+  "outputs": [
+   "default theme"
+  ]
+ },
+ "ts_tsconfig-pitfall3-wrong": {
+  "hash": "e95ef0526e80f79b2165",
+  "outputs": [
+   "theme is undefined"
   ]
  },
  "ts_tuples-divmod": {
@@ -6029,6 +6732,80 @@
     "line": 6,
     "msg": "Argument of type 'string' is not assignable to parameter of type 'Theme'."
    }
+  ]
+ },
+ "ts_utility_types-error1": {
+  "hash": "0e6fe2d25bfaea843b6b",
+  "diagnostics": [
+   {
+    "code": 2344,
+    "line": 2,
+    "msg": "Type '\"id\" | \"titel\"' does not satisfy the constraint 'keyof Task'.   Type '\"titel\"' is not assignable to type 'keyof Task'. Did you mean '\"title\"'?"
+   }
+  ]
+ },
+ "ts_utility_types-error2": {
+  "hash": "dc195924eeeb2d4d6d81",
+  "diagnostics": [
+   {
+    "code": 2741,
+    "line": 2,
+    "msg": "Property 'height' is missing in type '{ width: number; }' but required in type 'Required<Options>'."
+   }
+  ]
+ },
+ "ts_utility_types-example1": {
+  "hash": "761e679cfdf545dad8d5",
+  "outputs": [
+   "{\"id\":1,\"title\":\"write\",\"done\":true,\"priority\":\"high\"}"
+  ]
+ },
+ "ts_utility_types-example2": {
+  "hash": "f213b849a0edc8d1fd8d",
+  "outputs": [
+   "{\"food\":20,\"rent\":0,\"fun\":30}"
+  ]
+ },
+ "ts_utility_types-example3": {
+  "hash": "d28584eb545f7098774b",
+  "outputs": [
+   "name,age,createdAt"
+  ]
+ },
+ "ts_utility_types-pitfall1-right": {
+  "hash": "81e32693403ec12bb51f",
+  "outputs": [
+   "hi there"
+  ]
+ },
+ "ts_utility_types-pitfall1-wrong": {
+  "hash": "6079259e0503b1b21faf",
+  "outputs": [
+   "hi undefined"
+  ]
+ },
+ "ts_utility_types-pitfall2-right": {
+  "hash": "9f8ed676251e86f7e370",
+  "outputs": [
+   "2"
+  ]
+ },
+ "ts_utility_types-pitfall2-wrong": {
+  "hash": "e78a511f528311ccf5a8",
+  "outputs": [
+   "NaN"
+  ]
+ },
+ "ts_utility_types-pitfall3-right": {
+  "hash": "28b68135d9d62d9578d2",
+  "outputs": [
+   "retries: 3"
+  ]
+ },
+ "ts_utility_types-pitfall3-wrong": {
+  "hash": "334111a7e346f10a28c3",
+  "outputs": [
+   "retries: undefined"
   ]
  },
  "ts_variables-error1": {
