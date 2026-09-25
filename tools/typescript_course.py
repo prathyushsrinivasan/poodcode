@@ -483,6 +483,7 @@ _WEEK_FILES = (
     "ts_w25_recursion.py",     # Month 7 — recursion & backtracking
     "ts_w26_dp.py",            #          dynamic programming
     "ts_w27_graphs.py",        #          graphs: BFS & DFS
+    "ts_w28_heaps.py",         #          heaps & intervals
 )
 
 for _week_file in _WEEK_FILES:
@@ -548,8 +549,6 @@ for _week_file in _WEEK_FILES:
 # so it is worth writing the milestone before the lessons.
 # ===========================================================================
 _WEEKS += [
-    _skel(28, 7, _M7, "Heaps & Intervals",
-          "Use priority queues and interval techniques on classic problems."),
 ]
 _WEEKS += [
     _skel(29, 8, _M8, "Conditional & Mapped Types",

@@ -1,7 +1,7 @@
-# TypeScript Roadmap — Weeks 28-32
+# TypeScript Roadmap — Weeks 29-32
 
 The plan for finishing **TypeScript: Zero to Interview**, the 8-month course in
-`tools/typescript_course.py`. Weeks 1-27 ship; weeks 28-32 are one-line
+`tools/typescript_course.py`. Weeks 1-28 ship; weeks 29-32 are one-line
 skeletons waiting to be authored.
 
 Unlike [`JAVA_ROADMAP.md`](JAVA_ROADMAP.md), which starts after the basics, this
@@ -15,10 +15,10 @@ rule that nothing may require syntax a later week teaches.
 
 ## Where it stands
 
-**Built:** weeks 1-27 — **209 lessons, 1,523 judged exercises** (1,508 in lessons
+**Built:** weeks 1-28 — **216 lessons, 1,557 judged exercises** (1,542 in lessons
 and capstones, 15 in week 1's practice families), twenty Budget Buddy capstones —
-**the arc is complete** — seven interview reps, and a full
-glossary/cheat-sheet/self-check/review set per week. **Month 6 is finished.**
+**the arc is complete** — eight interview reps, and a full
+glossary/cheat-sheet/self-check/review set per week. **Months 6 and 7 are finished.**
 
 | | |
 |---|---|
@@ -82,7 +82,7 @@ verifier revealed which kind they were.
 ### Nothing is half-finished
 
 Every authored week is complete: lessons, exercises, capstone, stretch, glossary,
-cheat sheet, self-check, review, milestone. Weeks 28-32 are untouched skeletons, as
+cheat sheet, self-check, review, milestone. Weeks 29-32 are untouched skeletons, as
 they were before. There is no partially-authored week and no disabled exercise.
 
 ### Five traps that cost real time
@@ -801,7 +801,7 @@ to keep its ties.
 **One new scope rule**: `.toSorted(` gated at 24. Week 13's lesson prose mentions it
 in passing; no program before this week calls it.
 
-### Month 7 — DSA Interview Core (weeks 25-28) — 🚧 **25-27 done**
+### Month 7 — DSA Interview Core (weeks 25-28) — ✅ **done**
 
 **25. Recursion & Backtracking** ✅ · `tools/ts_w25_recursion.py` · 7 lessons,
 46 exercises
@@ -942,9 +942,48 @@ replaced because it did not do what the brief claimed of it; its output was take
 from the reference, as was every other number. Two `fix` prompts misquoted their
 starters' output and were corrected from real runs.
 
-**28. Heaps & Intervals** ⬜
-Standard interview ground. Heaps need a generic priority queue class — another
-dependency on week 11.
+**28. Heaps & Intervals** ✅ · `tools/ts_w28_heaps.py` · 7 lessons, 34 exercises —
+**closes Month 7**
+`w28-shape` · `w28-class` · `w28-uses` · `w28-merge` · `w28-rooms` · `w28-greedy` ·
+`w28-review`.
+*Capstone:* **interview rep #28** — the scheduler: merged busy blocks, rooms needed
+(a min-heap of end times), and the most meetings one person can attend (the
+earliest-end greedy), on one dataset. The back-to-back test is where the three
+questions deliberately treat touching meetings differently. Stretch: the running
+median with two heaps.
+Kinds: 25 drill, 6 fix, 1 diagnose.
+
+**It opens on week 27's cost**, as planned there: Dijkstra's "smallest item,
+repeatedly, as items arrive" was a counted O(V) scan, and the heap is the answer —
+the weeks 18 → 19 move again. Lesson 3 then runs Dijkstra with the heap and **lazy
+deletion**.
+
+**The generic class the roadmap called for** — `MinHeap<T>` with a comparator — obeys
+trap 1: **no parameter properties**, every field declared the long way, and lesson 2
+says why in the prose rather than leaving it to a footnote. It also needs no `!`
+anywhere: comparisons go through a private `less(i, j)` that treats a missing slot as
+"not less", which is the week's answer to "a generic `T` has no default to fall back
+to". Max-heaps are the same class with `(a, b) => b - a`.
+
+**Determinism was designed in, not patched.** A heap is not stable, so every exercise
+that pops records breaks ties in its comparator (by name) — two correct heaps then
+produce the same output. Intervals are half-open `[start, end)` throughout, and the
+one place touching blocks merge (busy time) says so in the brief.
+
+**Silent bugs as fixes:** sift-down into the larger child; top-k with a max-heap
+(keeps the three *smallest*); a merge that takes the newcomer's end (a block with an
+interval inside it shrinks); merging unsorted input (which prints only `8-10` for
+`8-10 1-3 2-6` — both earlier intervals are swallowed into the first block); the
+sweep-line tie with starts before ends (two rooms for back-to-back meetings); and
+the interval greedy sorted by start.
+
+**Greedy, proved rather than asserted.** Lesson 6 gives the exchange argument for
+"earliest end first", and an exercise runs three greedy rules side by side on two
+counter-examples — the way to reject a greedy rule, contrasted with week 26's coin
+change where no such argument exists.
+
+All 34 expected outputs were right first time; three `fix` prompts misquoted their
+starters' output and were corrected from real runs.
 
 ### Month 8 — Advanced Types & Interview Polish (weeks 29-32)
 
@@ -988,8 +1027,8 @@ still go first.
 | **C** ✅ | 13-16 | Types, then the project-shaped week: modules, tsconfig, .d.ts |
 | **D** ✅ | 17-20 | Async + data structures; the Budget Buddy arc is closed |
 | **E** ✅ | 21-24 | Algorithmic thinking; the month's idiom is to count operations |
-| **F** 🚧 | 25-27 ✅, **28** ← next | DSA core |
-| **G** | 29-32 | Type-level; lowest risk, highest polish |
+| **F** ✅ | 25-28 | DSA core |
+| **G** ← next | 29-32 | Type-level; lowest risk, highest polish |
 
 **Batches C and D are done, and with them every risk the back half was waiting
 on**: the one-file module problem (settled with evidence — week 16), async
