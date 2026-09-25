@@ -16974,6 +16974,39 @@
             "explanation": "Type-only exports and imports exist only for the compiler."
           },
           {
+            "question": "Under `noUncheckedIndexedAccess`, what is `const [first] = xs` typed as for `xs: string[]`?",
+            "options": [
+              "`string | undefined`",
+              "`string`",
+              "`[string]`",
+              "`never`"
+            ],
+            "answer": 0,
+            "explanation": "Destructuring reads an index, so the flag adds `undefined` (a tuple's fixed positions are exempt)."
+          },
+          {
+            "question": "What does `exactOptionalPropertyTypes` forbid?",
+            "options": [
+              "Assigning `undefined` explicitly to an optional property not typed `| undefined`",
+              "Optional properties entirely",
+              "Missing properties",
+              "`null` values"
+            ],
+            "answer": 0,
+            "explanation": "It separates \"absent\" from \"present but undefined\"."
+          },
+          {
+            "question": "`moduleResolution: bundler` vs `nodenext` — which fits a Node app without a bundler?",
+            "options": [
+              "`nodenext`",
+              "`bundler`",
+              "`classic`",
+              "`node10`"
+            ],
+            "answer": 0,
+            "explanation": "`nodenext` follows Node's own rules (file extensions, `exports`); `bundler` mirrors how bundlers resolve."
+          },
+          {
             "question": "What does `strictNullChecks` change about the meaning of `string`?",
             "options": [
               "With it on, `string` excludes null and undefined — absence must be written explicitly",
@@ -17969,6 +18002,204 @@
             "explanation": "`as const` freezes the literal types; `satisfies` validates them without widening."
           },
           {
+            "question": "What does `x as unknown as T` do?",
+            "options": [
+              "Forces any conversion past the compiler — a double assertion with no check",
+              "Converts `x` safely",
+              "Validates `x` at runtime",
+              "Is a syntax error"
+            ],
+            "answer": 0,
+            "explanation": "It exists for genuine escape hatches; treat it as a code-review red flag."
+          },
+          {
+            "question": "When is `as` reasonable?",
+            "options": [
+              "When you know something the compiler can't — and you've checked it, or it's a well-understood API",
+              "Whenever the compiler complains",
+              "To convert strings to numbers",
+              "Never"
+            ],
+            "answer": 0,
+            "explanation": "`as` is a claim. Prefer narrowing or validation when a check is possible."
+          },
+          {
+            "question": "What does `satisfies` check against a union target like `\"a\" | \"b\"`?",
+            "options": [
+              "That the value is one of the members, keeping the literal type",
+              "Nothing",
+              "That it's a string",
+              "That it's both"
+            ],
+            "answer": 0,
+            "explanation": "`const x = \"a\" satisfies \"a\" | \"b\"` is typed `\"a\"`."
+          },
+          {
+            "question": "Do excess-property checks apply to a variable passed to a function?",
+            "options": [
+              "No — only to fresh object literals",
+              "Yes, always",
+              "Only in strict mode",
+              "Only for classes"
+            ],
+            "answer": 0,
+            "explanation": "Structural typing admits objects with extra properties once they're in a variable."
+          },
+          {
+            "question": "Why does TypeScript use structural rather than nominal typing?",
+            "options": [
+              "JavaScript code routinely uses plain objects of the right shape, not declared classes",
+              "It's faster to check",
+              "It prevents all bugs",
+              "Classes don't exist in JavaScript"
+            ],
+            "answer": 0,
+            "explanation": "Typing \"duck typing\" is the whole point."
+          },
+          {
+            "question": "A function takes `{ name: string }`. Can you pass a `Date` with a `name` property added?",
+            "options": [
+              "Yes, if it has a string `name`",
+              "No, Date isn't an object type",
+              "Only with `as`",
+              "Only if `name` is readonly"
+            ],
+            "answer": 0,
+            "explanation": "Only the required members matter."
+          },
+          {
+            "question": "Is a `readonly` property assignable to a mutable one of the same type?",
+            "options": [
+              "Yes — `readonly` doesn't affect assignability",
+              "No",
+              "Only for arrays",
+              "Only with `as`"
+            ],
+            "answer": 0,
+            "explanation": "That's why a readonly view isn't a guarantee someone else can't mutate the object."
+          },
+          {
+            "question": "Is `readonly string[]` assignable to `string[]`?",
+            "options": [
+              "No — the mutable type has methods the readonly one lacks",
+              "Yes",
+              "Only for tuples",
+              "Only with `satisfies`"
+            ],
+            "answer": 0,
+            "explanation": "Array readonly-ness *is* checked, because `push` and friends differ."
+          },
+          {
+            "question": "What does `in out T` declare?",
+            "options": [
+              "`T` is invariant — both consumed and produced",
+              "`T` is optional",
+              "`T` is exported",
+              "`T` is readonly"
+            ],
+            "answer": 0,
+            "explanation": "Variance annotations: `out` covariant, `in` contravariant, both invariant."
+          },
+          {
+            "question": "Why is a callback parameter typed `(x: Animal) => void` more flexible for callers?",
+            "options": [
+              "It accepts any animal, so it fits slots expecting handlers for dogs, cats, …",
+              "It's faster",
+              "It can return anything",
+              "It's not"
+            ],
+            "answer": 0,
+            "explanation": "Contravariance: a handler of the supertype works wherever a handler of a subtype is needed."
+          },
+          {
+            "question": "What is `const el = document as any` in a codebase a sign of?",
+            "options": [
+              "Type checking turned off at that point — every use of `el` is unchecked",
+              "Good practice",
+              "A performance fix",
+              "Required for DOM access"
+            ],
+            "answer": 0,
+            "explanation": "`any` spreads: anything derived from it is `any` too."
+          },
+          {
+            "question": "What does `satisfies` do to the variable's declared type?",
+            "options": [
+              "Nothing — the variable keeps its inferred type",
+              "Replaces it with the target",
+              "Makes it readonly",
+              "Widens it"
+            ],
+            "answer": 0,
+            "explanation": "It checks, it doesn't annotate."
+          },
+          {
+            "question": "Which reports a missing property in a literal: annotation, `satisfies`, or `as`?",
+            "options": [
+              "Annotation and `satisfies`, but not `as`",
+              "Only `as`",
+              "All three",
+              "None"
+            ],
+            "answer": 0,
+            "explanation": "`as` only requires the two types to overlap, so a literal missing a required property is accepted."
+          },
+          {
+            "question": "Can you assign `{ x: 1 }` to `{ x: number; y?: number }`?",
+            "options": [
+              "Yes — optional properties may be absent",
+              "No",
+              "Only with `as`",
+              "Only if `y` is readonly"
+            ],
+            "answer": 0,
+            "explanation": "Optional means \"may be missing\"."
+          },
+          {
+            "question": "How does TypeScript compare two function types' return types?",
+            "options": [
+              "Covariantly — the source's return must be assignable to the target's",
+              "Contravariantly",
+              "Bivariantly",
+              "It ignores them"
+            ],
+            "answer": 0,
+            "explanation": "A function returning `Dog` fits a slot expecting a function returning `Animal`."
+          },
+          {
+            "question": "Why is `interface` method syntax `m(x: T): void` looser than `m: (x: T) => void`?",
+            "options": [
+              "Method parameters are checked bivariantly for compatibility",
+              "It isn't",
+              "Methods can't be typed",
+              "Properties are optional"
+            ],
+            "answer": 0,
+            "explanation": "Prefer property syntax for callback members you want checked strictly."
+          },
+          {
+            "question": "What is the risk of `JSON.parse(text) satisfies User`?",
+            "options": [
+              "It compiles and checks nothing — `JSON.parse` returns `any`, which satisfies every type",
+              "It validates the JSON",
+              "It throws on bad JSON",
+              "It converts the JSON"
+            ],
+            "answer": 0,
+            "explanation": "`satisfies` is compile-time only; untrusted data needs a runtime check."
+          },
+          {
+            "question": "What makes `private` members affect assignability?",
+            "options": [
+              "A class with a private member is compatible only with instances of that same class declaration",
+              "Nothing",
+              "They're erased",
+              "Only `#private` affects it"
+            ],
+            "answer": 0,
+            "explanation": "The one nominal corner of TypeScript's class types."
+          },
+          {
             "question": "What does `satisfies` do that a type annotation does not?",
             "options": [
               "It validates the value against the type while keeping the value's own narrower inferred type",
@@ -18905,6 +19136,204 @@
             "explanation": "`as const` applies recursively to the whole literal expression (unlike `Readonly<T>`)."
           },
           {
+            "question": "What is the smallest brand you can write?",
+            "options": [
+              "`type Email = string & { readonly __brand: \"Email\" }`",
+              "`type Email = string`",
+              "`class Email extends String {}`",
+              "`enum Email {}`"
+            ],
+            "answer": 0,
+            "explanation": "The phantom property only exists in the type; a `unique symbol` key makes it unforgeable outside the module."
+          },
+          {
+            "question": "Does a branded `Cents` still support arithmetic?",
+            "options": [
+              "Yes, but the result is a plain `number` — re-brand it through a function",
+              "No",
+              "Yes, and the result stays `Cents`",
+              "Only addition"
+            ],
+            "answer": 0,
+            "explanation": "`a + b` on two `Cents` gives `number`; wrap arithmetic in helpers that return `Cents`."
+          },
+          {
+            "question": "What does `ReadonlyArray<T>` lack compared with `T[]`?",
+            "options": [
+              "Every mutating method — `push`, `pop`, `splice`, `sort`, index assignment",
+              "`map` and `filter`",
+              "`length`",
+              "Iteration"
+            ],
+            "answer": 0,
+            "explanation": "Non-mutating methods (`map`, `slice`, `toSorted`) are all still there."
+          },
+          {
+            "question": "What does `Readonly<T>` do to nested objects?",
+            "options": [
+              "Nothing — it's shallow",
+              "Freezes them",
+              "Makes them readonly too",
+              "Removes them"
+            ],
+            "answer": 0,
+            "explanation": "A `DeepReadonly` needs a recursive mapped type (week 20)."
+          },
+          {
+            "question": "What does `Object.freeze` return, typed?",
+            "options": [
+              "`Readonly<T>` (and `readonly T[]` for arrays)",
+              "`T`",
+              "`void`",
+              "`frozen T`"
+            ],
+            "answer": 0,
+            "explanation": "The type reflects the shallow freeze."
+          },
+          {
+            "question": "In strict mode, what happens on assigning to a frozen object's property?",
+            "options": [
+              "A TypeError is thrown",
+              "It's silently ignored",
+              "The property is updated",
+              "A warning"
+            ],
+            "answer": 0,
+            "explanation": "Modules are strict, so the failure is loud. In sloppy scripts it's silent."
+          },
+          {
+            "question": "How do you sort an array without mutating it?",
+            "options": [
+              "`xs.toSorted(compare)`",
+              "`xs.sort(compare)`",
+              "`sorted(xs)`",
+              "`xs.sorted()`"
+            ],
+            "answer": 0,
+            "explanation": "Or `[...xs].sort(compare)` before ES2023."
+          },
+          {
+            "question": "Why is aliasing a common source of mutation bugs?",
+            "options": [
+              "Two variables refer to the same object, so a change through one is seen through the other",
+              "It creates copies",
+              "It's a TypeScript feature",
+              "It slows programs"
+            ],
+            "answer": 0,
+            "explanation": "Immutable updates avoid the question entirely."
+          },
+          {
+            "question": "What does `{ ...state, user: { ...state.user, name } }` do?",
+            "options": [
+              "Copies the path to the change and shares everything else",
+              "Deep-copies the whole state",
+              "Mutates `state.user`",
+              "Replaces the state with `user`"
+            ],
+            "answer": 0,
+            "explanation": "Structural sharing: new objects only where something changed."
+          },
+          {
+            "question": "A smart constructor returns `Email | undefined`. What should the caller do with `undefined`?",
+            "options": [
+              "Handle the invalid case explicitly — report or reject it",
+              "Cast it to `Email`",
+              "Ignore it",
+              "Retry until it works"
+            ],
+            "answer": 0,
+            "explanation": "The type forces the decision to be made, which is the point."
+          },
+          {
+            "question": "Why not validate an email with a `boolean` function?",
+            "options": [
+              "The knowledge is thrown away; later code can't tell a checked string from an unchecked one",
+              "Booleans are slow",
+              "Regexes don't return booleans",
+              "It's fine"
+            ],
+            "answer": 0,
+            "explanation": "Parse into a branded type instead."
+          },
+          {
+            "question": "Does `const` make an array immutable?",
+            "options": [
+              "No — it prevents rebinding; `push` still works",
+              "Yes",
+              "Only for primitives",
+              "Only with `as const`"
+            ],
+            "answer": 0,
+            "explanation": "Use `readonly` types (or `as const` for literals)."
+          },
+          {
+            "question": "What does `as const` on an array literal make it?",
+            "options": [
+              "A readonly tuple of literal types",
+              "A frozen array",
+              "A mutable array",
+              "A Set"
+            ],
+            "answer": 0,
+            "explanation": "Types only — nothing is frozen at runtime."
+          },
+          {
+            "question": "What's the cost of a brand compared with a wrapper class?",
+            "options": [
+              "Zero runtime cost; a wrapper allocates an object and needs unwrapping",
+              "Brands are slower",
+              "They're identical",
+              "Brands need a library"
+            ],
+            "answer": 0,
+            "explanation": "Brands are erased; the value is still a plain string or number."
+          },
+          {
+            "question": "Can two brands with the same symbol-less `__brand` string be confused?",
+            "options": [
+              "Yes — `{ __brand: \"Id\" }` in two modules is the same type",
+              "No, never",
+              "Only at runtime",
+              "Only for numbers"
+            ],
+            "answer": 0,
+            "explanation": "A module-private `unique symbol` avoids accidental collisions."
+          },
+          {
+            "question": "Which update to `const arr: readonly number[]` compiles?",
+            "options": [
+              "`const next = [...arr, 4];`",
+              "`arr.push(4)`",
+              "`arr[0] = 4`",
+              "`arr.length = 0`"
+            ],
+            "answer": 0,
+            "explanation": "Build a new array."
+          },
+          {
+            "question": "What is persistent data structure sharing good for?",
+            "options": [
+              "Cheap copies: undo/redo, time travel and snapshots without copying everything",
+              "Faster mutation",
+              "Smaller types",
+              "Avoiding garbage collection"
+            ],
+            "answer": 0,
+            "explanation": "Each version shares unchanged parts with the previous one."
+          },
+          {
+            "question": "Why validate at the boundary rather than in every function?",
+            "options": [
+              "Inside the boundary, precise types carry the guarantee; checking again is noise and drift",
+              "Boundaries are faster",
+              "Types can't be trusted inside",
+              "Functions can't validate"
+            ],
+            "answer": 0,
+            "explanation": "Parse once, then trust."
+          },
+          {
             "question": "Why should the constructor function be the ONLY place that writes `as UserId`?",
             "options": [
               "It concentrates the unchecked assertion in one validated spot, so the type genuinely implies the invariant",
@@ -19806,6 +20235,204 @@
             ],
             "answer": 0,
             "explanation": "No value is both a number and a string, so the property's type is `never`."
+          },
+          {
+            "question": "What is `Omit<{ a: 1; b: 2 }, \"c\">`?",
+            "options": [
+              "`{ a: 1; b: 2 }` — `Omit` accepts keys that don't exist",
+              "A compile error",
+              "`{}`",
+              "`never`"
+            ],
+            "answer": 0,
+            "explanation": "`Omit`'s key parameter is unconstrained, so a typo silently does nothing. `Pick` would reject it."
+          },
+          {
+            "question": "Why does `Pick<T, \"typo\">` fail while `Omit<T, \"typo\">` compiles?",
+            "options": [
+              "`Pick` constrains keys to `keyof T`; `Omit` takes any key",
+              "`Omit` is newer",
+              "`Pick` is stricter about values",
+              "It's a bug"
+            ],
+            "answer": 0,
+            "explanation": "Wrap it in your own `StrictOmit<T, K extends keyof T>` if you want the check."
+          },
+          {
+            "question": "What does `ReturnType<typeof f>` require?",
+            "options": [
+              "`typeof` — `f` is a value, and utilities take types",
+              "Nothing",
+              "A generic",
+              "`as const`"
+            ],
+            "answer": 0,
+            "explanation": "`ReturnType<f>` is an error."
+          },
+          {
+            "question": "What is `Parameters<typeof f>[0]`?",
+            "options": [
+              "The type of `f`'s first parameter",
+              "`f`'s first argument value",
+              "The number of parameters",
+              "`unknown`"
+            ],
+            "answer": 0,
+            "explanation": "An indexed access on the parameter tuple."
+          },
+          {
+            "question": "What does `Readonly<Pick<User, \"id\" | \"name\">>` produce?",
+            "options": [
+              "A type with just `id` and `name`, both readonly",
+              "All of `User`, readonly",
+              "An error",
+              "A mutable pick"
+            ],
+            "answer": 0,
+            "explanation": "Utilities compose."
+          },
+          {
+            "question": "What does `NoInfer<T>` (TS 5.4) do in a signature?",
+            "options": [
+              "Stops that position from contributing to inferring `T`",
+              "Makes `T` optional",
+              "Disables checks",
+              "Requires an explicit type argument"
+            ],
+            "answer": 0,
+            "explanation": "Useful for defaults and fallbacks."
+          },
+          {
+            "question": "What is composition over inheritance, in types?",
+            "options": [
+              "Building types by combining smaller ones (`&`, `Pick`, mapped types) instead of deep `extends` chains",
+              "Using classes everywhere",
+              "Never using interfaces",
+              "Using `any`"
+            ],
+            "answer": 0,
+            "explanation": "Small pieces are easier to reuse and to change."
+          },
+          {
+            "question": "What's a risk of `Partial<T>` as a function parameter everywhere?",
+            "options": [
+              "Required data can go missing without the compiler noticing",
+              "It's slow",
+              "It removes methods",
+              "It makes fields readonly"
+            ],
+            "answer": 0,
+            "explanation": "Use it for patches and options, not for complete records."
+          },
+          {
+            "question": "A `Record<\"a\" | \"b\", number>` literal is missing `b`. Result?",
+            "options": [
+              "A compile error — every key is required",
+              "It's fine",
+              "`b` defaults to 0",
+              "A runtime error"
+            ],
+            "answer": 0,
+            "explanation": "`Record` over a finite union demands every key."
+          },
+          {
+            "question": "What does `Awaited<Promise<Promise<number>>>` give?",
+            "options": [
+              "`number`",
+              "`Promise<number>`",
+              "`Promise<Promise<number>>`",
+              "`unknown`"
+            ],
+            "answer": 0,
+            "explanation": "It unwraps recursively, as `await` does."
+          },
+          {
+            "question": "What does `InstanceType<typeof MyClass>` give?",
+            "options": [
+              "The type of an instance of `MyClass`",
+              "The class itself",
+              "The constructor's parameters",
+              "`object`"
+            ],
+            "answer": 0,
+            "explanation": "Useful when all you have is the class value."
+          },
+          {
+            "question": "What does `ConstructorParameters<typeof Date>` describe?",
+            "options": [
+              "The argument tuples `new Date(…)` accepts",
+              "Date's methods",
+              "Date's instance type",
+              "Nothing"
+            ],
+            "answer": 0,
+            "explanation": "The constructor counterpart of `Parameters`."
+          },
+          {
+            "question": "Where should a validator's schema live relative to the type?",
+            "options": [
+              "The type should be derived from the schema — one source of truth",
+              "Separately, kept in sync by hand",
+              "In a comment",
+              "Only in tests"
+            ],
+            "answer": 0,
+            "explanation": "Two descriptions drift; one can't."
+          },
+          {
+            "question": "What does `Required<T>` do to `x?: number | undefined`?",
+            "options": [
+              "Makes `x` required and removes the `undefined` added by `?`",
+              "Nothing",
+              "Makes it `never`",
+              "Removes the property"
+            ],
+            "answer": 0,
+            "explanation": "It's the `-?` modifier in a mapped type."
+          },
+          {
+            "question": "What is `Extract<\"a\" | \"b\" | \"c\", \"a\" | \"z\">`?",
+            "options": [
+              "`\"a\"`",
+              "`\"a\" | \"z\"`",
+              "`never`",
+              "`\"b\" | \"c\"`"
+            ],
+            "answer": 0,
+            "explanation": "Only members of the first union that fit the second survive."
+          },
+          {
+            "question": "A `TaskPatch = Partial<Omit<Task, \"id\">>` — can a patch change the id?",
+            "options": [
+              "No — `id` isn't in the patch type",
+              "Yes, optionally",
+              "Only to a number",
+              "Only at runtime"
+            ],
+            "answer": 0,
+            "explanation": "Types make the rule part of the API."
+          },
+          {
+            "question": "When is a hand-written type better than a derived one?",
+            "options": [
+              "When it's a deliberate contract that must not change just because the source does",
+              "Never",
+              "Always",
+              "Only for primitives"
+            ],
+            "answer": 0,
+            "explanation": "Public API types are often pinned on purpose."
+          },
+          {
+            "question": "What does spreading a `Partial<Options>` with `{ width: undefined }` into defaults do?",
+            "options": [
+              "Overwrites `width` with `undefined`",
+              "Keeps the default",
+              "Removes `width`",
+              "Throws"
+            ],
+            "answer": 0,
+            "explanation": "Filter out undefined values or use `??` per field."
           },
           {
             "question": "Why derive the type from the schema rather than write both?",
