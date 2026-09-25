@@ -473,6 +473,10 @@ _WEEK_FILES = (
     "ts_w15_nullsafety.py",    #          null-safety & error handling
     "ts_w16_modules.py",       #          modules, tsconfig & declaration files
     "ts_w17_async.py",         # Month 5 — async & promises
+    "ts_w18_stacks.py",        #          stacks & queues
+    "ts_w19_maps.py",          #          maps & sets
+    "ts_w20_nodes.py",         #          linked lists & trees (closes the arc)
+    "ts_w21_bigo.py",          # Month 6 — big-O & complexity
 )
 
 for _week_file in _WEEK_FILES:
@@ -538,16 +542,8 @@ for _week_file in _WEEK_FILES:
 # so it is worth writing the milestone before the lessons.
 # ===========================================================================
 _WEEKS += [
-    _skel(18, 5, _M5, "Stacks & Queues",
-          "Build and use LIFO/FIFO structures and know when each fits."),
-    _skel(19, 5, _M5, "Maps & Sets",
-          "Reach for hash maps and sets to get O(1) lookup and de-duplication."),
-    _skel(20, 5, _M5, "Linked Lists & Trees",
-          "Model data as nodes that point to other nodes."),
 ]
 _WEEKS += [
-    _skel(21, 6, _M6, "Big-O & Complexity",
-          "Reason about the time and space cost of your code."),
     _skel(22, 6, _M6, "Searching & Two Pointers",
           "Binary search a sorted array and sweep it with two pointers."),
     _skel(23, 6, _M6, "Sliding Window & Prefix Sums",
@@ -734,6 +730,13 @@ _SCOPE_RULES = [
     # capstone was written with a `Map` and passed the lint because of exactly
     # that hole; it now uses a `Record` and the hole is closed.
     ("new Map<", 19), ("new Set<", 19),
+    # Week 19's own additions, verified absent from weeks 1-18.
+    ("new WeakMap", 19), ("new WeakSet", 19),
+    ("Object.groupBy(", 19), ("Map.groupBy(", 19),
+    # Week 20: generators and the iterable protocol. `function*` cannot be
+    # gated as `function* ` because the generator METHOD form is `*[Symbol…`,
+    # so both spellings are listed. Verified absent from weeks 1-19.
+    ("function* ", 20), ("yield ", 20), ("Symbol.iterator", 20),
     #
     # DELIBERATELY NOT GATED, because the authored weeks already use them and a
     # rule here would be a false claim about when the course first shows them:

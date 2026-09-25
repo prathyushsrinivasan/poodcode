@@ -1,12 +1,12 @@
-# TypeScript Roadmap — Weeks 18-32
+# TypeScript Roadmap — Weeks 22-32
 
 The plan for finishing **TypeScript: Zero to Interview**, the 8-month course in
-`tools/typescript_course.py`. Weeks 1-17 ship; weeks 18-32 are one-line
+`tools/typescript_course.py`. Weeks 1-21 ship; weeks 22-32 are one-line
 skeletons waiting to be authored.
 
 Unlike [`JAVA_ROADMAP.md`](JAVA_ROADMAP.md), which starts after the basics, this
 course starts at *zero* — week 1 is someone's first line of code. That decision
-is what makes the back half hard: everything in weeks 18-32 must still obey the
+is what makes the back half hard: everything in weeks 22-32 must still obey the
 rule that nothing may require syntax a later week teaches.
 
 **Status legend** — ✅ built and shipping · 🚧 partially built · ⬜ planned.
@@ -15,9 +15,10 @@ rule that nothing may require syntax a later week teaches.
 
 ## Where it stands
 
-**Built:** weeks 1-17 — **136 lessons, 1,025 judged exercises** (1,010 in lessons
-and capstones, 15 in week 1's practice families), seventeen Budget Buddy
-capstones, and a complete glossary/cheat-sheet/self-check/review set per week.
+**Built:** weeks 1-21 — **167 lessons, 1,250 judged exercises** (1,235 in lessons
+and capstones, 15 in week 1's practice families), twenty Budget Buddy capstones —
+**the arc is complete** — the first interview rep, and a full
+glossary/cheat-sheet/self-check/review set per week.
 
 | | |
 |---|---|
@@ -92,8 +93,10 @@ authored week in a new month therefore referenced a name that did not exist yet.
 so every remaining week's month title already exists before the loop runs and the
 trap cannot fire again.
 
-Weeks 16 and 17 added `ts_w16_modules.py` (2.1k lines) and `ts_w17_async.py`
-(2.6k lines) to `_WEEK_FILES`, which is what the split was for.
+Batches C and D added `ts_w16_modules.py` (2.2k lines), `ts_w17_async.py` (2.6k),
+`ts_w18_stacks.py` (2.2k), `ts_w19_maps.py` (2.1k) and `ts_w20_nodes.py` (2.8k) to
+`_WEEK_FILES` — 11.9k lines that would otherwise have gone into one file, which is
+exactly what the split was for.
 
 ### 2. Where the Budget Buddy arc ends ✅ — decided
 
@@ -344,7 +347,7 @@ number>()` does not contain the substring `new Map(`, so the week-19 gate missed
 too); and `namespace `, `globalThis` and `import type ` were ungated by anything
 and are now listed at 16.
 
-### Month 5 — Async & Data Structures (weeks 17-20) — 🚧 **17 done**
+### Month 5 — Async & Data Structures (weeks 17-20) — ✅ **done**
 
 **17. Async & Promises** ✅ · `tools/ts_w17_async.py` · 9 lessons, 71 exercises —
 the largest week in the course
@@ -391,34 +394,159 @@ nothing about the real problem. The two exercises that interpolate an awaited va
 carry an explicit `export {};`, week 16's marker doing exactly the job week 16
 said it does.
 
-**18. Stacks & Queues** ⬜ · reuse `ts_ds_generics`
-Array as stack · queue and the O(n) `shift` trap · a generic `Stack<T>` and
-`Queue<T>` class (needs week 11) · balanced brackets · monotonic stack.
-*Capstone:* Budget Buddy #18 — an undo/redo stack.
+**18. Stacks & Queues** ✅ · `tools/ts_w18_stacks.py` · 8 lessons, 57 exercises
+`w18-stack` · `w18-class` · `w18-brackets` · `w18-undo` · `w18-queue` ·
+`w18-fastqueue` · `w18-deque` · `w18-monotonic`.
+*Capstone:* Budget Buddy #18 — undo/redo over ledger commands, where each history
+entry carries what reversing it needs. Stretch caps the history at three, dropping
+the oldest from the other end.
+Kinds: 41 drill, 8 fix, 5 diagnose, 1 predict.
 
-**19. Maps & Sets** ⬜ · reuse `ts_maps_sets`
-`Map` vs an object as a lookup · `Set` and de-duplication · iteration order ·
-keying by object identity · `WeakMap` briefly · frequency counting.
+**It deepens rather than introduces:** week 6 already taught `.push`, `.pop`,
+`.shift` and `.unshift`, so the text is written as "you have had the operations for
+twelve weeks; here is what they are FOR, and what they cost".
 
-**20. Linked Lists & Trees** ⬜ · reuse `ts_ds_generics`, `ts_iterators`
-Node types and the recursive type that describes them · singly and doubly
-linked lists · binary trees · traversals · a tree of expense categories ·
-iterators and generators (`ts_iterators` is otherwise homeless).
-*Capstone:* Budget Buddy #20 — the category tree. **Closes the arc.**
-*Risk:* medium-high. Recursive generic node types under
-`noUncheckedIndexedAccess` and `strictNullChecks` get fiddly fast; keep node
-shapes small and lean on `design`.
+**The O(n) `shift` trap is taught without a clock**, which is the week's one real
+find. Timing is meaningless on a four-element array and a timeout on a large one,
+so lesson 5 has the learner **write the loop `shift()` hides** and count the
+element moves: draining four items costs `3+2+1+0 = 6`, printed as a number and
+identical everywhere. Lesson 6 replaces it with a head index and the same program
+prints `moves 0`. The same technique carries the undo-history cap and, later,
+week 19's quadratic de-duplication.
 
-### Month 6 — Algorithmic Thinking (weeks 21-24)
+**One constraint shaped the whole week:** `Map` and `Set` are gated at 19, so
+every lookup here is an array scan or a `Record`. That is the ladder working —
+week 19 arrives as the answer to a cost already paid.
 
-**21. Big-O & Complexity** ⬜
-*Risk:* **this week has almost nothing to judge.** Complexity is a reasoning
-skill, and the course's grading model is "run it and compare stdout". Options,
-in preference order: lean heavily on `warmup`/`quiz`/`review` (all already
-supported, and this is what they are for); write exercises that *measure*
-(count operations into a counter and print it, so the shape of the growth is
-the output); and consider a fifth kind, `predict-the-cost`, if quizzes prove
-too thin. Do not pad it with unrelated coding.
+**And one trap re-found:** `constructor(private readonly limit: number) {}` is a
+parameter property and dies at run time in strip-only mode (decision 5). Lesson
+7's `History` class had to be rewritten the long way. Any class in a *runnable*
+exercise, in any remaining week, has the same constraint.
+
+**19. Maps & Sets** ✅ · `tools/ts_w19_maps.py` · 8 lessons, 58 exercises
+`w19-why` · `w19-map` · `w19-freq` · `w19-set` · `w19-order` · `w19-identity` ·
+`w19-weak` · `w19-groupby`.
+*Capstone:* Budget Buddy #19 — the index: a `Map` keyed by tag plus a `Set` of
+descriptions, so a duplicate is rejected in O(1) and the per-tag report is never
+a filter-per-tag. Stretch compares two months with set algebra.
+Kinds: 45 drill, 6 fix, 3 diagnose, 2 predict.
+
+**Four verified facts carry the week**, each easy to get subtly wrong and each
+demonstrated rather than asserted:
+
+1. An object **reorders integer-like keys** — `Object.keys` on `b, 10, 2, a` gives
+   `2,10,b,a`, where a Map gives `b,10,2,a`. The single most convincing argument
+   for `Map`, and invisible until you see the output.
+2. `"toString" in {}` is **true** (prototype), while `new Map().has("toString")` is
+   false — so `in` is an unsafe membership test, and `Object.hasOwn` is the fix.
+   Shipped as a `fix` where a validator lets `constructor` through.
+3. `map.get(k)` is `V | undefined` always, so every read takes a `??` — the same
+   discipline as an index access, and **TS2532** for forgetting.
+4. Two structurally identical objects are **two different keys** (SameValueZero),
+   which lesson 6 pairs with the canonical-key-function workaround every grid
+   problem uses.
+
+`WeakMap`'s two restrictions ship as diagnoses because the compiler's messages are
+instructive: no `.size` (**TS2339**) and no primitive keys (**TS2344**, `WeakKey`).
+
+**Two exercises had to change kind**, and the reason is worth recording: a `fix`
+needs a starter that *fails*, and "slow" and "leaky" are not failures. The
+quadratic de-duplication became a counted one (week 18's technique, `comparisons
+0` in the answer); the WeakMap leak became a **drill about the choice** — weak for
+metadata nobody iterates, strong for what the report must walk — because a lifetime
+bug is by construction unobservable inside one short program.
+
+**20. Linked Lists & Trees** ✅ · `tools/ts_w20_nodes.py` · 8 lessons, 61
+exercises — **closes the Budget Buddy arc**
+`w20-node` · `w20-list` · `w20-listops` · `w20-doubly` · `w20-tree` ·
+`w20-traverse` · `w20-ntree` · `w20-iterators`.
+*Capstone:* Budget Buddy #20 — the category tree. Indented input is parsed into a
+tree **with a stack of open ancestors** (week 18 building week 20's data),
+totals roll up post-order, and the report is driven by a generator that yields
+`[Cat, depth]` so the printing code never recurses. Stretch adds a path query that
+builds the path on the way back out and counts the nodes visited.
+Kinds: 46 drill, 8 fix, 3 diagnose, 1 predict, 1 design.
+
+**One sequencing decision, taken here rather than deferred.** Week 25 owns
+"Recursion & Backtracking" and no earlier week teaches recursion — but a tree is a
+recursive data structure. Three options: teach trees without recursion (contorted),
+move week 25 forward (breaks the month), or **introduce recursion here, on the data
+structure where it is least abstract, and let week 25 deepen it**. The third, which
+is the same move weeks 13, 15 and 18 made. So lesson 5 introduces a recursive
+function whose base case *is* the `| null` from the type, and **week 25 must be
+written as "you have been recursing over trees since week 20; here is the whole
+story"** — the call stack, the depth limit, recursion→iteration as a technique, and
+backtracking (which lesson 7's path search already performs without naming).
+
+**The best teaching in the week is only possible because week 18 came first:**
+lesson 6 gives the same traversal twice, and the loop is identical —
+`stack.pop()` is depth-first, a head-index dequeue is breadth-first. *DFS and BFS
+are one algorithm with a different container*, which is a fact most people learn
+years later than they should, and week 27 is that fact again plus a visited set.
+
+**The `strictNullChecks` risk the roadmap flagged was real and lands in exactly one
+place:** a list-walking variable must be annotated, because `let cur = head`
+infers `N` and then `cur = cur.next` will not assign. Same for the `next` binding
+inside `reverse`. Both ship as exercises rather than footnotes, and node shapes are
+kept to two fields.
+
+**Two `fix` starters turned out to fail at COMPILE time, and both got better
+prompts for it.** The walk that advances `head` itself produces
+`TS2339: Property 'next' does not exist on type 'never'` — the compiler, having
+proved `head` is null after the first loop, types the second cursor as `never`,
+which is a narrowing error pointing straight at a logic bug. And `yield walk(kid)`
+instead of `yield*` cannot be annotated at all: the nesting grows one level per
+depth.
+
+`ts_iterators` is no longer homeless — lesson 8 covers the iterable protocol,
+generator functions, generator *methods* and `yield*`, all of which run untouched
+because generators are runtime syntax rather than type syntax.
+
+### Month 6 — Algorithmic Thinking (weeks 21-24) — 🚧 **21 done**
+
+**21. Big-O & Complexity** ✅ · `tools/ts_w21_bigo.py` · 7 lessons, 49 exercises
+`w21-why` · `w21-count` · `w21-classes` · `w21-rules` · `w21-space` ·
+`w21-cases` · `w21-read`.
+*Capstone:* **interview rep #21** — the complexity report. Four instrumented
+algorithms run at n and 2n; the ratio of the operation counts names each one's
+growth class. Stretch adds a third data point and flags an algorithm whose two
+ratios disagree as `unstable`.
+Kinds: 40 drill, 7 fix — and **no `predict` or `diagnose`, which is deliberate
+and is the one place the "use the reading kinds" rule does not apply**: complexity
+produces no compiler errors to read and no inferences to name. The reading in this
+week is the 28 warmup questions, the 16-question review and the counting tables
+themselves, which is what those fields are for.
+
+**The "almost nothing to judge" risk was answered by option two, and by the time
+it was authored it was no longer a guess.** Weeks 18 and 19 had already proved the
+technique — week 18 counts the element moves `shift()` hides (6 for four items),
+week 19 counts the comparisons `includes` performs — so **every exercise in this
+week instruments an algorithm and prints a count.** No fifth exercise kind was
+needed.
+
+That turned out to be the better lesson rather than a workaround. "O(n²)" is a
+label; `n=4 ops=6 / n=8 ops=28 / n=16 ops=120` is the thing the label names, and a
+learner who has watched a count quadruple owns the idea in a way that reciting
+classes does not produce. The sizes are chosen so the arithmetic is checkable by
+hand: linear gives 4/8/16, quadratic 6/28/120, binary search 4/5/6/…/11, and
+`fib(n)` calls 15/177/1973.
+
+**The capstone is the skill itself** — run at n and 2n, take the ratio, name the
+class — and it classifies with **bands** rather than exact ratios, because at these
+sizes the lower-order term is still visible: `pairs` at 16→32 gives 4.13, not 4.00.
+The code says so, which is the honest version of a detail most treatments hide.
+
+**Week 17's rule extends here unchanged: nothing measures elapsed time.** A
+millisecond reading is noise at small n and a judge timeout at large n; a count is
+an exact integer. Every "how expensive?" question in the week is answered in
+operations.
+
+**And the roadmap's "do not pad it with unrelated coding" was taken literally:**
+the week introduces no new algorithms at all. Everything it measures is code from
+an earlier week — week 18's `shift` and string concatenation, week 19's
+`includes` scan and Map lookup, week 20's tree recursion, depth and `RangeError`.
+That is also why it can afford to be this dense, and why it is the shortest week of
+the back half at seven hours.
 
 **22. Searching & Two Pointers** ⬜ · **23. Sliding Window & Prefix Sums** ⬜ ·
 **24. Sorting** ⬜
@@ -426,13 +554,31 @@ Standard, low-risk, stdout-gradable. The Problem Library and
 `tools/algorithms_defs.py` already hold the patterns and can seed both the
 lesson text and the capstone problems.
 
+*Two things these three inherit from week 21, which is now the month's foundation:*
+binary search is already built and counted there (`w21-classes`, 11 steps at
+n=1024), so week 22 should **deepen** it rather than introduce it; and each of these
+weeks should report an operation count beside its answer wherever a technique's
+whole point is that it is cheaper than the obvious version — which is true of all
+three. A sliding window that does not show the count it saved over the nested loop
+has not made its argument.
+
 ### Month 7 — DSA Interview Core (weeks 25-28)
 
 **25. Recursion & Backtracking** ⬜ (merged from two skeleton weeks)
 Base case and recursive case · the call stack · recursion → iteration ·
 subsets · permutations · N-Queens · pruning.
-*Note:* this week now carries the recursion fundamentals that used to sit in
-month 5, so it must start gentler than a pure backtracking week would.
+*Note, and it changed when week 20 landed:* this week no longer **introduces**
+recursion. Week 20 does, on trees, because a tree's type refers to itself and
+teaching it any other way was contorted (see that week's entry). So week 25
+**deepens** it, exactly as weeks 13, 15 and 18 deepen their subjects, and its file
+should open with "you have been recursing over trees since week 20; here is the
+whole story": the call stack and what a stack frame holds, recursion depth and the
+`RangeError` (week 20 ships one as a `fix`), memoisation as a lead-in to week 26,
+recursion → iteration as a deliberate technique (week 20 has both forms of every
+traversal to point at), and then backtracking — which week 20's `pathTo` already
+performs, returning `null` to mean "not in this subtree" so the caller tries the
+next branch. Naming a pattern the learner has already used is a much better
+opening than a factorial.
 
 **26. Dynamic Programming** ⬜ · **27. Graphs: BFS & DFS** ⬜ ·
 **28. Heaps & Intervals** ⬜
@@ -479,21 +625,32 @@ still go first.
 | **A** ✅ | — | Generator split, practice wired, capstone arc decided, gaps sequenced |
 | **B** ✅ | 11-12 | Classes unblock 18, 20, 28; structural typing completes month 3 |
 | **C** ✅ | 13-16 | Types, then the project-shaped week: modules, tsconfig, .d.ts |
-| **D** 🚧 | 17 ✅, **18-20** ← next | Async + data structures; closes the Budget Buddy arc |
-| **E** | 21-24 | Algorithmic thinking; 21 needs its format decided first |
+| **D** ✅ | 17-20 | Async + data structures; the Budget Buddy arc is closed |
+| **E** 🚧 | 21 ✅, **22-24** ← next | Algorithmic thinking; 21's format is settled — count operations |
 | **F** | 25-28 | DSA core |
 | **G** | 29-32 | Type-level; lowest risk, highest polish |
 
-**Weeks 16 and 17 both landed, which clears the two risks the back half was
-waiting on** — the one-file module problem (settled with evidence; see week 16)
-and async determinism (settled with a written rule; see week 17). What remains is
-18-20 to close the Budget Buddy arc, then 21-28, then the type-level month.
+**Batches C and D are done, and with them every risk the back half was waiting
+on**: the one-file module problem (settled with evidence — week 16), async
+determinism (settled with a written rule — week 17), and the recursive-node
+fiddliness (settled by annotating the walker and keeping nodes to two fields —
+week 20). The Budget Buddy arc ran its full twenty weeks and ended on the category
+tree, as decision 2 planned.
 
-**One constraint discovered while authoring 16 and 17, for whoever writes 18-20:**
-`Map` and `Set` are gated at **week 19**, so week 18's stacks and queues must be
-built from arrays and `Record` — which is the right ladder anyway, since week 19
-then arrives as the answer to the O(n) lookup week 18 had to live with. G remains
-independent of everything.
+**Four things the remaining weeks inherit, all learned the hard way:**
+
+* **A `fix` needs a starter that FAILS.** "Slow", "leaky" and "badly shaped" are
+  not failures. Where the bug is a cost, *count the operations* (weeks 18, 19);
+  where it is a lifetime, make it a drill about the choice instead (week 19).
+* **Nothing may print elapsed time**, and a race needs an unambiguous winner
+  (week 17's rule, which now applies to week 21's complexity material too — that
+  week should count operations for exactly the same reason).
+* **Parameter properties never run.** Any class in a runnable exercise declares its
+  fields the long way (weeks 18, 20).
+* **Recursion is now introduced in week 20**, on trees. Week 25 deepens it — see
+  that week's entry.
+
+G remains independent of everything.
 
 ---
 
