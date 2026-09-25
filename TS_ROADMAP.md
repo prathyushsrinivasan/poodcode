@@ -1,12 +1,12 @@
-# TypeScript Roadmap — Weeks 23-32
+# TypeScript Roadmap — Weeks 24-32
 
 The plan for finishing **TypeScript: Zero to Interview**, the 8-month course in
-`tools/typescript_course.py`. Weeks 1-22 ship; weeks 23-32 are one-line
+`tools/typescript_course.py`. Weeks 1-23 ship; weeks 24-32 are one-line
 skeletons waiting to be authored.
 
 Unlike [`JAVA_ROADMAP.md`](JAVA_ROADMAP.md), which starts after the basics, this
 course starts at *zero* — week 1 is someone's first line of code. That decision
-is what makes the back half hard: everything in weeks 23-32 must still obey the
+is what makes the back half hard: everything in weeks 24-32 must still obey the
 rule that nothing may require syntax a later week teaches.
 
 **Status legend** — ✅ built and shipping · 🚧 partially built · ⬜ planned.
@@ -15,9 +15,9 @@ rule that nothing may require syntax a later week teaches.
 
 ## Where it stands
 
-**Built:** weeks 1-22 — **174 lessons, 1,297 judged exercises** (1,282 in lessons
+**Built:** weeks 1-23 — **181 lessons, 1,342 judged exercises** (1,327 in lessons
 and capstones, 15 in week 1's practice families), twenty Budget Buddy capstones —
-**the arc is complete** — two interview reps, and a full
+**the arc is complete** — three interview reps, and a full
 glossary/cheat-sheet/self-check/review set per week.
 
 | | |
@@ -43,6 +43,112 @@ glossary/cheat-sheet/self-check/review set per week.
 Two grading modes back them: stdout comparison, and `judge_mode: "types"` —
 graded on the type-check alone, which is the only way to test a type. Week 10's
 `proof` lesson is the working template for the latter.
+
+---
+
+## State of play — what is proven, and what will bite you
+
+Written for whoever picks this up next, including me. Nothing here is a plan; it
+is the stuff that is only obvious after it has cost you an hour.
+
+### Verification status, precisely
+
+| | covers | last run |
+|---|---|---|
+| `python tools/verify_ts_course.py --starters` | **weeks 1-23, 1,342 exercises, 0 failures** | current |
+| `cd src-tauri && cargo test --test verify_ts_course` | weeks 1-21, 1,250 exercises, 3 tests, 916s | **not re-run for weeks 22-23** |
+
+The Rust suite is the judge-level one — it puts every program through the same
+judge the app uses, rather than through the fast Node path. It was green through
+week 21 and has not been re-run since weeks 22 and 23 landed. **Run it before
+trusting those two weeks in the app.** It takes about 15 minutes with the release
+binary already built, and the two verifiers have never disagreed, so this is
+diligence rather than suspicion.
+
+Note that the Python verifier prints a `note:` listing `fix` starters that fail at
+**compile** time rather than at run time. That note is informational — 32 such
+starters exist across the whole course, most of them from weeks 1-10 — and it is
+worth reading when you add a `fix`, because a compile-time failure teaches something
+different from a runtime one. Two in week 20 were deliberately re-prompted once the
+verifier revealed which kind they were.
+
+### Nothing is half-finished
+
+Every authored week is complete: lessons, exercises, capstone, stretch, glossary,
+cheat sheet, self-check, review, milestone. Weeks 24-32 are untouched skeletons, as
+they were before. There is no partially-authored week and no disabled exercise.
+
+### Five traps that cost real time
+
+1. **Parameter properties do not run.** `constructor(private readonly x: number) {}`
+   type-checks and then dies with
+   `ERR_UNSUPPORTED_TYPESCRIPT_SYNTAX` in strip-only mode. Week 11 knew this and
+   grades them with `judge_mode: "types"`; weeks 18 and 20 both walked into it
+   anyway. **Any class in a runnable exercise declares its fields the long way.**
+
+2. **Node's module detection cannot see an `await` inside a template literal.**
+   A file whose only top-level await is `` `${await f()}` `` is parsed as CommonJS
+   and reports `SyntaxError: Missing } in template expression`, which says nothing
+   about the real problem. Two week-17 exercises carry an explicit `export {};` for
+   this. If a program uses top-level await *only* inside a template, add one.
+
+3. **The scope lint matches substrings, so generic forms slip past it.**
+   `new Map<string, number>()` does not contain `new Map(`, and a `Map` therefore
+   reached week 16 despite the week-19 gate. Both generic spellings are now listed.
+   **When you gate a constructor, gate `new X<` as well as `new X(`.**
+
+4. **A `fix` needs a starter that FAILS — and "slow", "leaky" and "badly shaped"
+   are not failures.** The verifier rejects a buggy starter that passes, which is
+   correct and catches this every time. Three exercises had to be redesigned:
+   * where the bug is a **cost**, count the operations and let the count be wrong
+     (week 18's `shift`, week 19's `includes`, week 21 throughout);
+   * where the bug is a **lifetime**, it is unobservable in a short program —
+     week 19's WeakMap leak became a drill about the *choice* instead;
+   * where the bug is a **wrong technique**, you must find an input that actually
+     breaks it. Week 23's sliding-window-on-negatives looked broken on `[1, -2, 3]`
+     and is not; `[5, -5, 1]` with a budget of 1 is a real failure. That an obvious
+     input did not expose it is now part of the exercise's own prompt.
+
+5. **Expected outputs must be computed, never typed.** Several capstone outputs
+   were written by hand and were wrong — week 17's total, week 20's, week 21's
+   column widths, three of week 23's. The reliable loop is: put a placeholder in the
+   test, generate the seed, run the reference solution out of `ts_course.json`, and
+   paste what it actually printed. The Mastery track has `_computed()` for exactly
+   this; the course does not, and adding it would be a genuine improvement.
+
+### Two claims that were wrong and are now corrected
+
+Both were caught by the verifier rather than by review, which is worth knowing about
+how much the verifier is doing:
+
+* **Week 22** claimed that comparing against `xs[read - 1]` instead of
+  `xs[write - 1]` in an in-place dedupe was a bug. It is not — the two are
+  equivalent, because `write <= read` means the slot at `read - 1` can only be
+  overwritten when `write === read`, which is a no-op. The lesson now says that and
+  argues from *what the code means* instead.
+* **Week 23** claimed a difference array sized `n` rather than `n + 1` was
+  observably broken. It is not — writing past the end of a JavaScript array just
+  grows it. That `fix` now teaches the missing second write, which genuinely leaks
+  the adjustment to the end of the array.
+
+### One pre-existing breakage fixed along the way
+
+`gen_seed.py` failed at the commit this work started from: `tsm-w10-vending` in
+`tools/mastery_ts_more_m3.py` had a reference solution that did not type-check
+(**TS7022** — the narrowed `state` fed back into `next`'s own initializer), so its
+computed outputs had never been generated. Annotating the destructured tuple fixed
+it. Unrelated to the TypeScript course, but nothing could be built until it was.
+
+### Where the shared constraints now live
+
+Two documents carry rules that apply beyond a single week, and both are worth
+reading before authoring 24-32:
+
+* **`tools/ts_w17_async.py`'s header** — the determinism rule, in five clauses. It
+  governs any week that touches timing, and week 21 extended it to "nothing measures
+  elapsed time, ever".
+* **`tools/ts_w21_bigo.py`'s header** — why every measurement in month 6 is an
+  operation count, with the sizes chosen so the arithmetic is checkable by hand.
 
 ---
 
@@ -502,7 +608,7 @@ depth.
 generator functions, generator *methods* and `yield*`, all of which run untouched
 because generators are runtime syntax rather than type syntax.
 
-### Month 6 — Algorithmic Thinking (weeks 21-24) — 🚧 **21-22 done**
+### Month 6 — Algorithmic Thinking (weeks 21-24) — 🚧 **21-23 done**
 
 **21. Big-O & Complexity** ✅ · `tools/ts_w21_bigo.py` · 7 lessons, 49 exercises
 `w21-why` · `w21-count` · `w21-classes` · `w21-rules` · `w21-space` ·
@@ -593,16 +699,45 @@ which reports **1** kept element out of nothing.
 print a step count beside the answer, because "two pointers is O(n)" is a claim and
 `steps=5` next to `pairs=15` is the evidence.
 
-**23. Sliding Window & Prefix Sums** ⬜ · **24. Sorting** ⬜
+**23. Sliding Window & Prefix Sums** ✅ · `tools/ts_w23_windows.py` · 7 lessons,
+45 exercises
+`w23-fixed` · `w23-variable` · `w23-counts` · `w23-prefix` · `w23-submap` ·
+`w23-diff` · `w23-choose`.
+*Capstone:* **interview rep #23** — the ledger analytics report. Four questions
+about one ledger, each answered with a different technique from the week (prefix
+table, fixed window, variable window, prefix+Map) and each printing the operations
+it cost. Stretch adds the fifth technique, a difference array.
+Kinds: 36 drill, 7 fix.
+
+**The roadmap asked this week specifically to show its counts** — "a sliding window
+that does not show the count it saved over the nested loop has not made its
+argument" — so lesson 1 ships both versions of the same problem and prints both:
+11 operations against 15 on a seven-element array, and the exercise that follows
+extends it to n=1000, k=100, where it is **1,900 against 90,100**. That second
+number is the one that makes the point.
+
+**Lesson 7 is the week's actual payload**, and it is a table rather than an
+algorithm: *"contiguous" → window; a fixed count → fixed window; "longest … such
+that" → variable window; repeated range totals → prefix sums; "count the subarrays"
+→ prefix + Map; many updates then one read → difference array.* All five are short
+once chosen; choosing is the skill.
+
+**The one thing that decides between a window and prefix+Map is whether the values
+can be negative**, and that is stated as its own lesson-2 section, because a window
+silently returns a wrong answer rather than failing.
+
+**Three sentinels, named as one idea.** The prefix array's leading `0`, the
+difference array's `n + 1`th slot, and week 20's sentinel node are the same trade —
+one wasted slot in exchange for deleting a branch — and lesson 6 says so explicitly.
+Three appearances in one course is worth pointing at.
+
+**24. Sorting** ⬜
 Standard, low-risk, stdout-gradable. The Problem Library and
 `tools/algorithms_defs.py` already hold the patterns and can seed both the
 lesson text and the capstone problems.
 
-*What these two inherit, now that 21 and 22 are down:*
+*What it inherits:*
 
-* **Report the count.** A sliding window that does not show what it saved over the
-  nested loop has not made its argument. Weeks 21 and 22 both do this; it is the
-  month's idiom.
 * **Week 22 built the merge** (`w22-merge`, including both tail drains and the `<=`
   that makes it stable) explicitly as the heart of merge sort, so week 24 splits and
   recurses and calls it — it does not write it again. Week 22's
@@ -610,6 +745,11 @@ lesson text and the capstone problems.
 * **Sorting is already established as affordable.** Week 21's table and week 22's
   sort-then-sweep lesson both make the case, so week 24 can open on *how* the sorts
   work rather than on whether to sort.
+* **Report the count.** Comparisons and swaps, per algorithm, at two sizes — the
+  month's idiom, and the natural way to show why an O(n log n) sort beats an O(n²)
+  one without timing anything.
+* **Stability has already been introduced** (week 22's merge), so week 24 can
+  *use* the word rather than define it.
 
 ### Month 7 — DSA Interview Core (weeks 25-28)
 
@@ -675,7 +815,7 @@ still go first.
 | **B** ✅ | 11-12 | Classes unblock 18, 20, 28; structural typing completes month 3 |
 | **C** ✅ | 13-16 | Types, then the project-shaped week: modules, tsconfig, .d.ts |
 | **D** ✅ | 17-20 | Async + data structures; the Budget Buddy arc is closed |
-| **E** 🚧 | 21-22 ✅, **23-24** ← next | Algorithmic thinking; the month's idiom is to count operations |
+| **E** 🚧 | 21-23 ✅, **24** ← next | Algorithmic thinking; the month's idiom is to count operations |
 | **F** | 25-28 | DSA core |
 | **G** | 29-32 | Type-level; lowest risk, highest polish |
 

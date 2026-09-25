@@ -58329,19 +58329,2241 @@
       "month": 6,
       "month_title": "Algorithmic Thinking",
       "theme": "Sliding Window & Prefix Sums",
-      "goal": "Answer range and subarray questions in linear time.",
-      "summary": "",
-      "authored": false,
-      "lessons": [],
-      "capstone": null,
-      "objectives": [],
-      "why": "",
-      "est_minutes": 40,
-      "glossary": [],
-      "cheatsheet": "",
-      "self_check": [],
-      "review": [],
-      "milestone": "",
+      "goal": "Two ways to stop recomputing: carry the answer as the window moves, or precompute every prefix once and answer any range by subtraction.",
+      "summary": "Both techniques this week exist for the same reason: **the obvious solution\nrecomputes what it already knew.**\n\n## The sliding window\n\n\"The largest sum of any three consecutive amounts.\" The obvious version adds up\nevery window from scratch. But consecutive windows overlap almost entirely:\n\n```\n[1, 4, 2] 10  2  3  1     sum = 7\n 1 [4, 2, 10] 2  3  1     sum = 16   ← 7 - 1 + 10. Two operations, not three.\n```\n\n**Add what entered, subtract what left.** O(n) instead of O(n·k), and lesson 1\nprints both counts so the claim is evidenced.\n\n## Prefix sums\n\n\"The total between day 3 and day 7\", asked a thousand times. Precompute the running\ntotal once:\n\n```\nxs     =    [1, 2, 3,  4,  5]\nprefix = [0, 1, 3, 6, 10, 15]\n```\n\nand then **any** range is one subtraction:\n\n```ts\nrangeSum(lo, hi) = prefix[hi + 1] - prefix[lo]\n```\n\nO(n) once, then **O(1) per query, for ever**. That trade — pay once, answer\ncheaply — is one of the most reliable moves in programming.\n\n## And the two combined\n\nPrefix sums plus week 19's `Map` answers \"how many subarrays sum to exactly k?\" in\none pass. It is the highest-yield single trick in this month, and lesson 5 is it.\n\n## What you already know\n\nA variable-size window is **two pointers moving the same direction** (week 22),\nwith a condition deciding when the left one catches up. Every window that tracks\nwhat is inside it is a **Map of counts** (week 19). You are assembling parts, not\nlearning new ones.\n\n⏱️ Budget about **eight hours**.\n",
+      "authored": true,
+      "lessons": [
+        {
+          "key": "w23-fixed",
+          "title": "The fixed window",
+          "what": "Add what entered, subtract what left.",
+          "lesson": "\"The largest total of any `k` consecutive amounts.\"\n\nThe obvious version recomputes each window:\n\n```ts\nfor (let i = 0; i + k <= xs.length; i = i + 1) {\n  let sum = 0;\n  for (let j = i; j < i + k; j = j + 1) { sum = sum + (xs[j] ?? 0); }   // k adds\n  best = Math.max(best, sum);\n}\n```\n\n**O(n·k)** — and every window after the first shares `k - 1` elements with the one\nbefore it, so almost all of that work is a repeat.\n\n## The window\n\n```ts\nlet sum = 0;\nfor (let i = 0; i < k; i = i + 1) { sum = sum + (xs[i] ?? 0); }    // the first window\nlet best = sum;\nfor (let i = k; i < xs.length; i = i + 1) {\n  sum = sum + (xs[i] ?? 0) - (xs[i - k] ?? 0);      // enters, leaves\n  best = Math.max(best, sum);\n}\n```\n\n**O(n)**, two operations per step regardless of `k`.\n\n## The counts, since this is month 6\n\nOn `[1, 4, 2, 10, 2, 3, 1]` with k = 3:\n\n```\nrecompute:  ops=15\nrolling:    ops=11\n```\n\nBoth find 16. The saving looks small because `k` is small — and that is the point\nworth seeing: the recompute cost is `(n - k + 1) × k` and the rolling cost is\n`k + 2(n - k)`, so at k = 3 it is 15 against 11, and at k = 100 with n = 1,000 it is\n**90,100 against 1,900**. The window's cost barely moves when `k` grows; the\nrecompute's is proportional to it.\n\n## The two indices\n\n`i` is the element **entering**; `i - k` is the element **leaving**. Getting that\npair wrong by one is the whole difficulty of a fixed window, and the check is\narithmetic: when `i === k`, the window should cover `1 … k`, so the departing\nelement is index `0` — which is `i - k`. ✓\n\n## Not just a sum\n\nAnything you can add and subtract slides: a total, a count of matching elements, a\nrunning product (with care over zeroes). Anything you *cannot* undo does not — a\nmaximum is the classic example. Removing the largest element from a window does not\ntell you the new largest, which is why \"maximum in every window\" needs week 18's\n**monotonic deque** rather than a rolling value.\n\n> ⚠️ **Common mistakes:** `i - k + 1` for the departing index; forgetting to seed\n> the first window before the loop; and trying to slide a maximum.\n",
+          "warmup": [
+            {
+              "question": "Sliding a fixed window costs, per step…",
+              "options": [
+                "k operations",
+                "two",
+                "one",
+                "k + 1"
+              ],
+              "answer": 1,
+              "explanation": "One entering, one leaving."
+            },
+            {
+              "question": "Recomputing every window is…",
+              "options": [
+                "O(n)",
+                "O(n·k)",
+                "O(n log n)",
+                "O(k)"
+              ],
+              "answer": 1,
+              "explanation": "Almost all of it a repeat."
+            },
+            {
+              "question": "When `i === k`, the element leaving the window is at…",
+              "options": [
+                "i - k + 1",
+                "i - k",
+                "i - 1",
+                "0 always"
+              ],
+              "answer": 1,
+              "explanation": "Which happens to be 0 on that first step."
+            },
+            {
+              "question": "A maximum cannot be slid because…",
+              "options": [
+                "it is slow",
+                "removing the largest does not tell you the new largest",
+                "of types",
+                "it can"
+              ],
+              "answer": 1,
+              "explanation": "That is what a monotonic deque is for."
+            }
+          ],
+          "exercises": [
+            {
+              "id": "tscourse-w23-fx-1",
+              "title": "Seed the first window",
+              "prompt": "Total the first k elements before the sliding starts.",
+              "hint": "The first window is indices 0 up to k - 1.",
+              "hints": [
+                "The first window is indices 0 up to k - 1.",
+                "Write the loop that adds those k elements."
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst k = 3;\nlet sum = 0;\n____\nconsole.log(sum);\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst k = 3;\nlet sum = 0;\nfor (let i = 0; i < k; i = i + 1) {\n  sum = sum + (nums[i] ?? 0);\n}\nconsole.log(sum);\n",
+              "tests": [
+                {
+                  "input": "1 4 2 10",
+                  "output": "7"
+                },
+                {
+                  "input": "5 5 5 5",
+                  "output": "15"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w23-fx-2",
+              "title": "Slide it",
+              "prompt": "Add the entering element and subtract the departing one.",
+              "hint": "`i` is entering; `i - k` is leaving.",
+              "hints": [
+                "`i` is entering; `i - k` is leaving.",
+                "Write sum = sum + (nums[i] ?? 0) - (nums[i - k] ?? 0);"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst k = 3;\nlet sum = 0;\nfor (let i = 0; i < k; i = i + 1) {\n  sum = sum + (nums[i] ?? 0);\n}\nlet best = sum;\nfor (let i = k; i < nums.length; i = i + 1) {\n____\n  best = Math.max(best, sum);\n}\nconsole.log(best);\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst k = 3;\nlet sum = 0;\nfor (let i = 0; i < k; i = i + 1) {\n  sum = sum + (nums[i] ?? 0);\n}\nlet best = sum;\nfor (let i = k; i < nums.length; i = i + 1) {\n  sum = sum + (nums[i] ?? 0) - (nums[i - k] ?? 0);\n  best = Math.max(best, sum);\n}\nconsole.log(best);\n",
+              "tests": [
+                {
+                  "input": "1 4 2 10 2 3 1",
+                  "output": "16"
+                },
+                {
+                  "input": "1 1 1",
+                  "output": "3"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w23-fx-3",
+              "title": "Count both versions",
+              "prompt": "Report the operations the rolling window performs, against what recomputing would.",
+              "hint": "The number of windows, times the size of each.",
+              "hints": [
+                "The number of windows, times the size of each.",
+                "Write const recompute = (xs.length - k + 1) * k;"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "const xs = [1, 4, 2, 10, 2, 3, 1];\nconst k = 3;\nlet rolling = 0;\nlet sum = 0;\nfor (let i = 0; i < k; i = i + 1) {\n  sum = sum + (xs[i] ?? 0);\n  rolling = rolling + 1;\n}\nlet best = sum;\nfor (let i = k; i < xs.length; i = i + 1) {\n  sum = sum + (xs[i] ?? 0) - (xs[i - k] ?? 0);\n  rolling = rolling + 2;\n  best = Math.max(best, sum);\n}\n____\nconsole.log(`best=${best} rolling=${rolling} recompute=${recompute}`);\n",
+              "solution": "const xs = [1, 4, 2, 10, 2, 3, 1];\nconst k = 3;\nlet rolling = 0;\nlet sum = 0;\nfor (let i = 0; i < k; i = i + 1) {\n  sum = sum + (xs[i] ?? 0);\n  rolling = rolling + 1;\n}\nlet best = sum;\nfor (let i = k; i < xs.length; i = i + 1) {\n  sum = sum + (xs[i] ?? 0) - (xs[i - k] ?? 0);\n  rolling = rolling + 2;\n  best = Math.max(best, sum);\n}\nconst recompute = (xs.length - k + 1) * k;\nconsole.log(`best=${best} rolling=${rolling} recompute=${recompute}`);\n",
+              "tests": [
+                {
+                  "input": "",
+                  "output": "best=16 rolling=11 recompute=15"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w23-fx-4",
+              "title": "The saving at scale",
+              "prompt": "Report both costs for n = 1000 and k = 100, where the gap is the real story.",
+              "hint": "Seeding costs k; every step after that costs two.",
+              "hints": [
+                "Seeding costs k; every step after that costs two.",
+                "Write const rolling = k + 2 * (n - k);"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "const n = 1000;\nconst k = 100;\nconst recompute = (n - k + 1) * k;\n____\nconsole.log(`recompute=${recompute} rolling=${rolling}`);\n",
+              "solution": "const n = 1000;\nconst k = 100;\nconst recompute = (n - k + 1) * k;\nconst rolling = k + 2 * (n - k);\nconsole.log(`recompute=${recompute} rolling=${rolling}`);\n",
+              "tests": [
+                {
+                  "input": "",
+                  "output": "recompute=90100 rolling=1900"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w23-fx-5",
+              "title": "The window average",
+              "prompt": "Report the best average rather than the best total, to two decimals.",
+              "hint": "The best total divided by the window size.",
+              "hints": [
+                "The best total divided by the window size.",
+                "Write console.log((best / k).toFixed(2));"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst k = 2;\nlet sum = 0;\nfor (let i = 0; i < k; i = i + 1) {\n  sum = sum + (nums[i] ?? 0);\n}\nlet best = sum;\nfor (let i = k; i < nums.length; i = i + 1) {\n  sum = sum + (nums[i] ?? 0) - (nums[i - k] ?? 0);\n  best = Math.max(best, sum);\n}\n____\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst k = 2;\nlet sum = 0;\nfor (let i = 0; i < k; i = i + 1) {\n  sum = sum + (nums[i] ?? 0);\n}\nlet best = sum;\nfor (let i = k; i < nums.length; i = i + 1) {\n  sum = sum + (nums[i] ?? 0) - (nums[i - k] ?? 0);\n  best = Math.max(best, sum);\n}\nconsole.log((best / k).toFixed(2));\n",
+              "tests": [
+                {
+                  "input": "1 4 2 10",
+                  "output": "6.00"
+                },
+                {
+                  "input": "3 3",
+                  "output": "3.00"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w23-fx-6",
+              "title": "Count what matches, in a window",
+              "prompt": "Slide a count rather than a sum: how many elements in the window exceed 2.",
+              "hint": "A count slides exactly like a sum, using 0 or 1 per element.",
+              "hints": [
+                "A count slides exactly like a sum, using 0 or 1 per element.",
+                "Write inWindow = inWindow + big(nums[i] ?? 0) - big(nums[i - k] ?? 0);"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst k = 3;\nfunction big(v: number): number {\n  return v > 2 ? 1 : 0;\n}\nlet inWindow = 0;\nfor (let i = 0; i < k; i = i + 1) {\n  inWindow = inWindow + big(nums[i] ?? 0);\n}\nlet best = inWindow;\nfor (let i = k; i < nums.length; i = i + 1) {\n____\n  best = Math.max(best, inWindow);\n}\nconsole.log(best);\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst k = 3;\nfunction big(v: number): number {\n  return v > 2 ? 1 : 0;\n}\nlet inWindow = 0;\nfor (let i = 0; i < k; i = i + 1) {\n  inWindow = inWindow + big(nums[i] ?? 0);\n}\nlet best = inWindow;\nfor (let i = k; i < nums.length; i = i + 1) {\n  inWindow = inWindow + big(nums[i] ?? 0) - big(nums[i - k] ?? 0);\n  best = Math.max(best, inWindow);\n}\nconsole.log(best);\n",
+              "tests": [
+                {
+                  "input": "1 4 5 1 1 9",
+                  "output": "2"
+                },
+                {
+                  "input": "1 1 1",
+                  "output": "0"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w23-fx-fix1",
+              "title": "Fix the departing index",
+              "prompt": "This reports 18 where the answer is 16: the departing element is taken as `i - k + 1`, which is one *inside* the window, so the element that actually left is never subtracted and one that is still there is removed twice over.",
+              "hint": "At the first sliding step `i === k`, so the element leaving is index 0.",
+              "hints": [
+                "At the first sliding step `i === k`, so the element leaving is index 0.",
+                "`i - k + 1` is 1 at that point — an element still inside the window.",
+                "Write nums[i - k]."
+              ],
+              "language": "typescript",
+              "kind": "fix",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst k = 3;\nlet sum = 0;\nfor (let i = 0; i < k; i = i + 1) {\n  sum = sum + (nums[i] ?? 0);\n}\nlet best = sum;\nfor (let i = k; i < nums.length; i = i + 1) {\n  sum = sum + (nums[i] ?? 0) - (nums[i - k + 1] ?? 0);\n  best = Math.max(best, sum);\n}\nconsole.log(best);\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst k = 3;\nlet sum = 0;\nfor (let i = 0; i < k; i = i + 1) {\n  sum = sum + (nums[i] ?? 0);\n}\nlet best = sum;\nfor (let i = k; i < nums.length; i = i + 1) {\n  sum = sum + (nums[i] ?? 0) - (nums[i - k] ?? 0);\n  best = Math.max(best, sum);\n}\nconsole.log(best);\n",
+              "tests": [
+                {
+                  "input": "1 4 2 10 2 3 1",
+                  "output": "16"
+                },
+                {
+                  "input": "1 1 1 1",
+                  "output": "3"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            }
+          ],
+          "quiz": [
+            {
+              "question": "The rolling cost is `k + 2(n - k)`, which as k grows…",
+              "options": [
+                "grows with k",
+                "barely changes",
+                "doubles",
+                "is O(n·k)"
+              ],
+              "answer": 1,
+              "explanation": "Where the recompute cost is proportional to k."
+            },
+            {
+              "question": "Sliding a running product needs care because…",
+              "options": [
+                "it is slow",
+                "a zero cannot be divided back out",
+                "of types",
+                "it cannot slide"
+              ],
+              "answer": 1,
+              "explanation": "Undoing is what makes a value slidable."
+            }
+          ]
+        },
+        {
+          "key": "w23-variable",
+          "title": "The variable window",
+          "what": "Grow at the right, shrink from the left while the invariant is broken.",
+          "lesson": "When the window's size is not given — \"the **longest** run whose total stays within\nbudget\" — the shape changes:\n\n```ts\nlet start = 0;\nlet sum = 0;\nlet best = 0;\nfor (let end = 0; end < xs.length; end = end + 1) {\n  sum = sum + (xs[end] ?? 0);                      // 1. grow\n  while (sum > budget && start <= end) {\n    sum = sum - (xs[start] ?? 0);                  // 2. shrink until valid\n    start = start + 1;\n  }\n  best = Math.max(best, end - start + 1);          // 3. the window is valid HERE\n}\n```\n\nThree steps, in that order, every iteration. Write them in that order and the thing\nworks; reorder them and it does not.\n\n## The invariant\n\n> At the point where `best` is updated, the window `[start, end]` satisfies the\n> condition.\n\nThat is what makes the answer correct, and stating it is how you decide where the\n`best` update goes: **after** the shrink loop, never inside it.\n\n## Why it is still O(n)\n\nThere is a `while` inside a `for`, which looks quadratic and is not. Count the total\nwork instead (week 21's habit): `end` advances n times, and `start` **only ever\nmoves forward** — so across the entire run the inner loop can execute at most n\ntimes *in total*, not n times per iteration. Two pointers, n steps, **O(n)**.\n\nThis is exactly week 22's same-direction two pointers, with a condition rather than\na fixed rule deciding when the left one moves. If it feels familiar, it should.\n\n## This one is two pointers you have already met\n\n| | week 22 | week 23 |\n|---|---|---|\n| left moves when | the element is kept | the invariant is broken |\n| the answer is | a compacted array | the best window seen |\n\n## `start <= end` in the shrink condition\n\nIt guards the case where a **single element on its own** already breaks the\ncondition — an amount larger than the whole budget. Without it, `start` runs past\n`end` and the width goes negative. With it, the window legitimately becomes empty\nand `best` is not updated. Verified: `longestUnder([10, 1], 5)` is 1, not 0 and not\n2, because the `1` alone fits.\n\n## When a window does not work\n\nThe technique needs the condition to be **monotonic in the window**: growing the\nwindow can only ever make it more broken. That holds for a sum of **non-negative**\nnumbers and fails the moment a negative value appears — adding an element can then\n*reduce* the sum, so a window that was too big might become valid again, and\nshrinking from the left was the wrong move.\n\nThat is precisely why lesson 5's subarray counting uses prefix sums and a Map\ninstead: it makes no monotonicity assumption at all, and works with negatives.\n\n> ⚠️ **Common mistakes:** updating `best` inside the shrink loop; forgetting\n> `start <= end`; and using a window on data with negative values.\n",
+          "warmup": [
+            {
+              "question": "The three steps per iteration are…",
+              "options": [
+                "shrink, grow, record",
+                "grow, shrink, record",
+                "record, grow, shrink",
+                "grow, record, shrink"
+              ],
+              "answer": 1,
+              "explanation": "Record only once the window is valid again."
+            },
+            {
+              "question": "`best` is updated…",
+              "options": [
+                "inside the shrink loop",
+                "after it",
+                "before growing",
+                "twice"
+              ],
+              "answer": 1,
+              "explanation": "The invariant only holds there."
+            },
+            {
+              "question": "It stays O(n) because…",
+              "options": [
+                "the inner loop is short",
+                "`start` only moves forward, so the inner loop runs n times in TOTAL",
+                "of the Map",
+                "k is small"
+              ],
+              "answer": 1,
+              "explanation": "Total work, not nesting."
+            },
+            {
+              "question": "A window fails on negative values because…",
+              "options": [
+                "of types",
+                "growing can reduce the sum, so the condition is not monotonic",
+                "of the shrink",
+                "it does not"
+              ],
+              "answer": 1,
+              "explanation": "Prefix sums plus a Map handle that case."
+            }
+          ],
+          "exercises": [
+            {
+              "id": "tscourse-w23-vr-1",
+              "title": "Shrink until valid",
+              "prompt": "Remove elements from the left while the window's total exceeds the budget.",
+              "hint": "Keep removing from the left until the total fits.",
+              "hints": [
+                "Keep removing from the left until the total fits.",
+                "The guard `start <= end` handles a single element that is too big on its own."
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Hard",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst budget = 7;\nlet start = 0;\nlet sum = 0;\nlet best = 0;\nfor (let end = 0; end < nums.length; end = end + 1) {\n  sum = sum + (nums[end] ?? 0);\n____\n  best = Math.max(best, end - start + 1);\n}\nconsole.log(best);\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst budget = 7;\nlet start = 0;\nlet sum = 0;\nlet best = 0;\nfor (let end = 0; end < nums.length; end = end + 1) {\n  sum = sum + (nums[end] ?? 0);\n  while (sum > budget && start <= end) {\n    sum = sum - (nums[start] ?? 0);\n    start = start + 1;\n  }\n  best = Math.max(best, end - start + 1);\n}\nconsole.log(best);\n",
+              "tests": [
+                {
+                  "input": "1 2 3 4 5",
+                  "output": "3"
+                },
+                {
+                  "input": "10 1",
+                  "output": "1"
+                },
+                {
+                  "input": "1 1 1",
+                  "output": "3"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w23-vr-2",
+              "title": "Record after the shrink",
+              "prompt": "Update the best width where the invariant holds.",
+              "hint": "The width of an inclusive range is end - start + 1.",
+              "hints": [
+                "The width of an inclusive range is end - start + 1.",
+                "Write best = Math.max(best, end - start + 1);"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst budget = 7;\nlet start = 0;\nlet sum = 0;\nlet best = 0;\nfor (let end = 0; end < nums.length; end = end + 1) {\n  sum = sum + (nums[end] ?? 0);\n  while (sum > budget && start <= end) {\n    sum = sum - (nums[start] ?? 0);\n    start = start + 1;\n  }\n____\n}\nconsole.log(best);\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst budget = 7;\nlet start = 0;\nlet sum = 0;\nlet best = 0;\nfor (let end = 0; end < nums.length; end = end + 1) {\n  sum = sum + (nums[end] ?? 0);\n  while (sum > budget && start <= end) {\n    sum = sum - (nums[start] ?? 0);\n    start = start + 1;\n  }\n  best = Math.max(best, end - start + 1);\n}\nconsole.log(best);\n",
+              "tests": [
+                {
+                  "input": "1 2 3 4 5",
+                  "output": "3"
+                },
+                {
+                  "input": "7",
+                  "output": "1"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w23-vr-3",
+              "title": "Count the total inner steps",
+              "prompt": "Report how many times the shrink loop ran altogether, and compare it to n.",
+              "hint": "One per element removed from the left, across the whole run.",
+              "hints": [
+                "One per element removed from the left, across the whole run.",
+                "Write shrinks = shrinks + 1;"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst budget = 5;\nlet start = 0;\nlet sum = 0;\nlet shrinks = 0;\nfor (let end = 0; end < nums.length; end = end + 1) {\n  sum = sum + (nums[end] ?? 0);\n  while (sum > budget && start <= end) {\n    sum = sum - (nums[start] ?? 0);\n    start = start + 1;\n____\n  }\n}\nconsole.log(`n=${nums.length} shrinks=${shrinks}`);\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst budget = 5;\nlet start = 0;\nlet sum = 0;\nlet shrinks = 0;\nfor (let end = 0; end < nums.length; end = end + 1) {\n  sum = sum + (nums[end] ?? 0);\n  while (sum > budget && start <= end) {\n    sum = sum - (nums[start] ?? 0);\n    start = start + 1;\n    shrinks = shrinks + 1;\n  }\n}\nconsole.log(`n=${nums.length} shrinks=${shrinks}`);\n",
+              "tests": [
+                {
+                  "input": "1 2 3 4 5",
+                  "output": "n=5 shrinks=4"
+                },
+                {
+                  "input": "1 1",
+                  "output": "n=2 shrinks=0"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w23-vr-4",
+              "title": "The smallest window that reaches a target",
+              "prompt": "Shrink while the window is still large enough, keeping the narrowest that qualifies.",
+              "hint": "Here the window is recorded INSIDE the loop, because the condition being met is what qualifies it.",
+              "hints": [
+                "Here the window is recorded INSIDE the loop, because the condition being met is what qualifies it.",
+                "Write best = Math.min(best, end - start + 1);"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Hard",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst target = 7;\nlet start = 0;\nlet sum = 0;\nlet best = Number.MAX_SAFE_INTEGER;\nfor (let end = 0; end < nums.length; end = end + 1) {\n  sum = sum + (nums[end] ?? 0);\n  while (sum >= target) {\n____\n    sum = sum - (nums[start] ?? 0);\n    start = start + 1;\n  }\n}\nconsole.log(best === Number.MAX_SAFE_INTEGER ? 0 : best);\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst target = 7;\nlet start = 0;\nlet sum = 0;\nlet best = Number.MAX_SAFE_INTEGER;\nfor (let end = 0; end < nums.length; end = end + 1) {\n  sum = sum + (nums[end] ?? 0);\n  while (sum >= target) {\n    best = Math.min(best, end - start + 1);\n    sum = sum - (nums[start] ?? 0);\n    start = start + 1;\n  }\n}\nconsole.log(best === Number.MAX_SAFE_INTEGER ? 0 : best);\n",
+              "tests": [
+                {
+                  "input": "2 3 1 2 4 3",
+                  "output": "2"
+                },
+                {
+                  "input": "1 1",
+                  "output": "0"
+                },
+                {
+                  "input": "7",
+                  "output": "1"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w23-vr-5",
+              "title": "Longest run of small amounts",
+              "prompt": "A window whose condition is per-element rather than a total.",
+              "hint": "A disqualifying element means the window must restart after it.",
+              "hints": [
+                "A disqualifying element means the window must restart after it.",
+                "Write start = end + 1;"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nlet start = 0;\nlet best = 0;\nfor (let end = 0; end < nums.length; end = end + 1) {\n  if ((nums[end] ?? 0) > 3) {\n____\n  }\n  best = Math.max(best, end - start + 1);\n}\nconsole.log(best);\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nlet start = 0;\nlet best = 0;\nfor (let end = 0; end < nums.length; end = end + 1) {\n  if ((nums[end] ?? 0) > 3) {\n    start = end + 1;\n  }\n  best = Math.max(best, end - start + 1);\n}\nconsole.log(best);\n",
+              "tests": [
+                {
+                  "input": "1 2 9 1 2 3",
+                  "output": "3"
+                },
+                {
+                  "input": "9 9",
+                  "output": "0"
+                },
+                {
+                  "input": "1 2",
+                  "output": "2"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w23-vr-fix1",
+              "title": "Fix the record inside the shrink loop",
+              "prompt": "This reports 5 for a budget of 7 — a width that never satisfied the budget at all. `best` is updated before the shrink loop has restored the invariant, so it measures windows that were too big.",
+              "hint": "At the moment `best` is read, the window has just grown and may be invalid.",
+              "hints": [
+                "At the moment `best` is read, the window has just grown and may be invalid.",
+                "The invariant only holds after the shrink loop.",
+                "Move the `best` update below the while loop."
+              ],
+              "language": "typescript",
+              "kind": "fix",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst budget = 7;\nlet start = 0;\nlet sum = 0;\nlet best = 0;\nfor (let end = 0; end < nums.length; end = end + 1) {\n  sum = sum + (nums[end] ?? 0);\n  best = Math.max(best, end - start + 1);\n  while (sum > budget && start <= end) {\n    sum = sum - (nums[start] ?? 0);\n    start = start + 1;\n  }\n}\nconsole.log(best);\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst budget = 7;\nlet start = 0;\nlet sum = 0;\nlet best = 0;\nfor (let end = 0; end < nums.length; end = end + 1) {\n  sum = sum + (nums[end] ?? 0);\n  while (sum > budget && start <= end) {\n    sum = sum - (nums[start] ?? 0);\n    start = start + 1;\n  }\n  best = Math.max(best, end - start + 1);\n}\nconsole.log(best);\n",
+              "tests": [
+                {
+                  "input": "1 2 3 4 5",
+                  "output": "3"
+                },
+                {
+                  "input": "10 1",
+                  "output": "1"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            }
+          ],
+          "quiz": [
+            {
+              "question": "`start <= end` in the shrink condition guards…",
+              "options": [
+                "an empty array",
+                "a single element that already breaks the condition",
+                "the budget",
+                "nothing"
+              ],
+              "answer": 1,
+              "explanation": "Otherwise the width goes negative."
+            },
+            {
+              "question": "For the SMALLEST window reaching a target, `best` is recorded…",
+              "options": [
+                "after the loop",
+                "inside the shrink loop, because meeting the condition is what qualifies it",
+                "before growing",
+                "never"
+              ],
+              "answer": 1,
+              "explanation": "The mirror image of the longest-window case."
+            }
+          ]
+        },
+        {
+          "key": "w23-counts",
+          "title": "A window that remembers what is in it",
+          "what": "Week 19's Map, inside week 22's two pointers.",
+          "lesson": "When the condition is about the window's **contents** rather than its total, the\nwindow carries a `Map` of counts.\n\n## Entering and leaving\n\n```ts\ncounts.set(v, (counts.get(v) ?? 0) + 1);            // entering — week 19's idiom\n\nconst left = (counts.get(out) ?? 0) - 1;            // leaving\nif (left === 0) { counts.delete(out); }              // delete, do not leave a 0\nelse { counts.set(out, left); }\n```\n\n**The delete is load-bearing.** `counts.size` is how you know how many *distinct*\nvalues are in the window, and a key sitting at zero would be counted. This is the\none place where \"set it to 0\" and \"remove it\" are genuinely different.\n\n## Longest stretch with no repeat\n\n```ts\nconst lastSeen = new Map<string, number>();\nlet start = 0;\nlet best = 0;\nfor (let i = 0; i < text.length; i = i + 1) {\n  const ch = text.charAt(i);\n  const prev = lastSeen.get(ch);\n  if (prev !== undefined && prev >= start) {\n    start = prev + 1;                 // jump the window past the earlier copy\n  }\n  lastSeen.set(ch, i);\n  best = Math.max(best, i - start + 1);\n}\n```\n\nNote `prev >= start`: a character seen *before* the window began is not a repeat\ninside it, and that check is the only subtle line. Storing the **last index** rather\nthan a count lets `start` jump straight there instead of shrinking one at a time —\nstill O(n), and less code.\n\nOn `\"abcabcbb\"` the answer is 3; on `\"bbbbb\"` it is 1; on `\"pwwkew\"` it is 3.\n\n## At most k distinct, and then exactly k\n\n```ts\nwhile (counts.size > k) { /* remove from the left */ }\ntotal = total + (end - start + 1);      // every window ending at `end` is valid\n```\n\nThat `total +=` line counts **subarrays**, not width: if the window `[start, end]`\nis valid, so is every window ending at `end` that starts at or after `start` —\nwhich is `end - start + 1` of them.\n\nAnd then the trick worth remembering:\n\n> **exactly k  =  atMost(k) − atMost(k − 1)**\n\nBecause \"at most k\" includes every window with fewer, so subtracting \"at most k−1\"\nleaves precisely those with k. On `[1,2,1,2,3]`: atMost(2) is 12, atMost(1) is 5,\nso exactly-2 is **7**. Two runs of the same function, no third algorithm.\n\nThat pattern — compute a cumulative answer twice and subtract — appears all over\ncounting problems, and it is the same arithmetic as week 22's\n`upperBound − lowerBound`.\n\n> ⚠️ **Common mistakes:** leaving a zero count in the Map; forgetting\n> `prev >= start`; and adding 1 to the total instead of `end - start + 1`.\n",
+          "warmup": [
+            {
+              "question": "When a value leaves the window and its count hits 0 you must…",
+              "options": [
+                "set it to 0",
+                "delete the key",
+                "ignore it",
+                "reset the Map"
+              ],
+              "answer": 1,
+              "explanation": "Or `size` counts it."
+            },
+            {
+              "question": "`prev >= start` checks that…",
+              "options": [
+                "the character exists",
+                "the earlier copy is INSIDE the current window",
+                "the window is valid",
+                "start moved"
+              ],
+              "answer": 1,
+              "explanation": "A copy before the window is not a repeat."
+            },
+            {
+              "question": "`total = total + (end - start + 1)` counts…",
+              "options": [
+                "the width",
+                "every valid subarray ending at `end`",
+                "distinct values",
+                "one window"
+              ],
+              "answer": 1,
+              "explanation": "Which is how you count subarrays rather than measure one."
+            },
+            {
+              "question": "Exactly k distinct equals…",
+              "options": [
+                "atMost(k)",
+                "atMost(k) - atMost(k-1)",
+                "k",
+                "atLeast(k)"
+              ],
+              "answer": 1,
+              "explanation": "Two runs and a subtraction."
+            }
+          ],
+          "exercises": [
+            {
+              "id": "tscourse-w23-ct-1",
+              "title": "Jump past the repeat",
+              "prompt": "When the character was already seen inside the window, move the start past it.",
+              "hint": "Only a copy at or after `start` is a repeat within the window.",
+              "hints": [
+                "Only a copy at or after `start` is a repeat within the window.",
+                "Move the window to begin just after the earlier copy."
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Hard",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst line = fs.readFileSync(0, \"utf8\").trim();\nconst lastSeen = new Map<string, number>();\nlet start = 0;\nlet best = 0;\nfor (let i = 0; i < line.length; i = i + 1) {\n  const ch = line.charAt(i);\n  const prev = lastSeen.get(ch);\n____\n  lastSeen.set(ch, i);\n  best = Math.max(best, i - start + 1);\n}\nconsole.log(best);\n",
+              "solution": "import * as fs from \"fs\";\nconst line = fs.readFileSync(0, \"utf8\").trim();\nconst lastSeen = new Map<string, number>();\nlet start = 0;\nlet best = 0;\nfor (let i = 0; i < line.length; i = i + 1) {\n  const ch = line.charAt(i);\n  const prev = lastSeen.get(ch);\n  if (prev !== undefined && prev >= start) {\n    start = prev + 1;\n  }\n  lastSeen.set(ch, i);\n  best = Math.max(best, i - start + 1);\n}\nconsole.log(best);\n",
+              "tests": [
+                {
+                  "input": "abcabcbb",
+                  "output": "3"
+                },
+                {
+                  "input": "bbbbb",
+                  "output": "1"
+                },
+                {
+                  "input": "pwwkew",
+                  "output": "3"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w23-ct-2",
+              "title": "Delete the exhausted key",
+              "prompt": "Remove the key entirely when its count reaches zero, so `size` stays honest.",
+              "hint": "A zero left in the Map would still be counted by `size`.",
+              "hints": [
+                "A zero left in the Map would still be counted by `size`.",
+                "Delete when it reaches zero, otherwise store the decremented count."
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst counts = new Map<number, number>();\nfor (const n of nums) {\n  counts.set(n, (counts.get(n) ?? 0) + 1);\n}\nconst first = nums[0] ?? 0;\nconst left = (counts.get(first) ?? 0) - 1;\n____\nconsole.log(counts.size);\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst counts = new Map<number, number>();\nfor (const n of nums) {\n  counts.set(n, (counts.get(n) ?? 0) + 1);\n}\nconst first = nums[0] ?? 0;\nconst left = (counts.get(first) ?? 0) - 1;\nif (left === 0) {\n  counts.delete(first);\n} else {\n  counts.set(first, left);\n}\nconsole.log(counts.size);\n",
+              "tests": [
+                {
+                  "input": "1 2 3",
+                  "output": "2"
+                },
+                {
+                  "input": "1 1 2",
+                  "output": "2"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w23-ct-3",
+              "title": "At most k distinct",
+              "prompt": "Count every valid subarray ending at each position.",
+              "hint": "Every window ending here and starting at or after `start` is valid.",
+              "hints": [
+                "Every window ending here and starting at or after `start` is valid.",
+                "Write total = total + (end - start + 1);"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Hard",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nfunction atMost(xs: readonly number[], k: number): number {\n  const counts = new Map<number, number>();\n  let start = 0;\n  let total = 0;\n  for (let end = 0; end < xs.length; end = end + 1) {\n    const v = xs[end] ?? 0;\n    counts.set(v, (counts.get(v) ?? 0) + 1);\n    while (counts.size > k) {\n      const out = xs[start] ?? 0;\n      const left = (counts.get(out) ?? 0) - 1;\n      if (left === 0) {\n        counts.delete(out);\n      } else {\n        counts.set(out, left);\n      }\n      start = start + 1;\n    }\n____\n  }\n  return total;\n}\nconsole.log(atMost(nums, 2));\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nfunction atMost(xs: readonly number[], k: number): number {\n  const counts = new Map<number, number>();\n  let start = 0;\n  let total = 0;\n  for (let end = 0; end < xs.length; end = end + 1) {\n    const v = xs[end] ?? 0;\n    counts.set(v, (counts.get(v) ?? 0) + 1);\n    while (counts.size > k) {\n      const out = xs[start] ?? 0;\n      const left = (counts.get(out) ?? 0) - 1;\n      if (left === 0) {\n        counts.delete(out);\n      } else {\n        counts.set(out, left);\n      }\n      start = start + 1;\n    }\n    total = total + (end - start + 1);\n  }\n  return total;\n}\nconsole.log(atMost(nums, 2));\n",
+              "tests": [
+                {
+                  "input": "1 2 1 2 3",
+                  "output": "12"
+                },
+                {
+                  "input": "1 1",
+                  "output": "3"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w23-ct-4",
+              "title": "Exactly k, by subtraction",
+              "prompt": "Run the same function twice and subtract.",
+              "hint": "At most two, minus at most one.",
+              "hints": [
+                "At most two, minus at most one.",
+                "Write console.log(atMost(nums, 2) - atMost(nums, 1));"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nfunction atMost(xs: readonly number[], k: number): number {\n  const counts = new Map<number, number>();\n  let start = 0;\n  let total = 0;\n  for (let end = 0; end < xs.length; end = end + 1) {\n    const v = xs[end] ?? 0;\n    counts.set(v, (counts.get(v) ?? 0) + 1);\n    while (counts.size > k) {\n      const out = xs[start] ?? 0;\n      const left = (counts.get(out) ?? 0) - 1;\n      if (left === 0) {\n        counts.delete(out);\n      } else {\n        counts.set(out, left);\n      }\n      start = start + 1;\n    }\n    total = total + (end - start + 1);\n  }\n  return total;\n}\n____\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nfunction atMost(xs: readonly number[], k: number): number {\n  const counts = new Map<number, number>();\n  let start = 0;\n  let total = 0;\n  for (let end = 0; end < xs.length; end = end + 1) {\n    const v = xs[end] ?? 0;\n    counts.set(v, (counts.get(v) ?? 0) + 1);\n    while (counts.size > k) {\n      const out = xs[start] ?? 0;\n      const left = (counts.get(out) ?? 0) - 1;\n      if (left === 0) {\n        counts.delete(out);\n      } else {\n        counts.set(out, left);\n      }\n      start = start + 1;\n    }\n    total = total + (end - start + 1);\n  }\n  return total;\n}\nconsole.log(atMost(nums, 2) - atMost(nums, 1));\n",
+              "tests": [
+                {
+                  "input": "1 2 1 2 3",
+                  "output": "7"
+                },
+                {
+                  "input": "1 1",
+                  "output": "0"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w23-ct-5",
+              "title": "The most frequent value in the window",
+              "prompt": "Track the running maximum count as elements enter, which is enough for a fixed window.",
+              "hint": "The new count for this value may be the largest seen.",
+              "hints": [
+                "The new count for this value may be the largest seen.",
+                "Write mostCommon = Math.max(mostCommon, n);"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst words = fs.readFileSync(0, \"utf8\").trim().split(\" \");\nconst counts = new Map<string, number>();\nlet mostCommon = 0;\nfor (const w of words) {\n  const n = (counts.get(w) ?? 0) + 1;\n  counts.set(w, n);\n____\n}\nconsole.log(`${counts.size} ${mostCommon}`);\n",
+              "solution": "import * as fs from \"fs\";\nconst words = fs.readFileSync(0, \"utf8\").trim().split(\" \");\nconst counts = new Map<string, number>();\nlet mostCommon = 0;\nfor (const w of words) {\n  const n = (counts.get(w) ?? 0) + 1;\n  counts.set(w, n);\n  mostCommon = Math.max(mostCommon, n);\n}\nconsole.log(`${counts.size} ${mostCommon}`);\n",
+              "tests": [
+                {
+                  "input": "a b a c a",
+                  "output": "3 3"
+                },
+                {
+                  "input": "x",
+                  "output": "1 1"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w23-ct-fix1",
+              "title": "Fix the zero left in the Map",
+              "prompt": "This reports 3 distinct values in a window that holds two, because a key whose count dropped to zero was stored rather than removed — and `size` counts keys, not totals.",
+              "hint": "`size` is the number of KEYS, and a key holding 0 is still a key.",
+              "hints": [
+                "`size` is the number of KEYS, and a key holding 0 is still a key.",
+                "Decide before storing: is the new count zero?",
+                "Delete the key in that case."
+              ],
+              "language": "typescript",
+              "kind": "fix",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst counts = new Map<number, number>();\nfor (const n of nums) {\n  counts.set(n, (counts.get(n) ?? 0) + 1);\n}\nconst first = nums[0] ?? 0;\ncounts.set(first, (counts.get(first) ?? 0) - 1);\nconsole.log(counts.size);\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst counts = new Map<number, number>();\nfor (const n of nums) {\n  counts.set(n, (counts.get(n) ?? 0) + 1);\n}\nconst first = nums[0] ?? 0;\nconst left = (counts.get(first) ?? 0) - 1;\nif (left === 0) {\n  counts.delete(first);\n} else {\n  counts.set(first, left);\n}\nconsole.log(counts.size);\n",
+              "tests": [
+                {
+                  "input": "1 2 3",
+                  "output": "2"
+                },
+                {
+                  "input": "1 1 2",
+                  "output": "2"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            }
+          ],
+          "quiz": [
+            {
+              "question": "Storing the last INDEX rather than a count lets you…",
+              "options": [
+                "use less memory",
+                "jump `start` straight past the earlier copy",
+                "sort",
+                "avoid the Map"
+              ],
+              "answer": 1,
+              "explanation": "Still O(n), and less code."
+            },
+            {
+              "question": "\"Compute a cumulative answer twice and subtract\" also describes…",
+              "options": [
+                "binary search",
+                "week 22's upperBound - lowerBound",
+                "a window",
+                "a sort"
+              ],
+              "answer": 1,
+              "explanation": "The same arithmetic in a different costume."
+            }
+          ]
+        },
+        {
+          "key": "w23-prefix",
+          "title": "Prefix sums",
+          "what": "Pay O(n) once; answer every range in O(1) for ever.",
+          "lesson": "\"The total between index 3 and index 7.\" Once, a loop is fine. A thousand times,\nprecompute:\n\n```ts\nconst prefix: number[] = [0];                       // the sentinel\nfor (const x of xs) {\n  prefix.push((prefix[prefix.length - 1] ?? 0) + x);\n}\n```\n\n```\nxs     =    [1, 2, 3,  4,  5]\nprefix = [0, 1, 3, 6, 10, 15]\n```\n\n`prefix[i]` is the total of the **first i elements** — so `prefix[0]` is 0 (no\nelements) and `prefix[5]` is everything.\n\n## The query\n\n```ts\nfunction rangeSum(lo: number, hi: number): number {    // INCLUSIVE both ends\n  return (prefix[hi + 1] ?? 0) - (prefix[lo] ?? 0);\n}\n```\n\n`rangeSum(1, 3)` is `prefix[4] - prefix[1]` = 10 − 1 = **9**, which is 2+3+4. ✓\n\nTwo details, and between them they are every prefix-sum bug:\n\n* **`hi + 1`, not `hi`.** The prefix at `hi + 1` includes element `hi`, which is\n  what \"inclusive\" means. Using `prefix[hi]` gives you the sum of `[lo, hi-1]` —\n  one element short, and it looks plausible.\n* **The leading 0 is why `lo` needs no adjustment.** Without the sentinel,\n  `rangeSum(0, hi)` would need a special case (`lo === 0 ? prefix[hi] : …`). The\n  sentinel is one array slot that deletes a branch, which is the same trade as week\n  20's sentinel node.\n\n## The trade\n\n| | build | per query |\n|---|---|---|\n| loop each time | — | O(n) |\n| prefix sums | O(n) once | **O(1)** |\n\nWorth it from the second query onwards, and it is **not** free: the array is O(n)\nextra space, and it is **invalidated by any change to the input**. A prefix sum is\nfor data you read far more often than you write — and when writes dominate, lesson\n6's difference array inverts exactly this trade.\n\n## Beyond sums\n\nThe same construction works for anything with an inverse: a running count, a\nrunning XOR, a product without zeroes. It does **not** work for a maximum — you\ncannot un-max — which is the same limitation as the sliding window, and the reason\nrange-maximum queries need a different structure entirely.\n\n> ⚠️ **Common mistakes:** `prefix[hi]` instead of `prefix[hi + 1]`; omitting the\n> sentinel and needing a branch; and using a stale prefix array after the input\n> changed.\n",
+          "warmup": [
+            {
+              "question": "A prefix array for n elements has…",
+              "options": [
+                "n entries",
+                "n + 1",
+                "n - 1",
+                "2n"
+              ],
+              "answer": 1,
+              "explanation": "The sentinel is the extra one."
+            },
+            {
+              "question": "The inclusive range sum is…",
+              "options": [
+                "prefix[hi] - prefix[lo]",
+                "prefix[hi + 1] - prefix[lo]",
+                "prefix[hi] - prefix[lo - 1]",
+                "prefix[hi] + prefix[lo]"
+              ],
+              "answer": 1,
+              "explanation": "`hi + 1` includes element hi."
+            },
+            {
+              "question": "The leading 0 removes…",
+              "options": [
+                "a loop",
+                "the `lo === 0` special case",
+                "the sum",
+                "an allocation"
+              ],
+              "answer": 1,
+              "explanation": "One slot instead of a branch."
+            },
+            {
+              "question": "A prefix array is invalidated by…",
+              "options": [
+                "a query",
+                "any change to the input",
+                "nothing",
+                "a sort"
+              ],
+              "answer": 1,
+              "explanation": "It is for read-heavy data."
+            }
+          ],
+          "exercises": [
+            {
+              "id": "tscourse-w23-pf-1",
+              "title": "Build it with its sentinel",
+              "prompt": "Start the array at zero, then push each running total.",
+              "hint": "The first entry is the total of no elements.",
+              "hints": [
+                "The first entry is the total of no elements.",
+                "Write const prefix: number[] = [0];"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nfunction prefixOf(xs: readonly number[]): readonly number[] {\n____\n  for (const x of xs) {\n    prefix.push((prefix[prefix.length - 1] ?? 0) + x);\n  }\n  return prefix;\n}\nconsole.log(prefixOf(nums).join(\",\"));\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nfunction prefixOf(xs: readonly number[]): readonly number[] {\n  const prefix: number[] = [0];\n  for (const x of xs) {\n    prefix.push((prefix[prefix.length - 1] ?? 0) + x);\n  }\n  return prefix;\n}\nconsole.log(prefixOf(nums).join(\",\"));\n",
+              "tests": [
+                {
+                  "input": "1 2 3 4 5",
+                  "output": "0,1,3,6,10,15"
+                },
+                {
+                  "input": "7",
+                  "output": "0,7"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w23-pf-2",
+              "title": "The inclusive query",
+              "prompt": "Subtract the prefix before the range from the prefix through its end.",
+              "hint": "The prefix at `hi + 1` already includes element `hi`.",
+              "hints": [
+                "The prefix at `hi + 1` already includes element `hi`.",
+                "Write return (prefix[hi + 1] ?? 0) - (prefix[lo] ?? 0);"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nfunction prefixOf(xs: readonly number[]): readonly number[] {\n  const prefix: number[] = [0];\n  for (const x of xs) {\n    prefix.push((prefix[prefix.length - 1] ?? 0) + x);\n  }\n  return prefix;\n}\nconst prefix = prefixOf(nums);\nfunction rangeSum(lo: number, hi: number): number {\n____\n}\nconsole.log(`${rangeSum(0, nums.length - 1)} ${rangeSum(1, 3)}`);\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nfunction prefixOf(xs: readonly number[]): readonly number[] {\n  const prefix: number[] = [0];\n  for (const x of xs) {\n    prefix.push((prefix[prefix.length - 1] ?? 0) + x);\n  }\n  return prefix;\n}\nconst prefix = prefixOf(nums);\nfunction rangeSum(lo: number, hi: number): number {\n  return (prefix[hi + 1] ?? 0) - (prefix[lo] ?? 0);\n}\nconsole.log(`${rangeSum(0, nums.length - 1)} ${rangeSum(1, 3)}`);\n",
+              "tests": [
+                {
+                  "input": "1 2 3 4 5",
+                  "output": "15 9"
+                },
+                {
+                  "input": "2 4 6 8",
+                  "output": "20 18"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w23-pf-3",
+              "title": "Many queries, one build",
+              "prompt": "Answer three ranges from the same table and report how many builds it took.",
+              "hint": "Three queries, one build — which is the entire argument.",
+              "hints": [
+                "Three queries, one build — which is the entire argument.",
+                "Write the log line with all four values."
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nfunction prefixOf(xs: readonly number[]): readonly number[] {\n  const prefix: number[] = [0];\n  for (const x of xs) {\n    prefix.push((prefix[prefix.length - 1] ?? 0) + x);\n  }\n  return prefix;\n}\nlet builds = 0;\nbuilds = builds + 1;\nconst prefix = prefixOf(nums);\nfunction rangeSum(lo: number, hi: number): number {\n  return (prefix[hi + 1] ?? 0) - (prefix[lo] ?? 0);\n}\n____\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nfunction prefixOf(xs: readonly number[]): readonly number[] {\n  const prefix: number[] = [0];\n  for (const x of xs) {\n    prefix.push((prefix[prefix.length - 1] ?? 0) + x);\n  }\n  return prefix;\n}\nlet builds = 0;\nbuilds = builds + 1;\nconst prefix = prefixOf(nums);\nfunction rangeSum(lo: number, hi: number): number {\n  return (prefix[hi + 1] ?? 0) - (prefix[lo] ?? 0);\n}\nconsole.log(`${rangeSum(0, 1)} ${rangeSum(1, 2)} ${rangeSum(0, 2)} builds=${builds}`);\n",
+              "tests": [
+                {
+                  "input": "1 2 3",
+                  "output": "3 5 6 builds=1"
+                },
+                {
+                  "input": "5 5 5",
+                  "output": "10 10 15 builds=1"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w23-pf-4",
+              "title": "A prefix count",
+              "prompt": "Build a prefix over 0s and 1s, so a range query counts matching elements.",
+              "hint": "Contribute 1 for a matching element and 0 otherwise.",
+              "hints": [
+                "Contribute 1 for a matching element and 0 otherwise.",
+                "Write prefix.push((prefix[prefix.length - 1] ?? 0) + (n > 2 ? 1 : 0));"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst prefix: number[] = [0];\nfor (const n of nums) {\n____\n}\nfunction countBig(lo: number, hi: number): number {\n  return (prefix[hi + 1] ?? 0) - (prefix[lo] ?? 0);\n}\nconsole.log(`${countBig(0, nums.length - 1)} ${countBig(0, 1)}`);\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst prefix: number[] = [0];\nfor (const n of nums) {\n  prefix.push((prefix[prefix.length - 1] ?? 0) + (n > 2 ? 1 : 0));\n}\nfunction countBig(lo: number, hi: number): number {\n  return (prefix[hi + 1] ?? 0) - (prefix[lo] ?? 0);\n}\nconsole.log(`${countBig(0, nums.length - 1)} ${countBig(0, 1)}`);\n",
+              "tests": [
+                {
+                  "input": "1 4 5 1",
+                  "output": "2 1"
+                },
+                {
+                  "input": "9 9",
+                  "output": "2 2"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w23-pf-5",
+              "title": "The average of a range",
+              "prompt": "Divide the range total by its width, to two decimals.",
+              "hint": "An inclusive range has hi - lo + 1 elements.",
+              "hints": [
+                "An inclusive range has hi - lo + 1 elements.",
+                "Write return (total / (hi - lo + 1)).toFixed(2);"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nfunction prefixOf(xs: readonly number[]): readonly number[] {\n  const prefix: number[] = [0];\n  for (const x of xs) {\n    prefix.push((prefix[prefix.length - 1] ?? 0) + x);\n  }\n  return prefix;\n}\nconst prefix = prefixOf(nums);\nfunction rangeAvg(lo: number, hi: number): string {\n  const total = (prefix[hi + 1] ?? 0) - (prefix[lo] ?? 0);\n____\n}\nconsole.log(rangeAvg(0, nums.length - 1));\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nfunction prefixOf(xs: readonly number[]): readonly number[] {\n  const prefix: number[] = [0];\n  for (const x of xs) {\n    prefix.push((prefix[prefix.length - 1] ?? 0) + x);\n  }\n  return prefix;\n}\nconst prefix = prefixOf(nums);\nfunction rangeAvg(lo: number, hi: number): string {\n  const total = (prefix[hi + 1] ?? 0) - (prefix[lo] ?? 0);\n  return (total / (hi - lo + 1)).toFixed(2);\n}\nconsole.log(rangeAvg(0, nums.length - 1));\n",
+              "tests": [
+                {
+                  "input": "1 2 3",
+                  "output": "2.00"
+                },
+                {
+                  "input": "2 4",
+                  "output": "3.00"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w23-pf-fix1",
+              "title": "Fix the range that was one short",
+              "prompt": "`rangeSum(1, 3)` on `[1,2,3,4,5]` reports 6 where the answer is 9. `prefix[hi]` is the total *before* element `hi`, so the last element of the range is left out every time.",
+              "hint": "The prefix array is offset by one from the input, and the query has to account for it.",
+              "hints": [
+                "The prefix array is offset by one from the input, and the query has to account for it.",
+                "`prefix[hi]` totals the first `hi` elements — which stops just before element `hi`.",
+                "Write prefix[hi + 1]."
+              ],
+              "language": "typescript",
+              "kind": "fix",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nfunction prefixOf(xs: readonly number[]): readonly number[] {\n  const prefix: number[] = [0];\n  for (const x of xs) {\n    prefix.push((prefix[prefix.length - 1] ?? 0) + x);\n  }\n  return prefix;\n}\nconst prefix = prefixOf(nums);\nfunction rangeSum(lo: number, hi: number): number {\n  return (prefix[hi] ?? 0) - (prefix[lo] ?? 0);\n}\nconsole.log(rangeSum(1, 3));\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nfunction prefixOf(xs: readonly number[]): readonly number[] {\n  const prefix: number[] = [0];\n  for (const x of xs) {\n    prefix.push((prefix[prefix.length - 1] ?? 0) + x);\n  }\n  return prefix;\n}\nconst prefix = prefixOf(nums);\nfunction rangeSum(lo: number, hi: number): number {\n  return (prefix[hi + 1] ?? 0) - (prefix[lo] ?? 0);\n}\nconsole.log(rangeSum(1, 3));\n",
+              "tests": [
+                {
+                  "input": "1 2 3 4 5",
+                  "output": "9"
+                },
+                {
+                  "input": "5 5 5 5",
+                  "output": "15"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            }
+          ],
+          "quiz": [
+            {
+              "question": "Prefix sums do not work for a maximum because…",
+              "options": [
+                "they are slow",
+                "you cannot un-max — there is no inverse",
+                "of the sentinel",
+                "of types"
+              ],
+              "answer": 1,
+              "explanation": "The same limitation as a sliding window."
+            },
+            {
+              "question": "Prefix sums are the wrong choice when…",
+              "options": [
+                "there are many queries",
+                "writes dominate reads",
+                "the array is large",
+                "values are negative"
+              ],
+              "answer": 1,
+              "explanation": "Which is what lesson 6 inverts."
+            }
+          ]
+        },
+        {
+          "key": "w23-submap",
+          "title": "Prefix sums plus a Map",
+          "what": "The highest-yield trick in the month.",
+          "lesson": "\"How many contiguous stretches sum to exactly `k`?\"\n\nA window cannot do it: the values may be negative, so growing the window can reduce\nthe sum and the condition is not monotonic (lesson 2). But there is a one-pass\nanswer, and it is the combination this whole month has been building towards.\n\n## The idea\n\nA subarray `(i, j]` sums to `k` exactly when\n\n```\nrunning(j) - running(i) === k        ⇔        running(i) === running(j) - k\n```\n\nSo as you walk, keep a **Map of every running total you have seen and how often**.\nAt each step, the number of subarrays *ending here* with sum `k` is the number of\ntimes `running - k` has been seen before.\n\n```ts\nconst seen = new Map<number, number>();\nseen.set(0, 1);                                   // the empty prefix. REQUIRED.\nlet running = 0;\nlet count = 0;\nfor (const x of xs) {\n  running = running + x;\n  count = count + (seen.get(running - k) ?? 0);    // the complement\n  seen.set(running, (seen.get(running) ?? 0) + 1);\n}\n```\n\nOne pass, **O(n)** time and O(n) space, and it handles negative values without a\nthought.\n\n## `seen.set(0, 1)` is not optional\n\nIt records that a running total of 0 has occurred once — **before any element**.\nWithout it, every subarray that starts at index 0 is missed, because for those\n`running - k` is exactly 0 and nothing would have registered it. On `[1,2,3]` with\nk = 3 the answer is 2 (`[1,2]` and `[3]`); omit that line and you get 1.\n\nThis is the single most commonly forgotten line in the pattern, and the empty prefix\nis what it stands for — the same sentinel idea as lesson 4's leading zero.\n\n## The order matters\n\nLook up the complement **before** recording the current total. Reverse them and a\n`k` of 0 counts each element as a subarray with itself.\n\n## Verified answers\n\n```\n[1,1,1] k=2                  ->  2\n[1,2,3] k=3                  ->  2\n[3,4,7,2,-3,1,4,2] k=7       ->  4      ← the negative makes a window impossible\n```\n\nThat third one is the case to remember: `-3` in the data rules out the sliding\nwindow entirely, and this pattern does not care.\n\n## The family\n\nThe same shape solves a surprising range once you see it:\n\n* **A subarray divisible by k** — key on `running % k` instead of `running`.\n* **The longest subarray summing to k** — store the *first* index each total\n  appeared at, rather than a count.\n* **Equal numbers of two things** — map one to +1 and the other to −1, then count\n  subarrays summing to 0.\n\nAll three are \"prefix, complement, Map\". Recognising that is worth more than any one\nof them.\n\n> ⚠️ **Common mistakes:** omitting `seen.set(0, 1)`; recording before looking up;\n> and reaching for a sliding window on data with negatives.\n",
+          "warmup": [
+            {
+              "question": "A subarray sums to k exactly when…",
+              "options": [
+                "running === k",
+                "running(j) - running(i) === k for some earlier i",
+                "the window fits",
+                "k is positive"
+              ],
+              "answer": 1,
+              "explanation": "Which is a lookup for `running - k`."
+            },
+            {
+              "question": "`seen.set(0, 1)` before the loop accounts for…",
+              "options": [
+                "the target",
+                "the empty prefix — subarrays starting at index 0",
+                "the first element",
+                "nothing"
+              ],
+              "answer": 1,
+              "explanation": "Omit it and you undercount."
+            },
+            {
+              "question": "Look up the complement…",
+              "options": [
+                "after recording",
+                "before recording the current total",
+                "twice",
+                "at the end"
+              ],
+              "answer": 1,
+              "explanation": "Or k = 0 counts each element with itself."
+            },
+            {
+              "question": "This works with negative values where a window does not, because…",
+              "options": [
+                "it is faster",
+                "it assumes no monotonicity at all",
+                "of the Map",
+                "of the sentinel"
+              ],
+              "answer": 1,
+              "explanation": "That is the whole reason it exists."
+            }
+          ],
+          "exercises": [
+            {
+              "id": "tscourse-w23-sm-1",
+              "title": "Seed the empty prefix",
+              "prompt": "Record that a running total of zero has been seen once, before the walk begins.",
+              "hint": "Before any element, the running total is zero and that has happened once.",
+              "hints": [
+                "Before any element, the running total is zero and that has happened once.",
+                "Write seen.set(0, 1);"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst target = 3;\nconst seen = new Map<number, number>();\n____\nlet running = 0;\nlet count = 0;\nfor (const x of nums) {\n  running = running + x;\n  count = count + (seen.get(running - target) ?? 0);\n  seen.set(running, (seen.get(running) ?? 0) + 1);\n}\nconsole.log(count);\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst target = 3;\nconst seen = new Map<number, number>();\nseen.set(0, 1);\nlet running = 0;\nlet count = 0;\nfor (const x of nums) {\n  running = running + x;\n  count = count + (seen.get(running - target) ?? 0);\n  seen.set(running, (seen.get(running) ?? 0) + 1);\n}\nconsole.log(count);\n",
+              "tests": [
+                {
+                  "input": "1 2 3",
+                  "output": "2"
+                },
+                {
+                  "input": "3",
+                  "output": "1"
+                },
+                {
+                  "input": "1 1",
+                  "output": "0"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w23-sm-2",
+              "title": "Look up the complement",
+              "prompt": "Count how many earlier running totals would make a subarray ending here sum to the target.",
+              "hint": "The complement is the running total minus the target.",
+              "hints": [
+                "The complement is the running total minus the target.",
+                "Write count = count + (seen.get(running - target) ?? 0);"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst target = 2;\nconst seen = new Map<number, number>();\nseen.set(0, 1);\nlet running = 0;\nlet count = 0;\nfor (const x of nums) {\n  running = running + x;\n____\n  seen.set(running, (seen.get(running) ?? 0) + 1);\n}\nconsole.log(count);\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst target = 2;\nconst seen = new Map<number, number>();\nseen.set(0, 1);\nlet running = 0;\nlet count = 0;\nfor (const x of nums) {\n  running = running + x;\n  count = count + (seen.get(running - target) ?? 0);\n  seen.set(running, (seen.get(running) ?? 0) + 1);\n}\nconsole.log(count);\n",
+              "tests": [
+                {
+                  "input": "1 1 1",
+                  "output": "2"
+                },
+                {
+                  "input": "2 2",
+                  "output": "2"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w23-sm-3",
+              "title": "With a negative in the data",
+              "prompt": "Run the same pass on data a sliding window could not handle.",
+              "hint": "Record the current running total, incrementing how often it has occurred.",
+              "hints": [
+                "Record the current running total, incrementing how often it has occurred.",
+                "Write seen.set(running, (seen.get(running) ?? 0) + 1);"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Hard",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst target = 7;\nconst seen = new Map<number, number>();\nseen.set(0, 1);\nlet running = 0;\nlet count = 0;\nfor (const x of nums) {\n  running = running + x;\n  count = count + (seen.get(running - target) ?? 0);\n____\n}\nconsole.log(`count=${count}`);\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst target = 7;\nconst seen = new Map<number, number>();\nseen.set(0, 1);\nlet running = 0;\nlet count = 0;\nfor (const x of nums) {\n  running = running + x;\n  count = count + (seen.get(running - target) ?? 0);\n  seen.set(running, (seen.get(running) ?? 0) + 1);\n}\nconsole.log(`count=${count}`);\n",
+              "tests": [
+                {
+                  "input": "3 4 7 2 -3 1 4 2",
+                  "output": "count=4"
+                },
+                {
+                  "input": "7 -7 7",
+                  "output": "count=3"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w23-sm-4",
+              "title": "Divisible by k",
+              "prompt": "Key on the remainder instead of the total, and count subarrays divisible by k.",
+              "hint": "JavaScript's `%` can be negative, so normalise it into 0…k-1.",
+              "hints": [
+                "JavaScript's `%` can be negative, so normalise it into 0…k-1.",
+                "Write const key = ((running % k) + k) % k;"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Hard",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst k = 3;\nconst seen = new Map<number, number>();\nseen.set(0, 1);\nlet running = 0;\nlet count = 0;\nfor (const x of nums) {\n  running = running + x;\n____\n  count = count + (seen.get(key) ?? 0);\n  seen.set(key, (seen.get(key) ?? 0) + 1);\n}\nconsole.log(count);\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst k = 3;\nconst seen = new Map<number, number>();\nseen.set(0, 1);\nlet running = 0;\nlet count = 0;\nfor (const x of nums) {\n  running = running + x;\n  const key = ((running % k) + k) % k;\n  count = count + (seen.get(key) ?? 0);\n  seen.set(key, (seen.get(key) ?? 0) + 1);\n}\nconsole.log(count);\n",
+              "tests": [
+                {
+                  "input": "3 6 9",
+                  "output": "6"
+                },
+                {
+                  "input": "1 2 3",
+                  "output": "3"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w23-sm-5",
+              "title": "The longest one, not the count",
+              "prompt": "Store the first index each running total appeared at, so the width can be measured.",
+              "hint": "Only the FIRST occurrence of a total gives the widest span, so do not overwrite it.",
+              "hints": [
+                "Only the FIRST occurrence of a total gives the widest span, so do not overwrite it.",
+                "Write if (!firstAt.has(running)) { firstAt.set(running, i); }"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Hard",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst target = 3;\nconst firstAt = new Map<number, number>();\nfirstAt.set(0, -1);\nlet running = 0;\nlet best = 0;\nfor (let i = 0; i < nums.length; i = i + 1) {\n  running = running + (nums[i] ?? 0);\n  const at = firstAt.get(running - target);\n  if (at !== undefined) {\n    best = Math.max(best, i - at);\n  }\n____\n}\nconsole.log(best);\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst target = 3;\nconst firstAt = new Map<number, number>();\nfirstAt.set(0, -1);\nlet running = 0;\nlet best = 0;\nfor (let i = 0; i < nums.length; i = i + 1) {\n  running = running + (nums[i] ?? 0);\n  const at = firstAt.get(running - target);\n  if (at !== undefined) {\n    best = Math.max(best, i - at);\n  }\n  if (!firstAt.has(running)) {\n    firstAt.set(running, i);\n  }\n}\nconsole.log(best);\n",
+              "tests": [
+                {
+                  "input": "1 2 3",
+                  "output": "2"
+                },
+                {
+                  "input": "3 0 0",
+                  "output": "3"
+                },
+                {
+                  "input": "1 1",
+                  "output": "0"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w23-sm-fix1",
+              "title": "Fix the missing empty prefix",
+              "prompt": "On `[1,2,3]` with a target of 3 this reports 1 where the answer is 2. The subarray `[1,2]` starts at index 0, and nothing ever recorded that a running total of zero had occurred before the walk began.",
+              "hint": "Every subarray that begins at index 0 needs a complement of exactly 0.",
+              "hints": [
+                "Every subarray that begins at index 0 needs a complement of exactly 0.",
+                "Nothing in the loop can ever have registered that.",
+                "Seed the Map with `0` seen once, before the loop."
+              ],
+              "language": "typescript",
+              "kind": "fix",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst target = 3;\nconst seen = new Map<number, number>();\nlet running = 0;\nlet count = 0;\nfor (const x of nums) {\n  running = running + x;\n  count = count + (seen.get(running - target) ?? 0);\n  seen.set(running, (seen.get(running) ?? 0) + 1);\n}\nconsole.log(count);\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst target = 3;\nconst seen = new Map<number, number>();\nseen.set(0, 1);\nlet running = 0;\nlet count = 0;\nfor (const x of nums) {\n  running = running + x;\n  count = count + (seen.get(running - target) ?? 0);\n  seen.set(running, (seen.get(running) ?? 0) + 1);\n}\nconsole.log(count);\n",
+              "tests": [
+                {
+                  "input": "1 2 3",
+                  "output": "2"
+                },
+                {
+                  "input": "3",
+                  "output": "1"
+                },
+                {
+                  "input": "1 2",
+                  "output": "1"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            }
+          ],
+          "quiz": [
+            {
+              "question": "\"Equal numbers of two things\" becomes this pattern by…",
+              "options": [
+                "sorting",
+                "mapping one to +1 and the other to -1, then counting sums of 0",
+                "using a window",
+                "a prefix array"
+              ],
+              "answer": 1,
+              "explanation": "Prefix, complement, Map."
+            },
+            {
+              "question": "For the LONGEST subarray you store…",
+              "options": [
+                "a count",
+                "the FIRST index each total appeared at",
+                "the last index",
+                "the width"
+              ],
+              "answer": 1,
+              "explanation": "And you must not overwrite it."
+            }
+          ]
+        },
+        {
+          "key": "w23-diff",
+          "title": "Difference arrays",
+          "what": "Prefix sums, run backwards: cheap writes instead of cheap reads.",
+          "lesson": "A prefix sum makes **reads** cheap. Sometimes it is the **writes** that repeat:\n\n> \"Add £5 to days 1–3.\" \"Add £3 to days 2–4.\" A hundred times. Then tell me the\n> totals.\n\nApplying each update element by element is O(range) per update. A **difference\narray** makes each one two writes.\n\n## The idea\n\nStore the **changes**, not the values:\n\n```ts\nconst diff: number[] = new Array(n + 1).fill(0);    // n + 1 long, deliberately\n\nfunction addRange(lo: number, hi: number, amount: number): void {\n  diff[lo] = (diff[lo] ?? 0) + amount;              // from here, add it\n  diff[hi + 1] = (diff[hi + 1] ?? 0) - amount;      // from just past here, stop\n}\n```\n\nThen **one pass** turns the changes back into values — which is a running sum,\ni.e. a prefix sum:\n\n```ts\nlet running = 0;\nfor (let i = 0; i < n; i = i + 1) {\n  running = running + (diff[i] ?? 0);\n  out.push(running);\n}\n```\n\nTwo updates on a 5-element array — `addRange(0, 2, 5)` and `addRange(1, 3, 3)` —\ngive `5, 8, 8, 3, 0`. Worth tracing by hand once: the `-5` at index 3 and the `-3`\nat index 4 are what turn the ranges off.\n\n## Why the array is `n + 1` long\n\n`hi + 1` can be `n` — for a range that runs to the last element. Making the array\none longer means that write always has somewhere to go, and the extra slot is simply\nnever read. A sentinel again, exactly like lesson 4's leading zero and week 20's\nsentinel node: **one wasted slot in exchange for deleting a branch.** Three\nappearances of the same idea in this course is not a coincidence — it is worth\nrecognising as a technique.\n\n## The trade, against lesson 4\n\n| | build | update a range | read one value |\n|---|---|---|---|\n| plain array | — | O(range) | O(1) |\n| prefix sums | O(n) | **O(n) rebuild** | O(1) range query |\n| difference array | — | **O(1)** | O(n) to materialise |\n\nThey are mirror images. Prefix sums: pay once, read cheaply, writes are expensive.\nDifference array: write cheaply, pay once at the end to read.\n\n**The decision is which one repeats.** Many reads: prefix. Many writes then one\nread: difference. Both repeating: a segment tree, which is well outside this course\nbut is worth knowing the name of.\n\n> ⚠️ **Common mistakes:** an array of length `n` rather than `n + 1`; forgetting the\n> negative at `hi + 1`; and reading `diff` directly instead of materialising it.\n",
+          "warmup": [
+            {
+              "question": "A difference array stores…",
+              "options": [
+                "the values",
+                "the changes",
+                "the prefix sums",
+                "the ranges"
+              ],
+              "answer": 1,
+              "explanation": "One pass turns them into values."
+            },
+            {
+              "question": "A range update writes…",
+              "options": [
+                "every element",
+                "+amount at lo and -amount at hi + 1",
+                "+amount at lo",
+                "-amount at hi"
+              ],
+              "answer": 1,
+              "explanation": "Two writes, any range length."
+            },
+            {
+              "question": "The array is n + 1 long because…",
+              "options": [
+                "of the sentinel value",
+                "`hi + 1` can be n, for a range reaching the last element",
+                "of the sum",
+                "of rounding"
+              ],
+              "answer": 1,
+              "explanation": "One wasted slot instead of a branch."
+            },
+            {
+              "question": "Materialising the values is…",
+              "options": [
+                "a sort",
+                "a running sum — a prefix sum",
+                "a scan for each",
+                "free"
+              ],
+              "answer": 1,
+              "explanation": "Which is why the two techniques are mirror images."
+            }
+          ],
+          "exercises": [
+            {
+              "id": "tscourse-w23-df-1",
+              "title": "Turn the range off",
+              "prompt": "Subtract the amount just past the end of the range.",
+              "hint": "The change stops applying at the index just after the range.",
+              "hints": [
+                "The change stops applying at the index just after the range.",
+                "Write diff[hi + 1] = (diff[hi + 1] ?? 0) - amount;"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "const n = 5;\nconst diff: number[] = new Array(n + 1).fill(0);\nfunction addRange(lo: number, hi: number, amount: number): void {\n  diff[lo] = (diff[lo] ?? 0) + amount;\n____\n}\naddRange(0, 2, 5);\nconst out: number[] = [];\nlet running = 0;\nfor (let i = 0; i < n; i = i + 1) {\n  running = running + (diff[i] ?? 0);\n  out.push(running);\n}\nconsole.log(out.join(\",\"));\n",
+              "solution": "const n = 5;\nconst diff: number[] = new Array(n + 1).fill(0);\nfunction addRange(lo: number, hi: number, amount: number): void {\n  diff[lo] = (diff[lo] ?? 0) + amount;\n  diff[hi + 1] = (diff[hi + 1] ?? 0) - amount;\n}\naddRange(0, 2, 5);\nconst out: number[] = [];\nlet running = 0;\nfor (let i = 0; i < n; i = i + 1) {\n  running = running + (diff[i] ?? 0);\n  out.push(running);\n}\nconsole.log(out.join(\",\"));\n",
+              "tests": [
+                {
+                  "input": "",
+                  "output": "5,5,5,0,0"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w23-df-2",
+              "title": "Materialise with a running sum",
+              "prompt": "Accumulate the changes into values in one pass.",
+              "hint": "Carry the running total forward and record it at each index.",
+              "hints": [
+                "Carry the running total forward and record it at each index.",
+                "Two lines: add this index's change, then push the total."
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "const n = 5;\nconst diff: number[] = new Array(n + 1).fill(0);\nfunction addRange(lo: number, hi: number, amount: number): void {\n  diff[lo] = (diff[lo] ?? 0) + amount;\n  diff[hi + 1] = (diff[hi + 1] ?? 0) - amount;\n}\naddRange(0, 2, 5);\naddRange(1, 3, 3);\nconst out: number[] = [];\nlet running = 0;\nfor (let i = 0; i < n; i = i + 1) {\n____\n}\nconsole.log(out.join(\",\"));\n",
+              "solution": "const n = 5;\nconst diff: number[] = new Array(n + 1).fill(0);\nfunction addRange(lo: number, hi: number, amount: number): void {\n  diff[lo] = (diff[lo] ?? 0) + amount;\n  diff[hi + 1] = (diff[hi + 1] ?? 0) - amount;\n}\naddRange(0, 2, 5);\naddRange(1, 3, 3);\nconst out: number[] = [];\nlet running = 0;\nfor (let i = 0; i < n; i = i + 1) {\n  running = running + (diff[i] ?? 0);\n  out.push(running);\n}\nconsole.log(out.join(\",\"));\n",
+              "tests": [
+                {
+                  "input": "",
+                  "output": "5,8,8,3,0"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w23-df-3",
+              "title": "A range reaching the last element",
+              "prompt": "Update right to the end, which is why the array has a spare slot.",
+              "hint": "The whole array is the range, so `hi` is the last index.",
+              "hints": [
+                "The whole array is the range, so `hi` is the last index.",
+                "Write addRange(0, n - 1, 2);"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "const n = 4;\nconst diff: number[] = new Array(n + 1).fill(0);\nfunction addRange(lo: number, hi: number, amount: number): void {\n  diff[lo] = (diff[lo] ?? 0) + amount;\n  diff[hi + 1] = (diff[hi + 1] ?? 0) - amount;\n}\n____\nconst out: number[] = [];\nlet running = 0;\nfor (let i = 0; i < n; i = i + 1) {\n  running = running + (diff[i] ?? 0);\n  out.push(running);\n}\nconsole.log(`${out.join(\",\")} spare=${diff[n] ?? 0}`);\n",
+              "solution": "const n = 4;\nconst diff: number[] = new Array(n + 1).fill(0);\nfunction addRange(lo: number, hi: number, amount: number): void {\n  diff[lo] = (diff[lo] ?? 0) + amount;\n  diff[hi + 1] = (diff[hi + 1] ?? 0) - amount;\n}\naddRange(0, n - 1, 2);\nconst out: number[] = [];\nlet running = 0;\nfor (let i = 0; i < n; i = i + 1) {\n  running = running + (diff[i] ?? 0);\n  out.push(running);\n}\nconsole.log(`${out.join(\",\")} spare=${diff[n] ?? 0}`);\n",
+              "tests": [
+                {
+                  "input": "",
+                  "output": "2,2,2,2 spare=-2"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w23-df-4",
+              "title": "Count the writes",
+              "prompt": "Report the writes the difference array performed against what element-by-element updates would have cost.",
+              "hint": "Two writes per update, plus one pass to materialise.",
+              "hints": [
+                "Two writes per update, plus one pass to materialise.",
+                "Write const diffWrites = updates * 2 + n;"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "const n = 100;\nconst updates = 50;\nconst rangeWidth = 40;\n____\nconst naiveWrites = updates * rangeWidth;\nconsole.log(`diff=${diffWrites} naive=${naiveWrites}`);\n",
+              "solution": "const n = 100;\nconst updates = 50;\nconst rangeWidth = 40;\nconst diffWrites = updates * 2 + n;\nconst naiveWrites = updates * rangeWidth;\nconsole.log(`diff=${diffWrites} naive=${naiveWrites}`);\n",
+              "tests": [
+                {
+                  "input": "",
+                  "output": "diff=200 naive=2000"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w23-df-5",
+              "title": "Many updates from stdin",
+              "prompt": "Apply one range update per pair of input numbers, then materialise.",
+              "hint": "Each pair of numbers is one range, so step two at a time.",
+              "hints": [
+                "Each pair of numbers is one range, so step two at a time.",
+                "Write for (let i = 0; i + 1 < nums.length; i = i + 2) {"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst n = 6;\nconst diff: number[] = new Array(n + 1).fill(0);\n____\n  const lo = nums[i] ?? 0;\n  const hi = nums[i + 1] ?? 0;\n  diff[lo] = (diff[lo] ?? 0) + 1;\n  diff[hi + 1] = (diff[hi + 1] ?? 0) - 1;\n}\nconst out: number[] = [];\nlet running = 0;\nfor (let i = 0; i < n; i = i + 1) {\n  running = running + (diff[i] ?? 0);\n  out.push(running);\n}\nconsole.log(out.join(\",\"));\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst n = 6;\nconst diff: number[] = new Array(n + 1).fill(0);\nfor (let i = 0; i + 1 < nums.length; i = i + 2) {\n  const lo = nums[i] ?? 0;\n  const hi = nums[i + 1] ?? 0;\n  diff[lo] = (diff[lo] ?? 0) + 1;\n  diff[hi + 1] = (diff[hi + 1] ?? 0) - 1;\n}\nconst out: number[] = [];\nlet running = 0;\nfor (let i = 0; i < n; i = i + 1) {\n  running = running + (diff[i] ?? 0);\n  out.push(running);\n}\nconsole.log(out.join(\",\"));\n",
+              "tests": [
+                {
+                  "input": "0 2 1 3",
+                  "output": "1,2,2,1,0,0"
+                },
+                {
+                  "input": "0 5",
+                  "output": "1,1,1,1,1,1"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w23-df-fix1",
+              "title": "Fix the range that never turned off",
+              "prompt": "Every adjustment is applied from its start index onwards and never stopped, so the amounts leak all the way to the end: this prints `5,8,8,8,8` where it should print `5,8,8,3,0`. A range update is TWO writes, and only one of them is here.",
+              "hint": "The running sum carries each amount forward for ever, because nothing cancels it.",
+              "hints": [
+                "The running sum carries each amount forward for ever, because nothing cancels it.",
+                "A range update marks where the change starts AND where it stops applying.",
+                "Subtract the amount at `hi + 1` — which is why the array is `n + 1` long."
+              ],
+              "language": "typescript",
+              "kind": "fix",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "const n = 5;\nconst diff: number[] = new Array(n + 1).fill(0);\nfunction addRange(lo: number, hi: number, amount: number): void {\n  diff[lo] = (diff[lo] ?? 0) + amount;\n}\naddRange(0, 2, 5);\naddRange(1, 3, 3);\nconst out: number[] = [];\nlet running = 0;\nfor (let i = 0; i < n; i = i + 1) {\n  running = running + (diff[i] ?? 0);\n  out.push(running);\n}\nconsole.log(out.join(\",\"));\n",
+              "solution": "const n = 5;\nconst diff: number[] = new Array(n + 1).fill(0);\nfunction addRange(lo: number, hi: number, amount: number): void {\n  diff[lo] = (diff[lo] ?? 0) + amount;\n  diff[hi + 1] = (diff[hi + 1] ?? 0) - amount;\n}\naddRange(0, 2, 5);\naddRange(1, 3, 3);\nconst out: number[] = [];\nlet running = 0;\nfor (let i = 0; i < n; i = i + 1) {\n  running = running + (diff[i] ?? 0);\n  out.push(running);\n}\nconsole.log(out.join(\",\"));\n",
+              "tests": [
+                {
+                  "input": "",
+                  "output": "5,8,8,3,0"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            }
+          ],
+          "quiz": [
+            {
+              "question": "Prefix sums and difference arrays are…",
+              "options": [
+                "the same",
+                "mirror images: cheap reads versus cheap writes",
+                "unrelated",
+                "both O(n) per query"
+              ],
+              "answer": 1,
+              "explanation": "The decision is which operation repeats."
+            },
+            {
+              "question": "When BOTH reads and writes repeat you want…",
+              "options": [
+                "a prefix array",
+                "a segment tree",
+                "a Map",
+                "a window"
+              ],
+              "answer": 1,
+              "explanation": "Outside this course, but worth knowing the name."
+            }
+          ]
+        },
+        {
+          "key": "w23-choose",
+          "title": "Choosing, from the wording",
+          "what": "The question usually tells you which one.",
+          "lesson": "Four techniques, and the problem statement nearly always gives it away.\n\n| the wording | the technique |\n|---|---|\n| \"**consecutive**\", \"**contiguous**\", \"**longest … such that**\" | a window |\n| a fixed count — \"any **k** days\" | a **fixed** window |\n| \"longest/shortest … such that\" | a **variable** window |\n| \"sum **between** i and j\", asked repeatedly | **prefix sums** |\n| \"**count** the subarrays with …\" | prefix sums **+ a Map** |\n| many range **updates**, read once at the end | a **difference array** |\n\n## The two questions that decide it\n\n**1. Is the answer about a contiguous stretch?** If not, none of these apply —\nsort it, or use a Map.\n\n**2. Are the values all non-negative?**\n\n* **Yes** → a window works, and is O(1) space.\n* **No** → a window does **not** work (lesson 2), and prefix-sums-plus-Map does.\n\nThat second question is the one people skip, and it is the difference between a\nsolution and a solution that passes the sample and fails the hidden tests.\n\n## Worked, briefly\n\n> *\"The largest total of any 7 consecutive days.\"* Contiguous, fixed size → fixed\n> window. O(n), O(1) space.\n\n> *\"The longest run of days whose total stays under the budget.\"* Contiguous,\n> variable size, amounts non-negative → variable window.\n\n> *\"The total for days 10–20, and then for 30–40, and then…\"* Repeated ranges →\n> prefix sums.\n\n> *\"How many stretches total exactly £50?\"* Counting subarrays, and refunds mean\n> negatives → prefix + Map.\n\n> *\"Apply 200 range adjustments, then print every day.\"* Writes dominate →\n> difference array.\n\n## And the honest last word\n\nAll five are O(n)-ish and all five are short. The skill this week teaches is not the\nimplementations — it is reading a question and knowing, before writing anything,\nwhich of the five it is. That recognition is what an interviewer is actually\ntesting, and it is why the table above is worth more than any single exercise in\nthe week.\n\n> ⚠️ **Common mistakes:** a window on data with negatives; prefix sums for data\n> that keeps changing; and a difference array when the reads are what repeat.\n",
+          "warmup": [
+            {
+              "question": "\"Contiguous\" in a problem statement suggests…",
+              "options": [
+                "a sort",
+                "a window",
+                "a Map",
+                "recursion"
+              ],
+              "answer": 1,
+              "explanation": "Along with 'consecutive' and 'longest … such that'."
+            },
+            {
+              "question": "Repeated range totals suggest…",
+              "options": [
+                "a window",
+                "prefix sums",
+                "a difference array",
+                "a sort"
+              ],
+              "answer": 1,
+              "explanation": "Pay once, read cheaply."
+            },
+            {
+              "question": "Negative values rule out…",
+              "options": [
+                "prefix sums",
+                "a sliding window",
+                "a Map",
+                "a difference array"
+              ],
+              "answer": 1,
+              "explanation": "The condition stops being monotonic."
+            },
+            {
+              "question": "Many updates and one read at the end suggests…",
+              "options": [
+                "prefix sums",
+                "a difference array",
+                "a window",
+                "a Set"
+              ],
+              "answer": 1,
+              "explanation": "Cheap writes."
+            }
+          ],
+          "exercises": [
+            {
+              "id": "tscourse-w23-ch-1",
+              "title": "Pick the technique",
+              "prompt": "Classify each wording by the technique it points at.",
+              "hint": "Kind 4 is counting subarrays, which needs the Map.",
+              "hints": [
+                "Kind 4 is counting subarrays, which needs the Map.",
+                "Write if (kind === 4) { return \"prefix + map\"; }"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nfunction techniqueFor(kind: number): string {\n  if (kind === 1) {\n    return \"fixed window\";\n  }\n  if (kind === 2) {\n    return \"variable window\";\n  }\n  if (kind === 3) {\n    return \"prefix sums\";\n  }\n____\n  return \"difference array\";\n}\nfor (const k of nums) {\n  console.log(`${k} ${techniqueFor(k)}`);\n}\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nfunction techniqueFor(kind: number): string {\n  if (kind === 1) {\n    return \"fixed window\";\n  }\n  if (kind === 2) {\n    return \"variable window\";\n  }\n  if (kind === 3) {\n    return \"prefix sums\";\n  }\n  if (kind === 4) {\n    return \"prefix + map\";\n  }\n  return \"difference array\";\n}\nfor (const k of nums) {\n  console.log(`${k} ${techniqueFor(k)}`);\n}\n",
+              "tests": [
+                {
+                  "input": "1 2 3 4 5",
+                  "output": "1 fixed window\n2 variable window\n3 prefix sums\n4 prefix + map\n5 difference array"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w23-ch-2",
+              "title": "The monotonicity question",
+              "prompt": "Report whether a sliding window is safe, which depends on there being no negative value.",
+              "hint": "A single negative value rules the window out.",
+              "hints": [
+                "A single negative value rules the window out.",
+                "Write console.log(hasNegative ? \"prefix + map\" : \"window\");"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nlet hasNegative = false;\nfor (const n of nums) {\n  if (n < 0) {\n    hasNegative = true;\n  }\n}\n____\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nlet hasNegative = false;\nfor (const n of nums) {\n  if (n < 0) {\n    hasNegative = true;\n  }\n}\nconsole.log(hasNegative ? \"prefix + map\" : \"window\");\n",
+              "tests": [
+                {
+                  "input": "1 2 3",
+                  "output": "window"
+                },
+                {
+                  "input": "1 -2 3",
+                  "output": "prefix + map"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w23-ch-3",
+              "title": "Reads or writes",
+              "prompt": "Choose between prefix sums and a difference array from which operation repeats.",
+              "hint": "Whichever operation dominates decides.",
+              "hints": [
+                "Whichever operation dominates decides.",
+                "Write console.log(reads >= writes ? \"prefix sums\" : \"difference array\");"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst reads = nums[0] ?? 0;\nconst writes = nums[1] ?? 0;\n____\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst reads = nums[0] ?? 0;\nconst writes = nums[1] ?? 0;\nconsole.log(reads >= writes ? \"prefix sums\" : \"difference array\");\n",
+              "tests": [
+                {
+                  "input": "100 5",
+                  "output": "prefix sums"
+                },
+                {
+                  "input": "5 100",
+                  "output": "difference array"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w23-ch-4",
+              "title": "The space each one costs",
+              "prompt": "Report the auxiliary space of each technique, in the notation of week 21.",
+              "hint": "Print each on its own line.",
+              "hints": [
+                "Print each on its own line.",
+                "Write for (const c of costs) {"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "const costs = [\n  \"window: O(1)\",\n  \"window with counts: O(k)\",\n  \"prefix sums: O(n)\",\n  \"prefix + map: O(n)\",\n  \"difference array: O(n)\",\n];\n____\n  console.log(c);\n}\n",
+              "solution": "const costs = [\n  \"window: O(1)\",\n  \"window with counts: O(k)\",\n  \"prefix sums: O(n)\",\n  \"prefix + map: O(n)\",\n  \"difference array: O(n)\",\n];\nfor (const c of costs) {\n  console.log(c);\n}\n",
+              "tests": [
+                {
+                  "input": "",
+                  "output": "window: O(1)\nwindow with counts: O(k)\nprefix sums: O(n)\nprefix + map: O(n)\ndifference array: O(n)"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w23-ch-5",
+              "title": "Two techniques, one answer",
+              "prompt": "Solve the same fixed-window question both ways and confirm they agree.",
+              "hint": "A k-window starting at i is the prefix range [i, i + k - 1] — which is prefix[i + k] - prefix[i].",
+              "hints": [
+                "A k-window starting at i is the prefix range [i, i + k - 1] — which is prefix[i + k] - prefix[i].",
+                "Write viaPrefix = Math.max(viaPrefix, (prefix[i + k] ?? 0) - (prefix[i] ?? 0));"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Hard",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nfunction prefixOf(xs: readonly number[]): readonly number[] {\n  const prefix: number[] = [0];\n  for (const x of xs) {\n    prefix.push((prefix[prefix.length - 1] ?? 0) + x);\n  }\n  return prefix;\n}\nconst k = 2;\nconst prefix = prefixOf(nums);\nlet viaPrefix = 0;\nfor (let i = 0; i + k <= nums.length; i = i + 1) {\n____\n}\nlet sum = 0;\nfor (let i = 0; i < k; i = i + 1) {\n  sum = sum + (nums[i] ?? 0);\n}\nlet viaWindow = sum;\nfor (let i = k; i < nums.length; i = i + 1) {\n  sum = sum + (nums[i] ?? 0) - (nums[i - k] ?? 0);\n  viaWindow = Math.max(viaWindow, sum);\n}\nconsole.log(`${viaPrefix} ${viaWindow} agree=${viaPrefix === viaWindow}`);\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nfunction prefixOf(xs: readonly number[]): readonly number[] {\n  const prefix: number[] = [0];\n  for (const x of xs) {\n    prefix.push((prefix[prefix.length - 1] ?? 0) + x);\n  }\n  return prefix;\n}\nconst k = 2;\nconst prefix = prefixOf(nums);\nlet viaPrefix = 0;\nfor (let i = 0; i + k <= nums.length; i = i + 1) {\n  viaPrefix = Math.max(viaPrefix, (prefix[i + k] ?? 0) - (prefix[i] ?? 0));\n}\nlet sum = 0;\nfor (let i = 0; i < k; i = i + 1) {\n  sum = sum + (nums[i] ?? 0);\n}\nlet viaWindow = sum;\nfor (let i = k; i < nums.length; i = i + 1) {\n  sum = sum + (nums[i] ?? 0) - (nums[i - k] ?? 0);\n  viaWindow = Math.max(viaWindow, sum);\n}\nconsole.log(`${viaPrefix} ${viaWindow} agree=${viaPrefix === viaWindow}`);\n",
+              "tests": [
+                {
+                  "input": "1 4 2 10",
+                  "output": "12 12 agree=true"
+                },
+                {
+                  "input": "3 3 3",
+                  "output": "6 6 agree=true"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w23-ch-fix1",
+              "title": "Fix the window used on negative data",
+              "prompt": "The shrink loop assumes that removing an element always reduces the total, which a negative value breaks. On `[5, -5, 1]` with a budget of 1 it reports **2**, and the answer is **3** — the whole array totals 1, so it qualifies, but the window threw the leading 5 away before the -5 could pay for it. With negatives there is no monotonicity to exploit, so every range has to be considered.\n\n*(Finding an input that breaks it takes care: on `[1, -2, 3]` the window happens to get the right answer, which is exactly what makes this bug dangerous.)*",
+              "hint": "The window's correctness depends on growing it never reducing the total.",
+              "hints": [
+                "The window's correctness depends on growing it never reducing the total.",
+                "With negatives there is no monotonicity to exploit, so every range has to be considered.",
+                "A prefix-sum table makes each of those ranges an O(1) subtraction — O(n²) overall, and correct."
+              ],
+              "language": "typescript",
+              "kind": "fix",
+              "difficulty": "Hard",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst budget = 1;\nlet start = 0;\nlet sum = 0;\nlet best = 0;\nfor (let end = 0; end < nums.length; end = end + 1) {\n  sum = sum + (nums[end] ?? 0);\n  while (sum > budget && start <= end) {\n    sum = sum - (nums[start] ?? 0);\n    start = start + 1;\n  }\n  best = Math.max(best, end - start + 1);\n}\nconsole.log(best);\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nfunction prefixOf(xs: readonly number[]): readonly number[] {\n  const prefix: number[] = [0];\n  for (const x of xs) {\n    prefix.push((prefix[prefix.length - 1] ?? 0) + x);\n  }\n  return prefix;\n}\nconst budget = 1;\nconst prefix = prefixOf(nums);\nlet best = 0;\nfor (let lo = 0; lo < nums.length; lo = lo + 1) {\n  for (let hi = lo; hi < nums.length; hi = hi + 1) {\n    const total = (prefix[hi + 1] ?? 0) - (prefix[lo] ?? 0);\n    if (total <= budget) {\n      best = Math.max(best, hi - lo + 1);\n    }\n  }\n}\nconsole.log(best);\n",
+              "tests": [
+                {
+                  "input": "5 -5 1",
+                  "output": "3"
+                },
+                {
+                  "input": "1 1 1",
+                  "output": "1"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            }
+          ],
+          "quiz": [
+            {
+              "question": "The skill this week teaches is…",
+              "options": [
+                "the implementations",
+                "reading a question and knowing which of the five it is",
+                "counting",
+                "the Map"
+              ],
+              "answer": 1,
+              "explanation": "All five are short once chosen."
+            },
+            {
+              "question": "If the answer is not about a contiguous stretch…",
+              "options": [
+                "use a window",
+                "none of these apply — sort it, or use a Map",
+                "use prefix sums",
+                "use a difference array"
+              ],
+              "answer": 1,
+              "explanation": "The first question to ask."
+            }
+          ]
+        }
+      ],
+      "capstone": {
+        "title": "Interview rep #23 — the ledger analytics report",
+        "brief": "Four questions about one ledger, each answered with the right technique from this\nweek, and each printing the operations it cost.\n\nInput: the daily amounts on the first line, then `k budget target` on the second.\n\n```\n3 1 4 1 5 9 2 6\n3 10 10\n```\n\n```\nTotal:     31  ops 8\nBest 3:    17  ops 13\nLongest:    4  ops 14\nExactly:    1  ops 8\n```\n\n**The four answers:**\n\n1. **Total** — the whole ledger, from the prefix-sum table. `ops` is the number of\n   pushes the table cost to build (n), and it is the one build every later answer\n   reuses.\n2. **Best k** — the largest total of any `k` consecutive days, by **sliding\n   window**: `k` operations to seed plus 2 per step.\n3. **Longest** — the longest run whose total stays within `budget`, by **variable\n   window**: one operation per element entering, plus one per element leaving.\n4. **Exactly** — how many contiguous stretches total exactly `target`, by\n   **prefix sums plus a Map**: one operation per element.\n\n**What makes it a rep:**\n\n* **Four techniques, one program**, each chosen for its question rather than\n  applied uniformly — which is lesson 7's point made executable.\n* **Every count is measured**, not calculated from a formula. The whole month's\n  habit.\n* **The boundaries are all reachable from the tests:** a `k` larger than the\n  ledger (no window exists, so `Best k` is 0 with 0 ops), a budget smaller than\n  every single day (`Longest` is 0), and a target no stretch reaches (`Exactly` is\n  0 — and the Map still has to be seeded with the empty prefix or the answer is\n  wrong whenever a stretch *does* start at day one).\n\nColumn format: the label padded to 10, the number padded to 3, then `  ops N`.\n\nEmpty input, or a missing second line, prints all four lines with zeros.\n",
+        "kind": "auto",
+        "exercise": {
+          "id": "tscourse-w23-capstone",
+          "title": "Interview rep #23",
+          "prompt": "Answer four questions about one ledger with four different techniques, each reporting the operations it cost.",
+          "hint": "Build the prefix table once; the Total line reports what that build cost.",
+          "hints": [
+            "Build the prefix table once; the Total line reports what that build cost.",
+            "The fixed window costs k to seed and 2 per slide — count those separately, not with a formula.",
+            "The variable window counts one op per element entering and one per element leaving, so its total is a measurement of the amortisation.",
+            "`seen.set(0, 1)` is required, and the third test is what catches its absence.",
+            "A `k` larger than the ledger means no window exists: report 0 with 0 ops rather than guessing.",
+            "The label for the second row includes k itself, so build it with string concatenation before padding."
+          ],
+          "language": "typescript",
+          "kind": "challenge",
+          "difficulty": "Hard",
+          "strictness": "strict+indexed",
+          "harness": "",
+          "judge_mode": "",
+          "forbid": [],
+          "starter": "import * as fs from \"fs\";\nconst lines = fs.readFileSync(0, \"utf8\").split(\"\\n\");\nconst xs: readonly number[] = (lines[0] ?? \"\")\n  .trim()\n  .split(/\\s+/)\n  .filter((s) => s !== \"\")\n  .map(Number);\nconst params: readonly number[] = (lines[1] ?? \"\")\n  .trim()\n  .split(/\\s+/)\n  .filter((s) => s !== \"\")\n  .map(Number);\nconst k = params[0] ?? 0;\nconst budget = params[1] ?? 0;\nconst target = params[2] ?? 0;\nfunction row(label: string, value: number, ops: number): string {\n  return `${(label + \":\").padEnd(10)}${String(value).padStart(3)}  ops ${ops}`;\n}\nlet buildOps = 0;\nconst prefix: number[] = [0];\nfor (const x of xs) {\n  prefix.push((prefix[prefix.length - 1] ?? 0) + x);\n  buildOps = buildOps + 1;\n}\nconsole.log(row(\"Total\", prefix[prefix.length - 1] ?? 0, buildOps));\n____\n",
+          "solution": "import * as fs from \"fs\";\nconst lines = fs.readFileSync(0, \"utf8\").split(\"\\n\");\nconst xs: readonly number[] = (lines[0] ?? \"\")\n  .trim()\n  .split(/\\s+/)\n  .filter((s) => s !== \"\")\n  .map(Number);\nconst params: readonly number[] = (lines[1] ?? \"\")\n  .trim()\n  .split(/\\s+/)\n  .filter((s) => s !== \"\")\n  .map(Number);\nconst k = params[0] ?? 0;\nconst budget = params[1] ?? 0;\nconst target = params[2] ?? 0;\nfunction row(label: string, value: number, ops: number): string {\n  return `${(label + \":\").padEnd(10)}${String(value).padStart(3)}  ops ${ops}`;\n}\nlet buildOps = 0;\nconst prefix: number[] = [0];\nfor (const x of xs) {\n  prefix.push((prefix[prefix.length - 1] ?? 0) + x);\n  buildOps = buildOps + 1;\n}\nconsole.log(row(\"Total\", prefix[prefix.length - 1] ?? 0, buildOps));\nlet windowOps = 0;\nlet bestK = 0;\nif (k > 0 && k <= xs.length) {\n  let sum = 0;\n  for (let i = 0; i < k; i = i + 1) {\n    sum = sum + (xs[i] ?? 0);\n    windowOps = windowOps + 1;\n  }\n  bestK = sum;\n  for (let i = k; i < xs.length; i = i + 1) {\n    sum = sum + (xs[i] ?? 0) - (xs[i - k] ?? 0);\n    windowOps = windowOps + 2;\n    bestK = Math.max(bestK, sum);\n  }\n}\nconsole.log(row(\"Best \" + String(k), bestK, windowOps));\nlet varOps = 0;\nlet start = 0;\nlet running = 0;\nlet longest = 0;\nfor (let end = 0; end < xs.length; end = end + 1) {\n  running = running + (xs[end] ?? 0);\n  varOps = varOps + 1;\n  while (running > budget && start <= end) {\n    running = running - (xs[start] ?? 0);\n    start = start + 1;\n    varOps = varOps + 1;\n  }\n  longest = Math.max(longest, end - start + 1);\n}\nconsole.log(row(\"Longest\", longest, varOps));\nlet mapOps = 0;\nconst seen = new Map<number, number>();\nseen.set(0, 1);\nlet total = 0;\nlet exactly = 0;\nfor (const x of xs) {\n  total = total + x;\n  exactly = exactly + (seen.get(total - target) ?? 0);\n  seen.set(total, (seen.get(total) ?? 0) + 1);\n  mapOps = mapOps + 1;\n}\nconsole.log(row(\"Exactly\", exactly, mapOps));\n",
+          "tests": [
+            {
+              "input": "3 1 4 1 5 9 2 6\n3 10 10",
+              "output": "Total:     31  ops 8\nBest 3:    17  ops 13\nLongest:    4  ops 14\nExactly:    1  ops 8"
+            },
+            {
+              "input": "1 2 3\n2 3 3",
+              "output": "Total:      6  ops 3\nBest 2:     5  ops 4\nLongest:    2  ops 5\nExactly:    2  ops 3"
+            },
+            {
+              "input": "5 5\n9 1 5",
+              "output": "Total:     10  ops 2\nBest 9:     0  ops 0\nLongest:    0  ops 4\nExactly:    2  ops 2"
+            },
+            {
+              "input": "",
+              "output": "Total:      0  ops 0\nBest 0:     0  ops 0\nLongest:    0  ops 0\nExactly:    0  ops 0"
+            }
+          ],
+          "source_slug": "",
+          "dataset": ""
+        },
+        "example_io": "Total:     31  ops 8\nBest 3:    17  ops 13\nLongest:    4  ops 14\nExactly:    1  ops 8",
+        "rubric": [
+          "four techniques, each chosen for its own question rather than applied uniformly",
+          "every operation count is measured as the algorithm runs, never computed from a formula",
+          "the prefix table is built once and the Total line reports that build",
+          "the fixed window seeds with k operations and slides with two",
+          "the subarray-count Map is seeded with the empty prefix",
+          "a k larger than the ledger reports zero with zero operations",
+          "no index access is asserted with `!`",
+          "empty input prints all four rows with zeros"
+        ],
+        "reference": "",
+        "stretch": {
+          "id": "tscourse-w23-capstone-stretch",
+          "title": "Interview rep #23 (stretch)",
+          "prompt": "Add a fifth answer using the week's last technique: apply a series of range adjustments with a **difference array**, then report the largest adjusted day and the writes it took. Each later input line is `lo hi amount`. Report the difference array's write count against what element-by-element updates would have cost, so the two appear side by side.",
+          "hint": "Two writes per adjustment, whatever the range's width — that is the entire point.",
+          "hints": [
+            "Two writes per adjustment, whatever the range's width — that is the entire point.",
+            "Clamp `lo` and `hi` into the array, and skip an adjustment whose range inverts after clamping.",
+            "The materialising pass counts as one write per day, and it happens once however many adjustments there were.",
+            "`naive` accumulates the width of each range, which is what updating element by element would have cost — and on these tiny inputs it is SMALLER, because two adjustments over five days cannot amortise the materialising pass. That is the honest result, and it is the same lesson week 21 taught: a technique's advantage is a statement about large inputs."
+          ],
+          "language": "typescript",
+          "kind": "challenge",
+          "difficulty": "Hard",
+          "strictness": "strict+indexed",
+          "harness": "",
+          "judge_mode": "",
+          "forbid": [],
+          "starter": "import * as fs from \"fs\";\nconst lines = fs.readFileSync(0, \"utf8\").split(\"\\n\").filter((l) => l.trim() !== \"\");\nconst xs: readonly number[] = (lines[0] ?? \"\")\n  .trim()\n  .split(/\\s+/)\n  .filter((s) => s !== \"\")\n  .map(Number);\nconst n = xs.length;\nconst diff: number[] = new Array(n + 1).fill(0);\nlet writes = 0;\nlet naive = 0;\n____\nlet running = 0;\nlet biggest = 0;\nfor (let i = 0; i < n; i = i + 1) {\n  running = running + (diff[i] ?? 0);\n  biggest = Math.max(biggest, (xs[i] ?? 0) + running);\n  writes = writes + 1;\n}\nconsole.log(`Biggest:  ${String(biggest).padStart(3)}`);\nconsole.log(`Writes:   ${String(writes).padStart(3)}  naive ${naive}`);\n",
+          "solution": "import * as fs from \"fs\";\nconst lines = fs.readFileSync(0, \"utf8\").split(\"\\n\").filter((l) => l.trim() !== \"\");\nconst xs: readonly number[] = (lines[0] ?? \"\")\n  .trim()\n  .split(/\\s+/)\n  .filter((s) => s !== \"\")\n  .map(Number);\nconst n = xs.length;\nconst diff: number[] = new Array(n + 1).fill(0);\nlet writes = 0;\nlet naive = 0;\nfor (const line of lines.slice(1)) {\n  const parts = line.trim().split(/\\s+/).map(Number);\n  if (parts.length !== 3) {\n    continue;\n  }\n  const lo = Math.max(0, parts[0] ?? 0);\n  const hi = Math.min(n - 1, parts[1] ?? 0);\n  const amount = parts[2] ?? 0;\n  if (lo > hi) {\n    continue;\n  }\n  diff[lo] = (diff[lo] ?? 0) + amount;\n  diff[hi + 1] = (diff[hi + 1] ?? 0) - amount;\n  writes = writes + 2;\n  naive = naive + (hi - lo + 1);\n}\nlet running = 0;\nlet biggest = 0;\nfor (let i = 0; i < n; i = i + 1) {\n  running = running + (diff[i] ?? 0);\n  biggest = Math.max(biggest, (xs[i] ?? 0) + running);\n  writes = writes + 1;\n}\nconsole.log(`Biggest:  ${String(biggest).padStart(3)}`);\nconsole.log(`Writes:   ${String(writes).padStart(3)}  naive ${naive}`);\n",
+          "tests": [
+            {
+              "input": "1 1 1 1 1\n0 4 10\n1 2 5",
+              "output": "Biggest:   16\nWrites:     9  naive 7"
+            },
+            {
+              "input": "5 5\n0 1 1",
+              "output": "Biggest:    6\nWrites:     4  naive 2"
+            },
+            {
+              "input": "3",
+              "output": "Biggest:    3\nWrites:     1  naive 0"
+            }
+          ],
+          "source_slug": "",
+          "dataset": ""
+        }
+      },
+      "objectives": [
+        "Say what both techniques avoid recomputing",
+        "Slide a fixed-size window by adding one element and subtracting another",
+        "Show the operation count a rolling window saves over recomputing",
+        "Grow and shrink a variable-size window, and state its invariant",
+        "Say why a variable window is O(n) despite a loop inside a loop",
+        "Track a window's contents with a Map of counts",
+        "Answer 'exactly k' by subtracting two 'at most k' answers",
+        "Build a prefix-sum array with its sentinel, and say what the sentinel removes",
+        "Answer an inclusive range query with one subtraction",
+        "Count subarrays summing to a target with prefix sums and a Map",
+        "Apply many range updates in O(1) each with a difference array",
+        "Choose between a window, a prefix sum and a difference array"
+      ],
+      "why": "These two patterns cover an enormous share of array problems, and both are recognisable from the shape of the question: 'consecutive' or 'contiguous' means a window; 'range' or 'between i and j, repeatedly' means a prefix sum. Recognising which you are looking at is most of the work, and the implementations are short once you have.",
+      "est_minutes": 480,
+      "glossary": [
+        {
+          "term": "sliding window",
+          "def": "A contiguous range that moves through the array, carrying its own answer."
+        },
+        {
+          "term": "fixed window",
+          "def": "Constant size k. One element enters and one leaves per step."
+        },
+        {
+          "term": "variable window",
+          "def": "The size changes: grow at the right, shrink from the left while a condition is violated."
+        },
+        {
+          "term": "rolling update",
+          "def": "sum = sum + entering - leaving. The whole idea of a window."
+        },
+        {
+          "term": "window invariant",
+          "def": "What is true of the window at the end of every step. What makes the answer correct."
+        },
+        {
+          "term": "shrink loop",
+          "def": "The inner `while` that restores the invariant. Amortised O(1) per step."
+        },
+        {
+          "term": "prefix sum",
+          "def": "prefix[i] is the total of the first i elements. One longer than the input."
+        },
+        {
+          "term": "sentinel 0",
+          "def": "prefix[0] = 0, which removes the `lo === 0` special case."
+        },
+        {
+          "term": "range query",
+          "def": "prefix[hi + 1] - prefix[lo] — inclusive, O(1)."
+        },
+        {
+          "term": "precompute",
+          "def": "Pay O(n) once so every later query is cheap. The trade this week is built on."
+        },
+        {
+          "term": "running sum",
+          "def": "The prefix total as you walk, without storing the array."
+        },
+        {
+          "term": "complement",
+          "def": "running - target — the earlier prefix that would make this subarray sum to target."
+        },
+        {
+          "term": "difference array",
+          "def": "Store the CHANGES; one pass turns them back into values."
+        },
+        {
+          "term": "range update",
+          "def": "Add to a whole range in O(1): +amount at lo, -amount just past hi."
+        },
+        {
+          "term": "at most k",
+          "def": "A window constrained by a count. Subtract two of them to get 'exactly k'."
+        },
+        {
+          "term": "contiguous",
+          "def": "The word in the problem statement that means 'window'."
+        }
+      ],
+      "cheatsheet": "```ts\n// ---- fixed window: add what enters, subtract what leaves ---------------\nlet sum = 0;\nfor (let i = 0; i < k; i = i + 1) { sum = sum + (xs[i] ?? 0); }   // the first one\nlet best = sum;\nfor (let i = k; i < xs.length; i = i + 1) {\n  sum = sum + (xs[i] ?? 0) - (xs[i - k] ?? 0);      // TWO operations per step\n  best = Math.max(best, sum);\n}\n// O(n) rather than O(n·k). The saving grows with k.\n\n// ---- variable window: grow right, shrink left while invalid -----------\nlet start = 0;\nlet sum = 0;\nlet best = 0;\nfor (let end = 0; end < xs.length; end = end + 1) {\n  sum = sum + (xs[end] ?? 0);                       // grow\n  while (sum > budget && start <= end) {\n    sum = sum - (xs[start] ?? 0);                   // shrink\n    start = start + 1;\n  }\n  best = Math.max(best, end - start + 1);           // the window is valid HERE\n}\n// still O(n): `start` only ever moves forward, so the inner loop runs n times TOTAL\n\n// ---- a window that tracks its contents (week 19) ---------------------\ncounts.set(v, (counts.get(v) ?? 0) + 1);            // entering\nconst left = (counts.get(out) ?? 0) - 1;            // leaving\nif (left === 0) { counts.delete(out); } else { counts.set(out, left); }\ncounts.size;                                         // distinct values in the window\n\n// exactly k distinct  =  atMost(k) - atMost(k - 1)\n\n// ---- prefix sums: ONE LONGER than the input, starting at 0 -----------\nconst prefix: number[] = [0];\nfor (const x of xs) { prefix.push((prefix[prefix.length - 1] ?? 0) + x); }\n// xs     =    [1, 2, 3,  4,  5]\n// prefix = [0, 1, 3, 6, 10, 15]\nconst inclusive = (prefix[hi + 1] ?? 0) - (prefix[lo] ?? 0);   // O(1), any range\n\n// ---- prefix + Map: count subarrays summing to target ----------------\nconst seen = new Map<number, number>();\nseen.set(0, 1);                                      // the empty prefix. REQUIRED.\nlet running = 0;\nlet count = 0;\nfor (const x of xs) {\n  running = running + x;\n  count = count + (seen.get(running - target) ?? 0);          // the complement\n  seen.set(running, (seen.get(running) ?? 0) + 1);\n}\n\n// ---- difference array: many range updates, O(1) each ---------------\nconst diff: number[] = new Array(n + 1).fill(0);\ndiff[lo] = (diff[lo] ?? 0) + amount;\ndiff[hi + 1] = (diff[hi + 1] ?? 0) - amount;         // n + 1 long, so this is safe\nlet running = 0;\nfor (let i = 0; i < n; i = i + 1) {                  // one pass to materialise\n  running = running + (diff[i] ?? 0);\n  out.push(running);\n}\n\n// ---- which one ---------------------------------------------------------\n// \"contiguous\" / \"consecutive\" / \"longest … such that\"   -> window\n// \"sum between i and j\", asked repeatedly                 -> prefix sums\n// \"count subarrays with …\"                                -> prefix + Map\n// many range UPDATES, read once at the end                -> difference array\n```\n",
+      "self_check": [
+        "Can you say what both techniques stop you recomputing?",
+        "Can you slide a fixed window with two operations per step?",
+        "Can you say how many operations the rolling version saves, and why it grows with k?",
+        "Can you state a variable window's invariant?",
+        "Can you say why the shrink loop does not make it O(n²)?",
+        "Can you track the distinct values in a window?",
+        "Can you get 'exactly k' from two 'at most k' answers?",
+        "Can you build a prefix array and say why it is one longer than the input?",
+        "Can you say what the leading 0 removes the need for?",
+        "Can you write the inclusive range query from memory?",
+        "Can you say why the subarray-count Map must start with `{0: 1}`?",
+        "Can you apply a range update in O(1) and say where the -amount goes?",
+        "Can you pick the right technique from the wording of a question?"
+      ],
+      "review": [
+        {
+          "question": "A sliding window avoids…",
+          "options": [
+            "sorting",
+            "recomputing the overlap between consecutive windows",
+            "allocation",
+            "recursion"
+          ],
+          "answer": 1,
+          "explanation": "Add what entered, subtract what left."
+        },
+        {
+          "question": "Sliding a fixed window costs, per step…",
+          "options": [
+            "k operations",
+            "two operations",
+            "one",
+            "log k"
+          ],
+          "answer": 1,
+          "explanation": "Which is why it is O(n) rather than O(n·k)."
+        },
+        {
+          "question": "A variable window shrinks…",
+          "options": [
+            "always",
+            "while the invariant is violated",
+            "never",
+            "once per step"
+          ],
+          "answer": 1,
+          "explanation": "Grow at the right, shrink from the left."
+        },
+        {
+          "question": "The shrink loop keeps the whole thing O(n) because…",
+          "options": [
+            "it is short",
+            "`start` only moves forward, so it runs n times in total",
+            "of the Map",
+            "it is amortised over k"
+          ],
+          "answer": 1,
+          "explanation": "Total work, not per-iteration work."
+        },
+        {
+          "question": "The distinct values in a window are tracked with…",
+          "options": [
+            "an array",
+            "a Map of counts, deleting a key when it reaches 0",
+            "a Set alone",
+            "a sort"
+          ],
+          "answer": 1,
+          "explanation": "The count is what tells you when to delete."
+        },
+        {
+          "question": "\"Exactly k distinct\" equals…",
+          "options": [
+            "atMost(k)",
+            "atMost(k) - atMost(k-1)",
+            "atMost(k) + atMost(k-1)",
+            "k"
+          ],
+          "answer": 1,
+          "explanation": "A genuinely useful trick."
+        },
+        {
+          "question": "A prefix array for n elements has…",
+          "options": [
+            "n entries",
+            "n + 1 entries",
+            "n - 1",
+            "2n"
+          ],
+          "answer": 1,
+          "explanation": "The leading 0 is one of them."
+        },
+        {
+          "question": "The leading 0 exists to…",
+          "options": [
+            "mark the start",
+            "remove the `lo === 0` special case",
+            "make it sorted",
+            "save memory"
+          ],
+          "answer": 1,
+          "explanation": "A sentinel, exactly like week 20's."
+        },
+        {
+          "question": "The inclusive range sum is…",
+          "options": [
+            "prefix[hi] - prefix[lo]",
+            "prefix[hi + 1] - prefix[lo]",
+            "prefix[hi] - prefix[lo - 1]",
+            "prefix[hi + 1] - prefix[lo + 1]"
+          ],
+          "answer": 1,
+          "explanation": "`hi + 1` is what makes it inclusive."
+        },
+        {
+          "question": "`prefix[hi] - prefix[lo]` gives…",
+          "options": [
+            "the right answer",
+            "the sum of [lo, hi - 1] — silently one short",
+            "an error",
+            "zero"
+          ],
+          "answer": 1,
+          "explanation": "The commonest prefix-sum bug."
+        },
+        {
+          "question": "In the subarray-count Map, `seen.set(0, 1)` before the loop accounts for…",
+          "options": [
+            "nothing",
+            "the empty prefix — subarrays that start at index 0",
+            "the first element",
+            "the target"
+          ],
+          "answer": 1,
+          "explanation": "Leave it out and you miss every subarray starting at the beginning."
+        },
+        {
+          "question": "A difference array stores…",
+          "options": [
+            "the values",
+            "the CHANGES, turned back into values by one pass",
+            "the prefix sums",
+            "the ranges"
+          ],
+          "answer": 1,
+          "explanation": "Which makes a range update O(1)."
+        },
+        {
+          "question": "A range update writes…",
+          "options": [
+            "+amount at every index",
+            "+amount at lo and -amount just past hi",
+            "+amount at lo only",
+            "-amount at hi"
+          ],
+          "answer": 1,
+          "explanation": "Two writes, whatever the range's length."
+        },
+        {
+          "question": "\"Count the subarrays with sum k\" points at…",
+          "options": [
+            "a window",
+            "prefix sums plus a Map",
+            "a sort",
+            "a difference array"
+          ],
+          "answer": 1,
+          "explanation": "A window does not work when values can be negative."
+        }
+      ],
+      "milestone": "Interview rep #23 — the ledger analytics report. One pass builds a prefix-sum table; from it the report answers a range total in O(1), the best k-day window, the longest run that stays inside a budget, and the number of stretches that total exactly a target — each with the operations it cost, so every claim about cost is evidenced on the page.",
       "practice": []
     },
     {
