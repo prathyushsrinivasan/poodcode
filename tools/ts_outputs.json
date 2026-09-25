@@ -300,6 +300,93 @@
    "d\nd\n(none)\n3 words indexed"
   ]
  },
+ "ts_aliases-error1": {
+  "hash": "9bd9d27d3f8625391fa6",
+  "diagnostics": [
+   {
+    "code": 2300,
+    "line": 1,
+    "msg": "Duplicate identifier 'Size'."
+   },
+   {
+    "code": 2300,
+    "line": 2,
+    "msg": "Duplicate identifier 'Size'."
+   }
+  ]
+ },
+ "ts_aliases-error2": {
+  "hash": "6472fd55f725eeb1efa6",
+  "diagnostics": [
+   {
+    "code": 2430,
+    "line": 4,
+    "msg": "Interface 'Doc' incorrectly extends interface 'Base'.   Types of property 'id' are incompatible.     Type 'string' is not assignable to type 'number'."
+   }
+  ]
+ },
+ "ts_aliases-example1": {
+  "hash": "7e3790550c6c8e78a707",
+  "outputs": [
+   "850"
+  ]
+ },
+ "ts_aliases-example2": {
+  "hash": "fbbe74f4b87c2b493ce2",
+  "outputs": [
+   "name,team,createdAt"
+  ]
+ },
+ "ts_aliases-example3": {
+  "hash": "845fc73e1ccfe6448151",
+  "outputs": [
+   "save:3 SAVE"
+  ]
+ },
+ "ts_aliases-pitfall1-right": {
+  "hash": "fba91466cf5263a43bf8",
+  "diagnostics": [
+   {
+    "code": 2345,
+    "line": 5,
+    "msg": "Argument of type 'OrderId' is not assignable to parameter of type 'UserId'.   Type 'OrderId' is not assignable to type '{ readonly __brand: \"UserId\"; }'.     Types of property '__brand' are incompatible.       Type '\"OrderId\"' is not assignable to type '\"UserId\"'."
+   }
+  ]
+ },
+ "ts_aliases-pitfall1-wrong": {
+  "hash": "bc4d14fbc0cb86dd8840",
+  "outputs": [
+   "no orders"
+  ]
+ },
+ "ts_aliases-pitfall2-right": {
+  "hash": "cae525ab5abc736ea3b5",
+  "outputs": [
+   "3"
+  ]
+ },
+ "ts_aliases-pitfall2-wrong": {
+  "hash": "02fe76a792056212143d",
+  "outputs": [
+   "undefined"
+  ]
+ },
+ "ts_aliases-pitfall3-right": {
+  "hash": "42c7c6688c2632284651",
+  "diagnostics": [
+   {
+    "code": 2339,
+    "line": 5,
+    "msg": "Property 'push' does not exist on type 'readonly string[]'."
+   }
+  ]
+ },
+ "ts_aliases-pitfall3-wrong": {
+  "hash": "9bf5a683a020ffa302bd",
+  "outputs": [
+   "a,b"
+  ]
+ },
  "ts_array_methods-error1": {
   "hash": "2555d6ac49ca75294042",
   "diagnostics": [
@@ -1360,6 +1447,93 @@
    "ana light"
   ]
  },
+ "ts_discriminated_unions-error1": {
+  "hash": "a8c3a23c195dc8335303",
+  "diagnostics": [
+   {
+    "code": 2339,
+    "line": 3,
+    "msg": "Property 'r' does not exist on type 'Shape'.   Property 'r' does not exist on type '{ kind: \"square\"; side: number; }'."
+   },
+   {
+    "code": 2339,
+    "line": 3,
+    "msg": "Property 'r' does not exist on type 'Shape'.   Property 'r' does not exist on type '{ kind: \"square\"; side: number; }'."
+   }
+  ]
+ },
+ "ts_discriminated_unions-error2": {
+  "hash": "64407f5ecf5b9d550a1a",
+  "diagnostics": [
+   {
+    "code": 2322,
+    "line": 9,
+    "msg": "Type '{ kind: \"tri\"; b: number; h: number; }' is not assignable to type 'never'."
+   }
+  ]
+ },
+ "ts_discriminated_unions-example1": {
+  "hash": "416efc21334b02e348f7",
+  "outputs": [
+   "skipped: timeout\nsum 10"
+  ]
+ },
+ "ts_discriminated_unions-example2": {
+  "hash": "6fb52abb267e44e73364",
+  "outputs": [
+   "red red green amber red red"
+  ]
+ },
+ "ts_discriminated_unions-example3": {
+  "hash": "e2c7cc30288a06012b23",
+  "outputs": [
+   "69"
+  ]
+ },
+ "ts_discriminated_unions-pitfall1-right": {
+  "hash": "c283245a8991d0c21a32",
+  "outputs": [
+   "HI"
+  ]
+ },
+ "ts_discriminated_unions-pitfall1-wrong": {
+  "hash": "ac869bcea8d86a15f3ce",
+  "diagnostics": [
+   {
+    "code": 18048,
+    "line": 3,
+    "msg": "'m.text' is possibly 'undefined'."
+   }
+  ]
+ },
+ "ts_discriminated_unions-pitfall2-right": {
+  "hash": "41e27ecd3c4085ca0175",
+  "outputs": [
+   "6"
+  ]
+ },
+ "ts_discriminated_unions-pitfall2-wrong": {
+  "hash": "50d00abe08256e16fb0e",
+  "outputs": [
+   "0"
+  ]
+ },
+ "ts_discriminated_unions-pitfall3-right": {
+  "hash": "6057984dff39d867d2da",
+  "diagnostics": [
+   {
+    "code": 2353,
+    "line": 2,
+    "msg": "Object literal may only specify known properties, and 'error' does not exist in type '{ status: \"loading\"; }'."
+   }
+  ]
+ },
+ "ts_discriminated_unions-pitfall3-wrong": {
+  "hash": "01a132b9d10a1f91c385",
+  "outputs": [
+   "loading… (error: timeout)"
+  ]
+ },
  "ts_distributive-error1": {
   "hash": "6d3a212f2878855c3a87",
   "diagnostics": [
@@ -1473,6 +1647,80 @@
     "line": 7,
     "msg": "Type 'number' is not assignable to type 'string'."
    }
+  ]
+ },
+ "ts_enums-error1": {
+  "hash": "ece86700bd64e5f0162a",
+  "diagnostics": [
+   {
+    "code": 2322,
+    "line": 5,
+    "msg": "Type '\"red\"' is not assignable to type 'Color'."
+   }
+  ]
+ },
+ "ts_enums-error2": {
+  "hash": "99b4b07bbb2cfa03eeb5",
+  "diagnostics": [
+   {
+    "code": 2345,
+    "line": 6,
+    "msg": "Argument of type '\"north\"' is not assignable to parameter of type 'Direction'."
+   }
+  ]
+ },
+ "ts_enums-example1": {
+  "hash": "c996c0eef002227bfe54",
+  "outputs": [
+   "true false\nDebug=10 Info=20 Warn=30 Error=40"
+  ]
+ },
+ "ts_enums-example2": {
+  "hash": "6ce549717a3d1a05d9d9",
+  "outputs": [
+   "status doing (#2)\nstatus done (#3)\nunknown status archived"
+  ]
+ },
+ "ts_enums-example3": {
+  "hash": "169e432df32b428a248c",
+  "outputs": [
+   "Read+Write Exec none"
+  ]
+ },
+ "ts_enums-pitfall1-right": {
+  "hash": "da7f6056e37e96be4c42",
+  "outputs": [
+   "#f00 #0f0"
+  ]
+ },
+ "ts_enums-pitfall1-wrong": {
+  "hash": "e3420f94a36deac6ccb5",
+  "outputs": [
+   "Red Green"
+  ]
+ },
+ "ts_enums-pitfall2-right": {
+  "hash": "111ec1cc21bd4f152909",
+  "outputs": [
+   "unknown size"
+  ]
+ },
+ "ts_enums-pitfall2-wrong": {
+  "hash": "8357e278f87f6f844034",
+  "outputs": [
+   "size XXL ok"
+  ]
+ },
+ "ts_enums-pitfall3-right": {
+  "hash": "874eddaf69b411649572",
+  "outputs": [
+   "Teapot"
+  ]
+ },
+ "ts_enums-pitfall3-wrong": {
+  "hash": "68575a79ca39be573b7c",
+  "outputs": [
+   "no such code"
   ]
  },
  "ts_equality-classify": {
@@ -3336,6 +3584,244 @@
    "10 20 undefined"
   ]
  },
+ "ts_maps_sets-error1": {
+  "hash": "4ccac584343550f3c21a",
+  "diagnostics": [
+   {
+    "code": 2345,
+    "line": 2,
+    "msg": "Argument of type 'number' is not assignable to parameter of type 'string'."
+   }
+  ]
+ },
+ "ts_maps_sets-error2": {
+  "hash": "6f8e5669e9a1d4957e15",
+  "diagnostics": [
+   {
+    "code": 18048,
+    "line": 3,
+    "msg": "'left' is possibly 'undefined'."
+   }
+  ]
+ },
+ "ts_maps_sets-example1": {
+  "hash": "555fb95ab21c087cb0f0",
+  "outputs": [
+   "the=3 cat=2 mat=1"
+  ]
+ },
+ "ts_maps_sets-example2": {
+  "hash": "369b8097fc2c69597ce1",
+  "outputs": [
+   "home > about > blog\nrepeated: home,about"
+  ]
+ },
+ "ts_maps_sets-example3": {
+  "hash": "371989584537f6785523",
+  "outputs": [
+   "2 30 45"
+  ]
+ },
+ "ts_maps_sets-pitfall1-right": {
+  "hash": "583007298e53e5dc4272",
+  "outputs": [
+   "1"
+  ]
+ },
+ "ts_maps_sets-pitfall1-wrong": {
+  "hash": "398adec136d8cd63c44a",
+  "diagnostics": [
+   {
+    "code": 7052,
+    "line": 2,
+    "msg": "Element implicitly has an 'any' type because type 'Map<string, number>' has no index signature. Did you mean to call 'ages.set'?"
+   }
+  ]
+ },
+ "ts_maps_sets-pitfall2-right": {
+  "hash": "6a0b03300e33c0d5f9c9",
+  "outputs": [
+   "seen"
+  ]
+ },
+ "ts_maps_sets-pitfall2-wrong": {
+  "hash": "1868ea7f312c802622b4",
+  "outputs": [
+   "new"
+  ]
+ },
+ "ts_maps_sets-pitfall3-right": {
+  "hash": "392c936a439149e79ff8",
+  "outputs": [
+   "ana,bo"
+  ]
+ },
+ "ts_maps_sets-pitfall3-wrong": {
+  "hash": "2fd4a4141bea39a5ea93",
+  "outputs": [
+   "ana,31,bo,25"
+  ]
+ },
+ "ts_narrowing-error1": {
+  "hash": "1a4f8aae007747a5109e",
+  "diagnostics": [
+   {
+    "code": 2339,
+    "line": 4,
+    "msg": "Property 'swim' does not exist on type 'Fish | Bird'.   Property 'swim' does not exist on type 'Bird'."
+   }
+  ]
+ },
+ "ts_narrowing-error2": {
+  "hash": "648e68fcfe4087bcbcb5",
+  "diagnostics": [
+   {
+    "code": 18047,
+    "line": 2,
+    "msg": "'found' is possibly 'null'."
+   }
+  ]
+ },
+ "ts_narrowing-example1": {
+  "hash": "78bf21dfaa4901ff80b3",
+  "outputs": [
+   "2 7 z"
+  ]
+ },
+ "ts_narrowing-example2": {
+  "hash": "b225d4dc1ba915f94988",
+  "outputs": [
+   "2026-09-26 tomorrow"
+  ]
+ },
+ "ts_narrowing-example3": {
+  "hash": "e48bd593a477bb2eb75f",
+  "outputs": [
+   "answered yes | scored 7.0"
+  ]
+ },
+ "ts_narrowing-pitfall1-right": {
+  "hash": "7b85c7302cce66294900",
+  "outputs": [
+   "0 items | no data"
+  ]
+ },
+ "ts_narrowing-pitfall1-wrong": {
+  "hash": "8396d1269c9914752da4",
+  "outputs": [
+   "no data | no data"
+  ]
+ },
+ "ts_narrowing-pitfall2-right": {
+  "hash": "80ec91b1511dafd13f2d",
+  "outputs": [
+   "ANA"
+  ]
+ },
+ "ts_narrowing-pitfall2-wrong": {
+  "hash": "ab93c47170c2aa0d58d3",
+  "diagnostics": [
+   {
+    "code": 18048,
+    "line": 2,
+    "msg": "'name' is possibly 'undefined'."
+   }
+  ]
+ },
+ "ts_narrowing-pitfall3-right": {
+  "hash": "24ec35fd22e140eda887",
+  "outputs": [
+   "point (1, 2)"
+  ]
+ },
+ "ts_narrowing-pitfall3-wrong": {
+  "hash": "70e0dbd08bc3fc890aa3",
+  "outputs": [
+   "not a point"
+  ]
+ },
+ "ts_nullish-error1": {
+  "hash": "5c89dd8fe58386ba56e4",
+  "diagnostics": [
+   {
+    "code": 2322,
+    "line": 1,
+    "msg": "Type 'null' is not assignable to type 'string'."
+   }
+  ]
+ },
+ "ts_nullish-error2": {
+  "hash": "8bb5af87169ffee993cb",
+  "diagnostics": [
+   {
+    "code": 2532,
+    "line": 2,
+    "msg": "Object is possibly 'undefined'."
+   }
+  ]
+ },
+ "ts_nullish-example1": {
+  "hash": "03a5853df2725e3bccc1",
+  "outputs": [
+   "#101 #11 #101 #101 computed 2"
+  ]
+ },
+ "ts_nullish-example2": {
+  "hash": "60c64d4ee4b254b4ac62",
+  "outputs": [
+   "saved 5 bytes\ndone"
+  ]
+ },
+ "ts_nullish-example3": {
+  "hash": "b47339808ab3e7a00710",
+  "outputs": [
+   "{\"port\":3000,\"host\":\"localhost\",\"debug\":false}\n{\"port\":0,\"host\":\"localhost\",\"debug\":true}"
+  ]
+ },
+ "ts_nullish-pitfall1-right": {
+  "hash": "4f9c5f2fa2425d021996",
+  "outputs": [
+   "no city"
+  ]
+ },
+ "ts_nullish-pitfall1-wrong": {
+  "hash": "b3f43875635bcf933219",
+  "diagnostics": [
+   {
+    "code": 18048,
+    "line": 2,
+    "msg": "'order.customer.address' is possibly 'undefined'."
+   }
+  ]
+ },
+ "ts_nullish-pitfall2-right": {
+  "hash": "e36962bc158b175063e1",
+  "outputs": [
+   "UNKNOWN"
+  ]
+ },
+ "ts_nullish-pitfall2-wrong": {
+  "hash": "0c6683bbf4ab1890fc29",
+  "outputs": [
+   "failed: Cannot read properties of undefined (reading 'toUpperCase')"
+  ]
+ },
+ "ts_nullish-pitfall3-right": {
+  "hash": "8528ed776915a0bbc0c1",
+  "outputs": [
+   "5"
+  ]
+ },
+ "ts_nullish-pitfall3-wrong": {
+  "hash": "4ade846473b82f7ba99e",
+  "diagnostics": [
+   {
+    "code": 5076,
+    "line": 3,
+    "msg": "'??' and '||' operations cannot be mixed without parentheses."
+   }
+  ]
+ },
  "ts_number_format-big": {
   "hash": "5210f7ef6323a54c76aa",
   "outputs": [
@@ -5096,6 +5582,84 @@
    "name=solo age=? (+0 extra)"
   ]
  },
+ "ts_type_predicates-error1": {
+  "hash": "6d2a6dd7982d41f69099",
+  "diagnostics": [
+   {
+    "code": 2677,
+    "line": 1,
+    "msg": "A type predicate's type must be assignable to its parameter's type.   Type 'number' is not assignable to type 'string'."
+   }
+  ]
+ },
+ "ts_type_predicates-error2": {
+  "hash": "06376940d764a8eecb17",
+  "diagnostics": [
+   {
+    "code": 2775,
+    "line": 4,
+    "msg": "Assertions require every name in the call target to be declared with an explicit type annotation."
+   }
+  ]
+ },
+ "ts_type_predicates-example1": {
+  "hash": "be511baaa7a9911be0a7",
+  "outputs": [
+   "ANA,BO"
+  ]
+ },
+ "ts_type_predicates-example2": {
+  "hash": "b0dec360059012e4ed05",
+  "outputs": [
+   "distance 2.24\nnot a point\nnot a point"
+  ]
+ },
+ "ts_type_predicates-example3": {
+  "hash": "da2ba2344d1886082129",
+  "outputs": [
+   "PORT=  8080\nHOST is missing"
+  ]
+ },
+ "ts_type_predicates-pitfall1-right": {
+  "hash": "67062028932651600a91",
+  "outputs": [
+   "8"
+  ]
+ },
+ "ts_type_predicates-pitfall1-wrong": {
+  "hash": "f4617f7128c260dbabf4",
+  "outputs": [
+   "345"
+  ]
+ },
+ "ts_type_predicates-pitfall2-right": {
+  "hash": "9826a6d2423286ffd0d6",
+  "outputs": [
+   "3"
+  ]
+ },
+ "ts_type_predicates-pitfall2-wrong": {
+  "hash": "8b19ff3d7bc96bad266d",
+  "diagnostics": [
+   {
+    "code": 2339,
+    "line": 6,
+    "msg": "Property 'level' does not exist on type '{ name: string; }'."
+   }
+  ]
+ },
+ "ts_type_predicates-pitfall3-right": {
+  "hash": "6f79e4711d2b927953cf",
+  "outputs": [
+   "not a string"
+  ]
+ },
+ "ts_type_predicates-pitfall3-wrong": {
+  "hash": "61a207d798006adc4a31",
+  "outputs": [
+   "warning: not a string\nlength undefined"
+  ]
+ },
  "ts_type_testing-check": {
   "hash": "b84adaf746ec9ed44de2",
   "outputs": [
@@ -5387,6 +5951,84 @@
    "👍👍…",
    "🇯🇵🇫🇷🇩🇪…",
    "Zoë s…"
+  ]
+ },
+ "ts_unions-error1": {
+  "hash": "996f90cf1d6341727ff4",
+  "diagnostics": [
+   {
+    "code": 2339,
+    "line": 2,
+    "msg": "Property 'toFixed' does not exist on type 'string | number'.   Property 'toFixed' does not exist on type 'string'."
+   }
+  ]
+ },
+ "ts_unions-error2": {
+  "hash": "8557d06ca0c7a8bee7d3",
+  "diagnostics": [
+   {
+    "code": 2322,
+    "line": 3,
+    "msg": "Type '\"loading\"' is not assignable to type 'Status'."
+   }
+  ]
+ },
+ "ts_unions-example1": {
+  "hash": "e45298bdc37fdd0a67f8",
+  "outputs": [
+   "a|b\nx|y"
+  ]
+ },
+ "ts_unions-example2": {
+  "hash": "07ec87a7e4af5de6b010",
+  "outputs": [
+   "running -> paused -> stopped"
+  ]
+ },
+ "ts_unions-example3": {
+  "hash": "1cbbcb9694441015e5d2",
+  "outputs": [
+   "31: next year 32\n-2: rejected\nx: rejected"
+  ]
+ },
+ "ts_unions-pitfall1-right": {
+  "hash": "0e7fb5f3d31e8df412f9",
+  "outputs": [
+   "not found"
+  ]
+ },
+ "ts_unions-pitfall1-wrong": {
+  "hash": "2a61f20eb23dd75c3f05",
+  "outputs": [
+   "found: undefined"
+  ]
+ },
+ "ts_unions-pitfall2-right": {
+  "hash": "a05ad2a788fa957a7076",
+  "outputs": [
+   "35"
+  ]
+ },
+ "ts_unions-pitfall2-wrong": {
+  "hash": "abb356a9403046726221",
+  "outputs": [
+   "10205"
+  ]
+ },
+ "ts_unions-pitfall3-right": {
+  "hash": "fe4e63dad7b10a89c26a",
+  "outputs": [
+   "theme dark"
+  ]
+ },
+ "ts_unions-pitfall3-wrong": {
+  "hash": "857aa3e01004d4ccaef8",
+  "diagnostics": [
+   {
+    "code": 2345,
+    "line": 6,
+    "msg": "Argument of type 'string' is not assignable to parameter of type 'Theme'."
+   }
   ]
  },
  "ts_variables-error1": {
