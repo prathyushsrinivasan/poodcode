@@ -172,6 +172,46 @@
    "user:created: 0\nuser:deleted: 0\norder:placed: 0\norder:shipped: 0"
   ]
  },
+ "project-w23": {
+  "hash": "6f77620c211a9226e190",
+  "outputs": [
+   "opened A1\nopened A2\n-70\nrefused: insufficient funds\nok A2=800 A1=130\ninterest paid 16\nA1 checking ana 130\nA2 savings bo 816",
+   "refused: unknown kind\nrefused: amount must be a whole number >= 0\nrefused: amount must be a whole number >= 0\nrefused: amount must be a whole number >= 0\nopened A1\nrefused: no account A9\nrefused: bad amount\nA1 checking eve 0",
+   "opened A1\n90\n80\n70\nrefused: withdrawal limit\nrefused: withdrawal limit\nA1 savings s 70",
+   "opened A1\nopened A2\nrefused: insufficient funds\nok A1=-100 A2=100\nrefused: insufficient funds\nA1 checking c -100\nA2 savings s 100\ninterest paid 2",
+   "opened A1\ninterest paid 199\ninterest paid 203\nA1 savings rich 10401"
+  ]
+ },
+ "project-w24": {
+  "hash": "06f1959995a0944d87b1",
+  "outputs": [
+   "4 16 36 64 100\npulled 10\n1 1 2 3 5 8 13 21 34 55 89\npulled 12\n7 11 13 17\npulled 7\nrefused: infinite\npulled 0",
+   "25\npulled 10\n[1 2 3] [4 5 6] [7 8 9] [10]\npulled 10\n12\npulled 12",
+   "28\npulled 5\nunknown squares\nunknown fly\npulled 0",
+   "(empty)\npulled 0\n101 103 107\npulled 107",
+   "2 8 34 144\npulled 12\n[4 9] [25 49] [121 169] [289 361]\npulled 20"
+  ]
+ },
+ "project-w25": {
+  "hash": "33f45e8e2d01c17c8532",
+  "outputs": [
+   "line 4: age: required\nline 5: name: required\nline 5: age: must be a whole number from 0 to 150\nline 5: email: invalid email\nline 6: expected 3 fields, got 2\nana (31) ana@x.io\nLee, Bo (40) bo@y.io\nimported 2 of 5 rows",
+   "line 2: unclosed quote\nsay \"hi\" (5) q@w.io\nimported 1 of 2 rows",
+   "bad header",
+   "line 2: email: invalid email\nline 3: email: invalid email\nline 4: age: must be a whole number from 0 to 150\nimported 0 of 3 rows",
+   "spaced (7) s@p.a\nimported 1 of 1 rows"
+  ]
+ },
+ "project-w26": {
+  "hash": "02933d76d349d8eda9b7",
+  "outputs": [
+   "t=10 posts attempt 1 error\nt=20 users attempt 1 ok\nt=40 posts attempt 2 ok\nt=45 logo attempt 1 ok\nt=70 stats attempt 1 timeout\nt=80 stats attempt 2 ok\nusers: ok after 1 attempt\nposts: ok after 2 attempts\nstats: ok after 2 attempts\nlogo: ok after 1 attempt\ndone at t=80, 4/4 loaded",
+   "t=1 fast attempt 1 ok\nt=10 slow attempt 1 timeout\nslow: failed (timeout) after 1 attempt\nfast: ok after 1 attempt\ndone at t=10, 1/2 loaded",
+   "t=1 doomed attempt 1 error\nt=2 doomed attempt 2 error\nt=3 doomed attempt 3 error\nt=5 flaky attempt 1 error\nt=10 flaky attempt 2 error\nt=15 flaky attempt 3 ok\nflaky: ok after 3 attempts\ndoomed: failed (error) after 3 attempts\ndone at t=15, 1/2 loaded",
+   "t=29 b attempt 1 ok\nt=30 a attempt 1 ok\na: ok after 1 attempt\nb: ok after 1 attempt\ndone at t=30, 2/2 loaded",
+   "t=1 lonely attempt 1 error\nt=2 lonely attempt 2 error\nt=3 lonely attempt 3 error\nt=4 lonely attempt 4 error\nlonely: failed (error) after 4 attempts\ndone at t=4, 0/1 loaded"
+  ]
+ },
  "project-w3": {
   "hash": "9d28b0d98d13e4095c99",
   "outputs": [
@@ -348,6 +388,336 @@
   "hash": "c83871affb8797f6c3ba",
   "outputs": [
    "1 10 100 9"
+  ]
+ },
+ "ts_async_iteration-error1": {
+  "hash": "59b0e51358c8202d33e9",
+  "diagnostics": [
+   {
+    "code": 2488,
+    "line": 4,
+    "msg": "Type 'AsyncGenerator<number, any, any>' must have a '[Symbol.iterator]()' method that returns an iterator."
+   }
+  ]
+ },
+ "ts_async_iteration-error2": {
+  "hash": "4e3577ae36418e1eed27",
+  "diagnostics": [
+   {
+    "code": 1103,
+    "line": 5,
+    "msg": "'for await' loops are only allowed within async functions and at the top levels of modules."
+   }
+  ]
+ },
+ "ts_async_iteration-example1": {
+  "hash": "e20fb68e7051f87b3534",
+  "outputs": [
+   "ana\nbo\ncy\ndee\nrequests made: 2"
+  ]
+ },
+ "ts_async_iteration-example2": {
+  "hash": "1963d7e90ef748fdd367",
+  "outputs": [
+   "4 3 2 1\n9 4 1"
+  ]
+ },
+ "ts_async_iteration-example3": {
+  "hash": "efbf8f4d80aedc28c051",
+  "outputs": [
+   "open\nread one\nread two\nclose\nafter loop"
+  ]
+ },
+ "ts_async_iteration-example4": {
+  "hash": "8fcd3061504827370749",
+  "outputs": [
+   "#3 #6 #9"
+  ]
+ },
+ "ts_async_iteration-for-await": {
+  "hash": "a31e25944e0535fc713f",
+  "outputs": [
+   "after 1: average 10.00\nafter 2: average 15.00\nafter 3: average 20.00",
+   "after 1: average 5.00",
+   "after 1: average 1.00\nafter 2: average 1.50"
+  ]
+ },
+ "ts_async_iteration-gen": {
+  "hash": "404315616ae3b245bb64",
+  "outputs": [
+   "page 1: a b\npage 2: c d\npage 3: e\n3 pages",
+   "page 1: x y z\n1 pages",
+   "page 1: solo\n1 pages"
+  ]
+ },
+ "ts_async_iteration-merge": {
+  "hash": "f44f159a217740c32cff",
+  "outputs": [
+   "1 2 3 4 9 55\npulled 7",
+   "5 7 10\npulled 3",
+   "1 2 100\npulled 3"
+  ]
+ },
+ "ts_async_iteration-pitfall1-right": {
+  "hash": "01a849d730f06fc8a579",
+  "outputs": [
+   "a\nb"
+  ]
+ },
+ "ts_async_iteration-pitfall1-wrong": {
+  "hash": "1fc82d69220f1fed7664",
+  "diagnostics": [
+   {
+    "code": 2488,
+    "line": 5,
+    "msg": "Type 'AsyncGenerator<string, any, any>' must have a '[Symbol.iterator]()' method that returns an iterator."
+   }
+  ]
+ },
+ "ts_async_iteration-pitfall2-right": {
+  "hash": "236c07ee99b5de32076d",
+  "outputs": [
+   "first: 1,2\nsecond: 1,2"
+  ]
+ },
+ "ts_async_iteration-pitfall2-wrong": {
+  "hash": "f4ee5c7cb347f11237eb",
+  "outputs": [
+   "first: 1,2\nsecond: (nothing)"
+  ]
+ },
+ "ts_async_iteration-pitfall3-right": {
+  "hash": "ad3fd7e38f5f2df82df8",
+  "outputs": [
+   "2"
+  ]
+ },
+ "ts_async_iteration-pitfall3-wrong": {
+  "hash": "6a0d26667aa073c45bb3",
+  "diagnostics": [
+   {
+    "code": 2769,
+    "line": 5,
+    "msg": "No overload matches this call.   Overload 1 of 4, '(iterable: Iterable<unknown> | ArrayLike<unknown>): unknown[]', gave the following error.     Argument of type 'AsyncGenerator<number, any, any>' is not assignable to parameter of type 'Iterable<unknown> | ArrayLike<unknown>'.   Overload 2 of 4, '(arrayLike: ArrayLike<unknown>): unknown[]', gave the following error.     Argument of type 'AsyncGenerator<number, any, any>' is not assignable to parameter of type 'ArrayLike<unknown>'.       Property 'length' is missing in type 'AsyncGenerator<number, any, any>' but required in type 'ArrayLike<unknown>'."
+   }
+  ]
+ },
+ "ts_cancellation-check": {
+  "hash": "7b6524eca5be5883e5a1",
+  "outputs": [
+   "total 6",
+   "aborted after 2 ticks",
+   "total 7"
+  ]
+ },
+ "ts_cancellation-error1": {
+  "hash": "acbf914c580d6c053be4",
+  "diagnostics": [
+   {
+    "code": 2540,
+    "line": 2,
+    "msg": "Cannot assign to 'aborted' because it is a read-only property."
+   }
+  ]
+ },
+ "ts_cancellation-error2": {
+  "hash": "690507c3dbd32edd4f4d",
+  "diagnostics": [
+   {
+    "code": 2345,
+    "line": 2,
+    "msg": "Argument of type 'number' is not assignable to parameter of type 'string | PromiseLike<string>'."
+   }
+  ]
+ },
+ "ts_cancellation-example1": {
+  "hash": "6d2125f6412237995867",
+  "outputs": [
+   "processed a\nprocessed b\nprocessed c\nstopped: user cancelled"
+  ]
+ },
+ "ts_cancellation-example2": {
+  "hash": "22ee6d25b79d2db3fc62",
+  "outputs": [
+   "slept 5ms\nsleep 100ms interrupted: gave up"
+  ]
+ },
+ "ts_cancellation-example3": {
+  "hash": "4cdcb1881fc72921c584",
+  "outputs": [
+   "gave up: took longer than 50ms"
+  ]
+ },
+ "ts_cancellation-example4": {
+  "hash": "2c7cfd508b7b34962c4c",
+  "outputs": [
+   "ok 42\nrejected: not a number: x"
+  ]
+ },
+ "ts_cancellation-pitfall1-right": {
+  "hash": "81c045cf1018894a0b3a",
+  "outputs": [
+   "parts downloaded after abort: 1"
+  ]
+ },
+ "ts_cancellation-pitfall1-wrong": {
+  "hash": "8a84a426c824657dbd50",
+  "outputs": [
+   "parts downloaded after abort: 5"
+  ]
+ },
+ "ts_cancellation-pitfall2-right": {
+  "hash": "d91f61c184aa8b068e8f",
+  "outputs": [
+   "timed out\nstep 1"
+  ]
+ },
+ "ts_cancellation-pitfall2-wrong": {
+  "hash": "114bf42410acddb24572",
+  "outputs": [
+   "timed out\nstep 1, step 2, step 3, step 4"
+  ]
+ },
+ "ts_cancellation-pitfall3-right": {
+  "hash": "a51d2c8e8c2098bdeeaf",
+  "outputs": [
+   "cancelled (AbortError) — nothing to report"
+  ]
+ },
+ "ts_cancellation-pitfall3-wrong": {
+  "hash": "ee95beed7f36af494246",
+  "outputs": [
+   "ERROR: fetch failed — alerting on-call"
+  ]
+ },
+ "ts_cancellation-resolvers": {
+  "hash": "e3543afe33a305dab950",
+  "outputs": [
+   "handled wait\nhandled wait\nhandled open\nana released: go\nbo released: go",
+   "handled open\nhandled wait\nlate released: now"
+  ]
+ },
+ "ts_cancellation-retry": {
+  "hash": "ed5df5e42aba7ffbd941",
+  "outputs": [
+   "attempt 1\nattempt 2\nattempt 3\nresult ok on attempt 3",
+   "attempt 1\nattempt 2\nfailed: attempt 2 failed",
+   "attempt 1\nattempt 2\ncancelled: user pressed stop"
+  ]
+ },
+ "ts_class_design-abstract": {
+  "hash": "97d186e7d0cf5c5b87d3",
+  "outputs": [
+   "== Totals ==\nana: 6\nbo: 10\n(2 rows)",
+   "== Totals ==\ncy: 0\n(1 rows)"
+  ]
+ },
+ "ts_class_design-error1": {
+  "hash": "840315c2b0ae07db594e",
+  "diagnostics": [
+   {
+    "code": 2511,
+    "line": 4,
+    "msg": "Cannot create an instance of an abstract class."
+   }
+  ]
+ },
+ "ts_class_design-error2": {
+  "hash": "a55e88a73d51759bd0b1",
+  "diagnostics": [
+   {
+    "code": 2515,
+    "line": 5,
+    "msg": "Non-abstract class 'Square' does not implement inherited abstract member area from class 'Shape'."
+   }
+  ]
+ },
+ "ts_class_design-error3": {
+  "hash": "e21e3a696c91661db35c",
+  "diagnostics": [
+   {
+    "code": 4113,
+    "line": 7,
+    "msg": "This member cannot have an 'override' modifier because it is not declared in the base class 'Base'."
+   }
+  ]
+ },
+ "ts_class_design-error4": {
+  "hash": "f00a36bfe61b348e1a4f",
+  "diagnostics": [
+   {
+    "code": 2673,
+    "line": 7,
+    "msg": "Constructor of class 'Account' is private and only accessible within the class declaration."
+   }
+  ]
+ },
+ "ts_class_design-example1": {
+  "hash": "fba9417bd934c31c1370",
+  "outputs": [
+   "circle with area 3.1\nrect with area 6.0"
+  ]
+ },
+ "ts_class_design-example2": {
+  "hash": "7ac5152419ebcd9033c8",
+  "outputs": [
+   "ok: ana has 70\nowner required\nopening balance must be a whole number >= 0"
+  ]
+ },
+ "ts_class_design-example3": {
+  "hash": "ea9c7cad438ce2bf8210",
+  "outputs": [
+   "0ms ana allowed\n100ms ana allowed\n200ms ana limited\n1150ms ana allowed\n1200ms ana allowed"
+  ]
+ },
+ "ts_class_design-factory": {
+  "hash": "3dd0dae4da5c1f6e018c",
+  "outputs": [
+   "50% of 80 = 40\nbad percent 150\n0% of 99 = 0",
+   "100% of 7 = 7\nbad percent -1"
+  ]
+ },
+ "ts_class_design-inventory": {
+  "hash": "341e08ef9db9aa7f2e8d",
+  "outputs": [
+   "ok\nok\nrefused\n2\nok\nok\npen=2",
+   "refused\n0\n(empty)"
+  ]
+ },
+ "ts_class_design-pitfall1-right": {
+  "hash": "3fd16a33a8908de505e8",
+  "outputs": [
+   "rendering label: hello"
+  ]
+ },
+ "ts_class_design-pitfall1-wrong": {
+  "hash": "4c252fba109e9f82b330",
+  "outputs": [
+   "rendering label: undefined"
+  ]
+ },
+ "ts_class_design-pitfall2-right": {
+  "hash": "0a9d4fa05d0aec55035b",
+  "outputs": [
+   "21 15"
+  ]
+ },
+ "ts_class_design-pitfall2-wrong": {
+  "hash": "853d35c038daeb57df30",
+  "outputs": [
+   "21 -300 15"
+  ]
+ },
+ "ts_class_design-pitfall3-right": {
+  "hash": "44b99503b4cb9df9ebcb",
+  "outputs": [
+   "items in b: 1"
+  ]
+ },
+ "ts_class_design-pitfall3-wrong": {
+  "hash": "c8f8ee834fb29a40e78a",
+  "outputs": [
+   "items in b: 2"
   ]
  },
  "ts_closures_scope-counter": {
@@ -562,6 +932,121 @@
     "line": 2,
     "msg": "'label' is possibly 'undefined'."
    }
+  ]
+ },
+ "ts_decorators-error1": {
+  "hash": "2c82b39223baeb5dbd53",
+  "diagnostics": [
+   {
+    "code": 1206,
+    "line": 4,
+    "msg": "Decorators are not valid here."
+   }
+  ]
+ },
+ "ts_decorators-error2": {
+  "hash": "82953efa78cacd4deb71",
+  "diagnostics": [
+   {
+    "code": 1241,
+    "line": 5,
+    "msg": "Unable to resolve signature of method decorator when called as an expression.   The runtime will invoke the decorator with 2 arguments, but the decorator expects 3."
+   },
+   {
+    "code": 1270,
+    "line": 5,
+    "msg": "Decorator function return type 'PropertyDescriptor' is not assignable to type 'void | ((a: number, b: number) => number)'."
+   }
+  ]
+ },
+ "ts_decorators-example1": {
+  "hash": "369281e0151f37385030",
+  "outputs": [
+   "add(2, 3) = 5\nscale(5, 4) = 20"
+  ]
+ },
+ "ts_decorators-example2": {
+  "hash": "c8c36e8ddfbb255e83b8",
+  "outputs": [
+   "flaky attempt 1 failed: busy\nflaky attempt 2 failed: busy\nresult 42"
+  ]
+ },
+ "ts_decorators-example3": {
+  "hash": "6005739394405e1c796c",
+  "outputs": [
+   "[HELLO!]"
+  ]
+ },
+ "ts_decorators-memo": {
+  "hash": "78d1d84284b198aa95f1",
+  "outputs": [
+   "4 9 4 4 16\ncomputed 3 of 5",
+   "49\ncomputed 1 of 1",
+   "1 1 1\ncomputed 1 of 3"
+  ]
+ },
+ "ts_decorators-pitfall1-right": {
+  "hash": "06c2ae8cfb1729c3c30c",
+  "outputs": [
+   "call\n1"
+  ]
+ },
+ "ts_decorators-pitfall1-wrong": {
+  "hash": "a5a37d61e2456fced0ca",
+  "outputs": [
+   "call\ncrashed: Cannot read properties of undefined (reading 'count')"
+  ]
+ },
+ "ts_decorators-pitfall2-right": {
+  "hash": "0c279672987625f3bc39",
+  "outputs": [
+   "calling greet\nhi"
+  ]
+ },
+ "ts_decorators-pitfall2-wrong": {
+  "hash": "76d6000196e3b75a6606",
+  "diagnostics": [
+   {
+    "code": 1206,
+    "line": 4,
+    "msg": "Decorators are not valid here."
+   }
+  ]
+ },
+ "ts_decorators-pitfall3-right": {
+  "hash": "af8ff114c70f3a90bc90",
+  "outputs": [
+   "standard decorator on add\n3"
+  ]
+ },
+ "ts_decorators-pitfall3-wrong": {
+  "hash": "d362151ac26232fdfe40",
+  "diagnostics": [
+   {
+    "code": 1241,
+    "line": 5,
+    "msg": "Unable to resolve signature of method decorator when called as an expression.   The runtime will invoke the decorator with 2 arguments, but the decorator expects 3."
+   },
+   {
+    "code": 1270,
+    "line": 5,
+    "msg": "Decorator function return type 'PropertyDescriptor' is not assignable to type 'void | ((a: number, b: number) => number)'."
+   }
+  ]
+ },
+ "ts_decorators-timed": {
+  "hash": "685485b5c646899ce968",
+  "outputs": [
+   "hello ana\nhello bo\ngreet called 2 times",
+   "hello cy\ngreet called 1 times",
+   "hello a\nhello b\nhello c\nhello d\ngreet called 4 times"
+  ]
+ },
+ "ts_decorators-validate": {
+  "hash": "dafe5b6d493d137584af",
+  "outputs": [
+   "1.414\nsqrt: bad input -4\n0.250\nreciprocal: bad input 0\nunknown fn cube",
+   "0.000"
   ]
  },
  "ts_distributive-error1": {
@@ -952,6 +1437,203 @@
    "a: Closed\nb: Closed\nActive 0\nSuspended 0\nClosed 2"
   ]
  },
+ "ts_error_cause-chain": {
+  "hash": "c490c9b29fbf6248f711",
+  "outputs": [
+   "price 12.5\ncould not load price <- \"abc\" is not a number",
+   "price -3"
+  ]
+ },
+ "ts_error_cause-error1": {
+  "hash": "a6edbf189ec1d274de17",
+  "diagnostics": [
+   {
+    "code": 18046,
+    "line": 4,
+    "msg": "'e' is of type 'unknown'."
+   }
+  ]
+ },
+ "ts_error_cause-error2": {
+  "hash": "aa5c1767523408c8a4f1",
+  "diagnostics": [
+   {
+    "code": 2339,
+    "line": 9,
+    "msg": "Property 'status' does not exist on type 'Error'."
+   }
+  ]
+ },
+ "ts_error_cause-example1": {
+  "hash": "84195dca291d6a5e3a43",
+  "outputs": [
+   "age 42\nValidationError on age: not a whole number: 4.5\nValidationError on age: out of range: -3\nValidationError on age: not a whole number: x"
+  ]
+ },
+ "ts_error_cause-example2": {
+  "hash": "f3989b8f9e8573760a29",
+  "outputs": [
+   "StartupError: server could not start\n  ConfigError: config is not valid JSON\n    SyntaxError: Expected ',' or '}' after property value in JSON at position 11"
+  ]
+ },
+ "ts_error_cause-example3": {
+  "hash": "0e101949e84f4632b2d8",
+  "outputs": [
+   "ok\n3 problems\n - name is required\n - email is invalid\n - age must be at least 13"
+  ]
+ },
+ "ts_error_cause-http": {
+  "hash": "fa9b395db6698dfa5a4d",
+  "outputs": [
+   "200 user 2\n404 no user 9\n400 id: must be a positive integer, got x\n500 internal error (Error: db exploded)\n400 id: must be a positive integer, got 0",
+   "200 user 3"
+  ]
+ },
+ "ts_error_cause-narrow": {
+  "hash": "c6089f9e15bc9e2faa37",
+  "outputs": [
+   "total 6",
+   "line 2: not a number: five",
+   "line 1: not a number: x"
+  ]
+ },
+ "ts_error_cause-pitfall1-right": {
+  "hash": "5a74f60d901b5a39cde4",
+  "outputs": [
+   "failed: bad id -1"
+  ]
+ },
+ "ts_error_cause-pitfall1-wrong": {
+  "hash": "696cf3a34d9ea4eb4492",
+  "outputs": [
+   "failed: undefined"
+  ]
+ },
+ "ts_error_cause-pitfall2-right": {
+  "hash": "8fbd93dcfa68706c6e7e",
+  "outputs": [
+   "NotFoundError: user 7"
+  ]
+ },
+ "ts_error_cause-pitfall2-wrong": {
+  "hash": "8a6787bcf6bd280b0d54",
+  "outputs": [
+   "Error: user 7"
+  ]
+ },
+ "ts_error_cause-pitfall3-right": {
+  "hash": "647548a37cadd3b89290",
+  "outputs": [
+   "could not load user — cause: ECONNRESET"
+  ]
+ },
+ "ts_error_cause-pitfall3-wrong": {
+  "hash": "7e6ae516110b6f3b757e",
+  "outputs": [
+   "could not load user — cause: (none)"
+  ]
+ },
+ "ts_event_loop-all": {
+  "hash": "727b202d9a47b51148cf",
+  "outputs": [
+   "start 1, start 2, start 3\n2 4 6",
+   "start 10\n20"
+  ]
+ },
+ "ts_event_loop-error1": {
+  "hash": "9849f2e5f52593d907b0",
+  "diagnostics": [
+   {
+    "code": 1308,
+    "line": 2,
+    "msg": "'await' expressions are only allowed within async functions and at the top levels of modules."
+   }
+  ]
+ },
+ "ts_event_loop-error2": {
+  "hash": "75cdd3f64bc651a9c563",
+  "diagnostics": [
+   {
+    "code": 2801,
+    "line": 4,
+    "msg": "This condition will always return true since this 'Promise<boolean>' is always defined."
+   }
+  ]
+ },
+ "ts_event_loop-example1": {
+  "hash": "e48c2f6f6e5aa0aa3680",
+  "outputs": [
+   "1 sync\n2 sync\n3 promise\n4 queueMicrotask\n5 promise, queued from a microtask:\n5b still before the timer\n6 timer"
+  ]
+ },
+ "ts_event_loop-example2": {
+  "hash": "dcb018cd0092d4e728db",
+  "outputs": [
+   "a: start\nb: start\nboth started\na: after first await\nb: after first await\na: done\nb: done\nall finished"
+  ]
+ },
+ "ts_event_loop-example3": {
+  "hash": "5b55a5e726964e6ffe2d",
+  "outputs": [
+   "0ms -> 10ms -> 10ms, set later -> 30ms"
+  ]
+ },
+ "ts_event_loop-example4": {
+  "hash": "2989d64b3922583c5603",
+  "outputs": [
+   "sequential: start a, end a, start b, end b\nconcurrent: start a, start b, end a, end b\nA,B"
+  ]
+ },
+ "ts_event_loop-order": {
+  "hash": "351f1a33c45424f08eb8",
+  "outputs": [
+   "abc\ndef\n-- microtasks --\ncba\nfed",
+   "x\n-- microtasks --\nx"
+  ]
+ },
+ "ts_event_loop-pitfall1-right": {
+  "hash": "e63cf920d28b372e88eb",
+  "outputs": [
+   "saved 3 of 3"
+  ]
+ },
+ "ts_event_loop-pitfall1-wrong": {
+  "hash": "56e2ceed53514a133416",
+  "outputs": [
+   "saved 0 of 3"
+  ]
+ },
+ "ts_event_loop-pitfall2-right": {
+  "hash": "4f627a83c32e0f42c5f7",
+  "outputs": [
+   "status: synced"
+  ]
+ },
+ "ts_event_loop-pitfall2-wrong": {
+  "hash": "d4d1ef11a9e20f398dd5",
+  "outputs": [
+   "status: idle"
+  ]
+ },
+ "ts_event_loop-pitfall3-right": {
+  "hash": "593e7638c312870148d7",
+  "outputs": [
+   "timer, step 1, step 2, step 3"
+  ]
+ },
+ "ts_event_loop-pitfall3-wrong": {
+  "hash": "4c6b67cc188c61a5b862",
+  "outputs": [
+   "microtask 1, microtask 2, microtask 3, timer"
+  ]
+ },
+ "ts_event_loop-simulate": {
+  "hash": "e8435eee9c1f06a8adef",
+  "outputs": [
+   "a -> b -> m1 -> m2 -> t1 -> t3 -> t2\nreal: a -> b -> m1 -> m2 -> t1 -> t3 -> t2\nmatch: true",
+   "only -> late\nreal: only -> late\nmatch: true"
+  ]
+ },
  "ts_function_types-construct": {
   "hash": "6fe3552df88d2694e52f",
   "outputs": [
@@ -1212,6 +1894,113 @@
    "first: undefined"
   ]
  },
+ "ts_heap_pq-error1": {
+  "hash": "d04e9685fa17ff5cc36e",
+  "diagnostics": [
+   {
+    "code": 2322,
+    "line": 8,
+    "msg": "Type 'number | undefined' is not assignable to type 'number'.   Type 'undefined' is not assignable to type 'number'."
+   }
+  ]
+ },
+ "ts_heap_pq-error2": {
+  "hash": "489154a2adcef3c507e6",
+  "diagnostics": [
+   {
+    "code": 2345,
+    "line": 5,
+    "msg": "Argument of type '(a: string, b: string) => number' is not assignable to parameter of type '(a: number, b: number) => number'.   Types of parameters 'a' and 'a' are incompatible.     Type 'number' is not assignable to type 'string'."
+   }
+  ]
+ },
+ "ts_heap_pq-example1": {
+  "hash": "36ffb38788c6c37ff650",
+  "outputs": [
+   "1 2 3 5 8 9\nbanana kiwi 2"
+  ]
+ },
+ "ts_heap_pq-example2": {
+  "hash": "b7ab71b353ff6dfd97db",
+  "outputs": [
+   "1 2 4\n5"
+  ]
+ },
+ "ts_heap_pq-example3": {
+  "hash": "29f74ff98adecf3427b9",
+  "outputs": [
+   "alert(0) email(1) backup(2) report(2) cleanup(2)"
+  ]
+ },
+ "ts_heap_pq-example4": {
+  "hash": "f8f7616c827367b72bc6",
+  "outputs": [
+   "1 2 3 4 5 9 10"
+  ]
+ },
+ "ts_heap_pq-kth": {
+  "hash": "04be8ff5fd38a7ac2edc",
+  "outputs": [
+   "k-th largest: 7",
+   "k-th largest: 5",
+   "not enough values"
+  ]
+ },
+ "ts_heap_pq-max": {
+  "hash": "aa2e3b0267dd1c7bf518",
+  "outputs": [
+   "9 7 5\nleft 2",
+   "2 2\nleft 0",
+   "40 30 20\nleft 1"
+  ]
+ },
+ "ts_heap_pq-pitfall1-right": {
+  "hash": "3040a7830cab1b7ea94a",
+  "outputs": [
+   "next due: 10"
+  ]
+ },
+ "ts_heap_pq-pitfall1-wrong": {
+  "hash": "faee1b79a94b8038ff92",
+  "outputs": [
+   "next due: 30"
+  ]
+ },
+ "ts_heap_pq-pitfall2-right": {
+  "hash": "981447486f1ba82beb0d",
+  "outputs": [
+   "abcde"
+  ]
+ },
+ "ts_heap_pq-pitfall2-wrong": {
+  "hash": "4339d6e9126eccb8a9ef",
+  "outputs": [
+   "aedcb"
+  ]
+ },
+ "ts_heap_pq-pitfall3-right": {
+  "hash": "e6980f6664b943a20d59",
+  "outputs": [
+   "1,2,3"
+  ]
+ },
+ "ts_heap_pq-pitfall3-wrong": {
+  "hash": "3301169201b44cc121a7",
+  "diagnostics": [
+   {
+    "code": 2345,
+    "line": 2,
+    "msg": "Argument of type '(a: number, b: number) => boolean' is not assignable to parameter of type '(a: number, b: number) => number'.   Type 'boolean' is not assignable to type 'number'."
+   }
+  ]
+ },
+ "ts_heap_pq-scheduler": {
+  "hash": "153be2bcc08b294357b8",
+  "outputs": [
+   "run email\nrun backup\nrun alert\nrun report\nidle\npending late",
+   "idle\npending x y"
+  ]
+ },
  "ts_index_signatures-count": {
   "hash": "0992582a0a5dfbf8de58",
   "outputs": [
@@ -1422,6 +2211,119 @@
   "outputs": [
    "#42\nABC\n#7",
    "X"
+  ]
+ },
+ "ts_iterator_helpers-error1": {
+  "hash": "df1c1145a466302f27cc",
+  "diagnostics": [
+   {
+    "code": 2339,
+    "line": 2,
+    "msg": "Property 'take' does not exist on type 'Iterable<number>'."
+   }
+  ]
+ },
+ "ts_iterator_helpers-error2": {
+  "hash": "4b0a20fbd6c89111f668",
+  "diagnostics": [
+   {
+    "code": 2488,
+    "line": 2,
+    "msg": "Type '{ x: number; y: number; }' must have a '[Symbol.iterator]()' method that returns an iterator."
+   }
+  ]
+ },
+ "ts_iterator_helpers-example1": {
+  "hash": "9c3477ef9c57a6139ee8",
+  "outputs": [
+   "ANA, CY\nchecked 3 of 4"
+  ]
+ },
+ "ts_iterator_helpers-example2": {
+  "hash": "9283501d951f8f0a0c52",
+  "outputs": [
+   "2 3 5 7 11 13 17 19\n121 144 169\n5050"
+  ]
+ },
+ "ts_iterator_helpers-example3": {
+  "hash": "58b85a27d6e7dbcd8b94",
+  "outputs": [
+   "5,4,3,2,1\neven 4\neven 2\n50,40,30,20,10"
+  ]
+ },
+ "ts_iterator_helpers-example4": {
+  "hash": "61cec79e9c25553cdb4e",
+  "outputs": [
+   "ALPHA BETA GAMMA\nagain: []\n3 3"
+  ]
+ },
+ "ts_iterator_helpers-first": {
+  "hash": "bc1f26485a5096261855",
+  "outputs": [
+   "QUICK BROWN FOXES\n3",
+   "(none)\n0",
+   "LONGER WORDS HERE\n3"
+  ]
+ },
+ "ts_iterator_helpers-log": {
+  "hash": "228054ce6768a4e83492",
+  "outputs": [
+   "db down\ndb down again\nwarnings: 2\nhas fatal: false\nERROR db down",
+   "warnings: 0\nhas fatal: true\nnone",
+   "warnings: 0\nhas fatal: false\nnone"
+  ]
+ },
+ "ts_iterator_helpers-pitfall1-right": {
+  "hash": "6888c657bc29ec923d1b",
+  "outputs": [
+   "ANA BO | processed: ana,bo"
+  ]
+ },
+ "ts_iterator_helpers-pitfall1-wrong": {
+  "hash": "bacc52a60a06589eb7aa",
+  "outputs": [
+   "ANA BO | processed: ana,bo,cy,dee"
+  ]
+ },
+ "ts_iterator_helpers-pitfall2-right": {
+  "hash": "a1a05d47f0da6ece07bf",
+  "outputs": [
+   "max 90, total 160"
+  ]
+ },
+ "ts_iterator_helpers-pitfall2-wrong": {
+  "hash": "216a4aa4b8ac7dc5ef70",
+  "outputs": [
+   "max 90, total 0"
+  ]
+ },
+ "ts_iterator_helpers-pitfall3-right": {
+  "hash": "92964a778c5f0852bf3c",
+  "outputs": [
+   "2,4"
+  ]
+ },
+ "ts_iterator_helpers-pitfall3-wrong": {
+  "hash": "28254c85ea66ad87a75a",
+  "diagnostics": [
+   {
+    "code": 2339,
+    "line": 2,
+    "msg": "Property 'filter' does not exist on type 'Iterable<number>'."
+   },
+   {
+    "code": 7006,
+    "line": 2,
+    "msg": "Parameter 'n' implicitly has an 'any' type."
+   }
+  ]
+ },
+ "ts_iterator_helpers-range": {
+  "hash": "bb654d7e7eb5d63caeb5",
+  "outputs": [
+   "0 3 6 9\n18",
+   "(empty)\n0",
+   "1 2 3\n6"
   ]
  },
  "ts_key_remapping-emitter": {
@@ -2442,6 +3344,111 @@
    "valid\ninvalid\ninvalid\ninvalid",
    "valid",
    "invalid"
+  ]
+ },
+ "ts_resource_management-dispose": {
+  "hash": "ee8c2f838c1e2dae758b",
+  "outputs": [
+   "a: 3 ticks\nb: 0 ticks\nall timers released",
+   "solo: 5 ticks\nall timers released"
+  ]
+ },
+ "ts_resource_management-error1": {
+  "hash": "4d3960dc434a349f3a47",
+  "diagnostics": [
+   {
+    "code": 2850,
+    "line": 3,
+    "msg": "The initializer of a 'using' declaration must be either an object with a '[Symbol.dispose]()' method, or be 'null' or 'undefined'.   Property '[Symbol.dispose]' is missing in type '{ close(): void; }' but required in type 'Disposable'."
+   }
+  ]
+ },
+ "ts_resource_management-error2": {
+  "hash": "63357b7f1476f9e9fbcf",
+  "diagnostics": [
+   {
+    "code": 2852,
+    "line": 2,
+    "msg": "'await using' statements are only allowed within async functions and at the top levels of modules."
+   }
+  ]
+ },
+ "ts_resource_management-example1": {
+  "hash": "673ca30180a2d3b900d6",
+  "outputs": [
+   "open db\nopen file\nusing db and file\nclose file\nclose db\ndone"
+  ]
+ },
+ "ts_resource_management-example2": {
+  "hash": "9160764f5f92e45f7cad",
+  "outputs": [
+   "moved 50 while holding 1 lock\nlocks held afterwards: 0\nrejected\nlocks held afterwards: 0\nerror: limit exceeded\nlocks held afterwards: 0"
+  ]
+ },
+ "ts_resource_management-example3": {
+  "hash": "375c1cef6c07ce9460d6",
+  "outputs": [
+   "setup that fails:\n  start server\n  open cache\n  undo: close cache\n  undo: stop server\n  failed: config missing\nsetup that succeeds:\n  start server\n  open cache\n  running\n  undo: close cache\n  undo: stop server"
+  ]
+ },
+ "ts_resource_management-example4": {
+  "hash": "064345eb91f6e5306006",
+  "outputs": [
+   "#7: SELECT 1\nconnection 7 closed\nafter report"
+  ]
+ },
+ "ts_resource_management-pitfall1-right": {
+  "hash": "d200c8ad898ea71f6e04",
+  "outputs": [
+   "open, close, caught"
+  ]
+ },
+ "ts_resource_management-pitfall1-wrong": {
+  "hash": "3bb6191a5766b3021a7f",
+  "outputs": [
+   "open, caught"
+  ]
+ },
+ "ts_resource_management-pitfall2-right": {
+  "hash": "5cfd957079ce29b899b8",
+  "outputs": [
+   "contents"
+  ]
+ },
+ "ts_resource_management-pitfall2-wrong": {
+  "hash": "5d7ce468b42a5df74f4c",
+  "outputs": [
+   "(read after close)"
+  ]
+ },
+ "ts_resource_management-pitfall3-right": {
+  "hash": "448468b8e56ab8da5f7a",
+  "outputs": [
+   "working\nclosed"
+  ]
+ },
+ "ts_resource_management-pitfall3-wrong": {
+  "hash": "8f8b82f388226e7f4bed",
+  "diagnostics": [
+   {
+    "code": 2850,
+    "line": 3,
+    "msg": "The initializer of a 'using' declaration must be either an object with a '[Symbol.dispose]()' method, or be 'null' or 'undefined'.   Property '[Symbol.dispose]' is missing in type 'AsyncDisposable' but required in type 'Disposable'."
+   }
+  ]
+ },
+ "ts_resource_management-pool": {
+  "hash": "0029e07de24a1912c819",
+  "outputs": [
+   "job 1 on conn 1: HELLO WORLD\nfree 2\njob 2 failed\nfree 2\njob 3 on conn 1: LAST ONE\nfree 2",
+   "job 1 on conn 1: A\nfree 2\njob 2 on conn 2: B\nfree 2\njob 3 on conn 1: C\nfree 2"
+  ]
+ },
+ "ts_resource_management-stack": {
+  "hash": "d0ccd79d11b75ec7bf7b",
+  "outputs": [
+   "apply users\napply posts\nrollback posts\nrollback users\nfailed at index",
+   "apply a\napply b\ncommitted"
   ]
  },
  "ts_runtime_validation-error1": {
@@ -4277,6 +5284,239 @@
   "hash": "a91c10ecb489a7cee2d2",
   "outputs": [
    "user:created -> s1\norder:deleted -> s2\norder:created -> s3\nuser:deleted -> s1\norder:updated -> nobody\nbad event user:banned\nbad pattern *:*"
+  ]
+ },
+ "tsm-w23-elevator": {
+  "hash": "fce1dc8e8278e47d1adc",
+  "outputs": [
+   "t=1 floor 1\nt=2 floor 2\nt=3 floor 3\nt=3 stop 3\nt=4 floor 2\nt=5 floor 1\nt=5 stop 1\nt=7 floor 0\nt=7 stop 0\nt=8 floor 1\nt=9 floor 2\nt=10 floor 3\nt=11 floor 4\nt=12 floor 5\nt=12 stop 5",
+   "t=2 stop 0\nt=3 floor 1\nt=4 floor 2\nt=4 stop 2\nt=5 floor 1\nt=6 floor 0\nt=7 floor -1\nt=8 floor -2\nt=8 stop -2"
+  ]
+ },
+ "tsm-w23-library": {
+  "hash": "6c80e217f6ada7487684",
+  "outputs": [
+   "ok\nok\nok\nok\nok\nok\nrefused: already on loan\nok\nrefused: limit reached\nreturned, fee $1.25\nrefused: not borrowed by bo\nok\nana: 1 on loan, fees $1.25\nbo: 1 on loan, fees $0.00",
+   "ok\nrefused: no such book\nrefused: no such member\ncy: 0 on loan, fees $0.00"
+  ]
+ },
+ "tsm-w23-observable": {
+  "hash": "71c6967179742d7372f8",
+  "outputs": [
+   "withTax: 12.00 -> 24.00\nana: 10 -> 20\nset 20\nwithTax: 24.00 -> 6.00\nana: 20 -> 5\nbo: 20 -> 5\nwithTax: 6.00 -> 7.20\nbo: 5 -> 6",
+   "set 10\nset 10.001"
+  ]
+ },
+ "tsm-w23-parking": {
+  "hash": "55a03b02d598c4601289",
+  "outputs": [
+   "A1 -> medium\nB2 -> small\nC3 -> large\nD4 refused: no space\nE5 refused: no space\nsmall 0/1 medium 0/1 large 0/1\nA1 left medium\nE5 -> medium\nZ9 not found\nE5 refused: already parked",
+   "V -> large\nW refused: no space\nX refused: unknown type boat\nsmall 0/0 medium 0/0 large 0/1"
+  ]
+ },
+ "tsm-w23-shapes": {
+  "hash": "295285defeb07ea2dfd7",
+  "outputs": [
+   "bad shape triangle 1 1 5\nbad shape hexagon 2\nrect: area 6.00, perimeter 10.00\ntriangle: area 6.00, perimeter 12.00\ncircle: area 3.14, perimeter 6.28\ntotal perimeter 28.28",
+   "rect: area 1.00, perimeter 4.00\ncircle: area 0.79, perimeter 3.14\ntotal perimeter 7.14"
+  ]
+ },
+ "tsm-w23-temperature": {
+  "hash": "62558e3fb46568f36685",
+  "outputs": [
+   "c = 0.00\nf = 32.00\nf = 212.00\nc = 100.00\nrejected: below absolute zero\nk = 373.15\nk = 0.00\nf = -459.67"
+  ]
+ },
+ "tsm-w23-vector": {
+  "hash": "609590d6aa3bde25ea55",
+  "outputs": [
+   "(4, 6)\n(3, -6)\n5.00\ntrue\nfalse",
+   "1.41"
+  ]
+ },
+ "tsm-w24-bst": {
+  "hash": "b5fb6c8b3d8db6a0ea17",
+  "outputs": [
+   "20 30 40 50 60 70 80\n40\nnone\n40 50 60\n3",
+   "(empty)\n4\n(none)"
+  ]
+ },
+ "tsm-w24-interleave": {
+  "hash": "20e367286fe1e666b342",
+  "outputs": [
+   "a 1 x b 2 c\np r q s t u\ninfinite: a 1 x 1 b 2 2",
+   "solo\ninfinite: solo 1 2 3 4 5 6"
+  ]
+ },
+ "tsm-w24-linked-list": {
+  "hash": "a21a375ddd79189e9dda",
+  "outputs": [
+   "a b c\nremoved\nd b a\nd\n2\nnot found\nb a",
+   "empty\n(empty)\nremoved\n(empty)\ny"
+  ]
+ },
+ "tsm-w24-meeting-rooms": {
+  "hash": "603c4ed72496bda9bc37",
+  "outputs": [
+   "0-30 room 1\n5-10 room 2\n10-40 room 2\n15-20 room 3\n30-45 room 3\nrooms 3",
+   "9-10 room 1\n9-10 room 2\n10-11 room 1\nrooms 2"
+  ]
+ },
+ "tsm-w24-primes": {
+  "hash": "5fe677bc17c42dd041bd",
+  "outputs": [
+   "2 3 5 7 11 13\n23 29 31 37\n29\n(none)",
+   "2\n2"
+  ]
+ },
+ "tsm-w24-ring": {
+  "hash": "671d6e3487a3a5c71887",
+  "outputs": [
+   "(empty)\ndropped a\nb c d\nd\ndropped b\ndropped c\nd e f",
+   "empty\ndropped x\ny"
+  ]
+ },
+ "tsm-w24-running-median": {
+  "hash": "15a66a1abbe96fea4bed",
+  "outputs": [
+   "5 10 5 4 5 6 7 7.5",
+   "2",
+   "4 4 4 4"
+  ]
+ },
+ "tsm-w24-take-while": {
+  "hash": "490a47b0f390435f0385",
+  "outputs": [
+   "1 3 5 | -2 7\n9 | -\n-1 2 3 | -1 2 3",
+   "4 5 6 | -"
+  ]
+ },
+ "tsm-w25-cause-chain": {
+  "hash": "ab2eb17d9ca2ceafbb05",
+  "outputs": [
+   "imported 2",
+   "Error: import failed at line 2\n  Error: bad record 'bo:-4'\n    RangeError: age out of range: -4",
+   "Error: import failed at line 1\n  Error: bad record 'x:abc'\n    RangeError: age out of range: abc"
+  ]
+ },
+ "tsm-w25-fail-fast": {
+  "hash": "110cbf02c9bbf226102a",
+  "outputs": [
+   "line 2 name: needs 2+ letters\nline 2 age: must be 0-150\nline 2 email: must contain @\nline 4 age: must be 0-150\n4 error(s)",
+   "line 2 name: needs 2+ letters\n1 error(s)",
+   "all 1 valid"
+  ]
+ },
+ "tsm-w25-result-chain": {
+  "hash": "fbce610cd530c07621fa",
+  "outputs": [
+   "2.5\nerror: division by zero\n1.4142\nerror: negative root\nerror: bad number x\nerror: unknown operation",
+   "2.3333"
+  ]
+ },
+ "tsm-w25-retry": {
+  "hash": "7e3ea286a3dd33fb371f",
+  "outputs": [
+   "attempt 1: failed timeout\nattempt 2: failed busy\nattempt 3: 42\nresult 42",
+   "attempt 1: failed timeout\nattempt 2: failed auth\ngave up: auth (not retryable)",
+   "attempt 1: failed busy\nattempt 2: failed busy\ngave up: busy (out of attempts)",
+   "attempt 1: first\nresult first"
+  ]
+ },
+ "tsm-w25-safe-json": {
+  "hash": "72f03a8ab30384df9487",
+  "outputs": [
+   "sum 6.5 of 3\nsum 0 of 0\nerror: invalid JSON\nerror: not an object\nerror: missing items\nerror: items must be a list of numbers"
+  ]
+ },
+ "tsm-w25-transfer": {
+  "hash": "252cf6052e05d7441911",
+  "outputs": [
+   "ok\nana=49 bo=70 cy=0\nok\nana=69 bo=49 cy=0\nfailed: cy is frozen\nana=69 bo=49 cy=0\nfailed: unknown account dee\nana=69 bo=49 cy=0\nfailed: insufficient funds in bo\nana=69 bo=49 cy=0",
+   "failed: insufficient funds in x\nx=10 y=0\nok\nx=0 y=9"
+  ]
+ },
+ "tsm-w25-using-scopes": {
+  "hash": "09c5947a106a2bacdb33",
+  "outputs": [
+   "open db\nopen file\nworking\nclose file\nopen cache\ndone\nclose cache\nclose db\nfinished",
+   "open a\nopen b\nopen c\nclose c\nclose b\nclose a\nerror: disk full",
+   "nothing to open\nfinished"
+  ]
+ },
+ "tsm-w26-all-settled": {
+  "hash": "e397f61357705b80d739",
+  "outputs": [
+   "t=10 b rejected\nt=10 c fulfilled\nt=30 a fulfilled\nt=50 d rejected\na: alpha\nb failed: boom\nc: gamma\nd failed: late\nfinished at t=50",
+   "t=0 solo fulfilled\nsolo: x\nfinished at t=0"
+  ]
+ },
+ "tsm-w26-async-queue": {
+  "hash": "8e5fac31ec40ee782169",
+  "outputs": [
+   "ana got x\nbo got y\nsize 1\ncy got z\ndee got nothing (closed)\neve got nothing (closed)",
+   "x got a\ny got nothing (closed)"
+  ]
+ },
+ "tsm-w26-backoff": {
+  "hash": "53740510f65ba832553b",
+  "outputs": [
+   "t=0 attempt 1: fail\nt=100 attempt 2: fail\nt=300 attempt 3: ok\nsucceeded at t=300",
+   "t=0 attempt 1: fail\nt=50 attempt 2: fail\nt=150 attempt 3: fail\ngave up at t=150",
+   "t=0 attempt 1: ok\nsucceeded at t=0"
+  ]
+ },
+ "tsm-w26-cancel": {
+  "hash": "178725a9a7993861e6d7",
+  "outputs": [
+   "t=7 b step 1\nt=10 a step 1\nt=14 b step 2\nt=16 b cancelled after 2 steps\nt=20 a step 2\nt=30 a step 3\nt=30 a done\nsummary: 1 done, 1 cancelled",
+   "t=0 x cancelled after 0 steps\nsummary: 0 done, 1 cancelled"
+  ]
+ },
+ "tsm-w26-debounce": {
+  "hash": "7e528522f703678f1942",
+  "outputs": [
+   "t=220 search \"typ\"\nt=550 search \"types\"\nt=800 search \"typesc\"\nsearches: 3, keystrokes: 6",
+   "t=40 search \"ab\"\nsearches: 1, keystrokes: 2"
+  ]
+ },
+ "tsm-w26-loader": {
+  "hash": "a6680ed3f059b365d815",
+  "outputs": [
+   "t=0 start config\nt=0 start log\nt=2 ready config\nt=2 start db\nt=2 start cache\nt=4 ready log\nt=5 ready cache\nt=12 ready db\nt=12 start app\nt=17 ready app\nall ready at t=17",
+   "cycle: a -> b -> c -> a",
+   "t=0 start solo\nt=7 ready solo\nall ready at t=7"
+  ]
+ },
+ "tsm-w26-pages": {
+  "hash": "1863c813d5e072b814eb",
+  "outputs": [
+   "page 1\npage 2\na b c d\nfetched 2 pages",
+   "page 1\npage 2\na b c\nfetched 2 pages",
+   "(none)\nfetched 0 pages"
+  ]
+ },
+ "tsm-w26-pool": {
+  "hash": "1ac271a84c9b7144f3f5",
+  "outputs": [
+   "t=0 start a\nt=0 start b\nt=10 end b\nt=10 start c\nt=20 end c\nt=20 start d\nt=30 end a\nt=30 start e\nt=35 end e\nt=40 end d\nall done at t=40\na=30 b=10 c=10 d=20 e=5",
+   "t=0 start x\nt=5 end x\nt=5 start y\nt=10 end y\nall done at t=10\nx=5 y=5",
+   "t=0 start p\nt=0 start q\nt=3 end q\nt=7 end p\nall done at t=7\np=7 q=3"
+  ]
+ },
+ "tsm-w26-throttle": {
+  "hash": "3575da5558c1c3dc7b1d",
+  "outputs": [
+   "0 100 200 350\ndropped 4",
+   "5\ndropped 0",
+   "0 10 20 30\ndropped 0"
+  ]
+ },
+ "tsm-w26-timeouts": {
+  "hash": "d0eca08a5bf95d907913",
+  "outputs": [
+   "users: loaded in 20ms\nposts: timed out after 50ms\nstats: timed out after 50ms\nlogo: loaded in 5ms\ndone at t=50",
+   "slow: timed out after 10ms\ndone at t=10"
   ]
  },
  "tsm-w3-armstrong": {

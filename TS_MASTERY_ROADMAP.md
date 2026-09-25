@@ -61,10 +61,12 @@ the gap stays visible. This is what has landed since.
 | What the checker knows | `lib: es2022` — `toSorted`, `Object.groupBy`, Set methods, iterator helpers and `using` all failed to compile though Node 24 runs them | **ES2024 + the esnext libraries Node 24 ships** (array, collection, iterator, disposable, promise) — judge, verifier and editor in step | `tscheck.rs`, `ts_typecheck.mjs`, `monacoSetup.ts` |
 | Expected outputs | pasted in by hand after running the reference | **computed**: content names its inputs; `python tools/gen_ts_outputs.py` runs every reference (type-checked first) and caches the outputs, hash-pinned — a stale entry fails the build | `tools/ts_outputs_kit.py`, `tools/ts_outputs.json` |
 | Lesson template (X-02) | 1-2k-character lessons, prose only | new chapters are **structured data rendered into a fixed spine** — why, idea, worked examples *with the output they really print*, real compiler errors *as tsc prints them*, pitfalls (wrong vs right, both run), interview, forward links; 4k+ characters enforced | `tools/ts_chapter_kit.py`; chapters in `tools/ts_chapters_m*.py` |
-| Build projects (F-08) | a sentence; code saved but never run; "shipped" self-declared | **structured brief + acceptance tests** run through the judge; *shipping needs them green*; reference revealed after shipping; saved self-review rubric — weeks 1–22 (Month 4's include `ledger.ts` v4 and a reverse-routing `routes.ts`; Month 5's end with the `events.ts` typed event catalogue) | `project_spec`, `ProjectPanel`, `project_rubric` column |
-| Problems inside a week | 2-5 Library links | **a tiered problem set per week** (warm-up / core / stretch), original, judged at the week's strictness — weeks 1–22 (216 problems, 32 of them type-graded — none repeating a type workshop) | `problem_set`, `tools/mastery_ts_more_m*.py` |
+| Build projects (F-08) | a sentence; code saved but never run; "shipped" self-declared | **structured brief + acceptance tests** run through the judge; *shipping needs them green*; reference revealed after shipping; saved self-review rubric — every core week, 1–26 (Month 4's include `ledger.ts` v4 and a reverse-routing `routes.ts`; Month 5's end with the `events.ts` typed event catalogue; Month 6's with `fetchAll.ts` — pool, timeouts and retries on a virtual clock) | `project_spec`, `ProjectPanel`, `project_rubric` column |
+| Problems inside a week | 2-5 Library links | **a tiered problem set per week** (warm-up / core / stretch), original, judged at the week's strictness — every core week, 1–26 (253 problems, 37 of them type-graded — none repeating a type workshop) | `problem_set`, `tools/mastery_ts_more_m*.py` |
 | Month 4 chapters | none of the five the roadmap asks for | **`ts_erasable_syntax`, `ts_versions`, `ts_variance`, `ts_parse_dont_validate`, `ts_runtime_validation`** on the lesson template; TypeScript 6.0/7.0 facts checked against the official release notes (D-4) — the chapter teaches the 6.0 defaults and deprecations as content, the checker itself stays on 5.9 | `tools/ts_chapters_m4.py`, `tools/mastery_ts_more_m4.py` |
 | Month 5 chapters | none of the five the roadmap asks for | **`ts_generic_inference`, `ts_lookup_types`, `ts_key_remapping`, `ts_distributive`, `ts_type_performance`** on the lesson template — including real TS2589/TS2590 limits, reproduced by the checker rather than described | `tools/ts_chapters_m5.py`, `tools/mastery_ts_more_m5.py` |
+| Month 6 chapters | none of the nine the roadmap asks for | **`ts_class_design`, `ts_decorators`, `ts_iterator_helpers`, `ts_heap_pq`, `ts_resource_management`, `ts_error_cause`, `ts_event_loop`, `ts_cancellation`, `ts_async_iteration`** on the lesson template. Decorators can't run under type stripping, so that chapter runs their desugared form and lets the checker judge the `@` syntax. `AbortController`/`AbortSignal` added to the judge's ambient declarations (`tslib/poodcode-env.d.ts`, shared with the editor and verifiers); the whole TS course still type-checks | `tools/ts_chapters_m6.py`, `tools/mastery_ts_more_m6.py` |
+| Deterministic async (M6-03) | a rule on paper | week 26's problems and project run on a **virtual clock** (`_VCLOCK` in `mastery_ts_more_m6.py`): time advances only after every microtask settles, so no output depends on machine speed. Two chapter demos that raced real timers were caught and rebuilt so order follows from due times alone | `tools/mastery_ts_more_m6.py`, `tools/ts_chapters_m6.py` |
 | Fast authoring loop (X-102) | none for Mastery | `python tools/verify_ts_mastery.py --weeks 11-14` / `--only ts_regex` — type-checks and runs chapters, practice, problems, finals and projects in seconds | `tools/verify_ts_mastery.py` |
 
 ---
@@ -730,7 +732,7 @@ concurrency and cancellation.
 ### Week 23 — Classes & Encapsulation
 *Now:* `ts_classes`, `ts_this_accessors` · 3 problems · final "Bank account with invariants".
 
-* **Chapters:** ✅ both · ⬜ **`ts_class_design`** — `abstract` classes, `implements`, `override`, `protected`, mixins, composition vs inheritance, `static` factories, class vs closure-based objects · ⬜ **`ts_decorators`** — TC39 standard decorators and `accessor` (type-graded only — D-5).
+* **Chapters:** ✅ both · ✅ **`ts_class_design`** — `abstract` classes, `implements`, `override`, `protected`, mixins, composition vs inheritance, `static` factories, class vs closure-based objects · ✅ **`ts_decorators`** — TC39 standard decorators and `accessor` (type-graded only — D-5).
 * **Lesson additions:** `#private` vs `private`; parameter properties (type-graded only); getters/setters with validation; `this` binding and arrow-method fields; `instanceof` narrowing; classes are also types (structural!).
 * **Worked examples:** `BankAccount` with a `#balance` invariant; `Shape` abstract class vs a discriminated union — same problem, both designs; a `static from()` factory with validation.
 * **Pitfalls:** detached method losing `this`; `private` is compile-time only (`#` is real); two classes with the same shape are interchangeable; a setter assigning to itself (infinite recursion).
@@ -743,7 +745,7 @@ concurrency and cancellation.
 ### Week 24 — Iterators, Generators & Generic Data Structures
 *Now:* `ts_iterators`, `ts_ds_generics` · final "Lazy pipeline over an infinite source".
 
-* **Chapters:** ✅ both · ⬜ **`ts_iterator_helpers`** — ES2025 iterator helpers (`Iterator.prototype.map/filter/take/drop/flatMap/reduce/toArray`, `Iterator.from`), `Symbol.iterator` on your own classes · ⬜ **`ts_heap_pq`** — a generic binary heap / priority queue with a comparator (the DS the course arc needs for heaps).
+* **Chapters:** ✅ both · ✅ **`ts_iterator_helpers`** — ES2025 iterator helpers (`Iterator.prototype.map/filter/take/drop/flatMap/reduce/toArray`, `Iterator.from`), `Symbol.iterator` on your own classes · ✅ **`ts_heap_pq`** — a generic binary heap / priority queue with a comparator (the DS the course arc needs for heaps).
 * **Lesson additions:** the iterator protocol; generators (`function*`, `yield`, `yield*`, `return`); `Generator<T, TReturn, TNext>`; laziness and infinite sequences; typed generic `Stack<T>`, `Queue<T>` (and the O(n) `shift` trap), `LinkedList<T>`, `BinaryTree<T>`, `Heap<T>`.
 * **Worked examples:** `range`, `take`, `chunk` generators; an iterable `LinkedList<T>` usable in `for…of` and spread; a `PriorityQueue<T>` driving "k smallest"; an in-order tree iterator via `yield*`.
 * **Pitfalls:** a generator is single-use; spreading an infinite iterator hangs; `shift()` in a BFS loop is O(n); comparator sign mistakes.
@@ -756,7 +758,7 @@ concurrency and cancellation.
 ### Week 25 — Errors, `Result` & Resource Management *(D-2)*
 *Now:* "Errors & Async" with four chapters.
 
-* **Chapters:** ✅ `ts_errors`, `ts_error_types` · ⬜ **`ts_resource_management`** — `using` / `await using`, `Symbol.dispose`, `DisposableStack` (runs on the installed Node 24) · ⬜ **`ts_error_cause`** — `Error` subclasses, `cause`, `AggregateError`, `useUnknownInCatchVariables`, typed error unions.
+* **Chapters:** ✅ `ts_errors`, `ts_error_types` · ✅ **`ts_resource_management`** — `using` / `await using`, `Symbol.dispose`, `DisposableStack` (runs on the installed Node 24) · ✅ **`ts_error_cause`** — `Error` subclasses, `cause`, `AggregateError`, `useUnknownInCatchVariables`, typed error unions.
 * **Lesson additions:** `catch (e: unknown)` and narrowing it; custom error classes; `Result<T, E>` as a discriminated union; when to throw vs return; error boundaries at the edge of a program; cleanup with `finally` vs `using`.
 * **Worked examples:** a `Result`-returning parser chain with `map`/`andThen`; `ValidationError` with `cause`; a file-like resource closed deterministically with `using` (printing "opened"/"closed"); collecting all errors vs failing fast.
 * **Pitfalls:** throwing strings; `e.message` on `unknown`; swallowed errors in `catch {}`; `finally` overriding a `return`; a `Result` that's ignored.
@@ -769,7 +771,7 @@ concurrency and cancellation.
 ### Week 26 — Async, Concurrency & Cancellation *(D-2)*
 *Now:* "Modules, Declarations & Capstone".
 
-* **Chapters:** ✅ `ts_async`, `ts_async_patterns` (moved from 25) · ⬜ **`ts_event_loop`** — call stack, microtasks vs tasks, `await` ordering, `queueMicrotask` · ⬜ **`ts_cancellation`** — `AbortController`, `AbortSignal.timeout`, `AbortSignal.any`, `Promise.withResolvers`, `Promise.try` · ⬜ **`ts_async_iteration`** — `for await`, async generators, `Array.fromAsync`.
+* **Chapters:** ✅ `ts_async`, `ts_async_patterns` (moved from 25) · ✅ **`ts_event_loop`** — call stack, microtasks vs tasks, `await` ordering, `queueMicrotask` · ✅ **`ts_cancellation`** — `AbortController`, `AbortSignal.timeout`, `AbortSignal.any`, `Promise.withResolvers`, `Promise.try` · ✅ **`ts_async_iteration`** — `for await`, async generators, `Array.fromAsync`.
 * **Lesson additions:** promises and states; `async`/`await` sugar; sequential vs concurrent; `Promise.all` / `allSettled` / `race` / `any` and their typed results; concurrency limits (a pool); timeouts; `Awaited<T>`; unhandled rejections.
 * **Worked examples:** load 5 simulated resources with concurrency 2, printing in index order; race each against a timeout and return a `Result` per resource; a cancellable retry loop; an async generator paginating a simulated API.
 * **Pitfalls:** `forEach` with an async callback; `await` in a loop when you meant concurrency; `Promise.all` failing fast and losing other results; forgetting to `await` (TS floating promise); output depending on timing (M6-03).
@@ -804,6 +806,10 @@ concurrency and cancellation.
 | Final tests | 94 (2–5/week) | **~200** (≥ 6 per final, most 8) + hidden sets, + 26 alternates |
 | Checkpoints | 2 | 6 monthly + final exam |
 | Projects | 26 ungraded sentences | 26 structured, runnable, tested + 1 arc project across 6 months |
+
+---
+
+**Status, 2026-09-26 — Part B's content is built for all 26 core weeks.** TypeScript Learn chapters: **87** (the target), with 301 Learn exercises and 265 chapter quiz questions. Mastery TS track: 253 problem-set problems (37 type-graded), 198 practice exercises, 26 runnable projects, 945 week-bank quiz questions, 521 review cards, 219 final tests, 6 checkpoint contests. Still open from Part A and the targets above: the ~1,300-exercise and ~1,000-card volumes, alternate finals (X-33), two-part finals (X-34), the programme final exam (X-36), the multi-file workspace (X-45), the visualisers and UI items (M1-02, M3-01, M5-01, M6-01, X-60 onward), and week 27's capstone and mock-interview kit.
 
 ---
 

@@ -17339,6 +17339,1390 @@
     "practice": []
   },
   {
+    "key": "ts_class_design",
+    "name": "Designing with Classes",
+    "category": "TS: Runtime & Architecture",
+    "what": "Abstract classes, `implements`, `override`, `protected` and static factories — and when a class, a closure or plain composition is the better design.",
+    "deep": "Classes give you a runtime constructor *and* a type, `private`/`protected` members, and inheritance. Used well — an abstract base that fixes an algorithm's shape, a private constructor behind a validating `static` factory, an interface implemented by several classes — they make invariants impossible to bypass. Used as a default, they produce fragile hierarchies. This chapter is the toolkit and the judgement.",
+    "java": "Much is familiar from Java: `abstract`, `implements`, `protected`, `static`. The differences matter: classes are structurally typed (two classes with the same shape are interchangeable unless one has a `private` member), `private` is compile-time only while `#private` is enforced at runtime, `override` is checked but optional, and plain objects and closures are first-class alternatives rather than workarounds.",
+    "language": "typescript",
+    "lesson": "### Why it exists\nThe Classes chapter taught the mechanics: fields, constructors, methods,\n`#private`, accessors. Design is the next question. When a `Shape` needs an\n`area`, should it be an abstract class or a discriminated union? When an\n`Account` must never go negative, how do you make *constructing* a bad one\nimpossible? When two classes share code, should one extend the other?\n\nThose choices are what interviews probe and what codebases live with for years.\nThe tools are small — `abstract`, `implements`, `override`, `protected`, a\n`private constructor` — but each exists to make one kind of mistake impossible.\n\n### The core idea\n**`abstract` fixes the shape, leaves the details.** An abstract class can't be\ninstantiated; its `abstract` members must be implemented by every concrete\nsubclass. It's the right tool when the *algorithm* is shared and a step varies\n(a `describe()` that calls an abstract `area()`).\n\n**`implements` checks a class against an interface** without inheriting\nanything. Use it for capabilities (`Comparable`, `Serializable`) that unrelated\nclasses share.\n\n**`override` says \"this replaces a base member\".** If the base member is\nrenamed or removed, `override` turns the silent new method into a compile error\n(and `--noImplicitOverride` makes the keyword mandatory).\n\n**`protected`** is visible to subclasses but not to callers — the subclass\nextension points of a base class. Like `private`, it's compile-time only.\n\n**Private constructor + static factory** is the class form of a smart\nconstructor (week 16):\n\n```ts\nclass Account {\n  #balance: number;\n  private constructor(opening: number) { this.#balance = opening; }\n  static open(opening: number): Account | undefined {\n    return opening >= 0 ? new Account(opening) : undefined;\n  }\n}\n```\n\nNothing outside the class can call `new Account(-5)`.\n\n**Composition over inheritance.** Inheritance couples a subclass to its base's\ninternals; changing the base can break every subclass (the \"fragile base\nclass\"). Prefer small objects passed in — a `Logger`, a `Clock`, a `Store` — and\nreserve `extends` for real \"is-a\" relationships with a stable base.\n\n**Class, closure or union?** A discriminated union (week 12) suits data with a\nfixed set of variants handled by `switch`. A class suits an object with an\nidentity and invariants that its methods protect. A closure returning an object\nof functions gives true privacy with no `this` at all.\n\n### Worked examples\n#### An abstract base that fixes the algorithm\n```ts\nabstract class Shape {\n  abstract readonly name: string;\n  abstract area(): number;\n  describe(): string {\n    return `${this.name} with area ${this.area().toFixed(1)}`;\n  }\n}\nclass Circle extends Shape {\n  readonly name = \"circle\";\n  readonly r: number;\n  constructor(r: number) {\n    super();\n    this.r = r;\n  }\n  area(): number {\n    return Math.PI * this.r ** 2;\n  }\n}\nclass Rect extends Shape {\n  readonly name = \"rect\";\n  readonly w: number;\n  readonly h: number;\n  constructor(w: number, h: number) {\n    super();\n    this.w = w;\n    this.h = h;\n  }\n  area(): number {\n    return this.w * this.h;\n  }\n}\nconst shapes: Shape[] = [new Circle(1), new Rect(2, 3)];\nfor (const s of shapes) console.log(s.describe());\n```\n\nPrints:\n```text\ncircle with area 3.1\nrect with area 6.0\n```\n\n`describe` is written once, in the base; each subclass supplies `name` and `area`. Forgetting either in a subclass is a compile error (TS2515).\n\n#### A private constructor behind a factory\n```ts\nclass Account {\n  #balance: number;\n  readonly owner: string;\n  private constructor(owner: string, opening: number) {\n    this.owner = owner;\n    this.#balance = opening;\n  }\n  static open(owner: string, opening: number): Account | string {\n    if (owner.trim() === \"\") return \"owner required\";\n    if (!Number.isInteger(opening) || opening < 0) return \"opening balance must be a whole number >= 0\";\n    return new Account(owner.trim(), opening);\n  }\n  withdraw(amount: number): string {\n    if (amount > this.#balance) return `refused: ${this.owner} has ${this.#balance}`;\n    this.#balance -= amount;\n    return `ok: ${this.owner} has ${this.#balance}`;\n  }\n}\nfor (const [owner, opening] of [[\"ana\", 100], [\"\", 5], [\"bo\", -3]] as const) {\n  const acc = Account.open(owner, opening);\n  console.log(typeof acc === \"string\" ? acc : acc.withdraw(30));\n}\n```\n\nPrints:\n```text\nok: ana has 70\nowner required\nopening balance must be a whole number >= 0\n```\n\nThe only way to get an `Account` is `open`, which validates. `#balance` is private at runtime too, so no caller can write to it — the invariant lives in one place.\n\n#### Composition: behaviour passed in\n```ts\ninterface Clock {\n  now(): number;\n}\ninterface Log {\n  write(line: string): void;\n}\nclass RateLimiter {\n  readonly #clock: Clock;\n  readonly #log: Log;\n  readonly #hits: number[] = [];\n  readonly #limit: number;\n  constructor(clock: Clock, log: Log, limit: number) {\n    this.#clock = clock;\n    this.#log = log;\n    this.#limit = limit;\n  }\n  allow(user: string): boolean {\n    const t = this.#clock.now();\n    while (this.#hits.length > 0 && (this.#hits[0] ?? 0) <= t - 1000) this.#hits.shift();\n    const ok = this.#hits.length < this.#limit;\n    if (ok) this.#hits.push(t);\n    this.#log.write(`${t}ms ${user} ${ok ? \"allowed\" : \"limited\"}`);\n    return ok;\n  }\n}\nlet fake = 0;\nconst lines: string[] = [];\nconst limiter = new RateLimiter({ now: () => fake }, { write: (l) => lines.push(l) }, 2);\nfor (const t of [0, 100, 200, 1150, 1200]) {\n  fake = t;\n  limiter.allow(\"ana\");\n}\nconsole.log(lines.join(\"\\n\"));\n```\n\nPrints:\n```text\n0ms ana allowed\n100ms ana allowed\n200ms ana limited\n1150ms ana allowed\n1200ms ana allowed\n```\n\nThe limiter doesn't *extend* a clock or a logger — it receives them. A fake clock makes the output deterministic; in production you'd pass `{ now: () => Date.now() }`.\n\n### What the compiler says\n```ts\nabstract class Shape {\n  abstract area(): number;\n}\nconst s = new Shape();\n```\n```text\nline 4: error TS2511: Cannot create an instance of an abstract class.\n```\n\nAn abstract class is a template, not a thing: only its concrete subclasses can be constructed.\n\n```ts\nabstract class Shape {\n  abstract area(): number;\n  abstract readonly name: string;\n}\nclass Square extends Shape {\n  readonly name = \"square\";\n}\n```\n```text\nline 5: error TS2515: Non-abstract class 'Square' does not implement inherited abstract member area from class 'Shape'.\n```\n\nEvery abstract member must be implemented; `Square` forgot `area`. This is how an abstract base enforces its contract.\n\n```ts\nclass Base {\n  greet(): string {\n    return \"hi\";\n  }\n}\nclass Loud extends Base {\n  override greeting(): string {\n    return \"HI\";\n  }\n}\n```\n```text\nline 7: error TS4113: This member cannot have an 'override' modifier because it is not declared in the base class 'Base'.\n```\n\n`override` claims a base member is being replaced, and `Base` has no `greeting` — a typo that would otherwise silently add a new method.\n\n```ts\nclass Account {\n  private constructor(readonly owner: string) {}\n  static open(owner: string) {\n    return new Account(owner);\n  }\n}\nconst a = new Account(\"ana\");\n```\n```text\nline 7: error TS2673: Constructor of class 'Account' is private and only accessible within the class declaration.\n```\n\nThe constructor is private, so `open` is the only door. (Parameter properties like `readonly owner` are fine for the type checker; this app's runner can't strip them, which is why the runnable examples write fields out.)\n\n### Pitfalls\n#### A base constructor calling an overridable method\n```ts\nclass Widget {\n  constructor() {\n    console.log(\"rendering \" + this.render());\n  }\n  render(): string {\n    return \"widget\";\n  }\n}\nclass Label extends Widget {\n  text = \"hello\";\n  override render(): string {\n    return \"label: \" + this.text;\n  }\n}\nnew Label();\n```\nPrints:\n```text\nrendering label: undefined\n```\n\nThe base constructor runs *before* the subclass's field initialisers, so `this.text` is still `undefined` when the overridden `render` runs. Don't call overridable methods from a constructor; do the work in a separate step.\n\n```ts\nclass Widget {\n  render(): string {\n    return \"widget\";\n  }\n  mount(): void {\n    console.log(\"rendering \" + this.render());\n  }\n}\nclass Label extends Widget {\n  text = \"hello\";\n  override render(): string {\n    return \"label: \" + this.text;\n  }\n}\nnew Label().mount();\n```\nPrints:\n```text\nrendering label: hello\n```\n\n#### A constructor that allows invalid objects\n```ts\nclass Temperature {\n  readonly celsius: number;\n  constructor(celsius: number) {\n    this.celsius = celsius;\n  }\n}\nconst readings = [21, -300, 15].map((c) => new Temperature(c));\nconsole.log(readings.map((t) => t.celsius).join(\" \"));\n```\nPrints:\n```text\n21 -300 15\n```\n\nA public constructor can't refuse. A private one behind a factory that returns `undefined` (or a `Result`) makes \"below absolute zero\" unconstructable.\n\n```ts\nclass Temperature {\n  readonly celsius: number;\n  private constructor(celsius: number) {\n    this.celsius = celsius;\n  }\n  static of(celsius: number): Temperature | undefined {\n    return celsius >= -273.15 ? new Temperature(celsius) : undefined;\n  }\n}\nconst readings = [21, -300, 15].map((c) => Temperature.of(c)).filter((t) => t !== undefined);\nconsole.log(readings.map((t) => t.celsius).join(\" \"));\n```\nPrints:\n```text\n21 15\n```\n\n#### Static state shared by every instance\n```ts\nclass Cart {\n  static items: string[] = [];\n  add(item: string): number {\n    Cart.items.push(item);\n    return Cart.items.length;\n  }\n}\nconst a = new Cart();\nconst b = new Cart();\na.add(\"pen\");\nconsole.log(\"items in b: \" + b.add(\"cup\"));\n```\nPrints:\n```text\nitems in b: 2\n```\n\n`static` belongs to the class, so every cart shared one list. Per-object state is an instance field.\n\n```ts\nclass Cart {\n  readonly items: string[] = [];\n  add(item: string): number {\n    this.items.push(item);\n    return this.items.length;\n  }\n}\nconst a = new Cart();\nconst b = new Cart();\na.add(\"pen\");\nconsole.log(\"items in b: \" + b.add(\"cup\"));\n```\nPrints:\n```text\nitems in b: 1\n```\n\n### Where it shows up later\n- **Week 23 — Decorators.** Standard decorators wrap methods, fields and classes.\n- **Week 24 — Generic data structures.** `Stack<T>`, `Heap<T>` and iterable classes.\n- **Week 25 — Errors.** `Error` subclasses, and a `Result` returned by static factories.\n\n### In an interview\n\n**Abstract class or interface?**\n\nAn interface describes a capability with no implementation and can be implemented by unrelated classes — or by plain objects. An abstract class shares implementation: a template method that calls abstract steps. If there's no shared code, I use an interface.\n\n**How do you enforce an invariant in a class?**\n\nMake the state `#private`, validate in every method that changes it, and don't let construction bypass the rules: a private constructor behind a static factory that returns `undefined` or a `Result` for bad input.\n\n**Why prefer composition over inheritance?**\n\nInheritance couples subclasses to the base class's internals and call order — the fragile base class problem — and a class can only extend one base. Composition passes small collaborators in, which is easier to test (fake clocks, fake loggers) and to change.",
+    "exercises": [
+      {
+        "id": "ts_class_design-factory",
+        "title": "A factory that refuses",
+        "prompt": "`Percent` has a private constructor. Replace `____` with the condition under which `Percent.of` creates one: a number from 0 to 100 inclusive.",
+        "hint": "Both bounds are allowed.",
+        "language": "typescript",
+        "kind": "drill",
+        "difficulty": "",
+        "starter": "import * as fs from \"fs\";\nclass Percent {\n  readonly value: number;\n  private constructor(value: number) {\n    this.value = value;\n  }\n  static of(value: number): Percent | undefined {\n    return ____ ? new Percent(value) : undefined;\n  }\n  of(amount: number): number {\n    return (amount * this.value) / 100;\n  }\n}\nfor (const line of fs.readFileSync(0, \"utf8\").trim().split(\"\\n\")) {\n  const [p = \"\", amount = \"0\"] = line.trim().split(/\\s+/);\n  const pct = Percent.of(Number(p));\n  console.log(pct === undefined ? `bad percent ${p}` : `${p}% of ${amount} = ${pct.of(Number(amount))}`);\n}\n",
+        "solution": "import * as fs from \"fs\";\nclass Percent {\n  readonly value: number;\n  private constructor(value: number) {\n    this.value = value;\n  }\n  static of(value: number): Percent | undefined {\n    return value >= 0 && value <= 100 ? new Percent(value) : undefined;\n  }\n  of(amount: number): number {\n    return (amount * this.value) / 100;\n  }\n}\nfor (const line of fs.readFileSync(0, \"utf8\").trim().split(\"\\n\")) {\n  const [p = \"\", amount = \"0\"] = line.trim().split(/\\s+/);\n  const pct = Percent.of(Number(p));\n  console.log(pct === undefined ? `bad percent ${p}` : `${p}% of ${amount} = ${pct.of(Number(amount))}`);\n}\n",
+        "tests": [
+          {
+            "input": "50 80\n150 10\n0 99",
+            "output": "50% of 80 = 40\nbad percent 150\n0% of 99 = 0"
+          },
+          {
+            "input": "100 7\n-1 5",
+            "output": "100% of 7 = 7\nbad percent -1"
+          }
+        ],
+        "source_slug": ""
+      },
+      {
+        "id": "ts_class_design-abstract",
+        "title": "Implement the abstract step",
+        "prompt": "`Report` fixes the format; each subclass supplies `rows()`. Replace `____` with `Totals`' implementation: one `<name>: <total>` row per person, in input order.",
+        "hint": "Map each `[name, numbers]` pair to one row string.",
+        "language": "typescript",
+        "kind": "drill",
+        "difficulty": "",
+        "starter": "import * as fs from \"fs\";\nabstract class Report {\n  abstract readonly title: string;\n  abstract rows(): string[];\n  render(): string {\n    return [`== ${this.title} ==`, ...this.rows(), `(${this.rows().length} rows)`].join(\"\\n\");\n  }\n}\nclass Totals extends Report {\n  readonly title = \"Totals\";\n  readonly data: [string, number[]][];\n  constructor(data: [string, number[]][]) {\n    super();\n    this.data = data;\n  }\n  rows(): string[] {\n    ____\n  }\n}\nconst data: [string, number[]][] = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\").map((line) => {\n  const [name = \"\", ...xs] = line.trim().split(/\\s+/);\n  return [name, xs.map(Number)];\n});\nconsole.log(new Totals(data).render());\n",
+        "solution": "import * as fs from \"fs\";\nabstract class Report {\n  abstract readonly title: string;\n  abstract rows(): string[];\n  render(): string {\n    return [`== ${this.title} ==`, ...this.rows(), `(${this.rows().length} rows)`].join(\"\\n\");\n  }\n}\nclass Totals extends Report {\n  readonly title = \"Totals\";\n  readonly data: [string, number[]][];\n  constructor(data: [string, number[]][]) {\n    super();\n    this.data = data;\n  }\n  rows(): string[] {\n    return this.data.map(([name, xs]) => `${name}: ${xs.reduce((a, b) => a + b, 0)}`);\n  }\n}\nconst data: [string, number[]][] = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\").map((line) => {\n  const [name = \"\", ...xs] = line.trim().split(/\\s+/);\n  return [name, xs.map(Number)];\n});\nconsole.log(new Totals(data).render());\n",
+        "tests": [
+          {
+            "input": "ana 1 2 3\nbo 10",
+            "output": "== Totals ==\nana: 6\nbo: 10\n(2 rows)"
+          },
+          {
+            "input": "cy 0",
+            "output": "== Totals ==\ncy: 0\n(1 rows)"
+          }
+        ],
+        "source_slug": ""
+      },
+      {
+        "id": "ts_class_design-inventory",
+        "title": "An inventory that protects its invariant",
+        "prompt": "Write a class `Inventory` whose stock can never go negative: a private `Map` of counts, `add(item, n)`, `remove(item, n)` returning `true`/`false` (refused if there isn't enough), and `count(item)`. Each input line is `add <item> <n>`, `remove <item> <n>` or `count <item>`. Print `ok`/`refused` for changes and the number for counts, then every item with a positive count, sorted, as `<item>=<n>`.",
+        "hint": "Keep the map `#private` so nothing outside the class can make a count negative.",
+        "language": "typescript",
+        "kind": "challenge",
+        "difficulty": "Medium",
+        "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+        "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nclass Inventory {\n  readonly #stock = new Map<string, number>();\n  add(item: string, n: number): void {\n    this.#stock.set(item, this.count(item) + n);\n  }\n  remove(item: string, n: number): boolean {\n    const have = this.count(item);\n    if (n > have) return false;\n    this.#stock.set(item, have - n);\n    return true;\n  }\n  count(item: string): number {\n    return this.#stock.get(item) ?? 0;\n  }\n  entries(): [string, number][] {\n    return [...this.#stock].filter(([, n]) => n > 0).sort(([a], [b]) => a.localeCompare(b));\n  }\n}\nconst inv = new Inventory();\nfor (const line of input.split(\"\\n\")) {\n  const [cmd = \"\", item = \"\", n = \"0\"] = line.trim().split(/\\s+/);\n  if (cmd === \"add\") {\n    inv.add(item, Number(n));\n    console.log(\"ok\");\n  } else if (cmd === \"remove\") {\n    console.log(inv.remove(item, Number(n)) ? \"ok\" : \"refused\");\n  } else if (cmd === \"count\") {\n    console.log(inv.count(item));\n  }\n}\nconsole.log(inv.entries().map(([k, v]) => `${k}=${v}`).join(\" \") || \"(empty)\");\n",
+        "tests": [
+          {
+            "input": "add pen 5\nremove pen 3\nremove pen 3\ncount pen\nadd cup 1\nremove cup 1",
+            "output": "ok\nok\nrefused\n2\nok\nok\npen=2"
+          },
+          {
+            "input": "remove ink 1\ncount ink",
+            "output": "refused\n0\n(empty)"
+          }
+        ],
+        "source_slug": ""
+      }
+    ],
+    "cards": [],
+    "quiz": [
+      {
+        "question": "What does `abstract area(): number` in a base class require?",
+        "options": [
+          "Every concrete subclass must implement `area`",
+          "Callers must pass an `area`",
+          "`area` returns 0 by default",
+          "The class must be exported"
+        ],
+        "answer": 0,
+        "explanation": "Missing it is TS2515; the base class itself can't be instantiated (TS2511)."
+      },
+      {
+        "question": "What does the `override` keyword catch?",
+        "options": [
+          "A method meant to replace a base member when no such member exists (e.g. a typo)",
+          "Calls to `super`",
+          "Missing constructors",
+          "Private members"
+        ],
+        "answer": 0,
+        "explanation": "TS4113. `--noImplicitOverride` makes the keyword required."
+      },
+      {
+        "question": "How do you stop callers from constructing invalid instances?",
+        "options": [
+          "A `private constructor` plus a `static` factory that validates",
+          "Throw in every method",
+          "Use `readonly` fields",
+          "Make the class `abstract`"
+        ],
+        "answer": 0,
+        "explanation": "The factory is the only door, and it can refuse."
+      },
+      {
+        "question": "Why is calling an overridable method from a constructor risky?",
+        "options": [
+          "Subclass fields aren't initialised yet when the base constructor runs",
+          "It is a syntax error",
+          "Methods can't be called before `super()`",
+          "It always throws"
+        ],
+        "answer": 0,
+        "explanation": "The override sees `undefined` fields."
+      },
+      {
+        "question": "`private` vs `#private`?",
+        "options": [
+          "`private` is checked only by the compiler; `#private` is enforced at runtime",
+          "They are identical",
+          "`#private` is compile-time only",
+          "`private` fields are faster"
+        ],
+        "answer": 0,
+        "explanation": "`#` fields are part of JavaScript."
+      },
+      {
+        "question": "When is composition better than inheritance?",
+        "options": [
+          "When you want to reuse behaviour without coupling to a base class's internals",
+          "Never",
+          "Only for interfaces",
+          "Only for static methods"
+        ],
+        "answer": 0,
+        "explanation": "Pass collaborators in; keep `extends` for stable is-a relationships."
+      }
+    ],
+    "practice": []
+  },
+  {
+    "key": "ts_decorators",
+    "name": "Decorators",
+    "category": "TS: Runtime & Architecture",
+    "what": "TC39 standard decorators: functions that wrap a class, method, accessor or field at definition time — how they're typed, what they desugar to, and why this app's runner can't execute the `@` syntax yet.",
+    "deep": "A decorator is a function applied with `@name` above a class or member. It receives the original value and a `context` object (kind, name, `addInitializer`) and may return a replacement. TypeScript 5.0+ implements the standard (TC39 stage 3) decorators by default; the older `--experimentalDecorators` form has a different signature. Decorators are not erasable — they call functions at class definition — so type stripping can't run them; this chapter runs their desugared form and lets the compiler check the real syntax.",
+    "java": "Java annotations are metadata read by a framework; a TypeScript decorator is *code* that runs when the class is defined and can replace what it decorates. The closest Java analogue is an annotation processor combined with a proxy — TypeScript's is one function.",
+    "language": "typescript",
+    "lesson": "### Why it exists\nFrameworks love decorators: `@Component`, `@Injectable`, `@Get(\"/users\")`,\n`@observable`. They let a library add behaviour — logging, caching, validation,\nregistration — by writing one line above a member instead of editing its body.\n\nFor years TypeScript shipped an experimental version that differed from where\nthe JavaScript standard ended up. TypeScript 5.0 implemented the standard, which\nchanges the signatures you'll see in modern code. And because decorators *run*\n— they aren't just types — they are one of the features type stripping can't\nhandle (week 14). Knowing what a decorator desugars to is how you understand\nall of this without magic.\n\n### The core idea\n**A method decorator is a function from a method to a method:**\n\n```ts\nfunction logged<This, Args extends unknown[], R>(\n  target: (this: This, ...args: Args) => R,\n  context: ClassMethodDecoratorContext<This, (this: This, ...args: Args) => R>,\n) {\n  return function (this: This, ...args: Args): R {\n    console.log(`→ ${String(context.name)}(${args.join(\", \")})`);\n    return target.call(this, ...args);\n  };\n}\n\nclass Calc {\n  @logged\n  add(a: number, b: number) { return a + b; }\n}\n```\n\n**What it desugars to.** Roughly: after the class body is evaluated,\n`Calc.prototype.add = logged(Calc.prototype.add, { kind: \"method\", name: \"add\", … })`.\nThat's the whole idea — a function applied to the original, whose result\nreplaces it. Decorators on one member apply bottom-up (the one nearest the\nmember first).\n\n**Kinds and contexts.** Each kind gets a matching context type:\n`ClassDecoratorContext`, `ClassMethodDecoratorContext`,\n`ClassGetterDecoratorContext`, `ClassFieldDecoratorContext`,\n`ClassAccessorDecoratorContext` (for the new `accessor` keyword). A field\ndecorator returns an *initializer* transformer rather than a replacement.\n`context.addInitializer(fn)` runs code when an instance (or the class) is set up\n— useful for binding methods or registering the class.\n\n**Decorator factories** take configuration and return a decorator:\n`@retry(3)` is `retry(3)` evaluated first, then applied.\n\n**Standard vs experimental.** With `--experimentalDecorators` a method decorator\nwas `(target, propertyKey, descriptor) => …` and parameter decorators existed.\nStandard decorators have the `(value, context)` signature and no parameter\ndecorators. Mixing the two is a common source of confusing errors.\n\n**Why they can't run here.** Decorators execute code at class definition, so a\nstripper can't delete them, and Node doesn't implement the syntax natively yet.\nEvery runnable example below applies the decorator function by hand — which is\nexactly what the `@` line means.\n\n### Worked examples\n#### A logging decorator, applied by hand\n```ts\nfunction logged<This, Args extends unknown[], R>(target: (this: This, ...args: Args) => R, name: string) {\n  return function (this: This, ...args: Args): R {\n    const result = target.call(this, ...args);\n    console.log(`${name}(${args.join(\", \")}) = ${String(result)}`);\n    return result;\n  };\n}\n\nclass Calc {\n  add(a: number, b: number): number {\n    return a + b;\n  }\n  scale(x: number, k: number): number {\n    return x * k;\n  }\n}\n// What `@logged` above each method would do:\nCalc.prototype.add = logged(Calc.prototype.add, \"add\");\nCalc.prototype.scale = logged(Calc.prototype.scale, \"scale\");\n\nconst c = new Calc();\nc.scale(c.add(2, 3), 4);\n```\n\nPrints:\n```text\nadd(2, 3) = 5\nscale(5, 4) = 20\n```\n\nA decorator is just this: a function that takes the original method and returns a wrapper. The `@logged` syntax only changes *where* you write the call — above the member instead of after the class.\n\n#### A decorator factory with configuration\n```ts\nfunction retry(times: number) {\n  return function <Args extends unknown[], R>(target: (...args: Args) => R, name: string) {\n    return (...args: Args): R => {\n      for (let attempt = 1; ; attempt++) {\n        try {\n          return target(...args);\n        } catch (e) {\n          console.log(`${name} attempt ${attempt} failed: ${e instanceof Error ? e.message : String(e)}`);\n          if (attempt >= times) throw e;\n        }\n      }\n    };\n  };\n}\n\nlet calls = 0;\nfunction flaky(x: number): number {\n  calls++;\n  if (calls < 3) throw new Error(\"busy\");\n  return x * 2;\n}\n// @retry(3) applied to `flaky`:\nconst safe = retry(3)(flaky, \"flaky\");\nconsole.log(\"result \" + safe(21));\n```\n\nPrints:\n```text\nflaky attempt 1 failed: busy\nflaky attempt 2 failed: busy\nresult 42\n```\n\n`@retry(3)` evaluates `retry(3)` first — a decorator factory — and applies the decorator it returns. Configuration goes in the outer call.\n\n#### Order: nearest to the member first\n```ts\ntype Fn = (s: string) => string;\nconst trim = (f: Fn): Fn => (s) => f(s.trim());\nconst upper = (f: Fn): Fn => (s) => f(s.toUpperCase());\nconst exclaim = (f: Fn): Fn => (s) => f(s + \"!\");\n\nconst base: Fn = (s) => `[${s}]`;\n// @trim\n// @upper\n// @exclaim\n// greet(s) { ... }   — applied bottom-up: exclaim first, then upper, then trim\nconst decorated = trim(upper(exclaim(base)));\nconsole.log(decorated(\"  hello \"));\n```\n\nPrints:\n```text\n[HELLO!]\n```\n\nStacked decorators are applied from the bottom up, so the *top* decorator's wrapper runs first when the method is called: `trim`, then `upper`, then `exclaim`, then the original.\n\n### What the compiler says\n```ts\nfunction logged(target: unknown, context: unknown) {\n  return target;\n}\n@logged\nfunction greet() {\n  return \"hi\";\n}\n```\n```text\nline 4: error TS1206: Decorators are not valid here.\n```\n\nDecorators apply to classes and class members only — a plain function declaration can't be decorated. Wrap it by hand instead: `const greet = logged(…)`.\n\n```ts\nfunction legacy(target: object, key: string, descriptor: PropertyDescriptor) {\n  return descriptor;\n}\nclass Calc {\n  @legacy\n  add(a: number, b: number) {\n    return a + b;\n  }\n}\n```\n```text\nline 5: error TS1241: Unable to resolve signature of method decorator when called as an expression.\n  The runtime will invoke the decorator with 2 arguments, but the decorator expects 3.\n```\n\nThis is an `--experimentalDecorators` signature (`target, key, descriptor`). Standard decorators receive `(value, context)`, so the compiler can't resolve this call.\n\n### Pitfalls\n#### A wrapper that loses `this`\n```ts\nfunction logged<Args extends unknown[], R>(target: (...args: Args) => R) {\n  return (...args: Args): R => {\n    console.log(\"call\");\n    return target(...args);\n  };\n}\nclass Counter {\n  count = 0;\n  inc(): number {\n    return ++this.count;\n  }\n}\nCounter.prototype.inc = logged(Counter.prototype.inc);\ntry {\n  console.log(new Counter().inc());\n} catch (e) {\n  console.log(\"crashed: \" + (e instanceof Error ? e.message : String(e)));\n}\n```\nPrints:\n```text\ncall\ncrashed: Cannot read properties of undefined (reading 'count')\n```\n\nThe wrapper called the original method as a plain function, so `this` was `undefined`. A method decorator must forward `this` — a `function` wrapper (not an arrow) and `target.call(this, …)`.\n\n```ts\nfunction logged<This, Args extends unknown[], R>(target: (this: This, ...args: Args) => R) {\n  return function (this: This, ...args: Args): R {\n    console.log(\"call\");\n    return target.call(this, ...args);\n  };\n}\nclass Counter {\n  count = 0;\n  inc(): number {\n    return ++this.count;\n  }\n}\nCounter.prototype.inc = logged(Counter.prototype.inc);\nconsole.log(new Counter().inc());\n```\nPrints:\n```text\ncall\n1\n```\n\n#### Decorating a plain function\n```ts\nfunction logged(target: unknown, context: unknown) {\n  return target;\n}\n@logged\nfunction greet(): string {\n  return \"hi\";\n}\nconsole.log(greet());\n```\nThe compiler says:\n```text\nline 4: error TS1206: Decorators are not valid here.\n```\n\nOnly classes and class members take `@` decorators. For a function, apply the wrapper directly — it's the same idea without the syntax.\n\n```ts\nfunction logged<R>(target: () => R, name: string): () => R {\n  return () => {\n    console.log(\"calling \" + name);\n    return target();\n  };\n}\nconst greet = logged(() => \"hi\", \"greet\");\nconsole.log(greet());\n```\nPrints:\n```text\ncalling greet\nhi\n```\n\n#### A legacy decorator signature\n```ts\nfunction legacy(target: object, key: string, descriptor: PropertyDescriptor) {\n  return descriptor;\n}\nclass Calc {\n  @legacy\n  add(a: number, b: number) {\n    return a + b;\n  }\n}\nconsole.log(new Calc().add(1, 2));\n```\nThe compiler says:\n```text\nline 5: error TS1241: Unable to resolve signature of method decorator when called as an expression.\n  The runtime will invoke the decorator with 2 arguments, but the decorator expects 3.\n```\n\nCode copied from an older codebase often uses the experimental `(target, key, descriptor)` form. With standard decorators (TypeScript 5.0's default) the signature is `(value, context)`.\n\n```ts\nclass Calc {\n  add(a: number, b: number) {\n    return a + b;\n  }\n}\nfunction standard<This, Args extends unknown[], R>(target: (this: This, ...args: Args) => R, name: string) {\n  return function (this: This, ...args: Args): R {\n    console.log(\"standard decorator on \" + name);\n    return target.call(this, ...args);\n  };\n}\nCalc.prototype.add = standard(Calc.prototype.add, \"add\");\nconsole.log(new Calc().add(1, 2));\n```\nPrints:\n```text\nstandard decorator on add\n3\n```\n\n### Where it shows up later\n- **Week 23 — Class design.** What decorators usually decorate: methods, accessors and classes.\n- **Week 14 — Erasable syntax.** Why the runner can't execute decorators, alongside `enum` and parameter properties.\n\n### In an interview\n\n**What is a decorator in TypeScript?**\n\nA function applied with `@` to a class or class member at definition time. It receives the original and a context object and can return a replacement — wrapping a method with logging or caching, transforming a field's initial value, or registering a class. TypeScript 5.0 implements the standard TC39 decorators; the older `experimentalDecorators` form has a different signature.\n\n**How would you write a method decorator?**\n\nA generic function `(target: (this: This, ...args: Args) => R, context: ClassMethodDecoratorContext<This, …>)` that returns a `function (this: This, ...args: Args): R` wrapper, calling `target.call(this, ...args)`. The generics keep the method's exact signature, and the `function` wrapper preserves `this`.\n\n**Standard vs experimental decorators?**\n\nExperimental decorators receive `(target, key, descriptor)`, support parameter decorators and emit metadata with a flag — Angular and NestJS were built on them. Standard decorators receive `(value, context)`, have no parameter decorators, and follow the JavaScript proposal. New code should use the standard form unless a framework requires the legacy one.",
+    "exercises": [
+      {
+        "id": "ts_decorators-timed",
+        "title": "A counting decorator",
+        "prompt": "`counted` wraps a method and counts its calls, the way a `@counted` decorator would. Replace `____` so the wrapper forwards `this` and the arguments to the original method.",
+        "hint": "Call the original with `.call`, passing `this` first.",
+        "language": "typescript",
+        "kind": "drill",
+        "difficulty": "",
+        "starter": "import * as fs from \"fs\";\nconst counts = new Map<string, number>();\nfunction counted<This, Args extends unknown[], R>(target: (this: This, ...args: Args) => R, name: string) {\n  return function (this: This, ...args: Args): R {\n    counts.set(name, (counts.get(name) ?? 0) + 1);\n    ____\n  };\n}\nclass Greeter {\n  prefix = \"hello\";\n  greet(name: string): string {\n    return `${this.prefix} ${name}`;\n  }\n}\nGreeter.prototype.greet = counted(Greeter.prototype.greet, \"greet\");\nconst g = new Greeter();\nfor (const name of fs.readFileSync(0, \"utf8\").trim().split(/\\s+/)) console.log(g.greet(name));\nconsole.log(`greet called ${counts.get(\"greet\") ?? 0} times`);\n",
+        "solution": "import * as fs from \"fs\";\nconst counts = new Map<string, number>();\nfunction counted<This, Args extends unknown[], R>(target: (this: This, ...args: Args) => R, name: string) {\n  return function (this: This, ...args: Args): R {\n    counts.set(name, (counts.get(name) ?? 0) + 1);\n    return target.call(this, ...args);\n  };\n}\nclass Greeter {\n  prefix = \"hello\";\n  greet(name: string): string {\n    return `${this.prefix} ${name}`;\n  }\n}\nGreeter.prototype.greet = counted(Greeter.prototype.greet, \"greet\");\nconst g = new Greeter();\nfor (const name of fs.readFileSync(0, \"utf8\").trim().split(/\\s+/)) console.log(g.greet(name));\nconsole.log(`greet called ${counts.get(\"greet\") ?? 0} times`);\n",
+        "tests": [
+          {
+            "input": "ana bo",
+            "output": "hello ana\nhello bo\ngreet called 2 times"
+          },
+          {
+            "input": "cy",
+            "output": "hello cy\ngreet called 1 times"
+          },
+          {
+            "input": "a b c d",
+            "output": "hello a\nhello b\nhello c\nhello d\ngreet called 4 times"
+          }
+        ],
+        "source_slug": ""
+      },
+      {
+        "id": "ts_decorators-memo",
+        "title": "A memoising wrapper",
+        "prompt": "Replace `____` so `memo` returns the cached result when it has seen the argument before, and otherwise computes, stores and returns it.",
+        "hint": "Look up first; return early on a hit.",
+        "language": "typescript",
+        "kind": "drill",
+        "difficulty": "",
+        "starter": "import * as fs from \"fs\";\nlet computed = 0;\nfunction memo<R>(target: (n: number) => R) {\n  const cache = new Map<number, R>();\n  return (n: number): R => {\n    ____\n    const value = target(n);\n    cache.set(n, value);\n    return value;\n  };\n}\nconst square = memo((n: number) => {\n  computed++;\n  return n * n;\n});\nconst inputs = fs.readFileSync(0, \"utf8\").trim().split(/\\s+/).map(Number);\nconsole.log(inputs.map(square).join(\" \"));\nconsole.log(`computed ${computed} of ${inputs.length}`);\n",
+        "solution": "import * as fs from \"fs\";\nlet computed = 0;\nfunction memo<R>(target: (n: number) => R) {\n  const cache = new Map<number, R>();\n  return (n: number): R => {\n    const hit = cache.get(n);\n    if (hit !== undefined) return hit;\n    const value = target(n);\n    cache.set(n, value);\n    return value;\n  };\n}\nconst square = memo((n: number) => {\n  computed++;\n  return n * n;\n});\nconst inputs = fs.readFileSync(0, \"utf8\").trim().split(/\\s+/).map(Number);\nconsole.log(inputs.map(square).join(\" \"));\nconsole.log(`computed ${computed} of ${inputs.length}`);\n",
+        "tests": [
+          {
+            "input": "2 3 2 2 4",
+            "output": "4 9 4 4 16\ncomputed 3 of 5"
+          },
+          {
+            "input": "7",
+            "output": "49\ncomputed 1 of 1"
+          },
+          {
+            "input": "1 1 1",
+            "output": "1 1 1\ncomputed 1 of 3"
+          }
+        ],
+        "source_slug": ""
+      },
+      {
+        "id": "ts_decorators-validate",
+        "title": "A validating wrapper",
+        "prompt": "Write `validated(check, target, name)` — what a `@validated(check)` decorator would do — returning a function that throws `Error(\"<name>: bad input <x>\")` when `check(x)` is false and otherwise calls `target(x)`. Wrap `sqrt` with a non-negative check and `reciprocal` with a non-zero check. Each input line is `<fn> <x>`; print the result to 3 decimals, or the error message, or `unknown fn <f>`.",
+        "hint": "The wrapper checks, then either throws or delegates.",
+        "language": "typescript",
+        "kind": "challenge",
+        "difficulty": "Medium",
+        "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+        "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nfunction validated(check: (x: number) => boolean, target: (x: number) => number, name: string): (x: number) => number {\n  return (x) => {\n    if (!check(x)) throw new Error(`${name}: bad input ${x}`);\n    return target(x);\n  };\n}\nconst fns: Record<string, (x: number) => number> = {\n  sqrt: validated((x) => x >= 0, Math.sqrt, \"sqrt\"),\n  reciprocal: validated((x) => x !== 0, (x) => 1 / x, \"reciprocal\"),\n};\nfor (const line of input.split(\"\\n\")) {\n  const [name = \"\", x = \"0\"] = line.trim().split(/\\s+/);\n  const fn = Object.hasOwn(fns, name) ? fns[name] : undefined;\n  if (fn === undefined) {\n    console.log(`unknown fn ${name}`);\n    continue;\n  }\n  try {\n    console.log(fn(Number(x)).toFixed(3));\n  } catch (e) {\n    console.log(e instanceof Error ? e.message : String(e));\n  }\n}\n",
+        "tests": [
+          {
+            "input": "sqrt 2\nsqrt -4\nreciprocal 4\nreciprocal 0\ncube 3",
+            "output": "1.414\nsqrt: bad input -4\n0.250\nreciprocal: bad input 0\nunknown fn cube"
+          },
+          {
+            "input": "sqrt 0",
+            "output": "0.000"
+          }
+        ],
+        "source_slug": ""
+      }
+    ],
+    "cards": [],
+    "quiz": [
+      {
+        "question": "What does a standard method decorator receive?",
+        "options": [
+          "The original method and a context object",
+          "`target, key, descriptor`",
+          "Only the class",
+          "Only the method name"
+        ],
+        "answer": 0,
+        "explanation": "`(value, context)` — `context` has `kind`, `name`, `static`, `private` and `addInitializer`."
+      },
+      {
+        "question": "`@a @b method() {}` — which decorator is applied first?",
+        "options": [
+          "`@b` (the one nearest the member)",
+          "`@a`",
+          "Both at once",
+          "It is undefined"
+        ],
+        "answer": 0,
+        "explanation": "Decorators are applied bottom-up; the top one's wrapper runs outermost."
+      },
+      {
+        "question": "What is `@retry(3)`?",
+        "options": [
+          "A decorator factory: `retry(3)` returns the decorator that is applied",
+          "Three decorators",
+          "A type annotation",
+          "A comment"
+        ],
+        "answer": 0,
+        "explanation": "The outer call takes configuration."
+      },
+      {
+        "question": "Why can't type stripping run decorators?",
+        "options": [
+          "They execute code at class definition, so deleting them would delete behaviour",
+          "They're only types",
+          "Node forbids classes",
+          "They require `enum`"
+        ],
+        "answer": 0,
+        "explanation": "Like `enum` and parameter properties, they aren't erasable."
+      },
+      {
+        "question": "Which is the experimental (legacy) method decorator signature?",
+        "options": [
+          "`(target, propertyKey, descriptor)`",
+          "`(value, context)`",
+          "`(context)`",
+          "`(this, ...args)`"
+        ],
+        "answer": 0,
+        "explanation": "Enabled by `--experimentalDecorators`; different from the standard."
+      },
+      {
+        "question": "How must a method-decorator wrapper call the original?",
+        "options": [
+          "With the same `this` — e.g. `target.call(this, ...args)` in a `function` wrapper",
+          "As a plain function",
+          "With `new`",
+          "Through `super`"
+        ],
+        "answer": 0,
+        "explanation": "An arrow wrapper can't receive the instance as `this`."
+      }
+    ],
+    "practice": []
+  },
+  {
+    "key": "ts_iterator_helpers",
+    "name": "Iterator Helpers",
+    "category": "TS: Runtime & Architecture",
+    "what": "ES2025's lazy iterator methods — `map`, `filter`, `take`, `drop`, `flatMap`, `reduce`, `toArray` and friends on every iterator — plus `Iterator.from` and making your own classes iterable.",
+    "deep": "Arrays have had `map` and `filter` forever, but they're eager: each step builds a whole new array. ES2025 adds the same methods to *iterators* — the thing `Map.keys()`, `Set.values()`, generators and `array.values()` return — and they are lazy: nothing runs until you ask for values, and `take(n)` stops the pipeline early. That makes infinite sequences, large files and early exits cheap, with the vocabulary you already know.",
+    "java": "Java streams are the closest thing: lazy, chained, with terminal operations. The difference is that JavaScript iterator helpers are methods on the iterators you already have — no `.stream()` call — and an iterator, like a Java stream, can be consumed only once.",
+    "language": "typescript",
+    "lesson": "### Why it exists\nYou have a `Map` of 100,000 users and want the first five admins' names. The\nfamiliar way — `[...users.values()].filter(isAdmin).map(u => u.name).slice(0, 5)`\n— copies all 100,000 into an array, filters all of them, maps every admin, and\nonly then throws most of it away.\n\nIterator helpers do the same thing lazily:\n`users.values().filter(isAdmin).map(u => u.name).take(5).toArray()` looks at\nusers one at a time and stops as soon as it has five. Same vocabulary, a\nfraction of the work — and it works on infinite sources, which arrays never can.\n\n### The core idea\n**Where they live.** Every built-in iterator — from `array.values()`,\n`map.entries()`, `set.keys()`, `string[Symbol.iterator]()`, a generator — has\nthese methods (Node 22+, `lib: es2025` from TypeScript 6.0; `esnext.iterator`\nbefore that):\n\n| lazy (return an iterator) | eager (consume it) |\n|---|---|\n| `map`, `filter`, `take(n)`, `drop(n)`, `flatMap` | `toArray`, `reduce`, `forEach`, `some`, `every`, `find` |\n\n**Lazy means pull-based.** Each value flows through the whole chain before the\nnext is read. Nothing happens until an eager method (or `for…of`) pulls.\n\n**`Iterator.from(x)`** wraps anything iterable (or an iterator-like object) so\nthe helpers are available on it — handy for your own iterables.\n\n**Single use.** An iterator is a cursor. Once `toArray()` has consumed it, it's\nempty; call the source again for a fresh one.\n\n**Your own classes.** Implement `[Symbol.iterator]()` — often as a generator\nmethod `*[Symbol.iterator]()` — and the class works with `for…of`, spread, and\n(through `Iterator.from` or by returning a built-in iterator) the helpers:\n\n```ts\nclass Range implements Iterable<number> {\n  constructor(readonly from: number, readonly to: number) {}\n  *[Symbol.iterator]() { for (let i = this.from; i < this.to; i++) yield i; }\n}\nIterator.from(new Range(0, 1_000_000)).filter(isPrime).take(3).toArray();\n```\n\n**Types.** The helpers are typed on `IteratorObject<T>` (what built-in\niterators are); a plain `Iterable<T>` doesn't have them — convert with\n`Iterator.from`. `take` and `drop` return iterators of the same `T`; `map`\nchanges it.\n\n### Worked examples\n#### Lazy: only as much work as needed\n```ts\nconst users = new Map([\n  [1, { name: \"ana\", admin: true }],\n  [2, { name: \"bo\", admin: false }],\n  [3, { name: \"cy\", admin: true }],\n  [4, { name: \"dee\", admin: true }],\n]);\nlet checked = 0;\nconst firstTwoAdmins = users\n  .values()\n  .filter((u) => {\n    checked++;\n    return u.admin;\n  })\n  .map((u) => u.name.toUpperCase())\n  .take(2)\n  .toArray();\nconsole.log(firstTwoAdmins.join(\", \"));\nconsole.log(`checked ${checked} of ${users.size}`);\n```\n\nPrints:\n```text\nANA, CY\nchecked 3 of 4\n```\n\nThe pipeline stopped after the third user: `take(2)` had what it needed, so `dee` was never looked at. An array chain would have filtered all four.\n\n#### An infinite source, safely\n```ts\nfunction* naturals(): Generator<number> {\n  for (let n = 1; ; n++) yield n;\n}\nconst isPrime = (n: number) => {\n  if (n < 2) return false;\n  for (let d = 2; d * d <= n; d++) if (n % d === 0) return false;\n  return true;\n};\nconsole.log(naturals().filter(isPrime).take(8).toArray().join(\" \"));\nconsole.log(naturals().drop(10).map((n) => n * n).take(3).toArray().join(\" \"));\nconsole.log(naturals().take(100).reduce((a, b) => a + b, 0));\n```\n\nPrints:\n```text\n2 3 5 7 11 13 17 19\n121 144 169\n5050\n```\n\n`naturals()` never ends, but every pipeline has a `take`, so each pulls a finite number of values. `[...naturals()]` would hang.\n\n#### An iterable class, with the helpers\n```ts\nclass Countdown implements Iterable<number> {\n  readonly from: number;\n  constructor(from: number) {\n    this.from = from;\n  }\n  *[Symbol.iterator](): Generator<number> {\n    for (let i = this.from; i > 0; i--) yield i;\n  }\n}\nconst c = new Countdown(5);\nconsole.log([...c].join(\",\"));\nfor (const n of c) if (n % 2 === 0) console.log(\"even \" + n);\nconsole.log(Iterator.from(c).map((n) => n * 10).toArray().join(\",\"));\n```\n\nPrints:\n```text\n5,4,3,2,1\neven 4\neven 2\n50,40,30,20,10\n```\n\nA generator method makes the class iterable — each `for…of` or spread gets a fresh iterator. `Iterator.from` gives access to the helpers.\n\n#### An iterator is used up\n```ts\nconst words = [\"alpha\", \"beta\", \"gamma\"];\nconst upper = words.values().map((w) => w.toUpperCase());\nconsole.log(upper.toArray().join(\" \"));\nconsole.log(`again: [${upper.toArray().join(\" \")}]`);\nconst fresh = () => words.values().map((w) => w.toUpperCase());\nconsole.log(fresh().toArray().length, fresh().toArray().length);\n```\n\nPrints:\n```text\nALPHA BETA GAMMA\nagain: []\n3 3\n```\n\nThe second `toArray()` on the same iterator finds it empty. When you need to iterate twice, keep a function (or the array) that creates a new iterator each time.\n\n### What the compiler says\n```ts\nfunction firstTwo(items: Iterable<number>): number[] {\n  return items.take(2).toArray();\n}\n```\n```text\nline 2: error TS2339: Property 'take' does not exist on type 'Iterable<number>'.\n```\n\nA plain `Iterable<T>` only promises `[Symbol.iterator]()`; the helpers live on iterator objects. Wrap it: `Iterator.from(items).take(2).toArray()`.\n\n```ts\nconst point = { x: 1, y: 2 };\nfor (const v of point) console.log(v);\n```\n```text\nline 2: error TS2488: Type '{ x: number; y: number; }' must have a '[Symbol.iterator]()' method that returns an iterator.\n```\n\nAn ordinary object isn't iterable. Iterate `Object.values(point)` — or give a class a `[Symbol.iterator]` method.\n\n### Pitfalls\n#### Side effects run lazily\n```ts\nconst logged: string[] = [];\nconst names = [\"ana\", \"bo\", \"cy\", \"dee\"];\nconst firstTwo = names.map((n) => {\n  logged.push(n);\n  return n.toUpperCase();\n}).slice(0, 2);\nconsole.log(firstTwo.join(\" \"), \"| processed:\", logged.join(\",\"));\n```\nPrints:\n```text\nANA BO | processed: ana,bo,cy,dee\n```\n\nNot a bug either way — but a real difference. The array `map` processed every name before `slice` threw two away; the iterator pipeline processed exactly two. If the callback has side effects (logging, I/O, counting), lazy and eager chains behave differently.\n\n```ts\nconst logged: string[] = [];\nconst names = [\"ana\", \"bo\", \"cy\", \"dee\"];\nconst firstTwo = names.values().map((n) => {\n  logged.push(n);\n  return n.toUpperCase();\n}).take(2).toArray();\nconsole.log(firstTwo.join(\" \"), \"| processed:\", logged.join(\",\"));\n```\nPrints:\n```text\nANA BO | processed: ana,bo\n```\n\n#### Reusing a consumed iterator\n```ts\nconst scores = new Map([[\"ana\", 90], [\"bo\", 70]]);\nconst values = scores.values();\nconst max = Math.max(...values);\nconst total = values.reduce((a, b) => a + b, 0);\nconsole.log(`max ${max}, total ${total}`);\n```\nPrints:\n```text\nmax 90, total 0\n```\n\nThe spread consumed `values`, so `reduce` saw nothing and returned its initial `0`. Ask the `Map` for a fresh iterator each time.\n\n```ts\nconst scores = new Map([[\"ana\", 90], [\"bo\", 70]]);\nconst max = Math.max(...scores.values());\nconst total = scores.values().reduce((a, b) => a + b, 0);\nconsole.log(`max ${max}, total ${total}`);\n```\nPrints:\n```text\nmax 90, total 160\n```\n\n#### Helpers on a plain iterable\n```ts\nfunction evens(items: Iterable<number>): number[] {\n  return items.filter((n) => n % 2 === 0).toArray();\n}\nconsole.log(evens(new Set([1, 2, 3, 4])).join(\",\"));\n```\nThe compiler says:\n```text\nline 2: error TS2339: Property 'filter' does not exist on type 'Iterable<number>'.\n```\n\n`Iterable<number>` could be anything with `[Symbol.iterator]`; `Iterator.from` turns it into an iterator object with the helpers.\n\n```ts\nfunction evens(items: Iterable<number>): number[] {\n  return Iterator.from(items).filter((n) => n % 2 === 0).toArray();\n}\nconsole.log(evens(new Set([1, 2, 3, 4])).join(\",\"));\n```\nPrints:\n```text\n2,4\n```\n\n### Where it shows up later\n- **Week 24 — Generic data structures.** Iterable `LinkedList<T>` and tree iterators with `yield*`.\n- **Week 26 — Async iteration.** The same ideas for values that arrive over time: `for await`, async generators.\n\n### In an interview\n\n**What are iterator helpers and why do they matter?**\n\nES2025 added `map`, `filter`, `take`, `drop`, `flatMap`, `reduce`, `toArray` and similar methods to iterator objects. Unlike array methods they're lazy — values are pulled one at a time through the chain, and `take` stops early — so you can process large or infinite sequences, or `Map`/`Set` views, without building intermediate arrays.\n\n**What's the difference between an iterable and an iterator?**\n\nAn iterable has a `[Symbol.iterator]()` method that returns an iterator; an iterator has `next()` and is a single-use cursor. Arrays, maps and strings are iterables — each loop asks for a fresh iterator. Generators are both, which is why a generator object can only be consumed once.\n\n**How would you make a custom collection iterable?**\n\nAdd a generator method `*[Symbol.iterator]()` that yields the elements. That gives `for…of`, spread and destructuring for free, and `Iterator.from(collection)` gives the lazy helpers.",
+    "exercises": [
+      {
+        "id": "ts_iterator_helpers-first",
+        "title": "The first matches, lazily",
+        "prompt": "The input is a list of words. Replace `____` with a lazy pipeline over `words.values()` that keeps words longer than 3 letters, upper-cases them, and stops after 3.",
+        "hint": "`values()` gives an iterator; chain `filter`, `map`, `take`, then `toArray()`.",
+        "language": "typescript",
+        "kind": "drill",
+        "difficulty": "",
+        "starter": "import * as fs from \"fs\";\nconst words = fs.readFileSync(0, \"utf8\").trim().split(/\\s+/);\nconst picked = ____;\nconsole.log(picked.join(\" \") || \"(none)\");\nconsole.log(picked.length);\n",
+        "solution": "import * as fs from \"fs\";\nconst words = fs.readFileSync(0, \"utf8\").trim().split(/\\s+/);\nconst picked = words.values().filter((w) => w.length > 3).map((w) => w.toUpperCase()).take(3).toArray();\nconsole.log(picked.join(\" \") || \"(none)\");\nconsole.log(picked.length);\n",
+        "tests": [
+          {
+            "input": "the quick brown foxes jumped over lazy dogs",
+            "output": "QUICK BROWN FOXES\n3"
+          },
+          {
+            "input": "a bb ccc",
+            "output": "(none)\n0"
+          },
+          {
+            "input": "longer words here",
+            "output": "LONGER WORDS HERE\n3"
+          }
+        ],
+        "source_slug": ""
+      },
+      {
+        "id": "ts_iterator_helpers-range",
+        "title": "Make a class iterable",
+        "prompt": "Replace `____` with the generator method that makes `Range` iterable, yielding `from`, `from + step`, … while below `to`.",
+        "hint": "A generator method named `[Symbol.iterator]`, with a `for` loop that `yield`s.",
+        "language": "typescript",
+        "kind": "drill",
+        "difficulty": "",
+        "starter": "import * as fs from \"fs\";\nclass Range implements Iterable<number> {\n  readonly from: number;\n  readonly to: number;\n  readonly step: number;\n  constructor(from: number, to: number, step: number) {\n    this.from = from;\n    this.to = to;\n    this.step = step;\n  }\n  ____\n}\nconst [from = 0, to = 0, step = 1] = fs.readFileSync(0, \"utf8\").trim().split(/\\s+/).map(Number);\nconst r = new Range(from, to, step);\nconsole.log([...r].join(\" \") || \"(empty)\");\nconsole.log(Iterator.from(r).reduce((a, b) => a + b, 0));\n",
+        "solution": "import * as fs from \"fs\";\nclass Range implements Iterable<number> {\n  readonly from: number;\n  readonly to: number;\n  readonly step: number;\n  constructor(from: number, to: number, step: number) {\n    this.from = from;\n    this.to = to;\n    this.step = step;\n  }\n  *[Symbol.iterator](): Generator<number> {\n    for (let i = this.from; i < this.to; i += this.step) yield i;\n  }\n}\nconst [from = 0, to = 0, step = 1] = fs.readFileSync(0, \"utf8\").trim().split(/\\s+/).map(Number);\nconst r = new Range(from, to, step);\nconsole.log([...r].join(\" \") || \"(empty)\");\nconsole.log(Iterator.from(r).reduce((a, b) => a + b, 0));\n",
+        "tests": [
+          {
+            "input": "0 10 3",
+            "output": "0 3 6 9\n18"
+          },
+          {
+            "input": "5 5 1",
+            "output": "(empty)\n0"
+          },
+          {
+            "input": "1 4 1",
+            "output": "1 2 3\n6"
+          }
+        ],
+        "source_slug": ""
+      },
+      {
+        "id": "ts_iterator_helpers-log",
+        "title": "Scan a log lazily",
+        "prompt": "Each input line is a log entry `<level> <message…>`. Using iterator helpers over `lines.values()` (no intermediate arrays until the end), print the first 2 `ERROR` messages, then `warnings: <n>` (with `reduce`), then `has fatal: <bool>` (with `some`), then the 3rd line after skipping the first 2 (`drop`) or `none`.",
+        "hint": "Each question gets a fresh `lines.values()` — an iterator is consumed by the first pipeline that reads it.",
+        "language": "typescript",
+        "kind": "challenge",
+        "difficulty": "Medium",
+        "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+        "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst lines = input.split(\"\\n\").map((l) => l.trim());\nconst level = (l: string) => l.split(\" \")[0] ?? \"\";\nconst message = (l: string) => l.slice(l.indexOf(\" \") + 1);\nconst errors = lines.values().filter((l) => level(l) === \"ERROR\").map(message).take(2).toArray();\nfor (const e of errors) console.log(e);\nconsole.log(`warnings: ${lines.values().reduce((n, l) => n + (level(l) === \"WARN\" ? 1 : 0), 0)}`);\nconsole.log(`has fatal: ${lines.values().some((l) => level(l) === \"FATAL\")}`);\nconsole.log(lines.values().drop(2).take(1).toArray()[0] ?? \"none\");\n",
+        "tests": [
+          {
+            "input": "INFO boot\nWARN slow disk\nERROR db down\nINFO retry\nERROR db down again\nERROR third\nWARN hot",
+            "output": "db down\ndb down again\nwarnings: 2\nhas fatal: false\nERROR db down"
+          },
+          {
+            "input": "FATAL all bad",
+            "output": "warnings: 0\nhas fatal: true\nnone"
+          },
+          {
+            "input": "INFO a\nINFO b",
+            "output": "warnings: 0\nhas fatal: false\nnone"
+          }
+        ],
+        "source_slug": ""
+      }
+    ],
+    "cards": [],
+    "quiz": [
+      {
+        "question": "Which of these is lazy?",
+        "options": [
+          "`it.map(f)` on an iterator",
+          "`arr.map(f)` on an array",
+          "`it.toArray()`",
+          "`it.reduce(f, 0)`"
+        ],
+        "answer": 0,
+        "explanation": "Iterator `map` returns a new iterator and runs nothing until pulled."
+      },
+      {
+        "question": "What does `take(n)` do to the pipeline?",
+        "options": [
+          "Stops pulling from the source after `n` values",
+          "Skips `n` values",
+          "Sorts and takes the top `n`",
+          "Copies `n` values into an array"
+        ],
+        "answer": 0,
+        "explanation": "It's what makes infinite sources safe."
+      },
+      {
+        "question": "You call `toArray()` twice on the same iterator. The second result?",
+        "options": [
+          "An empty array — the iterator was consumed",
+          "The same values again",
+          "An error",
+          "`undefined`"
+        ],
+        "answer": 0,
+        "explanation": "Iterators are single-use cursors."
+      },
+      {
+        "question": "How do you use the helpers on a value typed `Iterable<T>`?",
+        "options": [
+          "`Iterator.from(value)`",
+          "`[...value]`",
+          "`value.iterator()`",
+          "They're already there"
+        ],
+        "answer": 0,
+        "explanation": "`Iterable<T>` only promises `[Symbol.iterator]`."
+      },
+      {
+        "question": "How do you make a class work with `for…of`?",
+        "options": [
+          "Implement `[Symbol.iterator]()`, often as a generator method",
+          "Extend `Array`",
+          "Add a `forEach` method",
+          "Mark it `iterable`"
+        ],
+        "answer": 0,
+        "explanation": "`*[Symbol.iterator]() { … yield … }`."
+      },
+      {
+        "question": "Which call hangs?",
+        "options": [
+          "`[...naturals()]` for an infinite generator",
+          "`naturals().take(5).toArray()`",
+          "`naturals().drop(5).take(1).toArray()`",
+          "`naturals().find((n) => n > 5)`"
+        ],
+        "answer": 0,
+        "explanation": "Spreading tries to collect everything."
+      }
+    ],
+    "practice": []
+  },
+  {
+    "key": "ts_heap_pq",
+    "name": "Heaps & Priority Queues",
+    "category": "TS: Data Structures",
+    "what": "A generic binary heap with a comparator: `push` and `pop` in O(log n), always handing out the smallest item — the structure behind priority queues, k-smallest, merging sorted lists and schedulers.",
+    "deep": "JavaScript has no built-in priority queue, so interviews and real schedulers need one written by hand. A binary heap keeps an array in *heap order* — every parent no larger than its children — so the minimum is always at index 0; `push` bubbles a new item up and `pop` sifts the last item down, each touching only O(log n) slots. Made generic over `T` with a comparator `(a, b) => number` (the same contract as `sort`), one class serves numbers, tasks, events and anything else.",
+    "java": "Java ships `PriorityQueue<E>` with a `Comparator<E>`; this chapter builds the same thing, because JavaScript doesn't have one. The comparator contract is identical: negative means `a` comes first.",
+    "language": "typescript",
+    "lesson": "### Why it exists\nMany problems need \"the smallest thing so far\" over and over while things are\nadded: the next task to run, the nearest unvisited city, the next line to merge\nfrom k sorted files, the running median. Re-sorting an array after every insert\ncosts O(n log n) each time; scanning for the minimum costs O(n). A heap does both\noperations in O(log n).\n\nInterviewers ask for heaps constantly — top-k, merge k lists, task scheduling,\nmeeting rooms — and TypeScript gives you nothing to import. Writing a small,\ngeneric, well-typed heap once, and knowing its comparator contract cold, is one\nof the most reusable pieces of interview code you can own.\n\n### The core idea\n**Heap order in an array.** Store a complete binary tree level by level: the\nchildren of index `i` are `2i + 1` and `2i + 2`, its parent is `(i - 1) >> 1`.\nThe *heap property* — every parent compares ≤ its children — puts the minimum at\n`items[0]`.\n\n- **push:** append at the end, then swap it with its parent while it's smaller\n  (\"bubble up\"). O(log n).\n- **pop:** take `items[0]`, move the last item to the root, then swap it with\n  its smaller child while a child is smaller (\"sift down\"). O(log n).\n- **peek:** `items[0]`, O(1). Under `noUncheckedIndexedAccess` both `peek` and\n  `pop` honestly return `T | undefined`.\n\n**Generic with a comparator.** `class Heap<T>` takes\n`compare: (a: T, b: T) => number` — negative if `a` should come out first —\nexactly `Array.prototype.sort`'s contract. A max-heap is the same class with the\ncomparator reversed: `(a, b) => b - a`.\n\n**Common patterns.**\n\n| problem | heap |\n|---|---|\n| k smallest of n | max-heap of size k: push, and pop whenever it exceeds k |\n| merge k sorted lists | min-heap of the current head of each list |\n| scheduler | min-heap of `(time, seq, task)`, seq breaking ties |\n| running median | a max-heap of the low half, a min-heap of the high half |\n\n**Heaps aren't stable.** Equal items can come out in any order. When order\namong equals matters (first-come-first-served), add an insertion counter to the\ncomparison.\n\n### Worked examples\n#### Heap sort, from the generic class\n```ts\nclass Heap<T> {\n  readonly #items: T[] = [];\n  readonly #compare: (a: T, b: T) => number;\n  constructor(compare: (a: T, b: T) => number) {\n    this.#compare = compare;\n  }\n  get size(): number {\n    return this.#items.length;\n  }\n  peek(): T | undefined {\n    return this.#items[0];\n  }\n  push(item: T): void {\n    const a = this.#items;\n    a.push(item);\n    let i = a.length - 1;\n    while (i > 0) {\n      const parent = (i - 1) >> 1;\n      const child = a[i] as T;\n      const up = a[parent] as T;\n      if (this.#compare(child, up) >= 0) break;\n      a[i] = up;\n      a[parent] = child;\n      i = parent;\n    }\n  }\n  pop(): T | undefined {\n    const a = this.#items;\n    const top = a[0];\n    const last = a.pop();\n    if (a.length > 0 && last !== undefined) {\n      a[0] = last;\n      let i = 0;\n      for (;;) {\n        const l = 2 * i + 1;\n        const r = l + 1;\n        let m = i;\n        if (l < a.length && this.#compare(a[l] as T, a[m] as T) < 0) m = l;\n        if (r < a.length && this.#compare(a[r] as T, a[m] as T) < 0) m = r;\n        if (m === i) break;\n        const tmp = a[i] as T;\n        a[i] = a[m] as T;\n        a[m] = tmp;\n        i = m;\n      }\n    }\n    return top;\n  }\n}\n\nconst h = new Heap<number>((a, b) => a - b);\nfor (const n of [5, 1, 8, 3, 9, 2]) h.push(n);\nconst out: number[] = [];\nfor (let x = h.pop(); x !== undefined; x = h.pop()) out.push(x);\nconsole.log(out.join(\" \"));\n\nconst words = new Heap<string>((a, b) => b.length - a.length || a.localeCompare(b));\nfor (const w of [\"pear\", \"fig\", \"banana\", \"kiwi\"]) words.push(w);\nconsole.log(words.pop(), words.pop(), words.size);\n```\n\nPrints:\n```text\n1 2 3 5 8 9\nbanana kiwi 2\n```\n\nThe same class, two element types, two orders: ascending numbers, and words longest-first (alphabetical on ties). The comparator is the only thing that changes.\n\n#### k smallest with a bounded max-heap\n```ts\nclass Heap<T> {\n  readonly #items: T[] = [];\n  readonly #compare: (a: T, b: T) => number;\n  constructor(compare: (a: T, b: T) => number) {\n    this.#compare = compare;\n  }\n  get size(): number {\n    return this.#items.length;\n  }\n  peek(): T | undefined {\n    return this.#items[0];\n  }\n  push(item: T): void {\n    const a = this.#items;\n    a.push(item);\n    let i = a.length - 1;\n    while (i > 0) {\n      const parent = (i - 1) >> 1;\n      const child = a[i] as T;\n      const up = a[parent] as T;\n      if (this.#compare(child, up) >= 0) break;\n      a[i] = up;\n      a[parent] = child;\n      i = parent;\n    }\n  }\n  pop(): T | undefined {\n    const a = this.#items;\n    const top = a[0];\n    const last = a.pop();\n    if (a.length > 0 && last !== undefined) {\n      a[0] = last;\n      let i = 0;\n      for (;;) {\n        const l = 2 * i + 1;\n        const r = l + 1;\n        let m = i;\n        if (l < a.length && this.#compare(a[l] as T, a[m] as T) < 0) m = l;\n        if (r < a.length && this.#compare(a[r] as T, a[m] as T) < 0) m = r;\n        if (m === i) break;\n        const tmp = a[i] as T;\n        a[i] = a[m] as T;\n        a[m] = tmp;\n        i = m;\n      }\n    }\n    return top;\n  }\n}\n\nfunction kSmallest(xs: readonly number[], k: number): number[] {\n  const worstFirst = new Heap<number>((a, b) => b - a);\n  for (const x of xs) {\n    worstFirst.push(x);\n    if (worstFirst.size > k) worstFirst.pop();\n  }\n  const out: number[] = [];\n  for (let x = worstFirst.pop(); x !== undefined; x = worstFirst.pop()) out.push(x);\n  return out.reverse();\n}\nconsole.log(kSmallest([9, 4, 7, 1, 8, 2, 6], 3).join(\" \"));\nconsole.log(kSmallest([5], 3).join(\" \"));\n```\n\nPrints:\n```text\n1 2 4\n5\n```\n\nThe heap never holds more than k items, so this is O(n log k) — much better than sorting everything when k is small. Its top is the largest of the k smallest, the one to evict.\n\n#### A scheduler with stable ties\n```ts\nclass Heap<T> {\n  readonly #items: T[] = [];\n  readonly #compare: (a: T, b: T) => number;\n  constructor(compare: (a: T, b: T) => number) {\n    this.#compare = compare;\n  }\n  get size(): number {\n    return this.#items.length;\n  }\n  peek(): T | undefined {\n    return this.#items[0];\n  }\n  push(item: T): void {\n    const a = this.#items;\n    a.push(item);\n    let i = a.length - 1;\n    while (i > 0) {\n      const parent = (i - 1) >> 1;\n      const child = a[i] as T;\n      const up = a[parent] as T;\n      if (this.#compare(child, up) >= 0) break;\n      a[i] = up;\n      a[parent] = child;\n      i = parent;\n    }\n  }\n  pop(): T | undefined {\n    const a = this.#items;\n    const top = a[0];\n    const last = a.pop();\n    if (a.length > 0 && last !== undefined) {\n      a[0] = last;\n      let i = 0;\n      for (;;) {\n        const l = 2 * i + 1;\n        const r = l + 1;\n        let m = i;\n        if (l < a.length && this.#compare(a[l] as T, a[m] as T) < 0) m = l;\n        if (r < a.length && this.#compare(a[r] as T, a[m] as T) < 0) m = r;\n        if (m === i) break;\n        const tmp = a[i] as T;\n        a[i] = a[m] as T;\n        a[m] = tmp;\n        i = m;\n      }\n    }\n    return top;\n  }\n}\n\ntype Job = { name: string; priority: number; seq: number };\nconst queue = new Heap<Job>((a, b) => a.priority - b.priority || a.seq - b.seq);\nlet seq = 0;\nfor (const [name, priority] of [[\"backup\", 2], [\"email\", 1], [\"report\", 2], [\"alert\", 0], [\"cleanup\", 2]] as const) {\n  queue.push({ name, priority, seq: seq++ });\n}\nconst order: string[] = [];\nfor (let j = queue.pop(); j !== undefined; j = queue.pop()) order.push(`${j.name}(${j.priority})`);\nconsole.log(order.join(\" \"));\n```\n\nPrints:\n```text\nalert(0) email(1) backup(2) report(2) cleanup(2)\n```\n\nPriority 2 has three jobs; the `seq` tie-break makes them run in arrival order. Without it a heap may hand them out in any order.\n\n#### Merge k sorted lists\n```ts\nclass Heap<T> {\n  readonly #items: T[] = [];\n  readonly #compare: (a: T, b: T) => number;\n  constructor(compare: (a: T, b: T) => number) {\n    this.#compare = compare;\n  }\n  get size(): number {\n    return this.#items.length;\n  }\n  peek(): T | undefined {\n    return this.#items[0];\n  }\n  push(item: T): void {\n    const a = this.#items;\n    a.push(item);\n    let i = a.length - 1;\n    while (i > 0) {\n      const parent = (i - 1) >> 1;\n      const child = a[i] as T;\n      const up = a[parent] as T;\n      if (this.#compare(child, up) >= 0) break;\n      a[i] = up;\n      a[parent] = child;\n      i = parent;\n    }\n  }\n  pop(): T | undefined {\n    const a = this.#items;\n    const top = a[0];\n    const last = a.pop();\n    if (a.length > 0 && last !== undefined) {\n      a[0] = last;\n      let i = 0;\n      for (;;) {\n        const l = 2 * i + 1;\n        const r = l + 1;\n        let m = i;\n        if (l < a.length && this.#compare(a[l] as T, a[m] as T) < 0) m = l;\n        if (r < a.length && this.#compare(a[r] as T, a[m] as T) < 0) m = r;\n        if (m === i) break;\n        const tmp = a[i] as T;\n        a[i] = a[m] as T;\n        a[m] = tmp;\n        i = m;\n      }\n    }\n    return top;\n  }\n}\n\nfunction mergeSorted(lists: readonly (readonly number[])[]): number[] {\n  const heads = new Heap<{ value: number; list: number; index: number }>((a, b) => a.value - b.value);\n  lists.forEach((l, list) => {\n    const first = l[0];\n    if (first !== undefined) heads.push({ value: first, list, index: 0 });\n  });\n  const out: number[] = [];\n  for (let h = heads.pop(); h !== undefined; h = heads.pop()) {\n    out.push(h.value);\n    const next = lists[h.list]?.[h.index + 1];\n    if (next !== undefined) heads.push({ value: next, list: h.list, index: h.index + 1 });\n  }\n  return out;\n}\nconsole.log(mergeSorted([[1, 4, 9], [2, 3, 10], [], [5]]).join(\" \"));\n```\n\nPrints:\n```text\n1 2 3 4 5 9 10\n```\n\nThe heap holds one candidate per list — at most k items — so merging n values costs O(n log k).\n\n### What the compiler says\n```ts\ndeclare class Heap<T> {\n  constructor(compare: (a: T, b: T) => number);\n  push(item: T): void;\n  pop(): T | undefined;\n}\nconst h = new Heap<number>((a, b) => a - b);\nh.push(3);\nconst smallest: number = h.pop();\n```\n```text\nline 8: error TS2322: Type 'number | undefined' is not assignable to type 'number'.\n  Type 'undefined' is not assignable to type 'number'.\n```\n\n`pop` on an empty heap has nothing to return, so its type says `number | undefined`. Handle the empty case (`?? …`, or loop `while (x !== undefined)`).\n\n```ts\ndeclare class Heap<T> {\n  constructor(compare: (a: T, b: T) => number);\n}\nconst byLength = (a: string, b: string) => a.length - b.length;\nconst h = new Heap<number>(byLength);\n```\n```text\nline 5: error TS2345: Argument of type '(a: string, b: string) => number' is not assignable to parameter of type '(a: number, b: number) => number'.\n  Types of parameters 'a' and 'a' are incompatible.\n    Type 'number' is not assignable to type 'string'.\n```\n\nThe comparator must compare the heap's element type. A `Heap<number>` needs `(a: number, b: number) => number`.\n\n### Pitfalls\n#### A comparator with the sign reversed\n```ts\nclass Heap<T> {\n  readonly #items: T[] = [];\n  readonly #compare: (a: T, b: T) => number;\n  constructor(compare: (a: T, b: T) => number) {\n    this.#compare = compare;\n  }\n  get size(): number {\n    return this.#items.length;\n  }\n  peek(): T | undefined {\n    return this.#items[0];\n  }\n  push(item: T): void {\n    const a = this.#items;\n    a.push(item);\n    let i = a.length - 1;\n    while (i > 0) {\n      const parent = (i - 1) >> 1;\n      const child = a[i] as T;\n      const up = a[parent] as T;\n      if (this.#compare(child, up) >= 0) break;\n      a[i] = up;\n      a[parent] = child;\n      i = parent;\n    }\n  }\n  pop(): T | undefined {\n    const a = this.#items;\n    const top = a[0];\n    const last = a.pop();\n    if (a.length > 0 && last !== undefined) {\n      a[0] = last;\n      let i = 0;\n      for (;;) {\n        const l = 2 * i + 1;\n        const r = l + 1;\n        let m = i;\n        if (l < a.length && this.#compare(a[l] as T, a[m] as T) < 0) m = l;\n        if (r < a.length && this.#compare(a[r] as T, a[m] as T) < 0) m = r;\n        if (m === i) break;\n        const tmp = a[i] as T;\n        a[i] = a[m] as T;\n        a[m] = tmp;\n        i = m;\n      }\n    }\n    return top;\n  }\n}\n\nconst tasks = new Heap<number>((a, b) => b - a);\nfor (const due of [30, 10, 20]) tasks.push(due);\nconsole.log(\"next due: \" + tasks.pop());\n```\nPrints:\n```text\nnext due: 30\n```\n\n`(a, b) => b - a` is a *max*-heap. The contract is `sort`'s: negative when `a` should come out first. Say it out loud before writing the comparator.\n\n```ts\nclass Heap<T> {\n  readonly #items: T[] = [];\n  readonly #compare: (a: T, b: T) => number;\n  constructor(compare: (a: T, b: T) => number) {\n    this.#compare = compare;\n  }\n  get size(): number {\n    return this.#items.length;\n  }\n  peek(): T | undefined {\n    return this.#items[0];\n  }\n  push(item: T): void {\n    const a = this.#items;\n    a.push(item);\n    let i = a.length - 1;\n    while (i > 0) {\n      const parent = (i - 1) >> 1;\n      const child = a[i] as T;\n      const up = a[parent] as T;\n      if (this.#compare(child, up) >= 0) break;\n      a[i] = up;\n      a[parent] = child;\n      i = parent;\n    }\n  }\n  pop(): T | undefined {\n    const a = this.#items;\n    const top = a[0];\n    const last = a.pop();\n    if (a.length > 0 && last !== undefined) {\n      a[0] = last;\n      let i = 0;\n      for (;;) {\n        const l = 2 * i + 1;\n        const r = l + 1;\n        let m = i;\n        if (l < a.length && this.#compare(a[l] as T, a[m] as T) < 0) m = l;\n        if (r < a.length && this.#compare(a[r] as T, a[m] as T) < 0) m = r;\n        if (m === i) break;\n        const tmp = a[i] as T;\n        a[i] = a[m] as T;\n        a[m] = tmp;\n        i = m;\n      }\n    }\n    return top;\n  }\n}\n\nconst tasks = new Heap<number>((a, b) => a - b);\nfor (const due of [30, 10, 20]) tasks.push(due);\nconsole.log(\"next due: \" + tasks.pop());\n```\nPrints:\n```text\nnext due: 10\n```\n\n#### Ties in arbitrary order\n```ts\nclass Heap<T> {\n  readonly #items: T[] = [];\n  readonly #compare: (a: T, b: T) => number;\n  constructor(compare: (a: T, b: T) => number) {\n    this.#compare = compare;\n  }\n  get size(): number {\n    return this.#items.length;\n  }\n  peek(): T | undefined {\n    return this.#items[0];\n  }\n  push(item: T): void {\n    const a = this.#items;\n    a.push(item);\n    let i = a.length - 1;\n    while (i > 0) {\n      const parent = (i - 1) >> 1;\n      const child = a[i] as T;\n      const up = a[parent] as T;\n      if (this.#compare(child, up) >= 0) break;\n      a[i] = up;\n      a[parent] = child;\n      i = parent;\n    }\n  }\n  pop(): T | undefined {\n    const a = this.#items;\n    const top = a[0];\n    const last = a.pop();\n    if (a.length > 0 && last !== undefined) {\n      a[0] = last;\n      let i = 0;\n      for (;;) {\n        const l = 2 * i + 1;\n        const r = l + 1;\n        let m = i;\n        if (l < a.length && this.#compare(a[l] as T, a[m] as T) < 0) m = l;\n        if (r < a.length && this.#compare(a[r] as T, a[m] as T) < 0) m = r;\n        if (m === i) break;\n        const tmp = a[i] as T;\n        a[i] = a[m] as T;\n        a[m] = tmp;\n        i = m;\n      }\n    }\n    return top;\n  }\n}\n\nconst q = new Heap<{ name: string; p: number }>((a, b) => a.p - b.p);\nfor (const name of [\"a\", \"b\", \"c\", \"d\", \"e\"]) q.push({ name, p: 1 });\nconst out: string[] = [];\nfor (let j = q.pop(); j !== undefined; j = q.pop()) out.push(j.name);\nconsole.log(out.join(\"\"));\n```\nPrints:\n```text\naedcb\n```\n\nAll five have the same priority, and a heap isn't stable: they came out shuffled. Add an insertion counter to the comparison when equal items must keep their order.\n\n```ts\nclass Heap<T> {\n  readonly #items: T[] = [];\n  readonly #compare: (a: T, b: T) => number;\n  constructor(compare: (a: T, b: T) => number) {\n    this.#compare = compare;\n  }\n  get size(): number {\n    return this.#items.length;\n  }\n  peek(): T | undefined {\n    return this.#items[0];\n  }\n  push(item: T): void {\n    const a = this.#items;\n    a.push(item);\n    let i = a.length - 1;\n    while (i > 0) {\n      const parent = (i - 1) >> 1;\n      const child = a[i] as T;\n      const up = a[parent] as T;\n      if (this.#compare(child, up) >= 0) break;\n      a[i] = up;\n      a[parent] = child;\n      i = parent;\n    }\n  }\n  pop(): T | undefined {\n    const a = this.#items;\n    const top = a[0];\n    const last = a.pop();\n    if (a.length > 0 && last !== undefined) {\n      a[0] = last;\n      let i = 0;\n      for (;;) {\n        const l = 2 * i + 1;\n        const r = l + 1;\n        let m = i;\n        if (l < a.length && this.#compare(a[l] as T, a[m] as T) < 0) m = l;\n        if (r < a.length && this.#compare(a[r] as T, a[m] as T) < 0) m = r;\n        if (m === i) break;\n        const tmp = a[i] as T;\n        a[i] = a[m] as T;\n        a[m] = tmp;\n        i = m;\n      }\n    }\n    return top;\n  }\n}\n\nconst q = new Heap<{ name: string; p: number; seq: number }>((a, b) => a.p - b.p || a.seq - b.seq);\n[\"a\", \"b\", \"c\", \"d\", \"e\"].forEach((name, seq) => q.push({ name, p: 1, seq }));\nconst out: string[] = [];\nfor (let j = q.pop(); j !== undefined; j = q.pop()) out.push(j.name);\nconsole.log(out.join(\"\"));\n```\nPrints:\n```text\nabcde\n```\n\n#### A boolean comparator\n```ts\nconst xs = [3, 1, 2];\nxs.sort((a, b) => a > b);\nconsole.log(xs.join(\",\"));\n```\nThe compiler says:\n```text\nline 2: error TS2345: Argument of type '(a: number, b: number) => boolean' is not assignable to parameter of type '(a: number, b: number) => number'.\n  Type 'boolean' is not assignable to type 'number'.\n```\n\nA comparator returns a *number* (negative, zero, positive). `a > b` returns a boolean, which JavaScript would silently turn into 0 or 1 — an inconsistent order. TypeScript refuses it.\n\n```ts\nconst xs = [3, 1, 2];\nxs.sort((a, b) => a - b);\nconsole.log(xs.join(\",\"));\n```\nPrints:\n```text\n1,2,3\n```\n\n### Where it shows up later\n- **Week 24 — Problem set.** Running median with two heaps, meeting rooms, a task scheduler.\n- **DSA curriculum, stage 5.** Heaps and the problems built on them (`/library`).\n- **Week 26 — Async.** A scheduler over a simulated clock is a heap keyed by time.\n\n### In an interview\n\n**How would you implement a priority queue in TypeScript?**\n\nA generic `Heap<T>` over an array with a comparator `(a, b) => number`: push appends and bubbles up, pop moves the last element to the root and sifts down, both O(log n); peek reads index 0. `pop` and `peek` return `T | undefined`. A max-heap is the same class with the comparator flipped.\n\n**Find the k largest elements in a stream.**\n\nKeep a min-heap of size k: push each element and pop whenever the size exceeds k. The heap then holds the k largest, with the k-th largest at the top. O(n log k) time, O(k) space — better than sorting when k is small, and it works on an unbounded stream.\n\n**How do you merge k sorted lists?**\n\nPush the head of each list into a min-heap keyed by value (remembering which list it came from); repeatedly pop the smallest, append it, and push the next element from the same list. O(n log k) for n total elements.",
+    "exercises": [
+      {
+        "id": "ts_heap_pq-max",
+        "title": "A max-heap from the same class",
+        "prompt": "`Heap<T>` is a min-heap by its comparator. Replace `____` with the comparator that makes `top` hand out the largest number first.",
+        "hint": "Negative when `a` should come out first — so when `a` is *larger*.",
+        "language": "typescript",
+        "kind": "drill",
+        "difficulty": "",
+        "starter": "class Heap<T> {\n  readonly #items: T[] = [];\n  readonly #compare: (a: T, b: T) => number;\n  constructor(compare: (a: T, b: T) => number) {\n    this.#compare = compare;\n  }\n  get size(): number {\n    return this.#items.length;\n  }\n  peek(): T | undefined {\n    return this.#items[0];\n  }\n  push(item: T): void {\n    const a = this.#items;\n    a.push(item);\n    let i = a.length - 1;\n    while (i > 0) {\n      const parent = (i - 1) >> 1;\n      const child = a[i] as T;\n      const up = a[parent] as T;\n      if (this.#compare(child, up) >= 0) break;\n      a[i] = up;\n      a[parent] = child;\n      i = parent;\n    }\n  }\n  pop(): T | undefined {\n    const a = this.#items;\n    const top = a[0];\n    const last = a.pop();\n    if (a.length > 0 && last !== undefined) {\n      a[0] = last;\n      let i = 0;\n      for (;;) {\n        const l = 2 * i + 1;\n        const r = l + 1;\n        let m = i;\n        if (l < a.length && this.#compare(a[l] as T, a[m] as T) < 0) m = l;\n        if (r < a.length && this.#compare(a[r] as T, a[m] as T) < 0) m = r;\n        if (m === i) break;\n        const tmp = a[i] as T;\n        a[i] = a[m] as T;\n        a[m] = tmp;\n        i = m;\n      }\n    }\n    return top;\n  }\n}\n\nimport * as fs from \"fs\";\nconst top = new Heap<number>(____);\nfor (const n of fs.readFileSync(0, \"utf8\").trim().split(/\\s+/).map(Number)) top.push(n);\nconst firstThree = [top.pop(), top.pop(), top.pop()].filter((x) => x !== undefined);\nconsole.log(firstThree.join(\" \"));\nconsole.log(`left ${top.size}`);\n",
+        "solution": "class Heap<T> {\n  readonly #items: T[] = [];\n  readonly #compare: (a: T, b: T) => number;\n  constructor(compare: (a: T, b: T) => number) {\n    this.#compare = compare;\n  }\n  get size(): number {\n    return this.#items.length;\n  }\n  peek(): T | undefined {\n    return this.#items[0];\n  }\n  push(item: T): void {\n    const a = this.#items;\n    a.push(item);\n    let i = a.length - 1;\n    while (i > 0) {\n      const parent = (i - 1) >> 1;\n      const child = a[i] as T;\n      const up = a[parent] as T;\n      if (this.#compare(child, up) >= 0) break;\n      a[i] = up;\n      a[parent] = child;\n      i = parent;\n    }\n  }\n  pop(): T | undefined {\n    const a = this.#items;\n    const top = a[0];\n    const last = a.pop();\n    if (a.length > 0 && last !== undefined) {\n      a[0] = last;\n      let i = 0;\n      for (;;) {\n        const l = 2 * i + 1;\n        const r = l + 1;\n        let m = i;\n        if (l < a.length && this.#compare(a[l] as T, a[m] as T) < 0) m = l;\n        if (r < a.length && this.#compare(a[r] as T, a[m] as T) < 0) m = r;\n        if (m === i) break;\n        const tmp = a[i] as T;\n        a[i] = a[m] as T;\n        a[m] = tmp;\n        i = m;\n      }\n    }\n    return top;\n  }\n}\n\nimport * as fs from \"fs\";\nconst top = new Heap<number>((a, b) => b - a);\nfor (const n of fs.readFileSync(0, \"utf8\").trim().split(/\\s+/).map(Number)) top.push(n);\nconst firstThree = [top.pop(), top.pop(), top.pop()].filter((x) => x !== undefined);\nconsole.log(firstThree.join(\" \"));\nconsole.log(`left ${top.size}`);\n",
+        "tests": [
+          {
+            "input": "5 1 9 3 7",
+            "output": "9 7 5\nleft 2"
+          },
+          {
+            "input": "2 2",
+            "output": "2 2\nleft 0"
+          },
+          {
+            "input": "10 20 30 40",
+            "output": "40 30 20\nleft 1"
+          }
+        ],
+        "source_slug": ""
+      },
+      {
+        "id": "ts_heap_pq-kth",
+        "title": "The k-th largest",
+        "prompt": "Keep a min-heap of the k largest values seen so far. Replace `____` with the step that keeps it at k items.",
+        "hint": "When the heap grows past k, remove its smallest.",
+        "language": "typescript",
+        "kind": "drill",
+        "difficulty": "",
+        "starter": "class Heap<T> {\n  readonly #items: T[] = [];\n  readonly #compare: (a: T, b: T) => number;\n  constructor(compare: (a: T, b: T) => number) {\n    this.#compare = compare;\n  }\n  get size(): number {\n    return this.#items.length;\n  }\n  peek(): T | undefined {\n    return this.#items[0];\n  }\n  push(item: T): void {\n    const a = this.#items;\n    a.push(item);\n    let i = a.length - 1;\n    while (i > 0) {\n      const parent = (i - 1) >> 1;\n      const child = a[i] as T;\n      const up = a[parent] as T;\n      if (this.#compare(child, up) >= 0) break;\n      a[i] = up;\n      a[parent] = child;\n      i = parent;\n    }\n  }\n  pop(): T | undefined {\n    const a = this.#items;\n    const top = a[0];\n    const last = a.pop();\n    if (a.length > 0 && last !== undefined) {\n      a[0] = last;\n      let i = 0;\n      for (;;) {\n        const l = 2 * i + 1;\n        const r = l + 1;\n        let m = i;\n        if (l < a.length && this.#compare(a[l] as T, a[m] as T) < 0) m = l;\n        if (r < a.length && this.#compare(a[r] as T, a[m] as T) < 0) m = r;\n        if (m === i) break;\n        const tmp = a[i] as T;\n        a[i] = a[m] as T;\n        a[m] = tmp;\n        i = m;\n      }\n    }\n    return top;\n  }\n}\n\nimport * as fs from \"fs\";\nconst [kText = \"1\", line = \"\"] = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nconst k = Number(kText);\nconst best = new Heap<number>((a, b) => a - b);\nfor (const x of line.trim().split(/\\s+/).map(Number)) {\n  best.push(x);\n  ____\n}\nconsole.log(best.size < k ? \"not enough values\" : `k-th largest: ${best.peek()}`);\n",
+        "solution": "class Heap<T> {\n  readonly #items: T[] = [];\n  readonly #compare: (a: T, b: T) => number;\n  constructor(compare: (a: T, b: T) => number) {\n    this.#compare = compare;\n  }\n  get size(): number {\n    return this.#items.length;\n  }\n  peek(): T | undefined {\n    return this.#items[0];\n  }\n  push(item: T): void {\n    const a = this.#items;\n    a.push(item);\n    let i = a.length - 1;\n    while (i > 0) {\n      const parent = (i - 1) >> 1;\n      const child = a[i] as T;\n      const up = a[parent] as T;\n      if (this.#compare(child, up) >= 0) break;\n      a[i] = up;\n      a[parent] = child;\n      i = parent;\n    }\n  }\n  pop(): T | undefined {\n    const a = this.#items;\n    const top = a[0];\n    const last = a.pop();\n    if (a.length > 0 && last !== undefined) {\n      a[0] = last;\n      let i = 0;\n      for (;;) {\n        const l = 2 * i + 1;\n        const r = l + 1;\n        let m = i;\n        if (l < a.length && this.#compare(a[l] as T, a[m] as T) < 0) m = l;\n        if (r < a.length && this.#compare(a[r] as T, a[m] as T) < 0) m = r;\n        if (m === i) break;\n        const tmp = a[i] as T;\n        a[i] = a[m] as T;\n        a[m] = tmp;\n        i = m;\n      }\n    }\n    return top;\n  }\n}\n\nimport * as fs from \"fs\";\nconst [kText = \"1\", line = \"\"] = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nconst k = Number(kText);\nconst best = new Heap<number>((a, b) => a - b);\nfor (const x of line.trim().split(/\\s+/).map(Number)) {\n  best.push(x);\n  if (best.size > k) best.pop();\n}\nconsole.log(best.size < k ? \"not enough values\" : `k-th largest: ${best.peek()}`);\n",
+        "tests": [
+          {
+            "input": "3\n4 9 1 7 3 8",
+            "output": "k-th largest: 7"
+          },
+          {
+            "input": "1\n5 2",
+            "output": "k-th largest: 5"
+          },
+          {
+            "input": "4\n1 2",
+            "output": "not enough values"
+          }
+        ],
+        "source_slug": ""
+      },
+      {
+        "id": "ts_heap_pq-scheduler",
+        "title": "Run jobs by priority, then arrival",
+        "prompt": "Each input line is `add <name> <priority>` (lower runs first) or `run <n>` (run up to n jobs). For each job run print `run <name>`; if the queue empties early print `idle`. Equal priorities run in the order they were added. Finish with `pending <names by the order they'd run>` or `pending none`. Write (or reuse) a generic heap with a comparator.",
+        "hint": "Compare by priority, then by an arrival counter.",
+        "language": "typescript",
+        "kind": "challenge",
+        "difficulty": "Medium",
+        "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+        "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nclass Heap<T> {\n  readonly #items: T[] = [];\n  readonly #compare: (a: T, b: T) => number;\n  constructor(compare: (a: T, b: T) => number) {\n    this.#compare = compare;\n  }\n  get size(): number {\n    return this.#items.length;\n  }\n  peek(): T | undefined {\n    return this.#items[0];\n  }\n  push(item: T): void {\n    const a = this.#items;\n    a.push(item);\n    let i = a.length - 1;\n    while (i > 0) {\n      const parent = (i - 1) >> 1;\n      const child = a[i] as T;\n      const up = a[parent] as T;\n      if (this.#compare(child, up) >= 0) break;\n      a[i] = up;\n      a[parent] = child;\n      i = parent;\n    }\n  }\n  pop(): T | undefined {\n    const a = this.#items;\n    const top = a[0];\n    const last = a.pop();\n    if (a.length > 0 && last !== undefined) {\n      a[0] = last;\n      let i = 0;\n      for (;;) {\n        const l = 2 * i + 1;\n        const r = l + 1;\n        let m = i;\n        if (l < a.length && this.#compare(a[l] as T, a[m] as T) < 0) m = l;\n        if (r < a.length && this.#compare(a[r] as T, a[m] as T) < 0) m = r;\n        if (m === i) break;\n        const tmp = a[i] as T;\n        a[i] = a[m] as T;\n        a[m] = tmp;\n        i = m;\n      }\n    }\n    return top;\n  }\n}\ntype Job = { name: string; priority: number; seq: number };\nconst queue = new Heap<Job>((a, b) => a.priority - b.priority || a.seq - b.seq);\nlet seq = 0;\nfor (const line of input.split(\"\\n\")) {\n  const [cmd = \"\", a = \"\", b = \"0\"] = line.trim().split(/\\s+/);\n  if (cmd === \"add\") queue.push({ name: a, priority: Number(b), seq: seq++ });\n  else if (cmd === \"run\") {\n    for (let i = 0; i < Number(a); i++) {\n      const job = queue.pop();\n      if (job === undefined) {\n        console.log(\"idle\");\n        break;\n      }\n      console.log(`run ${job.name}`);\n    }\n  }\n}\nconst pending: string[] = [];\nfor (let j = queue.pop(); j !== undefined; j = queue.pop()) pending.push(j.name);\nconsole.log(`pending ${pending.join(\" \") || \"none\"}`);\n",
+        "tests": [
+          {
+            "input": "add backup 2\nadd email 1\nadd report 2\nrun 2\nadd alert 0\nrun 5\nadd late 3",
+            "output": "run email\nrun backup\nrun alert\nrun report\nidle\npending late"
+          },
+          {
+            "input": "run 1\nadd x 5\nadd y 5",
+            "output": "idle\npending x y"
+          }
+        ],
+        "source_slug": ""
+      }
+    ],
+    "cards": [],
+    "quiz": [
+      {
+        "question": "Where is the smallest item in a min-heap stored in an array?",
+        "options": [
+          "At index 0",
+          "At the last index",
+          "In the middle",
+          "Anywhere"
+        ],
+        "answer": 0,
+        "explanation": "The heap property puts the minimum at the root."
+      },
+      {
+        "question": "What are the children of index `i`?",
+        "options": [
+          "`2i + 1` and `2i + 2`",
+          "`i + 1` and `i + 2`",
+          "`2i` and `2i + 1`",
+          "`i / 2`"
+        ],
+        "answer": 0,
+        "explanation": "Its parent is `(i - 1) >> 1`."
+      },
+      {
+        "question": "Cost of `push` and `pop`?",
+        "options": [
+          "O(log n) each",
+          "O(1) each",
+          "O(n) each",
+          "O(n log n) each"
+        ],
+        "answer": 0,
+        "explanation": "Each walks one root-to-leaf path."
+      },
+      {
+        "question": "How do you get the k smallest of n values in O(n log k)?",
+        "options": [
+          "A max-heap capped at k items, popping when it exceeds k",
+          "Sort, then slice",
+          "A min-heap of all n",
+          "A `Set`"
+        ],
+        "answer": 0,
+        "explanation": "Its top is the largest kept value — the one to evict."
+      },
+      {
+        "question": "Are heaps stable for equal priorities?",
+        "options": [
+          "No — add an insertion counter to the comparison if order matters",
+          "Yes, always",
+          "Only for numbers",
+          "Only when k = 1"
+        ],
+        "answer": 0,
+        "explanation": "Swaps reorder equal items."
+      },
+      {
+        "question": "What does the comparator `(a, b) => b - a` produce?",
+        "options": [
+          "A max-heap",
+          "A min-heap",
+          "A random order",
+          "An error"
+        ],
+        "answer": 0,
+        "explanation": "Negative when `a` is larger, so larger items come out first."
+      }
+    ],
+    "practice": []
+  },
+  {
+    "key": "ts_resource_management",
+    "name": "Resource Management with `using`",
+    "category": "TS: Robustness",
+    "what": "`using` and `await using` declarations, `Symbol.dispose` and `Symbol.asyncDispose`, and `DisposableStack` — deterministic cleanup that runs however a block exits.",
+    "deep": "A resource — a file handle, a lock, a transaction, a timer — must be released exactly once, even when the code using it returns early or throws. `try`/`finally` does that but scatters cleanup and gets the order wrong as resources multiply. `using x = acquire()` (TypeScript 5.2, Node 24) calls `x[Symbol.dispose]()` when the enclosing block exits, in reverse order of acquisition; `await using` does the same for async cleanup; `DisposableStack` collects cleanups that don't fit one variable.",
+    "java": "This is Java's try-with-resources and `AutoCloseable`, and C#'s `using`: the resource declares how to close itself, and the language guarantees the call. JavaScript's version is a declaration rather than a block, so several resources in one scope close in reverse order automatically.",
+    "language": "typescript",
+    "lesson": "### Why it exists\nCleanup bugs are quiet. A function opens a connection, something throws, and the\nconnection stays open; a lock is taken and an early `return` skips the release;\nthree resources are closed by hand in the wrong order. None of these fail a\nsimple test — they leak slowly in production.\n\n`try`/`finally` fixes each case, one hand-written block at a time. The `using`\ndeclaration moves the knowledge of *how* to release a resource into the\nresource itself, and the guarantee of *when* into the language: at the end of the\nblock, in reverse order, whatever happened.\n\n### The core idea\n**Disposable.** An object is disposable if it has a `[Symbol.dispose]()`\nmethod (the `Disposable` interface). Async-disposable objects have\n`[Symbol.asyncDispose](): Promise<void>` (`AsyncDisposable`).\n\n**`using`.**\n\n```ts\n{\n  using conn = openConnection();   // conn[Symbol.dispose]() runs at block end\n  using tx = conn.begin();         // tx is disposed first, then conn\n  tx.write(\"…\");\n}                                  // …even if write threw, or we returned early\n```\n\n- Disposal happens when the block exits — normally, by `return`, `break` or\n  exception.\n- Several `using` declarations dispose in **reverse** order: last acquired,\n  first released.\n- `null` and `undefined` are allowed and skipped (an optional resource).\n- If the block threw *and* a dispose throws, you get a `SuppressedError` whose\n  `.error` is the dispose error and `.suppressed` is the original.\n\n**`await using`** awaits `[Symbol.asyncDispose]()` at block exit; it's only\nallowed in async functions and at a module's top level.\n\n**`DisposableStack`** is a disposable that holds other cleanups:\n`stack.use(resource)`, `stack.defer(() => …)`, `stack.adopt(value, release)`.\nDisposing the stack runs them in reverse. `stack.move()` transfers ownership\nto a new stack — how a constructor that acquires several resources hands them to\nthe object only if all acquisitions succeeded.\n\n**Availability.** TypeScript 5.2+ with the `esnext.disposable` library (in this\napp's checker), and natively in Node 24 — which is what runs these examples.\n\n### Worked examples\n#### Acquired in order, released in reverse\n```ts\nclass Resource implements Disposable {\n  readonly name: string;\n  constructor(name: string) {\n    this.name = name;\n    console.log(\"open \" + name);\n  }\n  [Symbol.dispose](): void {\n    console.log(\"close \" + this.name);\n  }\n}\nfunction work(): string {\n  using db = new Resource(\"db\");\n  using file = new Resource(\"file\");\n  console.log(`using ${db.name} and ${file.name}`);\n  return \"done\";\n}\nconsole.log(work());\n```\n\nPrints:\n```text\nopen db\nopen file\nusing db and file\nclose file\nclose db\ndone\n```\n\n`file` was acquired last, so it's released first; both are released before `work`'s return value reaches the caller.\n\n#### Cleanup on every exit path\n```ts\nclass Lock implements Disposable {\n  static held = 0;\n  constructor() {\n    Lock.held++;\n  }\n  [Symbol.dispose](): void {\n    Lock.held--;\n  }\n}\nfunction transfer(amount: number): string {\n  using lock = new Lock();\n  if (amount <= 0) return \"rejected\";\n  if (amount > 100) throw new Error(\"limit exceeded\");\n  return `moved ${amount} while holding ${Lock.held} lock`;\n}\nfor (const amount of [50, -1, 500]) {\n  try {\n    console.log(transfer(amount));\n  } catch (e) {\n    console.log(\"error: \" + (e instanceof Error ? e.message : String(e)));\n  }\n  console.log(`locks held afterwards: ${Lock.held}`);\n}\n```\n\nPrints:\n```text\nmoved 50 while holding 1 lock\nlocks held afterwards: 0\nrejected\nlocks held afterwards: 0\nerror: limit exceeded\nlocks held afterwards: 0\n```\n\nAn early `return` and a `throw` both release the lock — there is no path out of the block that skips `[Symbol.dispose]`.\n\n#### A stack of cleanups\n```ts\nfunction setup(fail: boolean): DisposableStack {\n  using stack = new DisposableStack();\n  stack.defer(() => console.log(\"  undo: stop server\"));\n  console.log(\"  start server\");\n  stack.defer(() => console.log(\"  undo: close cache\"));\n  console.log(\"  open cache\");\n  if (fail) throw new Error(\"config missing\");\n  return stack.move();\n}\nfor (const fail of [true, false]) {\n  console.log(fail ? \"setup that fails:\" : \"setup that succeeds:\");\n  try {\n    using app = setup(fail);\n    console.log(\"  running\");\n  } catch (e) {\n    console.log(\"  failed: \" + (e instanceof Error ? e.message : String(e)));\n  }\n}\n```\n\nPrints:\n```text\nsetup that fails:\n  start server\n  open cache\n  undo: close cache\n  undo: stop server\n  failed: config missing\nsetup that succeeds:\n  start server\n  open cache\n  running\n  undo: close cache\n  undo: stop server\n```\n\nOn failure the local `stack` undoes everything done so far. On success, `move()` hands the cleanups to the caller's `app`, which releases them when *its* block ends.\n\n#### Async cleanup with `await using`\n```ts\nclass Connection implements AsyncDisposable {\n  readonly id: number;\n  constructor(id: number) {\n    this.id = id;\n  }\n  async query(sql: string): Promise<string> {\n    return `#${this.id}: ${sql.toUpperCase()}`;\n  }\n  async [Symbol.asyncDispose](): Promise<void> {\n    await Promise.resolve();\n    console.log(`connection ${this.id} closed`);\n  }\n}\nasync function report(): Promise<void> {\n  await using conn = new Connection(7);\n  console.log(await conn.query(\"select 1\"));\n}\nawait report();\nconsole.log(\"after report\");\n```\n\nPrints:\n```text\n#7: SELECT 1\nconnection 7 closed\nafter report\n```\n\n`await using` waits for the async close to finish before `report` completes, so \"closed\" always prints before \"after report\".\n\n### What the compiler says\n```ts\nconst handle = { close() {} };\nfunction read() {\n  using h = handle;\n}\n```\n```text\nline 3: error TS2850: The initializer of a 'using' declaration must be either an object with a '[Symbol.dispose]()' method, or be 'null' or 'undefined'.\n  Property '[Symbol.dispose]' is missing in type '{ close(): void; }' but required in type 'Disposable'.\n```\n\n`using` needs an object with `[Symbol.dispose]()`. An object with a `close()` method isn't disposable until it says how — wrap it: `using h = { [Symbol.dispose]: () => handle.close() }`.\n\n```ts\nfunction read(conn: AsyncDisposable) {\n  await using c = conn;\n}\n```\n```text\nline 2: error TS2852: 'await using' statements are only allowed within async functions and at the top levels of modules.\n```\n\n`await using` waits for async cleanup, so it's only allowed where `await` is: in async functions and at a module's top level.\n\n### Pitfalls\n#### Cleanup skipped by an exception\n```ts\nconst log: string[] = [];\nfunction risky(fail: boolean): void {\n  log.push(\"open\");\n  if (fail) throw new Error(\"boom\");\n  log.push(\"close\");\n}\ntry {\n  risky(true);\n} catch {\n  log.push(\"caught\");\n}\nconsole.log(log.join(\", \"));\n```\nPrints:\n```text\nopen, caught\n```\n\nThe close sat after the code that threw, so it never ran. With `using`, the release happens on the way out — before the caller's `catch` even runs.\n\n```ts\nconst log: string[] = [];\nfunction risky(fail: boolean): void {\n  using _handle = { [Symbol.dispose]: () => log.push(\"close\") };\n  log.push(\"open\");\n  if (fail) throw new Error(\"boom\");\n}\ntry {\n  risky(true);\n} catch {\n  log.push(\"caught\");\n}\nconsole.log(log.join(\", \"));\n```\nPrints:\n```text\nopen, close, caught\n```\n\n#### Returning a resource you `using`-ed\n```ts\nclass File implements Disposable {\n  open = true;\n  read(): string {\n    return this.open ? \"contents\" : \"(read after close)\";\n  }\n  [Symbol.dispose](): void {\n    this.open = false;\n  }\n}\nfunction openFile(): File {\n  using f = new File();\n  return f;\n}\nconst f = openFile();\nconsole.log(f.read());\n```\nPrints:\n```text\n(read after close)\n```\n\n`using` ties the resource's lifetime to the block, so returning it hands back a closed file. The function that *creates* a resource returns it plainly; the caller that *uses* it declares `using`.\n\n```ts\nclass File implements Disposable {\n  open = true;\n  read(): string {\n    return this.open ? \"contents\" : \"(read after close)\";\n  }\n  [Symbol.dispose](): void {\n    this.open = false;\n  }\n}\nfunction openFile(): File {\n  return new File();\n}\n{\n  using f = openFile();\n  console.log(f.read());\n}\n```\nPrints:\n```text\ncontents\n```\n\n#### `using` on an async-only resource\n```ts\nconst conn: AsyncDisposable = { async [Symbol.asyncDispose]() { console.log(\"closed\"); } };\nasync function run(): Promise<void> {\n  using c = conn;\n  console.log(\"working\");\n}\nawait run();\n```\nThe compiler says:\n```text\nline 3: error TS2850: The initializer of a 'using' declaration must be either an object with a '[Symbol.dispose]()' method, or be 'null' or 'undefined'.\n  Property '[Symbol.dispose]' is missing in type 'AsyncDisposable' but required in type 'Disposable'.\n```\n\nAn object with only `[Symbol.asyncDispose]` can't be released synchronously; the compiler insists on `await using`.\n\n```ts\nconst conn: AsyncDisposable = { async [Symbol.asyncDispose]() { console.log(\"closed\"); } };\nasync function run(): Promise<void> {\n  await using c = conn;\n  console.log(\"working\");\n}\nawait run();\n```\nPrints:\n```text\nworking\nclosed\n```\n\n### Where it shows up later\n- **Week 25 — Errors.** `SuppressedError`, and why cleanup must not hide the original failure.\n- **Week 26 — Cancellation.** Removing listeners and clearing timers when an operation is aborted — natural disposables.\n\n### In an interview\n\n**What problem does `using` solve?**\n\nDeterministic cleanup. `using x = acquire()` guarantees `x[Symbol.dispose]()` runs when the block exits — on return, break or exception — and several resources are released in reverse order. It replaces nested `try`/`finally` blocks, like Java's try-with-resources.\n\n**How do you make a class usable with `using`?**\n\nImplement `Disposable`: a `[Symbol.dispose]()` method that releases the resource (idempotently, ideally). For async cleanup implement `[Symbol.asyncDispose]()` returning a promise and use `await using`.\n\n**How do you clean up partially completed setup?**\n\nCollect each step's undo in a `DisposableStack` held by `using`; if a later step throws, the stack undoes the earlier ones in reverse. On success, `stack.move()` transfers the cleanups to the object or caller that now owns the resources.",
+    "exercises": [
+      {
+        "id": "ts_resource_management-dispose",
+        "title": "Make it disposable",
+        "prompt": "`Timer` should report its elapsed ticks when released. Replace `____` with the method name that `using` calls.",
+        "hint": "The well-known symbol `Symbol.dispose`, as a computed method name.",
+        "language": "typescript",
+        "kind": "drill",
+        "difficulty": "",
+        "starter": "import * as fs from \"fs\";\nclass Timer implements Disposable {\n  readonly label: string;\n  ticks = 0;\n  constructor(label: string) {\n    this.label = label;\n  }\n  tick(): void {\n    this.ticks++;\n  }\n  ____(): void {\n    console.log(`${this.label}: ${this.ticks} ticks`);\n  }\n}\nfor (const line of fs.readFileSync(0, \"utf8\").trim().split(\"\\n\")) {\n  const [label = \"\", n = \"0\"] = line.trim().split(/\\s+/);\n  using t = new Timer(label);\n  for (let i = 0; i < Number(n); i++) t.tick();\n}\nconsole.log(\"all timers released\");\n",
+        "solution": "import * as fs from \"fs\";\nclass Timer implements Disposable {\n  readonly label: string;\n  ticks = 0;\n  constructor(label: string) {\n    this.label = label;\n  }\n  tick(): void {\n    this.ticks++;\n  }\n  [Symbol.dispose](): void {\n    console.log(`${this.label}: ${this.ticks} ticks`);\n  }\n}\nfor (const line of fs.readFileSync(0, \"utf8\").trim().split(\"\\n\")) {\n  const [label = \"\", n = \"0\"] = line.trim().split(/\\s+/);\n  using t = new Timer(label);\n  for (let i = 0; i < Number(n); i++) t.tick();\n}\nconsole.log(\"all timers released\");\n",
+        "tests": [
+          {
+            "input": "a 3\nb 0",
+            "output": "a: 3 ticks\nb: 0 ticks\nall timers released"
+          },
+          {
+            "input": "solo 5",
+            "output": "solo: 5 ticks\nall timers released"
+          }
+        ],
+        "source_slug": ""
+      },
+      {
+        "id": "ts_resource_management-stack",
+        "title": "Undo on failure",
+        "prompt": "Replace `____` with the call that registers the rollback for each step on the stack, so a failing step undoes every earlier step in reverse.",
+        "hint": "`stack.defer(fn)` registers a cleanup; `move()` at the end keeps them from running on success.",
+        "language": "typescript",
+        "kind": "drill",
+        "difficulty": "",
+        "starter": "import * as fs from \"fs\";\nfunction migrate(steps: string[]): string {\n  using stack = new DisposableStack();\n  for (const step of steps) {\n    if (step.startsWith(\"!\")) return `failed at ${step.slice(1)}`;\n    console.log(\"apply \" + step);\n    ____\n  }\n  stack.move();\n  return \"committed\";\n}\nfor (const line of fs.readFileSync(0, \"utf8\").trim().split(\"\\n\")) console.log(migrate(line.trim().split(/\\s+/)));\n",
+        "solution": "import * as fs from \"fs\";\nfunction migrate(steps: string[]): string {\n  using stack = new DisposableStack();\n  for (const step of steps) {\n    if (step.startsWith(\"!\")) return `failed at ${step.slice(1)}`;\n    console.log(\"apply \" + step);\n    stack.defer(() => console.log(\"rollback \" + step));\n  }\n  stack.move();\n  return \"committed\";\n}\nfor (const line of fs.readFileSync(0, \"utf8\").trim().split(\"\\n\")) console.log(migrate(line.trim().split(/\\s+/)));\n",
+        "tests": [
+          {
+            "input": "users posts !index",
+            "output": "apply users\napply posts\nrollback posts\nrollback users\nfailed at index"
+          },
+          {
+            "input": "a b",
+            "output": "apply a\napply b\ncommitted"
+          }
+        ],
+        "source_slug": ""
+      },
+      {
+        "id": "ts_resource_management-pool",
+        "title": "A connection pool that always gets its connections back",
+        "prompt": "A pool has 2 connections. Each input line is a job: a list of words; the job borrows a connection with `using`, prints `job <n> on conn <id>: <words upper-cased>`, and — if a word is `crash` — throws before finishing (print `job <n> failed`). Borrowing when none are free prints `job <n> waiting` (and the job is skipped). After each job print `free <k>`. A borrowed connection must be returned on every path.",
+        "hint": "`using` accepts `undefined`, so an unavailable connection needs no special case in the cleanup.",
+        "language": "typescript",
+        "kind": "challenge",
+        "difficulty": "Medium",
+        "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+        "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nclass Pool {\n  readonly #free: number[] = [1, 2];\n  borrow(): (Disposable & { id: number }) | undefined {\n    const id = this.#free.shift();\n    if (id === undefined) return undefined;\n    return { id, [Symbol.dispose]: () => void this.#free.push(id) };\n  }\n  get free(): number {\n    return this.#free.length;\n  }\n}\nconst pool = new Pool();\nfunction run(n: number, words: string[]): void {\n  using conn = pool.borrow();\n  if (conn === undefined) {\n    console.log(`job ${n} waiting`);\n    return;\n  }\n  if (words.includes(\"crash\")) throw new Error(\"crash\");\n  console.log(`job ${n} on conn ${conn.id}: ${words.join(\" \").toUpperCase()}`);\n}\ninput.split(\"\\n\").forEach((line, i) => {\n  try {\n    run(i + 1, line.trim().split(/\\s+/));\n  } catch {\n    console.log(`job ${i + 1} failed`);\n  }\n  console.log(`free ${pool.free}`);\n});\n",
+        "tests": [
+          {
+            "input": "hello world\ncrash now\nlast one",
+            "output": "job 1 on conn 1: HELLO WORLD\nfree 2\njob 2 failed\nfree 2\njob 3 on conn 1: LAST ONE\nfree 2"
+          },
+          {
+            "input": "a\nb\nc",
+            "output": "job 1 on conn 1: A\nfree 2\njob 2 on conn 2: B\nfree 2\njob 3 on conn 1: C\nfree 2"
+          }
+        ],
+        "source_slug": ""
+      }
+    ],
+    "cards": [],
+    "quiz": [
+      {
+        "question": "When is `x[Symbol.dispose]()` called for `using x = …`?",
+        "options": [
+          "When the enclosing block exits — normally, by return, or by exception",
+          "Immediately",
+          "At program exit",
+          "When `x` is garbage collected"
+        ],
+        "answer": 0,
+        "explanation": "Deterministic, like `finally`."
+      },
+      {
+        "question": "Two `using` declarations in one block are disposed in which order?",
+        "options": [
+          "Reverse order of declaration",
+          "Declaration order",
+          "Alphabetical",
+          "Unspecified"
+        ],
+        "answer": 0,
+        "explanation": "Last acquired, first released."
+      },
+      {
+        "question": "What does `using x = undefined` do?",
+        "options": [
+          "Nothing at block exit — `null` and `undefined` are allowed and skipped",
+          "Throws",
+          "Is a compile error",
+          "Disposes the enclosing object"
+        ],
+        "answer": 0,
+        "explanation": "Handy for optional resources."
+      },
+      {
+        "question": "Where is `await using` allowed?",
+        "options": [
+          "In async functions and at a module's top level",
+          "Anywhere",
+          "Only in classes",
+          "Only in generators"
+        ],
+        "answer": 0,
+        "explanation": "Wherever `await` is."
+      },
+      {
+        "question": "What is `DisposableStack.prototype.move()` for?",
+        "options": [
+          "Transferring the collected cleanups to a new stack so the current one won't run them",
+          "Reordering cleanups",
+          "Disposing twice",
+          "Moving a resource between threads"
+        ],
+        "answer": 0,
+        "explanation": "Used when setup succeeds and ownership passes to the caller."
+      },
+      {
+        "question": "A block throws and then a dispose also throws. What propagates?",
+        "options": [
+          "A `SuppressedError` holding both",
+          "Only the first error",
+          "Only the dispose error",
+          "Nothing"
+        ],
+        "answer": 0,
+        "explanation": "`.error` is the dispose error, `.suppressed` the original."
+      }
+    ],
+    "practice": []
+  },
+  {
+    "key": "ts_error_cause",
+    "name": "Error Types, Causes & Aggregates",
+    "category": "TS: Robustness",
+    "what": "`Error` subclasses with their own fields, the `cause` option that chains a low-level failure to the high-level one it caused, `AggregateError` for many failures at once, and catching `unknown` safely.",
+    "deep": "An error message says what went wrong; its *type* says what kind of wrong, and its *cause* says why. Subclass `Error` (and set `name`) so callers can `instanceof` it and read typed fields; wrap a lower-level error with `new ConfigError(\"…\", { cause: e })` instead of losing it; throw an `AggregateError` when several independent things failed. Under `useUnknownInCatchVariables` every `catch` receives `unknown`, so narrowing is part of the design, not an afterthought.",
+    "java": "Java has checked exceptions, typed `catch` clauses and `getCause()`. TypeScript has none of the first two: a `catch` catches everything, as `unknown`. You get the same expressiveness from `instanceof` narrowing on your own subclasses — and `cause` is the direct equivalent of Java's exception chaining.",
+    "language": "typescript",
+    "lesson": "### Why it exists\n\"Something went wrong\" is not an error handling strategy. The code that catches\nan error needs to decide: retry? show the user? give up? That decision depends\non *which* error it is — and a bare `Error` with a message string gives it\nnothing reliable to decide on.\n\nThe other half of the problem appears when errors travel up through layers. The\ndatabase driver fails with \"ECONNRESET\", the repository turns that into \"could\nnot load user\", the handler turns *that* into \"500 Internal Error\". If each layer\nthrows a new error and drops the old one, whoever reads the log sees only the\ntop message. `cause` keeps the chain.\n\n### The core idea\n**Subclass `Error` for kinds of failure.**\n\n```ts\nclass ValidationError extends Error {\n  override readonly name = \"ValidationError\";\n  readonly field: string;\n  constructor(field: string, message: string, options?: ErrorOptions) {\n    super(message, options);\n    this.field = field;\n  }\n}\n```\n\n- Set `name`: it's what `String(e)` and stack traces print.\n- Add typed fields (`field`, `status`, `retryable`) — callers read them after\n  `e instanceof ValidationError`.\n- Pass `options` through to `super` so callers can attach a `cause`.\n\n**Chain with `cause`.** `new LoadError(\"could not load user 7\", { cause: e })`\nkeeps the original. Walk the chain with `while (err instanceof Error) { …; err =\nerr.cause; }`. Log the chain; show the user the top.\n\n**`AggregateError`** carries many errors: `new AggregateError(errors,\n\"3 fields invalid\")`, read back with `.errors`. `Promise.any` rejects with one\nwhen every promise fails.\n\n**Catch `unknown`.** Anything can be thrown — strings, numbers, objects — so a\n`catch (e)` variable is `unknown` under `strict`. Narrow before use:\n`e instanceof ValidationError` → typed fields; `e instanceof Error` → `message`;\notherwise `String(e)`. Rethrow what you don't handle.\n\n**Throw, or return a `Result`?** Throw for failures the immediate caller can't\nreasonably handle (bugs, lost connections). Return a `Result` (week 12's\ndiscriminated union) for *expected* failures that the caller must handle (bad\ninput, not found) — the compiler then makes them deal with it. The week's\nproblem set has both.\n\n### Worked examples\n#### A subclass callers can recognise\n```ts\nclass ValidationError extends Error {\n  override readonly name = \"ValidationError\";\n  readonly field: string;\n  constructor(field: string, message: string) {\n    super(message);\n    this.field = field;\n  }\n}\nfunction parseAge(text: string): number {\n  const n = Number(text);\n  if (!Number.isInteger(n)) throw new ValidationError(\"age\", `not a whole number: ${text}`);\n  if (n < 0 || n > 150) throw new ValidationError(\"age\", `out of range: ${n}`);\n  return n;\n}\nfor (const t of [\"42\", \"4.5\", \"-3\", \"x\"]) {\n  try {\n    console.log(\"age \" + parseAge(t));\n  } catch (e) {\n    if (e instanceof ValidationError) console.log(`${e.name} on ${e.field}: ${e.message}`);\n    else throw e;\n  }\n}\n```\n\nPrints:\n```text\nage 42\nValidationError on age: not a whole number: 4.5\nValidationError on age: out of range: -3\nValidationError on age: not a whole number: x\n```\n\n`instanceof ValidationError` narrows `e` from `unknown` to the subclass, so `e.field` is typed. Anything else is rethrown — this `catch` only handles what it understands.\n\n#### A chain of causes\n```ts\nclass ConfigError extends Error {\n  override readonly name = \"ConfigError\";\n}\nclass StartupError extends Error {\n  override readonly name = \"StartupError\";\n}\nfunction readConfig(text: string): { port: number } {\n  try {\n    return JSON.parse(text) as { port: number };\n  } catch (e) {\n    throw new ConfigError(\"config is not valid JSON\", { cause: e });\n  }\n}\nfunction start(text: string): string {\n  try {\n    return `listening on ${readConfig(text).port}`;\n  } catch (e) {\n    throw new StartupError(\"server could not start\", { cause: e });\n  }\n}\ntry {\n  console.log(start('{\"port\": 80'));\n} catch (e) {\n  let err: unknown = e;\n  for (let depth = 0; err instanceof Error; depth++) {\n    console.log(`${\"  \".repeat(depth)}${err.name}: ${err.message.split(\"\\n\")[0]?.split(\" (\")[0]}`);\n    err = err.cause;\n  }\n}\n```\n\nPrints:\n```text\nStartupError: server could not start\n  ConfigError: config is not valid JSON\n    SyntaxError: Expected ',' or '}' after property value in JSON at position 11\n```\n\nEach layer adds what *it* knows and keeps the rest via `cause`. The top of the chain is for the user; the whole chain is for whoever debugs it.\n\n#### Many failures at once\n```ts\nfunction validate(user: { name: string; email: string; age: number }): void {\n  const errors: Error[] = [];\n  if (user.name.trim() === \"\") errors.push(new Error(\"name is required\"));\n  if (!user.email.includes(\"@\")) errors.push(new Error(\"email is invalid\"));\n  if (user.age < 13) errors.push(new Error(\"age must be at least 13\"));\n  if (errors.length > 0) throw new AggregateError(errors, `${errors.length} problems`);\n}\nfor (const user of [{ name: \"ana\", email: \"ana@x.io\", age: 30 }, { name: \"\", email: \"nope\", age: 9 }]) {\n  try {\n    validate(user);\n    console.log(\"ok\");\n  } catch (e) {\n    if (!(e instanceof AggregateError)) throw e;\n    console.log(e.message);\n    for (const inner of e.errors) console.log(\" - \" + (inner instanceof Error ? inner.message : String(inner)));\n  }\n}\n```\n\nPrints:\n```text\nok\n3 problems\n - name is required\n - email is invalid\n - age must be at least 13\n```\n\nReporting every problem at once — as the week 17 validators did — with a standard error type that carries the list.\n\n### What the compiler says\n```ts\ntry {\n  JSON.parse(\"{\");\n} catch (e) {\n  console.log(e.message);\n}\n```\n```text\nline 4: error TS18046: 'e' is of type 'unknown'.\n```\n\n`e` is `unknown` under `strict`: JavaScript can throw anything. Narrow with `instanceof Error` first.\n\n```ts\nclass HttpError extends Error {\n  readonly status: number;\n  constructor(status: number, message: string) {\n    super(message);\n    this.status = status;\n  }\n}\nfunction report(e: Error): number {\n  return e.status;\n}\n```\n```text\nline 9: error TS2339: Property 'status' does not exist on type 'Error'.\n```\n\nOnly `HttpError` has `status`. Narrow first — `e instanceof HttpError ? e.status : 500` — or take an `HttpError` parameter.\n\n### Pitfalls\n#### Throwing a string\n```ts\nfunction load(id: number): string {\n  if (id < 0) throw `bad id ${id}`;\n  return \"user \" + id;\n}\ntry {\n  load(-1);\n} catch (e) {\n  console.log(\"failed: \" + (e as Error).message);\n}\n```\nPrints:\n```text\nfailed: undefined\n```\n\nA thrown string has no `message` (and no stack trace), and `as Error` hid that from the compiler. Throw `Error` objects, and narrow instead of asserting in `catch`.\n\n```ts\nfunction load(id: number): string {\n  if (id < 0) throw new RangeError(`bad id ${id}`);\n  return \"user \" + id;\n}\ntry {\n  load(-1);\n} catch (e) {\n  console.log(\"failed: \" + (e instanceof Error ? e.message : String(e)));\n}\n```\nPrints:\n```text\nfailed: bad id -1\n```\n\n#### A subclass that forgot its name\n```ts\nclass NotFoundError extends Error {}\ntry {\n  throw new NotFoundError(\"user 7\");\n} catch (e) {\n  console.log(String(e));\n}\n```\nPrints:\n```text\nError: user 7\n```\n\nWithout `name`, a subclass prints as a plain `Error` in logs and stack traces. `instanceof` still works — but the humans reading the log can't tell.\n\n```ts\nclass NotFoundError extends Error {\n  override readonly name = \"NotFoundError\";\n}\ntry {\n  throw new NotFoundError(\"user 7\");\n} catch (e) {\n  console.log(String(e));\n}\n```\nPrints:\n```text\nNotFoundError: user 7\n```\n\n#### Rethrowing without the cause\n```ts\nfunction fetchUser(): never {\n  throw new Error(\"ECONNRESET\");\n}\ntry {\n  try {\n    fetchUser();\n  } catch {\n    throw new Error(\"could not load user\");\n  }\n} catch (e) {\n  const cause = e instanceof Error && e.cause instanceof Error ? e.cause.message : \"(none)\";\n  console.log(`${e instanceof Error ? e.message : e} — cause: ${cause}`);\n}\n```\nPrints:\n```text\ncould not load user — cause: (none)\n```\n\nWrapping is right — the caller shouldn't see `ECONNRESET` as *its* error — but dropping the original makes the real failure invisible. `{ cause }` keeps it.\n\n```ts\nfunction fetchUser(): never {\n  throw new Error(\"ECONNRESET\");\n}\ntry {\n  try {\n    fetchUser();\n  } catch (inner) {\n    throw new Error(\"could not load user\", { cause: inner });\n  }\n} catch (e) {\n  const cause = e instanceof Error && e.cause instanceof Error ? e.cause.message : \"(none)\";\n  console.log(`${e instanceof Error ? e.message : e} — cause: ${cause}`);\n}\n```\nPrints:\n```text\ncould not load user — cause: ECONNRESET\n```\n\n### Where it shows up later\n- **Week 25 — `Result`.** Returning expected failures as values instead of throwing them.\n- **Week 25 — Resource management.** `SuppressedError` when cleanup fails during an error.\n- **Week 26 — Async.** `Promise.allSettled` and `Promise.any`'s `AggregateError`.\n\n### In an interview\n\n**How do you design errors in a TypeScript codebase?**\n\nSubclass `Error` for each kind a caller might handle differently, set `name`, add typed fields (`status`, `field`, `retryable`), and pass `ErrorOptions` through so callers can attach a `cause`. Catch as `unknown`, narrow with `instanceof`, handle what you understand, rethrow the rest. Expected failures that callers must handle are often better as a returned `Result`.\n\n**What is `error.cause` for?**\n\nChaining: when a layer catches a low-level error and throws its own, it passes the original as `{ cause }`. Logs can then show the whole chain — \"server could not start ← config is not valid JSON ← Unexpected end of JSON input\" — while the user only sees the top.\n\n**Why is the catch variable `unknown`?**\n\nBecause JavaScript can throw any value — a string, `undefined`, an object. Typing it as `Error` (the old `any` behaviour) was a lie that crashed on `e.message`. `useUnknownInCatchVariables` (part of `strict`) makes you narrow first.",
+    "exercises": [
+      {
+        "id": "ts_error_cause-narrow",
+        "title": "Handle only what you understand",
+        "prompt": "Replace `____` with the condition that recognises a `ParseError`, so its `line` field can be read; any other error is rethrown.",
+        "hint": "`instanceof` narrows `unknown` to the subclass.",
+        "language": "typescript",
+        "kind": "drill",
+        "difficulty": "",
+        "starter": "import * as fs from \"fs\";\nclass ParseError extends Error {\n  override readonly name = \"ParseError\";\n  readonly line: number;\n  constructor(line: number, message: string) {\n    super(message);\n    this.line = line;\n  }\n}\nfunction parse(lines: string[]): number {\n  let total = 0;\n  lines.forEach((l, i) => {\n    const n = Number(l);\n    if (!Number.isFinite(n)) throw new ParseError(i + 1, `not a number: ${l}`);\n    total += n;\n  });\n  return total;\n}\ntry {\n  console.log(\"total \" + parse(fs.readFileSync(0, \"utf8\").trim().split(\"\\n\")));\n} catch (e) {\n  if (____) console.log(`line ${e.line}: ${e.message}`);\n  else throw e;\n}\n",
+        "solution": "import * as fs from \"fs\";\nclass ParseError extends Error {\n  override readonly name = \"ParseError\";\n  readonly line: number;\n  constructor(line: number, message: string) {\n    super(message);\n    this.line = line;\n  }\n}\nfunction parse(lines: string[]): number {\n  let total = 0;\n  lines.forEach((l, i) => {\n    const n = Number(l);\n    if (!Number.isFinite(n)) throw new ParseError(i + 1, `not a number: ${l}`);\n    total += n;\n  });\n  return total;\n}\ntry {\n  console.log(\"total \" + parse(fs.readFileSync(0, \"utf8\").trim().split(\"\\n\")));\n} catch (e) {\n  if (e instanceof ParseError) console.log(`line ${e.line}: ${e.message}`);\n  else throw e;\n}\n",
+        "tests": [
+          {
+            "input": "1\n2\n3",
+            "output": "total 6"
+          },
+          {
+            "input": "4\nfive\n6",
+            "output": "line 2: not a number: five"
+          },
+          {
+            "input": "x",
+            "output": "line 1: not a number: x"
+          }
+        ],
+        "source_slug": ""
+      },
+      {
+        "id": "ts_error_cause-chain",
+        "title": "Keep the cause",
+        "prompt": "Replace `____` so the high-level error keeps the low-level one as its cause; the program prints the whole chain.",
+        "hint": "The second argument to `Error` is an options object with `cause`.",
+        "language": "typescript",
+        "kind": "drill",
+        "difficulty": "",
+        "starter": "import * as fs from \"fs\";\nfunction readNumber(text: string): number {\n  const n = Number(text);\n  if (!Number.isFinite(n)) throw new Error(`\"${text}\" is not a number`);\n  return n;\n}\nfunction loadPrice(text: string): number {\n  try {\n    return readNumber(text);\n  } catch (e) {\n    ____\n  }\n}\nfor (const line of fs.readFileSync(0, \"utf8\").trim().split(\"\\n\")) {\n  try {\n    console.log(`price ${loadPrice(line.trim())}`);\n  } catch (e) {\n    const parts: string[] = [];\n    for (let err: unknown = e; err instanceof Error; err = err.cause) parts.push(err.message);\n    console.log(parts.join(\" <- \"));\n  }\n}\n",
+        "solution": "import * as fs from \"fs\";\nfunction readNumber(text: string): number {\n  const n = Number(text);\n  if (!Number.isFinite(n)) throw new Error(`\"${text}\" is not a number`);\n  return n;\n}\nfunction loadPrice(text: string): number {\n  try {\n    return readNumber(text);\n  } catch (e) {\n    throw new Error(\"could not load price\", { cause: e });\n  }\n}\nfor (const line of fs.readFileSync(0, \"utf8\").trim().split(\"\\n\")) {\n  try {\n    console.log(`price ${loadPrice(line.trim())}`);\n  } catch (e) {\n    const parts: string[] = [];\n    for (let err: unknown = e; err instanceof Error; err = err.cause) parts.push(err.message);\n    console.log(parts.join(\" <- \"));\n  }\n}\n",
+        "tests": [
+          {
+            "input": "12.5\nabc",
+            "output": "price 12.5\ncould not load price <- \"abc\" is not a number"
+          },
+          {
+            "input": "-3",
+            "output": "price -3"
+          }
+        ],
+        "source_slug": ""
+      },
+      {
+        "id": "ts_error_cause-http",
+        "title": "Map errors to responses",
+        "prompt": "Define `NotFoundError` and `ValidationError` (with a `field`), both with names. Each input line is a request `get <id>`: ids must be positive integers (`ValidationError` on field `id`), and only ids 1-3 exist (`NotFoundError`); id 7 simulates a bug by throwing a plain `Error(\"db exploded\")`. Handle each request and print `200 user <id>`, `400 <field>: <message>`, `404 <message>`, or — for anything unrecognised — `500 internal error (<name>: <message>)`.",
+        "hint": "Check the most specific classes first; everything else is a 500.",
+        "language": "typescript",
+        "kind": "challenge",
+        "difficulty": "Medium",
+        "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+        "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nclass NotFoundError extends Error {\n  override readonly name = \"NotFoundError\";\n}\nclass ValidationError extends Error {\n  override readonly name = \"ValidationError\";\n  readonly field: string;\n  constructor(field: string, message: string) {\n    super(message);\n    this.field = field;\n  }\n}\nfunction getUser(idText: string): string {\n  const id = Number(idText);\n  if (!Number.isInteger(id) || id <= 0) throw new ValidationError(\"id\", `must be a positive integer, got ${idText}`);\n  if (id === 7) throw new Error(\"db exploded\");\n  if (id > 3) throw new NotFoundError(`no user ${id}`);\n  return `user ${id}`;\n}\nfor (const line of input.split(\"\\n\")) {\n  const id = line.trim().split(/\\s+/)[1] ?? \"\";\n  try {\n    console.log(`200 ${getUser(id)}`);\n  } catch (e) {\n    if (e instanceof ValidationError) console.log(`400 ${e.field}: ${e.message}`);\n    else if (e instanceof NotFoundError) console.log(`404 ${e.message}`);\n    else console.log(`500 internal error (${e instanceof Error ? `${e.name}: ${e.message}` : String(e)})`);\n  }\n}\n",
+        "tests": [
+          {
+            "input": "get 2\nget 9\nget x\nget 7\nget 0",
+            "output": "200 user 2\n404 no user 9\n400 id: must be a positive integer, got x\n500 internal error (Error: db exploded)\n400 id: must be a positive integer, got 0"
+          },
+          {
+            "input": "get 3",
+            "output": "200 user 3"
+          }
+        ],
+        "source_slug": ""
+      }
+    ],
+    "cards": [],
+    "quiz": [
+      {
+        "question": "Why set `name` on an `Error` subclass?",
+        "options": [
+          "It's what `String(e)` and stack traces print",
+          "`instanceof` needs it",
+          "It makes the error serialisable",
+          "`super` requires it"
+        ],
+        "answer": 0,
+        "explanation": "`instanceof` works without it; people reading logs don't."
+      },
+      {
+        "question": "How do you keep the original error when wrapping it?",
+        "options": [
+          "`new Error(\"high-level message\", { cause: original })`",
+          "Concatenate the messages",
+          "Throw both",
+          "`original.wrap()`"
+        ],
+        "answer": 0,
+        "explanation": "`cause` is part of the standard `Error` constructor (ES2022)."
+      },
+      {
+        "question": "What type is `e` in `catch (e)` under `strict`?",
+        "options": [
+          "`unknown`",
+          "`Error`",
+          "`any`",
+          "`never`"
+        ],
+        "answer": 0,
+        "explanation": "`useUnknownInCatchVariables` — anything can be thrown."
+      },
+      {
+        "question": "What does `AggregateError` hold?",
+        "options": [
+          "A list of errors in `.errors`, plus its own message",
+          "The first error only",
+          "A stack of causes",
+          "Only strings"
+        ],
+        "answer": 0,
+        "explanation": "`Promise.any` throws one when every promise rejects."
+      },
+      {
+        "question": "A `catch` block receives an error it doesn't understand. What should it do?",
+        "options": [
+          "Rethrow it",
+          "Log and ignore it",
+          "Return `undefined`",
+          "Convert it to a string"
+        ],
+        "answer": 0,
+        "explanation": "Handle what you can; let the rest propagate."
+      },
+      {
+        "question": "When is returning a `Result` better than throwing?",
+        "options": [
+          "For expected failures the caller must handle, like invalid input",
+          "Never",
+          "For programming bugs",
+          "For lost connections"
+        ],
+        "answer": 0,
+        "explanation": "The compiler then forces the caller to deal with the failure case."
+      }
+    ],
+    "practice": []
+  },
+  {
+    "key": "ts_event_loop",
+    "name": "The Event Loop",
+    "category": "TS: Runtime & Architecture",
+    "what": "How JavaScript runs asynchronous code on one thread: the call stack, the microtask queue (promise callbacks, `await` continuations, `queueMicrotask`) and the task queue (timers) — and how to predict the order things print.",
+    "deep": "JavaScript runs one piece of code at a time. When the current synchronous code finishes, the runtime drains the **microtask** queue completely — every `.then` callback, every resumed `await`, every `queueMicrotask` — and only then takes the next **task**, such as a `setTimeout` callback. That single rule predicts almost every async ordering question, explains why `await` gives other code a turn, and explains why a busy loop freezes timers.",
+    "java": "Java runs async work on thread pools, with real parallelism and locks. A JavaScript program has one thread for your code: there are no data races between callbacks, but there is an order — and a long synchronous computation blocks everything else, including timers.",
+    "language": "typescript",
+    "lesson": "### Why it exists\n\"What does this print?\" is the most common async interview question, and the\nmost common async bug is the same question asked by accident: a log line appears\nbefore the data it describes, a `forEach` finishes before its async callbacks, a\ntimer fires later than expected because a loop never yielded.\n\nNone of it is random. The runtime follows a small, fixed set of rules about\n*when* each callback runs. Learn them once and you can read async code the way\nthe engine runs it — and write code whose output doesn't depend on timing at all.\n\n### The core idea\n**One call stack.** Synchronous code runs to completion; nothing interrupts it.\n\n**Two queues.**\n\n- **Microtasks:** promise reactions (`.then`/`.catch`/`.finally` callbacks),\n  the continuation after each `await`, and `queueMicrotask(fn)`.\n- **Tasks (macrotasks):** timers (`setTimeout`), I/O callbacks, events.\n\n**The loop.** Run the current task to completion → run **all** microtasks,\nincluding any queued while draining → take the next task → repeat. So:\n\n```ts\nconsole.log(\"A\");\nsetTimeout(() => console.log(\"E\"), 0);\nPromise.resolve().then(() => console.log(\"C\"));\nqueueMicrotask(() => console.log(\"D\"));\nconsole.log(\"B\");\n// A B C D E\n```\n\n**`await` splits a function.** Everything before the first `await` runs\nsynchronously, as part of the caller. The rest is scheduled as a microtask when\nthe awaited promise settles — which is why two `async` calls interleave at their\n`await`s.\n\n**Timers are ordered by delay, then by when they were set.** A `setTimeout(f, 0)`\nstill waits for the current code *and* every microtask. Delays are minimums, not\npromises: a long synchronous loop delays every timer.\n\n**Writing deterministic async code** (this programme's rule, M6-03): make order\ndepend on these rules — microtasks before tasks, timers by delay — or on explicit\nsequencing (`await`, index-ordered results), never on how long something took.\n\n### Worked examples\n#### Sync, then microtasks, then timers\n```ts\nconsole.log(\"1 sync\");\nsetTimeout(() => console.log(\"6 timer\"), 0);\nPromise.resolve().then(() => console.log(\"3 promise\"));\nqueueMicrotask(() => console.log(\"4 queueMicrotask\"));\nPromise.resolve().then(() => {\n  console.log(\"5 promise, queued from a microtask:\");\n  queueMicrotask(() => console.log(\"5b still before the timer\"));\n});\nconsole.log(\"2 sync\");\n```\n\nPrints:\n```text\n1 sync\n2 sync\n3 promise\n4 queueMicrotask\n5 promise, queued from a microtask:\n5b still before the timer\n6 timer\n```\n\nThe whole microtask queue — including microtasks added while it drains — runs before the first timer.\n\n#### `await` hands over control\n```ts\nasync function task(name: string): Promise<void> {\n  console.log(`${name}: start`);\n  await null;\n  console.log(`${name}: after first await`);\n  await null;\n  console.log(`${name}: done`);\n}\nconst a = task(\"a\");\nconst b = task(\"b\");\nconsole.log(\"both started\");\nawait Promise.all([a, b]);\nconsole.log(\"all finished\");\n```\n\nPrints:\n```text\na: start\nb: start\nboth started\na: after first await\nb: after first await\na: done\nb: done\nall finished\n```\n\nEach `task` runs synchronously up to its first `await`, then returns a pending promise. The continuations are microtasks, so `a` and `b` take turns.\n\n#### Timers by delay\n```ts\nconst order: string[] = [];\nsetTimeout(() => order.push(\"30ms\"), 30);\nsetTimeout(() => order.push(\"10ms\"), 10);\nsetTimeout(() => order.push(\"0ms\"), 0);\nsetTimeout(() => order.push(\"10ms, set later\"), 10);\nsetTimeout(() => console.log(order.join(\" -> \")), 50);\n```\n\nPrints:\n```text\n0ms -> 10ms -> 10ms, set later -> 30ms\n```\n\nTimers fire by delay; equal delays fire in the order they were set. None of this depends on how fast the machine is.\n\n#### Sequential vs concurrent, made visible\n```ts\nconst events: string[] = [];\nconst fakeRequest = (name: string) =>\n  new Promise<string>((resolve) => {\n    events.push(`start ${name}`);\n    setTimeout(() => {\n      events.push(`end ${name}`);\n      resolve(name.toUpperCase());\n    }, 10);\n  });\n\nfor (const n of [\"a\", \"b\"]) await fakeRequest(n);\nconsole.log(\"sequential: \" + events.join(\", \"));\n\nevents.length = 0;\nconst results = await Promise.all([\"a\", \"b\"].map(fakeRequest));\nconsole.log(\"concurrent: \" + events.join(\", \"));\nconsole.log(results.join(\",\"));\n```\n\nPrints:\n```text\nsequential: start a, end a, start b, end b\nconcurrent: start a, start b, end a, end b\nA,B\n```\n\nAwaiting inside the loop starts each request after the previous one ends. Mapping to promises first starts them all, and `Promise.all` returns results in input order however they finish.\n\n### What the compiler says\n```ts\nfunction load(): string {\n  const text = await Promise.resolve(\"data\");\n  return text;\n}\n```\n```text\nline 2: error TS1308: 'await' expressions are only allowed within async functions and at the top levels of modules.\n```\n\n`await` is only allowed inside an `async` function (or at a module's top level). Mark the function `async` — its return type becomes `Promise<string>`.\n\n```ts\nasync function isReady(): Promise<boolean> {\n  return false;\n}\nif (isReady()) console.log(\"ready!\");\n```\n```text\nline 4: error TS2801: This condition will always return true since this 'Promise<boolean>' is always defined.\n```\n\nA `Promise` object is always truthy, whatever it will resolve to. The compiler catches the missing `await`.\n\n### Pitfalls\n#### `forEach` with an async callback\n```ts\nconst saved: string[] = [];\nconst save = async (x: string) => {\n  await null;\n  saved.push(x);\n};\nasync function saveAll(items: string[]): Promise<void> {\n  items.forEach(async (x) => {\n    await save(x);\n  });\n  console.log(`saved ${saved.length} of ${items.length}`);\n}\nawait saveAll([\"a\", \"b\", \"c\"]);\n```\nPrints:\n```text\nsaved 0 of 3\n```\n\n`forEach` ignores the promises its callback returns, so `saveAll` reported before any save finished. Use `for…of` with `await` (in order) or `await Promise.all(items.map(save))` (concurrently).\n\n```ts\nconst saved: string[] = [];\nconst save = async (x: string) => {\n  await null;\n  saved.push(x);\n};\nasync function saveAll(items: string[]): Promise<void> {\n  for (const x of items) await save(x);\n  console.log(`saved ${saved.length} of ${items.length}`);\n}\nawait saveAll([\"a\", \"b\", \"c\"]);\n```\nPrints:\n```text\nsaved 3 of 3\n```\n\n#### A promise nobody awaited\n```ts\nlet status = \"idle\";\nasync function sync(): Promise<void> {\n  await null;\n  status = \"synced\";\n}\nasync function main(): Promise<void> {\n  sync();\n  console.log(\"status: \" + status);\n}\nawait main();\n```\nPrints:\n```text\nstatus: idle\n```\n\nA floating promise runs on its own schedule: `main` read `status` before `sync` resumed. (Lint rules like `no-floating-promises` catch this; the compiler only catches it in conditions.)\n\n```ts\nlet status = \"idle\";\nasync function sync(): Promise<void> {\n  await null;\n  status = \"synced\";\n}\nasync function main(): Promise<void> {\n  await sync();\n  console.log(\"status: \" + status);\n}\nawait main();\n```\nPrints:\n```text\nstatus: synced\n```\n\n#### A timer that waits for microtasks\n```ts\nconst log: string[] = [];\nsetTimeout(() => log.push(\"timer\"), 0);\nlet n = 0;\nconst spin = (): void => {\n  if (n++ < 3) {\n    log.push(`microtask ${n}`);\n    queueMicrotask(spin);\n  }\n};\nqueueMicrotask(spin);\nsetTimeout(() => console.log(log.join(\", \")), 5);\n```\nPrints:\n```text\nmicrotask 1, microtask 2, microtask 3, timer\n```\n\nMicrotasks that keep queueing microtasks all run before the timer — the timer is *starved* until the chain ends. Scheduling each step as a task lets other tasks take turns.\n\n```ts\nconst log: string[] = [];\nsetTimeout(() => log.push(\"timer\"), 0);\nlet n = 0;\nconst spin = (): void => {\n  if (n++ < 3) {\n    log.push(`step ${n}`);\n    setTimeout(spin, 0);\n  } else {\n    console.log(log.join(\", \"));\n  }\n};\nsetTimeout(spin, 0);\n```\nPrints:\n```text\ntimer, step 1, step 2, step 3\n```\n\n### Where it shows up later\n- **Week 26 — Cancellation.** Stopping async work that's already been started.\n- **Week 26 — Async iteration.** Consuming values that arrive over time with `for await`.\n\n### In an interview\n\n**Explain the event loop.**\n\nJavaScript runs one task at a time on a single thread. After the current task (say, the script, or a timer callback) finishes, the runtime drains the microtask queue — promise callbacks, `await` continuations, `queueMicrotask` — completely, then takes the next task from the task queue: timers, I/O, events. So synchronous code runs first, then microtasks, then timers, which is how you predict print order.\n\n**What does `await` actually do?**\n\nIt suspends the async function and returns control to the caller; when the awaited promise settles, the rest of the function is queued as a microtask. Code before the first `await` runs synchronously. Two async functions called one after the other therefore interleave at their `await` points.\n\n**How do you run async operations in parallel and keep results in order?**\n\nStart them all first — `items.map(fn)` creates the promises — then `await Promise.all(promises)`, whose results are in input order. For a bounded number at a time, use a small pool that starts the next item as each finishes.",
+    "exercises": [
+      {
+        "id": "ts_event_loop-order",
+        "title": "Queue it for after the sync code",
+        "prompt": "The program should print the input words in order, then `-- microtasks --`, then each word reversed. Replace `____` so each reversal is printed from a microtask.",
+        "hint": "`queueMicrotask(fn)` runs `fn` after the current synchronous code.",
+        "language": "typescript",
+        "kind": "drill",
+        "difficulty": "",
+        "starter": "import * as fs from \"fs\";\nconst words = fs.readFileSync(0, \"utf8\").trim().split(/\\s+/);\nfor (const w of words) {\n  ____\n  console.log(w);\n}\nconsole.log(\"-- microtasks --\");\n",
+        "solution": "import * as fs from \"fs\";\nconst words = fs.readFileSync(0, \"utf8\").trim().split(/\\s+/);\nfor (const w of words) {\n  queueMicrotask(() => console.log([...w].reverse().join(\"\")));\n  console.log(w);\n}\nconsole.log(\"-- microtasks --\");\n",
+        "tests": [
+          {
+            "input": "abc def",
+            "output": "abc\ndef\n-- microtasks --\ncba\nfed"
+          },
+          {
+            "input": "x",
+            "output": "x\n-- microtasks --\nx"
+          }
+        ],
+        "source_slug": ""
+      },
+      {
+        "id": "ts_event_loop-all",
+        "title": "Start them together",
+        "prompt": "`double` is async. Replace `____` so all the calls start at once and the results arrive in input order.",
+        "hint": "Map to promises first, then await them all with `Promise.all`.",
+        "language": "typescript",
+        "kind": "drill",
+        "difficulty": "",
+        "starter": "import * as fs from \"fs\";\nconst log: string[] = [];\nasync function double(n: number): Promise<number> {\n  log.push(`start ${n}`);\n  await null;\n  return n * 2;\n}\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(/\\s+/).map(Number);\nconst results = ____;\nconsole.log(log.join(\", \"));\nconsole.log(results.join(\" \"));\n",
+        "solution": "import * as fs from \"fs\";\nconst log: string[] = [];\nasync function double(n: number): Promise<number> {\n  log.push(`start ${n}`);\n  await null;\n  return n * 2;\n}\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(/\\s+/).map(Number);\nconst results = await Promise.all(nums.map(double));\nconsole.log(log.join(\", \"));\nconsole.log(results.join(\" \"));\n",
+        "tests": [
+          {
+            "input": "1 2 3",
+            "output": "start 1, start 2, start 3\n2 4 6"
+          },
+          {
+            "input": "10",
+            "output": "start 10\n20"
+          }
+        ],
+        "source_slug": ""
+      },
+      {
+        "id": "ts_event_loop-simulate",
+        "title": "Predict the order",
+        "prompt": "Each input line is an operation for a tiny event-loop simulator: `log <x>` (synchronous), `micro <x>` (queue a microtask that logs x), `timer <ms> <x>` (a timer that logs x). Simulate the rules — run every `log` in order, then all microtasks in order, then timers by delay (ties in the order they were set) — and print the order as `x -> y -> …`. Then check your simulator against the real runtime: schedule the same operations with `queueMicrotask`/`setTimeout` and print the real order too, as `real: …`, then `match: true|false`.",
+        "hint": "Three buckets: synchronous logs, microtasks, timers sorted by delay then by position.",
+        "language": "typescript",
+        "kind": "challenge",
+        "difficulty": "Hard",
+        "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+        "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Op = { kind: \"log\" | \"micro\"; label: string } | { kind: \"timer\"; ms: number; label: string };\nconst ops: Op[] = input.split(\"\\n\").map((line) => {\n  const [kind = \"\", a = \"\", b = \"\"] = line.trim().split(/\\s+/);\n  return kind === \"timer\" ? { kind: \"timer\", ms: Number(a), label: b } : { kind: kind === \"micro\" ? \"micro\" : \"log\", label: a };\n});\nconst predicted = [\n  ...ops.filter((o) => o.kind === \"log\").map((o) => o.label),\n  ...ops.filter((o) => o.kind === \"micro\").map((o) => o.label),\n  ...ops.flatMap((o, i) => (o.kind === \"timer\" ? [{ ms: o.ms, i, label: o.label }] : []))\n    .sort((a, b) => a.ms - b.ms || a.i - b.i)\n    .map((t) => t.label),\n];\nconsole.log(predicted.join(\" -> \"));\nconst real: string[] = [];\nfor (const o of ops) {\n  if (o.kind === \"timer\") setTimeout(() => real.push(o.label), o.ms);\n  else if (o.kind === \"log\") real.push(o.label);\n  else queueMicrotask(() => real.push(o.label));\n}\nconst longest = Math.max(0, ...ops.map((o) => (o.kind === \"timer\" ? o.ms : 0)));\nsetTimeout(() => {\n  console.log(\"real: \" + real.join(\" -> \"));\n  console.log(`match: ${real.join() === predicted.join()}`);\n}, longest + 20);\n",
+        "tests": [
+          {
+            "input": "log a\ntimer 0 t1\nmicro m1\nlog b\ntimer 5 t2\nmicro m2\ntimer 0 t3",
+            "output": "a -> b -> m1 -> m2 -> t1 -> t3 -> t2\nreal: a -> b -> m1 -> m2 -> t1 -> t3 -> t2\nmatch: true"
+          },
+          {
+            "input": "timer 10 late\nlog only",
+            "output": "only -> late\nreal: only -> late\nmatch: true"
+          }
+        ],
+        "source_slug": ""
+      }
+    ],
+    "cards": [],
+    "quiz": [
+      {
+        "question": "`setTimeout(f, 0)` and `Promise.resolve().then(g)` are scheduled in that order. Which runs first?",
+        "options": [
+          "`g` — microtasks run before the next timer",
+          "`f` — it was scheduled first",
+          "They run together",
+          "It depends on the machine"
+        ],
+        "answer": 0,
+        "explanation": "The whole microtask queue drains before any task."
+      },
+      {
+        "question": "What runs synchronously when you call an `async` function?",
+        "options": [
+          "Its body up to the first `await`",
+          "Nothing — it all runs later",
+          "The whole body",
+          "Only the return statement"
+        ],
+        "answer": 0,
+        "explanation": "The rest is resumed as a microtask."
+      },
+      {
+        "question": "Which of these is a microtask?",
+        "options": [
+          "The continuation after an `await`",
+          "A `setTimeout` callback",
+          "An I/O callback",
+          "A click event"
+        ],
+        "answer": 0,
+        "explanation": "Also `.then` callbacks and `queueMicrotask`."
+      },
+      {
+        "question": "Why does `items.forEach(async (x) => await save(x))` not wait?",
+        "options": [
+          "`forEach` ignores the promises its callback returns",
+          "`forEach` is synchronous only for arrays of numbers",
+          "`await` doesn't work in arrow functions",
+          "It does wait"
+        ],
+        "answer": 0,
+        "explanation": "Use `for…of` with `await`, or `Promise.all(items.map(…))`."
+      },
+      {
+        "question": "A synchronous loop runs for two seconds. What happens to a `setTimeout(f, 10)` set before it?",
+        "options": [
+          "It runs after the loop — about two seconds late",
+          "It interrupts the loop",
+          "It runs on another thread",
+          "It's cancelled"
+        ],
+        "answer": 0,
+        "explanation": "Nothing interrupts running code; a delay is a minimum."
+      },
+      {
+        "question": "`Promise.all([slow(), fast()])` — what order are the results in?",
+        "options": [
+          "Input order, regardless of which finished first",
+          "Completion order",
+          "Random",
+          "Reverse"
+        ],
+        "answer": 0,
+        "explanation": "That's what makes it deterministic to print."
+      }
+    ],
+    "practice": []
+  },
+  {
+    "key": "ts_cancellation",
+    "name": "Cancellation: AbortController & Friends",
+    "category": "TS: Runtime & Architecture",
+    "what": "Stopping async work that has already started: `AbortController` and `AbortSignal`, timeouts and combined signals, and the promise helpers `Promise.withResolvers` and `Promise.try`.",
+    "deep": "A promise can't be cancelled — once work has started, only the work itself can decide to stop. The web-standard way to ask it to is an `AbortSignal`: the caller keeps an `AbortController`, passes `controller.signal` down, and calls `abort(reason)`; the work checks `signal.aborted` (or calls `signal.throwIfAborted()`) between steps and listens for the `abort` event to stop timers. `AbortSignal.timeout(ms)` and `AbortSignal.any([...])` build signals for timeouts and \"whichever comes first\".",
+    "java": "Java cancels a `Future` or interrupts a thread; the task must still check `isInterrupted()`. JavaScript's `AbortSignal` is the same cooperative idea, standardised across `fetch`, Node streams, timers and event listeners — so one signal can cancel a whole tree of operations.",
+    "language": "typescript",
+    "lesson": "### Why it exists\nThe user closes the page, types another letter into the search box, or gives up\nwaiting. The request you started is still running, and it will finish and update\nthe screen with a stale result — or keep a connection busy for nothing.\n\n`Promise.race(work, timeout)` looks like a fix and isn't: the loser keeps\nrunning. Real cancellation is a conversation: the caller signals, and the work\nstops at the next safe point and cleans up. `AbortController` is the standard\nshape of that conversation, and it's what `fetch`, Node's APIs and most\nlibraries accept.\n\n### The core idea\n**The pair.**\n\n```ts\nconst controller = new AbortController();\nstartWork(controller.signal);        // pass the signal down\ncontroller.abort(new Error(\"user cancelled\"));   // later\n```\n\n`signal.aborted` becomes `true`, `signal.reason` holds the reason (a\n`DOMException` named `AbortError` if you gave none), and an `abort` event fires\nonce.\n\n**Inside the work.** Check between steps — `signal.throwIfAborted()` throws the\nreason — and, for anything that waits (a timer, a listener), subscribe with\n`signal.addEventListener(\"abort\", …, { once: true })` so the wait ends\nimmediately. Always remove listeners and clear timers when the work finishes\nnormally too.\n\n**Composing signals.** `AbortSignal.timeout(ms)` aborts itself after `ms` with a\n`TimeoutError`. `AbortSignal.any([userSignal, AbortSignal.timeout(5000)])`\naborts when *either* does — \"cancel, or give up after 5 s\" in one signal.\n\n**Promise helpers.** `Promise.withResolvers<T>()` returns\n`{ promise, resolve, reject }`, so code that isn't inside a `new Promise`\nexecutor can settle it — the natural way to build a cancellable wait.\n`Promise.try(fn)` runs `fn` and always returns a promise, turning a synchronous\n`throw` into a rejection.\n\n**Contracts to keep.** An aborted operation should reject (typically with the\nsignal's reason) rather than resolve with a partial result; callers tell a\ncancellation from a failure with `signal.aborted` or the error's `name`.\n\n### Worked examples\n#### Cooperative cancellation between steps\n```ts\nasync function process(items: string[], signal: AbortSignal): Promise<string[]> {\n  const done: string[] = [];\n  for (const item of items) {\n    signal.throwIfAborted();\n    await null;\n    done.push(item.toUpperCase());\n    console.log(\"processed \" + item);\n  }\n  return done;\n}\nconst controller = new AbortController();\nconst work = process([\"a\", \"b\", \"c\", \"d\"], controller.signal);\nqueueMicrotask(() => queueMicrotask(() => controller.abort(new Error(\"user cancelled\"))));\ntry {\n  console.log(\"result \" + (await work).join(\",\"));\n} catch (e) {\n  console.log(\"stopped: \" + (e instanceof Error ? e.message : String(e)));\n}\n```\n\nPrints:\n```text\nprocessed a\nprocessed b\nprocessed c\nstopped: user cancelled\n```\n\nThe work checks the signal before each step, so it stops at the first safe point after `abort` — here after the third item — and rejects with the reason instead of returning a partial result.\n\n#### A cancellable sleep with `Promise.withResolvers`\n```ts\nfunction sleep(ms: number, signal: AbortSignal): Promise<void> {\n  const { promise, resolve, reject } = Promise.withResolvers<void>();\n  const onAbort = () => {\n    clearTimeout(timer);\n    reject(signal.reason);\n  };\n  const timer = setTimeout(() => {\n    signal.removeEventListener(\"abort\", onAbort);\n    resolve();\n  }, ms);\n  signal.addEventListener(\"abort\", onAbort, { once: true });\n  return promise;\n}\nconst c = new AbortController();\nsetTimeout(() => c.abort(new Error(\"gave up\")), 20);\nfor (const ms of [5, 100]) {\n  try {\n    await sleep(ms, c.signal);\n    console.log(`slept ${ms}ms`);\n  } catch (e) {\n    console.log(`sleep ${ms}ms interrupted: ${e instanceof Error ? e.message : String(e)}`);\n  }\n}\n```\n\nPrints:\n```text\nslept 5ms\nsleep 100ms interrupted: gave up\n```\n\n`withResolvers` hands `resolve` and `reject` to the timer and the abort listener. Whichever happens first wins, and it tidies up after the other so nothing fires later.\n\n#### Cancel or time out, whichever comes first\n```ts\nasync function slowTask(signal: AbortSignal): Promise<string> {\n  for (let step = 1; step <= 5; step++) {\n    await new Promise<void>((r) => setTimeout(r, 20));\n    signal.throwIfAborted();\n  }\n  return \"finished\";\n}\nconst user = new AbortController();\nconst signal = AbortSignal.any([user.signal, AbortSignal.timeout(50)]);\ntry {\n  console.log(await slowTask(signal));\n} catch (e) {\n  const name = e instanceof Error ? e.name : \"unknown\";\n  console.log(name === \"TimeoutError\" ? \"gave up: took longer than 50ms\" : \"cancelled by the user\");\n}\n```\n\nPrints:\n```text\ngave up: took longer than 50ms\n```\n\n`AbortSignal.any` combines the user's signal with a timeout. The task needs ~100ms and the timeout fires at 50ms, so the result is always the timeout — decided by fixed delays, not by machine speed.\n\n#### `Promise.try` turns a throw into a rejection\n```ts\nfunction parse(text: string): number {\n  const n = Number(text);\n  if (!Number.isFinite(n)) throw new Error(`not a number: ${text}`);\n  return n;\n}\nfor (const t of [\"42\", \"x\"]) {\n  const result = await Promise.try(() => parse(t)).then(\n    (n) => `ok ${n}`,\n    (e: unknown) => `rejected: ${e instanceof Error ? e.message : String(e)}`,\n  );\n  console.log(result);\n}\n```\n\nPrints:\n```text\nok 42\nrejected: not a number: x\n```\n\nA synchronous `throw` inside `Promise.try` becomes a rejected promise, so one `.then(ok, fail)` handles both the sync and async failure paths.\n\n### What the compiler says\n```ts\nconst controller = new AbortController();\ncontroller.signal.aborted = true;\n```\n```text\nline 2: error TS2540: Cannot assign to 'aborted' because it is a read-only property.\n```\n\nA signal is read-only for everyone but its controller: call `controller.abort(reason)`. That also sets the reason and fires the `abort` event, which assigning a flag never could.\n\n```ts\nconst { promise, resolve } = Promise.withResolvers<string>();\nresolve(42);\n```\n```text\nline 2: error TS2345: Argument of type 'number' is not assignable to parameter of type 'string | PromiseLike<string>'.\n```\n\n`withResolvers<string>()` gives a `resolve` that only accepts strings — the same type the `promise` will produce.\n\n### Pitfalls\n#### Work that ignores its signal\n```ts\nasync function download(parts: number, signal: AbortSignal): Promise<number> {\n  let got = 0;\n  for (let i = 1; i <= parts; i++) {\n    await null;\n    got++;\n  }\n  return got;\n}\nconst c = new AbortController();\nconst job = download(5, c.signal);\nc.abort();\nconst got = await job;\nconsole.log(`parts downloaded after abort: ${got}`);\n```\nPrints:\n```text\nparts downloaded after abort: 5\n```\n\nAccepting a signal isn't the same as honouring it: cancellation is cooperative. Check it at every step (the first `got++` ran before the check in the second version only because the loop body had already started).\n\n```ts\nasync function download(parts: number, signal: AbortSignal): Promise<number> {\n  let got = 0;\n  for (let i = 1; i <= parts; i++) {\n    if (signal.aborted) break;\n    await null;\n    got++;\n  }\n  return got;\n}\nconst c = new AbortController();\nconst job = download(5, c.signal);\nc.abort();\nconst got = await job;\nconsole.log(`parts downloaded after abort: ${got}`);\n```\nPrints:\n```text\nparts downloaded after abort: 1\n```\n\n#### `Promise.race` doesn't stop the loser\n```ts\nconst log: string[] = [];\nasync function work(): Promise<string> {\n  for (let i = 1; i <= 4; i++) {\n    await new Promise<void>((r) => setTimeout(r, 30));\n    log.push(`step ${i}`);\n  }\n  return \"done\";\n}\nconst timeout = new Promise<string>((r) => setTimeout(() => r(\"timed out\"), 45));\nconsole.log(await Promise.race([work(), timeout]));\nawait new Promise<void>((r) => setTimeout(r, 150));\nconsole.log(log.join(\", \"));\n```\nPrints:\n```text\ntimed out\nstep 1, step 2, step 3, step 4\n```\n\nThe race resolved at 25ms, but the first `work` kept going to step 4. Racing only decides which result you *read*; stopping the work needs a signal the work checks.\n\n```ts\nconst log: string[] = [];\nasync function work(signal: AbortSignal): Promise<string> {\n  for (let i = 1; i <= 4; i++) {\n    await new Promise<void>((r) => setTimeout(r, 30));\n    if (signal.aborted) return \"cancelled\";\n    log.push(`step ${i}`);\n  }\n  return \"done\";\n}\nconst c = new AbortController();\nconst timeout = new Promise<string>((r) => setTimeout(() => { c.abort(); r(\"timed out\"); }, 45));\nconsole.log(await Promise.race([work(c.signal), timeout]));\nawait new Promise<void>((r) => setTimeout(r, 150));\nconsole.log(log.join(\", \"));\n```\nPrints:\n```text\ntimed out\nstep 1\n```\n\n#### Treating cancellation as a failure\n```ts\nasync function fetchData(signal: AbortSignal): Promise<string> {\n  await null;\n  signal.throwIfAborted();\n  return \"data\";\n}\nconst c = new AbortController();\nc.abort();\ntry {\n  await fetchData(c.signal);\n} catch (e) {\n  console.log(\"ERROR: fetch failed — alerting on-call\");\n}\n```\nPrints:\n```text\nERROR: fetch failed — alerting on-call\n```\n\nAn abort rejects the promise, so it arrives in the same `catch` as real failures. Check `signal.aborted` (or the error's `name`) before treating it as an error.\n\n```ts\nasync function fetchData(signal: AbortSignal): Promise<string> {\n  await null;\n  signal.throwIfAborted();\n  return \"data\";\n}\nconst c = new AbortController();\nc.abort();\ntry {\n  await fetchData(c.signal);\n} catch (e) {\n  if (c.signal.aborted) console.log(\"cancelled (\" + (e instanceof Error ? e.name : \"?\") + \") — nothing to report\");\n  else console.log(\"ERROR: fetch failed — alerting on-call\");\n}\n```\nPrints:\n```text\ncancelled (AbortError) — nothing to report\n```\n\n### Where it shows up later\n- **Week 26 — Problem set.** A cancellable task runner, retries that stop when aborted, debouncing on a simulated clock.\n- **Week 25 — Resource management.** Removing listeners and clearing timers are cleanups — `using` fits them.\n\n### In an interview\n\n**How do you cancel an in-flight async operation?**\n\nCreate an `AbortController`, pass its `signal` into the operation, and call `abort(reason)`. The operation checks `signal.aborted` or calls `signal.throwIfAborted()` between steps and listens for the `abort` event to stop timers or requests; `fetch` and most Node APIs accept the signal directly. It's cooperative — the work has to honour it.\n\n**How would you implement a timeout for an async function?**\n\nCombine signals: `AbortSignal.any([callerSignal, AbortSignal.timeout(ms)])` and pass that down. That stops the work when the timeout fires, unlike `Promise.race`, which only stops you waiting while the work keeps running.\n\n**What are `Promise.withResolvers` and `Promise.try` for?**\n\n`withResolvers` gives you a promise plus its `resolve`/`reject` so you can settle it from event handlers or timers without nesting code in an executor — useful for cancellable waits and gates. `Promise.try(fn)` runs `fn` and always returns a promise, converting a synchronous throw into a rejection so one error path handles both.",
+    "exercises": [
+      {
+        "id": "ts_cancellation-check",
+        "title": "Honour the signal",
+        "prompt": "`sum` adds numbers one per microtask. Replace `____` so it stops — rejecting with the signal's reason — as soon as the signal is aborted.",
+        "hint": "One call on the signal throws its reason if it has been aborted.",
+        "language": "typescript",
+        "kind": "drill",
+        "difficulty": "",
+        "starter": "import * as fs from \"fs\";\nasync function sum(nums: number[], signal: AbortSignal): Promise<number> {\n  let total = 0;\n  for (const n of nums) {\n    ____\n    await null;\n    total += n;\n  }\n  return total;\n}\nconst [limit = 0, ...nums] = fs.readFileSync(0, \"utf8\").trim().split(/\\s+/).map(Number);\nconst c = new AbortController();\nlet ticks = 0;\nconst tick = () => {\n  if (++ticks >= limit) c.abort(new Error(`aborted after ${limit} ticks`));\n  else queueMicrotask(tick);\n};\nif (limit > 0) queueMicrotask(tick);\ntry {\n  console.log(\"total \" + (await sum(nums, c.signal)));\n} catch (e) {\n  console.log(e instanceof Error ? e.message : String(e));\n}\n",
+        "solution": "import * as fs from \"fs\";\nasync function sum(nums: number[], signal: AbortSignal): Promise<number> {\n  let total = 0;\n  for (const n of nums) {\n    signal.throwIfAborted();\n    await null;\n    total += n;\n  }\n  return total;\n}\nconst [limit = 0, ...nums] = fs.readFileSync(0, \"utf8\").trim().split(/\\s+/).map(Number);\nconst c = new AbortController();\nlet ticks = 0;\nconst tick = () => {\n  if (++ticks >= limit) c.abort(new Error(`aborted after ${limit} ticks`));\n  else queueMicrotask(tick);\n};\nif (limit > 0) queueMicrotask(tick);\ntry {\n  console.log(\"total \" + (await sum(nums, c.signal)));\n} catch (e) {\n  console.log(e instanceof Error ? e.message : String(e));\n}\n",
+        "tests": [
+          {
+            "input": "0 1 2 3",
+            "output": "total 6"
+          },
+          {
+            "input": "2 5 5 5 5 5",
+            "output": "aborted after 2 ticks"
+          },
+          {
+            "input": "1 7",
+            "output": "total 7"
+          }
+        ],
+        "source_slug": ""
+      },
+      {
+        "id": "ts_cancellation-resolvers",
+        "title": "A gate you open from outside",
+        "prompt": "Replace `____` with the call that creates a promise together with its `resolve` function, so the `open` command can release everyone waiting.",
+        "hint": "`Promise.withResolvers<T>()` returns `{ promise, resolve, reject }`.",
+        "language": "typescript",
+        "kind": "drill",
+        "difficulty": "",
+        "starter": "import * as fs from \"fs\";\nconst { promise: gate, resolve: open } = ____;\nconst waiting: Promise<void>[] = [];\nfor (const line of fs.readFileSync(0, \"utf8\").trim().split(\"\\n\")) {\n  const [cmd = \"\", arg = \"\"] = line.trim().split(/\\s+/);\n  if (cmd === \"wait\") waiting.push(gate.then((msg) => console.log(`${arg} released: ${msg}`)));\n  else if (cmd === \"open\") open(arg);\n  console.log(\"handled \" + cmd);\n}\nawait Promise.all(waiting);\n",
+        "solution": "import * as fs from \"fs\";\nconst { promise: gate, resolve: open } = Promise.withResolvers<string>();\nconst waiting: Promise<void>[] = [];\nfor (const line of fs.readFileSync(0, \"utf8\").trim().split(\"\\n\")) {\n  const [cmd = \"\", arg = \"\"] = line.trim().split(/\\s+/);\n  if (cmd === \"wait\") waiting.push(gate.then((msg) => console.log(`${arg} released: ${msg}`)));\n  else if (cmd === \"open\") open(arg);\n  console.log(\"handled \" + cmd);\n}\nawait Promise.all(waiting);\n",
+        "tests": [
+          {
+            "input": "wait ana\nwait bo\nopen go",
+            "output": "handled wait\nhandled wait\nhandled open\nana released: go\nbo released: go"
+          },
+          {
+            "input": "open now\nwait late",
+            "output": "handled open\nhandled wait\nlate released: now"
+          }
+        ],
+        "source_slug": ""
+      },
+      {
+        "id": "ts_cancellation-retry",
+        "title": "Retries that stop when cancelled",
+        "prompt": "Write `retry(task, attempts, signal)` that calls an async task up to `attempts` times, stopping early if the signal is aborted (rejecting with its reason) and rethrowing the last failure otherwise. The input's first line is how many attempts; the second is the outcome of each call to the task (`fail`, `ok`); the third, `cancel <n>` or `none`, aborts the signal right after the task has been called n times. Print `attempt <k>` for each call, then `result <value>`, `failed: <message>` or `cancelled: <reason>`.",
+        "hint": "Check the signal before every attempt; keep the last error to rethrow when attempts run out.",
+        "language": "typescript",
+        "kind": "challenge",
+        "difficulty": "Hard",
+        "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+        "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nasync function retry<T>(task: () => Promise<T>, attempts: number, signal: AbortSignal): Promise<T> {\n  let last: unknown = new Error(\"no attempts\");\n  for (let i = 1; i <= attempts; i++) {\n    signal.throwIfAborted();\n    try {\n      return await task();\n    } catch (e) {\n      last = e;\n    }\n  }\n  throw last;\n}\nconst [attemptsText = \"1\", outcomesText = \"\", cancelText = \"none\"] = input.split(\"\\n\");\nconst outcomes = outcomesText.trim().split(/\\s+/);\nconst cancelAfter = cancelText.startsWith(\"cancel\") ? Number(cancelText.split(\" \")[1]) : Infinity;\nconst c = new AbortController();\nlet calls = 0;\nconst task = async (): Promise<string> => {\n  calls++;\n  console.log(`attempt ${calls}`);\n  if (calls >= cancelAfter) c.abort(new Error(\"user pressed stop\"));\n  await null;\n  if (outcomes[calls - 1] === \"ok\") return `ok on attempt ${calls}`;\n  throw new Error(`attempt ${calls} failed`);\n};\ntry {\n  console.log(\"result \" + (await retry(task, Number(attemptsText), c.signal)));\n} catch (e) {\n  const message = e instanceof Error ? e.message : String(e);\n  console.log(c.signal.aborted ? `cancelled: ${message}` : `failed: ${message}`);\n}\n",
+        "tests": [
+          {
+            "input": "3\nfail fail ok\nnone",
+            "output": "attempt 1\nattempt 2\nattempt 3\nresult ok on attempt 3"
+          },
+          {
+            "input": "2\nfail fail fail\nnone",
+            "output": "attempt 1\nattempt 2\nfailed: attempt 2 failed"
+          },
+          {
+            "input": "5\nfail fail fail ok\ncancel 2",
+            "output": "attempt 1\nattempt 2\ncancelled: user pressed stop"
+          }
+        ],
+        "source_slug": ""
+      }
+    ],
+    "cards": [],
+    "quiz": [
+      {
+        "question": "Can you cancel a promise?",
+        "options": [
+          "No — you ask the work to stop via a signal, and it cooperates",
+          "Yes, with `promise.cancel()`",
+          "Yes, by rejecting it from outside",
+          "Only with `Promise.race`"
+        ],
+        "answer": 0,
+        "explanation": "Cancellation is cooperative in JavaScript."
+      },
+      {
+        "question": "What does `signal.throwIfAborted()` do?",
+        "options": [
+          "Throws the signal's reason if it has been aborted; otherwise nothing",
+          "Aborts the signal",
+          "Waits until it's aborted",
+          "Returns a boolean"
+        ],
+        "answer": 0,
+        "explanation": "The one-line check between steps."
+      },
+      {
+        "question": "`AbortSignal.any([a, b])` aborts when?",
+        "options": [
+          "When either `a` or `b` aborts",
+          "When both abort",
+          "Never",
+          "Immediately"
+        ],
+        "answer": 0,
+        "explanation": "Cancel-or-timeout in one signal."
+      },
+      {
+        "question": "What does `Promise.withResolvers<T>()` return?",
+        "options": [
+          "`{ promise, resolve, reject }`",
+          "A resolved promise",
+          "An `AbortController`",
+          "An array of promises"
+        ],
+        "answer": 0,
+        "explanation": "Settle the promise from outside an executor."
+      },
+      {
+        "question": "After `Promise.race([work(), timeout])` resolves with the timeout, what is `work()` doing?",
+        "options": [
+          "Still running, unless it was given a signal and checks it",
+          "It was cancelled",
+          "It was paused",
+          "It threw"
+        ],
+        "answer": 0,
+        "explanation": "Racing chooses a result; it doesn't stop anything."
+      },
+      {
+        "question": "`controller.abort()` with no argument — what is `signal.reason`?",
+        "options": [
+          "A `DOMException` named `AbortError`",
+          "`undefined`",
+          "`null`",
+          "`\"aborted\"`"
+        ],
+        "answer": 0,
+        "explanation": "Pass your own reason for a clearer message."
+      }
+    ],
+    "practice": []
+  },
+  {
+    "key": "ts_async_iteration",
+    "name": "Async Iteration",
+    "category": "TS: Runtime & Architecture",
+    "what": "Values that arrive over time: `for await…of`, async generators (`async function*`), `Symbol.asyncIterator`, `Array.fromAsync` — pagination, streams and pipelines that pull one item at a time.",
+    "deep": "A regular iterator hands out values synchronously; an async iterator hands out *promises* of values, and `for await (const x of source)` waits for each one before running the loop body. An async generator — `async function*` — can `await` and `yield`, which makes paginated APIs, line-by-line readers and polling loops look like ordinary loops. Consumers pull at their own pace, so a slow consumer naturally slows the producer (backpressure).",
+    "java": "Java's closest analogues are reactive streams (`Flow.Publisher`) or blocking iterators on a thread. JavaScript's async iterators are *pull*-based and built into the language: `for await` works on any object with `[Symbol.asyncIterator]`, including Node streams.",
+    "language": "typescript",
+    "lesson": "### Why it exists\nMany sources don't give you everything at once: an API returns results a page at\na time, a file arrives in chunks, a queue delivers messages as they come. The\nnaive version fetches everything into an array first — slow to start, and\nimpossible for sources that never end.\n\nAsync iteration lets you write the consumer as a plain loop — \"for each user, do\nthis\" — while the producer fetches the next page only when the loop asks for\nmore. Stop the loop early and the producer stops too. The pattern is everywhere\nin modern Node code, from `readline` to streams to database cursors.\n\n### The core idea\n**The protocol.** An async iterable has `[Symbol.asyncIterator]()` returning an\nobject whose `next()` returns a `Promise<IteratorResult<T>>`.\n\n**`for await…of`** pulls values one at a time, awaiting each:\n\n```ts\nfor await (const user of fetchAllUsers()) {\n  if (user.banned) break;      // stops the producer too\n  console.log(user.name);\n}\n```\n\nIt also accepts ordinary iterables of promises (`for await (const x of\n[p1, p2])`), awaiting each in order. Like `await`, it's only allowed in async\nfunctions and at a module's top level.\n\n**Async generators** are the easy way to write a source:\n\n```ts\nasync function* pages(): AsyncGenerator<User[]> {\n  for (let page = 1; ; page++) {\n    const batch = await fetchPage(page);\n    if (batch.length === 0) return;\n    yield batch;\n  }\n}\nasync function* users() {\n  for await (const batch of pages()) yield* batch;   // flatten pages into users\n}\n```\n\n- `yield*` delegates to another (async) iterable.\n- `break`, `return` or an exception in the consumer calls the generator's\n  `return()`, so its `finally` blocks run — clean up connections there.\n- Like sync generators, an async generator object is single-use.\n\n**Collecting.** `Array.fromAsync(source)` awaits every value into an array\n(ES2024). Use it when you really need them all; iterate when you don't.\n\n**Sequential by nature.** `for await` handles one item at a time. For bounded\nconcurrency, pull a few items and process them with `Promise.all`, or use a pool\n(week 26's problem set).\n\n### Worked examples\n#### Paginating a simulated API\n```ts\nconst DB = [\"ana\", \"bo\", \"cy\", \"dee\", \"eve\", \"fay\", \"gus\"];\nlet requests = 0;\nasync function fetchPage(page: number, size: number): Promise<string[]> {\n  requests++;\n  await null;\n  return DB.slice((page - 1) * size, page * size);\n}\nasync function* allUsers(size: number): AsyncGenerator<string> {\n  for (let page = 1; ; page++) {\n    const batch = await fetchPage(page, size);\n    if (batch.length === 0) return;\n    yield* batch;\n  }\n}\nfor await (const name of allUsers(3)) {\n  console.log(name);\n  if (name === \"dee\") break;\n}\nconsole.log(`requests made: ${requests}`);\n```\n\nPrints:\n```text\nana\nbo\ncy\ndee\nrequests made: 2\n```\n\nThe consumer stopped at `dee`, on the second page, so the third page was never requested. The generator fetches only as fast as the loop pulls.\n\n#### Collecting with `Array.fromAsync`\n```ts\nasync function* countdown(from: number): AsyncGenerator<number> {\n  for (let i = from; i > 0; i--) {\n    await null;\n    yield i;\n  }\n}\nconst all = await Array.fromAsync(countdown(4));\nconsole.log(all.join(\" \"));\nconst squares = await Array.fromAsync(countdown(3), (n) => n * n);\nconsole.log(squares.join(\" \"));\n```\n\nPrints:\n```text\n4 3 2 1\n9 4 1\n```\n\n`Array.fromAsync` is `Array.from` for async sources — including an optional mapping function. It waits for the source to end, so never use it on an infinite one.\n\n#### Cleanup when the consumer stops early\n```ts\nasync function* lines(text: string): AsyncGenerator<string> {\n  console.log(\"open\");\n  try {\n    for (const line of text.split(\"\\n\")) {\n      await null;\n      yield line;\n    }\n  } finally {\n    console.log(\"close\");\n  }\n}\nfor await (const line of lines(\"one\\ntwo\\nSTOP\\nfour\")) {\n  if (line === \"STOP\") break;\n  console.log(\"read \" + line);\n}\nconsole.log(\"after loop\");\n```\n\nPrints:\n```text\nopen\nread one\nread two\nclose\nafter loop\n```\n\n`break` calls the generator's `return()`, which runs its `finally` — the reader is closed before the loop statement finishes, exactly as `using` would guarantee.\n\n#### An async pipeline of generators\n```ts\nasync function* numbers(): AsyncGenerator<number> {\n  for (let i = 1; i <= 10; i++) {\n    await null;\n    yield i;\n  }\n}\nasync function* filterAsync<T>(source: AsyncIterable<T>, keep: (x: T) => boolean): AsyncGenerator<T> {\n  for await (const x of source) if (keep(x)) yield x;\n}\nasync function* mapAsync<T, U>(source: AsyncIterable<T>, fn: (x: T) => U): AsyncGenerator<U> {\n  for await (const x of source) yield fn(x);\n}\nconst pipeline = mapAsync(filterAsync(numbers(), (n) => n % 3 === 0), (n) => `#${n}`);\nconsole.log((await Array.fromAsync(pipeline)).join(\" \"));\n```\n\nPrints:\n```text\n#3 #6 #9\n```\n\nEach stage is a small async generator that pulls from the previous one — the async version of iterator helpers. Values flow through one at a time.\n\n### What the compiler says\n```ts\nasync function* ticks(): AsyncGenerator<number> {\n  yield 1;\n}\nfor (const t of ticks()) console.log(t);\n```\n```text\nline 4: error TS2488: Type 'AsyncGenerator<number, any, any>' must have a '[Symbol.iterator]()' method that returns an iterator.\n```\n\nAn async generator produces promises, so it's an *async* iterable: consume it with `for await`.\n\n```ts\nasync function* ticks(): AsyncGenerator<number> {\n  yield 1;\n}\nfunction show(): void {\n  for await (const t of ticks()) console.log(t);\n}\n```\n```text\nline 5: error TS1103: 'for await' loops are only allowed within async functions and at the top levels of modules.\n```\n\n`for await` waits, so — like `await` — it's only allowed in async functions and at a module's top level.\n\n### Pitfalls\n#### A sync loop over an async source\n```ts\nasync function* words(): AsyncGenerator<string> {\n  yield \"a\";\n  yield \"b\";\n}\nfor (const w of words()) console.log(w);\n```\nThe compiler says:\n```text\nline 5: error TS2488: Type 'AsyncGenerator<string, any, any>' must have a '[Symbol.iterator]()' method that returns an iterator.\n```\n\nValues from an async generator arrive as promises; `for await` waits for each.\n\n```ts\nasync function* words(): AsyncGenerator<string> {\n  yield \"a\";\n  yield \"b\";\n}\nfor await (const w of words()) console.log(w);\n```\nPrints:\n```text\na\nb\n```\n\n#### Iterating the same generator twice\n```ts\nasync function* ids(): AsyncGenerator<number> {\n  yield 1;\n  yield 2;\n}\nconst source = ids();\nconsole.log(\"first: \" + (await Array.fromAsync(source)).join(\",\"));\nconsole.log(\"second: \" + ((await Array.fromAsync(source)).join(\",\") || \"(nothing)\"));\n```\nPrints:\n```text\nfirst: 1,2\nsecond: (nothing)\n```\n\nA generator object is a single-use cursor. Call the generator function again for a fresh one.\n\n```ts\nasync function* ids(): AsyncGenerator<number> {\n  yield 1;\n  yield 2;\n}\nconsole.log(\"first: \" + (await Array.fromAsync(ids())).join(\",\"));\nconsole.log(\"second: \" + ((await Array.fromAsync(ids())).join(\",\") || \"(nothing)\"));\n```\nPrints:\n```text\nfirst: 1,2\nsecond: 1,2\n```\n\n#### `Array.from` on an async source\n```ts\nasync function* ids(): AsyncGenerator<number> {\n  yield 1;\n  yield 2;\n}\nconst all = Array.from(ids());\nconsole.log(all.length);\n```\nThe compiler says:\n```text\nline 5: error TS2769: No overload matches this call.\n  Overload 1 of 4, '(iterable: Iterable<unknown> | ArrayLike<unknown>): unknown[]', gave the following error.\n    Argument of type 'AsyncGenerator<number, any, any>' is not assignable to parameter of type 'Iterable<unknown> | ArrayLike<unknown>'.\n  Overload 2 of 4, '(arrayLike: ArrayLike<unknown>): unknown[]', gave the following error.\n    Argument of type 'AsyncGenerator<number, any, any>' is not assignable to parameter of type 'ArrayLike<unknown>'.\n      Property 'length' is missing in type 'AsyncGenerator<number, any, any>' but required in type 'ArrayLike<unknown>'.\n```\n\n`Array.from` needs a synchronous iterable. `Array.fromAsync` awaits each value — and returns a promise, so `await` it.\n\n```ts\nasync function* ids(): AsyncGenerator<number> {\n  yield 1;\n  yield 2;\n}\nconst all = await Array.fromAsync(ids());\nconsole.log(all.length);\n```\nPrints:\n```text\n2\n```\n\n### Where it shows up later\n- **Week 26 — Problem set.** Paginated loading, an async queue, and a concurrency-limited pool.\n- **Week 24 — Iterator helpers.** The synchronous version of these pipelines.\n\n### In an interview\n\n**What's an async iterator?**\n\nAn object whose `next()` returns a promise of `{ value, done }`, reachable through `[Symbol.asyncIterator]`. `for await…of` consumes it one value at a time. Async generators (`async function*`) are the easy way to produce one — they can `await` between `yield`s.\n\n**How would you consume a paginated API?**\n\nWrap it in an async generator that fetches page by page and `yield*`s each batch, so callers write `for await (const item of all())`. Pages are fetched lazily, the consumer can stop early (which ends the generator and runs its `finally`), and memory holds one page at a time.\n\n**`for await` vs `Promise.all`?**\n\n`for await` is sequential — one value at a time, good for streams and backpressure. `Promise.all` runs already-started promises concurrently and gives all results at once. For large workloads you often want something in between: a concurrency-limited pool.",
+    "exercises": [
+      {
+        "id": "ts_async_iteration-gen",
+        "title": "An async generator of pages",
+        "prompt": "Replace `____` so `pages` yields the input's items in pages of `size`, awaiting a (simulated) fetch for each page.",
+        "hint": "Loop over page numbers; stop (`return`) at the first empty page; `yield` each batch.",
+        "language": "typescript",
+        "kind": "drill",
+        "difficulty": "",
+        "starter": "import * as fs from \"fs\";\nconst [sizeText = \"2\", ...items] = fs.readFileSync(0, \"utf8\").trim().split(/\\s+/);\nconst size = Number(sizeText);\nasync function fetchPage(page: number): Promise<string[]> {\n  await null;\n  return items.slice(page * size, (page + 1) * size);\n}\nasync function* pages(): AsyncGenerator<string[]> {\n  ____\n}\nlet n = 0;\nfor await (const batch of pages()) console.log(`page ${++n}: ${batch.join(\" \")}`);\nconsole.log(`${n} pages`);\n",
+        "solution": "import * as fs from \"fs\";\nconst [sizeText = \"2\", ...items] = fs.readFileSync(0, \"utf8\").trim().split(/\\s+/);\nconst size = Number(sizeText);\nasync function fetchPage(page: number): Promise<string[]> {\n  await null;\n  return items.slice(page * size, (page + 1) * size);\n}\nasync function* pages(): AsyncGenerator<string[]> {\n  for (let page = 0; ; page++) {\n    const batch = await fetchPage(page);\n    if (batch.length === 0) return;\n    yield batch;\n  }\n}\nlet n = 0;\nfor await (const batch of pages()) console.log(`page ${++n}: ${batch.join(\" \")}`);\nconsole.log(`${n} pages`);\n",
+        "tests": [
+          {
+            "input": "2 a b c d e",
+            "output": "page 1: a b\npage 2: c d\npage 3: e\n3 pages"
+          },
+          {
+            "input": "3 x y z",
+            "output": "page 1: x y z\n1 pages"
+          },
+          {
+            "input": "5 solo",
+            "output": "page 1: solo\n1 pages"
+          }
+        ],
+        "source_slug": ""
+      },
+      {
+        "id": "ts_async_iteration-for-await",
+        "title": "Consume it with `for await`",
+        "prompt": "Replace `____` with the loop header that consumes `readings()` one value at a time, so the running average is printed after each reading.",
+        "hint": "`for await (const x of source)`.",
+        "language": "typescript",
+        "kind": "drill",
+        "difficulty": "",
+        "starter": "import * as fs from \"fs\";\nconst values = fs.readFileSync(0, \"utf8\").trim().split(/\\s+/).map(Number);\nasync function* readings(): AsyncGenerator<number> {\n  for (const v of values) {\n    await null;\n    yield v;\n  }\n}\nlet count = 0;\nlet total = 0;\n____ {\n  count++;\n  total += r;\n  console.log(`after ${count}: average ${(total / count).toFixed(2)}`);\n}\n",
+        "solution": "import * as fs from \"fs\";\nconst values = fs.readFileSync(0, \"utf8\").trim().split(/\\s+/).map(Number);\nasync function* readings(): AsyncGenerator<number> {\n  for (const v of values) {\n    await null;\n    yield v;\n  }\n}\nlet count = 0;\nlet total = 0;\nfor await (const r of readings()) {\n  count++;\n  total += r;\n  console.log(`after ${count}: average ${(total / count).toFixed(2)}`);\n}\n",
+        "tests": [
+          {
+            "input": "10 20 30",
+            "output": "after 1: average 10.00\nafter 2: average 15.00\nafter 3: average 20.00"
+          },
+          {
+            "input": "5",
+            "output": "after 1: average 5.00"
+          },
+          {
+            "input": "1 2",
+            "output": "after 1: average 1.00\nafter 2: average 1.50"
+          }
+        ],
+        "source_slug": ""
+      },
+      {
+        "id": "ts_async_iteration-merge",
+        "title": "Merge two sorted async streams",
+        "prompt": "The input has two lines of sorted numbers. Turn each into an async generator (one `await null` per value), then write `merge(a, b)` — an async generator that yields all values in sorted order by pulling from whichever stream has the smaller current value (`a` on ties). Print the merged values, then `pulled <k>` — how many values were pulled from the two sources in total — when the consumer stops after the first value greater than 50 (print the values up to and including it).",
+        "hint": "Keep the current `next()` result of each source; yield the smaller and advance that source only.",
+        "language": "typescript",
+        "kind": "challenge",
+        "difficulty": "Hard",
+        "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+        "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nasync function* fromList(xs: number[], counter: { pulled: number }): AsyncGenerator<number> {\n  for (const x of xs) {\n    await null;\n    counter.pulled++;\n    yield x;\n  }\n}\nasync function* merge(a: AsyncIterator<number>, b: AsyncIterator<number>): AsyncGenerator<number> {\n  let x = await a.next();\n  let y = await b.next();\n  while (!x.done || !y.done) {\n    if (!x.done && (y.done || x.value <= y.value)) {\n      yield x.value;\n      x = await a.next();\n    } else if (!y.done) {\n      yield y.value;\n      y = await b.next();\n    }\n  }\n}\nconst [first = \"\", second = \"\"] = input.split(\"\\n\");\nconst parse = (s: string) => s.trim().split(/\\s+/).filter((t) => t !== \"\").map(Number);\nconst counter = { pulled: 0 };\nconst out: number[] = [];\nfor await (const v of merge(fromList(parse(first), counter), fromList(parse(second), counter))) {\n  out.push(v);\n  if (v > 50) break;\n}\nconsole.log(out.join(\" \"));\nconsole.log(`pulled ${counter.pulled}`);\n",
+        "tests": [
+          {
+            "input": "1 4 9 60 70\n2 3 55 80",
+            "output": "1 2 3 4 9 55\npulled 7"
+          },
+          {
+            "input": "5 10\n7",
+            "output": "5 7 10\npulled 3"
+          },
+          {
+            "input": "100\n1 2",
+            "output": "1 2 100\npulled 3"
+          }
+        ],
+        "source_slug": ""
+      }
+    ],
+    "cards": [],
+    "quiz": [
+      {
+        "question": "What does `for await (const x of source)` do each iteration?",
+        "options": [
+          "Awaits the next value before running the body",
+          "Runs all iterations in parallel",
+          "Awaits only the first value",
+          "Nothing different from `for…of`"
+        ],
+        "answer": 0,
+        "explanation": "Values are pulled one at a time."
+      },
+      {
+        "question": "What does an `async function*` return?",
+        "options": [
+          "An async generator — an async iterable of its yielded values",
+          "A promise of an array",
+          "A regular generator",
+          "A single promise"
+        ],
+        "answer": 0,
+        "explanation": "Consume it with `for await` or `Array.fromAsync`."
+      },
+      {
+        "question": "A consumer `break`s out of `for await` early. What happens to the generator?",
+        "options": [
+          "Its `return()` is called, so its `finally` blocks run",
+          "It keeps running in the background",
+          "It throws",
+          "Nothing"
+        ],
+        "answer": 0,
+        "explanation": "Put cleanup in `finally`."
+      },
+      {
+        "question": "How do you collect an async iterable into an array?",
+        "options": [
+          "`await Array.fromAsync(source)`",
+          "`Array.from(source)`",
+          "`[...source]`",
+          "`source.toArray()`"
+        ],
+        "answer": 0,
+        "explanation": "ES2024; also takes a mapping function."
+      },
+      {
+        "question": "Can you iterate the same async generator object twice?",
+        "options": [
+          "No — it's single-use; call the generator function again",
+          "Yes",
+          "Only with `for await`",
+          "Only if it's finite"
+        ],
+        "answer": 0,
+        "explanation": "Same as sync generators."
+      },
+      {
+        "question": "Why is async iteration good for paginated APIs?",
+        "options": [
+          "The next page is fetched only when the consumer asks for more",
+          "It fetches all pages in parallel",
+          "It caches every page",
+          "It avoids promises"
+        ],
+        "answer": 0,
+        "explanation": "Stopping early saves the remaining requests."
+      }
+    ],
+    "practice": []
+  },
+  {
     "key": "jp_coding_basics",
     "name": "Coding Basics — プログラミングの基礎",
     "category": "JP: Coding Basics",

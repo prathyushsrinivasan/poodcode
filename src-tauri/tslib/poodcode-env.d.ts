@@ -166,3 +166,25 @@ interface FetchInit {
 }
 
 declare function fetch(input: string, init?: FetchInit): Promise<FetchResponse>;
+
+// The TypeScript Mastery "cancellation" chapter (week 26) teaches
+// AbortController / AbortSignal — host globals in Node 15+, typed here as the
+// DOM lib types them, narrowed to the members the programme's programs use.
+interface AbortSignal {
+  readonly aborted: boolean;
+  readonly reason: unknown;
+  throwIfAborted(): void;
+  addEventListener(type: "abort", listener: () => void, options?: { once?: boolean }): void;
+  removeEventListener(type: "abort", listener: () => void): void;
+  onabort: (() => void) | null;
+}
+declare var AbortSignal: {
+  prototype: AbortSignal;
+  abort(reason?: unknown): AbortSignal;
+  timeout(milliseconds: number): AbortSignal;
+  any(signals: AbortSignal[]): AbortSignal;
+};
+declare class AbortController {
+  readonly signal: AbortSignal;
+  abort(reason?: unknown): void;
+}
