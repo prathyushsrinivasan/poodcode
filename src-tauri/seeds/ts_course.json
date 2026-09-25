@@ -71591,19 +71591,1642 @@
       "month": 8,
       "month_title": "Advanced Types & Interview Polish",
       "theme": "Conditional & Mapped Types",
-      "goal": "Compute new types from existing ones with conditional and mapped types.",
-      "summary": "",
-      "authored": false,
-      "lessons": [],
-      "capstone": null,
-      "objectives": [],
-      "why": "",
-      "est_minutes": 40,
-      "glossary": [],
-      "cheatsheet": "",
-      "self_check": [],
-      "review": [],
-      "milestone": "",
+      "goal": "Types that compute other types: an `if` for types, a `for` loop over keys, and `infer` to pull a type out of another. Then rebuild Partial, Pick, Omit and Exclude by hand — and start a small typed library.",
+      "summary": "Week 14 used `Partial`, `Pick`, `Omit` and `Exclude`. They are not compiler magic.\nEach is a few characters of ordinary TypeScript, written with two tools this week\nteaches — and once you can write them, you can write the ones the library does not\nhave.\n\n## Two tools\n\n**Conditional types** — an `if` for types:\n\n```ts\ntype IsString<T> = T extends string ? true : false;\n```\n\n**Mapped types** — a `for` loop over a type's keys:\n\n```ts\ntype Optional<T> = { [K in keyof T]?: T[K] };      // that is Partial\n```\n\nPlus **`infer`**, which reads a type *out of* another: \"if `F` is a function, call\nits return type `R`\".\n\n## You have used one every week since week 10\n\nThe checker's `Equal<X, Y>` — the line in every type-graded harness — is a\nconditional type. This month you can read it.\n\n## How the week is graded\n\nMostly by the **compiler alone** (week 10's `judge_mode: \"types\"`): the exercise\npasses when the program type-checks against assertions like\n`Expect<Equal<Optional<Entry>, Partial<Entry>>>`. Where you rebuild a built-in, its\nname is **banned** from your answer, so the assertion cannot be satisfied by copying\nit. Lesson 6 and the capstone then put the types back onto running code.\n\n## The library\n\nMonths 5-7 ended on interview reps. The last four weeks build **a small typed\nlibrary**, one module a week. This week's module: a configuration loader whose\noverrides are a `DeepPartial` and whose result is `DeepReadonly` — and genuinely\nfrozen at run time.\n\n⏱️ Budget about **seven hours**.\n",
+      "authored": true,
+      "lessons": [
+        {
+          "key": "w29-conditional",
+          "title": "An if for types",
+          "what": "`T extends U ? X : Y` — and the Equal helper you have used since week 10.",
+          "lesson": "```ts\ntype IsString<T> = T extends string ? true : false;\n\ntype A = IsString<\"hello\">;     // true\ntype B = IsString<42>;          // false\n```\n\n`extends` here means **\"is assignable to\"**, the same relation as everywhere else.\n`\"hello\"` is assignable to `string`, so the first branch is chosen. The result is a\n**type** — `true` and `false` here are literal types, not values.\n\n## Useful at once\n\n```ts\ntype ElementOf<T> = T extends readonly unknown[] ? T[number] : never;\ntype Flatten<T>   = T extends readonly unknown[] ? T[number] : T;\n```\n\n`T[number]` is week 10's indexed access: \"the type you get by indexing with a\nnumber\" — the element type. It is only allowed once the compiler knows `T` *is* an\narray, which is exactly what the `extends` check establishes.\n\n## The error that asks for one\n\n```ts\ntype Len<T> = T[\"length\"];\n```\n\n```\nTS2536: Type '\"length\"' cannot be used to index type 'T'.\n```\n\nAn unconstrained `T` might be `number`, which has no `length`. Either constrain the\nparameter (`T extends readonly unknown[]`) or branch on it with a conditional.\n\n## Reading `Equal`\n\nEvery type-graded exercise since week 10 has run this:\n\n```ts\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\n```\n\nTwo conditional types, deferred because `T` is unknown, compared with a third. The\ncompiler can only call the two deferred types identical when `X` and `Y` are\n*identical* — which is stricter than \"each assignable to the other\", and is why\n`Equal<any, string>` is false where `any extends string` is not. You do not have to\nbe able to invent that; you now can read it.\n\n> ⚠️ **Common mistakes:** reading `extends` as \"inherits\"; indexing an\n> unconstrained parameter; and expecting `true`/`false` here to be booleans at run\n> time — they exist only for the compiler.\n",
+          "warmup": [
+            {
+              "question": "In a conditional type, `extends` means…",
+              "options": [
+                "inherits from",
+                "is assignable to",
+                "equals",
+                "contains"
+              ],
+              "answer": 1,
+              "explanation": "The ordinary relation."
+            },
+            {
+              "question": "`IsString<42>` is…",
+              "options": [
+                "true",
+                "false",
+                "never",
+                "number"
+              ],
+              "answer": 1,
+              "explanation": "42 is not assignable to string."
+            },
+            {
+              "question": "`T[number]` on an array type is…",
+              "options": [
+                "the length",
+                "the element type",
+                "a number",
+                "never"
+              ],
+              "answer": 1,
+              "explanation": "Indexed access by number."
+            },
+            {
+              "question": "`type Len<T> = T[\"length\"]` fails because…",
+              "options": [
+                "length is private",
+                "T is unconstrained and might have no length",
+                "of a typo",
+                "it is recursive"
+              ],
+              "answer": 1,
+              "explanation": "TS2536."
+            }
+          ],
+          "exercises": [
+            {
+              "id": "tscourse-w29-cd-t1",
+              "title": "Is it a string?",
+              "prompt": "Write `IsString<T>`: `true` when T is assignable to string, `false` otherwise.",
+              "hint": "A condition, then two branches.",
+              "hints": [
+                "A condition, then two branches.",
+                "T extends string ? true : false"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<IsString<\"hello\">, true>>;\ntype _2 = Expect<Equal<IsString<string>, true>>;\ntype _3 = Expect<Equal<IsString<42>, false>>;\ntype _4 = Expect<Equal<IsString<{ a: 1 }>, false>>;\n",
+              "judge_mode": "types",
+              "forbid": [],
+              "starter": "type IsString<T> = ____;\n",
+              "solution": "type IsString<T> = T extends string ? true : false;\n",
+              "tests": [],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w29-cd-t2",
+              "title": "The element type",
+              "prompt": "Write `ElementOf<T>`: an array's element type, or `never` for anything that is not an array.",
+              "hint": "Check it is an array — `readonly unknown[]` accepts both kinds.",
+              "hints": [
+                "Check it is an array — `readonly unknown[]` accepts both kinds.",
+                "Then `T[number]` is the element type.",
+                "T extends readonly unknown[] ? T[number] : never"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<ElementOf<string[]>, string>>;\ntype _2 = Expect<Equal<ElementOf<readonly number[]>, number>>;\ntype _3 = Expect<Equal<ElementOf<[1, \"a\"]>, 1 | \"a\">>;\ntype _4 = Expect<Equal<ElementOf<string>, never>>;\n",
+              "judge_mode": "types",
+              "forbid": [],
+              "starter": "type ElementOf<T> = ____;\n",
+              "solution": "type ElementOf<T> = T extends readonly unknown[] ? T[number] : never;\n",
+              "tests": [],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w29-cd-t3",
+              "title": "Flatten one level",
+              "prompt": "Write `Flatten<T>`: an array's element type, or T itself when it is not an array.",
+              "hint": "The same test as ElementOf; only the else-branch differs.",
+              "hints": [
+                "The same test as ElementOf; only the else-branch differs.",
+                "T extends readonly unknown[] ? T[number] : T"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<Flatten<string[]>, string>>;\ntype _2 = Expect<Equal<Flatten<number>, number>>;\ntype _3 = Expect<Equal<Flatten<boolean[][]>, boolean[]>>;\n",
+              "judge_mode": "types",
+              "forbid": [],
+              "starter": "type Flatten<T> = ____;\n",
+              "solution": "type Flatten<T> = T extends readonly unknown[] ? T[number] : T;\n",
+              "tests": [],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w29-cd-t4",
+              "title": "Which kind of value",
+              "prompt": "Write `KindOf<T>`: \"text\" for strings, \"number\" for numbers, \"list\" for arrays, \"other\" for anything else — conditionals can be chained like else-if.",
+              "hint": "Each false branch can be another conditional.",
+              "hints": [
+                "Each false branch can be another conditional.",
+                "Order matters only when the tests overlap; these do not."
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<KindOf<\"a\">, \"text\">>;\ntype _2 = Expect<Equal<KindOf<3>, \"number\">>;\ntype _3 = Expect<Equal<KindOf<string[]>, \"list\">>;\ntype _4 = Expect<Equal<KindOf<{ x: 1 }>, \"other\">>;\n",
+              "judge_mode": "types",
+              "forbid": [],
+              "starter": "type KindOf<T> = ____;\n",
+              "solution": "type KindOf<T> = T extends string ? \"text\" : T extends number ? \"number\" : T extends readonly unknown[] ? \"list\" : \"other\";\n",
+              "tests": [],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w29-cd-d1",
+              "title": "Indexing what might not have it",
+              "prompt": "The compiler rejects this program:\n\n    TS2536: Type '\"length\"' cannot be used to index type 'T'.\n\nFix the cause.",
+              "hint": "What if T were number? It has no length.",
+              "hints": [
+                "What if T were number? It has no length.",
+                "Promise the compiler T is an array, with a constraint.",
+                "type Len<T extends readonly unknown[]> = T[\"length\"];"
+              ],
+              "language": "typescript",
+              "kind": "diagnose",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "type Len<T> = T[\"length\"];\nconst n: Len<[1, 2, 3]> = 3;\nconsole.log(n);\n",
+              "solution": "type Len<T extends readonly unknown[]> = T[\"length\"];\nconst n: Len<[1, 2, 3]> = 3;\nconsole.log(n);\n",
+              "tests": [
+                {
+                  "input": "",
+                  "output": "3"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            }
+          ],
+          "quiz": [
+            {
+              "question": "`Equal<any, string>` is false where `any extends string ? true : false` is true, because…",
+              "options": [
+                "a bug",
+                "Equal compares for identity, not assignability",
+                "any is never",
+                "of distribution"
+              ],
+              "answer": 1,
+              "explanation": "Which is why the harness uses it."
+            },
+            {
+              "question": "A tuple type's `length` is…",
+              "options": [
+                "number",
+                "a literal type, e.g. 3",
+                "never",
+                "string"
+              ],
+              "answer": 1,
+              "explanation": "Len<[1, 2, 3]> is 3."
+            }
+          ]
+        },
+        {
+          "key": "w29-distribute",
+          "title": "Unions go through one at a time",
+          "what": "Distribution — the reason Exclude works, and the reason IsNever needs a tuple.",
+          "lesson": "Give a conditional type a union, with the parameter **bare** on the left of\n`extends`, and it runs **once per member** and unions the results:\n\n```ts\ntype ToArray<T> = T extends unknown ? T[] : never;\ntype A = ToArray<string | number>;       // string[] | number[]    — not (string | number)[]\n```\n\nThat is called **distribution**, and it is what makes the union filters a single\nline:\n\n```ts\ntype Without<T, U> = T extends U ? never : T;     // Exclude\ntype Only<T, U>    = T extends U ? T : never;     // Extract\n```\n\n`Without<\"a\" | \"b\" | \"c\", \"a\">` runs for `\"a\"` (→ never), `\"b\"` (→ \"b\") and `\"c\"`\n(→ \"c\"); `never` vanishes from a union, leaving `\"b\" | \"c\"`.\n\n## Switching it off\n\nWrap both sides in a one-element tuple. `[T]` is not a bare parameter, so the\ncondition is checked once, on the whole union:\n\n```ts\ntype ToArrayOne<T> = [T] extends [unknown] ? T[] : never;   // (string | number)[]\n```\n\n## `never`, the empty union\n\nDistribution over a union of **no** members runs **zero** times and produces\n`never`. So this looks right and is not:\n\n```ts\ntype IsNeverWrong<T> = T extends never ? true : false;\ntype X = IsNeverWrong<never>;            // never — not true\n```\n\nThe tuple wrapper is required: `[T] extends [never]`. The first time this bites, it\nis baffling; now it will not.\n\n> ⚠️ **Common mistakes:** expecting `(A | B)[]` from a distributive conditional;\n> forgetting the tuple wrapper for `never`; and wrapping only one side.\n",
+          "warmup": [
+            {
+              "question": "A conditional distributes when…",
+              "options": [
+                "always",
+                "the checked type is a bare type parameter and receives a union",
+                "it uses infer",
+                "it is recursive"
+              ],
+              "answer": 1,
+              "explanation": "Once per member."
+            },
+            {
+              "question": "`never` in a union…",
+              "options": [
+                "stays",
+                "disappears",
+                "becomes unknown",
+                "is an error"
+              ],
+              "answer": 1,
+              "explanation": "Which is how Exclude removes members."
+            },
+            {
+              "question": "`[T] extends [U]` means…",
+              "options": [
+                "an array check",
+                "check the whole union once — no distribution",
+                "a tuple of T",
+                "a syntax error"
+              ],
+              "answer": 1,
+              "explanation": "The wrapper."
+            },
+            {
+              "question": "`T extends never ? true : false` with T = never gives…",
+              "options": [
+                "true",
+                "false",
+                "never",
+                "unknown"
+              ],
+              "answer": 2,
+              "explanation": "Zero members, zero results."
+            }
+          ],
+          "exercises": [
+            {
+              "id": "tscourse-w29-ds-t1",
+              "title": "Exclude, by hand",
+              "prompt": "Write `Without<T, U>`: the members of T not assignable to U. `Exclude` itself is banned.",
+              "hint": "Each member is tested on its own.",
+              "hints": [
+                "Each member is tested on its own.",
+                "A member that matches U becomes never, and never disappears from the union.",
+                "T extends U ? never : T"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<Without<\"a\" | \"b\" | \"c\", \"a\">, \"b\" | \"c\">>;\ntype _2 = Expect<Equal<Without<string | number | boolean, number>, string | boolean>>;\ntype _3 = Expect<Equal<Without<\"a\", \"a\">, never>>;\ntype _4 = Expect<Equal<Without<\"a\" | \"b\", \"a\">, Exclude<\"a\" | \"b\", \"a\">>>;\n",
+              "judge_mode": "types",
+              "forbid": [
+                "Exclude<"
+              ],
+              "starter": "type Without<T, U> = ____;\n",
+              "solution": "type Without<T, U> = T extends U ? never : T;\n",
+              "tests": [],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w29-ds-t2",
+              "title": "Extract, by hand",
+              "prompt": "Write `Only<T, U>`: the members of T that ARE assignable to U. `Extract` is banned.",
+              "hint": "The mirror image of Without.",
+              "hints": [
+                "The mirror image of Without.",
+                "T extends U ? T : never"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<Only<\"a\" | \"b\" | 1, string>, \"a\" | \"b\">>;\ntype _2 = Expect<Equal<Only<string | number, boolean>, never>>;\ntype _3 = Expect<Equal<Only<\"x\" | \"y\", \"y\">, Extract<\"x\" | \"y\", \"y\">>>;\n",
+              "judge_mode": "types",
+              "forbid": [
+                "Extract<"
+              ],
+              "starter": "type Only<T, U> = ____;\n",
+              "solution": "type Only<T, U> = T extends U ? T : never;\n",
+              "tests": [],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w29-ds-t3",
+              "title": "NonNullable, by hand",
+              "prompt": "Write `Present<T>`: T without null and undefined. `NonNullable` and `Exclude` are banned.",
+              "hint": "It is Without<T, null | undefined>, written out.",
+              "hints": [
+                "It is Without<T, null | undefined>, written out.",
+                "T extends null | undefined ? never : T"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<Present<string | null>, string>>;\ntype _2 = Expect<Equal<Present<number | undefined | null>, number>>;\ntype _3 = Expect<Equal<Present<null>, never>>;\ntype _4 = Expect<Equal<Present<string | null | undefined>, NonNullable<string | null | undefined>>>;\n",
+              "judge_mode": "types",
+              "forbid": [
+                "NonNullable<",
+                "Exclude<"
+              ],
+              "starter": "type Present<T> = ____;\n",
+              "solution": "type Present<T> = T extends null | undefined ? never : T;\n",
+              "tests": [],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w29-ds-t4",
+              "title": "One array, not a union of arrays",
+              "prompt": "Write `ToArrayOne<T>` so that a union becomes ONE array of the union, not a union of arrays.",
+              "hint": "A bare type parameter distributes; a tuple around it does not.",
+              "hints": [
+                "A bare type parameter distributes; a tuple around it does not.",
+                "[T] extends [unknown] ? T[] : never"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<ToArrayOne<string | number>, (string | number)[]>>;\ntype _2 = Expect<Equal<ToArrayOne<boolean>, boolean[]>>;\n",
+              "judge_mode": "types",
+              "forbid": [],
+              "starter": "type ToArrayOne<T> = ____;\n",
+              "solution": "type ToArrayOne<T> = [T] extends [unknown] ? T[] : never;\n",
+              "tests": [],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w29-ds-t5",
+              "title": "Is it never?",
+              "prompt": "Write `IsNever<T>`: true only for never. The obvious version returns never for never.",
+              "hint": "never is the empty union, so a distributive check runs zero times.",
+              "hints": [
+                "never is the empty union, so a distributive check runs zero times.",
+                "Wrap both sides in a tuple.",
+                "[T] extends [never] ? true : false"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Hard",
+              "strictness": "strict+indexed",
+              "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<IsNever<never>, true>>;\ntype _2 = Expect<Equal<IsNever<string>, false>>;\ntype _3 = Expect<Equal<IsNever<undefined>, false>>;\n",
+              "judge_mode": "types",
+              "forbid": [],
+              "starter": "type IsNever<T> = ____;\n",
+              "solution": "type IsNever<T> = [T] extends [never] ? true : false;\n",
+              "tests": [],
+              "source_slug": "",
+              "dataset": ""
+            }
+          ],
+          "quiz": [
+            {
+              "question": "`Without<string | number, string | number>` is…",
+              "options": [
+                "string | number",
+                "never",
+                "unknown",
+                "an error"
+              ],
+              "answer": 1,
+              "explanation": "Every member is removed."
+            },
+            {
+              "question": "Why does Exclude need distribution to work?",
+              "options": [
+                "it does not",
+                "it must test and keep or drop each member separately",
+                "for speed",
+                "for never"
+              ],
+              "answer": 1,
+              "explanation": "One member at a time."
+            }
+          ]
+        },
+        {
+          "key": "w29-infer",
+          "title": "Pulling a type out with `infer`",
+          "what": "Name a piece of the matched type, and use it in the result.",
+          "lesson": "`ElementOf` used `T[number]`. That works for arrays because indexing has a syntax.\nFor a function's return type there is no such syntax — so TypeScript lets you **name\nthe piece** during the match:\n\n```ts\ntype Ret<F> = F extends (...args: never[]) => infer R ? R : never;\n```\n\nRead it as: \"if `F` matches the shape *a function returning something*, call that\nsomething `R`, and the answer is `R`.\" That is exactly the library's `ReturnType`.\n\n## The same move, other shapes\n\n```ts\ntype Args<F>   = F extends (...args: infer A) => unknown ? A : never;   // Parameters\ntype Unwrap<P> = P extends Promise<infer V> ? V : P;                  // one level of Awaited\ntype Item<T>   = T extends readonly (infer E)[] ? E : never;          // ElementOf, again\ntype First<F>  = F extends (first: infer A, ...rest: never[]) => unknown ? A : never;\n```\n\n`infer` may only appear inside an `extends` clause of a conditional type, and the\nname it introduces only exists in the **true** branch.\n\n## Why `never[]` for the parameters\n\n`(...args: never[]) => infer R` matches **every** function, because parameter types\nare checked *contravariantly* (week 12): a function accepting anything can stand in\nwhere one accepting nothing is expected. `any[]` would work too; `unknown[]` would\n**not** match a function whose parameter is, say, `string`. Week 30 goes deeper into\nexactly where `infer` can sit.\n\n> ⚠️ **Common mistakes:** `infer` outside an extends clause; using the inferred\n> name in the false branch; and `unknown[]` for the parameters, which rejects most\n> real functions.\n",
+          "warmup": [
+            {
+              "question": "`infer R` introduces R…",
+              "options": [
+                "globally",
+                "inside a conditional's extends clause, usable in the true branch",
+                "as a value",
+                "anywhere"
+              ],
+              "answer": 1,
+              "explanation": "Only there."
+            },
+            {
+              "question": "`F extends (...args: never[]) => infer R ? R : never` rebuilds…",
+              "options": [
+                "Parameters",
+                "ReturnType",
+                "Awaited",
+                "InstanceType"
+              ],
+              "answer": 1,
+              "explanation": "The return type."
+            },
+            {
+              "question": "`Unwrap<Promise<number>>` with `P extends Promise<infer V> ? V : P` is…",
+              "options": [
+                "Promise<number>",
+                "number",
+                "never",
+                "unknown"
+              ],
+              "answer": 1,
+              "explanation": "One level unwrapped."
+            },
+            {
+              "question": "Parameters are matched with `never[]` rather than `unknown[]` because…",
+              "options": [
+                "style",
+                "parameter checks are contravariant, so never[] matches every function",
+                "speed",
+                "unknown is banned"
+              ],
+              "answer": 1,
+              "explanation": "Week 12."
+            }
+          ],
+          "exercises": [
+            {
+              "id": "tscourse-w29-if-t1",
+              "title": "ReturnType, by hand",
+              "prompt": "Write `Ret<F>` with `infer`. `ReturnType` is banned.",
+              "hint": "Match the shape 'a function returning something', and name the something.",
+              "hints": [
+                "Match the shape 'a function returning something', and name the something.",
+                "Use never[] for the parameters so every function matches.",
+                "F extends (...args: never[]) => infer R ? R : never"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<Ret<() => string>, string>>;\ntype _2 = Expect<Equal<Ret<(a: number, b: string) => boolean>, boolean>>;\ntype _3 = Expect<Equal<Ret<string>, never>>;\ndeclare function sample(x: number): { ok: true };\ntype _4 = Expect<Equal<Ret<typeof sample>, ReturnType<typeof sample>>>;\n",
+              "judge_mode": "types",
+              "forbid": [
+                "ReturnType<"
+              ],
+              "starter": "type Ret<F> = ____;\n",
+              "solution": "type Ret<F> = F extends (...args: never[]) => infer R ? R : never;\n",
+              "tests": [],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w29-if-t2",
+              "title": "Parameters, by hand",
+              "prompt": "Write `Args<F>`: the tuple of a function's parameter types. `Parameters` is banned.",
+              "hint": "This time the inferred part is the whole rest-parameter tuple.",
+              "hints": [
+                "This time the inferred part is the whole rest-parameter tuple.",
+                "F extends (...args: infer A) => unknown ? A : never"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<Args<(a: number, b: string) => void>, [a: number, b: string]>>;\ntype _2 = Expect<Equal<Args<() => void>, []>>;\ntype _3 = Expect<Equal<Args<number>, never>>;\n",
+              "judge_mode": "types",
+              "forbid": [
+                "Parameters<"
+              ],
+              "starter": "type Args<F> = ____;\n",
+              "solution": "type Args<F> = F extends (...args: infer A) => unknown ? A : never;\n",
+              "tests": [],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w29-if-t3",
+              "title": "What a promise holds",
+              "prompt": "Write `Unwrap<P>`: the value type of a Promise, or P itself if it is not one.",
+              "hint": "Promise<something> — name the something.",
+              "hints": [
+                "Promise<something> — name the something.",
+                "P extends Promise<infer V> ? V : P"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<Unwrap<Promise<number>>, number>>;\ntype _2 = Expect<Equal<Unwrap<string>, string>>;\ntype _3 = Expect<Equal<Unwrap<Promise<string[]>>, string[]>>;\n",
+              "judge_mode": "types",
+              "forbid": [
+                "Awaited<"
+              ],
+              "starter": "type Unwrap<P> = ____;\n",
+              "solution": "type Unwrap<P> = P extends Promise<infer V> ? V : P;\n",
+              "tests": [],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w29-if-t4",
+              "title": "The first argument",
+              "prompt": "Write `First<F>`: the type of a function's first parameter, or never if it has none.",
+              "hint": "Name the first parameter; accept any rest after it.",
+              "hints": [
+                "Name the first parameter; accept any rest after it.",
+                "F extends (first: infer A, ...rest: never[]) => unknown ? A : never"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Hard",
+              "strictness": "strict+indexed",
+              "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<First<(a: string, b: number) => void>, string>>;\ntype _2 = Expect<Equal<First<(x: boolean) => void>, boolean>>;\n",
+              "judge_mode": "types",
+              "forbid": [],
+              "starter": "type First<F> = ____;\n",
+              "solution": "type First<F> = F extends (first: infer A, ...rest: never[]) => unknown ? A : never;\n",
+              "tests": [],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w29-if-t5",
+              "title": "Unwrap all the way",
+              "prompt": "Write `DeepUnwrap<P>`: unwrap nested promises until a non-promise remains — a recursive conditional.",
+              "hint": "The true branch can call the type again on what it found.",
+              "hints": [
+                "The true branch can call the type again on what it found.",
+                "P extends Promise<infer V> ? DeepUnwrap<V> : P"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<DeepUnwrap<Promise<Promise<number>>>, number>>;\ntype _2 = Expect<Equal<DeepUnwrap<Promise<string>>, string>>;\ntype _3 = Expect<Equal<DeepUnwrap<boolean>, boolean>>;\n",
+              "judge_mode": "types",
+              "forbid": [
+                "Awaited<"
+              ],
+              "starter": "type DeepUnwrap<P> = ____;\n",
+              "solution": "type DeepUnwrap<P> = P extends Promise<infer V> ? DeepUnwrap<V> : P;\n",
+              "tests": [],
+              "source_slug": "",
+              "dataset": ""
+            }
+          ],
+          "quiz": [
+            {
+              "question": "The library's `Awaited` is essentially…",
+              "options": [
+                "Unwrap",
+                "DeepUnwrap, with care for thenables",
+                "ReturnType",
+                "Promise"
+              ],
+              "answer": 1,
+              "explanation": "Recursive unwrapping."
+            },
+            {
+              "question": "Can `infer` appear in a mapped type on its own?",
+              "options": [
+                "yes",
+                "no — only inside a conditional's extends clause",
+                "only with keyof",
+                "only in week 30"
+              ],
+              "answer": 1,
+              "explanation": "Pattern matching needs a condition."
+            }
+          ]
+        },
+        {
+          "key": "w29-mapped",
+          "title": "A loop over keys",
+          "what": "Mapped types — and Partial, Readonly and Required in one line each.",
+          "lesson": "```ts\ntype Optional<T> = { [K in keyof T]?: T[K] };\n```\n\nRead it as a `for` loop: *for each key `K` in `keyof T`, make a property `K`,\noptional, with the type `T[K]`*. That is `Partial<T>`, exactly — the library's\ndefinition is this line.\n\n## Modifiers\n\nA mapped property can add or remove the two property modifiers:\n\n```ts\ntype Frozen<T>  = { readonly [K in keyof T]: T[K] };     // Readonly\ntype Needed<T>  = { [K in keyof T]-?: T[K] };            // Required — REMOVE ?\ntype Mutable<T> = { -readonly [K in keyof T]: T[K] };    // remove readonly\n```\n\n`+` is the default and rarely written; `-` is the only way to take a modifier\naway. There is no built-in `Mutable`, which is a good reason to be able to write it.\n\n## Homomorphic: modifiers carry over\n\nA mapped type over `keyof T` keeps T's own `readonly` and `?` unless told otherwise.\nSo `Optional<Entry>` leaves `id` readonly, and `Needed<Entry>` leaves it readonly\ntoo — only the modifier you mention changes.\n\n## Changing the value type\n\nThe right-hand side can be anything computed from `K` or `T[K]`:\n\n```ts\ntype Flags<T>    = { [K in keyof T]: boolean };\ntype Nullable<T> = { [K in keyof T]: T[K] | null };\n```\n\n> ⚠️ **Common mistakes:** `?:` when you meant `-?:`; forgetting that the modifiers\n> are inherited; and writing `[K in T]` when T is an object rather than a union of\n> keys.\n",
+          "warmup": [
+            {
+              "question": "`[K in keyof T]` loops over…",
+              "options": [
+                "values",
+                "T's keys",
+                "numbers",
+                "T's methods only"
+              ],
+              "answer": 1,
+              "explanation": "A for loop over keys."
+            },
+            {
+              "question": "Partial is…",
+              "options": [
+                "{ [K in keyof T]-?: T[K] }",
+                "{ [K in keyof T]?: T[K] }",
+                "{ readonly [K in keyof T]: T[K] }",
+                "{ [K in T]: K }"
+              ],
+              "answer": 1,
+              "explanation": "Add ?."
+            },
+            {
+              "question": "To remove readonly you write…",
+              "options": [
+                "readonly-",
+                "-readonly",
+                "!readonly",
+                "mutable"
+              ],
+              "answer": 1,
+              "explanation": "A minus before the modifier."
+            },
+            {
+              "question": "A homomorphic mapped type…",
+              "options": [
+                "drops modifiers",
+                "keeps T's readonly and ? unless told otherwise",
+                "is recursive",
+                "is a union"
+              ],
+              "answer": 1,
+              "explanation": "They carry over."
+            }
+          ],
+          "exercises": [
+            {
+              "id": "tscourse-w29-mp-t1",
+              "title": "Partial, by hand",
+              "prompt": "Write `Optional<T>`. `Partial` is banned.",
+              "hint": "Loop over every key, and add the optional modifier.",
+              "hints": [
+                "Loop over every key, and add the optional modifier.",
+                "{ [K in keyof T]?: T[K] }"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<Optional<Entry>, Partial<Entry>>>;\ntype _2 = Expect<Equal<Optional<{ a: number }>, { a?: number }>>;\n",
+              "judge_mode": "types",
+              "forbid": [
+                "Partial<"
+              ],
+              "starter": "interface Entry {\n  readonly id: string;\n  desc: string;\n  tag?: string;\n  cents: number;\n}\ntype Optional<T> = ____;\n",
+              "solution": "interface Entry {\n  readonly id: string;\n  desc: string;\n  tag?: string;\n  cents: number;\n}\ntype Optional<T> = { [K in keyof T]?: T[K] };\n",
+              "tests": [],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w29-mp-t2",
+              "title": "Readonly, by hand",
+              "prompt": "Write `Frozen<T>`. `Readonly` is banned.",
+              "hint": "The modifier goes before the bracket.",
+              "hints": [
+                "The modifier goes before the bracket.",
+                "{ readonly [K in keyof T]: T[K] }"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<Frozen<Entry>, Readonly<Entry>>>;\ntype _2 = Expect<Equal<Frozen<{ a: number }>, { readonly a: number }>>;\n",
+              "judge_mode": "types",
+              "forbid": [
+                "Readonly<"
+              ],
+              "starter": "interface Entry {\n  readonly id: string;\n  desc: string;\n  tag?: string;\n  cents: number;\n}\ntype Frozen<T> = ____;\n",
+              "solution": "interface Entry {\n  readonly id: string;\n  desc: string;\n  tag?: string;\n  cents: number;\n}\ntype Frozen<T> = { readonly [K in keyof T]: T[K] };\n",
+              "tests": [],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w29-mp-t3",
+              "title": "Required, by hand",
+              "prompt": "Write `Needed<T>`, removing optionality from every key. `Required` is banned.",
+              "hint": "A minus in front of the ? removes it.",
+              "hints": [
+                "A minus in front of the ? removes it.",
+                "{ [K in keyof T]-?: T[K] }"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<Needed<Entry>, Required<Entry>>>;\ntype _2 = Expect<Equal<Needed<{ a?: number }>, { a: number }>>;\n",
+              "judge_mode": "types",
+              "forbid": [
+                "Required<"
+              ],
+              "starter": "interface Entry {\n  readonly id: string;\n  desc: string;\n  tag?: string;\n  cents: number;\n}\ntype Needed<T> = ____;\n",
+              "solution": "interface Entry {\n  readonly id: string;\n  desc: string;\n  tag?: string;\n  cents: number;\n}\ntype Needed<T> = { [K in keyof T]-?: T[K] };\n",
+              "tests": [],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w29-mp-t4",
+              "title": "The one the library lacks",
+              "prompt": "Write `Mutable<T>`, removing readonly from every key.",
+              "hint": "-readonly, before the bracket.",
+              "hints": [
+                "-readonly, before the bracket.",
+                "{ -readonly [K in keyof T]: T[K] }"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<Mutable<{ readonly a: number; readonly b: string }>, { a: number; b: string }>>;\ntype _2 = Expect<Equal<Mutable<Entry>, { id: string; desc: string; tag?: string; cents: number }>>;\n",
+              "judge_mode": "types",
+              "forbid": [],
+              "starter": "interface Entry {\n  readonly id: string;\n  desc: string;\n  tag?: string;\n  cents: number;\n}\ntype Mutable<T> = ____;\n",
+              "solution": "interface Entry {\n  readonly id: string;\n  desc: string;\n  tag?: string;\n  cents: number;\n}\ntype Mutable<T> = { -readonly [K in keyof T]: T[K] };\n",
+              "tests": [],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w29-mp-t5",
+              "title": "Every value nullable",
+              "prompt": "Write `Nullable<T>`: the same keys, each value also allowing null.",
+              "hint": "The value side can be any type expression over T[K].",
+              "hints": [
+                "The value side can be any type expression over T[K].",
+                "{ [K in keyof T]: T[K] | null }"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<Nullable<{ a: number; b: string }>, { a: number | null; b: string | null }>>;\ntype _2 = Expect<Equal<Nullable<{ readonly x: boolean }>, { readonly x: boolean | null }>>;\n",
+              "judge_mode": "types",
+              "forbid": [],
+              "starter": "interface Entry {\n  readonly id: string;\n  desc: string;\n  tag?: string;\n  cents: number;\n}\ntype Nullable<T> = ____;\n",
+              "solution": "interface Entry {\n  readonly id: string;\n  desc: string;\n  tag?: string;\n  cents: number;\n}\ntype Nullable<T> = { [K in keyof T]: T[K] | null };\n",
+              "tests": [],
+              "source_slug": "",
+              "dataset": ""
+            }
+          ],
+          "quiz": [
+            {
+              "question": "`Needed<Entry>` keeps `id` readonly because…",
+              "options": [
+                "a bug",
+                "mapped types over keyof T inherit modifiers not mentioned",
+                "id is required",
+                "of -?"
+              ],
+              "answer": 1,
+              "explanation": "Homomorphic."
+            },
+            {
+              "question": "`[K in \"a\" | \"b\"]: number` produces…",
+              "options": [
+                "a union",
+                "{ a: number; b: number }",
+                "number[]",
+                "never"
+              ],
+              "answer": 1,
+              "explanation": "Any union of keys can be looped over."
+            }
+          ]
+        },
+        {
+          "key": "w29-remap",
+          "title": "Choosing and renaming keys",
+          "what": "Pick, Omit, filtering by value type — and the first recursive mapped type.",
+          "lesson": "## Pick loops over a subset of keys\n\n```ts\ntype Keep<T, K extends keyof T> = { [P in K]: T[P] };\n```\n\nThe constraint `K extends keyof T` is what week 14 met as **TS2344** when a key was\nmisspelled — now you can see where it comes from.\n\n## Omit needs `as`\n\nOmit keeps every key *except* some. A mapped type can **remap** each key with `as`,\nand remapping a key to `never` **drops** it:\n\n```ts\ntype Drop<T, K extends PropertyKey> = { [P in keyof T as P extends K ? never : P]: T[P] };\n```\n\nNote the constraint: `PropertyKey`, not `keyof T`. The library's `Omit` is\ndeliberately loose — week 14 found that a misspelled key omits nothing, silently —\nand this version reproduces that exactly.\n\n## Filtering by value type\n\n`as` can test the **value**, too:\n\n```ts\ntype NumbersOf<T> = { [K in keyof T as T[K] extends number ? K : never]: T[K] };\n```\n\n`NumbersOf<Entry>` is `{ cents: number }` — a type the library cannot express.\n\n## Recursion\n\nA mapped type can refer to itself. `Frozen` makes the top level readonly; this makes\nevery level readonly:\n\n```ts\ntype DeepReadonly<T> = T extends object\n  ? { readonly [K in keyof T]: DeepReadonly<T[K]> }\n  : T;\n```\n\nThe conditional is the base case — a primitive is returned unchanged — exactly as\nweek 25's recursions needed one. Arrays come out as `readonly` arrays, because a\nmapped type over an array type produces an array type.\n\n> ⚠️ **Common mistakes:** `keyof T` as Omit's constraint (stricter than the\n> library); `as never` meaning \"keep\"; and a recursive type with no base case,\n> which the compiler reports as excessively deep.\n",
+          "warmup": [
+            {
+              "question": "Pick loops over…",
+              "options": [
+                "keyof T",
+                "the chosen keys K",
+                "values",
+                "never"
+              ],
+              "answer": 1,
+              "explanation": "[P in K]."
+            },
+            {
+              "question": "Remapping a key to never…",
+              "options": [
+                "keeps it",
+                "drops it",
+                "is an error",
+                "makes it optional"
+              ],
+              "answer": 1,
+              "explanation": "How Omit works."
+            },
+            {
+              "question": "The library's Omit constrains K to…",
+              "options": [
+                "keyof T",
+                "PropertyKey — anything, which is why a typo omits nothing",
+                "string",
+                "never"
+              ],
+              "answer": 1,
+              "explanation": "Week 14's silent failure."
+            },
+            {
+              "question": "DeepReadonly's base case is…",
+              "options": [
+                "an array",
+                "a non-object type, returned unchanged",
+                "never",
+                "a function"
+              ],
+              "answer": 1,
+              "explanation": "The false branch."
+            }
+          ],
+          "exercises": [
+            {
+              "id": "tscourse-w29-rm-t1",
+              "title": "Pick, by hand",
+              "prompt": "Write `Keep<T, K>`. `Pick` is banned.",
+              "hint": "Loop over the chosen keys only.",
+              "hints": [
+                "Loop over the chosen keys only.",
+                "{ [P in K]: T[P] }"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<Keep<Entry, \"id\" | \"tag\">, Pick<Entry, \"id\" | \"tag\">>>;\ntype _2 = Expect<Equal<Keep<{ a: 1; b: 2 }, \"a\">, { a: 1 }>>;\n",
+              "judge_mode": "types",
+              "forbid": [
+                "Pick<"
+              ],
+              "starter": "interface Entry {\n  readonly id: string;\n  desc: string;\n  tag?: string;\n  cents: number;\n}\ntype Keep<T, K extends keyof T> = ____;\n",
+              "solution": "interface Entry {\n  readonly id: string;\n  desc: string;\n  tag?: string;\n  cents: number;\n}\ntype Keep<T, K extends keyof T> = { [P in K]: T[P] };\n",
+              "tests": [],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w29-rm-t2",
+              "title": "Omit, by hand",
+              "prompt": "Write `Drop<T, K>` with key remapping. `Omit`, `Pick` and `Exclude` are all banned.",
+              "hint": "Loop over every key, and remap the unwanted ones to never.",
+              "hints": [
+                "Loop over every key, and remap the unwanted ones to never.",
+                "[P in keyof T as P extends K ? never : P]"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Hard",
+              "strictness": "strict+indexed",
+              "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<Drop<Entry, \"desc\">, Omit<Entry, \"desc\">>>;\ntype _2 = Expect<Equal<Drop<{ a: 1; b: 2; c: 3 }, \"a\" | \"c\">, { b: 2 }>>;\n",
+              "judge_mode": "types",
+              "forbid": [
+                "Omit<",
+                "Pick<",
+                "Exclude<"
+              ],
+              "starter": "interface Entry {\n  readonly id: string;\n  desc: string;\n  tag?: string;\n  cents: number;\n}\ntype Drop<T, K extends PropertyKey> = ____;\n",
+              "solution": "interface Entry {\n  readonly id: string;\n  desc: string;\n  tag?: string;\n  cents: number;\n}\ntype Drop<T, K extends PropertyKey> = { [P in keyof T as P extends K ? never : P]: T[P] };\n",
+              "tests": [],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w29-rm-t3",
+              "title": "Only the numbers",
+              "prompt": "Write `NumbersOf<T>`: only the keys whose values are numbers.",
+              "hint": "Test the value type in the `as` clause.",
+              "hints": [
+                "Test the value type in the `as` clause.",
+                "as T[K] extends number ? K : never"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Hard",
+              "strictness": "strict+indexed",
+              "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<NumbersOf<Entry>, { cents: number }>>;\ntype _2 = Expect<Equal<NumbersOf<{ a: 1; b: \"x\"; c: 2 }>, { a: 1; c: 2 }>>;\n",
+              "judge_mode": "types",
+              "forbid": [],
+              "starter": "interface Entry {\n  readonly id: string;\n  desc: string;\n  tag?: string;\n  cents: number;\n}\ntype NumbersOf<T> = ____;\n",
+              "solution": "interface Entry {\n  readonly id: string;\n  desc: string;\n  tag?: string;\n  cents: number;\n}\ntype NumbersOf<T> = { [K in keyof T as T[K] extends number ? K : never]: T[K] };\n",
+              "tests": [],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w29-rm-t4",
+              "title": "Readonly all the way down",
+              "prompt": "Write `DeepReadonly<T>`: readonly at every level, arrays included.",
+              "hint": "A primitive is the base case, returned as it is.",
+              "hints": [
+                "A primitive is the base case, returned as it is.",
+                "An object is mapped, and each value goes through DeepReadonly again."
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Hard",
+              "strictness": "strict+indexed",
+              "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<DeepReadonly<{ a: { b: number[] } }>, { readonly a: { readonly b: readonly number[] } }>>;\ntype _2 = Expect<Equal<DeepReadonly<string>, string>>;\n",
+              "judge_mode": "types",
+              "forbid": [],
+              "starter": "type DeepReadonly<T> = ____;\n",
+              "solution": "type DeepReadonly<T> = T extends object ? { readonly [K in keyof T]: DeepReadonly<T[K]> } : T;\n",
+              "tests": [],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w29-rm-d1",
+              "title": "The key that is not there",
+              "prompt": "The compiler rejects this program:\n\n    TS2344: Type '\"desc\" | \"tagg\"' does not satisfy the constraint 'keyof Entry'.\n\nFix the cause.",
+              "hint": "The constraint `K extends keyof T` checked every key you passed.",
+              "hints": [
+                "The constraint `K extends keyof T` checked every key you passed.",
+                "One of them is not a key of Entry.",
+                "It is spelled tag."
+              ],
+              "language": "typescript",
+              "kind": "diagnose",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "interface Entry {\n  desc: string;\n  tag: string;\n  cents: number;\n}\ntype Keep<T, K extends keyof T> = { [P in K]: T[P] };\ntype Summary = Keep<Entry, \"desc\" | \"tagg\">;\nconst s: Summary = { desc: \"coffee\", tagg: \"food\" };\nconsole.log(`${s.desc} ${s.tagg}`);\n",
+              "solution": "interface Entry {\n  desc: string;\n  tag: string;\n  cents: number;\n}\ntype Keep<T, K extends keyof T> = { [P in K]: T[P] };\ntype Summary = Keep<Entry, \"desc\" | \"tag\">;\nconst s: Summary = { desc: \"coffee\", tag: \"food\" };\nconsole.log(`${s.desc} ${s.tag}`);\n",
+              "tests": [
+                {
+                  "input": "",
+                  "output": "coffee food"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            }
+          ],
+          "quiz": [
+            {
+              "question": "`Drop<Entry, \"descc\">` (a typo) gives…",
+              "options": [
+                "an error",
+                "Entry unchanged — nothing matched, nothing dropped",
+                "never",
+                "{}"
+              ],
+              "answer": 1,
+              "explanation": "Loose, like the library."
+            },
+            {
+              "question": "A recursive type with no base case…",
+              "options": [
+                "works",
+                "is reported as excessively deep",
+                "is any",
+                "is never"
+              ],
+              "answer": 1,
+              "explanation": "Week 25, at the type level."
+            }
+          ]
+        },
+        {
+          "key": "w29-runtime",
+          "title": "Types that follow values",
+          "what": "A computed type on running code — graded on the output AND on the types.",
+          "lesson": "A mapped type earns its place when a **function** returns it. Then the caller gets a\nprecise type computed from their own argument:\n\n```ts\nfunction totals<T extends Record<string, readonly number[]>>(groups: T): Totals<T> {\n  const out = {} as Totals<T>;\n  for (const k of Object.keys(groups) as (keyof T)[]) {\n    out[k] = (groups[k] ?? []).reduce((a, b) => a + b, 0);\n  }\n  return out;\n}\ntype Totals<T> = { [K in keyof T]: number };\n```\n\nCall it with `{ food: [3, 4], rent: [900] }` and the result's type is\n`{ food: number; rent: number }` — not a vague `Record<string, number>`.\n\n## The casts are at the edge, on purpose\n\n`{} as Totals<T>` and `Object.keys(...) as (keyof T)[]` are claims the checker cannot\nverify (week 15): an empty object is not yet a `Totals<T>`, and `Object.keys` returns\n`string[]` because an object may have more keys at run time than its type admits.\nKeep such casts **inside** the implementation, where one careful reading covers them,\nand give callers the precise type.\n\n## A type is not a runtime filter\n\nWeek 14 found `Omit` leaking a field at run time, because it is only a type. The\nsame is true here: a function typed to return `Keep<T, K>` must *build* an object\nwith only those keys. Spread the whole input and cast, and the type says one thing\nwhile `Object.keys` prints another. That is this lesson's `fix`.\n\n> ⚠️ **Common mistakes:** casting the *result* rather than building it; letting a\n> cast leak into the public signature; and believing a mapped type removes anything\n> at run time.\n",
+          "warmup": [
+            {
+              "question": "A function returning `Totals<T>` gives its caller…",
+              "options": [
+                "Record<string, number>",
+                "a type computed from their own argument's keys",
+                "any",
+                "unknown"
+              ],
+              "answer": 1,
+              "explanation": "The point of the exercise."
+            },
+            {
+              "question": "`Object.keys(obj)` is typed `string[]` because…",
+              "options": [
+                "a bug",
+                "the object may have more keys at run time than its type lists",
+                "keys are strings",
+                "of symbols"
+              ],
+              "answer": 1,
+              "explanation": "Structural typing."
+            },
+            {
+              "question": "A function typed as returning `Keep<T, K>` that returns `{ ...obj }`…",
+              "options": [
+                "removes the extra keys",
+                "still carries them at run time",
+                "fails to compile",
+                "throws"
+              ],
+              "answer": 1,
+              "explanation": "Types do not filter."
+            },
+            {
+              "question": "Casts in a typed library belong…",
+              "options": [
+                "in the public signature",
+                "inside the implementation, where they can be checked by reading",
+                "nowhere",
+                "in the caller"
+              ],
+              "answer": 1,
+              "explanation": "Precise outside, careful inside."
+            }
+          ],
+          "exercises": [
+            {
+              "id": "tscourse-w29-rt-des1",
+              "title": "Design the totals type",
+              "prompt": "`totals` is written; declare the type it returns: the SAME keys as its argument, each mapped to a number. A `Record<string, number>` would lose the keys and fail the checks.",
+              "hint": "Keep every key; change every value's type.",
+              "hints": [
+                "Keep every key; change every value's type.",
+                "type Totals<T> = { [K in keyof T]: number };"
+              ],
+              "language": "typescript",
+              "kind": "design",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<typeof t, { food: number; rent: number }>>;\ntype _2 = Expect<Equal<Totals<{ a: number[] }>, { a: number }>>;\n",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "____\nfunction totals<T extends Record<string, readonly number[]>>(groups: T): Totals<T> {\n  const out = {} as Totals<T>;\n  for (const k of Object.keys(groups) as (keyof T)[]) {\n    out[k] = (groups[k] ?? []).reduce((a, b) => a + b, 0);\n  }\n  return out;\n}\nconst t = totals({ food: [325, 450], rent: [90000] });\nconsole.log(`${t.food} ${t.rent}`);\n",
+              "solution": "type Totals<T> = { [K in keyof T]: number };\nfunction totals<T extends Record<string, readonly number[]>>(groups: T): Totals<T> {\n  const out = {} as Totals<T>;\n  for (const k of Object.keys(groups) as (keyof T)[]) {\n    out[k] = (groups[k] ?? []).reduce((a, b) => a + b, 0);\n  }\n  return out;\n}\nconst t = totals({ food: [325, 450], rent: [90000] });\nconsole.log(`${t.food} ${t.rent}`);\n",
+              "tests": [
+                {
+                  "input": "",
+                  "output": "775 90000"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w29-rt-1",
+              "title": "Build only the chosen keys",
+              "prompt": "Implement `pick` so the object it returns really has only the requested keys.",
+              "hint": "Copy one property per requested key — nothing else.",
+              "hints": [
+                "Copy one property per requested key — nothing else.",
+                "for (const k of keys) { out[k] = obj[k]; }"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "type Keep<T, K extends keyof T> = { [P in K]: T[P] };\nfunction pick<T extends object, K extends keyof T>(obj: T, keys: readonly K[]): Keep<T, K> {\n  const out = {} as Keep<T, K>;\n____\n  return out;\n}\nconst entry = { id: \"e1\", desc: \"coffee\", cents: 325, secret: \"x\" };\nconst view = pick(entry, [\"desc\", \"cents\"]);\nconsole.log(`${Object.keys(view).join(\",\")} ${view.desc} ${view.cents}`);\n",
+              "solution": "type Keep<T, K extends keyof T> = { [P in K]: T[P] };\nfunction pick<T extends object, K extends keyof T>(obj: T, keys: readonly K[]): Keep<T, K> {\n  const out = {} as Keep<T, K>;\n  for (const k of keys) {\n    out[k] = obj[k];\n  }\n  return out;\n}\nconst entry = { id: \"e1\", desc: \"coffee\", cents: 325, secret: \"x\" };\nconst view = pick(entry, [\"desc\", \"cents\"]);\nconsole.log(`${Object.keys(view).join(\",\")} ${view.desc} ${view.cents}`);\n",
+              "tests": [
+                {
+                  "input": "",
+                  "output": "desc,cents coffee 325"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w29-rt-2",
+              "title": "Keys, typed",
+              "prompt": "Return an object's keys typed as its own key union, with the one cast inside the function.",
+              "hint": "Object.keys returns string[]; the cast narrows it to T's keys.",
+              "hints": [
+                "Object.keys returns string[]; the cast narrows it to T's keys.",
+                "Write return Object.keys(obj) as (keyof T)[];"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "function keysOf<T extends object>(obj: T): (keyof T)[] {\n____\n}\nconst limits = { food: 400, fun: 100 };\nfor (const k of keysOf(limits)) {\n  console.log(`${k}=${limits[k]}`);\n}\n",
+              "solution": "function keysOf<T extends object>(obj: T): (keyof T)[] {\n  return Object.keys(obj) as (keyof T)[];\n}\nconst limits = { food: 400, fun: 100 };\nfor (const k of keysOf(limits)) {\n  console.log(`${k}=${limits[k]}`);\n}\n",
+              "tests": [
+                {
+                  "input": "",
+                  "output": "food=400\nfun=100"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w29-rt-fix1",
+              "title": "Fix the pick that returned everything",
+              "prompt": "`view` is typed as having only `desc` and `cents`, and `Object.keys(view)` prints all four keys — including `secret`. The implementation spreads the whole input and casts it; the type promises a filter the code never performs.",
+              "hint": "Week 14's Omit leak, again: a type never removes anything at run time.",
+              "hints": [
+                "Week 14's Omit leak, again: a type never removes anything at run time.",
+                "`keys` is never even read.",
+                "Build a new object from the requested keys only."
+              ],
+              "language": "typescript",
+              "kind": "fix",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "type Keep<T, K extends keyof T> = { [P in K]: T[P] };\nfunction pick<T extends object, K extends keyof T>(obj: T, keys: readonly K[]): Keep<T, K> {\n  return { ...obj } as Keep<T, K>;\n}\nconst entry = { id: \"e1\", desc: \"coffee\", cents: 325, secret: \"x\" };\nconst view = pick(entry, [\"desc\", \"cents\"]);\nconsole.log(Object.keys(view).join(\",\"));\n",
+              "solution": "type Keep<T, K extends keyof T> = { [P in K]: T[P] };\nfunction pick<T extends object, K extends keyof T>(obj: T, keys: readonly K[]): Keep<T, K> {\n  const out = {} as Keep<T, K>;\n  for (const k of keys) {\n    out[k] = obj[k];\n  }\n  return out;\n}\nconst entry = { id: \"e1\", desc: \"coffee\", cents: 325, secret: \"x\" };\nconst view = pick(entry, [\"desc\", \"cents\"]);\nconsole.log(Object.keys(view).join(\",\"));\n",
+              "tests": [
+                {
+                  "input": "",
+                  "output": "desc,cents"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            }
+          ],
+          "quiz": [
+            {
+              "question": "Why is `{} as Totals<T>` acceptable here?",
+              "options": [
+                "it never is",
+                "it is inside the implementation and every key is filled before return",
+                "casts are free",
+                "Totals is optional"
+              ],
+              "answer": 1,
+              "explanation": "A cast is a claim; keep it where it can be checked by reading."
+            },
+            {
+              "question": "After `pick(entry, [\"desc\"])` the variable's type has…",
+              "options": [
+                "all keys",
+                "only desc",
+                "no keys",
+                "desc and id"
+              ],
+              "answer": 1,
+              "explanation": "Computed from the call."
+            }
+          ]
+        },
+        {
+          "key": "w29-library",
+          "title": "Library #1: the config module",
+          "what": "DeepPartial overrides, a typed deep merge, and a frozen DeepReadonly result.",
+          "lesson": "The last four weeks build a small typed library, one module a week. The first is\nthe kind every application has: **configuration**.\n\n* **Defaults** — a complete, typed object.\n* **Overrides** — any subset, at any depth: `{ \"db\": { \"port\": 5433 } }`. Its type is\n  `DeepPartial<Config>`: every key optional, recursively.\n* **The result** — defaults with overrides merged in, `DeepReadonly<Config>` to the\n  compiler **and** `Object.freeze`d at every level at run time, so neither a typo nor\n  a cast can change it.\n\n## DeepPartial\n\n```ts\ntype DeepPartial<T> = T extends object ? { [K in keyof T]?: DeepPartial<T[K]> } : T;\n```\n\nLesson 5's DeepReadonly with `?` instead of `readonly`.\n\n## The merge\n\n```ts\nfunction mergeDeep<T>(base: T, patch: DeepPartial<T>): T {\n  if (!isRecord(base) || !isRecord(patch)) {\n    return (patch === undefined ? base : patch) as T;      // a leaf: the patch wins\n  }\n  const out: Record<string, unknown> = { ...base };\n  for (const [k, v] of Object.entries(patch)) {\n    if (v !== undefined) { out[k] = mergeDeep<unknown>(base[k], v); }\n  }\n  return out as T;\n}\n```\n\nOne recursion, one type guard (`isRecord`, week 15's user-defined guard), and two\ncasts — both inside, both at the point where the code has just established what the\ncast claims.\n\n## Freezing to match the type\n\n`DeepReadonly` is a promise to the compiler; `Object.freeze` is enforcement at run\ntime, and it is shallow (week 13). A recursive `deepFreeze` makes the two agree:\n\n```ts\nfunction deepFreeze<T>(value: T): DeepReadonly<T> {\n  if (isRecord(value)) {\n    for (const v of Object.values(value)) { deepFreeze(v); }\n    Object.freeze(value);\n  }\n  return value as DeepReadonly<T>;\n}\n```\n\n## Testing a rejection\n\nThe capstone's checker contains, inside a function that is never called:\n\n```ts\n// @ts-expect-error — the config is read-only\ncfg.db.port = 1;\n```\n\nIf your result type were not deeply read-only, that line would compile, the\ndirective would be unused, and the check would fail with TS2578. The test **proves\nthe type rejects the write** — and because the function is never called, it never\nruns, so it proves it without touching the frozen object.\n",
+          "warmup": [
+            {
+              "question": "`DeepPartial<{ db: { port: number } }>` accepts…",
+              "options": [
+                "only the full object",
+                "{}, { db: {} } and { db: { port: 1 } }",
+                "only { db }",
+                "nothing"
+              ],
+              "answer": 1,
+              "explanation": "Optional at every level."
+            },
+            {
+              "question": "`Object.freeze` is…",
+              "options": [
+                "deep",
+                "shallow — nested objects stay writable",
+                "a type",
+                "recursive by default"
+              ],
+              "answer": 1,
+              "explanation": "Week 13."
+            },
+            {
+              "question": "The `@ts-expect-error` write sits in an uncalled function so that…",
+              "options": [
+                "it is hidden",
+                "it is type-checked but never executed",
+                "it runs twice",
+                "it is skipped"
+              ],
+              "answer": 1,
+              "explanation": "Proves the rejection without running it."
+            },
+            {
+              "question": "In `mergeDeep`, a leaf is decided by…",
+              "options": [
+                "the key name",
+                "the patch's value, if present",
+                "the default always",
+                "a merge"
+              ],
+              "answer": 1,
+              "explanation": "The override wins."
+            }
+          ],
+          "exercises": [
+            {
+              "id": "tscourse-w29-lb-t1",
+              "title": "Partial all the way down",
+              "prompt": "Write `DeepPartial<T>`: every key optional, at every level.",
+              "hint": "DeepReadonly's shape, with ? in place of readonly.",
+              "hints": [
+                "DeepReadonly's shape, with ? in place of readonly.",
+                "T extends object ? { [K in keyof T]?: DeepPartial<T[K]> } : T"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ninterface Config { name: string; db: { host: string; port: number } }\nconst _a: DeepPartial<Config> = {};\nconst _b: DeepPartial<Config> = { db: { port: 5433 } };\ntype _1 = Expect<Equal<DeepPartial<{ a: { b: number } }>, { a?: { b?: number } }>>;\n// @ts-expect-error — a wrong type is still wrong, however deep\nconst _c: DeepPartial<Config> = { db: { port: \"5433\" } };\n",
+              "judge_mode": "types",
+              "forbid": [],
+              "starter": "type DeepPartial<T> = ____;\n",
+              "solution": "type DeepPartial<T> = T extends object ? { [K in keyof T]?: DeepPartial<T[K]> } : T;\n",
+              "tests": [],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w29-lb-1",
+              "title": "Freeze every level",
+              "prompt": "Freeze the children before the object itself, recursively.",
+              "hint": "Object.freeze alone would leave cfg.db writable.",
+              "hints": [
+                "Object.freeze alone would leave cfg.db writable.",
+                "Recurse into every value before freezing the object."
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "type DeepPartial<T> = T extends object ? { [K in keyof T]?: DeepPartial<T[K]> } : T;\ntype DeepReadonly<T> = T extends object ? { readonly [K in keyof T]: DeepReadonly<T[K]> } : T;\nfunction isRecord(v: unknown): v is Record<string, unknown> {\n  return typeof v === \"object\" && v !== null && !Array.isArray(v);\n}\nfunction deepFreeze<T>(value: T): DeepReadonly<T> {\n  if (isRecord(value)) {\n____\n    Object.freeze(value);\n  }\n  return value as DeepReadonly<T>;\n}\nconst cfg = deepFreeze({ name: \"app\", db: { host: \"localhost\", port: 5432 } });\nconsole.log(`${Object.isFrozen(cfg)} ${Object.isFrozen(cfg.db)}`);\n",
+              "solution": "type DeepPartial<T> = T extends object ? { [K in keyof T]?: DeepPartial<T[K]> } : T;\ntype DeepReadonly<T> = T extends object ? { readonly [K in keyof T]: DeepReadonly<T[K]> } : T;\nfunction isRecord(v: unknown): v is Record<string, unknown> {\n  return typeof v === \"object\" && v !== null && !Array.isArray(v);\n}\nfunction deepFreeze<T>(value: T): DeepReadonly<T> {\n  if (isRecord(value)) {\n    for (const v of Object.values(value)) {\n      deepFreeze(v);\n    }\n    Object.freeze(value);\n  }\n  return value as DeepReadonly<T>;\n}\nconst cfg = deepFreeze({ name: \"app\", db: { host: \"localhost\", port: 5432 } });\nconsole.log(`${Object.isFrozen(cfg)} ${Object.isFrozen(cfg.db)}`);\n",
+              "tests": [
+                {
+                  "input": "",
+                  "output": "true true"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w29-lb-2",
+              "title": "Merge one level down",
+              "prompt": "Recurse into each overriding key, so a nested override keeps its siblings.",
+              "hint": "Replacing out[k] with v outright would lose db.host.",
+              "hints": [
+                "Replacing out[k] with v outright would lose db.host.",
+                "Merge the base's value for k with the patch's value for k.",
+                "Write out[k] = mergeDeep<unknown>(base[k], v);"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Hard",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "type DeepPartial<T> = T extends object ? { [K in keyof T]?: DeepPartial<T[K]> } : T;\ntype DeepReadonly<T> = T extends object ? { readonly [K in keyof T]: DeepReadonly<T[K]> } : T;\nfunction isRecord(v: unknown): v is Record<string, unknown> {\n  return typeof v === \"object\" && v !== null && !Array.isArray(v);\n}\nfunction mergeDeep<T>(base: T, patch: DeepPartial<T>): T {\n  if (!isRecord(base) || !isRecord(patch)) {\n    return (patch === undefined ? base : patch) as T;\n  }\n  const out: Record<string, unknown> = { ...base };\n  for (const [k, v] of Object.entries(patch)) {\n    if (v !== undefined) {\n____\n    }\n  }\n  return out as T;\n}\nconst merged = mergeDeep({ db: { host: \"localhost\", port: 5432 }, debug: false }, { db: { port: 5433 } });\nconsole.log(JSON.stringify(merged));\n",
+              "solution": "type DeepPartial<T> = T extends object ? { [K in keyof T]?: DeepPartial<T[K]> } : T;\ntype DeepReadonly<T> = T extends object ? { readonly [K in keyof T]: DeepReadonly<T[K]> } : T;\nfunction isRecord(v: unknown): v is Record<string, unknown> {\n  return typeof v === \"object\" && v !== null && !Array.isArray(v);\n}\nfunction mergeDeep<T>(base: T, patch: DeepPartial<T>): T {\n  if (!isRecord(base) || !isRecord(patch)) {\n    return (patch === undefined ? base : patch) as T;\n  }\n  const out: Record<string, unknown> = { ...base };\n  for (const [k, v] of Object.entries(patch)) {\n    if (v !== undefined) {\n      out[k] = mergeDeep<unknown>(base[k], v);\n    }\n  }\n  return out as T;\n}\nconst merged = mergeDeep({ db: { host: \"localhost\", port: 5432 }, debug: false }, { db: { port: 5433 } });\nconsole.log(JSON.stringify(merged));\n",
+              "tests": [
+                {
+                  "input": "",
+                  "output": "{\"db\":{\"host\":\"localhost\",\"port\":5433},\"debug\":false}"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w29-lb-fix1",
+              "title": "Fix the merge that lost the siblings",
+              "prompt": "Overriding only `db.port` also wiped out `db.host`: this prints `{\"db\":{\"port\":5433},\"debug\":false}`. The merge is shallow — it replaces the whole `db` object with the patch's `db` instead of merging inside it.",
+              "hint": "A spread is one level deep.",
+              "hints": [
+                "A spread is one level deep.",
+                "When both sides of a key are objects, merge them — recursively.",
+                "Walk the patch's entries and recurse for each."
+              ],
+              "language": "typescript",
+              "kind": "fix",
+              "difficulty": "Hard",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "type DeepPartial<T> = T extends object ? { [K in keyof T]?: DeepPartial<T[K]> } : T;\ntype DeepReadonly<T> = T extends object ? { readonly [K in keyof T]: DeepReadonly<T[K]> } : T;\nfunction isRecord(v: unknown): v is Record<string, unknown> {\n  return typeof v === \"object\" && v !== null && !Array.isArray(v);\n}\nfunction mergeDeep<T>(base: T, patch: DeepPartial<T>): T {\n  return { ...base, ...patch } as T;\n}\nconst merged = mergeDeep({ db: { host: \"localhost\", port: 5432 }, debug: false }, { db: { port: 5433 } });\nconsole.log(JSON.stringify(merged));\n",
+              "solution": "type DeepPartial<T> = T extends object ? { [K in keyof T]?: DeepPartial<T[K]> } : T;\ntype DeepReadonly<T> = T extends object ? { readonly [K in keyof T]: DeepReadonly<T[K]> } : T;\nfunction isRecord(v: unknown): v is Record<string, unknown> {\n  return typeof v === \"object\" && v !== null && !Array.isArray(v);\n}\nfunction mergeDeep<T>(base: T, patch: DeepPartial<T>): T {\n  if (!isRecord(base) || !isRecord(patch)) {\n    return (patch === undefined ? base : patch) as T;\n  }\n  const out: Record<string, unknown> = { ...base };\n  for (const [k, v] of Object.entries(patch)) {\n    if (v !== undefined) {\n      out[k] = mergeDeep<unknown>(base[k], v);\n    }\n  }\n  return out as T;\n}\nconst merged = mergeDeep({ db: { host: \"localhost\", port: 5432 }, debug: false }, { db: { port: 5433 } });\nconsole.log(JSON.stringify(merged));\n",
+              "tests": [
+                {
+                  "input": "",
+                  "output": "{\"db\":{\"host\":\"localhost\",\"port\":5433},\"debug\":false}"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            }
+          ],
+          "quiz": [
+            {
+              "question": "Why does `mergeDeep` call itself with `<unknown>`?",
+              "options": [
+                "speed",
+                "below the top level the precise type is not tracked; the public signature carries it",
+                "unknown is required",
+                "to disable checks"
+              ],
+              "answer": 1,
+              "explanation": "Precise outside, careful inside."
+            },
+            {
+              "question": "DeepReadonly without deepFreeze…",
+              "options": [
+                "is enough",
+                "stops typed writes but not a cast, or plain JavaScript",
+                "freezes the object",
+                "is an error"
+              ],
+              "answer": 1,
+              "explanation": "The type is a promise; freezing enforces it."
+            }
+          ]
+        }
+      ],
+      "capstone": {
+        "title": "Library #1 — the config module",
+        "brief": "The first module of the typed library: load configuration.\n\nDefaults (write these exactly):\n\n```ts\ninterface Config {\n  name: string;\n  db: { host: string; port: number };\n  debug: boolean;\n}\nconst DEFAULTS: Config = { name: \"app\", db: { host: \"localhost\", port: 5432 }, debug: false };\n```\n\nInput: one JSON object of overrides on stdin — any subset, at any depth.\n\n```\n{\"db\":{\"port\":5433}}\n```\n\n```\n{\"name\":\"app\",\"db\":{\"host\":\"localhost\",\"port\":5433},\"debug\":false}\nfrozen true true\n```\n\n**What to build:**\n\n* `DeepPartial<T>` and `DeepReadonly<T>`, recursive, as in lessons 5 and 7.\n* `mergeDeep<T>(base: T, patch: DeepPartial<T>): T` — a nested override keeps its\n  siblings.\n* `deepFreeze<T>(value: T): DeepReadonly<T>` — freezes every level.\n* `configure(patch: DeepPartial<Config>): DeepReadonly<Config>`, which merges the\n  overrides into the defaults and freezes the result.\n* Print `JSON.stringify` of the result, then `frozen` and whether the result and\n  `result.db` are frozen.\n\n**How it is checked:** on stdout, and by type assertions in the hidden harness —\nthat `configure` returns exactly `DeepReadonly<Config>`, that `DeepPartial<Config>`\naccepts `{ db: {} }`, and, inside a function that never runs,\n`// @ts-expect-error` on a write to `cfg.db.port`. If the result type is not deeply\nread-only, that directive is unused and the check fails.\n\n`JSON.parse` hands back `any` (week 15); this module trusts its input's shape and\nsays so with one cast at the boundary. Week 15's validation would go there in a real\nsystem.\n",
+        "kind": "auto",
+        "exercise": {
+          "id": "tscourse-w29-capstone",
+          "title": "Library #1 — the config module",
+          "prompt": "Merge JSON overrides into typed defaults, freeze the result at every level, and type it DeepReadonly — checked on stdout and by type assertions.",
+          "hint": "Write the two recursive types first; the functions follow their shapes.",
+          "hints": [
+            "Write the two recursive types first; the functions follow their shapes.",
+            "mergeDeep recurses only when BOTH sides are plain objects; otherwise the patch's value wins if present.",
+            "deepFreeze freezes the children before the parent.",
+            "configure is one line: freeze the merge.",
+            "One cast at the JSON boundary: `as DeepPartial<Config>`."
+          ],
+          "language": "typescript",
+          "kind": "challenge",
+          "difficulty": "Hard",
+          "strictness": "strict+indexed",
+          "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype _1 = Expect<Equal<ReturnType<typeof configure>, DeepReadonly<Config>>>;\nconst _partial: DeepPartial<Config> = { db: {} };\nfunction _neverCalled(): void {\n  // @ts-expect-error — the config is read-only, all the way down\n  cfg.db.port = 1;\n}\n",
+          "judge_mode": "",
+          "forbid": [],
+          "starter": "import * as fs from \"fs\";\ntype DeepPartial<T> = T extends object ? { [K in keyof T]?: DeepPartial<T[K]> } : T;\ntype DeepReadonly<T> = T extends object ? { readonly [K in keyof T]: DeepReadonly<T[K]> } : T;\nfunction isRecord(v: unknown): v is Record<string, unknown> {\n  return typeof v === \"object\" && v !== null && !Array.isArray(v);\n}\ninterface Config {\n  name: string;\n  db: { host: string; port: number };\n  debug: boolean;\n}\nconst DEFAULTS: Config = { name: \"app\", db: { host: \"localhost\", port: 5432 }, debug: false };\n____\nconst cfg = configure(JSON.parse(fs.readFileSync(0, \"utf8\")) as DeepPartial<Config>);\nconsole.log(JSON.stringify(cfg));\nconsole.log(`frozen ${Object.isFrozen(cfg)} ${Object.isFrozen(cfg.db)}`);\n",
+          "solution": "import * as fs from \"fs\";\ntype DeepPartial<T> = T extends object ? { [K in keyof T]?: DeepPartial<T[K]> } : T;\ntype DeepReadonly<T> = T extends object ? { readonly [K in keyof T]: DeepReadonly<T[K]> } : T;\nfunction isRecord(v: unknown): v is Record<string, unknown> {\n  return typeof v === \"object\" && v !== null && !Array.isArray(v);\n}\ninterface Config {\n  name: string;\n  db: { host: string; port: number };\n  debug: boolean;\n}\nconst DEFAULTS: Config = { name: \"app\", db: { host: \"localhost\", port: 5432 }, debug: false };\nfunction mergeDeep<T>(base: T, patch: DeepPartial<T>): T {\n  if (!isRecord(base) || !isRecord(patch)) {\n    return (patch === undefined ? base : patch) as T;\n  }\n  const out: Record<string, unknown> = { ...base };\n  for (const [k, v] of Object.entries(patch)) {\n    if (v !== undefined) {\n      out[k] = mergeDeep<unknown>(base[k], v);\n    }\n  }\n  return out as T;\n}\nfunction deepFreeze<T>(value: T): DeepReadonly<T> {\n  if (isRecord(value)) {\n    for (const v of Object.values(value)) {\n      deepFreeze(v);\n    }\n    Object.freeze(value);\n  }\n  return value as DeepReadonly<T>;\n}\nfunction configure(patch: DeepPartial<Config>): DeepReadonly<Config> {\n  return deepFreeze(mergeDeep(DEFAULTS, patch));\n}\nconst cfg = configure(JSON.parse(fs.readFileSync(0, \"utf8\")) as DeepPartial<Config>);\nconsole.log(JSON.stringify(cfg));\nconsole.log(`frozen ${Object.isFrozen(cfg)} ${Object.isFrozen(cfg.db)}`);\n",
+          "tests": [
+            {
+              "input": "{\"db\":{\"port\":5433}}",
+              "output": "{\"name\":\"app\",\"db\":{\"host\":\"localhost\",\"port\":5433},\"debug\":false}\nfrozen true true"
+            },
+            {
+              "input": "{}",
+              "output": "{\"name\":\"app\",\"db\":{\"host\":\"localhost\",\"port\":5432},\"debug\":false}\nfrozen true true"
+            },
+            {
+              "input": "{\"debug\":true,\"db\":{\"host\":\"db.internal\"},\"name\":\"api\"}",
+              "output": "{\"name\":\"api\",\"db\":{\"host\":\"db.internal\",\"port\":5432},\"debug\":true}\nfrozen true true"
+            }
+          ],
+          "source_slug": "",
+          "dataset": ""
+        },
+        "example_io": "{\"name\":\"app\",\"db\":{\"host\":\"localhost\",\"port\":5433},\"debug\":false}\nfrozen true true",
+        "rubric": [
+          "DeepPartial and DeepReadonly are recursive, with a primitive base case",
+          "a nested override keeps its siblings",
+          "every level of the result is frozen, children before parents",
+          "configure's signature is exactly DeepPartial<Config> in, DeepReadonly<Config> out",
+          "casts live inside the implementation, and there is exactly one at the JSON boundary",
+          "the harness's @ts-expect-error write is rejected by the type"
+        ],
+        "reference": "",
+        "stretch": {
+          "id": "tscourse-w29-capstone-stretch",
+          "title": "Library #1 (stretch)",
+          "prompt": "Two more library types. `DeepMutable<T>` undoes DeepReadonly at every level. `Settable<T>` keeps only the keys whose values are NOT objects — the leaves a user may set directly from a command line.",
+          "hint": "DeepMutable is DeepReadonly with -readonly.",
+          "hints": [
+            "DeepMutable is DeepReadonly with -readonly.",
+            "Settable remaps object-valued keys to never."
+          ],
+          "language": "typescript",
+          "kind": "drill",
+          "difficulty": "Hard",
+          "strictness": "strict+indexed",
+          "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ninterface Config { name: string; db: { host: string; port: number }; debug: boolean }\ntype RO = { readonly a: { readonly b: readonly number[] } };\ntype _1 = Expect<Equal<DeepMutable<RO>, { a: { b: number[] } }>>;\ntype _2 = Expect<Equal<Settable<Config>, { name: string; debug: boolean }>>;\ntype _3 = Expect<Equal<Settable<Config[\"db\"]>, { host: string; port: number }>>;\n",
+          "judge_mode": "types",
+          "forbid": [],
+          "starter": "____\n",
+          "solution": "type DeepMutable<T> = T extends object ? { -readonly [K in keyof T]: DeepMutable<T[K]> } : T;\ntype Settable<T> = { [K in keyof T as T[K] extends object ? never : K]: T[K] };\n",
+          "tests": [],
+          "source_slug": "",
+          "dataset": ""
+        }
+      },
+      "objectives": [
+        "Write a conditional type, and read the course's own Equal helper",
+        "Say what 'distributive' means, and turn it off when it is not wanted",
+        "Rebuild Exclude, Extract and NonNullable by hand",
+        "Use `infer` to extract an element, a return type or a promise's value",
+        "Write mapped types, including the `?`, `readonly`, `-?` and `-readonly` modifiers",
+        "Rebuild Partial, Readonly, Required, Pick and Omit by hand",
+        "Filter keys by their value type with `as` remapping",
+        "Write a recursive mapped type — DeepReadonly, DeepPartial",
+        "Give a runtime function a return type computed from its arguments",
+        "Prove a type REJECTS something with `@ts-expect-error`"
+      ],
+      "why": "Library and framework types are built from exactly these pieces, and reading them is a daily task: every `Partial`, every `ReturnType`, every generated API client. Interviewers who ask 'type-level' questions ask these. And the skill that transfers is not the syntax — it is thinking of a type as the output of a computation over another type.",
+      "est_minutes": 420,
+      "glossary": [
+        {
+          "term": "conditional type",
+          "def": "T extends U ? X : Y — an if/else evaluated by the compiler."
+        },
+        {
+          "term": "distributive",
+          "def": "A conditional on a bare type parameter runs once per union member and unions the results."
+        },
+        {
+          "term": "[T] extends [U]",
+          "def": "Wrapping in a tuple switches distribution off."
+        },
+        {
+          "term": "never",
+          "def": "The empty union. A distributive conditional over it produces never."
+        },
+        {
+          "term": "infer",
+          "def": "Inside a conditional's extends clause: name a part of the type to use in the result."
+        },
+        {
+          "term": "mapped type",
+          "def": "{ [K in keyof T]: … } — build an object type by looping over keys."
+        },
+        {
+          "term": "homomorphic",
+          "def": "A mapped type over keyof T; it keeps T's readonly and ? modifiers."
+        },
+        {
+          "term": "modifier",
+          "def": "readonly and ? on a property. + adds them, - removes them."
+        },
+        {
+          "term": "key remapping",
+          "def": "{ [K in keyof T as NewKey]: … } — rename or drop keys; never drops."
+        },
+        {
+          "term": "recursive type",
+          "def": "A type that refers to itself, like DeepReadonly."
+        },
+        {
+          "term": "@ts-expect-error",
+          "def": "A comment asserting the next line is an error — itself an error if it is not."
+        },
+        {
+          "term": "type-level test",
+          "def": "Expect<Equal<Actual, Expected>> — fails to COMPILE when wrong."
+        }
+      ],
+      "cheatsheet": "```ts\n// ---- conditional -------------------------------------------------------\ntype IsString<T> = T extends string ? true : false;\ntype ElementOf<T> = T extends readonly unknown[] ? T[number] : never;\n\n// distributive over unions, when T is a bare parameter:\ntype ToArray<T> = T extends unknown ? T[] : never;     // string | number → string[] | number[]\ntype ToArrayOne<T> = [T] extends [unknown] ? T[] : never;   // → (string | number)[]\ntype IsNever<T> = [T] extends [never] ? true : false;       // must be wrapped\n\n// the union filters, by hand\ntype Without<T, U> = T extends U ? never : T;          // Exclude\ntype Only<T, U> = T extends U ? T : never;             // Extract\n\n// ---- infer --------------------------------------------------------------\ntype Ret<F> = F extends (...args: never[]) => infer R ? R : never;     // ReturnType\ntype Unwrap<P> = P extends Promise<infer V> ? V : P;\n\n// ---- mapped ----------------------------------------------------------------\ntype Optional<T> = { [K in keyof T]?: T[K] };           // Partial\ntype Frozen<T>   = { readonly [K in keyof T]: T[K] };   // Readonly\ntype Needed<T>   = { [K in keyof T]-?: T[K] };          // Required\ntype Mutable<T>  = { -readonly [K in keyof T]: T[K] };\ntype Keep<T, K extends keyof T> = { [P in K]: T[P] };   // Pick\n\n// ---- remapping with `as` -----------------------------------------------------\ntype Drop<T, K extends PropertyKey> = { [P in keyof T as P extends K ? never : P]: T[P] };  // Omit\ntype NumbersOf<T> = { [K in keyof T as T[K] extends number ? K : never]: T[K] };\n\n// ---- recursive -----------------------------------------------------------------\ntype DeepReadonly<T> = T extends object ? { readonly [K in keyof T]: DeepReadonly<T[K]> } : T;\n\n// ---- proving a REJECTION in a test --------------------------------------------\n// @ts-expect-error — an error if the next line compiles\nconst bad: Nested = [1, \"two\"];\n```\n",
+      "self_check": [
+        "Can you write IsString<T>, and read the course's Equal<X, Y>?",
+        "Can you say what ToArray<string | number> is, and why?",
+        "Can you turn distribution off?",
+        "Can you say why IsNever<never> needs a tuple?",
+        "Can you rebuild Exclude and Extract from memory?",
+        "Can you write ReturnType with `infer`?",
+        "Can you rebuild Partial, Readonly and Required, including `-?`?",
+        "Can you rebuild Pick, and Omit with `as`?",
+        "Can you keep only the keys whose values are numbers?",
+        "Can you write DeepReadonly, and say what it does to arrays?",
+        "Can you give a runtime function a mapped return type?",
+        "Can you prove a type rejects a value?"
+      ],
+      "review": [
+        {
+          "question": "`T extends U ? X : Y` is evaluated…",
+          "options": [
+            "at run time",
+            "by the compiler, on types",
+            "never",
+            "by Node"
+          ],
+          "answer": 1,
+          "explanation": "An if for types."
+        },
+        {
+          "question": "`ToArray<string | number>` with `T extends unknown ? T[] : never` is…",
+          "options": [
+            "(string | number)[]",
+            "string[] | number[]",
+            "never",
+            "unknown[]"
+          ],
+          "answer": 1,
+          "explanation": "Distributive: once per member."
+        },
+        {
+          "question": "Distribution is switched off by…",
+          "options": [
+            "`as`",
+            "wrapping in a tuple: [T] extends [U]",
+            "`infer`",
+            "`keyof`"
+          ],
+          "answer": 1,
+          "explanation": "A tuple is not a bare type parameter."
+        },
+        {
+          "question": "`T extends U ? never : T` rebuilds…",
+          "options": [
+            "Extract",
+            "Exclude",
+            "Pick",
+            "Omit"
+          ],
+          "answer": 1,
+          "explanation": "Drop the members that match."
+        },
+        {
+          "question": "`infer R` means…",
+          "options": [
+            "R is any",
+            "name this part of the matched type R, for use in the result",
+            "R is required",
+            "run R"
+          ],
+          "answer": 1,
+          "explanation": "Only inside an extends clause."
+        },
+        {
+          "question": "`{ [K in keyof T]?: T[K] }` is…",
+          "options": [
+            "Required<T>",
+            "Partial<T>",
+            "Readonly<T>",
+            "Pick<T>"
+          ],
+          "answer": 1,
+          "explanation": "The ? modifier on every key."
+        },
+        {
+          "question": "`-?` in a mapped type…",
+          "options": [
+            "adds optional",
+            "removes optional — Required",
+            "is a syntax error",
+            "negates"
+          ],
+          "answer": 1,
+          "explanation": "And -readonly removes readonly."
+        },
+        {
+          "question": "Omit is rebuilt with…",
+          "options": [
+            "a union",
+            "key remapping: as P extends K ? never : P",
+            "infer",
+            "a tuple"
+          ],
+          "answer": 1,
+          "explanation": "Mapping a key to never drops it."
+        },
+        {
+          "question": "DeepReadonly on `number[]` gives…",
+          "options": [
+            "number[]",
+            "readonly number[]",
+            "never",
+            "Readonly<number>"
+          ],
+          "answer": 1,
+          "explanation": "Mapped types over arrays produce arrays."
+        },
+        {
+          "question": "`// @ts-expect-error` above a line that compiles…",
+          "options": [
+            "is ignored",
+            "is itself an error (TS2578)",
+            "passes",
+            "hides the line"
+          ],
+          "answer": 1,
+          "explanation": "Which is what lets a test prove a rejection."
+        },
+        {
+          "question": "Why is `Partial<` banned in the rebuild exercises?",
+          "options": [
+            "it is slow",
+            "`Equal<Optional<E>, Partial<E>>` would pass by writing Partial<E>",
+            "it is deprecated",
+            "it is not typed"
+          ],
+          "answer": 1,
+          "explanation": "The assertion cannot defend itself."
+        }
+      ],
+      "milestone": "Library #1 — the config module. A typed defaults object; overrides read as JSON and typed as a `DeepPartial` of it; a generic deep merge; and a result that is `DeepReadonly` to the compiler and `Object.freeze`d all the way down at run time — with a test that proves writing to it will not compile.",
       "practice": []
     },
     {

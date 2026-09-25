@@ -1,7 +1,7 @@
-# TypeScript Roadmap — Weeks 29-32
+# TypeScript Roadmap — Weeks 30-32
 
 The plan for finishing **TypeScript: Zero to Interview**, the 8-month course in
-`tools/typescript_course.py`. Weeks 1-28 ship; weeks 29-32 are one-line
+`tools/typescript_course.py`. Weeks 1-29 ship; weeks 30-32 are one-line
 skeletons waiting to be authored.
 
 Unlike [`JAVA_ROADMAP.md`](JAVA_ROADMAP.md), which starts after the basics, this
@@ -15,7 +15,7 @@ rule that nothing may require syntax a later week teaches.
 
 ## Where it stands
 
-**Built:** weeks 1-28 — **216 lessons, 1,557 judged exercises** (1,542 in lessons
+**Built:** weeks 1-29 — **223 lessons, 1,592 judged exercises** (1,577 in lessons
 and capstones, 15 in week 1's practice families), twenty Budget Buddy capstones —
 **the arc is complete** — eight interview reps, and a full
 glossary/cheat-sheet/self-check/review set per week. **Months 6 and 7 are finished.**
@@ -82,7 +82,7 @@ verifier revealed which kind they were.
 ### Nothing is half-finished
 
 Every authored week is complete: lessons, exercises, capstone, stretch, glossary,
-cheat sheet, self-check, review, milestone. Weeks 29-32 are untouched skeletons, as
+cheat sheet, self-check, review, milestone. Weeks 30-32 are untouched skeletons, as
 they were before. There is no partially-authored week and no disabled exercise.
 
 ### Five traps that cost real time
@@ -985,13 +985,47 @@ change where no such argument exists.
 All 34 expected outputs were right first time; three `fix` prompts misquoted their
 starters' output and were corrected from real runs.
 
-### Month 8 — Advanced Types & Interview Polish (weeks 29-32)
+### Month 8 — Advanced Types & Interview Polish (weeks 29-32) — 🚧 **29 done**
 
-**29. Conditional & Mapped Types** ⬜ · reuse `ts_mapped_types`,
-`ts_conditional_types`
-`T extends U ? X : Y` · `infer` · distributive conditionals · mapped types ·
-key remapping · modifiers (`+`/`-`, `readonly`, `?`) · rebuilding `Partial`,
-`Pick` and `Omit` by hand.
+**29. Conditional & Mapped Types** ✅ · `tools/ts_w29_mapped.py` · 7 lessons,
+35 exercises (25 type-graded)
+`w29-conditional` · `w29-distribute` · `w29-infer` · `w29-mapped` · `w29-remap` ·
+`w29-runtime` · `w29-library`.
+*Capstone:* **Library #1 — the config module** (decision 2's typed library begins):
+JSON overrides typed as `DeepPartial<Config>`, a generic `mergeDeep` that keeps a
+nested override's siblings, and a result that is `DeepReadonly<Config>` to the
+compiler *and* `deepFreeze`d at run time. Graded on stdout **and** type assertions.
+Stretch: `DeepMutable` and `Settable` (object-valued keys remapped away).
+Kinds: 28 drill (most type-graded), 2 diagnose, 2 fix, 1 design.
+
+**Rebuilding the built-ins is graded honestly.** `Equal<Optional<E>, Partial<E>>` is
+satisfied by writing `Partial<E>`, so `_types` gained a `forbid` parameter (the
+judge's existing substring ban, which exempts the hidden harness) and every rebuild
+bans its built-in's name. The rebuilt types get their own names — `Optional`,
+`Frozen`, `Needed`, `Keep`, `Drop`, `Without`, `Only`, `Present`, `Ret`, `Args` — partly
+because `MyPartial<` contains the banned substring `Partial<`. (The same trap caught
+`DeepPartial<T`, which contains `Partial<T`; the verifier's `check_forbidden` refused
+the build, as it should.)
+
+**Every equality was probed against the checker before a line was written**, including
+the subtle ones: the key-remapped `Drop` *is* `Equal` to `Omit` (modifiers survive the
+`as` clause); `DeepReadonly` turns `number[]` into `readonly number[]`; and a
+distributive conditional over `never` is `never`, which is why `IsNever` must wrap
+its parameter in a tuple — shipped as the lesson's hardest exercise.
+
+**`@ts-expect-error` proves rejections**, the device week 25 introduced. In the
+capstone it sits in a function that is never called, so a write to the frozen config
+is type-checked (and must be rejected, or the unused directive fails the check with
+TS2578) but never executed — which matters, because in an ES module that write
+would throw.
+
+**Lesson 6 puts the types back onto running code**, graded on stdout plus
+assertions, and its `fix` is week 14's `Omit` leak one level up: a `pick` typed as
+returning `Keep<T, K>` that spreads the whole input prints all four keys. A type is
+not a runtime filter.
+
+Two new scope rules: `infer ` and `in keyof`, both at 29, verified absent from every
+earlier program. Every expected output and every `fix` prompt was right first time.
 
 **30. Inference & Template Literal Types** ⬜ · reuse
 `ts_template_literal_types`, `ts_keyof_indexed`
@@ -1028,7 +1062,7 @@ still go first.
 | **D** ✅ | 17-20 | Async + data structures; the Budget Buddy arc is closed |
 | **E** ✅ | 21-24 | Algorithmic thinking; the month's idiom is to count operations |
 | **F** ✅ | 25-28 | DSA core |
-| **G** ← next | 29-32 | Type-level; lowest risk, highest polish |
+| **G** 🚧 | 29 ✅, **30** ← next | Type-level; lowest risk, highest polish |
 
 **Batches C and D are done, and with them every risk the back half was waiting
 on**: the one-file module problem (settled with evidence — week 16), async

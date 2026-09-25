@@ -236,10 +236,17 @@ type Expect<T extends true> = T;
 """
 
 
-def _types(eid, title, prompt, full, blank, asserts, hints=(), difficulty="Medium"):
-    """A type-level drill. `asserts` is one `type _n = Expect<...>` per claim."""
+def _types(eid, title, prompt, full, blank, asserts, hints=(), difficulty="Medium",
+           forbid=()):
+    """A type-level drill. `asserts` is one `type _n = Expect<...>` per claim.
+
+    `forbid` exists for the month-8 "rebuild it by hand" exercises: an
+    assertion that `MyPartial<T>` equals `Partial<T>` is satisfied by writing
+    `Partial<T>`, so the built-in's name is banned from the submission (the
+    hidden harness may still use it)."""
     return _mk(eid, title, prompt, full, [], hints, difficulty, "drill", blank=blank,
-               harness=_TYPE_PRELUDE + "\n" + _prog(asserts), judge_mode="types")
+               harness=_TYPE_PRELUDE + "\n" + _prog(asserts), judge_mode="types",
+               forbid=forbid)
 
 
 # ---------------------------------------------------------------------------
@@ -484,6 +491,7 @@ _WEEK_FILES = (
     "ts_w26_dp.py",            #          dynamic programming
     "ts_w27_graphs.py",        #          graphs: BFS & DFS
     "ts_w28_heaps.py",         #          heaps & intervals
+    "ts_w29_mapped.py",        # Month 8 — conditional & mapped types
 )
 
 for _week_file in _WEEK_FILES:
@@ -551,8 +559,6 @@ for _week_file in _WEEK_FILES:
 _WEEKS += [
 ]
 _WEEKS += [
-    _skel(29, 8, _M8, "Conditional & Mapped Types",
-          "Compute new types from existing ones with conditional and mapped types."),
     _skel(30, 8, _M8, "Inference & Template Literal Types",
           "Bend the inference engine and build types from string patterns."),
     _skel(31, 8, _M8, "Type-Level Challenges",
@@ -728,6 +734,10 @@ _SCOPE_RULES = [
     # Week 24: the non-mutating sort. Week 13's lesson text mentions `toSorted`
     # in passing, but no program before week 24 calls it (verified).
     (".toSorted(", 24),
+    # Week 29: conditional-type inference and mapped types over keys. Verified
+    # absent from every program in weeks 1-28 (week 14 USED Partial and Pick but
+    # never showed how they are written).
+    ("infer ", 29), ("in keyof", 29),
     #
     # DELIBERATELY NOT GATED, because the authored weeks already use them and a
     # rule here would be a false claim about when the course first shows them:
