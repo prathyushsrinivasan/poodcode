@@ -61,8 +61,9 @@ the gap stays visible. This is what has landed since.
 | What the checker knows | `lib: es2022` — `toSorted`, `Object.groupBy`, Set methods, iterator helpers and `using` all failed to compile though Node 24 runs them | **ES2024 + the esnext libraries Node 24 ships** (array, collection, iterator, disposable, promise) — judge, verifier and editor in step | `tscheck.rs`, `ts_typecheck.mjs`, `monacoSetup.ts` |
 | Expected outputs | pasted in by hand after running the reference | **computed**: content names its inputs; `python tools/gen_ts_outputs.py` runs every reference (type-checked first) and caches the outputs, hash-pinned — a stale entry fails the build | `tools/ts_outputs_kit.py`, `tools/ts_outputs.json` |
 | Lesson template (X-02) | 1-2k-character lessons, prose only | new chapters are **structured data rendered into a fixed spine** — why, idea, worked examples *with the output they really print*, real compiler errors *as tsc prints them*, pitfalls (wrong vs right, both run), interview, forward links; 4k+ characters enforced | `tools/ts_chapter_kit.py`; chapters in `tools/ts_chapters_m*.py` |
-| Build projects (F-08) | a sentence; code saved but never run; "shipped" self-declared | **structured brief + acceptance tests** run through the judge; *shipping needs them green*; reference revealed after shipping; saved self-review rubric — weeks 1–13 | `project_spec`, `ProjectPanel`, `project_rubric` column |
-| Problems inside a week | 2-5 Library links | **a tiered problem set per week** (warm-up / core / stretch), original, judged at the week's strictness — weeks 1–13 (138 problems), type-graded ones included from week 13 | `problem_set`, `tools/mastery_ts_more_m*.py` |
+| Build projects (F-08) | a sentence; code saved but never run; "shipped" self-declared | **structured brief + acceptance tests** run through the judge; *shipping needs them green*; reference revealed after shipping; saved self-review rubric — weeks 1–17 (Month 4's include `ledger.ts` v4 and a reverse-routing `routes.ts`) | `project_spec`, `ProjectPanel`, `project_rubric` column |
+| Problems inside a week | 2-5 Library links | **a tiered problem set per week** (warm-up / core / stretch), original, judged at the week's strictness — weeks 1–17 (174 problems, 11 of them type-graded) | `problem_set`, `tools/mastery_ts_more_m*.py` |
+| Month 4 chapters | none of the five the roadmap asks for | **`ts_erasable_syntax`, `ts_versions`, `ts_variance`, `ts_parse_dont_validate`, `ts_runtime_validation`** on the lesson template; TypeScript 6.0/7.0 facts checked against the official release notes (D-4) — the chapter teaches the 6.0 defaults and deprecations as content, the checker itself stays on 5.9 | `tools/ts_chapters_m4.py`, `tools/mastery_ts_more_m4.py` |
 | Fast authoring loop (X-102) | none for Mastery | `python tools/verify_ts_mastery.py --weeks 11-14` / `--only ts_regex` — type-checks and runs chapters, practice, problems, finals and projects in seconds | `tools/verify_ts_mastery.py` |
 
 ---
@@ -341,7 +342,7 @@ print stdout, and know exactly what TypeScript infers without being told.
 ### Week 1 — Values, Types & Inference
 *Now:* `ts_variables`, `ts_types`, `ts_inference` · 4 problems · 6 quiz · final "Temperature table" (4 tests).
 
-* **Chapters:** ✅ the three above · ⬜ **`ts_program_io`** — the stdin/stdout contract: `readFileSync(0)`, `trim`, `split("\n")`, `Number()` vs `parseInt`, printing with `console.log` and template strings.
+* **Chapters:** ✅ the three above · ✅ **`ts_program_io`** — the stdin/stdout contract: `readFileSync(0)`, `trim`, `split("\n")`, `Number()` vs `parseInt`, printing with `console.log` and template strings.
 * **Lesson additions:** literal types from `const` vs widening from `let`; `number` is one type (no int/float); `null` vs `undefined`; `any` as a hole in the type system; `unknown` as the safe top type; why annotations on locals are usually noise and on function boundaries usually essential; how type stripping means types never change runtime behaviour.
 * **Worked examples:** celsius converter with and without annotations (same output — types are erased); `let x = 5` hover vs `const x = 5` hover; reading two numbers on one line vs two lines.
 * **Pitfalls:** `Number("")` is `0`; `Number("12px")` is `NaN`; `parseInt("08")` works but `parseInt("1e3")` is `1`; forgetting `trim()` leaves `"\r"` on Windows input; `console.log(a, b)` inserts a space.
@@ -367,7 +368,7 @@ print stdout, and know exactly what TypeScript infers without being told.
 ### Week 2 — Operators & Control Flow
 *Now:* `ts_operators`, `ts_conditionals` · 5 problems · final "Ticket price".
 
-* **Chapters:** ✅ both · ⬜ **`ts_equality`** — `===` vs `==`, `NaN !== NaN`, `Object.is`, the full truthiness table, `??` vs `||`.
+* **Chapters:** ✅ both · ✅ **`ts_equality`** — `===` vs `==`, `NaN !== NaN`, `Object.is`, the full truthiness table, `??` vs `||`.
 * **Lesson additions:** precedence of `&&`/`||`/`??` (and why mixing `??` with `||` without parentheses is a syntax error); `switch` fallthrough and `break`; ternaries for values, `if` for effects; early returns; comparing strings (`"10" < "9"`); `%` with negatives.
 * **Worked examples:** leap-year rule three ways (nested ifs, single boolean expression, lookup); ticket pricing with a table of age bands; grading with a `switch (true)` vs an if-chain.
 * **Pitfalls:** `if (count)` skipping 0; `value || default` replacing `0`/`""`; `==` coercions (`"" == 0`); `-7 % 3 === -1`; a `switch` missing `break`.
@@ -380,7 +381,7 @@ print stdout, and know exactly what TypeScript infers without being told.
 ### Week 3 — Loops & Numbers
 *Now:* `ts_loops`, `ts_number_math` · final "Number report".
 
-* **Chapters:** ✅ both · ⬜ **`ts_number_format`** — floating point (`0.1 + 0.2`), `toFixed` rounding, integers as cents, `Number.isInteger`, `Number.MAX_SAFE_INTEGER`, **`bigint`** (`123n`), `Intl.NumberFormat` for currency and grouping.
+* **Chapters:** ✅ both · ✅ **`ts_number_format`** — floating point (`0.1 + 0.2`), `toFixed` rounding, integers as cents, `Number.isInteger`, `Number.MAX_SAFE_INTEGER`, **`bigint`** (`123n`), `Intl.NumberFormat` for currency and grouping.
 * **Lesson additions:** `for` / `while` / `do…while` / `for…of`; `break`/`continue` and labelled breaks; loop invariants in plain English; off-by-one as a habit, not an accident; `Math.floor` vs `Math.trunc` for negatives; integer overflow doesn't exist — precision loss does.
 * **Worked examples:** digit sum with `%` and division; primes by trial division to `√n`; running totals in cents; factorial past 2^53 with `bigint`.
 * **Pitfalls:** `(1.005).toFixed(2)` is `"1.00"`; `Math.round(-2.5)` is `-2`; `for (const i in arr)` gives strings; mutating a loop bound mid-loop.
@@ -393,7 +394,7 @@ print stdout, and know exactly what TypeScript infers without being told.
 ### Week 4 — Text & String Methods
 *Now:* `ts_strings`, `ts_string_methods` · final "Title case and initials".
 
-* **Chapters:** ✅ both · ⬜ **`ts_regex`** — literals vs `new RegExp`, flags, `test`/`match`/`matchAll`/`replaceAll`, named groups, `RegExp.escape` · ⬜ **`ts_unicode`** — UTF-16 code units, `for…of` iterates code points, `"é".length`, emoji, `Intl.Segmenter` for graphemes, `localeCompare`.
+* **Chapters:** ✅ both · ✅ **`ts_regex`** — literals vs `new RegExp`, flags, `test`/`match`/`matchAll`/`replaceAll`, named groups, `RegExp.escape` · ✅ **`ts_unicode`** — UTF-16 code units, `for…of` iterates code points, `"é".length`, emoji, `Intl.Segmenter` for graphemes, `localeCompare`.
 * **Lesson additions:** strings are immutable; `slice` vs `substring`; `padStart` for tables; `split("")` breaks emoji; template literal multi-line; building strings in loops vs `join`.
 * **Worked examples:** slugify three ways (loop, chained methods, regex); a fixed-width table printer; counting words with and without regex; parsing `key=value` pairs with named groups.
 * **Pitfalls:** `replace` with a string replaces only the first match; `split(" ")` on double spaces; `toUpperCase` on `ß`; sorting strings with `<` vs `localeCompare`.
@@ -424,7 +425,7 @@ collections without mutation surprises, and model records as typed objects.
 ### Week 5 — Functions & Parameters
 *Now:* `ts_functions`, `ts_params` · 4 problems · final "Formatter with options".
 
-* **Chapters:** ✅ both · ⬜ **`ts_overloads`** — overload signatures vs implementation signature, when a union parameter is better, `this` parameters · ⬜ **`ts_closures_scope`** — lexical scope, closures, the loop-closure bug with `var`, IIFEs, module scope.
+* **Chapters:** ✅ both · ✅ **`ts_overloads`** — overload signatures vs implementation signature, when a union parameter is better, `this` parameters · ✅ **`ts_closures_scope`** — lexical scope, closures, the loop-closure bug with `var`, IIFEs, module scope.
 * **Lesson additions:** return type inference vs annotation (annotate exported functions); optional vs default parameters; rest parameters as tuples; `void` vs `undefined` returns; function declarations vs arrow functions (hoisting, `this`); pure functions.
 * **Worked examples:** `formatMoney(cents, { symbol, decimals })` with an options object; a counter factory via closure; overloads for `parse(input: string): number` / `parse(input: string[]): number[]`.
 * **Pitfalls:** default parameter evaluated each call; optional before required (TS1016); a callback typed `() => void` still accepts a function returning a value; forgetting `return` in a braced arrow.
@@ -437,7 +438,7 @@ collections without mutation surprises, and model records as typed objects.
 ### Week 6 — Higher-Order Functions
 *Now:* `ts_higher_order` · 3 problems · final "Compose a text pipeline".
 
-* **Chapters:** ✅ `ts_higher_order` · ⬜ **`ts_recursion`** — base case, recursive case, the call stack, recursion depth in Node, recursion vs loops, simple memoisation (moved forward from week 25 of the course arc so month 6 isn't the first time the learner sees it).
+* **Chapters:** ✅ `ts_higher_order` · ✅ **`ts_recursion`** — base case, recursive case, the call stack, recursion depth in Node, recursion vs loops, simple memoisation (moved forward from week 25 of the course arc so month 6 isn't the first time the learner sees it).
 * **Lesson additions:** functions as values; typing callbacks with contextual typing; `pipe` vs `compose`; partial application and currying; generics appear here *by necessity* for `pipe` — a preview, not the lesson (week 18 is).
 * **Worked examples:** `pipe(trim, lower, collapseSpaces, slug)`; a debounce-shaped function (simulated clock, deterministic); recursive `sumDigits`, `power`, `flatten`.
 * **Pitfalls:** passing `parseInt` to `map` (`["1","2","3"].map(parseInt)`); losing `this` when passing a method; unbounded recursion (`RangeError: Maximum call stack size exceeded`).
@@ -450,7 +451,7 @@ collections without mutation surprises, and model records as typed objects.
 ### Week 7 — Arrays & Array Methods
 *Now:* `ts_arrays`, `ts_array_methods` · final "Array statistics".
 
-* **Chapters:** ✅ both · ⬜ **`ts_tuples`** — tuples, labelled elements, optional and rest elements, `readonly` tuples, returning tuples · ⬜ **`ts_array_modern`** — `at`, `toSorted`/`toReversed`/`toSpliced`/`with` (non-mutating), `Object.groupBy`, `flatMap`, `Array.from({ length })`, `structuredClone`.
+* **Chapters:** ✅ both · ✅ **`ts_tuples`** — tuples, labelled elements, optional and rest elements, `readonly` tuples, returning tuples · ✅ **`ts_array_modern`** — `at`, `toSorted`/`toReversed`/`toSpliced`/`with` (non-mutating), `Object.groupBy`, `flatMap`, `Array.from({ length })`, `structuredClone`.
 * **Lesson additions:** `T[]` vs `Array<T>`; `sort()` mutates and sorts as strings by default; `reduce` with an explicit accumulator type; `find` returns `T | undefined`; `includes` vs `indexOf`; `noUncheckedIndexedAccess` preview.
 * **Worked examples:** statistics with `reduce`; `toSorted` vs `sort` side-by-side (showing the original array); grouping transactions by category with `Object.groupBy`; `[min, max]` tuple return.
 * **Pitfalls:** `[10, 9, 1].sort()` → `[1, 10, 9]`; `reduce` without an initial value on an empty array throws; `new Array(3).map(...)` does nothing (holes); `forEach` can't `break`.
@@ -463,7 +464,7 @@ collections without mutation surprises, and model records as typed objects.
 ### Week 8 — Destructuring, Objects & JSON
 *Now:* `ts_destructuring`, `ts_objects`, `ts_json` · 3 problems · final "Merge JSON records".
 
-* **Chapters:** ✅ all three · ⬜ **`ts_interfaces_types`** — `interface` vs `type`, `extends`, declaration merging, when each wins · ⬜ **`ts_index_signatures`** — `{ [key: string]: T }`, `Record<K, V>`, excess-property checks, optional properties vs `| undefined` (`exactOptionalPropertyTypes`).
+* **Chapters:** ✅ all three · ✅ **`ts_interfaces_types`** — `interface` vs `type`, `extends`, declaration merging, when each wins · ✅ **`ts_index_signatures`** — `{ [key: string]: T }`, `Record<K, V>`, excess-property checks, optional properties vs `| undefined` (`exactOptionalPropertyTypes`).
 * **Lesson additions:** shorthand properties; computed keys; spread and its shallowness; `Object.keys` returns `string[]` (and why); `JSON.parse` returns `any` — the reason week 11 exists; `JSON.stringify` with indentation and replacers; dates in JSON.
 * **Worked examples:** config reader with defaults via destructuring; merging records with spread (later keys win); `Object.entries` round trip; pretty-printing JSON with sorted keys.
 * **Pitfalls:** spreading `undefined` is fine, spreading `null` is fine, destructuring `null` throws; nested spread is shallow; `JSON.stringify` drops `undefined` and functions; `Object.keys` order for integer-like keys.
@@ -493,7 +494,7 @@ control-flow narrowing the way the compiler does.
 ### Week 9 — Maps, Sets & Hashing
 *Now:* `ts_maps_sets` · 5 problems · final "Inverted index".
 
-* **Chapters:** ✅ `ts_maps_sets` · ⬜ **`ts_set_algebra`** — ES2025 `Set` methods (`union`, `intersection`, `difference`, `symmetricDifference`, `isSubsetOf`), `Map.groupBy`, `WeakMap`/`WeakSet` and when identity keys matter.
+* **Chapters:** ✅ `ts_maps_sets` · ✅ **`ts_set_algebra`** — ES2025 `Set` methods (`union`, `intersection`, `difference`, `symmetricDifference`, `isSubsetOf`), `Map.groupBy`, `WeakMap`/`WeakSet` and when identity keys matter.
 * **Lesson additions:** `Map` vs object (any key type, insertion order, `size`, no prototype keys); `get` returns `V | undefined`; counting pattern `m.set(k, (m.get(k) ?? 0) + 1)`; object keys by identity; iteration order guarantees; hashing intuition — why lookup is O(1) on average.
 * **Worked examples:** word frequency; two-sum with a `Map`; de-duplicating objects by id; tag intersection with `Set.prototype.intersection`.
 * **Pitfalls:** `map[key]` on a `Map` (sets a property, not an entry); two identical object literals are different keys; `JSON.stringify(new Map())` is `{}`; `new Set("abc")` is a set of characters.
@@ -507,7 +508,7 @@ control-flow narrowing the way the compiler does.
 ### Week 10 — Unions, Aliases & Literal Types
 *Now:* `ts_unions`, `ts_aliases`, `ts_enums` · final "Traffic light machine".
 
-* **Chapters:** ✅ all three · ⬜ **`ts_literal_inference`** — widening rules, `as const`, readonly tuples from `as const`, deriving a union from an array (`typeof xs[number]`), `const` type parameters (preview).
+* **Chapters:** ✅ all three · ✅ **`ts_literal_inference`** — widening rules, `as const`, readonly tuples from `as const`, deriving a union from an array (`typeof xs[number]`), `const` type parameters (preview).
 * **Lesson additions:** union as "one of"; literal unions as the replacement for enums (erasable-syntax argument, D-5); `enum` graded by type-check only; union of objects vs object of unions; type aliases vs interfaces revisited.
 * **Worked examples:** traffic light as a literal union + transition table; `const SIZES = ["S","M","L"] as const; type Size = typeof SIZES[number]`; the same thing as an enum, and why the union wins.
 * **Pitfalls:** `let dir = "up"` widens to `string`; `enum` reverse mappings; numeric enums accept any number (older TS); `as const` on a mutable binding.
@@ -520,7 +521,7 @@ control-flow narrowing the way the compiler does.
 ### Week 11 — Narrowing, Type Guards & Nullish *(D-2: `ts_nullish` moves here)*
 *Now:* `ts_narrowing`, `ts_type_predicates` · 3 problems · final "Validate a batch of records".
 
-* **Chapters:** ✅ `ts_narrowing`, `ts_type_predicates`, `ts_nullish` (moved) · ⬜ **`ts_control_flow`** — control-flow analysis in depth: assignments, early returns, `in`, `instanceof`, `Array.isArray`, **inferred type predicates** (TS 5.5: `xs.filter(x => x !== undefined)` narrows), **assertion functions** (`asserts x is T`), aliased conditions.
+* **Chapters:** ✅ `ts_narrowing`, `ts_type_predicates`, `ts_nullish` (moved) · ✅ **`ts_control_flow`** — control-flow analysis in depth: assignments, early returns, `in`, `instanceof`, `Array.isArray`, **inferred type predicates** (TS 5.5: `xs.filter(x => x !== undefined)` narrows), **assertion functions** (`asserts x is T`), aliased conditions.
 * **Lesson additions:** `typeof` guard table; truthiness narrowing and its `0`/`""` trap; `?.` and `??` and `??=`; `!` as an earned assertion vs a lie; narrowing does not survive callbacks; `unknown` → validated type as the core workflow; `noUncheckedIndexedAccess` on from here.
 * **Worked examples:** validating a batch of JSON records with `isPerson(x: unknown): x is Person`; `assertIsDefined`; `filter` with an inferred predicate; a parser that returns `Person | null`.
 * **Pitfalls:** a type predicate that lies (the compiler trusts it); narrowing lost after `await`/callback; `if (x)` excluding `0`; `!` hiding a real bug; `typeof null === "object"`.
@@ -533,7 +534,7 @@ control-flow narrowing the way the compiler does.
 ### Week 12 — Discriminated Unions
 *Now:* `ts_discriminated_unions` · final "Stack language interpreter".
 
-* **Chapters:** ✅ `ts_discriminated_unions` · ⬜ **`ts_top_bottom`** — `unknown`, `never`, `void`, `{}` vs `object` vs `Object`, exhaustiveness via `never`, `satisfies never`.
+* **Chapters:** ✅ `ts_discriminated_unions` · ✅ **`ts_top_bottom`** — `unknown`, `never`, `void`, `{}` vs `object` vs `Object`, exhaustiveness via `never`, `satisfies never`.
 * **Lesson additions:** the tag field; `switch` on the tag; exhaustiveness as a refactoring tool (add a variant → the compiler lists every place to update); `Result<T, E>` as a discriminated union (preview of week 25); modelling states that carry data (`{ status: "done"; value } | { status: "failed"; error }`).
 * **Worked examples:** shapes with area; an expression evaluator (`num | add | mul | neg`); a download state with per-state data; a reducer `(state, action) => state`.
 * **Pitfalls:** tags that aren't literal types (`kind: string`); destructuring the tag loses narrowing (older TS) — show when it works now; optional tags; `default:` that swallows new variants.
@@ -546,7 +547,7 @@ control-flow narrowing the way the compiler does.
 ### Week 13 — Tuples, Overloads & Function Types in Depth *(D-2)* + Checkpoint
 *Now:* "Checkpoint — Consolidation", no chapters, contest "Months 1–3".
 
-* **Chapters:** ⬜ **`ts_function_types`** — call signatures, construct signatures, `this` types, function type assignability (parameter bivariance preview), `ReturnType`/`Parameters` preview · ⬜ **`ts_type_testing`** — `Expect<Equal<A, B>>`, `@ts-expect-error`, how to *test* a type. Needed before months 4–5, which grade types.
+* **Chapters:** ✅ **`ts_function_types`** — call signatures, construct signatures, `this` types, function type assignability (parameter bivariance preview), `ReturnType`/`Parameters` preview · ✅ **`ts_type_testing`** — `Expect<Equal<A, B>>`, `@ts-expect-error`, how to *test* a type. Needed before months 4–5, which grade types.
 * **Checkpoint (kept):** the 90-minute contest stays attached; quiz draws from weeks 9–12 via `quiz_from` (F-11).
 * **Review:** 10 "review" problems from weeks 1–12 (explicitly `note: "review"`), interleaved.
 * **Exercises:** +8 drill, +4 predict, +4 diagnose (TS2578 unused `@ts-expect-error`), **+6 type-graded** (write the assertion that fails for the wrong type).
@@ -575,7 +576,7 @@ typing is sometimes unsound, and make illegal values unconstructable.
 ### Week 14 — The Toolchain: tsconfig, Modules & Declarations *(D-2)*
 *Now:* "Nullability & Compiler Strictness" (`ts_nullish`, `ts_tsconfig`).
 
-* **Chapters:** ✅ `ts_tsconfig`, `ts_modules`, `ts_declaration_files` (moved from 26) · ⬜ **`ts_erasable_syntax`** — type stripping, `--erasableSyntaxOnly`, `verbatimModuleSyntax`, `import type`/`export type`, why `enum`/`namespace`/parameter properties need a transform · ⬜ **`ts_versions`** — what changed in TypeScript 6.0 and what TypeScript 7 (native compiler) means for a project (D-4; author from the release notes).
+* **Chapters:** ✅ `ts_tsconfig`, `ts_modules`, `ts_declaration_files` (moved from 26) · ✅ **`ts_erasable_syntax`** — type stripping, `--erasableSyntaxOnly`, `verbatimModuleSyntax`, `import type`/`export type`, why `enum`/`namespace`/parameter properties need a transform · ✅ **`ts_versions`** — what changed in TypeScript 6.0 and what TypeScript 7 (native compiler) means for a project (D-4; author from the release notes).
 * **Lesson additions:** what each `strict` sub-flag buys (`strictNullChecks`, `noImplicitAny`, `strictFunctionTypes`, `useUnknownInCatchVariables`…); `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`, `noPropertyAccessFromIndexSignature`; `module`/`moduleResolution` (`nodenext`, `bundler`); ESM vs CJS; `.d.ts` files, `declare`, `declare global`, module augmentation; typing an untyped dependency.
 * **Worked examples:** the same program under four tsconfigs; a `.d.ts` for a tiny untyped "library"; augmenting `Array` with a typed helper (and why you shouldn't); a two-module project in the multi-file workspace.
 * **Pitfalls:** `import` of a type without `type` under `verbatimModuleSyntax`; default-export interop; circular imports; `skipLibCheck` hiding real errors; `any` leaking through a `.d.ts`.
@@ -588,7 +589,7 @@ typing is sometimes unsound, and make illegal values unconstructable.
 ### Week 15 — Assertions, `satisfies` & Structural Typing
 *Now:* `ts_assertions`, `ts_satisfies`, `ts_structural_typing` · 2 problems · final "Route table with satisfies".
 
-* **Chapters:** ✅ all three · ⬜ **`ts_variance`** — covariance, contravariance, method bivariance, array covariance unsoundness, `in`/`out` variance annotations.
+* **Chapters:** ✅ all three · ✅ **`ts_variance`** — covariance, contravariance, method bivariance, array covariance unsoundness, `in`/`out` variance annotations.
 * **Lesson additions:** `as` as a claim, not a conversion; double assertion `as unknown as T` and why it exists; `satisfies` keeps the literal type while checking; structural typing and "duck typing with a compiler"; excess-property checks only on fresh literals; unsoundness you can watch (the `Dog[]` → `Animal[]` push).
 * **Worked examples:** route table with `satisfies Record<string, Route>` and a derived name union; the three-way comparison `: T` vs `as T` vs `satisfies T`; a callback parameter that accepts too much.
 * **Pitfalls:** `as` silencing a real mismatch; `satisfies` with a union target; methods declared with method syntax are bivariant; a wider object keeps its extra keys at runtime.
@@ -601,7 +602,7 @@ typing is sometimes unsound, and make illegal values unconstructable.
 ### Week 16 — Branded Types & Immutability
 *Now:* `ts_branded_types`, `ts_immutability` · 2 problems · final "Branded money".
 
-* **Chapters:** ✅ both · ⬜ **`ts_parse_dont_validate`** — smart constructors, `unique symbol` brands, opaque types, making illegal values unconstructable.
+* **Chapters:** ✅ both · ✅ **`ts_parse_dont_validate`** — smart constructors, `unique symbol` brands, opaque types, making illegal values unconstructable.
 * **Lesson additions:** `readonly` properties, `ReadonlyArray`, `Readonly<T>`, `as const`; shallow vs deep; `Object.freeze` two failure modes (silent in sloppy mode, throws in strict); aliasing bugs; structural sharing for cheap copies; `DeepReadonly` preview.
 * **Worked examples:** `Cents`, `UserId`, `Email` brands with parsers; an immutable ledger with undo via history snapshots; `with()`/`toSorted()` for immutable updates.
 * **Pitfalls:** `readonly` is compile-time only; a brand forged with `as`; `readonly` array passed to a function that mutates via a mutable alias; `Object.freeze` is shallow.
@@ -614,7 +615,7 @@ typing is sometimes unsound, and make illegal values unconstructable.
 ### Week 17 — Composition & Utility Types
 *Now:* `ts_compose`, `ts_utility_types` · 3 problems (all interval problems) · final "Merge intervals".
 
-* **Chapters:** ✅ both · ⬜ **`ts_runtime_validation`** — a mini schema library (`str()`, `num()`, `obj({...})`, `arr()`), `Infer<typeof schema>`, why validators and types must come from one source.
+* **Chapters:** ✅ both · ✅ **`ts_runtime_validation`** — a mini schema library (`str()`, `num()`, `obj({...})`, `arr()`), `Infer<typeof schema>`, why validators and types must come from one source.
 * **Lesson additions:** every built-in utility with a real use (`Partial`, `Required`, `Readonly`, `Pick`, `Omit`, `Record`, `Exclude`, `Extract`, `NonNullable`, `ReturnType`, `Parameters`, `Awaited`, `NoInfer`); the `Pick` constrained / `Omit` unconstrained asymmetry; `Omit` doesn't remove keys at runtime; composition over inheritance.
 * **Worked examples:** `TaskDraft` / `TaskPatch` / `TaskSummary` derived from `Task`; an update function taking a `Partial`; a 60-line schema validator with inferred types.
 * **Pitfalls:** `Omit<T, "typo">` compiles; `Partial` everywhere hides required data; spreading an `Omit` result leaks the omitted key.

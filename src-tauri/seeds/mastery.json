@@ -14621,7 +14621,9 @@
         "concepts": [
           "ts_tsconfig",
           "ts_modules",
-          "ts_declaration_files"
+          "ts_declaration_files",
+          "ts_erasable_syntax",
+          "ts_versions"
         ],
         "problems": [
           {
@@ -14913,6 +14915,138 @@
             ],
             "answer": 0,
             "explanation": "A file with no imports or exports is a script, and its top-level declarations are already global — so `declare global` is only meaningful (and only legal) inside a module."
+          },
+          {
+            "question": "Which of these survives type stripping unchanged?",
+            "options": [
+              "`function f<T>(x: T): T { return x as T; }`",
+              "`enum Color { Red }`",
+              "`namespace Util { export const x = 1; }`",
+              "`constructor(private id: number) {}`"
+            ],
+            "answer": 0,
+            "explanation": "Generics and `as` are only deleted. The other three generate runtime code, so a stripper rejects them."
+          },
+          {
+            "question": "What does `--erasableSyntaxOnly` do?",
+            "options": [
+              "Reports every construct that would need code generation, such as `enum` and parameter properties",
+              "Strips types from the output",
+              "Forbids `interface`",
+              "Makes every import type-only"
+            ],
+            "answer": 0,
+            "explanation": "It makes the type checker agree with a stripper about what can run."
+          },
+          {
+            "question": "Why does `verbatimModuleSyntax` require `import type` for type-only imports?",
+            "options": [
+              "A stripper can't tell which imports are types, so the source must say which ones to delete",
+              "Type imports are slower",
+              "Interfaces can't be imported otherwise",
+              "It prevents circular imports"
+            ],
+            "answer": 0,
+            "explanation": "The rule is: what you write is what runs. A type-only import is deleted; any other import is kept."
+          },
+          {
+            "question": "`const Level = { A: 1, B: 2 } as const; type Level = (typeof Level)[keyof typeof Level];` — what is the type `Level`?",
+            "options": [
+              "`1 | 2`",
+              "`\"A\" | \"B\"`",
+              "`number`",
+              "`{ A: 1; B: 2 }`"
+            ],
+            "answer": 0,
+            "explanation": "`keyof typeof Level` is the keys; indexing by them gives the values' literal types."
+          },
+          {
+            "question": "Why can't you write `x instanceof User` when `User` is an interface?",
+            "options": [
+              "Interfaces are erased — nothing named `User` exists at runtime",
+              "`instanceof` only works on arrays",
+              "Interfaces need `implements` first",
+              "You can, with `strict` on"
+            ],
+            "answer": 0,
+            "explanation": "`instanceof` needs a runtime constructor. Test a value (`in`, a tag, a validator) instead."
+          },
+          {
+            "question": "What does `const n = \"5\" as unknown as number; console.log(n + 1)` print?",
+            "options": [
+              "`51`",
+              "`6`",
+              "It throws",
+              "`NaN`"
+            ],
+            "answer": 0,
+            "explanation": "Assertions never convert. The value is still a string, so `+` concatenates."
+          },
+          {
+            "question": "In TypeScript 6.0, what is `strict` if a tsconfig doesn't mention it?",
+            "options": [
+              "`true`",
+              "`false`",
+              "It depends on `target`",
+              "It must be set explicitly"
+            ],
+            "answer": 0,
+            "explanation": "6.0 flipped the default. A project that wants the old behaviour has to say `\"strict\": false`."
+          },
+          {
+            "question": "Which option did TypeScript 6.0 deprecate?",
+            "options": [
+              "`moduleResolution: node` (node10)",
+              "`moduleResolution: bundler`",
+              "`module: nodenext`",
+              "`noUncheckedIndexedAccess`"
+            ],
+            "answer": 0,
+            "explanation": "Use `nodenext` for Node and `bundler` for bundled apps."
+          },
+          {
+            "question": "What does `\"ignoreDeprecations\": \"6.0\"` do in TypeScript 7.0?",
+            "options": [
+              "Nothing useful — the deprecated options are removed and are errors",
+              "Silences the errors, as in 6.0",
+              "Switches 7.0 into 6.0 mode",
+              "Enables the old JavaScript compiler"
+            ],
+            "answer": 0,
+            "explanation": "It is a 6.0 transition aid. 7.0 has no switch to bring the options back."
+          },
+          {
+            "question": "What is TypeScript 7.0?",
+            "options": [
+              "The compiler ported to Go — same `typescript` package and `tsc` command, roughly 10× faster",
+              "A new language with different syntax",
+              "A runtime that replaces Node",
+              "A linter"
+            ],
+            "answer": 0,
+            "explanation": "The language is the same; the implementation is native."
+          },
+          {
+            "question": "Which flag is NOT part of `strict`?",
+            "options": [
+              "`noUncheckedIndexedAccess`",
+              "`strictNullChecks`",
+              "`noImplicitAny`",
+              "`useUnknownInCatchVariables`"
+            ],
+            "answer": 0,
+            "explanation": "It's valuable but disruptive, so it is opt-in. So is `exactOptionalPropertyTypes`."
+          },
+          {
+            "question": "A 6.0 project doesn't list `types`. What happens to the `@types/node` package it has installed?",
+            "options": [
+              "It isn't loaded — the default is now `[]`, so it must be listed",
+              "It's loaded, as before",
+              "It's loaded only for `.d.ts` files",
+              "It's an error to have it installed"
+            ],
+            "answer": 0,
+            "explanation": "6.0 changed the default from 'every installed @types package' to none; add `\"types\": [\"node\"]`."
           }
         ],
         "quiz_sample": 8,
@@ -15028,6 +15162,30 @@
           {
             "front": "What is `moduleResolution: \"bundler\"` for?",
             "back": "Resolving imports the way modern bundlers do: extensionless relative imports allowed, `package.json` `exports` respected."
+          },
+          {
+            "front": "What does type stripping do with `enum Color { Red }`?",
+            "back": "Refuses to run it: an `enum` generates an object, so it isn't erasable. Use an `as const` object plus a derived type."
+          },
+          {
+            "front": "`const Level = {…} as const; type Level = …` — how is the type written?",
+            "back": "`type Level = (typeof Level)[keyof typeof Level];` — the union of the object's values."
+          },
+          {
+            "front": "Why must type-only imports say `import type` under `verbatimModuleSyntax`?",
+            "back": "A stripper can't tell types from values, so the source must mark which imports to delete."
+          },
+          {
+            "front": "TypeScript 6.0's new default for `strict`?",
+            "back": "`true` — and `module` defaults to `esnext`, `types` to `[]`, `target` to the current ES year."
+          },
+          {
+            "front": "Name three options TypeScript 6.0 deprecated.",
+            "back": "Any of: `target: es5`, `moduleResolution: node`/`classic`, `baseUrl`, `outFile`, `module: amd/umd/systemjs/none`, `esModuleInterop: false`."
+          },
+          {
+            "front": "What is TypeScript 7.0?",
+            "back": "The compiler ported to Go (July 2026): same `tsc`, about 10× faster; the 6.0 deprecations are errors, and it ships no compiler API yet."
           }
         ],
         "practice": [
@@ -15138,11 +15296,443 @@
             ],
             "source_slug": "",
             "dataset": ""
+          },
+          {
+            "id": "tsm-w14-p2",
+            "title": "A record read under the flag",
+            "prompt": "What type does TypeScript already infer for `s`? Annotate `check` with exactly that type — not merely one that fits. This exercise is checked with `noUncheckedIndexedAccess` on.",
+            "hint": "A `Record<string, …>` might not have this key.",
+            "hints": [
+              "A `Record<string, …>` might not have this key.",
+              "The flag adds `undefined` to every index read."
+            ],
+            "language": "typescript",
+            "kind": "predict",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<typeof check, typeof s>>;\n",
+            "judge_mode": "types",
+            "forbid": [
+              "typeof"
+            ],
+            "starter": "const scores: Record<string, number> = { ana: 3 };\nconst s = scores[\"bo\"];\nconst check: ____ = s;\n",
+            "solution": "const scores: Record<string, number> = { ana: 3 };\nconst s = scores[\"bo\"];\nconst check: number | undefined = s;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w14-d4",
+            "title": "A type-only import used as a value",
+            "prompt": "The compiler rejects this program:\n\n    error TS1361: 'readFileSync' cannot be used as a value because it was imported using 'import type'.\n\nFix the cause.",
+            "hint": "`import type` is deleted before the program runs.",
+            "hints": [
+              "`import type` is deleted before the program runs.",
+              "This import is a value — import it normally."
+            ],
+            "language": "typescript",
+            "kind": "diagnose",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import type { readFileSync } from \"fs\";\nconst input = readFileSync(0, \"utf8\").trim();\nconsole.log(input.length);\n",
+            "solution": "import { readFileSync } from \"fs\";\nconst input = readFileSync(0, \"utf8\").trim();\nconsole.log(input.length);\n",
+            "tests": [
+              {
+                "input": "abc",
+                "output": "3"
+              },
+              {
+                "input": "hello",
+                "output": "5"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w14-f1",
+            "title": "The element past the end",
+            "prompt": "Print the last word on the line, or `empty`. It always prints `empty`.",
+            "hint": "Indexes run from 0 to `length - 1`.",
+            "hints": [
+              "Indexes run from 0 to `length - 1`.",
+              "`words.at(-1)` reads the last element — and is honest about `undefined`."
+            ],
+            "language": "typescript",
+            "kind": "fix",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst words = input.split(\" \").filter((w) => w !== \"\");\nconsole.log(words[words.length] ?? \"empty\");\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst words = input.split(\" \").filter((w) => w !== \"\");\nconsole.log(words.at(-1) ?? \"empty\");\n",
+            "tests": [
+              {
+                "input": "a b c",
+                "output": "c"
+              },
+              {
+                "input": "",
+                "output": "empty"
+              },
+              {
+                "input": "solo",
+                "output": "solo"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
           }
         ],
         "optional": false,
-        "problem_set": [],
-        "project_spec": null
+        "problem_set": [
+          {
+            "id": "tsm-w14-lookup",
+            "title": "An honest lookup table",
+            "prompt": "The first line is `key=value` pairs separated by spaces (a later pair replaces an earlier one; a value may itself contain `=`). Each later line is a key to look up. Print `<key> -> <value>` or `missing <key>` — and an inherited name like `toString` is missing too. Finish with `keys: <k>`.",
+            "hint": "Under `noUncheckedIndexedAccess`, `table[key]` is `string | undefined` — the type now says what you already had to handle.",
+            "hints": [
+              "Under `noUncheckedIndexedAccess`, `table[key]` is `string | undefined` — the type now says what you already had to handle.",
+              "`Object.hasOwn` rules out inherited names."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst [tableLine = \"\", ...queries] = input.split(\"\\n\");\nconst table: Record<string, string> = {};\nfor (const pair of tableLine.trim().split(/\\s+/)) {\n  const eq = pair.indexOf(\"=\");\n  if (eq > 0) table[pair.slice(0, eq)] = pair.slice(eq + 1);\n}\nfor (const q of queries) {\n  const key = q.trim();\n  const value = Object.hasOwn(table, key) ? table[key] : undefined;\n  console.log(value === undefined ? `missing ${key}` : `${key} -> ${value}`);\n}\nconsole.log(`keys: ${Object.keys(table).length}`);\n",
+            "tests": [
+              {
+                "input": "a=1 b=2 a=3\na\nb\nc\ntoString",
+                "output": "a -> 3\nb -> 2\nmissing c\nmissing toString\nkeys: 2"
+              },
+              {
+                "input": "k=v=w\nk\nK",
+                "output": "k -> v=w\nmissing K\nkeys: 1"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w14-matrix",
+            "title": "Reads that may fall off the grid",
+            "prompt": "The input is a grid of integers (rows may have different lengths), a line `---`, then queries: `get r c`, `row r` (the row's sum) or `col c` (the column's sum — out of bounds if any row lacks that column). Print each answer or `out of bounds`.",
+            "hint": "`grid[r]?.[c]` stops at a missing row; the result is `number | undefined` either way.",
+            "hints": [
+              "`grid[r]?.[c]` stops at a missing row; the result is `number | undefined` either way.",
+              "Check every value of a column before summing it."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst [gridPart = \"\", queryPart = \"\"] = input.split(\"\\n---\\n\");\nconst grid = gridPart.split(\"\\n\").map((row) => row.trim().split(/\\s+/).map(Number));\nfor (const q of queryPart.split(\"\\n\")) {\n  const [kind = \"\", a = \"\", b = \"\"] = q.trim().split(/\\s+/);\n  if (kind === \"get\") {\n    const v = grid[Number(a)]?.[Number(b)];\n    console.log(v === undefined ? \"out of bounds\" : v);\n  } else if (kind === \"row\") {\n    const row = grid[Number(a)];\n    console.log(row === undefined ? \"out of bounds\" : row.reduce((s, x) => s + x, 0));\n  } else if (kind === \"col\") {\n    const values = grid.map((row) => row[Number(b === \"\" ? a : b)]);\n    const complete = values.every((v) => v !== undefined);\n    console.log(complete ? values.reduce<number>((s, x) => s + (x ?? 0), 0) : \"out of bounds\");\n  }\n}\n",
+            "tests": [
+              {
+                "input": "1 2 3\n4 5 6\n---\nget 0 2\nget 2 0\nget 1 -1\nrow 1\nrow 5\ncol 1\ncol 3",
+                "output": "3\nout of bounds\nout of bounds\n15\nout of bounds\n7\nout of bounds"
+              },
+              {
+                "input": "7\n8 9\n---\ncol 0\ncol 1\nget 1 1",
+                "output": "15\nout of bounds\n9"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w14-esm-cjs",
+            "title": "ES module or CommonJS?",
+            "prompt": "Each input line is a file name, optionally followed by the package's `type` (`module` or `commonjs`, default `commonjs`). Apply Node's rule: `.mjs`/`.mts` are always ESM, `.cjs`/`.cts` always CommonJS, and `.js`/`.ts` follow the package type. Print `<file>: ESM`, `<file>: CJS` or `<file>: not a module file`, then `esm=<a> cjs=<b>`.",
+            "hint": "The explicit extensions win; only `.js` and `.ts` depend on the package.",
+            "hints": [
+              "The explicit extensions win; only `.js` and `.ts` depend on the package."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Format = \"ESM\" | \"CJS\";\nfunction formatOf(file: string, packageType: string): Format | undefined {\n  const dot = file.lastIndexOf(\".\");\n  const ext = dot < 0 ? \"\" : file.slice(dot);\n  if (ext === \".mjs\" || ext === \".mts\") return \"ESM\";\n  if (ext === \".cjs\" || ext === \".cts\") return \"CJS\";\n  if (ext === \".js\" || ext === \".ts\") return packageType === \"module\" ? \"ESM\" : \"CJS\";\n  return undefined;\n}\nconst counts: Record<Format, number> = { ESM: 0, CJS: 0 };\nfor (const line of input.split(\"\\n\")) {\n  const [file = \"\", type = \"commonjs\"] = line.trim().split(/\\s+/);\n  const format = formatOf(file, type);\n  if (format === undefined) {\n    console.log(`${file}: not a module file`);\n  } else {\n    counts[format]++;\n    console.log(`${file}: ${format}`);\n  }\n}\nconsole.log(`esm=${counts.ESM} cjs=${counts.CJS}`);\n",
+            "tests": [
+              {
+                "input": "index.ts module\nutil.cjs module\nold.js\nlib.mts\nstyles.css",
+                "output": "index.ts: ESM\nutil.cjs: CJS\nold.js: CJS\nlib.mts: ESM\nstyles.css: not a module file\nesm=2 cjs=2"
+              },
+              {
+                "input": "a.cts\nb.js module\nREADME",
+                "output": "a.cts: CJS\nb.js: ESM\nREADME: not a module file\nesm=1 cjs=1"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w14-env",
+            "title": "Parse a .env file",
+            "prompt": "The input is a `.env` file. Blank lines and `#` comments are skipped; an optional `export ` prefix is ignored. Each other line must be `KEY=value` (a key is letters, digits and `_`, not starting with a digit; spaces around `=` are allowed). A value in `\"double\"` or `'single'` quotes is taken up to the matching quote (`line <n>: unterminated quote` if there is none); an unquoted value ends at ` #`. A later key replaces an earlier one. Print errors (`line <n>: expected KEY=value`) as they occur, then every variable sorted by key as `KEY=<value as JSON>`.",
+            "hint": "A regex with two groups splits the key from the value; `m[1]` and `m[2]` are `string | undefined` under this week's flag.",
+            "hints": [
+              "A regex with two groups splits the key from the value; `m[1]` and `m[2]` are `string | undefined` under this week's flag.",
+              "Handle the quoted case first — a `#` inside quotes is part of the value."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst vars = new Map<string, string>();\nfor (const [i, raw] of input.split(\"\\n\").entries()) {\n  let line = raw.trim();\n  if (line === \"\" || line.startsWith(\"#\")) continue;\n  if (line.startsWith(\"export \")) line = line.slice(7).trim();\n  const m = /^([A-Za-z_][A-Za-z0-9_]*)\\s*=\\s*(.*)$/.exec(line);\n  if (m === null) {\n    console.log(`line ${i + 1}: expected KEY=value`);\n    continue;\n  }\n  const key = m[1] ?? \"\";\n  let value = (m[2] ?? \"\").trim();\n  const quote = value.charAt(0);\n  if (quote === '\"' || quote === \"'\") {\n    const end = value.indexOf(quote, 1);\n    if (end < 0) {\n      console.log(`line ${i + 1}: unterminated quote`);\n      continue;\n    }\n    value = value.slice(1, end);\n  } else {\n    const hash = value.indexOf(\" #\");\n    if (hash >= 0) value = value.slice(0, hash).trim();\n  }\n  vars.set(key, value);\n}\nfor (const [k, v] of [...vars].sort(([a], [b]) => a.localeCompare(b))) console.log(`${k}=${JSON.stringify(v)}`);\n",
+            "tests": [
+              {
+                "input": "# settings\nexport PORT=8080\nNAME=\"Poodcode App\"  # quoted\nDEBUG=true # inline\nEMPTY=\nbad line\nPORT = 9090",
+                "output": "line 6: expected KEY=value\nDEBUG=\"true\"\nEMPTY=\"\"\nNAME=\"Poodcode App\"\nPORT=\"9090\""
+              },
+              {
+                "input": "A='x # not a comment'\nB=\"open\n9X=1\n_ok=yes",
+                "output": "line 2: unterminated quote\nline 3: expected KEY=value\n_ok=\"yes\"\nA=\"x # not a comment\""
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w14-flags",
+            "title": "Feature flags from one table",
+            "prompt": "Plans are an enum-style object: `const Plan = { Free: \"free\", Pro: \"pro\", Team: \"team\" } as const`. Flags are rules in one object: `darkMode` (everyone), `export` (any paid plan), `sso` (team only), `newEditor` (users who opted into beta), `euBilling` (country `DE`, `FR` or `NL`). Each input line is `<name> <plan> <country> [beta]`. Print `<name>: <flags in declaration order>` or `<name>: unknown plan <p>`, then each flag with how many users have it.",
+            "hint": "`keyof typeof FLAGS` is the flag-name union; `Object.values(Plan)` is the list of valid plans.",
+            "hints": [
+              "`keyof typeof FLAGS` is the flag-name union; `Object.values(Plan)` is the list of valid plans.",
+              "Store a rule in a variable typed `(u: User) => boolean` before calling it — `darkMode` takes no parameter, and that still fits."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst Plan = { Free: \"free\", Pro: \"pro\", Team: \"team\" } as const;\ntype Plan = (typeof Plan)[keyof typeof Plan];\ntype User = { name: string; plan: Plan; country: string; beta: boolean };\nconst FLAGS = {\n  darkMode: () => true,\n  export: (u: User) => u.plan !== Plan.Free,\n  sso: (u: User) => u.plan === Plan.Team,\n  newEditor: (u: User) => u.beta,\n  euBilling: (u: User) => [\"DE\", \"FR\", \"NL\"].includes(u.country),\n};\ntype Flag = keyof typeof FLAGS;\nconst flagNames = Object.keys(FLAGS) as Flag[];\nconst parsePlan = (s: string): Plan | undefined => Object.values(Plan).find((p) => p === s);\nconst counts = new Map<Flag, number>();\nfor (const line of input.split(\"\\n\")) {\n  const [name = \"\", planText = \"\", country = \"\", beta = \"\"] = line.trim().split(/\\s+/);\n  const plan = parsePlan(planText);\n  if (plan === undefined) {\n    console.log(`${name}: unknown plan ${planText}`);\n    continue;\n  }\n  const user: User = { name, plan, country, beta: beta === \"beta\" };\n  const on = flagNames.filter((f) => {\n    const rule: (u: User) => boolean = FLAGS[f];\n    return rule(user);\n  });\n  for (const f of on) counts.set(f, (counts.get(f) ?? 0) + 1);\n  console.log(`${name}: ${on.join(\" \")}`);\n}\nfor (const f of flagNames) console.log(`${f} ${counts.get(f) ?? 0}`);\n",
+            "tests": [
+              {
+                "input": "ana free DE\nbo pro US beta\ncy team NL\ndee gold FR",
+                "output": "ana: darkMode euBilling\nbo: darkMode export newEditor\ncy: darkMode export sso euBilling\ndee: unknown plan gold\ndarkMode 3\nexport 2\nsso 1\nnewEditor 1\neuBilling 2"
+              },
+              {
+                "input": "eve team JP beta",
+                "output": "eve: darkMode export sso newEditor\ndarkMode 1\nexport 1\nsso 1\nnewEditor 1\neuBilling 0"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w14-merge",
+            "title": "Merge config patches",
+            "prompt": "The first line is a JSON config; each later line is a JSON patch. Merge each patch into the running config: objects merge key by key (recursively), anything else — arrays included — replaces, and a `null` value deletes the key. Print the config after each patch as JSON with keys sorted at every level.",
+            "hint": "A recursive `Json` type describes any JSON value; narrow it with a type predicate `isObject`.",
+            "hints": [
+              "A recursive `Json` type describes any JSON value; narrow it with a type predicate `isObject`.",
+              "Under this week's flag `out[k]` may be `undefined` — decide what merging into nothing means."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Json = null | boolean | number | string | Json[] | { [key: string]: Json };\nfunction isObject(v: Json | undefined): v is { [key: string]: Json } {\n  return typeof v === \"object\" && v !== null && !Array.isArray(v);\n}\nfunction merge(base: Json, patch: Json): Json {\n  if (!isObject(patch) || !isObject(base)) return patch;\n  const out: { [key: string]: Json } = { ...base };\n  for (const [k, v] of Object.entries(patch)) {\n    if (v === null) delete out[k];\n    else out[k] = merge(out[k] ?? null, v);\n  }\n  return out;\n}\nfunction sortKeys(v: Json): Json {\n  if (Array.isArray(v)) return v.map(sortKeys);\n  if (isObject(v)) return Object.fromEntries(Object.keys(v).sort().map((k) => [k, sortKeys(v[k] ?? null)]));\n  return v;\n}\nconst [first = \"null\", ...patches] = input.split(\"\\n\");\nlet config: Json = JSON.parse(first);\nfor (const line of patches) {\n  const patch: Json = JSON.parse(line);\n  config = merge(config, patch);\n  console.log(JSON.stringify(sortKeys(config)));\n}\n",
+            "tests": [
+              {
+                "input": "{\"port\":80,\"db\":{\"host\":\"a\",\"pool\":5},\"tags\":[\"x\"]}\n{\"db\":{\"pool\":10},\"tags\":[\"y\",\"z\"]}\n{\"db\":{\"host\":null},\"debug\":true}\n{\"db\":\"sqlite\"}",
+                "output": "{\"db\":{\"host\":\"a\",\"pool\":10},\"port\":80,\"tags\":[\"y\",\"z\"]}\n{\"db\":{\"pool\":10},\"debug\":true,\"port\":80,\"tags\":[\"y\",\"z\"]}\n{\"db\":\"sqlite\",\"debug\":true,\"port\":80,\"tags\":[\"y\",\"z\"]}"
+              },
+              {
+                "input": "{\"a\":1}\n{\"b\":{\"c\":{\"d\":1}}}\n{\"b\":{\"c\":{\"e\":2}}}\n5",
+                "output": "{\"a\":1,\"b\":{\"c\":{\"d\":1}}}\n{\"a\":1,\"b\":{\"c\":{\"d\":1,\"e\":2}}}\n5"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w14-optional",
+            "title": "Missing, cleared or empty?",
+            "prompt": "Each input line is a JSON record that should have a string `name` and may have `nickname`. Tell the cases apart — they mean different things, which is what `exactOptionalPropertyTypes` makes the compiler see: `<name>: no nickname field` (the key is absent), `<name>: nickname cleared` (`null`), `<name>: empty nickname` (`\"\"`), `<name>: nickname \"<n>\"`, or `<name>: bad nickname` (any other type). A record without a string `name` prints `bad record`.",
+            "hint": "`\"nickname\" in data` asks whether the key exists at all; `=== null` and `=== \"\"` ask about its value.",
+            "hints": [
+              "`\"nickname\" in data` asks whether the key exists at all; `=== null` and `=== \"\"` ask about its value."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nfor (const line of input.split(\"\\n\")) {\n  const data: unknown = JSON.parse(line);\n  if (typeof data !== \"object\" || data === null || !(\"name\" in data) || typeof data.name !== \"string\") {\n    console.log(\"bad record\");\n    continue;\n  }\n  let nick: string;\n  if (!(\"nickname\" in data)) nick = \"no nickname field\";\n  else if (data.nickname === null) nick = \"nickname cleared\";\n  else if (typeof data.nickname !== \"string\") nick = \"bad nickname\";\n  else nick = data.nickname === \"\" ? \"empty nickname\" : `nickname \"${data.nickname}\"`;\n  console.log(`${data.name}: ${nick}`);\n}\n",
+            "tests": [
+              {
+                "input": "{\"name\":\"ana\"}\n{\"name\":\"bo\",\"nickname\":null}\n{\"name\":\"cy\",\"nickname\":\"\"}\n{\"name\":\"dee\",\"nickname\":\"D\"}\n{\"name\":\"eve\",\"nickname\":5}\n{\"nick\":\"x\"}",
+                "output": "ana: no nickname field\nbo: nickname cleared\ncy: empty nickname\ndee: nickname \"D\"\neve: bad nickname\nbad record"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w14-load-order",
+            "title": "Module load order",
+            "prompt": "Each input line is `<file> imports <file…>` (possibly importing nothing). A module must load after everything it imports. Print a load order — visiting files alphabetically and each file's imports alphabetically, depth first — one file per line; or, if the imports form a cycle, only `cycle: <a> -> <b> -> … -> <a>` for the first cycle found that way.",
+            "hint": "Depth-first search with three states: unvisited, visiting (on the current path) and done.",
+            "hints": [
+              "Depth-first search with three states: unvisited, visiting (on the current path) and done.",
+              "Reaching a `visiting` file again means a cycle; the path from it on the stack is the cycle."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Hard",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst deps = new Map<string, string[]>();\nfor (const line of input.split(\"\\n\")) {\n  const [file = \"\", , ...imports] = line.trim().split(/\\s+/);\n  deps.set(file, imports);\n  for (const d of imports) if (!deps.has(d)) deps.set(d, []);\n}\nconst state = new Map<string, \"visiting\" | \"done\">();\nconst order: string[] = [];\nconst stack: string[] = [];\nfunction visit(f: string): string | undefined {\n  const s = state.get(f);\n  if (s === \"done\") return undefined;\n  if (s === \"visiting\") return [...stack.slice(stack.indexOf(f)), f].join(\" -> \");\n  state.set(f, \"visiting\");\n  stack.push(f);\n  for (const d of [...(deps.get(f) ?? [])].sort()) {\n    const cycle = visit(d);\n    if (cycle !== undefined) return cycle;\n  }\n  stack.pop();\n  state.set(f, \"done\");\n  order.push(f);\n  return undefined;\n}\nlet cycle: string | undefined;\nfor (const f of [...deps.keys()].sort()) {\n  cycle = visit(f);\n  if (cycle !== undefined) break;\n}\nconsole.log(cycle === undefined ? order.join(\"\\n\") : `cycle: ${cycle}`);\n",
+            "tests": [
+              {
+                "input": "main.ts imports app.ts util.ts\napp.ts imports util.ts db.ts\ndb.ts imports util.ts",
+                "output": "util.ts\ndb.ts\napp.ts\nmain.ts"
+              },
+              {
+                "input": "a.ts imports b.ts\nb.ts imports c.ts\nc.ts imports a.ts",
+                "output": "cycle: a.ts -> b.ts -> c.ts -> a.ts"
+              },
+              {
+                "input": "solo.ts imports",
+                "output": "solo.ts"
+              },
+              {
+                "input": "x.ts imports y.ts\nw.ts imports x.ts z.ts\nz.ts imports",
+                "output": "y.ts\nx.ts\nz.ts\nw.ts"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w14-declare-lib",
+            "title": "Declare an untyped library",
+            "prompt": "`tiny-slug` ships no types. Write the declaration for its `slugify` function: it takes the text and optional options (`separator`, a string, and `lower`, a boolean — both optional) and returns a string.",
+            "hint": "A `declare function` is a signature with no body.",
+            "hints": [
+              "A `declare function` is a signature with no body.",
+              "The options object is optional as a whole, and so is each of its fields."
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<Parameters<typeof slugify>, [text: string, options?: { separator?: string; lower?: boolean }]>>;\ntype _2 = Expect<Equal<ReturnType<typeof slugify>, string>>;\nfunction _typeTests() {\n  // @ts-expect-error — the text must be a string\n  slugify(42);\n  // @ts-expect-error — there is no `sep` option\n  slugify(\"x\", { sep: \"-\" });\n}\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "declare function slugify____;\ndeclare const SLUG_VERSION: string;\n\nconst slug: string = slugify(\"Hello World\", { separator: \"_\" });\nconst plain: string = slugify(\"Hi\");\n",
+            "solution": "declare function slugify(text: string, options?: { separator?: string; lower?: boolean }): string;\ndeclare const SLUG_VERSION: string;\n\nconst slug: string = slugify(\"Hello World\", { separator: \"_\" });\nconst plain: string = slugify(\"Hi\");\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w14-augment",
+            "title": "Augment a global type",
+            "prompt": "Add a `last()` method to every array's type: it returns the last element, or `undefined` for an empty array. (Doing this for real is usually a bad idea — every array in the program changes — but it's how libraries add typings to globals.)",
+            "hint": "Interfaces merge: declaring `interface Array<T>` again inside `declare global` adds members to the built-in one.",
+            "hints": [
+              "Interfaces merge: declaring `interface Array<T>` again inside `declare global` adds members to the built-in one.",
+              "The element type is the interface's own `T`."
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Hard",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<ReturnType<number[][\"last\"]>, number | undefined>>;\ntype _2 = Expect<Equal<ReturnType<string[][\"last\"]>, string | undefined>>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "declare global {\n  interface Array<T> {\n    ____\n  }\n}\nArray.prototype.last = function () {\n  return this[this.length - 1];\n};\n",
+            "solution": "declare global {\n  interface Array<T> {\n    last(): T | undefined;\n  }\n}\nArray.prototype.last = function () {\n  return this[this.length - 1];\n};\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          }
+        ],
+        "project_spec": {
+          "title": "ledger.ts v4 — a strict bank statement",
+          "goal": "The arc project's fourth version: the ledger read under every flag this month turns on. Money is integer cents in a branded type, every index read is honest under `noUncheckedIndexedAccess`, and bad rows are reported, never guessed at.",
+          "requirements": [
+            "Each input line is a CSV row `date,account,amount,memo` — the memo is optional and may itself contain commas. Dates are `YYYY-MM-DD` and must exist on the calendar; amounts are like `12`, `-3.5` or `1200.75` (at most two decimals).",
+            "For a bad row print `line <n>: bad date <d>`, `line <n>: missing account` or `line <n>: bad amount <a>` (checked in that order) and skip it.",
+            "Then print each account, sorted, as `<account>: <balance> (<k> transactions)` (`transaction` for one), with balances to two decimals (`-4.50`).",
+            "Then `total: <sum of all balances>`, `busiest month: <YYYY-MM> (<n> transactions)` (the earliest on a tie; `none` with no rows) and `largest expense: <memo, or the account if no memo> <amount>` (the most negative amount; `none` if nothing is negative).",
+            "Keep amounts as a branded `Cents` type produced by one parser, never as floating-point dollars."
+          ],
+          "stretch": [
+            "Split it into modules — `money.ts`, `parse.ts`, `report.ts`, `main.ts` — with `import type` for the types.",
+            "Write a `money.d.ts` describing a pretend untyped `currency-format` library, and format balances with it."
+          ],
+          "rubric": [
+            "No `any` anywhere — not even one hidden in a cast",
+            "Every function has a typed signature; locals are left to inference",
+            "Bad input is handled on purpose, not by accident",
+            "Names say what things are, not how they are stored",
+            "I could explain every line to someone else"
+          ],
+          "language": "typescript",
+          "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n// Build the project here. Read all of stdin from `input` above, and print\n// exactly what the requirements ask for. Run the tests as you go.\n",
+          "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ndeclare const CentsBrand: unique symbol;\ntype Cents = number & { readonly [CentsBrand]: true };\ntype Txn = { readonly date: string; readonly account: string; readonly amount: Cents; readonly memo: string };\n\nfunction parseCents(text: string): Cents | undefined {\n  const m = /^(-?)(\\d+)(?:\\.(\\d{1,2}))?$/.exec(text.trim());\n  if (m === null) return undefined;\n  const cents = Number(m[2] ?? \"0\") * 100 + Number((m[3] ?? \"\").padEnd(2, \"0\"));\n  return (m[1] === \"-\" ? -cents : cents) as Cents;\n}\nfunction isDate(s: string): boolean {\n  const m = /^(\\d{4})-(\\d{2})-(\\d{2})$/.exec(s);\n  if (m === null) return false;\n  const [year, month, day] = [Number(m[1]), Number(m[2]), Number(m[3])];\n  const d = new Date(Date.UTC(year, month - 1, day));\n  return d.getUTCMonth() === month - 1 && d.getUTCDate() === day;\n}\nconst money = (c: number): string => (c < 0 ? \"-\" : \"\") + (Math.abs(c) / 100).toFixed(2);\n\nconst txns: Txn[] = [];\nfor (const [i, line] of input.split(\"\\n\").entries()) {\n  const [date = \"\", account = \"\", amountText = \"\", ...memo] = line.split(\",\").map((s) => s.trim());\n  if (!isDate(date)) {\n    console.log(`line ${i + 1}: bad date ${date}`);\n    continue;\n  }\n  if (account === \"\") {\n    console.log(`line ${i + 1}: missing account`);\n    continue;\n  }\n  const amount = parseCents(amountText);\n  if (amount === undefined) {\n    console.log(`line ${i + 1}: bad amount ${amountText}`);\n    continue;\n  }\n  txns.push({ date, account, amount, memo: memo.join(\", \") });\n}\n\nconst byAccount = new Map<string, { balance: number; count: number }>();\nfor (const t of txns) {\n  const acc = byAccount.get(t.account) ?? { balance: 0, count: 0 };\n  byAccount.set(t.account, { balance: acc.balance + t.amount, count: acc.count + 1 });\n}\nfor (const [name, acc] of [...byAccount].sort(([a], [b]) => a.localeCompare(b))) {\n  console.log(`${name}: ${money(acc.balance)} (${acc.count} ${acc.count === 1 ? \"transaction\" : \"transactions\"})`);\n}\nconsole.log(`total: ${money(txns.reduce((s, t) => s + t.amount, 0))}`);\n\nconst months = new Map<string, number>();\nfor (const t of txns) months.set(t.date.slice(0, 7), (months.get(t.date.slice(0, 7)) ?? 0) + 1);\nconst busiest = [...months].sort(([a, x], [b, y]) => y - x || a.localeCompare(b))[0];\nconsole.log(busiest === undefined ? \"busiest month: none\" : `busiest month: ${busiest[0]} (${busiest[1]} ${busiest[1] === 1 ? \"transaction\" : \"transactions\"})`);\n\nconst largest = txns.filter((t) => t.amount < 0).sort((a, b) => a.amount - b.amount)[0];\nconsole.log(largest === undefined ? \"largest expense: none\" : `largest expense: ${largest.memo || largest.account} ${money(largest.amount)}`);\n",
+          "tests": [
+            {
+              "input": "2026-01-05,checking,2500,salary\n2026-01-09,checking,-45.50,groceries\n2026-01-20,savings,500\n2026-02-01,checking,-1200,rent, February",
+              "output": "checking: 1254.50 (3 transactions)\nsavings: 500.00 (1 transaction)\ntotal: 1754.50\nbusiest month: 2026-01 (3 transactions)\nlargest expense: rent, February -1200.00"
+            },
+            {
+              "input": "2026-02-30,checking,10\n,checking,5\n2026-03-01,,5\n2026-03-01,cash,5.555\n2026-03-02,cash,-0.5",
+              "output": "line 1: bad date 2026-02-30\nline 2: bad date\nline 3: missing account\nline 4: bad amount 5.555\ncash: -0.50 (1 transaction)\ntotal: -0.50\nbusiest month: 2026-03 (1 transaction)\nlargest expense: cash -0.50"
+            },
+            {
+              "input": "2025-12-31,a,1.1\n2026-01-01,b,-1.10,refund\n2026-01-02,a,-3,coffee",
+              "output": "a: -1.90 (2 transactions)\nb: -1.10 (1 transaction)\ntotal: -3.00\nbusiest month: 2026-01 (2 transactions)\nlargest expense: coffee -3.00"
+            },
+            {
+              "input": "bad",
+              "output": "line 1: bad date bad\ntotal: 0.00\nbusiest month: none\nlargest expense: none"
+            },
+            {
+              "input": "2024-02-29,wallet,-20,leap day lunch\n2024-02-28,wallet,100\n2024-03-01,wallet,-20,book",
+              "output": "wallet: 60.00 (3 transactions)\ntotal: 60.00\nbusiest month: 2024-02 (2 transactions)\nlargest expense: leap day lunch -20.00"
+            }
+          ],
+          "strictness": "strict+indexed"
+        }
       },
       {
         "week": 15,
@@ -15152,7 +15742,8 @@
         "concepts": [
           "ts_assertions",
           "ts_satisfies",
-          "ts_structural_typing"
+          "ts_structural_typing",
+          "ts_variance"
         ],
         "problems": [
           {
@@ -15341,6 +15932,72 @@
             ],
             "answer": 0,
             "explanation": "Private and protected members are tied to their declaring class, so two classes with identical-looking private fields are not interchangeable — the one nominal corner of the type system."
+          },
+          {
+            "question": "`Dog` is assignable to `Animal`. Which is assignable to which for `type Getter<T> = () => T`?",
+            "options": [
+              "`Getter<Dog>` to `Getter<Animal>`",
+              "`Getter<Animal>` to `Getter<Dog>`",
+              "Neither",
+              "Both"
+            ],
+            "answer": 0,
+            "explanation": "A getter produces `T`, so it is covariant: same direction as `Dog → Animal`."
+          },
+          {
+            "question": "And for `type Handler<T> = (x: T) => void`?",
+            "options": [
+              "`Handler<Animal>` to `Handler<Dog>`",
+              "`Handler<Dog>` to `Handler<Animal>`",
+              "Neither",
+              "Both"
+            ],
+            "answer": 0,
+            "explanation": "A handler consumes `T`: contravariant. A handler of any animal can handle a dog."
+          },
+          {
+            "question": "Why is passing `Dog[]` where `Animal[]` is expected unsound?",
+            "options": [
+              "The receiver can push a non-dog into your array",
+              "Arrays are compared by length",
+              "It isn't — arrays are read-only",
+              "Dog[] has fewer methods"
+            ],
+            "answer": 0,
+            "explanation": "TypeScript allows it for convenience; `readonly Animal[]` makes it genuinely safe."
+          },
+          {
+            "question": "What variance does `{ get(): T; set(v: T): void }` have in `T`?",
+            "options": [
+              "Invariant",
+              "Covariant",
+              "Contravariant",
+              "Bivariant"
+            ],
+            "answer": 0,
+            "explanation": "It both produces and consumes `T`, so only the exact same `T` fits."
+          },
+          {
+            "question": "What does `interface Source<out T>` do?",
+            "options": [
+              "Declares `T` covariant, and the compiler checks that `T` is only produced",
+              "Makes `T` optional",
+              "Exports `T`",
+              "Makes `Source` readonly at runtime"
+            ],
+            "answer": 0,
+            "explanation": "Variance annotations are checked, erased documentation."
+          },
+          {
+            "question": "Which declaration gets the strict, contravariant parameter check under `strictFunctionTypes`?",
+            "options": [
+              "`handle: (x: T) => void`",
+              "`handle(x: T): void`",
+              "Both",
+              "Neither"
+            ],
+            "answer": 0,
+            "explanation": "Method syntax stays bivariant; property syntax with a function type is checked contravariantly."
           }
         ],
         "quiz_sample": 8,
@@ -15436,6 +16093,30 @@
           {
             "front": "Why test membership with `Object.hasOwn(obj, k)` instead of `k in obj`?",
             "back": "`in` also sees inherited properties — `\"toString\" in {}` is `true`."
+          },
+          {
+            "front": "Covariant, contravariant, invariant — in one line each?",
+            "back": "Producers keep the subtype direction; consumers reverse it; things that do both need an exact match."
+          },
+          {
+            "front": "Is `Dog[]` assignable to `Animal[]`? Is that safe?",
+            "back": "Yes, and no: arrays are covariant for convenience, but the receiver can push a non-dog. `readonly Animal[]` is the safe version."
+          },
+          {
+            "front": "`(a: Animal) => void` vs `(d: Dog) => void` — which fits where the other is expected?",
+            "back": "The `Animal` handler fits a `Dog` slot, not the reverse (parameters are contravariant)."
+          },
+          {
+            "front": "What does `interface Source<out T>` promise?",
+            "back": "`T` only comes out of a `Source`; the compiler checks the body and rejects members that take a `T` in."
+          },
+          {
+            "front": "Why does `interface Box<out T> { set(v: T): void }` compile?",
+            "back": "Method syntax is bivariant, so the check misses it; `set: (v: T) => void` is caught (TS2636)."
+          },
+          {
+            "front": "How do you make an object property safe to widen?",
+            "back": "Mark it `readonly` in the wider type, so nothing can write a supertype value through it."
           }
         ],
         "practice": [
@@ -15542,11 +16223,409 @@
             ],
             "source_slug": "",
             "dataset": ""
+          },
+          {
+            "id": "tsm-w15-p3",
+            "title": "An annotation widens",
+            "prompt": "What type does TypeScript already infer for `cfg.mode`? Annotate `check` with exactly that type — not merely one that fits.",
+            "hint": "An annotation replaces the inferred type.",
+            "hints": [
+              "An annotation replaces the inferred type.",
+              "The declared type says `string`."
+            ],
+            "language": "typescript",
+            "kind": "predict",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<typeof check, typeof cfg.mode>>;\n",
+            "judge_mode": "types",
+            "forbid": [
+              "typeof"
+            ],
+            "starter": "const cfg: { mode: string } = { mode: \"dark\" };\nconst check: ____ = cfg.mode;\n",
+            "solution": "const cfg: { mode: string } = { mode: \"dark\" };\nconst check: string = cfg.mode;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w15-d2",
+            "title": "A value that doesn't satisfy",
+            "prompt": "The compiler rejects this program:\n\n    error TS2322: Type 'string' is not assignable to type 'number'.\n\nThe port is a number.",
+            "hint": "`satisfies` reports the mismatching property itself.",
+            "hints": [
+              "`satisfies` reports the mismatching property itself.",
+              "Write the port as a number literal."
+            ],
+            "language": "typescript",
+            "kind": "diagnose",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "const server = { host: \"localhost\", port: \"8080\" } satisfies { host: string; port: number };\nconsole.log(server.port + 1);\n",
+            "solution": "const server = { host: \"localhost\", port: 8080 } satisfies { host: string; port: number };\nconsole.log(server.port + 1);\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "8081"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w15-f2",
+            "title": "A narrower type that kept its secret",
+            "prompt": "Print a user's public profile as JSON: only `name` and `city`. The password is printed too.",
+            "hint": "Structural typing lets a bigger object through; the annotation removes nothing.",
+            "hints": [
+              "Structural typing lets a bigger object through; the annotation removes nothing.",
+              "Build the smaller object explicitly."
+            ],
+            "language": "typescript",
+            "kind": "fix",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Public = { name: string; city: string };\nconst user = { ...(JSON.parse(input) as Public), password: \"hunter2\" };\nconst profile: Public = user;\nconsole.log(JSON.stringify(profile));\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Public = { name: string; city: string };\nconst user = { ...(JSON.parse(input) as Public), password: \"hunter2\" };\nconst profile: Public = { name: user.name, city: user.city };\nconsole.log(JSON.stringify(profile));\n",
+            "tests": [
+              {
+                "input": "{\"name\":\"ana\",\"city\":\"Oslo\"}",
+                "output": "{\"name\":\"ana\",\"city\":\"Oslo\"}"
+              },
+              {
+                "input": "{\"city\":\"Rome\",\"name\":\"bo\"}",
+                "output": "{\"name\":\"bo\",\"city\":\"Rome\"}"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
           }
         ],
         "optional": false,
-        "problem_set": [],
-        "project_spec": null
+        "problem_set": [
+          {
+            "id": "tsm-w15-routes",
+            "title": "Which route is this?",
+            "prompt": "A route table maps names to `{ method, path }` and is checked with `satisfies Record<string, Route>`: `home` GET `/`, `listUsers` GET `/users`, `createUser` POST `/users`, `logout` POST `/logout`. Each input line is `<METHOD> <path>`. Print the route's name, `405 method not allowed` if the path exists with other methods, or `404 not found`.",
+            "hint": "`satisfies` checks each route but keeps the object's own keys, so `keyof typeof routes` is the four names.",
+            "hints": [
+              "`satisfies` checks each route but keeps the object's own keys, so `keyof typeof routes` is the four names."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Method = \"GET\" | \"POST\" | \"DELETE\";\ntype Route = { method: Method; path: string };\nconst routes = {\n  home: { method: \"GET\", path: \"/\" },\n  listUsers: { method: \"GET\", path: \"/users\" },\n  createUser: { method: \"POST\", path: \"/users\" },\n  logout: { method: \"POST\", path: \"/logout\" },\n} satisfies Record<string, Route>;\ntype RouteName = keyof typeof routes;\nconst names = Object.keys(routes) as RouteName[];\nfor (const line of input.split(\"\\n\")) {\n  const [method = \"\", path = \"\"] = line.trim().split(/\\s+/);\n  const name = names.find((n) => routes[n].method === method && routes[n].path === path);\n  const samePath = names.some((n) => routes[n].path === path);\n  console.log(name ?? (samePath ? \"405 method not allowed\" : \"404 not found\"));\n}\n",
+            "tests": [
+              {
+                "input": "GET /\nPOST /users\nGET /users\nDELETE /users\nGET /nope",
+                "output": "home\ncreateUser\nlistUsers\n405 method not allowed\n404 not found"
+              },
+              {
+                "input": "POST /logout\nGET /logout",
+                "output": "logout\n405 method not allowed"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w15-icons",
+            "title": "An icon registry",
+            "prompt": "Icons are registered as `{ glyph, size }` with `size` one of `16 | 24 | 32`, checked by `satisfies Record<string, Icon>`: `home` `⌂` 24, `star` `★` 16, `heart` `♥` 24, `check` `✓` 32. Each input line is `<name> [size]`. Print `<glyph> <name> <size>px` (the requested size, if it is a valid one, otherwise the icon's own), `bad size <s>` for any other size, or `no icon <name>` plus `; did you mean <n>?` when exactly one icon name starts with its first letter.",
+            "hint": "A type predicate `isName` turns an input string into an `IconName`, after which `icons[name]` needs no `undefined` check.",
+            "hints": [
+              "A type predicate `isName` turns an input string into an `IconName`, after which `icons[name]` needs no `undefined` check."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Icon = { glyph: string; size: 16 | 24 | 32 };\nconst icons = {\n  home: { glyph: \"⌂\", size: 24 },\n  star: { glyph: \"★\", size: 16 },\n  heart: { glyph: \"♥\", size: 24 },\n  check: { glyph: \"✓\", size: 32 },\n} satisfies Record<string, Icon>;\ntype IconName = keyof typeof icons;\nconst names = Object.keys(icons) as IconName[];\nconst isName = (s: string): s is IconName => Object.hasOwn(icons, s);\nconst SIZES: readonly number[] = [16, 24, 32];\nfor (const line of input.split(\"\\n\")) {\n  const [name = \"\", sizeText] = line.trim().split(/\\s+/);\n  if (!isName(name)) {\n    const guesses = names.filter((n) => n.startsWith(name.charAt(0)));\n    const only = guesses.length === 1 ? guesses[0] : undefined;\n    console.log(`no icon ${name}${only === undefined ? \"\" : `; did you mean ${only}?`}`);\n    continue;\n  }\n  const icon = icons[name];\n  if (sizeText !== undefined && !SIZES.includes(Number(sizeText))) {\n    console.log(`bad size ${sizeText}`);\n    continue;\n  }\n  console.log(`${icon.glyph} ${name} ${sizeText ?? icon.size}px`);\n}\n",
+            "tests": [
+              {
+                "input": "home\nstar 32\nheart 20\nhouse\nzap\nsun",
+                "output": "⌂ home 24px\n★ star 32px\nbad size 20\nno icon house\nno icon zap\nno icon sun; did you mean star?"
+              },
+              {
+                "input": "check\ncheck 16\nhart\ncheq",
+                "output": "✓ check 32px\n✓ check 16px\nno icon hart\nno icon cheq; did you mean check?"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w15-shapes",
+            "title": "Which interfaces does it satisfy?",
+            "prompt": "Structural typing asks only what a value *has*. Each input line is JSON. Report which of these shapes it satisfies, in this order: `Named` (a string `name`), `Priced` (a number `price`), `Dated` (a string `date` that `Date.parse` accepts). Print `line <n>: <shapes>`, `line <n>: nothing` or `line <n>: not an object`, then how many lines satisfied each shape.",
+            "hint": "A value satisfies a shape when it has the right members — extra members don't matter.",
+            "hints": [
+              "A value satisfies a shape when it has the right members — extra members don't matter."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Rec = Record<string, unknown>;\nconst SHAPES = {\n  Named: (v: Rec) => typeof v[\"name\"] === \"string\",\n  Priced: (v: Rec) => typeof v[\"price\"] === \"number\",\n  Dated: (v: Rec) => {\n    const d = v[\"date\"];\n    return typeof d === \"string\" && !Number.isNaN(Date.parse(d));\n  },\n} satisfies Record<string, (v: Rec) => boolean>;\ntype Shape = keyof typeof SHAPES;\nconst shapes = Object.keys(SHAPES) as Shape[];\nconst counts = new Map<Shape, number>();\nfor (const [i, line] of input.split(\"\\n\").entries()) {\n  const data: unknown = JSON.parse(line);\n  if (typeof data !== \"object\" || data === null || Array.isArray(data)) {\n    console.log(`line ${i + 1}: not an object`);\n    continue;\n  }\n  const rec = data as Rec;\n  const fits = shapes.filter((s) => SHAPES[s](rec));\n  for (const s of fits) counts.set(s, (counts.get(s) ?? 0) + 1);\n  console.log(`line ${i + 1}: ${fits.join(\" \") || \"nothing\"}`);\n}\nfor (const s of shapes) console.log(`${s} ${counts.get(s) ?? 0}`);\n",
+            "tests": [
+              {
+                "input": "{\"name\":\"pen\",\"price\":2}\n{\"date\":\"2026-01-02\",\"name\":\"launch\"}\n{\"price\":\"2\"}\n[1]\n{\"date\":\"soon\"}",
+                "output": "line 1: Named Priced\nline 2: Named Dated\nline 3: nothing\nline 4: not an object\nline 5: nothing\nNamed 2\nPriced 1\nDated 1"
+              },
+              {
+                "input": "{\"name\":\"x\",\"price\":1,\"date\":\"2020-02-02\",\"extra\":true}",
+                "output": "line 1: Named Priced Dated\nNamed 1\nPriced 1\nDated 1"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w15-plugins",
+            "title": "A plugin pipeline",
+            "prompt": "Text plugins are `{ order, run }` objects checked with `satisfies Record<string, Plugin>`: `trim` (0), `collapse` (1, runs of whitespace become one space), `upper` (2), `reverse` (3), `exclaim` (4, appends `!`). Each input line is `<plugin,plugin,…> | <text>`. Apply the named plugins in `order` (each once, however often it is named) and print `[<applied, in order>] <result>` — or `unknown plugin <name>` for the first unknown one.",
+            "hint": "`satisfies` gives each `run` its parameter type from `Plugin`, and keeps the keys for `PluginName`.",
+            "hints": [
+              "`satisfies` gives each `run` its parameter type from `Plugin`, and keeps the keys for `PluginName`.",
+              "Filter with the type predicate itself: `requested.filter(isPlugin)` is `PluginName[]`."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Plugin = { order: number; run: (text: string) => string };\nconst plugins = {\n  trim: { order: 0, run: (t) => t.trim() },\n  collapse: { order: 1, run: (t) => t.replace(/\\s+/g, \" \") },\n  upper: { order: 2, run: (t) => t.toUpperCase() },\n  reverse: { order: 3, run: (t) => [...t].reverse().join(\"\") },\n  exclaim: { order: 4, run: (t) => t + \"!\" },\n} satisfies Record<string, Plugin>;\ntype PluginName = keyof typeof plugins;\nconst isPlugin = (s: string): s is PluginName => Object.hasOwn(plugins, s);\nfor (const line of input.split(\"\\n\")) {\n  const bar = line.indexOf(\"|\");\n  const requested = line.slice(0, bar).split(\",\").map((s) => s.trim()).filter((s) => s !== \"\");\n  const text = line.slice(bar + 1).replace(/^ /, \"\");\n  const unknown = requested.find((p) => !isPlugin(p));\n  if (unknown !== undefined) {\n    console.log(`unknown plugin ${unknown}`);\n    continue;\n  }\n  const chosen = [...new Set(requested.filter(isPlugin))].sort((a, b) => plugins[a].order - plugins[b].order);\n  const result = chosen.reduce((t, p) => plugins[p].run(t), text);\n  console.log(`[${chosen.join(\",\")}] ${result}`);\n}\n",
+            "tests": [
+              {
+                "input": "upper,trim |   hello   world  \nexclaim,reverse,collapse | a  b\nupper,shout | x\nupper,upper | twice",
+                "output": "[trim,upper] HELLO   WORLD\n[collapse,reverse,exclaim] b a!\nunknown plugin shout\n[upper] TWICE"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w15-theme",
+            "title": "Resolve theme tokens",
+            "prompt": "The input defines design tokens, one per line, as `<name> = <value>` where a value is a colour `#rgb`/`#rrggbb` or a reference `$<other>`; then a line `---`; then token names to resolve. Follow references to a colour and print `<name>: <#colour>`, or `<name>: unknown token <t>` (for the first unknown name met), or `<name>: cycle`. A malformed definition prints `bad definition <line>` while reading.",
+            "hint": "A small discriminated union for a token's value makes the resolver a loop with two cases.",
+            "hints": [
+              "A small discriminated union for a token's value makes the resolver a loop with two cases.",
+              "Remember every name visited; seeing one again means a cycle."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype TokenValue = { kind: \"colour\"; hex: string } | { kind: \"ref\"; name: string };\nconst [defs = \"\", queries = \"\"] = input.split(\"\\n---\\n\");\nconst tokens = new Map<string, TokenValue>();\nfor (const line of defs.split(\"\\n\")) {\n  const m = /^(\\w+)\\s*=\\s*(#[0-9a-fA-F]{3}(?:[0-9a-fA-F]{3})?|\\$\\w+)$/.exec(line.trim());\n  const name = m?.[1];\n  const value = m?.[2];\n  if (name === undefined || value === undefined) {\n    console.log(`bad definition ${line.trim()}`);\n    continue;\n  }\n  tokens.set(name, value.startsWith(\"#\") ? { kind: \"colour\", hex: value.toLowerCase() } : { kind: \"ref\", name: value.slice(1) });\n}\nfunction resolve(name: string): string {\n  const seen = new Set<string>();\n  let current = name;\n  for (;;) {\n    if (seen.has(current)) return \"cycle\";\n    seen.add(current);\n    const t = tokens.get(current);\n    if (t === undefined) return `unknown token ${current}`;\n    if (t.kind === \"colour\") return t.hex;\n    current = t.name;\n  }\n}\nfor (const q of queries.split(\"\\n\")) console.log(`${q.trim()}: ${resolve(q.trim())}`);\n",
+            "tests": [
+              {
+                "input": "brand = #3355FF\nprimary = $brand\nbutton = $primary\nlink = $accent\nloop = $loop2\nloop2 = $loop\nbad = blue\n---\nbutton\nlink\nloop\nbrand\nnothing",
+                "output": "bad definition bad = blue\nbutton: #3355ff\nlink: unknown token accent\nloop: cycle\nbrand: #3355ff\nnothing: unknown token nothing"
+              },
+              {
+                "input": "a = #abc\nb = $a\n---\nb",
+                "output": "b: #abc"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w15-form",
+            "title": "Validate a form against its schema",
+            "prompt": "A sign-up form's fields are declared with `satisfies Record<string, Field>`: `name` (text, required, 2-20 characters), `age` (number, optional, 13-120), `email` (email, required), `bio` (text, optional, at most 40 characters). Each input line is a submitted JSON object. Print `ok`, or every problem in field order joined by `; ` — `<f>: required`, `<f>: must be text`, `<f>: must be a number`, `<f>: not an email`, `<f>: at least <n>` / `<f>: at most <n>` (characters for text, value for numbers) — followed by `unknown field <k>` for extra keys.",
+            "hint": "`satisfies` checks every field definition; to loop over them as `Field`s, annotate the entries: `[string, Field][]`.",
+            "hints": [
+              "`satisfies` checks every field definition; to loop over them as `Field`s, annotate the entries: `[string, Field][]`.",
+              "Missing and empty are the same case; decide it before checking the type."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Field = { type: \"text\" | \"number\" | \"email\"; required: boolean; min?: number; max?: number };\nconst signup = {\n  name: { type: \"text\", required: true, min: 2, max: 20 },\n  age: { type: \"number\", required: false, min: 13, max: 120 },\n  email: { type: \"email\", required: true },\n  bio: { type: \"text\", required: false, max: 40 },\n} satisfies Record<string, Field>;\nconst fields: [string, Field][] = Object.entries(signup);\nfunction check(name: string, field: Field, value: unknown): string | undefined {\n  if (value === undefined || value === \"\") return field.required ? `${name}: required` : undefined;\n  let size: number;\n  if (field.type === \"number\") {\n    if (typeof value !== \"number\") return `${name}: must be a number`;\n    size = value;\n  } else {\n    if (typeof value !== \"string\") return `${name}: must be text`;\n    if (field.type === \"email\" && !/^[^@\\s]+@[^@\\s]+\\.\\w+$/.test(value)) return `${name}: not an email`;\n    size = value.length;\n  }\n  if (field.min !== undefined && size < field.min) return `${name}: at least ${field.min}`;\n  if (field.max !== undefined && size > field.max) return `${name}: at most ${field.max}`;\n  return undefined;\n}\nfor (const line of input.split(\"\\n\")) {\n  const data = JSON.parse(line) as Record<string, unknown>;\n  const problems = fields.map(([name, field]) => check(name, field, data[name])).filter((p) => p !== undefined);\n  for (const key of Object.keys(data)) if (!Object.hasOwn(signup, key)) problems.push(`unknown field ${key}`);\n  console.log(problems.length === 0 ? \"ok\" : problems.join(\"; \"));\n}\n",
+            "tests": [
+              {
+                "input": "{\"name\":\"Ana\",\"email\":\"ana@x.io\"}\n{\"name\":\"A\",\"age\":9,\"email\":\"nope\"}\n{\"age\":\"30\",\"bio\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\",\"role\":\"admin\"}\n{\"name\":\"Bo\",\"email\":\"bo@y.dev\",\"age\":120,\"bio\":\"\"}",
+                "output": "ok\nname: at least 2; age: at least 13; email: not an email\nname: required; age: must be a number; email: required; bio: at most 40; unknown field role\nok"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w15-endpoints",
+            "title": "Route requests to endpoints",
+            "prompt": "Endpoints are declared with `satisfies Record<string, Endpoint>` where a path may have `:params`: `listUsers` GET `/users`, `getUser` GET `/users/:id`, `deleteUser` DELETE `/users/:id` (auth), `userPosts` GET `/users/:id/posts/:postId`, `createPost` POST `/posts` (auth). Each input line is `<METHOD> <path> [token]`. Print `<name> <param=value,…>` (or just the name without params), `401 <name>` for an auth endpoint called without a token, `405` if the path matches other methods only, or `404`.",
+            "hint": "Split both paths on `/` and compare segment by segment; a `:name` segment captures.",
+            "hints": [
+              "Split both paths on `/` and compare segment by segment; a `:name` segment captures.",
+              "Collect every endpoint whose path matches, then pick the one whose method matches — that's how 404 differs from 405."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Hard",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Endpoint = { method: \"GET\" | \"POST\" | \"DELETE\"; path: string; auth: boolean };\nconst endpoints = {\n  listUsers: { method: \"GET\", path: \"/users\", auth: false },\n  getUser: { method: \"GET\", path: \"/users/:id\", auth: false },\n  deleteUser: { method: \"DELETE\", path: \"/users/:id\", auth: true },\n  userPosts: { method: \"GET\", path: \"/users/:id/posts/:postId\", auth: false },\n  createPost: { method: \"POST\", path: \"/posts\", auth: true },\n} satisfies Record<string, Endpoint>;\ntype EndpointName = keyof typeof endpoints;\nconst names = Object.keys(endpoints) as EndpointName[];\nfunction match(pattern: string, path: string): Map<string, string> | undefined {\n  const want = pattern.split(\"/\");\n  const got = path.split(\"/\");\n  if (want.length !== got.length) return undefined;\n  const params = new Map<string, string>();\n  for (const [i, seg] of want.entries()) {\n    const actual = got[i] ?? \"\";\n    if (seg.startsWith(\":\")) {\n      if (actual === \"\") return undefined;\n      params.set(seg.slice(1), actual);\n    } else if (seg !== actual) {\n      return undefined;\n    }\n  }\n  return params;\n}\nfor (const line of input.split(\"\\n\")) {\n  const [method = \"\", path = \"\", token] = line.trim().split(/\\s+/);\n  const hits = names.flatMap((n) => {\n    const params = match(endpoints[n].path, path);\n    return params === undefined ? [] : [{ name: n, params }];\n  });\n  const hit = hits.find((h) => endpoints[h.name].method === method);\n  if (hit === undefined) {\n    console.log(hits.length > 0 ? \"405\" : \"404\");\n  } else if (endpoints[hit.name].auth && token === undefined) {\n    console.log(`401 ${hit.name}`);\n  } else {\n    const params = [...hit.params].map(([k, v]) => `${k}=${v}`).join(\",\");\n    console.log(params === \"\" ? hit.name : `${hit.name} ${params}`);\n  }\n}\n",
+            "tests": [
+              {
+                "input": "GET /users\nGET /users/42\nDELETE /users/42\nDELETE /users/42 t0k\nGET /users/7/posts/3\nPUT /users/7\nPOST /posts abc\nGET /users//posts/1\nGET /teams",
+                "output": "listUsers\ngetUser id=42\n401 deleteUser\ndeleteUser id=42\nuserPosts id=7,postId=3\n405\ncreatePost\n404\n404"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w15-palette",
+            "title": "Derive the palette's keys",
+            "prompt": "The palette is checked with `satisfies` (every value must be a `#` colour) and frozen with `as const`. Derive `PaletteKey`, the union of its colour names, from the object itself.",
+            "hint": "`typeof palette` is the object's type; you want its keys.",
+            "hints": [
+              "`typeof palette` is the object's type; you want its keys.",
+              "`keyof typeof palette`."
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<PaletteKey, \"red\" | \"green\" | \"blue\">>;\ntype _2 = Expect<Equal<PaletteHex, \"#e5484d\" | \"#30a46c\" | \"#0090ff\">>;\nfunction _typeTests() {\n  // @ts-expect-error — not a colour in the palette\n  const k: PaletteKey = \"pink\";\n}\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "const palette = {\n  red: \"#e5484d\",\n  green: \"#30a46c\",\n  blue: \"#0090ff\",\n} as const satisfies Record<string, `#${string}`>;\ntype PaletteKey = ____;\ntype PaletteHex = (typeof palette)[PaletteKey];\n",
+            "solution": "const palette = {\n  red: \"#e5484d\",\n  green: \"#30a46c\",\n  blue: \"#0090ff\",\n} as const satisfies Record<string, `#${string}`>;\ntype PaletteKey = keyof typeof palette;\ntype PaletteHex = (typeof palette)[PaletteKey];\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w15-sink",
+            "title": "A sink that is really contravariant",
+            "prompt": "A `Sink<T>` only accepts values. Declare its `put` member so that a sink of animals can be used as a sink of dogs, but not the other way round. (Careful: one of the two ways of writing a member is checked bivariantly.)",
+            "hint": "`put(value: T): void` is method syntax — bivariant, so the unsafe assignment would compile.",
+            "hints": [
+              "`put(value: T): void` is method syntax — bivariant, so the unsafe assignment would compile.",
+              "Write it as a property with a function type: `put: (value: T) => void;`."
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ndeclare const animalSink: Sink<Animal>;\ndeclare const dogSink: Sink<Dog>;\nconst fine: Sink<Dog> = animalSink;\n// @ts-expect-error — a dog sink cannot accept every animal\nconst unsafe: Sink<Animal> = dogSink;\ntype _1 = Expect<Equal<Parameters<Sink<Dog>[\"put\"]>, [value: Dog]>>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type Animal = { name: string };\ntype Dog = { name: string; bark: () => string };\ninterface Sink<in T> {\n  ____\n}\n",
+            "solution": "type Animal = { name: string };\ntype Dog = { name: string; bark: () => string };\ninterface Sink<in T> {\n  put: (value: T) => void;\n}\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w15-route-literals",
+            "title": "Keep the literal types",
+            "prompt": "Finish the route table so that it is checked against `Route`, keeps its own keys, *and* keeps every value's literal type, read-only (`routes.login.method` is exactly `\"POST\"`).",
+            "hint": "An annotation `: Record<string, Route>` would lose the keys; `satisfies` keeps them.",
+            "hints": [
+              "An annotation `: Record<string, Route>` would lose the keys; `satisfies` keeps them.",
+              "`as const` first (literal, read-only values), then `satisfies` to check them."
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Hard",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<RouteName, \"home\" | \"login\">>;\ntype _2 = Expect<Equal<(typeof routes)[\"login\"][\"method\"], \"POST\">>;\ntype _3 = Expect<Equal<(typeof routes)[\"home\"], { readonly method: \"GET\"; readonly path: \"/\" }>>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type Route = { method: \"GET\" | \"POST\"; path: string };\nconst routes = {\n  home: { method: \"GET\", path: \"/\" },\n  login: { method: \"POST\", path: \"/login\" },\n} ____;\ntype RouteName = keyof typeof routes;\n",
+            "solution": "type Route = { method: \"GET\" | \"POST\"; path: string };\nconst routes = {\n  home: { method: \"GET\", path: \"/\" },\n  login: { method: \"POST\", path: \"/login\" },\n} as const satisfies Record<string, Route>;\ntype RouteName = keyof typeof routes;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          }
+        ],
+        "project_spec": {
+          "title": "routes.ts — a typed route table with reverse routing",
+          "goal": "Declare a route table once, with `satisfies`, and derive everything else from it: the route-name union, request matching with `:params`, and reverse routing — building a URL from a route's name — that rejects unknown names and missing parameters.",
+          "requirements": [
+            "Routes: `home` GET `/`, `listTodos` GET `/todos`, `getTodo` GET `/todos/:id`, `createTodo` POST `/todos`, `updateTodo` PUT `/todos/:id`, `deleteTodo` DELETE `/todos/:id`, `todoComments` GET `/todos/:id/comments/:commentId`. Declare them `as const satisfies Record<string, Route>`.",
+            "`match <METHOD> <path>`: ignore a `?query` and a trailing `/` (except on `/` itself). Print `<name>` plus ` <param=value,…>` when there are params; `405 allow <methods>` (the matching routes' methods, sorted, comma-separated) when only the method is wrong; `404` otherwise.",
+            "`url <name> <param=value …>`: print the path with the params filled in, or `unknown route <name>`, `missing param <p>` (the first missing) or `unknown param <p>` (the first extra).",
+            "`names` prints every route name, sorted, space-separated; `count` prints `<k> routes`.",
+            "Keep one source of truth: the name union comes from `keyof typeof routes`, not from a list you typed."
+          ],
+          "stretch": [
+            "Type `url` so its parameters are checked at compile time: `url(\"getTodo\", { id: \"5\" })` — you'll have the tools in week 22 (template literal types).",
+            "Add route groups (`/api/v1` prefixes) without repeating the prefix in every path."
+          ],
+          "rubric": [
+            "No `any` anywhere — not even one hidden in a cast",
+            "Every function has a typed signature; locals are left to inference",
+            "Bad input is handled on purpose, not by accident",
+            "Names say what things are, not how they are stored",
+            "I could explain every line to someone else"
+          ],
+          "language": "typescript",
+          "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n// Build the project here. Read all of stdin from `input` above, and print\n// exactly what the requirements ask for. Run the tests as you go.\n",
+          "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Method = \"GET\" | \"POST\" | \"PUT\" | \"DELETE\";\ntype Route = { method: Method; path: string };\nconst routes = {\n  home: { method: \"GET\", path: \"/\" },\n  listTodos: { method: \"GET\", path: \"/todos\" },\n  getTodo: { method: \"GET\", path: \"/todos/:id\" },\n  createTodo: { method: \"POST\", path: \"/todos\" },\n  updateTodo: { method: \"PUT\", path: \"/todos/:id\" },\n  deleteTodo: { method: \"DELETE\", path: \"/todos/:id\" },\n  todoComments: { method: \"GET\", path: \"/todos/:id/comments/:commentId\" },\n} as const satisfies Record<string, Route>;\ntype RouteName = keyof typeof routes;\nconst names = Object.keys(routes) as RouteName[];\nconst isRoute = (s: string): s is RouteName => Object.hasOwn(routes, s);\n\nfunction match(pattern: string, path: string): [string, string][] | undefined {\n  const want = pattern.split(\"/\");\n  const got = path.split(\"/\");\n  if (want.length !== got.length) return undefined;\n  const params: [string, string][] = [];\n  for (const [i, seg] of want.entries()) {\n    const actual = got[i] ?? \"\";\n    if (seg.startsWith(\":\")) {\n      if (actual === \"\") return undefined;\n      params.push([seg.slice(1), actual]);\n    } else if (seg !== actual) {\n      return undefined;\n    }\n  }\n  return params;\n}\nfunction normalise(path: string): string {\n  const bare = path.split(\"?\")[0] ?? \"\";\n  return bare.length > 1 && bare.endsWith(\"/\") ? bare.slice(0, -1) : bare;\n}\nfunction buildUrl(name: string, args: string[]): string {\n  if (!isRoute(name)) return `unknown route ${name}`;\n  const given = new Map<string, string>();\n  for (const arg of args) {\n    const eq = arg.indexOf(\"=\");\n    given.set(arg.slice(0, eq), arg.slice(eq + 1));\n  }\n  const segments: string[] = routes[name].path.split(\"/\");\n  const wanted = segments.filter((s) => s.startsWith(\":\")).map((s) => s.slice(1));\n  const missing = wanted.find((p) => !given.has(p));\n  if (missing !== undefined) return `missing param ${missing}`;\n  const extra = [...given.keys()].find((p) => !wanted.includes(p));\n  if (extra !== undefined) return `unknown param ${extra}`;\n  return segments.map((s) => (s.startsWith(\":\") ? given.get(s.slice(1)) ?? \"\" : s)).join(\"/\") || \"/\";\n}\nfor (const line of input.split(\"\\n\")) {\n  const [cmd = \"\", a = \"\", ...rest] = line.trim().split(/\\s+/);\n  if (cmd === \"match\") {\n    const path = normalise(rest[0] ?? \"\");\n    const hits = names.flatMap((n) => {\n      const params = match(routes[n].path, path);\n      return params === undefined ? [] : [{ name: n, params }];\n    });\n    const hit = hits.find((h) => routes[h.name].method === a);\n    if (hit !== undefined) {\n      const params = hit.params.map(([k, v]) => `${k}=${v}`).join(\",\");\n      console.log(params === \"\" ? hit.name : `${hit.name} ${params}`);\n    } else if (hits.length > 0) {\n      console.log(`405 allow ${[...new Set(hits.map((h) => routes[h.name].method))].sort().join(\",\")}`);\n    } else {\n      console.log(\"404\");\n    }\n  } else if (cmd === \"url\") {\n    console.log(buildUrl(a, rest));\n  } else if (cmd === \"names\") {\n    console.log([...names].sort().join(\" \"));\n  } else if (cmd === \"count\") {\n    console.log(`${names.length} routes`);\n  }\n}\n",
+          "tests": [
+            {
+              "input": "match GET /todos/7\nmatch PATCH /todos/7\nmatch GET /todos/\nmatch GET /\nmatch GET /todos/7/comments/2?x=1\nmatch GET /users",
+              "output": "getTodo id=7\n405 allow DELETE,GET,PUT\nlistTodos\nhome\ntodoComments id=7,commentId=2\n404"
+            },
+            {
+              "input": "url getTodo id=5\nurl todoComments commentId=9 id=3\nurl home\nurl getTodo\nurl getTodo id=1 x=2\nurl nowhere id=1",
+              "output": "/todos/5\n/todos/3/comments/9\n/\nmissing param id\nunknown param x\nunknown route nowhere"
+            },
+            {
+              "input": "names\ncount",
+              "output": "createTodo deleteTodo getTodo home listTodos todoComments updateTodo\n7 routes"
+            },
+            {
+              "input": "match POST /todos\nmatch DELETE /todos\nmatch PUT /todos/abc/",
+              "output": "createTodo\n405 allow GET,POST\nupdateTodo id=abc"
+            },
+            {
+              "input": "match GET //\nurl listTodos\nmatch DELETE /todos/1/comments/2",
+              "output": "home\n/todos\n405 allow GET"
+            }
+          ],
+          "strictness": "strict+indexed"
+        }
       },
       {
         "week": 16,
@@ -15555,7 +16634,8 @@
         "goal": "Make validated values a type, and stop accidental mutation at the boundary.",
         "concepts": [
           "ts_branded_types",
-          "ts_immutability"
+          "ts_immutability",
+          "ts_parse_dont_validate"
         ],
         "problems": [
           {
@@ -15744,6 +16824,72 @@
             ],
             "answer": 0,
             "explanation": "Since the brand is erased there is nothing to inspect. Runtime questions about a branded value always come back to re-checking the underlying data."
+          },
+          {
+            "question": "What is the difference between a validator and a parser?",
+            "options": [
+              "A parser returns a more precise type that records the check; a validator returns a boolean",
+              "A parser is faster",
+              "A validator throws, a parser doesn't",
+              "There is none"
+            ],
+            "answer": 0,
+            "explanation": "The parser's return type carries the knowledge forward, so nothing downstream has to recheck."
+          },
+          {
+            "question": "What does `declare const Brand: unique symbol` emit at runtime?",
+            "options": [
+              "Nothing — `declare` is erased",
+              "A new Symbol()",
+              "A frozen object",
+              "A class"
+            ],
+            "answer": 0,
+            "explanation": "It only creates a type-level unique symbol to key the brand property."
+          },
+          {
+            "question": "Where should the `as Email` cast appear?",
+            "options": [
+              "Once, inside the parser, right after the check",
+              "Wherever an email is needed",
+              "In every test",
+              "Nowhere — brands need no casts"
+            ],
+            "answer": 0,
+            "explanation": "Concentrating the cast in the smart constructor is what makes the brand trustworthy."
+          },
+          {
+            "question": "Why is `readonly [number, ...number[]]` useful?",
+            "options": [
+              "Its first element is never `undefined`, so code taking it needs no emptiness check",
+              "It is faster than an array",
+              "It can't be iterated",
+              "It prevents duplicates"
+            ],
+            "answer": 0,
+            "explanation": "The non-emptiness is proven once, at construction, and carried in the type."
+          },
+          {
+            "question": "A parser trims and lower-cases emails. Why?",
+            "options": [
+              "So equal addresses become equal strings — normalising is part of parsing",
+              "Regexes can't match capitals",
+              "The brand requires it",
+              "It's faster to compare"
+            ],
+            "answer": 0,
+            "explanation": "Returning the canonical form removes a whole class of duplicate bugs."
+          },
+          {
+            "question": "Where in a program should parsing happen?",
+            "options": [
+              "At the boundary, where untyped input enters — once",
+              "In every function that uses the value",
+              "Only in tests",
+              "Just before printing"
+            ],
+            "answer": 0,
+            "explanation": "Inside the boundary, the precise types carry the guarantee."
           }
         ],
         "quiz_sample": 8,
@@ -15839,6 +16985,30 @@
           {
             "front": "TS2540 — cause?",
             "back": "\"Cannot assign to 'x' because it is a read-only property.\""
+          },
+          {
+            "front": "Validator vs parser, in one line?",
+            "back": "A validator returns `true`/`false` and forgets; a parser returns a more precise type (`Email`) that proves the check happened."
+          },
+          {
+            "front": "How do you declare an unforgeable brand?",
+            "back": "`declare const B: unique symbol; type Email = string & { readonly [B]: true };` — kept private to the module."
+          },
+          {
+            "front": "What does a `unique symbol` brand cost at runtime?",
+            "back": "Nothing: `declare` emits no code and the intersection is erased — the value is a plain string."
+          },
+          {
+            "front": "Where does the one `as Email` belong?",
+            "back": "Inside the smart constructor, immediately after the check that justifies it."
+          },
+          {
+            "front": "How do you type a list that can't be empty?",
+            "back": "`readonly [T, ...T[]]` — its first element is always present."
+          },
+          {
+            "front": "Why normalise inside the parser?",
+            "back": "So equal values become equal (trimmed, lower-cased, integer cents) and duplicates can't sneak in."
           }
         ],
         "practice": [
@@ -15943,11 +17113,396 @@
             ],
             "source_slug": "",
             "dataset": ""
+          },
+          {
+            "id": "tsm-w16-p2",
+            "title": "A tuple index under the flag",
+            "prompt": "What type does TypeScript already infer for `first`? Annotate `check` with exactly that type — not merely one that fits. This exercise is checked with `noUncheckedIndexedAccess` on.",
+            "hint": "A tuple's length is known, so a fixed index is never out of range.",
+            "hints": [
+              "A tuple's length is known, so a fixed index is never out of range.",
+              "`as const` keeps the literal."
+            ],
+            "language": "typescript",
+            "kind": "predict",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<typeof check, typeof first>>;\n",
+            "judge_mode": "types",
+            "forbid": [
+              "typeof"
+            ],
+            "starter": "const tags = [\"a\", \"b\"] as const;\nconst first = tags[0];\nconst check: ____ = first;\n",
+            "solution": "const tags = [\"a\", \"b\"] as const;\nconst first = tags[0];\nconst check: \"a\" = first;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w16-d3",
+            "title": "A read-only list passed to a mutating helper",
+            "prompt": "The compiler rejects this program:\n\n    error TS2345: Argument of type 'readonly string[]' is not assignable to parameter of type 'string[]'.\n\nSort a copy — the original order must survive.",
+            "hint": "A function that sorts in place needs a mutable array.",
+            "hints": [
+              "A function that sorts in place needs a mutable array.",
+              "Accept `readonly string[]` and return a sorted copy with `toSorted()`."
+            ],
+            "language": "typescript",
+            "kind": "diagnose",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nfunction sortNames(xs: string[]): string[] {\n  return xs.sort();\n}\nconst names: readonly string[] = input.split(\" \");\nconsole.log(sortNames(names).join(\",\"));\nconsole.log(names.join(\",\"));\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nfunction sortNames(xs: readonly string[]): string[] {\n  return xs.toSorted();\n}\nconst names: readonly string[] = input.split(\" \");\nconsole.log(sortNames(names).join(\",\"));\nconsole.log(names.join(\",\"));\n",
+            "tests": [
+              {
+                "input": "b c a",
+                "output": "a,b,c\nb,c,a"
+              },
+              {
+                "input": "x",
+                "output": "x\nx"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w16-f2",
+            "title": "A frozen object with a mutable inside",
+            "prompt": "Print the default tags, then the user's tags (the defaults plus the input word). The defaults change too.",
+            "hint": "`Object.freeze` is shallow: the array inside is still mutable.",
+            "hints": [
+              "`Object.freeze` is shallow: the array inside is still mutable.",
+              "Build a new array instead of pushing onto the shared one."
+            ],
+            "language": "typescript",
+            "kind": "fix",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst DEFAULTS = Object.freeze({ tags: [\"base\"] });\nfunction withTag(tag: string): string[] {\n  const tags = DEFAULTS.tags;\n  tags.push(tag);\n  return tags;\n}\nconst mine = withTag(input);\nconsole.log(DEFAULTS.tags.join(\",\"));\nconsole.log(mine.join(\",\"));\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst DEFAULTS = Object.freeze({ tags: [\"base\"] });\nfunction withTag(tag: string): string[] {\n  return [...DEFAULTS.tags, tag];\n}\nconst mine = withTag(input);\nconsole.log(DEFAULTS.tags.join(\",\"));\nconsole.log(mine.join(\",\"));\n",
+            "tests": [
+              {
+                "input": "x",
+                "output": "base\nbase,x"
+              },
+              {
+                "input": "urgent",
+                "output": "base\nbase,urgent"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
           }
         ],
         "optional": false,
-        "problem_set": [],
-        "project_spec": null
+        "problem_set": [
+          {
+            "id": "tsm-w16-money",
+            "title": "Money in branded cents",
+            "prompt": "Each input line is a money command: `add <a> <b>`, `sub <a> <b>`, `mul <a> <factor>` (rounded to the nearest cent) or `split <a> <n>` (into n parts that differ by at most a cent, the larger parts first). Amounts look like `12`, `-3.5` or `0.99`. Parse them once into a branded `Cents` type and print results like `$12.34` / `-$0.50` (a split prints its parts space-separated). Errors: `bad amount <x>`, `bad count <n>` (n must be a whole number ≥ 1), `cannot split a negative amount`, `unknown command <c>`.",
+            "hint": "Integer cents make `0.10 + 0.20` exactly `0.30`.",
+            "hints": [
+              "Integer cents make `0.10 + 0.20` exactly `0.30`.",
+              "A split gives everyone `floor(total / n)` and hands out the remaining cents one each."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ndeclare const CentsBrand: unique symbol;\ntype Cents = number & { readonly [CentsBrand]: true };\nfunction parseMoney(text: string): Cents | undefined {\n  const m = /^(-?)(\\d+)(?:\\.(\\d{1,2}))?$/.exec(text);\n  if (m === null) return undefined;\n  const cents = Number(m[2] ?? \"0\") * 100 + Number((m[3] ?? \"\").padEnd(2, \"0\"));\n  return (m[1] === \"-\" ? -cents : cents) as Cents;\n}\nconst show = (c: Cents): string => (c < 0 ? \"-\" : \"\") + \"$\" + (Math.abs(c) / 100).toFixed(2);\nconst add = (a: Cents, b: Cents): Cents => (a + b) as Cents;\nconst scale = (a: Cents, factor: number): Cents => Math.round(a * factor) as Cents;\nfunction split(total: Cents, n: number): Cents[] {\n  const base = Math.floor(total / n);\n  const extra = total - base * n;\n  return Array.from({ length: n }, (_, i) => (base + (i < extra ? 1 : 0)) as Cents);\n}\nfor (const line of input.split(\"\\n\")) {\n  const [cmd = \"\", x = \"\", y = \"\"] = line.trim().split(/\\s+/);\n  const a = parseMoney(x);\n  if (a === undefined) {\n    console.log(`bad amount ${x}`);\n    continue;\n  }\n  if (cmd === \"add\" || cmd === \"sub\") {\n    const b = parseMoney(y);\n    if (b === undefined) console.log(`bad amount ${y}`);\n    else console.log(show(add(a, cmd === \"add\" ? b : ((-b) as Cents))));\n  } else if (cmd === \"mul\") {\n    const f = Number(y);\n    console.log(y === \"\" || !Number.isFinite(f) ? `bad amount ${y}` : show(scale(a, f)));\n  } else if (cmd === \"split\") {\n    const n = Number(y);\n    if (!Number.isInteger(n) || n < 1) console.log(`bad count ${y}`);\n    else if (a < 0) console.log(\"cannot split a negative amount\");\n    else console.log(split(a, n).map(show).join(\" \"));\n  } else {\n    console.log(`unknown command ${cmd}`);\n  }\n}\n",
+            "tests": [
+              {
+                "input": "add 0.10 0.20\nsub 5 7.5\nmul 19.99 3\nmul 10 0.175\nsplit 10 3\nsplit 0.05 2",
+                "output": "$0.30\n-$2.50\n$59.97\n$1.75\n$3.34 $3.33 $3.33\n$0.03 $0.02"
+              },
+              {
+                "input": "add 1.234 1\nsplit -3 2\nsplit 1 0\ndiv 1 2\nmul 2 x",
+                "output": "bad amount 1.234\ncannot split a negative amount\nbad count 0\nunknown command div\nbad amount x"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w16-percent",
+            "title": "A percentage that can't be out of range",
+            "prompt": "Each input line is `<price> <discount>`, the discount written like `15%` or `12.5%`. Parse the discount into a branded `Percent` (0-100, at most one decimal) and the price into cents, then print `<price> - <p>% = <final>` with money as `$x.yy` and the final price rounded to the nearest cent. Errors: `bad price <x>`, `bad percent <x>`, `percent out of range <x>`.",
+            "hint": "Return the reason alongside the branded value — `Percent | \"bad\" | \"range\"` — and narrow on the two reasons.",
+            "hints": [
+              "Return the reason alongside the branded value — `Percent | \"bad\" | \"range\"` — and narrow on the two reasons."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ndeclare const PercentBrand: unique symbol;\ntype Percent = number & { readonly [PercentBrand]: true };\nfunction parsePercent(text: string): Percent | \"bad\" | \"range\" {\n  const m = /^(\\d+(?:\\.\\d)?)%$/.exec(text);\n  if (m === null) return \"bad\";\n  const p = Number(m[1]);\n  return p <= 100 ? (p as Percent) : \"range\";\n}\nfunction parseCents(text: string): number | undefined {\n  return /^\\d+(\\.\\d{1,2})?$/.test(text) ? Math.round(Number(text) * 100) : undefined;\n}\nconst money = (c: number) => \"$\" + (c / 100).toFixed(2);\nfor (const line of input.split(\"\\n\")) {\n  const [priceText = \"\", pctText = \"\"] = line.trim().split(/\\s+/);\n  const price = parseCents(priceText);\n  const pct = parsePercent(pctText);\n  if (price === undefined) console.log(`bad price ${priceText}`);\n  else if (pct === \"bad\") console.log(`bad percent ${pctText}`);\n  else if (pct === \"range\") console.log(`percent out of range ${pctText}`);\n  else console.log(`${money(price)} - ${pct}% = ${money(Math.round((price * (100 - pct)) / 100))}`);\n}\n",
+            "tests": [
+              {
+                "input": "80 15%\n19.99 12.5%\n10 100%\n5 0%",
+                "output": "$80.00 - 15% = $68.00\n$19.99 - 12.5% = $17.49\n$10.00 - 100% = $0.00\n$5.00 - 0% = $5.00"
+              },
+              {
+                "input": "10 150%\n10 15\nx 5%\n9.99 33.33%",
+                "output": "percent out of range 150%\nbad percent 15\nbad price x\nbad percent 33.33%"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w16-emails",
+            "title": "Canonical email addresses",
+            "prompt": "Each input line is an email address as someone typed it. Parse it into a branded `Email`: trim, lower-case, exactly one `@`, a non-empty local part and a domain containing a dot. Print `rejected <input, trimmed>` for bad ones as you go; then every distinct valid address, sorted; then each domain with its count, most first (ties alphabetically).",
+            "hint": "Normalising is part of parsing: after it, equal addresses are equal strings, so a `Set` dedupes them.",
+            "hints": [
+              "Normalising is part of parsing: after it, equal addresses are equal strings, so a `Set` dedupes them."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ndeclare const EmailBrand: unique symbol;\ntype Email = string & { readonly [EmailBrand]: true };\nfunction parseEmail(raw: string): Email | undefined {\n  const s = raw.trim().toLowerCase();\n  const parts = s.split(\"@\");\n  const [local = \"\", domain = \"\"] = parts;\n  return parts.length === 2 && local !== \"\" && /^[a-z0-9-]+(\\.[a-z0-9-]+)+$/.test(domain) ? (s as Email) : undefined;\n}\nconst emails = new Set<Email>();\nfor (const line of input.split(\"\\n\")) {\n  const email = parseEmail(line);\n  if (email === undefined) console.log(`rejected ${line.trim()}`);\n  else emails.add(email);\n}\nconst sorted = [...emails].sort();\nfor (const e of sorted) console.log(e);\nconst domains = new Map<string, number>();\nfor (const e of sorted) {\n  const domain = e.slice(e.indexOf(\"@\") + 1);\n  domains.set(domain, (domains.get(domain) ?? 0) + 1);\n}\nfor (const [d, n] of [...domains].sort(([a, x], [b, y]) => y - x || a.localeCompare(b))) console.log(`${d} ${n}`);\n",
+            "tests": [
+              {
+                "input": "Ana@Example.com\n ana@example.com \nbo@mail.io\ncy@@x.io\n@x.io\ndee@localhost\nEVE@MAIL.IO",
+                "output": "rejected cy@@x.io\nrejected @x.io\nrejected dee@localhost\nana@example.com\nbo@mail.io\neve@mail.io\nmail.io 2\nexample.com 1"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w16-cart",
+            "title": "An immutable cart with undo",
+            "prompt": "Commands, one per line: `add <sku> <qty> <price>` (adds to an existing line's quantity, keeping its first price), `remove <sku>`, `qty <sku> <n>` (0 removes the line), `undo`, `show`. Every change must build a *new* cart (a `readonly` array of `readonly` lines) and remember the previous one; `undo` goes back one change (`nothing to undo`). `remove`/`qty` on a missing sku print `no <sku>` and change nothing. `show` prints each line as `<sku> x<qty> = <line total>` and then `total <sum>` (money with two decimals), or `(empty)`. Finally print `changes kept: <k>`.",
+            "hint": "`with(i, v)` and `toSpliced(i, 1)` return new arrays — the old cart is untouched, so it can go in the history.",
+            "hints": [
+              "`with(i, v)` and `toSpliced(i, 1)` return new arrays — the old cart is untouched, so it can go in the history.",
+              "Under `noUncheckedIndexedAccess`, `cart[index]` is `Line | undefined`; that check doubles as \"is the sku in the cart?\"."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Line = { readonly sku: string; readonly qty: number; readonly price: number };\ntype Cart = readonly Line[];\nlet cart: Cart = [];\nconst history: Cart[] = [];\nfunction commit(next: Cart): void {\n  history.push(cart);\n  cart = next;\n}\nconst money = (n: number) => n.toFixed(2);\nfor (const raw of input.split(\"\\n\")) {\n  const [cmd = \"\", sku = \"\", a = \"\", b = \"\"] = raw.trim().split(/\\s+/);\n  const index = cart.findIndex((l) => l.sku === sku);\n  const line = cart[index];\n  if (cmd === \"add\") {\n    const qty = Number(a);\n    commit(line === undefined ? [...cart, { sku, qty, price: Number(b) }] : cart.with(index, { ...line, qty: line.qty + qty }));\n  } else if (cmd === \"remove\" || cmd === \"qty\") {\n    if (line === undefined) {\n      console.log(`no ${sku}`);\n      continue;\n    }\n    const n = cmd === \"remove\" ? 0 : Number(a);\n    commit(n === 0 ? cart.toSpliced(index, 1) : cart.with(index, { ...line, qty: n }));\n  } else if (cmd === \"undo\") {\n    const previous = history.pop();\n    if (previous === undefined) console.log(\"nothing to undo\");\n    else cart = previous;\n  } else if (cmd === \"show\") {\n    if (cart.length === 0) console.log(\"(empty)\");\n    for (const l of cart) console.log(`${l.sku} x${l.qty} = ${money(l.qty * l.price)}`);\n    if (cart.length > 0) console.log(`total ${money(cart.reduce((s, l) => s + l.qty * l.price, 0))}`);\n  }\n}\nconsole.log(`changes kept: ${history.length}`);\n",
+            "tests": [
+              {
+                "input": "add pen 2 1.50\nadd cup 1 4\nadd pen 1 9\nshow\nqty cup 3\nremove pen\nshow\nundo\nundo\nshow",
+                "output": "pen x3 = 4.50\ncup x1 = 4.00\ntotal 8.50\ncup x3 = 12.00\ntotal 12.00\npen x3 = 4.50\ncup x1 = 4.00\ntotal 8.50\nchanges kept: 3"
+              },
+              {
+                "input": "undo\nremove ink\nshow\nadd ink 1 2.25\nqty ink 0\nshow\nundo\nshow",
+                "output": "nothing to undo\nno ink\n(empty)\n(empty)\nink x1 = 2.25\ntotal 2.25\nchanges kept: 1"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w16-versions",
+            "title": "A persistent stack",
+            "prompt": "A persistent stack never changes: `push` and `pop` make a new version that shares the old nodes. Version 0 is empty. Commands: `push <v>` and `pop` (from the current version; print `v<k>: <values top first>` for the new version k, or `v<k>: (empty)`; popping an empty stack prints `empty`), `checkout <k>` (make version k current; `no version <k>`), `print` (the current version). Finish with `versions <n>, nodes <m>` — how many versions exist and how many nodes were ever created.",
+            "hint": "A push creates exactly one node whose `next` is the old head — the rest of the list is shared, not copied.",
+            "hints": [
+              "A push creates exactly one node whose `next` is the old head — the rest of the list is shared, not copied.",
+              "Keep every version's head in an array; checking out is just picking an index."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Node = { readonly value: string; readonly next: Node | undefined };\nconst versions: (Node | undefined)[] = [undefined];\nlet current = 0;\nlet nodes = 0;\nconst show = (head: Node | undefined): string => {\n  const values: string[] = [];\n  for (let n = head; n !== undefined; n = n.next) values.push(n.value);\n  return values.join(\" \") || \"(empty)\";\n};\nfunction publish(head: Node | undefined): void {\n  versions.push(head);\n  current = versions.length - 1;\n  console.log(`v${current}: ${show(head)}`);\n}\nfor (const line of input.split(\"\\n\")) {\n  const [cmd = \"\", arg = \"\"] = line.trim().split(/\\s+/);\n  const head = versions[current];\n  if (cmd === \"push\") {\n    nodes++;\n    publish({ value: arg, next: head });\n  } else if (cmd === \"pop\") {\n    if (head === undefined) console.log(\"empty\");\n    else publish(head.next);\n  } else if (cmd === \"checkout\") {\n    const k = Number(arg);\n    if (Number.isInteger(k) && k >= 0 && k < versions.length) current = k;\n    else console.log(`no version ${arg}`);\n  } else if (cmd === \"print\") {\n    console.log(show(head));\n  }\n}\nconsole.log(`versions ${versions.length}, nodes ${nodes}`);\n",
+            "tests": [
+              {
+                "input": "push a\npush b\npush c\ncheckout 1\npush x\nprint\ncheckout 3\npop\npop\npop\npop\ncheckout 9",
+                "output": "v1: a\nv2: b a\nv3: c b a\nv4: x a\nx a\nv5: b a\nv6: a\nv7: (empty)\nempty\nno version 9\nversions 8, nodes 4"
+              },
+              {
+                "input": "pop\npush 1\ncheckout 0\nprint\npush 2",
+                "output": "empty\nv1: 1\n(empty)\nv2: 2\nversions 3, nodes 2"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w16-deep-equal",
+            "title": "Where do they differ?",
+            "prompt": "The input is pairs of lines, each line a JSON value. For each pair print `equal`, or the first difference as `<path>: <left> vs <right>`, with values as JSON and `missing` for an absent key or index. Paths start at `$`, then `.key` and `[i]`. Compare objects by their keys in sorted order (a key in either side), arrays index by index; values of different kinds differ at that path.",
+            "hint": "Recursion over a `Json` union: arrays, objects, and everything else compared directly.",
+            "hints": [
+              "Recursion over a `Json` union: arrays, objects, and everything else compared directly.",
+              "Under `noUncheckedIndexedAccess`, `a[i]` and `a[k]` are already `Json | undefined` — which is exactly the \"missing\" case."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Json = null | boolean | number | string | Json[] | { [key: string]: Json };\nconst isObject = (v: Json): v is { [key: string]: Json } => typeof v === \"object\" && v !== null && !Array.isArray(v);\nconst show = (v: Json | undefined) => (v === undefined ? \"missing\" : JSON.stringify(v));\nfunction diff(a: Json | undefined, b: Json | undefined, path: string): string | undefined {\n  if (a === undefined || b === undefined) return a === b ? undefined : `${path}: ${show(a)} vs ${show(b)}`;\n  if (Array.isArray(a) && Array.isArray(b)) {\n    for (let i = 0; i < Math.max(a.length, b.length); i++) {\n      const d = diff(a[i], b[i], `${path}[${i}]`);\n      if (d !== undefined) return d;\n    }\n    return undefined;\n  }\n  if (isObject(a) && isObject(b)) {\n    for (const k of [...new Set([...Object.keys(a), ...Object.keys(b)])].sort()) {\n      const d = diff(a[k], b[k], `${path}.${k}`);\n      if (d !== undefined) return d;\n    }\n    return undefined;\n  }\n  return JSON.stringify(a) === JSON.stringify(b) ? undefined : `${path}: ${show(a)} vs ${show(b)}`;\n}\nconst lines = input.split(\"\\n\");\nfor (let i = 0; i + 1 < lines.length; i += 2) {\n  const left: Json = JSON.parse(lines[i] ?? \"null\");\n  const right: Json = JSON.parse(lines[i + 1] ?? \"null\");\n  console.log(diff(left, right, \"$\") ?? \"equal\");\n}\n",
+            "tests": [
+              {
+                "input": "{\"a\":1,\"b\":[1,2]}\n{\"b\":[1,2],\"a\":1}\n{\"a\":{\"x\":[1,{\"y\":2}]}}\n{\"a\":{\"x\":[1,{\"y\":3}]}}\n[1,2,3]\n[1,2]\n{\"k\":1}\n{\"j\":1}",
+                "output": "equal\n$.a.x[1].y: 2 vs 3\n$[2]: 3 vs missing\n$.j: missing vs 1"
+              },
+              {
+                "input": "5\n\"5\"\nnull\nnull\n{\"a\":[]}\n{\"a\":{}}",
+                "output": "$: 5 vs \"5\"\nequal\n$.a: [] vs {}"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w16-time-travel",
+            "title": "A counter with time travel",
+            "prompt": "A counter starts at 0. Commands: `inc <n>`, `dec <n>`, `set <n>` (each prints the new value), `snapshot <name>` (prints `saved <name>`), `restore <name>` (the value when saved — it counts as a change and prints the value; `no snapshot <name>`), `back <k>` (undo the last k changes — or all of them — and print the value), `history` (every value from the start to now, space-separated). Keep the history as an immutable list of states: each change appends, and `back` returns to an earlier prefix.",
+            "hint": "`back` never mutates: `history.slice(0, …)` is a new, shorter list.",
+            "hints": [
+              "`back` never mutates: `history.slice(0, …)` is a new, shorter list.",
+              "Keep the start state, so going back further than the beginning stops at 0."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Hard",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype State = { readonly value: number; readonly cause: string };\nlet history: readonly State[] = [{ value: 0, cause: \"start\" }];\nconst snapshots = new Map<string, number>();\nconst now = (): number => history.at(-1)?.value ?? 0;\nfunction change(value: number, cause: string): void {\n  history = [...history, { value, cause }];\n  console.log(value);\n}\nfor (const line of input.split(\"\\n\")) {\n  const [cmd = \"\", arg = \"\"] = line.trim().split(/\\s+/);\n  const n = Number(arg);\n  if (cmd === \"inc\") change(now() + n, line);\n  else if (cmd === \"dec\") change(now() - n, line);\n  else if (cmd === \"set\") change(n, line);\n  else if (cmd === \"snapshot\") {\n    snapshots.set(arg, now());\n    console.log(`saved ${arg}`);\n  } else if (cmd === \"restore\") {\n    const saved = snapshots.get(arg);\n    if (saved === undefined) console.log(`no snapshot ${arg}`);\n    else change(saved, line);\n  } else if (cmd === \"back\") {\n    history = history.slice(0, Math.max(1, history.length - n));\n    console.log(now());\n  } else if (cmd === \"history\") {\n    console.log(history.map((s) => s.value).join(\" \"));\n  }\n}\n",
+            "tests": [
+              {
+                "input": "inc 5\ninc 3\nsnapshot mid\ndec 10\nhistory\nback 1\nrestore mid\nrestore end\nset 42\nback 99\nhistory",
+                "output": "5\n8\nsaved mid\n-2\n0 5 8 -2\n8\n8\nno snapshot end\n42\n0\n0"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w16-id-brands",
+            "title": "Ids that can't be mixed up",
+            "prompt": "`UserId` is a branded string. Declare `OrderId` the same way with its own brand, so that a user id can't be used as an order id (or a plain string as either) — but an order id can still be used as a string.",
+            "hint": "Intersect `string` with an object type whose only property is keyed by `OrderIdBrand`.",
+            "hints": [
+              "Intersect `string` with an object type whose only property is keyed by `OrderIdBrand`.",
+              "Each brand needs its own symbol, or the two types would be the same."
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ndeclare const u: UserId;\ndeclare const o: OrderId;\nconst asText: string = o;\nfunction _typeTests() {\n  // @ts-expect-error — a user id is not an order id\n  const mixed: OrderId = u;\n  // @ts-expect-error — a plain string is not an order id\n  const raw: OrderId = \"O-1001\";\n}\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "declare const UserIdBrand: unique symbol;\ndeclare const OrderIdBrand: unique symbol;\ntype UserId = string & { readonly [UserIdBrand]: true };\ntype OrderId = ____;\n",
+            "solution": "declare const UserIdBrand: unique symbol;\ndeclare const OrderIdBrand: unique symbol;\ntype UserId = string & { readonly [UserIdBrand]: true };\ntype OrderId = string & { readonly [OrderIdBrand]: true };\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w16-tags",
+            "title": "A tag list that is never empty",
+            "prompt": "Declare `Tags`: a read-only list of strings with at least one element, so an empty list is rejected, the first tag is a plain `string` (no `undefined`, even under `noUncheckedIndexedAccess`), and nothing can push onto it.",
+            "hint": "A tuple with a fixed first element and a rest element.",
+            "hints": [
+              "A tuple with a fixed first element and a rest element.",
+              "Prefix it with `readonly`."
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<Tags[0], string>>;\nfunction _typeTests(t: Tags) {\n  // @ts-expect-error — at least one tag\n  const none: Tags = [];\n  // @ts-expect-error — tags are read-only\n  t.push(\"x\");\n}\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type Tags = ____;\nconst one: Tags = [\"urgent\"];\nconst many: Tags = [\"a\", \"b\", \"c\"];\n",
+            "solution": "type Tags = readonly [string, ...string[]];\nconst one: Tags = [\"urgent\"];\nconst many: Tags = [\"a\", \"b\", \"c\"];\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          }
+        ],
+        "project_spec": {
+          "title": "ids.ts — branded ids and a read-only store",
+          "goal": "Parse users and orders into branded `UserId`/`OrderId` values and integer cents, reject every bad row, and answer queries from a store that callers cannot mutate. A user id where an order id belongs is a compile error — and, from the query input, a clear message.",
+          "requirements": [
+            "The input has three sections separated by lines containing only `---`: users (`<userId> <name>`), orders (`<orderId> <userId> <amount>`), queries.",
+            "A `UserId` is `U-` and three digits; an `OrderId` is `O-` and four; an amount has at most two decimals. Report bad rows as they are read: `bad user line: <line>`, `bad order line: <line>`, `duplicate id <id>`, `order <id>: unknown user <userId>`.",
+            "Queries: `user <id>` → `<name>: <k> orders, $<total>` (`order` for one); `order <id>` → `<id> by <name>: $<amount>`; `top` → the user with the highest total, `<name> $<total>` (earliest id on a tie; `none` if no orders). A missing id prints `no user <id>` / `no order <id>`; an id of the wrong kind or format prints `not a user id <x>` / `not an order id <x>`.",
+            "Store users and orders in `ReadonlyMap`s keyed by the branded ids, built once and never changed afterwards.",
+            "Money is printed with two decimals."
+          ],
+          "stretch": [
+            "Make the maps impossible to mutate even through a cast by freezing them — and explain why that is not the same guarantee.",
+            "Add `refund <orderId> <amount>` producing a new store rather than editing the old one."
+          ],
+          "rubric": [
+            "No `any` anywhere — not even one hidden in a cast",
+            "Every function has a typed signature; locals are left to inference",
+            "Bad input is handled on purpose, not by accident",
+            "Names say what things are, not how they are stored",
+            "I could explain every line to someone else"
+          ],
+          "language": "typescript",
+          "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n// Build the project here. Read all of stdin from `input` above, and print\n// exactly what the requirements ask for. Run the tests as you go.\n",
+          "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ndeclare const UserIdBrand: unique symbol;\ndeclare const OrderIdBrand: unique symbol;\ntype UserId = string & { readonly [UserIdBrand]: true };\ntype OrderId = string & { readonly [OrderIdBrand]: true };\ntype User = { readonly id: UserId; readonly name: string };\ntype Order = { readonly id: OrderId; readonly user: UserId; readonly cents: number };\n\nconst parseUserId = (s: string): UserId | undefined => (/^U-\\d{3}$/.test(s) ? (s as UserId) : undefined);\nconst parseOrderId = (s: string): OrderId | undefined => (/^O-\\d{4}$/.test(s) ? (s as OrderId) : undefined);\nconst parseCents = (s: string): number | undefined => (/^\\d+(\\.\\d{1,2})?$/.test(s) ? Math.round(Number(s) * 100) : undefined);\nconst money = (c: number) => \"$\" + (c / 100).toFixed(2);\n\nconst sections: string[][] = [[]];\nfor (const line of input.split(\"\\n\")) {\n  if (line.trim() === \"---\") sections.push([]);\n  else if (line.trim() !== \"\") sections.at(-1)?.push(line);\n}\nconst [userLines = [], orderLines = [], queryLines = []] = sections;\nconst userMap = new Map<UserId, User>();\nfor (const line of userLines) {\n  const [idText = \"\", ...name] = line.trim().split(/\\s+/);\n  const id = parseUserId(idText);\n  if (id === undefined || name.length === 0) console.log(`bad user line: ${line.trim()}`);\n  else if (userMap.has(id)) console.log(`duplicate id ${id}`);\n  else userMap.set(id, { id, name: name.join(\" \") });\n}\nconst orderMap = new Map<OrderId, Order>();\nfor (const line of orderLines) {\n  const [idText = \"\", userText = \"\", amountText = \"\"] = line.trim().split(/\\s+/);\n  const id = parseOrderId(idText);\n  const user = parseUserId(userText);\n  const cents = parseCents(amountText);\n  if (id === undefined || user === undefined || cents === undefined) console.log(`bad order line: ${line.trim()}`);\n  else if (orderMap.has(id)) console.log(`duplicate id ${id}`);\n  else if (!userMap.has(user)) console.log(`order ${id}: unknown user ${user}`);\n  else orderMap.set(id, { id, user, cents });\n}\nconst users: ReadonlyMap<UserId, User> = userMap;\nconst orders: ReadonlyMap<OrderId, Order> = orderMap;\nconst ordersOf = (u: UserId) => [...orders.values()].filter((o) => o.user === u);\nconst totalOf = (u: UserId) => ordersOf(u).reduce((s, o) => s + o.cents, 0);\n\nfor (const q of queryLines) {\n  const [cmd = \"\", arg = \"\"] = q.trim().split(/\\s+/);\n  if (cmd === \"user\") {\n    const id = parseUserId(arg);\n    const user = id === undefined ? undefined : users.get(id);\n    if (id === undefined) console.log(`not a user id ${arg}`);\n    else if (user === undefined) console.log(`no user ${id}`);\n    else {\n      const n = ordersOf(id).length;\n      console.log(`${user.name}: ${n} ${n === 1 ? \"order\" : \"orders\"}, ${money(totalOf(id))}`);\n    }\n  } else if (cmd === \"order\") {\n    const id = parseOrderId(arg);\n    const order = id === undefined ? undefined : orders.get(id);\n    if (id === undefined) console.log(`not an order id ${arg}`);\n    else if (order === undefined) console.log(`no order ${id}`);\n    else console.log(`${id} by ${users.get(order.user)?.name ?? \"?\"}: ${money(order.cents)}`);\n  } else if (cmd === \"top\") {\n    const ranked = [...users.keys()].filter((u) => ordersOf(u).length > 0)\n      .sort((a, b) => totalOf(b) - totalOf(a) || a.localeCompare(b));\n    const best = ranked[0];\n    console.log(best === undefined ? \"none\" : `${users.get(best)?.name ?? \"?\"} ${money(totalOf(best))}`);\n  }\n}\n",
+          "tests": [
+            {
+              "input": "U-001 ana\nU-002 bo lee\n---\nO-1001 U-001 12.50\nO-1002 U-002 30\nO-1003 U-001 20.25\n---\nuser U-001\nuser U-002\norder O-1002\ntop",
+              "output": "ana: 2 orders, $32.75\nbo lee: 1 order, $30.00\nO-1002 by bo lee: $30.00\nana $32.75"
+            },
+            {
+              "input": "U-1 x\nU-003 cy\nU-003 dup\n---\nO-2001 U-009 5\nO-2002 U-003 1.999\nO-2003 U-003 7\nO-2003 U-003 8\n---\nuser O-2003\norder U-003\nuser U-004\norder O-9999\nuser U-003",
+              "output": "bad user line: U-1 x\nduplicate id U-003\norder O-2001: unknown user U-009\nbad order line: O-2002 U-003 1.999\nduplicate id O-2003\nnot a user id O-2003\nnot an order id U-003\nno user U-004\nno order O-9999\ncy: 1 order, $7.00"
+            },
+            {
+              "input": "U-005 solo\n---\n---\ntop\nuser U-005",
+              "output": "none\nsolo: 0 orders, $0.00"
+            },
+            {
+              "input": "U-010 a\nU-011 b\n---\nO-3001 U-011 10\nO-3002 U-010 10\n---\ntop\norder O-3001",
+              "output": "a $10.00\nO-3001 by b: $10.00"
+            },
+            {
+              "input": "---\nO-4001 U-001 1\n---\nuser U-001\ntop",
+              "output": "order O-4001: unknown user U-001\nno user U-001\nnone"
+            }
+          ],
+          "strictness": "strict+indexed"
+        }
       },
       {
         "week": 17,
@@ -15956,7 +17511,8 @@
         "goal": "Build types out of other types instead of restating them.",
         "concepts": [
           "ts_compose",
-          "ts_utility_types"
+          "ts_utility_types",
+          "ts_runtime_validation"
         ],
         "problems": [
           {
@@ -16149,6 +17705,72 @@
             ],
             "answer": 0,
             "explanation": "No value is both a number and a string, so the property's type is `never`."
+          },
+          {
+            "question": "Why derive the type from the schema rather than write both?",
+            "options": [
+              "Two descriptions drift apart; one description can't",
+              "Schemas are faster than types",
+              "Types can't describe JSON",
+              "The compiler requires it"
+            ],
+            "answer": 0,
+            "explanation": "The validator is the source of truth, and `Infer` computes the type from it."
+          },
+          {
+            "question": "What does `Infer<typeof User>` give you when `User = obj({ name: str() })`?",
+            "options": [
+              "`{ name: string }`",
+              "`Schema<{ name: string }>`",
+              "`typeof User`",
+              "`unknown`"
+            ],
+            "answer": 0,
+            "explanation": "`Infer` extracts the `T` from a `Schema<T>`."
+          },
+          {
+            "question": "`const user = JSON.parse(text) as User` — what has been checked?",
+            "options": [
+              "Nothing; the assertion is a promise, erased at runtime",
+              "The top-level keys",
+              "Everything",
+              "Only the types of the values"
+            ],
+            "answer": 0,
+            "explanation": "Assertions never check. A schema does."
+          },
+          {
+            "question": "Why should a validator collect every issue instead of stopping at the first?",
+            "options": [
+              "So whoever sent bad data can fix all of it in one pass",
+              "It is faster",
+              "Stopping early leaks memory",
+              "The type system requires it"
+            ],
+            "answer": 0,
+            "explanation": "One error at a time makes fixing data a slow loop."
+          },
+          {
+            "question": "Where should `User.parse` be called?",
+            "options": [
+              "At the boundary where the data enters the program",
+              "In every function that uses a user",
+              "Only in tests",
+              "Before every print"
+            ],
+            "answer": 0,
+            "explanation": "Parse once; inside the boundary the type carries the guarantee."
+          },
+          {
+            "question": "Which existing libraries work this way?",
+            "options": [
+              "Zod, Valibot and ArkType",
+              "Jest and Vitest",
+              "Express and Fastify",
+              "Prettier and ESLint"
+            ],
+            "answer": 0,
+            "explanation": "They are schema libraries whose validators also produce static types."
           }
         ],
         "quiz_sample": 8,
@@ -16253,6 +17875,30 @@
           {
             "front": "TS2344 — cause?",
             "back": "A type argument doesn't satisfy its constraint, e.g. `Pick<User, \"nope\">`."
+          },
+          {
+            "front": "Why derive a type from a schema instead of writing both?",
+            "back": "Two descriptions drift; with `type T = Infer<typeof Schema>` there is only one."
+          },
+          {
+            "front": "`JSON.parse(text) as User` — what did it check?",
+            "back": "Nothing. An assertion is erased; only a runtime validator checks."
+          },
+          {
+            "front": "What does a schema's `parse` return?",
+            "back": "Either the typed value or the issues — a result union such as `{ ok: true; value } | { ok: false; issues }`."
+          },
+          {
+            "front": "Why collect every validation issue?",
+            "back": "So the sender can fix all of them in one pass instead of one per round trip."
+          },
+          {
+            "front": "Name three libraries built on the schema-first idea.",
+            "back": "Zod, Valibot and ArkType."
+          },
+          {
+            "front": "Where do you call a schema's `parse`?",
+            "back": "Once, at the boundary where untrusted data enters; inside, the inferred type carries the guarantee."
           }
         ],
         "practice": [
@@ -16409,11 +18055,385 @@
             "tests": [],
             "source_slug": "",
             "dataset": ""
+          },
+          {
+            "id": "tsm-w17-p9",
+            "title": "Reading a Partial field",
+            "prompt": "What type does TypeScript already infer for `t`? Annotate `check` with exactly that type — not merely one that fits.",
+            "hint": "`Partial` makes every property optional.",
+            "hints": [
+              "`Partial` makes every property optional.",
+              "An optional property reads as `T | undefined`."
+            ],
+            "language": "typescript",
+            "kind": "predict",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<typeof check, typeof t>>;\n",
+            "judge_mode": "types",
+            "forbid": [
+              "typeof"
+            ],
+            "starter": "const patch: Partial<{ title: string }> = {};\nconst t = patch.title;\nconst check: ____ = t;\n",
+            "solution": "const patch: Partial<{ title: string }> = {};\nconst t = patch.title;\nconst check: string | undefined = t;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w17-d9",
+            "title": "A key that isn't there",
+            "prompt": "The compiler rejects this program:\n\n    error TS2344: Type '\"titel\"' does not satisfy the constraint 'keyof Task'.\n\nFix the cause.",
+            "hint": "`Pick` only accepts keys the type has.",
+            "hints": [
+              "`Pick` only accepts keys the type has.",
+              "Fix the spelling."
+            ],
+            "language": "typescript",
+            "kind": "diagnose",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "type Task = { id: number; title: string };\ntype Summary = Pick<Task, \"id\" | \"titel\">;\nconst s: Summary = { id: 1, title: \"write\" };\nconsole.log(JSON.stringify(s));\n",
+            "solution": "type Task = { id: number; title: string };\ntype Summary = Pick<Task, \"id\" | \"title\">;\nconst s: Summary = { id: 1, title: \"write\" };\nconsole.log(JSON.stringify(s));\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "{\"id\":1,\"title\":\"write\"}"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w17-f9",
+            "title": "A spread that erased the default",
+            "prompt": "Print the window width: the given number, or 800 when the input is empty. It prints `undefined` for empty input.",
+            "hint": "Spreading `{ width: undefined }` sets `width` to `undefined` — it doesn't skip it.",
+            "hints": [
+              "Spreading `{ width: undefined }` sets `width` to `undefined` — it doesn't skip it.",
+              "Fall back explicitly with `??`."
+            ],
+            "language": "typescript",
+            "kind": "fix",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst DEFAULTS = { width: 800 };\nconst given = input === \"\" ? undefined : Number(input);\nconst options = { ...DEFAULTS, ...{ width: given } };\nconsole.log(options.width);\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst DEFAULTS = { width: 800 };\nconst given = input === \"\" ? undefined : Number(input);\nconst options = { ...DEFAULTS, width: given ?? DEFAULTS.width };\nconsole.log(options.width);\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "800"
+              },
+              {
+                "input": "1024",
+                "output": "1024"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
           }
         ],
         "optional": false,
-        "problem_set": [],
-        "project_spec": null
+        "problem_set": [
+          {
+            "id": "tsm-w17-apply-patch",
+            "title": "Apply patches to a task",
+            "prompt": "The first input line is a task's title; the task starts as `{ id: 1, title, done: false, priority: \"normal\" }`. Each later line is a JSON patch of type `Partial<Omit<Task, \"id\">>`. Check it — `title` a non-empty string, `done` a boolean, `priority` one of `low`/`normal`/`high`, no other keys (including `id`) — and print `rejected: <problems joined by \"; \">` or apply it and print the task as `#1 [x] <title> (<priority>)` (`[ ]` when not done).",
+            "hint": "`Partial<Omit<Task, \"id\">>` is exactly \"any subset of the fields except the id\".",
+            "hints": [
+              "`Partial<Omit<Task, \"id\">>` is exactly \"any subset of the fields except the id\".",
+              "Build the patch key by key, so a bad field never reaches the task."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Priority = \"low\" | \"normal\" | \"high\";\ntype Task = { id: number; title: string; done: boolean; priority: Priority };\ntype TaskPatch = Partial<Omit<Task, \"id\">>;\nconst PRIORITIES: readonly string[] = [\"low\", \"normal\", \"high\"];\nconst isPriority = (v: unknown): v is Priority => typeof v === \"string\" && PRIORITIES.includes(v);\nfunction parsePatch(data: Record<string, unknown>): TaskPatch | string[] {\n  const problems: string[] = [];\n  const patch: TaskPatch = {};\n  for (const [key, value] of Object.entries(data)) {\n    if (key === \"title\" && typeof value === \"string\" && value.trim() !== \"\") patch.title = value.trim();\n    else if (key === \"done\" && typeof value === \"boolean\") patch.done = value;\n    else if (key === \"priority\" && isPriority(value)) patch.priority = value;\n    else if (key === \"title\" || key === \"done\" || key === \"priority\") problems.push(`bad ${key}`);\n    else problems.push(`cannot change ${key}`);\n  }\n  return problems.length > 0 ? problems : patch;\n}\nconst [title = \"\", ...patches] = input.split(\"\\n\");\nlet task: Task = { id: 1, title: title.trim(), done: false, priority: \"normal\" };\nfor (const line of patches) {\n  const result = parsePatch(JSON.parse(line) as Record<string, unknown>);\n  if (Array.isArray(result)) {\n    console.log(`rejected: ${result.join(\"; \")}`);\n    continue;\n  }\n  task = { ...task, ...result };\n  console.log(`#${task.id} [${task.done ? \"x\" : \" \"}] ${task.title} (${task.priority})`);\n}\n",
+            "tests": [
+              {
+                "input": "Write report\n{\"done\":true}\n{\"priority\":\"urgent\",\"id\":7}\n{\"title\":\"Write the report\",\"priority\":\"high\"}\n{\"title\":\"  \"}\n{}",
+                "output": "#1 [x] Write report (normal)\nrejected: bad priority; cannot change id\n#1 [x] Write the report (high)\nrejected: bad title\n#1 [x] Write the report (high)"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w17-defaults",
+            "title": "Fill in the defaults — carefully",
+            "prompt": "Window options have defaults `{ width: 800, height: 600, title: \"Untitled\", resizable: true, theme: \"light\" }`. Each input line is a JSON object of overrides (a `Partial<Options>`). Keep only overrides of the right type (a positive number for `width`/`height`, a string `title`, a boolean `resizable`, `light` or `dark` for `theme`); print `ignored <key>` for each other key, in input order. Then print the resolved `<width>x<height> \"<title>\" resizable=<bool> theme=<theme>`. Note that a spread of `{ width: undefined }` would *erase* the default.",
+            "hint": "Copy an override only when it is present *and* valid; a key set to `undefined` or `null` must not reach the spread.",
+            "hints": [
+              "Copy an override only when it is present *and* valid; a key set to `undefined` or `null` must not reach the spread."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Options = { width: number; height: number; title: string; resizable: boolean; theme: \"light\" | \"dark\" };\nconst DEFAULTS: Options = { width: 800, height: 600, title: \"Untitled\", resizable: true, theme: \"light\" };\nfunction overrides(data: Record<string, unknown>): Partial<Options> {\n  const out: Partial<Options> = {};\n  for (const [key, v] of Object.entries(data)) {\n    if ((key === \"width\" || key === \"height\") && typeof v === \"number\" && v > 0) out[key] = v;\n    else if (key === \"title\" && typeof v === \"string\") out.title = v;\n    else if (key === \"resizable\" && typeof v === \"boolean\") out.resizable = v;\n    else if (key === \"theme\" && (v === \"light\" || v === \"dark\")) out.theme = v;\n    else console.log(`ignored ${key}`);\n  }\n  return out;\n}\nfor (const line of input.split(\"\\n\")) {\n  const o: Options = { ...DEFAULTS, ...overrides(JSON.parse(line) as Record<string, unknown>) };\n  console.log(`${o.width}x${o.height} \"${o.title}\" resizable=${o.resizable} theme=${o.theme}`);\n}\n",
+            "tests": [
+              {
+                "input": "{}\n{\"width\":1024,\"theme\":\"dark\"}\n{\"height\":-1,\"title\":\"\",\"resizable\":\"no\",\"color\":\"red\"}\n{\"width\":null,\"theme\":\"blue\",\"title\":\"Main\"}",
+                "output": "800x600 \"Untitled\" resizable=true theme=light\n1024x600 \"Untitled\" resizable=true theme=dark\nignored height\nignored resizable\nignored color\n800x600 \"\" resizable=true theme=light\nignored width\nignored theme\n800x600 \"Main\" resizable=true theme=light"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w17-redact",
+            "title": "Strip the secrets",
+            "prompt": "Each input line is a JSON value (usually an object) to be logged. Remove, at any depth, every key named `password` or `token`, every key ending in `Secret`, and every key starting with `_`. Print the cleaned value as JSON (keys in their original order) and then `removed <k>`.",
+            "hint": "At runtime there is no `Omit` — you build a new object without the keys.",
+            "hints": [
+              "At runtime there is no `Omit` — you build a new object without the keys.",
+              "Recurse into arrays and objects; return everything else unchanged."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nlet removed = 0;\nconst isSecret = (key: string) => key === \"password\" || key === \"token\" || key.endsWith(\"Secret\") || key.startsWith(\"_\");\nfunction redact(value: unknown): unknown {\n  if (Array.isArray(value)) return value.map(redact);\n  if (typeof value !== \"object\" || value === null) return value;\n  const out: Record<string, unknown> = {};\n  for (const [key, v] of Object.entries(value)) {\n    if (isSecret(key)) removed++;\n    else out[key] = redact(v);\n  }\n  return out;\n}\nfor (const line of input.split(\"\\n\")) {\n  removed = 0;\n  console.log(JSON.stringify(redact(JSON.parse(line))));\n  console.log(`removed ${removed}`);\n}\n",
+            "tests": [
+              {
+                "input": "{\"user\":\"ana\",\"password\":\"x\",\"profile\":{\"apiSecret\":\"k\",\"city\":\"Oslo\"},\"sessions\":[{\"token\":\"t\",\"ip\":\"1.2.3.4\"}],\"_rev\":3}\n[1,{\"password\":2}]\n\"just a string\"",
+                "output": "{\"user\":\"ana\",\"profile\":{\"city\":\"Oslo\"},\"sessions\":[{\"ip\":\"1.2.3.4\"}]}\nremoved 4\n[1,{}]\nremoved 1\n\"just a string\"\nremoved 0"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w17-category-totals",
+            "title": "Totals for every category",
+            "prompt": "Categories are `food`, `rent`, `travel`, `fun`, declared once `as const` with the `Category` type derived from them. Each input line is `<category> <amount>`; an unknown category counts as `other`. Keep a `Record<Category | \"other\", number>` — every key present from the start — and print every category in order as `<name> <total> <share>%` (total with two decimals, share of the grand total with one), then `biggest <name>` (the first on a tie).",
+            "hint": "A `Record` over a finite union has every key — no `undefined`, even under this week's flag.",
+            "hints": [
+              "A `Record` over a finite union has every key — no `undefined`, even under this week's flag.",
+              "`CATEGORIES.find((c) => c === s)` turns an input string into a `Category` or `undefined`."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst CATEGORIES = [\"food\", \"rent\", \"travel\", \"fun\"] as const;\ntype Category = (typeof CATEGORIES)[number];\ntype Bucket = Category | \"other\";\nconst BUCKETS: readonly Bucket[] = [...CATEGORIES, \"other\"];\nconst totals: Record<Bucket, number> = { food: 0, rent: 0, travel: 0, fun: 0, other: 0 };\nconst toBucket = (s: string): Bucket => CATEGORIES.find((c) => c === s) ?? \"other\";\nfor (const line of input.split(\"\\n\")) {\n  const [category = \"\", amount = \"0\"] = line.trim().split(/\\s+/);\n  totals[toBucket(category)] += Number(amount);\n}\nconst grand = BUCKETS.reduce((s, b) => s + totals[b], 0);\nfor (const b of BUCKETS) {\n  const share = grand === 0 ? 0 : (totals[b] / grand) * 100;\n  console.log(`${b} ${totals[b].toFixed(2)} ${share.toFixed(1)}%`);\n}\nconst biggest = BUCKETS.reduce((best, b) => (totals[b] > totals[best] ? b : best));\nconsole.log(`biggest ${biggest}`);\n",
+            "tests": [
+              {
+                "input": "food 12.50\nrent 900\nfood 30\ntaxes 120\ntravel 0.5",
+                "output": "food 42.50 4.0%\nrent 900.00 84.7%\ntravel 0.50 0.0%\nfun 0.00 0.0%\nother 120.00 11.3%\nbiggest rent"
+              },
+              {
+                "input": "fun 1\nfun 2",
+                "output": "food 0.00 0.0%\nrent 0.00 0.0%\ntravel 0.00 0.0%\nfun 3.00 100.0%\nother 0.00 0.0%\nbiggest fun"
+              },
+              {
+                "input": "gift 5",
+                "output": "food 0.00 0.0%\nrent 0.00 0.0%\ntravel 0.00 0.0%\nfun 0.00 0.0%\nother 5.00 100.0%\nbiggest other"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w17-project",
+            "title": "Project the fields you asked for",
+            "prompt": "The first input line is a JSON array of tasks with `id`, `title`, `owner`, `done` and `estimate`. Each later line is `fields: <a,b,…>`. Print every task with only those fields, in the order asked, as JSON — or `unknown field <f>` for the first field a task doesn't have in its type. (A runtime `Pick`.)",
+            "hint": "A type predicate `isKey` turns a requested name into a `keyof Task`.",
+            "hints": [
+              "A type predicate `isKey` turns a requested name into a `keyof Task`.",
+              "`Object.fromEntries` builds the projected object from `[key, value]` pairs."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Task = { id: number; title: string; owner: string; done: boolean; estimate: number };\nconst KEYS: readonly (keyof Task)[] = [\"id\", \"title\", \"owner\", \"done\", \"estimate\"];\nconst isKey = (s: string): s is keyof Task => KEYS.some((k) => k === s);\nconst [first = \"[]\", ...requests] = input.split(\"\\n\");\nconst tasks = JSON.parse(first) as Task[];\nfor (const line of requests) {\n  const wanted = line.replace(/^fields:\\s*/, \"\").split(\",\").map((f) => f.trim());\n  const bad = wanted.find((f) => !isKey(f));\n  if (bad !== undefined) {\n    console.log(`unknown field ${bad}`);\n    continue;\n  }\n  const keys = wanted.filter(isKey);\n  for (const t of tasks) console.log(JSON.stringify(Object.fromEntries(keys.map((k) => [k, t[k]]))));\n}\n",
+            "tests": [
+              {
+                "input": "[{\"id\":1,\"title\":\"write\",\"owner\":\"ana\",\"done\":false,\"estimate\":3},{\"id\":2,\"title\":\"test\",\"owner\":\"bo\",\"done\":true,\"estimate\":1}]\nfields: id,title\nfields: done, owner\nfields: id,secret\nfields: estimate",
+                "output": "{\"id\":1,\"title\":\"write\"}\n{\"id\":2,\"title\":\"test\"}\n{\"done\":false,\"owner\":\"ana\"}\n{\"done\":true,\"owner\":\"bo\"}\nunknown field secret\n{\"estimate\":3}\n{\"estimate\":1}"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w17-teams",
+            "title": "Summarise hours by team",
+            "prompt": "Each input line is `<team> <person> <hours>`. For each team print `<team>: <members> people (`person` for one), <total>h, avg <a>h, top <person>` — members counted once however many lines they have, the average per person to one decimal, the top person by their total hours (alphabetically first on a tie) — teams sorted by total hours, most first (then by name).",
+            "hint": "A `Map` of `Map`s: team → person → hours.",
+            "hints": [
+              "A `Map` of `Map`s: team → person → hours.",
+              "Sort each team's people once; the first is the top person and the rest give the total."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype TeamSummary = { team: string; members: number; hours: number; top: string };\nconst teams = new Map<string, Map<string, number>>();\nfor (const line of input.split(\"\\n\")) {\n  const [team = \"\", person = \"\", hours = \"0\"] = line.trim().split(/\\s+/);\n  const people = teams.get(team) ?? new Map<string, number>();\n  people.set(person, (people.get(person) ?? 0) + Number(hours));\n  teams.set(team, people);\n}\nconst summaries: TeamSummary[] = [...teams].map(([team, people]) => {\n  const ranked = [...people].sort(([a, x], [b, y]) => y - x || a.localeCompare(b));\n  return {\n    team,\n    members: people.size,\n    hours: ranked.reduce((s, [, h]) => s + h, 0),\n    top: ranked[0]?.[0] ?? \"\",\n  };\n});\nsummaries.sort((a, b) => b.hours - a.hours || a.team.localeCompare(b.team));\nfor (const s of summaries) {\n  console.log(`${s.team}: ${s.members} ${s.members === 1 ? \"person\" : \"people\"}, ${s.hours}h, avg ${(s.hours / s.members).toFixed(1)}h, top ${s.top}`);\n}\n",
+            "tests": [
+              {
+                "input": "web ana 5\nweb bo 3\nops cy 4\nweb ana 2\nops dee 4\nqa eve 1",
+                "output": "web: 2 people, 10h, avg 5.0h, top ana\nops: 2 people, 8h, avg 4.0h, top cy\nqa: 1 person, 1h, avg 1.0h, top eve"
+              },
+              {
+                "input": "solo zed 0.5",
+                "output": "solo: 1 person, 0.5h, avg 0.5h, top zed"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w17-form-errors",
+            "title": "A map of form errors",
+            "prompt": "A sign-up form has `username`, `password`, `confirm` and `age`. Each input line is the submitted JSON. Collect errors in a `Partial<Record<Field, string>>` — at most one per field: `username` must be 3-16 letters, digits or `_`; `password` at least 8 characters with a digit; `confirm` must equal the password; `age` is optional but must be a whole number of at least 13. A missing required field is `required`. Print `ok` or the errors in field order as `<field>: <message>` joined by `; `.",
+            "hint": "`Partial<Record<Field, string>>` means \"any of these fields may have an error\" — every read is `string | undefined`.",
+            "hints": [
+              "`Partial<Record<Field, string>>` means \"any of these fields may have an error\" — every read is `string | undefined`.",
+              "Loop over `FIELDS`, not over the errors object, so the output order is fixed."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Hard",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst FIELDS = [\"username\", \"password\", \"confirm\", \"age\"] as const;\ntype Field = (typeof FIELDS)[number];\ntype FormErrors = Partial<Record<Field, string>>;\nfunction validate(form: Record<string, unknown>): FormErrors {\n  const errors: FormErrors = {};\n  const { username, password, confirm, age } = form;\n  if (username === undefined) errors.username = \"required\";\n  else if (typeof username !== \"string\" || !/^\\w{3,16}$/.test(username)) errors.username = \"3-16 letters, digits or _\";\n  if (password === undefined) errors.password = \"required\";\n  else if (typeof password !== \"string\" || password.length < 8 || !/\\d/.test(password)) errors.password = \"at least 8 characters with a digit\";\n  if (confirm === undefined) errors.confirm = \"required\";\n  else if (confirm !== password) errors.confirm = \"does not match\";\n  if (age !== undefined && (typeof age !== \"number\" || !Number.isInteger(age) || age < 13)) errors.age = \"must be a whole number, 13 or over\";\n  return errors;\n}\nfor (const line of input.split(\"\\n\")) {\n  const errors = validate(JSON.parse(line) as Record<string, unknown>);\n  const messages = FIELDS.flatMap((f) => {\n    const message = errors[f];\n    return message === undefined ? [] : [`${f}: ${message}`];\n  });\n  console.log(messages.length === 0 ? \"ok\" : messages.join(\"; \"));\n}\n",
+            "tests": [
+              {
+                "input": "{\"username\":\"ana_1\",\"password\":\"secret123\",\"confirm\":\"secret123\"}\n{\"username\":\"a!\",\"password\":\"short\",\"confirm\":\"other\",\"age\":12.5}\n{\"age\":30}\n{\"username\":\"bo\",\"password\":\"longenough1\",\"confirm\":\"longenough1\",\"age\":13}",
+                "output": "ok\nusername: 3-16 letters, digits or _; password: at least 8 characters with a digit; confirm: does not match; age: must be a whole number, 13 or over\nusername: required; password: required; confirm: required\nusername: 3-16 letters, digits or _"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w17-update-type",
+            "title": "An update needs the id, and nothing else is required",
+            "prompt": "Derive `UserUpdate` from `User`: the `id` is required, `name` and `email` may be given, and nothing else (the password and the creation date are not updatable).",
+            "hint": "Two pieces: the required part and the optional part, joined with `&`.",
+            "hints": [
+              "Two pieces: the required part and the optional part, joined with `&`.",
+              "`Pick` the id; `Partial<Pick<…>>` the rest."
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<UserUpdate[\"id\"], number>>;\ntype _2 = Expect<Equal<UserUpdate[\"email\"], string | undefined>>;\nfunction _typeTests() {\n  // @ts-expect-error — the id is required\n  const noId: UserUpdate = { name: \"x\" };\n  // @ts-expect-error — passwords are not updated here\n  const pw: UserUpdate = { id: 1, password: \"x\" };\n}\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type User = { id: number; name: string; email: string; password: string; createdAt: string };\ntype UserUpdate = ____;\n\nconst justId: UserUpdate = { id: 1 };\nconst rename: UserUpdate = { id: 1, name: \"ana\" };\n",
+            "solution": "type User = { id: number; name: string; email: string; password: string; createdAt: string };\ntype UserUpdate = Pick<User, \"id\"> & Partial<Pick<User, \"name\" | \"email\">>;\n\nconst justId: UserUpdate = { id: 1 };\nconst rename: UserUpdate = { id: 1, name: \"ana\" };\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w17-settings-type",
+            "title": "Settings typed from their defaults",
+            "prompt": "The defaults function is the single source of truth. Derive `Settings` from what it returns, so adding a setting there adds it to the type.",
+            "hint": "`defaults` is a value; `typeof defaults` is its function type.",
+            "hints": [
+              "`defaults` is a value; `typeof defaults` is its function type.",
+              "A utility type reads a function type's result."
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<Settings, { theme: \"dark\" | \"light\"; fontSize: number; autosave: boolean }>>;\ntype _2 = Expect<Equal<SettingKey, \"theme\" | \"fontSize\" | \"autosave\">>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "const defaults = () => ({ theme: \"dark\" as \"dark\" | \"light\", fontSize: 14, autosave: true });\ntype Settings = ____;\ntype SettingKey = keyof Settings;\n",
+            "solution": "const defaults = () => ({ theme: \"dark\" as \"dark\" | \"light\", fontSize: 14, autosave: true });\ntype Settings = ReturnType<typeof defaults>;\ntype SettingKey = keyof Settings;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          }
+        ],
+        "project_spec": {
+          "title": "tasks.ts — a typed task API with validation",
+          "goal": "Build the core of a task service: one `Task` model, and every other shape — the create payload, the patch, the list summary — derived from it with utility types. Every JSON body is validated from `unknown`, and every problem is reported at once.",
+          "requirements": [
+            "`Task` is `{ id, title, done, priority, tags }` with priority `low`/`normal`/`high`. Derive `TaskDraft = Pick<Task, \"title\"> & Partial<Pick<Task, \"priority\" | \"tags\">>` and `TaskPatch = Partial<Omit<Task, \"id\">>`.",
+            "`create <json>`: title a non-empty string (required), priority one of the three (default `normal`), tags an array of strings (default none), no other keys. Print `created #<id>` (ids start at 1) or `create rejected: ` and every problem — `title: required`, `title: must be text`, `priority: must be low, normal or high`, `tags: must be a list of strings`, `unknown field <k>` — joined by `; `.",
+            "`patch <id> <json>`: the same rules for any subset of `title`, `done` (boolean, else `done: must be true or false`), `priority`, `tags`; `id: cannot change` if `id` is present. Print `patched #<id> (<changed fields in input order>)`, `patch #<id>: nothing to change` for an empty patch, `patch rejected: …`, or `no task #<id>`. `delete <id>` prints `deleted #<id>` or `no task #<id>`.",
+            "`list` prints each task by id: `#<id> [x] <title> (<priority>)` plus ` #tag` for each tag (`[ ]` when not done), or `(no tasks)`.",
+            "`summary` prints `open <a>, done <b>, high=<h> normal=<n> low=<l>`."
+          ],
+          "stretch": [
+            "Rewrite the validation with the week's schema library, so `TaskDraft` is `Infer<typeof TaskDraftSchema>`.",
+            "Add `undo`, keeping each version of the store immutable (week 16)."
+          ],
+          "rubric": [
+            "No `any` anywhere — not even one hidden in a cast",
+            "Every function has a typed signature; locals are left to inference",
+            "Bad input is handled on purpose, not by accident",
+            "Names say what things are, not how they are stored",
+            "I could explain every line to someone else"
+          ],
+          "language": "typescript",
+          "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n// Build the project here. Read all of stdin from `input` above, and print\n// exactly what the requirements ask for. Run the tests as you go.\n",
+          "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Priority = \"low\" | \"normal\" | \"high\";\ntype Task = { id: number; title: string; done: boolean; priority: Priority; tags: string[] };\ntype TaskDraft = Pick<Task, \"title\"> & Partial<Pick<Task, \"priority\" | \"tags\">>;\ntype TaskPatch = Partial<Omit<Task, \"id\">>;\nconst PRIORITIES: readonly Priority[] = [\"low\", \"normal\", \"high\"];\nconst isPriority = (v: unknown): v is Priority => PRIORITIES.some((p) => p === v);\nconst isTags = (v: unknown): v is string[] => Array.isArray(v) && v.every((t) => typeof t === \"string\");\n\nfunction readFields(data: unknown, allowDone: boolean): { patch: TaskPatch; problems: string[] } {\n  const patch: TaskPatch = {};\n  const problems: string[] = [];\n  if (typeof data !== \"object\" || data === null || Array.isArray(data)) return { patch, problems: [\"body: must be an object\"] };\n  for (const [key, v] of Object.entries(data)) {\n    if (key === \"title\") {\n      if (typeof v !== \"string\") problems.push(\"title: must be text\");\n      else if (v.trim() === \"\") problems.push(\"title: required\");\n      else patch.title = v.trim();\n    } else if (key === \"priority\") {\n      if (isPriority(v)) patch.priority = v;\n      else problems.push(\"priority: must be low, normal or high\");\n    } else if (key === \"tags\") {\n      if (isTags(v)) patch.tags = v;\n      else problems.push(\"tags: must be a list of strings\");\n    } else if (key === \"done\" && allowDone) {\n      if (typeof v === \"boolean\") patch.done = v;\n      else problems.push(\"done: must be true or false\");\n    } else if (key === \"id\" && allowDone) {\n      problems.push(\"id: cannot change\");\n    } else {\n      problems.push(`unknown field ${key}`);\n    }\n  }\n  return { patch, problems };\n}\nfunction parseDraft(data: unknown): TaskDraft | string[] {\n  const { patch, problems } = readFields(data, false);\n  if (patch.title === undefined && !problems.some((p) => p.startsWith(\"title\"))) problems.unshift(\"title: required\");\n  if (problems.length > 0 || patch.title === undefined) return problems;\n  const draft: TaskDraft = { title: patch.title };\n  if (patch.priority !== undefined) draft.priority = patch.priority;\n  if (patch.tags !== undefined) draft.tags = patch.tags;\n  return draft;\n}\n\nconst tasks = new Map<number, Task>();\nlet nextId = 1;\nfor (const line of input.split(\"\\n\")) {\n  const [cmd = \"\", ...rest] = line.trim().split(\" \");\n  if (cmd === \"create\") {\n    const draft = parseDraft(JSON.parse(rest.join(\" \")));\n    if (Array.isArray(draft)) {\n      console.log(`create rejected: ${draft.join(\"; \")}`);\n      continue;\n    }\n    const task: Task = { id: nextId++, done: false, priority: draft.priority ?? \"normal\", tags: draft.tags ?? [], title: draft.title };\n    tasks.set(task.id, task);\n    console.log(`created #${task.id}`);\n  } else if (cmd === \"patch\" || cmd === \"delete\") {\n    const id = Number(rest[0]);\n    const task = tasks.get(id);\n    if (task === undefined) {\n      console.log(`no task #${rest[0] ?? \"\"}`);\n    } else if (cmd === \"delete\") {\n      tasks.delete(id);\n      console.log(`deleted #${id}`);\n    } else {\n      const { patch, problems } = readFields(JSON.parse(rest.slice(1).join(\" \")), true);\n      if (problems.length > 0) {\n        console.log(`patch rejected: ${problems.join(\"; \")}`);\n        continue;\n      }\n      if (Object.keys(patch).length === 0) {\n        console.log(`patch #${id}: nothing to change`);\n        continue;\n      }\n      tasks.set(id, { ...task, ...patch });\n      console.log(`patched #${id} (${Object.keys(patch).join(\", \")})`);\n    }\n  } else if (cmd === \"list\") {\n    if (tasks.size === 0) console.log(\"(no tasks)\");\n    for (const t of [...tasks.values()].sort((a, b) => a.id - b.id)) {\n      console.log(`#${t.id} [${t.done ? \"x\" : \" \"}] ${t.title} (${t.priority})${t.tags.map((tag) => ` #${tag}`).join(\"\")}`);\n    }\n  } else if (cmd === \"summary\") {\n    const all = [...tasks.values()];\n    const count = (p: Priority) => all.filter((t) => t.priority === p).length;\n    const done = all.filter((t) => t.done).length;\n    console.log(`open ${all.length - done}, done ${done}, high=${count(\"high\")} normal=${count(\"normal\")} low=${count(\"low\")}`);\n  }\n}\n",
+          "tests": [
+            {
+              "input": "create {\"title\":\"Write report\",\"priority\":\"high\",\"tags\":[\"work\"]}\ncreate {\"title\":\"Buy milk\"}\nlist\npatch 2 {\"done\":true,\"tags\":[\"home\",\"errand\"]}\nlist\nsummary",
+              "output": "created #1\ncreated #2\n#1 [ ] Write report (high) #work\n#2 [ ] Buy milk (normal)\npatched #2 (done, tags)\n#1 [ ] Write report (high) #work\n#2 [x] Buy milk (normal) #home #errand\nopen 1, done 1, high=1 normal=1 low=0"
+            },
+            {
+              "input": "create {}\ncreate {\"title\":5,\"priority\":\"urgent\",\"tags\":\"x\",\"owner\":\"ana\"}\ncreate {\"title\":\"  \"}\nlist\nsummary",
+              "output": "create rejected: title: required\ncreate rejected: title: must be text; priority: must be low, normal or high; tags: must be a list of strings; unknown field owner\ncreate rejected: title: required\n(no tasks)\nopen 0, done 0, high=0 normal=0 low=0"
+            },
+            {
+              "input": "create {\"title\":\"a\"}\npatch 1 {\"id\":9,\"done\":\"yes\"}\npatch 7 {\"done\":true}\ndelete 1\ndelete 1\nlist",
+              "output": "created #1\npatch rejected: id: cannot change; done: must be true or false\nno task #7\ndeleted #1\nno task #1\n(no tasks)"
+            },
+            {
+              "input": "create {\"title\":\"t\",\"priority\":\"low\"}\npatch 1 {\"title\":\"renamed\",\"priority\":\"normal\",\"done\":false}\nlist",
+              "output": "created #1\npatched #1 (title, priority, done)\n#1 [ ] renamed (normal)"
+            },
+            {
+              "input": "summary\ncreate {\"title\":\"x\",\"tags\":[]}\npatch 1 {}\nlist",
+              "output": "open 0, done 0, high=0 normal=0 low=0\ncreated #1\npatch #1: nothing to change\n#1 [ ] x (normal)"
+            }
+          ],
+          "strictness": "strict+indexed"
+        }
       },
       {
         "week": 18,
@@ -21215,6 +23235,138 @@
             "explanation": "Declaration merging is an interface-only feature, and it is what lets you add a field to a library's existing type instead of shadowing it."
           },
           {
+            "question": "Which of these survives type stripping unchanged?",
+            "options": [
+              "`function f<T>(x: T): T { return x as T; }`",
+              "`enum Color { Red }`",
+              "`namespace Util { export const x = 1; }`",
+              "`constructor(private id: number) {}`"
+            ],
+            "answer": 0,
+            "explanation": "Generics and `as` are only deleted. The other three generate runtime code, so a stripper rejects them."
+          },
+          {
+            "question": "What does `--erasableSyntaxOnly` do?",
+            "options": [
+              "Reports every construct that would need code generation, such as `enum` and parameter properties",
+              "Strips types from the output",
+              "Forbids `interface`",
+              "Makes every import type-only"
+            ],
+            "answer": 0,
+            "explanation": "It makes the type checker agree with a stripper about what can run."
+          },
+          {
+            "question": "Why does `verbatimModuleSyntax` require `import type` for type-only imports?",
+            "options": [
+              "A stripper can't tell which imports are types, so the source must say which ones to delete",
+              "Type imports are slower",
+              "Interfaces can't be imported otherwise",
+              "It prevents circular imports"
+            ],
+            "answer": 0,
+            "explanation": "The rule is: what you write is what runs. A type-only import is deleted; any other import is kept."
+          },
+          {
+            "question": "`const Level = { A: 1, B: 2 } as const; type Level = (typeof Level)[keyof typeof Level];` — what is the type `Level`?",
+            "options": [
+              "`1 | 2`",
+              "`\"A\" | \"B\"`",
+              "`number`",
+              "`{ A: 1; B: 2 }`"
+            ],
+            "answer": 0,
+            "explanation": "`keyof typeof Level` is the keys; indexing by them gives the values' literal types."
+          },
+          {
+            "question": "Why can't you write `x instanceof User` when `User` is an interface?",
+            "options": [
+              "Interfaces are erased — nothing named `User` exists at runtime",
+              "`instanceof` only works on arrays",
+              "Interfaces need `implements` first",
+              "You can, with `strict` on"
+            ],
+            "answer": 0,
+            "explanation": "`instanceof` needs a runtime constructor. Test a value (`in`, a tag, a validator) instead."
+          },
+          {
+            "question": "What does `const n = \"5\" as unknown as number; console.log(n + 1)` print?",
+            "options": [
+              "`51`",
+              "`6`",
+              "It throws",
+              "`NaN`"
+            ],
+            "answer": 0,
+            "explanation": "Assertions never convert. The value is still a string, so `+` concatenates."
+          },
+          {
+            "question": "In TypeScript 6.0, what is `strict` if a tsconfig doesn't mention it?",
+            "options": [
+              "`true`",
+              "`false`",
+              "It depends on `target`",
+              "It must be set explicitly"
+            ],
+            "answer": 0,
+            "explanation": "6.0 flipped the default. A project that wants the old behaviour has to say `\"strict\": false`."
+          },
+          {
+            "question": "Which option did TypeScript 6.0 deprecate?",
+            "options": [
+              "`moduleResolution: node` (node10)",
+              "`moduleResolution: bundler`",
+              "`module: nodenext`",
+              "`noUncheckedIndexedAccess`"
+            ],
+            "answer": 0,
+            "explanation": "Use `nodenext` for Node and `bundler` for bundled apps."
+          },
+          {
+            "question": "What does `\"ignoreDeprecations\": \"6.0\"` do in TypeScript 7.0?",
+            "options": [
+              "Nothing useful — the deprecated options are removed and are errors",
+              "Silences the errors, as in 6.0",
+              "Switches 7.0 into 6.0 mode",
+              "Enables the old JavaScript compiler"
+            ],
+            "answer": 0,
+            "explanation": "It is a 6.0 transition aid. 7.0 has no switch to bring the options back."
+          },
+          {
+            "question": "What is TypeScript 7.0?",
+            "options": [
+              "The compiler ported to Go — same `typescript` package and `tsc` command, roughly 10× faster",
+              "A new language with different syntax",
+              "A runtime that replaces Node",
+              "A linter"
+            ],
+            "answer": 0,
+            "explanation": "The language is the same; the implementation is native."
+          },
+          {
+            "question": "Which flag is NOT part of `strict`?",
+            "options": [
+              "`noUncheckedIndexedAccess`",
+              "`strictNullChecks`",
+              "`noImplicitAny`",
+              "`useUnknownInCatchVariables`"
+            ],
+            "answer": 0,
+            "explanation": "It's valuable but disruptive, so it is opt-in. So is `exactOptionalPropertyTypes`."
+          },
+          {
+            "question": "A 6.0 project doesn't list `types`. What happens to the `@types/node` package it has installed?",
+            "options": [
+              "It isn't loaded — the default is now `[]`, so it must be listed",
+              "It's loaded, as before",
+              "It's loaded only for `.d.ts` files",
+              "It's an error to have it installed"
+            ],
+            "answer": 0,
+            "explanation": "6.0 changed the default from 'every installed @types package' to none; add `\"types\": [\"node\"]`."
+          },
+          {
             "question": "What does `satisfies` do that a type annotation does not?",
             "options": [
               "It validates the value against the type while keeping the value's own narrower inferred type",
@@ -21281,6 +23433,72 @@
             "explanation": "Private and protected members are tied to their declaring class, so two classes with identical-looking private fields are not interchangeable — the one nominal corner of the type system."
           },
           {
+            "question": "`Dog` is assignable to `Animal`. Which is assignable to which for `type Getter<T> = () => T`?",
+            "options": [
+              "`Getter<Dog>` to `Getter<Animal>`",
+              "`Getter<Animal>` to `Getter<Dog>`",
+              "Neither",
+              "Both"
+            ],
+            "answer": 0,
+            "explanation": "A getter produces `T`, so it is covariant: same direction as `Dog → Animal`."
+          },
+          {
+            "question": "And for `type Handler<T> = (x: T) => void`?",
+            "options": [
+              "`Handler<Animal>` to `Handler<Dog>`",
+              "`Handler<Dog>` to `Handler<Animal>`",
+              "Neither",
+              "Both"
+            ],
+            "answer": 0,
+            "explanation": "A handler consumes `T`: contravariant. A handler of any animal can handle a dog."
+          },
+          {
+            "question": "Why is passing `Dog[]` where `Animal[]` is expected unsound?",
+            "options": [
+              "The receiver can push a non-dog into your array",
+              "Arrays are compared by length",
+              "It isn't — arrays are read-only",
+              "Dog[] has fewer methods"
+            ],
+            "answer": 0,
+            "explanation": "TypeScript allows it for convenience; `readonly Animal[]` makes it genuinely safe."
+          },
+          {
+            "question": "What variance does `{ get(): T; set(v: T): void }` have in `T`?",
+            "options": [
+              "Invariant",
+              "Covariant",
+              "Contravariant",
+              "Bivariant"
+            ],
+            "answer": 0,
+            "explanation": "It both produces and consumes `T`, so only the exact same `T` fits."
+          },
+          {
+            "question": "What does `interface Source<out T>` do?",
+            "options": [
+              "Declares `T` covariant, and the compiler checks that `T` is only produced",
+              "Makes `T` optional",
+              "Exports `T`",
+              "Makes `Source` readonly at runtime"
+            ],
+            "answer": 0,
+            "explanation": "Variance annotations are checked, erased documentation."
+          },
+          {
+            "question": "Which declaration gets the strict, contravariant parameter check under `strictFunctionTypes`?",
+            "options": [
+              "`handle: (x: T) => void`",
+              "`handle(x: T): void`",
+              "Both",
+              "Neither"
+            ],
+            "answer": 0,
+            "explanation": "Method syntax stays bivariant; property syntax with a function type is checked contravariantly."
+          },
+          {
             "question": "What does a brand cost at runtime?",
             "options": [
               "Nothing — the intersection is erased and the value stays a plain string or number",
@@ -21312,6 +23530,138 @@
             ],
             "answer": 0,
             "explanation": "Since the brand is erased there is nothing to inspect. Runtime questions about a branded value always come back to re-checking the underlying data."
+          },
+          {
+            "question": "What is the difference between a validator and a parser?",
+            "options": [
+              "A parser returns a more precise type that records the check; a validator returns a boolean",
+              "A parser is faster",
+              "A validator throws, a parser doesn't",
+              "There is none"
+            ],
+            "answer": 0,
+            "explanation": "The parser's return type carries the knowledge forward, so nothing downstream has to recheck."
+          },
+          {
+            "question": "What does `declare const Brand: unique symbol` emit at runtime?",
+            "options": [
+              "Nothing — `declare` is erased",
+              "A new Symbol()",
+              "A frozen object",
+              "A class"
+            ],
+            "answer": 0,
+            "explanation": "It only creates a type-level unique symbol to key the brand property."
+          },
+          {
+            "question": "Where should the `as Email` cast appear?",
+            "options": [
+              "Once, inside the parser, right after the check",
+              "Wherever an email is needed",
+              "In every test",
+              "Nowhere — brands need no casts"
+            ],
+            "answer": 0,
+            "explanation": "Concentrating the cast in the smart constructor is what makes the brand trustworthy."
+          },
+          {
+            "question": "Why is `readonly [number, ...number[]]` useful?",
+            "options": [
+              "Its first element is never `undefined`, so code taking it needs no emptiness check",
+              "It is faster than an array",
+              "It can't be iterated",
+              "It prevents duplicates"
+            ],
+            "answer": 0,
+            "explanation": "The non-emptiness is proven once, at construction, and carried in the type."
+          },
+          {
+            "question": "A parser trims and lower-cases emails. Why?",
+            "options": [
+              "So equal addresses become equal strings — normalising is part of parsing",
+              "Regexes can't match capitals",
+              "The brand requires it",
+              "It's faster to compare"
+            ],
+            "answer": 0,
+            "explanation": "Returning the canonical form removes a whole class of duplicate bugs."
+          },
+          {
+            "question": "Where in a program should parsing happen?",
+            "options": [
+              "At the boundary, where untyped input enters — once",
+              "In every function that uses the value",
+              "Only in tests",
+              "Just before printing"
+            ],
+            "answer": 0,
+            "explanation": "Inside the boundary, the precise types carry the guarantee."
+          },
+          {
+            "question": "Why derive the type from the schema rather than write both?",
+            "options": [
+              "Two descriptions drift apart; one description can't",
+              "Schemas are faster than types",
+              "Types can't describe JSON",
+              "The compiler requires it"
+            ],
+            "answer": 0,
+            "explanation": "The validator is the source of truth, and `Infer` computes the type from it."
+          },
+          {
+            "question": "What does `Infer<typeof User>` give you when `User = obj({ name: str() })`?",
+            "options": [
+              "`{ name: string }`",
+              "`Schema<{ name: string }>`",
+              "`typeof User`",
+              "`unknown`"
+            ],
+            "answer": 0,
+            "explanation": "`Infer` extracts the `T` from a `Schema<T>`."
+          },
+          {
+            "question": "`const user = JSON.parse(text) as User` — what has been checked?",
+            "options": [
+              "Nothing; the assertion is a promise, erased at runtime",
+              "The top-level keys",
+              "Everything",
+              "Only the types of the values"
+            ],
+            "answer": 0,
+            "explanation": "Assertions never check. A schema does."
+          },
+          {
+            "question": "Why should a validator collect every issue instead of stopping at the first?",
+            "options": [
+              "So whoever sent bad data can fix all of it in one pass",
+              "It is faster",
+              "Stopping early leaks memory",
+              "The type system requires it"
+            ],
+            "answer": 0,
+            "explanation": "One error at a time makes fixing data a slow loop."
+          },
+          {
+            "question": "Where should `User.parse` be called?",
+            "options": [
+              "At the boundary where the data enters the program",
+              "In every function that uses a user",
+              "Only in tests",
+              "Before every print"
+            ],
+            "answer": 0,
+            "explanation": "Parse once; inside the boundary the type carries the guarantee."
+          },
+          {
+            "question": "Which existing libraries work this way?",
+            "options": [
+              "Zod, Valibot and ArkType",
+              "Jest and Vitest",
+              "Express and Fastify",
+              "Prettier and ESLint"
+            ],
+            "answer": 0,
+            "explanation": "They are schema libraries whose validators also produce static types."
           },
           {
             "question": "Why is `function longest<T extends { length: number }>(a: T, b: T): T` better than `function longest(a: { length: number }, b: { length: number }): { length: number }`?",

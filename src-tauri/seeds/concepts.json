@@ -15791,6 +15791,786 @@
     "practice": []
   },
   {
+    "key": "ts_erasable_syntax",
+    "name": "Erasable Syntax & Type Stripping",
+    "category": "TS: Runtime & Architecture",
+    "what": "Which TypeScript syntax can simply be deleted to leave working JavaScript — and what to write instead of `enum`, `namespace` and parameter properties, which cannot.",
+    "deep": "Node (22.18+, 23.6+, 24), Deno and Bun run `.ts` files by *stripping* the types: every annotation is replaced with whitespace and the rest runs as JavaScript. That only works for syntax with no runtime meaning. `enum`, `namespace` with values, parameter properties and `import x = require()` generate code, so a stripper rejects them. `--erasableSyntaxOnly` (TS 5.8) makes the compiler reject them too, and `verbatimModuleSyntax` makes every import say whether it is a type or a value. Every program in this app runs this way.",
+    "java": "Java's generics are erased too, but Java still has a compile step that generates code. TypeScript's whole type layer is designed to be erasable: nothing a type says survives to runtime — no reflection, no `instanceof SomeInterface`, no casts that convert. The few TypeScript features that break that rule are the ones this chapter replaces.",
+    "language": "typescript",
+    "lesson": "### Why it exists\nFor most of TypeScript's life, running a `.ts` file meant compiling it first:\n`tsc` (or Babel, esbuild, swc) read the whole program and wrote JavaScript. That\nstep is disappearing. Node runs `.ts` files directly, and so do Deno and Bun —\nnot by compiling them, but by **stripping** them: each annotation is replaced by\nspaces, so line and column numbers stay exactly where they were, and whatever is\nleft is run as JavaScript.\n\nStripping is fast and simple because it does not understand your program. It\ncan only *delete*. That is fine for almost everything TypeScript adds — types\nexist only for the checker — but a handful of older features are not types at\nall. An `enum` becomes an object with reverse mappings; a `namespace` becomes a\nfunction that builds an object; `constructor(private x: number)` quietly writes\n`this.x = x`. Delete their syntax and you delete behaviour, so a stripper\nrefuses to run them.\n\nEvery program in this app — the judge, the editor's Run button — runs by\nstripping. Knowing which syntax is erasable is knowing what will run.\n\n### The core idea\n**The test for a feature: delete it — does the program still do the same thing?**\n\n| Erasable (just deleted) | Not erasable (generates code) | Write instead |\n|---|---|---|\n| annotations, `interface`, `type` | `enum` | an `as const` object plus a derived union type |\n| generics `<T>`, `as`, `satisfies`, `!` | `namespace` / `module` with values | ES modules, or a plain object |\n| `declare`, `abstract`, `readonly` | parameter properties `constructor(private x)` | declare the field, assign it in the constructor |\n| `private` / `protected` / `public` on members | `import x = require(...)`, `export =` | `import` / `export` |\n| `import type`, `export type` | legacy (experimental) decorators | — (standard decorators aren't run by Node yet) |\n\n**The replacement for `enum`** is a frozen table and a type computed from it:\n\n```ts\nconst Level = { Debug: 10, Info: 20, Warn: 30 } as const;\ntype Level = (typeof Level)[keyof typeof Level];   // 10 | 20 | 30\n```\n\nOne name is both a value (the object) and a type (its values) — the same trick\n`class` uses. `Level.Info` reads like an enum member, `Object.values(Level)`\nlists them, and unlike a numeric `enum` the type does not accept any number.\n\n**Two flags keep you honest.** `--erasableSyntaxOnly` (TS 5.8) reports every\nnon-erasable construct as an error, so the type checker and the stripper agree\nabout what will run. `--verbatimModuleSyntax` requires an import used only for\ntypes to say so — `import type { User } from \"./user\"` — because a stripper\ncannot know which imports are types and would otherwise leave an import of a\nmodule that exports no such value. A type-only import is deleted; a value import\nis kept, exactly as written.\n\n**What erasure means for your mental model.** Types are never available at\nruntime. You cannot ask a value whether it is a `User`, cannot `instanceof` an\ninterface, and `as number` does not turn a string into a number. When runtime\nbehaviour depends on a type — parsing input, choosing a branch — you need a\n*value* to test: a tag field, `typeof`, `in`, `Array.isArray`, or a validator\n(week 17).\n\n### Worked examples\n#### An enum, rewritten as data\n```ts\nconst Direction = { Up: \"UP\", Down: \"DOWN\", Left: \"LEFT\", Right: \"RIGHT\" } as const;\ntype Direction = (typeof Direction)[keyof typeof Direction];\n\nfunction opposite(d: Direction): Direction {\n  switch (d) {\n    case Direction.Up:\n      return Direction.Down;\n    case Direction.Down:\n      return Direction.Up;\n    case Direction.Left:\n      return Direction.Right;\n    case Direction.Right:\n      return Direction.Left;\n  }\n}\n\nconsole.log(opposite(Direction.Up));\nconsole.log(Object.values(Direction).join(\",\"));\nconsole.log(Object.keys(Direction).length);\n```\n\nPrints:\n```text\nDOWN\nUP,DOWN,LEFT,RIGHT\n4\n```\n\n`Direction` the value is an ordinary object, so it runs untouched; `Direction` the type is `\"UP\" | \"DOWN\" | \"LEFT\" | \"RIGHT\"`. A string enum would print the same — but only after a compiler turned it into code.\n\n#### Parameter properties, written out\n```ts\nclass Point {\n  readonly x: number;\n  readonly y: number;\n  private label: string;\n\n  constructor(x: number, y: number, label = \"p\") {\n    this.x = x;\n    this.y = y;\n    this.label = label;\n  }\n\n  distanceTo(other: Point): number {\n    return Math.hypot(this.x - other.x, this.y - other.y);\n  }\n\n  toString(): string {\n    return `${this.label}(${this.x}, ${this.y})`;\n  }\n}\n\nconst a = new Point(0, 0, \"a\");\nconst b = new Point(3, 4, \"b\");\nconsole.log(`${a} to ${b}: ${a.distanceTo(b)}`);\n```\n\nPrints:\n```text\na(0, 0) to b(3, 4): 5\n```\n\n`readonly` and `private` on a declared field are erasable — deleting them leaves a plain class field. What is not erasable is the shorthand `constructor(private label: string)`, which *also* generates the assignment; written out, the assignment is visible code.\n\n#### Everything here is deleted before it runs\n```ts\ninterface User {\n  name: string;\n  admin?: boolean;\n}\n\nfunction first<T>(xs: readonly T[]): T | undefined {\n  return xs[0];\n}\n\nconst users = [{ name: \"ana\" }, { name: \"bo\", admin: true }] satisfies User[];\nconst lead = first(users)!;\nconst count = users.length as number;\n\nconsole.log(lead.name, count);\nconsole.log(typeof lead, Array.isArray(users));\n```\n\nPrints:\n```text\nana 2\nobject true\n```\n\nThe interface, `<T>`, `readonly`, `satisfies`, `!` and `as` all vanish, leaving `function first(xs) { return xs[0]; }` and friends. At runtime `typeof lead` can only say `\"object\"` — the name `User` never existed there.\n\n#### A namespace, as a plain object\n```ts\nconst Temperature = {\n  toFahrenheit(c: number): number {\n    return (c * 9) / 5 + 32;\n  },\n  toCelsius(f: number): number {\n    return ((f - 32) * 5) / 9;\n  },\n  describe(c: number): string {\n    return c < 0 ? \"freezing\" : c < 20 ? \"cool\" : \"warm\";\n  },\n};\n\nfor (const c of [-5, 12, 30]) {\n  console.log(`${c}C = ${Temperature.toFahrenheit(c)}F, ${Temperature.describe(c)}`);\n}\nconsole.log(Temperature.toCelsius(212));\n```\n\nPrints:\n```text\n-5C = 23F, freezing\n12C = 53.6F, cool\n30C = 86F, warm\n100\n```\n\nA `namespace Temperature { export function … }` compiles to an immediately-invoked function that fills an object. An object literal is that object, written directly — and in a real project, a module (`temperature.ts`) is better still.\n\n### What the compiler says\n```ts\ntype Circle = { radius: number };\ntype Square = { side: number };\nfunction area(s: Circle | Square): number {\n  if (s instanceof Circle) return Math.PI * s.radius ** 2;\n  return s.side ** 2;\n}\n```\n```text\nline 4: error TS2693: 'Circle' only refers to a type, but is being used as a value here.\n```\n\n`Circle` is a type, and types are erased — at runtime there is nothing named `Circle` to test against. Test a value instead: `\"radius\" in s`, or give the shapes a tag.\n\n```ts\nconst Level = { Debug: 10, Info: 20, Warn: 30 } as const;\nfunction show(level: Level): string {\n  return String(level);\n}\n```\n```text\nline 2: error TS2749: 'Level' refers to a value, but is being used as a type here. Did you mean 'typeof Level'?\n```\n\nOnly the *value* `Level` exists. The enum replacement needs its companion type: `type Level = (typeof Level)[keyof typeof Level];`.\n\n```ts\nimport type { readFileSync } from \"fs\";\nconst text = readFileSync(0, \"utf8\");\nconsole.log(text.length);\n```\n```text\nline 2: error TS1361: 'readFileSync' cannot be used as a value because it was imported using 'import type'.\n```\n\n`import type` promises the import is only used for types, so it is deleted before the program runs. Using it as a value would leave nothing to call — the compiler stops you.\n\n### Pitfalls\n#### `as` does not convert\n```ts\nconst raw: unknown = JSON.parse('\"5\"');\nconst n = raw as number;\nconsole.log(n + 1);\n```\nPrints:\n```text\n51\n```\n\n`as number` is deleted before the program runs; the value is still the string `\"5\"`, and `+ 1` concatenates. Converting is a runtime job — `Number(...)` — and asserting is only a promise to the compiler.\n\n```ts\nconst raw: unknown = JSON.parse('\"5\"');\nconst n = Number(raw);\nconsole.log(n + 1);\n```\nPrints:\n```text\n6\n```\n\n#### Asking a type a question at runtime\n```ts\ntype Circle = { radius: number };\ntype Square = { side: number };\nfunction area(s: Circle | Square): number {\n  if (s instanceof Circle) return 3 * s.radius ** 2;\n  return s.side ** 2;\n}\nconsole.log(area({ radius: 1 }), area({ side: 2 }));\n```\nThe compiler says:\n```text\nline 4: error TS2693: 'Circle' only refers to a type, but is being used as a value here.\n```\n\nThere is no `Circle` at runtime to be an instance of. `in` asks the value itself, and the compiler narrows on it just as well.\n\n```ts\ntype Circle = { radius: number };\ntype Square = { side: number };\nfunction area(s: Circle | Square): number {\n  if (\"radius\" in s) return 3 * s.radius ** 2;\n  return s.side ** 2;\n}\nconsole.log(area({ radius: 1 }), area({ side: 2 }));\n```\nPrints:\n```text\n3 4\n```\n\n#### A narrower type does not remove data\n```ts\ntype PublicUser = { name: string };\nconst user = { name: \"ana\", password: \"hunter2\" };\nconst shown: PublicUser = user;\nconsole.log(JSON.stringify(shown));\n```\nPrints:\n```text\n{\"name\":\"ana\",\"password\":\"hunter2\"}\n```\n\nThe annotation `PublicUser` is erased; `shown` is the very same object, password included. A type can hide a property from the compiler, never from `JSON.stringify`. Build the smaller object explicitly.\n\n```ts\ntype PublicUser = { name: string };\nconst user = { name: \"ana\", password: \"hunter2\" };\nconst shown: PublicUser = { name: user.name };\nconsole.log(JSON.stringify(shown));\n```\nPrints:\n```text\n{\"name\":\"ana\"}\n```\n\n### Where it shows up later\n- **Week 15 — Structural typing and assertions.** Why an erased type system compares shapes, and why `as` is a claim.\n- **Week 16 — Branded types.** A brand is a type-only property: zero runtime cost, because it is erased.\n- **Week 17 — Runtime validation.** When behaviour depends on a type, you need a validator — a value that knows the type.\n- **Week 23 — Classes.** Parameter properties and decorators, graded by the type checker only.\n\n### In an interview\n\n**What is type stripping, and what can't be stripped?**\n\nRunning TypeScript by replacing every type annotation with whitespace and executing the rest as JavaScript — what Node does natively now. It can't handle syntax that generates code: `enum`, `namespace` with values, parameter properties, `import =`/`export =`, and legacy decorators. `--erasableSyntaxOnly` makes the compiler reject exactly those.\n\n**What would you use instead of an `enum`?**\n\nAn `as const` object and a type derived from it: `const Color = { Red: \"red\" } as const; type Color = (typeof Color)[keyof typeof Color];`. It's plain JavaScript, it's iterable, it has no reverse-mapping surprises, and — unlike a numeric enum — the type doesn't accept arbitrary numbers.\n\n**Why can't TypeScript check a type at runtime?**\n\nBecause types are erased: the emitted JavaScript contains no trace of them. Runtime checks need values — `typeof`, `in`, `instanceof` on a class, a discriminant tag, or a schema validator that produces both the check and the type.",
+    "exercises": [
+      {
+        "id": "ts_erasable_syntax-levels",
+        "title": "An enum replacement you can iterate",
+        "prompt": "`Level` is an `as const` object used as an enum. Replace `____` so the program prints every level name whose value is at least the input threshold, in declaration order.",
+        "hint": "`Object.entries` gives `[name, value]` pairs of the real object.",
+        "language": "typescript",
+        "kind": "drill",
+        "difficulty": "",
+        "starter": "import * as fs from \"fs\";\nconst Level = { Debug: 10, Info: 20, Warn: 30, Error: 40 } as const;\ntype Level = (typeof Level)[keyof typeof Level];\nconst threshold = Number(fs.readFileSync(0, \"utf8\").trim());\nconst names = ____;\nconsole.log(names.join(\" \") || \"(none)\");\n",
+        "solution": "import * as fs from \"fs\";\nconst Level = { Debug: 10, Info: 20, Warn: 30, Error: 40 } as const;\ntype Level = (typeof Level)[keyof typeof Level];\nconst threshold = Number(fs.readFileSync(0, \"utf8\").trim());\nconst names = Object.entries(Level).filter(([, value]) => value >= threshold).map(([name]) => name);\nconsole.log(names.join(\" \") || \"(none)\");\n",
+        "tests": [
+          {
+            "input": "20",
+            "output": "Info Warn Error"
+          },
+          {
+            "input": "0",
+            "output": "Debug Info Warn Error"
+          },
+          {
+            "input": "41",
+            "output": "(none)"
+          },
+          {
+            "input": "40",
+            "output": "Error"
+          }
+        ],
+        "source_slug": ""
+      },
+      {
+        "id": "ts_erasable_syntax-fields",
+        "title": "Write the parameter properties out",
+        "prompt": "`constructor(readonly name: string, private qty: number)` would not survive type stripping. The fields are declared for you; replace `____` with the two assignments it would have generated.",
+        "hint": "A parameter property is shorthand for `this.<name> = <name>;` in the constructor.",
+        "language": "typescript",
+        "kind": "drill",
+        "difficulty": "",
+        "starter": "import * as fs from \"fs\";\nclass Item {\n  readonly name: string;\n  private qty: number;\n  constructor(name: string, qty: number) {\n    ____\n  }\n  take(n: number): string {\n    if (n > this.qty) return `only ${this.qty} ${this.name} left`;\n    this.qty -= n;\n    return `took ${n} ${this.name}, ${this.qty} left`;\n  }\n}\nconst [name = \"\", qty = \"0\", ...takes] = fs.readFileSync(0, \"utf8\").trim().split(/\\s+/);\nconst item = new Item(name, Number(qty));\nfor (const t of takes) console.log(item.take(Number(t)));\n",
+        "solution": "import * as fs from \"fs\";\nclass Item {\n  readonly name: string;\n  private qty: number;\n  constructor(name: string, qty: number) {\n    this.name = name;\n    this.qty = qty;\n  }\n  take(n: number): string {\n    if (n > this.qty) return `only ${this.qty} ${this.name} left`;\n    this.qty -= n;\n    return `took ${n} ${this.name}, ${this.qty} left`;\n  }\n}\nconst [name = \"\", qty = \"0\", ...takes] = fs.readFileSync(0, \"utf8\").trim().split(/\\s+/);\nconst item = new Item(name, Number(qty));\nfor (const t of takes) console.log(item.take(Number(t)));\n",
+        "tests": [
+          {
+            "input": "pens 5 2 2 2",
+            "output": "took 2 pens, 3 left\ntook 2 pens, 1 left\nonly 1 pens left"
+          },
+          {
+            "input": "cups 1 1",
+            "output": "took 1 cups, 0 left"
+          },
+          {
+            "input": "ink 10 3 3 3 3",
+            "output": "took 3 ink, 7 left\ntook 3 ink, 4 left\ntook 3 ink, 1 left\nonly 1 ink left"
+          }
+        ],
+        "source_slug": ""
+      },
+      {
+        "id": "ts_erasable_syntax-status",
+        "title": "Status codes without an enum",
+        "prompt": "Define `const Status = { Active: \"A\", Suspended: \"S\", Closed: \"C\" } as const` and its companion type. Each input line is `<account> <code>`. Print `<account>: <Name>` for a known code (the key whose value it is) or `<account>: unknown code <code>`, then one line per status in declaration order: `<Name> <count>`.",
+        "hint": "`keyof typeof Status` is the union of names; search the names for the one whose value matches.",
+        "language": "typescript",
+        "kind": "challenge",
+        "difficulty": "Medium",
+        "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+        "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst Status = { Active: \"A\", Suspended: \"S\", Closed: \"C\" } as const;\ntype Status = (typeof Status)[keyof typeof Status];\ntype StatusName = keyof typeof Status;\nconst names = Object.keys(Status) as StatusName[];\nconst nameOf = (code: string): StatusName | undefined => names.find((n) => Status[n] === code);\nconst counts = new Map<StatusName, number>();\nfor (const line of input.split(\"\\n\")) {\n  const [account = \"\", code = \"\"] = line.trim().split(/\\s+/);\n  const name = nameOf(code);\n  if (name === undefined) {\n    console.log(`${account}: unknown code ${code}`);\n    continue;\n  }\n  counts.set(name, (counts.get(name) ?? 0) + 1);\n  console.log(`${account}: ${name}`);\n}\nfor (const n of names) console.log(`${n} ${counts.get(n) ?? 0}`);\n",
+        "tests": [
+          {
+            "input": "acc1 A\nacc2 C\nacc3 A\nacc4 X",
+            "output": "acc1: Active\nacc2: Closed\nacc3: Active\nacc4: unknown code X\nActive 2\nSuspended 0\nClosed 1"
+          },
+          {
+            "input": "z S",
+            "output": "z: Suspended\nActive 0\nSuspended 1\nClosed 0"
+          },
+          {
+            "input": "a C\nb C",
+            "output": "a: Closed\nb: Closed\nActive 0\nSuspended 0\nClosed 2"
+          }
+        ],
+        "source_slug": ""
+      }
+    ],
+    "cards": [],
+    "quiz": [
+      {
+        "question": "Which of these survives type stripping unchanged?",
+        "options": [
+          "`function f<T>(x: T): T { return x as T; }`",
+          "`enum Color { Red }`",
+          "`namespace Util { export const x = 1; }`",
+          "`constructor(private id: number) {}`"
+        ],
+        "answer": 0,
+        "explanation": "Generics and `as` are only deleted. The other three generate runtime code, so a stripper rejects them."
+      },
+      {
+        "question": "What does `--erasableSyntaxOnly` do?",
+        "options": [
+          "Reports every construct that would need code generation, such as `enum` and parameter properties",
+          "Strips types from the output",
+          "Forbids `interface`",
+          "Makes every import type-only"
+        ],
+        "answer": 0,
+        "explanation": "It makes the type checker agree with a stripper about what can run."
+      },
+      {
+        "question": "Why does `verbatimModuleSyntax` require `import type` for type-only imports?",
+        "options": [
+          "A stripper can't tell which imports are types, so the source must say which ones to delete",
+          "Type imports are slower",
+          "Interfaces can't be imported otherwise",
+          "It prevents circular imports"
+        ],
+        "answer": 0,
+        "explanation": "The rule is: what you write is what runs. A type-only import is deleted; any other import is kept."
+      },
+      {
+        "question": "`const Level = { A: 1, B: 2 } as const; type Level = (typeof Level)[keyof typeof Level];` — what is the type `Level`?",
+        "options": [
+          "`1 | 2`",
+          "`\"A\" | \"B\"`",
+          "`number`",
+          "`{ A: 1; B: 2 }`"
+        ],
+        "answer": 0,
+        "explanation": "`keyof typeof Level` is the keys; indexing by them gives the values' literal types."
+      },
+      {
+        "question": "Why can't you write `x instanceof User` when `User` is an interface?",
+        "options": [
+          "Interfaces are erased — nothing named `User` exists at runtime",
+          "`instanceof` only works on arrays",
+          "Interfaces need `implements` first",
+          "You can, with `strict` on"
+        ],
+        "answer": 0,
+        "explanation": "`instanceof` needs a runtime constructor. Test a value (`in`, a tag, a validator) instead."
+      },
+      {
+        "question": "What does `const n = \"5\" as unknown as number; console.log(n + 1)` print?",
+        "options": [
+          "`51`",
+          "`6`",
+          "It throws",
+          "`NaN`"
+        ],
+        "answer": 0,
+        "explanation": "Assertions never convert. The value is still a string, so `+` concatenates."
+      }
+    ],
+    "practice": []
+  },
+  {
+    "key": "ts_versions",
+    "name": "TypeScript 6 & 7",
+    "category": "TS: Runtime & Architecture",
+    "what": "What TypeScript 6.0 changed by default, what it deprecated, what TypeScript 7 (the native compiler) removed — and the `strict` family every modern project now assumes.",
+    "deep": "TypeScript 6.0 is a bridge release: it turns `strict` on by default, defaults `module` to `esnext` and `types` to `[]`, and deprecates old options — `target: es5`, `moduleResolution: node`, `baseUrl`, `outFile`, AMD/UMD/SystemJS modules. TypeScript 7.0 (July 2026) is the compiler rewritten in Go, about 10× faster, and those deprecated options are hard errors there. The code you write barely changes; the configuration around it does.",
+    "java": "Java's language versions add features and almost never take anything away. TypeScript 6 and 7 are the opposite: nearly no new syntax, but a clean-out of configuration and defaults, so that the fast native compiler only has to support the modern subset.",
+    "language": "typescript",
+    "lesson": "### Why it exists\nTools age. The TypeScript compiler was written in TypeScript, and for large\ncodebases it got slow — tens of seconds for a full check, long waits for the\neditor. TypeScript 7 is the answer: the same compiler ported to Go, with native\nspeed and shared-memory parallelism.\n\nA port is also a chance to stop carrying the past. Options that existed for\nInternet Explorer (`target: es5`), for module systems nobody ships any more\n(AMD, UMD, SystemJS) or for resolution rules Node abandoned years ago were\ndeprecated in **TypeScript 6.0** — the last release of the old compiler — so\nprojects could fix their configuration *before* moving to 7.\n\nFor you, that means two things. A new project today starts with `strict` on\nand modern modules, whether or not it says so. And when you meet an old\n`tsconfig.json`, you should recognise which parts are about to stop working.\n\n### The core idea\n**TypeScript 6.0 changed these defaults** (a `tsconfig.json` that sets them\nexplicitly is unaffected):\n\n| option | before 6.0 | 6.0 |\n|---|---|---|\n| `strict` | `false` | `true` |\n| `module` | `commonjs` | `esnext` |\n| `target` | `es5` | the current year's ES version (`es2025`) |\n| `types` | every `@types` package installed | `[]` — list the ones you want, e.g. `[\"node\"]` |\n| `rootDir` | inferred from your files | the folder containing `tsconfig.json` |\n| `noUncheckedSideEffectImports` | `false` | `true` |\n\n**…and deprecated these.** In 6.0 they still work behind\n`\"ignoreDeprecations\": \"6.0\"`; in 7.0 they are errors.\n\n- `target: es5` and `downlevelIteration` (ES2015 is the floor now)\n- `module: amd`, `umd`, `systemjs`, `none`, and `outFile`\n- `moduleResolution: node` (a.k.a. `node10`) and `classic` — use `nodenext`\n  for Node, `bundler` for bundled apps\n- `baseUrl`; `esModuleInterop: false` and `allowSyntheticDefaultImports: false`\n  (both are always on); `alwaysStrict: false`\n- the `module Foo { }` spelling of a namespace, and `asserts` on imports (import\n  attributes use `with { type: \"json\" }`)\n\n6.0 also added an `es2025` target and library (Set methods, iterator helpers and\n`Promise.try` moved there from `esnext`) and typings for `RegExp.escape`,\n`Map.prototype.getOrInsert` and the Temporal API.\n\n**TypeScript 7.0** shipped on 8 July 2026. It installs and runs exactly as\nbefore — the `typescript` package, the `tsc` command — and is typically 8–12×\nfaster on a full build. Two things to know: the 6.0 deprecations are gone for\ngood, and 7.0 ships **no compiler API**, so tools that drive the compiler\nprogrammatically use a compatibility package (`@typescript/typescript6`) until\nthe new API lands.\n\n**The `strict` family.** `strict: true` is shorthand for a set of flags; the\nones you will actually meet are `noImplicitAny` (a parameter must have a type),\n`strictNullChecks` (`null`/`undefined` are their own types),\n`strictFunctionTypes` (week 13), `strictPropertyInitialization` (a class field\nmust be assigned), and `useUnknownInCatchVariables` (`catch (e)` gives\n`unknown`). Two valuable flags are *not* in `strict` and you turn them on\nyourself: `noUncheckedIndexedAccess` (this programme's weeks 14+) and\n`exactOptionalPropertyTypes`.\n\n**What this app runs.** Programs execute on Node 24 by type stripping, and are\nchecked by TypeScript 5.9 with `strict` on — the settings 6.0 made the\ndefault — which is why every message in this chapter is 5.9's.\n\n### Worked examples\n#### `catch` gives you `unknown` — narrow it\n```ts\nfunction parsePort(text: string): number {\n  const n = Number(text);\n  if (!Number.isInteger(n) || n < 1 || n > 65535) throw new RangeError(`not a port: ${text}`);\n  return n;\n}\n\nfor (const t of [\"8080\", \"http\", \"70000\"]) {\n  try {\n    console.log(parsePort(t));\n  } catch (e) {\n    console.log(e instanceof Error ? `${e.name}: ${e.message}` : String(e));\n  }\n}\n```\n\nPrints:\n```text\n8080\nRangeError: not a port: http\nRangeError: not a port: 70000\n```\n\nUnder `useUnknownInCatchVariables` (part of `strict`), `e` is `unknown`: anything can be thrown, not just `Error`s. `instanceof Error` narrows it before `.name` and `.message` are read.\n\n#### Every field assigned, every parameter typed\n```ts\nclass Counter {\n  count = 0;\n  readonly label: string;\n\n  constructor(label: string) {\n    this.label = label;\n  }\n\n  add(step: number): this {\n    this.count += step;\n    return this;\n  }\n}\n\nconst c = new Counter(\"clicks\").add(2).add(3);\nconsole.log(`${c.label}: ${c.count}`);\n```\n\nPrints:\n```text\nclicks: 5\n```\n\n`strictPropertyInitialization` checks that `label` is assigned in the constructor and `count` has an initialiser; `noImplicitAny` is why `step` needs its `: number`. Both are on by default from 6.0.\n\n#### ES2025 built-ins, in `es2025` from 6.0\n```ts\nconst a = new Set([\"ts\", \"go\", \"rust\"]);\nconst b = new Set([\"go\", \"java\"]);\nconsole.log([...a.union(b)].join(\",\"));\nconsole.log([...a.intersection(b)].join(\",\"));\n\nconst doubled = [1, 2, 3, 4].values().filter((n) => n % 2 === 0).map((n) => n * 10).toArray();\nconsole.log(doubled.join(\",\"));\n\nconst byLength = Object.groupBy([\"a\", \"bb\", \"cc\", \"d\"], (w) => String(w.length));\nconsole.log(JSON.stringify(byLength));\n```\n\nPrints:\n```text\nts,go,rust,java\ngo\n20,40\n{\"1\":[\"a\",\"d\"],\"2\":[\"bb\",\"cc\"]}\n```\n\nSet methods and iterator helpers were `esnext` library features until TypeScript 6.0 moved them into the new `es2025` target and library. Node 24 runs them natively.\n\n### What the compiler says\n```ts\nfunction total(prices) {\n  return prices.reduce((sum, p) => sum + p, 0);\n}\n```\n```text\nline 1: error TS7006: Parameter 'prices' implicitly has an 'any' type.\n```\n\n`noImplicitAny`: a parameter with no annotation and nothing to infer from would silently be `any`. Under `strict` — the default from 6.0 — it must be typed.\n\n```ts\ntry {\n  JSON.parse(\"{\");\n} catch (e) {\n  console.log(e.message);\n}\n```\n```text\nline 4: error TS18046: 'e' is of type 'unknown'.\n```\n\n`useUnknownInCatchVariables`: the caught value is `unknown`, because JavaScript can throw anything. Narrow it with `e instanceof Error` first.\n\n```ts\nclass Account {\n  owner: string;\n  balance = 0;\n}\n```\n```text\nline 2: error TS2564: Property 'owner' has no initializer and is not definitely assigned in the constructor.\n```\n\n`strictPropertyInitialization`: `owner` is declared as a `string` but nothing ever assigns it, so it would really be `undefined`.\n\n### Pitfalls\n#### A catch that assumes an `Error`\n```ts\nfunction risky(): never {\n  throw \"disk full\";\n}\ntry {\n  risky();\n} catch (e) {\n  console.log(\"failed: \" + (e as Error).message);\n}\n```\nPrints:\n```text\nfailed: undefined\n```\n\n`as Error` silences the compiler, and a thrown string has no `message`. `unknown` is telling the truth — narrow instead of asserting.\n\n```ts\nfunction risky(): never {\n  throw \"disk full\";\n}\ntry {\n  risky();\n} catch (e) {\n  console.log(\"failed: \" + (e instanceof Error ? e.message : String(e)));\n}\n```\nPrints:\n```text\nfailed: disk full\n```\n\n#### A definite-assignment `!` that was never earned\n```ts\nclass Job {\n  name!: string;\n  describe(): string {\n    return \"job \" + this.name;\n  }\n}\nconsole.log(new Job().describe());\n```\nPrints:\n```text\njob undefined\n```\n\n`name!:` tells `strictPropertyInitialization` \"trust me, it's assigned\" — and it isn't, so the program prints `undefined`. Assign it in the constructor and the check does its job.\n\n```ts\nclass Job {\n  name: string;\n  constructor(name: string) {\n    this.name = name;\n  }\n  describe(): string {\n    return \"job \" + this.name;\n  }\n}\nconsole.log(new Job(\"backup\").describe());\n```\nPrints:\n```text\njob backup\n```\n\n#### An untyped parameter\n```ts\nfunction average(xs) {\n  return xs.reduce((a, b) => a + b, 0) / xs.length;\n}\nconsole.log(average([2, 4, 9]));\n```\nThe compiler says:\n```text\nline 1: error TS7006: Parameter 'xs' implicitly has an 'any' type.\n```\n\nWithout `strict` this compiles, and `xs` is `any` — `average(\"abc\")` would compile too. From TypeScript 6.0, a project gets this error unless it opts out.\n\n```ts\nfunction average(xs: readonly number[]): number {\n  return xs.reduce((a, b) => a + b, 0) / xs.length;\n}\nconsole.log(average([2, 4, 9]));\n```\nPrints:\n```text\n5\n```\n\n### Where it shows up later\n- **Week 14 — tsconfig.** The rest of the configuration file: modules, resolution, and the flags not in `strict`.\n- **Week 25 — Errors.** `catch (e: unknown)`, `Error` subclasses and `cause`, in depth.\n- **Week 23 — Classes.** Field initialisation and `this`-returning methods.\n\n### In an interview\n\n**What changed in TypeScript 6.0?**\n\nIt's a transition release. Defaults moved to modern settings — `strict` on, `module: esnext`, `target` of the current ES year, `types: []` — and legacy options were deprecated: ES5 targets, AMD/UMD/SystemJS, `outFile`, `moduleResolution: node`, `baseUrl`. They still work with `ignoreDeprecations: \"6.0\"`, but TypeScript 7 removes them.\n\n**What's TypeScript 7?**\n\nThe compiler rewritten in Go, released in July 2026 — the same language, the same `tsc`, but typically 8–12× faster thanks to native code and parallel checking. The 6.0 deprecations are hard errors, and 7.0 ships without the old JavaScript compiler API, so tools that embed the compiler use a compatibility package for now.\n\n**Which compiler flags would you turn on in a new project, beyond `strict`?**\n\n`noUncheckedIndexedAccess`, so array and record reads admit they may be `undefined`; `exactOptionalPropertyTypes`, so an optional property can't be explicitly set to `undefined` unless the type says so; and `verbatimModuleSyntax` plus `erasableSyntaxOnly` if the code runs by type stripping.",
+    "exercises": [
+      {
+        "id": "ts_versions-catch",
+        "title": "Narrow what was caught",
+        "prompt": "Each input line is parsed as JSON. Replace `____` so a failure prints `bad: <message>` for an `Error`, or `bad: <value>` for anything else thrown.",
+        "hint": "`e` is `unknown`. Narrow with `instanceof Error` before reading `.message`.",
+        "language": "typescript",
+        "kind": "drill",
+        "difficulty": "",
+        "starter": "import * as fs from \"fs\";\nfor (const line of fs.readFileSync(0, \"utf8\").trim().split(\"\\n\")) {\n  try {\n    const value: unknown = JSON.parse(line);\n    console.log(`ok: ${typeof value}`);\n  } catch (e) {\n    console.log(`bad: ${____}`);\n  }\n}\n",
+        "solution": "import * as fs from \"fs\";\nfor (const line of fs.readFileSync(0, \"utf8\").trim().split(\"\\n\")) {\n  try {\n    const value: unknown = JSON.parse(line);\n    console.log(`ok: ${typeof value}`);\n  } catch (e) {\n    console.log(`bad: ${e instanceof Error ? e.message.split(\" \")[0] : String(e)}`);\n  }\n}\n",
+        "tests": [
+          {
+            "input": "1\n\"x\"\n{",
+            "output": "ok: number\nok: string\nbad: Expected"
+          },
+          {
+            "input": "[1,2]\nnull",
+            "output": "ok: object\nok: object"
+          },
+          {
+            "input": "tru",
+            "output": "bad: Unexpected"
+          }
+        ],
+        "source_slug": ""
+      },
+      {
+        "id": "ts_versions-init",
+        "title": "Assign every field",
+        "prompt": "`strictPropertyInitialization` requires each field to be assigned. Replace `____` so the constructor assigns `name` and starts `visits` at the given number.",
+        "hint": "Two assignments to `this`.",
+        "language": "typescript",
+        "kind": "drill",
+        "difficulty": "",
+        "starter": "import * as fs from \"fs\";\nclass Page {\n  name: string;\n  visits: number;\n  constructor(name: string, visits: number) {\n    ____\n  }\n  visit(): string {\n    this.visits++;\n    return `${this.name}: ${this.visits}`;\n  }\n}\nconst [name = \"\", start = \"0\", times = \"1\"] = fs.readFileSync(0, \"utf8\").trim().split(/\\s+/);\nconst page = new Page(name, Number(start));\nfor (let i = 0; i < Number(times); i++) console.log(page.visit());\n",
+        "solution": "import * as fs from \"fs\";\nclass Page {\n  name: string;\n  visits: number;\n  constructor(name: string, visits: number) {\n    this.name = name;\n    this.visits = visits;\n  }\n  visit(): string {\n    this.visits++;\n    return `${this.name}: ${this.visits}`;\n  }\n}\nconst [name = \"\", start = \"0\", times = \"1\"] = fs.readFileSync(0, \"utf8\").trim().split(/\\s+/);\nconst page = new Page(name, Number(start));\nfor (let i = 0; i < Number(times); i++) console.log(page.visit());\n",
+        "tests": [
+          {
+            "input": "home 0 2",
+            "output": "home: 1\nhome: 2"
+          },
+          {
+            "input": "about 41 1",
+            "output": "about: 42"
+          },
+          {
+            "input": "faq 7 3",
+            "output": "faq: 8\nfaq: 9\nfaq: 10"
+          }
+        ],
+        "source_slug": ""
+      },
+      {
+        "id": "ts_versions-config",
+        "title": "Audit a tsconfig",
+        "prompt": "The input is a list of `option=value` lines from an old `tsconfig.json`. For each line print `<option>=<value>: ok`, or `deprecated in 6.0` when it is one of: `target=es5`, `downlevelIteration=true`, `module=amd`, `module=umd`, `module=systemjs`, `module=none`, `moduleResolution=node`, `moduleResolution=node10`, `moduleResolution=classic`, `outFile=<anything>`, `baseUrl=<anything>`, `esModuleInterop=false`, `allowSyntheticDefaultImports=false`, `alwaysStrict=false`. Then print `<k> to fix before TypeScript 7`.",
+        "hint": "Two lookups: exact `option=value` pairs, and options that are deprecated whatever their value.",
+        "language": "typescript",
+        "kind": "challenge",
+        "difficulty": "Medium",
+        "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+        "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst ANY_VALUE = new Set([\"outFile\", \"baseUrl\"]);\nconst DEPRECATED = new Set([\n  \"target=es5\", \"downlevelIteration=true\", \"module=amd\", \"module=umd\", \"module=systemjs\", \"module=none\",\n  \"moduleResolution=node\", \"moduleResolution=node10\", \"moduleResolution=classic\",\n  \"esModuleInterop=false\", \"allowSyntheticDefaultImports=false\", \"alwaysStrict=false\",\n]);\nlet toFix = 0;\nfor (const line of input.split(\"\\n\")) {\n  const entry = line.trim();\n  const option = entry.split(\"=\")[0] ?? \"\";\n  const deprecated = DEPRECATED.has(entry) || ANY_VALUE.has(option);\n  if (deprecated) toFix++;\n  console.log(`${entry}: ${deprecated ? \"deprecated in 6.0\" : \"ok\"}`);\n}\nconsole.log(`${toFix} to fix before TypeScript 7`);\n",
+        "tests": [
+          {
+            "input": "target=es5\nmodule=esnext\nbaseUrl=./src\nstrict=true",
+            "output": "target=es5: deprecated in 6.0\nmodule=esnext: ok\nbaseUrl=./src: deprecated in 6.0\nstrict=true: ok\n2 to fix before TypeScript 7"
+          },
+          {
+            "input": "moduleResolution=bundler\nesModuleInterop=false\noutFile=out.js",
+            "output": "moduleResolution=bundler: ok\nesModuleInterop=false: deprecated in 6.0\noutFile=out.js: deprecated in 6.0\n2 to fix before TypeScript 7"
+          },
+          {
+            "input": "module=nodenext",
+            "output": "module=nodenext: ok\n0 to fix before TypeScript 7"
+          }
+        ],
+        "source_slug": ""
+      }
+    ],
+    "cards": [],
+    "quiz": [
+      {
+        "question": "In TypeScript 6.0, what is `strict` if a tsconfig doesn't mention it?",
+        "options": [
+          "`true`",
+          "`false`",
+          "It depends on `target`",
+          "It must be set explicitly"
+        ],
+        "answer": 0,
+        "explanation": "6.0 flipped the default. A project that wants the old behaviour has to say `\"strict\": false`."
+      },
+      {
+        "question": "Which option did TypeScript 6.0 deprecate?",
+        "options": [
+          "`moduleResolution: node` (node10)",
+          "`moduleResolution: bundler`",
+          "`module: nodenext`",
+          "`noUncheckedIndexedAccess`"
+        ],
+        "answer": 0,
+        "explanation": "Use `nodenext` for Node and `bundler` for bundled apps."
+      },
+      {
+        "question": "What does `\"ignoreDeprecations\": \"6.0\"` do in TypeScript 7.0?",
+        "options": [
+          "Nothing useful — the deprecated options are removed and are errors",
+          "Silences the errors, as in 6.0",
+          "Switches 7.0 into 6.0 mode",
+          "Enables the old JavaScript compiler"
+        ],
+        "answer": 0,
+        "explanation": "It is a 6.0 transition aid. 7.0 has no switch to bring the options back."
+      },
+      {
+        "question": "What is TypeScript 7.0?",
+        "options": [
+          "The compiler ported to Go — same `typescript` package and `tsc` command, roughly 10× faster",
+          "A new language with different syntax",
+          "A runtime that replaces Node",
+          "A linter"
+        ],
+        "answer": 0,
+        "explanation": "The language is the same; the implementation is native."
+      },
+      {
+        "question": "Which flag is NOT part of `strict`?",
+        "options": [
+          "`noUncheckedIndexedAccess`",
+          "`strictNullChecks`",
+          "`noImplicitAny`",
+          "`useUnknownInCatchVariables`"
+        ],
+        "answer": 0,
+        "explanation": "It's valuable but disruptive, so it is opt-in. So is `exactOptionalPropertyTypes`."
+      },
+      {
+        "question": "A 6.0 project doesn't list `types`. What happens to the `@types/node` package it has installed?",
+        "options": [
+          "It isn't loaded — the default is now `[]`, so it must be listed",
+          "It's loaded, as before",
+          "It's loaded only for `.d.ts` files",
+          "It's an error to have it installed"
+        ],
+        "answer": 0,
+        "explanation": "6.0 changed the default from 'every installed @types package' to none; add `\"types\": [\"node\"]`."
+      }
+    ],
+    "practice": []
+  },
+  {
+    "key": "ts_variance",
+    "name": "Variance",
+    "category": "TS: Type System",
+    "what": "When a container or a function of a subtype can stand in for one of a supertype: covariance, contravariance, invariance, the unsound corners, and `in`/`out` annotations.",
+    "deep": "`Dog` fits where `Animal` is expected. Does `Dog[]` fit `Animal[]`? Does a handler for `Dog`s fit where a handler for `Animal`s is expected? Variance is the rule that answers: things that *produce* a type follow its direction (covariant), things that *consume* it go the opposite way (contravariant), and things that do both fit only exactly (invariant). TypeScript mostly gets this right — and knowing where it deliberately doesn't (mutable arrays, method parameters) is what keeps you out of the bugs.",
+    "java": "Java arrays are covariant and throw `ArrayStoreException` when you exploit it; Java generics are invariant unless you write `? extends T` (producer) or `? super T` (consumer) at the use site. TypeScript measures variance automatically from how a type parameter is used, allows `in`/`out` annotations on the declaration, and — unlike Java — does not check array writes at runtime at all.",
+    "language": "typescript",
+    "lesson": "### Why it exists\nSubtyping is easy to state for plain values: a `Dog` has everything an\n`Animal` has, so a `Dog` can go anywhere an `Animal` can. The hard questions come\none level up, as soon as the type is *inside* something:\n\n- A function wants a list of animals. Can it have your list of dogs?\n- An event system wants a handler for any animal event. Can it have the handler\n  you wrote for dogs?\n- A cache is typed `Cell<Animal>`. Can it hold your `Cell<Dog>`?\n\nThe answers are different — yes, no, and no — and the reason is the same rule\napplied three ways. Get it wrong in one direction and the compiler rejects\nreasonable code; get it wrong in the other and a dog-handler gets called with a\ncat. This chapter is the rule, plus the two places TypeScript knowingly breaks\nit for convenience.\n\n### The core idea\nWrite `Dog ≤ Animal` for \"a `Dog` is assignable to an `Animal`\". For a type\nbuilt from `T`, ask which way assignability goes:\n\n| shape | `F<Dog>` vs `F<Animal>` | name |\n|---|---|---|\n| produces `T` — `() => T`, `readonly T[]`, a getter | `F<Dog> ≤ F<Animal>` — same direction | **covariant** |\n| consumes `T` — `(x: T) => void`, a setter, a comparator | `F<Animal> ≤ F<Dog>` — reversed | **contravariant** |\n| both — `{ get(): T; set(x: T): void }` | neither, unless equal | **invariant** |\n\nThe intuition: a producer of dogs is a fine producer of animals (every dog is an\nanimal). A *consumer* of animals is a fine consumer of dogs (it can handle any\nanimal, so certainly a dog) — but a consumer of dogs is not a consumer of\nanimals, because it might be handed a cat.\n\n**TypeScript measures this for you.** It works out each type parameter's\nvariance from how the type uses it. From TS 4.7 you can also *declare* it —\n`interface Source<out T>`, `interface Sink<in T>`, `interface Cell<in out T>` —\nand the compiler checks your declaration against the body. Annotations document\nintent and speed up checking; they never make something unsound pass.\n\n**Two deliberate holes.**\n\n1. **Arrays are covariant even though they are mutable.** `Dog[]` is accepted as\n   `Animal[]`, and nothing stops the receiver from pushing a cat into it.\n   Honest covariance needs `readonly Animal[]` — which, since it cannot be\n   written to, really is safe.\n2. **Method parameters are bivariant.** A member declared with method syntax,\n   `handle(x: T): void`, is compared both ways (week 13 showed the bug). A\n   member declared as a property, `handle: (x: T) => void`, is checked\n   contravariantly under `strictFunctionTypes`.\n\nMutable object properties are the same story as arrays: `{ pet: Dog }` is\naccepted as `{ pet: Animal }`. Make the property `readonly` and the assignment\nthrough the wider type becomes a compile error.\n\n### Worked examples\n#### Producers follow the subtype\n```ts\ntype Animal = { name: string };\ntype Dog = { name: string; bark: () => string };\ntype Getter<T> = () => T;\n\nconst rex: Dog = { name: \"rex\", bark: () => \"woof\" };\nconst getDog: Getter<Dog> = () => rex;\nconst getAnimal: Getter<Animal> = getDog; // covariant: fine\n\nconsole.log(getAnimal().name);\nconsole.log(getDog().bark());\n```\n\nPrints:\n```text\nrex\nwoof\n```\n\nAnything that calls `getAnimal` expects an animal back, and a dog is one. The arrow `Getter<Dog> → Getter<Animal>` points the same way as `Dog → Animal`.\n\n#### Consumers go the other way\n```ts\ntype Animal = { name: string };\ntype Dog = { name: string; bark: () => string };\ntype Handler<T> = (x: T) => string;\n\nconst describeAnimal: Handler<Animal> = (a) => \"an animal called \" + a.name;\nconst describeDog: Handler<Dog> = describeAnimal; // contravariant: fine\n\nconst dogs: Dog[] = [{ name: \"rex\", bark: () => \"woof\" }, { name: \"fido\", bark: () => \"arf\" }];\nconsole.log(dogs.map(describeDog).join(\"; \"));\n```\n\nPrints:\n```text\nan animal called rex; an animal called fido\n```\n\nA handler that copes with *any* animal certainly copes with dogs, so `Handler<Animal>` fits where `Handler<Dog>` is wanted. The reverse would hand a dog-handler a cat.\n\n#### `readonly` arrays are honestly covariant\n```ts\ntype Animal = { name: string };\ntype Dog = { name: string; breed: string };\n\nfunction names(animals: readonly Animal[]): string {\n  return animals.map((a) => a.name).join(\", \");\n}\n\nconst dogs: Dog[] = [{ name: \"rex\", breed: \"lab\" }, { name: \"ada\", breed: \"pug\" }];\nconsole.log(names(dogs));\nconsole.log(dogs.length);\n```\n\nPrints:\n```text\nrex, ada\n2\n```\n\n`names` promises not to write, so passing `Dog[]` as `readonly Animal[]` is safe, not just allowed. Prefer `readonly` parameters whenever a function only reads.\n\n#### Declaring variance with `out` and `in`\n```ts\ntype Animal = { name: string };\ntype Dog = { name: string; bark: () => string };\n\ninterface Source<out T> {\n  next(): T;\n}\ninterface Sink<in T> {\n  put(value: T): void;\n}\n\nconst kennel: Source<Dog> = { next: () => ({ name: \"rex\", bark: () => \"woof\" }) };\nconst anyAnimals: Source<Animal> = kennel;\n\nconst lines: string[] = [];\nconst register: Sink<Animal> = { put: (a) => lines.push(\"registered \" + a.name) };\nconst registerDog: Sink<Dog> = register;\n\nregisterDog.put(kennel.next());\nconsole.log(lines.join(\"\\n\"));\nconsole.log(\"the animal view sees \" + anyAnimals.next().name);\n```\n\nPrints:\n```text\nregistered rex\nthe animal view sees rex\n```\n\n`out T` says `T` only comes out of a `Source`; `in T` says it only goes into a `Sink`. The compiler checks both claims against the interface bodies — and they are erased like every other type annotation.\n\n### What the compiler says\n```ts\ntype Animal = { name: string };\ntype Dog = { name: string; bark: () => string };\ntype Handler<T> = (x: T) => void;\nconst handleDog: Handler<Dog> = (d) => console.log(d.bark());\nconst handleAnimal: Handler<Animal> = handleDog;\n```\n```text\nline 5: error TS2322: Type 'Handler<Dog>' is not assignable to type 'Handler<Animal>'.\n  Property 'bark' is missing in type 'Animal' but required in type 'Dog'.\n```\n\nA `Handler<Animal>` may be called with a cat, and `handleDog` would call `bark` on it. Parameter types are contravariant: this direction is rejected.\n\n```ts\ntype Animal = { name: string };\ntype Dog = { name: string; bark: () => string };\ntype Cell<T> = { get: () => T; set: (value: T) => void };\nfunction rename(cell: Cell<Animal>): void {\n  cell.set({ name: \"tom\" });\n}\nconst dogCell: Cell<Dog> = { get: () => ({ name: \"rex\", bark: () => \"woof\" }), set: () => {} };\nrename(dogCell);\n```\n```text\nline 8: error TS2345: Argument of type 'Cell<Dog>' is not assignable to parameter of type 'Cell<Animal>'.\n  Types of property 'set' are incompatible.\n    Type '(value: Dog) => void' is not assignable to type '(value: Animal) => void'.\n      Types of parameters 'value' and 'value' are incompatible.\n        Property 'bark' is missing in type 'Animal' but required in type 'Dog'.\n```\n\n`Cell` both produces and consumes `T`, so it is invariant: a `Cell<Dog>` is not a `Cell<Animal>`, because `rename` could store a non-dog in it.\n\n```ts\ninterface Box<out T> {\n  get(): T;\n  set: (value: T) => void;\n}\n```\n```text\nline 1: error TS2636: Type 'Box<sub-T>' is not assignable to type 'Box<super-T>' as implied by variance annotation.\n  Types of property 'set' are incompatible.\n    Type '(value: sub-T) => void' is not assignable to type '(value: super-T) => void'.\n      Types of parameters 'value' and 'value' are incompatible.\n        Type 'super-T' is not assignable to type 'sub-T'.\n```\n\nThe annotation claims `T` only comes *out* of a `Box`, but `set` takes one *in*. (Declared with method syntax, `set(value: T)`, it would slip through — method parameters are bivariant.) A variance annotation is checked against the body — here it should be `in out T`, or no annotation at all.\n\n### Pitfalls\n#### A mutable array accepted as a wider one\n```ts\ntype Animal = { name: string };\ntype Dog = { name: string; bark: () => string };\nfunction adopt(animals: Animal[]): void {\n  animals.push({ name: \"tom the cat\" });\n}\nconst dogs: Dog[] = [{ name: \"rex\", bark: () => \"woof\" }];\nadopt(dogs);\nfor (const d of dogs) {\n  console.log(typeof d.bark === \"function\" ? d.bark() : d.name + \" cannot bark\");\n}\n```\nPrints:\n```text\nwoof\ntom the cat cannot bark\n```\n\nArrays are covariant for convenience, so `Dog[]` passed as `Animal[]` compiles — and `adopt` puts a cat in your list of dogs. A `readonly` parameter can't be written through; return a new array instead.\n\n```ts\ntype Animal = { name: string };\ntype Dog = { name: string; bark: () => string };\nfunction adopt(animals: readonly Animal[]): Animal[] {\n  return [...animals, { name: \"tom the cat\" }];\n}\nconst dogs: Dog[] = [{ name: \"rex\", bark: () => \"woof\" }];\nconst shelter = adopt(dogs);\nfor (const d of dogs) console.log(d.bark());\nconsole.log(shelter.length + \" animals in the shelter\");\n```\nPrints:\n```text\nwoof\n2 animals in the shelter\n```\n\n#### A mutable property accepted as a wider one\n```ts\ntype Animal = { name: string };\ntype Dog = { name: string; bark: () => string };\ntype Holder = { pet: Animal };\nconst dogHouse: { pet: Dog } = { pet: { name: \"rex\", bark: () => \"woof\" } };\nconst house: Holder = dogHouse;\nhouse.pet = { name: \"tom\" };\nconsole.log(typeof dogHouse.pet.bark === \"function\" ? dogHouse.pet.bark() : \"the dog house holds a cat\");\n```\nPrints:\n```text\nthe dog house holds a cat\n```\n\nObject properties are covariant just like arrays, and just as unsound when written. Marking the property `readonly` in the wider view turns the bad write into a compile error.\n\n```ts\ntype Animal = { name: string };\ntype Dog = { name: string; bark: () => string };\ntype Holder = { readonly pet: Animal };\nconst dogHouse: { pet: Dog } = { pet: { name: \"rex\", bark: () => \"woof\" } };\nconst house: Holder = dogHouse;\nhouse.pet = { name: \"tom\" };\nconsole.log(dogHouse.pet.bark());\n```\nThe compiler says:\n```text\nline 6: error TS2540: Cannot assign to 'pet' because it is a read-only property.\n```\n\n#### An annotation that claims too much\n```ts\ninterface Channel<out T> {\n  receive(): T;\n  send: (value: T) => void;\n}\nconst log: string[] = [];\nconst ch: Channel<string> = { receive: () => \"ping\", send: (v) => { log.push(v); } };\nch.send(ch.receive());\nconsole.log(log.join(\",\"));\n```\nThe compiler says:\n```text\nline 1: error TS2636: Type 'Channel<sub-T>' is not assignable to type 'Channel<super-T>' as implied by variance annotation.\n  Types of property 'send' are incompatible.\n    Type '(value: sub-T) => void' is not assignable to type '(value: super-T) => void'.\n      Types of parameters 'value' and 'value' are incompatible.\n        Type 'super-T' is not assignable to type 'sub-T'.\n```\n\n`T` flows both in and out of a channel, so it is invariant: `in out T`. The compiler won't let `out` stand, which is the point of writing annotations — they are checked documentation.\n\n```ts\ninterface Channel<in out T> {\n  receive(): T;\n  send: (value: T) => void;\n}\nconst log: string[] = [];\nconst ch: Channel<string> = { receive: () => \"ping\", send: (v) => { log.push(v); } };\nch.send(ch.receive());\nconsole.log(log.join(\",\"));\n```\nPrints:\n```text\nping\n```\n\n### Where it shows up later\n- **Week 16 — Immutability.** `readonly` arrays and properties, which is what makes covariance safe.\n- **Week 18 — Generics.** Every generic you write has a variance; `in`/`out` let you state it.\n- **Week 23 — Classes.** Method overrides and the bivariance of method parameters.\n\n### In an interview\n\n**Explain covariance and contravariance.**\n\nIf `Dog` is a subtype of `Animal`, a covariant `F` keeps the direction — `F<Dog>` is usable as `F<Animal>` — which is right for things that produce `T`, like getters and read-only arrays. A contravariant `F` reverses it — `F<Animal>` is usable as `F<Dog>` — which is right for things that consume `T`, like callbacks and comparators. Something that does both is invariant.\n\n**Where is TypeScript's type system unsound on purpose?**\n\nArrays and mutable properties are covariant, so you can pass `Dog[]` as `Animal[]` and push a cat into it; method-syntax parameters are checked bivariantly; and `any` and type assertions opt out entirely. The fixes are `readonly` for data you only read and property syntax for callback members.\n\n**What are `in` and `out` on a type parameter?**\n\nVariance annotations, added in TS 4.7: `out T` means `T` is only produced, `in T` only consumed, `in out T` both. The compiler verifies them against the type's body, they make intent explicit, and they can speed up checking of large generic types. They don't change what's sound.",
+    "exercises": [
+      {
+        "id": "ts_variance-comparator",
+        "title": "One comparator for every subtype",
+        "prompt": "A comparator only *reads* its arguments, so one written for `Animal` sorts any list of animals — including `Dog`s. Replace `____` so `sorted` holds the dogs ordered by name, without modifying `dogs`.",
+        "hint": "`toSorted` returns a sorted copy; `byName` fits its comparator slot for `Dog`s because it accepts any `Animal`.",
+        "language": "typescript",
+        "kind": "drill",
+        "difficulty": "",
+        "starter": "import * as fs from \"fs\";\ntype Animal = { name: string };\ntype Dog = { name: string; breed: string };\nconst byName = (a: Animal, b: Animal): number => a.name.localeCompare(b.name);\nconst dogs: Dog[] = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\").map((line) => {\n  const [name = \"\", breed = \"\"] = line.trim().split(/\\s+/);\n  return { name, breed };\n});\nconst sorted = ____;\nfor (const d of sorted) console.log(`${d.name} (${d.breed})`);\nconsole.log(`first input: ${dogs[0]?.name}`);\n",
+        "solution": "import * as fs from \"fs\";\ntype Animal = { name: string };\ntype Dog = { name: string; breed: string };\nconst byName = (a: Animal, b: Animal): number => a.name.localeCompare(b.name);\nconst dogs: Dog[] = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\").map((line) => {\n  const [name = \"\", breed = \"\"] = line.trim().split(/\\s+/);\n  return { name, breed };\n});\nconst sorted = dogs.toSorted(byName);\nfor (const d of sorted) console.log(`${d.name} (${d.breed})`);\nconsole.log(`first input: ${dogs[0]?.name}`);\n",
+        "tests": [
+          {
+            "input": "rex lab\nada pug\nmilo beagle",
+            "output": "ada (pug)\nmilo (beagle)\nrex (lab)\nfirst input: rex"
+          },
+          {
+            "input": "solo mutt",
+            "output": "solo (mutt)\nfirst input: solo"
+          },
+          {
+            "input": "b x\na y",
+            "output": "a (y)\nb (x)\nfirst input: b"
+          }
+        ],
+        "source_slug": ""
+      },
+      {
+        "id": "ts_variance-readonly",
+        "title": "A read-only parameter accepts subtypes",
+        "prompt": "`oldest` only reads its argument, so it takes `readonly Person[]` — and a list of `Employee`s fits. Replace `____` with the expression that returns the oldest person's name (the first on a tie).",
+        "hint": "`reduce` without an initial value starts from the first element; keep the current best unless someone is strictly older.",
+        "language": "typescript",
+        "kind": "drill",
+        "difficulty": "",
+        "starter": "import * as fs from \"fs\";\ntype Person = { name: string; age: number };\ntype Employee = { name: string; age: number; team: string };\nfunction oldest(people: readonly Person[]): string {\n  return ____;\n}\nconst staff: Employee[] = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\").map((line) => {\n  const [name = \"\", age = \"0\", team = \"\"] = line.trim().split(/\\s+/);\n  return { name, age: Number(age), team };\n});\nconsole.log(oldest(staff));\nconsole.log(staff.map((e) => e.team).join(\",\"));\n",
+        "solution": "import * as fs from \"fs\";\ntype Person = { name: string; age: number };\ntype Employee = { name: string; age: number; team: string };\nfunction oldest(people: readonly Person[]): string {\n  return people.reduce((best, p) => (p.age > best.age ? p : best)).name;\n}\nconst staff: Employee[] = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\").map((line) => {\n  const [name = \"\", age = \"0\", team = \"\"] = line.trim().split(/\\s+/);\n  return { name, age: Number(age), team };\n});\nconsole.log(oldest(staff));\nconsole.log(staff.map((e) => e.team).join(\",\"));\n",
+        "tests": [
+          {
+            "input": "ana 31 web\nbo 45 ops\ncy 45 web",
+            "output": "bo\nweb,ops,web"
+          },
+          {
+            "input": "dee 20 qa",
+            "output": "dee\nqa"
+          }
+        ],
+        "source_slug": ""
+      },
+      {
+        "id": "ts_variance-handlers",
+        "title": "One logger, every event list",
+        "prompt": "Events are `<ms> key <k>` or `<ms> click <x> <y>`. Write `logAny(e: BaseEvent)` once and put it in *both* a `((e: KeyEvent) => string)[]` list and a `((e: ClickEvent) => string)[]` list, alongside a specific handler for each (`key <k>`, `click <x>,<y>`). For every event print the output of each handler in its list, joined by ` | `. Unknown lines print `skip`.",
+        "hint": "A function that accepts any `BaseEvent` is assignable to one that accepts a `KeyEvent` — parameters are contravariant.",
+        "language": "typescript",
+        "kind": "challenge",
+        "difficulty": "Medium",
+        "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+        "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype BaseEvent = { type: string; at: number };\ntype KeyEvent = { type: \"key\"; at: number; key: string };\ntype ClickEvent = { type: \"click\"; at: number; x: number; y: number };\nconst logAny = (e: BaseEvent): string => `${e.at}ms ${e.type}`;\nconst keyHandlers: ((e: KeyEvent) => string)[] = [logAny, (e) => `key ${e.key}`];\nconst clickHandlers: ((e: ClickEvent) => string)[] = [logAny, (e) => `click ${e.x},${e.y}`];\nfor (const line of input.split(\"\\n\")) {\n  const [at = \"\", type = \"\", a = \"\", b = \"\"] = line.trim().split(/\\s+/);\n  if (type === \"key\" && a !== \"\") {\n    const e: KeyEvent = { type, at: Number(at), key: a };\n    console.log(keyHandlers.map((h) => h(e)).join(\" | \"));\n  } else if (type === \"click\" && a !== \"\" && b !== \"\") {\n    const e: ClickEvent = { type, at: Number(at), x: Number(a), y: Number(b) };\n    console.log(clickHandlers.map((h) => h(e)).join(\" | \"));\n  } else {\n    console.log(\"skip\");\n  }\n}\n",
+        "tests": [
+          {
+            "input": "10 key a\n25 click 3 4\n30 hover\n41 key Z",
+            "output": "10ms key | key a\n25ms click | click 3,4\nskip\n41ms key | key Z"
+          },
+          {
+            "input": "5 click 0 0",
+            "output": "5ms click | click 0,0"
+          }
+        ],
+        "source_slug": ""
+      }
+    ],
+    "cards": [],
+    "quiz": [
+      {
+        "question": "`Dog` is assignable to `Animal`. Which is assignable to which for `type Getter<T> = () => T`?",
+        "options": [
+          "`Getter<Dog>` to `Getter<Animal>`",
+          "`Getter<Animal>` to `Getter<Dog>`",
+          "Neither",
+          "Both"
+        ],
+        "answer": 0,
+        "explanation": "A getter produces `T`, so it is covariant: same direction as `Dog → Animal`."
+      },
+      {
+        "question": "And for `type Handler<T> = (x: T) => void`?",
+        "options": [
+          "`Handler<Animal>` to `Handler<Dog>`",
+          "`Handler<Dog>` to `Handler<Animal>`",
+          "Neither",
+          "Both"
+        ],
+        "answer": 0,
+        "explanation": "A handler consumes `T`: contravariant. A handler of any animal can handle a dog."
+      },
+      {
+        "question": "Why is passing `Dog[]` where `Animal[]` is expected unsound?",
+        "options": [
+          "The receiver can push a non-dog into your array",
+          "Arrays are compared by length",
+          "It isn't — arrays are read-only",
+          "Dog[] has fewer methods"
+        ],
+        "answer": 0,
+        "explanation": "TypeScript allows it for convenience; `readonly Animal[]` makes it genuinely safe."
+      },
+      {
+        "question": "What variance does `{ get(): T; set(v: T): void }` have in `T`?",
+        "options": [
+          "Invariant",
+          "Covariant",
+          "Contravariant",
+          "Bivariant"
+        ],
+        "answer": 0,
+        "explanation": "It both produces and consumes `T`, so only the exact same `T` fits."
+      },
+      {
+        "question": "What does `interface Source<out T>` do?",
+        "options": [
+          "Declares `T` covariant, and the compiler checks that `T` is only produced",
+          "Makes `T` optional",
+          "Exports `T`",
+          "Makes `Source` readonly at runtime"
+        ],
+        "answer": 0,
+        "explanation": "Variance annotations are checked, erased documentation."
+      },
+      {
+        "question": "Which declaration gets the strict, contravariant parameter check under `strictFunctionTypes`?",
+        "options": [
+          "`handle: (x: T) => void`",
+          "`handle(x: T): void`",
+          "Both",
+          "Neither"
+        ],
+        "answer": 0,
+        "explanation": "Method syntax stays bivariant; property syntax with a function type is checked contravariantly."
+      }
+    ],
+    "practice": []
+  },
+  {
+    "key": "ts_parse_dont_validate",
+    "name": "Parse, Don't Validate",
+    "category": "TS: Type System",
+    "what": "Turn checks into types: smart constructors, `unique symbol` brands and shapes like non-empty tuples, so that an invalid value cannot be constructed and a valid one never needs checking again.",
+    "deep": "A validator answers yes or no and throws the answer away: the next function receives the same `string` and has to trust — or recheck — that it was validated. A *parser* returns a new, more precise type (`Email`, `Port`, `NonEmpty`) that can only be produced by passing the check. Brands built on a module-private `unique symbol` make that type impossible to forge by accident, and the rest of the program simply asks for `Email` instead of `string`.",
+    "java": "In Java you'd write a small final class with a private constructor and a static `parse` factory — a real wrapper object at runtime. TypeScript gets the same guarantee with zero runtime cost: the brand is a type-only property on a plain `string` or `number`, erased before the program runs.",
+    "language": "typescript",
+    "lesson": "### Why it exists\nHere is how validation usually goes. A function checks that a string looks like\nan email and returns `true`. The caller, satisfied, passes the *same string*\non — typed `string`, exactly like every unvalidated string in the program. Three\ncalls later, a function that needs an email has no way to know whether this one\nwas checked. So either it checks again (and there are now four copies of the\nrule, slowly drifting apart) or it doesn't (and one day a path skips the check).\n\nThe phrase *parse, don't validate* names the fix. A parser does the same\nchecking but **returns a different type** — `Email` rather than `string` — and\nit is the only way to obtain one. Functions that need a checked value ask for\n`Email`; the compiler then proves, at every call site, that the check happened.\nThe knowledge you gained by checking is kept, in the type.\n\n### The core idea\n**A smart constructor** is a function that is the single door into a type:\n\n```ts\ndeclare const EmailBrand: unique symbol;\nexport type Email = string & { readonly [EmailBrand]: true };\n\nexport function parseEmail(raw: string): Email | undefined {\n  const s = raw.trim().toLowerCase();\n  return /^[^@\\s]+@[^@\\s]+\\.[a-z]+$/.test(s) ? (s as Email) : undefined;\n}\n```\n\n- `declare const EmailBrand: unique symbol` creates a symbol *type* that exists\n  only in this module. It is erased — `declare` emits nothing — so the brand\n  costs nothing at runtime.\n- `Email` is a `string` with an extra, type-only property keyed by that symbol.\n  An ordinary string doesn't have it, so a plain `\"x@y.z\"` is not an `Email`.\n- The one `as Email` lives inside the parser, right after the check. Code\n  elsewhere can't name `EmailBrand` (when it isn't exported), so it can't write\n  the brand type by hand — only `parseEmail` makes `Email`s.\n\n**Parse at the boundary, then trust the types.** Input arrives as text at the\nedges of a program: stdin, JSON, a form. Parse it there, once, into precise\ntypes, and let everything inside take those types. A function that takes\n`Email` never validates; a function that takes `string` never assumes.\n\n**Normalise while you parse.** A parser can return the *canonical* form —\ntrimmed, lower-cased, integer cents — so that equal things are equal.\n\n**Shapes can carry facts too.** Not every precise type needs a brand:\n\n- `readonly [T, ...T[]]` is a non-empty list; its first element is never\n  `undefined`.\n- A discriminated union can make an impossible combination unrepresentable\n  (week 12).\n- A `Result` instead of `undefined` can say *why* parsing failed (week 25).\n\n**The cost** is the boundary code: a parser per precise type, and a moment's\nthought about which functions should take `Email` and which `string`. The pay-off\nis that the question \"was this checked?\" disappears from the rest of the code.\n\n### Worked examples\n#### An `Email` only a parser can make\n```ts\ndeclare const EmailBrand: unique symbol;\ntype Email = string & { readonly [EmailBrand]: true };\n\nfunction parseEmail(raw: string): Email | undefined {\n  const s = raw.trim().toLowerCase();\n  return /^[^@\\s]+@[^@\\s]+\\.[a-z]+$/.test(s) ? (s as Email) : undefined;\n}\n\nfunction sendWelcome(to: Email): string {\n  return \"welcome mail -> \" + to;\n}\n\nfor (const raw of [\"  Ana@Example.COM \", \"bob\", \"cy@x.io\"]) {\n  const email = parseEmail(raw);\n  console.log(email === undefined ? `rejected \"${raw.trim()}\"` : sendWelcome(email));\n}\n```\n\nPrints:\n```text\nwelcome mail -> ana@example.com\nrejected \"bob\"\nwelcome mail -> cy@x.io\n```\n\n`sendWelcome` cannot be called with a raw string, so there is no way to forget the check. And the parser normalised the address on the way in: `ana@example.com`.\n\n#### A list that cannot be empty\n```ts\ntype NonEmpty = readonly [number, ...number[]];\n\nfunction parseNonEmpty(xs: readonly number[]): NonEmpty | undefined {\n  const [head, ...rest] = xs;\n  return head === undefined ? undefined : [head, ...rest];\n}\n\nfunction range(xs: NonEmpty): string {\n  let lo = xs[0];\n  let hi = xs[0];\n  for (const x of xs) {\n    lo = Math.min(lo, x);\n    hi = Math.max(hi, x);\n  }\n  return `${lo}..${hi}`;\n}\n\nfor (const xs of [[4, 9, 1], [], [7]]) {\n  const checked = parseNonEmpty(xs);\n  console.log(checked === undefined ? \"no values\" : range(checked));\n}\n```\n\nPrints:\n```text\n1..9\nno values\n7..7\n```\n\nInside `range`, `xs[0]` is a `number` — never `undefined`, even under `noUncheckedIndexedAccess` — because the tuple type says a first element exists. The check happened once, in the parser, and became a shape.\n\n#### Parse at the edge, trust inside\n```ts\ndeclare const CentsBrand: unique symbol;\ntype Cents = number & { readonly [CentsBrand]: true };\ntype Order = { sku: string; qty: number; price: Cents };\n\nfunction parseCents(text: string): Cents | undefined {\n  const m = /^(\\d+)(?:\\.(\\d{2}))?$/.exec(text);\n  if (m === null) return undefined;\n  return (Number(m[1]) * 100 + Number(m[2] ?? \"0\")) as Cents;\n}\n\nfunction parseOrder(line: string): Order | string {\n  const [sku = \"\", qty = \"\", price = \"\"] = line.split(\",\");\n  const n = Number(qty);\n  if (!/^[A-Z]{3}\\d{2}$/.test(sku)) return `bad sku ${sku}`;\n  if (!Number.isInteger(n) || n <= 0) return `bad qty ${qty}`;\n  const cents = parseCents(price);\n  return cents === undefined ? `bad price ${price}` : { sku, qty: n, price: cents };\n}\n\nfunction lineTotal(o: Order): Cents {\n  return (o.qty * o.price) as Cents;\n}\n\nfor (const line of [\"ABC12,3,1.50\", \"XYZ99,1,20\", \"abc,1,1.00\", \"DEF10,2,1.5\"]) {\n  const o = parseOrder(line);\n  console.log(typeof o === \"string\" ? o : `${o.sku}: ${(lineTotal(o) / 100).toFixed(2)}`);\n}\n```\n\nPrints:\n```text\nABC12: 4.50\nXYZ99: 20.00\nbad sku abc\nbad price 1.5\n```\n\nPrices become integer cents the moment they enter, so `lineTotal` never sees `\"1.50\"` or floating-point dollars. Everything after `parseOrder` works with `Order`s, not strings.\n\n### What the compiler says\n```ts\ndeclare const EmailBrand: unique symbol;\ntype Email = string & { readonly [EmailBrand]: true };\nfunction sendWelcome(to: Email): string {\n  return \"welcome \" + to;\n}\nsendWelcome(\"ana@example.com\");\n```\n```text\nline 6: error TS2345: Argument of type 'string' is not assignable to parameter of type 'Email'.\n  Type 'string' is not assignable to type '{ readonly [EmailBrand]: true; }'.\n```\n\nA string literal is a `string`, not an `Email`: it hasn't been through the parser. This error is the whole design working — the only way to get an `Email` is `parseEmail`.\n\n```ts\ntype NonEmpty = readonly [number, ...number[]];\nconst none: NonEmpty = [];\n```\n```text\nline 2: error TS2322: Type '[]' is not assignable to type 'NonEmpty'.\n  Source has 0 element(s) but target requires 1.\n```\n\n`[]` has no first element, and `NonEmpty` requires one. An empty list is not constructible as this type.\n\n### Pitfalls\n#### Validate, then forget\n```ts\nfunction isEmail(s: string): boolean {\n  return /^[^@\\s]+@[^@\\s]+$/.test(s);\n}\nfunction sendWelcome(to: string): string {\n  return \"welcome mail -> \" + to;\n}\nconst signups = [\"ana@x.io\", \"bob\"];\nconst first = signups[0] ?? \"\";\nif (isEmail(first)) console.log(sendWelcome(first));\nconsole.log(sendWelcome(signups[1] ?? \"\")); // this path forgot to check\n```\nPrints:\n```text\nwelcome mail -> ana@x.io\nwelcome mail -> bob\n```\n\nThe boolean validator knew `\"bob\"` was bad, and threw that knowledge away. When `sendWelcome` demands an `Email`, the path that forgot to check doesn't compile.\n\n```ts\ndeclare const EmailBrand: unique symbol;\ntype Email = string & { readonly [EmailBrand]: true };\nfunction parseEmail(s: string): Email | undefined {\n  return /^[^@\\s]+@[^@\\s]+$/.test(s) ? (s as Email) : undefined;\n}\nfunction sendWelcome(to: Email): string {\n  return \"welcome mail -> \" + to;\n}\nfor (const raw of [\"ana@x.io\", \"bob\"]) {\n  const email = parseEmail(raw);\n  console.log(email === undefined ? \"rejected \" + raw : sendWelcome(email));\n}\n```\nPrints:\n```text\nwelcome mail -> ana@x.io\nrejected bob\n```\n\n#### A brand forged with `as`\n```ts\ndeclare const EmailBrand: unique symbol;\ntype Email = string & { readonly [EmailBrand]: true };\nfunction sendWelcome(to: Email): string {\n  return \"welcome mail -> \" + to;\n}\nconst quick = \"not an email\" as Email;\nconsole.log(sendWelcome(quick));\n```\nPrints:\n```text\nwelcome mail -> not an email\n```\n\nA brand is only as strong as the rule that nobody casts to it outside the parser. `as Email` elsewhere is a lie the compiler can't catch — keep the one cast in the smart constructor and review any other.\n\n```ts\ndeclare const EmailBrand: unique symbol;\ntype Email = string & { readonly [EmailBrand]: true };\nfunction parseEmail(s: string): Email | undefined {\n  return /^[^@\\s]+@[^@\\s]+$/.test(s) ? (s as Email) : undefined;\n}\nfunction sendWelcome(to: Email): string {\n  return \"welcome mail -> \" + to;\n}\nconst quick = parseEmail(\"not an email\");\nconsole.log(quick === undefined ? \"rejected\" : sendWelcome(quick));\n```\nPrints:\n```text\nrejected\n```\n\n#### Checking without normalising\n```ts\nconst seen = new Set<string>();\nfor (const raw of [\"Ana@X.io\", \" ana@x.io\", \"ANA@X.IO \"]) {\n  if (/^\\s*[^@\\s]+@[^@\\s]+\\s*$/.test(raw)) seen.add(raw);\n}\nconsole.log(\"distinct users: \" + seen.size);\n```\nPrints:\n```text\ndistinct users: 3\n```\n\nA validator that accepts all three spellings but keeps them as typed creates three users. A parser returns the canonical form, so equal emails are equal strings.\n\n```ts\nconst seen = new Set<string>();\nfor (const raw of [\"Ana@X.io\", \" ana@x.io\", \"ANA@X.IO \"]) {\n  const email = raw.trim().toLowerCase();\n  if (/^[^@\\s]+@[^@\\s]+$/.test(email)) seen.add(email);\n}\nconsole.log(\"distinct users: \" + seen.size);\n```\nPrints:\n```text\ndistinct users: 1\n```\n\n### Where it shows up later\n- **Week 17 — Runtime validation.** Parsing whole objects from JSON with a schema that also produces the type.\n- **Week 25 — Errors and `Result`.** A parser that says *why* it failed, instead of `undefined`.\n- **Week 23 — Classes.** A private constructor and a static `parse` is the class-shaped smart constructor.\n\n### In an interview\n\n**What does \"parse, don't validate\" mean?**\n\nInstead of checking data and returning a boolean — which loses the knowledge — you transform it into a more precise type that can only be produced by passing the check, like `Email` or a non-empty tuple. Downstream functions take the precise type, so the compiler proves the check happened and nobody re-validates.\n\n**How do you make a branded type that can't be forged?**\n\nIntersect the base type with a property keyed by a module-private `unique symbol`: `declare const B: unique symbol; type Email = string & { readonly [B]: true }`. Only the module's smart constructor casts to it. It costs nothing at runtime. Code can still lie with `as`, so the rule is one cast, in the parser.\n\n**Brands or wrapper classes?**\n\nBrands are free at runtime and the value is still a plain string or number, which serialises and compares naturally. A wrapper class gives you `instanceof` and a place for methods, at the cost of an allocation and conversions at every boundary. For IDs, units and validated strings I use brands.",
+    "exercises": [
+      {
+        "id": "ts_parse_dont_validate-port",
+        "title": "A port only a parser can make",
+        "prompt": "`Port` is a branded number. Replace `____` with the condition under which `text` is a valid port: all digits, and between 1 and 65535.",
+        "hint": "Check the characters first — `Number(\"1e3\")` is 1000 — then the range.",
+        "language": "typescript",
+        "kind": "drill",
+        "difficulty": "",
+        "starter": "import * as fs from \"fs\";\ndeclare const PortBrand: unique symbol;\ntype Port = number & { readonly [PortBrand]: true };\nfunction parsePort(text: string): Port | undefined {\n  const n = Number(text);\n  return ____ ? (n as Port) : undefined;\n}\nfunction listen(port: Port): string {\n  return `listening on ${port}`;\n}\nfor (const line of fs.readFileSync(0, \"utf8\").trim().split(\"\\n\")) {\n  const port = parsePort(line.trim());\n  console.log(port === undefined ? `bad port ${line.trim()}` : listen(port));\n}\n",
+        "solution": "import * as fs from \"fs\";\ndeclare const PortBrand: unique symbol;\ntype Port = number & { readonly [PortBrand]: true };\nfunction parsePort(text: string): Port | undefined {\n  const n = Number(text);\n  return /^\\d+$/.test(text) && n >= 1 && n <= 65535 ? (n as Port) : undefined;\n}\nfunction listen(port: Port): string {\n  return `listening on ${port}`;\n}\nfor (const line of fs.readFileSync(0, \"utf8\").trim().split(\"\\n\")) {\n  const port = parsePort(line.trim());\n  console.log(port === undefined ? `bad port ${line.trim()}` : listen(port));\n}\n",
+        "tests": [
+          {
+            "input": "8080\n0\n65536\n443",
+            "output": "listening on 8080\nbad port 0\nbad port 65536\nlistening on 443"
+          },
+          {
+            "input": "80.5\n-1\n1",
+            "output": "bad port 80.5\nbad port -1\nlistening on 1"
+          },
+          {
+            "input": "abc",
+            "output": "bad port abc"
+          }
+        ],
+        "source_slug": ""
+      },
+      {
+        "id": "ts_parse_dont_validate-nonempty",
+        "title": "Parse into a non-empty tuple",
+        "prompt": "Replace `____` so `parseNonEmpty` returns a `NonEmpty` when the list has at least one value (and `undefined` otherwise). `average` can then read `xs[0]` without a check.",
+        "hint": "Destructure the head; if it exists, rebuild the tuple as `[head, ...rest]`.",
+        "language": "typescript",
+        "kind": "drill",
+        "difficulty": "",
+        "starter": "import * as fs from \"fs\";\ntype NonEmpty = readonly [number, ...number[]];\nfunction parseNonEmpty(xs: readonly number[]): NonEmpty | undefined {\n  const [head, ...rest] = xs;\n  return ____;\n}\nfunction summary(xs: NonEmpty): string {\n  const avg = xs.reduce((a, b) => a + b, 0) / xs.length;\n  return `first ${xs[0]}, average ${avg.toFixed(1)}`;\n}\nfor (const line of fs.readFileSync(0, \"utf8\").trim().split(\"\\n\")) {\n  const values = line.trim() === \"-\" ? [] : line.trim().split(/\\s+/).map(Number);\n  const checked = parseNonEmpty(values);\n  console.log(checked === undefined ? \"empty\" : summary(checked));\n}\n",
+        "solution": "import * as fs from \"fs\";\ntype NonEmpty = readonly [number, ...number[]];\nfunction parseNonEmpty(xs: readonly number[]): NonEmpty | undefined {\n  const [head, ...rest] = xs;\n  return head === undefined ? undefined : [head, ...rest];\n}\nfunction summary(xs: NonEmpty): string {\n  const avg = xs.reduce((a, b) => a + b, 0) / xs.length;\n  return `first ${xs[0]}, average ${avg.toFixed(1)}`;\n}\nfor (const line of fs.readFileSync(0, \"utf8\").trim().split(\"\\n\")) {\n  const values = line.trim() === \"-\" ? [] : line.trim().split(/\\s+/).map(Number);\n  const checked = parseNonEmpty(values);\n  console.log(checked === undefined ? \"empty\" : summary(checked));\n}\n",
+        "tests": [
+          {
+            "input": "3 4 5\n-\n10",
+            "output": "first 3, average 4.0\nempty\nfirst 10, average 10.0"
+          },
+          {
+            "input": "7 7",
+            "output": "first 7, average 7.0"
+          }
+        ],
+        "source_slug": ""
+      },
+      {
+        "id": "ts_parse_dont_validate-usernames",
+        "title": "Register usernames",
+        "prompt": "Each input line is a requested username. Parse it into a branded `Username`: trim and lower-case it; it must be 3-12 characters of `a-z`, `0-9` and `_`, starting with a letter. Print `registered <name>`, `taken <name>` (already registered, compared after normalising), or `rejected \"<trimmed input>\": <reason>` with reason `length` or `characters` (length is checked first). Finish with `<k> users`.",
+        "hint": "Return either the branded name or the reason it failed; narrow on the two reason strings.",
+        "language": "typescript",
+        "kind": "challenge",
+        "difficulty": "Medium",
+        "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+        "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ndeclare const UsernameBrand: unique symbol;\ntype Username = string & { readonly [UsernameBrand]: true };\nfunction parseUsername(raw: string): Username | \"length\" | \"characters\" {\n  const s = raw.trim().toLowerCase();\n  if (s.length < 3 || s.length > 12) return \"length\";\n  if (!/^[a-z][a-z0-9_]*$/.test(s)) return \"characters\";\n  return s as Username;\n}\nconst users = new Set<Username>();\nfor (const line of input.split(\"\\n\")) {\n  const result = parseUsername(line);\n  if (result === \"length\" || result === \"characters\") {\n    console.log(`rejected \"${line.trim()}\": ${result}`);\n  } else if (users.has(result)) {\n    console.log(`taken ${result}`);\n  } else {\n    users.add(result);\n    console.log(`registered ${result}`);\n  }\n}\nconsole.log(`${users.size} users`);\n",
+        "tests": [
+          {
+            "input": "Ana_1\nana_1\nbo\n9lives\nsuper_long_name_x\nCy",
+            "output": "registered ana_1\ntaken ana_1\nrejected \"bo\": length\nrejected \"9lives\": characters\nrejected \"super_long_name_x\": length\nrejected \"Cy\": length\n1 users"
+          },
+          {
+            "input": "  Dee  \ndee\nd-e-e",
+            "output": "registered dee\ntaken dee\nrejected \"d-e-e\": characters\n1 users"
+          }
+        ],
+        "source_slug": ""
+      }
+    ],
+    "cards": [],
+    "quiz": [
+      {
+        "question": "What is the difference between a validator and a parser?",
+        "options": [
+          "A parser returns a more precise type that records the check; a validator returns a boolean",
+          "A parser is faster",
+          "A validator throws, a parser doesn't",
+          "There is none"
+        ],
+        "answer": 0,
+        "explanation": "The parser's return type carries the knowledge forward, so nothing downstream has to recheck."
+      },
+      {
+        "question": "What does `declare const Brand: unique symbol` emit at runtime?",
+        "options": [
+          "Nothing — `declare` is erased",
+          "A new Symbol()",
+          "A frozen object",
+          "A class"
+        ],
+        "answer": 0,
+        "explanation": "It only creates a type-level unique symbol to key the brand property."
+      },
+      {
+        "question": "Where should the `as Email` cast appear?",
+        "options": [
+          "Once, inside the parser, right after the check",
+          "Wherever an email is needed",
+          "In every test",
+          "Nowhere — brands need no casts"
+        ],
+        "answer": 0,
+        "explanation": "Concentrating the cast in the smart constructor is what makes the brand trustworthy."
+      },
+      {
+        "question": "Why is `readonly [number, ...number[]]` useful?",
+        "options": [
+          "Its first element is never `undefined`, so code taking it needs no emptiness check",
+          "It is faster than an array",
+          "It can't be iterated",
+          "It prevents duplicates"
+        ],
+        "answer": 0,
+        "explanation": "The non-emptiness is proven once, at construction, and carried in the type."
+      },
+      {
+        "question": "A parser trims and lower-cases emails. Why?",
+        "options": [
+          "So equal addresses become equal strings — normalising is part of parsing",
+          "Regexes can't match capitals",
+          "The brand requires it",
+          "It's faster to compare"
+        ],
+        "answer": 0,
+        "explanation": "Returning the canonical form removes a whole class of duplicate bugs."
+      },
+      {
+        "question": "Where in a program should parsing happen?",
+        "options": [
+          "At the boundary, where untyped input enters — once",
+          "In every function that uses the value",
+          "Only in tests",
+          "Just before printing"
+        ],
+        "answer": 0,
+        "explanation": "Inside the boundary, the precise types carry the guarantee."
+      }
+    ],
+    "practice": []
+  },
+  {
+    "key": "ts_runtime_validation",
+    "name": "Runtime Validation with Schemas",
+    "category": "TS: Robustness",
+    "what": "A mini schema library — `str()`, `num()`, `arr()`, `obj({...})` — where each validator also carries a type, so `Infer<typeof schema>` gives you the TypeScript type and the check can never drift from it.",
+    "deep": "Types are erased, so data from outside (JSON, stdin, a form) must be checked at runtime. Write the check and the type separately and they drift: the type says `age: number`, the validator forgot to check it. A schema is a value that knows how to check data *and* carries the type it proves; the type is derived from it (`type User = Infer<typeof User>`), so there is only one source of truth. This is how Zod, Valibot and ArkType work — and you can build the core in sixty lines.",
+    "java": "Java deserialisers (Jackson) validate against a class you already wrote, using reflection at runtime. TypeScript has no runtime types to reflect on, so the direction flips: you write the *validator* as a value and derive the static type from it.",
+    "language": "typescript",
+    "lesson": "### Why it exists\nEverything TypeScript knows is gone by the time the program runs. When\n`JSON.parse` hands you something, its type is whatever you say it is — and\n`JSON.parse(text) as User` is a promise nobody checked.\n\nSo you write a validator. And now you have two descriptions of a `User`: the\ntype, which the compiler reads, and the validator, which the runtime runs.\nThey start out the same. Then someone adds `email` to the type and forgets the\nvalidator, or loosens the validator and forgets the type. The compiler can't\nnotice, because it can't read what the validator *means*.\n\nThe fix is to write the description **once**, as a value the runtime can run,\nand have the compiler *compute* the type from it. That value is a schema.\n\n### The core idea\n**A schema is an object with a `parse` method** that takes `unknown` and returns\neither the value — now typed — or a list of issues:\n\n```ts\ntype Parsed<T> = { ok: true; value: T } | { ok: false; issues: string[] };\ntype Schema<T> = { parse: (value: unknown, path: string) => Parsed<T> };\n```\n\n**Small schemas combine into big ones.** `str()` and `num()` check primitives;\n`arr(item)` checks every element with `item`; `opt(inner)` also allows a missing\nvalue; `obj({ name: str(), age: num() })` checks each property with its schema\nand collects *every* issue, each with a path like `user.tags[2]`.\n\n**The type comes out of the schema.**\n\n```ts\nconst User = obj({ name: str(), age: num(), tags: arr(str()) });\ntype User = Infer<typeof User>;   // { name: string; age: number; tags: string[] }\n```\n\n`Infer` reads the `T` back out of a `Schema<T>`; `obj` builds its result type by\nmapping over the shape's keys. You will write both of those type-level tools\nyourself in weeks 20 and 21 — for now, notice what they buy: change the schema,\nand the type changes with it. There is nothing to keep in sync.\n\n**Use it at the boundary.**\n\n```ts\nconst r = User.parse(JSON.parse(text), \"user\");\nif (r.ok) greet(r.value);            // r.value: User\nelse console.log(r.issues.join(\"\\n\"));\n```\n\nEverything after the `if` works with a real `User`; nothing inside the program\nneeds to check again. That is parse-don't-validate (week 16) for whole objects.\n\n**Real libraries** — Zod, Valibot, ArkType — add unions, refinements\n(`.min(3)`), transforms and good error messages, but the core is exactly this.\n\n### Worked examples\n#### A schema, and the type computed from it\n```ts\ntype Parsed<T> = { ok: true; value: T } | { ok: false; issues: string[] };\ntype Schema<T> = { parse: (value: unknown, path: string) => Parsed<T> };\ntype Infer<S> = S extends Schema<infer T> ? T : never;\n\nconst fail = (path: string, expected: string): Parsed<never> => ({ ok: false, issues: [`${path}: expected ${expected}`] });\nconst str = (): Schema<string> => ({\n  parse: (v, path) => (typeof v === \"string\" ? { ok: true, value: v } : fail(path, \"string\")),\n});\nconst num = (): Schema<number> => ({\n  parse: (v, path) => (typeof v === \"number\" && Number.isFinite(v) ? { ok: true, value: v } : fail(path, \"number\")),\n});\nfunction opt<T>(inner: Schema<T>): Schema<T | undefined> {\n  return { parse: (v, path) => (v === undefined ? { ok: true, value: undefined } : inner.parse(v, path)) };\n}\nfunction arr<T>(item: Schema<T>): Schema<T[]> {\n  return {\n    parse(v, path) {\n      if (!Array.isArray(v)) return fail(path, \"array\");\n      const out: T[] = [];\n      const issues: string[] = [];\n      v.forEach((x: unknown, i) => {\n        const r = item.parse(x, `${path}[${i}]`);\n        if (r.ok) out.push(r.value);\n        else issues.push(...r.issues);\n      });\n      return issues.length > 0 ? { ok: false, issues } : { ok: true, value: out };\n    },\n  };\n}\nfunction obj<S extends Record<string, Schema<unknown>>>(shape: S): Schema<{ [K in keyof S]: Infer<S[K]> }> {\n  return {\n    parse(v, path) {\n      if (typeof v !== \"object\" || v === null || Array.isArray(v)) return fail(path, \"object\");\n      const record = v as Record<string, unknown>;\n      const out: Record<string, unknown> = {};\n      const issues: string[] = [];\n      for (const [key, schema] of Object.entries(shape)) {\n        const r = schema.parse(record[key], `${path}.${key}`);\n        if (r.ok) out[key] = r.value;\n        else issues.push(...r.issues);\n      }\n      return issues.length > 0 ? { ok: false, issues } : { ok: true, value: out as { [K in keyof S]: Infer<S[K]> } };\n    },\n  };\n}\n\nconst User = obj({ name: str(), age: num(), tags: arr(str()) });\ntype User = Infer<typeof User>;\n\nfunction greet(u: User): string {\n  return `${u.name} (${u.age}) ${u.tags.join(\"/\") || \"no tags\"}`;\n}\n\nfor (const text of ['{\"name\":\"ana\",\"age\":31,\"tags\":[\"admin\",\"ops\"]}', '{\"name\":\"bo\",\"age\":40,\"tags\":[]}']) {\n  const r = User.parse(JSON.parse(text), \"user\");\n  console.log(r.ok ? greet(r.value) : r.issues.join(\"; \"));\n}\n```\n\nPrints:\n```text\nana (31) admin/ops\nbo (40) no tags\n```\n\n`greet` is written against `User`, a type nobody wrote by hand. Add a field to the schema and `User` gains it; the compiler then points at every place that should use it.\n\n#### Every issue, with a path\n```ts\ntype Parsed<T> = { ok: true; value: T } | { ok: false; issues: string[] };\ntype Schema<T> = { parse: (value: unknown, path: string) => Parsed<T> };\ntype Infer<S> = S extends Schema<infer T> ? T : never;\n\nconst fail = (path: string, expected: string): Parsed<never> => ({ ok: false, issues: [`${path}: expected ${expected}`] });\nconst str = (): Schema<string> => ({\n  parse: (v, path) => (typeof v === \"string\" ? { ok: true, value: v } : fail(path, \"string\")),\n});\nconst num = (): Schema<number> => ({\n  parse: (v, path) => (typeof v === \"number\" && Number.isFinite(v) ? { ok: true, value: v } : fail(path, \"number\")),\n});\nfunction opt<T>(inner: Schema<T>): Schema<T | undefined> {\n  return { parse: (v, path) => (v === undefined ? { ok: true, value: undefined } : inner.parse(v, path)) };\n}\nfunction arr<T>(item: Schema<T>): Schema<T[]> {\n  return {\n    parse(v, path) {\n      if (!Array.isArray(v)) return fail(path, \"array\");\n      const out: T[] = [];\n      const issues: string[] = [];\n      v.forEach((x: unknown, i) => {\n        const r = item.parse(x, `${path}[${i}]`);\n        if (r.ok) out.push(r.value);\n        else issues.push(...r.issues);\n      });\n      return issues.length > 0 ? { ok: false, issues } : { ok: true, value: out };\n    },\n  };\n}\nfunction obj<S extends Record<string, Schema<unknown>>>(shape: S): Schema<{ [K in keyof S]: Infer<S[K]> }> {\n  return {\n    parse(v, path) {\n      if (typeof v !== \"object\" || v === null || Array.isArray(v)) return fail(path, \"object\");\n      const record = v as Record<string, unknown>;\n      const out: Record<string, unknown> = {};\n      const issues: string[] = [];\n      for (const [key, schema] of Object.entries(shape)) {\n        const r = schema.parse(record[key], `${path}.${key}`);\n        if (r.ok) out[key] = r.value;\n        else issues.push(...r.issues);\n      }\n      return issues.length > 0 ? { ok: false, issues } : { ok: true, value: out as { [K in keyof S]: Infer<S[K]> } };\n    },\n  };\n}\n\nconst Order = obj({\n  id: num(),\n  customer: obj({ name: str(), email: opt(str()) }),\n  items: arr(obj({ sku: str(), qty: num() })),\n});\n\nconst inputs = [\n  '{\"id\":7,\"customer\":{\"name\":\"ana\"},\"items\":[{\"sku\":\"A1\",\"qty\":2}]}',\n  '{\"id\":\"7\",\"customer\":{\"email\":3},\"items\":[{\"sku\":\"A1\",\"qty\":\"2\"},{\"qty\":1}]}',\n  '[1,2]',\n];\nfor (const text of inputs) {\n  const r = Order.parse(JSON.parse(text), \"order\");\n  if (r.ok) {\n    const units = r.value.items.reduce((n, item) => n + item.qty, 0);\n    console.log(`order ${r.value.id} for ${r.value.customer.name}: ${units} units`);\n  } else {\n    console.log(r.issues.join(\"\\n\"));\n  }\n}\n```\n\nPrints:\n```text\norder 7 for ana: 2 units\norder.id: expected number\norder.customer.name: expected string\norder.customer.email: expected string\norder.items[0].qty: expected number\norder.items[1].sku: expected string\norder: expected object\n```\n\nThe second input is wrong in five places, and all five are reported at once, each with the exact path — which is what whoever sent the data needs to fix it in one go.\n\n#### Parse once, then trust\n```ts\ntype Parsed<T> = { ok: true; value: T } | { ok: false; issues: string[] };\ntype Schema<T> = { parse: (value: unknown, path: string) => Parsed<T> };\ntype Infer<S> = S extends Schema<infer T> ? T : never;\n\nconst fail = (path: string, expected: string): Parsed<never> => ({ ok: false, issues: [`${path}: expected ${expected}`] });\nconst str = (): Schema<string> => ({\n  parse: (v, path) => (typeof v === \"string\" ? { ok: true, value: v } : fail(path, \"string\")),\n});\nconst num = (): Schema<number> => ({\n  parse: (v, path) => (typeof v === \"number\" && Number.isFinite(v) ? { ok: true, value: v } : fail(path, \"number\")),\n});\nfunction opt<T>(inner: Schema<T>): Schema<T | undefined> {\n  return { parse: (v, path) => (v === undefined ? { ok: true, value: undefined } : inner.parse(v, path)) };\n}\nfunction arr<T>(item: Schema<T>): Schema<T[]> {\n  return {\n    parse(v, path) {\n      if (!Array.isArray(v)) return fail(path, \"array\");\n      const out: T[] = [];\n      const issues: string[] = [];\n      v.forEach((x: unknown, i) => {\n        const r = item.parse(x, `${path}[${i}]`);\n        if (r.ok) out.push(r.value);\n        else issues.push(...r.issues);\n      });\n      return issues.length > 0 ? { ok: false, issues } : { ok: true, value: out };\n    },\n  };\n}\nfunction obj<S extends Record<string, Schema<unknown>>>(shape: S): Schema<{ [K in keyof S]: Infer<S[K]> }> {\n  return {\n    parse(v, path) {\n      if (typeof v !== \"object\" || v === null || Array.isArray(v)) return fail(path, \"object\");\n      const record = v as Record<string, unknown>;\n      const out: Record<string, unknown> = {};\n      const issues: string[] = [];\n      for (const [key, schema] of Object.entries(shape)) {\n        const r = schema.parse(record[key], `${path}.${key}`);\n        if (r.ok) out[key] = r.value;\n        else issues.push(...r.issues);\n      }\n      return issues.length > 0 ? { ok: false, issues } : { ok: true, value: out as { [K in keyof S]: Infer<S[K]> } };\n    },\n  };\n}\n\nconst Config = obj({ host: str(), port: opt(num()), retries: opt(num()) });\ntype Config = Infer<typeof Config>;\n\nfunction describe(c: Config): string {\n  return `${c.host}:${c.port ?? 80}, ${c.retries ?? 3} retries`;\n}\n\nfor (const text of ['{\"host\":\"db.local\",\"port\":5432}', '{\"host\":\"api\",\"retries\":0}', '{\"port\":\"80\"}']) {\n  const r = Config.parse(JSON.parse(text), \"config\");\n  console.log(r.ok ? describe(r.value) : \"invalid: \" + r.issues.join(\", \"));\n}\n```\n\nPrints:\n```text\ndb.local:5432, 3 retries\napi:80, 0 retries\ninvalid: config.host: expected string, config.port: expected number\n```\n\n`describe` handles only the optional fields' defaults — never the question of whether `host` exists or `port` is secretly a string. Note `retries: 0` survives: `??` keeps real zeroes.\n\n### What the compiler says\n```ts\ntype Schema<T> = { parse: (value: unknown) => T | undefined };\ntype Infer<S> = S extends Schema<infer T> ? T : never;\ndeclare function num(): Schema<number>;\ndeclare function obj<S extends Record<string, Schema<unknown>>>(shape: S): Schema<{ [K in keyof S]: Infer<S[K]> }>;\n\nconst Point = obj({ x: num(), y: num() });\ntype Point = Infer<typeof Point>;\nfunction depth(p: Point): number {\n  return p.z;\n}\n```\n```text\nline 9: error TS2339: Property 'z' does not exist on type '{ x: number; y: number; }'.\n```\n\nThe type came from the schema, and the schema has no `z`. To use a field you must first put it in the schema — which is exactly what keeps the check and the type in step.\n\n```ts\ntype Schema<T> = { parse: (value: unknown) => T | undefined };\ntype Infer<S> = S extends Schema<infer T> ? T : never;\ndeclare function str(): Schema<string>;\ndeclare function num(): Schema<number>;\ndeclare function obj<S extends Record<string, Schema<unknown>>>(shape: S): Schema<{ [K in keyof S]: Infer<S[K]> }>;\n\nconst Product = obj({ name: str(), price: num() });\ntype Product = Infer<typeof Product>;\nfunction label(p: Product): string {\n  return p.price;\n}\n```\n```text\nline 10: error TS2322: Type 'number' is not assignable to type 'string'.\n```\n\nThe schema says `price` is checked as a number, so the derived type says so too. The compiler knows exactly what the validator guarantees.\n\n### Pitfalls\n#### `JSON.parse(...) as User`\n```ts\ntype User = { name: string; age: number };\nconst user = JSON.parse('{\"name\":\"ana\",\"age\":\"31\"}') as User;\nconsole.log(`${user.name} turns ${user.age + 1}`);\n```\nPrints:\n```text\nana turns 311\n```\n\nThe assertion believed the JSON, and `\"31\" + 1` is `\"311\"`. Any real check — hand-written here, or a schema — refuses the string.\n\n```ts\ntype User = { name: string; age: number };\nfunction parseUser(value: unknown): User | undefined {\n  if (typeof value !== \"object\" || value === null) return undefined;\n  if (!(\"name\" in value) || typeof value.name !== \"string\") return undefined;\n  if (!(\"age\" in value) || typeof value.age !== \"number\") return undefined;\n  return { name: value.name, age: value.age };\n}\nconst user = parseUser(JSON.parse('{\"name\":\"ana\",\"age\":\"31\"}'));\nconsole.log(user === undefined ? \"invalid user\" : `${user.name} turns ${user.age + 1}`);\n```\nPrints:\n```text\ninvalid user\n```\n\n#### A type and a validator that drifted\n```ts\ntype User = { name: string; age: number };\nfunction isUser(v: unknown): v is User {\n  return typeof v === \"object\" && v !== null && \"name\" in v && typeof v.name === \"string\";\n}\nconst data: unknown = JSON.parse('{\"name\":\"bo\"}');\nif (isUser(data)) console.log(`${data.name} is ${data.age} years old`);\nelse console.log(\"invalid\");\n```\nPrints:\n```text\nbo is undefined years old\n```\n\n`age` was added to the type and never to the predicate, so the predicate lied: the compiler believes `data.age` is a `number`, and it prints `undefined`. A schema-derived type can't drift, because there is only one description.\n\n```ts\ntype User = { name: string; age: number };\nfunction isUser(v: unknown): v is User {\n  return typeof v === \"object\" && v !== null && \"name\" in v && typeof v.name === \"string\"\n    && \"age\" in v && typeof v.age === \"number\";\n}\nconst data: unknown = JSON.parse('{\"name\":\"bo\"}');\nif (isUser(data)) console.log(`${data.name} is ${data.age} years old`);\nelse console.log(\"invalid\");\n```\nPrints:\n```text\ninvalid\n```\n\n#### Stopping at the first problem\n```ts\nfunction check(v: { name?: unknown; age?: unknown; email?: unknown }): string {\n  if (typeof v.name !== \"string\") return \"name: expected string\";\n  if (typeof v.age !== \"number\") return \"age: expected number\";\n  if (typeof v.email !== \"string\") return \"email: expected string\";\n  return \"ok\";\n}\nconsole.log(check({ name: 1, age: \"x\" }));\n```\nPrints:\n```text\nname: expected string\n```\n\nReporting one problem at a time turns fixing bad data into a slow loop: fix, resubmit, get the next error. Collect them all.\n\n```ts\nfunction check(v: { name?: unknown; age?: unknown; email?: unknown }): string {\n  const issues: string[] = [];\n  if (typeof v.name !== \"string\") issues.push(\"name: expected string\");\n  if (typeof v.age !== \"number\") issues.push(\"age: expected number\");\n  if (typeof v.email !== \"string\") issues.push(\"email: expected string\");\n  return issues.length === 0 ? \"ok\" : issues.join(\"\\n\");\n}\nconsole.log(check({ name: 1, age: \"x\" }));\n```\nPrints:\n```text\nname: expected string\nage: expected number\nemail: expected string\n```\n\n### Where it shows up later\n- **Week 20 — Mapped types.** You write the `{ [K in keyof S]: … }` that `obj` returns.\n- **Week 21 — Conditional types and `infer`.** You write `Infer<S>` yourself.\n- **Week 25 — `Result`.** `Parsed<T>` is a `Result` — the same shape, generalised.\n\n### In an interview\n\n**How do you validate an API response in TypeScript?**\n\nTreat it as `unknown` and run it through a schema — Zod or similar — at the boundary. The schema checks the runtime shape and its inferred type (`z.infer<typeof Schema>`) is what the rest of the code uses, so the check and the type can't disagree. I avoid `as SomeType` on parsed JSON; it checks nothing.\n\n**How does a library like Zod infer the type from a schema?**\n\nEach schema is a value typed with a phantom parameter — `ZodType<Output>` — and combinators build bigger types from smaller ones: an object schema maps over its shape's keys with a mapped type, and `z.infer` pulls the output type out with a conditional type and `infer`. The runtime part and the type part are built by the same function calls.\n\n**Why not just generate validators from TypeScript types?**\n\nBecause types are erased: nothing about them exists at runtime to generate from, without a separate build step (a compiler plugin or codegen). Going the other way — types from runtime schemas — needs no tooling, which is why most of the ecosystem does that.",
+    "exercises": [
+      {
+        "id": "ts_runtime_validation-num",
+        "title": "The number schema",
+        "prompt": "The schema library is written for you except one condition. Replace `____` so `num()` accepts only finite numbers, then run the orders through it.",
+        "hint": "Two conditions: the right `typeof`, and not `NaN`/`Infinity` (JSON can't produce those, but other sources can).",
+        "language": "typescript",
+        "kind": "drill",
+        "difficulty": "",
+        "starter": "type Parsed<T> = { ok: true; value: T } | { ok: false; issues: string[] };\ntype Schema<T> = { parse: (value: unknown, path: string) => Parsed<T> };\ntype Infer<S> = S extends Schema<infer T> ? T : never;\n\nconst fail = (path: string, expected: string): Parsed<never> => ({ ok: false, issues: [`${path}: expected ${expected}`] });\nconst str = (): Schema<string> => ({\n  parse: (v, path) => (typeof v === \"string\" ? { ok: true, value: v } : fail(path, \"string\")),\n});\nconst num = (): Schema<number> => ({\n  parse: (v, path) => (____ ? { ok: true, value: v } : fail(path, \"number\")),\n});\nfunction opt<T>(inner: Schema<T>): Schema<T | undefined> {\n  return { parse: (v, path) => (v === undefined ? { ok: true, value: undefined } : inner.parse(v, path)) };\n}\nfunction arr<T>(item: Schema<T>): Schema<T[]> {\n  return {\n    parse(v, path) {\n      if (!Array.isArray(v)) return fail(path, \"array\");\n      const out: T[] = [];\n      const issues: string[] = [];\n      v.forEach((x: unknown, i) => {\n        const r = item.parse(x, `${path}[${i}]`);\n        if (r.ok) out.push(r.value);\n        else issues.push(...r.issues);\n      });\n      return issues.length > 0 ? { ok: false, issues } : { ok: true, value: out };\n    },\n  };\n}\nfunction obj<S extends Record<string, Schema<unknown>>>(shape: S): Schema<{ [K in keyof S]: Infer<S[K]> }> {\n  return {\n    parse(v, path) {\n      if (typeof v !== \"object\" || v === null || Array.isArray(v)) return fail(path, \"object\");\n      const record = v as Record<string, unknown>;\n      const out: Record<string, unknown> = {};\n      const issues: string[] = [];\n      for (const [key, schema] of Object.entries(shape)) {\n        const r = schema.parse(record[key], `${path}.${key}`);\n        if (r.ok) out[key] = r.value;\n        else issues.push(...r.issues);\n      }\n      return issues.length > 0 ? { ok: false, issues } : { ok: true, value: out as { [K in keyof S]: Infer<S[K]> } };\n    },\n  };\n}\n\nimport * as fs from \"fs\";\nconst Line = obj({ sku: str(), qty: num() });\nfor (const text of fs.readFileSync(0, \"utf8\").trim().split(\"\\n\")) {\n  const r = Line.parse(JSON.parse(text), \"line\");\n  console.log(r.ok ? `${r.value.sku} x${r.value.qty}` : r.issues.join(\"; \"));\n}\n",
+        "solution": "type Parsed<T> = { ok: true; value: T } | { ok: false; issues: string[] };\ntype Schema<T> = { parse: (value: unknown, path: string) => Parsed<T> };\ntype Infer<S> = S extends Schema<infer T> ? T : never;\n\nconst fail = (path: string, expected: string): Parsed<never> => ({ ok: false, issues: [`${path}: expected ${expected}`] });\nconst str = (): Schema<string> => ({\n  parse: (v, path) => (typeof v === \"string\" ? { ok: true, value: v } : fail(path, \"string\")),\n});\nconst num = (): Schema<number> => ({\n  parse: (v, path) => (typeof v === \"number\" && Number.isFinite(v) ? { ok: true, value: v } : fail(path, \"number\")),\n});\nfunction opt<T>(inner: Schema<T>): Schema<T | undefined> {\n  return { parse: (v, path) => (v === undefined ? { ok: true, value: undefined } : inner.parse(v, path)) };\n}\nfunction arr<T>(item: Schema<T>): Schema<T[]> {\n  return {\n    parse(v, path) {\n      if (!Array.isArray(v)) return fail(path, \"array\");\n      const out: T[] = [];\n      const issues: string[] = [];\n      v.forEach((x: unknown, i) => {\n        const r = item.parse(x, `${path}[${i}]`);\n        if (r.ok) out.push(r.value);\n        else issues.push(...r.issues);\n      });\n      return issues.length > 0 ? { ok: false, issues } : { ok: true, value: out };\n    },\n  };\n}\nfunction obj<S extends Record<string, Schema<unknown>>>(shape: S): Schema<{ [K in keyof S]: Infer<S[K]> }> {\n  return {\n    parse(v, path) {\n      if (typeof v !== \"object\" || v === null || Array.isArray(v)) return fail(path, \"object\");\n      const record = v as Record<string, unknown>;\n      const out: Record<string, unknown> = {};\n      const issues: string[] = [];\n      for (const [key, schema] of Object.entries(shape)) {\n        const r = schema.parse(record[key], `${path}.${key}`);\n        if (r.ok) out[key] = r.value;\n        else issues.push(...r.issues);\n      }\n      return issues.length > 0 ? { ok: false, issues } : { ok: true, value: out as { [K in keyof S]: Infer<S[K]> } };\n    },\n  };\n}\n\nimport * as fs from \"fs\";\nconst Line = obj({ sku: str(), qty: num() });\nfor (const text of fs.readFileSync(0, \"utf8\").trim().split(\"\\n\")) {\n  const r = Line.parse(JSON.parse(text), \"line\");\n  console.log(r.ok ? `${r.value.sku} x${r.value.qty}` : r.issues.join(\"; \"));\n}\n",
+        "tests": [
+          {
+            "input": "{\"sku\":\"A\",\"qty\":2}\n{\"sku\":\"B\",\"qty\":\"2\"}",
+            "output": "A x2\nline.qty: expected number"
+          },
+          {
+            "input": "{\"qty\":1}\n{\"sku\":\"C\",\"qty\":0}",
+            "output": "line.sku: expected string\nC x0"
+          },
+          {
+            "input": "{\"sku\":\"D\",\"qty\":null}",
+            "output": "line.qty: expected number"
+          }
+        ],
+        "source_slug": ""
+      },
+      {
+        "id": "ts_runtime_validation-product",
+        "title": "Describe a product",
+        "prompt": "Replace `____` with the schema for a product: a `name` string, a `price` number and a `tags` array of strings. The `Product` type — and everything that uses it — follows from it.",
+        "hint": "`obj({ … })` with one schema per property; `arr(str())` for a list of strings.",
+        "language": "typescript",
+        "kind": "drill",
+        "difficulty": "",
+        "starter": "type Parsed<T> = { ok: true; value: T } | { ok: false; issues: string[] };\ntype Schema<T> = { parse: (value: unknown, path: string) => Parsed<T> };\ntype Infer<S> = S extends Schema<infer T> ? T : never;\n\nconst fail = (path: string, expected: string): Parsed<never> => ({ ok: false, issues: [`${path}: expected ${expected}`] });\nconst str = (): Schema<string> => ({\n  parse: (v, path) => (typeof v === \"string\" ? { ok: true, value: v } : fail(path, \"string\")),\n});\nconst num = (): Schema<number> => ({\n  parse: (v, path) => (typeof v === \"number\" && Number.isFinite(v) ? { ok: true, value: v } : fail(path, \"number\")),\n});\nfunction opt<T>(inner: Schema<T>): Schema<T | undefined> {\n  return { parse: (v, path) => (v === undefined ? { ok: true, value: undefined } : inner.parse(v, path)) };\n}\nfunction arr<T>(item: Schema<T>): Schema<T[]> {\n  return {\n    parse(v, path) {\n      if (!Array.isArray(v)) return fail(path, \"array\");\n      const out: T[] = [];\n      const issues: string[] = [];\n      v.forEach((x: unknown, i) => {\n        const r = item.parse(x, `${path}[${i}]`);\n        if (r.ok) out.push(r.value);\n        else issues.push(...r.issues);\n      });\n      return issues.length > 0 ? { ok: false, issues } : { ok: true, value: out };\n    },\n  };\n}\nfunction obj<S extends Record<string, Schema<unknown>>>(shape: S): Schema<{ [K in keyof S]: Infer<S[K]> }> {\n  return {\n    parse(v, path) {\n      if (typeof v !== \"object\" || v === null || Array.isArray(v)) return fail(path, \"object\");\n      const record = v as Record<string, unknown>;\n      const out: Record<string, unknown> = {};\n      const issues: string[] = [];\n      for (const [key, schema] of Object.entries(shape)) {\n        const r = schema.parse(record[key], `${path}.${key}`);\n        if (r.ok) out[key] = r.value;\n        else issues.push(...r.issues);\n      }\n      return issues.length > 0 ? { ok: false, issues } : { ok: true, value: out as { [K in keyof S]: Infer<S[K]> } };\n    },\n  };\n}\n\nimport * as fs from \"fs\";\nconst Product = ____;\ntype Product = Infer<typeof Product>;\nconst label = (p: Product): string => `${p.name} $${p.price.toFixed(2)} [${p.tags.join(\",\")}]`;\nfor (const text of fs.readFileSync(0, \"utf8\").trim().split(\"\\n\")) {\n  const r = Product.parse(JSON.parse(text), \"product\");\n  console.log(r.ok ? label(r.value) : r.issues.join(\"; \"));\n}\n",
+        "solution": "type Parsed<T> = { ok: true; value: T } | { ok: false; issues: string[] };\ntype Schema<T> = { parse: (value: unknown, path: string) => Parsed<T> };\ntype Infer<S> = S extends Schema<infer T> ? T : never;\n\nconst fail = (path: string, expected: string): Parsed<never> => ({ ok: false, issues: [`${path}: expected ${expected}`] });\nconst str = (): Schema<string> => ({\n  parse: (v, path) => (typeof v === \"string\" ? { ok: true, value: v } : fail(path, \"string\")),\n});\nconst num = (): Schema<number> => ({\n  parse: (v, path) => (typeof v === \"number\" && Number.isFinite(v) ? { ok: true, value: v } : fail(path, \"number\")),\n});\nfunction opt<T>(inner: Schema<T>): Schema<T | undefined> {\n  return { parse: (v, path) => (v === undefined ? { ok: true, value: undefined } : inner.parse(v, path)) };\n}\nfunction arr<T>(item: Schema<T>): Schema<T[]> {\n  return {\n    parse(v, path) {\n      if (!Array.isArray(v)) return fail(path, \"array\");\n      const out: T[] = [];\n      const issues: string[] = [];\n      v.forEach((x: unknown, i) => {\n        const r = item.parse(x, `${path}[${i}]`);\n        if (r.ok) out.push(r.value);\n        else issues.push(...r.issues);\n      });\n      return issues.length > 0 ? { ok: false, issues } : { ok: true, value: out };\n    },\n  };\n}\nfunction obj<S extends Record<string, Schema<unknown>>>(shape: S): Schema<{ [K in keyof S]: Infer<S[K]> }> {\n  return {\n    parse(v, path) {\n      if (typeof v !== \"object\" || v === null || Array.isArray(v)) return fail(path, \"object\");\n      const record = v as Record<string, unknown>;\n      const out: Record<string, unknown> = {};\n      const issues: string[] = [];\n      for (const [key, schema] of Object.entries(shape)) {\n        const r = schema.parse(record[key], `${path}.${key}`);\n        if (r.ok) out[key] = r.value;\n        else issues.push(...r.issues);\n      }\n      return issues.length > 0 ? { ok: false, issues } : { ok: true, value: out as { [K in keyof S]: Infer<S[K]> } };\n    },\n  };\n}\n\nimport * as fs from \"fs\";\nconst Product = obj({ name: str(), price: num(), tags: arr(str()) });\ntype Product = Infer<typeof Product>;\nconst label = (p: Product): string => `${p.name} $${p.price.toFixed(2)} [${p.tags.join(\",\")}]`;\nfor (const text of fs.readFileSync(0, \"utf8\").trim().split(\"\\n\")) {\n  const r = Product.parse(JSON.parse(text), \"product\");\n  console.log(r.ok ? label(r.value) : r.issues.join(\"; \"));\n}\n",
+        "tests": [
+          {
+            "input": "{\"name\":\"pen\",\"price\":1.5,\"tags\":[\"office\"]}\n{\"name\":\"cup\",\"price\":\"3\",\"tags\":[1]}",
+            "output": "pen $1.50 [office]\nproduct.price: expected number; product.tags[0]: expected string"
+          },
+          {
+            "input": "{\"name\":\"ink\",\"price\":2,\"tags\":[]}",
+            "output": "ink $2.00 []"
+          }
+        ],
+        "source_slug": ""
+      },
+      {
+        "id": "ts_runtime_validation-events",
+        "title": "Validate an event feed",
+        "prompt": "Each input line is JSON for an event: `id` (number), `type` (string), `tags` (array of strings) and optionally `user` (an object with a string `name`). Validate from `unknown` and report every issue with its path, like the schema library does: `event.id: expected number`, `event.tags[1]: expected string`, `event.user.name: expected string`, or `event: expected object`. Print `ok <id> <type>` (plus ` by <name>` when there is a user) or the issues joined by `; `, then `valid <k> of <n>`.",
+        "hint": "Collect issues in an array instead of returning at the first one; return either the typed event or the issue list.",
+        "language": "typescript",
+        "kind": "challenge",
+        "difficulty": "Hard",
+        "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+        "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Event = { id: number; type: string; tags: string[]; user?: { name: string } };\nfunction validate(v: unknown): Event | string[] {\n  if (typeof v !== \"object\" || v === null || Array.isArray(v)) return [\"event: expected object\"];\n  const rec = v as Record<string, unknown>;\n  const issues: string[] = [];\n  const id = rec[\"id\"];\n  const type = rec[\"type\"];\n  const tags = rec[\"tags\"];\n  const user = rec[\"user\"];\n  if (typeof id !== \"number\") issues.push(\"event.id: expected number\");\n  if (typeof type !== \"string\") issues.push(\"event.type: expected string\");\n  const tagList: string[] = [];\n  if (!Array.isArray(tags)) issues.push(\"event.tags: expected array\");\n  else tags.forEach((t: unknown, i) => (typeof t === \"string\" ? tagList.push(t) : issues.push(`event.tags[${i}]: expected string`)));\n  let who: { name: string } | undefined;\n  if (user !== undefined) {\n    if (typeof user !== \"object\" || user === null) issues.push(\"event.user: expected object\");\n    else {\n      const name = (user as Record<string, unknown>)[\"name\"];\n      if (typeof name !== \"string\") issues.push(\"event.user.name: expected string\");\n      else who = { name };\n    }\n  }\n  if (issues.length > 0 || typeof id !== \"number\" || typeof type !== \"string\") return issues;\n  return who === undefined ? { id, type, tags: tagList } : { id, type, tags: tagList, user: who };\n}\nconst lines = input.split(\"\\n\");\nlet valid = 0;\nfor (const line of lines) {\n  const r = validate(JSON.parse(line));\n  if (Array.isArray(r)) {\n    console.log(r.join(\"; \"));\n  } else {\n    valid++;\n    console.log(`ok ${r.id} ${r.type}${r.user === undefined ? \"\" : ` by ${r.user.name}`}`);\n  }\n}\nconsole.log(`valid ${valid} of ${lines.length}`);\n",
+        "tests": [
+          {
+            "input": "{\"id\":1,\"type\":\"login\",\"tags\":[\"web\"],\"user\":{\"name\":\"ana\"}}\n{\"id\":\"2\",\"type\":5,\"tags\":[\"a\",3]}\n{\"id\":3,\"type\":\"ping\",\"tags\":[]}",
+            "output": "ok 1 login by ana\nevent.id: expected number; event.type: expected string; event.tags[1]: expected string\nok 3 ping\nvalid 2 of 3"
+          },
+          {
+            "input": "[]\n{\"id\":4,\"type\":\"x\",\"tags\":\"a\",\"user\":{\"name\":7}}\n{\"id\":5,\"type\":\"y\",\"tags\":[],\"user\":null}",
+            "output": "event: expected object\nevent.tags: expected array; event.user.name: expected string\nevent.user: expected object\nvalid 0 of 3"
+          }
+        ],
+        "source_slug": ""
+      }
+    ],
+    "cards": [],
+    "quiz": [
+      {
+        "question": "Why derive the type from the schema rather than write both?",
+        "options": [
+          "Two descriptions drift apart; one description can't",
+          "Schemas are faster than types",
+          "Types can't describe JSON",
+          "The compiler requires it"
+        ],
+        "answer": 0,
+        "explanation": "The validator is the source of truth, and `Infer` computes the type from it."
+      },
+      {
+        "question": "What does `Infer<typeof User>` give you when `User = obj({ name: str() })`?",
+        "options": [
+          "`{ name: string }`",
+          "`Schema<{ name: string }>`",
+          "`typeof User`",
+          "`unknown`"
+        ],
+        "answer": 0,
+        "explanation": "`Infer` extracts the `T` from a `Schema<T>`."
+      },
+      {
+        "question": "`const user = JSON.parse(text) as User` — what has been checked?",
+        "options": [
+          "Nothing; the assertion is a promise, erased at runtime",
+          "The top-level keys",
+          "Everything",
+          "Only the types of the values"
+        ],
+        "answer": 0,
+        "explanation": "Assertions never check. A schema does."
+      },
+      {
+        "question": "Why should a validator collect every issue instead of stopping at the first?",
+        "options": [
+          "So whoever sent bad data can fix all of it in one pass",
+          "It is faster",
+          "Stopping early leaks memory",
+          "The type system requires it"
+        ],
+        "answer": 0,
+        "explanation": "One error at a time makes fixing data a slow loop."
+      },
+      {
+        "question": "Where should `User.parse` be called?",
+        "options": [
+          "At the boundary where the data enters the program",
+          "In every function that uses a user",
+          "Only in tests",
+          "Before every print"
+        ],
+        "answer": 0,
+        "explanation": "Parse once; inside the boundary the type carries the guarantee."
+      },
+      {
+        "question": "Which existing libraries work this way?",
+        "options": [
+          "Zod, Valibot and ArkType",
+          "Jest and Vitest",
+          "Express and Fastify",
+          "Prettier and ESLint"
+        ],
+        "answer": 0,
+        "explanation": "They are schema libraries whose validators also produce static types."
+      }
+    ],
+    "practice": []
+  },
+  {
     "key": "jp_coding_basics",
     "name": "Coding Basics — プログラミングの基礎",
     "category": "JP: Coding Basics",

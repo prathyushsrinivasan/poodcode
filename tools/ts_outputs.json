@@ -66,6 +66,46 @@
    "name: tiny\nport: 3000\ndebug: false\ntags: (none)\ndb: (none)"
   ]
  },
+ "project-w14": {
+  "hash": "1b3387be6cb942901487",
+  "outputs": [
+   "checking: 1254.50 (3 transactions)\nsavings: 500.00 (1 transaction)\ntotal: 1754.50\nbusiest month: 2026-01 (3 transactions)\nlargest expense: rent, February -1200.00",
+   "line 1: bad date 2026-02-30\nline 2: bad date\nline 3: missing account\nline 4: bad amount 5.555\ncash: -0.50 (1 transaction)\ntotal: -0.50\nbusiest month: 2026-03 (1 transaction)\nlargest expense: cash -0.50",
+   "a: -1.90 (2 transactions)\nb: -1.10 (1 transaction)\ntotal: -3.00\nbusiest month: 2026-01 (2 transactions)\nlargest expense: coffee -3.00",
+   "line 1: bad date bad\ntotal: 0.00\nbusiest month: none\nlargest expense: none",
+   "wallet: 60.00 (3 transactions)\ntotal: 60.00\nbusiest month: 2024-02 (2 transactions)\nlargest expense: leap day lunch -20.00"
+  ]
+ },
+ "project-w15": {
+  "hash": "c3acf180d5aeb8bd0fed",
+  "outputs": [
+   "getTodo id=7\n405 allow DELETE,GET,PUT\nlistTodos\nhome\ntodoComments id=7,commentId=2\n404",
+   "/todos/5\n/todos/3/comments/9\n/\nmissing param id\nunknown param x\nunknown route nowhere",
+   "createTodo deleteTodo getTodo home listTodos todoComments updateTodo\n7 routes",
+   "createTodo\n405 allow GET,POST\nupdateTodo id=abc",
+   "home\n/todos\n405 allow GET"
+  ]
+ },
+ "project-w16": {
+  "hash": "79d5846d7bbdb2abd306",
+  "outputs": [
+   "ana: 2 orders, $32.75\nbo lee: 1 order, $30.00\nO-1002 by bo lee: $30.00\nana $32.75",
+   "bad user line: U-1 x\nduplicate id U-003\norder O-2001: unknown user U-009\nbad order line: O-2002 U-003 1.999\nduplicate id O-2003\nnot a user id O-2003\nnot an order id U-003\nno user U-004\nno order O-9999\ncy: 1 order, $7.00",
+   "none\nsolo: 0 orders, $0.00",
+   "a $10.00\nO-3001 by b: $10.00",
+   "order O-4001: unknown user U-001\nno user U-001\nnone"
+  ]
+ },
+ "project-w17": {
+  "hash": "9808f1feffcd1bddccd7",
+  "outputs": [
+   "created #1\ncreated #2\n#1 [ ] Write report (high) #work\n#2 [ ] Buy milk (normal)\npatched #2 (done, tags)\n#1 [ ] Write report (high) #work\n#2 [x] Buy milk (normal) #home #errand\nopen 1, done 1, high=1 normal=1 low=0",
+   "create rejected: title: required\ncreate rejected: title: must be text; priority: must be low, normal or high; tags: must be a list of strings; unknown field owner\ncreate rejected: title: required\n(no tasks)\nopen 0, done 0, high=0 normal=0 low=0",
+   "created #1\npatch rejected: id: cannot change; done: must be true or false\nno task #7\ndeleted #1\nno task #1\n(no tasks)",
+   "created #1\npatched #1 (title, priority, done)\n#1 [ ] renamed (normal)",
+   "open 0, done 0, high=0 normal=0 low=0\ncreated #1\npatch #1: nothing to change\n#1 [ ] x (normal)"
+  ]
+ },
  "project-w2": {
   "hash": "881c40ff67b8d1ec20d0",
   "outputs": [
@@ -606,6 +646,145 @@
    "different",
    "different",
    "same"
+  ]
+ },
+ "ts_erasable_syntax-error1": {
+  "hash": "efd196b399ee359acee5",
+  "diagnostics": [
+   {
+    "code": 2693,
+    "line": 4,
+    "msg": "'Circle' only refers to a type, but is being used as a value here."
+   },
+   {
+    "code": 2339,
+    "line": 4,
+    "msg": "Property 'radius' does not exist on type 'Circle | Square'.   Property 'radius' does not exist on type 'Square'."
+   },
+   {
+    "code": 2339,
+    "line": 5,
+    "msg": "Property 'side' does not exist on type 'Circle | Square'.   Property 'side' does not exist on type 'Circle'."
+   }
+  ]
+ },
+ "ts_erasable_syntax-error2": {
+  "hash": "8cff859d2948f699fd6a",
+  "diagnostics": [
+   {
+    "code": 2749,
+    "line": 2,
+    "msg": "'Level' refers to a value, but is being used as a type here. Did you mean 'typeof Level'?"
+   }
+  ]
+ },
+ "ts_erasable_syntax-error3": {
+  "hash": "8e6e384d2c808c387309",
+  "diagnostics": [
+   {
+    "code": 1361,
+    "line": 2,
+    "msg": "'readFileSync' cannot be used as a value because it was imported using 'import type'."
+   }
+  ]
+ },
+ "ts_erasable_syntax-example1": {
+  "hash": "823ce084817eee8a7f15",
+  "outputs": [
+   "DOWN\nUP,DOWN,LEFT,RIGHT\n4"
+  ]
+ },
+ "ts_erasable_syntax-example2": {
+  "hash": "14b3eec7ad277b61b874",
+  "outputs": [
+   "a(0, 0) to b(3, 4): 5"
+  ]
+ },
+ "ts_erasable_syntax-example3": {
+  "hash": "d5113632a92935256318",
+  "outputs": [
+   "ana 2\nobject true"
+  ]
+ },
+ "ts_erasable_syntax-example4": {
+  "hash": "cb3325dec8522ae538f9",
+  "outputs": [
+   "-5C = 23F, freezing\n12C = 53.6F, cool\n30C = 86F, warm\n100"
+  ]
+ },
+ "ts_erasable_syntax-fields": {
+  "hash": "6d68c65c26c766501501",
+  "outputs": [
+   "took 2 pens, 3 left\ntook 2 pens, 1 left\nonly 1 pens left",
+   "took 1 cups, 0 left",
+   "took 3 ink, 7 left\ntook 3 ink, 4 left\ntook 3 ink, 1 left\nonly 1 ink left"
+  ]
+ },
+ "ts_erasable_syntax-levels": {
+  "hash": "783ca8ac3b23171c06e2",
+  "outputs": [
+   "Info Warn Error",
+   "Debug Info Warn Error",
+   "(none)",
+   "Error"
+  ]
+ },
+ "ts_erasable_syntax-pitfall1-right": {
+  "hash": "b22d9dd6db28acd32a67",
+  "outputs": [
+   "6"
+  ]
+ },
+ "ts_erasable_syntax-pitfall1-wrong": {
+  "hash": "19f3fee355b5db09accc",
+  "outputs": [
+   "51"
+  ]
+ },
+ "ts_erasable_syntax-pitfall2-right": {
+  "hash": "c6bd388a3ed673b67fcb",
+  "outputs": [
+   "3 4"
+  ]
+ },
+ "ts_erasable_syntax-pitfall2-wrong": {
+  "hash": "944f04e5aa37233ab1c3",
+  "diagnostics": [
+   {
+    "code": 2693,
+    "line": 4,
+    "msg": "'Circle' only refers to a type, but is being used as a value here."
+   },
+   {
+    "code": 2339,
+    "line": 4,
+    "msg": "Property 'radius' does not exist on type 'Circle | Square'.   Property 'radius' does not exist on type 'Square'."
+   },
+   {
+    "code": 2339,
+    "line": 5,
+    "msg": "Property 'side' does not exist on type 'Circle | Square'.   Property 'side' does not exist on type 'Circle'."
+   }
+  ]
+ },
+ "ts_erasable_syntax-pitfall3-right": {
+  "hash": "6df25614b715442b67fe",
+  "outputs": [
+   "{\"name\":\"ana\"}"
+  ]
+ },
+ "ts_erasable_syntax-pitfall3-wrong": {
+  "hash": "647bfb28bcf717652c1c",
+  "outputs": [
+   "{\"name\":\"ana\",\"password\":\"hunter2\"}"
+  ]
+ },
+ "ts_erasable_syntax-status": {
+  "hash": "70bcdbcaf94479564233",
+  "outputs": [
+   "acc1: Active\nacc2: Closed\nacc3: Active\nacc4: unknown code X\nActive 2\nSuspended 0\nClosed 1",
+   "z: Suspended\nActive 0\nSuspended 1\nClosed 0",
+   "a: Closed\nb: Closed\nActive 0\nSuspended 0\nClosed 2"
   ]
  },
  "ts_function_types-construct": {
@@ -1303,6 +1482,102 @@
    "60:00\n60:00"
   ]
  },
+ "ts_parse_dont_validate-error1": {
+  "hash": "e9f9ac52048d986613d4",
+  "diagnostics": [
+   {
+    "code": 2345,
+    "line": 6,
+    "msg": "Argument of type 'string' is not assignable to parameter of type 'Email'.   Type 'string' is not assignable to type '{ readonly [EmailBrand]: true; }'."
+   }
+  ]
+ },
+ "ts_parse_dont_validate-error2": {
+  "hash": "1eaa3a645904d14e5688",
+  "diagnostics": [
+   {
+    "code": 2322,
+    "line": 2,
+    "msg": "Type '[]' is not assignable to type 'NonEmpty'.   Source has 0 element(s) but target requires 1."
+   }
+  ]
+ },
+ "ts_parse_dont_validate-example1": {
+  "hash": "56d457446edadcfde5bc",
+  "outputs": [
+   "welcome mail -> ana@example.com\nrejected \"bob\"\nwelcome mail -> cy@x.io"
+  ]
+ },
+ "ts_parse_dont_validate-example2": {
+  "hash": "2a683559bbc005a726a1",
+  "outputs": [
+   "1..9\nno values\n7..7"
+  ]
+ },
+ "ts_parse_dont_validate-example3": {
+  "hash": "11961a65c5477ba00093",
+  "outputs": [
+   "ABC12: 4.50\nXYZ99: 20.00\nbad sku abc\nbad price 1.5"
+  ]
+ },
+ "ts_parse_dont_validate-nonempty": {
+  "hash": "7d53ab312ca9553e1fe2",
+  "outputs": [
+   "first 3, average 4.0\nempty\nfirst 10, average 10.0",
+   "first 7, average 7.0"
+  ]
+ },
+ "ts_parse_dont_validate-pitfall1-right": {
+  "hash": "e2b211c9801414e1e2cf",
+  "outputs": [
+   "welcome mail -> ana@x.io\nrejected bob"
+  ]
+ },
+ "ts_parse_dont_validate-pitfall1-wrong": {
+  "hash": "7952948b695f29e96722",
+  "outputs": [
+   "welcome mail -> ana@x.io\nwelcome mail -> bob"
+  ]
+ },
+ "ts_parse_dont_validate-pitfall2-right": {
+  "hash": "2f5ef56b3501ba8a7ffa",
+  "outputs": [
+   "rejected"
+  ]
+ },
+ "ts_parse_dont_validate-pitfall2-wrong": {
+  "hash": "5b6fb3210ea8fa15cd0c",
+  "outputs": [
+   "welcome mail -> not an email"
+  ]
+ },
+ "ts_parse_dont_validate-pitfall3-right": {
+  "hash": "a9cd3e43822ecea8758e",
+  "outputs": [
+   "distinct users: 1"
+  ]
+ },
+ "ts_parse_dont_validate-pitfall3-wrong": {
+  "hash": "9288b333555d48585006",
+  "outputs": [
+   "distinct users: 3"
+  ]
+ },
+ "ts_parse_dont_validate-port": {
+  "hash": "fa59d55b79cd1e2e6ec2",
+  "outputs": [
+   "listening on 8080\nbad port 0\nbad port 65536\nlistening on 443",
+   "bad port 80.5\nbad port -1\nlistening on 1",
+   "bad port abc"
+  ]
+ },
+ "ts_parse_dont_validate-usernames": {
+  "hash": "2649ccf0a6ba29f8056d",
+  "outputs": [
+   "registered ana_1\ntaken ana_1\nrejected \"bo\": length\nrejected \"9lives\": characters\nrejected \"super_long_name_x\": length\nrejected \"Cy\": length\n1 users",
+   "registered dee\ntaken dee\nrejected \"d-e-e\": characters\n1 users"
+  ]
+ },
  "ts_program_io-double": {
   "hash": "b4da293c0a21eada5405",
   "outputs": [
@@ -1665,6 +1940,102 @@
    "valid\ninvalid\ninvalid\ninvalid",
    "valid",
    "invalid"
+  ]
+ },
+ "ts_runtime_validation-error1": {
+  "hash": "a4f153f4be865aafddd8",
+  "diagnostics": [
+   {
+    "code": 2339,
+    "line": 9,
+    "msg": "Property 'z' does not exist on type '{ x: number; y: number; }'."
+   }
+  ]
+ },
+ "ts_runtime_validation-error2": {
+  "hash": "65a2d6ba71ac1135f8b8",
+  "diagnostics": [
+   {
+    "code": 2322,
+    "line": 10,
+    "msg": "Type 'number' is not assignable to type 'string'."
+   }
+  ]
+ },
+ "ts_runtime_validation-events": {
+  "hash": "c898803a4726ddd6f2b5",
+  "outputs": [
+   "ok 1 login by ana\nevent.id: expected number; event.type: expected string; event.tags[1]: expected string\nok 3 ping\nvalid 2 of 3",
+   "event: expected object\nevent.tags: expected array; event.user.name: expected string\nevent.user: expected object\nvalid 0 of 3"
+  ]
+ },
+ "ts_runtime_validation-example1": {
+  "hash": "fa05a492c5e923c0361b",
+  "outputs": [
+   "ana (31) admin/ops\nbo (40) no tags"
+  ]
+ },
+ "ts_runtime_validation-example2": {
+  "hash": "e1b13ca10d2b24c1f046",
+  "outputs": [
+   "order 7 for ana: 2 units\norder.id: expected number\norder.customer.name: expected string\norder.customer.email: expected string\norder.items[0].qty: expected number\norder.items[1].sku: expected string\norder: expected object"
+  ]
+ },
+ "ts_runtime_validation-example3": {
+  "hash": "da30cbbdebdc4a23b20a",
+  "outputs": [
+   "db.local:5432, 3 retries\napi:80, 0 retries\ninvalid: config.host: expected string, config.port: expected number"
+  ]
+ },
+ "ts_runtime_validation-num": {
+  "hash": "40189ecb4d65839f2534",
+  "outputs": [
+   "A x2\nline.qty: expected number",
+   "line.sku: expected string\nC x0",
+   "line.qty: expected number"
+  ]
+ },
+ "ts_runtime_validation-pitfall1-right": {
+  "hash": "e024b096b36661115aae",
+  "outputs": [
+   "invalid user"
+  ]
+ },
+ "ts_runtime_validation-pitfall1-wrong": {
+  "hash": "af4f26a1ace3b8e4813d",
+  "outputs": [
+   "ana turns 311"
+  ]
+ },
+ "ts_runtime_validation-pitfall2-right": {
+  "hash": "6a60ae99b73bf13c9e6d",
+  "outputs": [
+   "invalid"
+  ]
+ },
+ "ts_runtime_validation-pitfall2-wrong": {
+  "hash": "e9684741f6cd7b13f96e",
+  "outputs": [
+   "bo is undefined years old"
+  ]
+ },
+ "ts_runtime_validation-pitfall3-right": {
+  "hash": "c5e159a9d3ca92a75057",
+  "outputs": [
+   "name: expected string\nage: expected number\nemail: expected string"
+  ]
+ },
+ "ts_runtime_validation-pitfall3-wrong": {
+  "hash": "3894d7f29bf862264d4d",
+  "outputs": [
+   "name: expected string"
+  ]
+ },
+ "ts_runtime_validation-product": {
+  "hash": "1285d45a14f141b82e54",
+  "outputs": [
+   "pen $1.50 [office]\nproduct.price: expected number; product.tags[0]: expected string",
+   "ink $2.00 []"
   ]
  },
  "ts_set_algebra-both": {
@@ -2181,6 +2552,258 @@
    "Zoë s…"
   ]
  },
+ "ts_variance-comparator": {
+  "hash": "0ab0778fcde589b1c878",
+  "outputs": [
+   "ada (pug)\nmilo (beagle)\nrex (lab)\nfirst input: rex",
+   "solo (mutt)\nfirst input: solo",
+   "a (y)\nb (x)\nfirst input: b"
+  ]
+ },
+ "ts_variance-error1": {
+  "hash": "339e6f5bc7ce728409bf",
+  "diagnostics": [
+   {
+    "code": 2322,
+    "line": 5,
+    "msg": "Type 'Handler<Dog>' is not assignable to type 'Handler<Animal>'.   Property 'bark' is missing in type 'Animal' but required in type 'Dog'."
+   }
+  ]
+ },
+ "ts_variance-error2": {
+  "hash": "7dd0867db473dcf391e1",
+  "diagnostics": [
+   {
+    "code": 2345,
+    "line": 8,
+    "msg": "Argument of type 'Cell<Dog>' is not assignable to parameter of type 'Cell<Animal>'.   Types of property 'set' are incompatible.     Type '(value: Dog) => void' is not assignable to type '(value: Animal) => void'.       Types of parameters 'value' and 'value' are incompatible.         Property 'bark' is missing in type 'Animal' but required in type 'Dog'."
+   }
+  ]
+ },
+ "ts_variance-error3": {
+  "hash": "6c82b554194358364caa",
+  "diagnostics": [
+   {
+    "code": 2636,
+    "line": 1,
+    "msg": "Type 'Box<sub-T>' is not assignable to type 'Box<super-T>' as implied by variance annotation.   Types of property 'set' are incompatible.     Type '(value: sub-T) => void' is not assignable to type '(value: super-T) => void'.       Types of parameters 'value' and 'value' are incompatible.         Type 'super-T' is not assignable to type 'sub-T'."
+   }
+  ]
+ },
+ "ts_variance-example1": {
+  "hash": "cae615c240717f8ba0d4",
+  "outputs": [
+   "rex\nwoof"
+  ]
+ },
+ "ts_variance-example2": {
+  "hash": "afc10e919c3120432299",
+  "outputs": [
+   "an animal called rex; an animal called fido"
+  ]
+ },
+ "ts_variance-example3": {
+  "hash": "dca3983a1de2de64e204",
+  "outputs": [
+   "rex, ada\n2"
+  ]
+ },
+ "ts_variance-example4": {
+  "hash": "02c11f39d96034b913df",
+  "outputs": [
+   "registered rex\nthe animal view sees rex"
+  ]
+ },
+ "ts_variance-handlers": {
+  "hash": "a159608a3c353e0f7a24",
+  "outputs": [
+   "10ms key | key a\n25ms click | click 3,4\nskip\n41ms key | key Z",
+   "5ms click | click 0,0"
+  ]
+ },
+ "ts_variance-pitfall1-right": {
+  "hash": "1fe81c338dba402f2694",
+  "outputs": [
+   "woof\n2 animals in the shelter"
+  ]
+ },
+ "ts_variance-pitfall1-wrong": {
+  "hash": "e825927d1421f6f9b72d",
+  "outputs": [
+   "woof\ntom the cat cannot bark"
+  ]
+ },
+ "ts_variance-pitfall2-right": {
+  "hash": "61d5fa98312a777c896d",
+  "diagnostics": [
+   {
+    "code": 2540,
+    "line": 6,
+    "msg": "Cannot assign to 'pet' because it is a read-only property."
+   }
+  ]
+ },
+ "ts_variance-pitfall2-wrong": {
+  "hash": "43e90913fec879087814",
+  "outputs": [
+   "the dog house holds a cat"
+  ]
+ },
+ "ts_variance-pitfall3-right": {
+  "hash": "9053d92b1164e60307d2",
+  "outputs": [
+   "ping"
+  ]
+ },
+ "ts_variance-pitfall3-wrong": {
+  "hash": "e795144f8444fa795281",
+  "diagnostics": [
+   {
+    "code": 2636,
+    "line": 1,
+    "msg": "Type 'Channel<sub-T>' is not assignable to type 'Channel<super-T>' as implied by variance annotation.   Types of property 'send' are incompatible.     Type '(value: sub-T) => void' is not assignable to type '(value: super-T) => void'.       Types of parameters 'value' and 'value' are incompatible.         Type 'super-T' is not assignable to type 'sub-T'."
+   }
+  ]
+ },
+ "ts_variance-readonly": {
+  "hash": "dee43ac4fc256a19ebff",
+  "outputs": [
+   "bo\nweb,ops,web",
+   "dee\nqa"
+  ]
+ },
+ "ts_versions-catch": {
+  "hash": "db419493210f2c2b10be",
+  "outputs": [
+   "ok: number\nok: string\nbad: Expected",
+   "ok: object\nok: object",
+   "bad: Unexpected"
+  ]
+ },
+ "ts_versions-config": {
+  "hash": "485e4893f307ff186bbb",
+  "outputs": [
+   "target=es5: deprecated in 6.0\nmodule=esnext: ok\nbaseUrl=./src: deprecated in 6.0\nstrict=true: ok\n2 to fix before TypeScript 7",
+   "moduleResolution=bundler: ok\nesModuleInterop=false: deprecated in 6.0\noutFile=out.js: deprecated in 6.0\n2 to fix before TypeScript 7",
+   "module=nodenext: ok\n0 to fix before TypeScript 7"
+  ]
+ },
+ "ts_versions-error1": {
+  "hash": "c923609d042e05c1d3f5",
+  "diagnostics": [
+   {
+    "code": 7006,
+    "line": 1,
+    "msg": "Parameter 'prices' implicitly has an 'any' type."
+   },
+   {
+    "code": 7006,
+    "line": 2,
+    "msg": "Parameter 'sum' implicitly has an 'any' type."
+   },
+   {
+    "code": 7006,
+    "line": 2,
+    "msg": "Parameter 'p' implicitly has an 'any' type."
+   }
+  ]
+ },
+ "ts_versions-error2": {
+  "hash": "a6edbf189ec1d274de17",
+  "diagnostics": [
+   {
+    "code": 18046,
+    "line": 4,
+    "msg": "'e' is of type 'unknown'."
+   }
+  ]
+ },
+ "ts_versions-error3": {
+  "hash": "7887e441fb2bc4ff44fe",
+  "diagnostics": [
+   {
+    "code": 2564,
+    "line": 2,
+    "msg": "Property 'owner' has no initializer and is not definitely assigned in the constructor."
+   }
+  ]
+ },
+ "ts_versions-example1": {
+  "hash": "992c00641558feb396c8",
+  "outputs": [
+   "8080\nRangeError: not a port: http\nRangeError: not a port: 70000"
+  ]
+ },
+ "ts_versions-example2": {
+  "hash": "d3221b297e395dbca95a",
+  "outputs": [
+   "clicks: 5"
+  ]
+ },
+ "ts_versions-example3": {
+  "hash": "2e509fbbe71fd19a92b7",
+  "outputs": [
+   "ts,go,rust,java\ngo\n20,40\n{\"1\":[\"a\",\"d\"],\"2\":[\"bb\",\"cc\"]}"
+  ]
+ },
+ "ts_versions-init": {
+  "hash": "b56359f11143248ab690",
+  "outputs": [
+   "home: 1\nhome: 2",
+   "about: 42",
+   "faq: 8\nfaq: 9\nfaq: 10"
+  ]
+ },
+ "ts_versions-pitfall1-right": {
+  "hash": "3c297f247f51723e574b",
+  "outputs": [
+   "failed: disk full"
+  ]
+ },
+ "ts_versions-pitfall1-wrong": {
+  "hash": "fa2da89f66331736cf4e",
+  "outputs": [
+   "failed: undefined"
+  ]
+ },
+ "ts_versions-pitfall2-right": {
+  "hash": "271271d9b2572ba21733",
+  "outputs": [
+   "job backup"
+  ]
+ },
+ "ts_versions-pitfall2-wrong": {
+  "hash": "48b9783703fdf7d80166",
+  "outputs": [
+   "job undefined"
+  ]
+ },
+ "ts_versions-pitfall3-right": {
+  "hash": "f6e4ad508e993d037b9e",
+  "outputs": [
+   "5"
+  ]
+ },
+ "ts_versions-pitfall3-wrong": {
+  "hash": "fc5f0bc2d15060677c5b",
+  "diagnostics": [
+   {
+    "code": 7006,
+    "line": 1,
+    "msg": "Parameter 'xs' implicitly has an 'any' type."
+   },
+   {
+    "code": 7006,
+    "line": 2,
+    "msg": "Parameter 'a' implicitly has an 'any' type."
+   },
+   {
+    "code": 7006,
+    "line": 2,
+    "msg": "Parameter 'b' implicitly has an 'any' type."
+   }
+  ]
+ },
  "tsm-w1-bmi": {
   "hash": "45f8f7318c4967381326",
   "outputs": [
@@ -2554,6 +3177,201 @@
   "outputs": [
    "6\na-b-c\nhello\nlongest needs a word",
    "5\nx\nab\nunknown max"
+  ]
+ },
+ "tsm-w14-env": {
+  "hash": "e9f74935687b0f9adf3f",
+  "outputs": [
+   "line 6: expected KEY=value\nDEBUG=\"true\"\nEMPTY=\"\"\nNAME=\"Poodcode App\"\nPORT=\"9090\"",
+   "line 2: unterminated quote\nline 3: expected KEY=value\n_ok=\"yes\"\nA=\"x # not a comment\""
+  ]
+ },
+ "tsm-w14-esm-cjs": {
+  "hash": "d9a5bd1e38d4ad782788",
+  "outputs": [
+   "index.ts: ESM\nutil.cjs: CJS\nold.js: CJS\nlib.mts: ESM\nstyles.css: not a module file\nesm=2 cjs=2",
+   "a.cts: CJS\nb.js: ESM\nREADME: not a module file\nesm=1 cjs=1"
+  ]
+ },
+ "tsm-w14-flags": {
+  "hash": "40867222fe7c4b9ab317",
+  "outputs": [
+   "ana: darkMode euBilling\nbo: darkMode export newEditor\ncy: darkMode export sso euBilling\ndee: unknown plan gold\ndarkMode 3\nexport 2\nsso 1\nnewEditor 1\neuBilling 2",
+   "eve: darkMode export sso newEditor\ndarkMode 1\nexport 1\nsso 1\nnewEditor 1\neuBilling 0"
+  ]
+ },
+ "tsm-w14-load-order": {
+  "hash": "01db983f8627775e96f8",
+  "outputs": [
+   "util.ts\ndb.ts\napp.ts\nmain.ts",
+   "cycle: a.ts -> b.ts -> c.ts -> a.ts",
+   "solo.ts",
+   "y.ts\nx.ts\nz.ts\nw.ts"
+  ]
+ },
+ "tsm-w14-lookup": {
+  "hash": "106b467504275672a13c",
+  "outputs": [
+   "a -> 3\nb -> 2\nmissing c\nmissing toString\nkeys: 2",
+   "k -> v=w\nmissing K\nkeys: 1"
+  ]
+ },
+ "tsm-w14-matrix": {
+  "hash": "88ff051b414ef35d29a2",
+  "outputs": [
+   "3\nout of bounds\nout of bounds\n15\nout of bounds\n7\nout of bounds",
+   "15\nout of bounds\n9"
+  ]
+ },
+ "tsm-w14-merge": {
+  "hash": "c127fc5536bced48daa6",
+  "outputs": [
+   "{\"db\":{\"host\":\"a\",\"pool\":10},\"port\":80,\"tags\":[\"y\",\"z\"]}\n{\"db\":{\"pool\":10},\"debug\":true,\"port\":80,\"tags\":[\"y\",\"z\"]}\n{\"db\":\"sqlite\",\"debug\":true,\"port\":80,\"tags\":[\"y\",\"z\"]}",
+   "{\"a\":1,\"b\":{\"c\":{\"d\":1}}}\n{\"a\":1,\"b\":{\"c\":{\"d\":1,\"e\":2}}}\n5"
+  ]
+ },
+ "tsm-w14-optional": {
+  "hash": "ffdf55cfdcb4e324ded0",
+  "outputs": [
+   "ana: no nickname field\nbo: nickname cleared\ncy: empty nickname\ndee: nickname \"D\"\neve: bad nickname\nbad record"
+  ]
+ },
+ "tsm-w15-endpoints": {
+  "hash": "6fc2454b74b07750f239",
+  "outputs": [
+   "listUsers\ngetUser id=42\n401 deleteUser\ndeleteUser id=42\nuserPosts id=7,postId=3\n405\ncreatePost\n404\n404"
+  ]
+ },
+ "tsm-w15-form": {
+  "hash": "0146bc6c38e493e83b3d",
+  "outputs": [
+   "ok\nname: at least 2; age: at least 13; email: not an email\nname: required; age: must be a number; email: required; bio: at most 40; unknown field role\nok"
+  ]
+ },
+ "tsm-w15-icons": {
+  "hash": "82a037f6e88edd3226f6",
+  "outputs": [
+   "⌂ home 24px\n★ star 32px\nbad size 20\nno icon house\nno icon zap\nno icon sun; did you mean star?",
+   "✓ check 32px\n✓ check 16px\nno icon hart\nno icon cheq; did you mean check?"
+  ]
+ },
+ "tsm-w15-plugins": {
+  "hash": "f2f6536350f1532619ee",
+  "outputs": [
+   "[trim,upper] HELLO   WORLD\n[collapse,reverse,exclaim] b a!\nunknown plugin shout\n[upper] TWICE"
+  ]
+ },
+ "tsm-w15-routes": {
+  "hash": "e10136fc221faaf84962",
+  "outputs": [
+   "home\ncreateUser\nlistUsers\n405 method not allowed\n404 not found",
+   "logout\n405 method not allowed"
+  ]
+ },
+ "tsm-w15-shapes": {
+  "hash": "cd4cb816022595142ac5",
+  "outputs": [
+   "line 1: Named Priced\nline 2: Named Dated\nline 3: nothing\nline 4: not an object\nline 5: nothing\nNamed 2\nPriced 1\nDated 1",
+   "line 1: Named Priced Dated\nNamed 1\nPriced 1\nDated 1"
+  ]
+ },
+ "tsm-w15-theme": {
+  "hash": "a3433b1a3c59e2d72894",
+  "outputs": [
+   "bad definition bad = blue\nbutton: #3355ff\nlink: unknown token accent\nloop: cycle\nbrand: #3355ff\nnothing: unknown token nothing",
+   "b: #abc"
+  ]
+ },
+ "tsm-w16-cart": {
+  "hash": "3dc87afbc4a279acd46b",
+  "outputs": [
+   "pen x3 = 4.50\ncup x1 = 4.00\ntotal 8.50\ncup x3 = 12.00\ntotal 12.00\npen x3 = 4.50\ncup x1 = 4.00\ntotal 8.50\nchanges kept: 3",
+   "nothing to undo\nno ink\n(empty)\n(empty)\nink x1 = 2.25\ntotal 2.25\nchanges kept: 1"
+  ]
+ },
+ "tsm-w16-deep-equal": {
+  "hash": "a832a1345f5863fbdf0f",
+  "outputs": [
+   "equal\n$.a.x[1].y: 2 vs 3\n$[2]: 3 vs missing\n$.j: missing vs 1",
+   "$: 5 vs \"5\"\nequal\n$.a: [] vs {}"
+  ]
+ },
+ "tsm-w16-emails": {
+  "hash": "b6218d8e4f4458da228c",
+  "outputs": [
+   "rejected cy@@x.io\nrejected @x.io\nrejected dee@localhost\nana@example.com\nbo@mail.io\neve@mail.io\nmail.io 2\nexample.com 1"
+  ]
+ },
+ "tsm-w16-money": {
+  "hash": "dbad9d7ff795280f5f84",
+  "outputs": [
+   "$0.30\n-$2.50\n$59.97\n$1.75\n$3.34 $3.33 $3.33\n$0.03 $0.02",
+   "bad amount 1.234\ncannot split a negative amount\nbad count 0\nunknown command div\nbad amount x"
+  ]
+ },
+ "tsm-w16-percent": {
+  "hash": "23eb240fe35b77a645f1",
+  "outputs": [
+   "$80.00 - 15% = $68.00\n$19.99 - 12.5% = $17.49\n$10.00 - 100% = $0.00\n$5.00 - 0% = $5.00",
+   "percent out of range 150%\nbad percent 15\nbad price x\nbad percent 33.33%"
+  ]
+ },
+ "tsm-w16-time-travel": {
+  "hash": "aaf3b5d0da77586dc339",
+  "outputs": [
+   "5\n8\nsaved mid\n-2\n0 5 8 -2\n8\n8\nno snapshot end\n42\n0\n0"
+  ]
+ },
+ "tsm-w16-versions": {
+  "hash": "d87a3486ecf2438e5bb6",
+  "outputs": [
+   "v1: a\nv2: b a\nv3: c b a\nv4: x a\nx a\nv5: b a\nv6: a\nv7: (empty)\nempty\nno version 9\nversions 8, nodes 4",
+   "empty\nv1: 1\n(empty)\nv2: 2\nversions 3, nodes 2"
+  ]
+ },
+ "tsm-w17-apply-patch": {
+  "hash": "d88cd41ed5e1ef7e1973",
+  "outputs": [
+   "#1 [x] Write report (normal)\nrejected: bad priority; cannot change id\n#1 [x] Write the report (high)\nrejected: bad title\n#1 [x] Write the report (high)"
+  ]
+ },
+ "tsm-w17-category-totals": {
+  "hash": "b75af3f5b9564f17cb2a",
+  "outputs": [
+   "food 42.50 4.0%\nrent 900.00 84.7%\ntravel 0.50 0.0%\nfun 0.00 0.0%\nother 120.00 11.3%\nbiggest rent",
+   "food 0.00 0.0%\nrent 0.00 0.0%\ntravel 0.00 0.0%\nfun 3.00 100.0%\nother 0.00 0.0%\nbiggest fun",
+   "food 0.00 0.0%\nrent 0.00 0.0%\ntravel 0.00 0.0%\nfun 0.00 0.0%\nother 5.00 100.0%\nbiggest other"
+  ]
+ },
+ "tsm-w17-defaults": {
+  "hash": "0e8726eee86b3308224c",
+  "outputs": [
+   "800x600 \"Untitled\" resizable=true theme=light\n1024x600 \"Untitled\" resizable=true theme=dark\nignored height\nignored resizable\nignored color\n800x600 \"\" resizable=true theme=light\nignored width\nignored theme\n800x600 \"Main\" resizable=true theme=light"
+  ]
+ },
+ "tsm-w17-form-errors": {
+  "hash": "ba225aa5b759412aeb81",
+  "outputs": [
+   "ok\nusername: 3-16 letters, digits or _; password: at least 8 characters with a digit; confirm: does not match; age: must be a whole number, 13 or over\nusername: required; password: required; confirm: required\nusername: 3-16 letters, digits or _"
+  ]
+ },
+ "tsm-w17-project": {
+  "hash": "25d184b5b3c77b3e4a56",
+  "outputs": [
+   "{\"id\":1,\"title\":\"write\"}\n{\"id\":2,\"title\":\"test\"}\n{\"done\":false,\"owner\":\"ana\"}\n{\"done\":true,\"owner\":\"bo\"}\nunknown field secret\n{\"estimate\":3}\n{\"estimate\":1}"
+  ]
+ },
+ "tsm-w17-redact": {
+  "hash": "ccf2a3118d6c925f8deb",
+  "outputs": [
+   "{\"user\":\"ana\",\"profile\":{\"city\":\"Oslo\"},\"sessions\":[{\"ip\":\"1.2.3.4\"}]}\nremoved 4\n[1,{}]\nremoved 1\n\"just a string\"\nremoved 0"
+  ]
+ },
+ "tsm-w17-teams": {
+  "hash": "bca57e975bd145520022",
+  "outputs": [
+   "web: 2 people, 10h, avg 5.0h, top ana\nops: 2 people, 8h, avg 4.0h, top cy\nqa: 1 person, 1h, avg 1.0h, top eve",
+   "solo: 1 person, 0.5h, avg 0.5h, top zed"
   ]
  },
  "tsm-w2-clamp": {
