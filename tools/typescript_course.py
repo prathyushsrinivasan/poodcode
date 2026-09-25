@@ -433,6 +433,13 @@ _M3 = "The Type System, Properly"
 # are exec'd BEFORE that list and a week in month 4 needs its title to exist. The
 # skeletons for weeks not yet authored reuse the same names.
 _M4 = "Robust, Real-World Programs"
+# Months 5-8 sit up here for the same reason: every one of weeks 17-32 is
+# authored in a file that is exec'd by the loop below, and a month title
+# referenced from such a file has to exist before the loop runs.
+_M5 = "Async & Data Structures"
+_M6 = "Algorithmic Thinking"
+_M7 = "DSA Interview Core"
+_M8 = "Advanced Types & Interview Polish"
 
 
 # ===========================================================================
@@ -464,6 +471,8 @@ _WEEK_FILES = (
     "ts_w13_immutability.py",  # Month 4 — immutability & readonly
     "ts_w14_utility.py",       #          utility types
     "ts_w15_nullsafety.py",    #          null-safety & error handling
+    "ts_w16_modules.py",       #          modules, tsconfig & declaration files
+    "ts_w17_async.py",         # Month 5 — async & promises
 )
 
 for _week_file in _WEEK_FILES:
@@ -529,14 +538,6 @@ for _week_file in _WEEK_FILES:
 # so it is worth writing the milestone before the lessons.
 # ===========================================================================
 _WEEKS += [
-    _skel(16, 4, _M4, "Modules, tsconfig & Declaration Files",
-          "Split a program across files, then control how the whole project is checked: "
-          "import/export, compiler strictness, and .d.ts files for untyped code."),
-]
-_M5 = "Async & Data Structures"
-_WEEKS += [
-    _skel(17, 5, _M5, "Async & Promises",
-          "Work with promises and async/await for tasks that take time."),
     _skel(18, 5, _M5, "Stacks & Queues",
           "Build and use LIFO/FIFO structures and know when each fits."),
     _skel(19, 5, _M5, "Maps & Sets",
@@ -544,7 +545,6 @@ _WEEKS += [
     _skel(20, 5, _M5, "Linked Lists & Trees",
           "Model data as nodes that point to other nodes."),
 ]
-_M6 = "Algorithmic Thinking"
 _WEEKS += [
     _skel(21, 6, _M6, "Big-O & Complexity",
           "Reason about the time and space cost of your code."),
@@ -555,7 +555,6 @@ _WEEKS += [
     _skel(24, 6, _M6, "Sorting",
           "Understand the common sorts and use sorting as a problem-solving tool."),
 ]
-_M7 = "DSA Interview Core"
 _WEEKS += [
     _skel(25, 7, _M7, "Recursion & Backtracking",
           "Solve problems whose definition refers to themselves, then use that to "
@@ -567,7 +566,6 @@ _WEEKS += [
     _skel(28, 7, _M7, "Heaps & Intervals",
           "Use priority queues and interval techniques on classic problems."),
 ]
-_M8 = "Advanced Types & Interview Polish"
 _WEEKS += [
     _skel(29, 8, _M8, "Conditional & Mapped Types",
           "Compute new types from existing ones with conditional and mapped types."),
@@ -724,8 +722,18 @@ _SCOPE_RULES = [
     ("NonNullable<", 15), ("Awaited<", 17),
     ("JSON.parse(", 15), ("JSON.stringify(", 15), ("??=", 15),
     ("export ", 16), ("declare ", 16),               # modules & ambient decls
+    # Week 16's own additions. `declare global` needs no rule of its own —
+    # `declare ` above already gates it — and `export default` is covered by
+    # `export `. These three are not covered by anything, and were verified
+    # absent from weeks 1-15 before being listed.
+    ("namespace ", 16), ("globalThis", 16), ("import type ", 16),
     ("async ", 17), ("await ", 17), ("Promise<", 17),
     ("new Map(", 19), ("new Set(", 19),
+    # …and the GENERIC forms, which the two rules above cannot see: `new
+    # Map<string, number>()` does not contain the substring `new Map(`. Week 16's
+    # capstone was written with a `Map` and passed the lint because of exactly
+    # that hole; it now uses a `Record` and the hole is closed.
+    ("new Map<", 19), ("new Set<", 19),
     #
     # DELIBERATELY NOT GATED, because the authored weeks already use them and a
     # rule here would be a false claim about when the course first shows them:

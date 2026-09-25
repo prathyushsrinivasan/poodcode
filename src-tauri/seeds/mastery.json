@@ -11124,19 +11124,19 @@
             "judge_mode": "",
             "forbid": [],
             "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
-            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype State = \"idle\" | \"ready\";\ntype Command = \"coin\" | \"push\" | \"refund\";\nconst COMMANDS: readonly string[] = [\"coin\", \"push\", \"refund\"];\nconst table: Record<State, Record<Command, [State, string]>> = {\n  idle: { coin: [\"ready\", \"ready\"], push: [\"idle\", \"insert coin\"], refund: [\"idle\", \"nothing to refund\"] },\n  ready: { coin: [\"ready\", \"returned\"], push: [\"idle\", \"vending -> idle\"], refund: [\"idle\", \"refunded\"] },\n};\nlet state: State = \"idle\";\nfor (const token of input.split(/\\s+/)) {\n  if (!COMMANDS.includes(token)) {\n    console.log(`unknown ${token}`);\n    continue;\n  }\n  const current: State = state;\n  const [next, message] = table[current][token as Command];\n  state = next;\n  console.log(message);\n}\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype State = \"idle\" | \"ready\";\ntype Command = \"coin\" | \"push\" | \"refund\";\nconst COMMANDS: readonly string[] = [\"coin\", \"push\", \"refund\"];\nconst table: Record<State, Record<Command, [State, string]>> = {\n  idle: { coin: [\"ready\", \"ready\"], push: [\"idle\", \"insert coin\"], refund: [\"idle\", \"nothing to refund\"] },\n  ready: { coin: [\"ready\", \"returned\"], push: [\"idle\", \"vending -> idle\"], refund: [\"idle\", \"refunded\"] },\n};\nlet state: State = \"idle\";\nfor (const token of input.split(/\\s+/)) {\n  if (!COMMANDS.includes(token)) {\n    console.log(`unknown ${token}`);\n    continue;\n  }\n  const current: State = state;\n  // The annotation is load-bearing: `state = next` feeds the narrowed type of\n  // `state` (and so of `current`, and so of `table[current]`) back into `next`'s\n  // own initializer, which tsc reports as TS7022 rather than resolving.\n  const [next, message]: [State, string] = table[current][token as Command];\n  state = next;\n  console.log(message);\n}\n",
             "tests": [
               {
                 "input": "coin push push",
-                "output": ""
+                "output": "ready\nvending -> idle\ninsert coin"
               },
               {
                 "input": "refund coin coin refund",
-                "output": ""
+                "output": "nothing to refund\nready\nreturned\nrefunded"
               },
               {
                 "input": "coin kick push",
-                "output": ""
+                "output": "ready\nunknown kick\nvending -> idle"
               }
             ],
             "source_slug": "",

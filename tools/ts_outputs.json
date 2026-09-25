@@ -2316,6 +2316,14 @@
    "99 invalid\n600 invalid\n2.5 invalid\nabc invalid"
   ]
  },
+ "tsm-w10-vending": {
+  "hash": "04d9ac6055e46d4051a2",
+  "outputs": [
+   "ready\nvending -> idle\ninsert coin",
+   "nothing to refund\nready\nreturned\nrefunded",
+   "ready\nunknown kick\nvending -> idle"
+  ]
+ },
  "tsm-w2-clamp": {
   "hash": "bd47cdb3cadbcfc06b26",
   "outputs": [

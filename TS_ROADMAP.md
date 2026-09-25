@@ -1,12 +1,12 @@
-# TypeScript Roadmap — Weeks 16-32
+# TypeScript Roadmap — Weeks 18-32
 
 The plan for finishing **TypeScript: Zero to Interview**, the 8-month course in
-`tools/typescript_course.py`. Weeks 1-15 ship; weeks 16-32 are one-line
+`tools/typescript_course.py`. Weeks 1-17 ship; weeks 18-32 are one-line
 skeletons waiting to be authored.
 
 Unlike [`JAVA_ROADMAP.md`](JAVA_ROADMAP.md), which starts after the basics, this
 course starts at *zero* — week 1 is someone's first line of code. That decision
-is what makes the back half hard: everything in weeks 16-32 must still obey the
+is what makes the back half hard: everything in weeks 18-32 must still obey the
 rule that nothing may require syntax a later week teaches.
 
 **Status legend** — ✅ built and shipping · 🚧 partially built · ⬜ planned.
@@ -15,9 +15,9 @@ rule that nothing may require syntax a later week teaches.
 
 ## Where it stands
 
-**Built:** weeks 1-15 — **119 lessons, 897 judged exercises** (882 in lessons and
-capstones, 15 in week 1's practice families), fifteen Budget Buddy capstones, and
-a complete glossary/cheat-sheet/self-check/review set per week.
+**Built:** weeks 1-17 — **136 lessons, 1,025 judged exercises** (1,010 in lessons
+and capstones, 15 in week 1's practice families), seventeen Budget Buddy
+capstones, and a complete glossary/cheat-sheet/self-check/review set per week.
 
 | | |
 |---|---|
@@ -88,8 +88,12 @@ positionally by the lint and strictness passes.
 **One structural gotcha, fixed when week 13 landed:** the month-title constants
 used to be defined *after* the `_WEEK_FILES` loop, next to the skeletons. An
 authored week in a new month therefore referenced a name that did not exist yet.
-`_M4` now sits with `_M1`-`_M3` above the loop, and **`_M5` must be moved up the
-same way before week 17 is authored.**
+`_M4` was moved up then; **`_M5` through `_M8` were moved up when week 17 landed**,
+so every remaining week's month title already exists before the loop runs and the
+trap cannot fire again.
+
+Weeks 16 and 17 added `ts_w16_modules.py` (2.1k lines) and `ts_w17_async.py`
+(2.6k lines) to `_WEEK_FILES`, which is what the split was for.
 
 ### 2. Where the Budget Buddy arc ends ✅ — decided
 
@@ -240,7 +244,7 @@ the teaching:
 Method bivariance gets the same treatment: a `fix` whose starter compiles and
 then throws `v.toUpperCase is not a function`.
 
-### Month 4 — Robust, Real-World Programs (weeks 13-16) — 🚧 **13-15 done, 16 outstanding**
+### Month 4 — Robust, Real-World Programs (weeks 13-16) — ✅ **done**
 
 **13. Immutability & `readonly`** ✅ · `tools/ts_w13_immutability.py` · 8 lessons,
 59 exercises
@@ -286,29 +290,106 @@ with a `diagnose` — the whole point is that there is **no error** — so lesso
 uses `_retype`, the kind that exists for exactly this, and lesson 9 earns the
 type back with a real guard. That pairing is the week's payload.
 
-**16. Modules, tsconfig & Declaration Files** ⬜ · reuse `ts_modules`,
-`ts_tsconfig`, `ts_declaration_files`
-`import`/`export`, named vs default · barrel files · circular imports ·
-`strict` and what each flag buys · `noUncheckedIndexedAccess` (the course has
-been running under it since week 6 — name it at last) · `.d.ts` · `declare` ·
-ambient types · typing an untyped dependency.
-*Risk:* **highest structural risk in the course.** The judge compiles **one
-file**; there is no module resolution and no second file. Modules must be
-taught with single-file-compatible examples (namespaces of a sort, or
-`export` used but never imported across files) and the lesson must be honest
-that the exercises simulate a multi-file project. Decide this approach before
-authoring, or the week will be rewritten.
+**16. Modules, tsconfig & Declaration Files** ✅ · `tools/ts_w16_modules.py` ·
+8 lessons, 57 exercises
+`w16-module` · `w16-export` · `w16-default` · `w16-import` · `w16-shape` ·
+`w16-tsconfig` · `w16-indexed` · `w16-declare`.
+*Capstone:* Budget Buddy #16 — the program becomes a **package**: five sections in
+dependency order, one export list, a host-supplied currency through
+`declare global`, and a `satisfies`-checked strictness preset. Stretch makes the
+currency a lookup with a minor-unit table (JPY prints no decimals).
+Kinds: 32 drill, 14 diagnose, 7 fix, 1 predict, 1 design.
 
-### Month 5 — Async & Data Structures (weeks 17-20)
+**The structural risk was real and it was settled with evidence, not a
+compromise.** Every candidate was run against the real checker and the real
+runner before a line was authored, and the results decided the week:
 
-**17. Async & Promises** ⬜ · reuse `ts_async`, `ts_async_patterns`
-Promises · `async`/`await` · error handling in async code · `Promise.all` /
-`allSettled` / `race` · sequential vs concurrent · typing async functions.
-*Risk:* **determinism.** This is the TypeScript analogue of the Java course's
-Part 10 problem, and the same discipline applies: output must be deterministic
-*by construction*. Await in a fixed order, or collect results and print in
-index order — never let timing decide output. Record the rule in the week
-file's header, as `java_m30_sync.py` does.
+| | type-checks | runs |
+|---|---|---|
+| `export const` / `function` / `default` / `{ a, b }` / `type` | ✅ | ✅ |
+| `export {}`, the module marker | ✅ | ✅ |
+| `import * as` / `{ named }` / `{ x as y }` / default, from `"fs"` | ✅ | ✅ |
+| `declare global { var X }` + `globalThis.X = …` | ✅ | ✅ |
+| `interface` declaration merging | ✅ | ✅ |
+| `import` from `"./money.js"` | ❌ TS2307 | ❌ ERR_MODULE_NOT_FOUND |
+| `namespace N { … }` | ✅ | ❌ strip-only mode |
+| `declare module "leftpad"` | ❌ TS2664 | — |
+
+So **modules are not simulated with namespaces**. A file with a top-level
+`export` genuinely *is* a module, and every export exercise is executed code; the
+four import forms are taught against `"fs"`, the one module that resolves;
+`namespace` gets exactly one type-graded exercise, and its unrunnability *is* the
+lesson (decision 5, the same argument week 12 made against `enum`); and a
+multi-file project is drawn with `// ---- money.ts ----` section comments, which
+lesson 1 names as the device it is. The one impossible thing — importing a second
+file — ships as a `diagnose` whose error is the genuine TS2307 and whose fix is
+what a single-file project really does.
+
+**Best find, and lesson 5's payload:** a circular import's crash reproduces
+*exactly* in one file with no imports at all. A function that reads a `const`
+declared below it type-checks clean (the body is deferred) and then dies with
+`ReferenceError: Cannot access 'RATE' before initialization` — the same temporal
+dead zone, from the same cause. Its compile-time twin is shipped beside it, where
+the initialiser reads the `const` directly and TS2448 catches it; the contrast is
+the teaching.
+
+**Lesson 7 finally names `noUncheckedIndexedAccess`**, which the course has worn
+since week 6 — the only place where the *configuration* is visible in every
+exercise the learner has already done. Note the code: an element access has no
+name to quote, so it is **TS2532**, not the TS18048 you would guess.
+
+**Two lint holes were found while authoring and closed:** `new Map<string,
+number>()` does not contain the substring `new Map(`, so the week-19 gate missed a
+`Map` in week 16's capstone (now a `Record`, and `new Map<`/`new Set<` are gated
+too); and `namespace `, `globalThis` and `import type ` were ungated by anything
+and are now listed at 16.
+
+### Month 5 — Async & Data Structures (weeks 17-20) — 🚧 **17 done**
+
+**17. Async & Promises** ✅ · `tools/ts_w17_async.py` · 9 lessons, 71 exercises —
+the largest week in the course
+`w17-why` · `w17-promise` · `w17-await` · `w17-order` · `w17-errors` ·
+`w17-seqpar` · `w17-combinators` · `w17-typing` · `w17-patterns`.
+*Capstone:* Budget Buddy #17 — a paged loader. Every page is requested at once,
+the delays are deliberately reversed so the last page finishes first, and
+`Promise.allSettled` reports each outcome **in page order**. Stretch gives each
+page a 20 ms deadline through a per-page `Promise.race`.
+Kinds: 49 drill, 9 fix, 8 diagnose, 3 predict.
+
+**The determinism rule is in the file's header, as planned**, and it is five
+clauses rather than one: order comes from the program (await in a fixed order, or
+collect and print by index); nothing prints elapsed time; a race must have an
+unambiguous winner (a microtask against a timer, or delays *far* apart — never two
+equal delays, which is insertion order wearing a disguise); failures are driven by
+a **counter**, never by timing, so a retry transcript is identical everywhere; and
+delays stay in the 1-60 ms range. Every program was run four times and its stdout
+compared across runs before it shipped.
+
+Two exercises deliberately ship a program whose output is **stable but wrong** —
+`w17-order` fix1 prints in completion order, `w17-seqpar` fix1 prints before the
+work finishes — because a `fix` needs a starter that fails the same way every time.
+
+**What the environment actually allows, all verified:** top-level await (with or
+without an import), `Promise.withResolvers`, `Awaited<T>`, and
+`Promise.all`/`allSettled`/`race`/`any`. There is no `process` and no real I/O,
+which is right: a `delay()` over `setTimeout` is a truer stand-in for a slow call
+than anything the judge could wait on.
+
+**Two runtime facts the week is built on.** An unhandled rejection **kills the
+process** (Node's default), so a floating promise is a crash rather than a lint
+finding — which makes it a far better lesson, and it ships as two `fix`
+exercises. And `return p` inside a `try` is not protected by its `catch`, because
+the promise leaves the block before it settles; the starter for that one prints
+nothing and exits non-zero.
+
+**One sharp edge, found by the verifier and recorded in the file header:** Node
+decides a file is an ES module by scanning for module syntax, and that scan does
+**not** see an `await` that appears only inside a template expression —
+`` console.log(`total ${await total(3)}`) `` as a file's sole await is parsed as
+CommonJS and reports `SyntaxError: Missing } in template expression`, which says
+nothing about the real problem. The two exercises that interpolate an awaited value
+carry an explicit `export {};`, week 16's marker doing exactly the job week 16
+said it does.
 
 **18. Stacks & Queues** ⬜ · reuse `ts_ds_generics`
 Array as stack · queue and the O(n) `shift` trap · a generic `Stack<T>` and
@@ -397,17 +478,21 @@ still go first.
 |---|---|---|
 | **A** ✅ | — | Generator split, practice wired, capstone arc decided, gaps sequenced |
 | **B** ✅ | 11-12 | Classes unblock 18, 20, 28; structural typing completes month 3 |
-| **C** 🚧 | 13-15 ✅, **16 left** | Types done; 16 was split off — see below |
-| **D** | 17-20 | Async + data structures; closes the Budget Buddy arc |
+| **C** ✅ | 13-16 | Types, then the project-shaped week: modules, tsconfig, .d.ts |
+| **D** 🚧 | 17 ✅, **18-20** ← next | Async + data structures; closes the Budget Buddy arc |
 | **E** | 21-24 | Algorithmic thinking; 21 needs its format decided first |
 | **F** | 25-28 | DSA core |
 | **G** | 29-32 | Type-level; lowest risk, highest polish |
 
-**Week 16 is now the only thing standing between the course and month 5**, and it
-is deliberately left last in its batch because it is the highest-risk week in the
-course — see its entry above, plus decision 5 on `namespace`. It blocks nothing:
-weeks 17-20 need classes (batch B) and nothing from 16, so **D can start
-immediately** and 16 can land whenever its format is settled. G remains
+**Weeks 16 and 17 both landed, which clears the two risks the back half was
+waiting on** — the one-file module problem (settled with evidence; see week 16)
+and async determinism (settled with a written rule; see week 17). What remains is
+18-20 to close the Budget Buddy arc, then 21-28, then the type-level month.
+
+**One constraint discovered while authoring 16 and 17, for whoever writes 18-20:**
+`Map` and `Set` are gated at **week 19**, so week 18's stacks and queues must be
+built from arrays and `Record` — which is the right ladder anyway, since week 19
+then arrives as the answer to the O(n) lookup week 18 had to live with. G remains
 independent of everything.
 
 ---

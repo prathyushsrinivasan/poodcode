@@ -371,7 +371,10 @@ for (const token of input.split(/\s+/)) {
     continue;
   }
   const current: State = state;
-  const [next, message] = table[current][token as Command];
+  // The annotation is load-bearing: `state = next` feeds the narrowed type of
+  // `state` (and so of `current`, and so of `table[current]`) back into `next`'s
+  // own initializer, which tsc reports as TS7022 rather than resolving.
+  const [next, message]: [State, string] = table[current][token as Command];
   state = next;
   console.log(message);
 }
