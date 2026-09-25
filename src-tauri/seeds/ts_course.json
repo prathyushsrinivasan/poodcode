@@ -56043,19 +56043,2285 @@
       "month": 6,
       "month_title": "Algorithmic Thinking",
       "theme": "Searching & Two Pointers",
-      "goal": "Binary search a sorted array and sweep it with two pointers.",
-      "summary": "",
-      "authored": false,
-      "lessons": [],
-      "capstone": null,
-      "objectives": [],
-      "why": "",
-      "est_minutes": 40,
-      "glossary": [],
-      "cheatsheet": "",
-      "self_check": [],
-      "review": [],
-      "milestone": "",
+      "goal": "When the input is sorted you do not have to look at all of it. Binary search properly — including the two bounds and searching on the answer — and the two-pointer sweeps that replace a nested loop.",
+      "summary": "Sorted input is a gift, and this week is about spending it. Two techniques, and\nboth turn an O(n²) or an O(n) into something smaller:\n\n* **Binary search** — halve the search space every step. O(log n).\n* **Two pointers** — one sweep with two indices instead of a nested loop. O(n).\n\n## You have already written one of them\n\nWeek 21 built a binary search and counted it: 11 steps for 1,024 items, and one\nmore for every doubling. So this week does not introduce it — it covers the three\nthings that make it actually useful:\n\n1. **The bounds.** \"Where is this value?\" is the *least* common question. The real\n   ones are \"where would it go?\", \"where does this range start?\" and \"how many are\n   there?\" — and all three are a **lower bound** or an **upper bound**.\n2. **Searching on the answer.** There is no array. You are halving a range of\n   *candidate answers*, and the test is a predicate that flips from false to true\n   exactly once.\n3. **The off-by-one.** Two loop shapes that look the same and are not. This is the\n   one genuinely tricky thing in the week, and a single-element array is how you\n   catch it.\n\n## Two pointers\n\n```ts\nlet lo = 0;\nlet hi = xs.length - 1;\nwhile (lo < hi) {\n  const sum = (xs[lo] ?? 0) + (xs[hi] ?? 0);\n  if (sum === target) { … }\n  else if (sum < target) { lo = lo + 1; }   // need more — the only way is right\n  else { hi = hi - 1; }                      // need less — the only way is left\n}\n```\n\nEvery step eliminates one element **for good**, which is why it is one pass. The\nwhole argument rests on the array being sorted: that is what makes \"I need a bigger\nnumber, so I must move right\" true.\n\n## Counted, as the month requires\n\nWhere the point of a technique is that it is cheaper, the exercises print the step\ncount next to the answer. \"Two pointers is O(n)\" is a claim; `steps=4` beside\n`pairs=15` is the evidence, and it is exactly what week 21 taught you to look at.\n\n⏱️ Budget about **eight hours**.\n",
+      "authored": true,
+      "lessons": [
+        {
+          "key": "w22-linear",
+          "title": "When a scan is the right answer",
+          "what": "Before the clever version, the honest one.",
+          "lesson": "```ts\nfor (let i = 0; i < xs.length; i = i + 1) {\n  if ((xs[i] ?? 0) === target) { return i; }\n}\nreturn -1;\n```\n\nO(n), no preconditions, impossible to get wrong. Reach for it when:\n\n* **the input is not sorted**, and sorting it would cost more than the scan\n  (sorting is O(n log n); one scan is O(n));\n* **you search once.** Sorting to search once is a loss; sorting to search a\n  thousand times is a bargain, and that arithmetic is the whole decision;\n* **n is small.** Twelve months, seven days, a handful of tags: a scan is clearer\n  and the difference is unmeasurable (week 21's last lesson);\n* **you need every match**, not one — a scan is already optimal for that.\n\n## Early exit is the only optimisation that matters\n\n```ts\nif ((xs[i] ?? 0) === target) { return i; }   // stop at the first hit\n```\n\nBest case O(1), worst case still O(n). Week 21 counted exactly this: searching for\nthe first element takes one step, searching for an absent one takes n.\n\n## Two scans people write by accident\n\n```ts\nif (xs.includes(target)) { return xs.indexOf(target); }   // TWO scans\nconst i = xs.indexOf(target);                              // one\nif (i >= 0) { … }\n```\n\nand:\n\n```ts\nconst found = xs.filter((x) => x === target);   // scans ALL of it, allocates\nconst found = xs.find((x) => x === target);     // stops at the first\n```\n\nNeither is a complexity change — both are O(n) — but both do twice the work for no\nreason, and `filter` also allocates. Week 21's habit applies: read what the call\nactually does.\n\n## The decision, in one line\n\n> **Sorted, or searched more than a few times: binary search. Otherwise: scan.**\n\nThe rest of this week is what to do once you have decided.\n\n> ⚠️ **Common mistakes:** binary searching an unsorted array (it silently returns\n> the wrong answer); sorting to search once; and calling `includes` then `indexOf`.\n",
+          "warmup": [
+            {
+              "question": "A linear search is the right choice when…",
+              "options": [
+                "always",
+                "the input is unsorted and searched once, or n is small",
+                "never",
+                "the input is sorted"
+              ],
+              "answer": 1,
+              "explanation": "Sorting to search once is a loss."
+            },
+            {
+              "question": "Early exit changes…",
+              "options": [
+                "the worst case",
+                "the best case only",
+                "both",
+                "neither"
+              ],
+              "answer": 1,
+              "explanation": "Worst case is still O(n)."
+            },
+            {
+              "question": "`xs.includes(t)` then `xs.indexOf(t)` is…",
+              "options": [
+                "one scan",
+                "two scans for one answer",
+                "O(1)",
+                "required"
+              ],
+              "answer": 1,
+              "explanation": "Use indexOf and test the result."
+            },
+            {
+              "question": "Binary searching an unsorted array…",
+              "options": [
+                "throws",
+                "silently returns the wrong answer",
+                "works",
+                "is O(n)"
+              ],
+              "answer": 1,
+              "explanation": "Which is why the precondition matters."
+            }
+          ],
+          "exercises": [
+            {
+              "id": "tscourse-w22-ln-1",
+              "title": "Scan with an early exit",
+              "prompt": "Return as soon as the target is found, and report how many steps it took.",
+              "hint": "Return the index and the count at the moment of the match.",
+              "hints": [
+                "Return the index and the count at the moment of the match.",
+                "Write return `found at ${i} steps=${steps}`;"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nfunction find(xs: readonly number[], target: number): string {\n  let steps = 0;\n  for (let i = 0; i < xs.length; i = i + 1) {\n    steps = steps + 1;\n    if ((xs[i] ?? 0) === target) {\n____\n    }\n  }\n  return `absent steps=${steps}`;\n}\nconsole.log(find(nums, 3));\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nfunction find(xs: readonly number[], target: number): string {\n  let steps = 0;\n  for (let i = 0; i < xs.length; i = i + 1) {\n    steps = steps + 1;\n    if ((xs[i] ?? 0) === target) {\n      return `found at ${i} steps=${steps}`;\n    }\n  }\n  return `absent steps=${steps}`;\n}\nconsole.log(find(nums, 3));\n",
+              "tests": [
+                {
+                  "input": "5 3 9",
+                  "output": "found at 1 steps=2"
+                },
+                {
+                  "input": "1 2",
+                  "output": "absent steps=2"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w22-ln-2",
+              "title": "Best case and worst case",
+              "prompt": "Search for the first element and then for an absent one, and print both counts.",
+              "hint": "The first element, then something that is not there.",
+              "hints": [
+                "The first element, then something that is not there.",
+                "Write console.log(`best=${steps(xs, 1)} worst=${steps(xs, 99)}`);"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "function steps(xs: readonly number[], target: number): number {\n  let n = 0;\n  for (const x of xs) {\n    n = n + 1;\n    if (x === target) {\n      return n;\n    }\n  }\n  return n;\n}\nconst xs = [1, 2, 3, 4, 5, 6, 7, 8];\n____\n",
+              "solution": "function steps(xs: readonly number[], target: number): number {\n  let n = 0;\n  for (const x of xs) {\n    n = n + 1;\n    if (x === target) {\n      return n;\n    }\n  }\n  return n;\n}\nconst xs = [1, 2, 3, 4, 5, 6, 7, 8];\nconsole.log(`best=${steps(xs, 1)} worst=${steps(xs, 99)}`);\n",
+              "tests": [
+                {
+                  "input": "",
+                  "output": "best=1 worst=8"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w22-ln-3",
+              "title": "One scan, not two",
+              "prompt": "Get the index once and test it, rather than asking twice.",
+              "hint": "`indexOf` already answers both questions.",
+              "hints": [
+                "`indexOf` already answers both questions.",
+                "Write const i = nums.indexOf(3);"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\n____\nconsole.log(i >= 0 ? `at ${i}` : \"absent\");\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst i = nums.indexOf(3);\nconsole.log(i >= 0 ? `at ${i}` : \"absent\");\n",
+              "tests": [
+                {
+                  "input": "5 3 9",
+                  "output": "at 1"
+                },
+                {
+                  "input": "1 2",
+                  "output": "absent"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w22-ln-4",
+              "title": "`find`, not `filter`",
+              "prompt": "Stop at the first match instead of collecting every one.",
+              "hint": "The method that returns one element and stops.",
+              "hints": [
+                "The method that returns one element and stops.",
+                "Write const first = nums.find((n) => n > 3);"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\n____\nconsole.log(first ?? -1);\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst first = nums.find((n) => n > 3);\nconsole.log(first ?? -1);\n",
+              "tests": [
+                {
+                  "input": "1 5 7",
+                  "output": "5"
+                },
+                {
+                  "input": "1 2",
+                  "output": "-1"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w22-ln-5",
+              "title": "The sort-once arithmetic",
+              "prompt": "Report the total cost of scanning k times against sorting once and binary searching k times.",
+              "hint": "Sorting is paid once; each search after it is logarithmic.",
+              "hints": [
+                "Sorting is paid once; each search after it is logarithmic.",
+                "Write const sorting = n * logN + k * logN;"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst n = 1024;\nconst logN = 10;\nconst k = nums[0] ?? 1;\nconst scanning = k * n;\n____\nconsole.log(`k=${k} scan=${scanning} sortThenSearch=${sorting} better=${scanning < sorting ? \"scan\" : \"sort\"}`);\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst n = 1024;\nconst logN = 10;\nconst k = nums[0] ?? 1;\nconst scanning = k * n;\nconst sorting = n * logN + k * logN;\nconsole.log(`k=${k} scan=${scanning} sortThenSearch=${sorting} better=${scanning < sorting ? \"scan\" : \"sort\"}`);\n",
+              "tests": [
+                {
+                  "input": "1",
+                  "output": "k=1 scan=1024 sortThenSearch=10250 better=scan"
+                },
+                {
+                  "input": "100",
+                  "output": "k=100 scan=102400 sortThenSearch=11240 better=sort"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w22-ln-fix1",
+              "title": "Fix the binary search on unsorted input",
+              "prompt": "This binary searches an array nobody sorted, and reports `absent` for a value that is right there. The algorithm is fine; its precondition is not.",
+              "hint": "Halving is only valid if everything left of the midpoint is smaller.",
+              "hints": [
+                "Halving is only valid if everything left of the midpoint is smaller.",
+                "Nothing in the program establishes that.",
+                "Sort the input as it is read, with a numeric comparator."
+              ],
+              "language": "typescript",
+              "kind": "fix",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums: readonly number[] = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nfunction has(xs: readonly number[], target: number): boolean {\n  let lo = 0;\n  let hi = xs.length - 1;\n  while (lo <= hi) {\n    const mid = Math.floor((lo + hi) / 2);\n    const v = xs[mid] ?? 0;\n    if (v === target) {\n      return true;\n    }\n    if (v < target) {\n      lo = mid + 1;\n    } else {\n      hi = mid - 1;\n    }\n  }\n  return false;\n}\nconsole.log(has(nums, 1));\n",
+              "solution": "import * as fs from \"fs\";\nconst nums: readonly number[] = fs\n  .readFileSync(0, \"utf8\")\n  .trim()\n  .split(\" \")\n  .map(Number)\n  .sort((a, b) => a - b);\nfunction has(xs: readonly number[], target: number): boolean {\n  let lo = 0;\n  let hi = xs.length - 1;\n  while (lo <= hi) {\n    const mid = Math.floor((lo + hi) / 2);\n    const v = xs[mid] ?? 0;\n    if (v === target) {\n      return true;\n    }\n    if (v < target) {\n      lo = mid + 1;\n    } else {\n      hi = mid - 1;\n    }\n  }\n  return false;\n}\nconsole.log(has(nums, 1));\n",
+              "tests": [
+                {
+                  "input": "9 5 1",
+                  "output": "true"
+                },
+                {
+                  "input": "3 2",
+                  "output": "false"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            }
+          ],
+          "quiz": [
+            {
+              "question": "`filter` instead of `find` costs…",
+              "options": [
+                "a complexity class",
+                "the rest of the scan, plus an allocation",
+                "nothing",
+                "a sort"
+              ],
+              "answer": 1,
+              "explanation": "Both are O(n); one does twice the work."
+            },
+            {
+              "question": "The decision rule is…",
+              "options": [
+                "always binary search",
+                "sorted or searched many times: binary search; otherwise scan",
+                "always scan",
+                "it depends on n only"
+              ],
+              "answer": 1,
+              "explanation": "And the arithmetic is in exercise 5."
+            }
+          ]
+        },
+        {
+          "key": "w22-binary",
+          "title": "Binary search, and the boundary that breaks it",
+          "what": "You wrote one in week 21. Here is why it is the most-failed question there is.",
+          "lesson": "The idea is trivial: look at the middle, throw away the half that cannot contain\nthe answer, repeat. The bug is never the idea. It is always the boundary.\n\n## The shape for finding a value\n\n```ts\nfunction search(xs: readonly number[], target: number): number {\n  let lo = 0;\n  let hi = xs.length - 1;          // INCLUSIVE: hi is a real index\n  while (lo <= hi) {                // <=  : a range of one is still a range\n    const mid = Math.floor((lo + hi) / 2);\n    const v = xs[mid] ?? 0;\n    if (v === target) { return mid; }\n    if (v < target) { lo = mid + 1; }\n    else { hi = mid - 1; }           // mid - 1: mid is ruled out\n  }\n  return -1;\n}\n```\n\nThree things have to agree, and they are the whole lesson:\n\n| `hi` starts at | loop test | shrink with |\n|---|---|---|\n| `length - 1` (inclusive) | `lo <= hi` | `hi = mid - 1` |\n| `length` (exclusive) | `lo < hi` | `hi = mid` |\n\n**Pick a row and stay in it.** Every binary search bug is a value from one row\nused with the other.\n\n## The invariant\n\n> If the target is in the array at all, it is somewhere in `[lo, hi]`.\n\nTrue before the loop, and each branch preserves it: if `xs[mid] < target` then the\ntarget cannot be at `mid` or to its left, so `lo = mid + 1` is safe. Being able to\nsay that sentence is what lets you write the thing without guessing.\n\n## The bug, and how to catch it in five seconds\n\n```ts\nwhile (lo < hi) { … hi = mid - 1; }    // ❌ mixed rows\n```\n\nWith an inclusive `hi`, `lo < hi` exits while one element is still unexamined:\n\n```\nsearch([1, 2, 3], 3)  ->  -1      // should be 2\nsearch([1], 1)        ->  -1      // should be 0\n```\n\n**A one-element array is the test.** If your binary search cannot find the only\nelement, the loop condition is wrong. It is the cheapest test in programming and\nalmost nobody writes it.\n\n## Termination\n\nThe range must shrink every iteration, or the loop hangs. `lo = mid + 1` and\n`hi = mid - 1` both exclude `mid`, so it always does. In the bound shape,\n`hi = mid` does *not* exclude `mid` — which is fine there only because that loop\ntests `lo < hi`, so `mid` is always strictly less than `hi` and the range still\nshrinks. If you ever write `lo = mid` you have written an infinite loop.\n\n## Mid-point overflow: not your problem here\n\nYou will see this:\n\n```ts\nconst mid = lo + Math.floor((hi - lo) / 2);\n```\n\nIn Java or C, `lo + hi` can exceed the maximum `int` and go negative — a famous bug\nthat sat in the JDK's own binary search for nine years. **In TypeScript this cannot\nhappen**: numbers are doubles, exact to 2^53, and an array cannot be longer than\n2^32. `(lo + hi) / 2` is correct here.\n\nThe idiom is still worth recognising, because you will read it constantly and\nbecause if you write the same algorithm in another language it becomes real again.\n\n> ⚠️ **Common mistakes:** mixing the two rows; not testing a one-element array; and\n> `lo = mid` instead of `lo = mid + 1`, which hangs.\n",
+          "warmup": [
+            {
+              "question": "With `hi = length - 1`, the loop test must be…",
+              "options": [
+                "lo < hi",
+                "lo <= hi",
+                "either",
+                "lo !== hi"
+              ],
+              "answer": 1,
+              "explanation": "A range of one is still a range."
+            },
+            {
+              "question": "With `hi = length`, you shrink with…",
+              "options": [
+                "hi = mid - 1",
+                "hi = mid",
+                "hi = mid + 1",
+                "hi--"
+              ],
+              "answer": 1,
+              "explanation": "Exclusive hi keeps mid as the new bound."
+            },
+            {
+              "question": "The five-second test for a binary search is…",
+              "options": [
+                "a big array",
+                "a ONE-element array",
+                "an empty array",
+                "a sorted array"
+              ],
+              "answer": 1,
+              "explanation": "If it cannot find the only element, the condition is wrong."
+            },
+            {
+              "question": "`lo = mid` instead of `lo = mid + 1`…",
+              "options": [
+                "is equivalent",
+                "hangs — the range stops shrinking",
+                "is faster",
+                "returns -1"
+              ],
+              "answer": 1,
+              "explanation": "Termination depends on excluding mid."
+            }
+          ],
+          "exercises": [
+            {
+              "id": "tscourse-w22-bs-1",
+              "title": "The inclusive shape",
+              "prompt": "Set the upper bound so the loop test `lo <= hi` is correct.",
+              "hint": "An inclusive bound is the last real index.",
+              "hints": [
+                "An inclusive bound is the last real index.",
+                "Write let hi = xs.length - 1;"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums: readonly number[] = fs\n  .readFileSync(0, \"utf8\")\n  .trim()\n  .split(\" \")\n  .filter((s) => s !== \"\")\n  .map(Number)\n  .sort((a, b) => a - b);\nfunction search(xs: readonly number[], target: number): number {\n  let lo = 0;\n____\n  while (lo <= hi) {\n    const mid = Math.floor((lo + hi) / 2);\n    const v = xs[mid] ?? 0;\n    if (v === target) {\n      return mid;\n    }\n    if (v < target) {\n      lo = mid + 1;\n    } else {\n      hi = mid - 1;\n    }\n  }\n  return -1;\n}\nconsole.log(search(nums, 3));\n",
+              "solution": "import * as fs from \"fs\";\nconst nums: readonly number[] = fs\n  .readFileSync(0, \"utf8\")\n  .trim()\n  .split(\" \")\n  .filter((s) => s !== \"\")\n  .map(Number)\n  .sort((a, b) => a - b);\nfunction search(xs: readonly number[], target: number): number {\n  let lo = 0;\n  let hi = xs.length - 1;\n  while (lo <= hi) {\n    const mid = Math.floor((lo + hi) / 2);\n    const v = xs[mid] ?? 0;\n    if (v === target) {\n      return mid;\n    }\n    if (v < target) {\n      lo = mid + 1;\n    } else {\n      hi = mid - 1;\n    }\n  }\n  return -1;\n}\nconsole.log(search(nums, 3));\n",
+              "tests": [
+                {
+                  "input": "1 2 3 4 5",
+                  "output": "2"
+                },
+                {
+                  "input": "3",
+                  "output": "0"
+                },
+                {
+                  "input": "1 2",
+                  "output": "-1"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w22-bs-2",
+              "title": "Count the steps",
+              "prompt": "Report how many iterations the search needed, which is the log.",
+              "hint": "One per iteration, at the top of the loop.",
+              "hints": [
+                "One per iteration, at the top of the loop.",
+                "Write n = n + 1;"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "function steps(xs: readonly number[], target: number): number {\n  let lo = 0;\n  let hi = xs.length - 1;\n  let n = 0;\n  while (lo <= hi) {\n____\n    const mid = Math.floor((lo + hi) / 2);\n    const v = xs[mid] ?? 0;\n    if (v === target) {\n      return n;\n    }\n    if (v < target) {\n      lo = mid + 1;\n    } else {\n      hi = mid - 1;\n    }\n  }\n  return n;\n}\nfor (const size of [8, 1024]) {\n  const xs = Array.from({ length: size }, (_, i) => i);\n  console.log(`n=${size} steps=${steps(xs, size - 1)}`);\n}\n",
+              "solution": "function steps(xs: readonly number[], target: number): number {\n  let lo = 0;\n  let hi = xs.length - 1;\n  let n = 0;\n  while (lo <= hi) {\n    n = n + 1;\n    const mid = Math.floor((lo + hi) / 2);\n    const v = xs[mid] ?? 0;\n    if (v === target) {\n      return n;\n    }\n    if (v < target) {\n      lo = mid + 1;\n    } else {\n      hi = mid - 1;\n    }\n  }\n  return n;\n}\nfor (const size of [8, 1024]) {\n  const xs = Array.from({ length: size }, (_, i) => i);\n  console.log(`n=${size} steps=${steps(xs, size - 1)}`);\n}\n",
+              "tests": [
+                {
+                  "input": "",
+                  "output": "n=8 steps=4\nn=1024 steps=11"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w22-bs-3",
+              "title": "Find the one element",
+              "prompt": "Run the search on a single-element array — the test that catches the boundary bug.",
+              "hint": "Three cases: the only element, a missing one, and an empty array.",
+              "hints": [
+                "Three cases: the only element, a missing one, and an empty array.",
+                "Write console.log(`${search([7], 7)} ${search([7], 9)} ${search([], 7)}`);"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "function search(xs: readonly number[], target: number): number {\n  let lo = 0;\n  let hi = xs.length - 1;\n  while (lo <= hi) {\n    const mid = Math.floor((lo + hi) / 2);\n    const v = xs[mid] ?? 0;\n    if (v === target) {\n      return mid;\n    }\n    if (v < target) {\n      lo = mid + 1;\n    } else {\n      hi = mid - 1;\n    }\n  }\n  return -1;\n}\n____\n",
+              "solution": "function search(xs: readonly number[], target: number): number {\n  let lo = 0;\n  let hi = xs.length - 1;\n  while (lo <= hi) {\n    const mid = Math.floor((lo + hi) / 2);\n    const v = xs[mid] ?? 0;\n    if (v === target) {\n      return mid;\n    }\n    if (v < target) {\n      lo = mid + 1;\n    } else {\n      hi = mid - 1;\n    }\n  }\n  return -1;\n}\nconsole.log(`${search([7], 7)} ${search([7], 9)} ${search([], 7)}`);\n",
+              "tests": [
+                {
+                  "input": "",
+                  "output": "0 -1 -1"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w22-bs-4",
+              "title": "Rule out the midpoint",
+              "prompt": "Move the lower bound past the midpoint, so the range shrinks and the loop ends.",
+              "hint": "`mid` has already been tested and is not the answer, so exclude it.",
+              "hints": [
+                "`mid` has already been tested and is not the answer, so exclude it.",
+                "Write lo = mid + 1;"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums: readonly number[] = fs\n  .readFileSync(0, \"utf8\")\n  .trim()\n  .split(\" \")\n  .filter((s) => s !== \"\")\n  .map(Number)\n  .sort((a, b) => a - b);\nfunction search(xs: readonly number[], target: number): number {\n  let lo = 0;\n  let hi = xs.length - 1;\n  while (lo <= hi) {\n    const mid = Math.floor((lo + hi) / 2);\n    const v = xs[mid] ?? 0;\n    if (v === target) {\n      return mid;\n    }\n    if (v < target) {\n____\n    } else {\n      hi = mid - 1;\n    }\n  }\n  return -1;\n}\nconsole.log(search(nums, 5));\n",
+              "solution": "import * as fs from \"fs\";\nconst nums: readonly number[] = fs\n  .readFileSync(0, \"utf8\")\n  .trim()\n  .split(\" \")\n  .filter((s) => s !== \"\")\n  .map(Number)\n  .sort((a, b) => a - b);\nfunction search(xs: readonly number[], target: number): number {\n  let lo = 0;\n  let hi = xs.length - 1;\n  while (lo <= hi) {\n    const mid = Math.floor((lo + hi) / 2);\n    const v = xs[mid] ?? 0;\n    if (v === target) {\n      return mid;\n    }\n    if (v < target) {\n      lo = mid + 1;\n    } else {\n      hi = mid - 1;\n    }\n  }\n  return -1;\n}\nconsole.log(search(nums, 5));\n",
+              "tests": [
+                {
+                  "input": "1 3 5 7",
+                  "output": "2"
+                },
+                {
+                  "input": "5",
+                  "output": "0"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w22-bs-5",
+              "title": "Which row am I in",
+              "prompt": "Report the three values that have to agree, for each shape.",
+              "hint": "Print each row on its own line.",
+              "hints": [
+                "Print each row on its own line.",
+                "Write for (const s of shapes) {"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "const shapes = [\n  \"value: hi=length-1, lo<=hi, hi=mid-1\",\n  \"bound: hi=length, lo<hi, hi=mid\",\n];\n____\n  console.log(s);\n}\n",
+              "solution": "const shapes = [\n  \"value: hi=length-1, lo<=hi, hi=mid-1\",\n  \"bound: hi=length, lo<hi, hi=mid\",\n];\nfor (const s of shapes) {\n  console.log(s);\n}\n",
+              "tests": [
+                {
+                  "input": "",
+                  "output": "value: hi=length-1, lo<=hi, hi=mid-1\nbound: hi=length, lo<hi, hi=mid"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w22-bs-fix1",
+              "title": "Fix the search that misses the last element",
+              "prompt": "`search([1,2,3], 3)` returns -1 and so does `search([1], 1)`. The upper bound is inclusive but the loop test is `<`, so the loop exits with one element still unexamined — two rows of the table, mixed.",
+              "hint": "The one-element case is the giveaway: the loop never runs at all.",
+              "hints": [
+                "The one-element case is the giveaway: the loop never runs at all.",
+                "With an inclusive `hi`, a range where lo equals hi still contains one element.",
+                "Change the loop test to `lo <= hi`."
+              ],
+              "language": "typescript",
+              "kind": "fix",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "function search(xs: readonly number[], target: number): number {\n  let lo = 0;\n  let hi = xs.length - 1;\n  while (lo < hi) {\n    const mid = Math.floor((lo + hi) / 2);\n    const v = xs[mid] ?? 0;\n    if (v === target) {\n      return mid;\n    }\n    if (v < target) {\n      lo = mid + 1;\n    } else {\n      hi = mid - 1;\n    }\n  }\n  return -1;\n}\nconsole.log(`${search([1, 2, 3], 3)} ${search([1], 1)}`);\n",
+              "solution": "function search(xs: readonly number[], target: number): number {\n  let lo = 0;\n  let hi = xs.length - 1;\n  while (lo <= hi) {\n    const mid = Math.floor((lo + hi) / 2);\n    const v = xs[mid] ?? 0;\n    if (v === target) {\n      return mid;\n    }\n    if (v < target) {\n      lo = mid + 1;\n    } else {\n      hi = mid - 1;\n    }\n  }\n  return -1;\n}\nconsole.log(`${search([1, 2, 3], 3)} ${search([1], 1)}`);\n",
+              "tests": [
+                {
+                  "input": "",
+                  "output": "2 0"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            }
+          ],
+          "quiz": [
+            {
+              "question": "The JDK's binary search had an overflow bug for nine years because…",
+              "options": [
+                "the idea is hard",
+                "`lo + hi` can exceed Java's int range",
+                "of sorting",
+                "of generics"
+              ],
+              "answer": 1,
+              "explanation": "Which is not possible with JavaScript doubles."
+            },
+            {
+              "question": "Being able to state the invariant lets you…",
+              "options": [
+                "skip tests",
+                "write the boundaries without guessing",
+                "avoid sorting",
+                "use recursion"
+              ],
+              "answer": 1,
+              "explanation": "\"If it is here at all, it is in [lo, hi].\""
+            }
+          ]
+        },
+        {
+          "key": "w22-bounds",
+          "title": "The two bounds",
+          "what": "What binary search is actually for.",
+          "lesson": "\"Find the index of x\" is the least useful question you can ask a sorted array. The\nuseful ones are:\n\n* Where does x **start**?\n* Where does x **end**?\n* **How many** x are there?\n* Where **would** x go?\n* How many values are in **[a, b]**?\n\nAll five are answered by two functions, which differ by **one character**.\n\n## Lower bound — the first index whose value is `>= target`\n\n```ts\nfunction lowerBound(xs: readonly number[], target: number): number {\n  let lo = 0;\n  let hi = xs.length;                       // EXCLUSIVE\n  while (lo < hi) {\n    const mid = Math.floor((lo + hi) / 2);\n    if ((xs[mid] ?? 0) < target) { lo = mid + 1; }\n    else { hi = mid; }\n  }\n  return lo;\n}\n```\n\nOn `[1, 3, 3, 3, 5, 7]`:\n\n```\nlowerBound(0) = 0     // before everything\nlowerBound(3) = 1     // the FIRST 3\nlowerBound(4) = 4     // where a 4 would go\nlowerBound(8) = 6     // past the end — note: a valid answer, not an error\n```\n\nIt never returns -1. A missing value gives you the position it *would* occupy,\nwhich is exactly what you want when inserting, and is why this is also called the\n**insertion point**.\n\n## Upper bound — the first index whose value is `> target`\n\n```ts\n    if ((xs[mid] ?? 0) <= target) { lo = mid + 1; }   // <= instead of <\n```\n\nThat is the entire difference. On the same array, `upperBound(3) = 4` — one past\nthe last 3.\n\n## What the pair gives you\n\n```ts\nconst first = lowerBound(xs, x);\nconst past = upperBound(xs, x);\n\npast - first;                   // how many x there are — no scanning\nfirst < xs.length && xs[first] === x;    // is x present\nlowerBound(xs, x);               // where to insert\nupperBound(xs, b) - lowerBound(xs, a);  // how many values in [a, b]\n```\n\nThat last line is worth staring at. \"How many ledger entries between £5 and £20\"\nis two binary searches and a subtraction — O(log n) for a question that looks like\nit needs a filter.\n\n## Presence, carefully\n\n```ts\nconst i = lowerBound(xs, x);\nconst present = i < xs.length && (xs[i] ?? 0) === x;\n```\n\n**The length check comes first.** `lowerBound` legitimately returns `xs.length`\nfor a value past the end, and indexing there is `undefined` — which under\n`noUncheckedIndexedAccess` the compiler already made you think about, and which\nwithout the check would compare `0 === x` and occasionally say yes.\n\n> ⚠️ **Common mistakes:** expecting -1 for a missing value; forgetting the length\n> check before comparing; and writing `<` where the upper bound needs `<=`.\n",
+          "warmup": [
+            {
+              "question": "A lower bound returns the first index whose value is…",
+              "options": [
+                "> target",
+                ">= target",
+                "=== target",
+                "< target"
+              ],
+              "answer": 1,
+              "explanation": "Which is where the value starts, or would go."
+            },
+            {
+              "question": "For a value past the end, `lowerBound` returns…",
+              "options": [
+                "-1",
+                "xs.length",
+                "0",
+                "undefined"
+              ],
+              "answer": 1,
+              "explanation": "A valid answer, not an error."
+            },
+            {
+              "question": "Upper bound differs from lower bound by…",
+              "options": [
+                "the loop shape",
+                "one character: `<=` instead of `<`",
+                "the return",
+                "the bounds"
+              ],
+              "answer": 1,
+              "explanation": "That is genuinely all."
+            },
+            {
+              "question": "The count of x is…",
+              "options": [
+                "a scan",
+                "upperBound(x) - lowerBound(x)",
+                "lowerBound(x)",
+                "1"
+              ],
+              "answer": 1,
+              "explanation": "Two searches and a subtraction."
+            }
+          ],
+          "exercises": [
+            {
+              "id": "tscourse-w22-bd-1",
+              "title": "The lower bound",
+              "prompt": "Move the exclusive upper bound down to the midpoint, keeping it as a candidate.",
+              "hint": "The midpoint might itself be the answer, so it stays in range.",
+              "hints": [
+                "The midpoint might itself be the answer, so it stays in range.",
+                "Write hi = mid;"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums: readonly number[] = fs\n  .readFileSync(0, \"utf8\")\n  .trim()\n  .split(\" \")\n  .filter((s) => s !== \"\")\n  .map(Number)\n  .sort((a, b) => a - b);\nfunction lowerBound(xs: readonly number[], target: number): number {\n  let lo = 0;\n  let hi = xs.length;\n  while (lo < hi) {\n    const mid = Math.floor((lo + hi) / 2);\n    if ((xs[mid] ?? 0) < target) {\n      lo = mid + 1;\n    } else {\n____\n    }\n  }\n  return lo;\n}\nconsole.log(lowerBound(nums, 3));\n",
+              "solution": "import * as fs from \"fs\";\nconst nums: readonly number[] = fs\n  .readFileSync(0, \"utf8\")\n  .trim()\n  .split(\" \")\n  .filter((s) => s !== \"\")\n  .map(Number)\n  .sort((a, b) => a - b);\nfunction lowerBound(xs: readonly number[], target: number): number {\n  let lo = 0;\n  let hi = xs.length;\n  while (lo < hi) {\n    const mid = Math.floor((lo + hi) / 2);\n    if ((xs[mid] ?? 0) < target) {\n      lo = mid + 1;\n    } else {\n      hi = mid;\n    }\n  }\n  return lo;\n}\nconsole.log(lowerBound(nums, 3));\n",
+              "tests": [
+                {
+                  "input": "1 3 3 3 5 7",
+                  "output": "1"
+                },
+                {
+                  "input": "1 2",
+                  "output": "2"
+                },
+                {
+                  "input": "5 6",
+                  "output": "0"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w22-bd-2",
+              "title": "The upper bound",
+              "prompt": "Change one operator, so the search lands one past the last match.",
+              "hint": "Equal values must be skipped over, not stopped at.",
+              "hints": [
+                "Equal values must be skipped over, not stopped at.",
+                "Write if ((xs[mid] ?? 0) <= target) {"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums: readonly number[] = fs\n  .readFileSync(0, \"utf8\")\n  .trim()\n  .split(\" \")\n  .filter((s) => s !== \"\")\n  .map(Number)\n  .sort((a, b) => a - b);\nfunction upperBound(xs: readonly number[], target: number): number {\n  let lo = 0;\n  let hi = xs.length;\n  while (lo < hi) {\n    const mid = Math.floor((lo + hi) / 2);\n____\n      lo = mid + 1;\n    } else {\n      hi = mid;\n    }\n  }\n  return lo;\n}\nconsole.log(upperBound(nums, 3));\n",
+              "solution": "import * as fs from \"fs\";\nconst nums: readonly number[] = fs\n  .readFileSync(0, \"utf8\")\n  .trim()\n  .split(\" \")\n  .filter((s) => s !== \"\")\n  .map(Number)\n  .sort((a, b) => a - b);\nfunction upperBound(xs: readonly number[], target: number): number {\n  let lo = 0;\n  let hi = xs.length;\n  while (lo < hi) {\n    const mid = Math.floor((lo + hi) / 2);\n    if ((xs[mid] ?? 0) <= target) {\n      lo = mid + 1;\n    } else {\n      hi = mid;\n    }\n  }\n  return lo;\n}\nconsole.log(upperBound(nums, 3));\n",
+              "tests": [
+                {
+                  "input": "1 3 3 3 5 7",
+                  "output": "4"
+                },
+                {
+                  "input": "1 2",
+                  "output": "2"
+                },
+                {
+                  "input": "3",
+                  "output": "1"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w22-bd-3",
+              "title": "Count without scanning",
+              "prompt": "Subtract the two bounds.",
+              "hint": "One past the last, minus the first.",
+              "hints": [
+                "One past the last, minus the first.",
+                "Write console.log(upperBound(nums, target) - lowerBound(nums, target));"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums: readonly number[] = fs\n  .readFileSync(0, \"utf8\")\n  .trim()\n  .split(\" \")\n  .filter((s) => s !== \"\")\n  .map(Number)\n  .sort((a, b) => a - b);\nfunction lowerBound(xs: readonly number[], target: number): number {\n  let lo = 0;\n  let hi = xs.length;\n  while (lo < hi) {\n    const mid = Math.floor((lo + hi) / 2);\n    if ((xs[mid] ?? 0) < target) {\n      lo = mid + 1;\n    } else {\n      hi = mid;\n    }\n  }\n  return lo;\n}\nfunction upperBound(xs: readonly number[], target: number): number {\n  let lo = 0;\n  let hi = xs.length;\n  while (lo < hi) {\n    const mid = Math.floor((lo + hi) / 2);\n    if ((xs[mid] ?? 0) <= target) {\n      lo = mid + 1;\n    } else {\n      hi = mid;\n    }\n  }\n  return lo;\n}\nconst target = 3;\n____\n",
+              "solution": "import * as fs from \"fs\";\nconst nums: readonly number[] = fs\n  .readFileSync(0, \"utf8\")\n  .trim()\n  .split(\" \")\n  .filter((s) => s !== \"\")\n  .map(Number)\n  .sort((a, b) => a - b);\nfunction lowerBound(xs: readonly number[], target: number): number {\n  let lo = 0;\n  let hi = xs.length;\n  while (lo < hi) {\n    const mid = Math.floor((lo + hi) / 2);\n    if ((xs[mid] ?? 0) < target) {\n      lo = mid + 1;\n    } else {\n      hi = mid;\n    }\n  }\n  return lo;\n}\nfunction upperBound(xs: readonly number[], target: number): number {\n  let lo = 0;\n  let hi = xs.length;\n  while (lo < hi) {\n    const mid = Math.floor((lo + hi) / 2);\n    if ((xs[mid] ?? 0) <= target) {\n      lo = mid + 1;\n    } else {\n      hi = mid;\n    }\n  }\n  return lo;\n}\nconst target = 3;\nconsole.log(upperBound(nums, target) - lowerBound(nums, target));\n",
+              "tests": [
+                {
+                  "input": "1 3 3 3 5",
+                  "output": "3"
+                },
+                {
+                  "input": "1 2",
+                  "output": "0"
+                },
+                {
+                  "input": "3 3",
+                  "output": "2"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w22-bd-4",
+              "title": "Present, safely",
+              "prompt": "Check the index is in range before comparing what is there.",
+              "hint": "The bound may legitimately be one past the end.",
+              "hints": [
+                "The bound may legitimately be one past the end.",
+                "Write return i < xs.length && (xs[i] ?? 0) === target;"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums: readonly number[] = fs\n  .readFileSync(0, \"utf8\")\n  .trim()\n  .split(\" \")\n  .filter((s) => s !== \"\")\n  .map(Number)\n  .sort((a, b) => a - b);\nfunction lowerBound(xs: readonly number[], target: number): number {\n  let lo = 0;\n  let hi = xs.length;\n  while (lo < hi) {\n    const mid = Math.floor((lo + hi) / 2);\n    if ((xs[mid] ?? 0) < target) {\n      lo = mid + 1;\n    } else {\n      hi = mid;\n    }\n  }\n  return lo;\n}\nfunction has(xs: readonly number[], target: number): boolean {\n  const i = lowerBound(xs, target);\n____\n}\nconsole.log(`${has(nums, 3)} ${has(nums, 99)}`);\n",
+              "solution": "import * as fs from \"fs\";\nconst nums: readonly number[] = fs\n  .readFileSync(0, \"utf8\")\n  .trim()\n  .split(\" \")\n  .filter((s) => s !== \"\")\n  .map(Number)\n  .sort((a, b) => a - b);\nfunction lowerBound(xs: readonly number[], target: number): number {\n  let lo = 0;\n  let hi = xs.length;\n  while (lo < hi) {\n    const mid = Math.floor((lo + hi) / 2);\n    if ((xs[mid] ?? 0) < target) {\n      lo = mid + 1;\n    } else {\n      hi = mid;\n    }\n  }\n  return lo;\n}\nfunction has(xs: readonly number[], target: number): boolean {\n  const i = lowerBound(xs, target);\n  return i < xs.length && (xs[i] ?? 0) === target;\n}\nconsole.log(`${has(nums, 3)} ${has(nums, 99)}`);\n",
+              "tests": [
+                {
+                  "input": "1 3 5",
+                  "output": "true false"
+                },
+                {
+                  "input": "1 2",
+                  "output": "false false"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w22-bd-5",
+              "title": "How many in a range",
+              "prompt": "Answer a range query with two bounds and a subtraction.",
+              "hint": "One past the top of the range, minus the start of it.",
+              "hints": [
+                "One past the top of the range, minus the start of it.",
+                "Write return upperBound(xs, hi) - lowerBound(xs, lo);"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums: readonly number[] = fs\n  .readFileSync(0, \"utf8\")\n  .trim()\n  .split(\" \")\n  .filter((s) => s !== \"\")\n  .map(Number)\n  .sort((a, b) => a - b);\nfunction lowerBound(xs: readonly number[], target: number): number {\n  let lo = 0;\n  let hi = xs.length;\n  while (lo < hi) {\n    const mid = Math.floor((lo + hi) / 2);\n    if ((xs[mid] ?? 0) < target) {\n      lo = mid + 1;\n    } else {\n      hi = mid;\n    }\n  }\n  return lo;\n}\nfunction upperBound(xs: readonly number[], target: number): number {\n  let lo = 0;\n  let hi = xs.length;\n  while (lo < hi) {\n    const mid = Math.floor((lo + hi) / 2);\n    if ((xs[mid] ?? 0) <= target) {\n      lo = mid + 1;\n    } else {\n      hi = mid;\n    }\n  }\n  return lo;\n}\nfunction inRange(xs: readonly number[], lo: number, hi: number): number {\n____\n}\nconsole.log(inRange(nums, 3, 7));\n",
+              "solution": "import * as fs from \"fs\";\nconst nums: readonly number[] = fs\n  .readFileSync(0, \"utf8\")\n  .trim()\n  .split(\" \")\n  .filter((s) => s !== \"\")\n  .map(Number)\n  .sort((a, b) => a - b);\nfunction lowerBound(xs: readonly number[], target: number): number {\n  let lo = 0;\n  let hi = xs.length;\n  while (lo < hi) {\n    const mid = Math.floor((lo + hi) / 2);\n    if ((xs[mid] ?? 0) < target) {\n      lo = mid + 1;\n    } else {\n      hi = mid;\n    }\n  }\n  return lo;\n}\nfunction upperBound(xs: readonly number[], target: number): number {\n  let lo = 0;\n  let hi = xs.length;\n  while (lo < hi) {\n    const mid = Math.floor((lo + hi) / 2);\n    if ((xs[mid] ?? 0) <= target) {\n      lo = mid + 1;\n    } else {\n      hi = mid;\n    }\n  }\n  return lo;\n}\nfunction inRange(xs: readonly number[], lo: number, hi: number): number {\n  return upperBound(xs, hi) - lowerBound(xs, lo);\n}\nconsole.log(inRange(nums, 3, 7));\n",
+              "tests": [
+                {
+                  "input": "1 3 5 7 9",
+                  "output": "3"
+                },
+                {
+                  "input": "1 2",
+                  "output": "0"
+                },
+                {
+                  "input": "3 4 5 6 7",
+                  "output": "5"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w22-bd-6",
+              "title": "Insert and stay sorted",
+              "prompt": "Splice the new value in at its lower bound.",
+              "hint": "The insertion point is exactly the lower bound.",
+              "hints": [
+                "The insertion point is exactly the lower bound.",
+                "Write xs.splice(lowerBound(xs, value), 0, value);"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums: readonly number[] = fs\n  .readFileSync(0, \"utf8\")\n  .trim()\n  .split(\" \")\n  .filter((s) => s !== \"\")\n  .map(Number)\n  .sort((a, b) => a - b);\nfunction lowerBound(xs: readonly number[], target: number): number {\n  let lo = 0;\n  let hi = xs.length;\n  while (lo < hi) {\n    const mid = Math.floor((lo + hi) / 2);\n    if ((xs[mid] ?? 0) < target) {\n      lo = mid + 1;\n    } else {\n      hi = mid;\n    }\n  }\n  return lo;\n}\nconst xs = [...nums];\nconst value = 4;\n____\nconsole.log(xs.join(\",\"));\n",
+              "solution": "import * as fs from \"fs\";\nconst nums: readonly number[] = fs\n  .readFileSync(0, \"utf8\")\n  .trim()\n  .split(\" \")\n  .filter((s) => s !== \"\")\n  .map(Number)\n  .sort((a, b) => a - b);\nfunction lowerBound(xs: readonly number[], target: number): number {\n  let lo = 0;\n  let hi = xs.length;\n  while (lo < hi) {\n    const mid = Math.floor((lo + hi) / 2);\n    if ((xs[mid] ?? 0) < target) {\n      lo = mid + 1;\n    } else {\n      hi = mid;\n    }\n  }\n  return lo;\n}\nconst xs = [...nums];\nconst value = 4;\nxs.splice(lowerBound(xs, value), 0, value);\nconsole.log(xs.join(\",\"));\n",
+              "tests": [
+                {
+                  "input": "1 3 5",
+                  "output": "1,3,4,5"
+                },
+                {
+                  "input": "9",
+                  "output": "4,9"
+                },
+                {
+                  "input": "1 2",
+                  "output": "1,2,4"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w22-bd-p1",
+              "title": "What a bound returns",
+              "prompt": "What type does TypeScript already infer for `at`? Annotate `check` with exactly that type — not merely one that fits. The question is the TYPE, not the value — and a bound never signals absence out of band.",
+              "hint": "It returns an index, always — even for a value past the end.",
+              "hints": [
+                "It returns an index, always — even for a value past the end.",
+                "Write number."
+              ],
+              "language": "typescript",
+              "kind": "predict",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<typeof check, typeof at>>;\n",
+              "judge_mode": "types",
+              "forbid": [
+                "typeof"
+              ],
+              "starter": "function lowerBound(xs: readonly number[], target: number): number {\n  let lo = 0;\n  let hi = xs.length;\n  while (lo < hi) {\n    const mid = Math.floor((lo + hi) / 2);\n    if ((xs[mid] ?? 0) < target) {\n      lo = mid + 1;\n    } else {\n      hi = mid;\n    }\n  }\n  return lo;\n}\nconst xs: readonly number[] = [1, 3, 5];\nconst at = lowerBound(xs, 99);\nconst check: ____ = at;\n",
+              "solution": "function lowerBound(xs: readonly number[], target: number): number {\n  let lo = 0;\n  let hi = xs.length;\n  while (lo < hi) {\n    const mid = Math.floor((lo + hi) / 2);\n    if ((xs[mid] ?? 0) < target) {\n      lo = mid + 1;\n    } else {\n      hi = mid;\n    }\n  }\n  return lo;\n}\nconst xs: readonly number[] = [1, 3, 5];\nconst at = lowerBound(xs, 99);\nconst check: number = at;\n",
+              "tests": [],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w22-bd-fix1",
+              "title": "Fix the presence check that read past the end",
+              "prompt": "`has(xs, 99)` says `true` for an array of `[1, 3, 5]`: the lower bound is 3, which is past the end, and `xs[3] ?? 0` is `0` — compared against nothing meaningful. Check the range first.",
+              "hint": "The fallback `?? target` makes the comparison true whenever the index is out of range.",
+              "hints": [
+                "The fallback `?? target` makes the comparison true whenever the index is out of range.",
+                "A bound can legitimately be `xs.length`.",
+                "Test `i < xs.length` before looking at what is there."
+              ],
+              "language": "typescript",
+              "kind": "fix",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "function lowerBound(xs: readonly number[], target: number): number {\n  let lo = 0;\n  let hi = xs.length;\n  while (lo < hi) {\n    const mid = Math.floor((lo + hi) / 2);\n    if ((xs[mid] ?? 0) < target) {\n      lo = mid + 1;\n    } else {\n      hi = mid;\n    }\n  }\n  return lo;\n}\nfunction has(xs: readonly number[], target: number): boolean {\n  const i = lowerBound(xs, target);\n  return (xs[i] ?? target) === target;\n}\nconsole.log(`${has([1, 3, 5], 3)} ${has([1, 3, 5], 99)}`);\n",
+              "solution": "function lowerBound(xs: readonly number[], target: number): number {\n  let lo = 0;\n  let hi = xs.length;\n  while (lo < hi) {\n    const mid = Math.floor((lo + hi) / 2);\n    if ((xs[mid] ?? 0) < target) {\n      lo = mid + 1;\n    } else {\n      hi = mid;\n    }\n  }\n  return lo;\n}\nfunction has(xs: readonly number[], target: number): boolean {\n  const i = lowerBound(xs, target);\n  return i < xs.length && (xs[i] ?? 0) === target;\n}\nconsole.log(`${has([1, 3, 5], 3)} ${has([1, 3, 5], 99)}`);\n",
+              "tests": [
+                {
+                  "input": "",
+                  "output": "true false"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            }
+          ],
+          "quiz": [
+            {
+              "question": "\"How many entries between 5 and 20\" costs…",
+              "options": [
+                "O(n)",
+                "O(log n) — two bounds and a subtraction",
+                "O(n log n)",
+                "O(1)"
+              ],
+              "answer": 1,
+              "explanation": "For a question that looks like a filter."
+            },
+            {
+              "question": "A lower bound never returns -1 because…",
+              "options": [
+                "it throws",
+                "a missing value still has a position it would occupy",
+                "it is 0",
+                "of the loop"
+              ],
+              "answer": 1,
+              "explanation": "Which is what makes it an insertion point."
+            }
+          ]
+        },
+        {
+          "key": "w22-answer",
+          "title": "Binary search on the answer",
+          "what": "There is no array. You are halving the answer itself.",
+          "lesson": "The hardest binary-search problems have no array in them at all. What is sorted is\nthe space of **possible answers**, and the \"comparison\" is a yes/no question about\na candidate.\n\n## The shape of the problem\n\n> Find the **smallest** budget / capacity / speed / day that **works**.\n\nIt is a binary search whenever the yes/no question is **monotonic**:\n\n```\nbudget:      1      2      3      4      5      6      7\nworks?     false  false  false  true   true   true   true\n                                  ↑\n                             the answer\n```\n\nOnce a budget works, every larger budget works too. That is the only requirement,\nand if it does not hold you cannot halve.\n\n## The template\n\n```ts\nlet lo = 1;                              // a definitely-impossible answer, or the\nlet hi = total;                          // smallest, and a definitely-possible one\nwhile (lo < hi) {                        // the BOUND shape, not the value shape\n  const mid = Math.floor((lo + hi) / 2);\n  if (feasible(mid)) { hi = mid; }       // it works, so the answer is <= mid\n  else { lo = mid + 1; }                 // it does not, so the answer is > mid\n}\nreturn lo;                                // lo === hi === the smallest that works\n```\n\nNote it is the **bound** shape from lesson 3, not the find-a-value shape. You are\nnot looking for a value that is there — you are looking for the boundary between\nfalse and true, which is exactly what a lower bound finds.\n\n## A worked example\n\n*The ledger has to be split across `days` days without reordering it. What is the\nsmallest daily limit that fits?*\n\n```ts\nfunction feasible(caps: readonly number[], perDay: number, days: number): boolean {\n  let used = 1;\n  let left = perDay;\n  for (const c of caps) {\n    if (c > perDay) { return false; }      // one item alone exceeds the limit\n    if (c > left) { used = used + 1; left = perDay; }   // start a new day\n    left = left - c;\n  }\n  return used <= days;\n}\n```\n\n`[1,2,3,4,5]` over 2 days gives **9**; over 5 days it gives **5** (the largest\nsingle item, which is the floor no number of days can go below). Both verified, and\nboth worth checking by hand — the second is the one that tells you the search\nbounds were right.\n\n## Choosing the bounds\n\n* `lo` = the smallest answer that could *conceivably* work.\n* `hi` = an answer that certainly works.\n\nIf `hi` is not certainly feasible the loop returns a wrong answer rather than\nfailing, which is the trap: here `hi` is the **sum** of everything, because one day\nholding the whole ledger always works.\n\n## Recognising it\n\nThree signals, and any one is usually enough:\n\n* the question says **\"minimum … such that\"** or **\"maximum … such that\"**;\n* checking a *specific* answer is much easier than finding the best one;\n* the answers are ordered, and feasibility never flips back.\n\nThat third one is the whole of it. \"Is 7 enough?\" being answerable in O(n) turns\n\"what is the smallest enough?\" into O(n log answer).\n\n> ⚠️ **Common mistakes:** a non-monotonic predicate; an upper bound that is not\n> actually feasible; and using the find-a-value loop shape, which will not converge\n> on a boundary.\n",
+          "warmup": [
+            {
+              "question": "Searching on the answer requires the predicate to be…",
+              "options": [
+                "fast",
+                "monotonic — once true, always true",
+                "pure",
+                "total"
+              ],
+              "answer": 1,
+              "explanation": "Otherwise halving is invalid."
+            },
+            {
+              "question": "The loop shape to use is…",
+              "options": [
+                "the find-a-value one",
+                "the BOUND one (lo < hi, hi = mid)",
+                "either",
+                "a for loop"
+              ],
+              "answer": 1,
+              "explanation": "You are finding a boundary, not a value."
+            },
+            {
+              "question": "`hi` must be chosen so that…",
+              "options": [
+                "it is large",
+                "it is certainly feasible",
+                "it is the sum",
+                "it is n"
+              ],
+              "answer": 1,
+              "explanation": "Otherwise the answer is silently wrong."
+            },
+            {
+              "question": "The signal phrase is…",
+              "options": [
+                "\"sort the array\"",
+                "\"the minimum X such that\"",
+                "\"find the index\"",
+                "\"in place\""
+              ],
+              "answer": 1,
+              "explanation": "Plus: checking one answer is easy."
+            }
+          ],
+          "exercises": [
+            {
+              "id": "tscourse-w22-an-1",
+              "title": "The monotonic table",
+              "prompt": "Print whether each candidate works, and confirm the answer never flips back.",
+              "hint": "One entry per candidate, with its verdict.",
+              "hints": [
+                "One entry per candidate, with its verdict.",
+                "Write row.push(`${b}:${works(b) ? \"T\" : \"F\"}`);"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "function works(budget: number): boolean {\n  return budget >= 4;\n}\nconst row: string[] = [];\nfor (let b = 1; b <= 7; b = b + 1) {\n____\n}\nconsole.log(row.join(\" \"));\n",
+              "solution": "function works(budget: number): boolean {\n  return budget >= 4;\n}\nconst row: string[] = [];\nfor (let b = 1; b <= 7; b = b + 1) {\n  row.push(`${b}:${works(b) ? \"T\" : \"F\"}`);\n}\nconsole.log(row.join(\" \"));\n",
+              "tests": [
+                {
+                  "input": "",
+                  "output": "1:F 2:F 3:F 4:T 5:T 6:T 7:T"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w22-an-2",
+              "title": "Find the boundary",
+              "prompt": "Binary search for the smallest candidate that works.",
+              "hint": "A working candidate might itself be the answer, so it stays in range.",
+              "hints": [
+                "A working candidate might itself be the answer, so it stays in range.",
+                "Write hi = mid;"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "function works(budget: number): boolean {\n  return budget >= 4;\n}\nfunction smallest(hiStart: number): number {\n  let lo = 1;\n  let hi = hiStart;\n  while (lo < hi) {\n    const mid = Math.floor((lo + hi) / 2);\n    if (works(mid)) {\n____\n    } else {\n      lo = mid + 1;\n    }\n  }\n  return lo;\n}\nconsole.log(smallest(100));\n",
+              "solution": "function works(budget: number): boolean {\n  return budget >= 4;\n}\nfunction smallest(hiStart: number): number {\n  let lo = 1;\n  let hi = hiStart;\n  while (lo < hi) {\n    const mid = Math.floor((lo + hi) / 2);\n    if (works(mid)) {\n      hi = mid;\n    } else {\n      lo = mid + 1;\n    }\n  }\n  return lo;\n}\nconsole.log(smallest(100));\n",
+              "tests": [
+                {
+                  "input": "",
+                  "output": "4"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w22-an-3",
+              "title": "The feasibility check",
+              "prompt": "Start a new day when the current one cannot hold the next item.",
+              "hint": "When the item does not fit in what is left, open a new day and reset the allowance.",
+              "hints": [
+                "When the item does not fit in what is left, open a new day and reset the allowance.",
+                "Write if (c > left) { used = used + 1; left = perDay; }"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums: readonly number[] = fs\n  .readFileSync(0, \"utf8\")\n  .trim()\n  .split(\" \")\n  .filter((s) => s !== \"\")\n  .map(Number)\n  .sort((a, b) => a - b);\nfunction feasible(caps: readonly number[], perDay: number, days: number): boolean {\n  let used = 1;\n  let left = perDay;\n  for (const c of caps) {\n    if (c > perDay) {\n      return false;\n    }\n____\n    left = left - c;\n  }\n  return used <= days;\n}\nconsole.log(`${feasible(nums, 9, 2)} ${feasible(nums, 4, 2)}`);\n",
+              "solution": "import * as fs from \"fs\";\nconst nums: readonly number[] = fs\n  .readFileSync(0, \"utf8\")\n  .trim()\n  .split(\" \")\n  .filter((s) => s !== \"\")\n  .map(Number)\n  .sort((a, b) => a - b);\nfunction feasible(caps: readonly number[], perDay: number, days: number): boolean {\n  let used = 1;\n  let left = perDay;\n  for (const c of caps) {\n    if (c > perDay) {\n      return false;\n    }\n    if (c > left) {\n      used = used + 1;\n      left = perDay;\n    }\n    left = left - c;\n  }\n  return used <= days;\n}\nconsole.log(`${feasible(nums, 9, 2)} ${feasible(nums, 4, 2)}`);\n",
+              "tests": [
+                {
+                  "input": "1 2 3 4 5",
+                  "output": "true false"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w22-an-4",
+              "title": "Search the whole thing",
+              "prompt": "Set the upper bound to an answer that certainly works — one day holding everything.",
+              "hint": "One day carrying the entire ledger is always feasible.",
+              "hints": [
+                "One day carrying the entire ledger is always feasible.",
+                "Write let hi = caps.reduce((s, c) => s + c, 0);"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Hard",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums: readonly number[] = fs\n  .readFileSync(0, \"utf8\")\n  .trim()\n  .split(\" \")\n  .filter((s) => s !== \"\")\n  .map(Number)\n  .sort((a, b) => a - b);\nfunction feasible(caps: readonly number[], perDay: number, days: number): boolean {\n  let used = 1;\n  let left = perDay;\n  for (const c of caps) {\n    if (c > perDay) {\n      return false;\n    }\n    if (c > left) {\n      used = used + 1;\n      left = perDay;\n    }\n    left = left - c;\n  }\n  return used <= days;\n}\nfunction minPerDay(caps: readonly number[], days: number): number {\n  let lo = 1;\n____\n  while (lo < hi) {\n    const mid = Math.floor((lo + hi) / 2);\n    if (feasible(caps, mid, days)) {\n      hi = mid;\n    } else {\n      lo = mid + 1;\n    }\n  }\n  return lo;\n}\nconsole.log(`${minPerDay(nums, 2)} ${minPerDay(nums, 5)}`);\n",
+              "solution": "import * as fs from \"fs\";\nconst nums: readonly number[] = fs\n  .readFileSync(0, \"utf8\")\n  .trim()\n  .split(\" \")\n  .filter((s) => s !== \"\")\n  .map(Number)\n  .sort((a, b) => a - b);\nfunction feasible(caps: readonly number[], perDay: number, days: number): boolean {\n  let used = 1;\n  let left = perDay;\n  for (const c of caps) {\n    if (c > perDay) {\n      return false;\n    }\n    if (c > left) {\n      used = used + 1;\n      left = perDay;\n    }\n    left = left - c;\n  }\n  return used <= days;\n}\nfunction minPerDay(caps: readonly number[], days: number): number {\n  let lo = 1;\n  let hi = caps.reduce((s, c) => s + c, 0);\n  while (lo < hi) {\n    const mid = Math.floor((lo + hi) / 2);\n    if (feasible(caps, mid, days)) {\n      hi = mid;\n    } else {\n      lo = mid + 1;\n    }\n  }\n  return lo;\n}\nconsole.log(`${minPerDay(nums, 2)} ${minPerDay(nums, 5)}`);\n",
+              "tests": [
+                {
+                  "input": "1 2 3 4 5",
+                  "output": "9 5"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w22-an-5",
+              "title": "The floor no budget can beat",
+              "prompt": "Report the largest single item, which is the smallest possible answer whatever the day count.",
+              "hint": "No daily limit below the largest item can ever work.",
+              "hints": [
+                "No daily limit below the largest item can ever work.",
+                "Write biggest = Math.max(biggest, n);"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums: readonly number[] = fs\n  .readFileSync(0, \"utf8\")\n  .trim()\n  .split(\" \")\n  .filter((s) => s !== \"\")\n  .map(Number)\n  .sort((a, b) => a - b);\nlet biggest = 0;\nfor (const n of nums) {\n____\n}\nconsole.log(`floor=${biggest}`);\n",
+              "solution": "import * as fs from \"fs\";\nconst nums: readonly number[] = fs\n  .readFileSync(0, \"utf8\")\n  .trim()\n  .split(\" \")\n  .filter((s) => s !== \"\")\n  .map(Number)\n  .sort((a, b) => a - b);\nlet biggest = 0;\nfor (const n of nums) {\n  biggest = Math.max(biggest, n);\n}\nconsole.log(`floor=${biggest}`);\n",
+              "tests": [
+                {
+                  "input": "1 2 3 4 5",
+                  "output": "floor=5"
+                },
+                {
+                  "input": "7",
+                  "output": "floor=7"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w22-an-6",
+              "title": "Count the feasibility checks",
+              "prompt": "Report how many times the predicate ran, which is the log of the answer range.",
+              "hint": "One per call to the predicate.",
+              "hints": [
+                "One per call to the predicate.",
+                "Write checks = checks + 1;"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "let checks = 0;\nfunction works(budget: number): boolean {\n____\n  return budget >= 40;\n}\nlet lo = 1;\nlet hi = 1024;\nwhile (lo < hi) {\n  const mid = Math.floor((lo + hi) / 2);\n  if (works(mid)) {\n    hi = mid;\n  } else {\n    lo = mid + 1;\n  }\n}\nconsole.log(`answer=${lo} checks=${checks}`);\n",
+              "solution": "let checks = 0;\nfunction works(budget: number): boolean {\n  checks = checks + 1;\n  return budget >= 40;\n}\nlet lo = 1;\nlet hi = 1024;\nwhile (lo < hi) {\n  const mid = Math.floor((lo + hi) / 2);\n  if (works(mid)) {\n    hi = mid;\n  } else {\n    lo = mid + 1;\n  }\n}\nconsole.log(`answer=${lo} checks=${checks}`);\n",
+              "tests": [
+                {
+                  "input": "",
+                  "output": "answer=40 checks=10"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w22-an-fix1",
+              "title": "Fix the upper bound that did not work",
+              "prompt": "This reports `5` as the smallest daily limit for two days, and five does not fit — the search started from an upper bound that is not itself feasible, so it converged on the wrong side of the boundary. The template needs a `hi` that certainly works.",
+              "hint": "`caps.length` is the number of items, which has nothing to do with a daily total.",
+              "hints": [
+                "`caps.length` is the number of items, which has nothing to do with a daily total.",
+                "The search only works if `hi` is an answer that is certainly feasible.",
+                "One day holding everything always works: use the sum."
+              ],
+              "language": "typescript",
+              "kind": "fix",
+              "difficulty": "Hard",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums: readonly number[] = fs\n  .readFileSync(0, \"utf8\")\n  .trim()\n  .split(\" \")\n  .filter((s) => s !== \"\")\n  .map(Number)\n  .sort((a, b) => a - b);\nfunction feasible(caps: readonly number[], perDay: number, days: number): boolean {\n  let used = 1;\n  let left = perDay;\n  for (const c of caps) {\n    if (c > perDay) {\n      return false;\n    }\n    if (c > left) {\n      used = used + 1;\n      left = perDay;\n    }\n    left = left - c;\n  }\n  return used <= days;\n}\nfunction minPerDay(caps: readonly number[], days: number): number {\n  let lo = 1;\n  let hi = caps.length;\n  while (lo < hi) {\n    const mid = Math.floor((lo + hi) / 2);\n    if (feasible(caps, mid, days)) {\n      hi = mid;\n    } else {\n      lo = mid + 1;\n    }\n  }\n  return lo;\n}\nconsole.log(minPerDay(nums, 2));\n",
+              "solution": "import * as fs from \"fs\";\nconst nums: readonly number[] = fs\n  .readFileSync(0, \"utf8\")\n  .trim()\n  .split(\" \")\n  .filter((s) => s !== \"\")\n  .map(Number)\n  .sort((a, b) => a - b);\nfunction feasible(caps: readonly number[], perDay: number, days: number): boolean {\n  let used = 1;\n  let left = perDay;\n  for (const c of caps) {\n    if (c > perDay) {\n      return false;\n    }\n    if (c > left) {\n      used = used + 1;\n      left = perDay;\n    }\n    left = left - c;\n  }\n  return used <= days;\n}\nfunction minPerDay(caps: readonly number[], days: number): number {\n  let lo = 1;\n  let hi = caps.reduce((s, c) => s + c, 0);\n  while (lo < hi) {\n    const mid = Math.floor((lo + hi) / 2);\n    if (feasible(caps, mid, days)) {\n      hi = mid;\n    } else {\n      lo = mid + 1;\n    }\n  }\n  return lo;\n}\nconsole.log(minPerDay(nums, 2));\n",
+              "tests": [
+                {
+                  "input": "1 2 3 4 5",
+                  "output": "9"
+                },
+                {
+                  "input": "10 10",
+                  "output": "10"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            }
+          ],
+          "quiz": [
+            {
+              "question": "A non-monotonic predicate means…",
+              "options": [
+                "a slower search",
+                "you cannot binary search at all",
+                "a wrong bound",
+                "more checks"
+              ],
+              "answer": 1,
+              "explanation": "Halving depends on one flip."
+            },
+            {
+              "question": "\"Is 7 enough?\" being O(n) makes \"what is the smallest enough?\"…",
+              "options": [
+                "O(n)",
+                "O(n log answer)",
+                "O(n²)",
+                "O(log n)"
+              ],
+              "answer": 1,
+              "explanation": "One predicate run per halving."
+            }
+          ]
+        },
+        {
+          "key": "w22-twoends",
+          "title": "Two pointers, from both ends",
+          "what": "One sweep instead of a nested loop.",
+          "lesson": "Find two numbers in a sorted array that sum to a target. The obvious version tries\nevery pair — O(n²). The good version needs one pass:\n\n```ts\nlet lo = 0;\nlet hi = xs.length - 1;\nwhile (lo < hi) {\n  const sum = (xs[lo] ?? 0) + (xs[hi] ?? 0);\n  if (sum === target) { return [lo, hi]; }\n  if (sum < target) { lo = lo + 1; }   // too small: the only bigger option is right\n  else { hi = hi - 1; }                 // too big: the only smaller option is left\n}\n```\n\n## Why it is correct, and why it needs sorting\n\nThe sum is too small. Could the answer involve `xs[lo]`? Only with something\n*bigger* than `xs[hi]` — and `xs[hi]` is the largest value left. So `xs[lo]` is in\nno solution at all, and discarding it loses nothing.\n\n**That argument only works because the array is sorted.** Unsorted, \"I need a\nbigger number, so I move right\" is false, and the whole thing collapses.\n\nEach step eliminates one element permanently, so at most n steps: **O(n)** time,\n**O(1)** space. On `[1,2,4,7,11,15]` for target 15 it takes 4 steps and finds\n`4+11`; for an impossible target it takes 5 and reports none. Both are printed in\nthis lesson's exercises, because \"O(n)\" is a claim and `steps=4` is the evidence.\n\n## The same sweep, three other problems\n\n**Palindrome** — compare the ends, move inwards:\n\n```ts\nwhile (lo < hi) {\n  if (text.charAt(lo) !== text.charAt(hi)) { return false; }\n  lo = lo + 1;\n  hi = hi - 1;\n}\n```\n\n**Reverse in place** — swap the ends, move inwards. Week 21's O(1)-space reversal.\n\n**Closest pair to a target** — the same loop, keeping the best sum seen instead of\nreturning on an exact match. Note it must run to `lo === hi`, since the closest\npair can turn up at any point.\n\n## The loop condition\n\n`lo < hi`, never `lo <= hi`. At `lo === hi` you are looking at one element twice,\nwhich is not a pair. The one exception is when a problem genuinely allows an\nelement to be used with itself, and then you should say so in a comment, because\nevery reader will assume it is a bug.\n\n## When it does not apply\n\n* **Unsorted input** you must not reorder — then it is a `Set` (week 19) in O(n)\n  time and O(n) space, or a sort first if reordering is allowed.\n* **Indices of the original array** must be reported — sorting destroys them unless\n  you carry them along.\n\nThat second point is the standard trap in \"two sum\": if the answer must be the\n*original* indices and the input is unsorted, the two-pointer version needs extra\nbookkeeping and a Map is simply better.\n\n> ⚠️ **Common mistakes:** applying it to unsorted data; `lo <= hi` and pairing an\n> element with itself; and losing the original indices to the sort.\n",
+          "warmup": [
+            {
+              "question": "The two-pointer pair-sum sweep is…",
+              "options": [
+                "O(n²)",
+                "O(n) time and O(1) space",
+                "O(n log n)",
+                "O(1)"
+              ],
+              "answer": 1,
+              "explanation": "Each step eliminates an element permanently."
+            },
+            {
+              "question": "It requires the array to be…",
+              "options": [
+                "unique",
+                "sorted",
+                "non-empty",
+                "numeric"
+              ],
+              "answer": 1,
+              "explanation": "Otherwise 'move right for more' is false."
+            },
+            {
+              "question": "The loop condition is…",
+              "options": [
+                "lo <= hi",
+                "lo < hi",
+                "lo !== hi",
+                "lo < hi - 1"
+              ],
+              "answer": 1,
+              "explanation": "At equality you would pair an element with itself."
+            },
+            {
+              "question": "If the ORIGINAL indices are required and the input is unsorted…",
+              "options": [
+                "sort anyway",
+                "a Map is better — sorting destroys the indices",
+                "use two pointers",
+                "impossible"
+              ],
+              "answer": 1,
+              "explanation": "The standard two-sum trap."
+            }
+          ],
+          "exercises": [
+            {
+              "id": "tscourse-w22-te-1",
+              "title": "Move the right pointer in",
+              "prompt": "When the sum is too big, the only way to get smaller is from the right.",
+              "hint": "Too big means the largest remaining value has to go.",
+              "hints": [
+                "Too big means the largest remaining value has to go.",
+                "Write hi = hi - 1;"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums: readonly number[] = fs\n  .readFileSync(0, \"utf8\")\n  .trim()\n  .split(\" \")\n  .filter((s) => s !== \"\")\n  .map(Number)\n  .sort((a, b) => a - b);\nfunction pair(xs: readonly number[], target: number): string {\n  let lo = 0;\n  let hi = xs.length - 1;\n  let steps = 0;\n  while (lo < hi) {\n    steps = steps + 1;\n    const sum = (xs[lo] ?? 0) + (xs[hi] ?? 0);\n    if (sum === target) {\n      return `${xs[lo] ?? 0}+${xs[hi] ?? 0} steps=${steps}`;\n    }\n    if (sum < target) {\n      lo = lo + 1;\n    } else {\n____\n    }\n  }\n  return `none steps=${steps}`;\n}\nconsole.log(pair(nums, 15));\n",
+              "solution": "import * as fs from \"fs\";\nconst nums: readonly number[] = fs\n  .readFileSync(0, \"utf8\")\n  .trim()\n  .split(\" \")\n  .filter((s) => s !== \"\")\n  .map(Number)\n  .sort((a, b) => a - b);\nfunction pair(xs: readonly number[], target: number): string {\n  let lo = 0;\n  let hi = xs.length - 1;\n  let steps = 0;\n  while (lo < hi) {\n    steps = steps + 1;\n    const sum = (xs[lo] ?? 0) + (xs[hi] ?? 0);\n    if (sum === target) {\n      return `${xs[lo] ?? 0}+${xs[hi] ?? 0} steps=${steps}`;\n    }\n    if (sum < target) {\n      lo = lo + 1;\n    } else {\n      hi = hi - 1;\n    }\n  }\n  return `none steps=${steps}`;\n}\nconsole.log(pair(nums, 15));\n",
+              "tests": [
+                {
+                  "input": "1 2 4 7 11 15",
+                  "output": "4+11 steps=4"
+                },
+                {
+                  "input": "1 2",
+                  "output": "none steps=1"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w22-te-2",
+              "title": "Count what it cost",
+              "prompt": "Report the steps for a target that exists and one that does not.",
+              "hint": "The number of pairs a nested loop would examine is n(n-1)/2.",
+              "hints": [
+                "The number of pairs a nested loop would examine is n(n-1)/2.",
+                "Five steps against fifteen pairs is the whole argument."
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "function steps(xs: readonly number[], target: number): number {\n  let lo = 0;\n  let hi = xs.length - 1;\n  let n = 0;\n  while (lo < hi) {\n    n = n + 1;\n    const sum = (xs[lo] ?? 0) + (xs[hi] ?? 0);\n    if (sum === target) {\n      return n;\n    }\n    if (sum < target) {\n      lo = lo + 1;\n    } else {\n      hi = hi - 1;\n    }\n  }\n  return n;\n}\nconst xs = [1, 2, 4, 7, 11, 15];\n____\n",
+              "solution": "function steps(xs: readonly number[], target: number): number {\n  let lo = 0;\n  let hi = xs.length - 1;\n  let n = 0;\n  while (lo < hi) {\n    n = n + 1;\n    const sum = (xs[lo] ?? 0) + (xs[hi] ?? 0);\n    if (sum === target) {\n      return n;\n    }\n    if (sum < target) {\n      lo = lo + 1;\n    } else {\n      hi = hi - 1;\n    }\n  }\n  return n;\n}\nconst xs = [1, 2, 4, 7, 11, 15];\nconsole.log(`found=${steps(xs, 15)} missing=${steps(xs, 100)} pairs=${(xs.length * (xs.length - 1)) / 2}`);\n",
+              "tests": [
+                {
+                  "input": "",
+                  "output": "found=4 missing=5 pairs=15"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w22-te-3",
+              "title": "Palindrome, from both ends",
+              "prompt": "Compare the outermost characters and walk inwards.",
+              "hint": "Mismatched ends mean it is not a palindrome.",
+              "hints": [
+                "Mismatched ends mean it is not a palindrome.",
+                "Write if (text.charAt(lo) !== text.charAt(hi)) {"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst line = fs.readFileSync(0, \"utf8\").trim();\nfunction isPal(text: string): boolean {\n  let lo = 0;\n  let hi = text.length - 1;\n  while (lo < hi) {\n____\n      return false;\n    }\n    lo = lo + 1;\n    hi = hi - 1;\n  }\n  return true;\n}\nconsole.log(isPal(line));\n",
+              "solution": "import * as fs from \"fs\";\nconst line = fs.readFileSync(0, \"utf8\").trim();\nfunction isPal(text: string): boolean {\n  let lo = 0;\n  let hi = text.length - 1;\n  while (lo < hi) {\n    if (text.charAt(lo) !== text.charAt(hi)) {\n      return false;\n    }\n    lo = lo + 1;\n    hi = hi - 1;\n  }\n  return true;\n}\nconsole.log(isPal(line));\n",
+              "tests": [
+                {
+                  "input": "racecar",
+                  "output": "true"
+                },
+                {
+                  "input": "abba",
+                  "output": "true"
+                },
+                {
+                  "input": "abc",
+                  "output": "false"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w22-te-4",
+              "title": "Reverse by swapping ends",
+              "prompt": "Swap and converge, allocating nothing.",
+              "hint": "The temporary already holds the left value, so overwrite left first.",
+              "hints": [
+                "The temporary already holds the left value, so overwrite left first.",
+                "Write xs[lo] = xs[hi] ?? 0; then xs[hi] = t;"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst xs = [...nums];\nlet lo = 0;\nlet hi = xs.length - 1;\nwhile (lo < hi) {\n  const t = xs[lo] ?? 0;\n____\n  lo = lo + 1;\n  hi = hi - 1;\n}\nconsole.log(xs.join(\",\"));\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst xs = [...nums];\nlet lo = 0;\nlet hi = xs.length - 1;\nwhile (lo < hi) {\n  const t = xs[lo] ?? 0;\n  xs[lo] = xs[hi] ?? 0;\n  xs[hi] = t;\n  lo = lo + 1;\n  hi = hi - 1;\n}\nconsole.log(xs.join(\",\"));\n",
+              "tests": [
+                {
+                  "input": "1 2 3",
+                  "output": "3,2,1"
+                },
+                {
+                  "input": "1 2 3 4",
+                  "output": "4,3,2,1"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w22-te-5",
+              "title": "The closest pair",
+              "prompt": "Run the sweep to the end, keeping the best sum rather than returning early.",
+              "hint": "A strictly smaller gap replaces the best; equal gaps keep the first.",
+              "hints": [
+                "A strictly smaller gap replaces the best; equal gaps keep the first.",
+                "Write if (gap < bestGap) { bestGap = gap; best = sum; }"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Hard",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums: readonly number[] = fs\n  .readFileSync(0, \"utf8\")\n  .trim()\n  .split(\" \")\n  .filter((s) => s !== \"\")\n  .map(Number)\n  .sort((a, b) => a - b);\nfunction closest(xs: readonly number[], target: number): number {\n  let lo = 0;\n  let hi = xs.length - 1;\n  let best = 0;\n  let bestGap = Number.MAX_SAFE_INTEGER;\n  while (lo < hi) {\n    const sum = (xs[lo] ?? 0) + (xs[hi] ?? 0);\n    const gap = Math.abs(sum - target);\n____\n    if (sum < target) {\n      lo = lo + 1;\n    } else {\n      hi = hi - 1;\n    }\n  }\n  return best;\n}\nconsole.log(closest(nums, 10));\n",
+              "solution": "import * as fs from \"fs\";\nconst nums: readonly number[] = fs\n  .readFileSync(0, \"utf8\")\n  .trim()\n  .split(\" \")\n  .filter((s) => s !== \"\")\n  .map(Number)\n  .sort((a, b) => a - b);\nfunction closest(xs: readonly number[], target: number): number {\n  let lo = 0;\n  let hi = xs.length - 1;\n  let best = 0;\n  let bestGap = Number.MAX_SAFE_INTEGER;\n  while (lo < hi) {\n    const sum = (xs[lo] ?? 0) + (xs[hi] ?? 0);\n    const gap = Math.abs(sum - target);\n    if (gap < bestGap) {\n      bestGap = gap;\n      best = sum;\n    }\n    if (sum < target) {\n      lo = lo + 1;\n    } else {\n      hi = hi - 1;\n    }\n  }\n  return best;\n}\nconsole.log(closest(nums, 10));\n",
+              "tests": [
+                {
+                  "input": "1 2 4 7 11",
+                  "output": "9"
+                },
+                {
+                  "input": "1 2",
+                  "output": "3"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w22-te-fix1",
+              "title": "Fix the pair that used one element twice",
+              "prompt": "With `lo <= hi` the loop reaches a point where both pointers are on the same element, so `[1, 2, 4]` reports a pair summing to 8 — which is `4 + 4`, the same 4 counted twice.",
+              "hint": "When lo equals hi, both pointers are on the same element — and that is not a pair.",
+              "hints": [
+                "When lo equals hi, both pointers are on the same element — and that is not a pair.",
+                "One character.",
+                "Write while (lo < hi) {"
+              ],
+              "language": "typescript",
+              "kind": "fix",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "function pair(xs: readonly number[], target: number): string {\n  let lo = 0;\n  let hi = xs.length - 1;\n  while (lo <= hi) {\n    const sum = (xs[lo] ?? 0) + (xs[hi] ?? 0);\n    if (sum === target) {\n      return `${xs[lo] ?? 0}+${xs[hi] ?? 0}`;\n    }\n    if (sum < target) {\n      lo = lo + 1;\n    } else {\n      hi = hi - 1;\n    }\n  }\n  return \"none\";\n}\nconsole.log(`${pair([1, 2, 4], 8)} ${pair([1, 2, 4], 5)}`);\n",
+              "solution": "function pair(xs: readonly number[], target: number): string {\n  let lo = 0;\n  let hi = xs.length - 1;\n  while (lo < hi) {\n    const sum = (xs[lo] ?? 0) + (xs[hi] ?? 0);\n    if (sum === target) {\n      return `${xs[lo] ?? 0}+${xs[hi] ?? 0}`;\n    }\n    if (sum < target) {\n      lo = lo + 1;\n    } else {\n      hi = hi - 1;\n    }\n  }\n  return \"none\";\n}\nconsole.log(`${pair([1, 2, 4], 8)} ${pair([1, 2, 4], 5)}`);\n",
+              "tests": [
+                {
+                  "input": "",
+                  "output": "none 1+4"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            }
+          ],
+          "quiz": [
+            {
+              "question": "Discarding `xs[lo]` when the sum is too small is safe because…",
+              "options": [
+                "it is small",
+                "nothing left is bigger than xs[hi], so xs[lo] is in no solution",
+                "of the loop",
+                "it is sorted"
+              ],
+              "answer": 1,
+              "explanation": "The argument is the whole proof."
+            },
+            {
+              "question": "The closest-pair variant must…",
+              "options": [
+                "return early",
+                "run the sweep to the end",
+                "sort again",
+                "use a Map"
+              ],
+              "answer": 1,
+              "explanation": "The best pair can appear at any point."
+            }
+          ]
+        },
+        {
+          "key": "w22-samedir",
+          "title": "Two pointers, same direction",
+          "what": "A read pointer and a write pointer.",
+          "lesson": "The other two-pointer shape: both indices move forward, at different speeds.\n\n* **read** visits every element, exactly once;\n* **write** marks where the next *kept* element goes.\n\n```ts\nfunction dedupe(xs: number[]): number {\n  if (xs.length === 0) { return 0; }\n  let write = 1;                                  // xs[0] is always kept\n  for (let read = 1; read < xs.length; read = read + 1) {\n    if ((xs[read] ?? 0) !== (xs[write - 1] ?? 0)) {\n      xs[write] = xs[read] ?? 0;\n      write = write + 1;\n    }\n  }\n  return write;                                    // the new length\n}\n```\n\nOn `[1,1,2,2,2,3]` that returns 3, with the first three slots holding `1,2,3`.\n\n## Why it returns a length\n\nYou cannot shrink an array in place without either mutating `length` or returning\nthe count. The convention — used by every in-place algorithm of this shape — is to\ncompact the kept elements to the front and **return the new length**, leaving\nwhatever is past it as garbage the caller ignores:\n\n```ts\nconst n = dedupe(xs);\nxs.slice(0, n);              // the part that matters\n```\n\nO(n) time, **O(1) auxiliary space**, which is the point. `[...new Set(xs)]` is\nshorter, clearer, and allocates — and on sorted input where space matters, this is\nthe version to know.\n\n## The comparison is against the last KEPT element\n\n`xs[write - 1]` — \"the last element I decided to keep\" — rather than\n`xs[read - 1]`, \"the previous element I looked at\".\n\nWorth being precise, because the two produce **identical answers here** and it is\neasy to write the wrong one and never find out. The reason they agree is that\n`write <= read` always, so the slot at `read - 1` can only have been overwritten\nwhen `write === read`, and that write is `xs[read] = xs[read]` — a no-op. Change the\nproblem and that argument has to be redone from scratch.\n\nSo: write the form that says what you mean. `xs[write - 1]` is correct *because of\nwhat it is*, and `xs[read - 1]` is correct *because of a two-line argument about\nindices* — and the second kind of correctness is the kind that stops being true when\nsomebody edits the loop.\n\n## The same shape, three other problems\n\n**Move zeroes to the end** — write every non-zero, then fill the rest with zeroes.\n\n**Partition by a predicate** — write the ones that pass; everything after `write`\nfailed. This is one half of quicksort (week 24).\n\n**Keep at most k of each** — compare against `xs[write - k]` instead. The\ngeneralisation the `write - 1` form gives you for free.\n\n## Fast and slow is the same family\n\nWeek 20's cycle detection and middle-finding also move two pointers forward at\ndifferent speeds. The difference is only what decides the speeds: there, a fixed\nratio; here, a condition.\n\n> ⚠️ **Common mistakes:** comparing against `xs[read - 1]`; forgetting the empty\n> case; and assuming the array's `length` changed when only the return value did.\n",
+          "warmup": [
+            {
+              "question": "The write pointer marks…",
+              "options": [
+                "the current element",
+                "where the next KEPT element goes",
+                "the end",
+                "the duplicate"
+              ],
+              "answer": 1,
+              "explanation": "Read visits; write keeps."
+            },
+            {
+              "question": "An in-place filter returns…",
+              "options": [
+                "a new array",
+                "the new length",
+                "void",
+                "a boolean"
+              ],
+              "answer": 1,
+              "explanation": "The caller slices to it."
+            },
+            {
+              "question": "`xs[write - 1]` is preferable to `xs[read - 1]` because…",
+              "options": [
+                "read - 1 gives a wrong answer here",
+                "both work, but only one is correct for a reason you can state in a sentence",
+                "it is faster",
+                "of types"
+              ],
+              "answer": 1,
+              "explanation": "They agree here; one agrees by accident."
+            },
+            {
+              "question": "Its auxiliary space is…",
+              "options": [
+                "O(n)",
+                "O(1)",
+                "O(log n)",
+                "O(n²)"
+              ],
+              "answer": 1,
+              "explanation": "Which is the whole reason to prefer it over a Set."
+            }
+          ],
+          "exercises": [
+            {
+              "id": "tscourse-w22-sd-1",
+              "title": "De-duplicate in place",
+              "prompt": "Compare against the last kept element, and advance the write pointer when you keep one.",
+              "hint": "Keep it when it differs from the last thing you kept.",
+              "hints": [
+                "Keep it when it differs from the last thing you kept.",
+                "Write if ((xs[read] ?? 0) !== (xs[write - 1] ?? 0)) {"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Hard",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums: readonly number[] = fs\n  .readFileSync(0, \"utf8\")\n  .trim()\n  .split(\" \")\n  .filter((s) => s !== \"\")\n  .map(Number)\n  .sort((a, b) => a - b);\nfunction dedupe(xs: number[]): number {\n  if (xs.length === 0) {\n    return 0;\n  }\n  let write = 1;\n  for (let read = 1; read < xs.length; read = read + 1) {\n____\n      xs[write] = xs[read] ?? 0;\n      write = write + 1;\n    }\n  }\n  return write;\n}\nconst xs = [...nums];\nconst n = dedupe(xs);\nconsole.log(`${n} ${xs.slice(0, n).join(\",\")}`);\n",
+              "solution": "import * as fs from \"fs\";\nconst nums: readonly number[] = fs\n  .readFileSync(0, \"utf8\")\n  .trim()\n  .split(\" \")\n  .filter((s) => s !== \"\")\n  .map(Number)\n  .sort((a, b) => a - b);\nfunction dedupe(xs: number[]): number {\n  if (xs.length === 0) {\n    return 0;\n  }\n  let write = 1;\n  for (let read = 1; read < xs.length; read = read + 1) {\n    if ((xs[read] ?? 0) !== (xs[write - 1] ?? 0)) {\n      xs[write] = xs[read] ?? 0;\n      write = write + 1;\n    }\n  }\n  return write;\n}\nconst xs = [...nums];\nconst n = dedupe(xs);\nconsole.log(`${n} ${xs.slice(0, n).join(\",\")}`);\n",
+              "tests": [
+                {
+                  "input": "1 1 2 2 2 3",
+                  "output": "3 1,2,3"
+                },
+                {
+                  "input": "5",
+                  "output": "1 5"
+                },
+                {
+                  "input": "1 2 3",
+                  "output": "3 1,2,3"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w22-sd-2",
+              "title": "Move the zeroes",
+              "prompt": "Write every non-zero forward, then pad the tail.",
+              "hint": "Everything from the write pointer onwards has to become zero.",
+              "hints": [
+                "Everything from the write pointer onwards has to become zero.",
+                "Write the while loop that fills the tail."
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst xs = [...nums];\nlet write = 0;\nfor (let read = 0; read < xs.length; read = read + 1) {\n  if ((xs[read] ?? 0) !== 0) {\n    xs[write] = xs[read] ?? 0;\n    write = write + 1;\n  }\n}\n____\nconsole.log(xs.join(\",\"));\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst xs = [...nums];\nlet write = 0;\nfor (let read = 0; read < xs.length; read = read + 1) {\n  if ((xs[read] ?? 0) !== 0) {\n    xs[write] = xs[read] ?? 0;\n    write = write + 1;\n  }\n}\nwhile (write < xs.length) {\n  xs[write] = 0;\n  write = write + 1;\n}\nconsole.log(xs.join(\",\"));\n",
+              "tests": [
+                {
+                  "input": "0 1 0 2 3",
+                  "output": "1,2,3,0,0"
+                },
+                {
+                  "input": "1 2",
+                  "output": "1,2"
+                },
+                {
+                  "input": "0 0",
+                  "output": "0,0"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w22-sd-3",
+              "title": "Partition by a predicate",
+              "prompt": "Keep the small values at the front and report how many there were.",
+              "hint": "Swap rather than overwrite, so nothing is lost.",
+              "hints": [
+                "Swap rather than overwrite, so nothing is lost.",
+                "Three lines: save, overwrite, put the saved value where it came from."
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Hard",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst xs = [...nums];\nlet write = 0;\nfor (let read = 0; read < xs.length; read = read + 1) {\n  if ((xs[read] ?? 0) < 5) {\n____\n    write = write + 1;\n  }\n}\nconsole.log(`${write} ${xs.slice(0, write).join(\",\")}`);\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst xs = [...nums];\nlet write = 0;\nfor (let read = 0; read < xs.length; read = read + 1) {\n  if ((xs[read] ?? 0) < 5) {\n    const t = xs[write] ?? 0;\n    xs[write] = xs[read] ?? 0;\n    xs[read] = t;\n    write = write + 1;\n  }\n}\nconsole.log(`${write} ${xs.slice(0, write).join(\",\")}`);\n",
+              "tests": [
+                {
+                  "input": "1 9 2 8 3",
+                  "output": "3 1,2,3"
+                },
+                {
+                  "input": "9 8",
+                  "output": "0 "
+                },
+                {
+                  "input": "1 2",
+                  "output": "2 1,2"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w22-sd-4",
+              "title": "Keep at most two of each",
+              "prompt": "Compare against the element two places behind the write pointer.",
+              "hint": "The first two are always kept; after that, compare against two back.",
+              "hints": [
+                "The first two are always kept; after that, compare against two back.",
+                "Write if (write < 2 || (xs[read] ?? 0) !== (xs[write - 2] ?? 0)) {"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Hard",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums: readonly number[] = fs\n  .readFileSync(0, \"utf8\")\n  .trim()\n  .split(\" \")\n  .filter((s) => s !== \"\")\n  .map(Number)\n  .sort((a, b) => a - b);\nfunction atMostTwo(xs: number[]): number {\n  let write = 0;\n  for (let read = 0; read < xs.length; read = read + 1) {\n____\n      xs[write] = xs[read] ?? 0;\n      write = write + 1;\n    }\n  }\n  return write;\n}\nconst xs = [...nums];\nconst n = atMostTwo(xs);\nconsole.log(`${n} ${xs.slice(0, n).join(\",\")}`);\n",
+              "solution": "import * as fs from \"fs\";\nconst nums: readonly number[] = fs\n  .readFileSync(0, \"utf8\")\n  .trim()\n  .split(\" \")\n  .filter((s) => s !== \"\")\n  .map(Number)\n  .sort((a, b) => a - b);\nfunction atMostTwo(xs: number[]): number {\n  let write = 0;\n  for (let read = 0; read < xs.length; read = read + 1) {\n    if (write < 2 || (xs[read] ?? 0) !== (xs[write - 2] ?? 0)) {\n      xs[write] = xs[read] ?? 0;\n      write = write + 1;\n    }\n  }\n  return write;\n}\nconst xs = [...nums];\nconst n = atMostTwo(xs);\nconsole.log(`${n} ${xs.slice(0, n).join(\",\")}`);\n",
+              "tests": [
+                {
+                  "input": "1 1 1 2 2 3",
+                  "output": "5 1,1,2,2,3"
+                },
+                {
+                  "input": "1 1",
+                  "output": "2 1,1"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w22-sd-5",
+              "title": "Count what it allocated",
+              "prompt": "Report the extra slots used, which is zero — the whole point.",
+              "hint": "Nothing was allocated, which is what distinguishes this from a Set.",
+              "hints": [
+                "Nothing was allocated, which is what distinguishes this from a Set.",
+                "Write console.log(`kept=${write} extraSlots=${slots}`);"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums: readonly number[] = fs\n  .readFileSync(0, \"utf8\")\n  .trim()\n  .split(\" \")\n  .filter((s) => s !== \"\")\n  .map(Number)\n  .sort((a, b) => a - b);\nlet slots = 0;\nconst xs = [...nums];\nlet write = 1;\nfor (let read = 1; read < xs.length; read = read + 1) {\n  if ((xs[read] ?? 0) !== (xs[write - 1] ?? 0)) {\n    xs[write] = xs[read] ?? 0;\n    write = write + 1;\n  }\n}\n____\n",
+              "solution": "import * as fs from \"fs\";\nconst nums: readonly number[] = fs\n  .readFileSync(0, \"utf8\")\n  .trim()\n  .split(\" \")\n  .filter((s) => s !== \"\")\n  .map(Number)\n  .sort((a, b) => a - b);\nlet slots = 0;\nconst xs = [...nums];\nlet write = 1;\nfor (let read = 1; read < xs.length; read = read + 1) {\n  if ((xs[read] ?? 0) !== (xs[write - 1] ?? 0)) {\n    xs[write] = xs[read] ?? 0;\n    write = write + 1;\n  }\n}\nconsole.log(`kept=${write} extraSlots=${slots}`);\n",
+              "tests": [
+                {
+                  "input": "1 1 2 3",
+                  "output": "kept=3 extraSlots=0"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w22-sd-fix1",
+              "title": "Fix the count for an empty array",
+              "prompt": "`write` starts at 1 because the first element is always kept — except when there is no first element. On empty input the loop never runs and the function reports **1** kept item out of nothing. Every in-place compaction of this shape needs that guard, and it is the case nobody tests.",
+              "hint": "The starter reports 1 for an array with nothing in it.",
+              "hints": [
+                "The starter reports 1 for an array with nothing in it.",
+                "`write = 1` assumes there is a first element to have kept.",
+                "Return 0 immediately when the array is empty."
+              ],
+              "language": "typescript",
+              "kind": "fix",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums: readonly number[] = fs\n  .readFileSync(0, \"utf8\")\n  .trim()\n  .split(\" \")\n  .filter((s) => s !== \"\")\n  .map(Number)\n  .sort((a, b) => a - b);\nfunction dedupe(xs: number[]): number {\n  let write = 1;\n  for (let read = 1; read < xs.length; read = read + 1) {\n    if ((xs[read] ?? 0) !== (xs[write - 1] ?? 0)) {\n      xs[write] = xs[read] ?? 0;\n      write = write + 1;\n    }\n  }\n  return write;\n}\nconst xs = [...nums];\nconst n = dedupe(xs);\nconsole.log(`${n} ${xs.slice(0, n).join(\",\")}`);\n",
+              "solution": "import * as fs from \"fs\";\nconst nums: readonly number[] = fs\n  .readFileSync(0, \"utf8\")\n  .trim()\n  .split(\" \")\n  .filter((s) => s !== \"\")\n  .map(Number)\n  .sort((a, b) => a - b);\nfunction dedupe(xs: number[]): number {\n  if (xs.length === 0) {\n    return 0;\n  }\n  let write = 1;\n  for (let read = 1; read < xs.length; read = read + 1) {\n    if ((xs[read] ?? 0) !== (xs[write - 1] ?? 0)) {\n      xs[write] = xs[read] ?? 0;\n      write = write + 1;\n    }\n  }\n  return write;\n}\nconst xs = [...nums];\nconst n = dedupe(xs);\nconsole.log(`${n} ${xs.slice(0, n).join(\",\")}`);\n",
+              "tests": [
+                {
+                  "input": "",
+                  "output": "0 "
+                },
+                {
+                  "input": "1 1 2",
+                  "output": "2 1,2"
+                },
+                {
+                  "input": "5",
+                  "output": "1 5"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            }
+          ],
+          "quiz": [
+            {
+              "question": "Partitioning by a predicate is one half of…",
+              "options": [
+                "merge sort",
+                "quicksort",
+                "binary search",
+                "a Map"
+              ],
+              "answer": 1,
+              "explanation": "Week 24 builds the other half."
+            },
+            {
+              "question": "Week 20's fast-and-slow pointers are…",
+              "options": [
+                "unrelated",
+                "the same family — two pointers moving forward at different speeds",
+                "opposite ends",
+                "a sort"
+              ],
+              "answer": 1,
+              "explanation": "Only what sets the speeds differs."
+            }
+          ]
+        },
+        {
+          "key": "w22-merge",
+          "title": "Merging, and sort-then-sweep",
+          "what": "Two sorted inputs in one pass, and the O(n³) that becomes O(n²).",
+          "lesson": "## Merging two sorted arrays\n\n```ts\nconst out: number[] = [];\nlet i = 0;\nlet j = 0;\nwhile (i < a.length && j < b.length) {\n  if ((a[i] ?? 0) <= (b[j] ?? 0)) { out.push(a[i] ?? 0); i = i + 1; }\n  else { out.push(b[j] ?? 0); j = j + 1; }\n}\nwhile (i < a.length) { out.push(a[i] ?? 0); i = i + 1; }   // drain a\nwhile (j < b.length) { out.push(b[j] ?? 0); j = j + 1; }   // drain b\n```\n\nO(n + m), one pass. Three things worth noting:\n\n* **Both tails must be drained.** The main loop stops as soon as *either* input is\n  exhausted, so one of the two tails always has something left (unless both ran out\n  together). Forgetting one is the classic bug, and it is silent on inputs where\n  that side happens to finish last.\n* **`<=`, not `<`.** With `<=` equal elements are taken from `a` first, which makes\n  the merge **stable** — equal items keep their relative order. That matters the\n  moment you are merging records rather than numbers.\n* **This is the heart of merge sort.** Week 24 splits, recurses, and calls exactly\n  this.\n\nThe same sweep gives you the **intersection** of two sorted arrays: advance the\nsmaller side, and when they are equal take it and advance both.\n\n## Sort, then sweep\n\nIf the input is not sorted and you are allowed to reorder it, **sorting to enable a\nsweep is usually a bargain** — week 21's table says why: O(n log n) is within a\nfactor of 20 of O(n) at a million items, and O(n²) is 50,000 times worse.\n\nThe canonical case is finding triples that sum to a target. The naive version is\nthree nested loops, O(n³). Sorted, it is one loop around a two-pointer sweep:\n\n```ts\nconst xs = [...nums].sort((a, b) => a - b);\nfor (let i = 0; i < xs.length - 2; i = i + 1) {\n  if (i > 0 && (xs[i] ?? 0) === (xs[i - 1] ?? 0)) { continue; }   // skip dup anchors\n  let lo = i + 1;\n  let hi = xs.length - 1;\n  while (lo < hi) {\n    const sum = (xs[i] ?? 0) + (xs[lo] ?? 0) + (xs[hi] ?? 0);\n    if (sum === target) {\n      out.push(`${xs[i]},${xs[lo]},${xs[hi]}`);\n      lo = lo + 1;\n      while (lo < hi && (xs[lo] ?? 0) === (xs[lo - 1] ?? 0)) { lo = lo + 1; }  // and here\n    } else if (sum < target) { lo = lo + 1; }\n    else { hi = hi - 1; }\n  }\n}\n```\n\n**O(n²)** — an O(n) sweep inside an O(n) loop, and the sort disappears into it.\n\n## The two duplicate skips\n\nBoth are needed, and they do different jobs:\n\n* **The anchor skip** (`i > 0 && xs[i] === xs[i-1]`) stops the same first element\n  being used twice, which would produce the same triple twice.\n* **The inner skip**, after recording a hit, advances past equal values so the\n  *second* element does not repeat either.\n\nOn `[-1,0,1,2,-1,-4]` for target 0 the answer is `-1,-1,2` and `-1,0,1` — and\nwithout the anchor skip the first of those appears twice. Duplicate handling is\nmost of what makes this problem fiddly, and it is worth writing out once by hand.\n\n> ⚠️ **Common mistakes:** draining only one tail; `<` instead of `<=`, losing\n> stability; and either duplicate skip missing.\n",
+          "warmup": [
+            {
+              "question": "After the main merge loop you must…",
+              "options": [
+                "stop",
+                "drain BOTH tails",
+                "sort",
+                "reverse"
+              ],
+              "answer": 1,
+              "explanation": "One side always has something left."
+            },
+            {
+              "question": "`<=` rather than `<` in the merge comparison makes it…",
+              "options": [
+                "faster",
+                "stable — equal items keep their order",
+                "correct",
+                "shorter"
+              ],
+              "answer": 1,
+              "explanation": "Which matters for records."
+            },
+            {
+              "question": "Merging is the heart of…",
+              "options": [
+                "quicksort",
+                "merge sort",
+                "binary search",
+                "a heap"
+              ],
+              "answer": 1,
+              "explanation": "Week 24 adds the splitting."
+            },
+            {
+              "question": "Sort-then-sweep turns the triple-sum problem from…",
+              "options": [
+                "O(n²) to O(n)",
+                "O(n³) to O(n²)",
+                "O(n) to O(log n)",
+                "O(n²) to O(n log n)"
+              ],
+              "answer": 1,
+              "explanation": "An O(n) sweep inside an O(n) loop."
+            }
+          ],
+          "exercises": [
+            {
+              "id": "tscourse-w22-mg-1",
+              "title": "Merge two sorted arrays",
+              "prompt": "Take from whichever side is smaller, and drain both tails afterwards.",
+              "hint": "The main loop runs only while BOTH sides still have elements.",
+              "hints": [
+                "The main loop runs only while BOTH sides still have elements.",
+                "Write while (i < a.length && j < b.length) {"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "function merge(a: readonly number[], b: readonly number[]): readonly number[] {\n  const out: number[] = [];\n  let i = 0;\n  let j = 0;\n____\n    if ((a[i] ?? 0) <= (b[j] ?? 0)) {\n      out.push(a[i] ?? 0);\n      i = i + 1;\n    } else {\n      out.push(b[j] ?? 0);\n      j = j + 1;\n    }\n  }\n  while (i < a.length) {\n    out.push(a[i] ?? 0);\n    i = i + 1;\n  }\n  while (j < b.length) {\n    out.push(b[j] ?? 0);\n    j = j + 1;\n  }\n  return out;\n}\nconsole.log(merge([1, 4, 7], [2, 3, 9]).join(\",\"));\n",
+              "solution": "function merge(a: readonly number[], b: readonly number[]): readonly number[] {\n  const out: number[] = [];\n  let i = 0;\n  let j = 0;\n  while (i < a.length && j < b.length) {\n    if ((a[i] ?? 0) <= (b[j] ?? 0)) {\n      out.push(a[i] ?? 0);\n      i = i + 1;\n    } else {\n      out.push(b[j] ?? 0);\n      j = j + 1;\n    }\n  }\n  while (i < a.length) {\n    out.push(a[i] ?? 0);\n    i = i + 1;\n  }\n  while (j < b.length) {\n    out.push(b[j] ?? 0);\n    j = j + 1;\n  }\n  return out;\n}\nconsole.log(merge([1, 4, 7], [2, 3, 9]).join(\",\"));\n",
+              "tests": [
+                {
+                  "input": "",
+                  "output": "1,2,3,4,7,9"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w22-mg-2",
+              "title": "Drain the other tail",
+              "prompt": "Add the second drain loop, so nothing is dropped.",
+              "hint": "Here it is `b` that has elements left over.",
+              "hints": [
+                "Here it is `b` that has elements left over.",
+                "Write the drain loop for j."
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "function merge(a: readonly number[], b: readonly number[]): readonly number[] {\n  const out: number[] = [];\n  let i = 0;\n  let j = 0;\n  while (i < a.length && j < b.length) {\n    if ((a[i] ?? 0) <= (b[j] ?? 0)) {\n      out.push(a[i] ?? 0);\n      i = i + 1;\n    } else {\n      out.push(b[j] ?? 0);\n      j = j + 1;\n    }\n  }\n  while (i < a.length) {\n    out.push(a[i] ?? 0);\n    i = i + 1;\n  }\n____\n  return out;\n}\nconsole.log(merge([1, 2], [3, 4, 5]).join(\",\"));\n",
+              "solution": "function merge(a: readonly number[], b: readonly number[]): readonly number[] {\n  const out: number[] = [];\n  let i = 0;\n  let j = 0;\n  while (i < a.length && j < b.length) {\n    if ((a[i] ?? 0) <= (b[j] ?? 0)) {\n      out.push(a[i] ?? 0);\n      i = i + 1;\n    } else {\n      out.push(b[j] ?? 0);\n      j = j + 1;\n    }\n  }\n  while (i < a.length) {\n    out.push(a[i] ?? 0);\n    i = i + 1;\n  }\n  while (j < b.length) {\n    out.push(b[j] ?? 0);\n    j = j + 1;\n  }\n  return out;\n}\nconsole.log(merge([1, 2], [3, 4, 5]).join(\",\"));\n",
+              "tests": [
+                {
+                  "input": "",
+                  "output": "1,2,3,4,5"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w22-mg-3",
+              "title": "Intersection of two sorted arrays",
+              "prompt": "Advance the smaller side; when they match, take it and advance both.",
+              "hint": "A match belongs in the output, and both pointers move past it.",
+              "hints": [
+                "A match belongs in the output, and both pointers move past it.",
+                "Write the equality branch: push, then advance both."
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "function intersect(a: readonly number[], b: readonly number[]): readonly number[] {\n  const out: number[] = [];\n  let i = 0;\n  let j = 0;\n  while (i < a.length && j < b.length) {\n    const x = a[i] ?? 0;\n    const y = b[j] ?? 0;\n____\n    } else if (x < y) {\n      i = i + 1;\n    } else {\n      j = j + 1;\n    }\n  }\n  return out;\n}\nconsole.log(intersect([1, 3, 5, 7], [3, 4, 5]).join(\",\"));\n",
+              "solution": "function intersect(a: readonly number[], b: readonly number[]): readonly number[] {\n  const out: number[] = [];\n  let i = 0;\n  let j = 0;\n  while (i < a.length && j < b.length) {\n    const x = a[i] ?? 0;\n    const y = b[j] ?? 0;\n    if (x === y) {\n      out.push(x);\n      i = i + 1;\n      j = j + 1;\n    } else if (x < y) {\n      i = i + 1;\n    } else {\n      j = j + 1;\n    }\n  }\n  return out;\n}\nconsole.log(intersect([1, 3, 5, 7], [3, 4, 5]).join(\",\"));\n",
+              "tests": [
+                {
+                  "input": "",
+                  "output": "3,5"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w22-mg-4",
+              "title": "Count the merge's steps",
+              "prompt": "Report how many elements were examined, which is n + m.",
+              "hint": "Whatever is left in either tail is still examined once each.",
+              "hints": [
+                "Whatever is left in either tail is still examined once each.",
+                "Write steps = steps + (a.length - i) + (b.length - j);"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "let steps = 0;\nfunction merge(a: readonly number[], b: readonly number[]): number {\n  let i = 0;\n  let j = 0;\n  while (i < a.length && j < b.length) {\n    steps = steps + 1;\n    if ((a[i] ?? 0) <= (b[j] ?? 0)) {\n      i = i + 1;\n    } else {\n      j = j + 1;\n    }\n  }\n____\n  return steps;\n}\nconsole.log(merge([1, 4, 7], [2, 3, 9]));\n",
+              "solution": "let steps = 0;\nfunction merge(a: readonly number[], b: readonly number[]): number {\n  let i = 0;\n  let j = 0;\n  while (i < a.length && j < b.length) {\n    steps = steps + 1;\n    if ((a[i] ?? 0) <= (b[j] ?? 0)) {\n      i = i + 1;\n    } else {\n      j = j + 1;\n    }\n  }\n  steps = steps + (a.length - i) + (b.length - j);\n  return steps;\n}\nconsole.log(merge([1, 4, 7], [2, 3, 9]));\n",
+              "tests": [
+                {
+                  "input": "",
+                  "output": "6"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w22-mg-5",
+              "title": "Triples, sorted and swept",
+              "prompt": "Skip a repeated anchor, so each triple appears once.",
+              "hint": "An anchor equal to the previous one would produce the same triples again.",
+              "hints": [
+                "An anchor equal to the previous one would produce the same triples again.",
+                "Guard `i > 0` first, then compare with the element before.",
+                "Write if (i > 0 && (xs[i] ?? 0) === (xs[i - 1] ?? 0)) { continue; }"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Hard",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nfunction triples(input: readonly number[], target: number): readonly string[] {\n  const xs = [...input].sort((a, b) => a - b);\n  const out: string[] = [];\n  for (let i = 0; i < xs.length - 2; i = i + 1) {\n____\n    let lo = i + 1;\n    let hi = xs.length - 1;\n    while (lo < hi) {\n      const sum = (xs[i] ?? 0) + (xs[lo] ?? 0) + (xs[hi] ?? 0);\n      if (sum === target) {\n        out.push(`${xs[i] ?? 0},${xs[lo] ?? 0},${xs[hi] ?? 0}`);\n        lo = lo + 1;\n        while (lo < hi && (xs[lo] ?? 0) === (xs[lo - 1] ?? 0)) {\n          lo = lo + 1;\n        }\n      } else if (sum < target) {\n        lo = lo + 1;\n      } else {\n        hi = hi - 1;\n      }\n    }\n  }\n  return out;\n}\nconsole.log(triples(nums, 0).join(\" | \"));\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nfunction triples(input: readonly number[], target: number): readonly string[] {\n  const xs = [...input].sort((a, b) => a - b);\n  const out: string[] = [];\n  for (let i = 0; i < xs.length - 2; i = i + 1) {\n    if (i > 0 && (xs[i] ?? 0) === (xs[i - 1] ?? 0)) {\n      continue;\n    }\n    let lo = i + 1;\n    let hi = xs.length - 1;\n    while (lo < hi) {\n      const sum = (xs[i] ?? 0) + (xs[lo] ?? 0) + (xs[hi] ?? 0);\n      if (sum === target) {\n        out.push(`${xs[i] ?? 0},${xs[lo] ?? 0},${xs[hi] ?? 0}`);\n        lo = lo + 1;\n        while (lo < hi && (xs[lo] ?? 0) === (xs[lo - 1] ?? 0)) {\n          lo = lo + 1;\n        }\n      } else if (sum < target) {\n        lo = lo + 1;\n      } else {\n        hi = hi - 1;\n      }\n    }\n  }\n  return out;\n}\nconsole.log(triples(nums, 0).join(\" | \"));\n",
+              "tests": [
+                {
+                  "input": "-1 0 1 2 -1 -4",
+                  "output": "-1,-1,2 | -1,0,1"
+                },
+                {
+                  "input": "1 2 3",
+                  "output": ""
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w22-mg-fix1",
+              "title": "Fix the merge that dropped a tail",
+              "prompt": "`merge([1,2], [3,4,5])` returns `1,2` — the main loop stops the moment `a` runs out, and nothing drains what is left of `b`.",
+              "hint": "Only one tail is drained, and the input was chosen so it is the wrong one.",
+              "hints": [
+                "Only one tail is drained, and the input was chosen so it is the wrong one.",
+                "The bug is silent whenever `a` happens to finish last.",
+                "Add the drain loop for `j`."
+              ],
+              "language": "typescript",
+              "kind": "fix",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "function merge(a: readonly number[], b: readonly number[]): readonly number[] {\n  const out: number[] = [];\n  let i = 0;\n  let j = 0;\n  while (i < a.length && j < b.length) {\n    if ((a[i] ?? 0) <= (b[j] ?? 0)) {\n      out.push(a[i] ?? 0);\n      i = i + 1;\n    } else {\n      out.push(b[j] ?? 0);\n      j = j + 1;\n    }\n  }\n  while (i < a.length) {\n    out.push(a[i] ?? 0);\n    i = i + 1;\n  }\n  return out;\n}\nconsole.log(merge([1, 2], [3, 4, 5]).join(\",\"));\n",
+              "solution": "function merge(a: readonly number[], b: readonly number[]): readonly number[] {\n  const out: number[] = [];\n  let i = 0;\n  let j = 0;\n  while (i < a.length && j < b.length) {\n    if ((a[i] ?? 0) <= (b[j] ?? 0)) {\n      out.push(a[i] ?? 0);\n      i = i + 1;\n    } else {\n      out.push(b[j] ?? 0);\n      j = j + 1;\n    }\n  }\n  while (i < a.length) {\n    out.push(a[i] ?? 0);\n    i = i + 1;\n  }\n  while (j < b.length) {\n    out.push(b[j] ?? 0);\n    j = j + 1;\n  }\n  return out;\n}\nconsole.log(merge([1, 2], [3, 4, 5]).join(\",\"));\n",
+              "tests": [
+                {
+                  "input": "",
+                  "output": "1,2,3,4,5"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            }
+          ],
+          "quiz": [
+            {
+              "question": "Draining only one tail is a dangerous bug because…",
+              "options": [
+                "it crashes",
+                "it is silent on inputs where that side finishes last",
+                "it is slow",
+                "of types"
+              ],
+              "answer": 1,
+              "explanation": "Half your tests pass."
+            },
+            {
+              "question": "The triple sweep needs TWO duplicate skips because…",
+              "options": [
+                "one is enough",
+                "the anchor and the second element can each repeat",
+                "of sorting",
+                "of the target"
+              ],
+              "answer": 1,
+              "explanation": "They do different jobs."
+            }
+          ]
+        }
+      ],
+      "capstone": {
+        "title": "Interview rep #22 — the search toolkit",
+        "brief": "One sorted ledger, five questions, each answered in O(log n) — and each printing\nthe number of binary-search steps it took, so the claim is evidenced rather than\nasserted.\n\nInput: the amounts on the first line, then one query per line.\n\n```\n100 250 250 250 400 900\n? 250\n+ 300\n# 250\n[ 200 500\n~ 700\n```\n\n```\n?  250  present at 1  steps 3\n+  300  insert at 4  steps 3\n#  250  count 3  steps 6\n[  200  500  in range 4  steps 6\n~  700  nearest 900  steps 3\nQueries:  5\nSteps:    21\n```\n\n**The five query types**, all built from the two bounds:\n\n| line | question | answer |\n|---|---|---|\n| `? x` | is x present? | `present at <lowerBound>` or `absent` |\n| `+ x` | where would x go? | `insert at <lowerBound>` |\n| `# x` | how many x? | `count <upper - lower>` |\n| `[ a b` | how many in [a, b]? | `in range <upper(b) - lower(a)>` |\n| `~ x` | nearest value to x? | `nearest <value>` |\n\n**What makes it a rep rather than a formatting exercise:**\n\n1. **One instrumented `lowerBound`**, counting its own iterations into a total.\n   `upperBound` is the same function with `<=`; `#` and `[` therefore cost **two**\n   searches, and the step counts must show that.\n2. **`~` is the interesting one.** The lower bound gives you the first value `>= x`;\n   the nearest value is that one **or the one before it**, whichever is closer.\n   Both ends need care: a bound of `0` has nothing before it, and a bound of\n   `length` has nothing at it. Ties go to the smaller value.\n3. **Presence needs the length check** before comparing (lesson 3), because the\n   bound can legitimately be one past the end.\n\nThe totals line reports the query count and the summed steps. An unrecognised\nquery line is skipped and does not count. Empty input, or no queries, prints\n`Queries:  0` and `Steps:    0`.\n",
+        "kind": "auto",
+        "exercise": {
+          "id": "tscourse-w22-capstone",
+          "title": "Interview rep #22",
+          "prompt": "Answer five kinds of query about a sorted ledger with two bounds, counting the binary-search steps each one costs.",
+          "hint": "One `bound` function with an `inclusive` flag is both bounds — the only difference is `<=` versus `<`.",
+          "hints": [
+            "One `bound` function with an `inclusive` flag is both bounds — the only difference is `<=` versus `<`.",
+            "Count the steps inside `bound`, and take `steps - before` around each query to report that query's share.",
+            "`#` and `[` each call `bound` twice, so their step counts are roughly double.",
+            "For `~`, the candidates are the value AT the lower bound and the one BEFORE it; guard both ends with sentinels.",
+            "Ties in `~` go to the smaller value, which is what `gapBefore <= gapAt` expresses.",
+            "Presence needs `i < xs.length` before comparing — the bound can be one past the end.",
+            "An unrecognised query falls through every branch and increments nothing."
+          ],
+          "language": "typescript",
+          "kind": "challenge",
+          "difficulty": "Hard",
+          "strictness": "strict+indexed",
+          "harness": "",
+          "judge_mode": "",
+          "forbid": [],
+          "starter": "import * as fs from \"fs\";\nconst lines = fs.readFileSync(0, \"utf8\").split(\"\\n\").filter((l) => l.trim() !== \"\");\nconst xs: readonly number[] = (lines[0] ?? \"\")\n  .trim()\n  .split(/\\s+/)\n  .filter((s) => s !== \"\")\n  .map(Number)\n  .sort((a, b) => a - b);\n____\nlet queries = 0;\nfor (const line of lines.slice(1)) {\n  const parts = line.trim().split(/\\s+/);\n  const kind = parts[0] ?? \"\";\n  const a = Number(parts[1] ?? \"0\");\n  const before = steps;\n  if (kind === \"?\") {\n    const i = bound(a, false);\n    const present = i < xs.length && (xs[i] ?? 0) === a;\n    queries = queries + 1;\n    console.log(`?  ${a}  ${present ? `present at ${i}` : \"absent\"}  steps ${steps - before}`);\n  } else if (kind === \"+\") {\n    const i = bound(a, false);\n    queries = queries + 1;\n    console.log(`+  ${a}  insert at ${i}  steps ${steps - before}`);\n  } else if (kind === \"#\") {\n    const count = bound(a, true) - bound(a, false);\n    queries = queries + 1;\n    console.log(`#  ${a}  count ${count}  steps ${steps - before}`);\n  } else if (kind === \"[\") {\n    const b = Number(parts[2] ?? \"0\");\n    const count = bound(b, true) - bound(a, false);\n    queries = queries + 1;\n    console.log(`[  ${a}  ${b}  in range ${count}  steps ${steps - before}`);\n  } else if (kind === \"~\") {\n    const value = xs.length === 0 ? 0 : nearest(a);\n    queries = queries + 1;\n    console.log(`~  ${a}  nearest ${value}  steps ${steps - before}`);\n  }\n}\nconsole.log(`Queries:  ${queries}`);\nconsole.log(`Steps:    ${steps}`);\n",
+          "solution": "import * as fs from \"fs\";\nconst lines = fs.readFileSync(0, \"utf8\").split(\"\\n\").filter((l) => l.trim() !== \"\");\nconst xs: readonly number[] = (lines[0] ?? \"\")\n  .trim()\n  .split(/\\s+/)\n  .filter((s) => s !== \"\")\n  .map(Number)\n  .sort((a, b) => a - b);\nlet steps = 0;\nfunction bound(target: number, inclusive: boolean): number {\n  let lo = 0;\n  let hi = xs.length;\n  while (lo < hi) {\n    steps = steps + 1;\n    const mid = Math.floor((lo + hi) / 2);\n    const v = xs[mid] ?? 0;\n    if (inclusive ? v <= target : v < target) {\n      lo = mid + 1;\n    } else {\n      hi = mid;\n    }\n  }\n  return lo;\n}\nfunction nearest(target: number): number {\n  const i = bound(target, false);\n  const at = i < xs.length ? xs[i] ?? 0 : Number.MAX_SAFE_INTEGER;\n  const before = i > 0 ? xs[i - 1] ?? 0 : Number.MIN_SAFE_INTEGER;\n  const gapAt = Math.abs(at - target);\n  const gapBefore = Math.abs(target - before);\n  return gapBefore <= gapAt ? before : at;\n}\nlet queries = 0;\nfor (const line of lines.slice(1)) {\n  const parts = line.trim().split(/\\s+/);\n  const kind = parts[0] ?? \"\";\n  const a = Number(parts[1] ?? \"0\");\n  const before = steps;\n  if (kind === \"?\") {\n    const i = bound(a, false);\n    const present = i < xs.length && (xs[i] ?? 0) === a;\n    queries = queries + 1;\n    console.log(`?  ${a}  ${present ? `present at ${i}` : \"absent\"}  steps ${steps - before}`);\n  } else if (kind === \"+\") {\n    const i = bound(a, false);\n    queries = queries + 1;\n    console.log(`+  ${a}  insert at ${i}  steps ${steps - before}`);\n  } else if (kind === \"#\") {\n    const count = bound(a, true) - bound(a, false);\n    queries = queries + 1;\n    console.log(`#  ${a}  count ${count}  steps ${steps - before}`);\n  } else if (kind === \"[\") {\n    const b = Number(parts[2] ?? \"0\");\n    const count = bound(b, true) - bound(a, false);\n    queries = queries + 1;\n    console.log(`[  ${a}  ${b}  in range ${count}  steps ${steps - before}`);\n  } else if (kind === \"~\") {\n    const value = xs.length === 0 ? 0 : nearest(a);\n    queries = queries + 1;\n    console.log(`~  ${a}  nearest ${value}  steps ${steps - before}`);\n  }\n}\nconsole.log(`Queries:  ${queries}`);\nconsole.log(`Steps:    ${steps}`);\n",
+          "tests": [
+            {
+              "input": "100 250 250 250 400 900\n? 250\n+ 300\n# 250\n[ 200 500\n~ 700",
+              "output": "?  250  present at 1  steps 3\n+  300  insert at 4  steps 3\n#  250  count 3  steps 6\n[  200  500  in range 4  steps 6\n~  700  nearest 900  steps 3\nQueries:  5\nSteps:    21"
+            },
+            {
+              "input": "100 200\n? 999\n~ 100\n~ 300",
+              "output": "?  999  absent  steps 1\n~  100  nearest 100  steps 2\n~  300  nearest 200  steps 1\nQueries:  3\nSteps:    4"
+            },
+            {
+              "input": "50\n# 50\n[ 0 100",
+              "output": "#  50  count 1  steps 2\n[  0  100  in range 1  steps 2\nQueries:  2\nSteps:    4"
+            },
+            {
+              "input": "100 200\nzz 1",
+              "output": "Queries:  0\nSteps:    0"
+            }
+          ],
+          "source_slug": "",
+          "dataset": ""
+        },
+        "example_io": "?  250  present at 1  steps 3\n+  300  insert at 4  steps 3\n#  250  count 3  steps 6\n[  200  500  in range 4  steps 6\n~  700  nearest 900  steps 3\nQueries:  5\nSteps:    21",
+        "rubric": [
+          "one bound function serves both bounds, differing only by the comparison",
+          "every query's step count is measured, not estimated",
+          "`#` and `[` visibly cost two searches",
+          "`~` considers the value at the bound and the one before it, and guards both ends",
+          "ties in `~` resolve to the smaller value",
+          "presence is checked with the length test before the comparison",
+          "the ledger is sorted as it is read rather than assumed sorted",
+          "an unrecognised query line is skipped and not counted"
+        ],
+        "reference": "",
+        "stretch": {
+          "id": "tscourse-w22-capstone-stretch",
+          "title": "Interview rep #22 (stretch)",
+          "prompt": "Add a `2 <target>` query: find two amounts in the ledger that sum to the target, using a two-pointer sweep rather than a search — and report the sweep steps beside the binary-search steps, so the two techniques' costs sit side by side on the same data.",
+          "hint": "The sweep needs no binary search at all — it is one pass from both ends.",
+          "hints": [
+            "The sweep needs no binary search at all — it is one pass from both ends.",
+            "`Pairs:` reports n(n-1)/2, which is what a nested loop would have examined.",
+            "Compare that against the sweep total: that contrast is the entire point of the query.",
+            "A ledger with fewer than two amounts has no pairs, and the sweep never enters its loop."
+          ],
+          "language": "typescript",
+          "kind": "challenge",
+          "difficulty": "Hard",
+          "strictness": "strict+indexed",
+          "harness": "",
+          "judge_mode": "",
+          "forbid": [],
+          "starter": "import * as fs from \"fs\";\nconst lines = fs.readFileSync(0, \"utf8\").split(\"\\n\").filter((l) => l.trim() !== \"\");\nconst xs: readonly number[] = (lines[0] ?? \"\")\n  .trim()\n  .split(/\\s+/)\n  .filter((s) => s !== \"\")\n  .map(Number)\n  .sort((a, b) => a - b);\n____\nfor (const line of lines.slice(1)) {\n  const parts = line.trim().split(/\\s+/);\n  if ((parts[0] ?? \"\") !== \"2\") {\n    continue;\n  }\n  const target = Number(parts[1] ?? \"0\");\n  const before = sweepSteps;\n  const answer = pair(target);\n  console.log(`2  ${target}  ${answer}  sweep ${sweepSteps - before}`);\n}\nconsole.log(`Pairs:    ${xs.length < 2 ? 0 : (xs.length * (xs.length - 1)) / 2}`);\nconsole.log(`Sweep:    ${sweepSteps}`);\n",
+          "solution": "import * as fs from \"fs\";\nconst lines = fs.readFileSync(0, \"utf8\").split(\"\\n\").filter((l) => l.trim() !== \"\");\nconst xs: readonly number[] = (lines[0] ?? \"\")\n  .trim()\n  .split(/\\s+/)\n  .filter((s) => s !== \"\")\n  .map(Number)\n  .sort((a, b) => a - b);\nlet sweepSteps = 0;\nfunction pair(target: number): string {\n  let lo = 0;\n  let hi = xs.length - 1;\n  while (lo < hi) {\n    sweepSteps = sweepSteps + 1;\n    const sum = (xs[lo] ?? 0) + (xs[hi] ?? 0);\n    if (sum === target) {\n      return `${xs[lo] ?? 0}+${xs[hi] ?? 0}`;\n    }\n    if (sum < target) {\n      lo = lo + 1;\n    } else {\n      hi = hi - 1;\n    }\n  }\n  return \"none\";\n}\nfor (const line of lines.slice(1)) {\n  const parts = line.trim().split(/\\s+/);\n  if ((parts[0] ?? \"\") !== \"2\") {\n    continue;\n  }\n  const target = Number(parts[1] ?? \"0\");\n  const before = sweepSteps;\n  const answer = pair(target);\n  console.log(`2  ${target}  ${answer}  sweep ${sweepSteps - before}`);\n}\nconsole.log(`Pairs:    ${xs.length < 2 ? 0 : (xs.length * (xs.length - 1)) / 2}`);\nconsole.log(`Sweep:    ${sweepSteps}`);\n",
+          "tests": [
+            {
+              "input": "100 250 400 900\n2 500\n2 1000\n2 7",
+              "output": "2  500  100+400  sweep 2\n2  1000  100+900  sweep 1\n2  7  none  sweep 3\nPairs:    6\nSweep:    6"
+            },
+            {
+              "input": "50\n2 100",
+              "output": "2  100  none  sweep 0\nPairs:    0\nSweep:    0"
+            }
+          ],
+          "source_slug": "",
+          "dataset": ""
+        }
+      },
+      "objectives": [
+        "Say when a linear scan is the right answer",
+        "Write a correct binary search, and say which loop shape you are using",
+        "Recognise the off-by-one from a single-element array",
+        "Say why mid-point overflow is a real bug in Java and not in TypeScript",
+        "Write a lower bound and an upper bound, and say what each returns for a missing value",
+        "Count occurrences, find an insertion point and answer a range query from the two bounds",
+        "Recognise a problem as a binary search on the answer, and name its monotonic predicate",
+        "Sweep a sorted array with two pointers from both ends",
+        "Use a read pointer and a write pointer to filter in place",
+        "Merge two sorted arrays in one pass",
+        "Sort and then sweep, to turn an O(n³) triple loop into O(n²)",
+        "Report the step count beside an answer, and say what it proves"
+      ],
+      "why": "Binary search is the most-asked and most-often-wrong interview question there is — the bug is never the idea, it is always the boundary. And two pointers is the single highest-yield pattern in the whole set: a startling number of array problems that look quadratic are one sorted sweep, and recognising that is worth more than any individual algorithm.",
+      "est_minutes": 480,
+      "glossary": [
+        {
+          "term": "linear search",
+          "def": "Look at each element. O(n), and the right answer on unsorted or tiny input."
+        },
+        {
+          "term": "binary search",
+          "def": "Halve the range each step. O(log n), and requires sorted input."
+        },
+        {
+          "term": "invariant",
+          "def": "What stays true every iteration: the answer, if any, is inside [lo, hi]."
+        },
+        {
+          "term": "inclusive hi",
+          "def": "`hi = length - 1` with `lo <= hi` and `hi = mid - 1`. For finding a value."
+        },
+        {
+          "term": "exclusive hi",
+          "def": "`hi = length` with `lo < hi` and `hi = mid`. For finding a bound."
+        },
+        {
+          "term": "lower bound",
+          "def": "The first index whose value is >= target. Where the value starts, or would go."
+        },
+        {
+          "term": "upper bound",
+          "def": "The first index whose value is > target. One past where it ends."
+        },
+        {
+          "term": "occurrence count",
+          "def": "upperBound - lowerBound. No scanning."
+        },
+        {
+          "term": "insertion point",
+          "def": "The lower bound: insert there and the array stays sorted."
+        },
+        {
+          "term": "search on the answer",
+          "def": "Binary search over candidate answers rather than over an array."
+        },
+        {
+          "term": "monotonic predicate",
+          "def": "A test that is false, false, …, true, true. What makes the answer searchable."
+        },
+        {
+          "term": "feasibility check",
+          "def": "The predicate itself: \"can it be done with this budget?\""
+        },
+        {
+          "term": "two pointers",
+          "def": "Two indices sweeping one array, each moving only one way."
+        },
+        {
+          "term": "opposite ends",
+          "def": "lo from the start, hi from the end, converging. For pair sums and palindromes."
+        },
+        {
+          "term": "same direction",
+          "def": "A read pointer and a write pointer. For filtering in place."
+        },
+        {
+          "term": "read/write pointers",
+          "def": "Read visits every element; write marks where the next kept one goes."
+        },
+        {
+          "term": "in-place filter",
+          "def": "Compacting the kept elements to the front and returning the new length."
+        },
+        {
+          "term": "merge",
+          "def": "Two sorted inputs, one output, one pass — the heart of merge sort (week 24)."
+        },
+        {
+          "term": "sort then sweep",
+          "def": "Sorting first to make a two-pointer sweep possible. O(n log n) well spent."
+        },
+        {
+          "term": "duplicate skipping",
+          "def": "Advancing past equal values so a solution set has no repeats."
+        }
+      ],
+      "cheatsheet": "```ts\n// ---- the two loop shapes. DO NOT MIX THEM. -----------------------------\n// finding a VALUE — inclusive hi\nlet lo = 0, hi = xs.length - 1;\nwhile (lo <= hi) {                       // <=\n  const mid = Math.floor((lo + hi) / 2);\n  const v = xs[mid] ?? 0;\n  if (v === target) { return mid; }\n  if (v < target) { lo = mid + 1; } else { hi = mid - 1; }   // mid - 1\n}\nreturn -1;\n\n// finding a BOUND — exclusive hi\nlet lo = 0, hi = xs.length;              // length, not length - 1\nwhile (lo < hi) {                        // <\n  const mid = Math.floor((lo + hi) / 2);\n  if ((xs[mid] ?? 0) < target) { lo = mid + 1; } else { hi = mid; }   // mid\n}\nreturn lo;                                // the LOWER bound\n\n// `<=` in that test instead of `<` gives the UPPER bound. That is the only change.\n\n// ---- what the bounds buy you -------------------------------------------\nconst first = lowerBound(xs, x);            // first index >= x\nconst past  = upperBound(xs, x);            // first index > x\npast - first;                                // how many x there are\nxs[first] === x;                             // is x present at all\nlowerBound(xs, x);                           // where to insert and stay sorted\nupperBound(xs, hiVal) - lowerBound(xs, loVal);   // how many in [loVal, hiVal]\n\n// ---- search on the ANSWER ---------------------------------------------\n// the predicate must be monotonic: false … false true … true\nlet lo = 1, hi = total;\nwhile (lo < hi) {\n  const mid = Math.floor((lo + hi) / 2);\n  if (feasible(mid)) { hi = mid; } else { lo = mid + 1; }\n}\nreturn lo;                                   // the smallest feasible answer\n\n// ---- two pointers, opposite ends -------------------------------------\nlet lo = 0, hi = xs.length - 1;\nwhile (lo < hi) {\n  const sum = (xs[lo] ?? 0) + (xs[hi] ?? 0);\n  if (sum === target) { return [lo, hi]; }\n  if (sum < target) { lo = lo + 1; } else { hi = hi - 1; }\n}\n\n// ---- two pointers, same direction: read and write ---------------------\nlet write = 1;\nfor (let read = 1; read < xs.length; read = read + 1) {\n  if ((xs[read] ?? 0) !== (xs[write - 1] ?? 0)) {\n    xs[write] = xs[read] ?? 0;\n    write = write + 1;\n  }\n}\nreturn write;                                // the new length; O(1) space\n\n// ---- merge two sorted arrays ------------------------------------------\nwhile (i < a.length && j < b.length) {\n  if ((a[i] ?? 0) <= (b[j] ?? 0)) { out.push(a[i] ?? 0); i = i + 1; }\n  else { out.push(b[j] ?? 0); j = j + 1; }\n}\nwhile (i < a.length) { out.push(a[i] ?? 0); i = i + 1; }    // drain both tails\nwhile (j < b.length) { out.push(b[j] ?? 0); j = j + 1; }\n\n// ---- sort, then sweep: triples in O(n²) ------------------------------\nconst xs = [...nums].sort((a, b) => a - b);\nfor (let i = 0; i < xs.length - 2; i = i + 1) {\n  if (i > 0 && xs[i] === xs[i - 1]) { continue; }    // skip duplicate anchors\n  let lo = i + 1, hi = xs.length - 1;\n  while (lo < hi) { /* the two-pointer sweep above */ }\n}\n```\n",
+      "self_check": [
+        "Can you say when a linear scan beats a binary search?",
+        "Can you write both loop shapes from memory and say which is for what?",
+        "Can you say what `while (lo < hi)` with `hi = length - 1` does to a one-element array?",
+        "Can you say why mid-point overflow is not a TypeScript problem?",
+        "Can you write a lower bound, and say what it returns for a value that is absent?",
+        "Can you count occurrences of a value without scanning?",
+        "Can you say what makes a predicate monotonic, and why that is required?",
+        "Can you explain why a two-pointer sweep needs the array sorted?",
+        "Can you filter an array in place with a read and a write pointer?",
+        "Can you merge two sorted arrays, including both tails?",
+        "Can you say why sorting first can make a problem cheaper overall?",
+        "Can you say what a step count printed beside an answer proves?"
+      ],
+      "review": [
+        {
+          "question": "Binary search requires…",
+          "options": [
+            "a Map",
+            "sorted input",
+            "unique values",
+            "recursion"
+          ],
+          "answer": 1,
+          "explanation": "Order is what makes halving valid."
+        },
+        {
+          "question": "The loop shape for finding a VALUE is…",
+          "options": [
+            "lo < hi with hi = length",
+            "lo <= hi with hi = length - 1",
+            "either",
+            "lo < hi with hi = length - 1"
+          ],
+          "answer": 1,
+          "explanation": "Inclusive hi, and `hi = mid - 1`."
+        },
+        {
+          "question": "The loop shape for a BOUND is…",
+          "options": [
+            "lo <= hi with hi = length - 1",
+            "lo < hi with hi = length",
+            "either",
+            "lo <= hi with hi = length"
+          ],
+          "answer": 1,
+          "explanation": "Exclusive hi, and `hi = mid`."
+        },
+        {
+          "question": "`while (lo < hi)` with `hi = length - 1` on a one-element array…",
+          "options": [
+            "works",
+            "never enters the loop, so it misses the only element",
+            "crashes",
+            "returns 0"
+          ],
+          "answer": 1,
+          "explanation": "The fastest way to catch the bug."
+        },
+        {
+          "question": "Mid-point overflow is a real bug in…",
+          "options": [
+            "TypeScript",
+            "Java and C, where lo + hi can exceed the integer range",
+            "every language",
+            "no language"
+          ],
+          "answer": 1,
+          "explanation": "JavaScript numbers are doubles."
+        },
+        {
+          "question": "A lower bound returns…",
+          "options": [
+            "the index of the value",
+            "the first index whose value is >= target",
+            "-1 if absent",
+            "the last index"
+          ],
+          "answer": 1,
+          "explanation": "Which is also the insertion point."
+        },
+        {
+          "question": "The number of occurrences of x is…",
+          "options": [
+            "a scan",
+            "upperBound - lowerBound",
+            "lowerBound",
+            "1"
+          ],
+          "answer": 1,
+          "explanation": "Two searches, no scanning."
+        },
+        {
+          "question": "A predicate suitable for searching on the answer must be…",
+          "options": [
+            "fast",
+            "monotonic — false … false true … true",
+            "total",
+            "pure"
+          ],
+          "answer": 1,
+          "explanation": "Otherwise halving is invalid."
+        },
+        {
+          "question": "A two-pointer sweep from both ends is O(n) because…",
+          "options": [
+            "it is sorted",
+            "each step eliminates one element permanently",
+            "of the while",
+            "of the sum"
+          ],
+          "answer": 1,
+          "explanation": "The pointers only ever move towards each other."
+        },
+        {
+          "question": "`if (sum < target) lo = lo + 1` is right because…",
+          "options": [
+            "it is arbitrary",
+            "a bigger sum can only come from a bigger left value, and the array is sorted",
+            "hi is fixed",
+            "of the loop"
+          ],
+          "answer": 1,
+          "explanation": "The whole argument rests on order."
+        },
+        {
+          "question": "A read pointer and a write pointer give you…",
+          "options": [
+            "two passes",
+            "an in-place filter, in O(1) extra space",
+            "a merge",
+            "a sort"
+          ],
+          "answer": 1,
+          "explanation": "The write index is where the next kept element goes."
+        },
+        {
+          "question": "Merging two sorted arrays needs…",
+          "options": [
+            "one loop",
+            "one loop plus a drain for each tail",
+            "a sort",
+            "recursion"
+          ],
+          "answer": 1,
+          "explanation": "Forgetting a tail is the classic bug."
+        },
+        {
+          "question": "Sorting first to enable a sweep costs O(n log n) and is…",
+          "options": [
+            "never worth it",
+            "usually a bargain against an O(n²) or O(n³) alternative",
+            "free",
+            "O(n)"
+          ],
+          "answer": 1,
+          "explanation": "Week 21's table says why."
+        },
+        {
+          "question": "Skipping duplicate anchors in a triple sweep prevents…",
+          "options": [
+            "a crash",
+            "repeated solutions in the output",
+            "O(n³)",
+            "an overflow"
+          ],
+          "answer": 1,
+          "explanation": "Which is what makes the answer a set."
+        }
+      ],
+      "milestone": "Interview rep #22 — a search toolkit. One sorted ledger and five different questions about it, each answered in O(log n) with the step count printed beside the answer: is this amount present, where would it go, how many are there, how many fall in a range, and which is nearest. Five questions, one algorithm, four boundary conditions that each break it differently.",
       "practice": []
     },
     {

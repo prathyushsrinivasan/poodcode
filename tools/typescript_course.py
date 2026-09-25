@@ -477,6 +477,7 @@ _WEEK_FILES = (
     "ts_w19_maps.py",          #          maps & sets
     "ts_w20_nodes.py",         #          linked lists & trees (closes the arc)
     "ts_w21_bigo.py",          # Month 6 — big-O & complexity
+    "ts_w22_search.py",        #          searching & two pointers
 )
 
 for _week_file in _WEEK_FILES:
@@ -544,8 +545,6 @@ for _week_file in _WEEK_FILES:
 _WEEKS += [
 ]
 _WEEKS += [
-    _skel(22, 6, _M6, "Searching & Two Pointers",
-          "Binary search a sorted array and sweep it with two pointers."),
     _skel(23, 6, _M6, "Sliding Window & Prefix Sums",
           "Answer range and subarray questions in linear time."),
     _skel(24, 6, _M6, "Sorting",

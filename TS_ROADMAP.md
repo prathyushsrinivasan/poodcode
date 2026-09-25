@@ -1,12 +1,12 @@
-# TypeScript Roadmap — Weeks 22-32
+# TypeScript Roadmap — Weeks 23-32
 
 The plan for finishing **TypeScript: Zero to Interview**, the 8-month course in
-`tools/typescript_course.py`. Weeks 1-21 ship; weeks 22-32 are one-line
+`tools/typescript_course.py`. Weeks 1-22 ship; weeks 23-32 are one-line
 skeletons waiting to be authored.
 
 Unlike [`JAVA_ROADMAP.md`](JAVA_ROADMAP.md), which starts after the basics, this
 course starts at *zero* — week 1 is someone's first line of code. That decision
-is what makes the back half hard: everything in weeks 22-32 must still obey the
+is what makes the back half hard: everything in weeks 23-32 must still obey the
 rule that nothing may require syntax a later week teaches.
 
 **Status legend** — ✅ built and shipping · 🚧 partially built · ⬜ planned.
@@ -15,9 +15,9 @@ rule that nothing may require syntax a later week teaches.
 
 ## Where it stands
 
-**Built:** weeks 1-21 — **167 lessons, 1,250 judged exercises** (1,235 in lessons
+**Built:** weeks 1-22 — **174 lessons, 1,297 judged exercises** (1,282 in lessons
 and capstones, 15 in week 1's practice families), twenty Budget Buddy capstones —
-**the arc is complete** — the first interview rep, and a full
+**the arc is complete** — two interview reps, and a full
 glossary/cheat-sheet/self-check/review set per week.
 
 | | |
@@ -502,7 +502,7 @@ depth.
 generator functions, generator *methods* and `yield*`, all of which run untouched
 because generators are runtime syntax rather than type syntax.
 
-### Month 6 — Algorithmic Thinking (weeks 21-24) — 🚧 **21 done**
+### Month 6 — Algorithmic Thinking (weeks 21-24) — 🚧 **21-22 done**
 
 **21. Big-O & Complexity** ✅ · `tools/ts_w21_bigo.py` · 7 lessons, 49 exercises
 `w21-why` · `w21-count` · `w21-classes` · `w21-rules` · `w21-space` ·
@@ -548,19 +548,68 @@ an earlier week — week 18's `shift` and string concatenation, week 19's
 That is also why it can afford to be this dense, and why it is the shortest week of
 the back half at seven hours.
 
-**22. Searching & Two Pointers** ⬜ · **23. Sliding Window & Prefix Sums** ⬜ ·
-**24. Sorting** ⬜
+**22. Searching & Two Pointers** ✅ · `tools/ts_w22_search.py` · 7 lessons,
+47 exercises
+`w22-linear` · `w22-binary` · `w22-bounds` · `w22-answer` · `w22-twoends` ·
+`w22-samedir` · `w22-merge`.
+*Capstone:* **interview rep #22** — the search toolkit. One sorted ledger, five
+query types (present / insertion point / count / range count / nearest), each built
+from the two bounds and each printing the binary-search steps it cost. Stretch adds
+a two-pointer pair-sum query so the sweep's step count sits beside the search's on
+the same data.
+Kinds: 37 drill, 7 fix, 1 predict.
+
+**It deepens binary search rather than introducing it** — week 21 already built and
+counted one — so the week spends its time on the three things that make it useful:
+the two **bounds** (which is what almost every real use is), searching **on the
+answer**, and the boundary that breaks it.
+
+**The off-by-one is taught as a table with two rows** — inclusive `hi` with
+`lo <= hi` and `hi = mid - 1`, or exclusive `hi` with `lo < hi` and `hi = mid` —
+and "every binary search bug is a value from one row used with the other". The
+`fix` ships the mixed version, whose giveaway is that **a one-element array fails**:
+`search([1], 1)` returns -1. That is the cheapest test in programming and almost
+nobody writes it.
+
+**Mid-point overflow is explicitly NOT taught as a bug here.** `lo + hi` exceeding
+the integer range is real in Java and C (it sat in the JDK for nine years) and
+cannot happen with JavaScript doubles, so the lesson says so and explains where the
+`lo + (hi - lo) / 2` idiom people copy comes from, instead of repeating advice that
+does not apply.
+
+**One authoring correction worth recording, because it is the kind of thing that
+ships as a confident falsehood.** The in-place dedupe lesson originally claimed that
+comparing against `xs[read - 1]` instead of `xs[write - 1]` was a *bug*. The
+verifier disagreed — the buggy starter passed — and testing showed the two are
+genuinely **equivalent** here, because `write <= read` means the slot at `read - 1`
+can only be overwritten when `write === read`, which is a no-op. The lesson now says
+that, and makes the honest argument instead: `xs[write - 1]` is correct because of
+what it means, `xs[read - 1]` is correct because of a two-line argument about
+indices, and the second kind of correctness stops being true when somebody edits the
+loop. The `fix` was replaced with a bug that is real — a missing empty-array guard,
+which reports **1** kept element out of nothing.
+
+**And the month's counting habit continues:** five exercises and both capstones
+print a step count beside the answer, because "two pointers is O(n)" is a claim and
+`steps=5` next to `pairs=15` is the evidence.
+
+**23. Sliding Window & Prefix Sums** ⬜ · **24. Sorting** ⬜
 Standard, low-risk, stdout-gradable. The Problem Library and
 `tools/algorithms_defs.py` already hold the patterns and can seed both the
 lesson text and the capstone problems.
 
-*Two things these three inherit from week 21, which is now the month's foundation:*
-binary search is already built and counted there (`w21-classes`, 11 steps at
-n=1024), so week 22 should **deepen** it rather than introduce it; and each of these
-weeks should report an operation count beside its answer wherever a technique's
-whole point is that it is cheaper than the obvious version — which is true of all
-three. A sliding window that does not show the count it saved over the nested loop
-has not made its argument.
+*What these two inherit, now that 21 and 22 are down:*
+
+* **Report the count.** A sliding window that does not show what it saved over the
+  nested loop has not made its argument. Weeks 21 and 22 both do this; it is the
+  month's idiom.
+* **Week 22 built the merge** (`w22-merge`, including both tail drains and the `<=`
+  that makes it stable) explicitly as the heart of merge sort, so week 24 splits and
+  recurses and calls it — it does not write it again. Week 22's
+  partition-by-predicate exercise is likewise half of quicksort.
+* **Sorting is already established as affordable.** Week 21's table and week 22's
+  sort-then-sweep lesson both make the case, so week 24 can open on *how* the sorts
+  work rather than on whether to sort.
 
 ### Month 7 — DSA Interview Core (weeks 25-28)
 
@@ -626,7 +675,7 @@ still go first.
 | **B** ✅ | 11-12 | Classes unblock 18, 20, 28; structural typing completes month 3 |
 | **C** ✅ | 13-16 | Types, then the project-shaped week: modules, tsconfig, .d.ts |
 | **D** ✅ | 17-20 | Async + data structures; the Budget Buddy arc is closed |
-| **E** 🚧 | 21 ✅, **22-24** ← next | Algorithmic thinking; 21's format is settled — count operations |
+| **E** 🚧 | 21-22 ✅, **23-24** ← next | Algorithmic thinking; the month's idiom is to count operations |
 | **F** | 25-28 | DSA core |
 | **G** | 29-32 | Type-level; lowest risk, highest polish |
 
