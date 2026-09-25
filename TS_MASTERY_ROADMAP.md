@@ -310,7 +310,7 @@ Everything here is built once and then used by every week in Part B.
 | ✅ X-103 | Diagnose-prompt checker: every quoted `TSnnnn` is re-derived from the starter (the course's verifier caught four wrong codes on first try — see the table in `TS_ROADMAP.md`). | P1 | S |
 | X-104 | Scope lint for Mastery — nothing may use a construct a later week teaches (port `_SCOPE_RULES`). | P1 | M |
 | X-105 | Upgrade the checker to TypeScript 6.x (D-4), re-run every verifier, record deltas. | P2 | M |
-| X-106 | Content stats script — prints the "Where it stands" table from the seed so this document never goes stale. | P3 | S |
+| ✅ X-106 | Content stats script — prints the "Where it stands" table from the seed so this document never goes stale — `python tools/ts_mastery_stats.py [--weeks]`. | P3 | S |
 
 ---
 
