@@ -26704,6 +26704,138 @@
             "explanation": "The car *has* an engine instead of *being* one — swap it without touching a hierarchy."
           },
           {
+            "question": "`class A { static count = 5 }` and `class B extends A {}` — what is `B.count`?",
+            "options": [
+              "`5` — static members are inherited",
+              "`undefined`",
+              "`0`",
+              "A compile error"
+            ],
+            "answer": 0,
+            "explanation": "Subclasses inherit static members through the constructor's prototype chain."
+          },
+          {
+            "question": "In `static make() { return new this(); }` called as `B.make()` on a subclass `B`, what is created?",
+            "options": [
+              "A `B`",
+              "An `A`",
+              "A plain object",
+              "A compile error"
+            ],
+            "answer": 0,
+            "explanation": "`this` in a static method is the constructor it was called on."
+          },
+          {
+            "question": "What does `protected` allow that `private` doesn't?",
+            "options": [
+              "Access from subclasses",
+              "Access from outside the class",
+              "Runtime privacy",
+              "Static access only"
+            ],
+            "answer": 0,
+            "explanation": "Both are compile-time only; `#` fields are runtime-private."
+          },
+          {
+            "question": "Does a subclass constructor have to call `super()` before using `this`?",
+            "options": [
+              "Yes",
+              "No",
+              "Only for abstract bases",
+              "Only in strict mode"
+            ],
+            "answer": 0,
+            "explanation": "Using `this` first is a compile error and a runtime ReferenceError."
+          },
+          {
+            "question": "What does `implements` add at runtime?",
+            "options": [
+              "Nothing — it's a compile-time check",
+              "The interface's methods",
+              "A prototype link",
+              "An `instanceof` check"
+            ],
+            "answer": 0,
+            "explanation": "Interfaces are erased."
+          },
+          {
+            "question": "A class `C` has a `#secret` field. Can another instance of `C` read it?",
+            "options": [
+              "Yes — privacy is per class, not per instance",
+              "No",
+              "Only through a getter",
+              "Only in static methods"
+            ],
+            "answer": 0,
+            "explanation": "Methods of `C` may read `#secret` on any `C`."
+          },
+          {
+            "question": "Why is an accessor pair (`get`/`set`) better than a public field for validated state?",
+            "options": [
+              "The setter can reject bad values while callers keep simple property syntax",
+              "It's faster",
+              "Accessors are erasable",
+              "Fields can't be read"
+            ],
+            "answer": 0,
+            "explanation": "Encapsulation without changing the call sites."
+          },
+          {
+            "question": "What is a mixin in TypeScript?",
+            "options": [
+              "A function that takes a class and returns a subclass adding behaviour",
+              "A class with no methods",
+              "An interface with a default",
+              "A decorator"
+            ],
+            "answer": 0,
+            "explanation": "`const Timestamped = <T extends new (...a: any[]) => object>(Base: T) => class extends Base { … }`."
+          },
+          {
+            "question": "When is a closure-based object (a factory returning functions) better than a class?",
+            "options": [
+              "When you want true privacy and no `this` — small objects passed around as callbacks",
+              "Never",
+              "When you need inheritance",
+              "When performance matters most"
+            ],
+            "answer": 0,
+            "explanation": "Each call gets its own captured variables."
+          },
+          {
+            "question": "What does `override` add at runtime?",
+            "options": [
+              "Nothing — it's erased; the compiler checks it",
+              "A call to `super`",
+              "A copy of the base method",
+              "Runtime validation"
+            ],
+            "answer": 0,
+            "explanation": "Like `private` and `abstract`, it only exists for the checker."
+          },
+          {
+            "question": "Can an `abstract` class have a constructor?",
+            "options": [
+              "Yes — subclasses call it with `super(…)`",
+              "No",
+              "Only a private one",
+              "Only if it has no abstract members"
+            ],
+            "answer": 0,
+            "explanation": "It just can't be called with `new` directly."
+          },
+          {
+            "question": "What does `accessor x = 1` (with standard decorators) declare?",
+            "options": [
+              "An auto-accessor: a getter/setter pair over a private backing field",
+              "A readonly field",
+              "A static field",
+              "A method"
+            ],
+            "answer": 0,
+            "explanation": "Designed so decorators can intercept reads and writes."
+          },
+          {
             "question": "What does `abstract area(): number` in a base class require?",
             "options": [
               "Every concrete subclass must implement `area`",
@@ -27514,6 +27646,138 @@
             ],
             "answer": 0,
             "explanation": "With `any`, every value that comes out has lost its type."
+          },
+          {
+            "question": "`function* g() { const x = yield 1; yield x * 2; }` — `it.next(); it.next(21).value` is?",
+            "options": [
+              "`42`",
+              "`2`",
+              "`21`",
+              "`NaN`"
+            ],
+            "answer": 0,
+            "explanation": "The argument to `next` becomes the value of the paused `yield`. The first `next`'s argument is ignored."
+          },
+          {
+            "question": "A `for…of` loop over a generator `break`s early. What runs?",
+            "options": [
+              "The generator's `finally` blocks",
+              "Nothing",
+              "The rest of the generator",
+              "An error"
+            ],
+            "answer": 0,
+            "explanation": "`break` calls the iterator's `return()`."
+          },
+          {
+            "question": "What does `[...(function* () { yield* [1, 2]; return 3; })()]` give?",
+            "options": [
+              "`[1, 2]`",
+              "`[1, 2, 3]`",
+              "`[3]`",
+              "`[]`"
+            ],
+            "answer": 0,
+            "explanation": "The `return` value is not part of iteration."
+          },
+          {
+            "question": "What does iterating a `Map` directly (`for (const x of map)`) yield?",
+            "options": [
+              "`[key, value]` pairs",
+              "Keys",
+              "Values",
+              "Indexes"
+            ],
+            "answer": 0,
+            "explanation": "Same as `map.entries()`."
+          },
+          {
+            "question": "What is `Generator<T, TReturn, TNext>`'s `TNext`?",
+            "options": [
+              "The type of values passed into `next()`",
+              "The yielded type",
+              "The return type",
+              "The error type"
+            ],
+            "answer": 0,
+            "explanation": "Most generators leave it `unknown` or `undefined`."
+          },
+          {
+            "question": "How do you traverse a tree in order with a generator?",
+            "options": [
+              "`yield* walk(left); yield node; yield* walk(right);`",
+              "A `while` loop only",
+              "`Array.from(tree)`",
+              "`for…in`"
+            ],
+            "answer": 0,
+            "explanation": "`yield*` delegates to the recursive calls."
+          },
+          {
+            "question": "Why is a linked list's `shift` O(1) but an array's O(n)?",
+            "options": [
+              "The list just moves its head pointer; the array re-indexes every element",
+              "It isn't",
+              "Arrays are sorted",
+              "Lists are cached"
+            ],
+            "answer": 0,
+            "explanation": "For queue-heavy code, use a real queue or a ring buffer."
+          },
+          {
+            "question": "What makes `Iterator.from(x)` useful?",
+            "options": [
+              "It gives any iterable the iterator helpers",
+              "It copies `x` into an array",
+              "It sorts `x`",
+              "It makes `x` async"
+            ],
+            "answer": 0,
+            "explanation": "Plain iterables don't carry `map`, `take` and friends."
+          },
+          {
+            "question": "What does `iter.drop(2)` do?",
+            "options": [
+              "Skips the first two values lazily",
+              "Removes two values from the source",
+              "Returns two values",
+              "Sorts and drops the two smallest"
+            ],
+            "answer": 0,
+            "explanation": "Like `slice(2)`, but lazy."
+          },
+          {
+            "question": "What is the cost of building a heap by pushing n items one by one?",
+            "options": [
+              "O(n log n)",
+              "O(n)",
+              "O(n²)",
+              "O(log n)"
+            ],
+            "answer": 0,
+            "explanation": "A bottom-up heapify can do it in O(n), but push-by-push is fine for most uses."
+          },
+          {
+            "question": "Why does a priority queue beat re-sorting an array after each insert?",
+            "options": [
+              "Each insert/remove is O(log n) instead of O(n log n)",
+              "It uses less memory",
+              "It keeps insertion order",
+              "It never needs a comparator"
+            ],
+            "answer": 0,
+            "explanation": "Sorting is right only when you need the whole order once."
+          },
+          {
+            "question": "What is the difference between `flatMap` on an iterator and on an array?",
+            "options": [
+              "The iterator version is lazy; both flatten one level",
+              "Only arrays can flatten",
+              "The iterator version flattens fully",
+              "There is no iterator `flatMap`"
+            ],
+            "answer": 0,
+            "explanation": "Iterator `flatMap` expects the callback to return an iterable."
           },
           {
             "question": "What happens the second time you iterate the SAME generator object?",
@@ -28415,6 +28679,138 @@
             "explanation": "Inside promise callbacks, `throw` becomes rejection — which is why an unhandled `.then` chain loses errors."
           },
           {
+            "question": "What does `await Promise.resolve(1).finally(() => 99)` give?",
+            "options": [
+              "`1` — `finally`'s return value is ignored",
+              "`99`",
+              "`undefined`",
+              "`[1, 99]`"
+            ],
+            "answer": 0,
+            "explanation": "`finally` is for cleanup; it can't change the result (unless it throws)."
+          },
+          {
+            "question": "A block with `using r` throws, and `r`'s dispose throws too. What reaches the `catch`?",
+            "options": [
+              "A `SuppressedError` with `.error` = the dispose error and `.suppressed` = the original",
+              "Only the original",
+              "Only the dispose error",
+              "Nothing"
+            ],
+            "answer": 0,
+            "explanation": "Neither failure is lost."
+          },
+          {
+            "question": "A `DisposableStack` has one deferred cleanup that throws. What does `dispose()` throw?",
+            "options": [
+              "That error",
+              "A SuppressedError",
+              "Nothing — errors are swallowed",
+              "An AggregateError"
+            ],
+            "answer": 0,
+            "explanation": "With several failing cleanups they're chained as SuppressedErrors."
+          },
+          {
+            "question": "Is `cause` part of `Object.keys(new Error(\"x\", { cause: 1 }))`?",
+            "options": [
+              "No — it's a non-enumerable own property",
+              "Yes",
+              "Only for `Error` subclasses",
+              "Only when `cause` is an Error"
+            ],
+            "answer": 0,
+            "explanation": "Read it directly (`e.cause`); `JSON.stringify(e)` won't show it."
+          },
+          {
+            "question": "Why prefer `Result` for parsing user input?",
+            "options": [
+              "Invalid input is expected, and the type makes every caller handle it",
+              "Exceptions are slow",
+              "`Result` is built in",
+              "Parsing can't throw"
+            ],
+            "answer": 0,
+            "explanation": "Exceptions are for the unexpected."
+          },
+          {
+            "question": "What does `stack.adopt(value, release)` do on a `DisposableStack`?",
+            "options": [
+              "Registers `release(value)` to run at disposal and returns `value`",
+              "Takes ownership of another stack",
+              "Disposes immediately",
+              "Moves the stack"
+            ],
+            "answer": 0,
+            "explanation": "For resources that don't implement `Symbol.dispose` themselves."
+          },
+          {
+            "question": "Should a dispose method be safe to call twice?",
+            "options": [
+              "Yes — make it idempotent",
+              "No, it should throw the second time",
+              "It's never called twice",
+              "Only async ones"
+            ],
+            "answer": 0,
+            "explanation": "Defensive cleanup avoids double-free bugs."
+          },
+          {
+            "question": "What is `SuppressedError`?",
+            "options": [
+              "The error raised when cleanup fails while another error is already propagating",
+              "A warning",
+              "A deprecated Error type",
+              "An error for suppressed logs"
+            ],
+            "answer": 0,
+            "explanation": "It keeps both the cleanup error and the original."
+          },
+          {
+            "question": "What should `catch` do with an error it can't handle?",
+            "options": [
+              "Rethrow it (or wrap it with a `cause`)",
+              "Log and continue",
+              "Return `null`",
+              "Convert to a string"
+            ],
+            "answer": 0,
+            "explanation": "Swallowing unknown errors hides bugs."
+          },
+          {
+            "question": "How do `try`/`finally` and `using` differ in ordering several resources?",
+            "options": [
+              "`using` releases in reverse order automatically; with `finally` you write the order by hand",
+              "They're identical",
+              "`finally` is reverse",
+              "`using` is random"
+            ],
+            "answer": 0,
+            "explanation": "Nested `finally` blocks are easy to get wrong as resources multiply."
+          },
+          {
+            "question": "What is `err.cause` typed as?",
+            "options": [
+              "`unknown`",
+              "`Error`",
+              "`string`",
+              "`Error | undefined`"
+            ],
+            "answer": 0,
+            "explanation": "Anything can be a cause; narrow before use."
+          },
+          {
+            "question": "What does a `Result` type look like as a discriminated union?",
+            "options": [
+              "`{ ok: true; value: T } | { ok: false; error: E }`",
+              "`T | Error`",
+              "`[T, E]`",
+              "`Promise<T>`"
+            ],
+            "answer": 0,
+            "explanation": "The `ok` tag narrows to the right member."
+          },
+          {
             "question": "What makes `Result<T, E>` enforce error handling?",
             "options": [
               "It is a discriminated union, so `value` is only reachable after checking `ok`",
@@ -29282,6 +29678,61 @@
             ],
             "answer": 0,
             "explanation": "It is a discriminated union on `status`; narrow it before reading `value` or `reason`."
+          },
+          {
+            "question": "What does `await Promise.resolve(Promise.resolve(2))` give?",
+            "options": [
+              "`2` — promises flatten",
+              "A promise of 2",
+              "`[2]`",
+              "`undefined`"
+            ],
+            "answer": 0,
+            "explanation": "A promise never resolves to another promise."
+          },
+          {
+            "question": "What does `Promise.race([])` do?",
+            "options": [
+              "Stays pending forever",
+              "Resolves with `undefined`",
+              "Rejects",
+              "Throws"
+            ],
+            "answer": 0,
+            "explanation": "An empty race has no competitor to settle it."
+          },
+          {
+            "question": "Why test async code with a virtual clock?",
+            "options": [
+              "Time advances only when the test says so, making output independent of machine speed",
+              "It's faster to write",
+              "Real timers aren't allowed",
+              "It avoids promises"
+            ],
+            "answer": 0,
+            "explanation": "Deterministic by construction."
+          },
+          {
+            "question": "What does a concurrency-limited pool guarantee that `Promise.all(items.map(work))` doesn't?",
+            "options": [
+              "At most k operations are in flight at once",
+              "Results in order",
+              "No failures",
+              "Faster completion"
+            ],
+            "answer": 0,
+            "explanation": "`Promise.all` starts everything immediately."
+          },
+          {
+            "question": "Debounce vs throttle?",
+            "options": [
+              "Debounce waits for a pause, then runs once; throttle runs at most once per interval",
+              "They're the same",
+              "Throttle waits for a pause",
+              "Debounce runs every time"
+            ],
+            "answer": 0,
+            "explanation": "Search boxes debounce; scroll handlers throttle."
           },
           {
             "question": "What is the total time of `await Promise.all(ids.map(fetchOne))` versus awaiting inside a loop?",

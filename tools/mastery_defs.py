@@ -2157,7 +2157,7 @@ MASTERY = [
 #   min_quiz_bank            — distinct questions per week, so retakes differ.
 _TRACK_RULES = {
     "typescript": {"min_exam_tests": 8, "starter_required": True,
-                   "repeats_need_review_note": True, "min_quiz_bank": 16},
+                   "repeats_need_review_note": True, "min_quiz_bank": 40},
 }
 
 

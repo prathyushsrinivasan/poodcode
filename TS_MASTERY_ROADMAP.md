@@ -227,7 +227,7 @@ Everything here is built once and then used by every week in Part B.
 
 | # | Item | P | Size |
 |---|---|---|---|
-| 🚧 X-30 | Week quiz bank **≥ 40 questions**; sample **10** per sitting (from 4). Mixed kinds: MCQ, "what does this print", "which line errors", "which type is inferred". ~1,050 questions total. | P1 | L |
+| ✅ X-30 | Week quiz bank **≥ 40 questions**; sample **10** per sitting (from 4). Mixed kinds: MCQ, "what does this print", "which line errors", "which type is inferred". ~1,050 questions total. | P1 | L |
 | X-31 | New quiz question types: **code-output** (show code, pick the output), **type-inference** (pick the inferred type), **multi-select**, **fill-the-type** (typed short answer checked by `ts_typecheck.mjs`). | P1 | L |
 | 🚧 X-32 | Every coding final: **≥ 6 tests**, ≥ 2 edge cases, 1 large input, and a **hidden** set not shown until pass (F-04). | **P0** | M |
 | X-33 | **Alternate finals**: a second final per week, served on retake, so a failed final can't be passed by memorising the first. | P2 | L |
@@ -809,7 +809,7 @@ concurrency and cancellation.
 
 ---
 
-**Status, 2026-09-26 — Part B's content is built for all 26 core weeks.** TypeScript Learn chapters: **87** (the target), with 301 Learn exercises and 265 chapter quiz questions. Mastery TS track: 261 problem-set problems (41 type-graded), 202 practice exercises, 27 runnable projects, 945 week-bank quiz questions, 521 review cards, 219 final tests, 6 checkpoint contests. Still open from Part A and the targets above: the ~1,300-exercise and ~1,000-card volumes, alternate finals (X-33), two-part finals (X-34), the programme final exam (X-36), the multi-file workspace (X-45), and the visualisers and UI items (M1-02, M3-01, M5-01, M6-01, X-60 onward). Optional week 27 now has its capstone (the arc's final `ledger.ts`: branded ids, `Result` parsing, a private-state class with a generator statement, concurrent loading with timeouts on the virtual clock), a four-problem mock-interview set with four type puzzles, and code-review practice; the 60-question interview bank and the three timed sessions are still to do.
+**Status, 2026-09-26 — Part B's content is built for all 26 core weeks.** TypeScript Learn chapters: **87** (the target), with 301 Learn exercises and 265 chapter quiz questions. Mastery TS track: 261 problem-set problems (41 type-graded), 202 practice exercises, 27 runnable projects, 1,324 week-bank quiz questions (at least 40 every week, build-asserted), 521 review cards, 219 final tests, 6 checkpoint contests. Still open from Part A and the targets above: the ~1,300-exercise and ~1,000-card volumes (the quiz target is met), alternate finals (X-33), two-part finals (X-34), the programme final exam (X-36), the multi-file workspace (X-45), and the visualisers and UI items (M1-02, M3-01, M5-01, M6-01, X-60 onward). Optional week 27 now has its capstone (the arc's final `ledger.ts`: branded ids, `Result` parsing, a private-state class with a generator statement, concurrent loading with timeouts on the virtual clock), a four-problem mock-interview set with four type puzzles, and code-review practice; the 60-question interview bank and the three timed sessions are still to do.
 
 ---
 

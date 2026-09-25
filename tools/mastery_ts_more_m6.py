@@ -2394,3 +2394,73 @@ TS_CARDS_MORE[27] = [
     ("Mock interview: how do you make async output testable?", "Inject the clock and the I/O, order results by input index, and never assert on real timing."),
     ("Mock interview: when would you reach for a branded type?", "When two values share a representation but must never be mixed — ids, units, validated strings — at zero runtime cost."),
 ]
+
+# ===========================================================================
+# Quiz top-ups (X-30): Month 6 week banks raised to 40+ questions.
+# Runtime facts quoted here were checked on the judge's Node.
+# ===========================================================================
+
+TS_QUIZ_TOPUP[23] = [
+    _mq("`class A { static count = 5 }` and `class B extends A {}` — what is `B.count`?", "`5` — static members are inherited", ["`undefined`", "`0`", "A compile error"],
+        "Subclasses inherit static members through the constructor's prototype chain."),
+    _mq("In `static make() { return new this(); }` called as `B.make()` on a subclass `B`, what is created?", "A `B`", ["An `A`", "A plain object", "A compile error"],
+        "`this` in a static method is the constructor it was called on."),
+    _mq("What does `protected` allow that `private` doesn't?", "Access from subclasses", ["Access from outside the class", "Runtime privacy", "Static access only"], "Both are compile-time only; `#` fields are runtime-private."),
+    _mq("Does a subclass constructor have to call `super()` before using `this`?", "Yes", ["No", "Only for abstract bases", "Only in strict mode"], "Using `this` first is a compile error and a runtime ReferenceError."),
+    _mq("What does `implements` add at runtime?", "Nothing — it's a compile-time check", ["The interface's methods", "A prototype link", "An `instanceof` check"], "Interfaces are erased."),
+    _mq("A class `C` has a `#secret` field. Can another instance of `C` read it?", "Yes — privacy is per class, not per instance", ["No", "Only through a getter", "Only in static methods"], "Methods of `C` may read `#secret` on any `C`."),
+    _mq("Why is an accessor pair (`get`/`set`) better than a public field for validated state?", "The setter can reject bad values while callers keep simple property syntax", ["It's faster", "Accessors are erasable", "Fields can't be read"],
+        "Encapsulation without changing the call sites."),
+    _mq("What is a mixin in TypeScript?", "A function that takes a class and returns a subclass adding behaviour", ["A class with no methods", "An interface with a default", "A decorator"], "`const Timestamped = <T extends new (...a: any[]) => object>(Base: T) => class extends Base { … }`."),
+    _mq("When is a closure-based object (a factory returning functions) better than a class?", "When you want true privacy and no `this` — small objects passed around as callbacks", ["Never", "When you need inheritance", "When performance matters most"],
+        "Each call gets its own captured variables."),
+    _mq("What does `override` add at runtime?", "Nothing — it's erased; the compiler checks it", ["A call to `super`", "A copy of the base method", "Runtime validation"], "Like `private` and `abstract`, it only exists for the checker."),
+    _mq("Can an `abstract` class have a constructor?", "Yes — subclasses call it with `super(…)`", ["No", "Only a private one", "Only if it has no abstract members"], "It just can't be called with `new` directly."),
+    _mq("What does `accessor x = 1` (with standard decorators) declare?", "An auto-accessor: a getter/setter pair over a private backing field", ["A readonly field", "A static field", "A method"],
+        "Designed so decorators can intercept reads and writes."),
+]
+
+TS_QUIZ_TOPUP[24] = [
+    _mq("`function* g() { const x = yield 1; yield x * 2; }` — `it.next(); it.next(21).value` is?", "`42`", ["`2`", "`21`", "`NaN`"],
+        "The argument to `next` becomes the value of the paused `yield`. The first `next`'s argument is ignored."),
+    _mq("A `for…of` loop over a generator `break`s early. What runs?", "The generator's `finally` blocks", ["Nothing", "The rest of the generator", "An error"], "`break` calls the iterator's `return()`."),
+    _mq("What does `[...(function* () { yield* [1, 2]; return 3; })()]` give?", "`[1, 2]`", ["`[1, 2, 3]`", "`[3]`", "`[]`"], "The `return` value is not part of iteration."),
+    _mq("What does iterating a `Map` directly (`for (const x of map)`) yield?", "`[key, value]` pairs", ["Keys", "Values", "Indexes"], "Same as `map.entries()`."),
+    _mq("What is `Generator<T, TReturn, TNext>`'s `TNext`?", "The type of values passed into `next()`", ["The yielded type", "The return type", "The error type"], "Most generators leave it `unknown` or `undefined`."),
+    _mq("How do you traverse a tree in order with a generator?", "`yield* walk(left); yield node; yield* walk(right);`", ["A `while` loop only", "`Array.from(tree)`", "`for…in`"], "`yield*` delegates to the recursive calls."),
+    _mq("Why is a linked list's `shift` O(1) but an array's O(n)?", "The list just moves its head pointer; the array re-indexes every element", ["It isn't", "Arrays are sorted", "Lists are cached"], "For queue-heavy code, use a real queue or a ring buffer."),
+    _mq("What makes `Iterator.from(x)` useful?", "It gives any iterable the iterator helpers", ["It copies `x` into an array", "It sorts `x`", "It makes `x` async"], "Plain iterables don't carry `map`, `take` and friends."),
+    _mq("What does `iter.drop(2)` do?", "Skips the first two values lazily", ["Removes two values from the source", "Returns two values", "Sorts and drops the two smallest"], "Like `slice(2)`, but lazy."),
+    _mq("What is the cost of building a heap by pushing n items one by one?", "O(n log n)", ["O(n)", "O(n²)", "O(log n)"], "A bottom-up heapify can do it in O(n), but push-by-push is fine for most uses."),
+    _mq("Why does a priority queue beat re-sorting an array after each insert?", "Each insert/remove is O(log n) instead of O(n log n)", ["It uses less memory", "It keeps insertion order", "It never needs a comparator"], "Sorting is right only when you need the whole order once."),
+    _mq("What is the difference between `flatMap` on an iterator and on an array?", "The iterator version is lazy; both flatten one level", ["Only arrays can flatten", "The iterator version flattens fully", "There is no iterator `flatMap`"],
+        "Iterator `flatMap` expects the callback to return an iterable."),
+]
+
+TS_QUIZ_TOPUP[25] = [
+    _mq("What does `await Promise.resolve(1).finally(() => 99)` give?", "`1` — `finally`'s return value is ignored", ["`99`", "`undefined`", "`[1, 99]`"], "`finally` is for cleanup; it can't change the result (unless it throws)."),
+    _mq("A block with `using r` throws, and `r`'s dispose throws too. What reaches the `catch`?", "A `SuppressedError` with `.error` = the dispose error and `.suppressed` = the original", ["Only the original", "Only the dispose error", "Nothing"],
+        "Neither failure is lost."),
+    _mq("A `DisposableStack` has one deferred cleanup that throws. What does `dispose()` throw?", "That error", ["A SuppressedError", "Nothing — errors are swallowed", "An AggregateError"], "With several failing cleanups they're chained as SuppressedErrors."),
+    _mq("Is `cause` part of `Object.keys(new Error(\"x\", { cause: 1 }))`?", "No — it's a non-enumerable own property", ["Yes", "Only for `Error` subclasses", "Only when `cause` is an Error"],
+        "Read it directly (`e.cause`); `JSON.stringify(e)` won't show it."),
+    _mq("Why prefer `Result` for parsing user input?", "Invalid input is expected, and the type makes every caller handle it", ["Exceptions are slow", "`Result` is built in", "Parsing can't throw"], "Exceptions are for the unexpected."),
+    _mq("What does `stack.adopt(value, release)` do on a `DisposableStack`?", "Registers `release(value)` to run at disposal and returns `value`", ["Takes ownership of another stack", "Disposes immediately", "Moves the stack"], "For resources that don't implement `Symbol.dispose` themselves."),
+    _mq("Should a dispose method be safe to call twice?", "Yes — make it idempotent", ["No, it should throw the second time", "It's never called twice", "Only async ones"], "Defensive cleanup avoids double-free bugs."),
+    _mq("What is `SuppressedError`?", "The error raised when cleanup fails while another error is already propagating", ["A warning", "A deprecated Error type", "An error for suppressed logs"], "It keeps both the cleanup error and the original."),
+    _mq("What should `catch` do with an error it can't handle?", "Rethrow it (or wrap it with a `cause`)", ["Log and continue", "Return `null`", "Convert to a string"], "Swallowing unknown errors hides bugs."),
+    _mq("How do `try`/`finally` and `using` differ in ordering several resources?", "`using` releases in reverse order automatically; with `finally` you write the order by hand", ["They're identical", "`finally` is reverse", "`using` is random"],
+        "Nested `finally` blocks are easy to get wrong as resources multiply."),
+    _mq("What is `err.cause` typed as?", "`unknown`", ["`Error`", "`string`", "`Error | undefined`"], "Anything can be a cause; narrow before use."),
+    _mq("What does a `Result` type look like as a discriminated union?", "`{ ok: true; value: T } | { ok: false; error: E }`", ["`T | Error`", "`[T, E]`", "`Promise<T>`"], "The `ok` tag narrows to the right member."),
+]
+
+TS_QUIZ_TOPUP[26] = [
+    _mq("What does `await Promise.resolve(Promise.resolve(2))` give?", "`2` — promises flatten", ["A promise of 2", "`[2]`", "`undefined`"], "A promise never resolves to another promise."),
+    _mq("What does `Promise.race([])` do?", "Stays pending forever", ["Resolves with `undefined`", "Rejects", "Throws"], "An empty race has no competitor to settle it."),
+    _mq("Why test async code with a virtual clock?", "Time advances only when the test says so, making output independent of machine speed", ["It's faster to write", "Real timers aren't allowed", "It avoids promises"],
+        "Deterministic by construction."),
+    _mq("What does a concurrency-limited pool guarantee that `Promise.all(items.map(work))` doesn't?", "At most k operations are in flight at once", ["Results in order", "No failures", "Faster completion"], "`Promise.all` starts everything immediately."),
+    _mq("Debounce vs throttle?", "Debounce waits for a pause, then runs once; throttle runs at most once per interval", ["They're the same", "Throttle waits for a pause", "Debounce runs every time"],
+        "Search boxes debounce; scroll handlers throttle."),
+]
