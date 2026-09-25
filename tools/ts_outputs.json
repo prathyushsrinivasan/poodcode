@@ -36,6 +36,36 @@
    "downloading 0%\npaused at 0%\nfailed: unknown\nidle\ndownloading 0%\ndownloading 5%\npaused at 5%\ndownloading 5%\ndownloading 100%\ndone"
   ]
  },
+ "project-w11": {
+  "hash": "e90d6c9bf43505b484f1",
+  "outputs": [
+   "line 1: ok\nline 2: ok\nline 3: ok\nvalid 3 of 3\naverage age 31.3\ntags: admin,ops",
+   "line 1: name missing\nline 2: name must be a non-empty string; age must be an integer from 0 to 150; email must contain @\nline 3: unknown field role; unknown field id\nvalid 0 of 3\naverage age -\ntags: none",
+   "line 1: not JSON\nline 2: not an object\nline 3: age must be an integer from 0 to 150; tags must be an array of strings\nline 4: not an object\nvalid 0 of 4\naverage age -\ntags: none",
+   "line 1: ok\nline 2: ok\nline 3: tags must be an array of strings\nvalid 2 of 3\naverage age 75.0\ntags: none",
+   "line 1: ok\nvalid 1 of 1\naverage age 28.0\ntags: a,z"
+  ]
+ },
+ "project-w12": {
+  "hash": "72f63c5a079e01beab23",
+  "outputs": [
+   "42\n-37\nstack: -37",
+   "-3\nline 8: division by zero\nstack: empty",
+   "line 2: stack underflow\nstack: 1",
+   "line 1: push needs an integer\nline 2: unknown instruction frobnicate\nline 3: pop takes no argument\nline 4: push needs an integer\nnot run",
+   "27\nline 8: stack underflow\nstack: empty"
+  ]
+ },
+ "project-w13": {
+  "hash": "8897bce61e034996a9a6",
+  "outputs": [
+   "name: poodcode\nport: 8080\ndebug: true\ntags: web, cli\ndb: localhost:5432",
+   "name: svc\nport: 3000\ndebug: false\ntags: (none)\ndb: db.local:6543",
+   "line 1: port must be an integer from 1 to 65535\nline 2: debug must be yes or no\nline 3: expected key = value\nline 4: unknown section [cache]\nline 8: unknown key user\nname is required\ndb.host is required\ninvalid config (7 problems)",
+   "line 2: duplicate key name\ninvalid config (1 problem)",
+   "name: tiny\nport: 3000\ndebug: false\ntags: (none)\ndb: (none)"
+  ]
+ },
  "project-w2": {
   "hash": "881c40ff67b8d1ec20d0",
   "outputs": [
@@ -2322,6 +2352,208 @@
    "ready\nvending -> idle\ninsert coin",
    "nothing to refund\nready\nreturned\nrefunded",
    "ready\nunknown kick\nvending -> idle"
+  ]
+ },
+ "tsm-w11-coerce": {
+  "hash": "228227ee201be223b12d",
+  "outputs": [
+   "ok -42\nreject: not an integer\nreject: too large\nok true\nreject: not a boolean",
+   "ok 2024-02-29\nreject: no such day\nreject: not YYYY-MM-DD\nok [1,2,-3] (3)\nreject: bad item x\nreject: unknown type color"
+  ]
+ },
+ "tsm-w11-deep-get": {
+  "hash": "e292dce09618e5429422",
+  "outputs": [
+   "\"Ana\"\n\"go\"\nmissing\nnull\nmissing\n0\nmissing",
+   "4\n[1,2]\nmissing\nmissing"
+  ]
+ },
+ "tsm-w11-default-fill": {
+  "hash": "29b166fb8da4a7d6683b",
+  "outputs": [
+   "name=Ana age=31 city=Oslo\nname=anonymous age=0 city=nowhere\nname= age=? city=nowhere\nnot an object\nnot JSON",
+   "name=anonymous age=? city=nowhere\nname=Bo age=? city=nowhere\nnot an object"
+  ]
+ },
+ "tsm-w11-event-filter": {
+  "hash": "1797f48303cde6e86e64",
+  "outputs": [
+   "ana: disk full\n(system): oom\ninfo=1 warn=1 error=2\nskipped 2",
+   "info=0 warn=1 error=0\nskipped 1"
+  ]
+ },
+ "tsm-w11-mixed-lines": {
+  "hash": "eef09d26bdd6d87ca3e6",
+  "outputs": [
+   "number 42 (even)\nboolean true\nnull\ntext \"hello\" (5 chars)\nnumber 3.5 (fraction)\nnumber -7 (odd)",
+   "boolean false\nnumber 16 (even)\ntext \"NaN\" (3 chars)\ntext \"null value\" (10 chars)",
+   "text \"a\" (1 chars)\ntext \"\" (0 chars)\ntext \"b\" (1 chars)"
+  ]
+ },
+ "tsm-w11-nullable-average": {
+  "hash": "48fe034f84c2dcc668fa",
+  "outputs": [
+   "5.00 (2 missing)",
+   "no data (2 missing)",
+   "10.00 (0 missing)\n1.50 (0 missing)",
+   "0.00 (1 missing)"
+  ]
+ },
+ "tsm-w11-safe-queries": {
+  "hash": "20ad9fe299df83f201de",
+  "outputs": [
+   "5\n21\nout of range\n21\n(empty)\nout of range\nunknown twist",
+   "out of range\nout of range\n7\n7"
+  ]
+ },
+ "tsm-w11-shape-in": {
+  "hash": "851143be6d95aa77629c",
+  "outputs": [
+   "3.14\n9.00\n10.00\nbad shape\nbad shape\ntotal 22.14",
+   "bad shape\n0.25\ntotal 0.25",
+   "12.57\ntotal 12.57"
+  ]
+ },
+ "tsm-w11-sum-valid": {
+  "hash": "37a6f137d572a969366e",
+  "outputs": [
+   "6\nskipped: x",
+   "1003.5\nskipped: abc Infinity",
+   "7\nskipped: none",
+   "6\nskipped: two"
+  ]
+ },
+ "tsm-w11-validate-person": {
+  "hash": "9247e7a6017bdf35ac73",
+  "outputs": [
+   "line 2: bad age\nline 4: not JSON\nline 5: bad name\nAna, 31\nCy, 40 <cy@x.io>\n2 valid",
+   "line 1: bad age\nline 2: bad email\nline 3: not an object\nFlo, 0\n1 valid",
+   "line 1: bad name\n0 valid"
+  ]
+ },
+ "tsm-w12-bank-replay": {
+  "hash": "bae2b147447b8340eb5c",
+  "outputs": [
+   "rejected 4: insufficient funds\nana 20\nbo 40",
+   "rejected 1: insufficient funds\nbad line 2\nbad line 3\nbad line 4\ncy 7"
+  ]
+ },
+ "tsm-w12-expr": {
+  "hash": "cce03acb01e6d4e6f233",
+  "outputs": [
+   "(1 + (2 * 3)) = 7\n-(2 - 7) = 5\nmax(4, min(9, 6)) = 6\n42 = 42",
+   "error: bad atom )\nerror: bad operator ^\nerror: expected )\nerror: trailing input\nerror: bad atom x"
+  ]
+ },
+ "tsm-w12-http": {
+  "hash": "8c72eccfe6ac546ca1c2",
+  "outputs": [
+   "show \"hello world\"\nfollow /new-home\nfail 404: not found\nretry\ngive up\nbroken redirect\nbad status 99\nok=1 redirect=2 client=1 server=2",
+   "show \"\"\nfail 418: I'm a teapot\nretry\nbad status abc\nok=1 redirect=0 client=1 server=1"
+  ]
+ },
+ "tsm-w12-markdown": {
+  "hash": "eed1566ffe0d3a61d151",
+  "outputs": [
+   "<h1>Title</h1>\n<p>Some text that continues.</p>\n<ul><li>one</li><li>two</li></ul>\n<hr>\n<h2>Next</h2>\n<p>End.</p>\nblocks: 6",
+   "<ul><li>a</li></ul>\n<ul><li>b</li></ul>\n<p>text after</p>\n<h6>tiny</h6>\n<p>####### not a heading #nospace</p>\nblocks: 5"
+  ]
+ },
+ "tsm-w12-rpn": {
+  "hash": "4072130451d1db3eb1c0",
+  "outputs": [
+   "14\n3.3333\nstack underflow\ndivision by zero\nleftover 2\nbad token x",
+   "5\n6\n10"
+  ]
+ },
+ "tsm-w12-shapes": {
+  "hash": "7e967151de394a8c7fcf",
+  "outputs": [
+   "circle 3.14\nrect 6.00\ntri 10.00\nbad line\nbad line\ntotal 19.14\nlargest tri",
+   "tri 50.00\nbad line\ntotal 50.00\nlargest tri",
+   "bad line\ntotal 0.00\nlargest none"
+  ]
+ },
+ "tsm-w12-todo-reducer": {
+  "hash": "040be33d78d9707b1731",
+  "outputs": [
+   "[x] 1 buy milk\n[ ] 3 fix the bike\n[ ] 4 walk\n2 left",
+   "[ ] 3 c\n1 left",
+   "0 left"
+  ]
+ },
+ "tsm-w12-tokens": {
+  "hash": "c772e4851954ce9f578b",
+  "outputs": [
+   "ident(x1) op(=) ident(max) lparen ident(a) comma num(12.5) rparen op(*) num(3)\nident(if_ok) op(>=) num(10) op(!=) ident(y)\nunexpected '@' at 11",
+   "ident(f) lparen ident(g) lparen num(1) rparen comma num(2) rparen\nunexpected '.' at 2\nident(_a) op(==) ident(_b)"
+  ]
+ },
+ "tsm-w12-undo": {
+  "hash": "315792fcb2a1f09ba639",
+  "outputs": [
+   "\"hello world\"\n\"hello\"\n\"hello world\"\nnothing to redo\n\"hello\"",
+   "nothing to undo\n\"\"\nnothing to undo\n\"\"\nnothing to redo\n\"abc!\""
+  ]
+ },
+ "tsm-w12-vm": {
+  "hash": "f9a936ea6748478029c0",
+  "outputs": [
+   "3\n2\n1\nhalted\nstack: 0",
+   "3\nended\nstack: 7",
+   "underflow at 1\nstack: empty",
+   "step limit\nstack: empty",
+   "line 2: bad instruction"
+  ]
+ },
+ "tsm-w13-dispatch": {
+  "hash": "a43c4378863f6bfe0790",
+  "outputs": [
+   "HELLO THERE\n3\n3 2 1\n15\ncount reverse sum upper\nunknown command dance",
+   "0\nunknown command toString\n0"
+  ]
+ },
+ "tsm-w13-handlers": {
+  "hash": "125504b407bf29ba5034",
+  "outputs": [
+   "click at 3,4\nkey A\nkey b\nscroll up 5\nscroll down 2\nunknown event hover\nclick=1 key=2 scroll=2",
+   "bad args for click\nbad args for key\nbad args for key\nbad args for scroll\nclick at 0,0\nclick=1 key=0 scroll=0"
+  ]
+ },
+ "tsm-w13-overloads": {
+  "hash": "3c46b9e3de2a12da29b2",
+  "outputs": [
+   "number 21, doubled 42\nlist of 3, sum 6\nbool true, negated false\nbool false, negated true",
+   "list of 1, sum 7\nnumber -0.5, doubled -1\nunknown kind date"
+  ]
+ },
+ "tsm-w13-partial": {
+  "hash": "6216f1566f49cd3de507",
+  "outputs": [
+   "6 7 8\n9 8 7\n2 4 6\n1 8 1024",
+   "-4 -9\nunknown op mod"
+  ]
+ },
+ "tsm-w13-registry": {
+  "hash": "a76859f07811688614a3",
+  "outputs": [
+   "#1\n#2\n#3\nhi there\nHI THERE!\ncall 1\nagain\nAGAIN!\ncall 2\nremoved #2\nbye\ncall 3\nno listeners for other",
+   "#1\nunknown handler nope\nremoved #1\nno #1\nno listeners for a\n#2\n#3\ncall 1\ncall 1"
+  ]
+ },
+ "tsm-w13-stats": {
+  "hash": "4d60d8bab9c89b4e025f",
+  "outputs": [
+   "min 1 max 5 mean 2.8 range 4",
+   "min 10 max 10 mean 10 range 0\nmin -2 max 2 mean 0 range 4",
+   "min 0.25 max 1 mean 0.58 range 0.75"
+  ]
+ },
+ "tsm-w13-variadic": {
+  "hash": "29dcee55c846d2a418ca",
+  "outputs": [
+   "6\na-b-c\nhello\nlongest needs a word",
+   "5\nx\nab\nunknown max"
   ]
  },
  "tsm-w2-clamp": {

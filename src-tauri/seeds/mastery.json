@@ -11792,6 +11792,30 @@
           {
             "front": "`null` vs `undefined` — a convention that keeps code sane?",
             "back": "`undefined` for \"not provided / absent\"; `null` for \"deliberately empty\". Don't mix them for one concept."
+          },
+          {
+            "front": "`[1, undefined].filter((x) => x !== undefined)` — the result type since TS 5.5?",
+            "back": "`number[]`: the arrow is inferred as a type predicate, so `filter` narrows without a cast."
+          },
+          {
+            "front": "`asserts cond` vs `asserts x is T`?",
+            "back": "The first narrows by whatever condition you passed (`check(m !== null)`); the second narrows one argument to `T`. Both must throw when the check fails."
+          },
+          {
+            "front": "Can an assertion function be an arrow assigned to a `const` without an annotation?",
+            "back": "No — calls to assertion functions need an explicitly declared type, so use a function declaration or annotate the `const`."
+          },
+          {
+            "front": "Does `if (\"email\" in data)` work when `data: object`?",
+            "back": "Yes — it narrows to `object & Record<\"email\", unknown>`; then check `typeof data.email`."
+          },
+          {
+            "front": "`const isStr = typeof x === \"string\"; if (isStr) …` — does `x` narrow?",
+            "back": "Yes (TS 4.4+), when `x` is a `const` or unassigned parameter and the condition is stored in a `const`."
+          },
+          {
+            "front": "`xs.at(-1)` — its type without `noUncheckedIndexedAccess`?",
+            "back": "`T | undefined` regardless of the flag — `at` is declared that way, so it is always honest."
           }
         ],
         "practice": [
@@ -11870,11 +11894,511 @@
             ],
             "source_slug": "",
             "dataset": ""
+          },
+          {
+            "id": "tsm-w11-p2",
+            "title": "An inferred type predicate",
+            "prompt": "What type does TypeScript already infer for `xs`? Annotate `check` with exactly that type — not merely one that fits.",
+            "hint": "Since TS 5.5 the arrow is inferred as `(x) => x is number`.",
+            "hints": [
+              "Since TS 5.5 the arrow is inferred as `(x) => x is number`.",
+              "So `filter` returns `number[]`."
+            ],
+            "language": "typescript",
+            "kind": "predict",
+            "difficulty": "Easy",
+            "strictness": "strict",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<typeof check, typeof xs>>;\n",
+            "judge_mode": "types",
+            "forbid": [
+              "typeof"
+            ],
+            "starter": "const xs = [1, undefined, 3].filter((x) => x !== undefined);\nconst check: ____ = xs;\n",
+            "solution": "const xs = [1, undefined, 3].filter((x) => x !== undefined);\nconst check: number[] = xs;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w11-p3",
+            "title": "A match result",
+            "prompt": "What type does TypeScript already infer for `m`? Annotate `check` with exactly that type — not merely one that fits.",
+            "hint": "`match` finds nothing sometimes.",
+            "hints": [
+              "`match` finds nothing sometimes.",
+              "It returns `null` then, not an empty array."
+            ],
+            "language": "typescript",
+            "kind": "predict",
+            "difficulty": "Easy",
+            "strictness": "strict",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<typeof check, typeof m>>;\n",
+            "judge_mode": "types",
+            "forbid": [
+              "typeof"
+            ],
+            "starter": "const m = \"a1b2\".match(/\\d/g);\nconst check: ____ = m;\n",
+            "solution": "const m = \"a1b2\".match(/\\d/g);\nconst check: RegExpMatchArray | null = m;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w11-d3",
+            "title": "A match that might fail",
+            "prompt": "The compiler rejects this program:\n\n    error TS18047: 'm' is possibly 'null'.\n\nPrint double the first number in the input, or `no number`.",
+            "hint": "`match` returns `null` when nothing matches.",
+            "hints": [
+              "`match` returns `null` when nothing matches.",
+              "Handle that case before reading `m[0]`."
+            ],
+            "language": "typescript",
+            "kind": "diagnose",
+            "difficulty": "Easy",
+            "strictness": "strict",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst m = input.match(/\\d+/);\nconsole.log(Number(m[0]) * 2);\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst m = input.match(/\\d+/);\nconsole.log(m === null ? \"no number\" : Number(m[0]) * 2);\n",
+            "tests": [
+              {
+                "input": "abc 21 def",
+                "output": "42"
+              },
+              {
+                "input": "none",
+                "output": "no number"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w11-f1",
+            "title": "Zero is not missing",
+            "prompt": "Print each quantity, or `missing` for `-`. A quantity of 0 prints `missing` too.",
+            "hint": "Truthiness treats `0` like `undefined`.",
+            "hints": [
+              "Truthiness treats `0` like `undefined`.",
+              "`??` only replaces `null` and `undefined`."
+            ],
+            "language": "typescript",
+            "kind": "fix",
+            "difficulty": "Easy",
+            "strictness": "strict",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst qty = input.split(\" \").map((t) => (t === \"-\" ? undefined : Number(t)));\nconsole.log(qty.map((q) => (q ? q : \"missing\")).join(\" \"));\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst qty = input.split(\" \").map((t) => (t === \"-\" ? undefined : Number(t)));\nconsole.log(qty.map((q) => q ?? \"missing\").join(\" \"));\n",
+            "tests": [
+              {
+                "input": "3 - 0",
+                "output": "3 missing 0"
+              },
+              {
+                "input": "-",
+                "output": "missing"
+              },
+              {
+                "input": "0 0",
+                "output": "0 0"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
           }
         ],
         "optional": false,
-        "problem_set": [],
-        "project_spec": null
+        "problem_set": [
+          {
+            "id": "tsm-w11-mixed-lines",
+            "title": "What is on each line?",
+            "prompt": "Each input line holds a number, `true`/`false`, `null`, or anything else (text). Parse each line into `number | boolean | null | string`, then narrow it to print `number <n> (even|odd|fraction)`, `boolean <b>`, `null`, or `text \"<t>\" (<k> chars)`.",
+            "hint": "Check `null` first — `typeof null` is `\"object\"`, and it is not a number, boolean or string.",
+            "hints": [
+              "Check `null` first — `typeof null` is `\"object\"`, and it is not a number, boolean or string.",
+              "After the `number` and `boolean` branches, what is left is a `string`."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Easy",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Value = number | boolean | null | string;\nfunction parse(text: string): Value {\n  const t = text.trim();\n  if (t === \"null\") return null;\n  if (t === \"true\" || t === \"false\") return t === \"true\";\n  if (t !== \"\" && Number.isFinite(Number(t))) return Number(t);\n  return t;\n}\nfor (const line of input.split(\"\\n\")) {\n  const v = parse(line);\n  if (v === null) {\n    console.log(\"null\");\n  } else if (typeof v === \"number\") {\n    const parity = Number.isInteger(v) ? (v % 2 === 0 ? \"even\" : \"odd\") : \"fraction\";\n    console.log(`number ${v} (${parity})`);\n  } else if (typeof v === \"boolean\") {\n    console.log(`boolean ${v}`);\n  } else {\n    console.log(`text \"${v}\" (${v.length} chars)`);\n  }\n}\n",
+            "tests": [
+              {
+                "input": "42\ntrue\nnull\nhello\n3.5\n-7",
+                "output": "number 42 (even)\nboolean true\nnull\ntext \"hello\" (5 chars)\nnumber 3.5 (fraction)\nnumber -7 (odd)"
+              },
+              {
+                "input": "false\n0x10\nNaN\nnull value",
+                "output": "boolean false\nnumber 16 (even)\ntext \"NaN\" (3 chars)\ntext \"null value\" (10 chars)"
+              },
+              {
+                "input": "a\n\nb",
+                "output": "text \"a\" (1 chars)\ntext \"\" (0 chars)\ntext \"b\" (1 chars)"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w11-sum-valid",
+            "title": "Sum what parses",
+            "prompt": "The input is numbers separated by spaces and/or commas, some of them garbage. Write `toNumber(text): number | undefined` (only finite numbers count) and use it to print the sum of the valid ones, then `skipped: <tokens>` in input order, or `skipped: none`.",
+            "hint": "`Number.isFinite` rejects `NaN` and `Infinity` in one check.",
+            "hints": [
+              "`Number.isFinite` rejects `NaN` and `Infinity` in one check.",
+              "Compare the result with `undefined` — `if (n)` would skip a real 0."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Easy",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nfunction toNumber(text: string): number | undefined {\n  const t = text.trim();\n  if (t === \"\") return undefined;\n  const n = Number(t);\n  return Number.isFinite(n) ? n : undefined;\n}\nlet sum = 0;\nconst skipped: string[] = [];\nfor (const token of input.split(/[\\s,]+/)) {\n  const n = toNumber(token);\n  if (n === undefined) skipped.push(token);\n  else sum += n;\n}\nconsole.log(sum);\nconsole.log(skipped.length === 0 ? \"skipped: none\" : `skipped: ${skipped.join(\" \")}`);\n",
+            "tests": [
+              {
+                "input": "1 2 x 3",
+                "output": "6\nskipped: x"
+              },
+              {
+                "input": "4.5, -1, abc, 1e3, Infinity",
+                "output": "1003.5\nskipped: abc Infinity"
+              },
+              {
+                "input": "7",
+                "output": "7\nskipped: none"
+              },
+              {
+                "input": "1,,2 two 3",
+                "output": "6\nskipped: two"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w11-default-fill",
+            "title": "Fill in the defaults",
+            "prompt": "Each input line should be a JSON object with optional `name` (string), `age` (number) and `city` (string). Print `name=<n> age=<a> city=<c>` with the defaults `anonymous`, `?` and `nowhere` for anything missing or of the wrong type — but an empty name or an age of 0 is a real value and must be kept. A line that is not JSON prints `not JSON`; JSON that is not an object prints `not an object`.",
+            "hint": "`\"age\" in data` narrows `data` so `data.age` can be read (as `unknown`), then `typeof` narrows that.",
+            "hints": [
+              "`\"age\" in data` narrows `data` so `data.age` can be read (as `unknown`), then `typeof` narrows that.",
+              "`??` falls back only for `null`/`undefined`; `||` would also replace `0` and `\"\"`."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Easy",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nfor (const line of input.split(\"\\n\")) {\n  let data: unknown;\n  try {\n    data = JSON.parse(line);\n  } catch {\n    console.log(\"not JSON\");\n    continue;\n  }\n  if (typeof data !== \"object\" || data === null || Array.isArray(data)) {\n    console.log(\"not an object\");\n    continue;\n  }\n  const name = \"name\" in data && typeof data.name === \"string\" ? data.name : undefined;\n  const age = \"age\" in data && typeof data.age === \"number\" ? data.age : undefined;\n  const city = \"city\" in data && typeof data.city === \"string\" ? data.city : undefined;\n  console.log(`name=${name ?? \"anonymous\"} age=${age ?? \"?\"} city=${city ?? \"nowhere\"}`);\n}\n",
+            "tests": [
+              {
+                "input": "{\"name\":\"Ana\",\"age\":31,\"city\":\"Oslo\"}\n{\"age\":0}\n{\"name\":\"\",\"city\":null}\n[1,2]\n{oops",
+                "output": "name=Ana age=31 city=Oslo\nname=anonymous age=0 city=nowhere\nname= age=? city=nowhere\nnot an object\nnot JSON"
+              },
+              {
+                "input": "{}\n{\"name\":\"Bo\",\"age\":\"old\"}\n7",
+                "output": "name=anonymous age=? city=nowhere\nname=Bo age=? city=nowhere\nnot an object"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w11-nullable-average",
+            "title": "Average the readings you have",
+            "prompt": "Each input line is a series of sensor readings; `-` means the sensor was offline. Print the average of the present readings to two decimals and how many were missing — `<avg> (<k> missing)` — or `no data (<k> missing)` when every reading is missing.",
+            "hint": "Model an offline reading as `null`, so the array is `(number | null)[]`.",
+            "hints": [
+              "Model an offline reading as `null`, so the array is `(number | null)[]`.",
+              "`filter((r) => r !== null)` is inferred as a type predicate (TS 5.5), so the result is `number[]` with no cast."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Easy",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nfor (const line of input.split(\"\\n\")) {\n  const readings = line.trim().split(/\\s+/).map((t) => (t === \"-\" ? null : Number(t)));\n  const present = readings.filter((r) => r !== null);\n  const missing = readings.length - present.length;\n  if (present.length === 0) {\n    console.log(`no data (${missing} missing)`);\n  } else {\n    const avg = present.reduce((a, b) => a + b, 0) / present.length;\n    console.log(`${avg.toFixed(2)} (${missing} missing)`);\n  }\n}\n",
+            "tests": [
+              {
+                "input": "3 - 5 - 7",
+                "output": "5.00 (2 missing)"
+              },
+              {
+                "input": "- -",
+                "output": "no data (2 missing)"
+              },
+              {
+                "input": "10\n1 2",
+                "output": "10.00 (0 missing)\n1.50 (0 missing)"
+              },
+              {
+                "input": "0 - 0",
+                "output": "0.00 (1 missing)"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w11-validate-person",
+            "title": "Keep the people",
+            "prompt": "Each input line should be JSON for a person: `name` (non-empty string), `age` (whole number ≥ 0) and optionally `email` (a string containing `@`). Write `isPerson(data: unknown): data is Person`. For each bad line print `line <n>: <reason>` — `not JSON`, `not an object`, `bad name`, `bad age` or `bad email` (the first that applies) — then list the valid people as `<name>, <age>` plus ` <email>` in angle brackets when present, then `<k> valid`.",
+            "hint": "Write one function that returns the first problem (or `undefined`), and build the predicate on it.",
+            "hints": [
+              "Write one function that returns the first problem (or `undefined`), and build the predicate on it.",
+              "`\"name\" in data` narrows an `object` to one with a `name` property of type `unknown`."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Person = { name: string; age: number; email?: string };\nfunction problemWith(data: unknown): string | undefined {\n  if (typeof data !== \"object\" || data === null || Array.isArray(data)) return \"not an object\";\n  if (!(\"name\" in data) || typeof data.name !== \"string\" || data.name.trim() === \"\") return \"bad name\";\n  if (!(\"age\" in data) || typeof data.age !== \"number\" || !Number.isInteger(data.age) || data.age < 0) return \"bad age\";\n  if (\"email\" in data && (typeof data.email !== \"string\" || !data.email.includes(\"@\"))) return \"bad email\";\n  return undefined;\n}\nfunction isPerson(data: unknown): data is Person {\n  return problemWith(data) === undefined;\n}\nconst people: Person[] = [];\ninput.split(\"\\n\").forEach((line, i) => {\n  let data: unknown;\n  try {\n    data = JSON.parse(line);\n  } catch {\n    console.log(`line ${i + 1}: not JSON`);\n    return;\n  }\n  if (isPerson(data)) people.push(data);\n  else console.log(`line ${i + 1}: ${problemWith(data) ?? \"invalid\"}`);\n});\nfor (const p of people) console.log(`${p.name}, ${p.age}${p.email === undefined ? \"\" : ` <${p.email}>`}`);\nconsole.log(`${people.length} valid`);\n",
+            "tests": [
+              {
+                "input": "{\"name\":\"Ana\",\"age\":31}\n{\"name\":\"Bo\",\"age\":-2}\n{\"name\":\"Cy\",\"age\":40,\"email\":\"cy@x.io\"}\nnope\n{\"name\":\"\",\"age\":3}",
+                "output": "line 2: bad age\nline 4: not JSON\nline 5: bad name\nAna, 31\nCy, 40 <cy@x.io>\n2 valid"
+              },
+              {
+                "input": "{\"name\":\"Di\",\"age\":2.5}\n{\"name\":\"Ed\",\"age\":20,\"email\":\"ed\"}\n[]\n{\"name\":\"Flo\",\"age\":0}",
+                "output": "line 1: bad age\nline 2: bad email\nline 3: not an object\nFlo, 0\n1 valid"
+              },
+              {
+                "input": "{\"age\":5}",
+                "output": "line 1: bad name\n0 valid"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w11-shape-in",
+            "title": "Shapes told apart by their fields",
+            "prompt": "Each input line is JSON for a shape, recognised by its fields: `{\"radius\"}`, `{\"side\"}` or `{\"width\",\"height\"}` (all positive numbers). Print each area to two decimals — or `bad shape` — and finally `total <sum>` to two decimals. Model the three shapes as a union with no tag, and tell them apart with `in`.",
+            "hint": "`\"radius\" in s` narrows a union to the members that declare `radius`.",
+            "hints": [
+              "`\"radius\" in s` narrows a union to the members that declare `radius`.",
+              "After ruling out circles and squares, only `Rect` is left — no third check needed."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Circle = { radius: number };\ntype Square = { side: number };\ntype Rect = { width: number; height: number };\ntype Shape = Circle | Square | Rect;\nfunction area(s: Shape): number {\n  if (\"radius\" in s) return Math.PI * s.radius ** 2;\n  if (\"side\" in s) return s.side ** 2;\n  return s.width * s.height;\n}\nfunction toShape(data: unknown): Shape | undefined {\n  if (typeof data !== \"object\" || data === null) return undefined;\n  const rec = data as Record<string, unknown>;\n  const positive = (key: string): number | undefined => {\n    const v = rec[key];\n    return typeof v === \"number\" && v > 0 ? v : undefined;\n  };\n  const radius = positive(\"radius\");\n  const side = positive(\"side\");\n  const width = positive(\"width\");\n  const height = positive(\"height\");\n  if (radius !== undefined) return { radius };\n  if (side !== undefined) return { side };\n  if (width !== undefined && height !== undefined) return { width, height };\n  return undefined;\n}\nlet total = 0;\nfor (const line of input.split(\"\\n\")) {\n  let data: unknown = null;\n  try {\n    data = JSON.parse(line);\n  } catch {\n    // not JSON: stays null, and toShape rejects it\n  }\n  const shape = toShape(data);\n  if (shape === undefined) {\n    console.log(\"bad shape\");\n    continue;\n  }\n  const a = area(shape);\n  total += a;\n  console.log(a.toFixed(2));\n}\nconsole.log(`total ${total.toFixed(2)}`);\n",
+            "tests": [
+              {
+                "input": "{\"radius\":1}\n{\"side\":3}\n{\"width\":2,\"height\":5}\n{\"width\":2}\nhello",
+                "output": "3.14\n9.00\n10.00\nbad shape\nbad shape\ntotal 22.14"
+              },
+              {
+                "input": "{\"radius\":-1}\n{\"side\":0.5}",
+                "output": "bad shape\n0.25\ntotal 0.25"
+              },
+              {
+                "input": "{\"radius\":2,\"side\":9}",
+                "output": "12.57\ntotal 12.57"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w11-deep-get",
+            "title": "Follow a path through JSON",
+            "prompt": "The first input line is a JSON document; each later line is a dotted path such as `user.langs.1`. Array steps are indexes; object steps must be the object's own keys. Print the value at the path as JSON, or `missing` if any step fails.",
+            "hint": "Narrow in order: array first (`Array.isArray`), then object (`typeof … === \"object\" && … !== null`).",
+            "hints": [
+              "Narrow in order: array first (`Array.isArray`), then object (`typeof … === \"object\" && … !== null`).",
+              "`Object.hasOwn` keeps inherited names like `toString` from counting as keys."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst [doc = \"null\", ...paths] = input.split(\"\\n\");\nconst root: unknown = JSON.parse(doc);\nfunction step(value: unknown, key: string): unknown {\n  if (Array.isArray(value)) {\n    const i = Number(key);\n    return Number.isInteger(i) && i >= 0 && i < value.length ? value[i] : undefined;\n  }\n  if (typeof value === \"object\" && value !== null && Object.hasOwn(value, key)) {\n    return (value as Record<string, unknown>)[key];\n  }\n  return undefined;\n}\nfor (const path of paths) {\n  let value: unknown = root;\n  for (const key of path.trim().split(\".\")) {\n    value = step(value, key);\n    if (value === undefined) break;\n  }\n  console.log(value === undefined ? \"missing\" : JSON.stringify(value));\n}\n",
+            "tests": [
+              {
+                "input": "{\"user\":{\"name\":\"Ana\",\"langs\":[\"ts\",\"go\"],\"address\":null},\"n\":0}\nuser.name\nuser.langs.1\nuser.langs.5\nuser.address\nuser.address.city\nn\nuser.toString",
+                "output": "\"Ana\"\n\"go\"\nmissing\nnull\nmissing\n0\nmissing"
+              },
+              {
+                "input": "[[1,2],[3,[4,5]]]\n1.1.0\n0\n0.-1\n2",
+                "output": "4\n[1,2]\nmissing\nmissing"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w11-event-filter",
+            "title": "Errors from a messy log",
+            "prompt": "Each input line should be a JSON log event: `level` (`info`, `warn` or `error`), `msg` (string) and optionally `user` (string). Anything else is skipped. Parse each line to `LogEvent | undefined`, keep the good ones with `filter`, then print every error as `<user>: <msg>` (`(system)` when there is no user), then `info=<a> warn=<b> error=<c>`, then `skipped <k>`.",
+            "hint": "`lines.map(parse)` is `(LogEvent | undefined)[]`; `filter((e) => e !== undefined)` narrows it to `LogEvent[]` by itself.",
+            "hints": [
+              "`lines.map(parse)` is `(LogEvent | undefined)[]`; `filter((e) => e !== undefined)` narrows it to `LogEvent[]` by itself.",
+              "A type predicate `isLevel` turns a checked string into a `Level`."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Level = \"info\" | \"warn\" | \"error\";\ntype LogEvent = { level: Level; msg: string; user?: string };\nconst isLevel = (s: string): s is Level => s === \"info\" || s === \"warn\" || s === \"error\";\nfunction parse(line: string): LogEvent | undefined {\n  let data: unknown;\n  try {\n    data = JSON.parse(line);\n  } catch {\n    return undefined;\n  }\n  if (typeof data !== \"object\" || data === null) return undefined;\n  if (!(\"level\" in data) || typeof data.level !== \"string\" || !isLevel(data.level)) return undefined;\n  if (!(\"msg\" in data) || typeof data.msg !== \"string\") return undefined;\n  const event: LogEvent = { level: data.level, msg: data.msg };\n  if (\"user\" in data && typeof data.user === \"string\") event.user = data.user;\n  return event;\n}\nconst lines = input.split(\"\\n\");\nconst events = lines.map(parse).filter((e) => e !== undefined);\nfor (const e of events) {\n  if (e.level === \"error\") console.log(`${e.user ?? \"(system)\"}: ${e.msg}`);\n}\nconst counts: Record<Level, number> = { info: 0, warn: 0, error: 0 };\nfor (const e of events) counts[e.level]++;\nconsole.log(`info=${counts.info} warn=${counts.warn} error=${counts.error}`);\nconsole.log(`skipped ${lines.length - events.length}`);\n",
+            "tests": [
+              {
+                "input": "{\"level\":\"info\",\"msg\":\"boot\"}\n{\"level\":\"error\",\"msg\":\"disk full\",\"user\":\"ana\"}\n{\"level\":\"error\",\"msg\":\"oom\"}\n{\"level\":\"debug\",\"msg\":\"x\"}\ngarbage\n{\"level\":\"warn\",\"msg\":\"slow\"}",
+                "output": "ana: disk full\n(system): oom\ninfo=1 warn=1 error=2\nskipped 2"
+              },
+              {
+                "input": "{\"level\":\"error\",\"msg\":42}\n{\"level\":\"warn\",\"msg\":\"a\",\"user\":7}",
+                "output": "info=0 warn=1 error=0\nskipped 1"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w11-coerce",
+            "title": "Coerce or reject",
+            "prompt": "Each input line is `<type> <value>` with type `int`, `bool`, `date` or `list`. Print `ok <normalised>` or `reject: <reason>`. `int`: an optional minus and digits (`not an integer`), and a safe integer (`too large`). `bool`: `true/false/yes/no/1/0` in any case, printed as `true`/`false` (`not a boolean`). `date`: `YYYY-MM-DD` (`not YYYY-MM-DD`) that exists on the calendar (`no such day`). `list`: comma-separated ints, printed as `[a,b] (<count>)` (`bad item <x>`). Any other type: `unknown type <t>`. Write an assertion function `check(condition, reason): asserts condition` and use it for every rule.",
+            "hint": "After `check(m !== null, …)` returns, the compiler knows `m` is not `null` — that is what `asserts condition` means.",
+            "hints": [
+              "After `check(m !== null, …)` returns, the compiler knows `m` is not `null` — that is what `asserts condition` means.",
+              "Throw a class of your own so the caller can tell a rejection from a real bug."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Hard",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nclass Rejected extends Error {}\nfunction check(condition: unknown, reason: string): asserts condition {\n  if (!condition) throw new Rejected(reason);\n}\nfunction toInt(raw: string, reason: string): number {\n  check(/^-?\\d+$/.test(raw), reason);\n  const n = Number(raw);\n  check(Number.isSafeInteger(n), \"too large\");\n  return n;\n}\nfunction coerce(kind: string, raw: string): string {\n  switch (kind) {\n    case \"int\":\n      return String(toInt(raw, \"not an integer\"));\n    case \"bool\": {\n      const t = raw.toLowerCase();\n      check([\"true\", \"false\", \"yes\", \"no\", \"1\", \"0\"].includes(t), \"not a boolean\");\n      return String(t === \"true\" || t === \"yes\" || t === \"1\");\n    }\n    case \"date\": {\n      const m = /^(\\d{4})-(\\d{2})-(\\d{2})$/.exec(raw);\n      check(m !== null, \"not YYYY-MM-DD\");\n      const year = Number(m[1]);\n      const month = Number(m[2]);\n      const day = Number(m[3]);\n      const date = new Date(Date.UTC(year, month - 1, day));\n      check(date.getUTCMonth() === month - 1 && date.getUTCDate() === day, \"no such day\");\n      return raw;\n    }\n    case \"list\": {\n      const items = raw.split(\",\").map((item) => toInt(item, `bad item ${item}`));\n      return `[${items.join(\",\")}] (${items.length})`;\n    }\n    default:\n      throw new Rejected(`unknown type ${kind}`);\n  }\n}\nfor (const line of input.split(\"\\n\")) {\n  const [kind = \"\", raw = \"\"] = line.trim().split(/\\s+/);\n  try {\n    console.log(`ok ${coerce(kind, raw)}`);\n  } catch (e) {\n    if (e instanceof Rejected) console.log(`reject: ${e.message}`);\n    else throw e;\n  }\n}\n",
+            "tests": [
+              {
+                "input": "int -042\nint 4.5\nint 99999999999999999\nbool YES\nbool maybe",
+                "output": "ok -42\nreject: not an integer\nreject: too large\nok true\nreject: not a boolean"
+              },
+              {
+                "input": "date 2024-02-29\ndate 2023-02-29\ndate 24-1-1\nlist 1,2,-3\nlist 1,x,3\ncolor red",
+                "output": "ok 2024-02-29\nreject: no such day\nreject: not YYYY-MM-DD\nok [1,2,-3] (3)\nreject: bad item x\nreject: unknown type color"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w11-safe-queries",
+            "title": "Queries that may miss",
+            "prompt": "The first line is a list of integers; each later line is a query: `get i` (negative `i` counts from the end), `sum a b` or `slice a b` (the half-open range `a..b`, with `0 ≤ a ≤ b ≤ length`). Print the answer — `slice` prints the values or `(empty)` — or `out of range`, or `unknown <op>`.",
+            "hint": "`xs.at(i)` is typed `number | undefined` even without `noUncheckedIndexedAccess` — handle it.",
+            "hints": [
+              "`xs.at(i)` is typed `number | undefined` even without `noUncheckedIndexedAccess` — handle it.",
+              "Validate both bounds before slicing; `slice` silently clamps bad ones."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Hard",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst [first = \"\", ...queries] = input.split(\"\\n\");\nconst xs = first.trim().split(/\\s+/).map(Number);\nfor (const q of queries) {\n  const [op = \"\", a = \"\", b = \"\"] = q.trim().split(/\\s+/);\n  if (op === \"get\") {\n    const i = Number(a);\n    const v = a !== \"\" && Number.isInteger(i) ? xs.at(i) : undefined;\n    console.log(v === undefined ? \"out of range\" : v);\n  } else if (op === \"sum\" || op === \"slice\") {\n    const lo = Number(a);\n    const hi = Number(b);\n    const ok = a !== \"\" && b !== \"\" && Number.isInteger(lo) && Number.isInteger(hi) && 0 <= lo && lo <= hi && hi <= xs.length;\n    if (!ok) {\n      console.log(\"out of range\");\n      continue;\n    }\n    const part = xs.slice(lo, hi);\n    console.log(op === \"sum\" ? part.reduce((s, x) => s + x, 0) : part.join(\" \") || \"(empty)\");\n  } else {\n    console.log(`unknown ${op}`);\n  }\n}\n",
+            "tests": [
+              {
+                "input": "5 8 13 21\nget 0\nget -1\nget 4\nsum 1 3\nslice 2 2\nslice 3 9\ntwist 1",
+                "output": "5\n21\nout of range\n21\n(empty)\nout of range\nunknown twist"
+              },
+              {
+                "input": "7\nget\nget -2\nsum 0 1\nslice 0 1",
+                "output": "out of range\nout of range\n7\n7"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          }
+        ],
+        "project_spec": {
+          "title": "validate.ts — a record validator that explains itself",
+          "goal": "Data from outside a program is `unknown` until proven otherwise. Build a validator that turns each JSON line into either a typed `Person` or a list of every problem with it — not just the first — so whoever sent the data can fix it in one pass.",
+          "requirements": [
+            "Each input line is one record. A valid record is a JSON object with `name` (a non-empty string), `age` (a whole number from 0 to 150), and optionally `email` (a string containing `@`) and `tags` (an array of strings). Any other field is an error.",
+            "For each line print `line <n>: ok`, or `line <n>: ` followed by every problem joined by `; `, in this order: `name missing` / `name must be a non-empty string`, `age missing` / `age must be an integer from 0 to 150`, `email must contain @`, `tags must be an array of strings`, then `unknown field <key>` for each extra key in input order.",
+            "A line that is not JSON prints `line <n>: not JSON`; JSON that is not an object prints `line <n>: not an object`.",
+            "Then print `valid <k> of <n>`, `average age <a>` (one decimal, or `-` with no valid records) and `tags: <t>` — the distinct tags of the valid records, sorted and comma-separated, or `none`.",
+            "Validate from `unknown` with narrowing and a type predicate `isPerson(data): data is Person` — no `as Person`."
+          ],
+          "stretch": [
+            "Report the path of the problem for nested data (`address.city must be a string`).",
+            "Return a discriminated union `{ ok: true; value: Person } | { ok: false; problems: string[] }` instead of two functions."
+          ],
+          "rubric": [
+            "No `any` anywhere — not even one hidden in a cast",
+            "Every function has a typed signature; locals are left to inference",
+            "Bad input is handled on purpose, not by accident",
+            "Names say what things are, not how they are stored",
+            "I could explain every line to someone else"
+          ],
+          "language": "typescript",
+          "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n// Build the project here. Read all of stdin from `input` above, and print\n// exactly what the requirements ask for. Run the tests as you go.\n",
+          "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Person = { name: string; age: number; email?: string; tags?: string[] };\nconst KNOWN = new Set([\"name\", \"age\", \"email\", \"tags\"]);\nfunction problems(data: unknown): string[] {\n  if (typeof data !== \"object\" || data === null || Array.isArray(data)) return [\"not an object\"];\n  const out: string[] = [];\n  if (!(\"name\" in data)) out.push(\"name missing\");\n  else if (typeof data.name !== \"string\" || data.name.trim() === \"\") out.push(\"name must be a non-empty string\");\n  if (!(\"age\" in data)) out.push(\"age missing\");\n  else if (typeof data.age !== \"number\" || !Number.isInteger(data.age) || data.age < 0 || data.age > 150) {\n    out.push(\"age must be an integer from 0 to 150\");\n  }\n  if (\"email\" in data && (typeof data.email !== \"string\" || !data.email.includes(\"@\"))) out.push(\"email must contain @\");\n  if (\"tags\" in data && !(Array.isArray(data.tags) && data.tags.every((t) => typeof t === \"string\"))) {\n    out.push(\"tags must be an array of strings\");\n  }\n  for (const key of Object.keys(data)) if (!KNOWN.has(key)) out.push(`unknown field ${key}`);\n  return out;\n}\nfunction isPerson(data: unknown): data is Person {\n  return problems(data).length === 0;\n}\nconst valid: Person[] = [];\nconst lines = input.split(\"\\n\");\nlines.forEach((line, i) => {\n  let data: unknown;\n  try {\n    data = JSON.parse(line);\n  } catch {\n    console.log(`line ${i + 1}: not JSON`);\n    return;\n  }\n  if (isPerson(data)) {\n    valid.push(data);\n    console.log(`line ${i + 1}: ok`);\n  } else {\n    console.log(`line ${i + 1}: ${problems(data).join(\"; \")}`);\n  }\n});\nconsole.log(`valid ${valid.length} of ${lines.length}`);\nconst average = valid.length === 0 ? \"-\" : (valid.reduce((s, p) => s + p.age, 0) / valid.length).toFixed(1);\nconsole.log(`average age ${average}`);\nconst tags = [...new Set(valid.flatMap((p) => p.tags ?? []))].sort();\nconsole.log(`tags: ${tags.join(\",\") || \"none\"}`);\n",
+          "tests": [
+            {
+              "input": "{\"name\":\"Ana\",\"age\":31,\"tags\":[\"admin\",\"ops\"]}\n{\"name\":\"Bo\",\"age\":44,\"email\":\"bo@x.io\",\"tags\":[\"ops\"]}\n{\"name\":\"Cy\",\"age\":19}",
+              "output": "line 1: ok\nline 2: ok\nline 3: ok\nvalid 3 of 3\naverage age 31.3\ntags: admin,ops"
+            },
+            {
+              "input": "{\"age\":20}\n{\"name\":\"\",\"age\":200,\"email\":\"nope\"}\n{\"name\":\"Di\",\"age\":3,\"role\":\"x\",\"id\":7}",
+              "output": "line 1: name missing\nline 2: name must be a non-empty string; age must be an integer from 0 to 150; email must contain @\nline 3: unknown field role; unknown field id\nvalid 0 of 3\naverage age -\ntags: none"
+            },
+            {
+              "input": "not json\n[1,2]\n{\"name\":\"Ed\",\"age\":2.5,\"tags\":\"a,b\"}\nnull",
+              "output": "line 1: not JSON\nline 2: not an object\nline 3: age must be an integer from 0 to 150; tags must be an array of strings\nline 4: not an object\nvalid 0 of 4\naverage age -\ntags: none"
+            },
+            {
+              "input": "{\"name\":\"Flo\",\"age\":0}\n{\"name\":\"Gus\",\"age\":150,\"tags\":[]}\n{\"name\":\"Hal\",\"age\":150,\"tags\":[1]}",
+              "output": "line 1: ok\nline 2: ok\nline 3: tags must be an array of strings\nvalid 2 of 3\naverage age 75.0\ntags: none"
+            },
+            {
+              "input": "{\"name\":\"Ivy\",\"age\":28,\"email\":\"ivy@example.com\",\"tags\":[\"z\",\"a\",\"z\"]}",
+              "output": "line 1: ok\nvalid 1 of 1\naverage age 28.0\ntags: a,z"
+            }
+          ],
+          "strictness": ""
+        }
       },
       {
         "week": 12,
@@ -12226,6 +12750,30 @@
           {
             "front": "What does exhaustiveness checking buy you in a refactor?",
             "back": "Add a variant and the compiler points at every `switch` that does not handle it yet."
+          },
+          {
+            "front": "Which type holds every value but allows nothing until you narrow it?",
+            "back": "`unknown`, the safe top type."
+          },
+          {
+            "front": "`string | never` simplifies to?",
+            "back": "`string` — `never` is the empty union and disappears from any union."
+          },
+          {
+            "front": "What does the type `{}` accept?",
+            "back": "Every value except `null` and `undefined` — including `0` and `\"\"`."
+          },
+          {
+            "front": "`object` vs `Object`?",
+            "back": "`object` is any non-primitive; `Object` (capital) accepts nearly everything, primitives included — avoid it."
+          },
+          {
+            "front": "A function whose return type is `never`?",
+            "back": "It never returns normally: it always throws, or loops forever."
+          },
+          {
+            "front": "`value satisfies never` in a `default:` branch?",
+            "back": "An exhaustiveness check without a throwaway variable: it fails to compile when a member reaches the default."
           }
         ],
         "practice": [
@@ -12313,11 +12861,471 @@
             ],
             "source_slug": "",
             "dataset": ""
+          },
+          {
+            "id": "tsm-w12-p2",
+            "title": "Pop from an empty literal",
+            "prompt": "What type does TypeScript already infer for `nothing`? Annotate `check` with exactly that type — not merely one that fits.",
+            "hint": "Under `strict`, `[]` on its own is `never[]`.",
+            "hints": [
+              "Under `strict`, `[]` on its own is `never[]`.",
+              "`pop` returns the element type or `undefined` — and `never | undefined` is `undefined`."
+            ],
+            "language": "typescript",
+            "kind": "predict",
+            "difficulty": "Easy",
+            "strictness": "strict",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<typeof check, typeof nothing>>;\n",
+            "judge_mode": "types",
+            "forbid": [
+              "typeof"
+            ],
+            "starter": "const nothing = [].pop();\nconst check: ____ = nothing;\n",
+            "solution": "const nothing = [].pop();\nconst check: undefined = nothing;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w12-d2",
+            "title": "A light nobody handled",
+            "prompt": "The compiler rejects this program:\n\n    error TS2322: Type '\"amber\"' is not assignable to type 'never'.\n\nAfter amber comes red. Keep the exhaustiveness check.",
+            "hint": "The check is doing its job: one member reaches `default`.",
+            "hints": [
+              "The check is doing its job: one member reaches `default`.",
+              "Add the missing `case`."
+            ],
+            "language": "typescript",
+            "kind": "diagnose",
+            "difficulty": "Easy",
+            "strictness": "strict",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "type Light = \"red\" | \"green\" | \"amber\";\nfunction next(l: Light): Light {\n  switch (l) {\n    case \"red\":\n      return \"green\";\n    case \"green\":\n      return \"amber\";\n    default: {\n      const unreachable: never = l;\n      return unreachable;\n    }\n  }\n}\nconsole.log(next(\"amber\"));\n",
+            "solution": "type Light = \"red\" | \"green\" | \"amber\";\nfunction next(l: Light): Light {\n  switch (l) {\n    case \"red\":\n      return \"green\";\n    case \"green\":\n      return \"amber\";\n    case \"amber\":\n      return \"red\";\n    default: {\n      const unreachable: never = l;\n      return unreachable;\n    }\n  }\n}\nconsole.log(next(\"amber\"));\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "red"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w12-f2",
+            "title": "Zero read as a failure",
+            "prompt": "Print each parsed value, or the error for a bad token. A value of 0 prints `error`.",
+            "hint": "The tag is `ok` — narrow on it, not on the payload's truthiness.",
+            "hints": [
+              "The tag is `ok` — narrow on it, not on the payload's truthiness.",
+              "`r.ok ? r.value : r.error`."
+            ],
+            "language": "typescript",
+            "kind": "fix",
+            "difficulty": "Medium",
+            "strictness": "strict",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Result = { ok: true; value: number } | { ok: false; error: string };\nfunction parse(t: string): Result {\n  const n = Number(t);\n  return Number.isInteger(n) ? { ok: true, value: n } : { ok: false, error: `bad ${t}` };\n}\nfor (const t of input.split(\" \")) {\n  const r = parse(t);\n  console.log(\"value\" in r && r.value ? r.value : \"error\");\n}\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Result = { ok: true; value: number } | { ok: false; error: string };\nfunction parse(t: string): Result {\n  const n = Number(t);\n  return Number.isInteger(n) ? { ok: true, value: n } : { ok: false, error: `bad ${t}` };\n}\nfor (const t of input.split(\" \")) {\n  const r = parse(t);\n  console.log(r.ok ? r.value : r.error);\n}\n",
+            "tests": [
+              {
+                "input": "5 0 x",
+                "output": "5\n0\nbad x"
+              },
+              {
+                "input": "0",
+                "output": "0"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
           }
         ],
         "optional": false,
-        "problem_set": [],
-        "project_spec": null
+        "problem_set": [
+          {
+            "id": "tsm-w12-shapes",
+            "title": "Areas from a tagged union",
+            "prompt": "Each input line is `circle r`, `rect w h` or `tri base height` (positive numbers). Parse each into a discriminated union and print `<kind> <area>` (two decimals) or `bad line`, then `total <sum>` and `largest <kind>` (the first on a tie; `none` if nothing parsed). The area function must end in a `never` exhaustiveness check.",
+            "hint": "Check `kind` and the number count together, then build the member with the literal `kind`.",
+            "hints": [
+              "Check `kind` and the number count together, then build the member with the literal `kind`.",
+              "In `default:`, assigning `s` to a `never` only compiles when every kind was handled."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Easy",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Shape =\n  | { kind: \"circle\"; r: number }\n  | { kind: \"rect\"; w: number; h: number }\n  | { kind: \"tri\"; base: number; height: number };\nfunction parse(line: string): Shape | undefined {\n  const [kind = \"\", ...rest] = line.trim().split(/\\s+/);\n  const n = rest.map(Number);\n  if (n.some((x) => !(x > 0))) return undefined;\n  const [a = 0, b = 0] = n;\n  if (kind === \"circle\" && n.length === 1) return { kind, r: a };\n  if (kind === \"rect\" && n.length === 2) return { kind, w: a, h: b };\n  if (kind === \"tri\" && n.length === 2) return { kind, base: a, height: b };\n  return undefined;\n}\nfunction area(s: Shape): number {\n  switch (s.kind) {\n    case \"circle\":\n      return Math.PI * s.r * s.r;\n    case \"rect\":\n      return s.w * s.h;\n    case \"tri\":\n      return (s.base * s.height) / 2;\n    default: {\n      const unreachable: never = s;\n      return unreachable;\n    }\n  }\n}\nlet total = 0;\nlet largest: Shape | undefined;\nfor (const line of input.split(\"\\n\")) {\n  const s = parse(line);\n  if (s === undefined) {\n    console.log(\"bad line\");\n    continue;\n  }\n  const a = area(s);\n  total += a;\n  if (largest === undefined || a > area(largest)) largest = s;\n  console.log(`${s.kind} ${a.toFixed(2)}`);\n}\nconsole.log(`total ${total.toFixed(2)}`);\nconsole.log(`largest ${largest?.kind ?? \"none\"}`);\n",
+            "tests": [
+              {
+                "input": "circle 1\nrect 2 3\ntri 4 5\nhexagon 2\nrect 2",
+                "output": "circle 3.14\nrect 6.00\ntri 10.00\nbad line\nbad line\ntotal 19.14\nlargest tri"
+              },
+              {
+                "input": "tri 10 10\ncircle -1",
+                "output": "tri 50.00\nbad line\ntotal 50.00\nlargest tri"
+              },
+              {
+                "input": "blob",
+                "output": "bad line\ntotal 0.00\nlargest none"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w12-rpn",
+            "title": "A calculator in reverse Polish",
+            "prompt": "Each input line is an expression in reverse Polish notation (`3 4 + 2 *`). Tokenise into `{ kind: \"num\" } | { kind: \"op\" }` and evaluate with a stack. Print the result (rounded to at most 4 decimals), or the first error: `bad token <t>`, `stack underflow`, `division by zero`, or `leftover <k>` when more than one value remains.",
+            "hint": "After `tok.kind === \"num\"` is handled, `tok` is narrowed to the operator member.",
+            "hints": [
+              "After `tok.kind === \"num\"` is handled, `tok` is narrowed to the operator member.",
+              "Pop the right operand first."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Easy",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Op = \"+\" | \"-\" | \"*\" | \"/\";\ntype Token = { kind: \"num\"; value: number } | { kind: \"op\"; op: Op };\nfunction tokenize(t: string): Token | undefined {\n  if (t === \"+\" || t === \"-\" || t === \"*\" || t === \"/\") return { kind: \"op\", op: t };\n  const n = Number(t);\n  return t !== \"\" && Number.isFinite(n) ? { kind: \"num\", value: n } : undefined;\n}\nfunction evaluate(line: string): string {\n  const stack: number[] = [];\n  for (const raw of line.trim().split(/\\s+/)) {\n    const tok = tokenize(raw);\n    if (tok === undefined) return `bad token ${raw}`;\n    if (tok.kind === \"num\") {\n      stack.push(tok.value);\n      continue;\n    }\n    const b = stack.pop();\n    const a = stack.pop();\n    if (a === undefined || b === undefined) return \"stack underflow\";\n    if (tok.op === \"/\" && b === 0) return \"division by zero\";\n    stack.push(tok.op === \"+\" ? a + b : tok.op === \"-\" ? a - b : tok.op === \"*\" ? a * b : a / b);\n  }\n  if (stack.length !== 1) return `leftover ${stack.length}`;\n  return String(Number((stack[0] ?? 0).toFixed(4)));\n}\nfor (const line of input.split(\"\\n\")) console.log(evaluate(line));\n",
+            "tests": [
+              {
+                "input": "3 4 + 2 *\n10 3 /\n1 +\n4 0 /\n1 2 3 +\n2 x *",
+                "output": "14\n3.3333\nstack underflow\ndivision by zero\nleftover 2\nbad token x"
+              },
+              {
+                "input": "5\n-2 -3 *\n1 2 3 4 + + +",
+                "output": "5\n6\n10"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w12-bank-replay",
+            "title": "Replay the bank's events",
+            "prompt": "Each input line is `deposit <acct> <n>`, `withdraw <acct> <n>` or `transfer <from> <to> <n>` (positive whole amounts). Parse into a discriminated union (a bad line prints `bad line <n>`), apply in order, and reject any withdrawal or transfer that would overdraw with `rejected <line>: insufficient funds`. Finally print every account that appeared in an applied event as `<acct> <balance>`, sorted by name.",
+            "hint": "Parse once into the union; every later step switches on `kind`.",
+            "hints": [
+              "Parse once into the union; every later step switches on `kind`.",
+              "`kind === \"deposit\" || kind === \"withdraw\"` gives a member whose `kind` is either — TypeScript accepts it as the union."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Easy",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype BankEvent =\n  | { kind: \"deposit\"; account: string; amount: number }\n  | { kind: \"withdraw\"; account: string; amount: number }\n  | { kind: \"transfer\"; from: string; to: string; amount: number };\nfunction parse(line: string): BankEvent | undefined {\n  const [kind = \"\", a = \"\", b = \"\", c = \"\"] = line.trim().split(/\\s+/);\n  if (kind === \"deposit\" || kind === \"withdraw\") {\n    const amount = Number(b);\n    return a !== \"\" && Number.isInteger(amount) && amount > 0 ? { kind, account: a, amount } : undefined;\n  }\n  if (kind === \"transfer\") {\n    const amount = Number(c);\n    return a !== \"\" && b !== \"\" && a !== b && Number.isInteger(amount) && amount > 0 ? { kind, from: a, to: b, amount } : undefined;\n  }\n  return undefined;\n}\nconst balances = new Map<string, number>();\nconst balance = (acct: string) => balances.get(acct) ?? 0;\ninput.split(\"\\n\").forEach((line, i) => {\n  const e = parse(line);\n  if (e === undefined) {\n    console.log(`bad line ${i + 1}`);\n    return;\n  }\n  switch (e.kind) {\n    case \"deposit\":\n      balances.set(e.account, balance(e.account) + e.amount);\n      break;\n    case \"withdraw\":\n      if (balance(e.account) < e.amount) console.log(`rejected ${i + 1}: insufficient funds`);\n      else balances.set(e.account, balance(e.account) - e.amount);\n      break;\n    case \"transfer\":\n      if (balance(e.from) < e.amount) {\n        console.log(`rejected ${i + 1}: insufficient funds`);\n      } else {\n        balances.set(e.from, balance(e.from) - e.amount);\n        balances.set(e.to, balance(e.to) + e.amount);\n      }\n      break;\n  }\n});\nfor (const [acct, n] of [...balances].sort(([a], [b]) => a.localeCompare(b))) console.log(`${acct} ${n}`);\n",
+            "tests": [
+              {
+                "input": "deposit ana 100\nwithdraw ana 30\ntransfer ana bo 50\ntransfer ana bo 50\nwithdraw bo 10",
+                "output": "rejected 4: insufficient funds\nana 20\nbo 40"
+              },
+              {
+                "input": "withdraw cy 5\ndeposit cy -5\ntransfer cy cy 1\nrefund cy 3\ndeposit cy 7",
+                "output": "rejected 1: insufficient funds\nbad line 2\nbad line 3\nbad line 4\ncy 7"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w12-todo-reducer",
+            "title": "A todo list as a reducer",
+            "prompt": "Each input line is an action: `add <text…>`, `toggle <id>`, `remove <id>`, `rename <id> <text…>` or `clear-done`. Ids start at 1 and are never reused. Parse each line into an `Action` union (skip anything else), fold them with a pure `reduce(state, action): State` that never mutates, then print each todo as `[x] <id> <text>` or `[ ] <id> <text>`, then `<k> left` (undone count).",
+            "hint": "Each `case` returns a new state built with spreads; nothing is assigned to.",
+            "hints": [
+              "Each `case` returns a new state built with spreads; nothing is assigned to.",
+              "With a `switch` that returns from every case, the compiler knows the function always returns."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Todo = { readonly id: number; readonly text: string; readonly done: boolean };\ntype State = { readonly todos: readonly Todo[]; readonly nextId: number };\ntype Action =\n  | { type: \"add\"; text: string }\n  | { type: \"toggle\"; id: number }\n  | { type: \"remove\"; id: number }\n  | { type: \"rename\"; id: number; text: string }\n  | { type: \"clear-done\" };\nfunction parse(line: string): Action | undefined {\n  const [type = \"\", arg = \"\", ...rest] = line.trim().split(/\\s+/);\n  const id = Number(arg);\n  if (type === \"add\" && arg !== \"\") return { type, text: [arg, ...rest].join(\" \") };\n  if ((type === \"toggle\" || type === \"remove\") && Number.isInteger(id)) return { type, id };\n  if (type === \"rename\" && Number.isInteger(id) && rest.length > 0) return { type, id, text: rest.join(\" \") };\n  if (type === \"clear-done\") return { type };\n  return undefined;\n}\nfunction reduce(state: State, action: Action): State {\n  switch (action.type) {\n    case \"add\":\n      return { todos: [...state.todos, { id: state.nextId, text: action.text, done: false }], nextId: state.nextId + 1 };\n    case \"toggle\":\n      return { ...state, todos: state.todos.map((t) => (t.id === action.id ? { ...t, done: !t.done } : t)) };\n    case \"remove\":\n      return { ...state, todos: state.todos.filter((t) => t.id !== action.id) };\n    case \"rename\":\n      return { ...state, todos: state.todos.map((t) => (t.id === action.id ? { ...t, text: action.text } : t)) };\n    case \"clear-done\":\n      return { ...state, todos: state.todos.filter((t) => !t.done) };\n  }\n}\nconst actions = input.split(\"\\n\").map(parse).filter((a) => a !== undefined);\nconst final = actions.reduce(reduce, { todos: [], nextId: 1 });\nfor (const t of final.todos) console.log(`[${t.done ? \"x\" : \" \"}] ${t.id} ${t.text}`);\nconsole.log(`${final.todos.filter((t) => !t.done).length} left`);\n",
+            "tests": [
+              {
+                "input": "add buy milk\nadd call mum\nadd fix bike\ntoggle 1\nrename 3 fix the bike\nremove 2\nadd walk",
+                "output": "[x] 1 buy milk\n[ ] 3 fix the bike\n[ ] 4 walk\n2 left"
+              },
+              {
+                "input": "add a\nadd b\ntoggle 1\ntoggle 2\nclear-done\nadd c\ntoggle 9\nnonsense",
+                "output": "[ ] 3 c\n1 left"
+              },
+              {
+                "input": "clear-done",
+                "output": "0 left"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w12-expr",
+            "title": "Evaluate a prefix expression",
+            "prompt": "Each input line is an expression in parentheses: numbers, `(neg e)`, or `(op a b)` with op `+ - * max min`. Parse it into a recursive union (`num`, `neg`, `bin`), then print it in infix form and its value: `(1 + (2 * 3)) = 7`. `neg` prints as `-x`, `max`/`min` as `max(a, b)`. Print `error: <message>` for malformed input (`unexpected end`, `bad atom <t>`, `bad operator <t>`, `expected )`, `trailing input`).",
+            "hint": "A recursive type: `neg` and `bin` hold `Expr`s. Parsing and evaluation are both recursive over it.",
+            "hints": [
+              "A recursive type: `neg` and `bin` hold `Expr`s. Parsing and evaluation are both recursive over it.",
+              "Keep the cursor in a closure (`pos`) and read tokens through one `next()` that throws at the end."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Expr =\n  | { kind: \"num\"; value: number }\n  | { kind: \"neg\"; arg: Expr }\n  | { kind: \"bin\"; op: \"+\" | \"-\" | \"*\" | \"max\" | \"min\"; left: Expr; right: Expr };\nfunction parse(tokens: string[]): Expr {\n  let pos = 0;\n  const next = (): string => {\n    const t: string | undefined = tokens[pos++];\n    if (t === undefined) throw new Error(\"unexpected end\");\n    return t;\n  };\n  const expr = (): Expr => {\n    const t = next();\n    if (t !== \"(\") {\n      const n = Number(t);\n      if (t === \")\" || !Number.isFinite(n)) throw new Error(`bad atom ${t}`);\n      return { kind: \"num\", value: n };\n    }\n    const op = next();\n    let result: Expr;\n    if (op === \"neg\") {\n      result = { kind: \"neg\", arg: expr() };\n    } else if (op === \"+\" || op === \"-\" || op === \"*\" || op === \"max\" || op === \"min\") {\n      const left = expr();\n      const right = expr();\n      result = { kind: \"bin\", op, left, right };\n    } else {\n      throw new Error(`bad operator ${op}`);\n    }\n    if (next() !== \")\") throw new Error(\"expected )\");\n    return result;\n  };\n  const e = expr();\n  if (pos !== tokens.length) throw new Error(\"trailing input\");\n  return e;\n}\nfunction evaluate(e: Expr): number {\n  switch (e.kind) {\n    case \"num\":\n      return e.value;\n    case \"neg\":\n      return -evaluate(e.arg);\n    case \"bin\": {\n      const a = evaluate(e.left);\n      const b = evaluate(e.right);\n      switch (e.op) {\n        case \"+\": return a + b;\n        case \"-\": return a - b;\n        case \"*\": return a * b;\n        case \"max\": return Math.max(a, b);\n        case \"min\": return Math.min(a, b);\n      }\n    }\n  }\n}\nfunction show(e: Expr): string {\n  switch (e.kind) {\n    case \"num\":\n      return String(e.value);\n    case \"neg\":\n      return `-${show(e.arg)}`;\n    case \"bin\":\n      return e.op === \"max\" || e.op === \"min\"\n        ? `${e.op}(${show(e.left)}, ${show(e.right)})`\n        : `(${show(e.left)} ${e.op} ${show(e.right)})`;\n  }\n}\nfor (const line of input.split(\"\\n\")) {\n  const tokens = line.replace(/\\(/g, \" ( \").replace(/\\)/g, \" ) \").trim().split(/\\s+/);\n  try {\n    const e = parse(tokens);\n    console.log(`${show(e)} = ${evaluate(e)}`);\n  } catch (err) {\n    console.log(`error: ${err instanceof Error ? err.message : String(err)}`);\n  }\n}\n",
+            "tests": [
+              {
+                "input": "(+ 1 (* 2 3))\n(neg (- 2 7))\n(max 4 (min 9 6))\n42",
+                "output": "(1 + (2 * 3)) = 7\n-(2 - 7) = 5\nmax(4, min(9, 6)) = 6\n42 = 42"
+              },
+              {
+                "input": "(+ 1)\n(^ 1 2)\n(+ 1 2 3)\n(+ 1 2) 3\n(* x 2)",
+                "output": "error: bad atom )\nerror: bad operator ^\nerror: expected )\nerror: trailing input\nerror: bad atom x"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w12-http",
+            "title": "Handle every kind of response",
+            "prompt": "Each input line is `<status> <rest…>`. Classify it into a union — `ok` (200-299, rest is the body), `redirect` (300-399, rest is the location), `client` (400-499, rest is the message) or `server` (500-599). Print `show \"<body>\"`, `follow <location>` (or `broken redirect` when there is none), `fail <status>: <message>`, `retry` (for 502, 503, 504) or `give up`; a status outside 200-599 prints `bad status <s>`. Finish with `ok=<a> redirect=<b> client=<c> server=<d>`.",
+            "hint": "`Response[\"kind\"]` is the union of the tags — a ready-made key type for the counts.",
+            "hints": [
+              "`Response[\"kind\"]` is the union of the tags — a ready-made key type for the counts.",
+              "Each `case` sees only its own member's fields."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Response =\n  | { kind: \"ok\"; body: string }\n  | { kind: \"redirect\"; location: string }\n  | { kind: \"client\"; status: number; message: string }\n  | { kind: \"server\"; status: number };\nfunction classify(status: number, rest: string): Response | undefined {\n  if (!Number.isInteger(status)) return undefined;\n  if (status >= 200 && status < 300) return { kind: \"ok\", body: rest };\n  if (status >= 300 && status < 400) return { kind: \"redirect\", location: rest };\n  if (status >= 400 && status < 500) return { kind: \"client\", status, message: rest };\n  if (status >= 500 && status < 600) return { kind: \"server\", status };\n  return undefined;\n}\nfunction handle(r: Response): string {\n  switch (r.kind) {\n    case \"ok\":\n      return `show \"${r.body}\"`;\n    case \"redirect\":\n      return r.location === \"\" ? \"broken redirect\" : `follow ${r.location}`;\n    case \"client\":\n      return `fail ${r.status}: ${r.message}`;\n    case \"server\":\n      return [502, 503, 504].includes(r.status) ? \"retry\" : \"give up\";\n  }\n}\nconst counts: Record<Response[\"kind\"], number> = { ok: 0, redirect: 0, client: 0, server: 0 };\nfor (const line of input.split(\"\\n\")) {\n  const [code = \"\", ...rest] = line.trim().split(/\\s+/);\n  const r = classify(Number(code), rest.join(\" \"));\n  if (r === undefined) {\n    console.log(`bad status ${code}`);\n    continue;\n  }\n  counts[r.kind]++;\n  console.log(handle(r));\n}\nconsole.log(`ok=${counts.ok} redirect=${counts.redirect} client=${counts.client} server=${counts.server}`);\n",
+            "tests": [
+              {
+                "input": "200 hello world\n301 /new-home\n404 not found\n503\n500\n302\n99 x",
+                "output": "show \"hello world\"\nfollow /new-home\nfail 404: not found\nretry\ngive up\nbroken redirect\nbad status 99\nok=1 redirect=2 client=1 server=2"
+              },
+              {
+                "input": "204\n418 I'm a teapot\n504 gateway\nabc",
+                "output": "show \"\"\nfail 418: I'm a teapot\nretry\nbad status abc\nok=1 redirect=0 client=1 server=1"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w12-undo",
+            "title": "An editor with undo and redo",
+            "prompt": "Each input line is a command: `type <text…>` (append the text, spaces included), `delete <n>` (remove the last n characters, fewer if the document is shorter), `undo`, `redo`, or `print`. Record each edit as `{ kind: \"insert\"; text } | { kind: \"delete\"; removed }` so it can be undone exactly. A new edit clears the redo history. `print` prints the document in quotes; `undo`/`redo` with nothing to do print `nothing to undo`/`nothing to redo`.",
+            "hint": "A deletion must remember the text it removed, or undo cannot put it back.",
+            "hints": [
+              "A deletion must remember the text it removed, or undo cannot put it back.",
+              "Undo moves an edit from `done` to `undone`; redo moves it back."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Edit = { kind: \"insert\"; text: string } | { kind: \"delete\"; removed: string };\nlet doc = \"\";\nconst done: Edit[] = [];\nconst undone: Edit[] = [];\nfunction apply(e: Edit): void {\n  switch (e.kind) {\n    case \"insert\":\n      doc += e.text;\n      break;\n    case \"delete\":\n      doc = doc.slice(0, doc.length - e.removed.length);\n      break;\n  }\n}\nfunction revert(e: Edit): void {\n  switch (e.kind) {\n    case \"insert\":\n      doc = doc.slice(0, doc.length - e.text.length);\n      break;\n    case \"delete\":\n      doc += e.removed;\n      break;\n  }\n}\nfor (const line of input.split(\"\\n\")) {\n  const space = line.indexOf(\" \");\n  const cmd = space < 0 ? line.trim() : line.slice(0, space);\n  const arg = space < 0 ? \"\" : line.slice(space + 1);\n  if (cmd === \"type\" || cmd === \"delete\") {\n    const n = Math.max(0, Math.min(doc.length, Number(arg) || 0));\n    const edit: Edit = cmd === \"type\" ? { kind: \"insert\", text: arg } : { kind: \"delete\", removed: doc.slice(doc.length - n) };\n    apply(edit);\n    done.push(edit);\n    undone.length = 0;\n  } else if (cmd === \"undo\" || cmd === \"redo\") {\n    const from = cmd === \"undo\" ? done : undone;\n    const to = cmd === \"undo\" ? undone : done;\n    const e = from.pop();\n    if (e === undefined) {\n      console.log(`nothing to ${cmd}`);\n      continue;\n    }\n    if (cmd === \"undo\") revert(e);\n    else apply(e);\n    to.push(e);\n  } else if (cmd === \"print\") {\n    console.log(`\"${doc}\"`);\n  }\n}\n",
+            "tests": [
+              {
+                "input": "type hello\ntype  world\nprint\ndelete 6\nprint\nundo\nprint\nredo\nredo\nprint",
+                "output": "\"hello world\"\n\"hello\"\n\"hello world\"\nnothing to redo\n\"hello\""
+              },
+              {
+                "input": "undo\ntype abc\ndelete 10\nprint\nundo\nundo\nundo\nprint\nredo\ntype !\nredo\nprint",
+                "output": "nothing to undo\n\"\"\nnothing to undo\n\"\"\nnothing to redo\n\"abc!\""
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w12-vm",
+            "title": "A tiny stack machine",
+            "prompt": "The input is a program, one instruction per line (numbered from 0): `push n`, `add`, `sub`, `mul`, `dup`, `swap`, `print` (pop and print), `jmp t`, `jz t` (pop; jump to line t if it was 0), `halt`. Parse the whole program into an instruction union first — the first bad line prints `line <k>: bad instruction` and nothing runs. Then execute: stop at `halt` (`halted`), past the last line (`ended`), on underflow (`underflow at <k>`), on a jump outside the program (`bad jump at <k>`) or after 10000 steps (`step limit`). Finally print `stack: <values>` or `stack: empty`.",
+            "hint": "Group the operand-free instructions into one member: `{ op: \"add\" | \"sub\" | … }`.",
+            "hints": [
+              "Group the operand-free instructions into one member: `{ op: \"add\" | \"sub\" | … }`.",
+              "Parse everything before running anything, so a typo on the last line stops the program before it prints."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Hard",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Instr =\n  | { op: \"push\"; value: number }\n  | { op: \"add\" | \"sub\" | \"mul\" | \"dup\" | \"swap\" | \"print\" | \"halt\" }\n  | { op: \"jmp\" | \"jz\"; target: number };\nfunction parseLine(line: string): Instr | undefined {\n  const [op = \"\", arg = \"\"] = line.trim().split(/\\s+/);\n  const n = Number(arg);\n  if (op === \"push\") return arg !== \"\" && Number.isInteger(n) ? { op, value: n } : undefined;\n  if (op === \"jmp\" || op === \"jz\") return arg !== \"\" && Number.isInteger(n) ? { op, target: n } : undefined;\n  if (op === \"add\" || op === \"sub\" || op === \"mul\" || op === \"dup\" || op === \"swap\" || op === \"print\" || op === \"halt\") {\n    return arg === \"\" ? { op } : undefined;\n  }\n  return undefined;\n}\nfunction run(program: Instr[], stack: number[]): string {\n  let pc = 0;\n  for (let steps = 0; steps < 10000; steps++) {\n    const ins = program[pc];\n    if (ins === undefined) return \"ended\";\n    const at = pc;\n    pc++;\n    switch (ins.op) {\n      case \"push\":\n        stack.push(ins.value);\n        break;\n      case \"add\":\n      case \"sub\":\n      case \"mul\": {\n        const b = stack.pop();\n        const a = stack.pop();\n        if (a === undefined || b === undefined) return `underflow at ${at}`;\n        stack.push(ins.op === \"add\" ? a + b : ins.op === \"sub\" ? a - b : a * b);\n        break;\n      }\n      case \"dup\": {\n        const top = stack.at(-1);\n        if (top === undefined) return `underflow at ${at}`;\n        stack.push(top);\n        break;\n      }\n      case \"swap\": {\n        const b = stack.pop();\n        const a = stack.pop();\n        if (a === undefined || b === undefined) return `underflow at ${at}`;\n        stack.push(b, a);\n        break;\n      }\n      case \"print\": {\n        const top = stack.pop();\n        if (top === undefined) return `underflow at ${at}`;\n        console.log(top);\n        break;\n      }\n      case \"halt\":\n        return \"halted\";\n      case \"jmp\":\n      case \"jz\": {\n        if (ins.op === \"jz\") {\n          const top = stack.pop();\n          if (top === undefined) return `underflow at ${at}`;\n          if (top !== 0) break;\n        }\n        if (ins.target < 0 || ins.target >= program.length) return `bad jump at ${at}`;\n        pc = ins.target;\n        break;\n      }\n    }\n  }\n  return \"step limit\";\n}\nconst program: Instr[] = [];\nlet bad = -1;\ninput.split(\"\\n\").forEach((line, i) => {\n  const ins = parseLine(line);\n  if (ins === undefined) {\n    if (bad < 0) bad = i;\n  } else {\n    program.push(ins);\n  }\n});\nif (bad >= 0) {\n  console.log(`line ${bad}: bad instruction`);\n} else {\n  const stack: number[] = [];\n  console.log(run(program, stack));\n  console.log(`stack: ${stack.join(\" \") || \"empty\"}`);\n}\n",
+            "tests": [
+              {
+                "input": "push 3\ndup\nprint\npush 1\nsub\ndup\njz 8\njmp 1\nhalt",
+                "output": "3\n2\n1\nhalted\nstack: 0"
+              },
+              {
+                "input": "push 2\npush 5\nswap\nsub\nprint\npush 7",
+                "output": "3\nended\nstack: 7"
+              },
+              {
+                "input": "push 1\nadd",
+                "output": "underflow at 1\nstack: empty"
+              },
+              {
+                "input": "jmp 0",
+                "output": "step limit\nstack: empty"
+              },
+              {
+                "input": "push 1\njz 1\npush x",
+                "output": "line 2: bad instruction"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w12-markdown",
+            "title": "Render a little Markdown",
+            "prompt": "The input is a Markdown document. Parse its lines into blocks — `heading` (`#` to `######` then a space), `list` (consecutive `- ` lines), `rule` (`---`) and `paragraph` (consecutive other non-blank lines, joined with one space); a blank line ends a list or paragraph. Render each block on its own line: `<h2>text</h2>`, `<ul><li>a</li><li>b</li></ul>`, `<hr>`, `<p>text</p>`. Finish with `blocks: <n>`. Render with an exhaustive `switch`.",
+            "hint": "A blank line pushes an empty paragraph, which ends whatever was open; drop empty paragraphs before rendering.",
+            "hints": [
+              "A blank line pushes an empty paragraph, which ends whatever was open; drop empty paragraphs before rendering.",
+              "`last?.kind === \"list\"` narrows `last` to the list member, so `last.items` is available."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Hard",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Block =\n  | { kind: \"heading\"; level: number; text: string }\n  | { kind: \"list\"; items: string[] }\n  | { kind: \"rule\" }\n  | { kind: \"paragraph\"; lines: string[] };\nconst blocks: Block[] = [];\nfor (const raw of input.split(\"\\n\")) {\n  const line = raw.trim();\n  const last = blocks.at(-1);\n  const heading = /^(#{1,6}) (.+)$/.exec(line);\n  if (line === \"\") {\n    blocks.push({ kind: \"paragraph\", lines: [] });\n  } else if (heading !== null) {\n    blocks.push({ kind: \"heading\", level: (heading[1] ?? \"#\").length, text: heading[2] ?? \"\" });\n  } else if (line === \"---\") {\n    blocks.push({ kind: \"rule\" });\n  } else if (line.startsWith(\"- \")) {\n    if (last?.kind === \"list\") last.items.push(line.slice(2));\n    else blocks.push({ kind: \"list\", items: [line.slice(2)] });\n  } else if (last?.kind === \"paragraph\") {\n    last.lines.push(line);\n  } else {\n    blocks.push({ kind: \"paragraph\", lines: [line] });\n  }\n}\nfunction render(b: Block): string {\n  switch (b.kind) {\n    case \"heading\":\n      return `<h${b.level}>${b.text}</h${b.level}>`;\n    case \"list\":\n      return `<ul>${b.items.map((item) => `<li>${item}</li>`).join(\"\")}</ul>`;\n    case \"rule\":\n      return \"<hr>\";\n    case \"paragraph\":\n      return `<p>${b.lines.join(\" \")}</p>`;\n  }\n}\nconst real = blocks.filter((b) => b.kind !== \"paragraph\" || b.lines.length > 0);\nfor (const b of real) console.log(render(b));\nconsole.log(`blocks: ${real.length}`);\n",
+            "tests": [
+              {
+                "input": "# Title\nSome text\nthat continues.\n\n- one\n- two\n---\n## Next\nEnd.",
+                "output": "<h1>Title</h1>\n<p>Some text that continues.</p>\n<ul><li>one</li><li>two</li></ul>\n<hr>\n<h2>Next</h2>\n<p>End.</p>\nblocks: 6"
+              },
+              {
+                "input": "- a\n\n- b\ntext after\n###### tiny\n####### not a heading\n#nospace",
+                "output": "<ul><li>a</li></ul>\n<ul><li>b</li></ul>\n<p>text after</p>\n<h6>tiny</h6>\n<p>####### not a heading #nospace</p>\nblocks: 5"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w12-tokens",
+            "title": "Tokenise an expression",
+            "prompt": "Each input line is an expression. Split it into tokens — `num` (digits, optionally `.digits`), `ident` (a letter or `_`, then letters, digits or `_`), `op` (`==`, `!=`, `<=`, `>=`, then single `+ - * / = < >`), `lparen`, `rparen`, `comma` — skipping spaces. Print them space-separated as `num(12) ident(x) op(+) lparen rparen comma`; at an unexpected character print `unexpected '<c>' at <column>` (1-based) instead of the line's tokens.",
+            "hint": "Return `Token[] | string` and let the caller narrow with `typeof`.",
+            "hints": [
+              "Return `Token[] | string` and let the caller narrow with `typeof`.",
+              "Grouping cases (`case \"num\": case \"ident\":`) narrows to the members that share a `text` field."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Hard",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Token =\n  | { kind: \"num\"; text: string }\n  | { kind: \"ident\"; text: string }\n  | { kind: \"op\"; text: string }\n  | { kind: \"lparen\" }\n  | { kind: \"rparen\" }\n  | { kind: \"comma\" };\nfunction tokenize(line: string): Token[] | string {\n  const tokens: Token[] = [];\n  let i = 0;\n  while (i < line.length) {\n    const rest = line.slice(i);\n    const c = line.charAt(i);\n    const num = /^\\d+(\\.\\d+)?/.exec(rest);\n    const ident = /^[A-Za-z_]\\w*/.exec(rest);\n    const op = /^(==|!=|<=|>=|[+\\-*\\/=<>])/.exec(rest);\n    if (c === \" \") {\n      i++;\n    } else if (num !== null) {\n      tokens.push({ kind: \"num\", text: num[0] });\n      i += num[0].length;\n    } else if (ident !== null) {\n      tokens.push({ kind: \"ident\", text: ident[0] });\n      i += ident[0].length;\n    } else if (op !== null) {\n      tokens.push({ kind: \"op\", text: op[0] });\n      i += op[0].length;\n    } else if (c === \"(\" || c === \")\" || c === \",\") {\n      tokens.push({ kind: c === \"(\" ? \"lparen\" : c === \")\" ? \"rparen\" : \"comma\" });\n      i++;\n    } else {\n      return `unexpected '${c}' at ${i + 1}`;\n    }\n  }\n  return tokens;\n}\nfunction show(t: Token): string {\n  switch (t.kind) {\n    case \"num\":\n    case \"ident\":\n    case \"op\":\n      return `${t.kind}(${t.text})`;\n    case \"lparen\":\n    case \"rparen\":\n    case \"comma\":\n      return t.kind;\n  }\n}\nfor (const line of input.split(\"\\n\")) {\n  const result = tokenize(line);\n  console.log(typeof result === \"string\" ? result : result.map(show).join(\" \"));\n}\n",
+            "tests": [
+              {
+                "input": "x1 = max(a, 12.5) * 3\nif_ok >= 10 != y\nprice * 2 @ 3",
+                "output": "ident(x1) op(=) ident(max) lparen ident(a) comma num(12.5) rparen op(*) num(3)\nident(if_ok) op(>=) num(10) op(!=) ident(y)\nunexpected '@' at 11"
+              },
+              {
+                "input": "f(g(1),2)\n3.x\n_a==_b",
+                "output": "ident(f) lparen ident(g) lparen num(1) rparen comma num(2) rparen\nunexpected '.' at 2\nident(_a) op(==) ident(_b)"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          }
+        ],
+        "project_spec": {
+          "title": "interpreter.ts — a stack language with a checker",
+          "goal": "Model a small language as a discriminated union of instructions, check the whole program before running any of it, and let an exhaustive `switch` — ending in `never` — be what forces you to handle every instruction you add.",
+          "requirements": [
+            "The input is a program, one instruction per line: `push <int>`, `pop`, `add`, `sub`, `mul`, `div` (integer division, truncating toward zero), `dup`, `swap`, `print`. Blank lines and lines starting with `#` are ignored; line numbers count every line from 1.",
+            "Parse every line first. For each bad line print `line <n>: unknown instruction <word>` or `line <n>: push needs an integer` (also for any extra words: `line <n>: <word> takes no argument`). If there were any, print `not run` and stop.",
+            "Otherwise run it. `print` prints the top of the stack without popping. The first runtime error — `line <n>: stack underflow` or `line <n>: division by zero` — stops the program.",
+            "At the end (normal or after an error) print `stack: <bottom … top>` or `stack: empty`.",
+            "Represent instructions as a discriminated union and execute them with a `switch` that ends in a `never` check."
+          ],
+          "stretch": [
+            "Add `jz <line>` and `jmp <line>` instructions — the `never` check shows you every switch that must learn them.",
+            "Report *all* runtime problems a static pass can find before running (like underflow on straight-line code)."
+          ],
+          "rubric": [
+            "No `any` anywhere — not even one hidden in a cast",
+            "Every function has a typed signature; locals are left to inference",
+            "Bad input is handled on purpose, not by accident",
+            "Names say what things are, not how they are stored",
+            "I could explain every line to someone else"
+          ],
+          "language": "typescript",
+          "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n// Build the project here. Read all of stdin from `input` above, and print\n// exactly what the requirements ask for. Run the tests as you go.\n",
+          "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Instr =\n  | { op: \"push\"; value: number; line: number }\n  | { op: \"pop\" | \"add\" | \"sub\" | \"mul\" | \"div\" | \"dup\" | \"swap\" | \"print\"; line: number };\nconst NO_ARG = [\"pop\", \"add\", \"sub\", \"mul\", \"div\", \"dup\", \"swap\", \"print\"] as const;\ntype NoArg = (typeof NO_ARG)[number];\nconst isNoArg = (s: string): s is NoArg => NO_ARG.some((op) => op === s);\nconst program: Instr[] = [];\nconst errors: string[] = [];\nfor (const [i, raw] of input.split(\"\\n\").entries()) {\n  const line = i + 1;\n  const text = raw.trim();\n  if (text === \"\" || text.startsWith(\"#\")) continue;\n  const [word = \"\", arg, extra] = text.split(/\\s+/);\n  if (word === \"push\") {\n    const n = Number(arg);\n    if (arg === undefined || extra !== undefined || !Number.isInteger(n)) errors.push(`line ${line}: push needs an integer`);\n    else program.push({ op: \"push\", value: n, line });\n  } else if (isNoArg(word)) {\n    if (arg !== undefined) errors.push(`line ${line}: ${word} takes no argument`);\n    else program.push({ op: word, line });\n  } else {\n    errors.push(`line ${line}: unknown instruction ${word}`);\n  }\n}\nconst stack: number[] = [];\nfunction run(): string | undefined {\n  for (const ins of program) {\n    const need = ins.op === \"push\" ? 0 : ins.op === \"pop\" || ins.op === \"dup\" || ins.op === \"print\" ? 1 : 2;\n    if (stack.length < need) return `line ${ins.line}: stack underflow`;\n    switch (ins.op) {\n      case \"push\":\n        stack.push(ins.value);\n        break;\n      case \"pop\":\n        stack.pop();\n        break;\n      case \"dup\":\n        stack.push(stack[stack.length - 1] ?? 0);\n        break;\n      case \"print\":\n        console.log(stack[stack.length - 1] ?? 0);\n        break;\n      case \"swap\":\n      case \"add\":\n      case \"sub\":\n      case \"mul\":\n      case \"div\": {\n        const b = stack.pop() ?? 0;\n        const a = stack.pop() ?? 0;\n        if (ins.op === \"swap\") stack.push(b, a);\n        else if (ins.op === \"add\") stack.push(a + b);\n        else if (ins.op === \"sub\") stack.push(a - b);\n        else if (ins.op === \"mul\") stack.push(a * b);\n        else if (b === 0) return `line ${ins.line}: division by zero`;\n        else stack.push(Math.trunc(a / b));\n        break;\n      }\n      default: {\n        const unreachable: never = ins;\n        return unreachable;\n      }\n    }\n  }\n  return undefined;\n}\nif (errors.length > 0) {\n  for (const e of errors) console.log(e);\n  console.log(\"not run\");\n} else {\n  const failure = run();\n  if (failure !== undefined) console.log(failure);\n  console.log(`stack: ${stack.join(\" \") || \"empty\"}`);\n}\n",
+          "tests": [
+            {
+              "input": "push 6\npush 7\nmul\nprint\npush 5\nswap\nsub\nprint",
+              "output": "42\n-37\nstack: -37"
+            },
+            {
+              "input": "# division\npush 7\npush -2\ndiv\nprint\n\npush 0\ndiv\nprint",
+              "output": "-3\nline 8: division by zero\nstack: empty"
+            },
+            {
+              "input": "push 1\nadd\npush 9",
+              "output": "line 2: stack underflow\nstack: 1"
+            },
+            {
+              "input": "push x\nfrobnicate\npop 3\npush 1 2\npush 4",
+              "output": "line 1: push needs an integer\nline 2: unknown instruction frobnicate\nline 3: pop takes no argument\nline 4: push needs an integer\nnot run"
+            },
+            {
+              "input": "push 3\ndup\ndup\nmul\nmul\nprint\npop\npop",
+              "output": "27\nline 8: stack underflow\nstack: empty"
+            }
+          ],
+          "strictness": ""
+        }
       },
       {
         "week": 13,
@@ -13090,6 +14098,30 @@
           {
             "front": "What does an unused `@ts-expect-error` do?",
             "back": "It is itself an error (TS2578) — which is exactly what makes it a negative test."
+          },
+          {
+            "front": "Is `(x: number) => void` assignable to `(x: number, i: number) => void`?",
+            "back": "Yes — a function taking fewer parameters can always be called with more; the extras are ignored."
+          },
+          {
+            "front": "What is a construct signature?",
+            "back": "`new (args) => T`: the type of something you call with `new`, such as a class value."
+          },
+          {
+            "front": "What does a `this` parameter compile to?",
+            "back": "Nothing — it's erased, but every call is checked for the right `this`."
+          },
+          {
+            "front": "How do you write a type test for a misuse?",
+            "back": "Put `// @ts-expect-error` on the line above it; if the line compiles, the unused directive is itself an error (TS2578)."
+          },
+          {
+            "front": "Why pair type tests with runtime tests?",
+            "back": "Type tests prove shapes, not values — a correctly typed function can still return the wrong number."
+          },
+          {
+            "front": "What is `typeof fn<string>`?",
+            "back": "An instantiation expression: the generic function's type with `T` fixed to `string`."
           }
         ],
         "practice": [
@@ -13185,11 +14217,401 @@
             "tests": [],
             "source_slug": "",
             "dataset": ""
+          },
+          {
+            "id": "tsm-w13-p2",
+            "title": "A default parameter in a signature",
+            "prompt": "What type does TypeScript already infer for `pad`? Annotate `check` with exactly that type — not merely one that fits.",
+            "hint": "A parameter with a default is optional to the caller.",
+            "hints": [
+              "A parameter with a default is optional to the caller.",
+              "Its type is inferred from the default."
+            ],
+            "language": "typescript",
+            "kind": "predict",
+            "difficulty": "Easy",
+            "strictness": "strict",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<typeof check, typeof pad>>;\n",
+            "judge_mode": "types",
+            "forbid": [
+              "typeof"
+            ],
+            "starter": "const pad = (text: string, width = 8) => text.padStart(width);\nconst check: ____ = pad;\n",
+            "solution": "const pad = (text: string, width = 8) => text.padStart(width);\nconst check: (text: string, width?: number) => string = pad;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w13-d1",
+            "title": "Called without its `this`",
+            "prompt": "The compiler rejects this program:\n\n    error TS2684: The 'this' context of type 'void' is not assignable to method's 'this' of type 'Account'.\n\nGreet the account owned by Ana.",
+            "hint": "`greet` needs an `Account` as `this`.",
+            "hints": [
+              "`greet` needs an `Account` as `this`.",
+              "Supply one with `.call`."
+            ],
+            "language": "typescript",
+            "kind": "diagnose",
+            "difficulty": "Easy",
+            "strictness": "strict",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "interface Account {\n  owner: string;\n}\nfunction greet(this: Account): string {\n  return \"hi \" + this.owner;\n}\nconsole.log(greet());\n",
+            "solution": "interface Account {\n  owner: string;\n}\nfunction greet(this: Account): string {\n  return \"hi \" + this.owner;\n}\nconsole.log(greet.call({ owner: \"Ana\" }));\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "hi Ana"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w13-d2",
+            "title": "A negative test that never failed",
+            "prompt": "The compiler rejects this program:\n\n    error TS2578: Unused '@ts-expect-error' directive.\n\nThe test is right — a port must be a number. Fix `setPort`, not the test.",
+            "hint": "The directive expects the next line to be an error, and it isn't.",
+            "hints": [
+              "The directive expects the next line to be an error, and it isn't.",
+              "Narrow the parameter type."
+            ],
+            "language": "typescript",
+            "kind": "diagnose",
+            "difficulty": "Medium",
+            "strictness": "strict",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "function setPort(port: number | string): number {\n  return Number(port);\n}\nfunction _typeTests() {\n  // @ts-expect-error — a port must be a number\n  setPort(\"8080\");\n}\nconsole.log(setPort(8080));\n",
+            "solution": "function setPort(port: number): number {\n  return port;\n}\nfunction _typeTests() {\n  // @ts-expect-error — a port must be a number\n  setPort(\"8080\");\n}\nconsole.log(setPort(8080));\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "8080"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
           }
         ],
         "optional": false,
-        "problem_set": [],
-        "project_spec": null
+        "problem_set": [
+          {
+            "id": "tsm-w13-dispatch",
+            "title": "A command table",
+            "prompt": "Each input line is `<command> <args…>`. Keep a `Record<string, Command>` where `type Command = (args: string[]) => string`, with `upper` (args joined by spaces, upper-cased), `count` (how many args), `reverse` (args in reverse order) and `sum` (args as numbers). `help` prints the command names, sorted. Anything else prints `unknown command <name>`.",
+            "hint": "Each table entry only needs to fit the `Command` signature.",
+            "hints": [
+              "Each table entry only needs to fit the `Command` signature.",
+              "`Object.hasOwn` keeps `toString` from being treated as a command."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Easy",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Command = (args: string[]) => string;\nconst commands: Record<string, Command> = {\n  upper: (args) => args.join(\" \").toUpperCase(),\n  count: (args) => String(args.length),\n  reverse: (args) => [...args].reverse().join(\" \"),\n  sum: (args) => String(args.map(Number).reduce((a, b) => a + b, 0)),\n};\nfor (const line of input.split(\"\\n\")) {\n  const [name = \"\", ...args] = line.trim().split(/\\s+/);\n  if (name === \"help\") {\n    console.log(Object.keys(commands).sort().join(\" \"));\n    continue;\n  }\n  const run = Object.hasOwn(commands, name) ? commands[name] : undefined;\n  console.log(run === undefined ? `unknown command ${name}` : run(args));\n}\n",
+            "tests": [
+              {
+                "input": "upper hello there\ncount a b c\nreverse 1 2 3\nsum 4 5 6\nhelp\ndance",
+                "output": "HELLO THERE\n3\n3 2 1\n15\ncount reverse sum upper\nunknown command dance"
+              },
+              {
+                "input": "count\ntoString x\nsum -1 1",
+                "output": "0\nunknown command toString\n0"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w13-stats",
+            "title": "Three results in one tuple",
+            "prompt": "Each input line is a list of numbers. Write `stats(xs): [min: number, max: number, mean: number]` and destructure its result to print `min <a> max <b> mean <c> range <d>`, with the mean rounded to at most 2 decimals.",
+            "hint": "A labelled tuple documents what each position means, and destructuring reads it back by position.",
+            "hints": [
+              "A labelled tuple documents what each position means, and destructuring reads it back by position."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Easy",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nfunction stats(xs: readonly number[]): [min: number, max: number, mean: number] {\n  let min = Infinity;\n  let max = -Infinity;\n  let sum = 0;\n  for (const x of xs) {\n    min = Math.min(min, x);\n    max = Math.max(max, x);\n    sum += x;\n  }\n  return [min, max, sum / xs.length];\n}\nfor (const line of input.split(\"\\n\")) {\n  const [min, max, mean] = stats(line.trim().split(/\\s+/).map(Number));\n  console.log(`min ${min} max ${max} mean ${Number(mean.toFixed(2))} range ${max - min}`);\n}\n",
+            "tests": [
+              {
+                "input": "3 1 4 1 5",
+                "output": "min 1 max 5 mean 2.8 range 4"
+              },
+              {
+                "input": "10\n-2 2",
+                "output": "min 10 max 10 mean 10 range 0\nmin -2 max 2 mean 0 range 4"
+              },
+              {
+                "input": "0.5 0.25 1",
+                "output": "min 0.25 max 1 mean 0.58 range 0.75"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w13-variadic",
+            "title": "Rest parameters",
+            "prompt": "Each input line is `sum <n…>`, `join <sep> <word…>` or `longest <word…>`. Implement them as `sum(...xs: number[])`, `joinWith(sep: string, ...parts: string[])` and `longest(first: string, ...rest: string[])` (the first longest word). `longest` with no words prints `longest needs a word`; anything else prints `unknown <op>`.",
+            "hint": "`longest(first, ...rest)` makes \"at least one word\" part of the signature.",
+            "hints": [
+              "`longest(first, ...rest)` makes \"at least one word\" part of the signature.",
+              "Spread an array into a rest parameter with `...`."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Easy",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nfunction sum(...xs: number[]): number {\n  return xs.reduce((a, b) => a + b, 0);\n}\nfunction joinWith(separator: string, ...parts: string[]): string {\n  return parts.join(separator);\n}\nfunction longest(first: string, ...rest: string[]): string {\n  return rest.reduce((best, s) => (s.length > best.length ? s : best), first);\n}\nfor (const line of input.split(\"\\n\")) {\n  const [op = \"\", ...args] = line.trim().split(/\\s+/);\n  if (op === \"sum\") {\n    console.log(sum(...args.map(Number)));\n  } else if (op === \"join\") {\n    const [sep = \"\", ...words] = args;\n    console.log(joinWith(sep, ...words));\n  } else if (op === \"longest\") {\n    const [first, ...rest] = args;\n    console.log(first === undefined ? \"longest needs a word\" : longest(first, ...rest));\n  } else {\n    console.log(`unknown ${op}`);\n  }\n}\n",
+            "tests": [
+              {
+                "input": "sum 1 2 3\njoin - a b c\nlongest hi hello hey\nlongest",
+                "output": "6\na-b-c\nhello\nlongest needs a word"
+              },
+              {
+                "input": "sum 5\njoin :: x\nlongest ab cd\nmax 1 2",
+                "output": "5\nx\nab\nunknown max"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w13-overloads",
+            "title": "One parser, three return types",
+            "prompt": "Each input line is `number <text>`, `list <a,b,c>` or `bool <text>`. Write an overloaded `parse` whose return type follows its second argument — `parse(text, \"number\"): number`, `parse(text, \"list\"): number[]`, `parse(text, \"bool\"): boolean` (true for `true`, `yes`, `1` in any case). Print `number <n>, doubled <2n>`, `list of <k>, sum <s>`, `bool <b>, negated <!b>`, or `unknown kind <k>`.",
+            "hint": "Write the overload signatures first, then one implementation signature that covers all of them.",
+            "hints": [
+              "Write the overload signatures first, then one implementation signature that covers all of them.",
+              "Callers only see the overloads, so `parse(text, \"list\")` is a `number[]` with no narrowing."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nfunction parse(text: string, as: \"number\"): number;\nfunction parse(text: string, as: \"list\"): number[];\nfunction parse(text: string, as: \"bool\"): boolean;\nfunction parse(text: string, as: \"number\" | \"list\" | \"bool\"): number | number[] | boolean {\n  if (as === \"number\") return Number(text);\n  if (as === \"list\") return text === \"\" ? [] : text.split(\",\").map(Number);\n  return [\"true\", \"yes\", \"1\"].includes(text.toLowerCase());\n}\nfor (const line of input.split(\"\\n\")) {\n  const [kind = \"\", text = \"\"] = line.trim().split(/\\s+/);\n  if (kind === \"number\") {\n    const n = parse(text, \"number\");\n    console.log(`number ${n}, doubled ${n * 2}`);\n  } else if (kind === \"list\") {\n    const xs = parse(text, \"list\");\n    console.log(`list of ${xs.length}, sum ${xs.reduce((a, b) => a + b, 0)}`);\n  } else if (kind === \"bool\") {\n    const b = parse(text, \"bool\");\n    console.log(`bool ${b}, negated ${!b}`);\n  } else {\n    console.log(`unknown kind ${kind}`);\n  }\n}\n",
+            "tests": [
+              {
+                "input": "number 21\nlist 1,2,3\nbool YES\nbool no",
+                "output": "number 21, doubled 42\nlist of 3, sum 6\nbool true, negated false\nbool false, negated true"
+              },
+              {
+                "input": "list 7\nnumber -0.5\ndate 2024",
+                "output": "list of 1, sum 7\nnumber -0.5, doubled -1\nunknown kind date"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w13-registry",
+            "title": "A callback registry",
+            "prompt": "Commands, one per line: `on <event> <handler>` registers a handler and prints its id (`#1`, `#2`, …), `off <id>` prints `removed #<id>` or `no #<id>`, and `emit <event> <payload…>` runs that event's handlers in registration order, printing each result — or `no listeners for <event>`. Handlers are made by name: `echo` (the payload), `shout` (upper-case plus `!`), `count` (how many times *this* registration has run, as `call <n>`) and `len` (the payload's length). An unknown handler name prints `unknown handler <name>`.",
+            "hint": "A factory returning a fresh closure gives each registration its own `count` state.",
+            "hints": [
+              "A factory returning a fresh closure gives each registration its own `count` state.",
+              "A `Map` iterates in insertion order — registration order for free."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Handler = (payload: string) => string;\nconst factories: Record<string, () => Handler> = {\n  echo: () => (payload) => payload,\n  shout: () => (payload) => payload.toUpperCase() + \"!\",\n  count: () => {\n    let calls = 0;\n    return () => `call ${++calls}`;\n  },\n  len: () => (payload) => String(payload.length),\n};\nconst registry = new Map<number, { event: string; handler: Handler }>();\nlet nextId = 1;\nfor (const line of input.split(\"\\n\")) {\n  const [cmd = \"\", a = \"\", ...rest] = line.trim().split(/\\s+/);\n  if (cmd === \"on\") {\n    const name = rest[0] ?? \"\";\n    const make = Object.hasOwn(factories, name) ? factories[name] : undefined;\n    if (make === undefined) {\n      console.log(`unknown handler ${name}`);\n      continue;\n    }\n    registry.set(nextId, { event: a, handler: make() });\n    console.log(`#${nextId++}`);\n  } else if (cmd === \"off\") {\n    const id = Number(a.replace(\"#\", \"\"));\n    console.log(registry.delete(id) ? `removed #${id}` : `no #${id}`);\n  } else if (cmd === \"emit\") {\n    const listeners = [...registry.values()].filter((r) => r.event === a);\n    if (listeners.length === 0) console.log(`no listeners for ${a}`);\n    for (const { handler } of listeners) console.log(handler(rest.join(\" \")));\n  }\n}\n",
+            "tests": [
+              {
+                "input": "on greet echo\non greet shout\non greet count\nemit greet hi there\nemit greet again\noff 2\nemit greet bye\nemit other x",
+                "output": "#1\n#2\n#3\nhi there\nHI THERE!\ncall 1\nagain\nAGAIN!\ncall 2\nremoved #2\nbye\ncall 3\nno listeners for other"
+              },
+              {
+                "input": "on a len\non a nope\noff #1\noff 1\nemit a hello\non a count\non a count\nemit a x",
+                "output": "#1\nunknown handler nope\nremoved #1\nno #1\nno listeners for a\n#2\n#3\ncall 1\ncall 1"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w13-partial",
+            "title": "Fix the first argument",
+            "prompt": "Each input line is `<op> <a> [then <op> <a>]… | <values…>`, with ops `add`, `sub`, `mul`, `pow`, `max`. Each `<op> <a>` becomes a one-argument function by fixing the operator's *first* argument (`sub 10` is `b => 10 - b`); chain them left to right with `then`, and apply the chain to every value. Print the results space-separated, or `unknown op <op>`. Use `bindFirst(f: Binary, a: number): Unary` and `compose(f: Unary, g: Unary): Unary`.",
+            "hint": "`Math.pow` and `Math.max` already fit `Binary`.",
+            "hints": [
+              "`Math.pow` and `Math.max` already fit `Binary`.",
+              "Start the pipeline with the identity function and compose each stage onto it."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Binary = (a: number, b: number) => number;\ntype Unary = (b: number) => number;\nconst OPS: Record<string, Binary> = {\n  add: (a, b) => a + b,\n  sub: (a, b) => a - b,\n  mul: (a, b) => a * b,\n  pow: Math.pow,\n  max: Math.max,\n};\nfunction bindFirst(f: Binary, a: number): Unary {\n  return (b) => f(a, b);\n}\nfunction compose(f: Unary, g: Unary): Unary {\n  return (x) => g(f(x));\n}\nfor (const line of input.split(\"\\n\")) {\n  const [chain = \"\", values = \"\"] = line.split(\"|\");\n  let pipeline: Unary = (x) => x;\n  let error = \"\";\n  for (const stage of chain.trim().split(/\\s+then\\s+/)) {\n    const [name = \"\", a = \"0\"] = stage.trim().split(/\\s+/);\n    const op = Object.hasOwn(OPS, name) ? OPS[name] : undefined;\n    if (op === undefined) {\n      error = `unknown op ${name}`;\n      break;\n    }\n    pipeline = compose(pipeline, bindFirst(op, Number(a)));\n  }\n  console.log(error || values.trim().split(/\\s+/).map((v) => pipeline(Number(v))).join(\" \"));\n}\n",
+            "tests": [
+              {
+                "input": "add 5 | 1 2 3\nsub 10 | 1 2 3\nadd 1 then mul 2 | 0 1 2\npow 2 | 0 3 10",
+                "output": "6 7 8\n9 8 7\n2 4 6\n1 8 1024"
+              },
+              {
+                "input": "max 4 then sub 0 | 1 9\nmod 3 | 1",
+                "output": "-4 -9\nunknown op mod"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w13-handlers",
+            "title": "Handlers with different signatures",
+            "prompt": "Handlers have different parameter lists: `click(x, y)`, `key(key, shift)` and `scroll(dy)`, typed as one `Handlers` object type. Each input line is an event (`click 3 4`, `key a shift`, `key b`, `scroll -5`). Parse the arguments for that event, call the right handler with correctly typed arguments, and print its result: `click at 3,4`, `key A` (upper-case when `shift`) / `key b`, `scroll up 5` / `scroll down 2`. Bad arguments print `bad args for <event>`, unknown events `unknown event <e>`. Finish with the number of handled events per kind: `click=<a> key=<b> scroll=<c>`.",
+            "hint": "Validate the strings first, then call with the converted, correctly typed values — each handler's parameters are checked.",
+            "hints": [
+              "Validate the strings first, then call with the converted, correctly typed values — each handler's parameters are checked.",
+              "`keyof Handlers` gives the event names for the counts object."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Hard",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Handlers = {\n  click: (x: number, y: number) => string;\n  key: (key: string, shift: boolean) => string;\n  scroll: (dy: number) => string;\n};\nconst handlers: Handlers = {\n  click: (x, y) => `click at ${x},${y}`,\n  key: (key, shift) => `key ${shift ? key.toUpperCase() : key}`,\n  scroll: (dy) => (dy < 0 ? `scroll up ${-dy}` : `scroll down ${dy}`),\n};\nconst handled: Record<keyof Handlers, number> = { click: 0, key: 0, scroll: 0 };\nconst isInt = (s: string | undefined): s is string => s !== undefined && /^-?\\d+$/.test(s);\nfunction dispatch(name: string, args: string[]): string {\n  const [a, b] = args;\n  switch (name) {\n    case \"click\":\n      if (!isInt(a) || !isInt(b) || args.length !== 2) return \"bad args for click\";\n      handled.click++;\n      return handlers.click(Number(a), Number(b));\n    case \"key\":\n      if (a === undefined || a.length !== 1 || (b !== undefined && b !== \"shift\")) return \"bad args for key\";\n      handled.key++;\n      return handlers.key(a, b === \"shift\");\n    case \"scroll\":\n      if (!isInt(a) || args.length !== 1) return \"bad args for scroll\";\n      handled.scroll++;\n      return handlers.scroll(Number(a));\n    default:\n      return `unknown event ${name}`;\n  }\n}\nfor (const line of input.split(\"\\n\")) {\n  const [name = \"\", ...args] = line.trim().split(/\\s+/);\n  console.log(dispatch(name, args));\n}\nconsole.log(`click=${handled.click} key=${handled.key} scroll=${handled.scroll}`);\n",
+            "tests": [
+              {
+                "input": "click 3 4\nkey a shift\nkey b\nscroll -5\nscroll 2\nhover 1",
+                "output": "click at 3,4\nkey A\nkey b\nscroll up 5\nscroll down 2\nunknown event hover\nclick=1 key=2 scroll=2"
+              },
+              {
+                "input": "click 1\nkey ab\nkey x ctrl\nscroll 1.5\nclick 0 0",
+                "output": "bad args for click\nbad args for key\nbad args for key\nbad args for scroll\nclick at 0,0\nclick=1 key=0 scroll=0"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w13-middleware-type",
+            "title": "Type the middleware slot",
+            "prompt": "`auth` and `log` are middleware: they take a request and a `next` function that produces the response, and return the response. Write the `Middleware` function type so both fit — and so a middleware that forgets to return is rejected.",
+            "hint": "It is a function type: two parameters and a return type.",
+            "hints": [
+              "It is a function type: two parameters and a return type.",
+              "`next` itself is a function that takes nothing and returns a `string`."
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Medium",
+            "strictness": "strict",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<Parameters<Middleware>, [req: HttpRequest, next: () => string]>>;\ntype _2 = Expect<Equal<ReturnType<Middleware>, string>>;\nfunction _typeTests() {\n  // @ts-expect-error — a middleware must return the response\n  const forgetful: Middleware = (req, next) => {\n    next();\n  };\n}\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type HttpRequest = { path: string; user?: string };\ntype Middleware = ____;\n\nconst auth: Middleware = (req, next) => (req.user === undefined ? \"401\" : next());\nconst log: Middleware = (req, next) => req.path + \" -> \" + next();\nconsole.log(log({ path: \"/a\", user: \"ana\" }, () => auth({ path: \"/a\", user: \"ana\" }, () => \"200\")));\n",
+            "solution": "type HttpRequest = { path: string; user?: string };\ntype Middleware = (req: HttpRequest, next: () => string) => string;\n\nconst auth: Middleware = (req, next) => (req.user === undefined ? \"401\" : next());\nconst log: Middleware = (req, next) => req.path + \" -> \" + next();\nconsole.log(log({ path: \"/a\", user: \"ana\" }, () => auth({ path: \"/a\", user: \"ana\" }, () => \"200\")));\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w13-plugin-ctor",
+            "title": "A slot for a class",
+            "prompt": "`load` receives a plugin *class* and creates it with `new`. Write `PluginClass`, the type of anything that can be constructed from a config string into a `Plugin`.",
+            "hint": "A construct signature starts with `new`.",
+            "hints": [
+              "A construct signature starts with `new`.",
+              "`new (config: string) => Plugin`."
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Hard",
+            "strictness": "strict",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<InstanceType<PluginClass>, Plugin>>;\ntype _2 = Expect<Equal<ConstructorParameters<PluginClass>, [config: string]>>;\nfunction _typeTests() {\n  // @ts-expect-error — a plain function is not a class\n  load((config: string) => ({ name: config, run: (s: string) => s }), \"x\");\n}\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "interface Plugin {\n  name: string;\n  run(input: string): string;\n}\ntype PluginClass = ____;\n\nclass Upper implements Plugin {\n  name: string;\n  constructor(config: string) {\n    this.name = \"upper:\" + config;\n  }\n  run(input: string): string {\n    return input.toUpperCase();\n  }\n}\nfunction load(cls: PluginClass, config: string): Plugin {\n  return new cls(config);\n}\nconsole.log(load(Upper, \"x\").run(\"hi\"));\n",
+            "solution": "interface Plugin {\n  name: string;\n  run(input: string): string;\n}\ntype PluginClass = new (config: string) => Plugin;\n\nclass Upper implements Plugin {\n  name: string;\n  constructor(config: string) {\n    this.name = \"upper:\" + config;\n  }\n  run(input: string): string {\n    return input.toUpperCase();\n  }\n}\nfunction load(cls: PluginClass, config: string): Plugin {\n  return new cls(config);\n}\nconsole.log(load(Upper, \"x\").run(\"hi\"));\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          }
+        ],
+        "project_spec": {
+          "title": "config.ts — the config reader, from scratch",
+          "goal": "Rebuild the Week 8 config reader without looking at it, the way you would now: every input line is untrusted, every value is validated against a schema, every problem is reported with its line number, and the parsed result has an exact type. (Stretch: pin that type down with `Expect<Equal<…>>` tests.)",
+          "requirements": [
+            "The input is an INI-style file: `key = value` lines, `[section]` headers, blank lines and `#` comments. Line numbers count every line from 1.",
+            "Top-level keys: `name` (required, non-empty), `port` (integer 1-65535, default 3000), `debug` (`yes/no/true/false/on/off`, default `false`), `tags` (comma-separated, trimmed, empty items dropped; default none). A `[db]` section may set `host` (required when the section appears) and `port` (default 5432).",
+            "Report, sorted by line: `line <n>: expected key = value`, `line <n>: unknown section [<s>]` (its keys are then skipped), `line <n>: unknown key <k>`, `line <n>: duplicate key <k>`, `line <n>: port must be an integer from 1 to 65535`, `line <n>: debug must be yes or no`. Then the missing ones, unnumbered: `name is required`, `db.host is required`.",
+            "With any problem, print them all and then `invalid config (<k> problems)` (`problem` when there is one).",
+            "Otherwise print `name: <n>`, `port: <p>`, `debug: <true|false>`, `tags: <a, b>` or `tags: (none)`, and `db: <host>:<port>` or `db: (none)`."
+          ],
+          "stretch": [
+            "Add type tests: `Expect<Equal<Config[\"db\"], { host: string; port: number } | undefined>>`, and a `@ts-expect-error` line assigning a string to `port`.",
+            "Make the schema data (key → validator) so adding a key is one line."
+          ],
+          "rubric": [
+            "No `any` anywhere — not even one hidden in a cast",
+            "Every function has a typed signature; locals are left to inference",
+            "Bad input is handled on purpose, not by accident",
+            "Names say what things are, not how they are stored",
+            "I could explain every line to someone else"
+          ],
+          "language": "typescript",
+          "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n// Build the project here. Read all of stdin from `input` above, and print\n// exactly what the requirements ask for. Run the tests as you go.\n",
+          "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Entry = { value: string; line: number };\ntype Problem = { line: number; message: string };\nconst problems: Problem[] = [];\nconst top = new Map<string, Entry>();\nconst db = new Map<string, Entry>();\nlet section: \"top\" | \"db\" | \"skip\" = \"top\";\nlet sawDb = false;\nconst ALLOWED = { top: [\"name\", \"port\", \"debug\", \"tags\"], db: [\"host\", \"port\"] };\nfor (const [i, raw] of input.split(\"\\n\").entries()) {\n  const line = i + 1;\n  const text = raw.trim();\n  if (text === \"\" || text.startsWith(\"#\")) continue;\n  const header = /^\\[(.*)\\]$/.exec(text);\n  if (header !== null) {\n    const name = (header[1] ?? \"\").trim();\n    if (name === \"db\") {\n      section = \"db\";\n      sawDb = true;\n    } else {\n      section = \"skip\";\n      problems.push({ line, message: `unknown section [${name}]` });\n    }\n    continue;\n  }\n  const eq = text.indexOf(\"=\");\n  if (eq <= 0) {\n    problems.push({ line, message: \"expected key = value\" });\n    continue;\n  }\n  if (section === \"skip\") continue;\n  const key = text.slice(0, eq).trim();\n  const target = section === \"db\" ? db : top;\n  if (!ALLOWED[section].includes(key)) problems.push({ line, message: `unknown key ${key}` });\n  else if (target.has(key)) problems.push({ line, message: `duplicate key ${key}` });\n  else target.set(key, { value: text.slice(eq + 1).trim(), line });\n}\nfunction port(entry: Entry | undefined, fallback: number): number {\n  if (entry === undefined) return fallback;\n  const p = Number(entry.value);\n  if (/^\\d+$/.test(entry.value) && p >= 1 && p <= 65535) return p;\n  problems.push({ line: entry.line, message: \"port must be an integer from 1 to 65535\" });\n  return fallback;\n}\nfunction flag(entry: Entry | undefined): boolean {\n  if (entry === undefined) return false;\n  const v = entry.value.toLowerCase();\n  if ([\"yes\", \"true\", \"on\"].includes(v)) return true;\n  if (![\"no\", \"false\", \"off\"].includes(v)) problems.push({ line: entry.line, message: \"debug must be yes or no\" });\n  return false;\n}\ntype Config = { name: string; port: number; debug: boolean; tags: string[]; db?: { host: string; port: number } };\nconst config: Config = {\n  name: top.get(\"name\")?.value ?? \"\",\n  port: port(top.get(\"port\"), 3000),\n  debug: flag(top.get(\"debug\")),\n  tags: (top.get(\"tags\")?.value ?? \"\").split(\",\").map((t) => t.trim()).filter((t) => t !== \"\"),\n};\nconst dbPort = port(db.get(\"port\"), 5432);\nconst host = db.get(\"host\")?.value ?? \"\";\nif (sawDb && host !== \"\") config.db = { host, port: dbPort };\nproblems.sort((a, b) => a.line - b.line);\nconst missing: string[] = [];\nif (config.name === \"\") missing.push(\"name is required\");\nif (sawDb && host === \"\") missing.push(\"db.host is required\");\nconst all = [...problems.map((p) => `line ${p.line}: ${p.message}`), ...missing];\nif (all.length > 0) {\n  for (const p of all) console.log(p);\n  console.log(`invalid config (${all.length} ${all.length === 1 ? \"problem\" : \"problems\"})`);\n} else {\n  console.log(`name: ${config.name}`);\n  console.log(`port: ${config.port}`);\n  console.log(`debug: ${config.debug}`);\n  console.log(`tags: ${config.tags.join(\", \") || \"(none)\"}`);\n  console.log(`db: ${config.db === undefined ? \"(none)\" : `${config.db.host}:${config.db.port}`}`);\n}\n",
+          "tests": [
+            {
+              "input": "# app\nname = poodcode\nport = 8080\ndebug = YES\ntags = web, , cli\n[db]\nhost = localhost",
+              "output": "name: poodcode\nport: 8080\ndebug: true\ntags: web, cli\ndb: localhost:5432"
+            },
+            {
+              "input": "name = svc\n[db]\nhost = db.local\nport = 6543",
+              "output": "name: svc\nport: 3000\ndebug: false\ntags: (none)\ndb: db.local:6543"
+            },
+            {
+              "input": "port = 99999\ndebug = maybe\nname\n[cache]\nsize = 3\n[db]\nport = 1\nuser = x",
+              "output": "line 1: port must be an integer from 1 to 65535\nline 2: debug must be yes or no\nline 3: expected key = value\nline 4: unknown section [cache]\nline 8: unknown key user\nname is required\ndb.host is required\ninvalid config (7 problems)"
+            },
+            {
+              "input": "name = a\nname = b\nport = 80",
+              "output": "line 2: duplicate key name\ninvalid config (1 problem)"
+            },
+            {
+              "input": "name = tiny",
+              "output": "name: tiny\nport: 3000\ndebug: false\ntags: (none)\ndb: (none)"
+            }
+          ],
+          "strictness": ""
+        }
       },
       {
         "week": 14,
