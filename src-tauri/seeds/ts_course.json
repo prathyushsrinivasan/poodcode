@@ -67641,19 +67641,2049 @@
       "month": 7,
       "month_title": "DSA Interview Core",
       "theme": "Graphs: BFS & DFS",
-      "goal": "Traverse graphs and grids to answer reachability and shortest-path questions.",
-      "summary": "",
-      "authored": false,
-      "lessons": [],
-      "capstone": null,
-      "objectives": [],
-      "why": "",
-      "est_minutes": 40,
-      "glossary": [],
-      "cheatsheet": "",
-      "self_check": [],
-      "review": [],
-      "milestone": "",
+      "goal": "Week 20 said depth-first and breadth-first are one algorithm with a different container. On a graph they need one more thing — a visited set — and with it they answer reachability, shortest paths, components, cycles and order.",
+      "summary": "A **graph** is things (nodes) and connections between them (edges). A tree is a\ngraph with no cycles and one path between any two nodes; a linked list is a tree\nwith one child each. You have been doing graphs since week 20.\n\n## The one new idea\n\nWeek 20's traversal:\n\n```ts\nconst stack = [root];\nwhile (stack.length > 0) {\n  const t = stack.pop();\n  // visit t, push its children\n}\n```\n\nOn a tree, each node is reached exactly once, because each has one parent. On a\ngraph, a node can be reached **many ways** — and around a cycle, forever. So:\n\n```ts\nconst visited = new Set<number>();         // the one addition\n```\n\nThat is it. **Stack → depth-first. Queue → breadth-first. Plus a visited set.**\nEverything this week is those three lines, applied.\n\n## What each one gives you\n\n* **DFS** — goes deep first. Reachability, connected components, cycle detection,\n  topological order.\n* **BFS** — goes level by level. Because it reaches every node at distance 1 before\n  any at distance 2, the first time it reaches a node is by a **shortest path**\n  (counting edges). That property is the whole reason to choose it.\n\n## Grids are graphs\n\nEvery maze, island-counting and flood-fill question is a graph whose nodes are\ncells and whose edges are the four neighbours. Lesson 4 is nothing but that\nobservation, and it covers a large share of real interview questions.\n\n⏱️ Budget about **eight hours**.\n",
+      "authored": true,
+      "lessons": [
+        {
+          "key": "w27-model",
+          "title": "Storing a graph",
+          "what": "An adjacency list — and the type that TypeScript guesses wrong.",
+          "lesson": "The input to almost every graph question is an **edge list**: the number of nodes,\nthen one `u v` pair per edge. The first job is always to turn it into an\n**adjacency list** — for each node, its neighbours:\n\n```\n4          0: 1 2\n0 1   →    1: 0 3\n0 2        2: 0\n1 3        3: 1\n```\n\n```ts\nconst adj: number[][] = Array.from({ length: n }, (): number[] => []);\nfor (const [u, v] of edges) {\n  adj[u]?.push(v);\n  adj[v]?.push(u);         // undirected: an edge goes both ways\n}\n```\n\n**Directed** graphs push only `adj[u].push(v)`. Forgetting the second push on an\nundirected graph is the commonest graph bug there is: half the edges are one-way,\nand traversals mysteriously miss nodes.\n\n## `never[][]`\n\nLeave the annotation off:\n\n```ts\nconst adj = Array.from({ length: n }, () => []);\nadj[u]?.push(v);\n```\n\n```\nTS2345: Argument of type 'number' is not assignable to parameter of type 'never'.\n```\n\n`[]` on its own is an array of **nothing** — `never[]` — because there is nothing in\nit to infer from, and it is never widened later. Annotate the variable\n(`const adj: number[][]`) or, better, the callback (`(): number[] => []`), and it\nis typed from the start.\n\n## Why a list and not a matrix\n\nAn **adjacency matrix** is an n × n grid of booleans. It answers \"is there an edge\nu-v?\" in O(1), but it costs n² cells whatever the edges: a thousand nodes with three\nthousand edges is a million cells, against six thousand list entries. Real graphs\nare sparse, so the list is the default.\n\n## Degree\n\nA node's **degree** is `adj[u].length`. In an undirected graph every edge adds 1 to\ntwo degrees, so **the degrees sum to twice the edge count** — a quick check that\nyou stored every edge both ways.\n\n> ⚠️ **Common mistakes:** one-way edges in an undirected graph; `never[][]`; and\n> a matrix for a large sparse graph.\n",
+          "warmup": [
+            {
+              "question": "An undirected edge is stored…",
+              "options": [
+                "once",
+                "in both nodes' lists",
+                "in a matrix",
+                "as a string"
+              ],
+              "answer": 1,
+              "explanation": "adj[u] gets v, adj[v] gets u."
+            },
+            {
+              "question": "`Array.from({ length: n }, () => [])` gives…",
+              "options": [
+                "number[][]",
+                "never[][]",
+                "any[][]",
+                "[][]"
+              ],
+              "answer": 1,
+              "explanation": "An empty literal infers never[]."
+            },
+            {
+              "question": "The degrees of an undirected graph sum to…",
+              "options": [
+                "the edge count",
+                "twice the edge count",
+                "n",
+                "n²"
+              ],
+              "answer": 1,
+              "explanation": "Each edge touches two nodes."
+            },
+            {
+              "question": "An adjacency matrix costs…",
+              "options": [
+                "O(edges)",
+                "O(n²) whatever the edges",
+                "O(n)",
+                "O(1)"
+              ],
+              "answer": 1,
+              "explanation": "A lot, for a sparse graph."
+            }
+          ],
+          "exercises": [
+            {
+              "id": "tscourse-w27-gm-1",
+              "title": "Both directions",
+              "prompt": "Store each undirected edge in both nodes' neighbour lists.",
+              "hint": "An undirected edge can be walked from either end.",
+              "hints": [
+                "An undirected edge can be walked from either end.",
+                "adj[u]?.push(v); and adj[v]?.push(u);"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst lines = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nconst n = Number(lines[0] ?? \"0\");\nconst adj: number[][] = Array.from({ length: n }, (): number[] => []);\nfor (const l of lines.slice(1)) {\n  const [u, v] = l.trim().split(/\\s+/).map(Number);\n  if (u === undefined || v === undefined) {\n    continue;\n  }\n____\n}\nadj.forEach((ns, u) => console.log(`${u}: ${ns.join(\" \")}`));\n",
+              "solution": "import * as fs from \"fs\";\nconst lines = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nconst n = Number(lines[0] ?? \"0\");\nconst adj: number[][] = Array.from({ length: n }, (): number[] => []);\nfor (const l of lines.slice(1)) {\n  const [u, v] = l.trim().split(/\\s+/).map(Number);\n  if (u === undefined || v === undefined) {\n    continue;\n  }\n  adj[u]?.push(v);\n  adj[v]?.push(u);\n}\nadj.forEach((ns, u) => console.log(`${u}: ${ns.join(\" \")}`));\n",
+              "tests": [
+                {
+                  "input": "4\n0 1\n0 2\n1 3",
+                  "output": "0: 1 2\n1: 0 3\n2: 0\n3: 1"
+                },
+                {
+                  "input": "2\n0 1",
+                  "output": "0: 1\n1: 0"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w27-gm-p1",
+              "title": "What an empty row is",
+              "prompt": "What type does TypeScript already infer for `adj`? Annotate `check` with exactly that type — not merely one that fits. There is nothing in `[]` to infer an element type from.",
+              "hint": "An array literal with no elements has no element type to report.",
+              "hints": [
+                "An array literal with no elements has no element type to report.",
+                "The type that has no values at all is `never`.",
+                "Write never[][]."
+              ],
+              "language": "typescript",
+              "kind": "predict",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<typeof check, typeof adj>>;\n",
+              "judge_mode": "types",
+              "forbid": [
+                "typeof"
+              ],
+              "starter": "const n = 3;\nconst adj = Array.from({ length: n }, () => []);\nconst check: ____ = adj;\n",
+              "solution": "const n = 3;\nconst adj = Array.from({ length: n }, () => []);\nconst check: never[][] = adj;\n",
+              "tests": [],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w27-gm-d1",
+              "title": "The list that could hold nothing",
+              "prompt": "The compiler rejects this program:\n\n    TS2345: Argument of type 'number' is not assignable to parameter of type 'never'.\n\nFix the cause.",
+              "hint": "What element type did `[]` give each row?",
+              "hints": [
+                "What element type did `[]` give each row?",
+                "Tell the callback what it returns.",
+                "Write (): number[] => []."
+              ],
+              "language": "typescript",
+              "kind": "diagnose",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst lines = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nconst n = Number(lines[0] ?? \"0\");\nconst adj = Array.from({ length: n }, () => []);\nfor (const l of lines.slice(1)) {\n  const [u, v] = l.trim().split(/\\s+/).map(Number);\n  if (u === undefined || v === undefined) {\n    continue;\n  }\n  adj[u]?.push(v);\n}\nconsole.log(adj.map((ns) => ns.length).join(\" \"));\n",
+              "solution": "import * as fs from \"fs\";\nconst lines = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nconst n = Number(lines[0] ?? \"0\");\nconst adj = Array.from({ length: n }, (): number[] => []);\nfor (const l of lines.slice(1)) {\n  const [u, v] = l.trim().split(/\\s+/).map(Number);\n  if (u === undefined || v === undefined) {\n    continue;\n  }\n  adj[u]?.push(v);\n}\nconsole.log(adj.map((ns) => ns.length).join(\" \"));\n",
+              "tests": [
+                {
+                  "input": "3\n0 1\n0 2",
+                  "output": "2 0 0"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w27-gm-2",
+              "title": "In and out",
+              "prompt": "In a directed graph, count the edges leaving and entering each node.",
+              "hint": "Every edge u → v adds one to v's in-degree.",
+              "hints": [
+                "Every edge u → v adds one to v's in-degree.",
+                "Write into[v] = (into[v] ?? 0) + 1;"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst lines = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nconst n = Number(lines[0] ?? \"0\");\nconst adj: number[][] = Array.from({ length: n }, (): number[] => []);\nfor (const l of lines.slice(1)) {\n  const [u, v] = l.trim().split(/\\s+/).map(Number);\n  if (u === undefined || v === undefined) {\n    continue;\n  }\n  adj[u]?.push(v);\n}\nconst into = new Array<number>(n).fill(0);\nfor (const ns of adj) {\n  for (const v of ns) {\n____\n  }\n}\nconsole.log(`out ${adj.map((ns) => ns.length).join(\" \")}`);\nconsole.log(`in ${into.join(\" \")}`);\n",
+              "solution": "import * as fs from \"fs\";\nconst lines = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nconst n = Number(lines[0] ?? \"0\");\nconst adj: number[][] = Array.from({ length: n }, (): number[] => []);\nfor (const l of lines.slice(1)) {\n  const [u, v] = l.trim().split(/\\s+/).map(Number);\n  if (u === undefined || v === undefined) {\n    continue;\n  }\n  adj[u]?.push(v);\n}\nconst into = new Array<number>(n).fill(0);\nfor (const ns of adj) {\n  for (const v of ns) {\n    into[v] = (into[v] ?? 0) + 1;\n  }\n}\nconsole.log(`out ${adj.map((ns) => ns.length).join(\" \")}`);\nconsole.log(`in ${into.join(\" \")}`);\n",
+              "tests": [
+                {
+                  "input": "3\n0 1\n0 2\n1 2",
+                  "output": "out 2 1 0\nin 0 1 2"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w27-gm-3",
+              "title": "The handshake check",
+              "prompt": "Degrees of an undirected graph sum to twice the edges — confirm it.",
+              "hint": "A node's degree is the length of its neighbour list.",
+              "hints": [
+                "A node's degree is the length of its neighbour list.",
+                "Write degreeSum = degreeSum + ns.length;"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst lines = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nconst n = Number(lines[0] ?? \"0\");\nconst adj: number[][] = Array.from({ length: n }, (): number[] => []);\nfor (const l of lines.slice(1)) {\n  const [u, v] = l.trim().split(/\\s+/).map(Number);\n  if (u === undefined || v === undefined) {\n    continue;\n  }\n  adj[u]?.push(v);\n  adj[v]?.push(u);\n}\nconst edges = lines.length - 1;\nlet degreeSum = 0;\nfor (const ns of adj) {\n____\n}\nconsole.log(`edges=${edges} degreeSum=${degreeSum} ok=${degreeSum === 2 * edges}`);\n",
+              "solution": "import * as fs from \"fs\";\nconst lines = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nconst n = Number(lines[0] ?? \"0\");\nconst adj: number[][] = Array.from({ length: n }, (): number[] => []);\nfor (const l of lines.slice(1)) {\n  const [u, v] = l.trim().split(/\\s+/).map(Number);\n  if (u === undefined || v === undefined) {\n    continue;\n  }\n  adj[u]?.push(v);\n  adj[v]?.push(u);\n}\nconst edges = lines.length - 1;\nlet degreeSum = 0;\nfor (const ns of adj) {\n  degreeSum = degreeSum + ns.length;\n}\nconsole.log(`edges=${edges} degreeSum=${degreeSum} ok=${degreeSum === 2 * edges}`);\n",
+              "tests": [
+                {
+                  "input": "4\n0 1\n0 2\n1 3",
+                  "output": "edges=3 degreeSum=6 ok=true"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w27-gm-4",
+              "title": "List or matrix",
+              "prompt": "Compare the storage each would need for a sparse graph.",
+              "hint": "Each undirected edge appears in two lists.",
+              "hints": [
+                "Each undirected edge appears in two lists.",
+                "Write const listEntries = 2 * edges;"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "const n = 1000;\nconst edges = 3000;\nconst matrixCells = n * n;\n____\nconsole.log(`matrix=${matrixCells} list=${listEntries}`);\n",
+              "solution": "const n = 1000;\nconst edges = 3000;\nconst matrixCells = n * n;\nconst listEntries = 2 * edges;\nconsole.log(`matrix=${matrixCells} list=${listEntries}`);\n",
+              "tests": [
+                {
+                  "input": "",
+                  "output": "matrix=1000000 list=6000"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w27-gm-fix1",
+              "title": "Fix the edges that only went one way",
+              "prompt": "The graph is undirected, but nodes 2 and 3 print empty neighbour lists and node 1 has lost its link back to 0 — each edge was stored only from its first node, so half of every connection is missing.",
+              "hint": "An undirected edge must be walkable from both ends.",
+              "hints": [
+                "An undirected edge must be walkable from both ends.",
+                "Which list never hears about the edge?",
+                "Add adj[v]?.push(u);"
+              ],
+              "language": "typescript",
+              "kind": "fix",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst lines = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nconst n = Number(lines[0] ?? \"0\");\nconst adj: number[][] = Array.from({ length: n }, (): number[] => []);\nfor (const l of lines.slice(1)) {\n  const [u, v] = l.trim().split(/\\s+/).map(Number);\n  if (u === undefined || v === undefined) {\n    continue;\n  }\n  adj[u]?.push(v);\n}\nadj.forEach((ns, u) => console.log(`${u}: ${ns.join(\" \")}`));\n",
+              "solution": "import * as fs from \"fs\";\nconst lines = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nconst n = Number(lines[0] ?? \"0\");\nconst adj: number[][] = Array.from({ length: n }, (): number[] => []);\nfor (const l of lines.slice(1)) {\n  const [u, v] = l.trim().split(/\\s+/).map(Number);\n  if (u === undefined || v === undefined) {\n    continue;\n  }\n  adj[u]?.push(v);\n  adj[v]?.push(u);\n}\nadj.forEach((ns, u) => console.log(`${u}: ${ns.join(\" \")}`));\n",
+              "tests": [
+                {
+                  "input": "4\n0 1\n0 2\n1 3",
+                  "output": "0: 1 2\n1: 0 3\n2: 0\n3: 1"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            }
+          ],
+          "quiz": [
+            {
+              "question": "Why is the annotation better on the callback than the variable?",
+              "options": [
+                "it is shorter",
+                "the value is typed where it is created, so any use of it is right",
+                "it is required",
+                "it is faster"
+              ],
+              "answer": 1,
+              "explanation": "Either compiles; the callback is the source."
+            },
+            {
+              "question": "A tree with n nodes has how many edges?",
+              "options": [
+                "n",
+                "n - 1",
+                "2n",
+                "n²"
+              ],
+              "answer": 1,
+              "explanation": "One per node except the root."
+            }
+          ]
+        },
+        {
+          "key": "w27-dfs",
+          "title": "Depth-first, plus a visited set",
+          "what": "Week 20's loop, one Set, and the things it can answer.",
+          "lesson": "Recursive DFS from a start node:\n\n```ts\nconst visited = new Array<boolean>(n).fill(false);\nfunction dfs(u: number): void {\n  if (visited[u]) { return; }\n  visited[u] = true;\n  order.push(u);\n  for (const v of adj[u] ?? []) { dfs(v); }\n}\n```\n\nWithout the `visited` check, an undirected edge is a cycle of length two: `dfs(0)`\ncalls `dfs(1)`, which calls `dfs(0)`, which calls `dfs(1)` … until week 25's\n`RangeError`. Every graph traversal needs it, and \"mark it before you explore from\nit\" is the rule.\n\n## Connected components\n\nStart a DFS from **every node not yet visited**. Each fresh start discovers a whole\ncomponent, so the number of starts is the number of components:\n\n```ts\nlet components = 0;\nfor (let u = 0; u < n; u = u + 1) {\n  if (!visited[u]) { components = components + 1; dfs(u); }\n}\n```\n\nCount the nodes each start marks, and you have component sizes too.\n\n## Iterative, when depth matters\n\nRecursive DFS on a long path is a long recursion. A grid of 300 × 300 open cells can\nbe a 90,000-deep path — week 25's stack overflow. The iterative version is week\n20's loop with a Set, and it has no depth limit:\n\n```ts\nconst seen = new Set<number>([start]);\nconst stack = [start];\nwhile (stack.length > 0) {\n  const u = stack.pop();\n  if (u === undefined) { continue; }\n  for (const v of adj[u] ?? []) {\n    if (!seen.has(v)) { seen.add(v); stack.push(v); }\n  }\n}\n```\n\nIt visits the same nodes, though not necessarily in the same order as the recursive\nversion — \"depth-first\" describes the shape, not one exact order.\n\n> ⚠️ **Common mistakes:** no visited set; marking after exploring instead of\n> before; and recursive DFS on input that can be a long chain.\n",
+          "warmup": [
+            {
+              "question": "Recursive DFS on an undirected graph without a visited check…",
+              "options": [
+                "works",
+                "bounces along an edge until the stack overflows",
+                "is BFS",
+                "skips nodes"
+              ],
+              "answer": 1,
+              "explanation": "Every edge is a two-node cycle."
+            },
+            {
+              "question": "The number of connected components equals…",
+              "options": [
+                "n",
+                "the number of fresh DFS starts from unvisited nodes",
+                "the edge count",
+                "1"
+              ],
+              "answer": 1,
+              "explanation": "Each start finds one whole component."
+            },
+            {
+              "question": "Iterative DFS exists because…",
+              "options": [
+                "it is faster",
+                "recursion depth can exceed the stack on long paths",
+                "it is BFS",
+                "of types"
+              ],
+              "answer": 1,
+              "explanation": "Week 25."
+            },
+            {
+              "question": "Two correct DFS implementations always visit nodes in the same order.",
+              "options": [
+                "true",
+                "false — only the set visited is guaranteed",
+                "only on trees",
+                "only recursively"
+              ],
+              "answer": 1,
+              "explanation": "Order depends on details."
+            }
+          ],
+          "exercises": [
+            {
+              "id": "tscourse-w27-df-1",
+              "title": "Never twice",
+              "prompt": "Return at once if the node was already visited.",
+              "hint": "A node reached a second time has nothing new to offer.",
+              "hints": [
+                "A node reached a second time has nothing new to offer.",
+                "if (visited[u]) { return; }"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst lines = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nconst n = Number(lines[0] ?? \"0\");\nconst adj: number[][] = Array.from({ length: n }, (): number[] => []);\nfor (const l of lines.slice(1)) {\n  const [u, v] = l.trim().split(/\\s+/).map(Number);\n  if (u === undefined || v === undefined) {\n    continue;\n  }\n  adj[u]?.push(v);\n  adj[v]?.push(u);\n}\nconst visited = new Array<boolean>(n).fill(false);\nconst order: number[] = [];\nfunction dfs(u: number): void {\n____\n  visited[u] = true;\n  order.push(u);\n  for (const v of adj[u] ?? []) {\n    dfs(v);\n  }\n}\ndfs(0);\nconsole.log(order.join(\" \"));\n",
+              "solution": "import * as fs from \"fs\";\nconst lines = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nconst n = Number(lines[0] ?? \"0\");\nconst adj: number[][] = Array.from({ length: n }, (): number[] => []);\nfor (const l of lines.slice(1)) {\n  const [u, v] = l.trim().split(/\\s+/).map(Number);\n  if (u === undefined || v === undefined) {\n    continue;\n  }\n  adj[u]?.push(v);\n  adj[v]?.push(u);\n}\nconst visited = new Array<boolean>(n).fill(false);\nconst order: number[] = [];\nfunction dfs(u: number): void {\n  if (visited[u]) {\n    return;\n  }\n  visited[u] = true;\n  order.push(u);\n  for (const v of adj[u] ?? []) {\n    dfs(v);\n  }\n}\ndfs(0);\nconsole.log(order.join(\" \"));\n",
+              "tests": [
+                {
+                  "input": "5\n0 1\n0 2\n1 3\n2 3\n3 4",
+                  "output": "0 1 3 2 4"
+                },
+                {
+                  "input": "3\n0 1\n1 2\n2 0",
+                  "output": "0 1 2"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w27-df-2",
+              "title": "Count the components",
+              "prompt": "Start a traversal from every node not yet reached; each start is a new component.",
+              "hint": "A node nobody has reached yet is the first of a new component.",
+              "hints": [
+                "A node nobody has reached yet is the first of a new component.",
+                "Count it, then traverse from it so the rest of its component is marked."
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst lines = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nconst n = Number(lines[0] ?? \"0\");\nconst adj: number[][] = Array.from({ length: n }, (): number[] => []);\nfor (const l of lines.slice(1)) {\n  const [u, v] = l.trim().split(/\\s+/).map(Number);\n  if (u === undefined || v === undefined) {\n    continue;\n  }\n  adj[u]?.push(v);\n  adj[v]?.push(u);\n}\nconst visited = new Array<boolean>(n).fill(false);\nfunction dfs(u: number): void {\n  if (visited[u]) {\n    return;\n  }\n  visited[u] = true;\n  for (const v of adj[u] ?? []) {\n    dfs(v);\n  }\n}\nlet components = 0;\nfor (let u = 0; u < n; u = u + 1) {\n____\n}\nconsole.log(components);\n",
+              "solution": "import * as fs from \"fs\";\nconst lines = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nconst n = Number(lines[0] ?? \"0\");\nconst adj: number[][] = Array.from({ length: n }, (): number[] => []);\nfor (const l of lines.slice(1)) {\n  const [u, v] = l.trim().split(/\\s+/).map(Number);\n  if (u === undefined || v === undefined) {\n    continue;\n  }\n  adj[u]?.push(v);\n  adj[v]?.push(u);\n}\nconst visited = new Array<boolean>(n).fill(false);\nfunction dfs(u: number): void {\n  if (visited[u]) {\n    return;\n  }\n  visited[u] = true;\n  for (const v of adj[u] ?? []) {\n    dfs(v);\n  }\n}\nlet components = 0;\nfor (let u = 0; u < n; u = u + 1) {\n  if (!visited[u]) {\n    components = components + 1;\n    dfs(u);\n  }\n}\nconsole.log(components);\n",
+              "tests": [
+                {
+                  "input": "5\n0 1\n2 3",
+                  "output": "3"
+                },
+                {
+                  "input": "4\n0 1\n1 2\n2 3",
+                  "output": "1"
+                },
+                {
+                  "input": "3",
+                  "output": "3"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w27-df-3",
+              "title": "Iteratively",
+              "prompt": "DFS with a stack and a Set: mark a node when you first push it.",
+              "hint": "Only an unseen neighbour is worth pushing — and it is seen from the moment it is pushed.",
+              "hints": [
+                "Only an unseen neighbour is worth pushing — and it is seen from the moment it is pushed.",
+                "if (!seen.has(v)) { seen.add(v); stack.push(v); }"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst lines = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nconst n = Number(lines[0] ?? \"0\");\nconst adj: number[][] = Array.from({ length: n }, (): number[] => []);\nfor (const l of lines.slice(1)) {\n  const [u, v] = l.trim().split(/\\s+/).map(Number);\n  if (u === undefined || v === undefined) {\n    continue;\n  }\n  adj[u]?.push(v);\n  adj[v]?.push(u);\n}\nconst seen = new Set<number>([0]);\nconst stack = [0];\nwhile (stack.length > 0) {\n  const u = stack.pop();\n  if (u === undefined) {\n    continue;\n  }\n  for (const v of adj[u] ?? []) {\n____\n  }\n}\nconsole.log(`reached ${seen.size} of ${n}`);\n",
+              "solution": "import * as fs from \"fs\";\nconst lines = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nconst n = Number(lines[0] ?? \"0\");\nconst adj: number[][] = Array.from({ length: n }, (): number[] => []);\nfor (const l of lines.slice(1)) {\n  const [u, v] = l.trim().split(/\\s+/).map(Number);\n  if (u === undefined || v === undefined) {\n    continue;\n  }\n  adj[u]?.push(v);\n  adj[v]?.push(u);\n}\nconst seen = new Set<number>([0]);\nconst stack = [0];\nwhile (stack.length > 0) {\n  const u = stack.pop();\n  if (u === undefined) {\n    continue;\n  }\n  for (const v of adj[u] ?? []) {\n    if (!seen.has(v)) {\n      seen.add(v);\n      stack.push(v);\n    }\n  }\n}\nconsole.log(`reached ${seen.size} of ${n}`);\n",
+              "tests": [
+                {
+                  "input": "5\n0 1\n1 2\n3 4",
+                  "output": "reached 3 of 5"
+                },
+                {
+                  "input": "2\n0 1",
+                  "output": "reached 2 of 2"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w27-df-4",
+              "title": "Component sizes",
+              "prompt": "Report every component's size, largest first.",
+              "hint": "A component's size is 1 for this node plus whatever each neighbour's traversal adds.",
+              "hints": [
+                "A component's size is 1 for this node plus whatever each neighbour's traversal adds.",
+                "Already-visited neighbours contribute 0.",
+                "Write total = total + size(v);"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst lines = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nconst n = Number(lines[0] ?? \"0\");\nconst adj: number[][] = Array.from({ length: n }, (): number[] => []);\nfor (const l of lines.slice(1)) {\n  const [u, v] = l.trim().split(/\\s+/).map(Number);\n  if (u === undefined || v === undefined) {\n    continue;\n  }\n  adj[u]?.push(v);\n  adj[v]?.push(u);\n}\nconst visited = new Array<boolean>(n).fill(false);\nfunction size(u: number): number {\n  if (visited[u]) {\n    return 0;\n  }\n  visited[u] = true;\n  let total = 1;\n  for (const v of adj[u] ?? []) {\n____\n  }\n  return total;\n}\nconst sizes: number[] = [];\nfor (let u = 0; u < n; u = u + 1) {\n  if (!visited[u]) {\n    sizes.push(size(u));\n  }\n}\nconsole.log(sizes.sort((a, b) => b - a).join(\" \"));\n",
+              "solution": "import * as fs from \"fs\";\nconst lines = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nconst n = Number(lines[0] ?? \"0\");\nconst adj: number[][] = Array.from({ length: n }, (): number[] => []);\nfor (const l of lines.slice(1)) {\n  const [u, v] = l.trim().split(/\\s+/).map(Number);\n  if (u === undefined || v === undefined) {\n    continue;\n  }\n  adj[u]?.push(v);\n  adj[v]?.push(u);\n}\nconst visited = new Array<boolean>(n).fill(false);\nfunction size(u: number): number {\n  if (visited[u]) {\n    return 0;\n  }\n  visited[u] = true;\n  let total = 1;\n  for (const v of adj[u] ?? []) {\n    total = total + size(v);\n  }\n  return total;\n}\nconst sizes: number[] = [];\nfor (let u = 0; u < n; u = u + 1) {\n  if (!visited[u]) {\n    sizes.push(size(u));\n  }\n}\nconsole.log(sizes.sort((a, b) => b - a).join(\" \"));\n",
+              "tests": [
+                {
+                  "input": "6\n0 1\n1 2\n3 4",
+                  "output": "3 2 1"
+                },
+                {
+                  "input": "2",
+                  "output": "1 1"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w27-df-5",
+              "title": "Can you get there?",
+              "prompt": "Report whether the last node is reachable from node 0.",
+              "hint": "Everything reachable ends up in `seen`.",
+              "hints": [
+                "Everything reachable ends up in `seen`.",
+                "Write console.log(seen.has(n - 1) ? \"yes\" : \"no\");"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst lines = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nconst n = Number(lines[0] ?? \"0\");\nconst adj: number[][] = Array.from({ length: n }, (): number[] => []);\nfor (const l of lines.slice(1)) {\n  const [u, v] = l.trim().split(/\\s+/).map(Number);\n  if (u === undefined || v === undefined) {\n    continue;\n  }\n  adj[u]?.push(v);\n  adj[v]?.push(u);\n}\nconst seen = new Set<number>([0]);\nconst stack = [0];\nwhile (stack.length > 0) {\n  const u = stack.pop();\n  if (u === undefined) {\n    continue;\n  }\n  for (const v of adj[u] ?? []) {\n    if (!seen.has(v)) {\n      seen.add(v);\n      stack.push(v);\n    }\n  }\n}\n____\n",
+              "solution": "import * as fs from \"fs\";\nconst lines = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nconst n = Number(lines[0] ?? \"0\");\nconst adj: number[][] = Array.from({ length: n }, (): number[] => []);\nfor (const l of lines.slice(1)) {\n  const [u, v] = l.trim().split(/\\s+/).map(Number);\n  if (u === undefined || v === undefined) {\n    continue;\n  }\n  adj[u]?.push(v);\n  adj[v]?.push(u);\n}\nconst seen = new Set<number>([0]);\nconst stack = [0];\nwhile (stack.length > 0) {\n  const u = stack.pop();\n  if (u === undefined) {\n    continue;\n  }\n  for (const v of adj[u] ?? []) {\n    if (!seen.has(v)) {\n      seen.add(v);\n      stack.push(v);\n    }\n  }\n}\nconsole.log(seen.has(n - 1) ? \"yes\" : \"no\");\n",
+              "tests": [
+                {
+                  "input": "4\n0 1\n1 3",
+                  "output": "yes"
+                },
+                {
+                  "input": "4\n0 1\n2 3",
+                  "output": "no"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w27-df-fix1",
+              "title": "Fix the traversal that never stopped",
+              "prompt": "This dies with `RangeError: Maximum call stack size exceeded`. There is no visited check, so the undirected edge between 0 and 1 is walked 0 → 1 → 0 → 1 … for ever.",
+              "hint": "On a tree this would work. What does an undirected graph have that a tree walk never met?",
+              "hints": [
+                "On a tree this would work. What does an undirected graph have that a tree walk never met?",
+                "Every edge leads back the way you came.",
+                "Keep a visited array; return at once for a node already in it."
+              ],
+              "language": "typescript",
+              "kind": "fix",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst lines = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nconst n = Number(lines[0] ?? \"0\");\nconst adj: number[][] = Array.from({ length: n }, (): number[] => []);\nfor (const l of lines.slice(1)) {\n  const [u, v] = l.trim().split(/\\s+/).map(Number);\n  if (u === undefined || v === undefined) {\n    continue;\n  }\n  adj[u]?.push(v);\n  adj[v]?.push(u);\n}\nconst order: number[] = [];\nfunction dfs(u: number): void {\n  order.push(u);\n  for (const v of adj[u] ?? []) {\n    dfs(v);\n  }\n}\ndfs(0);\nconsole.log(order.join(\" \"));\n",
+              "solution": "import * as fs from \"fs\";\nconst lines = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nconst n = Number(lines[0] ?? \"0\");\nconst adj: number[][] = Array.from({ length: n }, (): number[] => []);\nfor (const l of lines.slice(1)) {\n  const [u, v] = l.trim().split(/\\s+/).map(Number);\n  if (u === undefined || v === undefined) {\n    continue;\n  }\n  adj[u]?.push(v);\n  adj[v]?.push(u);\n}\nconst visited = new Array<boolean>(n).fill(false);\nconst order: number[] = [];\nfunction dfs(u: number): void {\n  if (visited[u]) {\n    return;\n  }\n  visited[u] = true;\n  order.push(u);\n  for (const v of adj[u] ?? []) {\n    dfs(v);\n  }\n}\ndfs(0);\nconsole.log(order.join(\" \"));\n",
+              "tests": [
+                {
+                  "input": "3\n0 1\n1 2",
+                  "output": "0 1 2"
+                },
+                {
+                  "input": "2\n0 1",
+                  "output": "0 1"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            }
+          ],
+          "quiz": [
+            {
+              "question": "`seen.add(v)` happens when v is pushed, not when popped, because…",
+              "options": [
+                "style",
+                "otherwise v can be pushed many times before it is popped once",
+                "of types",
+                "it is DFS"
+              ],
+              "answer": 1,
+              "explanation": "Mark on discovery."
+            },
+            {
+              "question": "Why do both DFS versions reach the same SET but maybe not the same ORDER?",
+              "options": [
+                "a bug",
+                "the recursion and the stack take neighbours in different orders",
+                "randomness",
+                "the Set"
+              ],
+              "answer": 1,
+              "explanation": "Both are depth-first."
+            }
+          ]
+        },
+        {
+          "key": "w27-bfs",
+          "title": "Breadth-first, and shortest paths",
+          "what": "A queue instead of a stack — and the first arrival is the shortest.",
+          "lesson": "Swap the stack for week 18's head-index queue and the traversal goes **level by\nlevel**: everything one edge away, then everything two away, and so on.\n\n```ts\nconst dist = new Array<number>(n).fill(-1);      // -1: not reached\ndist[start] = 0;\nconst queue = [start];\nfor (let head = 0; head < queue.length; head = head + 1) {\n  const u = queue[head] ?? 0;\n  for (const v of adj[u] ?? []) {\n    if (dist[v] === -1) {\n      dist[v] = (dist[u] ?? 0) + 1;\n      queue.push(v);\n    }\n  }\n}\n```\n\n`dist` doubles as the visited set: -1 means \"not reached\".\n\n## Why it finds shortest paths\n\nEvery node at distance d is dequeued before any node at distance d + 1 is even\n**discovered**, so the first time BFS reaches a node, it is by a route with the\nfewest possible edges. DFS has no such property: it will happily reach a neighbour\nof the start by a ten-edge detour first. **For \"fewest steps\", BFS is the answer**,\nand this is the reason.\n\n## The path, not just its length\n\nRecord where each node was reached **from**:\n\n```ts\nparent[v] = u;\n```\n\nThen walk back from the target — `t, parent[t], parent[parent[t]] …` — until the\nstart, and reverse. Week 26's reconstruction, on a graph.\n\n## Mark when you enqueue\n\nThe check `dist[v] === -1` happens **before** pushing, and `dist[v]` is set\nimmediately. Mark on *dequeue* instead and a node can be pushed once by every\nneighbour that sees it before it is processed — the answers stay right, but the\nqueue fills with duplicates and the work multiplies. The month's counting habit is\nhow you see it: count what enters the queue.\n\n## A queue, never `shift`\n\nWeek 18 counted what `shift()` costs: every call moves the whole array. A BFS over\na hundred thousand nodes with `shift` is quadratic. The head index is not an\noptimisation, it is the correct data structure.\n\n> ⚠️ **Common mistakes:** marking on dequeue; `shift` as a queue; and using DFS\n> when the question says \"fewest\" or \"shortest\".\n",
+          "warmup": [
+            {
+              "question": "BFS uses…",
+              "options": [
+                "a stack",
+                "a queue",
+                "recursion",
+                "a heap"
+              ],
+              "answer": 1,
+              "explanation": "Level by level."
+            },
+            {
+              "question": "The first time BFS reaches a node, it is by…",
+              "options": [
+                "some path",
+                "a path with the fewest edges",
+                "the longest path",
+                "a random path"
+              ],
+              "answer": 1,
+              "explanation": "Distance d before d + 1."
+            },
+            {
+              "question": "A path is rebuilt from…",
+              "options": [
+                "the queue",
+                "parent links, walked back from the target",
+                "the distances",
+                "the stack"
+              ],
+              "answer": 1,
+              "explanation": "Then reversed."
+            },
+            {
+              "question": "Marking visited on DEQUEUE…",
+              "options": [
+                "is required",
+                "lets a node enter the queue several times",
+                "is faster",
+                "breaks BFS order"
+              ],
+              "answer": 1,
+              "explanation": "Mark on enqueue."
+            }
+          ],
+          "exercises": [
+            {
+              "id": "tscourse-w27-bf-1",
+              "title": "One further than where you came from",
+              "prompt": "Set each newly reached node's distance and queue it.",
+              "hint": "A neighbour reached from u for the first time is one edge further than u.",
+              "hints": [
+                "A neighbour reached from u for the first time is one edge further than u.",
+                "Record its distance, then queue it."
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst lines = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nconst n = Number(lines[0] ?? \"0\");\nconst adj: number[][] = Array.from({ length: n }, (): number[] => []);\nfor (const l of lines.slice(1)) {\n  const [u, v] = l.trim().split(/\\s+/).map(Number);\n  if (u === undefined || v === undefined) {\n    continue;\n  }\n  adj[u]?.push(v);\n  adj[v]?.push(u);\n}\nconst dist = new Array<number>(n).fill(-1);\ndist[0] = 0;\nconst queue = [0];\nfor (let head = 0; head < queue.length; head = head + 1) {\n  const u = queue[head] ?? 0;\n  for (const v of adj[u] ?? []) {\n    if (dist[v] === -1) {\n____\n    }\n  }\n}\nconsole.log(dist.join(\" \"));\n",
+              "solution": "import * as fs from \"fs\";\nconst lines = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nconst n = Number(lines[0] ?? \"0\");\nconst adj: number[][] = Array.from({ length: n }, (): number[] => []);\nfor (const l of lines.slice(1)) {\n  const [u, v] = l.trim().split(/\\s+/).map(Number);\n  if (u === undefined || v === undefined) {\n    continue;\n  }\n  adj[u]?.push(v);\n  adj[v]?.push(u);\n}\nconst dist = new Array<number>(n).fill(-1);\ndist[0] = 0;\nconst queue = [0];\nfor (let head = 0; head < queue.length; head = head + 1) {\n  const u = queue[head] ?? 0;\n  for (const v of adj[u] ?? []) {\n    if (dist[v] === -1) {\n      dist[v] = (dist[u] ?? 0) + 1;\n      queue.push(v);\n    }\n  }\n}\nconsole.log(dist.join(\" \"));\n",
+              "tests": [
+                {
+                  "input": "5\n0 1\n0 2\n1 3\n2 3\n3 4",
+                  "output": "0 1 1 2 3"
+                },
+                {
+                  "input": "4\n0 1\n2 3",
+                  "output": "0 1 -1 -1"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w27-bf-2",
+              "title": "Walk the parents back",
+              "prompt": "Rebuild the shortest path from node 0 to the last node.",
+              "hint": "Start at the target and follow parent links until there is no parent (-1).",
+              "hints": [
+                "Start at the target and follow parent links until there is no parent (-1).",
+                "The start's parent is -1, so the walk ends there.",
+                "Collect as you go; reverse at the end."
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst lines = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nconst n = Number(lines[0] ?? \"0\");\nconst adj: number[][] = Array.from({ length: n }, (): number[] => []);\nfor (const l of lines.slice(1)) {\n  const [u, v] = l.trim().split(/\\s+/).map(Number);\n  if (u === undefined || v === undefined) {\n    continue;\n  }\n  adj[u]?.push(v);\n  adj[v]?.push(u);\n}\nconst parent = new Array<number>(n).fill(-1);\nconst seen = new Array<boolean>(n).fill(false);\nseen[0] = true;\nconst queue = [0];\nfor (let head = 0; head < queue.length; head = head + 1) {\n  const u = queue[head] ?? 0;\n  for (const v of adj[u] ?? []) {\n    if (!seen[v]) {\n      seen[v] = true;\n      parent[v] = u;\n      queue.push(v);\n    }\n  }\n}\nconst target = n - 1;\nif (!seen[target]) {\n  console.log(\"unreachable\");\n} else {\n  const path: number[] = [];\n____\n  console.log(path.reverse().join(\" -> \"));\n}\n",
+              "solution": "import * as fs from \"fs\";\nconst lines = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nconst n = Number(lines[0] ?? \"0\");\nconst adj: number[][] = Array.from({ length: n }, (): number[] => []);\nfor (const l of lines.slice(1)) {\n  const [u, v] = l.trim().split(/\\s+/).map(Number);\n  if (u === undefined || v === undefined) {\n    continue;\n  }\n  adj[u]?.push(v);\n  adj[v]?.push(u);\n}\nconst parent = new Array<number>(n).fill(-1);\nconst seen = new Array<boolean>(n).fill(false);\nseen[0] = true;\nconst queue = [0];\nfor (let head = 0; head < queue.length; head = head + 1) {\n  const u = queue[head] ?? 0;\n  for (const v of adj[u] ?? []) {\n    if (!seen[v]) {\n      seen[v] = true;\n      parent[v] = u;\n      queue.push(v);\n    }\n  }\n}\nconst target = n - 1;\nif (!seen[target]) {\n  console.log(\"unreachable\");\n} else {\n  const path: number[] = [];\n  for (let at = target; at !== -1; at = parent[at] ?? -1) {\n    path.push(at);\n  }\n  console.log(path.reverse().join(\" -> \"));\n}\n",
+              "tests": [
+                {
+                  "input": "5\n0 1\n0 2\n1 3\n2 3\n3 4",
+                  "output": "0 -> 1 -> 3 -> 4"
+                },
+                {
+                  "input": "3\n0 2",
+                  "output": "0 -> 2"
+                },
+                {
+                  "input": "3\n0 1",
+                  "output": "unreachable"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w27-bf-3",
+              "title": "How many at each distance",
+              "prompt": "Report the size of every BFS level.",
+              "hint": "Each reached node adds one to the count for its distance.",
+              "hints": [
+                "Each reached node adds one to the count for its distance.",
+                "Write levels[d] = (levels[d] ?? 0) + 1;"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst lines = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nconst n = Number(lines[0] ?? \"0\");\nconst adj: number[][] = Array.from({ length: n }, (): number[] => []);\nfor (const l of lines.slice(1)) {\n  const [u, v] = l.trim().split(/\\s+/).map(Number);\n  if (u === undefined || v === undefined) {\n    continue;\n  }\n  adj[u]?.push(v);\n  adj[v]?.push(u);\n}\nconst dist = new Array<number>(n).fill(-1);\ndist[0] = 0;\nconst queue = [0];\nfor (let head = 0; head < queue.length; head = head + 1) {\n  const u = queue[head] ?? 0;\n  for (const v of adj[u] ?? []) {\n    if (dist[v] === -1) {\n      dist[v] = (dist[u] ?? 0) + 1;\n      queue.push(v);\n    }\n  }\n}\nconst levels: number[] = [];\nfor (const d of dist) {\n  if (d >= 0) {\n____\n  }\n}\nconsole.log(levels.join(\" \"));\n",
+              "solution": "import * as fs from \"fs\";\nconst lines = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nconst n = Number(lines[0] ?? \"0\");\nconst adj: number[][] = Array.from({ length: n }, (): number[] => []);\nfor (const l of lines.slice(1)) {\n  const [u, v] = l.trim().split(/\\s+/).map(Number);\n  if (u === undefined || v === undefined) {\n    continue;\n  }\n  adj[u]?.push(v);\n  adj[v]?.push(u);\n}\nconst dist = new Array<number>(n).fill(-1);\ndist[0] = 0;\nconst queue = [0];\nfor (let head = 0; head < queue.length; head = head + 1) {\n  const u = queue[head] ?? 0;\n  for (const v of adj[u] ?? []) {\n    if (dist[v] === -1) {\n      dist[v] = (dist[u] ?? 0) + 1;\n      queue.push(v);\n    }\n  }\n}\nconst levels: number[] = [];\nfor (const d of dist) {\n  if (d >= 0) {\n    levels[d] = (levels[d] ?? 0) + 1;\n  }\n}\nconsole.log(levels.join(\" \"));\n",
+              "tests": [
+                {
+                  "input": "6\n0 1\n0 2\n1 3\n2 4\n4 5",
+                  "output": "1 2 2 1"
+                },
+                {
+                  "input": "1",
+                  "output": "1"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w27-bf-4",
+              "title": "Depth-first is not shortest",
+              "prompt": "Compare the path length DFS happens to find with BFS's shortest one.",
+              "hint": "Each recursive step is one edge deeper.",
+              "hints": [
+                "Each recursive step is one edge deeper.",
+                "Write dfs(v, d + 1);"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst lines = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nconst n = Number(lines[0] ?? \"0\");\nconst adj: number[][] = Array.from({ length: n }, (): number[] => []);\nfor (const l of lines.slice(1)) {\n  const [u, v] = l.trim().split(/\\s+/).map(Number);\n  if (u === undefined || v === undefined) {\n    continue;\n  }\n  adj[u]?.push(v);\n  adj[v]?.push(u);\n}\nconst dfsDepth = new Array<number>(n).fill(-1);\nfunction dfs(u: number, d: number): void {\n  if (dfsDepth[u] !== -1) {\n    return;\n  }\n  dfsDepth[u] = d;\n  for (const v of adj[u] ?? []) {\n____\n  }\n}\ndfs(0, 0);\nconst dist = new Array<number>(n).fill(-1);\ndist[0] = 0;\nconst queue = [0];\nfor (let head = 0; head < queue.length; head = head + 1) {\n  const u = queue[head] ?? 0;\n  for (const v of adj[u] ?? []) {\n    if (dist[v] === -1) {\n      dist[v] = (dist[u] ?? 0) + 1;\n      queue.push(v);\n    }\n  }\n}\nconst t = n - 1;\nconsole.log(`dfs=${dfsDepth[t] ?? -1} bfs=${dist[t] ?? -1}`);\n",
+              "solution": "import * as fs from \"fs\";\nconst lines = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nconst n = Number(lines[0] ?? \"0\");\nconst adj: number[][] = Array.from({ length: n }, (): number[] => []);\nfor (const l of lines.slice(1)) {\n  const [u, v] = l.trim().split(/\\s+/).map(Number);\n  if (u === undefined || v === undefined) {\n    continue;\n  }\n  adj[u]?.push(v);\n  adj[v]?.push(u);\n}\nconst dfsDepth = new Array<number>(n).fill(-1);\nfunction dfs(u: number, d: number): void {\n  if (dfsDepth[u] !== -1) {\n    return;\n  }\n  dfsDepth[u] = d;\n  for (const v of adj[u] ?? []) {\n    dfs(v, d + 1);\n  }\n}\ndfs(0, 0);\nconst dist = new Array<number>(n).fill(-1);\ndist[0] = 0;\nconst queue = [0];\nfor (let head = 0; head < queue.length; head = head + 1) {\n  const u = queue[head] ?? 0;\n  for (const v of adj[u] ?? []) {\n    if (dist[v] === -1) {\n      dist[v] = (dist[u] ?? 0) + 1;\n      queue.push(v);\n    }\n  }\n}\nconst t = n - 1;\nconsole.log(`dfs=${dfsDepth[t] ?? -1} bfs=${dist[t] ?? -1}`);\n",
+              "tests": [
+                {
+                  "input": "5\n0 1\n1 2\n2 3\n3 4\n0 4",
+                  "output": "dfs=4 bfs=1"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w27-bf-fix1",
+              "title": "Fix the queue full of duplicates",
+              "prompt": "Every node should enter the queue once — five nodes, five entries — and this reports 6. The distances happen to come out right, but a node is only marked when it is taken OFF the queue, so every neighbour that sees it first queues it again.",
+              "hint": "Between being queued and being processed, a node looks unvisited to everyone else.",
+              "hints": [
+                "Between being queued and being processed, a node looks unvisited to everyone else.",
+                "Mark it the moment it is discovered.",
+                "Set dist[v] as you push v, and drop the separate depth array."
+              ],
+              "language": "typescript",
+              "kind": "fix",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst lines = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nconst n = Number(lines[0] ?? \"0\");\nconst adj: number[][] = Array.from({ length: n }, (): number[] => []);\nfor (const l of lines.slice(1)) {\n  const [u, v] = l.trim().split(/\\s+/).map(Number);\n  if (u === undefined || v === undefined) {\n    continue;\n  }\n  adj[u]?.push(v);\n  adj[v]?.push(u);\n}\nconst dist = new Array<number>(n).fill(-1);\nconst queue = [0];\nconst depth = [0];\nfor (let head = 0; head < queue.length; head = head + 1) {\n  const u = queue[head] ?? 0;\n  if (dist[u] !== -1) {\n    continue;\n  }\n  dist[u] = depth[head] ?? 0;\n  for (const v of adj[u] ?? []) {\n    if (dist[v] === -1) {\n      queue.push(v);\n      depth.push((dist[u] ?? 0) + 1);\n    }\n  }\n}\nconsole.log(`${dist.join(\" \")} enqueued=${queue.length}`);\n",
+              "solution": "import * as fs from \"fs\";\nconst lines = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nconst n = Number(lines[0] ?? \"0\");\nconst adj: number[][] = Array.from({ length: n }, (): number[] => []);\nfor (const l of lines.slice(1)) {\n  const [u, v] = l.trim().split(/\\s+/).map(Number);\n  if (u === undefined || v === undefined) {\n    continue;\n  }\n  adj[u]?.push(v);\n  adj[v]?.push(u);\n}\nconst dist = new Array<number>(n).fill(-1);\ndist[0] = 0;\nconst queue = [0];\nfor (let head = 0; head < queue.length; head = head + 1) {\n  const u = queue[head] ?? 0;\n  for (const v of adj[u] ?? []) {\n    if (dist[v] === -1) {\n      dist[v] = (dist[u] ?? 0) + 1;\n      queue.push(v);\n    }\n  }\n}\nconsole.log(`${dist.join(\" \")} enqueued=${queue.length}`);\n",
+              "tests": [
+                {
+                  "input": "5\n0 1\n0 2\n1 3\n2 3\n3 4",
+                  "output": "0 1 1 2 3 enqueued=5"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            }
+          ],
+          "quiz": [
+            {
+              "question": "Why is `shift` wrong for a BFS queue?",
+              "options": [
+                "it is buggy",
+                "each call moves the whole array, making BFS quadratic",
+                "it is not typed",
+                "it reverses order"
+              ],
+              "answer": 1,
+              "explanation": "Week 18's count."
+            },
+            {
+              "question": "`dist` filled with -1 also serves as…",
+              "options": [
+                "the queue",
+                "the visited set",
+                "the parent array",
+                "the answer"
+              ],
+              "answer": 1,
+              "explanation": "-1 means not reached."
+            }
+          ]
+        },
+        {
+          "key": "w27-grids",
+          "title": "Grids are graphs",
+          "what": "Cells are nodes; the four neighbours are the edges.",
+          "lesson": "A grid needs no adjacency list. The neighbours of `(r, c)` are computed:\n\n```ts\nconst DIRS = [[-1, 0], [1, 0], [0, -1], [0, 1]];     // up, down, left, right\nfor (const [dr, dc] of DIRS) {\n  const nr = r + dr;\n  const nc = c + dc;\n  if (nr < 0 || nr >= R || nc < 0 || nc >= C) { continue; }    // off the board\n  // (nr, nc) is a neighbour\n}\n```\n\nThe bounds check is the whole difficulty. Everything else is lesson 2 or lesson 3.\n\n## Naming a cell\n\nA visited set needs a key per cell. Two choices:\n\n* **A string**, `` `${r},${c}` `` — week 19's canonical key. Readable, a little slow.\n* **A number**, `r * C + c` — an index into a flat `boolean[]`. Fast.\n\nThe number has one trap. The cell to the **left** of `id` is `id - 1` — **unless the\ncell is in column 0**, in which case `id - 1` is the last cell of the *previous row*.\nCompute neighbours from `(r, c)` and bounds-check them, then convert to an id; never\ndo arithmetic on the id to find a neighbour.\n\n## Islands\n\n\"Count the islands of `#` in a grid of `.`\": for every land cell not yet visited,\ncount one and flood out from it — lesson 2's components, on cells. Use the iterative\nstack: a 300 × 300 all-land grid is a 90,000-cell flood, too deep to recurse.\n\n## The shortest way through a maze\n\nBFS from the start over open cells; the distance at the exit is the answer. This is\nthe capstone.\n\n> ⚠️ **Common mistakes:** a missing half of the bounds check; `id - 1` as the left\n> neighbour; and recursive flood fill on a large grid.\n",
+          "warmup": [
+            {
+              "question": "The four neighbours of (r, c) need…",
+              "options": [
+                "nothing",
+                "a bounds check before use",
+                "sorting",
+                "a Map"
+              ],
+              "answer": 1,
+              "explanation": "Or you read off the board."
+            },
+            {
+              "question": "With id = r * C + c, the left neighbour of a column-0 cell is…",
+              "options": [
+                "id - 1",
+                "off the board",
+                "id + 1",
+                "id - C"
+              ],
+              "answer": 1,
+              "explanation": "id - 1 is the previous row's last cell."
+            },
+            {
+              "question": "Counting islands is counting…",
+              "options": [
+                "cells",
+                "connected components of land",
+                "edges",
+                "rows"
+              ],
+              "answer": 1,
+              "explanation": "Lesson 2, on cells."
+            },
+            {
+              "question": "Flood fill on a large grid should be…",
+              "options": [
+                "recursive",
+                "iterative, with an explicit stack or queue",
+                "sorted",
+                "memoised"
+              ],
+              "answer": 1,
+              "explanation": "Depth can be R × C."
+            }
+          ],
+          "exercises": [
+            {
+              "id": "tscourse-w27-gd-1",
+              "title": "Stay on the board",
+              "prompt": "Count the islands of `#`, skipping any neighbour off the grid.",
+              "hint": "A neighbour is only real if its row is in 0..R-1 and its column in 0..C-1.",
+              "hints": [
+                "A neighbour is only real if its row is in 0..R-1 and its column in 0..C-1.",
+                "Four comparisons, one `continue`."
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst grid: readonly string[] = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\").map((l) => l.trim());\nconst R = grid.length;\nconst C = (grid[0] ?? \"\").length;\nfunction cell(r: number, c: number): string {\n  if (r < 0 || r >= R || c < 0 || c >= C) {\n    return \"\";\n  }\n  return (grid[r] ?? \"\").charAt(c);\n}\nconst DIRS: readonly (readonly [number, number])[] = [[-1, 0], [1, 0], [0, -1], [0, 1]];\nconst seen = new Set<string>();\nlet islands = 0;\nfor (let r = 0; r < R; r = r + 1) {\n  for (let c = 0; c < C; c = c + 1) {\n    if (cell(r, c) !== \"#\" || seen.has(`${r},${c}`)) {\n      continue;\n    }\n    islands = islands + 1;\n    seen.add(`${r},${c}`);\n    const stack: (readonly [number, number])[] = [[r, c]];\n    while (stack.length > 0) {\n      const top = stack.pop();\n      if (top === undefined) {\n        continue;\n      }\n      for (const [dr, dc] of DIRS) {\n        const nr = top[0] + dr;\n        const nc = top[1] + dc;\n____\n        if (cell(nr, nc) === \"#\" && !seen.has(`${nr},${nc}`)) {\n          seen.add(`${nr},${nc}`);\n          stack.push([nr, nc]);\n        }\n      }\n    }\n  }\n}\nconsole.log(islands);\n",
+              "solution": "import * as fs from \"fs\";\nconst grid: readonly string[] = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\").map((l) => l.trim());\nconst R = grid.length;\nconst C = (grid[0] ?? \"\").length;\nfunction cell(r: number, c: number): string {\n  if (r < 0 || r >= R || c < 0 || c >= C) {\n    return \"\";\n  }\n  return (grid[r] ?? \"\").charAt(c);\n}\nconst DIRS: readonly (readonly [number, number])[] = [[-1, 0], [1, 0], [0, -1], [0, 1]];\nconst seen = new Set<string>();\nlet islands = 0;\nfor (let r = 0; r < R; r = r + 1) {\n  for (let c = 0; c < C; c = c + 1) {\n    if (cell(r, c) !== \"#\" || seen.has(`${r},${c}`)) {\n      continue;\n    }\n    islands = islands + 1;\n    seen.add(`${r},${c}`);\n    const stack: (readonly [number, number])[] = [[r, c]];\n    while (stack.length > 0) {\n      const top = stack.pop();\n      if (top === undefined) {\n        continue;\n      }\n      for (const [dr, dc] of DIRS) {\n        const nr = top[0] + dr;\n        const nc = top[1] + dc;\n        if (nr < 0 || nr >= R || nc < 0 || nc >= C) {\n          continue;\n        }\n        if (cell(nr, nc) === \"#\" && !seen.has(`${nr},${nc}`)) {\n          seen.add(`${nr},${nc}`);\n          stack.push([nr, nc]);\n        }\n      }\n    }\n  }\n}\nconsole.log(islands);\n",
+              "tests": [
+                {
+                  "input": "##..\n#..#\n...#",
+                  "output": "2"
+                },
+                {
+                  "input": "#.#\n.#.\n#.#",
+                  "output": "5"
+                },
+                {
+                  "input": "...",
+                  "output": "0"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w27-gd-2",
+              "title": "The biggest island",
+              "prompt": "Flood each island with a queue and keep the largest size.",
+              "hint": "Every cell of the island passed through the queue exactly once.",
+              "hints": [
+                "Every cell of the island passed through the queue exactly once.",
+                "Write biggest = Math.max(biggest, queue.length);"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst grid: readonly string[] = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\").map((l) => l.trim());\nconst R = grid.length;\nconst C = (grid[0] ?? \"\").length;\nfunction cell(r: number, c: number): string {\n  if (r < 0 || r >= R || c < 0 || c >= C) {\n    return \"\";\n  }\n  return (grid[r] ?? \"\").charAt(c);\n}\nconst DIRS: readonly (readonly [number, number])[] = [[-1, 0], [1, 0], [0, -1], [0, 1]];\nconst seen = new Set<string>();\nlet biggest = 0;\nfor (let r = 0; r < R; r = r + 1) {\n  for (let c = 0; c < C; c = c + 1) {\n    if (cell(r, c) !== \"#\" || seen.has(`${r},${c}`)) {\n      continue;\n    }\n    seen.add(`${r},${c}`);\n    const queue: (readonly [number, number])[] = [[r, c]];\n    for (let head = 0; head < queue.length; head = head + 1) {\n      const [cr, cc] = queue[head] ?? [0, 0];\n      for (const [dr, dc] of DIRS) {\n        const nr = cr + dr;\n        const nc = cc + dc;\n        if (cell(nr, nc) === \"#\" && !seen.has(`${nr},${nc}`)) {\n          seen.add(`${nr},${nc}`);\n          queue.push([nr, nc]);\n        }\n      }\n    }\n____\n  }\n}\nconsole.log(biggest);\n",
+              "solution": "import * as fs from \"fs\";\nconst grid: readonly string[] = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\").map((l) => l.trim());\nconst R = grid.length;\nconst C = (grid[0] ?? \"\").length;\nfunction cell(r: number, c: number): string {\n  if (r < 0 || r >= R || c < 0 || c >= C) {\n    return \"\";\n  }\n  return (grid[r] ?? \"\").charAt(c);\n}\nconst DIRS: readonly (readonly [number, number])[] = [[-1, 0], [1, 0], [0, -1], [0, 1]];\nconst seen = new Set<string>();\nlet biggest = 0;\nfor (let r = 0; r < R; r = r + 1) {\n  for (let c = 0; c < C; c = c + 1) {\n    if (cell(r, c) !== \"#\" || seen.has(`${r},${c}`)) {\n      continue;\n    }\n    seen.add(`${r},${c}`);\n    const queue: (readonly [number, number])[] = [[r, c]];\n    for (let head = 0; head < queue.length; head = head + 1) {\n      const [cr, cc] = queue[head] ?? [0, 0];\n      for (const [dr, dc] of DIRS) {\n        const nr = cr + dr;\n        const nc = cc + dc;\n        if (cell(nr, nc) === \"#\" && !seen.has(`${nr},${nc}`)) {\n          seen.add(`${nr},${nc}`);\n          queue.push([nr, nc]);\n        }\n      }\n    }\n    biggest = Math.max(biggest, queue.length);\n  }\n}\nconsole.log(biggest);\n",
+              "tests": [
+                {
+                  "input": "##..\n#..#\n...#",
+                  "output": "3"
+                },
+                {
+                  "input": "###\n###",
+                  "output": "6"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w27-gd-3",
+              "title": "Flood fill",
+              "prompt": "Repaint the region connected to the top-left cell.",
+              "hint": "A neighbour of the original colour becomes part of the region — repaint it before pushing, so it is never pushed twice.",
+              "hints": [
+                "A neighbour of the original colour becomes part of the region — repaint it before pushing, so it is never pushed twice.",
+                "Repainting IS the visited mark here."
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst grid: readonly string[] = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\").map((l) => l.trim());\nconst R = grid.length;\nconst C = (grid[0] ?? \"\").length;\nfunction cell(r: number, c: number): string {\n  if (r < 0 || r >= R || c < 0 || c >= C) {\n    return \"\";\n  }\n  return (grid[r] ?? \"\").charAt(c);\n}\nconst DIRS: readonly (readonly [number, number])[] = [[-1, 0], [1, 0], [0, -1], [0, 1]];\nconst out = grid.map((row) => [...row]);\nconst from = cell(0, 0);\nconst stack: (readonly [number, number])[] = [[0, 0]];\nif (out[0] !== undefined) {\n  out[0][0] = \"x\";\n}\nwhile (stack.length > 0) {\n  const top = stack.pop();\n  if (top === undefined) {\n    continue;\n  }\n  for (const [dr, dc] of DIRS) {\n    const nr = top[0] + dr;\n    const nc = top[1] + dc;\n    const row = out[nr];\n____\n  }\n}\nconsole.log(out.map((row) => row.join(\"\")).join(\"\\n\"));\n",
+              "solution": "import * as fs from \"fs\";\nconst grid: readonly string[] = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\").map((l) => l.trim());\nconst R = grid.length;\nconst C = (grid[0] ?? \"\").length;\nfunction cell(r: number, c: number): string {\n  if (r < 0 || r >= R || c < 0 || c >= C) {\n    return \"\";\n  }\n  return (grid[r] ?? \"\").charAt(c);\n}\nconst DIRS: readonly (readonly [number, number])[] = [[-1, 0], [1, 0], [0, -1], [0, 1]];\nconst out = grid.map((row) => [...row]);\nconst from = cell(0, 0);\nconst stack: (readonly [number, number])[] = [[0, 0]];\nif (out[0] !== undefined) {\n  out[0][0] = \"x\";\n}\nwhile (stack.length > 0) {\n  const top = stack.pop();\n  if (top === undefined) {\n    continue;\n  }\n  for (const [dr, dc] of DIRS) {\n    const nr = top[0] + dr;\n    const nc = top[1] + dc;\n    const row = out[nr];\n    if (row !== undefined && row[nc] === from) {\n      row[nc] = \"x\";\n      stack.push([nr, nc]);\n    }\n  }\n}\nconsole.log(out.map((row) => row.join(\"\")).join(\"\\n\"));\n",
+              "tests": [
+                {
+                  "input": "..#\n.##\n#..",
+                  "output": "xx#\nx##\n#.."
+                },
+                {
+                  "input": "aa\naa",
+                  "output": "xx\nxx"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w27-gd-4",
+              "title": "The shortest way across",
+              "prompt": "BFS from the top-left to the bottom-right over `.` cells; report the steps or -1.",
+              "hint": "An open cell nobody has reached is one step further than the current one.",
+              "hints": [
+                "An open cell nobody has reached is one step further than the current one.",
+                "Set its distance as you queue it."
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst grid: readonly string[] = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\").map((l) => l.trim());\nconst R = grid.length;\nconst C = (grid[0] ?? \"\").length;\nfunction cell(r: number, c: number): string {\n  if (r < 0 || r >= R || c < 0 || c >= C) {\n    return \"\";\n  }\n  return (grid[r] ?? \"\").charAt(c);\n}\nconst DIRS: readonly (readonly [number, number])[] = [[-1, 0], [1, 0], [0, -1], [0, 1]];\nconst dist = new Map<string, number>([[\"0,0\", 0]]);\nconst queue: (readonly [number, number])[] = [[0, 0]];\nfor (let head = 0; head < queue.length; head = head + 1) {\n  const [r, c] = queue[head] ?? [0, 0];\n  const d = dist.get(`${r},${c}`) ?? 0;\n  for (const [dr, dc] of DIRS) {\n    const nr = r + dr;\n    const nc = c + dc;\n____\n  }\n}\nconsole.log(dist.get(`${R - 1},${C - 1}`) ?? -1);\n",
+              "solution": "import * as fs from \"fs\";\nconst grid: readonly string[] = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\").map((l) => l.trim());\nconst R = grid.length;\nconst C = (grid[0] ?? \"\").length;\nfunction cell(r: number, c: number): string {\n  if (r < 0 || r >= R || c < 0 || c >= C) {\n    return \"\";\n  }\n  return (grid[r] ?? \"\").charAt(c);\n}\nconst DIRS: readonly (readonly [number, number])[] = [[-1, 0], [1, 0], [0, -1], [0, 1]];\nconst dist = new Map<string, number>([[\"0,0\", 0]]);\nconst queue: (readonly [number, number])[] = [[0, 0]];\nfor (let head = 0; head < queue.length; head = head + 1) {\n  const [r, c] = queue[head] ?? [0, 0];\n  const d = dist.get(`${r},${c}`) ?? 0;\n  for (const [dr, dc] of DIRS) {\n    const nr = r + dr;\n    const nc = c + dc;\n    if (cell(nr, nc) === \".\" && !dist.has(`${nr},${nc}`)) {\n      dist.set(`${nr},${nc}`, d + 1);\n      queue.push([nr, nc]);\n    }\n  }\n}\nconsole.log(dist.get(`${R - 1},${C - 1}`) ?? -1);\n",
+              "tests": [
+                {
+                  "input": "...\n.#.\n...",
+                  "output": "4"
+                },
+                {
+                  "input": ".#\n#.",
+                  "output": "-1"
+                },
+                {
+                  "input": "....\n###.\n....",
+                  "output": "5"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w27-gd-5",
+              "title": "A number for every cell",
+              "prompt": "Key cells by r * C + c in a flat boolean array, and count the open cells reachable from the top-left.",
+              "hint": "Row-major order: each row is C cells long.",
+              "hints": [
+                "Row-major order: each row is C cells long.",
+                "Write const id = nr * C + nc;"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst grid: readonly string[] = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\").map((l) => l.trim());\nconst R = grid.length;\nconst C = (grid[0] ?? \"\").length;\nfunction cell(r: number, c: number): string {\n  if (r < 0 || r >= R || c < 0 || c >= C) {\n    return \"\";\n  }\n  return (grid[r] ?? \"\").charAt(c);\n}\nconst DIRS: readonly (readonly [number, number])[] = [[-1, 0], [1, 0], [0, -1], [0, 1]];\nconst seen = new Array<boolean>(R * C).fill(false);\nseen[0] = true;\nconst stack: (readonly [number, number])[] = [[0, 0]];\nlet reached = 1;\nwhile (stack.length > 0) {\n  const top = stack.pop();\n  if (top === undefined) {\n    continue;\n  }\n  for (const [dr, dc] of DIRS) {\n    const nr = top[0] + dr;\n    const nc = top[1] + dc;\n____\n    if (cell(nr, nc) === \".\" && !seen[id]) {\n      seen[id] = true;\n      reached = reached + 1;\n      stack.push([nr, nc]);\n    }\n  }\n}\nconsole.log(reached);\n",
+              "solution": "import * as fs from \"fs\";\nconst grid: readonly string[] = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\").map((l) => l.trim());\nconst R = grid.length;\nconst C = (grid[0] ?? \"\").length;\nfunction cell(r: number, c: number): string {\n  if (r < 0 || r >= R || c < 0 || c >= C) {\n    return \"\";\n  }\n  return (grid[r] ?? \"\").charAt(c);\n}\nconst DIRS: readonly (readonly [number, number])[] = [[-1, 0], [1, 0], [0, -1], [0, 1]];\nconst seen = new Array<boolean>(R * C).fill(false);\nseen[0] = true;\nconst stack: (readonly [number, number])[] = [[0, 0]];\nlet reached = 1;\nwhile (stack.length > 0) {\n  const top = stack.pop();\n  if (top === undefined) {\n    continue;\n  }\n  for (const [dr, dc] of DIRS) {\n    const nr = top[0] + dr;\n    const nc = top[1] + dc;\n    const id = nr * C + nc;\n    if (cell(nr, nc) === \".\" && !seen[id]) {\n      seen[id] = true;\n      reached = reached + 1;\n      stack.push([nr, nc]);\n    }\n  }\n}\nconsole.log(reached);\n",
+              "tests": [
+                {
+                  "input": "..#\n.#.\n...",
+                  "output": "7"
+                },
+                {
+                  "input": ".#.\n##.",
+                  "output": "1"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w27-gd-fix1",
+              "title": "Fix the left neighbour that wrapped round",
+              "prompt": "This finds 1 island in a grid that has 2. Neighbours are found by arithmetic on the cell's number — `id - 1` for left — so the first cell of row 1 treats the LAST cell of row 0 as its neighbour, and two islands on opposite edges are joined.",
+              "hint": "Where is `id - 1` when the cell is in column 0?",
+              "hints": [
+                "Where is `id - 1` when the cell is in column 0?",
+                "The row boundary is invisible to arithmetic on the id.",
+                "Find neighbours from (r, c) with a bounds check, and only then convert to an id."
+              ],
+              "language": "typescript",
+              "kind": "fix",
+              "difficulty": "Hard",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst grid: readonly string[] = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\").map((l) => l.trim());\nconst R = grid.length;\nconst C = (grid[0] ?? \"\").length;\nfunction cell(r: number, c: number): string {\n  if (r < 0 || r >= R || c < 0 || c >= C) {\n    return \"\";\n  }\n  return (grid[r] ?? \"\").charAt(c);\n}\nconst DIRS: readonly (readonly [number, number])[] = [[-1, 0], [1, 0], [0, -1], [0, 1]];\nconst seen = new Array<boolean>(R * C).fill(false);\nfunction isLand(id: number): boolean {\n  return id >= 0 && id < R * C && cell(Math.floor(id / C), id % C) === \"#\";\n}\nlet islands = 0;\nfor (let start = 0; start < R * C; start = start + 1) {\n  if (!isLand(start) || seen[start]) {\n    continue;\n  }\n  islands = islands + 1;\n  seen[start] = true;\n  const stack = [start];\n  while (stack.length > 0) {\n    const id = stack.pop() ?? 0;\n    for (const next of [id - C, id + C, id - 1, id + 1]) {\n      if (isLand(next) && !seen[next]) {\n        seen[next] = true;\n        stack.push(next);\n      }\n    }\n  }\n}\nconsole.log(islands);\n",
+              "solution": "import * as fs from \"fs\";\nconst grid: readonly string[] = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\").map((l) => l.trim());\nconst R = grid.length;\nconst C = (grid[0] ?? \"\").length;\nfunction cell(r: number, c: number): string {\n  if (r < 0 || r >= R || c < 0 || c >= C) {\n    return \"\";\n  }\n  return (grid[r] ?? \"\").charAt(c);\n}\nconst DIRS: readonly (readonly [number, number])[] = [[-1, 0], [1, 0], [0, -1], [0, 1]];\nconst seen = new Array<boolean>(R * C).fill(false);\nlet islands = 0;\nfor (let r = 0; r < R; r = r + 1) {\n  for (let c = 0; c < C; c = c + 1) {\n    if (cell(r, c) !== \"#\" || seen[r * C + c]) {\n      continue;\n    }\n    islands = islands + 1;\n    seen[r * C + c] = true;\n    const stack: (readonly [number, number])[] = [[r, c]];\n    while (stack.length > 0) {\n      const top = stack.pop();\n      if (top === undefined) {\n        continue;\n      }\n      for (const [dr, dc] of DIRS) {\n        const nr = top[0] + dr;\n        const nc = top[1] + dc;\n        if (cell(nr, nc) === \"#\" && !seen[nr * C + nc]) {\n          seen[nr * C + nc] = true;\n          stack.push([nr, nc]);\n        }\n      }\n    }\n  }\n}\nconsole.log(islands);\n",
+              "tests": [
+                {
+                  "input": "..#\n#..",
+                  "output": "2"
+                },
+                {
+                  "input": "#.#\n#.#",
+                  "output": "2"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            }
+          ],
+          "quiz": [
+            {
+              "question": "Why does `cell()` return \"\" off the board rather than throwing?",
+              "options": [
+                "style",
+                "so a neighbour off the edge simply fails the `=== \"#\"` test",
+                "speed",
+                "types"
+              ],
+              "answer": 1,
+              "explanation": "The bounds check folded into the lookup."
+            },
+            {
+              "question": "A 300 × 300 all-land grid flooded recursively…",
+              "options": [
+                "is fine",
+                "may be 90,000 frames deep — week 25's overflow",
+                "is O(1)",
+                "cannot happen"
+              ],
+              "answer": 1,
+              "explanation": "Iterate."
+            }
+          ]
+        },
+        {
+          "key": "w27-order",
+          "title": "Cycles and topological order",
+          "what": "Directed graphs: what must come before what — and when nothing can.",
+          "lesson": "In a **directed** graph, an edge `u → v` often means \"u must come before v\": a\nprerequisite, a dependency, a build step. A **topological order** lists every node\nso that every edge points forwards. It exists exactly when there is **no cycle** —\na graph like that is a **DAG**.\n\n## Kahn's algorithm\n\nA node with **in-degree 0** has nothing that must precede it, so it can go first:\n\n```ts\n// indegree[v] = number of edges into v\nqueue every node with in-degree 0\nwhile the queue is not empty:\n  take u; output it\n  for each edge u → v: indegree[v] -= 1; if it reaches 0, queue v\n```\n\nRemoving `u` removes its edges, which may free its successors. `0→1, 0→2, 1→3, 2→3`\ngives `0 1 2 3`.\n\n**And it detects cycles for free**: nodes on a cycle wait on each other and never\nreach in-degree 0, so the output comes up **short**. Output shorter than n means a\ncycle — \"these courses can never be taken\".\n\n## Cycles by DFS: three colours\n\nIn an undirected graph, reaching a visited node means a cycle. In a **directed** one\nit does not — `0→1, 0→2, 1→3, 2→3` reaches 3 twice and has no cycle (a diamond).\nThe fix is to distinguish *why* a node was seen:\n\n* **white** — not visited yet\n* **grey** — visited, and **still on the current path** (its DFS has not finished)\n* **black** — finished\n\nReaching a **grey** node means you have come back round to something you are still\ninside: a cycle. Reaching a black one is just a second route to a finished node.\n\n## A DP over a topological order\n\n\"Each course takes one semester; how many semesters at minimum?\" Process nodes in\ntopological order and let `level[v] = max(level[v], level[u] + 1)`. Every\nprerequisite is finished before the course is reached — which is exactly the\ndependency order week 26 said a table must be filled in. The answer is the longest\npath in the DAG.\n\n> ⚠️ **Common mistakes:** an undirected-style visited check on a directed graph\n> (every diamond becomes a \"cycle\"); forgetting that Kahn's short output is the\n> cycle signal; and edges pointing the wrong way.\n",
+          "warmup": [
+            {
+              "question": "A topological order exists when the graph…",
+              "options": [
+                "is connected",
+                "has no directed cycle",
+                "is undirected",
+                "is a tree"
+              ],
+              "answer": 1,
+              "explanation": "A DAG."
+            },
+            {
+              "question": "Kahn's algorithm begins with…",
+              "options": [
+                "node 0",
+                "every node of in-degree 0",
+                "the deepest node",
+                "a DFS"
+              ],
+              "answer": 1,
+              "explanation": "Nothing must come before them."
+            },
+            {
+              "question": "Kahn's output has fewer than n nodes. That means…",
+              "options": [
+                "a bug",
+                "a cycle",
+                "a disconnected graph",
+                "an undirected graph"
+              ],
+              "answer": 1,
+              "explanation": "The cycle's nodes never reach 0."
+            },
+            {
+              "question": "In the three-colour DFS, reaching a GREY node means…",
+              "options": [
+                "nothing",
+                "a cycle",
+                "a finished node",
+                "an error"
+              ],
+              "answer": 1,
+              "explanation": "You came back to your own path."
+            }
+          ],
+          "exercises": [
+            {
+              "id": "tscourse-w27-tp-1",
+              "title": "Free the successors",
+              "prompt": "When a node is output, remove its edges and queue any successor that has nothing left before it.",
+              "hint": "u is done, so every v it points to has one fewer thing to wait for.",
+              "hints": [
+                "u is done, so every v it points to has one fewer thing to wait for.",
+                "When v's count reaches zero, it can be queued."
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst lines = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nconst n = Number(lines[0] ?? \"0\");\nconst adj: number[][] = Array.from({ length: n }, (): number[] => []);\nfor (const l of lines.slice(1)) {\n  const [u, v] = l.trim().split(/\\s+/).map(Number);\n  if (u === undefined || v === undefined) {\n    continue;\n  }\n  adj[u]?.push(v);\n}\nconst indegree = new Array<number>(n).fill(0);\nfor (const ns of adj) {\n  for (const v of ns) {\n    indegree[v] = (indegree[v] ?? 0) + 1;\n  }\n}\nconst queue: number[] = [];\nfor (let u = 0; u < n; u = u + 1) {\n  if (indegree[u] === 0) {\n    queue.push(u);\n  }\n}\nfor (let head = 0; head < queue.length; head = head + 1) {\n  const u = queue[head] ?? 0;\n  for (const v of adj[u] ?? []) {\n____\n  }\n}\nconsole.log(queue.length === n ? queue.join(\" \") : \"cycle\");\n",
+              "solution": "import * as fs from \"fs\";\nconst lines = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nconst n = Number(lines[0] ?? \"0\");\nconst adj: number[][] = Array.from({ length: n }, (): number[] => []);\nfor (const l of lines.slice(1)) {\n  const [u, v] = l.trim().split(/\\s+/).map(Number);\n  if (u === undefined || v === undefined) {\n    continue;\n  }\n  adj[u]?.push(v);\n}\nconst indegree = new Array<number>(n).fill(0);\nfor (const ns of adj) {\n  for (const v of ns) {\n    indegree[v] = (indegree[v] ?? 0) + 1;\n  }\n}\nconst queue: number[] = [];\nfor (let u = 0; u < n; u = u + 1) {\n  if (indegree[u] === 0) {\n    queue.push(u);\n  }\n}\nfor (let head = 0; head < queue.length; head = head + 1) {\n  const u = queue[head] ?? 0;\n  for (const v of adj[u] ?? []) {\n    indegree[v] = (indegree[v] ?? 0) - 1;\n    if (indegree[v] === 0) {\n      queue.push(v);\n    }\n  }\n}\nconsole.log(queue.length === n ? queue.join(\" \") : \"cycle\");\n",
+              "tests": [
+                {
+                  "input": "4\n0 1\n0 2\n1 3\n2 3",
+                  "output": "0 1 2 3"
+                },
+                {
+                  "input": "3\n2 1\n1 0",
+                  "output": "2 1 0"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w27-tp-2",
+              "title": "Short output is a cycle",
+              "prompt": "Report `cycle` when Kahn's algorithm cannot place every node.",
+              "hint": "Every node that never reached in-degree 0 is stuck behind a cycle.",
+              "hints": [
+                "Every node that never reached in-degree 0 is stuck behind a cycle.",
+                "Compare how many were placed with n."
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst lines = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nconst n = Number(lines[0] ?? \"0\");\nconst adj: number[][] = Array.from({ length: n }, (): number[] => []);\nfor (const l of lines.slice(1)) {\n  const [u, v] = l.trim().split(/\\s+/).map(Number);\n  if (u === undefined || v === undefined) {\n    continue;\n  }\n  adj[u]?.push(v);\n}\nconst indegree = new Array<number>(n).fill(0);\nfor (const ns of adj) {\n  for (const v of ns) {\n    indegree[v] = (indegree[v] ?? 0) + 1;\n  }\n}\nconst queue: number[] = [];\nfor (let u = 0; u < n; u = u + 1) {\n  if (indegree[u] === 0) {\n    queue.push(u);\n  }\n}\nfor (let head = 0; head < queue.length; head = head + 1) {\n  const u = queue[head] ?? 0;\n  for (const v of adj[u] ?? []) {\n    indegree[v] = (indegree[v] ?? 0) - 1;\n    if (indegree[v] === 0) {\n      queue.push(v);\n    }\n  }\n}\n____\n",
+              "solution": "import * as fs from \"fs\";\nconst lines = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nconst n = Number(lines[0] ?? \"0\");\nconst adj: number[][] = Array.from({ length: n }, (): number[] => []);\nfor (const l of lines.slice(1)) {\n  const [u, v] = l.trim().split(/\\s+/).map(Number);\n  if (u === undefined || v === undefined) {\n    continue;\n  }\n  adj[u]?.push(v);\n}\nconst indegree = new Array<number>(n).fill(0);\nfor (const ns of adj) {\n  for (const v of ns) {\n    indegree[v] = (indegree[v] ?? 0) + 1;\n  }\n}\nconst queue: number[] = [];\nfor (let u = 0; u < n; u = u + 1) {\n  if (indegree[u] === 0) {\n    queue.push(u);\n  }\n}\nfor (let head = 0; head < queue.length; head = head + 1) {\n  const u = queue[head] ?? 0;\n  for (const v of adj[u] ?? []) {\n    indegree[v] = (indegree[v] ?? 0) - 1;\n    if (indegree[v] === 0) {\n      queue.push(v);\n    }\n  }\n}\nconsole.log(queue.length === n ? queue.join(\" \") : `cycle: ${n - queue.length} stuck`);\n",
+              "tests": [
+                {
+                  "input": "3\n0 1\n1 2\n2 0",
+                  "output": "cycle: 3 stuck"
+                },
+                {
+                  "input": "4\n0 1\n1 2\n2 1\n2 3",
+                  "output": "cycle: 3 stuck"
+                },
+                {
+                  "input": "2\n0 1",
+                  "output": "0 1"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w27-tp-3",
+              "title": "Grey means cycle",
+              "prompt": "In a three-colour DFS, reaching a node that is still on the current path is a cycle.",
+              "hint": "Grey (1) is 'visited, and its DFS has not finished' — it is an ancestor of u.",
+              "hints": [
+                "Grey (1) is 'visited, and its DFS has not finished' — it is an ancestor of u.",
+                "An edge back to an ancestor closes a loop.",
+                "if (colour[v] === 1) { return true; }"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Hard",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst lines = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nconst n = Number(lines[0] ?? \"0\");\nconst adj: number[][] = Array.from({ length: n }, (): number[] => []);\nfor (const l of lines.slice(1)) {\n  const [u, v] = l.trim().split(/\\s+/).map(Number);\n  if (u === undefined || v === undefined) {\n    continue;\n  }\n  adj[u]?.push(v);\n}\nconst colour = new Array<number>(n).fill(0);\nfunction hasCycle(u: number): boolean {\n  colour[u] = 1;\n  for (const v of adj[u] ?? []) {\n____\n    if (colour[v] === 0 && hasCycle(v)) {\n      return true;\n    }\n  }\n  colour[u] = 2;\n  return false;\n}\nlet cycle = false;\nfor (let u = 0; u < n; u = u + 1) {\n  if (colour[u] === 0 && hasCycle(u)) {\n    cycle = true;\n  }\n}\nconsole.log(cycle ? \"cycle\" : \"no cycle\");\n",
+              "solution": "import * as fs from \"fs\";\nconst lines = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nconst n = Number(lines[0] ?? \"0\");\nconst adj: number[][] = Array.from({ length: n }, (): number[] => []);\nfor (const l of lines.slice(1)) {\n  const [u, v] = l.trim().split(/\\s+/).map(Number);\n  if (u === undefined || v === undefined) {\n    continue;\n  }\n  adj[u]?.push(v);\n}\nconst colour = new Array<number>(n).fill(0);\nfunction hasCycle(u: number): boolean {\n  colour[u] = 1;\n  for (const v of adj[u] ?? []) {\n    if (colour[v] === 1) {\n      return true;\n    }\n    if (colour[v] === 0 && hasCycle(v)) {\n      return true;\n    }\n  }\n  colour[u] = 2;\n  return false;\n}\nlet cycle = false;\nfor (let u = 0; u < n; u = u + 1) {\n  if (colour[u] === 0 && hasCycle(u)) {\n    cycle = true;\n  }\n}\nconsole.log(cycle ? \"cycle\" : \"no cycle\");\n",
+              "tests": [
+                {
+                  "input": "4\n0 1\n0 2\n1 3\n2 3",
+                  "output": "no cycle"
+                },
+                {
+                  "input": "3\n0 1\n1 2\n2 0",
+                  "output": "cycle"
+                },
+                {
+                  "input": "2\n0 1\n1 0",
+                  "output": "cycle"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w27-tp-4",
+              "title": "The fewest semesters",
+              "prompt": "Walk the topological order and push each course's level to its successors.",
+              "hint": "A course can be taken the semester after its latest prerequisite.",
+              "hints": [
+                "A course can be taken the semester after its latest prerequisite.",
+                "Write level[v] = Math.max(level[v] ?? 1, (level[u] ?? 1) + 1);"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Hard",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst lines = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nconst n = Number(lines[0] ?? \"0\");\nconst adj: number[][] = Array.from({ length: n }, (): number[] => []);\nfor (const l of lines.slice(1)) {\n  const [u, v] = l.trim().split(/\\s+/).map(Number);\n  if (u === undefined || v === undefined) {\n    continue;\n  }\n  adj[u]?.push(v);\n}\nconst indegree = new Array<number>(n).fill(0);\nfor (const ns of adj) {\n  for (const v of ns) {\n    indegree[v] = (indegree[v] ?? 0) + 1;\n  }\n}\nconst level = new Array<number>(n).fill(1);\nconst queue: number[] = [];\nfor (let u = 0; u < n; u = u + 1) {\n  if (indegree[u] === 0) {\n    queue.push(u);\n  }\n}\nfor (let head = 0; head < queue.length; head = head + 1) {\n  const u = queue[head] ?? 0;\n  for (const v of adj[u] ?? []) {\n____\n    indegree[v] = (indegree[v] ?? 0) - 1;\n    if (indegree[v] === 0) {\n      queue.push(v);\n    }\n  }\n}\nconsole.log(Math.max(...level));\n",
+              "solution": "import * as fs from \"fs\";\nconst lines = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nconst n = Number(lines[0] ?? \"0\");\nconst adj: number[][] = Array.from({ length: n }, (): number[] => []);\nfor (const l of lines.slice(1)) {\n  const [u, v] = l.trim().split(/\\s+/).map(Number);\n  if (u === undefined || v === undefined) {\n    continue;\n  }\n  adj[u]?.push(v);\n}\nconst indegree = new Array<number>(n).fill(0);\nfor (const ns of adj) {\n  for (const v of ns) {\n    indegree[v] = (indegree[v] ?? 0) + 1;\n  }\n}\nconst level = new Array<number>(n).fill(1);\nconst queue: number[] = [];\nfor (let u = 0; u < n; u = u + 1) {\n  if (indegree[u] === 0) {\n    queue.push(u);\n  }\n}\nfor (let head = 0; head < queue.length; head = head + 1) {\n  const u = queue[head] ?? 0;\n  for (const v of adj[u] ?? []) {\n    level[v] = Math.max(level[v] ?? 1, (level[u] ?? 1) + 1);\n    indegree[v] = (indegree[v] ?? 0) - 1;\n    if (indegree[v] === 0) {\n      queue.push(v);\n    }\n  }\n}\nconsole.log(Math.max(...level));\n",
+              "tests": [
+                {
+                  "input": "4\n0 1\n0 2\n1 3\n2 3",
+                  "output": "3"
+                },
+                {
+                  "input": "5\n0 1\n1 2\n2 3\n3 4",
+                  "output": "5"
+                },
+                {
+                  "input": "3",
+                  "output": "1"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w27-tp-fix1",
+              "title": "Fix the diamond that was called a cycle",
+              "prompt": "`0→1, 0→2, 1→3, 2→3` has no cycle, and this reports one. It uses the undirected rule — 'reached an already-visited node' — but node 3 is simply reached by two routes. In a directed graph only a node still ON the current path closes a cycle.",
+              "hint": "Node 3 is reached from 1 and then again from 2. Is that a loop?",
+              "hints": [
+                "Node 3 is reached from 1 and then again from 2. Is that a loop?",
+                "You need to know whether a visited node is still being explored or already finished.",
+                "Three states: 0 unseen, 1 on the current path, 2 finished. Only 1 is a cycle."
+              ],
+              "language": "typescript",
+              "kind": "fix",
+              "difficulty": "Hard",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst lines = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nconst n = Number(lines[0] ?? \"0\");\nconst adj: number[][] = Array.from({ length: n }, (): number[] => []);\nfor (const l of lines.slice(1)) {\n  const [u, v] = l.trim().split(/\\s+/).map(Number);\n  if (u === undefined || v === undefined) {\n    continue;\n  }\n  adj[u]?.push(v);\n}\nconst visited = new Array<boolean>(n).fill(false);\nfunction hasCycle(u: number): boolean {\n  visited[u] = true;\n  for (const v of adj[u] ?? []) {\n    if (visited[v]) {\n      return true;\n    }\n    if (hasCycle(v)) {\n      return true;\n    }\n  }\n  return false;\n}\nlet cycle = false;\nfor (let u = 0; u < n; u = u + 1) {\n  if (!visited[u] && hasCycle(u)) {\n    cycle = true;\n  }\n}\nconsole.log(cycle ? \"cycle\" : \"no cycle\");\n",
+              "solution": "import * as fs from \"fs\";\nconst lines = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nconst n = Number(lines[0] ?? \"0\");\nconst adj: number[][] = Array.from({ length: n }, (): number[] => []);\nfor (const l of lines.slice(1)) {\n  const [u, v] = l.trim().split(/\\s+/).map(Number);\n  if (u === undefined || v === undefined) {\n    continue;\n  }\n  adj[u]?.push(v);\n}\nconst colour = new Array<number>(n).fill(0);\nfunction hasCycle(u: number): boolean {\n  colour[u] = 1;\n  for (const v of adj[u] ?? []) {\n    if (colour[v] === 1) {\n      return true;\n    }\n    if (colour[v] === 0 && hasCycle(v)) {\n      return true;\n    }\n  }\n  colour[u] = 2;\n  return false;\n}\nlet cycle = false;\nfor (let u = 0; u < n; u = u + 1) {\n  if (colour[u] === 0 && hasCycle(u)) {\n    cycle = true;\n  }\n}\nconsole.log(cycle ? \"cycle\" : \"no cycle\");\n",
+              "tests": [
+                {
+                  "input": "4\n0 1\n0 2\n1 3\n2 3",
+                  "output": "no cycle"
+                },
+                {
+                  "input": "3\n0 1\n1 2\n2 0",
+                  "output": "cycle"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            }
+          ],
+          "quiz": [
+            {
+              "question": "The 'fewest semesters' answer is…",
+              "options": [
+                "the node count",
+                "the longest path in the DAG",
+                "the shortest path",
+                "the number of edges"
+              ],
+              "answer": 1,
+              "explanation": "Each step of the chain is one more semester."
+            },
+            {
+              "question": "Topological order is unique when…",
+              "options": [
+                "always",
+                "the queue never holds more than one node",
+                "the graph is small",
+                "never"
+              ],
+              "answer": 1,
+              "explanation": "Otherwise several orders are correct."
+            }
+          ]
+        },
+        {
+          "key": "w27-levels",
+          "title": "Many sources, two colours",
+          "what": "Two BFS variations that turn up constantly.",
+          "lesson": "## Multi-source BFS\n\n\"A grid of oranges: `2` is rotten, `1` fresh, `0` empty. Each minute, rot spreads to\nthe four neighbours. How long until every orange is rotten?\"\n\nThe trap is to BFS from one rotten orange. Rot spreads from **all** of them at once,\nso **every** rotten orange starts in the queue at time 0:\n\n```ts\nfor each cell: if it is rotten, queue it with time 0\n// then an ordinary BFS\n```\n\nBFS then spreads outward from all sources together, level by level, and the level\nat which the last fresh orange falls is the answer — or -1 if some fresh orange is\nnever reached. Distance-to-the-nearest-anything is the same move.\n\n## Two-colouring\n\n\"Can the nodes be split into two groups with every edge between the groups?\" —\nseating people who dislike each other at two tables, or scheduling in two shifts.\nBFS, colouring each newly reached node the **opposite** colour of the node it came\nfrom. If an edge ever joins two nodes of the **same** colour, it is impossible.\n\nA graph is two-colourable exactly when it has **no odd cycle**: a square is fine,\na triangle is not.\n\nColour every component — start a BFS from each uncoloured node, as lesson 2 counted\ncomponents — or an isolated part of the graph is never checked.\n\n> ⚠️ **Common mistakes:** a single source where there are many; forgetting the -1\n> for an unreachable target; and checking only the first component.\n",
+          "warmup": [
+            {
+              "question": "Multi-source BFS starts with…",
+              "options": [
+                "one source",
+                "every source in the queue at distance 0",
+                "the farthest node",
+                "a sorted list"
+              ],
+              "answer": 1,
+              "explanation": "Spreading from all at once."
+            },
+            {
+              "question": "A graph is two-colourable exactly when it has…",
+              "options": [
+                "no cycle",
+                "no odd cycle",
+                "an even number of nodes",
+                "one component"
+              ],
+              "answer": 1,
+              "explanation": "A triangle fails."
+            },
+            {
+              "question": "Two-colouring must start a BFS from…",
+              "options": [
+                "node 0 only",
+                "every uncoloured node, so every component is checked",
+                "the largest node",
+                "a leaf"
+              ],
+              "answer": 1,
+              "explanation": "Components again."
+            },
+            {
+              "question": "Rotting oranges returns -1 when…",
+              "options": [
+                "no orange is rotten",
+                "some fresh orange is never reached",
+                "the grid is empty",
+                "never"
+              ],
+              "answer": 1,
+              "explanation": "Unreachable."
+            }
+          ],
+          "exercises": [
+            {
+              "id": "tscourse-w27-lv-1",
+              "title": "Every source at once",
+              "prompt": "Queue every rotten orange before the BFS begins.",
+              "hint": "Every rotten orange is a source, and all of them are at time 0.",
+              "hints": [
+                "Every rotten orange is a source, and all of them are at time 0.",
+                "Record time 0 and queue it, for each one."
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst grid: readonly string[] = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\").map((l) => l.trim());\nconst R = grid.length;\nconst C = (grid[0] ?? \"\").length;\nfunction cell(r: number, c: number): string {\n  if (r < 0 || r >= R || c < 0 || c >= C) {\n    return \"\";\n  }\n  return (grid[r] ?? \"\").charAt(c);\n}\nconst DIRS: readonly (readonly [number, number])[] = [[-1, 0], [1, 0], [0, -1], [0, 1]];\nconst time = new Map<string, number>();\nconst queue: (readonly [number, number])[] = [];\nlet fresh = 0;\nfor (let r = 0; r < R; r = r + 1) {\n  for (let c = 0; c < C; c = c + 1) {\n____\n    } else if (cell(r, c) === \"1\") {\n      fresh = fresh + 1;\n    }\n  }\n}\nlet latest = 0;\nfor (let head = 0; head < queue.length; head = head + 1) {\n  const [r, c] = queue[head] ?? [0, 0];\n  const t = time.get(`${r},${c}`) ?? 0;\n  for (const [dr, dc] of DIRS) {\n    const nr = r + dr;\n    const nc = c + dc;\n    if (cell(nr, nc) === \"1\" && !time.has(`${nr},${nc}`)) {\n      time.set(`${nr},${nc}`, t + 1);\n      latest = Math.max(latest, t + 1);\n      fresh = fresh - 1;\n      queue.push([nr, nc]);\n    }\n  }\n}\nconsole.log(fresh === 0 ? latest : -1);\n",
+              "solution": "import * as fs from \"fs\";\nconst grid: readonly string[] = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\").map((l) => l.trim());\nconst R = grid.length;\nconst C = (grid[0] ?? \"\").length;\nfunction cell(r: number, c: number): string {\n  if (r < 0 || r >= R || c < 0 || c >= C) {\n    return \"\";\n  }\n  return (grid[r] ?? \"\").charAt(c);\n}\nconst DIRS: readonly (readonly [number, number])[] = [[-1, 0], [1, 0], [0, -1], [0, 1]];\nconst time = new Map<string, number>();\nconst queue: (readonly [number, number])[] = [];\nlet fresh = 0;\nfor (let r = 0; r < R; r = r + 1) {\n  for (let c = 0; c < C; c = c + 1) {\n    if (cell(r, c) === \"2\") {\n      time.set(`${r},${c}`, 0);\n      queue.push([r, c]);\n    } else if (cell(r, c) === \"1\") {\n      fresh = fresh + 1;\n    }\n  }\n}\nlet latest = 0;\nfor (let head = 0; head < queue.length; head = head + 1) {\n  const [r, c] = queue[head] ?? [0, 0];\n  const t = time.get(`${r},${c}`) ?? 0;\n  for (const [dr, dc] of DIRS) {\n    const nr = r + dr;\n    const nc = c + dc;\n    if (cell(nr, nc) === \"1\" && !time.has(`${nr},${nc}`)) {\n      time.set(`${nr},${nc}`, t + 1);\n      latest = Math.max(latest, t + 1);\n      fresh = fresh - 1;\n      queue.push([nr, nc]);\n    }\n  }\n}\nconsole.log(fresh === 0 ? latest : -1);\n",
+              "tests": [
+                {
+                  "input": "211\n110\n011",
+                  "output": "4"
+                },
+                {
+                  "input": "211\n011\n101",
+                  "output": "-1"
+                },
+                {
+                  "input": "201\n102",
+                  "output": "1"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w27-lv-2",
+              "title": "Opposite colours",
+              "prompt": "Colour each newly reached node the opposite of its neighbour; a same-colour edge makes it impossible.",
+              "hint": "Colours are 0 and 1, so the opposite of c is 1 - c.",
+              "hints": [
+                "Colours are 0 and 1, so the opposite of c is 1 - c.",
+                "Write colour[v] = 1 - (colour[u] ?? 0);"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst lines = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nconst n = Number(lines[0] ?? \"0\");\nconst adj: number[][] = Array.from({ length: n }, (): number[] => []);\nfor (const l of lines.slice(1)) {\n  const [u, v] = l.trim().split(/\\s+/).map(Number);\n  if (u === undefined || v === undefined) {\n    continue;\n  }\n  adj[u]?.push(v);\n  adj[v]?.push(u);\n}\nconst colour = new Array<number>(n).fill(-1);\nlet ok = true;\nfor (let s = 0; s < n; s = s + 1) {\n  if (colour[s] !== -1) {\n    continue;\n  }\n  colour[s] = 0;\n  const queue = [s];\n  for (let head = 0; head < queue.length; head = head + 1) {\n    const u = queue[head] ?? 0;\n    for (const v of adj[u] ?? []) {\n      if (colour[v] === -1) {\n____\n        queue.push(v);\n      } else if (colour[v] === colour[u]) {\n        ok = false;\n      }\n    }\n  }\n}\nconsole.log(ok ? \"two tables\" : \"impossible\");\n",
+              "solution": "import * as fs from \"fs\";\nconst lines = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nconst n = Number(lines[0] ?? \"0\");\nconst adj: number[][] = Array.from({ length: n }, (): number[] => []);\nfor (const l of lines.slice(1)) {\n  const [u, v] = l.trim().split(/\\s+/).map(Number);\n  if (u === undefined || v === undefined) {\n    continue;\n  }\n  adj[u]?.push(v);\n  adj[v]?.push(u);\n}\nconst colour = new Array<number>(n).fill(-1);\nlet ok = true;\nfor (let s = 0; s < n; s = s + 1) {\n  if (colour[s] !== -1) {\n    continue;\n  }\n  colour[s] = 0;\n  const queue = [s];\n  for (let head = 0; head < queue.length; head = head + 1) {\n    const u = queue[head] ?? 0;\n    for (const v of adj[u] ?? []) {\n      if (colour[v] === -1) {\n        colour[v] = 1 - (colour[u] ?? 0);\n        queue.push(v);\n      } else if (colour[v] === colour[u]) {\n        ok = false;\n      }\n    }\n  }\n}\nconsole.log(ok ? \"two tables\" : \"impossible\");\n",
+              "tests": [
+                {
+                  "input": "4\n0 1\n1 2\n2 3\n3 0",
+                  "output": "two tables"
+                },
+                {
+                  "input": "3\n0 1\n1 2\n2 0",
+                  "output": "impossible"
+                },
+                {
+                  "input": "5\n0 1\n3 4\n2 3\n2 4",
+                  "output": "impossible"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w27-lv-3",
+              "title": "Distance to the nearest exit",
+              "prompt": "Multi-source BFS from every `E`; print each open cell's distance to the nearest one.",
+              "hint": "A cell first reached from distance d is at distance d + 1 from its nearest exit.",
+              "hints": [
+                "A cell first reached from distance d is at distance d + 1 from its nearest exit.",
+                "Record it and queue it."
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst grid: readonly string[] = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\").map((l) => l.trim());\nconst R = grid.length;\nconst C = (grid[0] ?? \"\").length;\nfunction cell(r: number, c: number): string {\n  if (r < 0 || r >= R || c < 0 || c >= C) {\n    return \"\";\n  }\n  return (grid[r] ?? \"\").charAt(c);\n}\nconst DIRS: readonly (readonly [number, number])[] = [[-1, 0], [1, 0], [0, -1], [0, 1]];\nconst dist: number[][] = Array.from({ length: R }, (): number[] => new Array<number>(C).fill(-1));\nconst queue: (readonly [number, number])[] = [];\nfor (let r = 0; r < R; r = r + 1) {\n  for (let c = 0; c < C; c = c + 1) {\n    if (cell(r, c) === \"E\") {\n      const row = dist[r];\n      if (row !== undefined) {\n        row[c] = 0;\n      }\n      queue.push([r, c]);\n    }\n  }\n}\nfor (let head = 0; head < queue.length; head = head + 1) {\n  const [r, c] = queue[head] ?? [0, 0];\n  const d = dist[r]?.[c] ?? 0;\n  for (const [dr, dc] of DIRS) {\n    const nr = r + dr;\n    const nc = c + dc;\n    const row = dist[nr];\n    if (cell(nr, nc) === \".\" && row !== undefined && row[nc] === -1) {\n____\n    }\n  }\n}\nconsole.log(dist.map((row, r) => row.map((d, c) => (cell(r, c) === \"#\" ? \"#\" : String(d))).join(\" \")).join(\"\\n\"));\n",
+              "solution": "import * as fs from \"fs\";\nconst grid: readonly string[] = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\").map((l) => l.trim());\nconst R = grid.length;\nconst C = (grid[0] ?? \"\").length;\nfunction cell(r: number, c: number): string {\n  if (r < 0 || r >= R || c < 0 || c >= C) {\n    return \"\";\n  }\n  return (grid[r] ?? \"\").charAt(c);\n}\nconst DIRS: readonly (readonly [number, number])[] = [[-1, 0], [1, 0], [0, -1], [0, 1]];\nconst dist: number[][] = Array.from({ length: R }, (): number[] => new Array<number>(C).fill(-1));\nconst queue: (readonly [number, number])[] = [];\nfor (let r = 0; r < R; r = r + 1) {\n  for (let c = 0; c < C; c = c + 1) {\n    if (cell(r, c) === \"E\") {\n      const row = dist[r];\n      if (row !== undefined) {\n        row[c] = 0;\n      }\n      queue.push([r, c]);\n    }\n  }\n}\nfor (let head = 0; head < queue.length; head = head + 1) {\n  const [r, c] = queue[head] ?? [0, 0];\n  const d = dist[r]?.[c] ?? 0;\n  for (const [dr, dc] of DIRS) {\n    const nr = r + dr;\n    const nc = c + dc;\n    const row = dist[nr];\n    if (cell(nr, nc) === \".\" && row !== undefined && row[nc] === -1) {\n      row[nc] = d + 1;\n      queue.push([nr, nc]);\n    }\n  }\n}\nconsole.log(dist.map((row, r) => row.map((d, c) => (cell(r, c) === \"#\" ? \"#\" : String(d))).join(\" \")).join(\"\\n\"));\n",
+              "tests": [
+                {
+                  "input": "E..\n.#.\n..E",
+                  "output": "0 1 2\n1 # 1\n2 1 0"
+                },
+                {
+                  "input": "E.#.",
+                  "output": "0 1 # -1"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w27-lv-fix1",
+              "title": "Fix the rot that started in one place",
+              "prompt": "Rot spreads from every rotten orange at once. For `2 1 1 2` (one row) the answer is 1 minute; this reports 2, because the BFS was seeded with only the FIRST rotten orange and the second one never spreads.",
+              "hint": "How many rotten oranges start in the queue?",
+              "hints": [
+                "How many rotten oranges start in the queue?",
+                "Every source must be at time 0 before the BFS runs.",
+                "Queue every rotten orange — drop the early exit."
+              ],
+              "language": "typescript",
+              "kind": "fix",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst grid: readonly string[] = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\").map((l) => l.trim());\nconst R = grid.length;\nconst C = (grid[0] ?? \"\").length;\nfunction cell(r: number, c: number): string {\n  if (r < 0 || r >= R || c < 0 || c >= C) {\n    return \"\";\n  }\n  return (grid[r] ?? \"\").charAt(c);\n}\nconst DIRS: readonly (readonly [number, number])[] = [[-1, 0], [1, 0], [0, -1], [0, 1]];\nconst time = new Map<string, number>();\nconst queue: (readonly [number, number])[] = [];\nfor (let r = 0; r < R && queue.length === 0; r = r + 1) {\n  for (let c = 0; c < C; c = c + 1) {\n    if (cell(r, c) === \"2\") {\n      time.set(`${r},${c}`, 0);\n      queue.push([r, c]);\n      break;\n    }\n  }\n}\nlet latest = 0;\nfor (let head = 0; head < queue.length; head = head + 1) {\n  const [r, c] = queue[head] ?? [0, 0];\n  const t = time.get(`${r},${c}`) ?? 0;\n  for (const [dr, dc] of DIRS) {\n    const nr = r + dr;\n    const nc = c + dc;\n    const here = cell(nr, nc);\n    if ((here === \"1\" || here === \"2\") && !time.has(`${nr},${nc}`)) {\n      time.set(`${nr},${nc}`, t + 1);\n      if (here === \"1\") {\n        latest = Math.max(latest, t + 1);\n      }\n      queue.push([nr, nc]);\n    }\n  }\n}\nconsole.log(latest);\n",
+              "solution": "import * as fs from \"fs\";\nconst grid: readonly string[] = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\").map((l) => l.trim());\nconst R = grid.length;\nconst C = (grid[0] ?? \"\").length;\nfunction cell(r: number, c: number): string {\n  if (r < 0 || r >= R || c < 0 || c >= C) {\n    return \"\";\n  }\n  return (grid[r] ?? \"\").charAt(c);\n}\nconst DIRS: readonly (readonly [number, number])[] = [[-1, 0], [1, 0], [0, -1], [0, 1]];\nconst time = new Map<string, number>();\nconst queue: (readonly [number, number])[] = [];\nfor (let r = 0; r < R; r = r + 1) {\n  for (let c = 0; c < C; c = c + 1) {\n    if (cell(r, c) === \"2\") {\n      time.set(`${r},${c}`, 0);\n      queue.push([r, c]);\n    }\n  }\n}\nlet latest = 0;\nfor (let head = 0; head < queue.length; head = head + 1) {\n  const [r, c] = queue[head] ?? [0, 0];\n  const t = time.get(`${r},${c}`) ?? 0;\n  for (const [dr, dc] of DIRS) {\n    const nr = r + dr;\n    const nc = c + dc;\n    const here = cell(nr, nc);\n    if ((here === \"1\" || here === \"2\") && !time.has(`${nr},${nc}`)) {\n      time.set(`${nr},${nc}`, t + 1);\n      if (here === \"1\") {\n        latest = Math.max(latest, t + 1);\n      }\n      queue.push([nr, nc]);\n    }\n  }\n}\nconsole.log(latest);\n",
+              "tests": [
+                {
+                  "input": "2112",
+                  "output": "1"
+                },
+                {
+                  "input": "21\n12",
+                  "output": "1"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            }
+          ],
+          "quiz": [
+            {
+              "question": "Why not run one BFS per rotten orange and take the minimum?",
+              "options": [
+                "it is wrong",
+                "it gives the right answer but costs one BFS per source",
+                "it is faster",
+                "it cannot"
+              ],
+              "answer": 1,
+              "explanation": "Multi-source does it in one pass."
+            },
+            {
+              "question": "A square is two-colourable and a triangle is not because…",
+              "options": [
+                "size",
+                "a triangle is an odd cycle",
+                "a square is a tree",
+                "luck"
+              ],
+              "answer": 1,
+              "explanation": "Colours must alternate round the loop."
+            }
+          ]
+        },
+        {
+          "key": "w27-weighted",
+          "title": "When edges have weights",
+          "what": "BFS counts edges. Dijkstra counts cost — and week 28 makes it fast.",
+          "lesson": "BFS's guarantee is \"fewest **edges**\". Give edges a **cost** and that is no longer the\nquestion:\n\n```\n0 —4— 1 —1— 3\n \\     |\n  1    1\n   \\   |\n    2 —\n```\n\nThe fewest edges from 0 to 3 is `0 → 1 → 3` (two edges, cost **5**). The cheapest is\n`0 → 2 → 1 → 3` (three edges, cost **3**). BFS returns the first one.\n\n## Dijkstra\n\nKeep a tentative distance for every node, all ∞ except the start at 0. Repeatedly:\n\n1. **settle** the unsettled node with the **smallest** tentative distance — its\n   distance is now final;\n2. **relax** its edges: for each `u → v` with weight w,\n   `dist[v] = min(dist[v], dist[u] + w)`.\n\nWhy is the smallest safe to settle? Every other route to it would go through some\nnode that is already at least as far — and with **non-negative** weights, going\nfurther can never make it cheaper. (Negative weights break exactly that argument,\nand need a different algorithm.)\n\n## The cost, and why week 28 exists\n\nStep 1, done by scanning every node, is O(V) — and it happens V times: **O(V²)**.\nThat is fine for a few hundred nodes and far too slow for a road network. What step 1\nneeds is a structure that hands back **the smallest** item quickly as items keep\narriving. That structure is a **priority queue**, built on a **heap**, and it is week\n28's first lesson. With it Dijkstra is O((V + E) log V).\n\n## Choosing\n\n| the question | the tool |\n|---|---|\n| reachable? components? | DFS or BFS |\n| fewest steps / edges | BFS |\n| cheapest total with non-negative costs | Dijkstra |\n| order respecting prerequisites | topological sort |\n| cycle in a directed graph | three colours, or Kahn |\n| can it be split in two | BFS two-colouring |\n\n> ⚠️ **Common mistakes:** BFS on weighted edges; relaxing without settling the\n> smallest first; and assuming Dijkstra works with negative weights.\n",
+          "warmup": [
+            {
+              "question": "BFS on a weighted graph returns…",
+              "options": [
+                "the cheapest path",
+                "the path with fewest edges",
+                "nothing",
+                "the longest path"
+              ],
+              "answer": 1,
+              "explanation": "Which may cost more."
+            },
+            {
+              "question": "Dijkstra always settles next…",
+              "options": [
+                "the newest node",
+                "the unsettled node with the smallest tentative distance",
+                "node 0",
+                "the largest"
+              ],
+              "answer": 1,
+              "explanation": "Its distance is then final."
+            },
+            {
+              "question": "Dijkstra needs weights that are…",
+              "options": [
+                "integers",
+                "non-negative",
+                "distinct",
+                "small"
+              ],
+              "answer": 1,
+              "explanation": "A negative edge can undercut a settled node."
+            },
+            {
+              "question": "Array-scan Dijkstra costs…",
+              "options": [
+                "O(V)",
+                "O(V²)",
+                "O(E)",
+                "O(log V)"
+              ],
+              "answer": 1,
+              "explanation": "Week 28's heap brings it down."
+            }
+          ],
+          "exercises": [
+            {
+              "id": "tscourse-w27-wt-1",
+              "title": "Relax the edges",
+              "prompt": "After settling a node, offer each neighbour a cheaper route through it.",
+              "hint": "Going to v through u costs dist[u] + w. Keep it if it is cheaper.",
+              "hints": [
+                "Going to v through u costs dist[u] + w. Keep it if it is cheaper.",
+                "Write dist[v] = Math.min(dist[v] ?? Infinity, (dist[u] ?? 0) + w);"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Hard",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst lines = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nconst n = Number(lines[0] ?? \"0\");\nconst adj: (readonly [number, number])[][] = Array.from({ length: n }, (): (readonly [number, number])[] => []);\nfor (const l of lines.slice(1)) {\n  const [u, v, w] = l.trim().split(/\\s+/).map(Number);\n  if (u === undefined || v === undefined || w === undefined) {\n    continue;\n  }\n  adj[u]?.push([v, w]);\n  adj[v]?.push([u, w]);\n}\nconst dist = new Array<number>(n).fill(Infinity);\nconst settled = new Array<boolean>(n).fill(false);\ndist[0] = 0;\nfor (let round = 0; round < n; round = round + 1) {\n  let u = -1;\n  for (let i = 0; i < n; i = i + 1) {\n    if (!settled[i] && (u === -1 || (dist[i] ?? Infinity) < (dist[u] ?? Infinity))) {\n      u = i;\n    }\n  }\n  if (u === -1 || dist[u] === Infinity) {\n    break;\n  }\n  settled[u] = true;\n  for (const [v, w] of adj[u] ?? []) {\n____\n  }\n}\nconsole.log(dist.map((d) => (d === Infinity ? \"-\" : String(d))).join(\" \"));\n",
+              "solution": "import * as fs from \"fs\";\nconst lines = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nconst n = Number(lines[0] ?? \"0\");\nconst adj: (readonly [number, number])[][] = Array.from({ length: n }, (): (readonly [number, number])[] => []);\nfor (const l of lines.slice(1)) {\n  const [u, v, w] = l.trim().split(/\\s+/).map(Number);\n  if (u === undefined || v === undefined || w === undefined) {\n    continue;\n  }\n  adj[u]?.push([v, w]);\n  adj[v]?.push([u, w]);\n}\nconst dist = new Array<number>(n).fill(Infinity);\nconst settled = new Array<boolean>(n).fill(false);\ndist[0] = 0;\nfor (let round = 0; round < n; round = round + 1) {\n  let u = -1;\n  for (let i = 0; i < n; i = i + 1) {\n    if (!settled[i] && (u === -1 || (dist[i] ?? Infinity) < (dist[u] ?? Infinity))) {\n      u = i;\n    }\n  }\n  if (u === -1 || dist[u] === Infinity) {\n    break;\n  }\n  settled[u] = true;\n  for (const [v, w] of adj[u] ?? []) {\n    dist[v] = Math.min(dist[v] ?? Infinity, (dist[u] ?? 0) + w);\n  }\n}\nconsole.log(dist.map((d) => (d === Infinity ? \"-\" : String(d))).join(\" \"));\n",
+              "tests": [
+                {
+                  "input": "4\n0 1 4\n0 2 1\n2 1 1\n1 3 1",
+                  "output": "0 2 1 3"
+                },
+                {
+                  "input": "3\n0 1 5",
+                  "output": "0 5 -"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w27-wt-2",
+              "title": "Settle the nearest",
+              "prompt": "Find the unsettled node with the smallest tentative distance.",
+              "hint": "Among nodes not yet settled, keep the one whose distance is smallest.",
+              "hints": [
+                "Among nodes not yet settled, keep the one whose distance is smallest.",
+                "The first unsettled node found is the starting candidate (u === -1)."
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Hard",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst lines = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nconst n = Number(lines[0] ?? \"0\");\nconst adj: (readonly [number, number])[][] = Array.from({ length: n }, (): (readonly [number, number])[] => []);\nfor (const l of lines.slice(1)) {\n  const [u, v, w] = l.trim().split(/\\s+/).map(Number);\n  if (u === undefined || v === undefined || w === undefined) {\n    continue;\n  }\n  adj[u]?.push([v, w]);\n  adj[v]?.push([u, w]);\n}\nconst dist = new Array<number>(n).fill(Infinity);\nconst settled = new Array<boolean>(n).fill(false);\ndist[0] = 0;\nlet scans = 0;\nfor (let round = 0; round < n; round = round + 1) {\n  let u = -1;\n  for (let i = 0; i < n; i = i + 1) {\n    scans = scans + 1;\n____\n  }\n  if (u === -1 || dist[u] === Infinity) {\n    break;\n  }\n  settled[u] = true;\n  for (const [v, w] of adj[u] ?? []) {\n    dist[v] = Math.min(dist[v] ?? Infinity, (dist[u] ?? 0) + w);\n  }\n}\nconsole.log(`to last=${dist[n - 1] ?? -1} scans=${scans}`);\n",
+              "solution": "import * as fs from \"fs\";\nconst lines = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nconst n = Number(lines[0] ?? \"0\");\nconst adj: (readonly [number, number])[][] = Array.from({ length: n }, (): (readonly [number, number])[] => []);\nfor (const l of lines.slice(1)) {\n  const [u, v, w] = l.trim().split(/\\s+/).map(Number);\n  if (u === undefined || v === undefined || w === undefined) {\n    continue;\n  }\n  adj[u]?.push([v, w]);\n  adj[v]?.push([u, w]);\n}\nconst dist = new Array<number>(n).fill(Infinity);\nconst settled = new Array<boolean>(n).fill(false);\ndist[0] = 0;\nlet scans = 0;\nfor (let round = 0; round < n; round = round + 1) {\n  let u = -1;\n  for (let i = 0; i < n; i = i + 1) {\n    scans = scans + 1;\n    if (!settled[i] && (u === -1 || (dist[i] ?? Infinity) < (dist[u] ?? Infinity))) {\n      u = i;\n    }\n  }\n  if (u === -1 || dist[u] === Infinity) {\n    break;\n  }\n  settled[u] = true;\n  for (const [v, w] of adj[u] ?? []) {\n    dist[v] = Math.min(dist[v] ?? Infinity, (dist[u] ?? 0) + w);\n  }\n}\nconsole.log(`to last=${dist[n - 1] ?? -1} scans=${scans}`);\n",
+              "tests": [
+                {
+                  "input": "4\n0 1 4\n0 2 1\n2 1 1\n1 3 1",
+                  "output": "to last=3 scans=16"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w27-wt-3",
+              "title": "Name the tool",
+              "prompt": "Map each question to the algorithm that answers it.",
+              "hint": "Kind 2 is 'cheapest total cost, costs non-negative'.",
+              "hints": [
+                "Kind 2 is 'cheapest total cost, costs non-negative'.",
+                "Write if (kind === 2) { return \"Dijkstra\"; }"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nfunction tool(kind: number): string {\n  if (kind === 1) {\n    return \"BFS\";\n  }\n____\n  if (kind === 3) {\n    return \"topological sort\";\n  }\n  return \"DFS\";\n}\nfor (const k of nums) {\n  console.log(`${k} ${tool(k)}`);\n}\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nfunction tool(kind: number): string {\n  if (kind === 1) {\n    return \"BFS\";\n  }\n  if (kind === 2) {\n    return \"Dijkstra\";\n  }\n  if (kind === 3) {\n    return \"topological sort\";\n  }\n  return \"DFS\";\n}\nfor (const k of nums) {\n  console.log(`${k} ${tool(k)}`);\n}\n",
+              "tests": [
+                {
+                  "input": "1 2 3 4",
+                  "output": "1 BFS\n2 Dijkstra\n3 topological sort\n4 DFS"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w27-wt-fix1",
+              "title": "Fix the route that took fewest roads, not least cost",
+              "prompt": "The cheapest way from 0 to 3 costs 3 (0 → 2 → 1 → 3). This reports 5: it is a BFS, so it settles each node the first time it is reached — by the fewest edges — and 0 → 1 → 3 has fewer edges. Costs need Dijkstra.",
+              "hint": "BFS fixes a node's value the first time it is reached. Is the first route the cheapest?",
+              "hints": [
+                "BFS fixes a node's value the first time it is reached. Is the first route the cheapest?",
+                "Settle nodes in order of cost, not in order of discovery.",
+                "Dijkstra: settle the cheapest unsettled node, then relax its edges."
+              ],
+              "language": "typescript",
+              "kind": "fix",
+              "difficulty": "Hard",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst lines = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nconst n = Number(lines[0] ?? \"0\");\nconst adj: (readonly [number, number])[][] = Array.from({ length: n }, (): (readonly [number, number])[] => []);\nfor (const l of lines.slice(1)) {\n  const [u, v, w] = l.trim().split(/\\s+/).map(Number);\n  if (u === undefined || v === undefined || w === undefined) {\n    continue;\n  }\n  adj[u]?.push([v, w]);\n  adj[v]?.push([u, w]);\n}\nconst cost = new Array<number>(n).fill(-1);\ncost[0] = 0;\nconst queue = [0];\nfor (let head = 0; head < queue.length; head = head + 1) {\n  const u = queue[head] ?? 0;\n  for (const [v, w] of adj[u] ?? []) {\n    if (cost[v] === -1) {\n      cost[v] = (cost[u] ?? 0) + w;\n      queue.push(v);\n    }\n  }\n}\nconsole.log(cost[n - 1] ?? -1);\n",
+              "solution": "import * as fs from \"fs\";\nconst lines = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nconst n = Number(lines[0] ?? \"0\");\nconst adj: (readonly [number, number])[][] = Array.from({ length: n }, (): (readonly [number, number])[] => []);\nfor (const l of lines.slice(1)) {\n  const [u, v, w] = l.trim().split(/\\s+/).map(Number);\n  if (u === undefined || v === undefined || w === undefined) {\n    continue;\n  }\n  adj[u]?.push([v, w]);\n  adj[v]?.push([u, w]);\n}\nconst cost = new Array<number>(n).fill(Infinity);\nconst settled = new Array<boolean>(n).fill(false);\ncost[0] = 0;\nfor (let round = 0; round < n; round = round + 1) {\n  let u = -1;\n  for (let i = 0; i < n; i = i + 1) {\n    if (!settled[i] && (u === -1 || (cost[i] ?? Infinity) < (cost[u] ?? Infinity))) {\n      u = i;\n    }\n  }\n  if (u === -1 || cost[u] === Infinity) {\n    break;\n  }\n  settled[u] = true;\n  for (const [v, w] of adj[u] ?? []) {\n    cost[v] = Math.min(cost[v] ?? Infinity, (cost[u] ?? 0) + w);\n  }\n}\nconsole.log(cost[n - 1] === Infinity ? -1 : cost[n - 1] ?? -1);\n",
+              "tests": [
+                {
+                  "input": "4\n0 1 4\n0 2 1\n2 1 1\n1 3 1",
+                  "output": "3"
+                },
+                {
+                  "input": "2\n0 1 7",
+                  "output": "7"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            }
+          ],
+          "quiz": [
+            {
+              "question": "If every edge weighs 1, Dijkstra and BFS give…",
+              "options": [
+                "different answers",
+                "the same distances",
+                "an error",
+                "nothing"
+              ],
+              "answer": 1,
+              "explanation": "BFS is Dijkstra with unit weights."
+            },
+            {
+              "question": "What does Dijkstra need that an array scan provides slowly?",
+              "options": [
+                "sorting",
+                "the smallest item, repeatedly, as items arrive — a priority queue",
+                "a Set",
+                "recursion"
+              ],
+              "answer": 1,
+              "explanation": "Week 28."
+            }
+          ]
+        }
+      ],
+      "capstone": {
+        "title": "Interview rep #27 — the maze",
+        "brief": "Find the shortest way through a maze, draw it, and report what the search cost.\n\nInput: the maze, one row per line. `S` is the start, `E` the exit, `#` a wall and\n`.` open floor. Moves are up, down, left and right.\n\n```\nS.#.\n..#.\n#...\n..#E\n```\n\n```\nS.#.\n**#.\n#***\n..#E\nsteps 6  explored 10\n```\n\n**The rules:**\n\n* BFS from `S`, trying neighbours in the order **up, down, left, right**, and\n  recording each cell's parent the first time it is reached. With that order fixed,\n  the path is fully determined.\n* Walk the parents back from `E` and mark every cell on the way with `*` — not `S`\n  or `E` themselves.\n* `steps` is the number of moves. `explored` is how many cells were **taken off the\n  queue** before `E` was — the start included, `E` not.\n* If `E` cannot be reached, print the maze unchanged, then\n  `no way out  explored N`, where N is every cell the search reached.\n\n**What makes it a rep:** it is lessons 3 and 4 together — a grid as a graph, BFS for\nfewest steps, parent links for the path — and `explored` is the month's counting\nhabit applied to a search: in the second test the exit is two columns from the start,\nbehind a wall, and the search explores every floor cell before it arrives.\n",
+        "kind": "auto",
+        "exercise": {
+          "id": "tscourse-w27-capstone",
+          "title": "Interview rep #27",
+          "prompt": "Find the shortest route through the maze with BFS, draw it with `*`, and report its length and how many cells the search explored.",
+          "hint": "Treat anything off the board as a wall, and the neighbour order up, down, left, right is then the whole of the determinism.",
+          "hints": [
+            "Treat anything off the board as a wall, and the neighbour order up, down, left, right is then the whole of the determinism.",
+            "Record a cell's parent the moment it is first queued — never overwrite it.",
+            "`explored` counts dequeues, and the loop stops the moment E is dequeued.",
+            "Walk parents back from E; mark every cell you land on until you reach S.",
+            "Steps: one for each parent link walked.",
+            "`let exit = null` assigned inside the loop IS narrowed correctly here — the loop is not a nested function, unlike week 25's stretch."
+          ],
+          "language": "typescript",
+          "kind": "challenge",
+          "difficulty": "Hard",
+          "strictness": "strict+indexed",
+          "harness": "",
+          "judge_mode": "",
+          "forbid": [],
+          "starter": "import * as fs from \"fs\";\nconst maze: readonly string[] = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\").map((l) => l.trim());\nconst R = maze.length;\nconst C = (maze[0] ?? \"\").length;\nfunction at(r: number, c: number): string {\n  if (r < 0 || r >= R || c < 0 || c >= C) {\n    return \"#\";\n  }\n  return (maze[r] ?? \"\").charAt(c);\n}\nlet start: readonly [number, number] = [0, 0];\nfor (let r = 0; r < R; r = r + 1) {\n  for (let c = 0; c < C; c = c + 1) {\n    if (at(r, c) === \"S\") {\n      start = [r, c];\n    }\n  }\n}\nconst DIRS: readonly (readonly [number, number])[] = [[-1, 0], [1, 0], [0, -1], [0, 1]];\n____\n",
+          "solution": "import * as fs from \"fs\";\nconst maze: readonly string[] = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\").map((l) => l.trim());\nconst R = maze.length;\nconst C = (maze[0] ?? \"\").length;\nfunction at(r: number, c: number): string {\n  if (r < 0 || r >= R || c < 0 || c >= C) {\n    return \"#\";\n  }\n  return (maze[r] ?? \"\").charAt(c);\n}\nlet start: readonly [number, number] = [0, 0];\nfor (let r = 0; r < R; r = r + 1) {\n  for (let c = 0; c < C; c = c + 1) {\n    if (at(r, c) === \"S\") {\n      start = [r, c];\n    }\n  }\n}\nconst DIRS: readonly (readonly [number, number])[] = [[-1, 0], [1, 0], [0, -1], [0, 1]];\nconst parent = new Map<string, string>();\nconst seen = new Set<string>([`${start[0]},${start[1]}`]);\nconst queue: (readonly [number, number])[] = [start];\nlet explored = 0;\nlet exit: readonly [number, number] | null = null;\nfor (let head = 0; head < queue.length; head = head + 1) {\n  const [r, c] = queue[head] ?? [0, 0];\n  if (at(r, c) === \"E\") {\n    exit = [r, c];\n    break;\n  }\n  explored = explored + 1;\n  for (const [dr, dc] of DIRS) {\n    const nr = r + dr;\n    const nc = c + dc;\n    const key = `${nr},${nc}`;\n    if (at(nr, nc) !== \"#\" && !seen.has(key)) {\n      seen.add(key);\n      parent.set(key, `${r},${c}`);\n      queue.push([nr, nc]);\n    }\n  }\n}\nconst out = maze.map((row) => [...row]);\nif (exit === null) {\n  console.log(maze.join(\"\\n\"));\n  console.log(`no way out  explored ${explored}`);\n} else {\n  let steps = 0;\n  let key = parent.get(`${exit[0]},${exit[1]}`);\n  steps = steps + 1;\n  while (key !== undefined && key !== `${start[0]},${start[1]}`) {\n    const [r, c] = key.split(\",\").map(Number);\n    const row = out[r ?? 0];\n    if (row !== undefined) {\n      row[c ?? 0] = \"*\";\n    }\n    steps = steps + 1;\n    key = parent.get(key);\n  }\n  console.log(out.map((row) => row.join(\"\")).join(\"\\n\"));\n  console.log(`steps ${steps}  explored ${explored}`);\n}\n",
+          "tests": [
+            {
+              "input": "S.#.\n..#.\n#...\n..#E",
+              "output": "S.#.\n**#.\n#***\n..#E\nsteps 6  explored 10"
+            },
+            {
+              "input": "S#E\n.#.\n...",
+              "output": "S#E\n*#*\n***\nsteps 6  explored 6"
+            },
+            {
+              "input": "S#E",
+              "output": "S#E\nno way out  explored 1"
+            },
+            {
+              "input": "SE",
+              "output": "SE\nsteps 1  explored 1"
+            }
+          ],
+          "source_slug": "",
+          "dataset": ""
+        },
+        "example_io": "S.#.\n**#.\n#***\n..#E\nsteps 6  explored 10",
+        "rubric": [
+          "the maze is searched with BFS over a head-index queue",
+          "neighbours are tried in the stated order, so the path is determined",
+          "each cell's parent is recorded once, when first reached",
+          "the path is rebuilt from parent links, not searched for again",
+          "explored counts dequeued cells, stopping at the exit",
+          "an unreachable exit prints the maze unchanged and the explored count",
+          "no index access is asserted with `!`"
+        ],
+        "reference": "",
+        "stretch": {
+          "id": "tscourse-w27-capstone-stretch",
+          "title": "Interview rep #27 (stretch)",
+          "prompt": "The course planner. The first line is the number of courses; each later line `a b` means course a must come before course b. Print a valid order in which, whenever several courses are available, the **smallest-numbered** is taken first; then the fewest `semesters` needed if any number of courses can be taken at once. If the prerequisites contain a cycle, print `impossible: N courses stuck` instead.",
+          "hint": "Kahn's algorithm, with the queue replaced by 'the available set, smallest first'.",
+          "hints": [
+            "Kahn's algorithm, with the queue replaced by 'the available set, smallest first'.",
+            "Sorting the available list before each pick is O(V² log V) — fine at this size, and week 28's heap does it properly.",
+            "`shift` is acceptable here only because the list is tiny; say why in a comment if you use it.",
+            "Semesters is the longest chain: a course's level is one more than its latest prerequisite's."
+          ],
+          "language": "typescript",
+          "kind": "challenge",
+          "difficulty": "Hard",
+          "strictness": "strict+indexed",
+          "harness": "",
+          "judge_mode": "",
+          "forbid": [],
+          "starter": "import * as fs from \"fs\";\nconst lines = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nconst n = Number(lines[0] ?? \"0\");\nconst adj: number[][] = Array.from({ length: n }, (): number[] => []);\nfor (const l of lines.slice(1)) {\n  const [u, v] = l.trim().split(/\\s+/).map(Number);\n  if (u === undefined || v === undefined) {\n    continue;\n  }\n  adj[u]?.push(v);\n}\nconst indegree = new Array<number>(n).fill(0);\nfor (const ns of adj) {\n  for (const v of ns) {\n    indegree[v] = (indegree[v] ?? 0) + 1;\n  }\n}\nconst level = new Array<number>(n).fill(1);\nconst available: number[] = [];\nfor (let u = 0; u < n; u = u + 1) {\n  if (indegree[u] === 0) {\n    available.push(u);\n  }\n}\n____\nif (order.length < n) {\n  console.log(`impossible: ${n - order.length} courses stuck`);\n} else {\n  console.log(`order ${order.join(\" \")}`);\n  console.log(`semesters ${n === 0 ? 0 : Math.max(...level)}`);\n}\n",
+          "solution": "import * as fs from \"fs\";\nconst lines = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nconst n = Number(lines[0] ?? \"0\");\nconst adj: number[][] = Array.from({ length: n }, (): number[] => []);\nfor (const l of lines.slice(1)) {\n  const [u, v] = l.trim().split(/\\s+/).map(Number);\n  if (u === undefined || v === undefined) {\n    continue;\n  }\n  adj[u]?.push(v);\n}\nconst indegree = new Array<number>(n).fill(0);\nfor (const ns of adj) {\n  for (const v of ns) {\n    indegree[v] = (indegree[v] ?? 0) + 1;\n  }\n}\nconst level = new Array<number>(n).fill(1);\nconst available: number[] = [];\nfor (let u = 0; u < n; u = u + 1) {\n  if (indegree[u] === 0) {\n    available.push(u);\n  }\n}\nconst order: number[] = [];\nwhile (available.length > 0) {\n  available.sort((a, b) => a - b);\n  const u = available.shift() ?? 0;\n  order.push(u);\n  for (const v of adj[u] ?? []) {\n    level[v] = Math.max(level[v] ?? 1, (level[u] ?? 1) + 1);\n    indegree[v] = (indegree[v] ?? 0) - 1;\n    if (indegree[v] === 0) {\n      available.push(v);\n    }\n  }\n}\nif (order.length < n) {\n  console.log(`impossible: ${n - order.length} courses stuck`);\n} else {\n  console.log(`order ${order.join(\" \")}`);\n  console.log(`semesters ${n === 0 ? 0 : Math.max(...level)}`);\n}\n",
+          "tests": [
+            {
+              "input": "4\n3 1\n3 2\n1 0\n2 0",
+              "output": "order 3 1 2 0\nsemesters 3"
+            },
+            {
+              "input": "5\n0 4\n1 4\n2 3",
+              "output": "order 0 1 2 3 4\nsemesters 2"
+            },
+            {
+              "input": "3\n0 1\n1 2\n2 1",
+              "output": "impossible: 2 courses stuck"
+            }
+          ],
+          "source_slug": "",
+          "dataset": ""
+        }
+      },
+      "objectives": [
+        "Store a graph as an adjacency list, directed or undirected",
+        "Type an adjacency list so it is not never[][]",
+        "Traverse with DFS and a visited set, and say what goes wrong without it",
+        "Count connected components and their sizes",
+        "Traverse with BFS, and say why it finds shortest paths in unweighted graphs",
+        "Reconstruct a shortest path from parent links",
+        "Mark nodes visited when they are enqueued, and say why",
+        "Treat a grid as a graph, with bounds-checked neighbours",
+        "Detect a cycle in a directed graph with three colours",
+        "Produce a topological order with Kahn's algorithm, and detect a cycle with it",
+        "Run a multi-source BFS, and 2-colour a graph",
+        "Say why BFS fails on weighted edges, and what replaces it"
+      ],
+      "why": "Graph questions are the ones that look hardest in an interview and reduce most completely to a template. Once 'islands', 'rotting oranges', 'course schedule' and 'word ladder' are all recognised as BFS or DFS with a visited set, a whole category stops being tricks. And it is the payoff of weeks 18-20: the stack and the queue were built for exactly this.",
+      "est_minutes": 480,
+      "glossary": [
+        {
+          "term": "graph",
+          "def": "Nodes and the edges between them."
+        },
+        {
+          "term": "directed / undirected",
+          "def": "An undirected edge goes both ways; a directed one only from u to v."
+        },
+        {
+          "term": "adjacency list",
+          "def": "For each node, the list of its neighbours. adj[u] = [v, w, …]."
+        },
+        {
+          "term": "degree",
+          "def": "How many edges touch a node. In a directed graph: in-degree and out-degree."
+        },
+        {
+          "term": "visited set",
+          "def": "The nodes already reached. What stops a traversal looping round a cycle."
+        },
+        {
+          "term": "DFS",
+          "def": "Depth-first search: a stack (or recursion). Deep before wide."
+        },
+        {
+          "term": "BFS",
+          "def": "Breadth-first search: a queue. Level by level, so first arrival is by a shortest path."
+        },
+        {
+          "term": "connected component",
+          "def": "A maximal set of nodes that can all reach each other."
+        },
+        {
+          "term": "parent link",
+          "def": "The node you came from. Walking them back rebuilds the path."
+        },
+        {
+          "term": "multi-source BFS",
+          "def": "Start the queue with EVERY source at distance 0."
+        },
+        {
+          "term": "bipartite",
+          "def": "Two-colourable: every edge joins the two colours."
+        },
+        {
+          "term": "DAG",
+          "def": "Directed acyclic graph. The kind that has a topological order."
+        },
+        {
+          "term": "topological order",
+          "def": "An order where every edge points forwards. Prerequisites first."
+        },
+        {
+          "term": "in-degree",
+          "def": "Edges pointing INTO a node. Kahn's algorithm starts from those with 0."
+        },
+        {
+          "term": "three colours",
+          "def": "White (unseen), grey (on the current path), black (finished). A grey hit is a cycle."
+        },
+        {
+          "term": "Dijkstra",
+          "def": "Shortest paths with non-negative weights: always settle the nearest unsettled node."
+        }
+      ],
+      "cheatsheet": "```ts\n// ---- an adjacency list — annotate the callback, or it is never[][] ---------\nconst adj: number[][] = Array.from({ length: n }, (): number[] => []);\nadj[u]?.push(v);\nadj[v]?.push(u);                                   // undirected: both directions\n\n// ---- DFS: a stack and a visited set --------------------------------------\nconst seen = new Set<number>([start]);\nconst stack = [start];\nwhile (stack.length > 0) {\n  const u = stack.pop();\n  if (u === undefined) { continue; }\n  for (const v of adj[u] ?? []) {\n    if (!seen.has(v)) { seen.add(v); stack.push(v); }\n  }\n}\n\n// ---- BFS: a head-index queue (week 18) and distances ----------------------\nconst dist = new Array<number>(n).fill(-1);\ndist[start] = 0;\nconst queue = [start];\nfor (let head = 0; head < queue.length; head = head + 1) {\n  const u = queue[head] ?? 0;\n  for (const v of adj[u] ?? []) {\n    if (dist[v] === -1) {                          // mark when ENQUEUED\n      dist[v] = (dist[u] ?? 0) + 1;\n      parent[v] = u;\n      queue.push(v);\n    }\n  }\n}\n\n// ---- a grid is a graph -----------------------------------------------------\nconst DIRS = [[-1, 0], [1, 0], [0, -1], [0, 1]];   // up, down, left, right\nif (r < 0 || r >= R || c < 0 || c >= C) { /* off the board */ }\nconst key = `${r},${c}`;                            // or r * C + c — NOT id ± 1\n\n// ---- Kahn's topological order ------------------------------------------------\n// indegree; queue every node with 0; pop, output, decrement its neighbours,\n// enqueue any that reach 0. Output shorter than n  ⇒  a cycle.\n\n// ---- directed cycle: three colours ------------------------------------------\n// 0 white · 1 grey (on the current path) · 2 black (done). Reaching GREY = cycle.\n```\n\n| question | reach for |\n|---|---|\n| reachable? components? | DFS or BFS |\n| fewest edges from A to B | **BFS** |\n| order with prerequisites | topological sort |\n| cycle in a directed graph | three colours, or Kahn |\n| fewest total WEIGHT | Dijkstra (week 28's heap) |\n",
+      "self_check": [
+        "Can you build an undirected adjacency list from an edge list?",
+        "Can you say why `Array.from({ length: n }, () => [])` rejects a push?",
+        "Can you write DFS with a visited set, and say what happens without one?",
+        "Can you count connected components?",
+        "Can you say why BFS finds shortest paths and DFS does not?",
+        "Can you rebuild the path itself from parent links?",
+        "Can you say why a node is marked when enqueued rather than when dequeued?",
+        "Can you walk a grid's four neighbours without going off the edge?",
+        "Can you say why `id - 1` is not the left neighbour of a grid cell?",
+        "Can you produce a topological order, and tell when none exists?",
+        "Can you detect a cycle in a directed graph, and say why 'visited' alone is not enough?",
+        "Can you start a BFS from several sources at once?",
+        "Can you say what BFS gets wrong on a weighted graph?"
+      ],
+      "review": [
+        {
+          "question": "DFS and BFS differ in…",
+          "options": [
+            "everything",
+            "the container: a stack or a queue",
+            "the visited set",
+            "the graph"
+          ],
+          "answer": 1,
+          "explanation": "Week 20's fact."
+        },
+        {
+          "question": "A traversal of a graph (not a tree) needs…",
+          "options": [
+            "recursion",
+            "a visited set",
+            "sorted edges",
+            "a heap"
+          ],
+          "answer": 1,
+          "explanation": "Or a cycle is walked for ever."
+        },
+        {
+          "question": "`Array.from({ length: 3 }, () => [])` is typed…",
+          "options": [
+            "number[][]",
+            "never[][]",
+            "any[][]",
+            "unknown[][]"
+          ],
+          "answer": 1,
+          "explanation": "Annotate the callback: (): number[] => []."
+        },
+        {
+          "question": "An undirected edge u-v is stored as…",
+          "options": [
+            "adj[u].push(v)",
+            "adj[u].push(v) AND adj[v].push(u)",
+            "adj[v].push(u)",
+            "a pair"
+          ],
+          "answer": 1,
+          "explanation": "Both directions."
+        },
+        {
+          "question": "BFS finds shortest paths because…",
+          "options": [
+            "it is fast",
+            "it reaches every node at distance d before any at d + 1",
+            "of the queue's size",
+            "it is recursive"
+          ],
+          "answer": 1,
+          "explanation": "First arrival is by a shortest path."
+        },
+        {
+          "question": "BFS marks a node visited…",
+          "options": [
+            "when dequeued",
+            "when enqueued, so it enters the queue once",
+            "never",
+            "at the end"
+          ],
+          "answer": 1,
+          "explanation": "Otherwise duplicates pile up."
+        },
+        {
+          "question": "Connected components are counted by…",
+          "options": [
+            "BFS once",
+            "starting a traversal from every unvisited node",
+            "sorting",
+            "degrees"
+          ],
+          "answer": 1,
+          "explanation": "Each fresh start is a new component."
+        },
+        {
+          "question": "In a grid stored as r * C + c, the left neighbour of a cell in column 0 is…",
+          "options": [
+            "id - 1",
+            "off the board — id - 1 is the previous row's last cell",
+            "id + C",
+            "id"
+          ],
+          "answer": 1,
+          "explanation": "Check the column, not the id."
+        },
+        {
+          "question": "Kahn's algorithm starts from the nodes with…",
+          "options": [
+            "the most edges",
+            "in-degree 0",
+            "out-degree 0",
+            "the smallest number"
+          ],
+          "answer": 1,
+          "explanation": "Nothing has to come before them."
+        },
+        {
+          "question": "Kahn's output shorter than n means…",
+          "options": [
+            "an error",
+            "the graph has a cycle",
+            "it is undirected",
+            "disconnected"
+          ],
+          "answer": 1,
+          "explanation": "Some nodes never reached in-degree 0."
+        },
+        {
+          "question": "A directed cycle check needs three colours because…",
+          "options": [
+            "tradition",
+            "reaching a FINISHED node is not a cycle; reaching one on the current path is",
+            "it is faster",
+            "of recursion"
+          ],
+          "answer": 1,
+          "explanation": "A diamond is not a cycle."
+        },
+        {
+          "question": "Multi-source BFS starts with…",
+          "options": [
+            "one node",
+            "every source in the queue at distance 0",
+            "the farthest node",
+            "a sort"
+          ],
+          "answer": 1,
+          "explanation": "Rotting oranges."
+        },
+        {
+          "question": "BFS on a weighted graph finds…",
+          "options": [
+            "the cheapest path",
+            "the path with fewest EDGES, which may cost more",
+            "nothing",
+            "a cycle"
+          ],
+          "answer": 1,
+          "explanation": "Weights need Dijkstra."
+        }
+      ],
+      "milestone": "Interview rep #27 — the maze. Read a grid with a start, an exit and walls; find the shortest route with BFS, draw it on the grid by walking the parent links back, and report its length and how many cells the search explored — or say there is no way out.",
       "practice": []
     },
     {

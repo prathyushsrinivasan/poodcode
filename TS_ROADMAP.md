@@ -1,7 +1,7 @@
-# TypeScript Roadmap — Weeks 27-32
+# TypeScript Roadmap — Weeks 28-32
 
 The plan for finishing **TypeScript: Zero to Interview**, the 8-month course in
-`tools/typescript_course.py`. Weeks 1-26 ship; weeks 27-32 are one-line
+`tools/typescript_course.py`. Weeks 1-27 ship; weeks 28-32 are one-line
 skeletons waiting to be authored.
 
 Unlike [`JAVA_ROADMAP.md`](JAVA_ROADMAP.md), which starts after the basics, this
@@ -15,9 +15,9 @@ rule that nothing may require syntax a later week teaches.
 
 ## Where it stands
 
-**Built:** weeks 1-26 — **202 lessons, 1,484 judged exercises** (1,469 in lessons
+**Built:** weeks 1-27 — **209 lessons, 1,523 judged exercises** (1,508 in lessons
 and capstones, 15 in week 1's practice families), twenty Budget Buddy capstones —
-**the arc is complete** — six interview reps, and a full
+**the arc is complete** — seven interview reps, and a full
 glossary/cheat-sheet/self-check/review set per week. **Month 6 is finished.**
 
 | | |
@@ -55,15 +55,18 @@ is the stuff that is only obvious after it has cost you an hour.
 
 | | covers | last run |
 |---|---|---|
-| `python tools/verify_ts_course.py --starters` | weeks 1-23 in full; **week 24's 55 exercises, 0 failures** | current |
-| `cd src-tauri && cargo test --release --test verify_ts_course` | **weeks 1-24, 1,397 exercises, 3 tests, 704s, all green** | current |
+| `python tools/verify_ts_course.py --starters` | weeks 1-23 in full; **weeks 24-27 one at a time (`--only=wNN-`), 0 failures each** | current |
+| `cd src-tauri && cargo test --release --test verify_ts_course` | **weeks 1-25, 1,443 exercises, 3 tests, 914s, all green** | weeks 26-27 not yet |
 
 The Rust suite is the judge-level one — it puts every program through the same
-judge the app uses, rather than through the fast Node path. The gap this section
-used to record (weeks 22-23 never judge-verified) is **closed**: the run above
-covers every authored week. The Python verifier was run on week 24 alone, which is
-sufficient because regenerating left weeks 1-23 of the seed **byte-identical**
-(checked by comparing each week's JSON against the previous commit's).
+judge the app uses, rather than through the fast Node path. The old gap (weeks
+22-23 never judge-verified) is closed. The suite now runs **once per batch**, as
+"Verification will get slow" recommends, started in the background right after a
+week is committed; weeks 26 and 27 landed after the last run and are covered by
+the Python verifier until batch F's closing run. Each new week was verified alone,
+which is sufficient because adding a week leaves every earlier week of the seed
+**byte-identical** (checked by comparing each week's JSON against the previous
+commit's).
 
 One thing to know before running it: the test `include_str!`s `ts_course.json` at
 **compile time**. A run already in progress when you regenerate the seed is
@@ -79,7 +82,7 @@ verifier revealed which kind they were.
 ### Nothing is half-finished
 
 Every authored week is complete: lessons, exercises, capstone, stretch, glossary,
-cheat sheet, self-check, review, milestone. Weeks 27-32 are untouched skeletons, as
+cheat sheet, self-check, review, milestone. Weeks 28-32 are untouched skeletons, as
 they were before. There is no partially-authored week and no disabled exercise.
 
 ### Five traps that cost real time
@@ -798,7 +801,7 @@ to keep its ties.
 **One new scope rule**: `.toSorted(` gated at 24. Week 13's lesson prose mentions it
 in passing; no program before this week calls it.
 
-### Month 7 — DSA Interview Core (weeks 25-28) — 🚧 **25-26 done**
+### Month 7 — DSA Interview Core (weeks 25-28) — 🚧 **25-27 done**
 
 **25. Recursion & Backtracking** ✅ · `tools/ts_w25_recursion.py` · 7 lessons,
 46 exercises
@@ -899,7 +902,46 @@ All 41 hand-written expected outputs were right on the first run — the first w
 where that happened. Two `fix` prompts quoted the wrong buggy output (4 for 7, and
 1 for 0) and were corrected from the starters' real output.
 
-**27. Graphs: BFS & DFS** ⬜ ·
+**27. Graphs: BFS & DFS** ✅ · `tools/ts_w27_graphs.py` · 7 lessons, 39 exercises
+`w27-model` · `w27-dfs` · `w27-bfs` · `w27-grids` · `w27-order` · `w27-levels` ·
+`w27-weighted`.
+*Capstone:* **interview rep #27** — the maze: BFS from `S` with a stated neighbour
+order (up, down, left, right — which is what makes "the" shortest path well
+defined), the route drawn with `*` from parent links, and `explored` counted as
+cells dequeued. Stretch: a course planner — Kahn's algorithm taking the
+smallest-numbered available course first, plus the fewest semesters (the longest
+path, a week-26 DP over the topological order).
+Kinds: 28 drill, 7 fix, 1 predict, 1 diagnose.
+
+**Week 20's promise, kept literally.** Lesson 2 opens on "stack → DFS, queue → BFS,
+plus a visited set", and the traversal loops are week 20's with a `Set` added.
+Every BFS uses week 18's head-index queue; recursive DFS appears only where depth is
+small, and the grid lessons use an explicit stack for week 25's reason.
+
+**The TypeScript fact, verified:** `Array.from({ length: n }, () => [])` infers
+**`never[][]`**, so the first `push` is TS2345. Shipped as a `_predict` (answer
+`never[][]`) and a `_diagnose`; every adjacency list in the week annotates the
+callback, `(): number[] => []`.
+
+**Bugs chosen because they are silent:** one-way edges in an undirected graph; a
+grid neighbour computed as `id - 1`, which wraps to the previous row and merges two
+islands on opposite edges; the undirected cycle rule applied to a directed graph,
+which calls a diamond a cycle (fixed with three colours); multi-source BFS seeded
+with one source; marking on dequeue (right distances, 6 queue entries for 5 nodes —
+a counted cost bug, per trap 4); and BFS on weighted edges, which answers 5 where
+the cheapest route is 3.
+
+**The lead-in to week 28 is deliberate.** Lesson 7 fixes the weighted case with an
+O(V²) array-scan Dijkstra and counts its scans (16 for four nodes), then says what
+step 1 really needs: "the smallest item, repeatedly, as items arrive". Week 28's heap
+is the answer to a cost the learner has just paid — the same move weeks 18 → 19 made.
+
+Two expected outputs were wrong on the first run (7 reachable cells, not 6, and the
+maze path — which goes down first under the stated order). One capstone test was
+replaced because it did not do what the brief claimed of it; its output was taken
+from the reference, as was every other number. Two `fix` prompts misquoted their
+starters' output and were corrected from real runs.
+
 **28. Heaps & Intervals** ⬜
 Standard interview ground. Heaps need a generic priority queue class — another
 dependency on week 11.
@@ -946,7 +988,7 @@ still go first.
 | **C** ✅ | 13-16 | Types, then the project-shaped week: modules, tsconfig, .d.ts |
 | **D** ✅ | 17-20 | Async + data structures; the Budget Buddy arc is closed |
 | **E** ✅ | 21-24 | Algorithmic thinking; the month's idiom is to count operations |
-| **F** 🚧 | 25-26 ✅, **27** ← next | DSA core |
+| **F** 🚧 | 25-27 ✅, **28** ← next | DSA core |
 | **G** | 29-32 | Type-level; lowest risk, highest polish |
 
 **Batches C and D are done, and with them every risk the back half was waiting
