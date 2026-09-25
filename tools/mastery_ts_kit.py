@@ -27,6 +27,7 @@ TS_PROBLEM_SETS = {}   # week -> [exercise]
 TS_PROJECTS = {}       # week -> project spec
 TS_PRACTICE_MORE = {}  # week -> [exercise], appended to the week's practice
 TS_CARDS_MORE = {}     # week -> [(front, back)], review cards for the chapters added later
+TS_QUIZ_TOPUP = {}     # week -> [question], raising each week bank towards 40 (X-30)
 
 _TS_TIER = {"warm-up": "Easy", "core": "Medium", "stretch": "Hard"}
 

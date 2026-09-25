@@ -6,7 +6,7 @@
 # ---------------------------------------------------------------------------
 
 _ts_week_numbers = {w["week"] for w in TS_WEEKS}
-for _table in (TS_PROBLEM_SETS, TS_PROJECTS, TS_PRACTICE_MORE, TS_CARDS_MORE):
+for _table in (TS_PROBLEM_SETS, TS_PROJECTS, TS_PRACTICE_MORE, TS_CARDS_MORE, TS_QUIZ_TOPUP):
     _unknown = sorted(set(_table) - _ts_week_numbers)
     assert not _unknown, f"TS Mastery content for weeks that do not exist: {_unknown}"
 
@@ -46,3 +46,15 @@ for _tsw in TS_WEEKS:
         assert _front.strip() and _back.strip(), f"TS week {_tsw['week']}: empty card"
         _ts_fronts.add(_front)
         _tsw["flashcards"].append({"front": _front, "back": _back})
+
+# Quiz top-ups (X-30). Question texts stay unique within a week's bank — the
+# chapter questions merged in later by _finalize_mastery are deduped against
+# these, so a top-up never brings a twin into a sitting.
+for _tsw in TS_WEEKS:
+    _texts = {q["question"] for q in _tsw["quiz"]}
+    for _q2 in TS_QUIZ_TOPUP.get(_tsw["week"], []):
+        assert _q2["question"] not in _texts, f"TS week {_tsw['week']}: duplicate quiz question {_q2['question']!r}"
+        assert len(_q2["options"]) == 4 and _q2["answer"] == 0, f"{_q2['question']!r}: four options, answer first"
+        assert len(set(_q2["options"])) == 4, f"{_q2['question']!r}: repeated option"
+        _texts.add(_q2["question"])
+        _tsw["quiz"].append(_q2)

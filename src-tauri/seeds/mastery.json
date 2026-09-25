@@ -238,6 +238,182 @@
             "explanation": "In plain JavaScript this would produce the string `\"05\"`. TypeScript knows `total` is a `number` and rejects the assignment."
           },
           {
+            "question": "What does `console.log([1, 2, 3])` print?",
+            "options": [
+              "`[ 1, 2, 3 ]`",
+              "`1,2,3`",
+              "`[1,2,3]`",
+              "`Array(3)`"
+            ],
+            "answer": 0,
+            "explanation": "Node formats arrays with brackets and spaces. When a judge expects `1 2 3` or `1,2,3`, build that string yourself with `join`."
+          },
+          {
+            "question": "What does `String([1, 2, 3])` give?",
+            "options": [
+              "`\"1,2,3\"`",
+              "`\"[1, 2, 3]\"`",
+              "`\"1 2 3\"`",
+              "`\"[object Array]\"`"
+            ],
+            "answer": 0,
+            "explanation": "An array's `toString` is `join(\",\")`."
+          },
+          {
+            "question": "What type does `const pair = [1, \"a\"]` infer?",
+            "options": [
+              "`(string | number)[]`",
+              "`[number, string]`",
+              "`any[]`",
+              "`[1, \"a\"]`"
+            ],
+            "answer": 0,
+            "explanation": "An array literal infers an array of the union of its elements. A tuple needs an annotation or `as const`."
+          },
+          {
+            "question": "`const user = { name: \"ana\" }; user.name = \"bo\";` — what happens?",
+            "options": [
+              "It compiles and runs: `const` fixes the binding, not the object",
+              "TS2588: cannot assign to a constant",
+              "A runtime error",
+              "It compiles, but the assignment is ignored"
+            ],
+            "answer": 0,
+            "explanation": "`const` stops `user = …`. The object's properties stay writable unless typed `readonly`."
+          },
+          {
+            "question": "What is `Number(\"\")`?",
+            "options": [
+              "`0`",
+              "`NaN`",
+              "`undefined`",
+              "A thrown error"
+            ],
+            "answer": 0,
+            "explanation": "An empty (or all-whitespace) string converts to 0 — a classic parsing trap. Check for empty input before converting."
+          },
+          {
+            "question": "What is `Number(\" 42 \")`?",
+            "options": [
+              "`42`",
+              "`NaN`",
+              "`\" 42 \"`",
+              "`4`"
+            ],
+            "answer": 0,
+            "explanation": "Surrounding whitespace is ignored by `Number`."
+          },
+          {
+            "question": "What are `Number(null)` and `Number(undefined)`?",
+            "options": [
+              "`0` and `NaN`",
+              "Both `NaN`",
+              "Both `0`",
+              "`NaN` and `0`"
+            ],
+            "answer": 0,
+            "explanation": "Another reason to validate before converting: a missing value can become a plausible-looking 0."
+          },
+          {
+            "question": "On empty stdin, what is `fs.readFileSync(0, \"utf8\").trim().split(\"\\n\")`?",
+            "options": [
+              "`[\"\"]` — one empty line",
+              "`[]`",
+              "`undefined`",
+              "A thrown error"
+            ],
+            "answer": 0,
+            "explanation": "`split` always returns at least one element. An empty input needs its own check."
+          },
+          {
+            "question": "`let a = 1; let b = a; b++;` — what is `a`?",
+            "options": [
+              "`1`",
+              "`2`",
+              "`undefined`",
+              "It depends on the engine"
+            ],
+            "answer": 0,
+            "explanation": "Primitives are copied on assignment."
+          },
+          {
+            "question": "`const a = [1]; const b = a; b.push(2);` — what is `a.length`?",
+            "options": [
+              "`2`",
+              "`1`",
+              "`0`",
+              "A compile error"
+            ],
+            "answer": 0,
+            "explanation": "Arrays and objects are shared by reference; `b` is the same array."
+          },
+          {
+            "question": "`let x: number; console.log(x);` under `strict`?",
+            "options": [
+              "TS2454: `x` is used before being assigned",
+              "It prints `0`",
+              "It prints `undefined` with no error",
+              "TS7005: implicit any"
+            ],
+            "answer": 0,
+            "explanation": "Definite-assignment analysis catches reads of variables that were never given a value."
+          },
+          {
+            "question": "What does `typeof []` return?",
+            "options": [
+              "`\"object\"`",
+              "`\"array\"`",
+              "`\"list\"`",
+              "`\"undefined\"`"
+            ],
+            "answer": 0,
+            "explanation": "Use `Array.isArray` to test for arrays."
+          },
+          {
+            "question": "What does `console.log(0.1 * 3)` print?",
+            "options": [
+              "`0.30000000000000004`",
+              "`0.3`",
+              "`0.30`",
+              "`0.299999`"
+            ],
+            "answer": 0,
+            "explanation": "Binary floating point can't represent 0.1 exactly; format with `toFixed` or work in integers."
+          },
+          {
+            "question": "Where is a type annotation genuinely required?",
+            "options": [
+              "On function parameters, which have nothing to infer from",
+              "On every `const`",
+              "On every `let`",
+              "On return statements"
+            ],
+            "answer": 0,
+            "explanation": "Locals infer from their initialiser; parameters don't, so `noImplicitAny` asks for them."
+          },
+          {
+            "question": "What does `parseInt(\"08\")` return in modern engines?",
+            "options": [
+              "`8`",
+              "`0`",
+              "`NaN`",
+              "`10`"
+            ],
+            "answer": 0,
+            "explanation": "Leading zeros no longer mean octal — but pass the radix `10` anyway to be explicit."
+          },
+          {
+            "question": "What is the type of `const lines = input.split(\"\\n\")` when `input` is a `string`?",
+            "options": [
+              "`string[]`",
+              "`string`",
+              "`[string]`",
+              "`string | undefined`"
+            ],
+            "answer": 0,
+            "explanation": "`split` always returns an array of strings."
+          },
+          {
             "question": "What does `fs.readFileSync(0, \"utf8\")` read?",
             "options": [
               "All of standard input, as one string",
@@ -1395,6 +1571,193 @@
             ],
             "answer": 0,
             "explanation": "Rounding error makes exact equality unreliable; compare against a small tolerance."
+          },
+          {
+            "question": "What is `1 + 2 + \"3\"`?",
+            "options": [
+              "`\"33\"`",
+              "`\"123\"`",
+              "`6`",
+              "`\"6\"`"
+            ],
+            "answer": 0,
+            "explanation": "Left to right: `1 + 2` is 3, then `3 + \"3\"` concatenates."
+          },
+          {
+            "question": "What is `\"1\" + 2 + 3`?",
+            "options": [
+              "`\"123\"`",
+              "`\"15\"`",
+              "`6`",
+              "`\"33\"`"
+            ],
+            "answer": 0,
+            "explanation": "Once the left side is a string, every `+` concatenates."
+          },
+          {
+            "question": "What are `7 % -3` and `-7 % 3`?",
+            "options": [
+              "`1` and `-1`",
+              "`-1` and `1`",
+              "`1` and `2`",
+              "`-2` and `2`"
+            ],
+            "answer": 0,
+            "explanation": "`%` takes the sign of the dividend (the left operand). For a true modulo use `((a % n) + n) % n`."
+          },
+          {
+            "question": "What is `\"10\" < \"9\"`?",
+            "options": [
+              "`true` — strings compare character by character",
+              "`false`",
+              "A compile error",
+              "`NaN`"
+            ],
+            "answer": 0,
+            "explanation": "`\"1\"` sorts before `\"9\"`. Convert to numbers before comparing numeric text."
+          },
+          {
+            "question": "What is `+\"\"`?",
+            "options": [
+              "`0`",
+              "`NaN`",
+              "`\"\"`",
+              "`undefined`"
+            ],
+            "answer": 0,
+            "explanation": "Unary plus converts like `Number(\"\")` — the same empty-string trap."
+          },
+          {
+            "question": "What does `a ||= b` do?",
+            "options": [
+              "Assigns `b` to `a` only when `a` is falsy",
+              "Always assigns `b`",
+              "Assigns when `a` is nullish",
+              "Compares `a` and `b`"
+            ],
+            "answer": 0,
+            "explanation": "Logical assignment: `||=` on falsy, `??=` on nullish, `&&=` on truthy."
+          },
+          {
+            "question": "What does `a ??= b` do?",
+            "options": [
+              "Assigns `b` only when `a` is `null` or `undefined`",
+              "Assigns when `a` is falsy",
+              "Always assigns",
+              "Throws when `a` is nullish"
+            ],
+            "answer": 0,
+            "explanation": "Keeps `0`, `\"\"` and `false`, unlike `||=`."
+          },
+          {
+            "question": "What does `true + 1` do under TypeScript?",
+            "options": [
+              "TS2365: operator `+` can't be applied to `boolean` and `number`",
+              "Evaluates to `2`",
+              "Evaluates to `\"true1\"`",
+              "Evaluates to `NaN`"
+            ],
+            "answer": 0,
+            "explanation": "JavaScript would give 2; TypeScript refuses the mix."
+          },
+          {
+            "question": "What is `null == undefined` and `null === undefined`?",
+            "options": [
+              "`true` and `false`",
+              "Both `true`",
+              "Both `false`",
+              "`false` and `true`"
+            ],
+            "answer": 0,
+            "explanation": "`x == null` is the one widely accepted use of `==`: it matches both."
+          },
+          {
+            "question": "What is `{ a: 1 } === { a: 1 }`?",
+            "options": [
+              "`false` — two different objects",
+              "`true`",
+              "A compile error",
+              "`undefined`"
+            ],
+            "answer": 0,
+            "explanation": "Objects compare by identity, not content."
+          },
+          {
+            "question": "What are `!!NaN` and `!![]`?",
+            "options": [
+              "`false` and `true`",
+              "Both `false`",
+              "Both `true`",
+              "`true` and `false`"
+            ],
+            "answer": 0,
+            "explanation": "`NaN` is falsy; every object, even an empty array, is truthy."
+          },
+          {
+            "question": "What is `Boolean(\"0\")`?",
+            "options": [
+              "`true`",
+              "`false`",
+              "`0`",
+              "`NaN`"
+            ],
+            "answer": 0,
+            "explanation": "Only the empty string is a falsy string."
+          },
+          {
+            "question": "In `false && sideEffect()`, is `sideEffect` called?",
+            "options": [
+              "No — `&&` short-circuits",
+              "Yes, always",
+              "Only in strict mode",
+              "Yes, but its result is ignored"
+            ],
+            "answer": 0,
+            "explanation": "The right side is evaluated only when the left is truthy."
+          },
+          {
+            "question": "A `switch` case has no `break`. What happens?",
+            "options": [
+              "Execution falls through into the next case",
+              "The switch ends",
+              "A runtime error",
+              "The next case is skipped"
+            ],
+            "answer": 0,
+            "explanation": "Fall-through is occasionally intentional; usually it's a bug — `noFallthroughCasesInSwitch` flags it."
+          },
+          {
+            "question": "How does `a ? b : c ? d : e` group?",
+            "options": [
+              "`a ? b : (c ? d : e)`",
+              "`(a ? b : c) ? d : e`",
+              "It's a syntax error",
+              "It depends on the values"
+            ],
+            "answer": 0,
+            "explanation": "The conditional operator is right-associative. Prefer `if`/`else` when it gets long."
+          },
+          {
+            "question": "What does `user?.name ?? \"anon\"` give when `user` is `undefined`?",
+            "options": [
+              "`\"anon\"`",
+              "`undefined`",
+              "A TypeError",
+              "`null`"
+            ],
+            "answer": 0,
+            "explanation": "`?.` short-circuits to `undefined`, and `??` supplies the default."
+          },
+          {
+            "question": "What is `2 ** -1`?",
+            "options": [
+              "`0.5`",
+              "`-2`",
+              "`0`",
+              "A compile error"
+            ],
+            "answer": 0,
+            "explanation": "`**` is exponentiation; a negative exponent is a reciprocal."
           },
           {
             "question": "Which comparison is `true`?",
@@ -2727,6 +3090,204 @@
             "explanation": "Each iteration gets a fresh `const` binding, which can't be reassigned (TS2588). Reassigning a `let` copy wouldn't change the array either."
           },
           {
+            "question": "What does `for (const i in \"ab\")` give `i`?",
+            "options": [
+              "The strings `\"0\"` and `\"1\"`",
+              "`\"a\"` and `\"b\"`",
+              "The numbers 0 and 1",
+              "Nothing — strings aren't iterable with `in`"
+            ],
+            "answer": 0,
+            "explanation": "`for…in` walks property keys, always as strings. `for…of` walks the characters."
+          },
+          {
+            "question": "How many times does a `do…while` body run when its condition is false from the start?",
+            "options": [
+              "Once",
+              "Zero times",
+              "Forever",
+              "It's a compile error"
+            ],
+            "answer": 0,
+            "explanation": "The condition is checked after the body."
+          },
+          {
+            "question": "What are `Math.floor(-4.5)` and `Math.ceil(-4.5)`?",
+            "options": [
+              "`-5` and `-4`",
+              "`-4` and `-5`",
+              "Both `-4`",
+              "Both `-5`"
+            ],
+            "answer": 0,
+            "explanation": "Floor goes down (towards −∞), ceil goes up."
+          },
+          {
+            "question": "What does `(1.005).toFixed(2)` return?",
+            "options": [
+              "`\"1.00\"`",
+              "`\"1.01\"`",
+              "`\"1.005\"`",
+              "`1.01`"
+            ],
+            "answer": 0,
+            "explanation": "1.005 is stored as slightly less than 1.005. Money belongs in integer cents."
+          },
+          {
+            "question": "What does `(2.5).toFixed(0)` return?",
+            "options": [
+              "`\"3\"`",
+              "`\"2\"`",
+              "`3`",
+              "`\"2.5\"`"
+            ],
+            "answer": 0,
+            "explanation": "`toFixed` returns a string, rounding an exact half away from zero."
+          },
+          {
+            "question": "What is `Infinity - Infinity`?",
+            "options": [
+              "`NaN`",
+              "`0`",
+              "`Infinity`",
+              "A thrown error"
+            ],
+            "answer": 0,
+            "explanation": "An undefined operation gives `NaN`."
+          },
+          {
+            "question": "Is `Number.isSafeInteger(2 ** 53)` true?",
+            "options": [
+              "No — the largest safe integer is `2 ** 53 - 1`",
+              "Yes",
+              "Only for bigint",
+              "It throws"
+            ],
+            "answer": 0,
+            "explanation": "Above that, adding 1 may not change the value."
+          },
+          {
+            "question": "What is `10n / 3n`?",
+            "options": [
+              "`3n` — bigint division truncates",
+              "`3.333…n`",
+              "`3.3333333333333335`",
+              "A compile error"
+            ],
+            "answer": 0,
+            "explanation": "Bigints are integers; there are no fractions."
+          },
+          {
+            "question": "What is `typeof 10n`?",
+            "options": [
+              "`\"bigint\"`",
+              "`\"number\"`",
+              "`\"object\"`",
+              "`\"integer\"`"
+            ],
+            "answer": 0,
+            "explanation": "Bigint is its own primitive type."
+          },
+          {
+            "question": "What does `Number.parseInt(\"101\", 2)` return?",
+            "options": [
+              "`5`",
+              "`101`",
+              "`2`",
+              "`NaN`"
+            ],
+            "answer": 0,
+            "explanation": "The second argument is the radix."
+          },
+          {
+            "question": "What does `(255).toString(16)` return?",
+            "options": [
+              "`\"ff\"`",
+              "`\"255\"`",
+              "`\"0xff\"`",
+              "`\"FF\"`"
+            ],
+            "answer": 0,
+            "explanation": "`toString` takes a radix too, and uses lower-case digits."
+          },
+          {
+            "question": "What is `Number(\"1e3\")`?",
+            "options": [
+              "`1000`",
+              "`NaN`",
+              "`1`",
+              "`\"1e3\"`"
+            ],
+            "answer": 0,
+            "explanation": "Exponent notation is valid number text — which is why digit-only input needs a regex check."
+          },
+          {
+            "question": "`for (let i = 0; i < 3; i++) queueMicrotask(() => console.log(i));` prints?",
+            "options": [
+              "`0`, `1`, `2`",
+              "`3`, `3`, `3`",
+              "Nothing",
+              "`0`, `0`, `0`"
+            ],
+            "answer": 0,
+            "explanation": "A `let` loop variable is a fresh binding each iteration; with `var` all three callbacks would see 3."
+          },
+          {
+            "question": "What range does `Math.random()` return?",
+            "options": [
+              "At least 0 and less than 1",
+              "0 to 1 inclusive",
+              "Any number",
+              "Integers 0–100"
+            ],
+            "answer": 0,
+            "explanation": "Scale and floor it for integers — and don't use it where a judge needs deterministic output."
+          },
+          {
+            "question": "How do you exit an outer loop from inside an inner one?",
+            "options": [
+              "Label the outer loop and `break outer`",
+              "`break 2`",
+              "`return` from the inner loop only",
+              "`continue outer`"
+            ],
+            "answer": 0,
+            "explanation": "`continue outer` would skip to the outer loop's next iteration instead."
+          },
+          {
+            "question": "What is `(1234.5678).toFixed(2)`?",
+            "options": [
+              "`\"1234.57\"`",
+              "`\"1234.56\"`",
+              "`1234.57`",
+              "`\"1,234.57\"`"
+            ],
+            "answer": 0,
+            "explanation": "No grouping separators — that's `Intl.NumberFormat`'s job."
+          },
+          {
+            "question": "What is `0 / 0`?",
+            "options": [
+              "`NaN`",
+              "`0`",
+              "`Infinity`",
+              "A thrown error"
+            ],
+            "answer": 0,
+            "explanation": "Division by zero never throws for numbers; check the divisor yourself."
+          },
+          {
+            "question": "What is `Math.sqrt(-1)`?",
+            "options": [
+              "`NaN`",
+              "`-1`",
+              "`i`",
+              "A thrown error"
+            ],
+            "answer": 0,
+            "explanation": "No complex numbers in JavaScript."
+          },
+          {
             "question": "How should an app store a price of $19.99?",
             "options": [
               "As the integer `1999` (cents)",
@@ -3910,6 +4471,116 @@
             ],
             "answer": 0,
             "explanation": "Splitting on the empty string separates every character (by UTF-16 code unit)."
+          },
+          {
+            "question": "What is `\"abc\".at(-1)`?",
+            "options": [
+              "`\"c\"`",
+              "`\"a\"`",
+              "`undefined`",
+              "`\"\"`"
+            ],
+            "answer": 0,
+            "explanation": "`at` accepts negative indexes, counting from the end — and is typed `string | undefined`."
+          },
+          {
+            "question": "What is `\"a-b-c\".replaceAll(\"-\", \"+\")`?",
+            "options": [
+              "`\"a+b+c\"`",
+              "`\"a+b-c\"`",
+              "`\"a-b-c\"`",
+              "An error: `replaceAll` needs a regex"
+            ],
+            "answer": 0,
+            "explanation": "`replaceAll` with a string replaces every occurrence."
+          },
+          {
+            "question": "What is `\"Hello\".startsWith(\"he\")`?",
+            "options": [
+              "`false` — it's case-sensitive",
+              "`true`",
+              "`\"He\"`",
+              "`undefined`"
+            ],
+            "answer": 0,
+            "explanation": "Normalise case first if you want a case-insensitive test."
+          },
+          {
+            "question": "What is `\"abc\".padStart(5, \"*\")`?",
+            "options": [
+              "`\"**abc\"`",
+              "`\"abc**\"`",
+              "`\"*****abc\"`",
+              "`\"*abc*\"`"
+            ],
+            "answer": 0,
+            "explanation": "Pads on the left to the target length."
+          },
+          {
+            "question": "What are `\"abc\".substring(2, 0)` and `\"abc\".slice(2, 0)`?",
+            "options": [
+              "`\"ab\"` and `\"\"`",
+              "Both `\"\"`",
+              "Both `\"ab\"`",
+              "`\"\"` and `\"ab\"`"
+            ],
+            "answer": 0,
+            "explanation": "`substring` swaps its arguments when start > end; `slice` doesn't. Prefer `slice`."
+          },
+          {
+            "question": "`const re = /a/g; re.test(\"a\"); re.test(\"a\");` — the two results?",
+            "options": [
+              "`true`, then `false`",
+              "`true`, `true`",
+              "`false`, `false`",
+              "`false`, then `true`"
+            ],
+            "answer": 0,
+            "explanation": "A global regex remembers `lastIndex` between calls. Don't reuse a `/g` regex with `test` across strings."
+          },
+          {
+            "question": "What is `\"a\".codePointAt(0)`?",
+            "options": [
+              "`97`",
+              "`\"a\"`",
+              "`65`",
+              "`1`"
+            ],
+            "answer": 0,
+            "explanation": "Lower-case letters start at 97, upper-case at 65."
+          },
+          {
+            "question": "What is `String.fromCharCode(72, 105)`?",
+            "options": [
+              "`\"Hi\"`",
+              "`\"72105\"`",
+              "`\"hi\"`",
+              "`[\"H\", \"i\"]`"
+            ],
+            "answer": 0,
+            "explanation": "It builds a string from UTF-16 code units."
+          },
+          {
+            "question": "What does `\"x,y\".split(\",\", 1)` return?",
+            "options": [
+              "`[\"x\"]`",
+              "`[\"x\", \"y\"]`",
+              "`[\"x,y\"]`",
+              "`\"x\"`"
+            ],
+            "answer": 0,
+            "explanation": "The second argument limits how many pieces are returned."
+          },
+          {
+            "question": "How do you test `s` for a whole string of digits?",
+            "options": [
+              "`/^\\d+$/.test(s)`",
+              "`/\\d+/.test(s)`",
+              "`Number(s) > 0`",
+              "`s.includes(\"0123456789\")`"
+            ],
+            "answer": 0,
+            "explanation": "Without the anchors `^` and `$`, the regex matches digits anywhere in the string."
           },
           {
             "question": "What does `/\\d+/.test(\"abc123\")` return?",
@@ -5113,6 +5784,160 @@
             "explanation": "No hidden state and no side effects means no setup and no ordering between tests."
           },
           {
+            "question": "For `function f(a, b = 2, c) {}`, what is `f.length`?",
+            "options": [
+              "`1` — parameters before the first default",
+              "`3`",
+              "`2`",
+              "`0`"
+            ],
+            "answer": 0,
+            "explanation": "`length` counts the leading parameters that have no default and aren't rest parameters."
+          },
+          {
+            "question": "`function addItem(item: number, list: number[] = []) { list.push(item); return list; }` — do two calls share `list`?",
+            "options": [
+              "No — a default is evaluated again on every call",
+              "Yes — the default array is created once",
+              "Only if called with the same item",
+              "It's a compile error"
+            ],
+            "answer": 0,
+            "explanation": "Unlike Python, JavaScript evaluates default values at call time, so each call gets a fresh array."
+          },
+          {
+            "question": "Can you call a function declaration `function f() {}` on a line above it?",
+            "options": [
+              "Yes — function declarations are hoisted",
+              "No — TDZ error",
+              "Only in strict mode",
+              "Only if it has no parameters"
+            ],
+            "answer": 0,
+            "explanation": "Declarations are hoisted with their body. `const f = () => …` is not: it's in the temporal dead zone until its line."
+          },
+          {
+            "question": "What is `this` inside a plain `function` called as `f()` in a module?",
+            "options": [
+              "`undefined`",
+              "The global object",
+              "The function itself",
+              "`null`"
+            ],
+            "answer": 0,
+            "explanation": "Modules are strict mode, so a bare call gets `this` undefined. Arrow functions take `this` from where they are written."
+          },
+          {
+            "question": "What does `(...args: number[]) => …` accept?",
+            "options": [
+              "Any number of numbers, including none",
+              "Exactly one array",
+              "At least one number",
+              "Only numbers in an array literal"
+            ],
+            "answer": 0,
+            "explanation": "Call it `f(1, 2, 3)`; spread an array in with `f(...xs)`."
+          },
+          {
+            "question": "How do you pass an array to a rest parameter?",
+            "options": [
+              "Spread it: `f(...xs)`",
+              "`f(xs)`",
+              "`f.apply(xs)`",
+              "`f([...xs])`"
+            ],
+            "answer": 0,
+            "explanation": "Without the spread, the whole array is one argument."
+          },
+          {
+            "question": "What does `function f(): never` promise?",
+            "options": [
+              "It never returns normally — it always throws or loops forever",
+              "It returns `undefined`",
+              "It returns nothing useful",
+              "It returns `null`"
+            ],
+            "answer": 0,
+            "explanation": "`never` is the type of a value that can't exist; a function returning it doesn't complete."
+          },
+          {
+            "question": "Why are parameters with defaults usually placed last?",
+            "options": [
+              "Callers can then omit them; an earlier default can only be triggered by passing `undefined`",
+              "They must be, or it's a syntax error",
+              "Defaults are slower in the middle",
+              "TypeScript reorders them"
+            ],
+            "answer": 0,
+            "explanation": "`f(1)` fills parameters left to right, so a default in the middle rarely helps."
+          },
+          {
+            "question": "What is an IIFE?",
+            "options": [
+              "A function expression called immediately: `(() => { … })()`",
+              "An imported function",
+              "An inline interface",
+              "A generator"
+            ],
+            "answer": 0,
+            "explanation": "Before modules and `let`, it was the way to get a private scope."
+          },
+          {
+            "question": "Two overloads and an implementation — how many signatures can callers use?",
+            "options": [
+              "Two — the implementation signature is hidden",
+              "Three",
+              "One",
+              "Only the implementation's"
+            ],
+            "answer": 0,
+            "explanation": "Overload lists describe the call sites; the implementation must be compatible with all of them."
+          },
+          {
+            "question": "A closure keeps a reference to `count`. Another function changes `count`. What does the closure see?",
+            "options": [
+              "The new value — closures capture variables, not values",
+              "The old value",
+              "`undefined`",
+              "A copy made when the closure was created"
+            ],
+            "answer": 0,
+            "explanation": "That's what makes closure-based counters work."
+          },
+          {
+            "question": "Why is `const inc = (n: number) => n + 1` preferred to a `function` for a small helper?",
+            "options": [
+              "It's shorter, has no own `this`, and can't be called before its line",
+              "It's faster",
+              "Only arrows can be exported",
+              "Functions can't have types"
+            ],
+            "answer": 0,
+            "explanation": "A style preference with real safety benefits; both are fine."
+          },
+          {
+            "question": "What is a pure function?",
+            "options": [
+              "One whose result depends only on its arguments and that changes nothing outside it",
+              "Any arrow function",
+              "A function without parameters",
+              "A function that returns `void`"
+            ],
+            "answer": 0,
+            "explanation": "Pure functions are trivial to test and safe to call in any order."
+          },
+          {
+            "question": "What does `function f(x: number | undefined)` require that `function f(x?: number)` doesn't?",
+            "options": [
+              "The caller must pass an argument (possibly `undefined`)",
+              "Nothing — they're identical",
+              "A default value",
+              "`strictNullChecks` off"
+            ],
+            "answer": 0,
+            "explanation": "Optional means the argument may be omitted; `| undefined` only widens its type."
+          },
+          {
             "question": "What do callers of an overloaded function see?",
             "options": [
               "Only the overload signatures — never the implementation signature",
@@ -6143,6 +6968,215 @@
             ],
             "answer": 0,
             "explanation": "Node doesn't eliminate tail calls, and the stack holds roughly ten thousand frames. Deep linear recursion should be a loop."
+          },
+          {
+            "question": "What does `[\"10\", \"10\", \"10\"].map(parseInt)` return?",
+            "options": [
+              "`[10, NaN, 2]`",
+              "`[10, 10, 10]`",
+              "`[\"10\", \"10\", \"10\"]`",
+              "A compile error"
+            ],
+            "answer": 0,
+            "explanation": "`map` passes `(value, index)`, and `parseInt` reads the index as the radix. Write `(s) => parseInt(s, 10)`."
+          },
+          {
+            "question": "What is `[].some((x) => true)`?",
+            "options": [
+              "`false`",
+              "`true`",
+              "`undefined`",
+              "A thrown error"
+            ],
+            "answer": 0,
+            "explanation": "No element satisfies anything in an empty array; `every` on an empty array is `true`."
+          },
+          {
+            "question": "What does `[1, 2, 3, 4].findLast((n) => n % 2 === 1)` return?",
+            "options": [
+              "`3`",
+              "`1`",
+              "`4`",
+              "`[1, 3]`"
+            ],
+            "answer": 0,
+            "explanation": "`findLast` searches from the end."
+          },
+          {
+            "question": "What does a higher-order function do?",
+            "options": [
+              "Takes a function as an argument or returns one",
+              "Runs at a higher priority",
+              "Calls itself",
+              "Only works on arrays"
+            ],
+            "answer": 0,
+            "explanation": "`map`, `filter`, `once`, `debounce` and `compose` are all higher-order."
+          },
+          {
+            "question": "`const twice = (f: (x: number) => number) => (x: number) => f(f(x));` — what is `twice((n) => n + 3)(1)`?",
+            "options": [
+              "`7`",
+              "`4`",
+              "`6`",
+              "`1`"
+            ],
+            "answer": 0,
+            "explanation": "`f(f(1))` = `f(4)` = `7`."
+          },
+          {
+            "question": "Why prefer `for…of` to `forEach` when you need to stop early?",
+            "options": [
+              "`break` works in `for…of`; `forEach` has no way to stop",
+              "`forEach` is slower",
+              "`for…of` can't access the index",
+              "They're the same"
+            ],
+            "answer": 0,
+            "explanation": "Use `some`/`find` for an early exit if you want to stay functional."
+          },
+          {
+            "question": "What does memoisation trade?",
+            "options": [
+              "Memory for time — it stores results to avoid recomputing them",
+              "Time for memory",
+              "Correctness for speed",
+              "Readability for types"
+            ],
+            "answer": 0,
+            "explanation": "It turns naive recursive Fibonacci from exponential to linear time."
+          },
+          {
+            "question": "What is tail recursion, and does Node optimise it?",
+            "options": [
+              "The recursive call is the last thing done — and no, Node doesn't eliminate the stack frames",
+              "A loop — yes",
+              "Recursion on the last element — yes",
+              "Recursion that returns early — only in strict mode"
+            ],
+            "answer": 0,
+            "explanation": "Deep recursion still overflows in Node, so convert deep recursion to a loop or explicit stack."
+          },
+          {
+            "question": "How do you turn recursion into iteration in general?",
+            "options": [
+              "Keep an explicit stack (or queue) of pending work in a loop",
+              "Use `setTimeout`",
+              "Use `try`/`catch`",
+              "It isn't possible"
+            ],
+            "answer": 0,
+            "explanation": "The call stack is just a stack; you can manage your own."
+          },
+          {
+            "question": "What does `reduce` without an initial value do on `[]`?",
+            "options": [
+              "Throws a TypeError",
+              "Returns `undefined`",
+              "Returns `0`",
+              "Returns `[]`"
+            ],
+            "answer": 0,
+            "explanation": "Always pass an initial value when the array might be empty."
+          },
+          {
+            "question": "What does `pipe(f, g, h)(x)` compute?",
+            "options": [
+              "`h(g(f(x)))` — left to right",
+              "`f(g(h(x)))`",
+              "`[f(x), g(x), h(x)]`",
+              "`f(x) + g(x) + h(x)`"
+            ],
+            "answer": 0,
+            "explanation": "`compose` is the right-to-left version."
+          },
+          {
+            "question": "A callback's parameter is typed `(item: T, index: number) => boolean`. Must your arrow declare `index`?",
+            "options": [
+              "No — fewer parameters are always fine",
+              "Yes, both are required",
+              "Only with `strict`",
+              "Only for arrays"
+            ],
+            "answer": 0,
+            "explanation": "Extra arguments are ignored."
+          },
+          {
+            "question": "What is a predicate function?",
+            "options": [
+              "A function returning a boolean, used to test values",
+              "A function that runs first",
+              "A generic function",
+              "A function with no side effects"
+            ],
+            "answer": 0,
+            "explanation": "`filter`, `find`, `some` and `every` all take predicates."
+          },
+          {
+            "question": "Why does `const fns = [1, 2, 3].map((n) => () => n);` give three functions returning 1, 2, 3?",
+            "options": [
+              "Each arrow closes over its own `n` parameter",
+              "They all return 3",
+              "They all return undefined",
+              "It's a compile error"
+            ],
+            "answer": 0,
+            "explanation": "Parameters (and `let`) are fresh per call — only `var` loops share one variable."
+          },
+          {
+            "question": "What does `Array.from(\"ab\", (c) => c + c)` return?",
+            "options": [
+              "`[\"aa\", \"bb\"]`",
+              "`\"aabb\"`",
+              "`[\"ab\", \"ab\"]`",
+              "`[\"a\", \"b\"]`"
+            ],
+            "answer": 0,
+            "explanation": "`Array.from` takes a mapping function as its second argument."
+          },
+          {
+            "question": "How deep can naive recursion go in Node before a stack overflow?",
+            "options": [
+              "On the order of ten thousand frames, depending on frame size",
+              "Unlimited",
+              "Exactly 100",
+              "About a million"
+            ],
+            "answer": 0,
+            "explanation": "Plan for inputs of that size with iteration."
+          },
+          {
+            "question": "What does `once(fn)` usually guarantee?",
+            "options": [
+              "`fn` runs at most one time; later calls return the first result",
+              "`fn` runs exactly once immediately",
+              "`fn` can't throw",
+              "`fn` runs once per second"
+            ],
+            "answer": 0,
+            "explanation": "It's a closure over a `called` flag and a stored result."
+          },
+          {
+            "question": "What makes `sort((a, b) => a - b)` correct for numbers?",
+            "options": [
+              "It returns negative, zero or positive by comparing numerically",
+              "It sorts strings too",
+              "It's stable only for numbers",
+              "It avoids mutating the array"
+            ],
+            "answer": 0,
+            "explanation": "Without a comparator, `sort` compares string forms, so 10 sorts before 9."
+          },
+          {
+            "question": "What does `const add = (a: number) => (b: number) => a + b; add(2)` return?",
+            "options": [
+              "A function waiting for `b`",
+              "`2`",
+              "`NaN`",
+              "A compile error"
+            ],
+            "answer": 0,
+            "explanation": "That's currying: one argument at a time."
           },
           {
             "question": "What is the type of `const add = (a: number) => (b: number) => a + b;`?",
@@ -7274,6 +8308,149 @@
             ],
             "answer": 0,
             "explanation": "The numeric comparator sorts numbers ascending (unlike the default string sort)."
+          },
+          {
+            "question": "What does `[NaN].includes(NaN)` return, and `[NaN].indexOf(NaN)`?",
+            "options": [
+              "`true` and `-1`",
+              "`false` and `-1`",
+              "`true` and `0`",
+              "`false` and `0`"
+            ],
+            "answer": 0,
+            "explanation": "`includes` uses SameValueZero, which treats `NaN` as equal to itself; `indexOf` uses `===`."
+          },
+          {
+            "question": "What does `[3, 20, 100].sort()` return?",
+            "options": [
+              "`[100, 20, 3]`",
+              "`[3, 20, 100]`",
+              "`[100, 3, 20]`",
+              "`[20, 3, 100]`"
+            ],
+            "answer": 0,
+            "explanation": "Default sort compares strings: `\"100\" < \"20\" < \"3\"`."
+          },
+          {
+            "question": "`const grid = Array(2).fill([]); grid[0].push(1);` — what is `grid[1].length`?",
+            "options": [
+              "`1` — both slots hold the same array",
+              "`0`",
+              "`2`",
+              "A TypeError"
+            ],
+            "answer": 0,
+            "explanation": "`fill` puts the same object in every slot. Use `Array.from({ length: 2 }, () => [])`."
+          },
+          {
+            "question": "What does `[1, 2, 3].fill(0, 1)` return?",
+            "options": [
+              "`[1, 0, 0]`",
+              "`[0, 0, 0]`",
+              "`[0, 2, 3]`",
+              "`[1, 2, 3]`"
+            ],
+            "answer": 0,
+            "explanation": "The second argument is the start index; `fill` mutates in place."
+          },
+          {
+            "question": "What is `[, 1].length`?",
+            "options": [
+              "`2` — the first slot is a hole",
+              "`1`",
+              "`0`",
+              "A syntax error"
+            ],
+            "answer": 0,
+            "explanation": "Holes are skipped by many methods; avoid creating them."
+          },
+          {
+            "question": "What does `[1, [2, [3, [4]]]].flat(Infinity)` return?",
+            "options": [
+              "`[1, 2, 3, 4]`",
+              "`[1, 2, [3, [4]]]`",
+              "`[1, [2, [3, [4]]]]`",
+              "A RangeError"
+            ],
+            "answer": 0,
+            "explanation": "`flat` takes a depth; `Infinity` flattens everything."
+          },
+          {
+            "question": "What does `[...\"abc\"].reverse().join(\"\")` return?",
+            "options": [
+              "`\"cba\"`",
+              "`\"abc\"`",
+              "`[\"c\", \"b\", \"a\"]`",
+              "A syntax error"
+            ],
+            "answer": 0,
+            "explanation": "Spread splits into characters, `reverse` mutates that new array, `join` rebuilds a string."
+          },
+          {
+            "question": "Which of these does NOT mutate: `reverse`, `sort`, `toReversed`, `splice`?",
+            "options": [
+              "`toReversed`",
+              "`reverse`",
+              "`sort`",
+              "`splice`"
+            ],
+            "answer": 0,
+            "explanation": "The `to…` methods (ES2023) return copies."
+          },
+          {
+            "question": "What does `xs.with(1, \"x\")` do?",
+            "options": [
+              "Returns a copy of `xs` with index 1 replaced",
+              "Replaces index 1 in place",
+              "Inserts `\"x\"` at index 1",
+              "Returns `\"x\"`"
+            ],
+            "answer": 0,
+            "explanation": "The immutable version of `xs[1] = \"x\"`."
+          },
+          {
+            "question": "What is the type of the element in `const [first] = [1, 2]` under `noUncheckedIndexedAccess`?",
+            "options": [
+              "`number | undefined`",
+              "`number`",
+              "`1`",
+              "`never`"
+            ],
+            "answer": 0,
+            "explanation": "Array destructuring reads an index, so the flag adds `undefined` — unless the array is a tuple."
+          },
+          {
+            "question": "What does `Object.keys([4, 5])` return?",
+            "options": [
+              "`[\"0\", \"1\"]`",
+              "`[4, 5]`",
+              "`[0, 1]`",
+              "`[]`"
+            ],
+            "answer": 0,
+            "explanation": "Array indexes are string keys."
+          },
+          {
+            "question": "How do you remove duplicates from an array of primitives?",
+            "options": [
+              "`[...new Set(xs)]`",
+              "`xs.unique()`",
+              "`xs.filter(Set)`",
+              "`Array.dedupe(xs)`"
+            ],
+            "answer": 0,
+            "explanation": "A `Set` keeps the first occurrence, in insertion order."
+          },
+          {
+            "question": "What does `xs.findIndex(p)` return when nothing matches?",
+            "options": [
+              "`-1`",
+              "`undefined`",
+              "`null`",
+              "`xs.length`"
+            ],
+            "answer": 0,
+            "explanation": "Check for `-1` before using the index; `find` returns `undefined` instead."
           },
           {
             "question": "What type does `const p = [1, \"a\"]` get?",
@@ -8438,6 +9615,160 @@
             ],
             "answer": 0,
             "explanation": "Dates serialise to ISO strings and come back as strings — revive them yourself."
+          },
+          {
+            "question": "What does `JSON.stringify([undefined])` produce?",
+            "options": [
+              "`\"[null]\"`",
+              "`\"[undefined]\"`",
+              "`\"[]\"`",
+              "A TypeError"
+            ],
+            "answer": 0,
+            "explanation": "`undefined` in an array becomes `null`; in an object, the key is dropped."
+          },
+          {
+            "question": "What does `JSON.stringify(new Map([[1, 2]]))` produce?",
+            "options": [
+              "`\"{}\"`",
+              "`\"[[1,2]]\"`",
+              "`\"{\\\"1\\\":2}\"`",
+              "A TypeError"
+            ],
+            "answer": 0,
+            "explanation": "Maps have no enumerable own properties. Convert first: `Object.fromEntries(map)` or `[...map]`."
+          },
+          {
+            "question": "What is `JSON.parse('{\"a\":1,\"a\":2}').a`?",
+            "options": [
+              "`2` — the last duplicate key wins",
+              "`1`",
+              "A SyntaxError",
+              "`[1, 2]`"
+            ],
+            "answer": 0,
+            "explanation": "Duplicate keys are legal JSON text; the parser keeps the last."
+          },
+          {
+            "question": "What is `typeof JSON.parse(\"null\")`?",
+            "options": [
+              "`\"object\"` — the value is `null`",
+              "`\"undefined\"`",
+              "`\"string\"`",
+              "A SyntaxError"
+            ],
+            "answer": 0,
+            "explanation": "`null` is valid JSON. Guard for it before treating the result as an object."
+          },
+          {
+            "question": "What does `{ ...[1, 2] }` produce?",
+            "options": [
+              "`{ \"0\": 1, \"1\": 2 }`",
+              "`[1, 2]`",
+              "`{}`",
+              "A TypeError"
+            ],
+            "answer": 0,
+            "explanation": "Object spread copies own enumerable properties — for an array, its indexes."
+          },
+          {
+            "question": "What does `{ ...null }` produce?",
+            "options": [
+              "`{}`",
+              "A TypeError",
+              "`null`",
+              "`{ null: undefined }`"
+            ],
+            "answer": 0,
+            "explanation": "Spreading `null` or `undefined` into an object is allowed and adds nothing."
+          },
+          {
+            "question": "Does `Object.assign(target, src)` return a new object?",
+            "options": [
+              "No — it mutates and returns `target`",
+              "Yes, always",
+              "Only when `target` is empty",
+              "It returns `src`"
+            ],
+            "answer": 0,
+            "explanation": "Use `{ ...target, ...src }` or `Object.assign({}, target, src)` for a copy."
+          },
+          {
+            "question": "What does `Object.fromEntries([[\"a\", 1]])` return?",
+            "options": [
+              "`{ a: 1 }`",
+              "`[[\"a\", 1]]`",
+              "`Map { \"a\" => 1 }`",
+              "`{ 0: [\"a\", 1] }`"
+            ],
+            "answer": 0,
+            "explanation": "The inverse of `Object.entries`."
+          },
+          {
+            "question": "How do you swap `x` and `y` without a temporary variable?",
+            "options": [
+              "`[x, y] = [y, x]`",
+              "`x, y = y, x`",
+              "`swap(x, y)`",
+              "`{ x, y } = { y, x }`"
+            ],
+            "answer": 0,
+            "explanation": "Array destructuring assignment."
+          },
+          {
+            "question": "What does `const { length } = \"abc\"` bind?",
+            "options": [
+              "`length` = 3",
+              "An error: strings can't be destructured",
+              "`length` = undefined",
+              "`length` = \"abc\""
+            ],
+            "answer": 0,
+            "explanation": "Destructuring reads properties, and strings have `length`."
+          },
+          {
+            "question": "What does `JSON.stringify(obj, null, 2)` do differently?",
+            "options": [
+              "Pretty-prints with two-space indentation",
+              "Limits depth to 2",
+              "Drops `null` values",
+              "Keeps only 2 keys"
+            ],
+            "answer": 0,
+            "explanation": "The third argument is the indentation."
+          },
+          {
+            "question": "In what order does `Object.entries({ b: 2, a: 1 })` list keys?",
+            "options": [
+              "Insertion order: `b`, then `a`",
+              "Alphabetical",
+              "Random",
+              "Reverse insertion order"
+            ],
+            "answer": 0,
+            "explanation": "String keys keep insertion order (integer-like keys come first, ascending)."
+          },
+          {
+            "question": "What type should `JSON.parse` results be given before validation?",
+            "options": [
+              "`unknown`",
+              "`any`",
+              "The expected interface",
+              "`object`"
+            ],
+            "answer": 0,
+            "explanation": "`unknown` makes you validate before use; `any` or a cast silently trusts the input."
+          },
+          {
+            "question": "`interface Point { x: number }` — can a class `implements Point` without extending anything?",
+            "options": [
+              "Yes — `implements` only checks the shape",
+              "No, it must extend a base class",
+              "Only if `Point` is a type alias",
+              "Only at runtime"
+            ],
+            "answer": 0,
+            "explanation": "Interfaces have no runtime existence; `implements` is a compile-time check."
           },
           {
             "question": "Which can name a union type?",
