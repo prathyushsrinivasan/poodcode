@@ -61,9 +61,10 @@ the gap stays visible. This is what has landed since.
 | What the checker knows | `lib: es2022` — `toSorted`, `Object.groupBy`, Set methods, iterator helpers and `using` all failed to compile though Node 24 runs them | **ES2024 + the esnext libraries Node 24 ships** (array, collection, iterator, disposable, promise) — judge, verifier and editor in step | `tscheck.rs`, `ts_typecheck.mjs`, `monacoSetup.ts` |
 | Expected outputs | pasted in by hand after running the reference | **computed**: content names its inputs; `python tools/gen_ts_outputs.py` runs every reference (type-checked first) and caches the outputs, hash-pinned — a stale entry fails the build | `tools/ts_outputs_kit.py`, `tools/ts_outputs.json` |
 | Lesson template (X-02) | 1-2k-character lessons, prose only | new chapters are **structured data rendered into a fixed spine** — why, idea, worked examples *with the output they really print*, real compiler errors *as tsc prints them*, pitfalls (wrong vs right, both run), interview, forward links; 4k+ characters enforced | `tools/ts_chapter_kit.py`; chapters in `tools/ts_chapters_m*.py` |
-| Build projects (F-08) | a sentence; code saved but never run; "shipped" self-declared | **structured brief + acceptance tests** run through the judge; *shipping needs them green*; reference revealed after shipping; saved self-review rubric — weeks 1–17 (Month 4's include `ledger.ts` v4 and a reverse-routing `routes.ts`) | `project_spec`, `ProjectPanel`, `project_rubric` column |
-| Problems inside a week | 2-5 Library links | **a tiered problem set per week** (warm-up / core / stretch), original, judged at the week's strictness — weeks 1–17 (174 problems, 11 of them type-graded) | `problem_set`, `tools/mastery_ts_more_m*.py` |
+| Build projects (F-08) | a sentence; code saved but never run; "shipped" self-declared | **structured brief + acceptance tests** run through the judge; *shipping needs them green*; reference revealed after shipping; saved self-review rubric — weeks 1–22 (Month 4's include `ledger.ts` v4 and a reverse-routing `routes.ts`; Month 5's end with the `events.ts` typed event catalogue) | `project_spec`, `ProjectPanel`, `project_rubric` column |
+| Problems inside a week | 2-5 Library links | **a tiered problem set per week** (warm-up / core / stretch), original, judged at the week's strictness — weeks 1–22 (216 problems, 32 of them type-graded — none repeating a type workshop) | `problem_set`, `tools/mastery_ts_more_m*.py` |
 | Month 4 chapters | none of the five the roadmap asks for | **`ts_erasable_syntax`, `ts_versions`, `ts_variance`, `ts_parse_dont_validate`, `ts_runtime_validation`** on the lesson template; TypeScript 6.0/7.0 facts checked against the official release notes (D-4) — the chapter teaches the 6.0 defaults and deprecations as content, the checker itself stays on 5.9 | `tools/ts_chapters_m4.py`, `tools/mastery_ts_more_m4.py` |
+| Month 5 chapters | none of the five the roadmap asks for | **`ts_generic_inference`, `ts_lookup_types`, `ts_key_remapping`, `ts_distributive`, `ts_type_performance`** on the lesson template — including real TS2589/TS2590 limits, reproduced by the checker rather than described | `tools/ts_chapters_m5.py`, `tools/mastery_ts_more_m5.py` |
 | Fast authoring loop (X-102) | none for Mastery | `python tools/verify_ts_mastery.py --weeks 11-14` / `--only ts_regex` — type-checks and runs chapters, practice, problems, finals and projects in seconds | `tools/verify_ts_mastery.py` |
 
 ---
@@ -645,7 +646,7 @@ the type-level programs behind every serious library.
 ### Week 18 — Generics & Constraints
 *Now:* `ts_generics`, `ts_generic_constraints` · 3 problems · final "Generic collection helpers".
 
-* **Chapters:** ✅ both · ⬜ **`ts_generic_inference`** — how type arguments are inferred, `const` type parameters (TS 5.0), `NoInfer<T>` (TS 5.4), defaults, when to pass type arguments explicitly.
+* **Chapters:** ✅ both · ✅ **`ts_generic_inference`** — how type arguments are inferred, `const` type parameters (TS 5.0), `NoInfer<T>` (TS 5.4), defaults, when to pass type arguments explicitly.
 * **Lesson additions:** generic functions, interfaces, classes; `extends` constraints; `keyof` constraints; the "generic that should be a union" smell; too many type parameters; returning `T` vs returning `unknown`.
 * **Worked examples:** `groupBy<T, K extends PropertyKey>`; `pluck<T, K extends keyof T>`; `first<T>(xs: readonly T[]): T | undefined`; `const` type parameter preserving literal tuples.
 * **Pitfalls:** a type parameter used once (it's just `unknown`); `T extends object` accepting arrays; inference picking a wider type than intended; generic defaults that never apply.
@@ -658,7 +659,7 @@ the type-level programs behind every serious library.
 ### Week 19 — `keyof`, `typeof` & Indexed Access
 *Now:* `ts_keyof_indexed` · 2 problems · final "Settings from one source of truth".
 
-* **Chapters:** ✅ `ts_keyof_indexed` · ⬜ **`ts_lookup_types`** — `T[K]`, `T[number]`, `T["a" | "b"]`, tuple element access, `typeof obj[keyof typeof obj]`, `PropertyKey`.
+* **Chapters:** ✅ `ts_keyof_indexed` · ✅ **`ts_lookup_types`** — `T[K]`, `T[number]`, `T["a" | "b"]`, tuple element access, `typeof obj[keyof typeof obj]`, `PropertyKey`.
 * **Lesson additions:** type-level `typeof` vs runtime `typeof`; `keyof` of a union vs intersection; deriving everything from one `as const` object; `Object.keys` doesn't return `keyof T` (and why that's correct).
 * **Worked examples:** settings getters/setters derived from defaults; typed `get(obj, key)`; a `Values<T>` helper; a column list whose type drives a table printer.
 * **Pitfalls:** `keyof` including `number` for index signatures; `keyof {}` is `never`; a typed `Object.keys` cast that lies.
@@ -671,7 +672,7 @@ the type-level programs behind every serious library.
 ### Week 20 — Mapped Types
 *Now:* `ts_mapped_types` · 2 problems · final with **2 tests** (F-04).
 
-* **Chapters:** ✅ `ts_mapped_types` · ⬜ **`ts_key_remapping`** — `as` clauses, filtering keys to `never`, template-literal key names (`getX`), homomorphic mapped types preserving modifiers.
+* **Chapters:** ✅ `ts_mapped_types` · ✅ **`ts_key_remapping`** — `as` clauses, filtering keys to `never`, template-literal key names (`getX`), homomorphic mapped types preserving modifiers.
 * **Lesson additions:** `{ [K in keyof T]: … }`; `+readonly`/`-readonly`, `+?`/`-?`; rebuilding `Partial`/`Required`/`Readonly`/`Pick`/`Record` by hand; mapping over unions vs over object keys; `DeepPartial`/`DeepReadonly`.
 * **Worked examples:** `Getters<T>` producing `getName(): string`; `PickByValue<T, V>`; `Mutable<T>`; `Nullable<T>`.
 * **Pitfalls:** mapped type over a primitive; losing optionality by mapping over `keyof T` indirectly; `DeepReadonly` on functions and `Date`.
@@ -684,7 +685,7 @@ the type-level programs behind every serious library.
 ### Week 21 — Conditional Types & `infer`
 *Now:* `ts_conditional_types` · 2 unrelated DSA problems (F-03).
 
-* **Chapters:** ✅ `ts_conditional_types` · ⬜ **`ts_distributive`** — distribution over naked type parameters, `[T] extends [U]` to stop it, `never` as the empty union, `infer U extends X` constraints.
+* **Chapters:** ✅ `ts_conditional_types` · ✅ **`ts_distributive`** — distribution over naked type parameters, `[T] extends [U]` to stop it, `never` as the empty union, `infer U extends X` constraints.
 * **Lesson additions:** `T extends U ? X : Y`; `infer` in function, array, promise and template positions; rebuilding `ReturnType`, `Parameters`, `Awaited`, `Exclude`, `Extract`, `NonNullable`; `IsNever`, `IsAny`, `IsUnion` tricks; conditional types in function return positions and why implementations need assertions.
 * **Worked examples:** `ElementOf<T>`; `UnwrapPromise<T>` recursively; `FunctionArgs<F>`; `IsEqual<A, B>` and why the naive version fails.
 * **Pitfalls:** unexpected distribution; `any` distributing to both branches; `never` input returning `never`; return-type conditional forcing a cast.
@@ -697,7 +698,7 @@ the type-level programs behind every serious library.
 ### Week 22 — Template Literals & Recursive Types
 *Now:* `ts_template_literal_types`, `ts_type_level` · 2 problems.
 
-* **Chapters:** ✅ both · ⬜ **`ts_type_performance`** — recursion depth limits, tail-recursive conditional types, instantiation cost, "type instantiation is excessively deep" (TS2589), when to stop.
+* **Chapters:** ✅ both · ✅ **`ts_type_performance`** — recursion depth limits, tail-recursive conditional types, instantiation cost, "type instantiation is excessively deep" (TS2589), when to stop.
 * **Lesson additions:** `` `${A}-${B}` ``; `Uppercase`/`Lowercase`/`Capitalize`/`Uncapitalize`; parsing strings at the type level (`Split`, `Trim`, route params); recursive types (`Json`, trees, `Paths<T>`); tuple manipulation (`Reverse`, `Length`, `Push`); type-level arithmetic via tuples (and why it's a toy).
 * **Worked examples:** `RouteParams<"/users/:id/posts/:postId">`; `Paths<T>` for typed `get("a.b.c")`; typed event names `${Entity}:${Action}`; `CamelCase<"foo_bar_baz">`.
 * **Pitfalls:** unions in template literals exploding (cartesian product); TS2589 depth errors; recursion on `string` (not a literal) returning `string`.

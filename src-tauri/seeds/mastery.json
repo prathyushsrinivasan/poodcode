@@ -18442,7 +18442,8 @@
         "goal": "Write one implementation that keeps every caller's exact type.",
         "concepts": [
           "ts_generics",
-          "ts_generic_constraints"
+          "ts_generic_constraints",
+          "ts_generic_inference"
         ],
         "problems": [
           {
@@ -18635,6 +18636,72 @@
             ],
             "answer": 0,
             "explanation": "A type-parameter default is not a value default. `makeBox(1)` still infers `T = number`; the default matters for cases like `const b: Box = ...` where no argument drives inference."
+          },
+          {
+            "question": "What is `T` in `wrap(42)` for `function wrap<T>(x: T)`?",
+            "options": [
+              "`number` — the literal widens",
+              "`42`",
+              "`unknown`",
+              "`any`"
+            ],
+            "answer": 0,
+            "explanation": "Inferred type arguments widen literals like a `let` does, unless the parameter is `const` or constrained."
+          },
+          {
+            "question": "What does a `const` type parameter change?",
+            "options": [
+              "Arguments are inferred as if written with `as const`, keeping literal and tuple types",
+              "The parameter can't be reassigned",
+              "The function becomes pure",
+              "`T` must be a primitive"
+            ],
+            "answer": 0,
+            "explanation": "Added in TS 5.0: `<const T extends readonly string[]>`."
+          },
+          {
+            "question": "What is `NoInfer<T>` for?",
+            "options": [
+              "Stopping one argument from contributing to `T`, so it is only checked against it",
+              "Disabling type checking for an argument",
+              "Making `T` optional",
+              "Forcing an explicit type argument"
+            ],
+            "answer": 0,
+            "explanation": "TS 5.4. Typical use: a fallback or default that must be one of the inferred options."
+          },
+          {
+            "question": "`box([])` infers `T` as?",
+            "options": [
+              "`never`",
+              "`unknown`",
+              "`any`",
+              "`undefined`"
+            ],
+            "answer": 0,
+            "explanation": "There is no element to infer from. Write `box<string>([])`."
+          },
+          {
+            "question": "Why is `function log<T>(x: T): void` a smell?",
+            "options": [
+              "`T` appears once, so it relates nothing — it's just `unknown`",
+              "Generic functions can't return `void`",
+              "It is slower",
+              "`T` must be constrained"
+            ],
+            "answer": 0,
+            "explanation": "Type parameters exist to connect types: an input to an output, or two inputs."
+          },
+          {
+            "question": "When does a type parameter default like `<T = string>` apply?",
+            "options": [
+              "When no type argument is given and nothing can be inferred",
+              "Always, overriding inference",
+              "Only for classes",
+              "Only when `T` is `unknown`"
+            ],
+            "answer": 0,
+            "explanation": "Inference wins when it has candidates; the default fills the gap when it doesn't."
           }
         ],
         "quiz_sample": 8,
@@ -18730,6 +18797,30 @@
           {
             "front": "Generic class — how is `T` fixed?",
             "back": "At construction: `new Stack<number>()`, or inferred from constructor arguments."
+          },
+          {
+            "front": "Where do inferred type arguments come from?",
+            "back": "Candidates from the arguments (and the contextual return type); literals widen unless the parameter is `const` or constrained."
+          },
+          {
+            "front": "What does `<const T extends readonly unknown[]>` do?",
+            "back": "Infers the argument as if written with `as const` — exact tuples and literal types (TS 5.0)."
+          },
+          {
+            "front": "What is `NoInfer<T>` for?",
+            "back": "Excluding one argument from inference so it is only checked against `T` — e.g. a fallback that must be one of the options (TS 5.4)."
+          },
+          {
+            "front": "`box([])` gives `T` = ?",
+            "back": "`never` — nothing to infer from. Write `box<string>([])`."
+          },
+          {
+            "front": "When does a default type argument `<T = string>` apply?",
+            "back": "Only when there is no explicit argument and nothing to infer."
+          },
+          {
+            "front": "A type parameter that appears once — what's wrong?",
+            "back": "It relates nothing to anything; use `unknown` (or a real constraint) instead."
           }
         ],
         "practice": [
@@ -18886,11 +18977,407 @@
             "tests": [],
             "source_slug": "",
             "dataset": ""
+          },
+          {
+            "id": "tsm-w18-p9",
+            "title": "An inferred generic call",
+            "prompt": "What type does TypeScript already infer for `boxed`? Annotate `check` with exactly that type — not merely one that fits.",
+            "hint": "The literal `\"ok\"` widens when `T` is inferred.",
+            "hints": [
+              "The literal `\"ok\"` widens when `T` is inferred.",
+              "So `T` is `string` and the result is `string[]`."
+            ],
+            "language": "typescript",
+            "kind": "predict",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<typeof check, typeof boxed>>;\n",
+            "judge_mode": "types",
+            "forbid": [
+              "typeof"
+            ],
+            "starter": "function wrap<T>(value: T) {\n  return [value];\n}\nconst boxed = wrap(\"ok\");\nconst check: ____ = boxed;\n",
+            "solution": "function wrap<T>(value: T) {\n  return [value];\n}\nconst boxed = wrap(\"ok\");\nconst check: string[] = boxed;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w18-d9",
+            "title": "A generic that promises too much",
+            "prompt": "The compiler rejects this program:\n\n    error TS2322: Type 'number' is not assignable to type 'T'.\n\nLet the caller supply the fallback, so it has the caller's type.",
+            "hint": "`0` is a number, and `T` might be anything.",
+            "hints": [
+              "`0` is a number, and `T` might be anything.",
+              "Take the fallback as a parameter of type `T`."
+            ],
+            "language": "typescript",
+            "kind": "diagnose",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "function orZero<T>(value: T | undefined): T {\n  return value ?? 0;\n}\nconsole.log(orZero<number>(undefined) + 1);\n",
+            "solution": "function orDefault<T>(value: T | undefined, fallback: T): T {\n  return value ?? fallback;\n}\nconsole.log(orDefault<number>(undefined, 0) + 1);\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "1"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
           }
         ],
         "optional": false,
-        "problem_set": [],
-        "project_spec": null
+        "problem_set": [
+          {
+            "id": "tsm-w18-partition",
+            "title": "Partition anything",
+            "prompt": "Write `partition<T>(items: readonly T[], test: (item: T) => boolean): [T[], T[]]`. The first input line is numbers, the second words. Print the numbers split into even and odd, and the words split into those longer than 3 characters and the rest, as `<yes…> | <no…>` (`-` for an empty half).",
+            "hint": "`T` is inferred from `items`, so the callback's parameter is typed for free.",
+            "hints": [
+              "`T` is inferred from `items`, so the callback's parameter is typed for free.",
+              "Return a tuple type `[T[], T[]]` so both halves destructure with the element type."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nfunction partition<T>(items: readonly T[], test: (item: T) => boolean): [T[], T[]] {\n  const yes: T[] = [];\n  const no: T[] = [];\n  for (const item of items) (test(item) ? yes : no).push(item);\n  return [yes, no];\n}\nconst [numLine = \"\", wordLine = \"\"] = input.split(\"\\n\");\nconst nums = numLine.trim().split(/\\s+/).map(Number);\nconst words = wordLine.trim().split(/\\s+/);\nconst [even, odd] = partition(nums, (n) => n % 2 === 0);\nconst [long, short] = partition(words, (w) => w.length > 3);\nconst show = (xs: readonly (string | number)[]) => xs.join(\" \") || \"-\";\nconsole.log(`${show(even)} | ${show(odd)}`);\nconsole.log(`${show(long)} | ${show(short)}`);\n",
+            "tests": [
+              {
+                "input": "1 2 3 4 5 6\nthe quick brown fox",
+                "output": "2 4 6 | 1 3 5\nquick brown | the fox"
+              },
+              {
+                "input": "7\nhi there",
+                "output": "- | 7\nthere | hi"
+              },
+              {
+                "input": "2 4\nab cd",
+                "output": "2 4 | -\n- | ab cd"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w18-zip",
+            "title": "Zip two lists",
+            "prompt": "Write `zip<A, B>(as: readonly A[], bs: readonly B[]): [A, B][]`, stopping at the shorter list. The first line is names, the second scores. Print each pair as `<name>: <score>`, then `<k> pairs` and, if the lists had different lengths, `ignored <n> extra`.",
+            "hint": "Two type parameters, one per list.",
+            "hints": [
+              "Two type parameters, one per list.",
+              "Under `noUncheckedIndexedAccess` each `as[i]` is `A | undefined` — check before pushing."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nfunction zip<A, B>(as: readonly A[], bs: readonly B[]): [A, B][] {\n  const out: [A, B][] = [];\n  for (let i = 0; i < Math.min(as.length, bs.length); i++) {\n    const a = as[i];\n    const b = bs[i];\n    if (a !== undefined && b !== undefined) out.push([a, b]);\n  }\n  return out;\n}\nconst [nameLine = \"\", scoreLine = \"\"] = input.split(\"\\n\");\nconst names = nameLine.trim().split(/\\s+/);\nconst scores = scoreLine.trim().split(/\\s+/).map(Number);\nconst pairs = zip(names, scores);\nfor (const [name, score] of pairs) console.log(`${name}: ${score}`);\nconsole.log(`${pairs.length} pairs`);\nconst extra = Math.abs(names.length - scores.length);\nif (extra > 0) console.log(`ignored ${extra} extra`);\n",
+            "tests": [
+              {
+                "input": "ana bo cy\n90 80 70",
+                "output": "ana: 90\nbo: 80\ncy: 70\n3 pairs"
+              },
+              {
+                "input": "ana bo cy dee\n1 2",
+                "output": "ana: 1\nbo: 2\n2 pairs\nignored 2 extra"
+              },
+              {
+                "input": "x\n5 6 7",
+                "output": "x: 5\n1 pairs\nignored 2 extra"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w18-chunk",
+            "title": "Chunks of any size",
+            "prompt": "Write `chunk<T>(items: readonly T[], size: number): T[][]`. The first input line is the size, the second a list of words. Print each chunk on its own line, words space-separated, then `<k> chunks` (`chunk` for one). A size below 1 prints `bad size`.",
+            "hint": "`slice(i, i + size)` never goes past the end.",
+            "hints": [
+              "`slice(i, i + size)` never goes past the end."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nfunction chunk<T>(items: readonly T[], size: number): T[][] {\n  const out: T[][] = [];\n  for (let i = 0; i < items.length; i += size) out.push(items.slice(i, i + size));\n  return out;\n}\nconst [sizeText = \"\", line = \"\"] = input.split(\"\\n\");\nconst size = Number(sizeText);\nif (!Number.isInteger(size) || size < 1) {\n  console.log(\"bad size\");\n} else {\n  const chunks = chunk(line.trim().split(/\\s+/), size);\n  for (const c of chunks) console.log(c.join(\" \"));\n  console.log(`${chunks.length} ${chunks.length === 1 ? \"chunk\" : \"chunks\"}`);\n}\n",
+            "tests": [
+              {
+                "input": "2\na b c d e",
+                "output": "a b\nc d\ne\n3 chunks"
+              },
+              {
+                "input": "3\nx y z",
+                "output": "x y z\n1 chunk"
+              },
+              {
+                "input": "0\na b",
+                "output": "bad size"
+              },
+              {
+                "input": "5\nonly",
+                "output": "only\n1 chunk"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w18-unique-by",
+            "title": "Unique by a key",
+            "prompt": "Write `uniqueBy<T, K>(items: readonly T[], keyOf: (item: T) => K): T[]`, keeping the first item for each key. Each input line is `<name> <email>`. Print the people unique by email compared case-insensitively (keeping the first), as `<name> <email>`, then `removed <k>`.",
+            "hint": "`K` is inferred from the key function's return type — here `string`.",
+            "hints": [
+              "`K` is inferred from the key function's return type — here `string`.",
+              "A `Set<K>` of keys already seen."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nfunction uniqueBy<T, K>(items: readonly T[], keyOf: (item: T) => K): T[] {\n  const seen = new Set<K>();\n  const out: T[] = [];\n  for (const item of items) {\n    const key = keyOf(item);\n    if (seen.has(key)) continue;\n    seen.add(key);\n    out.push(item);\n  }\n  return out;\n}\ntype Person = { name: string; email: string };\nconst people: Person[] = input.split(\"\\n\").map((line) => {\n  const [name = \"\", email = \"\"] = line.trim().split(/\\s+/);\n  return { name, email };\n});\nconst unique = uniqueBy(people, (p) => p.email.toLowerCase());\nfor (const p of unique) console.log(`${p.name} ${p.email}`);\nconsole.log(`removed ${people.length - unique.length}`);\n",
+            "tests": [
+              {
+                "input": "ana ana@x.io\nbo bo@y.io\nAna2 ANA@X.IO\ncy cy@z.io\nbob BO@y.io",
+                "output": "ana ana@x.io\nbo bo@y.io\ncy cy@z.io\nremoved 2"
+              },
+              {
+                "input": "solo s@s.io",
+                "output": "solo s@s.io\nremoved 0"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w18-min-max-by",
+            "title": "The best by any score",
+            "prompt": "Write `minBy<T>(items: readonly T[], score: (item: T) => number): T | undefined` and `maxBy` (first on ties). Each input line is `<city> <temp> <rain>`. Print `coldest <city>`, `warmest <city>`, `wettest <city>` and `longest name <city>` — or `no data` for empty input lines only.",
+            "hint": "Return `T | undefined` — an empty list has no best item.",
+            "hints": [
+              "Return `T | undefined` — an empty list has no best item.",
+              "`maxBy` is `minBy` of the negated score."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nfunction minBy<T>(items: readonly T[], score: (item: T) => number): T | undefined {\n  let best: T | undefined;\n  let bestScore = Infinity;\n  for (const item of items) {\n    const s = score(item);\n    if (s < bestScore) {\n      best = item;\n      bestScore = s;\n    }\n  }\n  return best;\n}\nfunction maxBy<T>(items: readonly T[], score: (item: T) => number): T | undefined {\n  return minBy(items, (item) => -score(item));\n}\ntype City = { name: string; temp: number; rain: number };\nconst cities: City[] = input.split(\"\\n\").filter((l) => l.trim() !== \"\").map((line) => {\n  const [name = \"\", temp = \"0\", rain = \"0\"] = line.trim().split(/\\s+/);\n  return { name, temp: Number(temp), rain: Number(rain) };\n});\nconst show = (label: string, c: City | undefined) => console.log(`${label} ${c?.name ?? \"no data\"}`);\nshow(\"coldest\", minBy(cities, (c) => c.temp));\nshow(\"warmest\", maxBy(cities, (c) => c.temp));\nshow(\"wettest\", maxBy(cities, (c) => c.rain));\nshow(\"longest name\", maxBy(cities, (c) => c.name.length));\n",
+            "tests": [
+              {
+                "input": "oslo -3 40\nrome 18 70\ncairo 30 1\nlima 18 5",
+                "output": "coldest oslo\nwarmest cairo\nwettest rome\nlongest name cairo"
+              },
+              {
+                "input": "reykjavik 2 90",
+                "output": "coldest reykjavik\nwarmest reykjavik\nwettest reykjavik\nlongest name reykjavik"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w18-lru",
+            "title": "A generic LRU cache",
+            "prompt": "Write a class `LruCache<K, V>` with a capacity, `get(key): V | undefined` (marks the key as recently used) and `set(key, value): K | undefined` (returns the evicted key, if any). The first input line is the capacity; each later line is `get <k>` or `set <k> <v>`. Print the value or `miss` for `get`, and `evicted <k>` when a `set` evicts. Finish with the keys from least to most recently used.",
+            "hint": "A `Map` iterates in insertion order: delete and re-insert to mark a key as used.",
+            "hints": [
+              "A `Map` iterates in insertion order: delete and re-insert to mark a key as used.",
+              "The iterator result has `done`; check it before reading `value`."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nclass LruCache<K, V> {\n  private readonly entries = new Map<K, V>();\n  private readonly capacity: number;\n  constructor(capacity: number) {\n    this.capacity = capacity;\n  }\n  get(key: K): V | undefined {\n    const value = this.entries.get(key);\n    if (value !== undefined) {\n      this.entries.delete(key);\n      this.entries.set(key, value);\n    }\n    return value;\n  }\n  set(key: K, value: V): K | undefined {\n    this.entries.delete(key);\n    this.entries.set(key, value);\n    if (this.entries.size <= this.capacity) return undefined;\n    const oldest = this.entries.keys().next();\n    if (oldest.done === true) return undefined;\n    this.entries.delete(oldest.value);\n    return oldest.value;\n  }\n  keys(): K[] {\n    return [...this.entries.keys()];\n  }\n}\nconst [capText = \"1\", ...ops] = input.split(\"\\n\");\nconst cache = new LruCache<string, number>(Number(capText));\nfor (const op of ops) {\n  const [cmd = \"\", key = \"\", value = \"\"] = op.trim().split(/\\s+/);\n  if (cmd === \"get\") console.log(cache.get(key) ?? \"miss\");\n  else {\n    const evicted = cache.set(key, Number(value));\n    if (evicted !== undefined) console.log(`evicted ${evicted}`);\n  }\n}\nconsole.log(cache.keys().join(\" \") || \"(empty)\");\n",
+            "tests": [
+              {
+                "input": "2\nset a 1\nset b 2\nget a\nset c 3\nget b\nget c",
+                "output": "1\nevicted b\nmiss\n3\na c"
+              },
+              {
+                "input": "1\nset x 5\nset x 6\nget x\nset y 1\nget x",
+                "output": "6\nevicted x\nmiss\ny"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w18-memo",
+            "title": "Memoise any function",
+            "prompt": "Write `memoize<A extends unknown[], R>(fn: (...args: A) => R, keyOf: (...args: A) => string)` returning a function of the same type plus a `calls()` counter of real computations. Use it on a recursive `ways(n, k)` — the number of ways to climb `n` steps taking 1 to `k` steps at a time. Each input line is `n k`; print `ways(<n>, <k>) = <w>`, and finally `computed <c> times`.",
+            "hint": "`A extends unknown[]` captures the whole parameter list as a tuple, so the wrapper keeps the original signature.",
+            "hints": [
+              "`A extends unknown[]` captures the whole parameter list as a tuple, so the wrapper keeps the original signature.",
+              "`Object.assign(fn, { calls })` adds a property to a function and types the result as both."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Hard",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nfunction memoize<A extends unknown[], R>(fn: (...args: A) => R, keyOf: (...args: A) => string) {\n  const cache = new Map<string, R>();\n  let computed = 0;\n  const wrapped = (...args: A): R => {\n    const key = keyOf(...args);\n    const hit = cache.get(key);\n    if (hit !== undefined) return hit;\n    computed++;\n    const value = fn(...args);\n    cache.set(key, value);\n    return value;\n  };\n  return Object.assign(wrapped, { calls: () => computed });\n}\nconst ways = memoize(\n  (n: number, k: number): number => {\n    if (n === 0) return 1;\n    let total = 0;\n    for (let step = 1; step <= Math.min(k, n); step++) total += ways(n - step, k);\n    return total;\n  },\n  (n, k) => `${n},${k}`,\n);\nfor (const line of input.split(\"\\n\")) {\n  const [n = \"0\", k = \"1\"] = line.trim().split(/\\s+/);\n  console.log(`ways(${n}, ${k}) = ${ways(Number(n), Number(k))}`);\n}\nconsole.log(`computed ${ways.calls()} times`);\n",
+            "tests": [
+              {
+                "input": "4 2\n10 3\n4 2",
+                "output": "ways(4, 2) = 5\nways(10, 3) = 274\nways(4, 2) = 5\ncomputed 16 times"
+              },
+              {
+                "input": "30 2\n0 5",
+                "output": "ways(30, 2) = 1346269\nways(0, 5) = 1\ncomputed 32 times"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w18-const-tuple",
+            "title": "Keep the tuple exactly",
+            "prompt": "`tuple` should return exactly what it was given — including literal types and positions — without the caller writing `as const`. Finish its type parameter.",
+            "hint": "A `const` modifier on a type parameter infers arguments as if they had `as const`.",
+            "hints": [
+              "A `const` modifier on a type parameter infers arguments as if they had `as const`.",
+              "The constraint must accept a readonly array."
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<typeof point, readonly [3, 4]>>;\ntype _2 = Expect<Equal<typeof mixed, readonly [\"id\", 7, true]>>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "function tuple<____>(xs: T): T {\n  return xs;\n}\nconst point = tuple([3, 4]);\nconst mixed = tuple([\"id\", 7, true]);\n",
+            "solution": "function tuple<const T extends readonly unknown[]>(xs: T): T {\n  return xs;\n}\nconst point = tuple([3, 4]);\nconst mixed = tuple([\"id\", 7, true]);\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w18-name-constraint",
+            "title": "Keep the caller's type through a constraint",
+            "prompt": "`longestName` works on anything with a `name`, and must return the caller's *own* element type (with every other field), not just `{ name: string }`. Write its type parameter.",
+            "hint": "Constrain `T` to things with a `name`, but keep `T` itself as the element type.",
+            "hints": [
+              "Constrain `T` to things with a `name`, but keep `T` itself as the element type."
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<typeof found, { name: string; age: number } | undefined>>;\nfunction _typeTests() {\n  // @ts-expect-error — the items need a name\n  longestName([{ title: \"x\" }]);\n}\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "function longestName<____>(items: readonly T[]): T | undefined {\n  let best: T | undefined;\n  for (const item of items) if (best === undefined || item.name.length > best.name.length) best = item;\n  return best;\n}\nconst people = [{ name: \"ana\", age: 31 }, { name: \"bartholomew\", age: 40 }];\nconst found = longestName(people);\n",
+            "solution": "function longestName<T extends { name: string }>(items: readonly T[]): T | undefined {\n  let best: T | undefined;\n  for (const item of items) if (best === undefined || item.name.length > best.name.length) best = item;\n  return best;\n}\nconst people = [{ name: \"ana\", age: 31 }, { name: \"bartholomew\", age: 40 }];\nconst found = longestName(people);\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w18-default-param",
+            "title": "A default type argument",
+            "prompt": "`createStore` holds a value. When the caller gives no initial value and no type argument, it should hold a `string`; otherwise the value decides. Add a default to its type parameter.",
+            "hint": "A default goes after the type parameter's name: `<T = …>`.",
+            "hints": [
+              "A default goes after the type parameter's name: `<T = …>`.",
+              "It only applies when nothing can be inferred."
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Hard",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<ReturnType<typeof names.get>, string | undefined>>;\ntype _2 = Expect<Equal<ReturnType<typeof counts.get>, number | undefined>>;\nfunction _typeTests() {\n  // @ts-expect-error — the default is string\n  names.set(5);\n}\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "function createStore<____>(initial?: T) {\n  let value = initial;\n  return {\n    get: (): T | undefined => value,\n    set: (next: T) => {\n      value = next;\n    },\n  };\n}\nconst names = createStore();\nconst counts = createStore(0);\n",
+            "solution": "function createStore<T = string>(initial?: T) {\n  let value = initial;\n  return {\n    get: (): T | undefined => value,\n    set: (next: T) => {\n      value = next;\n    },\n  };\n}\nconst names = createStore();\nconst counts = createStore(0);\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          }
+        ],
+        "project_spec": {
+          "title": "collections.ts — a generic collection pipeline",
+          "goal": "Write a small generic `Collection<T>` class whose methods keep the element type through a pipeline — `map` changes it, `filter` and `sortBy` keep it, `groupBy` produces a `Map` — and drive it from commands. The same class serves numbers and words, which is the point of making it generic.",
+          "requirements": [
+            "The first input line is `numbers <n…>` or `words <w…>`; each later line is one step applied to the current collection: `map double|square|length|upper`, `filter even|odd|long` (`long` = length > 3), `sortBy value|length`, `unique`, `take <n>`, `chunk <n>`, `groupBy length|parity`, `first`, `count`.",
+            "`map`, `filter`, `sortBy`, `unique` and `take` print the new collection space-separated (or `(empty)`); `first` prints the first item or `none`; `count` prints the size. A step that doesn't apply to the current element type (e.g. `map upper` on numbers) prints `cannot <step> <numbers|words>` and changes nothing.",
+            "`chunk <n>` prints the chunks as `[a b] [c]`; `groupBy` prints `<key>: <items>` per group in first-seen order. Neither changes the collection.",
+            "Implement `Collection<T>` with generic methods — `map<U>(fn: (x: T) => U): Collection<U>` and friends — so that the element type is tracked at every step.",
+            "`sortBy` is stable and ascending; `length` compares the printed length of each item."
+          ],
+          "stretch": [
+            "Add `reduce<U>(fn: (acc: U, x: T) => U, start: U): U` and a `sum` step that only type-checks for `Collection<number>` (hint: a `this` parameter, `sum(this: Collection<number>)`).",
+            "Make `Collection` iterable (`[Symbol.iterator]`) — week 24 teaches how."
+          ],
+          "rubric": [
+            "No `any` anywhere — not even one hidden in a cast",
+            "Every function has a typed signature; locals are left to inference",
+            "Bad input is handled on purpose, not by accident",
+            "Names say what things are, not how they are stored",
+            "I could explain every line to someone else"
+          ],
+          "language": "typescript",
+          "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n// Build the project here. Read all of stdin from `input` above, and print\n// exactly what the requirements ask for. Run the tests as you go.\n",
+          "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nclass Collection<T> {\n  readonly items: readonly T[];\n  constructor(items: readonly T[]) {\n    this.items = items;\n  }\n  map<U>(fn: (x: T) => U): Collection<U> {\n    return new Collection(this.items.map(fn));\n  }\n  filter(test: (x: T) => boolean): Collection<T> {\n    return new Collection(this.items.filter(test));\n  }\n  sortBy(score: (x: T) => number): Collection<T> {\n    return new Collection(this.items.toSorted((a, b) => score(a) - score(b)));\n  }\n  unique(): Collection<T> {\n    return new Collection([...new Set(this.items)]);\n  }\n  take(n: number): Collection<T> {\n    return new Collection(this.items.slice(0, n));\n  }\n  chunk(n: number): T[][] {\n    const out: T[][] = [];\n    for (let i = 0; i < this.items.length; i += n) out.push(this.items.slice(i, i + n));\n    return out;\n  }\n  groupBy<K>(keyOf: (x: T) => K): Map<K, T[]> {\n    const groups = new Map<K, T[]>();\n    for (const x of this.items) groups.set(keyOf(x), [...(groups.get(keyOf(x)) ?? []), x]);\n    return groups;\n  }\n  first(): T | undefined {\n    return this.items[0];\n  }\n  toString(): string {\n    return this.items.join(\" \") || \"(empty)\";\n  }\n}\ntype Current = { kind: \"numbers\"; c: Collection<number> } | { kind: \"words\"; c: Collection<string> };\nconst [head = \"\", ...steps] = input.split(\"\\n\");\nconst [kind = \"\", ...values] = head.trim().split(/\\s+/);\nlet cur: Current = kind === \"numbers\" ? { kind: \"numbers\", c: new Collection(values.map(Number)) } : { kind: \"words\", c: new Collection(values) };\nfunction apply(cur: Current, cmd: string, arg: string): Current | string {\n  const n = Number(arg);\n  if (cmd === \"take\") return cur.kind === \"numbers\" ? { kind: \"numbers\", c: cur.c.take(n) } : { kind: \"words\", c: cur.c.take(n) };\n  if (cmd === \"unique\") return cur.kind === \"numbers\" ? { kind: \"numbers\", c: cur.c.unique() } : { kind: \"words\", c: cur.c.unique() };\n  if (cmd === \"sortBy\" && (arg === \"value\" || arg === \"length\")) {\n    if (cur.kind === \"numbers\") return { kind: \"numbers\", c: cur.c.sortBy((x) => (arg === \"value\" ? x : String(x).length)) };\n    if (arg === \"length\") return { kind: \"words\", c: cur.c.sortBy((w) => w.length) };\n  }\n  if (cur.kind === \"numbers\") {\n    if (cmd === \"map\" && arg === \"double\") return { kind: \"numbers\", c: cur.c.map((x) => x * 2) };\n    if (cmd === \"map\" && arg === \"square\") return { kind: \"numbers\", c: cur.c.map((x) => x * x) };\n    if (cmd === \"filter\" && arg === \"even\") return { kind: \"numbers\", c: cur.c.filter((x) => x % 2 === 0) };\n    if (cmd === \"filter\" && arg === \"odd\") return { kind: \"numbers\", c: cur.c.filter((x) => x % 2 !== 0) };\n  } else {\n    if (cmd === \"map\" && arg === \"upper\") return { kind: \"words\", c: cur.c.map((w) => w.toUpperCase()) };\n    if (cmd === \"map\" && arg === \"length\") return { kind: \"numbers\", c: cur.c.map((w) => w.length) };\n    if (cmd === \"filter\" && arg === \"long\") return { kind: \"words\", c: cur.c.filter((w) => w.length > 3) };\n  }\n  return `cannot ${cmd}${arg === \"\" ? \"\" : \" \" + arg} ${cur.kind}`;\n}\nfor (const step of steps) {\n  const [cmd = \"\", arg = \"\"] = step.trim().split(/\\s+/);\n  if (cmd === \"first\") {\n    console.log(cur.c.first() ?? \"none\");\n  } else if (cmd === \"count\") {\n    console.log(cur.c.items.length);\n  } else if (cmd === \"chunk\") {\n    const chunks: readonly (readonly (string | number)[])[] = cur.kind === \"numbers\" ? cur.c.chunk(Number(arg)) : cur.c.chunk(Number(arg));\n    console.log(chunks.map((c) => `[${c.join(\" \")}]`).join(\" \"));\n  } else if (cmd === \"groupBy\" && (arg === \"length\" || (arg === \"parity\" && cur.kind === \"numbers\"))) {\n    const groups: Map<string, (string | number)[]> = cur.kind === \"numbers\"\n      ? cur.c.groupBy((x) => (arg === \"parity\" ? (x % 2 === 0 ? \"even\" : \"odd\") : String(String(x).length)))\n      : cur.c.groupBy((w) => String(w.length));\n    for (const [k, items] of groups) console.log(`${k}: ${items.join(\" \")}`);\n  } else if (cmd === \"groupBy\") {\n    console.log(`cannot groupBy ${arg} ${cur.kind}`);\n  } else {\n    const next = apply(cur, cmd, arg);\n    if (typeof next === \"string\") {\n      console.log(next);\n    } else {\n      cur = next;\n      console.log(String(cur.c));\n    }\n  }\n}\n",
+          "tests": [
+            {
+              "input": "numbers 5 3 8 3 10 1\nunique\nfilter even\nmap square\nfirst\ncount",
+              "output": "5 3 8 10 1\n8 10\n64 100\n64\n2"
+            },
+            {
+              "input": "words the quick brown fox jumps\nfilter long\nmap upper\nsortBy length\nchunk 2\ngroupBy length",
+              "output": "quick brown jumps\nQUICK BROWN JUMPS\nQUICK BROWN JUMPS\n[QUICK BROWN] [JUMPS]\n5: QUICK BROWN JUMPS"
+            },
+            {
+              "input": "numbers 4 1 3\nmap upper\nsortBy value\ntake 2\ngroupBy parity\nmap double",
+              "output": "cannot map upper numbers\n1 3 4\n1 3\nodd: 1 3\n2 6"
+            },
+            {
+              "input": "words a bb a ccc\nunique\nmap length\nmap double\nfilter odd\nfirst",
+              "output": "a bb ccc\n1 2 3\n2 4 6\n(empty)\nnone"
+            },
+            {
+              "input": "words solo\ngroupBy parity\ntake 0\nfirst\ncount",
+              "output": "cannot groupBy parity words\n(empty)\nnone\n0"
+            }
+          ],
+          "strictness": "strict+indexed"
+        }
       },
       {
         "week": 19,
@@ -18898,7 +19385,8 @@
         "title": "keyof, typeof & Indexed Access",
         "goal": "Derive types from values so one source of truth drives both.",
         "concepts": [
-          "ts_keyof_indexed"
+          "ts_keyof_indexed",
+          "ts_lookup_types"
         ],
         "problems": [
           {
@@ -19087,6 +19575,72 @@
             ],
             "answer": 0,
             "explanation": "They share a keyword and nothing else. `type S = typeof settings` computes a type; `typeof x === \\\"string\\\"` is a runtime check that happens to also narrow."
+          },
+          {
+            "question": "`type U = { tags: string[] }`. What is `U[\"tags\"][number]`?",
+            "options": [
+              "`string`",
+              "`string[]`",
+              "`number`",
+              "`never`"
+            ],
+            "answer": 0,
+            "explanation": "`U[\"tags\"]` is `string[]`; indexing an array type by `number` gives its element type."
+          },
+          {
+            "question": "`const S = [\"a\", \"b\"] as const; type T = (typeof S)[number];` — `T` is?",
+            "options": [
+              "`\"a\" | \"b\"`",
+              "`string`",
+              "`readonly [\"a\", \"b\"]`",
+              "`number`"
+            ],
+            "answer": 0,
+            "explanation": "`as const` keeps the literals; `[number]` unions the tuple's elements."
+          },
+          {
+            "question": "What does `User[\"id\" | \"email\"]` give?",
+            "options": [
+              "The union of both properties' types",
+              "A tuple of both",
+              "An error — keys must be single",
+              "`never`"
+            ],
+            "answer": 0,
+            "explanation": "Indexing with a union key distributes over it."
+          },
+          {
+            "question": "Why does `Object.keys(obj)` return `string[]` and not `(keyof T)[]`?",
+            "options": [
+              "At runtime an object can have more keys than its type lists",
+              "It is a TypeScript bug",
+              "Symbols are excluded",
+              "For performance"
+            ],
+            "answer": 0,
+            "explanation": "Structural typing admits objects with extra properties, so `keyof T` would be a lie."
+          },
+          {
+            "question": "What is `keyof { [k: string]: number }`?",
+            "options": [
+              "`string | number`",
+              "`string`",
+              "`never`",
+              "`PropertyKey`"
+            ],
+            "answer": 0,
+            "explanation": "Numeric keys are allowed on a string index signature (they become strings at runtime)."
+          },
+          {
+            "question": "`function get<T, K extends keyof T>(o: T, k: K)` — what should it return?",
+            "options": [
+              "`T[K]`",
+              "`T`",
+              "`unknown`",
+              "`keyof T`"
+            ],
+            "answer": 0,
+            "explanation": "The indexed access type follows the specific key passed in."
           }
         ],
         "quiz_sample": 8,
@@ -19182,6 +19736,30 @@
           {
             "front": "TS7053 — cause?",
             "back": "Indexing an object with a `string` its type doesn't declare an index signature for: \"Element implicitly has an 'any' type…\"."
+          },
+          {
+            "front": "`User[\"role\"]`?",
+            "back": "An indexed access type: the type of `User`'s `role` property."
+          },
+          {
+            "front": "Element type of `string[][]`'s inner arrays?",
+            "back": "`string[][][number][number]` — or just `string`; `[number]` reads an array's element type."
+          },
+          {
+            "front": "`(typeof X)[number]` for `const X = [\"a\", \"b\"] as const`?",
+            "back": "`\"a\" | \"b\"` — a union from a constant list."
+          },
+          {
+            "front": "`User[\"id\" | \"email\"]`?",
+            "back": "The union of both properties' types — a union key gives a union."
+          },
+          {
+            "front": "Why doesn't `Object.keys` return `(keyof T)[]`?",
+            "back": "Objects can have more keys at runtime than their type lists; `string[]` is the honest type."
+          },
+          {
+            "front": "The typed property read, as a signature?",
+            "back": "`function get<T, K extends keyof T>(obj: T, key: K): T[K]`."
           }
         ],
         "practice": [
@@ -19316,11 +19894,335 @@
             "tests": [],
             "source_slug": "",
             "dataset": ""
+          },
+          {
+            "id": "tsm-w19-p9",
+            "title": "A lookup through a table's values",
+            "prompt": "What type does TypeScript already infer for `limit`? Annotate `check` with exactly that type — not merely one that fits.",
+            "hint": "`as const` keeps each value's literal type.",
+            "hints": [
+              "`as const` keeps each value's literal type.",
+              "The property `pro` is exactly `50`."
+            ],
+            "language": "typescript",
+            "kind": "predict",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<typeof check, typeof limit>>;\n",
+            "judge_mode": "types",
+            "forbid": [
+              "typeof"
+            ],
+            "starter": "const LIMITS = { free: 3, pro: 50 } as const;\nconst limit = LIMITS.pro;\nconst check: ____ = limit;\n",
+            "solution": "const LIMITS = { free: 3, pro: 50 } as const;\nconst limit = LIMITS.pro;\nconst check: 50 = limit;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w19-d9",
+            "title": "A string used as a key",
+            "prompt": "The compiler rejects this program:\n\n    error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{ readonly S: 10; readonly M: 12; }'.\n\nFix the cause.",
+            "hint": "Not every string is a key of `PRICES`.",
+            "hints": [
+              "Not every string is a key of `PRICES`.",
+              "Narrow the input to `keyof typeof PRICES` first."
+            ],
+            "language": "typescript",
+            "kind": "diagnose",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst PRICES = { S: 10, M: 12 } as const;\nconsole.log(PRICES[input] ?? \"unknown size\");\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst PRICES = { S: 10, M: 12 } as const;\nconst isSize = (s: string): s is keyof typeof PRICES => Object.hasOwn(PRICES, s);\nconsole.log(isSize(input) ? PRICES[input] : \"unknown size\");\n",
+            "tests": [
+              {
+                "input": "M",
+                "output": "12"
+              },
+              {
+                "input": "XL",
+                "output": "unknown size"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
           }
         ],
         "optional": false,
-        "problem_set": [],
-        "project_spec": null
+        "problem_set": [
+          {
+            "id": "tsm-w19-status-codes",
+            "title": "Status names and codes, both ways",
+            "prompt": "Declare `const STATUS = { OK: 200, CREATED: 201, NOT_FOUND: 404, CONFLICT: 409, SERVER_ERROR: 500 } as const` and derive `StatusName` and `StatusCode` from it. Each input line is a name or a code: print `<name> = <code>` for a known one, else `unknown <x>`. Finish with the codes of the 4xx statuses, ascending.",
+            "hint": "`keyof typeof STATUS` for the names; index `typeof STATUS` by them for the codes.",
+            "hints": [
+              "`keyof typeof STATUS` for the names; index `typeof STATUS` by them for the codes."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst STATUS = { OK: 200, CREATED: 201, NOT_FOUND: 404, CONFLICT: 409, SERVER_ERROR: 500 } as const;\ntype StatusName = keyof typeof STATUS;\ntype StatusCode = (typeof STATUS)[StatusName];\nconst names = Object.keys(STATUS) as StatusName[];\nconst nameOf = (code: number): StatusName | undefined => names.find((n) => STATUS[n] === code);\nconst isName = (s: string): s is StatusName => Object.hasOwn(STATUS, s);\nfor (const line of input.split(\"\\n\")) {\n  const t = line.trim();\n  const byCode = /^\\d+$/.test(t) ? nameOf(Number(t)) : undefined;\n  if (isName(t)) console.log(`${t} = ${STATUS[t]}`);\n  else if (byCode !== undefined) console.log(`${byCode} = ${STATUS[byCode]}`);\n  else console.log(`unknown ${t}`);\n}\nconst clientErrors: StatusCode[] = names.map((n) => STATUS[n]).filter((c) => c >= 400 && c < 500);\nconsole.log(clientErrors.sort((a, b) => a - b).join(\" \"));\n",
+            "tests": [
+              {
+                "input": "OK\n404\nCONFLICT\n418\nnot_found",
+                "output": "OK = 200\nNOT_FOUND = 404\nCONFLICT = 409\nunknown 418\nunknown not_found\n404 409"
+              },
+              {
+                "input": "500",
+                "output": "SERVER_ERROR = 500\n404 409"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w19-settings-io",
+            "title": "Typed get and set",
+            "prompt": "Settings have defaults `{ volume: 5, muted: false, theme: \"light\", name: \"guest\" }`. Write `get<K extends keyof Settings>(key: K): Settings[K]` and `set<K extends keyof Settings>(key: K, value: Settings[K])`. Each input line is `get <key>` or `set <key> <text>`: convert the text to the key's type (the default's `typeof` decides — `true`/`false` for booleans, a finite number for numbers). Print the value after each command, or `unknown key <k>` / `bad value <text> for <key>`.",
+            "hint": "`Settings[K]` follows the key: `get(\"muted\")` is a `boolean`.",
+            "hints": [
+              "`Settings[K]` follows the key: `get(\"muted\")` is a `boolean`.",
+              "Decide how to parse the text from the *default value's* runtime type."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst defaults = { volume: 5, muted: false, theme: \"light\", name: \"guest\" };\ntype Settings = typeof defaults;\nconst settings: Settings = { ...defaults };\nfunction get<K extends keyof Settings>(key: K): Settings[K] {\n  return settings[key];\n}\nfunction set<K extends keyof Settings>(key: K, value: Settings[K]): void {\n  settings[key] = value;\n}\nconst isKey = (s: string): s is keyof Settings => Object.hasOwn(defaults, s);\nfunction convert(key: keyof Settings, text: string): Settings[keyof Settings] | undefined {\n  const kind = typeof defaults[key];\n  if (kind === \"number\") return text !== \"\" && Number.isFinite(Number(text)) ? Number(text) : undefined;\n  if (kind === \"boolean\") return text === \"true\" ? true : text === \"false\" ? false : undefined;\n  return text;\n}\nfor (const line of input.split(\"\\n\")) {\n  const [cmd = \"\", key = \"\", ...rest] = line.trim().split(/\\s+/);\n  if (!isKey(key)) {\n    console.log(`unknown key ${key}`);\n    continue;\n  }\n  if (cmd === \"set\") {\n    const text = rest.join(\" \");\n    const value = convert(key, text);\n    if (value === undefined) {\n      console.log(`bad value ${text} for ${key}`);\n      continue;\n    }\n    set(key, value as Settings[typeof key]);\n  }\n  console.log(`${key} = ${get(key)}`);\n}\n",
+            "tests": [
+              {
+                "input": "get volume\nset volume 8\nset muted yes\nset muted true\nset theme dark\nget colour\nset name Ana Lee",
+                "output": "volume = 5\nvolume = 8\nbad value yes for muted\nmuted = true\ntheme = dark\nunknown key colour\nname = Ana Lee"
+              },
+              {
+                "input": "set volume loud\nget name",
+                "output": "bad value loud for volume\nname = guest"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w19-columns",
+            "title": "A table printer driven by column types",
+            "prompt": "Rows are `{ name: string; qty: number; price: number; inStock: boolean }`. The columns are one `as const` list of `{ key, title, width }` checked with `satisfies readonly Column[]` where `key` is a `keyof Row`. The first input line lists the column keys to show (comma-separated); each later line is a CSV row `name,qty,price,inStock`. Print a header of the titles, then each row — text left-aligned, numbers right-aligned, booleans as `yes`/`no`, each padded to the column's width and separated by ` | ` — or `unknown column <k>`.",
+            "hint": "`(typeof COLUMNS)[number][\"key\"]` is the union of keys the columns actually use.",
+            "hints": [
+              "`(typeof COLUMNS)[number][\"key\"]` is the union of keys the columns actually use.",
+              "`row[key]` is `string | number | boolean`; narrow with `typeof` to format it."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Row = { name: string; qty: number; price: number; inStock: boolean };\ntype Column = { key: keyof Row; title: string; width: number };\nconst COLUMNS = [\n  { key: \"name\", title: \"Item\", width: 8 },\n  { key: \"qty\", title: \"Qty\", width: 4 },\n  { key: \"price\", title: \"Price\", width: 7 },\n  { key: \"inStock\", title: \"Stock\", width: 5 },\n] as const satisfies readonly Column[];\ntype ColumnKey = (typeof COLUMNS)[number][\"key\"];\nconst findColumn = (k: string) => COLUMNS.find((c) => c.key === k);\nfunction cell(row: Row, key: ColumnKey, width: number): string {\n  const v = row[key];\n  if (typeof v === \"number\") return (key === \"price\" ? v.toFixed(2) : String(v)).padStart(width);\n  if (typeof v === \"boolean\") return (v ? \"yes\" : \"no\").padEnd(width);\n  return v.padEnd(width);\n}\nconst [header = \"\", ...lines] = input.split(\"\\n\");\nconst wanted = header.split(\",\").map((k) => k.trim());\nconst unknown = wanted.find((k) => findColumn(k) === undefined);\nif (unknown !== undefined) {\n  console.log(`unknown column ${unknown}`);\n} else {\n  const cols = wanted.flatMap((k) => {\n    const c = findColumn(k);\n    return c === undefined ? [] : [c];\n  });\n  console.log(cols.map((c) => c.title.padEnd(c.width)).join(\" | \").trimEnd());\n  for (const line of lines) {\n    const [name = \"\", qty = \"0\", price = \"0\", stock = \"\"] = line.split(\",\");\n    const row: Row = { name, qty: Number(qty), price: Number(price), inStock: stock.trim() === \"true\" };\n    console.log(cols.map((c) => cell(row, c.key, c.width)).join(\" | \").trimEnd());\n  }\n}\n",
+            "tests": [
+              {
+                "input": "name,qty,price,inStock\npen,12,1.5,true\nnotebook,3,4.25,false",
+                "output": "Item     | Qty  | Price   | Stock\npen      |   12 |    1.50 | yes\nnotebook |    3 |    4.25 | no"
+              },
+              {
+                "input": "price,name\ncup,1,3,true",
+                "output": "Price   | Item\n   3.00 | cup"
+              },
+              {
+                "input": "name,colour\nx,1,1,true",
+                "output": "unknown column colour"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w19-i18n",
+            "title": "Messages with a fallback language",
+            "prompt": "Messages live in one nested object: `en` and `de`, each with `home.title`, `home.greeting` (containing `{name}`) and `cart.items` (containing `{count}`); `de` is missing `cart.items`. Each input line is `<lang> <section>.<key> [param=value …]`. Print the message with every `{param}` replaced — falling back to `en` when the language lacks that key — or `unknown language <l>` / `unknown message <path>`. A placeholder without a value stays as it is.",
+            "hint": "`(typeof MESSAGES)[\"en\"]` describes one language's sections; `keyof` it for the section names.",
+            "hints": [
+              "`(typeof MESSAGES)[\"en\"]` describes one language's sections; `keyof` it for the section names.",
+              "Read a language's section as `Record<string, string>` to look up a key you only know at runtime."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst MESSAGES = {\n  en: {\n    home: { title: \"Welcome\", greeting: \"Hello, {name}!\" },\n    cart: { items: \"You have {count} items\" },\n  },\n  de: {\n    home: { title: \"Willkommen\", greeting: \"Hallo, {name}!\" },\n    cart: {},\n  },\n} as const;\ntype Lang = keyof typeof MESSAGES;\ntype Section = keyof (typeof MESSAGES)[\"en\"];\nconst isLang = (s: string): s is Lang => Object.hasOwn(MESSAGES, s);\nconst isSection = (s: string): s is Section => Object.hasOwn(MESSAGES.en, s);\nfunction lookup(lang: Lang, section: Section, key: string): string | undefined {\n  const table: Record<string, string> = MESSAGES[lang][section];\n  return Object.hasOwn(table, key) ? table[key] : undefined;\n}\nfor (const line of input.split(\"\\n\")) {\n  const [lang = \"\", path = \"\", ...params] = line.trim().split(/\\s+/);\n  const [section = \"\", key = \"\"] = path.split(\".\");\n  if (!isLang(lang)) {\n    console.log(`unknown language ${lang}`);\n    continue;\n  }\n  const message = isSection(section) ? lookup(lang, section, key) ?? lookup(\"en\", section, key) : undefined;\n  if (message === undefined) {\n    console.log(`unknown message ${path}`);\n    continue;\n  }\n  const values = new Map(params.map((p) => [p.slice(0, p.indexOf(\"=\")), p.slice(p.indexOf(\"=\") + 1)] as const));\n  console.log(message.replace(/\\{(\\w+)\\}/g, (whole, name: string) => values.get(name) ?? whole));\n}\n",
+            "tests": [
+              {
+                "input": "en home.title\nde home.greeting name=Ana\nde cart.items count=3\nfr home.title\nen home.farewell\nen cart.items",
+                "output": "Welcome\nHallo, Ana!\nYou have 3 items\nunknown language fr\nunknown message home.farewell\nYou have {count} items"
+              },
+              {
+                "input": "de home.title\nen blog.title",
+                "output": "Willkommen\nunknown message blog.title"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w19-order-report",
+            "title": "A report from a lookup table",
+            "prompt": "Products are one `as const` table keyed by SKU, each `{ name, price, category }` with category `food`, `tools` or `toys`. Derive `Sku` and `Category` from the table. Each input line is `<sku> <qty>`; unknown SKUs print `unknown sku <s>`. Then print each category (in the order `food`, `tools`, `toys`) as `<category>: <units> units, $<total>` (`unit` for one), and finally `best seller: <name>` by units (first on a tie; `none` if nothing sold).",
+            "hint": "`(typeof PRODUCTS)[Sku][\"category\"]` is the union of every product's category literal.",
+            "hints": [
+              "`(typeof PRODUCTS)[Sku][\"category\"]` is the union of every product's category literal."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Hard",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst PRODUCTS = {\n  A1: { name: \"apple\", price: 0.5, category: \"food\" },\n  B2: { name: \"bread\", price: 2.25, category: \"food\" },\n  H3: { name: \"hammer\", price: 12, category: \"tools\" },\n  Y4: { name: \"yo-yo\", price: 3.5, category: \"toys\" },\n} as const;\ntype Sku = keyof typeof PRODUCTS;\ntype Category = (typeof PRODUCTS)[Sku][\"category\"];\nconst CATEGORIES: readonly Category[] = [\"food\", \"tools\", \"toys\"];\nconst isSku = (s: string): s is Sku => Object.hasOwn(PRODUCTS, s);\nconst units = new Map<Sku, number>();\nfor (const line of input.split(\"\\n\")) {\n  const [sku = \"\", qty = \"0\"] = line.trim().split(/\\s+/);\n  if (!isSku(sku)) {\n    console.log(`unknown sku ${sku}`);\n    continue;\n  }\n  units.set(sku, (units.get(sku) ?? 0) + Number(qty));\n}\nconst skus = Object.keys(PRODUCTS) as Sku[];\nfor (const cat of CATEGORIES) {\n  const inCat = skus.filter((s) => PRODUCTS[s].category === cat);\n  const count = inCat.reduce((n, s) => n + (units.get(s) ?? 0), 0);\n  const total = inCat.reduce((t, s) => t + (units.get(s) ?? 0) * PRODUCTS[s].price, 0);\n  console.log(`${cat}: ${count} ${count === 1 ? \"unit\" : \"units\"}, $${total.toFixed(2)}`);\n}\nconst best = skus.filter((s) => (units.get(s) ?? 0) > 0).sort((a, b) => (units.get(b) ?? 0) - (units.get(a) ?? 0))[0];\nconsole.log(`best seller: ${best === undefined ? \"none\" : PRODUCTS[best].name}`);\n",
+            "tests": [
+              {
+                "input": "A1 6\nH3 1\nY4 2\nZZ 1\nA1 4\nB2 1",
+                "output": "unknown sku ZZ\nfood: 11 units, $7.25\ntools: 1 unit, $12.00\ntoys: 2 units, $7.00\nbest seller: apple"
+              },
+              {
+                "input": "Q9 3",
+                "output": "unknown sku Q9\nfood: 0 units, $0.00\ntools: 0 units, $0.00\ntoys: 0 units, $0.00\nbest seller: none"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w19-tuple-union",
+            "title": "A union from a tuple",
+            "prompt": "Write `TupleToUnion<T>`: the union of a tuple's element types.",
+            "hint": "Index the tuple type with `number`.",
+            "hints": [
+              "Index the tuple type with `number`."
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<TupleToUnion<[\"a\", 1, true]>, \"a\" | 1 | true>>;\ntype _2 = Expect<Equal<TupleToUnion<readonly [\"x\"]>, \"x\">>;\ntype _3 = Expect<Equal<TupleToUnion<[]>, never>>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type TupleToUnion<T extends readonly unknown[]> = ____;\n",
+            "solution": "type TupleToUnion<T extends readonly unknown[]> = T[number];\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w19-keys-of-type",
+            "title": "Keys whose values have a type",
+            "prompt": "Write `KeysOfType<T, V>`: the union of `T`'s keys whose property type is assignable to `V`.",
+            "hint": "Map every key to itself or to `never`, then look up all the values at once with `[keyof T]`.",
+            "hints": [
+              "Map every key to itself or to `never`, then look up all the values at once with `[keyof T]`.",
+              "`never` members disappear from the resulting union."
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype User = { id: number; name: string; email: string; age: number; admin: boolean };\ntype _1 = Expect<Equal<KeysOfType<User, string>, \"name\" | \"email\">>;\ntype _2 = Expect<Equal<KeysOfType<User, number>, \"id\" | \"age\">>;\ntype _3 = Expect<Equal<KeysOfType<User, Date>, never>>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type KeysOfType<T, V> = ____;\n",
+            "solution": "type KeysOfType<T, V> = { [K in keyof T]: T[K] extends V ? K : never }[keyof T];\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w19-deep-lookup",
+            "title": "Reach into a nested type",
+            "prompt": "Derive `ButtonColour` — the type of the button's `colour` in the theme — and `Spacing`, the union of the spacing scale's values, by looking them up in `Theme`.",
+            "hint": "Chain indexed accesses, one property at a time.",
+            "hints": [
+              "Chain indexed accesses, one property at a time."
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<ButtonColour, \"primary\" | \"danger\">>;\ntype _2 = Expect<Equal<Spacing, 4 | 8 | 16 | 32>>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type Theme = {\n  spacing: readonly [4, 8, 16, 32];\n  components: { button: { colour: \"primary\" | \"danger\"; size: number }; card: { shadow: boolean } };\n};\ntype ButtonColour = ____;\ntype Spacing = Theme[\"spacing\"][number];\n",
+            "solution": "type Theme = {\n  spacing: readonly [4, 8, 16, 32];\n  components: { button: { colour: \"primary\" | \"danger\"; size: number }; card: { shadow: boolean } };\n};\ntype ButtonColour = Theme[\"components\"][\"button\"][\"colour\"];\ntype Spacing = Theme[\"spacing\"][number];\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          }
+        ],
+        "project_spec": {
+          "title": "settings.ts — settings from one source of truth",
+          "goal": "Every setting is declared once, with its default and (optionally) its allowed values; the key union, the value types, parsing, validation, reset and export all follow from that declaration. Adding a setting must be a one-line change.",
+          "requirements": [
+            "Declare `const DEFAULTS = { theme: \"light\", fontSize: 14, autosave: true, language: \"en\", tabWidth: 2 }` and `const CHOICES = { theme: [\"light\", \"dark\", \"system\"], language: [\"en\", \"de\", \"ja\"], tabWidth: [2, 4, 8] }`; derive `SettingKey` and `Settings` from `DEFAULTS`.",
+            "Commands: `get <key>` prints `<key> = <value>`; `set <key> <value>` converts the text to the setting's type (by its default: numbers must be finite, booleans `true`/`false`) and, if the key has choices, checks it is one of them, then prints `<key> = <value>`; `reset <key>` restores the default and prints it.",
+            "Errors: `unknown setting <k>`, `<key> expects a number|boolean`, `<key> must be one of <choices, comma-separated>`.",
+            "`diff` prints every setting that differs from its default as `<key>: <default> -> <value>` (in declaration order), or `no changes`; `export` prints the settings as JSON with keys sorted.",
+            "No setting name may be written anywhere except in `DEFAULTS` and `CHOICES` — every other use is derived."
+          ],
+          "stretch": [
+            "Make `set` fully type-safe for callers in code: `set(\"fontSize\", \"big\")` should be a compile error — it already is with `assign`; find where the program needed a cast and remove it.",
+            "Add a `validate` hook per setting (e.g. `fontSize` between 8 and 72) declared next to its default."
+          ],
+          "rubric": [
+            "No `any` anywhere — not even one hidden in a cast",
+            "Every function has a typed signature; locals are left to inference",
+            "Bad input is handled on purpose, not by accident",
+            "Names say what things are, not how they are stored",
+            "I could explain every line to someone else"
+          ],
+          "language": "typescript",
+          "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n// Build the project here. Read all of stdin from `input` above, and print\n// exactly what the requirements ask for. Run the tests as you go.\n",
+          "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst DEFAULTS = { theme: \"light\", fontSize: 14, autosave: true, language: \"en\", tabWidth: 2 };\nconst CHOICES: { [K in SettingKey]?: readonly Settings[K][] } = {\n  theme: [\"light\", \"dark\", \"system\"],\n  language: [\"en\", \"de\", \"ja\"],\n  tabWidth: [2, 4, 8],\n};\ntype Settings = typeof DEFAULTS;\ntype SettingKey = keyof Settings;\nconst KEYS = Object.keys(DEFAULTS) as SettingKey[];\nconst isKey = (s: string): s is SettingKey => Object.hasOwn(DEFAULTS, s);\nconst current: Settings = { ...DEFAULTS };\n\ntype Parsed = { ok: true; value: Settings[SettingKey] } | { ok: false; error: string };\nfunction parseValue(key: SettingKey, text: string): Parsed {\n  const kind = typeof DEFAULTS[key];\n  let value: Settings[SettingKey];\n  if (kind === \"number\") {\n    if (text === \"\" || !Number.isFinite(Number(text))) return { ok: false, error: `${key} expects a number` };\n    value = Number(text);\n  } else if (kind === \"boolean\") {\n    if (text !== \"true\" && text !== \"false\") return { ok: false, error: `${key} expects a boolean` };\n    value = text === \"true\";\n  } else {\n    value = text;\n  }\n  const choices: readonly Settings[SettingKey][] | undefined = CHOICES[key];\n  if (choices !== undefined && !choices.includes(value)) return { ok: false, error: `${key} must be one of ${choices.join(\",\")}` };\n  return { ok: true, value };\n}\nfunction assign<K extends SettingKey>(key: K, value: Settings[K]): void {\n  current[key] = value;\n}\n\nfor (const line of input.split(\"\\n\")) {\n  const [cmd = \"\", key = \"\", ...rest] = line.trim().split(/\\s+/);\n  if (cmd === \"diff\") {\n    const changed = KEYS.filter((k) => current[k] !== DEFAULTS[k]);\n    if (changed.length === 0) console.log(\"no changes\");\n    for (const k of changed) console.log(`${k}: ${DEFAULTS[k]} -> ${current[k]}`);\n    continue;\n  }\n  if (cmd === \"export\") {\n    console.log(JSON.stringify(Object.fromEntries([...KEYS].sort().map((k) => [k, current[k]]))));\n    continue;\n  }\n  if (!isKey(key)) {\n    console.log(`unknown setting ${key}`);\n    continue;\n  }\n  if (cmd === \"set\") {\n    const parsed = parseValue(key, rest.join(\" \"));\n    if (!parsed.ok) {\n      console.log(parsed.error);\n      continue;\n    }\n    assign(key, parsed.value as Settings[typeof key]);\n  } else if (cmd === \"reset\") {\n    assign(key, DEFAULTS[key]);\n  }\n  console.log(`${key} = ${current[key]}`);\n}\n",
+          "tests": [
+            {
+              "input": "get theme\nset theme dark\nset fontSize 16\nset autosave false\ndiff\nexport",
+              "output": "theme = light\ntheme = dark\nfontSize = 16\nautosave = false\ntheme: light -> dark\nfontSize: 14 -> 16\nautosave: true -> false\n{\"autosave\":false,\"fontSize\":16,\"language\":\"en\",\"tabWidth\":2,\"theme\":\"dark\"}"
+            },
+            {
+              "input": "set theme blue\nset tabWidth 3\nset tabWidth 4\nset fontSize big\nset autosave maybe\nset colour red",
+              "output": "theme must be one of light,dark,system\ntabWidth must be one of 2,4,8\ntabWidth = 4\nfontSize expects a number\nautosave expects a boolean\nunknown setting colour"
+            },
+            {
+              "input": "diff\nset language ja\nreset language\ndiff",
+              "output": "no changes\nlanguage = ja\nlanguage = en\nno changes"
+            },
+            {
+              "input": "set fontSize 12.5\nget fontSize\nreset fontSize\nget fontSize\nexport",
+              "output": "fontSize = 12.5\nfontSize = 12.5\nfontSize = 14\nfontSize = 14\n{\"autosave\":true,\"fontSize\":14,\"language\":\"en\",\"tabWidth\":2,\"theme\":\"light\"}"
+            },
+            {
+              "input": "set language de\nset theme system\nset tabWidth 8\ndiff",
+              "output": "language = de\ntheme = system\ntabWidth = 8\ntheme: light -> system\nlanguage: en -> de\ntabWidth: 2 -> 8"
+            }
+          ],
+          "strictness": "strict+indexed"
+        }
       },
       {
         "week": 20,
@@ -19328,7 +20230,8 @@
         "title": "Mapped Types",
         "goal": "Transform every property of a type at once — and build what the type describes.",
         "concepts": [
-          "ts_mapped_types"
+          "ts_mapped_types",
+          "ts_key_remapping"
         ],
         "problems": [
           {
@@ -19517,6 +20420,72 @@
             ],
             "answer": 0,
             "explanation": "Mapped types are erased like every other type. They describe the shape your runtime code is obliged to produce, usually ending in a cast where the loop finishes."
+          },
+          {
+            "question": "What does `as` do in `{ [K in keyof T as NewKey]: … }`?",
+            "options": [
+              "Chooses a new key for each property",
+              "Casts the value type",
+              "Filters values at runtime",
+              "Makes the key readonly"
+            ],
+            "answer": 0,
+            "explanation": "The `as` clause computes the output key from the input key `K`."
+          },
+          {
+            "question": "How do you remove a key in a mapped type?",
+            "options": [
+              "Map it to `never` in the `as` clause",
+              "Map its value to `never`",
+              "Use `delete`",
+              "Map it to `undefined`"
+            ],
+            "answer": 0,
+            "explanation": "A key of `never` produces no property. (A value of `never` would keep the key, with an unusable type.)"
+          },
+          {
+            "question": "Why write `Capitalize<string & K>` instead of `Capitalize<K>`?",
+            "options": [
+              "`keyof T` can include `number` and `symbol`, and `Capitalize` only accepts strings",
+              "`Capitalize` is lazy otherwise",
+              "It converts numbers to strings",
+              "It is required by `as` clauses"
+            ],
+            "answer": 0,
+            "explanation": "The intersection keeps only string keys."
+          },
+          {
+            "question": "What is `` `get${Capitalize<\"first_name\">}` ``?",
+            "options": [
+              "`\"getFirst_name\"`",
+              "`\"getFirstName\"`",
+              "`\"getFIRST_NAME\"`",
+              "`\"get_first_name\"`"
+            ],
+            "answer": 0,
+            "explanation": "`Capitalize` upper-cases only the first character."
+          },
+          {
+            "question": "Does `{ [K in keyof T as …]: T[K] }` keep `?` and `readonly` modifiers?",
+            "options": [
+              "Yes — it's still homomorphic over `keyof T`",
+              "No, `as` drops them",
+              "Only `readonly`",
+              "Only `?`"
+            ],
+            "answer": 0,
+            "explanation": "Add `-?` or `-readonly` to remove them explicitly."
+          },
+          {
+            "question": "A value is assigned to a remapped type that omits `password`. Is the password gone?",
+            "options": [
+              "No — types are erased; the object is unchanged",
+              "Yes, the compiler strips it",
+              "Only in `JSON.stringify`",
+              "Only with `strict`"
+            ],
+            "answer": 0,
+            "explanation": "Remove keys at runtime (rest destructuring), then type the result."
           }
         ],
         "quiz_sample": 8,
@@ -19612,6 +20581,30 @@
           {
             "front": "What does `{ [K in \"a\" | \"b\"]: number }` produce?",
             "back": "`{ a: number; b: number }`."
+          },
+          {
+            "front": "What does the `as` clause in a mapped type do?",
+            "back": "Computes each output key from the input key `K` — renaming, or filtering with `never`."
+          },
+          {
+            "front": "How do you drop a key in a mapped type?",
+            "back": "Map it to `never` in the `as` clause: `[K in keyof T as Test<K> extends true ? never : K]`."
+          },
+          {
+            "front": "`Capitalize<string & K>` — why the `string &`?",
+            "back": "`keyof T` may include number and symbol keys; `Capitalize` only accepts strings."
+          },
+          {
+            "front": "What is `` `get${Capitalize<\"first_name\">}` ``?",
+            "back": "`\"getFirst_name\"` — only the first letter changes."
+          },
+          {
+            "front": "Do `readonly` and `?` survive `{ [K in keyof T as …]: T[K] }`?",
+            "back": "Yes — mapping over `keyof T` keeps the modifiers; `-readonly` / `-?` remove them."
+          },
+          {
+            "front": "A remapped type omits `password`; is it gone from the object?",
+            "back": "No — types are erased; remove it at runtime (rest destructuring) and then type the result."
           }
         ],
         "practice": [
@@ -19768,11 +20761,305 @@
             "tests": [],
             "source_slug": "",
             "dataset": ""
+          },
+          {
+            "id": "tsm-w20-p9",
+            "title": "A mapped type's result",
+            "prompt": "What type does TypeScript already infer for `x`? Annotate `check` with exactly that type — not merely one that fits.",
+            "hint": "Every property of `Flags<…>` is a `boolean`.",
+            "hints": [
+              "Every property of `Flags<…>` is a `boolean`."
+            ],
+            "language": "typescript",
+            "kind": "predict",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<typeof check, typeof x>>;\n",
+            "judge_mode": "types",
+            "forbid": [
+              "typeof"
+            ],
+            "starter": "type Flags<T> = { [K in keyof T]: boolean };\nconst f: Flags<{ a: string; b: number }> = { a: true, b: false };\nconst x = f.b;\nconst check: ____ = x;\n",
+            "solution": "type Flags<T> = { [K in keyof T]: boolean };\nconst f: Flags<{ a: string; b: number }> = { a: true, b: false };\nconst x = f.b;\nconst check: boolean = x;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w20-d9",
+            "title": "A remapped key that needs a string",
+            "prompt": "The compiler rejects this program:\n\n    error TS2344: Type 'K' does not satisfy the constraint 'string'.\n\nFix the cause.",
+            "hint": "`keyof T` may contain number and symbol keys.",
+            "hints": [
+              "`keyof T` may contain number and symbol keys.",
+              "Intersect with `string`."
+            ],
+            "language": "typescript",
+            "kind": "diagnose",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "type Getters<T> = { [K in keyof T as `get${Capitalize<K>}`]: () => T[K] };\nconst g: Getters<{ size: number }> = { getSize: () => 3 };\nconsole.log(g.getSize() * 2);\n",
+            "solution": "type Getters<T> = { [K in keyof T as `get${Capitalize<string & K>}`]: () => T[K] };\nconst g: Getters<{ size: number }> = { getSize: () => 3 };\nconsole.log(g.getSize() * 2);\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "6"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
           }
         ],
         "optional": false,
-        "problem_set": [],
-        "project_spec": null
+        "problem_set": [
+          {
+            "id": "tsm-w20-permissions",
+            "title": "A permission matrix",
+            "prompt": "Roles are `viewer`, `editor`, `admin` and permissions `read`, `write`, `delete`, `invite`, each declared once `as const`. The matrix is typed as a mapped type — `{ [R in Role]: { [P in Perm]: boolean } }` — so every cell must be filled: viewers read; editors read and write; admins do everything. Each input line is `can <role> <perm>` (print `yes`/`no`), `row <role>` (the role's permissions, in order) or `who <perm>` (the roles that have it). Unknown names print `unknown <name>`.",
+            "hint": "A nested mapped type makes a missing cell a compile error.",
+            "hints": [
+              "A nested mapped type makes a missing cell a compile error.",
+              "`ROLES.find((r) => r === s)` turns an input string into a `Role`."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst ROLES = [\"viewer\", \"editor\", \"admin\"] as const;\nconst PERMS = [\"read\", \"write\", \"delete\", \"invite\"] as const;\ntype Role = (typeof ROLES)[number];\ntype Perm = (typeof PERMS)[number];\ntype Matrix = { [R in Role]: { [P in Perm]: boolean } };\nconst MATRIX: Matrix = {\n  viewer: { read: true, write: false, delete: false, invite: false },\n  editor: { read: true, write: true, delete: false, invite: false },\n  admin: { read: true, write: true, delete: true, invite: true },\n};\nconst asRole = (s: string): Role | undefined => ROLES.find((r) => r === s);\nconst asPerm = (s: string): Perm | undefined => PERMS.find((p) => p === s);\nfor (const line of input.split(\"\\n\")) {\n  const [cmd = \"\", a = \"\", b = \"\"] = line.trim().split(/\\s+/);\n  if (cmd === \"can\") {\n    const role = asRole(a);\n    const perm = asPerm(b);\n    if (role === undefined) console.log(`unknown ${a}`);\n    else if (perm === undefined) console.log(`unknown ${b}`);\n    else console.log(MATRIX[role][perm] ? \"yes\" : \"no\");\n  } else if (cmd === \"row\") {\n    const role = asRole(a);\n    console.log(role === undefined ? `unknown ${a}` : PERMS.filter((p) => MATRIX[role][p]).join(\" \"));\n  } else if (cmd === \"who\") {\n    const perm = asPerm(a);\n    console.log(perm === undefined ? `unknown ${a}` : ROLES.filter((r) => MATRIX[r][perm]).join(\" \"));\n  }\n}\n",
+            "tests": [
+              {
+                "input": "can editor write\ncan viewer delete\nrow editor\nwho invite\nwho read\ncan owner read\nrow admin",
+                "output": "yes\nno\nread write\nadmin\nviewer editor admin\nunknown owner\nread write delete invite"
+              },
+              {
+                "input": "who share\ncan admin fly",
+                "output": "unknown share\nunknown fly"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w20-form-state",
+            "title": "Form state for every field",
+            "prompt": "A sign-up model is `{ email: string; age: number; terms: boolean }`. Its form state is the mapped type `{ [K in keyof T]: { value: T[K]; touched: boolean; error?: string } }`, starting at `\"\"`, `0`, `false`, untouched. Commands: `set <field> <text>` (converted to the field's type and marks it touched; a bad number or boolean prints `bad value`), `validate` (email must contain `@`, age at least 18, terms `true`; prints `valid` or `<k> errors`), `show` (each field as `<field>=<value>` plus ` *` if touched and ` !<error>` if it has one, space-separated). Unknown fields print `unknown field <f>`.",
+            "hint": "`FieldState<T[K]>` gives each field's state the right value type.",
+            "hints": [
+              "`FieldState<T[K]>` gives each field's state the right value type.",
+              "A mapped type of validators, `{ [K in keyof T]: (v: T[K]) => … }`, keeps each rule's parameter typed."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Signup = { email: string; age: number; terms: boolean };\ntype FieldState<V> = { value: V; touched: boolean; error?: string };\ntype FormState<T> = { [K in keyof T]: FieldState<T[K]> };\nconst FIELDS = [\"email\", \"age\", \"terms\"] as const satisfies readonly (keyof Signup)[];\nconst form: FormState<Signup> = {\n  email: { value: \"\", touched: false },\n  age: { value: 0, touched: false },\n  terms: { value: false, touched: false },\n};\nconst asField = (s: string) => FIELDS.find((f) => f === s);\nfunction setField(field: keyof Signup, text: string): boolean {\n  if (field === \"email\") form.email = { value: text, touched: true };\n  else if (field === \"age\") {\n    if (!/^\\d+$/.test(text)) return false;\n    form.age = { value: Number(text), touched: true };\n  } else {\n    if (text !== \"true\" && text !== \"false\") return false;\n    form.terms = { value: text === \"true\", touched: true };\n  }\n  return true;\n}\nfunction validate(): number {\n  const rules: { [K in keyof Signup]: (v: Signup[K]) => string | undefined } = {\n    email: (v) => (v.includes(\"@\") ? undefined : \"email\"),\n    age: (v) => (v >= 18 ? undefined : \"too young\"),\n    terms: (v) => (v ? undefined : \"must accept\"),\n  };\n  let errors = 0;\n  for (const f of FIELDS) {\n    const error = f === \"email\" ? rules.email(form.email.value) : f === \"age\" ? rules.age(form.age.value) : rules.terms(form.terms.value);\n    if (error === undefined) delete form[f].error;\n    else {\n      form[f].error = error;\n      errors++;\n    }\n  }\n  return errors;\n}\nfor (const line of input.split(\"\\n\")) {\n  const [cmd = \"\", name = \"\", ...rest] = line.trim().split(/\\s+/);\n  if (cmd === \"set\") {\n    const field = asField(name);\n    if (field === undefined) console.log(`unknown field ${name}`);\n    else if (!setField(field, rest.join(\" \"))) console.log(\"bad value\");\n  } else if (cmd === \"validate\") {\n    const n = validate();\n    console.log(n === 0 ? \"valid\" : `${n} errors`);\n  } else if (cmd === \"show\") {\n    console.log(FIELDS.map((f) => `${f}=${form[f].value}${form[f].touched ? \" *\" : \"\"}${form[f].error === undefined ? \"\" : ` !${form[f].error}`}`).join(\" \"));\n  }\n}\n",
+            "tests": [
+              {
+                "input": "show\nset email ana\nset age 17\nvalidate\nshow\nset email ana@x.io\nset age 30\nset terms true\nvalidate\nshow",
+                "output": "email= age=0 terms=false\n3 errors\nemail=ana * !email age=17 * !too young terms=false !must accept\nvalid\nemail=ana@x.io * age=30 * terms=true *"
+              },
+              {
+                "input": "set age old\nset terms yes\nset phone 1\nvalidate",
+                "output": "bad value\nbad value\nunknown field phone\n3 errors"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w20-changes",
+            "title": "A change log with remapped keys",
+            "prompt": "The input is pairs of lines: a JSON object before and after an edit (flat, same keys possible on both sides). Describe the difference as a `Changes<T>` object whose keys are `<key>Changed` — built with a key-remapping mapped type — and print its entries sorted by key as `<key>Changed: <from> -> <to>` (values as JSON, `missing` for an absent side), or `no changes`. Separate pairs with a line `--`.",
+            "hint": "`` `${string & K}Changed` `` renames every key; the value type still uses the original `T[K]`.",
+            "hints": [
+              "`` `${string & K}Changed` `` renames every key; the value type still uses the original `T[K]`.",
+              "Compare values with `JSON.stringify` so arrays and objects compare by content."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Changes<T> = { [K in keyof T as `${string & K}Changed`]?: { from: T[K] | undefined; to: T[K] | undefined } };\ntype Flat = Record<string, unknown>;\nfunction diff(before: Flat, after: Flat): Changes<Flat> {\n  const changes: Record<string, { from: unknown; to: unknown }> = {};\n  for (const key of new Set([...Object.keys(before), ...Object.keys(after)])) {\n    const from = before[key];\n    const to = after[key];\n    if (JSON.stringify(from) !== JSON.stringify(to)) changes[`${key}Changed`] = { from, to };\n  }\n  return changes as Changes<Flat>;\n}\nconst show = (v: unknown) => (v === undefined ? \"missing\" : JSON.stringify(v));\nconst lines = input.split(\"\\n\");\nfor (let i = 0; i + 1 < lines.length; i += 2) {\n  if (i > 0) console.log(\"--\");\n  const changes = diff(JSON.parse(lines[i] ?? \"{}\") as Flat, JSON.parse(lines[i + 1] ?? \"{}\") as Flat);\n  const entries = Object.entries(changes).sort(([a], [b]) => a.localeCompare(b));\n  if (entries.length === 0) console.log(\"no changes\");\n  for (const [key, change] of entries) console.log(`${key}: ${show(change?.from)} -> ${show(change?.to)}`);\n}\n",
+            "tests": [
+              {
+                "input": "{\"name\":\"ana\",\"age\":31,\"city\":\"Oslo\"}\n{\"name\":\"Ana\",\"age\":31,\"zip\":\"0150\"}\n{\"x\":1}\n{\"x\":1}\n{\"tags\":[\"a\"]}\n{\"tags\":[\"a\",\"b\"]}",
+                "output": "cityChanged: \"Oslo\" -> missing\nnameChanged: \"ana\" -> \"Ana\"\nzipChanged: missing -> \"0150\"\n--\nno changes\n--\ntagsChanged: [\"a\"] -> [\"a\",\"b\"]"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w20-my-record",
+            "title": "Record, by hand",
+            "prompt": "Write `MyRecord<K, V>`: an object type with every key in `K`, each of type `V`.",
+            "hint": "Map over the key union itself, not over `keyof` something.",
+            "hints": [
+              "Map over the key union itself, not over `keyof` something."
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<MyRecord<\"a\" | \"b\", number>, { a: number; b: number }>>;\ntype _2 = Expect<Equal<MyRecord<\"only\", string[]>, { only: string[] }>>;\ntype _3 = Expect<Equal<MyRecord<never, number>, {}>>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type MyRecord<K extends PropertyKey, V> = ____;\n",
+            "solution": "type MyRecord<K extends PropertyKey, V> = { [P in K]: V };\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w20-omit-by-value",
+            "title": "Omit by value type",
+            "prompt": "Write `OmitByValue<T, V>`: `T` without the properties whose type is assignable to `V`.",
+            "hint": "Use an `as` clause and map unwanted keys to `never`.",
+            "hints": [
+              "Use an `as` clause and map unwanted keys to `never`."
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype Model = { id: number; name: string; save: () => void; load: () => void; count: number };\ntype _1 = Expect<Equal<OmitByValue<Model, () => void>, { id: number; name: string; count: number }>>;\ntype _2 = Expect<Equal<OmitByValue<Model, number>, { name: string; save: () => void; load: () => void }>>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type OmitByValue<T, V> = ____;\n",
+            "solution": "type OmitByValue<T, V> = { [K in keyof T as T[K] extends V ? never : K]: T[K] };\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w20-setters",
+            "title": "Setters by remapping",
+            "prompt": "Write `Setters<T>`: for each property `k` of `T`, a method `set<K>` (capitalised) taking the property's type and returning `void`.",
+            "hint": "`` `set${Capitalize<string & K>}` `` builds the name; `string & K` drops non-string keys.",
+            "hints": [
+              "`` `set${Capitalize<string & K>}` `` builds the name; `string & K` drops non-string keys."
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<Setters<{ name: string; age: number }>, { setName: (value: string) => void; setAge: (value: number) => void }>>;\ntype _2 = Expect<Equal<Setters<{ [1]: boolean }>, {}>>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type Setters<T> = ____;\n",
+            "solution": "type Setters<T> = { [K in keyof T as `set${Capitalize<string & K>}`]: (value: T[K]) => void };\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w20-deep-readonly",
+            "title": "Readonly all the way down",
+            "prompt": "Write `DeepReadonly<T>`: every property at every depth becomes `readonly`, and arrays become readonly arrays of deeply readonly elements — but functions are left as they are.",
+            "hint": "Three cases: functions (leave them), objects and arrays (map with `readonly`, recursing), primitives.",
+            "hints": [
+              "Three cases: functions (leave them), objects and arrays (map with `readonly`, recursing), primitives.",
+              "A homomorphic mapped type over an array type produces an array — `readonly` included."
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Hard",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype Config = { name: string; db: { hosts: string[]; port: number }; onLoad: () => void };\ntype _1 = Expect<Equal<DeepReadonly<Config>, {\n  readonly name: string;\n  readonly db: { readonly hosts: readonly string[]; readonly port: number };\n  readonly onLoad: () => void;\n}>>;\ntype _2 = Expect<Equal<DeepReadonly<number>, number>>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type DeepReadonly<T> = ____;\n",
+            "solution": "type DeepReadonly<T> = T extends (...args: never[]) => unknown\n  ? T\n  : T extends object\n    ? { readonly [K in keyof T]: DeepReadonly<T[K]> }\n    : T;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w20-optional-keys",
+            "title": "Which keys are optional?",
+            "prompt": "Write `OptionalKeys<T>`: the union of `T`'s optional keys (declared with `?`) — not keys whose type merely includes `undefined`.",
+            "hint": "`{}` is assignable to `Pick<T, K>` exactly when `K` is optional in `T`.",
+            "hints": [
+              "`{}` is assignable to `Pick<T, K>` exactly when `K` is optional in `T`.",
+              "`-?` stops the mapped type's own optionality from adding `undefined` to the looked-up union."
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Hard",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<OptionalKeys<{ a: number; b?: string; c?: boolean; d: number | undefined }>, \"b\" | \"c\">>;\ntype _2 = Expect<Equal<OptionalKeys<{ a: 1 }>, never>>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type OptionalKeys<T> = ____;\n",
+            "solution": "type OptionalKeys<T> = { [K in keyof T]-?: {} extends Pick<T, K> ? K : never }[keyof T];\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          }
+        ],
+        "project_spec": {
+          "title": "store.ts — a typed store with watchers and undo",
+          "goal": "A small state container: `createStore<T>(initial)` returns typed `get`/`set` keyed by `keyof T`, per-key watchers, snapshots and undo. Mapped types describe the watcher table and the change events, so a watcher for `count` receives numbers and nothing else.",
+          "requirements": [
+            "State is `{ count: number; user: string; dark: boolean }`, starting `{ count: 0, user: \"guest\", dark: false }`.",
+            "Commands: `get <key>` prints `<key> = <value>`; `set <key> <text>` converts by the key's current type (a bad number/boolean prints `bad value for <key>`); `inc <key> [n]` adds n (default 1) to a number (`<key> is not a number` otherwise); `toggle <key>` flips a boolean (`<key> is not a boolean`); unknown keys print `unknown key <k>`.",
+            "`watch <key>` / `unwatch <key>`: while watched, every change to the key prints `<key>: <old> -> <new>` (a set to the same value is not a change and prints nothing).",
+            "`undo` restores the state before the last change (and notifies watchers), or prints `nothing to undo`; `snapshot` prints the state as JSON.",
+            "Type the watcher table as a mapped type `{ [K in keyof T]?: (from: T[K], to: T[K]) => void }` and `set` as `<K extends keyof T>(key: K, value: T[K])`."
+          ],
+          "stretch": [
+            "Add `select<K extends keyof T>(...keys: K[]): Pick<T, K>`.",
+            "Generate `setCount`/`setUser`/`setDark` methods with the week's key remapping."
+          ],
+          "rubric": [
+            "No `any` anywhere — not even one hidden in a cast",
+            "Every function has a typed signature; locals are left to inference",
+            "Bad input is handled on purpose, not by accident",
+            "Names say what things are, not how they are stored",
+            "I could explain every line to someone else"
+          ],
+          "language": "typescript",
+          "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n// Build the project here. Read all of stdin from `input` above, and print\n// exactly what the requirements ask for. Run the tests as you go.\n",
+          "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Watchers<T> = { [K in keyof T]?: (from: T[K], to: T[K]) => void };\nfunction createStore<T extends object>(initial: T) {\n  let state: T = { ...initial };\n  const history: T[] = [];\n  const watchers: Watchers<T> = {};\n  function notify<K extends keyof T>(key: K, from: T[K], to: T[K]) {\n    if (from !== to) watchers[key]?.(from, to);\n  }\n  return {\n    get<K extends keyof T>(key: K): T[K] {\n      return state[key];\n    },\n    set<K extends keyof T>(key: K, value: T[K]): void {\n      const from = state[key];\n      if (from === value) return;\n      history.push(state);\n      state = { ...state, [key]: value };\n      notify(key, from, value);\n    },\n    watch<K extends keyof T>(key: K, fn: (from: T[K], to: T[K]) => void): void {\n      watchers[key] = fn;\n    },\n    unwatch(key: keyof T): void {\n      delete watchers[key];\n    },\n    undo(): boolean {\n      const previous = history.pop();\n      if (previous === undefined) return false;\n      const before = state;\n      state = previous;\n      for (const key of Object.keys(state) as (keyof T)[]) notify(key, before[key], previous[key]);\n      return true;\n    },\n    snapshot: (): string => JSON.stringify(state),\n  };\n}\ntype State = { count: number; user: string; dark: boolean };\nconst store = createStore<State>({ count: 0, user: \"guest\", dark: false });\nconst isKey = (s: string): s is keyof State => s === \"count\" || s === \"user\" || s === \"dark\";\nfor (const line of input.split(\"\\n\")) {\n  const [cmd = \"\", key = \"\", ...rest] = line.trim().split(/\\s+/);\n  if (cmd === \"undo\") {\n    if (!store.undo()) console.log(\"nothing to undo\");\n    continue;\n  }\n  if (cmd === \"snapshot\") {\n    console.log(store.snapshot());\n    continue;\n  }\n  if (!isKey(key)) {\n    console.log(`unknown key ${key}`);\n    continue;\n  }\n  const text = rest.join(\" \");\n  if (cmd === \"get\") console.log(`${key} = ${store.get(key)}`);\n  else if (cmd === \"watch\") store.watch(key, (from, to) => console.log(`${key}: ${from} -> ${to}`));\n  else if (cmd === \"unwatch\") store.unwatch(key);\n  else if (cmd === \"inc\") {\n    if (key !== \"count\") console.log(`${key} is not a number`);\n    else store.set(\"count\", store.get(\"count\") + (text === \"\" ? 1 : Number(text)));\n  } else if (cmd === \"toggle\") {\n    if (key !== \"dark\") console.log(`${key} is not a boolean`);\n    else store.set(\"dark\", !store.get(\"dark\"));\n  } else if (cmd === \"set\") {\n    if (key === \"count\") {\n      if (text === \"\" || !Number.isFinite(Number(text))) console.log(`bad value for ${key}`);\n      else store.set(\"count\", Number(text));\n    } else if (key === \"dark\") {\n      if (text !== \"true\" && text !== \"false\") console.log(`bad value for ${key}`);\n      else store.set(\"dark\", text === \"true\");\n    } else {\n      store.set(\"user\", text);\n    }\n  }\n}\n",
+          "tests": [
+            {
+              "input": "watch count\ninc count\ninc count 5\nset count 6\nget count\nundo\nget count\nsnapshot",
+              "output": "count: 0 -> 1\ncount: 1 -> 6\ncount = 6\ncount: 6 -> 1\ncount = 1\n{\"count\":1,\"user\":\"guest\",\"dark\":false}"
+            },
+            {
+              "input": "watch dark\ntoggle dark\ntoggle user\nset dark maybe\nset user Ana Lee\nwatch user\nundo\nundo\nundo\nsnapshot",
+              "output": "dark: false -> true\nuser is not a boolean\nbad value for dark\nuser: Ana Lee -> guest\ndark: true -> false\nnothing to undo\n{\"count\":0,\"user\":\"guest\",\"dark\":false}"
+            },
+            {
+              "input": "set count ten\ninc user\nset colour red\nget user\nundo",
+              "output": "bad value for count\nuser is not a number\nunknown key colour\nuser = guest\nnothing to undo"
+            },
+            {
+              "input": "watch count\nset count 3\nunwatch count\nset count 4\nundo\nsnapshot",
+              "output": "count: 0 -> 3\n{\"count\":3,\"user\":\"guest\",\"dark\":false}"
+            },
+            {
+              "input": "set user ana\nset user ana\nwatch user\nundo\nundo",
+              "output": "user: ana -> guest\nnothing to undo"
+            }
+          ],
+          "strictness": "strict+indexed"
+        }
       },
       {
         "week": 21,
@@ -19780,7 +21067,8 @@
         "title": "Conditional Types & infer",
         "goal": "Branch on types and pattern-match their structure.",
         "concepts": [
-          "ts_conditional_types"
+          "ts_conditional_types",
+          "ts_distributive"
         ],
         "problems": [
           {
@@ -19969,6 +21257,72 @@
             ],
             "answer": 0,
             "explanation": "Distribution requires a bare type parameter on the left. Putting it inside a tuple makes it non-naked, so the check runs once against the whole union."
+          },
+          {
+            "question": "`type F<T> = T extends unknown ? T[] : never`. What is `F<string | number>`?",
+            "options": [
+              "`string[] | number[]`",
+              "`(string | number)[]`",
+              "`never`",
+              "`unknown[]`"
+            ],
+            "answer": 0,
+            "explanation": "A naked type parameter distributes over the union."
+          },
+          {
+            "question": "How do you stop a conditional type from distributing?",
+            "options": [
+              "Wrap both sides in a tuple: `[T] extends [U]`",
+              "Use `infer`",
+              "Add `readonly`",
+              "Use `NoInfer<T>`"
+            ],
+            "answer": 0,
+            "explanation": "`[T]` isn't a naked type parameter, so the union is checked as a whole."
+          },
+          {
+            "question": "A distributive conditional type is given `never`. The result is?",
+            "options": [
+              "`never`",
+              "The true branch",
+              "The false branch",
+              "`unknown`"
+            ],
+            "answer": 0,
+            "explanation": "`never` is the empty union: zero members, zero results."
+          },
+          {
+            "question": "How is `IsNever<T>` written?",
+            "options": [
+              "`[T] extends [never] ? true : false`",
+              "`T extends never ? true : false`",
+              "`T extends unknown ? false : true`",
+              "`never extends T ? true : false`"
+            ],
+            "answer": 0,
+            "explanation": "The distributive version would return `never` for `never`."
+          },
+          {
+            "question": "What does `infer U extends string` do?",
+            "options": [
+              "Captures `U` only if it is a `string`, and types it as one in the true branch",
+              "Converts `U` to a string",
+              "Makes `U` a string at runtime",
+              "Nothing different from `infer U`"
+            ],
+            "answer": 0,
+            "explanation": "The constraint is part of the match (TS 4.7+)."
+          },
+          {
+            "question": "Why is `Exclude<\"a\" | \"b\", \"a\">` equal to `\"b\"`?",
+            "options": [
+              "Each member is tested; `\"a\"` becomes `never` and vanishes from the union",
+              "`Exclude` sorts the union",
+              "String literals are compared by length",
+              "It's a special case in the compiler"
+            ],
+            "answer": 0,
+            "explanation": "`type Exclude<T, U> = T extends U ? never : T` — distribution does the work."
           }
         ],
         "quiz_sample": 8,
@@ -20064,6 +21418,30 @@
           {
             "front": "How would you write `Awaited` for one level?",
             "back": "`type Unpromise<T> = T extends Promise<infer V> ? V : T`."
+          },
+          {
+            "front": "`T extends unknown ? T[] : never` given `string | number`?",
+            "back": "`string[] | number[]` — a naked type parameter distributes over the union."
+          },
+          {
+            "front": "What switches distribution off in `T extends U ? X : Y`?",
+            "back": "Wrapping both sides in a tuple: `[T] extends [U] ? … : …`."
+          },
+          {
+            "front": "A distributive conditional type given `never`?",
+            "back": "`never` — the empty union has no members to map."
+          },
+          {
+            "front": "How is `IsNever<T>` written?",
+            "back": "`[T] extends [never] ? true : false`."
+          },
+          {
+            "front": "`infer U extends string` — what's different from `infer U`?",
+            "back": "The branch only matches if the captured type is a `string`, and `U` is known to be one."
+          },
+          {
+            "front": "`ReturnType` of an overloaded function?",
+            "back": "The last overload's return type — `infer` sees only the last signature."
           }
         ],
         "practice": [
@@ -20242,11 +21620,319 @@
             "tests": [],
             "source_slug": "",
             "dataset": ""
+          },
+          {
+            "id": "tsm-w21-p9",
+            "title": "What NonNullable leaves",
+            "prompt": "What type does TypeScript already infer for `copy`? Annotate `check` with exactly that type — not merely one that fits.",
+            "hint": "`NonNullable` removes `null` and `undefined` from a union.",
+            "hints": [
+              "`NonNullable` removes `null` and `undefined` from a union."
+            ],
+            "language": "typescript",
+            "kind": "predict",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<typeof check, typeof copy>>;\n",
+            "judge_mode": "types",
+            "forbid": [
+              "typeof"
+            ],
+            "starter": "type Maybe = string | null | undefined;\nconst value: NonNullable<Maybe> = \"ok\";\nconst copy = value;\nconst check: ____ = copy;\n",
+            "solution": "type Maybe = string | null | undefined;\nconst value: NonNullable<Maybe> = \"ok\";\nconst copy = value;\nconst check: string = copy;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w21-d9",
+            "title": "`ReturnType` of an overloaded function",
+            "prompt": "The compiler rejects this program:\n\n    error TS2322: Type 'number' is not assignable to type 'string'.\n\nFix the cause.",
+            "hint": "`ReturnType` of an overloaded function uses the last overload.",
+            "hints": [
+              "`ReturnType` of an overloaded function uses the last overload.",
+              "Let the call infer its own type."
+            ],
+            "language": "typescript",
+            "kind": "diagnose",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "function size(x: string): number;\nfunction size(x: number): string;\nfunction size(x: string | number): string | number {\n  return typeof x === \"string\" ? x.length : String(x).length + \" digits\";\n}\nconst n: ReturnType<typeof size> = size(\"hello\");\nconsole.log(n);\n",
+            "solution": "function size(x: string): number;\nfunction size(x: number): string;\nfunction size(x: string | number): string | number {\n  return typeof x === \"string\" ? x.length : String(x).length + \" digits\";\n}\nconst n = size(\"hello\");\nconsole.log(n);\n",
+            "tests": [
+              {
+                "input": "",
+                "output": "5"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
           }
         ],
         "optional": false,
-        "problem_set": [],
-        "project_spec": null
+        "problem_set": [
+          {
+            "id": "tsm-w21-parse-kinds",
+            "title": "A return type chosen by an argument",
+            "prompt": "Write `parse<K extends Kind>(kind: K, text: string): ParseResult<K>` where `Kind` is `\"int\" | \"list\" | \"flag\"` and `ParseResult<K>` is a conditional type: `number` for `int`, `string[]` for `list` (comma-separated), `boolean` for `flag` (`on`/`yes`/`true`). Each input line is `<kind> <text>`. Call `parse` with a *literal* kind in each branch and print `int <n> (+1 = <n+1>)`, `list of <k>: <items joined by |>`, `flag <b> (not <!b>)`, or `unknown kind <k>`.",
+            "hint": "With a literal argument, `K` is that literal, so `ParseResult<K>` resolves to one type.",
+            "hints": [
+              "With a literal argument, `K` is that literal, so `ParseResult<K>` resolves to one type.",
+              "The implementation can't prove which branch it's in, so it returns with a single cast."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Kind = \"int\" | \"list\" | \"flag\";\ntype ParseResult<K extends Kind> = K extends \"int\" ? number : K extends \"list\" ? string[] : boolean;\nfunction parse<K extends Kind>(kind: K, text: string): ParseResult<K> {\n  const value = kind === \"int\" ? Number.parseInt(text, 10) : kind === \"list\" ? text.split(\",\").filter((s) => s !== \"\") : [\"on\", \"yes\", \"true\"].includes(text);\n  return value as ParseResult<K>;\n}\nfor (const line of input.split(\"\\n\")) {\n  const [kind = \"\", text = \"\"] = line.trim().split(/\\s+/);\n  if (kind === \"int\") {\n    const n = parse(\"int\", text);\n    console.log(`int ${n} (+1 = ${n + 1})`);\n  } else if (kind === \"list\") {\n    const xs = parse(\"list\", text);\n    console.log(`list of ${xs.length}: ${xs.join(\"|\") || \"(none)\"}`);\n  } else if (kind === \"flag\") {\n    const b = parse(\"flag\", text);\n    console.log(`flag ${b} (not ${!b})`);\n  } else {\n    console.log(`unknown kind ${kind}`);\n  }\n}\n",
+            "tests": [
+              {
+                "input": "int 41\nlist a,b,c\nflag yes\nflag off\nlist ,\ndate today",
+                "output": "int 41 (+1 = 42)\nlist of 3: a|b|c\nflag true (not false)\nflag false (not true)\nlist of 0: (none)\nunknown kind date"
+              },
+              {
+                "input": "int 7x",
+                "output": "int 7 (+1 = 8)"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w21-compact",
+            "title": "Compact and unwrap",
+            "prompt": "Each input line is a list of tokens: a number, `null`, `undefined`, or `err:<message>`. Parse them into `(Result<number, string> | null | undefined)[]`. Write `compact<T>(xs: readonly T[]): NonNullable<T>[]` to drop the nulls, then split the results with `Extract<…, { ok: true }>` / `Extract<…, { ok: false }>`. Print `kept <k> of <n>`, `values <v…>` (or `values none`), `sum <s>` and each error as `error <message>`.",
+            "hint": "`NonNullable<T>` removes `null` and `undefined` — it is itself a distributive conditional type.",
+            "hints": [
+              "`NonNullable<T>` removes `null` and `undefined` — it is itself a distributive conditional type.",
+              "`Extract<U, { ok: true }>` keeps the union members that match the pattern."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Result<T, E> = { ok: true; value: T } | { ok: false; error: E };\ntype Item = Result<number, string> | null | undefined;\nfunction compact<T>(xs: readonly T[]): NonNullable<T>[] {\n  return xs.filter((x): x is NonNullable<T> => x !== null && x !== undefined);\n}\nfunction token(t: string): Item {\n  if (t === \"null\") return null;\n  if (t === \"undefined\") return undefined;\n  if (t.startsWith(\"err:\")) return { ok: false, error: t.slice(4) };\n  return { ok: true, value: Number(t) };\n}\ntype Ok = Extract<NonNullable<Item>, { ok: true }>;\ntype Err = Extract<NonNullable<Item>, { ok: false }>;\nfor (const line of input.split(\"\\n\")) {\n  const items = line.trim().split(/\\s+/).map(token);\n  const present = compact(items);\n  const oks = present.filter((r): r is Ok => r.ok);\n  const errs = present.filter((r): r is Err => !r.ok);\n  console.log(`kept ${present.length} of ${items.length}`);\n  console.log(`values ${oks.map((r) => r.value).join(\" \") || \"none\"}`);\n  console.log(`sum ${oks.reduce((s, r) => s + r.value, 0)}`);\n  for (const e of errs) console.log(`error ${e.error}`);\n}\n",
+            "tests": [
+              {
+                "input": "1 null 2 err:boom undefined 3 err:bad-input",
+                "output": "kept 5 of 7\nvalues 1 2 3\nsum 6\nerror boom\nerror bad-input"
+              },
+              {
+                "input": "null undefined",
+                "output": "kept 0 of 2\nvalues none\nsum 0"
+              },
+              {
+                "input": "err:only",
+                "output": "kept 1 of 1\nvalues none\nsum 0\nerror only"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w21-flatten-deep",
+            "title": "Flatten to the bottom",
+            "prompt": "Write `flattenDeep<T>(xs: readonly T[]): FlattenDeep<T>[]` where `FlattenDeep<T> = T extends readonly (infer E)[] ? FlattenDeep<E> : T`. First print `sample <…>` — the flattened constant `[[1, [2, [3]]], [4]]`, typed `number[]` straight from the call. Then each input line is a JSON array of numbers nested to any depth: print the flattened numbers space-separated (or `(empty)`), then `depth <d>` — the deepest nesting (a flat array is 1).",
+            "hint": "The type recurses the same way the function does: while it's an array, look inside.",
+            "hints": [
+              "The type recurses the same way the function does: while it's an array, look inside.",
+              "For a literal argument the type is exact (`sample` is `number[]`). Don't feed it a *recursive* type like `type Nested = number | Nested[]` — that recursion never ends, and the checker stops with TS2589; parse JSON as `unknown[]` instead."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype FlattenDeep<T> = T extends readonly (infer E)[] ? FlattenDeep<E> : T;\nfunction flattenDeep<T>(xs: readonly T[]): FlattenDeep<T>[] {\n  const out: unknown[] = [];\n  const walk = (value: unknown): void => {\n    if (Array.isArray(value)) for (const v of value) walk(v);\n    else out.push(value);\n  };\n  walk(xs);\n  return out as FlattenDeep<T>[];\n}\nfunction depth(value: unknown): number {\n  return Array.isArray(value) ? 1 + Math.max(0, ...value.map(depth)) : 0;\n}\nconst sample: number[] = flattenDeep([[1, [2, [3]]], [4]]);\nconsole.log(`sample ${sample.join(\" \")}`);\nfor (const line of input.split(\"\\n\")) {\n  const data = JSON.parse(line) as unknown[];\n  const flat = flattenDeep(data).map(Number);\n  console.log(flat.join(\" \") || \"(empty)\");\n  console.log(`depth ${depth(data)}`);\n}\n",
+            "tests": [
+              {
+                "input": "[1,[2,[3,[4]]],5]",
+                "output": "sample 1 2 3 4\n1 2 3 4 5\ndepth 4"
+              },
+              {
+                "input": "[[],[[]]]\n[7]",
+                "output": "sample 1 2 3 4\n(empty)\ndepth 3\n7\ndepth 1"
+              },
+              {
+                "input": "[[1,2],[3,[4,[5,[6]]]]]",
+                "output": "sample 1 2 3 4\n1 2 3 4 5 6\ndepth 5"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w21-if",
+            "title": "A type-level `if`",
+            "prompt": "Write `If<C, T, F>`: `T` when the condition `C` is `true`, `F` when it's `false`.",
+            "hint": "A conditional type on `C`.",
+            "hints": [
+              "A conditional type on `C`.",
+              "`boolean` is `true | false`, so it distributes to both branches."
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<If<true, \"yes\", \"no\">, \"yes\">>;\ntype _2 = Expect<Equal<If<false, 1, 2>, 2>>;\ntype _3 = Expect<Equal<If<boolean, \"a\", \"b\">, \"a\" | \"b\">>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type If<C extends boolean, T, F> = ____;\n",
+            "solution": "type If<C extends boolean, T, F> = C extends true ? T : F;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w21-first-arg",
+            "title": "The first parameter's type",
+            "prompt": "Write `FirstArg<F>`: the type of a function's first parameter, `never` for a function with no parameters, and `never` for anything that isn't a function.",
+            "hint": "Capture the whole parameter list with `infer P`, then take its first element with a second `infer`.",
+            "hints": [
+              "Capture the whole parameter list with `infer P`, then take its first element with a second `infer`."
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<FirstArg<(name: string, age: number) => void>, string>>;\ntype _2 = Expect<Equal<FirstArg<() => void>, never>>;\ntype _3 = Expect<Equal<FirstArg<string>, never>>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type FirstArg<F> = ____;\n",
+            "solution": "type FirstArg<F> = F extends (...args: infer P) => unknown ? (P extends [infer A, ...unknown[]] ? A : never) : never;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w21-flatten-type",
+            "title": "FlattenDeep, as a type",
+            "prompt": "Write `FlattenDeep<T>`: the innermost element type of an array nested to any depth; non-arrays are left unchanged.",
+            "hint": "If it's an array of `E`, flatten `E`; otherwise stop.",
+            "hints": [
+              "If it's an array of `E`, flatten `E`; otherwise stop.",
+              "Distribution handles the union case for you."
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<FlattenDeep<number[][][]>, number>>;\ntype _2 = Expect<Equal<FlattenDeep<(string | boolean[])[]>, string | boolean>>;\ntype _3 = Expect<Equal<FlattenDeep<\"x\">, \"x\">>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type FlattenDeep<T> = ____;\n",
+            "solution": "type FlattenDeep<T> = T extends readonly (infer E)[] ? FlattenDeep<E> : T;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w21-is-union",
+            "title": "Is it a union?",
+            "prompt": "Write `IsUnion<T>`: `true` if `T` is a union of two or more members, else `false` (`never` is not a union).",
+            "hint": "Keep an undistributed copy of `T` in a second parameter with a default.",
+            "hints": [
+              "Keep an undistributed copy of `T` in a second parameter with a default.",
+              "Inside a distributive branch, `T` is one member; if the full union isn't assignable to it, there was more than one."
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Hard",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<IsUnion<string>, false>>;\ntype _2 = Expect<Equal<IsUnion<string | number>, true>>;\ntype _3 = Expect<Equal<IsUnion<never>, false>>;\ntype _4 = Expect<Equal<IsUnion<boolean>, true>>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type IsUnion<T, U = T> = ____;\n",
+            "solution": "type IsUnion<T, U = T> = [T] extends [never] ? false : T extends unknown ? ([U] extends [T] ? false : true) : never;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w21-union-to-intersection",
+            "title": "Union to intersection",
+            "prompt": "Write `UnionToIntersection<U>`: `A | B` becomes `A & B`. (The trick: put each member in a function *parameter* position, then `infer` from the union of those functions.)",
+            "hint": "Distribute `U` into a union of functions `(x: A) => void | (x: B) => void`.",
+            "hints": [
+              "Distribute `U` into a union of functions `(x: A) => void | (x: B) => void`.",
+              "Inferring a parameter type from a union of functions gives the intersection — parameters are contravariant."
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Hard",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<UnionToIntersection<{ a: 1 } | { b: 2 }>, { a: 1 } & { b: 2 }>>;\ntype _2 = Expect<Equal<UnionToIntersection<{ x: string }>, { x: string }>>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type UnionToIntersection<U> = ____;\n",
+            "solution": "type UnionToIntersection<U> = (U extends unknown ? (x: U) => void : never) extends (x: infer I) => void ? I : never;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          }
+        ],
+        "project_spec": {
+          "title": "commands.ts — a dispatcher typed from its handlers",
+          "goal": "Declare command handlers once; derive each command's argument types with `Parameters`, describe each argument's runtime kind with a mapped conditional type, and let the dispatcher parse text into correctly typed arguments before calling the handler.",
+          "requirements": [
+            "Handlers: `add(a: number, b: number)` → the sum; `greet(name: string, times: number)` → `hello <name>` repeated `times` times, joined by `, ` (`(no greeting)` for none); `flip(flag: boolean)` → the negation; `upper(text: string)` → upper-cased; `between(x: number, lo: number, hi: number)` → `true` if lo ≤ x ≤ hi.",
+            "Each input line is `<command> <args…>`. Parse each argument by its declared kind — numbers must be finite, booleans `true`/`false` — and print the handler's result, or `<command> expects <n> arguments`, `argument <i> of <command> must be a <kind>` (1-based, the first bad one), or `unknown command <c>`.",
+            "`help` prints every command with its argument kinds, in declaration order, like `add(number, number)`.",
+            "Derive `ArgsOf<N> = Parameters<Handlers[N]>` and a signature table typed with a mapped conditional type (`number` → `\"number\"`, …) so a handler whose parameters change breaks the table at compile time.",
+            "Only one cast is allowed: the final call of a handler with its parsed argument list."
+          ],
+          "stretch": [
+            "Add optional parameters (`greet(name, times = 1)`) and make the signature table say which arguments may be omitted.",
+            "Type `dispatch` so that a *call in code* like `dispatch(\"add\", 1, \"x\")` is a compile error."
+          ],
+          "rubric": [
+            "No `any` anywhere — not even one hidden in a cast",
+            "Every function has a typed signature; locals are left to inference",
+            "Bad input is handled on purpose, not by accident",
+            "Names say what things are, not how they are stored",
+            "I could explain every line to someone else"
+          ],
+          "language": "typescript",
+          "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n// Build the project here. Read all of stdin from `input` above, and print\n// exactly what the requirements ask for. Run the tests as you go.\n",
+          "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst HANDLERS = {\n  add: (a: number, b: number) => a + b,\n  greet: (name: string, times: number) => Array.from({ length: Math.max(0, times) }, () => `hello ${name}`).join(\", \") || \"(no greeting)\",\n  flip: (flag: boolean) => !flag,\n  upper: (text: string) => text.toUpperCase(),\n  between: (x: number, lo: number, hi: number) => lo <= x && x <= hi,\n};\ntype Handlers = typeof HANDLERS;\ntype Name = keyof Handlers;\ntype ArgsOf<N extends Name> = Parameters<Handlers[N]>;\ntype KindOf<T> = T extends number ? \"number\" : T extends boolean ? \"boolean\" : \"string\";\ntype Kinds<A extends readonly unknown[]> = { [I in keyof A]: KindOf<A[I]> };\nconst SIGNATURES: { [N in Name]: Kinds<ArgsOf<N>> } = {\n  add: [\"number\", \"number\"],\n  greet: [\"string\", \"number\"],\n  flip: [\"boolean\"],\n  upper: [\"string\"],\n  between: [\"number\", \"number\", \"number\"],\n};\nconst NAMES = Object.keys(HANDLERS) as Name[];\nconst isName = (s: string): s is Name => Object.hasOwn(HANDLERS, s);\nfunction convert(kind: \"number\" | \"boolean\" | \"string\", text: string): number | boolean | string | undefined {\n  if (kind === \"number\") return text !== \"\" && Number.isFinite(Number(text)) ? Number(text) : undefined;\n  if (kind === \"boolean\") return text === \"true\" ? true : text === \"false\" ? false : undefined;\n  return text;\n}\nfor (const line of input.split(\"\\n\")) {\n  const [cmd = \"\", ...args] = line.trim().split(/\\s+/);\n  if (cmd === \"help\") {\n    for (const n of NAMES) console.log(`${n}(${SIGNATURES[n].join(\", \")})`);\n    continue;\n  }\n  if (!isName(cmd)) {\n    console.log(`unknown command ${cmd}`);\n    continue;\n  }\n  const kinds: readonly (\"number\" | \"boolean\" | \"string\")[] = SIGNATURES[cmd];\n  if (args.length !== kinds.length) {\n    console.log(`${cmd} expects ${kinds.length} arguments`);\n    continue;\n  }\n  const parsed: (number | boolean | string)[] = [];\n  let bad = -1;\n  kinds.forEach((kind, i) => {\n    const value = convert(kind, args[i] ?? \"\");\n    if (value === undefined) {\n      if (bad < 0) bad = i;\n    } else {\n      parsed.push(value);\n    }\n  });\n  if (bad >= 0) {\n    console.log(`argument ${bad + 1} of ${cmd} must be a ${kinds[bad]}`);\n    continue;\n  }\n  const handler = HANDLERS[cmd] as (...a: (number | boolean | string)[]) => unknown;\n  console.log(String(handler(...parsed)));\n}\n",
+          "tests": [
+            {
+              "input": "add 2 3\nupper hello\nflip true\ngreet ana 2\nbetween 5 1 10\nhelp",
+              "output": "5\nHELLO\nfalse\nhello ana, hello ana\ntrue\nadd(number, number)\ngreet(string, number)\nflip(boolean)\nupper(string)\nbetween(number, number, number)"
+            },
+            {
+              "input": "add 2\nadd two 3\nflip yes\nbetween 1 2 x\nsubtract 5 3",
+              "output": "add expects 2 arguments\nargument 1 of add must be a number\nargument 1 of flip must be a boolean\nargument 3 of between must be a number\nunknown command subtract"
+            },
+            {
+              "input": "greet bo 0\nbetween 10 1 10\nupper MiXeD",
+              "output": "(no greeting)\ntrue\nMIXED"
+            },
+            {
+              "input": "flip false\nadd -1.5 0.5",
+              "output": "true\n-1"
+            },
+            {
+              "input": "help\nadd 1 2 3",
+              "output": "add(number, number)\ngreet(string, number)\nflip(boolean)\nupper(string)\nbetween(number, number, number)\nadd expects 2 arguments"
+            }
+          ],
+          "strictness": "strict+indexed"
+        }
       },
       {
         "week": 22,
@@ -20255,7 +21941,8 @@
         "goal": "Encode naming conventions in the type system, and describe unbounded data.",
         "concepts": [
           "ts_template_literal_types",
-          "ts_type_level"
+          "ts_type_level",
+          "ts_type_performance"
         ],
         "problems": [
           {
@@ -20444,6 +22131,72 @@
             ],
             "answer": 0,
             "explanation": "The conditional decides at each property whether to recurse. Primitives take the else branch and terminate that path."
+          },
+          {
+            "question": "What does TS2589 mean?",
+            "options": [
+              "Type instantiation is excessively deep and possibly infinite",
+              "A union has too many members",
+              "A type is used before it is declared",
+              "A generic has too many parameters"
+            ],
+            "answer": 0,
+            "explanation": "Usually a non-tail-recursive type, or genuinely infinite recursion."
+          },
+          {
+            "question": "Which recursive type can go deepest?",
+            "options": [
+              "One whose recursive call is the whole branch, with the result carried in an accumulator",
+              "One wrapped in a tuple spread",
+              "One using `infer`",
+              "Any recursive interface"
+            ],
+            "answer": 0,
+            "explanation": "Tail-recursive conditional types are evaluated iteratively, up to 1,000 steps."
+          },
+          {
+            "question": "A template literal of six 10-member unions is…",
+            "options": [
+              "A million members — TS2590, too complex to represent",
+              "60 members",
+              "Fine, unions are free",
+              "Automatically widened to `string`"
+            ],
+            "answer": 0,
+            "explanation": "Unions in template literals multiply. Use a pattern like `` `${number}` ``."
+          },
+          {
+            "question": "`Split<string>` with no special case returns `[string]`. Why is that wrong?",
+            "options": [
+              "A plain `string` has nothing to parse; the honest answer is `string[]`",
+              "`Split` can't take `string`",
+              "It should be `never`",
+              "It is right"
+            ],
+            "answer": 0,
+            "explanation": "Check `string extends S` first."
+          },
+          {
+            "question": "Which is cheaper for the checker?",
+            "options": [
+              "`interface C extends A, B {}`",
+              "`type C = A & B & …` with many parts",
+              "They are identical",
+              "Neither can be cached"
+            ],
+            "answer": 0,
+            "explanation": "Interfaces are cached by name; large intersections are recomputed."
+          },
+          {
+            "question": "When is complex type-level code worth it?",
+            "options": [
+              "When it catches real mistakes at many call sites of a widely used API",
+              "Always — more types are safer",
+              "Never",
+              "Only in libraries"
+            ],
+            "answer": 0,
+            "explanation": "Otherwise a plain type and a runtime check are cheaper to read and to check."
           }
         ],
         "quiz_sample": 8,
@@ -20548,6 +22301,30 @@
           {
             "front": "Why keep type-level programs small?",
             "back": "They slow the compiler, error messages grow unreadable, and depth limits bite. Reach for them where they remove real bugs."
+          },
+          {
+            "front": "What does TS2589 mean?",
+            "back": "Type instantiation is excessively deep and possibly infinite — usually recursion that isn't a tail call."
+          },
+          {
+            "front": "How do you let a recursive type go deeper?",
+            "back": "Make it tail-recursive: carry the result in an accumulator so the recursive call is the whole branch (up to 1,000 steps)."
+          },
+          {
+            "front": "What is TS2590?",
+            "back": "A union too complex to represent (over 100,000 members) — often a template literal of several unions."
+          },
+          {
+            "front": "Why check `string extends S` in a string-parsing type?",
+            "back": "A plain `string` has nothing to parse; return the general type (`string[]`) instead of a wrong tuple."
+          },
+          {
+            "front": "Cheaper for the checker: interface extends or a big intersection?",
+            "back": "`interface … extends` — named interfaces are cached; intersections are recomputed."
+          },
+          {
+            "front": "When is advanced type-level code worth it?",
+            "back": "When it catches real mistakes at many call sites of a widely used API; otherwise prefer a simple type and a runtime check."
           }
         ],
         "practice": [
@@ -20704,11 +22481,306 @@
             "tests": [],
             "source_slug": "",
             "dataset": ""
+          },
+          {
+            "id": "tsm-w22-p9",
+            "title": "A template literal of two unions",
+            "prompt": "What type does TypeScript already infer for `copy`? Annotate `check` with exactly that type — not merely one that fits.",
+            "hint": "A template literal type over two unions is every combination.",
+            "hints": [
+              "A template literal type over two unions is every combination.",
+              "Two sizes times two colours."
+            ],
+            "language": "typescript",
+            "kind": "predict",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<typeof check, typeof copy>>;\n",
+            "judge_mode": "types",
+            "forbid": [
+              "typeof"
+            ],
+            "starter": "type Size = \"s\" | \"m\";\ntype Colour = \"red\" | \"blue\";\ndeclare const sku: `${Size}-${Colour}`;\nconst copy = sku;\nconst check: ____ = copy;\n",
+            "solution": "type Size = \"s\" | \"m\";\ntype Colour = \"red\" | \"blue\";\ndeclare const sku: `${Size}-${Colour}`;\nconst copy = sku;\nconst check: \"s-red\" | \"s-blue\" | \"m-red\" | \"m-blue\" = copy;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w22-d9",
+            "title": "A union that is too large",
+            "prompt": "The compiler rejects this program:\n\n    error TS2590: Expression produces a union type that is too complex to represent.\n\nFix the cause.",
+            "hint": "Six ten-member unions make a million combinations.",
+            "hints": [
+              "Six ten-member unions make a million combinations.",
+              "Check the format at runtime instead of enumerating it in a type."
+            ],
+            "language": "typescript",
+            "kind": "diagnose",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype D = \"0\" | \"1\" | \"2\" | \"3\" | \"4\" | \"5\" | \"6\" | \"7\" | \"8\" | \"9\";\ntype Code = `${D}${D}${D}${D}${D}${D}`;\nconst code = input as Code;\nconsole.log(code.length === 6 ? \"ok\" : \"bad\");\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst isCode = (s: string) => /^\\d{6}$/.test(s);\nconsole.log(isCode(input) ? \"ok\" : \"bad\");\n",
+            "tests": [
+              {
+                "input": "123456",
+                "output": "ok"
+              },
+              {
+                "input": "12a",
+                "output": "bad"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
           }
         ],
         "optional": false,
-        "problem_set": [],
-        "project_spec": null
+        "problem_set": [
+          {
+            "id": "tsm-w22-case-styles",
+            "title": "Convert identifier styles",
+            "prompt": "Each input line is an identifier in `snake_case`, `kebab-case`, `camelCase` or `PascalCase`. Split it into lower-case words and print it in all four styles as `snake=<…> kebab=<…> camel=<…> pascal=<…>`. Type the style names as a union and the output as `Record<Style, string>`.",
+            "hint": "Normalise to a list of lower-case words first; each style is then one `join`.",
+            "hints": [
+              "Normalise to a list of lower-case words first; each style is then one `join`.",
+              "A lower-case letter or digit followed by an upper-case one marks a word boundary in camelCase — and so does the last capital of an acronym followed by a lower-case letter (`JSONValue` is `JSON Value`)."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Style = \"snake\" | \"kebab\" | \"camel\" | \"pascal\";\nconst STYLES: readonly Style[] = [\"snake\", \"kebab\", \"camel\", \"pascal\"];\nfunction words(id: string): string[] {\n  return id.replace(/([A-Z]+)([A-Z][a-z])/g, \"$1 $2\").replace(/([a-z0-9])([A-Z])/g, \"$1 $2\").split(/[\\s_-]+/).filter((w) => w !== \"\").map((w) => w.toLowerCase());\n}\nconst cap = (w: string) => w.charAt(0).toUpperCase() + w.slice(1);\nfunction convert(id: string): Record<Style, string> {\n  const ws = words(id);\n  return {\n    snake: ws.join(\"_\"),\n    kebab: ws.join(\"-\"),\n    camel: ws.map((w, i) => (i === 0 ? w : cap(w))).join(\"\"),\n    pascal: ws.map(cap).join(\"\"),\n  };\n}\nfor (const line of input.split(\"\\n\")) {\n  const out = convert(line.trim());\n  console.log(STYLES.map((s) => `${s}=${out[s]}`).join(\" \"));\n}\n",
+            "tests": [
+              {
+                "input": "first_name\nuser-id\nhttpStatusCode\nParseJSONValue\nx",
+                "output": "snake=first_name kebab=first-name camel=firstName pascal=FirstName\nsnake=user_id kebab=user-id camel=userId pascal=UserId\nsnake=http_status_code kebab=http-status-code camel=httpStatusCode pascal=HttpStatusCode\nsnake=parse_json_value kebab=parse-json-value camel=parseJsonValue pascal=ParseJsonValue\nsnake=x kebab=x camel=x pascal=X"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w22-route-params",
+            "title": "Match routes, typed parameters",
+            "prompt": "Routes are `as const` patterns: `/users/:id`, `/users/:id/posts/:postId`, `/files/:name.:ext` is not needed — only whole-segment params. The params type of a pattern is computed with a recursive template literal type, `RouteParams<\"/users/:id\">` = `{ id: string }`. Each input line is a path: print the first matching pattern and its params as `key=value` pairs (in pattern order), or `no route`. A param must be non-empty.",
+            "hint": "`ParamNames` peels one `:name` off the pattern per step; `RouteParams` maps the names to `string`.",
+            "hints": [
+              "`ParamNames` peels one `:name` off the pattern per step; `RouteParams` maps the names to `string`.",
+              "At runtime, compare segment by segment — the type only describes what the match returns."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype ParamNames<P extends string> = P extends `${string}:${infer Name}/${infer Rest}` ? Name | ParamNames<`/${Rest}`> : P extends `${string}:${infer Name}` ? Name : never;\ntype RouteParams<P extends string> = { [K in ParamNames<P>]: string };\nconst ROUTES = [\"/users/:id\", \"/users/:id/posts/:postId\", \"/tags/:tag\"] as const;\nfunction match<P extends string>(pattern: P, path: string): RouteParams<P> | undefined {\n  const want = pattern.split(\"/\");\n  const got = path.split(\"/\");\n  if (want.length !== got.length) return undefined;\n  const params: Record<string, string> = {};\n  for (const [i, seg] of want.entries()) {\n    const actual = got[i] ?? \"\";\n    if (seg.startsWith(\":\")) {\n      if (actual === \"\") return undefined;\n      params[seg.slice(1)] = actual;\n    } else if (seg !== actual) {\n      return undefined;\n    }\n  }\n  return params as RouteParams<P>;\n}\nconst user = match(\"/users/:id\", \"/users/42\");\nif (user !== undefined) console.log(`typed access: user ${user.id}`);\nfor (const line of input.split(\"\\n\")) {\n  const path = line.trim();\n  let found = false;\n  for (const route of ROUTES) {\n    const params = match(route, path);\n    if (params === undefined) continue;\n    console.log(`${route} ${Object.entries(params).map(([k, v]) => `${k}=${v}`).join(\" \")}`);\n    found = true;\n    break;\n  }\n  if (!found) console.log(\"no route\");\n}\n",
+            "tests": [
+              {
+                "input": "/users/7\n/users/7/posts/99\n/tags/ts\n/users/\n/users/7/posts\n/nope",
+                "output": "typed access: user 42\n/users/:id id=7\n/users/:id/posts/:postId id=7 postId=99\n/tags/:tag tag=ts\nno route\nno route\nno route"
+              },
+              {
+                "input": "/tags/a b",
+                "output": "typed access: user 42\n/tags/:tag tag=a b"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w22-topics",
+            "title": "Subscriptions with wildcards",
+            "prompt": "Event names are `` `${Entity}:${Action}` `` with entities `user`, `order` and actions `created`, `updated`, `deleted`. Input lines are `sub <id> <pattern>` (a pattern is an event name, `<entity>:*` or `*:<action>`), `unsub <id>`, or `emit <event>`. An `emit` of a name that isn't a valid event prints `bad event <e>`; otherwise print the ids of the matching subscriptions, in subscription order, as `<event> -> <ids>` or `<event> -> nobody`. A bad pattern prints `bad pattern <p>`.",
+            "hint": "A template literal type of two unions is every combination — six event names here.",
+            "hints": [
+              "A template literal type of two unions is every combination — six event names here.",
+              "Type predicates turn input strings into `EventName` and `Pattern` once, at the boundary."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Hard",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst ENTITIES = [\"user\", \"order\"] as const;\nconst ACTIONS = [\"created\", \"updated\", \"deleted\"] as const;\ntype Entity = (typeof ENTITIES)[number];\ntype Action = (typeof ACTIONS)[number];\ntype EventName = `${Entity}:${Action}`;\ntype Pattern = EventName | `${Entity}:*` | `*:${Action}`;\nconst isEntity = (s: string): s is Entity => ENTITIES.some((e) => e === s);\nconst isAction = (s: string): s is Action => ACTIONS.some((a) => a === s);\nfunction isEvent(s: string): s is EventName {\n  const [e = \"\", a = \"\", extra] = s.split(\":\");\n  return extra === undefined && isEntity(e) && isAction(a);\n}\nfunction isPattern(s: string): s is Pattern {\n  const [e = \"\", a = \"\", extra] = s.split(\":\");\n  if (extra !== undefined) return false;\n  return (isEntity(e) || e === \"*\") && (isAction(a) || a === \"*\") && !(e === \"*\" && a === \"*\");\n}\nfunction matches(p: Pattern, ev: EventName): boolean {\n  const [pe, pa] = p.split(\":\");\n  const [e, a] = ev.split(\":\");\n  return (pe === \"*\" || pe === e) && (pa === \"*\" || pa === a);\n}\nconst subs = new Map<string, Pattern>();\nfor (const line of input.split(\"\\n\")) {\n  const [cmd = \"\", a = \"\", b = \"\"] = line.trim().split(/\\s+/);\n  if (cmd === \"sub\") {\n    if (isPattern(b)) subs.set(a, b);\n    else console.log(`bad pattern ${b}`);\n  } else if (cmd === \"unsub\") {\n    subs.delete(a);\n  } else if (cmd === \"emit\") {\n    if (!isEvent(a)) {\n      console.log(`bad event ${a}`);\n      continue;\n    }\n    const ids = [...subs].filter(([, p]) => matches(p, a)).map(([id]) => id);\n    console.log(`${a} -> ${ids.join(\" \") || \"nobody\"}`);\n  }\n}\n",
+            "tests": [
+              {
+                "input": "sub s1 user:*\nsub s2 *:deleted\nsub s3 order:created\nemit user:created\nemit order:deleted\nemit order:created\nunsub s2\nemit user:deleted\nemit order:updated\nemit user:banned\nsub s4 *:*",
+                "output": "user:created -> s1\norder:deleted -> s2\norder:created -> s3\nuser:deleted -> s1\norder:updated -> nobody\nbad event user:banned\nbad pattern *:*"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w22-trim",
+            "title": "Trim both ends",
+            "prompt": "Write `Trim<S>`: `S` without leading or trailing spaces.",
+            "hint": "Peel one space off the front if there is one, else one off the back, and recurse.",
+            "hints": [
+              "Peel one space off the front if there is one, else one off the back, and recurse."
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<Trim<\"  hi  \">, \"hi\">>;\ntype _2 = Expect<Equal<Trim<\"a b\">, \"a b\">>;\ntype _3 = Expect<Equal<Trim<\"   \">, \"\">>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type Trim<S extends string> = ____;\n",
+            "solution": "type Trim<S extends string> = S extends ` ${infer R}` ? Trim<R> : S extends `${infer L} ` ? Trim<L> : S;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w22-starts-with",
+            "title": "Starts with",
+            "prompt": "Write `StartsWith<S, P>`: `true` if the string type `S` begins with `P`.",
+            "hint": "A template literal pattern: the prefix, then any string.",
+            "hints": [
+              "A template literal pattern: the prefix, then any string."
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<StartsWith<\"typescript\", \"type\">, true>>;\ntype _2 = Expect<Equal<StartsWith<\"typescript\", \"script\">, false>>;\ntype _3 = Expect<Equal<StartsWith<\"x\", \"\">, true>>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type StartsWith<S extends string, P extends string> = ____;\n",
+            "solution": "type StartsWith<S extends string, P extends string> = S extends `${P}${string}` ? true : false;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w22-replace-all",
+            "title": "Replace every occurrence",
+            "prompt": "Write `ReplaceAll<S, From, To>`: every occurrence of `From` in `S` replaced with `To` (an empty `From` changes nothing).",
+            "hint": "Match `${A}${From}${B}`; replace the first occurrence and recurse on the rest (`B`) only, so replacements aren't matched again.",
+            "hints": [
+              "Match `${A}${From}${B}`; replace the first occurrence and recurse on the rest (`B`) only, so replacements aren't matched again."
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<ReplaceAll<\"a_b_c\", \"_\", \"-\">, \"a-b-c\">>;\ntype _2 = Expect<Equal<ReplaceAll<\"aaa\", \"a\", \"ab\">, \"ababab\">>;\ntype _3 = Expect<Equal<ReplaceAll<\"none\", \"x\", \"y\">, \"none\">>;\ntype _4 = Expect<Equal<ReplaceAll<\"keep\", \"\", \"z\">, \"keep\">>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type ReplaceAll<S extends string, From extends string, To extends string> = ____;\n",
+            "solution": "type ReplaceAll<S extends string, From extends string, To extends string> = From extends \"\"\n  ? S\n  : S extends `${infer A}${From}${infer B}`\n    ? `${A}${To}${ReplaceAll<B, From, To>}`\n    : S;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w22-split",
+            "title": "Split, with a fallback",
+            "prompt": "Write `Split<S, D>`: a tuple of the pieces of `S` separated by `D` — and `string[]` when `S` is plain `string`, which has nothing to parse.",
+            "hint": "Check `string extends S` first.",
+            "hints": [
+              "Check `string extends S` first.",
+              "Then peel off the part before the first delimiter and recurse on the rest."
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<Split<\"a,b,c\", \",\">, [\"a\", \"b\", \"c\"]>>;\ntype _2 = Expect<Equal<Split<\"solo\", \",\">, [\"solo\"]>>;\ntype _3 = Expect<Equal<Split<string, \",\">, string[]>>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type Split<S extends string, D extends string> = ____;\n",
+            "solution": "type Split<S extends string, D extends string> = string extends S\n  ? string[]\n  : S extends `${infer H}${D}${infer T}`\n    ? [H, ...Split<T, D>]\n    : [S];\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w22-paths",
+            "title": "Every dotted path",
+            "prompt": "Write `Paths<T>`: the union of every dotted path to a property of a nested object type — `\"a\" | \"a.b\" | \"a.b.c\"` for `{ a: { b: { c: number } } }`.",
+            "hint": "Map every string key to itself, plus `key.` followed by the paths inside it when its value is an object.",
+            "hints": [
+              "Map every string key to itself, plus `key.` followed by the paths inside it when its value is an object.",
+              "Then look up all the mapped values at once with `[keyof T & string]`."
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Hard",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<Paths<{ a: { b: { c: number } }; d: string }>, \"a\" | \"a.b\" | \"a.b.c\" | \"d\">>;\ntype _2 = Expect<Equal<Paths<{ x: number }>, \"x\">>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type Paths<T> = ____;\n",
+            "solution": "type Paths<T> = T extends object\n  ? { [K in keyof T & string]: T[K] extends object ? K | `${K}.${Paths<T[K]>}` : K }[keyof T & string]\n  : never;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          }
+        ],
+        "project_spec": {
+          "title": "events.ts — a typed event catalogue (arc: typed-kit)",
+          "goal": "The Month 5 arc project: an event bus whose event names come from a catalogue, whose payloads are checked per event at runtime, and whose subscriptions support one-shot handlers and `entity:*` wildcards. Event names are a template literal type built from the catalogue.",
+          "requirements": [
+            "The catalogue: `user:created { name: string }`, `user:deleted { id: number }`, `order:placed { id: number; total: number }`, `order:shipped { id: number }`. Event names are typed as `` `${Entity}:${Action}` `` restricted to these four.",
+            "Commands: `on <sub> <pattern>`, `once <sub> <pattern>` (removed after its first delivery), `off <sub>`, `emit <event> <json>`. A pattern is an event name or `<entity>:*`; anything else prints `bad pattern <p>`.",
+            "`emit` checks the event name (`unknown event <e>`), parses the JSON and validates it against that event's payload shape (`bad payload for <event>`), then prints one line per delivery in subscription order: `<sub> got <event> <summary>` where the summary is `name=<n>`, `id=<i>` or `id=<i> total=<t>`; with no deliveries, `<event> unheard`.",
+            "`stats` prints each event name in catalogue order with how many times it was emitted successfully: `<event>: <n>`.",
+            "Payload validators are declared per event in a mapped type `{ [E in EventName]: (v: unknown) => v is Payloads[E] }`."
+          ],
+          "stretch": [
+            "Make `emit` type-safe in code: `emit(\"order:placed\", { id: 1 })` should fail to compile for the missing `total`.",
+            "Collect the Month 5 helpers — `groupBy`, `Paths`, `DeepReadonly`, `RouteParams`, this emitter — into one `typed-kit` file with type tests."
+          ],
+          "rubric": [
+            "No `any` anywhere — not even one hidden in a cast",
+            "Every function has a typed signature; locals are left to inference",
+            "Bad input is handled on purpose, not by accident",
+            "Names say what things are, not how they are stored",
+            "I could explain every line to someone else"
+          ],
+          "language": "typescript",
+          "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n// Build the project here. Read all of stdin from `input` above, and print\n// exactly what the requirements ask for. Run the tests as you go.\n",
+          "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Payloads = {\n  \"user:created\": { name: string };\n  \"user:deleted\": { id: number };\n  \"order:placed\": { id: number; total: number };\n  \"order:shipped\": { id: number };\n};\ntype EventName = keyof Payloads;\ntype Entity = EventName extends `${infer E}:${string}` ? E : never;\ntype Pattern = EventName | `${Entity}:*`;\nconst EVENTS = [\"user:created\", \"user:deleted\", \"order:placed\", \"order:shipped\"] as const satisfies readonly EventName[];\nconst isRecord = (v: unknown): v is Record<string, unknown> => typeof v === \"object\" && v !== null && !Array.isArray(v);\nconst VALIDATORS: { [E in EventName]: (v: unknown) => v is Payloads[E] } = {\n  \"user:created\": (v): v is Payloads[\"user:created\"] => isRecord(v) && typeof v[\"name\"] === \"string\",\n  \"user:deleted\": (v): v is Payloads[\"user:deleted\"] => isRecord(v) && typeof v[\"id\"] === \"number\",\n  \"order:placed\": (v): v is Payloads[\"order:placed\"] => isRecord(v) && typeof v[\"id\"] === \"number\" && typeof v[\"total\"] === \"number\",\n  \"order:shipped\": (v): v is Payloads[\"order:shipped\"] => isRecord(v) && typeof v[\"id\"] === \"number\",\n};\nconst isEvent = (s: string): s is EventName => EVENTS.some((e) => e === s);\nconst isPattern = (s: string): s is Pattern => isEvent(s) || s === \"user:*\" || s === \"order:*\";\nfunction summary(payload: unknown): string {\n  if (!isRecord(payload)) return \"\";\n  return Object.entries(payload).map(([k, v]) => `${k}=${String(v)}`).join(\" \");\n}\ntype Sub = { pattern: Pattern; once: boolean };\nconst subs = new Map<string, Sub>();\nconst emitted = new Map<EventName, number>();\nconst matches = (p: Pattern, e: EventName) => p === e || (p.endsWith(\":*\") && e.startsWith(p.slice(0, -1)));\nfor (const line of input.split(\"\\n\")) {\n  const [cmd = \"\", a = \"\", ...rest] = line.trim().split(\" \");\n  if (cmd === \"on\" || cmd === \"once\") {\n    const p = rest[0] ?? \"\";\n    if (isPattern(p)) subs.set(a, { pattern: p, once: cmd === \"once\" });\n    else console.log(`bad pattern ${p}`);\n  } else if (cmd === \"off\") {\n    subs.delete(a);\n  } else if (cmd === \"emit\") {\n    if (!isEvent(a)) {\n      console.log(`unknown event ${a}`);\n      continue;\n    }\n    let payload: unknown;\n    try {\n      payload = JSON.parse(rest.join(\" \"));\n    } catch {\n      payload = undefined;\n    }\n    if (!VALIDATORS[a](payload)) {\n      console.log(`bad payload for ${a}`);\n      continue;\n    }\n    emitted.set(a, (emitted.get(a) ?? 0) + 1);\n    const hits = [...subs].filter(([, s]) => matches(s.pattern, a));\n    if (hits.length === 0) console.log(`${a} unheard`);\n    for (const [id, s] of hits) {\n      console.log(`${id} got ${a} ${summary(payload)}`);\n      if (s.once) subs.delete(id);\n    }\n  } else if (cmd === \"stats\") {\n    for (const e of EVENTS) console.log(`${e}: ${emitted.get(e) ?? 0}`);\n  }\n}\n",
+          "tests": [
+            {
+              "input": "on audit user:*\nonce welcome user:created\nemit user:created {\"name\":\"ana\"}\nemit user:created {\"name\":\"bo\"}\nemit user:deleted {\"id\":7}\nstats",
+              "output": "audit got user:created name=ana\nwelcome got user:created name=ana\naudit got user:created name=bo\naudit got user:deleted id=7\nuser:created: 2\nuser:deleted: 1\norder:placed: 0\norder:shipped: 0"
+            },
+            {
+              "input": "on ship order:shipped\nemit order:placed {\"id\":1,\"total\":9.5}\nemit order:shipped {\"id\":\"1\"}\nemit order:shipped {\"id\":1}\nemit order:lost {}\non x *:*\nstats",
+              "output": "order:placed unheard\nbad payload for order:shipped\nship got order:shipped id=1\nunknown event order:lost\nbad pattern *:*\nuser:created: 0\nuser:deleted: 0\norder:placed: 1\norder:shipped: 1"
+            },
+            {
+              "input": "on all order:*\noff all\nemit order:placed {\"id\":2,\"total\":1}\nemit user:created not-json",
+              "output": "order:placed unheard\nbad payload for user:created"
+            },
+            {
+              "input": "once a user:deleted\nonce b user:deleted\nemit user:deleted {\"id\":3}\nemit user:deleted {\"id\":4}",
+              "output": "a got user:deleted id=3\nb got user:deleted id=3\nuser:deleted unheard"
+            },
+            {
+              "input": "stats",
+              "output": "user:created: 0\nuser:deleted: 0\norder:placed: 0\norder:shipped: 0"
+            }
+          ],
+          "strictness": "strict+indexed"
+        }
       },
       {
         "week": 23,
@@ -23697,6 +25769,72 @@
             "explanation": "A type-parameter default is not a value default. `makeBox(1)` still infers `T = number`; the default matters for cases like `const b: Box = ...` where no argument drives inference."
           },
           {
+            "question": "What is `T` in `wrap(42)` for `function wrap<T>(x: T)`?",
+            "options": [
+              "`number` — the literal widens",
+              "`42`",
+              "`unknown`",
+              "`any`"
+            ],
+            "answer": 0,
+            "explanation": "Inferred type arguments widen literals like a `let` does, unless the parameter is `const` or constrained."
+          },
+          {
+            "question": "What does a `const` type parameter change?",
+            "options": [
+              "Arguments are inferred as if written with `as const`, keeping literal and tuple types",
+              "The parameter can't be reassigned",
+              "The function becomes pure",
+              "`T` must be a primitive"
+            ],
+            "answer": 0,
+            "explanation": "Added in TS 5.0: `<const T extends readonly string[]>`."
+          },
+          {
+            "question": "What is `NoInfer<T>` for?",
+            "options": [
+              "Stopping one argument from contributing to `T`, so it is only checked against it",
+              "Disabling type checking for an argument",
+              "Making `T` optional",
+              "Forcing an explicit type argument"
+            ],
+            "answer": 0,
+            "explanation": "TS 5.4. Typical use: a fallback or default that must be one of the inferred options."
+          },
+          {
+            "question": "`box([])` infers `T` as?",
+            "options": [
+              "`never`",
+              "`unknown`",
+              "`any`",
+              "`undefined`"
+            ],
+            "answer": 0,
+            "explanation": "There is no element to infer from. Write `box<string>([])`."
+          },
+          {
+            "question": "Why is `function log<T>(x: T): void` a smell?",
+            "options": [
+              "`T` appears once, so it relates nothing — it's just `unknown`",
+              "Generic functions can't return `void`",
+              "It is slower",
+              "`T` must be constrained"
+            ],
+            "answer": 0,
+            "explanation": "Type parameters exist to connect types: an input to an output, or two inputs."
+          },
+          {
+            "question": "When does a type parameter default like `<T = string>` apply?",
+            "options": [
+              "When no type argument is given and nothing can be inferred",
+              "Always, overriding inference",
+              "Only for classes",
+              "Only when `T` is `unknown`"
+            ],
+            "answer": 0,
+            "explanation": "Inference wins when it has candidates; the default fills the gap when it doesn't."
+          },
+          {
             "question": "What is `(typeof levels)[number]` when `const levels = [\"a\", \"b\"] as const`?",
             "options": [
               "\"a\" | \"b\"",
@@ -23728,6 +25866,72 @@
             ],
             "answer": 0,
             "explanation": "They share a keyword and nothing else. `type S = typeof settings` computes a type; `typeof x === \\\"string\\\"` is a runtime check that happens to also narrow."
+          },
+          {
+            "question": "`type U = { tags: string[] }`. What is `U[\"tags\"][number]`?",
+            "options": [
+              "`string`",
+              "`string[]`",
+              "`number`",
+              "`never`"
+            ],
+            "answer": 0,
+            "explanation": "`U[\"tags\"]` is `string[]`; indexing an array type by `number` gives its element type."
+          },
+          {
+            "question": "`const S = [\"a\", \"b\"] as const; type T = (typeof S)[number];` — `T` is?",
+            "options": [
+              "`\"a\" | \"b\"`",
+              "`string`",
+              "`readonly [\"a\", \"b\"]`",
+              "`number`"
+            ],
+            "answer": 0,
+            "explanation": "`as const` keeps the literals; `[number]` unions the tuple's elements."
+          },
+          {
+            "question": "What does `User[\"id\" | \"email\"]` give?",
+            "options": [
+              "The union of both properties' types",
+              "A tuple of both",
+              "An error — keys must be single",
+              "`never`"
+            ],
+            "answer": 0,
+            "explanation": "Indexing with a union key distributes over it."
+          },
+          {
+            "question": "Why does `Object.keys(obj)` return `string[]` and not `(keyof T)[]`?",
+            "options": [
+              "At runtime an object can have more keys than its type lists",
+              "It is a TypeScript bug",
+              "Symbols are excluded",
+              "For performance"
+            ],
+            "answer": 0,
+            "explanation": "Structural typing admits objects with extra properties, so `keyof T` would be a lie."
+          },
+          {
+            "question": "What is `keyof { [k: string]: number }`?",
+            "options": [
+              "`string | number`",
+              "`string`",
+              "`never`",
+              "`PropertyKey`"
+            ],
+            "answer": 0,
+            "explanation": "Numeric keys are allowed on a string index signature (they become strings at runtime)."
+          },
+          {
+            "question": "`function get<T, K extends keyof T>(o: T, k: K)` — what should it return?",
+            "options": [
+              "`T[K]`",
+              "`T`",
+              "`unknown`",
+              "`keyof T`"
+            ],
+            "answer": 0,
+            "explanation": "The indexed access type follows the specific key passed in."
           },
           {
             "question": "What does `{ [K in keyof T]-?: T[K] }` produce?",
@@ -23763,6 +25967,72 @@
             "explanation": "Mapped types are erased like every other type. They describe the shape your runtime code is obliged to produce, usually ending in a cast where the loop finishes."
           },
           {
+            "question": "What does `as` do in `{ [K in keyof T as NewKey]: … }`?",
+            "options": [
+              "Chooses a new key for each property",
+              "Casts the value type",
+              "Filters values at runtime",
+              "Makes the key readonly"
+            ],
+            "answer": 0,
+            "explanation": "The `as` clause computes the output key from the input key `K`."
+          },
+          {
+            "question": "How do you remove a key in a mapped type?",
+            "options": [
+              "Map it to `never` in the `as` clause",
+              "Map its value to `never`",
+              "Use `delete`",
+              "Map it to `undefined`"
+            ],
+            "answer": 0,
+            "explanation": "A key of `never` produces no property. (A value of `never` would keep the key, with an unusable type.)"
+          },
+          {
+            "question": "Why write `Capitalize<string & K>` instead of `Capitalize<K>`?",
+            "options": [
+              "`keyof T` can include `number` and `symbol`, and `Capitalize` only accepts strings",
+              "`Capitalize` is lazy otherwise",
+              "It converts numbers to strings",
+              "It is required by `as` clauses"
+            ],
+            "answer": 0,
+            "explanation": "The intersection keeps only string keys."
+          },
+          {
+            "question": "What is `` `get${Capitalize<\"first_name\">}` ``?",
+            "options": [
+              "`\"getFirst_name\"`",
+              "`\"getFirstName\"`",
+              "`\"getFIRST_NAME\"`",
+              "`\"get_first_name\"`"
+            ],
+            "answer": 0,
+            "explanation": "`Capitalize` upper-cases only the first character."
+          },
+          {
+            "question": "Does `{ [K in keyof T as …]: T[K] }` keep `?` and `readonly` modifiers?",
+            "options": [
+              "Yes — it's still homomorphic over `keyof T`",
+              "No, `as` drops them",
+              "Only `readonly`",
+              "Only `?`"
+            ],
+            "answer": 0,
+            "explanation": "Add `-?` or `-readonly` to remove them explicitly."
+          },
+          {
+            "question": "A value is assigned to a remapped type that omits `password`. Is the password gone?",
+            "options": [
+              "No — types are erased; the object is unchanged",
+              "Yes, the compiler strips it",
+              "Only in `JSON.stringify`",
+              "Only with `strict`"
+            ],
+            "answer": 0,
+            "explanation": "Remove keys at runtime (rest destructuring), then type the result."
+          },
+          {
             "question": "What does `infer` do inside a conditional type?",
             "options": [
               "Binds a fresh type variable to whatever type matched at that position",
@@ -23794,6 +26064,72 @@
             ],
             "answer": 0,
             "explanation": "Distribution requires a bare type parameter on the left. Putting it inside a tuple makes it non-naked, so the check runs once against the whole union."
+          },
+          {
+            "question": "`type F<T> = T extends unknown ? T[] : never`. What is `F<string | number>`?",
+            "options": [
+              "`string[] | number[]`",
+              "`(string | number)[]`",
+              "`never`",
+              "`unknown[]`"
+            ],
+            "answer": 0,
+            "explanation": "A naked type parameter distributes over the union."
+          },
+          {
+            "question": "How do you stop a conditional type from distributing?",
+            "options": [
+              "Wrap both sides in a tuple: `[T] extends [U]`",
+              "Use `infer`",
+              "Add `readonly`",
+              "Use `NoInfer<T>`"
+            ],
+            "answer": 0,
+            "explanation": "`[T]` isn't a naked type parameter, so the union is checked as a whole."
+          },
+          {
+            "question": "A distributive conditional type is given `never`. The result is?",
+            "options": [
+              "`never`",
+              "The true branch",
+              "The false branch",
+              "`unknown`"
+            ],
+            "answer": 0,
+            "explanation": "`never` is the empty union: zero members, zero results."
+          },
+          {
+            "question": "How is `IsNever<T>` written?",
+            "options": [
+              "`[T] extends [never] ? true : false`",
+              "`T extends never ? true : false`",
+              "`T extends unknown ? false : true`",
+              "`never extends T ? true : false`"
+            ],
+            "answer": 0,
+            "explanation": "The distributive version would return `never` for `never`."
+          },
+          {
+            "question": "What does `infer U extends string` do?",
+            "options": [
+              "Captures `U` only if it is a `string`, and types it as one in the true branch",
+              "Converts `U` to a string",
+              "Makes `U` a string at runtime",
+              "Nothing different from `infer U`"
+            ],
+            "answer": 0,
+            "explanation": "The constraint is part of the match (TS 4.7+)."
+          },
+          {
+            "question": "Why is `Exclude<\"a\" | \"b\", \"a\">` equal to `\"b\"`?",
+            "options": [
+              "Each member is tested; `\"a\"` becomes `never` and vanishes from the union",
+              "`Exclude` sorts the union",
+              "String literals are compared by length",
+              "It's a special case in the compiler"
+            ],
+            "answer": 0,
+            "explanation": "`type Exclude<T, U> = T extends U ? never : T` — distribution does the work."
           },
           {
             "question": "How many members does `` type T = `${\"a\" | \"b\"}-${\"x\" | \"y\" | \"z\"}` `` have?",
@@ -23860,6 +26196,72 @@
             ],
             "answer": 0,
             "explanation": "It is the type-level equivalent of destructuring a head and tail — the standard step for recursive tuple algorithms, which must shrink toward the empty-tuple base case."
+          },
+          {
+            "question": "What does TS2589 mean?",
+            "options": [
+              "Type instantiation is excessively deep and possibly infinite",
+              "A union has too many members",
+              "A type is used before it is declared",
+              "A generic has too many parameters"
+            ],
+            "answer": 0,
+            "explanation": "Usually a non-tail-recursive type, or genuinely infinite recursion."
+          },
+          {
+            "question": "Which recursive type can go deepest?",
+            "options": [
+              "One whose recursive call is the whole branch, with the result carried in an accumulator",
+              "One wrapped in a tuple spread",
+              "One using `infer`",
+              "Any recursive interface"
+            ],
+            "answer": 0,
+            "explanation": "Tail-recursive conditional types are evaluated iteratively, up to 1,000 steps."
+          },
+          {
+            "question": "A template literal of six 10-member unions is…",
+            "options": [
+              "A million members — TS2590, too complex to represent",
+              "60 members",
+              "Fine, unions are free",
+              "Automatically widened to `string`"
+            ],
+            "answer": 0,
+            "explanation": "Unions in template literals multiply. Use a pattern like `` `${number}` ``."
+          },
+          {
+            "question": "`Split<string>` with no special case returns `[string]`. Why is that wrong?",
+            "options": [
+              "A plain `string` has nothing to parse; the honest answer is `string[]`",
+              "`Split` can't take `string`",
+              "It should be `never`",
+              "It is right"
+            ],
+            "answer": 0,
+            "explanation": "Check `string extends S` first."
+          },
+          {
+            "question": "Which is cheaper for the checker?",
+            "options": [
+              "`interface C extends A, B {}`",
+              "`type C = A & B & …` with many parts",
+              "They are identical",
+              "Neither can be cached"
+            ],
+            "answer": 0,
+            "explanation": "Interfaces are cached by name; large intersections are recomputed."
+          },
+          {
+            "question": "When is complex type-level code worth it?",
+            "options": [
+              "When it catches real mistakes at many call sites of a widely used API",
+              "Always — more types are safer",
+              "Never",
+              "Only in libraries"
+            ],
+            "answer": 0,
+            "explanation": "Otherwise a plain type and a runtime check are cheaper to read and to check."
           },
           {
             "question": "What happens the second time you iterate the SAME generator object?",

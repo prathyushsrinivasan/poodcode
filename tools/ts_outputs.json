@@ -106,6 +106,26 @@
    "open 0, done 0, high=0 normal=0 low=0\ncreated #1\npatch #1: nothing to change\n#1 [ ] x (normal)"
   ]
  },
+ "project-w18": {
+  "hash": "6aae070c3739ae2ba5a7",
+  "outputs": [
+   "5 3 8 10 1\n8 10\n64 100\n64\n2",
+   "quick brown jumps\nQUICK BROWN JUMPS\nQUICK BROWN JUMPS\n[QUICK BROWN] [JUMPS]\n5: QUICK BROWN JUMPS",
+   "cannot map upper numbers\n1 3 4\n1 3\nodd: 1 3\n2 6",
+   "a bb ccc\n1 2 3\n2 4 6\n(empty)\nnone",
+   "cannot groupBy parity words\n(empty)\nnone\n0"
+  ]
+ },
+ "project-w19": {
+  "hash": "1cda7003db12d84370b7",
+  "outputs": [
+   "theme = light\ntheme = dark\nfontSize = 16\nautosave = false\ntheme: light -> dark\nfontSize: 14 -> 16\nautosave: true -> false\n{\"autosave\":false,\"fontSize\":16,\"language\":\"en\",\"tabWidth\":2,\"theme\":\"dark\"}",
+   "theme must be one of light,dark,system\ntabWidth must be one of 2,4,8\ntabWidth = 4\nfontSize expects a number\nautosave expects a boolean\nunknown setting colour",
+   "no changes\nlanguage = ja\nlanguage = en\nno changes",
+   "fontSize = 12.5\nfontSize = 12.5\nfontSize = 14\nfontSize = 14\n{\"autosave\":true,\"fontSize\":14,\"language\":\"en\",\"tabWidth\":2,\"theme\":\"light\"}",
+   "language = de\ntheme = system\ntabWidth = 8\ntheme: light -> system\nlanguage: en -> de\ntabWidth: 2 -> 8"
+  ]
+ },
  "project-w2": {
   "hash": "881c40ff67b8d1ec20d0",
   "outputs": [
@@ -120,6 +140,36 @@
    "invalid",
    "invalid",
    "C-\npass"
+  ]
+ },
+ "project-w20": {
+  "hash": "6dec06cbe29383b649d5",
+  "outputs": [
+   "count: 0 -> 1\ncount: 1 -> 6\ncount = 6\ncount: 6 -> 1\ncount = 1\n{\"count\":1,\"user\":\"guest\",\"dark\":false}",
+   "dark: false -> true\nuser is not a boolean\nbad value for dark\nuser: Ana Lee -> guest\ndark: true -> false\nnothing to undo\n{\"count\":0,\"user\":\"guest\",\"dark\":false}",
+   "bad value for count\nuser is not a number\nunknown key colour\nuser = guest\nnothing to undo",
+   "count: 0 -> 3\n{\"count\":3,\"user\":\"guest\",\"dark\":false}",
+   "user: ana -> guest\nnothing to undo"
+  ]
+ },
+ "project-w21": {
+  "hash": "60902088fe001ad76b01",
+  "outputs": [
+   "5\nHELLO\nfalse\nhello ana, hello ana\ntrue\nadd(number, number)\ngreet(string, number)\nflip(boolean)\nupper(string)\nbetween(number, number, number)",
+   "add expects 2 arguments\nargument 1 of add must be a number\nargument 1 of flip must be a boolean\nargument 3 of between must be a number\nunknown command subtract",
+   "(no greeting)\ntrue\nMIXED",
+   "true\n-1",
+   "add(number, number)\ngreet(string, number)\nflip(boolean)\nupper(string)\nbetween(number, number, number)\nadd expects 2 arguments"
+  ]
+ },
+ "project-w22": {
+  "hash": "2ae150c0773f1e040ffd",
+  "outputs": [
+   "audit got user:created name=ana\nwelcome got user:created name=ana\naudit got user:created name=bo\naudit got user:deleted id=7\nuser:created: 2\nuser:deleted: 1\norder:placed: 0\norder:shipped: 0",
+   "order:placed unheard\nbad payload for order:shipped\nship got order:shipped id=1\nunknown event order:lost\nbad pattern *:*\nuser:created: 0\nuser:deleted: 0\norder:placed: 1\norder:shipped: 1",
+   "order:placed unheard\nbad payload for user:created",
+   "a got user:deleted id=3\nb got user:deleted id=3\nuser:deleted unheard",
+   "user:created: 0\nuser:deleted: 0\norder:placed: 0\norder:shipped: 0"
   ]
  },
  "project-w3": {
@@ -511,6 +561,121 @@
     "code": 18048,
     "line": 2,
     "msg": "'label' is possibly 'undefined'."
+   }
+  ]
+ },
+ "ts_distributive-error1": {
+  "hash": "6d3a212f2878855c3a87",
+  "diagnostics": [
+   {
+    "code": 2322,
+    "line": 2,
+    "msg": "Type '(string | number)[]' is not assignable to type 'string[] | number[]'.   Type '(string | number)[]' is not assignable to type 'string[]'.     Type 'string | number' is not assignable to type 'string'.       Type 'number' is not assignable to type 'string'."
+   }
+  ]
+ },
+ "ts_distributive-error2": {
+  "hash": "039f803195b81ebf0559",
+  "diagnostics": [
+   {
+    "code": 2345,
+    "line": 7,
+    "msg": "Argument of type 'boolean' is not assignable to parameter of type 'never'."
+   }
+  ]
+ },
+ "ts_distributive-example1": {
+  "hash": "62a97331e4f9bbe01ff4",
+  "outputs": [
+   "2 string\n3 number\nstring,number,string,number"
+  ]
+ },
+ "ts_distributive-example2": {
+  "hash": "ebe30c6de1a3233044d5",
+  "outputs": [
+   "keydown keyup | click scroll"
+  ]
+ },
+ "ts_distributive-example3": {
+  "hash": "b0f30c4ae6880a83f78e",
+  "outputs": [
+   "13 9 true yes"
+  ]
+ },
+ "ts_distributive-example4": {
+  "hash": "34dadf2a6d367ba02492",
+  "outputs": [
+   "42 TAIL"
+  ]
+ },
+ "ts_distributive-flatten": {
+  "hash": "8c28f7d9050ccdc22f06",
+  "outputs": [
+   "1 2 3 4 sum 10",
+   "5 6 7 sum 18",
+   "9 sum 9"
+  ]
+ },
+ "ts_distributive-never": {
+  "hash": "0429647cac08cd2a7c1c",
+  "outputs": [
+   "13",
+   "1",
+   "-4"
+  ]
+ },
+ "ts_distributive-partition": {
+  "hash": "2d7be53385187105d6b4",
+  "outputs": [
+   "values: 3 4\nsum: 7\nerror: disk full\nerror: timeout",
+   "values: none\nsum: 0\nerror: only one"
+  ]
+ },
+ "ts_distributive-pitfall1-right": {
+  "hash": "daa843b1200d46a5b4a7",
+  "outputs": [
+   "{\"value\":1} {\"value\":\"a\"}"
+  ]
+ },
+ "ts_distributive-pitfall1-wrong": {
+  "hash": "aa01fd56755656b5194f",
+  "diagnostics": [
+   {
+    "code": 2322,
+    "line": 3,
+    "msg": "Type '{ value: string | number; }' is not assignable to type '{ value: string; } | { value: number; }'.   Type '{ value: string | number; }' is not assignable to type '{ value: number; }'.     Types of property 'value' are incompatible.       Type 'string | number' is not assignable to type 'number'.         Type 'string' is not assignable to type 'number'."
+   }
+  ]
+ },
+ "ts_distributive-pitfall2-right": {
+  "hash": "c955506165c5e5a5da2b",
+  "outputs": [
+   "nothing"
+  ]
+ },
+ "ts_distributive-pitfall2-wrong": {
+  "hash": "58aa9038c2dcbb3d737d",
+  "diagnostics": [
+   {
+    "code": 2322,
+    "line": 3,
+    "msg": "Type '\"other\"' is not assignable to type 'never'."
+   }
+  ]
+ },
+ "ts_distributive-pitfall3-right": {
+  "hash": "0ef425f5aa2a7e0ebc3b",
+  "outputs": [
+   "6"
+  ]
+ },
+ "ts_distributive-pitfall3-wrong": {
+  "hash": "13ed2479d6d0d0922bd5",
+  "diagnostics": [
+   {
+    "code": 2322,
+    "line": 7,
+    "msg": "Type 'number' is not assignable to type 'string'."
    }
   ]
  },
@@ -926,6 +1091,127 @@
    "#a x1\n#b x2\n#c x3"
   ]
  },
+ "ts_generic_inference-countby": {
+  "hash": "c8ea0827a6e12e431fd0",
+  "outputs": [
+   "oslo=3 rome=1\n30s=2 <30=1 40+=1",
+   "lima=1\n<30=1"
+  ]
+ },
+ "ts_generic_inference-error1": {
+  "hash": "cd1d400c119cc7affa70",
+  "diagnostics": [
+   {
+    "code": 2322,
+    "line": 2,
+    "msg": "Type 'number[]' is not assignable to type 'T[]'.   Type 'number' is not assignable to type 'T'.     'T' could be instantiated with an arbitrary type which could be unrelated to 'number'."
+   }
+  ]
+ },
+ "ts_generic_inference-error2": {
+  "hash": "e46296f68cd72ceda3e5",
+  "diagnostics": [
+   {
+    "code": 2345,
+    "line": 4,
+    "msg": "Argument of type '\"medium\"' is not assignable to parameter of type '\"small\" | \"large\"'."
+   }
+  ]
+ },
+ "ts_generic_inference-error3": {
+  "hash": "415033aaf31f6c5a5782",
+  "diagnostics": [
+   {
+    "code": 2344,
+    "line": 2,
+    "msg": "Type '{ name: string; }' does not satisfy the constraint '{ id: number; }'.   Property 'id' is missing in type '{ name: string; }' but required in type '{ id: number; }'."
+   }
+  ]
+ },
+ "ts_generic_inference-example1": {
+  "hash": "a53b70e372823bc30536",
+  "outputs": [
+   "43 number\nx+y object\n14 object"
+  ]
+ },
+ "ts_generic_inference-example2": {
+  "hash": "613591644886a1e0c666",
+  "outputs": [
+   "navigating to /users\n2 2"
+  ]
+ },
+ "ts_generic_inference-example3": {
+  "hash": "e2a6c8c2233acbbca7d0",
+  "outputs": [
+   "large\nsmall"
+  ]
+ },
+ "ts_generic_inference-example4": {
+  "hash": "3c6be6ace5265f309489",
+  "outputs": [
+   "ana, bo\na=2 b=1"
+  ]
+ },
+ "ts_generic_inference-explicit": {
+  "hash": "d59224e3a9a9e7ae1af2",
+  "outputs": [
+   "a",
+   "y",
+   "solo"
+  ]
+ },
+ "ts_generic_inference-groupby": {
+  "hash": "47d6b5459d66d5f1c098",
+  "outputs": [
+   "1: a d\n2: bb cc\n3: eee",
+   "4: same size here",
+   "1: x"
+  ]
+ },
+ "ts_generic_inference-pitfall1-right": {
+  "hash": "4897d149939e7ee5087b",
+  "outputs": [
+   "1"
+  ]
+ },
+ "ts_generic_inference-pitfall1-wrong": {
+  "hash": "2d86adf04ad7cbcf0632",
+  "diagnostics": [
+   {
+    "code": 2345,
+    "line": 5,
+    "msg": "Argument of type '\"ana\"' is not assignable to parameter of type 'never'."
+   }
+  ]
+ },
+ "ts_generic_inference-pitfall2-right": {
+  "hash": "14e8bc7ef09fb80cadcc",
+  "outputs": [
+   "false"
+  ]
+ },
+ "ts_generic_inference-pitfall2-wrong": {
+  "hash": "2a75b5043de6a39721be",
+  "diagnostics": [
+   {
+    "code": 2345,
+    "line": 4,
+    "msg": "Argument of type 'string' is not assignable to parameter of type 'number'."
+   }
+  ]
+ },
+ "ts_generic_inference-pitfall3-right": {
+  "hash": "5ecc8126d4f71d57c8a5",
+  "outputs": [
+   "first: (none)"
+  ]
+ },
+ "ts_generic_inference-pitfall3-wrong": {
+  "hash": "b6ffa00a2792c78513ff",
+  "outputs": [
+   "first: undefined"
+  ]
+ },
  "ts_index_signatures-count": {
   "hash": "0992582a0a5dfbf8de58",
   "outputs": [
@@ -1138,6 +1424,106 @@
    "X"
   ]
  },
+ "ts_key_remapping-emitter": {
+  "hash": "77a6258176e646c9804d",
+  "outputs": [
+   "+ ana\n+ bo\nana: hello there\n- bo (timeout)\nunknown event wave\n1 online",
+   "- x (no reason)\n+ y\n0 online"
+  ]
+ },
+ "ts_key_remapping-error1": {
+  "hash": "59899c761ec28a7282db",
+  "diagnostics": [
+   {
+    "code": 2344,
+    "line": 2,
+    "msg": "Type 'K' does not satisfy the constraint 'string'.   Type 'keyof T' is not assignable to type 'string'.     Type 'string | number | symbol' is not assignable to type 'string'.       Type 'number' is not assignable to type 'string'."
+   }
+  ]
+ },
+ "ts_key_remapping-error2": {
+  "hash": "3bfd5e32e4416ec7156c",
+  "diagnostics": [
+   {
+    "code": 2551,
+    "line": 5,
+    "msg": "Property 'getFirstname' does not exist on type 'Getters<{ firstName: string; }>'. Did you mean 'getFirstName'?"
+   }
+  ]
+ },
+ "ts_key_remapping-example1": {
+  "hash": "76ae15ef09221a575715",
+  "outputs": [
+   "ANA\n32\nadmin"
+  ]
+ },
+ "ts_key_remapping-example2": {
+  "hash": "5925aee9e8a8ee043ad7",
+  "outputs": [
+   "{\"count\":4,\"label\":\"clicks\"}\n40"
+  ]
+ },
+ "ts_key_remapping-example3": {
+  "hash": "59c6cb64568846b94a4d",
+  "outputs": [
+   "opened /tmp/a\nclosed with 0\n(no handler for error)"
+  ]
+ },
+ "ts_key_remapping-getters": {
+  "hash": "7fbe2ce17fd72162a44c",
+  "outputs": [
+   "ana from oslo, visit 4\ngetName,getCity,getVisits",
+   "bo from rome, visit 1\ngetName,getCity,getVisits"
+  ]
+ },
+ "ts_key_remapping-pitfall1-right": {
+  "hash": "6141c32cf27fbcdb5a41",
+  "outputs": [
+   "{\"name\":\"ana\"}"
+  ]
+ },
+ "ts_key_remapping-pitfall1-wrong": {
+  "hash": "4e4e7a665e3b38124c5f",
+  "outputs": [
+   "{\"name\":\"ana\",\"password\":\"hunter2\"}"
+  ]
+ },
+ "ts_key_remapping-pitfall2-right": {
+  "hash": "3ffbbbc212b00f49aa9e",
+  "outputs": [
+   "ana"
+  ]
+ },
+ "ts_key_remapping-pitfall2-wrong": {
+  "hash": "eb1922620a789172a249",
+  "outputs": [
+   "no such getter at runtime"
+  ]
+ },
+ "ts_key_remapping-pitfall3-right": {
+  "hash": "a20eb934771e168cb0fc",
+  "outputs": [
+   "light"
+  ]
+ },
+ "ts_key_remapping-pitfall3-wrong": {
+  "hash": "01bd0529f17916f6aec3",
+  "diagnostics": [
+   {
+    "code": 2344,
+    "line": 1,
+    "msg": "Type 'K' does not satisfy the constraint 'string'.   Type 'keyof T' is not assignable to type 'string'.     Type 'string | number | symbol' is not assignable to type 'string'.       Type 'number' is not assignable to type 'string'."
+   }
+  ]
+ },
+ "ts_key_remapping-setters": {
+  "hash": "6d1f7305bd3b0f032e69",
+  "outputs": [
+   "volume 7\nvolume 7 (muted)\nvolume 10 (muted)",
+   "volume 5",
+   "volume 0\nvolume 0 (muted)\nvolume 0"
+  ]
+ },
  "ts_literal_inference-check": {
   "hash": "8f6a49c517cac6f948e0",
   "outputs": [
@@ -1241,6 +1627,122 @@
     "line": 6,
     "msg": "Argument of type 'readonly [\"a\", \"b\"]' is not assignable to parameter of type 'string[]'.   The type 'readonly [\"a\", \"b\"]' is 'readonly' and cannot be assigned to the mutable type 'string[]'."
    }
+  ]
+ },
+ "ts_lookup_types-error1": {
+  "hash": "26a7b8bdc28774954796",
+  "diagnostics": [
+   {
+    "code": 2339,
+    "line": 2,
+    "msg": "Property 'phone' does not exist on type 'User'."
+   }
+  ]
+ },
+ "ts_lookup_types-error2": {
+  "hash": "88bbacb56d20c17d95ab",
+  "diagnostics": [
+   {
+    "code": 7053,
+    "line": 3,
+    "msg": "Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{ apple: number; pear: number; }'.   No index signature with a parameter of type 'string' was found on type '{ apple: number; pear: number; }'."
+   }
+  ]
+ },
+ "ts_lookup_types-error3": {
+  "hash": "aa0413c4008871a70d93",
+  "diagnostics": [
+   {
+    "code": 2536,
+    "line": 1,
+    "msg": "Type 'K' cannot be used to index type 'T'."
+   }
+  ]
+ },
+ "ts_lookup_types-example1": {
+  "hash": "28ec49412c56880611fd",
+  "outputs": [
+   "true #ops #web"
+  ]
+ },
+ "ts_lookup_types-example2": {
+  "hash": "373259ec96d41c6e0e7c",
+  "outputs": [
+   "3 x M = 36\nS:10 M:12 L:14 XL:16"
+  ]
+ },
+ "ts_lookup_types-example3": {
+  "hash": "66575beac7aaab20f01f",
+  "outputs": [
+   "56 ana,bo\ntrue"
+  ]
+ },
+ "ts_lookup_types-example4": {
+  "hash": "704b95b298fb2cae5e8d",
+  "outputs": [
+   "91 6 2"
+  ]
+ },
+ "ts_lookup_types-limits": {
+  "hash": "f441fac04efbc62530a6",
+  "outputs": [
+   "free projects: 2/3 ok\nfree seats: 3/1 over by 2\npro projects: 50/50 ok\nunknown resource cpu\nunknown plan gold",
+   "team seats: 51/50 over by 1"
+  ]
+ },
+ "ts_lookup_types-pitfall1-right": {
+  "hash": "7bb6f4737290f0a220af",
+  "diagnostics": [
+   {
+    "code": 2820,
+    "line": 3,
+    "msg": "Type '\"aple\"' is not assignable to type '\"apple\" | \"pear\"'. Did you mean '\"apple\"'?"
+   }
+  ]
+ },
+ "ts_lookup_types-pitfall1-wrong": {
+  "hash": "e434005f2522d756d507",
+  "outputs": [
+   "total NaN"
+  ]
+ },
+ "ts_lookup_types-pitfall2-right": {
+  "hash": "fcfc2939c36e17a88568",
+  "outputs": [
+   "3"
+  ]
+ },
+ "ts_lookup_types-pitfall2-wrong": {
+  "hash": "241934541abdbbc59de9",
+  "outputs": [
+   "3A"
+  ]
+ },
+ "ts_lookup_types-pitfall3-right": {
+  "hash": "59d8378a16bc98e7d62b",
+  "outputs": [
+   "font 14px"
+  ]
+ },
+ "ts_lookup_types-pitfall3-wrong": {
+  "hash": "998f70bccbf89a5153e5",
+  "outputs": [
+   "font undefinedpx"
+  ]
+ },
+ "ts_lookup_types-pluck": {
+  "hash": "fb7dfa35e0b463d01d0c",
+  "outputs": [
+   "ana,bo\n80",
+   "cy\n55"
+  ]
+ },
+ "ts_lookup_types-sizes": {
+  "hash": "62e412252b50640edb1b",
+  "outputs": [
+   "M: size 2 of 4\nXL: size 4 of 4\nS: size 1 of 4",
+   "XXL: not a size\nm: not a size",
+   "L: size 3 of 4"
   ]
  },
  "ts_number_format-big": {
@@ -2333,6 +2835,119 @@
    "y x"
   ]
  },
+ "ts_type_performance-build": {
+  "hash": "4e69ea5d6f37f90138fb",
+  "outputs": [
+   "012345678901\n12 of at most 120",
+   "\n0 of at most 120",
+   "012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789\n120 of at most 120"
+  ]
+ },
+ "ts_type_performance-depth": {
+  "hash": "c0a3431a399b4784ce42",
+  "outputs": [
+   "0\n1\n2\n4\ntoo deep",
+   "0\n1"
+  ]
+ },
+ "ts_type_performance-error1": {
+  "hash": "d55293c423d9bb4fcee5",
+  "diagnostics": [
+   {
+    "code": 2589,
+    "line": 3,
+    "msg": "Type instantiation is excessively deep and possibly infinite."
+   },
+   {
+    "code": 2322,
+    "line": 4,
+    "msg": "Type '[]' is not assignable to type '[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ...any[]]'.   Source has 0 element(s) but target requires 49."
+   }
+  ]
+ },
+ "ts_type_performance-error2": {
+  "hash": "e9103b9fdde289b5471f",
+  "diagnostics": [
+   {
+    "code": 2590,
+    "line": 2,
+    "msg": "Expression produces a union type that is too complex to represent."
+   }
+  ]
+ },
+ "ts_type_performance-example1": {
+  "hash": "cf1df6fb3279592be18f",
+  "outputs": [
+   "100 true"
+  ]
+ },
+ "ts_type_performance-example2": {
+  "hash": "4c5561f2299eb638bcde",
+  "outputs": [
+   "#3355ff undefined\n20 1"
+  ]
+ },
+ "ts_type_performance-example3": {
+  "hash": "562c6cba7f62cb69cffa",
+  "outputs": [
+   "BLUE 3\n3 b"
+  ]
+ },
+ "ts_type_performance-pitfall1-right": {
+  "hash": "dc299f1713ca62eda570",
+  "outputs": [
+   "80"
+  ]
+ },
+ "ts_type_performance-pitfall1-wrong": {
+  "hash": "6152cc0731f0debc0418",
+  "diagnostics": [
+   {
+    "code": 2589,
+    "line": 3,
+    "msg": "Type instantiation is excessively deep and possibly infinite."
+   }
+  ]
+ },
+ "ts_type_performance-pitfall2-right": {
+  "hash": "7b6defd75657ca086cc1",
+  "outputs": [
+   "a b"
+  ]
+ },
+ "ts_type_performance-pitfall2-wrong": {
+  "hash": "98e7c1b2fdea8f438d8a",
+  "diagnostics": [
+   {
+    "code": 2493,
+    "line": 6,
+    "msg": "Tuple type '[string]' of length '1' has no element at index '1'."
+   }
+  ]
+ },
+ "ts_type_performance-pitfall3-right": {
+  "hash": "29a6cb5a045f110b523e",
+  "outputs": [
+   "6"
+  ]
+ },
+ "ts_type_performance-pitfall3-wrong": {
+  "hash": "1b710430400b542c1f8b",
+  "diagnostics": [
+   {
+    "code": 2590,
+    "line": 2,
+    "msg": "Expression produces a union type that is too complex to represent."
+   }
+  ]
+ },
+ "ts_type_performance-split": {
+  "hash": "133210cbce2eeea62a3d",
+  "outputs": [
+   "name=ana age=31 (+0 extra)\nname=bo age=25 (+2 extra)",
+   "name=solo age=? (+0 extra)"
+  ]
+ },
  "ts_type_testing-check": {
   "hash": "b84adaf746ec9ed44de2",
   "outputs": [
@@ -3374,6 +3989,95 @@
    "solo: 1 person, 0.5h, avg 0.5h, top zed"
   ]
  },
+ "tsm-w18-chunk": {
+  "hash": "048faddd62b5e0fabbfc",
+  "outputs": [
+   "a b\nc d\ne\n3 chunks",
+   "x y z\n1 chunk",
+   "bad size",
+   "only\n1 chunk"
+  ]
+ },
+ "tsm-w18-lru": {
+  "hash": "ebe8c0e15fd4d66637b5",
+  "outputs": [
+   "1\nevicted b\nmiss\n3\na c",
+   "6\nevicted x\nmiss\ny"
+  ]
+ },
+ "tsm-w18-memo": {
+  "hash": "a50f7b9e90f0a2bcb7cc",
+  "outputs": [
+   "ways(4, 2) = 5\nways(10, 3) = 274\nways(4, 2) = 5\ncomputed 16 times",
+   "ways(30, 2) = 1346269\nways(0, 5) = 1\ncomputed 32 times"
+  ]
+ },
+ "tsm-w18-min-max-by": {
+  "hash": "5c21bd1fd657fb07cb78",
+  "outputs": [
+   "coldest oslo\nwarmest cairo\nwettest rome\nlongest name cairo",
+   "coldest reykjavik\nwarmest reykjavik\nwettest reykjavik\nlongest name reykjavik"
+  ]
+ },
+ "tsm-w18-partition": {
+  "hash": "3038d300b876d279ea90",
+  "outputs": [
+   "2 4 6 | 1 3 5\nquick brown | the fox",
+   "- | 7\nthere | hi",
+   "2 4 | -\n- | ab cd"
+  ]
+ },
+ "tsm-w18-unique-by": {
+  "hash": "ae39a7673149c71c36ce",
+  "outputs": [
+   "ana ana@x.io\nbo bo@y.io\ncy cy@z.io\nremoved 2",
+   "solo s@s.io\nremoved 0"
+  ]
+ },
+ "tsm-w18-zip": {
+  "hash": "bed2eca7f422e7b96115",
+  "outputs": [
+   "ana: 90\nbo: 80\ncy: 70\n3 pairs",
+   "ana: 1\nbo: 2\n2 pairs\nignored 2 extra",
+   "x: 5\n1 pairs\nignored 2 extra"
+  ]
+ },
+ "tsm-w19-columns": {
+  "hash": "d14b97c2dd2dc679a0e4",
+  "outputs": [
+   "Item     | Qty  | Price   | Stock\npen      |   12 |    1.50 | yes\nnotebook |    3 |    4.25 | no",
+   "Price   | Item\n   3.00 | cup",
+   "unknown column colour"
+  ]
+ },
+ "tsm-w19-i18n": {
+  "hash": "85bb9405f019ae157ed9",
+  "outputs": [
+   "Welcome\nHallo, Ana!\nYou have 3 items\nunknown language fr\nunknown message home.farewell\nYou have {count} items",
+   "Willkommen\nunknown message blog.title"
+  ]
+ },
+ "tsm-w19-order-report": {
+  "hash": "5f8f3aed5c1875a9df0a",
+  "outputs": [
+   "unknown sku ZZ\nfood: 11 units, $7.25\ntools: 1 unit, $12.00\ntoys: 2 units, $7.00\nbest seller: apple",
+   "unknown sku Q9\nfood: 0 units, $0.00\ntools: 0 units, $0.00\ntoys: 0 units, $0.00\nbest seller: none"
+  ]
+ },
+ "tsm-w19-settings-io": {
+  "hash": "02960c9efbe3da79df61",
+  "outputs": [
+   "volume = 5\nvolume = 8\nbad value yes for muted\nmuted = true\ntheme = dark\nunknown key colour\nname = Ana Lee",
+   "bad value loud for volume\nname = guest"
+  ]
+ },
+ "tsm-w19-status-codes": {
+  "hash": "7eb8d195b06d27d591bf",
+  "outputs": [
+   "OK = 200\nNOT_FOUND = 404\nCONFLICT = 409\nunknown 418\nunknown not_found\n404 409",
+   "SERVER_ERROR = 500\n404 409"
+  ]
+ },
  "tsm-w2-clamp": {
   "hash": "bd47cdb3cadbcfc06b26",
   "outputs": [
@@ -3511,6 +4215,68 @@
    "solid",
    "invalid unit",
    "liquid"
+  ]
+ },
+ "tsm-w20-changes": {
+  "hash": "4b63a32ce0e4a5ebc1ea",
+  "outputs": [
+   "cityChanged: \"Oslo\" -> missing\nnameChanged: \"ana\" -> \"Ana\"\nzipChanged: missing -> \"0150\"\n--\nno changes\n--\ntagsChanged: [\"a\"] -> [\"a\",\"b\"]"
+  ]
+ },
+ "tsm-w20-form-state": {
+  "hash": "0050a19327aaa1e5d132",
+  "outputs": [
+   "email= age=0 terms=false\n3 errors\nemail=ana * !email age=17 * !too young terms=false !must accept\nvalid\nemail=ana@x.io * age=30 * terms=true *",
+   "bad value\nbad value\nunknown field phone\n3 errors"
+  ]
+ },
+ "tsm-w20-permissions": {
+  "hash": "d001d185fdc7bae9348b",
+  "outputs": [
+   "yes\nno\nread write\nadmin\nviewer editor admin\nunknown owner\nread write delete invite",
+   "unknown share\nunknown fly"
+  ]
+ },
+ "tsm-w21-compact": {
+  "hash": "050e93dcde72fa2f9272",
+  "outputs": [
+   "kept 5 of 7\nvalues 1 2 3\nsum 6\nerror boom\nerror bad-input",
+   "kept 0 of 2\nvalues none\nsum 0",
+   "kept 1 of 1\nvalues none\nsum 0\nerror only"
+  ]
+ },
+ "tsm-w21-flatten-deep": {
+  "hash": "9241756402d174351b27",
+  "outputs": [
+   "sample 1 2 3 4\n1 2 3 4 5\ndepth 4",
+   "sample 1 2 3 4\n(empty)\ndepth 3\n7\ndepth 1",
+   "sample 1 2 3 4\n1 2 3 4 5 6\ndepth 5"
+  ]
+ },
+ "tsm-w21-parse-kinds": {
+  "hash": "d37fb456d9e0ef0e61de",
+  "outputs": [
+   "int 41 (+1 = 42)\nlist of 3: a|b|c\nflag true (not false)\nflag false (not true)\nlist of 0: (none)\nunknown kind date",
+   "int 7 (+1 = 8)"
+  ]
+ },
+ "tsm-w22-case-styles": {
+  "hash": "cf944d4731e88c060587",
+  "outputs": [
+   "snake=first_name kebab=first-name camel=firstName pascal=FirstName\nsnake=user_id kebab=user-id camel=userId pascal=UserId\nsnake=http_status_code kebab=http-status-code camel=httpStatusCode pascal=HttpStatusCode\nsnake=parse_json_value kebab=parse-json-value camel=parseJsonValue pascal=ParseJsonValue\nsnake=x kebab=x camel=x pascal=X"
+  ]
+ },
+ "tsm-w22-route-params": {
+  "hash": "c952f217869e4c2a4345",
+  "outputs": [
+   "typed access: user 42\n/users/:id id=7\n/users/:id/posts/:postId id=7 postId=99\n/tags/:tag tag=ts\nno route\nno route\nno route",
+   "typed access: user 42\n/tags/:tag tag=a b"
+  ]
+ },
+ "tsm-w22-topics": {
+  "hash": "a91c10ecb489a7cee2d2",
+  "outputs": [
+   "user:created -> s1\norder:deleted -> s2\norder:created -> s3\nuser:deleted -> s1\norder:updated -> nobody\nbad event user:banned\nbad pattern *:*"
   ]
  },
  "tsm-w3-armstrong": {

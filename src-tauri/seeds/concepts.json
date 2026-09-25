@@ -16571,6 +16571,774 @@
     "practice": []
   },
   {
+    "key": "ts_generic_inference",
+    "name": "How Generic Inference Works",
+    "category": "TS: Generics & Type-Level",
+    "what": "How TypeScript picks a type argument from your call, why it sometimes picks the wrong one, and the tools that steer it: `const` type parameters, `NoInfer`, defaults, and writing the type argument yourself.",
+    "deep": "When you call `first(xs)` you never write `first<number>(xs)` — the compiler infers `T` from the arguments, widening literals the same way a `let` does. Most of the time that is exactly right. When it isn't, you have four tools: a `const` type parameter keeps literal types (TS 5.0), `NoInfer<T>` stops one argument from influencing `T` (TS 5.4), a default applies when nothing can be inferred, and an explicit type argument overrides inference entirely.",
+    "java": "Java infers generic method type arguments too, but conservatively and from fewer places. TypeScript infers from every argument, from the expected return type, and even from callbacks' return values — and it widens literal types unless you ask it not to.",
+    "language": "typescript",
+    "lesson": "### Why it exists\nA generic function is a promise: *give me any `T` and I'll keep track of it.* The\ncaller almost never says what `T` is — the compiler works it out from the call.\nThat inference is so good that it is easy to forget it's happening, until it\npicks something you didn't expect:\n\n- `pick([\"small\", \"large\"], \"medium\")` compiles, because `T` became `string`.\n- `box([])` gives you a box of `never`, and nothing can be added to it.\n- `routes([\"/\", \"/users\"])` returns `string[]`, not the two paths you wrote.\n\nEach of these is inference doing exactly what its rules say. Knowing the rules\n— where candidates come from, when literals widen, which argument wins — turns\nthese from mysteries into one-line fixes.\n\n### The core idea\n**Where `T` comes from.** For each type parameter the compiler collects\n*candidates* from the arguments whose parameter types mention it, then picks the\nbest common type. `wrap(1)` has the candidate `1`, widened to `number` because\nnothing asked for the literal. Contextual types count too: in\n`const n: number[] = parse(text)`, the expected return type can supply `T`.\n\n**Literal widening.** Like `let x = \"a\"`, an inferred type parameter widens\n`\"a\"` to `string` and `1` to `number` — unless the parameter is *constrained* to\na literal-ish type (`T extends string` keeps `\"a\"`), or declared `const`.\n\n**`const` type parameters (TS 5.0).** `function routes<const T extends readonly\nstring[]>(paths: T): T` infers `readonly [\"/\", \"/users\"]` from\n`routes([\"/\", \"/users\"])` — as if the caller had written `as const`.\n\n**`NoInfer<T>` (TS 5.4).** Sometimes one argument should *decide* `T` and\nanother should only be *checked* against it:\n\n```ts\nfunction pick<T extends string>(options: T[], fallback: NoInfer<T>): T\n```\n\nWithout `NoInfer`, `\"medium\"` would become a candidate and `T` would widen to\ninclude it; with it, `T` comes only from `options`, and `\"medium\"` is an error.\n\n**Defaults.** `<T = string>` supplies `T` when there is nothing to infer from —\ntypically for classes and factory functions called with no arguments.\n\n**Say it yourself** when inference has nothing to go on (`new Map()`,\n`box([])`, `JSON.parse`) or would pick something too narrow. An explicit\n`box<string>([])` is clearer than a cast afterwards.\n\n**Two smells.** A type parameter used only once — `function log<T>(x: T): void`\n— relates nothing to anything; it is just `unknown`. And a function whose return\ntype is a bare `T` that the body can't actually produce is lying: the compiler\nwill say \"`T` could be instantiated with an arbitrary type\".\n\n### Worked examples\n#### Inference from the arguments\n```ts\nfunction wrap<T>(value: T): { value: T; label: string } {\n  return { value, label: typeof value };\n}\n\nconst a = wrap(42);            // T = number   (the literal 42 widened)\nconst b = wrap([\"x\", \"y\"]);    // T = string[]\nconst c = wrap({ id: 7 });     // T = { id: number }\n\nconsole.log(a.value + 1, a.label);\nconsole.log(b.value.join(\"+\"), b.label);\nconsole.log(c.value.id * 2, c.label);\n```\n\nPrints:\n```text\n43 number\nx+y object\n14 object\n```\n\nNo type argument is written anywhere. Each call's `T` comes from its argument, which is why `a.value + 1` and `b.value.join` type-check: the result keeps the precise type.\n\n#### `const` type parameters keep the literals\n```ts\nfunction plainRoutes<T extends readonly string[]>(paths: T): T {\n  return paths;\n}\nfunction exactRoutes<const T extends readonly string[]>(paths: T): T {\n  return paths;\n}\n\nconst loose = plainRoutes([\"/\", \"/users\"]);   // string[]\nconst exact = exactRoutes([\"/\", \"/users\"]);   // readonly [\"/\", \"/users\"]\ntype Route = (typeof exact)[number];          // \"/\" | \"/users\"\n\nconst go = (r: Route) => \"navigating to \" + r;\nconsole.log(go(exact[1]));\nconsole.log(loose.length, exact.length);\n```\n\nPrints:\n```text\nnavigating to /users\n2 2\n```\n\nSame body, one modifier apart. With `const`, the call is inferred as if the caller had written `as const`, so the route union can be derived from the value.\n\n#### `NoInfer` — one argument decides, the other is checked\n```ts\nfunction pick<T extends string>(options: readonly T[], choice: string, fallback: NoInfer<T>): T {\n  return options.find((o) => o === choice) ?? fallback;\n}\n\nconst sizes = [\"small\", \"large\"] as const;\nconsole.log(pick(sizes, \"large\", \"small\"));\nconsole.log(pick(sizes, \"huge\", \"small\"));\n```\n\nPrints:\n```text\nlarge\nsmall\n```\n\n`T` is inferred only from `options` (`\"small\" | \"large\"`). Without `NoInfer`, the fallback would also be a candidate, and `pick(sizes, \"x\", \"medium\")` would quietly widen `T` to include `\"medium\"`.\n\n#### When to write the type argument\n```ts\nfunction box<T>(items: T[]) {\n  return {\n    add(item: T) {\n      items.push(item);\n      return this;\n    },\n    all: () => items.join(\", \"),\n  };\n}\n\nconst names = box<string>([]).add(\"ana\").add(\"bo\");\nconst counts = new Map<string, number>();\nfor (const n of [\"a\", \"b\", \"a\"]) counts.set(n, (counts.get(n) ?? 0) + 1);\n\nconsole.log(names.all());\nconsole.log([...counts].map(([k, v]) => `${k}=${v}`).join(\" \"));\n```\n\nPrints:\n```text\nana, bo\na=2 b=1\n```\n\nAn empty array or an empty `Map` gives inference nothing to work with, so say what goes in it. `box([])` alone would infer `never` and reject every `add`.\n\n### What the compiler says\n```ts\nfunction filled<T>(n: number): T[] {\n  return Array.from({ length: n }, () => 0);\n}\n```\n```text\nline 2: error TS2322: Type 'number[]' is not assignable to type 'T[]'.\n  Type 'number' is not assignable to type 'T'.\n    'T' could be instantiated with an arbitrary type which could be unrelated to 'number'.\n```\n\nThe signature promises an array of whatever `T` the caller picks, and the body can only make numbers. \"`T` could be instantiated with an arbitrary type\" is the compiler refusing that lie.\n\n```ts\nfunction pick<T extends string>(options: readonly T[], fallback: NoInfer<T>): T {\n  return options[0] ?? fallback;\n}\npick([\"small\", \"large\"], \"medium\");\n```\n```text\nline 4: error TS2345: Argument of type '\"medium\"' is not assignable to parameter of type '\"small\" | \"large\"'.\n```\n\n`NoInfer` kept `\"medium\"` out of inference, so `T` is `\"small\" | \"large\"` and the fallback is checked against it.\n\n```ts\ntype Entity<T extends { id: number }> = { data: T; loadedAt: number };\ntype Wrong = Entity<{ name: string }>;\n```\n```text\nline 2: error TS2344: Type '{ name: string; }' does not satisfy the constraint '{ id: number; }'.\n  Property 'id' is missing in type '{ name: string; }' but required in type '{ id: number; }'.\n```\n\nA constraint is checked wherever the generic is used: a type without an `id` can't be an `Entity`'s data.\n\n### Pitfalls\n#### An empty argument infers `never`\n```ts\nfunction box<T>(items: T[]) {\n  return { add: (item: T) => items.push(item), size: () => items.length };\n}\nconst b = box([]);\nb.add(\"ana\");\nconsole.log(b.size());\n```\nThe compiler says:\n```text\nline 5: error TS2345: Argument of type '\"ana\"' is not assignable to parameter of type 'never'.\n```\n\nWith nothing inside `[]`, the best `T` is `never` — a box that accepts nothing. Write the type argument when the argument can't carry it.\n\n```ts\nfunction box<T>(items: T[]) {\n  return { add: (item: T) => items.push(item), size: () => items.length };\n}\nconst b = box<string>([]);\nb.add(\"ana\");\nconsole.log(b.size());\n```\nPrints:\n```text\n1\n```\n\n#### Two candidates that don't agree\n```ts\nfunction same<T>(a: T, b: T): boolean {\n  return a === b;\n}\nconsole.log(same(1, \"1\"));\n```\nThe compiler says:\n```text\nline 4: error TS2345: Argument of type 'string' is not assignable to parameter of type 'number'.\n```\n\n`T` is fixed by the first argument (`number`), and the second must then fit it. If mixing is intended, say so with an explicit union; usually the error is catching a real mix-up.\n\n```ts\nfunction same<T>(a: T, b: T): boolean {\n  return a === b;\n}\nconsole.log(same<number | string>(1, \"1\"));\n```\nPrints:\n```text\nfalse\n```\n\n#### A bare `T` return that can be `undefined`\n```ts\nfunction first<T>(xs: T[]): T {\n  return xs[0] as T;\n}\nconst empty: string[] = [];\nconsole.log(\"first: \" + first(empty));\n```\nPrints:\n```text\nfirst: undefined\n```\n\nPromising `T` forced a cast, and the empty array returned `undefined` anyway. `T | undefined` is the honest signature, and it makes every caller decide what an empty list means.\n\n```ts\nfunction first<T>(xs: T[]): T | undefined {\n  return xs[0];\n}\nconst empty: string[] = [];\nconsole.log(\"first: \" + (first(empty) ?? \"(none)\"));\n```\nPrints:\n```text\nfirst: (none)\n```\n\n### Where it shows up later\n- **Week 19 — Lookup types.** `K extends keyof T` and `T[K]`: inference that follows a key to its value type.\n- **Week 21 — Conditional types.** `infer` is inference *inside* a type.\n- **Week 24 — Generic data structures.** `Stack<T>`, `Heap<T>` and when a class's type argument must be written.\n\n### In an interview\n\n**How does TypeScript infer generic type arguments?**\n\nIt collects candidates for each type parameter from the arguments (and the contextual return type), picks the best common type, and widens literals unless the parameter is constrained or `const`. If candidates conflict it reports an error at the argument that doesn't fit the chosen type.\n\n**What are `const` type parameters and `NoInfer`?**\n\n`const T` (TS 5.0) infers arguments as if they had `as const`, keeping tuples and literal types — useful for route tables and config builders. `NoInfer<T>` (TS 5.4) blocks inference from one position, so an argument like a fallback is checked against `T` instead of widening it.\n\n**When do you pass a type argument explicitly?**\n\nWhen inference has nothing to work with — an empty array or `new Map()` — or when I want a wider type than the argument suggests. Otherwise I let it infer; an explicit argument that inference would have produced anyway is just noise.",
+    "exercises": [
+      {
+        "id": "ts_generic_inference-groupby",
+        "title": "A generic group-by",
+        "prompt": "`groupBy` works for any element type and any key function. Replace `____` so it returns a `Map` from each key to the items that produced it, in input order.",
+        "hint": "Look up the current group (maybe missing), and store a new array with the item added.",
+        "language": "typescript",
+        "kind": "drill",
+        "difficulty": "",
+        "starter": "import * as fs from \"fs\";\nfunction groupBy<T, K>(items: readonly T[], keyOf: (item: T) => K): Map<K, T[]> {\n  const groups = new Map<K, T[]>();\n  for (const item of items) {\n    const key = keyOf(item);\n    ____\n  }\n  return groups;\n}\nconst words = fs.readFileSync(0, \"utf8\").trim().split(/\\s+/);\nfor (const [len, ws] of groupBy(words, (w) => w.length)) console.log(`${len}: ${ws.join(\" \")}`);\n",
+        "solution": "import * as fs from \"fs\";\nfunction groupBy<T, K>(items: readonly T[], keyOf: (item: T) => K): Map<K, T[]> {\n  const groups = new Map<K, T[]>();\n  for (const item of items) {\n    const key = keyOf(item);\n    groups.set(key, [...(groups.get(key) ?? []), item]);\n  }\n  return groups;\n}\nconst words = fs.readFileSync(0, \"utf8\").trim().split(/\\s+/);\nfor (const [len, ws] of groupBy(words, (w) => w.length)) console.log(`${len}: ${ws.join(\" \")}`);\n",
+        "tests": [
+          {
+            "input": "a bb cc d eee",
+            "output": "1: a d\n2: bb cc\n3: eee"
+          },
+          {
+            "input": "same size here",
+            "output": "4: same size here"
+          },
+          {
+            "input": "x",
+            "output": "1: x"
+          }
+        ],
+        "source_slug": ""
+      },
+      {
+        "id": "ts_generic_inference-explicit",
+        "title": "Tell inference what goes in",
+        "prompt": "`counter` starts empty, so inference can't see the key type. Replace `____` with the call that creates a counter of `string` keys.",
+        "hint": "Write the type argument between `<` and `>` right after the function name.",
+        "language": "typescript",
+        "kind": "drill",
+        "difficulty": "",
+        "starter": "import * as fs from \"fs\";\nfunction counter<K>(start: [K, number][]) {\n  const counts = new Map<K, number>(start);\n  return {\n    add(key: K) {\n      counts.set(key, (counts.get(key) ?? 0) + 1);\n    },\n    top(): string {\n      return [...counts].sort((a, b) => b[1] - a[1])[0]?.[0] + \"\";\n    },\n  };\n}\nconst c = ____;\nfor (const w of fs.readFileSync(0, \"utf8\").trim().split(/\\s+/)) c.add(w);\nconsole.log(c.top());\n",
+        "solution": "import * as fs from \"fs\";\nfunction counter<K>(start: [K, number][]) {\n  const counts = new Map<K, number>(start);\n  return {\n    add(key: K) {\n      counts.set(key, (counts.get(key) ?? 0) + 1);\n    },\n    top(): string {\n      return [...counts].sort((a, b) => b[1] - a[1])[0]?.[0] + \"\";\n    },\n  };\n}\nconst c = counter<string>([]);\nfor (const w of fs.readFileSync(0, \"utf8\").trim().split(/\\s+/)) c.add(w);\nconsole.log(c.top());\n",
+        "tests": [
+          {
+            "input": "a b a c a",
+            "output": "a"
+          },
+          {
+            "input": "x y y",
+            "output": "y"
+          },
+          {
+            "input": "solo",
+            "output": "solo"
+          }
+        ],
+        "source_slug": ""
+      },
+      {
+        "id": "ts_generic_inference-countby",
+        "title": "Count by any key",
+        "prompt": "Write `countBy<T>(items: readonly T[], keyOf: (item: T) => string): Map<string, number>`. The input is lines of `name age city`. Print counts by city (in first-seen order), then by age group (`<30`, `30s`, `40+`), both as `key=count` space-separated.",
+        "hint": "`T` is inferred from `items`; the callback's parameter then gets `T` for free.",
+        "language": "typescript",
+        "kind": "challenge",
+        "difficulty": "Medium",
+        "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+        "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Person = { name: string; age: number; city: string };\nfunction countBy<T>(items: readonly T[], keyOf: (item: T) => string): Map<string, number> {\n  const counts = new Map<string, number>();\n  for (const item of items) {\n    const key = keyOf(item);\n    counts.set(key, (counts.get(key) ?? 0) + 1);\n  }\n  return counts;\n}\nconst people: Person[] = input.split(\"\\n\").map((line) => {\n  const [name = \"\", age = \"0\", city = \"\"] = line.trim().split(/\\s+/);\n  return { name, age: Number(age), city };\n});\nconst show = (m: Map<string, number>) => [...m].map(([k, n]) => `${k}=${n}`).join(\" \");\nconsole.log(show(countBy(people, (p) => p.city)));\nconsole.log(show(countBy(people, (p) => (p.age < 30 ? \"<30\" : p.age < 40 ? \"30s\" : \"40+\"))));\n",
+        "tests": [
+          {
+            "input": "ana 31 oslo\nbo 25 rome\ncy 44 oslo\ndee 39 oslo",
+            "output": "oslo=3 rome=1\n30s=2 <30=1 40+=1"
+          },
+          {
+            "input": "eve 20 lima",
+            "output": "lima=1\n<30=1"
+          }
+        ],
+        "source_slug": ""
+      }
+    ],
+    "cards": [],
+    "quiz": [
+      {
+        "question": "What is `T` in `wrap(42)` for `function wrap<T>(x: T)`?",
+        "options": [
+          "`number` — the literal widens",
+          "`42`",
+          "`unknown`",
+          "`any`"
+        ],
+        "answer": 0,
+        "explanation": "Inferred type arguments widen literals like a `let` does, unless the parameter is `const` or constrained."
+      },
+      {
+        "question": "What does a `const` type parameter change?",
+        "options": [
+          "Arguments are inferred as if written with `as const`, keeping literal and tuple types",
+          "The parameter can't be reassigned",
+          "The function becomes pure",
+          "`T` must be a primitive"
+        ],
+        "answer": 0,
+        "explanation": "Added in TS 5.0: `<const T extends readonly string[]>`."
+      },
+      {
+        "question": "What is `NoInfer<T>` for?",
+        "options": [
+          "Stopping one argument from contributing to `T`, so it is only checked against it",
+          "Disabling type checking for an argument",
+          "Making `T` optional",
+          "Forcing an explicit type argument"
+        ],
+        "answer": 0,
+        "explanation": "TS 5.4. Typical use: a fallback or default that must be one of the inferred options."
+      },
+      {
+        "question": "`box([])` infers `T` as?",
+        "options": [
+          "`never`",
+          "`unknown`",
+          "`any`",
+          "`undefined`"
+        ],
+        "answer": 0,
+        "explanation": "There is no element to infer from. Write `box<string>([])`."
+      },
+      {
+        "question": "Why is `function log<T>(x: T): void` a smell?",
+        "options": [
+          "`T` appears once, so it relates nothing — it's just `unknown`",
+          "Generic functions can't return `void`",
+          "It is slower",
+          "`T` must be constrained"
+        ],
+        "answer": 0,
+        "explanation": "Type parameters exist to connect types: an input to an output, or two inputs."
+      },
+      {
+        "question": "When does a type parameter default like `<T = string>` apply?",
+        "options": [
+          "When no type argument is given and nothing can be inferred",
+          "Always, overriding inference",
+          "Only for classes",
+          "Only when `T` is `unknown`"
+        ],
+        "answer": 0,
+        "explanation": "Inference wins when it has candidates; the default fills the gap when it doesn't."
+      }
+    ],
+    "practice": []
+  },
+  {
+    "key": "ts_lookup_types",
+    "name": "Lookup Types",
+    "category": "TS: Generics & Type-Level",
+    "what": "Reading types out of other types: `T[K]`, `T[number]`, `T[\"a\" | \"b\"]`, tuple positions, and `(typeof obj)[keyof typeof obj]` — so one declaration can be the source of every related type.",
+    "deep": "An indexed access type looks up a property's type the way `obj[key]` looks up a value: `User[\"email\"]` is the type of a user's email, `Row[number]` is the element type of an array, `Point[0]` the first position of a tuple, and `Config[keyof Config]` the union of every value type. Combined with `typeof` and `keyof`, they let you declare data once and derive the types, instead of writing each type twice.",
+    "java": "Java has nothing like it: a field's type can't be referred to as a type. In TypeScript the property access you write on values has a type-level twin, so a type can follow another type's structure and stay in step when it changes.",
+    "language": "typescript",
+    "lesson": "### Why it exists\nDuplicated types rot. You write a `User` type, then a function that takes \"a\nuser's role\", and you type the parameter `string` — or you copy the role union\ninto a second place. The day someone adds a role, one copy is updated and the\nother isn't.\n\nLookup types remove the copy. `User[\"role\"]` *is* the type of a user's role,\nwherever you write it. `(typeof ROUTES)[number]` *is* whatever routes the array\nholds. Change the source and every derived type follows — and the compiler shows\nyou every place the change matters.\n\n### The core idea\n**Indexed access.** `T[K]` is the type of property `K` on `T`:\n\n```ts\ntype User = { id: number; email: string; role: \"admin\" | \"member\"; tags: string[] };\ntype Role = User[\"role\"];              // \"admin\" | \"member\"\ntype IdOrEmail = User[\"id\" | \"email\"]; // number | string — a union key gives a union\ntype Tag = User[\"tags\"][number];       // string — an array's element type\n```\n\n`K` must be a type the compiler knows is a key of `T`; anything else is an error.\n\n**`[number]` reads arrays and tuples.** `string[][number]` is `string`.\nFor a tuple, `[number]` is the union of its elements and a literal index picks\none position: `[string, number][1]` is `number`.\n\n**From values to types.** `typeof` lifts a value into the type world and\n`keyof` lists a type's keys, so the common patterns are:\n\n```ts\nconst SIZES = [\"S\", \"M\", \"L\"] as const;\ntype Size = (typeof SIZES)[number];                 // \"S\" | \"M\" | \"L\"\n\nconst LIMITS = { free: 3, pro: 50 } as const;\ntype Plan = keyof typeof LIMITS;                    // \"free\" | \"pro\"\ntype Limit = (typeof LIMITS)[keyof typeof LIMITS];  // 3 | 50\n```\n\n**Generic lookups.** `function get<T, K extends keyof T>(obj: T, key: K): T[K]`\nis the typed property read: the result type follows the key you pass.\n\n**`keyof` details worth knowing.** `keyof` a type with a string index signature\nis `string | number` (numeric keys are strings at runtime). `PropertyKey` is\n`string | number | symbol`, the type of any key. And `Object.keys(obj)` returns\n`string[]`, not `(keyof T)[]` — correctly, because an object can have more keys\nat runtime than its type lists.\n\n### Worked examples\n#### Types read from one model\n```ts\ntype User = { id: number; email: string; role: \"admin\" | \"member\"; tags: string[] };\ntype Role = User[\"role\"];\ntype Tag = User[\"tags\"][number];\n\nconst canEdit = (role: Role): boolean => role === \"admin\";\nconst badge = (tag: Tag): string => \"#\" + tag;\n\nconst u: User = { id: 1, email: \"ana@x.io\", role: \"admin\", tags: [\"ops\", \"web\"] };\nconsole.log(canEdit(u.role), u.tags.map(badge).join(\" \"));\n```\n\nPrints:\n```text\ntrue #ops #web\n```\n\n`Role` and `Tag` are never written out. Add `\"owner\"` to `User[\"role\"]` and `canEdit`'s parameter accepts it — and a `switch` over roles would show you where it's unhandled.\n\n#### A union from a list, a union from a table\n```ts\nconst SIZES = [\"S\", \"M\", \"L\", \"XL\"] as const;\ntype Size = (typeof SIZES)[number];\n\nconst PRICES = { S: 10, M: 12, L: 14, XL: 16 } as const satisfies Record<Size, number>;\ntype Price = (typeof PRICES)[Size];\n\nfunction quote(size: Size, qty: number): string {\n  const unit: Price = PRICES[size];\n  return `${qty} x ${size} = ${unit * qty}`;\n}\nconsole.log(quote(\"M\", 3));\nconsole.log(SIZES.map((s) => `${s}:${PRICES[s]}`).join(\" \"));\n```\n\nPrints:\n```text\n3 x M = 36\nS:10 M:12 L:14 XL:16\n```\n\n`Size` comes from the array, `Price` (`10 | 12 | 14 | 16`) from the table, and `satisfies Record<Size, number>` guarantees the table covers every size.\n\n#### A typed property read\n```ts\nfunction get<T, K extends keyof T>(obj: T, key: K): T[K] {\n  return obj[key];\n}\nfunction pluck<T, K extends keyof T>(rows: readonly T[], key: K): T[K][] {\n  return rows.map((r) => r[key]);\n}\n\nconst rows = [\n  { name: \"ana\", age: 31, admin: true },\n  { name: \"bo\", age: 25, admin: false },\n];\nconst ages = pluck(rows, \"age\");     // number[]\nconst names = pluck(rows, \"name\");   // string[]\nconsole.log(ages.reduce((a, b) => a + b, 0), names.join(\",\"));\nconsole.log(get({ name: \"cy\", age: 40, admin: true }, \"admin\"));\n```\n\nPrints:\n```text\n56 ana,bo\ntrue\n```\n\nThe return type follows the key: `pluck(rows, \"age\")` is `number[]`, so `reduce` adds numbers. A key that isn't on the row type is a compile error, not an `undefined` column.\n\n#### Tuple positions\n```ts\ntype Entry = [name: string, score: number, passed: boolean];\ntype Score = Entry[1];\ntype Cell = Entry[number];\n\nconst entries: Entry[] = [[\"ana\", 91, true], [\"bo\", 48, false]];\nconst best: Score = Math.max(...entries.map((e) => e[1]));\nconst cells: Cell[] = entries.flat();\nconsole.log(best, cells.length, cells.filter((c) => typeof c === \"boolean\").length);\n```\n\nPrints:\n```text\n91 6 2\n```\n\nA literal index picks one position of a tuple (`Entry[1]` is `number`); `[number]` is the union of all of them (`string | number | boolean`).\n\n### What the compiler says\n```ts\ntype User = { id: number; email: string };\ntype Phone = User[\"phone\"];\n```\n```text\nline 2: error TS2339: Property 'phone' does not exist on type 'User'.\n```\n\nIndexed access is checked like property access: `User` has no `phone`, so there is no type to look up.\n\n```ts\nconst PRICES = { apple: 1.2, pear: 0.8 };\nfunction price(fruit: string): number {\n  return PRICES[fruit];\n}\n```\n```text\nline 3: error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{ apple: number; pear: number; }'.\n  No index signature with a parameter of type 'string' was found on type '{ apple: number; pear: number; }'.\n```\n\nAny `string` might not be a key of `PRICES`, so the lookup would be `any`. Type the parameter as `keyof typeof PRICES` and the lookup is exact.\n\n```ts\ntype ValueAt<T, K> = T[K];\n```\n```text\nline 1: error TS2536: Type 'K' cannot be used to index type 'T'.\n```\n\nAn unconstrained `K` could be anything, so `T[K]` has no meaning yet. Constrain it: `type ValueAt<T, K extends keyof T> = T[K];` — the same fix as for a generic function, `<T, K extends keyof T>(obj: T, key: K)`.\n\n### Pitfalls\n#### A lookup table keyed by any string\n```ts\nconst PRICES: Record<string, number> = { apple: 1.2, pear: 0.8 };\nconst basket = [\"apple\", \"aple\", \"pear\"];\nconst total = basket.reduce((sum, f) => sum + (PRICES[f] as number), 0);\nconsole.log(\"total \" + total);\n```\nPrints:\n```text\ntotal NaN\n```\n\n`Record<string, number>` accepts every string, so the typo reaches runtime and the total is `NaN`. Deriving the key type from the table turns the typo into a compile error.\n\n```ts\nconst PRICES = { apple: 1.2, pear: 0.8 } as const;\ntype Fruit = keyof typeof PRICES;\nconst basket: Fruit[] = [\"apple\", \"aple\", \"pear\"];\nconst total = basket.reduce((sum, f) => sum + PRICES[f], 0);\nconsole.log(\"total \" + total);\n```\nThe compiler says:\n```text\nline 3: error TS2820: Type '\"aple\"' is not assignable to type '\"apple\" | \"pear\"'. Did you mean '\"apple\"'?\n```\n\n#### `Object.keys` cast to `keyof T`\n```ts\ntype Point = { x: number; y: number };\nfunction sum(p: Point): number {\n  let total = 0;\n  for (const k of Object.keys(p) as (keyof Point)[]) total += p[k];\n  return total;\n}\nconst withLabel = { x: 1, y: 2, label: \"A\" };\nconsole.log(sum(withLabel));\n```\nPrints:\n```text\n3A\n```\n\nStructural typing let an object with an extra `label` in, and `Object.keys` found it: `3` + `\"A\"` became `\"3A\"`. `Object.keys` returns `string[]` on purpose; iterate a list of the keys you mean.\n\n```ts\ntype Point = { x: number; y: number };\nconst POINT_KEYS = [\"x\", \"y\"] as const satisfies readonly (keyof Point)[];\nfunction sum(p: Point): number {\n  let total = 0;\n  for (const k of POINT_KEYS) total += p[k];\n  return total;\n}\nconst withLabel = { x: 1, y: 2, label: \"A\" };\nconsole.log(sum(withLabel));\n```\nPrints:\n```text\n3\n```\n\n#### An optional property's lookup includes `undefined`\n```ts\ntype Settings = { theme: string; fontSize?: number };\ntype FontSize = Settings[\"fontSize\"];\nfunction describe(size: FontSize): string {\n  return \"font \" + size + \"px\";\n}\nconsole.log(describe(undefined));\n```\nPrints:\n```text\nfont undefinedpx\n```\n\n`Settings[\"fontSize\"]` is `number | undefined`, because the property is optional — so `describe(undefined)` compiles and prints `undefinedpx`. `NonNullable<…>` strips it when you need the value itself.\n\n```ts\ntype Settings = { theme: string; fontSize?: number };\ntype FontSize = NonNullable<Settings[\"fontSize\"]>;\nfunction describe(size: FontSize): string {\n  return \"font \" + size + \"px\";\n}\nconsole.log(describe(14));\n```\nPrints:\n```text\nfont 14px\n```\n\n### Where it shows up later\n- **Week 20 — Mapped types.** `{ [K in keyof T]: T[K] }` — a lookup for every key at once.\n- **Week 21 — Conditional types.** `T extends readonly (infer E)[] ? E : never` generalises `T[number]`.\n- **Week 22 — Recursive types.** `Paths<T>` and a typed `get(obj, \"a.b.c\")` built from repeated lookups.\n\n### In an interview\n\n**What is an indexed access type?**\n\n`T[K]` — the type of property `K` of `T`, written like a property access but in type space. `User[\"email\"]`, `Row[number]` for an array's elements, `Tuple[0]` for a position, and a union key gives a union. It's how you derive related types from one declaration instead of repeating them.\n\n**How would you get a union type from a constant array?**\n\n`const X = [\"a\", \"b\"] as const; type X = (typeof X)[number];` — `as const` keeps the literals as a readonly tuple, `typeof` brings the value into type space, and `[number]` unions its elements.\n\n**Why isn't `Object.keys` typed as `(keyof T)[]`?**\n\nBecause TypeScript's types are structural: a value of type `{ x: number }` can have extra properties at runtime, so claiming the keys are only `\"x\"` would be unsound. If you need to iterate known keys, keep an explicit list of them.",
+    "exercises": [
+      {
+        "id": "ts_lookup_types-sizes",
+        "title": "A union from a list of values",
+        "prompt": "`SIZES` is the single source of truth. Replace `____` with the type of one of its elements, so `isSize` narrows an input to exactly those sizes.",
+        "hint": "`typeof SIZES` is a readonly tuple; index it with `number`.",
+        "language": "typescript",
+        "kind": "drill",
+        "difficulty": "",
+        "starter": "import * as fs from \"fs\";\nconst SIZES = [\"S\", \"M\", \"L\", \"XL\"] as const;\ntype Size = ____;\nconst isSize = (s: string): s is Size => SIZES.some((x) => x === s);\nfor (const t of fs.readFileSync(0, \"utf8\").trim().split(/\\s+/)) {\n  console.log(isSize(t) ? `${t}: size ${SIZES.indexOf(t) + 1} of ${SIZES.length}` : `${t}: not a size`);\n}\n",
+        "solution": "import * as fs from \"fs\";\nconst SIZES = [\"S\", \"M\", \"L\", \"XL\"] as const;\ntype Size = (typeof SIZES)[number];\nconst isSize = (s: string): s is Size => SIZES.some((x) => x === s);\nfor (const t of fs.readFileSync(0, \"utf8\").trim().split(/\\s+/)) {\n  console.log(isSize(t) ? `${t}: size ${SIZES.indexOf(t) + 1} of ${SIZES.length}` : `${t}: not a size`);\n}\n",
+        "tests": [
+          {
+            "input": "M XL S",
+            "output": "M: size 2 of 4\nXL: size 4 of 4\nS: size 1 of 4"
+          },
+          {
+            "input": "XXL m",
+            "output": "XXL: not a size\nm: not a size"
+          },
+          {
+            "input": "L",
+            "output": "L: size 3 of 4"
+          }
+        ],
+        "source_slug": ""
+      },
+      {
+        "id": "ts_lookup_types-pluck",
+        "title": "A column of a table",
+        "prompt": "Replace `____` with the return type of `pluck` so the result's type follows the key.",
+        "hint": "An array of the value type at key `K` of `T`.",
+        "language": "typescript",
+        "kind": "drill",
+        "difficulty": "",
+        "starter": "import * as fs from \"fs\";\nfunction pluck<T, K extends keyof T>(rows: readonly T[], key: K): ____ {\n  return rows.map((r) => r[key]);\n}\ntype Row = { name: string; score: number };\nconst rows: Row[] = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\").map((line) => {\n  const [name = \"\", score = \"0\"] = line.trim().split(/\\s+/);\n  return { name, score: Number(score) };\n});\nconst scores = pluck(rows, \"score\");\nconsole.log(pluck(rows, \"name\").join(\",\"));\nconsole.log(scores.reduce((a, b) => a + b, 0) / scores.length);\n",
+        "solution": "import * as fs from \"fs\";\nfunction pluck<T, K extends keyof T>(rows: readonly T[], key: K): T[K][] {\n  return rows.map((r) => r[key]);\n}\ntype Row = { name: string; score: number };\nconst rows: Row[] = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\").map((line) => {\n  const [name = \"\", score = \"0\"] = line.trim().split(/\\s+/);\n  return { name, score: Number(score) };\n});\nconst scores = pluck(rows, \"score\");\nconsole.log(pluck(rows, \"name\").join(\",\"));\nconsole.log(scores.reduce((a, b) => a + b, 0) / scores.length);\n",
+        "tests": [
+          {
+            "input": "ana 90\nbo 70",
+            "output": "ana,bo\n80"
+          },
+          {
+            "input": "cy 55",
+            "output": "cy\n55"
+          }
+        ],
+        "source_slug": ""
+      },
+      {
+        "id": "ts_lookup_types-limits",
+        "title": "Plans from one table",
+        "prompt": "Declare `const LIMITS = { free: { projects: 3, seats: 1 }, pro: { projects: 50, seats: 5 }, team: { projects: 500, seats: 50 } } as const`, and derive `Plan` and `Resource` (`\"projects\" | \"seats\"`) from it. Each input line is `<plan> <resource> <used>`. Print `<plan> <resource>: <used>/<limit> ok`, `… over by <n>`, `unknown plan <p>` or `unknown resource <r>`.",
+        "hint": "`keyof (typeof LIMITS)[Plan]` is the keys every plan's limits share.",
+        "language": "typescript",
+        "kind": "challenge",
+        "difficulty": "Medium",
+        "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+        "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst LIMITS = {\n  free: { projects: 3, seats: 1 },\n  pro: { projects: 50, seats: 5 },\n  team: { projects: 500, seats: 50 },\n} as const;\ntype Plan = keyof typeof LIMITS;\ntype Resource = keyof (typeof LIMITS)[Plan];\nconst isPlan = (s: string): s is Plan => Object.hasOwn(LIMITS, s);\nconst isResource = (s: string): s is Resource => s === \"projects\" || s === \"seats\";\nfor (const line of input.split(\"\\n\")) {\n  const [plan = \"\", resource = \"\", usedText = \"0\"] = line.trim().split(/\\s+/);\n  if (!isPlan(plan)) {\n    console.log(`unknown plan ${plan}`);\n    continue;\n  }\n  if (!isResource(resource)) {\n    console.log(`unknown resource ${resource}`);\n    continue;\n  }\n  const limit = LIMITS[plan][resource];\n  const used = Number(usedText);\n  console.log(`${plan} ${resource}: ${used}/${limit} ${used <= limit ? \"ok\" : `over by ${used - limit}`}`);\n}\n",
+        "tests": [
+          {
+            "input": "free projects 2\nfree seats 3\npro projects 50\nteam cpu 1\ngold seats 1",
+            "output": "free projects: 2/3 ok\nfree seats: 3/1 over by 2\npro projects: 50/50 ok\nunknown resource cpu\nunknown plan gold"
+          },
+          {
+            "input": "team seats 51",
+            "output": "team seats: 51/50 over by 1"
+          }
+        ],
+        "source_slug": ""
+      }
+    ],
+    "cards": [],
+    "quiz": [
+      {
+        "question": "`type U = { tags: string[] }`. What is `U[\"tags\"][number]`?",
+        "options": [
+          "`string`",
+          "`string[]`",
+          "`number`",
+          "`never`"
+        ],
+        "answer": 0,
+        "explanation": "`U[\"tags\"]` is `string[]`; indexing an array type by `number` gives its element type."
+      },
+      {
+        "question": "`const S = [\"a\", \"b\"] as const; type T = (typeof S)[number];` — `T` is?",
+        "options": [
+          "`\"a\" | \"b\"`",
+          "`string`",
+          "`readonly [\"a\", \"b\"]`",
+          "`number`"
+        ],
+        "answer": 0,
+        "explanation": "`as const` keeps the literals; `[number]` unions the tuple's elements."
+      },
+      {
+        "question": "What does `User[\"id\" | \"email\"]` give?",
+        "options": [
+          "The union of both properties' types",
+          "A tuple of both",
+          "An error — keys must be single",
+          "`never`"
+        ],
+        "answer": 0,
+        "explanation": "Indexing with a union key distributes over it."
+      },
+      {
+        "question": "Why does `Object.keys(obj)` return `string[]` and not `(keyof T)[]`?",
+        "options": [
+          "At runtime an object can have more keys than its type lists",
+          "It is a TypeScript bug",
+          "Symbols are excluded",
+          "For performance"
+        ],
+        "answer": 0,
+        "explanation": "Structural typing admits objects with extra properties, so `keyof T` would be a lie."
+      },
+      {
+        "question": "What is `keyof { [k: string]: number }`?",
+        "options": [
+          "`string | number`",
+          "`string`",
+          "`never`",
+          "`PropertyKey`"
+        ],
+        "answer": 0,
+        "explanation": "Numeric keys are allowed on a string index signature (they become strings at runtime)."
+      },
+      {
+        "question": "`function get<T, K extends keyof T>(o: T, k: K)` — what should it return?",
+        "options": [
+          "`T[K]`",
+          "`T`",
+          "`unknown`",
+          "`keyof T`"
+        ],
+        "answer": 0,
+        "explanation": "The indexed access type follows the specific key passed in."
+      }
+    ],
+    "practice": []
+  },
+  {
+    "key": "ts_key_remapping",
+    "name": "Key Remapping in Mapped Types",
+    "category": "TS: Generics & Type-Level",
+    "what": "The `as` clause in a mapped type: rename keys (`getName`), drop keys by mapping them to `never`, and build keys from template literals — the type-level half of every getter, setter, event and API wrapper generator.",
+    "deep": "A mapped type `{ [K in keyof T]: … }` keeps `T`'s keys. Add `as` and you choose the new key for each: `` [K in keyof T as `get${Capitalize<string & K>}`]: () => T[K] `` turns `{ name: string }` into `{ getName: () => string }`, and mapping a key to `never` removes it. The result is still tied to `T` — change the model and the derived API changes with it.",
+    "java": "Java generates this kind of boilerplate with annotation processors or Lombok, at build time. TypeScript describes it in the type system: the runtime code that creates `getName` is written once, generically, and the mapped type tells the compiler exactly which methods exist.",
+    "language": "typescript",
+    "lesson": "### Why it exists\nA lot of code is a *transformation* of some other shape. For a `User` model you\nwrite getters, then setters, then a `UserChanged` event per field, then a form\nstate with an error per field. Written by hand, each of those is a second copy of\n`User` that must be kept in step.\n\nMapped types (week 20) already let you derive `{ [K in keyof User]: … }` — the\nsame keys with new value types. But getters aren't called `name`; they're called\n`getName`. Event handlers aren't `click`; they're `onClick`. And a snapshot for\nlogging should drop the methods entirely. Key remapping is the missing piece:\nthe key itself becomes something you compute.\n\n### The core idea\n**The `as` clause** sits after `in keyof T` and gives each key its new name:\n\n```ts\ntype Getters<T> = {\n  [K in keyof T as `get${Capitalize<string & K>}`]: () => T[K];\n};\ntype G = Getters<{ name: string; age: number }>;\n// { getName: () => string; getAge: () => number }\n```\n\n- `string & K` is needed because `keyof T` can include `number` and `symbol`\n  keys, and `Capitalize` only takes strings. The intersection keeps just the\n  string keys (a `number | symbol` key becomes `never` and disappears).\n- Template literal types (week 22 goes deeper) build the new name; `Capitalize`,\n  `Uncapitalize`, `Uppercase` and `Lowercase` are built in.\n- The value side can still use `T[K]` — `K` is the *original* key.\n\n**Mapping to `never` filters.** A key renamed to `never` is dropped:\n\n```ts\ntype DataOnly<T> = {\n  [K in keyof T as T[K] extends (...args: never[]) => unknown ? never : K]: T[K];\n};\ntype OmitByName<T, Bad> = { [K in keyof T as K extends Bad ? never : K]: T[K] };\n```\n\nThis is the general form of `Omit` — keyed on anything you can test, including\nthe property's *value* type.\n\n**Modifiers survive.** A mapped type over `keyof T` keeps each property's\n`readonly` and `?`, with or without `as`, so `Getters` of an optional property is\nstill optional unless you add `-?`.\n\n**Types describe; code must match.** A remapped type is only a claim about an\nobject. The function that builds the object at runtime has to compute the same\nkeys — `\"get\" + key[0].toUpperCase() + key.slice(1)` — and usually needs one\ncast at the end, because the compiler can't follow string manipulation. Keep\nthat function small and test it.\n\n### Worked examples\n#### Getters, derived and built\n```ts\ntype Getters<T> = {\n  [K in keyof T as `get${Capitalize<string & K>}`]: () => T[K];\n};\n\nfunction makeGetters<T extends object>(obj: T): Getters<T> {\n  const out: Record<string, () => unknown> = {};\n  for (const [key, value] of Object.entries(obj)) {\n    out[\"get\" + key.charAt(0).toUpperCase() + key.slice(1)] = () => value;\n  }\n  return out as Getters<T>;\n}\n\nconst user = makeGetters({ name: \"ana\", age: 31, admin: true });\nconsole.log(user.getName().toUpperCase());\nconsole.log(user.getAge() + 1);\nconsole.log(user.getAdmin() ? \"admin\" : \"member\");\n```\n\nPrints:\n```text\nANA\n32\nadmin\n```\n\n`user.getAge()` is typed `number`, so `+ 1` is arithmetic. The one cast lives in `makeGetters`, where the runtime key computation mirrors the type's template literal exactly.\n\n#### Dropping keys by value type\n```ts\ntype DataOnly<T> = {\n  [K in keyof T as T[K] extends (...args: never[]) => unknown ? never : K]: T[K];\n};\n\nfunction snapshot<T extends object>(obj: T): DataOnly<T> {\n  return Object.fromEntries(Object.entries(obj).filter(([, v]) => typeof v !== \"function\")) as DataOnly<T>;\n}\n\nconst counter = {\n  count: 3,\n  label: \"clicks\",\n  increment() {\n    this.count++;\n  },\n};\ncounter.increment();\nconst saved = snapshot(counter);   // { count: number; label: string }\nconsole.log(JSON.stringify(saved));\nconsole.log(saved.count * 10);\n```\n\nPrints:\n```text\n{\"count\":4,\"label\":\"clicks\"}\n40\n```\n\nMapping `increment` to `never` removes it from the type; filtering functions out of the entries removes it at runtime. `saved.increment()` would now be a compile error — matching the object you actually have.\n\n#### Event handlers named from events\n```ts\ntype Events = { open: { path: string }; close: { code: number }; error: { message: string } };\ntype Handlers<E> = {\n  [K in keyof E as `on${Capitalize<string & K>}`]?: (payload: E[K]) => string;\n};\n\nfunction emit<K extends keyof Events>(handlers: Handlers<Events>, name: K, payload: Events[K]): string {\n  const key = \"on\" + name.charAt(0).toUpperCase() + name.slice(1);\n  const handler = (handlers as Record<string, ((p: Events[K]) => string) | undefined>)[key];\n  return handler === undefined ? `(no handler for ${name})` : handler(payload);\n}\n\nconst handlers: Handlers<Events> = {\n  onOpen: (p) => \"opened \" + p.path,\n  onClose: (p) => \"closed with \" + p.code,\n};\nconsole.log(emit(handlers, \"open\", { path: \"/tmp/a\" }));\nconsole.log(emit(handlers, \"close\", { code: 0 }));\nconsole.log(emit(handlers, \"error\", { message: \"disk\" }));\n```\n\nPrints:\n```text\nopened /tmp/a\nclosed with 0\n(no handler for error)\n```\n\n`onOpen`'s parameter is inferred as `{ path: string }` from `Events[\"open\"]` — no annotation needed. Rename an event in `Events` and the handler object stops compiling until it's renamed too.\n\n### What the compiler says\n```ts\ntype Getters<T> = {\n  [K in keyof T as `get${Capitalize<K>}`]: () => T[K];\n};\n```\n```text\nline 2: error TS2344: Type 'K' does not satisfy the constraint 'string'.\n  Type 'keyof T' is not assignable to type 'string'.\n    Type 'string | number | symbol' is not assignable to type 'string'.\n      Type 'number' is not assignable to type 'string'.\n```\n\n`keyof T` may include `number` and `symbol` keys, and `Capitalize` needs a string. Intersect: `Capitalize<string & K>`.\n\n```ts\ntype Getters<T> = {\n  [K in keyof T as `get${Capitalize<string & K>}`]: () => T[K];\n};\ndeclare const g: Getters<{ firstName: string }>;\ng.getFirstname();\n```\n```text\nline 5: error TS2551: Property 'getFirstname' does not exist on type 'Getters<{ firstName: string; }>'. Did you mean 'getFirstName'?\n```\n\nThe remapped key is `getFirstName` — `Capitalize` only touches the first letter; the rest of the key is kept exactly. The compiler has computed the real name and suggests it.\n\n### Pitfalls\n#### The type drops a key the object still has\n```ts\ntype User = { name: string; password: string };\ntype Public<T> = { [K in keyof T as K extends \"password\" ? never : K]: T[K] };\nconst user: User = { name: \"ana\", password: \"hunter2\" };\nconst shown: Public<User> = user;\nconsole.log(JSON.stringify(shown));\n```\nPrints:\n```text\n{\"name\":\"ana\",\"password\":\"hunter2\"}\n```\n\nA remapped type is a view, not an operation: `Public<User>` hides `password` from the compiler, but assigning `user` to it keeps the very same object. Remove the key at runtime (rest destructuring), then give the result the type.\n\n```ts\ntype User = { name: string; password: string };\ntype Public<T> = { [K in keyof T as K extends \"password\" ? never : K]: T[K] };\nconst user: User = { name: \"ana\", password: \"hunter2\" };\nconst { password: _hidden, ...shown }: User = user;\nconst safe: Public<User> = shown;\nconsole.log(JSON.stringify(safe));\n```\nPrints:\n```text\n{\"name\":\"ana\"}\n```\n\n#### Type and runtime disagree about the name\n```ts\ntype Getters<T> = { [K in keyof T as `get${Capitalize<string & K>}`]: () => T[K] };\nfunction makeGetters<T extends object>(obj: T): Getters<T> {\n  const out: Record<string, () => unknown> = {};\n  for (const [key, value] of Object.entries(obj)) {\n    const camel = key.replace(/_(\\w)/g, (_, c: string) => c.toUpperCase());\n    out[\"get\" + camel.charAt(0).toUpperCase() + camel.slice(1)] = () => value;\n  }\n  return out as Getters<T>;\n}\nconst row = makeGetters({ first_name: \"ana\" });\nconsole.log(typeof row.getFirst_name === \"function\" ? row.getFirst_name() : \"no such getter at runtime\");\n```\nPrints:\n```text\nno such getter at runtime\n```\n\nThe type says `getFirst_name`; the runtime also camel-cased the key and created `getFirstName`. The cast in `makeGetters` hid the mismatch. The runtime key computation must follow the type's rule exactly — that function is where the bugs live.\n\n```ts\ntype Getters<T> = { [K in keyof T as `get${Capitalize<string & K>}`]: () => T[K] };\nfunction makeGetters<T extends object>(obj: T): Getters<T> {\n  const out: Record<string, () => unknown> = {};\n  for (const [key, value] of Object.entries(obj)) {\n    out[\"get\" + key.charAt(0).toUpperCase() + key.slice(1)] = () => value;\n  }\n  return out as Getters<T>;\n}\nconst row = makeGetters({ first_name: \"ana\" });\nconsole.log(typeof row.getFirst_name === \"function\" ? row.getFirst_name() : \"no such getter at runtime\");\n```\nPrints:\n```text\nana\n```\n\n#### Forgetting `string &`\n```ts\ntype Setters<T> = { [K in keyof T as `set${Capitalize<K>}`]: (value: T[K]) => void };\nconst state = { theme: \"dark\" };\nconst setters: Setters<typeof state> = { setTheme: (v) => { state.theme = v; } };\nsetters.setTheme(\"light\");\nconsole.log(state.theme);\n```\nThe compiler says:\n```text\nline 1: error TS2344: Type 'K' does not satisfy the constraint 'string'.\n  Type 'keyof T' is not assignable to type 'string'.\n    Type 'string | number | symbol' is not assignable to type 'string'.\n      Type 'number' is not assignable to type 'string'.\n```\n\nEven when every actual key is a string, `keyof T` for a generic `T` is `string | number | symbol` as far as the definition knows. `string & K` is the idiom.\n\n```ts\ntype Setters<T> = { [K in keyof T as `set${Capitalize<string & K>}`]: (value: T[K]) => void };\nconst state = { theme: \"dark\" };\nconst setters: Setters<typeof state> = { setTheme: (v) => { state.theme = v; } };\nsetters.setTheme(\"light\");\nconsole.log(state.theme);\n```\nPrints:\n```text\nlight\n```\n\n### Where it shows up later\n- **Week 21 — Conditional types.** The `T[K] extends … ? never : K` test inside the `as` clause, in general.\n- **Week 22 — Template literal types.** Building and *parsing* key names: `CamelCase<\"first_name\">`.\n- **Week 23 — Classes.** Accessors (`get name()`) — the runtime feature these getter types often describe.\n\n### In an interview\n\n**How would you type a function that turns an object into getters?**\n\nWith a mapped type that remaps keys: `{ [K in keyof T as `get${Capitalize<string & K>}`]: () => T[K] }`. The implementation builds the same keys at runtime and returns the object with one cast, since the compiler can't follow string manipulation — so that function needs a test.\n\n**How do you omit properties by their value type?**\n\nKey remapping with a conditional: `{ [K in keyof T as T[K] extends Function ? never : K]: T[K] }`. Mapping a key to `never` drops it. That's a generalised `Omit` that can filter on anything, not just key names.\n\n**What's `string & K` for in mapped types?**\n\n`keyof T` is `string | number | symbol` in general, and template literal types and `Capitalize` need strings. Intersecting with `string` keeps just the string keys, which is almost always what you want for generated names.",
+    "exercises": [
+      {
+        "id": "ts_key_remapping-setters",
+        "title": "Setters from a state shape",
+        "prompt": "Replace `____` with the `as` clause that renames each key `K` to `set` + the capitalised key, so `setters.setVolume` and `setters.setMuted` exist and take the right value types.",
+        "hint": "`as` followed by a template literal type; remember `string & K`.",
+        "language": "typescript",
+        "kind": "drill",
+        "difficulty": "",
+        "starter": "import * as fs from \"fs\";\ntype Setters<T> = { [K in keyof T ____]: (value: T[K]) => void };\nconst state = { volume: 5, muted: false };\nconst setters: Setters<typeof state> = {\n  setVolume: (v) => {\n    state.volume = Math.max(0, Math.min(10, v));\n  },\n  setMuted: (m) => {\n    state.muted = m;\n  },\n};\nfor (const line of fs.readFileSync(0, \"utf8\").trim().split(\"\\n\")) {\n  const [cmd = \"\", arg = \"\"] = line.trim().split(/\\s+/);\n  if (cmd === \"volume\") setters.setVolume(Number(arg));\n  else if (cmd === \"mute\") setters.setMuted(arg === \"on\");\n  console.log(`volume ${state.volume}${state.muted ? \" (muted)\" : \"\"}`);\n}\n",
+        "solution": "import * as fs from \"fs\";\ntype Setters<T> = { [K in keyof T as `set${Capitalize<string & K>}`]: (value: T[K]) => void };\nconst state = { volume: 5, muted: false };\nconst setters: Setters<typeof state> = {\n  setVolume: (v) => {\n    state.volume = Math.max(0, Math.min(10, v));\n  },\n  setMuted: (m) => {\n    state.muted = m;\n  },\n};\nfor (const line of fs.readFileSync(0, \"utf8\").trim().split(\"\\n\")) {\n  const [cmd = \"\", arg = \"\"] = line.trim().split(/\\s+/);\n  if (cmd === \"volume\") setters.setVolume(Number(arg));\n  else if (cmd === \"mute\") setters.setMuted(arg === \"on\");\n  console.log(`volume ${state.volume}${state.muted ? \" (muted)\" : \"\"}`);\n}\n",
+        "tests": [
+          {
+            "input": "volume 7\nmute on\nvolume 12",
+            "output": "volume 7\nvolume 7 (muted)\nvolume 10 (muted)"
+          },
+          {
+            "input": "mute off",
+            "output": "volume 5"
+          },
+          {
+            "input": "volume -3\nmute on\nmute off",
+            "output": "volume 0\nvolume 0 (muted)\nvolume 0"
+          }
+        ],
+        "source_slug": ""
+      },
+      {
+        "id": "ts_key_remapping-getters",
+        "title": "Build the getters at runtime",
+        "prompt": "The type `Getters<T>` is given. Replace `____` with the runtime key that matches it: `get` followed by the key with its first letter upper-cased.",
+        "hint": "`charAt(0).toUpperCase()` for the first letter, then the rest unchanged.",
+        "language": "typescript",
+        "kind": "drill",
+        "difficulty": "",
+        "starter": "import * as fs from \"fs\";\ntype Getters<T> = { [K in keyof T as `get${Capitalize<string & K>}`]: () => T[K] };\nfunction makeGetters<T extends object>(obj: T): Getters<T> {\n  const out: Record<string, () => unknown> = {};\n  for (const [key, value] of Object.entries(obj)) out[____] = () => value;\n  return out as Getters<T>;\n}\nconst [name = \"\", city = \"\", visits = \"0\"] = fs.readFileSync(0, \"utf8\").trim().split(/\\s+/);\nconst profile = makeGetters({ name, city, visits: Number(visits) });\nconsole.log(`${profile.getName()} from ${profile.getCity()}, visit ${profile.getVisits() + 1}`);\nconsole.log(Object.keys(profile).join(\",\"));\n",
+        "solution": "import * as fs from \"fs\";\ntype Getters<T> = { [K in keyof T as `get${Capitalize<string & K>}`]: () => T[K] };\nfunction makeGetters<T extends object>(obj: T): Getters<T> {\n  const out: Record<string, () => unknown> = {};\n  for (const [key, value] of Object.entries(obj)) out[\"get\" + key.charAt(0).toUpperCase() + key.slice(1)] = () => value;\n  return out as Getters<T>;\n}\nconst [name = \"\", city = \"\", visits = \"0\"] = fs.readFileSync(0, \"utf8\").trim().split(/\\s+/);\nconst profile = makeGetters({ name, city, visits: Number(visits) });\nconsole.log(`${profile.getName()} from ${profile.getCity()}, visit ${profile.getVisits() + 1}`);\nconsole.log(Object.keys(profile).join(\",\"));\n",
+        "tests": [
+          {
+            "input": "ana oslo 3",
+            "output": "ana from oslo, visit 4\ngetName,getCity,getVisits"
+          },
+          {
+            "input": "bo rome 0",
+            "output": "bo from rome, visit 1\ngetName,getCity,getVisits"
+          }
+        ],
+        "source_slug": ""
+      },
+      {
+        "id": "ts_key_remapping-emitter",
+        "title": "A typed event emitter",
+        "prompt": "Events are `type Events = { join: { user: string }; leave: { user: string; reason: string }; message: { user: string; text: string } }`. Build `Handlers<E>` with keys `on<Event>` and register handlers for all three. Each input line is `<event> <user> [rest…]` (for `leave` the rest is the reason, for `message` the text). Dispatch it and print the handler's result — `+ <user>`, `- <user> (<reason>)`, `<user>: <text>` — or `unknown event <e>`. Finish with `<n> online` (joins minus leaves).",
+        "hint": "The handler object's keys are checked against `Handlers<Events>` — a misspelt `onJion` won't compile.",
+        "language": "typescript",
+        "kind": "challenge",
+        "difficulty": "Hard",
+        "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+        "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Events = { join: { user: string }; leave: { user: string; reason: string }; message: { user: string; text: string } };\ntype Handlers<E> = { [K in keyof E as `on${Capitalize<string & K>}`]: (payload: E[K]) => string };\nlet online = 0;\nconst handlers: Handlers<Events> = {\n  onJoin: (p) => {\n    online++;\n    return `+ ${p.user}`;\n  },\n  onLeave: (p) => {\n    online--;\n    return `- ${p.user} (${p.reason})`;\n  },\n  onMessage: (p) => `${p.user}: ${p.text}`,\n};\nfor (const line of input.split(\"\\n\")) {\n  const [event = \"\", user = \"\", ...rest] = line.trim().split(/\\s+/);\n  const text = rest.join(\" \");\n  if (event === \"join\") console.log(handlers.onJoin({ user }));\n  else if (event === \"leave\") console.log(handlers.onLeave({ user, reason: text || \"no reason\" }));\n  else if (event === \"message\") console.log(handlers.onMessage({ user, text }));\n  else console.log(`unknown event ${event}`);\n}\nconsole.log(`${online} online`);\n",
+        "tests": [
+          {
+            "input": "join ana\njoin bo\nmessage ana hello there\nleave bo timeout\nwave cy",
+            "output": "+ ana\n+ bo\nana: hello there\n- bo (timeout)\nunknown event wave\n1 online"
+          },
+          {
+            "input": "leave x\njoin y",
+            "output": "- x (no reason)\n+ y\n0 online"
+          }
+        ],
+        "source_slug": ""
+      }
+    ],
+    "cards": [],
+    "quiz": [
+      {
+        "question": "What does `as` do in `{ [K in keyof T as NewKey]: … }`?",
+        "options": [
+          "Chooses a new key for each property",
+          "Casts the value type",
+          "Filters values at runtime",
+          "Makes the key readonly"
+        ],
+        "answer": 0,
+        "explanation": "The `as` clause computes the output key from the input key `K`."
+      },
+      {
+        "question": "How do you remove a key in a mapped type?",
+        "options": [
+          "Map it to `never` in the `as` clause",
+          "Map its value to `never`",
+          "Use `delete`",
+          "Map it to `undefined`"
+        ],
+        "answer": 0,
+        "explanation": "A key of `never` produces no property. (A value of `never` would keep the key, with an unusable type.)"
+      },
+      {
+        "question": "Why write `Capitalize<string & K>` instead of `Capitalize<K>`?",
+        "options": [
+          "`keyof T` can include `number` and `symbol`, and `Capitalize` only accepts strings",
+          "`Capitalize` is lazy otherwise",
+          "It converts numbers to strings",
+          "It is required by `as` clauses"
+        ],
+        "answer": 0,
+        "explanation": "The intersection keeps only string keys."
+      },
+      {
+        "question": "What is `` `get${Capitalize<\"first_name\">}` ``?",
+        "options": [
+          "`\"getFirst_name\"`",
+          "`\"getFirstName\"`",
+          "`\"getFIRST_NAME\"`",
+          "`\"get_first_name\"`"
+        ],
+        "answer": 0,
+        "explanation": "`Capitalize` upper-cases only the first character."
+      },
+      {
+        "question": "Does `{ [K in keyof T as …]: T[K] }` keep `?` and `readonly` modifiers?",
+        "options": [
+          "Yes — it's still homomorphic over `keyof T`",
+          "No, `as` drops them",
+          "Only `readonly`",
+          "Only `?`"
+        ],
+        "answer": 0,
+        "explanation": "Add `-?` or `-readonly` to remove them explicitly."
+      },
+      {
+        "question": "A value is assigned to a remapped type that omits `password`. Is the password gone?",
+        "options": [
+          "No — types are erased; the object is unchanged",
+          "Yes, the compiler strips it",
+          "Only in `JSON.stringify`",
+          "Only with `strict`"
+        ],
+        "answer": 0,
+        "explanation": "Remove keys at runtime (rest destructuring), then type the result."
+      }
+    ],
+    "practice": []
+  },
+  {
+    "key": "ts_distributive",
+    "name": "Distributive Conditional Types",
+    "category": "TS: Generics & Type-Level",
+    "what": "Why a conditional type applied to a union runs once per member, how `[T] extends [U]` switches that off, why `never` goes in and `never` comes out, and how `infer U extends X` constrains what it captures.",
+    "deep": "`T extends U ? X : Y` on a *naked* type parameter distributes: given `A | B` it evaluates for `A` and for `B` separately and unions the results. That is what makes `Exclude<T, U>` work — and what makes `ToArray<string | number>` come out as `string[] | number[]` rather than `(string | number)[]`. Wrapping both sides in a tuple, `[T] extends [U]`, evaluates the union as a whole. `never` is the empty union, so a distributive type given `never` returns `never` without evaluating either branch.",
+    "java": "Nothing in Java's type system computes, so there is no analogue. The closest intuition is `map` over a list: a distributive conditional type maps a type function over the members of a union.",
+    "language": "typescript",
+    "lesson": "### Why it exists\nConditional types (week 21) are `if` statements on types. The surprise comes\nwhen the input is a union. Write a helper that wraps a type in an array, give it\n`string | number`, and you get `string[] | number[]` — an array of all strings\n*or* all numbers, not a mixed array. Write `IsString<T>` and give it `never`,\nand the answer is neither `true` nor `false` but `never`.\n\nThese aren't bugs; they're the rule that makes the standard library's\n`Exclude`, `Extract` and `NonNullable` one line each. But if you don't know the\nrule, it looks like the compiler is making things up. This chapter is the rule\nand its two escape hatches.\n\n### The core idea\n**The rule.** A conditional type `T extends U ? X : Y` whose checked type is a\n*naked* type parameter (just `T`, not `T[]` or `[T]`) is **distributive**: when\n`T` is instantiated with a union, the conditional is applied to each member\nseparately and the results are unioned.\n\n```ts\ntype ToArray<T> = T extends unknown ? T[] : never;\ntype A = ToArray<string | number>;   // string[] | number[]\n\ntype MyExclude<T, U> = T extends U ? never : T;\ntype B = MyExclude<\"a\" | \"b\" | \"c\", \"a\">;   // \"b\" | \"c\"\n```\n\n`MyExclude` works *because* of distribution: each member either survives (`T`)\nor vanishes (`never`, the empty union).\n\n**Switching it off.** Put the checked type in a one-element tuple:\n\n```ts\ntype ToArrayAll<T> = [T] extends [unknown] ? T[] : never;\ntype C = ToArrayAll<string | number>;   // (string | number)[]\n```\n\n`[T]` isn't a naked type parameter, so the union is checked as a whole.\n\n**`never` is the empty union.** Distributing over zero members produces zero\nresults — `never` — without looking at either branch. So `IsString<never>` is\n`never`, and a test for `never` itself must be non-distributive:\n`type IsNever<T> = [T] extends [never] ? true : false`.\n\n**`any` takes both branches.** `IsString<any>` is `true | false`, because `any`\nis assignable to anything *and* anything is assignable to it.\n\n**`infer` with a constraint.** `infer U extends X` captures a type only if it\nfits `X` — the branch is taken only then, and `U` is known to be an `X`:\n\n```ts\ntype FirstNumber<T> = T extends [infer H extends number, ...unknown[]] ? H : never;\ntype D = FirstNumber<[42, \"x\"]>;   // 42\ntype E = FirstNumber<[\"x\", 42]>;   // never\n```\n\n**Distribution at runtime?** There is none — types are erased. What the rule\nchanges is which *values* the compiler accepts: `ToArray<string | number>`\nrejects `[1, \"a\"]`, and `ToArrayAll` accepts it.\n\n### Worked examples\n#### One array type per member\n```ts\ntype ToArray<T> = T extends unknown ? T[] : never;\ntype ToArrayAll<T> = [T] extends [unknown] ? T[] : never;\n\nconst perMember: ToArray<string | number>[] = [[\"a\", \"b\"], [1, 2, 3]];   // each all-strings or all-numbers\nconst mixed: ToArrayAll<string | number> = [\"a\", 1, \"b\", 2];            // one mixed array\n\nfor (const arr of perMember) console.log(arr.length, typeof arr[0]);\nconsole.log(mixed.map((x) => typeof x).join(\",\"));\n```\n\nPrints:\n```text\n2 string\n3 number\nstring,number,string,number\n```\n\n`ToArray<string | number>` is `string[] | number[]`, so a mixed array would be rejected there; `ToArrayAll` checks the union as a whole and gives `(string | number)[]`.\n\n#### `Exclude` and `Extract` are one line each\n```ts\ntype MyExclude<T, U> = T extends U ? never : T;\ntype MyExtract<T, U> = T extends U ? T : never;\n\ntype Event = \"click\" | \"keydown\" | \"keyup\" | \"scroll\";\ntype KeyEvent = MyExtract<Event, `key${string}`>;\ntype OtherEvent = MyExclude<Event, KeyEvent>;\n\nconst keys: KeyEvent[] = [\"keydown\", \"keyup\"];\nconst others: OtherEvent[] = [\"click\", \"scroll\"];\nconsole.log(keys.join(\" \"), \"|\", others.join(\" \"));\n```\n\nPrints:\n```text\nkeydown keyup | click scroll\n```\n\nEach member of `Event` is tested against the pattern on its own; the ones that fail become `never` and vanish from the union. The template literal `` `key${string}` `` matches any string starting with `key`.\n\n#### `never` goes in, `never` comes out\n```ts\ntype IsString<T> = T extends string ? \"yes\" : \"no\";\ntype IsNever<T> = [T] extends [never] ? true : false;\n\nfunction assertNever(value: never): never {\n  throw new Error(\"unhandled: \" + JSON.stringify(value));\n}\ntype Shape = { kind: \"circle\"; r: number } | { kind: \"square\"; side: number };\nfunction area(s: Shape): number {\n  if (s.kind === \"circle\") return Math.round(3.14159 * s.r * s.r);\n  if (s.kind === \"square\") return s.side * s.side;\n  return assertNever(s);\n}\n\nconst neverCheck: IsNever<never> = true;\nconst stringCheck: IsString<\"a\"> = \"yes\";\nconsole.log(area({ kind: \"circle\", r: 2 }), area({ kind: \"square\", side: 3 }), neverCheck, stringCheck);\n```\n\nPrints:\n```text\n13 9 true yes\n```\n\n`IsString<never>` would be `never` (no members, no results). `IsNever` wraps both sides in tuples to test `never` itself. In `area`, the leftover `s` is `never` because every union member was handled.\n\n#### `infer … extends` captures only what fits\n```ts\ntype FirstNumber<T> = T extends readonly [infer H extends number, ...unknown[]] ? H : never;\ntype LastString<T> = T extends readonly [...unknown[], infer L extends string] ? L : never;\n\nconst row = [7, \"x\", \"tail\"] as const;\nconst first: FirstNumber<typeof row> = 7;\nconst last: LastString<typeof row> = \"tail\";\nconsole.log(first * 6, last.toUpperCase());\n```\n\nPrints:\n```text\n42 TAIL\n```\n\n`H` is captured only if it is a `number`, so inside the true branch it's known to be one. With `row` starting with a string, `FirstNumber` would be `never` and `const first` could hold nothing.\n\n### What the compiler says\n```ts\ntype ToArray<T> = T extends unknown ? T[] : never;\nconst mixed: ToArray<string | number> = [1, \"a\"];\n```\n```text\nline 2: error TS2322: Type '(string | number)[]' is not assignable to type 'string[] | number[]'.\n  Type '(string | number)[]' is not assignable to type 'string[]'.\n    Type 'string | number' is not assignable to type 'string'.\n      Type 'number' is not assignable to type 'string'.\n```\n\nDistribution made the type `string[] | number[]`: all strings or all numbers. A mixed array fits neither. Use `[T] extends [unknown]` if a mixed array is what you meant.\n\n```ts\nfunction assertNever(value: never): never {\n  throw new Error(String(value));\n}\nfunction label(v: string | number | boolean): string {\n  if (typeof v === \"string\") return \"text\";\n  if (typeof v === \"number\") return \"number\";\n  return assertNever(v);\n}\n```\n```text\nline 7: error TS2345: Argument of type 'boolean' is not assignable to parameter of type 'never'.\n```\n\nAfter two checks, `v` is still `boolean` — not `never` — so a case is missing. Exhaustiveness checks are distribution's `never` behaviour put to work.\n\n### Pitfalls\n#### A wrapper that distributes when you didn't want it to\n```ts\ntype Boxed<T> = T extends unknown ? { value: T } : never;\nfunction box(v: string | number): Boxed<string | number> {\n  return { value: v };\n}\nconsole.log(JSON.stringify(box(1)), JSON.stringify(box(\"a\")));\n```\nThe compiler says:\n```text\nline 3: error TS2322: Type '{ value: string | number; }' is not assignable to type '{ value: string; } | { value: number; }'.\n  Type '{ value: string | number; }' is not assignable to type '{ value: number; }'.\n    Types of property 'value' are incompatible.\n      Type 'string | number' is not assignable to type 'number'.\n        Type 'string' is not assignable to type 'number'.\n```\n\nDistributed, `Boxed<string | number>` is `{ value: string } | { value: number }`, and an object whose `value` is `string | number` fits neither member. Wrapped in a tuple, it's `{ value: string | number }`.\n\n```ts\ntype Boxed<T> = [T] extends [unknown] ? { value: T } : never;\nfunction box(v: string | number): Boxed<string | number> {\n  return { value: v };\n}\nconsole.log(JSON.stringify(box(1)), JSON.stringify(box(\"a\")));\n```\nPrints:\n```text\n{\"value\":1} {\"value\":\"a\"}\n```\n\n#### A test that returns `never` for `never`\n```ts\ntype Describe<T> = T extends string ? \"text\" : \"other\";\nfunction describeNothing(): Describe<never> {\n  return \"other\";\n}\nconsole.log(describeNothing());\n```\nThe compiler says:\n```text\nline 3: error TS2322: Type '\"other\"' is not assignable to type 'never'.\n```\n\nDistributing over the empty union gives the empty union: `Describe<never>` is `never`, so no value can be returned. Check for `never` first, non-distributively.\n\n```ts\ntype Describe<T> = [T] extends [never] ? \"nothing\" : T extends string ? \"text\" : \"other\";\nfunction describeNothing(): Describe<never> {\n  return \"nothing\";\n}\nconsole.log(describeNothing());\n```\nPrints:\n```text\nnothing\n```\n\n#### `ReturnType` of an overloaded function\n```ts\nfunction parse(text: string): number;\nfunction parse(text: number): string;\nfunction parse(text: string | number): string | number {\n  return typeof text === \"string\" ? Number(text) : String(text);\n}\ntype Parsed = ReturnType<typeof parse>;\nconst n: Parsed = parse(\"5\");\nconsole.log(n);\n```\nThe compiler says:\n```text\nline 7: error TS2322: Type 'number' is not assignable to type 'string'.\n```\n\n`infer` on an overloaded function sees only the *last* overload, so `ReturnType<typeof parse>` is `string`. Let the call site infer, or pull the overload you want out explicitly.\n\n```ts\nfunction parse(text: string): number;\nfunction parse(text: number): string;\nfunction parse(text: string | number): string | number {\n  return typeof text === \"string\" ? Number(text) : String(text);\n}\nconst n = parse(\"5\");\nconsole.log(n + 1);\n```\nPrints:\n```text\n6\n```\n\n### Where it shows up later\n- **Week 22 — Template literal and recursive types.** Distribution over string unions builds every combination — and can explode.\n- **Week 25 — `Result`.** `Extract<R, { ok: true }>` pulls the success member out of a result union.\n\n### In an interview\n\n**What is a distributive conditional type?**\n\nA conditional type whose checked type is a bare type parameter. When that parameter is a union, the conditional is applied to each member and the results are unioned — which is how `Exclude`, `Extract` and `NonNullable` work. Wrapping in a tuple, `[T] extends [U]`, turns distribution off.\n\n**Why does `IsString<never>` give `never`?**\n\n`never` is the empty union, and distribution over an empty union produces no results — so the answer is `never` without either branch being evaluated. To test for `never` you have to check non-distributively: `[T] extends [never]`.\n\n**How would you write `IsUnion<T>`?**\n\nCompare the distributed and undistributed forms: `type IsUnion<T, U = T> = T extends unknown ? ([U] extends [T] ? false : true) : never`. Inside the distributive branch `T` is one member while `U` is still the whole union, so they differ exactly when there was more than one member.",
+    "exercises": [
+      {
+        "id": "ts_distributive-flatten",
+        "title": "Flatten one level",
+        "prompt": "`Flatten<T>` is the element type if `T` is an array, otherwise `T` itself. Replace `____` with the conditional type so `flattenOnce` type-checks.",
+        "hint": "`infer E` inside `readonly (infer E)[]` captures the element type.",
+        "language": "typescript",
+        "kind": "drill",
+        "difficulty": "",
+        "starter": "import * as fs from \"fs\";\ntype Flatten<T> = ____;\nfunction flattenOnce<T>(items: readonly T[]): Flatten<T>[] {\n  const out: unknown[] = [];\n  for (const item of items) {\n    if (Array.isArray(item)) out.push(...item);\n    else out.push(item);\n  }\n  return out as Flatten<T>[];\n}\nconst parsed: (number | number[])[] = fs.readFileSync(0, \"utf8\").trim().split(/\\s+/)\n  .map((t) => (t.includes(\",\") ? t.split(\",\").map(Number) : Number(t)));\nconst flat: number[] = flattenOnce(parsed);\nconsole.log(flat.join(\" \"), \"sum\", flat.reduce((a, b) => a + b, 0));\n",
+        "solution": "import * as fs from \"fs\";\ntype Flatten<T> = T extends readonly (infer E)[] ? E : T;\nfunction flattenOnce<T>(items: readonly T[]): Flatten<T>[] {\n  const out: unknown[] = [];\n  for (const item of items) {\n    if (Array.isArray(item)) out.push(...item);\n    else out.push(item);\n  }\n  return out as Flatten<T>[];\n}\nconst parsed: (number | number[])[] = fs.readFileSync(0, \"utf8\").trim().split(/\\s+/)\n  .map((t) => (t.includes(\",\") ? t.split(\",\").map(Number) : Number(t)));\nconst flat: number[] = flattenOnce(parsed);\nconsole.log(flat.join(\" \"), \"sum\", flat.reduce((a, b) => a + b, 0));\n",
+        "tests": [
+          {
+            "input": "1 2,3 4",
+            "output": "1 2 3 4 sum 10"
+          },
+          {
+            "input": "5,6,7",
+            "output": "5 6 7 sum 18"
+          },
+          {
+            "input": "9",
+            "output": "9 sum 9"
+          }
+        ],
+        "source_slug": ""
+      },
+      {
+        "id": "ts_distributive-never",
+        "title": "Prove every case is handled",
+        "prompt": "`assertNever` only accepts `never`. Replace `____` so the last line of `describe` passes the leftover value to it — which compiles only because every `kind` is handled above.",
+        "hint": "After the three checks, `c` is `never`.",
+        "language": "typescript",
+        "kind": "drill",
+        "difficulty": "",
+        "starter": "import * as fs from \"fs\";\nfunction assertNever(value: never): never {\n  throw new Error(\"unhandled \" + String(value));\n}\ntype Cmd = { kind: \"add\"; n: number } | { kind: \"sub\"; n: number } | { kind: \"reset\" };\nfunction apply(total: number, c: Cmd): number {\n  if (c.kind === \"add\") return total + c.n;\n  if (c.kind === \"sub\") return total - c.n;\n  if (c.kind === \"reset\") return 0;\n  ____\n}\nconst cmds: Cmd[] = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\").map((line) => {\n  const [k = \"\", n = \"0\"] = line.trim().split(/\\s+/);\n  return k === \"add\" || k === \"sub\" ? { kind: k, n: Number(n) } : { kind: \"reset\" };\n});\nconsole.log(cmds.reduce(apply, 0));\n",
+        "solution": "import * as fs from \"fs\";\nfunction assertNever(value: never): never {\n  throw new Error(\"unhandled \" + String(value));\n}\ntype Cmd = { kind: \"add\"; n: number } | { kind: \"sub\"; n: number } | { kind: \"reset\" };\nfunction apply(total: number, c: Cmd): number {\n  if (c.kind === \"add\") return total + c.n;\n  if (c.kind === \"sub\") return total - c.n;\n  if (c.kind === \"reset\") return 0;\n  return assertNever(c);\n}\nconst cmds: Cmd[] = fs.readFileSync(0, \"utf8\").trim().split(\"\\n\").map((line) => {\n  const [k = \"\", n = \"0\"] = line.trim().split(/\\s+/);\n  return k === \"add\" || k === \"sub\" ? { kind: k, n: Number(n) } : { kind: \"reset\" };\n});\nconsole.log(cmds.reduce(apply, 0));\n",
+        "tests": [
+          {
+            "input": "add 5\nsub 2\nadd 10",
+            "output": "13"
+          },
+          {
+            "input": "add 3\nreset\nadd 1",
+            "output": "1"
+          },
+          {
+            "input": "sub 4",
+            "output": "-4"
+          }
+        ],
+        "source_slug": ""
+      },
+      {
+        "id": "ts_distributive-partition",
+        "title": "Split a union of results",
+        "prompt": "Each input line is `ok <number>` or `err <message…>`. Parse into `type Result = { ok: true; value: number } | { ok: false; error: string }`, then use `Extract<Result, { ok: true }>` and `Extract<Result, { ok: false }>` to type two arrays filled with type predicates. Print `values: <v…>` (or `values: none`), `sum: <s>`, and each error as `error: <message>`.",
+        "hint": "`Extract` distributes over the union and keeps the members that match the pattern.",
+        "language": "typescript",
+        "kind": "challenge",
+        "difficulty": "Medium",
+        "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+        "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Result = { ok: true; value: number } | { ok: false; error: string };\ntype Ok = Extract<Result, { ok: true }>;\ntype Err = Extract<Result, { ok: false }>;\nconst results: Result[] = input.split(\"\\n\").map((line) => {\n  const [tag = \"\", ...rest] = line.trim().split(/\\s+/);\n  return tag === \"ok\" ? { ok: true, value: Number(rest[0]) } : { ok: false, error: rest.join(\" \") };\n});\nconst oks: Ok[] = results.filter((r): r is Ok => r.ok);\nconst errs: Err[] = results.filter((r): r is Err => !r.ok);\nconsole.log(`values: ${oks.map((r) => r.value).join(\" \") || \"none\"}`);\nconsole.log(`sum: ${oks.reduce((s, r) => s + r.value, 0)}`);\nfor (const e of errs) console.log(`error: ${e.error}`);\n",
+        "tests": [
+          {
+            "input": "ok 3\nerr disk full\nok 4\nerr timeout",
+            "output": "values: 3 4\nsum: 7\nerror: disk full\nerror: timeout"
+          },
+          {
+            "input": "err only one",
+            "output": "values: none\nsum: 0\nerror: only one"
+          }
+        ],
+        "source_slug": ""
+      }
+    ],
+    "cards": [],
+    "quiz": [
+      {
+        "question": "`type F<T> = T extends unknown ? T[] : never`. What is `F<string | number>`?",
+        "options": [
+          "`string[] | number[]`",
+          "`(string | number)[]`",
+          "`never`",
+          "`unknown[]`"
+        ],
+        "answer": 0,
+        "explanation": "A naked type parameter distributes over the union."
+      },
+      {
+        "question": "How do you stop a conditional type from distributing?",
+        "options": [
+          "Wrap both sides in a tuple: `[T] extends [U]`",
+          "Use `infer`",
+          "Add `readonly`",
+          "Use `NoInfer<T>`"
+        ],
+        "answer": 0,
+        "explanation": "`[T]` isn't a naked type parameter, so the union is checked as a whole."
+      },
+      {
+        "question": "A distributive conditional type is given `never`. The result is?",
+        "options": [
+          "`never`",
+          "The true branch",
+          "The false branch",
+          "`unknown`"
+        ],
+        "answer": 0,
+        "explanation": "`never` is the empty union: zero members, zero results."
+      },
+      {
+        "question": "How is `IsNever<T>` written?",
+        "options": [
+          "`[T] extends [never] ? true : false`",
+          "`T extends never ? true : false`",
+          "`T extends unknown ? false : true`",
+          "`never extends T ? true : false`"
+        ],
+        "answer": 0,
+        "explanation": "The distributive version would return `never` for `never`."
+      },
+      {
+        "question": "What does `infer U extends string` do?",
+        "options": [
+          "Captures `U` only if it is a `string`, and types it as one in the true branch",
+          "Converts `U` to a string",
+          "Makes `U` a string at runtime",
+          "Nothing different from `infer U`"
+        ],
+        "answer": 0,
+        "explanation": "The constraint is part of the match (TS 4.7+)."
+      },
+      {
+        "question": "Why is `Exclude<\"a\" | \"b\", \"a\">` equal to `\"b\"`?",
+        "options": [
+          "Each member is tested; `\"a\"` becomes `never` and vanishes from the union",
+          "`Exclude` sorts the union",
+          "String literals are compared by length",
+          "It's a special case in the compiler"
+        ],
+        "answer": 0,
+        "explanation": "`type Exclude<T, U> = T extends U ? never : T` — distribution does the work."
+      }
+    ],
+    "practice": []
+  },
+  {
+    "key": "ts_type_performance",
+    "name": "Type-Level Performance & Limits",
+    "category": "TS: Generics & Type-Level",
+    "what": "Where type-level programming stops: recursion depth and TS2589, tail-recursive conditional types, unions that explode, recursion on plain `string` — and when to stop being clever.",
+    "deep": "The type checker runs your type-level code, and it has limits: a non-tail-recursive conditional type gives up after a few dozen levels of instantiation with TS2589 (\"excessively deep and possibly infinite\"); a tail-recursive one (whose recursive call is the whole branch) can go to 1,000. A union past 100,000 members is TS2590. And a type that parses string literals falls back to plain `string` for a plain `string` input — it has nothing to parse.",
+    "java": "Java's type checker doesn't run programs, so it has no such limits — and no such power. The trade-off in TypeScript is the same as with any runtime: an algorithm that is fine for ten items can time out at ten thousand, and a type that is fine for a small union can stall the editor.",
+    "language": "typescript",
+    "lesson": "### Why it exists\nThe last few weeks turned the type system into a programming language: it\nbranches (conditional types), loops (recursion), pattern-matches (`infer`) and\nbuilds strings (template literals). Like any language it has a runtime — the\ntype checker — and that runtime has resource limits.\n\nYou'll meet them in two ways. Loudly, as an error: \"Type instantiation is\nexcessively deep and possibly infinite.\" Or quietly, as an editor that takes\nseconds to show a hover, and a build that got slower one clever type at a time.\nKnowing where the limits are — and the handful of techniques that keep types\ncheap — lets you use type-level code where it earns its keep and stop before it\nbecomes the problem.\n\n### The core idea\n**Recursion depth.** Every recursive step of a conditional type is an\ninstantiation, and the checker caps how deep it will go. A recursive type whose\nrecursive call is *wrapped* in something — `[0, ...Build<N, …>]` — stops at a\ndepth of a few dozen levels (the 80-deep pitfall below already fails) with **TS2589**.\n\n**Tail recursion goes further.** When the recursive reference *is* the whole\nbranch — nothing wrapped around it — the checker evaluates it in a loop, up to\n1,000 iterations (TS 4.5+). The trick is the same as in runtime code: carry the\nresult in an accumulator parameter.\n\n```ts\n// wrapped: fails after a few dozen levels\ntype BuildWrapped<N extends number, T extends unknown[] = []> =\n  T[\"length\"] extends N ? [] : [0, ...BuildWrapped<N, [...T, 0]>];\n// tail-recursive: fine to 999\ntype Build<N extends number, Acc extends unknown[] = []> =\n  Acc[\"length\"] extends N ? Acc : Build<N, [...Acc, 0]>;\n```\n\n**Unions multiply.** A template literal with union placeholders produces every\ncombination: five 10-member unions make 100,000 members. Past 100,000 the\nchecker refuses with **TS2590**. Use a pattern type (`` `${number}` ``,\n`` `#${string}` ``) instead of enumerating.\n\n**Recursion on non-literals.** A type that parses a string, like\n`Split<S, \" \">`, only works when `S` is a *literal*. Given plain `string` (a\nvalue read at runtime), there is nothing to parse; decide explicitly what that\ncase returns — usually `string[]` — with a `string extends S ? … : …` check.\n\n**Keeping types cheap.**\n\n- Name intermediate types; the checker caches named instantiations.\n- Prefer `interface … extends` to big intersections — interfaces are cached,\n  intersections are recomputed.\n- Constrain early (`K extends keyof T`) so the checker does less work per step.\n- Type-level arithmetic with tuples is a toy: fine for tuple lengths, wrong for\n  real numbers.\n\n**When to stop.** A type is worth its complexity when it catches real mistakes\nat the call sites of a widely used API — a router, a query builder, a typed\nevent bus. It is not worth it when a plain type and a runtime check would do,\nor when nobody on the team can read it. `tsc --extendedDiagnostics` and\n`--generateTrace` show where checking time goes.\n\n### Worked examples\n#### Tail recursion with an accumulator\n```ts\ntype Build<N extends number, Acc extends unknown[] = []> = Acc[\"length\"] extends N ? Acc : Build<N, [...Acc, 0]>;\ntype Length<T extends readonly unknown[]> = T[\"length\"];\n\ntype Hundred = Build<100>;\nconst size: Length<Hundred> = 100;\nconst zeros = Array.from({ length: size }, () => 0);\nconsole.log(zeros.length, zeros.every((z) => z === 0));\n```\n\nPrints:\n```text\n100 true\n```\n\n`Build<100>` recurses 100 times — past the wrapped-recursion limit, but fine for a tail call. The result's `length` is the literal type `100`, so `const size: Length<Hundred> = 100` only accepts exactly 100.\n\n#### A pattern instead of an enumeration\n```ts\ntype Hex = `#${string}`;\ntype Percent = `${number}%`;\n\nfunction parseColour(text: string): Hex | undefined {\n  return /^#[0-9a-f]{6}$/i.test(text) ? (text.toLowerCase() as Hex) : undefined;\n}\nfunction scale(p: Percent, of: number): number {\n  return (parseFloat(p) / 100) * of;\n}\nconsole.log(parseColour(\"#3355FF\"), parseColour(\"blue\"));\nconsole.log(scale(\"25%\", 80), scale(\"12.5%\", 8));\n```\n\nPrints:\n```text\n#3355ff undefined\n20 1\n```\n\nEnumerating every hex colour as a union would be 16.7 million members; `` `#${string}` `` is one pattern type the checker handles instantly. Combine it with a runtime check for the exact format.\n\n#### Parsing literals, with a fallback for `string`\n```ts\ntype Split<S extends string> = string extends S\n  ? string[]\n  : S extends `${infer Head} ${infer Rest}`\n    ? [Head, ...Split<Rest>]\n    : [S];\n\nfunction words<S extends string>(s: S): Split<S> {\n  return s.split(\" \") as Split<S>;\n}\n\nconst known = words(\"red green blue\");   // [\"red\", \"green\", \"blue\"]\nconst fromInput = words([\"a\", \"b\", \"c\"].join(\" \"));   // string[]\nconsole.log(known[2].toUpperCase(), known.length);\nconsole.log(fromInput.length, fromInput[1] ?? \"-\");\n```\n\nPrints:\n```text\nBLUE 3\n3 b\n```\n\nFor a literal, `Split` computes the exact tuple, so `known[2]` is `\"blue\"`. For a runtime `string` it falls back to `string[]` — without the `string extends S` check it would claim a one-element tuple.\n\n### What the compiler says\n```ts\ntype BuildWrapped<N extends number, T extends unknown[] = []> =\n  T[\"length\"] extends N ? [] : [0, ...BuildWrapped<N, [...T, 0]>];\ntype Many = BuildWrapped<200>;\nconst m: Many = [];\n```\n```text\nline 3: error TS2589: Type instantiation is excessively deep and possibly infinite.\n```\n\nThe recursive call is wrapped in a tuple spread, so it isn't a tail call and hits the depth limit. Carry the result in an accumulator and return the recursive call directly.\n\n```ts\ntype Digit = \"0\" | \"1\" | \"2\" | \"3\" | \"4\" | \"5\" | \"6\" | \"7\" | \"8\" | \"9\";\ntype Code = `${Digit}${Digit}${Digit}${Digit}${Digit}${Digit}`;\nconst c: Code = \"123456\";\n```\n```text\nline 2: error TS2590: Expression produces a union type that is too complex to represent.\n```\n\nSix 10-member unions make a million combinations; the checker gives up past 100,000. Use `` `${number}` `` plus a runtime length check, or a branded string from a parser.\n\n### Pitfalls\n#### Recursion that isn't a tail call\n```ts\ntype BuildWrapped<N extends number, T extends unknown[] = []> =\n  T[\"length\"] extends N ? [] : [0, ...BuildWrapped<N, [...T, 0]>];\nconst row: BuildWrapped<80>[\"length\"] = 80;\nconsole.log(row);\n```\nThe compiler says:\n```text\nline 3: error TS2589: Type instantiation is excessively deep and possibly infinite.\n```\n\nSame result, but the second form's recursive call is the entire branch, so the checker runs it as a loop.\n\n```ts\ntype Build<N extends number, Acc extends unknown[] = []> =\n  Acc[\"length\"] extends N ? Acc : Build<N, [...Acc, 0]>;\nconst row: Build<80>[\"length\"] = 80;\nconsole.log(row);\n```\nPrints:\n```text\n80\n```\n\n#### A string parser given a plain `string`\n```ts\ntype Split<S extends string> = S extends `${infer Head} ${infer Rest}` ? [Head, ...Split<Rest>] : [S];\nfunction words<S extends string>(s: S): Split<S> {\n  return s.split(\" \") as Split<S>;\n}\nconst line: string = [\"a\", \"b\", \"c\"].join(\" \");\nconst [first, second] = words(line);\nconsole.log(first, second);\n```\nThe compiler says:\n```text\nline 6: error TS2493: Tuple type '[string]' of length '1' has no element at index '1'.\n```\n\n`string` doesn't match the pattern, so the first version says the result is `[string]` — one element — and rejects `second`, although the runtime array has three. Test `string extends S` first and return the honest general type.\n\n```ts\ntype Split<S extends string> = string extends S ? string[] : S extends `${infer Head} ${infer Rest}` ? [Head, ...Split<Rest>] : [S];\nfunction words<S extends string>(s: S): Split<S> {\n  return s.split(\" \") as Split<S>;\n}\nconst line: string = [\"a\", \"b\", \"c\"].join(\" \");\nconst [first, second] = words(line);\nconsole.log(first, second);\n```\nPrints:\n```text\na b\n```\n\n#### Enumerating what a pattern can describe\n```ts\ntype Digit = \"0\" | \"1\" | \"2\" | \"3\" | \"4\" | \"5\" | \"6\" | \"7\" | \"8\" | \"9\";\ntype Pin = `${Digit}${Digit}${Digit}${Digit}${Digit}${Digit}`;\nconst pin: Pin = \"004271\";\nconsole.log(pin.length);\n```\nThe compiler says:\n```text\nline 2: error TS2590: Expression produces a union type that is too complex to represent.\n```\n\nA million-member union is too big to check. A parser and a brand (week 16) give the same guarantee — only valid PINs reach code that takes `Pin` — at no type-level cost.\n\n```ts\ndeclare const PinBrand: unique symbol;\ntype Pin = string & { readonly [PinBrand]: true };\nconst parsePin = (s: string): Pin | undefined => (/^\\d{6}$/.test(s) ? (s as Pin) : undefined);\nconst pin = parsePin(\"004271\");\nconsole.log(pin === undefined ? \"bad pin\" : pin.length);\n```\nPrints:\n```text\n6\n```\n\n### Where it shows up later\n- **Week 27 — Capstone.** Decide, for your own typed CLI, which guarantees are worth type-level code and which are runtime checks.\n- **TypeScript 7** (week 14): the native compiler makes checking faster, but the same depth and union limits apply.\n\n### In an interview\n\n**You hit \"Type instantiation is excessively deep\". What do you do?**\n\nCheck whether the recursion is really infinite; if not, make it tail-recursive — carry the result in an accumulator parameter so the recursive reference is the entire branch — which raises the limit from a few dozen levels to 1,000. If it still doesn't fit, the type is probably doing a runtime job and should be simplified.\n\n**How do you keep a large codebase's type checking fast?**\n\nName intermediate types so they're cached, prefer `interface extends` over big intersections, avoid unions that explode through template literals, constrain generics early, and measure with `--extendedDiagnostics` or `--generateTrace` before optimising. TypeScript 7's native compiler helps, but doesn't remove those limits.\n\n**When should you not use advanced types?**\n\nWhen a simpler type plus a runtime check gives the same safety, or when the type is harder to read than the bug it prevents. Type-level code pays off in widely used APIs — routers, ORMs, event buses — where it catches mistakes at hundreds of call sites.",
+    "exercises": [
+      {
+        "id": "ts_type_performance-build",
+        "title": "A tail-recursive tuple",
+        "prompt": "`Build<N>` should produce a tuple of `N` zeros, tail-recursively. Replace `____` with the recursive branch so `Build<120>` compiles.",
+        "hint": "Return the recursive call itself, with one more element in the accumulator.",
+        "language": "typescript",
+        "kind": "drill",
+        "difficulty": "",
+        "starter": "import * as fs from \"fs\";\ntype Build<N extends number, Acc extends unknown[] = []> = Acc[\"length\"] extends N ? Acc : ____;\nconst size: Build<120>[\"length\"] = 120;\nconst n = Number(fs.readFileSync(0, \"utf8\").trim());\nconst row = Array.from({ length: Math.min(n, size) }, (_, i) => i % 10);\nconsole.log(row.join(\"\"));\nconsole.log(`${row.length} of at most ${size}`);\n",
+        "solution": "import * as fs from \"fs\";\ntype Build<N extends number, Acc extends unknown[] = []> = Acc[\"length\"] extends N ? Acc : Build<N, [...Acc, 0]>;\nconst size: Build<120>[\"length\"] = 120;\nconst n = Number(fs.readFileSync(0, \"utf8\").trim());\nconst row = Array.from({ length: Math.min(n, size) }, (_, i) => i % 10);\nconsole.log(row.join(\"\"));\nconsole.log(`${row.length} of at most ${size}`);\n",
+        "tests": [
+          {
+            "input": "12",
+            "output": "012345678901\n12 of at most 120"
+          },
+          {
+            "input": "0",
+            "output": "\n0 of at most 120"
+          },
+          {
+            "input": "130",
+            "output": "012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789\n120 of at most 120"
+          }
+        ],
+        "source_slug": ""
+      },
+      {
+        "id": "ts_type_performance-split",
+        "title": "A fallback for plain strings",
+        "prompt": "Replace `____` with the check that makes `Split` return `string[]` when `S` is plain `string`, so the runtime line can be split and its words read safely.",
+        "hint": "Put `string` on the left: \"is plain `string` assignable to `S`?\" is true only when `S` is `string` itself.",
+        "language": "typescript",
+        "kind": "drill",
+        "difficulty": "",
+        "starter": "import * as fs from \"fs\";\ntype Split<S extends string> = ____ ? string[] : S extends `${infer H},${infer R}` ? [H, ...Split<R>] : [S];\nfunction fields<S extends string>(s: S): Split<S> {\n  return s.split(\",\") as Split<S>;\n}\nconst header = fields(\"name,age\");\nfor (const line of fs.readFileSync(0, \"utf8\").trim().split(\"\\n\")) {\n  const values = fields(line);\n  console.log(`${header[0]}=${values[0] ?? \"?\"} ${header[1]}=${values[1] ?? \"?\"} (+${Math.max(0, values.length - 2)} extra)`);\n}\n",
+        "solution": "import * as fs from \"fs\";\ntype Split<S extends string> = string extends S ? string[] : S extends `${infer H},${infer R}` ? [H, ...Split<R>] : [S];\nfunction fields<S extends string>(s: S): Split<S> {\n  return s.split(\",\") as Split<S>;\n}\nconst header = fields(\"name,age\");\nfor (const line of fs.readFileSync(0, \"utf8\").trim().split(\"\\n\")) {\n  const values = fields(line);\n  console.log(`${header[0]}=${values[0] ?? \"?\"} ${header[1]}=${values[1] ?? \"?\"} (+${Math.max(0, values.length - 2)} extra)`);\n}\n",
+        "tests": [
+          {
+            "input": "ana,31\nbo,25,x,y",
+            "output": "name=ana age=31 (+0 extra)\nname=bo age=25 (+2 extra)"
+          },
+          {
+            "input": "solo",
+            "output": "name=solo age=? (+0 extra)"
+          }
+        ],
+        "source_slug": ""
+      },
+      {
+        "id": "ts_type_performance-depth",
+        "title": "How deep is this JSON?",
+        "prompt": "Types have a recursion limit; so does runtime code, and so do data formats. Each input line is JSON. Print its nesting depth (a primitive is 0, `[]`/`{}` is 1, `[[1]]` is 2) and `too deep` instead when it exceeds 5, computing depth with a recursive function over `unknown`.",
+        "hint": "An array or object is one level more than its deepest child; `Math.max(0, …)` handles the empty case.",
+        "language": "typescript",
+        "kind": "challenge",
+        "difficulty": "Medium",
+        "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+        "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nfunction depth(value: unknown): number {\n  if (Array.isArray(value)) return 1 + Math.max(0, ...value.map(depth));\n  if (typeof value === \"object\" && value !== null) return 1 + Math.max(0, ...Object.values(value).map(depth));\n  return 0;\n}\nfor (const line of input.split(\"\\n\")) {\n  const d = depth(JSON.parse(line));\n  console.log(d > 5 ? \"too deep\" : d);\n}\n",
+        "tests": [
+          {
+            "input": "1\n[]\n[[1]]\n{\"a\":{\"b\":[1,{\"c\":2}]}}\n[[[[[[0]]]]]]",
+            "output": "0\n1\n2\n4\ntoo deep"
+          },
+          {
+            "input": "\"x\"\n{}",
+            "output": "0\n1"
+          }
+        ],
+        "source_slug": ""
+      }
+    ],
+    "cards": [],
+    "quiz": [
+      {
+        "question": "What does TS2589 mean?",
+        "options": [
+          "Type instantiation is excessively deep and possibly infinite",
+          "A union has too many members",
+          "A type is used before it is declared",
+          "A generic has too many parameters"
+        ],
+        "answer": 0,
+        "explanation": "Usually a non-tail-recursive type, or genuinely infinite recursion."
+      },
+      {
+        "question": "Which recursive type can go deepest?",
+        "options": [
+          "One whose recursive call is the whole branch, with the result carried in an accumulator",
+          "One wrapped in a tuple spread",
+          "One using `infer`",
+          "Any recursive interface"
+        ],
+        "answer": 0,
+        "explanation": "Tail-recursive conditional types are evaluated iteratively, up to 1,000 steps."
+      },
+      {
+        "question": "A template literal of six 10-member unions is…",
+        "options": [
+          "A million members — TS2590, too complex to represent",
+          "60 members",
+          "Fine, unions are free",
+          "Automatically widened to `string`"
+        ],
+        "answer": 0,
+        "explanation": "Unions in template literals multiply. Use a pattern like `` `${number}` ``."
+      },
+      {
+        "question": "`Split<string>` with no special case returns `[string]`. Why is that wrong?",
+        "options": [
+          "A plain `string` has nothing to parse; the honest answer is `string[]`",
+          "`Split` can't take `string`",
+          "It should be `never`",
+          "It is right"
+        ],
+        "answer": 0,
+        "explanation": "Check `string extends S` first."
+      },
+      {
+        "question": "Which is cheaper for the checker?",
+        "options": [
+          "`interface C extends A, B {}`",
+          "`type C = A & B & …` with many parts",
+          "They are identical",
+          "Neither can be cached"
+        ],
+        "answer": 0,
+        "explanation": "Interfaces are cached by name; large intersections are recomputed."
+      },
+      {
+        "question": "When is complex type-level code worth it?",
+        "options": [
+          "When it catches real mistakes at many call sites of a widely used API",
+          "Always — more types are safer",
+          "Never",
+          "Only in libraries"
+        ],
+        "answer": 0,
+        "explanation": "Otherwise a plain type and a runtime check are cheaper to read and to check."
+      }
+    ],
+    "practice": []
+  },
+  {
     "key": "jp_coding_basics",
     "name": "Coding Basics — プログラミングの基礎",
     "category": "JP: Coding Basics",
