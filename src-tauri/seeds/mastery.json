@@ -10914,6 +10914,215 @@
             "explanation": "`fromEntries` accepts any iterable of pairs, including a Map."
           },
           {
+            "question": "What does `map.delete(k)` return?",
+            "options": [
+              "`true` if the key was there, `false` otherwise",
+              "The deleted value",
+              "The map",
+              "`undefined`"
+            ],
+            "answer": 0,
+            "explanation": "Handy for \"remove if present\" logic in one call."
+          },
+          {
+            "question": "A `Set` already holds `1`. Where does `set.add(1)` put it?",
+            "options": [
+              "Nowhere new — it stays in its original position",
+              "At the end",
+              "At the start",
+              "It throws"
+            ],
+            "answer": 0,
+            "explanation": "Re-adding doesn't move an element; insertion order is first insertion."
+          },
+          {
+            "question": "What is `new Set(\"hello\").size`?",
+            "options": [
+              "`4`",
+              "`5`",
+              "`1`",
+              "`0`"
+            ],
+            "answer": 0,
+            "explanation": "A string is iterable by character; the two `l`s collapse."
+          },
+          {
+            "question": "What is `[...new Set(\"banana\")].join(\"\")`?",
+            "options": [
+              "`\"ban\"`",
+              "`\"banana\"`",
+              "`\"abn\"`",
+              "`\"b\"`"
+            ],
+            "answer": 0,
+            "explanation": "Distinct characters in first-seen order."
+          },
+          {
+            "question": "What happens on `new WeakMap().set(\"k\", 1)`?",
+            "options": [
+              "A TypeError — WeakMap keys must be objects",
+              "It works like a Map",
+              "It returns `undefined`",
+              "The key is converted to an object"
+            ],
+            "answer": 0,
+            "explanation": "Weak keys exist so entries can disappear with their object; a string can't be collected that way."
+          },
+          {
+            "question": "`const m = new Map([[NaN, \"x\"]]);` — what is `m.get(NaN)`?",
+            "options": [
+              "`\"x\"`",
+              "`undefined`",
+              "A TypeError",
+              "`NaN`"
+            ],
+            "answer": 0,
+            "explanation": "Map keys use SameValueZero, so `NaN` matches `NaN`."
+          },
+          {
+            "question": "What is `({ 1: \"a\" })[\"1\"]`?",
+            "options": [
+              "`\"a\"` — object keys are strings",
+              "`undefined`",
+              "A TypeError",
+              "`1`"
+            ],
+            "answer": 0,
+            "explanation": "The number key `1` is stored as `\"1\"`. A `Map` keeps `1` and `\"1\"` apart."
+          },
+          {
+            "question": "What is the size property of a `Map` called?",
+            "options": [
+              "`size`",
+              "`length`",
+              "`count`",
+              "`size()`"
+            ],
+            "answer": 0,
+            "explanation": "A property, not a method — and not `length`."
+          },
+          {
+            "question": "What does `new Set([1, 2]).isSubsetOf(new Set([1, 2, 3]))` return?",
+            "options": [
+              "`true`",
+              "`false`",
+              "A new Set",
+              "`[1, 2]`"
+            ],
+            "answer": 0,
+            "explanation": "ES2025 Set methods answer set questions directly."
+          },
+          {
+            "question": "What does `a.isDisjointFrom(b)` test?",
+            "options": [
+              "That `a` and `b` share no elements",
+              "That they're equal",
+              "That `a` is empty",
+              "That `b` contains `a`"
+            ],
+            "answer": 0,
+            "explanation": "The opposite of a non-empty intersection."
+          },
+          {
+            "question": "What is `[...new Set([1, 2, 3]).symmetricDifference(new Set([2, 3, 4]))]`?",
+            "options": [
+              "`[1, 4]`",
+              "`[2, 3]`",
+              "`[1, 2, 3, 4]`",
+              "`[]`"
+            ],
+            "answer": 0,
+            "explanation": "Elements in exactly one of the sets."
+          },
+          {
+            "question": "In what order does `Object.keys({ b: 1, 2: \"x\", a: 2, 1: \"y\" })` list keys?",
+            "options": [
+              "`[\"1\", \"2\", \"b\", \"a\"]`",
+              "`[\"b\", \"2\", \"a\", \"1\"]`",
+              "`[\"1\", \"2\", \"a\", \"b\"]`",
+              "Random"
+            ],
+            "answer": 0,
+            "explanation": "Integer-like keys first in ascending order, then string keys in insertion order. A `Map` keeps pure insertion order."
+          },
+          {
+            "question": "How do you build a `Map` from an object?",
+            "options": [
+              "`new Map(Object.entries(obj))`",
+              "`new Map(obj)`",
+              "`Map.from(obj)`",
+              "`obj.toMap()`"
+            ],
+            "answer": 0,
+            "explanation": "`Object.entries` gives the `[key, value]` pairs the constructor wants."
+          },
+          {
+            "question": "What is the counting idiom for a `Map<string, number>`?",
+            "options": [
+              "`m.set(k, (m.get(k) ?? 0) + 1)`",
+              "`m[k]++`",
+              "`m.get(k)++`",
+              "`m.set(k, m.get(k) + 1)`"
+            ],
+            "answer": 0,
+            "explanation": "`get` may return `undefined`; `?? 0` handles the first occurrence."
+          },
+          {
+            "question": "Why is `map[key] = value` on a `Map` a bug?",
+            "options": [
+              "It sets an ordinary property on the object, not a map entry",
+              "It's a syntax error",
+              "It throws",
+              "It's the same as `set`"
+            ],
+            "answer": 0,
+            "explanation": "`map.get(key)` won't see it, and `size` doesn't change."
+          },
+          {
+            "question": "Which structure answers \"have I seen this before?\" in O(1) on average?",
+            "options": [
+              "A `Set`",
+              "An array with `includes`",
+              "A sorted array",
+              "A string"
+            ],
+            "answer": 0,
+            "explanation": "`includes` scans the whole array."
+          },
+          {
+            "question": "What does `map.forEach((value, key) => …)` pass first?",
+            "options": [
+              "The value",
+              "The key",
+              "The index",
+              "The entry"
+            ],
+            "answer": 0,
+            "explanation": "Same order as arrays (`value, index`); easy to get backwards."
+          },
+          {
+            "question": "When should keys be objects in a `Map`?",
+            "options": [
+              "When identity is what matters — e.g. metadata attached to specific objects",
+              "Never",
+              "Always — they're faster",
+              "Only for JSON"
+            ],
+            "answer": 0,
+            "explanation": "Two equal-looking objects are different keys."
+          },
+          {
+            "question": "What is the average cost of `map.get(k)`?",
+            "options": [
+              "O(1)",
+              "O(log n)",
+              "O(n)",
+              "O(n log n)"
+            ],
+            "answer": 0,
+            "explanation": "Hash-based lookup; that's why maps turn O(n²) pair searches into O(n)."
+          },
+          {
             "question": "What does `a.difference(b)` return?",
             "options": [
               "A new set of the members of `a` that are not in `b`",
@@ -11933,6 +12142,215 @@
             "explanation": "Interfaces describe object shapes only; aliases can name any type."
           },
           {
+            "question": "`const o = { a: 1 } as const; o.a = 2;` — result?",
+            "options": [
+              "TS2540: `a` is read-only",
+              "It works",
+              "`o.a` becomes `2 | 1`",
+              "A runtime TypeError"
+            ],
+            "answer": 0,
+            "explanation": "`as const` makes every property `readonly` and literal."
+          },
+          {
+            "question": "What is `let mode = \"dark\" as const` typed as?",
+            "options": [
+              "`\"dark\"`",
+              "`string`",
+              "`readonly \"dark\"`",
+              "`any`"
+            ],
+            "answer": 0,
+            "explanation": "`as const` stops the widening a `let` would do."
+          },
+          {
+            "question": "What does a union `A | B` let you do without narrowing?",
+            "options": [
+              "Use only what both `A` and `B` have",
+              "Use anything either has",
+              "Nothing at all",
+              "Only call methods"
+            ],
+            "answer": 0,
+            "explanation": "Narrow first to reach one member's own properties."
+          },
+          {
+            "question": "What is `string | never`?",
+            "options": [
+              "`string`",
+              "`never`",
+              "`string | never`",
+              "`unknown`"
+            ],
+            "answer": 0,
+            "explanation": "`never` is the empty union and disappears."
+          },
+          {
+            "question": "What is `unknown | string`?",
+            "options": [
+              "`unknown`",
+              "`string`",
+              "`never`",
+              "`string | unknown` — it doesn't simplify"
+            ],
+            "answer": 0,
+            "explanation": "`unknown` already contains every type."
+          },
+          {
+            "question": "How do you type a value that is one of three string literals?",
+            "options": [
+              "`\"s\" | \"m\" | \"l\"`",
+              "`enum`",
+              "`string[]`",
+              "`[\"s\", \"m\", \"l\"]`"
+            ],
+            "answer": 0,
+            "explanation": "A literal union — erasable, and the compiler checks every use."
+          },
+          {
+            "question": "Why is `function setSize(s: string)` weaker than `function setSize(s: \"s\" | \"m\" | \"l\")`?",
+            "options": [
+              "The first accepts typos; the second rejects them at compile time",
+              "It isn't",
+              "The second is slower",
+              "The first can't be called with literals"
+            ],
+            "answer": 0,
+            "explanation": "Literal unions move validation of known values to the compiler."
+          },
+          {
+            "question": "How do you get a runtime list AND a type of sizes from one declaration?",
+            "options": [
+              "`const SIZES = [\"s\", \"m\"] as const; type Size = (typeof SIZES)[number];`",
+              "`type Size = [\"s\", \"m\"]`",
+              "`enum Size`",
+              "Declare both separately"
+            ],
+            "answer": 0,
+            "explanation": "One source of truth: the array exists at runtime, the type is derived."
+          },
+          {
+            "question": "A numeric enum `enum E { A, B }` — what is `E[0]`?",
+            "options": [
+              "`\"A\"` — numeric enums have reverse mappings",
+              "`0`",
+              "`undefined`",
+              "A compile error"
+            ],
+            "answer": 0,
+            "explanation": "One reason numeric enums surprise people; this track uses literal unions."
+          },
+          {
+            "question": "What does `type Pair = [string, number]` name?",
+            "options": [
+              "A tuple type",
+              "An array of strings or numbers",
+              "An object type",
+              "A function type"
+            ],
+            "answer": 0,
+            "explanation": "Aliases can name any type."
+          },
+          {
+            "question": "Can an alias refer to itself, like `type Tree = { value: number; kids: Tree[] }`?",
+            "options": [
+              "Yes — recursive type aliases are allowed",
+              "No, only interfaces can",
+              "Only with `as const`",
+              "Only in `.d.ts` files"
+            ],
+            "answer": 0,
+            "explanation": "Recursive data is common: trees, JSON, linked lists."
+          },
+          {
+            "question": "What does `type Maybe = string | null | undefined` describe?",
+            "options": [
+              "A string, or no value in either form",
+              "A string that can't be empty",
+              "An optional property",
+              "Always `string`"
+            ],
+            "answer": 0,
+            "explanation": "Aliases keep long unions readable."
+          },
+          {
+            "question": "`function f(d: \"up\" | \"down\")`, `const dir = \"up\"; f(dir);` — does it compile?",
+            "options": [
+              "Yes — a `const` keeps the literal type `\"up\"`",
+              "No — `dir` is a `string`",
+              "Only with `as const`",
+              "Only with an annotation"
+            ],
+            "answer": 0,
+            "explanation": "A `let` would widen and fail."
+          },
+          {
+            "question": "`const cfg = { mode: \"dark\" }; f(cfg.mode)` where `f` takes `\"dark\" | \"light\"` — does it compile?",
+            "options": [
+              "No — object properties widen to `string`",
+              "Yes",
+              "Only in strict mode",
+              "Yes, with a warning"
+            ],
+            "answer": 0,
+            "explanation": "Fix with `as const`, an annotation, or `satisfies`."
+          },
+          {
+            "question": "What is `\"a\" | \"b\" | \"a\"`?",
+            "options": [
+              "`\"a\" | \"b\"`",
+              "An error",
+              "Three members",
+              "`string`"
+            ],
+            "answer": 0,
+            "explanation": "Unions dedupe their members."
+          },
+          {
+            "question": "Which is a template literal type?",
+            "options": [
+              "`` `id-${number}` ``",
+              "`\"id-\" + number`",
+              "`String<\"id\">`",
+              "`id${number}`"
+            ],
+            "answer": 0,
+            "explanation": "It matches strings like `id-7`; week 22 goes deeper."
+          },
+          {
+            "question": "Which is erasable: `enum`, a literal union, or `namespace`?",
+            "options": [
+              "A literal union",
+              "`enum`",
+              "`namespace`",
+              "All three"
+            ],
+            "answer": 0,
+            "explanation": "Types are deleted; `enum` and `namespace` generate code."
+          },
+          {
+            "question": "What does `x as \"a\" | \"b\"` do at runtime when `x` is `\"z\"`?",
+            "options": [
+              "Nothing — the value is still `\"z\"`",
+              "Throws",
+              "Converts it to `\"a\"`",
+              "Returns `undefined`"
+            ],
+            "answer": 0,
+            "explanation": "An assertion isn't a check. Validate with `includes`/`find` first."
+          },
+          {
+            "question": "When is an alias better than repeating a union inline?",
+            "options": [
+              "When the union is used in several places — one edit changes all of them",
+              "Never",
+              "Only for primitives",
+              "Only when exporting"
+            ],
+            "answer": 0,
+            "explanation": "Names document intent and stop the copies drifting."
+          },
+          {
             "question": "`let d = \"up\"` — what type is `d`?",
             "options": [
               "`string`",
@@ -12918,6 +13336,149 @@
             "explanation": "It's the one widely accepted use of `==`: `null == undefined` is `true`, and nothing else is loosely equal to either."
           },
           {
+            "question": "With `x: string | number` and `y: string | boolean`, what is `x` inside `if (x === y)`?",
+            "options": [
+              "`string`",
+              "`string | number`",
+              "`never`",
+              "`string | number | boolean`"
+            ],
+            "answer": 0,
+            "explanation": "Equality narrows both sides to the types they have in common."
+          },
+          {
+            "question": "What does `if (x != null)` exclude?",
+            "options": [
+              "Both `null` and `undefined`",
+              "Only `null`",
+              "Only `undefined`",
+              "All falsy values"
+            ],
+            "answer": 0,
+            "explanation": "The loose inequality is the one accepted use of `!=`."
+          },
+          {
+            "question": "What does `typeof x === \"function\"` narrow an `unknown` to?",
+            "options": [
+              "`Function`",
+              "`() => void`",
+              "`object`",
+              "Nothing"
+            ],
+            "answer": 0,
+            "explanation": "You'll usually need more checks before calling it with arguments."
+          },
+          {
+            "question": "What does `obj.method?.()` do when `method` is undefined?",
+            "options": [
+              "Evaluates to `undefined` without calling anything",
+              "Throws a TypeError",
+              "Calls `obj`",
+              "Returns `null`"
+            ],
+            "answer": 0,
+            "explanation": "Optional call — `?.` before the parentheses."
+          },
+          {
+            "question": "Does narrowing survive into a callback for a `let` that is reassigned later?",
+            "options": [
+              "No — the callback might run after the reassignment",
+              "Yes, always",
+              "Only in arrow functions",
+              "Only with `strict`"
+            ],
+            "answer": 0,
+            "explanation": "Copy it into a `const` first, or restructure so it isn't reassigned."
+          },
+          {
+            "question": "What does `x instanceof Error` narrow `unknown` to?",
+            "options": [
+              "`Error`",
+              "`object`",
+              "`string`",
+              "Nothing — `instanceof` doesn't narrow `unknown`"
+            ],
+            "answer": 0,
+            "explanation": "The standard way to read `message` from a caught value."
+          },
+          {
+            "question": "In `switch (typeof x)` with `case \"number\":`, what is `x` inside that case?",
+            "options": [
+              "`number`",
+              "`unknown`",
+              "`string`",
+              "`typeof x`"
+            ],
+            "answer": 0,
+            "explanation": "Switching on `typeof` narrows like `if` does."
+          },
+          {
+            "question": "What is the danger of `if (s)` when `s: string | undefined`?",
+            "options": [
+              "An empty string is treated like `undefined`",
+              "None",
+              "It's a compile error",
+              "It always passes"
+            ],
+            "answer": 0,
+            "explanation": "Check `s !== undefined` when `\"\"` is a valid value."
+          },
+          {
+            "question": "What does `a ?? b ?? c` return?",
+            "options": [
+              "The first of `a`, `b` that isn't nullish, else `c`",
+              "The first truthy value",
+              "`c` always",
+              "A syntax error"
+            ],
+            "answer": 0,
+            "explanation": "Chaining `??` picks the first non-null, non-undefined value."
+          },
+          {
+            "question": "Why does `const len = maybe!.length` compile when `maybe` could be undefined?",
+            "options": [
+              "`!` tells the compiler to trust you — and crashes at runtime if you're wrong",
+              "It checks at runtime",
+              "`!` converts undefined to \"\"",
+              "It doesn't compile"
+            ],
+            "answer": 0,
+            "explanation": "Use it only when you've proven non-nullness some other way."
+          },
+          {
+            "question": "Which narrows `pet: Fish | Bird` without a tag?",
+            "options": [
+              "`\"swim\" in pet`",
+              "`pet is Fish`",
+              "`typeof pet === \"Fish\"`",
+              "`pet instanceof Fish` for type aliases"
+            ],
+            "answer": 0,
+            "explanation": "`in` narrows on a property only one member declares."
+          },
+          {
+            "question": "A custom type guard `isString(x): x is string` returns `true` for numbers by mistake. What happens?",
+            "options": [
+              "The compiler trusts it, and the bug surfaces later at runtime",
+              "The compiler catches it",
+              "It throws",
+              "It's ignored"
+            ],
+            "answer": 0,
+            "explanation": "Type predicates are promises the compiler can't check — keep them tiny and tested."
+          },
+          {
+            "question": "After `if (typeof x === \"string\" || typeof x === \"number\") { … }`, what is `x` inside for `x: unknown`?",
+            "options": [
+              "`string | number`",
+              "`unknown`",
+              "`string`",
+              "`never`"
+            ],
+            "answer": 0,
+            "explanation": "Narrowing unions the branches."
+          },
+          {
             "question": "What changes if you write `function isPerson(x: unknown): boolean` instead of `: x is Person`?",
             "options": [
               "The function still runs but no longer narrows x at the call site",
@@ -13898,6 +14459,215 @@
             ],
             "answer": 0,
             "explanation": "Narrowing on the tag would leave a union of both members — the point of the tag is lost."
+          },
+          {
+            "question": "`const { kind, payload } = action;` — does `if (kind === \"add\")` narrow `payload`?",
+            "options": [
+              "Yes, since TS 4.6, when destructured from a `const` or parameter and not reassigned",
+              "No, never",
+              "Only inside a `switch`",
+              "Only if `payload` is annotated"
+            ],
+            "answer": 0,
+            "explanation": "Destructured discriminated unions keep the link between the tag and the other destructured fields."
+          },
+          {
+            "question": "What is `never & string`?",
+            "options": [
+              "`never`",
+              "`string`",
+              "`never & string`",
+              "`unknown`"
+            ],
+            "answer": 0,
+            "explanation": "Intersecting with the empty set gives the empty set."
+          },
+          {
+            "question": "What does the type `object` accept?",
+            "options": [
+              "Any non-primitive — objects, arrays, functions",
+              "Only plain `{}` objects",
+              "Everything except `null`",
+              "Strings too"
+            ],
+            "answer": 0,
+            "explanation": "`{}` is wider: it also accepts primitives."
+          },
+          {
+            "question": "What is `assertNever(x: never): never` for?",
+            "options": [
+              "An exhaustiveness check that also throws if an impossible value arrives at runtime",
+              "Creating `never` values",
+              "Suppressing errors",
+              "Asserting a value is not null"
+            ],
+            "answer": 0,
+            "explanation": "The compile-time error and the runtime guard in one call."
+          },
+          {
+            "question": "How do you add data to one variant of a union?",
+            "options": [
+              "Add the field to that member only",
+              "Add it as optional to all members",
+              "Use `any`",
+              "Create a new tag field"
+            ],
+            "answer": 0,
+            "explanation": "Each member carries exactly what exists in that state."
+          },
+          {
+            "question": "What does `value satisfies never` in a `default:` branch do?",
+            "options": [
+              "Fails to compile if any member reaches the default",
+              "Throws at runtime",
+              "Converts the value to `never`",
+              "Nothing"
+            ],
+            "answer": 0,
+            "explanation": "An exhaustiveness check without a throwaway variable."
+          },
+          {
+            "question": "Which is a better model of a fetch: `{ loading: boolean; data?: T; error?: string }` or a tagged union?",
+            "options": [
+              "The tagged union — it can't represent loading-with-an-error",
+              "The first — fewer types",
+              "They're equivalent",
+              "Neither can be typed"
+            ],
+            "answer": 0,
+            "explanation": "Make illegal states unrepresentable."
+          },
+          {
+            "question": "Can a discriminant be a number literal, like `version: 1 | 2`?",
+            "options": [
+              "Yes — any literal type works",
+              "No, only strings",
+              "Only booleans",
+              "Only with `as const`"
+            ],
+            "answer": 0,
+            "explanation": "String literals are conventional, not required."
+          },
+          {
+            "question": "How do you reply to a variant you haven't seen before from the network?",
+            "options": [
+              "Validate at the boundary; treat unknown tags as errors before they reach the union",
+              "Trust the type",
+              "Let the `never` check throw in production",
+              "Ignore the tag"
+            ],
+            "answer": 0,
+            "explanation": "Types describe what you've validated, not what arrives."
+          },
+          {
+            "question": "With `Result = { ok: true; value: number } | { ok: false; error: string }`, what is `r.value` before checking `ok`?",
+            "options": [
+              "A compile error — only one member has `value`",
+              "`number | undefined`",
+              "`number`",
+              "`unknown`"
+            ],
+            "answer": 0,
+            "explanation": "Narrow on `ok` first."
+          },
+          {
+            "question": "What does `void` mean as a function's return type?",
+            "options": [
+              "The caller shouldn't use the return value",
+              "It returns `undefined` and nothing else",
+              "It never returns",
+              "It returns `null`"
+            ],
+            "answer": 0,
+            "explanation": "A `() => void` slot accepts functions that return something; the value is just ignored."
+          },
+          {
+            "question": "Which type has no values at all?",
+            "options": [
+              "`never`",
+              "`void`",
+              "`undefined`",
+              "`null`"
+            ],
+            "answer": 0,
+            "explanation": "`void` and `undefined` both have the value `undefined`."
+          },
+          {
+            "question": "What's the difference between `unknown` and `{}`?",
+            "options": [
+              "`unknown` also includes `null` and `undefined`",
+              "None",
+              "`{}` includes `null`",
+              "`unknown` excludes primitives"
+            ],
+            "answer": 0,
+            "explanation": "`{}` is \"anything non-nullish\"."
+          },
+          {
+            "question": "Adding a member to a union used in five `switch`es with `never` checks — how many compile errors?",
+            "options": [
+              "One per switch that doesn't handle it yet",
+              "None",
+              "Exactly one",
+              "It depends on the order"
+            ],
+            "answer": 0,
+            "explanation": "The compiler walks you to every place that needs a new case."
+          },
+          {
+            "question": "Why prefer `switch` over a lookup object for handling union members with different payloads?",
+            "options": [
+              "Each `case` narrows the value to its member",
+              "Lookups are slower",
+              "Objects can't hold functions",
+              "`switch` is erasable"
+            ],
+            "answer": 0,
+            "explanation": "A lookup table of handlers needs extra typing to keep each handler's parameter precise."
+          },
+          {
+            "question": "Without `Extract`, how do you work with just the circle member of `Shape`?",
+            "options": [
+              "Narrow a value with `if (s.kind === \"circle\")`",
+              "`Shape.circle`",
+              "`Shape[\"circle\"]`",
+              "`typeof Shape.circle`"
+            ],
+            "answer": 0,
+            "explanation": "Week 17 adds `Extract<Shape, { kind: \"circle\" }>` for doing it at the type level."
+          },
+          {
+            "question": "Is a union of object types the same as an object type with union properties?",
+            "options": [
+              "No — `{a: 1; b: 1} | {a: 2; b: 2}` forbids `{a: 1; b: 2}`; `{a: 1 | 2; b: 1 | 2}` allows it",
+              "Yes",
+              "Only for strings",
+              "Only with `as const`"
+            ],
+            "answer": 0,
+            "explanation": "Unions of objects keep fields correlated."
+          },
+          {
+            "question": "What happens to a `default:` branch that returns a value when every case is handled?",
+            "options": [
+              "It's unreachable, and it will silently absorb any variant added later",
+              "It's a compile error",
+              "It runs first",
+              "Nothing — it's required"
+            ],
+            "answer": 0,
+            "explanation": "Prefer the `never` check to a catch-all default."
+          },
+          {
+            "question": "What is the top type and what is the bottom type?",
+            "options": [
+              "`unknown` is the top; `never` is the bottom",
+              "`any` and `void`",
+              "`object` and `null`",
+              "`{}` and `undefined`"
+            ],
+            "answer": 0,
+            "explanation": "Everything is assignable to `unknown`; `never` is assignable to everything."
           },
           {
             "question": "Why must the discriminant be a literal type rather than `string`?",
