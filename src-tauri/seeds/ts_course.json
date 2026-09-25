@@ -63163,19 +63163,2278 @@
       "month": 7,
       "month_title": "DSA Interview Core",
       "theme": "Recursion & Backtracking",
-      "goal": "Solve problems whose definition refers to themselves, then use that to generate and search combinatorial spaces (subsets, permutations).",
-      "summary": "",
-      "authored": false,
-      "lessons": [],
-      "capstone": null,
-      "objectives": [],
-      "why": "",
-      "est_minutes": 40,
-      "glossary": [],
-      "cheatsheet": "",
-      "self_check": [],
-      "review": [],
-      "milestone": "",
+      "goal": "You have been recursing over trees since week 20. Here is the whole story — the call stack, its limit, turning recursion into a loop — and then backtracking: choose, explore, un-choose, and prune.",
+      "summary": "You have been recursing since week 20. `depth(t)` called itself on each child;\nthe base case was the `null` the type told you about. This week is the rest of\nthe story.\n\n## What you already did without naming it\n\nWeek 20's `pathTo` looked for a category, and when a subtree did not contain it,\nreturned `null` so the caller could **try the next child**. That is\n**backtracking**: go down a path, and when it fails, back up and try another. By\nlesson 7 you will have written it a dozen times on purpose.\n\n## The plan\n\n1. **The call stack** — what a frame holds, and why \"on the way down\" and \"on the\n   way back up\" print in opposite orders.\n2. **Designing a recursion** — the smallest case, the smaller problem, the\n   combination — and recursive *types*, which TypeScript is happy to express.\n3. **Depth** — the stack runs out, and every recursion can become a loop.\n4. **Subsets**, 5. **permutations** — generating every possibility.\n6. **Pruning** — generating fewer, and counting how many fewer.\n7. **Recognising it** — and where it stops being enough (week 26).\n\n## Counted, as in month 6\n\nBacktracking is exponential by nature — 2ⁿ subsets, n! permutations — so every\ngenerator this week reports **how many calls** it made. Pruning then shows up as a\nsmaller number, not as an adjective.\n\n⏱️ Budget about **eight hours**.\n",
+      "authored": true,
+      "lessons": [
+        {
+          "key": "w25-stack",
+          "title": "The call stack",
+          "what": "You have been recursing since week 20. Here is what was happening underneath.",
+          "lesson": "Week 20's `depth(t)` called itself on each child and it worked. Here is *how*.\n\n## One frame per call\n\nEvery call gets a **stack frame**: its own parameters, its own local variables,\nand a note of where to return to. A recursive call does not overwrite the\ncaller's `n` — it gets a new frame with a new `n`, stacked on top. When it\nreturns, its frame is thrown away and the caller carries on with its own `n`\nuntouched.\n\n```ts\nfunction down(n: number, depth: number): void {\n  const pad = \"  \".repeat(depth);\n  console.log(`${pad}enter ${n}`);\n  if (n > 0) { down(n - 1, depth + 1); }\n  console.log(`${pad}leave ${n}`);\n}\n```\n\n`down(2, 0)`:\n\n```\nenter 2\n  enter 1\n    enter 0\n    leave 0\n  leave 1\nleave 2\n```\n\nThe indentation *is* the stack: three frames alive at the deepest point, and\nthey leave in the reverse of the order they arrived. Week 18 called that LIFO.\n\n## Before the call, after the call\n\nEverything before the recursive call runs **on the way down**; everything after\nit runs **on the way back up**:\n\n```ts\nfunction countDown(n: number): void { if (n === 0) { return; } console.log(n); countDown(n - 1); }  // 3 2 1\nfunction countUp(n: number): void   { if (n === 0) { return; } countUp(n - 1); console.log(n); }    // 1 2 3\n```\n\nSame calls, opposite order. Week 20's traversals are this exactly: pre-order does\nits work before recursing, post-order after.\n\n## Returning values\n\nA value comes back up the same way. `fact(4)` cannot finish until `fact(3)` has,\nso the **first** result computed is `fact(1)`, and each frame multiplies on the\nway back:\n\n```\nfact(1)=1  fact(2)=2  fact(3)=6  fact(4)=24\n```\n\n## The mistake the compiler catches\n\n```ts\nfunction sumTo(n: number): number {\n  if (n === 0) { return 0; }\n  n + sumTo(n - 1);                       // computed... and thrown away\n}\n```\n\n```\nTS2366: Function lacks ending return statement and return type does not\n        include 'undefined'.\n```\n\nThe recursive call happens, its answer is discarded, and the function falls off\nthe end. Without the `: number` annotation this would *run* and print\n`undefined` — the annotation is what turns a silent bug into an error.\n\n> ⚠️ **Common mistakes:** forgetting to `return` the recursive result; expecting\n> code after the call to run before the deeper calls; and thinking the callee\n> can change the caller's local variables.\n",
+          "warmup": [
+            {
+              "question": "A recursive call's `n`…",
+              "options": [
+                "overwrites the caller's",
+                "is a new variable in a new frame",
+                "is global",
+                "is shared"
+              ],
+              "answer": 1,
+              "explanation": "Each frame has its own."
+            },
+            {
+              "question": "Frames leave the stack…",
+              "options": [
+                "in the order they arrived",
+                "in reverse order — last in, first out",
+                "all at once",
+                "randomly"
+              ],
+              "answer": 1,
+              "explanation": "Week 18's LIFO."
+            },
+            {
+              "question": "`countUp(3)` prints its numbers after the recursive call, so it prints…",
+              "options": [
+                "3 2 1",
+                "1 2 3",
+                "3 only",
+                "nothing"
+              ],
+              "answer": 1,
+              "explanation": "The deepest call prints first."
+            },
+            {
+              "question": "The first `fact` call to FINISH is…",
+              "options": [
+                "fact(4)",
+                "fact(1)",
+                "fact(2)",
+                "all together"
+              ],
+              "answer": 1,
+              "explanation": "Everything above it is waiting on it."
+            }
+          ],
+          "exercises": [
+            {
+              "id": "tscourse-w25-st-1",
+              "title": "Watch the frames",
+              "prompt": "Recurse one level deeper, one indent further in.",
+              "hint": "A smaller n, one level deeper.",
+              "hints": [
+                "A smaller n, one level deeper.",
+                "Write down(n - 1, depth + 1);"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst line = fs.readFileSync(0, \"utf8\").trim();\nfunction down(n: number, depth: number): void {\n  const pad = \"  \".repeat(depth);\n  console.log(`${pad}enter ${n}`);\n  if (n > 0) {\n____\n  }\n  console.log(`${pad}leave ${n}`);\n}\ndown(Number(line), 0);\n",
+              "solution": "import * as fs from \"fs\";\nconst line = fs.readFileSync(0, \"utf8\").trim();\nfunction down(n: number, depth: number): void {\n  const pad = \"  \".repeat(depth);\n  console.log(`${pad}enter ${n}`);\n  if (n > 0) {\n    down(n - 1, depth + 1);\n  }\n  console.log(`${pad}leave ${n}`);\n}\ndown(Number(line), 0);\n",
+              "tests": [
+                {
+                  "input": "2",
+                  "output": "enter 2\n  enter 1\n    enter 0\n    leave 0\n  leave 1\nleave 2"
+                },
+                {
+                  "input": "0",
+                  "output": "enter 0\nleave 0"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w25-st-2",
+              "title": "On the way back up",
+              "prompt": "Print 1 to n by doing the printing AFTER the recursive call.",
+              "hint": "Everything smaller has to be printed before n is.",
+              "hints": [
+                "Everything smaller has to be printed before n is.",
+                "Write countUp(n - 1); above the print."
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst line = fs.readFileSync(0, \"utf8\").trim();\nfunction countUp(n: number): void {\n  if (n === 0) {\n    return;\n  }\n____\n  console.log(n);\n}\ncountUp(Number(line));\n",
+              "solution": "import * as fs from \"fs\";\nconst line = fs.readFileSync(0, \"utf8\").trim();\nfunction countUp(n: number): void {\n  if (n === 0) {\n    return;\n  }\n  countUp(n - 1);\n  console.log(n);\n}\ncountUp(Number(line));\n",
+              "tests": [
+                {
+                  "input": "3",
+                  "output": "1\n2\n3"
+                },
+                {
+                  "input": "1",
+                  "output": "1"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w25-st-3",
+              "title": "How many frames at once",
+              "prompt": "Track how many calls are alive, and the most there ever were.",
+              "hint": "A frame ends when its call returns.",
+              "hints": [
+                "A frame ends when its call returns.",
+                "Write live = live - 1; just before the return.",
+                "sumTo(5) has six frames at its deepest: 5, 4, 3, 2, 1 and 0."
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst line = fs.readFileSync(0, \"utf8\").trim();\nlet live = 0;\nlet deepest = 0;\nfunction sumTo(n: number): number {\n  live = live + 1;\n  deepest = Math.max(deepest, live);\n  const result = n === 0 ? 0 : n + sumTo(n - 1);\n____\n  return result;\n}\nconst total = sumTo(Number(line));\nconsole.log(`total=${total} deepest=${deepest} live=${live}`);\n",
+              "solution": "import * as fs from \"fs\";\nconst line = fs.readFileSync(0, \"utf8\").trim();\nlet live = 0;\nlet deepest = 0;\nfunction sumTo(n: number): number {\n  live = live + 1;\n  deepest = Math.max(deepest, live);\n  const result = n === 0 ? 0 : n + sumTo(n - 1);\n  live = live - 1;\n  return result;\n}\nconst total = sumTo(Number(line));\nconsole.log(`total=${total} deepest=${deepest} live=${live}`);\n",
+              "tests": [
+                {
+                  "input": "5",
+                  "output": "total=15 deepest=6 live=0"
+                },
+                {
+                  "input": "0",
+                  "output": "total=0 deepest=1 live=0"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w25-st-4",
+              "title": "Values come back up",
+              "prompt": "Compute each factorial from the one below it, printing as each call finishes.",
+              "hint": "The base case is n <= 1; otherwise it is n times the factorial below.",
+              "hints": [
+                "The base case is n <= 1; otherwise it is n times the factorial below.",
+                "Write const result = n <= 1 ? 1 : n * fact(n - 1);"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst line = fs.readFileSync(0, \"utf8\").trim();\nfunction fact(n: number): number {\n____\n  console.log(`fact(${n})=${result}`);\n  return result;\n}\nfact(Number(line));\n",
+              "solution": "import * as fs from \"fs\";\nconst line = fs.readFileSync(0, \"utf8\").trim();\nfunction fact(n: number): number {\n  const result = n <= 1 ? 1 : n * fact(n - 1);\n  console.log(`fact(${n})=${result}`);\n  return result;\n}\nfact(Number(line));\n",
+              "tests": [
+                {
+                  "input": "4",
+                  "output": "fact(1)=1\nfact(2)=2\nfact(3)=6\nfact(4)=24"
+                },
+                {
+                  "input": "1",
+                  "output": "fact(1)=1"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w25-st-d1",
+              "title": "The answer that was thrown away",
+              "prompt": "The compiler rejects this program:\n\n    TS2366: Function lacks ending return statement and return type does not include 'undefined'.\n\nFix the cause.",
+              "hint": "The last line computes a number. What happens to it?",
+              "hints": [
+                "The last line computes a number. What happens to it?",
+                "A recursive result has to be RETURNED to reach the caller.",
+                "Write return n + sumTo(n - 1);"
+              ],
+              "language": "typescript",
+              "kind": "diagnose",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "function sumTo(n: number): number {\n  if (n === 0) {\n    return 0;\n  }\n  n + sumTo(n - 1);\n}\nconsole.log(sumTo(3));\n",
+              "solution": "function sumTo(n: number): number {\n  if (n === 0) {\n    return 0;\n  }\n  return n + sumTo(n - 1);\n}\nconsole.log(sumTo(3));\n",
+              "tests": [
+                {
+                  "input": "",
+                  "output": "6"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w25-st-fix1",
+              "title": "Fix the countdown that counts up",
+              "prompt": "This should print `3 2 1` for 3 and prints `1 2 3`: the print sits AFTER the recursive call, so it runs on the way back up, deepest call first.",
+              "hint": "Which runs first: the code before the call, or the code after it?",
+              "hints": [
+                "Which runs first: the code before the call, or the code after it?",
+                "To print n before the smaller numbers, print on the way DOWN.",
+                "Move console.log(n) above the recursive call."
+              ],
+              "language": "typescript",
+              "kind": "fix",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst line = fs.readFileSync(0, \"utf8\").trim();\nfunction countDown(n: number): void {\n  if (n === 0) {\n    return;\n  }\n  countDown(n - 1);\n  console.log(n);\n}\ncountDown(Number(line));\n",
+              "solution": "import * as fs from \"fs\";\nconst line = fs.readFileSync(0, \"utf8\").trim();\nfunction countDown(n: number): void {\n  if (n === 0) {\n    return;\n  }\n  console.log(n);\n  countDown(n - 1);\n}\ncountDown(Number(line));\n",
+              "tests": [
+                {
+                  "input": "3",
+                  "output": "3\n2\n1"
+                },
+                {
+                  "input": "2",
+                  "output": "2\n1"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            }
+          ],
+          "quiz": [
+            {
+              "question": "Pre-order and post-order traversals (week 20) differ in…",
+              "options": [
+                "the tree",
+                "whether the work is before or after the recursive calls",
+                "speed",
+                "the base case"
+              ],
+              "answer": 1,
+              "explanation": "Down versus back up."
+            },
+            {
+              "question": "Without `: number`, the TS2366 program would…",
+              "options": [
+                "crash",
+                "run and print undefined",
+                "print 6",
+                "loop for ever"
+              ],
+              "answer": 1,
+              "explanation": "The annotation turns a silent bug into an error."
+            }
+          ]
+        },
+        {
+          "key": "w25-shape",
+          "title": "Designing a recursion",
+          "what": "Three questions, one leap of faith, and a type that refers to itself.",
+          "lesson": "Every recursion answers three questions:\n\n1. **What is the smallest input**, and its answer? (the base case)\n2. **How do I make the problem smaller?** (it must *strictly* shrink)\n3. **How do I build my answer from the smaller one?**\n\n```ts\nfunction sum(xs: readonly number[]): number {\n  if (xs.length === 0) { return 0; }                  // 1. empty: 0\n  return (xs[0] ?? 0) + sum(xs.slice(1));             // 2. the rest   3. add the first\n}\n```\n\n## The leap of faith\n\nDo not trace `sum` all the way down in your head. **Assume** `sum(xs.slice(1))`\nreturns the right total of the rest — then the only question is whether adding\n`xs[0]` makes it the total of the whole. It does, and the base case is right, so\nthe function is right. That is induction, and it is the only way to write a\nrecursion over a tree of any size.\n\n## Making it smaller, faster\n\nShrinking by one gives n calls. Shrinking by **half** gives log n:\n\n```ts\nfunction pow(x: number, n: number): number {\n  if (n === 0) { return 1; }\n  const half = pow(x, Math.floor(n / 2));             // ONE call, reused\n  return n % 2 === 0 ? half * half : half * half * x;\n}\n```\n\n`pow(2, 10)` makes **5** calls (10, 5, 2, 1, 0) where the obvious version makes\n11; `pow(2, 30)` makes 6. And `half` is computed once and used twice — calling\n`pow` twice instead would quietly make it linear again.\n\nBinary search (week 22) has the same shape and is often written recursively:\ncheck the middle, recurse into one half.\n\n## TypeScript wants the return type\n\n```ts\nfunction sumTo(n: number) {                           // no annotation\n  if (n === 0) { return 0; }\n  return n + sumTo(n - 1);\n}\n```\n\n```\nTS7023: 'sumTo' implicitly has return type 'any' because it does not have a\n        return type annotation and is referenced directly or indirectly in one\n        of its return expressions.\n```\n\nTo infer `sumTo`'s return type the compiler needs `sumTo`'s return type. It\nrefuses to guess. **Annotate every recursive function** — you would want to\nanyway, since the annotation is also what caught TS2366 in lesson 1.\n\n## Recursive types\n\nA type can refer to itself too, and it is the natural description of any nested\ndata:\n\n```ts\ntype Nested = number | readonly Nested[];\nconst data: Nested = [1, [2, [3, 4]], 5];\n```\n\nA function over it follows the type exactly — one branch per member of the union,\nand the recursion happens precisely where the type recurses:\n\n```ts\nfunction total(x: Nested): number {\n  if (typeof x === \"number\") { return x; }            // the base case IS the non-recursive member\n  let s = 0;\n  for (const item of x) { s = s + total(item); }\n  return s;\n}\n```\n\nWeek 20's `T | null` tree was exactly this, with `null` as the base case.\n\n> ⚠️ **Common mistakes:** a \"smaller\" problem that is not smaller (`n + 1`,\n> or a slice that includes everything); calling the recursion twice when once\n> would do; and leaving the return type to inference.\n",
+          "warmup": [
+            {
+              "question": "The three questions of a recursion are…",
+              "options": [
+                "loop, test, return",
+                "smallest case, how to shrink, how to combine",
+                "input, output, type",
+                "push, recurse, pop"
+              ],
+              "answer": 1,
+              "explanation": "Answer all three and it is written."
+            },
+            {
+              "question": "The leap of faith means…",
+              "options": [
+                "guess",
+                "assume the smaller call is right, and check only this level",
+                "trace every call",
+                "skip the base case"
+              ],
+              "answer": 1,
+              "explanation": "Induction."
+            },
+            {
+              "question": "Halving the problem each call gives…",
+              "options": [
+                "n calls",
+                "about log n calls",
+                "2ⁿ calls",
+                "n² calls"
+              ],
+              "answer": 1,
+              "explanation": "pow(2, 30) makes 6."
+            },
+            {
+              "question": "TS7023 is fixed by…",
+              "options": [
+                "a base case",
+                "annotating the return type",
+                "a loop",
+                "`any`"
+              ],
+              "answer": 1,
+              "explanation": "The compiler will not guess a type that depends on itself."
+            }
+          ],
+          "exercises": [
+            {
+              "id": "tscourse-w25-sh-1",
+              "title": "The first, plus the rest",
+              "prompt": "Sum an array recursively: the first element plus the sum of the others.",
+              "hint": "`xs.slice(1)` is everything but the first element — strictly smaller.",
+              "hints": [
+                "`xs.slice(1)` is everything but the first element — strictly smaller.",
+                "Write return (xs[0] ?? 0) + sum(xs.slice(1));"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nfunction sum(xs: readonly number[]): number {\n  if (xs.length === 0) {\n    return 0;\n  }\n____\n}\nconsole.log(sum(nums));\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nfunction sum(xs: readonly number[]): number {\n  if (xs.length === 0) {\n    return 0;\n  }\n  return (xs[0] ?? 0) + sum(xs.slice(1));\n}\nconsole.log(sum(nums));\n",
+              "tests": [
+                {
+                  "input": "1 2 3 4",
+                  "output": "10"
+                },
+                {
+                  "input": "7",
+                  "output": "7"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w25-sh-2",
+              "title": "The smallest palindrome",
+              "prompt": "A string of length 0 or 1 is a palindrome. Say so.",
+              "hint": "Both an even and an odd length eventually shrink to 0 or 1 characters.",
+              "hints": [
+                "Both an even and an odd length eventually shrink to 0 or 1 characters.",
+                "Return true when s.length <= 1."
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst line = fs.readFileSync(0, \"utf8\").trim();\nfunction isPal(s: string): boolean {\n____\n  return s.charAt(0) === s.charAt(s.length - 1) && isPal(s.slice(1, -1));\n}\nconsole.log(isPal(line));\n",
+              "solution": "import * as fs from \"fs\";\nconst line = fs.readFileSync(0, \"utf8\").trim();\nfunction isPal(s: string): boolean {\n  if (s.length <= 1) {\n    return true;\n  }\n  return s.charAt(0) === s.charAt(s.length - 1) && isPal(s.slice(1, -1));\n}\nconsole.log(isPal(line));\n",
+              "tests": [
+                {
+                  "input": "racecar",
+                  "output": "true"
+                },
+                {
+                  "input": "abca",
+                  "output": "false"
+                },
+                {
+                  "input": "abba",
+                  "output": "true"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w25-sh-3",
+              "title": "Halve it",
+              "prompt": "Compute a power with one recursive call on half the exponent, and count the calls.",
+              "hint": "x^n is (x^(n/2))², times one more x when n is odd.",
+              "hints": [
+                "x^n is (x^(n/2))², times one more x when n is odd.",
+                "Write const half = pow(x, Math.floor(n / 2));"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst line = fs.readFileSync(0, \"utf8\").trim();\nlet calls = 0;\nfunction pow(x: number, n: number): number {\n  calls = calls + 1;\n  if (n === 0) {\n    return 1;\n  }\n____\n  return n % 2 === 0 ? half * half : half * half * x;\n}\nconst n = Number(line);\nconsole.log(`${pow(2, n)} calls=${calls}`);\n",
+              "solution": "import * as fs from \"fs\";\nconst line = fs.readFileSync(0, \"utf8\").trim();\nlet calls = 0;\nfunction pow(x: number, n: number): number {\n  calls = calls + 1;\n  if (n === 0) {\n    return 1;\n  }\n  const half = pow(x, Math.floor(n / 2));\n  return n % 2 === 0 ? half * half : half * half * x;\n}\nconst n = Number(line);\nconsole.log(`${pow(2, n)} calls=${calls}`);\n",
+              "tests": [
+                {
+                  "input": "10",
+                  "output": "1024 calls=5"
+                },
+                {
+                  "input": "30",
+                  "output": "1073741824 calls=6"
+                },
+                {
+                  "input": "0",
+                  "output": "1 calls=1"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w25-sh-4",
+              "title": "Recurse where the type recurses",
+              "prompt": "Total a nested list: a number is itself, a list is the total of its items.",
+              "hint": "Each item is itself a Nested — a number or another list.",
+              "hints": [
+                "Each item is itself a Nested — a number or another list.",
+                "Write s = s + total(item);"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "type Nested = number | readonly Nested[];\nfunction total(x: Nested): number {\n  if (typeof x === \"number\") {\n    return x;\n  }\n  let s = 0;\n  for (const item of x) {\n____\n  }\n  return s;\n}\nconst data: Nested = [1, [2, [3, 4]], 5];\nconsole.log(total(data));\n",
+              "solution": "type Nested = number | readonly Nested[];\nfunction total(x: Nested): number {\n  if (typeof x === \"number\") {\n    return x;\n  }\n  let s = 0;\n  for (const item of x) {\n    s = s + total(item);\n  }\n  return s;\n}\nconst data: Nested = [1, [2, [3, 4]], 5];\nconsole.log(total(data));\n",
+              "tests": [
+                {
+                  "input": "",
+                  "output": "15"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w25-sh-des1",
+              "title": "Design the nested type",
+              "prompt": "The function below walks a value that is either a number or a read-only list of such values, nested to any depth. Write the type. The checker also confirms it REJECTS `[1, \"two\"]` — so `any` will not do.",
+              "hint": "It is a union of two members, and one of them mentions the type itself.",
+              "hints": [
+                "It is a union of two members, and one of them mentions the type itself.",
+                "The list is read-only — `total` never changes it.",
+                "type Nested = number | readonly Nested[];"
+              ],
+              "language": "typescript",
+              "kind": "design",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\nconst _ok1: Nested = 5;\nconst _ok2: Nested = [1, [2, [3, [4]]]];\n// @ts-expect-error — a string is not a Nested\nconst _bad: Nested = [1, \"two\"];\n",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "____\nfunction total(x: Nested): number {\n  if (typeof x === \"number\") {\n    return x;\n  }\n  let s = 0;\n  for (const item of x) {\n    s = s + total(item);\n  }\n  return s;\n}\nconst data: Nested = [1, [2, [3, [4]]]];\nconsole.log(total(data));\n",
+              "solution": "type Nested = number | readonly Nested[];\nfunction total(x: Nested): number {\n  if (typeof x === \"number\") {\n    return x;\n  }\n  let s = 0;\n  for (const item of x) {\n    s = s + total(item);\n  }\n  return s;\n}\nconst data: Nested = [1, [2, [3, [4]]]];\nconsole.log(total(data));\n",
+              "tests": [
+                {
+                  "input": "",
+                  "output": "10"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w25-sh-5",
+              "title": "Binary search, recursively",
+              "prompt": "Recurse into whichever half can still hold the target.",
+              "hint": "If the middle is too small, the target is to its right — and vice versa.",
+              "hints": [
+                "If the middle is too small, the target is to its right — and vice versa.",
+                "Week 22's inclusive row: mid + 1 and mid - 1.",
+                "Write return v < target ? find(xs, target, mid + 1, hi) : find(xs, target, lo, mid - 1);"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nfunction find(xs: readonly number[], target: number, lo: number, hi: number): number {\n  if (lo > hi) {\n    return -1;\n  }\n  const mid = Math.floor((lo + hi) / 2);\n  const v = xs[mid] ?? 0;\n  if (v === target) {\n    return mid;\n  }\n____\n}\nconsole.log(find(nums, 7, 0, nums.length - 1));\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nfunction find(xs: readonly number[], target: number, lo: number, hi: number): number {\n  if (lo > hi) {\n    return -1;\n  }\n  const mid = Math.floor((lo + hi) / 2);\n  const v = xs[mid] ?? 0;\n  if (v === target) {\n    return mid;\n  }\n  return v < target ? find(xs, target, mid + 1, hi) : find(xs, target, lo, mid - 1);\n}\nconsole.log(find(nums, 7, 0, nums.length - 1));\n",
+              "tests": [
+                {
+                  "input": "1 3 5 7 9",
+                  "output": "3"
+                },
+                {
+                  "input": "2 4",
+                  "output": "-1"
+                },
+                {
+                  "input": "7",
+                  "output": "0"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w25-sh-d1",
+              "title": "The return type that depends on itself",
+              "prompt": "The compiler rejects this program:\n\n    TS7023: 'sumTo' implicitly has return type 'any' because it does not have a return type annotation and is referenced directly or indirectly in one of its return expressions.\n\nFix the cause.",
+              "hint": "To infer what sumTo returns, the compiler would need to know what sumTo returns.",
+              "hints": [
+                "To infer what sumTo returns, the compiler would need to know what sumTo returns.",
+                "Tell it.",
+                "Write function sumTo(n: number): number {"
+              ],
+              "language": "typescript",
+              "kind": "diagnose",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst line = fs.readFileSync(0, \"utf8\").trim();\nfunction sumTo(n: number) {\n  if (n === 0) {\n    return 0;\n  }\n  return n + sumTo(n - 1);\n}\nconsole.log(sumTo(Number(line)));\n",
+              "solution": "import * as fs from \"fs\";\nconst line = fs.readFileSync(0, \"utf8\").trim();\nfunction sumTo(n: number): number {\n  if (n === 0) {\n    return 0;\n  }\n  return n + sumTo(n - 1);\n}\nconsole.log(sumTo(Number(line)));\n",
+              "tests": [
+                {
+                  "input": "3",
+                  "output": "6"
+                },
+                {
+                  "input": "0",
+                  "output": "0"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w25-sh-fix1",
+              "title": "Fix the problem that grows",
+              "prompt": "This dies with `RangeError: Maximum call stack size exceeded` for any positive input. The base case is 0, and the recursive call is on `n + 1` — moving AWAY from it.",
+              "hint": "Ask question 2: is the recursive call's problem smaller?",
+              "hints": [
+                "Ask question 2: is the recursive call's problem smaller?",
+                "It has to move TOWARDS the base case, every time.",
+                "Write sumTo(n - 1)."
+              ],
+              "language": "typescript",
+              "kind": "fix",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst line = fs.readFileSync(0, \"utf8\").trim();\nfunction sumTo(n: number): number {\n  if (n === 0) {\n    return 0;\n  }\n  return n + sumTo(n + 1);\n}\nconsole.log(sumTo(Number(line)));\n",
+              "solution": "import * as fs from \"fs\";\nconst line = fs.readFileSync(0, \"utf8\").trim();\nfunction sumTo(n: number): number {\n  if (n === 0) {\n    return 0;\n  }\n  return n + sumTo(n - 1);\n}\nconsole.log(sumTo(Number(line)));\n",
+              "tests": [
+                {
+                  "input": "3",
+                  "output": "6"
+                },
+                {
+                  "input": "4",
+                  "output": "10"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            }
+          ],
+          "quiz": [
+            {
+              "question": "Why is `half` computed once and used twice in `pow`?",
+              "options": [
+                "style",
+                "calling pow twice would double the calls at every level — linear again",
+                "types",
+                "it is required"
+              ],
+              "answer": 1,
+              "explanation": "Two calls on n/2 is n calls in total."
+            },
+            {
+              "question": "In `total(x: Nested)`, the base case corresponds to…",
+              "options": [
+                "the list",
+                "the non-recursive member of the union — `number`",
+                "an empty list",
+                "nothing"
+              ],
+              "answer": 1,
+              "explanation": "The function follows the type."
+            }
+          ]
+        },
+        {
+          "key": "w25-loops",
+          "title": "Depth, and turning recursion into a loop",
+          "what": "The stack is finite. A loop is not limited the same way.",
+          "lesson": "Every pending call holds a frame, and the call stack has a fixed size. Go deep\nenough and Node stops you:\n\n```\nRangeError: Maximum call stack size exceeded\n```\n\nWeek 21 said a recursion's depth **is** space. Here is where the space runs out.\n\n## How deep is too deep\n\nTypically around ten thousand frames — but **do not rely on a number.** It\ndepends on how big each frame is, the engine and its flags. What you can rely\non: a recursion whose depth grows with the input will fail on *some* input. A\ntree of a thousand nodes is fine because its depth is about log n; a **linked list\nof 100,000 nodes** recursed over one node per call is 100,000 frames, and it\nfails (verified).\n\nBalanced structures are safe; **long chains are not** — a linked list, a\ndegenerate BST (week 20), quicksort on sorted input (week 24).\n\n## Accumulators: nothing left to do on the way up\n\n```ts\nfunction sumTo(n: number, acc: number): number {\n  if (n === 0) { return acc; }\n  return sumTo(n - 1, acc + n);           // the call is the LAST thing\n}\n```\n\nThe answer travels **down** in `acc`, so after the recursive call there is\nnothing left to do. Some languages turn that into a loop for you (tail-call\noptimisation); **JavaScript engines do not**, so you do it yourself — and the\naccumulator form makes it mechanical:\n\n```ts\nlet acc = 0;\nwhile (n > 0) { acc = acc + n; n = n - 1; }\n```\n\nThe parameters become variables; the recursive call becomes the next iteration.\n\n## Branching recursion: an explicit stack\n\nWhen a call makes *several* recursive calls (a tree, a nested list), there is no\nsingle accumulator. Do what the call stack was doing, with an array (week 18):\n\n```ts\nconst stack: Nested[] = [data];\nwhile (stack.length > 0) {\n  const top = stack.pop();\n  if (top === undefined) { continue; }\n  if (typeof top === \"number\") { total = total + top; }\n  else { for (const item of top) { stack.push(item); } }\n}\n```\n\nWeek 20 did exactly this for its traversals, and pushed the **right** child before\nthe left so the left would come off first.\n\n## When to bother\n\nRecursion is clearer for trees and backtracking, and the depth there is modest.\nConvert when **the depth grows with n** and n can be large. That is a design\ndecision, not an optimisation.\n\n> ⚠️ **Common mistakes:** recursing once per element of a long list; assuming\n> the engine eliminates tail calls; and pushing children in the wrong order\n> when the traversal order matters.\n",
+          "warmup": [
+            {
+              "question": "A recursion over a 100,000-node linked list…",
+              "options": [
+                "is fine",
+                "exhausts the call stack",
+                "is O(1)",
+                "is a type error"
+              ],
+              "answer": 1,
+              "explanation": "One frame per node."
+            },
+            {
+              "question": "A balanced tree of a million nodes, recursed over, reaches a depth of about…",
+              "options": [
+                "a million",
+                "20",
+                "1,000",
+                "2"
+              ],
+              "answer": 1,
+              "explanation": "log2 of a million."
+            },
+            {
+              "question": "JavaScript engines eliminate tail calls…",
+              "options": [
+                "always",
+                "no — you convert to a loop yourself",
+                "in strict mode",
+                "for arrow functions"
+              ],
+              "answer": 1,
+              "explanation": "Which is why the accumulator form matters."
+            },
+            {
+              "question": "A branching recursion becomes a loop with…",
+              "options": [
+                "an accumulator",
+                "an explicit stack",
+                "a Set",
+                "a counter"
+              ],
+              "answer": 1,
+              "explanation": "Doing the call stack's job by hand."
+            }
+          ],
+          "exercises": [
+            {
+              "id": "tscourse-w25-lp-1",
+              "title": "Carry the answer down",
+              "prompt": "Pass the total so far into the next call, so nothing is left to do on the way up.",
+              "hint": "The smaller problem, with n added to the accumulator.",
+              "hints": [
+                "The smaller problem, with n added to the accumulator.",
+                "Write return sumTo(n - 1, acc + n);"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst line = fs.readFileSync(0, \"utf8\").trim();\nfunction sumTo(n: number, acc: number): number {\n  if (n === 0) {\n    return acc;\n  }\n____\n}\nconsole.log(sumTo(Number(line), 0));\n",
+              "solution": "import * as fs from \"fs\";\nconst line = fs.readFileSync(0, \"utf8\").trim();\nfunction sumTo(n: number, acc: number): number {\n  if (n === 0) {\n    return acc;\n  }\n  return sumTo(n - 1, acc + n);\n}\nconsole.log(sumTo(Number(line), 0));\n",
+              "tests": [
+                {
+                  "input": "4",
+                  "output": "10"
+                },
+                {
+                  "input": "0",
+                  "output": "0"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w25-lp-2",
+              "title": "The same thing, as a loop",
+              "prompt": "Turn the accumulator recursion into a while loop — and use a depth no recursion would survive.",
+              "hint": "The parameters become variables; the recursive call becomes the next iteration.",
+              "hints": [
+                "The parameters become variables; the recursive call becomes the next iteration.",
+                "acc = acc + n; then n = n - 1;"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst line = fs.readFileSync(0, \"utf8\").trim();\nlet n = Number(line);\nlet acc = 0;\nwhile (n > 0) {\n____\n}\nconsole.log(acc);\n",
+              "solution": "import * as fs from \"fs\";\nconst line = fs.readFileSync(0, \"utf8\").trim();\nlet n = Number(line);\nlet acc = 0;\nwhile (n > 0) {\n  acc = acc + n;\n  n = n - 1;\n}\nconsole.log(acc);\n",
+              "tests": [
+                {
+                  "input": "100000",
+                  "output": "5000050000"
+                },
+                {
+                  "input": "4",
+                  "output": "10"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w25-lp-3",
+              "title": "An explicit stack",
+              "prompt": "Total a nested list without recursion: push a list's items, add a number.",
+              "hint": "A list's items still need processing — put them on the stack.",
+              "hints": [
+                "A list's items still need processing — put them on the stack.",
+                "Loop over `top` and push each item."
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "type Nested = number | readonly Nested[];\nconst data: Nested = [1, [2, [3, [4, [5]]]], 6];\nlet total = 0;\nconst stack: Nested[] = [data];\nwhile (stack.length > 0) {\n  const top = stack.pop();\n  if (top === undefined) {\n    continue;\n  }\n  if (typeof top === \"number\") {\n    total = total + top;\n  } else {\n____\n  }\n}\nconsole.log(total);\n",
+              "solution": "type Nested = number | readonly Nested[];\nconst data: Nested = [1, [2, [3, [4, [5]]]], 6];\nlet total = 0;\nconst stack: Nested[] = [data];\nwhile (stack.length > 0) {\n  const top = stack.pop();\n  if (top === undefined) {\n    continue;\n  }\n  if (typeof top === \"number\") {\n    total = total + top;\n  } else {\n    for (const item of top) {\n      stack.push(item);\n    }\n  }\n}\nconsole.log(total);\n",
+              "tests": [
+                {
+                  "input": "",
+                  "output": "21"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w25-lp-4",
+              "title": "A long list, walked with a loop",
+              "prompt": "Count 100,000 nodes with a cursor rather than a recursion.",
+              "hint": "Move the cursor to the next node.",
+              "hints": [
+                "Move the cursor to the next node.",
+                "Write cur = cur.next;"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "interface N {\n  readonly value: number;\n  readonly next: N | null;\n}\nlet head: N | null = null;\nfor (let i = 0; i < 100000; i = i + 1) {\n  head = { value: i, next: head };\n}\nlet count = 0;\nlet cur: N | null = head;\nwhile (cur !== null) {\n  count = count + 1;\n____\n}\nconsole.log(count);\n",
+              "solution": "interface N {\n  readonly value: number;\n  readonly next: N | null;\n}\nlet head: N | null = null;\nfor (let i = 0; i < 100000; i = i + 1) {\n  head = { value: i, next: head };\n}\nlet count = 0;\nlet cur: N | null = head;\nwhile (cur !== null) {\n  count = count + 1;\n  cur = cur.next;\n}\nconsole.log(count);\n",
+              "tests": [
+                {
+                  "input": "",
+                  "output": "100000"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w25-lp-5",
+              "title": "Same order, no recursion",
+              "prompt": "Pre-order a tree with an explicit stack, pushing the right child first so the left comes off first.",
+              "hint": "A stack gives back the LAST thing pushed.",
+              "hints": [
+                "A stack gives back the LAST thing pushed.",
+                "To visit left first, push it last: right, then left."
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "interface T {\n  readonly value: number;\n  readonly left: T | null;\n  readonly right: T | null;\n}\nfunction leaf(value: number): T {\n  return { value, left: null, right: null };\n}\nconst tree: T = {\n  value: 1,\n  left: { value: 2, left: leaf(4), right: leaf(5) },\n  right: leaf(3),\n};\nfunction pre(t: T | null, out: number[]): void {\n  if (t === null) {\n    return;\n  }\n  out.push(t.value);\n  pre(t.left, out);\n  pre(t.right, out);\n}\nconst viaCalls: number[] = [];\npre(tree, viaCalls);\nconst viaStack: number[] = [];\nconst stack: T[] = [tree];\nwhile (stack.length > 0) {\n  const t = stack.pop();\n  if (t === undefined) {\n    continue;\n  }\n  viaStack.push(t.value);\n____\n}\nconsole.log(`${viaCalls.join(\",\")} ${viaStack.join(\",\")} same=${viaCalls.join(\",\") === viaStack.join(\",\")}`);\n",
+              "solution": "interface T {\n  readonly value: number;\n  readonly left: T | null;\n  readonly right: T | null;\n}\nfunction leaf(value: number): T {\n  return { value, left: null, right: null };\n}\nconst tree: T = {\n  value: 1,\n  left: { value: 2, left: leaf(4), right: leaf(5) },\n  right: leaf(3),\n};\nfunction pre(t: T | null, out: number[]): void {\n  if (t === null) {\n    return;\n  }\n  out.push(t.value);\n  pre(t.left, out);\n  pre(t.right, out);\n}\nconst viaCalls: number[] = [];\npre(tree, viaCalls);\nconst viaStack: number[] = [];\nconst stack: T[] = [tree];\nwhile (stack.length > 0) {\n  const t = stack.pop();\n  if (t === undefined) {\n    continue;\n  }\n  viaStack.push(t.value);\n  if (t.right !== null) {\n    stack.push(t.right);\n  }\n  if (t.left !== null) {\n    stack.push(t.left);\n  }\n}\nconsole.log(`${viaCalls.join(\",\")} ${viaStack.join(\",\")} same=${viaCalls.join(\",\") === viaStack.join(\",\")}`);\n",
+              "tests": [
+                {
+                  "input": "",
+                  "output": "1,2,4,5,3 1,2,4,5,3 same=true"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w25-lp-fix1",
+              "title": "Fix the recursion that ran out of stack",
+              "prompt": "This dies with `RangeError: Maximum call stack size exceeded`. `len` makes one call per node, and 100,000 nodes is 100,000 frames. The recursion is correct; the stack is simply not that deep. Walk the list with a loop instead.",
+              "hint": "The depth of this recursion equals the length of the list.",
+              "hints": [
+                "The depth of this recursion equals the length of the list.",
+                "A loop keeps one cursor, however long the list is.",
+                "Count with a while loop that follows `.next`."
+              ],
+              "language": "typescript",
+              "kind": "fix",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "interface N {\n  readonly value: number;\n  readonly next: N | null;\n}\nlet head: N | null = null;\nfor (let i = 0; i < 100000; i = i + 1) {\n  head = { value: i, next: head };\n}\nfunction len(n: N | null): number {\n  return n === null ? 0 : 1 + len(n.next);\n}\nconsole.log(len(head));\n",
+              "solution": "interface N {\n  readonly value: number;\n  readonly next: N | null;\n}\nlet head: N | null = null;\nfor (let i = 0; i < 100000; i = i + 1) {\n  head = { value: i, next: head };\n}\nfunction len(n: N | null): number {\n  let count = 0;\n  let cur = n;\n  while (cur !== null) {\n    count = count + 1;\n    cur = cur.next;\n  }\n  return count;\n}\nconsole.log(len(head));\n",
+              "tests": [
+                {
+                  "input": "",
+                  "output": "100000"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            }
+          ],
+          "quiz": [
+            {
+              "question": "Why not print 'the maximum recursion depth' as an exercise?",
+              "options": [
+                "it is secret",
+                "it varies with frame size and engine, so the output would not be deterministic",
+                "it is always 10,000",
+                "it is infinite"
+              ],
+              "answer": 1,
+              "explanation": "Week 17's rule, applied to the stack."
+            },
+            {
+              "question": "Which of these is at risk of a stack overflow?",
+              "options": [
+                "a balanced BST of a million nodes",
+                "quicksort (last pivot) on a large SORTED array",
+                "merge sort on a million elements",
+                "binary search"
+              ],
+              "answer": 1,
+              "explanation": "Its depth is n, not log n."
+            }
+          ]
+        },
+        {
+          "key": "w25-subsets",
+          "title": "Backtracking: every subset",
+          "what": "Choose, explore, un-choose.",
+          "lesson": "\"Every subset of `[1, 2, 3]`.\" For each element there are two choices — **in**\nor **out** — and the choices form a tree:\n\n```\n                     []\n            in 1 /         \\ out 1\n             [1]              []\n        in 2 /  \\        in 2 /  \\\n        [1,2]   [1]        [2]    []\n        ...\n```\n\nEight leaves, one per subset. Walking that tree is **backtracking**.\n\n## The template\n\n```ts\nconst path: number[] = [];\nfunction go(i: number): void {\n  if (i === xs.length) {                     // a leaf: every element decided\n    console.log(`[${path.join(\",\")}]`);\n    return;\n  }\n  path.push(xs[i] ?? 0);                     // choose:  i is in\n  go(i + 1);                                 // explore\n  path.pop();                                // un-choose\n  go(i + 1);                                 // explore:  i is out\n}\n```\n\n**One** `path` array, shared by every call, is extended before each exploration\nand restored after it. The `pop` is what makes the sibling branch start from the\nsame state its parent had — without it, choices from one branch leak into the next.\n\n## Counting it\n\nn elements, **2ⁿ** subsets, and the tree has **2ⁿ⁺¹ − 1** nodes (calls): 8\nleaves and 15 calls for n = 3, 32 and 63 for n = 5. Exponential — add one element\nand the work doubles. Backtracking is only ever feasible for small n (about 20),\nwhich is exactly the range interview problems use.\n\n## The loop form\n\nOften cleaner, and the one that generalises to combinations:\n\n```ts\nfunction go(start: number): void {\n  out.push([...path]);                       // every node is a subset\n  for (let j = start; j < xs.length; j = j + 1) {\n    path.push(xs[j] ?? 0);\n    go(j + 1);                               // only LATER elements, so no repeats\n    path.pop();\n  }\n}\n```\n\n`start` is what stops `[1,2]` and `[2,1]` both appearing: each call only\nconsiders elements after the last one chosen. Stop when `path.length === k` and\nyou have **combinations** of size k.\n\n## The copy\n\n```ts\nout.push([...path]);      // ✓ a snapshot\nout.push(path);           // ✗ the SAME array, again and again\n```\n\nPush `path` itself and every entry of `out` is one array — which, after the last\n`pop`, is empty. Eight subsets print as eight `[]`s. Week 13's aliasing, at its\nmost confusing.\n\n## Lazily, with a generator\n\nWeek 20's `yield*` fits backtracking perfectly: `yield [...path]` at a leaf,\n`yield*` into each branch, and the caller can stop after the first few without\nthe rest ever being generated.\n\n> ⚠️ **Common mistakes:** forgetting the `pop`; storing `path` instead of a\n> copy; and a loop that starts at 0 instead of `start`, generating every order.\n",
+          "warmup": [
+            {
+              "question": "The subsets of 4 elements number…",
+              "options": [
+                "4",
+                "8",
+                "16",
+                "24"
+              ],
+              "answer": 2,
+              "explanation": "2⁴."
+            },
+            {
+              "question": "`path.pop()` after exploring exists to…",
+              "options": [
+                "save memory",
+                "restore the state for the sibling branch",
+                "end the recursion",
+                "print"
+              ],
+              "answer": 1,
+              "explanation": "Un-choose."
+            },
+            {
+              "question": "`out.push(path)` without a copy leaves `out` holding…",
+              "options": [
+                "the subsets",
+                "the same array many times — empty at the end",
+                "nothing",
+                "copies"
+              ],
+              "answer": 1,
+              "explanation": "Aliasing."
+            },
+            {
+              "question": "In the loop form, starting at `start` rather than 0 prevents…",
+              "options": [
+                "recursion",
+                "the same set appearing in two orders",
+                "empty sets",
+                "duplicates in the input"
+              ],
+              "answer": 1,
+              "explanation": "Combinations, not arrangements."
+            }
+          ],
+          "exercises": [
+            {
+              "id": "tscourse-w25-sb-1",
+              "title": "Un-choose",
+              "prompt": "Undo the choice before exploring the branch without it.",
+              "hint": "The branch without element i must start from the same path the caller had.",
+              "hints": [
+                "The branch without element i must start from the same path the caller had.",
+                "Write path.pop();"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst path: number[] = [];\nfunction go(i: number): void {\n  if (i === nums.length) {\n    console.log(`[${path.join(\",\")}]`);\n    return;\n  }\n  path.push(nums[i] ?? 0);\n  go(i + 1);\n____\n  go(i + 1);\n}\ngo(0);\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst path: number[] = [];\nfunction go(i: number): void {\n  if (i === nums.length) {\n    console.log(`[${path.join(\",\")}]`);\n    return;\n  }\n  path.push(nums[i] ?? 0);\n  go(i + 1);\n  path.pop();\n  go(i + 1);\n}\ngo(0);\n",
+              "tests": [
+                {
+                  "input": "1 2 3",
+                  "output": "[1,2,3]\n[1,2]\n[1,3]\n[1]\n[2,3]\n[2]\n[3]\n[]"
+                },
+                {
+                  "input": "7",
+                  "output": "[7]\n[]"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w25-sb-2",
+              "title": "Count the tree",
+              "prompt": "Count every call, and every leaf.",
+              "hint": "A leaf is a call where every element has been decided.",
+              "hints": [
+                "A leaf is a call where every element has been decided.",
+                "Write leaves = leaves + 1;"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nlet calls = 0;\nlet leaves = 0;\nfunction go(i: number): void {\n  calls = calls + 1;\n  if (i === nums.length) {\n____\n    return;\n  }\n  go(i + 1);\n  go(i + 1);\n}\ngo(0);\nconsole.log(`leaves=${leaves} calls=${calls}`);\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nlet calls = 0;\nlet leaves = 0;\nfunction go(i: number): void {\n  calls = calls + 1;\n  if (i === nums.length) {\n    leaves = leaves + 1;\n    return;\n  }\n  go(i + 1);\n  go(i + 1);\n}\ngo(0);\nconsole.log(`leaves=${leaves} calls=${calls}`);\n",
+              "tests": [
+                {
+                  "input": "1 2 3",
+                  "output": "leaves=8 calls=15"
+                },
+                {
+                  "input": "1 2 3 4 5",
+                  "output": "leaves=32 calls=63"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w25-sb-3",
+              "title": "Subsets that hit a target",
+              "prompt": "Carry the running sum down, and count the leaves where it equals the target.",
+              "hint": "Only a complete decision — a leaf — is a subset.",
+              "hints": [
+                "Only a complete decision — a leaf — is a subset.",
+                "Count it when its sum equals the target."
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst target = 10;\nlet found = 0;\nfunction go(i: number, sum: number): void {\n  if (i === nums.length) {\n____\n    return;\n  }\n  go(i + 1, sum + (nums[i] ?? 0));\n  go(i + 1, sum);\n}\ngo(0, 0);\nconsole.log(found);\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst target = 10;\nlet found = 0;\nfunction go(i: number, sum: number): void {\n  if (i === nums.length) {\n    if (sum === target) {\n      found = found + 1;\n    }\n    return;\n  }\n  go(i + 1, sum + (nums[i] ?? 0));\n  go(i + 1, sum);\n}\ngo(0, 0);\nconsole.log(found);\n",
+              "tests": [
+                {
+                  "input": "2 3 5 7",
+                  "output": "2"
+                },
+                {
+                  "input": "10",
+                  "output": "1"
+                },
+                {
+                  "input": "1 2",
+                  "output": "0"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w25-sb-4",
+              "title": "Combinations of size two",
+              "prompt": "Loop over the later elements: choose one, explore, un-choose.",
+              "hint": "Choose element j, then explore only the elements after it.",
+              "hints": [
+                "Choose element j, then explore only the elements after it.",
+                "Push, recurse with j + 1, pop."
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst k = 2;\nconst path: number[] = [];\nfunction go(start: number): void {\n  if (path.length === k) {\n    console.log(path.join(\",\"));\n    return;\n  }\n  for (let j = start; j < nums.length; j = j + 1) {\n____\n  }\n}\ngo(0);\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst k = 2;\nconst path: number[] = [];\nfunction go(start: number): void {\n  if (path.length === k) {\n    console.log(path.join(\",\"));\n    return;\n  }\n  for (let j = start; j < nums.length; j = j + 1) {\n    path.push(nums[j] ?? 0);\n    go(j + 1);\n    path.pop();\n  }\n}\ngo(0);\n",
+              "tests": [
+                {
+                  "input": "1 2 3 4",
+                  "output": "1,2\n1,3\n1,4\n2,3\n2,4\n3,4"
+                },
+                {
+                  "input": "5 6",
+                  "output": "5,6"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w25-sb-5",
+              "title": "Only as many as you need",
+              "prompt": "Yield each subset from a generator, and stop after the first three.",
+              "hint": "At a leaf, hand out a SNAPSHOT of the path.",
+              "hints": [
+                "At a leaf, hand out a SNAPSHOT of the path.",
+                "Write yield [...path];"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nfunction* subsets(xs: readonly number[], i: number, path: number[]): Generator<readonly number[]> {\n  if (i === xs.length) {\n____\n    return;\n  }\n  path.push(xs[i] ?? 0);\n  yield* subsets(xs, i + 1, path);\n  path.pop();\n  yield* subsets(xs, i + 1, path);\n}\nlet taken = 0;\nfor (const s of subsets(nums, 0, [])) {\n  console.log(s.join(\",\"));\n  taken = taken + 1;\n  if (taken === 3) {\n    break;\n  }\n}\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nfunction* subsets(xs: readonly number[], i: number, path: number[]): Generator<readonly number[]> {\n  if (i === xs.length) {\n    yield [...path];\n    return;\n  }\n  path.push(xs[i] ?? 0);\n  yield* subsets(xs, i + 1, path);\n  path.pop();\n  yield* subsets(xs, i + 1, path);\n}\nlet taken = 0;\nfor (const s of subsets(nums, 0, [])) {\n  console.log(s.join(\",\"));\n  taken = taken + 1;\n  if (taken === 3) {\n    break;\n  }\n}\n",
+              "tests": [
+                {
+                  "input": "1 2 3",
+                  "output": "1,2,3\n1,2\n1,3"
+                },
+                {
+                  "input": "4 5 6 7 8 9",
+                  "output": "4,5,6,7,8,9\n4,5,6,7,8\n4,5,6,7,9"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w25-sb-fix1",
+              "title": "Fix the choice that was never undone",
+              "prompt": "For `1 2` this prints `[1,2]`, `[1,2]`, `[1,2,2]`, `[1,2,2]` — the choices pile up, because nothing takes element i back out before the branch that is supposed to skip it.",
+              "hint": "Choose, explore — and then?",
+              "hints": [
+                "Choose, explore — and then?",
+                "The second exploration is the branch where element i is OUT.",
+                "Add path.pop(); between the two calls."
+              ],
+              "language": "typescript",
+              "kind": "fix",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst path: number[] = [];\nfunction go(i: number): void {\n  if (i === nums.length) {\n    console.log(`[${path.join(\",\")}]`);\n    return;\n  }\n  path.push(nums[i] ?? 0);\n  go(i + 1);\n  go(i + 1);\n}\ngo(0);\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst path: number[] = [];\nfunction go(i: number): void {\n  if (i === nums.length) {\n    console.log(`[${path.join(\",\")}]`);\n    return;\n  }\n  path.push(nums[i] ?? 0);\n  go(i + 1);\n  path.pop();\n  go(i + 1);\n}\ngo(0);\n",
+              "tests": [
+                {
+                  "input": "1 2",
+                  "output": "[1,2]\n[1]\n[2]\n[]"
+                },
+                {
+                  "input": "5",
+                  "output": "[5]\n[]"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w25-sb-fix2",
+              "title": "Fix the subsets that all came out empty",
+              "prompt": "This prints `[]` four times for `1 2`. Each leaf stores `path` itself — the one shared array — so `out` holds four references to it, and by the time they are printed every choice has been popped back off.",
+              "hint": "How many different arrays does `out` actually contain?",
+              "hints": [
+                "How many different arrays does `out` actually contain?",
+                "Week 13: pushing an array stores a reference, not its contents.",
+                "Store a snapshot: out.push([...path]);"
+              ],
+              "language": "typescript",
+              "kind": "fix",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst path: number[] = [];\nconst out: number[][] = [];\nfunction go(i: number): void {\n  if (i === nums.length) {\n    out.push(path);\n    return;\n  }\n  path.push(nums[i] ?? 0);\n  go(i + 1);\n  path.pop();\n  go(i + 1);\n}\ngo(0);\nfor (const s of out) {\n  console.log(`[${s.join(\",\")}]`);\n}\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst path: number[] = [];\nconst out: number[][] = [];\nfunction go(i: number): void {\n  if (i === nums.length) {\n    out.push([...path]);\n    return;\n  }\n  path.push(nums[i] ?? 0);\n  go(i + 1);\n  path.pop();\n  go(i + 1);\n}\ngo(0);\nfor (const s of out) {\n  console.log(`[${s.join(\",\")}]`);\n}\n",
+              "tests": [
+                {
+                  "input": "1 2",
+                  "output": "[1,2]\n[1]\n[2]\n[]"
+                },
+                {
+                  "input": "3",
+                  "output": "[3]\n[]"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            }
+          ],
+          "quiz": [
+            {
+              "question": "Backtracking over subsets is practical up to about…",
+              "options": [
+                "n = 1,000",
+                "n = 20",
+                "n = 100,000",
+                "any n"
+              ],
+              "answer": 1,
+              "explanation": "2²⁰ is a million; 2³⁰ is a billion."
+            },
+            {
+              "question": "Stopping when `path.length === k` in the loop form generates…",
+              "options": [
+                "subsets",
+                "combinations of size k",
+                "permutations",
+                "pairs only"
+              ],
+              "answer": 1,
+              "explanation": "n choose k of them."
+            }
+          ]
+        },
+        {
+          "key": "w25-perms",
+          "title": "Permutations",
+          "what": "Every order — and every order only once.",
+          "lesson": "A subset decides *whether*. A permutation decides *where*: every element is used,\nand the question is the order.\n\n## A `used` flag per element\n\n```ts\nconst used: boolean[] = xs.map(() => false);\nfunction go(): void {\n  if (path.length === xs.length) { out.push(path.join(\"\")); return; }\n  for (let i = 0; i < xs.length; i = i + 1) {\n    if (used[i]) { continue; }\n    used[i] = true;  path.push(xs[i] ?? \"\");       // choose\n    go();                                           // explore\n    path.pop();      used[i] = false;               // un-choose — BOTH halves\n  }\n}\n```\n\nThe loop starts at **0** every time — unlike subsets, an earlier element can come\nlater — and `used` says which are already placed. Un-choosing is two statements\nnow, and forgetting the second one is the classic bug: nothing is ever free again,\nand you get exactly one permutation.\n\n`\"abc\"` gives `abc acb bac bca cab cba`: **3! = 6**. Four elements: 24 leaves, and\n65 calls altogether (1 + 4 + 12 + 24 + 24). n! grows faster than 2ⁿ — ten\nelements is 3.6 million orders.\n\n## Duplicates\n\n`\"aab\"` generates `aab` twice (the two `a`s swapped), `aba` twice, `baa` twice.\nThe fix needs week 24:\n\n1. **Sort** the input, so equal values sit next to each other.\n2. Skip a value equal to the one before it **when that one is not in use**:\n\n```ts\nif (i > 0 && xs[i] === xs[i - 1] && !used[i - 1]) { continue; }\n```\n\nThat rule means \"equal values are only ever placed in their original left-to-right\norder\", so each distinct arrangement is built once. `\"aab\"` gives `aab aba baa`.\n\n## Typing it generically\n\nA permutation function does not care what it is permuting, which is week 10's\ncue for a type parameter:\n\n```ts\nfunction permutations<T>(xs: readonly T[]): T[][]\n```\n\n`readonly` on the way in (it never changes its input), a fresh mutable array out\n(the caller owns it).\n\n> ⚠️ **Common mistakes:** resetting `path` but not `used`; skipping duplicates on\n> unsorted input; and starting the loop at `start` as if it were subsets.\n",
+          "warmup": [
+            {
+              "question": "The permutations of 4 distinct elements number…",
+              "options": [
+                "16",
+                "24",
+                "8",
+                "12"
+              ],
+              "answer": 1,
+              "explanation": "4 × 3 × 2 × 1."
+            },
+            {
+              "question": "Unlike subsets, the permutation loop starts at…",
+              "options": [
+                "start",
+                "0 every time",
+                "i + 1",
+                "the end"
+              ],
+              "answer": 1,
+              "explanation": "An earlier element can be placed later."
+            },
+            {
+              "question": "Un-choosing in permutations is…",
+              "options": [
+                "path.pop() only",
+                "path.pop() AND used[i] = false",
+                "used[i] = false only",
+                "nothing"
+              ],
+              "answer": 1,
+              "explanation": "Two pieces of state, two undos."
+            },
+            {
+              "question": "Skipping duplicate permutations needs the input…",
+              "options": [
+                "reversed",
+                "sorted",
+                "a Set",
+                "unique"
+              ],
+              "answer": 1,
+              "explanation": "Equal values must be adjacent."
+            }
+          ],
+          "exercises": [
+            {
+              "id": "tscourse-w25-pm-1",
+              "title": "Free it again",
+              "prompt": "Undo both halves of the choice after exploring.",
+              "hint": "Two things were changed when choosing; both must be undone.",
+              "hints": [
+                "Two things were changed when choosing; both must be undone.",
+                "path.pop(); then used[i] = false;"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst line = fs.readFileSync(0, \"utf8\").trim();\nconst xs = [...line];\nconst used: boolean[] = xs.map(() => false);\nconst path: string[] = [];\nfunction go(): void {\n  if (path.length === xs.length) {\n    console.log(path.join(\"\"));\n    return;\n  }\n  for (let i = 0; i < xs.length; i = i + 1) {\n    if (used[i]) {\n      continue;\n    }\n    used[i] = true;\n    path.push(xs[i] ?? \"\");\n    go();\n____\n  }\n}\ngo();\n",
+              "solution": "import * as fs from \"fs\";\nconst line = fs.readFileSync(0, \"utf8\").trim();\nconst xs = [...line];\nconst used: boolean[] = xs.map(() => false);\nconst path: string[] = [];\nfunction go(): void {\n  if (path.length === xs.length) {\n    console.log(path.join(\"\"));\n    return;\n  }\n  for (let i = 0; i < xs.length; i = i + 1) {\n    if (used[i]) {\n      continue;\n    }\n    used[i] = true;\n    path.push(xs[i] ?? \"\");\n    go();\n    path.pop();\n    used[i] = false;\n  }\n}\ngo();\n",
+              "tests": [
+                {
+                  "input": "abc",
+                  "output": "abc\nacb\nbac\nbca\ncab\ncba"
+                },
+                {
+                  "input": "ab",
+                  "output": "ab\nba"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w25-pm-2",
+              "title": "n! leaves, and the calls to reach them",
+              "prompt": "Count every call the permutation search makes.",
+              "hint": "Every call counts, not just the leaves.",
+              "hints": [
+                "Every call counts, not just the leaves.",
+                "Write calls = calls + 1; as the first line of go."
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst line = fs.readFileSync(0, \"utf8\").trim();\nconst xs = [...line];\nconst used: boolean[] = xs.map(() => false);\nlet placed = 0;\nlet calls = 0;\nlet perms = 0;\nfunction go(): void {\n____\n  if (placed === xs.length) {\n    perms = perms + 1;\n    return;\n  }\n  for (let i = 0; i < xs.length; i = i + 1) {\n    if (used[i]) {\n      continue;\n    }\n    used[i] = true;\n    placed = placed + 1;\n    go();\n    placed = placed - 1;\n    used[i] = false;\n  }\n}\ngo();\nconsole.log(`perms=${perms} calls=${calls}`);\n",
+              "solution": "import * as fs from \"fs\";\nconst line = fs.readFileSync(0, \"utf8\").trim();\nconst xs = [...line];\nconst used: boolean[] = xs.map(() => false);\nlet placed = 0;\nlet calls = 0;\nlet perms = 0;\nfunction go(): void {\n  calls = calls + 1;\n  if (placed === xs.length) {\n    perms = perms + 1;\n    return;\n  }\n  for (let i = 0; i < xs.length; i = i + 1) {\n    if (used[i]) {\n      continue;\n    }\n    used[i] = true;\n    placed = placed + 1;\n    go();\n    placed = placed - 1;\n    used[i] = false;\n  }\n}\ngo();\nconsole.log(`perms=${perms} calls=${calls}`);\n",
+              "tests": [
+                {
+                  "input": "abcd",
+                  "output": "perms=24 calls=65"
+                },
+                {
+                  "input": "abc",
+                  "output": "perms=6 calls=16"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w25-pm-3",
+              "title": "Each arrangement once",
+              "prompt": "On sorted input, skip a value equal to the one before it when that one is not in use.",
+              "hint": "Equal values must only ever be placed in their left-to-right order.",
+              "hints": [
+                "Equal values must only ever be placed in their left-to-right order.",
+                "Skip xs[i] when it equals xs[i - 1] and xs[i - 1] is not currently used."
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Hard",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst line = fs.readFileSync(0, \"utf8\").trim();\nconst xs = [...line].sort();\nconst used: boolean[] = xs.map(() => false);\nconst path: string[] = [];\nfunction go(): void {\n  if (path.length === xs.length) {\n    console.log(path.join(\"\"));\n    return;\n  }\n  for (let i = 0; i < xs.length; i = i + 1) {\n    if (used[i]) {\n      continue;\n    }\n____\n    used[i] = true;\n    path.push(xs[i] ?? \"\");\n    go();\n    path.pop();\n    used[i] = false;\n  }\n}\ngo();\n",
+              "solution": "import * as fs from \"fs\";\nconst line = fs.readFileSync(0, \"utf8\").trim();\nconst xs = [...line].sort();\nconst used: boolean[] = xs.map(() => false);\nconst path: string[] = [];\nfunction go(): void {\n  if (path.length === xs.length) {\n    console.log(path.join(\"\"));\n    return;\n  }\n  for (let i = 0; i < xs.length; i = i + 1) {\n    if (used[i]) {\n      continue;\n    }\n    if (i > 0 && xs[i] === xs[i - 1] && !used[i - 1]) {\n      continue;\n    }\n    used[i] = true;\n    path.push(xs[i] ?? \"\");\n    go();\n    path.pop();\n    used[i] = false;\n  }\n}\ngo();\n",
+              "tests": [
+                {
+                  "input": "aab",
+                  "output": "aab\naba\nbaa"
+                },
+                {
+                  "input": "bba",
+                  "output": "abb\nbab\nbba"
+                },
+                {
+                  "input": "abc",
+                  "output": "abc\nacb\nbac\nbca\ncab\ncba"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w25-pm-r1",
+              "title": "Type the permutations",
+              "prompt": "This works and its types say nothing. Make `permutations` generic: it takes a `readonly T[]` and returns a fresh `T[][]`, so permuting strings gives `string[][]` and permuting numbers gives `number[][]`. Every `any` must go.",
+              "hint": "One type parameter, T, for the element type.",
+              "hints": [
+                "One type parameter, T, for the element type.",
+                "`xs[i]` is `T | undefined` under this course's strictness — guard it before using it.",
+                "function permutations<T>(xs: readonly T[]): T[][]"
+              ],
+              "language": "typescript",
+              "kind": "retype",
+              "difficulty": "Hard",
+              "strictness": "strict+indexed",
+              "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\nconst _s = permutations([\"x\", \"y\"]);\ntype _1 = Expect<Equal<typeof _s, string[][]>>;\nconst _n = permutations([1, 2]);\ntype _2 = Expect<Equal<typeof _n, number[][]>>;\n",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "function permutations(xs: any): any {\n  if (xs.length <= 1) {\n    return [[...xs]];\n  }\n  const out: any = [];\n  for (let i = 0; i < xs.length; i = i + 1) {\n    const rest = [...xs.slice(0, i), ...xs.slice(i + 1)];\n    for (const p of permutations(rest)) {\n      out.push([xs[i], ...p]);\n    }\n  }\n  return out;\n}\nconsole.log(permutations([\"a\", \"b\", \"c\"]).map((p: any) => p.join(\"\")).join(\" \"));\n",
+              "solution": "function permutations<T>(xs: readonly T[]): T[][] {\n  if (xs.length <= 1) {\n    return [[...xs]];\n  }\n  const out: T[][] = [];\n  for (let i = 0; i < xs.length; i = i + 1) {\n    const first = xs[i];\n    if (first === undefined) {\n      continue;\n    }\n    const rest = [...xs.slice(0, i), ...xs.slice(i + 1)];\n    for (const p of permutations(rest)) {\n      out.push([first, ...p]);\n    }\n  }\n  return out;\n}\nconsole.log(permutations([\"a\", \"b\", \"c\"]).map((p) => p.join(\"\")).join(\" \"));\n",
+              "tests": [
+                {
+                  "input": "",
+                  "output": "abc acb bac bca cab cba"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w25-pm-fix1",
+              "title": "Fix the permutations that stopped after one",
+              "prompt": "This prints only `abc`. The path is popped after each exploration, but `used[i]` is never set back to false — so after the first full arrangement every element is permanently taken and no other branch can place anything.",
+              "hint": "Choosing changed two things. How many does un-choosing undo?",
+              "hints": [
+                "Choosing changed two things. How many does un-choosing undo?",
+                "An element that stays `used` can never be placed anywhere else.",
+                "Add used[i] = false; after the pop."
+              ],
+              "language": "typescript",
+              "kind": "fix",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst line = fs.readFileSync(0, \"utf8\").trim();\nconst xs = [...line];\nconst used: boolean[] = xs.map(() => false);\nconst path: string[] = [];\nfunction go(): void {\n  if (path.length === xs.length) {\n    console.log(path.join(\"\"));\n    return;\n  }\n  for (let i = 0; i < xs.length; i = i + 1) {\n    if (used[i]) {\n      continue;\n    }\n    used[i] = true;\n    path.push(xs[i] ?? \"\");\n    go();\n    path.pop();\n  }\n}\ngo();\n",
+              "solution": "import * as fs from \"fs\";\nconst line = fs.readFileSync(0, \"utf8\").trim();\nconst xs = [...line];\nconst used: boolean[] = xs.map(() => false);\nconst path: string[] = [];\nfunction go(): void {\n  if (path.length === xs.length) {\n    console.log(path.join(\"\"));\n    return;\n  }\n  for (let i = 0; i < xs.length; i = i + 1) {\n    if (used[i]) {\n      continue;\n    }\n    used[i] = true;\n    path.push(xs[i] ?? \"\");\n    go();\n    path.pop();\n    used[i] = false;\n  }\n}\ngo();\n",
+              "tests": [
+                {
+                  "input": "abc",
+                  "output": "abc\nacb\nbac\nbca\ncab\ncba"
+                },
+                {
+                  "input": "xy",
+                  "output": "xy\nyx"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            }
+          ],
+          "quiz": [
+            {
+              "question": "Ten distinct elements have how many permutations?",
+              "options": [
+                "1,024",
+                "about 3.6 million",
+                "100",
+                "3,628"
+              ],
+              "answer": 1,
+              "explanation": "10! = 3,628,800."
+            },
+            {
+              "question": "The duplicate-skip rule `!used[i - 1]` means equal values are placed…",
+              "options": [
+                "randomly",
+                "only in their original left-to-right order",
+                "last",
+                "never"
+              ],
+              "answer": 1,
+              "explanation": "So each arrangement is built exactly once."
+            }
+          ]
+        },
+        {
+          "key": "w25-prune",
+          "title": "Pruning",
+          "what": "Do not explore a branch that cannot work — and count what that saved.",
+          "lesson": "A backtracking search visits every node of its decision tree unless you tell it\nnot to. **Pruning** is telling it not to: cut a branch the moment it provably\ncannot lead to an answer.\n\n## On sorted input, `break`\n\n\"Every set of distinct candidates summing to 8.\" Sort the candidates first, and\nthis becomes legal:\n\n```ts\nfor (let j = start; j < xs.length; j = j + 1) {\n  const x = xs[j] ?? 0;\n  if (sum + x > target) { break; }       // everything after x is bigger too\n  go(j + 1, sum + x);\n}\n```\n\nNot `continue` — **`break`**, because sorted means every later candidate would\novershoot as well. One comparison discards a whole range of siblings and all of\ntheir descendants.\n\n**The pruning depends on the sort.** On unsorted input `[5, 1, 2, 3]` with target 3,\nthe loop meets the 5 first, breaks, and never sees `1 + 2` or `3`. It reports no\nanswers and no error. An optimisation that is only valid under a precondition has\nto be written next to the code that establishes it.\n\n## Counting it\n\nOn `1 … 8` with target 8 there are 6 answers. The count of calls — nodes visited\n— with and without the `break` is the evidence, and lesson 6's first two\nexercises print both.\n\n## N-Queens\n\nPlace n queens on an n×n board so none attacks another. One queen per row, so\nthe search chooses a **column** for each row in turn — and prunes any column that\nis already attacked:\n\n```ts\nif (cols.has(c) || d1.has(r + c) || d2.has(r - c)) { continue; }\n```\n\nThree `Set`s (week 19), because every square on one diagonal shares `r + c`, and\nevery square on the other shares `r - c`. The check is O(1) instead of scanning\nthe board. Choose adds to all three; un-choose deletes from all three.\n\nn = 4 has **2** solutions, n = 5 has **10**, n = 6 has **4**, n = 8 has **92**.\n\n## Generate only what is valid\n\nBalanced parentheses of n pairs: rather than generating all 2²ⁿ strings and\nfiltering, only ever add a `(` while fewer than n are open, and only a `)` while\nit would close something (`close < open`). Every leaf is then valid by\nconstruction — 5 for n = 3, where filtering would have looked at 64.\n\n> ⚠️ **Common mistakes:** `break` on unsorted input; `continue` where `break`\n> is valid (correct, but it prunes nothing); and un-choosing only one of the three\n> Sets.\n",
+          "warmup": [
+            {
+              "question": "Pruning means…",
+              "options": [
+                "deleting answers",
+                "not exploring a branch that cannot succeed",
+                "sorting",
+                "memoising"
+              ],
+              "answer": 1,
+              "explanation": "Fewer nodes visited, same answers."
+            },
+            {
+              "question": "`if (sum + x > target) break;` requires…",
+              "options": [
+                "positive targets",
+                "the candidates sorted ascending",
+                "a Set",
+                "no duplicates"
+              ],
+              "answer": 1,
+              "explanation": "Otherwise a smaller candidate later is skipped."
+            },
+            {
+              "question": "Two queens share a diagonal when they share…",
+              "options": [
+                "a row",
+                "r + c, or r - c",
+                "c",
+                "r × c"
+              ],
+              "answer": 1,
+              "explanation": "Constant along each diagonal."
+            },
+            {
+              "question": "Generating balanced parentheses, a `)` may be added when…",
+              "options": [
+                "always",
+                "close < open",
+                "open < n",
+                "close < n"
+              ],
+              "answer": 1,
+              "explanation": "It must close something."
+            }
+          ],
+          "exercises": [
+            {
+              "id": "tscourse-w25-pr-1",
+              "title": "Stop at the first candidate too big",
+              "prompt": "On sorted candidates, abandon the rest of the loop once one overshoots.",
+              "hint": "Sorted, so if x overshoots, every later candidate does too.",
+              "hints": [
+                "Sorted, so if x overshoots, every later candidate does too.",
+                "if (sum + x > target) { break; }"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst target = 8;\nconst xs = [...nums].sort((a, b) => a - b);\nlet visited = 0;\nlet found = 0;\nfunction go(start: number, sum: number): void {\n  visited = visited + 1;\n  if (sum === target) {\n    found = found + 1;\n    return;\n  }\n  for (let j = start; j < xs.length; j = j + 1) {\n    const x = xs[j] ?? 0;\n____\n    go(j + 1, sum + x);\n  }\n}\ngo(0, 0);\nconsole.log(`found=${found} visited=${visited}`);\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst target = 8;\nconst xs = [...nums].sort((a, b) => a - b);\nlet visited = 0;\nlet found = 0;\nfunction go(start: number, sum: number): void {\n  visited = visited + 1;\n  if (sum === target) {\n    found = found + 1;\n    return;\n  }\n  for (let j = start; j < xs.length; j = j + 1) {\n    const x = xs[j] ?? 0;\n    if (sum + x > target) {\n      break;\n    }\n    go(j + 1, sum + x);\n  }\n}\ngo(0, 0);\nconsole.log(`found=${found} visited=${visited}`);\n",
+              "tests": [
+                {
+                  "input": "1 2 3 4 5 6 7 8",
+                  "output": "found=6 visited=25"
+                },
+                {
+                  "input": "8 1 7",
+                  "output": "found=2 visited=5"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w25-pr-2",
+              "title": "What the break saved",
+              "prompt": "Run the same search with and without pruning, and report both counts.",
+              "hint": "The same search, with pruning switched off.",
+              "hints": [
+                "The same search, with pruning switched off.",
+                "Write go(0, 0, false);"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "const target = 8;\nconst xs = [1, 2, 3, 4, 5, 6, 7, 8];\nlet visited = 0;\nlet found = 0;\nfunction go(start: number, sum: number, prune: boolean): void {\n  visited = visited + 1;\n  if (sum === target) {\n    found = found + 1;\n    return;\n  }\n  for (let j = start; j < xs.length; j = j + 1) {\n    const x = xs[j] ?? 0;\n    if (prune && sum + x > target) {\n      break;\n    }\n    go(j + 1, sum + x, prune);\n  }\n}\ngo(0, 0, true);\nconst pruned = visited;\nvisited = 0;\nfound = 0;\n____\nconsole.log(`found=${found} pruned=${pruned} unpruned=${visited}`);\n",
+              "solution": "const target = 8;\nconst xs = [1, 2, 3, 4, 5, 6, 7, 8];\nlet visited = 0;\nlet found = 0;\nfunction go(start: number, sum: number, prune: boolean): void {\n  visited = visited + 1;\n  if (sum === target) {\n    found = found + 1;\n    return;\n  }\n  for (let j = start; j < xs.length; j = j + 1) {\n    const x = xs[j] ?? 0;\n    if (prune && sum + x > target) {\n      break;\n    }\n    go(j + 1, sum + x, prune);\n  }\n}\ngo(0, 0, true);\nconst pruned = visited;\nvisited = 0;\nfound = 0;\ngo(0, 0, false);\nconsole.log(`found=${found} pruned=${pruned} unpruned=${visited}`);\n",
+              "tests": [
+                {
+                  "input": "",
+                  "output": "found=6 pruned=25 unpruned=223"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w25-pr-3",
+              "title": "Is the square attacked?",
+              "prompt": "Skip any column already attacked along its column or either diagonal.",
+              "hint": "Three things can attack a square: its column, and its two diagonals.",
+              "hints": [
+                "Three things can attack a square: its column, and its two diagonals.",
+                "r + c names one diagonal, r - c the other.",
+                "if (cols.has(c) || d1.has(r + c) || d2.has(r - c)) { continue; }"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Hard",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "function queens(n: number): number {\n  const cols = new Set<number>();\n  const d1 = new Set<number>();\n  const d2 = new Set<number>();\n  let count = 0;\n  function place(r: number): void {\n    if (r === n) {\n      count = count + 1;\n      return;\n    }\n    for (let c = 0; c < n; c = c + 1) {\n____\n      cols.add(c);\n      d1.add(r + c);\n      d2.add(r - c);\n      place(r + 1);\n      cols.delete(c);\n      d1.delete(r + c);\n      d2.delete(r - c);\n    }\n  }\n  place(0);\n  return count;\n}\nfor (const n of [4, 5, 6]) {\n  console.log(`n=${n} solutions=${queens(n)}`);\n}\n",
+              "solution": "function queens(n: number): number {\n  const cols = new Set<number>();\n  const d1 = new Set<number>();\n  const d2 = new Set<number>();\n  let count = 0;\n  function place(r: number): void {\n    if (r === n) {\n      count = count + 1;\n      return;\n    }\n    for (let c = 0; c < n; c = c + 1) {\n      if (cols.has(c) || d1.has(r + c) || d2.has(r - c)) {\n        continue;\n      }\n      cols.add(c);\n      d1.add(r + c);\n      d2.add(r - c);\n      place(r + 1);\n      cols.delete(c);\n      d1.delete(r + c);\n      d2.delete(r - c);\n    }\n  }\n  place(0);\n  return count;\n}\nfor (const n of [4, 5, 6]) {\n  console.log(`n=${n} solutions=${queens(n)}`);\n}\n",
+              "tests": [
+                {
+                  "input": "",
+                  "output": "n=4 solutions=2\nn=5 solutions=10\nn=6 solutions=4"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w25-pr-4",
+              "title": "Eight queens",
+              "prompt": "Un-choose all three: free the column and both diagonals after exploring.",
+              "hint": "Everything added when choosing must be removed when un-choosing.",
+              "hints": [
+                "Everything added when choosing must be removed when un-choosing.",
+                "Delete c, r + c and r - c from their Sets."
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst line = fs.readFileSync(0, \"utf8\").trim();\nfunction queens(n: number): number {\n  const cols = new Set<number>();\n  const d1 = new Set<number>();\n  const d2 = new Set<number>();\n  let count = 0;\n  function place(r: number): void {\n    if (r === n) {\n      count = count + 1;\n      return;\n    }\n    for (let c = 0; c < n; c = c + 1) {\n      if (cols.has(c) || d1.has(r + c) || d2.has(r - c)) {\n        continue;\n      }\n      cols.add(c);\n      d1.add(r + c);\n      d2.add(r - c);\n      place(r + 1);\n____\n    }\n  }\n  place(0);\n  return count;\n}\nconsole.log(queens(Number(line)));\n",
+              "solution": "import * as fs from \"fs\";\nconst line = fs.readFileSync(0, \"utf8\").trim();\nfunction queens(n: number): number {\n  const cols = new Set<number>();\n  const d1 = new Set<number>();\n  const d2 = new Set<number>();\n  let count = 0;\n  function place(r: number): void {\n    if (r === n) {\n      count = count + 1;\n      return;\n    }\n    for (let c = 0; c < n; c = c + 1) {\n      if (cols.has(c) || d1.has(r + c) || d2.has(r - c)) {\n        continue;\n      }\n      cols.add(c);\n      d1.add(r + c);\n      d2.add(r - c);\n      place(r + 1);\n      cols.delete(c);\n      d1.delete(r + c);\n      d2.delete(r - c);\n    }\n  }\n  place(0);\n  return count;\n}\nconsole.log(queens(Number(line)));\n",
+              "tests": [
+                {
+                  "input": "8",
+                  "output": "92"
+                },
+                {
+                  "input": "4",
+                  "output": "2"
+                },
+                {
+                  "input": "1",
+                  "output": "1"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w25-pr-5",
+              "title": "Only valid strings",
+              "prompt": "Add a closing bracket only when it would close something.",
+              "hint": "A `)` is only valid while there is an unmatched `(`.",
+              "hints": [
+                "A `)` is only valid while there is an unmatched `(`.",
+                "if (close < open) { go(s + \")\", open, close + 1); }"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst line = fs.readFileSync(0, \"utf8\").trim();\nconst n = Number(line);\nconst out: string[] = [];\nfunction go(s: string, open: number, close: number): void {\n  if (s.length === 2 * n) {\n    out.push(s);\n    return;\n  }\n  if (open < n) {\n    go(s + \"(\", open + 1, close);\n  }\n____\n}\ngo(\"\", 0, 0);\nconsole.log(out.join(\" \"));\n",
+              "solution": "import * as fs from \"fs\";\nconst line = fs.readFileSync(0, \"utf8\").trim();\nconst n = Number(line);\nconst out: string[] = [];\nfunction go(s: string, open: number, close: number): void {\n  if (s.length === 2 * n) {\n    out.push(s);\n    return;\n  }\n  if (open < n) {\n    go(s + \"(\", open + 1, close);\n  }\n  if (close < open) {\n    go(s + \")\", open, close + 1);\n  }\n}\ngo(\"\", 0, 0);\nconsole.log(out.join(\" \"));\n",
+              "tests": [
+                {
+                  "input": "3",
+                  "output": "((())) (()()) (())() ()(()) ()()()"
+                },
+                {
+                  "input": "1",
+                  "output": "()"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w25-pr-fix1",
+              "title": "Fix the pruning that ran on unsorted input",
+              "prompt": "For `5 1 2 3` with a target of 3 this reports `found=0`. There are two answers, `3` and `1+2`. The loop meets the 5 first, sees it overshoot, and breaks — which is only valid if everything after it is bigger. Nothing sorted the candidates.",
+              "hint": "`break` claims every later candidate is at least as big. Is that true here?",
+              "hints": [
+                "`break` claims every later candidate is at least as big. Is that true here?",
+                "The claim needs the candidates in ascending order.",
+                "Sort a copy numerically before searching."
+              ],
+              "language": "typescript",
+              "kind": "fix",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst target = 3;\nconst xs = [...nums];\nlet found = 0;\nfunction go(start: number, sum: number): void {\n  if (sum === target) {\n    found = found + 1;\n    return;\n  }\n  for (let j = start; j < xs.length; j = j + 1) {\n    const x = xs[j] ?? 0;\n    if (sum + x > target) {\n      break;\n    }\n    go(j + 1, sum + x);\n  }\n}\ngo(0, 0);\nconsole.log(`found=${found}`);\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst target = 3;\nconst xs = [...nums].sort((a, b) => a - b);\nlet found = 0;\nfunction go(start: number, sum: number): void {\n  if (sum === target) {\n    found = found + 1;\n    return;\n  }\n  for (let j = start; j < xs.length; j = j + 1) {\n    const x = xs[j] ?? 0;\n    if (sum + x > target) {\n      break;\n    }\n    go(j + 1, sum + x);\n  }\n}\ngo(0, 0);\nconsole.log(`found=${found}`);\n",
+              "tests": [
+                {
+                  "input": "5 1 2 3",
+                  "output": "found=2"
+                },
+                {
+                  "input": "3 2 1",
+                  "output": "found=2"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w25-pr-fix2",
+              "title": "Fix the brackets that did not balance",
+              "prompt": "For n = 3 this reports `20` strings where there are 5 balanced ones. A `)` is allowed whenever fewer than n have been written — including when nothing is open, so `)(` and `())(()` get through.",
+              "hint": "What must be true for a `)` to be valid at this point?",
+              "hints": [
+                "What must be true for a `)` to be valid at this point?",
+                "It has to close a `(` that is still open.",
+                "The condition is close < open."
+              ],
+              "language": "typescript",
+              "kind": "fix",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst line = fs.readFileSync(0, \"utf8\").trim();\nconst n = Number(line);\nlet count = 0;\nfunction go(len: number, open: number, close: number): void {\n  if (len === 2 * n) {\n    count = count + 1;\n    return;\n  }\n  if (open < n) {\n    go(len + 1, open + 1, close);\n  }\n  if (close < n) {\n    go(len + 1, open, close + 1);\n  }\n}\ngo(0, 0, 0);\nconsole.log(count);\n",
+              "solution": "import * as fs from \"fs\";\nconst line = fs.readFileSync(0, \"utf8\").trim();\nconst n = Number(line);\nlet count = 0;\nfunction go(len: number, open: number, close: number): void {\n  if (len === 2 * n) {\n    count = count + 1;\n    return;\n  }\n  if (open < n) {\n    go(len + 1, open + 1, close);\n  }\n  if (close < open) {\n    go(len + 1, open, close + 1);\n  }\n}\ngo(0, 0, 0);\nconsole.log(count);\n",
+              "tests": [
+                {
+                  "input": "3",
+                  "output": "5"
+                },
+                {
+                  "input": "2",
+                  "output": "2"
+                },
+                {
+                  "input": "4",
+                  "output": "14"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            }
+          ],
+          "quiz": [
+            {
+              "question": "Using `continue` where `break` would be valid is…",
+              "options": [
+                "a bug",
+                "correct, but it prunes nothing — every sibling is still tested",
+                "faster",
+                "a type error"
+              ],
+              "answer": 1,
+              "explanation": "Right answers, wasted work."
+            },
+            {
+              "question": "Balanced-bracket generation that only builds valid prefixes looks at how many leaves for n = 3?",
+              "options": [
+                "64",
+                "5",
+                "20",
+                "8"
+              ],
+              "answer": 1,
+              "explanation": "Every leaf is an answer."
+            }
+          ]
+        },
+        {
+          "key": "w25-recognise",
+          "title": "Recognising it — and where it stops",
+          "what": "'Find all' is backtracking. 'How many ways' often is not.",
+          "lesson": "## You have been backtracking since week 20\n\n```ts\nfunction pathTo(c: Cat, name: string): readonly string[] | null {\n  if (c.name === name) { return [c.name]; }\n  for (const kid of c.kids) {\n    const below = pathTo(kid, name);\n    if (below !== null) { return [c.name, ...below]; }    // found: stop\n  }\n  return null;                                           // dead end: back up\n}\n```\n\n`return null` **is** the backtrack: this subtree failed, so the caller tries its\nnext child. With an explicit `path` array the same search is choose (`push`),\nexplore, un-choose (`pop`) — this lesson's first exercise writes it that way.\n\n## The wording that gives it away\n\n| the question says | reach for |\n|---|---|\n| \"all subsets / combinations / permutations\" | backtracking |\n| \"every way to…\", \"list every…\" | backtracking |\n| \"place n … so that none …\" | backtracking with pruning |\n| \"any one path / is it possible\" | backtracking that stops at the first success |\n| \"**how many** ways\" / \"the **best** way\" | often **not** — see below |\n\n## Where it stops being enough\n\n\"How many ways to climb 20 stairs, one or two at a time?\" A backtracking search\nwalks every way — and the answer is **10,946** ways, so it makes **21,891** calls.\nWorse, look at what it is doing: the number of ways to finish from stair 15 is\ncomputed again every time any path reaches stair 15.\n\nRemember each answer the first time — a `Map` from stair to ways — and the same\nquestion costs **39** calls:\n\n```ts\nconst known = memo.get(n);\nif (known !== undefined) { return known; }\nconst result = ways(n - 1) + ways(n - 2);\nmemo.set(n, result);\n```\n\nThat is **memoisation**, and it only works when the subproblems *repeat* and the\nanswer is a number rather than a list. Backtracking **lists** the ways; this\n**counts** them. Week 26 is entirely about that second kind of question — and it\nstarts from exactly this example, week 21's `fib`, and this Map.\n\n> ⚠️ **Common mistakes:** backtracking to *count* when the subproblems repeat;\n> memoising a search whose state includes the path (nothing ever repeats); and\n> storing a memo entry under the wrong key.\n",
+          "warmup": [
+            {
+              "question": "Week 20's `pathTo` returning `null` is…",
+              "options": [
+                "an error",
+                "the backtrack — this subtree failed, try the next",
+                "the base case only",
+                "memoisation"
+              ],
+              "answer": 1,
+              "explanation": "You were already doing it."
+            },
+            {
+              "question": "\"List every combination\" points at…",
+              "options": [
+                "DP",
+                "backtracking",
+                "sorting",
+                "a heap"
+              ],
+              "answer": 1,
+              "explanation": "Listing is generating."
+            },
+            {
+              "question": "Counting stair-climbing ways by backtracking recomputes…",
+              "options": [
+                "nothing",
+                "the ways from each stair, every time a path reaches it",
+                "the target",
+                "the sort"
+              ],
+              "answer": 1,
+              "explanation": "Repeated subproblems."
+            },
+            {
+              "question": "Memoisation works when…",
+              "options": [
+                "always",
+                "subproblems repeat and have a single answer each",
+                "the input is sorted",
+                "the depth is small"
+              ],
+              "answer": 1,
+              "explanation": "A path-dependent state never repeats."
+            }
+          ],
+          "exercises": [
+            {
+              "id": "tscourse-w25-rc-1",
+              "title": "pathTo, with a path",
+              "prompt": "Find a category and report the path to it, un-choosing on every dead end.",
+              "hint": "This category and nothing under it matched — take it back off the path.",
+              "hints": [
+                "This category and nothing under it matched — take it back off the path.",
+                "Write path.pop(); before returning false."
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst line = fs.readFileSync(0, \"utf8\").trim();\ninterface Cat {\n  readonly name: string;\n  readonly kids: readonly Cat[];\n}\nfunction cat(name: string, kids: readonly Cat[]): Cat {\n  return { name, kids };\n}\nconst root = cat(\"all\", [\n  cat(\"home\", [cat(\"rent\", []), cat(\"power\", [])]),\n  cat(\"food\", [cat(\"groceries\", []), cat(\"cafe\", [])]),\n]);\nconst path: string[] = [];\nfunction find(c: Cat, target: string): boolean {\n  path.push(c.name);\n  if (c.name === target) {\n    return true;\n  }\n  for (const kid of c.kids) {\n    if (find(kid, target)) {\n      return true;\n    }\n  }\n____\n  return false;\n}\nconsole.log(find(root, line) ? path.join(\" > \") : \"not found\");\n",
+              "solution": "import * as fs from \"fs\";\nconst line = fs.readFileSync(0, \"utf8\").trim();\ninterface Cat {\n  readonly name: string;\n  readonly kids: readonly Cat[];\n}\nfunction cat(name: string, kids: readonly Cat[]): Cat {\n  return { name, kids };\n}\nconst root = cat(\"all\", [\n  cat(\"home\", [cat(\"rent\", []), cat(\"power\", [])]),\n  cat(\"food\", [cat(\"groceries\", []), cat(\"cafe\", [])]),\n]);\nconst path: string[] = [];\nfunction find(c: Cat, target: string): boolean {\n  path.push(c.name);\n  if (c.name === target) {\n    return true;\n  }\n  for (const kid of c.kids) {\n    if (find(kid, target)) {\n      return true;\n    }\n  }\n  path.pop();\n  return false;\n}\nconsole.log(find(root, line) ? path.join(\" > \") : \"not found\");\n",
+              "tests": [
+                {
+                  "input": "cafe",
+                  "output": "all > food > cafe"
+                },
+                {
+                  "input": "rent",
+                  "output": "all > home > rent"
+                },
+                {
+                  "input": "travel",
+                  "output": "not found"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w25-rc-2",
+              "title": "Letters for digits",
+              "prompt": "Every string you can type on a phone keypad for the given digits.",
+              "hint": "Each digit offers a few letters; try each one for position i.",
+              "hints": [
+                "Each digit offers a few letters; try each one for position i.",
+                "The string is rebuilt on every call (`s + letter`), so there is nothing to un-choose."
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst line = fs.readFileSync(0, \"utf8\").trim();\nconst keys: Record<string, string> = {\n  \"2\": \"abc\", \"3\": \"def\", \"4\": \"ghi\", \"5\": \"jkl\",\n  \"6\": \"mno\", \"7\": \"pqrs\", \"8\": \"tuv\", \"9\": \"wxyz\",\n};\nconst out: string[] = [];\nfunction go(i: number, s: string): void {\n  if (i === line.length) {\n    out.push(s);\n    return;\n  }\n____\n}\ngo(0, \"\");\nconsole.log(out.join(\" \"));\n",
+              "solution": "import * as fs from \"fs\";\nconst line = fs.readFileSync(0, \"utf8\").trim();\nconst keys: Record<string, string> = {\n  \"2\": \"abc\", \"3\": \"def\", \"4\": \"ghi\", \"5\": \"jkl\",\n  \"6\": \"mno\", \"7\": \"pqrs\", \"8\": \"tuv\", \"9\": \"wxyz\",\n};\nconst out: string[] = [];\nfunction go(i: number, s: string): void {\n  if (i === line.length) {\n    out.push(s);\n    return;\n  }\n  for (const letter of keys[line.charAt(i)] ?? \"\") {\n    go(i + 1, s + letter);\n  }\n}\ngo(0, \"\");\nconsole.log(out.join(\" \"));\n",
+              "tests": [
+                {
+                  "input": "23",
+                  "output": "ad ae af bd be bf cd ce cf"
+                },
+                {
+                  "input": "7",
+                  "output": "p q r s"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w25-rc-3",
+              "title": "Where backtracking stops being enough",
+              "prompt": "Count stair-climbing ways twice — naively, and remembering each answer — and compare the calls.",
+              "hint": "Remember the answer for n before returning it.",
+              "hints": [
+                "Remember the answer for n before returning it.",
+                "Write memo.set(n, result);"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "let naiveCalls = 0;\nfunction ways(n: number): number {\n  naiveCalls = naiveCalls + 1;\n  return n <= 1 ? 1 : ways(n - 1) + ways(n - 2);\n}\nconst memo = new Map<number, number>();\nlet memoCalls = 0;\nfunction fastWays(n: number): number {\n  memoCalls = memoCalls + 1;\n  if (n <= 1) {\n    return 1;\n  }\n  const known = memo.get(n);\n  if (known !== undefined) {\n    return known;\n  }\n  const result = fastWays(n - 1) + fastWays(n - 2);\n____\n  return result;\n}\nconsole.log(`ways=${ways(20)} naive=${naiveCalls} fast=${fastWays(20)} memo=${memoCalls}`);\n",
+              "solution": "let naiveCalls = 0;\nfunction ways(n: number): number {\n  naiveCalls = naiveCalls + 1;\n  return n <= 1 ? 1 : ways(n - 1) + ways(n - 2);\n}\nconst memo = new Map<number, number>();\nlet memoCalls = 0;\nfunction fastWays(n: number): number {\n  memoCalls = memoCalls + 1;\n  if (n <= 1) {\n    return 1;\n  }\n  const known = memo.get(n);\n  if (known !== undefined) {\n    return known;\n  }\n  const result = fastWays(n - 1) + fastWays(n - 2);\n  memo.set(n, result);\n  return result;\n}\nconsole.log(`ways=${ways(20)} naive=${naiveCalls} fast=${fastWays(20)} memo=${memoCalls}`);\n",
+              "tests": [
+                {
+                  "input": "",
+                  "output": "ways=10946 naive=21891 fast=10946 memo=39"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w25-rc-4",
+              "title": "Read the question",
+              "prompt": "Map each kind of question to the technique it calls for.",
+              "hint": "Kind 3 is 'how many ways', where the same subproblem keeps recurring.",
+              "hints": [
+                "Kind 3 is 'how many ways', where the same subproblem keeps recurring.",
+                "Write if (kind === 3) { return \"memoisation\"; }"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nfunction technique(kind: number): string {\n  if (kind === 1) {\n    return \"backtracking\";\n  }\n  if (kind === 2) {\n    return \"backtracking with pruning\";\n  }\n____\n  return \"a loop\";\n}\nfor (const k of nums) {\n  console.log(`${k} ${technique(k)}`);\n}\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nfunction technique(kind: number): string {\n  if (kind === 1) {\n    return \"backtracking\";\n  }\n  if (kind === 2) {\n    return \"backtracking with pruning\";\n  }\n  if (kind === 3) {\n    return \"memoisation\";\n  }\n  return \"a loop\";\n}\nfor (const k of nums) {\n  console.log(`${k} ${technique(k)}`);\n}\n",
+              "tests": [
+                {
+                  "input": "1 2 3 4",
+                  "output": "1 backtracking\n2 backtracking with pruning\n3 memoisation\n4 a loop"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w25-rc-fix1",
+              "title": "Fix the memo stored under the wrong key",
+              "prompt": "There are 89 ways to climb 10 stairs, and this prints `ways=384`. The result for n is stored under `n - 1`, so the next lookup of n - 1 gets the answer for n, and the error compounds all the way up. A cache that is wrong is worse than no cache: it is fast AND wrong.",
+              "hint": "What key is the answer read back under? What key is it written under?",
+              "hints": [
+                "What key is the answer read back under? What key is it written under?",
+                "They must be the same — the question the answer belongs to.",
+                "Write memo.set(n, result);"
+              ],
+              "language": "typescript",
+              "kind": "fix",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst line = fs.readFileSync(0, \"utf8\").trim();\nconst memo = new Map<number, number>();\nfunction ways(n: number): number {\n  if (n <= 1) {\n    return 1;\n  }\n  const known = memo.get(n);\n  if (known !== undefined) {\n    return known;\n  }\n  const result = ways(n - 1) + ways(n - 2);\n  memo.set(n - 1, result);\n  return result;\n}\nconsole.log(`ways=${ways(Number(line))}`);\n",
+              "solution": "import * as fs from \"fs\";\nconst line = fs.readFileSync(0, \"utf8\").trim();\nconst memo = new Map<number, number>();\nfunction ways(n: number): number {\n  if (n <= 1) {\n    return 1;\n  }\n  const known = memo.get(n);\n  if (known !== undefined) {\n    return known;\n  }\n  const result = ways(n - 1) + ways(n - 2);\n  memo.set(n, result);\n  return result;\n}\nconsole.log(`ways=${ways(Number(line))}`);\n",
+              "tests": [
+                {
+                  "input": "10",
+                  "output": "ways=89"
+                },
+                {
+                  "input": "5",
+                  "output": "ways=8"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            }
+          ],
+          "quiz": [
+            {
+              "question": "Memoising a subsets search whose state includes the whole path…",
+              "options": [
+                "is the standard fix",
+                "saves nothing — no two calls share a state",
+                "is a type error",
+                "halves the calls"
+              ],
+              "answer": 1,
+              "explanation": "Memoisation needs repeated subproblems."
+            },
+            {
+              "question": "Naive stair-climbing for 20 stairs makes 21,891 calls; memoised, 39. The gap grows…",
+              "options": [
+                "linearly",
+                "exponentially — naive is exponential, memoised is linear",
+                "not at all",
+                "logarithmically"
+              ],
+              "answer": 1,
+              "explanation": "Week 26 starts here."
+            }
+          ]
+        }
+      ],
+      "capstone": {
+        "title": "Interview rep #25 — combinations to a target",
+        "brief": "Every combination of the candidates that sums to the target. Each candidate may be\nused **once**; the input may contain **duplicates**; the output must not.\n\nInput: the candidates on the first line, the target on the second.\n\n```\n10 1 2 7 6 1 5\n8\n```\n\n```\n1+1+6\n1+2+5\n1+7\n2+6\nfound 4  visited 17\n```\n\n**The rules:**\n\n* Each combination is printed in ascending order, joined with `+`, and the\n  combinations appear in ascending (lexicographic) order — which is exactly the\n  order a search over **sorted** candidates produces them in.\n* `visited` is the number of calls the search made, **including** the first one.\n* When nothing sums to the target, print `none` before the counts.\n* An empty candidate line, or a target of 0 or less, makes no call at all:\n  `none`, then `found 0  visited 0`.\n\n**What makes it a rep:** sorting does two jobs at once. It makes the\n`break`-on-overshoot pruning legal (lesson 6), and it puts equal candidates next to\neach other so the duplicate skip — `j > start && xs[j] === xs[j - 1]` — can stop\n`1+7` being found once per `1` (lesson 5's rule, in its combination form). The first\ntest contains two 1s: without the skip, `1+7` and `1+2+5` each appear twice.\n",
+        "kind": "auto",
+        "exercise": {
+          "id": "tscourse-w25-capstone",
+          "title": "Interview rep #25",
+          "prompt": "List every combination of the candidates summing to the target, each candidate used once, with no duplicate combinations — and count the calls.",
+          "hint": "Sort first. Every other part of the solution depends on it.",
+          "hints": [
+            "Sort first. Every other part of the solution depends on it.",
+            "Carry the REMAINING amount down; a call with 0 remaining has found a combination.",
+            "Skip a candidate equal to the previous one — but only when it is not the first choice at this level (`j > start`).",
+            "`break`, not `continue`, when a candidate exceeds what remains: everything after it is bigger.",
+            "`4 4 4 4` with target 8 has exactly one answer, and the duplicate skip is what makes it one rather than six.",
+            "Count the call before anything else in it, so the first call counts too."
+          ],
+          "language": "typescript",
+          "kind": "challenge",
+          "difficulty": "Hard",
+          "strictness": "strict+indexed",
+          "harness": "",
+          "judge_mode": "",
+          "forbid": [],
+          "starter": "import * as fs from \"fs\";\nconst lines = fs.readFileSync(0, \"utf8\").split(\"\\n\");\nconst xs: readonly number[] = (lines[0] ?? \"\")\n  .trim()\n  .split(/\\s+/)\n  .filter((s) => s !== \"\")\n  .map(Number)\n  .sort((a, b) => a - b);\nconst target = Number((lines[1] ?? \"\").trim() || \"0\");\nconst path: number[] = [];\nconst found: string[] = [];\nlet visited = 0;\n____\nif (xs.length > 0 && target > 0) {\n  go(0, target);\n}\nfor (const f of found) {\n  console.log(f);\n}\nif (found.length === 0) {\n  console.log(\"none\");\n}\nconsole.log(`found ${found.length}  visited ${visited}`);\n",
+          "solution": "import * as fs from \"fs\";\nconst lines = fs.readFileSync(0, \"utf8\").split(\"\\n\");\nconst xs: readonly number[] = (lines[0] ?? \"\")\n  .trim()\n  .split(/\\s+/)\n  .filter((s) => s !== \"\")\n  .map(Number)\n  .sort((a, b) => a - b);\nconst target = Number((lines[1] ?? \"\").trim() || \"0\");\nconst path: number[] = [];\nconst found: string[] = [];\nlet visited = 0;\nfunction go(start: number, remaining: number): void {\n  visited = visited + 1;\n  if (remaining === 0) {\n    found.push(path.join(\"+\"));\n    return;\n  }\n  for (let j = start; j < xs.length; j = j + 1) {\n    const x = xs[j] ?? 0;\n    if (j > start && x === (xs[j - 1] ?? 0)) {\n      continue;\n    }\n    if (x > remaining) {\n      break;\n    }\n    path.push(x);\n    go(j + 1, remaining - x);\n    path.pop();\n  }\n}\nif (xs.length > 0 && target > 0) {\n  go(0, target);\n}\nfor (const f of found) {\n  console.log(f);\n}\nif (found.length === 0) {\n  console.log(\"none\");\n}\nconsole.log(`found ${found.length}  visited ${visited}`);\n",
+          "tests": [
+            {
+              "input": "10 1 2 7 6 1 5\n8",
+              "output": "1+1+6\n1+2+5\n1+7\n2+6\nfound 4  visited 17"
+            },
+            {
+              "input": "2 5 2 1 2\n5",
+              "output": "1+2+2\n5\nfound 2  visited 7"
+            },
+            {
+              "input": "3 4\n2",
+              "output": "none\nfound 0  visited 1"
+            },
+            {
+              "input": "4 4 4 4\n8",
+              "output": "4+4\nfound 1  visited 3"
+            },
+            {
+              "input": "\n5",
+              "output": "none\nfound 0  visited 0"
+            }
+          ],
+          "source_slug": "",
+          "dataset": ""
+        },
+        "example_io": "1+1+6\n1+2+5\n1+7\n2+6\nfound 4  visited 17",
+        "rubric": [
+          "candidates are sorted once, before the search",
+          "choose / explore / un-choose, with a single shared path",
+          "duplicates are skipped only after the first choice at each level",
+          "an overshooting candidate ends the loop with `break`",
+          "every call is counted, including the first",
+          "combinations print in ascending order without being sorted afterwards",
+          "empty input or a non-positive target makes no call",
+          "no index access is asserted with `!`"
+        ],
+        "reference": "",
+        "stretch": {
+          "id": "tscourse-w25-capstone-stretch",
+          "title": "Interview rep #25 (stretch)",
+          "prompt": "N-Queens, reported. Read n. Print the **first** solution found (rows top to bottom, columns tried left to right) as a board of `.` and `Q`, then `solutions S  visited V`, where V counts every call to the placing function. If there is no solution, print `no solution` instead of a board. n of 0 or less makes no call.",
+          "hint": "Record each row's column in a path array; a snapshot of it IS a board.",
+          "hints": [
+            "Record each row's column in a path array; a snapshot of it IS a board.",
+            "Keep only the first snapshot — later solutions still count, but are not stored.",
+            "Store the snapshot in an array rather than a `let first = null`: TypeScript does not see an assignment made inside a nested function, and would narrow `first` to `null` for ever.",
+            "Row r has its queen at column c: c dots, a Q, then n - c - 1 dots."
+          ],
+          "language": "typescript",
+          "kind": "challenge",
+          "difficulty": "Hard",
+          "strictness": "strict+indexed",
+          "harness": "",
+          "judge_mode": "",
+          "forbid": [],
+          "starter": "import * as fs from \"fs\";\nconst n = Number(fs.readFileSync(0, \"utf8\").trim() || \"0\");\nconst cols = new Set<number>();\nconst d1 = new Set<number>();\nconst d2 = new Set<number>();\nconst queenAt: number[] = [];\nconst boards: (readonly number[])[] = [];\nlet solutions = 0;\nlet visited = 0;\n____\nif (n > 0) {\n  place(0);\n}\nconst first = boards[0];\nif (first === undefined) {\n  console.log(\"no solution\");\n} else {\n  for (const c of first) {\n    console.log(\".\".repeat(c) + \"Q\" + \".\".repeat(n - c - 1));\n  }\n}\nconsole.log(`solutions ${solutions}  visited ${visited}`);\n",
+          "solution": "import * as fs from \"fs\";\nconst n = Number(fs.readFileSync(0, \"utf8\").trim() || \"0\");\nconst cols = new Set<number>();\nconst d1 = new Set<number>();\nconst d2 = new Set<number>();\nconst queenAt: number[] = [];\nconst boards: (readonly number[])[] = [];\nlet solutions = 0;\nlet visited = 0;\nfunction place(r: number): void {\n  visited = visited + 1;\n  if (r === n) {\n    solutions = solutions + 1;\n    if (boards.length === 0) {\n      boards.push([...queenAt]);\n    }\n    return;\n  }\n  for (let c = 0; c < n; c = c + 1) {\n    if (cols.has(c) || d1.has(r + c) || d2.has(r - c)) {\n      continue;\n    }\n    cols.add(c);\n    d1.add(r + c);\n    d2.add(r - c);\n    queenAt.push(c);\n    place(r + 1);\n    queenAt.pop();\n    cols.delete(c);\n    d1.delete(r + c);\n    d2.delete(r - c);\n  }\n}\nif (n > 0) {\n  place(0);\n}\nconst first = boards[0];\nif (first === undefined) {\n  console.log(\"no solution\");\n} else {\n  for (const c of first) {\n    console.log(\".\".repeat(c) + \"Q\" + \".\".repeat(n - c - 1));\n  }\n}\nconsole.log(`solutions ${solutions}  visited ${visited}`);\n",
+          "tests": [
+            {
+              "input": "4",
+              "output": ".Q..\n...Q\nQ...\n..Q.\nsolutions 2  visited 17"
+            },
+            {
+              "input": "1",
+              "output": "Q\nsolutions 1  visited 2"
+            },
+            {
+              "input": "3",
+              "output": "no solution\nsolutions 0  visited 6"
+            },
+            {
+              "input": "0",
+              "output": "no solution\nsolutions 0  visited 0"
+            }
+          ],
+          "source_slug": "",
+          "dataset": ""
+        }
+      },
+      "objectives": [
+        "Say what a stack frame holds, and trace a recursion's calls and returns",
+        "Predict whether work before or after the recursive call runs first",
+        "Annotate a recursive function's return type, and say why TypeScript needs it",
+        "Design a recursion from its base case, its smaller problem and its combination",
+        "Write and recurse over a recursive type",
+        "Say why deep recursion fails, and rewrite a recursion as a loop",
+        "Generate every subset with choose / explore / un-choose",
+        "Generate permutations, and skip duplicates on sorted input",
+        "Copy a path before storing it, and say what goes wrong if you do not",
+        "Prune a search, and show with a count how much it saved",
+        "Solve N-Queens with sets of attacked columns and diagonals",
+        "Recognise a backtracking problem, and one that needs memoisation instead"
+      ],
+      "why": "Backtracking is how you answer every 'find all …' question in an interview — subsets, permutations, combinations, placements, paths — and it is one template with small variations. Understanding the call stack underneath it is what lets you debug it, bound its depth, and know when to turn it into a loop. And seeing the same subproblem solved twice is exactly the doorway into next week's dynamic programming.",
+      "est_minutes": 480,
+      "glossary": [
+        {
+          "term": "recursion",
+          "def": "A function that solves a problem by calling itself on a smaller version of it."
+        },
+        {
+          "term": "base case",
+          "def": "The input small enough to answer directly. Every recursion needs one it will reach."
+        },
+        {
+          "term": "stack frame",
+          "def": "One call's own parameters, locals and return point. Every pending call has one."
+        },
+        {
+          "term": "call stack",
+          "def": "The frames of every call that has started and not yet returned."
+        },
+        {
+          "term": "unwinding",
+          "def": "Returning back up through the frames — where 'after the call' code runs."
+        },
+        {
+          "term": "RangeError",
+          "def": "What Node throws when the call stack runs out: 'Maximum call stack size exceeded'."
+        },
+        {
+          "term": "accumulator",
+          "def": "A parameter that carries the answer-so-far down, so nothing is left to do on the way up."
+        },
+        {
+          "term": "explicit stack",
+          "def": "An array used as a stack to replace recursion with a loop."
+        },
+        {
+          "term": "recursive type",
+          "def": "A type that mentions itself: type Nested = number | readonly Nested[]."
+        },
+        {
+          "term": "backtracking",
+          "def": "Build a candidate step by step; when a step cannot work, undo it and try the next."
+        },
+        {
+          "term": "choose / explore / un-choose",
+          "def": "push, recurse, pop — the whole template."
+        },
+        {
+          "term": "decision tree",
+          "def": "The tree of choices a backtracking search walks. Its leaves are the candidates."
+        },
+        {
+          "term": "pruning",
+          "def": "Refusing to explore a branch that cannot lead to an answer."
+        },
+        {
+          "term": "nodes visited",
+          "def": "How many calls the search made. The honest measure of a backtracking cost."
+        },
+        {
+          "term": "memoisation",
+          "def": "Remember each subproblem's answer so it is computed once. Week 26's subject."
+        }
+      ],
+      "cheatsheet": "```ts\n// ---- a recursion: base case, smaller problem, combine --------------------\nfunction sum(xs: readonly number[]): number {        // ANNOTATE: else TS7023\n  if (xs.length === 0) { return 0; }                   // the base case\n  return (xs[0] ?? 0) + sum(xs.slice(1));              // RETURN it: else TS2366\n}\n\n// before the call runs on the way DOWN, after the call on the way back UP\nfunction down(n: number): void { if (n === 0) { return; } console.log(n); down(n - 1); }  // 3 2 1\nfunction up(n: number): void   { if (n === 0) { return; } up(n - 1); console.log(n); }    // 1 2 3\n\n// ---- a recursive type ---------------------------------------------------\ntype Nested = number | readonly Nested[];\n\n// ---- too deep: ~10k frames is typical; 100k is a RangeError ---------------\n// accumulator form -> a loop\nlet acc = 0;\nwhile (n > 0) { acc = acc + n; n = n - 1; }\n// or an explicit stack (week 18) for anything branching\nconst stack: Nested[] = [data];\nwhile (stack.length > 0) { const top = stack.pop(); /* … push its children … */ }\n\n// ---- backtracking: choose, explore, un-choose ----------------------------\nconst path: number[] = [];\nconst out: number[][] = [];\nfunction go(start: number): void {\n  out.push([...path]);                          // COPY — `path` keeps changing\n  for (let j = start; j < xs.length; j = j + 1) {\n    path.push(xs[j] ?? 0);                      // choose\n    go(j + 1);                                  // explore\n    path.pop();                                 // un-choose\n  }\n}\n\n// ---- permutations: a `used` flag per element ----------------------------\nif (used[i]) { continue; }\nused[i] = true; path.push(x); go(); path.pop(); used[i] = false;\n\n// duplicates: SORT first, then skip an equal value whose twin is unused\nif (i > 0 && xs[i] === xs[i - 1] && !used[i - 1]) { continue; }\n\n// ---- pruning on sorted input ---------------------------------------------\nif (sum + x > target) { break; }                // everything after is bigger too\n\n// ---- N-Queens: attacked columns and diagonals as Sets --------------------\nif (cols.has(c) || d1.has(r + c) || d2.has(r - c)) { continue; }\n```\n\n| generates | count | calls (no pruning) |\n|---|---|---|\n| subsets of n | 2ⁿ | 2ⁿ⁺¹ - 1 |\n| permutations of n | n! | about e·n! |\n| combinations n choose k | n!/(k!(n-k)!) | fewer, with a `start` index |\n",
+      "self_check": [
+        "Can you say what a stack frame holds?",
+        "Can you predict the output order of code before and after a recursive call?",
+        "Can you say why TypeScript needs a recursive function's return type written down?",
+        "Can you name the base case, the smaller problem and the combination of a recursion?",
+        "Can you write a recursive type and a function that walks it?",
+        "Can you say roughly how deep Node will recurse, and why you should not rely on a number?",
+        "Can you turn an accumulator recursion into a while loop?",
+        "Can you replace a branching recursion with an explicit stack?",
+        "Can you write the subsets template from memory?",
+        "Can you say why `out.push(path)` without a copy prints empty arrays?",
+        "Can you generate permutations without duplicates?",
+        "Can you prune a combination search, and say why it needs sorted input?",
+        "Can you place N queens using three Sets?",
+        "Can you tell a 'find all' problem from a 'how many ways' one?"
+      ],
+      "review": [
+        {
+          "question": "A stack frame holds…",
+          "options": [
+            "the whole program",
+            "one call's parameters, locals and where to return",
+            "the heap",
+            "only the return value"
+          ],
+          "answer": 1,
+          "explanation": "One per pending call."
+        },
+        {
+          "question": "Code AFTER the recursive call runs…",
+          "options": [
+            "first",
+            "on the way back up, in reverse order of the calls",
+            "never",
+            "in parallel"
+          ],
+          "answer": 1,
+          "explanation": "Which is why countUp prints 1 2 3."
+        },
+        {
+          "question": "TS7023 on a recursive function means…",
+          "options": [
+            "infinite recursion",
+            "its return type depends on itself — annotate it",
+            "a missing base case",
+            "a type error in the body"
+          ],
+          "answer": 1,
+          "explanation": "Write `: number` and it goes away."
+        },
+        {
+          "question": "TS2366 on a recursive function usually means…",
+          "options": [
+            "no base case",
+            "the recursive branch computes a value and forgets to return it",
+            "wrong parameter",
+            "too deep"
+          ],
+          "answer": 1,
+          "explanation": "The call happens; its answer is thrown away."
+        },
+        {
+          "question": "A 100,000-deep recursion in Node…",
+          "options": [
+            "works",
+            "throws RangeError: Maximum call stack size exceeded",
+            "is slow",
+            "is a type error"
+          ],
+          "answer": 1,
+          "explanation": "The stack is finite; a loop is not limited that way."
+        },
+        {
+          "question": "Any recursion can be turned into a loop with…",
+          "options": [
+            "a Map",
+            "an explicit stack",
+            "a Set",
+            "a sort"
+          ],
+          "answer": 1,
+          "explanation": "It is doing what the call stack did."
+        },
+        {
+          "question": "The backtracking template is…",
+          "options": [
+            "sort, search, stop",
+            "choose, explore, un-choose",
+            "split, recurse, merge",
+            "push, push, pop"
+          ],
+          "answer": 1,
+          "explanation": "push, recurse, pop."
+        },
+        {
+          "question": "`out.push(path)` instead of `out.push([...path])` gives…",
+          "options": [
+            "the right answer",
+            "every entry is the SAME array — empty by the end",
+            "a type error",
+            "duplicates"
+          ],
+          "answer": 1,
+          "explanation": "One array, pushed many times, emptied by the un-chooses."
+        },
+        {
+          "question": "The subsets of n elements number…",
+          "options": [
+            "n",
+            "n²",
+            "2ⁿ",
+            "n!"
+          ],
+          "answer": 2,
+          "explanation": "Each element is in or out."
+        },
+        {
+          "question": "The permutations of n distinct elements number…",
+          "options": [
+            "2ⁿ",
+            "n!",
+            "n²",
+            "n"
+          ],
+          "answer": 1,
+          "explanation": "4! = 24."
+        },
+        {
+          "question": "Skipping duplicate permutations needs the input…",
+          "options": [
+            "reversed",
+            "sorted, so equal values are adjacent",
+            "unique",
+            "in a Set"
+          ],
+          "answer": 1,
+          "explanation": "Week 24 pays off."
+        },
+        {
+          "question": "`if (sum + x > target) break;` is only correct when…",
+          "options": [
+            "always",
+            "the candidates are sorted ascending",
+            "the target is positive",
+            "there are no duplicates"
+          ],
+          "answer": 1,
+          "explanation": "Otherwise a smaller value later is skipped."
+        },
+        {
+          "question": "N-Queens tracks the two diagonals by…",
+          "options": [
+            "row",
+            "r + c and r - c",
+            "c only",
+            "a 2-D array"
+          ],
+          "answer": 1,
+          "explanation": "Each is constant along one diagonal."
+        },
+        {
+          "question": "\"How many ways…\" with repeated subproblems points at…",
+          "options": [
+            "more backtracking",
+            "memoisation — week 26",
+            "sorting",
+            "a heap"
+          ],
+          "answer": 1,
+          "explanation": "Backtracking lists; DP counts."
+        }
+      ],
+      "milestone": "Interview rep #25 — every combination that sums to a target, each candidate used once, duplicates in the input but never in the output. Sorted input makes the pruning legal and the duplicate skip possible, and the report counts the calls the search made — so the effect of both is a number on the page, not a claim.",
       "practice": []
     },
     {

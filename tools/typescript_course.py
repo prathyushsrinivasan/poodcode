@@ -480,6 +480,7 @@ _WEEK_FILES = (
     "ts_w22_search.py",        #          searching & two pointers
     "ts_w23_windows.py",       #          sliding window & prefix sums
     "ts_w24_sorting.py",       #          sorting
+    "ts_w25_recursion.py",     # Month 7 — recursion & backtracking
 )
 
 for _week_file in _WEEK_FILES:
@@ -545,9 +546,6 @@ for _week_file in _WEEK_FILES:
 # so it is worth writing the milestone before the lessons.
 # ===========================================================================
 _WEEKS += [
-    _skel(25, 7, _M7, "Recursion & Backtracking",
-          "Solve problems whose definition refers to themselves, then use that to "
-          "generate and search combinatorial spaces (subsets, permutations)."),
     _skel(26, 7, _M7, "Dynamic Programming",
           "Turn overlapping recursion into fast, memoized DP."),
     _skel(27, 7, _M7, "Graphs: BFS & DFS",

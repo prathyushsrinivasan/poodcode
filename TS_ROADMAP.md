@@ -1,7 +1,7 @@
-# TypeScript Roadmap — Weeks 25-32
+# TypeScript Roadmap — Weeks 26-32
 
 The plan for finishing **TypeScript: Zero to Interview**, the 8-month course in
-`tools/typescript_course.py`. Weeks 1-24 ship; weeks 25-32 are one-line
+`tools/typescript_course.py`. Weeks 1-25 ship; weeks 26-32 are one-line
 skeletons waiting to be authored.
 
 Unlike [`JAVA_ROADMAP.md`](JAVA_ROADMAP.md), which starts after the basics, this
@@ -15,9 +15,9 @@ rule that nothing may require syntax a later week teaches.
 
 ## Where it stands
 
-**Built:** weeks 1-24 — **188 lessons, 1,397 judged exercises** (1,382 in lessons
+**Built:** weeks 1-25 — **195 lessons, 1,443 judged exercises** (1,428 in lessons
 and capstones, 15 in week 1's practice families), twenty Budget Buddy capstones —
-**the arc is complete** — four interview reps, and a full
+**the arc is complete** — five interview reps, and a full
 glossary/cheat-sheet/self-check/review set per week. **Month 6 is finished.**
 
 | | |
@@ -79,7 +79,7 @@ verifier revealed which kind they were.
 ### Nothing is half-finished
 
 Every authored week is complete: lessons, exercises, capstone, stretch, glossary,
-cheat sheet, self-check, review, milestone. Weeks 25-32 are untouched skeletons, as
+cheat sheet, self-check, review, milestone. Weeks 26-32 are untouched skeletons, as
 they were before. There is no partially-authored week and no disabled exercise.
 
 ### Five traps that cost real time
@@ -798,31 +798,55 @@ to keep its ties.
 **One new scope rule**: `.toSorted(` gated at 24. Week 13's lesson prose mentions it
 in passing; no program before this week calls it.
 
-### Month 7 — DSA Interview Core (weeks 25-28)
+### Month 7 — DSA Interview Core (weeks 25-28) — 🚧 **25 done**
 
-**25. Recursion & Backtracking** ⬜ (merged from two skeleton weeks)
-Base case and recursive case · the call stack · recursion → iteration ·
-subsets · permutations · N-Queens · pruning.
-*Note, and it changed when week 20 landed:* this week no longer **introduces**
-recursion. Week 20 does, on trees, because a tree's type refers to itself and
-teaching it any other way was contorted (see that week's entry). So week 25
-**deepens** it, exactly as weeks 13, 15 and 18 deepen their subjects, and its file
-should open with "you have been recursing over trees since week 20; here is the
-whole story": the call stack and what a stack frame holds, recursion depth and the
-`RangeError` (week 20 ships one as a `fix`), memoisation as a lead-in to week 26,
-recursion → iteration as a deliberate technique (week 20 has both forms of every
-traversal to point at), and then backtracking — which week 20's `pathTo` already
-performs, returning `null` to mean "not in this subtree" so the caller tries the
-next branch. Naming a pattern the learner has already used is a much better
-opening than a factorial.
+**25. Recursion & Backtracking** ✅ · `tools/ts_w25_recursion.py` · 7 lessons,
+46 exercises
+`w25-stack` · `w25-shape` · `w25-loops` · `w25-subsets` · `w25-perms` ·
+`w25-prune` · `w25-recognise`.
+*Capstone:* **interview rep #25** — every combination summing to a target, each
+candidate used once, duplicates in the input but never in the output, with the
+calls counted. Sorting does two jobs (legal `break` pruning, and adjacent
+duplicates to skip); the `4 4 4 4 → 8` test is one answer only because of the skip.
+Stretch: N-Queens, printing the first board and the solution/visit counts.
+Kinds: 31 drill, 9 fix, 2 diagnose, 1 design, 1 retype.
 
-*What week 24 adds to that inheritance:* two more recursions the learner has
-written and counted. **Merge sort** is the cleanest divide-and-conquer example in
-the course, and its broken base case (`=== 0` instead of `<= 1`) already ships as a
-`RangeError` fix — the "must get strictly smaller" rule with a concrete failure
-behind it. **Quicksort's worst case** is a recursion depth of n rather than log n,
-which is the natural way into "why is the depth limit a real constraint". Both are
-better examples of the call stack than anything contrived for the purpose.
+**It deepens, as planned**: the file opens with "you have been recursing since
+week 20", and lesson 7 opens on week 20's `pathTo` — `return null` *is* the
+backtrack — before rewriting it with an explicit `path` and `pop`.
+
+**Three TypeScript facts carry lessons 1-2, all verified:** a recursive function
+with no return annotation is **TS7023** (its type depends on itself, so inference
+refuses), the forgotten `return` on the recursive branch is **TS2366** (and would
+silently print `undefined` without the annotation), and a **recursive type**
+(`type Nested = number | readonly Nested[]`) ships as a `_design` whose harness uses
+`// @ts-expect-error` to prove the learner's type *rejects* `[1, "two"]` — an `any`
+leaves the directive unused, which is itself an error. That is a new trick for
+type-graded harnesses and worth reusing in weeks 29-31.
+
+**The depth limit is taught without printing it.** A 100,000-node list recursed
+one node per call is a `RangeError` on the judge's Node (verified), and the `fix` is
+a loop — but no exercise prints "the maximum depth", because it varies with frame
+size and engine flags. Week 17's determinism rule, applied to the stack.
+
+**Month 6's counting idiom carries over as "calls made":** 8 leaves and 15 calls for
+the subsets of three; 24 permutations and 65 calls for four; pruning on `1…8` →
+target 8 visits 25 nodes against 223 unpruned; and lesson 7's lead-in to week 26 —
+stair-climbing for 20 stairs is **21,891** calls naively and **39** memoised.
+
+**Two `fix` exercises are aliasing and state bugs rather than crashes**, which is
+what backtracking actually goes wrong with: `out.push(path)` without a copy prints
+`[]` for every subset, and resetting `path` but not `used[i]` produces exactly one
+permutation. A third is a memo written under `n - 1`, which is fast *and* wrong
+(`ways=384` for 10 stairs).
+
+**One trap found while authoring and recorded in the stretch's hints:** `let first:
+T | null = null` assigned inside a nested function is still narrowed to `null`
+afterwards — TypeScript does not see assignments made in closures — so the stretch
+keeps its first board in an array instead.
+
+Its three hand-counted call totals were wrong on the first run (25 not 24, 223 not
+256, 17 not 12) — trap 5 again; all now come from the reference.
 
 **26. Dynamic Programming** ⬜ · **27. Graphs: BFS & DFS** ⬜ ·
 **28. Heaps & Intervals** ⬜
@@ -871,7 +895,7 @@ still go first.
 | **C** ✅ | 13-16 | Types, then the project-shaped week: modules, tsconfig, .d.ts |
 | **D** ✅ | 17-20 | Async + data structures; the Budget Buddy arc is closed |
 | **E** ✅ | 21-24 | Algorithmic thinking; the month's idiom is to count operations |
-| **F** ← next | 25-28 | DSA core |
+| **F** 🚧 | 25 ✅, **26** ← next | DSA core |
 | **G** | 29-32 | Type-level; lowest risk, highest polish |
 
 **Batches C and D are done, and with them every risk the back half was waiting
