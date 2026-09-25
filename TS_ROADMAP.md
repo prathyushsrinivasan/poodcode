@@ -1,7 +1,7 @@
-# TypeScript Roadmap — Weeks 24-32
+# TypeScript Roadmap — Weeks 25-32
 
 The plan for finishing **TypeScript: Zero to Interview**, the 8-month course in
-`tools/typescript_course.py`. Weeks 1-23 ship; weeks 24-32 are one-line
+`tools/typescript_course.py`. Weeks 1-24 ship; weeks 25-32 are one-line
 skeletons waiting to be authored.
 
 Unlike [`JAVA_ROADMAP.md`](JAVA_ROADMAP.md), which starts after the basics, this
@@ -15,10 +15,10 @@ rule that nothing may require syntax a later week teaches.
 
 ## Where it stands
 
-**Built:** weeks 1-23 — **181 lessons, 1,342 judged exercises** (1,327 in lessons
+**Built:** weeks 1-24 — **188 lessons, 1,397 judged exercises** (1,382 in lessons
 and capstones, 15 in week 1's practice families), twenty Budget Buddy capstones —
-**the arc is complete** — three interview reps, and a full
-glossary/cheat-sheet/self-check/review set per week.
+**the arc is complete** — four interview reps, and a full
+glossary/cheat-sheet/self-check/review set per week. **Month 6 is finished.**
 
 | | |
 |---|---|
@@ -55,15 +55,19 @@ is the stuff that is only obvious after it has cost you an hour.
 
 | | covers | last run |
 |---|---|---|
-| `python tools/verify_ts_course.py --starters` | **weeks 1-23, 1,342 exercises, 0 failures** | current |
-| `cd src-tauri && cargo test --test verify_ts_course` | weeks 1-21, 1,250 exercises, 3 tests, 916s | **not re-run for weeks 22-23** |
+| `python tools/verify_ts_course.py --starters` | weeks 1-23 in full; **week 24's 55 exercises, 0 failures** | current |
+| `cd src-tauri && cargo test --release --test verify_ts_course` | **weeks 1-24, 1,397 exercises, 3 tests, 704s, all green** | current |
 
 The Rust suite is the judge-level one — it puts every program through the same
-judge the app uses, rather than through the fast Node path. It was green through
-week 21 and has not been re-run since weeks 22 and 23 landed. **Run it before
-trusting those two weeks in the app.** It takes about 15 minutes with the release
-binary already built, and the two verifiers have never disagreed, so this is
-diligence rather than suspicion.
+judge the app uses, rather than through the fast Node path. The gap this section
+used to record (weeks 22-23 never judge-verified) is **closed**: the run above
+covers every authored week. The Python verifier was run on week 24 alone, which is
+sufficient because regenerating left weeks 1-23 of the seed **byte-identical**
+(checked by comparing each week's JSON against the previous commit's).
+
+One thing to know before running it: the test `include_str!`s `ts_course.json` at
+**compile time**. A run already in progress when you regenerate the seed is
+testing the old seed — stop it and start again.
 
 Note that the Python verifier prints a `note:` listing `fix` starters that fail at
 **compile** time rather than at run time. That note is informational — 32 such
@@ -75,7 +79,7 @@ verifier revealed which kind they were.
 ### Nothing is half-finished
 
 Every authored week is complete: lessons, exercises, capstone, stretch, glossary,
-cheat sheet, self-check, review, milestone. Weeks 24-32 are untouched skeletons, as
+cheat sheet, self-check, review, milestone. Weeks 25-32 are untouched skeletons, as
 they were before. There is no partially-authored week and no disabled exercise.
 
 ### Five traps that cost real time
@@ -115,6 +119,11 @@ they were before. There is no partially-authored week and no disabled exercise.
    test, generate the seed, run the reference solution out of `ts_course.json`, and
    paste what it actually printed. The Mastery track has `_computed()` for exactly
    this; the course does not, and adding it would be a genuine improvement.
+   Week 24 is the latest evidence: of 55 outputs worked out by hand, **three were
+   wrong** (a middle-pivot quicksort count of 49 that is really 38, and an insertion
+   count of 8 that is really 10, stated in three places). The verifier caught all
+   three on the first run; `verify_ts_course.py` prints `got:` beside `expected:`,
+   which is the number to paste.
 
 ### Two claims that were wrong and are now corrected
 
@@ -608,7 +617,7 @@ depth.
 generator functions, generator *methods* and `yield*`, all of which run untouched
 because generators are runtime syntax rather than type syntax.
 
-### Month 6 — Algorithmic Thinking (weeks 21-24) — 🚧 **21-23 done**
+### Month 6 — Algorithmic Thinking (weeks 21-24) — ✅ **done**
 
 **21. Big-O & Complexity** ✅ · `tools/ts_w21_bigo.py` · 7 lessons, 49 exercises
 `w21-why` · `w21-count` · `w21-classes` · `w21-rules` · `w21-space` ·
@@ -731,25 +740,63 @@ difference array's `n + 1`th slot, and week 20's sentinel node are the same trad
 one wasted slot in exchange for deleting a branch — and lesson 6 says so explicitly.
 Three appearances in one course is worth pointing at.
 
-**24. Sorting** ⬜
-Standard, low-risk, stdout-gradable. The Problem Library and
-`tools/algorithms_defs.py` already hold the patterns and can seed both the
-lesson text and the capstone problems.
+**24. Sorting** ✅ · `tools/ts_w24_sorting.py` · 7 lessons, 55 exercises
+`w24-simple` · `w24-merge` · `w24-quick` · `w24-counting` · `w24-builtin` ·
+`w24-tool` · `w24-choose`.
+*Capstone:* **interview rep #24** — the sort bench. Five hand-written sorts
+(insertion, selection, merge, quick, counting) run on one input, each checked
+against the built-in and each reporting its comparisons — counting sort reports
+`ops` instead, because it never compares. The tests are chosen so each sort takes a
+turn at looking good and bad: sorted input makes insertion cheapest and last-element
+quicksort as bad as selection; `3 1000 2` makes counting sort walk 1,001 buckets.
+Stretch benches **stability** instead of cost.
+Kinds: 36 drill, 13 fix, 2 diagnose, 1 predict, 1 function exercise (`_fn` —
+"write insertion sort", graded on the returned array).
 
-*What it inherits:*
+**Everything the roadmap said it inherits, it used.** Merge sort is three new lines
+around week 22's merge, and the file header lists what came from where (week 6's
+comparator, week 19's `||` tie-break, week 20's recursion, week 21's counting,
+week 22's merge and partition, week 23's prefix sums). The week opens on how the
+sorts work, not on whether to sort.
 
-* **Week 22 built the merge** (`w22-merge`, including both tail drains and the `<=`
-  that makes it stable) explicitly as the heart of merge sort, so week 24 splits and
-  recurses and calls it — it does not write it again. Week 22's
-  partition-by-predicate exercise is likewise half of quicksort.
-* **Sorting is already established as affordable.** Week 21's table and week 22's
-  sort-then-sweep lesson both make the case, so week 24 can open on *how* the sorts
-  work rather than on whether to sort.
-* **Report the count.** Comparisons and swaps, per algorithm, at two sizes — the
-  month's idiom, and the natural way to show why an O(n log n) sort beats an O(n²)
-  one without timing anything.
-* **Stability has already been introduced** (week 22's merge), so week 24 can
-  *use* the word rather than define it.
+**The counts carry the argument, as the month requires**, and every one is
+checkable by hand: selection sort does 28 comparisons on *any* eight elements
+("its cost ignores its input"), insertion sort 7 sorted and 28 reversed ("its cost
+depends on it" — week 21's best/worst case as two numbers from one program), merge
+sort 12/32/80 at n = 8/16/32 against n log n = 24/64/160, and last-element quicksort
+**120 on sorted input against 64 on mixed** — selection sort's number, on the input
+you would think was easiest. A middle pivot brings it to 38.
+
+**Two runtime facts found while probing, and both became exercises:**
+
+* A comparator that never returns a negative — `(a, b) => (a > b ? 1 : 0)` —
+  **type-checks and does not sort**: `[3, 1, 2]` comes back `3,1,2`, because the
+  engine only moves an element when told it belongs earlier. A `fix` with no error
+  message and no warning, which is exactly what makes it worth a lesson.
+* A boolean comparator is **TS2345**, and at run time it *also* leaves the array
+  unsorted — so the compile error reads as a rescue rather than pedantry. Shipped as
+  a `diagnose`, beside **TS2339** for `.sort` on a `readonly number[]` (the type
+  system's version of week 6's "sort mutates").
+
+**Lesson 4 closes the loop on the lower bound.** `⌈log₂ n!⌉` is computed as a sum of
+`Math.log2(i)` (5 / 16 / 45 for n = 4 / 8 / 16), merge sort's worst eight elements
+cost 17 against a floor of 16, and the middle-pivot quicksort's 38 on sixteen sorted
+elements — *under* the floor of 45 — gets a sentence explaining why that is no
+contradiction: the bound is about the worst input. Counting sort then steps around
+it, and its **stable** form is week 23's prefix sum doing a new job.
+
+**Two further `fix` exercises are silent data loss rather than crashes**: counting
+sort on negative values (`counts[-2]` sets a *property*, which the index walk never
+visits, so `-2` simply vanishes) and the emit loop stopping at `v < max`.
+
+**Quicksort's instability is exhibited, not asserted** — on `ann 2, bo 1, cy 2,
+dee 1` it puts `dee` before `bo` — and the stretch's hints make the honest point
+that `ties kept` on one input proves nothing: stability is a guarantee, and only its
+absence can be shown by example. Its second test is an input where quicksort happens
+to keep its ties.
+
+**One new scope rule**: `.toSorted(` gated at 24. Week 13's lesson prose mentions it
+in passing; no program before this week calls it.
 
 ### Month 7 — DSA Interview Core (weeks 25-28)
 
@@ -768,6 +815,14 @@ traversal to point at), and then backtracking — which week 20's `pathTo` alrea
 performs, returning `null` to mean "not in this subtree" so the caller tries the
 next branch. Naming a pattern the learner has already used is a much better
 opening than a factorial.
+
+*What week 24 adds to that inheritance:* two more recursions the learner has
+written and counted. **Merge sort** is the cleanest divide-and-conquer example in
+the course, and its broken base case (`=== 0` instead of `<= 1`) already ships as a
+`RangeError` fix — the "must get strictly smaller" rule with a concrete failure
+behind it. **Quicksort's worst case** is a recursion depth of n rather than log n,
+which is the natural way into "why is the depth limit a real constraint". Both are
+better examples of the call stack than anything contrived for the purpose.
 
 **26. Dynamic Programming** ⬜ · **27. Graphs: BFS & DFS** ⬜ ·
 **28. Heaps & Intervals** ⬜
@@ -815,8 +870,8 @@ still go first.
 | **B** ✅ | 11-12 | Classes unblock 18, 20, 28; structural typing completes month 3 |
 | **C** ✅ | 13-16 | Types, then the project-shaped week: modules, tsconfig, .d.ts |
 | **D** ✅ | 17-20 | Async + data structures; the Budget Buddy arc is closed |
-| **E** 🚧 | 21-23 ✅, **24** ← next | Algorithmic thinking; the month's idiom is to count operations |
-| **F** | 25-28 | DSA core |
+| **E** ✅ | 21-24 | Algorithmic thinking; the month's idiom is to count operations |
+| **F** ← next | 25-28 | DSA core |
 | **G** | 29-32 | Type-level; lowest risk, highest polish |
 
 **Batches C and D are done, and with them every risk the back half was waiting
@@ -857,6 +912,8 @@ G remains independent of everything.
   utility types (`Required<`, `Readonly<`, `Exclude<`, `Extract<`, `ReturnType<`,
   `Parameters<`), `JSON.parse(`, `JSON.stringify(` and `??=` — plus
   `NonNullable<` at 15 and `Awaited<` at 17, gated ahead of their weeks.
+  Weeks 16-24 added the module tokens, `async`/`await`/`Promise<`, `Map`/`Set`
+  in both constructor spellings, generators, and `.toSorted(` at 24.
   All were verified clear across every authored program first.
   Two tokens were deliberately **not** added, and the reasons are recorded in
   the table itself: `extends ` (week 10 uses it 79 times for generic

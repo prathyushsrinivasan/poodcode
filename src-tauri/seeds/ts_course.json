@@ -60571,19 +60571,2591 @@
       "month": 6,
       "month_title": "Algorithmic Thinking",
       "theme": "Sorting",
-      "goal": "Understand the common sorts and use sorting as a problem-solving tool.",
-      "summary": "",
-      "authored": false,
-      "lessons": [],
-      "capstone": null,
-      "objectives": [],
-      "why": "",
-      "est_minutes": 40,
-      "glossary": [],
-      "cheatsheet": "",
-      "self_check": [],
-      "review": [],
-      "milestone": "",
+      "goal": "How the sorts actually work — and what each one costs, counted — so that the built-in stops being magic and sorting becomes a tool you reach for on purpose.",
+      "summary": "You have called `.sort` since week 6. This week opens it up.\n\n## Why learn algorithms you will not write\n\nBecause every one of them is a lesson in something else:\n\n| sort | what it actually teaches |\n|---|---|\n| selection | an algorithm whose cost **ignores** its input |\n| insertion | one whose cost **depends** on it — best and worst case, made visible |\n| merge | divide and conquer, and where the `log n` comes from |\n| quick | partitioning, pivots, and an average case that is not the worst case |\n| counting | that `n log n` is a limit on **comparing**, not on sorting |\n\nAnd one practical reason: interviewers ask. Not usually \"write quicksort\", but\n\"why is the built-in stable\", \"what is the worst case\", \"can you do better than\n`n log n` here\" — questions you can only answer if you have taken one apart.\n\n## Counted, as always this month\n\nEvery algorithm this week prints its **comparisons**. On eight elements,\nalready sorted:\n\n```\nselection  cmp 28\ninsertion  cmp  7\nmerge      cmp 12\nquick      cmp 28     ← the last-element pivot's worst case\n```\n\nFour sorts, one input, four very different stories — and the numbers tell them.\n\n## What you already own\n\nWeek 22 wrote **the merge** (both tail drains, `<=` for stability) and **the\npartition** (keep the ones that pass). Merge sort is that merge plus recursion;\nquicksort is that partition plus recursion. Week 20 taught the recursion. You are\nassembling, not starting over.\n\n⏱️ Budget about **eight hours**.\n",
+      "authored": true,
+      "lessons": [
+        {
+          "key": "w24-simple",
+          "title": "The two sorts you could invent",
+          "what": "Selection and insertion — and why one of them notices sorted input.",
+          "lesson": "Ask someone to sort a hand of cards and they will do one of two things.\n\n## Selection sort — find the smallest, put it first, repeat\n\n```ts\nfor (let i = 0; i < xs.length - 1; i = i + 1) {\n  let min = i;\n  for (let j = i + 1; j < xs.length; j = j + 1) {\n    if ((xs[j] ?? 0) < (xs[min] ?? 0)) { min = j; }\n  }\n  swap(xs, i, min);\n}\n```\n\n`swap` needs the usual care under `noUncheckedIndexedAccess`: read both slots\nwith a `?? 0`, then write.\n\nThe comparisons are `(n-1) + (n-2) + … + 1` = **n(n-1)/2** — 28 for eight\nelements. And that is true of *any* eight elements, sorted, reversed or shuffled:\nthe inner loop always scans the whole remainder, because it cannot know the\nsmallest is already in front until it has looked at everything. **Its cost ignores\nits input.**\n\n## Insertion sort — take the next card, slide it into place\n\n```ts\nfor (let i = 1; i < xs.length; i = i + 1) {\n  const v = xs[i] ?? 0;                     // save it FIRST\n  let j = i - 1;\n  while (j >= 0 && (xs[j] ?? 0) > v) {\n    xs[j + 1] = xs[j] ?? 0;                 // shift the bigger one right\n    j = j - 1;\n  }\n  xs[j + 1] = v;                            // drop it into the gap\n}\n```\n\nEverything left of `i` is sorted; each step extends that sorted prefix by one.\n\nNow count:\n\n```\nalready sorted:  cmp  7      each element finds its place at once\nreversed:        cmp 28      each element travels all the way to the front\n```\n\n**Its cost depends on its input.** That is week 21's best case and worst case,\nand here they are as two numbers from the same code. The word for this is\n**adaptive**, and it is why insertion sort is not a toy: real library sorts switch\nto it for short runs and nearly-ordered data, where it beats anything cleverer.\n\n## The saved `v`\n\nThe first shift writes `xs[i] = xs[i - 1]`, so if you read `xs[i]` *after* the\nloop starts, the element you were inserting is gone. Saving it is not tidiness —\nit is the algorithm.\n\n## And bubble sort?\n\nSwap adjacent pairs until nothing moves. It is also O(n²), it is adaptive only\nwith an extra flag, and it does more writes than either of these. It is famous for\nbeing taught, not for being used — you can skip it.\n\n> ⚠️ **Common mistakes:** reading `xs[i]` after the shift instead of the saved\n> `v`; stopping selection's inner loop one short (`j < xs.length - 1`); and\n> assuming O(n²) means \"always slow\" — insertion sort on sorted input is linear.\n",
+          "warmup": [
+            {
+              "question": "Selection sort on 8 elements compares how many times?",
+              "options": [
+                "8",
+                "28",
+                "64",
+                "it depends on the input"
+              ],
+              "answer": 1,
+              "explanation": "7 + 6 + … + 1, always."
+            },
+            {
+              "question": "Insertion sort on already-sorted input is…",
+              "options": [
+                "O(n²)",
+                "O(n)",
+                "O(log n)",
+                "O(n log n)"
+              ],
+              "answer": 1,
+              "explanation": "One comparison per element."
+            },
+            {
+              "question": "\"Adaptive\" means…",
+              "options": [
+                "it uses less memory",
+                "it is cheaper when the input is nearly sorted",
+                "it is stable",
+                "it is recursive"
+              ],
+              "answer": 1,
+              "explanation": "Insertion is; selection is not."
+            },
+            {
+              "question": "Insertion sort saves `v` before shifting because…",
+              "options": [
+                "style",
+                "the first shift overwrites xs[i]",
+                "types",
+                "speed"
+              ],
+              "answer": 1,
+              "explanation": "Without it the element is lost."
+            }
+          ],
+          "exercises": [
+            {
+              "id": "tscourse-w24-sl-1",
+              "title": "Find the smallest of the rest",
+              "prompt": "Complete selection sort's inner step: remember where the smallest remaining element is.",
+              "hint": "Compare each remaining element with the smallest found so far.",
+              "hints": [
+                "Compare each remaining element with the smallest found so far.",
+                "When it is smaller, remember its index in `min`."
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nfunction swap(xs: number[], i: number, j: number): void {\n  const t = xs[i] ?? 0;\n  xs[i] = xs[j] ?? 0;\n  xs[j] = t;\n}\nfunction selectionSort(xs: number[]): void {\n  for (let i = 0; i < xs.length - 1; i = i + 1) {\n    let min = i;\n    for (let j = i + 1; j < xs.length; j = j + 1) {\n____\n    }\n    swap(xs, i, min);\n  }\n}\nselectionSort(nums);\nconsole.log(nums.join(\",\"));\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nfunction swap(xs: number[], i: number, j: number): void {\n  const t = xs[i] ?? 0;\n  xs[i] = xs[j] ?? 0;\n  xs[j] = t;\n}\nfunction selectionSort(xs: number[]): void {\n  for (let i = 0; i < xs.length - 1; i = i + 1) {\n    let min = i;\n    for (let j = i + 1; j < xs.length; j = j + 1) {\n      if ((xs[j] ?? 0) < (xs[min] ?? 0)) {\n        min = j;\n      }\n    }\n    swap(xs, i, min);\n  }\n}\nselectionSort(nums);\nconsole.log(nums.join(\",\"));\n",
+              "tests": [
+                {
+                  "input": "5 2 4 1 3",
+                  "output": "1,2,3,4,5"
+                },
+                {
+                  "input": "2 1",
+                  "output": "1,2"
+                },
+                {
+                  "input": "7",
+                  "output": "7"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w24-sl-2",
+              "title": "Selection sort cannot tell",
+              "prompt": "Count selection sort's comparisons on sorted and on reversed input.",
+              "hint": "Count once per comparison — that is, once per pass of the inner loop.",
+              "hints": [
+                "Count once per comparison — that is, once per pass of the inner loop.",
+                "Write cmp = cmp + 1;"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "function swap(xs: number[], i: number, j: number): void {\n  const t = xs[i] ?? 0;\n  xs[i] = xs[j] ?? 0;\n  xs[j] = t;\n}\nlet cmp = 0;\nfunction selectionSort(xs: number[]): void {\n  for (let i = 0; i < xs.length - 1; i = i + 1) {\n    let min = i;\n    for (let j = i + 1; j < xs.length; j = j + 1) {\n____\n      if ((xs[j] ?? 0) < (xs[min] ?? 0)) {\n        min = j;\n      }\n    }\n    swap(xs, i, min);\n  }\n}\nconst up = Array.from({ length: 8 }, (_, i) => i + 1);\nconst down = Array.from({ length: 8 }, (_, i) => 8 - i);\nselectionSort(up);\nconst sortedCmp = cmp;\ncmp = 0;\nselectionSort(down);\nconsole.log(`sorted=${sortedCmp} reversed=${cmp}`);\n",
+              "solution": "function swap(xs: number[], i: number, j: number): void {\n  const t = xs[i] ?? 0;\n  xs[i] = xs[j] ?? 0;\n  xs[j] = t;\n}\nlet cmp = 0;\nfunction selectionSort(xs: number[]): void {\n  for (let i = 0; i < xs.length - 1; i = i + 1) {\n    let min = i;\n    for (let j = i + 1; j < xs.length; j = j + 1) {\n      cmp = cmp + 1;\n      if ((xs[j] ?? 0) < (xs[min] ?? 0)) {\n        min = j;\n      }\n    }\n    swap(xs, i, min);\n  }\n}\nconst up = Array.from({ length: 8 }, (_, i) => i + 1);\nconst down = Array.from({ length: 8 }, (_, i) => 8 - i);\nselectionSort(up);\nconst sortedCmp = cmp;\ncmp = 0;\nselectionSort(down);\nconsole.log(`sorted=${sortedCmp} reversed=${cmp}`);\n",
+              "tests": [
+                {
+                  "input": "",
+                  "output": "sorted=28 reversed=28"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w24-sl-3",
+              "title": "Shift the bigger ones right",
+              "prompt": "Complete insertion sort's inner loop.",
+              "hint": "Keep moving left while the element there is bigger than `v`.",
+              "hints": [
+                "Keep moving left while the element there is bigger than `v`.",
+                "Each step copies xs[j] one place right, then moves j left."
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nfunction insertionSort(xs: number[]): void {\n  for (let i = 1; i < xs.length; i = i + 1) {\n    const v = xs[i] ?? 0;\n    let j = i - 1;\n____\n    xs[j + 1] = v;\n  }\n}\ninsertionSort(nums);\nconsole.log(nums.join(\",\"));\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nfunction insertionSort(xs: number[]): void {\n  for (let i = 1; i < xs.length; i = i + 1) {\n    const v = xs[i] ?? 0;\n    let j = i - 1;\n    while (j >= 0 && (xs[j] ?? 0) > v) {\n      xs[j + 1] = xs[j] ?? 0;\n      j = j - 1;\n    }\n    xs[j + 1] = v;\n  }\n}\ninsertionSort(nums);\nconsole.log(nums.join(\",\"));\n",
+              "tests": [
+                {
+                  "input": "5 2 4 1 3",
+                  "output": "1,2,3,4,5"
+                },
+                {
+                  "input": "3 3 1",
+                  "output": "1,3,3"
+                },
+                {
+                  "input": "1",
+                  "output": "1"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w24-sl-4",
+              "title": "Insertion sort can tell",
+              "prompt": "Count insertion sort's comparisons on sorted and on reversed input.",
+              "hint": "Route the comparison through `greater`, so every one is counted.",
+              "hints": [
+                "Route the comparison through `greater`, so every one is counted.",
+                "`&&` short-circuits: when j is -1, nothing is compared — and nothing is counted.",
+                "Write while (j >= 0 && greater(xs[j] ?? 0, v)) {"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "let cmp = 0;\nfunction greater(a: number, b: number): boolean {\n  cmp = cmp + 1;\n  return a > b;\n}\nfunction insertionSort(xs: number[]): void {\n  for (let i = 1; i < xs.length; i = i + 1) {\n    const v = xs[i] ?? 0;\n    let j = i - 1;\n____\n      xs[j + 1] = xs[j] ?? 0;\n      j = j - 1;\n    }\n    xs[j + 1] = v;\n  }\n}\nconst up = Array.from({ length: 8 }, (_, i) => i + 1);\nconst down = Array.from({ length: 8 }, (_, i) => 8 - i);\ninsertionSort(up);\nconst sortedCmp = cmp;\ncmp = 0;\ninsertionSort(down);\nconsole.log(`sorted=${sortedCmp} reversed=${cmp}`);\n",
+              "solution": "let cmp = 0;\nfunction greater(a: number, b: number): boolean {\n  cmp = cmp + 1;\n  return a > b;\n}\nfunction insertionSort(xs: number[]): void {\n  for (let i = 1; i < xs.length; i = i + 1) {\n    const v = xs[i] ?? 0;\n    let j = i - 1;\n    while (j >= 0 && greater(xs[j] ?? 0, v)) {\n      xs[j + 1] = xs[j] ?? 0;\n      j = j - 1;\n    }\n    xs[j + 1] = v;\n  }\n}\nconst up = Array.from({ length: 8 }, (_, i) => i + 1);\nconst down = Array.from({ length: 8 }, (_, i) => 8 - i);\ninsertionSort(up);\nconst sortedCmp = cmp;\ncmp = 0;\ninsertionSort(down);\nconsole.log(`sorted=${sortedCmp} reversed=${cmp}`);\n",
+              "tests": [
+                {
+                  "input": "",
+                  "output": "sorted=7 reversed=28"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w24-sl-5",
+              "title": "Nearly sorted is nearly free",
+              "prompt": "Drop the saved value into the gap, and see what one out-of-place element costs.",
+              "hint": "The loop stopped with j one place LEFT of the gap.",
+              "hints": [
+                "The loop stopped with j one place LEFT of the gap.",
+                "Write xs[j + 1] = v;"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nlet cmp = 0;\nfunction greater(a: number, b: number): boolean {\n  cmp = cmp + 1;\n  return a > b;\n}\nfunction insertionSort(xs: number[]): void {\n  for (let i = 1; i < xs.length; i = i + 1) {\n    const v = xs[i] ?? 0;\n    let j = i - 1;\n    while (j >= 0 && greater(xs[j] ?? 0, v)) {\n      xs[j + 1] = xs[j] ?? 0;\n      j = j - 1;\n    }\n____\n  }\n}\ninsertionSort(nums);\nconsole.log(`n=${nums.length} cmp=${cmp} ${nums.join(\",\")}`);\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nlet cmp = 0;\nfunction greater(a: number, b: number): boolean {\n  cmp = cmp + 1;\n  return a > b;\n}\nfunction insertionSort(xs: number[]): void {\n  for (let i = 1; i < xs.length; i = i + 1) {\n    const v = xs[i] ?? 0;\n    let j = i - 1;\n    while (j >= 0 && greater(xs[j] ?? 0, v)) {\n      xs[j + 1] = xs[j] ?? 0;\n      j = j - 1;\n    }\n    xs[j + 1] = v;\n  }\n}\ninsertionSort(nums);\nconsole.log(`n=${nums.length} cmp=${cmp} ${nums.join(\",\")}`);\n",
+              "tests": [
+                {
+                  "input": "1 2 3 5 4 6 7 8",
+                  "output": "n=8 cmp=8 1,2,3,4,5,6,7,8"
+                },
+                {
+                  "input": "3 2 1",
+                  "output": "n=3 cmp=3 1,2,3"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w24-sl-6",
+              "title": "Write insertion sort",
+              "prompt": "Return a sorted **copy** of `xs`, using insertion sort. Leave the argument untouched — copy it first, then sort the copy in place.",
+              "hint": "`[...xs]` gives you a mutable copy to work on.",
+              "hints": [
+                "`[...xs]` gives you a mutable copy to work on.",
+                "Save the element, shift the bigger ones right, drop it into the gap.",
+                "Return the copy."
+              ],
+              "language": "typescript",
+              "kind": "challenge",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "import * as fs from \"fs\";\nconst __pcLines: string[] = fs.readFileSync(0, \"utf8\").split(\"\\n\");\nconst __pcArg = (i: number): string => (__pcLines[i] ?? \"\").trim();\nconst __pcNums = (s: string): number[] => (s ? s.split(/\\s+/).map(Number) : []);\nconst __pcOut = insertionSorted(__pcNums(__pcArg(0)));\nconsole.log(__pcOut.map(String).join(\" \"));\n",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "function insertionSorted(xs: readonly number[]): number[] {\n  ____\n}\n",
+              "solution": "function insertionSorted(xs: readonly number[]): number[] {\n  const out = [...xs];\n  for (let i = 1; i < out.length; i = i + 1) {\n    const v = out[i] ?? 0;\n    let j = i - 1;\n    while (j >= 0 && (out[j] ?? 0) > v) {\n      out[j + 1] = out[j] ?? 0;\n      j = j - 1;\n    }\n    out[j + 1] = v;\n  }\n  return out;\n}\n",
+              "tests": [
+                {
+                  "input": "5 2 4 1 3",
+                  "output": "1 2 3 4 5"
+                },
+                {
+                  "input": "9 -1 9 0",
+                  "output": "-1 0 9 9"
+                },
+                {
+                  "input": "7",
+                  "output": "7"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w24-sl-fix1",
+              "title": "Fix the element that got overwritten",
+              "prompt": "This prints `3,3,3` for `3 1 2`. The loop compares against `xs[i]` and drops `xs[i]` into the gap — but the first shift has already written over `xs[i]`, so the element being inserted is lost.",
+              "hint": "When j is i - 1, the first shift writes to xs[i].",
+              "hints": [
+                "When j is i - 1, the first shift writes to xs[i].",
+                "Read the element ONCE, before the loop, into a const.",
+                "Use that saved value in both the comparison and the final write."
+              ],
+              "language": "typescript",
+              "kind": "fix",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nfunction insertionSort(xs: number[]): void {\n  for (let i = 1; i < xs.length; i = i + 1) {\n    let j = i - 1;\n    while (j >= 0 && (xs[j] ?? 0) > (xs[i] ?? 0)) {\n      xs[j + 1] = xs[j] ?? 0;\n      j = j - 1;\n    }\n    xs[j + 1] = xs[i] ?? 0;\n  }\n}\ninsertionSort(nums);\nconsole.log(nums.join(\",\"));\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nfunction insertionSort(xs: number[]): void {\n  for (let i = 1; i < xs.length; i = i + 1) {\n    const v = xs[i] ?? 0;\n    let j = i - 1;\n    while (j >= 0 && (xs[j] ?? 0) > v) {\n      xs[j + 1] = xs[j] ?? 0;\n      j = j - 1;\n    }\n    xs[j + 1] = v;\n  }\n}\ninsertionSort(nums);\nconsole.log(nums.join(\",\"));\n",
+              "tests": [
+                {
+                  "input": "3 1 2",
+                  "output": "1,2,3"
+                },
+                {
+                  "input": "5 4 3 2 1",
+                  "output": "1,2,3,4,5"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w24-sl-fix2",
+              "title": "Fix the scan that stops one short",
+              "prompt": "This prints `2,3,1` for `3 2 1`: the inner loop stops at `xs.length - 1`, so the last element is never a candidate for the smallest — and a small value at the end stays there.",
+              "hint": "The OUTER loop may stop one short — the last element is placed by elimination.",
+              "hints": [
+                "The OUTER loop may stop one short — the last element is placed by elimination.",
+                "The INNER loop may not: it must look at every remaining element.",
+                "Write j < xs.length."
+              ],
+              "language": "typescript",
+              "kind": "fix",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nfunction swap(xs: number[], i: number, j: number): void {\n  const t = xs[i] ?? 0;\n  xs[i] = xs[j] ?? 0;\n  xs[j] = t;\n}\nfunction selectionSort(xs: number[]): void {\n  for (let i = 0; i < xs.length - 1; i = i + 1) {\n    let min = i;\n    for (let j = i + 1; j < xs.length - 1; j = j + 1) {\n      if ((xs[j] ?? 0) < (xs[min] ?? 0)) {\n        min = j;\n      }\n    }\n    swap(xs, i, min);\n  }\n}\nselectionSort(nums);\nconsole.log(nums.join(\",\"));\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nfunction swap(xs: number[], i: number, j: number): void {\n  const t = xs[i] ?? 0;\n  xs[i] = xs[j] ?? 0;\n  xs[j] = t;\n}\nfunction selectionSort(xs: number[]): void {\n  for (let i = 0; i < xs.length - 1; i = i + 1) {\n    let min = i;\n    for (let j = i + 1; j < xs.length; j = j + 1) {\n      if ((xs[j] ?? 0) < (xs[min] ?? 0)) {\n        min = j;\n      }\n    }\n    swap(xs, i, min);\n  }\n}\nselectionSort(nums);\nconsole.log(nums.join(\",\"));\n",
+              "tests": [
+                {
+                  "input": "3 2 1",
+                  "output": "1,2,3"
+                },
+                {
+                  "input": "2 9 1",
+                  "output": "1,2,9"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            }
+          ],
+          "quiz": [
+            {
+              "question": "Why do library sorts still use insertion sort?",
+              "options": [
+                "tradition",
+                "on short or nearly sorted runs it beats cleverer sorts",
+                "it is stable only",
+                "they do not"
+              ],
+              "answer": 1,
+              "explanation": "Adaptive and tiny constant factors."
+            },
+            {
+              "question": "Selection sort's OUTER loop may stop at `length - 1` because…",
+              "options": [
+                "of speed",
+                "the last element is in place once all the others are",
+                "of types",
+                "it cannot"
+              ],
+              "answer": 1,
+              "explanation": "Its inner loop has no such excuse."
+            }
+          ]
+        },
+        {
+          "key": "w24-merge",
+          "title": "Merge sort",
+          "what": "Split, recurse, and call the merge you wrote in week 22.",
+          "lesson": "Week 22 merged two sorted arrays in one pass. Merge sort is the observation that\n**an array of one element is already sorted** — so split until you have those, and\nmerge your way back up.\n\n```ts\nfunction mergeSort(xs: readonly number[]): readonly number[] {\n  if (xs.length <= 1) { return xs; }                    // already sorted\n  const mid = Math.floor(xs.length / 2);\n  return merge(mergeSort(xs.slice(0, mid)), mergeSort(xs.slice(mid)));\n}\n```\n\nThree lines of new code. The merge is week 22's, word for word.\n\n## Where the log n comes from\n\n```\n[5 2 4 1 3 8 7 6]                 one array of 8\n[5 2 4 1]   [3 8 7 6]             two of 4\n[5 2] [4 1] [3 8] [7 6]           four of 2\n[5][2][4][1][3][8][7][6]          eight of 1      ← log2 8 = 3 splits\n```\n\nEach *level* merges all n elements once, so each level costs O(n). And there are\n**log n levels**, because that is how many times n can be halved. **n per level ×\nlog n levels = O(n log n)** — the whole analysis, and it holds for every input:\nmerge sort has no bad case.\n\n## The counts\n\nSorted input, where every merge finishes one side early:\n\n```\nn=8   cmp=12      n log n = 24\nn=16  cmp=32      n log n = 64\nn=32  cmp=80      n log n = 160\n```\n\nDouble n and the count goes up by a bit more than double — the signature of\nn log n, between week 21's linear and quadratic rows. The **worst** case, where\nevery merge has to interleave to the very end, is `[1, 5, 3, 7, 2, 6, 4, 8]`: 17\ncomparisons, against 28 for insertion sort's worst.\n\n## The base case is `<= 1`, and nothing else will do\n\nWrite `=== 0` and a one-element array splits into `[]` and **itself**, which\nsplits into `[]` and itself, until the stack runs out — week 20's `RangeError`. A\nrecursion must make the problem *strictly smaller* on every call, and splitting one\nelement does not.\n\n## The costs merge sort does not hide\n\n* **O(n) extra space.** Every merge builds a new array. Quicksort, next lesson,\n  sorts in place; this is what you trade for merge sort's guarantee.\n* **Stable** — because week 22's merge takes from the left on a tie (`<=`). Sort\n  records by score, and two with the same score come out in the order they went\n  in. Change `<=` to `<` and that silently stops being true.\n\n> ⚠️ **Common mistakes:** a base case of `=== 0`; `<` in the merge, losing\n> stability; and splitting at `mid + 1` or `mid - 1`, which leaves one side empty.\n",
+          "warmup": [
+            {
+              "question": "Merge sort's depth of recursion is about…",
+              "options": [
+                "n",
+                "log n",
+                "n²",
+                "1"
+              ],
+              "answer": 1,
+              "explanation": "How many times n can be halved."
+            },
+            {
+              "question": "Each level of merge sort costs…",
+              "options": [
+                "O(1)",
+                "O(n) — every element is merged once",
+                "O(log n)",
+                "O(n²)"
+              ],
+              "answer": 1,
+              "explanation": "n per level × log n levels."
+            },
+            {
+              "question": "Merge sort's worst case is…",
+              "options": [
+                "O(n²)",
+                "O(n log n) — it has no bad input",
+                "O(n)",
+                "O(log n)"
+              ],
+              "answer": 1,
+              "explanation": "Its guarantee, paid for with space."
+            },
+            {
+              "question": "Merge sort's extra space is…",
+              "options": [
+                "O(1)",
+                "O(n)",
+                "O(log n)",
+                "O(n²)"
+              ],
+              "answer": 1,
+              "explanation": "Every merge builds a new array."
+            }
+          ],
+          "exercises": [
+            {
+              "id": "tscourse-w24-ms-1",
+              "title": "The case that stops the recursion",
+              "prompt": "An array of zero or one elements is already sorted. Say so.",
+              "hint": "Return the array unchanged when there is nothing to sort.",
+              "hints": [
+                "Return the array unchanged when there is nothing to sort.",
+                "`<= 1`, not `=== 0` — a single element must stop the recursion too."
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nlet cmp = 0;\nfunction merge(a: readonly number[], b: readonly number[]): readonly number[] {\n  const out: number[] = [];\n  let i = 0;\n  let j = 0;\n  while (i < a.length && j < b.length) {\n    cmp = cmp + 1;\n    if ((a[i] ?? 0) <= (b[j] ?? 0)) {\n      out.push(a[i] ?? 0);\n      i = i + 1;\n    } else {\n      out.push(b[j] ?? 0);\n      j = j + 1;\n    }\n  }\n  while (i < a.length) {\n    out.push(a[i] ?? 0);\n    i = i + 1;\n  }\n  while (j < b.length) {\n    out.push(b[j] ?? 0);\n    j = j + 1;\n  }\n  return out;\n}\nfunction mergeSort(xs: readonly number[]): readonly number[] {\n____\n  const mid = Math.floor(xs.length / 2);\n  return merge(mergeSort(xs.slice(0, mid)), mergeSort(xs.slice(mid)));\n}\nconsole.log(mergeSort(nums).join(\",\"));\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nlet cmp = 0;\nfunction merge(a: readonly number[], b: readonly number[]): readonly number[] {\n  const out: number[] = [];\n  let i = 0;\n  let j = 0;\n  while (i < a.length && j < b.length) {\n    cmp = cmp + 1;\n    if ((a[i] ?? 0) <= (b[j] ?? 0)) {\n      out.push(a[i] ?? 0);\n      i = i + 1;\n    } else {\n      out.push(b[j] ?? 0);\n      j = j + 1;\n    }\n  }\n  while (i < a.length) {\n    out.push(a[i] ?? 0);\n    i = i + 1;\n  }\n  while (j < b.length) {\n    out.push(b[j] ?? 0);\n    j = j + 1;\n  }\n  return out;\n}\nfunction mergeSort(xs: readonly number[]): readonly number[] {\n  if (xs.length <= 1) {\n    return xs;\n  }\n  const mid = Math.floor(xs.length / 2);\n  return merge(mergeSort(xs.slice(0, mid)), mergeSort(xs.slice(mid)));\n}\nconsole.log(mergeSort(nums).join(\",\"));\n",
+              "tests": [
+                {
+                  "input": "5 2 4 1 3",
+                  "output": "1,2,3,4,5"
+                },
+                {
+                  "input": "8",
+                  "output": "8"
+                },
+                {
+                  "input": "2 1",
+                  "output": "1,2"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w24-ms-2",
+              "title": "Split in the middle",
+              "prompt": "Choose the split point so both halves are non-empty.",
+              "hint": "Half the length, rounded down.",
+              "hints": [
+                "Half the length, rounded down.",
+                "Write const mid = Math.floor(xs.length / 2);"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nlet cmp = 0;\nfunction merge(a: readonly number[], b: readonly number[]): readonly number[] {\n  const out: number[] = [];\n  let i = 0;\n  let j = 0;\n  while (i < a.length && j < b.length) {\n    cmp = cmp + 1;\n    if ((a[i] ?? 0) <= (b[j] ?? 0)) {\n      out.push(a[i] ?? 0);\n      i = i + 1;\n    } else {\n      out.push(b[j] ?? 0);\n      j = j + 1;\n    }\n  }\n  while (i < a.length) {\n    out.push(a[i] ?? 0);\n    i = i + 1;\n  }\n  while (j < b.length) {\n    out.push(b[j] ?? 0);\n    j = j + 1;\n  }\n  return out;\n}\nfunction mergeSort(xs: readonly number[]): readonly number[] {\n  if (xs.length <= 1) {\n    return xs;\n  }\n____\n  return merge(mergeSort(xs.slice(0, mid)), mergeSort(xs.slice(mid)));\n}\nconsole.log(mergeSort(nums).join(\",\"));\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nlet cmp = 0;\nfunction merge(a: readonly number[], b: readonly number[]): readonly number[] {\n  const out: number[] = [];\n  let i = 0;\n  let j = 0;\n  while (i < a.length && j < b.length) {\n    cmp = cmp + 1;\n    if ((a[i] ?? 0) <= (b[j] ?? 0)) {\n      out.push(a[i] ?? 0);\n      i = i + 1;\n    } else {\n      out.push(b[j] ?? 0);\n      j = j + 1;\n    }\n  }\n  while (i < a.length) {\n    out.push(a[i] ?? 0);\n    i = i + 1;\n  }\n  while (j < b.length) {\n    out.push(b[j] ?? 0);\n    j = j + 1;\n  }\n  return out;\n}\nfunction mergeSort(xs: readonly number[]): readonly number[] {\n  if (xs.length <= 1) {\n    return xs;\n  }\n  const mid = Math.floor(xs.length / 2);\n  return merge(mergeSort(xs.slice(0, mid)), mergeSort(xs.slice(mid)));\n}\nconsole.log(mergeSort(nums).join(\",\"));\n",
+              "tests": [
+                {
+                  "input": "4 3 2 1",
+                  "output": "1,2,3,4"
+                },
+                {
+                  "input": "9 7 8",
+                  "output": "7,8,9"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w24-ms-3",
+              "title": "Sort both halves, then merge them",
+              "prompt": "The recursive step: the whole algorithm in one line.",
+              "hint": "`xs.slice(0, mid)` and `xs.slice(mid)` are the halves.",
+              "hints": [
+                "`xs.slice(0, mid)` and `xs.slice(mid)` are the halves.",
+                "Sort each recursively, and merge the results."
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nlet cmp = 0;\nfunction merge(a: readonly number[], b: readonly number[]): readonly number[] {\n  const out: number[] = [];\n  let i = 0;\n  let j = 0;\n  while (i < a.length && j < b.length) {\n    cmp = cmp + 1;\n    if ((a[i] ?? 0) <= (b[j] ?? 0)) {\n      out.push(a[i] ?? 0);\n      i = i + 1;\n    } else {\n      out.push(b[j] ?? 0);\n      j = j + 1;\n    }\n  }\n  while (i < a.length) {\n    out.push(a[i] ?? 0);\n    i = i + 1;\n  }\n  while (j < b.length) {\n    out.push(b[j] ?? 0);\n    j = j + 1;\n  }\n  return out;\n}\nfunction mergeSort(xs: readonly number[]): readonly number[] {\n  if (xs.length <= 1) {\n    return xs;\n  }\n  const mid = Math.floor(xs.length / 2);\n____\n}\nconsole.log(mergeSort(nums).join(\",\"));\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nlet cmp = 0;\nfunction merge(a: readonly number[], b: readonly number[]): readonly number[] {\n  const out: number[] = [];\n  let i = 0;\n  let j = 0;\n  while (i < a.length && j < b.length) {\n    cmp = cmp + 1;\n    if ((a[i] ?? 0) <= (b[j] ?? 0)) {\n      out.push(a[i] ?? 0);\n      i = i + 1;\n    } else {\n      out.push(b[j] ?? 0);\n      j = j + 1;\n    }\n  }\n  while (i < a.length) {\n    out.push(a[i] ?? 0);\n    i = i + 1;\n  }\n  while (j < b.length) {\n    out.push(b[j] ?? 0);\n    j = j + 1;\n  }\n  return out;\n}\nfunction mergeSort(xs: readonly number[]): readonly number[] {\n  if (xs.length <= 1) {\n    return xs;\n  }\n  const mid = Math.floor(xs.length / 2);\n  return merge(mergeSort(xs.slice(0, mid)), mergeSort(xs.slice(mid)));\n}\nconsole.log(mergeSort(nums).join(\",\"));\n",
+              "tests": [
+                {
+                  "input": "9 7 8",
+                  "output": "7,8,9"
+                },
+                {
+                  "input": "2 2 1",
+                  "output": "1,2,2"
+                },
+                {
+                  "input": "6 5 4 3 2 1",
+                  "output": "1,2,3,4,5,6"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w24-ms-4",
+              "title": "n log n, counted",
+              "prompt": "Put merge sort's count beside n log n at three sizes.",
+              "hint": "`Math.log2` gives the number of halvings.",
+              "hints": [
+                "`Math.log2` gives the number of halvings.",
+                "Write const nlogn = n * Math.log2(n);"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "let cmp = 0;\nfunction merge(a: readonly number[], b: readonly number[]): readonly number[] {\n  const out: number[] = [];\n  let i = 0;\n  let j = 0;\n  while (i < a.length && j < b.length) {\n    cmp = cmp + 1;\n    if ((a[i] ?? 0) <= (b[j] ?? 0)) {\n      out.push(a[i] ?? 0);\n      i = i + 1;\n    } else {\n      out.push(b[j] ?? 0);\n      j = j + 1;\n    }\n  }\n  while (i < a.length) {\n    out.push(a[i] ?? 0);\n    i = i + 1;\n  }\n  while (j < b.length) {\n    out.push(b[j] ?? 0);\n    j = j + 1;\n  }\n  return out;\n}\nfunction mergeSort(xs: readonly number[]): readonly number[] {\n  if (xs.length <= 1) {\n    return xs;\n  }\n  const mid = Math.floor(xs.length / 2);\n  return merge(mergeSort(xs.slice(0, mid)), mergeSort(xs.slice(mid)));\n}\nfor (const n of [8, 16, 32]) {\n  cmp = 0;\n  mergeSort(Array.from({ length: n }, (_, i) => i + 1));\n____\n  console.log(`n=${n} cmp=${cmp} nlogn=${nlogn}`);\n}\n",
+              "solution": "let cmp = 0;\nfunction merge(a: readonly number[], b: readonly number[]): readonly number[] {\n  const out: number[] = [];\n  let i = 0;\n  let j = 0;\n  while (i < a.length && j < b.length) {\n    cmp = cmp + 1;\n    if ((a[i] ?? 0) <= (b[j] ?? 0)) {\n      out.push(a[i] ?? 0);\n      i = i + 1;\n    } else {\n      out.push(b[j] ?? 0);\n      j = j + 1;\n    }\n  }\n  while (i < a.length) {\n    out.push(a[i] ?? 0);\n    i = i + 1;\n  }\n  while (j < b.length) {\n    out.push(b[j] ?? 0);\n    j = j + 1;\n  }\n  return out;\n}\nfunction mergeSort(xs: readonly number[]): readonly number[] {\n  if (xs.length <= 1) {\n    return xs;\n  }\n  const mid = Math.floor(xs.length / 2);\n  return merge(mergeSort(xs.slice(0, mid)), mergeSort(xs.slice(mid)));\n}\nfor (const n of [8, 16, 32]) {\n  cmp = 0;\n  mergeSort(Array.from({ length: n }, (_, i) => i + 1));\n  const nlogn = n * Math.log2(n);\n  console.log(`n=${n} cmp=${cmp} nlogn=${nlogn}`);\n}\n",
+              "tests": [
+                {
+                  "input": "",
+                  "output": "n=8 cmp=12 nlogn=24\nn=16 cmp=32 nlogn=64\nn=32 cmp=80 nlogn=160"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w24-ms-5",
+              "title": "The worst case, and it is still fine",
+              "prompt": "Count one comparison per step of the merge's main loop, and try the input that interleaves every merge.",
+              "hint": "One comparison happens per pass of the main `while` loop.",
+              "hints": [
+                "One comparison happens per pass of the main `while` loop.",
+                "The drains compare nothing — here they are one line, `...a.slice(i), ...b.slice(j)`, and only one of the two is ever non-empty.",
+                "Write cmp = cmp + 1;"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nlet cmp = 0;\nfunction merge(a: readonly number[], b: readonly number[]): readonly number[] {\n  const out: number[] = [];\n  let i = 0;\n  let j = 0;\n  while (i < a.length && j < b.length) {\n____\n    if ((a[i] ?? 0) <= (b[j] ?? 0)) {\n      out.push(a[i] ?? 0);\n      i = i + 1;\n    } else {\n      out.push(b[j] ?? 0);\n      j = j + 1;\n    }\n  }\n  return [...out, ...a.slice(i), ...b.slice(j)];\n}\nfunction mergeSort(xs: readonly number[]): readonly number[] {\n  if (xs.length <= 1) {\n    return xs;\n  }\n  const mid = Math.floor(xs.length / 2);\n  return merge(mergeSort(xs.slice(0, mid)), mergeSort(xs.slice(mid)));\n}\nmergeSort(nums);\nconsole.log(cmp);\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nlet cmp = 0;\nfunction merge(a: readonly number[], b: readonly number[]): readonly number[] {\n  const out: number[] = [];\n  let i = 0;\n  let j = 0;\n  while (i < a.length && j < b.length) {\n    cmp = cmp + 1;\n    if ((a[i] ?? 0) <= (b[j] ?? 0)) {\n      out.push(a[i] ?? 0);\n      i = i + 1;\n    } else {\n      out.push(b[j] ?? 0);\n      j = j + 1;\n    }\n  }\n  return [...out, ...a.slice(i), ...b.slice(j)];\n}\nfunction mergeSort(xs: readonly number[]): readonly number[] {\n  if (xs.length <= 1) {\n    return xs;\n  }\n  const mid = Math.floor(xs.length / 2);\n  return merge(mergeSort(xs.slice(0, mid)), mergeSort(xs.slice(mid)));\n}\nmergeSort(nums);\nconsole.log(cmp);\n",
+              "tests": [
+                {
+                  "input": "1 5 3 7 2 6 4 8",
+                  "output": "17"
+                },
+                {
+                  "input": "1 2 3 4 5 6 7 8",
+                  "output": "12"
+                },
+                {
+                  "input": "8 7 6 5 4 3 2 1",
+                  "output": "12"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w24-ms-6",
+              "title": "Stable, because of one character",
+              "prompt": "Merge records by score so that equal scores keep their input order.",
+              "hint": "On a tie, take from the LEFT half — it came first in the input.",
+              "hints": [
+                "On a tie, take from the LEFT half — it came first in the input.",
+                "Write if (at(a, i).score <= at(b, j).score) {"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst words = fs.readFileSync(0, \"utf8\").trim().split(\" \");\ninterface Row {\n  readonly name: string;\n  readonly score: number;\n}\nconst rows: readonly Row[] = words.map((w) => {\n  const [name, score] = w.split(\":\");\n  return { name: name ?? \"\", score: Number(score ?? \"0\") };\n});\nfunction at(rs: readonly Row[], i: number): Row {\n  return rs[i] ?? { name: \"\", score: 0 };\n}\nfunction mergeRows(a: readonly Row[], b: readonly Row[]): readonly Row[] {\n  const out: Row[] = [];\n  let i = 0;\n  let j = 0;\n  while (i < a.length && j < b.length) {\n____\n      out.push(at(a, i));\n      i = i + 1;\n    } else {\n      out.push(at(b, j));\n      j = j + 1;\n    }\n  }\n  return [...out, ...a.slice(i), ...b.slice(j)];\n}\nfunction sortRows(rs: readonly Row[]): readonly Row[] {\n  if (rs.length <= 1) {\n    return rs;\n  }\n  const mid = Math.floor(rs.length / 2);\n  return mergeRows(sortRows(rs.slice(0, mid)), sortRows(rs.slice(mid)));\n}\nconsole.log(sortRows(rows).map((r) => r.name).join(\" \"));\n",
+              "solution": "import * as fs from \"fs\";\nconst words = fs.readFileSync(0, \"utf8\").trim().split(\" \");\ninterface Row {\n  readonly name: string;\n  readonly score: number;\n}\nconst rows: readonly Row[] = words.map((w) => {\n  const [name, score] = w.split(\":\");\n  return { name: name ?? \"\", score: Number(score ?? \"0\") };\n});\nfunction at(rs: readonly Row[], i: number): Row {\n  return rs[i] ?? { name: \"\", score: 0 };\n}\nfunction mergeRows(a: readonly Row[], b: readonly Row[]): readonly Row[] {\n  const out: Row[] = [];\n  let i = 0;\n  let j = 0;\n  while (i < a.length && j < b.length) {\n    if (at(a, i).score <= at(b, j).score) {\n      out.push(at(a, i));\n      i = i + 1;\n    } else {\n      out.push(at(b, j));\n      j = j + 1;\n    }\n  }\n  return [...out, ...a.slice(i), ...b.slice(j)];\n}\nfunction sortRows(rs: readonly Row[]): readonly Row[] {\n  if (rs.length <= 1) {\n    return rs;\n  }\n  const mid = Math.floor(rs.length / 2);\n  return mergeRows(sortRows(rs.slice(0, mid)), sortRows(rs.slice(mid)));\n}\nconsole.log(sortRows(rows).map((r) => r.name).join(\" \"));\n",
+              "tests": [
+                {
+                  "input": "ann:2 bo:1 cy:2 dee:1",
+                  "output": "bo dee ann cy"
+                },
+                {
+                  "input": "x:1 y:1 z:1",
+                  "output": "x y z"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w24-ms-fix1",
+              "title": "Fix the merge that lost stability",
+              "prompt": "This prints `dee bo cy ann` for `ann:2 bo:1 cy:2 dee:1`. The scores are in order — but `bo` came before `dee` in the input and now comes after, because on a tie the merge takes from the RIGHT half. Nothing crashes and every score is in order, which is exactly why this bug survives.",
+              "hint": "Look at what happens when the two scores are EQUAL.",
+              "hints": [
+                "Look at what happens when the two scores are EQUAL.",
+                "With `<`, a tie falls through to the else branch and takes from the right.",
+                "Use `<=`."
+              ],
+              "language": "typescript",
+              "kind": "fix",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst words = fs.readFileSync(0, \"utf8\").trim().split(\" \");\ninterface Row {\n  readonly name: string;\n  readonly score: number;\n}\nconst rows: readonly Row[] = words.map((w) => {\n  const [name, score] = w.split(\":\");\n  return { name: name ?? \"\", score: Number(score ?? \"0\") };\n});\nfunction at(rs: readonly Row[], i: number): Row {\n  return rs[i] ?? { name: \"\", score: 0 };\n}\nfunction mergeRows(a: readonly Row[], b: readonly Row[]): readonly Row[] {\n  const out: Row[] = [];\n  let i = 0;\n  let j = 0;\n  while (i < a.length && j < b.length) {\n    if (at(a, i).score < at(b, j).score) {\n      out.push(at(a, i));\n      i = i + 1;\n    } else {\n      out.push(at(b, j));\n      j = j + 1;\n    }\n  }\n  return [...out, ...a.slice(i), ...b.slice(j)];\n}\nfunction sortRows(rs: readonly Row[]): readonly Row[] {\n  if (rs.length <= 1) {\n    return rs;\n  }\n  const mid = Math.floor(rs.length / 2);\n  return mergeRows(sortRows(rs.slice(0, mid)), sortRows(rs.slice(mid)));\n}\nconsole.log(sortRows(rows).map((r) => r.name).join(\" \"));\n",
+              "solution": "import * as fs from \"fs\";\nconst words = fs.readFileSync(0, \"utf8\").trim().split(\" \");\ninterface Row {\n  readonly name: string;\n  readonly score: number;\n}\nconst rows: readonly Row[] = words.map((w) => {\n  const [name, score] = w.split(\":\");\n  return { name: name ?? \"\", score: Number(score ?? \"0\") };\n});\nfunction at(rs: readonly Row[], i: number): Row {\n  return rs[i] ?? { name: \"\", score: 0 };\n}\nfunction mergeRows(a: readonly Row[], b: readonly Row[]): readonly Row[] {\n  const out: Row[] = [];\n  let i = 0;\n  let j = 0;\n  while (i < a.length && j < b.length) {\n    if (at(a, i).score <= at(b, j).score) {\n      out.push(at(a, i));\n      i = i + 1;\n    } else {\n      out.push(at(b, j));\n      j = j + 1;\n    }\n  }\n  return [...out, ...a.slice(i), ...b.slice(j)];\n}\nfunction sortRows(rs: readonly Row[]): readonly Row[] {\n  if (rs.length <= 1) {\n    return rs;\n  }\n  const mid = Math.floor(rs.length / 2);\n  return mergeRows(sortRows(rs.slice(0, mid)), sortRows(rs.slice(mid)));\n}\nconsole.log(sortRows(rows).map((r) => r.name).join(\" \"));\n",
+              "tests": [
+                {
+                  "input": "ann:2 bo:1 cy:2 dee:1",
+                  "output": "bo dee ann cy"
+                },
+                {
+                  "input": "x:1 y:1",
+                  "output": "x y"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w24-ms-fix2",
+              "title": "Fix the recursion that never ends",
+              "prompt": "This dies with `RangeError: Maximum call stack size exceeded`. The base case only catches an EMPTY array — and a one-element array splits into `[]` and itself, which splits into `[]` and itself, for ever.",
+              "hint": "Work out `mid` for a one-element array, then what the two slices are.",
+              "hints": [
+                "Work out `mid` for a one-element array, then what the two slices are.",
+                "A recursive call must be on something strictly smaller.",
+                "Stop at `xs.length <= 1`."
+              ],
+              "language": "typescript",
+              "kind": "fix",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nlet cmp = 0;\nfunction merge(a: readonly number[], b: readonly number[]): readonly number[] {\n  const out: number[] = [];\n  let i = 0;\n  let j = 0;\n  while (i < a.length && j < b.length) {\n    cmp = cmp + 1;\n    if ((a[i] ?? 0) <= (b[j] ?? 0)) {\n      out.push(a[i] ?? 0);\n      i = i + 1;\n    } else {\n      out.push(b[j] ?? 0);\n      j = j + 1;\n    }\n  }\n  while (i < a.length) {\n    out.push(a[i] ?? 0);\n    i = i + 1;\n  }\n  while (j < b.length) {\n    out.push(b[j] ?? 0);\n    j = j + 1;\n  }\n  return out;\n}\nfunction mergeSort(xs: readonly number[]): readonly number[] {\n  if (xs.length === 0) {\n    return xs;\n  }\n  const mid = Math.floor(xs.length / 2);\n  return merge(mergeSort(xs.slice(0, mid)), mergeSort(xs.slice(mid)));\n}\nconsole.log(mergeSort(nums).join(\",\"));\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nlet cmp = 0;\nfunction merge(a: readonly number[], b: readonly number[]): readonly number[] {\n  const out: number[] = [];\n  let i = 0;\n  let j = 0;\n  while (i < a.length && j < b.length) {\n    cmp = cmp + 1;\n    if ((a[i] ?? 0) <= (b[j] ?? 0)) {\n      out.push(a[i] ?? 0);\n      i = i + 1;\n    } else {\n      out.push(b[j] ?? 0);\n      j = j + 1;\n    }\n  }\n  while (i < a.length) {\n    out.push(a[i] ?? 0);\n    i = i + 1;\n  }\n  while (j < b.length) {\n    out.push(b[j] ?? 0);\n    j = j + 1;\n  }\n  return out;\n}\nfunction mergeSort(xs: readonly number[]): readonly number[] {\n  if (xs.length <= 1) {\n    return xs;\n  }\n  const mid = Math.floor(xs.length / 2);\n  return merge(mergeSort(xs.slice(0, mid)), mergeSort(xs.slice(mid)));\n}\nconsole.log(mergeSort(nums).join(\",\"));\n",
+              "tests": [
+                {
+                  "input": "3 1 2",
+                  "output": "1,2,3"
+                },
+                {
+                  "input": "5",
+                  "output": "5"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            }
+          ],
+          "quiz": [
+            {
+              "question": "Why does merge sort split rather than, say, peel off one element at a time?",
+              "options": [
+                "style",
+                "halving gives log n levels; peeling one off gives n levels — O(n²)",
+                "it is stable",
+                "it uses less space"
+              ],
+              "answer": 1,
+              "explanation": "The halving is where the log comes from."
+            },
+            {
+              "question": "The worst case for merge sort's comparisons on 8 elements is…",
+              "options": [
+                "28",
+                "17",
+                "12",
+                "8"
+              ],
+              "answer": 1,
+              "explanation": "Every merge interleaves to the end: [1,5,3,7,2,6,4,8]."
+            }
+          ]
+        },
+        {
+          "key": "w24-quick",
+          "title": "Quicksort",
+          "what": "Partition around a pivot — and meet the input that ruins it.",
+          "lesson": "Merge sort does its work on the way **back up** (the merge). Quicksort does it on\nthe way **down**: rearrange the array so everything smaller than a chosen **pivot**\nsits to its left and everything else to its right. The pivot is then in its final\nplace for ever, and each side is a smaller copy of the same problem.\n\n## The partition (Lomuto)\n\n```ts\nfunction partition(xs: number[], lo: number, hi: number): number {\n  const pivot = xs[hi] ?? 0;          // the last element\n  let i = lo;                          // where the next \"smaller\" goes\n  for (let j = lo; j < hi; j = j + 1) {\n    if ((xs[j] ?? 0) < pivot) { swap(xs, i, j); i = i + 1; }\n  }\n  swap(xs, i, hi);                     // the pivot moves into the gap\n  return i;                            // ...and this is where it lives now\n}\n```\n\nThat is week 22's partition-by-predicate — \"write the ones that pass; everything\nafter `write` failed\" — with the predicate being `< pivot`, and one final swap.\n\n`partition([5, 2, 4, 1, 3])` with pivot 3 gives `[2, 1, 3, 5, 4]` and returns 2:\nthe 3 is finished.\n\n## The recursion\n\n```ts\nfunction quick(xs: number[], lo: number, hi: number): void {\n  if (lo >= hi) { return; }\n  const p = partition(xs, lo, hi);\n  quick(xs, lo, p - 1);                // p - 1: the pivot is done\n  quick(xs, p + 1, hi);\n}\n```\n\n**In place** — no new arrays, just swaps — which is quicksort's advantage over\nmerge sort. Its extra space is only the recursion's stack.\n\n## The bad case, counted\n\nWith the last element as pivot, look at what already-sorted input does: the pivot\nis the **largest** element, so the partition puts *everything* on one side and\nthe recursion peels off one element per call.\n\n```\nn=16, mixed:    cmp 64\nn=16, sorted:   cmp 120     = 16·15/2 — selection sort's number\n```\n\nO(n²), on the input you would think was easiest. And sorted input is not rare —\n\"sort it again after adding one item\" is everyday code.\n\n## The fix is a better pivot\n\nSwap the **middle** element to the end before partitioning:\n\n```ts\nswap(xs, Math.floor((lo + hi) / 2), hi);\n```\n\nOn sorted input the middle is the median, every split is even, and the count\ndrops from **120 to 38**. (Next lesson proves no comparison sort can *guarantee*\nfewer than 45 on sixteen elements. No contradiction: that floor is about the worst\ninput, and sorted input with a middle pivot is quicksort's best one.) It does not remove the worst case — some\ninput still hits it — but it moves it away from the inputs people actually have.\n(A *random* pivot makes the worst case astronomically unlikely, but it also makes\nthe counts differ from run to run, which is why this course does not use one.)\n\n## Not stable\n\nThe partition's long-distance swaps jump equal elements past each other. On\n`ann 2, bo 1, cy 2, dee 1` sorted by score, quicksort puts `dee` before `bo`. Merge\nsort never does that. Lesson 7 is where that decides something.\n\n## Quickselect: half of quicksort\n\n\"The k-th smallest\" does not need the whole array sorted. Partition, and the pivot\nlands at index `p`. If `p === k` you are done; otherwise the answer is on **one**\nside, so recurse into only that one. Throwing half the work away each time makes\nit **O(n) on average** — cheaper than sorting at all.\n\n> ⚠️ **Common mistakes:** recursing on `p` instead of `p - 1` (the pivot again,\n> for ever); `<=` in the partition, which piles duplicates on one side; and a\n> last-element pivot on data that arrives sorted.\n",
+          "warmup": [
+            {
+              "question": "After partitioning, the pivot is…",
+              "options": [
+                "at the end",
+                "in its final sorted position",
+                "at the start",
+                "removed"
+              ],
+              "answer": 1,
+              "explanation": "Which is why the recursion skips it."
+            },
+            {
+              "question": "Quicksort's extra space is…",
+              "options": [
+                "O(n)",
+                "O(log n) on average — just the recursion",
+                "O(1) exactly",
+                "O(n²)"
+              ],
+              "answer": 1,
+              "explanation": "It sorts in place."
+            },
+            {
+              "question": "Last-element quicksort on sorted input is…",
+              "options": [
+                "O(n log n)",
+                "O(n²)",
+                "O(n)",
+                "O(log n)"
+              ],
+              "answer": 1,
+              "explanation": "The pivot is always the largest."
+            },
+            {
+              "question": "Quickselect is O(n) on average because…",
+              "options": [
+                "it sorts",
+                "it recurses into ONE side only",
+                "it is in place",
+                "it uses a Map"
+              ],
+              "answer": 1,
+              "explanation": "n + n/2 + n/4 + … = 2n."
+            }
+          ],
+          "exercises": [
+            {
+              "id": "tscourse-w24-qs-1",
+              "title": "Keep the smaller ones on the left",
+              "prompt": "Complete the partition's loop: move each element smaller than the pivot into the next slot.",
+              "hint": "`i` is where the next smaller element goes.",
+              "hints": [
+                "`i` is where the next smaller element goes.",
+                "When xs[j] is smaller than the pivot, swap it into slot i and advance i."
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nfunction swap(xs: number[], i: number, j: number): void {\n  const t = xs[i] ?? 0;\n  xs[i] = xs[j] ?? 0;\n  xs[j] = t;\n}\nfunction partition(xs: number[], lo: number, hi: number): number {\n  const pivot = xs[hi] ?? 0;\n  let i = lo;\n  for (let j = lo; j < hi; j = j + 1) {\n____\n  }\n  swap(xs, i, hi);\n  return i;\n}\nfunction quick(xs: number[], lo: number, hi: number): void {\n  if (lo >= hi) {\n    return;\n  }\n  const p = partition(xs, lo, hi);\n  quick(xs, lo, p - 1);\n  quick(xs, p + 1, hi);\n}\nquick(nums, 0, nums.length - 1);\nconsole.log(nums.join(\",\"));\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nfunction swap(xs: number[], i: number, j: number): void {\n  const t = xs[i] ?? 0;\n  xs[i] = xs[j] ?? 0;\n  xs[j] = t;\n}\nfunction partition(xs: number[], lo: number, hi: number): number {\n  const pivot = xs[hi] ?? 0;\n  let i = lo;\n  for (let j = lo; j < hi; j = j + 1) {\n    if ((xs[j] ?? 0) < pivot) {\n      swap(xs, i, j);\n      i = i + 1;\n    }\n  }\n  swap(xs, i, hi);\n  return i;\n}\nfunction quick(xs: number[], lo: number, hi: number): void {\n  if (lo >= hi) {\n    return;\n  }\n  const p = partition(xs, lo, hi);\n  quick(xs, lo, p - 1);\n  quick(xs, p + 1, hi);\n}\nquick(nums, 0, nums.length - 1);\nconsole.log(nums.join(\",\"));\n",
+              "tests": [
+                {
+                  "input": "5 2 4 1 3",
+                  "output": "1,2,3,4,5"
+                },
+                {
+                  "input": "2 2 1",
+                  "output": "1,2,2"
+                },
+                {
+                  "input": "9",
+                  "output": "9"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w24-qs-2",
+              "title": "Put the pivot where it belongs",
+              "prompt": "Finish one partition and report where the pivot landed.",
+              "hint": "Everything before `i` is smaller than the pivot, so the pivot goes at `i`.",
+              "hints": [
+                "Everything before `i` is smaller than the pivot, so the pivot goes at `i`.",
+                "Write swap(xs, i, hi);"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nfunction swap(xs: number[], i: number, j: number): void {\n  const t = xs[i] ?? 0;\n  xs[i] = xs[j] ?? 0;\n  xs[j] = t;\n}\nfunction partition(xs: number[], lo: number, hi: number): number {\n  const pivot = xs[hi] ?? 0;\n  let i = lo;\n  for (let j = lo; j < hi; j = j + 1) {\n    if ((xs[j] ?? 0) < pivot) {\n      swap(xs, i, j);\n      i = i + 1;\n    }\n  }\n____\n  return i;\n}\nconst p = partition(nums, 0, nums.length - 1);\nconsole.log(`p=${p} ${nums.join(\",\")}`);\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nfunction swap(xs: number[], i: number, j: number): void {\n  const t = xs[i] ?? 0;\n  xs[i] = xs[j] ?? 0;\n  xs[j] = t;\n}\nfunction partition(xs: number[], lo: number, hi: number): number {\n  const pivot = xs[hi] ?? 0;\n  let i = lo;\n  for (let j = lo; j < hi; j = j + 1) {\n    if ((xs[j] ?? 0) < pivot) {\n      swap(xs, i, j);\n      i = i + 1;\n    }\n  }\n  swap(xs, i, hi);\n  return i;\n}\nconst p = partition(nums, 0, nums.length - 1);\nconsole.log(`p=${p} ${nums.join(\",\")}`);\n",
+              "tests": [
+                {
+                  "input": "5 2 4 1 3",
+                  "output": "p=2 2,1,3,5,4"
+                },
+                {
+                  "input": "1 2 3",
+                  "output": "p=2 1,2,3"
+                },
+                {
+                  "input": "3 2 1",
+                  "output": "p=0 1,2,3"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w24-qs-3",
+              "title": "Recurse around it",
+              "prompt": "Sort both sides of the pivot, leaving the pivot itself alone.",
+              "hint": "The pivot at p is finished. The left side ends just before it; the right starts just after.",
+              "hints": [
+                "The pivot at p is finished. The left side ends just before it; the right starts just after.",
+                "Write quick(xs, lo, p - 1); then quick(xs, p + 1, hi);"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nfunction swap(xs: number[], i: number, j: number): void {\n  const t = xs[i] ?? 0;\n  xs[i] = xs[j] ?? 0;\n  xs[j] = t;\n}\nlet cmp = 0;\nfunction partition(xs: number[], lo: number, hi: number): number {\n  const pivot = xs[hi] ?? 0;\n  let i = lo;\n  for (let j = lo; j < hi; j = j + 1) {\n    cmp = cmp + 1;\n    if ((xs[j] ?? 0) < pivot) {\n      swap(xs, i, j);\n      i = i + 1;\n    }\n  }\n  swap(xs, i, hi);\n  return i;\n}\nfunction quick(xs: number[], lo: number, hi: number): void {\n  if (lo >= hi) {\n    return;\n  }\n  const p = partition(xs, lo, hi);\n____\n}\nquick(nums, 0, nums.length - 1);\nconsole.log(nums.join(\",\"));\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nfunction swap(xs: number[], i: number, j: number): void {\n  const t = xs[i] ?? 0;\n  xs[i] = xs[j] ?? 0;\n  xs[j] = t;\n}\nlet cmp = 0;\nfunction partition(xs: number[], lo: number, hi: number): number {\n  const pivot = xs[hi] ?? 0;\n  let i = lo;\n  for (let j = lo; j < hi; j = j + 1) {\n    cmp = cmp + 1;\n    if ((xs[j] ?? 0) < pivot) {\n      swap(xs, i, j);\n      i = i + 1;\n    }\n  }\n  swap(xs, i, hi);\n  return i;\n}\nfunction quick(xs: number[], lo: number, hi: number): void {\n  if (lo >= hi) {\n    return;\n  }\n  const p = partition(xs, lo, hi);\n  quick(xs, lo, p - 1);\n  quick(xs, p + 1, hi);\n}\nquick(nums, 0, nums.length - 1);\nconsole.log(nums.join(\",\"));\n",
+              "tests": [
+                {
+                  "input": "5 2 4 1 3",
+                  "output": "1,2,3,4,5"
+                },
+                {
+                  "input": "4 4 4",
+                  "output": "4,4,4"
+                },
+                {
+                  "input": "6 5 4 3 2 1",
+                  "output": "1,2,3,4,5,6"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w24-qs-4",
+              "title": "The input that ruins it",
+              "prompt": "Count quicksort's comparisons on mixed input and on sorted input of the same size.",
+              "hint": "Sort the already-sorted array the same way, after resetting the counter.",
+              "hints": [
+                "Sort the already-sorted array the same way, after resetting the counter.",
+                "Write quick(sorted, 0, sorted.length - 1);"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "function swap(xs: number[], i: number, j: number): void {\n  const t = xs[i] ?? 0;\n  xs[i] = xs[j] ?? 0;\n  xs[j] = t;\n}\nlet cmp = 0;\nfunction partition(xs: number[], lo: number, hi: number): number {\n  const pivot = xs[hi] ?? 0;\n  let i = lo;\n  for (let j = lo; j < hi; j = j + 1) {\n    cmp = cmp + 1;\n    if ((xs[j] ?? 0) < pivot) {\n      swap(xs, i, j);\n      i = i + 1;\n    }\n  }\n  swap(xs, i, hi);\n  return i;\n}\nfunction quick(xs: number[], lo: number, hi: number): void {\n  if (lo >= hi) {\n    return;\n  }\n  const p = partition(xs, lo, hi);\n  quick(xs, lo, p - 1);\n  quick(xs, p + 1, hi);\n}\nconst mixed = [5, 3, 8, 1, 9, 2, 7, 4, 6, 12, 10, 16, 11, 14, 13, 15];\nconst sorted = Array.from({ length: 16 }, (_, i) => i + 1);\nquick(mixed, 0, mixed.length - 1);\nconst mixedCmp = cmp;\ncmp = 0;\n____\nconsole.log(`mixed=${mixedCmp} sorted=${cmp} worst=${(16 * 15) / 2}`);\n",
+              "solution": "function swap(xs: number[], i: number, j: number): void {\n  const t = xs[i] ?? 0;\n  xs[i] = xs[j] ?? 0;\n  xs[j] = t;\n}\nlet cmp = 0;\nfunction partition(xs: number[], lo: number, hi: number): number {\n  const pivot = xs[hi] ?? 0;\n  let i = lo;\n  for (let j = lo; j < hi; j = j + 1) {\n    cmp = cmp + 1;\n    if ((xs[j] ?? 0) < pivot) {\n      swap(xs, i, j);\n      i = i + 1;\n    }\n  }\n  swap(xs, i, hi);\n  return i;\n}\nfunction quick(xs: number[], lo: number, hi: number): void {\n  if (lo >= hi) {\n    return;\n  }\n  const p = partition(xs, lo, hi);\n  quick(xs, lo, p - 1);\n  quick(xs, p + 1, hi);\n}\nconst mixed = [5, 3, 8, 1, 9, 2, 7, 4, 6, 12, 10, 16, 11, 14, 13, 15];\nconst sorted = Array.from({ length: 16 }, (_, i) => i + 1);\nquick(mixed, 0, mixed.length - 1);\nconst mixedCmp = cmp;\ncmp = 0;\nquick(sorted, 0, sorted.length - 1);\nconsole.log(`mixed=${mixedCmp} sorted=${cmp} worst=${(16 * 15) / 2}`);\n",
+              "tests": [
+                {
+                  "input": "",
+                  "output": "mixed=64 sorted=120 worst=120"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w24-qs-5",
+              "title": "A middle pivot",
+              "prompt": "Swap the middle element into the pivot's slot before partitioning, and watch sorted input stop being the worst case.",
+              "hint": "The partition still takes its pivot from `hi` — so move the middle element there first.",
+              "hints": [
+                "The partition still takes its pivot from `hi` — so move the middle element there first.",
+                "Write swap(xs, Math.floor((lo + hi) / 2), hi);"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "function swap(xs: number[], i: number, j: number): void {\n  const t = xs[i] ?? 0;\n  xs[i] = xs[j] ?? 0;\n  xs[j] = t;\n}\nlet cmp = 0;\nfunction partition(xs: number[], lo: number, hi: number): number {\n____\n  const pivot = xs[hi] ?? 0;\n  let i = lo;\n  for (let j = lo; j < hi; j = j + 1) {\n    cmp = cmp + 1;\n    if ((xs[j] ?? 0) < pivot) {\n      swap(xs, i, j);\n      i = i + 1;\n    }\n  }\n  swap(xs, i, hi);\n  return i;\n}\nfunction quick(xs: number[], lo: number, hi: number): void {\n  if (lo >= hi) {\n    return;\n  }\n  const p = partition(xs, lo, hi);\n  quick(xs, lo, p - 1);\n  quick(xs, p + 1, hi);\n}\nconst sorted = Array.from({ length: 16 }, (_, i) => i + 1);\nquick(sorted, 0, sorted.length - 1);\nconsole.log(`sorted=${cmp} ok=${sorted.join(\",\") === \"1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16\"}`);\n",
+              "solution": "function swap(xs: number[], i: number, j: number): void {\n  const t = xs[i] ?? 0;\n  xs[i] = xs[j] ?? 0;\n  xs[j] = t;\n}\nlet cmp = 0;\nfunction partition(xs: number[], lo: number, hi: number): number {\n  swap(xs, Math.floor((lo + hi) / 2), hi);\n  const pivot = xs[hi] ?? 0;\n  let i = lo;\n  for (let j = lo; j < hi; j = j + 1) {\n    cmp = cmp + 1;\n    if ((xs[j] ?? 0) < pivot) {\n      swap(xs, i, j);\n      i = i + 1;\n    }\n  }\n  swap(xs, i, hi);\n  return i;\n}\nfunction quick(xs: number[], lo: number, hi: number): void {\n  if (lo >= hi) {\n    return;\n  }\n  const p = partition(xs, lo, hi);\n  quick(xs, lo, p - 1);\n  quick(xs, p + 1, hi);\n}\nconst sorted = Array.from({ length: 16 }, (_, i) => i + 1);\nquick(sorted, 0, sorted.length - 1);\nconsole.log(`sorted=${cmp} ok=${sorted.join(\",\") === \"1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16\"}`);\n",
+              "tests": [
+                {
+                  "input": "",
+                  "output": "sorted=38 ok=true"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w24-qs-6",
+              "title": "Quickselect",
+              "prompt": "Find the k-th smallest (counting from 0) by partitioning and keeping only the side that holds it.",
+              "hint": "If the pivot landed left of k, the answer is to its right — and vice versa.",
+              "hints": [
+                "If the pivot landed left of k, the answer is to its right — and vice versa.",
+                "Move `lo` past the pivot, or `hi` before it. Never both."
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Hard",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nfunction swap(xs: number[], i: number, j: number): void {\n  const t = xs[i] ?? 0;\n  xs[i] = xs[j] ?? 0;\n  xs[j] = t;\n}\nfunction partition(xs: number[], lo: number, hi: number): number {\n  const pivot = xs[hi] ?? 0;\n  let i = lo;\n  for (let j = lo; j < hi; j = j + 1) {\n    if ((xs[j] ?? 0) < pivot) {\n      swap(xs, i, j);\n      i = i + 1;\n    }\n  }\n  swap(xs, i, hi);\n  return i;\n}\nfunction select(xs: number[], k: number): number {\n  let lo = 0;\n  let hi = xs.length - 1;\n  while (lo < hi) {\n    const p = partition(xs, lo, hi);\n    if (p === k) {\n      return xs[p] ?? 0;\n    }\n____\n  }\n  return xs[lo] ?? 0;\n}\nconsole.log(select(nums, 2));\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nfunction swap(xs: number[], i: number, j: number): void {\n  const t = xs[i] ?? 0;\n  xs[i] = xs[j] ?? 0;\n  xs[j] = t;\n}\nfunction partition(xs: number[], lo: number, hi: number): number {\n  const pivot = xs[hi] ?? 0;\n  let i = lo;\n  for (let j = lo; j < hi; j = j + 1) {\n    if ((xs[j] ?? 0) < pivot) {\n      swap(xs, i, j);\n      i = i + 1;\n    }\n  }\n  swap(xs, i, hi);\n  return i;\n}\nfunction select(xs: number[], k: number): number {\n  let lo = 0;\n  let hi = xs.length - 1;\n  while (lo < hi) {\n    const p = partition(xs, lo, hi);\n    if (p === k) {\n      return xs[p] ?? 0;\n    }\n    if (p < k) {\n      lo = p + 1;\n    } else {\n      hi = p - 1;\n    }\n  }\n  return xs[lo] ?? 0;\n}\nconsole.log(select(nums, 2));\n",
+              "tests": [
+                {
+                  "input": "5 2 4 1 3",
+                  "output": "3"
+                },
+                {
+                  "input": "9 8 7 6 5",
+                  "output": "7"
+                },
+                {
+                  "input": "1 1 1",
+                  "output": "1"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w24-qs-fix1",
+              "title": "Fix the recursion that includes the pivot",
+              "prompt": "This dies with `RangeError: Maximum call stack size exceeded`. The left recursion covers `[lo, p]` — the pivot included — and the pivot is the largest thing in that range, so partitioning it returns `p` again, and again.",
+              "hint": "After the partition, the element at p is in its final place.",
+              "hints": [
+                "After the partition, the element at p is in its final place.",
+                "A recursive call must exclude it, or the range never shrinks.",
+                "Write quick(xs, lo, p - 1);"
+              ],
+              "language": "typescript",
+              "kind": "fix",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nfunction swap(xs: number[], i: number, j: number): void {\n  const t = xs[i] ?? 0;\n  xs[i] = xs[j] ?? 0;\n  xs[j] = t;\n}\nlet cmp = 0;\nfunction partition(xs: number[], lo: number, hi: number): number {\n  const pivot = xs[hi] ?? 0;\n  let i = lo;\n  for (let j = lo; j < hi; j = j + 1) {\n    cmp = cmp + 1;\n    if ((xs[j] ?? 0) < pivot) {\n      swap(xs, i, j);\n      i = i + 1;\n    }\n  }\n  swap(xs, i, hi);\n  return i;\n}\nfunction quick(xs: number[], lo: number, hi: number): void {\n  if (lo >= hi) {\n    return;\n  }\n  const p = partition(xs, lo, hi);\n  quick(xs, lo, p);\n  quick(xs, p + 1, hi);\n}\nquick(nums, 0, nums.length - 1);\nconsole.log(nums.join(\",\"));\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nfunction swap(xs: number[], i: number, j: number): void {\n  const t = xs[i] ?? 0;\n  xs[i] = xs[j] ?? 0;\n  xs[j] = t;\n}\nlet cmp = 0;\nfunction partition(xs: number[], lo: number, hi: number): number {\n  const pivot = xs[hi] ?? 0;\n  let i = lo;\n  for (let j = lo; j < hi; j = j + 1) {\n    cmp = cmp + 1;\n    if ((xs[j] ?? 0) < pivot) {\n      swap(xs, i, j);\n      i = i + 1;\n    }\n  }\n  swap(xs, i, hi);\n  return i;\n}\nfunction quick(xs: number[], lo: number, hi: number): void {\n  if (lo >= hi) {\n    return;\n  }\n  const p = partition(xs, lo, hi);\n  quick(xs, lo, p - 1);\n  quick(xs, p + 1, hi);\n}\nquick(nums, 0, nums.length - 1);\nconsole.log(nums.join(\",\"));\n",
+              "tests": [
+                {
+                  "input": "5 2 4 1 3",
+                  "output": "1,2,3,4,5"
+                },
+                {
+                  "input": "2 1",
+                  "output": "1,2"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w24-qs-fix2",
+              "title": "Fix the pivot that sorted input defeats",
+              "prompt": "The requirement is fewer than 60 comparisons on 16 already-sorted items, and this reports `cmp=120 over budget`. Nothing is wrong with the ORDER it produces — the bug is the cost, and the cause is the pivot: on sorted input the last element is always the largest.",
+              "hint": "Every partition peels off exactly one element — the pivot is always the maximum.",
+              "hints": [
+                "Every partition peels off exactly one element — the pivot is always the maximum.",
+                "A pivot from the middle of a sorted range is its median.",
+                "At the start of partition, swap(xs, Math.floor((lo + hi) / 2), hi);"
+              ],
+              "language": "typescript",
+              "kind": "fix",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "function swap(xs: number[], i: number, j: number): void {\n  const t = xs[i] ?? 0;\n  xs[i] = xs[j] ?? 0;\n  xs[j] = t;\n}\nlet cmp = 0;\nfunction partition(xs: number[], lo: number, hi: number): number {\n  const pivot = xs[hi] ?? 0;\n  let i = lo;\n  for (let j = lo; j < hi; j = j + 1) {\n    cmp = cmp + 1;\n    if ((xs[j] ?? 0) < pivot) {\n      swap(xs, i, j);\n      i = i + 1;\n    }\n  }\n  swap(xs, i, hi);\n  return i;\n}\nfunction quick(xs: number[], lo: number, hi: number): void {\n  if (lo >= hi) {\n    return;\n  }\n  const p = partition(xs, lo, hi);\n  quick(xs, lo, p - 1);\n  quick(xs, p + 1, hi);\n}\nconst sorted = Array.from({ length: 16 }, (_, i) => i + 1);\nquick(sorted, 0, sorted.length - 1);\nconsole.log(`cmp=${cmp} ${cmp < 60 ? \"ok\" : \"over budget\"}`);\n",
+              "solution": "function swap(xs: number[], i: number, j: number): void {\n  const t = xs[i] ?? 0;\n  xs[i] = xs[j] ?? 0;\n  xs[j] = t;\n}\nlet cmp = 0;\nfunction partition(xs: number[], lo: number, hi: number): number {\n  swap(xs, Math.floor((lo + hi) / 2), hi);\n  const pivot = xs[hi] ?? 0;\n  let i = lo;\n  for (let j = lo; j < hi; j = j + 1) {\n    cmp = cmp + 1;\n    if ((xs[j] ?? 0) < pivot) {\n      swap(xs, i, j);\n      i = i + 1;\n    }\n  }\n  swap(xs, i, hi);\n  return i;\n}\nfunction quick(xs: number[], lo: number, hi: number): void {\n  if (lo >= hi) {\n    return;\n  }\n  const p = partition(xs, lo, hi);\n  quick(xs, lo, p - 1);\n  quick(xs, p + 1, hi);\n}\nconst sorted = Array.from({ length: 16 }, (_, i) => i + 1);\nquick(sorted, 0, sorted.length - 1);\nconsole.log(`cmp=${cmp} ${cmp < 60 ? \"ok\" : \"over budget\"}`);\n",
+              "tests": [
+                {
+                  "input": "",
+                  "output": "cmp=38 ok"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            }
+          ],
+          "quiz": [
+            {
+              "question": "Merge sort works on the way up; quicksort works…",
+              "options": [
+                "also on the way up",
+                "on the way down — the partition happens before the recursion",
+                "not at all",
+                "in parallel"
+              ],
+              "answer": 1,
+              "explanation": "The pivot is placed before either side is sorted."
+            },
+            {
+              "question": "A random pivot is avoided in this course because…",
+              "options": [
+                "it is slow",
+                "the counts would differ from run to run",
+                "it is wrong",
+                "of types"
+              ],
+              "answer": 1,
+              "explanation": "Deterministic output is the judge's whole contract."
+            }
+          ]
+        },
+        {
+          "key": "w24-counting",
+          "title": "Sorting without comparing",
+          "what": "Counting sort, and the n log n limit it steps around.",
+          "lesson": "## The limit\n\nEvery sort so far learns the order by asking \"is `a` before `b`?\". There are\n`n!` possible orders of n elements, and each yes/no answer can at best halve the\nones still possible — so the worst case needs at least **⌈log₂ n!⌉** comparisons:\n\n```\nn=4    at least  5      (4! = 24 orders)\nn=8    at least 16      (8! = 40,320)\nn=16   at least 45\n```\n\n`log₂ n!` grows like **n log n**. That is the proof that no comparison sort can\nbeat O(n log n) — and merge sort, at 17 on its worst eight elements against a floor\nof 16, is almost exactly as good as possible.\n\n## Stepping around it\n\nThe bound is about **comparing**. If the values are small integers, you do not\nneed to compare them — you can use them as **array indexes**:\n\n```ts\nconst counts: number[] = new Array(max + 1).fill(0);\nfor (const x of xs) { counts[x] = (counts[x] ?? 0) + 1; }      // tally\nconst out: number[] = [];\nfor (let v = 0; v <= max; v = v + 1) {                           // emit in order\n  for (let c = 0; c < (counts[v] ?? 0); c = c + 1) { out.push(v); }\n}\n```\n\n**O(n + k)**, where k is the range of values, and not a single comparison. Ages,\ngrades, star ratings, days of the month: counting sort is the right tool, and it\nis linear.\n\n## When it is the wrong tool\n\nThe `+ k` is not decoration. Two numbers, `5` and `1000`: that is 2 tallies and\n**1,001** buckets to walk. The cost is the *range*, not the count, and a sort of\nthree timestamps would walk billions of empty buckets. Counting sort is for **small\ninteger ranges** — and it cannot sort strings or fractions at all.\n\n## Negative values\n\n`counts[-2]` does not index an array: it sets a *property* named `\"-2\"`, which the\n`0 … max` loop never visits — so negative values **silently disappear**. The fix is\nan offset: index by `x - min`, emit `v + min`.\n\n## A stable version, from week 23\n\nTo sort *records* by a small key (students by grade), tallies are not enough —\nyou need to know where each record *goes*. That is a **prefix sum** over the\ncounts: the number of records with a smaller key is exactly where the first record\nwith this key belongs.\n\n```\ngrades  = [2, 0, 2, 1]\ncounts  = [1, 1, 2]          (one 0, one 1, two 2s)\nstarts  = [0, 1, 2]          prefix sums — where each grade's block begins\n```\n\nWalk the input **in order**, placing each record at `starts[grade]` and bumping\nit. Equal grades land in input order: stable. Week 23's leading-zero prefix array,\ndoing a completely different job.\n\n> ⚠️ **Common mistakes:** emitting `v < max` and losing the largest value;\n> negative values without an offset; and counting sort on a huge range.\n",
+          "warmup": [
+            {
+              "question": "No comparison sort can beat…",
+              "options": [
+                "O(n)",
+                "about n log n comparisons in the worst case",
+                "O(n²)",
+                "O(log n)"
+              ],
+              "answer": 1,
+              "explanation": "Each answer at best halves n! possible orders."
+            },
+            {
+              "question": "Counting sort runs in…",
+              "options": [
+                "O(n log n)",
+                "O(n + k), k being the range of values",
+                "O(n²)",
+                "O(k²)"
+              ],
+              "answer": 1,
+              "explanation": "Tally, then walk the range."
+            },
+            {
+              "question": "Counting sort gets round the lower bound by…",
+              "options": [
+                "cheating",
+                "never comparing — using values as indexes",
+                "being unstable",
+                "recursion"
+              ],
+              "answer": 1,
+              "explanation": "The bound only applies to comparisons."
+            },
+            {
+              "question": "`counts[-2] = 1` on an array…",
+              "options": [
+                "throws",
+                "sets a property the index loop never visits",
+                "writes index 0",
+                "is a type error"
+              ],
+              "answer": 1,
+              "explanation": "Negative values silently vanish."
+            }
+          ],
+          "exercises": [
+            {
+              "id": "tscourse-w24-cs-1",
+              "title": "Tally",
+              "prompt": "Count how many times each value occurs.",
+              "hint": "The value is the index; the entry is how many times it occurred.",
+              "hints": [
+                "The value is the index; the entry is how many times it occurred.",
+                "Write counts[x] = (counts[x] ?? 0) + 1;"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nfunction countingSort(xs: readonly number[]): readonly number[] {\n  const max = Math.max(...xs);\n  const counts: number[] = new Array(max + 1).fill(0);\n  for (const x of xs) {\n____\n  }\n  const out: number[] = [];\n  for (let v = 0; v <= max; v = v + 1) {\n    for (let c = 0; c < (counts[v] ?? 0); c = c + 1) {\n      out.push(v);\n    }\n  }\n  return out;\n}\nconsole.log(countingSort(nums).join(\",\"));\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nfunction countingSort(xs: readonly number[]): readonly number[] {\n  const max = Math.max(...xs);\n  const counts: number[] = new Array(max + 1).fill(0);\n  for (const x of xs) {\n    counts[x] = (counts[x] ?? 0) + 1;\n  }\n  const out: number[] = [];\n  for (let v = 0; v <= max; v = v + 1) {\n    for (let c = 0; c < (counts[v] ?? 0); c = c + 1) {\n      out.push(v);\n    }\n  }\n  return out;\n}\nconsole.log(countingSort(nums).join(\",\"));\n",
+              "tests": [
+                {
+                  "input": "3 1 2 1 0",
+                  "output": "0,1,1,2,3"
+                },
+                {
+                  "input": "4 4",
+                  "output": "4,4"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w24-cs-2",
+              "title": "Emit in order",
+              "prompt": "Walk the values in order and output each one as many times as it was counted.",
+              "hint": "`counts[v]` says how many copies of v to output.",
+              "hints": [
+                "`counts[v]` says how many copies of v to output.",
+                "An inner loop that pushes v that many times."
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nfunction countingSort(xs: readonly number[]): readonly number[] {\n  const max = Math.max(...xs);\n  const counts: number[] = new Array(max + 1).fill(0);\n  for (const x of xs) {\n    counts[x] = (counts[x] ?? 0) + 1;\n  }\n  const out: number[] = [];\n  for (let v = 0; v <= max; v = v + 1) {\n____\n  }\n  return out;\n}\nconsole.log(countingSort(nums).join(\",\"));\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nfunction countingSort(xs: readonly number[]): readonly number[] {\n  const max = Math.max(...xs);\n  const counts: number[] = new Array(max + 1).fill(0);\n  for (const x of xs) {\n    counts[x] = (counts[x] ?? 0) + 1;\n  }\n  const out: number[] = [];\n  for (let v = 0; v <= max; v = v + 1) {\n    for (let c = 0; c < (counts[v] ?? 0); c = c + 1) {\n      out.push(v);\n    }\n  }\n  return out;\n}\nconsole.log(countingSort(nums).join(\",\"));\n",
+              "tests": [
+                {
+                  "input": "3 1 2 1 0",
+                  "output": "0,1,1,2,3"
+                },
+                {
+                  "input": "2 0 2",
+                  "output": "0,2,2"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w24-cs-3",
+              "title": "The cost is the range",
+              "prompt": "Count counting sort's steps: one per tally and one per bucket walked.",
+              "hint": "Every bucket from 0 to max is visited, empty or not.",
+              "hints": [
+                "Every bucket from 0 to max is visited, empty or not.",
+                "Write for (let v = 0; v <= max; v = v + 1) {"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst max = Math.max(...nums);\nconst counts: number[] = new Array(max + 1).fill(0);\nlet ops = 0;\nfor (const x of nums) {\n  counts[x] = (counts[x] ?? 0) + 1;\n  ops = ops + 1;\n}\nconst out: number[] = [];\n____\n  ops = ops + 1;\n  for (let c = 0; c < (counts[v] ?? 0); c = c + 1) {\n    out.push(v);\n  }\n}\nconsole.log(`n=${nums.length} ops=${ops} comparisons=0`);\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst max = Math.max(...nums);\nconst counts: number[] = new Array(max + 1).fill(0);\nlet ops = 0;\nfor (const x of nums) {\n  counts[x] = (counts[x] ?? 0) + 1;\n  ops = ops + 1;\n}\nconst out: number[] = [];\nfor (let v = 0; v <= max; v = v + 1) {\n  ops = ops + 1;\n  for (let c = 0; c < (counts[v] ?? 0); c = c + 1) {\n    out.push(v);\n  }\n}\nconsole.log(`n=${nums.length} ops=${ops} comparisons=0`);\n",
+              "tests": [
+                {
+                  "input": "3 1 2 1 0",
+                  "output": "n=5 ops=9 comparisons=0"
+                },
+                {
+                  "input": "5 1000",
+                  "output": "n=2 ops=1003 comparisons=0"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w24-cs-4",
+              "title": "Where each record goes",
+              "prompt": "Turn the counts into starting positions with a prefix sum, so records can be placed stably.",
+              "hint": "A grade's block starts where the previous grade's block started, plus how many that grade had.",
+              "hints": [
+                "A grade's block starts where the previous grade's block started, plus how many that grade had.",
+                "Write starts.push((starts[g - 1] ?? 0) + (counts[g - 1] ?? 0));"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Hard",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst words = fs.readFileSync(0, \"utf8\").trim().split(\" \");\ninterface Row {\n  readonly name: string;\n  readonly score: number;\n}\nconst rows: readonly Row[] = words.map((w) => {\n  const [name, score] = w.split(\":\");\n  return { name: name ?? \"\", score: Number(score ?? \"0\") };\n});\nfunction at(rs: readonly Row[], i: number): Row {\n  return rs[i] ?? { name: \"\", score: 0 };\n}\nconst counts: number[] = [0, 0, 0, 0];\nfor (const r of rows) {\n  counts[r.score] = (counts[r.score] ?? 0) + 1;\n}\nconst starts: number[] = [0];\nfor (let g = 1; g < counts.length; g = g + 1) {\n____\n}\nconst out: Row[] = new Array(rows.length);\nfor (const r of rows) {\n  const slot = starts[r.score] ?? 0;\n  out[slot] = r;\n  starts[r.score] = slot + 1;\n}\nconsole.log(out.map((r) => r.name).join(\" \"));\n",
+              "solution": "import * as fs from \"fs\";\nconst words = fs.readFileSync(0, \"utf8\").trim().split(\" \");\ninterface Row {\n  readonly name: string;\n  readonly score: number;\n}\nconst rows: readonly Row[] = words.map((w) => {\n  const [name, score] = w.split(\":\");\n  return { name: name ?? \"\", score: Number(score ?? \"0\") };\n});\nfunction at(rs: readonly Row[], i: number): Row {\n  return rs[i] ?? { name: \"\", score: 0 };\n}\nconst counts: number[] = [0, 0, 0, 0];\nfor (const r of rows) {\n  counts[r.score] = (counts[r.score] ?? 0) + 1;\n}\nconst starts: number[] = [0];\nfor (let g = 1; g < counts.length; g = g + 1) {\n  starts.push((starts[g - 1] ?? 0) + (counts[g - 1] ?? 0));\n}\nconst out: Row[] = new Array(rows.length);\nfor (const r of rows) {\n  const slot = starts[r.score] ?? 0;\n  out[slot] = r;\n  starts[r.score] = slot + 1;\n}\nconsole.log(out.map((r) => r.name).join(\" \"));\n",
+              "tests": [
+                {
+                  "input": "ann:2 bo:0 cy:2 dee:1",
+                  "output": "bo dee ann cy"
+                },
+                {
+                  "input": "a:3 b:3 c:0",
+                  "output": "c a b"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w24-cs-5",
+              "title": "The floor under every comparison sort",
+              "prompt": "Compute ⌈log₂ n!⌉ — the fewest comparisons any comparison sort can guarantee.",
+              "hint": "log₂(n!) = log₂ 2 + log₂ 3 + … + log₂ n — a sum, so no giant factorial is ever built.",
+              "hints": [
+                "log₂(n!) = log₂ 2 + log₂ 3 + … + log₂ n — a sum, so no giant factorial is ever built.",
+                "Write bits = bits + Math.log2(i);"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "for (const n of [4, 8, 16]) {\n  let bits = 0;\n  for (let i = 2; i <= n; i = i + 1) {\n____\n  }\n  console.log(`n=${n} atLeast=${Math.ceil(bits)}`);\n}\n",
+              "solution": "for (const n of [4, 8, 16]) {\n  let bits = 0;\n  for (let i = 2; i <= n; i = i + 1) {\n    bits = bits + Math.log2(i);\n  }\n  console.log(`n=${n} atLeast=${Math.ceil(bits)}`);\n}\n",
+              "tests": [
+                {
+                  "input": "",
+                  "output": "n=4 atLeast=5\nn=8 atLeast=16\nn=16 atLeast=45"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w24-cs-fix1",
+              "title": "Fix the largest value that vanished",
+              "prompt": "This prints `0,1,1,2` for `3 1 2 1 0` — the 3 is gone. The emit loop stops at `v < max`, so the bucket for the largest value is never walked.",
+              "hint": "The array was made `max + 1` long so that `max` itself has a bucket.",
+              "hints": [
+                "The array was made `max + 1` long so that `max` itself has a bucket.",
+                "The walk has to reach that bucket.",
+                "Write v <= max."
+              ],
+              "language": "typescript",
+              "kind": "fix",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst max = Math.max(...nums);\nconst counts: number[] = new Array(max + 1).fill(0);\nfor (const x of nums) {\n  counts[x] = (counts[x] ?? 0) + 1;\n}\nconst out: number[] = [];\nfor (let v = 0; v < max; v = v + 1) {\n  for (let c = 0; c < (counts[v] ?? 0); c = c + 1) {\n    out.push(v);\n  }\n}\nconsole.log(out.join(\",\"));\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst max = Math.max(...nums);\nconst counts: number[] = new Array(max + 1).fill(0);\nfor (const x of nums) {\n  counts[x] = (counts[x] ?? 0) + 1;\n}\nconst out: number[] = [];\nfor (let v = 0; v <= max; v = v + 1) {\n  for (let c = 0; c < (counts[v] ?? 0); c = c + 1) {\n    out.push(v);\n  }\n}\nconsole.log(out.join(\",\"));\n",
+              "tests": [
+                {
+                  "input": "3 1 2 1 0",
+                  "output": "0,1,1,2,3"
+                },
+                {
+                  "input": "7",
+                  "output": "7"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w24-cs-fix2",
+              "title": "Fix the negative values that disappeared",
+              "prompt": "This prints `0,3` for `-2 3 0`. `counts[-2]` is not an array slot — it creates a property named `\"-2\"`, which the walk from 0 never visits. Nothing throws; the value is just gone.",
+              "hint": "Shift every value so the smallest one lands at index 0.",
+              "hints": [
+                "Shift every value so the smallest one lands at index 0.",
+                "Index by `x - min`, size the array `max - min + 1`.",
+                "Shift back when emitting: push `v + min`."
+              ],
+              "language": "typescript",
+              "kind": "fix",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst max = Math.max(...nums);\nconst counts: number[] = new Array(max + 1).fill(0);\nfor (const x of nums) {\n  counts[x] = (counts[x] ?? 0) + 1;\n}\nconst out: number[] = [];\nfor (let v = 0; v <= max; v = v + 1) {\n  for (let c = 0; c < (counts[v] ?? 0); c = c + 1) {\n    out.push(v);\n  }\n}\nconsole.log(out.join(\",\"));\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst min = Math.min(...nums);\nconst max = Math.max(...nums);\nconst counts: number[] = new Array(max - min + 1).fill(0);\nfor (const x of nums) {\n  counts[x - min] = (counts[x - min] ?? 0) + 1;\n}\nconst out: number[] = [];\nfor (let v = 0; v <= max - min; v = v + 1) {\n  for (let c = 0; c < (counts[v] ?? 0); c = c + 1) {\n    out.push(v + min);\n  }\n}\nconsole.log(out.join(\",\"));\n",
+              "tests": [
+                {
+                  "input": "-2 3 0",
+                  "output": "-2,0,3"
+                },
+                {
+                  "input": "-1 -1 -5",
+                  "output": "-5,-1,-1"
+                },
+                {
+                  "input": "2 1",
+                  "output": "1,2"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            }
+          ],
+          "quiz": [
+            {
+              "question": "Merge sort's 17 comparisons on its worst 8 elements, against a floor of 16, shows…",
+              "options": [
+                "it is slow",
+                "it is within one comparison of the best possible",
+                "the floor is wrong",
+                "counting sort is better"
+              ],
+              "answer": 1,
+              "explanation": "n log n is not just good; it is nearly optimal."
+            },
+            {
+              "question": "A stable counting sort places records using…",
+              "options": [
+                "a Map",
+                "prefix sums of the counts — week 23",
+                "binary search",
+                "a stack"
+              ],
+              "answer": 1,
+              "explanation": "Where each key's block starts."
+            }
+          ]
+        },
+        {
+          "key": "w24-builtin",
+          "title": "The built-in sort, properly",
+          "what": "The comparator contract, stability you can rely on, and sorting without mutating.",
+          "lesson": "You will almost always call the built-in. Four things about it are worth knowing\nexactly.\n\n## 1. The comparator contract\n\n```ts\n(a, b) => negative   // a comes first\n(a, b) => positive   // b comes first\n(a, b) => 0          // either order will do\n```\n\n`a - b` is ascending, `b - a` descending. And the contract is not a suggestion.\n\n**A comparator that never returns a negative does not sort.** This compiles:\n\n```ts\n[3, 1, 2].sort((a, b) => (a > b ? 1 : 0));   // [3, 1, 2] — untouched\n```\n\nThe engine only moves an element when told it belongs *earlier*, and this\ncomparator never says that. No error, no warning — the array comes back as it\nwent in. It looks like a sort and it is not one.\n\n**A comparator returning a boolean is rejected**, which is the compiler saving\nyou from the same bug:\n\n```\nTS2345: Argument of type '(a: number, b: number) => boolean' is not\n        assignable to parameter of type '(a: number, b: number) => number'.\n```\n\nRun it anyway and `[3, 1, 2]` comes back unsorted too.\n\n## 2. Several keys\n\nWeek 19 wrote the idiom: compare the first key, and when that is a tie (`0`),\nfall through with `||` to the next.\n\n```ts\nrows.sort((a, b) => b.score - a.score || a.name.localeCompare(b.name));\n```\n\nScore descending, then name A-Z. `||` works because `0` is falsy and any other\nnumber is not.\n\n## 3. Stability is guaranteed\n\nSince ES2019 the built-in `sort` **must** be stable. That gives you a second way to\nsort by several keys: sort by the *least* important key first, then by the most\nimportant. The second sort keeps the first one's order among its ties:\n\n```ts\nrows.sort((a, b) => a.name.localeCompare(b.name));   // secondary first\nrows.sort((a, b) => b.score - a.score);              // primary last\n```\n\nSame result as the `||` version. Do them in the other order and the name sort\nwins, which is the classic mistake.\n\n## 4. `sort` mutates — so do not, unless you mean to\n\nWeek 6's warning, now with the type system's help. `readonly number[]` **has no\n`.sort` method**:\n\n```\nTS2339: Property 'sort' does not exist on type 'readonly number[]'.\n```\n\nThat is not a gap in the types, it *is* the type: `sort` mutates, and `readonly`\npromised nothing would. Two answers:\n\n```ts\nconst a = [...xs].sort((x, y) => x - y);      // copy, then sort the copy\nconst b = xs.toSorted((x, y) => x - y);       // the same thing, in one call\n```\n\n`toSorted` returns a new **mutable** array — `number[]`, not `readonly number[]` —\nbecause the copy is yours.\n\n> ⚠️ **Common mistakes:** a comparator that returns a boolean, or never returns a\n> negative; sorting the keys in the wrong order when relying on stability; and\n> sorting an array someone else is still reading.\n",
+          "warmup": [
+            {
+              "question": "A comparator returning a negative number means…",
+              "options": [
+                "b first",
+                "a first",
+                "equal",
+                "an error"
+              ],
+              "answer": 1,
+              "explanation": "a - b is negative when a is smaller: ascending."
+            },
+            {
+              "question": "`[3, 1, 2].sort((a, b) => (a > b ? 1 : 0))` gives…",
+              "options": [
+                "[1, 2, 3]",
+                "[3, 1, 2] — untouched",
+                "[3, 2, 1]",
+                "an error"
+              ],
+              "answer": 1,
+              "explanation": "It never says 'a comes first'."
+            },
+            {
+              "question": "The built-in sort is stable…",
+              "options": [
+                "sometimes",
+                "always, since ES2019",
+                "for numbers only",
+                "never"
+              ],
+              "answer": 1,
+              "explanation": "Which you can rely on."
+            },
+            {
+              "question": "`toSorted` returns…",
+              "options": [
+                "nothing",
+                "a sorted copy, leaving the original alone",
+                "the same array",
+                "a readonly array"
+              ],
+              "answer": 1,
+              "explanation": "The non-mutating sort."
+            }
+          ],
+          "exercises": [
+            {
+              "id": "tscourse-w24-bi-1",
+              "title": "Descending",
+              "prompt": "Sort largest first.",
+              "hint": "Positive means b comes first — so b - a puts bigger values first.",
+              "hints": [
+                "Positive means b comes first — so b - a puts bigger values first.",
+                "Write const sorted = [...nums].sort((a, b) => b - a);"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\n____\nconsole.log(sorted.join(\",\"));\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst sorted = [...nums].sort((a, b) => b - a);\nconsole.log(sorted.join(\",\"));\n",
+              "tests": [
+                {
+                  "input": "3 10 2",
+                  "output": "10,3,2"
+                },
+                {
+                  "input": "1 1 5",
+                  "output": "5,1,1"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w24-bi-2",
+              "title": "Two keys in one comparator",
+              "prompt": "Highest score first; on a tie, alphabetical by name.",
+              "hint": "The first key decides; `||` falls through to the second only when the first is 0.",
+              "hints": [
+                "The first key decides; `||` falls through to the second only when the first is 0.",
+                "Write const sorted = [...rows].sort((a, b) => b.score - a.score || a.name.localeCompare(b.name));"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst words = fs.readFileSync(0, \"utf8\").trim().split(\" \");\ninterface Row {\n  readonly name: string;\n  readonly score: number;\n}\nconst rows: readonly Row[] = words.map((w) => {\n  const [name, score] = w.split(\":\");\n  return { name: name ?? \"\", score: Number(score ?? \"0\") };\n});\nfunction at(rs: readonly Row[], i: number): Row {\n  return rs[i] ?? { name: \"\", score: 0 };\n}\n____\nconsole.log(sorted.map((r) => r.name).join(\" \"));\n",
+              "solution": "import * as fs from \"fs\";\nconst words = fs.readFileSync(0, \"utf8\").trim().split(\" \");\ninterface Row {\n  readonly name: string;\n  readonly score: number;\n}\nconst rows: readonly Row[] = words.map((w) => {\n  const [name, score] = w.split(\":\");\n  return { name: name ?? \"\", score: Number(score ?? \"0\") };\n});\nfunction at(rs: readonly Row[], i: number): Row {\n  return rs[i] ?? { name: \"\", score: 0 };\n}\nconst sorted = [...rows].sort((a, b) => b.score - a.score || a.name.localeCompare(b.name));\nconsole.log(sorted.map((r) => r.name).join(\" \"));\n",
+              "tests": [
+                {
+                  "input": "cy:2 ann:2 bo:3",
+                  "output": "bo ann cy"
+                },
+                {
+                  "input": "dee:1 cal:1 al:1",
+                  "output": "al cal dee"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w24-bi-3",
+              "title": "Two keys in two passes",
+              "prompt": "Rely on stability: sort by the secondary key, then by the primary one.",
+              "hint": "The LAST sort is the most important key.",
+              "hints": [
+                "The LAST sort is the most important key.",
+                "Write sorted.sort((a, b) => b.score - a.score);"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst words = fs.readFileSync(0, \"utf8\").trim().split(\" \");\ninterface Row {\n  readonly name: string;\n  readonly score: number;\n}\nconst rows: readonly Row[] = words.map((w) => {\n  const [name, score] = w.split(\":\");\n  return { name: name ?? \"\", score: Number(score ?? \"0\") };\n});\nfunction at(rs: readonly Row[], i: number): Row {\n  return rs[i] ?? { name: \"\", score: 0 };\n}\nconst sorted = [...rows];\nsorted.sort((a, b) => a.name.localeCompare(b.name));\n____\nconsole.log(sorted.map((r) => r.name).join(\" \"));\n",
+              "solution": "import * as fs from \"fs\";\nconst words = fs.readFileSync(0, \"utf8\").trim().split(\" \");\ninterface Row {\n  readonly name: string;\n  readonly score: number;\n}\nconst rows: readonly Row[] = words.map((w) => {\n  const [name, score] = w.split(\":\");\n  return { name: name ?? \"\", score: Number(score ?? \"0\") };\n});\nfunction at(rs: readonly Row[], i: number): Row {\n  return rs[i] ?? { name: \"\", score: 0 };\n}\nconst sorted = [...rows];\nsorted.sort((a, b) => a.name.localeCompare(b.name));\nsorted.sort((a, b) => b.score - a.score);\nconsole.log(sorted.map((r) => r.name).join(\" \"));\n",
+              "tests": [
+                {
+                  "input": "cy:2 ann:2 bo:3",
+                  "output": "bo ann cy"
+                },
+                {
+                  "input": "dee:1 cal:1 al:1",
+                  "output": "al cal dee"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w24-bi-4",
+              "title": "Sort without touching the original",
+              "prompt": "Get a sorted copy in one call.",
+              "hint": "`toSorted` takes the same comparator as `sort` and returns a new array.",
+              "hints": [
+                "`toSorted` takes the same comparator as `sort` and returns a new array.",
+                "Write const sorted = nums.toSorted((a, b) => a - b);"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\n____\nconsole.log(`${nums.join(\",\")} | ${sorted.join(\",\")}`);\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst sorted = nums.toSorted((a, b) => a - b);\nconsole.log(`${nums.join(\",\")} | ${sorted.join(\",\")}`);\n",
+              "tests": [
+                {
+                  "input": "3 1 2",
+                  "output": "3,1,2 | 1,2,3"
+                },
+                {
+                  "input": "9 8",
+                  "output": "9,8 | 8,9"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w24-bi-p1",
+              "title": "What a sorted copy is",
+              "prompt": "What type does TypeScript already infer for `sorted`? Annotate `check` with exactly that type — not merely one that fits. The input is `readonly` — is the copy?",
+              "hint": "A copy belongs to whoever made it.",
+              "hints": [
+                "A copy belongs to whoever made it.",
+                "Write string[]."
+              ],
+              "language": "typescript",
+              "kind": "predict",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<typeof check, typeof sorted>>;\n",
+              "judge_mode": "types",
+              "forbid": [
+                "typeof"
+              ],
+              "starter": "const names: readonly string[] = [\"cy\", \"ann\", \"bo\"];\nconst sorted = names.toSorted();\nconst check: ____ = sorted;\n",
+              "solution": "const names: readonly string[] = [\"cy\", \"ann\", \"bo\"];\nconst sorted = names.toSorted();\nconst check: string[] = sorted;\n",
+              "tests": [],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w24-bi-d1",
+              "title": "The comparator that answered a question",
+              "prompt": "The compiler rejects this program:\n\n    TS2345: Argument of type '(a: number, b: number) => boolean' is not assignable to parameter of type '(a: number, b: number) => number'.\n\nFix the cause.",
+              "hint": "A comparator answers 'which comes first, and by how much?' with a NUMBER.",
+              "hints": [
+                "A comparator answers 'which comes first, and by how much?' with a NUMBER.",
+                "`true` and `false` cannot say 'a first', 'b first' AND 'tie'.",
+                "Write (a, b) => a - b."
+              ],
+              "language": "typescript",
+              "kind": "diagnose",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst sorted = [...nums].sort((a, b) => a > b);\nconsole.log(sorted.join(\",\"));\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst sorted = [...nums].sort((a, b) => a - b);\nconsole.log(sorted.join(\",\"));\n",
+              "tests": [
+                {
+                  "input": "3 1 2",
+                  "output": "1,2,3"
+                },
+                {
+                  "input": "5 4 6",
+                  "output": "4,5,6"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w24-bi-d2",
+              "title": "Sorting what was promised read-only",
+              "prompt": "The compiler rejects this program:\n\n    TS2339: Property 'sort' does not exist on type 'readonly number[]'.\n\nFix the cause.",
+              "hint": "`sort` rearranges the array it is called on — the one thing `readonly` rules out.",
+              "hints": [
+                "`sort` rearranges the array it is called on — the one thing `readonly` rules out.",
+                "You want a sorted copy, not a sorted original.",
+                "Use toSorted (or [...prices].sort)."
+              ],
+              "language": "typescript",
+              "kind": "diagnose",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "const prices: readonly number[] = [30, 10, 20];\nconst sorted = prices.sort((a, b) => a - b);\nconsole.log(`${sorted.join(\",\")} from ${prices.join(\",\")}`);\n",
+              "solution": "const prices: readonly number[] = [30, 10, 20];\nconst sorted = prices.toSorted((a, b) => a - b);\nconsole.log(`${sorted.join(\",\")} from ${prices.join(\",\")}`);\n",
+              "tests": [
+                {
+                  "input": "",
+                  "output": "10,20,30 from 30,10,20"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w24-bi-fix1",
+              "title": "Fix the comparator that never says 'first'",
+              "prompt": "This compiles, runs, and prints `3,1,2` for `3 1 2` — unsorted. The comparator returns 1 or 0 and never a negative number, and the engine only moves an element when told it belongs earlier.",
+              "hint": "A comparator has three answers, and this one only gives two of them.",
+              "hints": [
+                "A comparator has three answers, and this one only gives two of them.",
+                "Negative must mean 'a comes first'.",
+                "Write (a, b) => a - b."
+              ],
+              "language": "typescript",
+              "kind": "fix",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst sorted = [...nums].sort((a, b) => (a > b ? 1 : 0));\nconsole.log(sorted.join(\",\"));\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst sorted = [...nums].sort((a, b) => a - b);\nconsole.log(sorted.join(\",\"));\n",
+              "tests": [
+                {
+                  "input": "3 1 2",
+                  "output": "1,2,3"
+                },
+                {
+                  "input": "5 4 3 2 1",
+                  "output": "1,2,3,4,5"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w24-bi-fix2",
+              "title": "Fix the report that sorted its own input",
+              "prompt": "The second line should echo the prices as entered, and prints them sorted: `sort` rearranged `nums` itself, and `sorted` is the same array under another name.",
+              "hint": "`sort` returns the array it was called on — not a new one.",
+              "hints": [
+                "`sort` returns the array it was called on — not a new one.",
+                "Sort a copy instead.",
+                "Use nums.toSorted(...) or [...nums].sort(...)."
+              ],
+              "language": "typescript",
+              "kind": "fix",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst sorted = nums.sort((a, b) => a - b);\nconsole.log(`lowest ${sorted[0] ?? 0}`);\nconsole.log(`as entered ${nums.join(\",\")}`);\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst sorted = nums.toSorted((a, b) => a - b);\nconsole.log(`lowest ${sorted[0] ?? 0}`);\nconsole.log(`as entered ${nums.join(\",\")}`);\n",
+              "tests": [
+                {
+                  "input": "30 10 20",
+                  "output": "lowest 10\nas entered 30,10,20"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            }
+          ],
+          "quiz": [
+            {
+              "question": "Sorting by name and then by score, relying on stability, orders…",
+              "options": [
+                "by name",
+                "by score, with ties by name",
+                "randomly",
+                "by score, ties reversed"
+              ],
+              "answer": 1,
+              "explanation": "The last sort is the primary key."
+            },
+            {
+              "question": "`||` works for tie-breaking because…",
+              "options": [
+                "it is a sort feature",
+                "0 is falsy, so only a tie falls through",
+                "it compares strings",
+                "it is stable"
+              ],
+              "answer": 1,
+              "explanation": "Any non-zero result stands."
+            }
+          ]
+        },
+        {
+          "key": "w24-tool",
+          "title": "Sorting as a tool",
+          "what": "Sort first, and a hard question becomes a question about neighbours.",
+          "lesson": "The most useful thing about sorting is not the sorted array. It is what the\nsorted array makes **easy**. After a sort, related things are **next to each\nother**, and a question about all pairs becomes a question about neighbours.\n\n## Closest pair\n\n\"The smallest gap between any two values.\" Every pair: n(n-1)/2 comparisons. But\nin sorted order the closest two values are always **adjacent** — anything in\nbetween would be closer to one of them — so:\n\n```ts\nconst s = [...xs].sort((a, b) => a - b);\nlet best = Infinity;\nfor (let i = 1; i < s.length; i = i + 1) {\n  best = Math.min(best, (s[i] ?? 0) - (s[i - 1] ?? 0));\n}\n```\n\nO(n log n) for the sort plus **n - 1** comparisons, against n(n-1)/2. Four values:\n6 against 3. A thousand: 499,500 against 999.\n\n## Duplicates, groups, clashes — all neighbours\n\n* **Any duplicate?** Sorted, two equal values are adjacent. (Week 19's `Set` is\n  O(n) and simpler — but sorting uses no extra memory, and it also tells you *how\n  many* of each, in order.)\n* **Group anagrams.** Sort each word's *letters* and use that as a `Map` key:\n  `listen`, `silent` and `enlist` all become `eilnst`. Sorting as a way to compute\n  a canonical key — the same trick as week 19's canonical-key function.\n* **Do any bookings clash?** Sort by start time; a clash can only be between a\n  booking and the one right after it. (Week 28 turns this into a whole topic.)\n\n## Order statistics\n\n* **The median** is the middle of the sorted array — or the average of the two\n  middles when the length is even.\n* **The k-th largest** is `s[s.length - k]`.\n\nBoth are O(n log n) this way. Lesson 3's quickselect does the k-th in O(n) average\nwhen that matters; sorting is the version you can write in an interview in thirty\nseconds and explain in ten.\n\n## Default sort, one more time\n\nEvery one of these needs a **numeric** comparator. Week 6's trap — `sort()` with no\ncomparator sorts `100, 25, 3, 9` as text — is at its most dangerous here, because\nthe program still produces a plausible-looking number.\n\n> ⚠️ **Common mistakes:** sorting without a comparator; taking the median of\n> unsorted data; and comparing every pair when neighbours would do.\n",
+          "warmup": [
+            {
+              "question": "After sorting, the closest pair of values is always…",
+              "options": [
+                "the first two",
+                "some adjacent pair",
+                "the ends",
+                "anywhere"
+              ],
+              "answer": 1,
+              "explanation": "Anything between them would be closer."
+            },
+            {
+              "question": "Anagrams share…",
+              "options": [
+                "a length only",
+                "the same letters in sorted order",
+                "a first letter",
+                "a Set"
+              ],
+              "answer": 1,
+              "explanation": "Sort the letters to get the key."
+            },
+            {
+              "question": "The median of 4 sorted values is…",
+              "options": [
+                "the 2nd",
+                "the average of the 2nd and 3rd",
+                "the 3rd",
+                "the mean"
+              ],
+              "answer": 1,
+              "explanation": "Two middles when the length is even."
+            },
+            {
+              "question": "To check whether any bookings clash, after sorting by start…",
+              "options": [
+                "check every pair",
+                "check each booking against the next",
+                "binary search",
+                "use a Map"
+              ],
+              "answer": 1,
+              "explanation": "Neighbours again."
+            }
+          ],
+          "exercises": [
+            {
+              "id": "tscourse-w24-tl-1",
+              "title": "The closest pair",
+              "prompt": "Sort, then compare each value only with its neighbour.",
+              "hint": "In sorted order the gap is always this element minus the one before.",
+              "hints": [
+                "In sorted order the gap is always this element minus the one before.",
+                "Write best = Math.min(best, (s[i] ?? 0) - (s[i - 1] ?? 0));"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst s = [...nums].sort((a, b) => a - b);\nlet best = Number.MAX_SAFE_INTEGER;\nfor (let i = 1; i < s.length; i = i + 1) {\n____\n}\nconsole.log(best);\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst s = [...nums].sort((a, b) => a - b);\nlet best = Number.MAX_SAFE_INTEGER;\nfor (let i = 1; i < s.length; i = i + 1) {\n  best = Math.min(best, (s[i] ?? 0) - (s[i - 1] ?? 0));\n}\nconsole.log(best);\n",
+              "tests": [
+                {
+                  "input": "10 3 7 1",
+                  "output": "2"
+                },
+                {
+                  "input": "5 5",
+                  "output": "0"
+                },
+                {
+                  "input": "100 25 3 9",
+                  "output": "6"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w24-tl-2",
+              "title": "What sorting saved",
+              "prompt": "Report every-pair comparisons against the neighbour comparisons a sort makes possible.",
+              "hint": "Every value against every later value.",
+              "hints": [
+                "Every value against every later value.",
+                "Write const pairs = (n * (n - 1)) / 2;"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst n = nums.length;\n____\nconst neighbours = n - 1;\nconsole.log(`pairs=${pairs} neighbours=${neighbours}`);\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst n = nums.length;\nconst pairs = (n * (n - 1)) / 2;\nconst neighbours = n - 1;\nconsole.log(`pairs=${pairs} neighbours=${neighbours}`);\n",
+              "tests": [
+                {
+                  "input": "10 3 7 1",
+                  "output": "pairs=6 neighbours=3"
+                },
+                {
+                  "input": "1 2",
+                  "output": "pairs=1 neighbours=1"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w24-tl-3",
+              "title": "Group the anagrams",
+              "prompt": "Use each word's letters, sorted, as its group key.",
+              "hint": "Spread the word into letters, sort them, join them back.",
+              "hints": [
+                "Spread the word into letters, sort them, join them back.",
+                "Single letters sort correctly as text — no comparator needed here.",
+                "Write const key = [...w].sort().join(\"\");"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst words = fs.readFileSync(0, \"utf8\").trim().split(\" \");\nconst groups = new Map<string, string[]>();\nfor (const w of words) {\n____\n  const group = groups.get(key) ?? [];\n  group.push(w);\n  groups.set(key, group);\n}\nfor (const group of groups.values()) {\n  console.log(group.join(\",\"));\n}\n",
+              "solution": "import * as fs from \"fs\";\nconst words = fs.readFileSync(0, \"utf8\").trim().split(\" \");\nconst groups = new Map<string, string[]>();\nfor (const w of words) {\n  const key = [...w].sort().join(\"\");\n  const group = groups.get(key) ?? [];\n  group.push(w);\n  groups.set(key, group);\n}\nfor (const group of groups.values()) {\n  console.log(group.join(\",\"));\n}\n",
+              "tests": [
+                {
+                  "input": "listen google silent enlist",
+                  "output": "listen,silent,enlist\ngoogle"
+                },
+                {
+                  "input": "ab ba c",
+                  "output": "ab,ba\nc"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w24-tl-4",
+              "title": "The median",
+              "prompt": "The middle value — or, for an even count, the average of the two middles.",
+              "hint": "For an even length, `mid` is the upper of the two middles.",
+              "hints": [
+                "For an even length, `mid` is the upper of the two middles.",
+                "Average s[mid - 1] and s[mid]."
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst s = [...nums].sort((a, b) => a - b);\nconst mid = Math.floor(s.length / 2);\nconst median = s.length % 2 === 1\n  ? (s[mid] ?? 0)\n____\nconsole.log(median);\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst s = [...nums].sort((a, b) => a - b);\nconst mid = Math.floor(s.length / 2);\nconst median = s.length % 2 === 1\n  ? (s[mid] ?? 0)\n  : ((s[mid - 1] ?? 0) + (s[mid] ?? 0)) / 2;\nconsole.log(median);\n",
+              "tests": [
+                {
+                  "input": "5 1 3",
+                  "output": "3"
+                },
+                {
+                  "input": "4 1 3 2",
+                  "output": "2.5"
+                },
+                {
+                  "input": "10 20",
+                  "output": "15"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w24-tl-5",
+              "title": "The k-th largest",
+              "prompt": "Count k from the top of the sorted array.",
+              "hint": "The largest is at s.length - 1, the second largest one before it.",
+              "hints": [
+                "The largest is at s.length - 1, the second largest one before it.",
+                "Write console.log(s[s.length - k] ?? 0);"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst k = 2;\nconst s = [...nums].sort((a, b) => a - b);\n____\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst k = 2;\nconst s = [...nums].sort((a, b) => a - b);\nconsole.log(s[s.length - k] ?? 0);\n",
+              "tests": [
+                {
+                  "input": "3 9 5",
+                  "output": "5"
+                },
+                {
+                  "input": "4 4 1",
+                  "output": "4"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w24-tl-6",
+              "title": "Do any bookings clash?",
+              "prompt": "Sort the bookings by start time, so a clash can only be between neighbours.",
+              "hint": "Order by the start time, earliest first.",
+              "hints": [
+                "Order by the start time, earliest first.",
+                "Write bookings.sort((a, b) => a.start - b.start);"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst words = fs.readFileSync(0, \"utf8\").trim().split(\" \");\ninterface Booking {\n  readonly start: number;\n  readonly end: number;\n}\nconst bookings: Booking[] = words.map((w) => {\n  const [start, end] = w.split(\"-\");\n  return { start: Number(start ?? \"0\"), end: Number(end ?? \"0\") };\n});\n____\nlet clash = false;\nfor (let i = 1; i < bookings.length; i = i + 1) {\n  const prev = bookings[i - 1];\n  const cur = bookings[i];\n  if (prev !== undefined && cur !== undefined && prev.end > cur.start) {\n    clash = true;\n  }\n}\nconsole.log(clash ? \"clash\" : \"fits\");\n",
+              "solution": "import * as fs from \"fs\";\nconst words = fs.readFileSync(0, \"utf8\").trim().split(\" \");\ninterface Booking {\n  readonly start: number;\n  readonly end: number;\n}\nconst bookings: Booking[] = words.map((w) => {\n  const [start, end] = w.split(\"-\");\n  return { start: Number(start ?? \"0\"), end: Number(end ?? \"0\") };\n});\nbookings.sort((a, b) => a.start - b.start);\nlet clash = false;\nfor (let i = 1; i < bookings.length; i = i + 1) {\n  const prev = bookings[i - 1];\n  const cur = bookings[i];\n  if (prev !== undefined && cur !== undefined && prev.end > cur.start) {\n    clash = true;\n  }\n}\nconsole.log(clash ? \"clash\" : \"fits\");\n",
+              "tests": [
+                {
+                  "input": "1-3 5-6 2-4",
+                  "output": "clash"
+                },
+                {
+                  "input": "5-6 1-2 2-3",
+                  "output": "fits"
+                },
+                {
+                  "input": "1-9",
+                  "output": "fits"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w24-tl-fix1",
+              "title": "Fix the gap that came out negative",
+              "prompt": "This reports a smallest gap of `-75` for `100 25 3 9`. A gap cannot be negative — the values were sorted as TEXT (`\"100\" < \"25\" < \"3\" < \"9\"`), so the neighbours are not in numeric order.",
+              "hint": "With no comparator, `sort` compares the values as strings.",
+              "hints": [
+                "With no comparator, `sort` compares the values as strings.",
+                "Week 6's trap, in a place where the wrong answer still looks like a number.",
+                "Write .sort((a, b) => a - b)."
+              ],
+              "language": "typescript",
+              "kind": "fix",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst s = [...nums].sort();\nlet best = Number.MAX_SAFE_INTEGER;\nfor (let i = 1; i < s.length; i = i + 1) {\n  best = Math.min(best, (s[i] ?? 0) - (s[i - 1] ?? 0));\n}\nconsole.log(best);\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst s = [...nums].sort((a, b) => a - b);\nlet best = Number.MAX_SAFE_INTEGER;\nfor (let i = 1; i < s.length; i = i + 1) {\n  best = Math.min(best, (s[i] ?? 0) - (s[i - 1] ?? 0));\n}\nconsole.log(best);\n",
+              "tests": [
+                {
+                  "input": "100 25 3 9",
+                  "output": "6"
+                },
+                {
+                  "input": "10 3 7 1",
+                  "output": "2"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w24-tl-fix2",
+              "title": "Fix the median of unsorted data",
+              "prompt": "This reports `1` as the median of `5 1 3`, which is simply the middle of the input as typed. A median is the middle of the values IN ORDER.",
+              "hint": "The position of the median only means something once the values are ordered.",
+              "hints": [
+                "The position of the median only means something once the values are ordered.",
+                "Sort a copy numerically first.",
+                "Then take the middle of the copy."
+              ],
+              "language": "typescript",
+              "kind": "fix",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst mid = Math.floor(nums.length / 2);\nconsole.log(nums[mid] ?? 0);\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nconst s = [...nums].sort((a, b) => a - b);\nconst mid = Math.floor(s.length / 2);\nconsole.log(s[mid] ?? 0);\n",
+              "tests": [
+                {
+                  "input": "5 1 3",
+                  "output": "3"
+                },
+                {
+                  "input": "9 7 8",
+                  "output": "8"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            }
+          ],
+          "quiz": [
+            {
+              "question": "Sorting a word's letters to get a key is the same idea as…",
+              "options": [
+                "binary search",
+                "week 19's canonical-key function",
+                "a prefix sum",
+                "a heap"
+              ],
+              "answer": 1,
+              "explanation": "Many inputs, one representative."
+            },
+            {
+              "question": "Checking for duplicates, a Set is O(n) and sorting is O(n log n). Sorting still wins when…",
+              "options": [
+                "never",
+                "memory is tight, or you also want the values in order",
+                "the values are strings",
+                "n is small"
+              ],
+              "answer": 1,
+              "explanation": "Different costs, not a strict ranking."
+            }
+          ]
+        },
+        {
+          "key": "w24-choose",
+          "title": "Choosing a sort",
+          "what": "Usually the built-in — and knowing exactly when it is not.",
+          "lesson": "## The table\n\n| | best | average | worst | extra space | stable | adaptive |\n|---|---|---|---|---|---|---|\n| selection | n² | n² | n² | 1 | no | no |\n| insertion | **n** | n² | n² | 1 | yes | **yes** |\n| merge | n log n | n log n | n log n | n | yes | no |\n| quick | n log n | n log n | **n²** | log n | no | no |\n| counting | n + k | n + k | n + k | n + k | yes | — |\n\n## The honest default\n\n**Use the built-in.** It is stable, it is O(n log n) in the worst case, and it is\nadaptive: engines use a hybrid (TimSort in V8) that finds already-sorted runs and\n**merges** them, falling back to **insertion sort** on short stretches — this\nweek's two best ideas, combined. You will not beat it with a hand-written\nquicksort.\n\n## When not\n\n* **Small integer range** (ages, grades, ratings) → **counting sort**. O(n + k),\n  and genuinely faster than any comparison sort.\n* **You need only the smallest few, not the full order** → don't sort everything.\n  k passes of selection cost about k·n; quickselect costs n on average.\n* **The data is already sorted, or nearly** → check first. An O(n) scan that\n  finds nothing to do is the cheapest sort there is.\n* **Ties must keep their input order** → a **stable** sort: the built-in, merge,\n  insertion or counting. **Never quicksort.**\n\n## Why an interviewer asks\n\n\"Which sort would you use?\" is almost never about quicksort versus merge sort in\nthe abstract. It is a question about *this* data: its range, its order, its size,\nand whether equal elements are distinguishable. Answer from the table, name the\nproperty that decided it, and you have answered the real question.\n\n> ⚠️ **Common mistakes:** writing a sort when the built-in would do; using an\n> unstable sort on records whose ties matter; and sorting everything to find three\n> values.\n",
+          "warmup": [
+            {
+              "question": "The built-in sort is a hybrid of…",
+              "options": [
+                "quick and heap",
+                "merge and insertion",
+                "selection and counting",
+                "bubble and quick"
+              ],
+              "answer": 1,
+              "explanation": "TimSort, in V8."
+            },
+            {
+              "question": "For exam grades 0-100, the fastest sort is…",
+              "options": [
+                "quicksort",
+                "counting sort",
+                "merge sort",
+                "insertion sort"
+              ],
+              "answer": 1,
+              "explanation": "A small integer range."
+            },
+            {
+              "question": "When ties must keep their order, never use…",
+              "options": [
+                "merge sort",
+                "quicksort",
+                "the built-in",
+                "insertion sort"
+              ],
+              "answer": 1,
+              "explanation": "It is not stable."
+            },
+            {
+              "question": "To find the 3 smallest of a million values…",
+              "options": [
+                "sort them all",
+                "don't sort everything — select them",
+                "use counting sort",
+                "use a Set"
+              ],
+              "answer": 1,
+              "explanation": "k passes, or quickselect."
+            }
+          ],
+          "exercises": [
+            {
+              "id": "tscourse-w24-ch-1",
+              "title": "Read the table back",
+              "prompt": "Report which of the five sorts are stable.",
+              "hint": "Keep the entries whose flag is true, then keep only their names.",
+              "hints": [
+                "Keep the entries whose flag is true, then keep only their names.",
+                "Write const stable = sorts.filter(([, isStable]) => isStable).map(([name]) => name);"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "const sorts: readonly [string, boolean][] = [\n  [\"selection\", false],\n  [\"insertion\", true],\n  [\"merge\", true],\n  [\"quick\", false],\n  [\"counting\", true],\n];\n____\nconsole.log(stable.join(\",\"));\n",
+              "solution": "const sorts: readonly [string, boolean][] = [\n  [\"selection\", false],\n  [\"insertion\", true],\n  [\"merge\", true],\n  [\"quick\", false],\n  [\"counting\", true],\n];\nconst stable = sorts.filter(([, isStable]) => isStable).map(([name]) => name);\nconsole.log(stable.join(\",\"));\n",
+              "tests": [
+                {
+                  "input": "",
+                  "output": "insertion,merge,counting"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w24-ch-2",
+              "title": "Choose from the shape of the data",
+              "prompt": "Map each situation to the sort that fits it.",
+              "hint": "Situation 2 is 'nearly sorted already' — which sort is adaptive?",
+              "hints": [
+                "Situation 2 is 'nearly sorted already' — which sort is adaptive?",
+                "Write if (situation === 2) { return \"insertion\"; }"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nfunction choose(situation: number): string {\n  if (situation === 1) {\n    return \"counting\";\n  }\n____\n  if (situation === 3) {\n    return \"stable\";\n  }\n  return \"built-in\";\n}\nfor (const s of nums) {\n  console.log(`${s} ${choose(s)}`);\n}\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nfunction choose(situation: number): string {\n  if (situation === 1) {\n    return \"counting\";\n  }\n  if (situation === 2) {\n    return \"insertion\";\n  }\n  if (situation === 3) {\n    return \"stable\";\n  }\n  return \"built-in\";\n}\nfor (const s of nums) {\n  console.log(`${s} ${choose(s)}`);\n}\n",
+              "tests": [
+                {
+                  "input": "1 2 3 4",
+                  "output": "1 counting\n2 insertion\n3 stable\n4 built-in"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w24-ch-3",
+              "title": "The smallest few, without sorting everything",
+              "prompt": "Run only k passes of selection sort and count what that saves.",
+              "hint": "Selection sort places the smallest remaining value on every pass — so stop after k passes.",
+              "hints": [
+                "Selection sort places the smallest remaining value on every pass — so stop after k passes.",
+                "Write for (let i = 0; i < k; i = i + 1) {"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "function swap(xs: number[], i: number, j: number): void {\n  const t = xs[i] ?? 0;\n  xs[i] = xs[j] ?? 0;\n  xs[j] = t;\n}\nlet cmp = 0;\nfunction smallest(xs: number[], k: number): readonly number[] {\n____\n    let min = i;\n    for (let j = i + 1; j < xs.length; j = j + 1) {\n      cmp = cmp + 1;\n      if ((xs[j] ?? 0) < (xs[min] ?? 0)) {\n        min = j;\n      }\n    }\n    swap(xs, i, min);\n  }\n  return xs.slice(0, k);\n}\nconst xs = Array.from({ length: 16 }, (_, i) => 16 - i);\nconst top = smallest(xs, 3);\nconsole.log(`${top.join(\",\")} cmp=${cmp} full=${(16 * 15) / 2}`);\n",
+              "solution": "function swap(xs: number[], i: number, j: number): void {\n  const t = xs[i] ?? 0;\n  xs[i] = xs[j] ?? 0;\n  xs[j] = t;\n}\nlet cmp = 0;\nfunction smallest(xs: number[], k: number): readonly number[] {\n  for (let i = 0; i < k; i = i + 1) {\n    let min = i;\n    for (let j = i + 1; j < xs.length; j = j + 1) {\n      cmp = cmp + 1;\n      if ((xs[j] ?? 0) < (xs[min] ?? 0)) {\n        min = j;\n      }\n    }\n    swap(xs, i, min);\n  }\n  return xs.slice(0, k);\n}\nconst xs = Array.from({ length: 16 }, (_, i) => 16 - i);\nconst top = smallest(xs, 3);\nconsole.log(`${top.join(\",\")} cmp=${cmp} full=${(16 * 15) / 2}`);\n",
+              "tests": [
+                {
+                  "input": "",
+                  "output": "1,2,3 cmp=42 full=120"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w24-ch-4",
+              "title": "The cheapest sort is the one you skip",
+              "prompt": "Check in one pass whether the data is already in order.",
+              "hint": "Out of order means some element is smaller than the one before it.",
+              "hints": [
+                "Out of order means some element is smaller than the one before it.",
+                "Equal neighbours are fine.",
+                "Write if ((nums[i] ?? 0) < (nums[i - 1] ?? 0)) {"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nlet inOrder = true;\nfor (let i = 1; i < nums.length; i = i + 1) {\n____\n    inOrder = false;\n  }\n}\nconsole.log(inOrder ? `already sorted, ${nums.length - 1} checks` : \"needs sorting\");\n",
+              "solution": "import * as fs from \"fs\";\nconst nums = fs.readFileSync(0, \"utf8\").trim().split(\" \").map(Number);\nlet inOrder = true;\nfor (let i = 1; i < nums.length; i = i + 1) {\n  if ((nums[i] ?? 0) < (nums[i - 1] ?? 0)) {\n    inOrder = false;\n  }\n}\nconsole.log(inOrder ? `already sorted, ${nums.length - 1} checks` : \"needs sorting\");\n",
+              "tests": [
+                {
+                  "input": "1 2 2 5",
+                  "output": "already sorted, 3 checks"
+                },
+                {
+                  "input": "2 1",
+                  "output": "needs sorting"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w24-ch-fix1",
+              "title": "Fix the leaderboard that reshuffled its ties",
+              "prompt": "The rule is: lowest score first, and players with the same score stay in sign-up order. For `ann:2 bo:1 cy:2 dee:1` this prints `dee bo ann cy` — `dee` signed up after `bo` and now comes first. Quicksort is not stable, and no fix to its comparisons will make it so. Choose a sort that is.",
+              "hint": "The scores come out in order; it is the TIES that are wrong.",
+              "hints": [
+                "The scores come out in order; it is the TIES that are wrong.",
+                "Stability is a property of the algorithm, not of the comparator.",
+                "The built-in sort is guaranteed stable: [...rows].sort((a, b) => a.score - b.score)."
+              ],
+              "language": "typescript",
+              "kind": "fix",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "import * as fs from \"fs\";\nconst words = fs.readFileSync(0, \"utf8\").trim().split(\" \");\ninterface Row {\n  readonly name: string;\n  readonly score: number;\n}\nconst rows: readonly Row[] = words.map((w) => {\n  const [name, score] = w.split(\":\");\n  return { name: name ?? \"\", score: Number(score ?? \"0\") };\n});\nfunction at(rs: readonly Row[], i: number): Row {\n  return rs[i] ?? { name: \"\", score: 0 };\n}\nfunction swapRows(rs: Row[], i: number, j: number): void {\n  const t = at(rs, i);\n  rs[i] = at(rs, j);\n  rs[j] = t;\n}\nfunction quick(rs: Row[], lo: number, hi: number): void {\n  if (lo >= hi) {\n    return;\n  }\n  const pivot = at(rs, hi).score;\n  let i = lo;\n  for (let j = lo; j < hi; j = j + 1) {\n    if (at(rs, j).score < pivot) {\n      swapRows(rs, i, j);\n      i = i + 1;\n    }\n  }\n  swapRows(rs, i, hi);\n  quick(rs, lo, i - 1);\n  quick(rs, i + 1, hi);\n}\nconst board = [...rows];\nquick(board, 0, board.length - 1);\nconsole.log(board.map((r) => r.name).join(\" \"));\n",
+              "solution": "import * as fs from \"fs\";\nconst words = fs.readFileSync(0, \"utf8\").trim().split(\" \");\ninterface Row {\n  readonly name: string;\n  readonly score: number;\n}\nconst rows: readonly Row[] = words.map((w) => {\n  const [name, score] = w.split(\":\");\n  return { name: name ?? \"\", score: Number(score ?? \"0\") };\n});\nfunction at(rs: readonly Row[], i: number): Row {\n  return rs[i] ?? { name: \"\", score: 0 };\n}\nconst board = [...rows].sort((a, b) => a.score - b.score);\nconsole.log(board.map((r) => r.name).join(\" \"));\n",
+              "tests": [
+                {
+                  "input": "ann:2 bo:1 cy:2 dee:1",
+                  "output": "bo dee ann cy"
+                },
+                {
+                  "input": "x:1 y:1 z:0",
+                  "output": "z x y"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            }
+          ],
+          "quiz": [
+            {
+              "question": "\"Which sort would you use?\" is really a question about…",
+              "options": [
+                "your favourite",
+                "the data: range, order, size, and whether ties matter",
+                "speed only",
+                "memory only"
+              ],
+              "answer": 1,
+              "explanation": "Name the property that decided it."
+            },
+            {
+              "question": "You can beat the built-in sort with a hand-written quicksort…",
+              "options": [
+                "usually",
+                "almost never — it is a tuned hybrid of merge and insertion",
+                "always",
+                "on strings"
+              ],
+              "answer": 1,
+              "explanation": "The exceptions are special data, not better code."
+            }
+          ]
+        }
+      ],
+      "capstone": {
+        "title": "Interview rep #24 — the sort bench",
+        "brief": "Five sorts, written by hand, run on the same input — each checked against the\nbuilt-in and each reporting what it cost.\n\nInput: one line of non-negative integers.\n\n```\n5 1 4 1 3 9\n```\n\n```\nSorted:    1 1 3 4 5 9\nInsertion: cmp  10\nSelection: cmp  15\nMerge:     cmp  10\nQuick:     cmp  11\nCounting:  ops  22\nAgree:     yes\nFewest:    insertion\n```\n\n**The rows:**\n\n* **Insertion**, **Selection**, **Merge**, **Quick** — each sorts its own copy and\n  counts its comparisons: insertion one per test of the shift loop, selection one\n  per inner step, merge one per step of the merge's main loop, quick one per step\n  of the partition loop (Lomuto, last element as pivot).\n* **Counting** reports `ops`, not `cmp`, because it never compares: one step per\n  element to find the maximum, one per tally, and one per bucket walked from 0 to\n  the maximum. A different currency — which is the point of printing it\n  separately.\n* **Agree** is `yes` when all five outputs equal the built-in's.\n* **Fewest** names the comparison sort with the fewest comparisons — counting is\n  not eligible — taking the earliest in the list order above on a tie.\n\n**What makes it a rep:** the tests are chosen so each sort takes a turn at looking\ngood and looking bad. Already-sorted input makes insertion sort the cheapest and\nlast-element quicksort as bad as selection sort; reversed input makes insertion sort\nas bad as it gets; and a single wide value makes counting sort walk a thousand\nempty buckets.\n\nColumn format: the label and its colon padded to 11, then `cmp` or `ops`, a space,\nand the count padded to 3. Empty input prints `Sorted:    (empty)`, zeros\nthroughout, `Agree:     yes` and `Fewest:    insertion`.\n",
+        "kind": "auto",
+        "exercise": {
+          "id": "tscourse-w24-capstone",
+          "title": "Interview rep #24",
+          "prompt": "Write five sorts, run each on the input, check each against the built-in, and report what each cost.",
+          "hint": "Each sort works on its own copy — `[...input]` — so they all see the same data.",
+          "hints": [
+            "Each sort works on its own copy — `[...input]` — so they all see the same data.",
+            "Count inside the algorithm as it runs, never from a formula: the tests are chosen so a formula gets at least one wrong.",
+            "For insertion sort, route the shift-loop test through a small counting function; `&&` then skips the count when j reaches -1.",
+            "Counting sort's cost has three parts: the max scan, the tallies, and every bucket from 0 to max.",
+            "Fewest: walk the four comparison sorts in order and replace only on a STRICTLY smaller count, so a tie keeps the earlier one.",
+            "An empty input has no maximum: start `max` at -1 and the bucket walk does nothing."
+          ],
+          "language": "typescript",
+          "kind": "challenge",
+          "difficulty": "Hard",
+          "strictness": "strict+indexed",
+          "harness": "",
+          "judge_mode": "",
+          "forbid": [],
+          "starter": "import * as fs from \"fs\";\nconst xs: readonly number[] = fs.readFileSync(0, \"utf8\")\n  .trim()\n  .split(/\\s+/)\n  .filter((s) => s !== \"\")\n  .map(Number);\ninterface Run {\n  readonly out: readonly number[];\n  readonly cost: number;\n}\nfunction swap(ys: number[], i: number, j: number): void {\n  const t = ys[i] ?? 0;\n  ys[i] = ys[j] ?? 0;\n  ys[j] = t;\n}\n____\nfunction row(label: string, text: string): string {\n  return `${(label + \":\").padEnd(11)}${text}`;\n}\nconst want = [...xs].sort((a, b) => a - b).join(\",\");\nconst compared: readonly [string, Run][] = [\n  [\"Insertion\", insertion(xs)],\n  [\"Selection\", selection(xs)],\n  [\"Merge\", mergeRun(xs)],\n  [\"Quick\", quickRun(xs)],\n];\nconst counted = countingRun(xs);\nconsole.log(row(\"Sorted\", xs.length === 0 ? \"(empty)\" : [...xs].sort((a, b) => a - b).join(\" \")));\nfor (const [label, run] of compared) {\n  console.log(row(label, `cmp ${String(run.cost).padStart(3)}`));\n}\nconsole.log(row(\"Counting\", `ops ${String(counted.cost).padStart(3)}`));\nconst agree = [...compared.map(([, run]) => run), counted].every((run) => run.out.join(\",\") === want);\nconsole.log(row(\"Agree\", agree ? \"yes\" : \"no\"));\nlet fewest = \"insertion\";\nlet fewestCost = Number.MAX_SAFE_INTEGER;\nfor (const [label, run] of compared) {\n  if (run.cost < fewestCost) {\n    fewest = label.toLowerCase();\n    fewestCost = run.cost;\n  }\n}\nconsole.log(row(\"Fewest\", fewest));\n",
+          "solution": "import * as fs from \"fs\";\nconst xs: readonly number[] = fs.readFileSync(0, \"utf8\")\n  .trim()\n  .split(/\\s+/)\n  .filter((s) => s !== \"\")\n  .map(Number);\ninterface Run {\n  readonly out: readonly number[];\n  readonly cost: number;\n}\nfunction swap(ys: number[], i: number, j: number): void {\n  const t = ys[i] ?? 0;\n  ys[i] = ys[j] ?? 0;\n  ys[j] = t;\n}\nfunction insertion(input: readonly number[]): Run {\n  const ys = [...input];\n  let cost = 0;\n  const greater = (a: number, b: number): boolean => {\n    cost = cost + 1;\n    return a > b;\n  };\n  for (let i = 1; i < ys.length; i = i + 1) {\n    const v = ys[i] ?? 0;\n    let j = i - 1;\n    while (j >= 0 && greater(ys[j] ?? 0, v)) {\n      ys[j + 1] = ys[j] ?? 0;\n      j = j - 1;\n    }\n    ys[j + 1] = v;\n  }\n  return { out: ys, cost };\n}\nfunction selection(input: readonly number[]): Run {\n  const ys = [...input];\n  let cost = 0;\n  for (let i = 0; i < ys.length - 1; i = i + 1) {\n    let min = i;\n    for (let j = i + 1; j < ys.length; j = j + 1) {\n      cost = cost + 1;\n      if ((ys[j] ?? 0) < (ys[min] ?? 0)) {\n        min = j;\n      }\n    }\n    swap(ys, i, min);\n  }\n  return { out: ys, cost };\n}\nfunction mergeRun(input: readonly number[]): Run {\n  let cost = 0;\n  function merge(a: readonly number[], b: readonly number[]): readonly number[] {\n    const out: number[] = [];\n    let i = 0;\n    let j = 0;\n    while (i < a.length && j < b.length) {\n      cost = cost + 1;\n      if ((a[i] ?? 0) <= (b[j] ?? 0)) {\n        out.push(a[i] ?? 0);\n        i = i + 1;\n      } else {\n        out.push(b[j] ?? 0);\n        j = j + 1;\n      }\n    }\n    return [...out, ...a.slice(i), ...b.slice(j)];\n  }\n  function sort(ys: readonly number[]): readonly number[] {\n    if (ys.length <= 1) {\n      return ys;\n    }\n    const mid = Math.floor(ys.length / 2);\n    return merge(sort(ys.slice(0, mid)), sort(ys.slice(mid)));\n  }\n  const out = sort(input);\n  return { out, cost };\n}\nfunction quickRun(input: readonly number[]): Run {\n  const ys = [...input];\n  let cost = 0;\n  function sort(lo: number, hi: number): void {\n    if (lo >= hi) {\n      return;\n    }\n    const pivot = ys[hi] ?? 0;\n    let i = lo;\n    for (let j = lo; j < hi; j = j + 1) {\n      cost = cost + 1;\n      if ((ys[j] ?? 0) < pivot) {\n        swap(ys, i, j);\n        i = i + 1;\n      }\n    }\n    swap(ys, i, hi);\n    sort(lo, i - 1);\n    sort(i + 1, hi);\n  }\n  sort(0, ys.length - 1);\n  return { out: ys, cost };\n}\nfunction countingRun(input: readonly number[]): Run {\n  let cost = 0;\n  let max = -1;\n  for (const x of input) {\n    max = Math.max(max, x);\n    cost = cost + 1;\n  }\n  const counts: number[] = new Array(max + 1).fill(0);\n  for (const x of input) {\n    counts[x] = (counts[x] ?? 0) + 1;\n    cost = cost + 1;\n  }\n  const out: number[] = [];\n  for (let v = 0; v <= max; v = v + 1) {\n    cost = cost + 1;\n    for (let c = 0; c < (counts[v] ?? 0); c = c + 1) {\n      out.push(v);\n    }\n  }\n  return { out, cost };\n}\nfunction row(label: string, text: string): string {\n  return `${(label + \":\").padEnd(11)}${text}`;\n}\nconst want = [...xs].sort((a, b) => a - b).join(\",\");\nconst compared: readonly [string, Run][] = [\n  [\"Insertion\", insertion(xs)],\n  [\"Selection\", selection(xs)],\n  [\"Merge\", mergeRun(xs)],\n  [\"Quick\", quickRun(xs)],\n];\nconst counted = countingRun(xs);\nconsole.log(row(\"Sorted\", xs.length === 0 ? \"(empty)\" : [...xs].sort((a, b) => a - b).join(\" \")));\nfor (const [label, run] of compared) {\n  console.log(row(label, `cmp ${String(run.cost).padStart(3)}`));\n}\nconsole.log(row(\"Counting\", `ops ${String(counted.cost).padStart(3)}`));\nconst agree = [...compared.map(([, run]) => run), counted].every((run) => run.out.join(\",\") === want);\nconsole.log(row(\"Agree\", agree ? \"yes\" : \"no\"));\nlet fewest = \"insertion\";\nlet fewestCost = Number.MAX_SAFE_INTEGER;\nfor (const [label, run] of compared) {\n  if (run.cost < fewestCost) {\n    fewest = label.toLowerCase();\n    fewestCost = run.cost;\n  }\n}\nconsole.log(row(\"Fewest\", fewest));\n",
+          "tests": [
+            {
+              "input": "5 1 4 1 3 9",
+              "output": "Sorted:    1 1 3 4 5 9\nInsertion: cmp  10\nSelection: cmp  15\nMerge:     cmp  10\nQuick:     cmp  11\nCounting:  ops  22\nAgree:     yes\nFewest:    insertion"
+            },
+            {
+              "input": "1 2 3 4 5 6 7 8",
+              "output": "Sorted:    1 2 3 4 5 6 7 8\nInsertion: cmp   7\nSelection: cmp  28\nMerge:     cmp  12\nQuick:     cmp  28\nCounting:  ops  25\nAgree:     yes\nFewest:    insertion"
+            },
+            {
+              "input": "8 7 6 5 4 3 2 1",
+              "output": "Sorted:    1 2 3 4 5 6 7 8\nInsertion: cmp  28\nSelection: cmp  28\nMerge:     cmp  12\nQuick:     cmp  28\nCounting:  ops  25\nAgree:     yes\nFewest:    merge"
+            },
+            {
+              "input": "3 1000 2",
+              "output": "Sorted:    2 3 1000\nInsertion: cmp   3\nSelection: cmp   3\nMerge:     cmp   3\nQuick:     cmp   3\nCounting:  ops 1007\nAgree:     yes\nFewest:    insertion"
+            },
+            {
+              "input": "",
+              "output": "Sorted:    (empty)\nInsertion: cmp   0\nSelection: cmp   0\nMerge:     cmp   0\nQuick:     cmp   0\nCounting:  ops   0\nAgree:     yes\nFewest:    insertion"
+            }
+          ],
+          "source_slug": "",
+          "dataset": ""
+        },
+        "example_io": "Sorted:    1 1 3 4 5 9\nInsertion: cmp  10\nSelection: cmp  15\nMerge:     cmp  10\nQuick:     cmp  11\nCounting:  ops  22\nAgree:     yes\nFewest:    insertion",
+        "rubric": [
+          "five sorts written by hand, each on its own copy of the input",
+          "every count measured as the algorithm runs, never computed from a formula",
+          "merge sort's base case is `length <= 1`, and its merge takes from the left on a tie",
+          "quicksort recurses on `p - 1` and `p + 1`, never on the pivot again",
+          "counting sort reports its cost separately, as ops rather than comparisons",
+          "every output is checked against the built-in sort",
+          "a tie for fewest keeps the earlier sort",
+          "no index access is asserted with `!`",
+          "empty input prints every row with zeros"
+        ],
+        "reference": "",
+        "stretch": {
+          "id": "tscourse-w24-capstone-stretch",
+          "title": "Interview rep #24 (stretch)",
+          "prompt": "Bench **stability** instead of cost. Each input line is `name score`. Sort the rows by score, ascending, with insertion sort, merge sort and quicksort (Lomuto, last element as pivot), and for each print the names in the order it produced followed by `ties kept` if every pair of equal scores is still in input order, or `ties reordered` if any pair is not. Label padded to 11 as before, then the names separated by spaces, two spaces, and the verdict.",
+          "hint": "Record each row's input position (`at`) when you parse it — stability is a statement about positions, and names can repeat.",
+          "hints": [
+            "Record each row's input position (`at`) when you parse it — stability is a statement about positions, and names can repeat.",
+            "Only NEIGHBOURS need checking: if every adjacent tie is in input order, all ties are.",
+            "`ties kept` on one input does not prove a sort stable — the second test shows quicksort keeping its ties. Stability is a guarantee; only its absence can be shown by example.",
+            "Label padded to 11, names, TWO spaces, verdict."
+          ],
+          "language": "typescript",
+          "kind": "challenge",
+          "difficulty": "Hard",
+          "strictness": "strict+indexed",
+          "harness": "",
+          "judge_mode": "",
+          "forbid": [],
+          "starter": "import * as fs from \"fs\";\ninterface Row {\n  readonly name: string;\n  readonly score: number;\n  readonly at: number;\n}\nconst rows: readonly Row[] = fs.readFileSync(0, \"utf8\")\n  .split(\"\\n\")\n  .map((l) => l.trim())\n  .filter((l) => l !== \"\")\n  .map((l, at) => {\n    const [name, score] = l.split(/\\s+/);\n    return { name: name ?? \"\", score: Number(score ?? \"0\"), at };\n  });\nfunction pick(rs: readonly Row[], i: number): Row {\n  return rs[i] ?? { name: \"\", score: 0, at: 0 };\n}\nfunction insertion(input: readonly Row[]): readonly Row[] {\n  const rs = [...input];\n  for (let i = 1; i < rs.length; i = i + 1) {\n    const v = pick(rs, i);\n    let j = i - 1;\n    while (j >= 0 && pick(rs, j).score > v.score) {\n      rs[j + 1] = pick(rs, j);\n      j = j - 1;\n    }\n    rs[j + 1] = v;\n  }\n  return rs;\n}\nfunction mergeSort(rs: readonly Row[]): readonly Row[] {\n  if (rs.length <= 1) {\n    return rs;\n  }\n  const mid = Math.floor(rs.length / 2);\n  const a = mergeSort(rs.slice(0, mid));\n  const b = mergeSort(rs.slice(mid));\n  const out: Row[] = [];\n  let i = 0;\n  let j = 0;\n  while (i < a.length && j < b.length) {\n    if (pick(a, i).score <= pick(b, j).score) {\n      out.push(pick(a, i));\n      i = i + 1;\n    } else {\n      out.push(pick(b, j));\n      j = j + 1;\n    }\n  }\n  return [...out, ...a.slice(i), ...b.slice(j)];\n}\nfunction quick(input: readonly Row[]): readonly Row[] {\n  const rs = [...input];\n  function swap(i: number, j: number): void {\n    const t = pick(rs, i);\n    rs[i] = pick(rs, j);\n    rs[j] = t;\n  }\n  function sort(lo: number, hi: number): void {\n    if (lo >= hi) {\n      return;\n    }\n    const pivot = pick(rs, hi).score;\n    let i = lo;\n    for (let j = lo; j < hi; j = j + 1) {\n      if (pick(rs, j).score < pivot) {\n        swap(i, j);\n        i = i + 1;\n      }\n    }\n    swap(i, hi);\n    sort(lo, i - 1);\n    sort(i + 1, hi);\n  }\n  sort(0, rs.length - 1);\n  return rs;\n}\n____\nconst benches: readonly [string, readonly Row[]][] = [\n  [\"Insertion\", insertion(rows)],\n  [\"Merge\", mergeSort(rows)],\n  [\"Quick\", quick(rows)],\n];\nfor (const [label, sorted] of benches) {\n  const names = sorted.map((r) => r.name).join(\" \");\n  const verdict = tiesKept(sorted) ? \"ties kept\" : \"ties reordered\";\n  console.log(`${(label + \":\").padEnd(11)}${names}  ${verdict}`);\n}\n",
+          "solution": "import * as fs from \"fs\";\ninterface Row {\n  readonly name: string;\n  readonly score: number;\n  readonly at: number;\n}\nconst rows: readonly Row[] = fs.readFileSync(0, \"utf8\")\n  .split(\"\\n\")\n  .map((l) => l.trim())\n  .filter((l) => l !== \"\")\n  .map((l, at) => {\n    const [name, score] = l.split(/\\s+/);\n    return { name: name ?? \"\", score: Number(score ?? \"0\"), at };\n  });\nfunction pick(rs: readonly Row[], i: number): Row {\n  return rs[i] ?? { name: \"\", score: 0, at: 0 };\n}\nfunction insertion(input: readonly Row[]): readonly Row[] {\n  const rs = [...input];\n  for (let i = 1; i < rs.length; i = i + 1) {\n    const v = pick(rs, i);\n    let j = i - 1;\n    while (j >= 0 && pick(rs, j).score > v.score) {\n      rs[j + 1] = pick(rs, j);\n      j = j - 1;\n    }\n    rs[j + 1] = v;\n  }\n  return rs;\n}\nfunction mergeSort(rs: readonly Row[]): readonly Row[] {\n  if (rs.length <= 1) {\n    return rs;\n  }\n  const mid = Math.floor(rs.length / 2);\n  const a = mergeSort(rs.slice(0, mid));\n  const b = mergeSort(rs.slice(mid));\n  const out: Row[] = [];\n  let i = 0;\n  let j = 0;\n  while (i < a.length && j < b.length) {\n    if (pick(a, i).score <= pick(b, j).score) {\n      out.push(pick(a, i));\n      i = i + 1;\n    } else {\n      out.push(pick(b, j));\n      j = j + 1;\n    }\n  }\n  return [...out, ...a.slice(i), ...b.slice(j)];\n}\nfunction quick(input: readonly Row[]): readonly Row[] {\n  const rs = [...input];\n  function swap(i: number, j: number): void {\n    const t = pick(rs, i);\n    rs[i] = pick(rs, j);\n    rs[j] = t;\n  }\n  function sort(lo: number, hi: number): void {\n    if (lo >= hi) {\n      return;\n    }\n    const pivot = pick(rs, hi).score;\n    let i = lo;\n    for (let j = lo; j < hi; j = j + 1) {\n      if (pick(rs, j).score < pivot) {\n        swap(i, j);\n        i = i + 1;\n      }\n    }\n    swap(i, hi);\n    sort(lo, i - 1);\n    sort(i + 1, hi);\n  }\n  sort(0, rs.length - 1);\n  return rs;\n}\nfunction tiesKept(rs: readonly Row[]): boolean {\n  for (let i = 1; i < rs.length; i = i + 1) {\n    const a = pick(rs, i - 1);\n    const b = pick(rs, i);\n    if (a.score === b.score && a.at > b.at) {\n      return false;\n    }\n  }\n  return true;\n}\nconst benches: readonly [string, readonly Row[]][] = [\n  [\"Insertion\", insertion(rows)],\n  [\"Merge\", mergeSort(rows)],\n  [\"Quick\", quick(rows)],\n];\nfor (const [label, sorted] of benches) {\n  const names = sorted.map((r) => r.name).join(\" \");\n  const verdict = tiesKept(sorted) ? \"ties kept\" : \"ties reordered\";\n  console.log(`${(label + \":\").padEnd(11)}${names}  ${verdict}`);\n}\n",
+          "tests": [
+            {
+              "input": "ann 2\nbo 1\ncy 2\ndee 1",
+              "output": "Insertion: bo dee ann cy  ties kept\nMerge:     bo dee ann cy  ties kept\nQuick:     dee bo ann cy  ties reordered"
+            },
+            {
+              "input": "a 1\nb 2",
+              "output": "Insertion: a b  ties kept\nMerge:     a b  ties kept\nQuick:     a b  ties kept"
+            },
+            {
+              "input": "solo 5",
+              "output": "Insertion: solo  ties kept\nMerge:     solo  ties kept\nQuick:     solo  ties kept"
+            }
+          ],
+          "source_slug": "",
+          "dataset": ""
+        }
+      },
+      "objectives": [
+        "Write selection and insertion sort, and count what each compares",
+        "Say why selection sort's cost ignores the input and insertion sort's does not",
+        "Write merge sort by splitting, recursing and calling week 22's merge",
+        "Say where merge sort's log n comes from, and what it costs in space",
+        "Partition around a pivot, and write quicksort on top of it",
+        "Show quicksort's worst case with a count, and remove it with a better pivot",
+        "Sort without comparing, with counting sort, and say when that is allowed",
+        "State the n log n lower bound and what it applies to",
+        "Write a comparator that obeys the contract, and sort by several keys",
+        "Say what 'stable' means, which sorts are, and rely on it",
+        "Sort without mutating, with a copy or `toSorted`",
+        "Use sorting to make a question easy: neighbours, groups, medians, clashes",
+        "Choose a sort from the shape of the data"
+      ],
+      "why": "Sorting is the most reused idea in algorithms: half the problems in the next month start with 'sort it first'. Knowing how the sorts work is what lets you answer the questions interviewers really ask about them — stability, worst cases, and when n log n can be beaten — and it is the cleanest place in the course to see divide-and-conquer.",
+      "est_minutes": 480,
+      "glossary": [
+        {
+          "term": "comparison sort",
+          "def": "A sort that learns the order only by comparing two elements at a time."
+        },
+        {
+          "term": "selection sort",
+          "def": "Repeatedly select the smallest remaining element. Always n(n-1)/2 comparisons."
+        },
+        {
+          "term": "insertion sort",
+          "def": "Insert each element into the sorted prefix before it. n-1 comparisons on sorted input."
+        },
+        {
+          "term": "adaptive",
+          "def": "Cheaper on input that is already nearly in order. Insertion sort is; selection is not."
+        },
+        {
+          "term": "merge sort",
+          "def": "Split in half, sort each half recursively, merge. O(n log n) always, O(n) extra space."
+        },
+        {
+          "term": "divide and conquer",
+          "def": "Split a problem into smaller copies of itself, solve those, combine."
+        },
+        {
+          "term": "quicksort",
+          "def": "Partition around a pivot, then sort each side. O(n log n) on average, O(n²) worst."
+        },
+        {
+          "term": "pivot",
+          "def": "The element a partition compares everything else against."
+        },
+        {
+          "term": "partition",
+          "def": "Rearrange so everything before the pivot is smaller and everything after is not."
+        },
+        {
+          "term": "quickselect",
+          "def": "Partition, then recurse into only the side that holds the k-th element. O(n) on average."
+        },
+        {
+          "term": "counting sort",
+          "def": "Tally each value, then emit the tallies in order. O(n + k), no comparisons."
+        },
+        {
+          "term": "lower bound",
+          "def": "No comparison sort can beat ceil(log2 n!) comparisons in the worst case — about n log n."
+        },
+        {
+          "term": "stable",
+          "def": "Equal elements keep their original relative order."
+        },
+        {
+          "term": "in place",
+          "def": "Sorts inside the array it was given, using O(1) or O(log n) extra space."
+        },
+        {
+          "term": "comparator",
+          "def": "(a, b) => negative if a comes first, positive if b does, 0 if either will do."
+        },
+        {
+          "term": "toSorted",
+          "def": "The non-mutating sort: returns a sorted copy and leaves the original alone."
+        }
+      ],
+      "cheatsheet": "```ts\n// ---- insertion sort: shift the bigger ones right, drop v in the gap -------\nfor (let i = 1; i < xs.length; i = i + 1) {\n  const v = xs[i] ?? 0;                           // SAVE it — the shift overwrites xs[i]\n  let j = i - 1;\n  while (j >= 0 && (xs[j] ?? 0) > v) {\n    xs[j + 1] = xs[j] ?? 0;\n    j = j - 1;\n  }\n  xs[j + 1] = v;\n}\n// sorted input: n - 1 comparisons. reversed: n(n-1)/2.\n\n// ---- merge sort: split, recurse, merge (week 22's merge) ---------------\nfunction mergeSort(xs: readonly number[]): readonly number[] {\n  if (xs.length <= 1) { return xs; }              // <= 1, never === 0\n  const mid = Math.floor(xs.length / 2);\n  return merge(mergeSort(xs.slice(0, mid)), mergeSort(xs.slice(mid)));\n}\n// O(n log n) always. O(n) extra space. Stable, because the merge uses <=.\n\n// ---- quicksort: Lomuto partition, last element as pivot ---------------\nfunction partition(xs: number[], lo: number, hi: number): number {\n  const pivot = xs[hi] ?? 0;\n  let i = lo;                                      // next slot for a \"smaller\"\n  for (let j = lo; j < hi; j = j + 1) {\n    if ((xs[j] ?? 0) < pivot) { swap(xs, i, j); i = i + 1; }\n  }\n  swap(xs, i, hi);                                 // pivot to its final place\n  return i;\n}\nfunction quick(xs: number[], lo: number, hi: number): void {\n  if (lo >= hi) { return; }\n  const p = partition(xs, lo, hi);\n  quick(xs, lo, p - 1);                            // p - 1, NOT p: the pivot is done\n  quick(xs, p + 1, hi);\n}\n// average O(n log n); sorted input with a last-element pivot is O(n²).\n// swap(xs, Math.floor((lo + hi) / 2), hi) first — a middle pivot — fixes that case.\n\n// ---- counting sort: small integer range, no comparisons ---------------\nconst counts: number[] = new Array(max + 1).fill(0);\nfor (const x of xs) { counts[x] = (counts[x] ?? 0) + 1; }\nfor (let v = 0; v <= max; v = v + 1) { /* emit v, counts[v] times */ }\n// O(n + k). Negative values: index by x - min.\n\n// ---- the built-in, properly -------------------------------------------\n[...xs].sort((a, b) => a - b);                     // ascending; copy first\nxs.toSorted((a, b) => b - a);                      // descending, no mutation\nrows.sort((a, b) => b.score - a.score || a.name.localeCompare(b.name));\n// negative: a first · positive: b first · 0: either. NEVER a boolean.\n// Stable since ES2019 — so sorting by name, THEN by score, orders ties by name.\n```\n\n| | best | average | worst | extra space | stable |\n|---|---|---|---|---|---|\n| selection | n² | n² | n² | 1 | no |\n| insertion | **n** | n² | n² | 1 | yes |\n| merge | n log n | n log n | n log n | n | yes |\n| quick | n log n | n log n | **n²** | log n | no |\n| counting | n + k | n + k | n + k | n + k | yes |\n| built-in | n | n log n | n log n | n | **yes** |\n",
+      "self_check": [
+        "Can you write insertion sort from memory, and say why `v` must be saved?",
+        "Can you say why selection sort does 28 comparisons on any 8 elements?",
+        "Can you say what makes insertion sort cheap on nearly sorted input?",
+        "Can you write merge sort using week 22's merge?",
+        "Can you say where the log n in merge sort comes from?",
+        "Can you say why the base case must be `length <= 1`?",
+        "Can you partition around a pivot and say what `i` means?",
+        "Can you name the input that makes last-element quicksort quadratic, and fix it?",
+        "Can you find the k-th smallest without sorting everything?",
+        "Can you say when counting sort beats n log n, and when it is a bad idea?",
+        "Can you write a comparator for two keys, one descending?",
+        "Can you say what stable means and which of the five sorts are?",
+        "Can you sort without disturbing the original array?",
+        "Can you turn 'closest pair' or 'any clash?' into a sort and a sweep?"
+      ],
+      "review": [
+        {
+          "question": "Selection sort on 8 elements, already sorted, compares…",
+          "options": [
+            "7 times",
+            "28 times",
+            "8 times",
+            "0 times"
+          ],
+          "answer": 1,
+          "explanation": "n(n-1)/2, whatever the input. It cannot tell."
+        },
+        {
+          "question": "Insertion sort on 8 already-sorted elements compares…",
+          "options": [
+            "28 times",
+            "7 times",
+            "0 times",
+            "64 times"
+          ],
+          "answer": 1,
+          "explanation": "One comparison per element: each finds its place immediately."
+        },
+        {
+          "question": "Insertion sort saves `v = xs[i]` before shifting because…",
+          "options": [
+            "it is faster",
+            "the first shift overwrites xs[i]",
+            "of types",
+            "it is stable"
+          ],
+          "answer": 1,
+          "explanation": "Forget it and the element is lost — the output fills with copies."
+        },
+        {
+          "question": "Merge sort's log n is…",
+          "options": [
+            "the merge",
+            "the number of times n can be halved — the depth of the recursion",
+            "the pivot",
+            "the space"
+          ],
+          "answer": 1,
+          "explanation": "Each level does O(n) merging; there are log n levels."
+        },
+        {
+          "question": "Merge sort's base case must be `length <= 1` because…",
+          "options": [
+            "of speed",
+            "a one-element array split in half gives [] and itself — for ever",
+            "empty arrays are rare",
+            "of stability"
+          ],
+          "answer": 1,
+          "explanation": "`=== 0` recurses until the stack runs out."
+        },
+        {
+          "question": "Merge sort is stable because…",
+          "options": [
+            "it recurses",
+            "the merge takes from the LEFT on a tie (`<=`)",
+            "it copies",
+            "it is O(n log n)"
+          ],
+          "answer": 1,
+          "explanation": "Week 22's `<=`, earning its keep."
+        },
+        {
+          "question": "After a Lomuto partition returns p…",
+          "options": [
+            "recurse on [lo, p] and [p, hi]",
+            "recurse on [lo, p-1] and [p+1, hi] — the pivot is finished",
+            "stop",
+            "recurse on [lo, hi]"
+          ],
+          "answer": 1,
+          "explanation": "Including p again can recurse for ever."
+        },
+        {
+          "question": "Last-element quicksort on already-sorted input is…",
+          "options": [
+            "O(n)",
+            "O(n²) — every partition peels off one element",
+            "O(n log n)",
+            "O(log n)"
+          ],
+          "answer": 1,
+          "explanation": "120 comparisons on 16 elements, the same as selection sort."
+        },
+        {
+          "question": "Quickselect finds the k-th smallest in…",
+          "options": [
+            "O(n log n)",
+            "O(n) on average — it recurses into ONE side",
+            "O(k)",
+            "O(1)"
+          ],
+          "answer": 1,
+          "explanation": "It is quicksort that throws half the work away."
+        },
+        {
+          "question": "Counting sort beats n log n because…",
+          "options": [
+            "it is clever",
+            "it never compares — the lower bound only applies to comparison sorts",
+            "it is in place",
+            "it is stable"
+          ],
+          "answer": 1,
+          "explanation": "It uses the values as addresses instead."
+        },
+        {
+          "question": "A comparator returns…",
+          "options": [
+            "true if a comes first",
+            "negative if a comes first, positive if b does, 0 for a tie",
+            "a or b",
+            "the larger"
+          ],
+          "answer": 1,
+          "explanation": "A boolean is TS2345, and at run time it does not sort."
+        },
+        {
+          "question": "`(a, b) => a > b ? 1 : 0` as a comparator…",
+          "options": [
+            "sorts ascending",
+            "type-checks and does not sort — it never says 'a comes first'",
+            "sorts descending",
+            "throws"
+          ],
+          "answer": 1,
+          "explanation": "The engine only moves an element when the answer is negative."
+        },
+        {
+          "question": "The built-in `sort` is…",
+          "options": [
+            "unstable",
+            "stable, guaranteed since ES2019",
+            "stable for numbers only",
+            "stable in Chrome only"
+          ],
+          "answer": 1,
+          "explanation": "Which is why sorting by two keys in two passes works."
+        },
+        {
+          "question": "`readonly number[]` has no `.sort` because…",
+          "options": [
+            "of a bug",
+            "sort mutates, and the type promised not to",
+            "it is slow",
+            "it is generic"
+          ],
+          "answer": 1,
+          "explanation": "Copy it, or use `toSorted`."
+        },
+        {
+          "question": "\"Is any pair closer than 5?\" after sorting needs…",
+          "options": [
+            "every pair",
+            "only adjacent pairs",
+            "a Map",
+            "binary search"
+          ],
+          "answer": 1,
+          "explanation": "The closest pair in sorted order are neighbours."
+        }
+      ],
+      "milestone": "Interview rep #24 — the sort bench. One input, five sorts written by hand — insertion, selection, merge, quick and counting — each checked against the built-in and each reporting what it cost. The bench names the cheapest, and the tests are chosen so that each sort takes a turn at looking good and at looking bad.",
       "practice": []
     },
     {

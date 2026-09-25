@@ -479,6 +479,7 @@ _WEEK_FILES = (
     "ts_w21_bigo.py",          # Month 6 — big-O & complexity
     "ts_w22_search.py",        #          searching & two pointers
     "ts_w23_windows.py",       #          sliding window & prefix sums
+    "ts_w24_sorting.py",       #          sorting
 )
 
 for _week_file in _WEEK_FILES:
@@ -543,12 +544,6 @@ for _week_file in _WEEK_FILES:
 # Each week's `milestone` string is what carries this narrative to the learner,
 # so it is worth writing the milestone before the lessons.
 # ===========================================================================
-_WEEKS += [
-]
-_WEEKS += [
-    _skel(24, 6, _M6, "Sorting",
-          "Understand the common sorts and use sorting as a problem-solving tool."),
-]
 _WEEKS += [
     _skel(25, 7, _M7, "Recursion & Backtracking",
           "Solve problems whose definition refers to themselves, then use that to "
@@ -735,6 +730,9 @@ _SCOPE_RULES = [
     # gated as `function* ` because the generator METHOD form is `*[Symbol…`,
     # so both spellings are listed. Verified absent from weeks 1-19.
     ("function* ", 20), ("yield ", 20), ("Symbol.iterator", 20),
+    # Week 24: the non-mutating sort. Week 13's lesson text mentions `toSorted`
+    # in passing, but no program before week 24 calls it (verified).
+    (".toSorted(", 24),
     #
     # DELIBERATELY NOT GATED, because the authored weeks already use them and a
     # rule here would be a false claim about when the course first shows them:
