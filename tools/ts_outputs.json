@@ -834,6 +834,80 @@
    "120.00"
   ]
  },
+ "ts_conditionals-error1": {
+  "hash": "c968be7e213ed5f0737a",
+  "diagnostics": [
+   {
+    "code": 2367,
+    "line": 3,
+    "msg": "This comparison appears to be unintentional because the types 'Size' and '\"l\"' have no overlap."
+   }
+  ]
+ },
+ "ts_conditionals-error2": {
+  "hash": "de72a892fbad32c44be9",
+  "diagnostics": [
+   {
+    "code": 2678,
+    "line": 6,
+    "msg": "Type '\"x\"' is not comparable to type 'Size'."
+   }
+  ]
+ },
+ "ts_conditionals-example1": {
+  "hash": "0fd75ea2480d4fe9fd9c",
+  "outputs": [
+   "A B C out of range invalid"
+  ]
+ },
+ "ts_conditionals-example2": {
+  "hash": "42f79e67af9823282e18",
+  "outputs": [
+   "weekend, weekday, not a day"
+  ]
+ },
+ "ts_conditionals-example3": {
+  "hash": "a7ddc4742173131fed34",
+  "outputs": [
+   "1 item\nfirst: pen"
+  ]
+ },
+ "ts_conditionals-pitfall1-right": {
+  "hash": "26333b5937ae37dd6698",
+  "outputs": [
+   "5 9"
+  ]
+ },
+ "ts_conditionals-pitfall1-wrong": {
+  "hash": "abf7ba3012e066748bf7",
+  "outputs": [
+   "9 9"
+  ]
+ },
+ "ts_conditionals-pitfall2-right": {
+  "hash": "8da05b58c976ceb7dbd3",
+  "outputs": [
+   "x is 1"
+  ]
+ },
+ "ts_conditionals-pitfall2-wrong": {
+  "hash": "070448f02dab1cacdb0c",
+  "outputs": [
+   "x was five?\nx is 5"
+  ]
+ },
+ "ts_conditionals-pitfall3-right": {
+  "hash": "8926d9752a1077bc6ddc",
+  "outputs": [
+   "excellent"
+  ]
+ },
+ "ts_conditionals-pitfall3-wrong": {
+  "hash": "9c77741edf3b76bb85ce",
+  "outputs": [
+   "pass"
+  ]
+ },
  "ts_control_flow-early": {
   "hash": "8192d39c2e9ccec03eff",
   "outputs": [
@@ -2119,6 +2193,88 @@
    "amber\nred"
   ]
  },
+ "ts_inference-error1": {
+  "hash": "7288319bdb867e8783c0",
+  "diagnostics": [
+   {
+    "code": 7006,
+    "line": 1,
+    "msg": "Parameter 'x' implicitly has an 'any' type."
+   }
+  ]
+ },
+ "ts_inference-error2": {
+  "hash": "b77bbccab9522b04b21f",
+  "diagnostics": [
+   {
+    "code": 2322,
+    "line": 2,
+    "msg": "Type 'string' is not assignable to type 'number'."
+   }
+  ]
+ },
+ "ts_inference-example1": {
+  "hash": "497e18acb9aced1427ae",
+  "outputs": [
+   "4.20 12.00 8.70\n2"
+  ]
+ },
+ "ts_inference-example2": {
+  "hash": "be19a8afe35845b0b89a",
+  "outputs": [
+   "3 1+3"
+  ]
+ },
+ "ts_inference-example3": {
+  "hash": "fa77447b06f33746ca90",
+  "outputs": [
+   "string negative\nnumber 0\nstring positive"
+  ]
+ },
+ "ts_inference-pitfall1-right": {
+  "hash": "2a91bc38a1f96aa9f4b6",
+  "outputs": [
+   "moving up"
+  ]
+ },
+ "ts_inference-pitfall1-wrong": {
+  "hash": "0c4746d62dbd3d1d1068",
+  "diagnostics": [
+   {
+    "code": 2345,
+    "line": 5,
+    "msg": "Argument of type 'string' is not assignable to parameter of type '\"up\" | \"down\"'."
+   }
+  ]
+ },
+ "ts_inference-pitfall2-right": {
+  "hash": "3c4811c9b535ecc5cd5c",
+  "outputs": [
+   "GET sent"
+  ]
+ },
+ "ts_inference-pitfall2-wrong": {
+  "hash": "716f1a9004bf31a70a4b",
+  "diagnostics": [
+   {
+    "code": 2345,
+    "line": 5,
+    "msg": "Argument of type 'string' is not assignable to parameter of type '\"GET\" | \"POST\"'."
+   }
+  ]
+ },
+ "ts_inference-pitfall3-right": {
+  "hash": "093c76f9c1747dc93ef9",
+  "outputs": [
+   "label: not positive"
+  ]
+ },
+ "ts_inference-pitfall3-wrong": {
+  "hash": "df9e827600e99b4515b8",
+  "outputs": [
+   "label: undefined"
+  ]
+ },
  "ts_interfaces_types-error1": {
   "hash": "3042b79428cc0b451877",
   "diagnostics": [
@@ -2657,6 +2813,80 @@
    "L: size 3 of 4"
   ]
  },
+ "ts_loops-error1": {
+  "hash": "c51c1f7bdd019f3dc9ef",
+  "diagnostics": [
+   {
+    "code": 2588,
+    "line": 3,
+    "msg": "Cannot assign to 'x' because it is a constant."
+   }
+  ]
+ },
+ "ts_loops-error2": {
+  "hash": "dda87c7d1baf253deaae",
+  "diagnostics": [
+   {
+    "code": 7053,
+    "line": 3,
+    "msg": "Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{ pen: number; cup: number; }'.   No index signature with a parameter of type 'string' was found on type '{ pen: number; cup: number; }'."
+   }
+  ]
+ },
+ "ts_loops-example1": {
+  "hash": "c6baa106145404e0b6b1",
+  "outputs": [
+   "1. write\n2. test\n3. ship"
+  ]
+ },
+ "ts_loops-example2": {
+  "hash": "1be807651703c971b917",
+  "outputs": [
+   "27 reaches 1 in 111 steps"
+  ]
+ },
+ "ts_loops-example3": {
+  "hash": "9c4f6a9ee567ad7e7dba",
+  "outputs": [
+   "8 + 11"
+  ]
+ },
+ "ts_loops-pitfall1-right": {
+  "hash": "a53beea956296cd8f692",
+  "outputs": [
+   "a,b"
+  ]
+ },
+ "ts_loops-pitfall1-wrong": {
+  "hash": "ca6e6150066df0ba70c4",
+  "outputs": [
+   "0,1"
+  ]
+ },
+ "ts_loops-pitfall2-right": {
+  "hash": "96808ca3f85e2cf74318",
+  "outputs": [
+   "7"
+  ]
+ },
+ "ts_loops-pitfall2-wrong": {
+  "hash": "733f6117eb357431398f",
+  "outputs": [
+   "4,7"
+  ]
+ },
+ "ts_loops-pitfall3-right": {
+  "hash": "374c6091c2340fe93e4d",
+  "outputs": [
+   "10 20"
+  ]
+ },
+ "ts_loops-pitfall3-wrong": {
+  "hash": "179cdd8345a02187b3ce",
+  "outputs": [
+   "10 20 undefined"
+  ]
+ },
  "ts_number_format-big": {
   "hash": "5210f7ef6323a54c76aa",
   "outputs": [
@@ -2788,6 +3018,154 @@
   "hash": "014568ed1b46cd8e1ddf",
   "outputs": [
    "1.5511210043330986e+25"
+  ]
+ },
+ "ts_number_math-error1": {
+  "hash": "5e564659cb9a79da9ae2",
+  "diagnostics": [
+   {
+    "code": 2365,
+    "line": 1,
+    "msg": "Operator '+' cannot be applied to types '10n' and '1'."
+   }
+  ]
+ },
+ "ts_number_math-error2": {
+  "hash": "daaf0688011de7668034",
+  "diagnostics": [
+   {
+    "code": 2345,
+    "line": 1,
+    "msg": "Argument of type 'string' is not assignable to parameter of type 'number'."
+   }
+  ]
+ },
+ "ts_number_math-example1": {
+  "hash": "587a4b2819728990f496",
+  "outputs": [
+   "2.5 3 2 3 2\n-2.5 -2 -3 -2 -2\n2.7 3 2 3 2"
+  ]
+ },
+ "ts_number_math-example2": {
+  "hash": "b6b80798a2bcc6c96930",
+  "outputs": [
+   "true false\n9007199254740993"
+  ]
+ },
+ "ts_number_math-example3": {
+  "hash": "483cbc242b8c7e742df2",
+  "outputs": [
+   "-5 -> 0%\n42 -> 42%\n180 -> 100%"
+  ]
+ },
+ "ts_number_math-pitfall1-right": {
+  "hash": "180b2954dc21a3d2d2d0",
+  "outputs": [
+   "equal"
+  ]
+ },
+ "ts_number_math-pitfall1-wrong": {
+  "hash": "eca69393132bff5ea814",
+  "outputs": [
+   "not equal"
+  ]
+ },
+ "ts_number_math-pitfall2-right": {
+  "hash": "d365c9df7cfaef4afcd8",
+  "outputs": [
+   "1.00"
+  ]
+ },
+ "ts_number_math-pitfall2-wrong": {
+  "hash": "d20d1bd6903f41363859",
+  "outputs": [
+   "0.9999999999999999"
+  ]
+ },
+ "ts_number_math-pitfall3-right": {
+  "hash": "7f608d8940246390113a",
+  "outputs": [
+   "2.5"
+  ]
+ },
+ "ts_number_math-pitfall3-wrong": {
+  "hash": "0ad8065b92fd152e8058",
+  "outputs": [
+   "1.51"
+  ]
+ },
+ "ts_operators-error1": {
+  "hash": "e60792ed069972dcdd3c",
+  "diagnostics": [
+   {
+    "code": 2362,
+    "line": 1,
+    "msg": "The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type."
+   }
+  ]
+ },
+ "ts_operators-error2": {
+  "hash": "0908de5f821aa98e90e1",
+  "diagnostics": [
+   {
+    "code": 2365,
+    "line": 1,
+    "msg": "Operator '>' cannot be applied to types 'boolean' and 'number'."
+   }
+  ]
+ },
+ "ts_operators-example1": {
+  "hash": "997095b1240a61c3a39a",
+  "outputs": [
+   "2 17\n1024 3.5 3"
+  ]
+ },
+ "ts_operators-example2": {
+  "hash": "220d4ca7961a28d365d4",
+  "outputs": [
+   "5 7 7"
+  ]
+ },
+ "ts_operators-example3": {
+  "hash": "6a9c930ea9649e34bfa7",
+  "outputs": [
+   "3 0\n\"anon\" \"\""
+  ]
+ },
+ "ts_operators-pitfall1-right": {
+  "hash": "5597aad99693ae3e1709",
+  "outputs": [
+   "3"
+  ]
+ },
+ "ts_operators-pitfall1-wrong": {
+  "hash": "824340e166e65369298e",
+  "outputs": [
+   "12"
+  ]
+ },
+ "ts_operators-pitfall2-right": {
+  "hash": "e5560a8472dd9237861f",
+  "outputs": [
+   "hour 17"
+  ]
+ },
+ "ts_operators-pitfall2-wrong": {
+  "hash": "93e667b02ad64ad770d9",
+  "outputs": [
+   "hour -7"
+  ]
+ },
+ "ts_operators-pitfall3-right": {
+  "hash": "ec970f266d324997e6e2",
+  "outputs": [
+   "0 8 5"
+  ]
+ },
+ "ts_operators-pitfall3-wrong": {
+  "hash": "508bfc2774ba7f7388aa",
+  "outputs": [
+   "5 8 5"
   ]
  },
  "ts_overloads-error1": {
@@ -3656,6 +4034,154 @@
    "joined: (none)\nleft: new\nstayed: (none)\nchanged"
   ]
  },
+ "ts_string_methods-error1": {
+  "hash": "130360a9ce82ecccbb08",
+  "diagnostics": [
+   {
+    "code": 2554,
+    "line": 1,
+    "msg": "Expected 1 arguments, but got 0."
+   }
+  ]
+ },
+ "ts_string_methods-error2": {
+  "hash": "1c6d28f3f3ec409fe62f",
+  "diagnostics": [
+   {
+    "code": 2345,
+    "line": 1,
+    "msg": "Argument of type 'number' is not assignable to parameter of type 'string'."
+   }
+  ]
+ },
+ "ts_string_methods-example1": {
+  "hash": "0e15565795c76701863c",
+  "outputs": [
+   "name:Ana city:Oslo role:admin"
+  ]
+ },
+ "ts_string_methods-example2": {
+  "hash": "9ad4f800b5e5c76ec42f",
+  "outputs": [
+   "pen.......   2\nnotebook..  12\nink.......   7"
+  ]
+ },
+ "ts_string_methods-example3": {
+  "hash": "886757be79b6f9b160f4",
+  "outputs": [
+   "3 2 0\n3"
+  ]
+ },
+ "ts_string_methods-pitfall1-right": {
+  "hash": "cc9a37dbd9ab87154f6c",
+  "outputs": [
+   "3"
+  ]
+ },
+ "ts_string_methods-pitfall1-wrong": {
+  "hash": "9dc601525f2b9d5c03af",
+  "outputs": [
+   "6"
+  ]
+ },
+ "ts_string_methods-pitfall2-right": {
+  "hash": "394b98fcec93d46202dd",
+  "outputs": [
+   "found"
+  ]
+ },
+ "ts_string_methods-pitfall2-wrong": {
+  "hash": "9554b0d13b70dd7898a6",
+  "outputs": [
+   "not found"
+  ]
+ },
+ "ts_string_methods-pitfall3-right": {
+  "hash": "c7eaf465884012af1b3f",
+  "outputs": [
+   "ef"
+  ]
+ },
+ "ts_string_methods-pitfall3-wrong": {
+  "hash": "cc1caf0af347d115cb13",
+  "outputs": [
+   "abcdef"
+  ]
+ },
+ "ts_strings-error1": {
+  "hash": "7cf3c302e7edc27e18b2",
+  "diagnostics": [
+   {
+    "code": 2339,
+    "line": 2,
+    "msg": "Property 'size' does not exist on type '\"abc\"'."
+   }
+  ]
+ },
+ "ts_strings-error2": {
+  "hash": "9ac8609f368671c32141",
+  "diagnostics": [
+   {
+    "code": 2542,
+    "line": 2,
+    "msg": "Index signature in type 'String' only permits reading."
+   }
+  ]
+ },
+ "ts_strings-example1": {
+  "hash": "995e7d76add2c7f0780a",
+  "outputs": [
+   "Customer: Ada\nItems: 2 (pen, cup)\nTotal: $12.50"
+  ]
+ },
+ "ts_strings-example2": {
+  "hash": "6c018d58e67a51bca6f8",
+  "outputs": [
+   "\"  Hello, World  \"\n\"hello, world\""
+  ]
+ },
+ "ts_strings-example3": {
+  "hash": "38535685cc9453e6ad70",
+  "outputs": [
+   "false true\na,b,C"
+  ]
+ },
+ "ts_strings-pitfall1-right": {
+  "hash": "5bb949464cf82a23d345",
+  "outputs": [
+   "1"
+  ]
+ },
+ "ts_strings-pitfall1-wrong": {
+  "hash": "9846701df79df4cba01f",
+  "outputs": [
+   "2"
+  ]
+ },
+ "ts_strings-pitfall2-right": {
+  "hash": "73019ae1ce886a622fd9",
+  "outputs": [
+   "a+b+c"
+  ]
+ },
+ "ts_strings-pitfall2-wrong": {
+  "hash": "db43eb481dffd381c492",
+  "outputs": [
+   "a+b-c"
+  ]
+ },
+ "ts_strings-pitfall3-right": {
+  "hash": "ec5255da81c930491ced",
+  "outputs": [
+   "apple,banana,Cherry"
+  ]
+ },
+ "ts_strings-pitfall3-wrong": {
+  "hash": "83e98868cc2978075eb5",
+  "outputs": [
+   "Cherry,apple,banana"
+  ]
+ },
  "ts_top_bottom-error1": {
   "hash": "641d4b09de1f1c2db64a",
   "diagnostics": [
@@ -4075,6 +4601,80 @@
    "q\n1"
   ]
  },
+ "ts_types-error1": {
+  "hash": "d29136cfd7d3a0fbe1b2",
+  "diagnostics": [
+   {
+    "code": 2322,
+    "line": 1,
+    "msg": "Type 'string' is not assignable to type 'number'."
+   }
+  ]
+ },
+ "ts_types-error2": {
+  "hash": "0320f59a62c58fe1392c",
+  "diagnostics": [
+   {
+    "code": 2345,
+    "line": 1,
+    "msg": "Argument of type 'string' is not assignable to parameter of type 'number'."
+   }
+  ]
+ },
+ "ts_types-example1": {
+  "hash": "d6cc901be36a25e66f4e",
+  "outputs": [
+   "42 -> number\nhi -> string\ntrue -> boolean\nnull -> null\nundefined -> undefined\n1 -> array\n[object Object] -> object\n10 -> bigint"
+  ]
+ },
+ "ts_types-example2": {
+  "hash": "28816db95e67574750ef",
+  "outputs": [
+   "white text on black\nblack text on white"
+  ]
+ },
+ "ts_types-example3": {
+  "hash": "67d739f827981bdaec15",
+  "outputs": [
+   "{\"name\":\"ana\",\"nickname\":null}\ntrue true true"
+  ]
+ },
+ "ts_types-pitfall1-right": {
+  "hash": "2d324e53543049ede372",
+  "outputs": [
+   "true"
+  ]
+ },
+ "ts_types-pitfall1-wrong": {
+  "hash": "7f8a8c3a6eb206ac82aa",
+  "outputs": [
+   "false"
+  ]
+ },
+ "ts_types-pitfall2-right": {
+  "hash": "371772f29ec95369833e",
+  "outputs": [
+   "not an object an object"
+  ]
+ },
+ "ts_types-pitfall2-wrong": {
+  "hash": "6da11be57f4c5138c92f",
+  "outputs": [
+   "an object an object"
+  ]
+ },
+ "ts_types-pitfall3-right": {
+  "hash": "7cabacb1be4fb0cd2098",
+  "outputs": [
+   "6"
+  ]
+ },
+ "ts_types-pitfall3-wrong": {
+  "hash": "ee8ca8ef62b0bdd451cd",
+  "outputs": [
+   "51"
+  ]
+ },
  "ts_unicode-error1": {
   "hash": "f8c7e48f5f218867c46b",
   "diagnostics": [
@@ -4182,6 +4782,85 @@
    "👍👍…",
    "🇯🇵🇫🇷🇩🇪…",
    "Zoë s…"
+  ]
+ },
+ "ts_variables-error1": {
+  "hash": "4148f5fdde47c95d3584",
+  "diagnostics": [
+   {
+    "code": 2588,
+    "line": 2,
+    "msg": "Cannot assign to 'total' because it is a constant."
+   }
+  ]
+ },
+ "ts_variables-error2": {
+  "hash": "d9be3665d45e109925f9",
+  "diagnostics": [
+   {
+    "code": 2448,
+    "line": 1,
+    "msg": "Block-scoped variable 'count' used before its declaration."
+   },
+   {
+    "code": 2454,
+    "line": 1,
+    "msg": "Variable 'count' is used before being assigned."
+   }
+  ]
+ },
+ "ts_variables-example1": {
+  "hash": "bc00c2325c8e406906c9",
+  "outputs": [
+   "70,85,92 2"
+  ]
+ },
+ "ts_variables-example2": {
+  "hash": "97b4c78e87fb70c0b32a",
+  "outputs": [
+   "printer 0, printer 1, printer 2"
+  ]
+ },
+ "ts_variables-example3": {
+  "hash": "2d29aa2b7ea204f7d033",
+  "outputs": [
+   "block\ninner outer"
+  ]
+ },
+ "ts_variables-pitfall1-right": {
+  "hash": "5ba77b8e1d0ba8cb3138",
+  "outputs": [
+   "0 1 2"
+  ]
+ },
+ "ts_variables-pitfall1-wrong": {
+  "hash": "e2923be169d2f505ddd3",
+  "outputs": [
+   "3 3 3"
+  ]
+ },
+ "ts_variables-pitfall2-right": {
+  "hash": "33efcd0a710df69c4659",
+  "outputs": [
+   "false true"
+  ]
+ },
+ "ts_variables-pitfall2-wrong": {
+  "hash": "95058b535695596c3719",
+  "outputs": [
+   "true true"
+  ]
+ },
+ "ts_variables-pitfall3-right": {
+  "hash": "e614b1018bbf92c8a1f2",
+  "outputs": [
+   "total 6"
+  ]
+ },
+ "ts_variables-pitfall3-wrong": {
+  "hash": "3f15c79aed9ff6383e72",
+  "outputs": [
+   "total 0"
   ]
  },
  "ts_variance-comparator": {

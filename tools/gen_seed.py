@@ -6055,7 +6055,8 @@ if os.path.exists(_tsm_path):
 # one file per programme month. Every lesson output and compiler message in
 # them comes from actually running the code — see ts_outputs_kit.py.
 for _tsx_file in ["ts_outputs_kit.py", "ts_chapter_kit.py"] + [
-        f"ts_chapters_m{_n}.py" for _n in range(1, 7)]:
+        f"ts_chapters_m{_n}.py" for _n in range(1, 7)] + [
+        f"ts_deepen_m{_n}.py" for _n in range(1, 7)]:
     _tsx_path = os.path.join(HERE, _tsx_file)
     if os.path.exists(_tsx_path):
         with open(_tsx_path, encoding="utf-8") as _tsxf:

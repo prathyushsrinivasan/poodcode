@@ -155,3 +155,32 @@ def _chapter(key, category, name, what, deep, note, *, why, idea, examples, erro
     EXERCISES[key] = exercises
     TS_INTERVIEW_MORE[key] = interview
     TS_CHAPTER_KEYS.append(key)
+
+
+TS_DEEPENED = []  # original chapters brought up to the template by _deepen
+
+
+def _deepen(key, *, why, examples, errors, pitfalls, later):
+    """Bring one of the original 50 chapters up to the template (F-12, X-02/X-03)
+    without rewriting it: the existing lesson stays as the core, preceded by
+    "Why it exists" and followed by computed worked examples, real compiler
+    errors, pitfalls and forward links. The interview block is still appended
+    afterwards by ts_lesson_interview.py."""
+    assert key in LESSONS and CONCEPTS.get(key, {}).get("language") == "typescript", f"{key}: not a TypeScript chapter"
+    assert key not in TS_CHAPTER_KEYS, f"{key}: already a templated chapter"
+    assert key not in TS_DEEPENED, f"{key}: deepened twice"
+    assert len(examples) >= 2, f"{key}: needs at least 2 more worked examples"
+    assert len(errors) >= 2, f"{key}: needs at least 2 compiler errors"
+    assert len(pitfalls) >= 3, f"{key}: needs at least 3 pitfalls"
+    lesson = "\n\n".join([
+        "### Why it exists\n" + why.strip(),
+        LESSONS[key].strip(),
+        "### More worked examples\n" + _render_examples(key, examples),
+        "### What the compiler says\n" + _render_errors(key, errors),
+        "### Pitfalls\n" + _render_pitfalls(key, pitfalls),
+        "### Where it shows up later\n" + "\n".join(f"- {line}" for line in later),
+    ])
+    assert len(lesson) >= TS_LESSON_MIN_CHARS or _TSO_COLLECT, \
+        f"{key}: deepened lesson is {len(lesson)} characters; the template asks for {TS_LESSON_MIN_CHARS}+"
+    LESSONS[key] = lesson
+    TS_DEEPENED.append(key)
