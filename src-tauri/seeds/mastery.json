@@ -21333,6 +21333,204 @@
             "explanation": "Inference and explicit arguments both take priority over the default."
           },
           {
+            "question": "`class Stack<T> { items: T[] = []; }` — what is `new Stack()`?",
+            "options": [
+              "`Stack<unknown>`",
+              "`Stack<any>`",
+              "`Stack<never>`",
+              "A compile error"
+            ],
+            "answer": 0,
+            "explanation": "With nothing to infer from and no default, a type parameter becomes `unknown`. Write `new Stack<number>()`."
+          },
+          {
+            "question": "For `f<T>(x: T[]): T`, what is `f([1, \"a\"])`?",
+            "options": [
+              "`string | number`",
+              "`number`",
+              "`unknown`",
+              "A compile error"
+            ],
+            "answer": 0,
+            "explanation": "The array literal's element type is the union, so `T` is too."
+          },
+          {
+            "question": "Are `Array<T>` and `T[]` different types?",
+            "options": [
+              "No — two spellings of the same type",
+              "Yes, `Array<T>` is mutable",
+              "Yes, `T[]` is readonly",
+              "Only for tuples"
+            ],
+            "answer": 0,
+            "explanation": "`ReadonlyArray<T>` is `readonly T[]`."
+          },
+          {
+            "question": "Does `T extends object` accept arrays?",
+            "options": [
+              "Yes — arrays are objects",
+              "No",
+              "Only readonly arrays",
+              "Only empty arrays"
+            ],
+            "answer": 0,
+            "explanation": "Constrain further (e.g. `Record<string, unknown>`) if you mean plain objects."
+          },
+          {
+            "question": "How do you annotate a variable that holds a generic function?",
+            "options": [
+              "`const id: <T>(x: T) => T = (x) => x;`",
+              "`const id<T> = (x: T) => x;`",
+              "`const id: (x: T) => T`",
+              "Generic functions can't be stored"
+            ],
+            "answer": 0,
+            "explanation": "The type parameter list goes at the start of the function type."
+          },
+          {
+            "question": "How do you require a type argument to satisfy two constraints?",
+            "options": [
+              "Intersect them: `<T extends A & B>`",
+              "`<T extends A, B>`",
+              "`<T extends A | B>`",
+              "Two `extends` clauses"
+            ],
+            "answer": 0,
+            "explanation": "An intersection means \"both\"."
+          },
+          {
+            "question": "What does `<T extends unknown>` constrain?",
+            "options": [
+              "Nothing — every type extends `unknown`",
+              "It forbids `any`",
+              "It forbids `null`",
+              "It forces `T` to be an object"
+            ],
+            "answer": 0,
+            "explanation": "It is the same as `<T>`."
+          },
+          {
+            "question": "Why is `function parse<T>(json: string): T` a warning sign?",
+            "options": [
+              "`T` appears only in the return type — the caller picks it, so it's an unchecked cast",
+              "Generics can't parse",
+              "It's slow",
+              "It returns `any`"
+            ],
+            "answer": 0,
+            "explanation": "Return `unknown` and validate, or take a schema that produces the type."
+          },
+          {
+            "question": "Can a default refer to an earlier type parameter: `<T, U = T[]>`?",
+            "options": [
+              "Yes",
+              "No",
+              "Only for classes",
+              "Only in `.d.ts` files"
+            ],
+            "answer": 0,
+            "explanation": "Defaults are evaluated left to right."
+          },
+          {
+            "question": "What are the conventional names `T`, `K`, `V`, `E`?",
+            "options": [
+              "Type, key, value, element (or error)",
+              "Required keywords",
+              "Type, kind, void, enum",
+              "They have no convention"
+            ],
+            "answer": 0,
+            "explanation": "Use descriptive names (`TItem`) when there are several."
+          },
+          {
+            "question": "In `<T extends string>`, what does `extends` mean?",
+            "options": [
+              "`T` must be assignable to `string`",
+              "`T` inherits from `String`",
+              "`T` is exactly `string`",
+              "`T` is a subclass"
+            ],
+            "answer": 0,
+            "explanation": "A constraint, not inheritance."
+          },
+          {
+            "question": "Why are generic classes like `Stack<T>` better than `Stack` of `unknown`?",
+            "options": [
+              "Callers get back the type they put in, with no casts",
+              "They're faster",
+              "They use less memory",
+              "They can't be misused"
+            ],
+            "answer": 0,
+            "explanation": "`pop()` on a `Stack<number>` returns `number | undefined`."
+          },
+          {
+            "question": "What does `Map<K, V>` need two type parameters for?",
+            "options": [
+              "The key type and the value type are independent",
+              "Performance",
+              "One is for iteration order",
+              "It doesn't; the second is optional"
+            ],
+            "answer": 0,
+            "explanation": "`Map<string, number[]>`, for example."
+          },
+          {
+            "question": "What does `function merge<A extends object, B extends object>(a: A, b: B)` ensure that plain `<A, B>` doesn't?",
+            "options": [
+              "Both arguments are objects, so spreading them makes sense",
+              "That they share keys",
+              "That they're arrays",
+              "Nothing"
+            ],
+            "answer": 0,
+            "explanation": "Constraints document and enforce the assumptions the body makes."
+          },
+          {
+            "question": "When does inference fail and require an explicit type argument?",
+            "options": [
+              "When nothing in the call mentions the type parameter — e.g. `new Map()` or `useState([])`",
+              "Never",
+              "Always for classes",
+              "Whenever there are two parameters"
+            ],
+            "answer": 0,
+            "explanation": "Give inference something, or say the type yourself."
+          },
+          {
+            "question": "What is a generic *constraint* for, in one line?",
+            "options": [
+              "To let the body use members every allowed `T` must have",
+              "To make `T` optional",
+              "To speed up checking",
+              "To pick a default"
+            ],
+            "answer": 0,
+            "explanation": "`T extends { length: number }` lets the body read `.length`."
+          },
+          {
+            "question": "What is `function wrap<T>(x: T): { value: T }` for `wrap(\"a\")` with a `const` result?",
+            "options": [
+              "`{ value: string }`",
+              "`{ value: \"a\" }`",
+              "`{ value: unknown }`",
+              "`\"a\"`"
+            ],
+            "answer": 0,
+            "explanation": "The literal widens when inferred for an unconstrained `T`; a `const` type parameter would keep `\"a\"`."
+          },
+          {
+            "question": "Why does `Promise<T>` need a type parameter?",
+            "options": [
+              "It describes what the promise will eventually hold",
+              "For error types",
+              "It doesn't",
+              "For cancellation"
+            ],
+            "answer": 0,
+            "explanation": "`await` on a `Promise<T>` gives a `T`."
+          },
+          {
             "question": "Why is `function longest<T extends { length: number }>(a: T, b: T): T` better than `function longest(a: { length: number }, b: { length: number }): { length: number }`?",
             "options": [
               "The generic returns the caller's exact type instead of collapsing it to { length: number }",
@@ -22283,6 +22481,204 @@
             "explanation": "Numeric keys are converted to strings, so they're allowed too."
           },
           {
+            "question": "What is `keyof any`?",
+            "options": [
+              "`string | number | symbol`",
+              "`never`",
+              "`string`",
+              "`any`"
+            ],
+            "answer": 0,
+            "explanation": "Every possible key type — also spelled `PropertyKey`."
+          },
+          {
+            "question": "What is `keyof unknown`?",
+            "options": [
+              "`never`",
+              "`string | number | symbol`",
+              "`unknown`",
+              "`string`"
+            ],
+            "answer": 0,
+            "explanation": "Nothing is known to be a key of an unknown value."
+          },
+          {
+            "question": "What is `[1, 2][\"length\"]` as a type?",
+            "options": [
+              "`2`",
+              "`number`",
+              "`1 | 2`",
+              "`never`"
+            ],
+            "answer": 0,
+            "explanation": "A tuple's length is a literal type."
+          },
+          {
+            "question": "What is `string[][\"length\"]`?",
+            "options": [
+              "`number`",
+              "`0`",
+              "`never`",
+              "`string`"
+            ],
+            "answer": 0,
+            "explanation": "An array's length isn't known statically."
+          },
+          {
+            "question": "What is `Record<string, number>[string]`?",
+            "options": [
+              "`number` — indexed access types don't add `undefined`",
+              "`number | undefined`",
+              "`never`",
+              "`unknown`"
+            ],
+            "answer": 0,
+            "explanation": "`noUncheckedIndexedAccess` affects reading values in code, not the type expression `T[string]`."
+          },
+          {
+            "question": "Does `keyof { a?: 1 }` include `a`?",
+            "options": [
+              "Yes — optional keys are still keys",
+              "No",
+              "Only with `-?`",
+              "Only under strict"
+            ],
+            "answer": 0,
+            "explanation": "`keyof` lists declared properties whether or not they're optional."
+          },
+          {
+            "question": "How do you get the type of every value in an object type `T`?",
+            "options": [
+              "`T[keyof T]`",
+              "`valueof T`",
+              "`T[]`",
+              "`Values<T>` (built in)"
+            ],
+            "answer": 0,
+            "explanation": "There's no `valueof`; index by all the keys at once."
+          },
+          {
+            "question": "What is `typeof` of a function value in a type position?",
+            "options": [
+              "Its full function type, with parameters and return",
+              "`\"function\"`",
+              "`Function`",
+              "`unknown`"
+            ],
+            "answer": 0,
+            "explanation": "Type-position `typeof` gives a type; the runtime operator gives a string."
+          },
+          {
+            "question": "With `const T = [\"a\", \"b\"] as const`, what is `(typeof T)[0]`?",
+            "options": [
+              "`\"a\"`",
+              "`string`",
+              "`\"a\" | \"b\"`",
+              "`undefined`"
+            ],
+            "answer": 0,
+            "explanation": "A readonly tuple has a type per position."
+          },
+          {
+            "question": "What does `(typeof CONFIG)[\"db\"][\"port\"]` read?",
+            "options": [
+              "The type of `CONFIG.db.port`",
+              "The value of the port",
+              "A string `\"port\"`",
+              "An error — only one level is allowed"
+            ],
+            "answer": 0,
+            "explanation": "Indexed accesses chain."
+          },
+          {
+            "question": "What is `PropertyKey`?",
+            "options": [
+              "`string | number | symbol`",
+              "`string`",
+              "`keyof object`",
+              "A class"
+            ],
+            "answer": 0,
+            "explanation": "The built-in alias for any valid key."
+          },
+          {
+            "question": "How do you test whether `\"id\"` is a key of `T` at the type level?",
+            "options": [
+              "`\"id\" extends keyof T ? … : …`",
+              "`T.has(\"id\")`",
+              "`keyof T === \"id\"`",
+              "`\"id\" in T`"
+            ],
+            "answer": 0,
+            "explanation": "Type-level membership is assignability to the key union."
+          },
+          {
+            "question": "What does `keyof` a class instance type include?",
+            "options": [
+              "Its public members, methods included",
+              "Only fields",
+              "Private members too",
+              "Only methods"
+            ],
+            "answer": 0,
+            "explanation": "`#private` and `private` members aren't in `keyof`."
+          },
+          {
+            "question": "For a function parameter typed `key: keyof T`, what may a caller pass?",
+            "options": [
+              "Only the literal names of `T`'s keys (or a variable of that union)",
+              "Any string",
+              "Any key of any object",
+              "Only numbers"
+            ],
+            "answer": 0,
+            "explanation": "Typos become compile errors."
+          },
+          {
+            "question": "Why is `get<T, K extends keyof T>(obj: T, key: K): T[K]` better than `(obj: T, key: keyof T): T[keyof T]`?",
+            "options": [
+              "The return type follows the specific key instead of being the union of all value types",
+              "It isn't",
+              "It's shorter",
+              "It allows any key"
+            ],
+            "answer": 0,
+            "explanation": "A separate `K` remembers which key was passed."
+          },
+          {
+            "question": "What is `Parameters<typeof Math.max>`?",
+            "options": [
+              "`number[]`",
+              "`[number, number]`",
+              "`[number]`",
+              "`never`"
+            ],
+            "answer": 0,
+            "explanation": "`Math.max` takes a rest parameter of numbers."
+          },
+          {
+            "question": "Why does deriving `type Size = (typeof SIZES)[number]` beat writing the union by hand?",
+            "options": [
+              "Adding a size to the array updates the type automatically",
+              "It's faster to check",
+              "Hand-written unions are unsound",
+              "It works without `as const`"
+            ],
+            "answer": 0,
+            "explanation": "One source of truth."
+          },
+          {
+            "question": "What does `keyof` a tuple type include besides its indexes?",
+            "options": [
+              "The array members too — `length`, `map`, `push`, …",
+              "Only the indexes",
+              "Only `length`",
+              "Nothing else"
+            ],
+            "answer": 0,
+            "explanation": "Tuples are arrays; use `T[number]` for the elements."
+          },
+          {
             "question": "`const levels = [\"a\", \"b\"];` — with no `as const` — what is `(typeof levels)[number]`?",
             "options": [
               "string",
@@ -23128,6 +23524,204 @@
             "explanation": "`{ readonly [K in keyof T]: DeepReadonly<T[K]> }` walks every level."
           },
           {
+            "question": "What is `Partial<string>`?",
+            "options": [
+              "`string` — mapped types leave primitives alone",
+              "`string | undefined`",
+              "`{}`",
+              "A compile error"
+            ],
+            "answer": 0,
+            "explanation": "Homomorphic mapped types pass primitives through."
+          },
+          {
+            "question": "What is `Readonly<string[]>`?",
+            "options": [
+              "`readonly string[]`",
+              "`string[]`",
+              "`{ readonly [n: number]: string }`",
+              "A compile error"
+            ],
+            "answer": 0,
+            "explanation": "Mapped types over arrays and tuples produce arrays and tuples."
+          },
+          {
+            "question": "What is `{ [K in string]: number }`?",
+            "options": [
+              "An index signature: `{ [x: string]: number }`",
+              "`{}`",
+              "A compile error",
+              "`Record<never, number>`"
+            ],
+            "answer": 0,
+            "explanation": "Mapping over `string` itself gives a string index signature."
+          },
+          {
+            "question": "What is `Partial<A | B>`?",
+            "options": [
+              "`Partial<A> | Partial<B>`",
+              "`Partial<A & B>`",
+              "`{}`",
+              "An error"
+            ],
+            "answer": 0,
+            "explanation": "A homomorphic mapped type on a type parameter distributes over unions."
+          },
+          {
+            "question": "What does `-readonly` do?",
+            "options": [
+              "Removes `readonly` from each mapped property",
+              "Adds `readonly`",
+              "Deletes the property",
+              "Makes it optional"
+            ],
+            "answer": 0,
+            "explanation": "`Mutable<T>` is `{ -readonly [K in keyof T]: T[K] }`."
+          },
+          {
+            "question": "What is `{ -readonly [K in keyof T]: T[K] }` for `T = readonly [1, 2]`?",
+            "options": [
+              "`[1, 2]`",
+              "`readonly [1, 2]`",
+              "`(1 | 2)[]`",
+              "`{ 0: 1; 1: 2 }`"
+            ],
+            "answer": 0,
+            "explanation": "Tuples stay tuples; the modifier is removed."
+          },
+          {
+            "question": "What is `+?` in a mapped type?",
+            "options": [
+              "The same as `?` — add optional",
+              "Remove optional",
+              "Make required and readonly",
+              "A syntax error"
+            ],
+            "answer": 0,
+            "explanation": "`+` is the explicit form; `-` removes."
+          },
+          {
+            "question": "How is `Pick<T, K>` written as a mapped type?",
+            "options": [
+              "`{ [P in K]: T[P] }` with `K extends keyof T`",
+              "`{ [P in keyof T]: K }`",
+              "`T & K`",
+              "`Omit<T, keyof T>`"
+            ],
+            "answer": 0,
+            "explanation": "Mapping over the chosen keys only."
+          },
+          {
+            "question": "What does `{ [K in keyof T as Uppercase<string & K>]: T[K] }` make of `{ a: 1 }`?",
+            "options": [
+              "`{ A: 1 }`",
+              "`{ a: 1 }`",
+              "`{ A: \"1\" }`",
+              "An error"
+            ],
+            "answer": 0,
+            "explanation": "Key remapping with an intrinsic string type."
+          },
+          {
+            "question": "How do you keep only the string-valued properties of `T`?",
+            "options": [
+              "`{ [K in keyof T as T[K] extends string ? K : never]: T[K] }`",
+              "`Pick<T, string>`",
+              "`Extract<T, string>`",
+              "`T & string`"
+            ],
+            "answer": 0,
+            "explanation": "Filter keys by their value type in the `as` clause."
+          },
+          {
+            "question": "What does `{ [K in keyof T]: T[K][] }` produce?",
+            "options": [
+              "Each property becomes an array of its type",
+              "An array of `T`",
+              "An error",
+              "`T[]`"
+            ],
+            "answer": 0,
+            "explanation": "Mapped types can transform every value type."
+          },
+          {
+            "question": "Do mapped types keep an index signature of `T`?",
+            "options": [
+              "Yes, when mapping over `keyof T`",
+              "No",
+              "Only for number signatures",
+              "Only with `as`"
+            ],
+            "answer": 0,
+            "explanation": "`Partial<Record<string, number>>` is `{ [x: string]: number | undefined }`-like."
+          },
+          {
+            "question": "Why does `DeepPartial` need a special case for arrays?",
+            "options": [
+              "Otherwise arrays become objects with optional numeric keys and methods",
+              "Arrays can't be partial",
+              "It's faster",
+              "It doesn't"
+            ],
+            "answer": 0,
+            "explanation": "Recurse into the element type instead."
+          },
+          {
+            "question": "What makes a mapped type \"homomorphic\"?",
+            "options": [
+              "It maps over `keyof T` for some `T`, preserving `T`'s structure and modifiers",
+              "It uses `as`",
+              "It's recursive",
+              "It maps over a union of literals"
+            ],
+            "answer": 0,
+            "explanation": "Homomorphic mapped types keep `?`, `readonly`, arrays and tuples."
+          },
+          {
+            "question": "What is `Record<\"a\" | \"b\", number>` written as a mapped type?",
+            "options": [
+              "`{ [K in \"a\" | \"b\"]: number }`",
+              "`{ a: number } | { b: number }`",
+              "`number[]`",
+              "`[number, number]`"
+            ],
+            "answer": 0,
+            "explanation": "`Record<K, V> = { [P in K]: V }`."
+          },
+          {
+            "question": "What does `Required<Partial<T>>` give back?",
+            "options": [
+              "`T` again (for a `T` without optional properties)",
+              "`Partial<T>`",
+              "`never`",
+              "`{}`"
+            ],
+            "answer": 0,
+            "explanation": "`-?` undoes `?`."
+          },
+          {
+            "question": "Can a mapped type add keys that weren't in `T`?",
+            "options": [
+              "Only by renaming them with `as` (or intersecting with another type)",
+              "Yes, freely",
+              "No, never",
+              "Only numeric keys"
+            ],
+            "answer": 0,
+            "explanation": "The output keys come from the keys you map over."
+          },
+          {
+            "question": "What is the result of a mapped type whose every key maps to `never` via `as`?",
+            "options": [
+              "`{}`",
+              "`never`",
+              "`unknown`",
+              "An error"
+            ],
+            "answer": 0,
+            "explanation": "No keys survive."
+          },
+          {
             "question": "In a mapped type's `as` clause, what happens to a key you map to `never`?",
             "options": [
               "The property is removed from the result — this is how Omit works",
@@ -23963,6 +24557,204 @@
             ],
             "answer": 0,
             "explanation": "The recursion peels one promise per step until none are left."
+          },
+          {
+            "question": "What is `boolean extends true ? 1 : 2`?",
+            "options": [
+              "`2`",
+              "`1`",
+              "`1 | 2`",
+              "`never`"
+            ],
+            "answer": 0,
+            "explanation": "No type parameter, so no distribution: `boolean` as a whole isn't assignable to `true`."
+          },
+          {
+            "question": "For `type D<T> = T extends true ? 1 : 2`, what is `D<boolean>`?",
+            "options": [
+              "`1 | 2`",
+              "`2`",
+              "`1`",
+              "`never`"
+            ],
+            "answer": 0,
+            "explanation": "`boolean` is `true | false`, and a type parameter distributes."
+          },
+          {
+            "question": "What is `never extends string ? 1 : 2` (written directly, not through a type parameter)?",
+            "options": [
+              "`1`",
+              "`never`",
+              "`2`",
+              "`1 | 2`"
+            ],
+            "answer": 0,
+            "explanation": "`never` is assignable to everything; only a *type parameter* given `never` returns `never`."
+          },
+          {
+            "question": "With `type I<T> = T extends { a: infer U; b: infer U } ? U : never`, what is `I<{ a: string; b: number }>`?",
+            "options": [
+              "`string | number`",
+              "`string & number`",
+              "`never`",
+              "`string`"
+            ],
+            "answer": 0,
+            "explanation": "Several candidates for one `infer` in covariant positions are unioned."
+          },
+          {
+            "question": "And when the same `infer U` appears in two *parameter* positions?",
+            "options": [
+              "The candidates are intersected",
+              "Unioned",
+              "The first wins",
+              "It's an error"
+            ],
+            "answer": 0,
+            "explanation": "Contravariant positions combine with `&` — the trick behind `UnionToIntersection`."
+          },
+          {
+            "question": "What is `NonNullable<string | null>`?",
+            "options": [
+              "`string`",
+              "`string | null`",
+              "`never`",
+              "`string | undefined`"
+            ],
+            "answer": 0,
+            "explanation": "Defined today as `T & {}`."
+          },
+          {
+            "question": "What is `Extract<string | number, number | boolean>`?",
+            "options": [
+              "`number`",
+              "`number | boolean`",
+              "`string`",
+              "`never`"
+            ],
+            "answer": 0,
+            "explanation": "Members of the first union assignable to the second."
+          },
+          {
+            "question": "What is `ReturnType<() => void>`?",
+            "options": [
+              "`void`",
+              "`undefined`",
+              "`never`",
+              "`unknown`"
+            ],
+            "answer": 0,
+            "explanation": "It reads the declared return type."
+          },
+          {
+            "question": "How do you detect `any` at the type level?",
+            "options": [
+              "`0 extends 1 & T ? true : false`",
+              "`T extends any`",
+              "`any extends T`",
+              "`T === any`"
+            ],
+            "answer": 0,
+            "explanation": "Only `any` makes `1 & T` accept `0`."
+          },
+          {
+            "question": "When is a conditional type on a type parameter *deferred*?",
+            "options": [
+              "While the parameter is still generic — it's resolved when `T` is known",
+              "Never",
+              "Only for `infer`",
+              "At runtime"
+            ],
+            "answer": 0,
+            "explanation": "Inside a generic function body, `T extends string ? … : …` stays unresolved."
+          },
+          {
+            "question": "Why does an implementation returning a conditional type usually need a cast?",
+            "options": [
+              "The compiler can't resolve the conditional for a generic `T` inside the body",
+              "Conditional types are erased",
+              "Returns can't be typed",
+              "It doesn't"
+            ],
+            "answer": 0,
+            "explanation": "Overloads are the common alternative."
+          },
+          {
+            "question": "What is `Awaited<string>`?",
+            "options": [
+              "`string`",
+              "`Promise<string>`",
+              "`never`",
+              "`unknown`"
+            ],
+            "answer": 0,
+            "explanation": "Non-promises pass through unchanged."
+          },
+          {
+            "question": "With `T = string | number`, is `[T] extends [string]` true?",
+            "options": [
+              "No",
+              "Yes",
+              "Partly — it distributes",
+              "It's an error"
+            ],
+            "answer": 0,
+            "explanation": "Wrapped in a tuple, the union is checked as a whole."
+          },
+          {
+            "question": "What is `Exclude<\"a\" | \"b\", string>`?",
+            "options": [
+              "`never`",
+              "`\"a\" | \"b\"`",
+              "`string`",
+              "`\"a\"`"
+            ],
+            "answer": 0,
+            "explanation": "Both members are strings, so both are excluded."
+          },
+          {
+            "question": "Where does `infer` get its candidate in `T extends (x: infer P) => void ? P : never`?",
+            "options": [
+              "From the parameter type of `T`",
+              "From the return type",
+              "From `T` itself",
+              "Nowhere"
+            ],
+            "answer": 0,
+            "explanation": "`infer` can sit anywhere a type can in the pattern."
+          },
+          {
+            "question": "Why write `T extends unknown ? … : never` deliberately?",
+            "options": [
+              "To force distribution over a union `T`",
+              "To remove `unknown`",
+              "To make it faster",
+              "It does nothing"
+            ],
+            "answer": 0,
+            "explanation": "It maps a transformation over each member."
+          },
+          {
+            "question": "What does `T extends readonly unknown[]` accept that `T extends unknown[]` doesn't?",
+            "options": [
+              "Readonly arrays and tuples",
+              "Nothing",
+              "Strings",
+              "Objects"
+            ],
+            "answer": 0,
+            "explanation": "Match `readonly` so `as const` values work too."
+          },
+          {
+            "question": "What is `Parameters<(x: string, y?: number) => void>`?",
+            "options": [
+              "`[x: string, y?: number]`",
+              "`[string, number]`",
+              "`string[]`",
+              "`[x: string, y: number | undefined]`"
+            ],
+            "answer": 0,
+            "explanation": "Optional parameters stay optional in the tuple."
           },
           {
             "question": "What does `infer` do inside a conditional type?",
@@ -24826,6 +25618,204 @@
             ],
             "answer": 0,
             "explanation": "A bare `type Bad = Bad | string` has nothing to defer and is rejected."
+          },
+          {
+            "question": "What is `` `${boolean}` ``?",
+            "options": [
+              "`\"false\" | \"true\"`",
+              "`string`",
+              "`\"boolean\"`",
+              "`boolean`"
+            ],
+            "answer": 0,
+            "explanation": "A union placeholder produces one string per member."
+          },
+          {
+            "question": "What is `Uppercase<\"a\" | \"b\">`?",
+            "options": [
+              "`\"A\" | \"B\"`",
+              "`\"AB\"`",
+              "`string`",
+              "An error"
+            ],
+            "answer": 0,
+            "explanation": "The intrinsic string types distribute over unions."
+          },
+          {
+            "question": "What is `Uncapitalize<\"Hello\">`?",
+            "options": [
+              "`\"hello\"`",
+              "`\"HELLO\"`",
+              "`\"Hello\"`",
+              "`\"hELLO\"`"
+            ],
+            "answer": 0,
+            "explanation": "Only the first character changes."
+          },
+          {
+            "question": "With `` type Sp<S> = S extends `${infer A},${infer B}` ? [A, B] : never ``, what is `Sp<\"a,b,c\">`?",
+            "options": [
+              "`[\"a\", \"b,c\"]`",
+              "`[\"a,b\", \"c\"]`",
+              "`[\"a\", \"b\"]`",
+              "`never`"
+            ],
+            "answer": 0,
+            "explanation": "The first `infer` takes the shortest match; the last takes the rest."
+          },
+          {
+            "question": "Is `\"prefix-\"` assignable to `` `prefix-${string}` ``?",
+            "options": [
+              "Yes — `${string}` matches the empty string",
+              "No",
+              "Only with `as const`",
+              "Only if the suffix is a number"
+            ],
+            "answer": 0,
+            "explanation": "Pattern placeholders can be empty."
+          },
+          {
+            "question": "What is `` `${1 | 2}px` ``?",
+            "options": [
+              "`\"1px\" | \"2px\"`",
+              "`\"1 | 2px\"`",
+              "`string`",
+              "`number`"
+            ],
+            "answer": 0,
+            "explanation": "Numbers in unions are stringified per member."
+          },
+          {
+            "question": "How do you compute a tuple's length type?",
+            "options": [
+              "`T[\"length\"]`",
+              "`T.length`",
+              "`Length<T>` (built in)",
+              "`keyof T`"
+            ],
+            "answer": 0,
+            "explanation": "For tuples it's a literal like `3`."
+          },
+          {
+            "question": "How do you append to a tuple type?",
+            "options": [
+              "`[...T, V]`",
+              "`T & V`",
+              "`T | V`",
+              "`Push<T, V>` (built in)"
+            ],
+            "answer": 0,
+            "explanation": "Variadic tuple types spread other tuples."
+          },
+          {
+            "question": "Why is type-level arithmetic with tuples \"a toy\"?",
+            "options": [
+              "It builds tuples of that length, so it's limited to small numbers and is slow",
+              "It's wrong",
+              "It needs a flag",
+              "It only works on strings"
+            ],
+            "answer": 0,
+            "explanation": "Fine for lengths of a few hundred; not for real numbers."
+          },
+          {
+            "question": "What does `--generateTrace` help with?",
+            "options": [
+              "Finding which types make type checking slow",
+              "Debugging runtime code",
+              "Generating `.d.ts` files",
+              "Tracing imports"
+            ],
+            "answer": 0,
+            "explanation": "Load the output in a trace viewer."
+          },
+          {
+            "question": "What's a sign a recursive type should be simplified?",
+            "options": [
+              "It hits TS2589, makes the editor lag, or nobody can read it",
+              "It has more than one parameter",
+              "It uses `infer`",
+              "It's exported"
+            ],
+            "answer": 0,
+            "explanation": "Complexity has a cost at every call site."
+          },
+          {
+            "question": "What does `` S extends `${infer H}${infer R}` ? H : never `` give for `S = \"\"`?",
+            "options": [
+              "`never` — an empty string has no first character",
+              "`\"\"`",
+              "`string`",
+              "An error"
+            ],
+            "answer": 0,
+            "explanation": "Each `infer` without a delimiter matches at least one character."
+          },
+          {
+            "question": "How do you recurse over each character of a string type?",
+            "options": [
+              "`` S extends `${infer H}${infer R}` ? [H, ...Chars<R>] : [] ``",
+              "`S[number]`",
+              "`keyof S`",
+              "`Split<S>` (built in)"
+            ],
+            "answer": 0,
+            "explanation": "Peel one character per step."
+          },
+          {
+            "question": "Can an interface refer to itself?",
+            "options": [
+              "Yes — `interface Tree { kids: Tree[] }`",
+              "No, only type aliases",
+              "Only with generics",
+              "Only in `.d.ts`"
+            ],
+            "answer": 0,
+            "explanation": "Self-reference through properties is fine for both."
+          },
+          {
+            "question": "Why does `` `${Entity}:${Action}` `` beat a hand-written list of event names?",
+            "options": [
+              "It stays in step with the two unions and can't miss a combination",
+              "It's shorter at runtime",
+              "It's required",
+              "It's faster"
+            ],
+            "answer": 0,
+            "explanation": "Derive, don't duplicate."
+          },
+          {
+            "question": "What is `Lowercase<string>` useful for?",
+            "options": [
+              "Describing \"any lower-case string\" as a pattern type",
+              "Nothing — it's `string`",
+              "Runtime conversion",
+              "Sorting"
+            ],
+            "answer": 0,
+            "explanation": "Intrinsic types work on non-literal strings too, as patterns."
+          },
+          {
+            "question": "What limit applies to the number of members in a union?",
+            "options": [
+              "About 100,000 — past that, TS2590",
+              "10",
+              "1,000",
+              "None"
+            ],
+            "answer": 0,
+            "explanation": "Template literals over several unions reach it quickly."
+          },
+          {
+            "question": "What does `Capitalize<\"hello world\">` return?",
+            "options": [
+              "`\"Hello world\"`",
+              "`\"Hello World\"`",
+              "`\"HELLO WORLD\"`",
+              "`\"hello world\"`"
+            ],
+            "answer": 0,
+            "explanation": "One character, not one per word."
           },
           {
             "question": "How many members does `` type T = `${\"a\" | \"b\"}-${\"x\" | \"y\" | \"z\"}` `` have?",
