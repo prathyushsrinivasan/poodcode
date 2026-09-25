@@ -29454,12 +29454,425 @@
           {
             "front": "Interview: `Promise.all` or `Promise.allSettled`?",
             "back": "`all` when one failure should fail the whole operation; `allSettled` when every outcome matters on its own — e.g. reporting each resource."
+          },
+          {
+            "front": "Mock interview: how do you open a coding question?",
+            "back": "Restate it, confirm the input/output shapes and edge cases, state a brute force and its complexity, then improve."
+          },
+          {
+            "front": "Mock interview: `interface` or `type`?",
+            "back": "Interchangeable for object shapes; `interface` merges and extends cheaply, `type` handles unions, mapped and conditional types. Pick one convention and say why."
+          },
+          {
+            "front": "Mock interview: how do you type untrusted JSON?",
+            "back": "Parse to `unknown`, validate at the boundary with a guard or schema, and let the inferred type flow inward — never `as T`."
+          },
+          {
+            "front": "Mock interview: what is structural typing's biggest surprise?",
+            "back": "Extra properties pass silently (except fresh literals), so types never guarantee a value has *only* what they list."
+          },
+          {
+            "front": "Mock interview: how do you make async output testable?",
+            "back": "Inject the clock and the I/O, order results by input index, and never assert on real timing."
+          },
+          {
+            "front": "Mock interview: when would you reach for a branded type?",
+            "back": "When two values share a representation but must never be mixed — ids, units, validated strings — at zero runtime cost."
           }
         ],
-        "practice": [],
+        "practice": [
+          {
+            "id": "tsm-w27-f1",
+            "title": "Code review: a sort that edits the caller's data",
+            "prompt": "Print the top score, then the scores in their original order. The original order comes out sorted.",
+            "hint": "`sort` sorts in place — the review comment is \"this mutates its argument\".",
+            "hints": [
+              "`sort` sorts in place — the review comment is \"this mutates its argument\".",
+              "Take `readonly number[]` and use `toSorted`."
+            ],
+            "language": "typescript",
+            "kind": "fix",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst scores = input.split(\" \").map(Number);\nfunction top(xs: number[]): number {\n  return xs.sort((a, b) => b - a)[0] ?? 0;\n}\nconsole.log(top(scores));\nconsole.log(scores.join(\" \"));\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst scores = input.split(\" \").map(Number);\nfunction top(xs: readonly number[]): number {\n  return xs.toSorted((a, b) => b - a)[0] ?? 0;\n}\nconsole.log(top(scores));\nconsole.log(scores.join(\" \"));\n",
+            "tests": [
+              {
+                "input": "3 9 4",
+                "output": "9\n3 9 4"
+              },
+              {
+                "input": "5",
+                "output": "5\n5"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w27-f2",
+            "title": "Code review: money in floating point",
+            "prompt": "Print the total of the prices, to two decimals, and whether it equals the expected total on the first line. Totals that should match don't.",
+            "hint": "`0.1 + 0.2 !== 0.3` in floating point.",
+            "hints": [
+              "`0.1 + 0.2 !== 0.3` in floating point.",
+              "Compare integer cents."
+            ],
+            "language": "typescript",
+            "kind": "fix",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst [expected = \"0\", ...prices] = input.split(\" \");\nconst total = prices.map(Number).reduce((a, b) => a + b, 0);\nconsole.log(total.toFixed(2), total === Number(expected));\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst [expected = \"0\", ...prices] = input.split(\" \");\nconst cents = (s: string) => Math.round(Number(s) * 100);\nconst total = prices.map(cents).reduce((a, b) => a + b, 0);\nconsole.log((total / 100).toFixed(2), total === cents(expected));\n",
+            "tests": [
+              {
+                "input": "0.3 0.1 0.2",
+                "output": "0.30 true"
+              },
+              {
+                "input": "1.15 0.5 0.65",
+                "output": "1.15 true"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w27-f3",
+            "title": "Code review: `||` where `??` was meant",
+            "prompt": "Print each item's quantity, defaulting to 1 only when no quantity was given (`-`). A quantity of 0 becomes 1.",
+            "hint": "`||` replaces every falsy value, including `0`.",
+            "hints": [
+              "`||` replaces every falsy value, including `0`.",
+              "`??` replaces only `null` and `undefined`."
+            ],
+            "language": "typescript",
+            "kind": "fix",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst qty = input.split(\" \").map((t) => (t === \"-\" ? undefined : Number(t)));\nconsole.log(qty.map((q) => q || 1).join(\" \"));\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst qty = input.split(\" \").map((t) => (t === \"-\" ? undefined : Number(t)));\nconsole.log(qty.map((q) => q ?? 1).join(\" \"));\n",
+            "tests": [
+              {
+                "input": "3 - 0",
+                "output": "3 1 0"
+              },
+              {
+                "input": "0",
+                "output": "0"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w27-d1",
+            "title": "Code review: an `any` that hid a bug",
+            "prompt": "The compiler rejects this program:\n\n    error TS2339: Property 'toUpperCase' does not exist on type 'string | number'.\n\nNumbers should print as `#<n>`, words upper-cased. (The original code typed `value` as `any`, and this crashed in production.)",
+            "hint": "Narrow the union before calling a string method.",
+            "hints": [
+              "Narrow the union before calling a string method.",
+              "`typeof value === \"number\"`."
+            ],
+            "language": "typescript",
+            "kind": "diagnose",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nfunction label(value: string | number): string {\n  return value.toUpperCase();\n}\nconsole.log(input.split(\" \").map((t) => label(/^\\d+$/.test(t) ? Number(t) : t)).join(\" \"));\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nfunction label(value: string | number): string {\n  return typeof value === \"number\" ? `#${value}` : value.toUpperCase();\n}\nconsole.log(input.split(\" \").map((t) => label(/^\\d+$/.test(t) ? Number(t) : t)).join(\" \"));\n",
+            "tests": [
+              {
+                "input": "ab 12 cd",
+                "output": "AB #12 CD"
+              },
+              {
+                "input": "7",
+                "output": "#7"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          }
+        ],
         "optional": true,
-        "problem_set": [],
-        "project_spec": null
+        "problem_set": [
+          {
+            "id": "tsm-w27-top-words",
+            "title": "Mock interview 1: the k most frequent words",
+            "prompt": "The first input line is k; the rest is text. Count words case-insensitively (a word is a run of letters or apostrophes) and print the k most frequent as `<word> <count>`, most frequent first, ties alphabetical. If there are fewer than k distinct words, print them all. Say your complexity out loud before you code: this should be O(n log n) or better.",
+            "hint": "A `Map<string, number>` of counts, then one sort with a tie-break.",
+            "hints": [
+              "A `Map<string, number>` of counts, then one sort with a tie-break.",
+              "For very large inputs and small k, a size-k heap is O(n log k) — mention it even if you sort."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst [kText = \"0\", ...lines] = input.split(\"\\n\");\nconst k = Number(kText);\nconst counts = new Map<string, number>();\nfor (const word of lines.join(\" \").toLowerCase().match(/[a-z']+/g) ?? []) counts.set(word, (counts.get(word) ?? 0) + 1);\nconst ranked = [...counts].sort(([a, x], [b, y]) => y - x || a.localeCompare(b)).slice(0, k);\nfor (const [word, n] of ranked) console.log(`${word} ${n}`);\n",
+            "tests": [
+              {
+                "input": "2\nthe cat and the hat\nand the bat",
+                "output": "the 3\nand 2"
+              },
+              {
+                "input": "5\nOne fish, two fish.",
+                "output": "fish 2\none 1\ntwo 1"
+              },
+              {
+                "input": "1\nb a",
+                "output": "a 1"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w27-intervals",
+            "title": "Mock interview 2: insert and merge intervals",
+            "prompt": "The first input line is a list of intervals `a-b` (inclusive, possibly overlapping, unsorted); each later line is a new interval to insert. After each insertion print the merged, sorted list as `a-b a-b …` and `covered <total length>` (the number of integer points covered). Type intervals as readonly tuples `readonly [start: number, end: number]` and never mutate the input list.",
+            "hint": "Sort by start, then extend the last merged interval while the next one overlaps or touches.",
+            "hints": [
+              "Sort by start, then extend the last merged interval while the next one overlaps or touches.",
+              "Labelled readonly tuples document the shape and stop accidental mutation."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Interval = readonly [start: number, end: number];\nconst parse = (t: string): Interval => {\n  const [a = \"0\", b = \"0\"] = t.split(\"-\");\n  return [Math.min(Number(a), Number(b)), Math.max(Number(a), Number(b))];\n};\nfunction merge(intervals: readonly Interval[]): Interval[] {\n  const sorted = intervals.toSorted((x, y) => x[0] - y[0] || x[1] - y[1]);\n  const out: Interval[] = [];\n  for (const cur of sorted) {\n    const last = out.at(-1);\n    if (last !== undefined && cur[0] <= last[1] + 1) out[out.length - 1] = [last[0], Math.max(last[1], cur[1])];\n    else out.push(cur);\n  }\n  return out;\n}\nconst [first = \"\", ...inserts] = input.split(\"\\n\");\nlet current: readonly Interval[] = merge(first.trim().split(/\\s+/).map(parse));\nfor (const line of inserts) {\n  current = merge([...current, parse(line.trim())]);\n  console.log(current.map(([a, b]) => `${a}-${b}`).join(\" \"));\n  console.log(`covered ${current.reduce((s, [a, b]) => s + b - a + 1, 0)}`);\n}\n",
+            "tests": [
+              {
+                "input": "1-3 8-10 5-6\n4-4\n11-20\n0-100",
+                "output": "1-6 8-10\ncovered 9\n1-6 8-20\ncovered 19\n0-100\ncovered 101"
+              },
+              {
+                "input": "5-5\n1-2\n3-4",
+                "output": "1-2 5-5\ncovered 3\n1-5\ncovered 5"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w27-rate-limiter",
+            "title": "Mock interview 3: a sliding-window rate limiter",
+            "prompt": "Design `class RateLimiter` allowing at most `limit` requests per user in any window of `window` ms (a request at time t counts for the window (t - window, t]). The first input line is `limit window`; each later line is `<time> <user>` in non-decreasing time. Print `<time> <user> allowed` or `<time> <user> limited (retry at <t>)` — the earliest time a request would be allowed. Keep each user's timestamps in their own queue.",
+            "hint": "A queue of timestamps per user; drop the ones that fell out of the window before deciding.",
+            "hints": [
+              "A queue of timestamps per user; drop the ones that fell out of the window before deciding.",
+              "The earliest retry is when the oldest remaining hit leaves the window."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nclass RateLimiter {\n  readonly #limit: number;\n  readonly #window: number;\n  readonly #hits = new Map<string, number[]>();\n  constructor(limit: number, windowMs: number) {\n    this.#limit = limit;\n    this.#window = windowMs;\n  }\n  request(user: string, t: number): { allowed: true } | { allowed: false; retryAt: number } {\n    const hits = this.#hits.get(user) ?? [];\n    while (hits.length > 0 && (hits[0] ?? 0) <= t - this.#window) hits.shift();\n    this.#hits.set(user, hits);\n    if (hits.length < this.#limit) {\n      hits.push(t);\n      return { allowed: true };\n    }\n    return { allowed: false, retryAt: (hits[0] ?? t) + this.#window };\n  }\n}\nconst [config = \"\", ...lines] = input.split(\"\\n\");\nconst [limit = 1, windowMs = 1000] = config.trim().split(/\\s+/).map(Number);\nconst limiter = new RateLimiter(limit, windowMs);\nfor (const line of lines) {\n  const [time = \"0\", user = \"\"] = line.trim().split(/\\s+/);\n  const r = limiter.request(user, Number(time));\n  console.log(r.allowed ? `${time} ${user} allowed` : `${time} ${user} limited (retry at ${r.retryAt})`);\n}\n",
+            "tests": [
+              {
+                "input": "2 1000\n0 ana\n100 ana\n200 ana\n300 bo\n1000 ana\n1050 ana\n1101 ana",
+                "output": "0 ana allowed\n100 ana allowed\n200 ana limited (retry at 1000)\n300 bo allowed\n1000 ana allowed\n1050 ana limited (retry at 1100)\n1101 ana allowed"
+              },
+              {
+                "input": "1 10\n5 x\n5 x\n14 x\n15 x",
+                "output": "5 x allowed\n5 x limited (retry at 15)\n14 x limited (retry at 15)\n15 x allowed"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w27-event-sourcing",
+            "title": "Mock interview 4: rebuild state from events",
+            "prompt": "An account's history is a stream of events, one per input line: `<time> opened <owner>`, `<time> deposited <n>`, `<time> withdrew <n>`, `<time> renamed <owner>`, `<time> closed`, then queries `at <time>` (the state after every event up to and including that time). Model events as a discriminated union and state as the result of folding them with a pure `apply(state, event)`; an event that is invalid in the current state (a withdrawal beyond the balance, anything after `closed`, anything before `opened`) is skipped with `skipped <time> <kind>`. Print each query as `at <t>: <owner> <balance> <open|closed>` or `at <t>: no account`.",
+            "hint": "A pure `apply` returning the next state (or a marker for invalid) makes replay-to-any-time trivial.",
+            "hints": [
+              "A pure `apply` returning the next state (or a marker for invalid) makes replay-to-any-time trivial.",
+              "Record the state after each accepted event; a query picks the last one at or before its time."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Hard",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Event =\n  | { kind: \"opened\"; t: number; owner: string }\n  | { kind: \"deposited\" | \"withdrew\"; t: number; amount: number }\n  | { kind: \"renamed\"; t: number; owner: string }\n  | { kind: \"closed\"; t: number };\ntype State = { readonly owner: string; readonly balance: number; readonly open: boolean } | undefined;\nfunction apply(s: State, e: Event): State | \"invalid\" {\n  if (e.kind === \"opened\") return s === undefined ? { owner: e.owner, balance: 0, open: true } : \"invalid\";\n  if (s === undefined || !s.open) return \"invalid\";\n  switch (e.kind) {\n    case \"deposited\":\n      return { ...s, balance: s.balance + e.amount };\n    case \"withdrew\":\n      return e.amount > s.balance ? \"invalid\" : { ...s, balance: s.balance - e.amount };\n    case \"renamed\":\n      return { ...s, owner: e.owner };\n    case \"closed\":\n      return { ...s, open: false };\n  }\n}\nconst events: Event[] = [];\nconst queries: number[] = [];\nfor (const line of input.split(\"\\n\")) {\n  const [a = \"\", b = \"\", c = \"\"] = line.trim().split(/\\s+/);\n  if (a === \"at\") {\n    queries.push(Number(b));\n    continue;\n  }\n  const t = Number(a);\n  if (b === \"opened\" || b === \"renamed\") events.push({ kind: b, t, owner: c });\n  else if (b === \"deposited\" || b === \"withdrew\") events.push({ kind: b, t, amount: Number(c) });\n  else if (b === \"closed\") events.push({ kind: b, t });\n}\nconst timeline: { t: number; state: State }[] = [];\nlet state: State = undefined;\nfor (const e of events) {\n  const next = apply(state, e);\n  if (next === \"invalid\") {\n    console.log(`skipped ${e.t} ${e.kind}`);\n    continue;\n  }\n  state = next;\n  timeline.push({ t: e.t, state });\n}\nfor (const q of queries) {\n  const s = timeline.filter((x) => x.t <= q).at(-1)?.state;\n  console.log(s === undefined ? `at ${q}: no account` : `at ${q}: ${s.owner} ${s.balance} ${s.open ? \"open\" : \"closed\"}`);\n}\n",
+            "tests": [
+              {
+                "input": "1 deposited 5\n2 opened ana\n3 deposited 100\n4 withdrew 150\n5 withdrew 30\n6 renamed ana-lee\n7 closed\n8 deposited 1\nat 0\nat 3\nat 5\nat 6\nat 99",
+                "output": "skipped 1 deposited\nskipped 4 withdrew\nskipped 8 deposited\nat 0: no account\nat 3: ana 100 open\nat 5: ana 70 open\nat 6: ana-lee 70 open\nat 99: ana-lee 70 closed"
+              },
+              {
+                "input": "10 opened bo\n10 opened cy\nat 10\nat 9",
+                "output": "skipped 10 opened\nat 10: bo 0 open\nat 9: no account"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w27-deep-partial",
+            "title": "Mock type puzzle 1: DeepPartial",
+            "prompt": "Write `DeepPartial<T>`: every property at every depth becomes optional; arrays keep their shape but their elements become deep-partial; functions are left alone.",
+            "hint": "Four cases, in order: functions, arrays, objects, primitives.",
+            "hints": [
+              "Four cases, in order: functions, arrays, objects, primitives.",
+              "Arrays: recurse into the element type."
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype Config = { name: string; db: { host: string; ports: number[] }; tags: { id: number; label: string }[]; onLoad: () => void };\ntype _1 = Expect<Equal<DeepPartial<Config>, {\n  name?: string;\n  db?: { host?: string; ports?: number[] };\n  tags?: { id?: number; label?: string }[];\n  onLoad?: () => void;\n}>>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type DeepPartial<T> = ____;\n",
+            "solution": "type DeepPartial<T> = T extends (...args: never[]) => unknown\n  ? T\n  : T extends readonly (infer E)[]\n    ? DeepPartial<E>[]\n    : T extends object\n      ? { [K in keyof T]?: DeepPartial<T[K]> }\n      : T;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w27-path-value",
+            "title": "Mock type puzzle 2: the value at a path",
+            "prompt": "Write `PathValue<T, P>`: the type found at the dotted path `P` inside `T` (`never` for a path that doesn't exist).",
+            "hint": "Split off the first segment with a template literal pattern and recurse on the rest.",
+            "hints": [
+              "Split off the first segment with a template literal pattern and recurse on the rest.",
+              "Each segment must be a `keyof` the current type, or the answer is `never`."
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Hard",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype User = { name: string; address: { city: string; geo: { lat: number } }; tags: string[] };\ntype _1 = Expect<Equal<PathValue<User, \"name\">, string>>;\ntype _2 = Expect<Equal<PathValue<User, \"address.geo.lat\">, number>>;\ntype _3 = Expect<Equal<PathValue<User, \"address.zip\">, never>>;\ntype _4 = Expect<Equal<PathValue<User, \"tags\">, string[]>>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type PathValue<T, P extends string> = ____;\n",
+            "solution": "type PathValue<T, P extends string> = P extends `${infer Head}.${infer Rest}`\n  ? Head extends keyof T\n    ? PathValue<T[Head], Rest>\n    : never\n  : P extends keyof T\n    ? T[P]\n    : never;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w27-required-keys",
+            "title": "Mock type puzzle 3: required keys",
+            "prompt": "Write `RequiredKeys<T>`: the union of `T`'s keys that are *not* optional.",
+            "hint": "`{}` is assignable to `Pick<T, K>` exactly when `K` is optional.",
+            "hints": [
+              "`{}` is assignable to `Pick<T, K>` exactly when `K` is optional.",
+              "Map the optional ones to `never`, and don't forget `-?`."
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<RequiredKeys<{ id: number; name?: string; email: string | undefined }>, \"id\" | \"email\">>;\ntype _2 = Expect<Equal<RequiredKeys<{ a?: 1 }>, never>>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type RequiredKeys<T> = ____;\n",
+            "solution": "type RequiredKeys<T> = { [K in keyof T]-?: {} extends Pick<T, K> ? never : K }[keyof T];\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w27-awaited-all",
+            "title": "Mock type puzzle 4: the type of Promise.all",
+            "prompt": "Write `AwaitedAll<T>`: for a tuple of values and promises, the tuple of what each resolves to — the result type of `Promise.all` — as a mutable tuple.",
+            "hint": "A mapped type over a tuple produces a tuple.",
+            "hints": [
+              "A mapped type over a tuple produces a tuple.",
+              "`Awaited` unwraps nested promises; `-readonly` drops the modifier."
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<AwaitedAll<[Promise<number>, string, Promise<Promise<boolean>>]>, [number, string, boolean]>>;\ntype _2 = Expect<Equal<AwaitedAll<readonly [Promise<\"a\">]>, [\"a\"]>>;\ntype _3 = Expect<Equal<AwaitedAll<[]>, []>>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type AwaitedAll<T extends readonly unknown[]> = ____;\n",
+            "solution": "type AwaitedAll<T extends readonly unknown[]> = { -readonly [K in keyof T]: Awaited<T[K]> };\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          }
+        ],
+        "project_spec": {
+          "title": "ledger.ts — the arc's final version",
+          "goal": "The six-month arc project, finished: a ledger that loads its sources concurrently with a timeout, parses every row into branded types with `Result`s, keeps its state private in a class, streams statements lazily with a generator, and never lets timing decide what it prints.",
+          "requirements": [
+            "The input has three sections separated by `---` lines: config (`timeout=<ms>`), sources (`<name> <delayMs> <row;row;…>` with rows `YYYY-MM-DD,ACC-123,amount`), and commands.",
+            "Load every source concurrently on a virtual clock: a source finishes after its delay, or times out at the timeout (a delay equal to the timeout still loads). Parse each loaded row with `Result`s — `bad date`, `bad account` (three capitals, `-`, three digits), `bad amount` (at most two decimals) — recording errors as `<source>#<row>: <problem>`; add good rows to the ledger in source input order.",
+            "Commands: `sources` (`<name>: <k> rows` — `row` for one — or `<name>: timed out`, in input order); `balance <acc>`; `statement <acc> [n]` (the first n lines — all by default — of `<date> <signed amount> <running balance>` in date order, produced by a generator); `top <n>` (accounts by balance, highest first, ties by id); `months` (`<YYYY-MM> in <x> out <y>`, sorted); `errors` (in load order, or `no errors`).",
+            "Money prints as `$12.00` / `-$3.50`; a bad account id in a command prints `bad account <x>`, and an unknown one `no account <x>`.",
+            "Use a branded `AccountId` and `Cents`, a `Ledger` class with `#private` transactions, and `Result<T, string>` for every parser."
+          ],
+          "stretch": [
+            "Split it into modules (`money.ts`, `parse.ts`, `ledger.ts`, `load.ts`, `main.ts`) with `import type` where it applies.",
+            "Add `using`-managed resources for the sources and print when each is released."
+          ],
+          "rubric": [
+            "Every parser returns a `Result`; nothing in the parsing path throws",
+            "Branded `AccountId`/`Cents` are created only by their parsers",
+            "The ledger's transactions are `#private`; callers can read, never write",
+            "No output depends on real time — only on the virtual clock",
+            "No `any` anywhere; every function has a typed signature"
+          ],
+          "language": "typescript",
+          "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n// Build the project here. Read all of stdin from `input` above, and print\n// exactly what the requirements ask for. Run the tests as you go.\n",
+          "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n// A virtual clock: time moves only when every pending microtask has settled\n// and the next timer is fired, so output never depends on machine speed.\nclass VirtualClock {\n  now = 0;\n  #timers: { at: number; seq: number; fire: () => void }[] = [];\n  #seq = 0;\n  sleep(ms: number, signal?: AbortSignal): Promise<void> {\n    return new Promise<void>((resolve, reject) => {\n      if (signal?.aborted === true) {\n        reject(signal.reason);\n        return;\n      }\n      const timer = { at: this.now + ms, seq: this.#seq++, fire: () => resolve() };\n      this.#timers.push(timer);\n      signal?.addEventListener(\"abort\", () => {\n        this.#timers = this.#timers.filter((t) => t !== timer);\n        reject(signal.reason);\n      }, { once: true });\n    });\n  }\n  async run(): Promise<void> {\n    for (;;) {\n      await new Promise<void>((r) => setTimeout(r, 0));\n      this.#timers.sort((a, b) => a.at - b.at || a.seq - b.seq);\n      const next = this.#timers.shift();\n      if (next === undefined) return;\n      this.now = next.at;\n      next.fire();\n    }\n  }\n}\nconst clock = new VirtualClock();\ndeclare const AccountBrand: unique symbol;\ndeclare const CentsBrand: unique symbol;\ntype AccountId = string & { readonly [AccountBrand]: true };\ntype Cents = number & { readonly [CentsBrand]: true };\ntype Result<T, E = string> = { ok: true; value: T } | { ok: false; error: E };\ntype Tx = { readonly date: string; readonly account: AccountId; readonly amount: Cents };\nconst ok = <T>(value: T): Result<T, never> => ({ ok: true, value });\nconst err = (error: string): Result<never> => ({ ok: false, error });\nconst parseAccount = (s: string): Result<AccountId> => (/^[A-Z]{3}-\\d{3}$/.test(s) ? ok(s as AccountId) : err(\"bad account\"));\nfunction parseCents(s: string): Result<Cents> {\n  const m = /^(-?)(\\d+)(?:\\.(\\d{1,2}))?$/.exec(s);\n  if (m === null) return err(\"bad amount\");\n  const cents = Number(m[2] ?? \"0\") * 100 + Number((m[3] ?? \"\").padEnd(2, \"0\"));\n  return ok((m[1] === \"-\" ? -cents : cents) as Cents);\n}\nfunction parseDate(s: string): Result<string> {\n  const m = /^(\\d{4})-(\\d{2})-(\\d{2})$/.exec(s);\n  if (m === null) return err(\"bad date\");\n  const [y, mo, d] = [Number(m[1]), Number(m[2]), Number(m[3])];\n  const date = new Date(Date.UTC(y, mo - 1, d));\n  return date.getUTCMonth() === mo - 1 && date.getUTCDate() === d ? ok(s) : err(\"bad date\");\n}\nfunction parseTx(row: string): Result<Tx> {\n  const [d = \"\", a = \"\", amt = \"\"] = row.split(\",\").map((x) => x.trim());\n  const date = parseDate(d);\n  if (!date.ok) return date;\n  const account = parseAccount(a);\n  if (!account.ok) return account;\n  const amount = parseCents(amt);\n  if (!amount.ok) return amount;\n  return ok({ date: date.value, account: account.value, amount: amount.value });\n}\nconst money = (c: number) => (c < 0 ? \"-\" : \"\") + \"$\" + (Math.abs(c) / 100).toFixed(2);\n\nclass Ledger {\n  readonly #txs: Tx[] = [];\n  add(tx: Tx): void {\n    this.#txs.push(tx);\n  }\n  has(acc: AccountId): boolean {\n    return this.#txs.some((t) => t.account === acc);\n  }\n  balance(acc: AccountId): number {\n    return this.#txs.reduce((s, t) => s + (t.account === acc ? t.amount : 0), 0);\n  }\n  *statement(acc: AccountId): Generator<string> {\n    let running = 0;\n    for (const t of this.#txs.filter((x) => x.account === acc).toSorted((a, b) => a.date.localeCompare(b.date))) {\n      running += t.amount;\n      yield `${t.date} ${t.amount >= 0 ? \"+\" : \"\"}${money(t.amount)} ${money(running)}`;\n    }\n  }\n  accounts(): AccountId[] {\n    return [...new Set(this.#txs.map((t) => t.account))];\n  }\n  months(): [string, { in: number; out: number }][] {\n    const m = new Map<string, { in: number; out: number }>();\n    for (const t of this.#txs) {\n      const key = t.date.slice(0, 7);\n      const cur = m.get(key) ?? { in: 0, out: 0 };\n      m.set(key, t.amount >= 0 ? { ...cur, in: cur.in + t.amount } : { ...cur, out: cur.out - t.amount });\n    }\n    return [...m].sort(([a], [b]) => a.localeCompare(b));\n  }\n}\n\nconst sections: string[][] = [[]];\nfor (const line of input.split(\"\\n\")) {\n  if (line.trim() === \"---\") sections.push([]);\n  else if (line.trim() !== \"\") sections.at(-1)?.push(line.trim());\n}\nconst [configLines = [], sourceLines = [], commands = []] = sections;\nconst timeout = Number((configLines[0] ?? \"timeout=100\").split(\"=\")[1] ?? \"100\");\nconst sources = sourceLines.map((line) => {\n  const [name = \"\", delay = \"0\", rows = \"\"] = line.split(/\\s+/);\n  return { name, delay: Number(delay), rows: rows.split(\";\").filter((r) => r !== \"\") };\n});\n\nasync function loadSource(delay: number, rows: string[]): Promise<string[] | undefined> {\n  const work = new AbortController();\n  const timer = new AbortController();\n  const loaded = clock.sleep(delay, work.signal).then(() => {\n    timer.abort();\n    return rows;\n  }, () => undefined);\n  const timedOut = clock.sleep(timeout, timer.signal).then(() => {\n    work.abort();\n    return undefined;\n  }, () => undefined);\n  return Promise.race([loaded, timedOut]);\n}\n\nconst ledger = new Ledger();\nconst errors: string[] = [];\nconst loaded: (string[] | undefined)[] = [];\nconst done = Promise.all(sources.map((s) => loadSource(s.delay, s.rows))).then((results) => {\n  results.forEach((rows, i) => {\n    loaded.push(rows);\n    const name = sources[i]?.name ?? \"?\";\n    (rows ?? []).forEach((row, r) => {\n      const tx = parseTx(row);\n      if (tx.ok) ledger.add(tx.value);\n      else errors.push(`${name}#${r + 1}: ${tx.error}`);\n    });\n  });\n});\nawait clock.run();\nawait done;\n\nfor (const command of commands) {\n  const [cmd = \"\", arg = \"\", n = \"\"] = command.split(/\\s+/);\n  const account = (): AccountId | undefined => {\n    const r = parseAccount(arg);\n    if (!r.ok) console.log(`bad account ${arg}`);\n    else if (!ledger.has(r.value)) console.log(`no account ${arg}`);\n    else return r.value;\n    return undefined;\n  };\n  if (cmd === \"sources\") {\n    sources.forEach((s, i) => {\n      const rows = loaded[i];\n      console.log(rows === undefined ? `${s.name}: timed out` : `${s.name}: ${rows.length} ${rows.length === 1 ? \"row\" : \"rows\"}`);\n    });\n  } else if (cmd === \"balance\") {\n    const acc = account();\n    if (acc !== undefined) console.log(`${acc}: ${money(ledger.balance(acc))}`);\n  } else if (cmd === \"statement\") {\n    const acc = account();\n    if (acc !== undefined) {\n      const lines = n === \"\" ? ledger.statement(acc).toArray() : ledger.statement(acc).take(Number(n)).toArray();\n      for (const l of lines) console.log(l);\n    }\n  } else if (cmd === \"top\") {\n    const ranked = ledger.accounts().sort((a, b) => ledger.balance(b) - ledger.balance(a) || a.localeCompare(b));\n    for (const a of ranked.slice(0, Number(arg))) console.log(`${a} ${money(ledger.balance(a))}`);\n  } else if (cmd === \"months\") {\n    for (const [m, v] of ledger.months()) console.log(`${m} in ${money(v.in)} out ${money(v.out)}`);\n  } else if (cmd === \"errors\") {\n    if (errors.length === 0) console.log(\"no errors\");\n    for (const e of errors) console.log(e);\n  }\n}\n",
+          "tests": [
+            {
+              "input": "timeout=50\n---\nbank 20 2026-01-05,CHK-001,2500;2026-01-09,CHK-001,-45.50;2026-02-01,SAV-002,500\ncards 40 2026-01-20,CHK-001,-120;2026-01-31,CRD-003,-60.25\nlate 90 2026-03-01,CHK-001,1\n---\nsources\nbalance CHK-001\nstatement CHK-001\ntop 2\nmonths\nerrors",
+              "output": "bank: 3 rows\ncards: 2 rows\nlate: timed out\nCHK-001: $2334.50\n2026-01-05 +$2500.00 $2500.00\n2026-01-09 -$45.50 $2454.50\n2026-01-20 -$120.00 $2334.50\nCHK-001 $2334.50\nSAV-002 $500.00\n2026-01 in $2500.00 out $225.75\n2026-02 in $500.00 out $0.00\nno errors"
+            },
+            {
+              "input": "timeout=30\n---\na 30 2026-02-30,ABC-111,5;2026-01-01,abc-111,5;2026-01-02,ABC-111,5.555;2026-01-03,ABC-111,-7\nb 31 2026-01-01,XYZ-999,1\n---\nsources\nerrors\nbalance ABC-111\nbalance XYZ-999\nbalance nope",
+              "output": "a: 4 rows\nb: timed out\na#1: bad date\na#2: bad account\na#3: bad amount\nABC-111: -$7.00\nno account XYZ-999\nbad account nope"
+            },
+            {
+              "input": "timeout=100\n---\nonly 0 2026-05-01,ACC-001,10;2026-04-01,ACC-001,-4;2026-06-01,ACC-001,1\n---\nstatement ACC-001 2\nstatement ACC-001\nmonths\ntop 5",
+              "output": "2026-04-01 -$4.00 -$4.00\n2026-05-01 +$10.00 $6.00\n2026-04-01 -$4.00 -$4.00\n2026-05-01 +$10.00 $6.00\n2026-06-01 +$1.00 $7.00\n2026-04 in $0.00 out $4.00\n2026-05 in $10.00 out $0.00\n2026-06 in $1.00 out $0.00\nACC-001 $7.00"
+            },
+            {
+              "input": "timeout=10\n---\nslow 11 2026-01-01,AAA-000,1\n---\nsources\ntop 3\nerrors\nstatement AAA-000",
+              "output": "slow: timed out\nno errors\nno account AAA-000"
+            },
+            {
+              "input": "timeout=5\n---\nx 1 2024-02-29,LEP-029,29.02;2023-02-28,LEP-029,-0.02\ny 2 2024-02-29,LEP-030,1\n---\ntop 2\nstatement LEP-029 1\nmonths\nsources",
+              "output": "LEP-029 $29.00\nLEP-030 $1.00\n2023-02-28 -$0.02 -$0.02\n2023-02 in $0.00 out $0.02\n2024-02 in $30.02 out $0.00\nx: 2 rows\ny: 1 row"
+            }
+          ],
+          "strictness": "strict+indexed"
+        }
       }
     ]
   },

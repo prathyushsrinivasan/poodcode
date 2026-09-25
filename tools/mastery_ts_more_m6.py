@@ -1987,3 +1987,410 @@ TS_CARDS_MORE[26] = [
     ("How do you consume an async generator?", "`for await (const x of gen())`, or `await Array.fromAsync(gen())` for a finite one."),
     ("How do you make async output deterministic in tests?", "Order results by input index (`Promise.all`), and drive time with a virtual clock rather than real timers."),
 ]
+
+# ===========================================================================
+# Week 27 (optional) — Capstone & mock interview
+# ===========================================================================
+
+TS_PROBLEM_SETS[27] = [
+    _tsp(27, "tsm-w27-top-words", "Mock interview 1: the k most frequent words", "core",
+         "The first input line is k; the rest is text. Count words case-insensitively (a word is a run of letters or apostrophes) and print the k most frequent as `<word> <count>`, most frequent first, ties alphabetical. If there are fewer than k distinct words, print them all. Say your complexity out loud before you code: this should be O(n log n) or better.",
+         r"""
+const [kText = "0", ...lines] = input.split("\n");
+const k = Number(kText);
+const counts = new Map<string, number>();
+for (const word of lines.join(" ").toLowerCase().match(/[a-z']+/g) ?? []) counts.set(word, (counts.get(word) ?? 0) + 1);
+const ranked = [...counts].sort(([a, x], [b, y]) => y - x || a.localeCompare(b)).slice(0, k);
+for (const [word, n] of ranked) console.log(`${word} ${n}`);
+""", ["2\nthe cat and the hat\nand the bat", "5\nOne fish, two fish.", "1\nb a"],
+         hints=["A `Map<string, number>` of counts, then one sort with a tie-break.",
+                "For very large inputs and small k, a size-k heap is O(n log k) — mention it even if you sort."]),
+    _tsp(27, "tsm-w27-intervals", "Mock interview 2: insert and merge intervals", "core",
+         "The first input line is a list of intervals `a-b` (inclusive, possibly overlapping, unsorted); each later line is a new interval to insert. After each insertion print the merged, sorted list as `a-b a-b …` and `covered <total length>` (the number of integer points covered). Type intervals as readonly tuples `readonly [start: number, end: number]` and never mutate the input list.",
+         r"""
+type Interval = readonly [start: number, end: number];
+const parse = (t: string): Interval => {
+  const [a = "0", b = "0"] = t.split("-");
+  return [Math.min(Number(a), Number(b)), Math.max(Number(a), Number(b))];
+};
+function merge(intervals: readonly Interval[]): Interval[] {
+  const sorted = intervals.toSorted((x, y) => x[0] - y[0] || x[1] - y[1]);
+  const out: Interval[] = [];
+  for (const cur of sorted) {
+    const last = out.at(-1);
+    if (last !== undefined && cur[0] <= last[1] + 1) out[out.length - 1] = [last[0], Math.max(last[1], cur[1])];
+    else out.push(cur);
+  }
+  return out;
+}
+const [first = "", ...inserts] = input.split("\n");
+let current: readonly Interval[] = merge(first.trim().split(/\s+/).map(parse));
+for (const line of inserts) {
+  current = merge([...current, parse(line.trim())]);
+  console.log(current.map(([a, b]) => `${a}-${b}`).join(" "));
+  console.log(`covered ${current.reduce((s, [a, b]) => s + b - a + 1, 0)}`);
+}
+""", ["1-3 8-10 5-6\n4-4\n11-20\n0-100", "5-5\n1-2\n3-4"],
+         hints=["Sort by start, then extend the last merged interval while the next one overlaps or touches.",
+                "Labelled readonly tuples document the shape and stop accidental mutation."]),
+    _tsp(27, "tsm-w27-rate-limiter", "Mock interview 3: a sliding-window rate limiter", "core",
+         "Design `class RateLimiter` allowing at most `limit` requests per user in any window of `window` ms (a request at time t counts for the window (t - window, t]). The first input line is `limit window`; each later line is `<time> <user>` in non-decreasing time. Print `<time> <user> allowed` or `<time> <user> limited (retry at <t>)` — the earliest time a request would be allowed. Keep each user's timestamps in their own queue.",
+         r"""
+class RateLimiter {
+  readonly #limit: number;
+  readonly #window: number;
+  readonly #hits = new Map<string, number[]>();
+  constructor(limit: number, windowMs: number) {
+    this.#limit = limit;
+    this.#window = windowMs;
+  }
+  request(user: string, t: number): { allowed: true } | { allowed: false; retryAt: number } {
+    const hits = this.#hits.get(user) ?? [];
+    while (hits.length > 0 && (hits[0] ?? 0) <= t - this.#window) hits.shift();
+    this.#hits.set(user, hits);
+    if (hits.length < this.#limit) {
+      hits.push(t);
+      return { allowed: true };
+    }
+    return { allowed: false, retryAt: (hits[0] ?? t) + this.#window };
+  }
+}
+const [config = "", ...lines] = input.split("\n");
+const [limit = 1, windowMs = 1000] = config.trim().split(/\s+/).map(Number);
+const limiter = new RateLimiter(limit, windowMs);
+for (const line of lines) {
+  const [time = "0", user = ""] = line.trim().split(/\s+/);
+  const r = limiter.request(user, Number(time));
+  console.log(r.allowed ? `${time} ${user} allowed` : `${time} ${user} limited (retry at ${r.retryAt})`);
+}
+""", ["2 1000\n0 ana\n100 ana\n200 ana\n300 bo\n1000 ana\n1050 ana\n1101 ana", "1 10\n5 x\n5 x\n14 x\n15 x"],
+         hints=["A queue of timestamps per user; drop the ones that fell out of the window before deciding.",
+                "The earliest retry is when the oldest remaining hit leaves the window."]),
+    _tsp(27, "tsm-w27-event-sourcing", "Mock interview 4: rebuild state from events", "stretch",
+         "An account's history is a stream of events, one per input line: `<time> opened <owner>`, `<time> deposited <n>`, `<time> withdrew <n>`, `<time> renamed <owner>`, `<time> closed`, then queries `at <time>` (the state after every event up to and including that time). Model events as a discriminated union and state as the result of folding them with a pure `apply(state, event)`; an event that is invalid in the current state (a withdrawal beyond the balance, anything after `closed`, anything before `opened`) is skipped with `skipped <time> <kind>`. Print each query as `at <t>: <owner> <balance> <open|closed>` or `at <t>: no account`.",
+         r"""
+type Event =
+  | { kind: "opened"; t: number; owner: string }
+  | { kind: "deposited" | "withdrew"; t: number; amount: number }
+  | { kind: "renamed"; t: number; owner: string }
+  | { kind: "closed"; t: number };
+type State = { readonly owner: string; readonly balance: number; readonly open: boolean } | undefined;
+function apply(s: State, e: Event): State | "invalid" {
+  if (e.kind === "opened") return s === undefined ? { owner: e.owner, balance: 0, open: true } : "invalid";
+  if (s === undefined || !s.open) return "invalid";
+  switch (e.kind) {
+    case "deposited":
+      return { ...s, balance: s.balance + e.amount };
+    case "withdrew":
+      return e.amount > s.balance ? "invalid" : { ...s, balance: s.balance - e.amount };
+    case "renamed":
+      return { ...s, owner: e.owner };
+    case "closed":
+      return { ...s, open: false };
+  }
+}
+const events: Event[] = [];
+const queries: number[] = [];
+for (const line of input.split("\n")) {
+  const [a = "", b = "", c = ""] = line.trim().split(/\s+/);
+  if (a === "at") {
+    queries.push(Number(b));
+    continue;
+  }
+  const t = Number(a);
+  if (b === "opened" || b === "renamed") events.push({ kind: b, t, owner: c });
+  else if (b === "deposited" || b === "withdrew") events.push({ kind: b, t, amount: Number(c) });
+  else if (b === "closed") events.push({ kind: b, t });
+}
+const timeline: { t: number; state: State }[] = [];
+let state: State = undefined;
+for (const e of events) {
+  const next = apply(state, e);
+  if (next === "invalid") {
+    console.log(`skipped ${e.t} ${e.kind}`);
+    continue;
+  }
+  state = next;
+  timeline.push({ t: e.t, state });
+}
+for (const q of queries) {
+  const s = timeline.filter((x) => x.t <= q).at(-1)?.state;
+  console.log(s === undefined ? `at ${q}: no account` : `at ${q}: ${s.owner} ${s.balance} ${s.open ? "open" : "closed"}`);
+}
+""", ["1 deposited 5\n2 opened ana\n3 deposited 100\n4 withdrew 150\n5 withdrew 30\n6 renamed ana-lee\n7 closed\n8 deposited 1\nat 0\nat 3\nat 5\nat 6\nat 99",
+      "10 opened bo\n10 opened cy\nat 10\nat 9"],
+         hints=["A pure `apply` returning the next state (or a marker for invalid) makes replay-to-any-time trivial.",
+                "Record the state after each accepted event; a query picks the last one at or before its time."]),
+    _tsp_types(27, "tsm-w27-deep-partial", "Mock type puzzle 1: DeepPartial", "core",
+               "Write `DeepPartial<T>`: every property at every depth becomes optional; arrays keep their shape but their elements become deep-partial; functions are left alone.",
+               '''
+type DeepPartial<T> = T extends (...args: never[]) => unknown
+  ? T
+  : T extends readonly (infer E)[]
+    ? DeepPartial<E>[]
+    : T extends object
+      ? { [K in keyof T]?: DeepPartial<T[K]> }
+      : T;
+''', '''T extends (...args: never[]) => unknown
+  ? T
+  : T extends readonly (infer E)[]
+    ? DeepPartial<E>[]
+    : T extends object
+      ? { [K in keyof T]?: DeepPartial<T[K]> }
+      : T''',
+               '''
+type Config = { name: string; db: { host: string; ports: number[] }; tags: { id: number; label: string }[]; onLoad: () => void };
+type _1 = Expect<Equal<DeepPartial<Config>, {
+  name?: string;
+  db?: { host?: string; ports?: number[] };
+  tags?: { id?: number; label?: string }[];
+  onLoad?: () => void;
+}>>;
+''', hints=["Four cases, in order: functions, arrays, objects, primitives.", "Arrays: recurse into the element type."]),
+    _tsp_types(27, "tsm-w27-path-value", "Mock type puzzle 2: the value at a path", "stretch",
+               "Write `PathValue<T, P>`: the type found at the dotted path `P` inside `T` (`never` for a path that doesn't exist).",
+               '''
+type PathValue<T, P extends string> = P extends `${infer Head}.${infer Rest}`
+  ? Head extends keyof T
+    ? PathValue<T[Head], Rest>
+    : never
+  : P extends keyof T
+    ? T[P]
+    : never;
+''', '''P extends `${infer Head}.${infer Rest}`
+  ? Head extends keyof T
+    ? PathValue<T[Head], Rest>
+    : never
+  : P extends keyof T
+    ? T[P]
+    : never''',
+               '''
+type User = { name: string; address: { city: string; geo: { lat: number } }; tags: string[] };
+type _1 = Expect<Equal<PathValue<User, "name">, string>>;
+type _2 = Expect<Equal<PathValue<User, "address.geo.lat">, number>>;
+type _3 = Expect<Equal<PathValue<User, "address.zip">, never>>;
+type _4 = Expect<Equal<PathValue<User, "tags">, string[]>>;
+''', hints=["Split off the first segment with a template literal pattern and recurse on the rest.",
+            "Each segment must be a `keyof` the current type, or the answer is `never`."]),
+    _tsp_types(27, "tsm-w27-required-keys", "Mock type puzzle 3: required keys", "core",
+               "Write `RequiredKeys<T>`: the union of `T`'s keys that are *not* optional.",
+               '''
+type RequiredKeys<T> = { [K in keyof T]-?: {} extends Pick<T, K> ? never : K }[keyof T];
+''', "{ [K in keyof T]-?: {} extends Pick<T, K> ? never : K }[keyof T]",
+               '''
+type _1 = Expect<Equal<RequiredKeys<{ id: number; name?: string; email: string | undefined }>, "id" | "email">>;
+type _2 = Expect<Equal<RequiredKeys<{ a?: 1 }>, never>>;
+''', hints=["`{}` is assignable to `Pick<T, K>` exactly when `K` is optional.", "Map the optional ones to `never`, and don't forget `-?`."]),
+    _tsp_types(27, "tsm-w27-awaited-all", "Mock type puzzle 4: the type of Promise.all", "core",
+               "Write `AwaitedAll<T>`: for a tuple of values and promises, the tuple of what each resolves to — the result type of `Promise.all` — as a mutable tuple.",
+               '''
+type AwaitedAll<T extends readonly unknown[]> = { -readonly [K in keyof T]: Awaited<T[K]> };
+''', "{ -readonly [K in keyof T]: Awaited<T[K]> }",
+               '''
+type _1 = Expect<Equal<AwaitedAll<[Promise<number>, string, Promise<Promise<boolean>>]>, [number, string, boolean]>>;
+type _2 = Expect<Equal<AwaitedAll<readonly [Promise<"a">]>, ["a"]>>;
+type _3 = Expect<Equal<AwaitedAll<[]>, []>>;
+''', hints=["A mapped type over a tuple produces a tuple.", "`Awaited` unwraps nested promises; `-readonly` drops the modifier."]),
+]
+
+TS_PROJECTS[27] = _project(
+    27, "ledger.ts — the arc's final version",
+    "The six-month arc project, finished: a ledger that loads its sources concurrently with a timeout, parses every row into branded types with `Result`s, keeps its state private in a class, streams statements lazily with a generator, and never lets timing decide what it prints.",
+    ["The input has three sections separated by `---` lines: config (`timeout=<ms>`), sources (`<name> <delayMs> <row;row;…>` with rows `YYYY-MM-DD,ACC-123,amount`), and commands.",
+     "Load every source concurrently on a virtual clock: a source finishes after its delay, or times out at the timeout (a delay equal to the timeout still loads). Parse each loaded row with `Result`s — `bad date`, `bad account` (three capitals, `-`, three digits), `bad amount` (at most two decimals) — recording errors as `<source>#<row>: <problem>`; add good rows to the ledger in source input order.",
+     "Commands: `sources` (`<name>: <k> rows` — `row` for one — or `<name>: timed out`, in input order); `balance <acc>`; `statement <acc> [n]` (the first n lines — all by default — of `<date> <signed amount> <running balance>` in date order, produced by a generator); `top <n>` (accounts by balance, highest first, ties by id); `months` (`<YYYY-MM> in <x> out <y>`, sorted); `errors` (in load order, or `no errors`).",
+     "Money prints as `$12.00` / `-$3.50`; a bad account id in a command prints `bad account <x>`, and an unknown one `no account <x>`.",
+     "Use a branded `AccountId` and `Cents`, a `Ledger` class with `#private` transactions, and `Result<T, string>` for every parser."],
+    _VCLOCK + r"""
+declare const AccountBrand: unique symbol;
+declare const CentsBrand: unique symbol;
+type AccountId = string & { readonly [AccountBrand]: true };
+type Cents = number & { readonly [CentsBrand]: true };
+type Result<T, E = string> = { ok: true; value: T } | { ok: false; error: E };
+type Tx = { readonly date: string; readonly account: AccountId; readonly amount: Cents };
+const ok = <T>(value: T): Result<T, never> => ({ ok: true, value });
+const err = (error: string): Result<never> => ({ ok: false, error });
+const parseAccount = (s: string): Result<AccountId> => (/^[A-Z]{3}-\d{3}$/.test(s) ? ok(s as AccountId) : err("bad account"));
+function parseCents(s: string): Result<Cents> {
+  const m = /^(-?)(\d+)(?:\.(\d{1,2}))?$/.exec(s);
+  if (m === null) return err("bad amount");
+  const cents = Number(m[2] ?? "0") * 100 + Number((m[3] ?? "").padEnd(2, "0"));
+  return ok((m[1] === "-" ? -cents : cents) as Cents);
+}
+function parseDate(s: string): Result<string> {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s);
+  if (m === null) return err("bad date");
+  const [y, mo, d] = [Number(m[1]), Number(m[2]), Number(m[3])];
+  const date = new Date(Date.UTC(y, mo - 1, d));
+  return date.getUTCMonth() === mo - 1 && date.getUTCDate() === d ? ok(s) : err("bad date");
+}
+function parseTx(row: string): Result<Tx> {
+  const [d = "", a = "", amt = ""] = row.split(",").map((x) => x.trim());
+  const date = parseDate(d);
+  if (!date.ok) return date;
+  const account = parseAccount(a);
+  if (!account.ok) return account;
+  const amount = parseCents(amt);
+  if (!amount.ok) return amount;
+  return ok({ date: date.value, account: account.value, amount: amount.value });
+}
+const money = (c: number) => (c < 0 ? "-" : "") + "$" + (Math.abs(c) / 100).toFixed(2);
+
+class Ledger {
+  readonly #txs: Tx[] = [];
+  add(tx: Tx): void {
+    this.#txs.push(tx);
+  }
+  has(acc: AccountId): boolean {
+    return this.#txs.some((t) => t.account === acc);
+  }
+  balance(acc: AccountId): number {
+    return this.#txs.reduce((s, t) => s + (t.account === acc ? t.amount : 0), 0);
+  }
+  *statement(acc: AccountId): Generator<string> {
+    let running = 0;
+    for (const t of this.#txs.filter((x) => x.account === acc).toSorted((a, b) => a.date.localeCompare(b.date))) {
+      running += t.amount;
+      yield `${t.date} ${t.amount >= 0 ? "+" : ""}${money(t.amount)} ${money(running)}`;
+    }
+  }
+  accounts(): AccountId[] {
+    return [...new Set(this.#txs.map((t) => t.account))];
+  }
+  months(): [string, { in: number; out: number }][] {
+    const m = new Map<string, { in: number; out: number }>();
+    for (const t of this.#txs) {
+      const key = t.date.slice(0, 7);
+      const cur = m.get(key) ?? { in: 0, out: 0 };
+      m.set(key, t.amount >= 0 ? { ...cur, in: cur.in + t.amount } : { ...cur, out: cur.out - t.amount });
+    }
+    return [...m].sort(([a], [b]) => a.localeCompare(b));
+  }
+}
+
+const sections: string[][] = [[]];
+for (const line of input.split("\n")) {
+  if (line.trim() === "---") sections.push([]);
+  else if (line.trim() !== "") sections.at(-1)?.push(line.trim());
+}
+const [configLines = [], sourceLines = [], commands = []] = sections;
+const timeout = Number((configLines[0] ?? "timeout=100").split("=")[1] ?? "100");
+const sources = sourceLines.map((line) => {
+  const [name = "", delay = "0", rows = ""] = line.split(/\s+/);
+  return { name, delay: Number(delay), rows: rows.split(";").filter((r) => r !== "") };
+});
+
+async function loadSource(delay: number, rows: string[]): Promise<string[] | undefined> {
+  const work = new AbortController();
+  const timer = new AbortController();
+  const loaded = clock.sleep(delay, work.signal).then(() => {
+    timer.abort();
+    return rows;
+  }, () => undefined);
+  const timedOut = clock.sleep(timeout, timer.signal).then(() => {
+    work.abort();
+    return undefined;
+  }, () => undefined);
+  return Promise.race([loaded, timedOut]);
+}
+
+const ledger = new Ledger();
+const errors: string[] = [];
+const loaded: (string[] | undefined)[] = [];
+const done = Promise.all(sources.map((s) => loadSource(s.delay, s.rows))).then((results) => {
+  results.forEach((rows, i) => {
+    loaded.push(rows);
+    const name = sources[i]?.name ?? "?";
+    (rows ?? []).forEach((row, r) => {
+      const tx = parseTx(row);
+      if (tx.ok) ledger.add(tx.value);
+      else errors.push(`${name}#${r + 1}: ${tx.error}`);
+    });
+  });
+});
+await clock.run();
+await done;
+
+for (const command of commands) {
+  const [cmd = "", arg = "", n = ""] = command.split(/\s+/);
+  const account = (): AccountId | undefined => {
+    const r = parseAccount(arg);
+    if (!r.ok) console.log(`bad account ${arg}`);
+    else if (!ledger.has(r.value)) console.log(`no account ${arg}`);
+    else return r.value;
+    return undefined;
+  };
+  if (cmd === "sources") {
+    sources.forEach((s, i) => {
+      const rows = loaded[i];
+      console.log(rows === undefined ? `${s.name}: timed out` : `${s.name}: ${rows.length} ${rows.length === 1 ? "row" : "rows"}`);
+    });
+  } else if (cmd === "balance") {
+    const acc = account();
+    if (acc !== undefined) console.log(`${acc}: ${money(ledger.balance(acc))}`);
+  } else if (cmd === "statement") {
+    const acc = account();
+    if (acc !== undefined) {
+      const lines = n === "" ? ledger.statement(acc).toArray() : ledger.statement(acc).take(Number(n)).toArray();
+      for (const l of lines) console.log(l);
+    }
+  } else if (cmd === "top") {
+    const ranked = ledger.accounts().sort((a, b) => ledger.balance(b) - ledger.balance(a) || a.localeCompare(b));
+    for (const a of ranked.slice(0, Number(arg))) console.log(`${a} ${money(ledger.balance(a))}`);
+  } else if (cmd === "months") {
+    for (const [m, v] of ledger.months()) console.log(`${m} in ${money(v.in)} out ${money(v.out)}`);
+  } else if (cmd === "errors") {
+    if (errors.length === 0) console.log("no errors");
+    for (const e of errors) console.log(e);
+  }
+}
+""", ["timeout=50\n---\nbank 20 2026-01-05,CHK-001,2500;2026-01-09,CHK-001,-45.50;2026-02-01,SAV-002,500\ncards 40 2026-01-20,CHK-001,-120;2026-01-31,CRD-003,-60.25\nlate 90 2026-03-01,CHK-001,1\n---\nsources\nbalance CHK-001\nstatement CHK-001\ntop 2\nmonths\nerrors",
+      "timeout=30\n---\na 30 2026-02-30,ABC-111,5;2026-01-01,abc-111,5;2026-01-02,ABC-111,5.555;2026-01-03,ABC-111,-7\nb 31 2026-01-01,XYZ-999,1\n---\nsources\nerrors\nbalance ABC-111\nbalance XYZ-999\nbalance nope",
+      "timeout=100\n---\nonly 0 2026-05-01,ACC-001,10;2026-04-01,ACC-001,-4;2026-06-01,ACC-001,1\n---\nstatement ACC-001 2\nstatement ACC-001\nmonths\ntop 5",
+      "timeout=10\n---\nslow 11 2026-01-01,AAA-000,1\n---\nsources\ntop 3\nerrors\nstatement AAA-000",
+      "timeout=5\n---\nx 1 2024-02-29,LEP-029,29.02;2023-02-28,LEP-029,-0.02\ny 2 2024-02-29,LEP-030,1\n---\ntop 2\nstatement LEP-029 1\nmonths\nsources"],
+    rubric=["Every parser returns a `Result`; nothing in the parsing path throws",
+            "Branded `AccountId`/`Cents` are created only by their parsers",
+            "The ledger's transactions are `#private`; callers can read, never write",
+            "No output depends on real time — only on the virtual clock",
+            "No `any` anywhere; every function has a typed signature"],
+    stretch=["Split it into modules (`money.ts`, `parse.ts`, `ledger.ts`, `load.ts`, `main.ts`) with `import type` where it applies.",
+             "Add `using`-managed resources for the sources and print when each is released."],
+)
+
+TS_PRACTICE_MORE[27] = [
+    _fx("tsm-w27-f1", "Code review: a sort that edits the caller's data",
+        "Print the top score, then the scores in their original order. The original order comes out sorted.",
+        _STDIN + 'const scores = input.split(" ").map(Number);\nfunction top(xs: number[]): number {\n  return xs.sort((a, b) => b - a)[0] ?? 0;\n}\nconsole.log(top(scores));\nconsole.log(scores.join(" "));\n',
+        _STDIN + 'const scores = input.split(" ").map(Number);\nfunction top(xs: readonly number[]): number {\n  return xs.toSorted((a, b) => b - a)[0] ?? 0;\n}\nconsole.log(top(scores));\nconsole.log(scores.join(" "));\n',
+        [("3 9 4", "9\n3 9 4"), ("5", "5\n5")], strictness=_SI,
+        hints=["`sort` sorts in place — the review comment is \"this mutates its argument\".", "Take `readonly number[]` and use `toSorted`."]),
+    _fx("tsm-w27-f2", "Code review: money in floating point",
+        "Print the total of the prices, to two decimals, and whether it equals the expected total on the first line. Totals that should match don't.",
+        _STDIN + 'const [expected = "0", ...prices] = input.split(" ");\nconst total = prices.map(Number).reduce((a, b) => a + b, 0);\nconsole.log(total.toFixed(2), total === Number(expected));\n',
+        _STDIN + 'const [expected = "0", ...prices] = input.split(" ");\nconst cents = (s: string) => Math.round(Number(s) * 100);\nconst total = prices.map(cents).reduce((a, b) => a + b, 0);\nconsole.log((total / 100).toFixed(2), total === cents(expected));\n',
+        [("0.3 0.1 0.2", "0.30 true"), ("1.15 0.5 0.65", "1.15 true")], strictness=_SI,
+        hints=["`0.1 + 0.2 !== 0.3` in floating point.", "Compare integer cents."], difficulty="Medium"),
+    _fx("tsm-w27-f3", "Code review: `||` where `??` was meant",
+        "Print each item's quantity, defaulting to 1 only when no quantity was given (`-`). A quantity of 0 becomes 1.",
+        _STDIN + 'const qty = input.split(" ").map((t) => (t === "-" ? undefined : Number(t)));\nconsole.log(qty.map((q) => q || 1).join(" "));\n',
+        _STDIN + 'const qty = input.split(" ").map((t) => (t === "-" ? undefined : Number(t)));\nconsole.log(qty.map((q) => q ?? 1).join(" "));\n',
+        [("3 - 0", "3 1 0"), ("0", "0")], strictness=_SI,
+        hints=["`||` replaces every falsy value, including `0`.", "`??` replaces only `null` and `undefined`."]),
+    _dx("tsm-w27-d1", "Code review: an `any` that hid a bug",
+        "error TS2339: Property 'toUpperCase' does not exist on type 'string | number'.",
+        _STDIN + 'function label(value: string | number): string {\n  return value.toUpperCase();\n}\nconsole.log(input.split(" ").map((t) => label(/^\\d+$/.test(t) ? Number(t) : t)).join(" "));\n',
+        _STDIN + 'function label(value: string | number): string {\n  return typeof value === "number" ? `#${value}` : value.toUpperCase();\n}\nconsole.log(input.split(" ").map((t) => label(/^\\d+$/.test(t) ? Number(t) : t)).join(" "));\n',
+        [("ab 12 cd", "AB #12 CD"), ("7", "#7")], strictness=_SI,
+        ask="Numbers should print as `#<n>`, words upper-cased. (The original code typed `value` as `any`, and this crashed in production.)",
+        hints=["Narrow the union before calling a string method.", "`typeof value === \"number\"`."], difficulty="Medium"),
+]
+
+TS_CARDS_MORE[27] = [
+    ("Mock interview: how do you open a coding question?", "Restate it, confirm the input/output shapes and edge cases, state a brute force and its complexity, then improve."),
+    ("Mock interview: `interface` or `type`?", "Interchangeable for object shapes; `interface` merges and extends cheaply, `type` handles unions, mapped and conditional types. Pick one convention and say why."),
+    ("Mock interview: how do you type untrusted JSON?", "Parse to `unknown`, validate at the boundary with a guard or schema, and let the inferred type flow inward — never `as T`."),
+    ("Mock interview: what is structural typing's biggest surprise?", "Extra properties pass silently (except fresh literals), so types never guarantee a value has *only* what they list."),
+    ("Mock interview: how do you make async output testable?", "Inject the clock and the I/O, order results by input index, and never assert on real timing."),
+    ("Mock interview: when would you reach for a branded type?", "When two values share a representation but must never be mixed — ids, units, validated strings — at zero runtime cost."),
+]

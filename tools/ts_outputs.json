@@ -212,6 +212,16 @@
    "t=1 lonely attempt 1 error\nt=2 lonely attempt 2 error\nt=3 lonely attempt 3 error\nt=4 lonely attempt 4 error\nlonely: failed (error) after 4 attempts\ndone at t=4, 0/1 loaded"
   ]
  },
+ "project-w27": {
+  "hash": "72af0fa5266ca0fd66d3",
+  "outputs": [
+   "bank: 3 rows\ncards: 2 rows\nlate: timed out\nCHK-001: $2334.50\n2026-01-05 +$2500.00 $2500.00\n2026-01-09 -$45.50 $2454.50\n2026-01-20 -$120.00 $2334.50\nCHK-001 $2334.50\nSAV-002 $500.00\n2026-01 in $2500.00 out $225.75\n2026-02 in $500.00 out $0.00\nno errors",
+   "a: 4 rows\nb: timed out\na#1: bad date\na#2: bad account\na#3: bad amount\nABC-111: -$7.00\nno account XYZ-999\nbad account nope",
+   "2026-04-01 -$4.00 -$4.00\n2026-05-01 +$10.00 $6.00\n2026-04-01 -$4.00 -$4.00\n2026-05-01 +$10.00 $6.00\n2026-06-01 +$1.00 $7.00\n2026-04 in $0.00 out $4.00\n2026-05 in $10.00 out $0.00\n2026-06 in $1.00 out $0.00\nACC-001 $7.00",
+   "slow: timed out\nno errors\nno account AAA-000",
+   "LEP-029 $29.00\nLEP-030 $1.00\n2023-02-28 -$0.02 -$0.02\n2023-02 in $0.00 out $0.02\n2024-02 in $30.02 out $0.00\nx: 2 rows\ny: 1 row"
+  ]
+ },
  "project-w3": {
   "hash": "9d28b0d98d13e4095c99",
   "outputs": [
@@ -5517,6 +5527,35 @@
   "outputs": [
    "users: loaded in 20ms\nposts: timed out after 50ms\nstats: timed out after 50ms\nlogo: loaded in 5ms\ndone at t=50",
    "slow: timed out after 10ms\ndone at t=10"
+  ]
+ },
+ "tsm-w27-event-sourcing": {
+  "hash": "b734e226de4b1e40a30f",
+  "outputs": [
+   "skipped 1 deposited\nskipped 4 withdrew\nskipped 8 deposited\nat 0: no account\nat 3: ana 100 open\nat 5: ana 70 open\nat 6: ana-lee 70 open\nat 99: ana-lee 70 closed",
+   "skipped 10 opened\nat 10: bo 0 open\nat 9: no account"
+  ]
+ },
+ "tsm-w27-intervals": {
+  "hash": "a72ffdc2a45cf6503ede",
+  "outputs": [
+   "1-6 8-10\ncovered 9\n1-6 8-20\ncovered 19\n0-100\ncovered 101",
+   "1-2 5-5\ncovered 3\n1-5\ncovered 5"
+  ]
+ },
+ "tsm-w27-rate-limiter": {
+  "hash": "fc3eaac0f85f53836dd9",
+  "outputs": [
+   "0 ana allowed\n100 ana allowed\n200 ana limited (retry at 1000)\n300 bo allowed\n1000 ana allowed\n1050 ana limited (retry at 1100)\n1101 ana allowed",
+   "5 x allowed\n5 x limited (retry at 15)\n14 x limited (retry at 15)\n15 x allowed"
+  ]
+ },
+ "tsm-w27-top-words": {
+  "hash": "0f13c84a51ff6a18a99d",
+  "outputs": [
+   "the 3\nand 2",
+   "fish 2\none 1\ntwo 1",
+   "a 1"
   ]
  },
  "tsm-w3-armstrong": {

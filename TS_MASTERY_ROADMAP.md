@@ -809,7 +809,7 @@ concurrency and cancellation.
 
 ---
 
-**Status, 2026-09-26 — Part B's content is built for all 26 core weeks.** TypeScript Learn chapters: **87** (the target), with 301 Learn exercises and 265 chapter quiz questions. Mastery TS track: 253 problem-set problems (37 type-graded), 198 practice exercises, 26 runnable projects, 945 week-bank quiz questions, 521 review cards, 219 final tests, 6 checkpoint contests. Still open from Part A and the targets above: the ~1,300-exercise and ~1,000-card volumes, alternate finals (X-33), two-part finals (X-34), the programme final exam (X-36), the multi-file workspace (X-45), the visualisers and UI items (M1-02, M3-01, M5-01, M6-01, X-60 onward), and week 27's capstone and mock-interview kit.
+**Status, 2026-09-26 — Part B's content is built for all 26 core weeks.** TypeScript Learn chapters: **87** (the target), with 301 Learn exercises and 265 chapter quiz questions. Mastery TS track: 261 problem-set problems (41 type-graded), 202 practice exercises, 27 runnable projects, 945 week-bank quiz questions, 521 review cards, 219 final tests, 6 checkpoint contests. Still open from Part A and the targets above: the ~1,300-exercise and ~1,000-card volumes, alternate finals (X-33), two-part finals (X-34), the programme final exam (X-36), the multi-file workspace (X-45), and the visualisers and UI items (M1-02, M3-01, M5-01, M6-01, X-60 onward). Optional week 27 now has its capstone (the arc's final `ledger.ts`: branded ids, `Result` parsing, a private-state class with a generator statement, concurrent loading with timeouts on the virtual clock), a four-problem mock-interview set with four type puzzles, and code-review practice; the 60-question interview bank and the three timed sessions are still to do.
 
 ---
 
