@@ -57,13 +57,6 @@ _PATHS = (
 )
 
 
-def _typed(eid, title, prompt, full, blank, asserts, tests, hints=(), difficulty="Medium"):
-    """A runtime drill whose hidden harness ALSO carries type assertions — graded on
-    stdout and on the assertions, like `_design`, but blanking implementation."""
-    return _mk(eid, title, prompt, full, tests, hints, difficulty, "drill", blank=blank,
-               harness=_TYPE_PRELUDE + "\n" + _prog(asserts))
-
-
 # --- Week 30 --------------------------------------------------------------
 _WEEKS.append(_week(
     30, 8, _M8,

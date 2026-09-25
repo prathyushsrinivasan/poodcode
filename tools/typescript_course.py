@@ -364,6 +364,15 @@ def _design(eid, title, prompt, full, blank, asserts, tests, hints=(),
                blank=blank, harness=_TYPE_PRELUDE + "\n" + _prog(asserts))
 
 
+def _typed(eid, title, prompt, full, blank, asserts, tests, hints=(), difficulty="Medium"):
+    """A runtime drill whose hidden harness ALSO carries type assertions — graded on
+    stdout and on the assertions, like `_design`, but blanking implementation
+    rather than a type. Added for month 8, where the point of a computed type is
+    that running code receives it (weeks 30-31)."""
+    return _mk(eid, title, prompt, full, tests, hints, difficulty, "drill", blank=blank,
+               harness=_TYPE_PRELUDE + "\n" + _prog(asserts))
+
+
 def _lesson(key, title, what, lesson_md, exercises, warmup=None, quiz=None):
     return {"key": key, "title": title, "what": what,
             "lesson": _prog(lesson_md) if lesson_md else "",
@@ -493,6 +502,7 @@ _WEEK_FILES = (
     "ts_w28_heaps.py",         #          heaps & intervals
     "ts_w29_mapped.py",        # Month 8 — conditional & mapped types
     "ts_w30_template.py",      #          inference & template literal types
+    "ts_w31_challenges.py",    #          type-level challenges
 )
 
 for _week_file in _WEEK_FILES:
@@ -560,8 +570,6 @@ for _week_file in _WEEK_FILES:
 _WEEKS += [
 ]
 _WEEKS += [
-    _skel(31, 8, _M8, "Type-Level Challenges",
-          "Solve 'type gymnastics' puzzles the way interviewers pose them."),
     _skel(32, 8, _M8, "Mock Interview Week",
           "Put it together under time: DSA solved in TypeScript plus type challenges."),
 ]

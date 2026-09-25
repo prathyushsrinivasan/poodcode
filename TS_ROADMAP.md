@@ -1,8 +1,8 @@
-# TypeScript Roadmap — Weeks 31-32
+# TypeScript Roadmap — Week 32
 
 The plan for finishing **TypeScript: Zero to Interview**, the 8-month course in
-`tools/typescript_course.py`. Weeks 1-30 ship; weeks 31-32 are one-line
-skeletons waiting to be authored.
+`tools/typescript_course.py`. Weeks 1-31 ship; week 32 is a one-line
+skeleton waiting to be authored.
 
 Unlike [`JAVA_ROADMAP.md`](JAVA_ROADMAP.md), which starts after the basics, this
 course starts at *zero* — week 1 is someone's first line of code. That decision
@@ -15,7 +15,7 @@ rule that nothing may require syntax a later week teaches.
 
 ## Where it stands
 
-**Built:** weeks 1-30 — **230 lessons, 1,626 judged exercises** (1,611 in lessons
+**Built:** weeks 1-31 — **237 lessons, 1,654 judged exercises** (1,639 in lessons
 and capstones, 15 in week 1's practice families), twenty Budget Buddy capstones —
 **the arc is complete** — eight interview reps, and a full
 glossary/cheat-sheet/self-check/review set per week. **Months 6 and 7 are finished.**
@@ -55,8 +55,8 @@ is the stuff that is only obvious after it has cost you an hour.
 
 | | covers | last run |
 |---|---|---|
-| `python tools/verify_ts_course.py --starters` | weeks 1-23 in full; **weeks 24-30 one at a time (`--only=wNN-`), 0 failures each** | current |
-| `cd src-tauri && cargo test --release --test verify_ts_course` | **weeks 1-28 (batch F's closing run), 1,557 exercises, 3 tests, all green** | weeks 29-30 not yet |
+| `python tools/verify_ts_course.py --starters` | weeks 1-23 in full; **weeks 24-31 one at a time (`--only=wNN-`), 0 failures each** | current |
+| `cd src-tauri && cargo test --release --test verify_ts_course` | **weeks 1-28 (batch F's closing run), 1,557 exercises, 3 tests, all green** | weeks 29-31 not yet |
 
 The Rust suite is the judge-level one — it puts every program through the same
 judge the app uses, rather than through the fast Node path. The old gap (weeks
@@ -88,7 +88,7 @@ verifier revealed which kind they were.
 ### Nothing is half-finished
 
 Every authored week is complete: lessons, exercises, capstone, stretch, glossary,
-cheat sheet, self-check, review, milestone. Weeks 31-32 are untouched skeletons, as
+cheat sheet, self-check, review, milestone. Week 32 is an untouched skeleton, as
 they were before. There is no partially-authored week and no disabled exercise.
 
 ### Five traps that cost real time
@@ -991,7 +991,7 @@ change where no such argument exists.
 All 34 expected outputs were right first time; three `fix` prompts misquoted their
 starters' output and were corrected from real runs.
 
-### Month 8 — Advanced Types & Interview Polish (weeks 29-32) — 🚧 **29-30 done**
+### Month 8 — Advanced Types & Interview Polish (weeks 29-32) — 🚧 **29-31 done**
 
 **29. Conditional & Mapped Types** ✅ · `tools/ts_w29_mapped.py` · 7 lessons,
 35 exercises (25 type-graded)
@@ -1067,9 +1067,43 @@ Four new scope rules: `Uppercase<`, `Lowercase<`, `Capitalize<`, `Uncapitalize<`
 Every expected output and `fix` prompt was right first time; one quiz question was
 caught garbled in review before generation.
 
-**31. Type-Level Challenges** ⬜ · reuse `ts_type_level`
-Recursive types · tuple manipulation · depth limits and why they exist ·
-type-challenges-style puzzles.
+**31. Type-Level Challenges** ✅ · `tools/ts_w31_challenges.py` · 7 lessons,
+28 exercises (21 type-graded)
+`w31-tuples` · `w31-count` · `w31-limits` · `w31-recursive` · `w31-unions` ·
+`w31-puzzles` · `w31-library`.
+*Capstone:* **Library #3 — the typed event emitter** decision 2 named: one events
+map (`{ purchase: [user: string, cents: number] }`) types both `on` and `emit`, so a
+missing argument and an unknown event name both fail to compile (the harness proves
+each with `@ts-expect-error`). The class stores listeners in a mapped type keyed by
+event and needs **no casts at all** — the week's quiet contrast with the router's one
+boundary cast. Stretch: `off` and `once`, where `emit` iterates a copy so a listener
+can remove itself mid-loop.
+Kinds: 24 drill (mostly type-graded), 1 diagnose, 1 fix.
+
+**The depth limits were measured, not quoted.** Against the course's checker: a
+tail-recursive conditional type reaches depth **999** (1,000 is TS2589); a non-tail
+one, with work wrapped around the recursive call, only **40** (49 fails). Lesson 3 is
+built on that 25-fold gap, framed as week 25's accumulator rewrite done by the
+compiler, and its diagnose is the non-tail `Repeat` failing at 60 with the real
+**TS2589** message — fixed by moving the string into an accumulator parameter.
+
+**`Includes` needs identity, and says so.** `H extends U` gets `Includes<[boolean],
+true>` wrong (true is assignable to boolean). Rather than letting the solution lean
+on the hidden harness's `Equal` (which would compile, because type declarations are
+hoisted — a trap), the program declares its own `Same<X, Y>` in plain sight.
+
+**Every puzzle was probed first**, including `UnionToIntersection` (explained through
+week 12's contravariance rather than presented as magic), `Permutation` (n! again,
+computed by the compiler), `RequiredKeys` and `Subtract` returning `never` when the
+answer would be negative.
+
+**One structural change:** week 30's `_typed` helper moved into the parent
+`typescript_course.py`, because week 31 reuses it and a week file must never depend
+on another. Verified output-neutral: the regenerated seed was byte-identical before
+week 31 was added.
+
+One expected output was miscounted by hand (`events 7` for 6 — login 1 + purchases
+2 + 2 + logout 1) and corrected from the reference.
 
 **Weeks 29-31 are the lowest-risk content in the whole back half** — they are
 graded entirely by `judge_mode: "types"`, which is proven and needs no runtime
@@ -1097,7 +1131,7 @@ still go first.
 | **D** ✅ | 17-20 | Async + data structures; the Budget Buddy arc is closed |
 | **E** ✅ | 21-24 | Algorithmic thinking; the month's idiom is to count operations |
 | **F** ✅ | 25-28 | DSA core |
-| **G** 🚧 | 29-30 ✅, **31** ← next | Type-level; lowest risk, highest polish |
+| **G** 🚧 | 29-31 ✅, **32** ← next | Type-level; lowest risk, highest polish |
 
 **Batches C and D are done, and with them every risk the back half was waiting
 on**: the one-file module problem (settled with evidence — week 16), async
