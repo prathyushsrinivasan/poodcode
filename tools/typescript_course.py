@@ -503,6 +503,7 @@ _WEEK_FILES = (
     "ts_w29_mapped.py",        # Month 8 — conditional & mapped types
     "ts_w30_template.py",      #          inference & template literal types
     "ts_w31_challenges.py",    #          type-level challenges
+    "ts_w32_mock.py",          #          mock interview week
 )
 
 for _week_file in _WEEK_FILES:
@@ -560,19 +561,17 @@ for _week_file in _WEEK_FILES:
 #   weeks 11-20  Budget Buddy #11-#20, ending with the category tree.
 #   weeks 21-28  interview reps — a timed problem in the week's technique,
 #                judged the same way, with no pretence of being a product.
-#   weeks 29-32  a small typed library built from the type-level material
-#                (DeepReadonly, a typed event emitter, a router whose paths are
-#                parsed by template literal types).
+#   weeks 29-31  a small typed library built from the type-level material
+#                (the config module, a router whose paths are parsed by template
+#                literal types, and a typed event emitter).
+#   week 32      a mock interview: judged rounds, and a self-scored brief.
 #
 # Each week's `milestone` string is what carries this narrative to the learner,
 # so it is worth writing the milestone before the lessons.
+#
+# Every week is now authored: `_WEEK_FILES` above lists all 32, and no skeleton
+# remains. `_skel` is kept for a future course that grows the same way.
 # ===========================================================================
-_WEEKS += [
-]
-_WEEKS += [
-    _skel(32, 8, _M8, "Mock Interview Week",
-          "Put it together under time: DSA solved in TypeScript plus type challenges."),
-]
 
 
 # ===========================================================================

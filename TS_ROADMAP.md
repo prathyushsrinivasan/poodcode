@@ -1,8 +1,9 @@
-# TypeScript Roadmap — Week 32
+# TypeScript Roadmap — complete
 
 The plan for finishing **TypeScript: Zero to Interview**, the 8-month course in
-`tools/typescript_course.py`. Weeks 1-31 ship; week 32 is a one-line
-skeleton waiting to be authored.
+`tools/typescript_course.py` — and now the record of how it was finished. **All 32
+weeks ship**; no skeleton remains. What is left is optional (see "After the course"
+at the end).
 
 Unlike [`JAVA_ROADMAP.md`](JAVA_ROADMAP.md), which starts after the basics, this
 course starts at *zero* — week 1 is someone's first line of code. That decision
@@ -15,14 +16,15 @@ rule that nothing may require syntax a later week teaches.
 
 ## Where it stands
 
-**Built:** weeks 1-31 — **237 lessons, 1,654 judged exercises** (1,639 in lessons
-and capstones, 15 in week 1's practice families), twenty Budget Buddy capstones —
-**the arc is complete** — eight interview reps, and a full
-glossary/cheat-sheet/self-check/review set per week. **Months 6 and 7 are finished.**
+**Built: all 32 weeks — 244 lessons, 1,680 judged exercises** (1,665 in lessons and
+capstones, 15 in week 1's practice families): twenty Budget Buddy capstones (weeks
+1-20), eight interview reps (weeks 21-28), three typed-library modules (weeks 29-31)
+and a mock interview (week 32), each week with a full
+glossary/cheat-sheet/self-check/review set.
 
 | | |
 |---|---|
-| Content generator | `tools/typescript_course.py` (~690 lines) + one `ts_wNN_*.py` per week |
+| Content generator | `tools/typescript_course.py` (~720 lines) + one `ts_wNN_*.py` per week |
 | Practice | `tools/ts_pNN_practice.py`, optional, one per week |
 | Generated seed | `src-tauri/seeds/ts_course.json` |
 | UI | `src/pages/Course.tsx` (shared with the Java course), route `/ts-course` |
@@ -55,24 +57,28 @@ is the stuff that is only obvious after it has cost you an hour.
 
 | | covers | last run |
 |---|---|---|
-| `python tools/verify_ts_course.py --starters` | weeks 1-23 in full; **weeks 24-31 one at a time (`--only=wNN-`), 0 failures each** | current |
-| `cd src-tauri && cargo test --release --test verify_ts_course` | **weeks 1-28 (batch F's closing run), 1,557 exercises, 3 tests, all green** | weeks 29-31 not yet |
+| `python tools/verify_ts_course.py --starters` | **all 32 weeks, 1,680 exercises, 0 failures** (every `fix` starter confirmed failing), about 30 min | current |
+| `cd src-tauri && cargo test --release --test verify_ts_course` | **all 32 weeks, 1,680 exercises, 3 tests, 840 s, all green** | current |
+
+Both were run **in full, one after the other, with nothing else on the machine**,
+once week 32 landed — batch G's closing pair, and the course's.
 
 The Rust suite is the judge-level one — it puts every program through the same
-judge the app uses, rather than through the fast Node path. The old gap (weeks
-22-23 never judge-verified) is closed. The suite now runs **once per batch**, as
-"Verification will get slow" recommends, started in the background right after a
-batch's last week is committed; weeks 29-30 landed after it and are covered by the
-Python verifier until batch G's closing run. Each new week was verified alone,
-which is sufficient because adding a week leaves every earlier week of the seed
-**byte-identical** (checked by comparing each week's JSON against the previous
-commit's).
+judge the app uses, rather than through the fast Node path. During weeks 24-32 it ran
+**once per batch** (as "Verification will get slow" recommends), and each new week was
+verified alone with `--only=wNN-`, which was sufficient because adding a week leaves
+every earlier week of the seed **byte-identical** (checked by comparing each week's
+JSON against the previous commit's).
 
-**Timing, recorded honestly:** the weeks 1-25 run took 914 s; the weeks 1-28 run took
-**6,545 s**, because it shared the machine with the authoring of weeks 29-30 (the
-Python verifier and `gen_seed.py` both spawn Node). Nothing failed — the judge's
-timeouts are generous — but it is the memory note "run judge-heavy suites alone"
-measured: alone, expect about 15 minutes.
+**Timing, recorded honestly:** alone, the judge suite takes 840-914 s. One mid-way
+run (weeks 1-28) took **6,545 s** because it shared the machine with the authoring of
+weeks 29-30 — the Python verifier and `gen_seed.py` both spawn Node. Nothing failed,
+since the judge's timeouts are generous, but it is the note "run judge-heavy suites
+alone" measured.
+
+The Python verifier's informational note still lists **32 `fix` starters that fail at
+compile time rather than run time** — the same 32 as before, none of them from weeks
+24-32.
 
 One thing to know before running it: the test `include_str!`s `ts_course.json` at
 **compile time**. A run already in progress when you regenerate the seed is
@@ -87,9 +93,9 @@ verifier revealed which kind they were.
 
 ### Nothing is half-finished
 
-Every authored week is complete: lessons, exercises, capstone, stretch, glossary,
-cheat sheet, self-check, review, milestone. Week 32 is an untouched skeleton, as
-they were before. There is no partially-authored week and no disabled exercise.
+Every week is complete: lessons, exercises, capstone, stretch, glossary, cheat
+sheet, self-check, review, milestone. There is no partially-authored week, no
+skeleton, and no disabled exercise.
 
 ### Five traps that cost real time
 
@@ -991,7 +997,7 @@ change where no such argument exists.
 All 34 expected outputs were right first time; three `fix` prompts misquoted their
 starters' output and were corrected from real runs.
 
-### Month 8 — Advanced Types & Interview Polish (weeks 29-32) — 🚧 **29-31 done**
+### Month 8 — Advanced Types & Interview Polish (weeks 29-32) — ✅ **done**
 
 **29. Conditional & Mapped Types** ✅ · `tools/ts_w29_mapped.py` · 7 lessons,
 35 exercises (25 type-graded)
@@ -1105,16 +1111,48 @@ week 31 was added.
 One expected output was miscounted by hand (`events 7` for 6 — login 1 + purchases
 2 + 2 + logout 1) and corrected from the reference.
 
-**Weeks 29-31 are the lowest-risk content in the whole back half** — they are
-graded entirely by `judge_mode: "types"`, which is proven and needs no runtime
-determinism, no stdout, and no test cases. If momentum is ever needed, these
-are the weeks to author.
+**The prediction held, with one amendment.** Weeks 29-31 were the lowest-risk weeks
+of the back half — 68 of their 97 exercises are type-graded, and only one expected
+output was wrong across all three. The amendment: each also puts its types back onto
+running code (lesson 6 of week 29, the `_typed` drills of 30-31, and all three
+capstones), graded on stdout *and* assertions, because a type-level trick that never
+meets a value is a puzzle rather than a tool.
 
-**32. Mock Interview Week** ⬜
-*Open question:* the app has no timer, so "under time" cannot be enforced.
-Either make this a `brief` (unjudged) capstone with a self-scored rubric — the
-`_cap_brief` helper already exists and is currently unused by the course — or
-lean on the Mastery track's judged final, which already does timed assessment.
+**32. Mock Interview Week** ✅ · `tools/ts_w32_mock.py` · 7 lessons, 26 exercises —
+**the last week**
+`w32-method` · `w32-round1` · `w32-round2` · `w32-round3` · `w32-round4` ·
+`w32-typescript` · `w32-last`.
+*Capstone:* **The full mock** — the course's first `_cap_brief`: three unseen problems,
+ninety minutes, the seven-step routine said aloud, and a nine-item checklist scored
+0-2 per problem. Its reference is a narrated strong answer to one round-1 problem,
+step by step. *Stretch (judged):* the median of two sorted arrays.
+Kinds: 20 function problems (`_fn`), 2 diagnose, 1 design, 1 retype, 1 type drill.
+
+**The open question is settled by doing both, each where it is strong.** The judge
+cannot keep time, so the five *rounds* are judged `_fn` problems — the learner writes
+only the function, and the return value is graded, which is how interviewers pose
+problems — each with a time box in its title that the learner keeps. The *capstone*
+is the self-scored brief the roadmap proposed, because the thing it practises (the
+whole loop, including talking) cannot be judged by stdout. The Mastery track's timed
+final is pointed to from lesson 1 for anyone who wants a clock the app does keep.
+
+**Nothing is new except method.** Every round names the weeks it draws on (arrays &
+hashing: 6, 19, 21; pointers and windows: 22, 23; grids and graphs: 20, 27; DP: 25,
+26). Lesson 1 is the seven-step routine — clarify, examples, brute force, optimise,
+code, test, complexity — and its first two problems are the same question twice,
+brute force then optimised, because stating the brute force first is the habit most
+worth building. Problems with several valid answers pin one in the prompt, exactly as
+a clarifying question would.
+
+**The TypeScript round** is the three language questions interviews actually ask:
+exhaustiveness (a `diagnose` whose TS2345 is `assertNever` catching a union member
+nobody handled), `unknown` versus `any` (TS18046), and a generic signature on demand
+(`groupBy`, returning an honest `Partial<Record<K, T[]>>`). Lesson 7 retypes a
+working-but-`any` interview answer, because in a TypeScript interview the types are
+part of the answer.
+
+All 26 expected outputs were right on the first run, and every starter failed as
+intended.
 
 ---
 
@@ -1131,7 +1169,7 @@ still go first.
 | **D** ✅ | 17-20 | Async + data structures; the Budget Buddy arc is closed |
 | **E** ✅ | 21-24 | Algorithmic thinking; the month's idiom is to count operations |
 | **F** ✅ | 25-28 | DSA core |
-| **G** 🚧 | 29-31 ✅, **32** ← next | Type-level; lowest risk, highest polish |
+| **G** ✅ | 29-32 | Type-level; lowest risk, highest polish |
 
 **Batches C and D are done, and with them every risk the back half was waiting
 on**: the one-file module problem (settled with evidence — week 16), async
@@ -1242,8 +1280,35 @@ lesson-text corrections.
 
 ---
 
-## What "done" looks like
+## What "done" looks like — and what it turned out to be
 
-32 weeks · ~1,900 judged exercises · ~250 lessons · a Budget Buddy arc that
-ends at week 20 with a real typed application · eight months of material that
-never once requires syntax it hasn't taught.
+The target was: *32 weeks · ~1,900 judged exercises · ~250 lessons · a Budget Buddy
+arc that ends at week 20 with a real typed application · eight months of material
+that never once requires syntax it hasn't taught.*
+
+| | planned | shipped |
+|---|---|---|
+| weeks | 32 | **32** |
+| lessons | ~250 | **244** |
+| judged exercises | ~1,900 | **1,680** |
+| Budget Buddy arc | ends at week 20 | **ends at week 20**, on the category tree |
+| scope ladder | never requires later syntax | **enforced by `_SCOPE_RULES`**, which fails the build |
+
+The exercise count is lower than projected because the back half's weeks are
+denser rather than longer: month 6's weeks average 50 exercises, month 7's 40, and
+month 8's type weeks around 30 — each type exercise is several assertions, and each
+back-half exercise tends to count, time or prove something rather than drill one
+line. The projection extrapolated from weeks 1-10, where 60-70 short drills a week
+was right for someone learning syntax.
+
+## After the course — optional, none of it blocking
+
+* **Practice families beyond week 1.** `_PRACTICE_FILES` still lists only
+  `ts_p01_practice.py`. The machinery is proven (decision 3); any week can gain
+  families without touching its lessons.
+* **A `_computed()` helper for the course** (trap 5). Every week of the back half
+  found at least one hand-typed output wrong; the verifier caught all of them, but a
+  helper that fills outputs from the reference would remove the round trip.
+* **Run the full Python verifier and the judge suite alone after any bulk edit.**
+  Both are green on all 32 weeks (see "Verification status"); the judge suite takes
+  about 15 minutes when nothing else is running.
