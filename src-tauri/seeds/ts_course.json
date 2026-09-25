@@ -73234,19 +73234,1593 @@
       "month": 8,
       "month_title": "Advanced Types & Interview Polish",
       "theme": "Inference & Template Literal Types",
-      "goal": "Bend the inference engine and build types from string patterns.",
-      "summary": "",
-      "authored": false,
-      "lessons": [],
-      "capstone": null,
-      "objectives": [],
-      "why": "",
-      "est_minutes": 40,
-      "glossary": [],
-      "cheatsheet": "",
-      "self_check": [],
-      "review": [],
-      "milestone": "",
+      "goal": "Strings get types too. Build them with template literals, take them apart with `infer`, and parse a route like \"/users/:id\" into the object its handler receives — at compile time.",
+      "summary": "Week 19 keyed a `Map` with strings like `\"3,4\"`. To the compiler those were just\n`string`. This week they get **types with structure**.\n\n## Template literal types\n\nThe template-literal syntax you have used for values since week 2 works on types:\n\n```ts\ntype Px = `${number}px`;                       // \"12px\" ✓   \"12em\" ✗\ntype Cell = `${\"a\" | \"b\"}${1 | 2}`;            // \"a1\" | \"a2\" | \"b1\" | \"b2\"\ntype Handler = `on${Capitalize<\"click\">}`;     // \"onClick\"\n```\n\nUnions **multiply**, and four built-in helpers change case: `Uppercase`,\n`Lowercase`, `Capitalize`, `Uncapitalize`.\n\n## …and `infer` takes them apart\n\nWeek 29's `infer` works inside a template literal too — which makes it a **parser**:\n\n```ts\ntype Head<S> = S extends `${infer H} ${string}` ? H : S;\ntype A = Head<\"hello world\">;                  // \"hello\"\n```\n\nRecursion (week 25, at the type level) lets it keep going: split on commas, trim\nspaces, pull `:id` and `:postId` out of `\"/users/:id/posts/:postId\"`.\n\n## Why anyone does this\n\nBecause then a **string argument can decide a type**:\n\n```ts\nrouter.add(\"/users/:id/posts/:postId\", (p) => p.postId);   // p: { id: string; postId: string }\nrouter.add(\"/users/:id\", (p) => p.name);                   // ✗ does not compile\n```\n\nThat is the library module this week builds, and it is exactly how real routers,\nORMs and i18n libraries type their string APIs.\n\n⏱️ Budget about **seven hours**.\n",
+      "authored": true,
+      "lessons": [
+        {
+          "key": "w30-template",
+          "title": "Strings with structure",
+          "what": "Template literal types, multiplying unions, and changing case.",
+          "lesson": "```ts\ntype Px = `${number}px`;\nconst a: Px = \"12px\";      // ✓\nconst b: Px = \"12em\";      // ✗\n```\n\nA template literal **type** describes a set of strings. `${number}` matches any\nnumeric text; `${string}` matches anything.\n\n## Unions multiply\n\n```ts\ntype Row = \"a\" | \"b\";\ntype Col = 1 | 2 | 3;\ntype Cell = `${Row}${Col}`;     // six members: a1 a2 a3 b1 b2 b3\n```\n\nEvery combination, like a nested loop. Useful — and a thing to watch: three unions of\nten members is a thousand-member type.\n\n## Changing case\n\nFour helpers are built into the compiler:\n\n```ts\nUppercase<\"get\">       // \"GET\"\nLowercase<\"GET\">       // \"get\"\nCapitalize<\"click\">    // \"Click\"\nUncapitalize<\"Click\">  // \"click\"\n```\n\nTogether with templates, the classic:\n\n```ts\ntype OnEvent<E extends string> = `on${Capitalize<E>}`;\ntype H = OnEvent<\"click\" | \"focus\">;     // \"onClick\" | \"onFocus\" — distributes, too\n```\n\n## Renaming keys — and the `& string`\n\nWeek 29's `as` clause can rename keys through a template:\n\n```ts\ntype Getters<T> = { [K in keyof T as `get${Capitalize<K & string>}`]: () => T[K] };\n```\n\nLeave out `& string` and:\n\n```\nTS2344: Type 'K' does not satisfy the constraint 'string'.\n```\n\n`keyof T` can contain **number** and **symbol** keys, and you cannot capitalise a\nsymbol. `K & string` keeps only the string keys — the idiom you will see in every\nlibrary that does this.\n\n> ⚠️ **Common mistakes:** `Capitalize<K>` without `& string`; expecting\n> `Capitalize` to change more than the first letter; and building accidental\n> thousand-member unions.\n",
+          "warmup": [
+            {
+              "question": "`${number}px` accepts…",
+              "options": [
+                "\"px\"",
+                "\"12px\"",
+                "\"12 px\"",
+                "12"
+              ],
+              "answer": 1,
+              "explanation": "Numeric text, then px."
+            },
+            {
+              "question": "`${\"x\"|\"y\"}${1|2|3}` has how many members?",
+              "options": [
+                "5",
+                "6",
+                "3",
+                "2"
+              ],
+              "answer": 1,
+              "explanation": "2 × 3."
+            },
+            {
+              "question": "`Uppercase<\"get\">` is…",
+              "options": [
+                "\"Get\"",
+                "\"GET\"",
+                "\"get\"",
+                "string"
+              ],
+              "answer": 1,
+              "explanation": "Every letter."
+            },
+            {
+              "question": "`K & string` in a key remap exists because…",
+              "options": [
+                "style",
+                "keyof may include number and symbol keys",
+                "Capitalize needs two",
+                "of never"
+              ],
+              "answer": 1,
+              "explanation": "TS2344 otherwise."
+            }
+          ],
+          "exercises": [
+            {
+              "id": "tscourse-w30-tl-t1",
+              "title": "Every cell",
+              "prompt": "Write `Cell` as every combination of a row letter and a column number.",
+              "hint": "A template literal type with two placeholders.",
+              "hints": [
+                "A template literal type with two placeholders.",
+                "Unions inside it multiply out.",
+                "`${Row}${Col}`"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<Cell, \"a1\" | \"a2\" | \"b1\" | \"b2\">>;\n",
+              "judge_mode": "types",
+              "forbid": [],
+              "starter": "type Row = \"a\" | \"b\";\ntype Col = 1 | 2;\ntype Cell = ____;\n",
+              "solution": "type Row = \"a\" | \"b\";\ntype Col = 1 | 2;\ntype Cell = `${Row}${Col}`;\n",
+              "tests": [],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w30-tl-t2",
+              "title": "Handler names",
+              "prompt": "Write `OnEvent<E>`: \"on\" followed by the event name with its first letter capitalised.",
+              "hint": "A template with the prefix \"on\".",
+              "hints": [
+                "A template with the prefix \"on\".",
+                "Capitalize changes only the first letter.",
+                "`on${Capitalize<E>}`"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<OnEvent<\"click\">, \"onClick\">>;\ntype _2 = Expect<Equal<OnEvent<\"click\" | \"focus\">, \"onClick\" | \"onFocus\">>;\n",
+              "judge_mode": "types",
+              "forbid": [],
+              "starter": "type OnEvent<E extends string> = ____;\n",
+              "solution": "type OnEvent<E extends string> = `on${Capitalize<E>}`;\n",
+              "tests": [],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w30-tl-t3",
+              "title": "Only pixel values",
+              "prompt": "Write `Px` so that \"12px\" and \"0.5px\" are accepted and \"12em\" is not.",
+              "hint": "`${number}` matches numeric text.",
+              "hints": [
+                "`${number}` matches numeric text.",
+                "`${number}px`"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\nconst _a: Px = \"12px\";\nconst _b: Px = \"0.5px\";\n// @ts-expect-error — not pixels\nconst _c: Px = \"12em\";\n",
+              "judge_mode": "types",
+              "forbid": [],
+              "starter": "type Px = ____;\n",
+              "solution": "type Px = `${number}px`;\n",
+              "tests": [],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w30-tl-t4",
+              "title": "Getters for every key",
+              "prompt": "Write `Getters<T>`: for each key `name`, a method `getName` returning that key's type.",
+              "hint": "Week 29's key remapping, with a template as the new key.",
+              "hints": [
+                "Week 29's key remapping, with a template as the new key.",
+                "Only string keys can be capitalised: K & string.",
+                "{ [K in keyof T as `get${Capitalize<K & string>}`]: () => T[K] }"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Hard",
+              "strictness": "strict+indexed",
+              "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<Getters<{ name: string; age: number }>, { getName: () => string; getAge: () => number }>>;\n",
+              "judge_mode": "types",
+              "forbid": [],
+              "starter": "type Getters<T> = ____;\n",
+              "solution": "type Getters<T> = { [K in keyof T as `get${Capitalize<K & string>}`]: () => T[K] };\n",
+              "tests": [],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w30-tl-d1",
+              "title": "The key that might be a symbol",
+              "prompt": "The compiler rejects this program:\n\n    TS2344: Type 'K' does not satisfy the constraint 'string'.\n\nFix the cause.",
+              "hint": "What kinds of key can `keyof T` produce?",
+              "hints": [
+                "What kinds of key can `keyof T` produce?",
+                "Capitalize only accepts strings.",
+                "Capitalize<K & string>."
+              ],
+              "language": "typescript",
+              "kind": "diagnose",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "interface Person {\n  name: string;\n  age: number;\n}\ntype Getters<T> = { [K in keyof T as `get${Capitalize<K>}`]: () => T[K] };\nconst g: Getters<Person> = { getName: () => \"Ada\", getAge: () => 36 };\nconsole.log(`${g.getName()} ${g.getAge()}`);\n",
+              "solution": "interface Person {\n  name: string;\n  age: number;\n}\ntype Getters<T> = { [K in keyof T as `get${Capitalize<K & string>}`]: () => T[K] };\nconst g: Getters<Person> = { getName: () => \"Ada\", getAge: () => 36 };\nconsole.log(`${g.getName()} ${g.getAge()}`);\n",
+              "tests": [
+                {
+                  "input": "",
+                  "output": "Ada 36"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w30-tl-1",
+              "title": "The runtime twin",
+              "prompt": "Build the getter name at run time, typed with the same template the type uses.",
+              "hint": "Upper-case the first character, keep the rest.",
+              "hints": [
+                "Upper-case the first character, keep the rest.",
+                "String methods return string, so the precise type needs one cast.",
+                "return `get${key.charAt(0).toUpperCase()}${key.slice(1)}` as `get${Capitalize<K>}`;"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<typeof n, \"getTotal\">>;\n",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "function getterName<K extends string>(key: K): `get${Capitalize<K>}` {\n____\n}\nconst n = getterName(\"total\");\nconsole.log(n);\n",
+              "solution": "function getterName<K extends string>(key: K): `get${Capitalize<K>}` {\n  return `get${key.charAt(0).toUpperCase()}${key.slice(1)}` as `get${Capitalize<K>}`;\n}\nconst n = getterName(\"total\");\nconsole.log(n);\n",
+              "tests": [
+                {
+                  "input": "",
+                  "output": "getTotal"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            }
+          ],
+          "quiz": [
+            {
+              "question": "`Capitalize<\"hELLO\">` is…",
+              "options": [
+                "\"Hello\"",
+                "\"HELLO\"",
+                "\"hELLO\"",
+                "\"hello\""
+              ],
+              "answer": 1,
+              "explanation": "Only the first letter is changed; the rest is left exactly as it was."
+            },
+            {
+              "question": "Why does the runtime getterName need a cast?",
+              "options": [
+                "it does not",
+                "string methods return string; the checker cannot follow them into the template",
+                "Capitalize is runtime",
+                "K is unknown"
+              ],
+              "answer": 1,
+              "explanation": "Precise outside, careful inside."
+            }
+          ]
+        },
+        {
+          "key": "w30-match",
+          "title": "Taking strings apart",
+          "what": "`infer` inside a template: prefixes, trimming, splitting, replacing.",
+          "lesson": "A template literal can sit on the right of `extends`, with `infer` in its holes:\n\n```ts\ntype Head<S> = S extends `${infer H} ${string}` ? H : S;\ntype A = Head<\"hello big world\">;      // \"hello\"\n```\n\nThe compiler matches left to right, and an `infer` followed by a literal takes the\n**shortest** match up to that literal — so `H` stops at the first space.\n\n## Prefixes and suffixes\n\n```ts\ntype StartsWith<S extends string, P extends string> = S extends `${P}${string}` ? true : false;\n```\n\nNo `infer` needed when you only ask *whether* it matches.\n\n## Recursion makes it a parser\n\n```ts\ntype TrimLeft<S extends string> = S extends ` ${infer R}` ? TrimLeft<R> : S;\n```\n\nPeel one space, call again on the rest, stop when there is no leading space — the\nbase case. `TrimLeft<\"   hi\">` is `\"hi\"`.\n\nSplitting collects pieces into a **tuple**:\n\n```ts\ntype Split<S extends string, D extends string> =\n  S extends `${infer H}${D}${infer T}` ? [H, ...Split<T, D>] : [S];\ntype P = Split<\"a,b,c\", \",\">;          // [\"a\", \"b\", \"c\"]\n```\n\n## The limits\n\nRecursive types have a depth limit (about 1,000 levels for these tail-recursive\nconditionals); past it the compiler reports that the type is excessively deep. It\nis week 25's stack, at the type level — and one reason type-level parsing is for\nshort strings like routes, not documents.\n\n> ⚠️ **Common mistakes:** expecting `infer` to take the longest match; a recursive\n> string type with no base case; and parsing long strings at the type level.\n",
+          "warmup": [
+            {
+              "question": "`infer H` followed by a literal matches…",
+              "options": [
+                "the longest prefix",
+                "the shortest prefix up to that literal",
+                "one character",
+                "nothing"
+              ],
+              "answer": 1,
+              "explanation": "Left to right, first occurrence."
+            },
+            {
+              "question": "`StartsWith<\"hello\", \"he\">` is…",
+              "options": [
+                "false",
+                "true",
+                "never",
+                "\"llo\""
+              ],
+              "answer": 1,
+              "explanation": "`${P}${string}` matches."
+            },
+            {
+              "question": "`Split<\"a,b\", \",\">` is…",
+              "options": [
+                "\"a\" | \"b\"",
+                "[\"a\", \"b\"]",
+                "string[]",
+                "[\"a,b\"]"
+              ],
+              "answer": 1,
+              "explanation": "A tuple."
+            },
+            {
+              "question": "Type-level recursion has…",
+              "options": [
+                "no limit",
+                "a depth limit",
+                "a runtime cost",
+                "no base case"
+              ],
+              "answer": 1,
+              "explanation": "The compiler's own stack."
+            }
+          ],
+          "exercises": [
+            {
+              "id": "tscourse-w30-mt-t1",
+              "title": "Does it start with…",
+              "prompt": "Write `StartsWith<S, P>`: true when S begins with P.",
+              "hint": "Match P followed by anything.",
+              "hints": [
+                "Match P followed by anything.",
+                "S extends `${P}${string}` ? true : false"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<StartsWith<\"hello\", \"he\">, true>>;\ntype _2 = Expect<Equal<StartsWith<\"hello\", \"lo\">, false>>;\ntype _3 = Expect<Equal<StartsWith<\"abc\", \"\">, true>>;\n",
+              "judge_mode": "types",
+              "forbid": [],
+              "starter": "type StartsWith<S extends string, P extends string> = ____;\n",
+              "solution": "type StartsWith<S extends string, P extends string> = S extends `${P}${string}` ? true : false;\n",
+              "tests": [],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w30-mt-t2",
+              "title": "The first word",
+              "prompt": "Write `FirstWord<S>`: everything before the first space, or S if there is none.",
+              "hint": "Infer the part before a space.",
+              "hints": [
+                "Infer the part before a space.",
+                "S extends `${infer W} ${string}` ? W : S"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<FirstWord<\"hello big world\">, \"hello\">>;\ntype _2 = Expect<Equal<FirstWord<\"solo\">, \"solo\">>;\n",
+              "judge_mode": "types",
+              "forbid": [],
+              "starter": "type FirstWord<S extends string> = ____;\n",
+              "solution": "type FirstWord<S extends string> = S extends `${infer W} ${string}` ? W : S;\n",
+              "tests": [],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w30-mt-t3",
+              "title": "Trim the left",
+              "prompt": "Write `TrimLeft<S>`, removing every leading space — recursively.",
+              "hint": "Peel one leading space and call again on the rest.",
+              "hints": [
+                "Peel one leading space and call again on the rest.",
+                "S extends ` ${infer R}` ? TrimLeft<R> : S"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<TrimLeft<\"   hi\">, \"hi\">>;\ntype _2 = Expect<Equal<TrimLeft<\"hi \">, \"hi \">>;\ntype _3 = Expect<Equal<TrimLeft<\"\">, \"\">>;\n",
+              "judge_mode": "types",
+              "forbid": [],
+              "starter": "type TrimLeft<S extends string> = ____;\n",
+              "solution": "type TrimLeft<S extends string> = S extends ` ${infer R}` ? TrimLeft<R> : S;\n",
+              "tests": [],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w30-mt-t4",
+              "title": "Split on a delimiter",
+              "prompt": "Write `Split<S, D>` returning a tuple of the pieces.",
+              "hint": "Take the head before the first delimiter; recurse on the tail.",
+              "hints": [
+                "Take the head before the first delimiter; recurse on the tail.",
+                "Spread the recursive result into a tuple after the head.",
+                "S extends `${infer H}${D}${infer T}` ? [H, ...Split<T, D>] : [S]"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Hard",
+              "strictness": "strict+indexed",
+              "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<Split<\"a,b,c\", \",\">, [\"a\", \"b\", \"c\"]>>;\ntype _2 = Expect<Equal<Split<\"one\", \",\">, [\"one\"]>>;\ntype _3 = Expect<Equal<Split<\"x-y\", \"-\">, [\"x\", \"y\"]>>;\n",
+              "judge_mode": "types",
+              "forbid": [],
+              "starter": "type Split<S extends string, D extends string> = ____;\n",
+              "solution": "type Split<S extends string, D extends string> = S extends `${infer H}${D}${infer T}` ? [H, ...Split<T, D>] : [S];\n",
+              "tests": [],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w30-mt-t5",
+              "title": "Replace every occurrence",
+              "prompt": "Write `ReplaceAll<S, From, To>`.",
+              "hint": "Split around the first From, put To in its place, and recurse on what follows.",
+              "hints": [
+                "Split around the first From, put To in its place, and recurse on what follows.",
+                "An empty From would match everywhere forever — treat it as a no-op first."
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Hard",
+              "strictness": "strict+indexed",
+              "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<ReplaceAll<\"a-b-c\", \"-\", \"+\">, \"a+b+c\">>;\ntype _2 = Expect<Equal<ReplaceAll<\"none\", \"-\", \"+\">, \"none\">>;\ntype _3 = Expect<Equal<ReplaceAll<\"abc\", \"\", \"x\">, \"abc\">>;\n",
+              "judge_mode": "types",
+              "forbid": [],
+              "starter": "type ReplaceAll<S extends string, From extends string, To extends string> =\n  ____;\n",
+              "solution": "type ReplaceAll<S extends string, From extends string, To extends string> =\n  From extends \"\" ? S : S extends `${infer A}${From}${infer B}` ? `${A}${To}${ReplaceAll<B, From, To>}` : S;\n",
+              "tests": [],
+              "source_slug": "",
+              "dataset": ""
+            }
+          ],
+          "quiz": [
+            {
+              "question": "Why must ReplaceAll guard `From extends \"\"`?",
+              "options": [
+                "style",
+                "an empty pattern matches at every position and the recursion never shrinks",
+                "speed",
+                "it is required"
+              ],
+              "answer": 1,
+              "explanation": "A base case, again."
+            },
+            {
+              "question": "Split recurses on…",
+              "options": [
+                "the head",
+                "the tail after the first delimiter",
+                "the whole string",
+                "the delimiter"
+              ],
+              "answer": 1,
+              "explanation": "The part still to process."
+            }
+          ]
+        },
+        {
+          "key": "w30-infer",
+          "title": "`infer`, in depth",
+          "what": "Tuples, object properties, and inference with a constraint.",
+          "lesson": "Week 29 used `infer` in function and promise positions. It works anywhere a type\ncan be written inside the `extends` clause.\n\n## In tuples\n\n```ts\ntype Last<T extends readonly unknown[]> = T extends readonly [...unknown[], infer L] ? L : never;\ntype Tail<T extends readonly unknown[]> = T extends readonly [unknown, ...infer R] ? R : [];\n```\n\nVariadic tuple patterns: \"anything, then one last element\" and \"one element, then\nthe rest\". `Last<[1, 2, 3]>` is `3`; `Tail<[1, 2, 3]>` is `[2, 3]`.\n\n## In object properties\n\n```ts\ntype DataOf<T> = T extends { data: infer D } ? D : never;\ntype R = DataOf<{ status: 200; data: string[] }>;     // string[]\n```\n\nPull the payload type out of an API response shape without naming it anywhere.\n\n## Several at once\n\n```ts\ntype Swap<T> = T extends [infer A, infer B] ? [B, A] : never;\n```\n\n## With a constraint\n\nTypeScript 4.7 added `infer X extends C`: infer, **and** only match if it fits C.\nIts best trick converts numeric text to a number literal:\n\n```ts\ntype ToNum<S extends string> = S extends `${infer N extends number}` ? N : never;\ntype N = ToNum<\"42\">;          // 42 — the number, not the string\n```\n\nThat is what lets a type-level parser do arithmetic on route segments or version\nstrings.\n\n## Literal templates on values\n\nA template **expression** is typed `string`, unless you say otherwise:\n\n```ts\nconst n = 7;\nconst loose = `id-${n}`;              // string\nconst exact = `id-${n}` as const;     // \"id-7\"\n```\n\n`as const` asks for the narrowest type, and for a template that is the literal it\nwill produce.\n\n> ⚠️ **Common mistakes:** `infer` outside an extends clause; forgetting `readonly`\n> in tuple patterns (a readonly tuple will not match a mutable pattern); and\n> expecting template expressions to keep literal types without `as const`.\n",
+          "warmup": [
+            {
+              "question": "`[...unknown[], infer L]` gives…",
+              "options": [
+                "the first element",
+                "the last element",
+                "the length",
+                "the rest"
+              ],
+              "answer": 1,
+              "explanation": "Anything, then one."
+            },
+            {
+              "question": "`T extends { data: infer D }` extracts…",
+              "options": [
+                "T",
+                "the type of the data property",
+                "the keys",
+                "never"
+              ],
+              "answer": 1,
+              "explanation": "Infer in a property."
+            },
+            {
+              "question": "`infer N extends number` on \"42\" gives…",
+              "options": [
+                "number",
+                "42",
+                "\"42\"",
+                "never"
+              ],
+              "answer": 1,
+              "explanation": "The numeric literal."
+            },
+            {
+              "question": "`const x = `id-${7}`` is typed…",
+              "options": [
+                "\"id-7\"",
+                "string",
+                "`id-${number}`",
+                "never"
+              ],
+              "answer": 1,
+              "explanation": "Add as const for the literal."
+            }
+          ],
+          "exercises": [
+            {
+              "id": "tscourse-w30-id-t1",
+              "title": "The last element",
+              "prompt": "Write `Last<T>` for any tuple.",
+              "hint": "A variadic pattern: anything, then one inferred element.",
+              "hints": [
+                "A variadic pattern: anything, then one inferred element.",
+                "readonly in the pattern lets readonly tuples match too."
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<Last<[1, 2, 3]>, 3>>;\ntype _2 = Expect<Equal<Last<readonly [\"a\"]>, \"a\">>;\ntype _3 = Expect<Equal<Last<[]>, never>>;\n",
+              "judge_mode": "types",
+              "forbid": [],
+              "starter": "type Last<T extends readonly unknown[]> = ____;\n",
+              "solution": "type Last<T extends readonly unknown[]> = T extends readonly [...unknown[], infer L] ? L : never;\n",
+              "tests": [],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w30-id-t2",
+              "title": "Everything but the first",
+              "prompt": "Write `Tail<T>`: the tuple without its first element, or [] if it is empty.",
+              "hint": "One element, then infer the rest.",
+              "hints": [
+                "One element, then infer the rest.",
+                "T extends readonly [unknown, ...infer R] ? R : []"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<Tail<[1, 2, 3]>, [2, 3]>>;\ntype _2 = Expect<Equal<Tail<[1]>, []>>;\ntype _3 = Expect<Equal<Tail<[]>, []>>;\n",
+              "judge_mode": "types",
+              "forbid": [],
+              "starter": "type Tail<T extends readonly unknown[]> = ____;\n",
+              "solution": "type Tail<T extends readonly unknown[]> = T extends readonly [unknown, ...infer R] ? R : [];\n",
+              "tests": [],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w30-id-t3",
+              "title": "The payload",
+              "prompt": "Write `DataOf<T>`: the type of an object's `data` property, or never.",
+              "hint": "Infer the type in the data position.",
+              "hints": [
+                "Infer the type in the data position.",
+                "T extends { data: infer D } ? D : never"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<DataOf<{ status: 200; data: string[] }>, string[]>>;\ntype _2 = Expect<Equal<DataOf<{ status: 404 }>, never>>;\n",
+              "judge_mode": "types",
+              "forbid": [],
+              "starter": "type DataOf<T> = ____;\n",
+              "solution": "type DataOf<T> = T extends { data: infer D } ? D : never;\n",
+              "tests": [],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w30-id-t4",
+              "title": "Text to number",
+              "prompt": "Write `ToNum<S>`: the number literal a numeric string spells, or never.",
+              "hint": "infer with a constraint: infer N extends number.",
+              "hints": [
+                "infer with a constraint: infer N extends number.",
+                "S extends `${infer N extends number}` ? N : never"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Hard",
+              "strictness": "strict+indexed",
+              "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<ToNum<\"42\">, 42>>;\ntype _2 = Expect<Equal<ToNum<\"3.5\">, 3.5>>;\ntype _3 = Expect<Equal<ToNum<\"abc\">, never>>;\n",
+              "judge_mode": "types",
+              "forbid": [],
+              "starter": "type ToNum<S extends string> = ____;\n",
+              "solution": "type ToNum<S extends string> = S extends `${infer N extends number}` ? N : never;\n",
+              "tests": [],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w30-id-t5",
+              "title": "Swap a pair",
+              "prompt": "Write `Swap<T>` for two-element tuples.",
+              "hint": "Infer both elements, then rebuild in the other order.",
+              "hints": [
+                "Infer both elements, then rebuild in the other order.",
+                "T extends [infer A, infer B] ? [B, A] : never"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<Swap<[1, \"a\"]>, [\"a\", 1]>>;\ntype _2 = Expect<Equal<Swap<[1, 2, 3]>, never>>;\n",
+              "judge_mode": "types",
+              "forbid": [],
+              "starter": "type Swap<T> = ____;\n",
+              "solution": "type Swap<T> = T extends [infer A, infer B] ? [B, A] : never;\n",
+              "tests": [],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w30-id-p1",
+              "title": "A template that keeps its value",
+              "prompt": "What type does TypeScript already infer for `label`? Annotate `check` with exactly that type — not merely one that fits. Without `as const` it would be plain string.",
+              "hint": "`as const` asks for the narrowest type.",
+              "hints": [
+                "`as const` asks for the narrowest type.",
+                "n is the literal 7, so the template is fully known.",
+                "Write \"id-7\"."
+              ],
+              "language": "typescript",
+              "kind": "predict",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<typeof check, typeof label>>;\n",
+              "judge_mode": "types",
+              "forbid": [
+                "typeof"
+              ],
+              "starter": "const n = 7;\nconst label = `id-${n}` as const;\nconst check: ____ = label;\n",
+              "solution": "const n = 7;\nconst label = `id-${n}` as const;\nconst check: \"id-7\" = label;\n",
+              "tests": [],
+              "source_slug": "",
+              "dataset": ""
+            }
+          ],
+          "quiz": [
+            {
+              "question": "Why does `Last` use `readonly` in its pattern?",
+              "options": [
+                "style",
+                "a readonly tuple does not match a mutable tuple pattern",
+                "speed",
+                "it is required by infer"
+              ],
+              "answer": 1,
+              "explanation": "readonly accepts both."
+            },
+            {
+              "question": "Where can `infer` appear?",
+              "options": [
+                "anywhere",
+                "anywhere a type can be written, inside a conditional's extends clause",
+                "only in functions",
+                "only in tuples"
+              ],
+              "answer": 1,
+              "explanation": "Pattern positions."
+            }
+          ]
+        },
+        {
+          "key": "w30-parse",
+          "title": "Parsing a route",
+          "what": "From \"/users/:id/posts/:postId\" to { id: string; postId: string }.",
+          "lesson": "Everything so far comes together in one type:\n\n```ts\ntype ParamNames<P extends string> =\n  P extends `${string}:${infer Name}/${infer Rest}` ? Name | ParamNames<`/${Rest}`>\n  : P extends `${string}:${infer Name}` ? Name\n  : never;\n```\n\nRead the three branches:\n\n1. A `:name` followed by more path → that name, **plus** the names in the rest.\n2. A `:name` at the end → just that name.\n3. No `:` at all → `never` — no parameters.\n\n`ParamNames<\"/users/:id/posts/:postId\">` is `\"id\" | \"postId\"`. A mapped type (week\n29) turns that into the object a handler receives:\n\n```ts\ntype Params<P extends string> = { [K in ParamNames<P>]: string };\n```\n\n`Params<\"/health\">` is `{}` — a mapped type over `never` has no keys.\n\n## Why the rest is re-prefixed\n\n`ParamNames<`/${Rest}`>` puts the slash back. Without it, `Rest` is\n`\"posts/:postId\"`, which still works here — but it keeps every recursive call\nlooking like a path, which makes the type easier to reason about and to extend.\n\n## The same shape, elsewhere\n\nA query string `\"page=2&sort=name\"` has keys before each `=`; a template\n`\"Hello {name}\"` has keys inside braces. Each is one conditional and one recursion\naway. This week's exercises and stretch do both.\n\n> ⚠️ **Common mistakes:** forgetting the recursive call, so only the first\n> parameter is found; matching `:name` without stopping at the next `/`; and\n> expecting route parsing on a `string` — a plain `string` has no structure to\n> parse, so it yields `never`.\n",
+          "warmup": [
+            {
+              "question": "`ParamNames<\"/users/:id\">` is…",
+              "options": [
+                "string",
+                "\"id\"",
+                "\"users\"",
+                "never"
+              ],
+              "answer": 1,
+              "explanation": "The name after the colon."
+            },
+            {
+              "question": "`Params<\"/health\">` is…",
+              "options": [
+                "never",
+                "{}",
+                "{ health: string }",
+                "string"
+              ],
+              "answer": 1,
+              "explanation": "A mapped type over never."
+            },
+            {
+              "question": "Without the recursive call, `ParamNames` of a two-parameter path gives…",
+              "options": [
+                "both",
+                "only the first",
+                "never",
+                "string"
+              ],
+              "answer": 1,
+              "explanation": "It stops after one."
+            },
+            {
+              "question": "`ParamNames<string>` is…",
+              "options": [
+                "string",
+                "never — a plain string has no structure to match",
+                "any",
+                "\"\""
+              ],
+              "answer": 1,
+              "explanation": "Needs a literal."
+            }
+          ],
+          "exercises": [
+            {
+              "id": "tscourse-w30-pr-t1",
+              "title": "The parameter names",
+              "prompt": "Write `ParamNames<P>` for route patterns.",
+              "hint": "Three cases: a parameter with more path after it, a final parameter, none.",
+              "hints": [
+                "Three cases: a parameter with more path after it, a final parameter, none.",
+                "In the first case, union the name with the names in the rest.",
+                "Stop the name at the next / by matching `:${infer Name}/${infer Rest}`."
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Hard",
+              "strictness": "strict+indexed",
+              "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<ParamNames<\"/users/:id/posts/:postId\">, \"id\" | \"postId\">>;\ntype _2 = Expect<Equal<ParamNames<\"/users/:id\">, \"id\">>;\ntype _3 = Expect<Equal<ParamNames<\"/health\">, never>>;\n",
+              "judge_mode": "types",
+              "forbid": [],
+              "starter": "type ParamNames<P extends string> =\n____\n",
+              "solution": "type ParamNames<P extends string> =\n  P extends `${string}:${infer Name}/${infer Rest}` ? Name | ParamNames<`/${Rest}`>\n  : P extends `${string}:${infer Name}` ? Name\n  : never;\n",
+              "tests": [],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w30-pr-t2",
+              "title": "The handler's argument",
+              "prompt": "Write `Params<P>`: an object with a string property per parameter name.",
+              "hint": "A mapped type over the union of names.",
+              "hints": [
+                "A mapped type over the union of names.",
+                "{ [K in ParamNames<P>]: string }"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<Params<\"/users/:id/posts/:postId\">, { id: string; postId: string }>>;\ntype _2 = Expect<Equal<Params<\"/health\">, {}>>;\n",
+              "judge_mode": "types",
+              "forbid": [],
+              "starter": "type ParamNames<P extends string> =\n  P extends `${string}:${infer Name}/${infer Rest}` ? Name | ParamNames<`/${Rest}`>\n  : P extends `${string}:${infer Name}` ? Name\n  : never;\ntype Params<P extends string> = ____;\n",
+              "solution": "type ParamNames<P extends string> =\n  P extends `${string}:${infer Name}/${infer Rest}` ? Name | ParamNames<`/${Rest}`>\n  : P extends `${string}:${infer Name}` ? Name\n  : never;\ntype Params<P extends string> = { [K in ParamNames<P>]: string };\n",
+              "tests": [],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w30-pr-t3",
+              "title": "Query-string keys",
+              "prompt": "Write `QueryKeys<Q>` for strings like \"page=2&sort=name\": the keys before each `=`.",
+              "hint": "Split on & first; each pair then has a key before =.",
+              "hints": [
+                "Split on & first; each pair then has a key before =.",
+                "Recurse on both halves of the split."
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Hard",
+              "strictness": "strict+indexed",
+              "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<QueryKeys<\"page=2&sort=name\">, \"page\" | \"sort\">>;\ntype _2 = Expect<Equal<QueryKeys<\"q=ts\">, \"q\">>;\ntype _3 = Expect<Equal<QueryKeys<\"\">, never>>;\n",
+              "judge_mode": "types",
+              "forbid": [],
+              "starter": "type QueryKeys<Q extends string> =\n____\n",
+              "solution": "type QueryKeys<Q extends string> =\n  Q extends `${infer Pair}&${infer Rest}` ? QueryKeys<Pair> | QueryKeys<Rest>\n  : Q extends `${infer K}=${string}` ? K\n  : never;\n",
+              "tests": [],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w30-pr-t4",
+              "title": "Join a tuple",
+              "prompt": "Write `Join<T, D>`: a tuple of strings joined by a delimiter.",
+              "hint": "One element: just it. More: the head, the delimiter, and the joined rest.",
+              "hints": [
+                "One element: just it. More: the head, the delimiter, and the joined rest.",
+                "`infer … extends string` keeps each piece usable in a template."
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Hard",
+              "strictness": "strict+indexed",
+              "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<Join<[\"a\", \"b\", \"c\"], \"/\">, \"a/b/c\">>;\ntype _2 = Expect<Equal<Join<[\"solo\"], \"/\">, \"solo\">>;\ntype _3 = Expect<Equal<Join<[], \"/\">, \"\">>;\n",
+              "judge_mode": "types",
+              "forbid": [],
+              "starter": "type Join<T extends readonly string[], D extends string> =\n____\n",
+              "solution": "type Join<T extends readonly string[], D extends string> =\n  T extends readonly [infer H extends string] ? H\n  : T extends readonly [infer H extends string, ...infer R extends readonly string[]] ? `${H}${D}${Join<R, D>}`\n  : \"\";\n",
+              "tests": [],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w30-pr-1",
+              "title": "Parse at run time, typed at compile time",
+              "prompt": "Extract a path's parameters at run time into the object the type describes.",
+              "hint": "A segment starting with : is a parameter; its name is the rest of the segment.",
+              "hints": [
+                "A segment starting with : is a parameter; its name is the rest of the segment.",
+                "Store the matching segment of the actual path under that name."
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<typeof p, { id: string; postId: string }>>;\n",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "type ParamNames<P extends string> =\n  P extends `${string}:${infer Name}/${infer Rest}` ? Name | ParamNames<`/${Rest}`>\n  : P extends `${string}:${infer Name}` ? Name\n  : never;\ntype Params<P extends string> = { [K in ParamNames<P>]: string };\nfunction extract<P extends string>(pattern: P, path: string): Params<P> {\n  const want = pattern.split(\"/\");\n  const got = path.split(\"/\");\n  const out: Record<string, string> = {};\n  want.forEach((w, i) => {\n____\n  });\n  return out as Params<P>;\n}\nconst p = extract(\"/users/:id/posts/:postId\", \"/users/42/posts/7\");\nconsole.log(`${p.id} ${p.postId}`);\n",
+              "solution": "type ParamNames<P extends string> =\n  P extends `${string}:${infer Name}/${infer Rest}` ? Name | ParamNames<`/${Rest}`>\n  : P extends `${string}:${infer Name}` ? Name\n  : never;\ntype Params<P extends string> = { [K in ParamNames<P>]: string };\nfunction extract<P extends string>(pattern: P, path: string): Params<P> {\n  const want = pattern.split(\"/\");\n  const got = path.split(\"/\");\n  const out: Record<string, string> = {};\n  want.forEach((w, i) => {\n    if (w.startsWith(\":\")) {\n      out[w.slice(1)] = got[i] ?? \"\";\n    }\n  });\n  return out as Params<P>;\n}\nconst p = extract(\"/users/:id/posts/:postId\", \"/users/42/posts/7\");\nconsole.log(`${p.id} ${p.postId}`);\n",
+              "tests": [
+                {
+                  "input": "",
+                  "output": "42 7"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            }
+          ],
+          "quiz": [
+            {
+              "question": "Why does `Join` use `infer H extends string`?",
+              "options": [
+                "style",
+                "so H is known to be a string and can go inside a template",
+                "speed",
+                "for readonly"
+              ],
+              "answer": 1,
+              "explanation": "Week 30's constrained infer."
+            },
+            {
+              "question": "`extract` casts its result because…",
+              "options": [
+                "it is wrong",
+                "the object is built from runtime strings the checker cannot follow",
+                "Params is optional",
+                "of Record"
+              ],
+              "answer": 1,
+              "explanation": "One cast, inside, where the code establishes the claim."
+            }
+          ]
+        },
+        {
+          "key": "w30-paths",
+          "title": "Typed object paths",
+          "what": "\"db.port\" as a type — and a `get` that knows it returns a number.",
+          "lesson": "Week 29's config has nested keys. A settings screen, a form library or a logger\noften refers to them as **dotted paths**: `\"db.port\"`. With template literals, the\nset of valid paths is a type:\n\n```ts\ntype Paths<T> = T extends object\n  ? { [K in keyof T & string]: K | `${K}.${Paths<T[K]>}` }[keyof T & string]\n  : never;\n\ntype P = Paths<Config>;     // \"name\" | \"db\" | \"db.host\" | \"db.port\"\n```\n\nA mapped type builds, for each key, \"the key itself, or the key, a dot, and any\npath inside it\"; indexing the result with `[keyof T & string]` collects all of them\ninto one union.\n\n## The value at a path\n\n```ts\ntype PathValue<T, P extends string> =\n  P extends `${infer K}.${infer R}` ? (K extends keyof T ? PathValue<T[K], R> : never)\n  : P extends keyof T ? T[P]\n  : never;\n\ntype V = PathValue<Config, \"db.port\">;    // number\n```\n\nSplit at the first dot, step into that key, recurse on the rest.\n\n## A typed `get`\n\n```ts\nfunction get<T, P extends Paths<T>>(obj: T, path: P): PathValue<T, P> { … }\nget(config, \"db.port\");       // number\nget(config, \"db.prot\");       // ✗ — not a path of Config\n```\n\nThe implementation walks the object at run time with `split(\".\")` and one cast;\nthe signature makes every call site checked and precisely typed.\n\n> ⚠️ **Common mistakes:** forgetting `& string` (symbol keys cannot be in a template);\n> walking the runtime path with a different separator from the type's; and using\n> paths on deeply recursive types, which can hit the depth limit.\n",
+          "warmup": [
+            {
+              "question": "`Paths<{ a: { b: number } }>` is…",
+              "options": [
+                "\"a.b\"",
+                "\"a\" | \"a.b\"",
+                "\"b\"",
+                "string"
+              ],
+              "answer": 1,
+              "explanation": "Every prefix, too."
+            },
+            {
+              "question": "`PathValue<Config, \"db.host\">` is…",
+              "options": [
+                "Config",
+                "string",
+                "never",
+                "number"
+              ],
+              "answer": 1,
+              "explanation": "Step into db, then host."
+            },
+            {
+              "question": "`{ … }[keyof T & string]` at the end of Paths…",
+              "options": [
+                "is a typo",
+                "collects every key's paths into one union",
+                "filters keys",
+                "makes it optional"
+              ],
+              "answer": 1,
+              "explanation": "An indexed access with a union."
+            },
+            {
+              "question": "A typed `get(config, \"db.prot\")`…",
+              "options": [
+                "returns undefined",
+                "does not compile",
+                "returns never",
+                "throws"
+              ],
+              "answer": 1,
+              "explanation": "Not a member of Paths<Config>."
+            }
+          ],
+          "exercises": [
+            {
+              "id": "tscourse-w30-pa-t1",
+              "title": "Every path",
+              "prompt": "Write `Paths<T>`: every dotted path into T, as a union.",
+              "hint": "For each key: the key alone, or the key + \".\" + a path inside it.",
+              "hints": [
+                "For each key: the key alone, or the key + \".\" + a path inside it.",
+                "Index the mapped type by its own keys to collect them.",
+                "{ [K in keyof T & string]: K | `${K}.${Paths<T[K]>}` }[keyof T & string]"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Hard",
+              "strictness": "strict+indexed",
+              "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<Paths<Config>, \"name\" | \"db\" | \"db.host\" | \"db.port\">>;\ntype _2 = Expect<Equal<Paths<{ a: { b: { c: 1 } } }>, \"a\" | \"a.b\" | \"a.b.c\">>;\n",
+              "judge_mode": "types",
+              "forbid": [],
+              "starter": "interface Config {\n  name: string;\n  db: { host: string; port: number };\n}\ntype Paths<T> = T extends object\n____\n  : never;\n",
+              "solution": "interface Config {\n  name: string;\n  db: { host: string; port: number };\n}\ntype Paths<T> = T extends object\n  ? { [K in keyof T & string]: K | `${K}.${Paths<T[K]>}` }[keyof T & string]\n  : never;\n",
+              "tests": [],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w30-pa-t2",
+              "title": "The value at a path",
+              "prompt": "Write `PathValue<T, P>`.",
+              "hint": "A dotted path: step into the first key and recurse on the rest.",
+              "hints": [
+                "A dotted path: step into the first key and recurse on the rest.",
+                "An undotted path: it is a key, or it is nothing."
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Hard",
+              "strictness": "strict+indexed",
+              "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<PathValue<Config, \"db.port\">, number>>;\ntype _2 = Expect<Equal<PathValue<Config, \"name\">, string>>;\ntype _3 = Expect<Equal<PathValue<Config, \"db\">, { host: string; port: number }>>;\ntype _4 = Expect<Equal<PathValue<Config, \"db.nope\">, never>>;\n",
+              "judge_mode": "types",
+              "forbid": [],
+              "starter": "interface Config {\n  name: string;\n  db: { host: string; port: number };\n}\ntype PathValue<T, P extends string> =\n____\n",
+              "solution": "interface Config {\n  name: string;\n  db: { host: string; port: number };\n}\ntype PathValue<T, P extends string> =\n  P extends `${infer K}.${infer R}` ? (K extends keyof T ? PathValue<T[K], R> : never)\n  : P extends keyof T ? T[P]\n  : never;\n",
+              "tests": [],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w30-pa-1",
+              "title": "A typed get",
+              "prompt": "Walk the object one dotted segment at a time.",
+              "hint": "Split the path on dots and step down one key at a time.",
+              "hints": [
+                "Split the path on dots and step down one key at a time.",
+                "At run time the object is just a record of unknowns — one cast per step."
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Hard",
+              "strictness": "strict+indexed",
+              "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<typeof port, number>>;\nfunction _neverCalled(): void {\n  // @ts-expect-error — not a path of Config\n  get(config, \"db.prot\");\n}\n",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "interface Config {\n  name: string;\n  db: { host: string; port: number };\n}\ntype Paths<T> = T extends object\n  ? { [K in keyof T & string]: K | `${K}.${Paths<T[K]>}` }[keyof T & string]\n  : never;\ntype PathValue<T, P extends string> =\n  P extends `${infer K}.${infer R}` ? (K extends keyof T ? PathValue<T[K], R> : never)\n  : P extends keyof T ? T[P]\n  : never;\nfunction get<T, P extends Paths<T>>(obj: T, path: P): PathValue<T, P> {\n  let cur: unknown = obj;\n____\n  return cur as PathValue<T, P>;\n}\nconst config: Config = { name: \"app\", db: { host: \"localhost\", port: 5432 } };\nconst port = get(config, \"db.port\");\nconsole.log(`${get(config, \"name\")} ${port + 1}`);\n",
+              "solution": "interface Config {\n  name: string;\n  db: { host: string; port: number };\n}\ntype Paths<T> = T extends object\n  ? { [K in keyof T & string]: K | `${K}.${Paths<T[K]>}` }[keyof T & string]\n  : never;\ntype PathValue<T, P extends string> =\n  P extends `${infer K}.${infer R}` ? (K extends keyof T ? PathValue<T[K], R> : never)\n  : P extends keyof T ? T[P]\n  : never;\nfunction get<T, P extends Paths<T>>(obj: T, path: P): PathValue<T, P> {\n  let cur: unknown = obj;\n  for (const key of path.split(\".\")) {\n    cur = (cur as Record<string, unknown>)[key];\n  }\n  return cur as PathValue<T, P>;\n}\nconst config: Config = { name: \"app\", db: { host: \"localhost\", port: 5432 } };\nconst port = get(config, \"db.port\");\nconsole.log(`${get(config, \"name\")} ${port + 1}`);\n",
+              "tests": [
+                {
+                  "input": "",
+                  "output": "app 5433"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w30-pa-fix1",
+              "title": "Fix the separator that did not match the type",
+              "prompt": "The type says paths are dotted, and the runtime walk splits on `/` — so `get(config, \"db.port\")` looks up a key literally named `db.port`, finds nothing, and prints `undefined`. The type and the implementation must agree on the separator.",
+              "hint": "The cast at the end is a promise the walk must keep.",
+              "hints": [
+                "The cast at the end is a promise the walk must keep.",
+                "What character separates the segments in Paths<T>?",
+                "Split on \".\"."
+              ],
+              "language": "typescript",
+              "kind": "fix",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "interface Config {\n  name: string;\n  db: { host: string; port: number };\n}\ntype Paths<T> = T extends object\n  ? { [K in keyof T & string]: K | `${K}.${Paths<T[K]>}` }[keyof T & string]\n  : never;\ntype PathValue<T, P extends string> =\n  P extends `${infer K}.${infer R}` ? (K extends keyof T ? PathValue<T[K], R> : never)\n  : P extends keyof T ? T[P]\n  : never;\nfunction get<T, P extends Paths<T>>(obj: T, path: P): PathValue<T, P> {\n  let cur: unknown = obj;\n  for (const key of path.split(\"/\")) {\n    cur = (cur as Record<string, unknown>)[key];\n  }\n  return cur as PathValue<T, P>;\n}\nconst config: Config = { name: \"app\", db: { host: \"localhost\", port: 5432 } };\nconsole.log(get(config, \"db.port\"));\n",
+              "solution": "interface Config {\n  name: string;\n  db: { host: string; port: number };\n}\ntype Paths<T> = T extends object\n  ? { [K in keyof T & string]: K | `${K}.${Paths<T[K]>}` }[keyof T & string]\n  : never;\ntype PathValue<T, P extends string> =\n  P extends `${infer K}.${infer R}` ? (K extends keyof T ? PathValue<T[K], R> : never)\n  : P extends keyof T ? T[P]\n  : never;\nfunction get<T, P extends Paths<T>>(obj: T, path: P): PathValue<T, P> {\n  let cur: unknown = obj;\n  for (const key of path.split(\".\")) {\n    cur = (cur as Record<string, unknown>)[key];\n  }\n  return cur as PathValue<T, P>;\n}\nconst config: Config = { name: \"app\", db: { host: \"localhost\", port: 5432 } };\nconsole.log(get(config, \"db.port\"));\n",
+              "tests": [
+                {
+                  "input": "",
+                  "output": "5432"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            }
+          ],
+          "quiz": [
+            {
+              "question": "Why can the typed `get` still print undefined?",
+              "options": [
+                "it cannot",
+                "the cast trusts the implementation; if the walk is wrong, the type is a lie",
+                "of never",
+                "Paths is loose"
+              ],
+              "answer": 1,
+              "explanation": "Types describe; code does."
+            },
+            {
+              "question": "Paths on a type that contains itself (a tree) would…",
+              "options": [
+                "be fine",
+                "recurse without end and hit the depth limit",
+                "be never",
+                "be string"
+              ],
+              "answer": 1,
+              "explanation": "Infinite paths."
+            }
+          ]
+        },
+        {
+          "key": "w30-literal",
+          "title": "Keeping literals alive",
+          "what": "Why `let` loses \"GET\", and how `const` type parameters keep it.",
+          "lesson": "Everything this week depends on the compiler seeing a **literal** — `\"/users/:id\"`,\nnot `string`. Literals are easy to lose.\n\n## Widening\n\n```ts\nlet method = \"GET\";          // string   — a let may be reassigned, so it is widened\nconst verb = \"GET\";          // \"GET\"    — a const cannot change\nrequest(method);             // ✗ TS2345: 'string' is not assignable to '\"GET\" | \"POST\"'\n```\n\n## `as const`\n\nFor objects and arrays, `as const` keeps every literal and makes it readonly:\n\n```ts\nconst EVENTS = [\"open\", \"close\"] as const;       // readonly [\"open\", \"close\"]\ntype Ev = (typeof EVENTS)[number];               // \"open\" | \"close\"\n```\n\nA runtime list and a type, from one declaration — the list is the source of truth.\n\n## `const` type parameters\n\nA generic function infers loose types by default: `tags([\"a\", \"b\"])` is `string[]`.\nSince TypeScript 5.0, a **`const` type parameter** asks for the narrow inference the\ncaller would have got with `as const`:\n\n```ts\nfunction tags<const T extends readonly string[]>(xs: T): T { return xs; }\nconst t = tags([\"a\", \"b\"]);                      // readonly [\"a\", \"b\"]\n```\n\nLibrary authors use this so callers do not have to remember `as const`. A route\nfunction receiving `\"/users/:id\"` does not need it — a string argument already infers\nas its literal — but arrays and objects of routes do.\n\n> ⚠️ **Common mistakes:** `let` for a value whose literal type matters; forgetting\n> `as const` on a list meant to define a union; and writing `as const` at every call\n> site when a `const` type parameter would do it once.\n",
+          "warmup": [
+            {
+              "question": "`let m = \"GET\"` is typed…",
+              "options": [
+                "\"GET\"",
+                "string",
+                "const",
+                "any"
+              ],
+              "answer": 1,
+              "explanation": "Widened, because it may change."
+            },
+            {
+              "question": "`[\"a\", \"b\"] as const` is…",
+              "options": [
+                "string[]",
+                "readonly [\"a\", \"b\"]",
+                "[\"a\", \"b\"]",
+                "readonly string[]"
+              ],
+              "answer": 1,
+              "explanation": "Literal and readonly."
+            },
+            {
+              "question": "`(typeof EVENTS)[number]` gives…",
+              "options": [
+                "the length",
+                "the union of the list's elements",
+                "number",
+                "the first element"
+              ],
+              "answer": 1,
+              "explanation": "Indexed access by number."
+            },
+            {
+              "question": "A `const` type parameter…",
+              "options": [
+                "makes the argument readonly at run time",
+                "infers as narrowly as `as const` would",
+                "is a const variable",
+                "disables inference"
+              ],
+              "answer": 1,
+              "explanation": "TypeScript 5.0."
+            }
+          ],
+          "exercises": [
+            {
+              "id": "tscourse-w30-lt-d1",
+              "title": "The method that became a string",
+              "prompt": "The compiler rejects this program:\n\n    TS2345: Argument of type 'string' is not assignable to parameter of type '\"GET\" | \"POST\"'.\n\nFix the cause.",
+              "hint": "What type does a `let` initialised with \"GET\" get?",
+              "hints": [
+                "What type does a `let` initialised with \"GET\" get?",
+                "A binding that never changes can keep its literal type.",
+                "Use const."
+              ],
+              "language": "typescript",
+              "kind": "diagnose",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "function request(method: \"GET\" | \"POST\", path: string): string {\n  return `${method} ${path}`;\n}\nlet method = \"GET\";\nconsole.log(request(method, \"/health\"));\n",
+              "solution": "function request(method: \"GET\" | \"POST\", path: string): string {\n  return `${method} ${path}`;\n}\nconst method = \"GET\";\nconsole.log(request(method, \"/health\"));\n",
+              "tests": [
+                {
+                  "input": "",
+                  "output": "GET /health"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w30-lt-t1",
+              "title": "A union from a list",
+              "prompt": "Derive `Ev` from the runtime list, so adding an event to the list adds it to the type.",
+              "hint": "Index the list's type with number.",
+              "hints": [
+                "Index the list's type with number.",
+                "(typeof EVENTS)[number]"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<Ev, \"open\" | \"close\" | \"error\">>;\n",
+              "judge_mode": "types",
+              "forbid": [],
+              "starter": "const EVENTS = [\"open\", \"close\", \"error\"] as const;\ntype Ev = ____;\n",
+              "solution": "const EVENTS = [\"open\", \"close\", \"error\"] as const;\ntype Ev = (typeof EVENTS)[number];\n",
+              "tests": [],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w30-lt-1",
+              "title": "A const type parameter",
+              "prompt": "Declare `tags` so its callers get their exact literals back without writing `as const`.",
+              "hint": "Add the const modifier to the type parameter.",
+              "hints": [
+                "Add the const modifier to the type parameter.",
+                "function tags<const T extends readonly string[]>(xs: T): T {"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<typeof t, readonly [\"urgent\", \"later\"]>>;\n",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "____\n  return xs;\n}\nconst t = tags([\"urgent\", \"later\"]);\nconsole.log(t.join(\" \"));\n",
+              "solution": "function tags<const T extends readonly string[]>(xs: T): T {\n  return xs;\n}\nconst t = tags([\"urgent\", \"later\"]);\nconsole.log(t.join(\" \"));\n",
+              "tests": [
+                {
+                  "input": "",
+                  "output": "urgent later"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w30-lt-2",
+              "title": "Handlers named from events",
+              "prompt": "Type a handler table whose keys are `on` + each event name, derived from the runtime list.",
+              "hint": "Map over the event union, renaming each through a template.",
+              "hints": [
+                "Map over the event union, renaming each through a template.",
+                "type Handlers = { [E in Ev as `on${Capitalize<E>}`]: () => string };"
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<keyof Handlers, \"onOpen\" | \"onClose\">>;\n",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "const EVENTS = [\"open\", \"close\"] as const;\ntype Ev = (typeof EVENTS)[number];\n____\nconst handlers: Handlers = {\n  onOpen: () => \"opened\",\n  onClose: () => \"closed\",\n};\nfor (const e of EVENTS) {\n  const key = `on${e.charAt(0).toUpperCase()}${e.slice(1)}` as keyof Handlers;\n  console.log(handlers[key]());\n}\n",
+              "solution": "const EVENTS = [\"open\", \"close\"] as const;\ntype Ev = (typeof EVENTS)[number];\ntype Handlers = { [E in Ev as `on${Capitalize<E>}`]: () => string };\nconst handlers: Handlers = {\n  onOpen: () => \"opened\",\n  onClose: () => \"closed\",\n};\nfor (const e of EVENTS) {\n  const key = `on${e.charAt(0).toUpperCase()}${e.slice(1)}` as keyof Handlers;\n  console.log(handlers[key]());\n}\n",
+              "tests": [
+                {
+                  "input": "",
+                  "output": "opened\nclosed"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            }
+          ],
+          "quiz": [
+            {
+              "question": "Why does `router.add(\"/users/:id\", …)` not need `as const`?",
+              "options": [
+                "it does",
+                "a string argument to a generic `P extends string` already infers as its literal",
+                "routes are const",
+                "of Params"
+              ],
+              "answer": 1,
+              "explanation": "Arrays and objects are where widening bites."
+            },
+            {
+              "question": "Deriving a type from `as const` data makes…",
+              "options": [
+                "two sources of truth",
+                "the runtime list the single source of truth",
+                "the list mutable",
+                "no difference"
+              ],
+              "answer": 1,
+              "explanation": "Add to the list, the type follows."
+            }
+          ]
+        },
+        {
+          "key": "w30-library",
+          "title": "Library #2: the router",
+          "what": "Handlers typed from their patterns, matched at run time.",
+          "lesson": "The library's second module is a **router**:\n\n```ts\nconst router = new Router()\n  .add(\"/health\", () => \"ok\")\n  .add(\"/users/:id\", (p) => `user ${p.id}`)\n  .add(\"/users/:id/posts/:postId\", (p) => `post ${p.postId} by ${p.id}`);\n\nrouter.resolve(\"/users/42/posts/7\");      // \"post 7 by 42\"\nrouter.resolve(\"/nope\");                  // \"404 /nope\"\n```\n\nTwo halves, deliberately separated.\n\n## The type half\n\n```ts\nadd<P extends string>(pattern: P, handler: (params: Params<P>) => string): this\n```\n\n`P` infers as the literal pattern, `Params<P>` parses it (lesson 4), and the handler's\n`p` is exactly `{ id: string; postId: string }`. Returning `this` makes `.add` chain.\n\n## The runtime half\n\nRoutes of *different* parameter types must live in one array, so they are stored\n**type-erased**:\n\n```ts\ninterface Route {\n  readonly pattern: string;\n  readonly handle: (params: Record<string, string>) => string;\n}\n```\n\n`add` casts its precise handler to that erased shape — once, at the boundary — and\n`resolve` matches segment by segment: equal lengths, literal segments equal, `:name`\nsegments captured into the params object.\n\n## The test that proves it\n\nThe capstone's harness contains, in a function that never runs:\n\n```ts\n// @ts-expect-error — /users/:id has no `name` parameter\nrouter.add(\"/users/:id\", (p) => p.name);\n```\n\nIf `Params` were too loose (say `Record<string, string>`), that line would compile and\nthe unused directive would fail the check.\n",
+          "warmup": [
+            {
+              "question": "`add` returns `this` so that…",
+              "options": [
+                "it is typed",
+                "calls can chain",
+                "it is private",
+                "it is async"
+              ],
+              "answer": 1,
+              "explanation": "A fluent API."
+            },
+            {
+              "question": "Routes are stored type-erased because…",
+              "options": [
+                "types are slow",
+                "routes with different parameter types must share one array",
+                "Params is unknown",
+                "of classes"
+              ],
+              "answer": 1,
+              "explanation": "One cast, at the boundary."
+            },
+            {
+              "question": "A path matches a pattern when…",
+              "options": [
+                "it starts with it",
+                "segment counts match and every literal segment is equal",
+                "it contains a :",
+                "always"
+              ],
+              "answer": 1,
+              "explanation": "Segment by segment."
+            },
+            {
+              "question": "The `@ts-expect-error` test fails if…",
+              "options": [
+                "the router is wrong at run time",
+                "the handler type is loose enough that p.name compiles",
+                "it runs",
+                "never"
+              ],
+              "answer": 1,
+              "explanation": "An unused directive is an error."
+            }
+          ],
+          "exercises": [
+            {
+              "id": "tscourse-w30-lb-1",
+              "title": "Match one segment",
+              "prompt": "A parameter segment captures; a literal segment must be equal.",
+              "hint": "Two cases per segment: a parameter, or a literal.",
+              "hints": [
+                "Two cases per segment: a parameter, or a literal.",
+                "A mismatched literal means this pattern does not match at all."
+              ],
+              "language": "typescript",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "function match(pattern: string, path: string): Record<string, string> | null {\n  const want = pattern.split(\"/\").filter((s) => s !== \"\");\n  const got = path.split(\"/\").filter((s) => s !== \"\");\n  if (want.length !== got.length) {\n    return null;\n  }\n  const params: Record<string, string> = {};\n  for (let i = 0; i < want.length; i = i + 1) {\n    const w = want[i] ?? \"\";\n    const g = got[i] ?? \"\";\n____\n  }\n  return params;\n}\nconsole.log(JSON.stringify(match(\"/users/:id\", \"/users/42\")));\nconsole.log(JSON.stringify(match(\"/users/:id\", \"/teams/42\")));\nconsole.log(JSON.stringify(match(\"/users/:id\", \"/users/42/x\")));\n",
+              "solution": "function match(pattern: string, path: string): Record<string, string> | null {\n  const want = pattern.split(\"/\").filter((s) => s !== \"\");\n  const got = path.split(\"/\").filter((s) => s !== \"\");\n  if (want.length !== got.length) {\n    return null;\n  }\n  const params: Record<string, string> = {};\n  for (let i = 0; i < want.length; i = i + 1) {\n    const w = want[i] ?? \"\";\n    const g = got[i] ?? \"\";\n    if (w.startsWith(\":\")) {\n      params[w.slice(1)] = g;\n    } else if (w !== g) {\n      return null;\n    }\n  }\n  return params;\n}\nconsole.log(JSON.stringify(match(\"/users/:id\", \"/users/42\")));\nconsole.log(JSON.stringify(match(\"/users/:id\", \"/teams/42\")));\nconsole.log(JSON.stringify(match(\"/users/:id\", \"/users/42/x\")));\n",
+              "tests": [
+                {
+                  "input": "",
+                  "output": "{\"id\":\"42\"}\nnull\nnull"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "tscourse-w30-lb-fix1",
+              "title": "Fix the match that ignored the length",
+              "prompt": "`/users/42/posts/7` should not match the pattern `/users/:id`, and this prints `{\"id\":\"42\"}` — it compares the pattern's segments and never checks that the path has no more of its own.",
+              "hint": "The loop only looks at as many segments as the pattern has.",
+              "hints": [
+                "The loop only looks at as many segments as the pattern has.",
+                "A path with extra segments is a different route.",
+                "Return null when the segment counts differ."
+              ],
+              "language": "typescript",
+              "kind": "fix",
+              "difficulty": "Easy",
+              "strictness": "strict+indexed",
+              "harness": "",
+              "judge_mode": "",
+              "forbid": [],
+              "starter": "function match(pattern: string, path: string): Record<string, string> | null {\n  const want = pattern.split(\"/\").filter((s) => s !== \"\");\n  const got = path.split(\"/\").filter((s) => s !== \"\");\n  const params: Record<string, string> = {};\n  for (let i = 0; i < want.length; i = i + 1) {\n    const w = want[i] ?? \"\";\n    const g = got[i] ?? \"\";\n    if (w.startsWith(\":\")) {\n      params[w.slice(1)] = g;\n    } else if (w !== g) {\n      return null;\n    }\n  }\n  return params;\n}\nconsole.log(JSON.stringify(match(\"/users/:id\", \"/users/42/posts/7\")));\n",
+              "solution": "function match(pattern: string, path: string): Record<string, string> | null {\n  const want = pattern.split(\"/\").filter((s) => s !== \"\");\n  const got = path.split(\"/\").filter((s) => s !== \"\");\n  if (want.length !== got.length) {\n    return null;\n  }\n  const params: Record<string, string> = {};\n  for (let i = 0; i < want.length; i = i + 1) {\n    const w = want[i] ?? \"\";\n    const g = got[i] ?? \"\";\n    if (w.startsWith(\":\")) {\n      params[w.slice(1)] = g;\n    } else if (w !== g) {\n      return null;\n    }\n  }\n  return params;\n}\nconsole.log(JSON.stringify(match(\"/users/:id\", \"/users/42/posts/7\")));\n",
+              "tests": [
+                {
+                  "input": "",
+                  "output": "null"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            }
+          ],
+          "quiz": [
+            {
+              "question": "Why does the router's first route not match `/users/42/posts/7` in the capstone?",
+              "options": [
+                "order",
+                "the segment counts differ",
+                "it is shadowed",
+                "of types"
+              ],
+              "answer": 1,
+              "explanation": "The length check."
+            },
+            {
+              "question": "Where would a real router validate `:id` as a number?",
+              "options": [
+                "in the type",
+                "at run time, in the handler or a parser — types never see the real path",
+                "in Params",
+                "nowhere"
+              ],
+              "answer": 1,
+              "explanation": "Runtime values need runtime checks (week 15)."
+            }
+          ]
+        }
+      ],
+      "capstone": {
+        "title": "Library #2 — the router",
+        "brief": "Build the router class. The parameter types are supplied:\n\n```ts\ntype ParamNames<P extends string> = …;          // lesson 4\ntype Params<P extends string> = { [K in ParamNames<P>]: string };\ninterface Route {\n  readonly pattern: string;\n  readonly handle: (params: Record<string, string>) => string;\n}\n```\n\n**`class Router`:**\n\n* `add<P extends string>(pattern: P, handler: (params: Params<P>) => string): this` —\n  store the route, casting the handler to the erased shape once, and return `this`.\n* `resolve(path: string): string` — try the routes **in the order they were added**;\n  the first whose pattern matches (same number of segments, every literal segment\n  equal, every `:name` segment captured) is called with the captured params. If none\n  matches, return `404 <path>`.\n\nThe program registers three routes and resolves each input line:\n\n```\n/health\n/users/42\n/users/42/posts/7\n/users\n```\n\n```\nok\nuser 42\npost 7 by 42\n404 /users\n```\n\n**How it is checked:** stdout, plus type assertions — that `Params` of the three\npatterns are exactly right, and a `@ts-expect-error` on a handler that reads a\nparameter its pattern does not declare. The class must use **no parameter\nproperties** (week 11) — declare `routes` as a field.\n",
+        "kind": "auto",
+        "exercise": {
+          "id": "tscourse-w30-capstone",
+          "title": "Library #2 — the router",
+          "prompt": "Write the Router class: typed registration with chaining, and segment-by-segment resolution with a 404 — checked on stdout and by type assertions.",
+          "hint": "Store routes type-erased: one cast in add, where the precise handler becomes the erased shape.",
+          "hints": [
+            "Store routes type-erased: one cast in add, where the precise handler becomes the erased shape.",
+            "add returns this, so registrations chain.",
+            "resolve: split into non-empty segments, compare counts first, then each segment.",
+            "A `:name` segment captures; a literal segment must be equal.",
+            "No parameter properties — declare `routes` as a field (week 11)."
+          ],
+          "language": "typescript",
+          "kind": "challenge",
+          "difficulty": "Hard",
+          "strictness": "strict+indexed",
+          "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype _1 = Expect<Equal<Params<\"/users/:id/posts/:postId\">, { id: string; postId: string }>>;\ntype _2 = Expect<Equal<Params<\"/health\">, {}>>;\nfunction _neverCalled(): void {\n  // @ts-expect-error — /users/:id has no `name` parameter\n  router.add(\"/users/:id\", (p) => p.name);\n}\n",
+          "judge_mode": "",
+          "forbid": [],
+          "starter": "import * as fs from \"fs\";\ntype ParamNames<P extends string> =\n  P extends `${string}:${infer Name}/${infer Rest}` ? Name | ParamNames<`/${Rest}`>\n  : P extends `${string}:${infer Name}` ? Name\n  : never;\ntype Params<P extends string> = { [K in ParamNames<P>]: string };\ninterface Route {\n  readonly pattern: string;\n  readonly handle: (params: Record<string, string>) => string;\n}\n____\nconst router = new Router()\n  .add(\"/health\", () => \"ok\")\n  .add(\"/users/:id\", (p) => `user ${p.id}`)\n  .add(\"/users/:id/posts/:postId\", (p) => `post ${p.postId} by ${p.id}`);\nconst lines = fs.readFileSync(0, \"utf8\").split(\"\\n\").map((l) => l.trim()).filter((l) => l !== \"\");\nfor (const line of lines) {\n  console.log(router.resolve(line));\n}\n",
+          "solution": "import * as fs from \"fs\";\ntype ParamNames<P extends string> =\n  P extends `${string}:${infer Name}/${infer Rest}` ? Name | ParamNames<`/${Rest}`>\n  : P extends `${string}:${infer Name}` ? Name\n  : never;\ntype Params<P extends string> = { [K in ParamNames<P>]: string };\ninterface Route {\n  readonly pattern: string;\n  readonly handle: (params: Record<string, string>) => string;\n}\nclass Router {\n  private readonly routes: Route[] = [];\n  add<P extends string>(pattern: P, handler: (params: Params<P>) => string): this {\n    this.routes.push({ pattern, handle: handler as (params: Record<string, string>) => string });\n    return this;\n  }\n  resolve(path: string): string {\n    const parts = path.split(\"/\").filter((s) => s !== \"\");\n    for (const r of this.routes) {\n      const want = r.pattern.split(\"/\").filter((s) => s !== \"\");\n      if (want.length !== parts.length) {\n        continue;\n      }\n      const params: Record<string, string> = {};\n      let ok = true;\n      want.forEach((w, i) => {\n        const got = parts[i] ?? \"\";\n        if (w.startsWith(\":\")) {\n          params[w.slice(1)] = got;\n        } else if (w !== got) {\n          ok = false;\n        }\n      });\n      if (ok) {\n        return r.handle(params);\n      }\n    }\n    return `404 ${path}`;\n  }\n}\nconst router = new Router()\n  .add(\"/health\", () => \"ok\")\n  .add(\"/users/:id\", (p) => `user ${p.id}`)\n  .add(\"/users/:id/posts/:postId\", (p) => `post ${p.postId} by ${p.id}`);\nconst lines = fs.readFileSync(0, \"utf8\").split(\"\\n\").map((l) => l.trim()).filter((l) => l !== \"\");\nfor (const line of lines) {\n  console.log(router.resolve(line));\n}\n",
+          "tests": [
+            {
+              "input": "/health\n/users/42\n/users/42/posts/7\n/users",
+              "output": "ok\nuser 42\npost 7 by 42\n404 /users"
+            },
+            {
+              "input": "/users/abc/posts/xyz\n/health/extra",
+              "output": "post xyz by abc\n404 /health/extra"
+            },
+            {
+              "input": "/",
+              "output": "404 /"
+            }
+          ],
+          "source_slug": "",
+          "dataset": ""
+        },
+        "example_io": "ok\nuser 42\npost 7 by 42\n404 /users",
+        "rubric": [
+          "handlers are typed from their pattern strings, not from a loose record",
+          "routes are stored type-erased with exactly one cast, in add",
+          "add returns this, so registrations chain",
+          "resolution compares segment counts before segments",
+          "routes are tried in the order added, and an unmatched path is a 404",
+          "no parameter properties"
+        ],
+        "reference": "",
+        "stretch": {
+          "id": "tscourse-w30-capstone-stretch",
+          "title": "Library #2 (stretch)",
+          "prompt": "A typed message formatter. `format(\"Hello {name}, you have {count} new\", values)` must require exactly the placeholders the template names — computed with a template literal type — and fill them at run time. Input: two lines, a name and a count.",
+          "hint": "Placeholders is ParamNames with braces instead of a colon and a slash.",
+          "hints": [
+            "Placeholders is ParamNames with braces instead of a colon and a slash.",
+            "The values parameter is a mapped type over those names.",
+            "At run time, one regex replace with a callback fills them in."
+          ],
+          "language": "typescript",
+          "kind": "challenge",
+          "difficulty": "Hard",
+          "strictness": "strict+indexed",
+          "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype _1 = Expect<Equal<Placeholders<\"a {x} b {y}\">, \"x\" | \"y\">>;\ntype _2 = Expect<Equal<Placeholders<\"none\">, never>>;\nfunction _neverCalled(): void {\n  // @ts-expect-error — {count} is missing\n  format(\"Hi {name}, {count}\", { name: \"x\" });\n}\n",
+          "judge_mode": "",
+          "forbid": [],
+          "starter": "import * as fs from \"fs\";\n____\nconst [who, count] = fs.readFileSync(0, \"utf8\").split(\"\\n\").map((l) => l.trim());\nconsole.log(format(\"Hello {name}, you have {count} new\", { name: who ?? \"\", count: Number(count ?? \"0\") }));\n",
+          "solution": "import * as fs from \"fs\";\ntype Placeholders<S extends string> =\n  S extends `${string}{${infer K}}${infer Rest}` ? K | Placeholders<Rest> : never;\nfunction format<S extends string>(template: S, values: { [K in Placeholders<S>]: string | number }): string {\n  const table = values as Record<string, string | number>;\n  return template.replace(/\\{(\\w+)\\}/g, (_: string, key: string) => String(table[key] ?? \"\"));\n}\nconst [who, count] = fs.readFileSync(0, \"utf8\").split(\"\\n\").map((l) => l.trim());\nconsole.log(format(\"Hello {name}, you have {count} new\", { name: who ?? \"\", count: Number(count ?? \"0\") }));\n",
+          "tests": [
+            {
+              "input": "Ada\n3",
+              "output": "Hello Ada, you have 3 new"
+            },
+            {
+              "input": "Lin\n0",
+              "output": "Hello Lin, you have 0 new"
+            }
+          ],
+          "source_slug": "",
+          "dataset": ""
+        }
+      },
+      "objectives": [
+        "Write template literal types, and predict how unions multiply inside them",
+        "Change case with Uppercase, Lowercase, Capitalize and Uncapitalize",
+        "Remap keys through a template, and say why `K & string` is needed",
+        "Match and take apart strings with `infer` inside a template",
+        "Write recursive string types: trim, split, replace",
+        "Use `infer` in tuple positions, object properties, and with an `extends` constraint",
+        "Parse route parameters out of a path string at the type level",
+        "Type dotted object paths, and the value at a path",
+        "Keep literal types alive with `as const` and `const` type parameters",
+        "Give a runtime string API a type computed from its argument"
+      ],
+      "why": "String-typed APIs are everywhere — routes, event names, CSS values, translation keys, SQL-ish query builders — and template literal types are how modern libraries make them safe. Being able to read (and occasionally write) the types behind `router.get(\"/users/:id\", …)` is what separates using a typed library from being surprised by it.",
+      "est_minutes": 420,
+      "glossary": [
+        {
+          "term": "template literal type",
+          "def": "`prefix${T}suffix` at the type level. Unions inside it multiply."
+        },
+        {
+          "term": "intrinsic string types",
+          "def": "Uppercase, Lowercase, Capitalize, Uncapitalize — case changes built into the compiler."
+        },
+        {
+          "term": "K & string",
+          "def": "Narrows a key type to its string members, so it can go inside a template."
+        },
+        {
+          "term": "pattern match",
+          "def": "S extends `${infer A}-${infer B}` — split S at the first '-'."
+        },
+        {
+          "term": "recursive string type",
+          "def": "A string type that calls itself on the rest — trim, split, replace."
+        },
+        {
+          "term": "variadic tuple",
+          "def": "[...unknown[], infer L] — match the LAST element of any tuple."
+        },
+        {
+          "term": "infer … extends",
+          "def": "infer N extends number — infer, and only accept it if it matches the constraint."
+        },
+        {
+          "term": "path type",
+          "def": "\"db\" | \"db.host\" — every dotted path into an object, as a union."
+        },
+        {
+          "term": "widening",
+          "def": "`let m = \"GET\"` is typed string, not \"GET\" — the literal is lost."
+        },
+        {
+          "term": "const type parameter",
+          "def": "function f<const T>(x: T) — infer T as narrowly as `as const` would."
+        }
+      ],
+      "cheatsheet": "```ts\n// ---- building strings ----------------------------------------------------\ntype Px = `${number}px`;\ntype Cell = `${\"a\" | \"b\"}${1 | 2}`;                   // a1 | a2 | b1 | b2\ntype OnEvent<E extends string> = `on${Capitalize<E>}`;\ntype Getters<T> = { [K in keyof T as `get${Capitalize<K & string>}`]: () => T[K] };\n//                                                  ^^^^^^^^^^ keyof may hold number | symbol\n\n// ---- taking them apart -----------------------------------------------------\ntype StartsWith<S extends string, P extends string> = S extends `${P}${string}` ? true : false;\ntype TrimLeft<S extends string> = S extends ` ${infer R}` ? TrimLeft<R> : S;\ntype Split<S extends string, D extends string> =\n  S extends `${infer H}${D}${infer T}` ? [H, ...Split<T, D>] : [S];\n\n// ---- infer, in depth ---------------------------------------------------------\ntype Last<T extends readonly unknown[]> = T extends readonly [...unknown[], infer L] ? L : never;\ntype ToNum<S extends string> = S extends `${infer N extends number}` ? N : never;   // \"42\" → 42\ntype DataOf<T> = T extends { data: infer D } ? D : never;\n\n// ---- a route's parameters ------------------------------------------------------\ntype ParamNames<P extends string> =\n  P extends `${string}:${infer Name}/${infer Rest}` ? Name | ParamNames<`/${Rest}`>\n  : P extends `${string}:${infer Name}` ? Name\n  : never;\ntype Params<P extends string> = { [K in ParamNames<P>]: string };\n\n// ---- dotted paths -----------------------------------------------------------------\ntype Paths<T> = T extends object\n  ? { [K in keyof T & string]: K | `${K}.${Paths<T[K]>}` }[keyof T & string]\n  : never;\n\n// ---- keeping literals ----------------------------------------------------------------\nconst m = \"GET\";                       // \"GET\"      (let m = \"GET\" would be string)\nconst xs = [\"a\", \"b\"] as const;        // readonly [\"a\", \"b\"]\nfunction tags<const T extends readonly string[]>(xs: T): T { return xs; }\n```\n",
+      "self_check": [
+        "Can you say how many members `${\"a\"|\"b\"}-${1|2|3}` has?",
+        "Can you write an event-handler name type with Capitalize?",
+        "Can you explain why `Capitalize<K>` needs `K & string` in a mapped type?",
+        "Can you test whether a string type starts with a prefix?",
+        "Can you write a recursive TrimLeft and Split?",
+        "Can you get the last element of any tuple type?",
+        "Can you turn \"42\" into the literal type 42?",
+        "Can you extract the parameter names from \"/users/:id/posts/:postId\"?",
+        "Can you list every dotted path of a nested object type?",
+        "Can you say why `let method = \"GET\"` fails where `const` passes?",
+        "Can you give a router handler a params type computed from its path?"
+      ],
+      "review": [
+        {
+          "question": "`${\"a\" | \"b\"}-${1 | 2}` has how many members?",
+          "options": [
+            "2",
+            "4",
+            "3",
+            "1"
+          ],
+          "answer": 1,
+          "explanation": "Unions multiply."
+        },
+        {
+          "question": "`Capitalize<\"click\">` is…",
+          "options": [
+            "\"CLICK\"",
+            "\"Click\"",
+            "\"click\"",
+            "string"
+          ],
+          "answer": 1,
+          "explanation": "First letter only."
+        },
+        {
+          "question": "In `{ [K in keyof T as `get${Capitalize<K>}`]: … }`, the error is because…",
+          "options": [
+            "Capitalize is wrong",
+            "keyof T may include number and symbol keys",
+            "T is unknown",
+            "of the as"
+          ],
+          "answer": 1,
+          "explanation": "Write K & string."
+        },
+        {
+          "question": "`S extends `${infer H} ${string}` ? H : S` on \"hello big world\" gives…",
+          "options": [
+            "\"hello big\"",
+            "\"hello\"",
+            "\"world\"",
+            "never"
+          ],
+          "answer": 1,
+          "explanation": "infer H takes the shortest match before the first space."
+        },
+        {
+          "question": "A recursive string type needs…",
+          "options": [
+            "a loop",
+            "a case where it stops calling itself",
+            "a Map",
+            "infer twice"
+          ],
+          "answer": 1,
+          "explanation": "Week 25, at the type level."
+        },
+        {
+          "question": "`[...unknown[], infer L]` matches…",
+          "options": [
+            "the first element",
+            "the last element of any tuple",
+            "an empty tuple",
+            "arrays only"
+          ],
+          "answer": 1,
+          "explanation": "A variadic tuple pattern."
+        },
+        {
+          "question": "`infer N extends number` in `${infer N extends number}` turns \"42\" into…",
+          "options": [
+            "number",
+            "42",
+            "\"42\"",
+            "never"
+          ],
+          "answer": 1,
+          "explanation": "The literal number."
+        },
+        {
+          "question": "`ParamNames<\"/users/:id/posts/:postId\">` is…",
+          "options": [
+            "string",
+            "\"id\" | \"postId\"",
+            "[\"id\", \"postId\"]",
+            "never"
+          ],
+          "answer": 1,
+          "explanation": "Parsed from the string."
+        },
+        {
+          "question": "`let method = \"GET\"` has the type…",
+          "options": [
+            "\"GET\"",
+            "string",
+            "any",
+            "const"
+          ],
+          "answer": 1,
+          "explanation": "let widens; const does not."
+        },
+        {
+          "question": "A `const` type parameter makes `f([\"a\", \"b\"])` infer…",
+          "options": [
+            "string[]",
+            "readonly [\"a\", \"b\"]",
+            "[string, string]",
+            "any"
+          ],
+          "answer": 1,
+          "explanation": "As if the caller had written as const."
+        }
+      ],
+      "milestone": "Library #2 — the router. Register handlers against patterns like \"/users/:id/posts/:postId\"; each handler's parameter object is typed FROM the pattern string, so a handler that reads a parameter the path does not declare does not compile. At run time the router matches incoming paths segment by segment and calls the right handler, or reports a 404.",
       "practice": []
     },
     {

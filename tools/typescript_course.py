@@ -492,6 +492,7 @@ _WEEK_FILES = (
     "ts_w27_graphs.py",        #          graphs: BFS & DFS
     "ts_w28_heaps.py",         #          heaps & intervals
     "ts_w29_mapped.py",        # Month 8 — conditional & mapped types
+    "ts_w30_template.py",      #          inference & template literal types
 )
 
 for _week_file in _WEEK_FILES:
@@ -559,8 +560,6 @@ for _week_file in _WEEK_FILES:
 _WEEKS += [
 ]
 _WEEKS += [
-    _skel(30, 8, _M8, "Inference & Template Literal Types",
-          "Bend the inference engine and build types from string patterns."),
     _skel(31, 8, _M8, "Type-Level Challenges",
           "Solve 'type gymnastics' puzzles the way interviewers pose them."),
     _skel(32, 8, _M8, "Mock Interview Week",
@@ -738,6 +737,8 @@ _SCOPE_RULES = [
     # absent from every program in weeks 1-28 (week 14 USED Partial and Pick but
     # never showed how they are written).
     ("infer ", 29), ("in keyof", 29),
+    # Week 30: the intrinsic string-case types. Verified absent from weeks 1-29.
+    ("Uppercase<", 30), ("Lowercase<", 30), ("Capitalize<", 30), ("Uncapitalize<", 30),
     #
     # DELIBERATELY NOT GATED, because the authored weeks already use them and a
     # rule here would be a false claim about when the course first shows them:

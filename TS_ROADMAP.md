@@ -1,7 +1,7 @@
-# TypeScript Roadmap — Weeks 30-32
+# TypeScript Roadmap — Weeks 31-32
 
 The plan for finishing **TypeScript: Zero to Interview**, the 8-month course in
-`tools/typescript_course.py`. Weeks 1-29 ship; weeks 30-32 are one-line
+`tools/typescript_course.py`. Weeks 1-30 ship; weeks 31-32 are one-line
 skeletons waiting to be authored.
 
 Unlike [`JAVA_ROADMAP.md`](JAVA_ROADMAP.md), which starts after the basics, this
@@ -15,7 +15,7 @@ rule that nothing may require syntax a later week teaches.
 
 ## Where it stands
 
-**Built:** weeks 1-29 — **223 lessons, 1,592 judged exercises** (1,577 in lessons
+**Built:** weeks 1-30 — **230 lessons, 1,626 judged exercises** (1,611 in lessons
 and capstones, 15 in week 1's practice families), twenty Budget Buddy capstones —
 **the arc is complete** — eight interview reps, and a full
 glossary/cheat-sheet/self-check/review set per week. **Months 6 and 7 are finished.**
@@ -55,18 +55,24 @@ is the stuff that is only obvious after it has cost you an hour.
 
 | | covers | last run |
 |---|---|---|
-| `python tools/verify_ts_course.py --starters` | weeks 1-23 in full; **weeks 24-27 one at a time (`--only=wNN-`), 0 failures each** | current |
-| `cd src-tauri && cargo test --release --test verify_ts_course` | **weeks 1-25, 1,443 exercises, 3 tests, 914s, all green** | weeks 26-27 not yet |
+| `python tools/verify_ts_course.py --starters` | weeks 1-23 in full; **weeks 24-30 one at a time (`--only=wNN-`), 0 failures each** | current |
+| `cd src-tauri && cargo test --release --test verify_ts_course` | **weeks 1-28 (batch F's closing run), 1,557 exercises, 3 tests, all green** | weeks 29-30 not yet |
 
 The Rust suite is the judge-level one — it puts every program through the same
 judge the app uses, rather than through the fast Node path. The old gap (weeks
 22-23 never judge-verified) is closed. The suite now runs **once per batch**, as
 "Verification will get slow" recommends, started in the background right after a
-week is committed; weeks 26 and 27 landed after the last run and are covered by
-the Python verifier until batch F's closing run. Each new week was verified alone,
+batch's last week is committed; weeks 29-30 landed after it and are covered by the
+Python verifier until batch G's closing run. Each new week was verified alone,
 which is sufficient because adding a week leaves every earlier week of the seed
 **byte-identical** (checked by comparing each week's JSON against the previous
 commit's).
+
+**Timing, recorded honestly:** the weeks 1-25 run took 914 s; the weeks 1-28 run took
+**6,545 s**, because it shared the machine with the authoring of weeks 29-30 (the
+Python verifier and `gen_seed.py` both spawn Node). Nothing failed — the judge's
+timeouts are generous — but it is the memory note "run judge-heavy suites alone"
+measured: alone, expect about 15 minutes.
 
 One thing to know before running it: the test `include_str!`s `ts_course.json` at
 **compile time**. A run already in progress when you regenerate the seed is
@@ -82,7 +88,7 @@ verifier revealed which kind they were.
 ### Nothing is half-finished
 
 Every authored week is complete: lessons, exercises, capstone, stretch, glossary,
-cheat sheet, self-check, review, milestone. Weeks 30-32 are untouched skeletons, as
+cheat sheet, self-check, review, milestone. Weeks 31-32 are untouched skeletons, as
 they were before. There is no partially-authored week and no disabled exercise.
 
 ### Five traps that cost real time
@@ -985,7 +991,7 @@ change where no such argument exists.
 All 34 expected outputs were right first time; three `fix` prompts misquoted their
 starters' output and were corrected from real runs.
 
-### Month 8 — Advanced Types & Interview Polish (weeks 29-32) — 🚧 **29 done**
+### Month 8 — Advanced Types & Interview Polish (weeks 29-32) — 🚧 **29-30 done**
 
 **29. Conditional & Mapped Types** ✅ · `tools/ts_w29_mapped.py` · 7 lessons,
 35 exercises (25 type-graded)
@@ -1027,10 +1033,39 @@ not a runtime filter.
 Two new scope rules: `infer ` and `in keyof`, both at 29, verified absent from every
 earlier program. Every expected output and every `fix` prompt was right first time.
 
-**30. Inference & Template Literal Types** ⬜ · reuse
-`ts_template_literal_types`, `ts_keyof_indexed`
-`infer` in depth · template literal types · `Uppercase`/`Capitalize` · parsing
-a string at the type level · typed object paths.
+**30. Inference & Template Literal Types** ✅ · `tools/ts_w30_template.py` ·
+7 lessons, 34 exercises (22 type-graded)
+`w30-template` · `w30-match` · `w30-infer` · `w30-parse` · `w30-paths` ·
+`w30-literal` · `w30-library`.
+*Capstone:* **Library #2 — the router** decision 2 named: handlers typed from their
+pattern strings (`"/users/:id/posts/:postId"` → `{ id: string; postId: string }`),
+routes stored type-erased with one cast in `add`, `add` returning `this` so
+registrations chain, and segment-by-segment resolution with a 404. The harness
+proves `(p) => p.name` on `/users/:id` does not compile. Stretch: a typed message
+formatter whose values object must name exactly the template's `{placeholders}`.
+Kinds: 27 drill (most type-graded), 2 diagnose, 2 fix, 1 predict.
+
+**Every type in the week was probed before it was written** — including the ones
+that look too clever to be true: a template of two unions multiplies (`${"a"|"b"}-${1|2}`
+has four members), `infer N extends number` turns `"42"` into the literal `42`,
+`Paths<Config>` is exactly `"name" | "db" | "db.host" | "db.port"`, and a `const`
+type parameter keeps `["a", "b"]` as `readonly ["a", "b"]`.
+
+**The key-type trap is a diagnose, not a footnote:** `Capitalize<K>` with
+`K in keyof T` is **TS2344**, because `keyof` may include number and symbol keys;
+`K & string` is the idiom every library uses. **Widening** gets one too — `let
+method = "GET"` is `string`, which a `"GET" | "POST"` parameter rejects (TS2345).
+
+**A new helper, `_typed`,** grades a runtime *drill* on stdout and on harness
+assertions (week 29 did this through `_mk` directly for its capstone). Lesson 5's
+typed `get(config, "db.port")` is graded both ways: it must print `5433`, its result
+must be `number`, and `get(config, "db.prot")` must not compile. Its `fix` is the
+case the types cannot catch — a walk that splits on `/` while the type says `.`
+prints `undefined` — "types describe; code does".
+
+Four new scope rules: `Uppercase<`, `Lowercase<`, `Capitalize<`, `Uncapitalize<`, at 30.
+Every expected output and `fix` prompt was right first time; one quiz question was
+caught garbled in review before generation.
 
 **31. Type-Level Challenges** ⬜ · reuse `ts_type_level`
 Recursive types · tuple manipulation · depth limits and why they exist ·
@@ -1062,7 +1097,7 @@ still go first.
 | **D** ✅ | 17-20 | Async + data structures; the Budget Buddy arc is closed |
 | **E** ✅ | 21-24 | Algorithmic thinking; the month's idiom is to count operations |
 | **F** ✅ | 25-28 | DSA core |
-| **G** 🚧 | 29 ✅, **30** ← next | Type-level; lowest risk, highest polish |
+| **G** 🚧 | 29-30 ✅, **31** ← next | Type-level; lowest risk, highest polish |
 
 **Batches C and D are done, and with them every risk the back half was waiting
 on**: the one-file module problem (settled with evidence — week 16), async
