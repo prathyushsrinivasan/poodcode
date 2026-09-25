@@ -300,6 +300,80 @@
    "d\nd\n(none)\n3 words indexed"
   ]
  },
+ "ts_array_methods-error1": {
+  "hash": "2555d6ac49ca75294042",
+  "diagnostics": [
+   {
+    "code": 2339,
+    "line": 1,
+    "msg": "Property 'length' does not exist on type 'number'."
+   }
+  ]
+ },
+ "ts_array_methods-error2": {
+  "hash": "54137196b2f209f49ea3",
+  "diagnostics": [
+   {
+    "code": 2322,
+    "line": 1,
+    "msg": "Type 'number | undefined' is not assignable to type 'number'.   Type 'undefined' is not assignable to type 'number'."
+   }
+  ]
+ },
+ "ts_array_methods-example1": {
+  "hash": "2d51b44fc835a88a0e01",
+  "outputs": [
+   "7 the|quick|fox|jumps|over|the|dog"
+  ]
+ },
+ "ts_array_methods-example2": {
+  "hash": "dbfe1ebbb57254235d96",
+  "outputs": [
+   "{\"ts\":3,\"go\":2,\"rust\":1}"
+  ]
+ },
+ "ts_array_methods-example3": {
+  "hash": "686bf0b682d379156c8e",
+  "outputs": [
+   "[{\"id\":1,\"done\":false},{\"id\":2,\"done\":true}] false"
+  ]
+ },
+ "ts_array_methods-pitfall1-right": {
+  "hash": "7f33a2dc0110931de6ca",
+  "outputs": [
+   "4,8"
+  ]
+ },
+ "ts_array_methods-pitfall1-wrong": {
+  "hash": "9e699381744f61dbc591",
+  "outputs": [
+   "undefined"
+  ]
+ },
+ "ts_array_methods-pitfall2-right": {
+  "hash": "751760bee4592e513908",
+  "outputs": [
+   "0"
+  ]
+ },
+ "ts_array_methods-pitfall2-wrong": {
+  "hash": "9bb5df6283a721708652",
+  "outputs": [
+   "-1"
+  ]
+ },
+ "ts_array_methods-pitfall3-right": {
+  "hash": "6d101547c87534b36a96",
+  "outputs": [
+   "a,b | queue: a,b,c,d"
+  ]
+ },
+ "ts_array_methods-pitfall3-wrong": {
+  "hash": "67ae6ba48a6197809ec0",
+  "outputs": [
+   "a,b | queue: c,d"
+  ]
+ },
  "ts_array_modern-copy": {
   "hash": "c84ff4eb9e16d9b74d56",
   "outputs": [
@@ -398,6 +472,80 @@
   "hash": "c83871affb8797f6c3ba",
   "outputs": [
    "1 10 100 9"
+  ]
+ },
+ "ts_arrays-error1": {
+  "hash": "e2a4543e972d980f6f16",
+  "diagnostics": [
+   {
+    "code": 2345,
+    "line": 2,
+    "msg": "Argument of type 'string' is not assignable to parameter of type 'number'."
+   }
+  ]
+ },
+ "ts_arrays-error2": {
+  "hash": "19d9110eb51c37225d3d",
+  "diagnostics": [
+   {
+    "code": 2493,
+    "line": 2,
+    "msg": "Tuple type '[number, number]' of length '2' has no element at index '2'."
+   }
+  ]
+ },
+ "ts_arrays-example1": {
+  "hash": "b903531f5580c23677e7",
+  "outputs": [
+   "@.#.\n.#.#\n#.#."
+  ]
+ },
+ "ts_arrays-example2": {
+  "hash": "a14b1db095a87a12673b",
+  "outputs": [
+   "2 3 99"
+  ]
+ },
+ "ts_arrays-example3": {
+  "hash": "cf89f696239bd245d8de",
+  "outputs": [
+   "true 1 3\ngo -1"
+  ]
+ },
+ "ts_arrays-pitfall1-right": {
+  "hash": "318768f59251db754b8c",
+  "outputs": [
+   "[[\"x\"],[]]"
+  ]
+ },
+ "ts_arrays-pitfall1-wrong": {
+  "hash": "3ec9c2b29238e00b8e0b",
+  "outputs": [
+   "[[\"x\"],[\"x\"]]"
+  ]
+ },
+ "ts_arrays-pitfall2-right": {
+  "hash": "dde5ccfecb4217da1463",
+  "outputs": [
+   "arrived: cy,ana,bo"
+  ]
+ },
+ "ts_arrays-pitfall2-wrong": {
+  "hash": "59c2ec092306e959b0c1",
+  "outputs": [
+   "arrived: ana,bo,cy"
+  ]
+ },
+ "ts_arrays-pitfall3-right": {
+  "hash": "4af366339d506d04e669",
+  "outputs": [
+   "same"
+  ]
+ },
+ "ts_arrays-pitfall3-wrong": {
+  "hash": "4d1b32a97ba321de35cb",
+  "outputs": [
+   "different"
   ]
  },
  "ts_async_iteration-error1": {
@@ -1133,6 +1281,85 @@
    "0.000"
   ]
  },
+ "ts_destructuring-error1": {
+  "hash": "2e8d5521a49375639b70",
+  "diagnostics": [
+   {
+    "code": 2339,
+    "line": 1,
+    "msg": "Property 'age' does not exist on type '{ name: string; }'."
+   },
+   {
+    "code": 2353,
+    "line": 1,
+    "msg": "Object literal may only specify known properties, and 'name' does not exist in type '{ age: any; }'."
+   }
+  ]
+ },
+ "ts_destructuring-error2": {
+  "hash": "179ad5954dfd2395a1eb",
+  "diagnostics": [
+   {
+    "code": 2488,
+    "line": 1,
+    "msg": "Type '{ x: number; }' must have a '[Symbol.iterator]()' method that returns an iterator."
+   }
+  ]
+ },
+ "ts_destructuring-example1": {
+  "hash": "756c045f325b56660176",
+  "outputs": [
+   "#7: 3 units, note: none"
+  ]
+ },
+ "ts_destructuring-example2": {
+  "hash": "b26c270f51950d76cef5",
+  "outputs": [
+   "200 ana admin"
+  ]
+ },
+ "ts_destructuring-example3": {
+  "hash": "181d6692afc6b0d3b9b5",
+  "outputs": [
+   "9 1"
+  ]
+ },
+ "ts_destructuring-pitfall1-right": {
+  "hash": "96e0cdc166b9475512c1",
+  "outputs": [
+   "port 8080"
+  ]
+ },
+ "ts_destructuring-pitfall1-wrong": {
+  "hash": "42103987bb942e2da5b8",
+  "outputs": [
+   "port null"
+  ]
+ },
+ "ts_destructuring-pitfall2-right": {
+  "hash": "19e54a912c3462808584",
+  "outputs": [
+   "1"
+  ]
+ },
+ "ts_destructuring-pitfall2-wrong": {
+  "hash": "7b341d3ab827a01f7512",
+  "outputs": [
+   "NaN"
+  ]
+ },
+ "ts_destructuring-pitfall3-right": {
+  "hash": "395ab596ab9eb8df8616",
+  "outputs": [
+   "ana dark"
+  ]
+ },
+ "ts_destructuring-pitfall3-wrong": {
+  "hash": "5c69bc1dc9fd5865aff2",
+  "outputs": [
+   "ana light"
+  ]
+ },
  "ts_distributive-error1": {
   "hash": "6d3a212f2878855c3a87",
   "diagnostics": [
@@ -1857,6 +2084,80 @@
    "#a x1\n#b x2\n#c x3"
   ]
  },
+ "ts_functions-error1": {
+  "hash": "ce0f1debef9dbc9a0068",
+  "diagnostics": [
+   {
+    "code": 2554,
+    "line": 4,
+    "msg": "Expected 2 arguments, but got 1."
+   }
+  ]
+ },
+ "ts_functions-error2": {
+  "hash": "0cb9258fdf301d980412",
+  "diagnostics": [
+   {
+    "code": 2355,
+    "line": 1,
+    "msg": "A function whose declared type is neither 'undefined', 'void', nor 'any' must return a value."
+   }
+  ]
+ },
+ "ts_functions-example1": {
+  "hash": "807e2aa55f819dad521d",
+  "outputs": [
+   "mon: avg 5.0 over 3\ntue: avg 15.0 over 2"
+  ]
+ },
+ "ts_functions-example2": {
+  "hash": "51c2b14c0446f85ccef6",
+  "outputs": [
+   "READY!"
+  ]
+ },
+ "ts_functions-example3": {
+  "hash": "0bce35f1a5c84bd9c79b",
+  "outputs": [
+   "> saved\ntrue"
+  ]
+ },
+ "ts_functions-pitfall1-right": {
+  "hash": "9d0f5dedf310ad84b08d",
+  "outputs": [
+   "2,4"
+  ]
+ },
+ "ts_functions-pitfall1-wrong": {
+  "hash": "9efa800f6933a509ad99",
+  "outputs": [
+   ","
+  ]
+ },
+ "ts_functions-pitfall2-right": {
+  "hash": "2a00c25fa91ef7bc82e9",
+  "outputs": [
+   "true"
+  ]
+ },
+ "ts_functions-pitfall2-wrong": {
+  "hash": "ace185e2eba0f19c6bf4",
+  "outputs": [
+   "false"
+  ]
+ },
+ "ts_functions-pitfall3-right": {
+  "hash": "6971ebbe44a90aa2980c",
+  "outputs": [
+   "5 9,1,5"
+  ]
+ },
+ "ts_functions-pitfall3-wrong": {
+  "hash": "ccbe7f5383ffbcf947e1",
+  "outputs": [
+   "5 1,5,9"
+  ]
+ },
  "ts_generic_inference-countby": {
   "hash": "c8ea0827a6e12e431fd0",
   "outputs": [
@@ -2083,6 +2384,80 @@
   "outputs": [
    "run email\nrun backup\nrun alert\nrun report\nidle\npending late",
    "idle\npending x y"
+  ]
+ },
+ "ts_higher_order-error1": {
+  "hash": "bc7d523f97ace64e52bd",
+  "diagnostics": [
+   {
+    "code": 2345,
+    "line": 1,
+    "msg": "Argument of type '(s: string) => number' is not assignable to parameter of type '(value: number, index: number, array: number[]) => number'.   Types of parameters 's' and 'value' are incompatible.     Type 'number' is not assignable to type 'string'."
+   }
+  ]
+ },
+ "ts_higher_order-error2": {
+  "hash": "01cb1d5d7f9e39ca131e",
+  "diagnostics": [
+   {
+    "code": 2349,
+    "line": 2,
+    "msg": "This expression is not callable.   Type 'Number' has no call signatures."
+   }
+  ]
+ },
+ "ts_higher_order-example1": {
+  "hash": "32733f5103d6ed750323",
+  "outputs": [
+   "6 20\ncalled 2 times"
+  ]
+ },
+ "ts_higher_order-example2": {
+  "hash": "454defa5dcd5c1378303",
+  "outputs": [
+   "short: at least 8 characters, needs a digit\nlongenough: needs a digit\nlonger123: ok"
+  ]
+ },
+ "ts_higher_order-example3": {
+  "hash": "2aeceda29c097da45cf5",
+  "outputs": [
+   "a: apple avocado\nb: banana blueberry\nc: cherry"
+  ]
+ },
+ "ts_higher_order-pitfall1-right": {
+  "hash": "775b7b1f4aededa6eb89",
+  "outputs": [
+   "hi ana, hi bo"
+  ]
+ },
+ "ts_higher_order-pitfall1-wrong": {
+  "hash": "22c17e21ac88e5e8081e",
+  "outputs": [
+   "failed: Cannot read properties of undefined (reading 'greeting')"
+  ]
+ },
+ "ts_higher_order-pitfall2-right": {
+  "hash": "c0b9d09f66a5f7419438",
+  "outputs": [
+   "0"
+  ]
+ },
+ "ts_higher_order-pitfall2-wrong": {
+  "hash": "62df64717af52e020739",
+  "outputs": [
+   "failed: Reduce of empty array with no initial value"
+  ]
+ },
+ "ts_higher_order-pitfall3-right": {
+  "hash": "e50469b149a44218ac8c",
+  "outputs": [
+   "add one, then double: 8"
+  ]
+ },
+ "ts_higher_order-pitfall3-wrong": {
+  "hash": "3739712bc5d0f2ca2b3b",
+  "outputs": [
+   "add one, then double: 7"
   ]
  },
  "ts_index_signatures-count": {
@@ -2490,6 +2865,80 @@
    "0 3 6 9\n18",
    "(empty)\n0",
    "1 2 3\n6"
+  ]
+ },
+ "ts_json-error1": {
+  "hash": "f1d5d3e99fa861296b4f",
+  "diagnostics": [
+   {
+    "code": 18046,
+    "line": 2,
+    "msg": "'data' is of type 'unknown'."
+   }
+  ]
+ },
+ "ts_json-error2": {
+  "hash": "ac8126400c193133a2ab",
+  "diagnostics": [
+   {
+    "code": 2345,
+    "line": 1,
+    "msg": "Argument of type 'number' is not assignable to parameter of type 'string'."
+   }
+  ]
+ },
+ "ts_json-example1": {
+  "hash": "6f6b17ccde4d40038d63",
+  "outputs": [
+   "{\n  \"id\": 7,\n  \"name\": \"ana\",\n  \"roles\": [\n    \"admin\"\n  ]\n}"
+  ]
+ },
+ "ts_json-example2": {
+  "hash": "1004adde80c82ae25e89",
+  "outputs": [
+   "launch 2026 true"
+  ]
+ },
+ "ts_json-example3": {
+  "hash": "cc83a28b6656bdb9c13f",
+  "outputs": [
+   "object: {\"ok\":true}\ninvalid JSON\nnumber: 42\nobject: null"
+  ]
+ },
+ "ts_json-pitfall1-right": {
+  "hash": "6175391171743639f253",
+  "outputs": [
+   "2026"
+  ]
+ },
+ "ts_json-pitfall1-wrong": {
+  "hash": "d94bee3ca48f9678c3f3",
+  "outputs": [
+   "failed: loaded.when.getUTCFullYear is not a function"
+  ]
+ },
+ "ts_json-pitfall2-right": {
+  "hash": "c6c5e2b7afda5e916154",
+  "outputs": [
+   "{\"nickname\":null}"
+  ]
+ },
+ "ts_json-pitfall2-wrong": {
+  "hash": "d14168fc36c02b6704ba",
+  "outputs": [
+   "{}"
+  ]
+ },
+ "ts_json-pitfall3-right": {
+  "hash": "1e410a21a33cc1df71cb",
+  "outputs": [
+   "{\"ana\":3,\"bo\":5}"
+  ]
+ },
+ "ts_json-pitfall3-wrong": {
+  "hash": "cecacf38a6612fd632ad",
+  "outputs": [
+   "{}"
   ]
  },
  "ts_key_remapping-emitter": {
@@ -3094,6 +3543,80 @@
    "1.51"
   ]
  },
+ "ts_objects-error1": {
+  "hash": "8dd6f5773db255d0bc87",
+  "diagnostics": [
+   {
+    "code": 2741,
+    "line": 5,
+    "msg": "Property 'email' is missing in type '{ name: string; }' but required in type 'User'."
+   }
+  ]
+ },
+ "ts_objects-error2": {
+  "hash": "f8bad8c85eee3852721d",
+  "diagnostics": [
+   {
+    "code": 2353,
+    "line": 5,
+    "msg": "Object literal may only specify known properties, and 'z' does not exist in type 'Point'."
+   }
+  ]
+ },
+ "ts_objects-example1": {
+  "hash": "e21827ed581f8c4b859b",
+  "outputs": [
+   "{\"name\":\"ana\",\"role\":\"admin\",\"lastLogin\":\"2026-09-01\",\"adminSince\":2024}"
+  ]
+ },
+ "ts_objects-example2": {
+  "hash": "235497987ff6f908dfac",
+  "outputs": [
+   "{\"pen\":1.8,\"cup\":4.8,\"ink\":14.4}"
+  ]
+ },
+ "ts_objects-example3": {
+  "hash": "4055ad17ec2a944bb71c",
+  "outputs": [
+   "Oslo\nunknown city\nunknown city"
+  ]
+ },
+ "ts_objects-pitfall1-right": {
+  "hash": "54f6d836f6c9dc231730",
+  "outputs": [
+   "a"
+  ]
+ },
+ "ts_objects-pitfall1-wrong": {
+  "hash": "26dbf1e7649a70f645b8",
+  "outputs": [
+   "a,b"
+  ]
+ },
+ "ts_objects-pitfall2-right": {
+  "hash": "32a838cd62e57e57841f",
+  "outputs": [
+   "new"
+  ]
+ },
+ "ts_objects-pitfall2-wrong": {
+  "hash": "a69973cc30f2c7b89b29",
+  "outputs": [
+   "seen"
+  ]
+ },
+ "ts_objects-pitfall3-right": {
+  "hash": "74ee4f02f6dfbdfc5de3",
+  "outputs": [
+   "30,10,b,20"
+  ]
+ },
+ "ts_objects-pitfall3-wrong": {
+  "hash": "3ddc2e08b09ccc360f98",
+  "outputs": [
+   "10,20,30,b"
+  ]
+ },
  "ts_operators-error1": {
   "hash": "e60792ed069972dcdd3c",
   "diagnostics": [
@@ -3272,6 +3795,88 @@
    "2:05\n2:05",
    "0:59\n0:59",
    "60:00\n60:00"
+  ]
+ },
+ "ts_params-error1": {
+  "hash": "3be7f023f194abb861b8",
+  "diagnostics": [
+   {
+    "code": 1016,
+    "line": 1,
+    "msg": "A required parameter cannot follow an optional parameter."
+   }
+  ]
+ },
+ "ts_params-error2": {
+  "hash": "7b83ab9fe21932f56414",
+  "diagnostics": [
+   {
+    "code": 2555,
+    "line": 4,
+    "msg": "Expected at least 1 arguments, but got 0."
+   }
+  ]
+ },
+ "ts_params-example1": {
+  "hash": "ffa6fccf4c9c640e7d5a",
+  "outputs": [
+   "tcp://localhost:5432\ntcp://localhost:6000\ntls://db.local:5432"
+  ]
+ },
+ "ts_params-example2": {
+  "hash": "acb3547d39c8b467132a",
+  "outputs": [
+   "3 9 11"
+  ]
+ },
+ "ts_params-example3": {
+  "hash": "ba891006c55f027d3e9d",
+  "outputs": [
+   "draft draft (v2)\n....ok .ok"
+  ]
+ },
+ "ts_params-pitfall1-right": {
+  "hash": "4f1377a1084c6e5fcdd0",
+  "outputs": [
+   "Hello, friend"
+  ]
+ },
+ "ts_params-pitfall1-wrong": {
+  "hash": "c8ec85c6019b129a8929",
+  "outputs": [
+   "Hello, null"
+  ]
+ },
+ "ts_params-pitfall2-right": {
+  "hash": "7befb3e0423f0e4ec4b5",
+  "outputs": [
+   "true"
+  ]
+ },
+ "ts_params-pitfall2-wrong": {
+  "hash": "745b49987eb916b43368",
+  "diagnostics": [
+   {
+    "code": 1016,
+    "line": 1,
+    "msg": "A required parameter cannot follow an optional parameter."
+   }
+  ]
+ },
+ "ts_params-pitfall3-right": {
+  "hash": "4a845038d9dfa05f0531",
+  "outputs": [
+   "6"
+  ]
+ },
+ "ts_params-pitfall3-wrong": {
+  "hash": "f8ebaaa3c15c1b347a18",
+  "diagnostics": [
+   {
+    "code": 2345,
+    "line": 5,
+    "msg": "Argument of type 'number[]' is not assignable to parameter of type 'number'."
+   }
   ]
  },
  "ts_parse_dont_validate-error1": {
