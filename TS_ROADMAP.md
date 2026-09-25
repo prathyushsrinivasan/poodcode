@@ -1,7 +1,7 @@
-# TypeScript Roadmap — Weeks 26-32
+# TypeScript Roadmap — Weeks 27-32
 
 The plan for finishing **TypeScript: Zero to Interview**, the 8-month course in
-`tools/typescript_course.py`. Weeks 1-25 ship; weeks 26-32 are one-line
+`tools/typescript_course.py`. Weeks 1-26 ship; weeks 27-32 are one-line
 skeletons waiting to be authored.
 
 Unlike [`JAVA_ROADMAP.md`](JAVA_ROADMAP.md), which starts after the basics, this
@@ -15,9 +15,9 @@ rule that nothing may require syntax a later week teaches.
 
 ## Where it stands
 
-**Built:** weeks 1-25 — **195 lessons, 1,443 judged exercises** (1,428 in lessons
+**Built:** weeks 1-26 — **202 lessons, 1,484 judged exercises** (1,469 in lessons
 and capstones, 15 in week 1's practice families), twenty Budget Buddy capstones —
-**the arc is complete** — five interview reps, and a full
+**the arc is complete** — six interview reps, and a full
 glossary/cheat-sheet/self-check/review set per week. **Month 6 is finished.**
 
 | | |
@@ -79,7 +79,7 @@ verifier revealed which kind they were.
 ### Nothing is half-finished
 
 Every authored week is complete: lessons, exercises, capstone, stretch, glossary,
-cheat sheet, self-check, review, milestone. Weeks 26-32 are untouched skeletons, as
+cheat sheet, self-check, review, milestone. Weeks 27-32 are untouched skeletons, as
 they were before. There is no partially-authored week and no disabled exercise.
 
 ### Five traps that cost real time
@@ -798,7 +798,7 @@ to keep its ties.
 **One new scope rule**: `.toSorted(` gated at 24. Week 13's lesson prose mentions it
 in passing; no program before this week calls it.
 
-### Month 7 — DSA Interview Core (weeks 25-28) — 🚧 **25 done**
+### Month 7 — DSA Interview Core (weeks 25-28) — 🚧 **25-26 done**
 
 **25. Recursion & Backtracking** ✅ · `tools/ts_w25_recursion.py` · 7 lessons,
 46 exercises
@@ -848,7 +848,58 @@ keeps its first board in an array instead.
 Its three hand-counted call totals were wrong on the first run (25 not 24, 223 not
 256, 17 not 12) — trap 5 again; all now come from the reference.
 
-**26. Dynamic Programming** ⬜ · **27. Graphs: BFS & DFS** ⬜ ·
+**26. Dynamic Programming** ✅ · `tools/ts_w26_dp.py` · 7 lessons, 41 exercises
+`w26-memo` · `w26-table` · `w26-state` · `w26-grid` · `w26-strings` ·
+`w26-knapsack` · `w26-choose`.
+*Capstone:* **interview rep #26** — the coin report: fewest coins *and which ones*
+(reconstructed from a recorded choice per amount), greedy's answer beside it, and
+the number of combinations. One test is an input where greedy reaches the amount
+badly (`1 3 4 → 6`: 4+1+1 against 3+3); another is one where greedy **cannot reach
+it at all** while DP can (`5 3 → 9`). Stretch: edit distance with the edits listed.
+Kinds: 30 drill, 7 fix, 1 diagnose, 1 predict.
+
+**It starts exactly where week 25 stopped** — 21,891 calls against 39 — and lesson
+1 generalises the Map: the key is the *whole state*, keyed with week 19's
+`` `${r},${c}` `` trick. The recipe (state → transition → base → order → answer) is
+lesson 3, and every later lesson is that recipe applied, as the week's summary
+promises.
+
+**Three TypeScript facts, all verified, that no generic DP course would teach:**
+
+* `new Array(n).fill(0)` is **`any[]`** — every tutorial's DP table, and the checker
+  then accepts `dp[0] = "oops"`. Shipped as a `_predict` whose answer is `any[]`;
+  every table in the week is `new Array<number>(n)`.
+* `if (memo.has(n)) return memo.get(n);` is **TS2322** — `has` does not narrow
+  `get`. A `diagnose`, fixed with week 19's get-then-compare idiom.
+* `new Array(R).fill(new Array(C).fill(0))` is one row, R times (week 13's
+  aliasing). The week's grid helpers (`makeGrid`/`at`/`put`) use `Array.from`.
+
+**Two `fix` starters passed on the first run, and both findings are now part of the
+teaching:**
+
+* **The aliased-rows table computed the right corner.** With one shared row, the
+  grid-paths loop *becomes* lesson 4's one-row rolling version, so `28` came out
+  right. The exercise now prints the whole table — every row comes out as the last
+  row — and the prompt says why the corner survived: "a table you cannot trust away
+  from its corner is not a table".
+* **The off-by-one LCS comparison (`charAt(i)` for `charAt(i - 1)`) gave 3 on
+  `abcde`/`ace`.** Two errors cancel: it skips the first characters, and at the last
+  cell both `charAt` calls run off the end and return `""` — which equals `""`. It
+  now tests `abc`/`xbc` (prints 3, answer 2), and the prompt explains the phantom
+  match. Trap 4 again: finding the input that breaks a wrong technique is part of
+  writing the exercise.
+
+**Loop order as meaning, twice.** Coin *combinations* need the coin loop outside
+(4 for amount 5 with 1, 2, 5); swapped, the same code counts *sequences* (9) — a
+`fix` whose every line of arithmetic is right. And 0/1 knapsack in one row must walk
+capacity backwards; forwards packs one item three times (9 against 3) and is exactly
+right for the unbounded version, which lesson 6 also runs.
+
+All 41 hand-written expected outputs were right on the first run — the first week
+where that happened. Two `fix` prompts quoted the wrong buggy output (4 for 7, and
+1 for 0) and were corrected from the starters' real output.
+
+**27. Graphs: BFS & DFS** ⬜ ·
 **28. Heaps & Intervals** ⬜
 Standard interview ground. Heaps need a generic priority queue class — another
 dependency on week 11.
@@ -895,7 +946,7 @@ still go first.
 | **C** ✅ | 13-16 | Types, then the project-shaped week: modules, tsconfig, .d.ts |
 | **D** ✅ | 17-20 | Async + data structures; the Budget Buddy arc is closed |
 | **E** ✅ | 21-24 | Algorithmic thinking; the month's idiom is to count operations |
-| **F** 🚧 | 25 ✅, **26** ← next | DSA core |
+| **F** 🚧 | 25-26 ✅, **27** ← next | DSA core |
 | **G** | 29-32 | Type-level; lowest risk, highest polish |
 
 **Batches C and D are done, and with them every risk the back half was waiting

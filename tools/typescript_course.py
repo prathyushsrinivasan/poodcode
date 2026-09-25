@@ -481,6 +481,7 @@ _WEEK_FILES = (
     "ts_w23_windows.py",       #          sliding window & prefix sums
     "ts_w24_sorting.py",       #          sorting
     "ts_w25_recursion.py",     # Month 7 — recursion & backtracking
+    "ts_w26_dp.py",            #          dynamic programming
 )
 
 for _week_file in _WEEK_FILES:
@@ -546,8 +547,6 @@ for _week_file in _WEEK_FILES:
 # so it is worth writing the milestone before the lessons.
 # ===========================================================================
 _WEEKS += [
-    _skel(26, 7, _M7, "Dynamic Programming",
-          "Turn overlapping recursion into fast, memoized DP."),
     _skel(27, 7, _M7, "Graphs: BFS & DFS",
           "Traverse graphs and grids to answer reachability and shortest-path questions."),
     _skel(28, 7, _M7, "Heaps & Intervals",
