@@ -232,3 +232,20 @@ for _tsd_w in TS_WEEKS:
 print(f"  derived from chapters: {TS_DERIVED_COUNTS['cards']} cards, "
       f"{TS_DERIVED_COUNTS['order']} order, {TS_DERIVED_COUNTS['spot']} spot exercises, "
       f"{TS_DERIVED_COUNTS['output']} code-output questions")
+
+# X-07: every compiler error a chapter shows has a glossary entry, so its
+# TsErrorLinks badge leads somewhere. Add missing ones to ts_errors_more.py.
+import json as _tsd_json
+import re as _tsd_re
+with open(os.path.join(HERE, "..", "src", "data", "ts_errors.json"), encoding="utf-8") as _tsd_f:
+    _tsd_glossary = {e["code"] for e in _tsd_json.load(_tsd_f)}
+_tsd_shown = {}
+for _tsd_key, _tsd_data in TS_CHAPTER_DATA.items():
+    _tsd_texts = [e["message"] for e in _tsd_data["errors"]]
+    _tsd_texts += [p["wrong_shows"] for p in _tsd_data["pitfalls"] if p["wrong_label"] != "Prints:"]
+    for _tsd_t in _tsd_texts:
+        for _tsd_code in _tsd_re.findall(r"error TS(\d+)", _tsd_t):
+            _tsd_shown.setdefault(int(_tsd_code), _tsd_key)
+_tsd_missing = sorted(c for c in _tsd_shown if c not in _tsd_glossary)
+assert _TSO_COLLECT or not _tsd_missing, \
+    "X-07: chapters show errors the glossary lacks: " + ", ".join(f"TS{c} ({_tsd_shown[c]})" for c in _tsd_missing)
