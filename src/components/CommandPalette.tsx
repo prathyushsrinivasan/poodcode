@@ -6,11 +6,13 @@ import type {
   BackendTrack,
   Concept,
   DsaCurriculum,
+  MasteryTrack,
   Problem,
   ProjectTrack,
   WeeklyCourse,
 } from "../types";
 import { loadCurriculumSeed } from "./CurriculumData";
+import { TS_ERRORS } from "../lib/tsErrors";
 import { clearRecents, readRecents } from "../lib/recents";
 
 interface Cmd {
@@ -32,9 +34,30 @@ type Tracks = {
   backend: BackendTrack | null;
   projects: ProjectTrack | null;
   dsa: DsaCurriculum | null;
+  mastery: MasteryTrack[] | null;
 };
 
-const NO_TRACKS: Tracks = { ts: null, java: null, backend: null, projects: null, dsa: null };
+const NO_TRACKS: Tracks = { ts: null, java: null, backend: null, projects: null, dsa: null, mastery: null };
+
+/** One command per Mastery week — searchable by title, goal and phase — and
+ * one per TypeScript error in the glossary (TS_MASTERY_ROADMAP X-73). */
+function masteryCmds(tracks: MasteryTrack[] | null, navigate: (to: string) => void): Cmd[] {
+  const weeks = (tracks ?? []).flatMap((t) =>
+    t.weeks.map((w) => ({
+      id: `mastery-${t.key}-${w.week}`,
+      label: `🎓 ${t.title} · Week ${w.week}. ${w.title}`,
+      hint: `${w.phase} · ${w.goal}`,
+      run: () => navigate(`/mastery?group=${encodeURIComponent(w.phase)}`),
+    }))
+  );
+  const errors = TS_ERRORS.map((e) => ({
+    id: `ts-error-${e.code}`,
+    label: `TS${e.code} — ${e.title}`,
+    hint: `TypeScript error glossary · ${e.meaning}`,
+    run: () => navigate(`/ts-errors?code=${e.code}`),
+  }));
+  return [...weeks, ...errors];
+}
 
 /**
  * One command per DSA unit, plus the mixed set per stage.
@@ -165,6 +188,7 @@ export function CommandPalette() {
     api.backendTrack().then(put("backend")).catch(() => {});
     api.projectsTrack().then(put("projects")).catch(() => {});
     loadCurriculumSeed().then(put("dsa")).catch(() => {});
+    api.mastery().then(put("mastery")).catch(() => {});
     api.concepts().then(setConcepts).catch(() => {});
   }, [open]);
 
@@ -269,6 +293,7 @@ export function CommandPalette() {
   const trackCmds = useMemo<Cmd[]>(
     () => [
       ...dsaCmds(tracks.dsa, navigate),
+      ...masteryCmds(tracks.mastery, navigate),
       ...japaneseCmds(concepts, navigate),
       ...courseCmds(tracks.ts, "/course", navigate),
       ...courseCmds(tracks.java, "/java-course", navigate),

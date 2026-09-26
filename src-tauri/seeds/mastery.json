@@ -22103,16 +22103,8 @@
         ],
         "problems": [
           {
-            "slug": "two-sum-fn",
-            "note": "A function whose signature is the interesting part."
-          },
-          {
-            "slug": "reverse-array-fn",
-            "note": "Generic in the element type."
-          },
-          {
             "slug": "kth-largest-element",
-            "note": "A comparator-driven selection."
+            "note": "Applied: a comparator-driven selection — a generic `compare` in a real problem."
           }
         ],
         "project": "Write a `collections.ts` exporting generic `unique`, `groupBy`, `partition` and `sortBy` helpers, each preserving the input's element type.",
@@ -23314,11 +23306,7 @@
         "problems": [
           {
             "slug": "time-based-kv",
-            "note": "A keyed store with a typed accessor."
-          },
-          {
-            "slug": "prefix-counts",
-            "note": "Deriving structure from data."
+            "note": "Applied: a keyed store with a typed accessor."
           }
         ],
         "project": "Write a `settings.ts` where one `as const` object defines the defaults, and every getter, setter and key union is derived from it — adding a setting should require exactly one edit.",
@@ -24425,12 +24413,8 @@
         ],
         "problems": [
           {
-            "slug": "design-hashset",
-            "note": "A container described by a derived type."
-          },
-          {
             "slug": "top-k-frequent",
-            "note": "Projection over a frequency table."
+            "note": "Applied: a projection over a frequency table."
           }
         ],
         "project": "Reimplement `Partial`, `Required`, `Readonly`, `Pick` and `Omit` from scratch in a `utils.d.ts`, then check each against the built-in with a type-level test.",
@@ -25529,12 +25513,8 @@
         ],
         "problems": [
           {
-            "slug": "nested-list-depth-sum",
-            "note": "Nested data is the runtime shape a recursive `Unwrap<T>` describes — peel one layer per level."
-          },
-          {
             "slug": "decode-string",
-            "note": "`k[...]` nests arbitrarily deep: unwrap the inner layer before the outer one, as `infer` does."
+            "note": "Applied: `k[...]` nests arbitrarily deep — unwrap the inner layer before the outer one, as `infer` does."
           }
         ],
         "project": "Write a `types.ts` implementing `ReturnType`, `Parameters`, `Awaited` and `Exclude` yourself, with a comment on each explaining where `infer` binds.",
@@ -26670,12 +26650,8 @@
         ],
         "problems": [
           {
-            "slug": "replace-words-roots",
-            "note": "Prefix matching over a dictionary."
-          },
-          {
             "slug": "implement-trie-ops",
-            "note": "A recursive structure with a recursive type."
+            "note": "Applied: a recursive structure with a recursive type."
           }
         ],
         "project": "Write an `events.ts` where the entity and action lists are `as const` arrays, the event-name type is a template literal over them, and a typed emitter rejects any name not in the catalogue.",
@@ -31429,11 +31405,11 @@
           "title": "Mastery finale — the whole programme",
           "duration_seconds": 7200,
           "slugs": [
-            "longest-unique-substring",
+            "lru-cache",
+            "implement-queue-stacks",
             "evaluate-rpn",
             "hit-counter",
-            "median-from-stream",
-            "word-ladder-length"
+            "process-tasks-using-servers"
           ]
         },
         "flashcards": [

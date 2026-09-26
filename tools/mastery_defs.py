@@ -184,9 +184,9 @@ TS_CONTEST_SLUGS = {
     8: ["fizzbuzz-value", "sort-by-frequency", "second-largest", "run-length-encode"],
     17: ["missing-number", "product-except-self", "longest-common-prefix-strs", "merge-intervals"],
     22: ["kth-largest-element", "time-based-kv", "top-k-frequent", "implement-trie-ops"],
-    # The finale spans the programme rather than its last week's problems.
-    26: ["longest-unique-substring", "evaluate-rpn", "hit-counter", "median-from-stream",
-         "word-ladder-length"],
+    # M6-05: the month-6 checkpoint is built from month 6's own problems.
+    26: ["lru-cache", "implement-queue-stacks", "evaluate-rpn", "hit-counter",
+         "process-tasks-using-servers"],
 }
 
 # ---------------------------------------------------------------------------

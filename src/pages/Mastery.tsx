@@ -15,6 +15,7 @@ import type {
 import { Markdown } from "../components/Markdown";
 import { CodeEditor } from "../components/CodeEditor";
 import { WorkspaceEditor } from "../components/WorkspaceEditor";
+import { DiffView } from "../components/DiffView";
 import { FailingCases } from "../components/OutputCompare";
 import { TsErrorLinks } from "../components/TsErrorLinks";
 import { DiffBadge, Empty, inlineCode } from "../components/common";
@@ -211,9 +212,21 @@ export default function Mastery() {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.ctrlKey || e.metaKey || e.altKey) return;
-      if (e.key !== "j" && e.key !== "k" && e.key !== "n") return;
+      if (e.key !== "j" && e.key !== "k" && e.key !== "n" && e.key !== "h") return;
       const t = e.target as HTMLElement | null;
       if (t && (t.closest("input, textarea, select, [contenteditable=true], .monaco-editor") !== null)) return;
+      if (e.key === "h") {
+        // The next hint of the first exercise on screen.
+        const hint = [...document.querySelectorAll<HTMLElement>("[data-hint-next]")].find((b) => {
+          const r = b.getBoundingClientRect();
+          return r.top >= 0 && r.bottom <= window.innerHeight;
+        });
+        if (hint) {
+          e.preventDefault();
+          hint.click();
+        }
+        return;
+      }
       const sections = [...document.querySelectorAll<HTMLElement>("[data-spine-section]")];
       if (sections.length === 0) return;
       const tops = sections.map((el) => el.getBoundingClientRect().top);
@@ -895,7 +908,7 @@ function WeekCard({
               </button>
             ))}
             <p className="dim week-spine-keys">
-              <kbd>j</kbd>/<kbd>k</kbd> move · <kbd>n</kbd> next unfinished
+              <kbd>j</kbd>/<kbd>k</kbd> move · <kbd>n</kbd> next unfinished · <kbd>h</kbd> hint
             </p>
           </nav>
 
@@ -1250,6 +1263,22 @@ function WeekCard({
   );
 }
 
+type ProjectVersion = { at: string; code: string };
+
+function parseHistory(raw: string | undefined): ProjectVersion[] {
+  try {
+    const v: unknown = JSON.parse(raw || "[]");
+    return Array.isArray(v)
+      ? v.filter(
+          (x): x is ProjectVersion =>
+            typeof x === "object" && x !== null && typeof (x as ProjectVersion).at === "string" && typeof (x as ProjectVersion).code === "string"
+        )
+      : [];
+  } catch {
+    return [];
+  }
+}
+
 /** Rubric ticks are stored as a JSON array of item indices. */
 function parseTicks(raw: string | undefined): Set<number> {
   try {
@@ -1296,10 +1325,30 @@ function ProjectPanel({
   // With acceptance tests, shipping means they pass. Un-shipping is always allowed.
   const canShip = shipped || !spec || green;
 
+  // X-46: every save keeps a version (up to 20), in settings, so it is backed up.
+  const historyKey = `mastery-project-history:${workspaceId}`;
+  const [history, setHistory] = useState<ProjectVersion[]>([]);
+  const [showHistory, setShowHistory] = useState(false);
+  const [diffWith, setDiffWith] = useState<number | null>(null);
+  useEffect(() => {
+    api
+      .getSettings()
+      .then((s) => setHistory(parseHistory(s[historyKey])))
+      .catch(() => {});
+  }, [historyKey]);
+
+  function keepVersion(text: string) {
+    if (!text.trim() || history[0]?.code === text) return;
+    const next = [{ at: new Date().toISOString(), code: text }, ...history].slice(0, 20);
+    setHistory(next);
+    api.setSetting(historyKey, JSON.stringify(next)).catch(() => {});
+  }
+
   async function save(nextShipped = shipped) {
     setSaving(true);
     try {
       await onSave(notes, code, nextShipped);
+      keepVersion(code);
       setShipped(nextShipped);
       toast(nextShipped && !shipped ? "Project shipped" : "Project saved");
     } finally {
@@ -1445,6 +1494,11 @@ function ProjectPanel({
                 {showReference ? "Hide reference" : "Reference implementation"}
               </button>
             )}
+            {history.length > 0 && (
+              <button className="ghost" onClick={() => setShowHistory((h) => !h)}>
+                {showHistory ? "Hide history" : `History (${history.length})`}
+              </button>
+            )}
             {spec?.strictness === "strict+indexed" && (
               <span className="dim quiz-note">
                 Checked with <code>noUncheckedIndexedAccess</code>
@@ -1485,12 +1539,44 @@ function ProjectPanel({
             </div>
           )}
 
+          {showHistory && history.length > 0 && (
+            <div className="card" style={{ marginTop: 10 }}>
+              <div className="io-label">Saved versions — newest first</div>
+              {history.map((v, i) => (
+                <div key={v.at} className="row" style={{ gap: 8, alignItems: "center", margin: "4px 0" }}>
+                  <span className="quiz-note">{new Date(v.at).toLocaleString()}</span>
+                  <span className="dim quiz-note">{v.code.split("\n").length} lines</span>
+                  <button className="ghost" onClick={() => setDiffWith(diffWith === i ? null : i)}>
+                    {diffWith === i ? "Hide diff" : "Diff with now"}
+                  </button>
+                  <button
+                    className="ghost"
+                    onClick={() => {
+                      if (window.confirm("Replace the code in the editor with this version?")) setCode(v.code);
+                    }}
+                  >
+                    Restore
+                  </button>
+                </div>
+              ))}
+              {diffWith !== null && history[diffWith] && (
+                <DiffView before={history[diffWith]!.code} after={code} maxHeight={380} />
+              )}
+            </div>
+          )}
+
           {showReference && spec && shipped && (
             <div style={{ marginTop: 10 }}>
               <p className="dim quiz-note">
-                One way to meet the brief — compare it with yours rather than copying it.
+                One way to meet the brief — compare it with yours rather than copying it. The diff shows what the
+                reference does differently: <span style={{ color: "var(--bad)" }}>−</span> yours,{" "}
+                <span style={{ color: "var(--good)" }}>+</span> the reference.
               </p>
-              <Markdown>{"```" + spec.language + "\n" + spec.solution + "\n```"}</Markdown>
+              <DiffView before={code} after={spec.solution} maxHeight={420} />
+              <details style={{ marginTop: 8 }}>
+                <summary className="dim quiz-note">The reference on its own</summary>
+                <Markdown>{"```" + spec.language + "\n" + spec.solution + "\n```"}</Markdown>
+              </details>
             </div>
           )}
         </>

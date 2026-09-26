@@ -208,7 +208,7 @@ export function ExerciseCard({
           Reset
         </button>
         {hintsShown < hintLadder.length && (
-          <button className="ghost" onClick={() => setHintsShown((n) => n + 1)}>
+          <button className="ghost" data-hint-next onClick={() => setHintsShown((n) => n + 1)}>
             {hintsShown === 0
               ? hintLadder.length > 1
                 ? `Hint (${hintLadder.length})`
