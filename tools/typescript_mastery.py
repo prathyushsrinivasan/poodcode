@@ -2646,13 +2646,14 @@ interface Host {
 }
 declare const host: Host;
 let emitted = 0;
-(globalThis as Record<string, unknown>).host = {
+const impl: Host = {
   version: "2.0.0",
   emit(name: string, payload: string) {
     emitted++;
     console.log(name + ":" + payload);
   },
-} satisfies Host;
+};
+(globalThis as Record<string, unknown>).host = impl;
 console.log(host.version);
 for (let i = 1; i <= n; i++) {
   const [name, payload] = lines[i].trim().split(/\\s+/);

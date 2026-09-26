@@ -36903,28 +36903,6 @@
             "dataset": ""
           },
           {
-            "id": "tsm-w19-keys-of-type",
-            "title": "Keys whose values have a type",
-            "prompt": "Write `KeysOfType<T, V>`: the union of `T`'s keys whose property type is assignable to `V`.",
-            "hint": "Map every key to itself or to `never`, then look up all the values at once with `[keyof T]`.",
-            "hints": [
-              "Map every key to itself or to `never`, then look up all the values at once with `[keyof T]`.",
-              "`never` members disappear from the resulting union."
-            ],
-            "language": "typescript",
-            "kind": "typelevel",
-            "difficulty": "Medium",
-            "strictness": "strict+indexed",
-            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype User = { id: number; name: string; email: string; age: number; admin: boolean };\ntype _1 = Expect<Equal<KeysOfType<User, string>, \"name\" | \"email\">>;\ntype _2 = Expect<Equal<KeysOfType<User, number>, \"id\" | \"age\">>;\ntype _3 = Expect<Equal<KeysOfType<User, Date>, never>>;\n",
-            "judge_mode": "types",
-            "forbid": [],
-            "starter": "type KeysOfType<T, V> = ____;\n",
-            "solution": "type KeysOfType<T, V> = { [K in keyof T]: T[K] extends V ? K : never }[keyof T];\n",
-            "tests": [],
-            "source_slug": "",
-            "dataset": ""
-          },
-          {
             "id": "tsm-w19-deep-lookup",
             "title": "Reach into a nested type",
             "prompt": "Derive `ButtonColour` — the type of the button's `colour` in the theme — and `Spacing`, the union of the spacing scale's values, by looking them up in `Theme`.",
@@ -38381,6 +38359,28 @@
         ],
         "optional": false,
         "problem_set": [
+          {
+            "id": "tsm-w19-keys-of-type",
+            "title": "Keys whose values have a type",
+            "prompt": "Write `KeysOfType<T, V>`: the union of `T`'s keys whose property type is assignable to `V`.",
+            "hint": "Map every key to itself or to `never`, then look up all the values at once with `[keyof T]`.",
+            "hints": [
+              "Map every key to itself or to `never`, then look up all the values at once with `[keyof T]`.",
+              "`never` members disappear from the resulting union."
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype User = { id: number; name: string; email: string; age: number; admin: boolean };\ntype _1 = Expect<Equal<KeysOfType<User, string>, \"name\" | \"email\">>;\ntype _2 = Expect<Equal<KeysOfType<User, number>, \"id\" | \"age\">>;\ntype _3 = Expect<Equal<KeysOfType<User, Date>, never>>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type KeysOfType<T, V> = ____;\n",
+            "solution": "type KeysOfType<T, V> = { [K in keyof T]: T[K] extends V ? K : never }[keyof T];\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
           {
             "id": "tsm-w20-permissions",
             "title": "A permission matrix",

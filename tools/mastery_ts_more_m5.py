@@ -575,18 +575,6 @@ type _1 = Expect<Equal<TupleToUnion<["a", 1, true]>, "a" | 1 | true>>;
 type _2 = Expect<Equal<TupleToUnion<readonly ["x"]>, "x">>;
 type _3 = Expect<Equal<TupleToUnion<[]>, never>>;
 ''', hints=["Index the tuple type with `number`."]),
-    _tsp_types(19, "tsm-w19-keys-of-type", "Keys whose values have a type", "core",
-               "Write `KeysOfType<T, V>`: the union of `T`'s keys whose property type is assignable to `V`.",
-               '''
-type KeysOfType<T, V> = { [K in keyof T]: T[K] extends V ? K : never }[keyof T];
-''', "{ [K in keyof T]: T[K] extends V ? K : never }[keyof T]",
-               '''
-type User = { id: number; name: string; email: string; age: number; admin: boolean };
-type _1 = Expect<Equal<KeysOfType<User, string>, "name" | "email">>;
-type _2 = Expect<Equal<KeysOfType<User, number>, "id" | "age">>;
-type _3 = Expect<Equal<KeysOfType<User, Date>, never>>;
-''', hints=["Map every key to itself or to `never`, then look up all the values at once with `[keyof T]`.",
-            "`never` members disappear from the resulting union."]),
     _tsp_types(19, "tsm-w19-deep-lookup", "Reach into a nested type", "warm-up",
                "Derive `ButtonColour` — the type of the button's `colour` in the theme — and `Spacing`, the union of the spacing scale's values, by looking them up in `Theme`.",
                '''
@@ -707,6 +695,19 @@ TS_CARDS_MORE[19] = [
 # ===========================================================================
 
 TS_PROBLEM_SETS[20] = [
+    # Moved from week 19 (X-104): the answer is a mapped type, which week 20 teaches.
+    _tsp_types(20, "tsm-w19-keys-of-type", "Keys whose values have a type", "core",
+               "Write `KeysOfType<T, V>`: the union of `T`'s keys whose property type is assignable to `V`.",
+               '''
+type KeysOfType<T, V> = { [K in keyof T]: T[K] extends V ? K : never }[keyof T];
+''', "{ [K in keyof T]: T[K] extends V ? K : never }[keyof T]",
+               '''
+type User = { id: number; name: string; email: string; age: number; admin: boolean };
+type _1 = Expect<Equal<KeysOfType<User, string>, "name" | "email">>;
+type _2 = Expect<Equal<KeysOfType<User, number>, "id" | "age">>;
+type _3 = Expect<Equal<KeysOfType<User, Date>, never>>;
+''', hints=["Map every key to itself or to `never`, then look up all the values at once with `[keyof T]`.",
+            "`never` members disappear from the resulting union."]),
     _tsp(20, "tsm-w20-permissions", "A permission matrix", "warm-up",
          "Roles are `viewer`, `editor`, `admin` and permissions `read`, `write`, `delete`, `invite`, each declared once `as const`. The matrix is typed as a mapped type — `{ [R in Role]: { [P in Perm]: boolean } }` — so every cell must be filled: viewers read; editors read and write; admins do everything. Each input line is `can <role> <perm>` (print `yes`/`no`), `row <role>` (the role's permissions, in order) or `who <perm>` (the roles that have it). Unknown names print `unknown <name>`.",
          r"""

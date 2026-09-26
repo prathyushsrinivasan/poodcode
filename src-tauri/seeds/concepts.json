@@ -12545,7 +12545,7 @@
         "kind": "challenge",
         "difficulty": "Medium",
         "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
-        "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst lines = input.split(\"\\n\");\nconst n = Number(lines[0]);\ninterface Host {\n  version: string;\n  emit(name: string, payload: string): void;\n}\ndeclare const host: Host;\nlet emitted = 0;\n(globalThis as Record<string, unknown>).host = {\n  version: \"2.0.0\",\n  emit(name: string, payload: string) {\n    emitted++;\n    console.log(name + \":\" + payload);\n  },\n} satisfies Host;\nconsole.log(host.version);\nfor (let i = 1; i <= n; i++) {\n  const [name, payload] = lines[i].trim().split(/\\s+/);\n  host.emit(name, payload);\n}\nconsole.log(emitted);\n",
+        "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst lines = input.split(\"\\n\");\nconst n = Number(lines[0]);\ninterface Host {\n  version: string;\n  emit(name: string, payload: string): void;\n}\ndeclare const host: Host;\nlet emitted = 0;\nconst impl: Host = {\n  version: \"2.0.0\",\n  emit(name: string, payload: string) {\n    emitted++;\n    console.log(name + \":\" + payload);\n  },\n};\n(globalThis as Record<string, unknown>).host = impl;\nconsole.log(host.version);\nfor (let i = 1; i <= n; i++) {\n  const [name, payload] = lines[i].trim().split(/\\s+/);\n  host.emit(name, payload);\n}\nconsole.log(emitted);\n",
         "tests": [
           {
             "input": "2\nclick a\nkey b",
