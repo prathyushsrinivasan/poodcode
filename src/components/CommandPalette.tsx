@@ -249,7 +249,7 @@ export function CommandPalette() {
       { id: "flashcards", label: "Flashcards", run: () => navigate("/flashcards") },
       { id: "ts-errors", label: "TypeScript errors, explained", run: () => navigate("/ts-errors") },
       { id: "ts-playground", label: "TypeScript playground — types, narrowing, what runs", run: () => navigate("/playground/ts") },
-      { id: "async-visualiser", label: "Event loop and promise combinators, step by step", run: () => navigate("/visualise/async") },
+      { id: "async-visualiser", label: "Step by step — call stack, array pipelines, event loop, promises", run: () => navigate("/visualise/async") },
       { id: "settings", label: "Settings", run: () => navigate("/settings") },
     ],
     [navigate]

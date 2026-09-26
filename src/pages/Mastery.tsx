@@ -31,6 +31,7 @@ import { CapstonePractice } from "../components/MasteryCapstone";
 import { MixedQuiz, ReviewSession } from "../components/MasteryReview";
 import { DailyTypePuzzle, WeekZero } from "../components/MasteryDaily";
 import { typeLadder } from "../lib/typeLadder";
+import { SkillRadar } from "../components/SkillRadar";
 import {
   FinalExamPanel,
   ProgrammeSummary,
@@ -68,6 +69,7 @@ import {
   mostRetried,
   weakChapters,
   progressReport,
+  skillProfile,
   type ExamQuestion,
   type ProgressMap,
   type WeekProgress,
@@ -426,6 +428,10 @@ export default function Mastery() {
           </span>
         </div>
         <Bar percent={Math.round((completedWeeks / core.length) * 100)} />
+        <details style={{ marginTop: 8 }}>
+          <summary className="dim quiz-note">📡 Skills — what kinds of work you have done</summary>
+          <SkillRadar skills={skillProfile(track, solvedAll, perWeek)} />
+        </details>
         <div className="row" style={{ gap: 6, marginTop: 8, justifyContent: "flex-end" }}>
           <button className="ghost" onClick={exportJson} title="Save every week's progress as JSON — for a portfolio or a mentor.">
             ⬇ Export progress

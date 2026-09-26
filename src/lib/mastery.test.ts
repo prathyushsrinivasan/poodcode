@@ -22,6 +22,7 @@ import {
   mostRetried,
   weakChapters,
   progressReport,
+  skillProfile,
   type ProgressMap,
 } from "./mastery";
 
@@ -466,5 +467,30 @@ describe("progressReport", () => {
     expect(parsed.weeks[0].chapters).toBe("1/1");
     expect(markdown).toContain("| Week | Title |");
     expect(markdown).toContain("Exported 2026-09-27");
+  });
+});
+
+describe("skillProfile", () => {
+  it("counts each kind of work solved, and finals as programs", () => {
+    const t: MasteryTrack = {
+      ...track,
+      weeks: [
+        {
+          ...week(1, [], []),
+          practice: [
+            { id: "p1", kind: "predict" },
+            { id: "d1", kind: "diagnose" },
+            { id: "t1", kind: "typelevel" },
+          ] as never,
+        },
+      ],
+    };
+    const per = t.weeks.map((w) => weekProgress(w, t, new Set(), new Set(), new Map()));
+    const skills = skillProfile(t, new Set(["p1", "t1"]), per);
+    const by = Object.fromEntries(skills.map((s) => [s.label, `${s.done}/${s.total}`]));
+    expect(by["Reading types"]).toBe("1/1");
+    expect(by["Reading errors"]).toBe("0/1");
+    expect(by["Writing types"]).toBe("1/1");
+    expect(by["Writing programs"]).toBe("0/1");
   });
 });

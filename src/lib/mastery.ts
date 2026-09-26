@@ -300,6 +300,12 @@ export function weekTools(trackKey: string, week: number): WeekTool[] {
   if (week <= 8) {
     tools.push({ label: "Playground", to: "/playground/ts", why: "see what every declaration infers (Types tab)" });
   }
+  if (week === 5 || week === 6) {
+    tools.push({ label: "Call stack", to: "/visualise/async?tab=stack", why: "recursion and closures, frame by frame" });
+  }
+  if (week === 6 || week === 7) {
+    tools.push({ label: "Array pipeline", to: "/visualise/async?tab=pipeline", why: "every intermediate array of a method chain" });
+  }
   if (week >= 10 && week <= 13) {
     tools.push({ label: "Narrowing stepper", to: "/playground/ts", why: "a variable's type at every line (Narrowing tab)" });
   }
@@ -310,8 +316,8 @@ export function weekTools(trackKey: string, week: number): WeekTool[] {
     tools.push({ label: "Type expander", to: "/playground/ts", why: "every type alias fully expanded (Types tab)" });
   }
   if (week === 26) {
-    tools.push({ label: "Event loop", to: "/visualise/async", why: "step through the stack and the queues" });
-    tools.push({ label: "Promise timeline", to: "/visualise/async", why: "when all / allSettled / race / any settle" });
+    tools.push({ label: "Event loop", to: "/visualise/async?tab=loop", why: "step through the stack and the queues" });
+    tools.push({ label: "Promise timeline", to: "/visualise/async?tab=combinators", why: "when all / allSettled / race / any settle" });
   }
   tools.push({ label: "Error glossary", to: "/ts-errors", why: "every TSnnnn code, explained" });
   return tools;
@@ -617,4 +623,51 @@ export function progressReport(
     "",
   ].join("\n");
   return { json, markdown: md };
+}
+
+// ---------------------------------------------------------------------------
+// Skill profile (X-69): what kinds of work you have done, as fractions.
+// ---------------------------------------------------------------------------
+
+export interface Skill {
+  label: string;
+  done: number;
+  total: number;
+}
+
+/** Six skills, each the share of that kind of work solved so far:
+ * reading inferred types (predict), reading errors (diagnose), repairing code
+ * (fix), writing types (type challenges), writing programs (problems and
+ * finals), and the runtime month (weeks 23-26). */
+export function skillProfile(
+  track: MasteryTrack,
+  solved: Set<string>,
+  perWeek: WeekProgress[]
+): Skill[] {
+  const all = track.weeks.flatMap((w) =>
+    [...(w.practice ?? []), ...(w.problem_set ?? []), ...(w.exam?.types ? [w.exam.types] : [])].map((e) => ({
+      e,
+      week: w.week,
+    }))
+  );
+  const count = (pick: (x: { e: { kind: string; id: string }; week: number }) => boolean): [number, number] => {
+    const xs = all.filter(pick);
+    return [xs.filter((x) => solved.has(x.e.id)).length, xs.length];
+  };
+  const finals = track.weeks.filter((w) => w.exam && !w.optional);
+  const finalsPassed = finals.filter((w) => perWeek[w.week - 1]?.examPassed).length;
+  const [predictDone, predictTotal] = count((x) => x.e.kind === "predict");
+  const [diagDone, diagTotal] = count((x) => x.e.kind === "diagnose");
+  const [fixDone, fixTotal] = count((x) => x.e.kind === "fix");
+  const [typesDone, typesTotal] = count((x) => x.e.kind === "typelevel");
+  const [codeDone, codeTotal] = count((x) => x.e.kind === "challenge");
+  const [runDone, runTotal] = count((x) => x.week >= 23 && x.week <= 26);
+  return [
+    { label: "Reading types", done: predictDone, total: predictTotal },
+    { label: "Reading errors", done: diagDone, total: diagTotal },
+    { label: "Repairing code", done: fixDone, total: fixTotal },
+    { label: "Writing types", done: typesDone, total: typesTotal },
+    { label: "Writing programs", done: codeDone + finalsPassed, total: codeTotal + finals.length },
+    { label: "Runtime & async", done: runDone, total: runTotal },
+  ];
 }

@@ -82,6 +82,53 @@ console.log(dist(origin, p) as number);
 `,
   },
   {
+    title: "Classes & exhaustiveness",
+    focus: "kind",
+    code: `interface Shape {
+  area(): number;
+}
+
+abstract class Base implements Shape {
+  static count = 0;
+  #id: number;
+  protected constructor() {
+    this.#id = ++Base.count;
+  }
+  abstract area(): number;
+  get id(): number {
+    return this.#id;
+  }
+}
+
+class Circle extends Base {
+  readonly r: number;
+  constructor(r: number) {
+    super();
+    this.r = r;
+  }
+  area(): number {
+    return Math.PI * this.r ** 2;
+  }
+}
+
+type Kind = "circle" | "square";
+function label(kind: Kind): string {
+  switch (kind) {
+    case "circle":
+      return "round";
+    case "square":
+      return "boxy";
+    default: {
+      const unreachable: never = kind;
+      return unreachable;
+    }
+  }
+}
+
+console.log(new Circle(1).area().toFixed(2), label("square"));
+`,
+  },
+  {
     title: "Strictness",
     focus: "s",
     code: `const scores: Record<string, number> = { ana: 3 };
@@ -100,6 +147,56 @@ console.log(profile, lookup({}));
 ];
 
 type Flags = Record<string, boolean>;
+
+/** The tsconfig explorer (M4-02): fixed programs, each tripping one flag. */
+const SAMPLES: { title: string; flag: string; code: string }[] = [
+  { title: "Implicit any", flag: "strict", code: "export function echo(x) {\n  return x;\n}\n" },
+  {
+    title: "Maybe-null value",
+    flag: "strict",
+    code: "export function len(s: string | null): number {\n  return s.length;\n}\n",
+  },
+  {
+    title: "Caught value",
+    flag: "strict",
+    code: 'try {\n  JSON.parse("{");\n} catch (e) {\n  console.log(e.message);\n}\nexport {};\n',
+  },
+  {
+    title: "Index read",
+    flag: "noUncheckedIndexedAccess",
+    code: "const xs = [1, 2, 3];\nexport const n: number = xs[5];\n",
+  },
+  {
+    title: "Optional set to undefined",
+    flag: "exactOptionalPropertyTypes",
+    code: "type Profile = { nick?: string };\nexport const p: Profile = { nick: undefined };\n",
+  },
+  {
+    title: "Dot on an index signature",
+    flag: "noPropertyAccessFromIndexSignature",
+    code: "export function get(t: { [key: string]: string }) {\n  return t.name;\n}\n",
+  },
+  {
+    title: "A path with no return",
+    flag: "noImplicitReturns",
+    code: "export function sign(n: number): number | undefined {\n  if (n > 0) return 1;\n}\n",
+  },
+  {
+    title: "Fallthrough",
+    flag: "noFallthroughCasesInSwitch",
+    code: 'export function say(k: number) {\n  switch (k) {\n    case 1:\n      console.log("one");\n    case 2:\n      console.log("two");\n  }\n}\n',
+  },
+];
+
+type SampleResult = { title: string; flag: string; ok: boolean; first: string };
+type ClassInfo = {
+  name: string;
+  abstract: boolean;
+  extends: string;
+  implements: string[];
+  members: { name: string; kind: string; visibility: "+" | "-" | "#"; isStatic: boolean }[];
+};
+type NeverCheck = { line: number; ok: boolean; message: string };
 
 const FLAG_INFO: { key: string; label: string; note: string }[] = [
   { key: "strict", label: "strict", note: "The family: null checks, no implicit any, strict function types…" },
@@ -127,6 +224,8 @@ type Analysis = {
   narrowing: Row[];
   js: string;
   diags: Diag[];
+  classes: ClassInfo[];
+  nevers: NeverCheck[];
 };
 
 function flatten(message: unknown): string {
@@ -155,7 +254,8 @@ export default function TsPlayground() {
   const [code, setCode] = useState(saved.code);
   const [focus, setFocus] = useState(saved.focus);
   const [flags, setFlags] = useState<Flags>(DEFAULT_FLAGS);
-  const [view, setView] = useState<"types" | "narrowing" | "js" | "compiler">("types");
+  const [view, setView] = useState<"types" | "narrowing" | "js" | "compiler" | "classes">("types");
+  const [samples, setSamples] = useState<SampleResult[]>([]);
   const [analysis, setAnalysis] = useState<Analysis | null>(null);
   const [stdin, setStdin] = useState("");
   const [run, setRun] = useState<ProcOut | null>(null);
@@ -197,6 +297,24 @@ export default function TsPlayground() {
     },
     [monaco]
   );
+
+  // The tsconfig explorer re-checks its sample programs whenever a flag flips.
+  useEffect(() => {
+    if (!monaco || view !== "compiler") return;
+    let live = true;
+    const timer = setTimeout(async () => {
+      try {
+        const out = await checkSamples(monaco);
+        if (live) setSamples(out);
+      } catch {
+        /* retried on the next flip */
+      }
+    }, 400);
+    return () => {
+      live = false;
+      clearTimeout(timer);
+    };
+  }, [monaco, flags, view]);
 
   async function runIt() {
     setRunning(true);
@@ -291,6 +409,7 @@ export default function TsPlayground() {
                 ["narrowing", "Narrowing"],
                 ["js", "What runs"],
                 ["compiler", `Compiler${analysis && analysis.diags.length ? ` (${analysis.diags.length})` : ""}`],
+                ["classes", `Classes${analysis && analysis.classes.length ? ` (${analysis.classes.length})` : ""}`],
               ] as const
             ).map(([key, label]) => (
               <button
@@ -313,6 +432,24 @@ export default function TsPlayground() {
                 Every type alias and interface without type parameters, fully expanded — what{" "}
                 <code>Partial&lt;Omit&lt;…&gt;&gt;</code> actually is. Then every top-level value.
               </p>
+              {analysis.nevers.length > 0 && (
+                <div style={{ margin: "6px 0" }}>
+                  {analysis.nevers.map((n) => (
+                    <div key={n.line} className={`assertion ${n.ok ? "ok" : "bad"}`}>
+                      {n.ok ? (
+                        <>
+                          ✓ line {n.line}: <strong>exhaustive</strong> — every case is handled, so the leftover is{" "}
+                          <code>never</code>.
+                        </>
+                      ) : (
+                        <>
+                          ✗ line {n.line}: <strong>a case is missing</strong> — {n.message}
+                        </>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
               {analysis.types.length === 0 && <p className="dim quiz-note">No type declarations yet.</p>}
               {analysis.types.map((r) => (
                 <TypeRow key={"t" + r.label} row={r} />
@@ -361,6 +498,43 @@ export default function TsPlayground() {
             </>
           )}
 
+          {analysis && view === "classes" && (
+            <>
+              <p className="dim quiz-note">
+                Every class in the file: what it extends and implements, and its members — <code>+</code> public,{" "}
+                <code>#</code> protected, <code>-</code> private (<code>#field</code> or <code>private</code>), and{" "}
+                <u>underlined</u> for static.
+              </p>
+              {analysis.classes.length === 0 && <p className="dim quiz-note">No classes in this file.</p>}
+              <div className="class-diagram">
+                {analysis.classes.map((c) => (
+                  <div key={c.name} className="class-box">
+                    <div className="class-name">
+                      {c.abstract ? <em>«abstract» {c.name}</em> : <strong>{c.name}</strong>}
+                    </div>
+                    {(c.extends || c.implements.length > 0) && (
+                      <div className="class-heritage">
+                        {c.extends && <>▷ extends {c.extends}</>}
+                        {c.extends && c.implements.length > 0 && <br />}
+                        {c.implements.length > 0 && <>⇢ implements {c.implements.join(", ")}</>}
+                      </div>
+                    )}
+                    {c.members.map((m) => (
+                      <div key={m.kind + m.name} className="class-member">
+                        <code>{m.visibility}</code>{" "}
+                        <span style={{ textDecoration: m.isStatic ? "underline" : undefined }}>
+                          {m.name}
+                          {m.kind === "method" || m.kind === "constructor" ? "()" : ""}
+                        </span>{" "}
+                        <span className="dim">{m.kind}</span>
+                      </div>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+
           {view === "compiler" && (
             <>
               <p className="dim quiz-note">
@@ -388,6 +562,17 @@ export default function TsPlayground() {
                 </div>
               ))}
               {errorText && <TsErrorLinks text={errorText} />}
+              <div className="io-label" style={{ marginTop: 14 }}>
+                tsconfig explorer — eight small programs under these flags
+              </div>
+              {samples.length === 0 && <p className="dim quiz-note">Checking…</p>}
+              {samples.map((r) => (
+                <div key={r.title} className={`assertion ${r.ok ? "ok" : "bad"}`}>
+                  {r.ok ? "✓ compiles" : "✗ rejected"} — <strong>{r.title}</strong>{" "}
+                  <span className="dim">(turned on by <code>{r.flag}</code>)</span>
+                  {!r.ok && <div className="dim quiz-note">{r.first}</div>}
+                </div>
+              ))}
             </>
           )}
         </div>
@@ -408,6 +593,36 @@ function TypeRow({ row }: { row: Row }) {
 }
 
 type Monaco = NonNullable<ReturnType<typeof useMonaco>>;
+type NavItem = {
+  text: string;
+  kind: string;
+  kindModifiers?: string;
+  childItems?: NavItem[];
+  nameSpan?: { start: number };
+  spans?: { start: number }[];
+};
+
+/** Check the explorer's samples under the current options. */
+async function checkSamples(monaco: Monaco): Promise<SampleResult[]> {
+  const getWorker = await monaco.languages.typescript.getTypeScriptWorker();
+  const out: SampleResult[] = [];
+  for (let i = 0; i < SAMPLES.length; i++) {
+    const sample = SAMPLES[i]!;
+    const uri = monaco.Uri.parse(`file:///playground/samples/s${i}.ts`);
+    const model = monaco.editor.getModel(uri) ?? monaco.editor.createModel(sample.code, "typescript", uri);
+    const client = await getWorker(uri);
+    const diags = await client.getSemanticDiagnostics(uri.toString());
+    const first = diags[0];
+    out.push({
+      title: sample.title,
+      flag: sample.flag,
+      ok: diags.length === 0,
+      first: first ? `TS${first.code}: ${flatten(first.messageText)}` : "",
+    });
+    void model;
+  }
+  return out;
+}
 
 async function analyse(monaco: Monaco, focus: string): Promise<Analysis> {
   const mainUri = monaco.Uri.parse(MAIN);
@@ -435,7 +650,7 @@ async function analyse(monaco: Monaco, focus: string): Promise<Analysis> {
 
   // Top-level values from the navigation tree.
   const values: Row[] = [];
-  const tree = await client.getNavigationTree(MAIN);
+  const tree = (await client.getNavigationTree(MAIN)) as NavItem | undefined;
   for (const item of tree?.childItems ?? []) {
     if (!["const", "let", "var", "function", "class"].includes(item.kind)) continue;
     const start = item.nameSpan?.start ?? item.spans?.[0]?.start;
@@ -474,5 +689,46 @@ async function analyse(monaco: Monaco, focus: string): Promise<Analysis> {
     message: flatten(d.messageText),
   }));
 
-  return { types, values, narrowing, js, diags };
+  // M3-02: `const x: never = …` / `satisfies never` lines — exhaustive when
+  // the compiler has nothing to say about them.
+  const nevers: NeverCheck[] = [];
+  src.split("\n").forEach((text, i) => {
+    if (!/:\s*never\s*=|satisfies\s+never\b/.test(text)) return;
+    const line = i + 1;
+    const hit = diags.find((d) => d.line === line);
+    nevers.push({ line, ok: !hit, message: hit ? hit.message : "" });
+  });
+
+  // M6-04: classes from the navigation tree, heritage from the source.
+  const classes: ClassInfo[] = [];
+  const walk = (items: NavItem[]) => {
+    for (const item of items) {
+      if (item.kind === "class") {
+        const head = new RegExp(
+          `class\\s+${item.text}(?:<[^>]*>)?\\s*(?:extends\\s+([\\w.]+)(?:<[^>]*>)?)?\\s*(?:implements\\s+([^{]+))?\\{`
+        ).exec(src);
+        classes.push({
+          name: item.text,
+          abstract: (item.kindModifiers ?? "").includes("abstract"),
+          extends: head?.[1] ?? "",
+          implements: (head?.[2] ?? "").split(",").map((x) => x.trim()).filter(Boolean),
+          members: (item.childItems ?? [])
+            .filter((m) => ["property", "method", "getter", "setter", "constructor"].includes(m.kind))
+            .map((m) => {
+              const mods = m.kindModifiers ?? "";
+              return {
+                name: m.text,
+                kind: m.kind,
+                visibility: m.text.startsWith("#") || mods.includes("private") ? "-" : mods.includes("protected") ? "#" : "+",
+                isStatic: mods.includes("static"),
+              };
+            }),
+        });
+      }
+      walk(item.childItems ?? []);
+    }
+  };
+  walk(tree?.childItems ?? []);
+
+  return { types, values, narrowing, js, diags, classes, nevers };
 }

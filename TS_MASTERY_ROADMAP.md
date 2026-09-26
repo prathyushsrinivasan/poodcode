@@ -76,6 +76,7 @@ the gap stays visible. This is what has landed since.
 | The week view (X-53–X-55, X-60, X-61, X-72–X-76, X-80, X-81, X-90–X-92) | a long expanding card | each open week has a **checklist spine** — Read · Practise · Problems · Project · Quiz · Final · Notes, each with its count, state and whether it gates — beside the content (`j`/`k` move between sections, `n` jumps to the next unfinished one); **today's share** of the current week at your pace; a **pause for a holiday** that stops the calendar (Today's cards honour it too); a **time budget** per week that flags a week taking twice the plan; **week notes**; **locked weeks show their goal and chapters**; **month goals and progress rings** in the phase rail; **search** across week titles, goals and chapters; an **interleaved warm-up** from two and five weeks back; a **review sitting** drawn from every finished week plus the weeks worth revisiting; and links to the matching **TypeScript course weeks** (with completion), **DSA units** and the **Backend Lab / Projects** | `WeekCard` in `src/pages/Mastery.tsx`, `src/components/MasteryReview.tsx`, `todayPlan`/`interleavedWarmup`/`weekLinks`/`effectiveStart` in `src/lib/mastery.ts`, `phase_goals` in the seed, `progressRings` in `TrackShell` |
 | Assertion panel (M5-03) | a failed type exercise showed a wall of `TS2344` messages at `checks.ts` lines the learner cannot see | every hidden claim listed ✓/✗ — `Expect<Equal<…>>` and `@ts-expect-error` alike, multi-line claims included — and for a failing `Equal`, **your type and the expected type side by side**, expanded by the editor's TypeScript service; the raw compiler text stays one click away. On every type-graded exercise, practice item, problem, final type half and exam puzzle | `src/components/AssertionPanel.tsx`, `src/lib/assertions.ts` |
 | Study aids (X-04, X-35, X-52, X-54, X-71, X-82, X-83, M1-01, M3-04, M5-02) | — | **failed runs are tracked** per exercise: anything failed twice and still unsolved **comes back in a later week's warm-up** (X-52), the review card lists **chapters with a low first-try rate** (X-54), and each week names its **most-retried exercise** (X-82); every TypeScript code block in a lesson has **▶ Playground** (X-04); the coding final has **focus mode** with a clock (X-71); progress **exports as JSON or copies as a Markdown table** (X-83); a **Week 0 guide** with a first judged program (M1-01); the week the strictness ladder steps up **says so** (M3-04); a **daily type puzzle** climbing a 91-rung ladder, with a streak (M5-02); and every **monthly checkpoint** gains a 20-question quiz from the whole month, plus a 10-puzzle type section in the type-level months (X-35, M1-04, M2-04, M4-04, M5-04) | `recordExerciseRun` in `learnProgress.ts`; `requeued`/`weakChapters`/`mostRetried`/`progressReport` in `mastery.ts`; `src/lib/typeLadder.ts`; `src/components/MasteryDaily.tsx`, `MasteryReview.tsx` (`MixedQuiz`) |
+| Teaching tools, round two (M2-02, M2-03, M3-02, M4-02, M6-04, X-69) | — | the step-by-step page gains a **call-stack stepper** for recursion and closures (frames with their locals, values captured by closures; each scenario's traced twin is tested against the real code's output) and an **array-pipeline viewer** (edit the input and each `filter`/`map`/`reduce`/`toSorted`… step, see every intermediate array and which steps mutate); the playground gains **exhaustiveness badges** for every `never` check, a **tsconfig explorer** — eight small programs, each flipped by one flag, re-checked as you toggle — and a **class diagram** of every class (heritage, members, visibility, static); the Mastery page gains a **skill radar** over six kinds of work | `src/lib/callStack.ts`, `src/lib/pipeline.ts`, `src/pages/AsyncVisualiser.tsx`, `src/pages/TsPlayground.tsx`, `src/components/SkillRadar.tsx`, `skillProfile` in `mastery.ts` |
 | Week 27 interview practice | a capstone and a four-problem mock set | **63-question interview bank** with model answers (7 topics, "ask me one" drill), **three timed 45-minute mock interviews** (bank questions + a problem + a type puzzle, clock, self-scored rubric, attempt history), **10 code-review exercises** (X-14): write the review, compare with the model review, tick what you caught — the PR code and the corrected code are both run and their output computed | `tools/mastery_ts_w27.py`, `src/components/MasteryCapstone.tsx`, `src/lib/capstone.ts` |
 | Fast authoring loop (X-102) | none for Mastery | `python tools/verify_ts_mastery.py --weeks 11-14` / `--only ts_regex` — type-checks and runs chapters, practice, problems, finals and projects in seconds | `tools/verify_ts_mastery.py` |
 
@@ -272,7 +273,7 @@ Everything here is built once and then used by every week in Part B.
 | ✅ X-66 | **TS error glossary** page (`/ts-errors`): every `TSnnnn` code the programme can produce, plain-English cause, minimal repro, fix, and which chapters teach it. | P1 | M |
 | ✅ X-67 | **Type playground** (`/playground/ts`): scratch file + panel listing every declared type's fully-expanded form (via the language service's `quickInfo`). | P2 | L |
 | ✅ X-68 | **Completion summary** per month and for the programme: time spent, finals first-try rate, weakest chapters, projects shipped, printable. | P2 | M |
-| X-69 | **Skill radar** — per-phase mastery (reading types, writing types, runtime correctness, async, type-level) computed from exercise kinds passed. | P3 | M |
+| ✅ X-69 | **Skill radar** — per-phase mastery (reading types, writing types, runtime correctness, async, type-level) computed from exercise kinds passed. | P3 | M |
 | ✅ X-70 | **Quiz review screen** after every sitting: every question, your answer, the right answer, the explanation, "add to flashcards". | P1 | S |
 | ✅ X-71 | **Exam timer & focus mode** (optional): hide the sidebar, show elapsed time, record it; does not gate. | P2 | S |
 | 🚧 X-72 | **Keyboard-first flow**: `j/k` through exercises, `Ctrl+Enter` run, `Ctrl+Shift+Enter` submit, `h` next hint, `n` next unfinished item. | P2 | S |
@@ -430,8 +431,8 @@ collections without mutation surprises, and model records as typed objects.
 | # | Item | P |
 |---|---|---|
 | M2-01 | **TypeScript function harness** (X-23) must be live by week 5 — from here, most problems say "implement `f`", not "parse stdin". | **P0** |
-| M2-02 | **Call-stack visualiser** for closures and recursion (extends `/debugger`): step through, see frames and captured variables. | P2 |
-| M2-03 | **Array-method pipeline viewer** — for a `.filter().map().reduce()` chain, show the intermediate array after each step. | P2 |
+| ✅ M2-02 | **Call-stack visualiser** for closures and recursion (extends `/debugger`): step through, see frames and captured variables. | P2 |
+| ✅ M2-03 | **Array-method pipeline viewer** — for a `.filter().map().reduce()` chain, show the intermediate array after each step. | P2 |
 | ✅ M2-04 | **Month 2 checkpoint** (new): 75-minute contest, 4 problems + 20 questions. | P1 |
 | M2-05 | Arc project: **`ledger.ts` v2** — transactions become typed objects; filter/group/summarise with array methods; a `formatMoney` with options. | P1 |
 
@@ -499,7 +500,7 @@ control-flow narrowing the way the compiler does.
 | # | Item | P |
 |---|---|---|
 | ✅ M3-01 | **Narrowing stepper** — step through a function; at each line, a side panel shows the narrowed type of each variable (via the language service's `quickInfo` at that position). The teaching tool for weeks 10–12. | P1 |
-| M3-02 | **Exhaustiveness badge** — the editor shows "switch is exhaustive ✓" when a `never` check compiles. | P3 |
+| ✅ M3-02 | **Exhaustiveness badge** — the editor shows "switch is exhaustive ✓" when a `never` check compiles. | P3 |
 | M3-03 | **State-machine diagram** — for a union of states + transition function, render the states and allowed transitions (weeks 10 and 12). | P3 |
 | ✅ M3-04 | **Strictness ladder step**: from week 11, every exercise runs under `strict+indexed` (X-17). Announce it in-app. | P1 |
 | M3-05 | Arc project: **`ledger.ts` v3** — transactions become a discriminated union (`deposit` / `withdrawal` / `transfer`), parsed from JSON with a guard, exhaustive formatting. | P1 |
@@ -581,7 +582,7 @@ typing is sometimes unsound, and make illegal values unconstructable.
 | # | Item | P |
 |---|---|---|
 | ✅ M4-01 | **Type-graded problems (X-12) and two-part finals (X-34) live** before week 15. | **P0** |
-| M4-02 | **tsconfig explorer** — an interactive tsconfig with every flag used in the programme; toggle one, see which of a fixed set of sample programs start or stop compiling. | P2 |
+| ✅ M4-02 | **tsconfig explorer** — an interactive tsconfig with every flag used in the programme; toggle one, see which of a fixed set of sample programs start or stop compiling. | P2 |
 | ✅ M4-03 | **Multi-file project workspace** (X-45) — required for week 14's modules project. | P1 |
 | ✅ M4-04 | **Month 4 checkpoint** (new): 90-minute contest + a 10-puzzle type-challenge section. | P1 |
 | M4-05 | Arc project: **`ledger.ts` v4** — branded `Cents` and `AccountId`, a validated parser from untrusted JSON, `readonly` everywhere, derived types via utility types, split across modules. | P1 |
@@ -735,7 +736,7 @@ concurrency and cancellation.
 | ✅ M6-01 | **Event-loop visualiser** — for a snippet with `setTimeout`, `Promise.then`, `queueMicrotask` and `await`, animate call stack / microtask queue / task queue and the resulting print order. Teaching tool for week 26. | P1 |
 | ✅ M6-02 | **Async timeline** — for `Promise.all`/`allSettled`/`race`/`any` over simulated delays, draw each promise's lifetime and when the combinator settles. | P2 |
 | M6-03 | **Deterministic async rule** (as the course's `java_m30_sync.py` header): output must be deterministic *by construction* — simulated clocks, index-ordered printing, never timing-dependent. Build lint for `setTimeout` with non-constant delays. | **P0** |
-| M6-04 | **Class diagram** — render a class hierarchy (fields, visibility, `implements`/`extends`) from the learner's code. | P3 |
+| ✅ M6-04 | **Class diagram** — render a class hierarchy (fields, visibility, `implements`/`extends`) from the learner's code. | P3 |
 | M6-05 | **Month 6 checkpoint** = the existing week-26 contest, rebuilt from month 6 problems. | P1 |
 | M6-06 | Arc project: **`ledger` final** — classes with private state, a generator-based report stream, `Result`-based parsing, an async loader with timeout and cancellation. | P1 |
 

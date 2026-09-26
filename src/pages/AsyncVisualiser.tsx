@@ -1,4 +1,8 @@
-// Async, made visible (TS_MASTERY_ROADMAP M6-01, M6-02):
+// Step by step (TS_MASTERY_ROADMAP M2-02, M2-03, M6-01, M6-02):
+//   * Call stack — recursion and closures, frame by frame, with each frame's
+//     locals and what closures captured (lib/callStack.ts).
+//   * Array pipeline — a filter/map/reduce chain with every intermediate array
+//     (lib/pipeline.ts).
 //   * Event loop — step through a snippet and watch the call stack, the
 //     microtask queue, the timer queue and the output change.
 //   * Promise combinators — lay promises on a timeline and see when (and with
@@ -7,7 +11,16 @@
 // lib/eventLoop.test.ts.
 
 import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
+import { STACK_SCENARIOS, traceScenario } from "../lib/callStack";
+import {
+  PIPE_METHODS,
+  PIPE_PRESETS,
+  describe,
+  runPipeline,
+  type PipeMethod,
+  type PipeStep,
+} from "../lib/pipeline";
 import {
   SCENARIOS,
   settle,
@@ -16,33 +29,233 @@ import {
   type TimedPromise,
 } from "../lib/eventLoop";
 
+const TABS = [
+  ["stack", "Call stack"],
+  ["pipeline", "Array pipeline"],
+  ["loop", "Event loop"],
+  ["combinators", "Promise combinators"],
+] as const;
+type Tab = (typeof TABS)[number][0];
+
 export default function AsyncVisualiser() {
-  const [tab, setTab] = useState<"loop" | "combinators">("loop");
+  const [params, setParams] = useSearchParams();
+  const requested = params.get("tab");
+  const tab: Tab = TABS.some(([k]) => k === requested) ? (requested as Tab) : "stack";
   return (
     <div className="page">
-      <h1 className="page-title">🔁 Async, step by step</h1>
+      <h1 className="page-title">🔁 Step by step</h1>
       <p className="page-sub">
-        Why does <code>setTimeout(f, 0)</code> run last? When does <code>Promise.all</code> give up? Step through it.
-        For Week 26 of <Link to="/mastery">the Mastery programme</Link>; try your own snippets in the{" "}
+        What is on the call stack right now? What does each array method hand to the next? Why does{" "}
+        <code>setTimeout(f, 0)</code> run last? Step through it. Try your own snippets in the{" "}
         <Link to="/playground/ts">playground</Link>.
       </p>
-      <div className="row" style={{ gap: 6, marginBottom: 12 }} role="tablist">
-        <button className={tab === "loop" ? "" : "ghost"} onClick={() => setTab("loop")} role="tab" aria-selected={tab === "loop"}>
-          Event loop
-        </button>
-        <button
-          className={tab === "combinators" ? "" : "ghost"}
-          onClick={() => setTab("combinators")}
-          role="tab"
-          aria-selected={tab === "combinators"}
-        >
-          Promise combinators
-        </button>
+      <div className="row" style={{ gap: 6, marginBottom: 12, flexWrap: "wrap" }} role="tablist">
+        {TABS.map(([key, label]) => (
+          <button
+            key={key}
+            className={tab === key ? "" : "ghost"}
+            onClick={() => setParams({ tab: key }, { replace: true })}
+            role="tab"
+            aria-selected={tab === key}
+          >
+            {label}
+          </button>
+        ))}
       </div>
-      {tab === "loop" ? <EventLoop /> : <Combinators />}
+      {tab === "stack" && <CallStackView />}
+      {tab === "pipeline" && <PipelineView />}
+      {tab === "loop" && <EventLoop />}
+      {tab === "combinators" && <Combinators />}
     </div>
   );
 }
+
+function CallStackView() {
+  const [key, setKey] = useState(STACK_SCENARIOS[0]!.key);
+  const scenario = STACK_SCENARIOS.find((s) => s.key === key) ?? STACK_SCENARIOS[0]!;
+  const steps = useMemo(() => traceScenario(scenario), [scenario]);
+  const [i, setI] = useState(0);
+  const step = steps[Math.min(i, steps.length - 1)]!;
+  const done = i >= steps.length - 1;
+
+  useEffect(() => setI(0), [key]);
+
+  return (
+    <>
+      <div className="row" style={{ gap: 6, flexWrap: "wrap", marginBottom: 8 }}>
+        {STACK_SCENARIOS.map((s) => (
+          <button key={s.key} className={s.key === key ? "" : "ghost"} onClick={() => setKey(s.key)}>
+            {s.title}
+          </button>
+        ))}
+      </div>
+      <p style={{ marginTop: 0 }}>{scenario.lesson}</p>
+      <div className="loop-grid">
+        <div>
+          <div className="io-label">Code</div>
+          <pre className="io-block loop-code">
+            {scenario.code.split("\n").map((l, n) => (
+              <div key={n} className={step.line === n + 1 ? "loop-line-now" : undefined}>
+                <span className="oc-no">{n + 1}</span>
+                {l || " "}
+              </div>
+            ))}
+          </pre>
+          <LoopBox title="Output" items={step.output} empty="nothing yet" mono />
+        </div>
+        <div>
+          <div className="card loop-box">
+            <div className="io-label">
+              Call stack <span className="dim" style={{ textTransform: "none" }}>· top of stack first</span>
+            </div>
+            {step.frames.length === 0 ? (
+              <div className="dim quiz-note">empty</div>
+            ) : (
+              [...step.frames].reverse().map((f, k) => (
+                <div key={k} className={`stack-frame ${k === 0 ? "top" : ""}`}>
+                  <strong>{f.name}</strong>
+                  {f.locals.length > 0 && (
+                    <div className="stack-locals">
+                      {f.locals.map(([name, value]) => (
+                        <span key={name}>
+                          <code>{name}</code> = <code>{value}</code>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))
+            )}
+          </div>
+          {step.captured.length > 0 && (
+            <div className="card loop-box" style={{ marginTop: 8 }}>
+              <div className="io-label">Captured by closures</div>
+              {step.captured.map(([name, value]) => (
+                <div key={name} className="loop-item mono">
+                  {name} = {value}
+                </div>
+              ))}
+            </div>
+          )}
+          <div className="card loop-note">
+            <span className="badge">
+              step {i + 1}/{steps.length}
+            </span>{" "}
+            {step.note}
+          </div>
+          <div className="row" style={{ gap: 6, marginTop: 8 }}>
+            <button className="ghost" onClick={() => setI(0)} disabled={i === 0}>
+              ⏮ Reset
+            </button>
+            <button className="ghost" onClick={() => setI((n) => Math.max(0, n - 1))} disabled={i === 0}>
+              ◀ Back
+            </button>
+            <button onClick={() => setI((n) => Math.min(steps.length - 1, n + 1))} disabled={done}>
+              Step ▶
+            </button>
+            <button className="ghost" onClick={() => setI(steps.length - 1)} disabled={done}>
+              ⏭ End
+            </button>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
+
+function PipelineView() {
+  const [input, setInput] = useState(PIPE_PRESETS[0]!.input);
+  const [steps, setSteps] = useState<PipeStep[]>(PIPE_PRESETS[0]!.steps);
+  const [lesson, setLesson] = useState(PIPE_PRESETS[0]!.lesson);
+  let parsed: unknown;
+  let parseError = "";
+  try {
+    parsed = JSON.parse(input);
+  } catch (e) {
+    parseError = e instanceof Error ? e.message : String(e);
+  }
+  const results = parseError ? [] : runPipeline(parsed, steps);
+
+  const update = (k: number, patch: Partial<PipeStep>) => setSteps(steps.map((s, i) => (i === k ? { ...s, ...patch } : s)));
+
+  return (
+    <>
+      <div className="row" style={{ gap: 6, flexWrap: "wrap", marginBottom: 8 }}>
+        {PIPE_PRESETS.map((p) => (
+          <button
+            key={p.title}
+            className="ghost"
+            onClick={() => {
+              setInput(p.input);
+              setSteps(p.steps);
+              setLesson(p.lesson);
+            }}
+          >
+            {p.title}
+          </button>
+        ))}
+      </div>
+      <p style={{ marginTop: 0 }}>{lesson}</p>
+      <div className="card">
+        <div className="io-label">Input (JSON)</div>
+        <input
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          style={{ width: "100%", fontFamily: "var(--font-mono)" }}
+          aria-label="Input array as JSON"
+        />
+        {parseError && <p className="quiz-note" style={{ color: "var(--bad)" }}>Not valid JSON: {parseError}</p>}
+        {steps.map((s, k) => {
+          const r = results[k];
+          return (
+            <div key={k} className="pipe-step">
+              <div className="row" style={{ gap: 6, alignItems: "center" }}>
+                <code>.</code>
+                <select value={s.method} onChange={(e) => update(k, { method: e.target.value as PipeMethod })}>
+                  {PIPE_METHODS.map((m) => (
+                    <option key={m} value={m}>
+                      {m}
+                    </option>
+                  ))}
+                </select>
+                <code>(</code>
+                <input
+                  value={s.arg}
+                  onChange={(e) => update(k, { arg: e.target.value })}
+                  style={{ flex: 1, fontFamily: "var(--font-mono)" }}
+                  aria-label={`Argument of step ${k + 1}`}
+                />
+                <code>)</code>
+                <button className="ghost" onClick={() => setSteps(steps.filter((_, i) => i !== k))} aria-label="Remove step">
+                  ×
+                </button>
+              </div>
+              {r && (
+                <div className="pipe-result">
+                  {r.error ? (
+                    <span style={{ color: "var(--bad)" }}>{r.error}</span>
+                  ) : (
+                    <>
+                      → <code>{describe(r.value)}</code>
+                      {r.mutatedInput && <span className="badge" style={{ marginLeft: 6 }}>mutated its input</span>}
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
+          );
+        })}
+        <button className="ghost" onClick={() => setSteps([...steps, { method: "map", arg: "(x) => x" }])}>
+          + step
+        </button>
+        <p className="dim quiz-note" style={{ marginBottom: 0 }}>
+          Each argument is plain JavaScript (no type annotations), run in this page on the result of the step above.
+        </p>
+      </div>
+    </>
+  );
+}
+
 
 function EventLoop() {
   const [key, setKey] = useState(SCENARIOS[0]!.key);
