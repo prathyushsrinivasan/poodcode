@@ -554,6 +554,43 @@ export interface MasteryWeek {
   problem_set?: Exercise[];
   /** The build project as a runnable brief; `project` is its one-line summary. */
   project_spec?: MasteryProjectSpec | null;
+  /** Capstone week only: interview questions with model answers. */
+  interview_bank?: MasteryInterviewQ[];
+  /** Capstone week only: timed mock interviews. */
+  mock_sessions?: MasteryMockSession[];
+  /** Capstone week only: snippets to review against a model review. */
+  code_reviews?: MasteryCodeReview[];
+}
+
+export interface MasteryInterviewQ {
+  topic: string;
+  question: string;
+  /** Markdown. */
+  answer: string;
+}
+
+export interface MasteryMockSession {
+  title: string;
+  minutes: number;
+  brief: string;
+  /** Indices into the week's `interview_bank`. */
+  questions: number[];
+  /** Exercise ids in the week's `problem_set`. */
+  problem: string;
+  puzzle: string;
+  rubric: string[];
+}
+
+export interface MasteryCodeReview {
+  id: string;
+  title: string;
+  context: string;
+  code: string;
+  /** What the snippet prints, computed. */
+  runs: string;
+  comments: string[];
+  fixed: string;
+  fixed_runs: string;
 }
 
 export interface MasteryTrack {

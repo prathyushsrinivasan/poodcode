@@ -1338,6 +1338,60 @@ pub struct MasteryWeek {
     /// stays as the one-line summary.
     #[serde(default)]
     pub project_spec: Option<MasteryProjectSpec>,
+    /// Capstone week only: conceptual interview questions with model answers.
+    #[serde(default)]
+    pub interview_bank: Vec<MasteryInterviewQ>,
+    /// Capstone week only: timed mock interviews built from the bank and the
+    /// week's problem set.
+    #[serde(default)]
+    pub mock_sessions: Vec<MasteryMockSession>,
+    /// Capstone week only: PR-sized snippets to review against a model review.
+    #[serde(default)]
+    pub code_reviews: Vec<MasteryCodeReview>,
+}
+
+/// One interview question with a model answer (Markdown).
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MasteryInterviewQ {
+    pub topic: String,
+    pub question: String,
+    pub answer: String,
+}
+
+/// A timed mock interview: idiom questions (indices into the week's
+/// `interview_bank`), one problem and one type puzzle (ids in the week's
+/// `problem_set`), and a self-scored rubric.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MasteryMockSession {
+    pub title: String,
+    pub minutes: i64,
+    #[serde(default)]
+    pub brief: String,
+    #[serde(default)]
+    pub questions: Vec<usize>,
+    pub problem: String,
+    pub puzzle: String,
+    #[serde(default)]
+    pub rubric: Vec<String>,
+}
+
+/// A code-review exercise: a snippet that compiles and runs and is wrong, the
+/// model review, and the corrected code. `runs` / `fixed_runs` are what each
+/// version prints, computed by running it.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MasteryCodeReview {
+    pub id: String,
+    pub title: String,
+    #[serde(default)]
+    pub context: String,
+    pub code: String,
+    #[serde(default)]
+    pub runs: String,
+    #[serde(default)]
+    pub comments: Vec<String>,
+    pub fixed: String,
+    #[serde(default)]
+    pub fixed_runs: String,
 }
 
 /// One authored review card: a prompt, and the answer to recall.

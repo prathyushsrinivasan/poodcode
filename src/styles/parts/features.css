@@ -411,6 +411,16 @@ table.sqlgrid tbody tr.diff td {
 .mastery-practice > summary {
   cursor: pointer;
 }
+/* What a snippet prints — computed output shown under the code. */
+.code-output {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  background: var(--bg-elev-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 12px;
+  white-space: pre-wrap;
+}
 
 /* ---- Checkpoint contests --------------------------------------------- */
 .contest-clock {

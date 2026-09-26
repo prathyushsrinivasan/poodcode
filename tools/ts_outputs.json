@@ -8348,6 +8348,126 @@
    }
   ]
  },
+ "tsm-cr-account-fixed": {
+  "hash": "72dc222bebccadae3950",
+  "outputs": [
+   "deposit must be a positive whole number of cents, got -50\n250"
+  ]
+ },
+ "tsm-cr-account-pr": {
+  "hash": "d530c5538664eefa370f",
+  "outputs": [
+   "-50\n1000000"
+  ]
+ },
+ "tsm-cr-age-fixed": {
+  "hash": "bcfdf604696ae9308987",
+  "outputs": [
+   "31,invalid,invalid,invalid"
+  ]
+ },
+ "tsm-cr-age-pr": {
+  "hash": "6adc774249259b124982",
+  "outputs": [
+   "31,0,0,4.5"
+  ]
+ },
+ "tsm-cr-config-fixed": {
+  "hash": "bc2e6eab70c155ed775b",
+  "outputs": [
+   "rejected: retries must be an integer, got \"3\"\nretries + 1 = 4"
+  ]
+ },
+ "tsm-cr-config-pr": {
+  "hash": "3a66fb4cdd35b81c17e0",
+  "outputs": [
+   "31"
+  ]
+ },
+ "tsm-cr-foreach-fixed": {
+  "hash": "010cf48fc23489f2461a",
+  "outputs": [
+   "saved 1\nsaved 2\nsaved 3\nall saved"
+  ]
+ },
+ "tsm-cr-foreach-pr": {
+  "hash": "1118f215f05a547a70b0",
+  "outputs": [
+   "all saved\nsaved 1\nsaved 2\nsaved 3"
+  ]
+ },
+ "tsm-cr-generic-fixed": {
+  "hash": "697bd3541c30030c9238",
+  "outputs": [
+   "empty no x"
+  ]
+ },
+ "tsm-cr-generic-pr": {
+  "hash": "96271006611dee6d9fa7",
+  "outputs": [
+   "undefined undefined"
+  ]
+ },
+ "tsm-cr-guard-fixed": {
+  "hash": "4d5572980f8807d30cbe",
+  "outputs": [
+   "1: a@x.io\nskipped: {\"id\":2}"
+  ]
+ },
+ "tsm-cr-guard-pr": {
+  "hash": "c00478316e0f873fed86",
+  "outputs": [
+   "1: a@x.io\n2: undefined"
+  ]
+ },
+ "tsm-cr-prices-fixed": {
+  "hash": "99f646cc4e9900e5d02e",
+  "outputs": [
+   "210 cents; unknown: kiwi"
+  ]
+ },
+ "tsm-cr-prices-pr": {
+  "hash": "57de0361b47016b9cbac",
+  "outputs": [
+   "NaN"
+  ]
+ },
+ "tsm-cr-status-fixed": {
+  "hash": "2c645ca822f31014cd69",
+  "outputs": [
+   "Active, Pending"
+  ]
+ },
+ "tsm-cr-status-pr": {
+  "hash": "50c1084c9739df857bda",
+  "outputs": [
+   "Active, Deleted"
+  ]
+ },
+ "tsm-cr-tags-fixed": {
+  "hash": "f3b017765dd175477479",
+  "outputs": [
+   "draft,news\ndraft,sport\ndraft"
+  ]
+ },
+ "tsm-cr-tags-pr": {
+  "hash": "25755dd7af9c2418c317",
+  "outputs": [
+   "draft,news,sport\ndraft,news,sport\ndraft,news,sport"
+  ]
+ },
+ "tsm-cr-transfer-fixed": {
+  "hash": "8f4955ab57c8293307d5",
+  "outputs": [
+   "move 2500 from #7 to #12"
+  ]
+ },
+ "tsm-cr-transfer-pr": {
+  "hash": "b48d1c917fa71d9293f7",
+  "outputs": [
+   "move 42 from #7 to #2500"
+  ]
+ },
  "tsm-w1-bmi": {
   "hash": "45f8f7318c4967381326",
   "outputs": [

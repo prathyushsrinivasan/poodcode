@@ -58,3 +58,30 @@ for _tsw in TS_WEEKS:
         assert len(set(_q2["options"])) == 4, f"{_q2['question']!r}: repeated option"
         _texts.add(_q2["question"])
         _tsw["quiz"].append(_q2)
+
+# Week 27's interview bank, timed mock sessions and code reviews
+# (mastery_ts_w27.py). Only the capstone week carries them.
+_w27 = next(w for w in TS_WEEKS if w["week"] == 27)
+_bank_texts = set()
+for _iq2 in TS_INTERVIEW_BANK:
+    assert _iq2["question"] not in _bank_texts, f"interview bank: duplicate {_iq2['question']!r}"
+    assert len(_iq2["answer"]) >= 200, f"interview bank: thin answer for {_iq2['question']!r}"
+    _bank_texts.add(_iq2["question"])
+assert len(TS_INTERVIEW_BANK) >= 60, "interview bank: the roadmap asks for 60 questions"
+_w27_ids = {ex["id"]: ex for ex in _w27["problem_set"]}
+for _ms in TS_MOCK_SESSIONS:
+    assert _ms["minutes"] > 0 and _ms["rubric"], f"{_ms['title']}: needs a clock and a rubric"
+    assert all(0 <= i < len(TS_INTERVIEW_BANK) for i in _ms["questions"]), f"{_ms['title']}: bad question index"
+    assert _ms["problem"] in _w27_ids and _w27_ids[_ms["problem"]]["kind"] == "challenge", \
+        f"{_ms['title']}: problem {_ms['problem']!r} is not a week-27 problem"
+    assert _ms["puzzle"] in _w27_ids and _w27_ids[_ms["puzzle"]]["kind"] == "typelevel", \
+        f"{_ms['title']}: puzzle {_ms['puzzle']!r} is not a week-27 type puzzle"
+_cr_ids = set()
+for _cr2 in TS_CODE_REVIEWS:
+    assert _cr2["id"] not in _cr_ids, f"code review: duplicate id {_cr2['id']}"
+    _cr_ids.add(_cr2["id"])
+    assert len(_cr2["comments"]) >= 3, f"{_cr2['id']}: the model review needs 3+ comments"
+    assert _TSO_COLLECT or _cr2["runs"] != _cr2["fixed_runs"], f"{_cr2['id']}: the fix changes nothing observable"
+_w27["interview_bank"] = TS_INTERVIEW_BANK
+_w27["mock_sessions"] = TS_MOCK_SESSIONS
+_w27["code_reviews"] = TS_CODE_REVIEWS

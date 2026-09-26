@@ -24,6 +24,7 @@ import {
   solvedExercises,
 } from "../lib/learnProgress";
 import { ExerciseSections } from "../components/ExerciseSections";
+import { CapstonePractice } from "../components/MasteryCapstone";
 import { useToast } from "../components/Toast";
 import { TrackSkeleton } from "../components/Skeleton";
 import {
@@ -713,6 +714,8 @@ function WeekCard({
               />
             </details>
           )}
+
+          <CapstonePractice week={week} trackKey={track.key} />
 
           {(week.flashcards?.length ?? 0) > 0 && (
             <p className="dim quiz-note">

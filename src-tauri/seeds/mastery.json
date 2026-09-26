@@ -34041,7 +34041,524 @@
             }
           ],
           "strictness": "strict+indexed"
-        }
+        },
+        "interview_bank": [
+          {
+            "topic": "Types & inference",
+            "question": "What is the difference between `any`, `unknown` and `never`?",
+            "answer": "`any` switches checking off: every operation is allowed and the value spreads\n`any` to everything it touches. `unknown` is the safe top type — anything can be\nassigned to it, but you can do nothing with it until you narrow it (`typeof`,\n`instanceof`, a type guard). `never` is the bottom type: no value has it. It is\nthe type of a function that never returns, of an impossible branch, and of the\nempty union — which is what makes exhaustiveness checks work. Rule of thumb:\ndata from outside (JSON, `catch`, user input) is `unknown`; `any` is a\nmigration tool, not a design."
+          },
+          {
+            "topic": "Types & inference",
+            "question": "`interface` or `type` — which do you use, and when does it matter?",
+            "answer": "For object shapes they are nearly interchangeable. The real differences:\n`interface` supports declaration merging (two declarations with the same name\ncombine — useful for augmenting a library, surprising otherwise) and `extends`,\nwhich reports conflicting members clearly. `type` can name anything — unions,\ntuples, mapped and conditional types — which `interface` cannot. A common\nconvention: `interface` for object shapes that others might extend, `type` for\neverything else. What matters more than the choice is being consistent."
+          },
+          {
+            "topic": "Types & inference",
+            "question": "What does \"structural typing\" mean, and how would you get nominal behaviour when you need it?",
+            "answer": "Compatibility is decided by shape, not by name: any value with the required\nmembers is assignable, whatever it was declared as. Two classes with the same\npublic members are interchangeable. When two things share a shape but must not\nmix — `UserId` and `OrderId` are both `number` — add a *brand*:\n`type UserId = number & { readonly __brand: \"UserId\" }`, created only by a\nvalidating function. The brand exists only in the type system; at runtime it is\nstill a plain number."
+          },
+          {
+            "topic": "Types & inference",
+            "question": "When should you write a type annotation, and when should you let TypeScript infer?",
+            "answer": "Annotate boundaries; infer the inside. Function parameters must be annotated\n(there is nothing to infer from). Return types of exported functions are worth\nwriting: they document intent and stop an accidental change of return type from\nleaking to every caller. Locals are usually better inferred — an annotation\nthere can only widen the type or repeat it. Annotate a local when inference\nwould be too wide (an empty array, a `let` that starts as `null`)."
+          },
+          {
+            "topic": "Types & inference",
+            "question": "Why does `let x = \"up\"` have type `string` while `const x = \"up\"` has type `\"up\"`?",
+            "answer": "Widening. A `const` can never change, so the literal type is exact. A `let` can\nbe reassigned, so TypeScript widens the literal to its base type — otherwise\nyou could never assign another string. Object properties widen too, because\nthey are mutable. `as const` opts out: it keeps literal types and makes\nproperties `readonly`, which is how you derive a union from a constant array\n(`typeof SIZES[number]`)."
+          },
+          {
+            "topic": "Types & inference",
+            "question": "What does `\"strict\": true` actually turn on?",
+            "answer": "A family of flags: `noImplicitAny`, `strictNullChecks`, `strictFunctionTypes`,\n`strictBindCallApply`, `strictPropertyInitialization`, `noImplicitThis`,\n`useUnknownInCatchVariables` and `alwaysStrict` (plus newer ones added to the\nfamily over time). The two most important are `strictNullChecks` — `null` and\n`undefined` become their own types — and `noImplicitAny`. Two valuable flags are\n*not* in `strict`: `noUncheckedIndexedAccess` and `exactOptionalPropertyTypes`."
+          },
+          {
+            "topic": "Types & inference",
+            "question": "What is the difference between `prop?: string` and `prop: string | undefined`?",
+            "answer": "`prop?: string` means the key may be absent; `prop: string | undefined` means\nthe key must be present but its value may be `undefined`. By default TypeScript\nlets you write `undefined` into an optional property, so the two blur. Under\n`exactOptionalPropertyTypes` they separate: `{ prop: undefined }` is rejected\nfor `prop?: string`. It matters wherever absence and `undefined` behave\ndifferently — `\"prop\" in obj`, `Object.keys`, spreading over defaults."
+          },
+          {
+            "topic": "Types & inference",
+            "question": "Do types exist at runtime? What does that mean for your code?",
+            "answer": "No. Types are erased — Node's type stripping literally replaces them with\nwhitespace. So you cannot `instanceof` an interface, cannot branch on a type\nparameter, and a type assertion converts nothing. Anything you need to check at\nruntime must be a runtime value: a tag field, a class, a validator. That is why\nvalidation libraries derive the type *from* the validator — one source of truth\nfor both worlds."
+          },
+          {
+            "topic": "Narrowing & unions",
+            "question": "What is narrowing, and which constructs narrow a type?",
+            "answer": "Control-flow analysis: after a check, the compiler knows more about a value in\nthat branch. Narrowing constructs: `typeof x === \"string\"`, `instanceof`,\n`\"key\" in x`, equality with a literal (`x.kind === \"circle\"`, `x === null`),\ntruthiness, `Array.isArray`, user-defined type predicates (`x is T`), assertion\nfunctions (`asserts x is T`), and since 5.5 inferred predicates from arrow\nfunctions like `x => x !== undefined`. Assignments narrow too, and early\nreturns narrow everything after them."
+          },
+          {
+            "topic": "Narrowing & unions",
+            "question": "What is a discriminated union, and how do you make a `switch` over one exhaustive?",
+            "answer": "A union of object types that share a literal-typed tag field\n(`{ kind: \"circle\"; r: number } | { kind: \"square\"; side: number }`). Checking\nthe tag narrows to one member. For exhaustiveness, end the `switch` with\n`default: { const unreachable: never = shape; ... }` (or `shape satisfies never`).\nIf someone adds a variant, the leftover member is not assignable to `never` and\nevery unhandled switch becomes a compile error — the compiler hands you the\nto-do list."
+          },
+          {
+            "topic": "Narrowing & unions",
+            "question": "What is a user-defined type guard, and what is the risk?",
+            "answer": "A function returning `x is T`: when it returns `true`, the caller's value is\nnarrowed to `T`. The risk is that the compiler trusts it completely — a guard\nthat checks only `\"id\" in x` but claims `x is User` will happily let you read\n`x.email` that is not there. Write guards that check every property you will\nuse, keep them next to the type, and test them with bad inputs."
+          },
+          {
+            "topic": "Narrowing & unions",
+            "question": "What is an assertion function?",
+            "answer": "A function whose return type is `asserts x is T` (or `asserts cond`). If it\nreturns at all, the compiler narrows `x` for the rest of the scope; it signals\nfailure by throwing. `function assertIsDefined<T>(v: T): asserts v is NonNullable<T>`\nis the classic. It must be declared with an explicit type annotation to be\nused as an assertion, and like a type predicate it is trusted — it must really\nthrow on bad input."
+          },
+          {
+            "topic": "Narrowing & unions",
+            "question": "Compare `const x: T = ...`, `... as T` and `... satisfies T`.",
+            "answer": "An annotation checks the value against `T` and then *forgets* the precise type —\n`x` is just `T`. `as T` is a claim, not a check: it only refuses conversions\nbetween unrelated types, so it can hide a real mismatch. `satisfies T` checks the\nvalue against `T` *and keeps the inferred type*, so a route table\n`satisfies Record<string, Route>` still knows its exact keys. Prefer\n`satisfies` for config-like literals, annotations for boundaries, and `as` only\nwhere you know something the compiler cannot."
+          },
+          {
+            "topic": "Narrowing & unions",
+            "question": "Why is narrowing sometimes lost inside a callback?",
+            "answer": "The callback may run later, after the variable has changed. For a `let` (or a\nproperty) that is reassigned anywhere, the compiler cannot prove the narrowed\ntype still holds when the callback runs, so it falls back to the declared type.\nA `const`, or a `let` that is never reassigned after the check, keeps its\nnarrowing (TypeScript 5.4 improved this for closures created after the last\nassignment). The fix is usually to copy the narrowed value into a `const`."
+          },
+          {
+            "topic": "Narrowing & unions",
+            "question": "When is the non-null assertion `!` acceptable?",
+            "answer": "When you know something the compiler cannot express and the knowledge is local\nand obvious — a `Map` lookup right after `has` on the same key, an element that\nthe surrounding code has just created. It is never a fix for \"possibly\nundefined\" that you have not thought about: it removes the check without\nremoving the bug. Prefer narrowing, `??` with a default, or restructuring so the\nvalue cannot be missing."
+          },
+          {
+            "topic": "Narrowing & unions",
+            "question": "How does the `in` operator narrow, and what is the catch?",
+            "answer": "`\"swim\" in animal` narrows a union to the members that declare `swim` (and, since\n4.9, adds the property to types that do not declare it). The catch is that `in`\nlooks at the prototype chain: `\"toString\" in {}` is `true`. For \"does this\nobject have its own key\", use `Object.hasOwn(obj, key)` — and remember that an\nobject literal type does not promise the absence of extra keys at runtime."
+          },
+          {
+            "topic": "Functions & generics",
+            "question": "How would you type `pipe(f, g, h)`?",
+            "answer": "Two honest answers. The practical one is overloads for 1..N steps, each linking\none function's return type to the next one's parameter — readable, and what\nmost libraries ship. The general one is a variadic signature validated by a\nrecursive conditional type over the tuple of functions — it works, but the\nerror messages get worse. Say which trade-off you are making; an interviewer\ncares more about that than about the cleverer type."
+          },
+          {
+            "topic": "Functions & generics",
+            "question": "When should a function be generic, and when should it take a union?",
+            "answer": "Generic when the type parameter *relates* two positions: the input type\ndetermines the output (`first<T>(xs: readonly T[]): T | undefined`). If a type\nparameter appears only once, it relates nothing — it is `unknown` in disguise,\nor worse, a hidden cast (`parse<T>(s): T`). A union is right when the function\naccepts several shapes and returns the same thing regardless."
+          },
+          {
+            "topic": "Functions & generics",
+            "question": "What does `K extends keyof T` buy you in `get<T, K extends keyof T>(obj: T, key: K)`?",
+            "answer": "Two things. The constraint rejects keys that do not exist, at the call site. And\nthe return type can be `T[K]` — the type of exactly that property — instead of\nthe union of all property types. Because `K` is inferred as the literal key\n(`\"name\"`), `get(user, \"name\")` returns `string`, not `string | number`."
+          },
+          {
+            "topic": "Functions & generics",
+            "question": "Overloads or a union parameter — how do you choose?",
+            "answer": "Use a union parameter when the return type does not depend on which member was\npassed; one signature is simpler and callers can pass a value that is itself a\nunion. Use overloads when the return type *does* depend on the argument\n(`parse(s: string): number; parse(s: string[]): number[]`). Remember that the\nimplementation signature is invisible to callers, and a union argument cannot\nmatch any single overload."
+          },
+          {
+            "topic": "Functions & generics",
+            "question": "What does a `const` type parameter do?",
+            "answer": "`function f<const T>(x: T)` infers `T` as if the argument had been written with\n`as const`: literal types are kept and arrays become readonly tuples. So\n`f([\"a\", \"b\"])` gives `T = readonly [\"a\", \"b\"]` instead of `string[]`. It is how\nlibraries preserve literal route names or column lists without making every\ncaller write `as const`. Added in TypeScript 5.0."
+          },
+          {
+            "topic": "Functions & generics",
+            "question": "What problem does `NoInfer<T>` solve?",
+            "answer": "Stopping a position from contributing to inference. In\n`createStore<T>(initial: T, fallback: T)` both arguments are inference sites, so\na wrong fallback silently widens `T` instead of erroring. Writing\n`fallback: NoInfer<T>` makes `T` come from `initial` only, and the fallback is\nchecked against it. Added in TypeScript 5.4."
+          },
+          {
+            "topic": "Functions & generics",
+            "question": "Why is `(x: Dog) => void` not assignable to `(x: Animal) => void` under `strictFunctionTypes`?",
+            "answer": "Parameters are contravariant. A function expecting an `Animal` may be called with\na `Cat`; a handler that only knows how to handle a `Dog` would then receive a\n`Cat`. `strictFunctionTypes` enforces this for function-typed properties — but\n*not* for methods declared with method syntax (`handle(x: Dog): void`), which stay\nbivariant for compatibility. That is a reason to prefer property syntax for\ncallbacks in interfaces."
+          },
+          {
+            "topic": "Functions & generics",
+            "question": "Show a place where TypeScript is deliberately unsound.",
+            "answer": "Array covariance: `Dog[]` is assignable to `Animal[]`, and then\n`animals.push(cat)` puts a `Cat` in the dog array — no error. Others: method\nparameter bivariance, `any`, type assertions, and index access without\n`noUncheckedIndexedAccess` (`xs[99]` is typed `T`). These are trade-offs for\nusability; knowing them tells you where to add `readonly` or a stricter flag."
+          },
+          {
+            "topic": "Type-level programming",
+            "question": "What is a mapped type, and what does key remapping add?",
+            "answer": "`{ [K in keyof T]: F<T[K]> }` builds an object type by iterating keys — it is how\n`Partial`, `Readonly` and `Record` are written. Modifiers can be added or removed\n(`-readonly`, `-?`). Key remapping (`as`) renames or filters keys:\n``[K in keyof T as `get${Capitalize<K & string>}`]`` produces getter names, and\nmapping a key to `never` drops it — `PickByValue` and `OmitByValue` are written\nthat way."
+          },
+          {
+            "topic": "Type-level programming",
+            "question": "What is a distributive conditional type, and how do you stop the distribution?",
+            "answer": "A conditional type whose checked type is a *naked* type parameter distributes\nover unions: `T extends U ? X : Y` with `T = A | B` evaluates for `A` and `B`\nseparately and unions the results. That is how `Exclude` works. Wrap both sides\nin a tuple — `[T] extends [U]` — to test the union as a whole. Watch out for\n`never`: it is the empty union, so a distributive type given `never` returns\n`never` without evaluating either branch."
+          },
+          {
+            "topic": "Type-level programming",
+            "question": "What does `infer` do?",
+            "answer": "Inside the `extends` clause of a conditional type, `infer R` declares a type\nvariable that TypeScript solves by matching: `T extends (...args: any[]) => infer R ? R : never`\nis `ReturnType`. It works in any position — array elements, promise payloads,\ntuple heads (`[infer H, ...infer Rest]`), template literal pieces. `infer R extends string`\nconstrains what may be captured."
+          },
+          {
+            "topic": "Type-level programming",
+            "question": "Give an example of a template literal type doing real work.",
+            "answer": "Extracting route parameters: `RouteParams<\"/users/:id/posts/:postId\">` evaluates\nto `\"id\" | \"postId\"` by recursively matching `${string}:${infer P}/${infer Rest}`.\nAnother: typed event names `${Entity}:${\"created\" | \"deleted\"}`. The catch is\nthat unions inside template literals multiply — three unions of ten members\nmake a thousand strings."
+          },
+          {
+            "topic": "Type-level programming",
+            "question": "How do you test that two types are equal, and why does the naive version fail?",
+            "answer": "The naive `A extends B ? (B extends A ? true : false) : false` distributes over\nunions and treats `any` as equal to everything. The standard trick compares two\ngeneric functions:\n`type Equal<X, Y> = (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false`,\nwhich relies on the compiler's internal identity check. Pair it with\n`type Expect<T extends true> = T` so a failing assertion is a compile error, and\nuse `@ts-expect-error` to prove something is *rejected*."
+          },
+          {
+            "topic": "Type-level programming",
+            "question": "What goes wrong with a naive `DeepReadonly<T>`?",
+            "answer": "`{ readonly [K in keyof T]: DeepReadonly<T[K]> }` recurses into everything —\nincluding functions (whose call signatures a mapped type does not preserve) and\nbuilt-ins like `Date` or `Map`, whose methods still mutate. A usable version\nstops at primitives and functions, and maps arrays to `ReadonlyArray`. Also:\n`readonly` is compile-time only, so it documents intent rather than freezing\nanything."
+          },
+          {
+            "topic": "Type-level programming",
+            "question": "Why is `Omit<User, \"passwrd\">` (with a typo) not an error, while `Pick<User, \"passwrd\">` is?",
+            "answer": "`Pick<T, K extends keyof T>` constrains its keys; `Omit<T, K extends keyof any>`\ndeliberately does not, so omitting a key that is not there compiles and removes\nnothing. If you want the safety, define `StrictOmit<T, K extends keyof T> = Omit<T, K>`.\nAnd remember that `Omit` changes only the type — the object still carries the\nkey at runtime unless you remove it."
+          },
+          {
+            "topic": "Type-level programming",
+            "question": "You hit \"Type instantiation is excessively deep and possibly infinite\" (TS2589). What do you do?",
+            "answer": "It means a recursive type went past the compiler's depth limit — often a\nrecursive conditional type fed a recursive type, or an unbounded tuple\ncounter. Options: make the recursion tail-recursive (accumulate in a parameter\nso the compiler can evaluate it iteratively), bound the depth with a counter,\nnarrow the input so the recursion terminates sooner, or step back — a type that\nclever is often costing more than it saves."
+          },
+          {
+            "topic": "Type-level programming",
+            "question": "What is `keyof (A | B)` versus `keyof (A & B)`?",
+            "answer": "`keyof (A | B)` is the keys common to both — the only ones you can safely read\nfrom a value that might be either. `keyof (A & B)` is the keys of either — the\nintersection value has all of them. It feels backwards until you think of\nvalues: a union value promises less, so fewer keys are safe."
+          },
+          {
+            "topic": "Type-level programming",
+            "question": "How would you write a type for any JSON value?",
+            "answer": "A recursive union:\n`type Json = string | number | boolean | null | Json[] | { [key: string]: Json }`.\nRecursive type aliases are allowed when the recursion goes through an object or\narray type. It is the right return type for a *validated* parse — though\n`JSON.parse` itself returns `any`, so you would parse into `unknown` and check."
+          },
+          {
+            "topic": "Objects, classes & modules",
+            "question": "`#count` or `private count`?",
+            "answer": "`private` is a compile-time rule: it is erased, so plain JavaScript (or an\n`as any`) can read and write it. `#count` is an ECMAScript private field,\nenforced by the engine — genuinely inaccessible outside the class, and\n`#count in obj` is a reliable brand check. Use `#` when the privacy protects an\ninvariant. `private` still exists for older targets and for code that\ndeliberately peeks in tests."
+          },
+          {
+            "topic": "Objects, classes & modules",
+            "question": "Abstract class or interface?",
+            "answer": "An interface is a pure contract with no runtime existence; any shape that matches\nsatisfies it. An abstract class can carry shared implementation and state, and\nit exists at runtime (so `instanceof` works), but it forces single inheritance.\nDefault to an interface for the contract; reach for an abstract class when there\nis real shared behaviour to inherit — and often composition does that job\nbetter."
+          },
+          {
+            "topic": "Objects, classes & modules",
+            "question": "What is declaration merging, and where is it useful?",
+            "answer": "Several declarations with the same name combine into one: two `interface Foo`\nblocks merge their members; an interface can merge with a class; a namespace can\nmerge with a function. It is how you augment a library's types\n(`declare module \"express\" { interface Request { user?: User } }`) or add to\nglobals with `declare global`. It is also why an accidental second `interface`\nwith a common name can silently change a type."
+          },
+          {
+            "topic": "Objects, classes & modules",
+            "question": "Why do many teams avoid `enum`?",
+            "answer": "An `enum` is one of the few TypeScript features that emits runtime code, so it\ndoes not work under type stripping (`--erasableSyntaxOnly`); numeric enums have\nreverse mappings and historically accepted any number; and `const enum` has\ncross-file pitfalls. A literal union — or an `as const` object plus\n`type Kind = typeof KIND[keyof typeof KIND]` — gives the same safety, erases\ncleanly, and plays well with narrowing."
+          },
+          {
+            "topic": "Objects, classes & modules",
+            "question": "Why does TypeScript report an excess property only sometimes?",
+            "answer": "Excess-property checking applies to *fresh* object literals assigned directly to\na typed target: there, an unknown key is almost certainly a typo. Once the object\nis stored in a variable and passed along, structural typing applies — having\nextra members is allowed, because every subtype has them. So\n`f({ nmae: \"x\" })` errors while `const o = { nmae: \"x\" }; f(o)` may not."
+          },
+          {
+            "topic": "Objects, classes & modules",
+            "question": "`readonly`, `as const` and `Object.freeze` — what does each actually do?",
+            "answer": "`readonly` (and `ReadonlyArray`, `Readonly<T>`) is a compile-time rule that\ndisappears at runtime, and it is shallow. `as const` makes a literal deeply\nreadonly *in the type* and keeps literal types. `Object.freeze` really prevents\nchanges at runtime — but only one level deep, and in sloppy-mode scripts a\nwrite fails silently rather than throwing. Types document intent; freeze\nenforces it at runtime."
+          },
+          {
+            "topic": "Objects, classes & modules",
+            "question": "How do branded types work, and how do values get their brand?",
+            "answer": "`type Cents = number & { readonly __brand: \"Cents\" }` is a subtype of `number`\nthat no plain number is assignable to. Values get the brand only through a\n*smart constructor* — `function toCents(n: number): Cents | null` that validates\nand then asserts `n as Cents`. That single assertion is the whole trusted\nboundary; everywhere else the compiler stops you mixing `Cents` with dollars or\nwith an `AccountId`. \"Parse, don't validate\" is the principle behind it."
+          },
+          {
+            "topic": "Objects, classes & modules",
+            "question": "Index signature, `Record`, or `Map`?",
+            "answer": "`Record<K, V>` with a finite key union is a fixed-shape object: every key must be\npresent. An index signature `{ [k: string]: V }` (≈ `Record<string, V>`) is an\nopen dictionary whose lookups are typed `V` — a lie without\n`noUncheckedIndexedAccess`. A `Map` is the runtime dictionary: any key type,\ninsertion order, `size`, no prototype keys, and `get` honestly returns\n`V | undefined`. Use a `Map` for data you add and remove at runtime."
+          },
+          {
+            "topic": "Errors & async",
+            "question": "Why is the `catch` variable `unknown`, and how do you use it?",
+            "answer": "Because JavaScript can throw anything — a string, a number, `undefined`.\n`useUnknownInCatchVariables` (part of `strict`) types `e` as `unknown`, so you\nmust narrow: `e instanceof Error ? e.message : String(e)`. Throw only `Error`\nsubclasses yourself, and attach the original with `new Error(\"...\", { cause: e })`\nwhen you wrap one."
+          },
+          {
+            "topic": "Errors & async",
+            "question": "Exceptions or a `Result` type?",
+            "answer": "Throw for bugs and truly exceptional conditions — things the immediate caller\ncannot sensibly handle. Return a `Result<T, E>` (a discriminated union\n`{ ok: true; value } | { ok: false; error }`) for failures that are part of the\ncontract, like invalid user input: the type forces the caller to look at the\nerror branch before reaching the value. Mixing both is fine as long as the rule\nis clear."
+          },
+          {
+            "topic": "Errors & async",
+            "question": "Compare `Promise.all`, `allSettled`, `race` and `any`.",
+            "answer": "`all` resolves with every value (a tuple type when given a tuple) and rejects on\nthe first rejection — fail fast, losing the other results. `allSettled` always\nresolves with an array of `{ status, value | reason }` — collect everything.\n`race` settles with the first promise to settle either way — the timeout\npattern. `any` resolves with the first *fulfilment* and rejects with an\n`AggregateError` only if all reject — first success wins."
+          },
+          {
+            "topic": "Errors & async",
+            "question": "In what order does this print: `console.log(1); setTimeout(() => console.log(2)); Promise.resolve().then(() => console.log(3)); console.log(4);`?",
+            "answer": "1, 4, 3, 2. Synchronous code runs to completion first (1, 4). Then the microtask\nqueue drains — promise reactions, `queueMicrotask`, code after an `await` — so 3.\nOnly then does the event loop take the next task, the timer callback: 2. Every\n`await` is a microtask boundary, which is why async code interleaves the way it\ndoes."
+          },
+          {
+            "topic": "Errors & async",
+            "question": "What is wrong with `items.forEach(async (item) => { await save(item); })`?",
+            "answer": "`forEach` ignores the promises the callback returns. The saves start, nothing\nwaits for them, the code after the loop runs immediately, and any rejection is\nunhandled. Use `for (const item of items) await save(item)` for one at a time,\nor `await Promise.all(items.map(save))` for concurrency — and a pool if the\nnumber must be limited."
+          },
+          {
+            "topic": "Errors & async",
+            "question": "How do you cancel async work in TypeScript?",
+            "answer": "With `AbortController`: the caller creates a controller and passes\n`controller.signal` down; the work checks `signal.aborted` or listens for\n`\"abort\"`, and `fetch` and many Node APIs accept a signal directly.\n`AbortSignal.timeout(ms)` gives a signal that aborts itself, and\n`AbortSignal.any([a, b])` combines them. Cancellation is cooperative — a promise\ncannot be forcibly stopped; the work has to notice."
+          },
+          {
+            "topic": "Errors & async",
+            "question": "What does `Awaited<T>` do?",
+            "answer": "It models what `await` produces: it unwraps promises (and thenables) recursively,\nso `Awaited<Promise<Promise<number>>>` is `number` and a non-promise type is\nreturned unchanged. The type of `Promise.all`'s result uses it for every\nelement. Writing it yourself is a good `infer` exercise, and a naive\n`T extends Promise<infer U> ? U : T` gets nested promises wrong."
+          },
+          {
+            "topic": "Errors & async",
+            "question": "What are generators good for, and what is the gotcha?",
+            "answer": "Producing values lazily: `function*` returns an iterator that computes each value\nonly when asked, so a pipeline over an infinite source works as long as\nsomething (`take`) stops asking. `yield*` delegates to another iterable, which\nmakes recursive traversals (a tree's in-order walk) short. The gotchas: a\ngenerator object is single-use — iterate it twice and the second pass is empty —\nand spreading an infinite one hangs."
+          },
+          {
+            "topic": "Errors & async",
+            "question": "What do `using` and `Symbol.dispose` give you over `try/finally`?",
+            "answer": "`using res = open()` calls `res[Symbol.dispose]()` automatically when the\nenclosing block exits — normally or by an exception — in reverse order of\ndeclaration. It is `try/finally` that cannot be forgotten and composes when\nyou hold several resources. `await using` does the same with\n`Symbol.asyncDispose`, and `DisposableStack` collects cleanups dynamically."
+          },
+          {
+            "topic": "Errors & async",
+            "question": "What is a floating promise and why is it dangerous?",
+            "answer": "A promise that nobody awaits, returns or attaches a handler to — typically a\ncall to an `async` function without `await`. Errors from it become unhandled\nrejections (which crash Node by default), and the code after it runs before the\nwork finishes. The compiler does not flag it; lint rules like\n`no-floating-promises` do. Mark deliberate fire-and-forget with `void`."
+          },
+          {
+            "topic": "Tooling & ecosystem",
+            "question": "How does TypeScript code actually run?",
+            "answer": "Either compiled (`tsc` or a bundler emits JavaScript) or with its types stripped\n(Node 22.6+ runs `.ts` files by replacing type syntax with whitespace; esbuild\nand swc do the same). Stripping only works for *erasable* syntax — `enum`,\n`namespace` with values and parameter properties need a transform, which\n`--erasableSyntaxOnly` rejects. Either way, type-checking is a separate step:\nrunning a file never checks it."
+          },
+          {
+            "topic": "Tooling & ecosystem",
+            "question": "What is a `.d.ts` file, and how do you type an untyped library?",
+            "answer": "A declaration file: types only, no implementation, describing JavaScript that\nexists elsewhere. For an untyped package, first look for `@types/<name>`; if\nthere is none, write `declare module \"lib\" { export function f(x: string): number; }`\nin a `.d.ts` in your project — start with the functions you use, not the whole\nAPI. `declare module \"lib\";` alone makes every import `any`, which is a\nstopgap, not a solution."
+          },
+          {
+            "topic": "Tooling & ecosystem",
+            "question": "What is module augmentation?",
+            "answer": "Adding declarations to an existing module's types from your own code:\n`declare module \"express\" { interface Request { user?: User } }` merges into the\nlibrary's `Request` interface; `declare global { interface Window { ... } }`\ndoes the same for globals. The file must be a module (have an `import` or\n`export`) for `declare global` to be an augmentation rather than a new global\nscript."
+          },
+          {
+            "topic": "Tooling & ecosystem",
+            "question": "What does `skipLibCheck` do, and is it safe?",
+            "answer": "It skips type-checking of declaration files (`.d.ts`), including those in\n`node_modules`. It speeds up builds a lot and hides conflicts between two\nlibraries' types that you cannot fix anyway, so most projects enable it. The\ncost: errors in *your own* `.d.ts` files go unreported too — keep hand-written\ndeclarations small and exercised by real code."
+          },
+          {
+            "topic": "Tooling & ecosystem",
+            "question": "`moduleResolution: nodenext` or `bundler`?",
+            "answer": "`nodenext` models Node exactly: ESM files need explicit extensions in relative\nimports, `package.json` `\"type\"` decides ESM vs CommonJS per file, and\n`exports` maps are honoured. Use it for code Node runs directly. `bundler` models\ntools like Vite and esbuild: extensionless imports are fine and `exports` are\nstill respected. The old `node` (node10) resolution is deprecated as of\nTypeScript 6.0."
+          },
+          {
+            "topic": "Tooling & ecosystem",
+            "question": "What changed in TypeScript 6.0 and 7.0 that a project needs to know about?",
+            "answer": "6.0 was the last release of the JavaScript-based compiler and a bridge: new\ndefaults (`strict` on, `module: esnext`, a current `target`, `types: []`) and\ndeprecations — `target: es5`, AMD/UMD/SystemJS modules, `moduleResolution: node`,\n`baseUrl` — that still work behind `ignoreDeprecations: \"6.0\"`. 7.0 is the\nnative (Go) compiler: same `tsc`, much faster, the deprecated options removed,\nand no programmatic compiler API yet. Fix the 6.0 deprecations and 7.0 is a\ndrop-in upgrade."
+          },
+          {
+            "topic": "Tooling & ecosystem",
+            "question": "How do you test types?",
+            "answer": "With assertions that fail at compile time: `type Expect<T extends true> = T`\nand an `Equal<A, B>` helper give `type _ = Expect<Equal<ReturnType<typeof f>, string>>`;\n`// @ts-expect-error` above a line proves it is rejected (and errors if it\ncompiles — TS2578). Libraries like `expect-type` or `tsd` package the same idea.\nRun them in CI through `tsc --noEmit`; nothing needs to execute."
+          },
+          {
+            "topic": "Tooling & ecosystem",
+            "question": "How would you migrate a large JavaScript codebase to TypeScript?",
+            "answer": "Incrementally. Add `tsconfig` with `allowJs` (and `checkJs` for a first read of\nexisting JSDoc), rename files one module at a time starting from the leaves,\nand type the boundaries first — API clients, data models, shared utilities.\nStart with `strict` off if you must, then turn flags on one at a time, fixing\neach wave. Keep `any` countable (a lint rule, or `// TODO` search) so it goes\ndown, and add types for the libraries you depend on early."
+          },
+          {
+            "topic": "Tooling & ecosystem",
+            "question": "What does `verbatimModuleSyntax` enforce, and why?",
+            "answer": "That imports and exports are emitted exactly as written: anything imported only\nas a type must say so (`import type { User }` or `import { type User }`),\notherwise it is an error (TS1484). The point is predictability for tools that\ncompile one file at a time — type stripping, esbuild, swc — which cannot know\nwhether an import is a type without seeing the other file. It replaces the\nolder `importsNotUsedAsValues`/`preserveValueImports` pair."
+          },
+          {
+            "topic": "Tooling & ecosystem",
+            "question": "What is `noUncheckedIndexedAccess`, and why is it not part of `strict`?",
+            "answer": "It types every index read — `xs[i]`, `record[key]` — as `T | undefined`, so you\nmust handle the missing case. It catches real out-of-range and missing-key bugs.\nIt is left out of `strict` because it is noisy: loops that are provably in range\nstill need a check or a `!`. `for…of`, destructuring with defaults, and `.at()`\navoid most of the noise, which is why this programme turns it on from week 14."
+          },
+          {
+            "topic": "Tooling & ecosystem",
+            "question": "A teammate says \"TypeScript made our code slower.\" What do you say?",
+            "answer": "Types are erased, so the emitted JavaScript runs at the same speed — the only\nruntime costs come from features that emit code (`enum`, down-levelling to an\nold `target`, decorators) and from the build. What can be slow is the *compiler*:\nhuge unions, deep recursive types and project-wide checks. Measure with\n`tsc --extendedDiagnostics` or `--generateTrace`, and consider project\nreferences — and TypeScript 7's native compiler — before blaming the types."
+          }
+        ],
+        "mock_sessions": [
+          {
+            "title": "Mock interview 1 — data wrangling",
+            "minutes": 45,
+            "brief": "Ten minutes of idiom questions (answer out loud or in the notes box, then compare), twenty on the problem, fifteen on the type puzzle.",
+            "questions": [
+              0,
+              1,
+              12
+            ],
+            "problem": "tsm-w27-top-words",
+            "puzzle": "tsm-w27-deep-partial",
+            "rubric": [
+              "Communication — said the plan out loud before coding, and named the trade-offs",
+              "Correctness — the tests pass, and I named the edge cases before running them",
+              "Types — no `any`, honest signatures, the compiler did work for me",
+              "Testing — I walked an example by hand and checked the output myself"
+            ]
+          },
+          {
+            "title": "Mock interview 2 — modelling data",
+            "minutes": 45,
+            "brief": "The questions lean on narrowing and generics; the problem needs careful sorting and merging; the puzzle is about optional keys.",
+            "questions": [
+              9,
+              17,
+              30
+            ],
+            "problem": "tsm-w27-intervals",
+            "puzzle": "tsm-w27-required-keys",
+            "rubric": [
+              "Communication — said the plan out loud before coding, and named the trade-offs",
+              "Correctness — the tests pass, and I named the edge cases before running them",
+              "Types — no `any`, honest signatures, the compiler did work for me",
+              "Testing — I walked an example by hand and checked the output myself"
+            ]
+          },
+          {
+            "title": "Mock interview 3 — async and time",
+            "minutes": 45,
+            "brief": "Async questions, a stateful rate limiter over a stream of timestamps, and the type of `Promise.all`.",
+            "questions": [
+              44,
+              45,
+              46
+            ],
+            "problem": "tsm-w27-rate-limiter",
+            "puzzle": "tsm-w27-awaited-all",
+            "rubric": [
+              "Communication — said the plan out loud before coding, and named the trade-offs",
+              "Correctness — the tests pass, and I named the edge cases before running them",
+              "Types — no `any`, honest signatures, the compiler did work for me",
+              "Testing — I walked an example by hand and checked the output myself"
+            ]
+          }
+        ],
+        "code_reviews": [
+          {
+            "id": "tsm-cr-config",
+            "title": "Load the service config",
+            "context": "The PR adds a config loader. The config arrives as JSON text from a file the ops team edits by hand.",
+            "code": "interface Config {\n  name: string;\n  retries: number;\n}\n\nfunction loadConfig(text: string): Config {\n  return JSON.parse(text);\n}\n\nconst cfg = loadConfig('{\"name\":\"api\",\"retries\":\"3\"}');\nconsole.log(cfg.retries + 1);\n",
+            "runs": "31",
+            "comments": [
+              "`JSON.parse` returns `any`, so `loadConfig` promises a `Config` it never checked — the return type is a cast in disguise.",
+              "Here `retries` is the string `\"3\"`, so `cfg.retries + 1` is `\"31\"`. Nothing in the types can see it.",
+              "Parse into `unknown` and validate every field; return a `Result` (or throw a descriptive error) when the file is wrong.",
+              "Name the failure: which field, what was expected, what arrived — whoever edits the file by hand needs that message."
+            ],
+            "fixed": "interface Config {\n  name: string;\n  retries: number;\n}\n\ntype Result<T> = { ok: true; value: T } | { ok: false; error: string };\n\nfunction loadConfig(text: string): Result<Config> {\n  const raw: unknown = JSON.parse(text);\n  if (typeof raw !== \"object\" || raw === null) return { ok: false, error: \"config must be an object\" };\n  const name: unknown = (raw as Record<string, unknown>)[\"name\"];\n  const retries: unknown = (raw as Record<string, unknown>)[\"retries\"];\n  if (typeof name !== \"string\") return { ok: false, error: \"name must be a string\" };\n  if (typeof retries !== \"number\" || !Number.isInteger(retries)) {\n    return { ok: false, error: `retries must be an integer, got ${JSON.stringify(retries)}` };\n  }\n  return { ok: true, value: { name, retries } };\n}\n\nfor (const text of ['{\"name\":\"api\",\"retries\":\"3\"}', '{\"name\":\"api\",\"retries\":3}']) {\n  const r = loadConfig(text);\n  console.log(r.ok ? `retries + 1 = ${r.value.retries + 1}` : `rejected: ${r.error}`);\n}\n",
+            "fixed_runs": "rejected: retries must be an integer, got \"3\"\nretries + 1 = 4"
+          },
+          {
+            "id": "tsm-cr-status",
+            "title": "Label account statuses",
+            "context": "The PR adds a `pending` status to the account model and ships the UI labels in the same change.",
+            "code": "type Status = \"active\" | \"suspended\" | \"deleted\" | \"pending\";\n\nfunction label(s: Status): string {\n  switch (s) {\n    case \"active\":\n      return \"Active\";\n    case \"suspended\":\n      return \"Suspended\";\n    default:\n      return \"Deleted\";\n  }\n}\n\nconst incoming = [\"active\", \"pending\"];\nconsole.log(incoming.map((s) => label(s as Status)).join(\", \"));\n",
+            "runs": "Active, Deleted",
+            "comments": [
+              "The `default` branch swallows every status it does not name — the new `pending` accounts are labelled \"Deleted\".",
+              "Handle each status explicitly and end with an exhaustiveness check (`const unreachable: never = s`), so the next new status is a compile error here rather than a wrong label.",
+              "`s as Status` asserts that any string is a status. Type the source as `Status[]`, or validate strings from outside with a guard."
+            ],
+            "fixed": "type Status = \"active\" | \"suspended\" | \"deleted\" | \"pending\";\n\nfunction label(s: Status): string {\n  switch (s) {\n    case \"active\":\n      return \"Active\";\n    case \"suspended\":\n      return \"Suspended\";\n    case \"deleted\":\n      return \"Deleted\";\n    case \"pending\":\n      return \"Pending\";\n    default: {\n      const unreachable: never = s;\n      return unreachable;\n    }\n  }\n}\n\nconst incoming: Status[] = [\"active\", \"pending\"];\nconsole.log(incoming.map(label).join(\", \"));\n",
+            "fixed_runs": "Active, Pending"
+          },
+          {
+            "id": "tsm-cr-guard",
+            "title": "A guard for user rows",
+            "context": "The PR adds a type guard for rows coming back from the database layer, which types them as `unknown`.",
+            "code": "interface User {\n  id: number;\n  email: string;\n}\n\nfunction isUser(x: unknown): x is User {\n  return typeof x === \"object\" && x !== null && \"id\" in x;\n}\n\nconst rows: unknown[] = [{ id: 1, email: \"a@x.io\" }, { id: 2 }];\nfor (const r of rows) {\n  if (isUser(r)) console.log(`${r.id}: ${r.email}`);\n}\n",
+            "runs": "1: a@x.io\n2: undefined",
+            "comments": [
+              "The guard checks only that `id` exists, then promises a full `User`. The compiler trusts a type predicate completely, so the second row prints `undefined` for its email.",
+              "Check every property the type promises, with its type: `typeof id === \"number\"` and `typeof email === \"string\"`.",
+              "Add a test with a malformed row — a guard is only as good as the bad inputs it has been shown."
+            ],
+            "fixed": "interface User {\n  id: number;\n  email: string;\n}\n\nfunction isUser(x: unknown): x is User {\n  if (typeof x !== \"object\" || x === null) return false;\n  const r = x as Record<string, unknown>;\n  return typeof r[\"id\"] === \"number\" && typeof r[\"email\"] === \"string\";\n}\n\nconst rows: unknown[] = [{ id: 1, email: \"a@x.io\" }, { id: 2 }];\nfor (const r of rows) {\n  console.log(isUser(r) ? `${r.id}: ${r.email}` : `skipped: ${JSON.stringify(r)}`);\n}\n",
+            "fixed_runs": "1: a@x.io\nskipped: {\"id\":2}"
+          },
+          {
+            "id": "tsm-cr-tags",
+            "title": "Add a tag to a post",
+            "context": "The PR adds a helper used by the editor to attach tags, starting from a shared default list.",
+            "code": "const DEFAULT_TAGS: string[] = [\"draft\"];\n\nfunction withTag(tags: string[], tag: string): string[] {\n  tags.push(tag);\n  return tags;\n}\n\nconst a = withTag(DEFAULT_TAGS, \"news\");\nconst b = withTag(DEFAULT_TAGS, \"sport\");\nconsole.log(a.join(\",\"));\nconsole.log(b.join(\",\"));\nconsole.log(DEFAULT_TAGS.join(\",\"));\n",
+            "runs": "draft,news,sport\ndraft,news,sport\ndraft,news,sport",
+            "comments": [
+              "`withTag` mutates its argument and returns the same array, so both posts share one list and the shared default grows with every call.",
+              "Take `readonly string[]` — the signature then says the function will not change it, and `push` stops compiling.",
+              "Return a new array: `[...tags, tag]`. Make the default `as const` (or `readonly`) so nobody else can mutate it either."
+            ],
+            "fixed": "const DEFAULT_TAGS: readonly string[] = [\"draft\"];\n\nfunction withTag(tags: readonly string[], tag: string): string[] {\n  return [...tags, tag];\n}\n\nconst a = withTag(DEFAULT_TAGS, \"news\");\nconst b = withTag(DEFAULT_TAGS, \"sport\");\nconsole.log(a.join(\",\"));\nconsole.log(b.join(\",\"));\nconsole.log(DEFAULT_TAGS.join(\",\"));\n",
+            "fixed_runs": "draft,news\ndraft,sport\ndraft"
+          },
+          {
+            "id": "tsm-cr-foreach",
+            "title": "Save every draft",
+            "context": "The PR adds a \"save all\" button. The log line is used by support to confirm a save happened.",
+            "code": "async function save(id: number): Promise<void> {\n  await Promise.resolve();\n  console.log(`saved ${id}`);\n}\n\nasync function saveAll(ids: number[]) {\n  ids.forEach(async (id) => {\n    await save(id);\n  });\n  console.log(\"all saved\");\n}\n\nsaveAll([1, 2, 3]);\n",
+            "runs": "all saved\nsaved 1\nsaved 2\nsaved 3",
+            "comments": [
+              "`forEach` ignores the promises its async callback returns, so \"all saved\" is logged before any save finishes — and a failed save would be an unhandled rejection.",
+              "Use `await Promise.all(ids.map(save))` to save concurrently (or `for…of` with `await` if order matters).",
+              "Give `saveAll` an explicit `Promise<void>` return type, and `await` the top-level call (or `.catch` it) — it is a floating promise as written."
+            ],
+            "fixed": "async function save(id: number): Promise<void> {\n  await Promise.resolve();\n  console.log(`saved ${id}`);\n}\n\nasync function saveAll(ids: readonly number[]): Promise<void> {\n  await Promise.all(ids.map(save));\n  console.log(\"all saved\");\n}\n\nsaveAll([1, 2, 3]).catch((e: unknown) => console.log(`save failed: ${String(e)}`));\n",
+            "fixed_runs": "saved 1\nsaved 2\nsaved 3\nall saved"
+          },
+          {
+            "id": "tsm-cr-prices",
+            "title": "Price a basket",
+            "context": "The PR adds basket pricing. Item names come from the client.",
+            "code": "const PRICES: Record<string, number> = { apple: 120, pear: 90 };\n\nfunction total(items: string[]): number {\n  return items.reduce((sum, item) => sum + PRICES[item], 0);\n}\n\nconsole.log(total([\"apple\", \"pear\", \"kiwi\"]));\n",
+            "runs": "NaN",
+            "comments": [
+              "`Record<string, number>` claims every string has a price, so `PRICES[item]` is typed `number` — but `kiwi` gives `undefined` and the total becomes `NaN`.",
+              "Turn on `noUncheckedIndexedAccess`: this line stops compiling until the missing price is handled.",
+              "Decide what an unknown item means — reject the basket with a message, or skip it and report it — and make that visible in the return type.",
+              "Derive the item names from the price table (`as const satisfies Record<string, number>`, then `keyof typeof PRICES`) so known items are checked at compile time."
+            ],
+            "fixed": "const PRICES = { apple: 120, pear: 90 } as const satisfies Record<string, number>;\ntype Item = keyof typeof PRICES;\n\nfunction isItem(name: string): name is Item {\n  return Object.hasOwn(PRICES, name);\n}\n\nfunction total(items: readonly string[]): { cents: number; unknown: string[] } {\n  let cents = 0;\n  const unknown: string[] = [];\n  for (const name of items) {\n    if (isItem(name)) cents += PRICES[name];\n    else unknown.push(name);\n  }\n  return { cents, unknown };\n}\n\nconst r = total([\"apple\", \"pear\", \"kiwi\"]);\nconsole.log(`${r.cents} cents; unknown: ${r.unknown.join(\",\") || \"none\"}`);\n",
+            "fixed_runs": "210 cents; unknown: kiwi"
+          },
+          {
+            "id": "tsm-cr-account",
+            "title": "An account class",
+            "context": "The PR introduces an `Account` class for the wallet feature. Balances must never go negative.",
+            "code": "class Account {\n  private balance = 0;\n\n  deposit(amount: number) {\n    this.balance += amount;\n  }\n\n  get total() {\n    return this.balance;\n  }\n}\n\nconst acct = new Account();\nacct.deposit(-50);\nconsole.log(acct.total);\n(acct as any).balance = 1_000_000;\nconsole.log(acct.total);\n",
+            "runs": "-50\n1000000",
+            "comments": [
+              "`deposit` accepts negative (and fractional, and `NaN`) amounts, so the \"never negative\" invariant is not enforced anywhere.",
+              "`private` is erased at runtime — `(acct as any).balance` rewrites it. Use a `#balance` field when privacy protects an invariant.",
+              "Validate in the method and reject bad amounts (throw a `RangeError`, or return a `Result`); add explicit return types on the public members."
+            ],
+            "fixed": "class Account {\n  #balance = 0;\n\n  deposit(amount: number): void {\n    if (!Number.isInteger(amount) || amount <= 0) {\n      throw new RangeError(`deposit must be a positive whole number of cents, got ${amount}`);\n    }\n    this.#balance += amount;\n  }\n\n  get total(): number {\n    return this.#balance;\n  }\n}\n\nconst acct = new Account();\ntry {\n  acct.deposit(-50);\n} catch (e) {\n  console.log(e instanceof Error ? e.message : String(e));\n}\nacct.deposit(250);\nconsole.log(acct.total);\n",
+            "fixed_runs": "deposit must be a positive whole number of cents, got -50\n250"
+          },
+          {
+            "id": "tsm-cr-transfer",
+            "title": "Move money between accounts",
+            "context": "The PR adds the transfer call used by the payments screen.",
+            "code": "function transfer(fromId: number, toId: number, cents: number): string {\n  return `move ${cents} from #${fromId} to #${toId}`;\n}\n\nconst userId = 42;\nconst accountId = 7;\nconsole.log(transfer(accountId, 2500, userId));\n",
+            "runs": "move 42 from #7 to #2500",
+            "comments": [
+              "Three `number` parameters in a row: the call passes the amount as the destination and a user id as the amount, and it type-checks.",
+              "Brand the ids and the money (`AccountId`, `Cents`) so the compiler can tell them apart — a user id is not an account id either.",
+              "Or take one object parameter, `{ from, to, amount }`, so every argument is named at the call site."
+            ],
+            "fixed": "type AccountId = number & { readonly __brand: \"AccountId\" };\ntype Cents = number & { readonly __brand: \"Cents\" };\n\nconst accountId = (n: number): AccountId => n as AccountId;\nconst cents = (n: number): Cents => n as Cents;\n\nfunction transfer(t: { from: AccountId; to: AccountId; amount: Cents }): string {\n  return `move ${t.amount} from #${t.from} to #${t.to}`;\n}\n\nconsole.log(transfer({ from: accountId(7), to: accountId(12), amount: cents(2500) }));\n",
+            "fixed_runs": "move 2500 from #7 to #12"
+          },
+          {
+            "id": "tsm-cr-age",
+            "title": "Parse an age field",
+            "context": "The PR adds age parsing for the sign-up form. Zero is not a valid age.",
+            "code": "function parseAge(s: string): number {\n  const n = Number(s);\n  if (Number.isNaN(n)) throw \"bad age\";\n  return n;\n}\n\nfunction safeAge(s: string): number {\n  try {\n    return parseAge(s);\n  } catch {\n    return 0;\n  }\n}\n\nconsole.log([\"31\", \"x\", \"\", \"4.5\"].map(safeAge).join(\",\"));\n",
+            "runs": "31,0,0,4.5",
+            "comments": [
+              "`throw \"bad age\"` throws a string: no stack trace, and every `catch` has to guess its type. Throw an `Error` (a `RangeError` here).",
+              "`Number(\"\")` is `0`, so an empty field is accepted as age 0; `\"4.5\"` passes too. Check for an integer in a sensible range.",
+              "`safeAge` turns every failure into `0`, which the caller cannot tell apart from a real value. Return `number | null` or a `Result` instead of a sentinel."
+            ],
+            "fixed": "function parseAge(s: string): number | null {\n  const trimmed = s.trim();\n  if (!/^\\d+$/.test(trimmed)) return null;\n  const n = Number(trimmed);\n  return n >= 1 && n <= 130 ? n : null;\n}\n\nconsole.log([\"31\", \"x\", \"\", \"4.5\"].map((s) => parseAge(s) ?? \"invalid\").join(\",\"));\n",
+            "fixed_runs": "31,invalid,invalid,invalid"
+          },
+          {
+            "id": "tsm-cr-generic",
+            "title": "Two little helpers",
+            "context": "The PR adds `first` and `parse` to the shared utilities module.",
+            "code": "function first<T>(xs: T[]): T {\n  return xs[0] as T;\n}\n\nfunction parse<T>(json: string): T {\n  return JSON.parse(json) as T;\n}\n\nconst n = first<number>([]);\nconst p = parse<{ x: number }>('{\"y\":1}');\nconsole.log(n, p.x);\n",
+            "runs": "undefined undefined",
+            "comments": [
+              "`first` claims to return a `T`, but an empty array gives `undefined`; the `as T` is there only to hide that. Return `T | undefined` (and take `readonly T[]`).",
+              "`parse<T>` uses its type parameter only in the return type, which makes it a cast with extra steps — the caller picks the type and nothing checks it. Return `unknown` and validate.",
+              "Neither `as` is needed once the signatures are honest — a good sign the types were wrong."
+            ],
+            "fixed": "function first<T>(xs: readonly T[]): T | undefined {\n  return xs[0];\n}\n\nfunction parsePoint(json: string): { x: number } | null {\n  const raw: unknown = JSON.parse(json);\n  if (typeof raw === \"object\" && raw !== null) {\n    const x: unknown = (raw as Record<string, unknown>)[\"x\"];\n    if (typeof x === \"number\") return { x };\n  }\n  return null;\n}\n\nconsole.log(first<number>([]) ?? \"empty\", parsePoint('{\"y\":1}')?.x ?? \"no x\");\n",
+            "fixed_runs": "empty no x"
+          }
+        ]
       }
     ]
   },
