@@ -10,6 +10,7 @@ import { inlineCode } from "./common";
 import { drawFinalPaper } from "../lib/finalExam";
 import { WEEK_BUDGET_HOURS, type ChapterStat, type WeekProgress } from "../lib/mastery";
 import { useToast } from "./Toast";
+import { recordSitting } from "../lib/quizStats";
 
 /** A fresh mixed paper on demand: `size` questions drawn round-robin from the
  * banks of `weeks`, marked on submit, misses savable as flashcards. */
@@ -117,7 +118,13 @@ export function MixedQuiz({
       <div className="row" style={{ gap: 8, alignItems: "center" }}>
         {!submitted ? (
           <>
-            <button onClick={() => setSubmitted(true)} disabled={picked.some((p) => p < 0)}>
+            <button
+              onClick={() => {
+                setSubmitted(true);
+                recordSitting(paper.map((q, i) => ({ question: q.question, right: picked[i] === q.answer })));
+              }}
+              disabled={picked.some((p) => p < 0)}
+            >
               Check my answers
             </button>
             <span className="dim quiz-note">

@@ -16,10 +16,13 @@ export function ExerciseSections({
   exercises,
   onSolved,
   overrides = {},
+  predictFirst = false,
 }: {
   exercises: Exercise[];
   onSolved: (id: string) => void;
   overrides?: Record<string, Partial<Omit<KindSection, "kind">>>;
+  /** Ask for a prediction before each run (M1-03). */
+  predictFirst?: boolean;
 }) {
   return (
     <>
@@ -40,6 +43,7 @@ export function ExerciseSections({
                 exercise={ex}
                 challenge={section.kind === "challenge"}
                 onSolved={onSolved}
+                predictFirst={predictFirst}
               />
             ))}
           </React.Fragment>

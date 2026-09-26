@@ -24,6 +24,7 @@ import { optionOrder } from "../lib/quizShuffle";
 import { Markdown } from "./Markdown";
 import { CodeEditor } from "./CodeEditor";
 import { TsErrorLinks } from "./TsErrorLinks";
+import { logMismatch, predictionMatches } from "../lib/predict";
 
 export function ExerciseCard({
   index,
@@ -31,12 +32,15 @@ export function ExerciseCard({
   source,
   challenge = false,
   onSolved,
+  predictFirst = false,
 }: {
   index: number;
   exercise: Exercise;
   source?: Problem;
   challenge?: boolean;
   onSolved?: (id: string) => void;
+  /** M1-03: ask for a prediction of the first test's output before a run. */
+  predictFirst?: boolean;
 }) {
   const nav = useNavigate();
   const storeKey = `poodcode:learn-ex:${exercise.id}`;
@@ -50,6 +54,8 @@ export function ExerciseCard({
   const [hintsShown, setHintsShown] = useState(0);
   const [showSolution, setShowSolution] = useState(false);
   const [showChecks, setShowChecks] = useState(false);
+  const [prediction, setPrediction] = useState("");
+  const [verdict, setVerdict] = useState<null | { match: boolean; actual: string }>(null);
 
   // Progressive hint ladder (nudge → strategy → near-answer); fall back to the
   // single legacy `hint` when no ladder is authored.
@@ -79,6 +85,7 @@ export function ExerciseCard({
   // A type-level exercise is never run: it passes when the compiler accepts the
   // assertions in its harness. There are no test cases and no output to show.
   const isTypes = exercise.judge_mode === "types";
+  const predicting = predictFirst && !isTypes && exercise.tests.length > 0;
 
   const height = Math.min(
     Math.max(exercise.starter.split("\n").length * 20 + 24, big ? 260 : 150),
@@ -119,6 +126,12 @@ export function ExerciseCard({
       });
       setReport(r);
       recordExerciseRun(exercise.id, r.status === "accepted");
+      const first = r.results[0];
+      if (predicting && first && !r.compile_error) {
+        const match = predictionMatches(prediction, first.actual);
+        setVerdict({ match, actual: first.actual });
+        if (!match) logMismatch(exercise.id, prediction, first.actual);
+      }
       if (r.status === "accepted") onSolved?.(exercise.id);
     } catch (e) {
       setErr(String(e));
@@ -200,8 +213,37 @@ export function ExerciseCard({
         />
       </div>
 
+      {predicting && (
+        <div className="predict-box">
+          <div className="io-label">🔮 Predict first — for this input, your code will print:</div>
+          <pre className="io-block" style={{ margin: "0 0 6px", fontSize: 12 }}>
+            {exercise.tests[0]!.input || "(no input)"}
+          </pre>
+          <textarea
+            value={prediction}
+            onChange={(e) => {
+              setPrediction(e.target.value);
+              setVerdict(null);
+            }}
+            placeholder="Write the output you expect, line by line — then run."
+            style={{ width: "100%", minHeight: 48, fontFamily: "var(--font-mono)", fontSize: 12 }}
+          />
+          {verdict && (
+            <p className="quiz-note" style={{ margin: "4px 0 0", color: verdict.match ? "var(--good)" : "var(--bad)" }}>
+              {verdict.match
+                ? "✓ Exactly what it printed — you read your own code right."
+                : `✗ It printed ${JSON.stringify(verdict.actual.trim())} — a learning moment, logged for review.`}
+            </p>
+          )}
+        </div>
+      )}
+
       <div className="row" style={{ marginTop: 10, flexWrap: "wrap", gap: 8 }}>
-        <button onClick={check} disabled={running}>
+        <button
+          onClick={check}
+          disabled={running || (predicting && prediction.trim() === "")}
+          title={predicting && prediction.trim() === "" ? "Write your prediction first." : undefined}
+        >
           {running ? "Checking…" : isTypes ? "Type-check" : "Check"}
         </button>
         <button className="ghost" onClick={reset} disabled={running}>

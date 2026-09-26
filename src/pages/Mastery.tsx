@@ -32,6 +32,8 @@ import { CapstonePractice } from "../components/MasteryCapstone";
 import { MixedQuiz, ReviewSession } from "../components/MasteryReview";
 import { DailyTypePuzzle, WeekZero } from "../components/MasteryDaily";
 import { typeLadder } from "../lib/typeLadder";
+import { predictionLog } from "../lib/predict";
+import { flaggedQuestions, quizStats, recordSitting } from "../lib/quizStats";
 import { SkillRadar } from "../components/SkillRadar";
 import {
   FinalExamPanel,
@@ -595,7 +597,48 @@ export default function Mastery() {
       )}
 
       <TrackBody spec={spec} progress={trackProgress(spec.units)} />
+
+      <QuestionStats />
     </div>
+  );
+}
+
+/** X-38: questions you keep missing and questions you never miss, from every
+ * marked sitting on this device. */
+function QuestionStats() {
+  const [open, setOpen] = useState(false);
+  const flagged = open ? flaggedQuestions(quizStats()) : null;
+  return (
+    <details className="card mastery-practice" style={{ marginTop: 18 }} onToggle={(e) => setOpen((e.target as HTMLDetailsElement).open)}>
+      <summary>
+        <strong>🔬 Question stats</strong>{" "}
+        <span className="dim quiz-note">which questions you keep missing, and which you never miss</span>
+      </summary>
+      {flagged && (
+        <>
+          <div className="io-label">Missed most — a real gap, or an ambiguous question</div>
+          {flagged.missed.length === 0 && <p className="dim quiz-note">Nothing yet — a question needs two sittings.</p>}
+          {flagged.missed.slice(0, 15).map((r) => (
+            <div key={r.question} className="quiz-note" style={{ margin: "3px 0" }}>
+              <span className="badge" style={{ color: "var(--bad)" }}>
+                {r.right}/{r.attempts}
+              </span>{" "}
+              {inlineCode(r.question)}
+            </div>
+          ))}
+          <div className="io-label" style={{ marginTop: 10 }}>Never missed — maybe too easy</div>
+          {flagged.tooEasy.length === 0 && <p className="dim quiz-note">Nothing yet — a question needs three sittings.</p>}
+          {flagged.tooEasy.slice(0, 15).map((r) => (
+            <div key={r.question} className="quiz-note" style={{ margin: "3px 0" }}>
+              <span className="badge" style={{ color: "var(--good)" }}>
+                {r.right}/{r.attempts}
+              </span>{" "}
+              {inlineCode(r.question)}
+            </div>
+          ))}
+        </>
+      )}
+    </details>
   );
 }
 
@@ -745,6 +788,9 @@ function WeekCard({
   }
 
   const links = weekLinks(track.key, week.week);
+  // M1-03: predict-first, a per-learner switch for months 1-2.
+  const predictKey = `mastery-predict-first:${track.key}`;
+  const predictFirst = week.week <= 8 && settings[predictKey] === "1";
   // M3-04: the week the strictness ladder steps up says so.
   const previous = track.weeks.find((w) => w.week === week.week - 1);
   const strictStep =
@@ -913,6 +959,17 @@ function WeekCard({
           </nav>
 
           <div className="week-content">
+            {week.week <= 8 && track.key === "typescript" && (
+              <label className="dim quiz-note" style={{ display: "flex", gap: 6, alignItems: "center", margin: "0 0 6px" }}>
+                <input
+                  type="checkbox"
+                  checked={predictFirst}
+                  onChange={(e) => saveSetting(predictKey, e.target.checked ? "1" : "0")}
+                />
+                🔮 Predict first — before each run of a practice exercise or problem, write what it will print
+                {predictionLog().length > 0 && ` (${predictionLog().length} learning moments logged)`}
+              </label>
+            )}
             <p className="dim quiz-note" style={{ marginTop: 0, color: budget.over ? "var(--bad)" : undefined }}>
               ⏱ {budget.text}
               {budget.over && " — more than twice the plan. Worth asking what slowed you down."}
@@ -1059,6 +1116,7 @@ function WeekCard({
                     <ExerciseSections
                       exercises={practice}
                       onSolved={(id) => setSolvedEx(new Set(markExerciseSolved(id)))}
+                      predictFirst={predictFirst}
                     />
                   </details>
                 )}
@@ -1123,6 +1181,7 @@ function WeekCard({
                       exercises={problemSet}
                       onSolved={(id) => setSolvedEx(new Set(markExerciseSolved(id)))}
                       overrides={{ challenge: { heading: "🎯 Problems" } }}
+                      predictFirst={predictFirst}
                     />
                   </details>
                 )}
@@ -1615,6 +1674,7 @@ function QuizPanel({
 
   function submit() {
     setSubmitted(true);
+    recordSitting(paper.map((q, i) => ({ question: q.question, right: picked[i] === q.answer })));
     onSubmit(percent).catch(() => {});
   }
 

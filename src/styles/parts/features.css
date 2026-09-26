@@ -833,6 +833,13 @@ body.focus-mode .topbar {
   fill: var(--text-dim);
 }
 
+.predict-box {
+  margin-top: 8px;
+  padding: 8px 10px;
+  border: 1px dashed var(--accent);
+  border-radius: 8px;
+}
+
 /* What a snippet prints — computed output shown under the code. */
 .code-output {
   font-family: var(--font-mono);
