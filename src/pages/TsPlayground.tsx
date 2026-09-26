@@ -5,6 +5,8 @@
 //   * Narrowing  one variable's type at each place it is used
 //   * What runs  the JavaScript the types erase to
 //   * Compiler   strictness flags to flip, and the errors they produce
+//   * Step       a conditional type's evaluation, one union member at a time
+//                (M5-01): which branch, what each `infer` binds, the result
 // Run executes the file through the real judge, like any exercise.
 
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -22,9 +24,15 @@ import {
   probeType,
 } from "../lib/tsAnalysis";
 import type { ProcOut } from "../types";
+import { applications, conditionalAliases, planSteps, splitUnion, withArg } from "../lib/typeStepper";
 
 const MAIN = "file:///playground/main.ts";
 const PROBE = "file:///playground/__probe.ts";
+const STEP_PROBE = "file:///playground/__steps.ts";
+// A distributive identity: forces an alias or application to evaluate and
+// prints a union member by member, without expanding `Promise` or `Date` into
+// their structure the way the Types view's helper does.
+const STEP_HELPER = "type __PgId<T> = T extends unknown ? T : never;";
 const STORE = "poodcode:ts-playground";
 
 type Example = { title: string; focus: string; code: string };
@@ -62,6 +70,23 @@ type Names = User["name" | "email"];
 const user: User = { id: 1, name: "Ada" };
 const patch: Patch = { email: "ada@example.com" };
 console.log({ ...user, ...patch });
+`,
+  },
+  {
+    title: "Conditional types, stepped",
+    focus: "sizes",
+    code: `// Open the Step tab: each application below is evaluated one union member at a time.
+type ElementOf<T> = T extends readonly (infer E)[] ? E : T;
+type Unwrap<T> = T extends Promise<infer V> ? V : T;
+type IsString<T> = [T] extends [string] ? "yes" : "no";
+
+type Mixed = ElementOf<string[] | readonly [1, 2] | boolean>;
+type Loaded = Unwrap<Promise<number> | Promise<string> | Date>;
+type Whole = IsString<"a" | 1>;
+type Nothing = ElementOf<never>;
+
+const sizes = ["S", "M"] as const;
+console.log(sizes.length);
 `,
   },
   {
@@ -218,7 +243,18 @@ const DEFAULT_FLAGS: Flags = {
 
 type Diag = { code: number; line: number; message: string };
 type Row = { label: string; type: string; line?: number };
+type StepMember = { member: string; branch: string; infers: { name: string; type: string }[]; result: string };
+type Stepped = {
+  name: string;
+  application: string;
+  arg: string | null;
+  cond: { check: string; ext: string; yes: string; no: string };
+  members: StepMember[];
+  total: string;
+};
+
 type Analysis = {
+  steps: Stepped[];
   types: Row[];
   values: Row[];
   narrowing: Row[];
@@ -254,7 +290,7 @@ export default function TsPlayground() {
   const [code, setCode] = useState(saved.code);
   const [focus, setFocus] = useState(saved.focus);
   const [flags, setFlags] = useState<Flags>(DEFAULT_FLAGS);
-  const [view, setView] = useState<"types" | "narrowing" | "js" | "compiler" | "classes">("types");
+  const [view, setView] = useState<"types" | "narrowing" | "js" | "compiler" | "classes" | "step">("types");
   const [samples, setSamples] = useState<SampleResult[]>([]);
   const [analysis, setAnalysis] = useState<Analysis | null>(null);
   const [stdin, setStdin] = useState("");
@@ -294,6 +330,7 @@ export default function TsPlayground() {
   useEffect(
     () => () => {
       monaco?.editor.getModel(monaco.Uri.parse(PROBE))?.dispose();
+      monaco?.editor.getModel(monaco.Uri.parse(STEP_PROBE))?.dispose();
     },
     [monaco]
   );
@@ -410,6 +447,7 @@ export default function TsPlayground() {
                 ["js", "What runs"],
                 ["compiler", `Compiler${analysis && analysis.diags.length ? ` (${analysis.diags.length})` : ""}`],
                 ["classes", `Classes${analysis && analysis.classes.length ? ` (${analysis.classes.length})` : ""}`],
+                ["step", `Step${analysis && analysis.steps.length ? ` (${analysis.steps.length})` : ""}`],
               ] as const
             ).map(([key, label]) => (
               <button
@@ -457,6 +495,82 @@ export default function TsPlayground() {
               {analysis.values.length > 0 && <div className="io-label" style={{ marginTop: 10 }}>Values</div>}
               {analysis.values.map((r) => (
                 <TypeRow key={"v" + r.label} row={r} />
+              ))}
+            </>
+          )}
+
+          {analysis && view === "step" && (
+            <>
+              <p className="dim quiz-note">
+                For every <code>type X = F&lt;…&gt;</code> where <code>F</code> is a conditional type: the checked
+                argument split into its union members, and for each one the branch it takes, what every{" "}
+                <code>infer</code> binds, and its result. The answers come from the compiler itself.
+              </p>
+              {analysis.steps.length === 0 && (
+                <p className="dim quiz-note">
+                  No applications to step. Declare a conditional type, e.g.{" "}
+                  <code>type ElementOf&lt;T&gt; = T extends (infer E)[] ? E : never;</code>, then apply it:{" "}
+                  <code>type X = ElementOf&lt;string[] | number&gt;;</code>
+                </p>
+              )}
+              {analysis.steps.map((st) => (
+                <div key={st.name} className="card" style={{ margin: "8px 0", padding: "8px 10px" }}>
+                  <div>
+                    <strong>
+                      <code>{st.name}</code>
+                    </strong>{" "}
+                    = <code>{st.application}</code>
+                  </div>
+                  <div className="dim quiz-note" style={{ margin: "4px 0" }}>
+                    <code>{st.cond.check}</code> extends <code>{st.cond.ext}</code> ? <code>{st.cond.yes}</code> :{" "}
+                    <code>{st.cond.no}</code>
+                  </div>
+                  {st.arg !== null ? (
+                    <div className="quiz-note" style={{ margin: "4px 0" }}>
+                      1. <code>{st.cond.check}</code> is a bare type parameter, so the conditional{" "}
+                      <strong>distributes</strong> over <code>{st.arg}</code> —{" "}
+                      {st.members.length === 0 ? (
+                        <>
+                          which is <code>never</code>: no members, so the result is <code>never</code>.
+                        </>
+                      ) : (
+                        <>{st.members.length} member{st.members.length === 1 ? "" : "s"}, each checked on its own:</>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="quiz-note" style={{ margin: "4px 0" }}>
+                      1. <code>{st.cond.check}</code> is not a bare type parameter, so the whole argument is checked
+                      at once (no distribution):
+                    </div>
+                  )}
+                  {st.members.map((m, i) => (
+                    <div key={i} className="playground-row" style={{ flexWrap: "wrap" }}>
+                      <span className="playground-label">
+                        <code>{m.member}</code>
+                      </span>
+                      <span className="quiz-note">
+                        {m.branch === "true" ? (
+                          <span style={{ color: "var(--good)" }}>matches → true branch</span>
+                        ) : m.branch === "false" ? (
+                          <span style={{ color: "var(--bad)" }}>no match → false branch</span>
+                        ) : (
+                          <span>both branches ({m.branch})</span>
+                        )}
+                        {m.infers.map((b) => (
+                          <span key={b.name}>
+                            {" "}
+                            · <code>{b.name}</code> = <code>{b.type}</code>
+                          </span>
+                        ))}{" "}
+                        → <code className="playground-type">{m.result}</code>
+                      </span>
+                    </div>
+                  ))}
+                  <div className="quiz-note" style={{ marginTop: 6 }}>
+                    {st.arg !== null && st.members.length > 1 ? "2. The results, joined into one union" : "2. Result"}:{" "}
+                    <code className="playground-type">{st.total}</code>
+                  </div>
+                </div>
               ))}
             </>
           )}
@@ -648,6 +762,75 @@ async function analyse(monaco: Monaco, focus: string): Promise<Analysis> {
     types.push({ label: names[i]!, type: probeType(await quick(probeClient, PROBE, offsets[i]!)) });
   }
 
+  // M5-01: step conditional-type applications, in two rounds of probes —
+  // first each checked argument's members, then each member's branch, infer
+  // bindings and result.
+  const steps: Stepped[] = [];
+  const aliases = conditionalAliases(src);
+  const apps = applications(src, new Set(aliases.keys())).slice(0, 6);
+  if (apps.length > 0) {
+    const stepUri = monaco.Uri.parse(STEP_PROBE);
+    const stepModel = monaco.editor.getModel(stepUri) ?? monaco.editor.createModel("", "typescript", stepUri);
+    const plans = apps.map((app, k) => planSteps(app, aliases.get(app.fn)!, k));
+    const base =
+      src.replace(/\s*$/, "") + "\n\n" + STEP_HELPER + "\n" + plans.flatMap((pl) => pl.helpers).join("\n") + "\n";
+    const ask = async (questions: string[]) => {
+      let text = base;
+      const at: number[] = [];
+      questions.forEach((q, i) => {
+        at.push(text.length + "declare const ".length);
+        text += `declare const __pq_${i}: ${q};\n`;
+      });
+      if (stepModel.getValue() !== text) stepModel.setValue(text);
+      const c = await getWorker(stepUri);
+      const out: string[] = [];
+      for (const off of at) out.push(probeType(await quick(c, STEP_PROBE, off)));
+      return out;
+    };
+    const argQs = plans.map((pl) => (pl.distributesOver === null ? "never" : `__PgId<${pl.app.args[pl.distributesOver]}>`));
+    const argTypes = await ask(argQs);
+    const rows = plans.map((pl, k) => {
+      const members =
+        pl.distributesOver === null ? [null] : splitUnion(argTypes[k] ?? "").slice(0, 12);
+      return { pl, members };
+    });
+    const qs: string[] = [];
+    const index: { k: number; member: string | null; branch: number; infers: number[]; result: number }[] = [];
+    rows.forEach(({ pl, members }, k) => {
+      for (const member of members) {
+        const args = member === null ? pl.app.args.join(", ") : withArg(pl.app.args, pl.distributesOver!, member);
+        const branch = qs.push(`${pl.branchHelper}<${args}>`) - 1;
+        const infers = pl.infers.map((n) => qs.push(`__PgId<${pl.inferHelper(n)}<${args}>>`) - 1);
+        const result = qs.push(`__PgId<${pl.app.fn}<${args}>>`) - 1;
+        index.push({ k, member, branch, infers, result });
+      }
+      // The application, not the alias's name — asking about `Mixed` prints `Mixed`.
+      qs.push(`__PgId<${pl.app.fn}<${pl.app.args.join(", ")}>>`);
+    });
+    const answers = await ask(qs);
+    let cursor = 0;
+    rows.forEach(({ pl, members }, k) => {
+      const mine = index.filter((x) => x.k === k);
+      cursor += mine.reduce((n, x) => n + 2 + x.infers.length, 0);
+      const alias = aliases.get(pl.app.fn)!;
+      steps.push({
+        name: pl.app.name,
+        application: `${pl.app.fn}<${pl.app.args.join(", ")}>`,
+        arg: pl.distributesOver === null ? null : argTypes[k] ?? "",
+        cond: alias.cond,
+        members: mine.map((x) => ({
+          member: x.member ?? pl.app.args.join(", "),
+          branch: answers[x.branch] ?? "",
+          infers: pl.infers.map((n, i) => ({ name: n, type: answers[x.infers[i]!] ?? "" })),
+          result: answers[x.result] ?? "",
+        })),
+        total: answers[cursor] ?? "",
+      });
+      cursor += 1;
+      void members;
+    });
+  }
+
   // Top-level values from the navigation tree.
   const values: Row[] = [];
   const tree = (await client.getNavigationTree(MAIN)) as NavItem | undefined;
@@ -730,5 +913,5 @@ async function analyse(monaco: Monaco, focus: string): Promise<Analysis> {
   };
   walk(tree?.childItems ?? []);
 
-  return { types, values, narrowing, js, diags, classes, nevers };
+  return { steps, types, values, narrowing, js, diags, classes, nevers };
 }
