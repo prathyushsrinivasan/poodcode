@@ -788,6 +788,10 @@ function WeekCard({
   }
 
   const links = weekLinks(track.key, week.week);
+  // X-44: the arc project's progress lives in settings (one row per week holds
+  // the weekly project).
+  const arcKey = `mastery-arc:${track.key}:${week.week}`;
+  const arc = parseArc(settings[arcKey]);
   // M1-03: predict-first, a per-learner switch for months 1-2.
   const predictKey = `mastery-predict-first:${track.key}`;
   const predictFirst = week.week <= 8 && settings[predictKey] === "1";
@@ -1188,7 +1192,7 @@ function WeekCard({
               </section>
             )}
 
-            {(week.project || week.contest) && (
+            {(week.project || week.contest || week.arc_project) && (
               <section {...section("project")}>
                 {week.project && (
                   <ProjectPanel
@@ -1204,6 +1208,25 @@ function WeekCard({
                     }
                     onRubric={(ticked) => api.masterySaveRubric(track.key, week.week, ticked)}
                   />
+                )}
+
+                {week.arc_project && (
+                  <>
+                    <div className="io-label" style={{ marginTop: 4 }}>
+                      🧵 The arc project — one ledger that grows all programme
+                    </div>
+                    <ProjectPanel
+                      workspaceId={`${track.key}-w${week.week}-arc`}
+                      brief={week.arc_project.goal}
+                      spec={week.arc_project}
+                      row={arcRow(row, track.key, week.week, arc)}
+                      language={track.exam_language}
+                      onSave={async (notes, code, shipped) =>
+                        saveSetting(arcKey, JSON.stringify({ ...arc, notes, code, done: shipped }))
+                      }
+                      onRubric={async (ticked) => saveSetting(arcKey, JSON.stringify({ ...arc, rubric: ticked }))}
+                    />
+                  </>
                 )}
 
                 {week.contest && (
@@ -1320,6 +1343,40 @@ function WeekCard({
       )}
     </div>
   );
+}
+
+type ArcState = { notes: string; code: string; done: boolean; rubric: number[] };
+
+function parseArc(raw: string | undefined): ArcState {
+  try {
+    const v = JSON.parse(raw || "{}") as Partial<ArcState>;
+    return {
+      notes: typeof v.notes === "string" ? v.notes : "",
+      code: typeof v.code === "string" ? v.code : "",
+      done: v.done === true,
+      rubric: Array.isArray(v.rubric) ? v.rubric.filter((x): x is number => typeof x === "number") : [],
+    };
+  } catch {
+    return { notes: "", code: "", done: false, rubric: [] };
+  }
+}
+
+/** The arc project's state, shaped like a progress row for ProjectPanel. */
+function arcRow(row: MasteryProgress | undefined, trackKey: string, week: number, arc: ArcState): MasteryProgress {
+  return {
+    track_key: trackKey,
+    week,
+    best_quiz: row?.best_quiz ?? -1,
+    exam_passed: row?.exam_passed ?? false,
+    exam_code: "",
+    project_notes: arc.notes,
+    project_code: arc.code,
+    project_done: arc.done,
+    study_seconds: 0,
+    started_at: null,
+    completed_at: null,
+    project_rubric: JSON.stringify(arc.rubric),
+  };
 }
 
 type ProjectVersion = { at: string; code: string };

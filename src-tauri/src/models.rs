@@ -1347,6 +1347,10 @@ pub struct MasteryWeek {
     /// stays as the one-line summary.
     #[serde(default)]
     pub project_spec: Option<MasteryProjectSpec>,
+    /// The running "arc" project's version for this week (X-44), shown beside
+    /// the weekly project. Optional, like every project.
+    #[serde(default)]
+    pub arc_project: Option<MasteryProjectSpec>,
     /// Alternate coding finals (X-33), served on a retake so a failed final
     /// cannot be passed by memorising it. Passing any version passes the week.
     #[serde(default)]

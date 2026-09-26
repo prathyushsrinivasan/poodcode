@@ -1,4 +1,34 @@
 {
+ "arc-ledger-v1": {
+  "hash": "4e7db2c7696c3b9a53c6",
+  "outputs": [
+   "DATE        DESCRIPTION              AMOUNT    BALANCE\n2026-01-05  Salary                  2500.00    2500.00\n2026-01-09  Groceries                -45.50    2454.50\n2026-01-20  Freelance work           500.00    2954.50\n2026-02-01  Rent                   -1200.00    1754.50\n------------------------------------------------------\nincome 3000.00 · spending -1245.50 · 4 transactions",
+   "DATE        DESCRIPTION              AMOUNT    BALANCE\n2026-03-01  a                          0.10       0.10\n2026-03-02  b                          0.20       0.30\n------------------------------------------------------\nincome 0.30 · spending 0.00 · 2 transactions",
+   "DATE        DESCRIPTION              AMOUNT    BALANCE\nline 1: skipped\n2026-04-02  Fine                      10.00      10.00\nline 3: skipped\n------------------------------------------------------\nincome 10.00 · spending 0.00 · 1 transaction",
+   "DATE        DESCRIPTION              AMOUNT    BALANCE\n2026-05-01  A very long descrip…     -19.99     -19.99\n------------------------------------------------------\nincome 0.00 · spending -19.99 · 1 transaction",
+   "DATE        DESCRIPTION              AMOUNT    BALANCE\n2026-06-01  Only one                  42.00      42.00\n------------------------------------------------------\nincome 42.00 · spending 0.00 · 1 transaction"
+  ]
+ },
+ "arc-ledger-v2": {
+  "hash": "b8395770e8a4e8e74f02",
+  "outputs": [
+   "By category:\n  food: -$57.75 (2)\n  home: -$1,200.00 (1)\n  salary: +$2,500.00 (1)\nBy month:\n  2026-01: +$2,454.50\n  2026-02: -$1,212.25\nBiggest expense: Rent $1,200.00\nNet: +$1,242.25",
+   "By category:\n  windfall: +$1,234,567.89 (1)\nBy month:\n  2026-03: +$1,234,567.89\nBiggest expense: none\nNet: +$1,234,567.89",
+   "line 1: invalid\nline 2: invalid\nBy category:\n  gift: +$10.00 (1)\nBy month:\n  2026-04: +$10.00\nBiggest expense: none\nNet: +$10.00",
+   "By category:\n  coffee: -$6.00 (2)\nBy month:\n  2026-05: -$6.00\nBiggest expense: coffee $3.00\nNet: -$6.00",
+   "By category:\n  zero: $0.00 (1)\nBy month:\n  2026-06: $0.00\nBiggest expense: none\nNet: $0.00"
+  ]
+ },
+ "arc-ledger-v3": {
+  "hash": "28b4ebb3dfceb004a06e",
+  "outputs": [
+   "deposit 100.00 to A\nwithdrawal 30.00 from A\ntransfer 20.00 A -> B\nA: 50.00\nB: 20.00\ndeposits=1 withdrawals=1 transfers=1",
+   "line 1: rejected withdrawal (insufficient funds)\ndeposit 5.00 to A\nwithdrawal 5.00 from A\nA: 0.00\ndeposits=1 withdrawals=1 transfers=0",
+   "line 1: invalid\nline 2: invalid\nline 3: invalid\nline 4: invalid\ndeposits=0 withdrawals=0 transfers=0",
+   "deposit 0.10 to Z\ndeposit 0.20 to Z\ntransfer 0.30 Z -> Y\nY: 0.30\nZ: 0.00\ndeposits=2 withdrawals=0 transfers=1",
+   "line 1: rejected transfer (insufficient funds)\ndeposit 2.50 to B\nB: 2.50\ndeposits=1 withdrawals=0 transfers=0"
+  ]
+ },
  "final-w25": {
   "hash": "b21f332f0c233541e510",
   "outputs": [

@@ -122,6 +122,11 @@ def collect(only, weeks, include_learn, include_mastery):
                     work.append((where + f"/final-alt{k}", as_exercise(
                         f"final-w{n}-alt{k}", "final", alt["starter"], alt["solution"],
                         alt["tests"], alt.get("strictness"))))
+            arc = w.get("arc_project")
+            if arc and (not only or only in f"arc-w{n}"):
+                work.append((where + "/arc", as_exercise(
+                    f"arc-w{n}", "project", arc["starter"], arc["solution"],
+                    arc["tests"], arc.get("strictness"))))
             proj = w.get("project_spec")
             if proj and (not only or only in f"project-w{n}"):
                 work.append((where + "/project", as_exercise(

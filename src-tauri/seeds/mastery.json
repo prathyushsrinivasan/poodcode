@@ -5766,7 +5766,55 @@
             "strictness": "",
             "visible_tests": 4
           }
-        ]
+        ],
+        "arc_project": {
+          "title": "ledger.ts v1 — a printed bank statement",
+          "goal": "The first version of the programme's running project. Every month it grows: typed records in month 2, a discriminated union in month 3, modules and branded money in month 4, and in the end classes, generators and async loading. Version 1 only has to read raw lines and print a clean statement — with strings, numbers and a loop.",
+          "requirements": [
+            "Each input line is `YYYY-MM-DD amount description…` — the amount like `2500` or `-45.50`, the description one or more words. Skip blank lines.",
+            "Print a header `DATE` (padded to 12) `DESCRIPTION` (padded to 21) `AMOUNT` (right-aligned in 10) `BALANCE` (right-aligned in 11), then one row per transaction in the same columns: the description cut to 19 characters plus `…` when it is longer than 20, the amount and the running balance to two decimals.",
+            "A line with fewer than three parts, or an amount that is not a number, prints `line <n>: skipped` instead of a row (n counts from 1) and changes nothing.",
+            "Finish with 54 dashes and `income <total of positive amounts> · spending <total of negative amounts> · <n> transactions` (`transaction` for one).",
+            "Keep money in whole cents while you add it up — `0.1 + 0.2` is not `0.3`."
+          ],
+          "stretch": [
+            "Print the month (`YYYY-MM`) as a heading whenever it changes.",
+            "Accept amounts written with a thousands separator (`1,200.00`)."
+          ],
+          "rubric": [
+            "No `any` anywhere — not even one hidden in a cast",
+            "Every function has a typed signature; locals are left to inference",
+            "Bad input is handled on purpose, not by accident",
+            "Names say what things are, not how they are stored",
+            "I could explain every line to someone else"
+          ],
+          "language": "typescript",
+          "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n// Build the project here. Read all of stdin from `input` above, and print\n// exactly what the requirements ask for. Run the tests as you go.\n",
+          "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst lines = input.split(\"\\n\");\nconst money = (cents: number): string => (cents / 100).toFixed(2);\nconsole.log(\"DATE\".padEnd(12) + \"DESCRIPTION\".padEnd(21) + \"AMOUNT\".padStart(10) + \"BALANCE\".padStart(11));\nlet balance = 0;\nlet income = 0;\nlet spending = 0;\nlet count = 0;\nfor (let i = 0; i < lines.length; i++) {\n  const line = (lines[i] ?? \"\").trim();\n  if (line === \"\") continue;\n  const parts = line.split(/\\s+/);\n  const date = parts[0] ?? \"\";\n  const amount = Number(parts[1]);\n  if (parts.length < 3 || !Number.isFinite(amount)) {\n    console.log(`line ${i + 1}: skipped`);\n    continue;\n  }\n  const description = parts.slice(2).join(\" \");\n  const cents = Math.round(amount * 100);\n  balance += cents;\n  count++;\n  if (cents >= 0) income += cents;\n  else spending += cents;\n  const shown = description.length > 20 ? description.slice(0, 19) + \"…\" : description;\n  console.log(date.padEnd(12) + shown.padEnd(21) + money(cents).padStart(10) + money(balance).padStart(11));\n}\nconsole.log(\"-\".repeat(54));\nconsole.log(`income ${money(income)} · spending ${money(spending)} · ${count} transaction${count === 1 ? \"\" : \"s\"}`);\n",
+          "tests": [
+            {
+              "input": "2026-01-05 2500 Salary\n2026-01-09 -45.50 Groceries\n2026-01-20 500 Freelance work\n2026-02-01 -1200 Rent",
+              "output": "DATE        DESCRIPTION              AMOUNT    BALANCE\n2026-01-05  Salary                  2500.00    2500.00\n2026-01-09  Groceries                -45.50    2454.50\n2026-01-20  Freelance work           500.00    2954.50\n2026-02-01  Rent                   -1200.00    1754.50\n------------------------------------------------------\nincome 3000.00 · spending -1245.50 · 4 transactions"
+            },
+            {
+              "input": "2026-03-01 0.1 a\n2026-03-02 0.2 b",
+              "output": "DATE        DESCRIPTION              AMOUNT    BALANCE\n2026-03-01  a                          0.10       0.10\n2026-03-02  b                          0.20       0.30\n------------------------------------------------------\nincome 0.30 · spending 0.00 · 2 transactions"
+            },
+            {
+              "input": "2026-04-01 abc Broken\n2026-04-02 10 Fine\nshort line",
+              "output": "DATE        DESCRIPTION              AMOUNT    BALANCE\nline 1: skipped\n2026-04-02  Fine                      10.00      10.00\nline 3: skipped\n------------------------------------------------------\nincome 10.00 · spending 0.00 · 1 transaction"
+            },
+            {
+              "input": "2026-05-01 -19.99 A very long description that will not fit",
+              "output": "DATE        DESCRIPTION              AMOUNT    BALANCE\n2026-05-01  A very long descrip…     -19.99     -19.99\n------------------------------------------------------\nincome 0.00 · spending -19.99 · 1 transaction"
+            },
+            {
+              "input": "2026-06-01 42 Only one\n\n\n",
+              "output": "DATE        DESCRIPTION              AMOUNT    BALANCE\n2026-06-01  Only one                  42.00      42.00\n------------------------------------------------------\nincome 42.00 · spending 0.00 · 1 transaction"
+            }
+          ],
+          "strictness": ""
+        }
       },
       {
         "week": 5,
@@ -11082,7 +11130,55 @@
             "strictness": "",
             "visible_tests": 4
           }
-        ]
+        ],
+        "arc_project": {
+          "title": "ledger.ts v2 — typed records and a monthly summary",
+          "goal": "Version 2 of the running project. Since v1 the raw lines have become JSON records, and the program stops printing a row per line: it parses each record into a typed `Transaction`, then summarises with array methods — by category, by month — and formats money through one `formatMoney` with options.",
+          "requirements": [
+            "Each input line is a JSON object with `date` (`YYYY-MM-DD`), `amount` (a number, in dollars), `category` (a string) and an optional `memo`. A line that is not JSON, or lacks a string `date`, a number `amount` or a string `category`, prints `line <n>: invalid` and is left out.",
+            "Write `formatMoney(cents, { symbol, sign })` — `symbol` defaults to `$`, `sign` to `false` — giving `$1,234.50`: a thousands separator, two decimals, a leading `-` for negatives and, when `sign` is on, a leading `+` for positives.",
+            "Print `By category:` then `  <category>: <total with sign> (<count>)` for each category, alphabetically.",
+            "Print `By month:` then `  <YYYY-MM>: <total with sign>` for each month, in order.",
+            "Then `Biggest expense: <memo, or the category if there is none> <amount without sign>` for the most negative amount (`Biggest expense: none` without one), and `Net: <total with sign>`."
+          ],
+          "stretch": [
+            "Add a `--since YYYY-MM` first line that filters the records before summarising.",
+            "Give `formatMoney` a `decimals` option."
+          ],
+          "rubric": [
+            "No `any` anywhere — not even one hidden in a cast",
+            "Every function has a typed signature; locals are left to inference",
+            "Bad input is handled on purpose, not by accident",
+            "Names say what things are, not how they are stored",
+            "I could explain every line to someone else"
+          ],
+          "language": "typescript",
+          "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n// Build the project here. Read all of stdin from `input` above, and print\n// exactly what the requirements ask for. Run the tests as you go.\n",
+          "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Transaction = { date: string; cents: number; category: string; memo: string };\n\nfunction formatMoney(cents: number, { symbol = \"$\", sign = false }: { symbol?: string; sign?: boolean } = {}): string {\n  const abs = Math.abs(cents);\n  const whole = Math.floor(abs / 100).toString().replace(/\\B(?=(\\d{3})+(?!\\d))/g, \",\");\n  const frac = String(abs % 100).padStart(2, \"0\");\n  const prefix = cents < 0 ? \"-\" : sign && cents > 0 ? \"+\" : \"\";\n  return `${prefix}${symbol}${whole}.${frac}`;\n}\n\nfunction parse(line: string): Transaction | null {\n  try {\n    const { date, amount, category, memo = \"\" } = JSON.parse(line);\n    if (typeof date !== \"string\" || typeof amount !== \"number\" || typeof category !== \"string\") return null;\n    return { date, cents: Math.round(amount * 100), category, memo: typeof memo === \"string\" ? memo : \"\" };\n  } catch {\n    return null;\n  }\n}\n\nconst txns: Transaction[] = [];\ninput.split(\"\\n\").forEach((line, i) => {\n  const t = parse(line);\n  if (t === null) console.log(`line ${i + 1}: invalid`);\n  else txns.push(t);\n});\n\nconst total = (ts: Transaction[]): number => ts.reduce((sum, t) => sum + t.cents, 0);\n\nconsole.log(\"By category:\");\nconst byCategory = Object.groupBy(txns, (t) => t.category);\nfor (const category of Object.keys(byCategory).sort()) {\n  const ts = byCategory[category] ?? [];\n  console.log(`  ${category}: ${formatMoney(total(ts), { sign: true })} (${ts.length})`);\n}\n\nconsole.log(\"By month:\");\nconst byMonth = Object.groupBy(txns, (t) => t.date.slice(0, 7));\nfor (const month of Object.keys(byMonth).sort()) {\n  console.log(`  ${month}: ${formatMoney(total(byMonth[month] ?? []), { sign: true })}`);\n}\n\nconst expenses = txns.filter((t) => t.cents < 0).toSorted((a, b) => a.cents - b.cents);\nconst biggest = expenses[0];\nconsole.log(\n  biggest === undefined\n    ? \"Biggest expense: none\"\n    : `Biggest expense: ${biggest.memo || biggest.category} ${formatMoney(-biggest.cents)}`\n);\nconsole.log(`Net: ${formatMoney(total(txns), { sign: true })}`);\n",
+          "tests": [
+            {
+              "input": "{\"date\":\"2026-01-05\",\"amount\":2500,\"category\":\"salary\",\"memo\":\"January\"}\n{\"date\":\"2026-01-09\",\"amount\":-45.5,\"category\":\"food\",\"memo\":\"Groceries\"}\n{\"date\":\"2026-02-01\",\"amount\":-1200,\"category\":\"home\",\"memo\":\"Rent\"}\n{\"date\":\"2026-02-03\",\"amount\":-12.25,\"category\":\"food\"}",
+              "output": "By category:\n  food: -$57.75 (2)\n  home: -$1,200.00 (1)\n  salary: +$2,500.00 (1)\nBy month:\n  2026-01: +$2,454.50\n  2026-02: -$1,212.25\nBiggest expense: Rent $1,200.00\nNet: +$1,242.25"
+            },
+            {
+              "input": "{\"date\":\"2026-03-01\",\"amount\":1234567.89,\"category\":\"windfall\"}",
+              "output": "By category:\n  windfall: +$1,234,567.89 (1)\nBy month:\n  2026-03: +$1,234,567.89\nBiggest expense: none\nNet: +$1,234,567.89"
+            },
+            {
+              "input": "not json\n{\"date\":\"2026-04-01\",\"amount\":\"10\",\"category\":\"x\"}\n{\"date\":\"2026-04-02\",\"amount\":10,\"category\":\"gift\"}",
+              "output": "line 1: invalid\nline 2: invalid\nBy category:\n  gift: +$10.00 (1)\nBy month:\n  2026-04: +$10.00\nBiggest expense: none\nNet: +$10.00"
+            },
+            {
+              "input": "{\"date\":\"2026-05-01\",\"amount\":-3,\"category\":\"coffee\"}\n{\"date\":\"2026-05-02\",\"amount\":-3,\"category\":\"coffee\",\"memo\":\"flat white\"}",
+              "output": "By category:\n  coffee: -$6.00 (2)\nBy month:\n  2026-05: -$6.00\nBiggest expense: coffee $3.00\nNet: -$6.00"
+            },
+            {
+              "input": "{\"date\":\"2026-06-30\",\"amount\":0,\"category\":\"zero\"}",
+              "output": "By category:\n  zero: $0.00 (1)\nBy month:\n  2026-06: $0.00\nBiggest expense: none\nNet: $0.00"
+            }
+          ],
+          "strictness": ""
+        }
       },
       {
         "week": 9,
@@ -15994,7 +16090,55 @@
             "strictness": "",
             "visible_tests": 4
           }
-        ]
+        ],
+        "arc_project": {
+          "title": "ledger.ts v3 — events as a discriminated union",
+          "goal": "Version 3 of the running project. Since v2 the records have become events of three kinds that carry different data. Model them as a discriminated union, let a type guard decide what is valid, and let the compiler check that every kind is handled — then add a kind and watch it point at every `switch`.",
+          "requirements": [
+            "Each input line is a JSON event: `{\"kind\":\"deposit\",\"account\":…,\"amount\":…}`, `{\"kind\":\"withdrawal\",\"account\":…,\"amount\":…}` or `{\"kind\":\"transfer\",\"from\":…,\"to\":…,\"amount\":…}`, with accounts as non-empty strings and a positive amount in dollars.",
+            "Write a type guard `isEvent(x: unknown): x is LedgerEvent`. A line that is not JSON or not a valid event prints `line <n>: invalid`.",
+            "Apply events in order. A withdrawal or transfer that would take an account below zero prints `line <n>: rejected <kind> (insufficient funds)` and changes nothing.",
+            "Every applied event prints one line from a `switch` on `kind` that ends in an exhaustiveness check: `deposit 100.00 to A`, `withdrawal 30.00 from A`, `transfer 20.00 A -> B`.",
+            "Finish with each account that ever appeared in an applied event, alphabetically, as `<account>: <balance>`, then `deposits=<n> withdrawals=<n> transfers=<n>` counting applied events."
+          ],
+          "stretch": [
+            "Add a fourth kind, `fee`, and follow the compiler to every place that must handle it.",
+            "Report every problem with a line instead of stopping at the first reason it is invalid."
+          ],
+          "rubric": [
+            "No `any` anywhere — not even one hidden in a cast",
+            "Every function has a typed signature; locals are left to inference",
+            "Bad input is handled on purpose, not by accident",
+            "Names say what things are, not how they are stored",
+            "I could explain every line to someone else"
+          ],
+          "language": "typescript",
+          "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n// Build the project here. Read all of stdin from `input` above, and print\n// exactly what the requirements ask for. Run the tests as you go.\n",
+          "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype LedgerEvent =\n  | { kind: \"deposit\"; account: string; amount: number }\n  | { kind: \"withdrawal\"; account: string; amount: number }\n  | { kind: \"transfer\"; from: string; to: string; amount: number };\n\nconst isAccount = (v: unknown): v is string => typeof v === \"string\" && v.length > 0;\n\nfunction isEvent(x: unknown): x is LedgerEvent {\n  if (typeof x !== \"object\" || x === null) return false;\n  const e = x as Record<string, unknown>;\n  if (typeof e.amount !== \"number\" || !(e.amount > 0)) return false;\n  switch (e.kind) {\n    case \"deposit\":\n    case \"withdrawal\":\n      return isAccount(e.account);\n    case \"transfer\":\n      return isAccount(e.from) && isAccount(e.to);\n    default:\n      return false;\n  }\n}\n\nconst money = (cents: number): string => (cents / 100).toFixed(2);\n\nfunction describe(e: LedgerEvent): string {\n  switch (e.kind) {\n    case \"deposit\":\n      return `deposit ${money(Math.round(e.amount * 100))} to ${e.account}`;\n    case \"withdrawal\":\n      return `withdrawal ${money(Math.round(e.amount * 100))} from ${e.account}`;\n    case \"transfer\":\n      return `transfer ${money(Math.round(e.amount * 100))} ${e.from} -> ${e.to}`;\n    default: {\n      const unreachable: never = e;\n      return unreachable;\n    }\n  }\n}\n\nconst balances = new Map<string, number>();\nconst counts = { deposit: 0, withdrawal: 0, transfer: 0 };\nconst bal = (a: string): number => balances.get(a) ?? 0;\n\ninput.split(\"\\n\").forEach((line, i) => {\n  let parsed: unknown;\n  try {\n    parsed = JSON.parse(line);\n  } catch {\n    parsed = null;\n  }\n  if (!isEvent(parsed)) {\n    console.log(`line ${i + 1}: invalid`);\n    return;\n  }\n  const e = parsed;\n  const cents = Math.round(e.amount * 100);\n  const source = e.kind === \"withdrawal\" ? e.account : e.kind === \"transfer\" ? e.from : null;\n  if (source !== null && bal(source) < cents) {\n    console.log(`line ${i + 1}: rejected ${e.kind} (insufficient funds)`);\n    return;\n  }\n  if (e.kind === \"deposit\") balances.set(e.account, bal(e.account) + cents);\n  else if (e.kind === \"withdrawal\") balances.set(e.account, bal(e.account) - cents);\n  else {\n    balances.set(e.from, bal(e.from) - cents);\n    balances.set(e.to, bal(e.to) + cents);\n  }\n  counts[e.kind]++;\n  console.log(describe(e));\n});\n\nfor (const account of [...balances.keys()].sort()) console.log(`${account}: ${money(bal(account))}`);\nconsole.log(`deposits=${counts.deposit} withdrawals=${counts.withdrawal} transfers=${counts.transfer}`);\n",
+          "tests": [
+            {
+              "input": "{\"kind\":\"deposit\",\"account\":\"A\",\"amount\":100}\n{\"kind\":\"withdrawal\",\"account\":\"A\",\"amount\":30}\n{\"kind\":\"transfer\",\"from\":\"A\",\"to\":\"B\",\"amount\":20}",
+              "output": "deposit 100.00 to A\nwithdrawal 30.00 from A\ntransfer 20.00 A -> B\nA: 50.00\nB: 20.00\ndeposits=1 withdrawals=1 transfers=1"
+            },
+            {
+              "input": "{\"kind\":\"withdrawal\",\"account\":\"A\",\"amount\":5}\n{\"kind\":\"deposit\",\"account\":\"A\",\"amount\":5}\n{\"kind\":\"withdrawal\",\"account\":\"A\",\"amount\":5}",
+              "output": "line 1: rejected withdrawal (insufficient funds)\ndeposit 5.00 to A\nwithdrawal 5.00 from A\nA: 0.00\ndeposits=1 withdrawals=1 transfers=0"
+            },
+            {
+              "input": "{\"kind\":\"refund\",\"account\":\"A\",\"amount\":5}\n{\"kind\":\"deposit\",\"account\":\"\",\"amount\":5}\n{\"kind\":\"deposit\",\"account\":\"C\",\"amount\":-1}\nnope",
+              "output": "line 1: invalid\nline 2: invalid\nline 3: invalid\nline 4: invalid\ndeposits=0 withdrawals=0 transfers=0"
+            },
+            {
+              "input": "{\"kind\":\"deposit\",\"account\":\"Z\",\"amount\":0.1}\n{\"kind\":\"deposit\",\"account\":\"Z\",\"amount\":0.2}\n{\"kind\":\"transfer\",\"from\":\"Z\",\"to\":\"Y\",\"amount\":0.3}",
+              "output": "deposit 0.10 to Z\ndeposit 0.20 to Z\ntransfer 0.30 Z -> Y\nY: 0.30\nZ: 0.00\ndeposits=2 withdrawals=0 transfers=1"
+            },
+            {
+              "input": "{\"kind\":\"transfer\",\"from\":\"A\",\"to\":\"B\",\"amount\":1}\n{\"kind\":\"deposit\",\"account\":\"B\",\"amount\":2.5}",
+              "output": "line 1: rejected transfer (insufficient funds)\ndeposit 2.50 to B\nB: 2.50\ndeposits=1 withdrawals=0 transfers=0"
+            }
+          ],
+          "strictness": ""
+        }
       },
       {
         "week": 13,

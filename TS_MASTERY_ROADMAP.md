@@ -80,6 +80,7 @@ the gap stays visible. This is what has landed since.
 | Closing the loops (F-03, F-08, X-40–X-43, X-46, X-72, X-73, M2-01, M6-05) | — | a shipped project's reference opens as a **diff against your code** (X-43), and every save keeps a **version history** with diff and restore (X-46); `h` reveals the next hint of the exercise on screen (X-72); the **command palette** finds every Mastery week and every TypeScript error in the glossary (X-73); weeks 18–22 keep one DSA problem each, labelled **Applied** (F-03); the week-26 checkpoint is **built from month 6's problems** (M6-05) | `ProjectPanel` in `Mastery.tsx`, `masteryCmds` in `CommandPalette.tsx`, `mastery_ts_m5.py`, `TS_CONTEST_SLUGS` |
 | Volume: problems and type challenges (X-21, X-24) | weeks 16 and 18–22 had 9–11 problems; 91 type challenges | **29 new type puzzles** — 14 problem-set problems and 15 practice items across weeks 15–22, each inside what its week has taught — so **every core week has 12–16 problems** and the **type-challenge ladder has 121 rungs** | `tools/mastery_ts_types_more.py` |
 | Predict first and question stats (M1-03, X-38) | — | a **predict-first switch** for weeks 1–8: before each run of a practice exercise or problem you write what it will print for the first test's input; a mismatch (judged with the judge's own normalisation) is logged as a learning moment. Every marked quiz sitting feeds **per-question stats**, and a panel lists the questions you keep missing and the ones you never miss | `src/lib/predict.ts`, `src/lib/quizStats.ts`, `ExerciseCard` in `LearnExercise.tsx`, `QuestionStats` in `Mastery.tsx` |
+| The arc project, v1–v3 (X-44, M1-05, M2-05, M3-05) | only v4 (week 14), the typed-kit (week 22) and the final (week 27) existed | **`ledger.ts` v1** (week 4: a printed statement from raw lines, money in cents), **v2** (week 8: typed JSON records, `formatMoney` with options, summaries by category and month via array methods), **v3** (week 12: a discriminated union of deposit/withdrawal/transfer, a type guard, an exhaustive `switch`, overdraft rejection) — each a second, optional project beside the weekly one, with 5 acceptance tests computed from the reference; progress stored in settings (`mastery-arc:<track>:<week>`) | `tools/mastery_ts_arc.py`, `arc_project` on `MasteryWeek`, `arcRow`/`parseArc` in `Mastery.tsx` |
 | Week 27 interview practice | a capstone and a four-problem mock set | **63-question interview bank** with model answers (7 topics, "ask me one" drill), **three timed 45-minute mock interviews** (bank questions + a problem + a type puzzle, clock, self-scored rubric, attempt history), **10 code-review exercises** (X-14): write the review, compare with the model review, tick what you caught — the PR code and the corrected code are both run and their output computed | `tools/mastery_ts_w27.py`, `src/components/MasteryCapstone.tsx`, `src/lib/capstone.ts` |
 | Fast authoring loop (X-102) | none for Mastery | `python tools/verify_ts_mastery.py --weeks 11-14` / `--only ts_regex` — type-checks and runs chapters, practice, problems, finals and projects in seconds | `tools/verify_ts_mastery.py` |
 
@@ -259,7 +260,7 @@ Everything here is built once and then used by every week in Part B.
 | ✅ X-41 | **Run the project** — the code box gets Run and Test buttons backed by `run_scratch`, with 5–10 acceptance tests per project. "Shipped" requires them green. | P1 | M |
 | ✅ X-42 | **Self-review rubric** per project (typing quality, no `any`, error handling, naming) — tick-boxes saved with the project. | P2 | S |
 | ✅ X-43 | **Reference implementation** revealable after shipping, with a side-by-side diff against the learner's code (`src/lib/diff.ts` already does LCS). | P2 | M |
-| X-44 | **Project continuity** — a single running project that grows each month (like the Course's Budget Buddy): *Ledger → typed CLI → validated store → type-safe event system → async loader*. The monthly "arc" projects are listed in Part B. | P1 | L |
+| ✅ X-44 | **Project continuity** — a single running project that grows each month (like the Course's Budget Buddy): *Ledger → typed CLI → validated store → type-safe event system → async loader*. The monthly "arc" projects are listed in Part B. | P1 | L |
 | ✅ X-45 | **Multi-file projects** in the project workspace (tabs for several `.ts` files, bundled into one file for the judge by concatenation with `export` stripped). Required for months 4 and 6. | P2 | L |
 | ✅ X-46 | Project history — keep every saved version, not just the latest (ProjectHistory.tsx exists for the Projects track and can be reused). | P3 | M |
 
@@ -354,7 +355,7 @@ print stdout, and know exactly what TypeScript infers without being told.
 | ✅ M1-02 | **stdin/stdout visualiser** — show the test's stdin split into lines, what your program printed, and where the first difference is, character-aligned. | P1 |
 | ✅ M1-03 | "**Predict first**" mode for months 1–2: before Run, you must type what you think it prints; mismatches are logged as learning moments. | P2 |
 | ✅ M1-04 | **Month 1 checkpoint** (new, X-35): 60-minute contest of 4 problems + 20 questions. | P1 |
-| M1-05 | Month arc project start: **`ledger.ts` v1** — read transactions line by line, print a formatted statement. Grows every month (X-44). | P1 |
+| ✅ M1-05 | Month arc project start: **`ledger.ts` v1** — read transactions line by line, print a formatted statement. Grows every month (X-44). | P1 |
 
 ### Week 1 — Values, Types & Inference
 *Now:* `ts_variables`, `ts_types`, `ts_inference` · 4 problems · 6 quiz · final "Temperature table" (4 tests).
@@ -437,7 +438,7 @@ collections without mutation surprises, and model records as typed objects.
 | ✅ M2-02 | **Call-stack visualiser** for closures and recursion (extends `/debugger`): step through, see frames and captured variables. | P2 |
 | ✅ M2-03 | **Array-method pipeline viewer** — for a `.filter().map().reduce()` chain, show the intermediate array after each step. | P2 |
 | ✅ M2-04 | **Month 2 checkpoint** (new): 75-minute contest, 4 problems + 20 questions. | P1 |
-| M2-05 | Arc project: **`ledger.ts` v2** — transactions become typed objects; filter/group/summarise with array methods; a `formatMoney` with options. | P1 |
+| ✅ M2-05 | Arc project: **`ledger.ts` v2** — transactions become typed objects; filter/group/summarise with array methods; a `formatMoney` with options. | P1 |
 
 ### Week 5 — Functions & Parameters
 *Now:* `ts_functions`, `ts_params` · 4 problems · final "Formatter with options".
@@ -506,7 +507,7 @@ control-flow narrowing the way the compiler does.
 | ✅ M3-02 | **Exhaustiveness badge** — the editor shows "switch is exhaustive ✓" when a `never` check compiles. | P3 |
 | M3-03 | **State-machine diagram** — for a union of states + transition function, render the states and allowed transitions (weeks 10 and 12). | P3 |
 | ✅ M3-04 | **Strictness ladder step**: from week 11, every exercise runs under `strict+indexed` (X-17). Announce it in-app. | P1 |
-| M3-05 | Arc project: **`ledger.ts` v3** — transactions become a discriminated union (`deposit` / `withdrawal` / `transfer`), parsed from JSON with a guard, exhaustive formatting. | P1 |
+| ✅ M3-05 | Arc project: **`ledger.ts` v3** — transactions become a discriminated union (`deposit` / `withdrawal` / `transfer`), parsed from JSON with a guard, exhaustive formatting. | P1 |
 
 ### Week 9 — Maps, Sets & Hashing
 *Now:* `ts_maps_sets` · 5 problems · final "Inverted index".
@@ -588,7 +589,7 @@ typing is sometimes unsound, and make illegal values unconstructable.
 | ✅ M4-02 | **tsconfig explorer** — an interactive tsconfig with every flag used in the programme; toggle one, see which of a fixed set of sample programs start or stop compiling. | P2 |
 | ✅ M4-03 | **Multi-file project workspace** (X-45) — required for week 14's modules project. | P1 |
 | ✅ M4-04 | **Month 4 checkpoint** (new): 90-minute contest + a 10-puzzle type-challenge section. | P1 |
-| M4-05 | Arc project: **`ledger.ts` v4** — branded `Cents` and `AccountId`, a validated parser from untrusted JSON, `readonly` everywhere, derived types via utility types, split across modules. | P1 |
+| ✅ M4-05 | Arc project: **`ledger.ts` v4** — branded `Cents` and `AccountId`, a validated parser from untrusted JSON, `readonly` everywhere, derived types via utility types, split across modules. | P1 |
 
 ### Week 14 — The Toolchain: tsconfig, Modules & Declarations *(D-2)*
 *Now:* "Nullability & Compiler Strictness" (`ts_nullish`, `ts_tsconfig`).
@@ -657,7 +658,7 @@ the type-level programs behind every serious library.
 | ✅ M5-02 | **Type-challenge ladder** (X-24) surfaced as a daily rep: one puzzle a day, easy → extreme, streak tracked. | P1 |
 | ✅ M5-03 | **Assertion panel** — for type-graded work, list every `Expect<Equal<…>>` with ✓/✗ and the two types side by side when it fails. | **P0** |
 | ✅ M5-04 | **Month 5 checkpoint** (new): 20 type puzzles in 90 minutes + 2 runtime generic problems. | P1 |
-| M5-05 | Arc project: **`typed-kit`** — a small library: `groupBy`, `pick`, `DeepReadonly`, `Paths<T>`, a typed event emitter, a route-param parser. Portfolio-grade. | P1 |
+| ✅ M5-05 | Arc project: **`typed-kit`** — a small library: `groupBy`, `pick`, `DeepReadonly`, `Paths<T>`, a typed event emitter, a route-param parser. Portfolio-grade. | P1 |
 
 ### Week 18 — Generics & Constraints
 *Now:* `ts_generics`, `ts_generic_constraints` · 3 problems · final "Generic collection helpers".
@@ -741,7 +742,7 @@ concurrency and cancellation.
 | M6-03 | **Deterministic async rule** (as the course's `java_m30_sync.py` header): output must be deterministic *by construction* — simulated clocks, index-ordered printing, never timing-dependent. Build lint for `setTimeout` with non-constant delays. | **P0** |
 | ✅ M6-04 | **Class diagram** — render a class hierarchy (fields, visibility, `implements`/`extends`) from the learner's code. | P3 |
 | ✅ M6-05 | **Month 6 checkpoint** = the existing week-26 contest, rebuilt from month 6 problems. | P1 |
-| M6-06 | Arc project: **`ledger` final** — classes with private state, a generator-based report stream, `Result`-based parsing, an async loader with timeout and cancellation. | P1 |
+| ✅ M6-06 | Arc project: **`ledger` final** — classes with private state, a generator-based report stream, `Result`-based parsing, an async loader with timeout and cancellation. | P1 |
 
 ### Week 23 — Classes & Encapsulation
 *Now:* `ts_classes`, `ts_this_accessors` · 3 problems · final "Bank account with invariants".
@@ -823,7 +824,52 @@ concurrency and cancellation.
 
 ---
 
-**Status, 2026-09-27 — Part B's content is built for all 26 core weeks, and every lesson is on the template.** TypeScript Learn chapters: **87** (the target), every one 5k+ characters on the X-02 template (the original 50 deepened, F-12), with 301 Learn exercises and 265 chapter quiz questions. Mastery TS track: 261 problem-set problems (41 type-graded), 202 practice exercises, 27 runnable projects, 1,324 week-bank quiz questions (at least 40 every week, build-asserted), 521 review cards, 219 final tests, 6 checkpoint contests. Still open from Part A and the targets above: the ~1,300-exercise and ~1,000-card volumes (the quiz target is met), and the visualisers and UI items (M1-02, M3-01, M5-01, M6-01, X-60 onward). Optional week 27 now has its capstone (the arc's final `ledger.ts`: branded ids, `Result` parsing, a private-state class with a generator statement, concurrent loading with timeouts on the virtual clock), a four-problem mock-interview set with four type puzzles, a 63-question interview bank, three timed mock interviews and ten code-review exercises — week 27 is complete.
+**Status, 2026-09-27 (end of the second build session).** Part B's content is built for all 26 core weeks and optional week 27, and most of Part A has landed — see *Shipped so far*. TypeScript Learn chapters: **87**, all on the X-02 template (5k–19k characters). Mastery TS track: **276** problem-set problems (**55** type-graded) — every core week has 12–16; **218** practice exercises; **27** weekly projects plus **3** arc versions (v1–v3), all runnable with acceptance tests (week 14's is a four-module workspace); **1,324** week-bank questions (40+ every week); **527** review cards; **27** finals with 220 tests plus **26** alternate finals, hidden test sets, and two-part finals for weeks 15–22; a **3-hour programme final exam**; **6** monthly checkpoints, each with a 20-question quiz (and a type section in months 4–5); a **121-rung** type-challenge ladder served as a daily puzzle. Tools: TS playground, step-by-step page (call stack, array pipeline, event loop, promise combinators), stdin/stdout visualiser, assertion panel, multi-file workspace, tsconfig explorer. Still open: see *Handoff* below.
+
+---
+
+## Handoff — where the next session starts (2026-09-27)
+
+**Uncommitted work in the tree** (all verified, not yet committed): the arc projects v1–v3 —
+`tools/mastery_ts_arc.py` (new), hooks in `tools/gen_seed.py` / `tools/mastery_ts_attach.py`, `eid=` on
+`_project` in `tools/mastery_ts_kit.py`, `arc_project` on `MasteryWeek` (`models.rs`, `types.ts`), both verifiers
+covering it (`verify_mastery.rs` `all_projects`, `verify_ts_mastery.py`), the second `ProjectPanel` in
+`Mastery.tsx`, and regenerated `mastery.json` / `ts_outputs.json`. State when paused: `python
+tools/verify_ts_mastery.py --only=arc-w --mastery-only` → 3 checked, 0 failures; `npx tsc --noEmit` clean. Still
+to do before committing: `cargo check --tests`, `npx vitest run`, a look in the mock preview (open week 4, 8 or 12
+→ the "🧵 The arc project" panel), then commit.
+
+**Commits this session (branch `java-course`):** bee8ab4 week 27 · d461dc6 finals round two, final exam,
+multi-file projects, Monaco lib fix · 613aa57 playground + stdin/stdout visualiser · 6e5a1ef event loop +
+promise timeline · 85fdeab week view · 1112c88 assertion panel · feefead study aids · 12e21f7 call stack,
+pipelines, tsconfig explorer, class diagram, skill radar · 1ae3cc8 project diff/history, palette, applied labels,
+month-6 checkpoint · 31b5280 29 type challenges · 56e0cfb predict-first + question stats.
+
+**Still open, roughly in value order**
+
+| # | Item | Notes |
+|---|---|---|
+| X-50 / X-100 | Cards to ≥ 12 per chapter (~1,000 total; 527 now) | Pure authoring in `TS_CARDS_MORE`; fronts must be unique across the track (attach asserts). Then add the ≥ 12-per-chapter build assert (X-100). |
+| X-31 | New quiz kinds: multi-select, fill-the-type (checked via Monaco `Expect<Equal>`), code-output | Needs `kind`/`answers`/`type_answer` on `QuizQuestion`, UI in `QuizPanel` + `MixedQuiz` + final exam, and authored questions. |
+| X-15 / X-16 / X-13 | New exercise kinds: `order` (Parsons — can be derived from existing short solutions and judged by running), `spot` (click the buggy line), `refactor` (banned tokens via `forbid`) | Add to `exerciseKinds.ts` + `ExerciseCard`. |
+| X-10 / X-11 | ≥ 3 predict / diagnose / retype / design and ≥ 2 fix **per chapter** | 67 predict, 51 diagnose, 42 fix, 0 retype, 0 design so far — volume authoring. |
+| X-104 | Scope lint: nothing uses a construct a later week teaches | Port `_SCOPE_RULES` from the TS course generator. |
+| X-17 | Chapter-level strictness for Learn exercises | Learn's `ExerciseCard` (in `Learn.tsx`) does not pass strictness/harness to the judge yet — no Learn exercise needs it today. |
+| M6-03 | Determinism check for async content | Idea: have `gen_ts_outputs.py` run every program using timers 3× under load and fail on differing output. |
+| X-37 | Explanations for wrong options | ~1,300 questions — authoring. |
+| X-22 / X-26 / X-25 | Idiomatic-TS editorials, "three ways" sets, `min_week` tags | Authoring / Library changes. |
+| X-12 | Type-graded **Library** problems | Problem sets already carry 55 type-graded problems; the Library (Solve page) itself cannot judge `types` yet. |
+| X-05 / X-07 / X-08 / X-09 | Chapter pitfall cards, errors field, cheat sheet, Python/JS comparisons | Chapter data exists in `ts_chapter_kit.py`; rendering/authoring. |
+| X-19, X-18 | Practice families; hint ladders on every exercise | Authoring. |
+| M5-01 | Stepping a conditional type's evaluation | Expansion ships in the playground; stepping does not. |
+| M3-03 | State-machine diagram | P3. |
+| X-93 | Mastery completion on heatmap/streak | Study time already counts; check what else "like other tracks" needs. |
+| X-105 | TypeScript 6.x checker | Re-run every verifier after upgrading; risky, do last. |
+
+**Traps met this session** (also in the project memory): the Bash tool's heredocs mangle `\n` and `\b` inside
+Python edit scripts — write scripts with the Write tool and run them; the mock dev server caches seeds (restart it
+after `gen_seed.py`); never regenerate seeds while `cargo test --test verify_mastery` is running; Monaco's bundled
+TypeScript 5.4 has libs only to es2023 (newer APIs go in `src/monacoLibShims.ts`).
 
 ---
 

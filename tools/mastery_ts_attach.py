@@ -181,3 +181,10 @@ console.log(input.length);
 assert TS_WEEK_ZERO["id"] not in _ts_ids
 _ts_ids.add(TS_WEEK_ZERO["id"])
 _ts_track["week_zero"] = TS_WEEK_ZERO
+
+# The arc project's early versions (mastery_ts_arc.py): a second, optional
+# project on the weeks that end months 1-3.
+for _n, _arc in TS_ARC_PROJECTS.items():
+    _aw = next(w for w in TS_WEEKS if w["week"] == _n)
+    assert len(_arc["requirements"]) >= 3 and len(_arc["tests"]) >= 5, f"arc week {_n}: needs requirements and 5+ tests"
+    _aw["arc_project"] = _arc

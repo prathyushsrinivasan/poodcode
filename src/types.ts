@@ -558,6 +558,8 @@ export interface MasteryWeek {
   problem_set?: Exercise[];
   /** The build project as a runnable brief; `project` is its one-line summary. */
   project_spec?: MasteryProjectSpec | null;
+  /** The running arc project's version for this week, beside the weekly one. */
+  arc_project?: MasteryProjectSpec | null;
   /** Alternate finals, offered on a retake after a failed attempt. */
   exam_alternates?: MasteryExam[];
   /** Capstone week only: interview questions with model answers. */

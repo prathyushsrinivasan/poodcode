@@ -140,8 +140,8 @@ fn all_projects(tracks: &[MasteryTrack]) -> Vec<(String, MasteryExam)> {
     tracks
         .iter()
         .flat_map(|t| {
-            t.weeks.iter().filter_map(move |w| {
-                w.project_spec.as_ref().map(|p| {
+            t.weeks.iter().flat_map(move |w| {
+                w.project_spec.iter().chain(w.arc_project.iter()).map(move |p| {
                     (
                         format!("{} week {} project ({})", t.key, w.week, p.title),
                         MasteryExam {

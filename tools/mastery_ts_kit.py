@@ -172,7 +172,7 @@ _PROJECT_STARTER = (
 
 
 def _project(week, title, goal, requirements, body, inputs, stretch=(), rubric=(), starter=None,
-             multi_file=False):
+             multi_file=False, eid=None):
     """`multi_file`: `body` and `starter` are whole `// @file` workspaces (X-45),
     used as they are — no stdin scaffold is prepended, `main.ts` reads stdin
     itself — and the expected outputs come from the bundled reference."""
@@ -186,7 +186,7 @@ def _project(week, title, goal, requirements, body, inputs, stretch=(), rubric=(
             "language": "typescript",
             "starter": starter.strip("\n") + "\n",
             "solution": solution,
-            "tests": _computed(f"project-w{week}", _bundle_ts(solution), inputs, strictness),
+            "tests": _computed(eid or f"project-w{week}", _bundle_ts(solution), inputs, strictness),
             "strictness": strictness,
         }
     solution = _TS_SCAFFOLD + body.strip("\n") + "\n"
@@ -197,7 +197,7 @@ def _project(week, title, goal, requirements, body, inputs, stretch=(), rubric=(
         "language": "typescript",
         "starter": _TS_SCAFFOLD + (starter.strip("\n") + "\n" if starter else _PROJECT_STARTER),
         "solution": solution,
-        "tests": _computed(f"project-w{week}", solution, inputs, strictness),
+        "tests": _computed(eid or f"project-w{week}", solution, inputs, strictness),
         "strictness": strictness,
     }
 
