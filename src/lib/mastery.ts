@@ -297,11 +297,17 @@ export function weekTools(trackKey: string, week: number): WeekTool[] {
   if (week >= 10 && week <= 13) {
     tools.push({ label: "Narrowing stepper", to: "/playground/ts", why: "a variable's type at every line (Narrowing tab)" });
   }
+  if (week === 10 || week === 12) {
+    tools.push({ label: "State machines", to: "/playground/ts", why: "a union of states and its moves, drawn (Machines tab)" });
+  }
   if (week === 14 || week === 15 || week === 16) {
     tools.push({ label: "Strictness switcher", to: "/playground/ts", why: "flip compiler flags and watch errors appear (Compiler tab)" });
   }
   if (week >= 17 && week <= 22) {
     tools.push({ label: "Type expander", to: "/playground/ts", why: "every type alias fully expanded (Types tab)" });
+  }
+  if (week >= 20 && week <= 22) {
+    tools.push({ label: "Type stepper", to: "/playground/ts", why: "a conditional type evaluated member by member (Step tab)" });
   }
   if (week === 26) {
     tools.push({ label: "Event loop", to: "/visualise/async?tab=loop", why: "step through the stack and the queues" });
