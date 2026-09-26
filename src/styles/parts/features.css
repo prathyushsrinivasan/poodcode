@@ -982,3 +982,20 @@ body.focus-mode .topbar {
 .pitfall-mark {
   color: var(--warn);
 }
+
+/* Printing a chapter cheat sheet (X-08): only the sheet reaches the paper. */
+@media print {
+  body.printing-sheet * {
+    visibility: hidden;
+  }
+  body.printing-sheet .cheat-sheet,
+  body.printing-sheet .cheat-sheet * {
+    visibility: visible;
+  }
+  body.printing-sheet .cheat-sheet {
+    position: absolute;
+    inset: 0 auto auto 0;
+    width: 100%;
+    color: #000;
+  }
+}

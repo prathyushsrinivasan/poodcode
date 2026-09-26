@@ -1,4 +1,5 @@
 import { LessonMarkdown } from "../components/LessonMarkdown";
+import { ChapterCheatSheet } from "../components/ChapterCheatSheet";
 import { AssertionPanel } from "../components/AssertionPanel";
 import { FailingCases } from "../components/OutputCompare";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -776,6 +777,18 @@ function ConceptDetail({
           <LessonMarkdown>{concept.lesson}</LessonMarkdown>
         )}
       </Section>
+
+      {conceptLang(concept) === "typescript" && (
+        <Section
+          title="📄 Cheat sheet"
+          // Folded by default: useCollapse opens sections unless toggled, so
+          // this one reads the inverse of its own key.
+          open={!sec.isOpen("cheatsheet")}
+          onToggle={() => sec.toggle("cheatsheet")}
+        >
+          <ChapterCheatSheet name={concept.name} what={concept.what} lesson={concept.lesson} />
+        </Section>
+      )}
 
       {usedDatasets.length > 0 && (
         <Section
