@@ -1703,6 +1703,54 @@
             ]
           },
           {
+            "id": "tsm-ts_variables-predict1",
+            "title": "Read the inference: `const` fixes the name, not the contents",
+            "prompt": "What type does TypeScript already infer for `user`? Annotate `check` with exactly that type — not merely one that fits. The program is the worked example “`const` fixes the name, not the contents” from Variables — let & const.",
+            "hint": "Read the declaration of `user` and what it is initialised with.",
+            "hints": [
+              "Read the declaration of `user` and what it is initialised with.",
+              "Write the type out in full — literal types, `readonly` and all — not a wider one that also fits."
+            ],
+            "language": "typescript",
+            "kind": "predict",
+            "difficulty": "Easy",
+            "strictness": "strict",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<typeof check, typeof user>>;\n",
+            "judge_mode": "types",
+            "forbid": [
+              "typeof"
+            ],
+            "starter": "const scores = [70, 85];\nscores.push(92);\nconst user = { name: \"ana\", visits: 1 };\nuser.visits += 1;\nconsole.log(scores.join(\",\"), user.visits);\nconst check: ____ = user;\n",
+            "solution": "const scores = [70, 85];\nscores.push(92);\nconst user = { name: \"ana\", visits: 1 };\nuser.visits += 1;\nconsole.log(scores.join(\",\"), user.visits);\nconst check: { name: string; visits: number; } = user;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-ts_variables-predict2",
+            "title": "Read the inference: Shadowing: an inner name hides an outer one",
+            "prompt": "What type does TypeScript already infer for `label`? Annotate `check` with exactly that type — not merely one that fits. The program is the worked example “Shadowing: an inner name hides an outer one” from Variables — let & const.",
+            "hint": "Read the declaration of `label` and what it is initialised with.",
+            "hints": [
+              "Read the declaration of `label` and what it is initialised with.",
+              "Write the type out in full — literal types, `readonly` and all — not a wider one that also fits."
+            ],
+            "language": "typescript",
+            "kind": "predict",
+            "difficulty": "Easy",
+            "strictness": "strict",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<typeof check, typeof label>>;\n",
+            "judge_mode": "types",
+            "forbid": [
+              "typeof"
+            ],
+            "starter": "const label = \"outer\";\nfunction show(): string {\n  const label = \"inner\";\n  return label;\n}\n{\n  const label = \"block\";\n  console.log(label);\n}\nconsole.log(show(), label);\nconst check: ____ = label;\n",
+            "solution": "const label = \"outer\";\nfunction show(): string {\n  const label = \"inner\";\n  return label;\n}\n{\n  const label = \"block\";\n  console.log(label);\n}\nconsole.log(show(), label);\nconst check: \"outer\" = label;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
             "id": "tsm-ts_types-order1",
             "title": "Put it in order: What each value is at runtime",
             "prompt": "The lines of the worked example “What each value is at runtime” from Primitive Types & Annotations, shuffled. Put them back in an order that compiles and prints exactly:\n\n    42 -> number\n    hi -> string\n    true -> boolean\n    null -> null\n    undefined -> undefined\n    1 -> array\n    [object Object] -> object\n    10 -> bigint",
@@ -1783,6 +1831,30 @@
             "lines": [
               2
             ]
+          },
+          {
+            "id": "tsm-ts_types-predict1",
+            "title": "Read the inference: `null` and `undefined` in data",
+            "prompt": "What type does TypeScript already infer for `profile`? Annotate `check` with exactly that type — not merely one that fits. The program is the worked example “`null` and `undefined` in data” from Primitive Types & Annotations.",
+            "hint": "Read the declaration of `profile` and what it is initialised with.",
+            "hints": [
+              "Read the declaration of `profile` and what it is initialised with.",
+              "Write the type out in full — literal types, `readonly` and all — not a wider one that also fits."
+            ],
+            "language": "typescript",
+            "kind": "predict",
+            "difficulty": "Easy",
+            "strictness": "strict",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<typeof check, typeof profile>>;\n",
+            "judge_mode": "types",
+            "forbid": [
+              "typeof"
+            ],
+            "starter": "const profile = { name: \"ana\", nickname: null, age: undefined };\nconsole.log(JSON.stringify(profile));\nconsole.log(\"nickname\" in profile, \"age\" in profile, profile.age === undefined);\nconst check: ____ = profile;\n",
+            "solution": "const profile = { name: \"ana\", nickname: null, age: undefined };\nconsole.log(JSON.stringify(profile));\nconsole.log(\"nickname\" in profile, \"age\" in profile, profile.age === undefined);\nconst check: { name: string; nickname: null; age: undefined; } = profile;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
           },
           {
             "id": "tsm-ts_inference-order1",
@@ -3857,6 +3929,30 @@
             ]
           },
           {
+            "id": "tsm-ts_operators-predict1",
+            "title": "Read the inference: Integer arithmetic on floating-point numbers",
+            "prompt": "What type does TypeScript already infer for `minutes`? Annotate `check` with exactly that type — not merely one that fits. The program is the worked example “Integer arithmetic on floating-point numbers” from Operators & Expressions.",
+            "hint": "Read the declaration of `minutes` and what it is initialised with.",
+            "hints": [
+              "Read the declaration of `minutes` and what it is initialised with.",
+              "Write the type out in full — literal types, `readonly` and all — not a wider one that also fits."
+            ],
+            "language": "typescript",
+            "kind": "predict",
+            "difficulty": "Easy",
+            "strictness": "strict",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<typeof check, typeof minutes>>;\n",
+            "judge_mode": "types",
+            "forbid": [
+              "typeof"
+            ],
+            "starter": "const minutes = 137;\nconsole.log(Math.trunc(minutes / 60), minutes % 60);\nconsole.log(2 ** 10, 7 / 2, Math.floor(7 / 2));\nconst check: ____ = minutes;\n",
+            "solution": "const minutes = 137;\nconsole.log(Math.trunc(minutes / 60), minutes % 60);\nconsole.log(2 ** 10, 7 / 2, Math.floor(7 / 2));\nconst check: 137 = minutes;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
             "id": "tsm-ts_equality-order1",
             "title": "Put it in order: Identity, not contents",
             "prompt": "The lines of the worked example “Identity, not contents” from Equality & Truthiness, shuffled. Put them back in an order that compiles and prints exactly:\n\n    false true\n    true\n    3",
@@ -4032,6 +4128,30 @@
             ]
           },
           {
+            "id": "tsm-ts_equality-predict1",
+            "title": "Read the inference: `??` keeps the zero `||` throws away",
+            "prompt": "What type does TypeScript already infer for `typed`? Annotate `check` with exactly that type — not merely one that fits. The program is the worked example “`??` keeps the zero `||` throws away” from Equality & Truthiness.",
+            "hint": "Read the declaration of `typed` and what it is initialised with.",
+            "hints": [
+              "Read the declaration of `typed` and what it is initialised with.",
+              "Write the type out in full — literal types, `readonly` and all — not a wider one that also fits."
+            ],
+            "language": "typescript",
+            "kind": "predict",
+            "difficulty": "Easy",
+            "strictness": "strict",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<typeof check, typeof typed>>;\n",
+            "judge_mode": "types",
+            "forbid": [
+              "typeof"
+            ],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst typed = input === \"\" ? undefined : Number(input);\nconsole.log(\"with ||:\", typed || 10);\nconsole.log(\"with ??:\", typed ?? 10);\nconst check: ____ = typed;\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst typed = input === \"\" ? undefined : Number(input);\nconsole.log(\"with ||:\", typed || 10);\nconsole.log(\"with ??:\", typed ?? 10);\nconst check: number | undefined = typed;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
             "id": "tsm-ts_conditionals-order1",
             "title": "Put it in order: Guard clauses keep the main path flat",
             "prompt": "The lines of the worked example “Guard clauses keep the main path flat” from Conditionals & Truthiness, shuffled. Put them back in an order that compiles and prints exactly:\n\n    A B C out of range invalid",
@@ -4140,6 +4260,30 @@
             "lines": [
               3
             ]
+          },
+          {
+            "id": "tsm-ts_conditionals-predict1",
+            "title": "Read the inference: A ternary for a value, `if` for an action",
+            "prompt": "What type does TypeScript already infer for `noun`? Annotate `check` with exactly that type — not merely one that fits. The program is the worked example “A ternary for a value, `if` for an action” from Conditionals & Truthiness.",
+            "hint": "Read the declaration of `noun` and what it is initialised with.",
+            "hints": [
+              "Read the declaration of `noun` and what it is initialised with.",
+              "Write the type out in full — literal types, `readonly` and all — not a wider one that also fits."
+            ],
+            "language": "typescript",
+            "kind": "predict",
+            "difficulty": "Easy",
+            "strictness": "strict",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<typeof check, typeof noun>>;\n",
+            "judge_mode": "types",
+            "forbid": [
+              "typeof"
+            ],
+            "starter": "const items = [\"pen\"];\nconst noun = items.length === 1 ? \"item\" : \"items\";\nconsole.log(`${items.length} ${noun}`);\nif (items.length > 0) {\n  console.log(\"first: \" + items[0]);\n}\nconst check: ____ = noun;\n",
+            "solution": "const items = [\"pen\"];\nconst noun = items.length === 1 ? \"item\" : \"items\";\nconsole.log(`${items.length} ${noun}`);\nif (items.length > 0) {\n  console.log(\"first: \" + items[0]);\n}\nconst check: \"item\" | \"items\" = noun;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
           }
         ],
         "optional": false,
@@ -8446,6 +8590,30 @@
             "lines": [
               2
             ]
+          },
+          {
+            "id": "tsm-ts_strings-predict1",
+            "title": "Read the inference: Template literals for output",
+            "prompt": "What type does TypeScript already infer for `name`? Annotate `check` with exactly that type — not merely one that fits. The program is the worked example “Template literals for output” from Strings & Template Literals.",
+            "hint": "Read the declaration of `name` and what it is initialised with.",
+            "hints": [
+              "Read the declaration of `name` and what it is initialised with.",
+              "Write the type out in full — literal types, `readonly` and all — not a wider one that also fits."
+            ],
+            "language": "typescript",
+            "kind": "predict",
+            "difficulty": "Easy",
+            "strictness": "strict",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<typeof check, typeof name>>;\n",
+            "judge_mode": "types",
+            "forbid": [
+              "typeof"
+            ],
+            "starter": "const name = \"Ada\";\nconst items = [\"pen\", \"cup\"];\nconst receipt = `Customer: ${name}\nItems: ${items.length} (${items.join(\", \")})\nTotal: $${(12.5).toFixed(2)}`;\nconsole.log(receipt);\nconst check: ____ = name;\n",
+            "solution": "const name = \"Ada\";\nconst items = [\"pen\", \"cup\"];\nconst receipt = `Customer: ${name}\nItems: ${items.length} (${items.join(\", \")})\nTotal: $${(12.5).toFixed(2)}`;\nconsole.log(receipt);\nconst check: \"Ada\" = name;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
           },
           {
             "id": "tsm-ts_string_methods-order1",
@@ -14986,6 +15154,30 @@
             ]
           },
           {
+            "id": "tsm-ts_arrays-predict1",
+            "title": "Read the inference: Copies are shallow",
+            "prompt": "What type does TypeScript already infer for `team`? Annotate `check` with exactly that type — not merely one that fits. The program is the worked example “Copies are shallow” from Arrays & Tuples.",
+            "hint": "Read the declaration of `team` and what it is initialised with.",
+            "hints": [
+              "Read the declaration of `team` and what it is initialised with.",
+              "Write the type out in full — literal types, `readonly` and all — not a wider one that also fits."
+            ],
+            "language": "typescript",
+            "kind": "predict",
+            "difficulty": "Easy",
+            "strictness": "strict",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<typeof check, typeof team>>;\n",
+            "judge_mode": "types",
+            "forbid": [
+              "typeof"
+            ],
+            "starter": "const team = [{ name: \"ana\", score: 1 }, { name: \"bo\", score: 2 }];\nconst copy = [...team];\ncopy.push({ name: \"cy\", score: 3 });\ncopy[0]!.score = 99;\nconsole.log(team.length, copy.length, team[0]!.score);\nconst check: ____ = team;\n",
+            "solution": "const team = [{ name: \"ana\", score: 1 }, { name: \"bo\", score: 2 }];\nconst copy = [...team];\ncopy.push({ name: \"cy\", score: 3 });\ncopy[0]!.score = 99;\nconsole.log(team.length, copy.length, team[0]!.score);\nconst check: { name: string; score: number; }[] = team;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
             "id": "tsm-ts_array_methods-order1",
             "title": "Put it in order: `reduce` into a lookup",
             "prompt": "The lines of the worked example “`reduce` into a lookup” from Array Methods, shuffled. Put them back in an order that compiles and prints exactly:\n\n    {\"ts\":3,\"go\":2,\"rust\":1}",
@@ -15094,6 +15286,30 @@
             "lines": [
               2
             ]
+          },
+          {
+            "id": "tsm-ts_array_methods-predict1",
+            "title": "Read the inference: Update one element without mutating",
+            "prompt": "What type does TypeScript already infer for `tasks`? Annotate `check` with exactly that type — not merely one that fits. The program is the worked example “Update one element without mutating” from Array Methods.",
+            "hint": "Read the declaration of `tasks` and what it is initialised with.",
+            "hints": [
+              "Read the declaration of `tasks` and what it is initialised with.",
+              "Write the type out in full — literal types, `readonly` and all — not a wider one that also fits."
+            ],
+            "language": "typescript",
+            "kind": "predict",
+            "difficulty": "Easy",
+            "strictness": "strict",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<typeof check, typeof tasks>>;\n",
+            "judge_mode": "types",
+            "forbid": [
+              "typeof"
+            ],
+            "starter": "const tasks = [{ id: 1, done: false }, { id: 2, done: false }];\nconst i = tasks.findIndex((t) => t.id === 2);\nconst updated = i < 0 ? tasks : tasks.with(i, { id: 2, done: true });\nconsole.log(JSON.stringify(updated), tasks[1]?.done);\nconst check: ____ = tasks;\n",
+            "solution": "const tasks = [{ id: 1, done: false }, { id: 2, done: false }];\nconst i = tasks.findIndex((t) => t.id === 2);\nconst updated = i < 0 ? tasks : tasks.with(i, { id: 2, done: true });\nconsole.log(JSON.stringify(updated), tasks[1]?.done);\nconst check: { id: number; done: boolean; }[] = tasks;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
           },
           {
             "id": "tsm-ts_tuples-order1",
@@ -15237,6 +15453,30 @@
             ]
           },
           {
+            "id": "tsm-ts_tuples-predict1",
+            "title": "Read the inference: Entries are tuples",
+            "prompt": "What type does TypeScript already infer for `entries`? Annotate `check` with exactly that type — not merely one that fits. The program is the worked example “Entries are tuples” from Tuples.",
+            "hint": "Read the declaration of `entries` and what it is initialised with.",
+            "hints": [
+              "Read the declaration of `entries` and what it is initialised with.",
+              "Write the type out in full — literal types, `readonly` and all — not a wider one that also fits."
+            ],
+            "language": "typescript",
+            "kind": "predict",
+            "difficulty": "Easy",
+            "strictness": "strict",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<typeof check, typeof entries>>;\n",
+            "judge_mode": "types",
+            "forbid": [
+              "typeof"
+            ],
+            "starter": "const stock: Record<string, number> = { apples: 3, pears: 0, figs: 12 };\nconst entries = Object.entries(stock);\nconst sorted = [...entries].sort((a, b) => b[1] - a[1]);\nfor (const [fruit, count] of sorted) console.log(`${fruit.padEnd(6)} ${count}`);\nconst counts = new Map<string, number>(entries);\nconsole.log(counts.get(\"figs\"));\nconst check: ____ = entries;\n",
+            "solution": "const stock: Record<string, number> = { apples: 3, pears: 0, figs: 12 };\nconst entries = Object.entries(stock);\nconst sorted = [...entries].sort((a, b) => b[1] - a[1]);\nfor (const [fruit, count] of sorted) console.log(`${fruit.padEnd(6)} ${count}`);\nconst counts = new Map<string, number>(entries);\nconsole.log(counts.get(\"figs\"));\nconst check: [string, number][] = entries;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
             "id": "tsm-ts_array_modern-order1",
             "title": "Put it in order: Grouping and flat-mapping",
             "prompt": "The lines of the worked example “Grouping and flat-mapping” from Modern Array Methods, shuffled. Put them back in an order that compiles and — given the input below — prints exactly the output below.\n\nInput:\n    the cat sat on a mat\n\nPrints:\n    1: a\n    2: on\n    3: the, cat, sat, mat\n    15 letters, 9 distinct",
@@ -15349,6 +15589,54 @@
             "lines": [
               1
             ]
+          },
+          {
+            "id": "tsm-ts_array_modern-predict1",
+            "title": "Read the inference: Grouping and flat-mapping",
+            "prompt": "What type does TypeScript already infer for `byLength`? Annotate `check` with exactly that type — not merely one that fits. The program is the worked example “Grouping and flat-mapping” from Modern Array Methods.",
+            "hint": "Read the declaration of `byLength` and what it is initialised with.",
+            "hints": [
+              "Read the declaration of `byLength` and what it is initialised with.",
+              "Write the type out in full — literal types, `readonly` and all — not a wider one that also fits."
+            ],
+            "language": "typescript",
+            "kind": "predict",
+            "difficulty": "Easy",
+            "strictness": "strict",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<typeof check, typeof byLength>>;\n",
+            "judge_mode": "types",
+            "forbid": [
+              "typeof"
+            ],
+            "starter": "import * as fs from \"fs\";\nconst words = fs.readFileSync(0, \"utf8\").trim().split(/\\s+/);\nconst byLength = Object.groupBy(words, (w) => String(w.length));\nfor (const [len, group] of Object.entries(byLength)) {\n  console.log(`${len}: ${(group ?? []).join(\", \")}`);\n}\nconst letters = words.flatMap((w) => [...w.toLowerCase()]);\nconsole.log(`${letters.length} letters, ${new Set(letters).size} distinct`);\nconst check: ____ = byLength;\n",
+            "solution": "import * as fs from \"fs\";\nconst words = fs.readFileSync(0, \"utf8\").trim().split(/\\s+/);\nconst byLength = Object.groupBy(words, (w) => String(w.length));\nfor (const [len, group] of Object.entries(byLength)) {\n  console.log(`${len}: ${(group ?? []).join(\", \")}`);\n}\nconst letters = words.flatMap((w) => [...w.toLowerCase()]);\nconsole.log(`${letters.length} letters, ${new Set(letters).size} distinct`);\nconst check: Partial<Record<string, string[]>> = byLength;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-ts_array_modern-predict2",
+            "title": "Read the inference: Copies that go all the way down",
+            "prompt": "What type does TypeScript already infer for `original`? Annotate `check` with exactly that type — not merely one that fits. The program is the worked example “Copies that go all the way down” from Modern Array Methods.",
+            "hint": "Read the declaration of `original` and what it is initialised with.",
+            "hints": [
+              "Read the declaration of `original` and what it is initialised with.",
+              "Write the type out in full — literal types, `readonly` and all — not a wider one that also fits."
+            ],
+            "language": "typescript",
+            "kind": "predict",
+            "difficulty": "Easy",
+            "strictness": "strict",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<typeof check, typeof original>>;\n",
+            "judge_mode": "types",
+            "forbid": [
+              "typeof"
+            ],
+            "starter": "const original = { name: \"cart\", items: [{ sku: \"a1\", qty: 1 }] };\nconst shallow = { ...original, items: [...original.items] };\nconst deep = structuredClone(original);\nshallow.items[0].qty = 5;\ndeep.items[0].qty = 99;\nconsole.log(original.items[0].qty, shallow.items[0].qty, deep.items[0].qty);\nconst squares = Array.from({ length: 5 }, (_, i) => i * i);\nconsole.log(squares.with(0, -1).join(\" \"), \"|\", squares.join(\" \"));\nconst check: ____ = original;\n",
+            "solution": "const original = { name: \"cart\", items: [{ sku: \"a1\", qty: 1 }] };\nconst shallow = { ...original, items: [...original.items] };\nconst deep = structuredClone(original);\nshallow.items[0].qty = 5;\ndeep.items[0].qty = 99;\nconsole.log(original.items[0].qty, shallow.items[0].qty, deep.items[0].qty);\nconst squares = Array.from({ length: 5 }, (_, i) => i * i);\nconsole.log(squares.with(0, -1).join(\" \"), \"|\", squares.join(\" \"));\nconst check: { name: string; items: { sku: string; qty: number; }[]; } = original;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
           }
         ],
         "optional": false,
@@ -17512,6 +17800,54 @@
             ]
           },
           {
+            "id": "tsm-ts_objects-predict1",
+            "title": "Read the inference: Shorthand and computed keys",
+            "prompt": "What type does TypeScript already infer for `name`? Annotate `check` with exactly that type — not merely one that fits. The program is the worked example “Shorthand and computed keys” from Objects.",
+            "hint": "Read the declaration of `name` and what it is initialised with.",
+            "hints": [
+              "Read the declaration of `name` and what it is initialised with.",
+              "Write the type out in full — literal types, `readonly` and all — not a wider one that also fits."
+            ],
+            "language": "typescript",
+            "kind": "predict",
+            "difficulty": "Easy",
+            "strictness": "strict",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<typeof check, typeof name>>;\n",
+            "judge_mode": "types",
+            "forbid": [
+              "typeof"
+            ],
+            "starter": "const name = \"ana\";\nconst role = \"admin\";\nconst field = \"lastLogin\";\nconst user = { name, role, [field]: \"2026-09-01\", [`${role}Since`]: 2024 };\nconsole.log(JSON.stringify(user));\nconst check: ____ = name;\n",
+            "solution": "const name = \"ana\";\nconst role = \"admin\";\nconst field = \"lastLogin\";\nconst user = { name, role, [field]: \"2026-09-01\", [`${role}Since`]: 2024 };\nconsole.log(JSON.stringify(user));\nconst check: \"ana\" = name;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-ts_objects-predict2",
+            "title": "Read the inference: Transforming every value",
+            "prompt": "What type does TypeScript already infer for `prices`? Annotate `check` with exactly that type — not merely one that fits. The program is the worked example “Transforming every value” from Objects.",
+            "hint": "Read the declaration of `prices` and what it is initialised with.",
+            "hints": [
+              "Read the declaration of `prices` and what it is initialised with.",
+              "Write the type out in full — literal types, `readonly` and all — not a wider one that also fits."
+            ],
+            "language": "typescript",
+            "kind": "predict",
+            "difficulty": "Easy",
+            "strictness": "strict",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<typeof check, typeof prices>>;\n",
+            "judge_mode": "types",
+            "forbid": [
+              "typeof"
+            ],
+            "starter": "const prices = { pen: 1.5, cup: 4, ink: 12 };\nconst withTax = Object.fromEntries(Object.entries(prices).map(([item, p]) => [item, Number((p * 1.2).toFixed(2))]));\nconsole.log(JSON.stringify(withTax));\nconst check: ____ = prices;\n",
+            "solution": "const prices = { pen: 1.5, cup: 4, ink: 12 };\nconst withTax = Object.fromEntries(Object.entries(prices).map(([item, p]) => [item, Number((p * 1.2).toFixed(2))]));\nconsole.log(JSON.stringify(withTax));\nconst check: { pen: number; cup: number; ink: number; } = prices;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
             "id": "tsm-ts_json-order1",
             "title": "Put it in order: Parsing that can't crash",
             "prompt": "The lines of the worked example “Parsing that can't crash” from JSON: parse & stringify, shuffled. Put them back in an order that compiles and prints exactly:\n\n    object: {\"ok\":true}\n    invalid JSON\n    number: 42\n    object: null",
@@ -17592,6 +17928,30 @@
             "lines": [
               2
             ]
+          },
+          {
+            "id": "tsm-ts_json-predict1",
+            "title": "Read the inference: Pretty output, and choosing the keys",
+            "prompt": "What type does TypeScript already infer for `user`? Annotate `check` with exactly that type — not merely one that fits. The program is the worked example “Pretty output, and choosing the keys” from JSON: parse & stringify.",
+            "hint": "Read the declaration of `user` and what it is initialised with.",
+            "hints": [
+              "Read the declaration of `user` and what it is initialised with.",
+              "Write the type out in full — literal types, `readonly` and all — not a wider one that also fits."
+            ],
+            "language": "typescript",
+            "kind": "predict",
+            "difficulty": "Easy",
+            "strictness": "strict",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<typeof check, typeof user>>;\n",
+            "judge_mode": "types",
+            "forbid": [
+              "typeof"
+            ],
+            "starter": "const user = { id: 7, name: \"ana\", password: \"hunter2\", roles: [\"admin\"] };\nconsole.log(JSON.stringify(user, [\"id\", \"name\", \"roles\"], 2));\nconst check: ____ = user;\n",
+            "solution": "const user = { id: 7, name: \"ana\", password: \"hunter2\", roles: [\"admin\"] };\nconsole.log(JSON.stringify(user, [\"id\", \"name\", \"roles\"], 2));\nconst check: { id: number; name: string; password: string; roles: string[]; } = user;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
           },
           {
             "id": "tsm-ts_interfaces_types-order1",
@@ -17845,6 +18205,30 @@
             "lines": [
               1
             ]
+          },
+          {
+            "id": "tsm-ts_index_signatures-predict1",
+            "title": "Read the inference: Counting with an index signature",
+            "prompt": "What type does TypeScript already infer for `top`? Annotate `check` with exactly that type — not merely one that fits. The program is the worked example “Counting with an index signature” from Index Signatures & Records.",
+            "hint": "Read the declaration of `top` and what it is initialised with.",
+            "hints": [
+              "Read the declaration of `top` and what it is initialised with.",
+              "Write the type out in full — literal types, `readonly` and all — not a wider one that also fits."
+            ],
+            "language": "typescript",
+            "kind": "predict",
+            "difficulty": "Easy",
+            "strictness": "strict",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<typeof check, typeof top>>;\n",
+            "judge_mode": "types",
+            "forbid": [
+              "typeof"
+            ],
+            "starter": "import * as fs from \"fs\";\nconst words = fs.readFileSync(0, \"utf8\").trim().toLowerCase().split(/\\s+/);\nconst counts: { [word: string]: number } = {};\nfor (const w of words) counts[w] = (counts[w] ?? 0) + 1;\nconst top = Object.entries(counts).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));\nfor (const [word, n] of top.slice(0, 3)) console.log(`${word} ${n}`);\nconst check: ____ = top;\n",
+            "solution": "import * as fs from \"fs\";\nconst words = fs.readFileSync(0, \"utf8\").trim().toLowerCase().split(/\\s+/);\nconst counts: { [word: string]: number } = {};\nfor (const w of words) counts[w] = (counts[w] ?? 0) + 1;\nconst top = Object.entries(counts).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));\nfor (const [word, n] of top.slice(0, 3)) console.log(`${word} ${n}`);\nconst check: [string, number][] = top;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
           }
         ],
         "optional": false,
@@ -19636,6 +20020,30 @@
             ]
           },
           {
+            "id": "tsm-ts_maps_sets-predict1",
+            "title": "Read the inference: The three most common words",
+            "prompt": "What type does TypeScript already infer for `top`? Annotate `check` with exactly that type — not merely one that fits. The program is the worked example “The three most common words” from Map & Set.",
+            "hint": "Read the declaration of `top` and what it is initialised with.",
+            "hints": [
+              "Read the declaration of `top` and what it is initialised with.",
+              "Write the type out in full — literal types, `readonly` and all — not a wider one that also fits."
+            ],
+            "language": "typescript",
+            "kind": "predict",
+            "difficulty": "Easy",
+            "strictness": "strict",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<typeof check, typeof top>>;\n",
+            "judge_mode": "types",
+            "forbid": [
+              "typeof"
+            ],
+            "starter": "const text = \"the cat sat on the mat the cat ran\";\nconst counts = new Map<string, number>();\nfor (const w of text.split(\" \")) counts.set(w, (counts.get(w) ?? 0) + 1);\nconst top = [...counts].sort(([a, x], [b, y]) => y - x || a.localeCompare(b)).slice(0, 3);\nconsole.log(top.map(([w, n]) => `${w}=${n}`).join(\" \"));\nconst check: ____ = top;\n",
+            "solution": "const text = \"the cat sat on the mat the cat ran\";\nconst counts = new Map<string, number>();\nfor (const w of text.split(\" \")) counts.set(w, (counts.get(w) ?? 0) + 1);\nconst top = [...counts].sort(([a, x], [b, y]) => y - x || a.localeCompare(b)).slice(0, 3);\nconsole.log(top.map(([w, n]) => `${w}=${n}`).join(\" \"));\nconst check: [string, number][] = top;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
             "id": "tsm-ts_set_algebra-order1",
             "title": "Put it in order: Tag algebra",
             "prompt": "The lines of the worked example “Tag algebra” from Set Algebra, Grouping & Weak Collections, shuffled. Put them back in an order that compiles and — given the input below — prints exactly the output below.\n\nInput:\n    ts js web\n    js web css\n\nPrints:\n    both:      js web\n    either:    ts js web css\n    only a:    ts\n    only one:  ts css\n    a within b? false | share nothing? false",
@@ -19748,6 +20156,54 @@
             "lines": [
               2
             ]
+          },
+          {
+            "id": "tsm-ts_set_algebra-predict1",
+            "title": "Read the inference: Grouping by a numeric key",
+            "prompt": "What type does TypeScript already infer for `byDecade`? Annotate `check` with exactly that type — not merely one that fits. The program is the worked example “Grouping by a numeric key” from Set Algebra, Grouping & Weak Collections.",
+            "hint": "Read the declaration of `byDecade` and what it is initialised with.",
+            "hints": [
+              "Read the declaration of `byDecade` and what it is initialised with.",
+              "Write the type out in full — literal types, `readonly` and all — not a wider one that also fits."
+            ],
+            "language": "typescript",
+            "kind": "predict",
+            "difficulty": "Easy",
+            "strictness": "strict",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<typeof check, typeof byDecade>>;\n",
+            "judge_mode": "types",
+            "forbid": [
+              "typeof"
+            ],
+            "starter": "const scores = [91, 78, 85, 62, 99, 70, 88];\nconst byDecade = Map.groupBy(scores, (s) => Math.floor(s / 10) * 10);\nfor (const [decade, group] of [...byDecade].sort((x, y) => y[0] - x[0])) {\n  console.log(`${decade}s: ${group.join(\" \")}`);\n}\nconst check: ____ = byDecade;\n",
+            "solution": "const scores = [91, 78, 85, 62, 99, 70, 88];\nconst byDecade = Map.groupBy(scores, (s) => Math.floor(s / 10) * 10);\nfor (const [decade, group] of [...byDecade].sort((x, y) => y[0] - x[0])) {\n  console.log(`${decade}s: ${group.join(\" \")}`);\n}\nconst check: Map<number, number[]> = byDecade;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-ts_set_algebra-predict2",
+            "title": "Read the inference: Remembering things about objects",
+            "prompt": "What type does TypeScript already infer for `leaf`? Annotate `check` with exactly that type — not merely one that fits. The program is the worked example “Remembering things about objects” from Set Algebra, Grouping & Weak Collections.",
+            "hint": "Read the declaration of `leaf` and what it is initialised with.",
+            "hints": [
+              "Read the declaration of `leaf` and what it is initialised with.",
+              "Write the type out in full — literal types, `readonly` and all — not a wider one that also fits."
+            ],
+            "language": "typescript",
+            "kind": "predict",
+            "difficulty": "Easy",
+            "strictness": "strict",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<typeof check, typeof leaf>>;\n",
+            "judge_mode": "types",
+            "forbid": [
+              "typeof"
+            ],
+            "starter": "type Node = { id: string; children: Node[] };\nconst sizeCache = new WeakMap<Node, number>();\nlet computed = 0;\nfunction size(node: Node): number {\n  const cached = sizeCache.get(node);\n  if (cached !== undefined) return cached;\n  computed++;\n  let total = 1;\n  for (const child of node.children) total += size(child);\n  sizeCache.set(node, total);\n  return total;\n}\nconst leaf = { id: \"leaf\", children: [] };\nconst tree: Node = { id: \"root\", children: [{ id: \"a\", children: [leaf] }, leaf] };\nconsole.log(size(tree), size(tree), `computed ${computed}`);\nconst check: ____ = leaf;\n",
+            "solution": "type Node = { id: string; children: Node[] };\nconst sizeCache = new WeakMap<Node, number>();\nlet computed = 0;\nfunction size(node: Node): number {\n  const cached = sizeCache.get(node);\n  if (cached !== undefined) return cached;\n  computed++;\n  let total = 1;\n  for (const child of node.children) total += size(child);\n  sizeCache.set(node, total);\n  return total;\n}\nconst leaf = { id: \"leaf\", children: [] };\nconst tree: Node = { id: \"root\", children: [{ id: \"a\", children: [leaf] }, leaf] };\nconsole.log(size(tree), size(tree), `computed ${computed}`);\nconst check: { id: string; children: never[]; } = leaf;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
           }
         ],
         "optional": false,
@@ -21778,6 +22234,30 @@
               4,
               5
             ]
+          },
+          {
+            "id": "tsm-ts_literal_inference-predict1",
+            "title": "Read the inference: Where a literal widens",
+            "prompt": "What type does TypeScript already infer for `request`? Annotate `check` with exactly that type — not merely one that fits. The program is the worked example “Where a literal widens” from Literal Types, Widening & `as const`.",
+            "hint": "Read the declaration of `request` and what it is initialised with.",
+            "hints": [
+              "Read the declaration of `request` and what it is initialised with.",
+              "Write the type out in full — literal types, `readonly` and all — not a wider one that also fits."
+            ],
+            "language": "typescript",
+            "kind": "predict",
+            "difficulty": "Easy",
+            "strictness": "strict",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<typeof check, typeof request>>;\n",
+            "judge_mode": "types",
+            "forbid": [
+              "typeof"
+            ],
+            "starter": "type Method = \"GET\" | \"POST\";\nfunction send(method: Method, path: string): string {\n  return `${method} ${path}`;\n}\n\nconst fixed = \"GET\";\nconst request = { method: \"POST\", path: \"/items\" } as const;\nconst table = { method: \"GET\" as Method, path: \"/\" };\n\nconsole.log(send(fixed, \"/health\"));\nconsole.log(send(request.method, request.path));\nconsole.log(send(table.method, table.path));\nconst check: ____ = request;\n",
+            "solution": "type Method = \"GET\" | \"POST\";\nfunction send(method: Method, path: string): string {\n  return `${method} ${path}`;\n}\n\nconst fixed = \"GET\";\nconst request = { method: \"POST\", path: \"/items\" } as const;\nconst table = { method: \"GET\" as Method, path: \"/\" };\n\nconsole.log(send(fixed, \"/health\"));\nconsole.log(send(request.method, request.path));\nconsole.log(send(table.method, table.path));\nconst check: { readonly method: \"POST\"; readonly path: \"/items\"; } = request;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
           },
           {
             "id": "tsm-ts_enums-order1",
@@ -23930,6 +24410,30 @@
             ]
           },
           {
+            "id": "tsm-ts_type_predicates-predict1",
+            "title": "Read the inference: A predicate that makes `filter` precise",
+            "prompt": "What type does TypeScript already infer for `raw`? Annotate `check` with exactly that type — not merely one that fits. The program is the worked example “A predicate that makes `filter` precise” from User-Defined Type Guards.",
+            "hint": "Read the declaration of `raw` and what it is initialised with.",
+            "hints": [
+              "Read the declaration of `raw` and what it is initialised with.",
+              "Write the type out in full — literal types, `readonly` and all — not a wider one that also fits."
+            ],
+            "language": "typescript",
+            "kind": "predict",
+            "difficulty": "Easy",
+            "strictness": "strict",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<typeof check, typeof raw>>;\n",
+            "judge_mode": "types",
+            "forbid": [
+              "typeof"
+            ],
+            "starter": "const isNonEmpty = (s: string | null | undefined): s is string => s !== null && s !== undefined && s.trim() !== \"\";\nconst raw = [\"ana\", \"\", null, \"bo\", undefined, \"  \"];\nconst names = raw.filter(isNonEmpty);\nconsole.log(names.map((n) => n.toUpperCase()).join(\",\"));\nconst check: ____ = raw;\n",
+            "solution": "const isNonEmpty = (s: string | null | undefined): s is string => s !== null && s !== undefined && s.trim() !== \"\";\nconst raw = [\"ana\", \"\", null, \"bo\", undefined, \"  \"];\nconst names = raw.filter(isNonEmpty);\nconsole.log(names.map((n) => n.toUpperCase()).join(\",\"));\nconst check: (string | null | undefined)[] = raw;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
             "id": "tsm-ts_nullish-order1",
             "title": "Put it in order: A lazily filled cache with `??=`",
             "prompt": "The lines of the worked example “A lazily filled cache with `??=`” from null, undefined & Strict Checks, shuffled. Put them back in an order that compiles and prints exactly:\n\n    #101 #11 #101 #101 computed 2",
@@ -24180,6 +24684,30 @@
             "lines": [
               2
             ]
+          },
+          {
+            "id": "tsm-ts_control_flow-predict1",
+            "title": "Read the inference: `filter` that narrows by itself",
+            "prompt": "What type does TypeScript already infer for `parsed`? Annotate `check` with exactly that type — not merely one that fits. The program is the worked example “`filter` that narrows by itself” from Control-Flow Analysis.",
+            "hint": "Read the declaration of `parsed` and what it is initialised with.",
+            "hints": [
+              "Read the declaration of `parsed` and what it is initialised with.",
+              "Write the type out in full — literal types, `readonly` and all — not a wider one that also fits."
+            ],
+            "language": "typescript",
+            "kind": "predict",
+            "difficulty": "Easy",
+            "strictness": "strict",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<typeof check, typeof parsed>>;\n",
+            "judge_mode": "types",
+            "forbid": [
+              "typeof"
+            ],
+            "starter": "import * as fs from \"fs\";\nconst raw = fs.readFileSync(0, \"utf8\").trim().split(/\\s+/);\nconst parsed = raw.map((t) => (/^-?\\d+$/.test(t) ? Number(t) : undefined));\nconst numbers = parsed.filter((n) => n !== undefined);\nconst total = numbers.reduce((a, b) => a + b, 0);\nconsole.log(`${numbers.length} numbers, total ${total}, ${parsed.length - numbers.length} skipped`);\nconst check: ____ = parsed;\n",
+            "solution": "import * as fs from \"fs\";\nconst raw = fs.readFileSync(0, \"utf8\").trim().split(/\\s+/);\nconst parsed = raw.map((t) => (/^-?\\d+$/.test(t) ? Number(t) : undefined));\nconst numbers = parsed.filter((n) => n !== undefined);\nconst total = numbers.reduce((a, b) => a + b, 0);\nconsole.log(`${numbers.length} numbers, total ${total}, ${parsed.length - numbers.length} skipped`);\nconst check: (number | undefined)[] = parsed;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
           }
         ],
         "optional": false,
@@ -27629,6 +28157,30 @@
             ]
           },
           {
+            "id": "tsm-ts_function_types-predict1",
+            "title": "Read the inference: A function that carries a property",
+            "prompt": "What type does TypeScript already infer for `money`? Annotate `check` with exactly that type — not merely one that fits. The program is the worked example “A function that carries a property” from Function Types in Depth.",
+            "hint": "Read the declaration of `money` and what it is initialised with.",
+            "hints": [
+              "Read the declaration of `money` and what it is initialised with.",
+              "Write the type out in full — literal types, `readonly` and all — not a wider one that also fits."
+            ],
+            "language": "typescript",
+            "kind": "predict",
+            "difficulty": "Easy",
+            "strictness": "strict",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<typeof check, typeof money>>;\n",
+            "judge_mode": "types",
+            "forbid": [
+              "typeof"
+            ],
+            "starter": "type Formatter = {\n  (value: number): string;\n  label: string;\n};\n\nconst money = (value: number) => \"$\" + value.toFixed(2);\nmoney.label = \"money\";\n\nconst percent = (value: number) => (value * 100).toFixed(0) + \"%\";\npercent.label = \"percent\";\n\nconst formatters: Formatter[] = [money, percent];\nfor (const f of formatters) {\n  console.log(f.label + \": \" + f(0.256));\n}\nconst check: ____ = money;\n",
+            "solution": "type Formatter = {\n  (value: number): string;\n  label: string;\n};\n\nconst money = (value: number) => \"$\" + value.toFixed(2);\nmoney.label = \"money\";\n\nconst percent = (value: number) => (value * 100).toFixed(0) + \"%\";\npercent.label = \"percent\";\n\nconst formatters: Formatter[] = [money, percent];\nfor (const f of formatters) {\n  console.log(f.label + \": \" + f(0.256));\n}\nconst check: { (value: number): string; label: string; } = money;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
             "id": "tsm-ts_type_testing-order1",
             "title": "Put it in order: A negative test: the misuse must be rejected",
             "prompt": "The lines of the worked example “A negative test: the misuse must be rejected” from Testing Types, shuffled. Put them back in an order that compiles and prints exactly:\n\n    9\n    3",
@@ -29598,6 +30150,30 @@
             ]
           },
           {
+            "id": "tsm-ts_modules-predict1",
+            "title": "Read the inference: A namespace import",
+            "prompt": "What type does TypeScript already infer for `exported`? Annotate `check` with exactly that type — not merely one that fits. The program is the worked example “A namespace import” from Modules (import / export).",
+            "hint": "Read the declaration of `exported` and what it is initialised with.",
+            "hints": [
+              "Read the declaration of `exported` and what it is initialised with.",
+              "Write the type out in full — literal types, `readonly` and all — not a wider one that also fits."
+            ],
+            "language": "typescript",
+            "kind": "predict",
+            "difficulty": "Easy",
+            "strictness": "strict",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<typeof check, typeof exported>>;\n",
+            "judge_mode": "types",
+            "forbid": [
+              "typeof"
+            ],
+            "starter": "import * as fs from \"fs\";\nconst exported = Object.keys(fs).filter((k) => k === \"readFileSync\" || k === \"writeFileSync\");\nconsole.log(exported.sort().join(\",\"));\nconst check: ____ = exported;\n",
+            "solution": "import * as fs from \"fs\";\nconst exported = Object.keys(fs).filter((k) => k === \"readFileSync\" || k === \"writeFileSync\");\nconsole.log(exported.sort().join(\",\"));\nconst check: (\"readFileSync\" | \"writeFileSync\")[] = exported;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
             "id": "tsm-ts_declaration_files-order1",
             "title": "Put it in order: Adding a method to every array",
             "prompt": "The lines of the worked example “Adding a method to every array” from Declaration Files & Ambient Types, shuffled. Put them back in an order that compiles and prints exactly:\n\n    11",
@@ -29648,6 +30224,30 @@
                 "output": "ENOSPC: disk full"
               }
             ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-ts_declaration_files-predict1",
+            "title": "Read the inference: Adding a method to every array",
+            "prompt": "What type does TypeScript already infer for `cart`? Annotate `check` with exactly that type — not merely one that fits. The program is the worked example “Adding a method to every array” from Declaration Files & Ambient Types.",
+            "hint": "Read the declaration of `cart` and what it is initialised with.",
+            "hints": [
+              "Read the declaration of `cart` and what it is initialised with.",
+              "Write the type out in full — literal types, `readonly` and all — not a wider one that also fits."
+            ],
+            "language": "typescript",
+            "kind": "predict",
+            "difficulty": "Easy",
+            "strictness": "strict",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<typeof check, typeof cart>>;\n",
+            "judge_mode": "types",
+            "forbid": [
+              "typeof"
+            ],
+            "starter": "declare global {\n  interface Array<T> {\n    sumBy(this: T[], f: (x: T) => number): number;\n  }\n}\nArray.prototype.sumBy = function <T>(this: T[], f: (x: T) => number): number {\n  return this.reduce((s, x) => s + f(x), 0);\n};\nconst cart = [{ price: 2, qty: 3 }, { price: 5, qty: 1 }];\nconsole.log(cart.sumBy((i) => i.price * i.qty));\nconst check: ____ = cart;\n",
+            "solution": "declare global {\n  interface Array<T> {\n    sumBy(this: T[], f: (x: T) => number): number;\n  }\n}\nArray.prototype.sumBy = function <T>(this: T[], f: (x: T) => number): number {\n  return this.reduce((s, x) => s + f(x), 0);\n};\nconst cart = [{ price: 2, qty: 3 }, { price: 5, qty: 1 }];\nconsole.log(cart.sumBy((i) => i.price * i.qty));\nconst check: { price: number; qty: number; }[] = cart;\n",
+            "tests": [],
             "source_slug": "",
             "dataset": ""
           },
@@ -29900,6 +30500,30 @@
             "lines": [
               1
             ]
+          },
+          {
+            "id": "tsm-ts_versions-predict1",
+            "title": "Read the inference: ES2025 built-ins, in `es2025` from 6.0",
+            "prompt": "What type does TypeScript already infer for `byLength`? Annotate `check` with exactly that type — not merely one that fits. The program is the worked example “ES2025 built-ins, in `es2025` from 6.0” from TypeScript 6 & 7.",
+            "hint": "Read the declaration of `byLength` and what it is initialised with.",
+            "hints": [
+              "Read the declaration of `byLength` and what it is initialised with.",
+              "Write the type out in full — literal types, `readonly` and all — not a wider one that also fits."
+            ],
+            "language": "typescript",
+            "kind": "predict",
+            "difficulty": "Easy",
+            "strictness": "strict",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<typeof check, typeof byLength>>;\n",
+            "judge_mode": "types",
+            "forbid": [
+              "typeof"
+            ],
+            "starter": "const a = new Set([\"ts\", \"go\", \"rust\"]);\nconst b = new Set([\"go\", \"java\"]);\nconsole.log([...a.union(b)].join(\",\"));\nconsole.log([...a.intersection(b)].join(\",\"));\n\nconst doubled = [1, 2, 3, 4].values().filter((n) => n % 2 === 0).map((n) => n * 10).toArray();\nconsole.log(doubled.join(\",\"));\n\nconst byLength = Object.groupBy([\"a\", \"bb\", \"cc\", \"d\"], (w) => String(w.length));\nconsole.log(JSON.stringify(byLength));\nconst check: ____ = byLength;\n",
+            "solution": "const a = new Set([\"ts\", \"go\", \"rust\"]);\nconst b = new Set([\"go\", \"java\"]);\nconsole.log([...a.union(b)].join(\",\"));\nconsole.log([...a.intersection(b)].join(\",\"));\n\nconst doubled = [1, 2, 3, 4].values().filter((n) => n % 2 === 0).map((n) => n * 10).toArray();\nconsole.log(doubled.join(\",\"));\n\nconst byLength = Object.groupBy([\"a\", \"bb\", \"cc\", \"d\"], (w) => String(w.length));\nconsole.log(JSON.stringify(byLength));\nconst check: Partial<Record<string, string[]>> = byLength;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
           }
         ],
         "optional": false,
@@ -31758,6 +32382,30 @@
             ]
           },
           {
+            "id": "tsm-ts_satisfies-predict1",
+            "title": "Read the inference: A lookup that must cover every case",
+            "prompt": "What type does TypeScript already infer for `LABEL`? Annotate `check` with exactly that type — not merely one that fits. The program is the worked example “A lookup that must cover every case” from The satisfies Operator.",
+            "hint": "Read the declaration of `LABEL` and what it is initialised with.",
+            "hints": [
+              "Read the declaration of `LABEL` and what it is initialised with.",
+              "Write the type out in full — literal types, `readonly` and all — not a wider one that also fits."
+            ],
+            "language": "typescript",
+            "kind": "predict",
+            "difficulty": "Easy",
+            "strictness": "strict",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<typeof check, typeof LABEL>>;\n",
+            "judge_mode": "types",
+            "forbid": [
+              "typeof"
+            ],
+            "starter": "type Status = \"todo\" | \"doing\" | \"done\";\nconst LABEL = { todo: \"To do\", doing: \"In progress\", done: \"Done\" } satisfies Record<Status, string>;\nconst statuses: Status[] = [\"done\", \"todo\"];\nconsole.log(statuses.map((s) => LABEL[s]).join(\" / \"));\nconst check: ____ = LABEL;\n",
+            "solution": "type Status = \"todo\" | \"doing\" | \"done\";\nconst LABEL = { todo: \"To do\", doing: \"In progress\", done: \"Done\" } satisfies Record<Status, string>;\nconst statuses: Status[] = [\"done\", \"todo\"];\nconsole.log(statuses.map((s) => LABEL[s]).join(\" / \"));\nconst check: { todo: string; doing: string; done: string; } = LABEL;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
             "id": "tsm-ts_structural_typing-order1",
             "title": "Put it in order: Classes are structural too",
             "prompt": "The lines of the worked example “Classes are structural too” from Structural Typing & Excess Properties, shuffled. Put them back in an order that compiles and prints exactly:\n\n    40 false true",
@@ -31838,6 +32486,30 @@
             "lines": [
               11
             ]
+          },
+          {
+            "id": "tsm-ts_structural_typing-predict1",
+            "title": "Read the inference: Ask only for what you use",
+            "prompt": "What type does TypeScript already infer for `rope`? Annotate `check` with exactly that type — not merely one that fits. The program is the worked example “Ask only for what you use” from Structural Typing & Excess Properties.",
+            "hint": "Read the declaration of `rope` and what it is initialised with.",
+            "hints": [
+              "Read the declaration of `rope` and what it is initialised with.",
+              "Write the type out in full — literal types, `readonly` and all — not a wider one that also fits."
+            ],
+            "language": "typescript",
+            "kind": "predict",
+            "difficulty": "Easy",
+            "strictness": "strict",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<typeof check, typeof rope>>;\n",
+            "judge_mode": "types",
+            "forbid": [
+              "typeof"
+            ],
+            "starter": "function describeLength(x: { length: number }): string {\n  return `length ${x.length}`;\n}\nconst rope = { length: 7, unit: \"m\" };\nconsole.log(describeLength(\"hello\"), \"|\", describeLength([1, 2, 3]), \"|\", describeLength(rope));\nconst check: ____ = rope;\n",
+            "solution": "function describeLength(x: { length: number }): string {\n  return `length ${x.length}`;\n}\nconst rope = { length: 7, unit: \"m\" };\nconsole.log(describeLength(\"hello\"), \"|\", describeLength([1, 2, 3]), \"|\", describeLength(rope));\nconst check: { length: number; unit: string; } = rope;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
           },
           {
             "id": "tsm-ts_variance-order1",
@@ -33724,6 +34396,30 @@
             "lines": [
               4
             ]
+          },
+          {
+            "id": "tsm-ts_immutability-predict1",
+            "title": "Read the inference: `Object.freeze` at runtime, in strict code",
+            "prompt": "What type does TypeScript already infer for `limits`? Annotate `check` with exactly that type — not merely one that fits. The program is the worked example “`Object.freeze` at runtime, in strict code” from readonly & Immutability.",
+            "hint": "Read the declaration of `limits` and what it is initialised with.",
+            "hints": [
+              "Read the declaration of `limits` and what it is initialised with.",
+              "Write the type out in full — literal types, `readonly` and all — not a wider one that also fits."
+            ],
+            "language": "typescript",
+            "kind": "predict",
+            "difficulty": "Easy",
+            "strictness": "strict",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<typeof check, typeof limits>>;\n",
+            "judge_mode": "types",
+            "forbid": [
+              "typeof"
+            ],
+            "starter": "\"use strict\";\nconst limits = Object.freeze({ maxUsers: 10 });\ntry {\n  (limits as { maxUsers: number }).maxUsers = 99;\n} catch (e) {\n  console.log(e instanceof TypeError ? \"refused: frozen\" : \"unexpected\");\n}\nconsole.log(limits.maxUsers, Object.isFrozen(limits));\nconst check: ____ = limits;\n",
+            "solution": "\"use strict\";\nconst limits = Object.freeze({ maxUsers: 10 });\ntry {\n  (limits as { maxUsers: number }).maxUsers = 99;\n} catch (e) {\n  console.log(e instanceof TypeError ? \"refused: frozen\" : \"unexpected\");\n}\nconsole.log(limits.maxUsers, Object.isFrozen(limits));\nconst check: Readonly<{ maxUsers: 10; }> = limits;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
           },
           {
             "id": "tsm-ts_parse_dont_validate-spot1",
@@ -37494,6 +38190,54 @@
             ]
           },
           {
+            "id": "tsm-ts_generics-predict1",
+            "title": "Read the inference: A generic result wrapper",
+            "prompt": "What type does TypeScript already infer for `parsed`? Annotate `check` with exactly that type — not merely one that fits. The program is the worked example “A generic result wrapper” from Generics (Basics).",
+            "hint": "Read the declaration of `parsed` and what it is initialised with.",
+            "hints": [
+              "Read the declaration of `parsed` and what it is initialised with.",
+              "Write the type out in full — literal types, `readonly` and all — not a wider one that also fits."
+            ],
+            "language": "typescript",
+            "kind": "predict",
+            "difficulty": "Easy",
+            "strictness": "strict",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<typeof check, typeof parsed>>;\n",
+            "judge_mode": "types",
+            "forbid": [
+              "typeof"
+            ],
+            "starter": "type Result<T> = { ok: true; value: T } | { ok: false; error: string };\nfunction attempt<T>(f: () => T): Result<T> {\n  try {\n    return { ok: true, value: f() };\n  } catch (e) {\n    return { ok: false, error: e instanceof Error ? e.message : String(e) };\n  }\n}\nconst parsed = attempt(() => JSON.parse('{\"n\": 2}') as { n: number });\nconst broken = attempt(() => JSON.parse(\"{\"));\nconsole.log(parsed.ok ? parsed.value.n * 21 : parsed.error, \"|\", broken.ok ? \"?\" : \"error caught\");\nconst check: ____ = parsed;\n",
+            "solution": "type Result<T> = { ok: true; value: T } | { ok: false; error: string };\nfunction attempt<T>(f: () => T): Result<T> {\n  try {\n    return { ok: true, value: f() };\n  } catch (e) {\n    return { ok: false, error: e instanceof Error ? e.message : String(e) };\n  }\n}\nconst parsed = attempt(() => JSON.parse('{\"n\": 2}') as { n: number });\nconst broken = attempt(() => JSON.parse(\"{\"));\nconsole.log(parsed.ok ? parsed.value.n * 21 : parsed.error, \"|\", broken.ok ? \"?\" : \"error caught\");\nconst check: Result<{ n: number; }> = parsed;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-ts_generics-predict2",
+            "title": "Read the inference: Transforming every value of a record",
+            "prompt": "What type does TypeScript already infer for `prices`? Annotate `check` with exactly that type — not merely one that fits. The program is the worked example “Transforming every value of a record” from Generics (Basics).",
+            "hint": "Read the declaration of `prices` and what it is initialised with.",
+            "hints": [
+              "Read the declaration of `prices` and what it is initialised with.",
+              "Write the type out in full — literal types, `readonly` and all — not a wider one that also fits."
+            ],
+            "language": "typescript",
+            "kind": "predict",
+            "difficulty": "Easy",
+            "strictness": "strict",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<typeof check, typeof prices>>;\n",
+            "judge_mode": "types",
+            "forbid": [
+              "typeof"
+            ],
+            "starter": "function mapValues<T, U>(obj: Record<string, T>, f: (value: T, key: string) => U): Record<string, U> {\n  return Object.fromEntries(Object.entries(obj).map(([k, v]) => [k, f(v, k)]));\n}\nconst prices = { pen: 1.5, cup: 4 };\nconst labels = mapValues(prices, (p, name) => `${name}: $${p.toFixed(2)}`);\nconsole.log(Object.values(labels).join(\" | \"));\nconst check: ____ = prices;\n",
+            "solution": "function mapValues<T, U>(obj: Record<string, T>, f: (value: T, key: string) => U): Record<string, U> {\n  return Object.fromEntries(Object.entries(obj).map(([k, v]) => [k, f(v, k)]));\n}\nconst prices = { pen: 1.5, cup: 4 };\nconst labels = mapValues(prices, (p, name) => `${name}: $${p.toFixed(2)}`);\nconsole.log(Object.values(labels).join(\" | \"));\nconst check: { pen: number; cup: number; } = prices;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
             "id": "tsm-ts_generic_constraints-order1",
             "title": "Put it in order: A factory constrained to a constructor",
             "prompt": "The lines of the worked example “A factory constrained to a constructor” from Generic Constraints, shuffled. Put them back in an order that compiles and prints exactly:\n\n    #ts #node",
@@ -37632,6 +38376,30 @@
             ]
           },
           {
+            "id": "tsm-ts_generic_constraints-predict1",
+            "title": "Read the inference: Sort by any key of the element",
+            "prompt": "What type does TypeScript already infer for `people`? Annotate `check` with exactly that type — not merely one that fits. The program is the worked example “Sort by any key of the element” from Generic Constraints.",
+            "hint": "Read the declaration of `people` and what it is initialised with.",
+            "hints": [
+              "Read the declaration of `people` and what it is initialised with.",
+              "Write the type out in full — literal types, `readonly` and all — not a wider one that also fits."
+            ],
+            "language": "typescript",
+            "kind": "predict",
+            "difficulty": "Easy",
+            "strictness": "strict",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<typeof check, typeof people>>;\n",
+            "judge_mode": "types",
+            "forbid": [
+              "typeof"
+            ],
+            "starter": "function sortBy<T, K extends keyof T>(items: readonly T[], key: K): T[] {\n  return items.toSorted((a, b) => (a[key] < b[key] ? -1 : a[key] > b[key] ? 1 : 0));\n}\nconst people = [{ name: \"cy\", age: 40 }, { name: \"ana\", age: 31 }, { name: \"bo\", age: 25 }];\nconsole.log(sortBy(people, \"age\").map((p) => p.name).join(\",\"));\nconsole.log(sortBy(people, \"name\").map((p) => p.name).join(\",\"));\nconst check: ____ = people;\n",
+            "solution": "function sortBy<T, K extends keyof T>(items: readonly T[], key: K): T[] {\n  return items.toSorted((a, b) => (a[key] < b[key] ? -1 : a[key] > b[key] ? 1 : 0));\n}\nconst people = [{ name: \"cy\", age: 40 }, { name: \"ana\", age: 31 }, { name: \"bo\", age: 25 }];\nconsole.log(sortBy(people, \"age\").map((p) => p.name).join(\",\"));\nconsole.log(sortBy(people, \"name\").map((p) => p.name).join(\",\"));\nconst check: { name: string; age: number; }[] = people;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
             "id": "tsm-ts_generic_inference-order1",
             "title": "Put it in order: `const` type parameters keep the literals",
             "prompt": "The lines of the worked example “`const` type parameters keep the literals” from How Generic Inference Works, shuffled. Put them back in an order that compiles and prints exactly:\n\n    navigating to /users\n    2 2",
@@ -37740,6 +38508,30 @@
             "lines": [
               4
             ]
+          },
+          {
+            "id": "tsm-ts_generic_inference-predict1",
+            "title": "Read the inference: `NoInfer` — one argument decides, the other is checked",
+            "prompt": "What type does TypeScript already infer for `sizes`? Annotate `check` with exactly that type — not merely one that fits. The program is the worked example “`NoInfer` — one argument decides, the other is checked” from How Generic Inference Works.",
+            "hint": "Read the declaration of `sizes` and what it is initialised with.",
+            "hints": [
+              "Read the declaration of `sizes` and what it is initialised with.",
+              "Write the type out in full — literal types, `readonly` and all — not a wider one that also fits."
+            ],
+            "language": "typescript",
+            "kind": "predict",
+            "difficulty": "Easy",
+            "strictness": "strict",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<typeof check, typeof sizes>>;\n",
+            "judge_mode": "types",
+            "forbid": [
+              "typeof"
+            ],
+            "starter": "function pick<T extends string>(options: readonly T[], choice: string, fallback: NoInfer<T>): T {\n  return options.find((o) => o === choice) ?? fallback;\n}\n\nconst sizes = [\"small\", \"large\"] as const;\nconsole.log(pick(sizes, \"large\", \"small\"));\nconsole.log(pick(sizes, \"huge\", \"small\"));\nconst check: ____ = sizes;\n",
+            "solution": "function pick<T extends string>(options: readonly T[], choice: string, fallback: NoInfer<T>): T {\n  return options.find((o) => o === choice) ?? fallback;\n}\n\nconst sizes = [\"small\", \"large\"] as const;\nconsole.log(pick(sizes, \"large\", \"small\"));\nconsole.log(pick(sizes, \"huge\", \"small\"));\nconst check: readonly [\"small\", \"large\"] = sizes;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
           }
         ],
         "optional": false,
@@ -39475,6 +40267,30 @@
               2,
               6
             ]
+          },
+          {
+            "id": "tsm-ts_lookup_types-predict1",
+            "title": "Read the inference: A typed property read",
+            "prompt": "What type does TypeScript already infer for `rows`? Annotate `check` with exactly that type — not merely one that fits. The program is the worked example “A typed property read” from Lookup Types.",
+            "hint": "Read the declaration of `rows` and what it is initialised with.",
+            "hints": [
+              "Read the declaration of `rows` and what it is initialised with.",
+              "Write the type out in full — literal types, `readonly` and all — not a wider one that also fits."
+            ],
+            "language": "typescript",
+            "kind": "predict",
+            "difficulty": "Easy",
+            "strictness": "strict",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<typeof check, typeof rows>>;\n",
+            "judge_mode": "types",
+            "forbid": [
+              "typeof"
+            ],
+            "starter": "function get<T, K extends keyof T>(obj: T, key: K): T[K] {\n  return obj[key];\n}\nfunction pluck<T, K extends keyof T>(rows: readonly T[], key: K): T[K][] {\n  return rows.map((r) => r[key]);\n}\n\nconst rows = [\n  { name: \"ana\", age: 31, admin: true },\n  { name: \"bo\", age: 25, admin: false },\n];\nconst ages = pluck(rows, \"age\");     // number[]\nconst names = pluck(rows, \"name\");   // string[]\nconsole.log(ages.reduce((a, b) => a + b, 0), names.join(\",\"));\nconsole.log(get({ name: \"cy\", age: 40, admin: true }, \"admin\"));\nconst check: ____ = rows;\n",
+            "solution": "function get<T, K extends keyof T>(obj: T, key: K): T[K] {\n  return obj[key];\n}\nfunction pluck<T, K extends keyof T>(rows: readonly T[], key: K): T[K][] {\n  return rows.map((r) => r[key]);\n}\n\nconst rows = [\n  { name: \"ana\", age: 31, admin: true },\n  { name: \"bo\", age: 25, admin: false },\n];\nconst ages = pluck(rows, \"age\");     // number[]\nconst names = pluck(rows, \"name\");   // string[]\nconsole.log(ages.reduce((a, b) => a + b, 0), names.join(\",\"));\nconsole.log(get({ name: \"cy\", age: 40, admin: true }, \"admin\"));\nconst check: { name: string; age: number; admin: boolean; }[] = rows;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
           }
         ],
         "optional": false,
@@ -41121,6 +41937,30 @@
             ]
           },
           {
+            "id": "tsm-ts_mapped_types-predict1",
+            "title": "Read the inference: Tracking which fields changed",
+            "prompt": "What type does TypeScript already infer for `diff`? Annotate `check` with exactly that type — not merely one that fits. The program is the worked example “Tracking which fields changed” from Mapped Types.",
+            "hint": "Read the declaration of `diff` and what it is initialised with.",
+            "hints": [
+              "Read the declaration of `diff` and what it is initialised with.",
+              "Write the type out in full — literal types, `readonly` and all — not a wider one that also fits."
+            ],
+            "language": "typescript",
+            "kind": "predict",
+            "difficulty": "Easy",
+            "strictness": "strict",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<typeof check, typeof diff>>;\n",
+            "judge_mode": "types",
+            "forbid": [
+              "typeof"
+            ],
+            "starter": "type Flags<T> = { [K in keyof T]: boolean };\nfunction changed<T extends object>(before: T, after: T): Flags<T> {\n  return Object.fromEntries((Object.keys(before) as (keyof T)[]).map((k) => [k, before[k] !== after[k]])) as Flags<T>;\n}\nconst diff = changed({ name: \"ana\", age: 31, city: \"Oslo\" }, { name: \"ana\", age: 32, city: \"Rome\" });\nconsole.log(Object.entries(diff).filter(([, v]) => v).map(([k]) => k).join(\",\"));\nconst check: ____ = diff;\n",
+            "solution": "type Flags<T> = { [K in keyof T]: boolean };\nfunction changed<T extends object>(before: T, after: T): Flags<T> {\n  return Object.fromEntries((Object.keys(before) as (keyof T)[]).map((k) => [k, before[k] !== after[k]])) as Flags<T>;\n}\nconst diff = changed({ name: \"ana\", age: 31, city: \"Oslo\" }, { name: \"ana\", age: 32, city: \"Rome\" });\nconsole.log(Object.entries(diff).filter(([, v]) => v).map(([k]) => k).join(\",\"));\nconst check: Flags<{ name: string; age: number; city: string; }> = diff;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
             "id": "tsm-ts_key_remapping-spot1",
             "title": "Spot the bug: Key Remapping in Mapped Types #1",
             "prompt": "This program runs, but prints the wrong thing.\n\nIt prints:\n    {\"name\":\"ana\",\"password\":\"hunter2\"}\n\nIt should print:\n    {\"name\":\"ana\"}\n\nClick the line that causes it.",
@@ -41205,6 +42045,30 @@
             "lines": [
               1
             ]
+          },
+          {
+            "id": "tsm-ts_key_remapping-predict1",
+            "title": "Read the inference: Getters, derived and built",
+            "prompt": "What type does TypeScript already infer for `user`? Annotate `check` with exactly that type — not merely one that fits. The program is the worked example “Getters, derived and built” from Key Remapping in Mapped Types.",
+            "hint": "Read the declaration of `user` and what it is initialised with.",
+            "hints": [
+              "Read the declaration of `user` and what it is initialised with.",
+              "Write the type out in full — literal types, `readonly` and all — not a wider one that also fits."
+            ],
+            "language": "typescript",
+            "kind": "predict",
+            "difficulty": "Easy",
+            "strictness": "strict",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<typeof check, typeof user>>;\n",
+            "judge_mode": "types",
+            "forbid": [
+              "typeof"
+            ],
+            "starter": "type Getters<T> = {\n  [K in keyof T as `get${Capitalize<string & K>}`]: () => T[K];\n};\n\nfunction makeGetters<T extends object>(obj: T): Getters<T> {\n  const out: Record<string, () => unknown> = {};\n  for (const [key, value] of Object.entries(obj)) {\n    out[\"get\" + key.charAt(0).toUpperCase() + key.slice(1)] = () => value;\n  }\n  return out as Getters<T>;\n}\n\nconst user = makeGetters({ name: \"ana\", age: 31, admin: true });\nconsole.log(user.getName().toUpperCase());\nconsole.log(user.getAge() + 1);\nconsole.log(user.getAdmin() ? \"admin\" : \"member\");\nconst check: ____ = user;\n",
+            "solution": "type Getters<T> = {\n  [K in keyof T as `get${Capitalize<string & K>}`]: () => T[K];\n};\n\nfunction makeGetters<T extends object>(obj: T): Getters<T> {\n  const out: Record<string, () => unknown> = {};\n  for (const [key, value] of Object.entries(obj)) {\n    out[\"get\" + key.charAt(0).toUpperCase() + key.slice(1)] = () => value;\n  }\n  return out as Getters<T>;\n}\n\nconst user = makeGetters({ name: \"ana\", age: 31, admin: true });\nconsole.log(user.getName().toUpperCase());\nconsole.log(user.getAge() + 1);\nconsole.log(user.getAdmin() ? \"admin\" : \"member\");\nconst check: Getters<{ name: string; age: number; admin: boolean; }> = user;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
           }
         ],
         "optional": false,
@@ -44934,6 +45798,30 @@
             "lines": [
               1
             ]
+          },
+          {
+            "id": "tsm-ts_type_performance-predict1",
+            "title": "Read the inference: Parsing literals, with a fallback for `string`",
+            "prompt": "What type does TypeScript already infer for `known`? Annotate `check` with exactly that type — not merely one that fits. The program is the worked example “Parsing literals, with a fallback for `string`” from Type-Level Performance & Limits.",
+            "hint": "Read the declaration of `known` and what it is initialised with.",
+            "hints": [
+              "Read the declaration of `known` and what it is initialised with.",
+              "Write the type out in full — literal types, `readonly` and all — not a wider one that also fits."
+            ],
+            "language": "typescript",
+            "kind": "predict",
+            "difficulty": "Easy",
+            "strictness": "strict",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<typeof check, typeof known>>;\n",
+            "judge_mode": "types",
+            "forbid": [
+              "typeof"
+            ],
+            "starter": "type Split<S extends string> = string extends S\n  ? string[]\n  : S extends `${infer Head} ${infer Rest}`\n    ? [Head, ...Split<Rest>]\n    : [S];\n\nfunction words<S extends string>(s: S): Split<S> {\n  return s.split(\" \") as Split<S>;\n}\n\nconst known = words(\"red green blue\");   // [\"red\", \"green\", \"blue\"]\nconst fromInput = words([\"a\", \"b\", \"c\"].join(\" \"));   // string[]\nconsole.log(known[2].toUpperCase(), known.length);\nconsole.log(fromInput.length, fromInput[1] ?? \"-\");\nconst check: ____ = known;\n",
+            "solution": "type Split<S extends string> = string extends S\n  ? string[]\n  : S extends `${infer Head} ${infer Rest}`\n    ? [Head, ...Split<Rest>]\n    : [S];\n\nfunction words<S extends string>(s: S): Split<S> {\n  return s.split(\" \") as Split<S>;\n}\n\nconst known = words(\"red green blue\");   // [\"red\", \"green\", \"blue\"]\nconst fromInput = words([\"a\", \"b\", \"c\"].join(\" \"));   // string[]\nconsole.log(known[2].toUpperCase(), known.length);\nconsole.log(fromInput.length, fromInput[1] ?? \"-\");\nconst check: [\"red\", \"green\", \"blue\"] = known;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
           }
         ],
         "optional": false,
@@ -48466,6 +49354,30 @@
             ]
           },
           {
+            "id": "tsm-ts_iterator_helpers-predict1",
+            "title": "Read the inference: Lazy: only as much work as needed",
+            "prompt": "What type does TypeScript already infer for `users`? Annotate `check` with exactly that type — not merely one that fits. The program is the worked example “Lazy: only as much work as needed” from Iterator Helpers.",
+            "hint": "Read the declaration of `users` and what it is initialised with.",
+            "hints": [
+              "Read the declaration of `users` and what it is initialised with.",
+              "Write the type out in full — literal types, `readonly` and all — not a wider one that also fits."
+            ],
+            "language": "typescript",
+            "kind": "predict",
+            "difficulty": "Easy",
+            "strictness": "strict",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<typeof check, typeof users>>;\n",
+            "judge_mode": "types",
+            "forbid": [
+              "typeof"
+            ],
+            "starter": "const users = new Map([\n  [1, { name: \"ana\", admin: true }],\n  [2, { name: \"bo\", admin: false }],\n  [3, { name: \"cy\", admin: true }],\n  [4, { name: \"dee\", admin: true }],\n]);\nlet checked = 0;\nconst firstTwoAdmins = users\n  .values()\n  .filter((u) => {\n    checked++;\n    return u.admin;\n  })\n  .map((u) => u.name.toUpperCase())\n  .take(2)\n  .toArray();\nconsole.log(firstTwoAdmins.join(\", \"));\nconsole.log(`checked ${checked} of ${users.size}`);\nconst check: ____ = users;\n",
+            "solution": "const users = new Map([\n  [1, { name: \"ana\", admin: true }],\n  [2, { name: \"bo\", admin: false }],\n  [3, { name: \"cy\", admin: true }],\n  [4, { name: \"dee\", admin: true }],\n]);\nlet checked = 0;\nconst firstTwoAdmins = users\n  .values()\n  .filter((u) => {\n    checked++;\n    return u.admin;\n  })\n  .map((u) => u.name.toUpperCase())\n  .take(2)\n  .toArray();\nconsole.log(firstTwoAdmins.join(\", \"));\nconsole.log(`checked ${checked} of ${users.size}`);\nconst check: Map<number, { name: string; admin: boolean; }> = users;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
             "id": "tsm-ts_heap_pq-spot1",
             "title": "Spot the bug: Heaps & Priority Queues #1",
             "prompt": "This program runs, but prints the wrong thing.\n\nIt prints:\n    next due: 30\n\nIt should print:\n    next due: 10\n\nClick the line that causes it.",
@@ -50189,6 +51101,30 @@
               5,
               6
             ]
+          },
+          {
+            "id": "tsm-ts_error_types-predict1",
+            "title": "Read the inference: Collecting every validation error with `Result`",
+            "prompt": "What type does TypeScript already infer for `results`? Annotate `check` with exactly that type — not merely one that fits. The program is the worked example “Collecting every validation error with `Result`” from Result Types & Typed Errors.",
+            "hint": "Read the declaration of `results` and what it is initialised with.",
+            "hints": [
+              "Read the declaration of `results` and what it is initialised with.",
+              "Write the type out in full — literal types, `readonly` and all — not a wider one that also fits."
+            ],
+            "language": "typescript",
+            "kind": "predict",
+            "difficulty": "Easy",
+            "strictness": "strict",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<typeof check, typeof results>>;\n",
+            "judge_mode": "types",
+            "forbid": [
+              "typeof"
+            ],
+            "starter": "type Result<T, E = string> = { ok: true; value: T } | { ok: false; error: E };\ntype Person = { name: string; age: number };\nfunction parsePerson(line: string): Result<Person> {\n  const [name = \"\", ageText = \"\"] = line.split(\",\");\n  if (!name.trim()) return { ok: false, error: \"missing name\" };\n  const age = Number(ageText);\n  if (!Number.isInteger(age) || age < 0) return { ok: false, error: `bad age \"${ageText}\"` };\n  return { ok: true, value: { name: name.trim(), age } };\n}\nconst lines = [\"ana,31\", \",20\", \"ben,x\", \"cy,7\"];\nconst results = lines.map(parsePerson);\nconst people = results.flatMap((r) => (r.ok ? [r.value] : []));\nconst problems = results.flatMap((r, i) => (r.ok ? [] : [`line ${i + 1}: ${r.error}`]));\nconsole.log(people.map((p) => p.name).join(\",\"), \"|\", problems.join(\"; \"));\nconst check: ____ = results;\n",
+            "solution": "type Result<T, E = string> = { ok: true; value: T } | { ok: false; error: E };\ntype Person = { name: string; age: number };\nfunction parsePerson(line: string): Result<Person> {\n  const [name = \"\", ageText = \"\"] = line.split(\",\");\n  if (!name.trim()) return { ok: false, error: \"missing name\" };\n  const age = Number(ageText);\n  if (!Number.isInteger(age) || age < 0) return { ok: false, error: `bad age \"${ageText}\"` };\n  return { ok: true, value: { name: name.trim(), age } };\n}\nconst lines = [\"ana,31\", \",20\", \"ben,x\", \"cy,7\"];\nconst results = lines.map(parsePerson);\nconst people = results.flatMap((r) => (r.ok ? [r.value] : []));\nconst problems = results.flatMap((r, i) => (r.ok ? [] : [`line ${i + 1}: ${r.error}`]));\nconsole.log(people.map((p) => p.name).join(\",\"), \"|\", problems.join(\"; \"));\nconst check: Result<Person, string>[] = results;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
           },
           {
             "id": "tsm-ts_resource_management-spot1",

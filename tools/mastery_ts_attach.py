@@ -23,9 +23,9 @@ for _tsw in TS_WEEKS:
         assert _ex["id"] not in _ts_ids, f"TS week {_n}: duplicate exercise id {_ex['id']}"
         _ts_ids.add(_ex["id"])
         _want = _week_strictness(_n) or "strict"
-        # Order and spot exercises are a chapter's own code, checked at the
-        # chapter's plain `strict` (mastery_ts_derived.py).
-        assert _ex["kind"] in ("order", "spot") or (_ex.get("strictness") or "strict") in (_want, "strict+indexed"), \
+        # Chapter-derived exercises (ids tsm-ts_*: order, spot, predict) are a
+        # chapter's own code, checked at its plain `strict` (mastery_ts_derived.py).
+        assert _ex["kind"] in ("order", "spot") or _ex["id"].startswith("tsm-ts_") or (_ex.get("strictness") or "strict") in (_want, "strict+indexed"), \
             f"{_ex['id']}: runs at {_ex.get('strictness')!r}, week {_n} is {_want!r}"
     for _ex in _set:
         assert _ex["kind"] in ("challenge", "typelevel"), f"{_ex['id']}: problem-set kind {_ex['kind']!r}"

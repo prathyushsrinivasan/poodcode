@@ -195,7 +195,31 @@ def _tsd_output_question(name, p, n):
     }
 
 
-TS_DERIVED_COUNTS = {"order": 0, "spot": 0, "cards": 0, "output": 0}
+# Predict-the-type drills on the worked examples (X-10): the answers were read
+# from the checker by tools/gen_ts_predicts.py. An entry whose example has
+# changed since is skipped — a stale cache loses a drill, it never misleads.
+try:
+    with open(os.path.join(HERE, "ts_predicts.json"), encoding="utf-8") as _tsd_pf:
+        _TSD_PREDICTS = json.load(_tsd_pf)
+except FileNotFoundError:
+    _TSD_PREDICTS = {}
+
+
+def _tsd_predicts(key, name, data):
+    codes = {ex["code"] for ex in data["examples"]}
+    out = []
+    for i, p in enumerate(_TSD_PREDICTS.get(key, []), start=1):
+        if p["code"] not in codes:
+            continue
+        ex = _pr(f"tsm-{key}-predict{i}", f"Read the inference: {p['title']}", p["code"], p["name"], p["type"],
+                 hints=["Read the declaration of `" + p["name"] + "` and what it is initialised with.",
+                        "Write the type out in full — literal types, `readonly` and all — not a wider one that also fits."],
+                 why=f"The program is the worked example “{p['title']}” from {name}.")
+        out.append(ex)
+    return out
+
+
+TS_DERIVED_COUNTS = {"order": 0, "spot": 0, "cards": 0, "output": 0, "predict": 0}
 _tsd_fronts = {c["front"] for w in TS_WEEKS for c in w["flashcards"]}
 _tsd_fronts |= {f for cs in TS_CARDS_MORE.values() for f, _ in cs}
 for _tsd_w in TS_WEEKS:
@@ -221,6 +245,9 @@ for _tsd_w in TS_WEEKS:
                 _tsd_j += 1
                 _tsd_more.append(_tsd_ex)
                 TS_DERIVED_COUNTS["spot"] += 1
+        for _tsd_ex in _tsd_predicts(_tsd_key, _tsd_name, _tsd_data):
+            _tsd_more.append(_tsd_ex)
+            TS_DERIVED_COUNTS["predict"] += 1
         _tsd_texts = {q["question"] for q in _tsd_w["quiz"]}
         _tsd_k = 0
         for _tsd_p in _tsd_data["pitfalls"]:
@@ -239,7 +266,7 @@ for _tsd_w in TS_WEEKS:
             TS_DERIVED_COUNTS["cards"] += 1
 print(f"  derived from chapters: {TS_DERIVED_COUNTS['cards']} cards, "
       f"{TS_DERIVED_COUNTS['order']} order, {TS_DERIVED_COUNTS['spot']} spot exercises, "
-      f"{TS_DERIVED_COUNTS['output']} code-output questions")
+      f"{TS_DERIVED_COUNTS['output']} code-output questions, {TS_DERIVED_COUNTS['predict']} predict drills")
 
 # X-07: every compiler error a chapter shows has a glossary entry, so its
 # TsErrorLinks badge leads somewhere. Add missing ones to ts_errors_more.py.

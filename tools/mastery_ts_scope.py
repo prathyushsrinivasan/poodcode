@@ -69,8 +69,8 @@ def _sc_strip(src):
 def _sc_programs(w):
     out = []
     for ex in w.get("practice", []) + w.get("problem_set", []):
-        if ex["kind"] in ("order", "spot"):
-            continue
+        if ex["kind"] in ("order", "spot") or ex["id"].startswith("tsm-ts_"):
+            continue  # a chapter's own example code (mastery_ts_derived.py)
         out.append((ex["id"], ex["solution"]))
         out.append((ex["id"] + ":starter", ex["starter"]))
     for key in w["concepts"]:

@@ -1,0 +1,304 @@
+{
+ "ts_array_methods": [
+  {
+   "title": "Update one element without mutating",
+   "code": "const tasks = [{ id: 1, done: false }, { id: 2, done: false }];\nconst i = tasks.findIndex((t) => t.id === 2);\nconst updated = i < 0 ? tasks : tasks.with(i, { id: 2, done: true });\nconsole.log(JSON.stringify(updated), tasks[1]?.done);\n",
+   "name": "tasks",
+   "type": "{ id: number; done: boolean; }[]"
+  }
+ ],
+ "ts_array_modern": [
+  {
+   "title": "Grouping and flat-mapping",
+   "code": "import * as fs from \"fs\";\nconst words = fs.readFileSync(0, \"utf8\").trim().split(/\\s+/);\nconst byLength = Object.groupBy(words, (w) => String(w.length));\nfor (const [len, group] of Object.entries(byLength)) {\n  console.log(`${len}: ${(group ?? []).join(\", \")}`);\n}\nconst letters = words.flatMap((w) => [...w.toLowerCase()]);\nconsole.log(`${letters.length} letters, ${new Set(letters).size} distinct`);\n",
+   "name": "byLength",
+   "type": "Partial<Record<string, string[]>>"
+  },
+  {
+   "title": "Copies that go all the way down",
+   "code": "const original = { name: \"cart\", items: [{ sku: \"a1\", qty: 1 }] };\nconst shallow = { ...original, items: [...original.items] };\nconst deep = structuredClone(original);\nshallow.items[0].qty = 5;\ndeep.items[0].qty = 99;\nconsole.log(original.items[0].qty, shallow.items[0].qty, deep.items[0].qty);\nconst squares = Array.from({ length: 5 }, (_, i) => i * i);\nconsole.log(squares.with(0, -1).join(\" \"), \"|\", squares.join(\" \"));\n",
+   "name": "original",
+   "type": "{ name: string; items: { sku: string; qty: number; }[]; }"
+  }
+ ],
+ "ts_arrays": [
+  {
+   "title": "Copies are shallow",
+   "code": "const team = [{ name: \"ana\", score: 1 }, { name: \"bo\", score: 2 }];\nconst copy = [...team];\ncopy.push({ name: \"cy\", score: 3 });\ncopy[0]!.score = 99;\nconsole.log(team.length, copy.length, team[0]!.score);\n",
+   "name": "team",
+   "type": "{ name: string; score: number; }[]"
+  }
+ ],
+ "ts_conditionals": [
+  {
+   "title": "A ternary for a value, `if` for an action",
+   "code": "const items = [\"pen\"];\nconst noun = items.length === 1 ? \"item\" : \"items\";\nconsole.log(`${items.length} ${noun}`);\nif (items.length > 0) {\n  console.log(\"first: \" + items[0]);\n}\n",
+   "name": "noun",
+   "type": "\"item\" | \"items\""
+  }
+ ],
+ "ts_control_flow": [
+  {
+   "title": "`filter` that narrows by itself",
+   "code": "import * as fs from \"fs\";\nconst raw = fs.readFileSync(0, \"utf8\").trim().split(/\\s+/);\nconst parsed = raw.map((t) => (/^-?\\d+$/.test(t) ? Number(t) : undefined));\nconst numbers = parsed.filter((n) => n !== undefined);\nconst total = numbers.reduce((a, b) => a + b, 0);\nconsole.log(`${numbers.length} numbers, total ${total}, ${parsed.length - numbers.length} skipped`);\n",
+   "name": "parsed",
+   "type": "(number | undefined)[]"
+  }
+ ],
+ "ts_declaration_files": [
+  {
+   "title": "Adding a method to every array",
+   "code": "declare global {\n  interface Array<T> {\n    sumBy(this: T[], f: (x: T) => number): number;\n  }\n}\nArray.prototype.sumBy = function <T>(this: T[], f: (x: T) => number): number {\n  return this.reduce((s, x) => s + f(x), 0);\n};\nconst cart = [{ price: 2, qty: 3 }, { price: 5, qty: 1 }];\nconsole.log(cart.sumBy((i) => i.price * i.qty));\n",
+   "name": "cart",
+   "type": "{ price: number; qty: number; }[]"
+  }
+ ],
+ "ts_equality": [
+  {
+   "title": "`??` keeps the zero `||` throws away",
+   "code": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst typed = input === \"\" ? undefined : Number(input);\nconsole.log(\"with ||:\", typed || 10);\nconsole.log(\"with ??:\", typed ?? 10);\n",
+   "name": "typed",
+   "type": "number | undefined"
+  }
+ ],
+ "ts_error_types": [
+  {
+   "title": "Collecting every validation error with `Result`",
+   "code": "type Result<T, E = string> = { ok: true; value: T } | { ok: false; error: E };\ntype Person = { name: string; age: number };\nfunction parsePerson(line: string): Result<Person> {\n  const [name = \"\", ageText = \"\"] = line.split(\",\");\n  if (!name.trim()) return { ok: false, error: \"missing name\" };\n  const age = Number(ageText);\n  if (!Number.isInteger(age) || age < 0) return { ok: false, error: `bad age \"${ageText}\"` };\n  return { ok: true, value: { name: name.trim(), age } };\n}\nconst lines = [\"ana,31\", \",20\", \"ben,x\", \"cy,7\"];\nconst results = lines.map(parsePerson);\nconst people = results.flatMap((r) => (r.ok ? [r.value] : []));\nconst problems = results.flatMap((r, i) => (r.ok ? [] : [`line ${i + 1}: ${r.error}`]));\nconsole.log(people.map((p) => p.name).join(\",\"), \"|\", problems.join(\"; \"));\n",
+   "name": "results",
+   "type": "Result<Person, string>[]"
+  }
+ ],
+ "ts_function_types": [
+  {
+   "title": "A function that carries a property",
+   "code": "type Formatter = {\n  (value: number): string;\n  label: string;\n};\n\nconst money = (value: number) => \"$\" + value.toFixed(2);\nmoney.label = \"money\";\n\nconst percent = (value: number) => (value * 100).toFixed(0) + \"%\";\npercent.label = \"percent\";\n\nconst formatters: Formatter[] = [money, percent];\nfor (const f of formatters) {\n  console.log(f.label + \": \" + f(0.256));\n}\n",
+   "name": "money",
+   "type": "{ (value: number): string; label: string; }"
+  }
+ ],
+ "ts_generic_constraints": [
+  {
+   "title": "Sort by any key of the element",
+   "code": "function sortBy<T, K extends keyof T>(items: readonly T[], key: K): T[] {\n  return items.toSorted((a, b) => (a[key] < b[key] ? -1 : a[key] > b[key] ? 1 : 0));\n}\nconst people = [{ name: \"cy\", age: 40 }, { name: \"ana\", age: 31 }, { name: \"bo\", age: 25 }];\nconsole.log(sortBy(people, \"age\").map((p) => p.name).join(\",\"));\nconsole.log(sortBy(people, \"name\").map((p) => p.name).join(\",\"));\n",
+   "name": "people",
+   "type": "{ name: string; age: number; }[]"
+  }
+ ],
+ "ts_generic_inference": [
+  {
+   "title": "`NoInfer` — one argument decides, the other is checked",
+   "code": "function pick<T extends string>(options: readonly T[], choice: string, fallback: NoInfer<T>): T {\n  return options.find((o) => o === choice) ?? fallback;\n}\n\nconst sizes = [\"small\", \"large\"] as const;\nconsole.log(pick(sizes, \"large\", \"small\"));\nconsole.log(pick(sizes, \"huge\", \"small\"));\n",
+   "name": "sizes",
+   "type": "readonly [\"small\", \"large\"]"
+  }
+ ],
+ "ts_generics": [
+  {
+   "title": "A generic result wrapper",
+   "code": "type Result<T> = { ok: true; value: T } | { ok: false; error: string };\nfunction attempt<T>(f: () => T): Result<T> {\n  try {\n    return { ok: true, value: f() };\n  } catch (e) {\n    return { ok: false, error: e instanceof Error ? e.message : String(e) };\n  }\n}\nconst parsed = attempt(() => JSON.parse('{\"n\": 2}') as { n: number });\nconst broken = attempt(() => JSON.parse(\"{\"));\nconsole.log(parsed.ok ? parsed.value.n * 21 : parsed.error, \"|\", broken.ok ? \"?\" : \"error caught\");\n",
+   "name": "parsed",
+   "type": "Result<{ n: number; }>"
+  },
+  {
+   "title": "Transforming every value of a record",
+   "code": "function mapValues<T, U>(obj: Record<string, T>, f: (value: T, key: string) => U): Record<string, U> {\n  return Object.fromEntries(Object.entries(obj).map(([k, v]) => [k, f(v, k)]));\n}\nconst prices = { pen: 1.5, cup: 4 };\nconst labels = mapValues(prices, (p, name) => `${name}: $${p.toFixed(2)}`);\nconsole.log(Object.values(labels).join(\" | \"));\n",
+   "name": "prices",
+   "type": "{ pen: number; cup: number; }"
+  }
+ ],
+ "ts_immutability": [
+  {
+   "title": "`Object.freeze` at runtime, in strict code",
+   "code": "\"use strict\";\nconst limits = Object.freeze({ maxUsers: 10 });\ntry {\n  (limits as { maxUsers: number }).maxUsers = 99;\n} catch (e) {\n  console.log(e instanceof TypeError ? \"refused: frozen\" : \"unexpected\");\n}\nconsole.log(limits.maxUsers, Object.isFrozen(limits));\n",
+   "name": "limits",
+   "type": "Readonly<{ maxUsers: 10; }>"
+  }
+ ],
+ "ts_index_signatures": [
+  {
+   "title": "Counting with an index signature",
+   "code": "import * as fs from \"fs\";\nconst words = fs.readFileSync(0, \"utf8\").trim().toLowerCase().split(/\\s+/);\nconst counts: { [word: string]: number } = {};\nfor (const w of words) counts[w] = (counts[w] ?? 0) + 1;\nconst top = Object.entries(counts).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));\nfor (const [word, n] of top.slice(0, 3)) console.log(`${word} ${n}`);\n",
+   "name": "top",
+   "type": "[string, number][]"
+  }
+ ],
+ "ts_iterator_helpers": [
+  {
+   "title": "Lazy: only as much work as needed",
+   "code": "const users = new Map([\n  [1, { name: \"ana\", admin: true }],\n  [2, { name: \"bo\", admin: false }],\n  [3, { name: \"cy\", admin: true }],\n  [4, { name: \"dee\", admin: true }],\n]);\nlet checked = 0;\nconst firstTwoAdmins = users\n  .values()\n  .filter((u) => {\n    checked++;\n    return u.admin;\n  })\n  .map((u) => u.name.toUpperCase())\n  .take(2)\n  .toArray();\nconsole.log(firstTwoAdmins.join(\", \"));\nconsole.log(`checked ${checked} of ${users.size}`);\n",
+   "name": "users",
+   "type": "Map<number, { name: string; admin: boolean; }>"
+  }
+ ],
+ "ts_json": [
+  {
+   "title": "Pretty output, and choosing the keys",
+   "code": "const user = { id: 7, name: \"ana\", password: \"hunter2\", roles: [\"admin\"] };\nconsole.log(JSON.stringify(user, [\"id\", \"name\", \"roles\"], 2));\n",
+   "name": "user",
+   "type": "{ id: number; name: string; password: string; roles: string[]; }"
+  }
+ ],
+ "ts_key_remapping": [
+  {
+   "title": "Getters, derived and built",
+   "code": "type Getters<T> = {\n  [K in keyof T as `get${Capitalize<string & K>}`]: () => T[K];\n};\n\nfunction makeGetters<T extends object>(obj: T): Getters<T> {\n  const out: Record<string, () => unknown> = {};\n  for (const [key, value] of Object.entries(obj)) {\n    out[\"get\" + key.charAt(0).toUpperCase() + key.slice(1)] = () => value;\n  }\n  return out as Getters<T>;\n}\n\nconst user = makeGetters({ name: \"ana\", age: 31, admin: true });\nconsole.log(user.getName().toUpperCase());\nconsole.log(user.getAge() + 1);\nconsole.log(user.getAdmin() ? \"admin\" : \"member\");\n",
+   "name": "user",
+   "type": "Getters<{ name: string; age: number; admin: boolean; }>"
+  }
+ ],
+ "ts_literal_inference": [
+  {
+   "title": "Where a literal widens",
+   "code": "type Method = \"GET\" | \"POST\";\nfunction send(method: Method, path: string): string {\n  return `${method} ${path}`;\n}\n\nconst fixed = \"GET\";\nconst request = { method: \"POST\", path: \"/items\" } as const;\nconst table = { method: \"GET\" as Method, path: \"/\" };\n\nconsole.log(send(fixed, \"/health\"));\nconsole.log(send(request.method, request.path));\nconsole.log(send(table.method, table.path));\n",
+   "name": "request",
+   "type": "{ readonly method: \"POST\"; readonly path: \"/items\"; }"
+  }
+ ],
+ "ts_lookup_types": [
+  {
+   "title": "A typed property read",
+   "code": "function get<T, K extends keyof T>(obj: T, key: K): T[K] {\n  return obj[key];\n}\nfunction pluck<T, K extends keyof T>(rows: readonly T[], key: K): T[K][] {\n  return rows.map((r) => r[key]);\n}\n\nconst rows = [\n  { name: \"ana\", age: 31, admin: true },\n  { name: \"bo\", age: 25, admin: false },\n];\nconst ages = pluck(rows, \"age\");     // number[]\nconst names = pluck(rows, \"name\");   // string[]\nconsole.log(ages.reduce((a, b) => a + b, 0), names.join(\",\"));\nconsole.log(get({ name: \"cy\", age: 40, admin: true }, \"admin\"));\n",
+   "name": "rows",
+   "type": "{ name: string; age: number; admin: boolean; }[]"
+  }
+ ],
+ "ts_mapped_types": [
+  {
+   "title": "Tracking which fields changed",
+   "code": "type Flags<T> = { [K in keyof T]: boolean };\nfunction changed<T extends object>(before: T, after: T): Flags<T> {\n  return Object.fromEntries((Object.keys(before) as (keyof T)[]).map((k) => [k, before[k] !== after[k]])) as Flags<T>;\n}\nconst diff = changed({ name: \"ana\", age: 31, city: \"Oslo\" }, { name: \"ana\", age: 32, city: \"Rome\" });\nconsole.log(Object.entries(diff).filter(([, v]) => v).map(([k]) => k).join(\",\"));\n",
+   "name": "diff",
+   "type": "Flags<{ name: string; age: number; city: string; }>"
+  }
+ ],
+ "ts_maps_sets": [
+  {
+   "title": "The three most common words",
+   "code": "const text = \"the cat sat on the mat the cat ran\";\nconst counts = new Map<string, number>();\nfor (const w of text.split(\" \")) counts.set(w, (counts.get(w) ?? 0) + 1);\nconst top = [...counts].sort(([a, x], [b, y]) => y - x || a.localeCompare(b)).slice(0, 3);\nconsole.log(top.map(([w, n]) => `${w}=${n}`).join(\" \"));\n",
+   "name": "top",
+   "type": "[string, number][]"
+  }
+ ],
+ "ts_modules": [
+  {
+   "title": "A namespace import",
+   "code": "import * as fs from \"fs\";\nconst exported = Object.keys(fs).filter((k) => k === \"readFileSync\" || k === \"writeFileSync\");\nconsole.log(exported.sort().join(\",\"));\n",
+   "name": "exported",
+   "type": "(\"readFileSync\" | \"writeFileSync\")[]"
+  }
+ ],
+ "ts_objects": [
+  {
+   "title": "Shorthand and computed keys",
+   "code": "const name = \"ana\";\nconst role = \"admin\";\nconst field = \"lastLogin\";\nconst user = { name, role, [field]: \"2026-09-01\", [`${role}Since`]: 2024 };\nconsole.log(JSON.stringify(user));\n",
+   "name": "name",
+   "type": "\"ana\""
+  },
+  {
+   "title": "Transforming every value",
+   "code": "const prices = { pen: 1.5, cup: 4, ink: 12 };\nconst withTax = Object.fromEntries(Object.entries(prices).map(([item, p]) => [item, Number((p * 1.2).toFixed(2))]));\nconsole.log(JSON.stringify(withTax));\n",
+   "name": "prices",
+   "type": "{ pen: number; cup: number; ink: number; }"
+  }
+ ],
+ "ts_operators": [
+  {
+   "title": "Integer arithmetic on floating-point numbers",
+   "code": "const minutes = 137;\nconsole.log(Math.trunc(minutes / 60), minutes % 60);\nconsole.log(2 ** 10, 7 / 2, Math.floor(7 / 2));\n",
+   "name": "minutes",
+   "type": "137"
+  }
+ ],
+ "ts_satisfies": [
+  {
+   "title": "A lookup that must cover every case",
+   "code": "type Status = \"todo\" | \"doing\" | \"done\";\nconst LABEL = { todo: \"To do\", doing: \"In progress\", done: \"Done\" } satisfies Record<Status, string>;\nconst statuses: Status[] = [\"done\", \"todo\"];\nconsole.log(statuses.map((s) => LABEL[s]).join(\" / \"));\n",
+   "name": "LABEL",
+   "type": "{ todo: string; doing: string; done: string; }"
+  }
+ ],
+ "ts_set_algebra": [
+  {
+   "title": "Grouping by a numeric key",
+   "code": "const scores = [91, 78, 85, 62, 99, 70, 88];\nconst byDecade = Map.groupBy(scores, (s) => Math.floor(s / 10) * 10);\nfor (const [decade, group] of [...byDecade].sort((x, y) => y[0] - x[0])) {\n  console.log(`${decade}s: ${group.join(\" \")}`);\n}\n",
+   "name": "byDecade",
+   "type": "Map<number, number[]>"
+  },
+  {
+   "title": "Remembering things about objects",
+   "code": "type Node = { id: string; children: Node[] };\nconst sizeCache = new WeakMap<Node, number>();\nlet computed = 0;\nfunction size(node: Node): number {\n  const cached = sizeCache.get(node);\n  if (cached !== undefined) return cached;\n  computed++;\n  let total = 1;\n  for (const child of node.children) total += size(child);\n  sizeCache.set(node, total);\n  return total;\n}\nconst leaf = { id: \"leaf\", children: [] };\nconst tree: Node = { id: \"root\", children: [{ id: \"a\", children: [leaf] }, leaf] };\nconsole.log(size(tree), size(tree), `computed ${computed}`);\n",
+   "name": "leaf",
+   "type": "{ id: string; children: never[]; }"
+  }
+ ],
+ "ts_strings": [
+  {
+   "title": "Template literals for output",
+   "code": "const name = \"Ada\";\nconst items = [\"pen\", \"cup\"];\nconst receipt = `Customer: ${name}\nItems: ${items.length} (${items.join(\", \")})\nTotal: $${(12.5).toFixed(2)}`;\nconsole.log(receipt);\n",
+   "name": "name",
+   "type": "\"Ada\""
+  }
+ ],
+ "ts_structural_typing": [
+  {
+   "title": "Ask only for what you use",
+   "code": "function describeLength(x: { length: number }): string {\n  return `length ${x.length}`;\n}\nconst rope = { length: 7, unit: \"m\" };\nconsole.log(describeLength(\"hello\"), \"|\", describeLength([1, 2, 3]), \"|\", describeLength(rope));\n",
+   "name": "rope",
+   "type": "{ length: number; unit: string; }"
+  }
+ ],
+ "ts_tuples": [
+  {
+   "title": "Entries are tuples",
+   "code": "const stock: Record<string, number> = { apples: 3, pears: 0, figs: 12 };\nconst entries = Object.entries(stock);\nconst sorted = [...entries].sort((a, b) => b[1] - a[1]);\nfor (const [fruit, count] of sorted) console.log(`${fruit.padEnd(6)} ${count}`);\nconst counts = new Map<string, number>(entries);\nconsole.log(counts.get(\"figs\"));\n",
+   "name": "entries",
+   "type": "[string, number][]"
+  }
+ ],
+ "ts_type_performance": [
+  {
+   "title": "Parsing literals, with a fallback for `string`",
+   "code": "type Split<S extends string> = string extends S\n  ? string[]\n  : S extends `${infer Head} ${infer Rest}`\n    ? [Head, ...Split<Rest>]\n    : [S];\n\nfunction words<S extends string>(s: S): Split<S> {\n  return s.split(\" \") as Split<S>;\n}\n\nconst known = words(\"red green blue\");   // [\"red\", \"green\", \"blue\"]\nconst fromInput = words([\"a\", \"b\", \"c\"].join(\" \"));   // string[]\nconsole.log(known[2].toUpperCase(), known.length);\nconsole.log(fromInput.length, fromInput[1] ?? \"-\");\n",
+   "name": "known",
+   "type": "[\"red\", \"green\", \"blue\"]"
+  }
+ ],
+ "ts_type_predicates": [
+  {
+   "title": "A predicate that makes `filter` precise",
+   "code": "const isNonEmpty = (s: string | null | undefined): s is string => s !== null && s !== undefined && s.trim() !== \"\";\nconst raw = [\"ana\", \"\", null, \"bo\", undefined, \"  \"];\nconst names = raw.filter(isNonEmpty);\nconsole.log(names.map((n) => n.toUpperCase()).join(\",\"));\n",
+   "name": "raw",
+   "type": "(string | null | undefined)[]"
+  }
+ ],
+ "ts_types": [
+  {
+   "title": "`null` and `undefined` in data",
+   "code": "const profile = { name: \"ana\", nickname: null, age: undefined };\nconsole.log(JSON.stringify(profile));\nconsole.log(\"nickname\" in profile, \"age\" in profile, profile.age === undefined);\n",
+   "name": "profile",
+   "type": "{ name: string; nickname: null; age: undefined; }"
+  }
+ ],
+ "ts_variables": [
+  {
+   "title": "`const` fixes the name, not the contents",
+   "code": "const scores = [70, 85];\nscores.push(92);\nconst user = { name: \"ana\", visits: 1 };\nuser.visits += 1;\nconsole.log(scores.join(\",\"), user.visits);\n",
+   "name": "user",
+   "type": "{ name: string; visits: number; }"
+  },
+  {
+   "title": "Shadowing: an inner name hides an outer one",
+   "code": "const label = \"outer\";\nfunction show(): string {\n  const label = \"inner\";\n  return label;\n}\n{\n  const label = \"block\";\n  console.log(label);\n}\nconsole.log(show(), label);\n",
+   "name": "label",
+   "type": "\"outer\""
+  }
+ ],
+ "ts_versions": [
+  {
+   "title": "ES2025 built-ins, in `es2025` from 6.0",
+   "code": "const a = new Set([\"ts\", \"go\", \"rust\"]);\nconst b = new Set([\"go\", \"java\"]);\nconsole.log([...a.union(b)].join(\",\"));\nconsole.log([...a.intersection(b)].join(\",\"));\n\nconst doubled = [1, 2, 3, 4].values().filter((n) => n % 2 === 0).map((n) => n * 10).toArray();\nconsole.log(doubled.join(\",\"));\n\nconst byLength = Object.groupBy([\"a\", \"bb\", \"cc\", \"d\"], (w) => String(w.length));\nconsole.log(JSON.stringify(byLength));\n",
+   "name": "byLength",
+   "type": "Partial<Record<string, string[]>>"
+  }
+ ]
+}

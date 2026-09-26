@@ -117,9 +117,31 @@ const input = await new Promise((resolve, reject) => {
   process.stdin.on("error", reject);
 });
 
+// With `infer: true`, also report the type the checker gives every top-level
+// `const` bound to a plain name without an annotation — the answers to a
+// "predict the type" drill, straight from the compiler (tools/gen_ts_predicts.py).
+function inferConsts(src, preset) {
+  const program = ts.createProgram([ENV_DTS, MAIN], optionsFor(preset), makeHost(src));
+  const checker = program.getTypeChecker();
+  const file = program.getSourceFile(MAIN);
+  const types = [];
+  for (const st of file.statements) {
+    if (!ts.isVariableStatement(st) || !(st.declarationList.flags & ts.NodeFlags.Const)) continue;
+    for (const d of st.declarationList.declarations) {
+      if (!ts.isIdentifier(d.name) || d.type) continue;
+      types.push({
+        name: d.name.text,
+        type: checker.typeToString(checker.getTypeAtLocation(d.name), undefined, ts.TypeFormatFlags.NoTruncation),
+      });
+    }
+  }
+  return types;
+}
+
 const items = JSON.parse(input);
-const out = items.map(({ id, src, preset }) => ({
+const out = items.map(({ id, src, preset, infer }) => ({
   id,
   diagnostics: diagnose(src, preset || "strict"),
+  ...(infer ? { consts: inferConsts(src, preset || "strict") } : {}),
 }));
 process.stdout.write(JSON.stringify(out));
