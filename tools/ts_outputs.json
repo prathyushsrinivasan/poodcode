@@ -9015,6 +9015,23 @@
    "33.33"
   ]
  },
+ "tsm-w1-rf1": {
+  "hash": "4c01612d2deef9bc272c",
+  "outputs": [
+   "area 12\nperimeter 14",
+   "area 20\nperimeter 24",
+   "area 1\nperimeter 4"
+  ]
+ },
+ "tsm-w1-rt1": {
+  "hash": "42c040f14c97900af468",
+  "outputs": [
+   "212 F",
+   "32 F",
+   "-40 F",
+   "98.6 F"
+  ]
+ },
  "tsm-w1-unit-price": {
   "hash": "1cf691ab6326a2f62adb",
   "outputs": [
@@ -9038,6 +9055,13 @@
    "S N S N",
    "W S E",
    "(no turns)"
+  ]
+ },
+ "tsm-w10-dz1": {
+  "hash": "1665dfc5626fa8276b55",
+  "outputs": [
+   "skip XL\n36",
+   "24"
   ]
  },
  "tsm-w10-lock": {
@@ -9075,6 +9099,13 @@
   "outputs": [
    "ann 6\nbob 1\ncy 1",
    "x 1\ny 1"
+  ]
+ },
+ "tsm-w10-rt1": {
+  "hash": "9c6a98bff290cf8b4ffb",
+  "outputs": [
+   "number 3.0\nyes\ntext HELLO",
+   "no\nnumber 2.3"
   ]
  },
  "tsm-w10-sizes": {
@@ -9119,6 +9150,12 @@
    "name=anonymous age=? city=nowhere\nname=Bo age=? city=nowhere\nnot an object"
   ]
  },
+ "tsm-w11-dz1": {
+  "hash": "5b59139930b6b9c94ed6",
+  "outputs": [
+   "a@x\n555\nno way to reach cy\nd@x"
+  ]
+ },
  "tsm-w11-event-filter": {
   "hash": "1797f48303cde6e86e64",
   "outputs": [
@@ -9141,6 +9178,19 @@
    "no data (2 missing)",
    "10.00 (0 missing)\n1.50 (0 missing)",
    "0.00 (1 missing)"
+  ]
+ },
+ "tsm-w11-rf1": {
+  "hash": "1f7240fefcd06ff29f80",
+  "outputs": [
+   "a=1.0\nb missing\nc=2.5",
+   "a missing\nb=3.0\nc missing"
+  ]
+ },
+ "tsm-w11-rt1": {
+  "hash": "f0cb27872acbfba63621",
+  "outputs": [
+   "port 80\nbad abc\nbad 70000\nport 443"
   ]
  },
  "tsm-w11-safe-queries": {
@@ -9182,6 +9232,12 @@
    "rejected 1: insufficient funds\nbad line 2\nbad line 3\nbad line 4\ncy 7"
   ]
  },
+ "tsm-w12-dz1": {
+  "hash": "a4afef44be7a3fcb59a7",
+  "outputs": [
+   "8\nnot a number: x\nempty\n5"
+  ]
+ },
  "tsm-w12-expr": {
   "hash": "cce03acb01e6d4e6f233",
   "outputs": [
@@ -9203,11 +9259,25 @@
    "<ul><li>a</li></ul>\n<ul><li>b</li></ul>\n<p>text after</p>\n<h6>tiny</h6>\n<p>####### not a heading #nospace</p>\nblocks: 5"
   ]
  },
+ "tsm-w12-rf1": {
+  "hash": "e2f61e03cea1deb4d321",
+  "outputs": [
+   "3\n12\n0\n2",
+   "0"
+  ]
+ },
  "tsm-w12-rpn": {
   "hash": "4072130451d1db3eb1c0",
   "outputs": [
    "14\n3.3333\nstack underflow\ndivision by zero\nleftover 2\nbad token x",
    "5\n6\n10"
+  ]
+ },
+ "tsm-w12-rt1": {
+  "hash": "a52ac2993fe62fd5ec29",
+  "outputs": [
+   "3.14\n6.00",
+   "1.00"
   ]
  },
  "tsm-w12-shapes": {
@@ -9257,6 +9327,13 @@
    "0\nunknown command toString\n0"
   ]
  },
+ "tsm-w13-dz1": {
+  "hash": "1f1be8bea051b4789e6d",
+  "outputs": [
+   "HI!\nTHERE!",
+   "X!"
+  ]
+ },
  "tsm-w13-handlers": {
   "hash": "125504b407bf29ba5034",
   "outputs": [
@@ -9285,6 +9362,12 @@
    "#1\nunknown handler nope\nremoved #1\nno #1\nno listeners for a\n#2\n#3\ncall 1\ncall 1"
   ]
  },
+ "tsm-w13-rt1": {
+  "hash": "7688ca4d2327616b5960",
+  "outputs": [
+   "4\n9\n4\n4\n16\ncalls 3"
+  ]
+ },
  "tsm-w13-stats": {
   "hash": "4d60d8bab9c89b4e025f",
   "outputs": [
@@ -9298,6 +9381,13 @@
   "outputs": [
    "6\na-b-c\nhello\nlongest needs a word",
    "5\nx\nab\nunknown max"
+  ]
+ },
+ "tsm-w14-dz1": {
+  "hash": "62a6a1f147f32df3de32",
+  "outputs": [
+   "production 80 false",
+   "development 3000 true"
   ]
  },
  "tsm-w14-env": {
@@ -9357,6 +9447,21 @@
    "ana: no nickname field\nbo: nickname cleared\ncy: empty nickname\ndee: nickname \"D\"\neve: bad nickname\nbad record"
   ]
  },
+ "tsm-w14-rt1": {
+  "hash": "0f36c2547cc8d12272ed",
+  "outputs": [
+   "8080\nlocalhost",
+   "1\nexample.org",
+   "3000\nlocalhost"
+  ]
+ },
+ "tsm-w15-dz1": {
+  "hash": "44c03207a36f4de7ff1d",
+  "outputs": [
+   "hi ada; hi bo",
+   "hi cy"
+  ]
+ },
  "tsm-w15-endpoints": {
   "hash": "6fc2454b74b07750f239",
   "outputs": [
@@ -9382,11 +9487,24 @@
    "[trim,upper] HELLO   WORLD\n[collapse,reverse,exclaim] b a!\nunknown plugin shout\n[upper] TWICE"
   ]
  },
+ "tsm-w15-rf1": {
+  "hash": "d3d728d696e0f9e39036",
+  "outputs": [
+   "#ff0000\n#008080\nunknown blue"
+  ]
+ },
  "tsm-w15-routes": {
   "hash": "e10136fc221faaf84962",
   "outputs": [
    "home\ncreateUser\nlistUsers\n405 method not allowed\n404 not found",
    "logout\n405 method not allowed"
+  ]
+ },
+ "tsm-w15-rt1": {
+  "hash": "c8e573645802ffa167c1",
+  "outputs": [
+   "localhost:8080",
+   "localhost:443"
   ]
  },
  "tsm-w15-shapes": {
@@ -9417,6 +9535,12 @@
    "$: 5 vs \"5\"\nequal\n$.a: [] vs {}"
   ]
  },
+ "tsm-w16-dz1": {
+  "hash": "fe0dbf7e1ee099223ef2",
+  "outputs": [
+   "to ada@x.io: hello there\nrejected not-an-email"
+  ]
+ },
  "tsm-w16-emails": {
   "hash": "b6218d8e4f4458da228c",
   "outputs": [
@@ -9435,6 +9559,20 @@
   "outputs": [
    "$80.00 - 15% = $68.00\n$19.99 - 12.5% = $17.49\n$10.00 - 100% = $0.00\n$5.00 - 0% = $5.00",
    "percent out of range 150%\nbad percent 15\nbad price x\nbad percent 33.33%"
+  ]
+ },
+ "tsm-w16-rf1": {
+  "hash": "7abb4444a7aa631a92b6",
+  "outputs": [
+   "ax3 bx1 cx1",
+   "xx1"
+  ]
+ },
+ "tsm-w16-rt1": {
+  "hash": "caaea62164e3a01cf6ac",
+  "outputs": [
+   "6 10",
+   "25"
   ]
  },
  "tsm-w16-time-travel": {
@@ -9470,6 +9608,12 @@
    "800x600 \"Untitled\" resizable=true theme=light\n1024x600 \"Untitled\" resizable=true theme=dark\nignored height\nignored resizable\nignored color\n800x600 \"\" resizable=true theme=light\nignored width\nignored theme\n800x600 \"Main\" resizable=true theme=light"
   ]
  },
+ "tsm-w17-dz1": {
+  "hash": "9378e139e3fcb29636cd",
+  "outputs": [
+   "1 x write tests\n2 - ship it"
+  ]
+ },
  "tsm-w17-form-errors": {
   "hash": "ba225aa5b759412aeb81",
   "outputs": [
@@ -9488,6 +9632,13 @@
    "{\"user\":\"ana\",\"profile\":{\"city\":\"Oslo\"},\"sessions\":[{\"ip\":\"1.2.3.4\"}]}\nremoved 4\n[1,{}]\nremoved 1\n\"just a string\"\nremoved 0"
   ]
  },
+ "tsm-w17-rt1": {
+  "hash": "004c270a47d8798e34a0",
+  "outputs": [
+   "5 1000 true",
+   "3 250 false"
+  ]
+ },
  "tsm-w17-teams": {
   "hash": "bca57e975bd145520022",
   "outputs": [
@@ -9502,6 +9653,13 @@
    "x y z\n1 chunk",
    "bad size",
    "only\n1 chunk"
+  ]
+ },
+ "tsm-w18-dz1": {
+  "hash": "56d8e30fe5a016c26281",
+  "outputs": [
+   "page 2/3: c d",
+   "page 1/1: x"
   ]
  },
  "tsm-w18-lru": {
@@ -9533,6 +9691,20 @@
    "2 4 | -\n- | ab cd"
   ]
  },
+ "tsm-w18-rf1": {
+  "hash": "2a6769db8f120970b44e",
+  "outputs": [
+   "hello\n5",
+   "a\n1"
+  ]
+ },
+ "tsm-w18-rt1": {
+  "hash": "1cafefb866087a460603",
+  "outputs": [
+   "a: apple,avocado\nb: banana,blueberry\nc: cherry",
+   "k: kiwi"
+  ]
+ },
  "tsm-w18-unique-by": {
   "hash": "ae39a7673149c71c36ce",
   "outputs": [
@@ -9556,6 +9728,12 @@
    "unknown column colour"
   ]
  },
+ "tsm-w19-dz1": {
+  "hash": "7ef6ceb13e04e28e1d2f",
+  "outputs": [
+   "HI THERE\ncba\nunknown op nope\n4"
+  ]
+ },
  "tsm-w19-i18n": {
   "hash": "85bb9405f019ae157ed9",
   "outputs": [
@@ -9568,6 +9746,12 @@
   "outputs": [
    "unknown sku ZZ\nfood: 11 units, $7.25\ntools: 1 unit, $12.00\ntoys: 2 units, $7.00\nbest seller: apple",
    "unknown sku Q9\nfood: 0 units, $0.00\ntools: 0 units, $0.00\ntoys: 0 units, $0.00\nbest seller: none"
+  ]
+ },
+ "tsm-w19-rt1": {
+  "hash": "e1916d2a1d8080b7986f",
+  "outputs": [
+   "port=8080\nhost=localhost\ntls=false\nno nope"
   ]
  },
  "tsm-w19-settings-io": {
@@ -9649,6 +9833,15 @@
    "y-axis"
   ]
  },
+ "tsm-w2-rf1": {
+  "hash": "ffa138f1b6ac6ae464ef",
+  "outputs": [
+   "red",
+   "blue",
+   "unknown",
+   "green"
+  ]
+ },
  "tsm-w2-rps": {
   "hash": "03b18086692ee36f9fc2",
   "outputs": [
@@ -9658,6 +9851,14 @@
    "draw",
    "invalid",
    "invalid"
+  ]
+ },
+ "tsm-w2-rt1": {
+  "hash": "64cc108c773739637d9c",
+  "outputs": [
+   "high",
+   "equal",
+   "low"
   ]
  },
  "tsm-w2-shipping": {
@@ -9729,6 +9930,12 @@
    "cityChanged: \"Oslo\" -> missing\nnameChanged: \"ana\" -> \"Ana\"\nzipChanged: missing -> \"0150\"\n--\nno changes\n--\ntagsChanged: [\"a\"] -> [\"a\",\"b\"]"
   ]
  },
+ "tsm-w20-dz1": {
+  "hash": "0af5151a5f495069dd2d",
+  "outputs": [
+   "ok\nname required; age must be a whole number; email invalid"
+  ]
+ },
  "tsm-w20-form-state": {
   "hash": "0050a19327aaa1e5d132",
   "outputs": [
@@ -9743,12 +9950,24 @@
    "unknown share\nunknown fly"
   ]
  },
+ "tsm-w20-rt1": {
+  "hash": "b96d969e9f7a73c80eee",
+  "outputs": [
+   "dark,compact,beta\ntrue"
+  ]
+ },
  "tsm-w21-compact": {
   "hash": "050e93dcde72fa2f9272",
   "outputs": [
    "kept 5 of 7\nvalues 1 2 3\nsum 6\nerror boom\nerror bad-input",
    "kept 0 of 2\nvalues none\nsum 0",
    "kept 1 of 1\nvalues none\nsum 0\nerror only"
+  ]
+ },
+ "tsm-w21-dz1": {
+  "hash": "5b0cde45daa2f5f3a04b",
+  "outputs": [
+   "S S M L XL"
   ]
  },
  "tsm-w21-flatten-deep": {
@@ -9772,6 +9991,12 @@
    "snake=first_name kebab=first-name camel=firstName pascal=FirstName\nsnake=user_id kebab=user-id camel=userId pascal=UserId\nsnake=http_status_code kebab=http-status-code camel=httpStatusCode pascal=HttpStatusCode\nsnake=parse_json_value kebab=parse-json-value camel=parseJsonValue pascal=ParseJsonValue\nsnake=x kebab=x camel=x pascal=X"
   ]
  },
+ "tsm-w22-dz1": {
+  "hash": "f2a89ff460f8a97a3895",
+  "outputs": [
+   "london\nada\nno getAge"
+  ]
+ },
  "tsm-w22-route-params": {
   "hash": "c952f217869e4c2a4345",
   "outputs": [
@@ -9783,6 +10008,13 @@
   "hash": "a91c10ecb489a7cee2d2",
   "outputs": [
    "user:created -> s1\norder:deleted -> s2\norder:created -> s3\nuser:deleted -> s1\norder:updated -> nobody\nbad event user:banned\nbad pattern *:*"
+  ]
+ },
+ "tsm-w23-dz1": {
+  "hash": "610224b40c3c1afe6172",
+  "outputs": [
+   "w1 3.30",
+   "w1 0.30"
   ]
  },
  "tsm-w23-elevator": {
@@ -9813,6 +10045,20 @@
    "V -> large\nW refused: no space\nX refused: unknown type boat\nsmall 0/0 medium 0/0 large 0/1"
   ]
  },
+ "tsm-w23-rf1": {
+  "hash": "250ed40c28dbb8d4f43b",
+  "outputs": [
+   "2 4 6",
+   "5"
+  ]
+ },
+ "tsm-w23-rt1": {
+  "hash": "b38c198d6bc692b03c46",
+  "outputs": [
+   "2\n1\nempty\nsize 0",
+   "size 1"
+  ]
+ },
  "tsm-w23-shapes": {
   "hash": "295285defeb07ea2dfd7",
   "outputs": [
@@ -9838,6 +10084,13 @@
   "outputs": [
    "20 30 40 50 60 70 80\n40\nnone\n40 50 60\n3",
    "(empty)\n4\n(none)"
+  ]
+ },
+ "tsm-w24-dz1": {
+  "hash": "961efbe36b9b0c0ca8c0",
+  "outputs": [
+   "a\n2 left: b,c",
+   "empty\n0 left:"
   ]
  },
  "tsm-w24-interleave": {
@@ -9875,6 +10128,13 @@
    "empty\ndropped x\ny"
   ]
  },
+ "tsm-w24-rt1": {
+  "hash": "e14fdfb654fa3a40830e",
+  "outputs": [
+   "a,b\nc,d\ne",
+   "x"
+  ]
+ },
  "tsm-w24-running-median": {
   "hash": "15a66a1abbe96fea4bed",
   "outputs": [
@@ -9896,6 +10156,12 @@
    "imported 2",
    "Error: import failed at line 2\n  Error: bad record 'bo:-4'\n    RangeError: age out of range: -4",
    "Error: import failed at line 1\n  Error: bad record 'x:abc'\n    RangeError: age out of range: abc"
+  ]
+ },
+ "tsm-w25-dz1": {
+  "hash": "367d503e0a5b034bd8c1",
+  "outputs": [
+   "age 36\nerror out of range: -1\nerror not a whole number: abc\nerror out of range: 200\nage 0"
   ]
  },
  "tsm-w25-fail-fast": {
@@ -9920,6 +10186,18 @@
    "attempt 1: failed timeout\nattempt 2: failed auth\ngave up: auth (not retryable)",
    "attempt 1: failed busy\nattempt 2: failed busy\ngave up: busy (out of attempts)",
    "attempt 1: first\nresult first"
+  ]
+ },
+ "tsm-w25-rf1": {
+  "hash": "8f9dbe76bdaa96676e5d",
+  "outputs": [
+   "2\nfailed: exploded\nfailed: a plain string"
+  ]
+ },
+ "tsm-w25-rt1": {
+  "hash": "84ec983c0105ba701b82",
+  "outputs": [
+   "ok a\nhandling x: bad x (error cause)\nhandling y: 42 (cause 42)"
   ]
  },
  "tsm-w25-safe-json": {
@@ -9979,6 +10257,13 @@
    "t=40 search \"ab\"\nsearches: 1, keystrokes: 2"
   ]
  },
+ "tsm-w26-dz1": {
+  "hash": "e78824f208243725dac4",
+  "outputs": [
+   "1 4 9 16",
+   "25"
+  ]
+ },
  "tsm-w26-loader": {
   "hash": "a6680ed3f059b365d815",
   "outputs": [
@@ -10001,6 +10286,20 @@
    "t=0 start a\nt=0 start b\nt=10 end b\nt=10 start c\nt=20 end c\nt=20 start d\nt=30 end a\nt=30 start e\nt=35 end e\nt=40 end d\nall done at t=40\na=30 b=10 c=10 d=20 e=5",
    "t=0 start x\nt=5 end x\nt=5 start y\nt=10 end y\nall done at t=10\nx=5 y=5",
    "t=0 start p\nt=0 start q\nt=3 end q\nt=7 end p\nall done at t=7\np=7 q=3"
+  ]
+ },
+ "tsm-w26-rf1": {
+  "hash": "7654fa13c8ec6e15ced9",
+  "outputs": [
+   "item1,item2,item3\nextra item3",
+   "item7\nextra item1"
+  ]
+ },
+ "tsm-w26-rt1": {
+  "hash": "b862956a58e7a2aec632",
+  "outputs": [
+   "2 4 6",
+   "20"
   ]
  },
  "tsm-w26-throttle": {
@@ -10146,6 +10445,22 @@
    "-1000009"
   ]
  },
+ "tsm-w3-rf1": {
+  "hash": "0acad889576d3acff422",
+  "outputs": [
+   "total 14 max 9",
+   "total -6 max -1",
+   "total 7 max 7"
+  ]
+ },
+ "tsm-w3-rt1": {
+  "hash": "c08fbd51012c637a7318",
+  "outputs": [
+   "10 2.50",
+   "10 10.00",
+   "16 5.33"
+  ]
+ },
  "tsm-w3-words": {
   "hash": "7bca81a1ad53e038700a",
   "outputs": [
@@ -10214,12 +10529,26 @@
    "pangram"
   ]
  },
+ "tsm-w4-rf1": {
+  "hash": "c96ef6ce991e165f63f1",
+  "outputs": [
+   "Name: LOVELACE, ada (london)",
+   "Name: TURING, alan (wilmslow)"
+  ]
+ },
  "tsm-w4-roman": {
   "hash": "6090435700105faf25ea",
   "outputs": [
    "3\n4\n9\n58\n1994",
    "3999\ninvalid\ninvalid\ninvalid",
    "42\ninvalid\n1000"
+  ]
+ },
+ "tsm-w4-rt1": {
+  "hash": "2174adb8cbb8f50d365c",
+  "outputs": [
+   "AL\nGBH",
+   "AT"
   ]
  },
  "tsm-w4-snake": {
@@ -10268,6 +10597,13 @@
    "1 minute, 1 second\n1h\n2 hours\n59s"
   ]
  },
+ "tsm-w5-dz1": {
+  "hash": "6341b6c4ee7c05cbabca",
+  "outputs": [
+   "3\n3.14\n3.14m",
+   "10\n10.0\n10.0kg"
+  ]
+ },
  "tsm-w5-greet": {
   "hash": "9fe39008ff2647149e89",
   "outputs": [
@@ -10302,6 +10638,20 @@
   "outputs": [
    "0 1 2 3 4\n2 3 4 5\n10 7 4 1\n0 4 8",
    "(empty)\n(empty)\n(empty)\n(empty)"
+  ]
+ },
+ "tsm-w5-rf1": {
+  "hash": "2226e443e5f23eb4d4b3",
+  "outputs": [
+   "Hello, friend!\nHello, Ada!\nHi, Ada!",
+   "Hello, friend!\nHello, Bo!\nWelcome, Bo!"
+  ]
+ },
+ "tsm-w5-rt1": {
+  "hash": "8794f3afc2e45eabddb7",
+  "outputs": [
+   "72\n60",
+   "17.99\n9.99"
   ]
  },
  "tsm-w5-safe-divide": {
@@ -10339,6 +10689,13 @@
    "15: b\n49: d\n59: e",
    "6: x",
    "3: a\n6: b\n9: c\n12: d"
+  ]
+ },
+ "tsm-w6-dz1": {
+  "hash": "6fccb6433f81034b58c2",
+  "outputs": [
+   "11 3",
+   "4 3"
   ]
  },
  "tsm-w6-find-from": {
@@ -10400,6 +10757,20 @@
    "all even: true\nany negative: false\nnone zero: false\nsorted: true"
   ]
  },
+ "tsm-w6-rf1": {
+  "hash": "7336a92465d79d667aad",
+  "outputs": [
+   "5,5,5\n15",
+   "4,5\n9"
+  ]
+ },
+ "tsm-w6-rt1": {
+  "hash": "aca3e1df22163782b528",
+  "outputs": [
+   "3\n5\n7",
+   "21"
+  ]
+ },
  "tsm-w6-unique-perms": {
   "hash": "7a59143481843dce1496",
   "outputs": [
@@ -10442,6 +10813,13 @@
    "-5 -4\ndecreasing"
   ]
  },
+ "tsm-w7-dz1": {
+  "hash": "c183a5e5b3a9c064f5f9",
+  "outputs": [
+   "cy 95\n3",
+   "solo 1\n1"
+  ]
+ },
  "tsm-w7-group-length": {
   "hash": "3bbc486eca8dd9f39e96",
   "outputs": [
@@ -10458,6 +10836,13 @@
    "1 2 3\n3"
   ]
  },
+ "tsm-w7-rf1": {
+  "hash": "36a029c128cdc76deaa6",
+  "outputs": [
+   "1 2 3\n3 2 1\n3 1 2",
+   "7 8 9 10\n10 9 8 7\n9 8 7 10"
+  ]
+ },
  "tsm-w7-rotate": {
   "hash": "ea79fc5dec05338ceece",
   "outputs": [
@@ -10465,6 +10850,14 @@
    "b c a",
    "4 1 2 3",
    "z"
+  ]
+ },
+ "tsm-w7-rt1": {
+  "hash": "6824a3e5f0ceaf0d3e7d",
+  "outputs": [
+   "1..3",
+   "5..5",
+   "-1..10"
   ]
  },
  "tsm-w7-spiral": {
@@ -10525,6 +10918,12 @@
    "~ n: 1 -> \"1\""
   ]
  },
+ "tsm-w8-dz1": {
+  "hash": "0d753c6e21967aba6e78",
+  "outputs": [
+   "A1: 3.00 (gift)\nB2: 11.50"
+  ]
+ },
  "tsm-w8-flatten": {
   "hash": "751b25cf647cb9b0dab3",
   "outputs": [
@@ -10572,6 +10971,19 @@
    "{\"b\":1,\"c\":[1,2]}"
   ]
  },
+ "tsm-w8-rf1": {
+  "hash": "22e5c24c81863ecfbbad",
+  "outputs": [
+   "(3, 4) -> 5.0\n(1, 1) -> 1.4",
+   "(0, 5) -> 5.0"
+  ]
+ },
+ "tsm-w8-rt1": {
+  "hash": "fd83d2935c8fa8c3b25f",
+  "outputs": [
+   "ada [admin,dev] 2 more\nbo [] 2 more"
+  ]
+ },
  "tsm-w8-unflatten": {
   "hash": "7348b608053e8190600b",
   "outputs": [
@@ -10601,6 +11013,13 @@
    "2 4\n6",
    "(none)\n2",
    "7 8 9\n3"
+  ]
+ },
+ "tsm-w9-dz1": {
+  "hash": "022f6aec99647efd93c9",
+  "outputs": [
+   "a: b,c\nb: a,c\nc: a,b",
+   "x: y\ny: x"
   ]
  },
  "tsm-w9-first-repeat": {
@@ -10649,6 +11068,20 @@
    "yes",
    "missing e1 o2 z2",
    "yes"
+  ]
+ },
+ "tsm-w9-rf1": {
+  "hash": "51e29073b55aa887490a",
+  "outputs": [
+   "a b",
+   "none"
+  ]
+ },
+ "tsm-w9-rt1": {
+  "hash": "6b05828ba356344fd0b0",
+  "outputs": [
+   "b 3\n3",
+   "x 1\n1"
   ]
  },
  "tsm-w9-same-shape": {

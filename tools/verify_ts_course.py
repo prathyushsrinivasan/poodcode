@@ -223,6 +223,10 @@ def check_starter(where, ex, args, type_failed):
     """
     if type_failed:
         return []
+    # The judge rejects a banned token before compiling anything (a refactor
+    # exercise's starter works, and fails only this way).
+    if any(b and b in ex["starter"] for b in (ex.get("forbid") or [])):
+        return []
     # A type-level exercise has no other way to fail: the type-check IS the
     # grade, so a starter that compiles is a starter that passes.
     if ex.get("judge_mode") == "types":

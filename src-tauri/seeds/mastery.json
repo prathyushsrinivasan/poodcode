@@ -1236,6 +1236,81 @@
             "dataset": ""
           },
           {
+            "id": "tsm-w1-rt1",
+            "title": "Temperatures without any",
+            "prompt": "It converts Celsius to Fahrenheit correctly — and `any` means the compiler checks none of it. Replace both `any` annotations with the type each value really has.",
+            "hint": "`Number(...)` always produces a number.",
+            "hints": [
+              "`Number(...)` always produces a number.",
+              "Arithmetic on numbers gives a number: both are `number`."
+            ],
+            "language": "typescript",
+            "kind": "retype",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype _1 = Expect<Equal<typeof celsius, number>>;\ntype _2 = Expect<Equal<typeof fahrenheit, number>>;\n",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst celsius: any = Number(input);\nconst fahrenheit: any = (celsius * 9) / 5 + 32;\nconsole.log(fahrenheit + \" F\");\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst celsius: number = Number(input);\nconst fahrenheit: number = (celsius * 9) / 5 + 32;\nconsole.log(fahrenheit + \" F\");\n",
+            "tests": [
+              {
+                "input": "100",
+                "output": "212 F"
+              },
+              {
+                "input": "0",
+                "output": "32 F"
+              },
+              {
+                "input": "-40",
+                "output": "-40 F"
+              },
+              {
+                "input": "37",
+                "output": "98.6 F"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w1-rf1",
+            "title": "Nothing here changes",
+            "prompt": "Every `let` below is assigned once and never again. Make each one a `const`, so the compiler stops anyone reassigning them by accident. The output must not change.",
+            "hint": "Reach for `const` by default; `let` is for values that really change.",
+            "hints": [
+              "Reach for `const` by default; `let` is for values that really change."
+            ],
+            "language": "typescript",
+            "kind": "refactor",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [
+              "let "
+            ],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nlet parts = input.split(/\\s+/);\nlet w = Number(parts[0]);\nlet h = Number(parts[1]);\nlet area = w * h;\nlet perimeter = 2 * (w + h);\nconsole.log(`area ${area}`);\nconsole.log(`perimeter ${perimeter}`);\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst parts = input.split(/\\s+/);\nconst w = Number(parts[0]);\nconst h = Number(parts[1]);\nconst area = w * h;\nconst perimeter = 2 * (w + h);\nconsole.log(`area ${area}`);\nconsole.log(`perimeter ${perimeter}`);\n",
+            "tests": [
+              {
+                "input": "3 4",
+                "output": "area 12\nperimeter 14"
+              },
+              {
+                "input": "10 2",
+                "output": "area 20\nperimeter 24"
+              },
+              {
+                "input": "1 1",
+                "output": "area 1\nperimeter 4"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
             "id": "tsm-ts_program_io-order1",
             "title": "Put it in order: Two numbers on one line",
             "prompt": "The lines of the worked example “Two numbers on one line” from Program I/O — stdin and stdout, shuffled. Put them back in an order that compiles and — given the input below — prints exactly the output below.\n\nInput:\n    3 4\n\nPrints:\n    area 12\n    perimeter 14",
@@ -3439,6 +3514,83 @@
               {
                 "input": "9",
                 "output": "many"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w2-rt1",
+            "title": "Classify with real types",
+            "prompt": "`classify` compares two numbers and names the result. Replace every `any`: the two parameters are numbers, and the return type should be `string`.",
+            "hint": "The call passes the numbers from `.map(Number)`.",
+            "hints": [
+              "The call passes the numbers from `.map(Number)`.",
+              "Annotate the return as `string`."
+            ],
+            "language": "typescript",
+            "kind": "retype",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype _1 = Expect<Equal<Parameters<typeof classify>[0], number>>;\ntype _2 = Expect<Equal<Parameters<typeof classify>[1], number>>;\ntype _3 = Expect<Equal<ReturnType<typeof classify>, string>>;\n",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nfunction classify(n: any, limit: any): any {\n  if (n > limit) return \"high\";\n  if (n === limit) return \"equal\";\n  return \"low\";\n}\nconst [a, b] = input.split(/\\s+/).map(Number);\nconsole.log(classify(a, b));\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nfunction classify(n: number, limit: number): string {\n  if (n > limit) return \"high\";\n  if (n === limit) return \"equal\";\n  return \"low\";\n}\nconst [a, b] = input.split(/\\s+/).map(Number);\nconsole.log(classify(a, b));\n",
+            "tests": [
+              {
+                "input": "5 3",
+                "output": "high"
+              },
+              {
+                "input": "3 3",
+                "output": "equal"
+              },
+              {
+                "input": "1 9",
+                "output": "low"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w2-rf1",
+            "title": "A table, not a chain",
+            "prompt": "The if/else chain maps a colour code to its name. Replace it with a lookup object and `??` for the fallback — no `if (` and no `switch` left.",
+            "hint": "An object whose keys are the codes: `{ R: \"red\", ... }`.",
+            "hints": [
+              "An object whose keys are the codes: `{ R: \"red\", ... }`.",
+              "Annotate it `Record<string, string>` so any code can index it, then `?? \"unknown\"`."
+            ],
+            "language": "typescript",
+            "kind": "refactor",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [
+              "if (",
+              "switch"
+            ],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nlet name = \"\";\nif (input === \"R\") name = \"red\";\nelse if (input === \"G\") name = \"green\";\nelse if (input === \"B\") name = \"blue\";\nelse name = \"unknown\";\nconsole.log(name);\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst names: Record<string, string> = { R: \"red\", G: \"green\", B: \"blue\" };\nconsole.log(names[input] ?? \"unknown\");\n",
+            "tests": [
+              {
+                "input": "R",
+                "output": "red"
+              },
+              {
+                "input": "B",
+                "output": "blue"
+              },
+              {
+                "input": "X",
+                "output": "unknown"
+              },
+              {
+                "input": "G",
+                "output": "green"
               }
             ],
             "source_slug": "",
@@ -5700,6 +5852,78 @@
             "dataset": ""
           },
           {
+            "id": "tsm-w3-rt1",
+            "title": "Statistics, typed",
+            "prompt": "`stats` sums a list of numbers and averages it. Replace each `any` — `xs` is an array of numbers (a `readonly` one is fine too) and `sum` is a number.",
+            "hint": "`number[]` or `readonly number[]` for the list.",
+            "hints": [
+              "`number[]` or `readonly number[]` for the list.",
+              "Once `sum` starts as a number, the return type follows."
+            ],
+            "language": "typescript",
+            "kind": "retype",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype _P = Parameters<typeof stats>[0];\ntype _1 = Expect<Equal<IsAny<_P>, false>>;\ntype _2 = Expect<Equal<number[] extends _P ? (_P extends readonly number[] ? true : false) : false, true>>;\ntype _3 = Expect<Equal<ReturnType<typeof stats>, { sum: number; mean: number }>>;\n",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nfunction stats(xs: any) {\n  let sum: any = 0;\n  for (const x of xs) sum += x;\n  return { sum, mean: sum / xs.length };\n}\nconst s = stats(input.split(/\\s+/).map(Number));\nconsole.log(s.sum + \" \" + s.mean.toFixed(2));\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nfunction stats(xs: readonly number[]) {\n  let sum = 0;\n  for (const x of xs) sum += x;\n  return { sum, mean: sum / xs.length };\n}\nconst s = stats(input.split(/\\s+/).map(Number));\nconsole.log(s.sum + \" \" + s.mean.toFixed(2));\n",
+            "tests": [
+              {
+                "input": "1 2 3 4",
+                "output": "10 2.50"
+              },
+              {
+                "input": "10",
+                "output": "10 10.00"
+              },
+              {
+                "input": "5 5 6",
+                "output": "16 5.33"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w3-rf1",
+            "title": "No index bookkeeping",
+            "prompt": "The loop only ever reads `xs[i]`. Rewrite it without an index: iterate over the values directly. The output must not change.",
+            "hint": "`for (const x of xs)` hands you each value.",
+            "hints": [
+              "`for (const x of xs)` hands you each value."
+            ],
+            "language": "typescript",
+            "kind": "refactor",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [
+              "for (let",
+              "xs[i]"
+            ],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst xs = input.split(/\\s+/).map(Number);\nlet total = 0;\nlet best = -Infinity;\nfor (let i = 0; i < xs.length; i++) {\n  total += xs[i];\n  if (xs[i] > best) best = xs[i];\n}\nconsole.log(`total ${total} max ${best}`);\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst xs = input.split(/\\s+/).map(Number);\nlet total = 0;\nlet best = -Infinity;\nfor (const x of xs) {\n  total += x;\n  if (x > best) best = x;\n}\nconsole.log(`total ${total} max ${best}`);\n",
+            "tests": [
+              {
+                "input": "3 9 2",
+                "output": "total 14 max 9"
+              },
+              {
+                "input": "-5 -1",
+                "output": "total -6 max -1"
+              },
+              {
+                "input": "7",
+                "output": "total 7 max 7"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
             "id": "tsm-ts_loops-order1",
             "title": "Put it in order: Breaking out of nested loops",
             "prompt": "The lines of the worked example “Breaking out of nested loops” from Loops, shuffled. Put them back in an order that compiles and prints exactly:\n\n    8 + 11",
@@ -7765,6 +7989,69 @@
               {
                 "input": "a😀b",
                 "output": "b😀a"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w4-rt1",
+            "title": "Initials, typed",
+            "prompt": "`initials` turns a full name into its initials. Replace the three `any`s: a name is a string, each word is a string, and so is the result.",
+            "hint": "Once `name` is a string, `split` gives `string[]` and the callback's `w` is inferred — no annotation needed.",
+            "hints": [
+              "Once `name` is a string, `split` gives `string[]` and the callback's `w` is inferred — no annotation needed."
+            ],
+            "language": "typescript",
+            "kind": "retype",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype _1 = Expect<Equal<Parameters<typeof initials>[0], string>>;\ntype _2 = Expect<Equal<ReturnType<typeof initials>, string>>;\n",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nfunction initials(name: any): any {\n  return name.split(\" \").map((w: any) => w[0].toUpperCase()).join(\"\");\n}\nfor (const line of input.split(\"\\n\")) console.log(initials(line.trim()));\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nfunction initials(name: string): string {\n  return name.split(\" \").map((w) => w[0].toUpperCase()).join(\"\");\n}\nfor (const line of input.split(\"\\n\")) console.log(initials(line.trim()));\n",
+            "tests": [
+              {
+                "input": "ada lovelace\ngrace brewster hopper",
+                "output": "AL\nGBH"
+              },
+              {
+                "input": "alan turing",
+                "output": "AT"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w4-rf1",
+            "title": "Template, not glue",
+            "prompt": "The line is glued together with `+`. Build it with one template literal instead — no `\" +` or `+ \"` left. Same output.",
+            "hint": "Backticks, with each value in `${...}`.",
+            "hints": [
+              "Backticks, with each value in `${...}`."
+            ],
+            "language": "typescript",
+            "kind": "refactor",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [
+              "\" +",
+              "+ \""
+            ],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst [first, last, city] = input.split(\",\").map((s) => s.trim());\nconsole.log(\"Name: \" + last.toUpperCase() + \", \" + first + \" (\" + city + \")\");\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst [first, last, city] = input.split(\",\").map((s) => s.trim());\nconsole.log(`Name: ${last.toUpperCase()}, ${first} (${city})`);\n",
+            "tests": [
+              {
+                "input": "ada, lovelace, london",
+                "output": "Name: LOVELACE, ada (london)"
+              },
+              {
+                "input": "alan,turing,wilmslow",
+                "output": "Name: TURING, alan (wilmslow)"
               }
             ],
             "source_slug": "",
@@ -9992,6 +10279,100 @@
             "dataset": ""
           },
           {
+            "id": "tsm-w5-dz1",
+            "title": "A formatter's type",
+            "prompt": "Write `Formatter` first: a function type taking a number and an optional options object (`decimals?: number`, `unit?: string`) and returning a string. The implementation and the calls below already rely on it.",
+            "hint": "A function type: `(value: number, opts?: {...}) => string`.",
+            "hints": [
+              "A function type: `(value: number, opts?: {...}) => string`.",
+              "The second parameter is optional — `opts?:` — because the first call leaves it out."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype _1 = Expect<Equal<Parameters<Formatter>[0], number>>;\ntype _2 = Expect<Equal<Parameters<Formatter>[1], { decimals?: number; unit?: string } | undefined>>;\ntype _3 = Expect<Equal<ReturnType<Formatter>, string>>;\ntype _4 = Expect<Equal<Parameters<Formatter>[\"length\"], 1 | 2>>;\n",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\nconst format: Formatter = (value, opts = {}) => `${value.toFixed(opts.decimals ?? 0)}${opts.unit ?? \"\"}`;\nconst [v, d, u] = input.split(/\\s+/);\nconsole.log(format(Number(v)));\nconsole.log(format(Number(v), { decimals: Number(d) }));\nconsole.log(format(Number(v), { decimals: Number(d), unit: u }));\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Formatter = (value: number, opts?: { decimals?: number; unit?: string }) => string;\nconst format: Formatter = (value, opts = {}) => `${value.toFixed(opts.decimals ?? 0)}${opts.unit ?? \"\"}`;\nconst [v, d, u] = input.split(/\\s+/);\nconsole.log(format(Number(v)));\nconsole.log(format(Number(v), { decimals: Number(d) }));\nconsole.log(format(Number(v), { decimals: Number(d), unit: u }));\n",
+            "tests": [
+              {
+                "input": "3.14159 2 m",
+                "output": "3\n3.14\n3.14m"
+              },
+              {
+                "input": "10 1 kg",
+                "output": "10\n10.0\n10.0kg"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w5-rt1",
+            "title": "Discounts, typed",
+            "prompt": "Replace every `any` in `applyDiscount`. The discount percentage has a default of 10; its type should still be `number`.",
+            "hint": "A default value is enough for inference: `pct = 10` is a `number`.",
+            "hints": [
+              "A default value is enough for inference: `pct = 10` is a `number`.",
+              "Callers may leave it out, so its parameter type reads `number | undefined` from outside."
+            ],
+            "language": "typescript",
+            "kind": "retype",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype _1 = Expect<Equal<Parameters<typeof applyDiscount>[0], number>>;\ntype _2 = Expect<Equal<Parameters<typeof applyDiscount>[1], number | undefined>>;\ntype _3 = Expect<Equal<ReturnType<typeof applyDiscount>, number>>;\n",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nfunction applyDiscount(price: any, pct: any = 10): any {\n  return Math.round(price * (100 - pct)) / 100;\n}\nconst [p, d] = input.split(/\\s+/).map(Number);\nconsole.log(applyDiscount(p));\nconsole.log(applyDiscount(p, d));\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nfunction applyDiscount(price: number, pct = 10): number {\n  return Math.round(price * (100 - pct)) / 100;\n}\nconst [p, d] = input.split(/\\s+/).map(Number);\nconsole.log(applyDiscount(p));\nconsole.log(applyDiscount(p, d));\n",
+            "tests": [
+              {
+                "input": "80 25",
+                "output": "72\n60"
+              },
+              {
+                "input": "19.99 50",
+                "output": "17.99\n9.99"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w5-rf1",
+            "title": "Defaults where they belong",
+            "prompt": "`greet` fakes default arguments with `||`. Use real default parameters instead — no `||` left. (Every test passes non-empty names, so the behaviour is the same.)",
+            "hint": "`function greet(name = \"friend\", ...)` — the default applies when the argument is missing.",
+            "hints": [
+              "`function greet(name = \"friend\", ...)` — the default applies when the argument is missing."
+            ],
+            "language": "typescript",
+            "kind": "refactor",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [
+              "||"
+            ],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nfunction greet(name?: string, greeting?: string): string {\n  const n = name || \"friend\";\n  const g = greeting || \"Hello\";\n  return `${g}, ${n}!`;\n}\nconst parts = input.split(\",\").map((s) => s.trim());\nconsole.log(greet());\nconsole.log(greet(parts[0]));\nconsole.log(greet(parts[0], parts[1]));\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nfunction greet(name = \"friend\", greeting = \"Hello\"): string {\n  return `${greeting}, ${name}!`;\n}\nconst parts = input.split(\",\").map((s) => s.trim());\nconsole.log(greet());\nconsole.log(greet(parts[0]));\nconsole.log(greet(parts[0], parts[1]));\n",
+            "tests": [
+              {
+                "input": "Ada, Hi",
+                "output": "Hello, friend!\nHello, Ada!\nHi, Ada!"
+              },
+              {
+                "input": "Bo, Welcome",
+                "output": "Hello, friend!\nHello, Bo!\nWelcome, Bo!"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
             "id": "tsm-ts_functions-order1",
             "title": "Put it in order: Small functions, wired together",
             "prompt": "The lines of the worked example “Small functions, wired together” from Functions & Arrow Functions, shuffled. Put them back in an order that compiles and prints exactly:\n\n    mon: avg 5.0 over 3\n    tue: avg 15.0 over 2",
@@ -11901,6 +12282,102 @@
             "dataset": ""
           },
           {
+            "id": "tsm-w6-rt1",
+            "title": "Composition, typed",
+            "prompt": "`compose(f, g)` returns a function that applies `f` then `g`. Here both work on numbers. Replace every `any` so the parameters are `(n: number) => number` functions and the result is one too.",
+            "hint": "A function type is written `(n: number) => number`.",
+            "hints": [
+              "A function type is written `(n: number) => number`.",
+              "Annotate the return type and the inner arrow's `x` is inferred."
+            ],
+            "language": "typescript",
+            "kind": "retype",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype _1 = Expect<Equal<Parameters<typeof compose>[0], (n: number) => number>>;\ntype _2 = Expect<Equal<Parameters<typeof compose>[1], (n: number) => number>>;\ntype _3 = Expect<Equal<ReturnType<typeof compose>, (x: number) => number>>;\n",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nfunction compose(f: any, g: any): any {\n  return (x: any) => g(f(x));\n}\nconst double = (n: number) => n * 2;\nconst inc = (n: number) => n + 1;\nconst both = compose(double, inc);\nfor (const n of input.split(/\\s+/).map(Number)) console.log(both(n));\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nfunction compose(f: (n: number) => number, g: (n: number) => number): (x: number) => number {\n  return (x) => g(f(x));\n}\nconst double = (n: number) => n * 2;\nconst inc = (n: number) => n + 1;\nconst both = compose(double, inc);\nfor (const n of input.split(/\\s+/).map(Number)) console.log(both(n));\n",
+            "tests": [
+              {
+                "input": "1 2 3",
+                "output": "3\n5\n7"
+              },
+              {
+                "input": "10",
+                "output": "21"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w6-rf1",
+            "title": "Loops into a pipeline",
+            "prompt": "Rewrite the two loops as a `filter`, a `map` and a `reduce` — no `for (` or `while (` left. Same output.",
+            "hint": "Keep the long words, then turn each into its length.",
+            "hints": [
+              "Keep the long words, then turn each into its length.",
+              "`reduce((a, b) => a + b, 0)` sums."
+            ],
+            "language": "typescript",
+            "kind": "refactor",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [
+              "for (",
+              "while ("
+            ],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst words = input.split(/\\s+/);\nconst lengths: number[] = [];\nfor (const w of words) {\n  if (w.length > 3) lengths.push(w.length);\n}\nlet total = 0;\nfor (const n of lengths) total += n;\nconsole.log(lengths.join(\",\"));\nconsole.log(total);\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst words = input.split(/\\s+/);\nconst lengths = words.filter((w) => w.length > 3).map((w) => w.length);\nconst total = lengths.reduce((a, b) => a + b, 0);\nconsole.log(lengths.join(\",\"));\nconsole.log(total);\n",
+            "tests": [
+              {
+                "input": "the quick brown fox jumps",
+                "output": "5,5,5\n15"
+              },
+              {
+                "input": "a bb ccc dddd eeeee",
+                "output": "4,5\n9"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w6-dz1",
+            "title": "A recursive shape",
+            "prompt": "Write the `Tree` type: a node has a numeric `value` and a list of `children`, each of which is itself a `Tree`. Both recursive functions below depend on it.",
+            "hint": "A type alias may refer to itself inside an object type.",
+            "hints": [
+              "A type alias may refer to itself inside an object type.",
+              "`children: Tree[]`."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype _1 = Expect<Equal<Tree[\"value\"], number>>;\ntype _2 = Expect<Equal<Tree[\"children\"][number], Tree>>;\n",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\nfunction sum(t: Tree): number {\n  return t.value + t.children.reduce((acc, c) => acc + sum(c), 0);\n}\nfunction depth(t: Tree): number {\n  return 1 + Math.max(0, ...t.children.map(depth));\n}\nconst [a, b, c] = input.split(/\\s+/).map(Number);\nconst tree: Tree = {\n  value: a,\n  children: [{ value: b, children: [] }, { value: c, children: [{ value: 1, children: [] }] }],\n};\nconsole.log(sum(tree), depth(tree));\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Tree = { value: number; children: Tree[] };\nfunction sum(t: Tree): number {\n  return t.value + t.children.reduce((acc, c) => acc + sum(c), 0);\n}\nfunction depth(t: Tree): number {\n  return 1 + Math.max(0, ...t.children.map(depth));\n}\nconst [a, b, c] = input.split(/\\s+/).map(Number);\nconst tree: Tree = {\n  value: a,\n  children: [{ value: b, children: [] }, { value: c, children: [{ value: 1, children: [] }] }],\n};\nconsole.log(sum(tree), depth(tree));\n",
+            "tests": [
+              {
+                "input": "5 3 2",
+                "output": "11 3"
+              },
+              {
+                "input": "1 1 1",
+                "output": "4 3"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
             "id": "tsm-ts_higher_order-order1",
             "title": "Put it in order: A wrapper that counts calls",
             "prompt": "The lines of the worked example “A wrapper that counts calls” from Higher-Order Functions & Currying, shuffled. Put them back in an order that compiles and prints exactly:\n\n    6 20\n    called 2 times",
@@ -13747,6 +14224,104 @@
               {
                 "input": "3 2 1",
                 "output": "1 2 3"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w7-rt1",
+            "title": "Min and max as a pair",
+            "prompt": "`minMax` returns the smallest and largest number as a pair. Replace every `any`: the input is a list of numbers (`readonly` is fine) and the result is the tuple `[number, number]` (a `readonly` tuple is fine too).",
+            "hint": "Without an annotation, `[a, b]` is inferred as `number[]` — say `[number, number]`.",
+            "hints": [
+              "Without an annotation, `[a, b]` is inferred as `number[]` — say `[number, number]`."
+            ],
+            "language": "typescript",
+            "kind": "retype",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype _P = Parameters<typeof minMax>[0];\ntype _R = ReturnType<typeof minMax>;\ntype _1 = Expect<Equal<IsAny<_P>, false>>;\ntype _2 = Expect<Equal<number[] extends _P ? (_P extends readonly number[] ? true : false) : false, true>>;\ntype _3 = Expect<Equal<IsAny<_R>, false>>;\ntype _4 = Expect<Equal<[number, number] extends _R ? (_R extends readonly [number, number] ? true : false) : false, true>>;\n",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nfunction minMax(xs: any): any {\n  const sorted = xs.toSorted((a: any, b: any) => a - b);\n  return [sorted[0], sorted[sorted.length - 1]];\n}\nconst [lo, hi] = minMax(input.split(/\\s+/).map(Number));\nconsole.log(`${lo}..${hi}`);\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nfunction minMax(xs: readonly number[]): [number, number] {\n  const sorted = xs.toSorted((a, b) => a - b);\n  return [sorted[0], sorted[sorted.length - 1]];\n}\nconst [lo, hi] = minMax(input.split(/\\s+/).map(Number));\nconsole.log(`${lo}..${hi}`);\n",
+            "tests": [
+              {
+                "input": "3 1 2",
+                "output": "1..3"
+              },
+              {
+                "input": "5",
+                "output": "5..5"
+              },
+              {
+                "input": "-1 10 4",
+                "output": "-1..10"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w7-dz1",
+            "title": "Name the pair",
+            "prompt": "Write `Entry`: a tuple of a name (string) and a score (number). `parse` builds one per line and the sort reads the score at position 1.",
+            "hint": "A tuple type lists each position's type: `[string, number]`.",
+            "hints": [
+              "A tuple type lists each position's type: `[string, number]`.",
+              "Labels such as `[name: string, score: number]` document it without changing it."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype _1 = Expect<Equal<Entry, [string, number]>>;\n",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\nfunction parse(line: string): Entry {\n  const [name, score] = line.split(\":\");\n  return [name.trim(), Number(score)];\n}\nconst entries = input.split(\"\\n\").map(parse);\nconst best = entries.toSorted((a, b) => b[1] - a[1])[0];\nconsole.log(`${best[0]} ${best[1]}`);\nconsole.log(entries.length);\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Entry = [name: string, score: number];\nfunction parse(line: string): Entry {\n  const [name, score] = line.split(\":\");\n  return [name.trim(), Number(score)];\n}\nconst entries = input.split(\"\\n\").map(parse);\nconst best = entries.toSorted((a, b) => b[1] - a[1])[0];\nconsole.log(`${best[0]} ${best[1]}`);\nconsole.log(entries.length);\n",
+            "tests": [
+              {
+                "input": "ada: 90\nbob: 72\ncy: 95",
+                "output": "cy 95\n3"
+              },
+              {
+                "input": "solo: 1",
+                "output": "solo 1\n1"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w7-rf1",
+            "title": "Stop mutating the input",
+            "prompt": "`sort` and `reverse` change the array in place — which is why the last line prints the sorted order instead of the order the numbers came in. Use the copying methods, so the last line prints the input order. No `.sort(` or `.reverse(` left.",
+            "hint": "ES2023 added `toSorted` and `toReversed`, which return new arrays.",
+            "hints": [
+              "ES2023 added `toSorted` and `toReversed`, which return new arrays."
+            ],
+            "language": "typescript",
+            "kind": "refactor",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [
+              ".sort(",
+              ".reverse("
+            ],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst xs = input.split(/\\s+/).map(Number);\nconst asc = xs.sort((a, b) => a - b);\nconst desc = [...asc].reverse();\nconsole.log(asc.join(\" \"));\nconsole.log(desc.join(\" \"));\nconsole.log(xs.join(\" \"));\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst xs = input.split(/\\s+/).map(Number);\nconst asc = xs.toSorted((a, b) => a - b);\nconst desc = asc.toReversed();\nconsole.log(asc.join(\" \"));\nconsole.log(desc.join(\" \"));\nconsole.log(xs.join(\" \"));\n",
+            "tests": [
+              {
+                "input": "3 1 2",
+                "output": "1 2 3\n3 2 1\n3 1 2"
+              },
+              {
+                "input": "9 8 7 10",
+                "output": "7 8 9 10\n10 9 8 7\n9 8 7 10"
               }
             ],
             "source_slug": "",
@@ -16025,6 +16600,93 @@
             "dataset": ""
           },
           {
+            "id": "tsm-w8-dz1",
+            "title": "Shape the orders",
+            "prompt": "Write the `Order` interface the code below reads: an `id` string, a list of `items` (each with `sku` string, `qty` number and `price` number), and an optional `note` string.",
+            "hint": "`note` is sometimes missing: make it optional with `?`.",
+            "hints": [
+              "`note` is sometimes missing: make it optional with `?`.",
+              "`items` is an array of object types."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype _1 = Expect<Equal<Order[\"id\"], string>>;\ntype _2 = Expect<Equal<Order[\"items\"][number], { sku: string; qty: number; price: number }>>;\ntype _3 = Expect<Equal<Order[\"note\"], string | undefined>>;\ntype _4 = Expect<Equal<{} extends Pick<Order, \"note\"> ? true : false, true>>;\n",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\nconst orders: Order[] = JSON.parse(input);\nfor (const o of orders) {\n  const total = o.items.reduce((s, i) => s + i.qty * i.price, 0);\n  console.log(`${o.id}: ${total.toFixed(2)}${o.note ? \" (\" + o.note + \")\" : \"\"}`);\n}\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ninterface Order {\n  id: string;\n  items: { sku: string; qty: number; price: number }[];\n  note?: string;\n}\nconst orders: Order[] = JSON.parse(input);\nfor (const o of orders) {\n  const total = o.items.reduce((s, i) => s + i.qty * i.price, 0);\n  console.log(`${o.id}: ${total.toFixed(2)}${o.note ? \" (\" + o.note + \")\" : \"\"}`);\n}\n",
+            "tests": [
+              {
+                "input": "[{\"id\":\"A1\",\"items\":[{\"sku\":\"x\",\"qty\":2,\"price\":1.5}],\"note\":\"gift\"},{\"id\":\"B2\",\"items\":[{\"sku\":\"y\",\"qty\":1,\"price\":10},{\"sku\":\"z\",\"qty\":3,\"price\":0.5}]}]",
+                "output": "A1: 3.00 (gift)\nB2: 11.50"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w8-rt1",
+            "title": "JSON with a shape",
+            "prompt": "Each user in the input has a `name` (string), `roles` (string array), `email` (string) and `age` (number). Replace every `any` — including the one on `JSON.parse`'s result — with types that say so.",
+            "hint": "Name the shape once with `type User = { ... }`.",
+            "hints": [
+              "Name the shape once with `type User = { ... }`.",
+              "Annotate what `JSON.parse` returns — it is `any` until you say otherwise."
+            ],
+            "language": "typescript",
+            "kind": "retype",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype _U = { name: string; roles: string[]; email: string; age: number };\ntype _1 = Expect<Equal<Parameters<typeof summarize>[0], _U>>;\ntype _2 = Expect<Equal<ReturnType<typeof summarize>, string>>;\ntype _3 = Expect<Equal<typeof users, _U[]>>;\n",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nfunction summarize(user: any): any {\n  const { name, roles, ...rest } = user;\n  return `${name} [${roles.join(\",\")}] ${Object.keys(rest).length} more`;\n}\nconst users: any = JSON.parse(input);\nfor (const u of users) console.log(summarize(u));\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype User = { name: string; roles: string[]; email: string; age: number };\nfunction summarize(user: User): string {\n  const { name, roles, ...rest } = user;\n  return `${name} [${roles.join(\",\")}] ${Object.keys(rest).length} more`;\n}\nconst users: User[] = JSON.parse(input);\nfor (const u of users) console.log(summarize(u));\n",
+            "tests": [
+              {
+                "input": "[{\"name\":\"ada\",\"roles\":[\"admin\",\"dev\"],\"email\":\"a@x\",\"age\":36},{\"name\":\"bo\",\"roles\":[],\"email\":\"b@x\",\"age\":20}]",
+                "output": "ada [admin,dev] 2 more\nbo [] 2 more"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w8-rf1",
+            "title": "Destructure the point",
+            "prompt": "The loop reads `p.x` and `p.y` five times. Destructure `{ x, y }` in the loop header instead — no `p.x` or `p.y` left.",
+            "hint": "`for (const { x, y } of points)`.",
+            "hints": [
+              "`for (const { x, y } of points)`."
+            ],
+            "language": "typescript",
+            "kind": "refactor",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [
+              "p.x",
+              "p.y"
+            ],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst points = input.split(\"\\n\").map((l) => {\n  const [x, y] = l.split(\",\").map(Number);\n  return { x, y };\n});\nfor (const p of points) console.log(`(${p.x}, ${p.y}) -> ${Math.hypot(p.x, p.y).toFixed(1)}`);\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst points = input.split(\"\\n\").map((l) => {\n  const [x, y] = l.split(\",\").map(Number);\n  return { x, y };\n});\nfor (const { x, y } of points) console.log(`(${x}, ${y}) -> ${Math.hypot(x, y).toFixed(1)}`);\n",
+            "tests": [
+              {
+                "input": "3,4\n1,1",
+                "output": "(3, 4) -> 5.0\n(1, 1) -> 1.4"
+              },
+              {
+                "input": "0,5",
+                "output": "(0, 5) -> 5.0"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
             "id": "tsm-ts_destructuring-order1",
             "title": "Put it in order: Destructuring in a parameter list",
             "prompt": "The lines of the worked example “Destructuring in a parameter list” from Destructuring, Spread & Rest, shuffled. Put them back in an order that compiles and prints exactly:\n\n    #7: 3 units, note: none",
@@ -18084,6 +18746,100 @@
             "dataset": ""
           },
           {
+            "id": "tsm-w9-rt1",
+            "title": "A typed word count",
+            "prompt": "Replace both `any`s: the map counts words (string keys, number values), and `top` is one `[word, count]` entry.",
+            "hint": "`new Map<string, number>()` gives the map its types.",
+            "hints": [
+              "`new Map<string, number>()` gives the map its types.",
+              "Spreading a `Map<K, V>` gives `[K, V][]`, so `top` needs no annotation."
+            ],
+            "language": "typescript",
+            "kind": "retype",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype _1 = Expect<Equal<typeof counts, Map<string, number>>>;\ntype _2 = Expect<Equal<typeof top, [string, number]>>;\n",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst counts: any = new Map();\nfor (const w of input.split(/\\s+/)) counts.set(w, (counts.get(w) ?? 0) + 1);\nconst top: any = [...counts].sort((a: any, b: any) => b[1] - a[1] || a[0].localeCompare(b[0]))[0];\nconsole.log(`${top[0]} ${top[1]}`);\nconsole.log(counts.size);\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst counts = new Map<string, number>();\nfor (const w of input.split(/\\s+/)) counts.set(w, (counts.get(w) ?? 0) + 1);\nconst top = [...counts].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))[0];\nconsole.log(`${top[0]} ${top[1]}`);\nconsole.log(counts.size);\n",
+            "tests": [
+              {
+                "input": "b a b c a b",
+                "output": "b 3\n3"
+              },
+              {
+                "input": "x",
+                "output": "x 1\n1"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w9-dz1",
+            "title": "An adjacency map",
+            "prompt": "Write `Graph`: a map from each node's name to the set of names it is connected to.",
+            "hint": "`Map<Key, Value>` where each value is a `Set<string>`.",
+            "hints": [
+              "`Map<Key, Value>` where each value is a `Set<string>`."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype _1 = Expect<Equal<Graph, Map<string, Set<string>>>>;\n",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\nfunction addEdge(g: Graph, a: string, b: string): void {\n  if (!g.has(a)) g.set(a, new Set());\n  if (!g.has(b)) g.set(b, new Set());\n  g.get(a)!.add(b);\n  g.get(b)!.add(a);\n}\nconst g: Graph = new Map();\nfor (const pair of input.split(\"\\n\")) {\n  const [a, b] = pair.split(\"-\");\n  addEdge(g, a, b);\n}\nfor (const [node, nbrs] of [...g].sort((x, y) => x[0].localeCompare(y[0]))) {\n  console.log(`${node}: ${[...nbrs].sort().join(\",\")}`);\n}\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Graph = Map<string, Set<string>>;\nfunction addEdge(g: Graph, a: string, b: string): void {\n  if (!g.has(a)) g.set(a, new Set());\n  if (!g.has(b)) g.set(b, new Set());\n  g.get(a)!.add(b);\n  g.get(b)!.add(a);\n}\nconst g: Graph = new Map();\nfor (const pair of input.split(\"\\n\")) {\n  const [a, b] = pair.split(\"-\");\n  addEdge(g, a, b);\n}\nfor (const [node, nbrs] of [...g].sort((x, y) => x[0].localeCompare(y[0]))) {\n  console.log(`${node}: ${[...nbrs].sort().join(\",\")}`);\n}\n",
+            "tests": [
+              {
+                "input": "a-b\nb-c\na-c",
+                "output": "a: b,c\nb: a,c\nc: a,b"
+              },
+              {
+                "input": "x-y",
+                "output": "x: y\ny: x"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w9-rf1",
+            "title": "Sets, not searches",
+            "prompt": "`includes` searches the whole array every time. Track what you have seen with `Set`s instead — no `.includes(` left. The output order must stay the same.",
+            "hint": "`Set.has` is a constant-time lookup, and a Set ignores a second `add` of the same value.",
+            "hints": [
+              "`Set.has` is a constant-time lookup, and a Set ignores a second `add` of the same value.",
+              "A Set iterates in insertion order, so the output order is kept."
+            ],
+            "language": "typescript",
+            "kind": "refactor",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [
+              ".includes("
+            ],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst seen: string[] = [];\nconst dupes: string[] = [];\nfor (const w of input.split(/\\s+/)) {\n  if (seen.includes(w) && !dupes.includes(w)) dupes.push(w);\n  seen.push(w);\n}\nconsole.log(dupes.join(\" \") || \"none\");\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst seen = new Set<string>();\nconst dupes = new Set<string>();\nfor (const w of input.split(/\\s+/)) {\n  if (seen.has(w)) dupes.add(w);\n  seen.add(w);\n}\nconsole.log([...dupes].join(\" \") || \"none\");\n",
+            "tests": [
+              {
+                "input": "a b a c b a",
+                "output": "a b"
+              },
+              {
+                "input": "x y z",
+                "output": "none"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
             "id": "tsm-ts_maps_sets-order1",
             "title": "Put it in order: Objects as keys",
             "prompt": "The lines of the worked example “Objects as keys” from Map & Set, shuffled. Put them back in an order that compiles and prints exactly:\n\n    2 30 45",
@@ -19880,6 +20636,67 @@
               {
                 "input": "pink",
                 "output": "unknown"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w10-dz1",
+            "title": "The sizes on sale",
+            "prompt": "Write `Size`: exactly the three sizes the shop sells, as a union of string literals. The price table is keyed by it, so a missing or extra size would be a compile error.",
+            "hint": "A union of literal types: `\"S\" | \"M\" | \"L\"`.",
+            "hints": [
+              "A union of literal types: `\"S\" | \"M\" | \"L\"`."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype _1 = Expect<Equal<Size, \"S\" | \"M\" | \"L\">>;\n",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\nconst PRICE: Record<Size, number> = { S: 10, M: 12, L: 14 };\nconst SIZES: readonly Size[] = [\"S\", \"M\", \"L\"];\nlet total = 0;\nfor (const token of input.split(/\\s+/)) {\n  const size = SIZES.find((s) => s === token);\n  if (size === undefined) console.log(`skip ${token}`);\n  else total += PRICE[size];\n}\nconsole.log(total);\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Size = \"S\" | \"M\" | \"L\";\nconst PRICE: Record<Size, number> = { S: 10, M: 12, L: 14 };\nconst SIZES: readonly Size[] = [\"S\", \"M\", \"L\"];\nlet total = 0;\nfor (const token of input.split(/\\s+/)) {\n  const size = SIZES.find((s) => s === token);\n  if (size === undefined) console.log(`skip ${token}`);\n  else total += PRICE[size];\n}\nconsole.log(total);\n",
+            "tests": [
+              {
+                "input": "S M XL L",
+                "output": "skip XL\n36"
+              },
+              {
+                "input": "M M",
+                "output": "24"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w10-rt1",
+            "title": "What can a value be?",
+            "prompt": "`describe` handles numbers, booleans and strings. Replace the `any`s: the parameter is the union of those three, and the function returns a `string`.",
+            "hint": "A union type: `string | number | boolean`.",
+            "hints": [
+              "A union type: `string | number | boolean`.",
+              "Each `typeof` check narrows `v` for the line after it."
+            ],
+            "language": "typescript",
+            "kind": "retype",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype _1 = Expect<Equal<Parameters<typeof describe>[0], string | number | boolean>>;\ntype _2 = Expect<Equal<ReturnType<typeof describe>, string>>;\n",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nfunction describe(v: any): any {\n  if (typeof v === \"number\") return `number ${v.toFixed(1)}`;\n  if (typeof v === \"boolean\") return v ? \"yes\" : \"no\";\n  return `text ${v.toUpperCase()}`;\n}\nfor (const t of input.split(/\\s+/)) {\n  const v = t === \"true\" || t === \"false\" ? t === \"true\" : Number.isNaN(Number(t)) ? t : Number(t);\n  console.log(describe(v));\n}\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nfunction describe(v: string | number | boolean): string {\n  if (typeof v === \"number\") return `number ${v.toFixed(1)}`;\n  if (typeof v === \"boolean\") return v ? \"yes\" : \"no\";\n  return `text ${v.toUpperCase()}`;\n}\nfor (const t of input.split(/\\s+/)) {\n  const v = t === \"true\" || t === \"false\" ? t === \"true\" : Number.isNaN(Number(t)) ? t : Number(t);\n  console.log(describe(v));\n}\n",
+            "tests": [
+              {
+                "input": "3 true hello",
+                "output": "number 3.0\nyes\ntext HELLO"
+              },
+              {
+                "input": "false 2.25",
+                "output": "no\nnumber 2.3"
               }
             ],
             "source_slug": "",
@@ -21891,6 +22708,91 @@
             "dataset": ""
           },
           {
+            "id": "tsm-w11-rt1",
+            "title": "A port or nothing",
+            "prompt": "`parsePort` returns the port number, or `null` when the text is not a valid port. Replace the `any`s so the return type says exactly that.",
+            "hint": "`number | null` — and callers must check for `null` before using it.",
+            "hints": [
+              "`number | null` — and callers must check for `null` before using it."
+            ],
+            "language": "typescript",
+            "kind": "retype",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype _1 = Expect<Equal<Parameters<typeof parsePort>[0], string>>;\ntype _2 = Expect<Equal<ReturnType<typeof parsePort>, number | null>>;\n",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nfunction parsePort(raw: any): any {\n  const n = Number(raw);\n  return Number.isInteger(n) && n > 0 && n < 65536 ? n : null;\n}\nfor (const t of input.split(/\\s+/)) {\n  const port = parsePort(t);\n  console.log(port === null ? `bad ${t}` : `port ${port}`);\n}\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nfunction parsePort(raw: string): number | null {\n  const n = Number(raw);\n  return Number.isInteger(n) && n > 0 && n < 65536 ? n : null;\n}\nfor (const t of input.split(/\\s+/)) {\n  const port = parsePort(t);\n  console.log(port === null ? `bad ${t}` : `port ${port}`);\n}\n",
+            "tests": [
+              {
+                "input": "80 abc 70000 443",
+                "output": "port 80\nbad abc\nbad 70000\nport 443"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w11-dz1",
+            "title": "A contact, with gaps",
+            "prompt": "Write `Contact`: a `name` (string), an optional `email` (string), and an optional `phone` that is a string or explicitly `null` when the number was withdrawn.",
+            "hint": "Optional means `?:` — the key may be missing.",
+            "hints": [
+              "Optional means `?:` — the key may be missing.",
+              "`phone?: string | null` allows missing, a string, or `null`."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype _1 = Expect<Equal<Contact[\"name\"], string>>;\ntype _2 = Expect<Equal<Contact[\"email\"], string | undefined>>;\ntype _3 = Expect<Equal<Contact[\"phone\"], string | null | undefined>>;\ntype _4 = Expect<Equal<{} extends Pick<Contact, \"email\" | \"phone\"> ? true : false, true>>;\n",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\nfunction reach(c: Contact): string {\n  return c.email ?? c.phone ?? `no way to reach ${c.name}`;\n}\nconst contacts: Contact[] = JSON.parse(input);\nfor (const c of contacts) console.log(reach(c));\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Contact = { name: string; email?: string; phone?: string | null };\nfunction reach(c: Contact): string {\n  return c.email ?? c.phone ?? `no way to reach ${c.name}`;\n}\nconst contacts: Contact[] = JSON.parse(input);\nfor (const c of contacts) console.log(reach(c));\n",
+            "tests": [
+              {
+                "input": "[{\"name\":\"ada\",\"email\":\"a@x\"},{\"name\":\"bo\",\"phone\":\"555\"},{\"name\":\"cy\",\"phone\":null},{\"name\":\"di\",\"email\":\"d@x\",\"phone\":\"1\"}]",
+                "output": "a@x\n555\nno way to reach cy\nd@x"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w11-rf1",
+            "title": "Narrow instead of insisting",
+            "prompt": "`m.get(key)!` asserts the value is there — it happens to be, after `has`, but the compiler cannot see that. Read the value once and narrow it with a check. No `!.` left.",
+            "hint": "`const value = m.get(key)` is `number | undefined`; `if (value !== undefined)` narrows it.",
+            "hints": [
+              "`const value = m.get(key)` is `number | undefined`; `if (value !== undefined)` narrows it."
+            ],
+            "language": "typescript",
+            "kind": "refactor",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [
+              "!."
+            ],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst m = new Map<string, number>();\nfor (const pair of input.split(\",\")) {\n  const [k, v] = pair.split(\"=\");\n  m.set(k.trim(), Number(v));\n}\nfor (const key of [\"a\", \"b\", \"c\"]) {\n  if (m.has(key)) console.log(`${key}=${m.get(key)!.toFixed(1)}`);\n  else console.log(`${key} missing`);\n}\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst m = new Map<string, number>();\nfor (const pair of input.split(\",\")) {\n  const [k, v] = pair.split(\"=\");\n  m.set(k.trim(), Number(v));\n}\nfor (const key of [\"a\", \"b\", \"c\"]) {\n  const value = m.get(key);\n  if (value !== undefined) console.log(`${key}=${value.toFixed(1)}`);\n  else console.log(`${key} missing`);\n}\n",
+            "tests": [
+              {
+                "input": "a=1, c=2.5",
+                "output": "a=1.0\nb missing\nc=2.5"
+              },
+              {
+                "input": "b=3",
+                "output": "a missing\nb=3.0\nc missing"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
             "id": "tsm-ts_narrowing-order1",
             "title": "Put it in order: Normalising input of several shapes",
             "prompt": "The lines of the worked example “Normalising input of several shapes” from Type Narrowing, shuffled. Put them back in an order that compiles and prints exactly:\n\n    2 7 z",
@@ -23797,6 +24699,95 @@
             "dataset": ""
           },
           {
+            "id": "tsm-w12-dz1",
+            "title": "Success or a reason",
+            "prompt": "Write `Parsed`: a discriminated union on `ok` — `{ ok: true; value: number }` or `{ ok: false; reason: string }`.",
+            "hint": "Two object types joined by `|`, each with a literal `ok`.",
+            "hints": [
+              "Two object types joined by `|`, each with a literal `ok`."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype _1 = Expect<Equal<Parsed, { ok: true; value: number } | { ok: false; reason: string }>>;\n",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\nfunction parse(t: string): Parsed {\n  const n = Number(t);\n  if (t === \"\") return { ok: false, reason: \"empty\" };\n  if (Number.isNaN(n)) return { ok: false, reason: `not a number: ${t}` };\n  return { ok: true, value: n };\n}\nfor (const t of input.split(\",\")) {\n  const r = parse(t.trim());\n  console.log(r.ok ? r.value * 2 : r.reason);\n}\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Parsed = { ok: true; value: number } | { ok: false; reason: string };\nfunction parse(t: string): Parsed {\n  const n = Number(t);\n  if (t === \"\") return { ok: false, reason: \"empty\" };\n  if (Number.isNaN(n)) return { ok: false, reason: `not a number: ${t}` };\n  return { ok: true, value: n };\n}\nfor (const t of input.split(\",\")) {\n  const r = parse(t.trim());\n  console.log(r.ok ? r.value * 2 : r.reason);\n}\n",
+            "tests": [
+              {
+                "input": "4, x, , 2.5",
+                "output": "8\nnot a number: x\nempty\n5"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w12-rt1",
+            "title": "Area of a shape",
+            "prompt": "`Shape` is already a discriminated union. Replace `area`'s `any`s: it takes a `Shape` and returns a number — and with every case handled, no `undefined` sneaks into the return type.",
+            "hint": "`s: Shape` makes each `case` narrow `s`.",
+            "hints": [
+              "`s: Shape` makes each `case` narrow `s`.",
+              "Because the switch is exhaustive, the compiler knows the end of the function is unreachable."
+            ],
+            "language": "typescript",
+            "kind": "retype",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype _1 = Expect<Equal<Parameters<typeof area>[0], { kind: \"circle\"; r: number } | { kind: \"rect\"; w: number; h: number }>>;\ntype _2 = Expect<Equal<ReturnType<typeof area>, number>>;\n",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Shape = { kind: \"circle\"; r: number } | { kind: \"rect\"; w: number; h: number };\nfunction area(s: any): any {\n  switch (s.kind) {\n    case \"circle\":\n      return Math.PI * s.r ** 2;\n    case \"rect\":\n      return s.w * s.h;\n  }\n}\nfor (const line of input.split(\"\\n\")) {\n  const [k, a, b] = line.split(/\\s+/);\n  const s: Shape = k === \"circle\" ? { kind: \"circle\", r: Number(a) } : { kind: \"rect\", w: Number(a), h: Number(b) };\n  console.log(area(s).toFixed(2));\n}\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Shape = { kind: \"circle\"; r: number } | { kind: \"rect\"; w: number; h: number };\nfunction area(s: Shape): number {\n  switch (s.kind) {\n    case \"circle\":\n      return Math.PI * s.r ** 2;\n    case \"rect\":\n      return s.w * s.h;\n  }\n}\nfor (const line of input.split(\"\\n\")) {\n  const [k, a, b] = line.split(/\\s+/);\n  const s: Shape = k === \"circle\" ? { kind: \"circle\", r: Number(a) } : { kind: \"rect\", w: Number(a), h: Number(b) };\n  console.log(area(s).toFixed(2));\n}\n",
+            "tests": [
+              {
+                "input": "circle 1\nrect 2 3",
+                "output": "3.14\n6.00"
+              },
+              {
+                "input": "rect 1 1",
+                "output": "1.00"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w12-rf1",
+            "title": "Let the compiler count the cases",
+            "prompt": "The `default` branch quietly ignores any command added later. Remove it: with every case handled and a `number` return type, the compiler proves the switch is exhaustive — and would flag a new command. No `default` left.",
+            "hint": "Delete the `default` branch — nothing else needs to change.",
+            "hints": [
+              "Delete the `default` branch — nothing else needs to change."
+            ],
+            "language": "typescript",
+            "kind": "refactor",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [
+              "default"
+            ],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Cmd = { type: \"add\"; n: number } | { type: \"mul\"; n: number } | { type: \"reset\" };\nfunction apply(acc: number, c: Cmd): number {\n  switch (c.type) {\n    case \"add\":\n      return acc + c.n;\n    case \"mul\":\n      return acc * c.n;\n    case \"reset\":\n      return 0;\n    default:\n      return acc;\n  }\n}\nlet acc = 0;\nfor (const line of input.split(\"\\n\")) {\n  const [t, n] = line.split(\" \");\n  const c: Cmd = t === \"reset\" ? { type: \"reset\" } : { type: t === \"mul\" ? \"mul\" : \"add\", n: Number(n) };\n  acc = apply(acc, c);\n  console.log(acc);\n}\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Cmd = { type: \"add\"; n: number } | { type: \"mul\"; n: number } | { type: \"reset\" };\nfunction apply(acc: number, c: Cmd): number {\n  switch (c.type) {\n    case \"add\":\n      return acc + c.n;\n    case \"mul\":\n      return acc * c.n;\n    case \"reset\":\n      return 0;\n  }\n}\nlet acc = 0;\nfor (const line of input.split(\"\\n\")) {\n  const [t, n] = line.split(\" \");\n  const c: Cmd = t === \"reset\" ? { type: \"reset\" } : { type: t === \"mul\" ? \"mul\" : \"add\", n: Number(n) };\n  acc = apply(acc, c);\n  console.log(acc);\n}\n",
+            "tests": [
+              {
+                "input": "add 3\nmul 4\nreset\nadd 2",
+                "output": "3\n12\n0\n2"
+              },
+              {
+                "input": "mul 5",
+                "output": "0"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
             "id": "tsm-ts_discriminated_unions-order1",
             "title": "Put it in order: Processing results",
             "prompt": "The lines of the worked example “Processing results” from Discriminated Unions & Exhaustiveness, shuffled. Put them back in an order that compiles and prints exactly:\n\n    skipped: timeout\n    sum 10",
@@ -25588,6 +26579,62 @@
             "dataset": ""
           },
           {
+            "id": "tsm-w13-dz1",
+            "title": "A middleware chain",
+            "prompt": "Write `Middleware`: a function that takes the current string and a `next` callback (string in, string out), and returns a string.",
+            "hint": "A function type whose second parameter is itself a function type.",
+            "hints": [
+              "A function type whose second parameter is itself a function type."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype _1 = Expect<Equal<Parameters<Middleware>[0], string>>;\ntype _2 = Expect<Equal<Parameters<Middleware>[1], (v: string) => string>>;\ntype _3 = Expect<Equal<ReturnType<Middleware>, string>>;\n",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\nconst trim: Middleware = (v, next) => next(v.trim());\nconst upper: Middleware = (v, next) => next(v.toUpperCase());\nconst exclaim: Middleware = (v, next) => next(v + \"!\");\nfunction run(chain: Middleware[], value: string): string {\n  const step = (i: number, v: string): string => (i === chain.length ? v : chain[i](v, (n) => step(i + 1, n)));\n  return step(0, value);\n}\nfor (const line of input.split(\"\\n\")) console.log(run([trim, upper, exclaim], line));\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Middleware = (value: string, next: (v: string) => string) => string;\nconst trim: Middleware = (v, next) => next(v.trim());\nconst upper: Middleware = (v, next) => next(v.toUpperCase());\nconst exclaim: Middleware = (v, next) => next(v + \"!\");\nfunction run(chain: Middleware[], value: string): string {\n  const step = (i: number, v: string): string => (i === chain.length ? v : chain[i](v, (n) => step(i + 1, n)));\n  return step(0, value);\n}\nfor (const line of input.split(\"\\n\")) console.log(run([trim, upper, exclaim], line));\n",
+            "tests": [
+              {
+                "input": "  hi \nthere",
+                "output": "HI!\nTHERE!"
+              },
+              {
+                "input": "x",
+                "output": "X!"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w13-rt1",
+            "title": "Memo, typed",
+            "prompt": "`memo` wraps a number-to-number function with a cache. Replace the `any`s: it takes a `(n: number) => number` and returns one.",
+            "hint": "Both the parameter and the result are `(n: number) => number`.",
+            "hints": [
+              "Both the parameter and the result are `(n: number) => number`."
+            ],
+            "language": "typescript",
+            "kind": "retype",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype _1 = Expect<Equal<Parameters<typeof memo>[0], (n: number) => number>>;\ntype _2 = Expect<Equal<ReturnType<typeof memo>, (n: number) => number>>;\n",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nfunction memo(fn: any): any {\n  const cache = new Map<number, number>();\n  return (n: number) => {\n    const hit = cache.get(n);\n    if (hit !== undefined) return hit;\n    const v = fn(n);\n    cache.set(n, v);\n    return v;\n  };\n}\nlet calls = 0;\nconst square = memo((n: number) => {\n  calls++;\n  return n * n;\n});\nfor (const t of input.split(/\\s+/)) console.log(square(Number(t)));\nconsole.log(`calls ${calls}`);\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nfunction memo(fn: (n: number) => number): (n: number) => number {\n  const cache = new Map<number, number>();\n  return (n: number) => {\n    const hit = cache.get(n);\n    if (hit !== undefined) return hit;\n    const v = fn(n);\n    cache.set(n, v);\n    return v;\n  };\n}\nlet calls = 0;\nconst square = memo((n: number) => {\n  calls++;\n  return n * n;\n});\nfor (const t of input.split(/\\s+/)) console.log(square(Number(t)));\nconsole.log(`calls ${calls}`);\n",
+            "tests": [
+              {
+                "input": "2 3 2 2 4",
+                "output": "4\n9\n4\n4\n16\ncalls 3"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
             "id": "tsm-ts_function_types-order1",
             "title": "Put it in order: A function that carries a property",
             "prompt": "The lines of the worked example “A function that carries a property” from Function Types in Depth, shuffled. Put them back in an order that compiles and prints exactly:\n\n    money: $0.26\n    percent: 26%",
@@ -27313,6 +28360,70 @@
               {
                 "input": "solo",
                 "output": "solo"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w14-rt1",
+            "title": "Command-line flags",
+            "prompt": "`flag` finds the value after a flag like `--port`, or `undefined` when the flag is absent. Replace the `any`s — remembering that with `noUncheckedIndexedAccess` an array read may be `undefined`.",
+            "hint": "`args[i + 1]` is `string | undefined` under the week's strictness — and so is the result.",
+            "hints": [
+              "`args[i + 1]` is `string | undefined` under the week's strictness — and so is the result."
+            ],
+            "language": "typescript",
+            "kind": "retype",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype _1 = Expect<Equal<typeof args, string[]>>;\ntype _2 = Expect<Equal<Parameters<typeof flag>[0], string>>;\ntype _3 = Expect<Equal<ReturnType<typeof flag>, string | undefined>>;\n",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst args: any = input.split(/\\s+/);\nfunction flag(name: any): any {\n  const i = args.indexOf(name);\n  return i === -1 ? undefined : args[i + 1];\n}\nconsole.log(flag(\"--port\") ?? \"3000\");\nconsole.log(flag(\"--host\") ?? \"localhost\");\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst args = input.split(/\\s+/);\nfunction flag(name: string): string | undefined {\n  const i = args.indexOf(name);\n  return i === -1 ? undefined : args[i + 1];\n}\nconsole.log(flag(\"--port\") ?? \"3000\");\nconsole.log(flag(\"--host\") ?? \"localhost\");\n",
+            "tests": [
+              {
+                "input": "--port 8080",
+                "output": "8080\nlocalhost"
+              },
+              {
+                "input": "--host example.org --port 1",
+                "output": "1\nexample.org"
+              },
+              {
+                "input": "--verbose",
+                "output": "3000\nlocalhost"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w14-dz1",
+            "title": "Environment settings",
+            "prompt": "Write `Env`: `NODE_ENV` is exactly `\"development\"` or `\"production\"`, `PORT` is a number and `DEBUG` a boolean.",
+            "hint": "`NODE_ENV` is a union of two string literals, not `string`.",
+            "hints": [
+              "`NODE_ENV` is a union of two string literals, not `string`."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype _1 = Expect<Equal<Env, { NODE_ENV: \"development\" | \"production\"; PORT: number; DEBUG: boolean }>>;\n",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\nfunction loadEnv(pairs: string[]): Env {\n  const raw: Record<string, string> = {};\n  for (const p of pairs) {\n    const [k = \"\", v = \"\"] = p.split(\"=\");\n    raw[k] = v;\n  }\n  return {\n    NODE_ENV: raw[\"NODE_ENV\"] === \"production\" ? \"production\" : \"development\",\n    PORT: Number(raw[\"PORT\"] ?? \"3000\"),\n    DEBUG: raw[\"DEBUG\"] === \"1\",\n  };\n}\nconst env = loadEnv(input.split(/\\s+/));\nconsole.log(`${env.NODE_ENV} ${env.PORT} ${env.DEBUG}`);\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Env = { NODE_ENV: \"development\" | \"production\"; PORT: number; DEBUG: boolean };\nfunction loadEnv(pairs: string[]): Env {\n  const raw: Record<string, string> = {};\n  for (const p of pairs) {\n    const [k = \"\", v = \"\"] = p.split(\"=\");\n    raw[k] = v;\n  }\n  return {\n    NODE_ENV: raw[\"NODE_ENV\"] === \"production\" ? \"production\" : \"development\",\n    PORT: Number(raw[\"PORT\"] ?? \"3000\"),\n    DEBUG: raw[\"DEBUG\"] === \"1\",\n  };\n}\nconst env = loadEnv(input.split(/\\s+/));\nconsole.log(`${env.NODE_ENV} ${env.PORT} ${env.DEBUG}`);\n",
+            "tests": [
+              {
+                "input": "NODE_ENV=production PORT=80",
+                "output": "production 80 false"
+              },
+              {
+                "input": "DEBUG=1",
+                "output": "development 3000 true"
               }
             ],
             "source_slug": "",
@@ -29306,6 +30417,94 @@
             "dataset": ""
           },
           {
+            "id": "tsm-w15-rf1",
+            "title": "Check, don't assert",
+            "prompt": "Each `as Rgb` tells the compiler to trust the literal — so a colour missing a channel would compile. Replace them with one `satisfies` on the whole object, which checks every entry and keeps the keys. No `as Rgb` left.",
+            "hint": "`{ ... } satisfies Record<string, Rgb>` checks every value against `Rgb`.",
+            "hints": [
+              "`{ ... } satisfies Record<string, Rgb>` checks every value against `Rgb`."
+            ],
+            "language": "typescript",
+            "kind": "refactor",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [
+              "as Rgb"
+            ],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Rgb = { r: number; g: number; b: number };\nconst colours = {\n  red: { r: 255, g: 0, b: 0 } as Rgb,\n  teal: { r: 0, g: 128, b: 128 } as Rgb,\n};\nconst hex = (c: Rgb) => \"#\" + [c.r, c.g, c.b].map((n) => n.toString(16).padStart(2, \"0\")).join(\"\");\nfor (const name of input.split(/\\s+/)) {\n  const c = name === \"red\" ? colours.red : name === \"teal\" ? colours.teal : undefined;\n  console.log(c ? hex(c) : `unknown ${name}`);\n}\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Rgb = { r: number; g: number; b: number };\nconst colours = {\n  red: { r: 255, g: 0, b: 0 },\n  teal: { r: 0, g: 128, b: 128 },\n} satisfies Record<string, Rgb>;\nconst hex = (c: Rgb) => \"#\" + [c.r, c.g, c.b].map((n) => n.toString(16).padStart(2, \"0\")).join(\"\");\nfor (const name of input.split(/\\s+/)) {\n  const c = name === \"red\" ? colours.red : name === \"teal\" ? colours.teal : undefined;\n  console.log(c ? hex(c) : `unknown ${name}`);\n}\n",
+            "tests": [
+              {
+                "input": "red teal blue",
+                "output": "#ff0000\n#008080\nunknown blue"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w15-rt1",
+            "title": "Merging settings",
+            "prompt": "`merge` overlays `b` on `a`. Here `a` is `{ host: string; port: number }` and `b` is `{ port: number }`. Replace the `any`s so the result's type is `{ host: string; port: number }`.",
+            "hint": "Spreading two objects gives their combined properties — the later one wins for `port`.",
+            "hints": [
+              "Spreading two objects gives their combined properties — the later one wins for `port`."
+            ],
+            "language": "typescript",
+            "kind": "retype",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype _1 = Expect<Equal<Parameters<typeof merge>[0], { host: string; port: number }>>;\ntype _2 = Expect<Equal<Parameters<typeof merge>[1], { port: number }>>;\ntype _3 = Expect<Equal<ReturnType<typeof merge>, { host: string; port: number }>>;\n",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nfunction merge(a: any, b: any): any {\n  return { ...a, ...b };\n}\nconst base = { host: \"localhost\", port: 80 };\nconst merged = merge(base, { port: Number(input) });\nconsole.log(`${merged.host}:${merged.port}`);\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nfunction merge(a: { host: string; port: number }, b: { port: number }): { host: string; port: number } {\n  return { ...a, ...b };\n}\nconst base = { host: \"localhost\", port: 80 };\nconst merged = merge(base, { port: Number(input) });\nconsole.log(`${merged.host}:${merged.port}`);\n",
+            "tests": [
+              {
+                "input": "8080",
+                "output": "localhost:8080"
+              },
+              {
+                "input": "443",
+                "output": "localhost:443"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w15-dz1",
+            "title": "Only what is needed",
+            "prompt": "Write `Named`: the smallest type `greetAll` needs — just a `name` string. The people passed in carry more than that, and structural typing lets them through.",
+            "hint": "Ask for exactly what the function reads — a type with one property.",
+            "hints": [
+              "Ask for exactly what the function reads — a type with one property."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype _1 = Expect<Equal<Named, { name: string }>>;\n",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\nfunction greetAll(xs: readonly Named[]): string[] {\n  return xs.map((x) => `hi ${x.name}`);\n}\nconst people = input.split(\",\").map((s) => ({ name: s.trim(), joined: 2020 }));\nconsole.log(greetAll(people).join(\"; \"));\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Named = { name: string };\nfunction greetAll(xs: readonly Named[]): string[] {\n  return xs.map((x) => `hi ${x.name}`);\n}\nconst people = input.split(\",\").map((s) => ({ name: s.trim(), joined: 2020 }));\nconsole.log(greetAll(people).join(\"; \"));\n",
+            "tests": [
+              {
+                "input": "ada, bo",
+                "output": "hi ada; hi bo"
+              },
+              {
+                "input": "cy",
+                "output": "hi cy"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
             "id": "tsm-ts_assertions-order1",
             "title": "Put it in order: An assertion after a check the compiler can't follow",
             "prompt": "The lines of the worked example “An assertion after a check the compiler can't follow” from Type Assertions (as), shuffled. Put them back in an order that compiles and prints exactly:\n\n    pen: 2 left | no ink",
@@ -31119,6 +32318,97 @@
             "dataset": ""
           },
           {
+            "id": "tsm-w16-dz1",
+            "title": "An email you can trust",
+            "prompt": "Write `Email`: a branded string. A plain `string` must not be assignable to it, but an `Email` must still be usable as a string. `parseEmail` is the only way to make one.",
+            "hint": "Intersect `string` with an object type that only exists at compile time.",
+            "hints": [
+              "Intersect `string` with an object type that only exists at compile time.",
+              "`string & { readonly __brand: \"Email\" }`."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype _1 = Expect<Equal<string extends Email ? true : false, false>>;\ntype _2 = Expect<Equal<Email extends string ? true : false, true>>;\ntype _3 = Expect<Equal<IsAny<Email>, false>>;\n",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\nfunction parseEmail(s: string): Email | null {\n  return /^[^@\\s]+@[^@\\s]+\\.[a-z]+$/.test(s) ? (s as Email) : null;\n}\nfunction send(to: Email, body: string): string {\n  return `to ${to}: ${body}`;\n}\nfor (const line of input.split(\"\\n\")) {\n  const [addr = \"\", ...rest] = line.split(\" \");\n  const e = parseEmail(addr);\n  console.log(e === null ? `rejected ${addr}` : send(e, rest.join(\" \")));\n}\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Email = string & { readonly __brand: \"Email\" };\nfunction parseEmail(s: string): Email | null {\n  return /^[^@\\s]+@[^@\\s]+\\.[a-z]+$/.test(s) ? (s as Email) : null;\n}\nfunction send(to: Email, body: string): string {\n  return `to ${to}: ${body}`;\n}\nfor (const line of input.split(\"\\n\")) {\n  const [addr = \"\", ...rest] = line.split(\" \");\n  const e = parseEmail(addr);\n  console.log(e === null ? `rejected ${addr}` : send(e, rest.join(\" \")));\n}\n",
+            "tests": [
+              {
+                "input": "ada@x.io hello there\nnot-an-email hi",
+                "output": "to ada@x.io: hello there\nrejected not-an-email"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w16-rt1",
+            "title": "Rows nobody may change",
+            "prompt": "Replace the `any`s. `totals` must not be able to modify the rows it is given: type the parameter as a readonly array of `{ readonly qty: number; readonly price: number }`, and the result as `number[]`.",
+            "hint": "`readonly T[]` forbids `push`; `readonly` on each property forbids reassigning it.",
+            "hints": [
+              "`readonly T[]` forbids `push`; `readonly` on each property forbids reassigning it."
+            ],
+            "language": "typescript",
+            "kind": "retype",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype _1 = Expect<Equal<Parameters<typeof totals>[0], readonly { readonly qty: number; readonly price: number }[]>>;\ntype _2 = Expect<Equal<ReturnType<typeof totals>, number[]>>;\n",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nfunction totals(rows: any): any {\n  return rows.map((r: any) => r.qty * r.price);\n}\nconst rows = input.split(\"\\n\").map((l) => {\n  const [qty = \"0\", price = \"0\"] = l.split(\" \");\n  return { qty: Number(qty), price: Number(price) };\n});\nconsole.log(totals(rows).join(\" \"));\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nfunction totals(rows: readonly { readonly qty: number; readonly price: number }[]): number[] {\n  return rows.map((r) => r.qty * r.price);\n}\nconst rows = input.split(\"\\n\").map((l) => {\n  const [qty = \"0\", price = \"0\"] = l.split(\" \");\n  return { qty: Number(qty), price: Number(price) };\n});\nconsole.log(totals(rows).join(\" \"));\n",
+            "tests": [
+              {
+                "input": "2 3\n1 10",
+                "output": "6 10"
+              },
+              {
+                "input": "5 5",
+                "output": "25"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w16-rf1",
+            "title": "Build it without mutation",
+            "prompt": "The cart is built by pushing and bumping `qty` in place. Build it immutably instead — each step returns a new array (spread, `map`) — with no `.push(` or `+=` left. Same output.",
+            "hint": "`reduce` with an empty readonly array as the seed.",
+            "hints": [
+              "`reduce` with an empty readonly array as the seed.",
+              "Existing SKU: `map` to a copy with `qty + 1`; new SKU: `[...acc, { sku, qty: 1 }]`."
+            ],
+            "language": "typescript",
+            "kind": "refactor",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [
+              ".push(",
+              "+="
+            ],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst cart: { sku: string; qty: number }[] = [];\nfor (const token of input.split(/\\s+/)) {\n  const found = cart.find((l) => l.sku === token);\n  if (found) found.qty += 1;\n  else cart.push({ sku: token, qty: 1 });\n}\nconsole.log(cart.map((l) => `${l.sku}x${l.qty}`).join(\" \"));\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Line = { readonly sku: string; readonly qty: number };\nconst empty: readonly Line[] = [];\nconst cart = input.split(/\\s+/).reduce(\n  (acc, sku) =>\n    acc.some((l) => l.sku === sku)\n      ? acc.map((l) => (l.sku === sku ? { ...l, qty: l.qty + 1 } : l))\n      : [...acc, { sku, qty: 1 }],\n  empty,\n);\nconsole.log(cart.map((l) => `${l.sku}x${l.qty}`).join(\" \"));\n",
+            "tests": [
+              {
+                "input": "a b a c a",
+                "output": "ax3 bx1 cx1"
+              },
+              {
+                "input": "x",
+                "output": "xx1"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
             "id": "tsm-ts_branded_types-order1",
             "title": "Put it in order: A validated non-empty string",
             "prompt": "The lines of the worked example “A validated non-empty string” from Branded (Nominal) Types, shuffled. Put them back in an order that compiles and prints exactly:\n\n    published \"Hello world\"\n    rejected\n    rejected",
@@ -32917,6 +34207,64 @@
             "dataset": ""
           },
           {
+            "id": "tsm-w17-dz1",
+            "title": "Derive, don't restate",
+            "prompt": "Write `NewTask` (what `add` needs: a `Task` without `id` or `done`) and `TaskPatch` (any of a `Task`'s fields except `id`, all optional) — derived from `Task` with utility types, not written out.",
+            "hint": "`Omit<Task, \"id\" | \"done\">`.",
+            "hints": [
+              "`Omit<Task, \"id\" | \"done\">`.",
+              "`Partial` makes every remaining property optional."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype _1 = Expect<Equal<NewTask, { title: string; tags: string[] }>>;\ntype _2 = Expect<Equal<TaskPatch, { title?: string; done?: boolean; tags?: string[] }>>;\n",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Task = { id: number; title: string; done: boolean; tags: string[] };\n____\nlet nextId = 1;\nconst tasks: Task[] = [];\nfunction add(t: NewTask): Task {\n  const task = { ...t, id: nextId++, done: false };\n  tasks.push(task);\n  return task;\n}\nfunction patch(id: number, p: TaskPatch): void {\n  const i = tasks.findIndex((t) => t.id === id);\n  const current = tasks[i];\n  if (current) tasks[i] = { ...current, ...p };\n}\nfor (const line of input.split(\"\\n\")) {\n  const [cmd = \"\", ...rest] = line.split(\" \");\n  if (cmd === \"add\") add({ title: rest.join(\" \"), tags: [] });\n  else if (cmd === \"done\") patch(Number(rest[0]), { done: true });\n}\nfor (const t of tasks) console.log(`${t.id} ${t.done ? \"x\" : \"-\"} ${t.title}`);\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Task = { id: number; title: string; done: boolean; tags: string[] };\ntype NewTask = Omit<Task, \"id\" | \"done\">;\ntype TaskPatch = Partial<Omit<Task, \"id\">>;\nlet nextId = 1;\nconst tasks: Task[] = [];\nfunction add(t: NewTask): Task {\n  const task = { ...t, id: nextId++, done: false };\n  tasks.push(task);\n  return task;\n}\nfunction patch(id: number, p: TaskPatch): void {\n  const i = tasks.findIndex((t) => t.id === id);\n  const current = tasks[i];\n  if (current) tasks[i] = { ...current, ...p };\n}\nfor (const line of input.split(\"\\n\")) {\n  const [cmd = \"\", ...rest] = line.split(\" \");\n  if (cmd === \"add\") add({ title: rest.join(\" \"), tags: [] });\n  else if (cmd === \"done\") patch(Number(rest[0]), { done: true });\n}\nfor (const t of tasks) console.log(`${t.id} ${t.done ? \"x\" : \"-\"} ${t.title}`);\n",
+            "tests": [
+              {
+                "input": "add write tests\nadd ship it\ndone 1",
+                "output": "1 x write tests\n2 - ship it"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w17-rt1",
+            "title": "Overrides over defaults",
+            "prompt": "`configure` overlays some settings on the defaults. Replace the `any`s: the overrides are any subset of the defaults' fields (derive that type — don't write it out), and the result has every field.",
+            "hint": "`typeof DEFAULTS` names the full settings type.",
+            "hints": [
+              "`typeof DEFAULTS` names the full settings type.",
+              "`Partial<...>` of it is the overrides."
+            ],
+            "language": "typescript",
+            "kind": "retype",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype _1 = Expect<Equal<Parameters<typeof configure>[0], { retries?: number; timeoutMs?: number; verbose?: boolean }>>;\ntype _2 = Expect<Equal<ReturnType<typeof configure>, { retries: number; timeoutMs: number; verbose: boolean }>>;\n",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst DEFAULTS = { retries: 3, timeoutMs: 1000, verbose: false };\nfunction configure(overrides: any): any {\n  return { ...DEFAULTS, ...overrides };\n}\nconst o: { retries?: number; timeoutMs?: number; verbose?: boolean } = {};\nfor (const pair of input.split(/\\s+/)) {\n  const [k, v = \"\"] = pair.split(\"=\");\n  if (k === \"retries\") o.retries = Number(v);\n  else if (k === \"timeoutMs\") o.timeoutMs = Number(v);\n  else if (k === \"verbose\") o.verbose = v === \"true\";\n}\nconst c = configure(o);\nconsole.log(`${c.retries} ${c.timeoutMs} ${c.verbose}`);\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst DEFAULTS = { retries: 3, timeoutMs: 1000, verbose: false };\ntype Settings = typeof DEFAULTS;\nfunction configure(overrides: Partial<Settings>): Settings {\n  return { ...DEFAULTS, ...overrides };\n}\nconst o: { retries?: number; timeoutMs?: number; verbose?: boolean } = {};\nfor (const pair of input.split(/\\s+/)) {\n  const [k, v = \"\"] = pair.split(\"=\");\n  if (k === \"retries\") o.retries = Number(v);\n  else if (k === \"timeoutMs\") o.timeoutMs = Number(v);\n  else if (k === \"verbose\") o.verbose = v === \"true\";\n}\nconst c = configure(o);\nconsole.log(`${c.retries} ${c.timeoutMs} ${c.verbose}`);\n",
+            "tests": [
+              {
+                "input": "retries=5 verbose=true",
+                "output": "5 1000 true"
+              },
+              {
+                "input": "timeoutMs=250",
+                "output": "3 250 false"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
             "id": "tsm-ts_compose-order1",
             "title": "Put it in order: `extends` for a named family",
             "prompt": "The lines of the worked example “`extends` for a named family” from Extending & Combining Types, shuffled. Put them back in an order that compiles and prints exactly:\n\n    cube:24 square:4 8",
@@ -34702,6 +36050,100 @@
             "starter": "declare function getAll____;\n",
             "solution": "declare function getAll<T, K extends keyof T>(obj: T, keys: K[]): T[K][];\n",
             "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w18-rt1",
+            "title": "Group by, generically",
+            "prompt": "Make `groupBy` generic: for a list of `T` and a key function from `T` to `string`, it returns `Record<string, T[]>`. No `any` left.",
+            "hint": "One type parameter `T` links the list, the key function's argument and the groups.",
+            "hints": [
+              "One type parameter `T` links the list, the key function's argument and the groups.",
+              "`function groupBy<T>(xs: readonly T[], key: (x: T) => string): Record<string, T[]>`."
+            ],
+            "language": "typescript",
+            "kind": "retype",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\nconst _g = groupBy([1, 2, 3], (n) => (n % 2 ? \"odd\" : \"even\"));\ntype _1 = Expect<Equal<typeof _g, Record<string, number[]>>>;\nconst _h = groupBy([\"a\"], (s) => s);\ntype _2 = Expect<Equal<typeof _h, Record<string, string[]>>>;\n",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nfunction groupBy(xs: any, key: any): any {\n  const out: any = {};\n  for (const x of xs) (out[key(x)] ??= []).push(x);\n  return out;\n}\nconst words = input.split(/\\s+/);\nconst byFirst = groupBy(words, (w: string) => w[0] ?? \"\");\nfor (const k of Object.keys(byFirst).sort()) console.log(`${k}: ${byFirst[k]!.join(\",\")}`);\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nfunction groupBy<T>(xs: readonly T[], key: (x: T) => string): Record<string, T[]> {\n  const out: Record<string, T[]> = {};\n  for (const x of xs) (out[key(x)] ??= []).push(x);\n  return out;\n}\nconst words = input.split(/\\s+/);\nconst byFirst = groupBy(words, (w: string) => w[0] ?? \"\");\nfor (const k of Object.keys(byFirst).sort()) console.log(`${k}: ${byFirst[k]!.join(\",\")}`);\n",
+            "tests": [
+              {
+                "input": "apple avocado banana blueberry cherry",
+                "output": "a: apple,avocado\nb: banana,blueberry\nc: cherry"
+              },
+              {
+                "input": "kiwi",
+                "output": "k: kiwi"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w18-dz1",
+            "title": "A page of anything",
+            "prompt": "Write the generic `Page<T>`: the `items` on this page (an array of `T`), the `page` number and the `total` number of pages.",
+            "hint": "A type alias can take a type parameter: `type Page<T> = { ... }`.",
+            "hints": [
+              "A type alias can take a type parameter: `type Page<T> = { ... }`."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype _1 = Expect<Equal<Page<number>, { items: number[]; page: number; total: number }>>;\ntype _2 = Expect<Equal<Page<string>[\"items\"], string[]>>;\n",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\nfunction paginate<T>(all: readonly T[], page: number, size: number): Page<T> {\n  return { items: all.slice((page - 1) * size, page * size), page, total: Math.ceil(all.length / size) };\n}\nconst [pageText = \"1\", sizeText = \"2\", ...rest] = input.split(/\\s+/);\nconst p = paginate(rest, Number(pageText), Number(sizeText));\nconsole.log(`page ${p.page}/${p.total}: ${p.items.join(\" \")}`);\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Page<T> = { items: T[]; page: number; total: number };\nfunction paginate<T>(all: readonly T[], page: number, size: number): Page<T> {\n  return { items: all.slice((page - 1) * size, page * size), page, total: Math.ceil(all.length / size) };\n}\nconst [pageText = \"1\", sizeText = \"2\", ...rest] = input.split(/\\s+/);\nconst p = paginate(rest, Number(pageText), Number(sizeText));\nconsole.log(`page ${p.page}/${p.total}: ${p.items.join(\" \")}`);\n",
+            "tests": [
+              {
+                "input": "2 2 a b c d e",
+                "output": "page 2/3: c d"
+              },
+              {
+                "input": "1 3 x",
+                "output": "page 1/1: x"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w18-rf1",
+            "title": "One function, not two",
+            "prompt": "`firstNum` and `firstStr` are the same function twice. Replace them with one generic `first<T>` — neither old name may remain.",
+            "hint": "`function first<T>(xs: readonly T[]): T | undefined`.",
+            "hints": [
+              "`function first<T>(xs: readonly T[]): T | undefined`."
+            ],
+            "language": "typescript",
+            "kind": "refactor",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [
+              "firstNum",
+              "firstStr"
+            ],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nfunction firstNum(xs: readonly number[]): number | undefined {\n  return xs[0];\n}\nfunction firstStr(xs: readonly string[]): string | undefined {\n  return xs[0];\n}\nconst words = input.split(/\\s+/);\nconsole.log(firstStr(words) ?? \"none\");\nconsole.log(firstNum(words.map((w) => w.length)) ?? \"none\");\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nfunction first<T>(xs: readonly T[]): T | undefined {\n  return xs[0];\n}\nconst words = input.split(/\\s+/);\nconsole.log(first(words) ?? \"none\");\nconsole.log(first(words.map((w) => w.length)) ?? \"none\");\n",
+            "tests": [
+              {
+                "input": "hello world",
+                "output": "hello\n5"
+              },
+              {
+                "input": "a",
+                "output": "a\n1"
+              }
+            ],
             "source_slug": "",
             "dataset": ""
           },
@@ -36499,6 +37941,59 @@
             "dataset": ""
           },
           {
+            "id": "tsm-w19-dz1",
+            "title": "Operations from a table",
+            "prompt": "Write `Op`: the names of the handlers in `HANDLERS`, derived from the object itself so that adding a handler adds an operation.",
+            "hint": "`typeof HANDLERS` is the object's type; `keyof` of that is its keys.",
+            "hints": [
+              "`typeof HANDLERS` is the object's type; `keyof` of that is its keys."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype _1 = Expect<Equal<Op, \"upper\" | \"reverse\" | \"length\">>;\n",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst HANDLERS = {\n  upper: (s: string) => s.toUpperCase(),\n  reverse: (s: string) => [...s].reverse().join(\"\"),\n  length: (s: string) => String(s.length),\n};\n____\nfunction isOp(s: string): s is Op {\n  return s in HANDLERS;\n}\nfor (const line of input.split(\"\\n\")) {\n  const [op = \"\", ...words] = line.split(\" \");\n  console.log(isOp(op) ? HANDLERS[op](words.join(\" \")) : `unknown op ${op}`);\n}\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst HANDLERS = {\n  upper: (s: string) => s.toUpperCase(),\n  reverse: (s: string) => [...s].reverse().join(\"\"),\n  length: (s: string) => String(s.length),\n};\ntype Op = keyof typeof HANDLERS;\nfunction isOp(s: string): s is Op {\n  return s in HANDLERS;\n}\nfor (const line of input.split(\"\\n\")) {\n  const [op = \"\", ...words] = line.split(\" \");\n  console.log(isOp(op) ? HANDLERS[op](words.join(\" \")) : `unknown op ${op}`);\n}\n",
+            "tests": [
+              {
+                "input": "upper hi there\nreverse abc\nnope x\nlength four",
+                "output": "HI THERE\ncba\nunknown op nope\n4"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w19-rt1",
+            "title": "A typed getter",
+            "prompt": "`get(key)` reads one setting. Replace the `any`s so the key must be one of `config`'s keys and the result has that key's type — `get(\"port\")` is a `number`, `get(\"host\")` a `string`.",
+            "hint": "A type parameter constrained to the keys: `K extends keyof typeof config`.",
+            "hints": [
+              "A type parameter constrained to the keys: `K extends keyof typeof config`.",
+              "The result is the indexed access type `(typeof config)[K]`."
+            ],
+            "language": "typescript",
+            "kind": "retype",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\nconst _p = get(\"port\");\nconst _h = get(\"host\");\ntype _1 = Expect<Equal<typeof _p, number>>;\ntype _2 = Expect<Equal<typeof _h, string>>;\n",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst config = { host: \"localhost\", port: 8080, tls: false };\nfunction get(key: any): any {\n  return config[key];\n}\nfor (const k of input.split(/\\s+/)) {\n  if (k === \"host\" || k === \"port\" || k === \"tls\") console.log(`${k}=${get(k)}`);\n  else console.log(`no ${k}`);\n}\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst config = { host: \"localhost\", port: 8080, tls: false };\nfunction get<K extends keyof typeof config>(key: K): (typeof config)[K] {\n  return config[key];\n}\nfor (const k of input.split(/\\s+/)) {\n  if (k === \"host\" || k === \"port\" || k === \"tls\") console.log(`${k}=${get(k)}`);\n  else console.log(`no ${k}`);\n}\n",
+            "tests": [
+              {
+                "input": "port host tls nope",
+                "output": "port=8080\nhost=localhost\ntls=false\nno nope"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
             "id": "tsm-ts_keyof_indexed-order1",
             "title": "Put it in order: Typed get and set from one object",
             "prompt": "The lines of the worked example “Typed get and set from one object” from keyof, typeof & Indexed Access, shuffled. Put them back in an order that compiles and prints exactly:\n\n    {\"theme\":\"dark\",\"fontSize\":16,\"autosave\":true}",
@@ -38129,6 +39624,59 @@
             "starter": "type ReadonlyExcept<T, K extends keyof T> = ____;\n",
             "solution": "type ReadonlyExcept<T, K extends keyof T> = Readonly<Omit<T, K>> & Pick<T, K>;\n",
             "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w20-dz1",
+            "title": "An error per field",
+            "prompt": "Write the mapped type `Errors<T>`: for every key of `T`, an optional error message string.",
+            "hint": "`{ [K in keyof T]?: string }` — map over the keys, with `?` on each.",
+            "hints": [
+              "`{ [K in keyof T]?: string }` — map over the keys, with `?` on each."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype _1 = Expect<Equal<Errors<{ a: number; b: string }>, { a?: string; b?: string }>>;\n",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Form = { name: string; age: number; email: string };\n____\nfunction validate(f: Form): Errors<Form> {\n  const e: Errors<Form> = {};\n  if (f.name.trim() === \"\") e.name = \"required\";\n  if (!Number.isInteger(f.age) || f.age < 0) e.age = \"must be a whole number\";\n  if (!f.email.includes(\"@\")) e.email = \"invalid\";\n  return e;\n}\nfor (const line of input.split(\"\\n\")) {\n  const [name = \"\", age = \"\", email = \"\"] = line.split(\",\");\n  const errs = validate({ name, age: Number(age), email });\n  const list = Object.entries(errs).map(([k, v]) => `${k} ${v}`);\n  console.log(list.length ? list.join(\"; \") : \"ok\");\n}\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Form = { name: string; age: number; email: string };\ntype Errors<T> = { [K in keyof T]?: string };\nfunction validate(f: Form): Errors<Form> {\n  const e: Errors<Form> = {};\n  if (f.name.trim() === \"\") e.name = \"required\";\n  if (!Number.isInteger(f.age) || f.age < 0) e.age = \"must be a whole number\";\n  if (!f.email.includes(\"@\")) e.email = \"invalid\";\n  return e;\n}\nfor (const line of input.split(\"\\n\")) {\n  const [name = \"\", age = \"\", email = \"\"] = line.split(\",\");\n  const errs = validate({ name, age: Number(age), email });\n  const list = Object.entries(errs).map(([k, v]) => `${k} ${v}`);\n  console.log(list.length ? list.join(\"; \") : \"ok\");\n}\n",
+            "tests": [
+              {
+                "input": "ada,36,a@x\n,x,nope",
+                "output": "ok\nname required; age must be a whole number; email invalid"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w20-rt1",
+            "title": "Flags from names",
+            "prompt": "`toggles` turns a list of names into an object with one `false` flag per name. Replace the `any`s so that `toggles([\"a\", \"b\"])` has the type `{ a: boolean; b: boolean }`.",
+            "hint": "Capture the names as a type parameter `K extends string` so the literals are kept.",
+            "hints": [
+              "Capture the names as a type parameter `K extends string` so the literals are kept.",
+              "The result is the mapped type `{ [P in K]: boolean }`."
+            ],
+            "language": "typescript",
+            "kind": "retype",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\nconst _t = toggles([\"a\", \"b\"]);\ntype _1 = Expect<Equal<typeof _t, { a: boolean; b: boolean }>>;\n",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nfunction toggles(keys: any): any {\n  const out: any = {};\n  for (const k of keys) out[k] = false;\n  return out;\n}\nconst t = toggles(input.split(/\\s+/));\nconsole.log(Object.keys(t).join(\",\"));\nconsole.log(Object.values(t).every((v) => v === false));\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nfunction toggles<K extends string>(keys: readonly K[]): { [P in K]: boolean } {\n  const out = {} as { [P in K]: boolean };\n  for (const k of keys) out[k] = false;\n  return out;\n}\nconst t = toggles(input.split(/\\s+/));\nconsole.log(Object.keys(t).join(\",\"));\nconsole.log(Object.values(t).every((v) => v === false));\n",
+            "tests": [
+              {
+                "input": "dark compact beta",
+                "output": "dark,compact,beta\ntrue"
+              }
+            ],
             "source_slug": "",
             "dataset": ""
           },
@@ -39831,6 +41379,33 @@
             "starter": "type PropsOf<C> = ____;\n",
             "solution": "type PropsOf<C> = C extends (props: infer P) => unknown ? P : never;\n",
             "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w21-dz1",
+            "title": "The element of a list",
+            "prompt": "Write `ElementOf<T>`: the element type of an array or readonly array `T`, and `never` for anything else. `Size` is derived with it.",
+            "hint": "A conditional type with `infer`: `T extends readonly (infer E)[] ? E : never`.",
+            "hints": [
+              "A conditional type with `infer`: `T extends readonly (infer E)[] ? E : never`.",
+              "`readonly` in the pattern matches mutable arrays too."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype _1 = Expect<Equal<ElementOf<string[]>, string>>;\ntype _2 = Expect<Equal<ElementOf<readonly [1, 2]>, 1 | 2>>;\ntype _3 = Expect<Equal<ElementOf<number>, never>>;\n",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\nconst SIZES = [\"S\", \"M\", \"L\", \"XL\"] as const;\ntype Size = ElementOf<typeof SIZES>;\nconst ORDER: Record<Size, number> = { S: 0, M: 1, L: 2, XL: 3 };\nconst isSize = (s: string): s is Size => (SIZES as readonly string[]).includes(s);\nconst given = input.split(/\\s+/).filter(isSize);\nconsole.log(given.toSorted((a, b) => ORDER[a] - ORDER[b]).join(\" \"));\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype ElementOf<T> = T extends readonly (infer E)[] ? E : never;\nconst SIZES = [\"S\", \"M\", \"L\", \"XL\"] as const;\ntype Size = ElementOf<typeof SIZES>;\nconst ORDER: Record<Size, number> = { S: 0, M: 1, L: 2, XL: 3 };\nconst isSize = (s: string): s is Size => (SIZES as readonly string[]).includes(s);\nconst given = input.split(/\\s+/).filter(isSize);\nconsole.log(given.toSorted((a, b) => ORDER[a] - ORDER[b]).join(\" \"));\n",
+            "tests": [
+              {
+                "input": "XL S M foo L S",
+                "output": "S S M L XL"
+              }
+            ],
             "source_slug": "",
             "dataset": ""
           },
@@ -41644,6 +43219,33 @@
             "dataset": ""
           },
           {
+            "id": "tsm-w22-dz1",
+            "title": "Getter names",
+            "prompt": "Write `Getter<K>`: for a property name like `\"name\"`, the getter name `\"getName\"` — a template literal type with the name capitalised.",
+            "hint": "A template literal type: `` `get${...}` ``.",
+            "hints": [
+              "A template literal type: `` `get${...}` ``.",
+              "`Capitalize<K>` upper-cases the first letter."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype _1 = Expect<Equal<Getter<\"name\">, \"getName\">>;\ntype _2 = Expect<Equal<Getter<\"a\" | \"b\">, \"getA\" | \"getB\">>;\n",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\nconst user = { name: \"ada\", city: \"london\" };\ntype User = typeof user;\nconst getters = {\n  getName: () => user.name,\n  getCity: () => user.city,\n} satisfies { [K in keyof User as Getter<K>]: () => string };\nfor (const k of input.split(/\\s+/)) {\n  if (k === \"getName\" || k === \"getCity\") console.log(getters[k]());\n  else console.log(`no ${k}`);\n}\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Getter<K extends string> = `get${Capitalize<K>}`;\nconst user = { name: \"ada\", city: \"london\" };\ntype User = typeof user;\nconst getters = {\n  getName: () => user.name,\n  getCity: () => user.city,\n} satisfies { [K in keyof User as Getter<K>]: () => string };\nfor (const k of input.split(/\\s+/)) {\n  if (k === \"getName\" || k === \"getCity\") console.log(getters[k]());\n  else console.log(`no ${k}`);\n}\n",
+            "tests": [
+              {
+                "input": "getCity getName getAge",
+                "output": "london\nada\nno getAge"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
             "id": "tsm-ts_template_literal_types-order1",
             "title": "Put it in order: Event names from two unions",
             "prompt": "The lines of the worked example “Event names from two unions” from Template Literal Types, shuffled. Put them back in an order that compiles and prints exactly:\n\n    user:created=2 order:deleted=1",
@@ -43353,6 +44955,100 @@
             "dataset": ""
           },
           {
+            "id": "tsm-w23-dz1",
+            "title": "What an account promises",
+            "prompt": "Write the `Account` interface that `Wallet` implements: a readonly `id` string, a `balance()` method returning a number, and `deposit(amount: number)` returning nothing.",
+            "hint": "Method signatures in an interface: `balance(): number;`.",
+            "hints": [
+              "Method signatures in an interface: `balance(): number;`.",
+              "`readonly id: string;` — the implementing class keeps it readonly too."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype _1 = Expect<Equal<Account[\"id\"], string>>;\ntype _2 = Expect<Equal<Account[\"balance\"], () => number>>;\ntype _3 = Expect<Equal<Account[\"deposit\"], (amount: number) => void>>;\ntype _4 = Expect<Equal<Readonly<Pick<Account, \"id\">>, Pick<Account, \"id\">>>;\n",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\nclass Wallet implements Account {\n  readonly id: string;\n  #cents = 0;\n  constructor(id: string) {\n    this.id = id;\n  }\n  balance(): number {\n    return this.#cents / 100;\n  }\n  deposit(amount: number): void {\n    this.#cents += Math.round(amount * 100);\n  }\n}\nconst w = new Wallet(\"w1\");\nfor (const t of input.split(/\\s+/)) w.deposit(Number(t));\nconsole.log(`${w.id} ${w.balance().toFixed(2)}`);\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ninterface Account {\n  readonly id: string;\n  balance(): number;\n  deposit(amount: number): void;\n}\nclass Wallet implements Account {\n  readonly id: string;\n  #cents = 0;\n  constructor(id: string) {\n    this.id = id;\n  }\n  balance(): number {\n    return this.#cents / 100;\n  }\n  deposit(amount: number): void {\n    this.#cents += Math.round(amount * 100);\n  }\n}\nconst w = new Wallet(\"w1\");\nfor (const t of input.split(/\\s+/)) w.deposit(Number(t));\nconsole.log(`${w.id} ${w.balance().toFixed(2)}`);\n",
+            "tests": [
+              {
+                "input": "1.10 2.20",
+                "output": "w1 3.30"
+              },
+              {
+                "input": "0.1 0.2",
+                "output": "w1 0.30"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w23-rt1",
+            "title": "A typed stack",
+            "prompt": "Replace every `any` in `Stack`: it holds numbers, `push` returns the stack itself so calls chain, `pop` may find it empty, and `size` is a number.",
+            "hint": "`pop` on an empty array returns `undefined`, so say `number | undefined`.",
+            "hints": [
+              "`pop` on an empty array returns `undefined`, so say `number | undefined`.",
+              "Returning `this` (or `Stack`) lets calls chain."
+            ],
+            "language": "typescript",
+            "kind": "retype",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype _1 = Expect<Equal<Parameters<Stack[\"push\"]>[0], number>>;\ntype _2 = Expect<Equal<ReturnType<Stack[\"pop\"]>, number | undefined>>;\ntype _3 = Expect<Equal<Stack[\"size\"], number>>;\ntype _4 = Expect<Equal<ReturnType<Stack[\"push\"]>, Stack>>;\n",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nclass Stack {\n  private items: any = [];\n  push(x: any): any {\n    this.items.push(x);\n    return this;\n  }\n  pop(): any {\n    return this.items.pop();\n  }\n  get size(): any {\n    return this.items.length;\n  }\n}\nconst s = new Stack();\nfor (const line of input.split(\"\\n\")) {\n  const [cmd, arg] = line.split(\" \");\n  if (cmd === \"push\") s.push(Number(arg));\n  else console.log(s.pop() ?? \"empty\");\n}\nconsole.log(`size ${s.size}`);\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nclass Stack {\n  private items: number[] = [];\n  push(x: number): this {\n    this.items.push(x);\n    return this;\n  }\n  pop(): number | undefined {\n    return this.items.pop();\n  }\n  get size(): number {\n    return this.items.length;\n  }\n}\nconst s = new Stack();\nfor (const line of input.split(\"\\n\")) {\n  const [cmd, arg] = line.split(\" \");\n  if (cmd === \"push\") s.push(Number(arg));\n  else console.log(s.pop() ?? \"empty\");\n}\nconsole.log(`size ${s.size}`);\n",
+            "tests": [
+              {
+                "input": "push 1\npush 2\npop\npop\npop",
+                "output": "2\n1\nempty\nsize 0"
+              },
+              {
+                "input": "push 7",
+                "output": "size 1"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w23-rf1",
+            "title": "Private for real",
+            "prompt": "`private` is only a compile-time rule — at runtime anyone can read `count`. Make both fields JavaScript private fields (`#`) instead. No `private ` left; same output.",
+            "hint": "Rename `count` to `#count` everywhere, declaration included.",
+            "hints": [
+              "Rename `count` to `#count` everywhere, declaration included."
+            ],
+            "language": "typescript",
+            "kind": "refactor",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [
+              "private "
+            ],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nclass Counter {\n  private count = 0;\n  private readonly step: number;\n  constructor(step: number) {\n    this.step = step;\n  }\n  tick(): number {\n    this.count += this.step;\n    return this.count;\n  }\n}\nconst [step = \"1\", times = \"1\"] = input.split(/\\s+/);\nconst c = new Counter(Number(step));\nconst seen: number[] = [];\nfor (let i = 0; i < Number(times); i++) seen.push(c.tick());\nconsole.log(seen.join(\" \"));\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nclass Counter {\n  #count = 0;\n  readonly #step: number;\n  constructor(step: number) {\n    this.#step = step;\n  }\n  tick(): number {\n    this.#count += this.#step;\n    return this.#count;\n  }\n}\nconst [step = \"1\", times = \"1\"] = input.split(/\\s+/);\nconst c = new Counter(Number(step));\nconst seen: number[] = [];\nfor (let i = 0; i < Number(times); i++) seen.push(c.tick());\nconsole.log(seen.join(\" \"));\n",
+            "tests": [
+              {
+                "input": "2 3",
+                "output": "2 4 6"
+              },
+              {
+                "input": "5 1",
+                "output": "5"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
             "id": "tsm-ts_classes-spot1",
             "title": "Spot the bug: Classes #1",
             "prompt": "This program runs, but prints the wrong thing.\n\nIt prints:\n    tagged undefined\n\nIt should print:\n    tagged v2\n\nClick the line that causes it.",
@@ -44946,6 +46642,68 @@
               {
                 "input": "x",
                 "output": "1\nx"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w24-rt1",
+            "title": "Chunks of anything",
+            "prompt": "`chunks` lazily yields slices of a list. Replace the `any`s so it works for any element type and `for (const c of chunks(xs, 2))` gives `c` the type `T[]`.",
+            "hint": "A generic generator: `function* chunks<T>(xs: readonly T[], size: number)`.",
+            "hints": [
+              "A generic generator: `function* chunks<T>(xs: readonly T[], size: number)`.",
+              "Its return type is `Generator<T[]>` — or leave it off and let inference find it."
+            ],
+            "language": "typescript",
+            "kind": "retype",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype _Elem<I> = I extends Iterable<infer E> ? E : never;\nconst _c = chunks([1, 2, 3], 2);\ntype _1 = Expect<Equal<IsAny<typeof _c>, false>>;\ntype _2 = Expect<Equal<_Elem<typeof _c>, number[]>>;\n",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nfunction* chunks(xs: any, size: any): any {\n  for (let i = 0; i < xs.length; i += size) yield xs.slice(i, i + size);\n}\nfor (const c of chunks(input.split(/\\s+/), 2)) console.log(c.join(\",\"));\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nfunction* chunks<T>(xs: readonly T[], size: number): Generator<T[]> {\n  for (let i = 0; i < xs.length; i += size) yield xs.slice(i, i + size);\n}\nfor (const c of chunks(input.split(/\\s+/), 2)) console.log(c.join(\",\"));\n",
+            "tests": [
+              {
+                "input": "a b c d e",
+                "output": "a,b\nc,d\ne"
+              },
+              {
+                "input": "x",
+                "output": "x"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w24-dz1",
+            "title": "A queue you can iterate",
+            "prompt": "Write the generic `Queue<T>` interface: it is `Iterable<T>`, has `enqueue(x: T): void`, `dequeue(): T | undefined`, and a readonly `length` number.",
+            "hint": "`interface Queue<T> extends Iterable<T> { ... }`.",
+            "hints": [
+              "`interface Queue<T> extends Iterable<T> { ... }`.",
+              "`readonly length: number;`."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype _1 = Expect<Equal<Queue<number>[\"enqueue\"], (x: number) => void>>;\ntype _2 = Expect<Equal<Queue<number>[\"dequeue\"], () => number | undefined>>;\ntype _3 = Expect<Equal<Queue<number>[\"length\"], number>>;\ntype _4 = Expect<Equal<Queue<number> extends Iterable<number> ? true : false, true>>;\n",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\nfunction makeQueue<T>(): Queue<T> {\n  const items: T[] = [];\n  return {\n    enqueue: (x) => {\n      items.push(x);\n    },\n    dequeue: () => items.shift(),\n    get length() {\n      return items.length;\n    },\n    [Symbol.iterator]: () => items[Symbol.iterator](),\n  };\n}\nconst q = makeQueue<string>();\nfor (const line of input.split(\"\\n\")) {\n  const [cmd = \"\", arg = \"\"] = line.split(\" \");\n  if (cmd === \"in\") q.enqueue(arg);\n  else console.log(q.dequeue() ?? \"empty\");\n}\nconsole.log(`${q.length} left: ${[...q].join(\",\")}`);\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ninterface Queue<T> extends Iterable<T> {\n  enqueue(x: T): void;\n  dequeue(): T | undefined;\n  readonly length: number;\n}\nfunction makeQueue<T>(): Queue<T> {\n  const items: T[] = [];\n  return {\n    enqueue: (x) => {\n      items.push(x);\n    },\n    dequeue: () => items.shift(),\n    get length() {\n      return items.length;\n    },\n    [Symbol.iterator]: () => items[Symbol.iterator](),\n  };\n}\nconst q = makeQueue<string>();\nfor (const line of input.split(\"\\n\")) {\n  const [cmd = \"\", arg = \"\"] = line.split(\" \");\n  if (cmd === \"in\") q.enqueue(arg);\n  else console.log(q.dequeue() ?? \"empty\");\n}\nconsole.log(`${q.length} left: ${[...q].join(\",\")}`);\n",
+            "tests": [
+              {
+                "input": "in a\nin b\nout\nin c",
+                "output": "a\n2 left: b,c"
+              },
+              {
+                "input": "out",
+                "output": "empty\n0 left:"
               }
             ],
             "source_slug": "",
@@ -46657,6 +48415,86 @@
             "dataset": ""
           },
           {
+            "id": "tsm-w25-dz1",
+            "title": "Result, generic",
+            "prompt": "Write `Result<T, E = string>`: `{ ok: true; value: T }` or `{ ok: false; error: E }`, with the error type defaulting to `string`.",
+            "hint": "Two type parameters; give the second a default with `E = string`.",
+            "hints": [
+              "Two type parameters; give the second a default with `E = string`."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype _1 = Expect<Equal<Result<number>, { ok: true; value: number } | { ok: false; error: string }>>;\ntype _2 = Expect<Equal<Result<1, 2>, { ok: true; value: 1 } | { ok: false; error: 2 }>>;\n",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\nfunction parseAge(s: string): Result<number> {\n  const n = Number(s);\n  if (!Number.isInteger(n)) return { ok: false, error: `not a whole number: ${s}` };\n  if (n < 0 || n > 150) return { ok: false, error: `out of range: ${n}` };\n  return { ok: true, value: n };\n}\nfor (const t of input.split(/\\s+/)) {\n  const r = parseAge(t);\n  console.log(r.ok ? `age ${r.value}` : `error ${r.error}`);\n}\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Result<T, E = string> = { ok: true; value: T } | { ok: false; error: E };\nfunction parseAge(s: string): Result<number> {\n  const n = Number(s);\n  if (!Number.isInteger(n)) return { ok: false, error: `not a whole number: ${s}` };\n  if (n < 0 || n > 150) return { ok: false, error: `out of range: ${n}` };\n  return { ok: true, value: n };\n}\nfor (const t of input.split(/\\s+/)) {\n  const r = parseAge(t);\n  console.log(r.ok ? `age ${r.value}` : `error ${r.error}`);\n}\n",
+            "tests": [
+              {
+                "input": "36 -1 abc 200 0",
+                "output": "age 36\nerror out of range: -1\nerror not a whole number: abc\nerror out of range: 200\nage 0"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w25-rf1",
+            "title": "Don't assume it is an Error",
+            "prompt": "`(e as Error).message` assumes whatever was thrown is an `Error` — the thrown string prints `failed: undefined`. Narrow with `instanceof` and fall back to `String(e)`. No `as Error` left.",
+            "hint": "A caught value is `unknown`: `e instanceof Error` narrows it.",
+            "hints": [
+              "A caught value is `unknown`: `e instanceof Error` narrows it."
+            ],
+            "language": "typescript",
+            "kind": "refactor",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [
+              "as Error"
+            ],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nfunction risky(s: string): number {\n  if (s === \"boom\") throw new Error(\"exploded\");\n  if (s === \"str\") throw \"a plain string\";\n  return s.length;\n}\nfor (const t of input.split(/\\s+/)) {\n  try {\n    console.log(risky(t));\n  } catch (e) {\n    console.log(`failed: ${(e as Error).message}`);\n  }\n}\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nfunction risky(s: string): number {\n  if (s === \"boom\") throw new Error(\"exploded\");\n  if (s === \"str\") throw \"a plain string\";\n  return s.length;\n}\nfor (const t of input.split(/\\s+/)) {\n  try {\n    console.log(risky(t));\n  } catch (e) {\n    console.log(`failed: ${e instanceof Error ? e.message : String(e)}`);\n  }\n}\n",
+            "tests": [
+              {
+                "input": "ok boom str",
+                "output": "2\nfailed: exploded\nfailed: a plain string"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w25-rt1",
+            "title": "Wrapping a failure",
+            "prompt": "`wrap` adds context to whatever was thrown, keeping the original as the `cause`. Replace the `any`s: a caught value is `unknown`, the context is a string, and the result is an `Error`.",
+            "hint": "`unknown` is the honest type of anything that was thrown.",
+            "hints": [
+              "`unknown` is the honest type of anything that was thrown."
+            ],
+            "language": "typescript",
+            "kind": "retype",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype _1 = Expect<Equal<Parameters<typeof wrap>[0], unknown>>;\ntype _2 = Expect<Equal<Parameters<typeof wrap>[1], string>>;\ntype _3 = Expect<Equal<ReturnType<typeof wrap>, Error>>;\n",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nfunction wrap(e: any, context: any): any {\n  return new Error(`${context}: ${e instanceof Error ? e.message : String(e)}`, { cause: e });\n}\nfor (const t of input.split(/\\s+/)) {\n  try {\n    if (t === \"x\") throw new Error(\"bad x\");\n    if (t === \"y\") throw 42;\n    console.log(`ok ${t}`);\n  } catch (e) {\n    const w = wrap(e, `handling ${t}`);\n    console.log(w.message, w.cause instanceof Error ? \"(error cause)\" : `(cause ${String(w.cause)})`);\n  }\n}\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nfunction wrap(e: unknown, context: string): Error {\n  return new Error(`${context}: ${e instanceof Error ? e.message : String(e)}`, { cause: e });\n}\nfor (const t of input.split(/\\s+/)) {\n  try {\n    if (t === \"x\") throw new Error(\"bad x\");\n    if (t === \"y\") throw 42;\n    console.log(`ok ${t}`);\n  } catch (e) {\n    const w = wrap(e, `handling ${t}`);\n    console.log(w.message, w.cause instanceof Error ? \"(error cause)\" : `(cause ${String(w.cause)})`);\n  }\n}\n",
+            "tests": [
+              {
+                "input": "a x y",
+                "output": "ok a\nhandling x: bad x (error cause)\nhandling y: 42 (cause 42)"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
             "id": "tsm-ts_errors-spot1",
             "title": "Spot the bug: Error Handling #1",
             "prompt": "This program runs, but prints the wrong thing.\n\nIt prints:\n    finally wins\n\nIt should print:\n    cleanup\n    caught: lost\n\nClick the line that causes it.",
@@ -48360,6 +50198,98 @@
               {
                 "input": "x",
                 "output": "xx\ndone"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w26-rt1",
+            "title": "Async, typed",
+            "prompt": "Replace the `any`s in `double`: it takes a number and resolves to a number.",
+            "hint": "An async function's return type is always a `Promise<...>`.",
+            "hints": [
+              "An async function's return type is always a `Promise<...>`."
+            ],
+            "language": "typescript",
+            "kind": "retype",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype _1 = Expect<Equal<Parameters<typeof double>[0], number>>;\ntype _2 = Expect<Equal<ReturnType<typeof double>, Promise<number>>>;\n",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nasync function double(n: any): Promise<any> {\n  return n * 2;\n}\nasync function main(): Promise<void> {\n  const xs = input.split(/\\s+/).map(Number);\n  const ys = await Promise.all(xs.map(double));\n  console.log(ys.join(\" \"));\n}\nmain();\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nasync function double(n: number): Promise<number> {\n  return n * 2;\n}\nasync function main(): Promise<void> {\n  const xs = input.split(/\\s+/).map(Number);\n  const ys = await Promise.all(xs.map(double));\n  console.log(ys.join(\" \"));\n}\nmain();\n",
+            "tests": [
+              {
+                "input": "1 2 3",
+                "output": "2 4 6"
+              },
+              {
+                "input": "10",
+                "output": "20"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w26-dz1",
+            "title": "A task is a promise-maker",
+            "prompt": "Write `Task<T>`: a function with no arguments that returns a promise of `T`. `runAll` runs a list of them with at most `limit` in flight.",
+            "hint": "A function type with no parameters: `() => Promise<T>`.",
+            "hints": [
+              "A function type with no parameters: `() => Promise<T>`."
+            ],
+            "language": "typescript",
+            "kind": "design",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\ntype IsAny<T> = 0 extends 1 & T ? true : false;\n\ntype _1 = Expect<Equal<Task<number>, () => Promise<number>>>;\n",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\nasync function runAll<T>(tasks: readonly Task<T>[], limit: number): Promise<T[]> {\n  const results: T[] = [];\n  let next = 0;\n  async function worker(): Promise<void> {\n    while (next < tasks.length) {\n      const i = next++;\n      const task = tasks[i];\n      if (task) results[i] = await task();\n    }\n  }\n  await Promise.all(Array.from({ length: Math.min(limit, tasks.length) }, worker));\n  return results;\n}\nconst nums = input.split(/\\s+/).map(Number);\nrunAll(nums.map((n) => async () => n * n), 2).then((r) => console.log(r.join(\" \")));\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Task<T> = () => Promise<T>;\nasync function runAll<T>(tasks: readonly Task<T>[], limit: number): Promise<T[]> {\n  const results: T[] = [];\n  let next = 0;\n  async function worker(): Promise<void> {\n    while (next < tasks.length) {\n      const i = next++;\n      const task = tasks[i];\n      if (task) results[i] = await task();\n    }\n  }\n  await Promise.all(Array.from({ length: Math.min(limit, tasks.length) }, worker));\n  return results;\n}\nconst nums = input.split(/\\s+/).map(Number);\nrunAll(nums.map((n) => async () => n * n), 2).then((r) => console.log(r.join(\" \")));\n",
+            "tests": [
+              {
+                "input": "1 2 3 4",
+                "output": "1 4 9 16"
+              },
+              {
+                "input": "5",
+                "output": "25"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w26-rf1",
+            "title": "Chains into awaits",
+            "prompt": "Rewrite `main` with `async`/`await` instead of `.then` chains — no `.then(` left. Same output.",
+            "hint": "Mark `main` `async`, then `const items = await Promise.all(...)`.",
+            "hints": [
+              "Mark `main` `async`, then `const items = await Promise.all(...)`."
+            ],
+            "language": "typescript",
+            "kind": "refactor",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [
+              ".then("
+            ],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nfunction load(id: number): Promise<string> {\n  return Promise.resolve(`item${id}`);\n}\nfunction main(): Promise<void> {\n  const ids = input.split(/\\s+/).map(Number);\n  return Promise.all(ids.map(load)).then((items) => {\n    console.log(items.join(\",\"));\n    return load(ids.length).then((extra) => console.log(`extra ${extra}`));\n  });\n}\nmain();\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nfunction load(id: number): Promise<string> {\n  return Promise.resolve(`item${id}`);\n}\nasync function main(): Promise<void> {\n  const ids = input.split(/\\s+/).map(Number);\n  const items = await Promise.all(ids.map(load));\n  console.log(items.join(\",\"));\n  const extra = await load(ids.length);\n  console.log(`extra ${extra}`);\n}\nmain();\n",
+            "tests": [
+              {
+                "input": "1 2 3",
+                "output": "item1,item2,item3\nextra item3"
+              },
+              {
+                "input": "7",
+                "output": "item7\nextra item1"
               }
             ],
             "source_slug": "",

@@ -89,6 +89,14 @@ def _sc_programs(w):
     return out
 
 
+def _sc_uses(body, token):
+    """A token that starts with a word character must start a word, so that
+    `try {` is not found in `Entry {` nor `never` in `whenever`."""
+    if token[0].isalnum() or token[0] in "_$":
+        return _sc_re.search(r"(?<![\w$])" + _sc_re.escape(token), body) is not None
+    return token in body
+
+
 def _lint_ts_scope(weeks):
     problems = []
     for w in weeks:
@@ -98,7 +106,7 @@ def _lint_ts_scope(weeks):
                 continue
             body = _sc_strip(src)
             for token, allowed_from in TS_SCOPE_RULES:
-                if n < allowed_from and token in body:
+                if n < allowed_from and _sc_uses(body, token):
                     problems.append(f"week {n} {pid} uses {token!r} (taught in week {allowed_from})")
     if problems:
         raise AssertionError("TS Mastery scope violations (X-104):\n  " + "\n  ".join(problems))

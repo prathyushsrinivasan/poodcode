@@ -64,6 +64,12 @@ export const KIND_SECTIONS: KindSection[] = [
       "This program runs, and its types say nothing. Replace every `any` with a type that describes what is actually there — the hidden checks accept nothing vaguer.",
   },
   {
+    kind: "refactor",
+    heading: "🔧 Refactor under a constraint",
+    blurb:
+      "This program already works. Change how it is written to meet the constraint in the prompt — the banned text is rejected before the code runs — while every test still passes.",
+  },
+  {
     kind: "design",
     heading: "📐 Design the type first",
     blurb:

@@ -91,6 +91,7 @@ function CodeExerciseCard({
     predict: { badge: "🧠 predict the type", color: "var(--accent)", whole: false },
     design: { badge: "📐 types first", color: "var(--accent)", whole: true },
     order: { badge: "🧱 put it in order", color: "var(--accent)", whole: false },
+    refactor: { badge: "🔧 refactor", color: "var(--warn)", whole: true },
   };
   const style = KIND_STYLE[exercise.kind];
   const big = challenge || !!style?.whole;
