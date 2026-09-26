@@ -1,3 +1,4 @@
+import { FailingCases } from "../components/OutputCompare";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { api } from "../api";
@@ -1486,25 +1487,7 @@ function Feedback({ report, isSql = false }: { report: JudgeReport; isSql?: bool
         ))}
       {!ok &&
         !isSql &&
-        failing.slice(0, 3).map((r, i) => (
-          <div key={i} style={{ marginTop: 6, fontSize: 12 }}>
-            <div className="dim">{r.name}</div>
-            <div style={{ fontFamily: "var(--font-mono)" }}>
-              <div>
-                input: <code>{r.input.replace(/\n/g, " ⏎ ") || "(none)"}</code>
-              </div>
-              <div>
-                expected: <code>{r.expected}</code>
-              </div>
-              <div style={{ color: "var(--bad)" }}>
-                got: <code>{r.timed_out ? "(timed out)" : r.actual || "(nothing)"}</code>
-              </div>
-              {r.stderr && (
-                <pre style={{ margin: "4px 0 0", whiteSpace: "pre-wrap" }}>{r.stderr}</pre>
-              )}
-            </div>
-          </div>
-        ))}
+        <FailingCases failing={failing} />}
     </div>
   );
 }

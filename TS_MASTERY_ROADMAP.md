@@ -71,6 +71,7 @@ the gap stays visible. This is what has landed since.
 | Assessment round two (X-32, X-33, X-34, X-36, X-68) | one final per week, every failing test shown, no programme exam, a four-number summary | **two-part finals** for weeks 15–22 (a type-graded half that must pass as well); week 17's final is now **Typed patch API** ("Merge intervals" moved to the problem set); a **hidden test set** on every final (the first four tests shown, the rest only say they failed); **26 alternate finals**, offered on a retake after a failed attempt; a **3-hour programme final exam** once all 26 weeks are done — 40 questions drawn round-robin from every week, 5 cross-month problems, 5 type puzzles; a **completion summary** by month with weeks to revisit and a **printable certificate** | `tools/mastery_ts_finals.py`, `mastery_ts_alternates.py`, `mastery_ts_final_exam.py`; `ExamPanel` in `Mastery.tsx`; `src/components/MasteryFinalExam.tsx`, `src/lib/finalExam.ts` |
 | Multi-file projects (X-45, M4-03) | one code box per project | a **tabbed workspace**: files travel as one string with `// @file name.ts` markers; the judge bundles them in tab order (sibling imports dropped, `export` stripped, compiler errors mapped back to `parse.ts(12,5)`), and every tab is its own Monaco model so imports resolve in the editor. Week 14's project is now a four-module `ledger/` (`money.ts`, `parse.ts`, `report.ts`, `main.ts`); any TypeScript project can be split into files. The Python mirror of the bundler computes expected outputs; the Rust one judges the reference, so the two cannot drift | `src-tauri/src/tsbundle.rs`, `_bundle_ts` in `tools/mastery_ts_kit.py`, `src/components/WorkspaceEditor.tsx`, `src/lib/projectFiles.ts` |
 | Editor standard library | every TypeScript editor named `lib.es2024.d.ts`, which Monaco's bundled TypeScript 5.4 does not ship — so the whole standard library silently dropped out (`Cannot find name 'Error'`, `'trim' does not exist on type 'string'`) | the newest libs Monaco has (es2023 + esnext collection/disposable/promise/object) plus editor-only declarations for what the judge's 5.9 adds (Set methods, iterator helpers, `Iterator.from`, `Array.fromAsync`, `Promise.try`) | `src/monacoSetup.ts`, `src/monacoLibShims.ts` |
+| Teaching tools, round one (X-64, X-65, X-67, M1-02, M3-01, M5-01) | none | **TypeScript playground** (`/playground/ts`): every declared type fully expanded and every top-level value's type (the type evaluator, M5-01 — expansion, not yet step-by-step), one variable's type at every use (the narrowing stepper, M3-01), the JavaScript the types erase to (X-64), and six strictness flags to flip with the errors they produce (X-65) — all computed by the editor's own TypeScript service. **stdin/stdout visualiser** (M1-02) on every failing test in Solve, Learn, the Course and the Mastery finals: numbered stdin, expected and yours side by side, a caret under the first differing character, and a sentence ("line 2 ends early", "differs only in spacing") — using the judge's own normalisation | `src/pages/TsPlayground.tsx`, `src/lib/tsAnalysis.ts`, `src/components/OutputCompare.tsx`, `src/lib/outputCompare.ts` |
 | Week 27 interview practice | a capstone and a four-problem mock set | **63-question interview bank** with model answers (7 topics, "ask me one" drill), **three timed 45-minute mock interviews** (bank questions + a problem + a type puzzle, clock, self-scored rubric, attempt history), **10 code-review exercises** (X-14): write the review, compare with the model review, tick what you caught — the PR code and the corrected code are both run and their output computed | `tools/mastery_ts_w27.py`, `src/components/MasteryCapstone.tsx`, `src/lib/capstone.ts` |
 | Fast authoring loop (X-102) | none for Mastery | `python tools/verify_ts_mastery.py --weeks 11-14` / `--only ts_regex` — type-checks and runs chapters, practice, problems, finals and projects in seconds | `tools/verify_ts_mastery.py` |
 
@@ -262,10 +263,10 @@ Everything here is built once and then used by every week in Part B.
 | 🚧 X-61 | **Today card** on the Mastery page: "at your pace, today is: finish chapter 2, 3 drills, 1 problem" — derived from pacing + remaining work. Also surfaced on the Today page (`today.ts`). | P1 | M |
 | ✅ X-62 | **Inferred-type hovers in the editor** — Monaco ships a TypeScript language service; wire it for TS exercises so hovering shows the inferred type (with `strict` and the exercise's strictness preset). The single biggest learning aid for this language. | P1 | M |
 | ✅ X-63 | **Inline error squiggles with explanations** — show `TSnnnn` diagnostics live, and on hover link to the error glossary entry (X-66). | P1 | M |
-| X-64 | **"What runs" view** — a toggle showing the type-stripped JavaScript that actually executes, lines aligned with the source. Makes erasure visible from week 1. | P2 | M |
-| X-65 | **Strictness switcher** in scratch mode — flip `strict`, `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes` and watch errors appear and disappear. | P2 | M |
+| ✅ X-64 | **"What runs" view** — a toggle showing the type-stripped JavaScript that actually executes, lines aligned with the source. Makes erasure visible from week 1. | P2 | M |
+| ✅ X-65 | **Strictness switcher** in scratch mode — flip `strict`, `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes` and watch errors appear and disappear. | P2 | M |
 | ✅ X-66 | **TS error glossary** page (`/ts-errors`): every `TSnnnn` code the programme can produce, plain-English cause, minimal repro, fix, and which chapters teach it. | P1 | M |
-| X-67 | **Type playground** (`/playground/ts`): scratch file + panel listing every declared type's fully-expanded form (via the language service's `quickInfo`). | P2 | L |
+| ✅ X-67 | **Type playground** (`/playground/ts`): scratch file + panel listing every declared type's fully-expanded form (via the language service's `quickInfo`). | P2 | L |
 | ✅ X-68 | **Completion summary** per month and for the programme: time spent, finals first-try rate, weakest chapters, projects shipped, printable. | P2 | M |
 | X-69 | **Skill radar** — per-phase mastery (reading types, writing types, runtime correctness, async, type-level) computed from exercise kinds passed. | P3 | M |
 | ✅ X-70 | **Quiz review screen** after every sitting: every question, your answer, the right answer, the explanation, "add to flashcards". | P1 | S |
@@ -342,7 +343,7 @@ print stdout, and know exactly what TypeScript infers without being told.
 | # | Item | P |
 |---|---|---|
 | M1-01 | **Onboarding week 0** (ungated, 30 min): the editor, Run vs Submit, how stdin/stdout grading works, reading a failing test, hovering for types. | P1 |
-| M1-02 | **stdin/stdout visualiser** — show the test's stdin split into lines, what your program printed, and where the first difference is, character-aligned. | P1 |
+| ✅ M1-02 | **stdin/stdout visualiser** — show the test's stdin split into lines, what your program printed, and where the first difference is, character-aligned. | P1 |
 | M1-03 | "**Predict first**" mode for months 1–2: before Run, you must type what you think it prints; mismatches are logged as learning moments. | P2 |
 | 🚧 M1-04 | **Month 1 checkpoint** (new, X-35): 60-minute contest of 4 problems + 20 questions. | P1 |
 | M1-05 | Month arc project start: **`ledger.ts` v1** — read transactions line by line, print a formatted statement. Grows every month (X-44). | P1 |
@@ -493,7 +494,7 @@ control-flow narrowing the way the compiler does.
 
 | # | Item | P |
 |---|---|---|
-| M3-01 | **Narrowing stepper** — step through a function; at each line, a side panel shows the narrowed type of each variable (via the language service's `quickInfo` at that position). The teaching tool for weeks 10–12. | P1 |
+| ✅ M3-01 | **Narrowing stepper** — step through a function; at each line, a side panel shows the narrowed type of each variable (via the language service's `quickInfo` at that position). The teaching tool for weeks 10–12. | P1 |
 | M3-02 | **Exhaustiveness badge** — the editor shows "switch is exhaustive ✓" when a `never` check compiles. | P3 |
 | M3-03 | **State-machine diagram** — for a union of states + transition function, render the states and allowed transitions (weeks 10 and 12). | P3 |
 | M3-04 | **Strictness ladder step**: from week 11, every exercise runs under `strict+indexed` (X-17). Announce it in-app. | P1 |
@@ -644,7 +645,7 @@ the type-level programs behind every serious library.
 
 | # | Item | P |
 |---|---|---|
-| M5-01 | **Type evaluator** — paste a type, see it fully expanded, and **step** a conditional/mapped type's evaluation (distribution over each union member, each `infer` binding). The teaching tool for weeks 20–22. | P1 |
+| 🚧 M5-01 | **Type evaluator** — paste a type, see it fully expanded, and **step** a conditional/mapped type's evaluation (distribution over each union member, each `infer` binding). The teaching tool for weeks 20–22. | P1 |
 | M5-02 | **Type-challenge ladder** (X-24) surfaced as a daily rep: one puzzle a day, easy → extreme, streak tracked. | P1 |
 | M5-03 | **Assertion panel** — for type-graded work, list every `Expect<Equal<…>>` with ✓/✗ and the two types side by side when it fails. | **P0** |
 | M5-04 | **Month 5 checkpoint** (new): 20 type puzzles in 90 minutes + 2 runtime generic problems. | P1 |

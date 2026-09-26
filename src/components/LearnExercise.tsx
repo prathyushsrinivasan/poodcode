@@ -13,6 +13,7 @@
 // Either mode may carry `exercise.harness`: TypeScript appended to the
 // learner's code before compiling, which lets an exercise ask for a *function*
 // and grade what it returns instead of what it printed.
+import { FailingCases } from "./OutputCompare";
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { api } from "../api";
@@ -483,25 +484,7 @@ export function Feedback({ report }: { report: JudgeReport }) {
           : `${report.passed} / ${report.total} tests passed`}
       </div>
       {!ok &&
-        failing.slice(0, 3).map((r, i) => (
-          <div key={i} style={{ marginTop: 6, fontSize: 12 }}>
-            <div className="dim">{r.name}</div>
-            <div style={{ fontFamily: "var(--font-mono)" }}>
-              <div>
-                input: <code>{r.input.replace(/\n/g, " ⏎ ") || "(none)"}</code>
-              </div>
-              <div>
-                expected: <code>{r.expected}</code>
-              </div>
-              <div style={{ color: "var(--bad)" }}>
-                got: <code>{r.timed_out ? "(timed out)" : r.actual || "(nothing)"}</code>
-              </div>
-              {r.stderr && (
-                <pre style={{ margin: "4px 0 0", whiteSpace: "pre-wrap" }}>{r.stderr}</pre>
-              )}
-            </div>
-          </div>
-        ))}
+        <FailingCases failing={failing} />}
     </div>
   );
 }

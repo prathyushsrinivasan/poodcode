@@ -248,6 +248,7 @@ export function CommandPalette() {
       { id: "mastery", label: "6-Month Mastery", run: () => navigate("/mastery") },
       { id: "flashcards", label: "Flashcards", run: () => navigate("/flashcards") },
       { id: "ts-errors", label: "TypeScript errors, explained", run: () => navigate("/ts-errors") },
+      { id: "ts-playground", label: "TypeScript playground — types, narrowing, what runs", run: () => navigate("/playground/ts") },
       { id: "settings", label: "Settings", run: () => navigate("/settings") },
     ],
     [navigate]

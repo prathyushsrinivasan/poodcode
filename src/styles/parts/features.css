@@ -502,6 +502,88 @@ table.sqlgrid tbody tr.diff td {
   font-size: 11px;
 }
 
+/* ---- TypeScript playground (X-67) ----------------------------------- */
+.playground-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+}
+@media (max-width: 1100px) {
+  .playground-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.playground-editor {
+  height: 460px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.playground-side {
+  max-height: 640px;
+  overflow: auto;
+  margin-bottom: 0;
+}
+.playground-row {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 12.5px;
+}
+.playground-label code {
+  font-weight: 600;
+}
+.playground-type {
+  font-family: var(--font-mono);
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: var(--accent);
+}
+.playground-js {
+  max-height: 520px;
+  overflow: auto;
+}
+
+/* ---- stdin/stdout visualiser (M1-02) ---------------------------------- */
+.output-compare {
+  margin-top: 6px;
+}
+.output-compare-cols {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 8px;
+}
+.output-compare-lines {
+  max-height: 240px;
+  overflow: auto;
+  margin: 0 0 6px;
+  font-size: 12px;
+  white-space: pre;
+}
+.output-compare-lines .oc-no {
+  display: inline-block;
+  width: 2.2em;
+  margin-right: 6px;
+  text-align: right;
+  color: var(--text-dim);
+  user-select: none;
+}
+.output-compare-lines .oc-diff {
+  background: color-mix(in srgb, var(--bad) 16%, transparent);
+}
+.output-compare-lines .oc-caret {
+  color: var(--bad);
+  font-weight: 700;
+}
+.oc-sentence {
+  margin: 2px 0 0;
+  color: var(--bad);
+  font-size: 12.5px;
+}
+
 /* What a snippet prints — computed output shown under the code. */
 .code-output {
   font-family: var(--font-mono);

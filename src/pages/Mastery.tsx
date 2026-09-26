@@ -15,6 +15,7 @@ import type {
 import { Markdown } from "../components/Markdown";
 import { CodeEditor } from "../components/CodeEditor";
 import { WorkspaceEditor } from "../components/WorkspaceEditor";
+import { FailingCases } from "../components/OutputCompare";
 import { TsErrorLinks } from "../components/TsErrorLinks";
 import { DiffBadge, Empty, inlineCode } from "../components/common";
 import {
@@ -1509,33 +1510,7 @@ function ExamFeedback({
           )}
         </p>
       ) : (
-        failing.slice(0, 3).map((r, i) =>
-          r.name.startsWith("Hidden test") ? (
-            <div key={i} style={{ marginTop: 6, fontSize: 12 }}>
-              <div className="dim">{r.name}</div>
-              <div style={{ color: "var(--bad)" }}>
-                {r.timed_out ? "Timed out." : "Failed."} Its input stays hidden until the final
-                passes — think about the cases the visible tests do not cover.
-              </div>
-            </div>
-          ) : (
-          <div key={i} style={{ marginTop: 6, fontSize: 12 }}>
-            <div className="dim">{r.name}</div>
-            <div style={{ fontFamily: "var(--font-mono)" }}>
-              <div>
-                input: <code>{r.input.replace(/\n/g, " ⏎ ") || "(none)"}</code>
-              </div>
-              <div>
-                expected: <code>{r.expected}</code>
-              </div>
-              <div style={{ color: "var(--bad)" }}>
-                got: <code>{r.timed_out ? "(timed out)" : r.actual || "(nothing)"}</code>
-              </div>
-              {r.stderr && <pre style={{ margin: "4px 0 0", whiteSpace: "pre-wrap" }}>{r.stderr}</pre>}
-            </div>
-          </div>
-          )
-        )
+        <FailingCases failing={failing} />
       )}
     </div>
   );

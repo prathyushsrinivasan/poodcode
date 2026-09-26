@@ -20,6 +20,9 @@ interface Props {
    * give each file its own path, so the TypeScript service sees them as
    * sibling modules and `import … from "./parse"` resolves. */
   path?: string;
+  /** False when the page sets the TypeScript compiler options itself (the
+   * playground), so focusing this editor does not reset them to a judge preset. */
+  tsOptionsManaged?: boolean;
 }
 
 /** Imperative actions callers can trigger on the editor (format, find, replace). */
@@ -33,7 +36,18 @@ export interface CodeEditorHandle {
 
 /** Monaco wrapper honoring user editor preferences and app theme. */
 export const CodeEditor = forwardRef<CodeEditorHandle, Props>(function CodeEditor(
-  { language, value, onChange, disableIntellisense, readOnly, onRun, onSubmit, tsStrictness, path },
+  {
+    language,
+    value,
+    onChange,
+    disableIntellisense,
+    readOnly,
+    onRun,
+    onSubmit,
+    tsStrictness,
+    path,
+    tsOptionsManaged = true,
+  },
   ref
 ) {
   const prefs = useStore((s) => s.prefs);
@@ -59,7 +73,7 @@ export const CodeEditor = forwardRef<CodeEditorHandle, Props>(function CodeEdito
     monaco.editor.setTheme(prefs.editorTheme);
     // The TypeScript service is shared by every editor on the page, so the one
     // being typed in sets the strictness it is checked at.
-    if (language === "typescript") {
+    if (language === "typescript" && tsOptionsManaged) {
       setTypeScriptStrictness(strictnessRef.current);
       editor.onDidFocusEditorText(() => setTypeScriptStrictness(strictnessRef.current));
     }

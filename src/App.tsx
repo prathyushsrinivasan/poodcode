@@ -25,6 +25,7 @@ import Projects from "./pages/Projects";
 import Mastery from "./pages/Mastery";
 import Flashcards from "./pages/Flashcards";
 import TsErrors from "./pages/TsErrors";
+import TsPlayground from "./pages/TsPlayground";
 import Contest from "./pages/Contest";
 import JapaneseBridge from "./pages/JapaneseBridge";
 import Paths from "./pages/Paths";
@@ -89,6 +90,7 @@ function Shell() {
           <Route path="/mastery" element={<Mastery />} />
           <Route path="/flashcards" element={<Flashcards />} />
           <Route path="/ts-errors" element={<TsErrors />} />
+          <Route path="/playground/ts" element={<TsPlayground />} />
           <Route path="/contest/:id" element={<Contest />} />
           <Route path="/jp-bridge" element={<JapaneseBridge />} />
           <Route path="/problem/new" element={<ProblemForm />} />

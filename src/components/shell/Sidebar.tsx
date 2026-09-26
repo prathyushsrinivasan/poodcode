@@ -47,6 +47,7 @@ const GROUPS: { section: string; items: NavItem[] }[] = [
       { to: "/library", label: "DSA Curriculum", icon: "📚", badge: "curriculum" },
       { to: "/learn", label: "Learn", icon: "📘" },
       { to: "/paths", label: "Learning Paths", icon: "🧭" },
+      { to: "/playground/ts", label: "TS Playground", icon: "🧪" },
     ],
   },
   {

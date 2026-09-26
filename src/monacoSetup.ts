@@ -123,6 +123,24 @@ export function setTypeScriptStrictness(strictness = "") {
   tsLang.typescriptDefaults.setCompilerOptions(judgeCompilerOptions(preset));
 }
 
+/** The TypeScript playground (X-65) flips individual flags and emits
+ * JavaScript, so it takes over the shared compiler options while it is open. */
+export function setPlaygroundCompilerOptions(flags: Record<string, boolean>) {
+  appliedStrictness = null;
+  tsLang.typescriptDefaults.setCompilerOptions({
+    ...judgeCompilerOptions(flags.noUncheckedIndexedAccess ? "strict+indexed" : "strict"),
+    ...flags,
+    noEmit: false,
+    removeComments: false,
+  });
+}
+
+/** Hand the options back to the judge's presets when the playground closes. */
+export function restoreJudgeCompilerOptions() {
+  appliedStrictness = null;
+  setTypeScriptStrictness("strict");
+}
+
 tsLang.typescriptDefaults.addExtraLib(poodcodeEnvDts, "file:///poodcode-env.d.ts");
 tsLang.typescriptDefaults.addExtraLib(MONACO_LIB_SHIMS, "file:///poodcode-lib-shims.d.ts");
 // Hand every open model to the TypeScript worker, not only the one being

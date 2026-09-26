@@ -3,6 +3,7 @@ import type { JudgeReport } from "../types";
 import { formatMemory } from "../lib/format";
 import { lineDiff } from "../lib/diff";
 import { TsErrorLinks } from "./TsErrorLinks";
+import { OutputCompare } from "./OutputCompare";
 
 function IOBlock({ label, value }: { label: string; value: string }) {
   return (
@@ -134,13 +135,19 @@ export function TestResults({ report }: { report: JudgeReport | null }) {
                   Hidden test — input is not shown. Compare your logic against the
                   expected behavior.
                 </div>
-              ) : (
+              ) : !r.passed && !r.timed_out ? null : (
                 <IOBlock label="Input" value={r.input} />
               )}
-              <IOBlock label="Expected" value={r.expected} />
-              <IOBlock label="Your output" value={r.timed_out ? "(timed out)" : r.actual} />
-              {!r.passed && !r.timed_out && r.expected.trim() !== "" && r.actual !== r.expected && (
-                <ExpectedActualDiff expected={r.expected} actual={r.actual} />
+              {!r.passed && !r.timed_out && r.kind !== "hidden" ? (
+                <OutputCompare input={r.input} expected={r.expected} actual={r.actual} />
+              ) : (
+                <>
+                  <IOBlock label="Expected" value={r.expected} />
+                  <IOBlock label="Your output" value={r.timed_out ? "(timed out)" : r.actual} />
+                  {!r.passed && !r.timed_out && r.expected.trim() !== "" && r.actual !== r.expected && (
+                    <ExpectedActualDiff expected={r.expected} actual={r.actual} />
+                  )}
+                </>
               )}
               {r.stderr.trim() && <IOBlock label="Stderr" value={r.stderr} />}
             </div>
