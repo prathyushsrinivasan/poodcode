@@ -6078,6 +6078,10 @@ with open(_tsi_path, encoding="utf-8") as _tif:
 _tsh_path = os.path.join(HERE, "ts_hint_ladders.py")
 with open(_tsh_path, encoding="utf-8") as _thf:
     exec(compile(_thf.read(), _tsh_path, "exec"))
+# Python and JavaScript comparisons beside the Java one (X-09).
+_tcn_path = os.path.join(HERE, "ts_compare_notes.py")
+with open(_tcn_path, encoding="utf-8") as _tcnf:
+    exec(compile(_tcnf.read(), _tcn_path, "exec"))
 
 # The 8-month structured TypeScript COURSE (weeks/themes/goals/lessons/capstones).
 # Runs after the other TypeScript files so it can reuse tsx/tsc/_P. Defines
