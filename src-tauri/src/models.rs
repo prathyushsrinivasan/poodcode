@@ -1458,6 +1458,9 @@ pub struct MasteryTrack {
     /// core week is complete.
     #[serde(default)]
     pub final_exam: Option<MasteryFinalExam>,
+    /// One sentence per phase (month), shown above its weeks (X-76).
+    #[serde(default)]
+    pub phase_goals: std::collections::HashMap<String, String>,
 }
 
 /// One timed sitting over the whole programme: `quiz_size` questions drawn

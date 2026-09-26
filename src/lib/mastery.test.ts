@@ -11,6 +11,13 @@ import {
   unlockedWeeks,
   weekProgress,
   weekTools,
+  effectiveStart,
+  togglePause,
+  parsePause,
+  todayPlan,
+  daysLeftInWeek,
+  interleavedWarmup,
+  weekLinks,
   type ProgressMap,
 } from "./mastery";
 
@@ -324,5 +331,93 @@ describe("weekTools", () => {
   });
   it("offers nothing on other tracks", () => {
     expect(weekTools("java", 5)).toEqual([]);
+  });
+});
+
+describe("pauses", () => {
+  const day = 24 * 3600 * 1000;
+  it("shifts the start by every paused stretch, including one in progress", () => {
+    const start = new Date("2026-01-01T00:00:00Z");
+    const now = new Date("2026-01-20T00:00:00Z");
+    expect(effectiveStart(start, { pausedAt: null, pausedMs: 3 * day }, now).getTime()).toBe(start.getTime() + 3 * day);
+    expect(effectiveStart(start, { pausedAt: "2026-01-18T00:00:00Z", pausedMs: day }, now).getTime()).toBe(
+      start.getTime() + 3 * day
+    );
+  });
+
+  it("toggles on and off, banking the time", () => {
+    const on = togglePause({ pausedAt: null, pausedMs: 0 }, new Date("2026-01-01T00:00:00Z"));
+    expect(on.pausedAt).toBe("2026-01-01T00:00:00.000Z");
+    const off = togglePause(on, new Date("2026-01-02T00:00:00Z"));
+    expect(off).toEqual({ pausedAt: null, pausedMs: day });
+  });
+
+  it("parses defensively", () => {
+    expect(parsePause("nope")).toEqual({ pausedAt: null, pausedMs: 0 });
+    expect(parsePause(JSON.stringify({ pausedAt: "x", pausedMs: -1 }))).toEqual({ pausedAt: null, pausedMs: 0 });
+  });
+});
+
+describe("todayPlan", () => {
+  const base = {
+    chaptersLeft: ["Narrowing", "Type predicates"],
+    practiceLeft: 4,
+    problemsLeft: 3,
+    projectDone: false,
+    hasProject: true,
+    quizPassed: false,
+    examPassed: false,
+    daysLeft: 3,
+  };
+
+  it("puts the chapters first and spreads the rest over the days left", () => {
+    // 2 chapters + 2 practice chunks + 2 problem chunks + project + quiz + final = 9 tasks over 3 days
+    expect(todayPlan(base)).toEqual([
+      "Read and mark done: Narrowing",
+      "Read and mark done: Type predicates",
+      "Solve 3 practice exercises",
+    ]);
+  });
+
+  it("is empty when the week is done", () => {
+    expect(
+      todayPlan({ ...base, chaptersLeft: [], practiceLeft: 0, problemsLeft: 0, projectDone: true, quizPassed: true, examPassed: true })
+    ).toEqual([]);
+  });
+
+  it("counts days left in the scheduled week", () => {
+    const start = new Date("2026-01-01T00:00:00Z");
+    expect(daysLeftInWeek(start, 1, new Date("2026-01-05T00:00:00Z"))).toBe(3);
+    expect(daysLeftInWeek(start, 1, new Date("2026-01-20T00:00:00Z"))).toBe(1);
+  });
+});
+
+describe("interleavedWarmup", () => {
+  const weeks = [1, 2, 3, 4, 5, 6, 7].map((w) => ({
+    week: w,
+    practice: [0, 1, 2, 3].map((i) => ({ id: `w${w}-${i}` })),
+  }));
+
+  it("takes two from two weeks back and one from five weeks back", () => {
+    const picks = interleavedWarmup(weeks, 7).map((e) => e.id);
+    expect(picks).toHaveLength(3);
+    expect(picks.filter((id) => id.startsWith("w5-"))).toHaveLength(2);
+    expect(picks.filter((id) => id.startsWith("w2-"))).toHaveLength(1);
+  });
+
+  it("is empty at the start of the programme", () => {
+    expect(interleavedWarmup(weeks, 1)).toEqual([]);
+  });
+});
+
+describe("weekLinks", () => {
+  it("links TypeScript weeks to course weeks and DSA units", () => {
+    expect(weekLinks("typescript", 9)).toEqual({ course: [19], dsa: ["hashing"], projects: [] });
+    expect(weekLinks("typescript", 26).projects.map((p) => p.to)).toEqual(["/backend", "/projects"]);
+    expect(weekLinks("java", 9).course).toEqual([]);
+  });
+
+  it("covers every core week", () => {
+    for (let w = 1; w <= 26; w++) expect(weekLinks("typescript", w).course.length).toBeGreaterThan(0);
   });
 });

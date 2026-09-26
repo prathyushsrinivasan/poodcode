@@ -646,6 +646,90 @@ table.sqlgrid tbody tr.diff td {
   font-weight: 700;
 }
 
+/* ---- Mastery week view (X-60, X-61, X-72) ---------------------------- */
+.linklike {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  color: var(--accent);
+  cursor: pointer;
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+}
+.week-body {
+  display: grid;
+  grid-template-columns: 168px minmax(0, 1fr);
+  gap: 16px;
+  margin-top: 14px;
+  align-items: start;
+}
+@media (max-width: 900px) {
+  .week-body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .week-spine {
+    position: static !important;
+    flex-direction: row !important;
+    flex-wrap: wrap;
+  }
+}
+.week-spine {
+  position: sticky;
+  top: 64px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.week-spine-item {
+  display: grid;
+  grid-template-columns: 20px 1fr auto;
+  align-items: center;
+  gap: 6px;
+  text-align: left;
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-elev);
+  font-size: 12.5px;
+  position: relative;
+}
+.week-spine-item.done {
+  border-color: color-mix(in srgb, var(--good) 55%, var(--border));
+  color: var(--good);
+}
+.week-spine-label {
+  font-weight: 600;
+}
+.week-spine-detail {
+  color: var(--text-dim);
+  font-variant-numeric: tabular-nums;
+}
+.week-spine-gate {
+  grid-column: 2 / 4;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent);
+}
+.week-spine-keys {
+  font-size: 11px;
+  margin: 6px 0 0;
+}
+.week-spine-keys kbd {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0 4px;
+}
+.week-content > section {
+  scroll-margin-top: 72px;
+}
+.mastery-today {
+  border-color: var(--accent);
+}
+
 /* What a snippet prints — computed output shown under the code. */
 .code-output {
   font-family: var(--font-mono);

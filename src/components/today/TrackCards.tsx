@@ -14,7 +14,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { api } from "../../api";
 import { loadDoneChapters } from "../../lib/learnProgress";
-import { masteryResume, pacing, startDateKey } from "../../lib/mastery";
+import { masteryResume, pacing, effectiveStart, parsePause, pauseKey, startDateKey } from "../../lib/mastery";
 import type { MasteryProgress, MasteryTrack, WeeklyCourse } from "../../types";
 
 export interface TrackCard {
@@ -79,7 +79,8 @@ function masteryCard(
   if (!r) return null;
   let pace = "";
   if (startedAt && !r.finished) {
-    const p = pacing(new Date(startedAt), r.week.week, r.total);
+    const start = effectiveStart(new Date(startedAt), parsePause(settings[pauseKey(track.key)]));
+    const p = pacing(start, r.week.week, r.total);
     pace =
       p.weeksBehind > 0
         ? ` · ${p.weeksBehind} ${p.weeksBehind === 1 ? "week" : "weeks"} behind`

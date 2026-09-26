@@ -73,6 +73,7 @@ the gap stays visible. This is what has landed since.
 | Editor standard library | every TypeScript editor named `lib.es2024.d.ts`, which Monaco's bundled TypeScript 5.4 does not ship — so the whole standard library silently dropped out (`Cannot find name 'Error'`, `'trim' does not exist on type 'string'`) | the newest libs Monaco has (es2023 + esnext collection/disposable/promise/object) plus editor-only declarations for what the judge's 5.9 adds (Set methods, iterator helpers, `Iterator.from`, `Array.fromAsync`, `Promise.try`) | `src/monacoSetup.ts`, `src/monacoLibShims.ts` |
 | Teaching tools, round one (X-64, X-65, X-67, M1-02, M3-01, M5-01) | none | **TypeScript playground** (`/playground/ts`): every declared type fully expanded and every top-level value's type (the type evaluator, M5-01 — expansion, not yet step-by-step), one variable's type at every use (the narrowing stepper, M3-01), the JavaScript the types erase to (X-64), and six strictness flags to flip with the errors they produce (X-65) — all computed by the editor's own TypeScript service. **stdin/stdout visualiser** (M1-02) on every failing test in Solve, Learn, the Course and the Mastery finals: numbered stdin, expected and yours side by side, a caret under the first differing character, and a sentence ("line 2 ends early", "differs only in spacing") — using the judge's own normalisation | `src/pages/TsPlayground.tsx`, `src/lib/tsAnalysis.ts`, `src/components/OutputCompare.tsx`, `src/lib/outputCompare.ts` |
 | Async, made visible (M6-01, M6-02) | none | **`/visualise/async`**: six event-loop scenarios stepped one operation at a time — call stack, microtask queue, timer queue, output, the current line, and a "predict first" box; and a **promise-combinator timeline** where you set each promise's delay and outcome and see when `all` / `allSettled` / `race` / `any` settle and with what. Both are models, and a test runs every scenario's real JavaScript (and real combinators with real timers) and requires the model to agree. Each Mastery week now lists the tools that teach it | `src/pages/AsyncVisualiser.tsx`, `src/lib/eventLoop.ts` (+ `eventLoop.test.ts`), `weekTools` in `src/lib/mastery.ts` |
+| The week view (X-53–X-55, X-60, X-61, X-72–X-76, X-80, X-81, X-90–X-92) | a long expanding card | each open week has a **checklist spine** — Read · Practise · Problems · Project · Quiz · Final · Notes, each with its count, state and whether it gates — beside the content (`j`/`k` move between sections, `n` jumps to the next unfinished one); **today's share** of the current week at your pace; a **pause for a holiday** that stops the calendar (Today's cards honour it too); a **time budget** per week that flags a week taking twice the plan; **week notes**; **locked weeks show their goal and chapters**; **month goals and progress rings** in the phase rail; **search** across week titles, goals and chapters; an **interleaved warm-up** from two and five weeks back; a **review sitting** drawn from every finished week plus the weeks worth revisiting; and links to the matching **TypeScript course weeks** (with completion), **DSA units** and the **Backend Lab / Projects** | `WeekCard` in `src/pages/Mastery.tsx`, `src/components/MasteryReview.tsx`, `todayPlan`/`interleavedWarmup`/`weekLinks`/`effectiveStart` in `src/lib/mastery.ts`, `phase_goals` in the seed, `progressRings` in `TrackShell` |
 | Week 27 interview practice | a capstone and a four-problem mock set | **63-question interview bank** with model answers (7 topics, "ask me one" drill), **three timed 45-minute mock interviews** (bank questions + a problem + a type puzzle, clock, self-scored rubric, attempt history), **10 code-review exercises** (X-14): write the review, compare with the model review, tick what you caught — the PR code and the corrected code are both run and their output computed | `tools/mastery_ts_w27.py`, `src/components/MasteryCapstone.tsx`, `src/lib/capstone.ts` |
 | Fast authoring loop (X-102) | none for Mastery | `python tools/verify_ts_mastery.py --weeks 11-14` / `--only ts_regex` — type-checks and runs chapters, practice, problems, finals and projects in seconds | `tools/verify_ts_mastery.py` |
 
@@ -260,8 +261,8 @@ Everything here is built once and then used by every week in Part B.
 
 | # | Item | P | Size |
 |---|---|---|---|
-| X-60 | **Week view redesign**: a checklist spine down the left (Read → Practise → Problems → Project → Quiz → Final), each step with a count and a state; content on the right. | P1 | L |
-| 🚧 X-61 | **Today card** on the Mastery page: "at your pace, today is: finish chapter 2, 3 drills, 1 problem" — derived from pacing + remaining work. Also surfaced on the Today page (`today.ts`). | P1 | M |
+| ✅ X-60 | **Week view redesign**: a checklist spine down the left (Read → Practise → Problems → Project → Quiz → Final), each step with a count and a state; content on the right. | P1 | L |
+| ✅ X-61 | **Today card** on the Mastery page: "at your pace, today is: finish chapter 2, 3 drills, 1 problem" — derived from pacing + remaining work. Also surfaced on the Today page (`today.ts`). | P1 | M |
 | ✅ X-62 | **Inferred-type hovers in the editor** — Monaco ships a TypeScript language service; wire it for TS exercises so hovering shows the inferred type (with `strict` and the exercise's strictness preset). The single biggest learning aid for this language. | P1 | M |
 | ✅ X-63 | **Inline error squiggles with explanations** — show `TSnnnn` diagnostics live, and on hover link to the error glossary entry (X-66). | P1 | M |
 | ✅ X-64 | **"What runs" view** — a toggle showing the type-stripped JavaScript that actually executes, lines aligned with the source. Makes erasure visible from week 1. | P2 | M |
@@ -272,11 +273,11 @@ Everything here is built once and then used by every week in Part B.
 | X-69 | **Skill radar** — per-phase mastery (reading types, writing types, runtime correctness, async, type-level) computed from exercise kinds passed. | P3 | M |
 | ✅ X-70 | **Quiz review screen** after every sitting: every question, your answer, the right answer, the explanation, "add to flashcards". | P1 | S |
 | X-71 | **Exam timer & focus mode** (optional): hide the sidebar, show elapsed time, record it; does not gate. | P2 | S |
-| X-72 | **Keyboard-first flow**: `j/k` through exercises, `Ctrl+Enter` run, `Ctrl+Shift+Enter` submit, `h` next hint, `n` next unfinished item. | P2 | S |
-| X-73 | **Search inside Mastery** — find a chapter, example, pitfall or error code across all 26 weeks. Command palette integration. | P2 | M |
-| X-74 | **Week notes** — a free-form notes area per week (separate from project notes) exported with the backup. | P3 | S |
-| X-75 | **Locked-week preview** — sealed weeks show their title, goal and chapter list (not content), so the learner can see where the programme goes. | P3 | S |
-| X-76 | Phase banners with month goals and a progress ring per month. | P3 | S |
+| 🚧 X-72 | **Keyboard-first flow**: `j/k` through exercises, `Ctrl+Enter` run, `Ctrl+Shift+Enter` submit, `h` next hint, `n` next unfinished item. | P2 | S |
+| 🚧 X-73 | **Search inside Mastery** — find a chapter, example, pitfall or error code across all 26 weeks. Command palette integration. | P2 | M |
+| ✅ X-74 | **Week notes** — a free-form notes area per week (separate from project notes) exported with the backup. | P3 | S |
+| ✅ X-75 | **Locked-week preview** — sealed weeks show their title, goal and chapter list (not content), so the learner can see where the programme goes. | P3 | S |
+| ✅ X-76 | Phase banners with month goals and a progress ring per month. | P3 | S |
 
 ### A7. Review loops — spaced repetition and weakness
 
@@ -285,16 +286,16 @@ Everything here is built once and then used by every week in Part B.
 | 🚧 X-50 | **Flashcards for every chapter** — ≥ 12 per chapter (definition, "what does this infer", "which error", "fix this line"), ~1,000 total, fed to the revision queue when a week completes. | P1 | L |
 | ✅ X-51 | **Missed-question recycling**: a wrong quiz answer creates a flashcard automatically. | P1 | S |
 | X-52 | **Failed-exercise re-queue**: an exercise failed ≥ 2 times re-appears in a later week's warm-up. | P2 | M |
-| X-53 | **Interleaved review weeks** — each week's warm-up draws 3 exercises from two and five weeks earlier. | P1 | M |
-| X-54 | **Weak-chapter detector** — first-try rate + hints used per chapter → "revisit these" list on the Mastery page. | P2 | M |
-| X-55 | **Review mode for completed weeks**: a 15-minute mixed session drawn from everything behind you. | P2 | M |
+| ✅ X-53 | **Interleaved review weeks** — each week's warm-up draws 3 exercises from two and five weeks earlier. | P1 | M |
+| 🚧 X-54 | **Weak-chapter detector** — first-try rate + hints used per chapter → "revisit these" list on the Mastery page. | P2 | M |
+| ✅ X-55 | **Review mode for completed weeks**: a 15-minute mixed session drawn from everything behind you. | P2 | M |
 
 ### A8. Analytics & pacing
 
 | # | Item | P | Size |
 |---|---|---|---|
-| X-80 | Per-week **time budget** (e.g. 8–10 h) displayed next to actual study time; flag weeks that took 2× budget. | P2 | S |
-| X-81 | Pacing that understands **pauses** (a "holiday" toggle stops the clock). | P2 | S |
+| ✅ X-80 | Per-week **time budget** (e.g. 8–10 h) displayed next to actual study time; flag weeks that took 2× budget. | P2 | S |
+| ✅ X-81 | Pacing that understands **pauses** (a "holiday" toggle stops the clock). | P2 | S |
 | X-82 | "What slowed you down" — per week: most-failed exercise, most-hinted chapter, slowest final. | P3 | M |
 | X-83 | Export progress as JSON/Markdown for a portfolio or a mentor. | P3 | S |
 
@@ -302,9 +303,9 @@ Everything here is built once and then used by every week in Part B.
 
 | # | Item | P | Size |
 |---|---|---|---|
-| X-90 | **Course ↔ Mastery links** (D-1): every Mastery week lists the TS course lessons and practice families that cover the same ground, with completion shown. | P1 | M |
-| X-91 | **DSA ↔ Mastery**: months 3 and 6 link the DSA curriculum units whose problems use the same data structures (Maps & Sets → hashing unit; generic DS → structures stage). | P2 | S |
-| X-92 | **Projects track ↔ Mastery**: month 6 recommends the Backend Lab / Todo API modules as the next step. | P3 | S |
+| ✅ X-90 | **Course ↔ Mastery links** (D-1): every Mastery week lists the TS course lessons and practice families that cover the same ground, with completion shown. | P1 | M |
+| ✅ X-91 | **DSA ↔ Mastery**: months 3 and 6 link the DSA curriculum units whose problems use the same data structures (Maps & Sets → hashing unit; generic DS → structures stage). | P2 | S |
+| ✅ X-92 | **Projects track ↔ Mastery**: month 6 recommends the Backend Lab / Todo API modules as the next step. | P3 | S |
 | X-93 | Mastery completion writes to the **heatmap**, **streak** and **Today** exactly like other tracks (already partly true for study time). | P2 | S |
 
 ### A10. Tooling & verification

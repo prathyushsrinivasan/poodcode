@@ -316,3 +316,175 @@ export function weekTools(trackKey: string, week: number): WeekTool[] {
   tools.push({ label: "Error glossary", to: "/ts-errors", why: "every TSnnnn code, explained" });
   return tools;
 }
+
+// ---------------------------------------------------------------------------
+// Pacing that understands pauses (X-81). A pause shifts the start date: the
+// weeks you were on holiday do not count against you.
+// ---------------------------------------------------------------------------
+
+export type PauseState = { pausedAt: string | null; pausedMs: number };
+
+export function pauseKey(trackKey: string): string {
+  return `mastery:${trackKey}:pause`;
+}
+
+export function parsePause(raw: string | undefined): PauseState {
+  try {
+    const v: unknown = JSON.parse(raw ?? "");
+    if (typeof v === "object" && v !== null) {
+      const o = v as Record<string, unknown>;
+      const pausedAt =
+        typeof o.pausedAt === "string" && !Number.isNaN(Date.parse(o.pausedAt)) ? o.pausedAt : null;
+      const pausedMs = typeof o.pausedMs === "number" && o.pausedMs > 0 ? o.pausedMs : 0;
+      return { pausedAt, pausedMs };
+    }
+  } catch {
+    /* fall through */
+  }
+  return { pausedAt: null, pausedMs: 0 };
+}
+
+/** The start date with every paused stretch (including one in progress) added. */
+export function effectiveStart(started: Date, pause: PauseState, now: Date = new Date()): Date {
+  const ongoing = pause.pausedAt ? Math.max(0, now.getTime() - Date.parse(pause.pausedAt)) : 0;
+  return new Date(started.getTime() + pause.pausedMs + ongoing);
+}
+
+export function togglePause(pause: PauseState, now: Date = new Date()): PauseState {
+  if (pause.pausedAt) {
+    return { pausedAt: null, pausedMs: pause.pausedMs + Math.max(0, now.getTime() - Date.parse(pause.pausedAt)) };
+  }
+  return { pausedAt: now.toISOString(), pausedMs: pause.pausedMs };
+}
+
+// ---------------------------------------------------------------------------
+// Time budget (X-80)
+// ---------------------------------------------------------------------------
+
+/** Hours a week of the programme is planned to take. */
+export const WEEK_BUDGET_HOURS = 9;
+
+export function budgetNote(studySeconds: number): { text: string; over: boolean } {
+  const budget = WEEK_BUDGET_HOURS * 3600;
+  return {
+    text: `${formatStudyTime(studySeconds)} of a ~${WEEK_BUDGET_HOURS}h week`,
+    over: studySeconds > 2 * budget,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Today's share of the current week (X-61)
+// ---------------------------------------------------------------------------
+
+export interface PlanInput {
+  chaptersLeft: string[];
+  practiceLeft: number;
+  problemsLeft: number;
+  projectDone: boolean;
+  hasProject: boolean;
+  quizPassed: boolean;
+  examPassed: boolean;
+  /** Days left in this week at your pace (1..7). */
+  daysLeft: number;
+}
+
+/** Split what is left of a week into today's share: the gate first (chapters),
+ * then practice, problems and the project, then the quiz and the final. */
+export function todayPlan(p: PlanInput): string[] {
+  const tasks: string[] = [];
+  for (const c of p.chaptersLeft) tasks.push(`Read and mark done: ${c}`);
+  for (let i = 0; i < p.practiceLeft; i += 3) {
+    const n = Math.min(3, p.practiceLeft - i);
+    tasks.push(`Solve ${n} practice exercise${n === 1 ? "" : "s"}`);
+  }
+  for (let i = 0; i < p.problemsLeft; i += 2) {
+    const n = Math.min(2, p.problemsLeft - i);
+    tasks.push(`Solve ${n} problem${n === 1 ? "" : "s"}`);
+  }
+  if (p.hasProject && !p.projectDone) tasks.push("Work on the build project");
+  if (!p.quizPassed) tasks.push("Take the end-of-week quiz");
+  if (!p.examPassed) tasks.push("Submit the coding final");
+  if (tasks.length === 0) return [];
+  const perDay = Math.ceil(tasks.length / Math.max(1, Math.min(7, p.daysLeft)));
+  return tasks.slice(0, perDay);
+}
+
+/** Days left in the scheduled week, from the (pause-adjusted) start date. */
+export function daysLeftInWeek(start: Date, week: number, now: Date = new Date()): number {
+  const weekEnd = start.getTime() + week * MS_PER_WEEK;
+  const days = Math.ceil((weekEnd - now.getTime()) / (24 * 3600 * 1000));
+  return Math.max(1, Math.min(7, days));
+}
+
+// ---------------------------------------------------------------------------
+// Interleaved warm-up (X-53): three exercises from two and five weeks back.
+// ---------------------------------------------------------------------------
+
+export function interleavedWarmup<E extends { id: string }>(
+  weeks: { week: number; practice?: E[] }[],
+  week: number
+): E[] {
+  const from = (n: number) => weeks.find((w) => w.week === n)?.practice ?? [];
+  const pick = (xs: E[], k: number, salt: number) =>
+    xs.length === 0
+      ? []
+      : Array.from({ length: Math.min(k, xs.length) }, (_, i) => xs[(week * 7 + salt + i * 3) % xs.length]!);
+  const out = [...pick(from(week - 2), 2, 1), ...pick(from(week - 5), 1, 2)];
+  return out.filter((e, i) => out.findIndex((x) => x.id === e.id) === i);
+}
+
+// ---------------------------------------------------------------------------
+// Links to the rest of the app (X-90, X-91, X-92)
+// ---------------------------------------------------------------------------
+
+export interface WeekLinks {
+  /** TypeScript course week numbers covering the same ground. */
+  course: number[];
+  /** DSA curriculum unit keys that use the same structures. */
+  dsa: string[];
+  /** Next steps in the Projects track / Backend Lab. */
+  projects: { label: string; to: string }[];
+}
+
+const TS_WEEK_LINKS: Record<number, [number[], string[]]> = {
+  1: [[1, 2], ["io-and-arithmetic"]],
+  2: [[3], ["branching"]],
+  3: [[4], ["loops-and-digits"]],
+  4: [[2], ["strings"]],
+  5: [[5], []],
+  6: [[5], ["recursion"]],
+  7: [[6], ["arrays-first-pass"]],
+  8: [[7], []],
+  9: [[19], ["hashing"]],
+  10: [[8, 9], []],
+  11: [[9, 15], []],
+  12: [[9], []],
+  13: [[8], []],
+  14: [[16], []],
+  15: [[12], []],
+  16: [[13], []],
+  17: [[14], ["intervals"]],
+  18: [[10], []],
+  19: [[14, 29], []],
+  20: [[29], []],
+  21: [[29, 30], []],
+  22: [[30, 31], ["tries"]],
+  23: [[11], ["design"]],
+  24: [[18, 20], ["stacks", "queues-and-deques", "linked-lists", "heaps"]],
+  25: [[15], []],
+  26: [[17], []],
+  27: [[32], ["design"]],
+};
+
+export function weekLinks(trackKey: string, week: number): WeekLinks {
+  if (trackKey !== "typescript") return { course: [], dsa: [], projects: [] };
+  const [course, dsa] = TS_WEEK_LINKS[week] ?? [[], []];
+  const projects =
+    week >= 25
+      ? [
+          { label: "Backend Lab", to: "/backend" },
+          { label: "Projects track", to: "/projects" },
+        ]
+      : [];
+  return { course, dsa, projects };
+}

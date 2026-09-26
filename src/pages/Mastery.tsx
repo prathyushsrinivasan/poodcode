@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { api } from "../api";
 import type {
   Concept,
@@ -27,6 +27,7 @@ import {
 } from "../lib/learnProgress";
 import { ExerciseSections } from "../components/ExerciseSections";
 import { CapstonePractice } from "../components/MasteryCapstone";
+import { ReviewSession } from "../components/MasteryReview";
 import {
   FinalExamPanel,
   ProgrammeSummary,
@@ -51,6 +52,15 @@ import {
   unlockedWeeks,
   weekProgress,
   weekTools,
+  budgetNote,
+  daysLeftInWeek,
+  effectiveStart,
+  interleavedWarmup,
+  parsePause,
+  pauseKey,
+  todayPlan,
+  togglePause,
+  weekLinks,
   type ExamQuestion,
   type ProgressMap,
   type WeekProgress,
@@ -74,7 +84,16 @@ export default function Mastery() {
     () => localStorage.getItem(TRACK_STORE_KEY) || ""
   );
   const [loading, setLoading] = useState(true);
+  const [focusWeek, setFocusWeek] = useState<number | null>(null);
+  const [query, setQuery] = useState("");
+  const [solvedAll, setSolvedAll] = useState<Set<string>>(() => solvedExercises());
+  const [, setParams] = useSearchParams();
   const toast = useToast();
+
+  const saveSetting = useCallback((key: string, value: string) => {
+    setSettings((s) => ({ ...s, [key]: value }));
+    api.setSetting(key, value).catch(() => {});
+  }, []);
 
   const refreshProgress = useCallback(async () => {
     setRows(await api.masteryProgress());
@@ -103,6 +122,7 @@ export default function Mastery() {
         setDone(d);
         setSettings(s);
       })
+      .then(() => loadSolvedExercises().then(setSolvedAll))
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
@@ -179,6 +199,28 @@ export default function Mastery() {
     })().catch(() => {});
   }, [track, perWeek, progress, refreshProgress, toast]);
 
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
+      if (e.key !== "j" && e.key !== "k" && e.key !== "n") return;
+      const t = e.target as HTMLElement | null;
+      if (t && (t.closest("input, textarea, select, [contenteditable=true], .monaco-editor") !== null)) return;
+      const sections = [...document.querySelectorAll<HTMLElement>("[data-spine-section]")];
+      if (sections.length === 0) return;
+      const tops = sections.map((el) => el.getBoundingClientRect().top);
+      const current = Math.max(0, tops.findIndex((top) => top > 90) - 1);
+      let target: HTMLElement | undefined;
+      if (e.key === "j") target = sections[Math.min(sections.length - 1, tops.findIndex((top) => top > 90))];
+      else if (e.key === "k") target = sections[Math.max(0, current - (tops[current]! > 60 ? 1 : 0))];
+      else target = sections.slice(current + 1).find((el) => el.dataset.done === "false") ?? sections.find((el) => el.dataset.done === "false");
+      if (!target) return;
+      e.preventDefault();
+      target.scrollIntoView({ behavior: "smooth", block: "start" });
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
   if (loading) return <TrackSkeleton cards={6} />;
   if (!track) {
     return (
@@ -198,10 +240,56 @@ export default function Mastery() {
     core.length;
   const totalStudy = perWeek.reduce((sum, p) => sum + p.studySeconds, 0);
   const startedRaw = settings[startDateKey(track.key)];
-  const pace = startedRaw
-    ? pacing(new Date(startedRaw), currentWeek, core.length)
-    : null;
+  const pause = parsePause(settings[pauseKey(track.key)]);
+  const effStart = startedRaw ? effectiveStart(new Date(startedRaw), pause) : null;
+  const pace = effStart ? pacing(effStart, currentWeek, core.length) : null;
   const finished = completedWeeks === core.length;
+
+  // X-61: today's share of the current week.
+  const current = track.weeks.find((w) => w.week === currentWeek);
+  const currentProgress = current ? perWeek[current.week - 1] : undefined;
+  const plan =
+    current && currentProgress && !finished
+      ? todayPlan({
+          chaptersLeft: current.concepts.filter((k) => !done.has(k)).map((k) => conceptByKey.get(k)?.name ?? k),
+          practiceLeft: (current.practice ?? []).filter((e) => !solvedAll.has(e.id)).length,
+          problemsLeft:
+            currentProgress.problemsTotal -
+            currentProgress.problemsSolved +
+            (current.problem_set ?? []).filter((e) => !solvedAll.has(e.id)).length,
+          projectDone: currentProgress.projectDone,
+          hasProject: !!current.project,
+          quizPassed: currentProgress.quizPassed,
+          examPassed: currentProgress.examPassed,
+          daysLeft: effStart ? daysLeftInWeek(effStart, currentWeek) : 7,
+        })
+      : [];
+
+  // X-73: search the programme — week titles and goals, chapter names and keys.
+  const q = query.trim().toLowerCase();
+  const hits =
+    q.length < 2
+      ? []
+      : track.weeks.filter((w) =>
+          [w.title, w.goal, w.project, ...w.concepts, ...w.concepts.map((k) => conceptByKey.get(k)?.name ?? "")]
+            .join(" ")
+            .toLowerCase()
+            .includes(q)
+        );
+
+  function openWeek(n: number) {
+    const w = track.weeks.find((x) => x.week === n);
+    if (!w) return;
+    setParams({ group: w.phase }, { replace: true });
+    setFocusWeek(null);
+    setTimeout(() => setFocusWeek(n), 0);
+  }
+
+  function flipPause() {
+    const next = togglePause(pause);
+    saveSetting(pauseKey(track.key), JSON.stringify(next));
+    toast(next.pausedAt ? "Pacing paused — the calendar stops until you resume" : "Pacing resumed");
+  }
 
   /* The programme as a track: phases are the rail, weeks are the units. They
      expand in place rather than navigating, so `renderUnit` supplies the card
@@ -212,7 +300,12 @@ export default function Mastery() {
     base: "/mastery",
     unitLabel: "Week",
     groupLabel: "Phase",
-    groups: phases.map<TrackGroup>(([phase]) => ({ key: phase, title: phase })),
+    groups: phases.map<TrackGroup>(([phase]) => ({
+      key: phase,
+      title: phase,
+      goal: track.phase_goals?.[phase],
+    })),
+    progressRings: true,
     units: track.weeks.map((w) => ({
       slug: String(w.week),
       number: w.week,
@@ -236,6 +329,9 @@ export default function Mastery() {
           done={done}
           onToggleChapter={toggleChapter}
           onChanged={refreshProgress}
+          settings={settings}
+          saveSetting={saveSetting}
+          focused={focusWeek === w.week}
         />
       );
     },
@@ -317,6 +413,16 @@ export default function Mastery() {
             {!finished && (
               <> · at this pace you finish {pace.projectedFinish.toLocaleDateString()}</>
             )}
+            {!finished && (
+              <>
+                {" · "}
+                <button className="linklike" onClick={flipPause} title="A holiday stops the calendar: paused days never count against your pace.">
+                  {pause.pausedAt
+                    ? `▶ resume (paused since ${new Date(pause.pausedAt).toLocaleDateString()})`
+                    : "⏸ pause for a holiday"}
+                </button>
+              </>
+            )}
           </p>
         ) : (
           <div className="row" style={{ marginTop: 12, gap: 10, alignItems: "center" }}>
@@ -327,6 +433,55 @@ export default function Mastery() {
           </div>
         )}
       </div>
+
+      {plan.length > 0 && current && (
+        <div className="card mastery-today" style={{ marginBottom: 18 }}>
+          <div className="io-label" style={{ color: "var(--accent)" }}>
+            📅 Today, at your pace — Week {current.week}: {current.title}
+          </div>
+          <ol style={{ margin: "4px 0 6px" }}>
+            {plan.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ol>
+          <div className="row" style={{ gap: 8, alignItems: "center" }}>
+            <button className="ghost" onClick={() => openWeek(current.week)}>
+              Open Week {current.week}
+            </button>
+            <span className="dim quiz-note">
+              {effStart
+                ? `What is left of this week, spread over the ${daysLeftInWeek(effStart, currentWeek)} day(s) left in it.`
+                : "Start the programme to spread this over the days of the week."}
+            </span>
+          </div>
+        </div>
+      )}
+
+      <div className="row" style={{ gap: 8, alignItems: "center", marginBottom: 12 }}>
+        <input
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="🔎 Search the programme — a topic, a chapter, a keyword"
+          style={{ flex: 1, maxWidth: 460 }}
+          aria-label="Search the programme"
+        />
+        {hits.length > 0 && <span className="dim quiz-note">{hits.length} week{hits.length === 1 ? "" : "s"}</span>}
+      </div>
+      {hits.length > 0 && (
+        <div className="card" style={{ marginBottom: 18 }}>
+          {hits.slice(0, 12).map((w) => (
+            <div key={w.week} className="row" style={{ gap: 8, alignItems: "baseline", margin: "4px 0" }}>
+              <button className="linklike" onClick={() => openWeek(w.week)}>
+                Week {w.week} — {w.title}
+              </button>
+              <span className="dim quiz-note">{w.phase}</span>
+              {!unlocked.has(w.week) && <span className="dim quiz-note">🔒</span>}
+            </div>
+          ))}
+        </div>
+      )}
+
+      <ReviewSession trackTitle={track.title} weeks={core} perWeek={corePerWeek} onOpenWeek={openWeek} />
 
       {finished && (
         <ProgrammeSummary
@@ -368,6 +523,18 @@ function Bar({ percent }: { percent: number }) {
   );
 }
 
+type SpineItem = {
+  id: string;
+  icon: string;
+  label: string;
+  detail: string;
+  done: boolean;
+  /** Part of the week's gate (chapters, quiz, final). */
+  gate?: boolean;
+};
+
+const prettyKey = (key: string) => key.replace(/-/g, " ").replace(/^./, (c) => c.toUpperCase());
+
 function WeekCard({
   week,
   track,
@@ -379,6 +546,9 @@ function WeekCard({
   done,
   onToggleChapter,
   onChanged,
+  settings,
+  saveSetting,
+  focused,
 }: {
   week: MasteryWeek;
   track: MasteryTrack;
@@ -390,22 +560,39 @@ function WeekCard({
   done: Set<string>;
   onToggleChapter: (key: string) => void;
   onChanged: () => Promise<void>;
+  settings: Record<string, string>;
+  saveSetting: (key: string, value: string) => void;
+  /** Set when search picked this week: open it and scroll to it. */
+  focused: boolean;
 }) {
   const nav = useNavigate();
   const toast = useToast();
   const [open, setOpen] = useState(!locked && !progress.complete);
   const practice = week.practice ?? [];
   const problemSet = week.problem_set ?? [];
+  const warmup = useMemo(() => interleavedWarmup(track.weeks, week.week), [track.weeks, week.week]);
   const [solvedEx, setSolvedEx] = useState<Set<string>>(() => solvedExercises());
   const practiceSolved = practice.filter((ex) => solvedEx.has(ex.id)).length;
   const setSolved = problemSet.filter((ex) => solvedEx.has(ex.id)).length;
+  const warmupSolved = warmup.filter((ex) => solvedEx.has(ex.id)).length;
+  const notesKey = `mastery-notes:${track.key}:${week.week}`;
+  const [notes, setNotes] = useState(settings[notesKey] ?? "");
+  const cardRef = useRef<HTMLDivElement | null>(null);
+  const anchor = (id: string) => `w${week.week}-${id}`;
+
+  useEffect(() => {
+    if (!focused || locked) return;
+    setOpen(true);
+    const t = setTimeout(() => cardRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 60);
+    return () => clearTimeout(t);
+  }, [focused, locked]);
 
   // Practice solved-state lives in SQLite; the initialiser reads the warm
   // session cache and this fills it on a cold start.
   useEffect(() => {
-    if (practice.length === 0 && problemSet.length === 0) return;
+    if (practice.length === 0 && problemSet.length === 0 && warmup.length === 0) return;
     loadSolvedExercises().then(setSolvedEx).catch(() => {});
-  }, [practice.length, problemSet.length]);
+  }, [practice.length, problemSet.length, warmup.length]);
 
   // Study time is accumulated only while this week is expanded, then flushed
   // periodically and on collapse. It also lands in daily_sessions, so mastery
@@ -430,15 +617,26 @@ function WeekCard({
   }, [locked, open, track.key, week.week]);
 
   if (locked) {
+    // X-75: a sealed week still shows where the programme goes.
     return (
-      <div className="card week-card locked">
-        <div className="row" style={{ alignItems: "center", gap: 10 }}>
+      <div className="card week-card locked" id={`week-${week.week}`} ref={cardRef}>
+        <div className="row" style={{ alignItems: "flex-start", gap: 10 }}>
           <span className="week-num">🔒</span>
           <div>
-            <strong className="dim">Week {week.week} — locked</strong>
+            <strong className="dim">
+              Week {week.week} — {week.title}
+            </strong>
             <p className="dim" style={{ margin: "4px 0 0", fontSize: 13 }}>
-              Finish Week {week.week - 1} — every chapter marked done, the quiz passed at{" "}
-              {track.pass_mark}%, and its coding final accepted — to open this one.
+              {week.goal}
+            </p>
+            {week.concepts.length > 0 && (
+              <p className="dim quiz-note" style={{ margin: "4px 0 0" }}>
+                Chapters: {week.concepts.map((k) => conceptByKey.get(k)?.name ?? k).join(" · ")}
+              </p>
+            )}
+            <p className="dim quiz-note" style={{ margin: "4px 0 0" }}>
+              🔒 Opens when Week {week.week - 1} is finished — every chapter marked done, the quiz passed at{" "}
+              {track.pass_mark}%, and its coding final accepted.
             </p>
           </div>
         </div>
@@ -446,9 +644,66 @@ function WeekCard({
     );
   }
 
+  const links = weekLinks(track.key, week.week);
+  const budget = budgetNote(progress.studySeconds);
+  const spine: SpineItem[] = [];
+  if (week.concepts.length > 0) {
+    spine.push({
+      id: "read",
+      icon: "📘",
+      label: "Read",
+      detail: `${progress.conceptsDone}/${progress.conceptsTotal}`,
+      done: progress.conceptsDone === progress.conceptsTotal,
+      gate: true,
+    });
+  }
+  if (practice.length + warmup.length > 0) {
+    spine.push({
+      id: "practice",
+      icon: "🧩",
+      label: "Practise",
+      detail: `${practiceSolved + warmupSolved}/${practice.length + warmup.length}`,
+      done: practiceSolved + warmupSolved === practice.length + warmup.length,
+    });
+  }
+  if (week.problems.length + problemSet.length > 0) {
+    spine.push({
+      id: "problems",
+      icon: "🎯",
+      label: "Problems",
+      detail: `${progress.problemsSolved + setSolved}/${week.problems.length + problemSet.length}`,
+      done: progress.problemsSolved + setSolved === week.problems.length + problemSet.length,
+    });
+  }
+  if (week.project) {
+    spine.push({ id: "project", icon: "🔨", label: "Project", detail: progress.projectDone ? "shipped" : "open", done: progress.projectDone });
+  }
+  spine.push({
+    id: "quiz",
+    icon: "📝",
+    label: "Quiz",
+    detail: progress.score === null ? "—" : `${progress.score}%`,
+    done: progress.quizPassed,
+    gate: true,
+  });
+  if (week.exam) {
+    spine.push({ id: "final", icon: "🧪", label: "Final", detail: progress.examPassed ? "passed" : "—", done: progress.examPassed, gate: true });
+  }
+  spine.push({ id: "notes", icon: "🗒", label: "Notes", detail: notes.trim() ? "✎" : "", done: true });
+
+  const go = (id: string) =>
+    document.getElementById(anchor(id))?.scrollIntoView({ behavior: "smooth", block: "start" });
+  const section = (id: string) => ({
+    id: anchor(id),
+    "data-spine-section": id,
+    "data-done": String(spine.find((s) => s.id === id)?.done ?? true),
+  });
+
   return (
     <div
       className="card week-card"
+      id={`week-${week.week}`}
+      ref={cardRef}
       style={{ borderColor: progress.complete ? "var(--good)" : undefined }}
     >
       <div
@@ -517,242 +772,334 @@ function WeekCard({
       <Bar percent={progress.percent} />
 
       {open && (
-        <div style={{ marginTop: 14 }}>
-          {progress.studySeconds > 0 && (
-            <p className="dim" style={{ marginTop: 0, fontSize: 12 }}>
-              {formatStudyTime(progress.studySeconds)} spent on this week so far.
+        <div className="week-body">
+          {/* X-60: the week as a checklist, in the order it is worked. */}
+          <nav className="week-spine" aria-label={`Week ${week.week} checklist`}>
+            {spine.map((s) => (
+              <button
+                key={s.id}
+                className={`week-spine-item ${s.done ? "done" : ""}`}
+                onClick={() => go(s.id)}
+                title={s.gate ? "Part of the week's gate" : "Optional"}
+              >
+                <span aria-hidden>{s.done && s.id !== "notes" ? "✓" : s.icon}</span>
+                <span className="week-spine-label">{s.label}</span>
+                <span className="week-spine-detail">{s.detail}</span>
+                {s.gate && !s.done && <span className="week-spine-gate">gate</span>}
+              </button>
+            ))}
+            <p className="dim week-spine-keys">
+              <kbd>j</kbd>/<kbd>k</kbd> move · <kbd>n</kbd> next unfinished
             </p>
-          )}
+          </nav>
 
-          {weekTools(track.key, week.week).length > 0 && (
-            <p className="dim quiz-note" style={{ marginTop: 0 }}>
-              🧰 Tools for this week:{" "}
-              {weekTools(track.key, week.week).map((t, k) => (
-                <span key={t.label}>
-                  {k > 0 && " · "}
-                  <Link to={t.to} title={t.why}>
-                    {t.label}
-                  </Link>
-                </span>
-              ))}
+          <div className="week-content">
+            <p className="dim quiz-note" style={{ marginTop: 0, color: budget.over ? "var(--bad)" : undefined }}>
+              ⏱ {budget.text}
+              {budget.over && " — more than twice the plan. Worth asking what slowed you down."}
             </p>
-          )}
 
-          {week.concepts.length > 0 && (
-            <>
-              <div className="io-label">📘 Chapters to study</div>
-              <div className="grid cols-2" style={{ marginBottom: 14 }}>
-                {week.concepts.map((key) => {
-                  const c = conceptByKey.get(key);
-                  const isDone = done.has(key);
-                  return (
-                    <div
-                      key={key}
-                      className="card"
-                      style={{
-                        marginBottom: 0,
-                        cursor: "pointer",
-                        borderColor: isDone ? "var(--good)" : undefined,
-                      }}
-                      onClick={() => nav(`/learn/${key}`)}
-                    >
-                      <div className="row" style={{ justifyContent: "space-between", gap: 8 }}>
-                        <strong>
-                          {isDone && <span style={{ color: "var(--good)" }}>✓ </span>}
-                          {c?.name ?? key}
-                        </strong>
-                        <button
-                          className="ghost"
-                          style={{
-                            padding: "2px 8px",
-                            fontSize: 11,
-                            borderColor: isDone ? "var(--good)" : undefined,
-                            color: isDone ? "var(--good)" : undefined,
-                          }}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onToggleChapter(key);
-                          }}
-                        >
-                          {isDone ? "Done" : "Mark done"}
-                        </button>
-                      </div>
-                      {c?.what && (
-                        <p className="dim" style={{ margin: "6px 0 0", fontSize: 12 }}>
-                          {c.what}
-                        </p>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </>
-          )}
-
-          {week.problems.length > 0 && (
-            <>
-              <div className="io-label">🎯 Problems to solve</div>
-              <div className="grid cols-2" style={{ marginBottom: 14 }}>
-                {week.problems.map((ref) => {
-                  const p = problemBySlug.get(ref.slug);
-                  if (!p) return null;
-                  const solved = p.solved_status === "solved";
-                  return (
-                    <div
-                      key={ref.slug}
-                      className="card"
-                      style={{
-                        marginBottom: 0,
-                        cursor: "pointer",
-                        borderColor: solved ? "var(--good)" : undefined,
-                      }}
-                      onClick={() => nav(`/solve/${p.id}`)}
-                    >
-                      <div className="row" style={{ justifyContent: "space-between", gap: 8 }}>
-                        <strong>
-                          {solved && <span style={{ color: "var(--good)" }}>✓ </span>}
-                          {p.title}
-                        </strong>
-                        <DiffBadge d={p.difficulty} />
-                      </div>
-                      {ref.note && (
-                        <p className="dim" style={{ margin: "6px 0 0", fontSize: 12 }}>
-                          {ref.note}
-                        </p>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </>
-          )}
-
-          {problemSet.length > 0 && (
-            <details className="card mastery-practice">
-              <summary>
-                <strong>🏋️ Problem set</strong>{" "}
-                <span className="dim quiz-note">
-                  {setSolved}/{problemSet.length} solved · warm-up, core and stretch · optional —
-                  not part of the week's gate
-                </span>
-              </summary>
-              <p className="dim quiz-note">
-                Original problems on exactly this week&rsquo;s ideas, written for TypeScript and
-                judged at this week&rsquo;s strictness. Easy is a warm-up, Medium is the core of
-                the week, Hard is a stretch.
+            {weekTools(track.key, week.week).length > 0 && (
+              <p className="dim quiz-note" style={{ marginTop: 0 }}>
+                🧰 Tools for this week:{" "}
+                {weekTools(track.key, week.week).map((t, k) => (
+                  <span key={t.label}>
+                    {k > 0 && " · "}
+                    <Link to={t.to} title={t.why}>
+                      {t.label}
+                    </Link>
+                  </span>
+                ))}
               </p>
-              <ExerciseSections
-                exercises={problemSet}
-                onSolved={(id) => setSolvedEx(new Set(markExerciseSolved(id)))}
-                overrides={{ challenge: { heading: "🎯 Problems" } }}
-              />
-            </details>
-          )}
+            )}
 
-          {week.project && (
-            <ProjectPanel
-              workspaceId={`${track.key}-w${week.week}`}
-              brief={week.project}
-              spec={week.project_spec ?? null}
-              row={row}
-              language={track.exam_language}
-              onSave={(notes, code, done) =>
-                api
-                  .masterySaveProject(track.key, week.week, notes, code, done)
-                  .then(onChanged)
-              }
-              onRubric={(ticked) => api.masterySaveRubric(track.key, week.week, ticked)}
-            />
-          )}
+            {(links.course.length > 0 || links.dsa.length > 0 || links.projects.length > 0) && (
+              <p className="dim quiz-note" style={{ marginTop: 0 }}>
+                🔗 Elsewhere in the app:{" "}
+                {links.course.map((n, k) => (
+                  <span key={`c${n}`}>
+                    {k > 0 && " · "}
+                    <Link to={`/course/${n}`}>
+                      TypeScript course week {n}
+                      {done.has(`ts-course:w${n}`) ? " ✓" : ""}
+                    </Link>
+                  </span>
+                ))}
+                {links.dsa.map((key) => (
+                  <span key={`d${key}`}>
+                    {" · "}
+                    <Link to={`/library/unit/${key}`}>DSA: {prettyKey(key)}</Link>
+                  </span>
+                ))}
+                {links.projects.map((p) => (
+                  <span key={p.to}>
+                    {" · "}
+                    <Link to={p.to}>{p.label}</Link>
+                  </span>
+                ))}
+              </p>
+            )}
 
-          {week.contest && (
-            <div className="card mastery-checkpoint">
-              <div className="row wrap">
-                <div>
-                  <strong>⏱ {week.contest.title}</strong>
-                  <div className="dim quiz-note">
-                    {Math.round(week.contest.duration_seconds / 60)} minutes ·{" "}
-                    {(week.contest.slugs?.length ?? 0) > 0
-                      ? `${week.contest.slugs!.length} problems from across the month`
-                      : `this week's ${week.problems.length} problems`}{" "}
-                    · optional, timed, and retakeable
-                  </div>
+            {week.concepts.length > 0 && (
+              <section {...section("read")}>
+                <div className="io-label">📘 Chapters to study</div>
+                <div className="grid cols-2" style={{ marginBottom: 14 }}>
+                  {week.concepts.map((key) => {
+                    const c = conceptByKey.get(key);
+                    const isDone = done.has(key);
+                    return (
+                      <div
+                        key={key}
+                        className="card"
+                        style={{
+                          marginBottom: 0,
+                          cursor: "pointer",
+                          borderColor: isDone ? "var(--good)" : undefined,
+                        }}
+                        onClick={() => nav(`/learn/${key}`)}
+                      >
+                        <div className="row" style={{ justifyContent: "space-between", gap: 8 }}>
+                          <strong>
+                            {isDone && <span style={{ color: "var(--good)" }}>✓ </span>}
+                            {c?.name ?? key}
+                          </strong>
+                          <button
+                            className="ghost"
+                            style={{
+                              padding: "2px 8px",
+                              fontSize: 11,
+                              borderColor: isDone ? "var(--good)" : undefined,
+                              color: isDone ? "var(--good)" : undefined,
+                            }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onToggleChapter(key);
+                            }}
+                          >
+                            {isDone ? "Done" : "Mark done"}
+                          </button>
+                        </div>
+                        {c?.what && (
+                          <p className="dim" style={{ margin: "6px 0 0", fontSize: 12 }}>
+                            {c.what}
+                          </p>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
-                <span className="spacer" />
-                <button
-                  onClick={async () => {
-                    try {
-                      const id = await api.masteryStartContest(track.key, week.week);
-                      nav(`/contest/${id}`);
-                    } catch (e) {
-                      toast(`Could not start the checkpoint: ${e}`);
+              </section>
+            )}
+
+            {practice.length + warmup.length > 0 && (
+              <section {...section("practice")}>
+                {warmup.length > 0 && (
+                  <details className="card mastery-practice">
+                    <summary>
+                      <strong>🔁 Warm-up from earlier weeks</strong>{" "}
+                      <span className="dim quiz-note">
+                        {warmupSolved}/{warmup.length} solved · from weeks {week.week - 2} and {week.week - 5} —
+                        interleaving is what makes it stick
+                      </span>
+                    </summary>
+                    <ExerciseSections
+                      exercises={warmup}
+                      onSolved={(id) => setSolvedEx(new Set(markExerciseSolved(id)))}
+                    />
+                  </details>
+                )}
+                {practice.length > 0 && (
+                  <details className="card mastery-practice">
+                    <summary>
+                      <strong>🧩 Practice</strong>{" "}
+                      <span className="dim quiz-note">
+                        {practiceSolved}/{practice.length} solved · optional — not part of the week's gate
+                      </span>
+                    </summary>
+                    <p className="dim quiz-note">
+                      Short, judged exercises on this week's ideas — reading an inference, reading a real
+                      compiler error, repairing code that runs wrong, and on the type-level weeks, writing types
+                      the compiler checks.
+                    </p>
+                    <ExerciseSections
+                      exercises={practice}
+                      onSolved={(id) => setSolvedEx(new Set(markExerciseSolved(id)))}
+                    />
+                  </details>
+                )}
+              </section>
+            )}
+
+            {week.problems.length + problemSet.length > 0 && (
+              <section {...section("problems")}>
+                {week.problems.length > 0 && (
+                  <>
+                    <div className="io-label">🎯 Problems to solve</div>
+                    <div className="grid cols-2" style={{ marginBottom: 14 }}>
+                      {week.problems.map((ref) => {
+                        const p = problemBySlug.get(ref.slug);
+                        if (!p) return null;
+                        const solved = p.solved_status === "solved";
+                        return (
+                          <div
+                            key={ref.slug}
+                            className="card"
+                            style={{
+                              marginBottom: 0,
+                              cursor: "pointer",
+                              borderColor: solved ? "var(--good)" : undefined,
+                            }}
+                            onClick={() => nav(`/solve/${p.id}`)}
+                          >
+                            <div className="row" style={{ justifyContent: "space-between", gap: 8 }}>
+                              <strong>
+                                {solved && <span style={{ color: "var(--good)" }}>✓ </span>}
+                                {p.title}
+                              </strong>
+                              <DiffBadge d={p.difficulty} />
+                            </div>
+                            {ref.note && (
+                              <p className="dim" style={{ margin: "6px 0 0", fontSize: 12 }}>
+                                {ref.note}
+                              </p>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </>
+                )}
+
+                {problemSet.length > 0 && (
+                  <details className="card mastery-practice">
+                    <summary>
+                      <strong>🏋️ Problem set</strong>{" "}
+                      <span className="dim quiz-note">
+                        {setSolved}/{problemSet.length} solved · warm-up, core and stretch · optional —
+                        not part of the week's gate
+                      </span>
+                    </summary>
+                    <p className="dim quiz-note">
+                      Original problems on exactly this week&rsquo;s ideas, written for TypeScript and
+                      judged at this week&rsquo;s strictness. Easy is a warm-up, Medium is the core of
+                      the week, Hard is a stretch.
+                    </p>
+                    <ExerciseSections
+                      exercises={problemSet}
+                      onSolved={(id) => setSolvedEx(new Set(markExerciseSolved(id)))}
+                      overrides={{ challenge: { heading: "🎯 Problems" } }}
+                    />
+                  </details>
+                )}
+              </section>
+            )}
+
+            {(week.project || week.contest) && (
+              <section {...section("project")}>
+                {week.project && (
+                  <ProjectPanel
+                    workspaceId={`${track.key}-w${week.week}`}
+                    brief={week.project}
+                    spec={week.project_spec ?? null}
+                    row={row}
+                    language={track.exam_language}
+                    onSave={(notes, code, done) =>
+                      api
+                        .masterySaveProject(track.key, week.week, notes, code, done)
+                        .then(onChanged)
                     }
-                  }}
-                >
-                  Start the checkpoint
-                </button>
-              </div>
-            </div>
-          )}
+                    onRubric={(ticked) => api.masterySaveRubric(track.key, week.week, ticked)}
+                  />
+                )}
 
-          {practice.length > 0 && (
-            <details className="card mastery-practice">
-              <summary>
-                <strong>🧩 Practice</strong>{" "}
-                <span className="dim quiz-note">
-                  {practiceSolved}/{practice.length} solved · optional — not part of the week's gate
-                </span>
-              </summary>
+                {week.contest && (
+                  <div className="card mastery-checkpoint">
+                    <div className="row wrap">
+                      <div>
+                        <strong>⏱ {week.contest.title}</strong>
+                        <div className="dim quiz-note">
+                          {Math.round(week.contest.duration_seconds / 60)} minutes ·{" "}
+                          {(week.contest.slugs?.length ?? 0) > 0
+                            ? `${week.contest.slugs!.length} problems from across the month`
+                            : `this week's ${week.problems.length} problems`}{" "}
+                          · optional, timed, and retakeable
+                        </div>
+                      </div>
+                      <span className="spacer" />
+                      <button
+                        onClick={async () => {
+                          try {
+                            const id = await api.masteryStartContest(track.key, week.week);
+                            nav(`/contest/${id}`);
+                          } catch (e) {
+                            toast(`Could not start the checkpoint: ${e}`);
+                          }
+                        }}
+                      >
+                        Start the checkpoint
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </section>
+            )}
+
+            <CapstonePractice week={week} trackKey={track.key} />
+
+            {(week.flashcards?.length ?? 0) > 0 && (
               <p className="dim quiz-note">
-                Short, judged exercises on this week's ideas — reading an inference, reading a real
-                compiler error, repairing code that runs wrong, and on the type-level weeks, writing types
-                the compiler checks.
+                🃏 {progress.complete ? (
+                  <>
+                    This week's {week.flashcards!.length} review cards are in{" "}
+                    <Link to="/flashcards">Flashcards</Link>.
+                  </>
+                ) : (
+                  <>{week.flashcards!.length} review cards join your Flashcards when you finish this week.</>
+                )}
               </p>
-              <ExerciseSections
-                exercises={practice}
-                onSolved={(id) => setSolvedEx(new Set(markExerciseSolved(id)))}
+            )}
+
+            <section {...section("quiz")}>
+              <QuizPanel
+                week={week}
+                track={track}
+                best={progress.score}
+                onSubmit={(percent) =>
+                  api.masteryRecordQuiz(track.key, week.week, percent).then(onChanged)
+                }
               />
-            </details>
-          )}
+            </section>
 
-          <CapstonePractice week={week} trackKey={track.key} />
+            {week.exam && (
+              <section {...section("final")}>
+                <ExamPanel
+                  versions={[week.exam, ...(week.exam_alternates ?? [])]}
+                  variantKey={`mastery-final-variant:${track.key}:${week.week}`}
+                  weekNumber={week.week}
+                  passed={progress.examPassed}
+                  savedCode={row?.exam_code ?? ""}
+                  typesSolved={!!week.exam.types && solvedEx.has(week.exam.types.id)}
+                  onTypesSolved={(id) => setSolvedEx(new Set(markExerciseSolved(id)))}
+                  onResult={(passed, code) =>
+                    api.masteryRecordExam(track.key, week.week, passed, code).then(onChanged)
+                  }
+                />
+              </section>
+            )}
 
-          {(week.flashcards?.length ?? 0) > 0 && (
-            <p className="dim quiz-note">
-              🃏 {progress.complete ? (
-                <>
-                  This week's {week.flashcards!.length} review cards are in{" "}
-                  <Link to="/flashcards">Flashcards</Link>.
-                </>
-              ) : (
-                <>{week.flashcards!.length} review cards join your Flashcards when you finish this week.</>
-              )}
-            </p>
-          )}
-
-          <QuizPanel
-            week={week}
-            track={track}
-            best={progress.score}
-            onSubmit={(percent) =>
-              api.masteryRecordQuiz(track.key, week.week, percent).then(onChanged)
-            }
-          />
-
-          {week.exam && (
-            <ExamPanel
-              versions={[week.exam, ...(week.exam_alternates ?? [])]}
-              variantKey={`mastery-final-variant:${track.key}:${week.week}`}
-              weekNumber={week.week}
-              passed={progress.examPassed}
-              savedCode={row?.exam_code ?? ""}
-              typesSolved={!!week.exam.types && solvedEx.has(week.exam.types.id)}
-              onTypesSolved={(id) => setSolvedEx(new Set(markExerciseSolved(id)))}
-              onResult={(passed, code) =>
-                api.masteryRecordExam(track.key, week.week, passed, code).then(onChanged)
-              }
-            />
-          )}
+            <section {...section("notes")} style={{ marginTop: 14 }}>
+              <div className="io-label">🗒 Your notes for this week</div>
+              <textarea
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                onBlur={() => {
+                  if (notes !== (settings[notesKey] ?? "")) saveSetting(notesKey, notes);
+                }}
+                placeholder="What clicked, what didn't, what to revisit. Saved with your backups."
+                style={{ width: "100%", minHeight: 80 }}
+              />
+            </section>
+          </div>
         </div>
       )}
     </div>

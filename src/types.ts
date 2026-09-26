@@ -613,6 +613,8 @@ export interface MasteryTrack {
   weeks: MasteryWeek[];
   /** The programme's final exam, open once every core week is complete. */
   final_exam?: MasteryFinalExam | null;
+  /** One sentence per phase, shown above its weeks. */
+  phase_goals?: Record<string, string>;
 }
 
 /** One timed sitting over the whole programme (X-36). */

@@ -173,6 +173,26 @@
   margin: 0;
   font-size: var(--text-xl);
 }
+.track-group-goal {
+  margin: 6px 0 0;
+  color: var(--text-dim);
+  font-size: var(--text-sm);
+  max-width: 70ch;
+}
+/* A rail number drawn as a progress ring (TrackSpec.progressRings). */
+.track-rail-ring {
+  position: relative;
+  width: 28px;
+  height: 28px;
+  border: none;
+}
+.track-rail-ring svg {
+  position: absolute;
+  inset: 0;
+}
+.track-rail-ring-num {
+  position: relative;
+}
 .track-unit-list {
   list-style: none;
   margin: 0;

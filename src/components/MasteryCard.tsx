@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { api } from "../api";
 import type { MasteryTrack } from "../types";
 import { loadDoneChapters } from "../lib/learnProgress";
-import { pacing, progressByWeek, startDateKey, unlockedWeeks, weekProgress } from "../lib/mastery";
+import { pacing, effectiveStart, parsePause, pauseKey, progressByWeek, startDateKey, unlockedWeeks, weekProgress } from "../lib/mastery";
 
 /** Dashboard summary of whichever mastery track is furthest along: where you
  * are, what is still outstanding this week, and whether you are behind pace.
@@ -66,7 +66,11 @@ export function MasteryCard() {
 
       const startedRaw = settings[startDateKey(best.track.key)];
       const pace = startedRaw
-        ? pacing(new Date(startedRaw), best.current, best.track.weeks.length)
+        ? pacing(
+            effectiveStart(new Date(startedRaw), parsePause(settings[pauseKey(best.track.key)])),
+            best.current,
+            best.track.weeks.length
+          )
         : null;
 
       setState({

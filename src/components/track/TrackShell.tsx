@@ -43,6 +43,8 @@ export interface TrackUnit {
 export interface TrackGroup {
   key: string;
   title: string;
+  /** One sentence shown above the group's units. */
+  goal?: string;
 }
 
 export interface TrackSpec {
@@ -56,6 +58,8 @@ export interface TrackSpec {
   groupLabel: string;
   groups: TrackGroup[];
   units: TrackUnit[];
+  /** Draw each group's number in the rail as a ring filled by its progress. */
+  progressRings?: boolean;
   /** Markdown shown once above the rail, if the track has an introduction. */
   intro?: string;
   /** Rendered between the hero and the rail — a track's own extras. */
@@ -162,6 +166,32 @@ export function TrackHero({ spec, progress }: { spec: TrackSpec; progress: Track
  * back to the part of the track you were reading rather than the top — the same
  * trick the curriculum's stage rail uses.
  */
+/** A group's number inside a ring that fills as its units are done. */
+function ProgressRing({ number, fraction }: { number: number; fraction: number }) {
+  const r = 11;
+  const c = 2 * Math.PI * r;
+  const done = fraction >= 1;
+  return (
+    <span className="track-rail-num track-rail-ring" aria-label={`${Math.round(fraction * 100)}% done`}>
+      <svg viewBox="0 0 28 28" width="28" height="28" aria-hidden>
+        <circle cx="14" cy="14" r={r} fill="none" stroke="var(--border)" strokeWidth="3" />
+        <circle
+          cx="14"
+          cy="14"
+          r={r}
+          fill="none"
+          stroke={done ? "var(--good)" : "var(--accent)"}
+          strokeWidth="3"
+          strokeDasharray={`${c * Math.min(1, fraction)} ${c}`}
+          strokeLinecap="round"
+          transform="rotate(-90 14 14)"
+        />
+      </svg>
+      <span className="track-rail-ring-num">{done ? "✓" : number}</span>
+    </span>
+  );
+}
+
 export function TrackBody({ spec, progress }: { spec: TrackSpec; progress: TrackProgress }) {
   const [params, setParams] = useSearchParams();
   const nav = useNavigate();
@@ -206,7 +236,11 @@ export function TrackBody({ spec, progress }: { spec: TrackSpec; progress: Track
                 aria-current={g.key === selected ? "true" : undefined}
                 onClick={() => setParams({ group: g.key }, { replace: true })}
               >
-                <span className="track-rail-num">{i + 1}</span>
+                {spec.progressRings && authored.length > 0 ? (
+                  <ProgressRing number={i + 1} fraction={done / authored.length} />
+                ) : (
+                  <span className="track-rail-num">{i + 1}</span>
+                )}
                 <span className="track-rail-text">
                   <span className="track-rail-title">{g.title}</span>
                   <span className="track-rail-meta">
@@ -231,6 +265,9 @@ export function TrackBody({ spec, progress }: { spec: TrackSpec; progress: Track
             <h2 className="track-group-title">
               {spec.groups.find((g) => g.key === selected)?.title}
             </h2>
+            {spec.groups.find((g) => g.key === selected)?.goal && (
+              <p className="track-group-goal">🎯 {spec.groups.find((g) => g.key === selected)?.goal}</p>
+            )}
           </div>
         )}
 

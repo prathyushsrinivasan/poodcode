@@ -145,3 +145,25 @@ for _ex in TS_FINAL_EXAM["problems"]:
 for _ex in TS_FINAL_EXAM["type_section"]:
     assert _ex["judge_mode"] == "types", f"{_ex['id']}: the type section is type-graded"
 _ts_track["final_exam"] = TS_FINAL_EXAM
+
+# Phase goals (X-76): one sentence per month, shown above its weeks. From the
+# roadmap's "Month goal" lines.
+TS_PHASE_GOALS = {
+    "Month 1 · Language foundations":
+        "Write small, correct, fully-typed programs that read stdin and print stdout — and know exactly what TypeScript infers without being told.",
+    "Month 2 · Functions & data":
+        "Design small functions with honest signatures, transform collections without mutation surprises, and model records as typed objects.",
+    "Month 3 · The type system":
+        "Model data so illegal states are unrepresentable, and read control-flow narrowing the way the compiler does.",
+    "Month 4 · Rigor":
+        "Configure the compiler on purpose, understand why structural typing is sometimes unsound, and make illegal values unconstructable.",
+    "Month 5 · Generics & type-level":
+        "Write generic code whose types stay precise, and read and write the type-level programs behind every serious library.",
+    "Month 6 · Runtime & architecture":
+        "Build real programs — classes with invariants, lazy pipelines, error handling that cannot be forgotten, and async code that is correct under concurrency and cancellation.",
+    "Capstone · optional":
+        "Put six months together in one program, then rehearse the interview.",
+}
+_ts_phases = {w["phase"] for w in TS_WEEKS}
+assert set(TS_PHASE_GOALS) == _ts_phases, f"X-76: phase goals out of step with the phases {sorted(_ts_phases)}"
+_ts_track["phase_goals"] = TS_PHASE_GOALS
