@@ -715,6 +715,7 @@ const handlers: Record<string, (a: Args) => any | Promise<any>> = {
     masteryRow(trackKey, week).project_rubric = JSON.stringify(ticked ?? []);
     save();
   },
+  mastery_record_solve: () => {},
   mastery_log_time: ({ trackKey, week, seconds }) => {
     masteryRow(trackKey, week).study_seconds += seconds;
     save();

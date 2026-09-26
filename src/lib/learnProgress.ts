@@ -164,6 +164,14 @@ export function markExerciseSolved(id: string): Set<string> {
   return new Set(solvedCache);
 }
 
+/** A Mastery exercise solved for the first time also counts as a solve for the
+ * day (X-93), so the programme's work reaches the heatmap, the streak and
+ * Today's "solved today" the way a Library solve does. A re-solve does not. */
+export function markMasterySolved(id: string): Set<string> {
+  if (!solvedCache.has(id)) void api.masteryRecordSolve().catch(() => {});
+  return markExerciseSolved(id);
+}
+
 /** Forget that a set of exercises was ever solved, so a unit can be worked
  * again from scratch. Only the solved marks go — the learner's own drafts
  * (`poodcode:learn-ex:*`) are their writing, not progress, and are left alone

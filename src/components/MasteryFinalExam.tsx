@@ -10,7 +10,7 @@ import type { MasteryFinalExam, MasteryTrack, MasteryWeek } from "../types";
 import { ExerciseSections } from "./ExerciseSections";
 import { inlineCode } from "./common";
 import { QuizChoices } from "./QuizChoices";
-import { markExerciseSolved } from "../lib/learnProgress";
+import { markMasterySolved } from "../lib/learnProgress";
 import { formatStudyTime, type WeekProgress } from "../lib/mastery";
 import {
   drawFinalPaper,
@@ -119,7 +119,7 @@ export function FinalExamPanel({
   }
 
   function solved(id: string) {
-    markExerciseSolved(id);
+    markMasterySolved(id);
     if (!sitting || sitting.solved.includes(id)) return;
     onChange({ ...state, sitting: { ...sitting, solved: [...sitting.solved, id] } });
   }

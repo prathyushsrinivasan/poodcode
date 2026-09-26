@@ -18,7 +18,7 @@ import type {
 import { Markdown } from "./Markdown";
 import { ExerciseSections } from "./ExerciseSections";
 import { inlineCode } from "./common";
-import { markExerciseSolved } from "../lib/learnProgress";
+import { markMasterySolved } from "../lib/learnProgress";
 import {
   mockAttemptSummary,
   parseMockState,
@@ -320,7 +320,7 @@ function MockSessionCard({
           <div className="io-label">2 · The problem, then 3 · the type puzzle</div>
           <ExerciseSections
             exercises={[problem, puzzle].filter((e): e is Exercise => !!e)}
-            onSolved={(id) => markExerciseSolved(id)}
+            onSolved={(id) => markMasterySolved(id)}
           />
 
           <div className="io-label" style={{ marginTop: 10 }}>

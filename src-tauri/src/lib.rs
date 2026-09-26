@@ -398,6 +398,7 @@ pub fn run() {
             commands::mastery_save_project,
             commands::mastery_save_rubric,
             commands::mastery_log_time,
+            commands::mastery_record_solve,
             commands::mastery_complete_week,
             commands::mastery_start_contest,
             commands::done_chapters,

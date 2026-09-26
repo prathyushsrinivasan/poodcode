@@ -24,7 +24,7 @@ import { answerText, questionText } from "../lib/quizKinds";
 import {
   loadDoneChapters,
   loadSolvedExercises,
-  markExerciseSolved,
+  markMasterySolved,
   exerciseFailures,
   setChapterDone,
   solvedExercises,
@@ -1102,7 +1102,7 @@ function WeekCard({
                     </summary>
                     <ExerciseSections
                       exercises={warmup}
-                      onSolved={(id) => setSolvedEx(new Set(markExerciseSolved(id)))}
+                      onSolved={(id) => setSolvedEx(new Set(markMasterySolved(id)))}
                     />
                   </details>
                 )}
@@ -1121,7 +1121,7 @@ function WeekCard({
                     </p>
                     <ExerciseSections
                       exercises={practice}
-                      onSolved={(id) => setSolvedEx(new Set(markExerciseSolved(id)))}
+                      onSolved={(id) => setSolvedEx(new Set(markMasterySolved(id)))}
                       predictFirst={predictFirst}
                     />
                   </details>
@@ -1185,7 +1185,7 @@ function WeekCard({
                     </p>
                     <ExerciseSections
                       exercises={problemSet}
-                      onSolved={(id) => setSolvedEx(new Set(markExerciseSolved(id)))}
+                      onSolved={(id) => setSolvedEx(new Set(markMasterySolved(id)))}
                       overrides={{ challenge: { heading: "🎯 Problems" } }}
                       predictFirst={predictFirst}
                     />
@@ -1276,7 +1276,7 @@ function WeekCard({
                         </summary>
                         <ExerciseSections
                           exercises={monthPuzzles}
-                          onSolved={(id) => setSolvedEx(new Set(markExerciseSolved(id)))}
+                          onSolved={(id) => setSolvedEx(new Set(markMasterySolved(id)))}
                         />
                       </details>
                     )}
@@ -1320,7 +1320,7 @@ function WeekCard({
                   passed={progress.examPassed}
                   savedCode={row?.exam_code ?? ""}
                   typesSolved={!!week.exam.types && solvedEx.has(week.exam.types.id)}
-                  onTypesSolved={(id) => setSolvedEx(new Set(markExerciseSolved(id)))}
+                  onTypesSolved={(id) => setSolvedEx(new Set(markMasterySolved(id)))}
                   onResult={(passed, code) =>
                     api.masteryRecordExam(track.key, week.week, passed, code).then(onChanged)
                   }

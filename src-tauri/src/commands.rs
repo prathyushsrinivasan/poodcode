@@ -1223,6 +1223,13 @@ pub fn mastery_save_rubric(
     repo::mastery_save_rubric(&state.conn(), &track_key, week, &ticked)
 }
 
+/// A Mastery exercise solved for the first time (X-93): one more solve today,
+/// for the heatmap, the streak and the dashboard.
+#[tauri::command]
+pub fn mastery_record_solve(state: State<'_, AppState>) -> AppResult<()> {
+    repo::record_practice_solve(&state.conn())
+}
+
 #[tauri::command]
 pub fn mastery_log_time(
     state: State<'_, AppState>,

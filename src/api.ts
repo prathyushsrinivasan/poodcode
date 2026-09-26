@@ -129,6 +129,8 @@ export const api = {
     invoke<void>("mastery_save_rubric", { trackKey, week, ticked }),
   masteryLogTime: (trackKey: string, week: number, seconds: number) =>
     invoke<void>("mastery_log_time", { trackKey, week, seconds }),
+  /** A Mastery exercise solved for the first time: counts towards today's solves. */
+  masteryRecordSolve: () => invoke<void>("mastery_record_solve"),
   /** Stamp a week complete and, the first time, seed its flashcards + reviews. */
   masteryCompleteWeek: (trackKey: string, week: number) =>
     invoke<boolean>("mastery_complete_week", { trackKey, week }),

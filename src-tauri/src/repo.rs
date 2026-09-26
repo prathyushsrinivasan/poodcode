@@ -528,6 +528,12 @@ pub fn list_attempts(conn: &Connection, problem_id: i64) -> AppResult<Vec<Attemp
 // Daily sessions
 // ---------------------------------------------------------------------------
 
+/// A practice solve outside the Library (a Mastery exercise, first time only —
+/// the frontend decides that) counts towards the day like an accepted problem.
+pub fn record_practice_solve(conn: &Connection) -> AppResult<()> {
+    bump_daily(conn, true, 0)
+}
+
 fn bump_daily(conn: &Connection, solved: bool, seconds: i64) -> AppResult<()> {
     let date = today().format("%Y-%m-%d").to_string();
     conn.execute(
@@ -1398,12 +1404,21 @@ pub fn mastery_record_exam(
     code: &str,
 ) -> AppResult<()> {
     ensure_week(conn, track_key, week)?;
+    let was_passed: bool = conn.query_row(
+        "SELECT exam_passed FROM mastery_progress WHERE track_key = ?1 AND week = ?2",
+        params![track_key, week],
+        |r| r.get(0),
+    )?;
     conn.execute(
         "UPDATE mastery_progress
             SET exam_passed = MAX(exam_passed, ?3), exam_code = ?4
           WHERE track_key = ?1 AND week = ?2",
         params![track_key, week, passed as i64, code],
     )?;
+    // The first pass of a week's final is a solve for the day (X-93).
+    if passed && !was_passed {
+        bump_daily(conn, true, 0)?;
+    }
     Ok(())
 }
 

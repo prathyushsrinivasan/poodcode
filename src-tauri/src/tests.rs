@@ -285,6 +285,25 @@ fn mastery_exam_pass_is_sticky_but_code_is_not() {
     assert_eq!(row.exam_code, "broken again");
 }
 
+/// X-93: Mastery work reaches the heatmap and streak — the first pass of a
+/// final and each practice solve count as a solve for the day; retakes do not.
+#[test]
+fn mastery_solves_count_towards_the_day() {
+    let c = conn();
+    let solved_today = |c: &rusqlite::Connection| -> i64 {
+        c.query_row("SELECT COALESCE(SUM(problems_solved), 0) FROM daily_sessions", [], |r| r.get(0))
+            .unwrap()
+    };
+    repo::mastery_record_exam(&c, "ts", 2, false, "draft").unwrap();
+    assert_eq!(solved_today(&c), 0);
+    repo::mastery_record_exam(&c, "ts", 2, true, "done").unwrap();
+    assert_eq!(solved_today(&c), 1);
+    repo::mastery_record_exam(&c, "ts", 2, true, "done again").unwrap();
+    assert_eq!(solved_today(&c), 1, "a retake is not a new solve");
+    repo::record_practice_solve(&c).unwrap();
+    assert_eq!(solved_today(&c), 2);
+}
+
 #[test]
 fn mastery_rows_are_scoped_per_track() {
     let c = conn();

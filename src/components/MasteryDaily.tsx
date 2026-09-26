@@ -5,7 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import type { Exercise, MasteryTrack } from "../types";
 import { ExerciseSections } from "./ExerciseSections";
-import { loadSolvedExercises, markExerciseSolved, solvedExercises } from "../lib/learnProgress";
+import { loadSolvedExercises, markMasterySolved, solvedExercises } from "../lib/learnProgress";
 import { dailyKey, localDay, parseDaily, streak, todaysPuzzle, typeLadder } from "../lib/typeLadder";
 
 export function DailyTypePuzzle({
@@ -44,7 +44,7 @@ export function DailyTypePuzzle({
   if (!rung) return null;
 
   const onSolved = (id: string) => {
-    setSolved(new Set(markExerciseSolved(id)));
+    setSolved(new Set(markMasterySolved(id)));
     if (id !== rung.exercise.id || done) return;
     saveSetting(key, JSON.stringify({ pick: { day: today, id }, days: [...state.days, today] }));
   };
@@ -121,7 +121,7 @@ export function WeekZero({
           <p className="quiz-note" style={{ marginBottom: 0 }}>
             Try it once, now: a first program, judged exactly like every exercise to come.
           </p>
-          <ExerciseSections exercises={[exercise]} onSolved={(id) => markExerciseSolved(id)} />
+          <ExerciseSections exercises={[exercise]} onSolved={(id) => markMasterySolved(id)} />
         </>
       )}
       <div className="row" style={{ gap: 8, marginTop: 8 }}>
