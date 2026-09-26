@@ -10,6 +10,66 @@
   "preset": "strict"
  },
  {
+  "code": 1039,
+  "title": "Initializers are not allowed in ambient contexts",
+  "meaning": "A `declare` statement gave a value.",
+  "cause": "`declare` only describes something that exists elsewhere — it never creates it, so it cannot set a value. Drop the initializer, or drop `declare` if you meant to define it here.",
+  "bad": "declare let version: string = \"1.0\";\n",
+  "good": "declare let version: string;\n",
+  "week": 14,
+  "preset": "strict"
+ },
+ {
+  "code": 1064,
+  "title": "The return type of an async function must be Promise<T>",
+  "meaning": "An async function was annotated with a plain return type.",
+  "cause": "An `async` function always returns a promise, whatever its body returns. Annotate what callers really get: `Promise<number>`, not `number`.",
+  "bad": "async function count(): number {\n  return 3;\n}\n",
+  "good": "async function count(): Promise<number> {\n  return 3;\n}\ncount().then(console.log);\n",
+  "week": 26,
+  "preset": "strict"
+ },
+ {
+  "code": 1103,
+  "title": "'for await' loops are only allowed within async functions",
+  "meaning": "A `for await` loop sits in an ordinary function.",
+  "cause": "Waiting needs an async context. Make the enclosing function `async` (it then returns a promise), or move the loop to the module's top level.",
+  "bad": "async function* ticks(): AsyncGenerator<number> {\n  yield 1;\n}\nfunction show(): void {\n  for await (const t of ticks()) console.log(t);\n}\n",
+  "good": "async function* ticks(): AsyncGenerator<number> {\n  yield 1;\n}\nasync function show(): Promise<void> {\n  for await (const t of ticks()) console.log(t);\n}\nshow();\n",
+  "week": 26,
+  "preset": "strict"
+ },
+ {
+  "code": 1196,
+  "title": "Catch clause variable type annotation must be 'any' or 'unknown'",
+  "meaning": "`catch (e: Error)` claims to know what was thrown.",
+  "cause": "Anything can be thrown — a string, a number, `undefined` — so the compiler will not let you promise it is an `Error`. Leave it `unknown` and narrow with `instanceof Error`.",
+  "bad": "try {\n  JSON.parse(\"{\");\n} catch (e: Error) {\n  console.log(e.message);\n}\n",
+  "good": "try {\n  JSON.parse(\"{\");\n} catch (e) {\n  console.log(e instanceof Error ? e.message : String(e));\n}\n",
+  "week": 25,
+  "preset": "strict"
+ },
+ {
+  "code": 1206,
+  "title": "Decorators are not valid here",
+  "meaning": "A decorator was put on something that cannot take one.",
+  "cause": "Decorators apply to classes and class members only — not to plain functions or variables. For a function, wrap it in a higher-order function instead.",
+  "bad": "function logged(target: unknown, context: unknown) {\n  return target;\n}\n@logged\nfunction greet() {\n  return \"hi\";\n}\n",
+  "good": "function logged<T extends () => string>(fn: T): T {\n  return fn;\n}\nconst greet = logged(() => \"hi\");\nconsole.log(greet());\n",
+  "week": 23,
+  "preset": "strict"
+ },
+ {
+  "code": 1241,
+  "title": "Unable to resolve signature of method decorator",
+  "meaning": "The decorator's parameters do not match how decorators are called.",
+  "cause": "Standard (TC39) decorators receive `(value, context)`. A legacy three-argument `(target, key, descriptor)` decorator only works under `experimentalDecorators`. Write the standard signature.",
+  "bad": "function legacy(target: object, key: string, descriptor: PropertyDescriptor) {\n  return descriptor;\n}\nclass Calc {\n  @legacy\n  add(a: number, b: number) {\n    return a + b;\n  }\n}\n",
+  "good": "function logged<T>(target: T, context: ClassMethodDecoratorContext): T {\n  console.log(\"decorating\", String(context.name));\n  return target;\n}\nclass Calc {\n  @logged\n  add(a: number, b: number) {\n    return a + b;\n  }\n}\n",
+  "week": 23,
+  "preset": "strict"
+ },
+ {
   "code": 1308,
   "title": "'await' expressions are only allowed within async functions and at the top levels of modules",
   "meaning": "You used `await` inside a function that isn't `async`.",
@@ -30,6 +90,16 @@
   "preset": "strict"
  },
  {
+  "code": 1361,
+  "title": "Cannot be used as a value because it was imported using 'import type'",
+  "meaning": "Something imported with `import type` was used at runtime.",
+  "cause": "`import type` is erased completely, so nothing is there to call. Use a plain `import` for values; keep `import type` for names used only in types.",
+  "bad": "import type { readFileSync } from \"fs\";\nconst text = readFileSync(0, \"utf8\");\nconsole.log(text.length);\n",
+  "good": "import { readFileSync } from \"fs\";\nconst text = readFileSync(0, \"utf8\");\nconsole.log(text.length);\n",
+  "week": 14,
+  "preset": "strict"
+ },
+ {
   "code": 2300,
   "title": "Duplicate identifier 'x'",
   "meaning": "Something is declared twice where only one declaration is allowed.",
@@ -47,6 +117,36 @@
   "bad": "console.log(totl);\n",
   "good": "const total = 3;\nconsole.log(total);\n",
   "week": 1,
+  "preset": "strict"
+ },
+ {
+  "code": 2305,
+  "title": "Module has no exported member",
+  "meaning": "You imported a name the module does not export.",
+  "cause": "Check the spelling and the module's actual exports — often a similarly named export exists (`readFileSync`, not `readFile`), or it is a default export.",
+  "bad": "import { readFile } from \"fs\";\n",
+  "good": "import { readFileSync } from \"fs\";\nconsole.log(typeof readFileSync);\n",
+  "week": 14,
+  "preset": "strict"
+ },
+ {
+  "code": 2307,
+  "title": "Cannot find module",
+  "meaning": "The import path does not lead to a module the compiler can see.",
+  "cause": "Check the relative path and file name. For a package, its types must be installed. In a single-file program there is no `./math` — define it in the same file.",
+  "bad": "import { add } from \"./math\";\nconsole.log(add(1, 2));\n",
+  "good": "function add(a: number, b: number): number {\n  return a + b;\n}\nconsole.log(add(1, 2));\n",
+  "week": 14,
+  "preset": "strict"
+ },
+ {
+  "code": 2312,
+  "title": "An interface can only extend an object type with statically known members",
+  "meaning": "An interface tried to extend a union.",
+  "cause": "An interface needs one fixed set of members to extend, and a union has several possible shapes. Use a type alias with an intersection instead.",
+  "bad": "type Pet = { name: string } | { id: number };\ninterface Owner extends Pet {}\n",
+  "good": "type Pet = { name: string } | { id: number };\ntype Owner = Pet & { since: number };\nconst o: Owner = { name: \"rex\", since: 2020 };\nconsole.log(o.since);\n",
+  "week": 17,
   "preset": "strict"
  },
  {
@@ -97,6 +197,16 @@
   "bad": "function double(n: number): number {\n  return n * 2;\n}\ndouble(\"4\");\n",
   "good": "function double(n: number): number {\n  return n * 2;\n}\ndouble(Number(\"4\"));\n",
   "week": 5,
+  "preset": "strict"
+ },
+ {
+  "code": 2348,
+  "title": "Value of type 'typeof X' is not callable. Did you mean to include 'new'?",
+  "meaning": "A class was called like a function.",
+  "cause": "Classes are constructed with `new`. Calling one without it throws at runtime, and TypeScript refuses it up front.",
+  "bad": "class Point {\n  x = 0;\n}\nconst p = Point();\n",
+  "good": "class Point {\n  x = 0;\n}\nconst p = new Point();\nconsole.log(p.x);\n",
+  "week": 13,
   "preset": "strict"
  },
  {
@@ -190,6 +300,36 @@
   "preset": "strict"
  },
  {
+  "code": 2394,
+  "title": "This overload signature is not compatible with its implementation signature",
+  "meaning": "The implementation cannot handle every overload.",
+  "cause": "The implementation signature must accept everything each overload accepts. Widen its parameter types (usually to a union) so every overload is covered.",
+  "bad": "function size(value: string): number;\nfunction size(value: number[]): number;\nfunction size(value: string): number {\n  return value.length;\n}\nconsole.log(size(\"abc\"));\n",
+  "good": "function size(value: string): number;\nfunction size(value: number[]): number;\nfunction size(value: string | number[]): number {\n  return value.length;\n}\nconsole.log(size(\"abc\"));\n",
+  "week": 5,
+  "preset": "strict"
+ },
+ {
+  "code": 2420,
+  "title": "Class incorrectly implements interface",
+  "meaning": "A class says `implements X` but is missing some of X's members.",
+  "cause": "`implements` is a checked promise: every member the interface lists must exist with a compatible type. Add what is missing (the message lists it).",
+  "bad": "interface Shape {\n  area(): number;\n}\nclass Square implements Shape {\n  readonly side: number;\n  constructor(side: number) {\n    this.side = side;\n  }\n  perimeter(): number {\n    return this.side * 4;\n  }\n}\n",
+  "good": "interface Shape {\n  area(): number;\n}\nclass Square implements Shape {\n  readonly side: number;\n  constructor(side: number) {\n    this.side = side;\n  }\n  area(): number {\n    return this.side ** 2;\n  }\n}\nconsole.log(new Square(3).area());\n",
+  "week": 23,
+  "preset": "strict"
+ },
+ {
+  "code": 2430,
+  "title": "Interface incorrectly extends interface",
+  "meaning": "An extending interface redeclared a member with an incompatible type.",
+  "cause": "A sub-interface may narrow an inherited member, never change it to something unrelated. Rename the new member, or rethink the relationship.",
+  "bad": "interface Base {\n  id: number;\n}\ninterface Doc extends Base {\n  id: string;\n}\n",
+  "good": "interface Base {\n  id: number;\n}\ninterface Doc extends Base {\n  title: string;\n}\nconst d: Doc = { id: 1, title: \"notes\" };\nconsole.log(d.title);\n",
+  "week": 10,
+  "preset": "strict"
+ },
+ {
   "code": 2448,
   "title": "Block-scoped variable 'x' used before its declaration",
   "meaning": "You used a `let`/`const` on a line above where it's declared.",
@@ -220,6 +360,16 @@
   "preset": "strict"
  },
  {
+  "code": 2456,
+  "title": "Type alias circularly references itself",
+  "meaning": "A type alias is defined directly in terms of itself.",
+  "cause": "A type may refer to itself only through a structure — an array, an object property, a function — never as a bare member of its own union.",
+  "bad": "type Bad = Bad | string;\n",
+  "good": "type Tree = string | Tree[];\nconst t: Tree = [\"a\", [\"b\"]];\nconsole.log(JSON.stringify(t));\n",
+  "week": 22,
+  "preset": "strict"
+ },
+ {
   "code": 2488,
   "title": "Type 'A' must have a '[Symbol.iterator]()' method that returns an iterator",
   "meaning": "You used `for…of` or spread on something that isn't iterable.",
@@ -246,6 +396,16 @@
   "cause": "Abstract classes exist to be extended. Instantiate a concrete subclass.",
   "bad": "abstract class Shape {\n  abstract area(): number;\n}\nconst s = new Shape();\n",
   "good": "abstract class Shape {\n  abstract area(): number;\n}\nclass Square extends Shape {\n  side: number;\n  constructor(side: number) {\n    super();\n    this.side = side;\n  }\n  area(): number { return this.side ** 2; }\n}\nconst s = new Square(2);\nconsole.log(s.area());\n",
+  "week": 23,
+  "preset": "strict"
+ },
+ {
+  "code": 2515,
+  "title": "Non-abstract class does not implement inherited abstract member",
+  "meaning": "A concrete subclass left an abstract member unimplemented.",
+  "cause": "An abstract member is a hole the subclass must fill. Implement it, or mark the subclass `abstract` too.",
+  "bad": "abstract class Shape {\n  abstract area(): number;\n  abstract readonly name: string;\n}\nclass Square extends Shape {\n  readonly name = \"square\";\n}\n",
+  "good": "abstract class Shape {\n  abstract area(): number;\n  abstract readonly name: string;\n}\nclass Square extends Shape {\n  readonly name = \"square\";\n  area(): number {\n    return 4;\n  }\n}\nconsole.log(new Square().area());\n",
   "week": 23,
   "preset": "strict"
  },
@@ -290,6 +450,16 @@
   "preset": "strict"
  },
  {
+  "code": 2542,
+  "title": "Index signature only permits reading",
+  "meaning": "You tried to assign through an index that is read-only.",
+  "cause": "Strings are immutable, so `s[0] = …` can never work; readonly arrays forbid it too. Build a new value instead.",
+  "bad": "const s: string = \"cat\";\ns[0] = \"b\";\n",
+  "good": "const s: string = \"cat\";\nconst t = \"b\" + s.slice(1);\nconsole.log(t);\n",
+  "week": 4,
+  "preset": "strict"
+ },
+ {
   "code": 2551,
   "title": "Property 'x' does not exist on type 'A'. Did you mean 'y'?",
   "meaning": "A misspelled property that is close to a real one.",
@@ -317,6 +487,36 @@
   "bad": "function greet(name: string, greeting: string): string {\n  return greeting + \", \" + name;\n}\ngreet(\"Ada\");\n",
   "good": "function greet(name: string, greeting = \"Hello\"): string {\n  return greeting + \", \" + name;\n}\ngreet(\"Ada\");\n",
   "week": 5,
+  "preset": "strict"
+ },
+ {
+  "code": 2555,
+  "title": "Expected at least N arguments, but got M",
+  "meaning": "A call left out a required argument before a rest parameter.",
+  "cause": "Rest parameters may be empty, but the required parameters before them may not. Pass them.",
+  "bad": "function log(level: string, ...messages: string[]): void {\n  console.log(level, messages.join(\" \"));\n}\nlog();\n",
+  "good": "function log(level: string, ...messages: string[]): void {\n  console.log(level, messages.join(\" \"));\n}\nlog(\"info\");\n",
+  "week": 5,
+  "preset": "strict"
+ },
+ {
+  "code": 2558,
+  "title": "Expected N type arguments, but got M",
+  "meaning": "An explicit type argument list has the wrong length.",
+  "cause": "Pass exactly as many type arguments as the generic declares — or none, and let inference work them out.",
+  "bad": "function pair<T>(a: T, b: T): [T, T] {\n  return [a, b];\n}\nconst p = pair<string, number>(\"a\", 1);\n",
+  "good": "function pair<T>(a: T, b: T): [T, T] {\n  return [a, b];\n}\nconst p = pair<string>(\"a\", \"b\");\nconsole.log(p);\n",
+  "week": 18,
+  "preset": "strict"
+ },
+ {
+  "code": 2559,
+  "title": "Type has no properties in common with type",
+  "meaning": "A value shares nothing with an all-optional ('weak') type.",
+  "cause": "A type whose properties are all optional would accept almost anything, so TypeScript insists a value shares at least one of them. Pass an object with the options.",
+  "bad": "interface Options {\n  verbose?: boolean;\n}\nfunction configure(o: Options): string {\n  return \"configured with \" + JSON.stringify(o);\n}\nconsole.log(configure(42));\n",
+  "good": "interface Options {\n  verbose?: boolean;\n}\nfunction configure(o: Options): string {\n  return \"configured with \" + JSON.stringify(o);\n}\nconsole.log(configure({ verbose: true }));\n",
+  "week": 15,
   "preset": "strict"
  },
  {
@@ -380,6 +580,96 @@
   "preset": "strict"
  },
  {
+  "code": 2589,
+  "title": "Type instantiation is excessively deep and possibly infinite",
+  "meaning": "A recursive type recursed too far.",
+  "cause": "The checker caps recursion depth. Keep recursive types shallow, use tail-recursive conditional types (which get a higher limit), or compute less at the type level.",
+  "bad": "type BuildWrapped<N extends number, T extends unknown[] = []> =\n  T[\"length\"] extends N ? [] : [0, ...BuildWrapped<N, [...T, 0]>];\ntype Many = BuildWrapped<200>;\nconst m: Many = [];\n",
+  "good": "type BuildWrapped<N extends number, T extends unknown[] = []> =\n  T[\"length\"] extends N ? [] : [0, ...BuildWrapped<N, [...T, 0]>];\ntype Few = BuildWrapped<3>;\nconst m: Few = [0, 0, 0];\nconsole.log(m.length);\n",
+  "week": 22,
+  "preset": "strict"
+ },
+ {
+  "code": 2590,
+  "title": "Expression produces a union type that is too complex to represent",
+  "meaning": "A type expanded into more union members than the checker allows.",
+  "cause": "Unions are capped at 100,000 members; a template literal of six digits makes a million. Validate the shape at runtime, or use a branded `string`, instead of enumerating it.",
+  "bad": "type Digit = \"0\" | \"1\" | \"2\" | \"3\" | \"4\" | \"5\" | \"6\" | \"7\" | \"8\" | \"9\";\ntype Code = `${Digit}${Digit}${Digit}${Digit}${Digit}${Digit}`;\nconst c: Code = \"123456\";\n",
+  "good": "type Digit = \"0\" | \"1\" | \"2\" | \"3\" | \"4\" | \"5\" | \"6\" | \"7\" | \"8\" | \"9\";\ntype Code = `${Digit}${Digit}${Digit}`;\nconst c: Code = \"123\";\nconsole.log(c);\n",
+  "week": 22,
+  "preset": "strict"
+ },
+ {
+  "code": 2591,
+  "title": "Cannot find name 'require'",
+  "meaning": "CommonJS `require` was used in an ES module.",
+  "cause": "This environment runs ES modules: use `import`. (`require` also needs Node's type definitions to be known to the checker.)",
+  "bad": "const fs = require(\"fs\");\nconsole.log(typeof fs.readFileSync);\n",
+  "good": "import * as fs from \"fs\";\nconsole.log(typeof fs.readFileSync);\n",
+  "week": 14,
+  "preset": "strict"
+ },
+ {
+  "code": 2636,
+  "title": "Type is not assignable as implied by variance annotation",
+  "meaning": "A variance annotation (`in`/`out`) contradicts how the type parameter is used.",
+  "cause": "`out T` promises T only flows out; a setter taking T makes it flow in too. Use `in out T` (invariant) or remove the member that breaks the promise.",
+  "bad": "interface Box<out T> {\n  get(): T;\n  set: (value: T) => void;\n}\n",
+  "good": "interface Box<in out T> {\n  get(): T;\n  set: (value: T) => void;\n}\nlet stored = 1;\nconst b: Box<number> = { get: () => stored, set: (v) => { stored = v; } };\nb.set(2);\nconsole.log(b.get());\n",
+  "week": 15,
+  "preset": "strict"
+ },
+ {
+  "code": 2673,
+  "title": "Constructor of class is private",
+  "meaning": "`new` was used on a class whose constructor is private.",
+  "cause": "A private constructor means instances are made only through the class's own factory (`static open(...)`). Call that instead.",
+  "bad": "class Account {\n  private constructor(readonly owner: string) {}\n  static open(owner: string) {\n    return new Account(owner);\n  }\n}\nconst a = new Account(\"ana\");\n",
+  "good": "class Account {\n  private constructor(readonly owner: string) {}\n  static open(owner: string) {\n    return new Account(owner);\n  }\n}\nconst a = Account.open(\"ana\");\nconsole.log(a.owner);\n",
+  "week": 23,
+  "preset": "strict"
+ },
+ {
+  "code": 2677,
+  "title": "A type predicate's type must be assignable to its parameter's type",
+  "meaning": "`x is T` names a type that `x` could never be.",
+  "cause": "A predicate narrows the parameter to a subtype of what it already is. A `string` can never be a `number`; take `unknown` (or a union) instead.",
+  "bad": "function isNumber(x: string): x is number {\n  return !Number.isNaN(Number(x));\n}\n",
+  "good": "function isNumber(x: unknown): x is number {\n  return typeof x === \"number\";\n}\nconsole.log(isNumber(3));\n",
+  "week": 11,
+  "preset": "strict"
+ },
+ {
+  "code": 2678,
+  "title": "Type is not comparable to type",
+  "meaning": "A `case` (or comparison) uses a value the switched type can never be.",
+  "cause": "A `case` label outside the union is dead code — usually a typo or a member missing from the type. Fix the label, or add the member.",
+  "bad": "type Size = \"s\" | \"m\";\nfunction label(size: Size): string {\n  switch (size) {\n    case \"s\":\n      return \"small\";\n    case \"x\":\n      return \"extra\";\n    default:\n      return \"medium\";\n  }\n}\n",
+  "good": "type Size = \"s\" | \"m\" | \"x\";\nfunction label(size: Size): string {\n  switch (size) {\n    case \"s\":\n      return \"small\";\n    case \"x\":\n      return \"extra\";\n    default:\n      return \"medium\";\n  }\n}\nconsole.log(label(\"x\"));\n",
+  "week": 2,
+  "preset": "strict"
+ },
+ {
+  "code": 2684,
+  "title": "The 'this' context is not assignable to method's 'this'",
+  "meaning": "A method that needs its `this` was called detached from its object.",
+  "cause": "Pulling a method off an object loses `this`. Call it on the object, bind it, or wrap it in an arrow.",
+  "bad": "class Counter {\n  count = 0;\n  inc(this: Counter): void {\n    this.count++;\n  }\n}\nconst c = new Counter();\nconst inc = c.inc;\ninc();\n",
+  "good": "class Counter {\n  count = 0;\n  inc(this: Counter): void {\n    this.count++;\n  }\n}\nconst c = new Counter();\nconst inc = () => c.inc();\ninc();\nconsole.log(c.count);\n",
+  "week": 23,
+  "preset": "strict"
+ },
+ {
+  "code": 2693,
+  "title": "Only refers to a type, but is being used as a value",
+  "meaning": "A type was used where a runtime value is needed.",
+  "cause": "Types are erased, so `instanceof Circle` has nothing to test against when `Circle` is a type. Narrow on a property (`\"radius\" in s`) or a discriminant instead.",
+  "bad": "type Circle = { radius: number };\ntype Square = { side: number };\nfunction area(s: Circle | Square): number {\n  if (s instanceof Circle) return Math.PI * s.radius ** 2;\n  return s.side ** 2;\n}\n",
+  "good": "type Circle = { radius: number };\ntype Square = { side: number };\nfunction area(s: Circle | Square): number {\n  if (\"radius\" in s) return Math.PI * s.radius ** 2;\n  return s.side ** 2;\n}\nconsole.log(area({ side: 2 }));\n",
+  "week": 14,
+  "preset": "strict"
+ },
+ {
   "code": 2739,
   "title": "Type 'A' is missing the following properties from type 'B': x, y",
   "meaning": "Several required properties are missing at once.",
@@ -400,6 +690,16 @@
   "preset": "strict"
  },
  {
+  "code": 2749,
+  "title": "Refers to a value, but is being used as a type",
+  "meaning": "A value's name was used as a type.",
+  "cause": "A `const` object is a value; to use its shape as a type, write `typeof Level` — or derive the union of its values with `(typeof Level)[keyof typeof Level]`.",
+  "bad": "const Level = { Debug: 10, Info: 20, Warn: 30 } as const;\nfunction show(level: Level): string {\n  return String(level);\n}\n",
+  "good": "const Level = { Debug: 10, Info: 20, Warn: 30 } as const;\ntype Level = (typeof Level)[keyof typeof Level];\nfunction show(level: Level): string {\n  return String(level);\n}\nconsole.log(show(Level.Info));\n",
+  "week": 14,
+  "preset": "strict"
+ },
+ {
   "code": 2769,
   "title": "No overload matches this call",
   "meaning": "None of a function's overload signatures accepts these arguments.",
@@ -407,6 +707,16 @@
   "bad": "const dashed = \"a-b\".replace(\"-\", 5);\n",
   "good": "const dashed = \"a-b\".replace(\"-\", \"5\");\nconsole.log(dashed);\n",
   "week": 4,
+  "preset": "strict"
+ },
+ {
+  "code": 2775,
+  "title": "Assertions require every name in the call target to be declared with an explicit type annotation",
+  "meaning": "An assertion function was written as an arrow without an annotated variable.",
+  "cause": "The checker only honours `asserts` when the function's type is known up front. Use a `function` declaration, or annotate the variable's type.",
+  "bad": "const assertPositive = (n: number): asserts n => {\n  if (n <= 0) throw new Error(\"not positive\");\n};\nassertPositive(3);\n",
+  "good": "function assertPositive(n: number): asserts n {\n  if (n <= 0) throw new Error(\"not positive\");\n}\nassertPositive(3);\nconsole.log(\"ok\");\n",
+  "week": 11,
   "preset": "strict"
  },
  {
@@ -420,6 +730,96 @@
   "preset": "strict"
  },
  {
+  "code": 2801,
+  "title": "This condition will always return true since this Promise is always defined",
+  "meaning": "A promise was tested for truthiness instead of being awaited.",
+  "cause": "A promise object is always truthy, whatever it will resolve to. `await` it to test the value.",
+  "bad": "async function isReady(): Promise<boolean> {\n  return false;\n}\nif (isReady()) console.log(\"ready!\");\n",
+  "good": "async function isReady(): Promise<boolean> {\n  return false;\n}\nif (await isReady()) console.log(\"ready!\");\n",
+  "week": 26,
+  "preset": "strict"
+ },
+ {
+  "code": 2820,
+  "title": "Type is not assignable. Did you mean …?",
+  "meaning": "A string literal is almost, but not quite, one of the allowed literals.",
+  "cause": "The typo is caught because the type lists the allowed strings. Fix the spelling — the message suggests the closest match.",
+  "bad": "const PRICES = { apple: 1.2, pear: 0.8 } as const;\ntype Fruit = keyof typeof PRICES;\nconst basket: Fruit[] = [\"apple\", \"aple\", \"pear\"];\n",
+  "good": "const PRICES = { apple: 1.2, pear: 0.8 } as const;\ntype Fruit = keyof typeof PRICES;\nconst basket: Fruit[] = [\"apple\", \"apple\", \"pear\"];\nconsole.log(basket.reduce((sum, f) => sum + PRICES[f], 0));\n",
+  "week": 19,
+  "preset": "strict"
+ },
+ {
+  "code": 2845,
+  "title": "This condition will always return 'false'",
+  "meaning": "A comparison with `NaN` can never be true.",
+  "cause": "`NaN` is not equal to anything, itself included, so `x === NaN` is always false. Use `Number.isNaN(x)`.",
+  "bad": "const n = Number(\"x\");\nconsole.log(n === NaN ? \"not a number\" : `ok: ${n}`);\n",
+  "good": "const n = Number(\"x\");\nconsole.log(Number.isNaN(n) ? \"not a number\" : `ok: ${n}`);\n",
+  "week": 2,
+  "preset": "strict"
+ },
+ {
+  "code": 2850,
+  "title": "The initializer of a 'using' declaration must have a [Symbol.dispose]() method",
+  "meaning": "`using` was given an object that does not know how to dispose of itself.",
+  "cause": "`using` calls `[Symbol.dispose]()` at the end of the scope; a `close()` method is not enough. Implement the symbol method (it can call `close`).",
+  "bad": "const handle = { close() {} };\nfunction read() {\n  using h = handle;\n}\n",
+  "good": "const handle = {\n  close() {\n    console.log(\"closed\");\n  },\n  [Symbol.dispose]() {\n    this.close();\n  },\n};\nfunction read() {\n  using h = handle;\n  console.log(\"reading\", typeof h);\n}\nread();\n",
+  "week": 25,
+  "preset": "strict"
+ },
+ {
+  "code": 2852,
+  "title": "'await using' statements are only allowed within async functions",
+  "meaning": "`await using` sits in an ordinary function.",
+  "cause": "Asynchronous disposal has to be awaited, which needs an async context. Make the function `async`.",
+  "bad": "function read(conn: AsyncDisposable) {\n  await using c = conn;\n}\n",
+  "good": "async function read(conn: AsyncDisposable) {\n  await using c = conn;\n  console.log(typeof c);\n}\nread({ [Symbol.asyncDispose]: async () => {} });\n",
+  "week": 25,
+  "preset": "strict"
+ },
+ {
+  "code": 4104,
+  "title": "The type 'readonly T[]' is 'readonly' and cannot be assigned to the mutable type",
+  "meaning": "A readonly array was passed where a mutable one is expected.",
+  "cause": "A mutable array type would let the receiver `push` into data that promised not to change. Copy it (`[...xs]`), or make the receiver accept `readonly T[]`.",
+  "bad": "const frozen: readonly number[] = [1, 2];\nconst editable: number[] = frozen;\n",
+  "good": "const frozen: readonly number[] = [1, 2];\nconst editable: number[] = [...frozen];\neditable.push(3);\nconsole.log(editable);\n",
+  "week": 16,
+  "preset": "strict"
+ },
+ {
+  "code": 4113,
+  "title": "This member cannot have an 'override' modifier because it is not declared in the base class",
+  "meaning": "`override` is on a method the base class does not have.",
+  "cause": "`override` is a checked claim: it catches renames and typos. Match the base class's member name, or drop `override` if the method is new.",
+  "bad": "class Base {\n  greet(): string {\n    return \"hi\";\n  }\n}\nclass Loud extends Base {\n  override greeting(): string {\n    return \"HI\";\n  }\n}\n",
+  "good": "class Base {\n  greet(): string {\n    return \"hi\";\n  }\n}\nclass Loud extends Base {\n  override greet(): string {\n    return \"HI\";\n  }\n}\nconsole.log(new Loud().greet());\n",
+  "week": 23,
+  "preset": "strict"
+ },
+ {
+  "code": 5076,
+  "title": "'??' and '||' operations cannot be mixed without parentheses",
+  "meaning": "`??` and `||` appear in one expression with nothing saying which comes first.",
+  "cause": "The two operators treat `0` and `\"\"` differently, so their order matters and JavaScript refuses to guess. Add parentheses.",
+  "bad": "const a: number | undefined = undefined;\nconst b = 0;\nconsole.log(a ?? b || 5);\n",
+  "good": "const a: number | undefined = undefined;\nconst b = 0;\nconsole.log((a ?? b) || 5);\n",
+  "week": 2,
+  "preset": "strict"
+ },
+ {
+  "code": 6234,
+  "title": "This expression is not callable because it is a 'get' accessor",
+  "meaning": "A getter was called like a method.",
+  "cause": "A `get` accessor is read like a property. Drop the parentheses.",
+  "bad": "class Rect {\n  readonly w = 3;\n  readonly h = 4;\n  get area(): number {\n    return this.w * this.h;\n  }\n}\nconsole.log(new Rect().area());\n",
+  "good": "class Rect {\n  readonly w = 3;\n  readonly h = 4;\n  get area(): number {\n    return this.w * this.h;\n  }\n}\nconsole.log(new Rect().area);\n",
+  "week": 23,
+  "preset": "strict"
+ },
+ {
   "code": 7006,
   "title": "Parameter 'x' implicitly has an 'any' type",
   "meaning": "A parameter has no type and nothing lets the compiler infer one.",
@@ -427,6 +827,36 @@
   "bad": "function double(n) {\n  return n * 2;\n}\n",
   "good": "function double(n: number): number {\n  return n * 2;\n}\n",
   "week": 5,
+  "preset": "strict"
+ },
+ {
+  "code": 7023,
+  "title": "Implicitly has return type 'any' because it is referenced in its own return expressions",
+  "meaning": "A recursive function's return type cannot be inferred.",
+  "cause": "To infer the return type the checker would need the return type. Annotate it.",
+  "bad": "function depth(tree: { children: unknown[] }) {\n  return tree.children.length === 0\n    ? 1\n    : 1 + Math.max(...tree.children.map((c) => depth(c as { children: unknown[] })));\n}\nconsole.log(depth({ children: [] }));\n",
+  "good": "function depth(tree: { children: unknown[] }): number {\n  return tree.children.length === 0\n    ? 1\n    : 1 + Math.max(...tree.children.map((c) => depth(c as { children: unknown[] })));\n}\nconsole.log(depth({ children: [] }));\n",
+  "week": 6,
+  "preset": "strict"
+ },
+ {
+  "code": 7031,
+  "title": "Binding element implicitly has an 'any' type",
+  "meaning": "A destructured parameter has no type.",
+  "cause": "Destructuring does not give the parameter a type. Annotate the whole pattern: `({ name, age }: { name: string; age: number })`.",
+  "bad": "function describe({ name, age }) {\n  return `${name} (${age})`;\n}\n",
+  "good": "function describe({ name, age }: { name: string; age: number }) {\n  return `${name} (${age})`;\n}\nconsole.log(describe({ name: \"ada\", age: 36 }));\n",
+  "week": 14,
+  "preset": "strict"
+ },
+ {
+  "code": 7052,
+  "title": "Element implicitly has an 'any' type because type has no index signature. Did you mean to call 'set'?",
+  "meaning": "Brackets were used to write to a `Map`.",
+  "cause": "`map[key] = value` sets an ordinary property that `get` and `size` never see. Use `map.set(key, value)`.",
+  "bad": "const ages = new Map<string, number>();\nages[\"ana\"] = 31;\nconsole.log(ages.size);\n",
+  "good": "const ages = new Map<string, number>();\nages.set(\"ana\", 31);\nconsole.log(ages.size);\n",
+  "week": 9,
   "preset": "strict"
  },
  {

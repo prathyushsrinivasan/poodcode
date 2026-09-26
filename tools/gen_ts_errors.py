@@ -680,6 +680,13 @@ load().then(console.log);
 ]
 
 
+# Every code a TypeScript chapter shows (X-07) — see tools/ts_errors_more.py.
+sys.path.insert(0, HERE)
+from ts_errors_more import MORE_ERRORS  # noqa: E402
+
+ERRORS += [E(*entry) for entry in MORE_ERRORS]
+
+
 def typecheck(items):
     r = subprocess.run(
         ["node", os.path.join(HERE, "ts_typecheck.mjs")],
