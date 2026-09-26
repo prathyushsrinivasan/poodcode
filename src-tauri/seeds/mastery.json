@@ -19323,6 +19323,28 @@
             ],
             "source_slug": "",
             "dataset": ""
+          },
+          {
+            "id": "tsm-w15-t-handler-variance",
+            "title": "A handler that cannot be faked",
+            "prompt": "A handler for `Dog`s only must not pose as a handler for any `Animal`. Write `AnimalHandler` so that `strictFunctionTypes` checks its `handle` — and a handler for all animals still works where a dog handler is expected.",
+            "hint": "Method syntax (`handle(a: Animal): void`) is checked bivariantly — that is the loophole.",
+            "hints": [
+              "Method syntax (`handle(a: Animal): void`) is checked bivariantly — that is the loophole.",
+              "Declare `handle` as a property with a function type: `handle: (animal: Animal) => void`."
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ndeclare const forAnimals: AnimalHandler;\ndeclare const forDogs: DogHandler;\nconst ok: DogHandler = forAnimals;\n// @ts-expect-error — a dog-only handler is not an animal handler\nconst fake: AnimalHandler = forDogs;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type Animal = { name: string };\ntype Dog = Animal & { bark(): string };\ntype AnimalHandler = ____;\ntype DogHandler = { handle: (dog: Dog) => void };\n",
+            "solution": "type Animal = { name: string };\ntype Dog = Animal & { bark(): string };\ntype AnimalHandler = { handle: (animal: Animal) => void };\ntype DogHandler = { handle: (dog: Dog) => void };\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
           }
         ],
         "optional": false,
@@ -20484,6 +20506,28 @@
             ],
             "source_slug": "",
             "dataset": ""
+          },
+          {
+            "id": "tsm-w16-t-readonly-input",
+            "title": "Input that cannot be pushed to",
+            "prompt": "Write `Input` — a list of numbers the function receiving it can read but not change. It must accept an ordinary array and an `as const` tuple.",
+            "hint": "An array type can be marked read-only.",
+            "hints": [
+              "An array type can be marked read-only.",
+              "`readonly number[]` (or `ReadonlyArray<number>`)."
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\nconst plain: Input = [1, 2, 3];\nconst fixed: Input = [4, 5] as const;\ndeclare const inp: Input;\n// @ts-expect-error — push does not exist on a readonly array\ninp.push(6);\ntype _1 = Expect<Equal<Input[number], number>>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type Input = ____;\n",
+            "solution": "type Input = readonly number[];\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
           }
         ],
         "optional": false,
@@ -20735,6 +20779,28 @@
             "forbid": [],
             "starter": "type Tags = ____;\nconst one: Tags = [\"urgent\"];\nconst many: Tags = [\"a\", \"b\", \"c\"];\n",
             "solution": "type Tags = readonly [string, ...string[]];\nconst one: Tags = [\"urgent\"];\nconst many: Tags = [\"a\", \"b\", \"c\"];\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w16-t-as-const-shape",
+            "title": "Write out what `as const` gives",
+            "prompt": "`LIMITS` is declared `as const`. Write its type out by hand as `Limits` — every property and every array element exactly as `as const` makes it — so that `Limits` and `typeof LIMITS` are the same type.",
+            "hint": "`as const` does three things: literal types, `readonly` properties, and arrays become readonly tuples.",
+            "hints": [
+              "`as const` does three things: literal types, `readonly` properties, and arrays become readonly tuples.",
+              "Every level is `readonly` — the tags too: `readonly [\"basic\", \"export\"]`."
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<Limits, typeof LIMITS>>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "const LIMITS = {\n  free: { seats: 1, tags: [\"basic\"] },\n  pro: { seats: 5, tags: [\"basic\", \"export\"] },\n} as const;\n\ntype Limits = ____;\n",
+            "solution": "const LIMITS = {\n  free: { seats: 1, tags: [\"basic\"] },\n  pro: { seats: 5, tags: [\"basic\", \"export\"] },\n} as const;\n\ntype Limits = {\n  readonly free: { readonly seats: 1; readonly tags: readonly [\"basic\"] };\n  readonly pro: { readonly seats: 5; readonly tags: readonly [\"basic\", \"export\"] };\n};\n",
             "tests": [],
             "source_slug": "",
             "dataset": ""
@@ -21691,6 +21757,50 @@
                 "output": "1024"
               }
             ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w17-t-arg-not-null",
+            "title": "The argument, without the null",
+            "prompt": "`greet` accepts a name or `null`. Write `Name`: the type of its first parameter with `null` and `undefined` removed — using utility types, not by writing `string` yourself.",
+            "hint": "`Parameters<typeof greet>[0]` is the first parameter's type.",
+            "hints": [
+              "`Parameters<typeof greet>[0]` is the first parameter's type.",
+              "`NonNullable` removes `null` and `undefined`."
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<Name, string>>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "declare function greet(name: string | null, loud?: boolean): string;\ntype Name = ____;\n",
+            "solution": "declare function greet(name: string | null, loud?: boolean): string;\ntype Name = NonNullable<Parameters<typeof greet>[0]>;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w17-t-with-payload",
+            "title": "Only the events that carry data",
+            "prompt": "Write `WithPayload`: the members of `AppEvent` that have a `payload` property.",
+            "hint": "One utility type keeps the union members assignable to a shape.",
+            "hints": [
+              "One utility type keeps the union members assignable to a shape.",
+              "`Extract<AppEvent, { payload: unknown }>`."
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<WithPayload, { type: \"message\"; payload: string } | { type: \"error\"; payload: Error }>>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type AppEvent =\n  | { type: \"ready\" }\n  | { type: \"message\"; payload: string }\n  | { type: \"error\"; payload: Error }\n  | { type: \"closed\" };\ntype WithPayload = ____;\n",
+            "solution": "type AppEvent =\n  | { type: \"ready\" }\n  | { type: \"message\"; payload: string }\n  | { type: \"error\"; payload: Error }\n  | { type: \"closed\" };\ntype WithPayload = Extract<AppEvent, { payload: unknown }>;\n",
+            "tests": [],
             "source_slug": "",
             "dataset": ""
           }
@@ -22897,6 +23007,50 @@
             ],
             "source_slug": "",
             "dataset": ""
+          },
+          {
+            "id": "tsm-w18-t-has-length",
+            "title": "Anything with a length",
+            "prompt": "Write the type parameter of `longest` so it accepts any two values of one type that has a numeric `length` — arrays, strings — and rejects numbers.",
+            "hint": "Constrain `T` with `extends`.",
+            "hints": [
+              "Constrain `T` with `extends`.",
+              "The constraint is a shape: `{ length: number }`."
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\nconst arr = longest([1, 2], [3]);\ntype _1 = Expect<Equal<typeof arr, number[]>>;\n// @ts-expect-error — a number has no length\nlongest(1, 2);\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "declare function longest____(a: T, b: T): T;\n",
+            "solution": "declare function longest<T extends { length: number }>(a: T, b: T): T;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w18-t-key-of-arg",
+            "title": "Only keys of the object",
+            "prompt": "Write the signature of `getAll`: it takes an object and a list of its keys, and returns the values at those keys as an array of the matching value types.",
+            "hint": "`K extends keyof T` ties the keys to the object.",
+            "hints": [
+              "`K extends keyof T` ties the keys to the object.",
+              "The result is `T[K][]` — an array of the looked-up types."
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\nconst user = { id: 1, name: \"Ada\", admin: true };\nconst picked = getAll(user, [\"id\", \"name\"]);\ntype _1 = Expect<Equal<typeof picked, (string | number)[]>>;\n// @ts-expect-error — \"email\" is not a key of user\ngetAll(user, [\"email\"]);\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "declare function getAll____;\n",
+            "solution": "declare function getAll<T, K extends keyof T>(obj: T, keys: K[]): T[K][];\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
           }
         ],
         "optional": false,
@@ -23194,6 +23348,28 @@
             "forbid": [],
             "starter": "function createStore<____>(initial?: T) {\n  let value = initial;\n  return {\n    get: (): T | undefined => value,\n    set: (next: T) => {\n      value = next;\n    },\n  };\n}\nconst names = createStore();\nconst counts = createStore(0);\n",
             "solution": "function createStore<T = string>(initial?: T) {\n  let value = initial;\n  return {\n    get: (): T | undefined => value,\n    set: (next: T) => {\n      value = next;\n    },\n  };\n}\nconst names = createStore();\nconst counts = createStore(0);\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w18-t-map-values",
+            "title": "Type `mapValues`",
+            "prompt": "Write the signature of `mapValues`: it takes a record whose keys are `K` (string keys) and values `V`, and a function from `V` to `U`, and returns a record with the same keys and `U` values. `K` must be inferred from the object passed in.",
+            "hint": "Three type parameters: the keys, the old value type, the new value type.",
+            "hints": [
+              "Three type parameters: the keys, the old value type, the new value type.",
+              "`obj: Record<K, V>` lets TypeScript infer the key union from the literal's keys."
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\nconst lengths = mapValues({ a: \"one\", b: \"three\" }, (s) => s.length);\ntype _1 = Expect<Equal<typeof lengths, Record<\"a\" | \"b\", number>>>;\nconst flags = mapValues({ on: 1 }, (n) => n > 0);\ntype _2 = Expect<Equal<typeof flags, Record<\"on\", boolean>>>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "declare function mapValues____;\n",
+            "solution": "declare function mapValues<K extends string, V, U>(obj: Record<K, V>, fn: (value: V) => U): Record<K, U>;\n",
             "tests": [],
             "source_slug": "",
             "dataset": ""
@@ -24081,6 +24257,50 @@
             ],
             "source_slug": "",
             "dataset": ""
+          },
+          {
+            "id": "tsm-w19-t-tag-of-post",
+            "title": "The type of one tag",
+            "prompt": "`Post` has a list of tags. Write `Tag`: the type of a single element of that list, by indexed access.",
+            "hint": "First look up the `tags` property.",
+            "hints": [
+              "First look up the `tags` property.",
+              "Then `[number]` gives the element type of an array type."
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<Tag, { label: string; colour: \"red\" | \"blue\" }>>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type Post = { id: number; tags: { label: string; colour: \"red\" | \"blue\" }[] };\ntype Tag = ____;\n",
+            "solution": "type Post = { id: number; tags: { label: string; colour: \"red\" | \"blue\" }[] };\ntype Tag = Post[\"tags\"][number];\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w19-t-colour-of-tag",
+            "title": "Two lookups deep",
+            "prompt": "Write `Colour`: the type of a tag's `colour`, reached from `Post` in one chain of indexed accesses.",
+            "hint": "Indexed accesses chain.",
+            "hints": [
+              "Indexed accesses chain.",
+              "`Post[\"tags\"][number][\"colour\"]`."
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<Colour, \"red\" | \"blue\">>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type Post = { id: number; tags: { label: string; colour: \"red\" | \"blue\" }[] };\ntype Colour = ____;\n",
+            "solution": "type Post = { id: number; tags: { label: string; colour: \"red\" | \"blue\" }[] };\ntype Colour = Post[\"tags\"][number][\"colour\"];\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
           }
         ],
         "optional": false,
@@ -24302,6 +24522,72 @@
             "forbid": [],
             "starter": "type Theme = {\n  spacing: readonly [4, 8, 16, 32];\n  components: { button: { colour: \"primary\" | \"danger\"; size: number }; card: { shadow: boolean } };\n};\ntype ButtonColour = ____;\ntype Spacing = Theme[\"spacing\"][number];\n",
             "solution": "type Theme = {\n  spacing: readonly [4, 8, 16, 32];\n  components: { button: { colour: \"primary\" | \"danger\"; size: number }; card: { shadow: boolean } };\n};\ntype ButtonColour = Theme[\"components\"][\"button\"][\"colour\"];\ntype Spacing = Theme[\"spacing\"][number];\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w19-t-common-keys",
+            "title": "Keys two types share",
+            "prompt": "Write `CommonKeys<A, B>`: the keys present in both `A` and `B`.",
+            "hint": "`keyof` gives each type's keys as a union.",
+            "hints": [
+              "`keyof` gives each type's keys as a union.",
+              "The keys in both is the intersection of the two unions."
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<CommonKeys<{ id: number; name: string }, { id: string; email: string }>, \"id\">>;\ntype _2 = Expect<Equal<CommonKeys<{ a: 1; b: 2 }, { a: 3; b: 4 }>, \"a\" | \"b\">>;\ntype _3 = Expect<Equal<CommonKeys<{ a: 1 }, { b: 2 }>, never>>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type CommonKeys<A, B> = ____;\n",
+            "solution": "type CommonKeys<A, B> = keyof A & keyof B;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w19-t-option-of",
+            "title": "One option of a function",
+            "prompt": "`connect` takes a single options object. Write `OptionOf<F, K>`: the type of option `K` of such a function `F`. `K` must be one of the options' keys.",
+            "hint": "`Parameters<F>` is a tuple of the parameter types; `[0]` is the options object.",
+            "hints": [
+              "`Parameters<F>` is a tuple of the parameter types; `[0]` is the options object.",
+              "Then index the options object by `K`."
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ndeclare function connect(options: { host: string; port: number; secure?: boolean }): void;\ntype _1 = Expect<Equal<OptionOf<typeof connect, \"port\">, number>>;\ntype _2 = Expect<Equal<OptionOf<typeof connect, \"secure\">, boolean | undefined>>;\n// @ts-expect-error — \"user\" is not an option\ntype _3 = OptionOf<typeof connect, \"user\">;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type OptionOf<F extends (options: never) => unknown, K extends keyof Parameters<F>[0]> = ____;\n",
+            "solution": "type OptionOf<F extends (options: never) => unknown, K extends keyof Parameters<F>[0]> = Parameters<F>[0][K];\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w19-t-column-type",
+            "title": "A column's value type",
+            "prompt": "`COLUMNS` names each column's type as a string. Write `ColumnType<K>`: the TypeScript type of column `K`, looked up through `TypeNames` — two indexed accesses in a row.",
+            "hint": "`(typeof COLUMNS)[K]` gives the type NAME, like `\"number\"`.",
+            "hints": [
+              "`(typeof COLUMNS)[K]` gives the type NAME, like `\"number\"`.",
+              "Use that name as the key into `TypeNames`."
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Hard",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<ColumnType<\"id\">, number>>;\ntype _2 = Expect<Equal<ColumnType<\"active\">, boolean>>;\ntype _3 = Expect<Equal<ColumnType<\"id\" | \"name\">, number | string>>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "const COLUMNS = { id: \"number\", name: \"string\", active: \"boolean\" } as const;\ntype TypeNames = { number: number; string: string; boolean: boolean };\ntype ColumnType<K extends keyof typeof COLUMNS> = ____;\n",
+            "solution": "const COLUMNS = { id: \"number\", name: \"string\", active: \"boolean\" } as const;\ntype TypeNames = { number: number; string: string; boolean: boolean };\ntype ColumnType<K extends keyof typeof COLUMNS> = TypeNames[(typeof COLUMNS)[K]];\n",
             "tests": [],
             "source_slug": "",
             "dataset": ""
@@ -25206,6 +25492,50 @@
             ],
             "source_slug": "",
             "dataset": ""
+          },
+          {
+            "id": "tsm-w20-t-form-text",
+            "title": "Every field as form text",
+            "prompt": "A form holds every field of a model as the text typed into it. Write `FormText<T>`: the same keys, every value a `string`, every key required.",
+            "hint": "Map over `keyof T` and ignore the old value type.",
+            "hints": [
+              "Map over `keyof T` and ignore the old value type.",
+              "`-?` makes an optional field required."
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<FormText<{ age: number; name?: string }>, { age: string; name: string }>>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type FormText<T> = ____;\n",
+            "solution": "type FormText<T> = { [K in keyof T]-?: string };\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w20-t-readonly-except",
+            "title": "Readonly except one field",
+            "prompt": "Write `ReadonlyExcept<T, K>`: every field read-only except the ones in `K`, which stay writable. (The checks flatten the result before comparing.)",
+            "hint": "Split the type: the part that becomes read-only, and the part that does not.",
+            "hints": [
+              "Split the type: the part that becomes read-only, and the part that does not.",
+              "`Readonly<Omit<T, K>> & Pick<T, K>`."
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype Simplify<T> = { [K in keyof T]: T[K] } & {};\n\ntype Doc = { id: number; title: string; body: string };\ntype _1 = Expect<Equal<Simplify<ReadonlyExcept<Doc, \"body\">>, { readonly id: number; readonly title: string; body: string }>>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type ReadonlyExcept<T, K extends keyof T> = ____;\n",
+            "solution": "type ReadonlyExcept<T, K extends keyof T> = Readonly<Omit<T, K>> & Pick<T, K>;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
           }
         ],
         "optional": false,
@@ -25402,6 +25732,72 @@
             "forbid": [],
             "starter": "type OptionalKeys<T> = ____;\n",
             "solution": "type OptionalKeys<T> = { [K in keyof T]-?: {} extends Pick<T, K> ? K : never }[keyof T];\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w20-t-prefixed",
+            "title": "Prefix every key",
+            "prompt": "Write `Prefixed<T, P>`: `T` with every key renamed to `P` followed by the key; the values unchanged.",
+            "hint": "Key remapping: `[K in keyof T as …]`.",
+            "hints": [
+              "Key remapping: `[K in keyof T as …]`.",
+              "A template literal builds the new key; `K & string` keeps only string keys."
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<Prefixed<{ id: number; name: string }, \"user_\">, { user_id: number; user_name: string }>>;\ntype _2 = Expect<Equal<Prefixed<{ x: 1 }, \"\">, { x: 1 }>>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type Prefixed<T, P extends string> = ____;\n",
+            "solution": "type Prefixed<T, P extends string> = { [K in keyof T as `${P}${K & string}`]: T[K] };\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w20-t-rename-key",
+            "title": "Rename one key",
+            "prompt": "Write `RenameKey<T, From, To>`: `T` with the key `From` renamed to `To`, every other key unchanged.",
+            "hint": "The `as` clause can decide the new name per key.",
+            "hints": [
+              "The `as` clause can decide the new name per key.",
+              "`K extends From ? To : K`."
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Hard",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<RenameKey<{ id: number; name: string }, \"id\", \"key\">, { key: number; name: string }>>;\ntype _2 = Expect<Equal<RenameKey<{ a: 1; b: 2 }, \"b\", \"c\">, { a: 1; c: 2 }>>;\n// @ts-expect-error — \"zip\" is not a key\ntype _3 = RenameKey<{ a: 1 }, \"zip\", \"z\">;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type RenameKey<T, From extends keyof T, To extends string> = ____;\n",
+            "solution": "type RenameKey<T, From extends keyof T, To extends string> = { [K in keyof T as K extends From ? To : K]: T[K] };\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w20-t-returns",
+            "title": "What every handler returns",
+            "prompt": "`handlers` maps names to functions. Write `Returns<T>`: the same keys, each mapped to what that function returns.",
+            "hint": "Map over the keys and keep them.",
+            "hints": [
+              "Map over the keys and keep them.",
+              "`ReturnType<T[K]>` for each value."
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\nconst handlers = { count: () => 3, label: (n: number) => `#${n}`, ok: () => true };\ntype _1 = Expect<Equal<Returns<typeof handlers>, { count: number; label: string; ok: boolean }>>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type Returns<T extends Record<string, (...args: never[]) => unknown>> = ____;\n",
+            "solution": "type Returns<T extends Record<string, (...args: never[]) => unknown>> = { [K in keyof T]: ReturnType<T[K]> };\n",
             "tests": [],
             "source_slug": "",
             "dataset": ""
@@ -26328,6 +26724,72 @@
             ],
             "source_slug": "",
             "dataset": ""
+          },
+          {
+            "id": "tsm-w21-t-is-async",
+            "title": "Does it return a promise?",
+            "prompt": "Write `IsAsync<F>`: `true` when the function type `F` returns a `Promise`, otherwise `false`.",
+            "hint": "Match the function against a shape whose return is `Promise<unknown>`.",
+            "hints": [
+              "Match the function against a shape whose return is `Promise<unknown>`.",
+              "Parameters: `(...args: never[])` accepts any list."
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<IsAsync<() => Promise<void>>, true>>;\ntype _2 = Expect<Equal<IsAsync<(n: number) => number>, false>>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type IsAsync<F> = ____;\n",
+            "solution": "type IsAsync<F> = F extends (...args: never[]) => Promise<unknown> ? true : false;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w21-t-tail",
+            "title": "Everything but the first",
+            "prompt": "Write `Tail<T>`: the tuple `T` without its first element; `[]` for an empty tuple.",
+            "hint": "Match `[first, ...rest]` with `infer` on the rest.",
+            "hints": [
+              "Match `[first, ...rest]` with `infer` on the rest.",
+              "`T extends [unknown, ...infer R] ? R : []`."
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<Tail<[1, 2, 3]>, [2, 3]>>;\ntype _2 = Expect<Equal<Tail<[\"only\"]>, []>>;\ntype _3 = Expect<Equal<Tail<[]>, []>>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type Tail<T extends unknown[]> = ____;\n",
+            "solution": "type Tail<T extends unknown[]> = T extends [unknown, ...infer R] ? R : [];\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w21-t-props-of",
+            "title": "The props of a component",
+            "prompt": "A component here is a function taking one props object. Write `PropsOf<C>`: that props type; `never` for anything else.",
+            "hint": "`infer` the parameter's type.",
+            "hints": [
+              "`infer` the parameter's type.",
+              "`C extends (props: infer P) => unknown ? P : never`."
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ndeclare function Button(props: { label: string; onClick: () => void }): string;\ntype _1 = Expect<Equal<PropsOf<typeof Button>, { label: string; onClick: () => void }>>;\ntype _2 = Expect<Equal<PropsOf<42>, never>>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type PropsOf<C> = ____;\n",
+            "solution": "type PropsOf<C> = C extends (props: infer P) => unknown ? P : never;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
           }
         ],
         "optional": false,
@@ -26538,6 +27000,72 @@
             "forbid": [],
             "starter": "type UnionToIntersection<U> = ____;\n",
             "solution": "type UnionToIntersection<U> = (U extends unknown ? (x: U) => void : never) extends (x: infer I) => void ? I : never;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w21-t-map-value",
+            "title": "The value type of a Map",
+            "prompt": "Write `MapValue<M>`: for a `Map`, the type of its values; `never` for anything else.",
+            "hint": "`infer` the second type argument of `Map`.",
+            "hints": [
+              "`infer` the second type argument of `Map`.",
+              "`M extends Map<unknown, infer V> ? V : never`."
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<MapValue<Map<string, number[]>>, number[]>>;\ntype _2 = Expect<Equal<MapValue<Map<\"a\", \"b\">>, \"b\">>;\ntype _3 = Expect<Equal<MapValue<Set<number>>, never>>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type MapValue<M> = ____;\n",
+            "solution": "type MapValue<M> = M extends Map<unknown, infer V> ? V : never;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w21-t-to-array",
+            "title": "Wrap in an array unless it is one",
+            "prompt": "Write `ToArray<T>`: `T` itself when it is an array, otherwise `T[]`. It must distribute over unions.",
+            "hint": "A conditional on a naked type parameter distributes.",
+            "hints": [
+              "A conditional on a naked type parameter distributes.",
+              "`T extends unknown[] ? T : T[]`."
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<ToArray<string>, string[]>>;\ntype _2 = Expect<Equal<ToArray<number[]>, number[]>>;\ntype _3 = Expect<Equal<ToArray<string | number[]>, string[] | number[]>>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type ToArray<T> = ____;\n",
+            "solution": "type ToArray<T> = T extends unknown[] ? T : T[];\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w21-t-arity",
+            "title": "How many parameters?",
+            "prompt": "Write `Arity<F>`: the number of parameters of the function type `F`, as a number literal.",
+            "hint": "`infer` the parameter list as a tuple.",
+            "hints": [
+              "`infer` the parameter list as a tuple.",
+              "A tuple's `length` is a number literal."
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<Arity<(a: string, b: number) => void>, 2>>;\ntype _2 = Expect<Equal<Arity<() => void>, 0>>;\ntype _3 = Expect<Equal<Arity<string>, never>>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type Arity<F> = ____;\n",
+            "solution": "type Arity<F> = F extends (...args: infer A) => unknown ? A[\"length\"] : never;\n",
             "tests": [],
             "source_slug": "",
             "dataset": ""
@@ -27457,6 +27985,72 @@
             ],
             "source_slug": "",
             "dataset": ""
+          },
+          {
+            "id": "tsm-w22-t-dot-join",
+            "title": "Join two path segments",
+            "prompt": "Write `DotJoin<A, B>`: `A.B`, except that an empty `A` gives just `B`.",
+            "hint": "Check for the empty string first.",
+            "hints": [
+              "Check for the empty string first.",
+              "Otherwise a template literal joins them with a dot."
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<DotJoin<\"user\", \"name\">, \"user.name\">>;\ntype _2 = Expect<Equal<DotJoin<\"\", \"id\">, \"id\">>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type DotJoin<A extends string, B extends string> = ____;\n",
+            "solution": "type DotJoin<A extends string, B extends string> = A extends \"\" ? B : `${A}.${B}`;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w22-t-str-length",
+            "title": "The length of a string literal",
+            "prompt": "Write `StrLength<S>`: the number of characters in the string literal `S`, as a number literal. Count with an accumulator tuple.",
+            "hint": "`${infer First}${infer Rest}` takes one character off the front.",
+            "hints": [
+              "`${infer First}${infer Rest}` takes one character off the front.",
+              "Grow the accumulator by one per character and read its `length` at the end."
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<StrLength<\"hello\">, 5>>;\ntype _2 = Expect<Equal<StrLength<\"\">, 0>>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type StrLength<S extends string, Acc extends unknown[] = []> =\n  ____;\n",
+            "solution": "type StrLength<S extends string, Acc extends unknown[] = []> =\n  S extends `${infer _First}${infer Rest}` ? StrLength<Rest, [...Acc, unknown]> : Acc[\"length\"];\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w22-t-getter-name",
+            "title": "Getter names from keys",
+            "prompt": "Write `GetterName<K>`: `get` followed by the capitalised key. Given a union of keys it must give the union of getter names.",
+            "hint": "A template literal type with `Capitalize`.",
+            "hints": [
+              "A template literal type with `Capitalize`.",
+              "Template literals distribute over unions on their own."
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<GetterName<\"id\">, \"getId\">>;\ntype _2 = Expect<Equal<GetterName<\"id\" | \"name\">, \"getId\" | \"getName\">>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type GetterName<K extends string> = ____;\n",
+            "solution": "type GetterName<K extends string> = `get${Capitalize<K>}`;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
           }
         ],
         "optional": false,
@@ -27649,6 +28243,72 @@
             "forbid": [],
             "starter": "type Paths<T> = ____;\n",
             "solution": "type Paths<T> = T extends object\n  ? { [K in keyof T & string]: T[K] extends object ? K | `${K}.${Paths<T[K]>}` : K }[keyof T & string]\n  : never;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w22-t-title-case",
+            "title": "Title Case, as a type",
+            "prompt": "Write `TitleCase<S>`: every space-separated word of `S` capitalised.",
+            "hint": "Split off the first word at the first space.",
+            "hints": [
+              "Split off the first word at the first space.",
+              "Capitalise it and recurse on the rest."
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<TitleCase<\"hello typed world\">, \"Hello Typed World\">>;\ntype _2 = Expect<Equal<TitleCase<\"one\">, \"One\">>;\ntype _3 = Expect<Equal<TitleCase<\"\">, \"\">>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type TitleCase<S extends string> = ____;\n",
+            "solution": "type TitleCase<S extends string> = S extends `${infer W} ${infer Rest}` ? `${Capitalize<W>} ${TitleCase<Rest>}` : Capitalize<S>;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w22-t-repeat",
+            "title": "Repeat a string",
+            "prompt": "Write `Repeat<S, N>`: the string `S` repeated `N` times. Count with an accumulator tuple.",
+            "hint": "Stop when the accumulator's length reaches `N`.",
+            "hints": [
+              "Stop when the accumulator's length reaches `N`.",
+              "Otherwise put one `S` in front and recurse with one more element."
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Hard",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<Repeat<\"ab\", 3>, \"ababab\">>;\ntype _2 = Expect<Equal<Repeat<\"x\", 0>, \"\">>;\ntype _3 = Expect<Equal<Repeat<\"-\", 1>, \"-\">>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type Repeat<S extends string, N extends number, Acc extends unknown[] = []> =\n  ____;\n",
+            "solution": "type Repeat<S extends string, N extends number, Acc extends unknown[] = []> =\n  Acc[\"length\"] extends N ? \"\" : `${S}${Repeat<S, N, [...Acc, unknown]>}`;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w22-t-ends-with",
+            "title": "Ends with",
+            "prompt": "Write `EndsWith<S, Suffix>`: `true` when the string `S` ends with `Suffix`, otherwise `false`.",
+            "hint": "A template literal pattern can start with `${string}`.",
+            "hints": [
+              "A template literal pattern can start with `${string}`.",
+              "`S extends `${string}${Suffix}``."
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<EndsWith<\"report.ts\", \".ts\">, true>>;\ntype _2 = Expect<Equal<EndsWith<\"report.js\", \".ts\">, false>>;\ntype _3 = Expect<Equal<EndsWith<\"a\", \"\">, true>>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type EndsWith<S extends string, Suffix extends string> = ____;\n",
+            "solution": "type EndsWith<S extends string, Suffix extends string> = S extends `${string}${Suffix}` ? true : false;\n",
             "tests": [],
             "source_slug": "",
             "dataset": ""

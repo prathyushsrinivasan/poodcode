@@ -6548,7 +6548,7 @@ if os.path.exists(_mst_path):
     # checked by mastery_ts_attach.py).
     for _mst_extra in ["mastery_ts_cards.py", "mastery_ts_quiz.py", "mastery_ts_practice.py",
                        "mastery_ts_kit.py"] + [f"mastery_ts_more_m{_n}.py" for _n in range(1, 7)] + [
-                       "mastery_ts_w27.py", "mastery_ts_finals.py", "mastery_ts_alternates.py",
+                       "mastery_ts_types_more.py", "mastery_ts_w27.py", "mastery_ts_finals.py", "mastery_ts_alternates.py",
                        "mastery_ts_final_exam.py", "mastery_ts_attach.py"]:
         _mstc_path = os.path.join(HERE, _mst_extra)
         if not os.path.exists(_mstc_path):
