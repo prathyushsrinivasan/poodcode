@@ -977,7 +977,9 @@ function ExerciseCard({
   const [report, setReport] = useState<JudgeReport | null>(null);
   const [running, setRunning] = useState(false);
   const [err, setErr] = useState("");
-  const [showHint, setShowHint] = useState(false);
+  const [hintsShown, setHintsShown] = useState(0);
+  // X-18: a ladder (nudge → strategy → near-answer), one rung at a time.
+  const hintLadder = exercise.hints && exercise.hints.length > 0 ? exercise.hints : exercise.hint ? [exercise.hint] : [];
   const [showSolution, setShowSolution] = useState(false);
   // The SQL track's scratch run: the learner's query against the base dataset,
   // showing whatever it returns rather than a pass/fail. Looking at the wrong
@@ -1129,9 +1131,13 @@ function ExerciseCard({
         <button className="ghost" onClick={reset} disabled={running}>
           Reset
         </button>
-        {exercise.hint && (
-          <button className="ghost" onClick={() => setShowHint((s) => !s)}>
-            {showHint ? "Hide hint" : "Hint"}
+        {hintsShown < hintLadder.length && (
+          <button className="ghost" data-hint-next onClick={() => setHintsShown((n) => n + 1)}>
+            {hintsShown === 0
+              ? hintLadder.length > 1
+                ? `Hint (${hintLadder.length})`
+                : "Hint"
+              : `Next hint (${hintsShown}/${hintLadder.length})`}
           </button>
         )}
         <button className="ghost" onClick={() => setShowSolution((s) => !s)}>
@@ -1151,13 +1157,20 @@ function ExerciseCard({
         </p>
       )}
 
-      {showHint && exercise.hint && (
+      {hintsShown > 0 && (
         <div
           className="card"
           style={{ marginTop: 10, marginBottom: 0, background: "var(--accent-dim)" }}
         >
-          <div className="io-label" style={{ color: "var(--accent)" }}>Hint</div>
-          <p style={{ margin: 0 }}>{exercise.hint}</p>
+          <div className="io-label" style={{ color: "var(--accent)" }}>
+            {hintLadder.length > 1 ? `Hints (${hintsShown}/${hintLadder.length})` : "Hint"}
+          </div>
+          {hintLadder.slice(0, hintsShown).map((h, i) => (
+            <p key={i} style={{ margin: i === 0 ? 0 : "6px 0 0" }}>
+              {hintLadder.length > 1 && <strong>{i + 1}. </strong>}
+              {h}
+            </p>
+          ))}
         </div>
       )}
 

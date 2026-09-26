@@ -113,3 +113,9 @@ def _lint_ts_scope(weeks):
 
 
 _lint_ts_scope(TS_WEEKS)
+
+
+# Hint ladders (X-18, ts_hint_ladders.py) for every practice item and problem.
+for _sc_w in TS_WEEKS:
+    for _sc_ex in _sc_w.get("practice", []) + _sc_w.get("problem_set", []):
+        _ts_ladder(_sc_ex)

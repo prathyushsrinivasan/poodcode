@@ -6487,7 +6487,11 @@
             "output": "-3"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Number(input) turns the text into a real number; store it with const n = ... .",
+          "The answer begins `const n: number …`"
+        ]
       },
       {
         "id": "ts_variables-let",
@@ -6513,7 +6517,11 @@
             "output": "6"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Only let allows the reassignment `total = total + 10` on the next line.",
+          "The answer begins `let total …`"
+        ]
       },
       {
         "id": "ts_variables-swap",
@@ -6539,7 +6547,11 @@
             "output": "9 9"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Save one value in a tmp box before overwriting it, or you lose it.",
+          "The reference solution is 6 lines and begins: `let first = a;`"
+        ]
       },
       {
         "id": "ts_variables-challenge",
@@ -6569,7 +6581,12 @@
             "output": "0\n0\n0"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Read the two numbers, then compute and log each result on its own line.",
+          "The reference solution uses `split` and `map`.",
+          "The reference solution is 7 lines and begins: `const [a, b] = input.split(/\\s+/).map(Number);`"
+        ]
       }
     ],
     "cards": [],
@@ -6610,7 +6627,11 @@
             "output": "false"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "A comparison like n > 0 already produces a boolean.",
+          "The answer begins `const isPositive: boolean = …`"
+        ]
       },
       {
         "id": "ts_types-convert",
@@ -6636,7 +6657,11 @@
             "output": "0"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Without Number(), \"41\" + 1 would be \"411\". Convert first.",
+          "The answer begins `const value: number …`"
+        ]
       },
       {
         "id": "ts_types-rect",
@@ -6662,7 +6687,11 @@
             "output": "14"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Area is width times height.",
+          "The reference solution is 2 lines and begins: `const area: number = w * h;`"
+        ]
       },
       {
         "id": "ts_types-challenge",
@@ -6692,7 +6721,12 @@
             "output": "100\n1"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "cents is an integer; dividing by 100 gives a decimal `number` like 0.25.",
+          "The reference solution uses `split` and `map`.",
+          "The reference solution is 5 lines and begins: `const [q, d, n, p] = input.split(/\\s+/).map(Number);`"
+        ]
       }
     ],
     "cards": [],
@@ -6733,7 +6767,11 @@
             "output": "0"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "const total = a + b;  — its type is inferred as number.",
+          "The answer begins `const total = …`"
+        ]
       },
       {
         "id": "ts_inference-unknown",
@@ -6759,7 +6797,11 @@
             "output": "ABC"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "typeof raw === \"string\" tells TypeScript (and you) it is safe to call string methods.",
+          "The answer begins `typeof raw …`"
+        ]
       },
       {
         "id": "ts_inference-larger",
@@ -6785,7 +6827,11 @@
             "output": "5"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "A ternary a > b ? a : b picks the larger value.",
+          "The reference solution is 2 lines and begins: `const larger = a > b ? a : b;`"
+        ]
       },
       {
         "id": "ts_inference-challenge",
@@ -6815,7 +6861,12 @@
             "output": "10\n10\n0"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Math.min(...nums) and Math.max(...nums) spread the array as arguments.",
+          "The reference solution uses `split`, `map` and `Math`.",
+          "The reference solution is 6 lines and begins: `const nums = input.split(/\\s+/).map(Number);`"
+        ]
       }
     ],
     "cards": [],
@@ -6856,7 +6907,11 @@
             "output": "Hi, Grace Hopper!"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Backticks let you embed ${name} straight into the text.",
+          "The answer begins ``Hi, …`"
+        ]
       },
       {
         "id": "ts_strings-upper",
@@ -6882,7 +6937,11 @@
             "output": "ABC DEF"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "String methods are camelCase: s.toUpperCase().",
+          "The answer is 15 characters long and begins `s.toUpp`."
+        ]
       },
       {
         "id": "ts_strings-length",
@@ -6908,7 +6967,11 @@
             "output": "8"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "s.length (no parentheses) gives the character count.",
+          "The answer is 8 characters long and begins `s.le`."
+        ]
       },
       {
         "id": "ts_strings-reverse",
@@ -6934,7 +6997,12 @@
             "output": "racecar"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Spread into an array of characters, reverse it, then .join(\"\").",
+          "The reference solution uses `join`.",
+          "The reference solution is 2 lines and begins: `const reversed = [...s].reverse().join(\"\");`"
+        ]
       },
       {
         "id": "ts_strings-challenge",
@@ -6964,7 +7032,12 @@
             "output": "JVN"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Split on spaces, take w[0] of each word, uppercase it, then join with \"\".",
+          "The reference solution uses `split`, `map` and `join`.",
+          "The reference solution is 3 lines and begins: `const words = input.split(/\\s+/);`"
+        ]
       }
     ],
     "cards": [],
@@ -7005,7 +7078,11 @@
             "output": "1"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "% is the remainder operator.",
+          "The answer begins `n % …`"
+        ]
       },
       {
         "id": "ts_operators-nullish",
@@ -7031,7 +7108,11 @@
             "output": "80"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "a ?? b gives b only when a is null or undefined.",
+          "The answer begins `value ?? …`"
+        ]
       },
       {
         "id": "ts_operators-ternary",
@@ -7057,7 +7138,11 @@
             "output": "zero"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "cond1 ? a : cond2 ? b : c chains two decisions.",
+          "The answer begins `n > 0 ? \"pos\" : n …`"
+        ]
       },
       {
         "id": "ts_operators-challenge",
@@ -7087,7 +7172,12 @@
             "output": "0\nfalse\ntrue"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "A comparison like a === b evaluates to true or false — log it directly.",
+          "The reference solution uses `split` and `map`.",
+          "The reference solution is 4 lines and begins: `const [a, b] = input.split(/\\s+/).map(Number);`"
+        ]
       }
     ],
     "cards": [],
@@ -7128,7 +7218,11 @@
             "output": "Even"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "A number is even when n % 2 === 0.",
+          "The answer begins `n % 2 …`"
+        ]
       },
       {
         "id": "ts_conditionals-truthy",
@@ -7154,7 +7248,11 @@
             "output": "no"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "0 is falsy, so an empty string's length of 0 takes the else branch.",
+          "The answer is 14 characters long and begins `trimmed`."
+        ]
       },
       {
         "id": "ts_conditionals-switch",
@@ -7180,7 +7278,11 @@
             "output": "Keep going"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "switch (grade) { ... } compares grade against each case with ===.",
+          "The answer begins `switch (grade) …`"
+        ]
       },
       {
         "id": "ts_conditionals-challenge",
@@ -7214,7 +7316,11 @@
             "output": "F"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Check the highest threshold first; each `else if` handles the next band down.",
+          "The reference solution is 8 lines and begins: `const score = Number(input);`"
+        ]
       }
     ],
     "cards": [],
@@ -7255,7 +7361,11 @@
             "output": "5"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "for (const x of nums) gives you each element, not its index.",
+          "The answer begins `for (const x …`"
+        ]
       },
       {
         "id": "ts_loops-count",
@@ -7281,7 +7391,11 @@
             "output": "0"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Valid indexes run 0 .. nums.length - 1, so the guard is i < nums.length.",
+          "The answer begins `i < …`"
+        ]
       },
       {
         "id": "ts_loops-firstover",
@@ -7307,7 +7421,12 @@
             "output": "5"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Default the answer to -1, then break as soon as you find one bigger than t.",
+          "The reference solution uses a `for` loop.",
+          "The reference solution is 8 lines and begins: `let answer = -1;`"
+        ]
       },
       {
         "id": "ts_loops-challenge",
@@ -7337,7 +7456,12 @@
             "output": "1\n2\nFizz\n4\nBuzz\nFizz\n7\n8\nFizz\nBuzz\n11\nFizz\n13\n14\nFizzBuzz"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Test the both-case (i % 15 === 0) first, or 15 prints Fizz instead of FizzBuzz.",
+          "The reference solution uses a `for` loop.",
+          "The reference solution is 7 lines and begins: `const n = Number(input);`"
+        ]
       }
     ],
     "cards": [],
@@ -7378,7 +7502,11 @@
             "output": "0"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "return x + y;",
+          "The answer begins `return x …`"
+        ]
       },
       {
         "id": "ts_functions-arrow",
@@ -7404,7 +7532,11 @@
             "output": "-6"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "(x: number): number => x * 2 — a single expression, so no braces or return.",
+          "The answer begins `(x: number): number => …`"
+        ]
       },
       {
         "id": "ts_functions-callback",
@@ -7430,7 +7562,11 @@
             "output": "8"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Functions are values — store the chosen one in fn, then call fn(a, b).",
+          "The reference solution is 2 lines and begins: `const fn = op === \"+\" ? add : mul;`"
+        ]
       },
       {
         "id": "ts_functions-challenge",
@@ -7464,7 +7600,12 @@
             "output": "0"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "isPrime(x): false below 2, otherwise no divisor d with d*d <= x divides it.",
+          "The reference solution uses a `for` loop.",
+          "The reference solution is 9 lines and begins: `const n = Number(input);`"
+        ]
       }
     ],
     "cards": [],
@@ -7505,7 +7646,11 @@
             "output": "Hello, Cid!"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "A default is written param: type = value, e.g. greeting: string = \"Hello\".",
+          "The answer begins `greeting: string …`"
+        ]
       },
       {
         "id": "ts_params-rest",
@@ -7531,7 +7676,11 @@
             "output": "60"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "A rest parameter uses ... and collects arguments into an array: ...xs: number[].",
+          "The answer begins `...xs: …`"
+        ]
       },
       {
         "id": "ts_params-optional",
@@ -7557,7 +7706,12 @@
             "output": "12"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Mark h optional with h?, then use h ?? w so a missing h becomes w (a square).",
+          "The reference solution uses `??`.",
+          "The reference solution is 5 lines and begins: `function area(w: number, h?: number): number {`"
+        ]
       },
       {
         "id": "ts_params-challenge",
@@ -7587,7 +7741,12 @@
             "output": "100 99"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Call clamp(x) with just one argument — the defaults supply lo and hi.",
+          "The reference solution uses `split`, `map` and `join`.",
+          "The reference solution is 7 lines and begins: `const nums = input.split(/\\s+/).map(Number);`"
+        ]
       }
     ],
     "cards": [],
@@ -7628,7 +7787,11 @@
             "output": "south"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Chain ternaries: dir === \"N\" ? \"north\" : dir === \"S\" ? ... .",
+          "The answer begins `dir === \"N\" ? \"north\" : dir === \"S\" ? …`"
+        ]
       },
       {
         "id": "ts_unions-strnum",
@@ -7654,7 +7817,11 @@
             "output": "-3"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Pick the number for the n case, otherwise keep the string.",
+          "The answer begins `parts[0] === \"n\" ? …`"
+        ]
       },
       {
         "id": "ts_unions-status",
@@ -7680,7 +7847,11 @@
             "output": "code 404"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Handle the number member first with typeof, then the two string literals.",
+          "The reference solution is 7 lines and begins: `if (typeof status === \"number\") {`"
+        ]
       },
       {
         "id": "ts_unions-challenge",
@@ -7710,7 +7881,12 @@
             "output": "3 -3"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Map each direction letter to a (dx, dy) step, then accumulate x and y.",
+          "The reference solution uses `split` and a `for` loop.",
+          "The reference solution is 14 lines and begins: `type Dir = \"N\" | \"S\" | \"E\" | \"W\";`"
+        ]
       }
     ],
     "cards": [],
@@ -7751,7 +7927,11 @@
             "output": "10"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Distance from the origin is sqrt(x*x + y*y).",
+          "The answer begins `return Math.sqrt(p.x * p.x …`"
+        ]
       },
       {
         "id": "ts_aliases-build",
@@ -7777,7 +7957,11 @@
             "output": "Cid is 7"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "age must be a number, so wrap parts[1] in Number(...).",
+          "The answer begins `{ name: parts[0], …`"
+        ]
       },
       {
         "id": "ts_aliases-points",
@@ -7803,7 +7987,12 @@
             "output": "5"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Step by 2 to read each x,y pair; then add up x + y for every point.",
+          "The reference solution uses a `for` loop.",
+          "The reference solution is 9 lines and begins: `const points: Point[] = [];`"
+        ]
       },
       {
         "id": "ts_aliases-challenge",
@@ -7833,7 +8022,12 @@
             "output": "20\ntotal 20"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Parse each line into a { w, h } object, then loop to print areas and sum them.",
+          "The reference solution uses `split`, `map` and a `for` loop.",
+          "The reference solution is 12 lines and begins: `interface Rect { w: number; h: number; }`"
+        ]
       }
     ],
     "cards": [],
@@ -7874,7 +8068,11 @@
             "output": "double -6"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "typeof value === \"number\" lets you safely do value * 2 inside the branch.",
+          "The answer begins `typeof value …`"
+        ]
       },
       {
         "id": "ts_narrowing-in",
@@ -7900,7 +8098,11 @@
             "output": "20"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "\"radius\" in shape is true only for the circle variant.",
+          "The answer begins `\"radius\" in …`"
+        ]
       },
       {
         "id": "ts_narrowing-discriminated",
@@ -7926,7 +8128,11 @@
             "output": "300"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Switch on s.kind; inside each branch TypeScript knows which fields exist.",
+          "The reference solution is 5 lines and begins: `if (s.kind === \"circle\") {`"
+        ]
       },
       {
         "id": "ts_narrowing-challenge",
@@ -7956,7 +8162,12 @@
             "output": "15 1"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Number(t) is NaN for a non-numeric token — that check narrows it to a word.",
+          "The reference solution uses `split` and a `for` loop.",
+          "The reference solution is 10 lines and begins: `const tokens = input.split(/\\s+/);`"
+        ]
       }
     ],
     "cards": [],
@@ -7997,7 +8208,11 @@
             "output": "4"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "arr.push(x) appends x to the end.",
+          "The answer is 21 characters long and begins `nums.push(`."
+        ]
       },
       {
         "id": "ts_arrays-last",
@@ -8023,7 +8238,11 @@
             "output": "9"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "The last index is length - 1.",
+          "The answer begins `nums[nums.length - …`"
+        ]
       },
       {
         "id": "ts_arrays-tuple",
@@ -8049,7 +8268,11 @@
             "output": "7 7"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "A tuple is just a fixed-length array; put the second element first.",
+          "The answer begins `[pair[1], …`"
+        ]
       },
       {
         "id": "ts_arrays-middle",
@@ -8075,7 +8298,12 @@
             "output": "6 7"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "slice(1, length - 1) keeps everything between the ends (end index is exclusive).",
+          "The reference solution uses `join` and `slice`.",
+          "The reference solution is 2 lines and begins: `const middle = nums.slice(1, nums.length - 1);`"
+        ]
       },
       {
         "id": "ts_arrays-challenge",
@@ -8105,7 +8333,12 @@
             "output": "2 1"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Take the last k with slice(len-k), then the rest, and spread them into one array.",
+          "The reference solution uses `split`, `map`, `join` and `slice`.",
+          "The reference solution is 5 lines and begins: `const lines = input.split(\"\\n\");`"
+        ]
       }
     ],
     "cards": [],
@@ -8146,7 +8379,11 @@
             "output": "4 16"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "map transforms each element: nums.map(x => x * x).",
+          "The answer begins `nums.map(x => x …`"
+        ]
       },
       {
         "id": "ts_array_methods-filter",
@@ -8172,7 +8409,11 @@
             "output": "10 20"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "filter keeps elements whose callback returns true.",
+          "The answer begins `nums.filter(x => x % …`"
+        ]
       },
       {
         "id": "ts_array_methods-reduce",
@@ -8198,7 +8439,11 @@
             "output": "5"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "reduce((acc, x) => acc + x, 0) folds the list to a single sum.",
+          "The answer begins `nums.reduce((a, x) => a …`"
+        ]
       },
       {
         "id": "ts_array_methods-pipeline",
@@ -8224,7 +8469,12 @@
             "output": "35"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Chain the three methods; each returns a new array for the next.",
+          "The reference solution uses `reduce`, `map` and `filter`.",
+          "The reference solution is 5 lines and begins: `const answer = nums`"
+        ]
       },
       {
         "id": "ts_array_methods-challenge",
@@ -8254,7 +8504,12 @@
             "output": "7\n0\n7"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "reduce folds to the sum/max; filter(...).length counts the evens.",
+          "The reference solution uses `split`, `reduce`, `map` and `filter`.",
+          "The reference solution is 7 lines and begins: `const nums = input.split(/\\s+/).map(Number);`"
+        ]
       }
     ],
     "cards": [],
@@ -8295,7 +8550,11 @@
             "output": "Cid"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Access object fields with a dot: user.name.",
+          "The answer is 9 characters long and begins `user`."
+        ]
       },
       {
         "id": "ts_objects-count",
@@ -8321,7 +8580,11 @@
             "output": "1"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "counts[w] = (counts[w] ?? 0) + 1 — the ?? handles the first time you see w.",
+          "The answer begins `counts[w] = (counts[w] ?? …`"
+        ]
       },
       {
         "id": "ts_objects-entries",
@@ -8347,7 +8610,12 @@
             "output": "5"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Object.entries(obj) yields [key, value] pairs you can destructure.",
+          "The reference solution uses a `for` loop and `Object.entries`.",
+          "The reference solution is 5 lines and begins: `let total = 0;`"
+        ]
       },
       {
         "id": "ts_objects-challenge",
@@ -8377,7 +8645,12 @@
             "output": "cat 2"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Tally into counts[w], then scan the words keeping the first that beats the max.",
+          "The reference solution uses `split`, `filter`, a `for` loop and `??`.",
+          "The reference solution is 12 lines and begins: `const words = input.split(/\\s+/).filter(w => w !== \"\");`"
+        ]
       }
     ],
     "cards": [],
@@ -8418,7 +8691,11 @@
             "output": "4"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "A Set ignores duplicates, so seen.add(x) then seen.size gives the distinct count.",
+          "The answer is 12 characters long and begins `seen.a`."
+        ]
       },
       {
         "id": "ts_maps_sets-map",
@@ -8444,7 +8721,11 @@
             "output": "2"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "freq.set(w, (freq.get(w) ?? 0) + 1) is the Map counting pattern.",
+          "The answer begins `freq.set(w, (freq.get(w) ?? …`"
+        ]
       },
       {
         "id": "ts_maps_sets-firstdup",
@@ -8470,7 +8751,12 @@
             "output": "5"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Check seen.has(x) BEFORE adding x; the first hit is your answer.",
+          "The reference solution uses a `Set` and a `for` loop.",
+          "The reference solution is 10 lines and begins: `const seen = new Set<number>();`"
+        ]
       },
       {
         "id": "ts_maps_sets-challenge",
@@ -8500,7 +8786,12 @@
             "output": "9"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Count first, then scan in original order for the first value with count === 1.",
+          "The reference solution uses `split`, a `Map`, `map`, a `for` loop and `??`.",
+          "The reference solution is 11 lines and begins: `const nums = input.split(/\\s+/).map(Number);`"
+        ]
       }
     ],
     "cards": [],
@@ -8541,7 +8832,11 @@
             "output": "W"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "(idx + 1) % 4 wraps from the last direction back to the first.",
+          "The answer begins `order[(idx + 1) …`"
+        ]
       },
       {
         "id": "ts_enums-const",
@@ -8567,7 +8862,11 @@
             "output": "error"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Index the object with the key: Status[code as Key].",
+          "The answer begins `Status[code as …`"
+        ]
       },
       {
         "id": "ts_enums-traffic",
@@ -8593,7 +8892,11 @@
             "output": "slow"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Handle red and yellow explicitly; green is the remaining case.",
+          "The reference solution is 5 lines and begins: `function action(c: Light): string {`"
+        ]
       },
       {
         "id": "ts_enums-challenge",
@@ -8627,7 +8930,12 @@
             "output": "E"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Index into [\"N\",\"E\",\"S\",\"W\"]; R is +1 mod 4, L is +3 mod 4 (same as −1).",
+          "The reference solution uses `split` and a `for` loop.",
+          "The reference solution is 8 lines and begins: `type Dir = \"N\" | \"E\" | \"S\" | \"W\";`"
+        ]
       }
     ],
     "cards": [],
@@ -8668,7 +8976,11 @@
             "output": "5"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "The type variable goes in angle brackets: function first<T>(arr: T[]): T.",
+          "The answer begins `function first<T>(arr: T[]): …`"
+        ]
       },
       {
         "id": "ts_generics-last",
@@ -8694,7 +9006,11 @@
             "output": "7"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "The last index is arr.length - 1.",
+          "The answer begins `return arr[arr.length …`"
+        ]
       },
       {
         "id": "ts_generics-longest",
@@ -8720,7 +9036,11 @@
             "output": "2"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "The constraint { length: number } lets you compare .length; use >= so ties keep x.",
+          "The reference solution is 4 lines and begins: `function longest<T extends { length: number }>(x: T, y: T): T {`"
+        ]
       },
       {
         "id": "ts_generics-challenge",
@@ -8750,7 +9070,12 @@
             "output": "dog cat\n2"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Track seen values in a Set<T>; push only the first time you see each one.",
+          "The reference solution uses `split`, a `Set`, `filter`, `join` and a `for` loop.",
+          "The reference solution is 15 lines and begins: `function unique<T>(arr: T[]): T[] {`"
+        ]
       }
     ],
     "cards": [],
@@ -8791,7 +9116,11 @@
             "output": "5"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Assign the parameter to the field with this.count = start;.",
+          "The answer begins `this.count = …`"
+        ]
       },
       {
         "id": "ts_classes-method",
@@ -8817,7 +9146,11 @@
             "output": "14"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Inside a method, read fields via this: this.width * this.height.",
+          "The answer begins `return this.width …`"
+        ]
       },
       {
         "id": "ts_classes-inherit",
@@ -8843,7 +9176,12 @@
             "output": "Max barks"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "extends Animal, then redefine speak() to return the barking message.",
+          "The reference solution uses a class.",
+          "The reference solution is 5 lines and begins: `class Dog extends Animal {`"
+        ]
       },
       {
         "id": "ts_classes-challenge",
@@ -8873,7 +9211,12 @@
             "output": "50 0"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Keep balance and a rejected counter as private fields; guard withdraw before subtracting.",
+          "The reference solution uses `split`, a `for` loop and a class.",
+          "The reference solution is 22 lines and begins: `class Account {`"
+        ]
       }
     ],
     "cards": [],
@@ -8914,7 +9257,11 @@
             "output": "14"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "A getter is accessed like a field: r.area, not r.area().",
+          "The answer is 6 characters long and begins `r.a`."
+        ]
       },
       {
         "id": "ts_this_accessors-setter",
@@ -8940,7 +9287,11 @@
             "output": "100"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "A setter runs on assignment: b.square = side; sets both width and height.",
+          "The answer begins `b.square = …`"
+        ]
       },
       {
         "id": "ts_this_accessors-account",
@@ -8966,7 +9317,11 @@
             "output": "70"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Inside deposit, update the field: this.balance += amount;.",
+          "The reference solution is 3 lines and begins: `deposit(amount: number): void {`"
+        ]
       },
       {
         "id": "ts_this_accessors-challenge",
@@ -8996,7 +9351,12 @@
             "output": "-40"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "A getter is read like a property: t.fahrenheit (no parentheses).",
+          "The reference solution uses `split`, `map`, `join` and a class.",
+          "The reference solution is 10 lines and begins: `class Temp {`"
+        ]
       }
     ],
     "cards": [],
@@ -9037,7 +9397,11 @@
             "output": "0"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Prefix the declaration with export: export function add(...) { ... }.",
+          "The answer begins `export function add(x: number, …`"
+        ]
       },
       {
         "id": "ts_modules-use",
@@ -9063,7 +9427,11 @@
             "output": "0"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Multiply price by the exported constant TAX.",
+          "The answer begins `price * …`"
+        ]
       },
       {
         "id": "ts_modules-default",
@@ -9089,7 +9457,11 @@
             "output": "-6"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "export default function main(...) marks the file's single main export.",
+          "The reference solution is 4 lines and begins: `export default function main(x: number): number {`"
+        ]
       },
       {
         "id": "ts_modules-challenge",
@@ -9119,7 +9491,12 @@
             "output": "20\n24"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "`export function` publishes a function; here you both export and call them in one file.",
+          "The reference solution uses `split` and `map`.",
+          "The reference solution is 5 lines and begins: `export function area(w: number, h: number): number { return w * h; }`"
+        ]
       }
     ],
     "cards": [],
@@ -9160,7 +9537,11 @@
             "output": "Hi Bob"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "name ?? \"friend\" uses the fallback only when name is null/undefined.",
+          "The answer begins `name ?? …`"
+        ]
       },
       {
         "id": "ts_nullish-guard",
@@ -9186,7 +9567,11 @@
             "output": "10.0"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "x != null rules out BOTH null and undefined in one check.",
+          "The answer begins `maybe != …`"
+        ]
       },
       {
         "id": "ts_nullish-chain",
@@ -9212,7 +9597,12 @@
             "output": "Tokyo"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "user.address?.city is undefined when address is missing; ?? supplies the fallback.",
+          "The reference solution uses `??`.",
+          "The reference solution is 2 lines and begins: `const city = user.address?.city ?? \"unknown\";`"
+        ]
       },
       {
         "id": "ts_nullish-challenge",
@@ -9242,7 +9632,12 @@
             "output": "a 1 b"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "map.get(k) is undefined when the key is missing — `?? default` fills it in.",
+          "The reference solution uses `split`, a `Map`, a `for` loop and `??`.",
+          "The reference solution is 9 lines and begins: `const map = new Map<string, string>();`"
+        ]
       }
     ],
     "cards": [],
@@ -9283,7 +9678,11 @@
             "output": "must be positive"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "throw new Error(\"...\") signals the failure the catch block handles.",
+          "The answer begins `throw new Error(\"must …`"
+        ]
       },
       {
         "id": "ts_errors-catch",
@@ -9309,7 +9708,11 @@
             "output": "0"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "e instanceof Error narrows unknown so e.message is available.",
+          "The answer begins `e instanceof …`"
+        ]
       },
       {
         "id": "ts_errors-finally",
@@ -9335,7 +9738,12 @@
             "output": "0\ndone"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "finally runs no matter what, so put the 'done' print there.",
+          "The reference solution uses `try`/`catch`.",
+          "The reference solution is 9 lines and begins: `try {`"
+        ]
       },
       {
         "id": "ts_errors-challenge",
@@ -9365,7 +9773,12 @@
             "output": "10 2"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Wrap each toNumber call in try/catch; the catch branch just increments failures.",
+          "The reference solution uses `split`, a `for` loop and `try`/`catch`.",
+          "The reference solution is 16 lines and begins: `function toNumber(s: string): number {`"
+        ]
       }
     ],
     "cards": [],
@@ -9406,7 +9819,11 @@
             "output": "Ada 99"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Spread the base then the patch: { ...user, ...patch } — later fields win.",
+          "The answer begins `{ ...user, …`"
+        ]
       },
       {
         "id": "ts_utility_types-record",
@@ -9432,7 +9849,11 @@
             "output": "2"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Record<string, number> is just a string-keyed number map; increment as usual.",
+          "The answer begins `counts[w] = (counts[w] ?? …`"
+        ]
       },
       {
         "id": "ts_utility_types-pick",
@@ -9458,7 +9879,11 @@
             "output": "Cid"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Pick<User, \"name\"> keeps only the name field, so build { name: user.name }.",
+          "The reference solution is 2 lines and begins: `const card: NameOnly = { name: user.name };`"
+        ]
       },
       {
         "id": "ts_utility_types-challenge",
@@ -9488,7 +9913,12 @@
             "output": "Y 1"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Each patch is a Partial<User>; `{ ...user, ...patch }` overrides just its field.",
+          "The reference solution uses `split` and a `for` loop.",
+          "The reference solution is 12 lines and begins: `interface User { name: string; age: number; }`"
+        ]
       }
     ],
     "cards": [],
@@ -9529,7 +9959,11 @@
             "output": "-6"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "await pauses until the promise resolves: const x = await later(n);.",
+          "The answer begins `const x = …`"
+        ]
       },
       {
         "id": "ts_async-all",
@@ -9555,7 +9989,11 @@
             "output": "0"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Promise.all([p1, p2]) resolves to an array once both are done.",
+          "The answer begins `await Promise.all([later(a), …`"
+        ]
       },
       {
         "id": "ts_async-trycatch",
@@ -9581,7 +10019,12 @@
             "output": "0"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "await throws on rejection, so wrap it in try/catch just like synchronous errors.",
+          "The reference solution uses `await` and `try`/`catch`.",
+          "The reference solution is 6 lines and begins: `try {`"
+        ]
       },
       {
         "id": "ts_async-challenge",
@@ -9611,7 +10054,12 @@
             "output": "25"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "await square(n) inside the loop unwraps the Promise to a plain number to add up.",
+          "The reference solution uses `split`, `map`, a `for` loop and `await`.",
+          "The reference solution is 12 lines and begins: `function square(n: number): Promise<number> {`"
+        ]
       }
     ],
     "cards": [],
@@ -9652,7 +10100,11 @@
             "output": "11"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "const [a, b] = nums pulls out the first two elements by position.",
+          "The answer begins `const [a, b] …`"
+        ]
       },
       {
         "id": "ts_destructuring-object",
@@ -9678,7 +10130,11 @@
             "output": "Cid 7"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Object destructuring matches by key: const { name, age } = user.",
+          "The answer begins `const { name, age …`"
+        ]
       },
       {
         "id": "ts_destructuring-spread",
@@ -9704,7 +10160,11 @@
             "output": "1 2"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "[...a, ...b] expands both arrays into a new combined array.",
+          "The answer begins `[...a, …`"
+        ]
       },
       {
         "id": "ts_destructuring-rest",
@@ -9730,7 +10190,12 @@
             "output": "10"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "const [first, ...rest] = nums gathers everything after the first into rest.",
+          "The reference solution uses `reduce`.",
+          "The reference solution is 3 lines and begins: `const [first, ...rest] = nums;`"
+        ]
       },
       {
         "id": "ts_destructuring-challenge",
@@ -9760,7 +10225,12 @@
             "output": "7"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Destructure each pair of points, add |x−px| + |y−py| to a running total.",
+          "The reference solution uses `split`, `map`, a `for` loop and `Math`.",
+          "The reference solution is 7 lines and begins: `const nums = input.split(/\\s+/).map(Number);`"
+        ]
       }
     ],
     "cards": [],
@@ -9801,7 +10271,11 @@
             "output": "42"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "The assertion lets you read data.count as a number; multiply it by 2.",
+          "The answer begins `data.count * …`"
+        ]
       },
       {
         "id": "ts_assertions-nonnull",
@@ -9827,7 +10301,11 @@
             "output": "22"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "nums.find(x => x > 10) returns the first match; the ! after it asserts it isn't undefined.",
+          "The answer begins `nums.find(x => x …`"
+        ]
       },
       {
         "id": "ts_assertions-array",
@@ -9853,7 +10331,12 @@
             "output": "5"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "JSON.parse(raw) as number[] gives a typed array you can reduce.",
+          "The reference solution uses `reduce` and `JSON.parse`.",
+          "The reference solution is 3 lines and begins: `const nums = JSON.parse(raw) as number[];`"
+        ]
       },
       {
         "id": "ts_assertions-challenge",
@@ -9883,7 +10366,12 @@
             "output": "none"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "`JSON.parse(input) as Person[]` tells TypeScript the parsed value's shape.",
+          "The reference solution uses `JSON.parse`.",
+          "The reference solution is 8 lines and begins: `interface Person { name: string; age: number; }`"
+        ]
       }
     ],
     "cards": [],
@@ -9924,7 +10412,11 @@
             "output": "Cid 7"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "An extended interface needs the inherited field (name) AND the new one (age).",
+          "The answer begins `{ name: parts[0], …`"
+        ]
       },
       {
         "id": "ts_compose-intersection",
@@ -9950,7 +10442,11 @@
             "output": "Cid earns 7"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "An intersection needs all members of both parts: name AND salary.",
+          "The answer begins `{ name: parts[0], …`"
+        ]
       },
       {
         "id": "ts_compose-circle",
@@ -9976,7 +10472,11 @@
             "output": "3"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Circle needs x, y (from Point) and r; area uses the radius: 3 * r * r.",
+          "The reference solution is 3 lines and begins: `const c: Circle = { x: parts[0], y: parts[1], r: parts[2] };`"
+        ]
       },
       {
         "id": "ts_compose-challenge",
@@ -10006,7 +10506,12 @@
             "output": "home: (5, 5)\n10"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Point & Labeled requires x, y, AND label together in one object.",
+          "The reference solution uses `split` and `Math`.",
+          "The reference solution is 7 lines and begins: `type Point = { x: number; y: number };`"
+        ]
       }
     ],
     "cards": [],
@@ -10047,7 +10552,11 @@
             "output": "Cid"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "JSON.parse(raw) converts the JSON string into an object you can read fields from.",
+          "The answer is 15 characters long and begins `JSON.pa`."
+        ]
       },
       {
         "id": "ts_json-stringify",
@@ -10069,7 +10578,11 @@
             "output": "{\"name\":\"Bob\",\"age\":40}"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "JSON.stringify(user) emits the fields in insertion order with no spaces.",
+          "The answer is 20 characters long and begins `JSON.strin`."
+        ]
       },
       {
         "id": "ts_json-roundtrip",
@@ -10091,7 +10604,12 @@
             "output": "{\"name\":\"Bob\",\"age\":10}"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Parse to an object, mutate the field, then stringify the whole object back.",
+          "The reference solution uses `JSON.parse`.",
+          "The reference solution is 3 lines and begins: `const user = JSON.parse(raw) as { name: string; age: number };`"
+        ]
       },
       {
         "id": "ts_json-challenge",
@@ -10121,7 +10639,12 @@
             "output": "0"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "JSON.parse gives you the array; reduce over qty * price starting from 0.",
+          "The reference solution uses `reduce` and `JSON.parse`.",
+          "The reference solution is 4 lines and begins: `interface Item { name: string; qty: number; price: number; }`"
+        ]
       }
     ],
     "cards": [],
@@ -10162,7 +10685,11 @@
             "output": "0 1"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "{ ...user, age: user.age + 1 } copies user then overrides age; the original stays put.",
+          "The answer begins `{ ...user, age: user.age …`"
+        ]
       },
       {
         "id": "ts_immutability-append",
@@ -10188,7 +10715,11 @@
             "output": "4 5"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "[...nums, 99] spreads the originals into a new array and adds 99 — nums itself is unchanged.",
+          "The answer begins `[...nums, …`"
+        ]
       },
       {
         "id": "ts_immutability-freeze",
@@ -10214,7 +10745,12 @@
             "output": "0"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Object.freeze locks the object; the write is rejected, so limit keeps its original value.",
+          "The reference solution uses `try`/`catch`.",
+          "The reference solution is 7 lines and begins: `const config = Object.freeze({ limit: n });`"
+        ]
       },
       {
         "id": "ts_immutability-challenge",
@@ -10244,7 +10780,12 @@
             "output": "0 2"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "`state = { ...state, balance: ... }` makes a fresh object; push each new state to history.",
+          "The reference solution uses `split` and a `for` loop.",
+          "The reference solution is 10 lines and begins: `interface State { balance: number; steps: number; }`"
+        ]
       }
     ],
     "cards": [],
@@ -10289,7 +10830,11 @@
             "output": "0"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Plain a / b keeps the fraction; Math.floor rounds it down to an integer.",
+          "The answer begins `Math.floor(a / …`"
+        ]
       },
       {
         "id": "ts_number_math-round",
@@ -10315,7 +10860,12 @@
             "output": "7\n7\n7"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "round = nearest, floor = down, ceil = up.",
+          "The reference solution uses `Math`.",
+          "The reference solution is 3 lines and begins: `console.log(Math.round(x));`"
+        ]
       },
       {
         "id": "ts_number_math-challenge",
@@ -10345,7 +10895,12 @@
             "output": "1 4"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Peel the last digit with n % 10, then drop it with Math.floor(n / 10) until n is 0.",
+          "The reference solution uses a `while` loop and `Math`.",
+          "The reference solution is 10 lines and begins: `let n = Math.abs(Number(input));`"
+        ]
       }
     ],
     "cards": [],
@@ -10386,7 +10941,11 @@
             "output": "12345"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "padStart(5, \"0\") adds leading zeros until the string is 5 characters wide.",
+          "The answer begins `n.padStart(5, …`"
+        ]
       },
       {
         "id": "ts_string_methods-count",
@@ -10412,7 +10971,11 @@
             "output": "0"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Splitting on the character yields one more piece than there are occurrences.",
+          "The answer begins `word.split(ch).length - …`"
+        ]
       },
       {
         "id": "ts_string_methods-challenge",
@@ -10442,7 +11005,12 @@
             "output": "no match here"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "\"*\".repeat(word.length) builds the mask; split(word).join(mask) swaps every occurrence.",
+          "The reference solution uses `split` and `join`.",
+          "The reference solution is 5 lines and begins: `const lines = input.split(\"\\n\");`"
+        ]
       }
     ],
     "cards": [],
@@ -10487,7 +11055,11 @@
             "output": "2 2 1"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "b - a is positive when b is bigger, which sorts b before a — that is descending order.",
+          "The answer begins `const byDescending = (a: number, b: …`"
+        ]
       },
       {
         "id": "ts_higher_order-curry",
@@ -10513,7 +11085,11 @@
             "output": "-4\n-6"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Two arrows in a row: (factor: number) => (x: number) => .... The inner arrow captures factor.",
+          "The answer begins `const multiplyBy = (factor: number) => …`"
+        ]
       },
       {
         "id": "ts_higher_order-challenge",
@@ -10543,7 +11119,12 @@
             "output": "a\nb\n50"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Parse each line into an object first; then the three stages are a filter, a sort with a two-level comparator, and a reduce.",
+          "The reference solution uses `split`, `reduce`, `map`, `filter`, `sort`, `slice`, a `for` loop, `Math` and `localeCompare`.",
+          "The reference solution is 12 lines and begins: `const lines = input.split(\"\\n\");`"
+        ]
       }
     ],
     "cards": [],
@@ -10622,7 +11203,11 @@
             "output": "7"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "The signature is `function isNumber(x: unknown): x is number` and the body is a single typeof check.",
+          "The reference solution is 3 lines and begins: `function isNumber(x: unknown): x is number {`"
+        ]
       },
       {
         "id": "ts_type_predicates-assert",
@@ -10652,7 +11237,11 @@
             "output": "(invalid)"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "An assertion function returns nothing — it either throws or falls through. Its return type is the words `asserts x is string`.",
+          "The reference solution is 3 lines and begins: `function assertLongEnough(x: unknown): asserts x is string {`"
+        ]
       },
       {
         "id": "ts_type_predicates-challenge",
@@ -10682,7 +11271,12 @@
             "output": "(none)\n2"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Reject non-objects and null FIRST, then cast to Record<string, unknown> so you can probe each field with typeof.",
+          "The reference solution uses `split`, `map`, `sort`, `join`, `JSON.parse` and a `for` loop.",
+          "The reference solution is 18 lines and begins: `const lines = input.split(\"\\n\");`"
+        ]
       }
     ],
     "cards": [],
@@ -10761,7 +11355,12 @@
             "output": "25"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "switch (s.kind) with one case per tag. Inside each case the matching fields are available without any optional-chaining.",
+          "The reference solution uses a `switch` and `Math`.",
+          "The reference solution is 6 lines and begins: `switch (s.kind) {`"
+        ]
       },
       {
         "id": "ts_discriminated_unions-never",
@@ -10791,7 +11390,11 @@
             "output": "click at -1"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "After every tag is handled, e has type never in the default branch — assigning it to a never-typed const is the whole trick.",
+          "The reference solution is 4 lines and begins: `default: {`"
+        ]
       },
       {
         "id": "ts_discriminated_unions-challenge",
@@ -10821,7 +11424,12 @@
             "output": "0\n7"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Keep parsing and applying separate: parse turns a line into a Cmd, apply switches on Cmd.kind. Only `reset` has no value field.",
+          "The reference solution uses `split`, `join`, a `switch` and a `for` loop.",
+          "The reference solution is 29 lines and begins: `const lines = input.split(\"\\n\");`"
+        ]
       }
     ],
     "cards": [],
@@ -10900,7 +11508,12 @@
             "output": "aa\n3"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Seed best with items[0] and only replace it on a strictly greater length, so ties keep the earlier item.",
+          "The reference solution uses a `for` loop.",
+          "The reference solution is 5 lines and begins: `let best = items[0];`"
+        ]
       },
       {
         "id": "ts_structural_typing-extra",
@@ -10930,7 +11543,11 @@
             "output": "true\n3"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Compare both fields with === and combine them with &&.",
+          "The answer begins `return a.x === b.x …`"
+        ]
       },
       {
         "id": "ts_structural_typing-challenge",
@@ -10960,7 +11577,12 @@
             "output": "debug=false\nextra=1\nhost=h\nport=80\n1"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Spread the defaults into a Record<string, string> so unknown keys are allowed, and count an override only when the key is one of the defaults AND the value actually differs.",
+          "The reference solution uses `split`, `filter`, `sort`, `slice` and a `for` loop.",
+          "The reference solution is 16 lines and begins: `const lines = input.split(\"\\n\").filter((l) => l.trim().length > 0);`"
+        ]
       }
     ],
     "cards": [],
@@ -11035,7 +11657,11 @@
             "output": "/help\n3"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "`keyof typeof routes` is the union of the object's own keys — the cast tells the compiler the raw string is one of them.",
+          "The reference solution is 2 lines and begins: `console.log(routes[input as keyof typeof routes]);`"
+        ]
       },
       {
         "id": "ts_satisfies-tuple",
@@ -11057,7 +11683,12 @@
             "output": "255,59,48\n362"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Index the palette with the cast key, then join the tuple and add its three entries.",
+          "The reference solution uses `join`.",
+          "The reference solution is 3 lines and begins: `const rgb = palette[input as keyof typeof palette];`"
+        ]
       },
       {
         "id": "ts_satisfies-challenge",
@@ -11087,7 +11718,12 @@
             "output": "false\n2"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "`name in flags` narrows at runtime; the `as FlagName` cast is what lets you index the table afterwards.",
+          "The reference solution uses `split`, `filter` and a `for` loop.",
+          "The reference solution is 16 lines and begins: `const lines = input.split(\"\\n\");`"
+        ]
       }
     ],
     "cards": [],
@@ -11162,7 +11798,11 @@
             "output": "X\n1"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Guard first, then `return raw as UserId`. A branded value is still a plain string at runtime, so .toUpperCase() works.",
+          "The reference solution is 4 lines and begins: `function toUserId(raw: string): UserId {`"
+        ]
       },
       {
         "id": "ts_branded_types-units",
@@ -11192,7 +11832,11 @@
             "output": "500\n5"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "An arrow with an explicit return type: (c: Cents): Dollars => (c / 100) as Dollars.",
+          "The answer begins `const toDollars = (c: Cents): Dollars …`"
+        ]
       },
       {
         "id": "ts_branded_types-challenge",
@@ -11222,7 +11866,12 @@
             "output": "(none)\n2"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Returning `TicketId | null` rather than throwing makes the caller deal with bad input. Anchor the regex with ^ and $ so partial matches are rejected.",
+          "The reference solution uses `split`, `join` and a `for` loop.",
+          "The reference solution is 17 lines and begins: `const lines = input.split(\"\\n\");`"
+        ]
       }
     ],
     "cards": [],
@@ -11297,7 +11946,12 @@
             "output": "a b c\n6"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Two type parameters: T for the row and K constrained to keyof T. The return type is T[K][].",
+          "The reference solution uses `map`.",
+          "The reference solution is 3 lines and begins: `function pluck<T, K extends keyof T>(items: T[], key: K): T[K][] {`"
+        ]
       },
       {
         "id": "ts_generic_constraints-max",
@@ -11323,7 +11977,12 @@
             "output": "5\n1000"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Because T is constrained, the body may call .valueOf() — and because it is still generic, the return keeps the caller's element type.",
+          "The reference solution uses a `for` loop.",
+          "The reference solution is 5 lines and begins: `let best = items[0];`"
+        ]
       },
       {
         "id": "ts_generic_constraints-challenge",
@@ -11353,7 +12012,12 @@
             "output": "z: p q"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "The Map is keyed by T[K], so the grouping key keeps its real type. Push into an existing bucket or create a new one.",
+          "The reference solution uses `split`, a `Map`, `map`, `sort`, `join`, `slice` and a `for` loop.",
+          "The reference solution is 21 lines and begins: `const lines = input.split(\"\\n\");`"
+        ]
       }
     ],
     "cards": [],
@@ -11428,7 +12092,11 @@
             "output": "true\nfontSize,theme,wrap"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "One type parameter constrained to keyof Settings, returning Settings[K]. The body is just settings[key].",
+          "The reference solution is 3 lines and begins: `function read<K extends keyof Settings>(key: K): Settings[K] {`"
+        ]
       },
       {
         "id": "ts_keyof_indexed-levels",
@@ -11458,7 +12126,11 @@
             "output": "1\n4"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "indexOf on the readonly tuple gives the position — the type only has to accept a Level and return a number.",
+          "The reference solution is 3 lines and begins: `function rank(level: Level): number {`"
+        ]
       },
       {
         "id": "ts_keyof_indexed-challenge",
@@ -11488,7 +12160,12 @@
             "output": "36\nage score"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "`key in profile` is the runtime check; `as Key` is what lets you index afterwards. Object.keys returns string[], so cast it to Key[] to index safely.",
+          "The reference solution uses `split`, `filter`, `sort`, `join` and a `for` loop.",
+          "The reference solution is 17 lines and begins: `const lines = input.split(\"\\n\");`"
+        ]
       }
     ],
     "cards": [],
@@ -11567,7 +12244,11 @@
             "output": "api.dev:80"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Spreading patch second lets its present keys win; absent keys leave base untouched.",
+          "The answer begins `return { ...base, …`"
+        ]
       },
       {
         "id": "ts_mapped_types-getters",
@@ -11589,7 +12270,12 @@
             "output": "bob\n36\ngetAge,getName"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "The mapped type is erased, so the runtime loop has to build the renamed keys itself — and the final cast is where you assert it matches.",
+          "The reference solution uses `slice` and a `for` loop.",
+          "The reference solution is 6 lines and begins: `const out: Record<string, () => unknown> = {};`"
+        ]
       },
       {
         "id": "ts_mapped_types-challenge",
@@ -11619,7 +12305,12 @@
             "output": "p=1\nq=2\n0"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "`Pick<T, K>` is itself the mapped type `{ [P in K]: T[P] }`. Start from an empty object cast to that type and copy only the requested keys that exist.",
+          "The reference solution uses `split`, `map`, `sort` and a `for` loop.",
+          "The reference solution is 19 lines and begins: `const lines = input.split(\"\\n\");`"
+        ]
       }
     ],
     "cards": [],
@@ -11694,7 +12385,11 @@
             "output": "1\nsolo"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "One ternary on Array.isArray, then a cast — the conditional type describes the result the runtime branch produces.",
+          "The answer begins `return (Array.isArray(value) ? value[0] …`"
+        ]
       },
       {
         "id": "ts_conditional_types-compact",
@@ -11724,7 +12419,11 @@
             "output": "(none)\n0"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "A single filter rejecting both null and undefined, then a cast to NonNil<T>[].",
+          "The answer begins `return items.filter((x) => x !== null …`"
+        ]
       },
       {
         "id": "ts_conditional_types-challenge",
@@ -11758,7 +12457,12 @@
             "output": "only=value"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Check the segment counts first, then walk both lists together — a `:` segment captures, anything else must be equal.",
+          "The reference solution uses `split`, `map`, `filter`, `sort`, `join`, `slice` and a `for` loop.",
+          "The reference solution is 19 lines and begins: `const lines = input.split(\"\\n\");`"
+        ]
       }
     ],
     "cards": [],
@@ -11833,7 +12537,11 @@
             "output": "1em\n0px"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "A backtick template with both holes, then a cast — the compiler cannot verify a runtime-built string matches the pattern.",
+          "The reference solution is 3 lines and begins: `function toSize(value: number, unit: Unit): Size {`"
+        ]
       },
       {
         "id": "ts_template_literal_types-events",
@@ -11863,7 +12571,11 @@
             "output": "false\n2"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Widen the typed array to string[] before calling includes with an arbitrary string.",
+          "The reference solution is 3 lines and begins: `function isHandled(name: string): boolean {`"
+        ]
       },
       {
         "id": "ts_template_literal_types-challenge",
@@ -11893,7 +12605,12 @@
             "output": "ok\n9"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "The nested loops over the two `as const` arrays produce exactly the nine names the template literal type describes.",
+          "The reference solution uses `split`, a `Set` and a `for` loop.",
+          "The reference solution is 18 lines and begins: `const lines = input.split(\"\\n\");`"
+        ]
       }
     ],
     "cards": [],
@@ -11972,7 +12689,12 @@
             "output": "1"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Test Array.isArray BEFORE the object check, since arrays are objects too — and remember typeof null is \"object\".",
+          "The reference solution uses `map` and `Math`.",
+          "The reference solution is 7 lines and begins: `function depth(value: Json): number {`"
+        ]
       },
       {
         "id": "ts_type_level-flatten",
@@ -12002,7 +12724,11 @@
             "output": "1 2\n2"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "The base case wraps a single number; the recursive case is one flatMap over the children.",
+          "The reference solution is 4 lines and begins: `function flatten(value: Nested): number[] {`"
+        ]
       },
       {
         "id": "ts_type_level-challenge",
@@ -12032,7 +12758,12 @@
             "output": "{\"a\":{\"b\":{\"c\":1,\"d\":2}}}\n1"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "A type predicate for 'plain object' keeps merge and canonical readable. Both functions recurse on exactly the branch where the type recurses.",
+          "The reference solution uses `split`, `map`, `sort`, `join`, `JSON.parse` and a `for` loop.",
+          "The reference solution is 29 lines and begins: `const lines = input.split(\"\\n\");`"
+        ]
       }
     ],
     "cards": [],
@@ -12111,7 +12842,12 @@
             "output": "1 4 9 16 25\n55"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "A generator is declared with function* and hands out values with yield — no array is built inside it.",
+          "The reference solution uses a `for` loop and a generator.",
+          "The reference solution is 3 lines and begins: `function* squares(n: number): Generator<number> {`"
+        ]
       },
       {
         "id": "ts_iterators-iterable",
@@ -12137,7 +12873,11 @@
             "output": "x,y\nX\nY"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "The method name is the computed key [Symbol.iterator], written as a generator with the * before it. yield* forwards every element.",
+          "The reference solution is 3 lines and begins: `*[Symbol.iterator](): Generator<string> {`"
+        ]
       },
       {
         "id": "ts_iterators-challenge",
@@ -12167,7 +12907,12 @@
             "output": "2 4 6 8\n20"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "take must `return` as soon as it has enough — that is what stops the infinite source. Compose them as take(filter(naturals(), ...), count).",
+          "The reference solution uses `split`, `reduce`, `map`, `join`, a `while` loop, a `for` loop and a generator.",
+          "The reference solution is 21 lines and begins: `const [count, divisor] = input.split(/\\s+/).map(Number);`"
+        ]
       }
     ],
     "cards": [],
@@ -12250,7 +12995,11 @@
             "output": "rejected: not an integer"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Return the failure shapes early, then the success shape. Number(\"abc\") is NaN, which Number.isInteger rejects.",
+          "The reference solution is 6 lines and begins: `function parsePort(raw: string): Result<number> {`"
+        ]
       },
       {
         "id": "ts_error_types-narrow",
@@ -12276,7 +13025,11 @@
             "output": "unknown failure"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Check the most specific class first — a ParseError is also an Error, so the order of the instanceof tests matters.",
+          "The reference solution is 3 lines and begins: `if (e instanceof ParseError) console.log(\"ParseError on line \" + e.line);`"
+        ]
       },
       {
         "id": "ts_error_types-challenge",
@@ -12306,7 +13059,12 @@
             "output": "bad not a number\nbad out of range\n0 0"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Because Result is a discriminated union, `if (result.ok)` narrows to the branch that actually has `value` — no optional chaining needed.",
+          "The reference solution uses `split` and a `for` loop.",
+          "The reference solution is 24 lines and begins: `const lines = input.split(\"\\n\");`"
+        ]
       }
     ],
     "cards": [],
@@ -12381,7 +13139,11 @@
             "output": "0 -2\n-2"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "nums.map(delayed) creates every promise immediately; Promise.all waits for all of them and preserves the input order.",
+          "The answer begins `const doubled = …`"
+        ]
       },
       {
         "id": "ts_async_patterns-settled",
@@ -12407,7 +13169,12 @@
             "output": "40\n0"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "PromiseSettledResult is a discriminated union on `status` — the fulfilled branch has `value`, the rejected branch has `reason`.",
+          "The reference solution uses a `for` loop.",
+          "The reference solution is 4 lines and begins: `for (const r of settled) {`"
+        ]
       },
       {
         "id": "ts_async_patterns-challenge",
@@ -12437,7 +13204,12 @@
             "output": "0=0\n4=16\n2"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Race each lookup against the timeout, then wrap the whole array in allSettled so one rejection does not lose the other results.",
+          "The reference solution uses `split`, `map` and `await`.",
+          "The reference solution is 24 lines and begins: `const ids = input.split(/\\s+/).map(Number);`"
+        ]
       }
     ],
     "cards": [],
@@ -12508,7 +13280,11 @@
             "output": "1.4.2\nreported: oops"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Two ambient declarations, one for a const and one for a function. They describe what the host provides; the assignments below are that host.",
+          "The reference solution is 2 lines and begins: `declare const BUILD_VERSION: string;`"
+        ]
       },
       {
         "id": "ts_declaration_files-augment",
@@ -12534,7 +13310,11 @@
             "output": "abc 0\nuser"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Declaring the same interface name twice merges the members — this is exactly how module augmentation adds a field to a library type.",
+          "The reference solution is 3 lines and begins: `interface Session {`"
+        ]
       },
       {
         "id": "ts_declaration_files-challenge",
@@ -12560,7 +13340,12 @@
             "output": "2.0.0\na:1\nb:2\nc:3\n3"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "`declare const host: Host` promises the binding exists; the assignment to globalThis is the runtime keeping that promise. `satisfies Host` checks the implementation matches.",
+          "The reference solution uses `split` and a `for` loop.",
+          "The reference solution is 22 lines and begins: `const lines = input.split(\"\\n\");`"
+        ]
       }
     ],
     "cards": [],
@@ -12635,7 +13420,11 @@
             "output": "2\ny\nx"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "pop() returns T | undefined, which is why the caller needs ?? \"(empty)\". The #items field is private at runtime, not just to the compiler.",
+          "The reference solution is 10 lines and begins: `#items: T[] = [];`"
+        ]
       },
       {
         "id": "ts_ds_generics-queue",
@@ -12661,7 +13450,11 @@
             "output": "4\n5"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "One generator method keyed by [Symbol.iterator]; yield* forwards the backing array's elements.",
+          "The reference solution is 3 lines and begins: `*[Symbol.iterator](): Generator<T> {`"
+        ]
       },
       {
         "id": "ts_ds_generics-challenge",
@@ -12691,7 +13484,12 @@
             "output": "z\n1\nfalse"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Push then trim: once the array is longer than the capacity, shift the oldest off the front. toArray copies so callers cannot mutate the internals.",
+          "The reference solution uses `split`, `filter`, `join`, a `for` loop and a class.",
+          "The reference solution is 31 lines and begins: `const lines = input.split(\"\\n\");`"
+        ]
       }
     ],
     "cards": [],
@@ -12766,7 +13564,11 @@
             "output": "ABC\n(missing)"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Narrow first with an early return; after the guard, TypeScript knows the value is a plain string.",
+          "The reference solution is 2 lines and begins: `if (value === null) return \"(missing)\";`"
+        ]
       },
       {
         "id": "ts_tsconfig-indexed",
@@ -12796,7 +13598,11 @@
             "output": "y\n(none)"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Read the element into a `T | undefined` first, then decide — an out-of-range index gives undefined at runtime whether the flag is on or not.",
+          "The reference solution is 2 lines and begins: `const value: T | undefined = items[index];`"
+        ]
       },
       {
         "id": "ts_tsconfig-challenge",
@@ -12826,7 +13632,12 @@
             "output": "noImplicitAny=off\nnoUncheckedIndexedAccess=on\nstrictNullChecks=off\n1\n2"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Derive the Flag union from the `as const` array so the settings record cannot drift from it. Treat both split halves as possibly-undefined.",
+          "The reference solution uses `split`, `filter`, `sort` and a `for` loop.",
+          "The reference solution is 23 lines and begins: `const lines = input.split(\"\\n\").filter((line) => line.trim().length > 0);`"
+        ]
       }
     ],
     "cards": [],
@@ -12905,7 +13716,11 @@
             "output": "200\n101"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Everything read from stdin is a string. `Number(...)` converts the whole thing.",
+          "The answer is 13 characters long and begins `Number`."
+        ]
       },
       {
         "id": "ts_program_io-pair",
@@ -12935,7 +13750,11 @@
             "output": "15\n56"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Split on a pattern that matches any run of whitespace: `/\\s+/`.",
+          "The answer is 18 characters long and begins `input.spl`."
+        ]
       },
       {
         "id": "ts_program_io-money",
@@ -12965,7 +13784,11 @@
             "output": "$39.98"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "`console.log(7.5)` prints `7.5`; the expected output wants `7.50`. `toFixed(2)` returns the string you need.",
+          "The answer is 16 characters long and begins `total.to`."
+        ]
       },
       {
         "id": "ts_program_io-receipt",
@@ -12995,7 +13818,12 @@
             "output": "gum x3 = $2.97\navg $0.99"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Read the three lines, trim what you print, convert what you compute with, and format with `toFixed(2)`.",
+          "The reference solution uses `split`.",
+          "The reference solution is 7 lines and begins: `const lines = input.split(\"\\n\");`"
+        ]
       }
     ],
     "cards": [],
@@ -13103,7 +13931,11 @@
             "output": "quantity 5"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "`||` would replace the zero. Which operator only replaces `null` and `undefined`?",
+          "The answer begins `typed ?? …`"
+        ]
       },
       {
         "id": "ts_equality-nan",
@@ -13129,7 +13961,11 @@
             "output": "ok: 0\nok: -1"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "`n === NaN` is never true. There is a function for exactly this.",
+          "The answer is 15 characters long and begins `Number.`."
+        ]
       },
       {
         "id": "ts_equality-same",
@@ -13159,7 +13995,11 @@
             "output": "same"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "`a === b` compares identity. Compare the lengths, then every element.",
+          "The answer begins `a.length === b.length && a.every((v, …`"
+        ]
       },
       {
         "id": "ts_equality-classify",
@@ -13189,7 +14029,12 @@
             "output": "positive\nnegative\nnan"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Check emptiness on the text before converting — `Number(\"\")` is `0`. `-0 === 0` is `true`, which is what you want here.",
+          "The reference solution uses `split` and a `for` loop.",
+          "The reference solution is 11 lines and begins: `for (const raw of input.split(\"\\n\")) {`"
+        ]
       }
     ],
     "cards": [],
@@ -13301,7 +14146,11 @@
             "output": "500\n5.00"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "`p * 100` is nearly an integer; `Math.round` makes it one.",
+          "The answer begins `Math.round(p * …`"
+        ]
       },
       {
         "id": "ts_number_format-big",
@@ -13331,7 +14180,11 @@
             "output": "1\n1"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Every operand must be a `bigint`: start the counter at `2n`.",
+          "The answer begins `for (let i = 2n; i …`"
+        ]
       },
       {
         "id": "ts_number_format-grouped",
@@ -13361,7 +14214,11 @@
             "output": "0.125"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "`Intl.NumberFormat` with an explicit locale.",
+          "The answer begins `new …`"
+        ]
       },
       {
         "id": "ts_number_format-bill",
@@ -13395,7 +14252,12 @@
             "output": "tip $31.25\ntotal $281.25\neach $40.18\nextra $0.01"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Convert the total to cents once, do integer arithmetic, and use `Math.ceil` for the per-person share.",
+          "The reference solution uses `split` and `Math`.",
+          "The reference solution is 11 lines and begins: `const [totalText = \"0\", peopleText = \"1\", tipText = \"0\"] = input.split(/\\s+/);`"
+        ]
       }
     ],
     "cards": [],
@@ -13503,7 +14365,11 @@
             "output": "invalid"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Anchor both ends with `^` and `$`, and count with `{5}`.",
+          "The answer is 9 characters long and begins `/^\\d`."
+        ]
       },
       {
         "id": "ts_regex-count",
@@ -13533,7 +14399,11 @@
             "output": "1\n007"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "One or more digits, and the flag that finds every match.",
+          "The answer is 6 characters long and begins `/\\d`."
+        ]
       },
       {
         "id": "ts_regex-swap",
@@ -13555,7 +14425,11 @@
             "output": "Alan Turing"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "`$1` is the first group, `$2` the second.",
+          "The answer begins `\"$2 …`"
+        ]
       },
       {
         "id": "ts_regex-log",
@@ -13585,7 +14459,12 @@
             "output": "INFO 1\nauth"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Anchor the pattern, capture the level and the component, and skip lines where `match` returns `null`.",
+          "The reference solution uses `split`, a `Map`, a `Set`, `sort`, `join`, a `for` loop and `??`.",
+          "The reference solution is 15 lines and begins: `const entry = /^(\\d{4}-\\d{2}-\\d{2}) (\\d{2}:\\d{2}:\\d{2}) (ERROR|WARN|INFO) \\[(\\w+)\\] (.*)$/;`"
+        ]
       }
     ],
     "cards": [],
@@ -13697,7 +14576,11 @@
             "output": "3 3"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Spreading a string iterates it by code point.",
+          "The answer is 17 characters long and begins `[...inpu`."
+        ]
       },
       {
         "id": "ts_unicode-reverse",
@@ -13723,7 +14606,11 @@
             "output": "🙃🙂\ntrue"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Spread into code points, reverse the array, join it back.",
+          "The answer is 29 characters long and begins `[...input].rev`."
+        ]
       },
       {
         "id": "ts_unicode-sort",
@@ -13749,7 +14636,11 @@
             "output": "a b"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "`localeCompare` with a fixed locale, returning a number for `sort`.",
+          "The answer begins `(a, b) => …`"
+        ]
       },
       {
         "id": "ts_unicode-truncate",
@@ -13779,7 +14670,12 @@
             "output": "Zoë s…"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Segment into graphemes first; then it's ordinary array slicing.",
+          "The reference solution uses `split`, `map`, `join`, `slice` and a `for` loop.",
+          "The reference solution is 12 lines and begins: `const seg = new Intl.Segmenter(\"en\", { granularity: \"grapheme\" });`"
+        ]
       }
     ],
     "cards": [],
@@ -13887,7 +14783,11 @@
             "output": "0\n1"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Check `typeof input` and return the matching shape.",
+          "The answer begins `typeof input === \"string\" …`"
+        ]
       },
       {
         "id": "ts_overloads-time",
@@ -13913,7 +14813,11 @@
             "output": "60:00\n60:00"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "When `b` is missing, `a` already *is* the total.",
+          "The answer begins `b === undefined ? a : …`"
+        ]
       },
       {
         "id": "ts_overloads-fmt",
@@ -13939,7 +14843,12 @@
             "output": "USD 12.35\n-1.00"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Branch on `Array.isArray(a)` first; then on whether `currency` was given.",
+          "The reference solution uses `split`, `map`, `join`, `slice` and a `for` loop.",
+          "The reference solution is 13 lines and begins: `function fmt(n: number): string;`"
+        ]
       }
     ],
     "cards": [],
@@ -14036,7 +14945,11 @@
             "output": "7 7"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "The returned arrow closes over `count`; update it, then return it.",
+          "The reference solution is 2 lines and begins: `count += step;`"
+        ]
       },
       {
         "id": "ts_closures_scope-loop",
@@ -14062,7 +14975,11 @@
             "output": "0"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "`let` in a `for` header creates a fresh binding each iteration.",
+          "The answer begins `for (let i = 0; …`"
+        ]
       },
       {
         "id": "ts_closures_scope-once",
@@ -14088,7 +15005,12 @@
             "output": "0 0 0 calls=1"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Keep a `done` flag and the saved `result` in the closure.",
+          "The reference solution uses `split`, `map`, `join` and a `for` loop.",
+          "The reference solution is 20 lines and begins: `function once(fn: (x: number) => number): (x: number) => number {`"
+        ]
       }
     ],
     "cards": [],
@@ -14185,7 +15107,11 @@
             "output": "1\n2"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "`n % 10` is the last digit; `Math.floor(n / 10)` is the rest.",
+          "The answer begins `return (n % 10) …`"
+        ]
       },
       {
         "id": "ts_recursion-power",
@@ -14215,7 +15141,11 @@
             "output": "100000 calls=5"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Compute the half power ONCE and multiply it by itself — calling `power` twice would undo the saving.",
+          "The reference solution is 2 lines and begins: `const half = power(base, exp / 2);`"
+        ]
       },
       {
         "id": "ts_recursion-flatten",
@@ -14241,7 +15171,12 @@
             "output": "1 2 3\nmax depth 3\n7\nmax depth 1"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Two recursive functions: one collects numbers into an output array, one returns 1 + the deepest child.",
+          "The reference solution uses `split`, `join`, `JSON.parse`, a `for` loop and `Math`.",
+          "The reference solution is 21 lines and begins: `type Nested = number | Nested[];`"
+        ]
       }
     ],
     "cards": [],
@@ -14338,7 +15273,11 @@
             "output": "7 7"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "A tuple is written like an array literal.",
+          "The answer begins `return [min, …`"
+        ]
       },
       {
         "id": "ts_tuples-swap",
@@ -14364,7 +15303,11 @@
             "output": "y x"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Assign a tuple of the two values, reversed, back into both.",
+          "The answer begins `[a, b] = …`"
+        ]
       },
       {
         "id": "ts_tuples-divmod",
@@ -14390,7 +15333,12 @@
             "output": "100 = 7*14 + 2"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Return `[q, a - b * q]`, and destructure it at the call site.",
+          "The reference solution uses `split`, `map`, a `for` loop and `Math`.",
+          "The reference solution is 9 lines and begins: `function divmod(a: number, b: number): [quotient: number, remainder: number] {`"
+        ]
       }
     ],
     "cards": [],
@@ -14487,7 +15435,11 @@
             "output": "-8"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "`at(-1)` reads from the end and may be `undefined`.",
+          "The answer begins `values.at(-1) ?? …`"
+        ]
       },
       {
         "id": "ts_array_modern-copy",
@@ -14513,7 +15465,11 @@
             "output": "5\n5"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "The copying sort takes the same comparator as `sort`.",
+          "The answer begins `scores.toSorted((a, b) => …`"
+        ]
       },
       {
         "id": "ts_array_modern-group",
@@ -14539,7 +15495,12 @@
             "output": "o: one\nt: two three Three\nt"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "`Object.groupBy(words, keyFn)`, then walk `Object.keys(groups).toSorted()`. Each group may be `undefined` to the compiler.",
+          "The reference solution uses `split`, `toSorted`, `join`, a `for` loop and `??`.",
+          "The reference solution is 14 lines and begins: `const words = input.split(/\\s+/);`"
+        ]
       }
     ],
     "cards": [],
@@ -14632,7 +15593,11 @@
             "output": "linus earns 1"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "`interface New extends Old { … }`.",
+          "The answer begins `interface Employee …`"
+        ]
       },
       {
         "id": "ts_interfaces_types-union",
@@ -14654,7 +15619,11 @@
             "output": "X"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Interfaces can't name unions.",
+          "The answer begins `type Id = …`"
+        ]
       },
       {
         "id": "ts_interfaces_types-public",
@@ -14676,7 +15645,12 @@
             "output": "{\"id\":3,\"name\":\"cy\",\"email\":\"c@y.io\"}"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Build a new object from the fields you want — assigning the record itself would carry its extra fields along.",
+          "The reference solution uses `split`, `JSON.parse` and a `for` loop.",
+          "The reference solution is 14 lines and begins: `interface PublicUser {`"
+        ]
       }
     ],
     "cards": [],
@@ -14773,7 +15747,11 @@
             "output": "ok=1 toString=2"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Read with a default, then write the incremented value back.",
+          "The answer begins `counts[w] = (counts[w] ?? …`"
+        ]
       },
       {
         "id": "ts_index_signatures-table",
@@ -14795,7 +15773,11 @@
             "output": "amber\nred"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "A utility type from a union of keys to a value type.",
+          "The answer begins `Record<Level, …`"
+        ]
       },
       {
         "id": "ts_index_signatures-inventory",
@@ -14821,7 +15803,12 @@
             "output": "short x\n(empty)"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "`Object.create(null)` gives a dictionary without inherited keys; read each quantity with `?? 0`.",
+          "The reference solution uses `split`, `map`, `filter`, `sort`, `join`, a `for` loop and `??`.",
+          "The reference solution is 14 lines and begins: `const stock: { [item: string]: number } = Object.create(null);`"
+        ]
       }
     ],
     "cards": [],
@@ -14918,7 +15905,11 @@
             "output": "100 0"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "A construct signature is called with `new`.",
+          "The answer begins `new …`"
+        ]
       },
       {
         "id": "ts_function_types-radix",
@@ -14944,7 +15935,11 @@
             "output": "1\n1"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Write the arrow explicitly and give `parseInt` its radix.",
+          "The answer begins `(w) => …`"
+        ]
       },
       {
         "id": "ts_function_types-this",
@@ -14970,7 +15965,11 @@
             "output": "#a x1\n#b x2\n#c x3"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "`fn.call(thisValue, ...args)` supplies `this` explicitly.",
+          "The answer begins `label.call(item, …`"
+        ]
       },
       {
         "id": "ts_function_types-ops",
@@ -15000,7 +15999,12 @@
             "output": "unknown op toString\n0\n1"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "`Math.max` fits `BinaryOp`: it takes any number of numbers, and two is a fine number. Guard lookups with `Object.hasOwn` so `toString` is not mistaken for an operator.",
+          "The reference solution uses `split`, a `for` loop and `Math`.",
+          "The reference solution is 20 lines and begins: `type BinaryOp = (a: number, b: number) => number;`"
+        ]
       }
     ],
     "cards": [],
@@ -15108,7 +16112,11 @@
             "output": "FAIL p\nFAIL q\n1 passed"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Two branches: count the pass, or print the failure.",
+          "The reference solution is 2 lines and begins: `if (actual === expected) passed++;`"
+        ]
       },
       {
         "id": "ts_type_testing-unique",
@@ -15134,7 +16142,11 @@
             "output": "q\n1"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "A `Set` keeps insertion order; spread it back into an array.",
+          "The answer begins `[...new …`"
+        ]
       },
       {
         "id": "ts_type_testing-report",
@@ -15160,7 +16172,12 @@
             "output": "✗ x: bad status SKIP\n✗ y: timeout\n0/2"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Destructure `status`, `name` and a rest array for the reason.",
+          "The reference solution uses `split`, `join` and a `for` loop.",
+          "The reference solution is 14 lines and begins: `let passed = 0;`"
+        ]
       }
     ],
     "cards": [],
@@ -15268,7 +16285,11 @@
             "output": "x y"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "One method call on `a`, with `b` as its argument.",
+          "The answer is 17 characters long and begins `a.inters`."
+        ]
       },
       {
         "id": "ts_set_algebra-missing",
@@ -15294,7 +16315,11 @@
             "output": "missing a b c\nfalse"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Required minus granted.",
+          "The answer is 28 characters long and begins `required.diffe`."
+        ]
       },
       {
         "id": "ts_set_algebra-roster",
@@ -15320,7 +16345,12 @@
             "output": "joined: (none)\nleft: new\nstayed: (none)\nchanged"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Joined is new minus old; left is old minus new; unchanged means the symmetric difference is empty.",
+          "The reference solution uses `split`, a `Set`, `filter`, `sort` and `join`.",
+          "The reference solution is 8 lines and begins: `const [before = \"\", after = \"\"] = input.split(\"\\n\");`"
+        ]
       }
     ],
     "cards": [],
@@ -15413,7 +16443,11 @@
             "output": "pink?\n#0f0"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "`typeof COLORS` is a readonly tuple; indexing it with `number` gives the element type.",
+          "The answer begins `(typeof …`"
+        ]
       },
       {
         "id": "ts_literal_inference-check",
@@ -15435,7 +16469,11 @@
             "output": "100.0 g"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "`find` with an equality test narrows a `string` to the element type.",
+          "The answer begins `UNITS.find((u) => u …`"
+        ]
       },
       {
         "id": "ts_literal_inference-http",
@@ -15461,7 +16499,12 @@
             "output": "GET=0 POST=0 PUT=2 DELETE=0\nother=0"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "`find` turns each token into a `Method | undefined`; the record then indexes safely.",
+          "The reference solution uses `split`, `map`, `join` and a `for` loop.",
+          "The reference solution is 12 lines and begins: `const METHODS = [\"GET\", \"POST\", \"PUT\", \"DELETE\"] as const;`"
+        ]
       }
     ],
     "cards": [],
@@ -15558,7 +16601,11 @@
             "output": "1 -1"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "An arrow that returns `v !== undefined` is inferred as `v is number`.",
+          "The answer begins `maybe.filter((v) => v …`"
+        ]
       },
       {
         "id": "ts_control_flow-early",
@@ -15576,7 +16623,11 @@
             "output": "hello, ada\nanonymous\nanonymous\nhello, bo"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "After the `if` returns, the compiler knows `name` is a `string`.",
+          "The answer begins `if (name === undefined || …`"
+        ]
       },
       {
         "id": "ts_control_flow-mixed",
@@ -15598,7 +16649,12 @@
             "output": "number\nnumber\narray(0)\nbig numbers: 1"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Rule out `null` and arrays before testing for `\"object\"`.",
+          "The reference solution uses `split`, `JSON.parse` and a `for` loop.",
+          "The reference solution is 14 lines and begins: `let bigNumbers = 0;`"
+        ]
       }
     ],
     "cards": [],
@@ -15687,7 +16743,11 @@
             "output": "5\n20\n-8"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "After every case, what type is left for `op`?",
+          "The answer begins `const unhandled: never …`"
+        ]
       },
       {
         "id": "ts_top_bottom-fail",
@@ -15705,7 +16765,11 @@
             "output": "31\nbad age -1\nbad age x\n1"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "The type with no values — for a function that always throws.",
+          "The answer is 5 characters long and begins `ne`."
+        ]
       },
       {
         "id": "ts_top_bottom-events",
@@ -15727,7 +16791,12 @@
             "output": "scroll down 40"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Switch on the tag; the `default` branch assigns the event to `never`.",
+          "The reference solution uses `split`, `JSON.parse`, a `switch`, a `for` loop and `Math`.",
+          "The reference solution is 23 lines and begins: `type Event =`"
+        ]
       }
     ],
     "cards": [],
@@ -15828,7 +16897,11 @@
             "output": "Error"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "`Object.entries` gives `[name, value]` pairs of the real object.",
+          "The answer begins `Object.entries(Level).filter(([, value]) => value …`"
+        ]
       },
       {
         "id": "ts_erasable_syntax-fields",
@@ -15854,7 +16927,11 @@
             "output": "took 3 ink, 7 left\ntook 3 ink, 4 left\ntook 3 ink, 1 left\nonly 1 ink left"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "A parameter property is shorthand for `this.<name> = <name>;` in the constructor.",
+          "The reference solution is 2 lines and begins: `this.name = name;`"
+        ]
       },
       {
         "id": "ts_erasable_syntax-status",
@@ -15880,7 +16957,12 @@
             "output": "a: Closed\nb: Closed\nActive 0\nSuspended 0\nClosed 2"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "`keyof typeof Status` is the union of names; search the names for the one whose value matches.",
+          "The reference solution uses `split`, a `Map`, a `for` loop and `??`.",
+          "The reference solution is 17 lines and begins: `const Status = { Active: \"A\", Suspended: \"S\", Closed: \"C\" } as const;`"
+        ]
       }
     ],
     "cards": [],
@@ -15988,7 +17070,11 @@
             "output": "bad: Unexpected"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "`e` is `unknown`. Narrow with `instanceof Error` before reading `.message`.",
+          "The answer begins `e instanceof Error ? …`"
+        ]
       },
       {
         "id": "ts_versions-init",
@@ -16014,7 +17100,11 @@
             "output": "faq: 8\nfaq: 9\nfaq: 10"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Two assignments to `this`.",
+          "The reference solution is 2 lines and begins: `this.name = name;`"
+        ]
       },
       {
         "id": "ts_versions-config",
@@ -16040,7 +17130,12 @@
             "output": "module=nodenext: ok\n0 to fix before TypeScript 7"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Two lookups: exact `option=value` pairs, and options that are deprecated whatever their value.",
+          "The reference solution uses `split`, a `Set`, a `for` loop and `??`.",
+          "The reference solution is 15 lines and begins: `const ANY_VALUE = new Set([\"outFile\", \"baseUrl\"]);`"
+        ]
       }
     ],
     "cards": [],
@@ -16148,7 +17243,11 @@
             "output": "a (y)\nb (x)\nfirst input: b"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "`toSorted` returns a sorted copy; `byName` fits its comparator slot for `Dog`s because it accepts any `Animal`.",
+          "The answer is 21 characters long and begins `dogs.toSor`."
+        ]
       },
       {
         "id": "ts_variance-readonly",
@@ -16170,7 +17269,11 @@
             "output": "dee\nqa"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "`reduce` without an initial value starts from the first element; keep the current best unless someone is strictly older.",
+          "The answer begins `people.reduce((best, p) => (p.age > …`"
+        ]
       },
       {
         "id": "ts_variance-handlers",
@@ -16192,7 +17295,12 @@
             "output": "5ms click | click 0,0"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "A function that accepts any `BaseEvent` is assignable to one that accepts a `KeyEvent` — parameters are contravariant.",
+          "The reference solution uses `split`, `map`, `join` and a `for` loop.",
+          "The reference solution is 18 lines and begins: `type BaseEvent = { type: string; at: number };`"
+        ]
       }
     ],
     "cards": [],
@@ -16300,7 +17408,11 @@
             "output": "bad port abc"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Check the characters first — `Number(\"1e3\")` is 1000 — then the range.",
+          "The answer begins `/^\\d+$/.test(text) && n >= 1 …`"
+        ]
       },
       {
         "id": "ts_parse_dont_validate-nonempty",
@@ -16322,7 +17434,11 @@
             "output": "first 7, average 7.0"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Destructure the head; if it exists, rebuild the tuple as `[head, ...rest]`.",
+          "The answer begins `head === undefined ? …`"
+        ]
       },
       {
         "id": "ts_parse_dont_validate-usernames",
@@ -16344,7 +17460,12 @@
             "output": "registered dee\ntaken dee\nrejected \"d-e-e\": characters\n1 users"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Return either the branded name or the reason it failed; narrow on the two reason strings.",
+          "The reference solution uses `split`, a `Set` and a `for` loop.",
+          "The reference solution is 21 lines and begins: `declare const UsernameBrand: unique symbol;`"
+        ]
       }
     ],
     "cards": [],
@@ -16452,7 +17573,11 @@
             "output": "line.qty: expected number"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Two conditions: the right `typeof`, and not `NaN`/`Infinity` (JSON can't produce those, but other sources can).",
+          "The answer begins `typeof v === …`"
+        ]
       },
       {
         "id": "ts_runtime_validation-product",
@@ -16474,7 +17599,11 @@
             "output": "ink $2.00 []"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "`obj({ … })` with one schema per property; `arr(str())` for a list of strings.",
+          "The answer begins `obj({ name: str(), price: …`"
+        ]
       },
       {
         "id": "ts_runtime_validation-events",
@@ -16496,7 +17625,12 @@
             "output": "event: expected object\nevent.tags: expected array; event.user.name: expected string\nevent.user: expected object\nvalid 0 of 3"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Collect issues in an array instead of returning at the first one; return either the typed event or the issue list.",
+          "The reference solution uses `split`, `join`, `JSON.parse` and a `for` loop.",
+          "The reference solution is 38 lines and begins: `type Event = { id: number; type: string; tags: string[]; user?: { name: string } };`"
+        ]
       }
     ],
     "cards": [],
@@ -16604,7 +17738,11 @@
             "output": "1: x"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Look up the current group (maybe missing), and store a new array with the item added.",
+          "The answer begins `groups.set(key, [...(groups.get(key) ?? …`"
+        ]
       },
       {
         "id": "ts_generic_inference-explicit",
@@ -16630,7 +17768,11 @@
             "output": "solo"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Write the type argument between `<` and `>` right after the function name.",
+          "The answer is 19 characters long and begins `counter<s`."
+        ]
       },
       {
         "id": "ts_generic_inference-countby",
@@ -16652,7 +17794,12 @@
             "output": "lima=1\n<30=1"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "`T` is inferred from `items`; the callback's parameter then gets `T` for free.",
+          "The reference solution uses `split`, a `Map`, `map`, `join`, a `for` loop and `??`.",
+          "The reference solution is 16 lines and begins: `type Person = { name: string; age: number; city: string };`"
+        ]
       }
     ],
     "cards": [],
@@ -16760,7 +17907,11 @@
             "output": "L: size 3 of 4"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "`typeof SIZES` is a readonly tuple; index it with `number`.",
+          "The answer begins `(typeof …`"
+        ]
       },
       {
         "id": "ts_lookup_types-pluck",
@@ -16782,7 +17933,11 @@
             "output": "cy\n55"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "An array of the value type at key `K` of `T`.",
+          "The answer is 6 characters long and begins `T[K`."
+        ]
       },
       {
         "id": "ts_lookup_types-limits",
@@ -16804,7 +17959,12 @@
             "output": "team seats: 51/50 over by 1"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "`keyof (typeof LIMITS)[Plan]` is the keys every plan's limits share.",
+          "The reference solution uses `split` and a `for` loop.",
+          "The reference solution is 23 lines and begins: `const LIMITS = {`"
+        ]
       }
     ],
     "cards": [],
@@ -16912,7 +18072,11 @@
             "output": "volume 0\nvolume 0 (muted)\nvolume 0"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "`as` followed by a template literal type; remember `string & K`.",
+          "The answer begins `as `set${Capitalize<string …`"
+        ]
       },
       {
         "id": "ts_key_remapping-getters",
@@ -16934,7 +18098,11 @@
             "output": "bo from rome, visit 1\ngetName,getCity,getVisits"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "`charAt(0).toUpperCase()` for the first letter, then the rest unchanged.",
+          "The answer begins `\"get\" + key.charAt(0).toUpperCase() …`"
+        ]
       },
       {
         "id": "ts_key_remapping-emitter",
@@ -16956,7 +18124,12 @@
             "output": "- x (no reason)\n+ y\n0 online"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "The handler object's keys are checked against `Handlers<Events>` — a misspelt `onJion` won't compile.",
+          "The reference solution uses `split`, `join` and a `for` loop.",
+          "The reference solution is 23 lines and begins: `type Events = { join: { user: string }; leave: { user: string; reason: string }; message: { user: string; text: string } };`"
+        ]
       }
     ],
     "cards": [],
@@ -17064,7 +18237,11 @@
             "output": "9 sum 9"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "`infer E` inside `readonly (infer E)[]` captures the element type.",
+          "The answer begins `T extends readonly (infer E)[] …`"
+        ]
       },
       {
         "id": "ts_distributive-never",
@@ -17090,7 +18267,11 @@
             "output": "-4"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "After the three checks, `c` is `never`.",
+          "The answer begins `return …`"
+        ]
       },
       {
         "id": "ts_distributive-partition",
@@ -17112,7 +18293,12 @@
             "output": "values: none\nsum: 0\nerror: only one"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "`Extract` distributes over the union and keeps the members that match the pattern.",
+          "The reference solution uses `split`, `reduce`, `map`, `filter`, `join` and a `for` loop.",
+          "The reference solution is 12 lines and begins: `type Result = { ok: true; value: number } | { ok: false; error: string };`"
+        ]
       }
     ],
     "cards": [],
@@ -17220,7 +18406,11 @@
             "output": "012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789\n120 of at most 120"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Return the recursive call itself, with one more element in the accumulator.",
+          "The answer begins `Build<N, [...Acc, …`"
+        ]
       },
       {
         "id": "ts_type_performance-split",
@@ -17242,7 +18432,11 @@
             "output": "name=solo age=? (+0 extra)"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Put `string` on the left: \"is plain `string` assignable to `S`?\" is true only when `S` is `string` itself.",
+          "The answer begins `string extends …`"
+        ]
       },
       {
         "id": "ts_type_performance-depth",
@@ -17264,7 +18458,12 @@
             "output": "0\n1"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "An array or object is one level more than its deepest child; `Math.max(0, …)` handles the empty case.",
+          "The reference solution uses `split`, `map`, `JSON.parse`, a `for` loop and `Math`.",
+          "The reference solution is 9 lines and begins: `function depth(value: unknown): number {`"
+        ]
       }
     ],
     "cards": [],
@@ -17368,7 +18567,11 @@
             "output": "100% of 7 = 7\nbad percent -1"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Both bounds are allowed.",
+          "The answer begins `value >= 0 && …`"
+        ]
       },
       {
         "id": "ts_class_design-abstract",
@@ -17390,7 +18593,11 @@
             "output": "== Totals ==\ncy: 0\n(1 rows)"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Map each `[name, numbers]` pair to one row string.",
+          "The answer begins `return this.data.map(([name, xs]) => `${name}: ${xs.reduce((a, …`"
+        ]
       },
       {
         "id": "ts_class_design-inventory",
@@ -17412,7 +18619,12 @@
             "output": "refused\n0\n(empty)"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Keep the map `#private` so nothing outside the class can make a count negative.",
+          "The reference solution uses `split`, a `Map`, `map`, `filter`, `sort`, `join`, a `for` loop, `localeCompare`, `??` and a class.",
+          "The reference solution is 31 lines and begins: `class Inventory {`"
+        ]
       }
     ],
     "cards": [],
@@ -17520,7 +18732,11 @@
             "output": "hello a\nhello b\nhello c\nhello d\ngreet called 4 times"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Call the original with `.call`, passing `this` first.",
+          "The answer begins `return target.call(this, …`"
+        ]
       },
       {
         "id": "ts_decorators-memo",
@@ -17546,7 +18762,11 @@
             "output": "1 1 1\ncomputed 1 of 3"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Look up first; return early on a hit.",
+          "The reference solution is 2 lines and begins: `const hit = cache.get(n);`"
+        ]
       },
       {
         "id": "ts_decorators-validate",
@@ -17568,7 +18788,12 @@
             "output": "0.000"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "The wrapper checks, then either throws or delegates.",
+          "The reference solution uses `split`, a `for` loop, `Math` and `try`/`catch`.",
+          "The reference solution is 23 lines and begins: `function validated(check: (x: number) => boolean, target: (x: number) => number, name: string): (x: number) => number {`"
+        ]
       }
     ],
     "cards": [],
@@ -17676,7 +18901,11 @@
             "output": "LONGER WORDS HERE\n3"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "`values()` gives an iterator; chain `filter`, `map`, `take`, then `toArray()`.",
+          "The answer begins `words.values().filter((w) => w.length > …`"
+        ]
       },
       {
         "id": "ts_iterator_helpers-range",
@@ -17702,7 +18931,12 @@
             "output": "1 2 3\n6"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "A generator method named `[Symbol.iterator]`, with a `for` loop that `yield`s.",
+          "The reference solution uses a `for` loop.",
+          "The reference solution is 3 lines and begins: `*[Symbol.iterator](): Generator<number> {`"
+        ]
       },
       {
         "id": "ts_iterator_helpers-log",
@@ -17728,7 +18962,12 @@
             "output": "warnings: 0\nhas fatal: false\nnone"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Each question gets a fresh `lines.values()` — an iterator is consumed by the first pipeline that reads it.",
+          "The reference solution uses `split`, `reduce`, `map`, `filter`, `slice`, a `for` loop and `??`.",
+          "The reference solution is 8 lines and begins: `const lines = input.split(\"\\n\").map((l) => l.trim());`"
+        ]
       }
     ],
     "cards": [],
@@ -17836,7 +19075,11 @@
             "output": "40 30 20\nleft 1"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Negative when `a` should come out first — so when `a` is *larger*.",
+          "The answer begins `(a, b) => …`"
+        ]
       },
       {
         "id": "ts_heap_pq-kth",
@@ -17862,7 +19105,11 @@
             "output": "not enough values"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "When the heap grows past k, remove its smallest.",
+          "The answer begins `if (best.size > …`"
+        ]
       },
       {
         "id": "ts_heap_pq-scheduler",
@@ -17884,7 +19131,12 @@
             "output": "idle\npending x y"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Compare by priority, then by an arrival counter.",
+          "The reference solution uses `split`, `join`, a `while` loop, a `for` loop and a class.",
+          "The reference solution is 69 lines and begins: `class Heap<T> {`"
+        ]
       }
     ],
     "cards": [],
@@ -17988,7 +19240,11 @@
             "output": "solo: 5 ticks\nall timers released"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "The well-known symbol `Symbol.dispose`, as a computed method name.",
+          "The answer is 16 characters long and begins `[Symbol.`."
+        ]
       },
       {
         "id": "ts_resource_management-stack",
@@ -18010,7 +19266,11 @@
             "output": "apply a\napply b\ncommitted"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "`stack.defer(fn)` registers a cleanup; `move()` at the end keeps them from running on success.",
+          "The answer begins `stack.defer(() => console.log(\"rollback …`"
+        ]
       },
       {
         "id": "ts_resource_management-pool",
@@ -18032,7 +19292,12 @@
             "output": "job 1 on conn 1: A\nfree 2\njob 2 on conn 2: B\nfree 2\njob 3 on conn 1: C\nfree 2"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "`using` accepts `undefined`, so an unavailable connection needs no special case in the cleanup.",
+          "The reference solution uses `split`, `join`, a class and `try`/`catch`.",
+          "The reference solution is 29 lines and begins: `class Pool {`"
+        ]
       }
     ],
     "cards": [],
@@ -18140,7 +19405,11 @@
             "output": "line 1: not a number: x"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "`instanceof` narrows `unknown` to the subclass.",
+          "The answer begins `e instanceof …`"
+        ]
       },
       {
         "id": "ts_error_cause-chain",
@@ -18162,7 +19431,11 @@
             "output": "price -3"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "The second argument to `Error` is an options object with `cause`.",
+          "The answer begins `throw new Error(\"could not load …`"
+        ]
       },
       {
         "id": "ts_error_cause-http",
@@ -18184,7 +19457,12 @@
             "output": "200 user 3"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Check the most specific classes first; everything else is a 500.",
+          "The reference solution uses `split`, a `for` loop, `??`, a class and `try`/`catch`.",
+          "The reference solution is 28 lines and begins: `class NotFoundError extends Error {`"
+        ]
       }
     ],
     "cards": [],
@@ -18288,7 +19566,11 @@
             "output": "x\n-- microtasks --\nx"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "`queueMicrotask(fn)` runs `fn` after the current synchronous code.",
+          "The answer begins `queueMicrotask(() => …`"
+        ]
       },
       {
         "id": "ts_event_loop-all",
@@ -18310,7 +19592,11 @@
             "output": "start 10\n20"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Map to promises first, then await them all with `Promise.all`.",
+          "The answer begins `await …`"
+        ]
       },
       {
         "id": "ts_event_loop-simulate",
@@ -18332,7 +19618,12 @@
             "output": "only -> late\nreal: only -> late\nmatch: true"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Three buckets: synchronous logs, microtasks, timers sorted by delay then by position.",
+          "The reference solution uses `split`, `map`, `filter`, `sort`, `join`, a `for` loop and `Math`.",
+          "The reference solution is 24 lines and begins: `type Op = { kind: \"log\" | \"micro\"; label: string } | { kind: \"timer\"; ms: number; label: string };`"
+        ]
       }
     ],
     "cards": [],
@@ -18440,7 +19731,11 @@
             "output": "total 7"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "One call on the signal throws its reason if it has been aborted.",
+          "The answer is 24 characters long and begins `signal.throw`."
+        ]
       },
       {
         "id": "ts_cancellation-resolvers",
@@ -18462,7 +19757,11 @@
             "output": "handled open\nhandled wait\nlate released: now"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "`Promise.withResolvers<T>()` returns `{ promise, resolve, reject }`.",
+          "The answer is 31 characters long and begins `Promise.withRes`."
+        ]
       },
       {
         "id": "ts_cancellation-retry",
@@ -18488,7 +19787,12 @@
             "output": "attempt 1\nattempt 2\ncancelled: user pressed stop"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Check the signal before every attempt; keep the last error to rethrow when attempts run out.",
+          "The reference solution uses `split`, a `for` loop, `await` and `try`/`catch`.",
+          "The reference solution is 31 lines and begins: `async function retry<T>(task: () => Promise<T>, attempts: number, signal: AbortSignal): Promise<T> {`"
+        ]
       }
     ],
     "cards": [],
@@ -18596,7 +19900,12 @@
             "output": "page 1: solo\n1 pages"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Loop over page numbers; stop (`return`) at the first empty page; `yield` each batch.",
+          "The reference solution uses a `for` loop and `await`.",
+          "The reference solution is 5 lines and begins: `for (let page = 0; ; page++) {`"
+        ]
       },
       {
         "id": "ts_async_iteration-for-await",
@@ -18622,7 +19931,11 @@
             "output": "after 1: average 1.00\nafter 2: average 1.50"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "`for await (const x of source)`.",
+          "The answer begins `for await (const …`"
+        ]
       },
       {
         "id": "ts_async_iteration-merge",
@@ -18648,7 +19961,12 @@
             "output": "1 2 100\npulled 3"
           }
         ],
-        "source_slug": ""
+        "source_slug": "",
+        "hints": [
+          "Keep the current `next()` result of each source; yield the smaller and advance that source only.",
+          "The reference solution uses `split`, `map`, `filter`, `join`, a `while` loop, a `for` loop, a generator and `await`.",
+          "The reference solution is 30 lines and begins: `async function* fromList(xs: number[], counter: { pulled: number }): AsyncGenerator<number> {`"
+        ]
       }
     ],
     "cards": [],

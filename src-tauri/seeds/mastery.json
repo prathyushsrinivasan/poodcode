@@ -1098,7 +1098,8 @@
             "prompt": "What type does TypeScript already infer for `n`? Annotate `check` with exactly that type — not merely one that fits.",
             "hint": "`Number(...)` always returns a `number` — even when the answer is `NaN`.",
             "hints": [
-              "`Number(...)` always returns a `number` — even when the answer is `NaN`."
+              "`Number(...)` always returns a `number` — even when the answer is `NaN`.",
+              "The answer is 6 characters long and begins `num`."
             ],
             "language": "typescript",
             "kind": "predict",
@@ -1121,7 +1122,8 @@
             "prompt": "What type does TypeScript already infer for `input`? Annotate `check` with exactly that type — not merely one that fits.",
             "hint": "With the `\"utf8\"` encoding, `readFileSync` returns text.",
             "hints": [
-              "With the `\"utf8\"` encoding, `readFileSync` returns text."
+              "With the `\"utf8\"` encoding, `readFileSync` returns text.",
+              "The answer is 6 characters long and begins `str`."
             ],
             "language": "typescript",
             "kind": "predict",
@@ -1280,7 +1282,8 @@
             "prompt": "Every `let` below is assigned once and never again. Make each one a `const`, so the compiler stops anyone reassigning them by accident. The output must not change.",
             "hint": "Reach for `const` by default; `let` is for values that really change.",
             "hints": [
-              "Reach for `const` by default; `let` is for values that really change."
+              "Reach for `const` by default; `let` is for values that really change.",
+              "The change starts on line 3 of the program."
             ],
             "language": "typescript",
             "kind": "refactor",
@@ -1942,7 +1945,9 @@
             "prompt": "The input is a radius. Print the circumference and the area, each to exactly three decimals, on two lines. Use `Math.PI`.",
             "hint": "`2πr` and `πr²`; `**` is the power operator.",
             "hints": [
-              "`2πr` and `πr²`; `**` is the power operator."
+              "`2πr` and `πr²`; `**` is the power operator.",
+              "The reference solution uses `Math`.",
+              "The reference solution is 3 lines and begins: `const r = Number(input);`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -1984,7 +1989,9 @@
             "prompt": "The input is three numbers on one line, separated by any whitespace. Print their mean to exactly two decimals.",
             "hint": "Split on `/\\s+/`, convert each token, then add before dividing.",
             "hints": [
-              "Split on `/\\s+/`, convert each token, then add before dividing."
+              "Split on `/\\s+/`, convert each token, then add before dividing.",
+              "The reference solution uses `split`.",
+              "The reference solution is 5 lines and begins: `const parts = input.split(/\\s+/);`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -2026,7 +2033,9 @@
             "prompt": "The input is `weightKg heightCm` on one line. Print the BMI — weight divided by the square of the height **in metres** — to one decimal.",
             "hint": "Convert centimetres to metres before squaring.",
             "hints": [
-              "Convert centimetres to metres before squaring."
+              "Convert centimetres to metres before squaring.",
+              "The reference solution uses `split`.",
+              "The reference solution is 4 lines and begins: `const parts = input.split(/\\s+/);`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -2115,7 +2124,9 @@
             "prompt": "The input is a whole number of hours. Print `<d> days <h> hours` — always the words `days` and `hours`, whatever the numbers.",
             "hint": "Whole days are `Math.floor(total / 24)`; the rest is `total % 24`.",
             "hints": [
-              "Whole days are `Math.floor(total / 24)`; the rest is `total % 24`."
+              "Whole days are `Math.floor(total / 24)`; the rest is `total % 24`.",
+              "The reference solution uses `Math`.",
+              "The reference solution is 2 lines and begins: `const total = Number(input);`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -3379,7 +3390,8 @@
             "prompt": "What type does TypeScript already infer for `same`? Annotate `check` with exactly that type — not merely one that fits.",
             "hint": "A comparison produces a `boolean`.",
             "hints": [
-              "A comparison produces a `boolean`."
+              "A comparison produces a `boolean`.",
+              "The answer is 7 characters long and begins `boo`."
             ],
             "language": "typescript",
             "kind": "predict",
@@ -3426,7 +3438,8 @@
             "prompt": "The compiler rejects this program:\n\n    error TS2367: This comparison appears to be unintentional because the types 'number' and 'string' have no overlap.\n\nFix the cause.",
             "hint": "`n` is a `number`; compare it with a number.",
             "hints": [
-              "`n` is a `number`; compare it with a number."
+              "`n` is a `number`; compare it with a number.",
+              "The change starts on line 4 of the program."
             ],
             "language": "typescript",
             "kind": "diagnose",
@@ -3491,7 +3504,8 @@
             "prompt": "Print `one`, `two` or `many` for 1, 2 and anything else. Input 1 prints the wrong word.",
             "hint": "Without `break`, case 1 falls through into case 2.",
             "hints": [
-              "Without `break`, case 1 falls through into case 2."
+              "Without `break`, case 1 falls through into case 2.",
+              "The change starts on line 7 of the program."
             ],
             "language": "typescript",
             "kind": "fix",
@@ -4064,7 +4078,9 @@
             "prompt": "The input is three side lengths. Print `invalid` unless every side is positive and each side is shorter than the sum of the other two. Otherwise print `equilateral`, `isosceles` or `scalene`.",
             "hint": "Rule out the invalid shapes first — including the flat triangle where one side equals the sum of the others.",
             "hints": [
-              "Rule out the invalid shapes first — including the flat triangle where one side equals the sum of the others."
+              "Rule out the invalid shapes first — including the flat triangle where one side equals the sum of the others.",
+              "The reference solution uses `split` and `map`.",
+              "The reference solution is 11 lines and begins: `const s = input.split(/\\s+/).map(Number);`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -4173,7 +4189,9 @@
             "prompt": "The input is a day number, 1 (Monday) to 7 (Sunday). Print the day's name and, on a second line, `weekend` or `weekday`. For any other input print only `invalid`.",
             "hint": "A `switch` on the number, with `break` after every case.",
             "hints": [
-              "A `switch` on the number, with `break` after every case."
+              "A `switch` on the number, with `break` after every case.",
+              "The reference solution uses a `switch`.",
+              "The reference solution is 17 lines and begins: `const n = Number(input);`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -4541,7 +4559,9 @@
             "prompt": "The input is two moves, e.g. `rock scissors`, case-insensitive. Print `player 1 wins`, `player 2 wins` or `draw`, or `invalid` if either move is not rock, paper or scissors.",
             "hint": "Normalise case once, validate both, then list only player 1's three winning pairs.",
             "hints": [
-              "Normalise case once, validate both, then list only player 1's three winning pairs."
+              "Normalise case once, validate both, then list only player 1's three winning pairs.",
+              "The reference solution uses `split`.",
+              "The reference solution is 12 lines and begins: `const p = input.toLowerCase().split(/\\s+/);`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -5707,7 +5727,8 @@
             "prompt": "What type does TypeScript already infer for `big`? Annotate `check` with exactly that type — not merely one that fits.",
             "hint": "A `const` keeps the literal type — for `bigint` too.",
             "hints": [
-              "A `const` keeps the literal type — for `bigint` too."
+              "A `const` keeps the literal type — for `bigint` too.",
+              "The answer is 3 characters long and begins `1`."
             ],
             "language": "typescript",
             "kind": "predict",
@@ -5730,7 +5751,8 @@
             "prompt": "What type does TypeScript already infer for `count`? Annotate `check` with exactly that type — not merely one that fits.",
             "hint": "`let` widens the literal to its general type.",
             "hints": [
-              "`let` widens the literal to its general type."
+              "`let` widens the literal to its general type.",
+              "The answer is 6 characters long and begins `big`."
             ],
             "language": "typescript",
             "kind": "predict",
@@ -5784,7 +5806,8 @@
             "prompt": "Print the sum of 1 to n inclusive. It's always short by n.",
             "hint": "\"1 to n inclusive\" — does the loop ever reach n?",
             "hints": [
-              "\"1 to n inclusive\" — does the loop ever reach n?"
+              "\"1 to n inclusive\" — does the loop ever reach n?",
+              "The change starts on line 5 of the program."
             ],
             "language": "typescript",
             "kind": "fix",
@@ -5892,7 +5915,8 @@
             "prompt": "The loop only ever reads `xs[i]`. Rewrite it without an index: iterate over the values directly. The output must not change.",
             "hint": "`for (const x of xs)` hands you each value.",
             "hints": [
-              "`for (const x of xs)` hands you each value."
+              "`for (const x of xs)` hands you each value.",
+              "The change starts on line 6 of the program."
             ],
             "language": "typescript",
             "kind": "refactor",
@@ -6223,7 +6247,9 @@
             "prompt": "The input is a positive integer n. Repeatedly halve it if even, or replace it with 3n + 1 if odd, until it reaches 1. Print the number of steps, then the largest value reached.",
             "hint": "A `while` loop, because you don't know the step count in advance.",
             "hints": [
-              "A `while` loop, because you don't know the step count in advance."
+              "A `while` loop, because you don't know the step count in advance.",
+              "The reference solution uses a `while` loop.",
+              "The reference solution is 10 lines and begins: `let n = Number(input);`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -6265,7 +6291,9 @@
             "prompt": "The input is a non-negative integer. Repeatedly replace it with the sum of its digits until one digit is left. Print every value along the way, space-separated, starting with the input.",
             "hint": "Peel digits with `% 10` and `Math.floor(/ 10)` in an inner loop.",
             "hints": [
-              "Peel digits with `% 10` and `Math.floor(/ 10)` in an inner loop."
+              "Peel digits with `% 10` and `Math.floor(/ 10)` in an inner loop.",
+              "The reference solution uses `join`, a `while` loop and `Math`.",
+              "The reference solution is 13 lines and begins: `let n = Number(input);`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -6350,7 +6378,9 @@
             "prompt": "The input is n. Print the sum of every positive integer below n that is a multiple of 3 or 5, then how many there were.",
             "hint": "A `for` loop with a condition; 15 counts once, not twice.",
             "hints": [
-              "A `for` loop with a condition; 15 counts once, not twice."
+              "A `for` loop with a condition; 15 counts once, not twice.",
+              "The reference solution uses a `for` loop.",
+              "The reference solution is 11 lines and begins: `const n = Number(input);`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -6427,7 +6457,9 @@
             "prompt": "The input is n. An Armstrong number equals the sum of its digits each raised to the power of the number of digits (153 = 1³ + 5³ + 3³). Print every Armstrong number from 1 to n, space-separated.",
             "hint": "For each i, count its digits, then add each digit to that power.",
             "hints": [
-              "For each i, count its digits, then add each digit to that power."
+              "For each i, count its digits, then add each digit to that power.",
+              "The reference solution uses `join`, a `while` loop, a `for` loop and `Math`.",
+              "The reference solution is 13 lines and begins: `const n = Number(input);`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -6465,7 +6497,9 @@
             "prompt": "The input is an integer, possibly negative. Print it with its digits reversed, keeping the sign and dropping leading zeros — using arithmetic, not string methods.",
             "hint": "Take the last digit with `% 10` and push it onto the reversed number with `* 10 +`.",
             "hints": [
-              "Take the last digit with `% 10` and push it onto the reversed number with `* 10 +`."
+              "Take the last digit with `% 10` and push it onto the reversed number with `* 10 +`.",
+              "The reference solution uses a `while` loop and `Math`.",
+              "The reference solution is 8 lines and begins: `const n = Number(input);`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -7802,7 +7836,8 @@
             "prompt": "The compiler rejects this program:\n\n    error TS2551: Property 'lenght' does not exist on type '\"hello\"'. Did you mean 'length'?\n\nFix the cause.",
             "hint": "Read the suggestion at the end of the message.",
             "hints": [
-              "Read the suggestion at the end of the message."
+              "Read the suggestion at the end of the message.",
+              "The change starts on line 2 of the program."
             ],
             "language": "typescript",
             "kind": "diagnose",
@@ -7863,7 +7898,8 @@
             "prompt": "What type does TypeScript already infer for `m`? Annotate `check` with exactly that type — not merely one that fits.",
             "hint": "`match` without `g` returns the match details — or `null`.",
             "hints": [
-              "`match` without `g` returns the match details — or `null`."
+              "`match` without `g` returns the match details — or `null`.",
+              "The answer begins `RegExpMatchArray | …`"
             ],
             "language": "typescript",
             "kind": "predict",
@@ -7886,7 +7922,8 @@
             "prompt": "What type does TypeScript already infer for `all`? Annotate `check` with exactly that type — not merely one that fits.",
             "hint": "With `g` it's still typed as `RegExpMatchArray | null`.",
             "hints": [
-              "With `g` it's still typed as `RegExpMatchArray | null`."
+              "With `g` it's still typed as `RegExpMatchArray | null`.",
+              "The answer begins `RegExpMatchArray | …`"
             ],
             "language": "typescript",
             "kind": "predict",
@@ -7909,7 +7946,8 @@
             "prompt": "The compiler rejects this program:\n\n    error TS18047: 'm' is possibly 'null'.\n\nFix the cause.",
             "hint": "`match` returns `null` when nothing matches.",
             "hints": [
-              "`match` returns `null` when nothing matches."
+              "`match` returns `null` when nothing matches.",
+              "The change starts on line 4 of the program."
             ],
             "language": "typescript",
             "kind": "diagnose",
@@ -7939,7 +7977,8 @@
             "prompt": "Replace every comma with a semicolon. Only the first changes.",
             "hint": "A string pattern replaces one occurrence.",
             "hints": [
-              "A string pattern replaces one occurrence."
+              "A string pattern replaces one occurrence.",
+              "The change starts on line 3 of the program."
             ],
             "language": "typescript",
             "kind": "fix",
@@ -8000,7 +8039,8 @@
             "prompt": "`initials` turns a full name into its initials. Replace the three `any`s: a name is a string, each word is a string, and so is the result.",
             "hint": "Once `name` is a string, `split` gives `string[]` and the callback's `w` is inferred — no annotation needed.",
             "hints": [
-              "Once `name` is a string, `split` gives `string[]` and the callback's `w` is inferred — no annotation needed."
+              "Once `name` is a string, `split` gives `string[]` and the callback's `w` is inferred — no annotation needed.",
+              "The change starts on line 3 of the program."
             ],
             "language": "typescript",
             "kind": "retype",
@@ -8030,7 +8070,8 @@
             "prompt": "The line is glued together with `+`. Build it with one template literal instead — no `\" +` or `+ \"` left. Same output.",
             "hint": "Backticks, with each value in `${...}`.",
             "hints": [
-              "Backticks, with each value in `${...}`."
+              "Backticks, with each value in `${...}`.",
+              "The change starts on line 4 of the program."
             ],
             "language": "typescript",
             "kind": "refactor",
@@ -8538,7 +8579,9 @@
             "prompt": "The input is a sentence. Words are runs of letters (ignore punctuation and digits). Print the longest word — the first one if several tie — and its length, as `<word> <n>`, or `none 0` if there are no words.",
             "hint": "`match(/[A-Za-z]+/g)` gives every run of letters, or `null`.",
             "hints": [
-              "`match(/[A-Za-z]+/g)` gives every run of letters, or `null`."
+              "`match(/[A-Za-z]+/g)` gives every run of letters, or `null`.",
+              "The reference solution uses a `for` loop and `??`.",
+              "The reference solution is 4 lines and begins: `const words = input.match(/[A-Za-z]+/g) ?? [];`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -8615,7 +8658,9 @@
             "prompt": "Each input line is a sentence. Print `pangram` if it contains every letter a-z at least once (case-insensitive), otherwise `missing <letters>` with the missing letters in alphabetical order.",
             "hint": "Loop over the character codes 97 (`a`) to 122 (`z`).",
             "hints": [
-              "Loop over the character codes 97 (`a`) to 122 (`z`)."
+              "Loop over the character codes 97 (`a`) to 122 (`z`).",
+              "The reference solution uses `split` and a `for` loop.",
+              "The reference solution is 9 lines and begins: `for (const line of input.split(\"\\n\")) {`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -8649,7 +8694,9 @@
             "prompt": "Each input line may have leading, trailing and repeated spaces and tabs. Print it with the ends trimmed and every run of whitespace replaced by one space, followed by ` (<k> removed)` — how many characters were dropped.",
             "hint": "`trim()` then `replace(/\\s+/g, \" \")`.",
             "hints": [
-              "`trim()` then `replace(/\\s+/g, \" \")`."
+              "`trim()` then `replace(/\\s+/g, \" \")`.",
+              "The reference solution uses `split` and a `for` loop.",
+              "The reference solution is 4 lines and begins: `for (const line of input.split(\"\\n\")) {`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -8757,7 +8804,9 @@
             "prompt": "Each input line is a snake_case or kebab-case identifier. Print it in camelCase: first word lowercase, each later word capitalised, underscores and hyphens removed. Repeated separators count as one.",
             "hint": "Split on `/[_-]+/`, drop empty pieces, capitalise every word but the first.",
             "hints": [
-              "Split on `/[_-]+/`, drop empty pieces, capitalise every word but the first."
+              "Split on `/[_-]+/`, drop empty pieces, capitalise every word but the first.",
+              "The reference solution uses `split`, `map`, `filter`, `join`, `slice` and a `for` loop.",
+              "The reference solution is 5 lines and begins: `for (const line of input.split(\"\\n\")) {`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -10046,7 +10095,8 @@
             "prompt": "What type does TypeScript already infer for `result`? Annotate `check` with exactly that type — not merely one that fits.",
             "hint": "The return type is inferred from the `return` expression.",
             "hints": [
-              "The return type is inferred from the `return` expression."
+              "The return type is inferred from the `return` expression.",
+              "The answer is 6 characters long and begins `num`."
             ],
             "language": "typescript",
             "kind": "predict",
@@ -10346,7 +10396,8 @@
             "prompt": "`greet` fakes default arguments with `||`. Use real default parameters instead — no `||` left. (Every test passes non-empty names, so the behaviour is the same.)",
             "hint": "`function greet(name = \"friend\", ...)` — the default applies when the argument is missing.",
             "hints": [
-              "`function greet(name = \"friend\", ...)` — the default applies when the argument is missing."
+              "`function greet(name = \"friend\", ...)` — the default applies when the argument is missing.",
+              "The change starts on line 3 of the program."
             ],
             "language": "typescript",
             "kind": "refactor",
@@ -10826,7 +10877,8 @@
             "prompt": "Write `greet(name?, greeting?)` returning `<greeting>, <name>!`, where a missing name means `world` and a missing greeting means `Hello`. The hidden driver calls it once per input line (`-` stands for an argument that is left out).",
             "hint": "Default parameters apply whenever the argument is `undefined`.",
             "hints": [
-              "Default parameters apply whenever the argument is `undefined`."
+              "Default parameters apply whenever the argument is `undefined`.",
+              "The answer begins `return `${greeting}, …`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -10856,7 +10908,8 @@
             "prompt": "Write `safeDivide(a: number, b: number): number | null` returning `a / b`, or `null` when `b` is 0. The driver prints each result (or `null`) for each input line `a b`.",
             "hint": "The return type already says what to do when you can't divide.",
             "hints": [
-              "The return type already says what to do when you can't divide."
+              "The return type already says what to do when you can't divide.",
+              "The answer begins `return b === 0 ? …`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -10886,7 +10939,9 @@
             "prompt": "Write `total(label: string, ...amounts: number[]): string` returning `<label>: <sum> (<count> items)`. The driver calls it with each line's first token as the label and the rest as numbers.",
             "hint": "A rest parameter is a real array inside the function.",
             "hints": [
-              "A rest parameter is a real array inside the function."
+              "A rest parameter is a real array inside the function.",
+              "The reference solution uses a `for` loop.",
+              "The reference solution is 3 lines and begins: `let sum = 0;`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -10912,7 +10967,8 @@
             "prompt": "Write `pluralize(count: number, singular: string, plural = singular + \"s\"): string` returning `<count> <word>`, using the singular only when count is exactly 1. The driver passes lines `count singular [plural]`.",
             "hint": "A default can use an earlier parameter: `plural = singular + \"s\"`.",
             "hints": [
-              "A default can use an earlier parameter: `plural = singular + \"s\"`."
+              "A default can use an earlier parameter: `plural = singular + \"s\"`.",
+              "The answer begins `return `${count} ${count === 1 …`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -12031,7 +12087,8 @@
             "prompt": "What type does TypeScript already infer for `lengths`? Annotate `check` with exactly that type — not merely one that fits.",
             "hint": "`map` returns an array of whatever the callback returns.",
             "hints": [
-              "`map` returns an array of whatever the callback returns."
+              "`map` returns an array of whatever the callback returns.",
+              "The answer is 8 characters long and begins `numb`."
             ],
             "language": "typescript",
             "kind": "predict",
@@ -12148,7 +12205,8 @@
             "prompt": "What type does TypeScript already infer for `doubled`? Annotate `check` with exactly that type — not merely one that fits.",
             "hint": "`map` returns an array of whatever the callback returns.",
             "hints": [
-              "`map` returns an array of whatever the callback returns."
+              "`map` returns an array of whatever the callback returns.",
+              "The answer is 8 characters long and begins `numb`."
             ],
             "language": "typescript",
             "kind": "predict",
@@ -12171,7 +12229,8 @@
             "prompt": "What type does TypeScript already infer for `addTwo`? Annotate `check` with exactly that type — not merely one that fits.",
             "hint": "`add(2)` returns the inner arrow.",
             "hints": [
-              "`add(2)` returns the inner arrow."
+              "`add(2)` returns the inner arrow.",
+              "The answer begins `(b: number) …`"
             ],
             "language": "typescript",
             "kind": "predict",
@@ -12525,7 +12584,9 @@
             "prompt": "The first line is a starting number; the second a list of operation names. Keep a table `Record<string, (n: number) => number>` with `double`, `inc`, `dec`, `square`, `neg` and `half` (halving rounds down). Apply the operations left to right and print the value after each, space-separated. An unknown name prints `unknown <name>` and stops.",
             "hint": "A table of functions replaces an if-chain; `Object.hasOwn` keeps `toString` out.",
             "hints": [
-              "A table of functions replaces an if-chain; `Object.hasOwn` keeps `toString` out."
+              "A table of functions replaces an if-chain; `Object.hasOwn` keeps `toString` out.",
+              "The reference solution uses `split`, `join`, a `for` loop and `Math`.",
+              "The reference solution is 23 lines and begins: `const [startText = \"0\", opsLine = \"\"] = input.split(\"\\n\");`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -12563,7 +12624,9 @@
             "prompt": "Write `countBy(xs: number[], pred: (x: number) => boolean): number`. The driver calls it with four predicates — even, negative, a multiple of 3, and greater than the mean — and prints the four counts.",
             "hint": "The predicate is just a function you call on each element.",
             "hints": [
-              "The predicate is just a function you call on each element."
+              "The predicate is just a function you call on each element.",
+              "The reference solution uses a `for` loop.",
+              "The reference solution is 3 lines and begins: `let n = 0;`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -12597,7 +12660,9 @@
             "prompt": "Write `findIndexFrom(xs: number[], pred: (x: number) => boolean, start = 0): number` returning the first index ≥ start whose element satisfies `pred`, or -1. The driver's first line is the numbers; each later line is `start threshold`, and it searches for the first element greater than the threshold.",
             "hint": "A plain loop from `start`, returning as soon as the predicate holds.",
             "hints": [
-              "A plain loop from `start`, returning as soon as the predicate holds."
+              "A plain loop from `start`, returning as soon as the predicate holds.",
+              "The reference solution uses a `for` loop and `Math`.",
+              "The reference solution is 2 lines and begins: `for (let i = Math.max(0, start); i < xs.length; i++) if (pred(xs[i])) return i;`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -12623,7 +12688,9 @@
             "prompt": "The input is a line of integers. Print `all even: <bool>`, `any negative: <bool>`, `none zero: <bool>` and `sorted: <bool>` (non-decreasing), using `every` and `some`.",
             "hint": "`every` gets the index too — compare each element with the one before it.",
             "hints": [
-              "`every` gets the index too — compare each element with the one before it."
+              "`every` gets the index too — compare each element with the one before it.",
+              "The reference solution uses `split`, `map` and `??`.",
+              "The reference solution is 5 lines and begins: `const xs = input.split(/\\s+/).map(Number);`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -12661,7 +12728,9 @@
             "prompt": "The input is n (1-10). Print the moves that transfer n disks from peg A to peg C using B, one per line as `disk <d>: <from> -> <to>`, then `<m> moves`.",
             "hint": "Move n-1 disks out of the way, move the biggest, move the n-1 back on top.",
             "hints": [
-              "Move n-1 disks out of the way, move the biggest, move the n-1 back on top."
+              "Move n-1 disks out of the way, move the biggest, move the n-1 back on top.",
+              "The reference solution uses a `for` loop.",
+              "The reference solution is 10 lines and begins: `const moves: string[] = [];`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -12812,7 +12881,8 @@
             "prompt": "Write `pipe(...fns: ((s: string) => string)[]): (s: string) => string` returning a function that applies each of `fns` in order. The driver maps names (`trim`, `lower`, `upper`, `squash` — collapse whitespace runs to one space, `reverse`) to functions, builds one pipe from the first line's names and applies it to every later line, printing `[<result>]`.",
             "hint": "`reduce` over the functions, threading the string through.",
             "hints": [
-              "`reduce` over the functions, threading the string through."
+              "`reduce` over the functions, threading the string through.",
+              "The answer begins `return (s) => fns.reduce((acc, …`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -14053,7 +14123,8 @@
             "prompt": "The compiler rejects this program:\n\n    error TS2493: Tuple type '[string, number]' of length '2' has no element at index '2'.\n\nPrint the pair's number.",
             "hint": "Tuples are zero-indexed.",
             "hints": [
-              "Tuples are zero-indexed."
+              "Tuples are zero-indexed.",
+              "The change starts on line 2 of the program."
             ],
             "language": "typescript",
             "kind": "diagnose",
@@ -14079,7 +14150,8 @@
             "prompt": "What type does TypeScript already infer for `pair`? Annotate `check` with exactly that type — not merely one that fits.",
             "hint": "Array literals infer arrays, not tuples.",
             "hints": [
-              "Array literals infer arrays, not tuples."
+              "Array literals infer arrays, not tuples.",
+              "The answer begins `(string | …`"
             ],
             "language": "typescript",
             "kind": "predict",
@@ -14102,7 +14174,8 @@
             "prompt": "What type does TypeScript already infer for `sorted`? Annotate `check` with exactly that type — not merely one that fits.",
             "hint": "`toSorted` returns a new array of the same element type.",
             "hints": [
-              "`toSorted` returns a new array of the same element type."
+              "`toSorted` returns a new array of the same element type.",
+              "The answer is 8 characters long and begins `numb`."
             ],
             "language": "typescript",
             "kind": "predict",
@@ -14125,7 +14198,8 @@
             "prompt": "What type does TypeScript already infer for `last`? Annotate `check` with exactly that type — not merely one that fits.",
             "hint": "`at` may be given an index that's out of range.",
             "hints": [
-              "`at` may be given an index that's out of range."
+              "`at` may be given an index that's out of range.",
+              "The answer begins `number | …`"
             ],
             "language": "typescript",
             "kind": "predict",
@@ -14148,7 +14222,8 @@
             "prompt": "The compiler rejects this program:\n\n    error TS2493: Tuple type '[string, number]' of length '2' has no element at index '2'.\n\nPrint the name and the age.",
             "hint": "A two-element tuple has indexes 0 and 1.",
             "hints": [
-              "A two-element tuple has indexes 0 and 1."
+              "A two-element tuple has indexes 0 and 1.",
+              "The change starts on line 5 of the program."
             ],
             "language": "typescript",
             "kind": "diagnose",
@@ -14205,7 +14280,8 @@
             "prompt": "Print the numbers in ascending order.",
             "hint": "Without a comparator, sorting compares strings.",
             "hints": [
-              "Without a comparator, sorting compares strings."
+              "Without a comparator, sorting compares strings.",
+              "The change starts on line 3 of the program."
             ],
             "language": "typescript",
             "kind": "fix",
@@ -14235,7 +14311,8 @@
             "prompt": "`minMax` returns the smallest and largest number as a pair. Replace every `any`: the input is a list of numbers (`readonly` is fine) and the result is the tuple `[number, number]` (a `readonly` tuple is fine too).",
             "hint": "Without an annotation, `[a, b]` is inferred as `number[]` — say `[number, number]`.",
             "hints": [
-              "Without an annotation, `[a, b]` is inferred as `number[]` — say `[number, number]`."
+              "Without an annotation, `[a, b]` is inferred as `number[]` — say `[number, number]`.",
+              "The change starts on line 3 of the program."
             ],
             "language": "typescript",
             "kind": "retype",
@@ -14300,7 +14377,8 @@
             "prompt": "`sort` and `reverse` change the array in place — which is why the last line prints the sorted order instead of the order the numbers came in. Use the copying methods, so the last line prints the input order. No `.sort(` or `.reverse(` left.",
             "hint": "ES2023 added `toSorted` and `toReversed`, which return new arrays.",
             "hints": [
-              "ES2023 added `toSorted` and `toReversed`, which return new arrays."
+              "ES2023 added `toSorted` and `toReversed`, which return new arrays.",
+              "The change starts on line 4 of the program."
             ],
             "language": "typescript",
             "kind": "refactor",
@@ -14839,7 +14917,9 @@
             "prompt": "The first line is the chunk size k; the second a list of values. Print the values in chunks of k, one chunk per line (the last may be shorter).",
             "hint": "Step the start index by k and `slice(i, i + k)`.",
             "hints": [
-              "Step the start index by k and `slice(i, i + k)`."
+              "Step the start index by k and `slice(i, i + k)`.",
+              "The reference solution uses `split`, `join`, `slice` and a `for` loop.",
+              "The reference solution is 4 lines and begins: `const [kText = \"1\", line = \"\"] = input.split(\"\\n\");`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -14873,7 +14953,9 @@
             "prompt": "Two lines of values. Pair them up position by position as `a:b`, stopping at the shorter list, then print `<n> pairs, <m> left over`.",
             "hint": "`Array.from({ length: n }, …)` builds the pairs as tuples.",
             "hints": [
-              "`Array.from({ length: n }, …)` builds the pairs as tuples."
+              "`Array.from({ length: n }, …)` builds the pairs as tuples.",
+              "The reference solution uses `split`, `map`, `join` and `Math`.",
+              "The reference solution is 7 lines and begins: `const [first = \"\", second = \"\"] = input.split(\"\\n\");`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -14907,7 +14989,9 @@
             "prompt": "The first line is k (may be larger than the length, or negative for a right rotation); the second a list. Print the list rotated left by k.",
             "hint": "Normalise k into 0…n-1 with a double modulo, then concatenate two slices.",
             "hints": [
-              "Normalise k into 0…n-1 with a double modulo, then concatenate two slices."
+              "Normalise k into 0…n-1 with a double modulo, then concatenate two slices.",
+              "The reference solution uses `split`, `join` and `slice`.",
+              "The reference solution is 5 lines and begins: `const [kText = \"0\", line = \"\"] = input.split(\"\\n\");`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -14945,7 +15029,9 @@
             "prompt": "Print the distinct values in order of first appearance, then `<k> removed`.",
             "hint": "A `Set` keeps insertion order.",
             "hints": [
-              "A `Set` keeps insertion order."
+              "A `Set` keeps insertion order.",
+              "The reference solution uses `split`, a `Set` and `join`.",
+              "The reference solution is 4 lines and begins: `const xs = input.split(/\\s+/);`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -14979,7 +15065,9 @@
             "prompt": "Print the differences between consecutive numbers, then `increasing`, `decreasing`, `constant` or `mixed` — strictly increasing, strictly decreasing, all equal, or none of those. A single number prints `(none)` then `constant`.",
             "hint": "`xs.slice(1).map((x, i) => x - xs[i])` pairs each element with the one before it.",
             "hints": [
-              "`xs.slice(1).map((x, i) => x - xs[i])` pairs each element with the one before it."
+              "`xs.slice(1).map((x, i) => x - xs[i])` pairs each element with the one before it.",
+              "The reference solution uses `split`, `map`, `join`, `slice` and `??`.",
+              "The reference solution is 7 lines and begins: `const xs = input.split(/\\s+/).map(Number);`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -15021,7 +15109,9 @@
             "prompt": "Each input line is a row of a rectangular matrix. Print its transpose, one row per line.",
             "hint": "Column c of the input becomes row c of the output: `rows.map(row => row[c])`.",
             "hints": [
-              "Column c of the input becomes row c of the output: `rows.map(row => row[c])`."
+              "Column c of the input becomes row c of the output: `rows.map(row => row[c])`.",
+              "The reference solution uses `split`, `map`, `join`, a `for` loop and `??`.",
+              "The reference solution is 4 lines and begins: `const rows = input.split(\"\\n\").map((line) => line.trim().split(/\\s+/));`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -15055,7 +15145,9 @@
             "prompt": "Group the words by length with `Object.groupBy`. Print one line per length, shortest first: `<length>: <words in input order>`, then the length with the most words (the shortest on a tie).",
             "hint": "`Object.groupBy` keys are property keys; turn them back into numbers to sort numerically.",
             "hints": [
-              "`Object.groupBy` keys are property keys; turn them back into numbers to sort numerically."
+              "`Object.groupBy` keys are property keys; turn them back into numbers to sort numerically.",
+              "The reference solution uses `split`, `map`, `toSorted`, `join`, a `for` loop and `??`.",
+              "The reference solution is 14 lines and begins: `const words = input.split(/\\s+/);`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -15124,7 +15216,9 @@
             "prompt": "The first line is n; the second a list of scores. Print the top n *distinct* scores with their dense rank (equal scores share a rank; the next rank is one more) as `#<rank> <score> (x<count>)`, highest first.",
             "hint": "Count each score, sort the distinct scores descending, take n.",
             "hints": [
-              "Count each score, sort the distinct scores descending, take n."
+              "Count each score, sort the distinct scores descending, take n.",
+              "The reference solution uses `split`, a `Map`, `map`, `toSorted`, `slice`, a `for` loop and `??`.",
+              "The reference solution is 6 lines and begins: `const [nText = \"0\", line = \"\"] = input.split(\"\\n\");`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -15158,7 +15252,9 @@
             "prompt": "Each input line is a list. Interleave them round-robin — first item of each list, then second of each, and so on, skipping lists that have run out. Print the result, then the length of the longest list.",
             "hint": "The outer loop is the position; the inner loop visits each list.",
             "hints": [
-              "The outer loop is the position; the inner loop visits each list."
+              "The outer loop is the position; the inner loop visits each list.",
+              "The reference solution uses `split`, `map`, `filter`, `join`, a `for` loop and `Math`.",
+              "The reference solution is 11 lines and begins: `const lists = input.split(\"\\n\").map((line) => line.trim().split(/\\s+/).filter((t) => t !== \"\"));`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -16414,7 +16510,8 @@
             "prompt": "The compiler rejects this program:\n\n    error TS2741: Property 'age' is missing in type '{ name: string; }' but required in type 'User'.\n\nAda is 36.",
             "hint": "Every required property must be present.",
             "hints": [
-              "Every required property must be present."
+              "Every required property must be present.",
+              "The change starts on line 2 of the program."
             ],
             "language": "typescript",
             "kind": "diagnose",
@@ -16467,7 +16564,8 @@
             "prompt": "What type does TypeScript already infer for `entries`? Annotate `check` with exactly that type — not merely one that fits.",
             "hint": "Each entry is a `[key, value]` tuple.",
             "hints": [
-              "Each entry is a `[key, value]` tuple."
+              "Each entry is a `[key, value]` tuple.",
+              "The answer begins `[string, …`"
             ],
             "language": "typescript",
             "kind": "predict",
@@ -16490,7 +16588,8 @@
             "prompt": "What type does TypeScript already infer for `n`? Annotate `check` with exactly that type — not merely one that fits.",
             "hint": "Without `noUncheckedIndexedAccess`, the read is typed as the value type — even though it may be missing.",
             "hints": [
-              "Without `noUncheckedIndexedAccess`, the read is typed as the value type — even though it may be missing."
+              "Without `noUncheckedIndexedAccess`, the read is typed as the value type — even though it may be missing.",
+              "The answer is 6 characters long and begins `num`."
             ],
             "language": "typescript",
             "kind": "predict",
@@ -16544,7 +16643,8 @@
             "prompt": "The compiler rejects this program:\n\n    error TS2741: Property 'error' is missing in type '{ info: string; warn: string; }' but required in type 'Record<Level, string>'.\n\nGive every level an icon — `error` is `x`.",
             "hint": "`Record` over a union needs every member.",
             "hints": [
-              "`Record` over a union needs every member."
+              "`Record` over a union needs every member.",
+              "The change starts on line 4 of the program."
             ],
             "language": "typescript",
             "kind": "diagnose",
@@ -16659,7 +16759,8 @@
             "prompt": "The loop reads `p.x` and `p.y` five times. Destructure `{ x, y }` in the loop header instead — no `p.x` or `p.y` left.",
             "hint": "`for (const { x, y } of points)`.",
             "hints": [
-              "`for (const { x, y } of points)`."
+              "`for (const { x, y } of points)`.",
+              "The change starts on line 7 of the program."
             ],
             "language": "typescript",
             "kind": "refactor",
@@ -17223,7 +17324,9 @@
             "prompt": "The first line is a list of field names; each later line is a JSON object. Print each object reduced to just those fields (in the listed order, skipping fields it doesn't have), as compact JSON.",
             "hint": "`Object.hasOwn` tells a missing field from one that holds `undefined` or `null`.",
             "hints": [
-              "`Object.hasOwn` tells a missing field from one that holds `undefined` or `null`."
+              "`Object.hasOwn` tells a missing field from one that holds `undefined` or `null`.",
+              "The reference solution uses `split`, `JSON.parse` and a `for` loop.",
+              "The reference solution is 8 lines and begins: `const [fieldLine = \"\", ...records] = input.split(\"\\n\");`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -17257,7 +17360,9 @@
             "prompt": "The input is a JSON object whose values are strings. Print the inverted object — values become keys, keys become values — with the keys sorted. When two keys share a value, the one that appears later wins. Then print how many keys were lost to collisions.",
             "hint": "`Object.entries` then `Object.fromEntries` — sort the entries in between.",
             "hints": [
-              "`Object.entries` then `Object.fromEntries` — sort the entries in between."
+              "`Object.entries` then `Object.fromEntries` — sort the entries in between.",
+              "The reference solution uses `sort`, `JSON.parse`, a `for` loop, `localeCompare` and `Object.entries`.",
+              "The reference solution is 6 lines and begins: `const original = JSON.parse(input) as Record<string, string>;`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -17291,7 +17396,9 @@
             "prompt": "The first line is a field name; the second a JSON array of objects. Count the objects by the value of that field (as a string; missing becomes `(missing)`). Print `value: count` lines sorted by count descending, then value ascending — or `(none)` for an empty array.",
             "hint": "A dictionary with no prototype is safe for any field value; default missing counts to 0.",
             "hints": [
-              "A dictionary with no prototype is safe for any field value; default missing counts to 0."
+              "A dictionary with no prototype is safe for any field value; default missing counts to 0.",
+              "The reference solution uses `split`, `sort`, `JSON.parse`, a `for` loop, `localeCompare`, `Object.entries` and `??`.",
+              "The reference solution is 10 lines and begins: `const [field = \"\", json = \"[]\"] = input.split(\"\\n\");`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -17325,7 +17432,9 @@
             "prompt": "The first line is a list of renames `old=new`; the second a JSON object. Print the object with those keys renamed (other keys unchanged, key order preserved).",
             "hint": "Map each entry's key through the rename table, defaulting to itself.",
             "hints": [
-              "Map each entry's key through the rename table, defaulting to itself."
+              "Map each entry's key through the rename table, defaulting to itself.",
+              "The reference solution uses `split`, a `Map`, `map`, `JSON.parse`, `Object.entries` and `??`.",
+              "The reference solution is 8 lines and begins: `const [renameLine = \"\", json = \"{}\"] = input.split(\"\\n\");`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -17359,7 +17468,9 @@
             "prompt": "The input is a JSON object with string, number, boolean, null or array values. Build a URL query string: keys sorted, each `key=value` percent-encoded with `encodeURIComponent`, arrays as repeated keys, `null` values skipped, joined with `&`. Print it, or `(empty)`.",
             "hint": "Normalise every value to an array, then encode each pair.",
             "hints": [
-              "Normalise every value to an array, then encode each pair."
+              "Normalise every value to an array, then encode each pair.",
+              "The reference solution uses `sort`, `join`, `JSON.parse` and a `for` loop.",
+              "The reference solution is 9 lines and begins: `const params = JSON.parse(input) as Record<string, string | number | boolean | null | (string | number)[]>;`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -17502,7 +17613,9 @@
             "prompt": "The first line is a JSON document. Each later line is `path | default`, where the path uses `.key` and `[index]` (e.g. `users[0].name`). Print the value at the path as compact JSON, or the default text if any step is missing.",
             "hint": "Split the path into steps with a regex; walk them, checking arrays and objects separately.",
             "hints": [
-              "Split the path into steps with a regex; walk them, checking arrays and objects separately."
+              "Split the path into steps with a regex; walk them, checking arrays and objects separately.",
+              "The reference solution uses `split`, `map`, `JSON.parse`, a `for` loop and `??`.",
+              "The reference solution is 19 lines and begins: `type Obj = { [key: string]: unknown };`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -17567,7 +17680,9 @@
             "prompt": "The first line is a schema of `field:type` entries (`string`, `number`, `boolean`), where a `?` after the field name makes it optional (`email?:string`). Each later line is a JSON record. Print `ok` or the problems joined by `; ` — `missing <f>`, `<f> should be <type>`, and `unexpected <f>` for fields not in the schema, in schema order then record order.",
             "hint": "Parse the schema into objects once; check each field, then look for unexpected keys.",
             "hints": [
-              "Parse the schema into objects once; check each field, then look for unexpected keys."
+              "Parse the schema into objects once; check each field, then look for unexpected keys.",
+              "The reference solution uses `split`, a `Set`, `map`, `join`, `slice`, `JSON.parse` and a `for` loop.",
+              "The reference solution is 21 lines and begins: `const [schemaLine = \"\", ...records] = input.split(\"\\n\");`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -18539,7 +18654,8 @@
             "prompt": "What type does TypeScript already infer for `v`? Annotate `check` with exactly that type — not merely one that fits.",
             "hint": "The key might not be there.",
             "hints": [
-              "The key might not be there."
+              "The key might not be there.",
+              "The answer begins `number | …`"
             ],
             "language": "typescript",
             "kind": "predict",
@@ -18562,7 +18678,8 @@
             "prompt": "What type does TypeScript already infer for `s`? Annotate `check` with exactly that type — not merely one that fits.",
             "hint": "Set is generic in its element type.",
             "hints": [
-              "Set is generic in its element type."
+              "Set is generic in its element type.",
+              "The answer is 11 characters long and begins `Set<n`."
             ],
             "language": "typescript",
             "kind": "predict",
@@ -18647,7 +18764,8 @@
             "prompt": "What type does TypeScript already infer for `a`? Annotate `check` with exactly that type — not merely one that fits.",
             "hint": "`get` may find nothing.",
             "hints": [
-              "`get` may find nothing."
+              "`get` may find nothing.",
+              "The answer begins `number | …`"
             ],
             "language": "typescript",
             "kind": "predict",
@@ -18670,7 +18788,8 @@
             "prompt": "What type does TypeScript already infer for `both`? Annotate `check` with exactly that type — not merely one that fits.",
             "hint": "The set methods return a new `Set` of the element type.",
             "hints": [
-              "The set methods return a new `Set` of the element type."
+              "The set methods return a new `Set` of the element type.",
+              "The answer is 11 characters long and begins `Set<n`."
             ],
             "language": "typescript",
             "kind": "predict",
@@ -18782,7 +18901,8 @@
             "prompt": "Write `Graph`: a map from each node's name to the set of names it is connected to.",
             "hint": "`Map<Key, Value>` where each value is a `Set<string>`.",
             "hints": [
-              "`Map<Key, Value>` where each value is a `Set<string>`."
+              "`Map<Key, Value>` where each value is a `Set<string>`.",
+              "The answer begins `type Graph = …`"
             ],
             "language": "typescript",
             "kind": "design",
@@ -19072,7 +19192,9 @@
             "prompt": "Each input line is a sentence. Print the first word (compared case-insensitively, punctuation ignored) whose second occurrence comes earliest, in lowercase — or `none`.",
             "hint": "A `Set` of words seen so far; the first word already in it is the answer.",
             "hints": [
-              "A `Set` of words seen so far; the first word already in it is the answer."
+              "A `Set` of words seen so far; the first word already in it is the answer.",
+              "The reference solution uses `split`, a `Set`, a `for` loop and `??`.",
+              "The reference solution is 13 lines and begins: `for (const line of input.split(\"\\n\")) {`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -19102,7 +19224,9 @@
             "prompt": "Each input line holds two words of equal length. Print `yes` if the letters of the first can be replaced one-for-one to give the second (each letter always maps to the same letter, and no two letters map to the same one), otherwise `no`.",
             "hint": "Two maps: letter → image and image → letter. Any disagreement means no.",
             "hints": [
-              "Two maps: letter → image and image → letter. Any disagreement means no."
+              "Two maps: letter → image and image → letter. Any disagreement means no.",
+              "The reference solution uses `split`, a `Map`, a `for` loop and `??`.",
+              "The reference solution is 14 lines and begins: `for (const line of input.split(\"\\n\")) {`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -19132,7 +19256,9 @@
             "prompt": "The first line is a note, the second a magazine. Ignoring spaces and case, can the note's letters be cut from the magazine's (each magazine letter used once)? Print `yes`, or `missing` followed by each missing letter and how many more are needed, alphabetically (`missing a2 z1`).",
             "hint": "Count the magazine's letters in a `Map`, then spend them on the note.",
             "hints": [
-              "Count the magazine's letters in a `Map`, then spend them on the note."
+              "Count the magazine's letters in a `Map`, then spend them on the note.",
+              "The reference solution uses `split`, a `Map`, `map`, `sort`, `join`, a `for` loop, `localeCompare` and `??`.",
+              "The reference solution is 12 lines and begins: `const [note = \"\", magazine = \"\"] = input.split(\"\\n\");`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -19166,7 +19292,9 @@
             "prompt": "Two lines of tags. Print `shared`, `either`, `only first`, `only second` and `in exactly one` — each a sorted list or `(none)` — using the `Set` methods, then `first ⊆ second: <bool>`.",
             "hint": "Each line is one method call on a `Set`.",
             "hints": [
-              "Each line is one method call on a `Set`."
+              "Each line is one method call on a `Set`.",
+              "The reference solution uses `split`, a `Set`, `filter`, `sort` and `join`.",
+              "The reference solution is 10 lines and begins: `const [x = \"\", y = \"\"] = input.split(\"\\n\");`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -19200,7 +19328,9 @@
             "prompt": "Each input line is a list of integers. Print the values that appear in every line, ascending (or `(none)`), then how many distinct values appear in at least one line.",
             "hint": "Fold the lines together with `intersection` (and `union` for the second answer).",
             "hints": [
-              "Fold the lines together with `intersection` (and `union` for the second answer)."
+              "Fold the lines together with `intersection` (and `union` for the second answer).",
+              "The reference solution uses `split`, a `Set`, `map`, `sort`, `join`, a `for` loop and `??`.",
+              "The reference solution is 9 lines and begins: `const sets = input.split(\"\\n\").map((line) => new Set(line.trim().split(/\\s+/).map(Number)));`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -19234,7 +19364,9 @@
             "prompt": "Each input line is a positive integer. Repeatedly replace it by the sum of the squares of its digits. Print the chain up to and including `1` (a happy number) or up to the first repeated value, space-separated, then `happy` or `cycle`.",
             "hint": "A `Set` of values already seen detects the cycle.",
             "hints": [
-              "A `Set` of values already seen detects the cycle."
+              "A `Set` of values already seen detects the cycle.",
+              "The reference solution uses `split`, a `Set`, `reduce`, `join`, a `while` loop and a `for` loop.",
+              "The reference solution is 14 lines and begins: `const squareDigits = (n: number) => [...String(n)].reduce((sum, d) => sum + Number(d) ** 2, 0);`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -19268,7 +19400,9 @@
             "prompt": "The first line is k; the second a list of integers. For every window of k consecutive values print how many distinct values it holds, space-separated. Keep a `Map` of counts and update it as the window slides, rather than rebuilding it.",
             "hint": "Add the value entering the window; decrement (and maybe delete) the one leaving it. The `Map`'s size is the answer.",
             "hints": [
-              "Add the value entering the window; decrement (and maybe delete) the one leaving it. The `Map`'s size is the answer."
+              "Add the value entering the window; decrement (and maybe delete) the one leaving it. The `Map`'s size is the answer.",
+              "The reference solution uses `split`, a `Map`, `map`, `join` and `??`.",
+              "The reference solution is 16 lines and begins: `const [kText = \"1\", line = \"\"] = input.split(\"\\n\");`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -19306,7 +19440,9 @@
             "prompt": "The input is a list of integers. A harmonious selection uses values whose max and min differ by exactly 1 (not necessarily adjacent). Print the size of the largest one, and the pair of values it uses as `lo hi` (the smallest `lo` on a tie) — or `0` alone if there is none.",
             "hint": "Count every value; for each value x the best selection using x and x+1 has count[x] + count[x+1] elements.",
             "hints": [
-              "Count every value; for each value x the best selection using x and x+1 has count[x] + count[x+1] elements."
+              "Count every value; for each value x the best selection using x and x+1 has count[x] + count[x+1] elements.",
+              "The reference solution uses `split`, a `Map`, `map`, `sort`, a `for` loop and `??`.",
+              "The reference solution is 12 lines and begins: `const counts = new Map<number, number>();`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -19344,7 +19480,9 @@
             "prompt": "The first line is k (≥ 0); the second a list of integers. Count the distinct value pairs `(a, b)` with `b - a = k` that can be formed from the list, and print them as `a:b`, ascending by `a`, then the count.",
             "hint": "Count values in a `Map`. For k > 0, look up x + k; for k = 0 a value needs two copies.",
             "hints": [
-              "Count values in a `Map`. For k > 0, look up x + k; for k = 0 a value needs two copies."
+              "Count values in a `Map`. For k > 0, look up x + k; for k = 0 a value needs two copies.",
+              "The reference solution uses `split`, a `Map`, `map`, `sort`, `join`, a `for` loop and `??`.",
+              "The reference solution is 11 lines and begins: `const [kText = \"0\", line = \"\"] = input.split(\"\\n\");`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -19382,7 +19520,9 @@
             "prompt": "The input is a line of words. Group anagrams (same letters, ignoring case). Print each group with more than one word as `<words in input order>`, largest group first (ties by the group's first word, alphabetically), then `<k> singletons`.",
             "hint": "The sorted letters are the key; a `Map` from key to the words that share it.",
             "hints": [
-              "The sorted letters are the key; a `Map` from key to the words that share it."
+              "The sorted letters are the key; a `Map` from key to the words that share it.",
+              "The reference solution uses `split`, a `Map`, `filter`, `sort`, `join`, a `for` loop, `localeCompare` and `??`.",
+              "The reference solution is 11 lines and begins: `const groups = new Map<string, string[]>();`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -20444,7 +20584,8 @@
             "prompt": "What type does TypeScript already infer for `dir`? Annotate `check` with exactly that type — not merely one that fits.",
             "hint": "`const` keeps the literal.",
             "hints": [
-              "`const` keeps the literal."
+              "`const` keeps the literal.",
+              "The answer is 4 characters long and begins `\"u`."
             ],
             "language": "typescript",
             "kind": "predict",
@@ -20467,7 +20608,8 @@
             "prompt": "What type does TypeScript already infer for `dirs`? Annotate `check` with exactly that type — not merely one that fits.",
             "hint": "`as const` makes a read-only tuple of literals.",
             "hints": [
-              "`as const` makes a read-only tuple of literals."
+              "`as const` makes a read-only tuple of literals.",
+              "The answer begins `readonly [\"up\", …`"
             ],
             "language": "typescript",
             "kind": "predict",
@@ -20490,7 +20632,8 @@
             "prompt": "What type does TypeScript already infer for `mode`? Annotate `check` with exactly that type — not merely one that fits.",
             "hint": "`as const` beats the widening a `let` would do.",
             "hints": [
-              "`as const` beats the widening a `let` would do."
+              "`as const` beats the widening a `let` would do.",
+              "The answer is 6 characters long and begins `\"da`."
             ],
             "language": "typescript",
             "kind": "predict",
@@ -20513,7 +20656,8 @@
             "prompt": "The compiler rejects this program:\n\n    error TS2345: Argument of type '\"E\"' is not assignable to parameter of type 'Dir'.\n\nThe step meant here is south.",
             "hint": "Only the members of `Dir` are allowed.",
             "hints": [
-              "Only the members of `Dir` are allowed."
+              "Only the members of `Dir` are allowed.",
+              "The change starts on line 5 of the program."
             ],
             "language": "typescript",
             "kind": "diagnose",
@@ -20539,7 +20683,8 @@
             "prompt": "What type does TypeScript already infer for `pair`? Annotate `check` with exactly that type — not merely one that fits.",
             "hint": "`as const` keeps literal types and makes the tuple readonly.",
             "hints": [
-              "`as const` keeps literal types and makes the tuple readonly."
+              "`as const` keeps literal types and makes the tuple readonly.",
+              "The answer begins `readonly [\"x\", …`"
             ],
             "language": "typescript",
             "kind": "predict",
@@ -20562,7 +20707,8 @@
             "prompt": "What type does TypeScript already infer for `first`? Annotate `check` with exactly that type — not merely one that fits.",
             "hint": "Each position of a const tuple has its own literal type.",
             "hints": [
-              "Each position of a const tuple has its own literal type."
+              "Each position of a const tuple has its own literal type.",
+              "The answer is 3 characters long and begins `\"`."
             ],
             "language": "typescript",
             "kind": "predict",
@@ -20647,7 +20793,8 @@
             "prompt": "Write `Size`: exactly the three sizes the shop sells, as a union of string literals. The price table is keyed by it, so a missing or extra size would be a compile error.",
             "hint": "A union of literal types: `\"S\" | \"M\" | \"L\"`.",
             "hints": [
-              "A union of literal types: `\"S\" | \"M\" | \"L\"`."
+              "A union of literal types: `\"S\" | \"M\" | \"L\"`.",
+              "The answer begins `type Size = \"S\" …`"
             ],
             "language": "typescript",
             "kind": "design",
@@ -21188,7 +21335,9 @@
             "prompt": "Each input line is a status code. Print `<code> <class>`, the class being `informational` (100-199), `success`, `redirect`, `client error` or `server error` (500-599), or `invalid`. Return the class from a function typed with a literal union.",
             "hint": "The hundreds digit picks the class; guard the range first.",
             "hints": [
-              "The hundreds digit picks the class; guard the range first."
+              "The hundreds digit picks the class; guard the range first.",
+              "The reference solution uses `split`, a `for` loop, `Math` and `??`.",
+              "The reference solution is 7 lines and begins: `type StatusClass = \"informational\" | \"success\" | \"redirect\" | \"client error\" | \"server error\" | \"invalid\";`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -21218,7 +21367,9 @@
             "prompt": "The input is a string of turns: `L` (left 90°), `R` (right 90°) and `U` (turn around). Starting facing `N`, print the heading after each turn, space-separated. Model headings as `\"N\" | \"E\" | \"S\" | \"W\"`.",
             "hint": "Keep the heading as an index into the `as const` array; a left turn is three rights.",
             "hints": [
-              "Keep the heading as an index into the `as const` array; a left turn is three rights."
+              "Keep the heading as an index into the `as const` array; a left turn is three rights.",
+              "The reference solution uses `join`, a `for` loop and `??`.",
+              "The reference solution is 12 lines and begins: `const HEADINGS = [\"N\", \"E\", \"S\", \"W\"] as const;`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -21256,7 +21407,9 @@
             "prompt": "Each input line is `<size> <from> <to>`, where the systems are `letter` (XS-XL), `eu` (44-52) and `us` (34-42), in step: XS=44=34, S=46=36, M=48=38, L=50=40, XL=52=42. Print the converted size, or `unknown size`.",
             "hint": "Parallel `as const` arrays: find the index in one, read the same index in another.",
             "hints": [
-              "Parallel `as const` arrays: find the index in one, read the same index in another."
+              "Parallel `as const` arrays: find the index in one, read the same index in another.",
+              "The reference solution uses `split` and a `for` loop.",
+              "The reference solution is 12 lines and begins: `const SYSTEMS = { letter: [\"XS\", \"S\", \"M\", \"L\", \"XL\"], eu: [\"44\", \"46\", \"48\", \"50\", \"52\"], us: [\"34\", \"36\", \"38\", \"40\", \"42\"] } as const;`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -21282,7 +21435,9 @@
             "prompt": "A machine is `idle`, `ready` (a coin is in) or `vending`. Commands: `coin` (idle→ready, or `returned` if already ready), `push` (ready→vending, then it drops the item and is idle again; from idle it prints `insert coin`), `refund` (ready→idle, printing `refunded`; otherwise `nothing to refund`). Print the state after each command as `<state>` or the message. Use a literal-union `State` and a transition table.",
             "hint": "A `Record<State, Record<Command, …>>` makes every (state, command) pair a compile-time requirement.",
             "hints": [
-              "A `Record<State, Record<Command, …>>` makes every (state, command) pair a compile-time requirement."
+              "A `Record<State, Record<Command, …>>` makes every (state, command) pair a compile-time requirement.",
+              "The reference solution uses `split` and a `for` loop.",
+              "The reference solution is 21 lines and begins: `type State = \"idle\" | \"ready\";`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -21316,7 +21471,9 @@
             "prompt": "The first line is the correct code; each later line is an attempt or the command `lock`. The lock is `locked` or `open`; three wrong codes in a row while locked set off the `alarm`, after which everything prints `alarm`. Print the state after each line. A correct code resets the wrong-attempt count.",
             "hint": "The state is a literal union; each input moves between three values.",
             "hints": [
-              "The state is a literal union; each input moves between three values."
+              "The state is a literal union; each input moves between three values.",
+              "The reference solution uses `split` and a `for` loop.",
+              "The reference solution is 22 lines and begins: `type LockState = \"locked\" | \"open\" | \"alarm\";`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -21346,7 +21503,9 @@
             "prompt": "The input is a command string: `F` moves one step forward, `L`/`R` turn 90°, and `B` moves one step back. The robot starts at 0,0 facing north (y grows north). Print the final position, the final heading (`N`/`E`/`S`/`W`), and the greatest Manhattan distance from the origin reached along the way.",
             "hint": "`as const` gives each heading a readonly `[dx, dy]` pair.",
             "hints": [
-              "`as const` gives each heading a readonly `[dx, dy]` pair."
+              "`as const` gives each heading a readonly `[dx, dy]` pair.",
+              "The reference solution uses a `for` loop, `Math` and `??`.",
+              "The reference solution is 22 lines and begins: `const DIRS = { N: [0, 1], E: [1, 0], S: [0, -1], W: [-1, 0] } as const;`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -21384,7 +21543,9 @@
             "prompt": "Each input line is `playerA moveA playerB moveB`. Moves are case-insensitive. A win is worth 3 points, a draw 1 each; an invalid move forfeits that game to the opponent (both invalid: no points). Print the table sorted by points descending then name: `name points`.",
             "hint": "`Record<Move, Move>` says what each move beats.",
             "hints": [
-              "`Record<Move, Move>` says what each move beats."
+              "`Record<Move, Move>` says what each move beats.",
+              "The reference solution uses `split`, a `Map`, `sort`, a `for` loop, `localeCompare` and `??`.",
+              "The reference solution is 21 lines and begins: `type Move = \"rock\" | \"paper\" | \"scissors\";`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -21414,7 +21575,9 @@
             "prompt": "The first line is the playlist (track names); the second a list of commands: `next`, `prev`, and `mode:off`, `mode:all`, `mode:one`. Start at the first track in mode `off`. With `off`, `next` on the last track (or `prev` on the first) prints `end` and stays; `all` wraps around; `one` repeats the current track. Print the current track after each `next`/`prev`, and the mode name after a mode change.",
             "hint": "The mode is a literal union; each command's effect depends on it.",
             "hints": [
-              "The mode is a literal union; each command's effect depends on it."
+              "The mode is a literal union; each command's effect depends on it.",
+              "The reference solution uses `split`, `slice` and a `for` loop.",
+              "The reference solution is 26 lines and begins: `type Mode = \"off\" | \"all\" | \"one\";`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -21444,7 +21607,9 @@
             "prompt": "Each input line is `<amount><unit> to <unit>` (spaces optional between number and unit), with units `mm`, `cm`, `m`, `km`, `in`, `ft`, `mi` (1 in = 2.54 cm, 1 ft = 12 in, 1 mi = 5280 ft). Print the converted amount rounded to 3 decimals with trailing zeros removed, plus the unit — or `bad unit <u>` / `bad input`.",
             "hint": "One `as const` table from unit to \"how many per metre\" makes every conversion two multiplications.",
             "hints": [
-              "One `as const` table from unit to \"how many per metre\" makes every conversion two multiplications."
+              "One `as const` table from unit to \"how many per metre\" makes every conversion two multiplications.",
+              "The reference solution uses `split` and a `for` loop.",
+              "The reference solution is 17 lines and begins: `const PER_METRE = { mm: 1000, cm: 100, m: 1, km: 0.001, in: 100 / 2.54, ft: 100 / 2.54 / 12, mi: 100 / 2.54 / 12 / 5280 } as const;`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -22523,7 +22688,8 @@
             "prompt": "What type does TypeScript already infer for `firstBig`? Annotate `check` with exactly that type — not merely one that fits.",
             "hint": "`??` removes the `undefined` case.",
             "hints": [
-              "`??` removes the `undefined` case."
+              "`??` removes the `undefined` case.",
+              "The answer is 6 characters long and begins `num`."
             ],
             "language": "typescript",
             "kind": "predict",
@@ -22573,7 +22739,8 @@
             "prompt": "The compiler rejects this program:\n\n    error TS2339: Property 'r' does not exist on type 'Circle | Square'.\n\nHandle both shapes (use 3 for pi).",
             "hint": "Narrow on `kind` first.",
             "hints": [
-              "Narrow on `kind` first."
+              "Narrow on `kind` first.",
+              "The change starts on line 4 of the program."
             ],
             "language": "typescript",
             "kind": "diagnose",
@@ -22713,7 +22880,8 @@
             "prompt": "`parsePort` returns the port number, or `null` when the text is not a valid port. Replace the `any`s so the return type says exactly that.",
             "hint": "`number | null` — and callers must check for `null` before using it.",
             "hints": [
-              "`number | null` — and callers must check for `null` before using it."
+              "`number | null` — and callers must check for `null` before using it.",
+              "The change starts on line 3 of the program."
             ],
             "language": "typescript",
             "kind": "retype",
@@ -22766,7 +22934,8 @@
             "prompt": "`m.get(key)!` asserts the value is there — it happens to be, after `has`, but the compiler cannot see that. Read the value once and narrow it with a check. No `!.` left.",
             "hint": "`const value = m.get(key)` is `number | undefined`; `if (value !== undefined)` narrows it.",
             "hints": [
-              "`const value = m.get(key)` is `number | undefined`; `if (value !== undefined)` narrows it."
+              "`const value = m.get(key)` is `number | undefined`; `if (value !== undefined)` narrows it.",
+              "The change starts on line 9 of the program."
             ],
             "language": "typescript",
             "kind": "refactor",
@@ -24537,7 +24706,8 @@
             "prompt": "What type does TypeScript already infer for `payload`? Annotate `check` with exactly that type — not merely one that fits.",
             "hint": "Each branch is narrowed to one member.",
             "hints": [
-              "Each branch is narrowed to one member."
+              "Each branch is narrowed to one member.",
+              "The answer begins `string | …`"
             ],
             "language": "typescript",
             "kind": "predict",
@@ -24704,7 +24874,8 @@
             "prompt": "Write `Parsed`: a discriminated union on `ok` — `{ ok: true; value: number }` or `{ ok: false; reason: string }`.",
             "hint": "Two object types joined by `|`, each with a literal `ok`.",
             "hints": [
-              "Two object types joined by `|`, each with a literal `ok`."
+              "Two object types joined by `|`, each with a literal `ok`.",
+              "The answer begins `type Parsed = { ok: true; value: number …`"
             ],
             "language": "typescript",
             "kind": "design",
@@ -24761,7 +24932,8 @@
             "prompt": "The `default` branch quietly ignores any command added later. Remove it: with every case handled and a `number` return type, the compiler proves the switch is exhaustive — and would flag a new command. No `default` left.",
             "hint": "Delete the `default` branch — nothing else needs to change.",
             "hints": [
-              "Delete the `default` branch — nothing else needs to change."
+              "Delete the `default` branch — nothing else needs to change.",
+              "The change starts on line 12 of the program."
             ],
             "language": "typescript",
             "kind": "refactor",
@@ -26483,7 +26655,8 @@
             "prompt": "What type does TypeScript already infer for `pairs`? Annotate `check` with exactly that type — not merely one that fits.",
             "hint": "Keys are strings; each entry is a pair.",
             "hints": [
-              "Keys are strings; each entry is a pair."
+              "Keys are strings; each entry is a pair.",
+              "The answer begins `[string, …`"
             ],
             "language": "typescript",
             "kind": "predict",
@@ -26584,7 +26757,8 @@
             "prompt": "Write `Middleware`: a function that takes the current string and a `next` callback (string in, string out), and returns a string.",
             "hint": "A function type whose second parameter is itself a function type.",
             "hints": [
-              "A function type whose second parameter is itself a function type."
+              "A function type whose second parameter is itself a function type.",
+              "The answer begins `type Middleware = (value: string, next: …`"
             ],
             "language": "typescript",
             "kind": "design",
@@ -26614,7 +26788,8 @@
             "prompt": "`memo` wraps a number-to-number function with a cache. Replace the `any`s: it takes a `(n: number) => number` and returns one.",
             "hint": "Both the parameter and the result are `(n: number) => number`.",
             "hints": [
-              "Both the parameter and the result are `(n: number) => number`."
+              "Both the parameter and the result are `(n: number) => number`.",
+              "The change starts on line 3 of the program."
             ],
             "language": "typescript",
             "kind": "retype",
@@ -26810,7 +26985,9 @@
             "prompt": "Each input line is a list of numbers. Write `stats(xs): [min: number, max: number, mean: number]` and destructure its result to print `min <a> max <b> mean <c> range <d>`, with the mean rounded to at most 2 decimals.",
             "hint": "A labelled tuple documents what each position means, and destructuring reads it back by position.",
             "hints": [
-              "A labelled tuple documents what each position means, and destructuring reads it back by position."
+              "A labelled tuple documents what each position means, and destructuring reads it back by position.",
+              "The reference solution uses `split`, `map`, a `for` loop and `Math`.",
+              "The reference solution is 15 lines and begins: `function stats(xs: readonly number[]): [min: number, max: number, mean: number] {`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -28224,7 +28401,8 @@
             "prompt": "The compiler rejects this program:\n\n    error TS18048: 'v' is possibly 'undefined'.\n\nFix the cause.",
             "hint": "`get` returns `V | undefined`.",
             "hints": [
-              "`get` returns `V | undefined`."
+              "`get` returns `V | undefined`.",
+              "The change starts on line 3 of the program."
             ],
             "language": "typescript",
             "kind": "diagnose",
@@ -28371,7 +28549,8 @@
             "prompt": "`flag` finds the value after a flag like `--port`, or `undefined` when the flag is absent. Replace the `any`s — remembering that with `noUncheckedIndexedAccess` an array read may be `undefined`.",
             "hint": "`args[i + 1]` is `string | undefined` under the week's strictness — and so is the result.",
             "hints": [
-              "`args[i + 1]` is `string | undefined` under the week's strictness — and so is the result."
+              "`args[i + 1]` is `string | undefined` under the week's strictness — and so is the result.",
+              "The change starts on line 3 of the program."
             ],
             "language": "typescript",
             "kind": "retype",
@@ -28405,7 +28584,8 @@
             "prompt": "Write `Env`: `NODE_ENV` is exactly `\"development\"` or `\"production\"`, `PORT` is a number and `DEBUG` a boolean.",
             "hint": "`NODE_ENV` is a union of two string literals, not `string`.",
             "hints": [
-              "`NODE_ENV` is a union of two string literals, not `string`."
+              "`NODE_ENV` is a union of two string literals, not `string`.",
+              "The answer begins `type Env = { NODE_ENV: \"development\" | …`"
             ],
             "language": "typescript",
             "kind": "design",
@@ -28970,7 +29150,9 @@
             "prompt": "Each input line is a file name, optionally followed by the package's `type` (`module` or `commonjs`, default `commonjs`). Apply Node's rule: `.mjs`/`.mts` are always ESM, `.cjs`/`.cts` always CommonJS, and `.js`/`.ts` follow the package type. Print `<file>: ESM`, `<file>: CJS` or `<file>: not a module file`, then `esm=<a> cjs=<b>`.",
             "hint": "The explicit extensions win; only `.js` and `.ts` depend on the package.",
             "hints": [
-              "The explicit extensions win; only `.js` and `.ts` depend on the package."
+              "The explicit extensions win; only `.js` and `.ts` depend on the package.",
+              "The reference solution uses `split`, `slice` and a `for` loop.",
+              "The reference solution is 21 lines and begins: `type Format = \"ESM\" | \"CJS\";`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -29093,7 +29275,9 @@
             "prompt": "Each input line is a JSON record that should have a string `name` and may have `nickname`. Tell the cases apart — they mean different things, which is what `exactOptionalPropertyTypes` makes the compiler see: `<name>: no nickname field` (the key is absent), `<name>: nickname cleared` (`null`), `<name>: empty nickname` (`\"\"`), `<name>: nickname \"<n>\"`, or `<name>: bad nickname` (any other type). A record without a string `name` prints `bad record`.",
             "hint": "`\"nickname\" in data` asks whether the key exists at all; `=== null` and `=== \"\"` ask about its value.",
             "hints": [
-              "`\"nickname\" in data` asks whether the key exists at all; `=== null` and `=== \"\"` ask about its value."
+              "`\"nickname\" in data` asks whether the key exists at all; `=== null` and `=== \"\"` ask about its value.",
+              "The reference solution uses `split`, `JSON.parse` and a `for` loop.",
+              "The reference solution is 13 lines and begins: `for (const line of input.split(\"\\n\")) {`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -30214,7 +30398,8 @@
             "prompt": "What type does TypeScript already infer for `cfg.mode`? Annotate `check` with exactly that type — not merely one that fits.",
             "hint": "`satisfies` checks without widening to the target type.",
             "hints": [
-              "`satisfies` checks without widening to the target type."
+              "`satisfies` checks without widening to the target type.",
+              "The answer is 6 characters long and begins `\"da`."
             ],
             "language": "typescript",
             "kind": "predict",
@@ -30422,7 +30607,8 @@
             "prompt": "Each `as Rgb` tells the compiler to trust the literal — so a colour missing a channel would compile. Replace them with one `satisfies` on the whole object, which checks every entry and keeps the keys. No `as Rgb` left.",
             "hint": "`{ ... } satisfies Record<string, Rgb>` checks every value against `Rgb`.",
             "hints": [
-              "`{ ... } satisfies Record<string, Rgb>` checks every value against `Rgb`."
+              "`{ ... } satisfies Record<string, Rgb>` checks every value against `Rgb`.",
+              "The change starts on line 5 of the program."
             ],
             "language": "typescript",
             "kind": "refactor",
@@ -30450,7 +30636,8 @@
             "prompt": "`merge` overlays `b` on `a`. Here `a` is `{ host: string; port: number }` and `b` is `{ port: number }`. Replace the `any`s so the result's type is `{ host: string; port: number }`.",
             "hint": "Spreading two objects gives their combined properties — the later one wins for `port`.",
             "hints": [
-              "Spreading two objects gives their combined properties — the later one wins for `port`."
+              "Spreading two objects gives their combined properties — the later one wins for `port`.",
+              "The change starts on line 3 of the program."
             ],
             "language": "typescript",
             "kind": "retype",
@@ -30480,7 +30667,8 @@
             "prompt": "Write `Named`: the smallest type `greetAll` needs — just a `name` string. The people passed in carry more than that, and structural typing lets them through.",
             "hint": "Ask for exactly what the function reads — a type with one property.",
             "hints": [
-              "Ask for exactly what the function reads — a type with one property."
+              "Ask for exactly what the function reads — a type with one property.",
+              "The answer begins `type Named = { …`"
             ],
             "language": "typescript",
             "kind": "design",
@@ -30869,7 +31057,9 @@
             "prompt": "A route table maps names to `{ method, path }` and is checked with `satisfies Record<string, Route>`: `home` GET `/`, `listUsers` GET `/users`, `createUser` POST `/users`, `logout` POST `/logout`. Each input line is `<METHOD> <path>`. Print the route's name, `405 method not allowed` if the path exists with other methods, or `404 not found`.",
             "hint": "`satisfies` checks each route but keeps the object's own keys, so `keyof typeof routes` is the four names.",
             "hints": [
-              "`satisfies` checks each route but keeps the object's own keys, so `keyof typeof routes` is the four names."
+              "`satisfies` checks each route but keeps the object's own keys, so `keyof typeof routes` is the four names.",
+              "The reference solution uses `split`, a `for` loop and `??`.",
+              "The reference solution is 16 lines and begins: `type Method = \"GET\" | \"POST\" | \"DELETE\";`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -30899,7 +31089,9 @@
             "prompt": "Icons are registered as `{ glyph, size }` with `size` one of `16 | 24 | 32`, checked by `satisfies Record<string, Icon>`: `home` `⌂` 24, `star` `★` 16, `heart` `♥` 24, `check` `✓` 32. Each input line is `<name> [size]`. Print `<glyph> <name> <size>px` (the requested size, if it is a valid one, otherwise the icon's own), `bad size <s>` for any other size, or `no icon <name>` plus `; did you mean <n>?` when exactly one icon name starts with its first letter.",
             "hint": "A type predicate `isName` turns an input string into an `IconName`, after which `icons[name]` needs no `undefined` check.",
             "hints": [
-              "A type predicate `isName` turns an input string into an `IconName`, after which `icons[name]` needs no `undefined` check."
+              "A type predicate `isName` turns an input string into an `IconName`, after which `icons[name]` needs no `undefined` check.",
+              "The reference solution uses `split`, `filter`, a `for` loop and `??`.",
+              "The reference solution is 26 lines and begins: `type Icon = { glyph: string; size: 16 | 24 | 32 };`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -30929,7 +31121,9 @@
             "prompt": "Structural typing asks only what a value *has*. Each input line is JSON. Report which of these shapes it satisfies, in this order: `Named` (a string `name`), `Priced` (a number `price`), `Dated` (a string `date` that `Date.parse` accepts). Print `line <n>: <shapes>`, `line <n>: nothing` or `line <n>: not an object`, then how many lines satisfied each shape.",
             "hint": "A value satisfies a shape when it has the right members — extra members don't matter.",
             "hints": [
-              "A value satisfies a shape when it has the right members — extra members don't matter."
+              "A value satisfies a shape when it has the right members — extra members don't matter.",
+              "The reference solution uses `split`, a `Map`, `filter`, `join`, `JSON.parse`, a `for` loop and `??`.",
+              "The reference solution is 24 lines and begins: `type Rec = Record<string, unknown>;`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -32113,7 +32307,8 @@
             "prompt": "What type does TypeScript already infer for `frozen`? Annotate `check` with exactly that type — not merely one that fits.",
             "hint": "`Object.freeze` changes the static type too.",
             "hints": [
-              "`Object.freeze` changes the static type too."
+              "`Object.freeze` changes the static type too.",
+              "The answer begins `readonly …`"
             ],
             "language": "typescript",
             "kind": "predict",
@@ -32136,7 +32331,8 @@
             "prompt": "The compiler rejects this program:\n\n    error TS2540: Cannot assign to 'x' because it is a read-only property.\n\nMake a new point instead of changing this one.",
             "hint": "Build a new object with the new value.",
             "hints": [
-              "Build a new object with the new value."
+              "Build a new object with the new value.",
+              "The change starts on line 3 of the program."
             ],
             "language": "typescript",
             "kind": "diagnose",
@@ -32162,7 +32358,8 @@
             "prompt": "The compiler rejects this program:\n\n    error TS2345: Argument of type 'number' is not assignable to parameter of type 'Cents'.\n\nUse the constructor that brands the value.",
             "hint": "`cents(...)` is the one place the brand is applied.",
             "hints": [
-              "`cents(...)` is the one place the brand is applied."
+              "`cents(...)` is the one place the brand is applied.",
+              "The change starts on line 8 of the program."
             ],
             "language": "typescript",
             "kind": "diagnose",
@@ -32350,7 +32547,8 @@
             "prompt": "Replace the `any`s. `totals` must not be able to modify the rows it is given: type the parameter as a readonly array of `{ readonly qty: number; readonly price: number }`, and the result as `number[]`.",
             "hint": "`readonly T[]` forbids `push`; `readonly` on each property forbids reassigning it.",
             "hints": [
-              "`readonly T[]` forbids `push`; `readonly` on each property forbids reassigning it."
+              "`readonly T[]` forbids `push`; `readonly` on each property forbids reassigning it.",
+              "The change starts on line 3 of the program."
             ],
             "language": "typescript",
             "kind": "retype",
@@ -32698,7 +32896,9 @@
             "prompt": "Each input line is `<price> <discount>`, the discount written like `15%` or `12.5%`. Parse the discount into a branded `Percent` (0-100, at most one decimal) and the price into cents, then print `<price> - <p>% = <final>` with money as `$x.yy` and the final price rounded to the nearest cent. Errors: `bad price <x>`, `bad percent <x>`, `percent out of range <x>`.",
             "hint": "Return the reason alongside the branded value — `Percent | \"bad\" | \"range\"` — and narrow on the two reasons.",
             "hints": [
-              "Return the reason alongside the branded value — `Percent | \"bad\" | \"range\"` — and narrow on the two reasons."
+              "Return the reason alongside the branded value — `Percent | \"bad\" | \"range\"` — and narrow on the two reasons.",
+              "The reference solution uses `split`, a `for` loop and `Math`.",
+              "The reference solution is 21 lines and begins: `declare const PercentBrand: unique symbol;`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -32728,7 +32928,9 @@
             "prompt": "Each input line is an email address as someone typed it. Parse it into a branded `Email`: trim, lower-case, exactly one `@`, a non-empty local part and a domain containing a dot. Print `rejected <input, trimmed>` for bad ones as you go; then every distinct valid address, sorted; then each domain with its count, most first (ties alphabetically).",
             "hint": "Normalising is part of parsing: after it, equal addresses are equal strings, so a `Set` dedupes them.",
             "hints": [
-              "Normalising is part of parsing: after it, equal addresses are equal strings, so a `Set` dedupes them."
+              "Normalising is part of parsing: after it, equal addresses are equal strings, so a `Set` dedupes them.",
+              "The reference solution uses `split`, a `Map`, a `Set`, `sort`, `slice`, a `for` loop, `localeCompare` and `??`.",
+              "The reference solution is 22 lines and begins: `declare const EmailBrand: unique symbol;`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -34577,7 +34779,9 @@
             "prompt": "Window options have defaults `{ width: 800, height: 600, title: \"Untitled\", resizable: true, theme: \"light\" }`. Each input line is a JSON object of overrides (a `Partial<Options>`). Keep only overrides of the right type (a positive number for `width`/`height`, a string `title`, a boolean `resizable`, `light` or `dark` for `theme`); print `ignored <key>` for each other key, in input order. Then print the resolved `<width>x<height> \"<title>\" resizable=<bool> theme=<theme>`. Note that a spread of `{ width: undefined }` would *erase* the default.",
             "hint": "Copy an override only when it is present *and* valid; a key set to `undefined` or `null` must not reach the spread.",
             "hints": [
-              "Copy an override only when it is present *and* valid; a key set to `undefined` or `null` must not reach the spread."
+              "Copy an override only when it is present *and* valid; a key set to `undefined` or `null` must not reach the spread.",
+              "The reference solution uses `split`, `JSON.parse`, a `for` loop and `Object.entries`.",
+              "The reference solution is 17 lines and begins: `type Options = { width: number; height: number; title: string; resizable: boolean; theme: \"light\" | \"dark\" };`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -34794,7 +34998,9 @@
             "prompt": "The input is `n` then `n` lines of `start end`. Merge every overlapping or touching interval and print the merged ones as `start end`, one per line sorted by start, then how many intervals were absorbed (input count minus output count).",
             "hint": "Sort by start, then either extend the last merged interval or push a copy of the current one.",
             "hints": [
-              "Sort by start, then either extend the last merged interval or push a copy of the current one."
+              "Sort by start, then either extend the last merged interval or push a copy of the current one.",
+              "The reference solution uses `split`, `map`, `sort`, a `for` loop, `Math` and `??`.",
+              "The reference solution is 20 lines and begins: `const lines = input.split(\"\\n\");`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -36090,7 +36296,8 @@
             "prompt": "Write the generic `Page<T>`: the `items` on this page (an array of `T`), the `page` number and the `total` number of pages.",
             "hint": "A type alias can take a type parameter: `type Page<T> = { ... }`.",
             "hints": [
-              "A type alias can take a type parameter: `type Page<T> = { ... }`."
+              "A type alias can take a type parameter: `type Page<T> = { ... }`.",
+              "The answer begins `type Page<T> = { items: T[]; …`"
             ],
             "language": "typescript",
             "kind": "design",
@@ -36120,7 +36327,8 @@
             "prompt": "`firstNum` and `firstStr` are the same function twice. Replace them with one generic `first<T>` — neither old name may remain.",
             "hint": "`function first<T>(xs: readonly T[]): T | undefined`.",
             "hints": [
-              "`function first<T>(xs: readonly T[]): T | undefined`."
+              "`function first<T>(xs: readonly T[]): T | undefined`.",
+              "The change starts on line 3 of the program."
             ],
             "language": "typescript",
             "kind": "refactor",
@@ -36587,7 +36795,9 @@
             "prompt": "Write `chunk<T>(items: readonly T[], size: number): T[][]`. The first input line is the size, the second a list of words. Print each chunk on its own line, words space-separated, then `<k> chunks` (`chunk` for one). A size below 1 prints `bad size`.",
             "hint": "`slice(i, i + size)` never goes past the end.",
             "hints": [
-              "`slice(i, i + size)` never goes past the end."
+              "`slice(i, i + size)` never goes past the end.",
+              "The reference solution uses `split`, `join`, `slice` and a `for` loop.",
+              "The reference solution is 14 lines and begins: `function chunk<T>(items: readonly T[], size: number): T[][] {`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -36771,7 +36981,8 @@
             "prompt": "`longestName` works on anything with a `name`, and must return the caller's *own* element type (with every other field), not just `{ name: string }`. Write its type parameter.",
             "hint": "Constrain `T` to things with a `name`, but keep `T` itself as the element type.",
             "hints": [
-              "Constrain `T` to things with a `name`, but keep `T` itself as the element type."
+              "Constrain `T` to things with a `name`, but keep `T` itself as the element type.",
+              "The answer begins `T extends { …`"
             ],
             "language": "typescript",
             "kind": "typelevel",
@@ -37946,7 +38157,8 @@
             "prompt": "Write `Op`: the names of the handlers in `HANDLERS`, derived from the object itself so that adding a handler adds an operation.",
             "hint": "`typeof HANDLERS` is the object's type; `keyof` of that is its keys.",
             "hints": [
-              "`typeof HANDLERS` is the object's type; `keyof` of that is its keys."
+              "`typeof HANDLERS` is the object's type; `keyof` of that is its keys.",
+              "The answer begins `type Op = …`"
             ],
             "language": "typescript",
             "kind": "design",
@@ -38225,7 +38437,9 @@
             "prompt": "Declare `const STATUS = { OK: 200, CREATED: 201, NOT_FOUND: 404, CONFLICT: 409, SERVER_ERROR: 500 } as const` and derive `StatusName` and `StatusCode` from it. Each input line is a name or a code: print `<name> = <code>` for a known one, else `unknown <x>`. Finish with the codes of the 4xx statuses, ascending.",
             "hint": "`keyof typeof STATUS` for the names; index `typeof STATUS` by them for the codes.",
             "hints": [
-              "`keyof typeof STATUS` for the names; index `typeof STATUS` by them for the codes."
+              "`keyof typeof STATUS` for the names; index `typeof STATUS` by them for the codes.",
+              "The reference solution uses `split`, `map`, `filter`, `sort`, `join` and a `for` loop.",
+              "The reference solution is 15 lines and begins: `const STATUS = { OK: 200, CREATED: 201, NOT_FOUND: 404, CONFLICT: 409, SERVER_ERROR: 500 } as const;`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -38352,7 +38566,9 @@
             "prompt": "Products are one `as const` table keyed by SKU, each `{ name, price, category }` with category `food`, `tools` or `toys`. Derive `Sku` and `Category` from the table. Each input line is `<sku> <qty>`; unknown SKUs print `unknown sku <s>`. Then print each category (in the order `food`, `tools`, `toys`) as `<category>: <units> units, $<total>` (`unit` for one), and finally `best seller: <name>` by units (first on a tie; `none` if nothing sold).",
             "hint": "`(typeof PRODUCTS)[Sku][\"category\"]` is the union of every product's category literal.",
             "hints": [
-              "`(typeof PRODUCTS)[Sku][\"category\"]` is the union of every product's category literal."
+              "`(typeof PRODUCTS)[Sku][\"category\"]` is the union of every product's category literal.",
+              "The reference solution uses `split`, a `Map`, `reduce`, `filter`, `sort`, a `for` loop and `??`.",
+              "The reference solution is 28 lines and begins: `const PRODUCTS = {`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -38382,7 +38598,8 @@
             "prompt": "Write `TupleToUnion<T>`: the union of a tuple's element types.",
             "hint": "Index the tuple type with `number`.",
             "hints": [
-              "Index the tuple type with `number`."
+              "Index the tuple type with `number`.",
+              "The answer is 9 characters long and begins `T[nu`."
             ],
             "language": "typescript",
             "kind": "typelevel",
@@ -38403,7 +38620,8 @@
             "prompt": "Derive `ButtonColour` — the type of the button's `colour` in the theme — and `Spacing`, the union of the spacing scale's values, by looking them up in `Theme`.",
             "hint": "Chain indexed accesses, one property at a time.",
             "hints": [
-              "Chain indexed accesses, one property at a time."
+              "Chain indexed accesses, one property at a time.",
+              "The answer is 39 characters long and begins `Theme[\"components\"]`."
             ],
             "language": "typescript",
             "kind": "typelevel",
@@ -39539,7 +39757,8 @@
             "prompt": "What type does TypeScript already infer for `x`? Annotate `check` with exactly that type — not merely one that fits.",
             "hint": "Every property of `Flags<…>` is a `boolean`.",
             "hints": [
-              "Every property of `Flags<…>` is a `boolean`."
+              "Every property of `Flags<…>` is a `boolean`.",
+              "The answer is 7 characters long and begins `boo`."
             ],
             "language": "typescript",
             "kind": "predict",
@@ -39633,7 +39852,8 @@
             "prompt": "Write the mapped type `Errors<T>`: for every key of `T`, an optional error message string.",
             "hint": "`{ [K in keyof T]?: string }` — map over the keys, with `?` on each.",
             "hints": [
-              "`{ [K in keyof T]?: string }` — map over the keys, with `?` on each."
+              "`{ [K in keyof T]?: string }` — map over the keys, with `?` on each.",
+              "The answer begins `type Errors<T> = { [K …`"
             ],
             "language": "typescript",
             "kind": "design",
@@ -40024,7 +40244,8 @@
             "prompt": "Write `MyRecord<K, V>`: an object type with every key in `K`, each of type `V`.",
             "hint": "Map over the key union itself, not over `keyof` something.",
             "hints": [
-              "Map over the key union itself, not over `keyof` something."
+              "Map over the key union itself, not over `keyof` something.",
+              "The answer begins `{ [P in …`"
             ],
             "language": "typescript",
             "kind": "typelevel",
@@ -40045,7 +40266,8 @@
             "prompt": "Write `OmitByValue<T, V>`: `T` without the properties whose type is assignable to `V`.",
             "hint": "Use an `as` clause and map unwanted keys to `never`.",
             "hints": [
-              "Use an `as` clause and map unwanted keys to `never`."
+              "Use an `as` clause and map unwanted keys to `never`.",
+              "The answer begins `{ [K in keyof T as T[K] extends …`"
             ],
             "language": "typescript",
             "kind": "typelevel",
@@ -40066,7 +40288,8 @@
             "prompt": "Write `Setters<T>`: for each property `k` of `T`, a method `set<K>` (capitalised) taking the property's type and returning `void`.",
             "hint": "`` `set${Capitalize<string & K>}` `` builds the name; `string & K` drops non-string keys.",
             "hints": [
-              "`` `set${Capitalize<string & K>}` `` builds the name; `string & K` drops non-string keys."
+              "`` `set${Capitalize<string & K>}` `` builds the name; `string & K` drops non-string keys.",
+              "The answer begins `{ [K in keyof T as `set${Capitalize<string …`"
             ],
             "language": "typescript",
             "kind": "typelevel",
@@ -41272,7 +41495,8 @@
             "prompt": "What type does TypeScript already infer for `copy`? Annotate `check` with exactly that type — not merely one that fits.",
             "hint": "`NonNullable` removes `null` and `undefined` from a union.",
             "hints": [
-              "`NonNullable` removes `null` and `undefined` from a union."
+              "`NonNullable` removes `null` and `undefined` from a union.",
+              "The answer is 6 characters long and begins `str`."
             ],
             "language": "typescript",
             "kind": "predict",
@@ -41820,7 +42044,8 @@
             "prompt": "Write `FirstArg<F>`: the type of a function's first parameter, `never` for a function with no parameters, and `never` for anything that isn't a function.",
             "hint": "Capture the whole parameter list with `infer P`, then take its first element with a second `infer`.",
             "hints": [
-              "Capture the whole parameter list with `infer P`, then take its first element with a second `infer`."
+              "Capture the whole parameter list with `infer P`, then take its first element with a second `infer`.",
+              "The answer begins `F extends (...args: infer P) => unknown ? (P extends …`"
             ],
             "language": "typescript",
             "kind": "typelevel",
@@ -43641,7 +43866,8 @@
             "prompt": "Write `Trim<S>`: `S` without leading or trailing spaces.",
             "hint": "Peel one space off the front if there is one, else one off the back, and recurse.",
             "hints": [
-              "Peel one space off the front if there is one, else one off the back, and recurse."
+              "Peel one space off the front if there is one, else one off the back, and recurse.",
+              "The answer begins `S extends ` ${infer R}` ? Trim<R> : S …`"
             ],
             "language": "typescript",
             "kind": "typelevel",
@@ -43662,7 +43888,8 @@
             "prompt": "Write `StartsWith<S, P>`: `true` if the string type `S` begins with `P`.",
             "hint": "A template literal pattern: the prefix, then any string.",
             "hints": [
-              "A template literal pattern: the prefix, then any string."
+              "A template literal pattern: the prefix, then any string.",
+              "The answer begins `S extends `${P}${string}` ? …`"
             ],
             "language": "typescript",
             "kind": "typelevel",
@@ -43683,7 +43910,8 @@
             "prompt": "Write `ReplaceAll<S, From, To>`: every occurrence of `From` in `S` replaced with `To` (an empty `From` changes nothing).",
             "hint": "Match `${A}${From}${B}`; replace the first occurrence and recurse on the rest (`B`) only, so replacements aren't matched again.",
             "hints": [
-              "Match `${A}${From}${B}`; replace the first occurrence and recurse on the rest (`B`) only, so replacements aren't matched again."
+              "Match `${A}${From}${B}`; replace the first occurrence and recurse on the rest (`B`) only, so replacements aren't matched again.",
+              "The reference solution is 5 lines and begins: `From extends \"\"`"
             ],
             "language": "typescript",
             "kind": "typelevel",
@@ -44856,7 +45084,8 @@
             "prompt": "What type does TypeScript already infer for `p`? Annotate `check` with exactly that type — not merely one that fits.",
             "hint": "A class declaration also declares a type of the same name.",
             "hints": [
-              "A class declaration also declares a type of the same name."
+              "A class declaration also declares a type of the same name.",
+              "The answer is 5 characters long and begins `Po`."
             ],
             "language": "typescript",
             "kind": "predict",
@@ -45022,7 +45251,8 @@
             "prompt": "`private` is only a compile-time rule — at runtime anyone can read `count`. Make both fields JavaScript private fields (`#`) instead. No `private ` left; same output.",
             "hint": "Rename `count` to `#count` everywhere, declaration included.",
             "hints": [
-              "Rename `count` to `#count` everywhere, declaration included."
+              "Rename `count` to `#count` everywhere, declaration included.",
+              "The change starts on line 4 of the program."
             ],
             "language": "typescript",
             "kind": "refactor",
@@ -45312,7 +45542,9 @@
             "prompt": "Write a class `Vec` with `readonly x` and `readonly y` and methods `add(v)`, `scale(k)`, `length()`, `equals(v)` and `toString()` (`(x, y)`), each returning a *new* vector where it returns one. Each input line is an expression: `add x1 y1 x2 y2`, `scale x y k`, `length x y` (two decimals) or `equals x1 y1 x2 y2`. Print the result.",
             "hint": "`readonly` fields and methods that return new vectors make every `Vec` immutable.",
             "hints": [
-              "`readonly` fields and methods that return new vectors make every `Vec` immutable."
+              "`readonly` fields and methods that return new vectors make every `Vec` immutable.",
+              "The reference solution uses `split`, `map`, a `for` loop, `Math` and a class.",
+              "The reference solution is 32 lines and begins: `class Vec {`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -45466,7 +45698,9 @@
             "prompt": "An elevator starts at floor 0, idle. Commands: `call <floor>` adds a request; `step <n>` advances n time steps; each step, if there are requests, it moves one floor toward its target and prints `t=<time> floor <f>`, and when it reaches a requested floor it prints `t=<time> stop <f>` and removes that request. Target choice (SCAN): keep going in the current direction while any request lies ahead; otherwise turn toward the nearest remaining request (the lower one on a tie). Time starts at 0 and counts every step, moving or not.",
             "hint": "Keep the requests in a `Set`; each step decides the direction, moves one floor, and stops if the new floor was requested.",
             "hints": [
-              "Keep the requests in a `Set`; each step decides the direction, moves one floor, and stops if the new floor was requested."
+              "Keep the requests in a `Set`; each step decides the direction, moves one floor, and stops if the new floor was requested.",
+              "The reference solution uses `split`, a `Set`, `sort`, a `for` loop, `Math`, `??` and a class.",
+              "The reference solution is 28 lines and begins: `class Elevator {`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -45518,7 +45752,8 @@
             "prompt": "Finish `Shape` so that it can't be instantiated and every subclass must provide an `area()` returning a number.",
             "hint": "The class is already `abstract`; declare the member the same way, with no body.",
             "hints": [
-              "The class is already `abstract`; declare the member the same way, with no body."
+              "The class is already `abstract`; declare the member the same way, with no body.",
+              "The answer begins `abstract area(): …`"
             ],
             "language": "typescript",
             "kind": "typelevel",
@@ -47028,7 +47263,9 @@
             "prompt": "Write a generator `primes()` that never ends. Each input line is `first <n>` (the first n primes), `between <a> <b>` (primes with a ≤ p ≤ b) or `nth <n>` (the n-th prime, 1-based). Answer each with iterator helpers over `primes()` — no arrays until the final `toArray()`.",
             "hint": "An infinite generator is fine as long as every consumer stops: `take`, `break`, or `drop` + `take`.",
             "hints": [
-              "An infinite generator is fine as long as every consumer stops: `take`, `break`, or `drop` + `take`."
+              "An infinite generator is fine as long as every consumer stops: `take`, `break`, or `drop` + `take`.",
+              "The reference solution uses `split`, `join`, a `for` loop, `??` and a generator.",
+              "The reference solution is 23 lines and begins: `function* primes(): Generator<number> {`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -47089,7 +47326,9 @@
             "prompt": "Write `class RingBuffer<T>` with a fixed capacity: `push` overwrites the oldest item when full, `toArray()` returns oldest → newest, and the class is iterable. The first input line is the capacity; each later line is `push <x>`, `latest` (the newest item or `empty`) or `dump` (all items, oldest first, or `(empty)`). After every `push` that overwrote something, print `dropped <old>`.",
             "hint": "Track where the oldest item is (`start`) and how many there are (`size`); indexes wrap with `%`.",
             "hints": [
-              "Track where the oldest item is (`start`) and how many there are (`size`); indexes wrap with `%`."
+              "Track where the oldest item is (`start`) and how many there are (`size`); indexes wrap with `%`.",
+              "The reference solution uses `split`, `join`, a `for` loop, `??` and a class.",
+              "The reference solution is 40 lines and begins: `class RingBuffer<T> implements Iterable<T> {`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -47212,7 +47451,9 @@
             "prompt": "Each input line is a meeting `<start>-<end>` (minutes, end exclusive). Assign meetings, in order of start time (then input order), to rooms numbered from 1: reuse the room that frees up earliest if it is free by the start time, otherwise open a new room. Print `<start>-<end> room <r>` in that order, then `rooms <n>`. Use a min-heap of `(end, room)`.",
             "hint": "The heap's top is the room that frees up first — the only one worth checking.",
             "hints": [
-              "The heap's top is the room that frees up first — the only one worth checking."
+              "The heap's top is the room that frees up first — the only one worth checking.",
+              "The reference solution uses `split`, `map`, `sort`, a `while` loop, a `for` loop and a class.",
+              "The reference solution is 70 lines and begins: `class Heap<T> {`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -48420,7 +48661,8 @@
             "prompt": "Write `Result<T, E = string>`: `{ ok: true; value: T }` or `{ ok: false; error: E }`, with the error type defaulting to `string`.",
             "hint": "Two type parameters; give the second a default with `E = string`.",
             "hints": [
-              "Two type parameters; give the second a default with `E = string`."
+              "Two type parameters; give the second a default with `E = string`.",
+              "The answer begins `type Result<T, E = string> = { ok: true; value: …`"
             ],
             "language": "typescript",
             "kind": "design",
@@ -48446,7 +48688,8 @@
             "prompt": "`(e as Error).message` assumes whatever was thrown is an `Error` — the thrown string prints `failed: undefined`. Narrow with `instanceof` and fall back to `String(e)`. No `as Error` left.",
             "hint": "A caught value is `unknown`: `e instanceof Error` narrows it.",
             "hints": [
-              "A caught value is `unknown`: `e instanceof Error` narrows it."
+              "A caught value is `unknown`: `e instanceof Error` narrows it.",
+              "The change starts on line 12 of the program."
             ],
             "language": "typescript",
             "kind": "refactor",
@@ -48474,7 +48717,8 @@
             "prompt": "`wrap` adds context to whatever was thrown, keeping the original as the `cause`. Replace the `any`s: a caught value is `unknown`, the context is a string, and the result is an `Error`.",
             "hint": "`unknown` is the honest type of anything that was thrown.",
             "hints": [
-              "`unknown` is the honest type of anything that was thrown."
+              "`unknown` is the honest type of anything that was thrown.",
+              "The change starts on line 3 of the program."
             ],
             "language": "typescript",
             "kind": "retype",
@@ -48761,7 +49005,9 @@
             "prompt": "Write `safeParse(text): Result<unknown, string>` around `JSON.parse`. Each input line should be JSON of the form `{ \"items\": [numbers…] }`. Print `sum <s> of <n>` or `error: <reason>` — `invalid JSON`, `not an object`, `missing items`, `items must be a list of numbers`.",
             "hint": "Catch once, at the boundary, and convert the exception into a `Result`.",
             "hints": [
-              "Catch once, at the boundary, and convert the exception into a `Result`."
+              "Catch once, at the boundary, and convert the exception into a `Result`.",
+              "The reference solution uses `split`, `reduce`, `JSON.parse`, a `for` loop and `try`/`catch`.",
+              "The reference solution is 23 lines and begins: `type Result<T, E = string> = { ok: true; value: T } | { ok: false; error: E };`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -48857,7 +49103,9 @@
             "prompt": "An operation's outcomes are scripted on the input's first line, one per attempt: `ok:<value>`, `fail:timeout`, `fail:busy` (both retryable) or `fail:auth`, `fail:invalid` (not). The second line is the maximum number of attempts. Model failures as a union `{ kind; retryable }`, return `Result`s, and retry retryable failures only. Print `attempt <n>: <ok value|failed kind>` for each attempt, then `result <value>` or `gave up: <kind> (<reason>)` with reason `not retryable` or `out of attempts`.",
             "hint": "Put `retryable` on the failure value itself, so the retry loop needs no knowledge of specific kinds.",
             "hints": [
-              "Put `retryable` on the failure value itself, so the retry loop needs no knowledge of specific kinds."
+              "Put `retryable` on the failure value itself, so the retry loop needs no knowledge of specific kinds.",
+              "The reference solution uses `split`, a `Set`, a `for` loop and `??`.",
+              "The reference solution is 27 lines and begins: `type Result<T, E = string> = { ok: true; value: T } | { ok: false; error: E };`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -48930,7 +49178,9 @@
             "prompt": "Accounts are given on the first line as `name=balance`. Each later line is a transfer `<from> <to> <amount>` made of three steps — debit the sender, credit the receiver, charge the sender a fee of 1 — any of which can fail (unknown account, insufficient funds, or a `frozen` receiver listed on the second line as `frozen <names…>`). Undo completed steps in reverse order when a later step fails, using a `DisposableStack` whose rollback is disarmed with `move()` on success. Print `ok` or `failed: <reason>` and then all balances in the order given.",
             "hint": "Register each step's undo right after the step succeeds; `move()` at the end means nothing is undone.",
             "hints": [
-              "Register each step's undo right after the step succeeds; `move()` at the end means nothing is undone."
+              "Register each step's undo right after the step succeeds; `move()` at the end means nothing is undone.",
+              "The reference solution uses `split`, a `Map`, a `Set`, `map`, `join`, `slice`, a `for` loop, `??` and `try`/`catch`.",
+              "The reference solution is 33 lines and begins: `const [accountLine = \"\", frozenLine = \"\", ...transfers] = input.split(\"\\n\");`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -48982,7 +49232,8 @@
             "prompt": "Application errors are a discriminated union. Derive `ErrorKind` — the union of their `kind` tags — from `AppError`, so a new error kind is added in one place.",
             "hint": "An indexed access on a union type reads the property from every member.",
             "hints": [
-              "An indexed access on a union type reads the property from every member."
+              "An indexed access on a union type reads the property from every member.",
+              "The answer is 16 characters long and begins `AppError`."
             ],
             "language": "typescript",
             "kind": "typelevel",
@@ -50209,7 +50460,8 @@
             "prompt": "Replace the `any`s in `double`: it takes a number and resolves to a number.",
             "hint": "An async function's return type is always a `Promise<...>`.",
             "hints": [
-              "An async function's return type is always a `Promise<...>`."
+              "An async function's return type is always a `Promise<...>`.",
+              "The change starts on line 3 of the program."
             ],
             "language": "typescript",
             "kind": "retype",
@@ -50239,7 +50491,8 @@
             "prompt": "Write `Task<T>`: a function with no arguments that returns a promise of `T`. `runAll` runs a list of them with at most `limit` in flight.",
             "hint": "A function type with no parameters: `() => Promise<T>`.",
             "hints": [
-              "A function type with no parameters: `() => Promise<T>`."
+              "A function type with no parameters: `() => Promise<T>`.",
+              "The answer begins `type Task<T> = …`"
             ],
             "language": "typescript",
             "kind": "design",
@@ -50269,7 +50522,8 @@
             "prompt": "Rewrite `main` with `async`/`await` instead of `.then` chains — no `.then(` left. Same output.",
             "hint": "Mark `main` `async`, then `const items = await Promise.all(...)`.",
             "hints": [
-              "Mark `main` `async`, then `const items = await Promise.all(...)`."
+              "Mark `main` `async`, then `const items = await Promise.all(...)`.",
+              "The change starts on line 6 of the program."
             ],
             "language": "typescript",
             "kind": "refactor",
@@ -50756,7 +51010,9 @@
             "prompt": "The first input line is the throttle interval in ms; the second, event times in ms (ascending). A leading-edge throttle lets an event through if at least `interval` ms have passed since the last event it let through. Print the times let through, then `dropped <k>`. (A pure function over timestamps — no timers needed.)",
             "hint": "Remember the time of the last event let through, not the last event seen.",
             "hints": [
-              "Remember the time of the last event let through, not the last event seen."
+              "Remember the time of the last event let through, not the last event seen.",
+              "The reference solution uses `split`, `map`, `join` and a `for` loop.",
+              "The reference solution is 16 lines and begins: `function throttle(times: readonly number[], interval: number): number[] {`"
             ],
             "language": "typescript",
             "kind": "challenge",
@@ -50922,7 +51178,9 @@
             "prompt": "The first input line is the debounce wait in ms; each later line is `<time> <character>` — a keystroke typed into a search box. On the virtual clock, deliver each keystroke at its time to a debounced `search` function: it runs only once the user has paused for the wait, with the full text typed so far. Print `t=<time> search \"<text>\"` for each call that actually runs, then `searches: <k>, keystrokes: <n>`.",
             "hint": "Each keystroke cancels the pending timer and starts a new one; only a timer that survives the whole wait fires.",
             "hints": [
-              "Each keystroke cancels the pending timer and starts a new one; only a timer that survives the whole wait fires."
+              "Each keystroke cancels the pending timer and starts a new one; only a timer that survives the whole wait fires.",
+              "The reference solution uses `split`, `filter`, `sort`, a `for` loop, a class and `await`.",
+              "The reference solution is 60 lines and begins: `// A virtual clock: time moves only when every pending microtask has settled`"
             ],
             "language": "typescript",
             "kind": "challenge",

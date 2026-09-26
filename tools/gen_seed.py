@@ -6073,6 +6073,12 @@ _tsi_path = os.path.join(HERE, "ts_lesson_interview.py")
 with open(_tsi_path, encoding="utf-8") as _tif:
     exec(compile(_tif.read(), _tsi_path, "exec"))
 
+# Hint ladders (X-18) for every TypeScript Learn exercise; the Mastery weeks
+# reuse `_ts_ladder` from mastery_ts_scope.py.
+_tsh_path = os.path.join(HERE, "ts_hint_ladders.py")
+with open(_tsh_path, encoding="utf-8") as _thf:
+    exec(compile(_thf.read(), _tsh_path, "exec"))
+
 # The 8-month structured TypeScript COURSE (weeks/themes/goals/lessons/capstones).
 # Runs after the other TypeScript files so it can reuse tsx/tsc/_P. Defines
 # TS_COURSE; written to seeds/ts_course.json near the concepts.
