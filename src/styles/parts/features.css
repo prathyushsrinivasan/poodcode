@@ -965,3 +965,20 @@ body.focus-mode .topbar {
   color: var(--text-faint);
   user-select: none;
 }
+
+/* A lesson pitfall as a collapsible card (X-05). */
+.pitfall-card {
+  margin: 8px 0;
+  padding: 8px 12px;
+  border-color: var(--warn);
+}
+.pitfall-card > summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+.pitfall-card[open] > summary {
+  margin-bottom: 6px;
+}
+.pitfall-mark {
+  color: var(--warn);
+}

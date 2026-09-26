@@ -1,3 +1,4 @@
+import { LessonMarkdown } from "../components/LessonMarkdown";
 import { AssertionPanel } from "../components/AssertionPanel";
 import { FailingCases } from "../components/OutputCompare";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -772,7 +773,7 @@ function ConceptDetail({
             variant={studyVariant(concept)}
           />
         ) : (
-          <Markdown>{concept.lesson}</Markdown>
+          <LessonMarkdown>{concept.lesson}</LessonMarkdown>
         )}
       </Section>
 
