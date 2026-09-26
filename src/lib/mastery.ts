@@ -282,3 +282,37 @@ export function formatStudyTime(seconds: number): string {
   const hours = Math.floor(minutes / 60);
   return `${hours}h ${minutes % 60}m`;
 }
+
+// ---------------------------------------------------------------------------
+// Teaching tools per week — the pages built for a stretch of the programme.
+// ---------------------------------------------------------------------------
+
+export interface WeekTool {
+  label: string;
+  to: string;
+  why: string;
+}
+
+/** The interactive tools that teach a TypeScript week's subject. */
+export function weekTools(trackKey: string, week: number): WeekTool[] {
+  if (trackKey !== "typescript") return [];
+  const tools: WeekTool[] = [];
+  if (week <= 8) {
+    tools.push({ label: "Playground", to: "/playground/ts", why: "see what every declaration infers (Types tab)" });
+  }
+  if (week >= 10 && week <= 13) {
+    tools.push({ label: "Narrowing stepper", to: "/playground/ts", why: "a variable's type at every line (Narrowing tab)" });
+  }
+  if (week === 14 || week === 15 || week === 16) {
+    tools.push({ label: "Strictness switcher", to: "/playground/ts", why: "flip compiler flags and watch errors appear (Compiler tab)" });
+  }
+  if (week >= 17 && week <= 22) {
+    tools.push({ label: "Type expander", to: "/playground/ts", why: "every type alias fully expanded (Types tab)" });
+  }
+  if (week === 26) {
+    tools.push({ label: "Event loop", to: "/visualise/async", why: "step through the stack and the queues" });
+    tools.push({ label: "Promise timeline", to: "/visualise/async", why: "when all / allSettled / race / any settle" });
+  }
+  tools.push({ label: "Error glossary", to: "/ts-errors", why: "every TSnnnn code, explained" });
+  return tools;
+}

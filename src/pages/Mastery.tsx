@@ -50,6 +50,7 @@ import {
   startDateKey,
   unlockedWeeks,
   weekProgress,
+  weekTools,
   type ExamQuestion,
   type ProgressMap,
   type WeekProgress,
@@ -520,6 +521,20 @@ function WeekCard({
           {progress.studySeconds > 0 && (
             <p className="dim" style={{ marginTop: 0, fontSize: 12 }}>
               {formatStudyTime(progress.studySeconds)} spent on this week so far.
+            </p>
+          )}
+
+          {weekTools(track.key, week.week).length > 0 && (
+            <p className="dim quiz-note" style={{ marginTop: 0 }}>
+              🧰 Tools for this week:{" "}
+              {weekTools(track.key, week.week).map((t, k) => (
+                <span key={t.label}>
+                  {k > 0 && " · "}
+                  <Link to={t.to} title={t.why}>
+                    {t.label}
+                  </Link>
+                </span>
+              ))}
             </p>
           )}
 

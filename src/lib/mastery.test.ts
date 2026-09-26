@@ -10,6 +10,7 @@ import {
   progressByWeek,
   unlockedWeeks,
   weekProgress,
+  weekTools,
   type ProgressMap,
 } from "./mastery";
 
@@ -310,5 +311,18 @@ describe("masteryResume", () => {
     expect(r?.finished).toBe(true);
     expect(r?.total).toBe(3);
     expect(r?.completed).toBe(3);
+  });
+});
+
+describe("weekTools", () => {
+  it("points each stretch of the TypeScript programme at its tool", () => {
+    const labels = (w: number) => weekTools("typescript", w).map((t) => t.label);
+    expect(labels(11)).toContain("Narrowing stepper");
+    expect(labels(14)).toContain("Strictness switcher");
+    expect(labels(20)).toContain("Type expander");
+    expect(labels(26)).toEqual(["Event loop", "Promise timeline", "Error glossary"]);
+  });
+  it("offers nothing on other tracks", () => {
+    expect(weekTools("java", 5)).toEqual([]);
   });
 });

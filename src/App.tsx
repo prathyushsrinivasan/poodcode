@@ -26,6 +26,7 @@ import Mastery from "./pages/Mastery";
 import Flashcards from "./pages/Flashcards";
 import TsErrors from "./pages/TsErrors";
 import TsPlayground from "./pages/TsPlayground";
+import AsyncVisualiser from "./pages/AsyncVisualiser";
 import Contest from "./pages/Contest";
 import JapaneseBridge from "./pages/JapaneseBridge";
 import Paths from "./pages/Paths";
@@ -91,6 +92,7 @@ function Shell() {
           <Route path="/flashcards" element={<Flashcards />} />
           <Route path="/ts-errors" element={<TsErrors />} />
           <Route path="/playground/ts" element={<TsPlayground />} />
+          <Route path="/visualise/async" element={<AsyncVisualiser />} />
           <Route path="/contest/:id" element={<Contest />} />
           <Route path="/jp-bridge" element={<JapaneseBridge />} />
           <Route path="/problem/new" element={<ProblemForm />} />
