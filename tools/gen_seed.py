@@ -6061,6 +6061,11 @@ for _tsx_file in ["ts_outputs_kit.py", "ts_chapter_kit.py"] + [
     if os.path.exists(_tsx_path):
         with open(_tsx_path, encoding="utf-8") as _tsxf:
             exec(compile(_tsxf.read(), _tsx_path, "exec"))
+# X-02 lint: every TypeScript chapter follows the lesson template — written with
+# `_chapter`, or one of the original 50 brought up to it with `_deepen`.
+_ts_untemplated = sorted(k for k, c in CONCEPTS.items() if c.get("language") == "typescript"
+                         and k not in TS_CHAPTER_KEYS and k not in TS_DEEPENED)
+assert not _ts_untemplated, f"TypeScript chapters not on the lesson template: {_ts_untemplated}"
 
 # "In an interview" — three questions with model answers appended to every
 # TypeScript chapter's lesson. Runs after every TypeScript chapter exists.

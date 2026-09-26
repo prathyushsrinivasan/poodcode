@@ -709,6 +709,94 @@
    "NaN"
   ]
  },
+ "ts_async-error1": {
+  "hash": "da9f7e473ac1aef67570",
+  "diagnostics": [
+   {
+    "code": 1308,
+    "line": 2,
+    "msg": "'await' expressions are only allowed within async functions and at the top levels of modules."
+   }
+  ]
+ },
+ "ts_async-error2": {
+  "hash": "8f14fe07afd308a5162a",
+  "diagnostics": [
+   {
+    "code": 2322,
+    "line": 4,
+    "msg": "Type 'Promise<number>' is not assignable to type 'number'."
+   }
+  ]
+ },
+ "ts_async-error3": {
+  "hash": "a7d643b58d2fb312806b",
+  "diagnostics": [
+   {
+    "code": 1064,
+    "line": 1,
+    "msg": "The return type of an async function or method must be the global Promise<T> type. Did you mean to write 'Promise<number>'?"
+   }
+  ]
+ },
+ "ts_async-example1": {
+  "hash": "45b9248bba2b789a0e84",
+  "outputs": [
+   "start a end a start b end b | start c start d end d end c"
+  ]
+ },
+ "ts_async-example2": {
+  "hash": "6847ba254e6938b7b306",
+  "outputs": [
+   "true 42\nrejected: nope"
+  ]
+ },
+ "ts_async-example3": {
+  "hash": "3b0aad6d89ce8fd51d37",
+  "outputs": [
+   "theme = dark\nno setting font"
+  ]
+ },
+ "ts_async-pitfall1-right": {
+  "hash": "b4e4264300773492ebee",
+  "outputs": [
+   "denied"
+  ]
+ },
+ "ts_async-pitfall1-wrong": {
+  "hash": "72afd40ceacf17544c8d",
+  "diagnostics": [
+   {
+    "code": 2801,
+    "line": 5,
+    "msg": "This condition will always return true since this 'Promise<boolean>' is always defined."
+   }
+  ]
+ },
+ "ts_async-pitfall2-right": {
+  "hash": "5253f8f8cb60c97a7084",
+  "outputs": [
+   "done after: [saved 1, saved 2]"
+  ]
+ },
+ "ts_async-pitfall2-wrong": {
+  "hash": "be6cff99c1663a82e323",
+  "outputs": [
+   "done after: []"
+  ]
+ },
+ "ts_async-pitfall3-right": {
+  "hash": "4db20093474fea7e6e14",
+  "outputs": [
+   "fallback"
+  ]
+ },
+ "ts_async-pitfall3-wrong": {
+  "hash": "17562f52f6a48b134989",
+  "outputs": [
+   "escaped: offline"
+  ]
+ },
  "ts_async_iteration-error1": {
   "hash": "59b0e51358c8202d33e9",
   "diagnostics": [
@@ -819,6 +907,80 @@
     "line": 5,
     "msg": "No overload matches this call.   Overload 1 of 4, '(iterable: Iterable<unknown> | ArrayLike<unknown>): unknown[]', gave the following error.     Argument of type 'AsyncGenerator<number, any, any>' is not assignable to parameter of type 'Iterable<unknown> | ArrayLike<unknown>'.   Overload 2 of 4, '(arrayLike: ArrayLike<unknown>): unknown[]', gave the following error.     Argument of type 'AsyncGenerator<number, any, any>' is not assignable to parameter of type 'ArrayLike<unknown>'.       Property 'length' is missing in type 'AsyncGenerator<number, any, any>' but required in type 'ArrayLike<unknown>'."
    }
+  ]
+ },
+ "ts_async_patterns-error1": {
+  "hash": "06dc21a008e2feb5f67b",
+  "diagnostics": [
+   {
+    "code": 2339,
+    "line": 3,
+    "msg": "Property 'value' does not exist on type 'PromiseSettledResult<number>'.   Property 'value' does not exist on type 'PromiseRejectedResult'."
+   }
+  ]
+ },
+ "ts_async_patterns-error2": {
+  "hash": "ffbd33ea1355d8b3bdf7",
+  "diagnostics": [
+   {
+    "code": 2322,
+    "line": 4,
+    "msg": "Type '[number, string]' is not assignable to type '[string, number]'.   Type at position 0 in source is not compatible with type at position 0 in target.     Type 'number' is not assignable to type 'string'."
+   }
+  ]
+ },
+ "ts_async_patterns-example1": {
+  "hash": "311749385c2f1f19e7b8",
+  "outputs": [
+   "pen: 2\nhat: failed (unknown sku hat)\ncup: 5\nall: unknown sku hat"
+  ]
+ },
+ "ts_async_patterns-example2": {
+  "hash": "eb958fc16b708ced7caf",
+  "outputs": [
+   "fast reply\nslow: timed out after 30 ms"
+  ]
+ },
+ "ts_async_patterns-example3": {
+  "hash": "15ba14789cffc3e05fc0",
+  "outputs": [
+   "60,20,40,20,10 | peak in flight: 2"
+  ]
+ },
+ "ts_async_patterns-pitfall1-right": {
+  "hash": "c9d9939d38c54ea2241e",
+  "outputs": [
+   "start 1, end 1, start 2, end 2, start 3, end 3"
+  ]
+ },
+ "ts_async_patterns-pitfall1-wrong": {
+  "hash": "9871a6d364fe56836ddf",
+  "outputs": [
+   "start 1, start 2, start 3, end 1, end 2, end 3"
+  ]
+ },
+ "ts_async_patterns-pitfall2-right": {
+  "hash": "f86bb0efba4f74c42cf8",
+  "outputs": [
+   "timeout\nwork skipped: aborted"
+  ]
+ },
+ "ts_async_patterns-pitfall2-wrong": {
+  "hash": "8a75042ccbe902ee7d0d",
+  "outputs": [
+   "timeout\nwork ran to the end"
+  ]
+ },
+ "ts_async_patterns-pitfall3-right": {
+  "hash": "05e061eb1a963e6ee516",
+  "outputs": [
+   "1 of 2 failed"
+  ]
+ },
+ "ts_async_patterns-pitfall3-wrong": {
+  "hash": "ffd35a4160f85ab1e2b0",
+  "outputs": [
+   "success? 2 results"
   ]
  },
  "ts_branded_types-error1": {
@@ -1115,6 +1277,90 @@
   "hash": "c8f8ee834fb29a40e78a",
   "outputs": [
    "items in b: 2"
+  ]
+ },
+ "ts_classes-error1": {
+  "hash": "029e14e53c7df3e160cc",
+  "diagnostics": [
+   {
+    "code": 2564,
+    "line": 2,
+    "msg": "Property 'count' has no initializer and is not definitely assigned in the constructor."
+   }
+  ]
+ },
+ "ts_classes-error2": {
+  "hash": "6f10bdc78bf8f58c7921",
+  "diagnostics": [
+   {
+    "code": 17009,
+    "line": 10,
+    "msg": "'super' must be called before accessing 'this' in the constructor of a derived class."
+   }
+  ]
+ },
+ "ts_classes-error3": {
+  "hash": "5d68d9a07811d9182425",
+  "diagnostics": [
+   {
+    "code": 2420,
+    "line": 4,
+    "msg": "Class 'Square' incorrectly implements interface 'Shape'.   Property 'area' is missing in type 'Square' but required in type 'Shape'."
+   }
+  ]
+ },
+ "ts_classes-example1": {
+  "hash": "eeebf0e491bb3bab15e1",
+  "outputs": [
+   "false true 40"
+  ]
+ },
+ "ts_classes-example2": {
+  "hash": "b9af7daa92e93a2954b6",
+  "outputs": [
+   "circle: 3.14\nsquare: 9.00"
+  ]
+ },
+ "ts_classes-example3": {
+  "hash": "850f5d902aec18cdf8f3",
+  "outputs": [
+   "Todo (2)\n- write\n- test"
+  ]
+ },
+ "ts_classes-pitfall1-right": {
+  "hash": "5fc20313d011e7398a0d",
+  "outputs": [
+   "tagged v2"
+  ]
+ },
+ "ts_classes-pitfall1-wrong": {
+  "hash": "1a45c80f2155648616ed",
+  "outputs": [
+   "tagged undefined"
+  ]
+ },
+ "ts_classes-pitfall2-right": {
+  "hash": "ab5a755382021a692c28",
+  "outputs": [
+   "[] {}"
+  ]
+ },
+ "ts_classes-pitfall2-wrong": {
+  "hash": "19b881fc611c3ea95275",
+  "outputs": [
+   "[ 'secret' ] {\"secret\":\"k-123\"}"
+  ]
+ },
+ "ts_classes-pitfall3-right": {
+  "hash": "c1421dfff8cc88e74ffd",
+  "outputs": [
+   "point 1,2"
+  ]
+ },
+ "ts_classes-pitfall3-wrong": {
+  "hash": "9a71c6a492c26c0939df",
+  "outputs": [
+   "not a point"
   ]
  },
  "ts_closures_scope-counter": {
@@ -2032,6 +2278,94 @@
    }
   ]
  },
+ "ts_ds_generics-error1": {
+  "hash": "296724f9429a09e0a5a4",
+  "diagnostics": [
+   {
+    "code": 2345,
+    "line": 8,
+    "msg": "Argument of type 'string' is not assignable to parameter of type 'number'."
+   }
+  ]
+ },
+ "ts_ds_generics-error2": {
+  "hash": "6787f3207bd9bdb4f0d3",
+  "diagnostics": [
+   {
+    "code": 18013,
+    "line": 8,
+    "msg": "Property '#items' is not accessible outside class 'Stack' because it has a private identifier."
+   }
+  ]
+ },
+ "ts_ds_generics-error3": {
+  "hash": "8a277219021f552ae1d1",
+  "diagnostics": [
+   {
+    "code": 2532,
+    "line": 12,
+    "msg": "Object is possibly 'undefined'."
+   }
+  ]
+ },
+ "ts_ds_generics-example1": {
+  "hash": "231252885103076576ad",
+  "outputs": [
+   "build test 1\n100000 0"
+  ]
+ },
+ "ts_ds_generics-example2": {
+  "hash": "386f580c7bb0efc24a95",
+  "outputs": [
+   "1 -> 2 -> 3 | reversed: 3 -> 2 -> 1 | size 3"
+  ]
+ },
+ "ts_ds_generics-example3": {
+  "hash": "168e94869af7ab551559",
+  "outputs": [
+   "a,c undefined"
+  ]
+ },
+ "ts_ds_generics-pitfall1-right": {
+  "hash": "618010bbdef4ce186265",
+  "diagnostics": [
+   {
+    "code": 2339,
+    "line": 12,
+    "msg": "Property 'toUpperCase' does not exist on type 'number'."
+   }
+  ]
+ },
+ "ts_ds_generics-pitfall1-wrong": {
+  "hash": "7cb646f06844911d5073",
+  "outputs": [
+   "failed: s.pop(...).toUpperCase is not a function"
+  ]
+ },
+ "ts_ds_generics-pitfall2-right": {
+  "hash": "0fcbaa7fa63d7e470c2a",
+  "outputs": [
+   "2,10,33"
+  ]
+ },
+ "ts_ds_generics-pitfall2-wrong": {
+  "hash": "5fd81b71c5c4f45a2f04",
+  "outputs": [
+   "10,2,33"
+  ]
+ },
+ "ts_ds_generics-pitfall3-right": {
+  "hash": "489750a77b34cbfe5aa5",
+  "outputs": [
+   "5,9"
+  ]
+ },
+ "ts_ds_generics-pitfall3-wrong": {
+  "hash": "bdbc09179d3bbbb5b07f",
+  "outputs": [
+   "5,9,1"
+  ]
+ },
  "ts_enums-error1": {
   "hash": "ece86700bd64e5f0162a",
   "diagnostics": [
@@ -2473,6 +2807,164 @@
   "hash": "7e6ae516110b6f3b757e",
   "outputs": [
    "could not load user — cause: (none)"
+  ]
+ },
+ "ts_error_types-error1": {
+  "hash": "414e85871258eb3000d1",
+  "diagnostics": [
+   {
+    "code": 2339,
+    "line": 4,
+    "msg": "Property 'value' does not exist on type 'Result<number>'.   Property 'value' does not exist on type '{ ok: false; error: string; }'."
+   }
+  ]
+ },
+ "ts_error_types-error2": {
+  "hash": "a5480a193c62644aeec0",
+  "diagnostics": [
+   {
+    "code": 2322,
+    "line": 7,
+    "msg": "Type '{ kind: \"timeout\"; ms: number; }' is not assignable to type 'never'."
+   }
+  ]
+ },
+ "ts_error_types-example1": {
+  "hash": "b2425b4f1e7aaa4f2fe4",
+  "outputs": [
+   "ana,cy | line 2: missing name; line 3: bad age \"x\""
+  ]
+ },
+ "ts_error_types-example2": {
+  "hash": "e42505b052fbc0075a0a",
+  "outputs": [
+   "404 (u7) NotFound: no record u7\n403 Forbidden: admins only\n400 AppError: bad request\n500 RangeError: bug"
+  ]
+ },
+ "ts_error_types-example3": {
+  "hash": "450461cbff82f03d1a8b",
+  "outputs": [
+   "ok: ana\nerror: name is required\nerror: at most 8 letters\nerror: \"3\" is not allowed"
+  ]
+ },
+ "ts_error_types-pitfall1-right": {
+  "hash": "e09bd75e61f15bcdf6ba",
+  "outputs": [
+   "ParseError: unexpected ','"
+  ]
+ },
+ "ts_error_types-pitfall1-wrong": {
+  "hash": "fcc7ac21313ec8622c56",
+  "outputs": [
+   "Error: unexpected ','"
+  ]
+ },
+ "ts_error_types-pitfall2-right": {
+  "hash": "5ae339dcab07b7644cc3",
+  "outputs": [
+   "not saved: negative amount"
+  ]
+ },
+ "ts_error_types-pitfall2-wrong": {
+  "hash": "132e7ca1282de4f70471",
+  "outputs": [
+   "saved"
+  ]
+ },
+ "ts_error_types-pitfall3-right": {
+  "hash": "6f57cbf3e8365aee41d9",
+  "outputs": [
+   "port 80\nerror: port missing\nerror: not JSON"
+  ]
+ },
+ "ts_error_types-pitfall3-wrong": {
+  "hash": "49914e941a5fbb74a0ac",
+  "outputs": [
+   "port 80\nerror: port missing\nescaped: SyntaxError"
+  ]
+ },
+ "ts_errors-error1": {
+  "hash": "a6edbf189ec1d274de17",
+  "diagnostics": [
+   {
+    "code": 18046,
+    "line": 4,
+    "msg": "'e' is of type 'unknown'."
+   }
+  ]
+ },
+ "ts_errors-error2": {
+  "hash": "5ff8cf5855f40bd9b472",
+  "diagnostics": [
+   {
+    "code": 1196,
+    "line": 3,
+    "msg": "Catch clause variable type annotation must be 'any' or 'unknown' if specified."
+   }
+  ]
+ },
+ "ts_errors-error3": {
+  "hash": "a5d2d18e75f35efa1d78",
+  "diagnostics": [
+   {
+    "code": 2366,
+    "line": 1,
+    "msg": "Function lacks ending return statement and return type does not include 'undefined'."
+   }
+  ]
+ },
+ "ts_errors-example1": {
+  "hash": "3eaa4404012f9cfea7c2",
+  "outputs": [
+   "42 -1 open > parsed > close > open > bad input > close"
+  ]
+ },
+ "ts_errors-example2": {
+  "hash": "5f19a603e33c71110bbb",
+  "outputs": [
+   "level1 caught: disk full"
+  ]
+ },
+ "ts_errors-example3": {
+  "hash": "651670b8812a4b8cc38a",
+  "outputs": [
+   "TypeError: wrong type\na string: oops\nan object with code 7\nsomething else: 42"
+  ]
+ },
+ "ts_errors-pitfall1-right": {
+  "hash": "a07dacf0d19ad78e84eb",
+  "outputs": [
+   "cleanup\ncaught: lost"
+  ]
+ },
+ "ts_errors-pitfall1-wrong": {
+  "hash": "a266b9ecdb0b54a743fc",
+  "outputs": [
+   "finally wins"
+  ]
+ },
+ "ts_errors-pitfall2-right": {
+  "hash": "3bb724320604bec10d54",
+  "outputs": [
+   "5\n0\nerror: items.reduce is not a function"
+  ]
+ },
+ "ts_errors-pitfall2-wrong": {
+  "hash": "777c5c26fd0415925857",
+  "outputs": [
+   "5 0 0"
+  ]
+ },
+ "ts_errors-pitfall3-right": {
+  "hash": "38c50d6c41e3fc91238b",
+  "outputs": [
+   "true string"
+  ]
+ },
+ "ts_errors-pitfall3-wrong": {
+  "hash": "7eb6f6700ebf694c5723",
+  "outputs": [
+   "false undefined"
   ]
  },
  "ts_event_loop-all": {
@@ -3726,6 +4218,80 @@
    "0 3 6 9\n18",
    "(empty)\n0",
    "1 2 3\n6"
+  ]
+ },
+ "ts_iterators-error1": {
+  "hash": "c5b6a7324a7d58a4f9df",
+  "diagnostics": [
+   {
+    "code": 2488,
+    "line": 2,
+    "msg": "Type '{ ana: number; ben: number; }' must have a '[Symbol.iterator]()' method that returns an iterator."
+   }
+  ]
+ },
+ "ts_iterators-error2": {
+  "hash": "c9bb4f2bf4f429cd97de",
+  "diagnostics": [
+   {
+    "code": 2322,
+    "line": 3,
+    "msg": "Type 'string' is not assignable to type 'number'."
+   }
+  ]
+ },
+ "ts_iterators-example1": {
+  "hash": "14474eabe6fee9ab674b",
+  "outputs": [
+   "1\n  2\n    4\n  3"
+  ]
+ },
+ "ts_iterators-example2": {
+  "hash": "d760242040b94646ee1f",
+  "outputs": [
+   "1,9,25 computed 5"
+  ]
+ },
+ "ts_iterators-example3": {
+  "hash": "e40b023645589982cd87",
+  "outputs": [
+   "0 1 2 2 9"
+  ]
+ },
+ "ts_iterators-pitfall1-right": {
+  "hash": "a06d2a5121db73bcca3b",
+  "outputs": [
+   "3 3"
+  ]
+ },
+ "ts_iterators-pitfall1-wrong": {
+  "hash": "f07b805c806c5ed9507a",
+  "outputs": [
+   "3 0"
+  ]
+ },
+ "ts_iterators-pitfall2-right": {
+  "hash": "950bcb69d5e2838048b2",
+  "outputs": [
+   "5"
+  ]
+ },
+ "ts_iterators-pitfall2-wrong": {
+  "hash": "302ad5fe1a8f9ce81097",
+  "outputs": [
+   "4,5"
+  ]
+ },
+ "ts_iterators-pitfall3-right": {
+  "hash": "35a2d560a394a6f42cba",
+  "outputs": [
+   "caught at call"
+  ]
+ },
+ "ts_iterators-pitfall3-wrong": {
+  "hash": "c1f7ce6b84c28f905c01",
+  "outputs": [
+   "created without error: object"
   ]
  },
  "ts_json-error1": {
@@ -6372,6 +6938,94 @@
   "hash": "64c5c77e925961ff41f2",
   "outputs": [
    "draft"
+  ]
+ },
+ "ts_this_accessors-error1": {
+  "hash": "7b98064390519dd35373",
+  "diagnostics": [
+   {
+    "code": 2684,
+    "line": 9,
+    "msg": "The 'this' context of type 'void' is not assignable to method's 'this' of type 'Counter'."
+   }
+  ]
+ },
+ "ts_this_accessors-error2": {
+  "hash": "3f57cece12551ee7967f",
+  "diagnostics": [
+   {
+    "code": 2540,
+    "line": 13,
+    "msg": "Cannot assign to 'area' because it is a read-only property."
+   }
+  ]
+ },
+ "ts_this_accessors-error3": {
+  "hash": "0d958b691fd38779a022",
+  "diagnostics": [
+   {
+    "code": 6234,
+    "line": 8,
+    "msg": "This expression is not callable because it is a 'get' accessor. Did you mean to use it without '()'?   Type 'Number' has no call signatures."
+   }
+  ]
+ },
+ "ts_this_accessors-example1": {
+  "hash": "92850434b633f3d44d97",
+  "outputs": [
+   "100 212\nbelow absolute zero: -300\n100"
+  ]
+ },
+ "ts_this_accessors-example2": {
+  "hash": "cc60e03963b1080ddadf",
+  "outputs": [
+   "hi from ana | hi from ben | hi from ben"
+  ]
+ },
+ "ts_this_accessors-example3": {
+  "hash": "70d0abc68f03fba64a5d",
+  "outputs": [
+   "3"
+  ]
+ },
+ "ts_this_accessors-pitfall1-right": {
+  "hash": "e99703a94f07ce5d879d",
+  "outputs": [
+   "6"
+  ]
+ },
+ "ts_this_accessors-pitfall1-wrong": {
+  "hash": "046bc0c0a3df1876f145",
+  "outputs": [
+   "failed: Cannot read properties of undefined (reading 'total')\n0"
+  ]
+ },
+ "ts_this_accessors-pitfall2-right": {
+  "hash": "0fb52fc8293e830abbb9",
+  "outputs": [
+   "ana"
+  ]
+ },
+ "ts_this_accessors-pitfall2-wrong": {
+  "hash": "d147a0a377a04cc65ace",
+  "outputs": [
+   "failed: Maximum call stack size exceeded"
+  ]
+ },
+ "ts_this_accessors-pitfall3-right": {
+  "hash": "d49b5b3d73a86be16c2f",
+  "outputs": [
+   "1"
+  ]
+ },
+ "ts_this_accessors-pitfall3-wrong": {
+  "hash": "27cf27e6f38f6eef749b",
+  "diagnostics": [
+   {
+    "code": 2532,
+    "line": 4,
+    "msg": "Object is possibly 'undefined'."
+   }
   ]
  },
  "ts_top_bottom-error1": {
