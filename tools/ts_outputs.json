@@ -1295,6 +1295,89 @@
    "5 5 5"
   ]
  },
+ "ts_conditional_types-error1": {
+  "hash": "22a37380dcf72f59c80d",
+  "diagnostics": [
+   {
+    "code": 2322,
+    "line": 2,
+    "msg": "Type 'number' is not assignable to type 'T extends string ? number : string'."
+   },
+   {
+    "code": 2322,
+    "line": 2,
+    "msg": "Type 'string' is not assignable to type 'T extends string ? number : string'."
+   }
+  ]
+ },
+ "ts_conditional_types-error2": {
+  "hash": "e5155d9d9a46ab057e1c",
+  "diagnostics": [
+   {
+    "code": 2344,
+    "line": 1,
+    "msg": "Type 'string' does not satisfy the constraint '(...args: any) => any'."
+   }
+  ]
+ },
+ "ts_conditional_types-example1": {
+  "hash": "27e65e54446622ddf286",
+  "outputs": [
+   "42 3 a+b+c"
+  ]
+ },
+ "ts_conditional_types-example2": {
+  "hash": "182eaa139b129c48bab6",
+  "outputs": [
+   "1:ana 2:bo"
+  ]
+ },
+ "ts_conditional_types-example3": {
+  "hash": "d4540c8608fe82e7a583",
+  "outputs": [
+   "53"
+  ]
+ },
+ "ts_conditional_types-pitfall1-right": {
+  "hash": "b52222250040a7fa6e4a",
+  "outputs": [
+   "saved: ok"
+  ]
+ },
+ "ts_conditional_types-pitfall1-wrong": {
+  "hash": "6efb64cb3ac0c99e2e0e",
+  "outputs": [
+   "saved: [object Promise]"
+  ]
+ },
+ "ts_conditional_types-pitfall2-right": {
+  "hash": "ae78699d35d66d8ee432",
+  "outputs": [
+   "S"
+  ]
+ },
+ "ts_conditional_types-pitfall2-wrong": {
+  "hash": "c4f44fb65ab423f6721c",
+  "diagnostics": [
+   {
+    "code": 2339,
+    "line": 7,
+    "msg": "Property 'toUpperCase' does not exist on type 'never'."
+   }
+  ]
+ },
+ "ts_conditional_types-pitfall3-right": {
+  "hash": "82f179e2da8a7cf745e4",
+  "outputs": [
+   "true false"
+  ]
+ },
+ "ts_conditional_types-pitfall3-wrong": {
+  "hash": "279ca67b58901deea515",
+  "outputs": [
+   "false true"
+  ]
+ },
  "ts_conditionals-error1": {
   "hash": "c968be7e213ed5f0737a",
   "diagnostics": [
@@ -2706,6 +2789,84 @@
    "5 1,5,9"
   ]
  },
+ "ts_generic_constraints-error1": {
+  "hash": "7811ba1980d05756f861",
+  "diagnostics": [
+   {
+    "code": 2345,
+    "line": 4,
+    "msg": "Argument of type 'number' is not assignable to parameter of type '{ length: number; }'."
+   }
+  ]
+ },
+ "ts_generic_constraints-error2": {
+  "hash": "389aae892e9920b63808",
+  "diagnostics": [
+   {
+    "code": 2344,
+    "line": 2,
+    "msg": "Type 'string' does not satisfy the constraint 'object'."
+   }
+  ]
+ },
+ "ts_generic_constraints-example1": {
+  "hash": "6bdd1fa290c9f1d0f35a",
+  "outputs": [
+   "bo,ana,cy\nana,bo,cy"
+  ]
+ },
+ "ts_generic_constraints-example2": {
+  "hash": "267aadd80ab8f529e8d3",
+  "outputs": [
+   "a:true b:false"
+  ]
+ },
+ "ts_generic_constraints-example3": {
+  "hash": "05c15453519f2ef64c62",
+  "outputs": [
+   "#ts #node"
+  ]
+ },
+ "ts_generic_constraints-pitfall1-right": {
+  "hash": "64990b4b3d01a846c55d",
+  "outputs": [
+   "fields: a,b | list of 2"
+  ]
+ },
+ "ts_generic_constraints-pitfall1-wrong": {
+  "hash": "12ac1c8370d540073be1",
+  "outputs": [
+   "fields: a,b | fields: 0,1"
+  ]
+ },
+ "ts_generic_constraints-pitfall2-right": {
+  "hash": "4c1a993e0669a6c41c80",
+  "outputs": [
+   "HELLO"
+  ]
+ },
+ "ts_generic_constraints-pitfall2-wrong": {
+  "hash": "680db22055c35ed9a99a",
+  "diagnostics": [
+   {
+    "code": 2339,
+    "line": 4,
+    "msg": "Property 'toUpperCase' does not exist on type '{ length: number; }'."
+   }
+  ]
+ },
+ "ts_generic_constraints-pitfall3-right": {
+  "hash": "6ee8af1c35face1ccf95",
+  "outputs": [
+   "true"
+  ]
+ },
+ "ts_generic_constraints-pitfall3-wrong": {
+  "hash": "990a679e0c345b6939cc",
+  "outputs": [
+   "false"
+  ]
+ },
  "ts_generic_inference-countby": {
   "hash": "c8ea0827a6e12e431fd0",
   "outputs": [
@@ -2825,6 +2986,84 @@
   "hash": "b6ffa00a2792c78513ff",
   "outputs": [
    "first: undefined"
+  ]
+ },
+ "ts_generics-error1": {
+  "hash": "70c007414ee3a8a11e19",
+  "diagnostics": [
+   {
+    "code": 2322,
+    "line": 2,
+    "msg": "Type '\"none\" | NonNullable<T>' is not assignable to type 'T'.   'T' could be instantiated with an arbitrary type which could be unrelated to '\"none\" | NonNullable<T>'."
+   }
+  ]
+ },
+ "ts_generics-error2": {
+  "hash": "cf0650059b90b95af2b7",
+  "diagnostics": [
+   {
+    "code": 2558,
+    "line": 4,
+    "msg": "Expected 1 type arguments, but got 2."
+   }
+  ]
+ },
+ "ts_generics-example1": {
+  "hash": "60002c7d70a86f8fe9c8",
+  "outputs": [
+   "B 30 3"
+  ]
+ },
+ "ts_generics-example2": {
+  "hash": "c2ee0ef53b1f760e74c7",
+  "outputs": [
+   "pen: $1.50 | cup: $4.00"
+  ]
+ },
+ "ts_generics-example3": {
+  "hash": "e35f20ea2aabf85f22a5",
+  "outputs": [
+   "42 | error caught"
+  ]
+ },
+ "ts_generics-pitfall1-right": {
+  "hash": "8911ddf573718acd9061",
+  "diagnostics": [
+   {
+    "code": 2551,
+    "line": 4,
+    "msg": "Property 'toFixed' does not exist on type 'string'. Did you mean 'fixed'?"
+   }
+  ]
+ },
+ "ts_generics-pitfall1-wrong": {
+  "hash": "b177857b938b63e17b86",
+  "outputs": [
+   "failed: first(...).toFixed is not a function"
+  ]
+ },
+ "ts_generics-pitfall2-right": {
+  "hash": "72c7892d4b191ea0ecf5",
+  "outputs": [
+   "6"
+  ]
+ },
+ "ts_generics-pitfall2-wrong": {
+  "hash": "73a0a131a6804647a7a9",
+  "outputs": [
+   "51"
+  ]
+ },
+ "ts_generics-pitfall3-right": {
+  "hash": "449e7e3fa32b1108a9a4",
+  "outputs": [
+   "names registered: 1"
+  ]
+ },
+ "ts_generics-pitfall3-wrong": {
+  "hash": "ab505f3345febc4a86f3",
+  "outputs": [
+   "names registered: 3"
   ]
  },
  "ts_heap_pq-error1": {
@@ -3663,6 +3902,88 @@
    "volume 0\nvolume 0 (muted)\nvolume 0"
   ]
  },
+ "ts_keyof_indexed-error1": {
+  "hash": "de519eb5df79615e70e5",
+  "diagnostics": [
+   {
+    "code": 2339,
+    "line": 2,
+    "msg": "Property 'color' does not exist on type 'Settings'."
+   }
+  ]
+ },
+ "ts_keyof_indexed-error2": {
+  "hash": "f101b692b0f9445959ef",
+  "diagnostics": [
+   {
+    "code": 7053,
+    "line": 3,
+    "msg": "Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{ theme: string; fontSize: number; }'.   No index signature with a parameter of type 'string' was found on type '{ theme: string; fontSize: number; }'."
+   }
+  ]
+ },
+ "ts_keyof_indexed-example1": {
+  "hash": "824ffbcca22d2c92ebf6",
+  "outputs": [
+   "{\"theme\":\"dark\",\"fontSize\":16,\"autosave\":true}"
+  ]
+ },
+ "ts_keyof_indexed-example2": {
+  "hash": "70dd3cf42830707eecd6",
+  "outputs": [
+   "login {\"user\":\"ana\"}\ntick 3\nlogout {\"user\":\"ana\",\"reason\":\"timeout\"}"
+  ]
+ },
+ "ts_keyof_indexed-example3": {
+  "hash": "010e61921483bc4e4304",
+  "outputs": [
+   "level warn = 2\nunknown level fatal"
+  ]
+ },
+ "ts_keyof_indexed-pitfall1-right": {
+  "hash": "66bf77c84cb3d1df2dbb",
+  "outputs": [
+   "2"
+  ]
+ },
+ "ts_keyof_indexed-pitfall1-wrong": {
+  "hash": "55f283a85b2d88d78a54",
+  "diagnostics": [
+   {
+    "code": 2345,
+    "line": 6,
+    "msg": "Argument of type '\"r\"' is not assignable to parameter of type '\"kind\"'."
+   }
+  ]
+ },
+ "ts_keyof_indexed-pitfall2-right": {
+  "hash": "e652f34a60b855166c8f",
+  "diagnostics": [
+   {
+    "code": 2322,
+    "line": 3,
+    "msg": "Type '\"zzz\"' is not assignable to type '\"light\" | \"dark\"'."
+   }
+  ]
+ },
+ "ts_keyof_indexed-pitfall2-wrong": {
+  "hash": "6b8ecdd472fcd813a8ed",
+  "outputs": [
+   "accepted mode zzz"
+  ]
+ },
+ "ts_keyof_indexed-pitfall3-right": {
+  "hash": "24ca87e64828641a11c1",
+  "outputs": [
+   "two"
+  ]
+ },
+ "ts_keyof_indexed-pitfall3-wrong": {
+  "hash": "ddc49f0a7721d1736421",
+  "outputs": [
+   "not found"
+  ]
+ },
  "ts_literal_inference-check": {
   "hash": "8f6a49c517cac6f948e0",
   "outputs": [
@@ -3956,6 +4277,84 @@
   "hash": "179cdd8345a02187b3ce",
   "outputs": [
    "10 20 undefined"
+  ]
+ },
+ "ts_mapped_types-error1": {
+  "hash": "5e5aede63101260e3f83",
+  "diagnostics": [
+   {
+    "code": 2741,
+    "line": 3,
+    "msg": "Property 'age' is missing in type '{ name: (v: string) => boolean; }' but required in type 'Validators<Signup>'."
+   }
+  ]
+ },
+ "ts_mapped_types-error2": {
+  "hash": "8282cc7a19fb373e2b1f",
+  "diagnostics": [
+   {
+    "code": 2322,
+    "line": 5,
+    "msg": "Type '(v: string) => boolean' is not assignable to type '(value: number) => boolean'.   Types of parameters 'v' and 'value' are incompatible.     Type 'number' is not assignable to type 'string'."
+   }
+  ]
+ },
+ "ts_mapped_types-example1": {
+  "hash": "5dbdb364ff72741ad091",
+  "outputs": [
+   "name: too short; age: too young; email: invalid\n0"
+  ]
+ },
+ "ts_mapped_types-example2": {
+  "hash": "24bfef516cdadf3e13d0",
+  "outputs": [
+   "age,city"
+  ]
+ },
+ "ts_mapped_types-example3": {
+  "hash": "6d38cb420cccfb1eca7e",
+  "outputs": [
+   "id=1 name=ana email=(none)"
+  ]
+ },
+ "ts_mapped_types-pitfall1-right": {
+  "hash": "4c3cbe3677daa7fc0994",
+  "outputs": [
+   "{\"db\":{\"host\":\"db.local\"}}"
+  ]
+ },
+ "ts_mapped_types-pitfall1-wrong": {
+  "hash": "5cd4af06abe900863e75",
+  "diagnostics": [
+   {
+    "code": 2741,
+    "line": 2,
+    "msg": "Property 'port' is missing in type '{ host: string; }' but required in type '{ host: string; port: number; }'."
+   }
+  ]
+ },
+ "ts_mapped_types-pitfall2-right": {
+  "hash": "a76c8594d96f390a906f",
+  "outputs": [
+   "view sees port 80"
+  ]
+ },
+ "ts_mapped_types-pitfall2-wrong": {
+  "hash": "1e94a3cb585e906ce6cc",
+  "outputs": [
+   "view sees port 9"
+  ]
+ },
+ "ts_mapped_types-pitfall3-right": {
+  "hash": "cc0231e216e5b9c4e524",
+  "outputs": [
+   "email touched: false"
+  ]
+ },
+ "ts_mapped_types-pitfall3-wrong": {
+  "hash": "44ab220aa719e9c70490",
+  "outputs": [
+   "email touched: undefined"
   ]
  },
  "ts_maps_sets-error1": {
@@ -5897,6 +6296,84 @@
    }
   ]
  },
+ "ts_template_literal_types-error1": {
+  "hash": "c3a2d6c697914a315f18",
+  "diagnostics": [
+   {
+    "code": 2322,
+    "line": 2,
+    "msg": "Type '\"12pt\"' is not assignable to type '`${number}px`'."
+   }
+  ]
+ },
+ "ts_template_literal_types-error2": {
+  "hash": "2be97dcafeab1c315846",
+  "diagnostics": [
+   {
+    "code": 2345,
+    "line": 3,
+    "msg": "Argument of type '\"user:updated\"' is not assignable to parameter of type '\"user:created\" | \"user:deleted\" | \"order:created\" | \"order:deleted\"'."
+   }
+  ]
+ },
+ "ts_template_literal_types-example1": {
+  "hash": "2bca3ad2fdb5922d81eb",
+  "outputs": [
+   "120 200 12.5"
+  ]
+ },
+ "ts_template_literal_types-example2": {
+  "hash": "22605a8818fc1577f558",
+  "outputs": [
+   "user:created=2 order:deleted=1"
+  ]
+ },
+ "ts_template_literal_types-example3": {
+  "hash": "de89aecf84b9ee59c82d",
+  "outputs": [
+   "api call to users | page /about"
+  ]
+ },
+ "ts_template_literal_types-pitfall1-right": {
+  "hash": "eba3647e26f98577ab65",
+  "outputs": [
+   "rejected 12pt"
+  ]
+ },
+ "ts_template_literal_types-pitfall1-wrong": {
+  "hash": "3071cfc1438d2f155a9e",
+  "outputs": [
+   "width 12 (12pt)"
+  ]
+ },
+ "ts_template_literal_types-pitfall2-right": {
+  "hash": "51240c277d969413bb79",
+  "outputs": [
+   "true"
+  ]
+ },
+ "ts_template_literal_types-pitfall2-wrong": {
+  "hash": "e9d98cdc334abbecf943",
+  "diagnostics": [
+   {
+    "code": 2367,
+    "line": 4,
+    "msg": "This comparison appears to be unintentional because the types 'number' and 'string' have no overlap."
+   }
+  ]
+ },
+ "ts_template_literal_types-pitfall3-right": {
+  "hash": "0ea6d3cd761769011e54",
+  "outputs": [
+   "DRAFT"
+  ]
+ },
+ "ts_template_literal_types-pitfall3-wrong": {
+  "hash": "64c5c77e925961ff41f2",
+  "outputs": [
+   "draft"
+  ]
+ },
  "ts_top_bottom-error1": {
   "hash": "641d4b09de1f1c2db64a",
   "diagnostics": [
@@ -6170,6 +6647,84 @@
    "right left",
    "2 1",
    "y x"
+  ]
+ },
+ "ts_type_level-error1": {
+  "hash": "a665aee5d31118076d46",
+  "diagnostics": [
+   {
+    "code": 2456,
+    "line": 1,
+    "msg": "Type alias 'Bad' circularly references itself."
+   }
+  ]
+ },
+ "ts_type_level-error2": {
+  "hash": "904198a057103dce2f67",
+  "diagnostics": [
+   {
+    "code": 2322,
+    "line": 2,
+    "msg": "Type '{ created: Date; }' is not assignable to type 'Json'.   Types of property 'created' are incompatible.     Type 'Date' is not assignable to type 'Json | undefined'.       Type 'Date' is not assignable to type '{ [key: string]: Json; }'.         Index signature for type 'string' is missing in type 'Date'."
+   }
+  ]
+ },
+ "ts_type_level-example1": {
+  "hash": "d91def9f796363f74265",
+  "outputs": [
+   "7"
+  ]
+ },
+ "ts_type_level-example2": {
+  "hash": "24c1da09eaa8699e6e0f",
+  "outputs": [
+   "root/file/open root/file/save root/help"
+  ]
+ },
+ "ts_type_level-example3": {
+  "hash": "f886e2a843cdab149bf1",
+  "outputs": [
+   "localhost:80/443 debug=false"
+  ]
+ },
+ "ts_type_level-pitfall1-right": {
+  "hash": "6b3743d19cbd1a5db013",
+  "outputs": [
+   "20000"
+  ]
+ },
+ "ts_type_level-pitfall1-wrong": {
+  "hash": "214f9fc17a4e1a2319b2",
+  "outputs": [
+   "failed: RangeError"
+  ]
+ },
+ "ts_type_level-pitfall2-right": {
+  "hash": "84202904694a2b2a379f",
+  "outputs": [
+   "{\"title\":\"launch\",\"at\":\"2026-09-26T00:00:00.000Z\"}"
+  ]
+ },
+ "ts_type_level-pitfall2-wrong": {
+  "hash": "613240c187f81f22f2fc",
+  "diagnostics": [
+   {
+    "code": 2322,
+    "line": 2,
+    "msg": "Type '{ title: string; at: Date; }' is not assignable to type 'Json'.   Types of property 'at' are incompatible.     Type 'Date' is not assignable to type 'Json | ((index: number) => string | undefined) | ((index: number) => Json | undefined) | undefined'.       Type 'Date' is not assignable to type '{ [key: string]: Json; }'.         Index signature for type 'string' is missing in type 'Date'."
+   }
+  ]
+ },
+ "ts_type_level-pitfall3-right": {
+  "hash": "4dc06ad71070dbc4ad4d",
+  "outputs": [
+   "10"
+  ]
+ },
+ "ts_type_level-pitfall3-wrong": {
+  "hash": "54beb86a5d2015714517",
+  "outputs": [
+   "99"
   ]
  },
  "ts_type_performance-build": {
