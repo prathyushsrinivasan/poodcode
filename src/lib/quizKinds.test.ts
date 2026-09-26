@@ -64,3 +64,11 @@ describe("bannedIn", () => {
     expect(bannedIn("{ typeofThing: string }")).toBeNull();
   });
 });
+
+describe("why_not", () => {
+  it("moves with the options when they are shuffled", () => {
+    const q = reorderOptions({ ...base, why_not: ["", "not b", "not c", "not d"] }, ["c", "a", "d", "b"]);
+    expect(q.why_not).toEqual(["not c", "", "not d", "not b"]);
+    expect(q.options[q.answer]).toBe("a");
+  });
+});

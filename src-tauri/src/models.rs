@@ -67,6 +67,9 @@ pub struct QuizQuestion {
     pub harness: String,
     #[serde(default, skip_serializing_if = "String::is_empty")]
     pub strictness: String,
+    /// Why each option is wrong, parallel to `options` ("" for right ones).
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub why_not: Vec<String>,
 }
 
 /// A pointer from a concept to a real Library problem to practice it on.

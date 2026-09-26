@@ -178,6 +178,8 @@ export interface QuizQuestion {
   harness?: string;
   /** "type": the strictness preset the typed answer is checked at. */
   strictness?: string;
+  /** X-37: why each option is wrong, parallel to `options` ("" for right ones). */
+  why_not?: string[];
 }
 
 export interface PracticeRef {

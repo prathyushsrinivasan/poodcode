@@ -61,14 +61,18 @@ export function answerText(q: Pick<QuizQuestion, "options" | "answer" | "answers
 }
 
 /** A question with its options shuffled: `answers`/`answer` follow the options. */
-export function reorderOptions<Q extends QuizQuestion>(q: Q, options: string[]): Q {
-  const at = (i: number) => options.indexOf(q.options[i]!);
+export function reorderOptions<Q extends QuizQuestion>(q0: Q, options: string[]): Q {
+  const at = (i: number) => options.indexOf(q0.options[i]!);
+  // `why_not` is parallel to the options, so it moves with them.
+  const q: Q = q0.why_not
+    ? { ...q0, why_not: options.map((o) => q0.why_not![q0.options.indexOf(o)] ?? "") }
+    : q0;
   if (quizKind(q) === "multi") {
-    const answers = (q.answers ?? []).map(at).sort((a, b) => a - b);
+    const answers = (q0.answers ?? []).map(at).sort((a, b) => a - b);
     return { ...q, options, answers, answer: MULTI + maskOf(answers) };
   }
   if (quizKind(q) === "type") return { ...q, options, answer: 0 };
-  return { ...q, options, answer: at(q.answer) };
+  return { ...q, options, answer: at(q0.answer) };
 }
 
 /** The program a typed answer is checked as, and the text it may not use:

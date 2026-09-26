@@ -173,17 +173,25 @@ def _tsd_output_question(name, p, n):
     if p["wrong_label"] == "Prints:":
         answer = p["wrong_shows"]
         options = [answer, right_out, _TSD_NO_COMPILE, _TSD_THROWS]
+        # X-37: each wrong option is wrong for a reason the pitfall itself proves.
+        why_not = ["",
+                   "That is what the corrected program prints. The bug is exactly what makes this one print something else.",
+                   "It compiles: the compiler accepts every line, which is what makes this bug easy to miss.",
+                   "It runs to the end without throwing; it just prints the wrong thing."]
     else:
         message = p["wrong_shows"].split(": ", 1)[1] if p["wrong_shows"].startswith("line ") else p["wrong_shows"]
         answer = f"Nothing: it does not compile ({message.split(chr(10))[0]})"
         options = [answer, right_out, _TSD_THROWS]
+        why_not = ["",
+                   "That is what it prints once corrected. As written, the compiler rejects it before it can run.",
+                   "It never gets to run: the type-check fails first, so nothing is thrown."]
     if len(set(options)) != len(options) or not all(o.strip() for o in options):
         return None
     reads = f" given the input `{inp}`" if inp else ""
     return {
         "question": f"{name}, program {n}: what does it print{reads}?",
         "options": options, "answer": 0, "kind": "output", "code": p["wrong"],
-        "explanation": f"{p['title']}. {p['note']}",
+        "explanation": f"{p['title']}. {p['note']}", "why_not": why_not,
     }
 
 
