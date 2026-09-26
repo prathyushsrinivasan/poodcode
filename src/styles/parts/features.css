@@ -730,6 +730,29 @@ table.sqlgrid tbody tr.diff td {
   border-color: var(--accent);
 }
 
+/* ---- Assertion panel for type-graded work (M5-03) --------------------- */
+.assertion-panel {
+  margin-bottom: 4px;
+}
+.assertion {
+  padding: 6px 8px;
+  margin: 4px 0;
+  border-left: 3px solid var(--good);
+  background: color-mix(in srgb, var(--good) 7%, transparent);
+  border-radius: 4px;
+  font-size: 12.5px;
+}
+.assertion.bad {
+  border-left-color: var(--bad);
+  background: color-mix(in srgb, var(--bad) 9%, transparent);
+}
+.assertion-types {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 10px;
+  margin-top: 6px;
+}
+
 /* What a snippet prints — computed output shown under the code. */
 .code-output {
   font-family: var(--font-mono);

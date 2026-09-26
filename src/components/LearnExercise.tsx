@@ -13,6 +13,7 @@
 // Either mode may carry `exercise.harness`: TypeScript appended to the
 // learner's code before compiling, which lets an exercise ask for a *function*
 // and grade what it returns instead of what it printed.
+import { AssertionPanel } from "./AssertionPanel";
 import { FailingCases } from "./OutputCompare";
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -263,7 +264,7 @@ export function ExerciseCard({
         </div>
       )}
 
-      {report && <Feedback report={report} />}
+      {report && <Feedback report={report} check={exercise.judge_mode === "types" ? { harness: exercise.harness ?? "", code } : undefined} />}
 
       {showSolution && (
         <div style={{ marginTop: 10 }}>
@@ -433,7 +434,14 @@ export function QuizItem({
   );
 }
 
-export function Feedback({ report }: { report: JudgeReport }) {
+export function Feedback({
+  report,
+  check,
+}: {
+  report: JudgeReport;
+  /** A type-graded exercise: its hidden checks and the code judged. */
+  check?: { harness: string; code: string };
+}) {
   if (report.status === "not_installed") {
     return (
       <div className="card" style={{ marginTop: 10, marginBottom: 0, borderColor: "var(--bad)" }}>
@@ -449,9 +457,19 @@ export function Feedback({ report }: { report: JudgeReport }) {
     return (
       <div className="card" style={{ marginTop: 10, marginBottom: 0, borderColor: "var(--bad)" }}>
         <div className="io-label" style={{ color: "var(--bad)" }}>Compile error</div>
-        <pre style={{ margin: 0, whiteSpace: "pre-wrap", fontSize: 12 }}>
-          {report.compile_error}
-        </pre>
+        {check && check.harness.trim() !== "" ? (
+          <>
+            <AssertionPanel harness={check.harness} message={report.compile_error} code={check.code} />
+            <details style={{ marginTop: 8 }}>
+              <summary className="dim quiz-note">The compiler&rsquo;s own words</summary>
+              <pre style={{ margin: 0, whiteSpace: "pre-wrap", fontSize: 12 }}>{report.compile_error}</pre>
+            </details>
+          </>
+        ) : (
+          <pre style={{ margin: 0, whiteSpace: "pre-wrap", fontSize: 12 }}>
+            {report.compile_error}
+          </pre>
+        )}
         <TsErrorLinks text={report.compile_error} />
       </div>
     );

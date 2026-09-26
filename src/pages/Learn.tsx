@@ -1,3 +1,4 @@
+import { AssertionPanel } from "../components/AssertionPanel";
 import { FailingCases } from "../components/OutputCompare";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
@@ -1167,7 +1168,7 @@ function ExerciseCard({
 
       {preview && <SqlPreview out={preview} />}
 
-      {report && <Feedback report={report} isSql={isSql} />}
+      {report && <Feedback report={report} isSql={isSql} check={exercise.judge_mode === "types" ? { harness: exercise.harness ?? "", code } : undefined} />}
 
       {showSolution && (
         <div style={{ marginTop: 10 }}>
@@ -1433,7 +1434,16 @@ function SqlCaseDiff({
   );
 }
 
-function Feedback({ report, isSql = false }: { report: JudgeReport; isSql?: boolean }) {
+function Feedback({
+  report,
+  isSql = false,
+  check,
+}: {
+  report: JudgeReport;
+  isSql?: boolean;
+  /** A type-graded exercise: its hidden checks and the code judged. */
+  check?: { harness: string; code: string };
+}) {
   if (report.status === "not_installed") {
     return (
       <div className="card" style={{ marginTop: 10, marginBottom: 0, borderColor: "var(--bad)" }}>
@@ -1451,9 +1461,19 @@ function Feedback({ report, isSql = false }: { report: JudgeReport; isSql?: bool
         <div className="io-label" style={{ color: "var(--bad)" }}>
           {isSql ? "SQL error — the query would not compile" : "Compile error"}
         </div>
-        <pre style={{ margin: 0, whiteSpace: "pre-wrap", fontSize: 12 }}>
-          {report.compile_error}
-        </pre>
+        {check && check.harness.trim() !== "" ? (
+          <>
+            <AssertionPanel harness={check.harness} message={report.compile_error} code={check.code} />
+            <details style={{ marginTop: 8 }}>
+              <summary className="dim quiz-note">The compiler&rsquo;s own words</summary>
+              <pre style={{ margin: 0, whiteSpace: "pre-wrap", fontSize: 12 }}>{report.compile_error}</pre>
+            </details>
+          </>
+        ) : (
+          <pre style={{ margin: 0, whiteSpace: "pre-wrap", fontSize: 12 }}>
+            {report.compile_error}
+          </pre>
+        )}
         <TsErrorLinks text={report.compile_error} />
       </div>
     );
