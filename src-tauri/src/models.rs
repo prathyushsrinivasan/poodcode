@@ -1461,6 +1461,9 @@ pub struct MasteryTrack {
     /// One sentence per phase (month), shown above its weeks (X-76).
     #[serde(default)]
     pub phase_goals: std::collections::HashMap<String, String>,
+    /// A first judged program shown before Week 1 (M1-01).
+    #[serde(default)]
+    pub week_zero: Option<Exercise>,
 }
 
 /// One timed sitting over the whole programme: `quiz_size` questions drawn

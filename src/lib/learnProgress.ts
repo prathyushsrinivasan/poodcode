@@ -173,3 +173,39 @@ export function unmarkExercisesSolved(ids: string[]): Set<string> {
   if (gone.length > 0) void api.setExercisesSolved(gone, false).catch(() => {});
   return new Set(solvedCache);
 }
+
+// ---------------------------------------------------------------------------
+// Failed runs per exercise (TS_MASTERY_ROADMAP X-52, X-54, X-82). A count of
+// judged runs that were not accepted, kept per device in localStorage: it is a
+// study aid (what to re-queue, which chapters were hard), not progress, so it
+// is not worth a table. Reset never happens — a later solve simply ends the
+// re-queue, and the count stays as history.
+// ---------------------------------------------------------------------------
+
+const FAILURES_KEY = "poodcode:exercise-failures";
+
+export function exerciseFailures(): Record<string, number> {
+  try {
+    const v: unknown = JSON.parse(localStorage.getItem(FAILURES_KEY) || "{}");
+    if (typeof v !== "object" || v === null || Array.isArray(v)) return {};
+    const out: Record<string, number> = {};
+    for (const [k, n] of Object.entries(v as Record<string, unknown>)) {
+      if (typeof n === "number" && n > 0) out[k] = n;
+    }
+    return out;
+  } catch {
+    return {};
+  }
+}
+
+/** Count a judged run; only failures are recorded. */
+export function recordExerciseRun(id: string, accepted: boolean): void {
+  if (accepted) return;
+  try {
+    const all = exerciseFailures();
+    all[id] = (all[id] ?? 0) + 1;
+    localStorage.setItem(FAILURES_KEY, JSON.stringify(all));
+  } catch {
+    /* private mode — nothing to re-queue, which is fine */
+  }
+}

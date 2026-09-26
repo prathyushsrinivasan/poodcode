@@ -95,7 +95,8 @@ def collect(only, weeks, include_learn, include_mastery):
         track = next(t for t in load("mastery.json") if t["key"] == "typescript")
         fx = track.get("final_exam") or {}
         if not weeks:
-            for ex in fx.get("problems", []) + fx.get("type_section", []):
+            for ex in fx.get("problems", []) + fx.get("type_section", []) + (
+                    [track["week_zero"]] if track.get("week_zero") else []):
                 if not only or only in ex["id"]:
                     work.append(("mastery/final-exam", ex))
         for w in track["weeks"]:

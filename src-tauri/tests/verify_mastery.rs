@@ -106,6 +106,9 @@ fn all_practice(tracks: &[MasteryTrack]) -> Vec<(String, Exercise)> {
                 .map(move |ex| (format!("{} final exam {}", t.key, ex.id), ex.clone()))
         })
     });
+    let week_zero = tracks
+        .iter()
+        .flat_map(|t| t.week_zero.iter().map(move |ex| (format!("{} week 0 {}", t.key, ex.id), ex.clone())));
     let weekly: Vec<(String, Exercise)> = tracks
         .iter()
         .flat_map(|t| {
@@ -129,7 +132,7 @@ fn all_practice(tracks: &[MasteryTrack]) -> Vec<(String, Exercise)> {
             })
         })
         .collect();
-    weekly.into_iter().chain(final_exam).collect()
+    weekly.into_iter().chain(final_exam).chain(week_zero).collect()
 }
 
 /// Every runnable project, as a final-shaped value so `judge_all` can run it.

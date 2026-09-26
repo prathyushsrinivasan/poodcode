@@ -48,6 +48,18 @@
 .md-copy:focus-visible {
   opacity: 1;
 }
+/* Copy and "open in playground" sit together in the corner. */
+.md-actions {
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-2);
+  z-index: var(--z-base);
+  display: flex;
+  gap: 4px;
+}
+.md-actions .md-copy {
+  position: static;
+}
 
 .hljs-keyword,
 .hljs-selector-tag,

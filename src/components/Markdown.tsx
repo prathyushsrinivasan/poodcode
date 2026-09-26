@@ -13,7 +13,7 @@
  * in a lesson and the same code in the editor look the same.
  */
 
-import { useState, type ReactNode } from "react";
+import { isValidElement, useState, type ReactNode } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeHighlight from "rehype-highlight";
@@ -64,11 +64,35 @@ function CodeBlock({ children }: { children: ReactNode }) {
     }
   };
 
+  // A TypeScript block opens in the playground in one click (X-04): the same
+  // code, with its inferred types, narrowing and emitted JavaScript beside it.
+  const className =
+    isValidElement(children) && typeof (children.props as { className?: unknown }).className === "string"
+      ? ((children.props as { className: string }).className)
+      : "";
+  const isTs = /\blanguage-(ts|typescript)\b/.test(className);
+  const openInPlayground = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const text = e.currentTarget.closest(".md-pre")?.querySelector("pre")?.textContent ?? "";
+    try {
+      localStorage.setItem("poodcode:ts-playground", JSON.stringify({ code: text, focus: "" }));
+    } catch {
+      /* private mode — the playground opens on its example instead */
+    }
+    window.location.hash = "#/playground/ts";
+  };
+
   return (
     <div className="md-pre">
-      <button className="md-copy" onClick={copy} aria-label="Copy this code">
-        {copied ? "Copied" : "Copy"}
-      </button>
+      <span className="md-actions">
+        {isTs && (
+          <button className="md-copy" onClick={openInPlayground} title="Open this code in the TypeScript playground">
+            ▶ Playground
+          </button>
+        )}
+        <button className="md-copy" onClick={copy} aria-label="Copy this code">
+          {copied ? "Copied" : "Copy"}
+        </button>
+      </span>
       <pre>{children}</pre>
     </div>
   );

@@ -167,3 +167,17 @@ TS_PHASE_GOALS = {
 _ts_phases = {w["phase"] for w in TS_WEEKS}
 assert set(TS_PHASE_GOALS) == _ts_phases, f"X-76: phase goals out of step with the phases {sorted(_ts_phases)}"
 _ts_track["phase_goals"] = TS_PHASE_GOALS
+
+# Week 0 (M1-01): one tiny judged program before Week 1, on the Mastery page.
+TS_WEEK_ZERO = _tsp(
+    1, "tsm-w0-hello", "Hello, stdin", "warm-up",
+    "The input is one line: a name. Print `Hello, <name>!`, then, on a second line, how many characters the name has.",
+    """
+console.log(`Hello, ${input}!`);
+console.log(input.length);
+""", ["Ada", "Grace Hopper", "x", "Tim Berners-Lee"],
+    hints=["`input` already holds the line, trimmed. A template string puts it inside the greeting.",
+           "`input.length` is the number of characters."])
+assert TS_WEEK_ZERO["id"] not in _ts_ids
+_ts_ids.add(TS_WEEK_ZERO["id"])
+_ts_track["week_zero"] = TS_WEEK_ZERO

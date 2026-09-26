@@ -38,6 +38,7 @@ import {
   solvedExercises,
   loadSolvedExercises,
   markExerciseSolved,
+  recordExerciseRun,
 } from "../lib/learnProgress";
 
 const CATEGORY_ORDER = [
@@ -1029,6 +1030,7 @@ function ExerciseCard({
     try {
       const r = await api.runTests(null, lang, code, cases);
       setReport(r);
+      recordExerciseRun(exercise.id, r.status === "accepted");
       if (r.status === "accepted") onSolved?.(exercise.id);
     } catch (e) {
       setErr(String(e));

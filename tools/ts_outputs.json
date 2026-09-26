@@ -8886,6 +8886,15 @@
    "b\n4"
   ]
  },
+ "tsm-w0-hello": {
+  "hash": "dcfc1f66b790f7d8f6e1",
+  "outputs": [
+   "Hello, Ada!\n3",
+   "Hello, Grace Hopper!\n12",
+   "Hello, x!\n1",
+   "Hello, Tim Berners-Lee!\n15"
+  ]
+ },
  "tsm-w1-bmi": {
   "hash": "45f8f7318c4967381326",
   "outputs": [

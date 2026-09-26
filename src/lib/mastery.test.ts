@@ -18,6 +18,10 @@ import {
   daysLeftInWeek,
   interleavedWarmup,
   weekLinks,
+  requeued,
+  mostRetried,
+  weakChapters,
+  progressReport,
   type ProgressMap,
 } from "./mastery";
 
@@ -419,5 +423,48 @@ describe("weekLinks", () => {
 
   it("covers every core week", () => {
     for (let w = 1; w <= 26; w++) expect(weekLinks("typescript", w).course.length).toBeGreaterThan(0);
+  });
+});
+
+describe("using failed runs", () => {
+  const ex = (id: string) => ({ id, title: id.toUpperCase() });
+  const weeks = [
+    { week: 1, practice: [ex("a"), ex("b")], problem_set: [ex("c")] },
+    { week: 2, practice: [ex("d")] },
+    { week: 3, practice: [ex("e")] },
+  ];
+
+  it("re-queues earlier exercises failed twice and still unsolved, worst first", () => {
+    const failures = { a: 2, b: 5, c: 1, d: 3, e: 9 };
+    expect(requeued(weeks, 3, failures, new Set(["d"])).map((e) => e.id)).toEqual(["b", "a"]);
+  });
+
+  it("finds the most retried exercise", () => {
+    expect(mostRetried([ex("a"), ex("b")], { a: 1, b: 4 })).toEqual({ title: "B", count: 4 });
+    expect(mostRetried([ex("a")], {})).toBeNull();
+  });
+
+  it("flags chapters with a low first-try rate", () => {
+    const chapters = [
+      { key: "k1", name: "Easy", exercises: [{ id: "x1" }, { id: "x2" }] },
+      { key: "k2", name: "Hard", exercises: [{ id: "y1" }, { id: "y2" }, { id: "y3" }] },
+      { key: "k3", name: "Untouched", exercises: [{ id: "z1" }] },
+    ];
+    const solved = new Set(["x1", "x2", "y1", "y2"]);
+    const failures = { y1: 2, y2: 1, y3: 1 };
+    expect(weakChapters(chapters, failures, solved)).toEqual([{ key: "k2", name: "Hard", attempted: 3, firstTry: 0 }]);
+  });
+});
+
+describe("progressReport", () => {
+  it("reports every week as JSON and as a Markdown table", () => {
+    const t: MasteryTrack = { ...track, weeks: [week(1, ["a"], []), week(2, ["b"], [])] };
+    const per = t.weeks.map((w) => weekProgress(w, t, new Set(["a"]), new Set(), new Map()));
+    const { json, markdown } = progressReport(t, per, new Map(), new Date("2026-09-27T00:00:00Z"));
+    const parsed = JSON.parse(json);
+    expect(parsed.weeks).toHaveLength(2);
+    expect(parsed.weeks[0].chapters).toBe("1/1");
+    expect(markdown).toContain("| Week | Title |");
+    expect(markdown).toContain("Exported 2026-09-27");
   });
 });

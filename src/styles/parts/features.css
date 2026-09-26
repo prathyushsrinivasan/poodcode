@@ -753,6 +753,26 @@ table.sqlgrid tbody tr.diff td {
   margin-top: 6px;
 }
 
+/* ---- Focus mode for a coding final (X-71) ----------------------------- */
+body.focus-mode .app {
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr;
+}
+body.focus-mode .sidebar,
+body.focus-mode .topbar {
+  display: none;
+}
+
+.strict-step {
+  border-color: var(--accent);
+  background: var(--accent-dim);
+  font-size: 13px;
+}
+.week0-steps li {
+  margin: 4px 0;
+  font-size: 13.5px;
+}
+
 /* What a snippet prints — computed output shown under the code. */
 .code-output {
   font-family: var(--font-mono);

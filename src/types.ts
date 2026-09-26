@@ -615,6 +615,8 @@ export interface MasteryTrack {
   final_exam?: MasteryFinalExam | null;
   /** One sentence per phase, shown above its weeks. */
   phase_goals?: Record<string, string>;
+  /** A first judged program shown before Week 1. */
+  week_zero?: Exercise | null;
 }
 
 /** One timed sitting over the whole programme (X-36). */

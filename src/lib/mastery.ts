@@ -488,3 +488,133 @@ export function weekLinks(trackKey: string, week: number): WeekLinks {
       : [];
   return { course, dsa, projects };
 }
+
+// ---------------------------------------------------------------------------
+// Using failed runs (X-52, X-54, X-82)
+// ---------------------------------------------------------------------------
+
+type Attemptable = { id: string; title: string };
+
+/** Exercises from earlier weeks failed twice or more and still unsolved —
+ * they come back in a later week's warm-up until they are solved (X-52). */
+export function requeued<E extends Attemptable>(
+  weeks: { week: number; practice?: E[]; problem_set?: E[] }[],
+  week: number,
+  failures: Record<string, number>,
+  solved: Set<string>,
+  max = 2
+): E[] {
+  return weeks
+    .filter((w) => w.week < week)
+    .flatMap((w) => [...(w.practice ?? []), ...(w.problem_set ?? [])])
+    .filter((e) => (failures[e.id] ?? 0) >= 2 && !solved.has(e.id))
+    .sort((a, b) => (failures[b.id] ?? 0) - (failures[a.id] ?? 0))
+    .slice(0, max);
+}
+
+/** The exercise with the most failed runs among `items` (X-82). */
+export function mostRetried<E extends Attemptable>(
+  items: E[],
+  failures: Record<string, number>
+): { title: string; count: number } | null {
+  let best: { title: string; count: number } | null = null;
+  for (const e of items) {
+    const n = failures[e.id] ?? 0;
+    if (n > 0 && (!best || n > best.count)) best = { title: e.title, count: n };
+  }
+  return best;
+}
+
+export interface ChapterStat {
+  key: string;
+  name: string;
+  attempted: number;
+  firstTry: number;
+}
+
+/** Chapters with a low first-try rate: of the exercises you have solved or
+ * failed, how many were accepted with no failed run first (X-54). A chapter
+ * needs two attempted exercises to be judged, and is weak below 50%. */
+export function weakChapters(
+  chapters: { key: string; name: string; exercises?: { id: string }[] }[],
+  failures: Record<string, number>,
+  solved: Set<string>
+): ChapterStat[] {
+  const out: ChapterStat[] = [];
+  for (const c of chapters) {
+    const ids = (c.exercises ?? []).map((e) => e.id);
+    const attempted = ids.filter((id) => solved.has(id) || (failures[id] ?? 0) > 0);
+    if (attempted.length < 2) continue;
+    const firstTry = attempted.filter((id) => solved.has(id) && !(failures[id] ?? 0)).length;
+    if (firstTry / attempted.length < 0.5) out.push({ key: c.key, name: c.name, attempted: attempted.length, firstTry });
+  }
+  return out.sort((a, b) => a.firstTry / a.attempted - b.firstTry / b.attempted);
+}
+
+// ---------------------------------------------------------------------------
+// Progress export (X-83) — for a portfolio or a mentor.
+// ---------------------------------------------------------------------------
+
+export interface ProgressReportRow {
+  week: number;
+  title: string;
+  phase: string;
+  complete: boolean;
+  bestQuiz: number | null;
+  finalPassed: boolean;
+  projectShipped: boolean;
+  chapters: string;
+  problems: string;
+  studyMinutes: number;
+  completedAt: string | null;
+}
+
+export function progressReport(
+  track: MasteryTrack,
+  perWeek: WeekProgress[],
+  progress: ProgressMap,
+  exportedAt: Date = new Date()
+): { json: string; markdown: string } {
+  const rows: ProgressReportRow[] = track.weeks.map((w, i) => {
+    const p = perWeek[i]!;
+    return {
+      week: w.week,
+      title: w.title,
+      phase: w.phase,
+      complete: p.complete,
+      bestQuiz: p.score,
+      finalPassed: p.examPassed,
+      projectShipped: p.projectDone,
+      chapters: `${p.conceptsDone}/${p.conceptsTotal}`,
+      problems: `${p.problemsSolved}/${p.problemsTotal}`,
+      studyMinutes: Math.round(p.studySeconds / 60),
+      completedAt: progress.get(w.week)?.completed_at ?? null,
+    };
+  });
+  const core = coreWeeks(track).length;
+  const done = rows.filter((r, i) => r.complete && !track.weeks[i]!.optional).length;
+  const json = JSON.stringify(
+    { track: track.key, title: track.title, exportedAt: exportedAt.toISOString(), weeksComplete: done, weeksTotal: core, weeks: rows },
+    null,
+    2
+  );
+  const tick = (b: boolean) => (b ? "✓" : "—");
+  const md = [
+    `# ${track.title} — progress`,
+    "",
+    `Exported ${exportedAt.toISOString().slice(0, 10)} · ${done}/${core} weeks complete · ${formatStudyTime(
+      rows.reduce((s, r) => s + r.studyMinutes * 60, 0)
+    )} of study`,
+    "",
+    "| Week | Title | Chapters | Problems | Best quiz | Final | Project | Time |",
+    "|---|---|---|---|---|---|---|---|",
+    ...rows.map(
+      (r) =>
+        `| ${r.week}${r.complete ? " ✓" : ""} | ${r.title} | ${r.chapters} | ${r.problems} | ${
+          r.bestQuiz === null ? "—" : `${r.bestQuiz}%`
+        } | ${tick(r.finalPassed)} | ${tick(r.projectShipped)} | ${formatStudyTime(r.studyMinutes * 60)} |`
+    ),
+    "",
+  ].join("\n");
+  return { json, markdown: md };
+}

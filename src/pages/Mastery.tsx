@@ -22,12 +22,15 @@ import {
   loadDoneChapters,
   loadSolvedExercises,
   markExerciseSolved,
+  exerciseFailures,
   setChapterDone,
   solvedExercises,
 } from "../lib/learnProgress";
 import { ExerciseSections } from "../components/ExerciseSections";
 import { CapstonePractice } from "../components/MasteryCapstone";
-import { ReviewSession } from "../components/MasteryReview";
+import { MixedQuiz, ReviewSession } from "../components/MasteryReview";
+import { DailyTypePuzzle, WeekZero } from "../components/MasteryDaily";
+import { typeLadder } from "../lib/typeLadder";
 import {
   FinalExamPanel,
   ProgrammeSummary,
@@ -61,6 +64,10 @@ import {
   todayPlan,
   togglePause,
   weekLinks,
+  requeued,
+  mostRetried,
+  weakChapters,
+  progressReport,
   type ExamQuestion,
   type ProgressMap,
   type WeekProgress,
@@ -285,6 +292,31 @@ export default function Mastery() {
     setTimeout(() => setFocusWeek(n), 0);
   }
 
+  async function exportJson() {
+    const { json } = progressReport(track, perWeek, progress);
+    try {
+      const { save } = await import("@tauri-apps/plugin-dialog");
+      const path = await save({
+        defaultPath: `poodcode-${track.key}-progress.json`,
+        filters: [{ name: "JSON", extensions: ["json"] }],
+      });
+      if (!path) return;
+      await api.writeFile(path, json);
+      toast("Progress exported");
+    } catch (e) {
+      toast(`Could not export: ${e}`);
+    }
+  }
+
+  async function copyMarkdown() {
+    try {
+      await navigator.clipboard.writeText(progressReport(track, perWeek, progress).markdown);
+      toast("Progress copied as a Markdown table");
+    } catch {
+      toast("The clipboard is not available here");
+    }
+  }
+
   function flipPause() {
     const next = togglePause(pause);
     saveSetting(pauseKey(track.key), JSON.stringify(next));
@@ -394,6 +426,14 @@ export default function Mastery() {
           </span>
         </div>
         <Bar percent={Math.round((completedWeeks / core.length) * 100)} />
+        <div className="row" style={{ gap: 6, marginTop: 8, justifyContent: "flex-end" }}>
+          <button className="ghost" onClick={exportJson} title="Save every week's progress as JSON — for a portfolio or a mentor.">
+            ⬇ Export progress
+          </button>
+          <button className="ghost" onClick={copyMarkdown} title="Copy a progress table you can paste anywhere.">
+            📋 Copy as Markdown
+          </button>
+        </div>
 
         {pace ? (
           <p className="dim" style={{ margin: "12px 0 0", fontSize: 13 }}>
@@ -481,7 +521,38 @@ export default function Mastery() {
         </div>
       )}
 
-      <ReviewSession trackTitle={track.title} weeks={core} perWeek={corePerWeek} onOpenWeek={openWeek} />
+      {completedWeeks === 0 && (
+        <WeekZero
+          track={track}
+          exercise={track.week_zero ?? null}
+          settings={settings}
+          saveSetting={saveSetting}
+          onOpenWeek={openWeek}
+        />
+      )}
+
+      <DailyTypePuzzle
+        track={track}
+        reachedWeek={Math.max(0, ...[...unlocked])}
+        settings={settings}
+        saveSetting={saveSetting}
+      />
+
+      <ReviewSession
+        trackTitle={track.title}
+        weeks={core}
+        perWeek={corePerWeek}
+        onOpenWeek={openWeek}
+        weakChapters={weakChapters(
+          core
+            .filter((_, i) => corePerWeek[i]?.complete)
+            .flatMap((w) => w.concepts)
+            .map((k) => conceptByKey.get(k))
+            .filter((c): c is Concept => !!c),
+          exerciseFailures(),
+          solvedAll
+        )}
+      />
 
       {finished && (
         <ProgrammeSummary
@@ -570,7 +641,17 @@ function WeekCard({
   const [open, setOpen] = useState(!locked && !progress.complete);
   const practice = week.practice ?? [];
   const problemSet = week.problem_set ?? [];
-  const warmup = useMemo(() => interleavedWarmup(track.weeks, week.week), [track.weeks, week.week]);
+  // The warm-up: interleaved review (X-53) plus anything failed twice in an
+  // earlier week and still unsolved (X-52). Fixed when the week opens, so an
+  // item solved here does not vanish from under the learner.
+  const warmup = useMemo(() => {
+    const base = interleavedWarmup(track.weeks, week.week);
+    const again = requeued(track.weeks, week.week, exerciseFailures(), solvedExercises()).filter(
+      (e) => !base.some((b) => b.id === e.id)
+    );
+    return [...base, ...again];
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [track.weeks, week.week, open]);
   const [solvedEx, setSolvedEx] = useState<Set<string>>(() => solvedExercises());
   const practiceSolved = practice.filter((ex) => solvedEx.has(ex.id)).length;
   const setSolved = problemSet.filter((ex) => solvedEx.has(ex.id)).length;
@@ -645,6 +726,25 @@ function WeekCard({
   }
 
   const links = weekLinks(track.key, week.week);
+  // M3-04: the week the strictness ladder steps up says so.
+  const previous = track.weeks.find((w) => w.week === week.week - 1);
+  const strictStep =
+    week.exam?.strictness === "strict+indexed" && previous?.exam?.strictness !== "strict+indexed";
+  // X-35: a checkpoint draws on its whole month; type-level months add puzzles.
+  const monthWeeks = track.weeks.filter((w) => w.phase === week.phase && !w.optional && w.week <= week.week);
+  const monthPuzzles = week.contest
+    ? (() => {
+        const ladder = typeLadder(monthWeeks);
+        if (ladder.length < 5) return [];
+        const step = Math.max(1, Math.floor(ladder.length / 10));
+        return ladder.filter((_, i) => i % step === 0).slice(0, 10).map((r) => r.exercise);
+      })()
+    : [];
+  // X-82: what slowed you down — the item with the most failed runs.
+  const retried = mostRetried(
+    [...practice, ...problemSet, ...(week.exam?.types ? [week.exam.types] : [])],
+    exerciseFailures()
+  );
   const budget = budgetNote(progress.studySeconds);
   const spine: SpineItem[] = [];
   if (week.concepts.length > 0) {
@@ -797,6 +897,13 @@ function WeekCard({
             <p className="dim quiz-note" style={{ marginTop: 0, color: budget.over ? "var(--bad)" : undefined }}>
               ⏱ {budget.text}
               {budget.over && " — more than twice the plan. Worth asking what slowed you down."}
+              {retried && (
+                <span className="dim">
+                  {" "}
+                  · most retried: <strong>{retried.title}</strong> ({retried.count} failed run
+                  {retried.count === 1 ? "" : "s"})
+                </span>
+              )}
             </p>
 
             {weekTools(track.key, week.week).length > 0 && (
@@ -838,6 +945,15 @@ function WeekCard({
                   </span>
                 ))}
               </p>
+            )}
+
+            {strictStep && (
+              <div className="card strict-step">
+                <strong>🔒 From this week on, the compiler is stricter.</strong> Every final, project and exercise is
+                checked with <code>noUncheckedIndexedAccess</code>: reading <code>xs[i]</code> or{" "}
+                <code>record[key]</code> gives <code>T | undefined</code> until you deal with the missing case.{" "}
+                <Link to="/playground/ts">Try the flag in the playground</Link>.
+              </div>
             )}
 
             {week.concepts.length > 0 && (
@@ -898,8 +1014,8 @@ function WeekCard({
                     <summary>
                       <strong>🔁 Warm-up from earlier weeks</strong>{" "}
                       <span className="dim quiz-note">
-                        {warmupSolved}/{warmup.length} solved · from weeks {week.week - 2} and {week.week - 5} —
-                        interleaving is what makes it stick
+                        {warmupSolved}/{warmup.length} solved · from earlier weeks, plus anything you failed
+                        twice and have not solved yet — interleaving is what makes it stick
                       </span>
                     </summary>
                     <ExerciseSections
@@ -1039,6 +1155,28 @@ function WeekCard({
                         Start the checkpoint
                       </button>
                     </div>
+                    <details style={{ marginTop: 8 }}>
+                      <summary className="quiz-note">
+                        📝 The checkpoint quiz — 20 questions from the whole month
+                      </summary>
+                      <MixedQuiz
+                        weeks={monthWeeks}
+                        size={20}
+                        source={`${track.title} · ${week.contest.title}`}
+                        startLabel="Draw a 20-question paper"
+                      />
+                    </details>
+                    {monthPuzzles.length > 0 && (
+                      <details style={{ marginTop: 8 }}>
+                        <summary className="quiz-note">
+                          🧬 The type-challenge section — {monthPuzzles.length} puzzles from the month
+                        </summary>
+                        <ExerciseSections
+                          exercises={monthPuzzles}
+                          onSolved={(id) => setSolvedEx(new Set(markExerciseSolved(id)))}
+                        />
+                      </details>
+                    )}
                   </div>
                 )}
               </section>
@@ -1618,6 +1756,22 @@ function ExamPanel({
   const [showSolution, setShowSolution] = useState(false);
   const [failedOnce, setFailedOnce] = useState(false);
   const types = versions[0].types ?? null;
+  // X-71: focus mode hides the app's chrome and runs a clock; a pass in focus
+  // mode records how long it took.
+  const [focusStart, setFocusStart] = useState<number | null>(null);
+  const [, setTick] = useState(0);
+  const [focusResult, setFocusResult] = useState<string>("");
+
+  useEffect(() => {
+    if (focusStart === null) return;
+    document.body.classList.add("focus-mode");
+    const t = setInterval(() => setTick((n) => n + 1), 1000);
+    return () => {
+      clearInterval(t);
+      document.body.classList.remove("focus-mode");
+    };
+  }, [focusStart]);
+  const focusSeconds = focusStart === null ? 0 : Math.floor((Date.now() - focusStart) / 1000);
 
   // Which version is in use survives a restart; an unknown value means the main one.
   useEffect(() => {
@@ -1666,6 +1820,13 @@ function ExamPanel({
       setReport(r);
       const green = r.status === "accepted";
       if (!green) setFailedOnce(true);
+      if (green && focusStart !== null) {
+        const secs = Math.round((Date.now() - focusStart) / 1000);
+        const text = `${Math.floor(secs / 60)}m ${String(secs % 60).padStart(2, "0")}s`;
+        setFocusResult(text);
+        api.setSetting(`${variantKey}:focus-time`, String(secs)).catch(() => {});
+        setFocusStart(null);
+      }
       await onResult(green && (!types || typesSolved), code);
     } catch (e) {
       setErr(String(e));
@@ -1759,6 +1920,16 @@ function ExamPanel({
             {showSolution ? "Hide reference solution" : "Reference solution"}
           </button>
         )}
+        <button
+          className="ghost"
+          onClick={() => setFocusStart((f) => (f === null ? Date.now() : null))}
+          title="Hide the sidebar and top bar, and time yourself. Nothing is gated on the time."
+        >
+          {focusStart === null
+            ? "🎯 Focus mode"
+            : `⏱ ${Math.floor(focusSeconds / 60)}:${String(focusSeconds % 60).padStart(2, "0")} · leave focus`}
+        </button>
+        {focusResult && <span className="dim quiz-note">Passed in focus mode in {focusResult}.</span>}
         {versions.length > 1 && !passed && failedOnce && (
           <button
             className="ghost"

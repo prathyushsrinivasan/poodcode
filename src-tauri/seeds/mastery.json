@@ -36429,6 +36429,45 @@
       "Month 5 · Generics & type-level": "Write generic code whose types stay precise, and read and write the type-level programs behind every serious library.",
       "Month 6 · Runtime & architecture": "Build real programs — classes with invariants, lazy pipelines, error handling that cannot be forgotten, and async code that is correct under concurrency and cancellation.",
       "Capstone · optional": "Put six months together in one program, then rehearse the interview."
+    },
+    "week_zero": {
+      "id": "tsm-w0-hello",
+      "title": "Hello, stdin",
+      "prompt": "The input is one line: a name. Print `Hello, <name>!`, then, on a second line, how many characters the name has.",
+      "hint": "`input` already holds the line, trimmed. A template string puts it inside the greeting.",
+      "hints": [
+        "`input` already holds the line, trimmed. A template string puts it inside the greeting.",
+        "`input.length` is the number of characters."
+      ],
+      "language": "typescript",
+      "kind": "challenge",
+      "difficulty": "Easy",
+      "strictness": "",
+      "harness": "",
+      "judge_mode": "",
+      "forbid": [],
+      "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+      "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconsole.log(`Hello, ${input}!`);\nconsole.log(input.length);\n",
+      "tests": [
+        {
+          "input": "Ada",
+          "output": "Hello, Ada!\n3"
+        },
+        {
+          "input": "Grace Hopper",
+          "output": "Hello, Grace Hopper!\n12"
+        },
+        {
+          "input": "x",
+          "output": "Hello, x!\n1"
+        },
+        {
+          "input": "Tim Berners-Lee",
+          "output": "Hello, Tim Berners-Lee!\n15"
+        }
+      ],
+      "source_slug": "",
+      "dataset": ""
     }
   },
   {

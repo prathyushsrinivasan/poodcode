@@ -13,6 +13,7 @@
 // Either mode may carry `exercise.harness`: TypeScript appended to the
 // learner's code before compiling, which lets an exercise ask for a *function*
 // and grade what it returns instead of what it printed.
+import { recordExerciseRun } from "../lib/learnProgress";
 import { AssertionPanel } from "./AssertionPanel";
 import { FailingCases } from "./OutputCompare";
 import { useMemo, useState } from "react";
@@ -117,6 +118,7 @@ export function ExerciseCard({
         forbid: exercise.forbid,
       });
       setReport(r);
+      recordExerciseRun(exercise.id, r.status === "accepted");
       if (r.status === "accepted") onSolved?.(exercise.id);
     } catch (e) {
       setErr(String(e));
