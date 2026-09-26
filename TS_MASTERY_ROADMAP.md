@@ -82,6 +82,8 @@ the gap stays visible. This is what has landed since.
 | Predict first and question stats (M1-03, X-38) | — | a **predict-first switch** for weeks 1–8: before each run of a practice exercise or problem you write what it will print for the first test's input; a mismatch (judged with the judge's own normalisation) is logged as a learning moment. Every marked quiz sitting feeds **per-question stats**, and a panel lists the questions you keep missing and the ones you never miss | `src/lib/predict.ts`, `src/lib/quizStats.ts`, `ExerciseCard` in `LearnExercise.tsx`, `QuestionStats` in `Mastery.tsx` |
 | The arc project, v1–v3 (X-44, M1-05, M2-05, M3-05) | only v4 (week 14), the typed-kit (week 22) and the final (week 27) existed | **`ledger.ts` v1** (week 4: a printed statement from raw lines, money in cents), **v2** (week 8: typed JSON records, `formatMoney` with options, summaries by category and month via array methods), **v3** (week 12: a discriminated union of deposit/withdrawal/transfer, a type guard, an exhaustive `switch`, overdraft rejection) — each a second, optional project beside the weekly one, with 5 acceptance tests computed from the reference; progress stored in settings (`mastery-arc:<track>:<week>`) | `tools/mastery_ts_arc.py`, `arc_project` on `MasteryWeek`, `arcRow`/`parseArc` in `Mastery.tsx` |
 | Week 27 interview practice | a capstone and a four-problem mock set | **63-question interview bank** with model answers (7 topics, "ask me one" drill), **three timed 45-minute mock interviews** (bank questions + a problem + a type puzzle, clock, self-scored rubric, attempt history), **10 code-review exercises** (X-14): write the review, compare with the model review, tick what you caught — the PR code and the corrected code are both run and their output computed | `tools/mastery_ts_w27.py`, `src/components/MasteryCapstone.tsx`, `src/lib/capstone.ts` |
+| Chapter-derived practice and cards (X-05, X-15, X-16, X-50, X-100) | 527 cards; no Parsons or spot-the-bug | every chapter's worked examples, compiler errors and pitfalls are recorded as data with their real outputs (`TS_CHAPTER_DATA`) and turned into **131 put-it-in-order (Parsons) exercises** — judged by running the learner's order, so any order that prints the right thing passes — **183 spot-the-bug exercises** (click the line the fix changes; the explanation and the fix appear once found) and **733 review cards** (what does this print · what does the compiler say · what goes wrong here). The track now has **1,260 cards**, and the build asserts ≥ 12 per scheduled chapter (X-100) | `tools/mastery_ts_derived.py`, `src/components/ParsonsExercise.tsx`, `src/lib/parsons.ts` |
+| Quiz kinds (X-31) | one kind: pick one of four | **multi-select** (52), **fill-the-type** (52 — the typed answer is checked by the real type-checker against the code's own inferred types, `typeof`/`keyof` banned in the answer) and **code-output** (251, derived from chapter pitfalls: the program, what it really prints, what it was meant to print). One renderer serves the weekly quiz, the mixed review and the final exam; `picked === answer` still grades every kind; a missed question's flashcard carries its code. Both verifiers prove every model type answer | `src/components/QuizChoices.tsx`, `src/lib/quizKinds.ts`, `tools/mastery_ts_quiz_kinds.py` |
 | Fast authoring loop (X-102) | none for Mastery | `python tools/verify_ts_mastery.py --weeks 11-14` / `--only ts_regex` — type-checks and runs chapters, practice, problems, finals and projects in seconds | `tools/verify_ts_mastery.py` |
 
 ---
@@ -220,8 +222,8 @@ Everything here is built once and then used by every week in Part B.
 | 🚧 X-12 | **Type-graded problems** (`judge_mode: "types"`): a Library problem whose "tests" are `Expect<Equal<…>>` assertions. Needs: `judge_mode` accepted on problems, the harness appended at check time, and TestResults showing *which* assertion failed. Unlocks months 4–5. | **P0** for M4–M5 | L |
 | X-13 | **`refactor`** — given working code, change it to satisfy a constraint (remove every `any`, make it immutable, replace the if-chain with a lookup) while tests still pass; banned-token list enforces the constraint. | P2 | M |
 | ✅ X-14 | **`explain`** — ungraded free-text answer, compared on reveal against a model answer; used for "why" questions and fed into self-review. | P3 | S |
-| X-15 | **`order`** — drag lines of a program into the correct order (Parsons problem). Excellent for months 1–2 and for async ordering in month 6. | P2 | M |
-| X-16 | **`spot`** — click the line that is the bug / the line where the type narrows / the line that throws. | P2 | M |
+| ✅ X-15 | **`order`** — drag lines of a program into the correct order (Parsons problem). Excellent for months 1–2 and for async ordering in month 6. | P2 | M |
+| ✅ X-16 | **`spot`** — click the line that is the bug / the line where the type narrows / the line that throws. | P2 | M |
 | 🚧 X-17 | **Strictness ladder** for Mastery: chapter-level `strictness` default (`strict` → `strict+indexed` from week 11) so indexed access is honest everywhere after narrowing is taught. | P1 | S |
 | X-18 | **Progressive hint ladders** (`hints: [nudge, strategy, near-answer]`) on every exercise — the field exists and is barely used in Mastery. | P2 | M |
 | X-19 | **Practice families** on Learn chapters: five variations of one pattern, twisting one dimension at a time, outside the gate. Target 4 families × 5 per chapter. | P2 | L |
@@ -243,7 +245,7 @@ Everything here is built once and then used by every week in Part B.
 | # | Item | P | Size |
 |---|---|---|---|
 | ✅ X-30 | Week quiz bank **≥ 40 questions**; sample **10** per sitting (from 4). Mixed kinds: MCQ, "what does this print", "which line errors", "which type is inferred". ~1,050 questions total. | P1 | L |
-| X-31 | New quiz question types: **code-output** (show code, pick the output), **type-inference** (pick the inferred type), **multi-select**, **fill-the-type** (typed short answer checked by `ts_typecheck.mjs`). | P1 | L |
+| ✅ X-31 | New quiz question types: **code-output** (show code, pick the output), **type-inference** (pick the inferred type), **multi-select**, **fill-the-type** (typed short answer checked by `ts_typecheck.mjs`). | P1 | L |
 | ✅ X-32 | Every coding final: **≥ 6 tests**, ≥ 2 edge cases, 1 large input, and a **hidden** set not shown until pass (F-04). | **P0** | M |
 | ✅ X-33 | **Alternate finals**: a second final per week, served on retake, so a failed final can't be passed by memorising the first. | P2 | L |
 | ✅ X-34 | **Two-part finals** for weeks 15–22: a type-graded half (assertions) + a runtime half (stdout). Pass requires both. | P1 | M |
@@ -290,7 +292,7 @@ Everything here is built once and then used by every week in Part B.
 
 | # | Item | P | Size |
 |---|---|---|---|
-| 🚧 X-50 | **Flashcards for every chapter** — ≥ 12 per chapter (definition, "what does this infer", "which error", "fix this line"), ~1,000 total, fed to the revision queue when a week completes. | P1 | L |
+| ✅ X-50 | **Flashcards for every chapter** — ≥ 12 per chapter (definition, "what does this infer", "which error", "fix this line"), ~1,000 total, fed to the revision queue when a week completes. | P1 | L |
 | ✅ X-51 | **Missed-question recycling**: a wrong quiz answer creates a flashcard automatically. | P1 | S |
 | ✅ X-52 | **Failed-exercise re-queue**: an exercise failed ≥ 2 times re-appears in a later week's warm-up. | P2 | M |
 | ✅ X-53 | **Interleaved review weeks** — each week's warm-up draws 3 exercises from two and five weeks earlier. | P1 | M |
@@ -319,7 +321,7 @@ Everything here is built once and then used by every week in Part B.
 
 | # | Item | P | Size |
 |---|---|---|---|
-| 🚧 X-100 | **Build asserts** in `mastery_defs.py`: TS starter exists for every curated slug; ≥ 6 final tests; ≥ 40-question bank; ≥ 12 cards per chapter; no slug curated twice except where `note` starts with "review"; every lesson passes the template lint. | **P0** | S |
+| ✅ X-100 | **Build asserts** in `mastery_defs.py`: TS starter exists for every curated slug; ≥ 6 final tests; ≥ 40-question bank; ≥ 12 cards per chapter; no slug curated twice except where `note` starts with "review"; every lesson passes the template lint. | **P0** | S |
 | ✅ X-101 | **A Mastery verifier** — `cargo test --test verify_mastery`: runs every final's reference solution through the real judge, every exercise's solution, every project's reference, every type-graded assertion. Mirrors `verify_ts_course.rs`. | **P0** | M |
 | ✅ X-102 | `--only=wNN` fast path for authoring, as the course verifier has. | P1 | S |
 | ✅ X-103 | Diagnose-prompt checker: every quoted `TSnnnn` is re-derived from the starter (the course's verifier caught four wrong codes on first try — see the table in `TS_ROADMAP.md`). | P1 | S |
@@ -830,14 +832,7 @@ concurrency and cancellation.
 
 ## Handoff — where the next session starts (2026-09-27)
 
-**Uncommitted work in the tree** (all verified, not yet committed): the arc projects v1–v3 —
-`tools/mastery_ts_arc.py` (new), hooks in `tools/gen_seed.py` / `tools/mastery_ts_attach.py`, `eid=` on
-`_project` in `tools/mastery_ts_kit.py`, `arc_project` on `MasteryWeek` (`models.rs`, `types.ts`), both verifiers
-covering it (`verify_mastery.rs` `all_projects`, `verify_ts_mastery.py`), the second `ProjectPanel` in
-`Mastery.tsx`, and regenerated `mastery.json` / `ts_outputs.json`. State when paused: `python
-tools/verify_ts_mastery.py --only=arc-w --mastery-only` → 3 checked, 0 failures; `npx tsc --noEmit` clean. Still
-to do before committing: `cargo check --tests`, `npx vitest run`, a look in the mock preview (open week 4, 8 or 12
-→ the "🧵 The arc project" panel), then commit.
+**Session 3 (2026-09-27, continued):** ebddbce arc projects v1–v3 committed after cargo/vitest/preview checks · aa98fa8 put-it-in-order + spot-the-bug practice and 733 chapter-derived cards · dc6fe42 quiz kinds (multi-select, fill-the-type, code-output).
 
 **Commits this session (branch `java-course`):** bee8ab4 week 27 · d461dc6 finals round two, final exam,
 multi-file projects, Monaco lib fix · 613aa57 playground + stdin/stdout visualiser · 6e5a1ef event loop +
@@ -849,9 +844,7 @@ month-6 checkpoint · 31b5280 29 type challenges · 56e0cfb predict-first + ques
 
 | # | Item | Notes |
 |---|---|---|
-| X-50 / X-100 | Cards to ≥ 12 per chapter (~1,000 total; 527 now) | Pure authoring in `TS_CARDS_MORE`; fronts must be unique across the track (attach asserts). Then add the ≥ 12-per-chapter build assert (X-100). |
-| X-31 | New quiz kinds: multi-select, fill-the-type (checked via Monaco `Expect<Equal>`), code-output | Needs `kind`/`answers`/`type_answer` on `QuizQuestion`, UI in `QuizPanel` + `MixedQuiz` + final exam, and authored questions. |
-| X-15 / X-16 / X-13 | New exercise kinds: `order` (Parsons — can be derived from existing short solutions and judged by running), `spot` (click the buggy line), `refactor` (banned tokens via `forbid`) | Add to `exerciseKinds.ts` + `ExerciseCard`. |
+| X-13 | `refactor` exercises (banned tokens via `forbid`) | `order` and `spot` shipped; `refactor` needs authoring — the judge already enforces `forbid`. |
 | X-10 / X-11 | ≥ 3 predict / diagnose / retype / design and ≥ 2 fix **per chapter** | 67 predict, 51 diagnose, 42 fix, 0 retype, 0 design so far — volume authoring. |
 | X-104 | Scope lint: nothing uses a construct a later week teaches | Port `_SCOPE_RULES` from the TS course generator. |
 | X-17 | Chapter-level strictness for Learn exercises | Learn's `ExerciseCard` (in `Learn.tsx`) does not pass strictness/harness to the judge yet — no Learn exercise needs it today. |
