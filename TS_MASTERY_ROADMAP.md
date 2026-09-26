@@ -90,6 +90,9 @@ the gap stays visible. This is what has landed since.
 | Heatmap and streak (X-93) | fed only by Library solves | a Mastery exercise solved for the first time, and a week's final passed for the first time, count as a solve for the day (tested) | `markMasterySolved` in `learnProgress.ts`, `mastery_record_solve`, `repo::mastery_record_exam` |
 | Error glossary coverage (X-07) | 49 entries; 43 codes shown in chapters had none | **92 entries** — every code a chapter shows, each bad program the chapter's own and each fix proven to compile; the build fails if a chapter shows a code the glossary lacks | `tools/ts_errors_more.py`, check in `mastery_ts_derived.py` |
 | Hint ladders (X-18) | one hint on most exercises | **every** TypeScript exercise has 2–3 rungs: missing rungs are derived from the reference (the building blocks it uses, how the blank's answer begins, the line a repair changes); Learn's card reveals them one at a time | `tools/ts_hint_ladders.py` |
+| Teaching tools, round three (M5-01, M3-03) | expansion only; no diagrams | the playground's **Step** view evaluates every `type X = F<Args>` where `F` is a conditional type member by member — the checked argument's union members (or the whole argument, when the checked type is wrapped and does not distribute), each member's branch, every `infer` binding, each result, and their union, each answered by the editor's TypeScript service; the **Machines** view draws a union of string-literal states and its transitions (from a table or a `switch` that returns states), marking the start, dead ends and unreachable states. Weeks 10/12 and 20–22 link them | `src/lib/typeStepper.ts`, `src/lib/stateMachine.ts`, `src/components/StateDiagram.tsx`, `TsPlayground.tsx` |
+| Lessons (X-05, X-08) | pitfalls as a long list; no cheat sheet | each lesson pitfall is a **collapsible card** (titles as a checklist); every TypeScript chapter has a **printable cheat sheet** built from its own lesson — examples, errors (named from the glossary), pitfalls with their gist, interview questions | `src/components/LessonMarkdown.tsx`, `src/components/ChapterCheatSheet.tsx`, `src/lib/cheatSheet.ts` |
+| Predict drills from the checker, why-not notes (X-10, X-37) | — | `ts_typecheck.mjs` gains an *infer* mode; `tools/gen_ts_predicts.py` asks it what each worked example's `const`s are and keeps the instructive ones — **39 predict drills** whose answers are the compiler's. Quiz questions can carry **why-not** notes per option (shown for the options you chose once marked); the 251 code-output questions have them | `tools/gen_ts_predicts.py`, `tools/ts_predicts.json`, `why_not` on `QuizQuestion` |
 | Fast authoring loop (X-102) | none for Mastery | `python tools/verify_ts_mastery.py --weeks 11-14` / `--only ts_regex` — type-checks and runs chapters, practice, problems, finals and projects in seconds | `tools/verify_ts_mastery.py` |
 
 ---
@@ -213,10 +216,10 @@ Everything here is built once and then used by every week in Part B.
 | ✅ X-02 | **Lesson template** for every chapter, enforced by a lint: *Why it exists* → *The core idea* → *Worked example* → *What the compiler says* (a real `TSnnnn` message, verified) → *Pitfalls* (≥ 3) → *In an interview* → *Where it shows up later* (forward links). | P1 | L |
 | ✅ X-03 | Raise every lesson to **4–8k characters** — roughly 15–25 minutes of reading. Today's lessons are a quarter of that. | P1 | L |
 | ✅ X-04 | `examples` field per chapter: 3–6 runnable worked examples, each openable in a scratch editor with one click ("Run this"). | P1 | M |
-| X-05 | `pitfalls` field per chapter: short "this looks right but…" cases, each with the wrong code, the symptom, and the fix. Rendered as collapsible cards. | P1 | M |
+| ✅ X-05 | `pitfalls` field per chapter: short "this looks right but…" cases, each with the wrong code, the symptom, and the fix. Rendered as collapsible cards. | P1 | M |
 | ✅ X-06 | `interview` field per chapter: 3–5 questions an interviewer actually asks about the topic ("`any` vs `unknown` vs `never`?", "`interface` vs `type`?"), with model answers. | P1 | M |
 | ✅ X-07 | `errors` field per chapter: the 3–5 `TSnnnn` codes a learner will hit in this chapter, verified against `ts_typecheck.mjs`, feeding a global error glossary (X-66). | P1 | M |
-| X-08 | Chapter **cheat sheet** (one screen, printable) and **glossary** entries, as the TS course already has per week. | P2 | M |
+| 🚧 X-08 | Chapter **cheat sheet** (one screen, printable) and **glossary** entries, as the TS course already has per week. | P2 | M |
 | X-09 | "Compared with Java" notes (`java` field exists) rewritten to cover Python and JavaScript too — the learner may arrive from any of them. | P3 | M |
 
 ### A2. Exercise kinds — bring the Course's toolkit to Mastery
@@ -257,7 +260,7 @@ Everything here is built once and then used by every week in Part B.
 | ✅ X-34 | **Two-part finals** for weeks 15–22: a type-graded half (assertions) + a runtime half (stdout). Pass requires both. | P1 | M |
 | ✅ X-35 | **Monthly checkpoint** at the end of every month (today: only weeks 13 and 26) — a timed contest from that month's problems + a 20-question mixed quiz. Months 1, 2, 4, 5 gain one. | P1 | M |
 | ✅ X-36 | **Final exam** for the whole programme: 3 hours, 5 coding problems across months, 40 questions, a type-challenge section. Unlocks a completion summary (X-68). | P2 | L |
-| X-37 | Quiz **explanations for wrong options**, not just the right one ("why not B?"). | P2 | M |
+| 🚧 X-37 | Quiz **explanations for wrong options**, not just the right one ("why not B?"). | P2 | M |
 | ✅ X-38 | Question-level analytics: track per-question accuracy; flag questions everyone gets right (too easy) or wrong (probably ambiguous) in a dev view. | P3 | M |
 
 ### A5. Build projects
@@ -513,7 +516,7 @@ control-flow narrowing the way the compiler does.
 |---|---|---|
 | ✅ M3-01 | **Narrowing stepper** — step through a function; at each line, a side panel shows the narrowed type of each variable (via the language service's `quickInfo` at that position). The teaching tool for weeks 10–12. | P1 |
 | ✅ M3-02 | **Exhaustiveness badge** — the editor shows "switch is exhaustive ✓" when a `never` check compiles. | P3 |
-| M3-03 | **State-machine diagram** — for a union of states + transition function, render the states and allowed transitions (weeks 10 and 12). | P3 |
+| ✅ M3-03 | **State-machine diagram** — for a union of states + transition function, render the states and allowed transitions (weeks 10 and 12). | P3 |
 | ✅ M3-04 | **Strictness ladder step**: from week 11, every exercise runs under `strict+indexed` (X-17). Announce it in-app. | P1 |
 | ✅ M3-05 | Arc project: **`ledger.ts` v3** — transactions become a discriminated union (`deposit` / `withdrawal` / `transfer`), parsed from JSON with a guard, exhaustive formatting. | P1 |
 
@@ -662,7 +665,7 @@ the type-level programs behind every serious library.
 
 | # | Item | P |
 |---|---|---|
-| 🚧 M5-01 | **Type evaluator** — paste a type, see it fully expanded, and **step** a conditional/mapped type's evaluation (distribution over each union member, each `infer` binding). The teaching tool for weeks 20–22. | P1 |
+| ✅ M5-01 | **Type evaluator** — paste a type, see it fully expanded, and **step** a conditional/mapped type's evaluation (distribution over each union member, each `infer` binding). The teaching tool for weeks 20–22. | P1 |
 | ✅ M5-02 | **Type-challenge ladder** (X-24) surfaced as a daily rep: one puzzle a day, easy → extreme, streak tracked. | P1 |
 | ✅ M5-03 | **Assertion panel** — for type-graded work, list every `Expect<Equal<…>>` with ✓/✗ and the two types side by side when it fails. | **P0** |
 | ✅ M5-04 | **Month 5 checkpoint** (new): 20 type puzzles in 90 minutes + 2 runtime generic problems. | P1 |
@@ -838,7 +841,7 @@ concurrency and cancellation.
 
 ## Handoff — where the next session starts (2026-09-27)
 
-**Session 3 (2026-09-27, continued):** ebddbce arc projects v1–v3 committed after cargo/vitest/preview checks · aa98fa8 put-it-in-order + spot-the-bug practice and 733 chapter-derived cards · dc6fe42 quiz kinds (multi-select, fill-the-type, code-output) · 9e60a47 scope lint (56 rules; the commit message says 58) · 242cd8e determinism check · 88b6793 heatmap/streak · 5f5d8cb retype/design/refactor · 1f5c31b + a1993a0 error glossary coverage · afe5155 hint ladders.
+**Session 3 (2026-09-27, continued):** ebddbce arc projects v1–v3 committed after cargo/vitest/preview checks · aa98fa8 put-it-in-order + spot-the-bug practice and 733 chapter-derived cards · dc6fe42 quiz kinds (multi-select, fill-the-type, code-output) · 9e60a47 scope lint (56 rules; the commit message says 58) · 242cd8e determinism check · 88b6793 heatmap/streak · 5f5d8cb retype/design/refactor · 1f5c31b + a1993a0 error glossary coverage · afe5155 hint ladders · 2d06f7e why-not notes · 3bebeb1 type stepper · c0b5cee pitfall cards · 6276f74 cheat sheets · 7598ebb predict drills · 3a8cb73 state machines.
 
 **Commits this session (branch `java-course`):** bee8ab4 week 27 · d461dc6 finals round two, final exam,
 multi-file projects, Monaco lib fix · 613aa57 playground + stdin/stdout visualiser · 6e5a1ef event loop +
@@ -852,12 +855,10 @@ month-6 checkpoint · 31b5280 29 type challenges · 56e0cfb predict-first + ques
 |---|---|---|
 | X-10 / X-11 | ≥ 3 predict / diagnose / retype / design and ≥ 2 fix **per chapter** | 67 predict, 51 diagnose, 42 fix, 24 retype, 22 design (plus 183 spot, 131 order, 17 refactor) — per-chapter volume is still short; authoring. |
 | X-17 | Chapter-level strictness for Learn exercises | Learn's `ExerciseCard` (in `Learn.tsx`) does not pass strictness/harness to the judge yet — no Learn exercise needs it today. |
-| X-37 | Explanations for wrong options | ~1,300 questions — authoring. |
+| X-37 | Explanations for wrong options | Field and UI shipped; the 251 code-output questions have them. The ~1,100 authored bank questions need authoring. |
 | X-22 / X-26 / X-25 | Idiomatic-TS editorials, "three ways" sets, `min_week` tags | Authoring / Library changes. |
-| X-12 | Type-graded **Library** problems | Problem sets already carry 55 type-graded problems; the Library (Solve page) itself cannot judge `types` yet. |
-| X-05 / X-08 / X-09 / X-19 | Collapsible pitfall cards, cheat sheet, Python/JS comparisons, practice families | Chapter data is in `TS_CHAPTER_DATA`; rendering/authoring. (X-07 shipped as glossary coverage.) |
-| M5-01 | Stepping a conditional type's evaluation | Expansion ships in the playground; stepping does not. |
-| M3-03 | State-machine diagram | P3. |
+| X-12 | Type-graded **Library** problems | Deliberately not done: a type-only problem cannot have the Java starter every Library problem is required to have (`verify_seeds`), and the Mastery weeks already carry 55 type-graded problems plus the 121-rung ladder. Revisit only with a TypeScript-only Library category. |
+| X-08 / X-09 / X-19 | Glossary entries per chapter, Python/JS comparisons, practice families | Cheat sheets and pitfall cards shipped; the rest is authoring. |
 | X-105 | TypeScript 6.x checker | Re-run every verifier after upgrading; risky, do last. |
 
 **Traps met this session** (also in the project memory): the Bash tool's heredocs mangle `\n` and `\b` inside
