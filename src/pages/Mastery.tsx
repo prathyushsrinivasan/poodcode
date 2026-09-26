@@ -19,6 +19,8 @@ import { DiffView } from "../components/DiffView";
 import { FailingCases } from "../components/OutputCompare";
 import { TsErrorLinks } from "../components/TsErrorLinks";
 import { DiffBadge, Empty, inlineCode } from "../components/common";
+import { QuizChoices } from "../components/QuizChoices";
+import { answerText, questionText } from "../lib/quizKinds";
 import {
   loadDoneChapters,
   loadSolvedExercises,
@@ -1754,9 +1756,9 @@ function QuizPanel({
       const source = `${track.title} · Week ${week.week} quiz`;
       let added = 0;
       for (const q of missed) {
-        if (existing.has(q.question)) continue;
-        await api.addFlashcard(q.question, `${q.options[q.answer]}\n\n${q.explanation}`, source);
-        existing.add(q.question);
+        if (existing.has(questionText(q))) continue;
+        await api.addFlashcard(questionText(q), `${answerText(q)}\n\n${q.explanation}`, source);
+        existing.add(questionText(q));
         added++;
       }
       setSavedMisses(added);
@@ -1875,39 +1877,9 @@ function QuizQuestionCard({
       }}
     >
       <strong>
-        {index}. {question.question}
+        {index}. {inlineCode(question.question)}
       </strong>
-      <div style={{ display: "flex", flexDirection: "column", gap: 6, marginTop: 10 }}>
-        {question.options.map((opt, oi) => {
-          let border: string | undefined;
-          let color: string | undefined;
-          if (revealed) {
-            if (oi === question.answer) {
-              border = "var(--good)";
-              color = "var(--good)";
-            } else if (oi === picked) {
-              border = "var(--bad)";
-              color = "var(--bad)";
-            }
-          } else if (oi === picked) {
-            border = "var(--accent)";
-            color = "var(--accent)";
-          }
-          return (
-            <button
-              key={oi}
-              className="ghost"
-              style={{ textAlign: "left", borderColor: border, color, padding: "8px 12px" }}
-              onClick={() => onPick(oi)}
-              disabled={revealed}
-            >
-              {revealed && oi === question.answer && "✓ "}
-              {revealed && oi === picked && oi !== question.answer && "✗ "}
-              {opt}
-            </button>
-          );
-        })}
-      </div>
+      <QuizChoices question={question} picked={picked} revealed={revealed} onPick={onPick} />
       {revealed && (
         <div
           className="card"

@@ -7,6 +7,8 @@ import { Link } from "react-router-dom";
 import { api } from "../api";
 import type { MasteryWeek } from "../types";
 import { inlineCode } from "./common";
+import { QuizChoices } from "./QuizChoices";
+import { answerText, questionText } from "../lib/quizKinds";
 import { drawFinalPaper } from "../lib/finalExam";
 import { WEEK_BUDGET_HOURS, type ChapterStat, type WeekProgress } from "../lib/mastery";
 import { useToast } from "./Toast";
@@ -53,8 +55,8 @@ export function MixedQuiz({
       const existing = new Set((await api.listFlashcards()).map((c) => c.front));
       let added = 0;
       for (const q of missed) {
-        if (existing.has(q.question)) continue;
-        await api.addFlashcard(q.question, `${q.options[q.answer]}\n\n${q.explanation}`, source);
+        if (existing.has(questionText(q))) continue;
+        await api.addFlashcard(questionText(q), `${answerText(q)}\n\n${q.explanation}`, source);
         added++;
       }
       setSaved(true);
@@ -82,31 +84,12 @@ export function MixedQuiz({
             <strong>
               {i + 1}. {inlineCode(q.question)}
             </strong>
-            <div style={{ display: "flex", flexDirection: "column", gap: 6, marginTop: 8 }}>
-              {q.options.map((opt, oi) => {
-                const chosen = picked[i] === oi;
-                const color = submitted
-                  ? oi === q.answer
-                    ? "var(--good)"
-                    : chosen
-                      ? "var(--bad)"
-                      : undefined
-                  : chosen
-                    ? "var(--accent)"
-                    : undefined;
-                return (
-                  <button
-                    key={oi}
-                    className="ghost"
-                    disabled={submitted}
-                    style={{ textAlign: "left", padding: "6px 12px", borderColor: color, color }}
-                    onClick={() => setPicked(picked.map((p, k) => (k === i ? oi : p)))}
-                  >
-                    {inlineCode(opt)}
-                  </button>
-                );
-              })}
-            </div>
+            <QuizChoices
+              question={q}
+              picked={picked[i] ?? -1}
+              revealed={submitted}
+              onPick={(v) => setPicked((prev) => prev.map((p, k) => (k === i ? v : p)))}
+            />
             {submitted && (
               <p className="dim quiz-note" style={{ marginBottom: 0 }}>
                 {q.explanation}

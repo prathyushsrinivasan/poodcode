@@ -158,7 +158,36 @@ def _tsd_cards(name, data):
     return cards
 
 
-TS_DERIVED_COUNTS = {"order": 0, "spot": 0, "cards": 0}
+_TSD_NO_COMPILE = "Nothing: it does not compile"
+_TSD_THROWS = "It throws an error at runtime"
+
+
+def _tsd_output_question(name, p, n):
+    """A code-output question (X-31) from a pitfall: the wrong program, and
+    what it really does against what it was meant to do. Only single-line
+    inputs, so the question can say what it reads."""
+    if p["right_tests"] is None or len(p["inputs"]) != 1 or "\n" in p["inputs"][0].strip():
+        return None
+    inp = p["inputs"][0].strip()
+    right_out = p["right_tests"][0]["output"]
+    if p["wrong_label"] == "Prints:":
+        answer = p["wrong_shows"]
+        options = [answer, right_out, _TSD_NO_COMPILE, _TSD_THROWS]
+    else:
+        message = p["wrong_shows"].split(": ", 1)[1] if p["wrong_shows"].startswith("line ") else p["wrong_shows"]
+        answer = f"Nothing: it does not compile ({message.split(chr(10))[0]})"
+        options = [answer, right_out, _TSD_THROWS]
+    if len(set(options)) != len(options) or not all(o.strip() for o in options):
+        return None
+    reads = f" given the input `{inp}`" if inp else ""
+    return {
+        "question": f"{name}, program {n}: what does it print{reads}?",
+        "options": options, "answer": 0, "kind": "output", "code": p["wrong"],
+        "explanation": f"{p['title']}. {p['note']}",
+    }
+
+
+TS_DERIVED_COUNTS = {"order": 0, "spot": 0, "cards": 0, "output": 0}
 _tsd_fronts = {c["front"] for w in TS_WEEKS for c in w["flashcards"]}
 _tsd_fronts |= {f for cs in TS_CARDS_MORE.values() for f, _ in cs}
 for _tsd_w in TS_WEEKS:
@@ -184,6 +213,15 @@ for _tsd_w in TS_WEEKS:
                 _tsd_j += 1
                 _tsd_more.append(_tsd_ex)
                 TS_DERIVED_COUNTS["spot"] += 1
+        _tsd_texts = {q["question"] for q in _tsd_w["quiz"]}
+        _tsd_k = 0
+        for _tsd_p in _tsd_data["pitfalls"]:
+            _tsd_q = _tsd_output_question(_tsd_name, _tsd_p, _tsd_k + 1)
+            if _tsd_q is not None and _tsd_q["question"] not in _tsd_texts:
+                _tsd_k += 1
+                _tsd_texts.add(_tsd_q["question"])
+                _tsd_w["quiz"].append(_tsd_q)
+                TS_DERIVED_COUNTS["output"] += 1
         _tsd_cards_week = TS_CARDS_MORE.setdefault(_tsd_n, [])
         for _tsd_front, _tsd_back in _tsd_cards(_tsd_name, _tsd_data):
             if _tsd_front in _tsd_fronts:
@@ -192,4 +230,5 @@ for _tsd_w in TS_WEEKS:
             _tsd_cards_week.append((_tsd_front, _tsd_back))
             TS_DERIVED_COUNTS["cards"] += 1
 print(f"  derived from chapters: {TS_DERIVED_COUNTS['cards']} cards, "
-      f"{TS_DERIVED_COUNTS['order']} order, {TS_DERIVED_COUNTS['spot']} spot exercises")
+      f"{TS_DERIVED_COUNTS['order']} order, {TS_DERIVED_COUNTS['spot']} spot exercises, "
+      f"{TS_DERIVED_COUNTS['output']} code-output questions")

@@ -2195,7 +2195,9 @@ def _check_mastery(tracks, concepts, problems):
             for q in week["quiz"]:
                 assert 0 <= q["answer"] < len(q["options"]), \
                     f"week {week['week']}: answer index out of range for {q['question']!r}"
-                assert len(q["options"]) >= 2, f"week {week['week']}: quiz needs options"
+                # A fill-the-type question (X-31) is answered by typing; its one
+                # "option" is the model answer.
+                assert len(q["options"]) >= 2 or q.get("kind") == "type", f"week {week['week']}: quiz needs options"
             assert week["quiz_sample"] >= 1, f"week {week['week']}: quiz_sample must be >= 1"
             assert len(week["quiz"]) >= week["quiz_sample"], \
                 f"week {week['week']}: bank of {len(week['quiz'])} is smaller than the sample"

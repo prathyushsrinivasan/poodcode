@@ -176,6 +176,8 @@ export interface QuizQuestion {
   /** "type": the model answer, and the hidden claims a typed answer must pass. */
   type_answer?: string;
   harness?: string;
+  /** "type": the strictness preset the typed answer is checked at. */
+  strictness?: string;
 }
 
 export interface PracticeRef {

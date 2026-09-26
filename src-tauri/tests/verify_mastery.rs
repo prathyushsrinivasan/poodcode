@@ -429,3 +429,49 @@ fn every_final_starter_fails() {
         .collect();
     assert!(passing.is_empty(), "final starters that already PASS: {passing:?}");
 }
+
+/// Fill-the-type quiz questions (X-31): the model answer, written after the
+/// question's code as `type Answer = …`, must satisfy the hidden claim through
+/// the real checker — and a type no answer can equal must not.
+#[test]
+fn every_type_question_model_answer_checks() {
+    let tracks = load_tracks();
+    let mut items: Vec<(String, Exercise)> = Vec::new();
+    for t in &tracks {
+        for w in &t.weeks {
+            for (k, q) in w.quiz.iter().filter(|q| q.kind == "type").enumerate() {
+                assert!(!q.type_answer.is_empty(), "{} week {}: a type question needs a model answer", t.key, w.week);
+                assert!(q.harness.contains("Expect<"), "{} week {}: a type question needs a claim", t.key, w.week);
+                let code = format!("{}\n", q.code.trim_end());
+                let ex: Exercise = serde_json::from_value(serde_json::json!({
+                    "id": format!("quiz-w{}-type{}", w.week, k + 1),
+                    "title": q.question,
+                    "prompt": q.question,
+                    "language": "typescript",
+                    "kind": "typelevel",
+                    "judge_mode": "types",
+                    "harness": q.harness,
+                    "strictness": if q.strictness.is_empty() { "strict" } else { q.strictness.as_str() },
+                    "starter": format!("{code}type Answer = {{ readonly __probe: true }};\n"),
+                    "solution": format!("{code}type Answer = {};\n", q.type_answer),
+                }))
+                .expect("exercise shape");
+                items.push((format!("{} week {} type question {}", t.key, w.week, k + 1), ex));
+            }
+        }
+    }
+    if items.is_empty() {
+        return;
+    }
+    let solved = judge_practice(&items, |ex| &ex.solution);
+    let failures: Vec<String> = solved
+        .iter()
+        .filter(|j| j.status != "accepted" && j.status != "not_installed")
+        .map(|j| format!("{}: {}", j.label, j.report))
+        .collect();
+    assert!(failures.is_empty(), "model answers that FAIL:\n{}", failures.join("\n\n"));
+    let probes = judge_practice(&items, |ex| &ex.starter);
+    let passing: Vec<&String> = probes.iter().filter(|j| j.status == "accepted").map(|j| &j.label).collect();
+    assert!(passing.is_empty(), "type questions any answer passes: {passing:?}");
+    eprintln!("verified {} type questions", items.len());
+}

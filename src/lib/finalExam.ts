@@ -9,6 +9,7 @@
 import type { MasteryFinalExam, MasteryWeek } from "../types";
 import type { ExamQuestion } from "./mastery";
 import { seededRandom, shuffleWith } from "./quizShuffle";
+import { reorderOptions } from "./quizKinds";
 
 export type FinalSitting = {
   seed: number;
@@ -52,14 +53,7 @@ export function drawFinalPaper(weeks: MasteryWeek[], size: number, seed: number)
       drewAny = true;
       if (seen.has(q.question)) continue;
       seen.add(q.question);
-      const correct = q.options[q.answer];
-      const options = shuffleWith(q.options, rand);
-      out.push({
-        question: q.question,
-        options,
-        answer: options.indexOf(correct),
-        explanation: q.explanation,
-      });
+      out.push(reorderOptions(q, shuffleWith(q.options, rand)));
     }
     if (!drewAny) break;
   }

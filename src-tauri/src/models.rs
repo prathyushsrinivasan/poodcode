@@ -65,6 +65,8 @@ pub struct QuizQuestion {
     pub type_answer: String,
     #[serde(default, skip_serializing_if = "String::is_empty")]
     pub harness: String,
+    #[serde(default, skip_serializing_if = "String::is_empty")]
+    pub strictness: String,
 }
 
 /// A pointer from a concept to a real Library problem to practice it on.

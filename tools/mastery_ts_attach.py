@@ -64,6 +64,19 @@ for _tsw in TS_WEEKS:
         _texts.add(_q2["question"])
         _tsw["quiz"].append(_q2)
 
+# New quiz kinds (X-31, mastery_ts_quiz_kinds.py): multi-select and
+# fill-the-type, two of each on every core week.
+for _tsw in TS_WEEKS:
+    _texts = {q["question"] for q in _tsw["quiz"]}
+    for _q3 in TS_QUIZ_KINDS.get(_tsw["week"], []):
+        assert _q3["question"] not in _texts, f"TS week {_tsw['week']}: duplicate quiz question {_q3['question']!r}"
+        _texts.add(_q3["question"])
+        _tsw["quiz"].append(_q3)
+    if not _tsw.get("optional"):
+        _kinds = [q.get("kind", "") for q in _tsw["quiz"]]
+        assert _kinds.count("multi") >= 2 and _kinds.count("type") >= 2 and _kinds.count("output") >= 1, \
+            f"X-31: TS week {_tsw['week']} needs multi-select, fill-the-type and code-output questions"
+
 # Week 27's interview bank, timed mock sessions and code reviews
 # (mastery_ts_w27.py). Only the capstone week carries them.
 _w27 = next(w for w in TS_WEEKS if w["week"] == 27)

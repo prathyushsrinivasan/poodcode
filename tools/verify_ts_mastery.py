@@ -110,6 +110,18 @@ def collect(only, weeks, include_learn, include_mastery):
             for ex in w.get("problem_set", []):
                 if not only or only in ex["id"]:
                     work.append((where + "/problem", ex))
+            # Fill-the-type quiz questions (X-31): the model answer must pass
+            # the hidden claim, and a type no answer can equal must not.
+            for k, q in enumerate([q for q in w.get("quiz", []) if q.get("kind") == "type"], 1):
+                qid = f"quiz-w{n}-type{k}"
+                if not only or only in qid:
+                    code = q["code"].rstrip() + "\n"
+                    work.append((where + "/quiz", {
+                        "id": qid, "kind": "typelevel", "judge_mode": "types", "harness": q["harness"],
+                        "strictness": q.get("strictness") or "strict", "tests": [],
+                        "starter": code + "type Answer = { readonly __probe: true };\n",
+                        "solution": code + f"type Answer = {q['type_answer']};\n",
+                    }))
             exam = w.get("exam")
             if exam and (not only or only in f"final-w{n}"):
                 work.append((where + "/final", as_exercise(

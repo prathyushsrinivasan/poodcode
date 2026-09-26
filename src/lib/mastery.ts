@@ -13,7 +13,8 @@
 // gate for a programming curriculum.
 
 import { api } from "../api";
-import type { MasteryProgress, MasteryTrack, MasteryWeek } from "../types";
+import type { MasteryProgress, MasteryTrack, MasteryWeek, QuizQuestion } from "../types";
+import { reorderOptions } from "./quizKinds";
 
 /** Progress rows keyed by week number, for one track. */
 export type ProgressMap = Map<number, MasteryProgress>;
@@ -238,13 +239,9 @@ export function startDateKey(trackKey: string): string {
 // Exam paper assembly
 // ---------------------------------------------------------------------------
 
-export interface ExamQuestion {
-  question: string;
-  options: string[];
-  /** Index into the SHUFFLED options. */
-  answer: number;
-  explanation: string;
-}
+/** A drawn question: options shuffled, `answer` (and a multi-select's
+ * `answers`) pointing into the SHUFFLED options — see lib/quizKinds.ts. */
+export type ExamQuestion = QuizQuestion;
 
 function shuffle<T>(items: T[], rand: () => number): T[] {
   const out = [...items];
@@ -262,16 +259,7 @@ export function drawExamPaper(week: MasteryWeek, rand: () => number = Math.rando
   const sample = Math.min(week.quiz_sample || week.quiz.length, week.quiz.length);
   return shuffle(week.quiz, rand)
     .slice(0, sample)
-    .map((q) => {
-      const correct = q.options[q.answer];
-      const options = shuffle(q.options, rand);
-      return {
-        question: q.question,
-        options,
-        answer: options.indexOf(correct),
-        explanation: q.explanation,
-      };
-    });
+    .map((q) => reorderOptions(q, shuffle(q.options, rand)));
 }
 
 /** Format a study-time total for the UI. */

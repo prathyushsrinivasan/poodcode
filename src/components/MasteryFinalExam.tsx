@@ -9,6 +9,7 @@ import { api } from "../api";
 import type { MasteryFinalExam, MasteryTrack, MasteryWeek } from "../types";
 import { ExerciseSections } from "./ExerciseSections";
 import { inlineCode } from "./common";
+import { QuizChoices } from "./QuizChoices";
 import { markExerciseSolved } from "../lib/learnProgress";
 import { formatStudyTime, type WeekProgress } from "../lib/mastery";
 import {
@@ -189,23 +190,7 @@ export function FinalExamPanel({
           <strong>
             {i + 1}. {inlineCode(q.question)}
           </strong>
-          <div style={{ display: "flex", flexDirection: "column", gap: 6, marginTop: 8 }}>
-            {q.options.map((opt, oi) => (
-              <button
-                key={oi}
-                className="ghost"
-                style={{
-                  textAlign: "left",
-                  padding: "6px 12px",
-                  borderColor: sitting.picked[i] === oi ? "var(--accent)" : undefined,
-                  color: sitting.picked[i] === oi ? "var(--accent)" : undefined,
-                }}
-                onClick={() => pick(i, oi)}
-              >
-                {inlineCode(opt)}
-              </button>
-            ))}
-          </div>
+          <QuizChoices question={q} picked={sitting.picked[i] ?? -1} revealed={false} onPick={(v) => pick(i, v)} />
         </div>
       ))}
 
