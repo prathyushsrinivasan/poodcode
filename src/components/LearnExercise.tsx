@@ -25,15 +25,9 @@ import { Markdown } from "./Markdown";
 import { CodeEditor } from "./CodeEditor";
 import { TsErrorLinks } from "./TsErrorLinks";
 import { logMismatch, predictionMatches } from "../lib/predict";
+import { OrderLines, SpotCard } from "./ParsonsExercise";
 
-export function ExerciseCard({
-  index,
-  exercise,
-  source,
-  challenge = false,
-  onSolved,
-  predictFirst = false,
-}: {
+type ExerciseCardProps = {
   index: number;
   exercise: Exercise;
   source?: Problem;
@@ -41,7 +35,25 @@ export function ExerciseCard({
   onSolved?: (id: string) => void;
   /** M1-03: ask for a prediction of the first test's output before a run. */
   predictFirst?: boolean;
-}) {
+};
+
+/** One exercise, whatever its kind. "Spot the bug" is answered by clicking a
+ * line, not by running code, so it has a card of its own. */
+export function ExerciseCard(props: ExerciseCardProps) {
+  if (props.exercise.kind === "spot") {
+    return <SpotCard index={props.index} exercise={props.exercise} onSolved={props.onSolved} />;
+  }
+  return <CodeExerciseCard {...props} />;
+}
+
+function CodeExerciseCard({
+  index,
+  exercise,
+  source,
+  challenge = false,
+  onSolved,
+  predictFirst = false,
+}: ExerciseCardProps) {
   const nav = useNavigate();
   const storeKey = `poodcode:learn-ex:${exercise.id}`;
   const lang = exercise.language || "java";
@@ -78,6 +90,7 @@ export function ExerciseCard({
     retype: { badge: "🚫 retype the any", color: "var(--warn)", whole: true },
     predict: { badge: "🧠 predict the type", color: "var(--accent)", whole: false },
     design: { badge: "📐 types first", color: "var(--accent)", whole: true },
+    order: { badge: "🧱 put it in order", color: "var(--accent)", whole: false },
   };
   const style = KIND_STYLE[exercise.kind];
   const big = challenge || !!style?.whole;
@@ -85,7 +98,9 @@ export function ExerciseCard({
   // A type-level exercise is never run: it passes when the compiler accepts the
   // assertions in its harness. There are no test cases and no output to show.
   const isTypes = exercise.judge_mode === "types";
-  const predicting = predictFirst && !isTypes && exercise.tests.length > 0;
+  // A Parsons problem is reordered, not typed; its prompt already shows the output.
+  const isOrder = exercise.kind === "order";
+  const predicting = predictFirst && !isTypes && !isOrder && exercise.tests.length > 0;
 
   const height = Math.min(
     Math.max(exercise.starter.split("\n").length * 20 + 24, big ? 260 : 150),
@@ -196,22 +211,26 @@ export function ExerciseCard({
         </p>
       )}
 
-      <div
-        style={{
-          height,
-          border: "1px solid var(--border)",
-          borderRadius: 6,
-          overflow: "hidden",
-        }}
-      >
-        <CodeEditor
-          language={lang}
-          value={code}
-          onChange={update}
-          onRun={check}
-          tsStrictness={exercise.strictness}
-        />
-      </div>
+      {isOrder ? (
+        <OrderLines value={code} solution={exercise.solution} onChange={update} disabled={running} />
+      ) : (
+        <div
+          style={{
+            height,
+            border: "1px solid var(--border)",
+            borderRadius: 6,
+            overflow: "hidden",
+          }}
+        >
+          <CodeEditor
+            language={lang}
+            value={code}
+            onChange={update}
+            onRun={check}
+            tsStrictness={exercise.strictness}
+          />
+        </div>
+      )}
 
       {predicting && (
         <div className="predict-box">

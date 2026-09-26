@@ -52,6 +52,19 @@ pub struct QuizQuestion {
     pub answer: i64,
     #[serde(default)]
     pub explanation: String,
+    /// "" (one right option), "output" (options are what `code` prints),
+    /// "multi" (every index in `answers` is right) or "type" (a typed answer
+    /// that must satisfy `harness`) — see src/lib/quizKinds.ts.
+    #[serde(default, skip_serializing_if = "String::is_empty")]
+    pub kind: String,
+    #[serde(default, skip_serializing_if = "String::is_empty")]
+    pub code: String,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub answers: Vec<i64>,
+    #[serde(default, skip_serializing_if = "String::is_empty")]
+    pub type_answer: String,
+    #[serde(default, skip_serializing_if = "String::is_empty")]
+    pub harness: String,
 }
 
 /// A pointer from a concept to a real Library problem to practice it on.
@@ -178,6 +191,14 @@ pub struct Exercise {
     /// whole chapter is stored once instead of once per exercise.
     #[serde(default)]
     pub dataset: String,
+    /// Shown once the exercise is solved: why the answer is the answer. Used by
+    /// the "spot the bug" kind, whose note would give the bug away as a hint.
+    #[serde(default, skip_serializing_if = "String::is_empty")]
+    pub explanation: String,
+    /// "spot" only: the 1-based lines of `starter` that hold the bug. Clicking
+    /// any one of them solves the exercise.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub lines: Vec<u32>,
 }
 
 /// A ready-made database for the SQL track: schema plus rows, as one batch of

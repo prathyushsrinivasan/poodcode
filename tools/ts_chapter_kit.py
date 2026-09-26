@@ -31,6 +31,14 @@ import re
 TS_INTERVIEW_MORE = {}      # key -> [(question, answer)], merged by ts_lesson_interview.py
 TS_CHAPTER_KEYS = []        # every chapter built with _chapter, in authoring order
 TS_LESSON_MIN_CHARS = 4000  # X-03: 15-25 minutes of reading, before the interview block
+# Every chapter's worked examples, compiler errors and pitfalls as data, with
+# the outputs and diagnostics they really produce — mastery_ts_derived.py turns
+# them into review cards and "put it in order" / "spot the bug" practice.
+TS_CHAPTER_DATA = {}        # key -> {"examples": [...], "errors": [...], "pitfalls": [...]}
+
+
+def _chapter_data(key):
+    return TS_CHAPTER_DATA.setdefault(key, {"examples": [], "errors": [], "pitfalls": []})
 
 
 def _fence(code, lang="ts"):
@@ -75,6 +83,7 @@ def _render_examples(key, examples):
         title, code, inputs, note = ex
         code = _P(code)
         tests = _computed(f"{key}-example{i}", code, inputs or [""])
+        _chapter_data(key)["examples"].append({"title": title, "code": code, "tests": tests})
         parts.append(f"#### {title}\n{_fence(code)}")
         for t in tests:
             if t["input"]:
@@ -92,12 +101,17 @@ def _render_errors(key, errors):
         snippet = _P(snippet)
         diags = _compiler_says(f"{key}-error{i}", snippet, code, strictness)
         first = diags[0]
+        _chapter_data(key)["errors"].append({"code": snippet, "message": _tsmsg(first), "note": note.strip(),
+                                             "strictness": strictness})
         flag = " (with `noUncheckedIndexedAccess`)" if strictness == "strict+indexed" else ""
         parts.append(_fence(snippet) + "\n"
                      + _fence(_tsmsg(first), "text")
                      + (f"\n\n{flag.strip()}" if flag else "")
                      + "\n\n" + note.strip())
     return "\n\n".join(parts)
+
+
+_TSO_LAST = {}  # the last runnable pitfall side's tests, read by _render_pitfalls
 
 
 def _pitfall_side(eid, side, inputs):
@@ -110,6 +124,7 @@ def _pitfall_side(eid, side, inputs):
         return source, "The compiler says:", _tsmsg(d)
     source = _P(side)
     outs = _computed(eid, source, inputs)
+    _TSO_LAST["tests"] = outs
     return source, "Prints:", "\n".join(t["output"] for t in outs) or "(nothing)"
 
 
@@ -123,6 +138,13 @@ def _render_pitfalls(key, pitfalls):
         rc, rl, ro = _pitfall_side(f"{key}-pitfall{i}-right", right, inputs)
         assert (wl, wo) != (rl, ro) or _TSO_COLLECT, \
             f"{key} pitfall {i}: the wrong and right programs show the same thing"
+        _chapter_data(key)["pitfalls"].append({
+            "title": title, "note": note.strip(), "inputs": inputs,
+            "wrong": wc, "wrong_label": wl, "wrong_shows": wo,
+            "right": rc, "right_label": rl, "right_shows": ro,
+            # The right side's own test list, when it is a program that runs.
+            "right_tests": None if isinstance(right, tuple) else _TSO_LAST.get("tests"),
+        })
         parts.append(f"#### {title}\n{_fence(wc)}\n{wl}\n{_fence(wo, 'text')}\n\n"
                      f"{note.strip()}\n\n{_fence(rc)}\n{rl}\n{_fence(ro, 'text')}")
     return "\n\n".join(parts)

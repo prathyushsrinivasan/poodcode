@@ -23,7 +23,9 @@ for _tsw in TS_WEEKS:
         assert _ex["id"] not in _ts_ids, f"TS week {_n}: duplicate exercise id {_ex['id']}"
         _ts_ids.add(_ex["id"])
         _want = _week_strictness(_n) or "strict"
-        assert (_ex.get("strictness") or "strict") in (_want, "strict+indexed"), \
+        # Order and spot exercises are a chapter's own code, checked at the
+        # chapter's plain `strict` (mastery_ts_derived.py).
+        assert _ex["kind"] in ("order", "spot") or (_ex.get("strictness") or "strict") in (_want, "strict+indexed"), \
             f"{_ex['id']}: runs at {_ex.get('strictness')!r}, week {_n} is {_want!r}"
     for _ex in _set:
         assert _ex["kind"] in ("challenge", "typelevel"), f"{_ex['id']}: problem-set kind {_ex['kind']!r}"
@@ -46,6 +48,9 @@ for _tsw in TS_WEEKS:
         assert _front.strip() and _back.strip(), f"TS week {_tsw['week']}: empty card"
         _ts_fronts.add(_front)
         _tsw["flashcards"].append({"front": _front, "back": _back})
+    # X-100: at least a dozen review cards for every chapter the week schedules.
+    assert len(_tsw["flashcards"]) >= 12 * len(_tsw["concepts"]), \
+        f"TS week {_tsw['week']}: {len(_tsw['flashcards'])} cards for {len(_tsw['concepts'])} chapters; X-100 asks for 12 each"
 
 # Quiz top-ups (X-30). Question texts stay unique within a week's bank — the
 # chapter questions merged in later by _finalize_mastery are deduped against

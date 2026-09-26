@@ -883,3 +883,85 @@ body.focus-mode .topbar {
   margin-bottom: 14px;
   border-color: var(--accent);
 }
+
+/* "Put it in order" (Parsons) and "spot the bug" exercises — lib/parsons.ts. */
+.order-lines,
+.spot-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+}
+.order-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 6px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg-elev-2);
+  cursor: grab;
+}
+.order-line.dragging {
+  opacity: 0.4;
+}
+.order-line.over {
+  border-color: var(--accent);
+}
+.order-grip {
+  color: var(--text-faint);
+  user-select: none;
+}
+.order-code {
+  flex: 1;
+  white-space: pre;
+  overflow-x: auto;
+  background: none;
+}
+.order-arrows {
+  display: flex;
+  gap: 2px;
+}
+.order-arrows button {
+  padding: 0 7px;
+  font-size: 12px;
+}
+.spot-line {
+  display: flex;
+  gap: 10px;
+  text-align: left;
+  padding: 2px 8px;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+.spot-line:hover:not(:disabled) {
+  border-color: var(--accent);
+}
+.spot-line:disabled {
+  cursor: default;
+  opacity: 0.75;
+}
+.spot-line code {
+  white-space: pre;
+  background: none;
+}
+.spot-line.miss {
+  border-color: var(--bad);
+  color: var(--bad);
+}
+.spot-line.bug {
+  border-color: var(--good);
+  color: var(--good);
+  opacity: 1;
+}
+.spot-num {
+  min-width: 2ch;
+  text-align: right;
+  color: var(--text-faint);
+  user-select: none;
+}

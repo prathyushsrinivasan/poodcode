@@ -93,6 +93,10 @@ export interface Exercise {
    * dataset's SQL is prepended to each test's `input` (which holds only that
    * case's variation on the data) before the query runs. */
   dataset: string;
+  /** Shown once solved: why the answer is the answer ("spot" exercises). */
+  explanation?: string;
+  /** "spot" only: the 1-based lines of `starter` that hold the bug. */
+  lines?: number[];
 }
 
 // --- SQL track (seeds/sql_datasets.json + the in-process SQL engine) --------
@@ -163,6 +167,15 @@ export interface QuizQuestion {
   /** 0-based index into `options`. */
   answer: number;
   explanation: string;
+  /** "" (one right option), "output", "multi" or "type" — see lib/quizKinds.ts. */
+  kind?: string;
+  /** A program shown with the question ("output" and "type" questions). */
+  code?: string;
+  /** "multi": every right option. */
+  answers?: number[];
+  /** "type": the model answer, and the hidden claims a typed answer must pass. */
+  type_answer?: string;
+  harness?: string;
 }
 
 export interface PracticeRef {

@@ -38,6 +38,18 @@ export const KIND_SECTIONS: KindSection[] = [
     blurb:
       "Here is a real compiler error and the code that produced it. Work out what it is telling you, then fix the cause.",
   },
+  {
+    kind: "spot",
+    heading: "🔎 Spot the bug",
+    blurb:
+      "Each program runs wrong or fails to compile. Don't fix it yet — find it: click the line that causes the problem.",
+  },
+  {
+    kind: "order",
+    heading: "🧱 Put it in order",
+    blurb:
+      "A worked example from the chapter, its lines shuffled. Drag them (or use the arrows) into an order that compiles and prints what is asked — it is judged by running it.",
+  },
   { kind: "drill", heading: "🧩 Practice — fill in the blank" },
   {
     kind: "fix",
