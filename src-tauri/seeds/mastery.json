@@ -522,7 +522,8 @@
               "output": "5=41\n15=59\n25=77\n35=95\n4"
             }
           ],
-          "strictness": ""
+          "strictness": "",
+          "visible_tests": 4
         },
         "contest": null,
         "flashcards": [
@@ -1349,7 +1350,53 @@
             }
           ],
           "strictness": ""
-        }
+        },
+        "exam_alternates": [
+          {
+            "title": "Length table",
+            "prompt": "The input is a line of lengths in inches (whole numbers). For each one print `in=cm` where cm is `in * 2.54`, one per line, then the total of all the centimetre values on the last line.",
+            "hint": "Split on whitespace, convert with `Number`, and keep a running total declared with `let`.",
+            "language": "typescript",
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst lengths = input.split(/\\s+/).map(Number);\nlet total = 0;\nfor (const inches of lengths) {\n  const cm = inches * 2.54;\n  total += cm;\n  console.log(inches + \"=\" + cm);\n}\nconsole.log(total);\n",
+            "tests": [
+              {
+                "input": "1 2",
+                "output": "1=2.54\n2=5.08\n7.62"
+              },
+              {
+                "input": "0",
+                "output": "0=0\n0"
+              },
+              {
+                "input": "12",
+                "output": "12=30.48\n30.48"
+              },
+              {
+                "input": "-3 3",
+                "output": "-3=-7.62\n3=7.62\n0"
+              },
+              {
+                "input": "10 20 30",
+                "output": "10=25.4\n20=50.8\n30=76.2\n152.39999999999998"
+              },
+              {
+                "input": "100",
+                "output": "100=254\n254"
+              },
+              {
+                "input": "7",
+                "output": "7=17.78\n17.78"
+              },
+              {
+                "input": "1 1 1 1",
+                "output": "1=2.54\n1=2.54\n1=2.54\n1=2.54\n10.16"
+              }
+            ],
+            "strictness": "",
+            "visible_tests": 4
+          }
+        ]
       },
       {
         "week": 2,
@@ -1872,7 +1919,8 @@
               "output": "15\nguest"
             }
           ],
-          "strictness": ""
+          "strictness": "",
+          "visible_tests": 4
         },
         "contest": null,
         "flashcards": [
@@ -2866,7 +2914,57 @@
             }
           ],
           "strictness": ""
-        }
+        },
+        "exam_alternates": [
+          {
+            "title": "Parking fee",
+            "prompt": "The input is `hours weekend` — a whole number of hours and `yes` or `no`. On a weekday the first hour is free, then each extra hour costs 4, capped at 20. At the weekend any stay costs a flat 6, and a stay of 0 hours costs nothing on any day. Print the fee, then `weekend` or `weekday`.",
+            "hint": "Handle the zero-hour stay first, then branch on the day; `Math.min` applies the cap.",
+            "language": "typescript",
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst [hoursRaw, weekendRaw] = input.split(/\\s+/);\nconst hours = Number(hoursRaw);\nconst weekend = weekendRaw === \"yes\";\nlet fee = 0;\nif (hours > 0) {\n  if (weekend) fee = 6;\n  else fee = Math.min(20, (hours - 1) * 4);\n}\nconsole.log(fee);\nconsole.log(weekend ? \"weekend\" : \"weekday\");\n",
+            "tests": [
+              {
+                "input": "0 no",
+                "output": "0\nweekday"
+              },
+              {
+                "input": "1 no",
+                "output": "0\nweekday"
+              },
+              {
+                "input": "2 no",
+                "output": "4\nweekday"
+              },
+              {
+                "input": "5 no",
+                "output": "16\nweekday"
+              },
+              {
+                "input": "6 no",
+                "output": "20\nweekday"
+              },
+              {
+                "input": "10 no",
+                "output": "20\nweekday"
+              },
+              {
+                "input": "0 yes",
+                "output": "0\nweekend"
+              },
+              {
+                "input": "3 yes",
+                "output": "6\nweekend"
+              },
+              {
+                "input": "1 yes",
+                "output": "6\nweekend"
+              }
+            ],
+            "strictness": "",
+            "visible_tests": 4
+          }
+        ]
       },
       {
         "week": 3,
@@ -3385,7 +3483,8 @@
               "output": "500500\n16\nfalse\n4"
             }
           ],
-          "strictness": ""
+          "strictness": "",
+          "visible_tests": 4
         },
         "contest": null,
         "flashcards": [
@@ -4237,7 +4336,53 @@
             }
           ],
           "strictness": ""
-        }
+        },
+        "exam_alternates": [
+          {
+            "title": "Digit report",
+            "prompt": "The input is one integer `n` (at least 1). Print four lines: the sum of its digits, the number with its digits reversed (leading zeros dropped), `yes` or `no` for whether n reads the same backwards, and how many of its digits are even. Use arithmetic (`%` and division), not strings.",
+            "hint": "`n % 10` is the last digit and `Math.floor(n / 10)` drops it; build the reverse as you go.",
+            "language": "typescript",
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst n = Number(input);\nlet rest = n;\nlet digitSum = 0;\nlet reversed = 0;\nlet evens = 0;\nwhile (rest > 0) {\n  const digit = rest % 10;\n  digitSum += digit;\n  reversed = reversed * 10 + digit;\n  if (digit % 2 === 0) evens++;\n  rest = Math.floor(rest / 10);\n}\nconsole.log(digitSum);\nconsole.log(reversed);\nconsole.log(reversed === n ? \"yes\" : \"no\");\nconsole.log(evens);\n",
+            "tests": [
+              {
+                "input": "7",
+                "output": "7\n7\nyes\n0"
+              },
+              {
+                "input": "121",
+                "output": "4\n121\nyes\n1"
+              },
+              {
+                "input": "1230",
+                "output": "6\n321\nno\n2"
+              },
+              {
+                "input": "9999",
+                "output": "36\n9999\nyes\n0"
+              },
+              {
+                "input": "10",
+                "output": "1\n1\nno\n1"
+              },
+              {
+                "input": "123456",
+                "output": "21\n654321\nno\n3"
+              },
+              {
+                "input": "1",
+                "output": "1\n1\nyes\n0"
+              },
+              {
+                "input": "1001",
+                "output": "2\n1001\nyes\n2"
+              }
+            ],
+            "strictness": "",
+            "visible_tests": 4
+          }
+        ]
       },
       {
         "week": 4,
@@ -4757,7 +4902,8 @@
               "output": "I Am Here Now\nIAHN\n4"
             }
           ],
-          "strictness": ""
+          "strictness": "",
+          "visible_tests": 4
         },
         "contest": {
           "title": "Checkpoint — Month 1: language foundations",
@@ -5574,7 +5720,53 @@
             }
           ],
           "strictness": ""
-        }
+        },
+        "exam_alternates": [
+          {
+            "title": "Mirror words",
+            "prompt": "The input is a line of lowercase words separated by one or more spaces. Print the words each reversed letter by letter (in their original order), then the words in reverse order, then the number of vowels (`a e i o u`) in the line — all separated by single spaces.",
+            "hint": "`split(\"\")`, `reverse()` and `join(\"\")` reverse one word; spread before reversing the list.",
+            "language": "typescript",
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst words = input.split(/\\s+/).filter((w) => w.length > 0);\nconsole.log(words.map((w) => w.split(\"\").reverse().join(\"\")).join(\" \"));\nconsole.log([...words].reverse().join(\" \"));\nlet vowels = 0;\nfor (const ch of input) {\n  if (\"aeiou\".includes(ch)) vowels++;\n}\nconsole.log(vowels);\n",
+            "tests": [
+              {
+                "input": "hello world",
+                "output": "olleh dlrow\nworld hello\n3"
+              },
+              {
+                "input": "a",
+                "output": "a\na\n1"
+              },
+              {
+                "input": "type script rocks",
+                "output": "epyt tpircs skcor\nrocks script type\n3"
+              },
+              {
+                "input": "level   noon",
+                "output": "level noon\nnoon level\n4"
+              },
+              {
+                "input": "xyz",
+                "output": "zyx\nxyz\n0"
+              },
+              {
+                "input": "one two three four",
+                "output": "eno owt eerht ruof\nfour three two one\n7"
+              },
+              {
+                "input": "queue",
+                "output": "eueuq\nqueue\n4"
+              },
+              {
+                "input": "  padded words here  ",
+                "output": "deddap sdrow ereh\nhere words padded\n5"
+              }
+            ],
+            "strictness": "",
+            "visible_tests": 4
+          }
+        ]
       },
       {
         "week": 5,
@@ -6090,7 +6282,8 @@
               "output": "0q\n.......q"
             }
           ],
-          "strictness": ""
+          "strictness": "",
+          "visible_tests": 4
         },
         "contest": null,
         "flashcards": [
@@ -6799,7 +6992,53 @@
             }
           ],
           "strictness": ""
-        }
+        },
+        "exam_alternates": [
+          {
+            "title": "Repeat with defaults",
+            "prompt": "The input is `word times sep`, where `times` may be `-` and `sep` may be `none`, meaning \"use the default\". Write `repeat(word, times?, sep?)` with `times` defaulting to 2 and `sep` to `-`, returning `word` repeated `times` times joined by `sep` (an empty string for 0). Print `repeat` applied to the input, then `repeat(word)`.",
+            "hint": "Passing `undefined` for a parameter uses its default — so map `-` and `none` to `undefined`.",
+            "language": "typescript",
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst [word = \"\", timesRaw, sepRaw] = input.split(/\\s+/);\nfunction repeat(word: string, times = 2, sep = \"-\"): string {\n  const parts: string[] = [];\n  for (let i = 0; i < times; i++) parts.push(word);\n  return parts.join(sep);\n}\nconst times = timesRaw === \"-\" ? undefined : Number(timesRaw);\nconst sep = sepRaw === \"none\" ? undefined : sepRaw;\nconsole.log(repeat(word, times, sep));\nconsole.log(repeat(word));\n",
+            "tests": [
+              {
+                "input": "ab 3 +",
+                "output": "ab+ab+ab\nab-ab"
+              },
+              {
+                "input": "go - none",
+                "output": "go-go\ngo-go"
+              },
+              {
+                "input": "x 0 ,",
+                "output": "\nx-x"
+              },
+              {
+                "input": "hi 1 none",
+                "output": "hi\nhi-hi"
+              },
+              {
+                "input": "na 4 none",
+                "output": "na-na-na-na\nna-na"
+              },
+              {
+                "input": "yo - *",
+                "output": "yo*yo\nyo-yo"
+              },
+              {
+                "input": "z 5 .",
+                "output": "z.z.z.z.z\nz-z"
+              },
+              {
+                "input": "echo 2 ~",
+                "output": "echo~echo\necho-echo"
+              }
+            ],
+            "strictness": "",
+            "visible_tests": 4
+          }
+        ]
       },
       {
         "week": 6,
@@ -7309,7 +7548,8 @@
               "output": "ONE\n1"
             }
           ],
-          "strictness": ""
+          "strictness": "",
+          "visible_tests": 4
         },
         "contest": null,
         "flashcards": [
@@ -8085,7 +8325,53 @@
             }
           ],
           "strictness": ""
-        }
+        },
+        "exam_alternates": [
+          {
+            "title": "Compose a number pipeline",
+            "prompt": "The input is a line of integers. Build a `pipe` helper that composes `(xs: number[]) => number[]` transforms left to right, then apply: drop the negatives, double each value, keep those under 50. Print the result space-separated (or `(none)`), then how many values the pipeline removed.",
+            "hint": "`reduce` over the steps, starting from the input array, applies them in order.",
+            "language": "typescript",
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst nums = input.split(/\\s+/).map(Number);\ntype Step = (xs: number[]) => number[];\nfunction pipe(...steps: Step[]): Step {\n  return (start) => steps.reduce((acc, step) => step(acc), start);\n}\nconst run = pipe(\n  (xs) => xs.filter((x) => x >= 0),\n  (xs) => xs.map((x) => x * 2),\n  (xs) => xs.filter((x) => x < 50),\n);\nconst out = run(nums);\nconsole.log(out.join(\" \") || \"(none)\");\nconsole.log(nums.length - out.length);\n",
+            "tests": [
+              {
+                "input": "1 2 3",
+                "output": "2 4 6\n0"
+              },
+              {
+                "input": "-1 -2",
+                "output": "(none)\n2"
+              },
+              {
+                "input": "30 10 -5 24",
+                "output": "20 48\n2"
+              },
+              {
+                "input": "0",
+                "output": "0\n0"
+              },
+              {
+                "input": "25 24",
+                "output": "48\n1"
+              },
+              {
+                "input": "5 -5 5 -5",
+                "output": "10 10\n2"
+              },
+              {
+                "input": "100 1",
+                "output": "2\n1"
+              },
+              {
+                "input": "12 13 -14 15",
+                "output": "24 26 30\n1"
+              }
+            ],
+            "strictness": "",
+            "visible_tests": 4
+          }
+        ]
       },
       {
         "week": 7,
@@ -8605,7 +8891,8 @@
               "output": "-9\n-1\n1\n-1 -3 -5"
             }
           ],
-          "strictness": ""
+          "strictness": "",
+          "visible_tests": 4
         },
         "contest": null,
         "flashcards": [
@@ -9410,7 +9697,53 @@
             }
           ],
           "strictness": ""
-        }
+        },
+        "exam_alternates": [
+          {
+            "title": "Array report",
+            "prompt": "The input is a line of numbers. Print, one per line: the minimum, the median (the mean of the two middle values when the count is even), the values that appear more than once in ascending order space-separated (or `(none)`), and the input reversed — without mutating the input for the earlier answers.",
+            "hint": "`toSorted` and `toReversed` leave the original alone. A value repeats when it equals its neighbour in the sorted copy.",
+            "language": "typescript",
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst nums = input.split(/\\s+/).map(Number);\nconst sorted = nums.toSorted((a, b) => a - b);\nconst mid = Math.floor(sorted.length / 2);\nconst median =\n  sorted.length % 2 === 1 ? sorted[mid]! : (sorted[mid - 1]! + sorted[mid]!) / 2;\nconst repeated = sorted.filter((x, i) => sorted.indexOf(x) !== i && sorted.indexOf(x) === i - 1);\nconsole.log(Math.min(...nums));\nconsole.log(median);\nconsole.log(repeated.join(\" \") || \"(none)\");\nconsole.log(nums.toReversed().join(\" \"));\n",
+            "tests": [
+              {
+                "input": "1 2 3 4",
+                "output": "1\n2.5\n(none)\n4 3 2 1"
+              },
+              {
+                "input": "5",
+                "output": "5\n5\n(none)\n5"
+              },
+              {
+                "input": "3 1 3 2 1",
+                "output": "1\n2\n1 3\n1 2 3 1 3"
+              },
+              {
+                "input": "7 7 7",
+                "output": "7\n7\n7\n7 7 7"
+              },
+              {
+                "input": "10 -2 4",
+                "output": "-2\n4\n(none)\n4 -2 10"
+              },
+              {
+                "input": "2 8",
+                "output": "2\n5\n(none)\n8 2"
+              },
+              {
+                "input": "9 1 5 1 9 9",
+                "output": "1\n7\n1 9\n9 9 1 5 1 9"
+              },
+              {
+                "input": "0 0 1",
+                "output": "0\n0\n0\n1 0 0"
+              }
+            ],
+            "strictness": "",
+            "visible_tests": 4
+          }
+        ]
       },
       {
         "week": 8,
@@ -9923,7 +10256,8 @@
               "output": "dup: s,t"
             }
           ],
-          "strictness": ""
+          "strictness": "",
+          "visible_tests": 4
         },
         "contest": {
           "title": "Checkpoint — Month 2: functions & data",
@@ -10702,7 +11036,53 @@
             }
           ],
           "strictness": ""
-        }
+        },
+        "exam_alternates": [
+          {
+            "title": "Merge inventory records",
+            "prompt": "The input is `n` then `n` JSON objects with a `sku`, a `qty` and an optional `price`. Merge them per sku: quantities add up, and the price is the last one given (0 if none ever was). Print `sku qty price` per sku in alphabetical order, then the stock value — the sum of qty × price.",
+            "hint": "Destructure each parsed record; `price ?? current.price` keeps the previous price when one is missing.",
+            "language": "typescript",
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst lines = input.split(\"\\n\");\nconst n = Number(lines[0]);\ntype Entry = { sku: string; qty: number; price?: number };\nconst merged: { [sku: string]: { qty: number; price: number } } = {};\nfor (let i = 1; i <= n; i++) {\n  const { sku, qty, price }: Entry = JSON.parse(lines[i] ?? \"{}\");\n  const current = merged[sku] ?? { qty: 0, price: 0 };\n  merged[sku] = { qty: current.qty + qty, price: price ?? current.price };\n}\nlet value = 0;\nfor (const sku of Object.keys(merged).sort()) {\n  const { qty, price } = merged[sku]!;\n  value += qty * price;\n  console.log(sku + \" \" + qty + \" \" + price);\n}\nconsole.log(value);\n",
+            "tests": [
+              {
+                "input": "2\n{\"sku\":\"b2\",\"qty\":3,\"price\":4}\n{\"sku\":\"a1\",\"qty\":1,\"price\":10}",
+                "output": "a1 1 10\nb2 3 4\n22"
+              },
+              {
+                "input": "3\n{\"sku\":\"a1\",\"qty\":2}\n{\"sku\":\"a1\",\"qty\":1,\"price\":5}\n{\"sku\":\"a1\",\"qty\":4}",
+                "output": "a1 7 5\n35"
+              },
+              {
+                "input": "1\n{\"sku\":\"z9\",\"qty\":0,\"price\":99}",
+                "output": "z9 0 99\n0"
+              },
+              {
+                "input": "2\n{\"sku\":\"c3\",\"qty\":5}\n{\"sku\":\"b2\",\"qty\":1}",
+                "output": "b2 1 0\nc3 5 0\n0"
+              },
+              {
+                "input": "3\n{\"sku\":\"a1\",\"qty\":1,\"price\":2}\n{\"sku\":\"a1\",\"qty\":1,\"price\":3}\n{\"sku\":\"b1\",\"qty\":2,\"price\":1}",
+                "output": "a1 2 3\nb1 2 1\n8"
+              },
+              {
+                "input": "2\n{\"sku\":\"x\",\"qty\":10,\"price\":1}\n{\"sku\":\"y\",\"qty\":1,\"price\":10}",
+                "output": "x 10 1\ny 1 10\n20"
+              },
+              {
+                "input": "4\n{\"sku\":\"m\",\"qty\":1,\"price\":1}\n{\"sku\":\"k\",\"qty\":2,\"price\":2}\n{\"sku\":\"m\",\"qty\":3}\n{\"sku\":\"k\",\"qty\":1,\"price\":5}",
+                "output": "k 3 5\nm 4 1\n19"
+              },
+              {
+                "input": "1\n{\"sku\":\"only\",\"qty\":7}",
+                "output": "only 7 0\n0"
+              }
+            ],
+            "strictness": "",
+            "visible_tests": 4
+          }
+        ]
       },
       {
         "week": 9,
@@ -11220,7 +11600,8 @@
               "output": "k: d2 d1"
             }
           ],
-          "strictness": ""
+          "strictness": "",
+          "visible_tests": 4
         },
         "contest": null,
         "flashcards": [
@@ -11936,7 +12317,53 @@
             }
           ],
           "strictness": ""
-        }
+        },
+        "exam_alternates": [
+          {
+            "title": "Friends in common",
+            "prompt": "The input is `n` then `n` lines `a b`, each meaning a and b are friends (friendship goes both ways), then a final line `x y`. Print the friends x and y have in common, sorted and space-separated (or `(none)`), then the number of distinct people in the friendship list.",
+            "hint": "A `Map<string, Set<string>>` of friends; the common ones are one set filtered by `has` on the other.",
+            "language": "typescript",
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst lines = input.split(\"\\n\");\nconst n = Number(lines[0]);\nconst friends = new Map<string, Set<string>>();\nfunction link(a: string, b: string): void {\n  if (!friends.has(a)) friends.set(a, new Set());\n  friends.get(a)!.add(b);\n}\nfor (let i = 1; i <= n; i++) {\n  const [a = \"\", b = \"\"] = (lines[i] ?? \"\").trim().split(/\\s+/);\n  link(a, b);\n  link(b, a);\n}\nconst [x = \"\", y = \"\"] = (lines[n + 1] ?? \"\").trim().split(/\\s+/);\nconst ofX = friends.get(x) ?? new Set<string>();\nconst ofY = friends.get(y) ?? new Set<string>();\nconst common = [...ofX].filter((p) => ofY.has(p)).sort();\nconsole.log(common.join(\" \") || \"(none)\");\nconsole.log(friends.size);\n",
+            "tests": [
+              {
+                "input": "3\nann bob\nann cat\nbob cat\nann bob",
+                "output": "cat\n3"
+              },
+              {
+                "input": "2\nann bob\ncat dan\nann cat",
+                "output": "(none)\n4"
+              },
+              {
+                "input": "4\na c\nb c\na d\nb d\na b",
+                "output": "c d\n4"
+              },
+              {
+                "input": "1\na b\nx y",
+                "output": "(none)\n2"
+              },
+              {
+                "input": "3\nmia leo\nleo zoe\nzoe mia\nmia zoe",
+                "output": "leo\n3"
+              },
+              {
+                "input": "5\np q\np r\np s\nt q\nt r\np t",
+                "output": "q r\n5"
+              },
+              {
+                "input": "2\nsolo pal\npal solo\nsolo pal",
+                "output": "(none)\n2"
+              },
+              {
+                "input": "3\na b\nb c\nc d\na c",
+                "output": "b\n4"
+              }
+            ],
+            "strictness": "",
+            "visible_tests": 4
+          }
+        ]
       },
       {
         "week": 10,
@@ -12448,7 +12875,8 @@
               "output": ""
             }
           ],
-          "strictness": ""
+          "strictness": "",
+          "visible_tests": 4
         },
         "contest": null,
         "flashcards": [
@@ -13097,7 +13525,53 @@
             }
           ],
           "strictness": ""
-        }
+        },
+        "exam_alternates": [
+          {
+            "title": "Turnstile machine",
+            "prompt": "A turnstile is `locked` or `unlocked`; events are `coin` and `push`. A coin unlocks a locked turnstile (and is kept); a coin in an unlocked one is refunded; a push through an unlocked one locks it; a push on a locked one does nothing. The input is a start state then events. Print the state after each event (`ignored <word>` for anything that is not an event, leaving the state as it was), then the number of coins kept.",
+            "hint": "Two literal unions — the states and the events — and a guard that turns a raw word into an `Event`.",
+            "language": "typescript",
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst [start, ...events] = input.split(/\\s+/);\ntype State = \"locked\" | \"unlocked\";\ntype Event = \"coin\" | \"push\";\nfunction isEvent(word: string): word is Event {\n  return word === \"coin\" || word === \"push\";\n}\nlet state: State = start === \"unlocked\" ? \"unlocked\" : \"locked\";\nlet kept = 0;\nfor (const word of events) {\n  if (!isEvent(word)) {\n    console.log(\"ignored \" + word);\n    continue;\n  }\n  if (state === \"locked\" && word === \"coin\") {\n    state = \"unlocked\";\n    kept++;\n  } else if (state === \"unlocked\" && word === \"push\") {\n    state = \"locked\";\n  }\n  console.log(state);\n}\nconsole.log(kept);\n",
+            "tests": [
+              {
+                "input": "locked coin push",
+                "output": "unlocked\nlocked\n1"
+              },
+              {
+                "input": "unlocked coin push push",
+                "output": "unlocked\nlocked\nlocked\n0"
+              },
+              {
+                "input": "locked push push coin",
+                "output": "locked\nlocked\nunlocked\n1"
+              },
+              {
+                "input": "locked coin coin push coin",
+                "output": "unlocked\nunlocked\nlocked\nunlocked\n2"
+              },
+              {
+                "input": "unlocked kick push",
+                "output": "ignored kick\nlocked\n0"
+              },
+              {
+                "input": "locked",
+                "output": "0"
+              },
+              {
+                "input": "unlocked push coin push coin",
+                "output": "locked\nunlocked\nlocked\nunlocked\n2"
+              },
+              {
+                "input": "locked coin wave push",
+                "output": "unlocked\nignored wave\nlocked\n1"
+              }
+            ],
+            "strictness": "",
+            "visible_tests": 4
+          }
+        ]
       },
       {
         "week": 11,
@@ -13609,7 +14083,8 @@
               "output": "bad\n0"
             }
           ],
-          "strictness": ""
+          "strictness": "",
+          "visible_tests": 4
         },
         "contest": null,
         "flashcards": [
@@ -14290,7 +14765,53 @@
             }
           ],
           "strictness": ""
-        }
+        },
+        "exam_alternates": [
+          {
+            "title": "Clean sensor readings",
+            "prompt": "The input is `n` then `n` JSON lines. A reading is an object with a non-empty string `sensor` and a `value` that is either a finite number or `null` (a gap). Print `ok <sensor> <value>`, `gap <sensor>` for a null value, or `bad` for anything else. Then print the largest valid value, or `none`. Write a type predicate for the reading.",
+            "hint": "Parse into `unknown`; the predicate checks `sensor` and both allowed forms of `value`.",
+            "language": "typescript",
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst lines = input.split(\"\\n\");\nconst n = Number(lines[0]);\ntype Reading = { sensor: string; value: number | null };\nfunction isReading(x: unknown): x is Reading {\n  if (typeof x !== \"object\" || x === null) return false;\n  const r = x as { sensor?: unknown; value?: unknown };\n  return (\n    typeof r.sensor === \"string\" && r.sensor.length > 0 &&\n    (r.value === null || (typeof r.value === \"number\" && Number.isFinite(r.value)))\n  );\n}\nlet best: number | undefined;\nfor (let i = 1; i <= n; i++) {\n  const parsed: unknown = JSON.parse(lines[i] ?? \"null\");\n  if (!isReading(parsed)) {\n    console.log(\"bad\");\n  } else if (parsed.value === null) {\n    console.log(\"gap \" + parsed.sensor);\n  } else {\n    console.log(\"ok \" + parsed.sensor + \" \" + parsed.value);\n    best = best === undefined ? parsed.value : Math.max(best, parsed.value);\n  }\n}\nconsole.log(best ?? \"none\");\n",
+            "tests": [
+              {
+                "input": "3\n{\"sensor\":\"t1\",\"value\":20.5}\n{\"sensor\":\"t2\",\"value\":null}\n{\"sensor\":\"\",\"value\":3}",
+                "output": "ok t1 20.5\ngap t2\nbad\n20.5"
+              },
+              {
+                "input": "2\n{\"sensor\":\"a\",\"value\":-4}\n{\"sensor\":\"b\",\"value\":-1}",
+                "output": "ok a -4\nok b -1\n-1"
+              },
+              {
+                "input": "1\n{\"value\":5}",
+                "output": "bad\nnone"
+              },
+              {
+                "input": "2\n[1,2]\n\"t1\"",
+                "output": "bad\nbad\nnone"
+              },
+              {
+                "input": "3\n{\"sensor\":\"x\",\"value\":\"7\"}\n{\"sensor\":\"y\",\"value\":0}\n{\"sensor\":\"z\",\"value\":null}",
+                "output": "bad\nok y 0\ngap z\n0"
+              },
+              {
+                "input": "1\n{\"sensor\":\"solo\",\"value\":null}",
+                "output": "gap solo\nnone"
+              },
+              {
+                "input": "4\n{\"sensor\":\"a\",\"value\":1}\n{\"sensor\":\"b\",\"value\":3}\n{\"sensor\":\"c\",\"value\":2}\nnull",
+                "output": "ok a 1\nok b 3\nok c 2\nbad\n3"
+              },
+              {
+                "input": "2\n{\"sensor\":\"q\",\"value\":true}\n{\"sensor\":\"r\",\"value\":12}",
+                "output": "bad\nok r 12\n12"
+              }
+            ],
+            "strictness": "",
+            "visible_tests": 4
+          }
+        ]
       },
       {
         "week": 12,
@@ -14800,7 +15321,8 @@
               "output": "8 1\n2"
             }
           ],
-          "strictness": ""
+          "strictness": "",
+          "visible_tests": 4
         },
         "contest": null,
         "flashcards": [
@@ -15426,7 +15948,53 @@
             }
           ],
           "strictness": ""
-        }
+        },
+        "exam_alternates": [
+          {
+            "title": "Drawing commands",
+            "prompt": "Commands are `circle r`, `rect w h`, `square s` and `clear` (remove every shape drawn so far). Model the shapes as a discriminated union. The input is `n` then `n` commands. Print each shape left at the end as `<kind> <area>` with the area to 2 decimal places (π from `Math.PI`), then the total area to 2 places — or `(empty)` and `0.00` when nothing is left.",
+            "hint": "`switch` on `kind` gives each branch the right fields; `toFixed(2)` formats.",
+            "language": "typescript",
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst lines = input.split(\"\\n\");\nconst n = Number(lines[0]);\ntype Shape =\n  | { kind: \"circle\"; r: number }\n  | { kind: \"rect\"; w: number; h: number }\n  | { kind: \"square\"; s: number };\nfunction area(shape: Shape): number {\n  switch (shape.kind) {\n    case \"circle\":\n      return Math.PI * shape.r * shape.r;\n    case \"rect\":\n      return shape.w * shape.h;\n    case \"square\":\n      return shape.s * shape.s;\n  }\n}\nlet shapes: Shape[] = [];\nfor (let i = 1; i <= n; i++) {\n  const [cmd, a = \"0\", b = \"0\"] = (lines[i] ?? \"\").trim().split(/\\s+/);\n  if (cmd === \"circle\") shapes.push({ kind: \"circle\", r: Number(a) });\n  else if (cmd === \"rect\") shapes.push({ kind: \"rect\", w: Number(a), h: Number(b) });\n  else if (cmd === \"square\") shapes.push({ kind: \"square\", s: Number(a) });\n  else if (cmd === \"clear\") shapes = [];\n}\nlet total = 0;\nfor (const shape of shapes) {\n  total += area(shape);\n  console.log(shape.kind + \" \" + area(shape).toFixed(2));\n}\nif (shapes.length === 0) console.log(\"(empty)\");\nconsole.log(total.toFixed(2));\n",
+            "tests": [
+              {
+                "input": "2\ncircle 1\nsquare 2",
+                "output": "circle 3.14\nsquare 4.00\n7.14"
+              },
+              {
+                "input": "3\nrect 2 3\nclear\nsquare 1",
+                "output": "square 1.00\n1.00"
+              },
+              {
+                "input": "1\nclear",
+                "output": "(empty)\n0.00"
+              },
+              {
+                "input": "2\ncircle 2\ncircle 0.5",
+                "output": "circle 12.57\ncircle 0.79\n13.35"
+              },
+              {
+                "input": "3\nsquare 3\nrect 1 1\ncircle 1",
+                "output": "square 9.00\nrect 1.00\ncircle 3.14\n13.14"
+              },
+              {
+                "input": "4\nrect 10 2\nclear\nclear\nrect 1 2",
+                "output": "rect 2.00\n2.00"
+              },
+              {
+                "input": "1\nrect 4 0.25",
+                "output": "rect 1.00\n1.00"
+              },
+              {
+                "input": "2\nsquare 0\ncircle 3",
+                "output": "square 0.00\ncircle 28.27\n28.27"
+              }
+            ],
+            "strictness": "",
+            "visible_tests": 4
+          }
+        ]
       },
       {
         "week": 13,
@@ -16120,7 +16688,8 @@
               "output": "a=2\nb=2\nc=2\n4"
             }
           ],
-          "strictness": ""
+          "strictness": "",
+          "visible_tests": 4
         },
         "contest": {
           "title": "Mastery checkpoint — Months 1–3",
@@ -16712,7 +17281,53 @@
             }
           ],
           "strictness": ""
-        }
+        },
+        "exam_alternates": [
+          {
+            "title": "Checkpoint: letter frequency report",
+            "prompt": "The input is a line of text. Counting letters only, case-insensitively, print the three most frequent letters as `letter=count`, one per line, breaking ties alphabetically; then the number of distinct letters. Fewer than three distinct letters prints only what exists.",
+            "hint": "A `Map<string, number>` of counts, then sort entries by count descending and letter ascending.",
+            "language": "typescript",
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst counts = new Map<string, number>();\nfor (const ch of input.toLowerCase()) {\n  if (ch >= \"a\" && ch <= \"z\") counts.set(ch, (counts.get(ch) ?? 0) + 1);\n}\nconst ranked = [...counts.entries()].sort((a, b) =>\n  b[1] !== a[1] ? b[1] - a[1] : a[0].localeCompare(b[0]),\n);\nfor (const [letter, count] of ranked.slice(0, 3)) {\n  console.log(letter + \"=\" + count);\n}\nconsole.log(counts.size);\n",
+            "tests": [
+              {
+                "input": "banana",
+                "output": "a=3\nn=2\nb=1\n3"
+              },
+              {
+                "input": "Hello, World!",
+                "output": "l=3\no=2\nd=1\n7"
+              },
+              {
+                "input": "aAbB",
+                "output": "a=2\nb=2\n2"
+              },
+              {
+                "input": "xyz",
+                "output": "x=1\ny=1\nz=1\n3"
+              },
+              {
+                "input": "Mississippi",
+                "output": "i=4\ns=4\np=2\n4"
+              },
+              {
+                "input": "aa bb cc dd",
+                "output": "a=2\nb=2\nc=2\n4"
+              },
+              {
+                "input": "q",
+                "output": "q=1\n1"
+              },
+              {
+                "input": "The quick brown fox",
+                "output": "o=2\nb=1\nc=1\n15"
+              }
+            ],
+            "strictness": "",
+            "visible_tests": 4
+          }
+        ]
       },
       {
         "week": 14,
@@ -17225,7 +17840,8 @@
               "output": "r=s\np=q\nz=(missing)\n1"
             }
           ],
-          "strictness": "strict+indexed"
+          "strictness": "strict+indexed",
+          "visible_tests": 4
         },
         "contest": null,
         "flashcards": [
@@ -17820,18 +18436,19 @@
           }
         ],
         "project_spec": {
-          "title": "ledger.ts v4 — a strict bank statement",
-          "goal": "The arc project's fourth version: the ledger read under every flag this month turns on. Money is integer cents in a branded type, every index read is honest under `noUncheckedIndexedAccess`, and bad rows are reported, never guessed at.",
+          "title": "ledger/ v4 — a strict bank statement in four modules",
+          "goal": "The arc project's fourth version: the ledger read under every flag this month turns on, and split into modules the way a real project is. Money is integer cents in a branded type, every index read is honest under `noUncheckedIndexedAccess`, bad rows are reported, never guessed at — and each file has one job. The workspace has a tab per file; the judge bundles them in tab order.",
           "requirements": [
+            "The workspace is four files: `money.ts` (the `Cents` brand, `parseCents`, `formatCents`), `parse.ts` (the `Txn` type and `parseRow`), `report.ts` (turns transactions into the report lines) and `main.ts` (reads stdin, prints). Import what a file uses from its siblings — `import type` for types — and export what others need.",
             "Each input line is a CSV row `date,account,amount,memo` — the memo is optional and may itself contain commas. Dates are `YYYY-MM-DD` and must exist on the calendar; amounts are like `12`, `-3.5` or `1200.75` (at most two decimals).",
             "For a bad row print `line <n>: bad date <d>`, `line <n>: missing account` or `line <n>: bad amount <a>` (checked in that order) and skip it.",
             "Then print each account, sorted, as `<account>: <balance> (<k> transactions)` (`transaction` for one), with balances to two decimals (`-4.50`).",
             "Then `total: <sum of all balances>`, `busiest month: <YYYY-MM> (<n> transactions)` (the earliest on a tie; `none` with no rows) and `largest expense: <memo, or the account if no memo> <amount>` (the most negative amount; `none` if nothing is negative).",
-            "Keep amounts as a branded `Cents` type produced by one parser, never as floating-point dollars."
+            "Keep amounts as a branded `Cents` type produced by one parser, never as floating-point dollars. The files share one scope when judged, so top-level names must not repeat across files."
           ],
           "stretch": [
-            "Split it into modules — `money.ts`, `parse.ts`, `report.ts`, `main.ts` — with `import type` for the types.",
-            "Write a `money.d.ts` describing a pretend untyped `currency-format` library, and format balances with it."
+            "Add a `currency.d.ts` describing a pretend untyped `currency-format` package (`declare module \"currency-format\" { … }`) — the types only; nothing here can install it.",
+            "Move the plural helper into its own `text.ts` and import it where it is used."
           ],
           "rubric": [
             "No `any` anywhere — not even one hidden in a cast",
@@ -17841,8 +18458,8 @@
             "I could explain every line to someone else"
           ],
           "language": "typescript",
-          "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n// Build the project here. Read all of stdin from `input` above, and print\n// exactly what the requirements ask for. Run the tests as you go.\n",
-          "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ndeclare const CentsBrand: unique symbol;\ntype Cents = number & { readonly [CentsBrand]: true };\ntype Txn = { readonly date: string; readonly account: string; readonly amount: Cents; readonly memo: string };\n\nfunction parseCents(text: string): Cents | undefined {\n  const m = /^(-?)(\\d+)(?:\\.(\\d{1,2}))?$/.exec(text.trim());\n  if (m === null) return undefined;\n  const cents = Number(m[2] ?? \"0\") * 100 + Number((m[3] ?? \"\").padEnd(2, \"0\"));\n  return (m[1] === \"-\" ? -cents : cents) as Cents;\n}\nfunction isDate(s: string): boolean {\n  const m = /^(\\d{4})-(\\d{2})-(\\d{2})$/.exec(s);\n  if (m === null) return false;\n  const [year, month, day] = [Number(m[1]), Number(m[2]), Number(m[3])];\n  const d = new Date(Date.UTC(year, month - 1, day));\n  return d.getUTCMonth() === month - 1 && d.getUTCDate() === day;\n}\nconst money = (c: number): string => (c < 0 ? \"-\" : \"\") + (Math.abs(c) / 100).toFixed(2);\n\nconst txns: Txn[] = [];\nfor (const [i, line] of input.split(\"\\n\").entries()) {\n  const [date = \"\", account = \"\", amountText = \"\", ...memo] = line.split(\",\").map((s) => s.trim());\n  if (!isDate(date)) {\n    console.log(`line ${i + 1}: bad date ${date}`);\n    continue;\n  }\n  if (account === \"\") {\n    console.log(`line ${i + 1}: missing account`);\n    continue;\n  }\n  const amount = parseCents(amountText);\n  if (amount === undefined) {\n    console.log(`line ${i + 1}: bad amount ${amountText}`);\n    continue;\n  }\n  txns.push({ date, account, amount, memo: memo.join(\", \") });\n}\n\nconst byAccount = new Map<string, { balance: number; count: number }>();\nfor (const t of txns) {\n  const acc = byAccount.get(t.account) ?? { balance: 0, count: 0 };\n  byAccount.set(t.account, { balance: acc.balance + t.amount, count: acc.count + 1 });\n}\nfor (const [name, acc] of [...byAccount].sort(([a], [b]) => a.localeCompare(b))) {\n  console.log(`${name}: ${money(acc.balance)} (${acc.count} ${acc.count === 1 ? \"transaction\" : \"transactions\"})`);\n}\nconsole.log(`total: ${money(txns.reduce((s, t) => s + t.amount, 0))}`);\n\nconst months = new Map<string, number>();\nfor (const t of txns) months.set(t.date.slice(0, 7), (months.get(t.date.slice(0, 7)) ?? 0) + 1);\nconst busiest = [...months].sort(([a, x], [b, y]) => y - x || a.localeCompare(b))[0];\nconsole.log(busiest === undefined ? \"busiest month: none\" : `busiest month: ${busiest[0]} (${busiest[1]} ${busiest[1] === 1 ? \"transaction\" : \"transactions\"})`);\n\nconst largest = txns.filter((t) => t.amount < 0).sort((a, b) => a.amount - b.amount)[0];\nconsole.log(largest === undefined ? \"largest expense: none\" : `largest expense: ${largest.memo || largest.account} ${money(largest.amount)}`);\n",
+          "starter": "// @file money.ts\ndeclare const CentsBrand: unique symbol;\nexport type Cents = number & { readonly [CentsBrand]: true };\n\n/** `12`, `-3.5` or `1200.75` as cents; `undefined` for anything else. */\nexport function parseCents(text: string): Cents | undefined {\n  throw new Error(\"TODO: parseCents\");\n}\n\n/** `-450` → `-4.50`. */\nexport function formatCents(c: number): string {\n  throw new Error(\"TODO: formatCents\");\n}\n\n// @file parse.ts\nimport type { Cents } from \"./money\";\nimport { parseCents } from \"./money\";\n\nexport type Txn = { readonly date: string; readonly account: string; readonly amount: Cents; readonly memo: string };\n\n/** A transaction, or the message to print for a bad row. */\nexport function parseRow(line: string, lineNo: number): Txn | string {\n  throw new Error(\"TODO: parseRow\");\n}\n\n// @file report.ts\nimport type { Txn } from \"./parse\";\nimport { formatCents } from \"./money\";\n\n/** The report lines, in order: accounts, total, busiest month, largest expense. */\nexport function report(txns: readonly Txn[]): string[] {\n  throw new Error(\"TODO: report\");\n}\n\n// @file main.ts\nimport * as fs from \"fs\";\nimport type { Txn } from \"./parse\";\nimport { parseRow } from \"./parse\";\nimport { report } from \"./report\";\n\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst txns: Txn[] = [];\nfor (const [i, line] of input.split(\"\\n\").entries()) {\n  const row = parseRow(line, i + 1);\n  if (typeof row === \"string\") console.log(row);\n  else txns.push(row);\n}\nfor (const line of report(txns)) console.log(line);\n",
+          "solution": "// @file money.ts\ndeclare const CentsBrand: unique symbol;\nexport type Cents = number & { readonly [CentsBrand]: true };\n\n/** `12`, `-3.5` or `1200.75` as cents; `undefined` for anything else. */\nexport function parseCents(text: string): Cents | undefined {\n  const m = /^(-?)(\\d+)(?:\\.(\\d{1,2}))?$/.exec(text.trim());\n  if (m === null) return undefined;\n  const cents = Number(m[2] ?? \"0\") * 100 + Number((m[3] ?? \"\").padEnd(2, \"0\"));\n  return (m[1] === \"-\" ? -cents : cents) as Cents;\n}\n\nexport function formatCents(c: number): string {\n  return (c < 0 ? \"-\" : \"\") + (Math.abs(c) / 100).toFixed(2);\n}\n\n// @file parse.ts\nimport type { Cents } from \"./money\";\nimport { parseCents } from \"./money\";\n\nexport type Txn = { readonly date: string; readonly account: string; readonly amount: Cents; readonly memo: string };\n\nfunction isDate(s: string): boolean {\n  const m = /^(\\d{4})-(\\d{2})-(\\d{2})$/.exec(s);\n  if (m === null) return false;\n  const [year, month, day] = [Number(m[1]), Number(m[2]), Number(m[3])];\n  const d = new Date(Date.UTC(year, month - 1, day));\n  return d.getUTCMonth() === month - 1 && d.getUTCDate() === day;\n}\n\n/** A transaction, or the message to print for a bad row. */\nexport function parseRow(line: string, lineNo: number): Txn | string {\n  const [date = \"\", account = \"\", amountText = \"\", ...memo] = line.split(\",\").map((s) => s.trim());\n  if (!isDate(date)) return `line ${lineNo}: bad date ${date}`;\n  if (account === \"\") return `line ${lineNo}: missing account`;\n  const amount = parseCents(amountText);\n  if (amount === undefined) return `line ${lineNo}: bad amount ${amountText}`;\n  return { date, account, amount, memo: memo.join(\", \") };\n}\n\n// @file report.ts\nimport type { Txn } from \"./parse\";\nimport { formatCents } from \"./money\";\n\nconst plural = (n: number): string => `${n} ${n === 1 ? \"transaction\" : \"transactions\"}`;\n\nexport function report(txns: readonly Txn[]): string[] {\n  const out: string[] = [];\n  const byAccount = new Map<string, { balance: number; count: number }>();\n  for (const t of txns) {\n    const acc = byAccount.get(t.account) ?? { balance: 0, count: 0 };\n    byAccount.set(t.account, { balance: acc.balance + t.amount, count: acc.count + 1 });\n  }\n  for (const [name, acc] of [...byAccount].sort(([a], [b]) => a.localeCompare(b))) {\n    out.push(`${name}: ${formatCents(acc.balance)} (${plural(acc.count)})`);\n  }\n  out.push(`total: ${formatCents(txns.reduce((s, t) => s + t.amount, 0))}`);\n\n  const months = new Map<string, number>();\n  for (const t of txns) months.set(t.date.slice(0, 7), (months.get(t.date.slice(0, 7)) ?? 0) + 1);\n  const busiest = [...months].sort(([a, x], [b, y]) => y - x || a.localeCompare(b))[0];\n  out.push(busiest === undefined ? \"busiest month: none\" : `busiest month: ${busiest[0]} (${plural(busiest[1])})`);\n\n  const largest = txns.filter((t) => t.amount < 0).sort((a, b) => a.amount - b.amount)[0];\n  out.push(largest === undefined ? \"largest expense: none\" : `largest expense: ${largest.memo || largest.account} ${formatCents(largest.amount)}`);\n  return out;\n}\n\n// @file main.ts\nimport * as fs from \"fs\";\nimport type { Txn } from \"./parse\";\nimport { parseRow } from \"./parse\";\nimport { report } from \"./report\";\n\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst txns: Txn[] = [];\nfor (const [i, line] of input.split(\"\\n\").entries()) {\n  const row = parseRow(line, i + 1);\n  if (typeof row === \"string\") console.log(row);\n  else txns.push(row);\n}\nfor (const line of report(txns)) console.log(line);\n",
           "tests": [
             {
               "input": "2026-01-05,checking,2500,salary\n2026-01-09,checking,-45.50,groceries\n2026-01-20,savings,500\n2026-02-01,checking,-1200,rent, February",
@@ -17866,7 +18483,53 @@
             }
           ],
           "strictness": "strict+indexed"
-        }
+        },
+        "exam_alternates": [
+          {
+            "title": "Safe matrix lookups",
+            "prompt": "The input is `r c`, then `r` rows of `c` numbers, then a line of queries `row,col`. Treat every index as possibly missing. Print the value or `(out of range)` per query, then the sum of the values that were found.",
+            "hint": "`grid[row]?.[col]` is `number | undefined` under `noUncheckedIndexedAccess` — test for `undefined`.",
+            "language": "typescript",
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst lines = input.split(\"\\n\");\nconst [r = 0] = (lines[0] ?? \"\").trim().split(/\\s+/).map(Number);\nconst grid: number[][] = [];\nfor (let i = 1; i <= r; i++) {\n  grid.push((lines[i] ?? \"\").trim().split(/\\s+/).map(Number));\n}\nlet found = 0;\nfor (const query of (lines[r + 1] ?? \"\").trim().split(/\\s+/)) {\n  const [row = -1, col = -1] = query.split(\",\").map(Number);\n  const value = grid[row]?.[col];\n  if (value === undefined) {\n    console.log(\"(out of range)\");\n  } else {\n    found += value;\n    console.log(value);\n  }\n}\nconsole.log(found);\n",
+            "tests": [
+              {
+                "input": "2 2\n1 2\n3 4\n0,0 1,1 2,0",
+                "output": "1\n4\n(out of range)\n5"
+              },
+              {
+                "input": "1 3\n5 6 7\n0,2 0,3",
+                "output": "7\n(out of range)\n7"
+              },
+              {
+                "input": "3 1\n1\n2\n3\n2,0 -1,0",
+                "output": "3\n(out of range)\n3"
+              },
+              {
+                "input": "2 3\n1 1 1\n2 2 2\n1,2 0,0 1,3",
+                "output": "2\n1\n(out of range)\n3"
+              },
+              {
+                "input": "1 1\n42\n0,0",
+                "output": "42\n42"
+              },
+              {
+                "input": "2 2\n-1 -2\n-3 -4\n1,0 0,1 5,5",
+                "output": "-3\n-2\n(out of range)\n-5"
+              },
+              {
+                "input": "3 3\n1 2 3\n4 5 6\n7 8 9\n2,2 1,1 0,0 3,3",
+                "output": "9\n5\n1\n(out of range)\n15"
+              },
+              {
+                "input": "2 2\n0 0\n0 0\n0,0 9,9 1,1",
+                "output": "0\n(out of range)\n0\n0"
+              }
+            ],
+            "strictness": "strict+indexed",
+            "visible_tests": 4
+          }
+        ]
       },
       {
         "week": 15,
@@ -18374,7 +19037,30 @@
               "output": "3"
             }
           ],
-          "strictness": "strict+indexed"
+          "strictness": "strict+indexed",
+          "types": {
+            "id": "tsm-final-w15-types",
+            "title": "Part 1 — a route table that keeps its literals",
+            "prompt": "Check `routes` against `Record<string, Route>` without losing what the object literal says: the route names must stay a union of the three keys, and each route's `method` its literal. Replace the `____` — do not annotate the variable, and do not use `as const` (the checks look at `path`, which must stay `string`).",
+            "hint": "An annotation (`: Record<string, Route>`) checks the value but forgets its keys.",
+            "hints": [
+              "An annotation (`: Record<string, Route>`) checks the value but forgets its keys.",
+              "The operator that checks without widening goes after the literal: `} satisfies …;`."
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<RouteName, \"home\" | \"login\" | \"logout\">>;\ntype _2 = Expect<Equal<(typeof routes)[\"login\"], { path: string; method: \"POST\" }>>;\ntype _3 = Expect<Equal<(typeof routes)[\"home\"][\"method\"], \"GET\">>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type Method = \"GET\" | \"POST\" | \"DELETE\";\ntype Route = { path: string; method: Method };\n\nconst routes = {\n  home: { path: \"/\", method: \"GET\" },\n  login: { path: \"/login\", method: \"POST\" },\n  logout: { path: \"/logout\", method: \"DELETE\" },\n} ____;\n\ntype RouteName = keyof typeof routes;\n",
+            "solution": "type Method = \"GET\" | \"POST\" | \"DELETE\";\ntype Route = { path: string; method: Method };\n\nconst routes = {\n  home: { path: \"/\", method: \"GET\" },\n  login: { path: \"/login\", method: \"POST\" },\n  logout: { path: \"/logout\", method: \"DELETE\" },\n} satisfies Record<string, Route>;\n\ntype RouteName = keyof typeof routes;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          "visible_tests": 4
         },
         "contest": null,
         "flashcards": [
@@ -18957,7 +19643,53 @@
             }
           ],
           "strictness": "strict+indexed"
-        }
+        },
+        "exam_alternates": [
+          {
+            "title": "Status codes with satisfies",
+            "prompt": "Declare a status table (`ok` → 200, `created` → 201, `notFound` → 404, `teapot` → 418) checked with `satisfies Record<string, number>`, and derive the name union from it. The input is `n` then `n` names. Print each code or `unknown` (inherited names like `toString` are unknown), then the names whose code is 400 or above, sorted and space-separated.",
+            "hint": "`Object.hasOwn` rejects inherited keys; a type predicate turns the string into the name union.",
+            "language": "typescript",
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst lines = input.split(\"\\n\");\nconst n = Number(lines[0]);\nconst statuses = {\n  ok: 200,\n  created: 201,\n  notFound: 404,\n  teapot: 418,\n} satisfies Record<string, number>;\ntype StatusName = keyof typeof statuses;\nfunction isStatusName(name: string): name is StatusName {\n  return Object.hasOwn(statuses, name);\n}\nfor (let i = 1; i <= n; i++) {\n  const name = (lines[i] ?? \"\").trim();\n  console.log(isStatusName(name) ? statuses[name] : \"unknown\");\n}\nconst errors = (Object.keys(statuses) as StatusName[]).filter((k) => statuses[k] >= 400).sort();\nconsole.log(errors.join(\" \"));\n",
+            "tests": [
+              {
+                "input": "2\nok\nteapot",
+                "output": "200\n418\nnotFound teapot"
+              },
+              {
+                "input": "1\nmissing",
+                "output": "unknown\nnotFound teapot"
+              },
+              {
+                "input": "3\ntoString\ncreated\nnotFound",
+                "output": "unknown\n201\n404\nnotFound teapot"
+              },
+              {
+                "input": "4\nok\nok\nok\nok",
+                "output": "200\n200\n200\n200\nnotFound teapot"
+              },
+              {
+                "input": "2\nconstructor\nteapot",
+                "output": "unknown\n418\nnotFound teapot"
+              },
+              {
+                "input": "1\nOK",
+                "output": "unknown\nnotFound teapot"
+              },
+              {
+                "input": "3\nnotFound\ncreated\nhasOwnProperty",
+                "output": "404\n201\nunknown\nnotFound teapot"
+              },
+              {
+                "input": "2\n \nok",
+                "output": "unknown\n200\nnotFound teapot"
+              }
+            ],
+            "strictness": "strict+indexed",
+            "visible_tests": 4
+          }
+        ]
       },
       {
         "week": 16,
@@ -19464,7 +20196,30 @@
               "output": "99999\n999.99"
             }
           ],
-          "strictness": "strict+indexed"
+          "strictness": "strict+indexed",
+          "types": {
+            "id": "tsm-final-w16-types",
+            "title": "Part 1 — a reusable brand",
+            "prompt": "Write `Brand<T, B>`: a `T` that carries the tag `B` in a property keyed by the `unique symbol` `brand`, so that a plain `number` is not a `UserId`, a `UserId` is not an `OrderId`, and both are still usable as numbers.",
+            "hint": "A brand is an intersection: the base type `&` an object type nobody else can produce.",
+            "hints": [
+              "A brand is an intersection: the base type `&` an object type nobody else can produce.",
+              "`T & { readonly [brand]: B }` — the computed key uses the `unique symbol` declared above."
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ndeclare const u: UserId;\ndeclare const o: OrderId;\nconst asNumber: number = u;\ntype _1 = Expect<Equal<[UserId] extends [never] ? true : false, false>>;\ntype _2 = Expect<Equal<UserId extends number ? true : false, true>>;\n// @ts-expect-error — a plain number is not a UserId\nconst fromNumber: UserId = 42;\n// @ts-expect-error — an OrderId is not a UserId\nconst mixedUp: UserId = o;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "declare const brand: unique symbol;\ntype Brand<T, B extends string> = ____;\n\ntype UserId = Brand<number, \"UserId\">;\ntype OrderId = Brand<number, \"OrderId\">;\n",
+            "solution": "declare const brand: unique symbol;\ntype Brand<T, B extends string> = T & { readonly [brand]: B };\n\ntype UserId = Brand<number, \"UserId\">;\ntype OrderId = Brand<number, \"OrderId\">;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          "visible_tests": 4
         },
         "contest": null,
         "flashcards": [
@@ -20032,7 +20787,53 @@
             }
           ],
           "strictness": "strict+indexed"
-        }
+        },
+        "exam_alternates": [
+          {
+            "title": "Branded temperatures",
+            "prompt": "Brand `Kelvin` and `Celsius`. The input is `n` then `n` readings in kelvin. Only a validating constructor may produce a `Kelvin` (a finite number, not below 0); print `invalid` for any other line. Convert each valid reading to `Celsius` (K − 273.15) and print it to 2 decimal places; then print the mean Celsius of the valid readings to 2 places, or `none`.",
+            "hint": "The constructor returns `Kelvin | null`; nothing else may assert a number into a brand.",
+            "language": "typescript",
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst lines = input.split(\"\\n\");\nconst n = Number(lines[0]);\ndeclare const brand: unique symbol;\ntype Kelvin = number & { readonly [brand]: \"Kelvin\" };\ntype Celsius = number & { readonly [brand]: \"Celsius\" };\nfunction toKelvin(raw: number): Kelvin | null {\n  return Number.isFinite(raw) && raw >= 0 ? (raw as Kelvin) : null;\n}\nfunction toCelsius(k: Kelvin): Celsius {\n  return (k - 273.15) as Celsius;\n}\nconst readings: Celsius[] = [];\nfor (let i = 1; i <= n; i++) {\n  const text = (lines[i] ?? \"\").trim();\n  const k = text === \"\" ? null : toKelvin(Number(text));\n  if (k === null) {\n    console.log(\"invalid\");\n    continue;\n  }\n  const c = toCelsius(k);\n  readings.push(c);\n  console.log(c.toFixed(2));\n}\nconst mean = readings.reduce((sum, c) => sum + c, 0) / readings.length;\nconsole.log(readings.length === 0 ? \"none\" : mean.toFixed(2));\n",
+            "tests": [
+              {
+                "input": "2\n273.15\n300",
+                "output": "0.00\n26.85\n13.43"
+              },
+              {
+                "input": "1\n-1",
+                "output": "invalid\nnone"
+              },
+              {
+                "input": "3\n0\nabc\n373.15",
+                "output": "-273.15\ninvalid\n100.00\n-86.57"
+              },
+              {
+                "input": "1\nhot",
+                "output": "invalid\nnone"
+              },
+              {
+                "input": "2\n310.15\n310.15",
+                "output": "37.00\n37.00\n37.00"
+              },
+              {
+                "input": "4\n1000\n-5\n250\n",
+                "output": "726.85\ninvalid\n-23.15\ninvalid\n351.85"
+              },
+              {
+                "input": "1\n273.15",
+                "output": "0.00\n0.00"
+              },
+              {
+                "input": "3\n5\n10\n15",
+                "output": "-268.15\n-263.15\n-258.15\n-263.15"
+              }
+            ],
+            "strictness": "strict+indexed",
+            "visible_tests": 4
+          }
+        ]
       },
       {
         "week": 17,
@@ -20503,47 +21304,74 @@
         ],
         "quiz_sample": 8,
         "exam": {
-          "title": "Merge intervals",
-          "prompt": "The input is `n` then `n` lines of `start end`. Merge every overlapping or touching interval and print the merged ones as `start end`, one per line sorted by start, then how many intervals were absorbed (input count minus output count).",
-          "hint": "Sort by start, then either extend the last merged interval or push a copy of the current one.",
+          "title": "Typed patch API",
+          "prompt": "Tasks are `id|title|done|tags` lines (`done` is `true`/`false`, tags comma-separated, possibly empty) after a count `n`; then a count `m` and `m` patches `id;key=value;key=value…`. A patch may set `title` (non-empty, trimmed), `done` (`true`/`false` only) and `tags` (comma-separated; empty clears them). It may never touch `id`, and an unknown key rejects it. A patch applies completely or not at all. Print `#<id>: updated <keys>` (the keys comma-joined in the order given, `nothing` for none), `#<id>: rejected, <reason>` (`id cannot change`, `unknown field <key>`, `title cannot be empty`, `done must be true or false`), or `#<id>: no such task`. Then every task by id as `id | title | done-or-open | tags-or--`. Type the patch as a utility type of `Task`, and parse it into a `Result`.",
+          "hint": "`Partial<Omit<Task, \"id\">>` is the patch. Build it field by field into a `Result`, and only apply it once every field has parsed.",
           "language": "typescript",
           "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
-          "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst lines = input.split(\"\\n\");\nconst n = Number(lines[0]);\ntype Interval = { start: number; end: number };\nconst intervals: Interval[] = [];\nfor (let i = 1; i <= n; i++) {\n  const [start = 0, end = 0] = (lines[i] ?? \"\").trim().split(/\\s+/).map(Number);\n  intervals.push({ start, end });\n}\nintervals.sort((a, b) => a.start - b.start);\nconst merged: Interval[] = [];\nfor (const current of intervals) {\n  const last = merged[merged.length - 1];\n  if (last !== undefined && current.start <= last.end) {\n    last.end = Math.max(last.end, current.end);\n  } else {\n    merged.push({ ...current });\n  }\n}\nfor (const iv of merged) console.log(iv.start + \" \" + iv.end);\nconsole.log(n - merged.length);\n",
+          "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Task = { id: number; title: string; done: boolean; tags: readonly string[] };\ntype Patch = Partial<Omit<Task, \"id\">>;\ntype Result<T> = { ok: true; value: T } | { ok: false; error: string };\n\nconst lines = input.split(\"\\n\");\nconst n = Number(lines[0]);\nconst tasks = new Map<number, Task>();\nfor (let i = 1; i <= n; i++) {\n  const [id = \"\", title = \"\", done = \"\", tags = \"\"] = (lines[i] ?? \"\").split(\"|\");\n  tasks.set(Number(id), { id: Number(id), title, done: done === \"true\", tags: tags ? tags.split(\",\") : [] });\n}\n\nfunction parsePatch(fields: readonly string[]): Result<Patch> {\n  const patch: Patch = {};\n  for (const field of fields) {\n    const eq = field.indexOf(\"=\");\n    const key = eq < 0 ? field : field.slice(0, eq);\n    const value = eq < 0 ? \"\" : field.slice(eq + 1);\n    switch (key) {\n      case \"title\":\n        if (value.trim() === \"\") return { ok: false, error: \"title cannot be empty\" };\n        patch.title = value.trim();\n        break;\n      case \"done\":\n        if (value !== \"true\" && value !== \"false\") return { ok: false, error: \"done must be true or false\" };\n        patch.done = value === \"true\";\n        break;\n      case \"tags\":\n        patch.tags = value ? value.split(\",\") : [];\n        break;\n      case \"id\":\n        return { ok: false, error: \"id cannot change\" };\n      default:\n        return { ok: false, error: `unknown field ${key}` };\n    }\n  }\n  return { ok: true, value: patch };\n}\n\nfunction apply(task: Task, patch: Patch): Task {\n  return { ...task, ...patch };\n}\n\nconst m = Number(lines[n + 1] ?? \"0\");\nfor (let j = 0; j < m; j++) {\n  const [idText = \"\", ...fields] = (lines[n + 2 + j] ?? \"\").split(\";\");\n  const task = tasks.get(Number(idText));\n  if (task === undefined) {\n    console.log(`#${idText}: no such task`);\n    continue;\n  }\n  const parsed = parsePatch(fields);\n  if (!parsed.ok) {\n    console.log(`#${task.id}: rejected, ${parsed.error}`);\n    continue;\n  }\n  tasks.set(task.id, apply(task, parsed.value));\n  console.log(`#${task.id}: updated ${Object.keys(parsed.value).join(\",\") || \"nothing\"}`);\n}\nfor (const t of [...tasks.values()].sort((a, b) => a.id - b.id)) {\n  console.log(`${t.id} | ${t.title} | ${t.done ? \"done\" : \"open\"} | ${t.tags.join(\",\") || \"-\"}`);\n}\n",
           "tests": [
             {
-              "input": "4\n1 3\n2 6\n8 10\n15 18",
-              "output": "1 6\n8 10\n15 18\n1"
+              "input": "3\n1|Write report|false|work,urgent\n2|Buy milk|false|home\n3|Call bank|true|\n4\n1;done=true;title=Write the report\n2;id=5\n4;done=true\n3;tags=money,phone",
+              "output": "#1: updated done,title\n#2: rejected, id cannot change\n#4: no such task\n#3: updated tags\n1 | Write the report | done | work,urgent\n2 | Buy milk | open | home\n3 | Call bank | done | money,phone"
             },
             {
-              "input": "2\n1 4\n4 5",
-              "output": "1 5\n1"
+              "input": "3\n1|Write report|false|work,urgent\n2|Buy milk|false|home\n3|Call bank|true|\n2\n1;done=yes\n2;title=  Buy oat milk  ",
+              "output": "#1: rejected, done must be true or false\n#2: updated title\n1 | Write report | open | work,urgent\n2 | Buy oat milk | open | home\n3 | Call bank | done | -"
             },
             {
-              "input": "1\n5 7",
-              "output": "5 7\n0"
+              "input": "3\n1|Write report|false|work,urgent\n2|Buy milk|false|home\n3|Call bank|true|\n2\n1;priority=high\n1;tags=",
+              "output": "#1: rejected, unknown field priority\n#1: updated tags\n1 | Write report | open | -\n2 | Buy milk | open | home\n3 | Call bank | done | -"
             },
             {
-              "input": "3\n1 10\n2 3\n4 5",
-              "output": "1 10\n2"
+              "input": "3\n1|Write report|false|work,urgent\n2|Buy milk|false|home\n3|Call bank|true|\n1\n2;title=   ",
+              "output": "#2: rejected, title cannot be empty\n1 | Write report | open | work,urgent\n2 | Buy milk | open | home\n3 | Call bank | done | -"
             },
             {
-              "input": "3\n8 10\n1 3\n2 6",
-              "output": "1 6\n8 10\n1"
+              "input": "3\n1|Write report|false|work,urgent\n2|Buy milk|false|home\n3|Call bank|true|\n0",
+              "output": "1 | Write report | open | work,urgent\n2 | Buy milk | open | home\n3 | Call bank | done | -"
             },
             {
-              "input": "2\n1 2\n3 4",
-              "output": "1 2\n3 4\n0"
+              "input": "3\n1|Write report|false|work,urgent\n2|Buy milk|false|home\n3|Call bank|true|\n2\n2\n3;done=false;done=true",
+              "output": "#2: updated nothing\n#3: updated done\n1 | Write report | open | work,urgent\n2 | Buy milk | open | home\n3 | Call bank | done | -"
             },
             {
-              "input": "3\n1 5\n1 5\n1 5",
-              "output": "1 5\n2"
+              "input": "2\n9|Plan trip|false|travel\n4|Pay rent|false|home,money\n3\n4;done=true\n4;title=Pay March rent;tags=money\n9;title=Plan the trip;id=9",
+              "output": "#4: updated done\n#4: updated title,tags\n#9: rejected, id cannot change\n4 | Pay March rent | done | money\n9 | Plan trip | open | travel"
             },
             {
-              "input": "4\n5 6\n1 2\n2 3\n6 7",
-              "output": "1 3\n5 7\n2"
+              "input": "1\n1|Solo|false|\n3\n1;tags=a,b,c\n1;title=Solo task;done=true\n7;title=Ghost",
+              "output": "#1: updated tags\n#1: updated title,done\n#7: no such task\n1 | Solo task | done | a,b,c"
+            },
+            {
+              "input": "3\n1|Write report|false|work,urgent\n2|Buy milk|false|home\n3|Call bank|true|\n1\n1;title=Report;done=true;id=2",
+              "output": "#1: rejected, id cannot change\n1 | Write report | open | work,urgent\n2 | Buy milk | open | home\n3 | Call bank | done | -"
             }
           ],
-          "strictness": "strict+indexed"
+          "strictness": "strict+indexed",
+          "types": {
+            "id": "tsm-final-w17-types",
+            "title": "Part 1 — make some keys required",
+            "prompt": "Write `WithRequired<T, K>`: `T` with the keys in `K` made required (and no longer `undefined`), every other property exactly as it was. `K` must be a key of `T`. Compose it from utility types.",
+            "hint": "Split `T` in two: the keys you are changing, and the rest.",
+            "hints": [
+              "Split `T` in two: the keys you are changing, and the rest.",
+              "`Omit<T, K>` keeps the rest untouched; `Required<Pick<T, K>>` makes the chosen ones required. Intersect them."
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype Simplify<T> = { [K in keyof T]: T[K] } & {};\n\ntype Task = { id: number; title?: string; done?: boolean; tags?: string[] };\ntype _1 = Expect<Equal<Simplify<WithRequired<Task, \"title\">>, { id: number; title: string; done?: boolean; tags?: string[] }>>;\ntype _2 = Expect<Equal<Simplify<WithRequired<Task, \"done\" | \"tags\">>, { id: number; title?: string; done: boolean; tags: string[] }>>;\ntype _3 = Expect<Equal<Simplify<WithRequired<Task, \"id\">>, Task>>;\n// @ts-expect-error — K must be a key of T\ntype _4 = WithRequired<Task, \"owner\">;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type WithRequired<T, K extends keyof T> = ____;\n",
+            "solution": "type WithRequired<T, K extends keyof T> = Omit<T, K> & Required<Pick<T, K>>;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          "visible_tests": 4
         },
         "contest": {
           "title": "Checkpoint — Month 4: rigor",
@@ -21112,6 +21940,60 @@
             "tests": [],
             "source_slug": "",
             "dataset": ""
+          },
+          {
+            "id": "tsm-w17-former-final",
+            "title": "Applied: Merge intervals",
+            "prompt": "The input is `n` then `n` lines of `start end`. Merge every overlapping or touching interval and print the merged ones as `start end`, one per line sorted by start, then how many intervals were absorbed (input count minus output count).",
+            "hint": "Sort by start, then either extend the last merged interval or push a copy of the current one.",
+            "hints": [
+              "Sort by start, then either extend the last merged interval or push a copy of the current one."
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst lines = input.split(\"\\n\");\nconst n = Number(lines[0]);\ntype Interval = { start: number; end: number };\nconst intervals: Interval[] = [];\nfor (let i = 1; i <= n; i++) {\n  const [start = 0, end = 0] = (lines[i] ?? \"\").trim().split(/\\s+/).map(Number);\n  intervals.push({ start, end });\n}\nintervals.sort((a, b) => a.start - b.start);\nconst merged: Interval[] = [];\nfor (const current of intervals) {\n  const last = merged[merged.length - 1];\n  if (last !== undefined && current.start <= last.end) {\n    last.end = Math.max(last.end, current.end);\n  } else {\n    merged.push({ ...current });\n  }\n}\nfor (const iv of merged) console.log(iv.start + \" \" + iv.end);\nconsole.log(n - merged.length);\n",
+            "tests": [
+              {
+                "input": "4\n1 3\n2 6\n8 10\n15 18",
+                "output": "1 6\n8 10\n15 18\n1"
+              },
+              {
+                "input": "2\n1 4\n4 5",
+                "output": "1 5\n1"
+              },
+              {
+                "input": "1\n5 7",
+                "output": "5 7\n0"
+              },
+              {
+                "input": "3\n1 10\n2 3\n4 5",
+                "output": "1 10\n2"
+              },
+              {
+                "input": "3\n8 10\n1 3\n2 6",
+                "output": "1 6\n8 10\n1"
+              },
+              {
+                "input": "2\n1 2\n3 4",
+                "output": "1 2\n3 4\n0"
+              },
+              {
+                "input": "3\n1 5\n1 5\n1 5",
+                "output": "1 5\n2"
+              },
+              {
+                "input": "4\n5 6\n1 2\n2 3\n6 7",
+                "output": "1 3\n5 7\n2"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
           }
         ],
         "project_spec": {
@@ -21161,7 +22043,53 @@
             }
           ],
           "strictness": "strict+indexed"
-        }
+        },
+        "exam_alternates": [
+          {
+            "title": "A user directory with Pick and Omit",
+            "prompt": "Users are `id|name|email|password` lines after a count `n`; then `m` queries `public <id>` (the user without `password`), `card <id>` (only `name` and `email`) or anything else. Print a public view or a card as JSON — keys in the order the type lists them — `no such user <id>`, or `bad query`. Type the views with `Omit` and `Pick`, and make sure the password really is absent at runtime. Finally print how many public views were served.",
+            "hint": "`Omit` changes only the type; a rest destructure (`{ password, ...rest }`) removes the key at runtime.",
+            "language": "typescript",
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst lines = input.split(\"\\n\");\nconst n = Number(lines[0]);\ntype User = { id: number; name: string; email: string; password: string };\ntype PublicUser = Omit<User, \"password\">;\ntype Card = Pick<User, \"name\" | \"email\">;\nconst users = new Map<number, User>();\nfor (let i = 1; i <= n; i++) {\n  const [id = \"\", name = \"\", email = \"\", password = \"\"] = (lines[i] ?? \"\").split(\"|\");\n  users.set(Number(id), { id: Number(id), name, email, password });\n}\nfunction publicView({ password: _secret, ...rest }: User): PublicUser {\n  return rest;\n}\nfunction card(user: User): Card {\n  return { name: user.name, email: user.email };\n}\nconst m = Number(lines[n + 1] ?? \"0\");\nlet served = 0;\nfor (let j = 0; j < m; j++) {\n  const [kind = \"\", idText = \"\"] = (lines[n + 2 + j] ?? \"\").trim().split(/\\s+/);\n  if (kind !== \"public\" && kind !== \"card\") {\n    console.log(\"bad query\");\n    continue;\n  }\n  const user = users.get(Number(idText));\n  if (user === undefined) {\n    console.log(\"no such user \" + idText);\n  } else if (kind === \"public\") {\n    served++;\n    console.log(JSON.stringify(publicView(user)));\n  } else {\n    console.log(JSON.stringify(card(user)));\n  }\n}\nconsole.log(served);\n",
+            "tests": [
+              {
+                "input": "2\n1|Ada|ada@x.io|pw1\n2|Alan|alan@x.io|pw2\n3\npublic 1\ncard 2\npublic 3",
+                "output": "{\"id\":1,\"name\":\"Ada\",\"email\":\"ada@x.io\"}\n{\"name\":\"Alan\",\"email\":\"alan@x.io\"}\nno such user 3\n1"
+              },
+              {
+                "input": "1\n7|Grace|g@x.io|s3cret\n2\npublic 7\npublic 7",
+                "output": "{\"id\":7,\"name\":\"Grace\",\"email\":\"g@x.io\"}\n{\"id\":7,\"name\":\"Grace\",\"email\":\"g@x.io\"}\n2"
+              },
+              {
+                "input": "1\n1|A|a@x.io|p\n2\ndelete 1\ncard 1",
+                "output": "bad query\n{\"name\":\"A\",\"email\":\"a@x.io\"}\n0"
+              },
+              {
+                "input": "1\n5|Bo|bo@x.io|x\n0",
+                "output": "0"
+              },
+              {
+                "input": "2\n3|Cy|cy@x.io|a\n4|Di|di@x.io|b\n3\ncard 4\ncard 3\npublic 4",
+                "output": "{\"name\":\"Di\",\"email\":\"di@x.io\"}\n{\"name\":\"Cy\",\"email\":\"cy@x.io\"}\n{\"id\":4,\"name\":\"Di\",\"email\":\"di@x.io\"}\n1"
+              },
+              {
+                "input": "1\n9|Ed|ed@x.io|z\n1\ncard 10",
+                "output": "no such user 10\n0"
+              },
+              {
+                "input": "3\n1|a|a@a|1\n2|b|b@b|2\n3|c|c@c|3\n3\npublic 3\npublic 2\npublic 1",
+                "output": "{\"id\":3,\"name\":\"c\",\"email\":\"c@c\"}\n{\"id\":2,\"name\":\"b\",\"email\":\"b@b\"}\n{\"id\":1,\"name\":\"a\",\"email\":\"a@a\"}\n3"
+              },
+              {
+                "input": "1\n2|Fay|fay@x.io|q\n2\n  public 2  \nshow 2",
+                "output": "{\"id\":2,\"name\":\"Fay\",\"email\":\"fay@x.io\"}\nbad query\n1"
+              }
+            ],
+            "strictness": "strict+indexed",
+            "visible_tests": 4
+          }
+        ]
       },
       {
         "week": 18,
@@ -21672,7 +22600,30 @@
               "output": "m: 1 2 3\n1"
             }
           ],
-          "strictness": "strict+indexed"
+          "strictness": "strict+indexed",
+          "types": {
+            "id": "tsm-final-w18-types",
+            "title": "Part 1 — type the signature of groupBy",
+            "prompt": "Write the type parameters and signature of `groupBy`: it takes a readonly array of `T` and a function from `T` to a key `K` (any property key), and returns `Partial<Record<K, T[]>>` — partial because a key may have no items. The key type must be inferred from the key function.",
+            "hint": "Two type parameters: the item type, and the key type — constrained so it can index a record.",
+            "hints": [
+              "Two type parameters: the item type, and the key type — constrained so it can index a record.",
+              "`K extends PropertyKey`, and the key function has type `(item: T) => K` so `K` is inferred from what it returns."
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype User = { name: string; role: \"admin\" | \"member\" };\ndeclare const users: User[];\nconst byRole = groupBy(users, (u) => u.role);\ntype _1 = Expect<Equal<typeof byRole, Partial<Record<\"admin\" | \"member\", User[]>>>>;\nconst byLength = groupBy([\"a\", \"bb\", \"cc\"], (s) => s.length);\ntype _2 = Expect<Equal<typeof byLength, Partial<Record<number, string[]>>>>;\n// @ts-expect-error — a key must be a string, number or symbol\ngroupBy(users, (u) => ({ name: u.name }));\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "declare function groupBy____;\n",
+            "solution": "declare function groupBy<T, K extends PropertyKey>(items: readonly T[], keyOf: (item: T) => K): Partial<Record<K, T[]>>;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          "visible_tests": 4
         },
         "contest": null,
         "flashcards": [
@@ -22303,7 +23254,53 @@
             }
           ],
           "strictness": "strict+indexed"
-        }
+        },
+        "exam_alternates": [
+          {
+            "title": "Generic partition and top-k",
+            "prompt": "Write generic `partition<T>(items, keep)` returning `[kept, rest]` and `topBy<T>(items, k, score, tie)`. The input is `n` then `n` lines `name score`. Print the names scoring 50 or more in input order (or `(none)`), then the others (or `(none)`), then the top two by score as `name:score` space-separated, ties broken by name.",
+            "hint": "`partition` returns a tuple type `[T[], T[]]`; `topBy` sorts a copy with a score function.",
+            "language": "typescript",
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst lines = input.split(\"\\n\");\nconst n = Number(lines[0]);\ntype Entry = { name: string; score: number };\nfunction partition<T>(items: readonly T[], keep: (item: T) => boolean): [T[], T[]] {\n  const kept: T[] = [];\n  const rest: T[] = [];\n  for (const item of items) (keep(item) ? kept : rest).push(item);\n  return [kept, rest];\n}\nfunction topBy<T>(items: readonly T[], k: number, score: (item: T) => number, tie: (a: T, b: T) => number): T[] {\n  return [...items].sort((a, b) => score(b) - score(a) || tie(a, b)).slice(0, k);\n}\nconst entries: Entry[] = [];\nfor (let i = 1; i <= n; i++) {\n  const [name = \"\", score = \"0\"] = (lines[i] ?? \"\").trim().split(/\\s+/);\n  entries.push({ name, score: Number(score) });\n}\nconst [pass, fail] = partition(entries, (e) => e.score >= 50);\nconsole.log(pass.map((e) => e.name).join(\" \") || \"(none)\");\nconsole.log(fail.map((e) => e.name).join(\" \") || \"(none)\");\nconst top = topBy(entries, 2, (e) => e.score, (a, b) => a.name.localeCompare(b.name));\nconsole.log(top.map((e) => e.name + \":\" + e.score).join(\" \"));\n",
+            "tests": [
+              {
+                "input": "3\nann 70\nbob 40\ncat 90",
+                "output": "ann cat\nbob\ncat:90 ann:70"
+              },
+              {
+                "input": "1\nsolo 50",
+                "output": "solo\n(none)\nsolo:50"
+              },
+              {
+                "input": "2\nx 10\ny 20",
+                "output": "(none)\nx y\ny:20 x:10"
+              },
+              {
+                "input": "4\na 80\nb 80\nc 80\nd 10",
+                "output": "a b c\nd\na:80 b:80"
+              },
+              {
+                "input": "3\nzed 99\namy 99\nbo 1",
+                "output": "zed amy\nbo\namy:99 zed:99"
+              },
+              {
+                "input": "2\nlow 0\nhigh 100",
+                "output": "high\nlow\nhigh:100 low:0"
+              },
+              {
+                "input": "5\nq 55\nr 45\ns 65\nt 35\nu 75",
+                "output": "q s u\nr t\nu:75 s:65"
+              },
+              {
+                "input": "1\nnobody 49",
+                "output": "(none)\nnobody\nnobody:49"
+              }
+            ],
+            "strictness": "strict+indexed",
+            "visible_tests": 4
+          }
+        ]
       },
       {
         "week": 19,
@@ -22809,7 +23806,30 @@
               "output": "wrap"
             }
           ],
-          "strictness": "strict+indexed"
+          "strictness": "strict+indexed",
+          "types": {
+            "id": "tsm-final-w19-types",
+            "title": "Part 1 — a two-level lookup type",
+            "prompt": "Write `Get<T, A, B>`: the type of `obj[a][b]` for `obj: T`. `A` must be a key of `T`, and `B` a key of `T[A]` — so a key from the wrong section is rejected.",
+            "hint": "Each type parameter is constrained by the one before it.",
+            "hints": [
+              "Each type parameter is constrained by the one before it.",
+              "`A extends keyof T`, `B extends keyof T[A]`, and the result is the indexed access `T[A][B]`."
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\nconst config = { server: { port: 8080, host: \"localhost\" }, flags: { beta: true } };\ntype Config = typeof config;\ntype _1 = Expect<Equal<Get<Config, \"server\", \"port\">, number>>;\ntype _2 = Expect<Equal<Get<Config, \"flags\", \"beta\">, boolean>>;\ntype _3 = Expect<Equal<Get<Config, \"server\", \"port\" | \"host\">, number | string>>;\n// @ts-expect-error — \"beta\" is not a key of the server section\ntype _4 = Get<Config, \"server\", \"beta\">;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type Get____;\n",
+            "solution": "type Get<T, A extends keyof T, B extends keyof T[A]> = T[A][B];\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          "visible_tests": 4
         },
         "contest": null,
         "flashcards": [
@@ -23346,7 +24366,53 @@
             }
           ],
           "strictness": "strict+indexed"
-        }
+        },
+        "exam_alternates": [
+          {
+            "title": "Theme tokens from one source of truth",
+            "prompt": "Declare defaults `primary: \"#3366ff\"`, `radius: 4`, `dark: false`, and derive the token names with `keyof typeof`. The input is `n` then `n` overrides `key=value`. An override applies only if the key is a token (not an inherited name) and the value parses to the default's runtime type (a number for `radius`, `true`/`false` for `dark`, any text for `primary`). Print `set <key>`, `unknown <key>` or `bad value <key>` per line, then every token as `key=value` sorted by key.",
+            "hint": "`Object.hasOwn` plus a type predicate narrows a string to a token name; each branch knows its value type.",
+            "language": "typescript",
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst lines = input.split(\"\\n\");\nconst n = Number(lines[0]);\nconst defaults = { primary: \"#3366ff\", radius: 4, dark: false };\ntype Tokens = typeof defaults;\ntype Token = keyof Tokens;\nconst tokens: Tokens = { ...defaults };\nfunction isToken(key: string): key is Token {\n  return Object.hasOwn(defaults, key);\n}\nfor (let i = 1; i <= n; i++) {\n  const line = (lines[i] ?? \"\").trim();\n  const eq = line.indexOf(\"=\");\n  const key = eq < 0 ? line : line.slice(0, eq);\n  const raw = eq < 0 ? \"\" : line.slice(eq + 1);\n  if (!isToken(key)) {\n    console.log(\"unknown \" + key);\n    continue;\n  }\n  if (key === \"radius\") {\n    const num = Number(raw);\n    if (raw === \"\" || !Number.isFinite(num)) {\n      console.log(\"bad value \" + key);\n      continue;\n    }\n    tokens.radius = num;\n  } else if (key === \"dark\") {\n    if (raw !== \"true\" && raw !== \"false\") {\n      console.log(\"bad value \" + key);\n      continue;\n    }\n    tokens.dark = raw === \"true\";\n  } else {\n    tokens.primary = raw;\n  }\n  console.log(\"set \" + key);\n}\nfor (const key of (Object.keys(tokens) as Token[]).sort()) {\n  console.log(key + \"=\" + String(tokens[key]));\n}\n",
+            "tests": [
+              {
+                "input": "2\nradius=8\ndark=true",
+                "output": "set radius\nset dark\ndark=true\nprimary=#3366ff\nradius=8"
+              },
+              {
+                "input": "1\ncolor=red",
+                "output": "unknown color\ndark=false\nprimary=#3366ff\nradius=4"
+              },
+              {
+                "input": "2\nradius=big\ndark=yes",
+                "output": "bad value radius\nbad value dark\ndark=false\nprimary=#3366ff\nradius=4"
+              },
+              {
+                "input": "1\ntoString=x",
+                "output": "unknown toString\ndark=false\nprimary=#3366ff\nradius=4"
+              },
+              {
+                "input": "3\nprimary=#000\nprimary=#fff\nradius=0",
+                "output": "set primary\nset primary\nset radius\ndark=false\nprimary=#fff\nradius=0"
+              },
+              {
+                "input": "0",
+                "output": "dark=false\nprimary=#3366ff\nradius=4"
+              },
+              {
+                "input": "2\ndark=false\nradius=-2",
+                "output": "set dark\nset radius\ndark=false\nprimary=#3366ff\nradius=-2"
+              },
+              {
+                "input": "1\nradius=",
+                "output": "bad value radius\ndark=false\nprimary=#3366ff\nradius=4"
+              }
+            ],
+            "strictness": "strict+indexed",
+            "visible_tests": 4
+          }
+        ]
       },
       {
         "week": 20,
@@ -23852,7 +24918,30 @@
               "output": "two words\n5\ngetName,getSize"
             }
           ],
-          "strictness": "strict+indexed"
+          "strictness": "strict+indexed",
+          "types": {
+            "id": "tsm-final-w20-types",
+            "title": "Part 1 — a validator for every field",
+            "prompt": "Write `Validators<T>`: for every property of `T` — optional ones included — a type guard `(value: unknown) => value is …` for that property's type. An optional property's guard accepts `undefined` too, and every validator is required.",
+            "hint": "A homomorphic mapped type over `keyof T` keeps `readonly` — and `?`, unless you remove it.",
+            "hints": [
+              "A homomorphic mapped type over `keyof T` keeps `readonly` — and `?`, unless you remove it.",
+              "`-?` removes the optionality; `T[K]` of an optional property already includes `undefined`."
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<Validators<{ name: string; age: number }>, {\n  name: (value: unknown) => value is string;\n  age: (value: unknown) => value is number;\n}>>;\ntype _2 = Expect<Equal<Validators<{ nick?: string }>, { nick: (value: unknown) => value is string | undefined }>>;\ntype _3 = Expect<Equal<Validators<{ readonly id: number }>, { readonly id: (value: unknown) => value is number }>>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type Validators<T> = ____;\n",
+            "solution": "type Validators<T> = { [K in keyof T]-?: (value: unknown) => value is T[K] };\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          "visible_tests": 4
         },
         "contest": null,
         "flashcards": [
@@ -24381,7 +25470,53 @@
             }
           ],
           "strictness": "strict+indexed"
-        }
+        },
+        "exam_alternates": [
+          {
+            "title": "Which fields changed",
+            "prompt": "`Changes<T>` maps every key of `T` to `boolean`. The input is two JSON objects on two lines with the same keys (values are strings, numbers or booleans). Build the `Changes` record at runtime and print `key: changed` or `key: same` for every key in sorted order, then how many changed.",
+            "hint": "A mapped type over `keyof T` gives the shape; build it key by key, comparing with `!==`.",
+            "language": "typescript",
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst [beforeText = \"{}\", afterText = \"{}\"] = input.split(\"\\n\");\ntype Changes<T> = { [K in keyof T]: boolean };\ntype Flat = Record<string, string | number | boolean>;\nfunction diff<T extends Flat>(before: T, after: T): Changes<T> {\n  const out = {} as Changes<T>;\n  for (const key of Object.keys(before) as (keyof T)[]) {\n    out[key] = before[key] !== after[key];\n  }\n  return out;\n}\nconst changes = diff(JSON.parse(beforeText) as Flat, JSON.parse(afterText) as Flat);\nlet changed = 0;\nfor (const key of Object.keys(changes).sort()) {\n  const flag = changes[key];\n  if (flag) changed++;\n  console.log(key + \": \" + (flag ? \"changed\" : \"same\"));\n}\nconsole.log(changed);\n",
+            "tests": [
+              {
+                "input": "{\"a\":1,\"b\":2}\n{\"a\":1,\"b\":3}",
+                "output": "a: same\nb: changed\n1"
+              },
+              {
+                "input": "{\"name\":\"x\"}\n{\"name\":\"x\"}",
+                "output": "name: same\n0"
+              },
+              {
+                "input": "{\"on\":true,\"n\":0}\n{\"on\":false,\"n\":0}",
+                "output": "n: same\non: changed\n1"
+              },
+              {
+                "input": "{\"z\":\"1\",\"y\":1}\n{\"z\":1,\"y\":\"1\"}",
+                "output": "y: changed\nz: changed\n2"
+              },
+              {
+                "input": "{\"k\":\"v\",\"m\":\"w\",\"l\":\"u\"}\n{\"k\":\"V\",\"m\":\"w\",\"l\":\"U\"}",
+                "output": "k: changed\nl: changed\nm: same\n2"
+              },
+              {
+                "input": "{\"only\":0}\n{\"only\":1}",
+                "output": "only: changed\n1"
+              },
+              {
+                "input": "{\"a\":true,\"b\":true}\n{\"a\":true,\"b\":true}",
+                "output": "a: same\nb: same\n0"
+              },
+              {
+                "input": "{\"q\":1.5,\"r\":2}\n{\"q\":1.5,\"r\":2.5}",
+                "output": "q: same\nr: changed\n1"
+              }
+            ],
+            "strictness": "strict+indexed",
+            "visible_tests": 4
+          }
+        ]
       },
       {
         "week": 21,
@@ -24887,7 +26022,30 @@
               "output": "p\np q r\n1"
             }
           ],
-          "strictness": "strict+indexed"
+          "strictness": "strict+indexed",
+          "types": {
+            "id": "tsm-final-w21-types",
+            "title": "Part 1 — resolve a function or a promise",
+            "prompt": "Write `Resolved<T>`: if `T` is a function, its return type; otherwise if it is a `Promise`, the value it resolves to (one level); otherwise `T` itself. It must distribute over unions.",
+            "hint": "Two conditional types, the second in the false branch of the first.",
+            "hints": [
+              "Two conditional types, the second in the false branch of the first.",
+              "`T extends (...args: never[]) => infer R ? R : T extends Promise<infer V> ? V : T` — a naked `T` distributes."
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<Resolved<() => number>, number>>;\ntype _2 = Expect<Equal<Resolved<(a: string, b: boolean) => string[]>, string[]>>;\ntype _3 = Expect<Equal<Resolved<Promise<string>>, string>>;\ntype _4 = Expect<Equal<Resolved<boolean>, boolean>>;\ntype _5 = Expect<Equal<Resolved<Date | (() => 1)>, Date | 1>>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type Resolved<T> = ____;\n",
+            "solution": "type Resolved<T> = T extends (...args: never[]) => infer R ? R : T extends Promise<infer V> ? V : T;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          "visible_tests": 4
         },
         "contest": null,
         "flashcards": [
@@ -25452,7 +26610,53 @@
             }
           ],
           "strictness": "strict+indexed"
-        }
+        },
+        "exam_alternates": [
+          {
+            "title": "Flatten and drop the gaps",
+            "prompt": "Write `Flat<T>` (the element type of an array, else `T`) and use `Exclude` to drop `null`. The input is a JSON array whose items are numbers, `null`, or arrays of numbers and `null` (one level deep). Flatten it one level, drop the nulls, and print the first value (or `(none)`), the values space-separated (or `(none)`), and their sum.",
+            "hint": "`T extends readonly (infer U)[] ? U : T`; a type predicate on `filter` narrows away `null`.",
+            "language": "typescript",
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Flat<T> = T extends readonly (infer U)[] ? U : T;\ntype Item = number | null | (number | null)[];\nfunction flatten<T>(items: readonly T[]): Flat<T>[] {\n  const out: Flat<T>[] = [];\n  for (const item of items) {\n    if (Array.isArray(item)) out.push(...(item as Flat<T>[]));\n    else out.push(item as Flat<T>);\n  }\n  return out;\n}\nfunction dropNull<T>(items: readonly T[]): Exclude<T, null>[] {\n  return items.filter((x): x is Exclude<T, null> => x !== null);\n}\nconst items = JSON.parse(input) as Item[];\nconst values = dropNull(flatten(items));\nconsole.log(values[0] ?? \"(none)\");\nconsole.log(values.join(\" \") || \"(none)\");\nconsole.log(values.reduce((a, b) => a + b, 0));\n",
+            "tests": [
+              {
+                "input": "[1,[2,3],null,4]",
+                "output": "1\n1 2 3 4\n10"
+              },
+              {
+                "input": "[]",
+                "output": "(none)\n(none)\n0"
+              },
+              {
+                "input": "[null,[null]]",
+                "output": "(none)\n(none)\n0"
+              },
+              {
+                "input": "[[5],[6,null],7]",
+                "output": "5\n5 6 7\n18"
+              },
+              {
+                "input": "[0,[0]]",
+                "output": "0\n0 0\n0"
+              },
+              {
+                "input": "[[-1,2],null,[3]]",
+                "output": "-1\n-1 2 3\n4"
+              },
+              {
+                "input": "[9]",
+                "output": "9\n9\n9"
+              },
+              {
+                "input": "[null,8,[null,1]]",
+                "output": "8\n8 1\n9"
+              }
+            ],
+            "strictness": "strict+indexed",
+            "visible_tests": 4
+          }
+        ]
       },
       {
         "week": 22,
@@ -25959,7 +27163,30 @@
               "output": "6\nuser:created user:deleted user:updated"
             }
           ],
-          "strictness": "strict+indexed"
+          "strictness": "strict+indexed",
+          "types": {
+            "id": "tsm-final-w22-types",
+            "title": "Part 1 — join a tuple of strings",
+            "prompt": "Write `Join<T, S>`: the string literal made by joining the tuple of string literals `T` with the separator `S`. An empty tuple joins to `\"\"`.",
+            "hint": "Take the tuple apart with `[infer H, ...infer R]` and recurse on the rest.",
+            "hints": [
+              "Take the tuple apart with `[infer H, ...infer R]` and recurse on the rest.",
+              "One element left means no separator after it; an empty tuple gives `\"\"`."
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<Join<[\"a\", \"b\", \"c\"], \"-\">, \"a-b-c\">>;\ntype _2 = Expect<Equal<Join<[\"user\", \"created\"], \":\">, \"user:created\">>;\ntype _3 = Expect<Equal<Join<[\"solo\"], \", \">, \"solo\">>;\ntype _4 = Expect<Equal<Join<[], \"/\">, \"\">>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type Join<T extends string[], S extends string> =\n  ____;\n",
+            "solution": "type Join<T extends string[], S extends string> =\n  T extends [infer H extends string, ...infer R extends string[]]\n    ? R extends [] ? H : `${H}${S}${Join<R, S>}`\n    : \"\";\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          "visible_tests": 4
         },
         "contest": {
           "title": "Checkpoint — Month 5: generics & type-level",
@@ -26498,7 +27725,53 @@
             }
           ],
           "strictness": "strict+indexed"
-        }
+        },
+        "exam_alternates": [
+          {
+            "title": "Utility class names",
+            "prompt": "Colours are `red`, `blue`; sizes are `sm`, `md`, `lg`. Derive `ClassName` as the template literal `${Color}-${Size}` over `as const` arrays and build the list at runtime. The input is `n` then `n` candidates. Print `color=<c> size=<s>` for a valid name or `bad` otherwise, then the number of class names, then the `blue` ones sorted.",
+            "hint": "`(typeof colors)[number]` is the union; a template literal type crosses the two unions.",
+            "language": "typescript",
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst lines = input.split(\"\\n\");\nconst n = Number(lines[0]);\nconst colors = [\"red\", \"blue\"] as const;\nconst sizes = [\"sm\", \"md\", \"lg\"] as const;\ntype Color = (typeof colors)[number];\ntype Size = (typeof sizes)[number];\ntype ClassName = `${Color}-${Size}`;\nconst all: ClassName[] = [];\nfor (const c of colors) {\n  for (const s of sizes) all.push(`${c}-${s}`);\n}\nconst known = new Set<string>(all);\nfunction isClassName(text: string): text is ClassName {\n  return known.has(text);\n}\nfor (let i = 1; i <= n; i++) {\n  const text = (lines[i] ?? \"\").trim();\n  if (isClassName(text)) {\n    const [c, s] = text.split(\"-\");\n    console.log(\"color=\" + c + \" size=\" + s);\n  } else {\n    console.log(\"bad\");\n  }\n}\nconsole.log(all.length);\nconsole.log(all.filter((x) => x.startsWith(\"blue-\")).sort().join(\" \"));\n",
+            "tests": [
+              {
+                "input": "2\nred-sm\nblue-xl",
+                "output": "color=red size=sm\nbad\n6\nblue-lg blue-md blue-sm"
+              },
+              {
+                "input": "1\ngreen-md",
+                "output": "bad\n6\nblue-lg blue-md blue-sm"
+              },
+              {
+                "input": "3\nblue-lg\nblue-md\nred-lg",
+                "output": "color=blue size=lg\ncolor=blue size=md\ncolor=red size=lg\n6\nblue-lg blue-md blue-sm"
+              },
+              {
+                "input": "1\nred",
+                "output": "bad\n6\nblue-lg blue-md blue-sm"
+              },
+              {
+                "input": "2\nRED-sm\nred-sm",
+                "output": "bad\ncolor=red size=sm\n6\nblue-lg blue-md blue-sm"
+              },
+              {
+                "input": "0",
+                "output": "6\nblue-lg blue-md blue-sm"
+              },
+              {
+                "input": "2\nblue-sm-sm\nblue-sm",
+                "output": "bad\ncolor=blue size=sm\n6\nblue-lg blue-md blue-sm"
+              },
+              {
+                "input": "1\n-md",
+                "output": "bad\n6\nblue-lg blue-md blue-sm"
+              }
+            ],
+            "strictness": "strict+indexed",
+            "visible_tests": 4
+          }
+        ]
       },
       {
         "week": 23,
@@ -27010,7 +28283,8 @@
               "output": "1000000\n1000000"
             }
           ],
-          "strictness": "strict+indexed"
+          "strictness": "strict+indexed",
+          "visible_tests": 4
         },
         "contest": null,
         "flashcards": [
@@ -27497,7 +28771,53 @@
             }
           ],
           "strictness": "strict+indexed"
-        }
+        },
+        "exam_alternates": [
+          {
+            "title": "Stock room with invariants",
+            "prompt": "Write a `Stock` class holding a `#counts` map from sku to units, with `add(sku, n)`, `remove(sku, n)` that refuses to go below zero, and a `total` getter. The input is `n` then `n` commands (`add sku n`, `remove sku n`). Print `<sku>=<units>` after each successful command or `refused`, then the total units. Quantities must be positive whole numbers; anything else is refused.",
+            "hint": "Keep the map private with `#`; every mutation goes through a method that checks the invariant first.",
+            "language": "typescript",
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst lines = input.split(\"\\n\");\nconst n = Number(lines[0]);\nclass Stock {\n  #counts = new Map<string, number>();\n  add(sku: string, units: number): boolean {\n    if (!Number.isInteger(units) || units <= 0) return false;\n    this.#counts.set(sku, this.count(sku) + units);\n    return true;\n  }\n  remove(sku: string, units: number): boolean {\n    if (!Number.isInteger(units) || units <= 0 || units > this.count(sku)) return false;\n    this.#counts.set(sku, this.count(sku) - units);\n    return true;\n  }\n  count(sku: string): number {\n    return this.#counts.get(sku) ?? 0;\n  }\n  get total(): number {\n    let sum = 0;\n    for (const units of this.#counts.values()) sum += units;\n    return sum;\n  }\n}\nconst stock = new Stock();\nfor (let i = 1; i <= n; i++) {\n  const [op = \"\", sku = \"\", unitsRaw = \"\"] = (lines[i] ?? \"\").trim().split(/\\s+/);\n  const units = Number(unitsRaw);\n  const ok = op === \"add\" ? stock.add(sku, units) : op === \"remove\" ? stock.remove(sku, units) : false;\n  console.log(ok ? sku + \"=\" + stock.count(sku) : \"refused\");\n}\nconsole.log(stock.total);\n",
+            "tests": [
+              {
+                "input": "3\nadd a 5\nremove a 2\nremove a 9",
+                "output": "a=5\na=3\nrefused\n3"
+              },
+              {
+                "input": "1\nremove x 1",
+                "output": "refused\n0"
+              },
+              {
+                "input": "2\nadd b 0\nadd b -3",
+                "output": "refused\nrefused\n0"
+              },
+              {
+                "input": "4\nadd a 1\nadd b 2\nremove a 1\nremove b 2",
+                "output": "a=1\nb=2\na=0\nb=0\n0"
+              },
+              {
+                "input": "2\nadd c 2.5\nadd c 2",
+                "output": "refused\nc=2\n2"
+              },
+              {
+                "input": "3\nsell a 1\nadd a 3\nremove a 3",
+                "output": "refused\na=3\na=0\n0"
+              },
+              {
+                "input": "1\nadd big 1000",
+                "output": "big=1000\n1000"
+              },
+              {
+                "input": "3\nadd q 4\nremove q 4\nremove q 1",
+                "output": "q=4\nq=0\nrefused\n0"
+              }
+            ],
+            "strictness": "strict+indexed",
+            "visible_tests": 4
+          }
+        ]
       },
       {
         "week": 24,
@@ -28009,7 +29329,8 @@
               "output": "9 36 81\n126"
             }
           ],
-          "strictness": "strict+indexed"
+          "strictness": "strict+indexed",
+          "visible_tests": 4
         },
         "contest": null,
         "flashcards": [
@@ -28495,7 +29816,53 @@
             }
           ],
           "strictness": "strict+indexed"
-        }
+        },
+        "exam_alternates": [
+          {
+            "title": "Lazy Fibonacci filter",
+            "prompt": "Write generators `fibonacci` (1, 1, 2, 3, 5, …, infinite), `filter` and `takeWhile`. The input is `limit divisor`. Take the Fibonacci numbers below `limit` that are divisible by `divisor` and print them space-separated (or `(none)`), then how many there were. Nothing infinite may be materialised.",
+            "hint": "`takeWhile` must stop the infinite source before `filter` sees it — the order of the wrappers matters.",
+            "language": "typescript",
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst [limit = 0, divisor = 1] = input.split(/\\s+/).map(Number);\nfunction* fibonacci(): Generator<number> {\n  let a = 1;\n  let b = 1;\n  while (true) {\n    yield a;\n    [a, b] = [b, a + b];\n  }\n}\nfunction* filter<T>(source: Iterable<T>, keep: (value: T) => boolean): Generator<T> {\n  for (const value of source) if (keep(value)) yield value;\n}\nfunction* takeWhile<T>(source: Iterable<T>, ok: (value: T) => boolean): Generator<T> {\n  for (const value of source) {\n    if (!ok(value)) return;\n    yield value;\n  }\n}\nconst picked = [...filter(takeWhile(fibonacci(), (x) => x < limit), (x) => x % divisor === 0)];\nconsole.log(picked.join(\" \") || \"(none)\");\nconsole.log(picked.length);\n",
+            "tests": [
+              {
+                "input": "100 2",
+                "output": "2 8 34\n3"
+              },
+              {
+                "input": "10 1",
+                "output": "1 1 2 3 5 8\n6"
+              },
+              {
+                "input": "1 1",
+                "output": "(none)\n0"
+              },
+              {
+                "input": "1000 5",
+                "output": "5 55 610\n3"
+              },
+              {
+                "input": "50 7",
+                "output": "21\n1"
+              },
+              {
+                "input": "2 1",
+                "output": "1 1\n2"
+              },
+              {
+                "input": "10000 3",
+                "output": "3 21 144 987 6765\n5"
+              },
+              {
+                "input": "144 144",
+                "output": "(none)\n0"
+              }
+            ],
+            "strictness": "strict+indexed",
+            "visible_tests": 4
+          }
+        ]
       },
       {
         "week": 25,
@@ -29015,7 +30382,8 @@
               "output": "host=spaced.io port=8080 debug=false retries=0"
             }
           ],
-          "strictness": "strict+indexed"
+          "strictness": "strict+indexed",
+          "visible_tests": 4
         },
         "contest": null,
         "flashcards": [
@@ -29495,7 +30863,53 @@
             }
           ],
           "strictness": "strict+indexed"
-        }
+        },
+        "exam_alternates": [
+          {
+            "title": "Parse a list of durations",
+            "prompt": "Each input line is a duration made of number-unit pairs: `90s`, `5m`, `2h`, `1h30m`, `1h5m10s` (units `h`, `m`, `s`, each at most once, in that order). Parse every line into seconds with a `Result`; blank lines are skipped. Print `line <k>: <seconds>` for a good line or `line <k>: error <message>` for a bad one (`empty`, `bad token <t>`, `unit order`), numbering lines from 1 — collect every error rather than stopping at the first — then `total <seconds>` over the good lines and `errors <count>`.",
+            "hint": "Match one `digits+unit` pair at a time from the front; remember the last unit's position to enforce the order.",
+            "language": "typescript",
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Result<T> = { ok: true; value: T } | { ok: false; error: string };\nconst UNIT_SECONDS = { h: 3600, m: 60, s: 1 } as const;\ntype Unit = keyof typeof UNIT_SECONDS;\nconst ORDER: readonly Unit[] = [\"h\", \"m\", \"s\"];\nfunction parseDuration(text: string): Result<number> {\n  if (text === \"\") return { ok: false, error: \"empty\" };\n  let rest = text;\n  let seconds = 0;\n  let lastIndex = -1;\n  while (rest.length > 0) {\n    const match = /^(\\d+)([a-z]?)/.exec(rest);\n    const digits = match?.[1];\n    const unit = match?.[2] ?? \"\";\n    if (match === null || digits === undefined || !Object.hasOwn(UNIT_SECONDS, unit)) {\n      return { ok: false, error: `bad token ${rest}` };\n    }\n    const index = ORDER.indexOf(unit as Unit);\n    if (index <= lastIndex) return { ok: false, error: \"unit order\" };\n    lastIndex = index;\n    seconds += Number(digits) * UNIT_SECONDS[unit as Unit];\n    rest = rest.slice(match[0].length);\n  }\n  return { ok: true, value: seconds };\n}\nlet total = 0;\nlet errors = 0;\ninput.split(\"\\n\").forEach((raw, i) => {\n  const text = raw.trim();\n  if (text === \"\") return;\n  const result = parseDuration(text);\n  if (result.ok) {\n    total += result.value;\n    console.log(`line ${i + 1}: ${result.value}`);\n  } else {\n    errors++;\n    console.log(`line ${i + 1}: error ${result.error}`);\n  }\n});\nconsole.log(`total ${total}`);\nconsole.log(`errors ${errors}`);\n",
+            "tests": [
+              {
+                "input": "90s\n5m\n2h",
+                "output": "line 1: 90\nline 2: 300\nline 3: 7200\ntotal 7590\nerrors 0"
+              },
+              {
+                "input": "1h30m\n1h5m10s",
+                "output": "line 1: 5400\nline 2: 3910\ntotal 9310\nerrors 0"
+              },
+              {
+                "input": "5x\n10",
+                "output": "line 1: error bad token 5x\nline 2: error bad token 10\ntotal 0\nerrors 2"
+              },
+              {
+                "input": "30m1h",
+                "output": "line 1: error unit order\ntotal 0\nerrors 1"
+              },
+              {
+                "input": "2h\n\n45s",
+                "output": "line 1: 7200\nline 3: 45\ntotal 7245\nerrors 0"
+              },
+              {
+                "input": "1h1h",
+                "output": "line 1: error unit order\ntotal 0\nerrors 1"
+              },
+              {
+                "input": "0s\n3m",
+                "output": "line 1: 0\nline 2: 180\ntotal 180\nerrors 0"
+              },
+              {
+                "input": "12m30s\nabc\n1h",
+                "output": "line 1: 750\nline 2: error bad token abc\nline 3: 3600\ntotal 4350\nerrors 1"
+              }
+            ],
+            "strictness": "strict+indexed",
+            "visible_tests": 4
+          }
+        ]
       },
       {
         "week": 26,
@@ -30008,7 +31422,8 @@
               "output": "2=20\n-3=failed\n4=40\n-1=failed\n2 60"
             }
           ],
-          "strictness": "strict+indexed"
+          "strictness": "strict+indexed",
+          "visible_tests": 4
         },
         "contest": {
           "title": "Mastery finale — the whole programme",
@@ -30557,7 +31972,53 @@
             }
           ],
           "strictness": "strict+indexed"
-        }
+        },
+        "exam_alternates": [
+          {
+            "title": "Race each load against a timeout",
+            "prompt": "`task(id)` resolves to `id * id` after `id * 10` ms. The input is a timeout `t` in ms, then ids. Race every task against its own `t`-ms timeout, all at once, and turn each outcome into a `Result`. Print `id=value` or `id=timeout` in input order, then how many finished in time. (No test has a task that takes exactly `t` ms.)",
+            "hint": "`Promise.race([task, timeout])` per id, inside a `try`, turns into a `Result`; `Promise.all` keeps input order.",
+            "language": "typescript",
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst [t = 0, ...ids] = input.split(/\\s+/).map(Number);\ntype Result<T> = { ok: true; value: T } | { ok: false; error: string };\nfunction task(id: number): Promise<number> {\n  return new Promise<number>((resolve) => setTimeout(() => resolve(id * id), id * 10));\n}\nfunction timeout(ms: number): Promise<never> {\n  return new Promise<never>((_, reject) => setTimeout(() => reject(new Error(\"timeout\")), ms));\n}\nasync function attempt(id: number): Promise<Result<number>> {\n  try {\n    return { ok: true, value: await Promise.race([task(id), timeout(t)]) };\n  } catch (e) {\n    return { ok: false, error: e instanceof Error ? e.message : String(e) };\n  }\n}\nasync function main(): Promise<void> {\n  const results = await Promise.all(ids.map(attempt));\n  let inTime = 0;\n  results.forEach((r, i) => {\n    if (r.ok) inTime++;\n    console.log(`${ids[i]}=${r.ok ? r.value : \"timeout\"}`);\n  });\n  console.log(inTime);\n}\nmain().catch((e: unknown) => console.log(String(e)));\n",
+            "tests": [
+              {
+                "input": "25 1 2 3",
+                "output": "1=1\n2=4\n3=timeout\n2"
+              },
+              {
+                "input": "5 1",
+                "output": "1=timeout\n0"
+              },
+              {
+                "input": "45 4 1 2",
+                "output": "4=16\n1=1\n2=4\n3"
+              },
+              {
+                "input": "100 3 6 9",
+                "output": "3=9\n6=36\n9=81\n3"
+              },
+              {
+                "input": "15 2 1",
+                "output": "2=timeout\n1=1\n1"
+              },
+              {
+                "input": "35 5 4 3 2 1",
+                "output": "5=timeout\n4=timeout\n3=9\n2=4\n1=1\n3"
+              },
+              {
+                "input": "65 7 1 6",
+                "output": "7=timeout\n1=1\n6=36\n2"
+              },
+              {
+                "input": "3 0 2",
+                "output": "0=0\n2=timeout\n1"
+              }
+            ],
+            "strictness": "strict+indexed",
+            "visible_tests": 4
+          }
+        ]
       },
       {
         "week": 27,
@@ -33572,7 +35033,8 @@
               "output": "added r-2\nadded r-1\nadded r-2\nr-2 r-1\n2"
             }
           ],
-          "strictness": "strict+indexed"
+          "strictness": "strict+indexed",
+          "visible_tests": 4
         },
         "contest": null,
         "flashcards": [
@@ -34560,7 +36022,405 @@
           }
         ]
       }
-    ]
+    ],
+    "final_exam": {
+      "title": "TypeScript Mastery — final exam",
+      "minutes": 180,
+      "intro": "Three hours, one sitting: 40 questions from across all 26 weeks, five coding problems — one for each stretch of the programme — and five type puzzles. You pass with 70% on the questions, three of the five problems and three of the five puzzles. Everything is checked with `strict` and `noUncheckedIndexedAccess`, like the last months of the programme.",
+      "quiz_size": 40,
+      "pass_mark": 70,
+      "min_problems": 3,
+      "min_types": 3,
+      "problems": [
+        {
+          "id": "tsm-exam-receipt",
+          "title": "Months 1–2: a receipt",
+          "prompt": "The input is `n` then `n` lines `name qty cents` — a whole positive quantity and a whole non-negative unit price in cents. Print one line per valid item, `<name padded to the longest valid name> x<qty> <line total>`, where money prints as `$D.CC`; a line that does not parse prints `skipped line <k>` (k counts from 1) in its place. Finish with `total <money>`.",
+          "hint": "Parse every line into `Item | null` first — the padding width depends on the valid names only.",
+          "hints": [
+            "Parse every line into `Item | null` first — the padding width depends on the valid names only.",
+            "`padEnd` pads the name; `padStart(2, \"0\")` pads the cents."
+          ],
+          "language": "typescript",
+          "kind": "challenge",
+          "difficulty": "Medium",
+          "strictness": "strict+indexed",
+          "harness": "",
+          "judge_mode": "",
+          "forbid": [],
+          "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+          "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nfunction money(cents: number): string {\n  return \"$\" + Math.floor(cents / 100) + \".\" + String(cents % 100).padStart(2, \"0\");\n}\ntype Item = { name: string; qty: number; cents: number };\nfunction parseItem(line: string): Item | null {\n  const [name, qtyText, centsText, ...extra] = line.trim().split(/\\s+/);\n  if (name === undefined || qtyText === undefined || centsText === undefined || extra.length > 0) return null;\n  const qty = Number(qtyText);\n  const cents = Number(centsText);\n  if (!Number.isInteger(qty) || qty <= 0 || !Number.isInteger(cents) || cents < 0) return null;\n  return { name, qty, cents };\n}\nconst lines = input.split(\"\\n\");\nconst n = Number(lines[0]);\nconst parsed: (Item | null)[] = [];\nfor (let i = 1; i <= n; i++) parsed.push(parseItem(lines[i] ?? \"\"));\nconst width = Math.max(0, ...parsed.map((p) => (p === null ? 0 : p.name.length)));\nlet total = 0;\nparsed.forEach((item, k) => {\n  if (item === null) {\n    console.log(`skipped line ${k + 1}`);\n    return;\n  }\n  const line = item.qty * item.cents;\n  total += line;\n  console.log(`${item.name.padEnd(width)} x${item.qty} ${money(line)}`);\n});\nconsole.log(`total ${money(total)}`);\n",
+          "tests": [
+            {
+              "input": "3\ntea 2 250\ncoffee 1 399\nbiscuits 3 120",
+              "output": "tea      x2 $5.00\ncoffee   x1 $3.99\nbiscuits x3 $3.60\ntotal $12.59"
+            },
+            {
+              "input": "2\nbread 1 0\nwater x 100",
+              "output": "bread x1 $0.00\nskipped line 2\ntotal $0.00"
+            },
+            {
+              "input": "1\nsingle 10 5",
+              "output": "single x10 $0.50\ntotal $0.50"
+            },
+            {
+              "input": "3\na 1 1\nbb 2 2\nccc 3 3",
+              "output": "a   x1 $0.01\nbb  x2 $0.04\nccc x3 $0.09\ntotal $0.14"
+            },
+            {
+              "input": "2\nbad 1\nworse -1 5",
+              "output": "skipped line 1\nskipped line 2\ntotal $0.00"
+            },
+            {
+              "input": "4\nmilk 2 99\nmilk 1 99\neggs 12 25\nfree 1 0",
+              "output": "milk x2 $1.98\nmilk x1 $0.99\neggs x12 $3.00\nfree x1 $0.00\ntotal $5.97"
+            },
+            {
+              "input": "1\nextra 1 2 3",
+              "output": "skipped line 1\ntotal $0.00"
+            },
+            {
+              "input": "2\npen 3 1.5\npad 1 150",
+              "output": "skipped line 1\npad x1 $1.50\ntotal $1.50"
+            }
+          ],
+          "source_slug": "",
+          "dataset": ""
+        },
+        {
+          "id": "tsm-exam-orders",
+          "title": "Month 3: an order state machine",
+          "prompt": "Orders move `placed → paid → shipped`, and can be `cancelled` from `placed` or `paid`. The input is `n` then `n` commands `place <id>`, `pay <id>`, `ship <id>` or `cancel <id>`. Model the commands as a discriminated union. Print `ok <id> <state>` for an allowed command, `invalid <id> <command> from <state>` for one the state does not allow (including placing an id that exists), `unknown <id>` for an id never placed, and `bad command` for anything else. Finish with `placed=<a> paid=<b> shipped=<c> cancelled=<d>`.",
+          "hint": "Parse each line into `Command | null`; the transition function switches on `kind`.",
+          "hints": [
+            "Parse each line into `Command | null`; the transition function switches on `kind`.",
+            "`Record<OrderState, number>` makes the final counts exhaustive."
+          ],
+          "language": "typescript",
+          "kind": "challenge",
+          "difficulty": "Medium",
+          "strictness": "strict+indexed",
+          "harness": "",
+          "judge_mode": "",
+          "forbid": [],
+          "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+          "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype OrderState = \"placed\" | \"paid\" | \"shipped\" | \"cancelled\";\ntype Command =\n  | { kind: \"place\"; id: string }\n  | { kind: \"pay\"; id: string }\n  | { kind: \"ship\"; id: string }\n  | { kind: \"cancel\"; id: string };\nfunction parse(line: string): Command | null {\n  const [kind, id, ...extra] = line.trim().split(/\\s+/);\n  if (id === undefined || extra.length > 0) return null;\n  if (kind === \"place\" || kind === \"pay\" || kind === \"ship\" || kind === \"cancel\") return { kind, id };\n  return null;\n}\nfunction next(state: OrderState, cmd: Command): OrderState | null {\n  switch (cmd.kind) {\n    case \"place\":\n      return null;\n    case \"pay\":\n      return state === \"placed\" ? \"paid\" : null;\n    case \"ship\":\n      return state === \"paid\" ? \"shipped\" : null;\n    case \"cancel\":\n      return state === \"placed\" || state === \"paid\" ? \"cancelled\" : null;\n  }\n}\nconst lines = input.split(\"\\n\");\nconst n = Number(lines[0]);\nconst orders = new Map<string, OrderState>();\nfor (let i = 1; i <= n; i++) {\n  const cmd = parse(lines[i] ?? \"\");\n  if (cmd === null) {\n    console.log(\"bad command\");\n    continue;\n  }\n  const state = orders.get(cmd.id);\n  if (state === undefined) {\n    if (cmd.kind === \"place\") {\n      orders.set(cmd.id, \"placed\");\n      console.log(`ok ${cmd.id} placed`);\n    } else {\n      console.log(`unknown ${cmd.id}`);\n    }\n    continue;\n  }\n  const to = next(state, cmd);\n  if (to === null) {\n    console.log(`invalid ${cmd.id} ${cmd.kind} from ${state}`);\n  } else {\n    orders.set(cmd.id, to);\n    console.log(`ok ${cmd.id} ${to}`);\n  }\n}\nconst counts: Record<OrderState, number> = { placed: 0, paid: 0, shipped: 0, cancelled: 0 };\nfor (const state of orders.values()) counts[state]++;\nconsole.log(`placed=${counts.placed} paid=${counts.paid} shipped=${counts.shipped} cancelled=${counts.cancelled}`);\n",
+          "tests": [
+            {
+              "input": "4\nplace a\npay a\nship a\ncancel a",
+              "output": "ok a placed\nok a paid\nok a shipped\ninvalid a cancel from shipped\nplaced=0 paid=0 shipped=1 cancelled=0"
+            },
+            {
+              "input": "3\npay x\nplace x\nplace x",
+              "output": "unknown x\nok x placed\ninvalid x place from placed\nplaced=1 paid=0 shipped=0 cancelled=0"
+            },
+            {
+              "input": "5\nplace a\nplace b\ncancel a\npay b\ncancel b",
+              "output": "ok a placed\nok b placed\nok a cancelled\nok b paid\nok b cancelled\nplaced=0 paid=0 shipped=0 cancelled=2"
+            },
+            {
+              "input": "2\nrefund a\nplace",
+              "output": "bad command\nbad command\nplaced=0 paid=0 shipped=0 cancelled=0"
+            },
+            {
+              "input": "4\nplace q\nship q\npay q\nship q",
+              "output": "ok q placed\ninvalid q ship from placed\nok q paid\nok q shipped\nplaced=0 paid=0 shipped=1 cancelled=0"
+            },
+            {
+              "input": "1\nplace solo",
+              "output": "ok solo placed\nplaced=1 paid=0 shipped=0 cancelled=0"
+            },
+            {
+              "input": "6\nplace a\nplace b\nplace c\npay a\npay b\nship a",
+              "output": "ok a placed\nok b placed\nok c placed\nok a paid\nok b paid\nok a shipped\nplaced=1 paid=1 shipped=1 cancelled=0"
+            },
+            {
+              "input": "3\nplace z\ncancel z\npay z",
+              "output": "ok z placed\nok z cancelled\ninvalid z pay from cancelled\nplaced=0 paid=0 shipped=0 cancelled=1"
+            }
+          ],
+          "source_slug": "",
+          "dataset": ""
+        },
+        {
+          "id": "tsm-exam-departments",
+          "title": "Months 4–5: summarise by department",
+          "prompt": "The input is `n` then `n` lines `dept|name|salary`. Write generic `groupBy` and `maxBy` helpers. Print, for each department in alphabetical order, `<dept>: n=<count> total=<sum> top=<name>` (the top earner, ties to the alphabetically first name); then `overall top=<name> (<salary>)` with the same tie rule — or `overall top=none` for no rows.",
+          "hint": "`groupBy` returns a `Map<K, T[]>`; `maxBy` returns `T | undefined` because the input may be empty.",
+          "hints": [
+            "`groupBy` returns a `Map<K, T[]>`; `maxBy` returns `T | undefined` because the input may be empty.",
+            "Pass the tie rule into `maxBy` as a comparison function."
+          ],
+          "language": "typescript",
+          "kind": "challenge",
+          "difficulty": "Medium",
+          "strictness": "strict+indexed",
+          "harness": "",
+          "judge_mode": "",
+          "forbid": [],
+          "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+          "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Row = { dept: string; name: string; salary: number };\nfunction groupBy<T, K>(items: readonly T[], keyOf: (item: T) => K): Map<K, T[]> {\n  const out = new Map<K, T[]>();\n  for (const item of items) {\n    const key = keyOf(item);\n    const bucket = out.get(key);\n    if (bucket === undefined) out.set(key, [item]);\n    else bucket.push(item);\n  }\n  return out;\n}\nfunction maxBy<T>(items: readonly T[], better: (a: T, b: T) => boolean): T | undefined {\n  let best: T | undefined;\n  for (const item of items) if (best === undefined || better(item, best)) best = item;\n  return best;\n}\nconst higher = (a: Row, b: Row): boolean =>\n  a.salary > b.salary || (a.salary === b.salary && a.name < b.name);\nconst lines = input.split(\"\\n\");\nconst n = Number(lines[0]);\nconst rows: Row[] = [];\nfor (let i = 1; i <= n; i++) {\n  const [dept = \"\", name = \"\", salary = \"0\"] = (lines[i] ?? \"\").trim().split(\"|\");\n  rows.push({ dept, name, salary: Number(salary) });\n}\nconst groups = groupBy(rows, (r) => r.dept);\nfor (const dept of [...groups.keys()].sort()) {\n  const members = groups.get(dept) ?? [];\n  const total = members.reduce((sum, r) => sum + r.salary, 0);\n  console.log(`${dept}: n=${members.length} total=${total} top=${maxBy(members, higher)?.name ?? \"none\"}`);\n}\nconst top = maxBy(rows, higher);\nconsole.log(top === undefined ? \"overall top=none\" : `overall top=${top.name} (${top.salary})`);\n",
+          "tests": [
+            {
+              "input": "3\neng|ada|100\neng|alan|90\nops|grace|95",
+              "output": "eng: n=2 total=190 top=ada\nops: n=1 total=95 top=grace\noverall top=ada (100)"
+            },
+            {
+              "input": "0",
+              "output": "overall top=none"
+            },
+            {
+              "input": "2\nhr|bo|50\nhr|al|50",
+              "output": "hr: n=2 total=100 top=al\noverall top=al (50)"
+            },
+            {
+              "input": "4\nb|x|1\na|y|2\nb|z|3\na|w|2",
+              "output": "a: n=2 total=4 top=w\nb: n=2 total=4 top=z\noverall top=z (3)"
+            },
+            {
+              "input": "1\nsolo|me|10",
+              "output": "solo: n=1 total=10 top=me\noverall top=me (10)"
+            },
+            {
+              "input": "3\nops|q|70\nops|r|80\neng|s|80",
+              "output": "eng: n=1 total=80 top=s\nops: n=2 total=150 top=r\noverall top=r (80)"
+            },
+            {
+              "input": "5\nx|a|5\ny|b|4\nz|c|3\nx|d|6\ny|e|4",
+              "output": "x: n=2 total=11 top=d\ny: n=2 total=8 top=b\nz: n=1 total=3 top=c\noverall top=d (6)"
+            },
+            {
+              "input": "2\nsales|zed|0\nsales|amy|0",
+              "output": "sales: n=2 total=0 top=amy\noverall top=amy (0)"
+            }
+          ],
+          "source_slug": "",
+          "dataset": ""
+        },
+        {
+          "id": "tsm-exam-statement",
+          "title": "Month 6: import a bank statement",
+          "prompt": "The first line is the header `date,amount,memo`; every later line is a transaction. Parse each into a `Result` and collect every error — `line <k>: wrong field count`, `bad date` (not `YYYY-MM-DD` with month 01-12 and day 01-31), `bad amount` (an optional `-`, digits, and at most two decimals) or `empty memo` — where k is the line number in the file. Print the errors in order, then `imported <count>`, the balance as `balance <money>` (money as `$D.CC` or `-$D.CC`, computed in cents), and `largest debit <memo> <money>` for the most negative amount (first wins on a tie) or `largest debit none`.",
+          "hint": "One parse function returning `Result<Txn>`; the loop only decides whether to print or keep.",
+          "hints": [
+            "One parse function returning `Result<Txn>`; the loop only decides whether to print or keep.",
+            "Money in cents: parse the whole and fractional parts separately; never add floats."
+          ],
+          "language": "typescript",
+          "kind": "challenge",
+          "difficulty": "Medium",
+          "strictness": "strict+indexed",
+          "harness": "",
+          "judge_mode": "",
+          "forbid": [],
+          "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+          "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Result<T> = { ok: true; value: T } | { ok: false; error: string };\ntype Txn = { date: string; cents: number; memo: string };\nfunction parseCents(text: string): number | null {\n  const m = /^(-?)(\\d+)(?:\\.(\\d{1,2}))?$/.exec(text);\n  if (m === null) return null;\n  const whole = Number(m[2] ?? \"0\");\n  const frac = Number((m[3] ?? \"\").padEnd(2, \"0\"));\n  const cents = whole * 100 + frac;\n  return m[1] === \"-\" ? -cents : cents;\n}\nfunction parseLine(line: string): Result<Txn> {\n  const fields = line.split(\",\");\n  if (fields.length !== 3) return { ok: false, error: \"wrong field count\" };\n  const [date = \"\", amount = \"\", memo = \"\"] = fields.map((f) => f.trim());\n  const d = /^\\d{4}-(\\d{2})-(\\d{2})$/.exec(date);\n  const month = Number(d?.[1] ?? \"0\");\n  const day = Number(d?.[2] ?? \"0\");\n  if (d === null || month < 1 || month > 12 || day < 1 || day > 31) return { ok: false, error: \"bad date\" };\n  const cents = parseCents(amount);\n  if (cents === null) return { ok: false, error: \"bad amount\" };\n  if (memo === \"\") return { ok: false, error: \"empty memo\" };\n  return { ok: true, value: { date, cents, memo } };\n}\nfunction money(cents: number): string {\n  const abs = Math.abs(cents);\n  return (cents < 0 ? \"-$\" : \"$\") + Math.floor(abs / 100) + \".\" + String(abs % 100).padStart(2, \"0\");\n}\nconst lines = input.split(\"\\n\").slice(1);\nconst imported: Txn[] = [];\nlines.forEach((line, i) => {\n  const r = parseLine(line);\n  if (r.ok) imported.push(r.value);\n  else console.log(`line ${i + 2}: ${r.error}`);\n});\nconst balance = imported.reduce((sum, t) => sum + t.cents, 0);\nlet debit: Txn | undefined;\nfor (const t of imported) if (t.cents < 0 && (debit === undefined || t.cents < debit.cents)) debit = t;\nconsole.log(`imported ${imported.length}`);\nconsole.log(`balance ${money(balance)}`);\nconsole.log(debit === undefined ? \"largest debit none\" : `largest debit ${debit.memo} ${money(debit.cents)}`);\n",
+          "tests": [
+            {
+              "input": "date,amount,memo\n2026-01-05,1200.00,salary\n2026-01-06,-45.5,groceries\n2026-01-07,-300,rent",
+              "output": "imported 3\nbalance $854.50\nlargest debit rent -$300.00"
+            },
+            {
+              "input": "date,amount,memo\n2026-13-01,5,x\n2026-02-30,5,y",
+              "output": "line 2: bad date\nimported 1\nbalance $5.00\nlargest debit none"
+            },
+            {
+              "input": "date,amount,memo\n2026-03-01,1.234,z\n2026-03-02,abc,w\n2026-03-03,7,",
+              "output": "line 2: bad amount\nline 3: bad amount\nline 4: empty memo\nimported 0\nbalance $0.00\nlargest debit none"
+            },
+            {
+              "input": "date,amount,memo\n2026-04-01,10,a,b\n2026-04-02,-0.99,coffee",
+              "output": "line 2: wrong field count\nimported 1\nbalance -$0.99\nlargest debit coffee -$0.99"
+            },
+            {
+              "input": "date,amount,memo",
+              "output": "imported 0\nbalance $0.00\nlargest debit none"
+            },
+            {
+              "input": "date,amount,memo\n2026-05-01,-10,first\n2026-05-02,-10,second\n2026-05-03,5.05,refund",
+              "output": "imported 3\nbalance -$14.95\nlargest debit first -$10.00"
+            },
+            {
+              "input": "date,amount,memo\n26-01-01,1,short year\n2026-06-15,0.5,interest",
+              "output": "line 2: bad date\nimported 1\nbalance $0.50\nlargest debit none"
+            },
+            {
+              "input": "date,amount,memo\n2026-07-01,-1000,big\n2026-07-02,999.99,back",
+              "output": "imported 2\nbalance -$0.01\nlargest debit big -$1000.00"
+            }
+          ],
+          "source_slug": "",
+          "dataset": ""
+        },
+        {
+          "id": "tsm-exam-pages",
+          "title": "Month 6: consume a paginated feed",
+          "prompt": "The first line is `pageSize limit`; the second is the feed's numbers. `fetchPage(k)` (async, no timers) returns page k's items and the next page number, or `null` after the last. Write an async generator `pages()` over it, and consume it with `for await`: print `page <k>: <items>` as each page arrives, and add its items one at a time to a running sum — stopping for good just before an item would push the sum past `limit`. The generator's `finally` prints `closed after page <k>`. Then print `sum <s>` and `stopped at <item>` or `all consumed`.",
+          "hint": "`break` out of a `for await` calls the generator's `return`, which runs its `finally`.",
+          "hints": [
+            "`break` out of a `for await` calls the generator's `return`, which runs its `finally`.",
+            "A label on the outer loop lets the inner loop stop both."
+          ],
+          "language": "typescript",
+          "kind": "challenge",
+          "difficulty": "Hard",
+          "strictness": "strict+indexed",
+          "harness": "",
+          "judge_mode": "",
+          "forbid": [],
+          "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+          "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst [head = \"\", feed = \"\"] = input.split(\"\\n\");\nconst [pageSize = 1, limit = 0] = head.trim().split(/\\s+/).map(Number);\nconst all = feed.trim() === \"\" ? [] : feed.trim().split(/\\s+/).map(Number);\ntype Page = { items: number[]; next: number | null };\nasync function fetchPage(k: number): Promise<Page> {\n  await Promise.resolve();\n  const items = all.slice(k * pageSize, (k + 1) * pageSize);\n  return { items, next: (k + 1) * pageSize < all.length ? k + 1 : null };\n}\nasync function* pages(): AsyncGenerator<number[]> {\n  let k: number | null = 0;\n  let last = 0;\n  try {\n    while (k !== null) {\n      const page: Page = await fetchPage(k);\n      last = k;\n      yield page.items;\n      k = page.next;\n    }\n  } finally {\n    console.log(`closed after page ${last}`);\n  }\n}\nlet sum = 0;\nlet stoppedAt: number | undefined;\nlet k = 0;\nouter: for await (const items of pages()) {\n  console.log(`page ${k}: ${items.join(\" \") || \"(empty)\"}`);\n  k++;\n  for (const item of items) {\n    if (sum + item > limit) {\n      stoppedAt = item;\n      break outer;\n    }\n    sum += item;\n  }\n}\nconsole.log(`sum ${sum}`);\nconsole.log(stoppedAt === undefined ? \"all consumed\" : `stopped at ${stoppedAt}`);\n",
+          "tests": [
+            {
+              "input": "2 10\n1 2 3 4 5 6",
+              "output": "page 0: 1 2\npage 1: 3 4\npage 2: 5 6\nclosed after page 2\nsum 10\nstopped at 5"
+            },
+            {
+              "input": "3 100\n5 5 5 5",
+              "output": "page 0: 5 5 5\npage 1: 5\nclosed after page 1\nsum 20\nall consumed"
+            },
+            {
+              "input": "1 0\n1",
+              "output": "page 0: 1\nclosed after page 0\nsum 0\nstopped at 1"
+            },
+            {
+              "input": "4 7\n1 1 1 1 1 1 1 1 1",
+              "output": "page 0: 1 1 1 1\npage 1: 1 1 1 1\nclosed after page 1\nsum 7\nstopped at 1"
+            },
+            {
+              "input": "2 5\n",
+              "output": "page 0: (empty)\nclosed after page 0\nsum 0\nall consumed"
+            },
+            {
+              "input": "5 50\n10 10 10 10 10 1",
+              "output": "page 0: 10 10 10 10 10\npage 1: 1\nclosed after page 1\nsum 50\nstopped at 1"
+            },
+            {
+              "input": "3 6\n2 2 2 2",
+              "output": "page 0: 2 2 2\npage 1: 2\nclosed after page 1\nsum 6\nstopped at 2"
+            },
+            {
+              "input": "2 1000\n100 200 300",
+              "output": "page 0: 100 200\npage 1: 300\nclosed after page 1\nsum 600\nall consumed"
+            }
+          ],
+          "source_slug": "",
+          "dataset": ""
+        }
+      ],
+      "type_section": [
+        {
+          "id": "tsm-exam-promisify",
+          "title": "Type puzzle: Promisify",
+          "prompt": "Write `Promisify<F>`: for a function type, the same parameters returning a `Promise` of its (awaited) return type; `never` for anything that is not a function.",
+          "hint": "`infer` the parameter tuple and the return type in one pattern.",
+          "hints": [
+            "`infer` the parameter tuple and the return type in one pattern.",
+            "Wrap the return in `Awaited` so a function that already returns a promise is not double-wrapped."
+          ],
+          "language": "typescript",
+          "kind": "typelevel",
+          "difficulty": "Medium",
+          "strictness": "strict+indexed",
+          "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<Promisify<(a: number, b: string) => boolean>, (a: number, b: string) => Promise<boolean>>>;\ntype _2 = Expect<Equal<Promisify<() => Promise<number>>, () => Promise<number>>>;\ntype _3 = Expect<Equal<Promisify<string>, never>>;\n",
+          "judge_mode": "types",
+          "forbid": [],
+          "starter": "type Promisify<F> = ____;\n",
+          "solution": "type Promisify<F> = F extends (...args: infer A) => infer R ? (...args: A) => Promise<Awaited<R>> : never;\n",
+          "tests": [],
+          "source_slug": "",
+          "dataset": ""
+        },
+        {
+          "id": "tsm-exam-entries",
+          "title": "Type puzzle: Entries",
+          "prompt": "Write `Entries<T>`: the union of `[key, value]` tuples for every property of `T`. An optional property's value type includes `undefined`, but no stray `undefined` member may appear in the union itself.",
+          "hint": "Map every key to its tuple, then index the mapped type with `keyof T` to get the union.",
+          "hints": [
+            "Map every key to its tuple, then index the mapped type with `keyof T` to get the union.",
+            "`-?` stops optional keys from adding `undefined` to the union."
+          ],
+          "language": "typescript",
+          "kind": "typelevel",
+          "difficulty": "Medium",
+          "strictness": "strict+indexed",
+          "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<Entries<{ a: number; b: string }>, [\"a\", number] | [\"b\", string]>>;\ntype _2 = Expect<Equal<Entries<{ c?: boolean }>, [\"c\", boolean | undefined]>>;\ntype _3 = Expect<Equal<Entries<{}>, never>>;\n",
+          "judge_mode": "types",
+          "forbid": [],
+          "starter": "type Entries<T> = ____;\n",
+          "solution": "type Entries<T> = { [K in keyof T]-?: [K, T[K]] }[keyof T];\n",
+          "tests": [],
+          "source_slug": "",
+          "dataset": ""
+        },
+        {
+          "id": "tsm-exam-from-entries",
+          "title": "Type puzzle: FromEntries",
+          "prompt": "Write `FromEntries<E>`: the object type built from a union of `[key, value]` tuples — the inverse of `Entries`.",
+          "hint": "A mapped type can iterate a union of anything — not only keys — if `as` gives each member a key.",
+          "hints": [
+            "A mapped type can iterate a union of anything — not only keys — if `as` gives each member a key.",
+            "`[P in E as P[0]]: P[1]`."
+          ],
+          "language": "typescript",
+          "kind": "typelevel",
+          "difficulty": "Medium",
+          "strictness": "strict+indexed",
+          "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<FromEntries<[\"a\", 1] | [\"b\", \"x\"]>, { a: 1; b: \"x\" }>>;\ntype _2 = Expect<Equal<FromEntries<[\"only\", boolean]>, { only: boolean }>>;\ntype _3 = Expect<Equal<FromEntries<never>, {}>>;\n",
+          "judge_mode": "types",
+          "forbid": [],
+          "starter": "type FromEntries<E extends [PropertyKey, unknown]> = ____;\n",
+          "solution": "type FromEntries<E extends [PropertyKey, unknown]> = { [P in E as P[0]]: P[1] };\n",
+          "tests": [],
+          "source_slug": "",
+          "dataset": ""
+        },
+        {
+          "id": "tsm-exam-zip",
+          "title": "Type puzzle: Zip",
+          "prompt": "Write `Zip<A, B>`: pair up two tuples element by element; the result is as long as the shorter one.",
+          "hint": "Take the head of both tuples with `[infer H, ...infer R]`, then recurse on the rests.",
+          "hints": [
+            "Take the head of both tuples with `[infer H, ...infer R]`, then recurse on the rests.",
+            "Stop with `[]` as soon as either tuple is empty."
+          ],
+          "language": "typescript",
+          "kind": "typelevel",
+          "difficulty": "Hard",
+          "strictness": "strict+indexed",
+          "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<Zip<[1, 2], [\"a\", \"b\"]>, [[1, \"a\"], [2, \"b\"]]>>;\ntype _2 = Expect<Equal<Zip<[1, 2, 3], [\"a\"]>, [[1, \"a\"]]>>;\ntype _3 = Expect<Equal<Zip<[], [1]>, []>>;\n",
+          "judge_mode": "types",
+          "forbid": [],
+          "starter": "type Zip<A extends unknown[], B extends unknown[]> =\n  ____;\n",
+          "solution": "type Zip<A extends unknown[], B extends unknown[]> =\n  A extends [infer HA, ...infer RA]\n    ? B extends [infer HB, ...infer RB] ? [[HA, HB], ...Zip<RA, RB>] : []\n    : [];\n",
+          "tests": [],
+          "source_slug": "",
+          "dataset": ""
+        },
+        {
+          "id": "tsm-exam-count-of",
+          "title": "Type puzzle: CountOf",
+          "prompt": "Write `CountOf<T, V>`: how many elements of the tuple `T` are exactly `V` (mutually assignable — `boolean` is not `true`), as a number literal. Count with an accumulator tuple and read its `length`.",
+          "hint": "Walk the tuple head by head, growing `Acc` by one element for every match.",
+          "hints": [
+            "Walk the tuple head by head, growing `Acc` by one element for every match.",
+            "Wrap both sides in `[…]` so the comparison does not distribute, and check it both ways."
+          ],
+          "language": "typescript",
+          "kind": "typelevel",
+          "difficulty": "Hard",
+          "strictness": "strict+indexed",
+          "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<CountOf<[1, 2, 1, 3, 1], 1>, 3>>;\ntype _2 = Expect<Equal<CountOf<[\"a\", \"b\"], \"c\">, 0>>;\ntype _3 = Expect<Equal<CountOf<[true, boolean, true], true>, 2>>;\ntype _4 = Expect<Equal<CountOf<[], 1>, 0>>;\n",
+          "judge_mode": "types",
+          "forbid": [],
+          "starter": "type CountOf<T extends readonly unknown[], V, Acc extends unknown[] = []> =\n  ____;\n",
+          "solution": "type CountOf<T extends readonly unknown[], V, Acc extends unknown[] = []> =\n  T extends readonly [infer H, ...infer R]\n    ? CountOf<R, V, [H] extends [V] ? ([V] extends [H] ? [...Acc, H] : Acc) : Acc>\n    : Acc[\"length\"];\n",
+          "tests": [],
+          "source_slug": "",
+          "dataset": ""
+        }
+      ]
+    }
   },
   {
     "key": "java",

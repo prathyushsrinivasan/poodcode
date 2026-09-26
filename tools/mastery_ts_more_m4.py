@@ -280,24 +280,37 @@ type _2 = Expect<Equal<ReturnType<string[]["last"]>, string | undefined>>;
 ]
 
 TS_PROJECTS[14] = _project(
-    14, "ledger.ts v4 — a strict bank statement",
-    "The arc project's fourth version: the ledger read under every flag this month turns on. Money is integer cents in a branded type, every index read is honest under `noUncheckedIndexedAccess`, and bad rows are reported, never guessed at.",
-    ["Each input line is a CSV row `date,account,amount,memo` — the memo is optional and may itself contain commas. Dates are `YYYY-MM-DD` and must exist on the calendar; amounts are like `12`, `-3.5` or `1200.75` (at most two decimals).",
+    14, "ledger/ v4 — a strict bank statement in four modules",
+    "The arc project's fourth version: the ledger read under every flag this month turns on, and split into modules the way a real project is. Money is integer cents in a branded type, every index read is honest under `noUncheckedIndexedAccess`, bad rows are reported, never guessed at — and each file has one job. The workspace has a tab per file; the judge bundles them in tab order.",
+    ["The workspace is four files: `money.ts` (the `Cents` brand, `parseCents`, `formatCents`), `parse.ts` (the `Txn` type and `parseRow`), `report.ts` (turns transactions into the report lines) and `main.ts` (reads stdin, prints). Import what a file uses from its siblings — `import type` for types — and export what others need.",
+     "Each input line is a CSV row `date,account,amount,memo` — the memo is optional and may itself contain commas. Dates are `YYYY-MM-DD` and must exist on the calendar; amounts are like `12`, `-3.5` or `1200.75` (at most two decimals).",
      "For a bad row print `line <n>: bad date <d>`, `line <n>: missing account` or `line <n>: bad amount <a>` (checked in that order) and skip it.",
      "Then print each account, sorted, as `<account>: <balance> (<k> transactions)` (`transaction` for one), with balances to two decimals (`-4.50`).",
      "Then `total: <sum of all balances>`, `busiest month: <YYYY-MM> (<n> transactions)` (the earliest on a tie; `none` with no rows) and `largest expense: <memo, or the account if no memo> <amount>` (the most negative amount; `none` if nothing is negative).",
-     "Keep amounts as a branded `Cents` type produced by one parser, never as floating-point dollars."],
+     "Keep amounts as a branded `Cents` type produced by one parser, never as floating-point dollars. The files share one scope when judged, so top-level names must not repeat across files."],
     r"""
+// @file money.ts
 declare const CentsBrand: unique symbol;
-type Cents = number & { readonly [CentsBrand]: true };
-type Txn = { readonly date: string; readonly account: string; readonly amount: Cents; readonly memo: string };
+export type Cents = number & { readonly [CentsBrand]: true };
 
-function parseCents(text: string): Cents | undefined {
+/** `12`, `-3.5` or `1200.75` as cents; `undefined` for anything else. */
+export function parseCents(text: string): Cents | undefined {
   const m = /^(-?)(\d+)(?:\.(\d{1,2}))?$/.exec(text.trim());
   if (m === null) return undefined;
   const cents = Number(m[2] ?? "0") * 100 + Number((m[3] ?? "").padEnd(2, "0"));
   return (m[1] === "-" ? -cents : cents) as Cents;
 }
+
+export function formatCents(c: number): string {
+  return (c < 0 ? "-" : "") + (Math.abs(c) / 100).toFixed(2);
+}
+
+// @file parse.ts
+import type { Cents } from "./money";
+import { parseCents } from "./money";
+
+export type Txn = { readonly date: string; readonly account: string; readonly amount: Cents; readonly memo: string };
+
 function isDate(s: string): boolean {
   const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s);
   if (m === null) return false;
@@ -305,51 +318,117 @@ function isDate(s: string): boolean {
   const d = new Date(Date.UTC(year, month - 1, day));
   return d.getUTCMonth() === month - 1 && d.getUTCDate() === day;
 }
-const money = (c: number): string => (c < 0 ? "-" : "") + (Math.abs(c) / 100).toFixed(2);
 
+/** A transaction, or the message to print for a bad row. */
+export function parseRow(line: string, lineNo: number): Txn | string {
+  const [date = "", account = "", amountText = "", ...memo] = line.split(",").map((s) => s.trim());
+  if (!isDate(date)) return `line ${lineNo}: bad date ${date}`;
+  if (account === "") return `line ${lineNo}: missing account`;
+  const amount = parseCents(amountText);
+  if (amount === undefined) return `line ${lineNo}: bad amount ${amountText}`;
+  return { date, account, amount, memo: memo.join(", ") };
+}
+
+// @file report.ts
+import type { Txn } from "./parse";
+import { formatCents } from "./money";
+
+const plural = (n: number): string => `${n} ${n === 1 ? "transaction" : "transactions"}`;
+
+export function report(txns: readonly Txn[]): string[] {
+  const out: string[] = [];
+  const byAccount = new Map<string, { balance: number; count: number }>();
+  for (const t of txns) {
+    const acc = byAccount.get(t.account) ?? { balance: 0, count: 0 };
+    byAccount.set(t.account, { balance: acc.balance + t.amount, count: acc.count + 1 });
+  }
+  for (const [name, acc] of [...byAccount].sort(([a], [b]) => a.localeCompare(b))) {
+    out.push(`${name}: ${formatCents(acc.balance)} (${plural(acc.count)})`);
+  }
+  out.push(`total: ${formatCents(txns.reduce((s, t) => s + t.amount, 0))}`);
+
+  const months = new Map<string, number>();
+  for (const t of txns) months.set(t.date.slice(0, 7), (months.get(t.date.slice(0, 7)) ?? 0) + 1);
+  const busiest = [...months].sort(([a, x], [b, y]) => y - x || a.localeCompare(b))[0];
+  out.push(busiest === undefined ? "busiest month: none" : `busiest month: ${busiest[0]} (${plural(busiest[1])})`);
+
+  const largest = txns.filter((t) => t.amount < 0).sort((a, b) => a.amount - b.amount)[0];
+  out.push(largest === undefined ? "largest expense: none" : `largest expense: ${largest.memo || largest.account} ${formatCents(largest.amount)}`);
+  return out;
+}
+
+// @file main.ts
+import * as fs from "fs";
+import type { Txn } from "./parse";
+import { parseRow } from "./parse";
+import { report } from "./report";
+
+const input = fs.readFileSync(0, "utf8").trim();
 const txns: Txn[] = [];
 for (const [i, line] of input.split("\n").entries()) {
-  const [date = "", account = "", amountText = "", ...memo] = line.split(",").map((s) => s.trim());
-  if (!isDate(date)) {
-    console.log(`line ${i + 1}: bad date ${date}`);
-    continue;
-  }
-  if (account === "") {
-    console.log(`line ${i + 1}: missing account`);
-    continue;
-  }
-  const amount = parseCents(amountText);
-  if (amount === undefined) {
-    console.log(`line ${i + 1}: bad amount ${amountText}`);
-    continue;
-  }
-  txns.push({ date, account, amount, memo: memo.join(", ") });
+  const row = parseRow(line, i + 1);
+  if (typeof row === "string") console.log(row);
+  else txns.push(row);
 }
-
-const byAccount = new Map<string, { balance: number; count: number }>();
-for (const t of txns) {
-  const acc = byAccount.get(t.account) ?? { balance: 0, count: 0 };
-  byAccount.set(t.account, { balance: acc.balance + t.amount, count: acc.count + 1 });
-}
-for (const [name, acc] of [...byAccount].sort(([a], [b]) => a.localeCompare(b))) {
-  console.log(`${name}: ${money(acc.balance)} (${acc.count} ${acc.count === 1 ? "transaction" : "transactions"})`);
-}
-console.log(`total: ${money(txns.reduce((s, t) => s + t.amount, 0))}`);
-
-const months = new Map<string, number>();
-for (const t of txns) months.set(t.date.slice(0, 7), (months.get(t.date.slice(0, 7)) ?? 0) + 1);
-const busiest = [...months].sort(([a, x], [b, y]) => y - x || a.localeCompare(b))[0];
-console.log(busiest === undefined ? "busiest month: none" : `busiest month: ${busiest[0]} (${busiest[1]} ${busiest[1] === 1 ? "transaction" : "transactions"})`);
-
-const largest = txns.filter((t) => t.amount < 0).sort((a, b) => a.amount - b.amount)[0];
-console.log(largest === undefined ? "largest expense: none" : `largest expense: ${largest.memo || largest.account} ${money(largest.amount)}`);
+for (const line of report(txns)) console.log(line);
 """, ["2026-01-05,checking,2500,salary\n2026-01-09,checking,-45.50,groceries\n2026-01-20,savings,500\n2026-02-01,checking,-1200,rent, February",
       "2026-02-30,checking,10\n,checking,5\n2026-03-01,,5\n2026-03-01,cash,5.555\n2026-03-02,cash,-0.5",
       "2025-12-31,a,1.1\n2026-01-01,b,-1.10,refund\n2026-01-02,a,-3,coffee",
       "bad",
       "2024-02-29,wallet,-20,leap day lunch\n2024-02-28,wallet,100\n2024-03-01,wallet,-20,book"],
-    stretch=["Split it into modules — `money.ts`, `parse.ts`, `report.ts`, `main.ts` — with `import type` for the types.",
-             "Write a `money.d.ts` describing a pretend untyped `currency-format` library, and format balances with it."],
+    stretch=["Add a `currency.d.ts` describing a pretend untyped `currency-format` package (`declare module \"currency-format\" { … }`) — the types only; nothing here can install it.",
+             "Move the plural helper into its own `text.ts` and import it where it is used."],
+    starter=r"""
+// @file money.ts
+declare const CentsBrand: unique symbol;
+export type Cents = number & { readonly [CentsBrand]: true };
+
+/** `12`, `-3.5` or `1200.75` as cents; `undefined` for anything else. */
+export function parseCents(text: string): Cents | undefined {
+  throw new Error("TODO: parseCents");
+}
+
+/** `-450` → `-4.50`. */
+export function formatCents(c: number): string {
+  throw new Error("TODO: formatCents");
+}
+
+// @file parse.ts
+import type { Cents } from "./money";
+import { parseCents } from "./money";
+
+export type Txn = { readonly date: string; readonly account: string; readonly amount: Cents; readonly memo: string };
+
+/** A transaction, or the message to print for a bad row. */
+export function parseRow(line: string, lineNo: number): Txn | string {
+  throw new Error("TODO: parseRow");
+}
+
+// @file report.ts
+import type { Txn } from "./parse";
+import { formatCents } from "./money";
+
+/** The report lines, in order: accounts, total, busiest month, largest expense. */
+export function report(txns: readonly Txn[]): string[] {
+  throw new Error("TODO: report");
+}
+
+// @file main.ts
+import * as fs from "fs";
+import type { Txn } from "./parse";
+import { parseRow } from "./parse";
+import { report } from "./report";
+
+const input = fs.readFileSync(0, "utf8").trim();
+const txns: Txn[] = [];
+for (const [i, line] of input.split("\n").entries()) {
+  const row = parseRow(line, i + 1);
+  if (typeof row === "string") console.log(row);
+  else txns.push(row);
+}
+for (const line of report(txns)) console.log(line);
+""",
+    multi_file=True,
 )
 
 TS_PRACTICE_MORE[14] = [

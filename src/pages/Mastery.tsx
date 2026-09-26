@@ -14,6 +14,7 @@ import type {
 } from "../types";
 import { Markdown } from "../components/Markdown";
 import { CodeEditor } from "../components/CodeEditor";
+import { WorkspaceEditor } from "../components/WorkspaceEditor";
 import { TsErrorLinks } from "../components/TsErrorLinks";
 import { DiffBadge, Empty, inlineCode } from "../components/common";
 import {
@@ -25,6 +26,11 @@ import {
 } from "../lib/learnProgress";
 import { ExerciseSections } from "../components/ExerciseSections";
 import { CapstonePractice } from "../components/MasteryCapstone";
+import {
+  FinalExamPanel,
+  ProgrammeSummary,
+  useFinalExamState,
+} from "../components/MasteryFinalExam";
 import { useToast } from "../components/Toast";
 import { TrackSkeleton } from "../components/Skeleton";
 import {
@@ -103,6 +109,8 @@ export default function Mastery() {
     () => tracks.find((t) => t.key === trackKey) ?? tracks[0],
     [tracks, trackKey]
   );
+
+  const [finalState, saveFinalState] = useFinalExamState(track?.key ?? "");
 
   const conceptByKey = useMemo(() => {
     const m = new Map<string, Concept>();
@@ -318,7 +326,26 @@ export default function Mastery() {
         )}
       </div>
 
-      {finished && <CompletionSummary track={track} perWeek={corePerWeek} totalStudy={totalStudy} />}
+      {finished && (
+        <ProgrammeSummary
+          track={track}
+          weeks={core}
+          perWeek={corePerWeek}
+          totalStudy={totalStudy}
+          exam={track.final_exam ?? null}
+          attempts={finalState?.attempts ?? []}
+        />
+      )}
+      {track.final_exam && finalState && (
+        <FinalExamPanel
+          exam={track.final_exam}
+          weeks={core}
+          finished={finished}
+          remaining={core.length - completedWeeks}
+          state={finalState}
+          onChange={saveFinalState}
+        />
+      )}
 
       <TrackBody spec={spec} progress={trackProgress(spec.units)} />
     </div>
@@ -335,50 +362,6 @@ function Bar({ percent }: { percent: number }) {
           background: percent === 100 ? "var(--good)" : "var(--accent)",
         }}
       />
-    </div>
-  );
-}
-
-function CompletionSummary({
-  track,
-  perWeek,
-  totalStudy,
-}: {
-  track: MasteryTrack;
-  perWeek: WeekProgress[];
-  totalStudy: number;
-}) {
-  const scores = perWeek.map((p) => p.score ?? 0);
-  const avg = Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
-  const problems = perWeek.reduce((s, p) => s + p.problemsSolved, 0);
-  const projects = perWeek.filter((p) => p.projectDone).length;
-  return (
-    <div className="card" style={{ marginBottom: 18, borderColor: "var(--good)" }}>
-      <div className="io-label" style={{ color: "var(--good)" }}>
-        🏁 Programme complete
-      </div>
-      <p style={{ marginTop: 0 }}>
-        Every week of <strong>{track.title}</strong> is finished — all{" "}
-        {perWeek.length} weeks of chapters studied, both exams passed each week.
-      </p>
-      <div className="grid cols-4">
-        <div className="card" style={{ marginBottom: 0 }}>
-          <div className="stat-value">{perWeek.length}</div>
-          <div className="stat-label">weeks completed</div>
-        </div>
-        <div className="card" style={{ marginBottom: 0 }}>
-          <div className="stat-value">{avg}%</div>
-          <div className="stat-label">average exam score</div>
-        </div>
-        <div className="card" style={{ marginBottom: 0 }}>
-          <div className="stat-value">{problems}</div>
-          <div className="stat-label">curated problems solved</div>
-        </div>
-        <div className="card" style={{ marginBottom: 0 }}>
-          <div className="stat-value">{formatStudyTime(totalStudy)}</div>
-          <div className="stat-label">time invested · {projects} projects shipped</div>
-        </div>
-      </div>
     </div>
   );
 }
@@ -652,6 +635,7 @@ function WeekCard({
 
           {week.project && (
             <ProjectPanel
+              workspaceId={`${track.key}-w${week.week}`}
               brief={week.project}
               spec={week.project_spec ?? null}
               row={row}
@@ -741,10 +725,13 @@ function WeekCard({
 
           {week.exam && (
             <ExamPanel
-              exam={week.exam}
+              versions={[week.exam, ...(week.exam_alternates ?? [])]}
+              variantKey={`mastery-final-variant:${track.key}:${week.week}`}
               weekNumber={week.week}
               passed={progress.examPassed}
               savedCode={row?.exam_code ?? ""}
+              typesSolved={!!week.exam.types && solvedEx.has(week.exam.types.id)}
+              onTypesSolved={(id) => setSolvedEx(new Set(markExerciseSolved(id)))}
               onResult={(passed, code) =>
                 api.masteryRecordExam(track.key, week.week, passed, code).then(onChanged)
               }
@@ -771,6 +758,7 @@ function parseTicks(raw: string | undefined): Set<number> {
  * reference implementation opens only after shipping (TS_MASTERY_ROADMAP
  * X-40 to X-43). Without one it is the older free-form brief. */
 function ProjectPanel({
+  workspaceId,
   brief,
   spec,
   row,
@@ -778,6 +766,7 @@ function ProjectPanel({
   onSave,
   onRubric,
 }: {
+  workspaceId: string;
   brief: string;
   spec: MasteryProjectSpec | null;
   row: MasteryProgress | undefined;
@@ -910,14 +899,15 @@ function ProjectPanel({
           <div className="io-label">Code</div>
           <div
             style={{
-              height: spec ? 360 : 260,
+              height: spec ? 420 : 260,
               border: "1px solid var(--border)",
               borderRadius: 6,
               overflow: "hidden",
               marginBottom: 10,
             }}
           >
-            <CodeEditor
+            <WorkspaceEditor
+              workspaceId={workspaceId}
               language={language}
               value={code}
               onChange={setCode}
@@ -1229,36 +1219,79 @@ function QuizQuestionCard({
 }
 
 /** The week's coding final — the half of the gate a quiz cannot test. Judged by
- * the same runner as the Learn challenges. */
+ * the same runner as the Learn challenges.
+ *
+ * Weeks 15-22 have two-part finals (X-34): a type-graded half that must be
+ * solved as well as the runtime tests. Tests past `visible_tests` are a hidden
+ * set (X-32). After a failed attempt the learner can switch to an alternate
+ * version of the final (X-33); the choice is remembered in settings, and
+ * passing any version passes the week. */
 function ExamPanel({
-  exam,
+  versions,
+  variantKey,
   weekNumber,
   passed,
   savedCode,
+  typesSolved,
+  onTypesSolved,
   onResult,
 }: {
-  exam: MasteryExam;
+  versions: MasteryExam[];
+  variantKey: string;
   weekNumber: number;
   passed: boolean;
   savedCode: string;
+  typesSolved: boolean;
+  onTypesSolved: (id: string) => void;
   onResult: (passed: boolean, code: string) => Promise<void>;
 }) {
+  const [variant, setVariant] = useState(0);
+  const exam = versions[Math.min(variant, versions.length - 1)];
   const [code, setCode] = useState(savedCode || exam.starter);
   const [report, setReport] = useState<JudgeReport | null>(null);
   const [running, setRunning] = useState(false);
   const [err, setErr] = useState("");
   const [showHint, setShowHint] = useState(false);
   const [showSolution, setShowSolution] = useState(false);
+  const [failedOnce, setFailedOnce] = useState(false);
+  const types = versions[0].types ?? null;
+
+  // Which version is in use survives a restart; an unknown value means the main one.
+  useEffect(() => {
+    if (versions.length < 2) return;
+    api
+      .getSettings()
+      .then((s) => {
+        const v = Number(s[variantKey] ?? "0");
+        if (Number.isInteger(v) && v > 0 && v < versions.length) {
+          setVariant(v);
+          if (!savedCode) setCode(versions[v].starter);
+        }
+      })
+      .catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [variantKey, versions.length]);
+
+  function switchVersion() {
+    const next = (variant + 1) % versions.length;
+    setVariant(next);
+    setCode(versions[next].starter);
+    setReport(null);
+    setShowHint(false);
+    setFailedOnce(false);
+    api.setSetting(variantKey, String(next)).catch(() => {});
+  }
 
   async function submit() {
     setRunning(true);
     setErr("");
     setReport(null);
+    const visible = exam.visible_tests || exam.tests.length;
     const cases: TestCase[] = exam.tests.map((t, i) => ({
       id: 0,
       problem_id: 0,
       kind: "hidden",
-      name: `Test ${i + 1}`,
+      name: i < visible ? `Test ${i + 1}` : `Hidden test ${i + 1 - visible}`,
       input: t.input,
       expected_output: t.output,
       ordering: i,
@@ -1268,7 +1301,9 @@ function ExamPanel({
         strictness: exam.strictness,
       });
       setReport(r);
-      await onResult(r.status === "accepted", code);
+      const green = r.status === "accepted";
+      if (!green) setFailedOnce(true);
+      await onResult(green && (!types || typesSolved), code);
     } catch (e) {
       setErr(String(e));
     } finally {
@@ -1279,6 +1314,13 @@ function ExamPanel({
   const accepted = report?.status === "accepted";
   const untouched = code.includes("____");
 
+  // Solving the type half after the runtime half is already green completes
+  // the final there and then.
+  function typesDone(id: string) {
+    onTypesSolved(id);
+    if (accepted) onResult(true, code).catch(() => {});
+  }
+
   return (
     <div
       className="card"
@@ -1288,8 +1330,36 @@ function ExamPanel({
         <div className="io-label" style={{ margin: 0, color: passed ? "var(--good)" : "var(--accent)" }}>
           🧪 Coding final — {exam.title} {passed && "✓"}
         </div>
-        <span className="badge">{exam.language}</span>
+        <span className="row" style={{ gap: 6 }}>
+          {versions.length > 1 && (
+            <span className="badge" title="Alternate versions are offered after a failed attempt.">
+              version {variant + 1} of {versions.length}
+            </span>
+          )}
+          <span className="badge">{exam.language}</span>
+        </span>
       </div>
+
+      {types && (
+        <>
+          <p className="dim quiz-note" style={{ margin: "6px 0 0" }}>
+            A two-part final: the type half and the runtime half must both pass.{" "}
+            {typesSolved ? "✓ Part 1 is done." : "Part 1 is still open."}
+          </p>
+          <ExerciseSections
+            exercises={[types]}
+            onSolved={typesDone}
+            overrides={{
+              typelevel: {
+                heading: "Part 1 — types",
+                blurb:
+                  "Nothing runs: hidden `Expect<Equal<…>>` claims about your type must all compile.",
+              },
+            }}
+          />
+          <h4>Part 2 — runtime</h4>
+        </>
+      )}
       <p style={{ margin: "6px 0 10px" }}>{exam.prompt}</p>
 
       <div
@@ -1326,6 +1396,15 @@ function ExamPanel({
             {showSolution ? "Hide reference solution" : "Reference solution"}
           </button>
         )}
+        {versions.length > 1 && !passed && failedOnce && (
+          <button
+            className="ghost"
+            onClick={switchVersion}
+            title="A different problem on the same ideas — so a retake tests the ideas, not your memory of the tests."
+          >
+            Retake with a different version
+          </button>
+        )}
         {untouched && !running && (
           <span className="dim" style={{ fontSize: 12, alignSelf: "center" }}>
             Replace the <code>____</code> before submitting.
@@ -1352,11 +1431,23 @@ function ExamPanel({
         </div>
       )}
 
-      {report && <ExamFeedback report={report} weekNumber={weekNumber} accepted={accepted} />}
+      {report && (
+        <ExamFeedback
+          report={report}
+          weekNumber={weekNumber}
+          accepted={accepted}
+          acceptedNote={
+            types && !typesSolved
+              ? "Every runtime test passes. Solve Part 1 — the type half — to finish the final."
+              : undefined
+          }
+        />
+      )}
 
       {showSolution && passed && (
         <div style={{ marginTop: 10 }}>
           <Markdown>{"```" + exam.language + "\n" + exam.solution + "\n```"}</Markdown>
+          {types && <Markdown>{"```ts\n" + types.solution + "```"}</Markdown>}
         </div>
       )}
     </div>
@@ -1418,7 +1509,16 @@ function ExamFeedback({
           )}
         </p>
       ) : (
-        failing.slice(0, 3).map((r, i) => (
+        failing.slice(0, 3).map((r, i) =>
+          r.name.startsWith("Hidden test") ? (
+            <div key={i} style={{ marginTop: 6, fontSize: 12 }}>
+              <div className="dim">{r.name}</div>
+              <div style={{ color: "var(--bad)" }}>
+                {r.timed_out ? "Timed out." : "Failed."} Its input stays hidden until the final
+                passes — think about the cases the visible tests do not cover.
+              </div>
+            </div>
+          ) : (
           <div key={i} style={{ marginTop: 6, fontSize: 12 }}>
             <div className="dim">{r.name}</div>
             <div style={{ fontFamily: "var(--font-mono)" }}>
@@ -1434,7 +1534,8 @@ function ExamFeedback({
               {r.stderr && <pre style={{ margin: "4px 0 0", whiteSpace: "pre-wrap" }}>{r.stderr}</pre>}
             </div>
           </div>
-        ))
+          )
+        )
       )}
     </div>
   );

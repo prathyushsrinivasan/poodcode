@@ -51,8 +51,29 @@ def week_range(spec):
     return out
 
 
+def _load_bundler():
+    """`_bundle_ts` from mastery_ts_kit.py — the Python mirror of the judge's
+    multi-file bundler (X-45). The kit is written to be exec'd by gen_seed.py,
+    so it is exec'd here too, into a namespace of its own."""
+    ns = {"TS_INDEXED_FROM_WEEK": 14}
+    with open(os.path.join(HERE, "mastery_ts_kit.py"), encoding="utf-8") as f:
+        exec(compile(f.read(), "mastery_ts_kit.py", "exec"), ns)
+    return ns["_bundle_ts"], ns["_BUNDLE_MARKER"]
+
+
+_bundle_ts, _BUNDLE_MARKER = _load_bundler()
+
+
+def _bundled(code):
+    """A multi-file workspace as the judge runs it; anything else unchanged."""
+    if any(_BUNDLE_MARKER.match(l) for l in code.split("\n")):
+        return _bundle_ts(code)
+    return code
+
+
 def as_exercise(eid, kind, starter, solution, tests, strictness=""):
     """A final or a project, shaped like an exercise so the shared checks apply."""
+    starter, solution = _bundled(starter), _bundled(solution)
     return {
         "id": eid, "kind": kind, "starter": starter, "solution": solution,
         "tests": tests, "strictness": strictness or "strict", "harness": "",
@@ -72,6 +93,11 @@ def collect(only, weeks, include_learn, include_mastery):
                 work.append((f"learn/{c['key']}", ex))
     if include_mastery:
         track = next(t for t in load("mastery.json") if t["key"] == "typescript")
+        fx = track.get("final_exam") or {}
+        if not weeks:
+            for ex in fx.get("problems", []) + fx.get("type_section", []):
+                if not only or only in ex["id"]:
+                    work.append(("mastery/final-exam", ex))
         for w in track["weeks"]:
             n = w["week"]
             if weeks and n not in weeks:
@@ -80,11 +106,21 @@ def collect(only, weeks, include_learn, include_mastery):
             for ex in w.get("practice", []):
                 if not only or only in ex["id"]:
                     work.append((where + "/practice", ex))
+            for ex in w.get("problem_set", []):
+                if not only or only in ex["id"]:
+                    work.append((where + "/problem", ex))
             exam = w.get("exam")
             if exam and (not only or only in f"final-w{n}"):
                 work.append((where + "/final", as_exercise(
                     f"final-w{n}", "final", exam["starter"], exam["solution"],
                     exam["tests"], exam.get("strictness"))))
+            if exam and exam.get("types") and (not only or only in exam["types"]["id"]):
+                work.append((where + "/final-types", exam["types"]))
+            for k, alt in enumerate(w.get("exam_alternates", []), 1):
+                if not only or only in f"final-w{n}-alt":
+                    work.append((where + f"/final-alt{k}", as_exercise(
+                        f"final-w{n}-alt{k}", "final", alt["starter"], alt["solution"],
+                        alt["tests"], alt.get("strictness"))))
             proj = w.get("project_spec")
             if proj and (not only or only in f"project-w{n}"):
                 work.append((where + "/project", as_exercise(

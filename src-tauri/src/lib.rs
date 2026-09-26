@@ -12,6 +12,7 @@ mod repo;
 pub mod sqlexec;
 mod stats;
 pub mod tscheck;
+pub mod tsbundle;
 
 #[cfg(test)]
 mod tests;

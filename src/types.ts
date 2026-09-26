@@ -499,6 +499,10 @@ export interface MasteryExam {
   tests: ExerciseTest[];
   /** TypeScript only: "" (strict) or "strict+indexed" — the judge preset. */
   strictness?: string;
+  /** Weeks 15-22: the type-graded half of a two-part final. */
+  types?: Exercise | null;
+  /** How many tests are shown when they fail; the rest are hidden. 0 = all. */
+  visible_tests?: number;
 }
 
 /** A week's build project as a runnable brief. The learner's code runs against
@@ -554,6 +558,8 @@ export interface MasteryWeek {
   problem_set?: Exercise[];
   /** The build project as a runnable brief; `project` is its one-line summary. */
   project_spec?: MasteryProjectSpec | null;
+  /** Alternate finals, offered on a retake after a failed attempt. */
+  exam_alternates?: MasteryExam[];
   /** Capstone week only: interview questions with model answers. */
   interview_bank?: MasteryInterviewQ[];
   /** Capstone week only: timed mock interviews. */
@@ -605,6 +611,23 @@ export interface MasteryTrack {
   /** Language the coding finals are written in. */
   exam_language: string;
   weeks: MasteryWeek[];
+  /** The programme's final exam, open once every core week is complete. */
+  final_exam?: MasteryFinalExam | null;
+}
+
+/** One timed sitting over the whole programme (X-36). */
+export interface MasteryFinalExam {
+  title: string;
+  minutes: number;
+  intro: string;
+  /** Questions drawn from every week's bank. */
+  quiz_size: number;
+  /** Quiz percentage needed to pass. */
+  pass_mark: number;
+  min_problems: number;
+  min_types: number;
+  problems: Exercise[];
+  type_section: Exercise[];
 }
 
 /** Per-week learner state, persisted in SQLite (table `mastery_progress`). */

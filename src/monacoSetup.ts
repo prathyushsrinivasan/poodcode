@@ -11,6 +11,7 @@ import htmlWorker from "monaco-editor/esm/vs/language/html/html.worker?worker";
 // The judge's own ambient declarations (`fs`, `console`, `setTimeout`, …), so
 // the editor and the judge resolve exactly the same host API.
 import poodcodeEnvDts from "../src-tauri/tslib/poodcode-env.d.ts?raw";
+import { MONACO_LIB_SHIMS } from "./monacoLibShims";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 (self as any).MonacoEnvironment = {
@@ -84,16 +85,18 @@ const tsLang = monaco.languages.typescript;
 function judgeCompilerOptions(strictness: string) {
   return {
     target: 9, // ES2022 — not in Monaco's ScriptTarget enum, but TS accepts it
-    // The judge's list (tscheck.rs). Monaco's bundled 5.4 predates the iterator
-    // helpers and the ES2025 Set methods, so those two stay unsquiggled-but-
-    // unknown in the editor; the judge still checks them.
+    // The judge's list (tscheck.rs) is es2024 + esnext.array/collection/
+    // iterator/disposable/promise. Monaco's bundled TypeScript 5.4 ships libs
+    // only up to es2023, and naming a lib file it does not have silently drops
+    // the WHOLE standard library — every editor used to report `Cannot find
+    // name 'Error'`. So: the newest libs Monaco has, plus MONACO_LIB_SHIMS
+    // (added below) for what the judge knows beyond them.
     lib: [
-      "lib.es2024.d.ts",
-      "lib.esnext.array.d.ts",
+      "lib.es2023.d.ts",
       "lib.esnext.collection.d.ts",
-      "lib.esnext.iterator.d.ts",
       "lib.esnext.disposable.d.ts",
       "lib.esnext.promise.d.ts",
+      "lib.esnext.object.d.ts",
     ],
     module: tsLang.ModuleKind.ESNext,
     moduleResolution: tsLang.ModuleResolutionKind.NodeJs,
@@ -121,6 +124,11 @@ export function setTypeScriptStrictness(strictness = "") {
 }
 
 tsLang.typescriptDefaults.addExtraLib(poodcodeEnvDts, "file:///poodcode-env.d.ts");
+tsLang.typescriptDefaults.addExtraLib(MONACO_LIB_SHIMS, "file:///poodcode-lib-shims.d.ts");
+// Hand every open model to the TypeScript worker, not only the one being
+// checked — a multi-file project workspace (X-45) keeps a model per file, and
+// `import … from "./parse"` resolves only if the worker can see parse.ts.
+tsLang.typescriptDefaults.setEagerModelSync(true);
 setTypeScriptStrictness("strict");
 
 loader.config({ monaco });

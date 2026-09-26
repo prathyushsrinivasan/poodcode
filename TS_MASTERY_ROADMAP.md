@@ -68,6 +68,9 @@ the gap stays visible. This is what has landed since.
 | Month 6 chapters | none of the nine the roadmap asks for | **`ts_class_design`, `ts_decorators`, `ts_iterator_helpers`, `ts_heap_pq`, `ts_resource_management`, `ts_error_cause`, `ts_event_loop`, `ts_cancellation`, `ts_async_iteration`** on the lesson template. Decorators can't run under type stripping, so that chapter runs their desugared form and lets the checker judge the `@` syntax. `AbortController`/`AbortSignal` added to the judge's ambient declarations (`tslib/poodcode-env.d.ts`, shared with the editor and verifiers); the whole TS course still type-checks | `tools/ts_chapters_m6.py`, `tools/mastery_ts_more_m6.py` |
 | Deterministic async (M6-03) | a rule on paper | week 26's problems and project run on a **virtual clock** (`_VCLOCK` in `mastery_ts_more_m6.py`): time advances only after every microtask settles, so no output depends on machine speed. Two chapter demos that raced real timers were caught and rebuilt so order follows from due times alone | `tools/mastery_ts_more_m6.py`, `tools/ts_chapters_m6.py` |
 | The original 50 lessons (F-12, X-02, X-03) | a page of syntax and a "Watch out for" list, 0.9–2.6k characters | **every one on the lesson template**: *Why it exists* before the original text, then computed worked examples, real compiler errors, three or more pitfalls (wrong and right, both run) and forward links. All 87 TS chapters are now 5.0k–19k characters (median 7.9k); `gen_seed.py` fails if any TypeScript chapter is off the template | `tools/ts_deepen_m1.py` … `m6.py` (`_deepen` in `ts_chapter_kit.py`) |
+| Assessment round two (X-32, X-33, X-34, X-36, X-68) | one final per week, every failing test shown, no programme exam, a four-number summary | **two-part finals** for weeks 15–22 (a type-graded half that must pass as well); week 17's final is now **Typed patch API** ("Merge intervals" moved to the problem set); a **hidden test set** on every final (the first four tests shown, the rest only say they failed); **26 alternate finals**, offered on a retake after a failed attempt; a **3-hour programme final exam** once all 26 weeks are done — 40 questions drawn round-robin from every week, 5 cross-month problems, 5 type puzzles; a **completion summary** by month with weeks to revisit and a **printable certificate** | `tools/mastery_ts_finals.py`, `mastery_ts_alternates.py`, `mastery_ts_final_exam.py`; `ExamPanel` in `Mastery.tsx`; `src/components/MasteryFinalExam.tsx`, `src/lib/finalExam.ts` |
+| Multi-file projects (X-45, M4-03) | one code box per project | a **tabbed workspace**: files travel as one string with `// @file name.ts` markers; the judge bundles them in tab order (sibling imports dropped, `export` stripped, compiler errors mapped back to `parse.ts(12,5)`), and every tab is its own Monaco model so imports resolve in the editor. Week 14's project is now a four-module `ledger/` (`money.ts`, `parse.ts`, `report.ts`, `main.ts`); any TypeScript project can be split into files. The Python mirror of the bundler computes expected outputs; the Rust one judges the reference, so the two cannot drift | `src-tauri/src/tsbundle.rs`, `_bundle_ts` in `tools/mastery_ts_kit.py`, `src/components/WorkspaceEditor.tsx`, `src/lib/projectFiles.ts` |
+| Editor standard library | every TypeScript editor named `lib.es2024.d.ts`, which Monaco's bundled TypeScript 5.4 does not ship — so the whole standard library silently dropped out (`Cannot find name 'Error'`, `'trim' does not exist on type 'string'`) | the newest libs Monaco has (es2023 + esnext collection/disposable/promise/object) plus editor-only declarations for what the judge's 5.9 adds (Set methods, iterator helpers, `Iterator.from`, `Array.fromAsync`, `Promise.try`) | `src/monacoSetup.ts`, `src/monacoLibShims.ts` |
 | Week 27 interview practice | a capstone and a four-problem mock set | **63-question interview bank** with model answers (7 topics, "ask me one" drill), **three timed 45-minute mock interviews** (bank questions + a problem + a type puzzle, clock, self-scored rubric, attempt history), **10 code-review exercises** (X-14): write the review, compare with the model review, tick what you caught — the PR code and the corrected code are both run and their output computed | `tools/mastery_ts_w27.py`, `src/components/MasteryCapstone.tsx`, `src/lib/capstone.ts` |
 | Fast authoring loop (X-102) | none for Mastery | `python tools/verify_ts_mastery.py --weeks 11-14` / `--only ts_regex` — type-checks and runs chapters, practice, problems, finals and projects in seconds | `tools/verify_ts_mastery.py` |
 
@@ -206,7 +209,7 @@ Everything here is built once and then used by every week in Part B.
 | 🚧 X-11 | **`fix`** (the starter compiles and prints the wrong thing, or crashes) — ≥ 2 per chapter. | P1 | M |
 | 🚧 X-12 | **Type-graded problems** (`judge_mode: "types"`): a Library problem whose "tests" are `Expect<Equal<…>>` assertions. Needs: `judge_mode` accepted on problems, the harness appended at check time, and TestResults showing *which* assertion failed. Unlocks months 4–5. | **P0** for M4–M5 | L |
 | X-13 | **`refactor`** — given working code, change it to satisfy a constraint (remove every `any`, make it immutable, replace the if-chain with a lookup) while tests still pass; banned-token list enforces the constraint. | P2 | M |
-| X-14 | **`explain`** — ungraded free-text answer, compared on reveal against a model answer; used for "why" questions and fed into self-review. | P3 | S |
+| ✅ X-14 | **`explain`** — ungraded free-text answer, compared on reveal against a model answer; used for "why" questions and fed into self-review. | P3 | S |
 | X-15 | **`order`** — drag lines of a program into the correct order (Parsons problem). Excellent for months 1–2 and for async ordering in month 6. | P2 | M |
 | X-16 | **`spot`** — click the line that is the bug / the line where the type narrows / the line that throws. | P2 | M |
 | 🚧 X-17 | **Strictness ladder** for Mastery: chapter-level `strictness` default (`strict` → `strict+indexed` from week 11) so indexed access is honest everywhere after narrowing is taught. | P1 | S |
@@ -231,11 +234,11 @@ Everything here is built once and then used by every week in Part B.
 |---|---|---|---|
 | ✅ X-30 | Week quiz bank **≥ 40 questions**; sample **10** per sitting (from 4). Mixed kinds: MCQ, "what does this print", "which line errors", "which type is inferred". ~1,050 questions total. | P1 | L |
 | X-31 | New quiz question types: **code-output** (show code, pick the output), **type-inference** (pick the inferred type), **multi-select**, **fill-the-type** (typed short answer checked by `ts_typecheck.mjs`). | P1 | L |
-| 🚧 X-32 | Every coding final: **≥ 6 tests**, ≥ 2 edge cases, 1 large input, and a **hidden** set not shown until pass (F-04). | **P0** | M |
-| X-33 | **Alternate finals**: a second final per week, served on retake, so a failed final can't be passed by memorising the first. | P2 | L |
-| X-34 | **Two-part finals** for weeks 15–22: a type-graded half (assertions) + a runtime half (stdout). Pass requires both. | P1 | M |
+| ✅ X-32 | Every coding final: **≥ 6 tests**, ≥ 2 edge cases, 1 large input, and a **hidden** set not shown until pass (F-04). | **P0** | M |
+| ✅ X-33 | **Alternate finals**: a second final per week, served on retake, so a failed final can't be passed by memorising the first. | P2 | L |
+| ✅ X-34 | **Two-part finals** for weeks 15–22: a type-graded half (assertions) + a runtime half (stdout). Pass requires both. | P1 | M |
 | 🚧 X-35 | **Monthly checkpoint** at the end of every month (today: only weeks 13 and 26) — a timed contest from that month's problems + a 20-question mixed quiz. Months 1, 2, 4, 5 gain one. | P1 | M |
-| X-36 | **Final exam** for the whole programme: 3 hours, 5 coding problems across months, 40 questions, a type-challenge section. Unlocks a completion summary (X-68). | P2 | L |
+| ✅ X-36 | **Final exam** for the whole programme: 3 hours, 5 coding problems across months, 40 questions, a type-challenge section. Unlocks a completion summary (X-68). | P2 | L |
 | X-37 | Quiz **explanations for wrong options**, not just the right one ("why not B?"). | P2 | M |
 | X-38 | Question-level analytics: track per-question accuracy; flag questions everyone gets right (too easy) or wrong (probably ambiguous) in a dev view. | P3 | M |
 
@@ -248,7 +251,7 @@ Everything here is built once and then used by every week in Part B.
 | ✅ X-42 | **Self-review rubric** per project (typing quality, no `any`, error handling, naming) — tick-boxes saved with the project. | P2 | S |
 | 🚧 X-43 | **Reference implementation** revealable after shipping, with a side-by-side diff against the learner's code (`src/lib/diff.ts` already does LCS). | P2 | M |
 | X-44 | **Project continuity** — a single running project that grows each month (like the Course's Budget Buddy): *Ledger → typed CLI → validated store → type-safe event system → async loader*. The monthly "arc" projects are listed in Part B. | P1 | L |
-| X-45 | **Multi-file projects** in the project workspace (tabs for several `.ts` files, bundled into one file for the judge by concatenation with `export` stripped). Required for months 4 and 6. | P2 | L |
+| ✅ X-45 | **Multi-file projects** in the project workspace (tabs for several `.ts` files, bundled into one file for the judge by concatenation with `export` stripped). Required for months 4 and 6. | P2 | L |
 | X-46 | Project history — keep every saved version, not just the latest (ProjectHistory.tsx exists for the Projects track and can be reused). | P3 | M |
 
 ### A6. UI — the Mastery page and the editor
@@ -263,7 +266,7 @@ Everything here is built once and then used by every week in Part B.
 | X-65 | **Strictness switcher** in scratch mode — flip `strict`, `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes` and watch errors appear and disappear. | P2 | M |
 | ✅ X-66 | **TS error glossary** page (`/ts-errors`): every `TSnnnn` code the programme can produce, plain-English cause, minimal repro, fix, and which chapters teach it. | P1 | M |
 | X-67 | **Type playground** (`/playground/ts`): scratch file + panel listing every declared type's fully-expanded form (via the language service's `quickInfo`). | P2 | L |
-| X-68 | **Completion summary** per month and for the programme: time spent, finals first-try rate, weakest chapters, projects shipped, printable. | P2 | M |
+| ✅ X-68 | **Completion summary** per month and for the programme: time spent, finals first-try rate, weakest chapters, projects shipped, printable. | P2 | M |
 | X-69 | **Skill radar** — per-phase mastery (reading types, writing types, runtime correctness, async, type-level) computed from exercise kinds passed. | P3 | M |
 | ✅ X-70 | **Quiz review screen** after every sitting: every question, your answer, the right answer, the explanation, "add to flashcards". | P1 | S |
 | X-71 | **Exam timer & focus mode** (optional): hide the sidebar, show elapsed time, record it; does not gate. | P2 | S |
@@ -572,9 +575,9 @@ typing is sometimes unsound, and make illegal values unconstructable.
 
 | # | Item | P |
 |---|---|---|
-| M4-01 | **Type-graded problems (X-12) and two-part finals (X-34) live** before week 15. | **P0** |
+| ✅ M4-01 | **Type-graded problems (X-12) and two-part finals (X-34) live** before week 15. | **P0** |
 | M4-02 | **tsconfig explorer** — an interactive tsconfig with every flag used in the programme; toggle one, see which of a fixed set of sample programs start or stop compiling. | P2 |
-| M4-03 | **Multi-file project workspace** (X-45) — required for week 14's modules project. | P1 |
+| ✅ M4-03 | **Multi-file project workspace** (X-45) — required for week 14's modules project. | P1 |
 | M4-04 | **Month 4 checkpoint** (new): 90-minute contest + a 10-puzzle type-challenge section. | P1 |
 | M4-05 | Arc project: **`ledger.ts` v4** — branded `Cents` and `AccountId`, a validated parser from untrusted JSON, `readonly` everywhere, derived types via utility types, split across modules. | P1 |
 
@@ -805,13 +808,13 @@ concurrency and cancellation.
 | Type-challenge bank | 0 | **~120** |
 | Quiz bank | 170 | **~1,050**, 10 sampled |
 | Flashcards | 0 | **~1,000** |
-| Final tests | 94 (2–5/week) | **~200** (≥ 6 per final, most 8) + hidden sets, + 26 alternates |
-| Checkpoints | 2 | 6 monthly + final exam |
+| Final tests | 94 (2–5/week) | **~200** (≥ 6 per final, most 8) + hidden sets, + 26 alternates — ✅ 220 + 213 alternate tests, hidden sets, 8 two-part finals |
+| Checkpoints | 2 | 6 monthly + final exam — ✅ |
 | Projects | 26 ungraded sentences | 26 structured, runnable, tested + 1 arc project across 6 months |
 
 ---
 
-**Status, 2026-09-27 — Part B's content is built for all 26 core weeks, and every lesson is on the template.** TypeScript Learn chapters: **87** (the target), every one 5k+ characters on the X-02 template (the original 50 deepened, F-12), with 301 Learn exercises and 265 chapter quiz questions. Mastery TS track: 261 problem-set problems (41 type-graded), 202 practice exercises, 27 runnable projects, 1,324 week-bank quiz questions (at least 40 every week, build-asserted), 521 review cards, 219 final tests, 6 checkpoint contests. Still open from Part A and the targets above: the ~1,300-exercise and ~1,000-card volumes (the quiz target is met), alternate finals (X-33), two-part finals (X-34), the programme final exam (X-36), the multi-file workspace (X-45), and the visualisers and UI items (M1-02, M3-01, M5-01, M6-01, X-60 onward). Optional week 27 now has its capstone (the arc's final `ledger.ts`: branded ids, `Result` parsing, a private-state class with a generator statement, concurrent loading with timeouts on the virtual clock), a four-problem mock-interview set with four type puzzles, a 63-question interview bank, three timed mock interviews and ten code-review exercises — week 27 is complete.
+**Status, 2026-09-27 — Part B's content is built for all 26 core weeks, and every lesson is on the template.** TypeScript Learn chapters: **87** (the target), every one 5k+ characters on the X-02 template (the original 50 deepened, F-12), with 301 Learn exercises and 265 chapter quiz questions. Mastery TS track: 261 problem-set problems (41 type-graded), 202 practice exercises, 27 runnable projects, 1,324 week-bank quiz questions (at least 40 every week, build-asserted), 521 review cards, 219 final tests, 6 checkpoint contests. Still open from Part A and the targets above: the ~1,300-exercise and ~1,000-card volumes (the quiz target is met), and the visualisers and UI items (M1-02, M3-01, M5-01, M6-01, X-60 onward). Optional week 27 now has its capstone (the arc's final `ledger.ts`: branded ids, `Result` parsing, a private-state class with a generator statement, concurrent loading with timeouts on the virtual clock), a four-problem mock-interview set with four type puzzles, a 63-question interview bank, three timed mock interviews and ten code-review exercises — week 27 is complete.
 
 ---
 

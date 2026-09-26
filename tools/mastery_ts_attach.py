@@ -85,3 +85,63 @@ for _cr2 in TS_CODE_REVIEWS:
 _w27["interview_bank"] = TS_INTERVIEW_BANK
 _w27["mock_sessions"] = TS_MOCK_SESSIONS
 _w27["code_reviews"] = TS_CODE_REVIEWS
+
+# Finals, round two (mastery_ts_finals.py): replaced finals, the type-graded
+# halves of the two-part finals (X-34), and the hidden-test split (X-32). A
+# replaced final's old version stays in the week as an "applied" problem.
+for _tsw in TS_WEEKS:
+    _n = _tsw["week"]
+    if _n in TS_EXAM_REPLACE:
+        _old = _tsw["exam"]
+        _new = dict(TS_EXAM_REPLACE[_n])
+        _new["strictness"] = _week_strictness(_n)
+        _tsw["exam"] = _new
+        _tsw["problem_set"].append({
+            "id": f"tsm-w{_n}-former-final", "title": f"Applied: {_old['title']}",
+            "prompt": _old["prompt"], "hint": _old.get("hint", ""), "hints": [h for h in [_old.get("hint", "")] if h],
+            "language": "typescript", "kind": "challenge", "difficulty": "Medium",
+            "strictness": _old.get("strictness", ""), "harness": "", "judge_mode": "", "forbid": [],
+            "starter": _old["starter"], "solution": _old["solution"], "tests": _old["tests"],
+            "source_slug": "", "dataset": "",
+        })
+    _exam = _tsw["exam"]
+    if _exam is None:
+        continue
+    if _n in TS_EXAM_TYPES:
+        _types = TS_EXAM_TYPES[_n]
+        assert _types["judge_mode"] == "types" and _types["kind"] == "typelevel", f"week {_n}: type half must be type-graded"
+        assert _types["id"] not in _ts_ids, f"week {_n}: type half id {_types['id']} is already used"
+        _ts_ids.add(_types["id"])
+        _exam["types"] = _types
+    _exam["visible_tests"] = min(TS_VISIBLE_TESTS, len(_exam["tests"]) - 1)
+_missing_types = [n for n in range(15, 23) if n not in TS_EXAM_TYPES]
+assert not _missing_types, f"X-34: weeks 15-22 need two-part finals, missing {_missing_types}"
+
+# Alternate finals (X-33, mastery_ts_alternates.py): one per core week, at the
+# week's strictness, with the same hidden-test split as the main final.
+for _tsw in TS_WEEKS:
+    _n = _tsw["week"]
+    _alts = TS_EXAM_ALTERNATES.get(_n)
+    if _alts is None:
+        assert _tsw.get("optional") or _tsw["exam"] is None, f"X-33: week {_n} has no alternate final"
+        continue
+    _alt_exam = dict(_alts)
+    _alt_exam["strictness"] = _week_strictness(_n)
+    _alt_exam["visible_tests"] = min(TS_VISIBLE_TESTS, len(_alt_exam["tests"]) - 1)
+    assert len(_alt_exam["tests"]) >= 8, f"week {_n} alternate: needs 8+ tests"
+    assert _alt_exam["title"] != _tsw["exam"]["title"], f"week {_n}: the alternate repeats the final"
+    _tsw["exam_alternates"] = [_alt_exam]
+
+# The programme's final exam (X-36, mastery_ts_final_exam.py), on the track.
+_ts_track = next(t for t in MASTERY if t["key"] == "typescript")
+assert len(TS_FINAL_EXAM["problems"]) == 5, "X-36: the final exam has five coding problems"
+assert len(TS_FINAL_EXAM["type_section"]) == 5, "X-36: the final exam has a five-puzzle type section"
+assert TS_FINAL_EXAM["min_problems"] <= 5 and TS_FINAL_EXAM["min_types"] <= 5
+for _ex in TS_FINAL_EXAM["problems"] + TS_FINAL_EXAM["type_section"]:
+    assert _ex["id"] not in _ts_ids, f"final exam: id {_ex['id']} is already used"
+    _ts_ids.add(_ex["id"])
+for _ex in TS_FINAL_EXAM["problems"]:
+    assert _ex["kind"] == "challenge" and len(_ex["tests"]) >= 8, f"{_ex['id']}: a judged problem with 8+ tests"
+for _ex in TS_FINAL_EXAM["type_section"]:
+    assert _ex["judge_mode"] == "types", f"{_ex['id']}: the type section is type-graded"
+_ts_track["final_exam"] = TS_FINAL_EXAM

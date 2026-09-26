@@ -16,6 +16,10 @@ interface Props {
   /** TypeScript only: the judge preset this code is checked at ("" = strict,
    * or "strict+indexed"), so the editor's squiggles match the judge's verdict. */
   tsStrictness?: string;
+  /** A model URI (`file:///ws/…/parse.ts`). Editors of one multi-file workspace
+   * give each file its own path, so the TypeScript service sees them as
+   * sibling modules and `import … from "./parse"` resolves. */
+  path?: string;
 }
 
 /** Imperative actions callers can trigger on the editor (format, find, replace). */
@@ -29,7 +33,7 @@ export interface CodeEditorHandle {
 
 /** Monaco wrapper honoring user editor preferences and app theme. */
 export const CodeEditor = forwardRef<CodeEditorHandle, Props>(function CodeEditor(
-  { language, value, onChange, disableIntellisense, readOnly, onRun, onSubmit, tsStrictness },
+  { language, value, onChange, disableIntellisense, readOnly, onRun, onSubmit, tsStrictness, path },
   ref
 ) {
   const prefs = useStore((s) => s.prefs);
@@ -72,6 +76,7 @@ export const CodeEditor = forwardRef<CodeEditorHandle, Props>(function CodeEdito
   return (
     <Editor
       language={language}
+      path={path}
       value={value}
       theme={prefs.editorTheme}
       onChange={(v) => onChange(v ?? "")}

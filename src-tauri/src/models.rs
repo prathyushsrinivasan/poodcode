@@ -1243,6 +1243,15 @@ pub struct MasteryExam {
     /// `strict+indexed` from the week that teaches `noUncheckedIndexedAccess`.
     #[serde(default)]
     pub strictness: String,
+    /// Weeks 15-22: the type-graded half of a two-part final (TS_MASTERY_ROADMAP
+    /// X-34) — an exercise judged on the type-check alone. The final passes only
+    /// when this and the runtime tests are both green.
+    #[serde(default)]
+    pub types: Option<Exercise>,
+    /// How many of `tests` are shown when they fail (X-32). The rest are a
+    /// hidden set whose inputs never appear. 0 = every test is shown.
+    #[serde(default)]
+    pub visible_tests: i64,
 }
 
 /// A week's build project as a structured, runnable brief (TS_MASTERY_ROADMAP
@@ -1338,6 +1347,10 @@ pub struct MasteryWeek {
     /// stays as the one-line summary.
     #[serde(default)]
     pub project_spec: Option<MasteryProjectSpec>,
+    /// Alternate coding finals (X-33), served on a retake so a failed final
+    /// cannot be passed by memorising it. Passing any version passes the week.
+    #[serde(default)]
+    pub exam_alternates: Vec<MasteryExam>,
     /// Capstone week only: conceptual interview questions with model answers.
     #[serde(default)]
     pub interview_bank: Vec<MasteryInterviewQ>,
@@ -1441,6 +1454,29 @@ pub struct MasteryTrack {
     pub exam_language: String,
     #[serde(default)]
     pub weeks: Vec<MasteryWeek>,
+    /// The programme's final exam (TS_MASTERY_ROADMAP X-36), open once every
+    /// core week is complete.
+    #[serde(default)]
+    pub final_exam: Option<MasteryFinalExam>,
+}
+
+/// One timed sitting over the whole programme: `quiz_size` questions drawn
+/// from every week's bank, plus judged problems and type puzzles. Passing needs
+/// `pass_mark`% on the questions, `min_problems` problems and `min_types` puzzles.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MasteryFinalExam {
+    pub title: String,
+    pub minutes: i64,
+    #[serde(default)]
+    pub intro: String,
+    pub quiz_size: i64,
+    pub pass_mark: i64,
+    pub min_problems: i64,
+    pub min_types: i64,
+    #[serde(default)]
+    pub problems: Vec<Exercise>,
+    #[serde(default)]
+    pub type_section: Vec<Exercise>,
 }
 
 // ---------------------------------------------------------------------------

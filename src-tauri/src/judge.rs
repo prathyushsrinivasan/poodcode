@@ -269,6 +269,23 @@ pub fn judge_with(
         None => code.to_string(),
     };
 
+    // A multi-file project workspace (X-45) is bundled into one program first.
+    // Bundling keeps line numbers, so compiler messages can be mapped back to
+    // the file and line the learner wrote (`bundle_relabel` below).
+    let bundled = if language == "typescript" {
+        crate::tsbundle::bundle(&effective_code)
+    } else {
+        None
+    };
+    let effective_code = match &bundled {
+        Some(b) => b.source.clone(),
+        None => effective_code,
+    };
+    let bundle_relabel = |message: String| match &bundled {
+        Some(b) => crate::tsbundle::relabel(&message, &b.origin),
+        None => message,
+    };
+
     // Then append the exercise's own hidden harness, if it has one. The two are
     // never both set: `function_spec` belongs to the problem bank,
     // `cfg.harness` to the TypeScript course.
@@ -317,7 +334,7 @@ pub fn judge_with(
             return JudgeReport::error("not_installed", hint)
         }
         Err(PrepareError::Compile { message }) => {
-            return JudgeReport::error("error", relabel(message))
+            return JudgeReport::error("error", bundle_relabel(relabel(message)))
         }
         Err(PrepareError::Unknown(id)) => {
             return JudgeReport::error("error", format!("unknown language: {id}"))

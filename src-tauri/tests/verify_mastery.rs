@@ -52,10 +52,16 @@ fn all_finals(tracks: &[MasteryTrack]) -> Vec<(String, MasteryExam)> {
     tracks
         .iter()
         .flat_map(|t| {
-            t.weeks.iter().filter_map(move |w| {
-                w.exam
+            t.weeks.iter().flat_map(move |w| {
+                let main = w
+                    .exam
                     .clone()
-                    .map(|e| (format!("{} week {} ({})", t.key, w.week, e.title), e))
+                    .map(|e| (format!("{} week {} ({})", t.key, w.week, e.title), e));
+                // Alternates (X-33) gate the week exactly as the main final does.
+                let alternates = w.exam_alternates.iter().enumerate().map(move |(k, e)| {
+                    (format!("{} week {} alternate {} ({})", t.key, w.week, k + 1, e.title), e.clone())
+                });
+                main.into_iter().chain(alternates)
             })
         })
         .collect()
@@ -91,7 +97,16 @@ fn judge_all(
 /// the same way — by the exercise's own settings, exactly as `ExerciseCard`
 /// sends them.
 fn all_practice(tracks: &[MasteryTrack]) -> Vec<(String, Exercise)> {
-    tracks
+    // The programme final exam's problems and puzzles are exercises too.
+    let final_exam = tracks.iter().flat_map(|t| {
+        t.final_exam.iter().flat_map(move |fx| {
+            fx.problems
+                .iter()
+                .chain(fx.type_section.iter())
+                .map(move |ex| (format!("{} final exam {}", t.key, ex.id), ex.clone()))
+        })
+    });
+    let weekly: Vec<(String, Exercise)> = tracks
         .iter()
         .flat_map(|t| {
             t.weeks.iter().flat_map(move |w| {
@@ -103,10 +118,18 @@ fn all_practice(tracks: &[MasteryTrack]) -> Vec<(String, Exercise)> {
                     .problem_set
                     .iter()
                     .map(move |ex| (format!("{} week {} problem {}", t.key, w.week, ex.id), ex.clone()));
-                practice.chain(problems)
+                // The type-graded half of a two-part final (X-34) is judged as
+                // the exercise it is.
+                let final_types = w
+                    .exam
+                    .iter()
+                    .filter_map(|e| e.types.clone())
+                    .map(move |ex| (format!("{} week {} final types {}", t.key, w.week, ex.id), ex));
+                practice.chain(problems).chain(final_types)
             })
         })
-        .collect()
+        .collect();
+    weekly.into_iter().chain(final_exam).collect()
 }
 
 /// Every runnable project, as a final-shaped value so `judge_all` can run it.
@@ -127,6 +150,8 @@ fn all_projects(tracks: &[MasteryTrack]) -> Vec<(String, MasteryExam)> {
                             solution: p.solution.clone(),
                             tests: p.tests.clone(),
                             strictness: p.strictness.clone(),
+                            types: None,
+                            visible_tests: 0,
                         },
                     )
                 })

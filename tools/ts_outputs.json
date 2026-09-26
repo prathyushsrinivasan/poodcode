@@ -67,7 +67,7 @@
   ]
  },
  "project-w14": {
-  "hash": "1b3387be6cb942901487",
+  "hash": "ecdc86bceeb0e4dda111",
   "outputs": [
    "checking: 1254.50 (3 transactions)\nsavings: 500.00 (1 transaction)\ntotal: 1754.50\nbusiest month: 2026-01 (3 transactions)\nlargest expense: rent, February -1200.00",
    "line 1: bad date 2026-02-30\nline 2: bad date\nline 3: missing account\nline 4: bad amount 5.555\ncash: -0.50 (1 transaction)\ntotal: -0.50\nbusiest month: 2026-03 (1 transaction)\nlargest expense: cash -0.50",
@@ -8466,6 +8466,424 @@
   "hash": "b48d1c917fa71d9293f7",
   "outputs": [
    "move 42 from #7 to #2500"
+  ]
+ },
+ "tsm-exam-departments": {
+  "hash": "cad1efef049cef7338d9",
+  "outputs": [
+   "eng: n=2 total=190 top=ada\nops: n=1 total=95 top=grace\noverall top=ada (100)",
+   "overall top=none",
+   "hr: n=2 total=100 top=al\noverall top=al (50)",
+   "a: n=2 total=4 top=w\nb: n=2 total=4 top=z\noverall top=z (3)",
+   "solo: n=1 total=10 top=me\noverall top=me (10)",
+   "eng: n=1 total=80 top=s\nops: n=2 total=150 top=r\noverall top=r (80)",
+   "x: n=2 total=11 top=d\ny: n=2 total=8 top=b\nz: n=1 total=3 top=c\noverall top=d (6)",
+   "sales: n=2 total=0 top=amy\noverall top=amy (0)"
+  ]
+ },
+ "tsm-exam-orders": {
+  "hash": "e44d9da18b82e6652d30",
+  "outputs": [
+   "ok a placed\nok a paid\nok a shipped\ninvalid a cancel from shipped\nplaced=0 paid=0 shipped=1 cancelled=0",
+   "unknown x\nok x placed\ninvalid x place from placed\nplaced=1 paid=0 shipped=0 cancelled=0",
+   "ok a placed\nok b placed\nok a cancelled\nok b paid\nok b cancelled\nplaced=0 paid=0 shipped=0 cancelled=2",
+   "bad command\nbad command\nplaced=0 paid=0 shipped=0 cancelled=0",
+   "ok q placed\ninvalid q ship from placed\nok q paid\nok q shipped\nplaced=0 paid=0 shipped=1 cancelled=0",
+   "ok solo placed\nplaced=1 paid=0 shipped=0 cancelled=0",
+   "ok a placed\nok b placed\nok c placed\nok a paid\nok b paid\nok a shipped\nplaced=1 paid=1 shipped=1 cancelled=0",
+   "ok z placed\nok z cancelled\ninvalid z pay from cancelled\nplaced=0 paid=0 shipped=0 cancelled=1"
+  ]
+ },
+ "tsm-exam-pages": {
+  "hash": "b80dd01fa755df331272",
+  "outputs": [
+   "page 0: 1 2\npage 1: 3 4\npage 2: 5 6\nclosed after page 2\nsum 10\nstopped at 5",
+   "page 0: 5 5 5\npage 1: 5\nclosed after page 1\nsum 20\nall consumed",
+   "page 0: 1\nclosed after page 0\nsum 0\nstopped at 1",
+   "page 0: 1 1 1 1\npage 1: 1 1 1 1\nclosed after page 1\nsum 7\nstopped at 1",
+   "page 0: (empty)\nclosed after page 0\nsum 0\nall consumed",
+   "page 0: 10 10 10 10 10\npage 1: 1\nclosed after page 1\nsum 50\nstopped at 1",
+   "page 0: 2 2 2\npage 1: 2\nclosed after page 1\nsum 6\nstopped at 2",
+   "page 0: 100 200\npage 1: 300\nclosed after page 1\nsum 600\nall consumed"
+  ]
+ },
+ "tsm-exam-receipt": {
+  "hash": "e5dbdcbdf03ee75d9fbc",
+  "outputs": [
+   "tea      x2 $5.00\ncoffee   x1 $3.99\nbiscuits x3 $3.60\ntotal $12.59",
+   "bread x1 $0.00\nskipped line 2\ntotal $0.00",
+   "single x10 $0.50\ntotal $0.50",
+   "a   x1 $0.01\nbb  x2 $0.04\nccc x3 $0.09\ntotal $0.14",
+   "skipped line 1\nskipped line 2\ntotal $0.00",
+   "milk x2 $1.98\nmilk x1 $0.99\neggs x12 $3.00\nfree x1 $0.00\ntotal $5.97",
+   "skipped line 1\ntotal $0.00",
+   "skipped line 1\npad x1 $1.50\ntotal $1.50"
+  ]
+ },
+ "tsm-exam-statement": {
+  "hash": "92b08356a9a8f6621f01",
+  "outputs": [
+   "imported 3\nbalance $854.50\nlargest debit rent -$300.00",
+   "line 2: bad date\nimported 1\nbalance $5.00\nlargest debit none",
+   "line 2: bad amount\nline 3: bad amount\nline 4: empty memo\nimported 0\nbalance $0.00\nlargest debit none",
+   "line 2: wrong field count\nimported 1\nbalance -$0.99\nlargest debit coffee -$0.99",
+   "imported 0\nbalance $0.00\nlargest debit none",
+   "imported 3\nbalance -$14.95\nlargest debit first -$10.00",
+   "line 2: bad date\nimported 1\nbalance $0.50\nlargest debit none",
+   "imported 2\nbalance -$0.01\nlargest debit big -$1000.00"
+  ]
+ },
+ "tsm-final-w1-alt-inches": {
+  "hash": "e27d4625508c6e923313",
+  "outputs": [
+   "1=2.54\n2=5.08\n7.62",
+   "0=0\n0",
+   "12=30.48\n30.48",
+   "-3=-7.62\n3=7.62\n0",
+   "10=25.4\n20=50.8\n30=76.2\n152.39999999999998",
+   "100=254\n254",
+   "7=17.78\n17.78",
+   "1=2.54\n1=2.54\n1=2.54\n1=2.54\n10.16"
+  ]
+ },
+ "tsm-final-w10-alt-turnstile": {
+  "hash": "72f6ce6a4f4ce4cb3dc8",
+  "outputs": [
+   "unlocked\nlocked\n1",
+   "unlocked\nlocked\nlocked\n0",
+   "locked\nlocked\nunlocked\n1",
+   "unlocked\nunlocked\nlocked\nunlocked\n2",
+   "ignored kick\nlocked\n0",
+   "0",
+   "locked\nunlocked\nlocked\nunlocked\n2",
+   "unlocked\nignored wave\nlocked\n1"
+  ]
+ },
+ "tsm-final-w11-alt-sensors": {
+  "hash": "fea5b199dc4eb1a808c0",
+  "outputs": [
+   "ok t1 20.5\ngap t2\nbad\n20.5",
+   "ok a -4\nok b -1\n-1",
+   "bad\nnone",
+   "bad\nbad\nnone",
+   "bad\nok y 0\ngap z\n0",
+   "gap solo\nnone",
+   "ok a 1\nok b 3\nok c 2\nbad\n3",
+   "bad\nok r 12\n12"
+  ]
+ },
+ "tsm-final-w12-alt-shapes": {
+  "hash": "a6a944c5cf0259eff359",
+  "outputs": [
+   "circle 3.14\nsquare 4.00\n7.14",
+   "square 1.00\n1.00",
+   "(empty)\n0.00",
+   "circle 12.57\ncircle 0.79\n13.35",
+   "square 9.00\nrect 1.00\ncircle 3.14\n13.14",
+   "rect 2.00\n2.00",
+   "rect 1.00\n1.00",
+   "square 0.00\ncircle 28.27\n28.27"
+  ]
+ },
+ "tsm-final-w13-alt-letters": {
+  "hash": "4c9511afb48d1d080f5a",
+  "outputs": [
+   "a=3\nn=2\nb=1\n3",
+   "l=3\no=2\nd=1\n7",
+   "a=2\nb=2\n2",
+   "x=1\ny=1\nz=1\n3",
+   "i=4\ns=4\np=2\n4",
+   "a=2\nb=2\nc=2\n4",
+   "q=1\n1",
+   "o=2\nb=1\nc=1\n15"
+  ]
+ },
+ "tsm-final-w14-alt-matrix": {
+  "hash": "80617187910c09b09c0d",
+  "outputs": [
+   "1\n4\n(out of range)\n5",
+   "7\n(out of range)\n7",
+   "3\n(out of range)\n3",
+   "2\n1\n(out of range)\n3",
+   "42\n42",
+   "-3\n-2\n(out of range)\n-5",
+   "9\n5\n1\n(out of range)\n15",
+   "0\n(out of range)\n0\n0"
+  ]
+ },
+ "tsm-final-w15-alt-status": {
+  "hash": "a99c86d7dc0be665a0e8",
+  "outputs": [
+   "200\n418\nnotFound teapot",
+   "unknown\nnotFound teapot",
+   "unknown\n201\n404\nnotFound teapot",
+   "200\n200\n200\n200\nnotFound teapot",
+   "unknown\n418\nnotFound teapot",
+   "unknown\nnotFound teapot",
+   "404\n201\nunknown\nnotFound teapot",
+   "unknown\n200\nnotFound teapot"
+  ]
+ },
+ "tsm-final-w16-alt-kelvin": {
+  "hash": "24ce28ed8665bf4c4051",
+  "outputs": [
+   "0.00\n26.85\n13.43",
+   "invalid\nnone",
+   "-273.15\ninvalid\n100.00\n-86.57",
+   "invalid\nnone",
+   "37.00\n37.00\n37.00",
+   "726.85\ninvalid\n-23.15\ninvalid\n351.85",
+   "0.00\n0.00",
+   "-268.15\n-263.15\n-258.15\n-263.15"
+  ]
+ },
+ "tsm-final-w17-alt-directory": {
+  "hash": "23f98cee268a882460ca",
+  "outputs": [
+   "{\"id\":1,\"name\":\"Ada\",\"email\":\"ada@x.io\"}\n{\"name\":\"Alan\",\"email\":\"alan@x.io\"}\nno such user 3\n1",
+   "{\"id\":7,\"name\":\"Grace\",\"email\":\"g@x.io\"}\n{\"id\":7,\"name\":\"Grace\",\"email\":\"g@x.io\"}\n2",
+   "bad query\n{\"name\":\"A\",\"email\":\"a@x.io\"}\n0",
+   "0",
+   "{\"name\":\"Di\",\"email\":\"di@x.io\"}\n{\"name\":\"Cy\",\"email\":\"cy@x.io\"}\n{\"id\":4,\"name\":\"Di\",\"email\":\"di@x.io\"}\n1",
+   "no such user 10\n0",
+   "{\"id\":3,\"name\":\"c\",\"email\":\"c@c\"}\n{\"id\":2,\"name\":\"b\",\"email\":\"b@b\"}\n{\"id\":1,\"name\":\"a\",\"email\":\"a@a\"}\n3",
+   "{\"id\":2,\"name\":\"Fay\",\"email\":\"fay@x.io\"}\nbad query\n1"
+  ]
+ },
+ "tsm-final-w17-patch": {
+  "hash": "dcecc123c5bfefbca7a1",
+  "outputs": [
+   "#1: updated done,title\n#2: rejected, id cannot change\n#4: no such task\n#3: updated tags\n1 | Write the report | done | work,urgent\n2 | Buy milk | open | home\n3 | Call bank | done | money,phone",
+   "#1: rejected, done must be true or false\n#2: updated title\n1 | Write report | open | work,urgent\n2 | Buy oat milk | open | home\n3 | Call bank | done | -",
+   "#1: rejected, unknown field priority\n#1: updated tags\n1 | Write report | open | -\n2 | Buy milk | open | home\n3 | Call bank | done | -",
+   "#2: rejected, title cannot be empty\n1 | Write report | open | work,urgent\n2 | Buy milk | open | home\n3 | Call bank | done | -",
+   "1 | Write report | open | work,urgent\n2 | Buy milk | open | home\n3 | Call bank | done | -",
+   "#2: updated nothing\n#3: updated done\n1 | Write report | open | work,urgent\n2 | Buy milk | open | home\n3 | Call bank | done | -",
+   "#4: updated done\n#4: updated title,tags\n#9: rejected, id cannot change\n4 | Pay March rent | done | money\n9 | Plan trip | open | travel",
+   "#1: updated tags\n#1: updated title,done\n#7: no such task\n1 | Solo task | done | a,b,c",
+   "#1: rejected, id cannot change\n1 | Write report | open | work,urgent\n2 | Buy milk | open | home\n3 | Call bank | done | -"
+  ]
+ },
+ "tsm-final-w18-alt-partition": {
+  "hash": "f2b68c74257588c34e91",
+  "outputs": [
+   "ann cat\nbob\ncat:90 ann:70",
+   "solo\n(none)\nsolo:50",
+   "(none)\nx y\ny:20 x:10",
+   "a b c\nd\na:80 b:80",
+   "zed amy\nbo\namy:99 zed:99",
+   "high\nlow\nhigh:100 low:0",
+   "q s u\nr t\nu:75 s:65",
+   "(none)\nnobody\nnobody:49"
+  ]
+ },
+ "tsm-final-w19-alt-tokens": {
+  "hash": "7be1d01fa4378ed5370b",
+  "outputs": [
+   "set radius\nset dark\ndark=true\nprimary=#3366ff\nradius=8",
+   "unknown color\ndark=false\nprimary=#3366ff\nradius=4",
+   "bad value radius\nbad value dark\ndark=false\nprimary=#3366ff\nradius=4",
+   "unknown toString\ndark=false\nprimary=#3366ff\nradius=4",
+   "set primary\nset primary\nset radius\ndark=false\nprimary=#fff\nradius=0",
+   "dark=false\nprimary=#3366ff\nradius=4",
+   "set dark\nset radius\ndark=false\nprimary=#3366ff\nradius=-2",
+   "bad value radius\ndark=false\nprimary=#3366ff\nradius=4"
+  ]
+ },
+ "tsm-final-w2-alt-parking": {
+  "hash": "e2166be3ef4a5c663cca",
+  "outputs": [
+   "0\nweekday",
+   "0\nweekday",
+   "4\nweekday",
+   "16\nweekday",
+   "20\nweekday",
+   "20\nweekday",
+   "0\nweekend",
+   "6\nweekend",
+   "6\nweekend"
+  ]
+ },
+ "tsm-final-w20-alt-changes": {
+  "hash": "b9213d1287f45d4bc011",
+  "outputs": [
+   "a: same\nb: changed\n1",
+   "name: same\n0",
+   "n: same\non: changed\n1",
+   "y: changed\nz: changed\n2",
+   "k: changed\nl: changed\nm: same\n2",
+   "only: changed\n1",
+   "a: same\nb: same\n0",
+   "q: same\nr: changed\n1"
+  ]
+ },
+ "tsm-final-w21-alt-flatten": {
+  "hash": "dfb15629eb7d69ff871c",
+  "outputs": [
+   "1\n1 2 3 4\n10",
+   "(none)\n(none)\n0",
+   "(none)\n(none)\n0",
+   "5\n5 6 7\n18",
+   "0\n0 0\n0",
+   "-1\n-1 2 3\n4",
+   "9\n9\n9",
+   "8\n8 1\n9"
+  ]
+ },
+ "tsm-final-w22-alt-classes": {
+  "hash": "427cad14c3421acfe412",
+  "outputs": [
+   "color=red size=sm\nbad\n6\nblue-lg blue-md blue-sm",
+   "bad\n6\nblue-lg blue-md blue-sm",
+   "color=blue size=lg\ncolor=blue size=md\ncolor=red size=lg\n6\nblue-lg blue-md blue-sm",
+   "bad\n6\nblue-lg blue-md blue-sm",
+   "bad\ncolor=red size=sm\n6\nblue-lg blue-md blue-sm",
+   "6\nblue-lg blue-md blue-sm",
+   "bad\ncolor=blue size=sm\n6\nblue-lg blue-md blue-sm",
+   "bad\n6\nblue-lg blue-md blue-sm"
+  ]
+ },
+ "tsm-final-w23-alt-stock": {
+  "hash": "cafa81aeec7fcd7b450a",
+  "outputs": [
+   "a=5\na=3\nrefused\n3",
+   "refused\n0",
+   "refused\nrefused\n0",
+   "a=1\nb=2\na=0\nb=0\n0",
+   "refused\nc=2\n2",
+   "refused\na=3\na=0\n0",
+   "big=1000\n1000",
+   "q=4\nq=0\nrefused\n0"
+  ]
+ },
+ "tsm-final-w24-alt-fibonacci": {
+  "hash": "046a140aefac364cacb5",
+  "outputs": [
+   "2 8 34\n3",
+   "1 1 2 3 5 8\n6",
+   "(none)\n0",
+   "5 55 610\n3",
+   "21\n1",
+   "1 1\n2",
+   "3 21 144 987 6765\n5",
+   "(none)\n0"
+  ]
+ },
+ "tsm-final-w25-alt-durations": {
+  "hash": "2b61ec78ff44d438e555",
+  "outputs": [
+   "line 1: 90\nline 2: 300\nline 3: 7200\ntotal 7590\nerrors 0",
+   "line 1: 5400\nline 2: 3910\ntotal 9310\nerrors 0",
+   "line 1: error bad token 5x\nline 2: error bad token 10\ntotal 0\nerrors 2",
+   "line 1: error unit order\ntotal 0\nerrors 1",
+   "line 1: 7200\nline 3: 45\ntotal 7245\nerrors 0",
+   "line 1: error unit order\ntotal 0\nerrors 1",
+   "line 1: 0\nline 2: 180\ntotal 180\nerrors 0",
+   "line 1: 750\nline 2: error bad token abc\nline 3: 3600\ntotal 4350\nerrors 1"
+  ]
+ },
+ "tsm-final-w26-alt-timeouts": {
+  "hash": "9e165c790bd755d831f7",
+  "outputs": [
+   "1=1\n2=4\n3=timeout\n2",
+   "1=timeout\n0",
+   "4=16\n1=1\n2=4\n3",
+   "3=9\n6=36\n9=81\n3",
+   "2=timeout\n1=1\n1",
+   "5=timeout\n4=timeout\n3=9\n2=4\n1=1\n3",
+   "7=timeout\n1=1\n6=36\n2",
+   "0=0\n2=timeout\n1"
+  ]
+ },
+ "tsm-final-w3-alt-digits": {
+  "hash": "274c9a9f91a36c26729f",
+  "outputs": [
+   "7\n7\nyes\n0",
+   "4\n121\nyes\n1",
+   "6\n321\nno\n2",
+   "36\n9999\nyes\n0",
+   "1\n1\nno\n1",
+   "21\n654321\nno\n3",
+   "1\n1\nyes\n0",
+   "2\n1001\nyes\n2"
+  ]
+ },
+ "tsm-final-w4-alt-mirror": {
+  "hash": "e614a1141eab3dfd4a89",
+  "outputs": [
+   "olleh dlrow\nworld hello\n3",
+   "a\na\n1",
+   "epyt tpircs skcor\nrocks script type\n3",
+   "level noon\nnoon level\n4",
+   "zyx\nxyz\n0",
+   "eno owt eerht ruof\nfour three two one\n7",
+   "eueuq\nqueue\n4",
+   "deddap sdrow ereh\nhere words padded\n5"
+  ]
+ },
+ "tsm-final-w5-alt-repeat": {
+  "hash": "af470cbb1c0ba13a3a54",
+  "outputs": [
+   "ab+ab+ab\nab-ab",
+   "go-go\ngo-go",
+   "\nx-x",
+   "hi\nhi-hi",
+   "na-na-na-na\nna-na",
+   "yo*yo\nyo-yo",
+   "z.z.z.z.z\nz-z",
+   "echo~echo\necho-echo"
+  ]
+ },
+ "tsm-final-w6-alt-numbers": {
+  "hash": "c75943d3d003ea5808f9",
+  "outputs": [
+   "2 4 6\n0",
+   "(none)\n2",
+   "20 48\n2",
+   "0\n0",
+   "48\n1",
+   "10 10\n2",
+   "2\n1",
+   "24 26 30\n1"
+  ]
+ },
+ "tsm-final-w7-alt-report": {
+  "hash": "41418f0748617314c86c",
+  "outputs": [
+   "1\n2.5\n(none)\n4 3 2 1",
+   "5\n5\n(none)\n5",
+   "1\n2\n1 3\n1 2 3 1 3",
+   "7\n7\n7\n7 7 7",
+   "-2\n4\n(none)\n4 -2 10",
+   "2\n5\n(none)\n8 2",
+   "1\n7\n1 9\n9 9 1 5 1 9",
+   "0\n0\n0\n1 0 0"
+  ]
+ },
+ "tsm-final-w8-alt-inventory": {
+  "hash": "0cc5ee37a9040aa4ecae",
+  "outputs": [
+   "a1 1 10\nb2 3 4\n22",
+   "a1 7 5\n35",
+   "z9 0 99\n0",
+   "b2 1 0\nc3 5 0\n0",
+   "a1 2 3\nb1 2 1\n8",
+   "x 10 1\ny 1 10\n20",
+   "k 3 5\nm 4 1\n19",
+   "only 7 0\n0"
+  ]
+ },
+ "tsm-final-w9-alt-friends": {
+  "hash": "204aa0b0b3b7d5eb04ce",
+  "outputs": [
+   "cat\n3",
+   "(none)\n4",
+   "c d\n4",
+   "(none)\n2",
+   "leo\n3",
+   "q r\n5",
+   "(none)\n2",
+   "b\n4"
   ]
  },
  "tsm-w1-bmi": {

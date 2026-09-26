@@ -393,6 +393,8 @@ fn judge_config_for(conn: &Connection, problem_id: Option<i64>) -> judge::JudgeC
 /// for seconds across several cases. Running that on Tauri's main thread freezes
 /// the whole webview (no scrolling, no clicks) until it returns, so the heavy
 /// work is pushed to a blocking worker and the UI thread stays responsive.
+// Each argument is a separate IPC field the frontend sends by name.
+#[allow(clippy::too_many_arguments)]
 #[tauri::command]
 pub async fn run_tests(
     state: State<'_, AppState>,
