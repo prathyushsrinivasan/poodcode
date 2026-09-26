@@ -6,6 +6,7 @@
 //   * What runs  the JavaScript the types erase to
 //   * Compiler   strictness flags to flip, and the errors they produce
 //   * Step       a conditional type's evaluation, one union member at a time
+//   * Machines   a union of states and its transitions, drawn (M3-03)
 //                (M5-01): which branch, what each `infer` binds, the result
 // Run executes the file through the real judge, like any exercise.
 
@@ -25,6 +26,8 @@ import {
 } from "../lib/tsAnalysis";
 import type { ProcOut } from "../types";
 import { applications, conditionalAliases, planSteps, splitUnion, withArg } from "../lib/typeStepper";
+import { analyseMachine, findMachines } from "../lib/stateMachine";
+import { StateDiagram } from "../components/StateDiagram";
 
 const MAIN = "file:///playground/main.ts";
 const PROBE = "file:///playground/__probe.ts";
@@ -70,6 +73,30 @@ type Names = User["name" | "email"];
 const user: User = { id: 1, name: "Ada" };
 const patch: Patch = { email: "ada@example.com" };
 console.log({ ...user, ...patch });
+`,
+  },
+  {
+    title: "State machine",
+    focus: "status",
+    code: `// Open the Machines tab. Try deleting "archived" from the table, or adding a state.
+type Status = "draft" | "review" | "live" | "archived";
+
+const NEXT: Record<Status, readonly Status[]> = {
+  draft: ["review"],
+  review: ["draft", "live"],
+  live: ["archived"],
+  archived: [],
+};
+
+function move(status: Status, to: Status): Status {
+  if (!NEXT[status].includes(to)) throw new Error(\`\${status} cannot become \${to}\`);
+  return to;
+}
+
+let status: Status = "draft";
+status = move(status, "review");
+status = move(status, "live");
+console.log(status);
 `,
   },
   {
@@ -290,7 +317,7 @@ export default function TsPlayground() {
   const [code, setCode] = useState(saved.code);
   const [focus, setFocus] = useState(saved.focus);
   const [flags, setFlags] = useState<Flags>(DEFAULT_FLAGS);
-  const [view, setView] = useState<"types" | "narrowing" | "js" | "compiler" | "classes" | "step">("types");
+  const [view, setView] = useState<"types" | "narrowing" | "js" | "compiler" | "classes" | "step" | "machines">("types");
   const [samples, setSamples] = useState<SampleResult[]>([]);
   const [analysis, setAnalysis] = useState<Analysis | null>(null);
   const [stdin, setStdin] = useState("");
@@ -298,6 +325,8 @@ export default function TsPlayground() {
   const [running, setRunning] = useState(false);
   const monaco = useMonaco();
   const seq = useRef(0);
+  // M3-03: read from the source text directly — no compiler round trip needed.
+  const machines = useMemo(() => findMachines(code), [code]);
 
   // The playground owns the compiler options while it is open.
   useEffect(() => {
@@ -448,6 +477,7 @@ export default function TsPlayground() {
                 ["compiler", `Compiler${analysis && analysis.diags.length ? ` (${analysis.diags.length})` : ""}`],
                 ["classes", `Classes${analysis && analysis.classes.length ? ` (${analysis.classes.length})` : ""}`],
                 ["step", `Step${analysis && analysis.steps.length ? ` (${analysis.steps.length})` : ""}`],
+                ["machines", `Machines${machines.length ? ` (${machines.length})` : ""}`],
               ] as const
             ).map(([key, label]) => (
               <button
@@ -496,6 +526,51 @@ export default function TsPlayground() {
               {analysis.values.map((r) => (
                 <TypeRow key={"v" + r.label} row={r} />
               ))}
+            </>
+          )}
+
+          {view === "machines" && (
+            <>
+              <p className="dim quiz-note">
+                A union of string-literal states, with its moves read from a transition table (
+                <code>{"{ draft: [\"review\"], … }"}</code>) or from a <code>switch</code> whose cases return
+                states. The ringed state is the start; dashed states have no way out; red ones cannot be reached from
+                the start.
+              </p>
+              {machines.length === 0 && (
+                <p className="dim quiz-note">
+                  No state machine found. Declare <code>type Status = "draft" | "review" | "live";</code> and a
+                  table <code>{"const NEXT: Record<Status, readonly Status[]> = { … }"}</code>, or a{" "}
+                  <code>switch</code> over a status that returns the next one.
+                </p>
+              )}
+              {machines.map((m) => {
+                const { terminal, unreachable } = analyseMachine(m);
+                return (
+                  <div key={m.name} className="card" style={{ margin: "8px 0", padding: "8px 10px" }}>
+                    <strong>
+                      <code>{m.name}</code>
+                    </strong>{" "}
+                    <span className="dim quiz-note">
+                      {m.states.length} states · {m.edges.length} transitions · from a {m.via}
+                    </span>
+                    <StateDiagram machine={m} />
+                    <div className="quiz-note">
+                      {m.edges.map(([a, b]) => `${a} → ${b}`).join(" · ")}
+                    </div>
+                    {terminal.length > 0 && (
+                      <div className="quiz-note">
+                        No way out: <code>{terminal.join(", ")}</code>
+                      </div>
+                    )}
+                    {unreachable.length > 0 && (
+                      <div className="quiz-note" style={{ color: "var(--bad)" }}>
+                        Unreachable from <code>{m.states[0]}</code>: <code>{unreachable.join(", ")}</code>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </>
           )}
 
