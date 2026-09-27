@@ -28,12 +28,21 @@ EXAMPLE = re.compile(r"^#### (.+?)\n```ts\n(.*?)\n```", re.S | re.M)
 TOO_EASY = {"string", "number", "boolean", "void", "undefined", "null", "unknown", "never"}
 
 
+PROGRAM = re.compile(r"```ts\n(.*?)\n```", re.S)
+
+
 def examples(lesson):
-    """(title, code) for each worked example, in the lesson's example sections."""
+    """(title, code) for each worked example and each pitfall program — the
+    wrong and the right one alike. Only programs that type-check cleanly are
+    kept later, and a pitfall's bug is at runtime, so its types are real."""
     out = []
     for sec in re.split(r"^### ", lesson, flags=re.M):
         if sec.startswith("Worked examples") or sec.startswith("More worked examples"):
             out += [(t.strip(), c + "\n") for t, c in EXAMPLE.findall(sec)]
+        elif sec.startswith("Pitfalls"):
+            for part in re.split(r"^#### ", sec, flags=re.M)[1:]:
+                title = part.split("\n", 1)[0].strip()
+                out += [(f"{title} (pitfall)", c + "\n") for c in PROGRAM.findall(part)]
     return out
 
 
@@ -88,7 +97,11 @@ def main():
         picks = out.setdefault(key, [])
         # Best first, one per worked example.
         for score, title, code, name, t in sorted(cs, key=lambda c: -c[0]):
-            if len(picks) < PER_CHAPTER and not any(p["code"] == code for p in picks):
+            # One per program, and never the same binding twice (a pitfall's
+            # wrong and right programs usually share their declarations).
+            if len(picks) < PER_CHAPTER and not any(
+                p["code"] == code or (p["name"], p["type"]) == (name, t) for p in picks
+            ):
                 picks.append({"title": title, "code": code, "name": name, "type": t})
     out = {k: v for k, v in sorted(out.items()) if v}
     with open(OUT, "w", encoding="utf-8", newline="\n") as f:

@@ -242,14 +242,18 @@ except FileNotFoundError:
 
 def _tsd_predicts(key, name, data):
     codes = {ex["code"] for ex in data["examples"]}
+    codes |= {pf[side] for pf in data["pitfalls"] for side in ("wrong", "right")}
     out = []
     for i, p in enumerate(_TSD_PREDICTS.get(key, []), start=1):
         if p["code"] not in codes:
             continue
+        from_pitfall = p["title"].endswith(" (pitfall)")
+        where = (f"the pitfall “{p['title'][:-len(' (pitfall)')]}”" if from_pitfall
+                 else f"the worked example “{p['title']}”")
         ex = _pr(f"tsm-{key}-predict{i}", f"Read the inference: {p['title']}", p["code"], p["name"], p["type"],
                  hints=["Read the declaration of `" + p["name"] + "` and what it is initialised with.",
                         "Write the type out in full — literal types, `readonly` and all — not a wider one that also fits."],
-                 why=f"The program is the worked example “{p['title']}” from {name}.")
+                 why=f"The program is {where} from {name}.")
         out.append(ex)
     return out
 

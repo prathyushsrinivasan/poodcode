@@ -1,10 +1,24 @@
 {
+ "ts_aliases": [
+  {
+   "title": "Two aliases of `string` are interchangeable (pitfall)",
+   "code": "type UserId = string;\ntype OrderId = string;\nconst ordersByUser = new Map<UserId, string[]>([[\"u1\", [\"o9\"]]]);\nfunction ordersOf(id: UserId): string {\n  return (ordersByUser.get(id) ?? []).join(\",\") || \"no orders\";\n}\nconst order: OrderId = \"o9\";\nconsole.log(ordersOf(order));\n",
+   "name": "ordersByUser",
+   "type": "Map<string, string[]>"
+  }
+ ],
  "ts_array_methods": [
   {
    "title": "Update one element without mutating",
    "code": "const tasks = [{ id: 1, done: false }, { id: 2, done: false }];\nconst i = tasks.findIndex((t) => t.id === 2);\nconst updated = i < 0 ? tasks : tasks.with(i, { id: 2, done: true });\nconsole.log(JSON.stringify(updated), tasks[1]?.done);\n",
    "name": "tasks",
    "type": "{ id: number; done: boolean; }[]"
+  },
+  {
+   "title": "`indexOf` with objects compares identity (pitfall)",
+   "code": "const users = [{ id: 1 }, { id: 2 }];\nconsole.log(users.indexOf({ id: 1 }));\n",
+   "name": "users",
+   "type": "{ id: number; }[]"
   }
  ],
  "ts_array_modern": [
@@ -29,6 +43,64 @@
    "type": "{ name: string; score: number; }[]"
   }
  ],
+ "ts_assertions": [
+  {
+   "title": "`!` on a search that can miss (pitfall)",
+   "code": "const users = [{ id: 1, name: \"ana\" }];\ntry {\n  console.log(users.find((u) => u.id === 2)!.name);\n} catch (e) {\n  console.log(\"failed: \" + (e instanceof Error ? e.message : String(e)));\n}\n",
+   "name": "users",
+   "type": "{ id: number; name: string; }[]"
+  },
+  {
+   "title": "A double assertion (pitfall)",
+   "code": "const input = \"twelve\";\nconst n = input as unknown as number;\nconsole.log(n * 2);\n",
+   "name": "input",
+   "type": "\"twelve\""
+  }
+ ],
+ "ts_async_patterns": [
+  {
+   "title": "`allSettled` never rejects (pitfall)",
+   "code": "const results = await Promise.allSettled([Promise.reject(new Error(\"db down\")), Promise.resolve(1)]);\nconst failed = results.filter((r) => r.status === \"rejected\");\nconsole.log(failed.length > 0 ? failed.length + \" of \" + results.length + \" failed\" : \"all ok\");\n",
+   "name": "results",
+   "type": "[PromiseSettledResult<never>, PromiseSettledResult<number>]"
+  }
+ ],
+ "ts_branded_types": [
+  {
+   "title": "Plain numbers mix units silently (pitfall)",
+   "code": "const runMeters = 5000;\nconst climbFeet = 1200;\nconsole.log(`total distance ${runMeters + climbFeet}`);\n",
+   "name": "runMeters",
+   "type": "5000"
+  }
+ ],
+ "ts_compose": [
+  {
+   "title": "Spread order decides who wins (pitfall)",
+   "code": "const defaults = { theme: \"light\", fontSize: 14 };\nconst user = { theme: \"dark\" };\nconsole.log(JSON.stringify({ ...user, ...defaults }));\n",
+   "name": "defaults",
+   "type": "{ theme: string; fontSize: number; }"
+  },
+  {
+   "title": "Spread order decides who wins (pitfall)",
+   "code": "const defaults = { theme: \"light\", fontSize: 14 };\nconst user = { theme: \"dark\" };\nconsole.log(JSON.stringify({ ...defaults, ...user }));\n",
+   "name": "user",
+   "type": "{ theme: string; }"
+  },
+  {
+   "title": "A shallow merge loses nested defaults (pitfall)",
+   "code": "const defaults = { db: { host: \"localhost\", port: 5432 }, debug: false };\nconst user = { db: { host: \"db.local\" } };\nconst merged = { ...defaults, ...user };\nconsole.log(JSON.stringify(merged));\n",
+   "name": "defaults",
+   "type": "{ db: { host: string; port: number; }; debug: boolean; }"
+  }
+ ],
+ "ts_conditional_types": [
+  {
+   "title": "A pattern that misses readonly arrays (pitfall)",
+   "code": "type Elem<T> = T extends readonly (infer E)[] ? E : never;\nfunction first<T extends readonly unknown[]>(xs: T): Elem<T> | undefined {\n  return xs[0] as Elem<T> | undefined;\n}\nconst SIZES = [\"s\", \"m\"] as const;\nconst s = first(SIZES);\nconsole.log(s?.toUpperCase());\n",
+   "name": "SIZES",
+   "type": "readonly [\"s\", \"m\"]"
+  }
+ ],
  "ts_conditionals": [
   {
    "title": "A ternary for a value, `if` for an action",
@@ -51,6 +123,52 @@
    "code": "declare global {\n  interface Array<T> {\n    sumBy(this: T[], f: (x: T) => number): number;\n  }\n}\nArray.prototype.sumBy = function <T>(this: T[], f: (x: T) => number): number {\n  return this.reduce((s, x) => s + f(x), 0);\n};\nconst cart = [{ price: 2, qty: 3 }, { price: 5, qty: 1 }];\nconsole.log(cart.sumBy((i) => i.price * i.qty));\n",
    "name": "cart",
    "type": "{ price: number; qty: number; }[]"
+  },
+  {
+   "title": "A declaration that disagrees with the code (pitfall)",
+   "code": "const lib = { add: (a: number, b: number) => a + b } as unknown as { add(a: number, b: number): string };\ntry {\n  console.log(lib.add(1, 2).toUpperCase());\n} catch (e) {\n  console.log(\"failed: \" + (e instanceof Error ? e.message : String(e)));\n}\n",
+   "name": "lib",
+   "type": "{ add(a: number, b: number): string; }"
+  }
+ ],
+ "ts_destructuring": [
+  {
+   "title": "A default doesn't replace `null` (pitfall)",
+   "code": "const config = JSON.parse('{\"port\": null}') as { port: number | null };\nconst { port = 8080 } = config;\nconsole.log(\"port \" + port);\n",
+   "name": "config",
+   "type": "{ port: number | null; }"
+  },
+  {
+   "title": "Destructuring a method loses `this` (pitfall)",
+   "code": "const counter = {\n  count: 0,\n  increment() {\n    this.count++;\n    return this.count;\n  },\n};\nconst { increment } = counter;\ntry {\n  console.log(increment());\n} catch (e) {\n  console.log(\"failed: \" + (e instanceof Error ? e.message : String(e)));\n}\n",
+   "name": "counter",
+   "type": "{ count: number; increment(): number; }"
+  },
+  {
+   "title": "`...rest` copies only one level (pitfall)",
+   "code": "const original = { name: \"ana\", prefs: { theme: \"dark\" } };\nconst { name, ...rest } = original;\nrest.prefs.theme = \"light\";\nconsole.log(name, original.prefs.theme);\n",
+   "name": "original",
+   "type": "{ name: string; prefs: { theme: string; }; }"
+  }
+ ],
+ "ts_enums": [
+  {
+   "title": "Keys where values were meant (pitfall)",
+   "code": "const Color = { Red: \"#f00\", Green: \"#0f0\" } as const;\nconsole.log(Object.keys(Color).join(\" \"));\n",
+   "name": "Color",
+   "type": "{ readonly Red: \"#f00\"; readonly Green: \"#0f0\"; }"
+  },
+  {
+   "title": "Looking a value up by its name (pitfall)",
+   "code": "const Code = { NotFound: 404, Teapot: 418 } as const;\nconst input: string = \"418\";\nconsole.log((Code as Record<string, number>)[input] ?? \"no such code\");\n",
+   "name": "Code",
+   "type": "{ readonly NotFound: 404; readonly Teapot: 418; }"
+  },
+  {
+   "title": "Looking a value up by its name (pitfall)",
+   "code": "const Code = { NotFound: 404, Teapot: 418 } as const;\nconst input: string = \"418\";\nconst name = Object.entries(Code).find(([, v]) => String(v) === input)?.[0];\nconsole.log(name ?? \"no such code\");\n",
+   "name": "name",
+   "type": "string | undefined"
   }
  ],
  "ts_equality": [
@@ -59,6 +177,14 @@
    "code": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst typed = input === \"\" ? undefined : Number(input);\nconsole.log(\"with ||:\", typed || 10);\nconsole.log(\"with ??:\", typed ?? 10);\n",
    "name": "typed",
    "type": "number | undefined"
+  }
+ ],
+ "ts_erasable_syntax": [
+  {
+   "title": "A narrower type does not remove data (pitfall)",
+   "code": "type PublicUser = { name: string };\nconst user = { name: \"ana\", password: \"hunter2\" };\nconst shown: PublicUser = user;\nconsole.log(JSON.stringify(shown));\n",
+   "name": "user",
+   "type": "{ name: string; password: string; }"
   }
  ],
  "ts_error_types": [
@@ -107,12 +233,38 @@
    "type": "{ pen: number; cup: number; }"
   }
  ],
+ "ts_heap_pq": [
+  {
+   "title": "Ties in arbitrary order (pitfall)",
+   "code": "class Heap<T> {\n  readonly #items: T[] = [];\n  readonly #compare: (a: T, b: T) => number;\n  constructor(compare: (a: T, b: T) => number) {\n    this.#compare = compare;\n  }\n  get size(): number {\n    return this.#items.length;\n  }\n  peek(): T | undefined {\n    return this.#items[0];\n  }\n  push(item: T): void {\n    const a = this.#items;\n    a.push(item);\n    let i = a.length - 1;\n    while (i > 0) {\n      const parent = (i - 1) >> 1;\n      const child = a[i] as T;\n      const up = a[parent] as T;\n      if (this.#compare(child, up) >= 0) break;\n      a[i] = up;\n      a[parent] = child;\n      i = parent;\n    }\n  }\n  pop(): T | undefined {\n    const a = this.#items;\n    const top = a[0];\n    const last = a.pop();\n    if (a.length > 0 && last !== undefined) {\n      a[0] = last;\n      let i = 0;\n      for (;;) {\n        const l = 2 * i + 1;\n        const r = l + 1;\n        let m = i;\n        if (l < a.length && this.#compare(a[l] as T, a[m] as T) < 0) m = l;\n        if (r < a.length && this.#compare(a[r] as T, a[m] as T) < 0) m = r;\n        if (m === i) break;\n        const tmp = a[i] as T;\n        a[i] = a[m] as T;\n        a[m] = tmp;\n        i = m;\n      }\n    }\n    return top;\n  }\n}\n\nconst q = new Heap<{ name: string; p: number }>((a, b) => a.p - b.p);\nfor (const name of [\"a\", \"b\", \"c\", \"d\", \"e\"]) q.push({ name, p: 1 });\nconst out: string[] = [];\nfor (let j = q.pop(); j !== undefined; j = q.pop()) out.push(j.name);\nconsole.log(out.join(\"\"));\n",
+   "name": "q",
+   "type": "Heap<{ name: string; p: number; }>"
+  },
+  {
+   "title": "Ties in arbitrary order (pitfall)",
+   "code": "class Heap<T> {\n  readonly #items: T[] = [];\n  readonly #compare: (a: T, b: T) => number;\n  constructor(compare: (a: T, b: T) => number) {\n    this.#compare = compare;\n  }\n  get size(): number {\n    return this.#items.length;\n  }\n  peek(): T | undefined {\n    return this.#items[0];\n  }\n  push(item: T): void {\n    const a = this.#items;\n    a.push(item);\n    let i = a.length - 1;\n    while (i > 0) {\n      const parent = (i - 1) >> 1;\n      const child = a[i] as T;\n      const up = a[parent] as T;\n      if (this.#compare(child, up) >= 0) break;\n      a[i] = up;\n      a[parent] = child;\n      i = parent;\n    }\n  }\n  pop(): T | undefined {\n    const a = this.#items;\n    const top = a[0];\n    const last = a.pop();\n    if (a.length > 0 && last !== undefined) {\n      a[0] = last;\n      let i = 0;\n      for (;;) {\n        const l = 2 * i + 1;\n        const r = l + 1;\n        let m = i;\n        if (l < a.length && this.#compare(a[l] as T, a[m] as T) < 0) m = l;\n        if (r < a.length && this.#compare(a[r] as T, a[m] as T) < 0) m = r;\n        if (m === i) break;\n        const tmp = a[i] as T;\n        a[i] = a[m] as T;\n        a[m] = tmp;\n        i = m;\n      }\n    }\n    return top;\n  }\n}\n\nconst q = new Heap<{ name: string; p: number; seq: number }>((a, b) => a.p - b.p || a.seq - b.seq);\n[\"a\", \"b\", \"c\", \"d\", \"e\"].forEach((name, seq) => q.push({ name, p: 1, seq }));\nconst out: string[] = [];\nfor (let j = q.pop(); j !== undefined; j = q.pop()) out.push(j.name);\nconsole.log(out.join(\"\"));\n",
+   "name": "q",
+   "type": "Heap<{ name: string; p: number; seq: number; }>"
+  }
+ ],
  "ts_immutability": [
   {
    "title": "`Object.freeze` at runtime, in strict code",
    "code": "\"use strict\";\nconst limits = Object.freeze({ maxUsers: 10 });\ntry {\n  (limits as { maxUsers: number }).maxUsers = 99;\n} catch (e) {\n  console.log(e instanceof TypeError ? \"refused: frozen\" : \"unexpected\");\n}\nconsole.log(limits.maxUsers, Object.isFrozen(limits));\n",
    "name": "limits",
    "type": "Readonly<{ maxUsers: 10; }>"
+  },
+  {
+   "title": "`Object.freeze` is shallow (pitfall)",
+   "code": "const config = Object.freeze({ db: { host: \"localhost\" } });\nconfig.db.host = \"prod-db\";\nconsole.log(config.db.host);\n",
+   "name": "config",
+   "type": "Readonly<{ db: { host: string; }; }>"
+  },
+  {
+   "title": "A copied array still shares its objects (pitfall)",
+   "code": "const todos = [{ title: \"write\", done: false }];\nconst next = [...todos];\nnext[0]!.done = true;\nconsole.log(\"original done:\", todos[0]!.done);\n",
+   "name": "todos",
+   "type": "{ title: string; done: boolean; }[]"
   }
  ],
  "ts_index_signatures": [
@@ -121,6 +273,28 @@
    "code": "import * as fs from \"fs\";\nconst words = fs.readFileSync(0, \"utf8\").trim().toLowerCase().split(/\\s+/);\nconst counts: { [word: string]: number } = {};\nfor (const w of words) counts[w] = (counts[w] ?? 0) + 1;\nconst top = Object.entries(counts).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));\nfor (const [word, n] of top.slice(0, 3)) console.log(`${word} ${n}`);\n",
    "name": "top",
    "type": "[string, number][]"
+  }
+ ],
+ "ts_inference": [
+  {
+   "title": "Object properties widen too (pitfall)",
+   "code": "function send(method: \"GET\" | \"POST\"): string {\n  return method + \" sent\";\n}\nconst request = { method: \"GET\" } as const;\nconsole.log(send(request.method));\n",
+   "name": "request",
+   "type": "{ readonly method: \"GET\"; }"
+  },
+  {
+   "title": "A `let` widens its literal (pitfall)",
+   "code": "function move(dir: \"up\" | \"down\"): string {\n  return \"moving \" + dir;\n}\nconst dir = \"up\";\nconsole.log(move(dir));\n",
+   "name": "dir",
+   "type": "\"up\""
+  }
+ ],
+ "ts_interfaces_types": [
+  {
+   "title": "Excess-property checks only apply to fresh literals (pitfall)",
+   "code": "interface PublicUser {\n  id: number;\n  name: string;\n}\nconst row = { id: 1, name: \"ada\", passwordHash: \"x9f\" };\nconst shown: PublicUser = row;\nconsole.log(JSON.stringify(shown));\n",
+   "name": "row",
+   "type": "{ id: number; name: string; passwordHash: string; }"
   }
  ],
  "ts_iterator_helpers": [
@@ -137,6 +311,18 @@
    "code": "const user = { id: 7, name: \"ana\", password: \"hunter2\", roles: [\"admin\"] };\nconsole.log(JSON.stringify(user, [\"id\", \"name\", \"roles\"], 2));\n",
    "name": "user",
    "type": "{ id: number; name: string; password: string; roles: string[]; }"
+  },
+  {
+   "title": "Dates come back as strings (pitfall)",
+   "code": "const saved = JSON.stringify({ when: new Date(Date.UTC(2026, 0, 2)) });\nconst loaded = JSON.parse(saved) as { when: Date };\ntry {\n  console.log(loaded.when.getUTCFullYear());\n} catch (e) {\n  console.log(\"failed: \" + (e instanceof Error ? e.message : String(e)));\n}\n",
+   "name": "loaded",
+   "type": "{ when: Date; }"
+  },
+  {
+   "title": "Dates come back as strings (pitfall)",
+   "code": "const saved = JSON.stringify({ when: new Date(Date.UTC(2026, 0, 2)) });\nconst loaded = JSON.parse(saved) as { when: string };\nconsole.log(new Date(loaded.when).getUTCFullYear());\n",
+   "name": "loaded",
+   "type": "{ when: string; }"
   }
  ],
  "ts_key_remapping": [
@@ -147,20 +333,52 @@
    "type": "Getters<{ name: string; age: number; admin: boolean; }>"
   }
  ],
+ "ts_keyof_indexed": [
+  {
+   "title": "Numeric keys come back as strings (pitfall)",
+   "code": "const names: Record<number, string> = { 1: \"one\", 2: \"two\" };\nconst found = Object.keys(names).find((k) => k === (2 as unknown as string));\nconsole.log(found === undefined ? \"not found\" : names[Number(found)]);\n",
+   "name": "found",
+   "type": "string | undefined"
+  }
+ ],
  "ts_literal_inference": [
   {
    "title": "Where a literal widens",
    "code": "type Method = \"GET\" | \"POST\";\nfunction send(method: Method, path: string): string {\n  return `${method} ${path}`;\n}\n\nconst fixed = \"GET\";\nconst request = { method: \"POST\", path: \"/items\" } as const;\nconst table = { method: \"GET\" as Method, path: \"/\" };\n\nconsole.log(send(fixed, \"/health\"));\nconsole.log(send(request.method, request.path));\nconsole.log(send(table.method, table.path));\n",
    "name": "request",
    "type": "{ readonly method: \"POST\"; readonly path: \"/items\"; }"
+  },
+  {
+   "title": "An object property widens (pitfall)",
+   "code": "type Level = \"info\" | \"warn\";\nfunction log(entry: { level: Level; text: string }): string {\n  return `[${entry.level}] ${entry.text}`;\n}\nconst entry = { level: \"warn\", text: \"disk almost full\" } as const;\nconsole.log(log(entry));\n",
+   "name": "entry",
+   "type": "{ readonly level: \"warn\"; readonly text: \"disk almost full\"; }"
+  },
+  {
+   "title": "`as const` arrays can't go where mutable arrays are expected (pitfall)",
+   "code": "const DEFAULTS = [\"a\", \"b\"] as const;\nfunction addTag(tags: readonly string[], tag: string): string[] {\n  return [...tags, tag];\n}\nconsole.log(addTag(DEFAULTS, \"c\").join(\",\"), DEFAULTS.length);\n",
+   "name": "DEFAULTS",
+   "type": "readonly [\"a\", \"b\"]"
   }
  ],
  "ts_lookup_types": [
+  {
+   "title": "`Object.keys` cast to `keyof T` (pitfall)",
+   "code": "type Point = { x: number; y: number };\nconst POINT_KEYS = [\"x\", \"y\"] as const satisfies readonly (keyof Point)[];\nfunction sum(p: Point): number {\n  let total = 0;\n  for (const k of POINT_KEYS) total += p[k];\n  return total;\n}\nconst withLabel = { x: 1, y: 2, label: \"A\" };\nconsole.log(sum(withLabel));\n",
+   "name": "POINT_KEYS",
+   "type": "readonly [\"x\", \"y\"]"
+  },
   {
    "title": "A typed property read",
    "code": "function get<T, K extends keyof T>(obj: T, key: K): T[K] {\n  return obj[key];\n}\nfunction pluck<T, K extends keyof T>(rows: readonly T[], key: K): T[K][] {\n  return rows.map((r) => r[key]);\n}\n\nconst rows = [\n  { name: \"ana\", age: 31, admin: true },\n  { name: \"bo\", age: 25, admin: false },\n];\nconst ages = pluck(rows, \"age\");     // number[]\nconst names = pluck(rows, \"name\");   // string[]\nconsole.log(ages.reduce((a, b) => a + b, 0), names.join(\",\"));\nconsole.log(get({ name: \"cy\", age: 40, admin: true }, \"admin\"));\n",
    "name": "rows",
    "type": "{ name: string; age: number; admin: boolean; }[]"
+  },
+  {
+   "title": "`Object.keys` cast to `keyof T` (pitfall)",
+   "code": "type Point = { x: number; y: number };\nfunction sum(p: Point): number {\n  let total = 0;\n  for (const k of Object.keys(p) as (keyof Point)[]) total += p[k];\n  return total;\n}\nconst withLabel = { x: 1, y: 2, label: \"A\" };\nconsole.log(sum(withLabel));\n",
+   "name": "withLabel",
+   "type": "{ x: number; y: number; label: string; }"
   }
  ],
  "ts_mapped_types": [
@@ -199,6 +417,12 @@
    "code": "const prices = { pen: 1.5, cup: 4, ink: 12 };\nconst withTax = Object.fromEntries(Object.entries(prices).map(([item, p]) => [item, Number((p * 1.2).toFixed(2))]));\nconsole.log(JSON.stringify(withTax));\n",
    "name": "prices",
    "type": "{ pen: number; cup: number; ink: number; }"
+  },
+  {
+   "title": "Spread copies one level (pitfall)",
+   "code": "const base = { name: \"ana\", tags: [\"a\"] };\nconst copy = { ...base };\ncopy.tags.push(\"b\");\nconsole.log(base.tags.join(\",\"));\n",
+   "name": "base",
+   "type": "{ name: string; tags: string[]; }"
   }
  ],
  "ts_operators": [
@@ -207,6 +431,34 @@
    "code": "const minutes = 137;\nconsole.log(Math.trunc(minutes / 60), minutes % 60);\nconsole.log(2 ** 10, 7 / 2, Math.floor(7 / 2));\n",
    "name": "minutes",
    "type": "137"
+  },
+  {
+   "title": "`%` keeps the sign of the dividend (pitfall)",
+   "code": "const hours = 24;\nconst shifted = (-7) % hours;\nconsole.log(\"hour \" + shifted);\n",
+   "name": "hours",
+   "type": "24"
+  }
+ ],
+ "ts_parse_dont_validate": [
+  {
+   "title": "A brand forged with `as` (pitfall)",
+   "code": "declare const EmailBrand: unique symbol;\ntype Email = string & { readonly [EmailBrand]: true };\nfunction parseEmail(s: string): Email | undefined {\n  return /^[^@\\s]+@[^@\\s]+$/.test(s) ? (s as Email) : undefined;\n}\nfunction sendWelcome(to: Email): string {\n  return \"welcome mail -> \" + to;\n}\nconst quick = parseEmail(\"not an email\");\nconsole.log(quick === undefined ? \"rejected\" : sendWelcome(quick));\n",
+   "name": "quick",
+   "type": "Email | undefined"
+  }
+ ],
+ "ts_regex": [
+  {
+   "title": "`replace` with a string replaces only the first (pitfall)",
+   "code": "const text = \"a-b-c-d\";\nconsole.log(text.replace(\"-\", \"+\"));\n",
+   "name": "text",
+   "type": "\"a-b-c-d\""
+  },
+  {
+   "title": "Special characters in a pattern built from text (pitfall)",
+   "code": "const price = \"1.5\";\nconst re = new RegExp(price);\nconsole.log(re.test(\"125\"));\n",
+   "name": "price",
+   "type": "\"1.5\""
   }
  ],
  "ts_satisfies": [
@@ -225,10 +477,24 @@
    "type": "Map<number, number[]>"
   },
   {
+   "title": "Objects are members by identity (pitfall)",
+   "code": "const visited = new Set<{ x: number; y: number }>();\nfor (const [x, y] of [[0, 0], [1, 0], [0, 0]]) visited.add({ x, y });\nconsole.log(visited.size);\n",
+   "name": "visited",
+   "type": "Set<{ x: number; y: number; }>"
+  },
+  {
    "title": "Remembering things about objects",
    "code": "type Node = { id: string; children: Node[] };\nconst sizeCache = new WeakMap<Node, number>();\nlet computed = 0;\nfunction size(node: Node): number {\n  const cached = sizeCache.get(node);\n  if (cached !== undefined) return cached;\n  computed++;\n  let total = 1;\n  for (const child of node.children) total += size(child);\n  sizeCache.set(node, total);\n  return total;\n}\nconst leaf = { id: \"leaf\", children: [] };\nconst tree: Node = { id: \"root\", children: [{ id: \"a\", children: [leaf] }, leaf] };\nconsole.log(size(tree), size(tree), `computed ${computed}`);\n",
    "name": "leaf",
    "type": "{ id: string; children: never[]; }"
+  }
+ ],
+ "ts_string_methods": [
+  {
+   "title": "`indexOf` returns 0 for a match at the start (pitfall)",
+   "code": "const s = \"apple pie\";\nconsole.log(s.indexOf(\"apple\") ? \"found\" : \"not found\");\n",
+   "name": "s",
+   "type": "\"apple pie\""
   }
  ],
  "ts_strings": [
@@ -237,6 +503,12 @@
    "code": "const name = \"Ada\";\nconst items = [\"pen\", \"cup\"];\nconst receipt = `Customer: ${name}\nItems: ${items.length} (${items.join(\", \")})\nTotal: $${(12.5).toFixed(2)}`;\nconsole.log(receipt);\n",
    "name": "name",
    "type": "\"Ada\""
+  },
+  {
+   "title": "`length` counts code units, not characters (pitfall)",
+   "code": "const face = \"😀\";\nconsole.log(face.length);\n",
+   "name": "face",
+   "type": "\"😀\""
   }
  ],
  "ts_structural_typing": [
@@ -247,12 +519,52 @@
    "type": "{ length: number; unit: string; }"
   }
  ],
+ "ts_template_literal_types": [
+  {
+   "title": "A cast is not a check (pitfall)",
+   "code": "type Size = `${number}px`;\nconst fromUser = \"12pt\" as Size;\nconsole.log(\"width \" + parseFloat(fromUser) + \" (\" + fromUser + \")\");\n",
+   "name": "fromUser",
+   "type": "`${number}px`"
+  },
+  {
+   "title": "A cast is not a check (pitfall)",
+   "code": "type Size = `${number}px`;\nconst isSize = (s: string): s is Size => /^\\d+(\\.\\d+)?px$/.test(s);\nconst raw = \"12pt\";\nconsole.log(isSize(raw) ? \"width \" + parseFloat(raw) : \"rejected \" + raw);\n",
+   "name": "raw",
+   "type": "\"12pt\""
+  },
+  {
+   "title": "An intrinsic type doesn't transform values (pitfall)",
+   "code": "const raw = \"draft\";\nconst shout = raw as Uppercase<string>;\nconsole.log(shout);\n",
+   "name": "raw",
+   "type": "\"draft\""
+  }
+ ],
+ "ts_this_accessors": [
+  {
+   "title": "An arrow function as an object-literal method (pitfall)",
+   "code": "const counter = {\n  count: 0,\n  inc() {\n    this.count++;\n  },\n};\ncounter.inc();\nconsole.log(counter.count);\n",
+   "name": "counter",
+   "type": "{ count: number; inc(): void; }"
+  }
+ ],
  "ts_tuples": [
+  {
+   "title": "`push` compiles on a tuple (pitfall)",
+   "code": "function point(): readonly [number, number] {\n  return [3, 4];\n}\nconst p = point();\nconst moved = [...p, 5];\nconst [x, y] = p;\nconsole.log(x, y, p.length, moved.length);\n",
+   "name": "p",
+   "type": "readonly [number, number]"
+  },
   {
    "title": "Entries are tuples",
    "code": "const stock: Record<string, number> = { apples: 3, pears: 0, figs: 12 };\nconst entries = Object.entries(stock);\nconst sorted = [...entries].sort((a, b) => b[1] - a[1]);\nfor (const [fruit, count] of sorted) console.log(`${fruit.padEnd(6)} ${count}`);\nconst counts = new Map<string, number>(entries);\nconsole.log(counts.get(\"figs\"));\n",
    "name": "entries",
    "type": "[string, number][]"
+  },
+  {
+   "title": "`push` compiles on a tuple (pitfall)",
+   "code": "function point(): [number, number] {\n  return [3, 4];\n}\nconst p = point();\np.push(5);\nconst [x, y] = p;\nconsole.log(x, y, p.length);\n",
+   "name": "p",
+   "type": "[number, number]"
   }
  ],
  "ts_type_performance": [
@@ -261,6 +573,12 @@
    "code": "type Split<S extends string> = string extends S\n  ? string[]\n  : S extends `${infer Head} ${infer Rest}`\n    ? [Head, ...Split<Rest>]\n    : [S];\n\nfunction words<S extends string>(s: S): Split<S> {\n  return s.split(\" \") as Split<S>;\n}\n\nconst known = words(\"red green blue\");   // [\"red\", \"green\", \"blue\"]\nconst fromInput = words([\"a\", \"b\", \"c\"].join(\" \"));   // string[]\nconsole.log(known[2].toUpperCase(), known.length);\nconsole.log(fromInput.length, fromInput[1] ?? \"-\");\n",
    "name": "known",
    "type": "[\"red\", \"green\", \"blue\"]"
+  },
+  {
+   "title": "Enumerating what a pattern can describe (pitfall)",
+   "code": "declare const PinBrand: unique symbol;\ntype Pin = string & { readonly [PinBrand]: true };\nconst parsePin = (s: string): Pin | undefined => (/^\\d{6}$/.test(s) ? (s as Pin) : undefined);\nconst pin = parsePin(\"004271\");\nconsole.log(pin === undefined ? \"bad pin\" : pin.length);\n",
+   "name": "pin",
+   "type": "Pin | undefined"
   }
  ],
  "ts_type_predicates": [
@@ -269,6 +587,12 @@
    "code": "const isNonEmpty = (s: string | null | undefined): s is string => s !== null && s !== undefined && s.trim() !== \"\";\nconst raw = [\"ana\", \"\", null, \"bo\", undefined, \"  \"];\nconst names = raw.filter(isNonEmpty);\nconsole.log(names.map((n) => n.toUpperCase()).join(\",\"));\n",
    "name": "raw",
    "type": "(string | null | undefined)[]"
+  },
+  {
+   "title": "A `boolean` return narrows nothing (pitfall)",
+   "code": "type Admin = { name: string; level: number };\nfunction isAdmin(u: { name: string }): u is Admin {\n  return \"level\" in u;\n}\nconst u = { name: \"ana\", level: 3 } as { name: string };\nif (isAdmin(u)) console.log(u.level);\n",
+   "name": "u",
+   "type": "{ name: string; }"
   }
  ],
  "ts_types": [
@@ -277,6 +601,28 @@
    "code": "const profile = { name: \"ana\", nickname: null, age: undefined };\nconsole.log(JSON.stringify(profile));\nconsole.log(\"nickname\" in profile, \"age\" in profile, profile.age === undefined);\n",
    "name": "profile",
    "type": "{ name: string; nickname: null; age: undefined; }"
+  }
+ ],
+ "ts_unicode": [
+  {
+   "title": "Truncating by `slice` cuts an emoji (pitfall)",
+   "code": "const message = \"ok 👍👍\";\nconst preview = message.slice(0, 4);\nconsole.log(preview, preview.length, preview.isWellFormed());\n",
+   "name": "message",
+   "type": "\"ok 👍👍\""
+  },
+  {
+   "title": "Counting letters with `length` (pitfall)",
+   "code": "const name = \"Zoë 🙂\";\nconsole.log(`${name.length} characters`);\n",
+   "name": "name",
+   "type": "\"Zoë 🙂\""
+  }
+ ],
+ "ts_unions": [
+  {
+   "title": "A sentinel of the same type (pitfall)",
+   "code": "const words = [\"alpha\", \"beta\"];\nconst found = words.find((w) => w === \"gamma\");\nconsole.log(found === undefined ? \"not found\" : \"found: \" + found);\n",
+   "name": "found",
+   "type": "\"gamma\" | undefined"
   }
  ],
  "ts_variables": [
@@ -291,6 +637,12 @@
    "code": "const label = \"outer\";\nfunction show(): string {\n  const label = \"inner\";\n  return label;\n}\n{\n  const label = \"block\";\n  console.log(label);\n}\nconsole.log(show(), label);\n",
    "name": "label",
    "type": "\"outer\""
+  },
+  {
+   "title": "A `const` object changed through a helper (pitfall)",
+   "code": "const defaults = { debug: false };\nfunction withDebug(config: { debug: boolean }) {\n  config.debug = true;\n  return config;\n}\nconst mine = withDebug(defaults);\nconsole.log(defaults.debug, mine.debug);\n",
+   "name": "defaults",
+   "type": "{ debug: boolean; }"
   }
  ],
  "ts_versions": [
