@@ -801,6 +801,44 @@ function UnitView({
   }, []);
 
   const tabSections = sections.filter((s) => s.tab === tab);
+
+  /** Jump to a section, switching tabs first when it lives on another one. */
+  const goToSection = (id: string, onTab: TabKey) => {
+    if (onTab !== tab) {
+      setTab(onTab);
+      rememberUnitTab(key, onTab);
+    }
+    setScrollTarget(id);
+  };
+
+  // Which of this tab's sections is in view, for the outline's highlight.
+  const [activeSection, setActiveSection] = useState<string>("");
+  const tabSectionIds = tabSections.map((s) => s.id).join("|");
+  useEffect(() => {
+    const main = scroller();
+    const ids = tabSectionIds ? tabSectionIds.split("|") : [];
+    if (!main || ids.length === 0) return;
+    let frame = 0;
+    const spy = () => {
+      frame = 0;
+      const line = main.getBoundingClientRect().top + 120;
+      let current = ids[0]!;
+      for (const id of ids) {
+        const el = document.getElementById(id);
+        if (el && el.getBoundingClientRect().top <= line) current = id;
+      }
+      setActiveSection(current);
+    };
+    const onScroll = () => {
+      if (!frame) frame = requestAnimationFrame(spy);
+    };
+    spy();
+    main.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      main.removeEventListener("scroll", onScroll);
+      if (frame) cancelAnimationFrame(frame);
+    };
+  }, [tabSectionIds]);
   const tabIndex = tabs.findIndex((t) => t.key === tab);
   const nextTab = tabs[tabIndex + 1] ?? null;
   const reviewDeck = {
@@ -960,8 +998,18 @@ function UnitView({
               key={t.key}
               role="tab"
               aria-selected={t.key === tab}
+              tabIndex={t.key === tab ? 0 : -1}
               className={`cu-tab ${t.key === tab ? "active" : ""}`}
               onClick={() => selectTab(t.key)}
+              onKeyDown={(e) => {
+                const step = e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0;
+                if (!step) return;
+                e.preventDefault();
+                const bar = e.currentTarget.parentElement;
+                const to = tabs[(i + step + tabs.length) % tabs.length]!;
+                selectTab(to.key);
+                requestAnimationFrame(() => (bar?.children[tabs.indexOf(to)] as HTMLElement | undefined)?.focus());
+              }}
               title={`${t.hint} (${i + 1})`}
             >
               <span className="cu-tab-icon" aria-hidden>
@@ -1029,26 +1077,35 @@ function UnitView({
         </div>
 
         <aside className="cu-aside">
-          <div>
-            <div className="cur-eyebrow">On this tab</div>
-            <div className="cu-aside-list">
-              {tabSections.map((s) => (
-                <button
-                  key={s.id}
-                  className="cu-aside-link"
-                  onClick={() =>
-                    document
-                      .getElementById(s.id)
-                      ?.scrollIntoView({ block: "start", behavior: "smooth" })
-                  }
-                >
-                  <span aria-hidden>{s.icon}</span>
-                  <span>{s.short}</span>
-                  {s.count && <span className="cu-aside-count">{s.count}</span>}
+          {/* The whole unit, every tab, as one outline (UI_ROADMAP H4). A
+              section on another tab is one click away: the tab switches, then
+              the page scrolls to it. The section in view is highlighted. */}
+          <nav aria-label="In this unit">
+            <div className="cur-eyebrow">In this unit</div>
+            {tabs.map((t) => (
+              <div key={t.key} className={`cu-outline-group ${t.key === tab ? "current" : ""}`}>
+                <button type="button" className="cu-outline-tab" onClick={() => selectTab(t.key)} aria-current={t.key === tab ? "true" : undefined}>
+                  {t.label}
                 </button>
-              ))}
-            </div>
-          </div>
+                <div className="cu-aside-list">
+                  {sections
+                    .filter((s) => s.tab === t.key)
+                    .map((s) => (
+                      <button
+                        key={s.id}
+                        className={`cu-aside-link ${s.id === activeSection && t.key === tab ? "active" : ""}`}
+                        aria-current={s.id === activeSection && t.key === tab ? "location" : undefined}
+                        onClick={() => goToSection(s.id, s.tab)}
+                      >
+                        <span aria-hidden>{s.icon}</span>
+                        <span>{s.short}</span>
+                        {s.count && <span className="cu-aside-count">{s.count}</span>}
+                      </button>
+                    ))}
+                </div>
+              </div>
+            ))}
+          </nav>
 
           {u.lessons.length > 0 && (
             <div>

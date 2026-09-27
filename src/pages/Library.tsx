@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { api } from "../api";
 import type { CardReview, Difficulty } from "../types";
@@ -17,7 +17,7 @@ import {
   type UnitMatch,
 } from "../lib/curriculum";
 import { reviewLane, type ReviewLane } from "../lib/dsaReview";
-import { EmptyState, ErrorState } from "../components/ui";
+import { EmptyState, ErrorState, Icon, IconButton } from "../components/ui";
 import { loadFailed } from "../lib/failures";
 
 /**
@@ -52,6 +52,8 @@ export default function Library() {
   // The intro and each stage's goal are reference text: worth one read, then in
   // the way. Closed by default, remembered once opened.
   const fold = useCollapse("dsa-overview", false);
+  // Default-closed namespace, so "open" here means the rail is folded.
+  const railCompact = fold.isOpen("rail");
 
   useEffect(() => {
     api
@@ -183,20 +185,37 @@ export default function Library() {
           onClear={() => setQuery("")}
         />
       ) : (
-        <div className="cur-layout">
+        <div className={`cur-layout ${railCompact ? "rail-compact" : ""}`}>
           <nav className="cur-stages" aria-label="Stages">
-            <div className="cur-eyebrow cur-stages-label">
-              Stages
+            <div className="cur-stages-head">
+              <span className="cur-eyebrow cur-stages-label">Stages</span>
+              {/* The rail folds to its numbers: on a narrow window, or when
+                  the stage itself is what you want the width for (H4). */}
+              <IconButton
+                size="sm"
+                icon={railCompact ? "sidebarOpen" : "sidebarClose"}
+                label={railCompact ? "Show stage names" : "Fold the stage rail to numbers"}
+                aria-expanded={!railCompact}
+                onClick={() => fold.toggle("rail")}
+              />
             </div>
             {data.stages.map((s, i) => (
-              <StageButton
-                key={s.key}
-                stage={s}
-                number={i + 1}
-                active={i === selectedIndex}
-                current={i === currentIndex && !!data.next}
-                onSelect={() => selectStage(s.key)}
-              />
+              <Fragment key={s.key}>
+                {/* The optional stage is past the finish line; say so where it sits. */}
+                {s.optional && (i === 0 || !data.stages[i - 1]!.optional) && (
+                  <div className="cur-optional-rule" role="presentation">
+                    <span>Optional</span>
+                  </div>
+                )}
+                <StageButton
+                  stage={s}
+                  number={i + 1}
+                  active={i === selectedIndex}
+                  current={i === currentIndex && !!data.next}
+                  compact={railCompact}
+                  onSelect={() => selectStage(s.key)}
+                />
+              </Fragment>
             ))}
             {data.unplaced.length > 0 && (
               <div className="cur-stage-foot">
@@ -428,6 +447,7 @@ function StageButton({
   number,
   active,
   current,
+  compact = false,
   onSelect,
 }: {
   stage: HydratedStage;
@@ -435,6 +455,8 @@ function StageButton({
   active: boolean;
   /** Holds the "up next" unit. */
   current: boolean;
+  /** The folded rail: the number only, the rest in the tooltip. */
+  compact?: boolean;
   onSelect: () => void;
 }) {
   const clearedUnits = stage.units.filter((u) => isCleared(u.status) || u.skipped).length;
@@ -444,15 +466,17 @@ function StageButton({
 
   return (
     <button
-      className={`cur-stage-btn ${active ? "active" : ""}`}
+      className={`cur-stage-btn ${active ? "active" : ""} ${stage.optional ? "optional" : ""} ${compact ? "compact" : ""}`}
       onClick={onSelect}
       aria-current={active ? "true" : undefined}
+      aria-label={compact ? `${stage.optional ? "Optional stage" : `Stage ${number}`}: ${stage.title}, ${clearedUnits} of ${stage.units.length} units` : undefined}
+      title={compact ? `${stage.title} — ${clearedUnits}/${stage.units.length} units` : undefined}
     >
-      <span className={`cur-num ${done ? "complete" : started ? "started" : ""}`}>
-        {done ? "✓" : stage.optional ? "+" : number}
+      <span className={`cur-num ${done ? "complete" : started ? "started" : ""} ${stage.optional ? "optional" : ""}`}>
+        {done ? <Icon name="check" size={14} /> : stage.optional ? <Icon name="sparkles" size={14} /> : number}
       </span>
-      <span style={{ minWidth: 0 }}>
-        <span className="cur-stage-name" style={{ display: "block" }}>
+      <span className="cur-stage-text">
+        <span className="cur-stage-name">
           {stage.icon} {stage.title}
         </span>
         <span className="cur-stage-meta">
