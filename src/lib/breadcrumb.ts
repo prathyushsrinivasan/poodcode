@@ -89,7 +89,7 @@ const TREE: Record<string, RouteNode> = {
   },
   "jp-bridge": { label: "日本語 → Java" },
   japanese: { label: "日本語 vocabulary" },
-  paths: { label: "Learning Paths" },
+  paths: { label: "Topic playlists" },
   insights: { label: "Insights" },
   settings: { label: "Settings" },
   ui: { label: "Component gallery" },

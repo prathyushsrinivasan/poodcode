@@ -331,3 +331,49 @@
     display: none;
   }
 }
+
+/* ---- Topic playlists (A3) ---- */
+.playlist-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  gap: var(--space-4);
+}
+.playlist {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  height: 100%;
+}
+.playlist-units {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1);
+  margin: 0;
+}
+.playlist-items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.playlist-mark {
+  width: 22px;
+  display: inline-flex;
+  justify-content: center;
+  color: var(--text-faint);
+  font-size: var(--text-xs);
+}
+a.btn.primary-link {
+  align-self: flex-start;
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--on-accent);
+  margin-top: auto;
+}
+a.btn.primary-link:hover {
+  filter: brightness(1.08);
+  background: var(--accent);
+}

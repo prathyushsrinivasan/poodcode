@@ -531,7 +531,26 @@ const handlers: Record<string, (a: Args) => any | Promise<any>> = {
   sql_datasets: () => seed("sql_datasets"),
   list_flashcards: () => seed("flashcards"),
   due_flashcards: async () => ((await seed("flashcards")) ?? []).slice(0, 8),
-  list_paths: () => [],
+  // Two playlists from the fixture bank, so the page has something to show:
+  // the first few problems on each of two common topics.
+  list_paths: async () => {
+    const ps = await problems();
+    const byTopic = (topic: string) => ps.filter((p) => p.topics.includes(topic)).slice(0, 6);
+    return ["Arrays", "Strings"].map((topic, i) => ({
+      id: i + 1,
+      key: topic.toLowerCase(),
+      title: `${topic} warm-up`,
+      description: `Six ${topic.toLowerCase()} problems, easiest first.`,
+      ordering: i,
+      items: byTopic(topic).map((p, k) => ({
+        problem_id: p.id,
+        title: p.title,
+        difficulty: p.difficulty,
+        solved_status: p.solved_status,
+        ordering: k,
+      })),
+    }));
+  },
   languages: () => LANGUAGES,
   // The real command drops a process-wide probe cache and re-runs it; with
   // no toolchains to probe, the honest fixture is the same list back.
