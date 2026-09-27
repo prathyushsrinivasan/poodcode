@@ -26,6 +26,7 @@ import {
   type MockState,
   type ReviewState,
 } from "../lib/capstone";
+import { saveFailed } from "../lib/failures";
 
 const mockKey = (track: string, week: number, i: number) => `mastery-mock:${track}:${week}:${i}`;
 const reviewKey = (track: string, id: string) => `mastery-review:${track}:${id}`;
@@ -43,7 +44,7 @@ export function CapstonePractice({ week, trackKey }: { week: MasteryWeek; trackK
   const save = (key: string, value: unknown) => {
     const raw = JSON.stringify(value);
     setSettings((s) => ({ ...(s ?? {}), [key]: raw }));
-    api.setSetting(key, raw).catch(() => {});
+    api.setSetting(key, raw).catch(saveFailed("your capstone progress"));
   };
 
   if (bank.length + mocks.length + reviews.length === 0) return null;

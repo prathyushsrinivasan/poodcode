@@ -31,6 +31,7 @@ import Contest from "./pages/Contest";
 import JapaneseBridge from "./pages/JapaneseBridge";
 import Paths from "./pages/Paths";
 import Gallery from "./pages/Gallery";
+import { ignore } from "./lib/failures";
 // Dev-only: the component gallery is not part of the shipped app, and the
 // literal check lets the bundler drop it from a production build.
 const DEV_UI = import.meta.env.VITE_MOCK === "1";
@@ -124,9 +125,7 @@ export default function App() {
       .then((s) => {
         if (s.onboarded !== "1") setShowWelcome(true);
       })
-      .catch(() => {
-        /* a settings read that fails is not a reason to onboard again */
-      });
+      .catch(ignore("a settings read that fails is not a reason to onboard again"));
   }, []);
 
   // Settings asks for the tour with an event rather than a reload: it used to
@@ -140,9 +139,7 @@ export default function App() {
 
   const dismissWelcome = () => {
     setShowWelcome(false);
-    api.setSetting("onboarded", "1").catch(() => {
-      /* the tour is dismissed either way; worst case it returns next launch */
-    });
+    api.setSetting("onboarded", "1").catch(ignore("the tour is dismissed either way; worst case it returns next launch"));
   };
 
   if (!loaded) {

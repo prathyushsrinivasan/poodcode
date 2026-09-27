@@ -16,6 +16,7 @@ import { api } from "../../api";
 import { loadDoneChapters } from "../../lib/learnProgress";
 import { masteryResume, pacing, effectiveStart, parsePause, pauseKey, startDateKey } from "../../lib/mastery";
 import type { MasteryProgress, MasteryTrack, WeeklyCourse } from "../../types";
+import { loadFailed } from "../../lib/failures";
 
 export interface TrackCard {
   key: string;
@@ -108,8 +109,8 @@ export function useTrackCards() {
     let cancelled = false;
     (async () => {
       const [ts, java, done, mastery, masteryRows, settings] = await Promise.all([
-        api.tsCourse().catch(() => null),
-        api.javaCourse().catch(() => null),
+        api.tsCourse().catch(loadFailed("the TypeScript course position")),
+        api.javaCourse().catch(loadFailed("the Java course position")),
         loadDoneChapters().catch(() => new Set<string>()),
         api.mastery().catch(() => [] as MasteryTrack[]),
         api.masteryProgress().catch(() => [] as MasteryProgress[]),

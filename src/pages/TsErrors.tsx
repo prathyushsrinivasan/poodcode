@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useRef, useState, type RefObject } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { Markdown } from "../components/Markdown";
-import { Empty, inlineCode } from "../components/common";
+import { inlineCode } from "../components/common";
 import { TS_ERRORS, errorEntry, searchErrors, type TsErrorEntry } from "../lib/tsErrors";
+import { EmptyState } from "../components/ui";
 
 /**
  * The TypeScript error glossary. Every entry is proven by
@@ -42,7 +43,13 @@ export default function TsErrors() {
       />
 
       {hits.length === 0 ? (
-        <Empty icon="🔎" text="No error matches that. Try the code number from the message." />
+        <EmptyState
+          icon="search"
+          title="No error matches that."
+          action={{ label: "Clear search", icon: "close", onClick: () => setQuery("") }}
+        >
+          Try the code number from the message — the 2322 in TS2322.
+        </EmptyState>
       ) : (
         hits.map((e) => (
           <ErrorEntry

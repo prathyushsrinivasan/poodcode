@@ -4,6 +4,7 @@ import type { Card, CardReview } from "../types";
 import { cardId } from "../lib/learnProgress";
 import { acceptsReading } from "../lib/romaji";
 import { todayISO } from "../lib/srs";
+import { saveFailed } from "../lib/failures";
 
 /* ------------------------------------------------------------------ helpers */
 
@@ -256,7 +257,7 @@ export function CardStudy({
             <button
               className="ghost"
               onClick={async () => {
-                await api.resetCards(ids).catch(() => {});
+                await api.resetCards(ids).catch(saveFailed("the card reset"));
                 build(false);
               }}
             >

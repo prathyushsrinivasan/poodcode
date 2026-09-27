@@ -11,6 +11,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { api } from "../../api";
 import { loadUnitIndex } from "../CurriculumData";
+import { ignore } from "../../lib/failures";
 
 interface Neighbour {
   id: number;
@@ -54,9 +55,7 @@ export function useRungPosition(slug: string | undefined) {
           next: pick(at + 1),
         });
       })
-      .catch(() => {
-        /* placement is context, not content — its absence costs nothing */
-      });
+      .catch(ignore("placement is context, not content — its absence costs nothing"));
     return () => {
       live = false;
     };

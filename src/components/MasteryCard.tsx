@@ -4,6 +4,7 @@ import { api } from "../api";
 import type { MasteryTrack } from "../types";
 import { loadDoneChapters } from "../lib/learnProgress";
 import { pacing, effectiveStart, parsePause, pauseKey, progressByWeek, startDateKey, unlockedWeeks, weekProgress } from "../lib/mastery";
+import { loadFailed } from "../lib/failures";
 
 /** Dashboard summary of whichever mastery track is furthest along: where you
  * are, what is still outstanding this week, and whether you are behind pace.
@@ -80,7 +81,7 @@ export function MasteryCard() {
         percent: wp.percent,
         behind: pace ? pace.weeksBehind : null,
       });
-    })().catch(() => {});
+    })().catch(loadFailed("the Mastery summary"));
   }, []);
 
   if (!state) return null;

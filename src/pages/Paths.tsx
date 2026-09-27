@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { api } from "../api";
 import type { Path } from "../types";
 import { DiffBadge } from "../components/common";
+import { EmptyState } from "../components/ui";
 
 export default function Paths() {
   const [paths, setPaths] = useState<Path[]>([]);
@@ -19,7 +20,7 @@ export default function Paths() {
         Curated, ordered tracks. Work top to bottom — each builds on the last.
       </p>
 
-      {paths.length === 0 && <div className="dim">No paths yet.</div>}
+      {paths.length === 0 && <EmptyState icon="paths" title="No paths yet." />}
 
       <div className="grid cols-2">
         {paths.map((p) => {

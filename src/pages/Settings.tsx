@@ -20,6 +20,8 @@ import { api } from "../api";
 import { useToast } from "../components/Toast";
 import { ConfirmDialog } from "../components/ui/Modal";
 import { SHORTCUTS, Keys } from "../components/shell/ShortcutSheet";
+import { EmptyState } from "../components/ui";
+import { recentFailures } from "../lib/failures";
 
 /** One labelled control. `keywords` feed the section search. */
 function Field({
@@ -256,10 +258,11 @@ export default function Settings() {
 
         <div className="settings-body" ref={bodyRef}>
           {matches?.length === 0 && (
-            <div className="card empty-state">
-              <p>Nothing in settings matches “{query}”.</p>
-              <button onClick={() => setQuery("")}>Clear search</button>
-            </div>
+            <EmptyState
+              icon="search"
+              title={`Nothing in settings matches “${query}”.`}
+              action={{ label: "Clear search", icon: "close", onClick: () => setQuery("") }}
+            />
           )}
 
           {/* ---- Appearance ---- */}
@@ -607,6 +610,36 @@ function About() {
         Everything runs offline: your code is executed by the toolchains on this machine and nothing
         is sent anywhere. Back up the database from time to time — it is the only copy.
       </p>
+      <BackgroundFailures />
     </section>
+  );
+}
+
+/** Calls that failed quietly this session (UI_ROADMAP E2). The ones that
+ * mattered already raised a toast; this is where the rest are written down,
+ * so "something is off" has somewhere to look. */
+function BackgroundFailures() {
+  const list = recentFailures();
+  return (
+    <details className="settings-failures">
+      <summary>
+        Background problems this session{" "}
+        <span className="tab-count">{list.length}</span>
+      </summary>
+      {list.length === 0 ? (
+        <p className="faint settings-note">None — every background load and save has landed.</p>
+      ) : (
+        <ul className="settings-failure-list">
+          {list.map((f, i) => (
+            <li key={i}>
+              <span className={`badge ${f.kind === "ignored" ? "" : "badge-warn"}`}>
+                {f.kind === "ignored" ? "ignored" : f.kind === "save" ? "not saved" : "not loaded"}
+              </span>{" "}
+              {f.what} <span className="faint mono">— {f.detail}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </details>
   );
 }

@@ -423,3 +423,10 @@ button.pill.on:hover:not(:disabled) {
   opacity: 0.85;
   cursor: progress;
 }
+
+/* A small explanatory line under a page-level state. */
+.page-note {
+  font-size: var(--text-xs);
+  text-align: center;
+  margin-top: var(--space-3);
+}

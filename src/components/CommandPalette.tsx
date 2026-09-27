@@ -14,6 +14,7 @@ import type {
 import { loadCurriculumSeed } from "./CurriculumData";
 import { TS_ERRORS } from "../lib/tsErrors";
 import { clearRecents, readRecents } from "../lib/recents";
+import { ignore } from "../lib/failures";
 
 interface Cmd {
   id: string;
@@ -173,7 +174,7 @@ export function CommandPalette() {
     setQ("");
     setSel(0);
     setRecents(readRecents());
-    api.listProblems().then(setProblems).catch(() => {});
+    api.listProblems().then(setProblems).catch(ignore("palette index: problems (search still covers pages)"));
     setTimeout(() => inputRef.current?.focus(), 10);
 
     // Track content is fetched once per session, and each failure is swallowed
@@ -183,13 +184,13 @@ export function CommandPalette() {
     tracksRequested.current = true;
     const put = <K extends keyof Tracks>(k: K) => (v: Tracks[K]) =>
       setTracks((t) => ({ ...t, [k]: v }));
-    api.tsCourse().then(put("ts")).catch(() => {});
-    api.javaCourse().then(put("java")).catch(() => {});
-    api.backendTrack().then(put("backend")).catch(() => {});
-    api.projectsTrack().then(put("projects")).catch(() => {});
-    loadCurriculumSeed().then(put("dsa")).catch(() => {});
-    api.mastery().then(put("mastery")).catch(() => {});
-    api.concepts().then(setConcepts).catch(() => {});
+    api.tsCourse().then(put("ts")).catch(ignore("palette index: TypeScript course"));
+    api.javaCourse().then(put("java")).catch(ignore("palette index: Java course"));
+    api.backendTrack().then(put("backend")).catch(ignore("palette index: Backend Lab"));
+    api.projectsTrack().then(put("projects")).catch(ignore("palette index: Projects"));
+    loadCurriculumSeed().then(put("dsa")).catch(ignore("palette index: DSA curriculum"));
+    api.mastery().then(put("mastery")).catch(ignore("palette index: Mastery"));
+    api.concepts().then(setConcepts).catch(ignore("palette index: concepts"));
   }, [open]);
 
   /** Things the palette can *do*, as opposed to places it can go. The palette

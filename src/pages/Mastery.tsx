@@ -18,7 +18,7 @@ import { WorkspaceEditor } from "../components/WorkspaceEditor";
 import { DiffView } from "../components/DiffView";
 import { FailingCases } from "../components/OutputCompare";
 import { TsErrorLinks } from "../components/TsErrorLinks";
-import { DiffBadge, Empty, inlineCode } from "../components/common";
+import { DiffBadge, inlineCode } from "../components/common";
 import { QuizChoices } from "../components/QuizChoices";
 import { QuizCard } from "../components/exercise";
 import { answerText, questionText } from "../lib/quizKinds";
@@ -80,6 +80,8 @@ import {
   type ProgressMap,
   type WeekProgress,
 } from "../lib/mastery";
+import { EmptyState, ErrorState } from "../components/ui";
+import { ignore, loadFailed, saveFailed } from "../lib/failures";
 
 const TRACK_STORE_KEY = "poodcode:mastery-track";
 /** How often accumulated study time is flushed to the backend. */
@@ -99,6 +101,8 @@ export default function Mastery() {
     () => localStorage.getItem(TRACK_STORE_KEY) || ""
   );
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
+  const [attempt, setAttempt] = useState(0);
   const [focusWeek, setFocusWeek] = useState<number | null>(null);
   const [query, setQuery] = useState("");
   const [solvedAll, setSolvedAll] = useState<Set<string>>(() => solvedExercises());
@@ -107,7 +111,7 @@ export default function Mastery() {
 
   const saveSetting = useCallback((key: string, value: string) => {
     setSettings((s) => ({ ...s, [key]: value }));
-    api.setSetting(key, value).catch(() => {});
+    api.setSetting(key, value).catch(saveFailed("a Mastery setting"));
   }, []);
 
   const refreshProgress = useCallback(async () => {
@@ -115,10 +119,11 @@ export default function Mastery() {
   }, []);
 
   useEffect(() => {
+    setLoadError("");
     // Exam scores used to live in localStorage; fold any leftovers into SQLite
     // before the first read so nothing looks lost on upgrade.
     migrateLegacyQuizScores()
-      .catch(() => {})
+      .catch(ignore("legacy quiz-score migration; it is retried next launch"))
       .then(() =>
         Promise.all([
           api.mastery(),
@@ -138,9 +143,11 @@ export default function Mastery() {
         setSettings(s);
       })
       .then(() => loadSolvedExercises().then(setSolvedAll))
-      .catch(() => {})
+      // Was a silent catch, after which the page said "No mastery track is
+      // bundled" — a load failure reported as missing content (E2).
+      .catch((e) => setLoadError(String(e)))
       .finally(() => setLoading(false));
-  }, []);
+  }, [attempt]);
 
   const track = useMemo(
     () => tracks.find((t) => t.key === trackKey) ?? tracks[0],
@@ -211,7 +218,7 @@ export default function Mastery() {
         }
       }
       await refreshProgress();
-    })().catch(() => {});
+    })().catch(saveFailed("the week's completion"));
   }, [track, perWeek, progress, refreshProgress, toast]);
 
   useEffect(() => {
@@ -249,10 +256,24 @@ export default function Mastery() {
   }, []);
 
   if (loading) return <TrackSkeleton cards={6} />;
+  if (loadError) {
+    return (
+      <div className="page">
+        <ErrorState
+          title="The Mastery programme could not be loaded."
+          error={loadError}
+          onRetry={() => {
+            setLoading(true);
+            setAttempt((n) => n + 1);
+          }}
+        />
+      </div>
+    );
+  }
   if (!track) {
     return (
       <div className="page">
-        <Empty icon="🎓" text="No mastery track is bundled." />
+        <EmptyState icon="mastery" title="No mastery track is bundled." />
       </div>
     );
   }
@@ -737,7 +758,7 @@ function WeekCard({
   // session cache and this fills it on a cold start.
   useEffect(() => {
     if (practice.length === 0 && problemSet.length === 0 && warmup.length === 0) return;
-    loadSolvedExercises().then(setSolvedEx).catch(() => {});
+    loadSolvedExercises().then(setSolvedEx).catch(loadFailed("your solved exercises"));
   }, [practice.length, problemSet.length, warmup.length]);
 
   // Study time is accumulated only while this week is expanded, then flushed
@@ -752,7 +773,7 @@ function WeekCard({
       const elapsed = Math.round((Date.now() - opened.current) / 1000);
       opened.current = Date.now();
       const seconds = Math.min(elapsed, MAX_FLUSH_SECONDS);
-      if (seconds > 0) api.masteryLogTime(track.key, week.week, seconds).catch(() => {});
+      if (seconds > 0) api.masteryLogTime(track.key, week.week, seconds).catch(saveFailed("study time"));
     };
     const timer = setInterval(flush, TIME_FLUSH_MS);
     return () => {
@@ -1457,14 +1478,14 @@ function ProjectPanel({
     api
       .getSettings()
       .then((s) => setHistory(parseHistory(s[historyKey])))
-      .catch(() => {});
+      .catch(loadFailed("your saved versions"));
   }, [historyKey]);
 
   function keepVersion(text: string) {
     if (!text.trim() || history[0]?.code === text) return;
     const next = [{ at: new Date().toISOString(), code: text }, ...history].slice(0, 20);
     setHistory(next);
-    api.setSetting(historyKey, JSON.stringify(next)).catch(() => {});
+    api.setSetting(historyKey, JSON.stringify(next)).catch(saveFailed("the version history"));
   }
 
   async function save(nextShipped = shipped) {
@@ -1739,7 +1760,7 @@ function QuizPanel({
   function submit() {
     setSubmitted(true);
     recordSitting(paper.map((q, i) => ({ question: q.question, right: picked[i] === q.answer })));
-    onSubmit(percent).catch(() => {});
+    onSubmit(percent).catch(saveFailed("your quiz score"));
   }
 
   function retake() {
@@ -1950,7 +1971,7 @@ function ExamPanel({
           if (!savedCode) setCode(versions[v].starter);
         }
       })
-      .catch(() => {});
+      .catch(loadFailed("your exam version"));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [variantKey, versions.length]);
 
@@ -1961,7 +1982,7 @@ function ExamPanel({
     setReport(null);
     setShowHint(false);
     setFailedOnce(false);
-    api.setSetting(variantKey, String(next)).catch(() => {});
+    api.setSetting(variantKey, String(next)).catch(saveFailed("your exam version"));
   }
 
   async function submit() {
@@ -1989,7 +2010,7 @@ function ExamPanel({
         const secs = Math.round((Date.now() - focusStart) / 1000);
         const text = `${Math.floor(secs / 60)}m ${String(secs % 60).padStart(2, "0")}s`;
         setFocusResult(text);
-        api.setSetting(`${variantKey}:focus-time`, String(secs)).catch(() => {});
+        api.setSetting(`${variantKey}:focus-time`, String(secs)).catch(saveFailed("focus time"));
         setFocusStart(null);
       }
       await onResult(green && (!types || typesSolved), code);
@@ -2007,7 +2028,7 @@ function ExamPanel({
   // the final there and then.
   function typesDone(id: string) {
     onTypesSolved(id);
-    if (accepted) onResult(true, code).catch(() => {});
+    if (accepted) onResult(true, code).catch(saveFailed("your exam result"));
   }
 
   return (

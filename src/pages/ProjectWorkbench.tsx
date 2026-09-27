@@ -23,8 +23,8 @@ import { api } from "../api";
 import type { Exercise, JudgeReport, ProcOut, Project, ProjectModule, TestCase } from "../types";
 import { CodeEditor } from "../components/CodeEditor";
 import { JudgeFeedback as Feedback } from "../components/exercise";
-import { Empty } from "../components/common";
 import { pairExchanges, sampleRequests } from "../lib/workbench";
+import { EmptyState } from "../components/ui";
 
 /** Where the judged programs' given replayer starts. Mirrors `_GIVEN_MARKER` in
  * tools/projects_track.py — a program containing it boots a server. */
@@ -218,7 +218,7 @@ export default function ProjectWorkbench({ project }: { project: Project }) {
         <button className="ghost" onClick={() => nav(`/projects/${project.key}`)}>
           ← {project.title}
         </button>
-        <Empty icon="🧪" text="No module of this project has a build to load yet." />
+        <EmptyState icon="build" title="No module of this project has a build to load yet." />
       </div>
     );
   }

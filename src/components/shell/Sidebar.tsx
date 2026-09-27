@@ -25,6 +25,7 @@ import { reviewLane } from "../../lib/dsaReview";
 import { loadDoneChapters } from "../../lib/learnProgress";
 import type { CardReview } from "../../types";
 import { Icon, type IconName } from "../ui/Icon";
+import { ignore } from "../../lib/failures";
 
 interface NavItem {
   to: string;
@@ -82,14 +83,10 @@ function useBadges() {
     api
       .cardReviews()
       .then((rs) => setReviews(new Map(rs.map((r) => [r.card_id, r]))))
-      .catch(() => {
-        /* a badge is not worth an error; it just does not appear */
-      });
+      .catch(ignore("a badge is not worth an error; it just does not appear"));
     loadDoneChapters()
       .then(setStarted)
-      .catch(() => {
-        /* same */
-      });
+      .catch(ignore("a nav badge: chapter progress"));
   }, []);
 
   const lane = useMemo(

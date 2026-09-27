@@ -7,6 +7,7 @@ import type { Exercise, MasteryTrack } from "../types";
 import { ExerciseSections } from "./ExerciseSections";
 import { loadSolvedExercises, markMasterySolved, solvedExercises } from "../lib/learnProgress";
 import { dailyKey, localDay, parseDaily, streak, todaysPuzzle, typeLadder } from "../lib/typeLadder";
+import { loadFailed } from "../lib/failures";
 
 export function DailyTypePuzzle({
   track,
@@ -30,7 +31,7 @@ export function DailyTypePuzzle({
   const run = streak(state.days, today);
 
   useEffect(() => {
-    loadSolvedExercises().then(setSolved).catch(() => {});
+    loadSolvedExercises().then(setSolved).catch(loadFailed("your solved exercises"));
   }, []);
 
   // Pin today's pick so a reload serves the same puzzle.

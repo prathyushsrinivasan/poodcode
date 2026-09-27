@@ -28,7 +28,7 @@ import {
   type TrackSpec,
 } from "../components/track/TrackShell";
 import { collectQuestions } from "../lib/projectReview";
-import { ClickableRow, Empty } from "../components/common";
+import { ClickableRow } from "../components/common";
 import { useToast } from "../components/Toast";
 import {
   loadDoneChapters,
@@ -54,6 +54,8 @@ import {
   type GlossaryEntry,
   type NoteEntry,
 } from "../lib/projectIndex";
+import { EmptyState, ErrorState } from "../components/ui";
+import { loadFailed } from "../lib/failures";
 
 // Module completion is tracked in the same SQLite-backed chapter-done set as
 // the Learn tab, the courses and the Backend Lab, under a namespaced key so it
@@ -91,7 +93,7 @@ export default function Projects({ view }: { view?: ProjectView } = {}) {
     load();
     loadDoneChapters()
       .then(setDone)
-      .catch(() => {})
+      .catch(loadFailed("your completed modules"))
       .finally(() => setDoneLoaded(true));
   }, [load]);
 
@@ -107,17 +109,11 @@ export default function Projects({ view }: { view?: ProjectView } = {}) {
   if (loadError) {
     return (
       <div className="page">
-        <Empty icon="⚠️" text="The Projects track could not be loaded." />
-        <p className="dim mono" style={{ fontSize: 12, textAlign: "center" }}>
-          {loadError}
-        </p>
-        <p className="faint" style={{ fontSize: 12, textAlign: "center" }}>
+        <ErrorState title="The Projects track could not be loaded." error={loadError} onRetry={load} />
+        <p className="faint page-note">
           This usually means <code>seeds/projects.json</code> and the Rust model have drifted
           apart — regenerate the seed with <code>python tools/gen_seed.py</code>.
         </p>
-        <div className="row" style={{ justifyContent: "center", marginTop: 10 }}>
-          <button onClick={load}>Try again</button>
-        </div>
       </div>
     );
   }
@@ -126,7 +122,7 @@ export default function Projects({ view }: { view?: ProjectView } = {}) {
   if (track.projects.length === 0) {
     return (
       <div className="page">
-        <Empty icon="🧱" text="No projects are built yet." />
+        <EmptyState icon="projects" title="No projects are built yet." />
       </div>
     );
   }
@@ -146,8 +142,11 @@ export default function Projects({ view }: { view?: ProjectView } = {}) {
     if (project !== undefined) {
       return (
         <div className="page">
-          <Empty icon="🧱" text="Project not found." />
-          <button onClick={() => nav("/projects")}>Back to Projects</button>
+          <EmptyState
+            icon="projects"
+            title="Project not found."
+            action={{ label: "Back to Projects", icon: "back", onClick: () => nav("/projects") }}
+          />
         </div>
       );
     }
@@ -171,8 +170,11 @@ export default function Projects({ view }: { view?: ProjectView } = {}) {
     if (!m) {
       return (
         <div className="page">
-          <Empty icon="🧱" text="Module not found." />
-          <button onClick={() => nav(`/projects/${p.key}`)}>Back to the project</button>
+          <EmptyState
+            icon="projects"
+            title="Module not found."
+            action={{ label: "Back to the project", icon: "back", onClick: () => nav(`/projects/${p.key}`) }}
+          />
         </div>
       );
     }
@@ -774,13 +776,14 @@ function ProjectReference({ project }: { project: Project }) {
       )}
 
       {shown === 0 ? (
-        <Empty
-          icon="🔍"
-          text={
+        <EmptyState
+          icon={q ? "search" : "document"}
+          title={
             q
               ? `No ${active.unit} in ${active.label} matches “${q}”.`
               : `This project has not written any ${active.unit}s yet.`
           }
+          action={q ? { label: "Clear search", icon: "close", onClick: () => setQ("") } : undefined}
         />
       ) : tab === "syntax" ? (
         syntaxGroups.map((group) => (
@@ -1222,7 +1225,7 @@ function ModuleDetail({
   // module-level cache — warm after the first load of the session — and this
   // is what fills it on a cold start.
   useEffect(() => {
-    loadSolvedExercises().then(setSolvedEx).catch(() => {});
+    loadSolvedExercises().then(setSolvedEx).catch(loadFailed("your solved exercises"));
   }, []);
 
   useEffect(() => {

@@ -2,8 +2,9 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { api } from "../api";
 import type { BridgeProblem, InterviewQA, JpBridge, Problem } from "../types";
-import { Empty } from "../components/common";
 import { ReadingSkeleton } from "../components/Skeleton";
+import { EmptyState } from "../components/ui";
+import { ignore, loadFailed } from "../lib/failures";
 
 /** The four stages a Japanese technical interview is actually made of. Every
  * question carries its stage as its first tag — asserted at generation. */
@@ -29,13 +30,11 @@ export default function JapaneseBridge() {
 
   useEffect(() => {
     api.jpBridge().then(setBridge).catch(() => setBridge({ problems: [], interview: [] }));
-    api.listProblems().then(setProblems).catch(() => {});
+    api.listProblems().then(setProblems).catch(loadFailed("the problem list"));
     api
       .jpVocab()
       .then((v) => setWordIds(new Map(v.words.map((w) => [w.term, w.id]))))
-      .catch(() => {
-        /* without the list the chips simply stay plain text */
-      });
+      .catch(ignore("without the list the chips simply stay plain text"));
   }, []);
 
   const idBySlug = useMemo(() => {
@@ -82,7 +81,7 @@ export default function JapaneseBridge() {
 
       {tab === "solve" ? (
         bridge.problems.length === 0 ? (
-          <Empty icon="🈁" text="No bridge problems yet." />
+          <EmptyState icon="japanese" title="No bridge problems yet." />
         ) : (
           <div className="grid cols-2">
             {bridge.problems.map((p) => (
@@ -96,7 +95,7 @@ export default function JapaneseBridge() {
           </div>
         )
       ) : bridge.interview.length === 0 ? (
-        <Empty icon="🗣" text="No interview questions yet." />
+        <EmptyState icon="japanese" title="No interview questions yet." />
       ) : (
         <>
           <div className="row" style={{ gap: 6, flexWrap: "wrap", marginBottom: 14 }}>

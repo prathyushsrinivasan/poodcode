@@ -22,6 +22,7 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Markdown } from "../Markdown";
 import { ClickableRow } from "../common";
 import { studyTime } from "../../lib/trackProgress";
+import { EmptyState } from "../ui/States";
 
 export interface TrackUnit {
   /** The route segment under the track's base — a number or a key. */
@@ -272,9 +273,7 @@ export function TrackBody({ spec, progress }: { spec: TrackSpec; progress: Track
         )}
 
         {units.filter((u) => u.authored).length === 0 ? (
-          <div className="card empty-state">
-            <p className="dim">Nothing in this {spec.groupLabel.toLowerCase()} is written yet.</p>
-          </div>
+          <EmptyState compact icon="document" title={`Nothing in this ${spec.groupLabel.toLowerCase()} is written yet.`} />
         ) : (
           <ol className="track-unit-list">
             {units

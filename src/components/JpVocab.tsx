@@ -28,6 +28,7 @@ import {
   speechSupported,
 } from "../lib/speech";
 import { todayISO } from "../lib/srs";
+import { ignore } from "../lib/failures";
 
 const TAG_STORE_KEY = "poodcode:jp-vocab-tag";
 const MODE_STORE_KEY = "poodcode:jp-vocab-mode";
@@ -114,9 +115,7 @@ export function useVocabReviews(): VocabReviews {
     api
       .cardReviews()
       .then((list) => setReviews(new Map(list.map((r) => [r.card_id, r]))))
-      .catch(() => {
-        /* no history yet is the same as no history loaded — everything is new */
-      });
+      .catch(ignore("no history yet is the same as no history loaded — everything is new"));
   }, []);
 
   const grade = useCallback(async (wordId: string, quality: number) => {

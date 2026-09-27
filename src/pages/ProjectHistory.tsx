@@ -16,9 +16,10 @@ import type { Project, ProjectModule } from "../types";
 import { DiffStatBadge, DiffView } from "../components/DiffView";
 import { Markdown } from "../components/Markdown";
 import { Section, useCollapse } from "../components/Collapsible";
-import { ClickableRow, Empty } from "../components/common";
+import { ClickableRow } from "../components/common";
 import { countCodeLines, diffSources, diffStats, numberLines } from "../lib/lineDiff";
 import { plural } from "../lib/trackProgress";
+import { EmptyState } from "../components/ui";
 
 interface Snapshot {
   module: ProjectModule;
@@ -66,7 +67,7 @@ export default function ProjectHistory({ project }: { project: Project }) {
         <button className="ghost" onClick={() => nav(`/projects/${project.key}`)}>
           ← {project.title}
         </button>
-        <Empty icon="🕰️" text="No module of this project has a reference implementation yet." />
+        <EmptyState icon="history" title="No module of this project has a reference implementation yet." />
       </div>
     );
   }

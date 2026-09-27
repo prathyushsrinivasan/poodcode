@@ -9,7 +9,6 @@ import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import type { Project } from "../types";
 import { QuizItem } from "../components/exercise";
-import { Empty } from "../components/common";
 import {
   collectQuestions,
   pickRound,
@@ -21,6 +20,7 @@ import {
 import { ConfirmDialog } from "../components/ui/Modal";
 import { useToast } from "../components/Toast";
 import { plural } from "../lib/trackProgress";
+import { EmptyState } from "../components/ui";
 
 const historyKey = (projectKey: string) => `poodcode:project-review:${projectKey}`;
 
@@ -145,7 +145,7 @@ export default function ProjectReview({
     return (
       <div className="page">
         {header}
-        <Empty icon="🔁" text="This project has no quiz questions to review yet." />
+        <EmptyState icon="checklist" title="This project has no quiz questions to review yet." />
       </div>
     );
   }

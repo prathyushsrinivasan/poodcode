@@ -20,6 +20,8 @@ import { SaveIndicator, useSaveState } from "../components/SaveState";
 import { formatMemory } from "../lib/format";
 import { lineDiff, diffStats } from "../lib/diff";
 import type { Attempt, JudgeReport, Mistake, Note, Problem, Solution, TestCase } from "../types";
+import { EmptyState } from "../components/ui";
+import { ignore, saveFailed } from "../lib/failures";
 
 type LeftTab =
   | "description"
@@ -178,9 +180,7 @@ export default function Solve({ onProgress }: { onProgress?: () => void }) {
       .then((n) => {
         if (!cancelled) setRevealed((cur) => Math.max(cur, n));
       })
-      .catch(() => {
-        /* keep whatever has been revealed in this session */
-      });
+      .catch(ignore("keep whatever has been revealed in this session"));
     api.knownPrereqs(pid).then((keys) => {
       if (!cancelled) setKnownPrereqs(new Set(keys));
     });
@@ -208,9 +208,7 @@ export default function Solve({ onProgress }: { onProgress?: () => void }) {
           notes: note && note.content.trim() ? 1 : 0,
         })
       )
-      .catch(() => {
-        /* the tabs work without their counts */
-      });
+      .catch(ignore("the tabs work without their counts"));
   }, [pid]);
 
   useEffect(() => {
@@ -270,7 +268,7 @@ export default function Solve({ onProgress }: { onProgress?: () => void }) {
   useEffect(() => {
     return () => {
       const delta = Math.max(0, elapsedRef.current - creditedRef.current);
-      if (delta > 3) api.logStudyTime(delta).catch(() => {});
+      if (delta > 3) api.logStudyTime(delta).catch(saveFailed("study time"));
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -311,7 +309,7 @@ export default function Solve({ onProgress }: { onProgress?: () => void }) {
     return () => {
       for (const t of Object.values(timers)) clearTimeout(t);
       for (const [lang, v] of Object.entries(pending)) {
-        api.saveDraft(pid, lang, v).catch(() => {});
+        api.saveDraft(pid, lang, v).catch(saveFailed("your draft"));
         delete pending[lang];
       }
     };
@@ -397,7 +395,7 @@ export default function Solve({ onProgress }: { onProgress?: () => void }) {
       if (contestId && rep.status !== "not_installed") {
         // Best-effort: a scoreboard that misses one update is not worth an error
         // toast on top of the verdict the learner is reading.
-        api.recordContestResult(contestId, problem.id, rep.status === "accepted").catch(() => {});
+        api.recordContestResult(contestId, problem.id, rep.status === "accepted").catch(ignore("a contest scoreboard update"));
       }
       if (rep.status === "accepted") {
         toast("✅ Accepted! Added to revision schedule.");
@@ -1127,7 +1125,16 @@ function SolutionsTab({
         </div>
       )}
 
-      {list.length === 0 && !editing && <div className="dim">No stored approaches yet.</div>}
+      {list.length === 0 && !editing && (
+        <EmptyState
+          compact
+          icon="code"
+          title="No stored approaches yet."
+          action={{ label: "Save the code in the editor", icon: "save", onClick: () => setEditing({ ...blank(), code: currentCode, title: "From editor" }) }}
+        >
+          Keep a brute force next to the optimal one — comparing them is the point.
+        </EmptyState>
+      )}
       {list.map((s) => (
         <div key={s.id} className="card" style={{ marginBottom: 10 }}>
           <div className="row">
@@ -1160,7 +1167,12 @@ function AttemptsTab({ problemId }: { problemId: number }) {
     api.listAttempts(problemId).then(setList);
   }, [problemId]);
 
-  if (list.length === 0) return <div className="dim">No submissions yet.</div>;
+  if (list.length === 0)
+    return (
+      <EmptyState compact icon="history" title="No submissions yet.">
+        Every Submit is kept here, so you can compare your first attempt with your best.
+      </EmptyState>
+    );
 
   const accepted = list.filter((a) => a.status === "accepted");
   const first = list[list.length - 1];
@@ -1431,13 +1443,13 @@ function EditorialTab({
       </div>
 
       {!showEditorial ? (
-        <div className="empty">
-          <div className="big">📖</div>
-          <p>The full editorial reveals the complete approach.</p>
-          <button className="primary" onClick={onShow}>
-            Reveal editorial
-          </button>
-        </div>
+        <EmptyState
+          icon="locked"
+          title="The editorial is hidden."
+          action={{ label: "Reveal editorial", icon: "show", onClick: onShow }}
+        >
+          It walks through the complete approach. Try the hints first.
+        </EmptyState>
       ) : (
         <>
           {problem.editorials.length > 0 && (

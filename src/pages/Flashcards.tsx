@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { api } from "../api";
 import type { Flashcard } from "../types";
-import { Empty } from "../components/common";
+import { EmptyState } from "../components/ui";
 import { Markdown } from "../components/Markdown";
 import { useToast } from "../components/Toast";
 import { GRADES, groupBySource, sourceLabel } from "../lib/flashcards";
@@ -137,25 +137,33 @@ export default function Flashcards() {
           )}
         </div>
       ) : (
-        <Empty
-          icon="🃏"
-          text={
-            all.length === 0
-              ? "No cards yet. Finish a Mastery week, save the questions you miss on a quiz, or add your own below."
-              : "Nothing due right now. Come back tomorrow — or add a card below."
-          }
-        />
+        <EmptyState
+          icon={all.length === 0 ? "inbox" : "done"}
+          title={all.length === 0 ? "No cards yet." : "Nothing due right now."}
+          action={{
+            label: "Add a card",
+            icon: "add",
+            onClick: () => document.getElementById("flash-new-front")?.focus(),
+          }}
+        >
+          {all.length === 0
+            ? "Finish a Mastery week, save the questions you miss on a quiz, or add your own."
+            : "Come back tomorrow — or add a card of your own."}
+        </EmptyState>
       )}
 
       <div className="card flash-new">
         <h3>New card</h3>
         <input
+          id="flash-new-front"
+          aria-label="Front of the card"
           placeholder="Front — a question or prompt"
           value={front}
           onChange={(e) => setFront(e.target.value)}
         />
         <textarea
           rows={3}
+          aria-label="Back of the card"
           placeholder="Back — the answer (Markdown and `code` work)"
           value={back}
           onChange={(e) => setBack(e.target.value)}

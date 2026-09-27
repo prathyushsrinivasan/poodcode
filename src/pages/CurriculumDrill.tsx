@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { api } from "../api";
 import type { CardReview, Problem } from "../types";
 import { InlineMarkdown, Markdown } from "../components/Markdown";
-import { DiffBadge, Empty } from "../components/common";
+import { DiffBadge } from "../components/common";
 import { LibrarySkeleton } from "../components/Skeleton";
 import { useCurriculumData } from "../components/CurriculumData";
 import { findUnit } from "../lib/curriculum";
@@ -14,6 +14,8 @@ import {
   type PlacementStage,
   type RoutingQuestion,
 } from "../lib/dsaRecognition";
+import { EmptyState, ErrorState } from "../components/ui";
+import { loadFailed } from "../lib/failures";
 
 /**
  * Recognition drills: the stage-end mixed set, and the placement diagnostic.
@@ -41,15 +43,14 @@ function todaySeed(extra: string): number {
 
 export default function CurriculumDrill({ view }: { view: "mixed" | "placement" }) {
   const { stage = "" } = useParams();
-  const { data, error, setSkipped } = useCurriculumData();
+  const { data, error, reload, setSkipped } = useCurriculumData();
   const nav = useNavigate();
 
   if (error) {
     return (
       <div className="page page-wide">
         <h1 className="page-title">Recognition</h1>
-        <Empty icon="⚠️" text={`Could not load the curriculum: ${error}`} />
-        <button onClick={() => nav("/library")}>Back to the curriculum</button>
+        <ErrorState title="Could not load the curriculum." error={error} onRetry={reload} />
       </div>
     );
   }
@@ -84,7 +85,7 @@ function MixedSet({
     api
       .cardReviews()
       .then((rs) => setReviews(new Map(rs.map((r) => [r.card_id, r]))))
-      .catch(() => {});
+      .catch(loadFailed("your review schedule"));
   }, []);
 
   const gradeRoute = useCallback(async (unitKey: string, right: boolean) => {
@@ -100,8 +101,11 @@ function MixedSet({
   if (!stage) {
     return (
       <div className="page page-wide">
-        <Empty icon="🤔" text="No such stage." />
-        <button onClick={() => nav("/library")}>Back to the curriculum</button>
+        <EmptyState
+          icon="map"
+          title="No such stage."
+          action={{ label: "Back to the curriculum", icon: "back", onClick: () => nav("/library") }}
+        />
       </div>
     );
   }
@@ -137,7 +141,11 @@ ${index > 0 ? `Drawn from stages 1–${index + 1}, not just this one — a set f
       </div>
 
       {questions.length === 0 ? (
-        <Empty icon="🎲" text="Not enough units with problems yet to build a mixed set." />
+        <EmptyState
+          icon="shuffle"
+          title="Not enough units with problems yet to build a mixed set."
+          action={{ label: "Back to the curriculum", icon: "back", onClick: () => nav("/library") }}
+        />
       ) : (
         questions.map((q) => (
           <RoutingCard

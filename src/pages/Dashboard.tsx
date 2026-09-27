@@ -35,6 +35,7 @@ import {
   type DueGroup,
   type GoalSpec,
 } from "../lib/today";
+import { EmptyState, ErrorState } from "../components/ui";
 
 /* --------------------------------------------------------------- pieces */
 
@@ -144,11 +145,7 @@ function Heatmap({ cells }: { cells: { date: string; count: number }[] }) {
 
 function SectionError({ what, error, onRetry }: { what: string; error: string; onRetry: () => void }) {
   return (
-    <div className="card error-state">
-      <strong>Could not load {what}.</strong>
-      <p className="dim error-state-detail">{error}</p>
-      <button onClick={onRetry}>Retry</button>
-    </div>
+    <ErrorState title={`Could not load ${what}.`} error={error} onRetry={onRetry} />
   );
 }
 
@@ -345,15 +342,13 @@ export default function Today() {
           ))}
 
           {trackCards !== null && trackCards.length === 0 && !curriculum?.next && (
-            <div className="card empty-state">
-              <div className="big" aria-hidden>
-                🌱
-              </div>
-              <p>Nothing started yet. Pick a track and solve one problem.</p>
-              <Link className="today-card-action" to="/library">
-                Open the DSA Curriculum →
-              </Link>
-            </div>
+            <EmptyState
+              icon="sparkles"
+              title="Nothing started yet."
+              action={{ label: "Open the DSA Curriculum", icon: "curriculum", onClick: () => nav("/library") }}
+            >
+              Pick a track and solve one problem.
+            </EmptyState>
           )}
         </div>
       </section>

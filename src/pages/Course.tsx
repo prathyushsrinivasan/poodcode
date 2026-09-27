@@ -6,7 +6,6 @@ import { Markdown } from "../components/Markdown";
 import { ExerciseCard, QuizSection, ReferenceReveal } from "../components/exercise";
 import { ExerciseSections } from "../components/ExerciseSections";
 import { Section, useCollapse } from "../components/Collapsible";
-import { Empty } from "../components/common";
 import {
   TrackOverview,
   UnitPager,
@@ -23,6 +22,8 @@ import {
 } from "../lib/learnProgress";
 import { collectExerciseIds, solvedLabel, studyTime } from "../lib/trackProgress";
 import { TrackSkeleton } from "../components/Skeleton";
+import { EmptyState } from "../components/ui";
+import { loadFailed } from "../lib/failures";
 
 // This page renders both structured courses. They share a data model, a judge
 // and every interaction; they differ only in where the content comes from, how
@@ -95,7 +96,7 @@ function CourseView({ track }: { track: Track }) {
   useEffect(() => {
     setCourse(null);
     track.load().then(setCourse).catch(() => setCourse(null));
-    loadDoneChapters().then(setDone).catch(() => {});
+    loadDoneChapters().then(setDone).catch(loadFailed("your completed chapters"));
   }, [track]);
 
   async function setUnitDone(n: number, value: boolean) {
@@ -107,7 +108,7 @@ function CourseView({ track }: { track: Track }) {
   if (course.weeks.length === 0) {
     return (
       <div className="page">
-        <Empty icon={track.icon} text={track.emptyText} />
+        <EmptyState icon={track.key === "java" ? "java" : "typescript"} title={track.emptyText} />
       </div>
     );
   }
@@ -120,8 +121,11 @@ function CourseView({ track }: { track: Track }) {
     if (!wk) {
       return (
         <div className="page">
-          <Empty icon={track.icon} text={`${labels.unit} not found.`} />
-          <button onClick={() => nav(track.base)}>Back to course</button>
+          <EmptyState
+            icon={track.key === "java" ? "java" : "typescript"}
+            title={`${labels.unit} not found.`}
+            action={{ label: "Back to the course", icon: "back", onClick: () => nav(track.base) }}
+          />
         </div>
       );
     }
@@ -285,7 +289,7 @@ function UnitDetail({
   // module-level cache — warm after the first load of the session — and this
   // is what fills it on a cold start.
   useEffect(() => {
-    loadSolvedExercises().then(setSolvedEx).catch(() => {});
+    loadSolvedExercises().then(setSolvedEx).catch(loadFailed("your solved exercises"));
   }, []);
 
   useEffect(() => {

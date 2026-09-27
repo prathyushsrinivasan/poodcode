@@ -3,6 +3,8 @@ import { api } from "../api";
 import type { Attempt, Solution, TestCase } from "../types";
 import { useToast } from "./Toast";
 import { mulberry32, mutateInput, hasMutablePayload, type GenMode } from "../lib/testgen";
+import { EmptyState } from "./ui/States";
+import { loadFailed } from "../lib/failures";
 
 interface Props {
   problemId: number;
@@ -35,8 +37,8 @@ export function TestCaseManager({ problemId, cases, onChange }: Props) {
   const userCases = cases.filter((c) => c.kind !== "hidden");
 
   useEffect(() => {
-    api.listAttempts(problemId).then(setAttempts).catch(() => {});
-    api.listSolutions(problemId).then(setSolutions).catch(() => {});
+    api.listAttempts(problemId).then(setAttempts).catch(loadFailed("past attempts (test generation needs one)"));
+    api.listSolutions(problemId).then(setSolutions).catch(loadFailed("saved solutions"));
   }, [problemId]);
 
   // Available oracles: latest accepted attempt + every saved solution with code.
@@ -254,7 +256,14 @@ export function TestCaseManager({ problemId, cases, onChange }: Props) {
       )}
 
       {userCases.length === 0 && !editing && (
-        <div className="dim">No custom test cases yet. Example cases from the statement are used by “Run”.</div>
+        <EmptyState
+          compact
+          icon="checklist"
+          title="No custom test cases yet."
+          action={{ label: "Add a case", icon: "add", onClick: () => setEditing(blank()) }}
+        >
+          Example cases from the statement are used by “Run”.
+        </EmptyState>
       )}
 
       {userCases.map((tc) => (

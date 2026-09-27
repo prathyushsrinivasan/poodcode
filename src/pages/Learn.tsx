@@ -16,7 +16,7 @@ import { CardStudy, type StudyVariant } from "../components/CardStudy";
 import { JpVocabCard, JpVocabMenu, useVocabReviews } from "../components/JpVocab";
 import { vocabCardId } from "../lib/jpVocab";
 import { joinReading } from "../lib/romaji";
-import { DiffBadge, Empty } from "../components/common";
+import { DiffBadge } from "../components/common";
 import { Section, useCollapse } from "../components/Collapsible";
 import {
   DatasetBrowser,
@@ -30,6 +30,8 @@ import {
   loadSolvedExercises,
   markExerciseSolved,
 } from "../lib/learnProgress";
+import { EmptyState } from "../components/ui";
+import { ignore, loadFailed } from "../lib/failures";
 
 const CATEGORY_ORDER = [
   "Foundations",
@@ -167,18 +169,18 @@ export default function Learn() {
         setConcepts(cs);
         // Fold any pre-existing glossary review rows onto the vocabulary card
         // ids that replaced them. Guarded internally, so this runs once.
-        migrateVocabCardIds(cs).catch(() => {});
+        migrateVocabCardIds(cs).catch(ignore("vocabulary id migration; it is retried next launch"));
       })
-      .catch(() => {});
-    api.jpVocab().then(setVocab).catch(() => {});
-    api.listProblems().then(setProblems).catch(() => {});
+      .catch(loadFailed("the concept library"));
+    api.jpVocab().then(setVocab).catch(loadFailed("the vocabulary deck"));
+    api.listProblems().then(setProblems).catch(loadFailed("the problem list"));
     api
       .sqlDatasets()
       .then((ds) => setDatasets(new Map(ds.map((d) => [d.key, d]))))
-      .catch(() => {});
+      .catch(loadFailed("the SQL datasets"));
     // Chapter completion lives in SQLite now (so backups cover it), which makes
     // it an async load rather than a synchronous localStorage read.
-    loadDoneChapters().then(setDone).catch(() => {});
+    loadDoneChapters().then(setDone).catch(loadFailed("your completed chapters"));
   }, []);
 
   function openVocab(id: string, list: string[]) {
@@ -271,8 +273,11 @@ export default function Learn() {
     if (!concept) {
       return (
         <div className="page">
-          <Empty icon="📘" text="Concept not found." />
-          <button onClick={() => nav("/learn")}>Back to Learn</button>
+          <EmptyState
+            icon="learn"
+            title="Concept not found."
+            action={{ label: "Back to Learn", icon: "back", onClick: () => nav("/learn") }}
+          />
         </div>
       );
     }
@@ -620,7 +625,7 @@ function ConceptDetail({
   // module-level cache — warm after the first load of the session — and this
   // is what fills it on a cold start.
   useEffect(() => {
-    loadSolvedExercises().then(setSolvedEx).catch(() => {});
+    loadSolvedExercises().then(setSolvedEx).catch(loadFailed("your solved exercises"));
   }, []);
 
   useEffect(() => {

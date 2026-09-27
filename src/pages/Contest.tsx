@@ -2,10 +2,11 @@ import { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { api } from "../api";
 import type { Contest as ContestT } from "../types";
-import { DiffBadge, Empty } from "../components/common";
+import { DiffBadge } from "../components/common";
 import { formatClock } from "../lib/format";
 import { contestScore, secondsLeft } from "../lib/contest";
 import { useToast } from "../components/Toast";
+import { ErrorState } from "../components/ui";
 
 /**
  * A timed checkpoint — the scoreboard for one contest.
@@ -63,7 +64,7 @@ export default function Contest() {
   if (error) {
     return (
       <div className="page">
-        <Empty icon="⏱" text={`This checkpoint could not be loaded. ${error}`} />
+        <ErrorState title="This checkpoint could not be loaded." error={error} onRetry={load} />
       </div>
     );
   }

@@ -13,6 +13,7 @@
 
 import { api } from "../api";
 import type { Concept } from "../types";
+import { saveFailed } from "./failures";
 
 const LEGACY_DONE_KEY = "poodcode:learn-done"; // pre-migration JSON array
 const MIGRATED_KEY = "poodcode:learn-done-migrated";
@@ -159,7 +160,7 @@ export function solvedExercises(): Set<string> {
 export function markExerciseSolved(id: string): Set<string> {
   if (!solvedCache.has(id)) {
     solvedCache.add(id);
-    void api.setExercisesSolved([id], true).catch(() => {});
+    void api.setExercisesSolved([id], true).catch(saveFailed("exercise progress"));
   }
   return new Set(solvedCache);
 }
@@ -168,7 +169,7 @@ export function markExerciseSolved(id: string): Set<string> {
  * day (X-93), so the programme's work reaches the heatmap, the streak and
  * Today's "solved today" the way a Library solve does. A re-solve does not. */
 export function markMasterySolved(id: string): Set<string> {
-  if (!solvedCache.has(id)) void api.masteryRecordSolve().catch(() => {});
+  if (!solvedCache.has(id)) void api.masteryRecordSolve().catch(saveFailed("the Mastery solve count"));
   return markExerciseSolved(id);
 }
 
@@ -178,7 +179,7 @@ export function markMasterySolved(id: string): Set<string> {
  * so a reset never destroys work they might still want to read. */
 export function unmarkExercisesSolved(ids: string[]): Set<string> {
   const gone = ids.filter((id) => solvedCache.delete(id));
-  if (gone.length > 0) void api.setExercisesSolved(gone, false).catch(() => {});
+  if (gone.length > 0) void api.setExercisesSolved(gone, false).catch(saveFailed("exercise progress"));
   return new Set(solvedCache);
 }
 

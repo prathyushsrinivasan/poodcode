@@ -10,6 +10,7 @@ import {
   type HydratedCurriculum,
   type UnitStatus,
 } from "../lib/curriculum";
+import { ignore } from "../lib/failures";
 
 /**
  * The curriculum seed, fetched once per session.
@@ -50,8 +51,9 @@ export function useCurriculumData() {
   const [error, setError] = useState<string>("");
 
   const load = useCallback(() => {
+    setError("");
     Promise.all([
-      loadCurriculumSeed().catch(() => null),
+      loadCurriculumSeed(),
       api.listProblems(),
       api.getSettings().catch(() => ({}) as Record<string, string>),
     ])
@@ -195,7 +197,7 @@ export function TaughtIn({ slug }: { slug: string }) {
       .then((index) => {
         if (live) setWhere(index.get(slug) ?? null);
       })
-      .catch(() => {});
+      .catch(ignore("the 'Taught in' badge on Solve"));
     return () => {
       live = false;
     };
@@ -246,7 +248,7 @@ export function NextInRung({ slug }: { slug: string }) {
         const pick = after ?? anywhere ?? null;
         setNext(pick ? { id: pick.id, title: pick.title, rung: where.rungTitle } : null);
       })
-      .catch(() => {});
+      .catch(ignore("the next-in-rung link on Solve"));
     return () => {
       live = false;
     };

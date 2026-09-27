@@ -5,7 +5,6 @@ import type { BackendProject, BackendStep, BackendTrack, Exercise } from "../typ
 import { Markdown } from "../components/Markdown";
 import { ExerciseCard, QuizSection, ReferenceReveal } from "../components/exercise";
 import { Section, useCollapse } from "../components/Collapsible";
-import { Empty } from "../components/common";
 import { useToast } from "../components/Toast";
 import {
   loadDoneChapters,
@@ -22,6 +21,8 @@ import {
   type TrackGroup,
   type TrackSpec,
 } from "../components/track/TrackShell";
+import { EmptyState } from "../components/ui";
+import { loadFailed } from "../lib/failures";
 
 // Project completion is tracked in the same SQLite-backed chapter-done set as
 // the Learn tab and the TypeScript course, under a namespaced key so it can
@@ -46,7 +47,7 @@ export default function Backend() {
 
   useEffect(() => {
     api.backendTrack().then(setTrack).catch(() => setTrack(null));
-    loadDoneChapters().then(setDone).catch(() => {});
+    loadDoneChapters().then(setDone).catch(loadFailed("your completed chapters"));
   }, []);
 
   async function setProjectDone(key: string, value: boolean) {
@@ -57,7 +58,7 @@ export default function Backend() {
   if (track.projects.length === 0) {
     return (
       <div className="page">
-        <Empty icon="🛠️" text="The Backend Lab isn't built yet." />
+        <EmptyState icon="backend" title="The Backend Lab isn't built yet." />
       </div>
     );
   }
@@ -67,8 +68,11 @@ export default function Backend() {
     if (!p) {
       return (
         <div className="page">
-          <Empty icon="🛠️" text="Project not found." />
-          <button onClick={() => nav("/backend")}>Back to the Backend Lab</button>
+          <EmptyState
+            icon="backend"
+            title="Project not found."
+            action={{ label: "Back to the Backend Lab", icon: "back", onClick: () => nav("/backend") }}
+          />
         </div>
       );
     }
@@ -207,7 +211,7 @@ function ProjectDetail({
   // module-level cache — warm after the first load of the session — and this
   // is what fills it on a cold start.
   useEffect(() => {
-    loadSolvedExercises().then(setSolvedEx).catch(() => {});
+    loadSolvedExercises().then(setSolvedEx).catch(loadFailed("your solved exercises"));
   }, []);
 
   useEffect(() => {

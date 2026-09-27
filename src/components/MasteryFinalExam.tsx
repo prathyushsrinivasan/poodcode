@@ -23,6 +23,7 @@ import {
   type FinalExamState,
 } from "../lib/finalExam";
 import { useToast } from "./Toast";
+import { saveFailed } from "../lib/failures";
 
 function clock(seconds: number): string {
   const s = Math.max(0, Math.round(seconds));
@@ -47,7 +48,7 @@ export function useFinalExamState(trackKey: string) {
   }, [trackKey]);
   const save = (next: FinalExamState) => {
     setState(next);
-    api.setSetting(finalExamKey(trackKey), JSON.stringify(next)).catch(() => {});
+    api.setSetting(finalExamKey(trackKey), JSON.stringify(next)).catch(saveFailed("your final-exam answers"));
   };
   return [state, save] as const;
 }

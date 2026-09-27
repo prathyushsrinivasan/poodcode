@@ -11,7 +11,7 @@
  */
 
 import { useState } from "react";
-import { DiffBadge, Empty, Stat, ClickableRow, Tag, Confidence } from "../components/common";
+import { DiffBadge, ClickableRow, Tag, Confidence } from "../components/common";
 import { Modal, ConfirmDialog } from "../components/ui/Modal";
 import { Tabs, TabPanel } from "../components/ui/Tabs";
 import { useToast } from "../components/Toast";
@@ -342,11 +342,6 @@ export default function Gallery() {
         </div>
       </Row>
 
-      <Row title="Stat tiles">
-        <Stat value={42} label="Solved" />
-        <Stat value="1h 12m" label="Study time" />
-      </Row>
-
       <Row title="Tabs" note="Roving focus, arrow keys, counts (D4).">
         <div className="gallery-wide">
           <Tabs
@@ -405,15 +400,6 @@ export default function Gallery() {
             runCount={4}
             onJumpToFailure={() => {}}
           />
-        </div>
-      </Row>
-
-      <Row title="Empty and error states">
-        <Empty icon="📭" text="Nothing here yet." />
-        <div className="card error-state">
-          <strong>Could not load your progress.</strong>
-          <p className="dim error-state-detail">TypeError: failed to fetch</p>
-          <button>Retry</button>
         </div>
       </Row>
 

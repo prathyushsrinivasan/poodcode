@@ -4,7 +4,7 @@ import { api } from "../api";
 import type { CardReview, Difficulty } from "../types";
 import { Markdown, InlineMarkdown } from "../components/Markdown";
 import { useCollapse } from "../components/Collapsible";
-import { ClickableRow, Empty } from "../components/common";
+import { ClickableRow } from "../components/common";
 import { LibrarySkeleton } from "../components/Skeleton";
 import { StatusBadge, UnitProgress, useCurriculumData } from "../components/CurriculumData";
 import {
@@ -17,6 +17,8 @@ import {
   type UnitMatch,
 } from "../lib/curriculum";
 import { reviewLane, type ReviewLane } from "../lib/dsaReview";
+import { EmptyState, ErrorState } from "../components/ui";
+import { loadFailed } from "../lib/failures";
 
 /**
  * The Problem Library, as a curriculum.
@@ -42,7 +44,7 @@ import { reviewLane, type ReviewLane } from "../lib/dsaReview";
  * marked known outright, which reads as cleared without claiming it was earned.
  */
 export default function Library() {
-  const { data, error } = useCurriculumData();
+  const { data, error, reload } = useCurriculumData();
   const [query, setQuery] = useState("");
   const [reviews, setReviews] = useState<Map<string, CardReview>>(new Map());
   const [params, setParams] = useSearchParams();
@@ -55,7 +57,7 @@ export default function Library() {
     api
       .cardReviews()
       .then((rs) => setReviews(new Map(rs.map((r) => [r.card_id, r]))))
-      .catch(() => {});
+      .catch(loadFailed("your review schedule"));
   }, []);
 
   const hits = useMemo(() => (data ? searchUnits(data, query) : []), [data, query]);
@@ -65,7 +67,7 @@ export default function Library() {
     return (
       <div className="page cur-page">
         <h1 className="page-title">DSA Curriculum</h1>
-        <Empty icon="⚠️" text={`Could not load the curriculum: ${error}`} />
+        <ErrorState title="Could not load the curriculum." error={error} onRetry={reload} />
       </div>
     );
   }
@@ -74,7 +76,7 @@ export default function Library() {
     return (
       <div className="page cur-page">
         <h1 className="page-title">{data.title || "DSA Curriculum"}</h1>
-        <Empty icon="📚" text="No curriculum content." />
+        <EmptyState icon="curriculum" title="No curriculum content." />
       </div>
     );
   }
@@ -716,7 +718,13 @@ function SearchResults({
         </button>
       </div>
       {hits.length === 0 ? (
-        <Empty icon="🔍" text="No unit mentions that. Try the problem search in Browse." />
+        <EmptyState
+          icon="search"
+          title="No unit mentions that."
+          action={{ label: "Clear search", icon: "close", onClick: onClear }}
+        >
+          The problem search in Browse covers every problem, not just unit titles.
+        </EmptyState>
       ) : (
         hits.map((m) => (
           <UnitCard

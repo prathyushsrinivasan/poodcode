@@ -29,6 +29,9 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { FAILURE_EVENT, failureMessage, type Failure } from "../lib/failures";
+import { Icon, type IconName } from "./ui/Icon";
+import { IconButton } from "./ui/Button";
 
 export type ToastTone = "info" | "success" | "warning" | "error";
 
@@ -77,12 +80,16 @@ const DEFAULT_DURATION: Record<ToastTone, number> = {
   error: 0,
 };
 
-const ICON: Record<ToastTone, string> = {
-  info: "i",
-  success: "✓",
-  warning: "!",
-  error: "✕",
+const ICON: Record<ToastTone, IconName> = {
+  info: "info",
+  success: "check",
+  warning: "warning",
+  error: "close",
 };
+
+/** A repeat of the same background failure inside this window is dropped, so a
+ * periodic write that keeps failing is one toast rather than one a minute. */
+const FAILURE_REPEAT_MS = 60_000;
 
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [rows, setRows] = useState<ToastRow[]>([]);
@@ -115,6 +122,24 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     fn.dismiss = dismiss;
     return fn;
   }, [dismiss]);
+
+  // Background failures reported through lib/failures (E2). Lib code has no
+  // hook to call, so it raises an event and this is where it becomes visible.
+  const lastShown = useRef(new Map<string, number>());
+  useEffect(() => {
+    const onFailure = (e: Event) => {
+      const f = (e as CustomEvent<Failure>).detail;
+      if (!f || f.kind === "ignored") return;
+      const message = failureMessage(f);
+      const now = Date.now();
+      const prev = lastShown.current.get(message) ?? 0;
+      if (now - prev < FAILURE_REPEAT_MS) return;
+      lastShown.current.set(message, now);
+      show.warning(message, { detail: f.detail });
+    };
+    window.addEventListener(FAILURE_EVENT, onFailure);
+    return () => window.removeEventListener(FAILURE_EVENT, onFailure);
+  }, [show]);
 
   return (
     <ToastCtx.Provider value={show}>
@@ -167,7 +192,7 @@ function ToastView({ row, onDismiss }: { row: ToastRow; onDismiss: (id: number) 
       onMouseLeave={() => setPaused(false)}
     >
       <span className="toast-icon" aria-hidden>
-        {ICON[row.tone]}
+        <Icon name={ICON[row.tone]} size={12} strokeWidth={3} />
       </span>
       <div className="toast-content">
         <div className="toast-message">{row.message}</div>
@@ -193,9 +218,7 @@ function ToastView({ row, onDismiss }: { row: ToastRow; onDismiss: (id: number) 
           </div>
         )}
       </div>
-      <button className="ghost toast-x" onClick={() => onDismiss(row.id)} aria-label="Dismiss">
-        ✕
-      </button>
+      <IconButton className="toast-x" icon="close" size="sm" label="Dismiss" onClick={() => onDismiss(row.id)} />
     </div>
   );
 }

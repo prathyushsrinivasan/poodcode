@@ -16,6 +16,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { api } from "../api";
 import { Modal } from "./ui/Modal";
+import { ignore } from "../lib/failures";
 
 interface Counts {
   problems: number | null;
@@ -40,9 +41,9 @@ export function Welcome({ open, onClose }: { open: boolean; onClose: () => void 
     let cancelled = false;
     (async () => {
       const [problems, java, ts] = await Promise.all([
-        api.listProblems().catch(() => null),
-        api.javaCourse().catch(() => null),
-        api.tsCourse().catch(() => null),
+        api.listProblems().catch(ignore("welcome tour counts are decoration")),
+        api.javaCourse().catch(ignore("welcome tour counts are decoration")),
+        api.tsCourse().catch(ignore("welcome tour counts are decoration")),
       ]);
       if (cancelled) return;
       setCounts({

@@ -13,9 +13,11 @@ import {
 } from "../lib/filters";
 import { hydrate } from "../lib/curriculum";
 import { loadCurriculumSeed } from "../components/CurriculumData";
-import { Confidence, DiffBadge, Empty } from "../components/common";
+import { Confidence, DiffBadge } from "../components/common";
 import { relativeDate } from "../lib/format";
 import { useToast } from "../components/Toast";
+import { EmptyState } from "../components/ui";
+import { loadFailed } from "../lib/failures";
 
 const STATUS_LABEL: Record<SolvedStatus, string> = {
   unsolved: "—",
@@ -83,7 +85,7 @@ export default function LibraryBrowse() {
             )
           );
         })
-        .catch(() => {});
+        .catch(loadFailed("each problem's curriculum unit"));
     });
     Promise.all([api.mastery(), api.masteryProgress()])
       .then(([tracks, rows]) => {
@@ -92,7 +94,7 @@ export default function LibraryBrowse() {
         setTsWeek(masteryWeekBySlug(ts));
         setTsCurrent(currentMasteryWeek(ts, rows));
       })
-      .catch(() => {});
+      .catch(loadFailed("the TypeScript Mastery weeks"));
     api.distinctTags("topic").then(setTopics);
     api.distinctTags("company").then(setCompanies);
   };
@@ -344,7 +346,19 @@ export default function LibraryBrowse() {
       </div>
 
       {filtered.length === 0 ? (
-        <Empty icon="🔍" text="No problems match these filters." />
+        <EmptyState
+          icon="filter"
+          title="No problems match these filters."
+          action={{
+            label: "Clear filters",
+            icon: "close",
+            onClick: () => {
+              setF(emptyFilter);
+              setMineOnly(false);
+              setSolvableNow(false);
+            },
+          }}
+        />
       ) : (
         <div className="card" style={{ padding: 0, overflow: "hidden" }}>
           <table className="data">

@@ -16,7 +16,7 @@ import type {
   Walkthrough,
 } from "../types";
 import { Markdown, InlineMarkdown } from "../components/Markdown";
-import { Confidence, DiffBadge, Empty } from "../components/common";
+import { Confidence, DiffBadge } from "../components/common";
 import { UnitSkeleton } from "../components/Skeleton";
 import { SkeletonBlock } from "../components/UnitPractice";
 import { StatusBadge, UnitProgress, useCurriculumData } from "../components/CurriculumData";
@@ -48,6 +48,8 @@ import {
   variantQuestions,
   type VariantQuestion,
 } from "../lib/dsaRecognition";
+import { EmptyState, ErrorState } from "../components/ui";
+import { loadFailed } from "../lib/failures";
 
 /**
  * One unit of the DSA curriculum: a technique, taught, then drilled.
@@ -73,13 +75,13 @@ import {
  */
 export default function CurriculumUnit() {
   const { key = "" } = useParams();
-  const { data, error, setSkipped } = useCurriculumData();
+  const { data, error, reload, setSkipped } = useCurriculumData();
   const [concepts, setConcepts] = useState<Concept[]>([]);
   const [reviews, setReviews] = useState<Map<string, CardReview>>(new Map());
   const nav = useNavigate();
 
   useEffect(() => {
-    api.concepts().then(setConcepts).catch(() => {});
+    api.concepts().then(setConcepts).catch(loadFailed("the concept links"));
   }, []);
 
   // Remembered so /library can offer "Resume Backtracking" beside "Up next".
@@ -93,7 +95,7 @@ export default function CurriculumUnit() {
     api
       .cardReviews()
       .then((rs) => setReviews(new Map(rs.map((r) => [r.card_id, r]))))
-      .catch(() => {});
+      .catch(loadFailed("your review schedule"));
   }, []);
 
   const grade = useCallback(async (id: string, remembered: boolean) => {
@@ -117,7 +119,7 @@ export default function CurriculumUnit() {
         <button className="ghost" onClick={() => nav("/library")}>
           ← Curriculum
         </button>
-        <Empty icon="⚠️" text={`Could not load the curriculum: ${error}`} />
+        <ErrorState title="Could not load the curriculum." error={error} onRetry={reload} />
       </div>
     );
   }
@@ -127,8 +129,11 @@ export default function CurriculumUnit() {
   if (!hydrated) {
     return (
       <div className="page cur-page">
-        <Empty icon="🤔" text="No such unit." />
-        <button onClick={() => nav("/library")}>Back to the curriculum</button>
+        <EmptyState
+          icon="map"
+          title="No such unit."
+          action={{ label: "Back to the curriculum", icon: "back", onClick: () => nav("/library") }}
+        />
       </div>
     );
   }
