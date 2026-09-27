@@ -64,6 +64,7 @@ export default function Contest() {
   if (error) {
     return (
       <div className="page">
+        <h1 className="page-title">Checkpoint</h1>
         <ErrorState title="This checkpoint could not be loaded." error={error} onRetry={load} />
       </div>
     );

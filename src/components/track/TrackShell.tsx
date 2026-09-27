@@ -20,7 +20,8 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Markdown } from "../Markdown";
-import { ClickableRow } from "../common";
+import { Icon } from "../ui/Icon";
+import { Deeper } from "../ui/Heading";
 import { studyTime } from "../../lib/trackProgress";
 import { EmptyState } from "../ui/States";
 
@@ -195,7 +196,6 @@ function ProgressRing({ number, fraction }: { number: number; fraction: number }
 
 export function TrackBody({ spec, progress }: { spec: TrackSpec; progress: TrackProgress }) {
   const [params, setParams] = useSearchParams();
-  const nav = useNavigate();
 
   const unitsByGroup = useMemo(() => {
     const map = new Map<string, TrackUnit[]>();
@@ -267,7 +267,9 @@ export function TrackBody({ spec, progress }: { spec: TrackSpec; progress: Track
               {spec.groups.find((g) => g.key === selected)?.title}
             </h2>
             {spec.groups.find((g) => g.key === selected)?.goal && (
-              <p className="track-group-goal">🎯 {spec.groups.find((g) => g.key === selected)?.goal}</p>
+              <p className="track-group-goal">
+                <Icon name="target" size={13} /> {spec.groups.find((g) => g.key === selected)?.goal}
+              </p>
             )}
           </div>
         )}
@@ -275,6 +277,7 @@ export function TrackBody({ spec, progress }: { spec: TrackSpec; progress: Track
         {units.filter((u) => u.authored).length === 0 ? (
           <EmptyState compact icon="document" title={`Nothing in this ${spec.groupLabel.toLowerCase()} is written yet.`} />
         ) : (
+          <Deeper>
           <ol className="track-unit-list">
             {units
               .filter((u) => u.authored)
@@ -285,13 +288,15 @@ export function TrackBody({ spec, progress }: { spec: TrackSpec; progress: Track
                   </li>
                 ) : (
                 <li key={u.slug}>
-                  <ClickableRow
+                  {/* A link, so Ctrl-click opens it in place of a new window
+                      and it reads as navigation, not as a command (D3). */}
+                  <Link
                     className={`track-unit ${u.done ? "done" : ""}`}
-                    onActivate={() => nav(`${spec.base}/${u.slug}`)}
+                    to={`${spec.base}/${u.slug}`}
                     title={`Open ${spec.unitLabel.toLowerCase()} ${u.number}`}
                   >
                     <span className="track-unit-num" aria-hidden>
-                      {u.done ? "✓" : u.number}
+                      {u.done ? <Icon name="check" size={14} /> : u.number}
                     </span>
                     <span className="track-unit-body">
                       <span className="track-unit-title">{u.title}</span>
@@ -299,22 +304,25 @@ export function TrackBody({ spec, progress }: { spec: TrackSpec; progress: Track
                       <span className="track-unit-meta">
                         {u.badges}
                         {u.estMinutes ? (
-                          <span className="badge">⏱ {studyTime(u.estMinutes)}</span>
+                          <span className="badge">
+                            <Icon name="clock" size={12} /> {studyTime(u.estMinutes)}
+                          </span>
                         ) : null}
                       </span>
                     </span>
-                  </ClickableRow>
+                  </Link>
                 </li>
                 )
               )}
           </ol>
+          </Deeper>
         )}
 
         {/* The unwritten tail, as one line rather than a grid of things you
             cannot open (UI_ROADMAP G2). */}
         {unwritten.length > 0 && !showRail && (
           <div className="coming-later">
-            <span aria-hidden>🚧</span>
+            <Icon name="clock" size={14} />
             <span>
               Coming later: {spec.unitLabel.toLowerCase()}s{" "}
               {Math.min(...unwritten.map((u) => u.number))}–

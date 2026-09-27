@@ -476,3 +476,22 @@
 .glossary dd {
   margin: 0;
 }
+
+.unit-part-anchor {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.unit-part-anchor .icon {
+  color: var(--accent);
+}
+.exercise-group-title {
+  font-size: var(--text-md);
+  margin: var(--space-4) 0 var(--space-2);
+}
+a.track-unit {
+  color: inherit;
+}
+a.track-unit:hover {
+  text-decoration: none;
+}

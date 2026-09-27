@@ -101,6 +101,7 @@ function MixedSet({
   if (!stage) {
     return (
       <div className="page page-wide">
+        <h1 className="page-title">Mixed set</h1>
         <EmptyState
           icon="map"
           title="No such stage."

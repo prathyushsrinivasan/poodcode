@@ -443,10 +443,9 @@ export default function Solve({ onProgress }: { onProgress?: () => void }) {
   const leftPane = (
     <div className="solve-pane">
         <div className="solve-toolbar">
-          <button className="ghost" onClick={() => nav(-1)} aria-label="Back">
-            ←
-          </button>
-          <strong>{problem.title}</strong>
+          <IconButton icon="back" label="Back" shortcut="Alt+←" onClick={() => nav(-1)} />
+          {/* The page's one h1 (D9) — styled as the toolbar title it always was. */}
+          <h1 className="solve-title">{problem.title}</h1>
           <DiffBadge d={problem.difficulty} />
           <button
             className={`ghost star ${problem.is_favorite ? "on" : ""}`}
@@ -544,7 +543,7 @@ export default function Solve({ onProgress }: { onProgress?: () => void }) {
 
     <div className="solve-pane solve-pane-right">
         <div className="solve-toolbar">
-          <select value={langId} onChange={(e) => setLangId(e.target.value)}>
+          <select value={langId} onChange={(e) => setLangId(e.target.value)} aria-label="Language">
             {languages.map((l) => (
               <option key={l.id} value={l.id}>
                 {l.label} {l.installed ? "" : "· (not installed)"}
@@ -825,14 +824,14 @@ function DescriptionTab({
 
       {problem.constraints && (
         <>
-          <h3>Constraints</h3>
+          <h2 className="solve-section-title">Constraints</h2>
           <Markdown>{problem.constraints.split("\n").map((l) => `- ${l}`).join("\n")}</Markdown>
         </>
       )}
 
       {problem.examples.length > 0 && (
         <>
-          <h3>Examples</h3>
+          <h2 className="solve-section-title">Examples</h2>
           {problem.examples.map((ex, i) => (
             <div key={i} className="card" style={{ marginBottom: 10 }}>
               <div className="io-label">Input</div>
@@ -856,7 +855,7 @@ function DescriptionTab({
       {problem.hints.length > 0 && (
         <>
           <div className="divider" />
-          <h3>Hints</h3>
+          <h2 className="solve-section-title">Hints</h2>
           {problem.hints.map((h, i) => (
             <div key={i} className="hint">
               <div className="hint-label">Hint {i + 1}</div>
@@ -1474,7 +1473,7 @@ function EditorialTab({
           {problem.follow_ups.length > 0 && (
             <>
               <div className="divider" />
-              <h3>Follow-ups</h3>
+              <h2 className="solve-section-title">Follow-ups</h2>
               {problem.follow_ups.map((f, i) => (
                 <FollowUpLink key={i} slug={f.slug} title={f.title} note={f.note} />
               ))}

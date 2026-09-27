@@ -12,6 +12,7 @@
 import type { ReactNode } from "react";
 import { inlineCode } from "../common";
 import { Button, Card, CardHeader, Icon, type IconName } from "../ui";
+import { Deeper, H } from "../ui/Heading";
 
 /** "What this unit is for": the goal, why it matters, what it builds on. */
 export function UnitGoal({
@@ -161,11 +162,14 @@ export function UnitPart({
 }) {
   return (
     <section className="unit-part">
-      <h2 className="unit-part-title" data-outline={outline ?? (typeof title === "string" ? title : undefined)}>
-        <Icon name={icon} size={18} /> {title}
-      </h2>
+      <H className="unit-part-title">
+        {/* The outline reads `data-outline`; on the heading so a jump lands on it. */}
+        <span data-outline={outline ?? (typeof title === "string" ? title : undefined)} className="unit-part-anchor">
+          <Icon name={icon} size={18} /> {title}
+        </span>
+      </H>
       {lead && <p className="section-lead">{lead}</p>}
-      {children}
+      <Deeper>{children}</Deeper>
     </section>
   );
 }
@@ -173,9 +177,9 @@ export function UnitPart({
 /** A heading inside a part or a lesson body (Predict the output, Fix the bug…). */
 export function SubHeading({ icon, children }: { icon: IconName; children: ReactNode }) {
   return (
-    <h4 className="unit-subtitle">
+    <H className="unit-subtitle">
       <Icon name={icon} size={15} /> {children}
-    </h4>
+    </H>
   );
 }
 

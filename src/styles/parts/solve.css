@@ -206,3 +206,18 @@
   background: var(--bg-elev);
   box-shadow: -12px 0 12px -8px var(--bg-elev);
 }
+
+/* The problem title is the page's h1, sized as the toolbar title it was. */
+.solve-title {
+  margin: 0;
+  font-size: var(--text-md);
+  font-weight: var(--weight-bold);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+.solve-section-title {
+  font-size: var(--text-lg);
+  margin: var(--space-5) 0 var(--space-2);
+}

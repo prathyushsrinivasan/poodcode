@@ -3,6 +3,7 @@ import type { Exercise } from "../types";
 import { ExerciseCard } from "./exercise";
 import { inlineCode } from "./common";
 import { groupByKind, type KindSection } from "../lib/exerciseKinds";
+import { Deeper, H } from "./ui/Heading";
 
 /** Every exercise, grouped into its sections and rendered in teaching order.
  *
@@ -63,13 +64,9 @@ export function ExerciseSections({
         }
         return (
           <React.Fragment key={section.kind}>
-            <h4>{heading}</h4>
-            {blurb && (
-              <p className="dim" style={{ marginTop: -4 }}>
-                {inlineCode(blurb)}
-              </p>
-            )}
-            {cards}
+            <H className="exercise-group-title">{heading}</H>
+            {blurb && <p className="section-lead">{inlineCode(blurb)}</p>}
+            <Deeper>{cards}</Deeper>
           </React.Fragment>
         );
       })}
@@ -104,11 +101,7 @@ function FoldedSection({
       <summary>
         <strong>{heading}</strong> <span className="dim quiz-note">{count}</span>
       </summary>
-      {blurb && (
-        <p className="dim" style={{ marginTop: 4 }}>
-          {inlineCode(blurb)}
-        </p>
-      )}
+      {blurb && <p className="section-lead exercise-fold-blurb">{inlineCode(blurb)}</p>}
       {opened && children}
     </details>
   );

@@ -17,6 +17,7 @@ import { Button } from "../ui/Button";
 import { Badge } from "../ui/Card";
 import { VerdictPanel } from "./Verdict";
 import { inlineCode } from "../common";
+import { H } from "../ui/Heading";
 
 export type OptionState = "idle" | "chosen" | "right" | "wrong" | "missed";
 
@@ -75,9 +76,9 @@ export function QuizCard({
 }) {
   return (
     <article className={`card quiz-card ${revealed ? (right ? "is-right" : "is-wrong") : ""}`}>
-      <h4 className="quiz-question">
+      <H className="quiz-question">
         <span className="exercise-index">{index}.</span> {question}
-      </h4>
+      </H>
       {children}
       {revealed && (
         <VerdictPanel tone={right ? "good" : "bad"} title={right ? "Correct" : "Not quite"}>

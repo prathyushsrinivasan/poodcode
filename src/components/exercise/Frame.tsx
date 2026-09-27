@@ -9,6 +9,7 @@
 import type { ReactNode } from "react";
 import { CodeEditor } from "../CodeEditor";
 import { Icon } from "../ui/Icon";
+import { H } from "../ui/Heading";
 
 export function ExerciseFrame({
   index,
@@ -36,14 +37,14 @@ export function ExerciseFrame({
       className={`card exercise ${solved ? "is-solved" : ""} ${emphasis ? "is-emphasis" : ""} ${className}`.trim()}
     >
       <header className="exercise-head">
-        <h4 className="exercise-title">
+        <H className="exercise-title">
           {index !== undefined && <span className="exercise-index">{index}.</span>} {title}
           {solved && (
             <span className="exercise-solved">
               <Icon name="done" size={15} label="Solved" />
             </span>
           )}
-        </h4>
+        </H>
         {badges && <div className="exercise-badges">{badges}</div>}
       </header>
       {prompt !== undefined && prompt !== null && prompt !== "" && (

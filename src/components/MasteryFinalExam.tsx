@@ -11,6 +11,7 @@ import { ExerciseSections } from "./ExerciseSections";
 import { inlineCode } from "./common";
 import { QuizChoices } from "./QuizChoices";
 import { QuizCard } from "./exercise/Quiz";
+import { H } from "./ui/Heading";
 import { markMasterySolved } from "../lib/learnProgress";
 import { formatStudyTime, type WeekProgress } from "../lib/mastery";
 import {
@@ -183,7 +184,7 @@ export function FinalExamPanel({
         </span>
       </div>
 
-      <h4>Part A — {paper.length} questions from across the programme</h4>
+      <H className="unit-subtitle">Part A — {paper.length} questions from across the programme</H>
       <p className="dim quiz-note" style={{ marginTop: -4 }}>
         {answered}/{paper.length} answered · {exam.pass_mark}% to pass this part. Answers are saved as you go.
       </p>
@@ -193,20 +194,20 @@ export function FinalExamPanel({
         </QuizCard>
       ))}
 
-      <h4>
+      <H className="unit-subtitle">
         Part B — problems ({exam.problems.filter((p) => solvedSet.has(p.id)).length}/{exam.problems.length}{" "}
         accepted this sitting · {exam.min_problems} needed)
-      </h4>
+      </H>
       <ExerciseSections
         exercises={exam.problems}
         onSolved={solved}
         overrides={{ challenge: { heading: "🎯 Problems" } }}
       />
 
-      <h4>
+      <H className="unit-subtitle">
         Part C — type puzzles ({exam.type_section.filter((p) => solvedSet.has(p.id)).length}/
         {exam.type_section.length} accepted this sitting · {exam.min_types} needed)
-      </h4>
+      </H>
       <ExerciseSections exercises={exam.type_section} onSolved={solved} />
 
       <div className="row" style={{ gap: 10, alignItems: "center", marginTop: 12 }}>

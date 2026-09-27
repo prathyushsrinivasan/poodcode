@@ -21,6 +21,7 @@ import { TsErrorLinks } from "../components/TsErrorLinks";
 import { DiffBadge, inlineCode } from "../components/common";
 import { QuizChoices } from "../components/QuizChoices";
 import { QuizCard } from "../components/exercise";
+import { H } from "../components/ui/Heading";
 import { Badge, Button, Card, EmptyState, ErrorState, Icon, PageHeader, ProgressBar, Segmented, type IconName } from "../components/ui";
 import { answerText, questionText } from "../lib/quizKinds";
 import {
@@ -2023,7 +2024,7 @@ function ExamPanel({
               },
             }}
           />
-          <h4>Part 2 — runtime</h4>
+          <H className="unit-subtitle">Part 2 — runtime</H>
         </>
       )}
       <p style={{ margin: "6px 0 10px" }}>{exam.prompt}</p>

@@ -1,5 +1,6 @@
 import { useCallback, useId, useState } from "react";
 import { Icon } from "./ui/Icon";
+import { Deeper, H } from "./ui/Heading";
 
 // Collapse state for Learn-tab sections. This is pure UI convenience, so it
 // lives in localStorage next to the chapter-done checkmarks and exercise
@@ -119,7 +120,8 @@ export function Section({
   open: boolean;
   onToggle: () => void;
   meta?: React.ReactNode;
-  /** Visual weight of the header — "h3" for page sections, "h4" for nested. */
+  /** Visual weight of the header — "h3" for page sections, "h4" for nested.
+   * The heading *tag* comes from the heading-level context, not from this. */
   level?: "h3" | "h4";
   /** Tint the header with the accent (the challenge section). */
   accent?: string;
@@ -133,13 +135,12 @@ export function Section({
   outline?: string | false;
   children: React.ReactNode;
 }) {
-  const Heading = level;
   const bodyId = useId();
   const outlineText = outline === false ? undefined : outline ?? plainTitle(title);
   return (
     <section className="collapsible" id={id} data-outline={outlineText}>
       <div className="collapsible-row">
-        <Heading className={`collapsible-heading ${accent ? "accent" : ""}`}>
+        <H className={`collapsible-heading ${level === "h4" ? "sub" : ""} ${accent ? "accent" : ""}`}>
           <button
             type="button"
             className="collapsible-head"
@@ -150,12 +151,12 @@ export function Section({
             <Icon name="chevronRight" size={14} className={`caret ${open ? "open" : ""}`} />
             <span className="collapsible-title">{title}</span>
           </button>
-        </Heading>
+        </H>
         {meta && <div className="collapsible-meta">{meta}</div>}
       </div>
       {open && (
         <div className="collapsible-body" id={bodyId}>
-          {children}
+          <Deeper>{children}</Deeper>
         </div>
       )}
     </section>

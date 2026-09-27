@@ -153,7 +153,7 @@ export default function Flashcards() {
       )}
 
       <div className="card flash-new">
-        <h3>New card</h3>
+        <h2 className="card-title">New card</h2>
         <input
           id="flash-new-front"
           aria-label="Front of the card"
@@ -175,7 +175,7 @@ export default function Flashcards() {
 
       <div className="card">
         <div className="row">
-          <h3>All cards ({all.length})</h3>
+          <h2 className="card-title">All cards ({all.length})</h2>
           <span className="spacer" />
           {all.length > 0 && (
             <button className="ghost" onClick={() => setShowAll((v) => !v)}>
