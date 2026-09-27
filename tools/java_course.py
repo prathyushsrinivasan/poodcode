@@ -16,14 +16,14 @@
 # over it. So Module 1 opens on the memory model and traversal *fluency*, not on
 # `int x = 5;`. The full roadmap (and what each part covers) is JAVA_ROADMAP.md.
 #
-# SHIPPED SCOPE: Parts 1-8 and Part 10 of that roadmap, COMPLETE — Arrays (modules 1-5),
+# SHIPPED SCOPE: Parts 1-8, 10 and 11 of that roadmap, COMPLETE - Arrays (modules 1-5),
 # Strings (6-8), Methods and recursion (9-10), object-oriented programming
 # (11-14), exception handling (15-16), the collections framework (17-20),
-# generics (21-24), Java 8+ (25-28) and multithreading (29-31). The roadmap's
-# Parts 9 and 11-14 are deliberately NOT planned: file I/O, JDBC/Maven/Spring
-# and the backend stack are job skills rather than interview-coding material,
-# and the DSA ground is already covered by the DSA Curriculum and the Mastery
-# track.
+# generics (21-24), Java 8+ (25-28), multithreading (29-31) and the APIs worth
+# knowing cold (32). The roadmap's Parts 9, 12 and 14 are deliberately NOT
+# planned: file I/O and the backend stack are job skills rather than
+# interview-coding material, and the DSA ground is already covered by the DSA
+# Curriculum and the Mastery track.
 #
 # PART 10 AND THE JUDGE: threads are the one topic where the same program can
 # print different things on different runs, and every exercise here is graded
@@ -389,6 +389,7 @@ _MODULE_FILES = (
     "java_m29_threads.py",     # Part 10 - threads, and what they cost
     "java_m30_sync.py",        #          shared state: races, locks, visibility
     "java_m31_executors.py",   #          executors, tasks and results - closes Part 10
+    "java_m32_stdlib.py",      # Part 11 - Math, Objects, Random, java.time, formatting
     # Parts 9 and 11-14 are deliberately NOT planned; see JAVA_ROADMAP.md for
     # what was dropped and why.
 )
@@ -448,6 +449,7 @@ _PRACTICE_FILES = (
     "java_p29_practice.py",
     "java_p30_practice.py",
     "java_p31_practice.py",
+    "java_p32_practice.py",
 )
 
 for _prac_file in _PRACTICE_FILES:
@@ -531,6 +533,15 @@ _SCOPE_RULES = [
     # ConcurrentModificationException, which has nothing to do with any of this.
     ("ExecutorService", 31), ("Executors.", 31), ("Callable", 31),
     ("Future", 31), ("ConcurrentHashMap", 31), ("CopyOnWrite", 31),
+    # --- Part 11: the APIs worth knowing cold (module 32) --------------------
+    # Nothing earlier needed any of these, and each is the SUBJECT of a lesson
+    # there - so no earlier program may quietly lean on one.
+    ("Math.floorMod", 32), ("Math.floorDiv", 32), ("Exact(", 32),
+    ("Objects.equals", 32), ("Objects.requireNonNull", 32), ("Objects.toString", 32),
+    ("new Random(", 32), ("Collections.shuffle", 32),
+    ("java.time", 32), ("LocalDate", 32), ("LocalTime", 32), ("Duration", 32),
+    ("DateTimeFormatter", 32), ("ChronoUnit", 32), ("Period.", 32),
+    ("String.format", 32), ("printf", 32), ("Locale", 32),
 ]
 
 # Text that every program (or many early ones) contains and that would trip a
@@ -612,8 +623,9 @@ JAVA_COURSE = {
         "part that turns that into fluency: arrays in depth, strings in depth, "
         "methods, object-oriented programming, exceptions, the collections "
         "framework, generics down to erasure and what it costs, then lambdas, "
-        "stream pipelines from `filter` to `groupingBy`, `Optional`, and multithreading from `start()` to thread pools, in "
-        "thirty-one judged modules. "
+        "stream pipelines from `filter` to `groupingBy`, `Optional`, multithreading from `start()` to thread pools, and the "
+        "standard-library corners that fail quietly, in "
+        "thirty-two judged modules. "
         "Each module is a goal, four to six lessons, warm-ups that make you "
         "predict the output, fill-in-the-blank drills, fix-the-bug programs, a "
         "coding challenge, a glossary, a cheat sheet and a project - plus a "

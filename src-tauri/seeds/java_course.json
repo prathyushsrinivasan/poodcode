@@ -1,7 +1,7 @@
 {
   "key": "java",
   "title": "Java: After the Basics",
-  "subtitle": "You know the syntax — variables, if/else, loops, printing. This is the part that turns that into fluency: arrays in depth, strings in depth, methods, object-oriented programming, exceptions, the collections framework, generics down to erasure and what it costs, then lambdas, stream pipelines from `filter` to `groupingBy`, `Optional`, and multithreading from `start()` to thread pools, in thirty-one judged modules. Each module is a goal, four to six lessons, warm-ups that make you predict the output, fill-in-the-blank drills, fix-the-bug programs, a coding challenge, a glossary, a cheat sheet and a project - plus a Practice section of variation drills you can come back to. Nothing ever needs an idea a later module hasn't taught yet.",
+  "subtitle": "You know the syntax — variables, if/else, loops, printing. This is the part that turns that into fluency: arrays in depth, strings in depth, methods, object-oriented programming, exceptions, the collections framework, generics down to erasure and what it costs, then lambdas, stream pipelines from `filter` to `groupingBy`, `Optional`, multithreading from `start()` to thread pools, and the standard-library corners that fail quietly, in thirty-two judged modules. Each module is a goal, four to six lessons, warm-ups that make you predict the output, fill-in-the-blank drills, fix-the-bug programs, a coding challenge, a glossary, a cheat sheet and a project - plus a Practice section of variation drills you can come back to. Nothing ever needs an idea a later module hasn't taught yet.",
   "unit_label": "Module",
   "group_label": "Part",
   "weeks": [
@@ -70499,6 +70499,2381 @@
                 {
                   "input": "6\n1 2 3 4 5 6\n3",
                   "output": "0 2\n1 4\n2 6\n6"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 32,
+      "month": 11,
+      "month_title": "The APIs worth knowing cold",
+      "theme": "The APIs worth knowing cold",
+      "goal": "The standard-library corners every Java developer is expected to know without looking up - and exactly where each one bites.",
+      "summary": "Most of the roadmap's \"APIs worth knowing cold\" list was taught where it was first\nneeded: `Arrays` in module 1, `String` in 6 and 7, `StringBuilder` in 8, the\ncollections in 17-20. This module is the remainder, and every lesson is about the\nplace the API fails quietly:\n\n* **`Math`.** `int` overflow wraps without a word, so use `addExact` and friends\n  where it would be a bug. `%` is a remainder that goes negative - `floorMod` is the\n  modulus. `Math.abs(Integer.MIN_VALUE)` is still negative, and `Math.round`\n  returns a `long` and rounds halves up.\n* **`Objects`.** `equals`, `hash`, `toString` and `requireNonNull`, all of which\n  exist to make null somebody else's problem - or, with `requireNonNull`, a problem\n  reported at the door.\n* **`Random`.** A seed makes it reproducible, which is what makes it testable.\n  Create it once; `nextInt(bound)` excludes the bound; `SecureRandom` for anything\n  secret.\n* **`LocalDate`.** Immutable - so an ignored `plusDays` does nothing. Month\n  arithmetic clamps, so chaining `plusMonths(1)` drifts. `DAYS.between` counts days;\n  `Period` describes the gap the way a person would.\n* **Formatting.** `String.format`'s specifiers, `DateTimeFormatter`'s\n  case-sensitive letters (`MM` is month, `mm` is minute), and the `Locale` argument\n  that decides whether your output is `3.14` or `3,14`.\n",
+      "authored": true,
+      "lessons": [
+        {
+          "key": "m32-math",
+          "title": "`Math`, and the arithmetic that fails silently",
+          "what": "`int` overflow wraps without a word, `%` goes negative, and `round` returns a long.",
+          "lesson": "Every operator you have used on an `int` so far has a failure mode that does\n**not** throw. `Math` is where the versions that behave live.\n\n## Overflow wraps, silently\n\n```java\nint big = Integer.MAX_VALUE;     // 2147483647\nSystem.out.println(big + 1);     // -2147483648   no exception, no warning\n```\n\nAn `int` is 32 bits, and arithmetic on it is arithmetic *modulo 2^32*. Adding one\nto the largest value wraps round to the smallest. Nothing tells you, and the\nwrong number flows on into everything computed from it.\n\nThe `*Exact` methods do the same arithmetic but **throw\n`ArithmeticException`** the moment the true answer does not fit:\n\n```java\nMath.addExact(a, b)        Math.subtractExact(a, b)\nMath.multiplyExact(a, b)   Math.negateExact(a)\nMath.toIntExact(someLong)  // a long that must fit in an int\n```\n\nUse them wherever an overflow would be a bug rather than an intention - totals,\nsizes, money. Note that checking the *final* total is not enough: a running sum\ncan overflow in the middle and come back into range by the end, and only a\ncheck at every step notices.\n\n**The one that surprises everybody:**\n\n```java\nMath.abs(Integer.MIN_VALUE)      // -2147483648  - still negative!\n```\n\nThere is no positive `int` large enough to hold the answer, so it wraps back to\nitself. Any code that says \"take the absolute value, so it is non-negative\" is\nwrong for exactly one input.\n\n## `%` is a remainder, not a modulus\n\n```java\n-1 % 5                 // -1   the sign follows the LEFT operand\nMath.floorMod(-1, 5)   //  4   the sign follows the divisor\n```\n\nFor a circular index - \"step `k` places round an array of `n`\" - a negative `k`\nwith `%` produces a negative index and an `ArrayIndexOutOfBoundsException`.\n`Math.floorMod(k, n)` always lands in `0..n-1`. Its partner `Math.floorDiv`\nrounds *down* where `/` truncates *toward zero*:\n\n| expression | `/` and `%` | `floorDiv` and `floorMod` |\n|---|---|---|\n| `7, 2` | `3`, `1` | `3`, `1` |\n| `-7, 2` | `-3`, `-1` | `-4`, `1` |\n\n## Rounding, and the types it returns\n\n| call | returns | `-2.5` gives |\n|---|---|---|\n| `(int) x` | `int` | `-2` - truncates toward zero |\n| `Math.floor(x)` | **`double`** | `-3.0` |\n| `Math.ceil(x)` | **`double`** | `-2.0` |\n| `Math.round(x)` | **`long`** for a `double` | `-2` - halves go *up* |\n\n`Math.round` is `floor(x + 0.5)`: `2.5` rounds to `3`, and `-2.5` rounds to\n`-2`, not `-3`. It returns a `long` because a `double` can be far larger than\nany `int` - so `int r = Math.round(d);` does not compile without a cast.\n\n`Math.pow(2, 10)` is `1024.0`, a `double`. For integer powers, a loop of\n`multiplyExact` is exact where `pow` quietly loses precision beyond 2^53.\n",
+          "warmup": [
+            {
+              "question": "`Integer.MAX_VALUE + 1` evaluates to…",
+              "options": [
+                "-2147483648",
+                "an ArithmeticException",
+                "2147483648",
+                "0"
+              ],
+              "answer": 0,
+              "explanation": "int arithmetic wraps silently. Only the `*Exact` methods throw."
+            },
+            {
+              "question": "`-7 % 3` in Java is…",
+              "options": [
+                "-1",
+                "2",
+                "1",
+                "-2"
+              ],
+              "answer": 0,
+              "explanation": "`%` takes the sign of the left operand. `Math.floorMod(-7, 3)` is 2."
+            }
+          ],
+          "exercises": [
+            {
+              "id": "j32-ma-floormod",
+              "title": "Round and round",
+              "prompt": "Each query steps `k` places round the array, where `k` may be negative (backwards). Print the element it lands on. Replace `____` with the index expression that always lands inside the array.",
+              "hint": "The index has to end up in `0..n-1` for every `k`, including negative ones.",
+              "hints": [
+                "The index has to end up in `0..n-1` for every `k`, including negative ones.",
+                "`k % n` is negative when `k` is.",
+                "`Math.floorMod(k, n)` takes the sign of `n`, which is positive.",
+                "Stepping -1 from index 0 lands on the LAST element."
+              ],
+              "language": "java",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "starter": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] a = new int[n];\n        for (int i = 0; i < n; i++) a[i] = sc.nextInt();\n        int q = sc.nextInt();\n        for (int i = 0; i < q; i++) {\n            int k = sc.nextInt();\n            System.out.println(a[____]);\n        }\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] a = new int[n];\n        for (int i = 0; i < n; i++) a[i] = sc.nextInt();\n        int q = sc.nextInt();\n        for (int i = 0; i < q; i++) {\n            int k = sc.nextInt();\n            System.out.println(a[Math.floorMod(k, n)]);\n        }\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "5\n10 20 30 40 50\n5\n2 -1 7 -6 0",
+                  "output": "30\n50\n30\n50\n10"
+                },
+                {
+                  "input": "3\n5 6 7\n5\n-3 -4 3 1 -1",
+                  "output": "5\n7\n5\n6\n7"
+                },
+                {
+                  "input": "1\n9\n3\n0 -5 5",
+                  "output": "9\n9\n9"
+                },
+                {
+                  "input": "4\n1 2 3 4\n3\n-9 13 4",
+                  "output": "4\n2\n1"
+                },
+                {
+                  "input": "6\n8 6 4 2 0 1\n3\n-1 -7 11",
+                  "output": "1\n1\n1"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "j32-ma-percent",
+              "title": "The index that went negative",
+              "prompt": "This circular lookup works for every non-negative step and throws `ArrayIndexOutOfBoundsException` for the first negative one. Fix the index so stepping backwards wraps round.",
+              "hint": "`-1 % 5` is `-1` in Java, not `4`.",
+              "hints": [
+                "`-1 % 5` is `-1` in Java, not `4`.",
+                "The remainder takes the sign of the left operand.",
+                "`Math.floorMod(k, n)` takes the sign of the right one.",
+                "The hand-written alternative is `((k % n) + n) % n` - correct, and the reason `floorMod` exists."
+              ],
+              "language": "java",
+              "kind": "fix",
+              "difficulty": "Easy",
+              "starter": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] a = new int[n];\n        for (int i = 0; i < n; i++) a[i] = sc.nextInt();\n        int q = sc.nextInt();\n        for (int i = 0; i < q; i++) {\n            int k = sc.nextInt();\n            System.out.println(a[k % n]);\n        }\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] a = new int[n];\n        for (int i = 0; i < n; i++) a[i] = sc.nextInt();\n        int q = sc.nextInt();\n        for (int i = 0; i < q; i++) {\n            int k = sc.nextInt();\n            System.out.println(a[Math.floorMod(k, n)]);\n        }\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "5\n10 20 30 40 50\n5\n2 -1 7 -6 0",
+                  "output": "30\n50\n30\n50\n10"
+                },
+                {
+                  "input": "3\n5 6 7\n5\n-3 -4 3 1 -1",
+                  "output": "5\n7\n5\n6\n7"
+                },
+                {
+                  "input": "1\n9\n3\n0 -5 5",
+                  "output": "9\n9\n9"
+                },
+                {
+                  "input": "4\n1 2 3 4\n3\n-9 13 4",
+                  "output": "4\n2\n1"
+                },
+                {
+                  "input": "6\n8 6 4 2 0 1\n3\n-1 -7 11",
+                  "output": "1\n1\n1"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "j32-ma-exact",
+              "title": "The total that noticed",
+              "prompt": "Add the numbers up as `int`s, but refuse to print a wrapped-round answer: if the running total ever overflows, print `overflow` instead. Replace `____` with the checked addition.",
+              "hint": "`total += x` would wrap silently and print a nonsense number.",
+              "hints": [
+                "`total += x` would wrap silently and print a nonsense number.",
+                "`Math.addExact(total, x)` throws `ArithmeticException` instead.",
+                "The check happens at EVERY step: `2e9 + 2e9 - 2e9` ends in range but overflows on the way.",
+                "`1000000000 + 1000000000 + 147483647` is exactly `Integer.MAX_VALUE`, which fits."
+              ],
+              "language": "java",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "starter": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] a = new int[n];\n        for (int i = 0; i < n; i++) a[i] = sc.nextInt();\n        int total = 0;\n        try {\n            for (int x : a) {\n____\n            }\n            System.out.println(total);\n        } catch (ArithmeticException e) {\n            System.out.println(\"overflow\");\n        }\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] a = new int[n];\n        for (int i = 0; i < n; i++) a[i] = sc.nextInt();\n        int total = 0;\n        try {\n            for (int x : a) {\n                total = Math.addExact(total, x);\n            }\n            System.out.println(total);\n        } catch (ArithmeticException e) {\n            System.out.println(\"overflow\");\n        }\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "3\n1 2 3",
+                  "output": "6"
+                },
+                {
+                  "input": "2\n2147483647 1",
+                  "output": "overflow"
+                },
+                {
+                  "input": "3\n2000000000 2000000000 -2000000000",
+                  "output": "overflow"
+                },
+                {
+                  "input": "2\n-2147483648 -1",
+                  "output": "overflow"
+                },
+                {
+                  "input": "3\n1000000000 1000000000 147483647",
+                  "output": "2147483647"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "j32-ma-round",
+              "title": "Three ways to divide",
+              "prompt": "For each `sum count` pair print three numbers on one line: Java's `/`, `Math.floorDiv`, and `Math.round` of the true (double) average. Write the `println`.",
+              "hint": "`/` on two ints truncates toward zero: `-7 / 2` is `-3`.",
+              "hints": [
+                "`/` on two ints truncates toward zero: `-7 / 2` is `-3`.",
+                "`Math.floorDiv(-7, 2)` rounds down: `-4`.",
+                "`(double) sum / count` casts BEFORE dividing, so the division is done in double.",
+                "`Math.round(-3.5)` is `-3` - halves always go up, even negative ones.",
+                "Parenthesise `(sum / count)` so `+` does not glue the string on first."
+              ],
+              "language": "java",
+              "kind": "challenge",
+              "difficulty": "Medium",
+              "starter": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int pairs = sc.nextInt();\n        for (int i = 0; i < pairs; i++) {\n            int sum = sc.nextInt();\n            int count = sc.nextInt();\n____\n        }\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int pairs = sc.nextInt();\n        for (int i = 0; i < pairs; i++) {\n            int sum = sc.nextInt();\n            int count = sc.nextInt();\n            System.out.println((sum / count) + \" \" + Math.floorDiv(sum, count)\n                    + \" \" + Math.round((double) sum / count));\n        }\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "2\n7 2\n-7 2",
+                  "output": "3 3 4\n-3 -4 -3"
+                },
+                {
+                  "input": "2\n10 4\n-10 4",
+                  "output": "2 2 3\n-2 -3 -2"
+                },
+                {
+                  "input": "2\n9 3\n-1 3",
+                  "output": "3 3 3\n0 -1 0"
+                },
+                {
+                  "input": "3\n-9 4\n5 2\n0 7",
+                  "output": "-2 -3 -2\n2 2 3\n0 0 0"
+                },
+                {
+                  "input": "3\n-15 6\n15 6\n-2 5",
+                  "output": "-2 -3 -2\n2 2 3\n0 -1 0"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            }
+          ],
+          "quiz": [
+            {
+              "question": "`Math.abs(Integer.MIN_VALUE)` returns…",
+              "options": [
+                "-2147483648",
+                "2147483648",
+                "an ArithmeticException",
+                "0"
+              ],
+              "answer": 0,
+              "explanation": "There is no positive int that large, so it wraps back to itself."
+            },
+            {
+              "question": "`Math.round(2.5)` and `Math.round(-2.5)` are…",
+              "options": [
+                "3 and -2",
+                "3 and -3",
+                "2 and -2",
+                "2 and -3"
+              ],
+              "answer": 0,
+              "explanation": "`Math.round` is floor(x + 0.5): halves always go up."
+            }
+          ]
+        },
+        {
+          "key": "m32-objects",
+          "title": "`Objects` - the null-safe helpers",
+          "what": "Module 13 used `Objects.hash`. Here is the rest of the class, and why it exists.",
+          "lesson": "`java.util.Objects` (note the **s**) is a small class of static helpers, and\nnearly all of them answer the same question: *what if this is null?*\n\n## `Objects.equals(a, b)`\n\n```java\na.equals(b)            // NullPointerException if a is null\nObjects.equals(a, b)   // true if both null, false if one is, else a.equals(b)\n```\n\nEvery `equals` method you write that compares a field which may be null wants\nthis - it is why module 13's `equals` could be one line.\n\n## `Objects.hash(...)` and `Objects.hashCode(x)`\n\n`Objects.hash(key, count)` combines several fields into one hash, using the\nsame `31 * h + next` recipe as `String.hashCode`, and treats null as `0`.\n`Objects.hashCode(x)` is the single-value version: `x.hashCode()`, or `0` for\nnull.\n\nThey are **not** interchangeable for one value: `Objects.hash(x)` wraps `x` in\nan array first, so it is `31 + x.hashCode()`. Use `hash` for several fields,\n`hashCode` for one.\n\n## `Objects.requireNonNull(x, \"name\")`\n\n```java\nTag(String name) {\n    this.name = Objects.requireNonNull(name, \"name\");\n}\n```\n\nIt returns its argument unchanged, or throws `NullPointerException` **with your\nmessage** if it is null. The point is *where* it throws: here, at construction,\nnaming the culprit - rather than an hour later, deep inside a method that\nhappened to be the first to call `name.length()`. This is module 12's \"establish\nthe invariant in the constructor\", in one call.\n\n## The rest\n\n```java\nObjects.toString(x, \"(none)\")   // x.toString(), or the default for null\nObjects.isNull(x)               // x == null  - as a method, so it can be\nObjects.nonNull(x)              // x != null    a method reference\nlist.stream().filter(Objects::nonNull).count();\n```\n\n`isNull` and `nonNull` look pointless next to `==`. They exist so a null check\ncan be passed around as a `Predicate` - `filter(Objects::nonNull)` reads better\nthan `filter(x -> x != null)`, and says the same thing.\n",
+          "warmup": [
+            {
+              "question": "`Objects.equals(null, null)` returns…",
+              "options": [
+                "true",
+                "false",
+                "throws NullPointerException",
+                "does not compile"
+              ],
+              "answer": 0,
+              "explanation": "Two nulls are equal; one null and one value are not."
+            },
+            {
+              "question": "`Objects.requireNonNull(x, \"x\")` returns…",
+              "options": [
+                "x itself, or throws NPE with the message \"x\"",
+                "a boolean",
+                "an Optional",
+                "void"
+              ],
+              "answer": 0,
+              "explanation": "Returning its argument is what lets it sit inside an assignment."
+            }
+          ],
+          "exercises": [
+            {
+              "id": "j32-ob-equals",
+              "title": "The comparison that crashed on null",
+              "prompt": "Each line holds two tokens, where `-` means null. This program compares them with `a.equals(b)` and throws `NullPointerException` as soon as the left one is null. Make the comparison null-safe.",
+              "hint": "Calling any method on a null reference throws.",
+              "hints": [
+                "Calling any method on a null reference throws.",
+                "`b` being null is fine - `\"ada\".equals(null)` is simply false.",
+                "`Objects.equals(a, b)` handles null on either side.",
+                "Two nulls compare equal."
+              ],
+              "language": "java",
+              "kind": "fix",
+              "difficulty": "Easy",
+              "starter": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    static String read(Scanner sc) {\n        String token = sc.next();\n        return token.equals(\"-\") ? null : token;\n    }\n\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        for (int i = 0; i < n; i++) {\n            String a = read(sc);\n            String b = read(sc);\n            System.out.println(a.equals(b));\n        }\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    static String read(Scanner sc) {\n        String token = sc.next();\n        return token.equals(\"-\") ? null : token;\n    }\n\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        for (int i = 0; i < n; i++) {\n            String a = read(sc);\n            String b = read(sc);\n            System.out.println(Objects.equals(a, b));\n        }\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "2\nada ada\n- ada",
+                  "output": "true\nfalse"
+                },
+                {
+                  "input": "2\n- -\nbo cy",
+                  "output": "true\nfalse"
+                },
+                {
+                  "input": "3\nada -\nx x\n- y",
+                  "output": "false\ntrue\nfalse"
+                },
+                {
+                  "input": "1\n- q",
+                  "output": "false"
+                },
+                {
+                  "input": "3\npear pear\nfig -\n- -",
+                  "output": "true\nfalse\ntrue"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "j32-ob-tostring",
+              "title": "A default for nothing",
+              "prompt": "Print each token, or `(none)` where it is null. Replace `____` with the expression.",
+              "hint": "Printing a null String prints the four letters `null`.",
+              "hints": [
+                "Printing a null String prints the four letters `null`.",
+                "`Objects.toString(x, dflt)` returns the default when `x` is null.",
+                "`Objects.toString(value, \"(none)\")`",
+                "The one-argument `Objects.toString(x)` would print `null` - which is exactly what you are avoiding."
+              ],
+              "language": "java",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "starter": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    static String read(Scanner sc) {\n        String token = sc.next();\n        return token.equals(\"-\") ? null : token;\n    }\n\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        for (int i = 0; i < n; i++) {\n            String value = read(sc);\n            System.out.println(____);\n        }\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    static String read(Scanner sc) {\n        String token = sc.next();\n        return token.equals(\"-\") ? null : token;\n    }\n\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        for (int i = 0; i < n; i++) {\n            String value = read(sc);\n            System.out.println(Objects.toString(value, \"(none)\"));\n        }\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "3\nada - bo",
+                  "output": "ada\n(none)\nbo"
+                },
+                {
+                  "input": "1\n-",
+                  "output": "(none)"
+                },
+                {
+                  "input": "2\nx y",
+                  "output": "x\ny"
+                },
+                {
+                  "input": "4\n- - z -",
+                  "output": "(none)\n(none)\nz\n(none)"
+                },
+                {
+                  "input": "1\nsolo",
+                  "output": "solo"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "j32-ob-require",
+              "title": "Refused at the door",
+              "prompt": "`Tag` must never hold a null name. Try to build one per token (`-` is null) and print the name, or `rejected` when the constructor refuses. Replace `____` with the constructor's one line.",
+              "hint": "The constructor is where an invariant is established (module 12).",
+              "hints": [
+                "The constructor is where an invariant is established (module 12).",
+                "`Objects.requireNonNull(name, \"name\")` returns `name` or throws.",
+                "Because it RETURNS its argument, it fits inside the assignment.",
+                "A plain `this.name = name;` would let a null in, and print `null` instead of `rejected`."
+              ],
+              "language": "java",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "starter": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\n\nclass Tag {\n    private final String name;\n\n    Tag(String name) {\n____\n    }\n\n    String name() {\n        return name;\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        for (int i = 0; i < n; i++) {\n            String token = sc.next();\n            String name = token.equals(\"-\") ? null : token;\n            try {\n                Tag tag = new Tag(name);\n                System.out.println(tag.name());\n            } catch (NullPointerException e) {\n                System.out.println(\"rejected\");\n            }\n        }\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\n\nclass Tag {\n    private final String name;\n\n    Tag(String name) {\n        this.name = Objects.requireNonNull(name, \"name\");\n    }\n\n    String name() {\n        return name;\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        for (int i = 0; i < n; i++) {\n            String token = sc.next();\n            String name = token.equals(\"-\") ? null : token;\n            try {\n                Tag tag = new Tag(name);\n                System.out.println(tag.name());\n            } catch (NullPointerException e) {\n                System.out.println(\"rejected\");\n            }\n        }\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "3\nada - bo",
+                  "output": "ada\nrejected\nbo"
+                },
+                {
+                  "input": "1\n-",
+                  "output": "rejected"
+                },
+                {
+                  "input": "2\nx y",
+                  "output": "x\ny"
+                },
+                {
+                  "input": "4\n- - z -",
+                  "output": "rejected\nrejected\nz\nrejected"
+                },
+                {
+                  "input": "1\nsolo",
+                  "output": "solo"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "j32-ob-hash",
+              "title": "`equals` and `hashCode`, null-safe",
+              "prompt": "`Entry` has a key that may be null and a count. Write its `equals` (using `Objects.equals` for the key) and its `hashCode` (using `Objects.hash`). `main` prints whether two entries are equal, whether their hashes match, and the first entry's hash.",
+              "hint": "`key.equals(other.key)` throws when `key` is null.",
+              "hints": [
+                "`key.equals(other.key)` throws when `key` is null.",
+                "`Objects.equals(key, other.key)` does not.",
+                "`hashCode` must use exactly the fields `equals` uses: `Objects.hash(key, count)`.",
+                "`Objects.hash` treats a null key as 0, so no special case is needed.",
+                "Equal objects must have equal hashes - the second line is `true` whenever the first is."
+              ],
+              "language": "java",
+              "kind": "challenge",
+              "difficulty": "Hard",
+              "starter": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\n\nclass Entry {\n    private final String key;\n    private final int count;\n\n    Entry(String key, int count) {\n        this.key = key;\n        this.count = count;\n    }\n\n____\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        String k1 = sc.next();\n        int c1 = sc.nextInt();\n        String k2 = sc.next();\n        int c2 = sc.nextInt();\n        Entry e1 = new Entry(k1.equals(\"-\") ? null : k1, c1);\n        Entry e2 = new Entry(k2.equals(\"-\") ? null : k2, c2);\n        System.out.println(e1.equals(e2));\n        System.out.println(e1.hashCode() == e2.hashCode());\n        System.out.println(e1.hashCode());\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\n\nclass Entry {\n    private final String key;\n    private final int count;\n\n    Entry(String key, int count) {\n        this.key = key;\n        this.count = count;\n    }\n\n    @Override\n    public boolean equals(Object o) {\n        if (this == o) return true;\n        if (!(o instanceof Entry)) return false;\n        Entry other = (Entry) o;\n        return count == other.count && Objects.equals(key, other.key);\n    }\n\n    @Override\n    public int hashCode() {\n        return Objects.hash(key, count);\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        String k1 = sc.next();\n        int c1 = sc.nextInt();\n        String k2 = sc.next();\n        int c2 = sc.nextInt();\n        Entry e1 = new Entry(k1.equals(\"-\") ? null : k1, c1);\n        Entry e2 = new Entry(k2.equals(\"-\") ? null : k2, c2);\n        System.out.println(e1.equals(e2));\n        System.out.println(e1.hashCode() == e2.hashCode());\n        System.out.println(e1.hashCode());\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "ada 3\nada 3",
+                  "output": "true\ntrue\n2989798"
+                },
+                {
+                  "input": "ada 3\nada 4",
+                  "output": "false\nfalse\n2989798"
+                },
+                {
+                  "input": "- 1\n- 1",
+                  "output": "true\ntrue\n962"
+                },
+                {
+                  "input": "- 2\nbo 2",
+                  "output": "false\nfalse\n963"
+                },
+                {
+                  "input": "pear 0\npear 0",
+                  "output": "true\ntrue\n106540955"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            }
+          ],
+          "quiz": [
+            {
+              "question": "`Objects.hash(x)` versus `Objects.hashCode(x)` for a single non-null x…",
+              "options": [
+                "differ: hash(x) is 31 + x.hashCode()",
+                "are identical",
+                "hash(x) throws on null",
+                "hashCode(x) is deprecated"
+              ],
+              "answer": 0,
+              "explanation": "`hash` is varargs, so it hashes a one-element array."
+            },
+            {
+              "question": "The best place for `Objects.requireNonNull` is…",
+              "options": [
+                "a constructor or method entry, so the failure names the culprit",
+                "inside every getter",
+                "in main only",
+                "in toString"
+              ],
+              "answer": 0,
+              "explanation": "Fail where the bad value arrives, not where it is first used."
+            }
+          ]
+        },
+        {
+          "key": "m32-random",
+          "title": "`Random`, and the seed that makes it testable",
+          "what": "Random numbers you can reproduce - which is the only kind you can test.",
+          "lesson": "`java.util.Random` is not random. It is a **pseudo-random generator**: a small\nformula that turns one number (its *state*) into the next, and whose output\nmerely *looks* random. The starting state is the **seed**.\n\n```java\nRandom rnd = new Random(42);     // seeded: the same sequence, every run, every JVM\nRandom any = new Random();       // seeded from the clock: different each run\n```\n\nThat is not a weakness - it is the most useful thing about it. A simulation,\na shuffled test deck, a procedurally generated level: with a fixed seed, a bug\nyou saw once you can see again. The algorithm behind `Random` is written into\nits specification, so seed 42 produces the same numbers on every machine and\nevery Java version. Every exercise in this lesson is judged on exactly that.\n\n## The methods\n\n```java\nrnd.nextInt(6)          // 0..5   - the bound is EXCLUSIVE\nrnd.nextInt(6) + 1      // 1..6   - a die\nrnd.nextInt(hi - lo + 1) + lo   // lo..hi inclusive\nrnd.nextBoolean()       // a coin\nrnd.nextDouble()        // [0.0, 1.0)\nrnd.nextInt()           // any int at all, negative included\n```\n\nThe exclusive upper bound is the source of the classic off-by-one:\n`nextInt(hi - lo) + lo` can never produce `hi`.\n\n## One generator, created once\n\n```java\nfor (int i = 0; i < 5; i++) {\n    System.out.println(new Random(seed).nextInt(6));   // the SAME number, 5 times\n}\n```\n\nA new generator with the same seed starts the same sequence from the top, so\nthis prints its first value five times. Create the generator **once**, then\ndraw from it.\n\n## Shuffling\n\n```java\nCollections.shuffle(list, new Random(seed));   // reproducible\nCollections.shuffle(list);                     // not\n```\n\n`shuffle` walks the list backwards, swapping each position with a random one at\nor before it - the Fisher-Yates shuffle, which makes every ordering equally\nlikely. Writing it yourself with `nextInt(size)` for *every* position (instead\nof `nextInt(i + 1)`) is a well-known bug: it looks random and is measurably\nbiased.\n\n## And the others\n\n`Math.random()` is a shared, unseeded `Random` returning a `double` - fine for a\nquick script, untestable in a program. `ThreadLocalRandom.current()` is the one\nto use from several threads (module 31), and it cannot be seeded. For anything\nsecurity-related - tokens, passwords, keys - use `java.security.SecureRandom`;\n`Random`'s next output can be predicted from a few of its previous ones.\n",
+          "warmup": [
+            {
+              "question": "Two `new Random(42)` objects, each asked for `nextInt(100)` three times…",
+              "options": [
+                "produce the same three numbers",
+                "produce different numbers",
+                "throw",
+                "depend on the clock"
+              ],
+              "answer": 0,
+              "explanation": "Same seed, same sequence - that is the point of a seed."
+            },
+            {
+              "question": "`rnd.nextInt(6)` returns values in…",
+              "options": [
+                "0..5",
+                "1..6",
+                "0..6",
+                "1..5"
+              ],
+              "answer": 0,
+              "explanation": "The bound is exclusive. Add 1 for a die."
+            }
+          ],
+          "exercises": [
+            {
+              "id": "j32-ra-dice",
+              "title": "A reproducible die",
+              "prompt": "Read a seed and a count, then roll a six-sided die that many times with one seeded generator, printing the rolls on one line. Replace `____` with a single roll.",
+              "hint": "`nextInt(6)` gives 0..5.",
+              "hints": [
+                "`nextInt(6)` gives 0..5.",
+                "A die shows 1..6, so shift by one.",
+                "`rnd.nextInt(6) + 1`",
+                "Because the seed is fixed, the judge knows exactly which rolls to expect."
+              ],
+              "language": "java",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "starter": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        long seed = sc.nextLong();\n        int n = sc.nextInt();\n        Random rnd = new Random(seed);\n        StringBuilder out = new StringBuilder();\n        for (int i = 0; i < n; i++) {\n            if (i > 0) out.append(' ');\n            out.append(____);\n        }\n        System.out.println(out);\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        long seed = sc.nextLong();\n        int n = sc.nextInt();\n        Random rnd = new Random(seed);\n        StringBuilder out = new StringBuilder();\n        for (int i = 0; i < n; i++) {\n            if (i > 0) out.append(' ');\n            out.append(rnd.nextInt(6) + 1);\n        }\n        System.out.println(out);\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "42 5",
+                  "output": "3 4 1 3 1"
+                },
+                {
+                  "input": "7 3",
+                  "output": "5 3 4"
+                },
+                {
+                  "input": "2024 6",
+                  "output": "1 3 1 5 6 6"
+                },
+                {
+                  "input": "1 4",
+                  "output": "4 5 2 4"
+                },
+                {
+                  "input": "123456789 5",
+                  "output": "2 1 6 5 1"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "j32-ra-reseed",
+              "title": "The die that always rolled the same",
+              "prompt": "This builds a fresh generator on every roll, so it prints the same number over and over. Make it draw a sequence from ONE generator.",
+              "hint": "A generator with a given seed always starts its sequence from the same place.",
+              "hints": [
+                "A generator with a given seed always starts its sequence from the same place.",
+                "Building one per iteration means taking the FIRST value every time.",
+                "Move `new Random(seed)` above the loop.",
+                "The same mistake without a seed is subtler: generators created in the same instant can share a clock-derived seed."
+              ],
+              "language": "java",
+              "kind": "fix",
+              "difficulty": "Easy",
+              "starter": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        long seed = sc.nextLong();\n        int n = sc.nextInt();\n        StringBuilder out = new StringBuilder();\n        for (int i = 0; i < n; i++) {\n            Random rnd = new Random(seed);\n            if (i > 0) out.append(' ');\n            out.append(rnd.nextInt(6) + 1);\n        }\n        System.out.println(out);\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        long seed = sc.nextLong();\n        int n = sc.nextInt();\n        Random rnd = new Random(seed);\n        StringBuilder out = new StringBuilder();\n        for (int i = 0; i < n; i++) {\n            if (i > 0) out.append(' ');\n            out.append(rnd.nextInt(6) + 1);\n        }\n        System.out.println(out);\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "42 5",
+                  "output": "3 4 1 3 1"
+                },
+                {
+                  "input": "7 3",
+                  "output": "5 3 4"
+                },
+                {
+                  "input": "2024 6",
+                  "output": "1 3 1 5 6 6"
+                },
+                {
+                  "input": "1 4",
+                  "output": "4 5 2 4"
+                },
+                {
+                  "input": "123456789 5",
+                  "output": "2 1 6 5 1"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "j32-ra-range",
+              "title": "The value that never came up",
+              "prompt": "Roll numbers in the INCLUSIVE range `lo..hi`. This version can never produce `hi`. Fix the bound.",
+              "hint": "`nextInt(bound)` returns `0..bound-1`.",
+              "hints": [
+                "`nextInt(bound)` returns `0..bound-1`.",
+                "`nextInt(hi - lo)` therefore gives `0..hi-lo-1`, and adding `lo` gives `lo..hi-1`.",
+                "There are `hi - lo + 1` values in an inclusive range.",
+                "`rnd.nextInt(hi - lo + 1) + lo`"
+              ],
+              "language": "java",
+              "kind": "fix",
+              "difficulty": "Medium",
+              "starter": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        long seed = sc.nextLong();\n        int lo = sc.nextInt();\n        int hi = sc.nextInt();\n        int n = sc.nextInt();\n        Random rnd = new Random(seed);\n        StringBuilder out = new StringBuilder();\n        for (int i = 0; i < n; i++) {\n            if (i > 0) out.append(' ');\n            out.append(rnd.nextInt(hi - lo) + lo);\n        }\n        System.out.println(out);\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        long seed = sc.nextLong();\n        int lo = sc.nextInt();\n        int hi = sc.nextInt();\n        int n = sc.nextInt();\n        Random rnd = new Random(seed);\n        StringBuilder out = new StringBuilder();\n        for (int i = 0; i < n; i++) {\n            if (i > 0) out.append(' ');\n            out.append(rnd.nextInt(hi - lo + 1) + lo);\n        }\n        System.out.println(out);\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "42 1 6 6",
+                  "output": "3 4 1 3 1 2"
+                },
+                {
+                  "input": "7 10 12 6",
+                  "output": "11 12 10 11 11 11"
+                },
+                {
+                  "input": "2024 -3 3 6",
+                  "output": "3 2 3 1 -3 0"
+                },
+                {
+                  "input": "1 0 1 8",
+                  "output": "1 0 0 0 0 0 0 1"
+                },
+                {
+                  "input": "99 5 9 6",
+                  "output": "7 8 9 6 5 7"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "j32-ra-deal",
+              "title": "Shuffle and deal",
+              "prompt": "Build the deck `1..n`, shuffle it reproducibly with the seed, print the shuffled deck, then deal it alternately into two hands (first card to hand A) and print each hand on its own line.",
+              "hint": "`Collections.shuffle(deck, new Random(seed))` - the two-argument form is the reproducible one.",
+              "hints": [
+                "`Collections.shuffle(deck, new Random(seed))` - the two-argument form is the reproducible one.",
+                "Printing a `List` gives `[a, b, c]`.",
+                "Even positions (0, 2, 4, ...) go to hand A, odd ones to hand B.",
+                "`(i % 2 == 0) ? a : b` picks the hand without duplicating the append code.",
+                "With `n` odd, hand A gets one card more."
+              ],
+              "language": "java",
+              "kind": "challenge",
+              "difficulty": "Medium",
+              "starter": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        long seed = sc.nextLong();\n        int n = sc.nextInt();\n        List<Integer> deck = new ArrayList<>();\n        for (int i = 1; i <= n; i++) {\n            deck.add(i);\n        }\n____\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        long seed = sc.nextLong();\n        int n = sc.nextInt();\n        List<Integer> deck = new ArrayList<>();\n        for (int i = 1; i <= n; i++) {\n            deck.add(i);\n        }\n        Collections.shuffle(deck, new Random(seed));\n        System.out.println(deck);\n        StringBuilder a = new StringBuilder();\n        StringBuilder b = new StringBuilder();\n        for (int i = 0; i < n; i++) {\n            StringBuilder hand = (i % 2 == 0) ? a : b;\n            if (hand.length() > 0) hand.append(' ');\n            hand.append(deck.get(i));\n        }\n        System.out.println(a);\n        System.out.println(b);\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "42 6",
+                  "output": "[2, 1, 5, 6, 4, 3]\n2 5 4\n1 6 3"
+                },
+                {
+                  "input": "7 5",
+                  "output": "[5, 4, 1, 3, 2]\n5 1 2\n4 3"
+                },
+                {
+                  "input": "2024 8",
+                  "output": "[2, 8, 3, 4, 7, 1, 6, 5]\n2 3 7 6\n8 4 1 5"
+                },
+                {
+                  "input": "1 4",
+                  "output": "[4, 1, 2, 3]\n4 2\n1 3"
+                },
+                {
+                  "input": "123456789 7",
+                  "output": "[5, 3, 6, 7, 4, 1, 2]\n5 6 4 2\n3 7 1"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            }
+          ],
+          "quiz": [
+            {
+              "question": "Why is a seeded `Random` valuable in a test?",
+              "options": [
+                "the same seed reproduces the same sequence, so a failure can be replayed",
+                "it is more random",
+                "it is faster",
+                "it is thread-safe"
+              ],
+              "answer": 0,
+              "explanation": "Reproducibility is what makes randomness testable."
+            },
+            {
+              "question": "Generating a password reset token should use…",
+              "options": [
+                "SecureRandom",
+                "new Random()",
+                "Math.random()",
+                "new Random(seed)"
+              ],
+              "answer": 0,
+              "explanation": "`Random`'s future output can be predicted from a few past values."
+            }
+          ]
+        },
+        {
+          "key": "m32-dates",
+          "title": "`LocalDate` - dates without the pain",
+          "what": "Immutable values, arithmetic that respects the calendar, and the month that clamps.",
+          "lesson": "Java's original `java.util.Date` was mutable, counted months from zero and years\nfrom 1900, and mixed up \"a date\" with \"an instant in time\". **`java.time`**\n(Java 8) replaced it, and it is built on one design decision: **every type is\nan immutable value.**\n\n`LocalDate` is a date with no time and no time zone - a birthday, a due date,\na holiday. \"Local\" means *as it reads on a calendar*, not \"in my time zone\".\n\n```java\nLocalDate d = LocalDate.of(2024, 1, 31);     // months are 1-12, finally\nLocalDate e = LocalDate.parse(\"2024-01-31\"); // ISO yyyy-MM-dd\nSystem.out.println(d);                       // 2024-01-31\nd.getDayOfWeek()                             // WEDNESDAY  (a DayOfWeek enum)\nd.isLeapYear()      d.lengthOfMonth()        // true, 31\nd.isBefore(e)       d.isAfter(e)   d.equals(e)\n```\n\n## Immutability, and the bug it causes\n\n```java\nd.plusDays(1);                // computes a new date... and throws it away\nSystem.out.println(d);        // still 2024-01-31\nd = d.plusDays(1);            // what you meant\n```\n\nEvery \"modifying\" method - `plusDays`, `minusWeeks`, `withDayOfMonth` - returns\na **new** `LocalDate`. That makes dates safe to share, cache and use as map\nkeys; it also means a call whose result is ignored does nothing at all. It is\nexactly the `String.toUpperCase()` mistake from module 6.\n\n## Month arithmetic clamps\n\n```java\nLocalDate.of(2024, 1, 31).plusMonths(1)   // 2024-02-29 - no Feb 31, so the last day\n```\n\n`plusMonths` keeps the day-of-month if it can and otherwise **clamps to the\nmonth's last day**. That has a consequence people trip over: adding one month\nthree times is not the same as adding three months.\n\n```java\njan31.plusMonths(3)                               // 2024-04-30\njan31.plusMonths(1).plusMonths(1).plusMonths(1)   // 2024-04-29 - the 29 stuck\n```\n\nFor a monthly schedule, always compute each date from the *original* start.\n\n## How far apart?\n\n```java\nChronoUnit.DAYS.between(a, b)    // a long: total days, negative if b < a\nPeriod.between(a, b)             // P1Y1M1D - years, months and days\n```\n\nThey answer different questions. `DAYS.between` is \"how many days\", which is\nwhat a fine, an interval or a countdown needs. `Period` is \"how would a person\nsay it\" - one year, one month, one day - and its `getDays()` is only the *days\npart*, not the total. Mixing them up is a real bug: `Period.between(jan1,\nmar1).getDays()` is `0`.\n",
+          "warmup": [
+            {
+              "question": "`d.plusDays(1);` on its own line…",
+              "options": [
+                "changes nothing - the new date is discarded",
+                "moves d forward a day",
+                "does not compile",
+                "throws"
+              ],
+              "answer": 0,
+              "explanation": "LocalDate is immutable. Assign the result."
+            },
+            {
+              "question": "`LocalDate.of(2023, 1, 31).plusMonths(1)` is…",
+              "options": [
+                "2023-02-28",
+                "2023-03-03",
+                "2023-02-31",
+                "an exception"
+              ],
+              "answer": 0,
+              "explanation": "It clamps to the last valid day of February."
+            }
+          ],
+          "exercises": [
+            {
+              "id": "j32-da-plus",
+              "title": "A week from Tuesday",
+              "prompt": "Read a date and a number of days (possibly negative). Print the date that many days later, then its day of the week. Replace `____` with the arithmetic.",
+              "hint": "`plusDays` returns a NEW date.",
+              "hints": [
+                "`plusDays` returns a NEW date.",
+                "A negative argument goes backwards - no need for `minusDays`.",
+                "`date.plusDays(k)`",
+                "Month and year boundaries, and leap days, are handled for you."
+              ],
+              "language": "java",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "starter": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        LocalDate date = LocalDate.parse(sc.next());\n        int k = sc.nextInt();\n        LocalDate later = ____;\n        System.out.println(later);\n        System.out.println(later.getDayOfWeek());\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        LocalDate date = LocalDate.parse(sc.next());\n        int k = sc.nextInt();\n        LocalDate later = date.plusDays(k);\n        System.out.println(later);\n        System.out.println(later.getDayOfWeek());\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "2024-01-31\n1",
+                  "output": "2024-02-01\nTHURSDAY"
+                },
+                {
+                  "input": "2023-12-25\n7",
+                  "output": "2024-01-01\nMONDAY"
+                },
+                {
+                  "input": "2024-02-28\n2",
+                  "output": "2024-03-01\nFRIDAY"
+                },
+                {
+                  "input": "2023-03-01\n-1",
+                  "output": "2023-02-28\nTUESDAY"
+                },
+                {
+                  "input": "2024-12-31\n365",
+                  "output": "2025-12-31\nWEDNESDAY"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "j32-da-immutable",
+              "title": "The date that would not move",
+              "prompt": "This is meant to print the date `k` days later and its weekday, but it prints the original date every time. Fix it.",
+              "hint": "`LocalDate` never changes after it is made.",
+              "hints": [
+                "`LocalDate` never changes after it is made.",
+                "`plusDays` hands back a new date - which this code ignores.",
+                "`date = date.plusDays(k);`",
+                "Module 6's `s.toUpperCase();` is the same bug in a different class."
+              ],
+              "language": "java",
+              "kind": "fix",
+              "difficulty": "Easy",
+              "starter": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        LocalDate date = LocalDate.parse(sc.next());\n        int k = sc.nextInt();\n        date.plusDays(k);\n        System.out.println(date);\n        System.out.println(date.getDayOfWeek());\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        LocalDate date = LocalDate.parse(sc.next());\n        int k = sc.nextInt();\n        date = date.plusDays(k);\n        System.out.println(date);\n        System.out.println(date.getDayOfWeek());\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "2024-01-31\n1",
+                  "output": "2024-02-01\nTHURSDAY"
+                },
+                {
+                  "input": "2023-12-25\n7",
+                  "output": "2024-01-01\nMONDAY"
+                },
+                {
+                  "input": "2024-02-28\n2",
+                  "output": "2024-03-01\nFRIDAY"
+                },
+                {
+                  "input": "2023-03-01\n-1",
+                  "output": "2023-02-28\nTUESDAY"
+                },
+                {
+                  "input": "2024-12-31\n365",
+                  "output": "2025-12-31\nWEDNESDAY"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "j32-da-between",
+              "title": "How long, two ways",
+              "prompt": "Read two dates, the first no later than the second. Print the total number of days between them, then the `Period`. Replace `____` with the day count.",
+              "hint": "`ChronoUnit.DAYS.between(a, b)` counts every day from a up to b.",
+              "hints": [
+                "`ChronoUnit.DAYS.between(a, b)` counts every day from a up to b.",
+                "It returns a `long`, and would be negative if `to` came first.",
+                "`Period` prints as `P1Y1M1D`, and `P0D` for no gap at all.",
+                "The two answer different questions: 'how many days' versus 'how would a person say it'."
+              ],
+              "language": "java",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "starter": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        LocalDate from = LocalDate.parse(sc.next());\n        LocalDate to = LocalDate.parse(sc.next());\n        System.out.println(____);\n        System.out.println(Period.between(from, to));\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        LocalDate from = LocalDate.parse(sc.next());\n        LocalDate to = LocalDate.parse(sc.next());\n        System.out.println(ChronoUnit.DAYS.between(from, to));\n        System.out.println(Period.between(from, to));\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "2024-01-01\n2024-12-31",
+                  "output": "365\nP11M30D"
+                },
+                {
+                  "input": "2023-01-31\n2024-03-01",
+                  "output": "395\nP1Y1M1D"
+                },
+                {
+                  "input": "2024-02-29\n2024-02-29",
+                  "output": "0\nP0D"
+                },
+                {
+                  "input": "2020-05-15\n2024-05-14",
+                  "output": "1460\nP3Y11M29D"
+                },
+                {
+                  "input": "2023-12-25\n2024-01-08",
+                  "output": "14\nP14D"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "j32-da-monthly",
+              "title": "The schedule that drifted",
+              "prompt": "A monthly payment starts on a date. For each of the next `k` months print two dates on one line: the date computed from the START (`start.plusMonths(i)`), and the date reached by adding one month to the PREVIOUS date. Watch the second column drift after a short month.",
+              "hint": "`plusMonths` clamps: Jan 31 plus one month is the last day of February.",
+              "hints": [
+                "`plusMonths` clamps: Jan 31 plus one month is the last day of February.",
+                "The first column never drifts, because each value starts from the original day-of-month.",
+                "The second column starts from a clamped date, so the smaller day sticks.",
+                "`chained = chained.plusMonths(1);` - remember to assign.",
+                "A date concatenated to a String prints in ISO form."
+              ],
+              "language": "java",
+              "kind": "challenge",
+              "difficulty": "Hard",
+              "starter": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        LocalDate start = LocalDate.parse(sc.next());\n        int k = sc.nextInt();\n____\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        LocalDate start = LocalDate.parse(sc.next());\n        int k = sc.nextInt();\n        LocalDate chained = start;\n        for (int i = 1; i <= k; i++) {\n            chained = chained.plusMonths(1);\n            System.out.println(start.plusMonths(i) + \" \" + chained);\n        }\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "2024-01-31\n4",
+                  "output": "2024-02-29 2024-02-29\n2024-03-31 2024-03-29\n2024-04-30 2024-04-29\n2024-05-31 2024-05-29"
+                },
+                {
+                  "input": "2023-10-31\n5",
+                  "output": "2023-11-30 2023-11-30\n2023-12-31 2023-12-30\n2024-01-31 2024-01-30\n2024-02-29 2024-02-29\n2024-03-31 2024-03-29"
+                },
+                {
+                  "input": "2024-03-15\n3",
+                  "output": "2024-04-15 2024-04-15\n2024-05-15 2024-05-15\n2024-06-15 2024-06-15"
+                },
+                {
+                  "input": "2023-08-31\n4",
+                  "output": "2023-09-30 2023-09-30\n2023-10-31 2023-10-30\n2023-11-30 2023-11-30\n2023-12-31 2023-12-30"
+                },
+                {
+                  "input": "2024-02-29\n3",
+                  "output": "2024-03-29 2024-03-29\n2024-04-29 2024-04-29\n2024-05-29 2024-05-29"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            }
+          ],
+          "quiz": [
+            {
+              "question": "`Period.between(2024-01-01, 2024-03-01).getDays()` is…",
+              "options": [
+                "0",
+                "60",
+                "2",
+                "59"
+              ],
+              "answer": 0,
+              "explanation": "The Period is P2M; `getDays()` is only the days PART."
+            },
+            {
+              "question": "Why is `LocalDate` immutable?",
+              "options": [
+                "so it can be shared, cached and used as a map key safely",
+                "for speed only",
+                "because Java has no setters",
+                "it is not"
+              ],
+              "answer": 0,
+              "explanation": "Values that cannot change cannot be changed behind your back."
+            }
+          ]
+        },
+        {
+          "key": "m32-format",
+          "title": "Formatting, and the `Locale` nobody passes",
+          "what": "`String.format` and `DateTimeFormatter` - and why the same line prints `3.14` here and `3,14` in Berlin.",
+          "lesson": "## `String.format` and `printf`\n\n```java\nString.format(\"%-8s|%5d\", name, score)   // \"ada     |   97\"\nSystem.out.printf(\"%d items%n\", n);      // printf = format + print\n```\n\nA format specifier is `%[flags][width][.precision]conversion`:\n\n| spec | means | `42` / `3.14159` / `\"ab\"` |\n|---|---|---|\n| `%d` | integer | `42` |\n| `%5d` | right-aligned in 5 | `   42` |\n| `%-5d` | left-aligned in 5 | `42   ` |\n| `%05d` | zero-padded | `00042` |\n| `%x` | hexadecimal | `2a` |\n| `%.2f` | 2 decimal places | `3.14` |\n| `%8.3f` | width 8, 3 places | `   3.142` |\n| `%s` / `%-6s` | string / left in 6 | `ab` / `ab    ` |\n| `%b` | boolean | `true` |\n| `%%` / `%n` | a literal `%` / a newline | |\n\n`%.2f` **rounds half up**, on the number as Java would print it: `1.005` becomes\n`1.01`. (Python's formatting gives `1.00` for the same value - a reminder that\n\"round to two places\" is less universal than it sounds.)\n\n## The `Locale`, which is the actual lesson\n\n```java\nString.format(\"%.2f\", 3.14159)              // \"3.14\" - on YOUR machine\n// on a machine set to German:              // \"3,14\"\nString.format(Locale.ROOT, \"%.2f\", 3.14159) // \"3.14\" everywhere\n```\n\nWithout a `Locale` argument, `format` uses the machine's default, which decides\nthe decimal separator, the digit grouping of `%,d`, and the language of month\nnames. That is right for text shown to a *person*, and a bug for anything a\n*program* will read back - a CSV file, a log line, a JSON number, a test's\nexpected output. Pass `Locale.ROOT` (the neutral locale) whenever the output is\ndata. Every program in this module does.\n\n## `DateTimeFormatter`\n\n```java\nDateTimeFormatter f = DateTimeFormatter.ofPattern(\"dd/MM/yyyy\");\nLocalDate d = LocalDate.parse(\"31/01/2024\", f);   // parse with a pattern\nd.format(f)                                       // \"31/01/2024\"\nd.format(DateTimeFormatter.ofPattern(\"EEE, d MMM yyyy\", Locale.ENGLISH))\n                                                  // \"Wed, 31 Jan 2024\"\n```\n\nThe pattern letters are **case-sensitive**, and the classic bug is one letter:\n\n| letter | means |\n|---|---|\n| `yyyy` | year |\n| `MM` / `MMM` | month number / short month name |\n| `dd` / `d` | day, padded / not |\n| `EEE` | short day name |\n| `HH` / `mm` / `ss` | hour (0-23) / **minute** / second |\n\n`dd/mm/yyyy` asks for *minutes*, which a `LocalDate` does not have - formatting\nthrows `UnsupportedTemporalTypeException`. A name pattern (`EEE`, `MMM`) also\ndepends on the locale, so pass one, as above.\n\nLike everything in `java.time`, a `DateTimeFormatter` is immutable and\nthread-safe, so a formatter is normally a `static final` constant, built once.\n",
+          "warmup": [
+            {
+              "question": "`String.format(\"%05d\", 42)` is…",
+              "options": [
+                "00042",
+                "42000",
+                "   42",
+                "42   "
+              ],
+              "answer": 0,
+              "explanation": "The `0` flag pads with zeros to the width."
+            },
+            {
+              "question": "In a `DateTimeFormatter` pattern, `mm` means…",
+              "options": [
+                "minutes",
+                "month",
+                "milliseconds",
+                "month name"
+              ],
+              "answer": 0,
+              "explanation": "Month is `MM`. Case matters."
+            }
+          ],
+          "exercises": [
+            {
+              "id": "j32-fo-table",
+              "title": "A table that lines up",
+              "prompt": "Print each name left-aligned in 8 characters, a `|`, then the score right-aligned in 5. Replace `____` with the format string.",
+              "hint": "`%s` is a string and `%d` an integer.",
+              "hints": [
+                "`%s` is a string and `%d` an integer.",
+                "A number between `%` and the letter is a width; `-` left-aligns.",
+                "`\"%-8s|%5d\"`",
+                "A name longer than 8 is NOT truncated - the width is a minimum."
+              ],
+              "language": "java",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "starter": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        for (int i = 0; i < n; i++) {\n            String name = sc.next();\n            int score = sc.nextInt();\n            System.out.println(String.format(Locale.ROOT, ____, name, score));\n        }\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        for (int i = 0; i < n; i++) {\n            String name = sc.next();\n            int score = sc.nextInt();\n            System.out.println(String.format(Locale.ROOT, \"%-8s|%5d\", name, score));\n        }\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "2\nada 97\nbo 5",
+                  "output": "ada     |   97\nbo      |    5"
+                },
+                {
+                  "input": "1\ngrace 100",
+                  "output": "grace   |  100"
+                },
+                {
+                  "input": "3\nx 0\nyy 12\nzzz 345",
+                  "output": "x       |    0\nyy      |   12\nzzz     |  345"
+                },
+                {
+                  "input": "2\nalan 88\nbarbara 1234",
+                  "output": "alan    |   88\nbarbara | 1234"
+                },
+                {
+                  "input": "2\nlinus 7\nken 42",
+                  "output": "linus   |    7\nken     |   42"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "j32-fo-average",
+              "title": "Two decimal places",
+              "prompt": "Print the average of the integers to exactly two decimal places. Replace `____` with the format call.",
+              "hint": "`%.2f` prints a double with two digits after the point.",
+              "hints": [
+                "`%.2f` prints a double with two digits after the point.",
+                "Pass `Locale.ROOT` first so the separator is always a dot.",
+                "`String.format(Locale.ROOT, \"%.2f\", average)`",
+                "`1.625` rounds UP to `1.63`: halves round up."
+              ],
+              "language": "java",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "starter": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] a = new int[n];\n        for (int i = 0; i < n; i++) a[i] = sc.nextInt();\n        int sum = 0;\n        for (int x : a) {\n            sum += x;\n        }\n        double average = (double) sum / n;\n        System.out.println(____);\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] a = new int[n];\n        for (int i = 0; i < n; i++) a[i] = sc.nextInt();\n        int sum = 0;\n        for (int x : a) {\n            sum += x;\n        }\n        double average = (double) sum / n;\n        System.out.println(String.format(Locale.ROOT, \"%.2f\", average));\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "2\n1 2",
+                  "output": "1.50"
+                },
+                {
+                  "input": "3\n10 20 25",
+                  "output": "18.33"
+                },
+                {
+                  "input": "8\n1 1 1 2 2 2 2 2",
+                  "output": "1.63"
+                },
+                {
+                  "input": "2\n-3 -4",
+                  "output": "-3.50"
+                },
+                {
+                  "input": "1\n100",
+                  "output": "100.00"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "j32-fo-pattern",
+              "title": "Minutes where the month should be",
+              "prompt": "This should parse an ISO date and print it as `dd/MM/yyyy`, but it throws `UnsupportedTemporalTypeException` on every input. Fix the pattern.",
+              "hint": "Pattern letters are case-sensitive.",
+              "hints": [
+                "Pattern letters are case-sensitive.",
+                "Lower-case `mm` is minute-of-hour.",
+                "A `LocalDate` has no time, so it cannot supply minutes.",
+                "Month is upper-case `MM`."
+              ],
+              "language": "java",
+              "kind": "fix",
+              "difficulty": "Easy",
+              "starter": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        LocalDate d = LocalDate.parse(sc.next());\n        DateTimeFormatter f = DateTimeFormatter.ofPattern(\"dd/mm/yyyy\");\n        System.out.println(d.format(f));\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        LocalDate d = LocalDate.parse(sc.next());\n        DateTimeFormatter f = DateTimeFormatter.ofPattern(\"dd/MM/yyyy\");\n        System.out.println(d.format(f));\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "2024-01-31",
+                  "output": "31/01/2024"
+                },
+                {
+                  "input": "2024-02-29",
+                  "output": "29/02/2024"
+                },
+                {
+                  "input": "2023-12-01",
+                  "output": "01/12/2023"
+                },
+                {
+                  "input": "1947-08-15",
+                  "output": "15/08/1947"
+                },
+                {
+                  "input": "2024-03-03",
+                  "output": "03/03/2024"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "j32-fo-parse",
+              "title": "Read it one way, print it another",
+              "prompt": "Read a date written `dd/MM/yyyy`. Print it in ISO form, then its day of the week, then as `EEE, d MMM yyyy` in English. Write the three lines, parsing with a formatter.",
+              "hint": "`LocalDate.parse(text, formatter)` - the two-argument form.",
+              "hints": [
+                "`LocalDate.parse(text, formatter)` - the two-argument form.",
+                "Printing a `LocalDate` directly gives ISO `yyyy-MM-dd`.",
+                "`getDayOfWeek()` prints in capitals: `WEDNESDAY`.",
+                "`d.format(out)` uses the English names because `out` was built with `Locale.ENGLISH`.",
+                "`d` (single letter) does not pad the day; `dd` would."
+              ],
+              "language": "java",
+              "kind": "challenge",
+              "difficulty": "Medium",
+              "starter": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        DateTimeFormatter in = DateTimeFormatter.ofPattern(\"dd/MM/yyyy\");\n        DateTimeFormatter out = DateTimeFormatter.ofPattern(\"EEE, d MMM yyyy\", Locale.ENGLISH);\n____\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        DateTimeFormatter in = DateTimeFormatter.ofPattern(\"dd/MM/yyyy\");\n        DateTimeFormatter out = DateTimeFormatter.ofPattern(\"EEE, d MMM yyyy\", Locale.ENGLISH);\n        LocalDate d = LocalDate.parse(sc.next(), in);\n        System.out.println(d);\n        System.out.println(d.getDayOfWeek());\n        System.out.println(d.format(out));\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "31/01/2024",
+                  "output": "2024-01-31\nWEDNESDAY\nWed, 31 Jan 2024"
+                },
+                {
+                  "input": "29/02/2024",
+                  "output": "2024-02-29\nTHURSDAY\nThu, 29 Feb 2024"
+                },
+                {
+                  "input": "01/12/2023",
+                  "output": "2023-12-01\nFRIDAY\nFri, 1 Dec 2023"
+                },
+                {
+                  "input": "15/08/1947",
+                  "output": "1947-08-15\nFRIDAY\nFri, 15 Aug 1947"
+                },
+                {
+                  "input": "03/03/2024",
+                  "output": "2024-03-03\nSUNDAY\nSun, 3 Mar 2024"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            }
+          ],
+          "quiz": [
+            {
+              "question": "Output that another PROGRAM will parse should be formatted with…",
+              "options": [
+                "Locale.ROOT",
+                "the default locale",
+                "Locale.GERMAN",
+                "no format at all"
+              ],
+              "answer": 0,
+              "explanation": "The default locale changes decimal separators and names per machine."
+            },
+            {
+              "question": "`String.format(Locale.ROOT, \"%.2f\", 2.675)` prints…",
+              "options": [
+                "2.68",
+                "2.67",
+                "2.7",
+                "2.675"
+              ],
+              "answer": 0,
+              "explanation": "Java rounds half up on the value as it prints it: 2.675 becomes 2.68."
+            }
+          ]
+        }
+      ],
+      "capstone": {
+        "title": "The library desk",
+        "brief": "A book is lent on a date for a number of days, and comes back on another date.\nWrite the three helpers the desk's `main` relies on:\n\n* **`PRETTY`** - a `static final DateTimeFormatter` printing `EEE, d MMM yyyy` in\n  English. Built once; formatters are immutable and thread-safe.\n* **`daysLate(due, returned)`** - the number of days after the due date the book\n  came back, as a `long`, and **never negative**: early is simply on time.\n* **`money(cents)`** - a fine in cents as a two-decimal string, **locale-proof**.\n\n`main` then works out the due date (`plusDays` - and remembers to keep the\nresult), multiplies the late days by the daily fine with `Math.multiplyExact` so\nan absurd fine throws instead of wrapping, and prints four lines.\n",
+        "kind": "auto",
+        "exercise": {
+          "id": "j32-cap-desk",
+          "title": "The library desk",
+          "prompt": "Write `PRETTY`, `daysLate` and `money` as the brief describes, so the given `main` prints its four lines.",
+          "hint": "`DateTimeFormatter.ofPattern(\"EEE, d MMM yyyy\", Locale.ENGLISH)` - the locale fixes the day and month names.",
+          "hints": [
+            "`DateTimeFormatter.ofPattern(\"EEE, d MMM yyyy\", Locale.ENGLISH)` - the locale fixes the day and month names.",
+            "`ChronoUnit.DAYS.between(due, returned)` is negative when the book came back early.",
+            "`Math.max(0, ...)` floors it at zero; with a `long` argument it returns a `long`.",
+            "`cents / 100.0` divides in double; `%.2f` prints two places.",
+            "Pass `Locale.ROOT` to `String.format` so the separator is a dot on every machine.",
+            "Returned exactly on the due date is on time: zero days late."
+          ],
+          "language": "java",
+          "kind": "challenge",
+          "difficulty": "Hard",
+          "starter": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n____\n\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        LocalDate loaned = LocalDate.parse(sc.next());\n        int days = sc.nextInt();\n        LocalDate returned = LocalDate.parse(sc.next());\n        int perDay = sc.nextInt();\n        LocalDate due = loaned.plusDays(days);\n        long late = daysLate(due, returned);\n        long fine = Math.multiplyExact(late, (long) perDay);\n        System.out.println(\"due: \" + due.format(PRETTY));\n        System.out.println(\"returned: \" + returned.format(PRETTY));\n        System.out.println(late == 0 ? \"on time\" : \"late by \" + late + \" days\");\n        System.out.println(\"fine: \" + money(fine));\n    }\n}\n",
+          "solution": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    static final DateTimeFormatter PRETTY =\n            DateTimeFormatter.ofPattern(\"EEE, d MMM yyyy\", Locale.ENGLISH);\n\n    static long daysLate(LocalDate due, LocalDate returned) {\n        return Math.max(0, ChronoUnit.DAYS.between(due, returned));\n    }\n\n    static String money(long cents) {\n        return String.format(Locale.ROOT, \"%.2f\", cents / 100.0);\n    }\n\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        LocalDate loaned = LocalDate.parse(sc.next());\n        int days = sc.nextInt();\n        LocalDate returned = LocalDate.parse(sc.next());\n        int perDay = sc.nextInt();\n        LocalDate due = loaned.plusDays(days);\n        long late = daysLate(due, returned);\n        long fine = Math.multiplyExact(late, (long) perDay);\n        System.out.println(\"due: \" + due.format(PRETTY));\n        System.out.println(\"returned: \" + returned.format(PRETTY));\n        System.out.println(late == 0 ? \"on time\" : \"late by \" + late + \" days\");\n        System.out.println(\"fine: \" + money(fine));\n    }\n}\n",
+          "tests": [
+            {
+              "input": "2024-02-20 14\n2024-03-08 25",
+              "output": "due: Tue, 5 Mar 2024\nreturned: Fri, 8 Mar 2024\nlate by 3 days\nfine: 0.75"
+            },
+            {
+              "input": "2024-01-31 21\n2024-02-15 50",
+              "output": "due: Wed, 21 Feb 2024\nreturned: Thu, 15 Feb 2024\non time\nfine: 0.00"
+            },
+            {
+              "input": "2023-12-20 14\n2024-01-03 30",
+              "output": "due: Wed, 3 Jan 2024\nreturned: Wed, 3 Jan 2024\non time\nfine: 0.00"
+            },
+            {
+              "input": "2024-02-28 7\n2024-03-31 125",
+              "output": "due: Wed, 6 Mar 2024\nreturned: Sun, 31 Mar 2024\nlate by 25 days\nfine: 31.25"
+            },
+            {
+              "input": "2023-06-01 30\n2023-08-15 99",
+              "output": "due: Sat, 1 Jul 2023\nreturned: Tue, 15 Aug 2023\nlate by 45 days\nfine: 44.55"
+            }
+          ],
+          "source_slug": "",
+          "dataset": ""
+        },
+        "example_io": "stdin:  2024-02-20 14\n        2024-03-08 25\n\nstdout: due: Tue, 5 Mar 2024\n        returned: Fri, 8 Mar 2024\n        late by 3 days\n        fine: 0.75",
+        "rubric": [
+          "`PRETTY` is a `static final` formatter built with `Locale.ENGLISH`.",
+          "`daysLate` uses `ChronoUnit.DAYS.between`, not `Period.getDays()`.",
+          "`daysLate` never returns a negative number.",
+          "`money` passes `Locale.ROOT` to `String.format`.",
+          "No `LocalDate` method is called with its result ignored."
+        ],
+        "reference": "",
+        "stretch": null
+      },
+      "objectives": [
+        "Explain why int overflow is silent, and use the `*Exact` methods to make it loud.",
+        "Say why `Math.abs(Integer.MIN_VALUE)` is negative.",
+        "Choose between `%` and `Math.floorMod`, and `/` and `Math.floorDiv`, for negative operands.",
+        "Predict the result and type of `Math.round`, `Math.floor`, `Math.ceil` and an `(int)` cast.",
+        "Use `Objects.equals`, `Objects.hash`, `Objects.toString` and `Objects.requireNonNull`.",
+        "Use a seeded `Random` to make output reproducible, and avoid the reseeding and off-by-one bugs.",
+        "Shuffle reproducibly with `Collections.shuffle(list, rnd)`.",
+        "Do date arithmetic with `LocalDate`, remembering that every method returns a new value.",
+        "Explain why chained `plusMonths(1)` drifts, and compute a schedule from its start instead.",
+        "Distinguish `ChronoUnit.DAYS.between` from `Period.between`.",
+        "Write `String.format` specifiers for width, alignment, padding and precision.",
+        "Say when to pass `Locale.ROOT`, and fix a `DateTimeFormatter` pattern that uses `mm` for month."
+      ],
+      "why": "Interviewers rarely ask about these APIs directly - they show up as the bug in your solution. An average that goes negative in the wrong direction, a circular buffer that crashes on a negative index, a sum that wraps, a date that never moves, a test that passes on your laptop and fails on the CI machine in another country. Knowing exactly where each of these bites is what lets you write the correct version first time, and explain why it is correct.",
+      "est_minutes": 300,
+      "glossary": [
+        {
+          "term": "Integer overflow",
+          "def": "When an int result does not fit in 32 bits it wraps round, silently. `Integer.MAX_VALUE + 1` is `Integer.MIN_VALUE`."
+        },
+        {
+          "term": "Math.addExact",
+          "def": "Adds two ints (or longs) and throws ArithmeticException instead of wrapping. Also `subtractExact`, `multiplyExact`, `negateExact`, `toIntExact`."
+        },
+        {
+          "term": "Math.floorMod",
+          "def": "A modulus whose result takes the sign of the divisor - always 0..n-1 for a positive n. Unlike `%`, which is a remainder."
+        },
+        {
+          "term": "Math.floorDiv",
+          "def": "Integer division that rounds down (toward negative infinity), where `/` truncates toward zero."
+        },
+        {
+          "term": "Math.round",
+          "def": "`floor(x + 0.5)`: halves round up. Returns a long for a double argument."
+        },
+        {
+          "term": "Objects.requireNonNull",
+          "def": "Returns its argument, or throws NullPointerException with your message if it is null - at the point the bad value arrives."
+        },
+        {
+          "term": "Seed",
+          "def": "The starting state of a pseudo-random generator. The same seed always produces the same sequence."
+        },
+        {
+          "term": "SecureRandom",
+          "def": "A generator whose output cannot feasibly be predicted - the one to use for tokens, keys and passwords."
+        },
+        {
+          "term": "LocalDate",
+          "def": "An immutable calendar date with no time or time zone."
+        },
+        {
+          "term": "Period",
+          "def": "A date-based amount of time in years, months and days - `P1Y2M3D`."
+        },
+        {
+          "term": "ChronoUnit.DAYS.between",
+          "def": "The total number of days between two dates, as a long."
+        },
+        {
+          "term": "DateTimeFormatter",
+          "def": "An immutable, thread-safe pattern for printing and parsing dates and times."
+        },
+        {
+          "term": "Locale.ROOT",
+          "def": "The neutral locale. Pass it when output is data another program will read."
+        }
+      ],
+      "cheatsheet": "```java\n// --- Math: make failure loud --------------------------------------------------\nMath.addExact(a, b)  Math.multiplyExact(a, b)  Math.toIntExact(someLong)  // throw\nMath.abs(Integer.MIN_VALUE)          // -2147483648 - still negative\n-1 % 5  == -1        Math.floorMod(-1, 5)  == 4     // circular index: floorMod\n-7 / 2  == -3        Math.floorDiv(-7, 2)  == -4\nMath.round(2.5) == 3   Math.round(-2.5) == -2       // long; halves go up\nMath.floor(-2.5) == -3.0   Math.ceil(2.1) == 3.0    // double!\n(int) -2.9 == -2                                    // truncates toward zero\n\n// --- Objects: null-safe ---------------------------------------------------------\nObjects.equals(a, b)                 // null-safe equals\nObjects.hash(key, count)             // several fields -> one hash (null = 0)\nObjects.hashCode(x)                  // ONE value; 0 for null (not the same as hash(x))\nObjects.toString(x, \"(none)\")        // default for null\nthis.name = Objects.requireNonNull(name, \"name\");   // reject at the door\nlist.stream().filter(Objects::nonNull)\n\n// --- Random ------------------------------------------------------------------\nRandom rnd = new Random(42);         // create ONCE; same seed, same sequence\nrnd.nextInt(6) + 1                   // a die: bound is exclusive\nrnd.nextInt(hi - lo + 1) + lo        // lo..hi inclusive\nCollections.shuffle(list, rnd);      // reproducible shuffle\n// secrets: SecureRandom.   threads: ThreadLocalRandom.current().\n\n// --- LocalDate -----------------------------------------------------------------\nLocalDate d = LocalDate.parse(\"2024-01-31\");\nd = d.plusDays(1);                   // ASSIGN - it is immutable\nd.getDayOfWeek()  d.isLeapYear()  d.lengthOfMonth()  d.isBefore(e)\nLocalDate.of(2024, 1, 31).plusMonths(1)    // 2024-02-29 (clamped)\nstart.plusMonths(i)                  // schedules: from the START, never chained\nChronoUnit.DAYS.between(a, b)        // total days (long)\nPeriod.between(a, b)                 // P1Y1M1D; getDays() is only the days PART\n\n// --- Formatting ------------------------------------------------------------------\nString.format(Locale.ROOT, \"%-8s|%5d|%05d|%.2f|%x|%%\", s, n, n, x, n)\nDateTimeFormatter f = DateTimeFormatter.ofPattern(\"dd/MM/yyyy\");   // MM month, mm MINUTE\nLocalDate.parse(\"31/01/2024\", f);   d.format(f);\nDateTimeFormatter.ofPattern(\"EEE, d MMM yyyy\", Locale.ENGLISH)      // names need a locale\n```\n",
+      "self_check": [
+        "Can you say what `Integer.MAX_VALUE + 1` is, and which method would have thrown instead?",
+        "Can you explain why checking only the final total misses some overflows?",
+        "Can you give `-7 % 3`, `Math.floorMod(-7, 3)`, `-7 / 2` and `Math.floorDiv(-7, 2)`?",
+        "Can you say what `Math.round(-2.5)` returns, and its type?",
+        "Can you say why `Objects.hash(x)` differs from `Objects.hashCode(x)`?",
+        "Can you explain what a seed is, and why seeding makes a program testable?",
+        "Can you spot the bug in `new Random(seed)` inside a loop?",
+        "Can you explain why `d.plusDays(1);` does nothing?",
+        "Can you explain why adding one month three times can differ from adding three months?",
+        "Can you say when `Period.getDays()` is the wrong way to count days?",
+        "Can you say what `mm` means in a date pattern, and what happens if you use it on a LocalDate?",
+        "Can you say when to pass `Locale.ROOT`, and what can go wrong without it?"
+      ],
+      "review": [
+        {
+          "question": "A running `int` total goes 2e9, 4e9, 2e9. Checking only the final value…",
+          "options": [
+            "misses the overflow in the middle",
+            "catches it",
+            "throws",
+            "is exact"
+          ],
+          "answer": 0,
+          "explanation": "The middle step wrapped. `addExact` checks every step."
+        },
+        {
+          "question": "A circular buffer of size n steps back from index 0. The safe index is…",
+          "options": [
+            "Math.floorMod(i - 1, n)",
+            "(i - 1) % n",
+            "Math.abs(i - 1) % n",
+            "i - 1"
+          ],
+          "answer": 0,
+          "explanation": "`%` would give -1 and an out-of-bounds exception."
+        },
+        {
+          "question": "`for (...) { new Random(7).nextInt(10); }` produces…",
+          "options": [
+            "the same number every iteration",
+            "a random sequence",
+            "an exception",
+            "a different number each time"
+          ],
+          "answer": 0,
+          "explanation": "Each new generator restarts the same sequence."
+        },
+        {
+          "question": "Monthly dates for a loan taken on 31 January should be computed as…",
+          "options": [
+            "start.plusMonths(i)",
+            "d = d.plusMonths(1) repeatedly",
+            "d.plusDays(30 * i)",
+            "Period.ofMonths(i).getDays()"
+          ],
+          "answer": 0,
+          "explanation": "Chaining lets a clamped day stick."
+        },
+        {
+          "question": "`String.format(\"%.2f\", x)` in a CSV export is a bug because…",
+          "options": [
+            "the default locale may use a comma as the decimal separator",
+            "it rounds",
+            "it is slow",
+            "it adds spaces"
+          ],
+          "answer": 0,
+          "explanation": "Pass `Locale.ROOT` for anything a program will read back."
+        }
+      ],
+      "milestone": "You know where the standard library fails quietly - overflow, negative remainders, reseeded generators, ignored dates, drifting months and locale-dependent output - and you reach for the version that fails loudly, or not at all.",
+      "practice": [
+        {
+          "key": "p32-math",
+          "title": "Arithmetic that fails loudly",
+          "pattern": "`floorMod`, `floorDiv`, the `*Exact` methods and `Math.round`.",
+          "intro": "Three habits, each replacing an operator that is quietly wrong for some inputs:\n\n```java\nMath.floorMod(k, n)        // not k % n       - negative k\nMath.floorDiv(v, 10)       // not v / 10      - negative v rounds DOWN\nMath.multiplyExact(a, b)   // not a * b       - throws instead of wrapping\n```\n\nAnd one to remember the shape of: `Math.round(x)` is `floor(x + 0.5)` and\nreturns a `long`, so `Math.round(-2.5)` is `-2`.\n\nThe worked case: 13! does not fit in an `int`. Multiplying with `*` gives\n`1932053504` - wrong, and plausible. `multiplyExact` throws at 13, which is the\nonly honest answer.\n",
+          "exercises": [
+            {
+              "id": "j32-pa-clock",
+              "title": "The 24-hour clock",
+              "prompt": "Each line is an hour `h` and an offset `k` in hours (possibly negative). Print the hour on a 24-hour clock after the offset.",
+              "hint": "`(h + k) % 24` goes negative for a large negative offset.",
+              "hints": [
+                "`(h + k) % 24` goes negative for a large negative offset.",
+                "`Math.floorMod(h + k, 24)` always lands in 0..23.",
+                "One hour before midnight (0, -1) is 23."
+              ],
+              "language": "java",
+              "kind": "challenge",
+              "difficulty": "Intro",
+              "starter": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n____\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int q = sc.nextInt();\n        for (int i = 0; i < q; i++) {\n            int h = sc.nextInt();\n            int k = sc.nextInt();\n            System.out.println(Math.floorMod(h + k, 24));\n        }\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "2\n9 5\n22 3",
+                  "output": "14\n1"
+                },
+                {
+                  "input": "1\n0 -1",
+                  "output": "23"
+                },
+                {
+                  "input": "2\n5 -30\n12 48",
+                  "output": "23\n12"
+                },
+                {
+                  "input": "2\n23 1\n1 -25",
+                  "output": "0\n0"
+                },
+                {
+                  "input": "3\n7 0\n18 -18\n3 100",
+                  "output": "7\n0\n7"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "j32-pa-bucket",
+              "title": "Buckets of ten",
+              "prompt": "Each value belongs to the bucket `floor(v / 10)`, so -1 is in bucket -1 and 15 in bucket 1. Print `v -> bucket` for each.",
+              "hint": "`-1 / 10` is 0 in Java - it truncates toward zero.",
+              "hints": [
+                "`-1 / 10` is 0 in Java - it truncates toward zero.",
+                "Bucket boundaries must not have a double-width bucket around zero.",
+                "`Math.floorDiv(v, 10)` rounds down: -1 goes to -1."
+              ],
+              "language": "java",
+              "kind": "challenge",
+              "difficulty": "Easy",
+              "starter": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n____\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] a = new int[n];\n        for (int i = 0; i < n; i++) a[i] = sc.nextInt();\n        for (int v : a) {\n            System.out.println(v + \" -> \" + Math.floorDiv(v, 10));\n        }\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "2\n15 -1",
+                  "output": "15 -> 1\n-1 -> -1"
+                },
+                {
+                  "input": "3\n0 9 10",
+                  "output": "0 -> 0\n9 -> 0\n10 -> 1"
+                },
+                {
+                  "input": "2\n-10 -11",
+                  "output": "-10 -> -1\n-11 -> -2"
+                },
+                {
+                  "input": "3\n99 -99 5",
+                  "output": "99 -> 9\n-99 -> -10\n5 -> 0"
+                },
+                {
+                  "input": "1\n-5",
+                  "output": "-5 -> -1"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "j32-pa-factorial",
+              "title": "Factorials until they break",
+              "prompt": "Print `k! = value` for k = 1..n using `int` arithmetic, but the moment a factorial does not fit, print `overflow at k` and stop.",
+              "hint": "`f * k` wraps silently at 13!; `Math.multiplyExact(f, k)` throws.",
+              "hints": [
+                "`f * k` wraps silently at 13!; `Math.multiplyExact(f, k)` throws.",
+                "Put the `try` INSIDE the loop, so the catch block still knows `k`.",
+                "`break` after reporting - there is nothing sensible to multiply next.",
+                "12! = 479001600 is the largest factorial an int can hold."
+              ],
+              "language": "java",
+              "kind": "challenge",
+              "difficulty": "Medium",
+              "starter": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n____\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int f = 1;\n        for (int k = 1; k <= n; k++) {\n            try {\n                f = Math.multiplyExact(f, k);\n            } catch (ArithmeticException e) {\n                System.out.println(\"overflow at \" + k);\n                break;\n            }\n            System.out.println(k + \"! = \" + f);\n        }\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "5",
+                  "output": "1! = 1\n2! = 2\n3! = 6\n4! = 24\n5! = 120"
+                },
+                {
+                  "input": "12",
+                  "output": "1! = 1\n2! = 2\n3! = 6\n4! = 24\n5! = 120\n6! = 720\n7! = 5040\n8! = 40320\n9! = 362880\n10! = 3628800\n11! = 39916800\n12! = 479001600"
+                },
+                {
+                  "input": "13",
+                  "output": "1! = 1\n2! = 2\n3! = 6\n4! = 24\n5! = 120\n6! = 720\n7! = 5040\n8! = 40320\n9! = 362880\n10! = 3628800\n11! = 39916800\n12! = 479001600\noverflow at 13"
+                },
+                {
+                  "input": "15",
+                  "output": "1! = 1\n2! = 2\n3! = 6\n4! = 24\n5! = 120\n6! = 720\n7! = 5040\n8! = 40320\n9! = 362880\n10! = 3628800\n11! = 39916800\n12! = 479001600\noverflow at 13"
+                },
+                {
+                  "input": "1",
+                  "output": "1! = 1"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "j32-pa-power",
+              "title": "Powers that must be exact",
+              "prompt": "Read a base and an exponent and print base^exponent as a `long` computed by repeated `multiplyExact` - or `overflow` if it does not fit.",
+              "hint": "`Math.pow` returns a double, which cannot hold every long exactly.",
+              "hints": [
+                "`Math.pow` returns a double, which cannot hold every long exactly.",
+                "`Math.multiplyExact(long, long)` throws on overflow.",
+                "2^63 does not fit, but (-2)^63 does: it is exactly `Long.MIN_VALUE`.",
+                "3^39 fits; 3^40 would not."
+              ],
+              "language": "java",
+              "kind": "challenge",
+              "difficulty": "Medium",
+              "starter": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n____\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        long base = sc.nextLong();\n        int exp = sc.nextInt();\n        long result = 1;\n        try {\n            for (int i = 0; i < exp; i++) {\n                result = Math.multiplyExact(result, base);\n            }\n            System.out.println(result);\n        } catch (ArithmeticException e) {\n            System.out.println(\"overflow\");\n        }\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "2 62",
+                  "output": "4611686018427387904"
+                },
+                {
+                  "input": "2 63",
+                  "output": "overflow"
+                },
+                {
+                  "input": "3 39",
+                  "output": "4052555153018976267"
+                },
+                {
+                  "input": "-2 63",
+                  "output": "-9223372036854775808"
+                },
+                {
+                  "input": "10 18",
+                  "output": "1000000000000000000"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "j32-pa-nearest",
+              "title": "Rounding to a multiple",
+              "prompt": "For each `x m` pair print two numbers: `x` rounded to the NEAREST multiple of `m` (halves go up, as `Math.round` does), and `x` rounded DOWN to a multiple of `m`.",
+              "hint": "Divide in double, round, then multiply back.",
+              "hints": [
+                "Divide in double, round, then multiply back.",
+                "`Math.round` returns a long, so `nearest` is a long.",
+                "-25 to the nearest 10 is -20: `Math.round(-2.5)` is -2.",
+                "Rounding down is `Math.floorDiv(x, m) * m` - for -17 and 5 that is -20, where `(x / m) * m` would give -15."
+              ],
+              "language": "java",
+              "kind": "challenge",
+              "difficulty": "Hard",
+              "starter": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n____\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int q = sc.nextInt();\n        for (int i = 0; i < q; i++) {\n            int x = sc.nextInt();\n            int m = sc.nextInt();\n            long nearest = Math.round((double) x / m) * m;\n            int down = Math.floorDiv(x, m) * m;\n            System.out.println(nearest + \" \" + down);\n        }\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "2\n17 5\n-17 5",
+                  "output": "15 15\n-15 -20"
+                },
+                {
+                  "input": "2\n25 10\n-25 10",
+                  "output": "30 20\n-20 -30"
+                },
+                {
+                  "input": "1\n7 7",
+                  "output": "7 7"
+                },
+                {
+                  "input": "2\n-1 4\n2 4",
+                  "output": "0 -4\n4 0"
+                },
+                {
+                  "input": "3\n149 100\n150 100\n-150 100",
+                  "output": "100 100\n200 100\n-100 -200"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            }
+          ]
+        },
+        {
+          "key": "p32-objects",
+          "title": "Null-safe with `Objects`",
+          "pattern": "`equals`, `toString`, `nonNull`, `requireNonNull` and `hash` - null handled once, in the library.",
+          "intro": "Each of these replaces a null check you would otherwise write by hand:\n\n```java\nObjects.equals(a, b)                   // a == null ? b == null : a.equals(b)\nObjects.toString(x, \"?\")               // x == null ? \"?\" : x.toString()\nObjects::nonNull                       // x -> x != null, as a Predicate\nObjects.requireNonNull(x, \"x is required\")   // throw here, with this message\nObjects.hash(a, b)                     // 31 * (31 + h(a)) + h(b), null = 0\n```\n\nEvery drill reads tokens where `-` stands for null, through a small `read`\nhelper, so null really does reach the code being tested.\n",
+          "exercises": [
+            {
+              "id": "j32-pb-count",
+              "title": "How many pairs match",
+              "prompt": "Count the pairs whose two tokens are equal (`-` is null, and two nulls count as equal). Write `countEqual`.",
+              "hint": "`left[i].equals(right[i])` throws when the left one is null.",
+              "hints": [
+                "`left[i].equals(right[i])` throws when the left one is null.",
+                "`Objects.equals` is null-safe on both sides.",
+                "`pear` and `Pear` are different Strings - equals is case-sensitive.",
+                "`read` is part of the region: it turns `-` into null."
+              ],
+              "language": "java",
+              "kind": "challenge",
+              "difficulty": "Intro",
+              "starter": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n____\n\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        String[] left = new String[n];\n        String[] right = new String[n];\n        for (int i = 0; i < n; i++) {\n            left[i] = read(sc);\n            right[i] = read(sc);\n        }\n        System.out.println(countEqual(left, right));\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    static String read(Scanner sc) {\n        String token = sc.next();\n        return token.equals(\"-\") ? null : token;\n    }\n\n    static int countEqual(String[] left, String[] right) {\n        int count = 0;\n        for (int i = 0; i < left.length; i++) {\n            if (Objects.equals(left[i], right[i])) {\n                count++;\n            }\n        }\n        return count;\n    }\n\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        String[] left = new String[n];\n        String[] right = new String[n];\n        for (int i = 0; i < n; i++) {\n            left[i] = read(sc);\n            right[i] = read(sc);\n        }\n        System.out.println(countEqual(left, right));\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "3\nada ada\n- ada\n- -",
+                  "output": "2"
+                },
+                {
+                  "input": "1\nbo cy",
+                  "output": "0"
+                },
+                {
+                  "input": "4\nx x\ny y\n- z\nq -",
+                  "output": "2"
+                },
+                {
+                  "input": "2\n- -\n- -",
+                  "output": "2"
+                },
+                {
+                  "input": "2\npear Pear\nfig fig",
+                  "output": "1"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "j32-pb-default",
+              "title": "Placeholders in a row",
+              "prompt": "Print all the tokens on one line separated by commas, showing `?` for each null (`-`).",
+              "hint": "Convert `-` to a real null first, then handle the null.",
+              "hints": [
+                "Convert `-` to a real null first, then handle the null.",
+                "`Objects.toString(value, \"?\")` gives the default for null.",
+                "`String.join(\",\", list)` from module 7 builds the line."
+              ],
+              "language": "java",
+              "kind": "challenge",
+              "difficulty": "Easy",
+              "starter": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n____\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        List<String> shown = new ArrayList<>();\n        for (int i = 0; i < n; i++) {\n            String token = sc.next();\n            String value = token.equals(\"-\") ? null : token;\n            shown.add(Objects.toString(value, \"?\"));\n        }\n        System.out.println(String.join(\",\", shown));\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "3\nada - bo",
+                  "output": "ada,?,bo"
+                },
+                {
+                  "input": "1\n-",
+                  "output": "?"
+                },
+                {
+                  "input": "3\nx y z",
+                  "output": "x,y,z"
+                },
+                {
+                  "input": "4\n- - q -",
+                  "output": "?,?,q,?"
+                },
+                {
+                  "input": "2\nsolo -",
+                  "output": "solo,?"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "j32-pb-nonnull",
+              "title": "Counting what is there",
+              "prompt": "Read the tokens into a list (with nulls for `-`) and print how many are non-null, using a stream and a method reference from `Objects`.",
+              "hint": "An `ArrayList` accepts null elements.",
+              "hints": [
+                "An `ArrayList` accepts null elements.",
+                "`filter(Objects::nonNull)` keeps the present ones.",
+                "`count()` returns a long.",
+                "The second line shows the list itself still holds the nulls."
+              ],
+              "language": "java",
+              "kind": "challenge",
+              "difficulty": "Easy",
+              "starter": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n____\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        List<String> values = new ArrayList<>();\n        for (int i = 0; i < n; i++) {\n            String token = sc.next();\n            values.add(token.equals(\"-\") ? null : token);\n        }\n        System.out.println(values.stream().filter(Objects::nonNull).count());\n        System.out.println(values.size());\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "3\nada - bo",
+                  "output": "2\n3"
+                },
+                {
+                  "input": "1\n-",
+                  "output": "0\n1"
+                },
+                {
+                  "input": "3\nx y z",
+                  "output": "3\n3"
+                },
+                {
+                  "input": "4\n- - q -",
+                  "output": "1\n4"
+                },
+                {
+                  "input": "2\nsolo -",
+                  "output": "1\n2"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "j32-pb-message",
+              "title": "Refused, with a reason",
+              "prompt": "An `Account` needs both an owner and a currency. Write the constructor's two lines so a missing one is rejected with the message `owner is required` or `currency is required`. `main` prints either the account or the message.",
+              "hint": "`Objects.requireNonNull(x, message)` puts YOUR message on the exception.",
+              "hints": [
+                "`Objects.requireNonNull(x, message)` puts YOUR message on the exception.",
+                "Check the owner first - when both are missing, the owner's message wins.",
+                "The message is the whole point: it names the field that was missing.",
+                "This is the one exception message it is safe to print, because you wrote it."
+              ],
+              "language": "java",
+              "kind": "challenge",
+              "difficulty": "Medium",
+              "starter": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\n\nclass Account {\n    private final String owner;\n    private final String currency;\n\n    Account(String owner, String currency) {\n____\n    }\n\n    String describe() {\n        return owner + \" \" + currency;\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        for (int i = 0; i < n; i++) {\n            String o = sc.next();\n            String c = sc.next();\n            try {\n                Account a = new Account(o.equals(\"-\") ? null : o,\n                                        c.equals(\"-\") ? null : c);\n                System.out.println(a.describe());\n            } catch (NullPointerException e) {\n                System.out.println(e.getMessage());\n            }\n        }\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\n\nclass Account {\n    private final String owner;\n    private final String currency;\n\n    Account(String owner, String currency) {\n        this.owner = Objects.requireNonNull(owner, \"owner is required\");\n        this.currency = Objects.requireNonNull(currency, \"currency is required\");\n    }\n\n    String describe() {\n        return owner + \" \" + currency;\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        for (int i = 0; i < n; i++) {\n            String o = sc.next();\n            String c = sc.next();\n            try {\n                Account a = new Account(o.equals(\"-\") ? null : o,\n                                        c.equals(\"-\") ? null : c);\n                System.out.println(a.describe());\n            } catch (NullPointerException e) {\n                System.out.println(e.getMessage());\n            }\n        }\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "2\nada EUR\n- USD",
+                  "output": "ada EUR\nowner is required"
+                },
+                {
+                  "input": "1\nbo -",
+                  "output": "currency is required"
+                },
+                {
+                  "input": "2\n- -\ncy JPY",
+                  "output": "owner is required\ncy JPY"
+                },
+                {
+                  "input": "1\ngrace GBP",
+                  "output": "grace GBP"
+                },
+                {
+                  "input": "3\nx -\n- y\nz CHF",
+                  "output": "currency is required\nowner is required\nz CHF"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "j32-pb-hashes",
+              "title": "`hash` versus `hashCode`",
+              "prompt": "For each pair of tokens (`-` is null) print `Objects.hash(a, b)`, then `Objects.hashCode(a)`, separated by a space.",
+              "hint": "`Objects.hash(a, b)` is `31 * (31 * 1 + h(a)) + h(b)`, with null as 0.",
+              "hints": [
+                "`Objects.hash(a, b)` is `31 * (31 * 1 + h(a)) + h(b)`, with null as 0.",
+                "`Objects.hashCode(a)` is just `a.hashCode()`, or 0 for null.",
+                "Both are null-safe; neither throws.",
+                "`\"Aa\"` and `\"BB\"` have the SAME String hash (2112) - a real collision, which is why equal hashes never prove equality."
+              ],
+              "language": "java",
+              "kind": "challenge",
+              "difficulty": "Hard",
+              "starter": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n____\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        for (int i = 0; i < n; i++) {\n            String x = sc.next();\n            String y = sc.next();\n            String a = x.equals(\"-\") ? null : x;\n            String b = y.equals(\"-\") ? null : y;\n            System.out.println(Objects.hash(a, b) + \" \" + Objects.hashCode(a));\n        }\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "1\nada bo",
+                  "output": "2992944 96414"
+                },
+                {
+                  "input": "1\n- x",
+                  "output": "1081 0"
+                },
+                {
+                  "input": "2\na -\n- -",
+                  "output": "3968 97\n961 0"
+                },
+                {
+                  "input": "1\nhello world",
+                  "output": "-1107615551 99162322"
+                },
+                {
+                  "input": "1\nAa BB",
+                  "output": "68545 2112"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            }
+          ]
+        },
+        {
+          "key": "p32-random",
+          "title": "Seeded randomness",
+          "pattern": "One generator, created once, from a seed - so every run is the same run.",
+          "intro": "```java\nRandom rnd = new Random(seed);   // once, before any loop\nrnd.nextInt(6) + 1               // a die\nrnd.nextBoolean()                // a coin\nCollections.shuffle(list, rnd);  // a reproducible shuffle\n```\n\nThe judge can check these programs only because a seeded `Random` is\ndeterministic: its algorithm is part of the Java specification. The same seed\ngives the same numbers on every machine - which is exactly what you want from a\nsimulation you need to debug.\n",
+          "exercises": [
+            {
+              "id": "j32-pc-coin",
+              "title": "Heads or tails",
+              "prompt": "Read a seed and a count. Flip a coin that many times with `nextBoolean` (true is heads), print the flips as a string of `H` and `T`, then the number of heads.",
+              "hint": "Create the `Random` once, above the loop.",
+              "hints": [
+                "Create the `Random` once, above the loop.",
+                "`nextBoolean()` is the coin.",
+                "Build the string with a `StringBuilder`."
+              ],
+              "language": "java",
+              "kind": "challenge",
+              "difficulty": "Intro",
+              "starter": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n____\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        long seed = sc.nextLong();\n        int n = sc.nextInt();\n        Random rnd = new Random(seed);\n        StringBuilder flips = new StringBuilder();\n        int heads = 0;\n        for (int i = 0; i < n; i++) {\n            if (rnd.nextBoolean()) {\n                flips.append('H');\n                heads++;\n            } else {\n                flips.append('T');\n            }\n        }\n        System.out.println(flips);\n        System.out.println(heads);\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "42 8",
+                  "output": "HTHTTHTH\n4"
+                },
+                {
+                  "input": "7 5",
+                  "output": "HHHTT\n3"
+                },
+                {
+                  "input": "2024 10",
+                  "output": "HHTHHHTHHH\n8"
+                },
+                {
+                  "input": "1 3",
+                  "output": "HTT\n1"
+                },
+                {
+                  "input": "99 6",
+                  "output": "HTTHHT\n3"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "j32-pc-sum",
+              "title": "Total of the dice",
+              "prompt": "Read a seed and a count, roll that many six-sided dice from one generator, and print their total.",
+              "hint": "`rnd.nextInt(6) + 1` is one die.",
+              "hints": [
+                "`rnd.nextInt(6) + 1` is one die.",
+                "One generator for all the rolls.",
+                "The smallest possible total is n, the largest 6n."
+              ],
+              "language": "java",
+              "kind": "challenge",
+              "difficulty": "Easy",
+              "starter": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n____\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        long seed = sc.nextLong();\n        int n = sc.nextInt();\n        Random rnd = new Random(seed);\n        int total = 0;\n        for (int i = 0; i < n; i++) {\n            total += rnd.nextInt(6) + 1;\n        }\n        System.out.println(total);\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "42 3",
+                  "output": "8"
+                },
+                {
+                  "input": "7 10",
+                  "output": "40"
+                },
+                {
+                  "input": "2024 1",
+                  "output": "1"
+                },
+                {
+                  "input": "1 6",
+                  "output": "23"
+                },
+                {
+                  "input": "99 4",
+                  "output": "13"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "j32-pc-pick",
+              "title": "Pick k without repeats",
+              "prompt": "Read a seed, a list of words and `k`. Choose `k` distinct words at random by shuffling a copy of the list with the seed and taking the first `k`. Print them as a list.",
+              "hint": "Picking k times with `nextInt(n)` could pick the same word twice.",
+              "hints": [
+                "Picking k times with `nextInt(n)` could pick the same word twice.",
+                "Shuffle, then take a prefix: every k-subset is equally likely.",
+                "`subList(0, k)` is a view of the first k elements.",
+                "Shuffle a COPY so the caller's list keeps its order."
+              ],
+              "language": "java",
+              "kind": "challenge",
+              "difficulty": "Medium",
+              "starter": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n____\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        long seed = sc.nextLong();\n        int n = sc.nextInt();\n        List<String> words = new ArrayList<>();\n        for (int i = 0; i < n; i++) {\n            words.add(sc.next());\n        }\n        int k = sc.nextInt();\n        List<String> copy = new ArrayList<>(words);\n        Collections.shuffle(copy, new Random(seed));\n        System.out.println(copy.subList(0, k));\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "42\n5\nada bo cy di ed\n2",
+                  "output": "[bo, cy]"
+                },
+                {
+                  "input": "7\n3\nx y z\n3",
+                  "output": "[x, z, y]"
+                },
+                {
+                  "input": "2024\n4\npear fig plum kiwi\n1",
+                  "output": "[fig]"
+                },
+                {
+                  "input": "1\n6\na b c d e f\n4",
+                  "output": "[e, c, a, b]"
+                },
+                {
+                  "input": "99\n1\nsolo\n1",
+                  "output": "[solo]"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "j32-pc-walk",
+              "title": "A random walk",
+              "prompt": "Start at 0. On each of `n` steps move +1 if `nextBoolean()` is true and -1 otherwise. Print the final position, then the highest position ever reached (the start counts, so it is at least 0).",
+              "hint": "One `nextBoolean()` call per step - calling it twice would consume two values and change every later step.",
+              "hints": [
+                "One `nextBoolean()` call per step - calling it twice would consume two values and change every later step.",
+                "Track the maximum as you go with `Math.max`.",
+                "`best` starts at 0 because the walk starts at 0."
+              ],
+              "language": "java",
+              "kind": "challenge",
+              "difficulty": "Medium",
+              "starter": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n____\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        long seed = sc.nextLong();\n        int n = sc.nextInt();\n        Random rnd = new Random(seed);\n        int pos = 0;\n        int best = 0;\n        for (int i = 0; i < n; i++) {\n            pos += rnd.nextBoolean() ? 1 : -1;\n            best = Math.max(best, pos);\n        }\n        System.out.println(pos);\n        System.out.println(best);\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "42 10",
+                  "output": "0\n1"
+                },
+                {
+                  "input": "7 5",
+                  "output": "1\n3"
+                },
+                {
+                  "input": "2024 20",
+                  "output": "2\n6"
+                },
+                {
+                  "input": "1 1",
+                  "output": "1\n1"
+                },
+                {
+                  "input": "99 15",
+                  "output": "3\n3"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "j32-pc-fisher",
+              "title": "Fisher-Yates by hand",
+              "prompt": "Write `shuffle(int[] a, Random rnd)`: walk from the last index down to 1, swapping each position with a random index at or before it. Done right, it matches `Collections.shuffle` with the same seed exactly - `main` checks.",
+              "hint": "Position `i` may swap with any index `0..i` - including itself.",
+              "hints": [
+                "Position `i` may swap with any index `0..i` - including itself.",
+                "That is `rnd.nextInt(i + 1)`.",
+                "Walking DOWN from the end is what `Collections.shuffle` does too, which is why the two agree draw for draw.",
+                "Using `nextInt(a.length)` for every position looks random and is biased.",
+                "Stop at 1: position 0 has only itself to swap with."
+              ],
+              "language": "java",
+              "kind": "challenge",
+              "difficulty": "Hard",
+              "starter": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n____\n\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        long seed = sc.nextLong();\n        int n = sc.nextInt();\n        int[] a = new int[n];\n        List<Integer> list = new ArrayList<>();\n        for (int i = 0; i < n; i++) {\n            a[i] = sc.nextInt();\n            list.add(a[i]);\n        }\n        shuffle(a, new Random(seed));\n        Collections.shuffle(list, new Random(seed));\n        System.out.println(Arrays.toString(a));\n        System.out.println(list);\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    static void shuffle(int[] a, Random rnd) {\n        for (int i = a.length - 1; i > 0; i--) {\n            int j = rnd.nextInt(i + 1);\n            int tmp = a[i];\n            a[i] = a[j];\n            a[j] = tmp;\n        }\n    }\n\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        long seed = sc.nextLong();\n        int n = sc.nextInt();\n        int[] a = new int[n];\n        List<Integer> list = new ArrayList<>();\n        for (int i = 0; i < n; i++) {\n            a[i] = sc.nextInt();\n            list.add(a[i]);\n        }\n        shuffle(a, new Random(seed));\n        Collections.shuffle(list, new Random(seed));\n        System.out.println(Arrays.toString(a));\n        System.out.println(list);\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "42\n5\n1 2 3 4 5",
+                  "output": "[2, 3, 4, 5, 1]\n[2, 3, 4, 5, 1]"
+                },
+                {
+                  "input": "7\n3\n10 20 30",
+                  "output": "[10, 30, 20]\n[10, 30, 20]"
+                },
+                {
+                  "input": "2024\n6\n5 4 3 2 1 0",
+                  "output": "[2, 3, 1, 0, 4, 5]\n[2, 3, 1, 0, 4, 5]"
+                },
+                {
+                  "input": "1\n2\n9 8",
+                  "output": "[9, 8]\n[9, 8]"
+                },
+                {
+                  "input": "99\n7\n3 1 4 1 5 9 2",
+                  "output": "[1, 1, 3, 9, 2, 4, 5]\n[1, 1, 3, 9, 2, 4, 5]"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            }
+          ]
+        },
+        {
+          "key": "p32-dates",
+          "title": "`LocalDate` arithmetic",
+          "pattern": "Immutable dates: every change is a new value, and the calendar's rules are already built in.",
+          "intro": "```java\nLocalDate d = LocalDate.parse(\"2024-02-29\");\nd.getDayOfWeek()            // THURSDAY\nd.isLeapYear()              // true\nd = d.plusDays(1);          // 2024-03-01 - assign it!\nd.withYear(2023)            // 2023-02-28 - clamped, like plusMonths\nChronoUnit.DAYS.between(a, b)   // total days, signed\nfor (LocalDate x = a; x.isBefore(b); x = x.plusDays(1)) { ... }   // every day in [a, b)\n```\n\nLeap years are the Gregorian rule - divisible by 4, except centuries, except\nevery 400 years - and `LocalDate` applies it for you. 1900 was not a leap year;\n2000 was.\n",
+          "exercises": [
+            {
+              "id": "j32-pd-weekday",
+              "title": "What day was it?",
+              "prompt": "Print the day of the week of each date.",
+              "hint": "`LocalDate.parse` reads ISO `yyyy-MM-dd`.",
+              "hints": [
+                "`LocalDate.parse` reads ISO `yyyy-MM-dd`.",
+                "`getDayOfWeek()` returns a `DayOfWeek` enum, which prints in capitals.",
+                "Print the date first, then the day."
+              ],
+              "language": "java",
+              "kind": "challenge",
+              "difficulty": "Intro",
+              "starter": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n____\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        for (int i = 0; i < n; i++) {\n            LocalDate d = LocalDate.parse(sc.next());\n            System.out.println(d + \" \" + d.getDayOfWeek());\n        }\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "1\n2024-03-03",
+                  "output": "2024-03-03 SUNDAY"
+                },
+                {
+                  "input": "2\n2000-01-01 1999-12-31",
+                  "output": "2000-01-01 SATURDAY\n1999-12-31 FRIDAY"
+                },
+                {
+                  "input": "2\n2024-02-29 2023-02-28",
+                  "output": "2024-02-29 THURSDAY\n2023-02-28 TUESDAY"
+                },
+                {
+                  "input": "1\n1969-07-20",
+                  "output": "1969-07-20 SUNDAY"
+                },
+                {
+                  "input": "2\n2038-01-19 2024-12-25",
+                  "output": "2038-01-19 TUESDAY\n2024-12-25 WEDNESDAY"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "j32-pd-leap",
+              "title": "Leap years",
+              "prompt": "For each year print `year leap` or `year common`, then the number of days in that year's February - asking `LocalDate`, not writing the rule by hand.",
+              "hint": "`LocalDate.of(year, 2, 1)` is any date in that February.",
+              "hints": [
+                "`LocalDate.of(year, 2, 1)` is any date in that February.",
+                "`isLeapYear()` and `lengthOfMonth()` answer both questions.",
+                "1900 and 2100 are common; 2000 and 2400 are leap - the century rule."
+              ],
+              "language": "java",
+              "kind": "challenge",
+              "difficulty": "Easy",
+              "starter": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n____\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        for (int i = 0; i < n; i++) {\n            int year = sc.nextInt();\n            LocalDate feb = LocalDate.of(year, 2, 1);\n            System.out.println(year + \" \" + (feb.isLeapYear() ? \"leap\" : \"common\")\n                    + \" \" + feb.lengthOfMonth());\n        }\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "2\n2024 2023",
+                  "output": "2024 leap 29\n2023 common 28"
+                },
+                {
+                  "input": "1\n1900",
+                  "output": "1900 common 28"
+                },
+                {
+                  "input": "2\n2000 2100",
+                  "output": "2000 leap 29\n2100 common 28"
+                },
+                {
+                  "input": "3\n1996 1997 1998",
+                  "output": "1996 leap 29\n1997 common 28\n1998 common 28"
+                },
+                {
+                  "input": "1\n2400",
+                  "output": "2400 leap 29"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "j32-pd-countdown",
+              "title": "Countdown",
+              "prompt": "Read today's date and an event's date. Print `today`, `in N days`, or `N days ago`.",
+              "hint": "`ChronoUnit.DAYS.between(today, event)` is negative for a past event.",
+              "hints": [
+                "`ChronoUnit.DAYS.between(today, event)` is negative for a past event.",
+                "It returns a `long`.",
+                "Across the end of February, the leap day is counted automatically."
+              ],
+              "language": "java",
+              "kind": "challenge",
+              "difficulty": "Easy",
+              "starter": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n____\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        LocalDate today = LocalDate.parse(sc.next());\n        LocalDate event = LocalDate.parse(sc.next());\n        long n = ChronoUnit.DAYS.between(today, event);\n        if (n == 0) {\n            System.out.println(\"today\");\n        } else if (n > 0) {\n            System.out.println(\"in \" + n + \" days\");\n        } else {\n            System.out.println((-n) + \" days ago\");\n        }\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "2024-01-01\n2024-01-11",
+                  "output": "in 10 days"
+                },
+                {
+                  "input": "2024-03-03\n2024-03-03",
+                  "output": "today"
+                },
+                {
+                  "input": "2024-12-25\n2024-12-20",
+                  "output": "5 days ago"
+                },
+                {
+                  "input": "2023-02-28\n2023-03-01",
+                  "output": "in 1 days"
+                },
+                {
+                  "input": "2024-02-28\n2024-03-01",
+                  "output": "in 2 days"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "j32-pd-workdays",
+              "title": "Working days",
+              "prompt": "Count the weekdays (Monday to Friday) from the first date INCLUSIVE to the second EXCLUSIVE, by walking day by day.",
+              "hint": "A `for` loop works on dates too: `d = d.plusDays(1)` is the step.",
+              "hints": [
+                "A `for` loop works on dates too: `d = d.plusDays(1)` is the step.",
+                "`isBefore(to)` makes the end exclusive.",
+                "`DayOfWeek` is an enum, so compare with `==`.",
+                "A Monday-to-Monday week has exactly five working days."
+              ],
+              "language": "java",
+              "kind": "challenge",
+              "difficulty": "Medium",
+              "starter": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n____\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        LocalDate from = LocalDate.parse(sc.next());\n        LocalDate to = LocalDate.parse(sc.next());\n        int count = 0;\n        for (LocalDate d = from; d.isBefore(to); d = d.plusDays(1)) {\n            DayOfWeek w = d.getDayOfWeek();\n            if (w != DayOfWeek.SATURDAY && w != DayOfWeek.SUNDAY) {\n                count++;\n            }\n        }\n        System.out.println(count);\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "2024-03-04\n2024-03-11",
+                  "output": "5"
+                },
+                {
+                  "input": "2024-03-09\n2024-03-11",
+                  "output": "0"
+                },
+                {
+                  "input": "2024-02-26\n2024-03-25",
+                  "output": "20"
+                },
+                {
+                  "input": "2024-03-03\n2024-03-03",
+                  "output": "0"
+                },
+                {
+                  "input": "2023-12-29\n2024-01-02",
+                  "output": "2"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "j32-pd-birthday",
+              "title": "Age and the next birthday",
+              "prompt": "Read a birth date and today's date. Print the age in whole years, the date of the next birthday (today counts), and how many days away it is. A 29 February birthday falls on 28 February in a common year.",
+              "hint": "`Period.between(birth, today).getYears()` is the age - here the years PART is exactly what you want.",
+              "hints": [
+                "`Period.between(birth, today).getYears()` is the age - here the years PART is exactly what you want.",
+                "`withYear` moves a date to another year, clamping 29 February.",
+                "If this year's birthday has already passed, use next year's.",
+                "A birthday today is zero days away, not a year away."
+              ],
+              "language": "java",
+              "kind": "challenge",
+              "difficulty": "Hard",
+              "starter": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n____\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        LocalDate birth = LocalDate.parse(sc.next());\n        LocalDate today = LocalDate.parse(sc.next());\n        System.out.println(Period.between(birth, today).getYears());\n        LocalDate next = birth.withYear(today.getYear());\n        if (next.isBefore(today)) {\n            next = birth.withYear(today.getYear() + 1);\n        }\n        System.out.println(next);\n        System.out.println(ChronoUnit.DAYS.between(today, next));\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "1990-05-15\n2024-03-03",
+                  "output": "33\n2024-05-15\n73"
+                },
+                {
+                  "input": "2000-02-29\n2023-03-01",
+                  "output": "23\n2024-02-29\n365"
+                },
+                {
+                  "input": "2000-02-29\n2024-02-28",
+                  "output": "23\n2024-02-29\n1"
+                },
+                {
+                  "input": "2010-03-03\n2024-03-03",
+                  "output": "14\n2024-03-03\n0"
+                },
+                {
+                  "input": "1985-12-31\n2024-01-01",
+                  "output": "38\n2024-12-31\n365"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            }
+          ]
+        },
+        {
+          "key": "p32-format",
+          "title": "Format specifiers",
+          "pattern": "`%[flags][width][.precision]conversion` - and `Locale.ROOT` every time.",
+          "intro": "| spec | `42` | spec | `3.14159` |\n|---|---|---|---|\n| `%5d` | `   42` | `%.2f` | `3.14` |\n| `%-5d` | `42   ` | `%8.3f` | `   3.142` |\n| `%05d` | `00042` | `%.1f%%` | `3.1%` |\n| `%x` / `%X` | `2a` / `2A` | `%s` / `%-6s` | left / padded text |\n\nThe width is a **minimum**: a longer value is never cut off, it just pushes the\nrest of the line along. And every call in this family passes `Locale.ROOT`,\nbecause a program's output is data.\n",
+          "exercises": [
+            {
+              "id": "j32-pe-ids",
+              "title": "Zero-padded IDs",
+              "prompt": "Print each number as a four-digit ID, zero-padded: `ID-0007`.",
+              "hint": "`%04d`: the `0` flag pads with zeros, `4` is the width.",
+              "hints": [
+                "`%04d`: the `0` flag pads with zeros, `4` is the width.",
+                "Numbers wider than 4 are printed in full.",
+                "Pass `Locale.ROOT` first."
+              ],
+              "language": "java",
+              "kind": "challenge",
+              "difficulty": "Intro",
+              "starter": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n____\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] a = new int[n];\n        for (int i = 0; i < n; i++) a[i] = sc.nextInt();\n        for (int x : a) {\n            System.out.println(String.format(Locale.ROOT, \"ID-%04d\", x));\n        }\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "2\n7 42",
+                  "output": "ID-0007\nID-0042"
+                },
+                {
+                  "input": "1\n1",
+                  "output": "ID-0001"
+                },
+                {
+                  "input": "2\n123 4567",
+                  "output": "ID-0123\nID-4567"
+                },
+                {
+                  "input": "2\n0 9999",
+                  "output": "ID-0000\nID-9999"
+                },
+                {
+                  "input": "3\n10 100 1000",
+                  "output": "ID-0010\nID-0100\nID-1000"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "j32-pe-hex",
+              "title": "Decimal and hex",
+              "prompt": "Print each number as `n = 0xhex = 0XHEX` - lower-case hex, then upper-case.",
+              "hint": "`%x` is lower-case hexadecimal, `%X` upper-case.",
+              "hints": [
+                "`%x` is lower-case hexadecimal, `%X` upper-case.",
+                "The same argument is passed three times - one per specifier.",
+                "48879 is `0xbeef`."
+              ],
+              "language": "java",
+              "kind": "challenge",
+              "difficulty": "Easy",
+              "starter": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n____\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] a = new int[n];\n        for (int i = 0; i < n; i++) a[i] = sc.nextInt();\n        for (int x : a) {\n            System.out.println(String.format(Locale.ROOT, \"%d = 0x%x = 0X%X\", x, x, x));\n        }\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "2\n255 16",
+                  "output": "255 = 0xff = 0XFF\n16 = 0x10 = 0X10"
+                },
+                {
+                  "input": "1\n0",
+                  "output": "0 = 0x0 = 0X0"
+                },
+                {
+                  "input": "2\n4096 10",
+                  "output": "4096 = 0x1000 = 0X1000\n10 = 0xa = 0XA"
+                },
+                {
+                  "input": "1\n48879",
+                  "output": "48879 = 0xbeef = 0XBEEF"
+                },
+                {
+                  "input": "3\n1 2 3",
+                  "output": "1 = 0x1 = 0X1\n2 = 0x2 = 0X2\n3 = 0x3 = 0X3"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "j32-pe-percent",
+              "title": "Pass rates",
+              "prompt": "Each line is `passed total`. Print the pass rate as a percentage with one decimal place and a `%` sign, e.g. `75.0%`.",
+              "hint": "`100.0 * passed / total` divides in double - `passed / total` alone would be integer division.",
+              "hints": [
+                "`100.0 * passed / total` divides in double - `passed / total` alone would be integer division.",
+                "`%.1f` is one decimal place.",
+                "A literal percent sign in a format string is written `%%`."
+              ],
+              "language": "java",
+              "kind": "challenge",
+              "difficulty": "Easy",
+              "starter": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n____\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        for (int i = 0; i < n; i++) {\n            int passed = sc.nextInt();\n            int total = sc.nextInt();\n            double rate = 100.0 * passed / total;\n            System.out.println(String.format(Locale.ROOT, \"%.1f%%\", rate));\n        }\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "1\n3 4",
+                  "output": "75.0%"
+                },
+                {
+                  "input": "2\n1 3\n2 3",
+                  "output": "33.3%\n66.7%"
+                },
+                {
+                  "input": "1\n0 5",
+                  "output": "0.0%"
+                },
+                {
+                  "input": "2\n7 7\n1 8",
+                  "output": "100.0%\n12.5%"
+                },
+                {
+                  "input": "1\n5 16",
+                  "output": "31.3%"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "j32-pe-receipt",
+              "title": "A receipt",
+              "prompt": "Each item is `name quantity priceInCents`. Print one line per item as `%-10s x%-3d%8.2f` (name, quantity, line cost in currency units), then a total line `%-14s%8.2f` with the label `TOTAL`.",
+              "hint": "Keep money in whole cents while adding up; divide by `100.0` only to print.",
+              "hints": [
+                "Keep money in whole cents while adding up; divide by `100.0` only to print.",
+                "`%-10s` left-aligns the name in ten characters.",
+                "`%8.2f` right-aligns the cost in eight, with two places.",
+                "`x%-3d` puts the quantity after an `x`, left-aligned in three.",
+                "The total's label is 14 wide so its number lines up with the others."
+              ],
+              "language": "java",
+              "kind": "challenge",
+              "difficulty": "Medium",
+              "starter": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n____\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        long total = 0;\n        for (int i = 0; i < n; i++) {\n            String name = sc.next();\n            int qty = sc.nextInt();\n            int cents = sc.nextInt();\n            long cost = (long) qty * cents;\n            total += cost;\n            System.out.println(String.format(Locale.ROOT, \"%-10s x%-3d%8.2f\",\n                    name, qty, cost / 100.0));\n        }\n        System.out.println(String.format(Locale.ROOT, \"%-14s%8.2f\", \"TOTAL\", total / 100.0));\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "1\ntea 2 350",
+                  "output": "tea        x2      7.00\nTOTAL             7.00"
+                },
+                {
+                  "input": "2\napple 3 45\nbread 1 299",
+                  "output": "apple      x3      1.35\nbread      x1      2.99\nTOTAL             4.34"
+                },
+                {
+                  "input": "1\nx 10 5",
+                  "output": "x          x10     0.50\nTOTAL             0.50"
+                },
+                {
+                  "input": "3\ncoffee 1 1005\nmilk 2 99\njam 1 450",
+                  "output": "coffee     x1     10.05\nmilk       x2      1.98\njam        x1      4.50\nTOTAL            16.53"
+                },
+                {
+                  "input": "1\ncandles 12 125",
+                  "output": "candles    x12    15.00\nTOTAL            15.00"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "j32-pe-shifts",
+              "title": "A timesheet",
+              "prompt": "Each line is a shift `start end` as `HH:mm` times on the same day. Print `start-end Hh MMm` for each (minutes zero-padded), then `total Hh MMm`. Use `LocalTime` and `Duration`.",
+              "hint": "`LocalTime.parse(\"09:15\")` reads `HH:mm`, and prints back the same way.",
+              "hints": [
+                "`LocalTime.parse(\"09:15\")` reads `HH:mm`, and prints back the same way.",
+                "`Duration.between(start, end)` is the length of the shift.",
+                "`toHours()` is whole hours; `toMinutes() % 60` the minutes left over.",
+                "`Duration` is immutable too: `total = total.plus(d);`",
+                "`%02d` zero-pads the minutes to two digits."
+              ],
+              "language": "java",
+              "kind": "challenge",
+              "difficulty": "Hard",
+              "starter": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n____\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.time.*;\nimport java.time.format.*;\nimport java.time.temporal.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        Duration total = Duration.ZERO;\n        for (int i = 0; i < n; i++) {\n            LocalTime start = LocalTime.parse(sc.next());\n            LocalTime end = LocalTime.parse(sc.next());\n            Duration d = Duration.between(start, end);\n            total = total.plus(d);\n            System.out.println(String.format(Locale.ROOT, \"%s-%s %dh %02dm\",\n                    start, end, d.toHours(), d.toMinutes() % 60));\n        }\n        System.out.println(String.format(Locale.ROOT, \"total %dh %02dm\",\n                total.toHours(), total.toMinutes() % 60));\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "1\n09:15 17:45",
+                  "output": "09:15-17:45 8h 30m\ntotal 8h 30m"
+                },
+                {
+                  "input": "2\n08:00 12:00\n13:00 17:30",
+                  "output": "08:00-12:00 4h 00m\n13:00-17:30 4h 30m\ntotal 8h 30m"
+                },
+                {
+                  "input": "1\n22:00 23:59",
+                  "output": "22:00-23:59 1h 59m\ntotal 1h 59m"
+                },
+                {
+                  "input": "2\n00:00 00:01\n10:10 10:10",
+                  "output": "00:00-00:01 0h 01m\n10:10-10:10 0h 00m\ntotal 0h 01m"
+                },
+                {
+                  "input": "3\n07:45 16:20\n09:00 18:15\n12:30 13:00",
+                  "output": "07:45-16:20 8h 35m\n09:00-18:15 9h 15m\n12:30-13:00 0h 30m\ntotal 18h 20m"
                 }
               ],
               "source_slug": "",

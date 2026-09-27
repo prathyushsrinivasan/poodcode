@@ -13,16 +13,16 @@ looking it up.
 **Status legend** — ✅ built and shipping in the app · 🚧 partially built ·
 ⬜ planned.
 
-**Built so far:** Parts 1–8 and Part 10, complete (modules 1–31) — **31 modules,
-147 lessons, 633 judged exercises, plus 775 practice problems** in 155 variation
+**Built so far:** Parts 1–8, 10 and 11, complete (modules 1–32) — **32 modules,
+152 lessons, 654 judged exercises, plus 800 practice problems** in 160 variation
 families.
 
-**Scope note.** Parts 9, 13 and 14 are deliberately **not planned** — file I/O,
-JDBC/Maven/Spring and the backend stack are job skills rather than
-interview-coding material, and the Backend Lab already covers the transport
-half. Part 11 is folded into earlier modules rather than authored, and Part 12
-is already served by the DSA Curriculum and the Mastery track. What remains is,
-possibly, a single senior-level module on the JVM and design patterns.
+**Scope note.** Parts 9 and 14, and the JDBC/Maven/JUnit/logging half of Part
+13, are deliberately **not planned** — file I/O, build tools and the backend
+stack are job skills rather than interview-coding material, and the Backend Lab
+already covers the transport half. Part 12 is already served by the DSA
+Curriculum and the Mastery track. Part 11 is module 32. What remains is the
+language-and-runtime half of Part 13 (see below).
 
 ---
 
@@ -401,10 +401,31 @@ never printed directly
 `CopyOnWrite` for 31. `Concurrent` alone is deliberately not a rule — module 17
 teaches `ConcurrentModificationException`, which is unrelated.)*
 
-## Part 11 — The APIs worth knowing cold ⬜
+## Part 11 — The APIs worth knowing cold ✅
 
-`Math` · `Arrays` · `Collections` · `String` · `StringBuilder` · `Objects` ·
-`Random` · `LocalDate` · `LocalTime` · `LocalDateTime` · `DateTimeFormatter`
+Module 32. `Arrays`, `String`, `StringBuilder` and `Collections` were already
+taught where they were first needed (modules 1, 6–8 and 17–20), so this part is
+the remainder — and each lesson is about the place the API fails *quietly*.
+
+**32. The APIs worth knowing cold** ✅
+`Math`: silent `int` overflow and the `*Exact` methods that make it loud ·
+`Math.abs(Integer.MIN_VALUE)` · `%` vs `floorMod`, `/` vs `floorDiv` ·
+`round`/`floor`/`ceil`/`(int)` and the types they return · `Objects.equals` /
+`hash` / `hashCode` / `toString` / `requireNonNull` / `nonNull` · a **seeded
+`Random`** and why it makes randomness testable · the reseed-in-a-loop and
+exclusive-bound bugs · `Collections.shuffle(list, rnd)` and hand-written
+Fisher–Yates · `SecureRandom` and `ThreadLocalRandom` · `LocalDate` as an
+immutable value · the ignored `plusDays` · `plusMonths` clamping and the
+schedule that drifts · `ChronoUnit.DAYS.between` vs `Period` · `LocalTime` and
+`Duration` · `String.format` specifiers · **`Locale.ROOT`** and why output that
+is data must pass it · `DateTimeFormatter` patterns (`MM` vs `mm`) and locales
+
+*(Judging: `Random(seed)` is specified bit-for-bit by the JDK, so seeded output
+is identical on every JVM; the generator mirrors it in Python, together with
+`Collections.shuffle`, `String.hashCode`, `Period.between` and `%.2f`'s
+HALF_UP-on-the-shortest-decimal rounding — all checked against a real JVM.
+Every `String.format` passes `Locale.ROOT` and every name-printing pattern
+passes `Locale.ENGLISH`.)*
 
 ## Part 12 — Data structures and algorithms in Java ⬜
 
