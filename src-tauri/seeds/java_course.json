@@ -1,7 +1,7 @@
 {
   "key": "java",
   "title": "Java: After the Basics",
-  "subtitle": "You know the syntax — variables, if/else, loops, printing. This is the part that turns that into fluency: arrays in depth, strings in depth, methods, object-oriented programming, exceptions, the collections framework, generics down to erasure and what it costs, then lambdas, stream pipelines from `filter` to `groupingBy`, `Optional`, multithreading from `start()` to thread pools, and the standard-library corners that fail quietly, in thirty-two judged modules. Each module is a goal, four to six lessons, warm-ups that make you predict the output, fill-in-the-blank drills, fix-the-bug programs, a coding challenge, a glossary, a cheat sheet and a project - plus a Practice section of variation drills you can come back to. Nothing ever needs an idea a later module hasn't taught yet.",
+  "subtitle": "You know the syntax — variables, if/else, loops, printing. This is the part that turns that into fluency: arrays in depth, strings in depth, methods, object-oriented programming, exceptions, the collections framework, generics down to erasure and what it costs, then lambdas, stream pipelines from `filter` to `groupingBy`, `Optional`, multithreading from `start()` to thread pools, the standard-library corners that fail quietly, and enums, switch and nested classes, in thirty-three judged modules. Each module is a goal, four to six lessons, warm-ups that make you predict the output, fill-in-the-blank drills, fix-the-bug programs, a coding challenge, a glossary, a cheat sheet and a project - plus a Practice section of variation drills you can come back to. Nothing ever needs an idea a later module hasn't taught yet.",
   "unit_label": "Module",
   "group_label": "Part",
   "weeks": [
@@ -72874,6 +72874,2374 @@
                 {
                   "input": "3\n07:45 16:20\n09:00 18:15\n12:30 13:00",
                   "output": "07:45-16:20 8h 35m\n09:00-18:15 9h 15m\n12:30-13:00 0h 30m\ntotal 18h 20m"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 33,
+      "month": 13,
+      "month_title": "Advanced Java",
+      "theme": "Enums, switch and nested classes",
+      "goal": "The three everyday language features the course had not needed yet - and the ones every design pattern after this relies on.",
+      "summary": "Thirty-two modules without an `enum`, a `switch` or a class inside a class. This\nmodule closes that gap, because the rest of Part 13 cannot do without them.\n\n* **Enums are classes with a fixed set of instances.** Compare with `==`; convert\n  with `valueOf` (case-sensitive, throws on a bad name); list with `values()`;\n  never store `ordinal()`. Constants can carry fields, a lambda each, or a whole\n  method body each.\n* **`EnumMap` and `EnumSet`** are the collections for enum keys - smaller, faster,\n  and iterating in declaration order.\n* **`switch` statements fall through** without `break`. **Switch expressions**\n  (Java 14) do not: arrow arms, comma-separated labels, `yield` for block arms, a\n  value at the end - and, over an enum, a compile error if a constant is missing.\n* **Nested classes**: `static` nested (no outer instance - the default choice),\n  inner (a hidden reference to the outer object, spelled `Outer.this`), local and\n  anonymous. Implementing `Iterable` with an inner iterator makes a class work in\n  an enhanced `for`.\n* **State machines** put all of it together: an enum of states and an exhaustive\n  switch for the transitions.\n",
+      "authored": true,
+      "lessons": [
+        {
+          "key": "m33-enum",
+          "title": "Enums: a fixed set of objects",
+          "what": "Not named integers - a class with exactly the instances you list.",
+          "lesson": "Before Java 5, a set of options was a handful of constants:\n\n```java\nstatic final int NORTH = 0, EAST = 1, SOUTH = 2, WEST = 3;\nvoid move(int direction) { ... }     // move(42) compiles. So does move(EAST + 7).\n```\n\nNothing stops a caller passing an int that means nothing. An **enum** is the\nfix, and it is much more than named numbers:\n\n```java\nenum Direction {\n    NORTH, EAST, SOUTH, WEST\n}\n\nvoid move(Direction d) { ... }       // only these four values - or null - fit\n```\n\nAn enum is **a class with a fixed set of instances**. `Direction.NORTH` is an\nobject, created once when the class loads, and there will never be a fifth\n`Direction`. That has consequences:\n\n* **Compare with `==`.** There is exactly one `NORTH`, so identity is equality -\n  and `==` cannot throw on null, where `.equals` could.\n* **`toString()` and `name()`** both give `\"NORTH\"`. `name()` is final and always\n  the declared name; `toString()` can be overridden for display.\n* **`ordinal()`** is the position in the declaration: `NORTH` is 0. Useful for\n  arithmetic *within* the enum, and **never** something to store in a file or\n  database - reorder the constants and every stored number silently changes\n  meaning.\n* **`Direction.values()`** returns a fresh array of every constant, in order.\n* **`Direction.valueOf(\"EAST\")`** turns a name back into the constant, and\n  throws `IllegalArgumentException` for anything else - including `\"east\"`.\n  Names are case-sensitive.\n\n## Enums can have fields\n\nBecause an enum is a class, each constant can carry data, passed to a\nconstructor:\n\n```java\nenum Coin {\n    PENNY(1), NICKEL(5), DIME(10), QUARTER(25);   // note the semicolon\n\n    private final int cents;\n\n    Coin(int cents) {           // implicitly private: nobody else may call it\n        this.cents = cents;\n    }\n\n    int cents() { return cents; }\n}\n```\n\nThe constants must come first, and when anything follows them, the list ends\nwith a `;`. The constructor is always private - it runs exactly once per\nconstant, and that is the only way instances are ever made.\n",
+          "warmup": [
+            {
+              "question": "`Direction.valueOf(\"east\")` when the constant is `EAST`…",
+              "options": [
+                "throws IllegalArgumentException",
+                "returns EAST",
+                "returns null",
+                "does not compile"
+              ],
+              "answer": 0,
+              "explanation": "Names are case-sensitive. Normalise the input first."
+            },
+            {
+              "question": "Two enum constants are best compared with…",
+              "options": [
+                "==",
+                ".equals only",
+                "compareTo",
+                "their ordinals"
+              ],
+              "answer": 0,
+              "explanation": "Each constant is a single object, and `==` is null-safe."
+            }
+          ],
+          "exercises": [
+            {
+              "id": "j33-en-valueof",
+              "title": "From text to constant",
+              "prompt": "Read direction names and print each one with its position in the declaration. Replace `____` with the conversion from the token.",
+              "hint": "Every enum gets a static `valueOf(String)` for free.",
+              "hints": [
+                "Every enum gets a static `valueOf(String)` for free.",
+                "`Direction.valueOf(token)`",
+                "`ordinal()` is the 0-based position in the declaration.",
+                "Printing the constant prints its name."
+              ],
+              "language": "java",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "starter": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\n\nenum Direction {\n    NORTH, EAST, SOUTH, WEST\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        for (int i = 0; i < n; i++) {\n            String token = sc.next();\n            Direction d = ____;\n            System.out.println(d + \" \" + d.ordinal());\n        }\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\n\nenum Direction {\n    NORTH, EAST, SOUTH, WEST\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        for (int i = 0; i < n; i++) {\n            String token = sc.next();\n            Direction d = Direction.valueOf(token);\n            System.out.println(d + \" \" + d.ordinal());\n        }\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "2\nNORTH WEST",
+                  "output": "NORTH 0\nWEST 3"
+                },
+                {
+                  "input": "1\nSOUTH",
+                  "output": "SOUTH 2"
+                },
+                {
+                  "input": "3\nEAST EAST NORTH",
+                  "output": "EAST 1\nEAST 1\nNORTH 0"
+                },
+                {
+                  "input": "3\nWEST SOUTH EAST",
+                  "output": "WEST 3\nSOUTH 2\nEAST 1"
+                },
+                {
+                  "input": "4\nNORTH SOUTH WEST EAST",
+                  "output": "NORTH 0\nSOUTH 2\nWEST 3\nEAST 1"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "j33-en-case",
+              "title": "The name that did not match",
+              "prompt": "Users type directions in any case. `valueOf` is case-sensitive, so this throws `IllegalArgumentException` on `north`. Normalise the token first - locale-proof, as module 32 taught.",
+              "hint": "The constant is `NORTH`; `valueOf(\"north\")` finds nothing.",
+              "hints": [
+                "The constant is `NORTH`; `valueOf(\"north\")` finds nothing.",
+                "Upper-case the token before looking it up.",
+                "`toUpperCase(Locale.ROOT)` - in a Turkish locale, a plain `toUpperCase()` turns `i` into a dotted capital `İ`, and the lookup fails again.",
+                "`Direction.valueOf(sc.next().toUpperCase(Locale.ROOT))`"
+              ],
+              "language": "java",
+              "kind": "fix",
+              "difficulty": "Easy",
+              "starter": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\n\nenum Direction {\n    NORTH, EAST, SOUTH, WEST\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        for (int i = 0; i < n; i++) {\n            Direction d = Direction.valueOf(sc.next());\n            System.out.println(d + \" \" + d.ordinal());\n        }\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\n\nenum Direction {\n    NORTH, EAST, SOUTH, WEST\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        for (int i = 0; i < n; i++) {\n            Direction d = Direction.valueOf(sc.next().toUpperCase(Locale.ROOT));\n            System.out.println(d + \" \" + d.ordinal());\n        }\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "2\nnorth West",
+                  "output": "NORTH 0\nWEST 3"
+                },
+                {
+                  "input": "1\nSOUTH",
+                  "output": "SOUTH 2"
+                },
+                {
+                  "input": "3\neast EaSt NORTH",
+                  "output": "EAST 1\nEAST 1\nNORTH 0"
+                },
+                {
+                  "input": "2\nwest south",
+                  "output": "WEST 3\nSOUTH 2"
+                },
+                {
+                  "input": "4\nNorth sOuTh WEST east",
+                  "output": "NORTH 0\nSOUTH 2\nWEST 3\nEAST 1"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "j33-en-values",
+              "title": "Every constant, in order",
+              "prompt": "Read one direction and print every OTHER direction, in declaration order. Replace `____` with the array of all the constants.",
+              "hint": "Every enum has a static `values()` returning all its constants.",
+              "hints": [
+                "Every enum has a static `values()` returning all its constants.",
+                "The order is the order they were declared in.",
+                "`d != skip` is the right comparison: there is only one of each.",
+                "`values()` returns a new array each call - cache it if you call it in a hot loop."
+              ],
+              "language": "java",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "starter": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\n\nenum Direction {\n    NORTH, EAST, SOUTH, WEST\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        Direction skip = Direction.valueOf(sc.next());\n        for (Direction d : ____) {\n            if (d != skip) {\n                System.out.println(d);\n            }\n        }\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\n\nenum Direction {\n    NORTH, EAST, SOUTH, WEST\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        Direction skip = Direction.valueOf(sc.next());\n        for (Direction d : Direction.values()) {\n            if (d != skip) {\n                System.out.println(d);\n            }\n        }\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "NORTH",
+                  "output": "EAST\nSOUTH\nWEST"
+                },
+                {
+                  "input": "EAST",
+                  "output": "NORTH\nSOUTH\nWEST"
+                },
+                {
+                  "input": "SOUTH",
+                  "output": "NORTH\nEAST\nWEST"
+                },
+                {
+                  "input": "WEST",
+                  "output": "NORTH\nEAST\nSOUTH"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "j33-en-coins",
+              "title": "Coins that know their value",
+              "prompt": "Write the body of `enum Coin`: four constants carrying their value in cents (1, 5, 10, 25), a private final field, a constructor and a `cents()` getter. `main` prints the total and then each coin with its value.",
+              "hint": "Constants first: `PENNY(1), NICKEL(5), DIME(10), QUARTER(25);`",
+              "hints": [
+                "Constants first: `PENNY(1), NICKEL(5), DIME(10), QUARTER(25);`",
+                "The `;` after the last constant is required once anything follows.",
+                "`private final int cents;` and a constructor `Coin(int cents)`.",
+                "An enum constructor cannot be public - it is private whether you write it or not.",
+                "`int cents() { return cents; }`"
+              ],
+              "language": "java",
+              "kind": "challenge",
+              "difficulty": "Medium",
+              "starter": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\n\nenum Coin {\n____\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        List<Coin> coins = new ArrayList<>();\n        int total = 0;\n        for (int i = 0; i < n; i++) {\n            Coin c = Coin.valueOf(sc.next());\n            coins.add(c);\n            total += c.cents();\n        }\n        System.out.println(total);\n        for (Coin c : coins) {\n            System.out.println(c + \" \" + c.cents());\n        }\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\n\nenum Coin {\n    PENNY(1), NICKEL(5), DIME(10), QUARTER(25);\n\n    private final int cents;\n\n    Coin(int cents) {\n        this.cents = cents;\n    }\n\n    int cents() {\n        return cents;\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        List<Coin> coins = new ArrayList<>();\n        int total = 0;\n        for (int i = 0; i < n; i++) {\n            Coin c = Coin.valueOf(sc.next());\n            coins.add(c);\n            total += c.cents();\n        }\n        System.out.println(total);\n        for (Coin c : coins) {\n            System.out.println(c + \" \" + c.cents());\n        }\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "2\nQUARTER DIME",
+                  "output": "35\nQUARTER 25\nDIME 10"
+                },
+                {
+                  "input": "1\nPENNY",
+                  "output": "1\nPENNY 1"
+                },
+                {
+                  "input": "4\nNICKEL NICKEL PENNY QUARTER",
+                  "output": "36\nNICKEL 5\nNICKEL 5\nPENNY 1\nQUARTER 25"
+                },
+                {
+                  "input": "3\nDIME DIME DIME",
+                  "output": "30\nDIME 10\nDIME 10\nDIME 10"
+                },
+                {
+                  "input": "5\nQUARTER QUARTER QUARTER QUARTER PENNY",
+                  "output": "101\nQUARTER 25\nQUARTER 25\nQUARTER 25\nQUARTER 25\nPENNY 1"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            }
+          ],
+          "quiz": [
+            {
+              "question": "Why should `ordinal()` never be stored in a database?",
+              "options": [
+                "reordering the constants silently changes what every stored number means",
+                "it is slow",
+                "it can be negative",
+                "it is not unique"
+              ],
+              "answer": 0,
+              "explanation": "Store `name()` instead - or a field you control."
+            },
+            {
+              "question": "An enum constructor is…",
+              "options": [
+                "always private",
+                "public by default",
+                "protected",
+                "not allowed"
+              ],
+              "answer": 0,
+              "explanation": "Only the enum itself may create its instances, once each."
+            }
+          ]
+        },
+        {
+          "key": "m33-behaviour",
+          "title": "Enums with behaviour",
+          "what": "Methods, a lambda per constant, a body per constant - and `EnumMap`.",
+          "lesson": "An enum is a class, so it can have methods - and each constant can bring its\nown behaviour. There are three ways to do it.\n\n## 1. A field holding a lambda\n\n```java\nenum Op {\n    ADD(\"+\", (a, b) -> a + b),\n    SUB(\"-\", (a, b) -> a - b),\n    MUL(\"*\", (a, b) -> a * b);\n\n    private final String symbol;\n    private final IntBinaryOperator fn;\n\n    Op(String symbol, IntBinaryOperator fn) { this.symbol = symbol; this.fn = fn; }\n\n    int apply(int a, int b) { return fn.applyAsInt(a, b); }\n}\n```\n\nEach constant passes module 25's functional interface to the constructor. This is\nthe **strategy pattern** in five lines, and there is no `if` or `switch` anywhere:\nthe choice of behaviour *is* the choice of constant.\n\n## 2. A body per constant\n\n```java\nenum Shape {\n    SQUARE   { int area(int s) { return s * s; } },\n    TRIANGLE { int area(int s) { return s * s / 2; } };\n\n    abstract int area(int s);\n}\n```\n\nThe enum declares an `abstract` method and every constant supplies a body - the\ncompiler refuses to build the enum if one forgets. Each constant is then really\nan instance of its own anonymous subclass. Use this when a behaviour is too big\nfor a one-line lambda.\n\n## 3. An ordinary method using the constant's data\n\n```java\nDay next() {\n    return values()[(ordinal() + 1) % values().length];\n}\n```\n\nWrap-around arithmetic is one of the few legitimate uses of `ordinal()`: it\nstays inside the enum, so it can never go stale.\n\n## `EnumMap` and `EnumSet`\n\n```java\nMap<Suit, Integer> counts = new EnumMap<>(Suit.class);\nSet<Suit> red = EnumSet.of(Suit.HEARTS, Suit.DIAMONDS);\nEnumSet.allOf(Suit.class)     EnumSet.noneOf(Suit.class)     EnumSet.range(MON, FRI)\n```\n\nWhen the keys are an enum, these beat `HashMap` and `HashSet` twice over. They\nare backed by an array indexed by ordinal (an `EnumSet` is literally a bit\nfield), so they are faster and smaller. And **they iterate in declaration\norder** - so printing an `EnumMap` gives the same line on every run, which a\n`HashMap` never promises.\n",
+          "warmup": [
+            {
+              "question": "An `EnumMap<Suit, Integer>` iterates its keys in…",
+              "options": [
+                "the order the constants are declared",
+                "insertion order",
+                "alphabetical order",
+                "no defined order"
+              ],
+              "answer": 0,
+              "explanation": "It is an array indexed by ordinal."
+            },
+            {
+              "question": "An enum declares `abstract int area(int s);`. A constant with no body…",
+              "options": [
+                "does not compile",
+                "returns 0",
+                "throws at run time",
+                "inherits a default"
+              ],
+              "answer": 0,
+              "explanation": "Every constant must supply the method."
+            }
+          ],
+          "exercises": [
+            {
+              "id": "j33-bh-op",
+              "title": "A calculator with no `if`",
+              "prompt": "Each line is `a OP b` with OP one of `ADD`, `SUB`, `MUL`. Print `a symbol b = result`. Replace `____` with the call that computes the result.",
+              "hint": "The constant already knows how to compute - ask it.",
+              "hints": [
+                "The constant already knows how to compute - ask it.",
+                "`op.apply(a, b)` calls the lambda stored in that constant.",
+                "Adding a DIV constant would need no change to `main` at all.",
+                "This is the strategy pattern with an enum as the registry."
+              ],
+              "language": "java",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "starter": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\n\nenum Op {\n    ADD(\"+\", (a, b) -> a + b),\n    SUB(\"-\", (a, b) -> a - b),\n    MUL(\"*\", (a, b) -> a * b);\n\n    private final String symbol;\n    private final IntBinaryOperator fn;\n\n    Op(String symbol, IntBinaryOperator fn) {\n        this.symbol = symbol;\n        this.fn = fn;\n    }\n\n    String symbol() {\n        return symbol;\n    }\n\n    int apply(int a, int b) {\n        return fn.applyAsInt(a, b);\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        for (int i = 0; i < n; i++) {\n            int a = sc.nextInt();\n            Op op = Op.valueOf(sc.next());\n            int b = sc.nextInt();\n            System.out.println(a + \" \" + op.symbol() + \" \" + b + \" = \" + ____);\n        }\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\n\nenum Op {\n    ADD(\"+\", (a, b) -> a + b),\n    SUB(\"-\", (a, b) -> a - b),\n    MUL(\"*\", (a, b) -> a * b);\n\n    private final String symbol;\n    private final IntBinaryOperator fn;\n\n    Op(String symbol, IntBinaryOperator fn) {\n        this.symbol = symbol;\n        this.fn = fn;\n    }\n\n    String symbol() {\n        return symbol;\n    }\n\n    int apply(int a, int b) {\n        return fn.applyAsInt(a, b);\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        for (int i = 0; i < n; i++) {\n            int a = sc.nextInt();\n            Op op = Op.valueOf(sc.next());\n            int b = sc.nextInt();\n            System.out.println(a + \" \" + op.symbol() + \" \" + b + \" = \" + op.apply(a, b));\n        }\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "1\n3 ADD 4",
+                  "output": "3 + 4 = 7"
+                },
+                {
+                  "input": "2\n10 SUB 12\n6 MUL 7",
+                  "output": "10 - 12 = -2\n6 * 7 = 42"
+                },
+                {
+                  "input": "1\n0 MUL 99",
+                  "output": "0 * 99 = 0"
+                },
+                {
+                  "input": "2\n-5 ADD 5\n-3 MUL -3",
+                  "output": "-5 + 5 = 0\n-3 * -3 = 9"
+                },
+                {
+                  "input": "3\n100 SUB 1\n2 ADD 2\n5 MUL 5",
+                  "output": "100 - 1 = 99\n2 + 2 = 4\n5 * 5 = 25"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "j33-bh-abstract",
+              "title": "A body per constant",
+              "prompt": "`Shape` declares `abstract int area(int size)`. Write its three constants, each with its own body: a SQUARE's area is size², a TRIANGLE's is size²/2 (integer division), and a STRIP's is just size.",
+              "hint": "Each constant is followed by a class body in braces: `SQUARE { ... },`",
+              "hints": [
+                "Each constant is followed by a class body in braces: `SQUARE { ... },`",
+                "Inside, implement `int area(int size)`.",
+                "Constants are separated by commas and the last ends with `;`.",
+                "Forgetting one body is a compile error - the enum's abstract method demands it."
+              ],
+              "language": "java",
+              "kind": "challenge",
+              "difficulty": "Medium",
+              "starter": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\n\nenum Shape {\n____\n\n    abstract int area(int size);\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        for (int i = 0; i < n; i++) {\n            Shape s = Shape.valueOf(sc.next());\n            int size = sc.nextInt();\n            System.out.println(s + \" \" + s.area(size));\n        }\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\n\nenum Shape {\n    SQUARE {\n        int area(int size) {\n            return size * size;\n        }\n    },\n    TRIANGLE {\n        int area(int size) {\n            return size * size / 2;\n        }\n    },\n    STRIP {\n        int area(int size) {\n            return size;\n        }\n    };\n\n    abstract int area(int size);\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        for (int i = 0; i < n; i++) {\n            Shape s = Shape.valueOf(sc.next());\n            int size = sc.nextInt();\n            System.out.println(s + \" \" + s.area(size));\n        }\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "1\nSQUARE 3",
+                  "output": "SQUARE 9"
+                },
+                {
+                  "input": "2\nTRIANGLE 5\nSTRIP 7",
+                  "output": "TRIANGLE 12\nSTRIP 7"
+                },
+                {
+                  "input": "2\nSQUARE 0\nTRIANGLE 1",
+                  "output": "SQUARE 0\nTRIANGLE 0"
+                },
+                {
+                  "input": "3\nSTRIP 4\nSQUARE 4\nTRIANGLE 4",
+                  "output": "STRIP 4\nSQUARE 16\nTRIANGLE 8"
+                },
+                {
+                  "input": "1\nTRIANGLE 10",
+                  "output": "TRIANGLE 50"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "j33-bh-enummap",
+              "title": "Counting by suit",
+              "prompt": "Count how many cards of each suit were dealt and print the map. Replace `____` with the map's construction.",
+              "hint": "`EnumMap` needs the enum's `Class` object to size its array.",
+              "hints": [
+                "`EnumMap` needs the enum's `Class` object to size its array.",
+                "`new EnumMap<>(Suit.class)`",
+                "It prints in DECLARATION order - CLUBS before HEARTS - whatever order the cards came in.",
+                "`merge(s, 1, Integer::sum)` is module 31's counting idiom."
+              ],
+              "language": "java",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "starter": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\n\nenum Suit {\n    CLUBS, DIAMONDS, HEARTS, SPADES\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        Map<Suit, Integer> counts = ____;\n        for (int i = 0; i < n; i++) {\n            Suit s = Suit.valueOf(sc.next());\n            counts.merge(s, 1, Integer::sum);\n        }\n        System.out.println(counts);\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\n\nenum Suit {\n    CLUBS, DIAMONDS, HEARTS, SPADES\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        Map<Suit, Integer> counts = new EnumMap<>(Suit.class);\n        for (int i = 0; i < n; i++) {\n            Suit s = Suit.valueOf(sc.next());\n            counts.merge(s, 1, Integer::sum);\n        }\n        System.out.println(counts);\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "3\nHEARTS CLUBS HEARTS",
+                  "output": "{CLUBS=1, HEARTS=2}"
+                },
+                {
+                  "input": "1\nSPADES",
+                  "output": "{SPADES=1}"
+                },
+                {
+                  "input": "4\nDIAMONDS SPADES CLUBS SPADES",
+                  "output": "{CLUBS=1, DIAMONDS=1, SPADES=2}"
+                },
+                {
+                  "input": "3\nHEARTS HEARTS HEARTS",
+                  "output": "{HEARTS=3}"
+                },
+                {
+                  "input": "5\nSPADES HEARTS DIAMONDS CLUBS CLUBS",
+                  "output": "{CLUBS=2, DIAMONDS=1, HEARTS=1, SPADES=1}"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "j33-bh-next",
+              "title": "The day after Sunday",
+              "prompt": "`next()` should wrap round from SUN to MON, but it throws `ArrayIndexOutOfBoundsException` for SUN. Fix it.",
+              "hint": "SUN is the last constant: `ordinal()` is 6, and there is no index 7.",
+              "hints": [
+                "SUN is the last constant: `ordinal()` is 6, and there is no index 7.",
+                "Wrap the index round with `%`.",
+                "`values()[(ordinal() + 1) % values().length]`",
+                "The ordinal never goes negative, so `%` is safe here - no floorMod needed."
+              ],
+              "language": "java",
+              "kind": "fix",
+              "difficulty": "Easy",
+              "starter": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\n\nenum Day {\n    MON, TUE, WED, THU, FRI, SAT, SUN;\n\n    Day next() {\n        return values()[ordinal() + 1];\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        for (int i = 0; i < n; i++) {\n            Day d = Day.valueOf(sc.next());\n            System.out.println(d + \" -> \" + d.next());\n        }\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\n\nenum Day {\n    MON, TUE, WED, THU, FRI, SAT, SUN;\n\n    Day next() {\n        return values()[(ordinal() + 1) % values().length];\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        for (int i = 0; i < n; i++) {\n            Day d = Day.valueOf(sc.next());\n            System.out.println(d + \" -> \" + d.next());\n        }\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "2\nMON SUN",
+                  "output": "MON -> TUE\nSUN -> MON"
+                },
+                {
+                  "input": "1\nSAT",
+                  "output": "SAT -> SUN"
+                },
+                {
+                  "input": "3\nFRI SUN WED",
+                  "output": "FRI -> SAT\nSUN -> MON\nWED -> THU"
+                },
+                {
+                  "input": "1\nSUN",
+                  "output": "SUN -> MON"
+                },
+                {
+                  "input": "4\nTHU TUE SUN MON",
+                  "output": "THU -> FRI\nTUE -> WED\nSUN -> MON\nMON -> TUE"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            }
+          ],
+          "quiz": [
+            {
+              "question": "Giving each enum constant a lambda field is an example of…",
+              "options": [
+                "the strategy pattern",
+                "the singleton pattern",
+                "inheritance",
+                "reflection"
+              ],
+              "answer": 0,
+              "explanation": "The behaviour is chosen by choosing the constant."
+            },
+            {
+              "question": "Why prefer `EnumMap` to `HashMap` for enum keys?",
+              "options": [
+                "faster, smaller, and iterates in declaration order",
+                "it allows null keys",
+                "it is thread-safe",
+                "it sorts values"
+              ],
+              "answer": 0,
+              "explanation": "An array indexed by ordinal beats hashing."
+            }
+          ]
+        },
+        {
+          "key": "m33-switch",
+          "title": "`switch` - the statement and the expression",
+          "what": "The classic statement falls through. The Java 14 expression does not, and must cover every case.",
+          "lesson": "## The statement, and the bug it is famous for\n\n```java\nswitch (grade) {\n    case \"A\":\n        System.out.println(\"excellent\");\n        break;\n    case \"B\":\n        System.out.println(\"good\");\n        break;\n    default:\n        System.out.println(\"try again\");\n}\n```\n\nA `switch` statement jumps to the matching label and then **keeps going** until\nit hits a `break` - straight through every following label. Leave out one\n`break` and a single `\"A\"` prints `excellent`, `good` *and* `try again`. That\nfall-through is occasionally useful (several labels sharing one body) and far\nmore often a bug.\n\nYou can switch on an `int`, `char`, `String` or enum (and their wrappers). With\nan enum you write the bare constant name - `case SATURDAY:`, not\n`case DayOfWeek.SATURDAY:`.\n\n## The expression (Java 14)\n\n```java\nString kind = switch (day) {\n    case SATURDAY, SUNDAY -> \"weekend\";\n    default -> \"weekday\";\n};\n```\n\nThree differences, each fixing a problem with the statement:\n\n1. **Arrow labels never fall through.** Each arm runs exactly its own code.\n2. **Several labels share an arm** with a comma - no fall-through needed.\n3. **It is an expression**: it produces a value, so the variable is assigned in\n   exactly one place, and it ends with a `;`.\n\nAn arm that needs more than one line uses a block and **`yield`** to produce its\nvalue:\n\n```java\nint cost = switch (zone) {\n    case LOCAL -> 5;\n    case NATIONAL -> {\n        int base = 10;\n        yield weight > 5 ? base + (weight - 5) * 2 : base;\n    }\n    case INTERNATIONAL -> 25 + weight * 3;\n};\n```\n\n## Exhaustiveness\n\nA switch *expression* must produce a value for **every** possible input. Over an\nenum, covering every constant is enough - no `default` needed - and then adding\na new constant later turns every switch that forgot it into a **compile error**.\nA switch *statement* with a missing case compiles happily and silently does\nnothing. That difference alone is a reason to prefer the expression.\n",
+          "warmup": [
+            {
+              "question": "A `switch` statement case with no `break`…",
+              "options": [
+                "falls through into the next case's code",
+                "is a compile error",
+                "returns",
+                "skips the rest of the switch"
+              ],
+              "answer": 0,
+              "explanation": "Execution continues until a `break` or the end of the switch."
+            },
+            {
+              "question": "In a switch EXPRESSION, a block arm produces its value with…",
+              "options": [
+                "yield",
+                "return",
+                "break",
+                "the last expression"
+              ],
+              "answer": 0,
+              "explanation": "`return` would return from the whole method."
+            }
+          ],
+          "exercises": [
+            {
+              "id": "j33-sw-fallthrough",
+              "title": "Excellent, good, pass, try again",
+              "prompt": "A grade of `A` should print one line, `excellent`. This prints four, because every case falls into the next. Fix the switch.",
+              "hint": "A statement switch keeps executing after its matching label.",
+              "hints": [
+                "A statement switch keeps executing after its matching label.",
+                "Only `F` - which goes straight to `default` - is right already.",
+                "Add `break;` at the end of each case.",
+                "Or rewrite it as a switch with arrow labels, which cannot fall through."
+              ],
+              "language": "java",
+              "kind": "fix",
+              "difficulty": "Easy",
+              "starter": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        for (int i = 0; i < n; i++) {\n            String grade = sc.next();\n            switch (grade) {\n                case \"A\":\n                    System.out.println(\"excellent\");\n                case \"B\":\n                    System.out.println(\"good\");\n                case \"C\":\n                    System.out.println(\"pass\");\n                default:\n                    System.out.println(\"try again\");\n            }\n        }\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        for (int i = 0; i < n; i++) {\n            String grade = sc.next();\n            switch (grade) {\n                case \"A\":\n                    System.out.println(\"excellent\");\n                    break;\n                case \"B\":\n                    System.out.println(\"good\");\n                    break;\n                case \"C\":\n                    System.out.println(\"pass\");\n                    break;\n                default:\n                    System.out.println(\"try again\");\n            }\n        }\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "2\nA C",
+                  "output": "excellent\npass"
+                },
+                {
+                  "input": "1\nB",
+                  "output": "good"
+                },
+                {
+                  "input": "3\nF A B",
+                  "output": "try again\nexcellent\ngood"
+                },
+                {
+                  "input": "2\nC C",
+                  "output": "pass\npass"
+                },
+                {
+                  "input": "2\nB F",
+                  "output": "good\ntry again"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "j33-sw-arrow",
+              "title": "Weekday or weekend",
+              "prompt": "Print each date with `weekend` or `weekday`, using a switch expression over its `DayOfWeek`. Replace `____` with the arm that covers both weekend days.",
+              "hint": "Several labels can share one arm, separated by commas.",
+              "hints": [
+                "Several labels can share one arm, separated by commas.",
+                "Inside a switch over an enum, write the bare constant: `SATURDAY`, not `DayOfWeek.SATURDAY`.",
+                "`case SATURDAY, SUNDAY -> \"weekend\";`",
+                "`DayOfWeek` has seven constants, so the `default` is needed here."
+              ],
+              "language": "java",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "starter": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        for (int i = 0; i < n; i++) {\n            LocalDate date = LocalDate.parse(sc.next());\n            String kind = switch (date.getDayOfWeek()) {\n____\n                default -> \"weekday\";\n            };\n            System.out.println(date + \" \" + kind);\n        }\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        for (int i = 0; i < n; i++) {\n            LocalDate date = LocalDate.parse(sc.next());\n            String kind = switch (date.getDayOfWeek()) {\n                case SATURDAY, SUNDAY -> \"weekend\";\n                default -> \"weekday\";\n            };\n            System.out.println(date + \" \" + kind);\n        }\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "2\n2024-03-02 2024-03-04",
+                  "output": "2024-03-02 weekend\n2024-03-04 weekday"
+                },
+                {
+                  "input": "1\n2024-03-03",
+                  "output": "2024-03-03 weekend"
+                },
+                {
+                  "input": "3\n2023-12-25 2023-12-30 2024-01-05",
+                  "output": "2023-12-25 weekday\n2023-12-30 weekend\n2024-01-05 weekday"
+                },
+                {
+                  "input": "1\n2024-02-29",
+                  "output": "2024-02-29 weekday"
+                },
+                {
+                  "input": "3\n2024-03-09 2024-03-10 2024-03-11",
+                  "output": "2024-03-09 weekend\n2024-03-10 weekend\n2024-03-11 weekday"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "j33-sw-string",
+              "title": "A command interpreter",
+              "prompt": "Run stack commands: `push x`, `pop`, `peek` and `size`. `pop` and `peek` print the value, or `empty`. Replace `____` with the `pop` case.",
+              "hint": "Arrow labels work in a switch STATEMENT too - and do not fall through.",
+              "hints": [
+                "Arrow labels work in a switch STATEMENT too - and do not fall through.",
+                "Switching on a `String` compares with `equals`, not `==`.",
+                "Mirror the `peek` case, but call `pop()`.",
+                "Both branches of `? :` must be Strings, hence `String.valueOf`."
+              ],
+              "language": "java",
+              "kind": "drill",
+              "difficulty": "Medium",
+              "starter": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        Deque<Integer> stack = new ArrayDeque<>();\n        for (int i = 0; i < n; i++) {\n            String cmd = sc.next();\n            switch (cmd) {\n                case \"push\" -> stack.push(sc.nextInt());\n____\n                case \"peek\" -> System.out.println(stack.isEmpty() ? \"empty\" : String.valueOf(stack.peek()));\n                case \"size\" -> System.out.println(\"size \" + stack.size());\n                default -> System.out.println(\"unknown \" + cmd);\n            }\n        }\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        Deque<Integer> stack = new ArrayDeque<>();\n        for (int i = 0; i < n; i++) {\n            String cmd = sc.next();\n            switch (cmd) {\n                case \"push\" -> stack.push(sc.nextInt());\n                case \"pop\" -> System.out.println(stack.isEmpty() ? \"empty\" : String.valueOf(stack.pop()));\n                case \"peek\" -> System.out.println(stack.isEmpty() ? \"empty\" : String.valueOf(stack.peek()));\n                case \"size\" -> System.out.println(\"size \" + stack.size());\n                default -> System.out.println(\"unknown \" + cmd);\n            }\n        }\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "5\npush 3\npush 4\npeek\npop\npeek",
+                  "output": "4\n4\n3"
+                },
+                {
+                  "input": "3\npush 1\npop\npop",
+                  "output": "1\nempty"
+                },
+                {
+                  "input": "2\npeek\npush 9",
+                  "output": "empty"
+                },
+                {
+                  "input": "6\npush 5\npush 6\npush 7\npop\npop\npop",
+                  "output": "7\n6\n5"
+                },
+                {
+                  "input": "5\npop\npush 2\nsize\npop\nsize",
+                  "output": "empty\nsize 1\n2\nsize 0"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "j33-sw-yield",
+              "title": "Shipping by zone",
+              "prompt": "Compute each parcel's cost with a switch EXPRESSION over its `Zone`: LOCAL costs 5; NATIONAL costs 10, plus 2 per kilogram over 5; INTERNATIONAL costs 25 plus 3 per kilogram. Cover every constant, with no `default`.",
+              "hint": "`int cost = switch (zone) { ... };` - it is an expression, so it ends with `;`.",
+              "hints": [
+                "`int cost = switch (zone) { ... };` - it is an expression, so it ends with `;`.",
+                "One-line arms: `case LOCAL -> 5;`",
+                "A multi-line arm is a block that ends with `yield value;`.",
+                "No `default`: covering all three constants makes the switch exhaustive.",
+                "Add a fourth Zone later and this line stops compiling - which is the point."
+              ],
+              "language": "java",
+              "kind": "challenge",
+              "difficulty": "Medium",
+              "starter": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\n\nenum Zone {\n    LOCAL, NATIONAL, INTERNATIONAL\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        for (int i = 0; i < n; i++) {\n            Zone zone = Zone.valueOf(sc.next());\n            int weight = sc.nextInt();\n____\n            System.out.println(zone + \" \" + weight + \" \" + cost);\n        }\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\n\nenum Zone {\n    LOCAL, NATIONAL, INTERNATIONAL\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        for (int i = 0; i < n; i++) {\n            Zone zone = Zone.valueOf(sc.next());\n            int weight = sc.nextInt();\n            int cost = switch (zone) {\n                case LOCAL -> 5;\n                case NATIONAL -> {\n                    int base = 10;\n                    yield weight > 5 ? base + (weight - 5) * 2 : base;\n                }\n                case INTERNATIONAL -> 25 + weight * 3;\n            };\n            System.out.println(zone + \" \" + weight + \" \" + cost);\n        }\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "1\nLOCAL 3",
+                  "output": "LOCAL 3 5"
+                },
+                {
+                  "input": "2\nNATIONAL 5\nNATIONAL 8",
+                  "output": "NATIONAL 5 10\nNATIONAL 8 16"
+                },
+                {
+                  "input": "1\nINTERNATIONAL 1",
+                  "output": "INTERNATIONAL 1 28"
+                },
+                {
+                  "input": "3\nLOCAL 20\nNATIONAL 6\nINTERNATIONAL 4",
+                  "output": "LOCAL 20 5\nNATIONAL 6 12\nINTERNATIONAL 4 37"
+                },
+                {
+                  "input": "1\nNATIONAL 0",
+                  "output": "NATIONAL 0 10"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            }
+          ],
+          "quiz": [
+            {
+              "question": "A switch EXPRESSION over an enum covers every constant, and a new constant is added later. The switch…",
+              "options": [
+                "no longer compiles until the new constant is handled",
+                "silently returns 0",
+                "throws at run time",
+                "falls through"
+              ],
+              "answer": 0,
+              "explanation": "Exhaustiveness is checked by the compiler."
+            },
+            {
+              "question": "`case SATURDAY, SUNDAY -> \"weekend\";` shows…",
+              "options": [
+                "several labels sharing one arrow arm",
+                "fall-through",
+                "a type pattern",
+                "a label with a guard"
+              ],
+              "answer": 0,
+              "explanation": "No fall-through needed to share code."
+            }
+          ]
+        },
+        {
+          "key": "m33-nested",
+          "title": "Classes inside classes",
+          "what": "Static nested, inner, local and anonymous - and the hidden reference that tells them apart.",
+          "lesson": "Every class so far has been top-level. Java also lets you declare a class\n**inside** another, in four flavours - and the difference that matters is a\nsingle hidden field.\n\n## Static nested class\n\n```java\nclass IntStack {\n    private static class Node {       // belongs to IntStack, but needs no IntStack\n        final int value;\n        final Node next;\n        Node(int value, Node next) { this.value = value; this.next = next; }\n    }\n    private Node top;\n    void push(int x) { top = new Node(x, top); }\n}\n```\n\nA `static` nested class is an ordinary class that happens to live inside\nanother: it can be `private` (so nothing outside the stack even knows `Node`\nexists), and it can see its outer class's private members - but it has **no\nlink to any outer instance**. This is the default choice, and the right one for\nhelpers like a list node or a `Builder` (module 35).\n\n## Inner class (non-static)\n\n```java\nclass Range implements Iterable<Integer> {\n    private final int start, end;\n    private class RangeIterator implements Iterator<Integer> {\n        private int next = start;         // reads the OUTER object's field\n        ...\n    }\n    public Iterator<Integer> iterator() { return new RangeIterator(); }\n}\n```\n\nAn inner class carries a hidden reference to the outer object that created it,\nso it can read that object's fields directly - here, the `Range`'s `start` and\n`end`. That is exactly what an iterator needs. When a name is shadowed, the outer\none is spelled **`Range.this.start`**.\n\nThe hidden reference has a cost: an inner-class object keeps its outer object\nalive for as long as it lives. A long-lived inner object can quietly pin a large\nouter one in memory, which is why \"make it `static` unless it needs the outer\ninstance\" is the rule.\n\n## Local and anonymous classes\n\nA **local class** is declared inside a method body and is visible only there. An\n**anonymous class** is declared and instantiated in one expression:\n\n```java\nwords.sort(new Comparator<String>() {\n    @Override\n    public int compare(String a, String b) {\n        return Integer.compare(a.length(), b.length());\n    }\n});\n```\n\nBefore lambdas, this was how you passed behaviour around. Since module 25 a lambda\ndoes it in one line - *when the interface has one abstract method*. An anonymous\nclass is still needed for anything else: an interface with several methods, an\nabstract class, or an object that needs its own state. (One more difference:\ninside an anonymous class, `this` is the anonymous object; inside a lambda it is\nthe enclosing one.)\n\n## Making something iterable\n\n`implements Iterable<Integer>` with an `iterator()` method is all the enhanced\n`for` loop needs:\n\n```java\nfor (int x : new Range(0, 10, 3)) { ... }   // 0 3 6 9\n```\n",
+          "warmup": [
+            {
+              "question": "An inner (non-static) class instance…",
+              "options": [
+                "holds a hidden reference to its outer instance",
+                "cannot see the outer class's private fields",
+                "must be public",
+                "cannot have fields"
+              ],
+              "answer": 0,
+              "explanation": "Which is how it reads the outer fields - and why it can pin them in memory."
+            },
+            {
+              "question": "A class needs `for (int x : obj)` to work. It must…",
+              "options": [
+                "implement Iterable<Integer>",
+                "extend ArrayList",
+                "be an enum",
+                "have a public size() method"
+              ],
+              "answer": 0,
+              "explanation": "The enhanced for loop calls `iterator()`."
+            }
+          ],
+          "exercises": [
+            {
+              "id": "j33-ne-node",
+              "title": "A private node",
+              "prompt": "`IntStack` keeps its elements in a private static nested `Node` class. Push every number, then pop them all. Replace `____` with the line that pushes a new node on top.",
+              "hint": "The new node's `next` is the current top.",
+              "hints": [
+                "The new node's `next` is the current top.",
+                "`new Node(x, top)` - `Node` is visible inside `IntStack` even though it is private.",
+                "Then the new node BECOMES the top.",
+                "Nothing outside `IntStack` can name `Node` at all - that is the encapsulation."
+              ],
+              "language": "java",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "starter": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\n\nclass IntStack {\n    private static class Node {\n        final int value;\n        final Node next;\n\n        Node(int value, Node next) {\n            this.value = value;\n            this.next = next;\n        }\n    }\n\n    private Node top;\n    private int size;\n\n    void push(int x) {\n____\n        size++;\n    }\n\n    int pop() {\n        int v = top.value;\n        top = top.next;\n        size--;\n        return v;\n    }\n\n    boolean isEmpty() {\n        return top == null;\n    }\n\n    int size() {\n        return size;\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] a = new int[n];\n        for (int i = 0; i < n; i++) a[i] = sc.nextInt();\n        IntStack stack = new IntStack();\n        for (int x : a) {\n            stack.push(x);\n        }\n        System.out.println(stack.size());\n        StringBuilder out = new StringBuilder();\n        while (!stack.isEmpty()) {\n            if (out.length() > 0) out.append(' ');\n            out.append(stack.pop());\n        }\n        System.out.println(out);\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\n\nclass IntStack {\n    private static class Node {\n        final int value;\n        final Node next;\n\n        Node(int value, Node next) {\n            this.value = value;\n            this.next = next;\n        }\n    }\n\n    private Node top;\n    private int size;\n\n    void push(int x) {\n        top = new Node(x, top);\n        size++;\n    }\n\n    int pop() {\n        int v = top.value;\n        top = top.next;\n        size--;\n        return v;\n    }\n\n    boolean isEmpty() {\n        return top == null;\n    }\n\n    int size() {\n        return size;\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] a = new int[n];\n        for (int i = 0; i < n; i++) a[i] = sc.nextInt();\n        IntStack stack = new IntStack();\n        for (int x : a) {\n            stack.push(x);\n        }\n        System.out.println(stack.size());\n        StringBuilder out = new StringBuilder();\n        while (!stack.isEmpty()) {\n            if (out.length() > 0) out.append(' ');\n            out.append(stack.pop());\n        }\n        System.out.println(out);\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "3\n1 2 3",
+                  "output": "3\n3 2 1"
+                },
+                {
+                  "input": "1\n7",
+                  "output": "1\n7"
+                },
+                {
+                  "input": "4\n5 5 9 1",
+                  "output": "4\n1 9 5 5"
+                },
+                {
+                  "input": "2\n10 20",
+                  "output": "2\n20 10"
+                },
+                {
+                  "input": "5\n4 3 2 1 0",
+                  "output": "5\n0 1 2 3 4"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "j33-ne-iterator",
+              "title": "An inner iterator",
+              "prompt": "Make `Range` work in an enhanced `for` loop. Write the private INNER class `RangeIterator`: it starts at the range's `start`, and hands out `start`, `start + step`, ... while below `end`.",
+              "hint": "`private class RangeIterator implements Iterator<Integer>` - no `static`, because it reads the outer Range's fields.",
+              "hints": [
+                "`private class RangeIterator implements Iterator<Integer>` - no `static`, because it reads the outer Range's fields.",
+                "A field `next`, initialised from the outer `start`.",
+                "`hasNext()` is `next < end`.",
+                "`next()` returns the current value, then advances by `step`.",
+                "`iterator()` is already written: it returns `new RangeIterator()`."
+              ],
+              "language": "java",
+              "kind": "challenge",
+              "difficulty": "Hard",
+              "starter": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\n\nclass Range implements Iterable<Integer> {\n    private final int start;\n    private final int end;\n    private final int step;\n\n    Range(int start, int end, int step) {\n        this.start = start;\n        this.end = end;\n        this.step = step;\n    }\n\n    @Override\n    public Iterator<Integer> iterator() {\n        return new RangeIterator();\n    }\n\n____\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int a = sc.nextInt();\n        int b = sc.nextInt();\n        int s = sc.nextInt();\n        StringBuilder out = new StringBuilder();\n        int count = 0;\n        for (int x : new Range(a, b, s)) {\n            if (out.length() > 0) out.append(' ');\n            out.append(x);\n            count++;\n        }\n        System.out.println(count == 0 ? \"(none)\" : out.toString());\n        System.out.println(count);\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\n\nclass Range implements Iterable<Integer> {\n    private final int start;\n    private final int end;\n    private final int step;\n\n    Range(int start, int end, int step) {\n        this.start = start;\n        this.end = end;\n        this.step = step;\n    }\n\n    @Override\n    public Iterator<Integer> iterator() {\n        return new RangeIterator();\n    }\n\n    private class RangeIterator implements Iterator<Integer> {\n        private int next = start;\n\n        @Override\n        public boolean hasNext() {\n            return next < end;\n        }\n\n        @Override\n        public Integer next() {\n            int value = next;\n            next += step;\n            return value;\n        }\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int a = sc.nextInt();\n        int b = sc.nextInt();\n        int s = sc.nextInt();\n        StringBuilder out = new StringBuilder();\n        int count = 0;\n        for (int x : new Range(a, b, s)) {\n            if (out.length() > 0) out.append(' ');\n            out.append(x);\n            count++;\n        }\n        System.out.println(count == 0 ? \"(none)\" : out.toString());\n        System.out.println(count);\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "0 5 1",
+                  "output": "0 1 2 3 4\n5"
+                },
+                {
+                  "input": "2 11 3",
+                  "output": "2 5 8\n3"
+                },
+                {
+                  "input": "5 5 1",
+                  "output": "(none)\n0"
+                },
+                {
+                  "input": "-3 3 2",
+                  "output": "-3 -1 1\n3"
+                },
+                {
+                  "input": "10 12 5",
+                  "output": "10\n1"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "j33-ne-outer",
+              "title": "Whose name is it?",
+              "prompt": "Each badge should read `player (team)`, but it prints the player's name twice: inside `Player`, `this.name` is the PLAYER's field. Refer to the enclosing team's name instead.",
+              "hint": "`Player` has its own `name` field, which shadows the team's.",
+              "hints": [
+                "`Player` has its own `name` field, which shadows the team's.",
+                "`this` inside `Player` is the player.",
+                "The enclosing instance is `Team.this`.",
+                "`Team.this.name`"
+              ],
+              "language": "java",
+              "kind": "fix",
+              "difficulty": "Medium",
+              "starter": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\n\nclass Team {\n    private final String name;\n    private final List<Player> players = new ArrayList<>();\n\n    Team(String name) {\n        this.name = name;\n    }\n\n    class Player {\n        private final String name;\n\n        Player(String name) {\n            this.name = name;\n        }\n\n        String badge() {\n            return name + \" (\" + this.name + \")\";\n        }\n    }\n\n    void add(String playerName) {\n        players.add(new Player(playerName));\n    }\n\n    void printBadges() {\n        for (Player p : players) {\n            System.out.println(p.badge());\n        }\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        Team team = new Team(sc.next());\n        int n = sc.nextInt();\n        for (int i = 0; i < n; i++) {\n            team.add(sc.next());\n        }\n        team.printBadges();\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\n\nclass Team {\n    private final String name;\n    private final List<Player> players = new ArrayList<>();\n\n    Team(String name) {\n        this.name = name;\n    }\n\n    class Player {\n        private final String name;\n\n        Player(String name) {\n            this.name = name;\n        }\n\n        String badge() {\n            return name + \" (\" + Team.this.name + \")\";\n        }\n    }\n\n    void add(String playerName) {\n        players.add(new Player(playerName));\n    }\n\n    void printBadges() {\n        for (Player p : players) {\n            System.out.println(p.badge());\n        }\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        Team team = new Team(sc.next());\n        int n = sc.nextInt();\n        for (int i = 0; i < n; i++) {\n            team.add(sc.next());\n        }\n        team.printBadges();\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "lions\n2\nada bo",
+                  "output": "ada (lions)\nbo (lions)"
+                },
+                {
+                  "input": "owls\n1\ncy",
+                  "output": "cy (owls)"
+                },
+                {
+                  "input": "foxes\n3\nx y z",
+                  "output": "x (foxes)\ny (foxes)\nz (foxes)"
+                },
+                {
+                  "input": "bees\n1\nsolo",
+                  "output": "solo (bees)"
+                },
+                {
+                  "input": "crows\n2\npear fig",
+                  "output": "pear (crows)\nfig (crows)"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "j33-ne-anon",
+              "title": "The way it was done before lambdas",
+              "prompt": "Sort the words by length, then alphabetically, using an ANONYMOUS `Comparator` class. Replace `____` with the line that starts it.",
+              "hint": "An anonymous class is `new Interface() { ...body... }`.",
+              "hints": [
+                "An anonymous class is `new Interface() { ...body... }`.",
+                "`new Comparator<String>() {` opens it; the body is already written.",
+                "It is closed by `}` and then the `)` of `sort(`.",
+                "The lambda version is one line: `Comparator.comparing(String::length).thenComparing(...)`."
+              ],
+              "language": "java",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "starter": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        List<String> words = new ArrayList<>();\n        for (int i = 0; i < n; i++) {\n            words.add(sc.next());\n        }\n____\n            @Override\n            public int compare(String a, String b) {\n                if (a.length() != b.length()) {\n                    return Integer.compare(a.length(), b.length());\n                }\n                return a.compareTo(b);\n            }\n        });\n        System.out.println(words);\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        List<String> words = new ArrayList<>();\n        for (int i = 0; i < n; i++) {\n            words.add(sc.next());\n        }\n        words.sort(new Comparator<String>() {\n            @Override\n            public int compare(String a, String b) {\n                if (a.length() != b.length()) {\n                    return Integer.compare(a.length(), b.length());\n                }\n                return a.compareTo(b);\n            }\n        });\n        System.out.println(words);\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "4\npear fig banana kiwi",
+                  "output": "[fig, kiwi, pear, banana]"
+                },
+                {
+                  "input": "4\nbb a ccc aa",
+                  "output": "[a, aa, bb, ccc]"
+                },
+                {
+                  "input": "1\nsolo",
+                  "output": "[solo]"
+                },
+                {
+                  "input": "4\ndd cc bb aa",
+                  "output": "[aa, bb, cc, dd]"
+                },
+                {
+                  "input": "4\nx yyy zz w",
+                  "output": "[w, x, zz, yyy]"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            }
+          ],
+          "quiz": [
+            {
+              "question": "A list's `Node` class should normally be…",
+              "options": [
+                "a private static nested class",
+                "an inner class",
+                "a public top-level class",
+                "an anonymous class"
+              ],
+              "answer": 0,
+              "explanation": "It needs no link to any particular list object."
+            },
+            {
+              "question": "Inside an anonymous class, `this` refers to…",
+              "options": [
+                "the anonymous object",
+                "the enclosing object",
+                "the interface",
+                "nothing - it is illegal"
+              ],
+              "answer": 0,
+              "explanation": "Unlike a lambda, where `this` is the enclosing object."
+            }
+          ]
+        },
+        {
+          "key": "m33-machines",
+          "title": "State machines: enums and switch together",
+          "what": "A set of states, a set of events, and one switch that says what happens next.",
+          "lesson": "A **state machine** is a thing that is always in exactly one of a fixed set of\nstates, and moves between them in response to events. A traffic light, a\nturnstile, an order, a TCP connection, a game character - all of them. It is the\nplace enums and switch expressions were made for:\n\n* the **states** are an enum, so an invalid state cannot even be written down;\n* the **transition** is a switch expression over the current state, so the\n  compiler checks that every state has been handled.\n\n```java\nenum State { LOCKED, UNLOCKED }\n\nstate = switch (state) {\n    case LOCKED   -> event.equals(\"COIN\") ? State.UNLOCKED : State.LOCKED;\n    case UNLOCKED -> event.equals(\"PUSH\") ? State.LOCKED   : State.UNLOCKED;\n};\n```\n\nTwo design choices worth making deliberately:\n\n**Where does the transition live?** For a small machine, one switch in one\nmethod, as above, is clearest - the whole behaviour is on one screen. For a\nlarge one, each constant can carry its own `next(event)` body (lesson 33.2's\nconstant-specific methods), so each state's rules sit with that state.\n\n**Cyclic machines** - a traffic light - need no switch at all: `next()` is\n`values()[(ordinal() + 1) % values().length]`, and the declaration order *is*\nthe cycle.\n\nAnd the lesson from 33.3 matters most here. A switch **statement** that forgets\na state compiles and silently does nothing when that state turns up. A switch\n**expression** that forgets one does not compile. For a state machine - where\n\"we added a state and forgot to handle it\" is the most common bug of all - that\nis the difference between a compile error today and a stuck order in\nproduction.\n\nCounting how often each state or event occurs is an `EnumMap` job; iterating\n`values()` prints every constant, including the ones with a count of zero.\n",
+          "warmup": [
+            {
+              "question": "A traffic light's `next()` can be written with no switch because…",
+              "options": [
+                "the declaration order is the cycle",
+                "enums cannot be switched on",
+                "switch is slow",
+                "ordinal() is random"
+              ],
+              "answer": 0,
+              "explanation": "`values()[(ordinal() + 1) % values().length]`."
+            },
+            {
+              "question": "A new state is added to an enum. Which switch keeps compiling and silently ignores it?",
+              "options": [
+                "a switch statement with no default",
+                "an exhaustive switch expression",
+                "both",
+                "neither"
+              ],
+              "answer": 0,
+              "explanation": "Only the expression is checked for exhaustiveness."
+            }
+          ],
+          "exercises": [
+            {
+              "id": "j33-sm-light",
+              "title": "A traffic light",
+              "prompt": "Start at a colour and print it, then the next `k` colours of the cycle RED, GREEN, YELLOW - all on one line. Replace `____` with `next()`'s return expression.",
+              "hint": "The declaration order is the order of the cycle.",
+              "hints": [
+                "The declaration order is the order of the cycle.",
+                "Take the next ordinal, wrapping round with `%`.",
+                "`values()[(ordinal() + 1) % values().length]`",
+                "Reordering the constants would change the cycle - which here is exactly right."
+              ],
+              "language": "java",
+              "kind": "drill",
+              "difficulty": "Easy",
+              "starter": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\n\nenum Light {\n    RED, GREEN, YELLOW;\n\n    Light next() {\n        return ____;\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        Light light = Light.valueOf(sc.next());\n        int k = sc.nextInt();\n        StringBuilder out = new StringBuilder(light.toString());\n        for (int i = 0; i < k; i++) {\n            light = light.next();\n            out.append(' ').append(light);\n        }\n        System.out.println(out);\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\n\nenum Light {\n    RED, GREEN, YELLOW;\n\n    Light next() {\n        return values()[(ordinal() + 1) % values().length];\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        Light light = Light.valueOf(sc.next());\n        int k = sc.nextInt();\n        StringBuilder out = new StringBuilder(light.toString());\n        for (int i = 0; i < k; i++) {\n            light = light.next();\n            out.append(' ').append(light);\n        }\n        System.out.println(out);\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "RED 3",
+                  "output": "RED GREEN YELLOW RED"
+                },
+                {
+                  "input": "YELLOW 1",
+                  "output": "YELLOW RED"
+                },
+                {
+                  "input": "GREEN 5",
+                  "output": "GREEN YELLOW RED GREEN YELLOW RED"
+                },
+                {
+                  "input": "RED 0",
+                  "output": "RED"
+                },
+                {
+                  "input": "YELLOW 4",
+                  "output": "YELLOW RED GREEN YELLOW RED"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "j33-sm-turnstile",
+              "title": "A turnstile",
+              "prompt": "Write `handle`'s transition as a switch expression over `state`. LOCKED + COIN unlocks; LOCKED + PUSH stays locked and counts a blocked push. UNLOCKED + PUSH locks; UNLOCKED + COIN stays unlocked and counts a wasted coin. `main` prints the state after each event, then the final report.",
+              "hint": "`state = switch (state) { case LOCKED -> {...} case UNLOCKED -> {...} };`",
+              "hints": [
+                "`state = switch (state) { case LOCKED -> {...} case UNLOCKED -> {...} };`",
+                "Each arm is a block, because it may also update a counter.",
+                "Inside a block, produce the next state with `yield`.",
+                "No `default`: two cases cover the enum, so the switch is exhaustive.",
+                "Event strings are compared with `equals`, never `==`."
+              ],
+              "language": "java",
+              "kind": "challenge",
+              "difficulty": "Hard",
+              "starter": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\n\nenum State {\n    LOCKED, UNLOCKED\n}\n\nclass Turnstile {\n    private State state = State.LOCKED;\n    private int wastedCoins;\n    private int blockedPushes;\n\n    void handle(String event) {\n____\n    }\n\n    String report() {\n        return state + \" \" + wastedCoins + \" \" + blockedPushes;\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        Turnstile t = new Turnstile();\n        StringBuilder trail = new StringBuilder();\n        for (int i = 0; i < n; i++) {\n            t.handle(sc.next());\n            if (trail.length() > 0) trail.append(' ');\n            trail.append(t.report().split(\" \")[0]);\n        }\n        System.out.println(trail);\n        System.out.println(t.report());\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\n\nenum State {\n    LOCKED, UNLOCKED\n}\n\nclass Turnstile {\n    private State state = State.LOCKED;\n    private int wastedCoins;\n    private int blockedPushes;\n\n    void handle(String event) {\n        state = switch (state) {\n            case LOCKED -> {\n                if (event.equals(\"COIN\")) {\n                    yield State.UNLOCKED;\n                }\n                blockedPushes++;\n                yield State.LOCKED;\n            }\n            case UNLOCKED -> {\n                if (event.equals(\"PUSH\")) {\n                    yield State.LOCKED;\n                }\n                wastedCoins++;\n                yield State.UNLOCKED;\n            }\n        };\n    }\n\n    String report() {\n        return state + \" \" + wastedCoins + \" \" + blockedPushes;\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        Turnstile t = new Turnstile();\n        StringBuilder trail = new StringBuilder();\n        for (int i = 0; i < n; i++) {\n            t.handle(sc.next());\n            if (trail.length() > 0) trail.append(' ');\n            trail.append(t.report().split(\" \")[0]);\n        }\n        System.out.println(trail);\n        System.out.println(t.report());\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "2\nCOIN PUSH",
+                  "output": "UNLOCKED LOCKED\nLOCKED 0 0"
+                },
+                {
+                  "input": "3\nPUSH PUSH COIN",
+                  "output": "LOCKED LOCKED UNLOCKED\nUNLOCKED 0 2"
+                },
+                {
+                  "input": "5\nCOIN COIN COIN PUSH PUSH",
+                  "output": "UNLOCKED UNLOCKED UNLOCKED LOCKED LOCKED\nLOCKED 2 1"
+                },
+                {
+                  "input": "1\nPUSH",
+                  "output": "LOCKED\nLOCKED 0 1"
+                },
+                {
+                  "input": "6\nCOIN PUSH COIN COIN PUSH PUSH",
+                  "output": "UNLOCKED LOCKED UNLOCKED UNLOCKED LOCKED LOCKED\nLOCKED 1 1"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "j33-sm-missing",
+              "title": "The state nobody handled",
+              "prompt": "Every status should get a label, but SHIPPED orders print `?` - the switch statement never mentions SHIPPED, and nothing complained. Rewrite it as a switch EXPRESSION covering every status, so a forgotten one cannot compile.",
+              "hint": "A switch statement is allowed to skip constants.",
+              "hints": [
+                "A switch statement is allowed to skip constants.",
+                "`String label = switch (s) { ... };` must produce a value for every Status.",
+                "Add `case SHIPPED -> \"on its way\";`",
+                "With all four covered, no `default` is needed - and a fifth status would break the build, not the output."
+              ],
+              "language": "java",
+              "kind": "fix",
+              "difficulty": "Medium",
+              "starter": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\n\nenum Status {\n    PLACED, PAID, SHIPPED, DELIVERED\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        for (int i = 0; i < n; i++) {\n            Status s = Status.valueOf(sc.next());\n            String label = \"?\";\n            switch (s) {\n                case PLACED -> label = \"waiting for payment\";\n                case PAID -> label = \"being packed\";\n                case DELIVERED -> label = \"arrived\";\n            }\n            System.out.println(s + \": \" + label);\n        }\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\n\nenum Status {\n    PLACED, PAID, SHIPPED, DELIVERED\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        for (int i = 0; i < n; i++) {\n            Status s = Status.valueOf(sc.next());\n            String label = switch (s) {\n                case PLACED -> \"waiting for payment\";\n                case PAID -> \"being packed\";\n                case SHIPPED -> \"on its way\";\n                case DELIVERED -> \"arrived\";\n            };\n            System.out.println(s + \": \" + label);\n        }\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "2\nPLACED SHIPPED",
+                  "output": "PLACED: waiting for payment\nSHIPPED: on its way"
+                },
+                {
+                  "input": "1\nSHIPPED",
+                  "output": "SHIPPED: on its way"
+                },
+                {
+                  "input": "3\nPAID DELIVERED SHIPPED",
+                  "output": "PAID: being packed\nDELIVERED: arrived\nSHIPPED: on its way"
+                },
+                {
+                  "input": "1\nDELIVERED",
+                  "output": "DELIVERED: arrived"
+                },
+                {
+                  "input": "4\nSHIPPED PLACED SHIPPED PAID",
+                  "output": "SHIPPED: on its way\nPLACED: waiting for payment\nSHIPPED: on its way\nPAID: being packed"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "j33-sm-counts",
+              "title": "Every state, even the empty ones",
+              "prompt": "Count how many orders are in each status with an `EnumMap`, then print EVERY status and its count - including zeros - in declaration order.",
+              "hint": "`counts.merge(status, 1, Integer::sum)` counts.",
+              "hints": [
+                "`counts.merge(status, 1, Integer::sum)` counts.",
+                "Printing the map itself would skip the statuses nobody reached.",
+                "Iterate `Status.values()` instead, and use `getOrDefault(s, 0)`.",
+                "Both the map and `values()` are in declaration order."
+              ],
+              "language": "java",
+              "kind": "challenge",
+              "difficulty": "Medium",
+              "starter": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\n\nenum Status {\n    PLACED, PAID, SHIPPED, DELIVERED\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        Map<Status, Integer> counts = new EnumMap<>(Status.class);\n____\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\n\nenum Status {\n    PLACED, PAID, SHIPPED, DELIVERED\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        Map<Status, Integer> counts = new EnumMap<>(Status.class);\n        for (int i = 0; i < n; i++) {\n            counts.merge(Status.valueOf(sc.next()), 1, Integer::sum);\n        }\n        for (Status s : Status.values()) {\n            System.out.println(s + \" \" + counts.getOrDefault(s, 0));\n        }\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "3\nPAID PLACED PAID",
+                  "output": "PLACED 1\nPAID 2\nSHIPPED 0\nDELIVERED 0"
+                },
+                {
+                  "input": "1\nDELIVERED",
+                  "output": "PLACED 0\nPAID 0\nSHIPPED 0\nDELIVERED 1"
+                },
+                {
+                  "input": "3\nSHIPPED SHIPPED PLACED",
+                  "output": "PLACED 1\nPAID 0\nSHIPPED 2\nDELIVERED 0"
+                },
+                {
+                  "input": "4\nPLACED PAID SHIPPED DELIVERED",
+                  "output": "PLACED 1\nPAID 1\nSHIPPED 1\nDELIVERED 1"
+                },
+                {
+                  "input": "2\nDELIVERED DELIVERED",
+                  "output": "PLACED 0\nPAID 0\nSHIPPED 0\nDELIVERED 2"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            }
+          ],
+          "quiz": [
+            {
+              "question": "Why model a state machine's states as an enum rather than Strings?",
+              "options": [
+                "an invalid state cannot be written, and switches can be checked for completeness",
+                "enums are faster to print",
+                "Strings cannot be switched on",
+                "enums are mutable"
+              ],
+              "answer": 0,
+              "explanation": "The type system does half the testing."
+            },
+            {
+              "question": "To print every status's count, including zero counts, iterate…",
+              "options": [
+                "Status.values(), with getOrDefault",
+                "the EnumMap's keySet",
+                "the EnumMap's entrySet",
+                "the input again"
+              ],
+              "answer": 0,
+              "explanation": "A map only holds keys that were put into it."
+            }
+          ]
+        }
+      ],
+      "capstone": {
+        "title": "The order tracker",
+        "brief": "An order is always in one of five states - `PLACED`, `PAID`, `SHIPPED`,\n`DELIVERED`, `CANCELLED` - and moves between them on events:\n\n| from | `pay` | `ship` | `deliver` | `cancel` |\n|---|---|---|---|---|\n| PLACED | PAID | | | CANCELLED |\n| PAID | | SHIPPED | | CANCELLED |\n| SHIPPED | | | DELIVERED | |\n| DELIVERED, CANCELLED | | | | |\n\nWrite `OrderStatus.on(event)`, returning the next state, and throwing\n`IllegalStateException` for any event the table leaves blank. Use a switch\nexpression over `this` - covering every constant, with **no `default`** at the\nouter level - and an inner switch over the event.\n\n`main` replays each order's events, stopping at the first rejected one, prints\neach order's final state (and the rejected event), and then an `EnumMap` of how\nmany orders ended in each state.\n",
+        "kind": "auto",
+        "exercise": {
+          "id": "j33-cap-orders",
+          "title": "The order tracker",
+          "prompt": "Write the `OrderStatus` enum's constants and its `on(String event)` method, as the brief's table describes.",
+          "hint": "Constants first: `PLACED, PAID, SHIPPED, DELIVERED, CANCELLED;`",
+          "hints": [
+            "Constants first: `PLACED, PAID, SHIPPED, DELIVERED, CANCELLED;`",
+            "`return switch (this) { ... };` - inside the enum, `this` is the current constant.",
+            "Each arm can itself be a switch expression over the `String` event.",
+            "`default -> throw new IllegalStateException();` - a `throw` is allowed as an arm.",
+            "`case DELIVERED, CANCELLED -> throw ...` - the final states accept nothing.",
+            "The outer switch needs no `default`: five constants, five covered.",
+            "The EnumMap prints in declaration order, skipping states nobody ended in."
+          ],
+          "language": "java",
+          "kind": "challenge",
+          "difficulty": "Hard",
+          "starter": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\n\nenum OrderStatus {\n____\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        Map<OrderStatus, Integer> finals = new EnumMap<>(OrderStatus.class);\n        for (int i = 1; i <= n; i++) {\n            int k = sc.nextInt();\n            OrderStatus s = OrderStatus.PLACED;\n            String rejected = null;\n            for (int j = 0; j < k; j++) {\n                String event = sc.next();\n                if (rejected != null) {\n                    continue;\n                }\n                try {\n                    s = s.on(event);\n                } catch (IllegalStateException e) {\n                    rejected = event;\n                }\n            }\n            System.out.println(\"order \" + i + \": \" + s\n                    + (rejected == null ? \"\" : \" (rejected \" + rejected + \")\"));\n            finals.merge(s, 1, Integer::sum);\n        }\n        System.out.println(finals);\n    }\n}\n",
+          "solution": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\n\nenum OrderStatus {\n    PLACED, PAID, SHIPPED, DELIVERED, CANCELLED;\n\n    OrderStatus on(String event) {\n        return switch (this) {\n            case PLACED -> switch (event) {\n                case \"pay\" -> PAID;\n                case \"cancel\" -> CANCELLED;\n                default -> throw new IllegalStateException();\n            };\n            case PAID -> switch (event) {\n                case \"ship\" -> SHIPPED;\n                case \"cancel\" -> CANCELLED;\n                default -> throw new IllegalStateException();\n            };\n            case SHIPPED -> switch (event) {\n                case \"deliver\" -> DELIVERED;\n                default -> throw new IllegalStateException();\n            };\n            case DELIVERED, CANCELLED -> throw new IllegalStateException();\n        };\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        Map<OrderStatus, Integer> finals = new EnumMap<>(OrderStatus.class);\n        for (int i = 1; i <= n; i++) {\n            int k = sc.nextInt();\n            OrderStatus s = OrderStatus.PLACED;\n            String rejected = null;\n            for (int j = 0; j < k; j++) {\n                String event = sc.next();\n                if (rejected != null) {\n                    continue;\n                }\n                try {\n                    s = s.on(event);\n                } catch (IllegalStateException e) {\n                    rejected = event;\n                }\n            }\n            System.out.println(\"order \" + i + \": \" + s\n                    + (rejected == null ? \"\" : \" (rejected \" + rejected + \")\"));\n            finals.merge(s, 1, Integer::sum);\n        }\n        System.out.println(finals);\n    }\n}\n",
+          "tests": [
+            {
+              "input": "2\n3 pay ship deliver\n1 cancel",
+              "output": "order 1: DELIVERED\norder 2: CANCELLED\n{DELIVERED=1, CANCELLED=1}"
+            },
+            {
+              "input": "3\n2 pay cancel\n1 ship\n0",
+              "output": "order 1: CANCELLED\norder 2: PLACED (rejected ship)\norder 3: PLACED\n{PLACED=2, CANCELLED=1}"
+            },
+            {
+              "input": "3\n3 pay ship cancel\n2 pay ship\n4 pay ship deliver pay",
+              "output": "order 1: SHIPPED (rejected cancel)\norder 2: SHIPPED\norder 3: DELIVERED (rejected pay)\n{SHIPPED=2, DELIVERED=1}"
+            },
+            {
+              "input": "1\n0",
+              "output": "order 1: PLACED\n{PLACED=1}"
+            },
+            {
+              "input": "4\n2 cancel pay\n3 pay ship deliver\n1 pay\n3 pay ship deliver",
+              "output": "order 1: CANCELLED (rejected pay)\norder 2: DELIVERED\norder 3: PAID\norder 4: DELIVERED\n{PAID=1, DELIVERED=2, CANCELLED=1}"
+            }
+          ],
+          "source_slug": "",
+          "dataset": ""
+        },
+        "example_io": "stdin:  2\n        3 pay ship deliver\n        1 cancel\n\nstdout: order 1: DELIVERED\n        order 2: CANCELLED\n        {DELIVERED=1, CANCELLED=1}",
+        "rubric": [
+          "The states are an enum; no state is ever a String or an int.",
+          "`on` is a switch expression over `this` that covers every constant without a `default`.",
+          "Invalid transitions throw `IllegalStateException` rather than returning the old state.",
+          "The final counts use an `EnumMap`, so they print in declaration order."
+        ],
+        "reference": "",
+        "stretch": null
+      },
+      "objectives": [
+        "Declare an enum, and explain why it is a class with a fixed set of instances.",
+        "Use `values()`, `valueOf()`, `name()` and `ordinal()`, and say why ordinals must not be persisted.",
+        "Give enum constants fields, lambda-valued fields and constant-specific method bodies.",
+        "Use `EnumMap` and `EnumSet`, and say why they beat hash-based collections for enum keys.",
+        "Explain switch fall-through, and fix a missing `break`.",
+        "Write switch expressions with arrow arms, shared labels and `yield`.",
+        "Explain exhaustiveness, and why a switch expression over an enum needs no `default`.",
+        "Choose between static nested, inner, local and anonymous classes.",
+        "Reach an enclosing instance with `Outer.this`, and explain the memory cost of inner classes.",
+        "Make a class iterable with an inner `Iterator`.",
+        "Model a state machine with an enum and an exhaustive switch."
+      ],
+      "why": "Enums and switch are on every Java interview's list of basics, and the follow-ups are where people slip: why not store the ordinal, what does `valueOf` throw, why did this switch print three lines, what is the difference between a static nested and an inner class, why can an inner class leak memory. They are also the building blocks of the next three modules - an enum is the safest singleton, a constant per strategy is the neatest strategy pattern, and a Builder is a static nested class.",
+      "est_minutes": 300,
+      "glossary": [
+        {
+          "term": "enum",
+          "def": "A class with a fixed, named set of instances, created once when the class loads."
+        },
+        {
+          "term": "ordinal()",
+          "def": "A constant's 0-based position in the declaration. Fine for arithmetic inside the enum; never persist it."
+        },
+        {
+          "term": "valueOf(String)",
+          "def": "Converts a constant's exact name back to the constant; throws IllegalArgumentException otherwise."
+        },
+        {
+          "term": "Constant-specific body",
+          "def": "A class body attached to one enum constant, usually implementing an abstract method the enum declares."
+        },
+        {
+          "term": "EnumMap / EnumSet",
+          "def": "Array- and bit-field-backed collections for enum keys; iterate in declaration order."
+        },
+        {
+          "term": "Fall-through",
+          "def": "In a switch statement, execution continuing into the next case because there was no `break`."
+        },
+        {
+          "term": "Switch expression",
+          "def": "A switch that produces a value, with arrow arms that never fall through (Java 14)."
+        },
+        {
+          "term": "yield",
+          "def": "Produces the value of a block arm in a switch expression."
+        },
+        {
+          "term": "Exhaustive",
+          "def": "Covering every possible value. Required of a switch expression, and checked by the compiler for enums."
+        },
+        {
+          "term": "Static nested class",
+          "def": "A class declared `static` inside another; no link to an outer instance."
+        },
+        {
+          "term": "Inner class",
+          "def": "A non-static nested class; each instance holds a hidden reference to the outer instance (`Outer.this`)."
+        },
+        {
+          "term": "Anonymous class",
+          "def": "A class declared and instantiated in one expression, with no name."
+        },
+        {
+          "term": "Iterable",
+          "def": "An interface with one method, `iterator()`; implementing it lets a class be used in an enhanced `for`."
+        }
+      ],
+      "cheatsheet": "```java\n// --- enums ------------------------------------------------------------------------\nenum Coin {\n    PENNY(1), NICKEL(5), DIME(10), QUARTER(25);   // constants first, then ';'\n    private final int cents;\n    Coin(int cents) { this.cents = cents; }        // always private\n    int cents() { return cents; }\n}\nCoin.valueOf(\"DIME\")         // exact name, else IllegalArgumentException\nCoin.values()                // every constant, declaration order (a new array)\nc.name()  c.ordinal()  c == Coin.DIME   // == is right: one instance each\n\nenum Op {                    // a behaviour per constant\n    ADD((a, b) -> a + b), MUL((a, b) -> a * b);\n    private final IntBinaryOperator fn;\n    Op(IntBinaryOperator fn) { this.fn = fn; }\n    int apply(int a, int b) { return fn.applyAsInt(a, b); }\n}\nenum Shape { SQUARE { int area(int s) { return s * s; } }; abstract int area(int s); }\nDay next() { return values()[(ordinal() + 1) % values().length]; }\n\nMap<Suit, Integer> m = new EnumMap<>(Suit.class);   // declaration-order iteration\nSet<Suit> red = EnumSet.of(Suit.HEARTS, Suit.DIAMONDS);\n\n// --- switch ----------------------------------------------------------------------\nswitch (grade) {                 // STATEMENT: falls through without break\n    case \"A\": System.out.println(\"excellent\"); break;\n    default:  System.out.println(\"try again\");\n}\nString kind = switch (day) {     // EXPRESSION (Java 14): no fall-through\n    case SATURDAY, SUNDAY -> \"weekend\";\n    default -> \"weekday\";\n};\nint cost = switch (zone) {       // exhaustive over an enum: no default needed\n    case LOCAL -> 5;\n    case NATIONAL -> { int base = 10; yield base + weight; }\n    case INTERNATIONAL -> throw new IllegalStateException();\n};\n\n// --- nested classes -------------------------------------------------------------\nclass Outer {\n    private static class Node { }            // static nested: no outer instance\n    private class Inner { int f() { return Outer.this.x; } }   // inner: has one\n}\nnew Comparator<String>() { public int compare(String a, String b) { ... } }  // anonymous\nclass Range implements Iterable<Integer> { public Iterator<Integer> iterator() { ... } }\n```\n",
+      "self_check": [
+        "Can you explain why an enum constant should be compared with `==`?",
+        "Can you say what `valueOf(\"east\")` does when the constant is `EAST`, and how to fix it?",
+        "Can you explain why an ordinal must not be written to a database?",
+        "Can you give an enum constant its own behaviour in two different ways?",
+        "Can you say two reasons to use `EnumMap` over `HashMap` for enum keys?",
+        "Can you predict what a switch statement with no `break`s prints?",
+        "Can you write a switch expression with shared labels and a `yield` block?",
+        "Can you explain why a switch expression over an enum needs no `default`, and what happens when a constant is added?",
+        "Can you say when a nested class should be `static`, and what an inner class costs?",
+        "Can you reach an outer field that an inner class's field shadows?",
+        "Can you make your own class work in an enhanced `for` loop?"
+      ],
+      "review": [
+        {
+          "question": "An enum's constants are reordered. What silently changes?",
+          "options": [
+            "every ordinal() value",
+            "every name()",
+            "every valueOf() result",
+            "nothing"
+          ],
+          "answer": 0,
+          "explanation": "Which is why ordinals must never be stored."
+        },
+        {
+          "question": "```java\nswitch (x) {\n    case 1: System.out.print(\"a\");\n    case 2: System.out.print(\"b\");\n    default: System.out.print(\"c\");\n}\n```\nWith `x = 1` this prints…",
+          "options": [
+            "abc",
+            "a",
+            "ac",
+            "nothing"
+          ],
+          "answer": 0,
+          "explanation": "No breaks: it falls through every following case."
+        },
+        {
+          "question": "A switch expression over an enum with three constants lists all three and no `default`. A fourth constant is added. The result is…",
+          "options": [
+            "a compile error at that switch",
+            "a silent 0",
+            "an exception at run time",
+            "the first arm runs"
+          ],
+          "answer": 0,
+          "explanation": "Exhaustiveness is re-checked on every compile."
+        },
+        {
+          "question": "A `Node` class used only inside a linked list should be…",
+          "options": [
+            "private static nested",
+            "a public inner class",
+            "anonymous",
+            "an enum"
+          ],
+          "answer": 0,
+          "explanation": "No outer-instance reference to carry around."
+        },
+        {
+          "question": "`EnumMap` prints its entries in…",
+          "options": [
+            "declaration order of the enum",
+            "insertion order",
+            "hash order",
+            "value order"
+          ],
+          "answer": 0,
+          "explanation": "It is an array indexed by ordinal."
+        }
+      ],
+      "milestone": "You can model a fixed set of values as an enum with its own data and behaviour, write a switch that the compiler checks for completeness, and choose the right kind of nested class - the vocabulary the design patterns module is written in.",
+      "practice": [
+        {
+          "key": "p33-enums",
+          "title": "Enums with data",
+          "pattern": "`valueOf`, `values()`, fields, a static lookup, and `name()` versus `toString()`.",
+          "intro": "An enum is a class whose instances you list:\n\n```java\nenum Grade {\n    A(90), B(80), C(70), D(60), F(0);\n    private final int min;\n    Grade(int min) { this.min = min; }\n\n    static Grade of(int score) {             // a lookup over values()\n        for (Grade g : values()) {\n            if (score >= g.min) return g;\n        }\n        throw new IllegalArgumentException();\n    }\n}\n```\n\nTwo facts carry this family. Enums are `Comparable` in **declaration order**, so\nsorting a list of them needs no comparator. And `name()` is final and always the\ndeclared name - `valueOf` uses it - while `toString()` can be overridden for\ndisplay. Parse with `valueOf`, print with `toString`, and the two never collide.\n",
+          "exercises": [
+            {
+              "id": "j33-pa-parse",
+              "title": "Valid and invalid names",
+              "prompt": "Parse each token as a `Color`. Print the valid ones in order, then `invalid: k` for how many were not colours. `valueOf` throws `IllegalArgumentException` for a bad name.",
+              "hint": "`Color.valueOf(token)` either returns a constant or throws.",
+              "hints": [
+                "`Color.valueOf(token)` either returns a constant or throws.",
+                "Catch `IllegalArgumentException` and count it.",
+                "`red` is not `RED` - no normalising in this one."
+              ],
+              "language": "java",
+              "kind": "challenge",
+              "difficulty": "Intro",
+              "starter": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\n\nenum Color {\n    RED, GREEN, BLUE\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n____\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\n\nenum Color {\n    RED, GREEN, BLUE\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int invalid = 0;\n        for (int i = 0; i < n; i++) {\n            String token = sc.next();\n            try {\n                System.out.println(Color.valueOf(token));\n            } catch (IllegalArgumentException e) {\n                invalid++;\n            }\n        }\n        System.out.println(\"invalid: \" + invalid);\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "3\nRED PINK BLUE",
+                  "output": "RED\nBLUE\ninvalid: 1"
+                },
+                {
+                  "input": "1\nGREEN",
+                  "output": "GREEN\ninvalid: 0"
+                },
+                {
+                  "input": "4\nred BLUE BLUE TEAL",
+                  "output": "BLUE\nBLUE\ninvalid: 2"
+                },
+                {
+                  "input": "1\nNONE",
+                  "output": "invalid: 1"
+                },
+                {
+                  "input": "3\nBLUE GREEN RED",
+                  "output": "BLUE\nGREEN\nRED\ninvalid: 0"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "j33-pa-field",
+              "title": "Cups by size",
+              "prompt": "Write `Size`'s body: SMALL, MEDIUM and LARGE hold 250, 350 and 500 ml. `main` prints the total volume of the order.",
+              "hint": "`SMALL(250), MEDIUM(350), LARGE(500);`",
+              "hints": [
+                "`SMALL(250), MEDIUM(350), LARGE(500);`",
+                "A private final field and a constructor that sets it.",
+                "`int ml()` returns it."
+              ],
+              "language": "java",
+              "kind": "challenge",
+              "difficulty": "Easy",
+              "starter": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\n\nenum Size {\n____\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int total = 0;\n        for (int i = 0; i < n; i++) {\n            total += Size.valueOf(sc.next()).ml();\n        }\n        System.out.println(total + \" ml\");\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\n\nenum Size {\n    SMALL(250), MEDIUM(350), LARGE(500);\n\n    private final int ml;\n\n    Size(int ml) {\n        this.ml = ml;\n    }\n\n    int ml() {\n        return ml;\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int total = 0;\n        for (int i = 0; i < n; i++) {\n            total += Size.valueOf(sc.next()).ml();\n        }\n        System.out.println(total + \" ml\");\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "2\nSMALL LARGE",
+                  "output": "750 ml"
+                },
+                {
+                  "input": "1\nMEDIUM",
+                  "output": "350 ml"
+                },
+                {
+                  "input": "3\nLARGE LARGE LARGE",
+                  "output": "1500 ml"
+                },
+                {
+                  "input": "4\nSMALL SMALL MEDIUM LARGE",
+                  "output": "1350 ml"
+                },
+                {
+                  "input": "2\nMEDIUM SMALL",
+                  "output": "600 ml"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "j33-pa-lookup",
+              "title": "Score to grade",
+              "prompt": "Write `Grade.of(score)`: return the FIRST grade, in declaration order, whose minimum the score reaches.",
+              "hint": "`static Grade of(int score)` - static, because there is no Grade yet.",
+              "hints": [
+                "`static Grade of(int score)` - static, because there is no Grade yet.",
+                "Loop over `values()`, highest minimum first.",
+                "The enum can read `g.min` even though it is private - same class.",
+                "F's minimum is 0, so every non-negative score finds a grade."
+              ],
+              "language": "java",
+              "kind": "challenge",
+              "difficulty": "Easy",
+              "starter": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\n\nenum Grade {\n    A(90), B(80), C(70), D(60), F(0);\n\n    private final int min;\n\n    Grade(int min) {\n        this.min = min;\n    }\n\n____\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        for (int i = 0; i < n; i++) {\n            int score = sc.nextInt();\n            System.out.println(score + \" \" + Grade.of(score));\n        }\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\n\nenum Grade {\n    A(90), B(80), C(70), D(60), F(0);\n\n    private final int min;\n\n    Grade(int min) {\n        this.min = min;\n    }\n\n    static Grade of(int score) {\n        for (Grade g : values()) {\n            if (score >= g.min) {\n                return g;\n            }\n        }\n        throw new IllegalArgumentException();\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        for (int i = 0; i < n; i++) {\n            int score = sc.nextInt();\n            System.out.println(score + \" \" + Grade.of(score));\n        }\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "2\n95 42",
+                  "output": "95 A\n42 F"
+                },
+                {
+                  "input": "3\n90 89 80",
+                  "output": "90 A\n89 B\n80 B"
+                },
+                {
+                  "input": "1\n0",
+                  "output": "0 F"
+                },
+                {
+                  "input": "4\n100 60 59 70",
+                  "output": "100 A\n60 D\n59 F\n70 C"
+                },
+                {
+                  "input": "1\n75",
+                  "output": "75 C"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "j33-pa-sort",
+              "title": "Most urgent first",
+              "prompt": "Each task is `name PRIORITY`. Print them most urgent first, breaking ties by name. Enums compare in declaration order, so no comparator for the priority itself is needed.",
+              "hint": "Enums implement `Comparable` by ordinal: LOW < MEDIUM < HIGH < URGENT.",
+              "hints": [
+                "Enums implement `Comparable` by ordinal: LOW < MEDIUM < HIGH < URGENT.",
+                "`Comparator.comparing(i -> pris.get(i))` then `.reversed()` puts URGENT first.",
+                "The lambda's parameter type has to be spelled `(Integer i)` - `reversed()` gives inference nothing to work from.",
+                "`.thenComparing(i -> names.get(i))` breaks ties alphabetically."
+              ],
+              "language": "java",
+              "kind": "challenge",
+              "difficulty": "Medium",
+              "starter": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\n\nenum Priority {\n    LOW, MEDIUM, HIGH, URGENT\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        List<String> names = new ArrayList<>();\n        List<Priority> pris = new ArrayList<>();\n        List<Integer> order = new ArrayList<>();\n        for (int i = 0; i < n; i++) {\n            names.add(sc.next());\n            pris.add(Priority.valueOf(sc.next()));\n            order.add(i);\n        }\n____\n        for (int i : order) {\n            System.out.println(pris.get(i) + \" \" + names.get(i));\n        }\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\n\nenum Priority {\n    LOW, MEDIUM, HIGH, URGENT\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        List<String> names = new ArrayList<>();\n        List<Priority> pris = new ArrayList<>();\n        List<Integer> order = new ArrayList<>();\n        for (int i = 0; i < n; i++) {\n            names.add(sc.next());\n            pris.add(Priority.valueOf(sc.next()));\n            order.add(i);\n        }\n        order.sort(Comparator.comparing((Integer i) -> pris.get(i)).reversed()\n                .thenComparing(i -> names.get(i)));\n        for (int i : order) {\n            System.out.println(pris.get(i) + \" \" + names.get(i));\n        }\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "3\nwrite LOW\nfix URGENT\ntest HIGH",
+                  "output": "URGENT fix\nHIGH test\nLOW write"
+                },
+                {
+                  "input": "1\nsolo MEDIUM",
+                  "output": "MEDIUM solo"
+                },
+                {
+                  "input": "3\nb HIGH\na HIGH\nc LOW",
+                  "output": "HIGH a\nHIGH b\nLOW c"
+                },
+                {
+                  "input": "4\nx URGENT\ny URGENT\nw MEDIUM\nv LOW",
+                  "output": "URGENT x\nURGENT y\nMEDIUM w\nLOW v"
+                },
+                {
+                  "input": "2\ndeploy MEDIUM\naudit LOW",
+                  "output": "MEDIUM deploy\nLOW audit"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "j33-pa-display",
+              "title": "`name()` for parsing, `toString()` for people",
+              "prompt": "Write `Unit`'s body so each constant prints as a friendly label (KM prints `kilometres`) while `valueOf(\"KM\")` still works. `main` prints `amount label (NAME)`.",
+              "hint": "Each constant passes its label to the constructor.",
+              "hints": [
+                "Each constant passes its label to the constructor.",
+                "Override `toString()` to return the label - it must be `public`.",
+                "`name()` is final: it is always `KM`, whatever `toString` says.",
+                "`valueOf` matches on `name()`, so overriding `toString` never breaks parsing."
+              ],
+              "language": "java",
+              "kind": "challenge",
+              "difficulty": "Hard",
+              "starter": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\n\nenum Unit {\n____\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        for (int i = 0; i < n; i++) {\n            int amount = sc.nextInt();\n            Unit u = Unit.valueOf(sc.next());\n            System.out.println(amount + \" \" + u + \" (\" + u.name() + \")\");\n        }\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\n\nenum Unit {\n    KM(\"kilometres\"), M(\"metres\"), CM(\"centimetres\");\n\n    private final String label;\n\n    Unit(String label) {\n        this.label = label;\n    }\n\n    @Override\n    public String toString() {\n        return label;\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        for (int i = 0; i < n; i++) {\n            int amount = sc.nextInt();\n            Unit u = Unit.valueOf(sc.next());\n            System.out.println(amount + \" \" + u + \" (\" + u.name() + \")\");\n        }\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "1\n3 KM",
+                  "output": "3 kilometres (KM)"
+                },
+                {
+                  "input": "2\n10 M\n5 CM",
+                  "output": "10 metres (M)\n5 centimetres (CM)"
+                },
+                {
+                  "input": "3\n1 CM\n2 KM\n7 M",
+                  "output": "1 centimetres (CM)\n2 kilometres (KM)\n7 metres (M)"
+                },
+                {
+                  "input": "1\n0 M",
+                  "output": "0 metres (M)"
+                },
+                {
+                  "input": "2\n42 KM\n42 CM",
+                  "output": "42 kilometres (KM)\n42 centimetres (CM)"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            }
+          ]
+        },
+        {
+          "key": "p33-maps",
+          "title": "`EnumMap` and `EnumSet`",
+          "pattern": "Collections keyed by an enum: array-backed, and always in declaration order.",
+          "intro": "```java\nMap<Color, Integer> counts = new EnumMap<>(Color.class);\nSet<Day> worked = EnumSet.noneOf(Day.class);\nEnumSet.of(Day.SAT, Day.SUN)          EnumSet.allOf(Day.class)\nEnumSet.range(Day.MON, Day.FRI)       EnumSet.complementOf(worked)\n```\n\nAn `EnumSet` is a bit field - one bit per constant - and an `EnumMap` is an\narray indexed by ordinal. Both print in declaration order, whatever order you\nadded things in, which makes them the natural choice whenever the keys are an\nenum and the output has to be predictable.\n",
+          "exercises": [
+            {
+              "id": "j33-pb-count",
+              "title": "Votes by colour",
+              "prompt": "Count the votes for each colour in an `EnumMap` and print it.",
+              "hint": "`new EnumMap<>(Color.class)`.",
+              "hints": [
+                "`new EnumMap<>(Color.class)`.",
+                "`merge(key, 1, Integer::sum)` counts.",
+                "It prints RED before GREEN before BLUE, whatever the input order."
+              ],
+              "language": "java",
+              "kind": "challenge",
+              "difficulty": "Intro",
+              "starter": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\n\nenum Color {\n    RED, GREEN, BLUE\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n____\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\n\nenum Color {\n    RED, GREEN, BLUE\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        Map<Color, Integer> votes = new EnumMap<>(Color.class);\n        for (int i = 0; i < n; i++) {\n            votes.merge(Color.valueOf(sc.next()), 1, Integer::sum);\n        }\n        System.out.println(votes);\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "3\nBLUE RED BLUE",
+                  "output": "{RED=1, BLUE=2}"
+                },
+                {
+                  "input": "1\nGREEN",
+                  "output": "{GREEN=1}"
+                },
+                {
+                  "input": "5\nRED RED GREEN BLUE GREEN",
+                  "output": "{RED=2, GREEN=2, BLUE=1}"
+                },
+                {
+                  "input": "1\nBLUE",
+                  "output": "{BLUE=1}"
+                },
+                {
+                  "input": "3\nGREEN GREEN GREEN",
+                  "output": "{GREEN=3}"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "j33-pb-all",
+              "title": "Including the colours nobody chose",
+              "prompt": "Print every colour with its vote count, one per line, including zeros.",
+              "hint": "The map only has keys that were voted for.",
+              "hints": [
+                "The map only has keys that were voted for.",
+                "Loop over `Color.values()` instead.",
+                "`getOrDefault(c, 0)` fills the gaps."
+              ],
+              "language": "java",
+              "kind": "challenge",
+              "difficulty": "Easy",
+              "starter": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\n\nenum Color {\n    RED, GREEN, BLUE\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        Map<Color, Integer> votes = new EnumMap<>(Color.class);\n        for (int i = 0; i < n; i++) {\n            votes.merge(Color.valueOf(sc.next()), 1, Integer::sum);\n        }\n____\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\n\nenum Color {\n    RED, GREEN, BLUE\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        Map<Color, Integer> votes = new EnumMap<>(Color.class);\n        for (int i = 0; i < n; i++) {\n            votes.merge(Color.valueOf(sc.next()), 1, Integer::sum);\n        }\n        for (Color c : Color.values()) {\n            System.out.println(c + \" \" + votes.getOrDefault(c, 0));\n        }\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "3\nBLUE RED BLUE",
+                  "output": "RED 1\nGREEN 0\nBLUE 2"
+                },
+                {
+                  "input": "1\nGREEN",
+                  "output": "RED 0\nGREEN 1\nBLUE 0"
+                },
+                {
+                  "input": "5\nRED RED GREEN BLUE GREEN",
+                  "output": "RED 2\nGREEN 2\nBLUE 1"
+                },
+                {
+                  "input": "1\nBLUE",
+                  "output": "RED 0\nGREEN 0\nBLUE 1"
+                },
+                {
+                  "input": "3\nGREEN GREEN GREEN",
+                  "output": "RED 0\nGREEN 3\nBLUE 0"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "j33-pb-set",
+              "title": "Days worked, days off",
+              "prompt": "Collect the days worked into an `EnumSet` (duplicates collapse), print it, then print the days NOT worked.",
+              "hint": "`EnumSet.noneOf(Day.class)` is an empty set of days.",
+              "hints": [
+                "`EnumSet.noneOf(Day.class)` is an empty set of days.",
+                "A set ignores the second FRI.",
+                "`EnumSet.complementOf` needs an `EnumSet`, and `worked` is declared as a `Set` - `EnumSet.copyOf(worked)` bridges the two.",
+                "Both print in declaration order, MON first."
+              ],
+              "language": "java",
+              "kind": "challenge",
+              "difficulty": "Medium",
+              "starter": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\n\nenum Day {\n    MON, TUE, WED, THU, FRI, SAT, SUN\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n____\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\n\nenum Day {\n    MON, TUE, WED, THU, FRI, SAT, SUN\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        Set<Day> worked = EnumSet.noneOf(Day.class);\n        for (int i = 0; i < n; i++) {\n            worked.add(Day.valueOf(sc.next()));\n        }\n        System.out.println(worked);\n        System.out.println(EnumSet.complementOf(EnumSet.copyOf(worked)));\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "2\nMON WED",
+                  "output": "[MON, WED]\n[TUE, THU, FRI, SAT, SUN]"
+                },
+                {
+                  "input": "1\nSUN",
+                  "output": "[SUN]\n[MON, TUE, WED, THU, FRI, SAT]"
+                },
+                {
+                  "input": "4\nFRI MON TUE FRI",
+                  "output": "[MON, TUE, FRI]\n[WED, THU, SAT, SUN]"
+                },
+                {
+                  "input": "2\nSAT SUN",
+                  "output": "[SAT, SUN]\n[MON, TUE, WED, THU, FRI]"
+                },
+                {
+                  "input": "5\nTHU WED TUE MON FRI",
+                  "output": "[MON, TUE, WED, THU, FRI]\n[SAT, SUN]"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "j33-pb-range",
+              "title": "A range of days",
+              "prompt": "Read two days and print every day from the first to the second INCLUSIVE, then how many there are.",
+              "hint": "`EnumSet.range(from, to)` includes both ends.",
+              "hints": [
+                "`EnumSet.range(from, to)` includes both ends.",
+                "It follows declaration order - which is why MON..FRI means the working week.",
+                "A range from a day to itself has one element."
+              ],
+              "language": "java",
+              "kind": "challenge",
+              "difficulty": "Medium",
+              "starter": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\n\nenum Day {\n    MON, TUE, WED, THU, FRI, SAT, SUN\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        Day from = Day.valueOf(sc.next());\n        Day to = Day.valueOf(sc.next());\n____\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\n\nenum Day {\n    MON, TUE, WED, THU, FRI, SAT, SUN\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        Day from = Day.valueOf(sc.next());\n        Day to = Day.valueOf(sc.next());\n        Set<Day> span = EnumSet.range(from, to);\n        System.out.println(span);\n        System.out.println(span.size());\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "MON FRI",
+                  "output": "[MON, TUE, WED, THU, FRI]\n5"
+                },
+                {
+                  "input": "SAT SUN",
+                  "output": "[SAT, SUN]\n2"
+                },
+                {
+                  "input": "WED WED",
+                  "output": "[WED]\n1"
+                },
+                {
+                  "input": "TUE THU",
+                  "output": "[TUE, WED, THU]\n3"
+                },
+                {
+                  "input": "MON SUN",
+                  "output": "[MON, TUE, WED, THU, FRI, SAT, SUN]\n7"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "j33-pb-group",
+              "title": "Words grouped by length class",
+              "prompt": "`Length.of(word)` classifies a word as SHORT (≤ 3), MEDIUM (≤ 6) or LONG. Group the words into an `EnumMap<Length, List<String>>`, keeping input order within each group, and print it.",
+              "hint": "`computeIfAbsent(key, k -> new ArrayList<>())` creates each list once.",
+              "hints": [
+                "`computeIfAbsent(key, k -> new ArrayList<>())` creates each list once.",
+                "Then `.add(w)` onto whatever list came back.",
+                "The groups print SHORT, MEDIUM, LONG - declaration order - and skip empty ones."
+              ],
+              "language": "java",
+              "kind": "challenge",
+              "difficulty": "Hard",
+              "starter": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\n\nenum Length {\n    SHORT, MEDIUM, LONG;\n\n    static Length of(String word) {\n        if (word.length() <= 3) {\n            return SHORT;\n        }\n        return word.length() <= 6 ? MEDIUM : LONG;\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n____\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\n\nenum Length {\n    SHORT, MEDIUM, LONG;\n\n    static Length of(String word) {\n        if (word.length() <= 3) {\n            return SHORT;\n        }\n        return word.length() <= 6 ? MEDIUM : LONG;\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        Map<Length, List<String>> groups = new EnumMap<>(Length.class);\n        for (int i = 0; i < n; i++) {\n            String w = sc.next();\n            groups.computeIfAbsent(Length.of(w), k -> new ArrayList<>()).add(w);\n        }\n        System.out.println(groups);\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "4\nada banana kiwi strawberry",
+                  "output": "{SHORT=[ada], MEDIUM=[banana, kiwi], LONG=[strawberry]}"
+                },
+                {
+                  "input": "1\nx",
+                  "output": "{SHORT=[x]}"
+                },
+                {
+                  "input": "4\npear plum fig melon",
+                  "output": "{SHORT=[fig], MEDIUM=[pear, plum, melon]}"
+                },
+                {
+                  "input": "2\nwatermelon grapefruit",
+                  "output": "{LONG=[watermelon, grapefruit]}"
+                },
+                {
+                  "input": "5\na bb cccc ddddddd eee",
+                  "output": "{SHORT=[a, bb, eee], MEDIUM=[cccc], LONG=[ddddddd]}"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            }
+          ]
+        },
+        {
+          "key": "p33-switch",
+          "title": "`switch`, both kinds",
+          "pattern": "Arrow arms and shared labels - and, once, a fall-through on purpose.",
+          "intro": "```java\nint days = switch (month) {          // an expression: it has a value\n    case 2 -> 28;\n    case 4, 6, 9, 11 -> 30;\n    default -> 31;\n};\n\nswitch (c) {                          // a statement with arrows: no fall-through\n    case 'a', 'e', 'i', 'o', 'u' -> vowels++;\n    default -> other++;\n}\n```\n\nArrow arms run exactly their own code. A block arm in an expression ends with\n`yield`. And the classic colon-style statement still falls through without\n`break` - which, just occasionally, is exactly what you want: the last drill\nuses it deliberately.\n",
+          "exercises": [
+            {
+              "id": "j33-pc-days",
+              "title": "Days in a month",
+              "prompt": "Print the number of days in each month number (ignore leap years), using a switch expression.",
+              "hint": "`case 4, 6, 9, 11 -> 30;` shares one arm between four labels.",
+              "hints": [
+                "`case 4, 6, 9, 11 -> 30;` shares one arm between four labels.",
+                "An int switch needs a `default` - the compiler cannot know which ints occur.",
+                "The whole switch ends with `;` because it is an expression."
+              ],
+              "language": "java",
+              "kind": "challenge",
+              "difficulty": "Intro",
+              "starter": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n____\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        for (int i = 0; i < n; i++) {\n            int month = sc.nextInt();\n            int days = switch (month) {\n                case 2 -> 28;\n                case 4, 6, 9, 11 -> 30;\n                default -> 31;\n            };\n            System.out.println(month + \" \" + days);\n        }\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "2\n1 2",
+                  "output": "1 31\n2 28"
+                },
+                {
+                  "input": "4\n4 6 9 11",
+                  "output": "4 30\n6 30\n9 30\n11 30"
+                },
+                {
+                  "input": "1\n12",
+                  "output": "12 31"
+                },
+                {
+                  "input": "3\n7 8 2",
+                  "output": "7 31\n8 31\n2 28"
+                },
+                {
+                  "input": "3\n3 5 10",
+                  "output": "3 31\n5 31\n10 31"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "j33-pc-chars",
+              "title": "Classifying characters",
+              "prompt": "Read one line and count vowels, consonants, digits and other non-space characters. Lower-case each character first, then switch on it.",
+              "hint": "You can switch on a `char`.",
+              "hints": [
+                "You can switch on a `char`.",
+                "`case 'a', 'e', 'i', 'o', 'u' -> vowels++;`",
+                "`case ' ' -> { }` is an arm that deliberately does nothing.",
+                "Everything else goes to a `default` block that sorts it further."
+              ],
+              "language": "java",
+              "kind": "challenge",
+              "difficulty": "Easy",
+              "starter": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n____\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        String line = sc.nextLine();\n        int vowels = 0, consonants = 0, digits = 0, other = 0;\n        for (char ch : line.toCharArray()) {\n            char c = Character.toLowerCase(ch);\n            switch (c) {\n                case 'a', 'e', 'i', 'o', 'u' -> vowels++;\n                case ' ' -> { }\n                default -> {\n                    if (c >= 'a' && c <= 'z') {\n                        consonants++;\n                    } else if (Character.isDigit(c)) {\n                        digits++;\n                    } else {\n                        other++;\n                    }\n                }\n            }\n        }\n        System.out.println(\"vowels \" + vowels + \" consonants \" + consonants\n                + \" digits \" + digits + \" other \" + other);\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "hello world 42\n",
+                  "output": "vowels 3 consonants 7 digits 2 other 0"
+                },
+                {
+                  "input": "AEIOU xyz\n",
+                  "output": "vowels 5 consonants 3 digits 0 other 0"
+                },
+                {
+                  "input": "rhythm\n",
+                  "output": "vowels 0 consonants 6 digits 0 other 0"
+                },
+                {
+                  "input": "a1b2c3!?\n",
+                  "output": "vowels 1 consonants 2 digits 3 other 2"
+                },
+                {
+                  "input": "Queue up 7 items\n",
+                  "output": "vowels 7 consonants 5 digits 1 other 0"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "j33-pc-calc",
+              "title": "An integer calculator",
+              "prompt": "Each line is `a op b`. Support `+ - * / %` with Java's integer semantics; print `division by zero` for a zero divisor and `bad op X` for any other operator.",
+              "hint": "Switch on the operator String.",
+              "hints": [
+                "Switch on the operator String.",
+                "`default -> throw new IllegalArgumentException(op);` - a throw is a legal arm.",
+                "Integer `/` and `%` by zero throw `ArithmeticException`.",
+                "`100 / 7` is 14 and `100 % 7` is 2."
+              ],
+              "language": "java",
+              "kind": "challenge",
+              "difficulty": "Medium",
+              "starter": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n____\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        for (int i = 0; i < n; i++) {\n            int a = sc.nextInt();\n            String op = sc.next();\n            int b = sc.nextInt();\n            try {\n                int r = switch (op) {\n                    case \"+\" -> a + b;\n                    case \"-\" -> a - b;\n                    case \"*\" -> a * b;\n                    case \"/\" -> a / b;\n                    case \"%\" -> a % b;\n                    default -> throw new IllegalArgumentException(op);\n                };\n                System.out.println(r);\n            } catch (ArithmeticException e) {\n                System.out.println(\"division by zero\");\n            } catch (IllegalArgumentException e) {\n                System.out.println(\"bad op \" + op);\n            }\n        }\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "2\n7 + 5\n7 / 2",
+                  "output": "12\n3"
+                },
+                {
+                  "input": "2\n9 % 4\n3 ^ 2",
+                  "output": "1\nbad op ^"
+                },
+                {
+                  "input": "1\n-6 * 7",
+                  "output": "-42"
+                },
+                {
+                  "input": "2\n5 / 0\n1 - 9",
+                  "output": "division by zero\n-8"
+                },
+                {
+                  "input": "3\n100 / 7\n100 % 7\n2 x 2",
+                  "output": "14\n2\nbad op x"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "j33-pc-yield",
+              "title": "Ticket prices",
+              "prompt": "A CHILD pays 5. An ADULT pays 12, or 15 at weekends. A SENIOR pays half the adult weekday price (6), but at weekends pays the adult weekday price minus 4. Compute each price with a switch expression over `Group`, using a block and `yield` where an arm needs more than one line.",
+              "hint": "Three constants, three arms - no `default` needed.",
+              "hints": [
+                "Three constants, three arms - no `default` needed.",
+                "`case ADULT -> weekend ? 15 : 12;` fits on one line.",
+                "The SENIOR arm uses a block: `{ ...; yield value; }`.",
+                "`yield`, not `return`, inside a switch expression's block."
+              ],
+              "language": "java",
+              "kind": "challenge",
+              "difficulty": "Medium",
+              "starter": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\n\nenum Group {\n    CHILD, ADULT, SENIOR\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        for (int i = 0; i < n; i++) {\n            Group g = Group.valueOf(sc.next());\n            boolean weekend = sc.next().equals(\"yes\");\n____\n            System.out.println(g + \" \" + price);\n        }\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\n\nenum Group {\n    CHILD, ADULT, SENIOR\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        for (int i = 0; i < n; i++) {\n            Group g = Group.valueOf(sc.next());\n            boolean weekend = sc.next().equals(\"yes\");\n            int price = switch (g) {\n                case CHILD -> 5;\n                case ADULT -> weekend ? 15 : 12;\n                case SENIOR -> {\n                    int adultWeekday = 12;\n                    yield weekend ? adultWeekday - 4 : adultWeekday / 2;\n                }\n            };\n            System.out.println(g + \" \" + price);\n        }\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "2\nCHILD no\nADULT yes",
+                  "output": "CHILD 5\nADULT 15"
+                },
+                {
+                  "input": "1\nSENIOR no",
+                  "output": "SENIOR 6"
+                },
+                {
+                  "input": "3\nADULT no\nSENIOR yes\nCHILD yes",
+                  "output": "ADULT 12\nSENIOR 8\nCHILD 5"
+                },
+                {
+                  "input": "1\nADULT yes",
+                  "output": "ADULT 15"
+                },
+                {
+                  "input": "3\nCHILD no\nCHILD yes\nSENIOR yes",
+                  "output": "CHILD 5\nCHILD 5\nSENIOR 8"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "j33-pc-pack",
+              "title": "Fall-through on purpose",
+              "prompt": "A trip of `d` days (1 to 4) needs every item from the `d`-th down to the first: day 4 adds a map, 3 a lamp, 2 a stove and 1 a tent. Print `trip of d:` then the items, most specific first - using ONE colon-style switch that falls through deliberately, with no `break` at all.",
+              "hint": "Enter the switch at the trip's length and let it fall through the smaller cases.",
+              "hints": [
+                "Enter the switch at the trip's length and let it fall through the smaller cases.",
+                "Order the cases from 4 down to 1.",
+                "No `break` anywhere - that is the whole trick.",
+                "Leave a comment saying the fall-through is intentional; in real code, readers assume it is a bug."
+              ],
+              "language": "java",
+              "kind": "challenge",
+              "difficulty": "Hard",
+              "starter": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n____\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        for (int i = 0; i < n; i++) {\n            int d = sc.nextInt();\n            System.out.println(\"trip of \" + d + \":\");\n            switch (d) {\n                case 4:\n                    System.out.println(\"map\");\n                case 3:\n                    System.out.println(\"lamp\");\n                case 2:\n                    System.out.println(\"stove\");\n                case 1:\n                    System.out.println(\"tent\");\n            }\n        }\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "1\n1",
+                  "output": "trip of 1:\ntent"
+                },
+                {
+                  "input": "1\n3",
+                  "output": "trip of 3:\nlamp\nstove\ntent"
+                },
+                {
+                  "input": "2\n4 2",
+                  "output": "trip of 4:\nmap\nlamp\nstove\ntent\ntrip of 2:\nstove\ntent"
+                },
+                {
+                  "input": "2\n2 1",
+                  "output": "trip of 2:\nstove\ntent\ntrip of 1:\ntent"
+                },
+                {
+                  "input": "1\n4",
+                  "output": "trip of 4:\nmap\nlamp\nstove\ntent"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            }
+          ]
+        },
+        {
+          "key": "p33-nested",
+          "title": "Nested classes",
+          "pattern": "Static nested for helpers, inner when you need the outer object, anonymous for a one-off.",
+          "intro": "```java\nclass IntQueue {\n    private static class Node { ... }       // needs no IntQueue: static\n}\nclass Bank {\n    private final int ratePercent;\n    class Account {                         // reads ratePercent: inner\n        int interest() { return balance * ratePercent / 100; }\n    }\n}\nreturn new Iterator<String>() { ... };      // anonymous, with its own state\n```\n\nThe question to ask every time is *does this class need the outer object?* If\nnot, make it `static`: it is cheaper, and it cannot accidentally keep a large\nouter object alive. If it does - an iterator over its outer collection, an\naccount that reads its bank's rate - an inner class is exactly right.\n",
+          "exercises": [
+            {
+              "id": "j33-pd-pair",
+              "title": "A static nested pair",
+              "prompt": "Read `name value` pairs into a list of a static nested `Entry` class declared inside `Main`, and print the entry with the largest value (the first one on a tie).",
+              "hint": "`main` is static, so it can only create a nested class that is static too.",
+              "hints": [
+                "`main` is static, so it can only create a nested class that is static too.",
+                "Declare `static class Entry` inside `Main`, after `main`.",
+                "The region ends inside `Entry` - its closing brace is already there.",
+                "`>` rather than `>=` keeps the first of equal values."
+              ],
+              "language": "java",
+              "kind": "challenge",
+              "difficulty": "Intro",
+              "starter": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n____\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        List<Entry> entries = new ArrayList<>();\n        for (int i = 0; i < n; i++) {\n            entries.add(new Entry(sc.next(), sc.nextInt()));\n        }\n        Entry best = entries.get(0);\n        for (Entry e : entries) {\n            if (e.value > best.value) {\n                best = e;\n            }\n        }\n        System.out.println(best.name + \" \" + best.value);\n    }\n\n    static class Entry {\n        final String name;\n        final int value;\n\n        Entry(String name, int value) {\n            this.name = name;\n            this.value = value;\n        }\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "3\nada 3\nbo 9\ncy 4",
+                  "output": "bo 9"
+                },
+                {
+                  "input": "1\nsolo 1",
+                  "output": "solo 1"
+                },
+                {
+                  "input": "2\nx -5\ny -2",
+                  "output": "y -2"
+                },
+                {
+                  "input": "3\na 7\nb 7\nc 1",
+                  "output": "a 7"
+                },
+                {
+                  "input": "3\npear 10\nfig 30\nplum 20",
+                  "output": "fig 30"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "j33-pd-queue",
+              "title": "A linked queue",
+              "prompt": "`IntQueue` keeps a private static `Node` class and `head`/`tail` pointers. Write `add` (append at the tail) and `remove` (take from the head). `main` prints the removed values, then what is left.",
+              "hint": "An empty queue has `tail == null`: the new node is both head and tail.",
+              "hints": [
+                "An empty queue has `tail == null`: the new node is both head and tail.",
+                "Otherwise link it after the current tail, then move the tail.",
+                "`remove` takes `head.value` and advances `head`.",
+                "When the last node leaves, reset `tail` to null too - or the next `add` links onto a node nobody can reach."
+              ],
+              "language": "java",
+              "kind": "challenge",
+              "difficulty": "Easy",
+              "starter": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\n\nclass IntQueue {\n    private static class Node {\n        final int value;\n        Node next;\n\n        Node(int value) {\n            this.value = value;\n        }\n    }\n\n    private Node head;\n    private Node tail;\n\n____\n\n    boolean isEmpty() {\n        return head == null;\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        IntQueue q = new IntQueue();\n        List<Integer> removed = new ArrayList<>();\n        List<Integer> added = new ArrayList<>();\n        for (int i = 0; i < n; i++) {\n            if (sc.next().equals(\"add\")) {\n                int x = sc.nextInt();\n                q.add(x);\n                added.add(x);\n            } else {\n                removed.add(q.remove());\n            }\n        }\n        StringBuilder out = new StringBuilder();\n        for (int x : removed) {\n            if (out.length() > 0) out.append(' ');\n            out.append(x);\n        }\n        System.out.println(out);\n        StringBuilder left = new StringBuilder();\n        while (!q.isEmpty()) {\n            left.append(left.length() == 0 ? \"left \" : \" \").append(q.remove());\n        }\n        System.out.println(left.length() == 0 ? \"empty\" : left.toString());\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\n\nclass IntQueue {\n    private static class Node {\n        final int value;\n        Node next;\n\n        Node(int value) {\n            this.value = value;\n        }\n    }\n\n    private Node head;\n    private Node tail;\n\n    void add(int x) {\n        Node node = new Node(x);\n        if (tail == null) {\n            head = node;\n        } else {\n            tail.next = node;\n        }\n        tail = node;\n    }\n\n    int remove() {\n        int v = head.value;\n        head = head.next;\n        if (head == null) {\n            tail = null;\n        }\n        return v;\n    }\n\n    boolean isEmpty() {\n        return head == null;\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        IntQueue q = new IntQueue();\n        List<Integer> removed = new ArrayList<>();\n        List<Integer> added = new ArrayList<>();\n        for (int i = 0; i < n; i++) {\n            if (sc.next().equals(\"add\")) {\n                int x = sc.nextInt();\n                q.add(x);\n                added.add(x);\n            } else {\n                removed.add(q.remove());\n            }\n        }\n        StringBuilder out = new StringBuilder();\n        for (int x : removed) {\n            if (out.length() > 0) out.append(' ');\n            out.append(x);\n        }\n        System.out.println(out);\n        StringBuilder left = new StringBuilder();\n        while (!q.isEmpty()) {\n            left.append(left.length() == 0 ? \"left \" : \" \").append(q.remove());\n        }\n        System.out.println(left.length() == 0 ? \"empty\" : left.toString());\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "6\nadd 1\nadd 2\nremove\nadd 3\nremove\nremove",
+                  "output": "1 2 3\nempty"
+                },
+                {
+                  "input": "2\nadd 9\nremove",
+                  "output": "9\nempty"
+                },
+                {
+                  "input": "8\nadd 5\nadd 6\nadd 7\nremove\nremove\nadd 8\nremove\nremove",
+                  "output": "5 6 7 8\nempty"
+                },
+                {
+                  "input": "4\nadd 4\nremove\nadd 4\nremove",
+                  "output": "4 4\nempty"
+                },
+                {
+                  "input": "4\nadd 1\nadd 2\nadd 3\nremove",
+                  "output": "1\nleft 2 3"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "j33-pd-inner",
+              "title": "An inner class reads its bank",
+              "prompt": "`Bank.Account` is an INNER class, so it can read its bank's `ratePercent`. Write `interest()`: balance times the rate, over 100, in integer arithmetic.",
+              "hint": "`ratePercent` belongs to the Bank, not the Account.",
+              "hints": [
+                "`ratePercent` belongs to the Bank, not the Account.",
+                "An inner class reads it directly - it is `Bank.this.ratePercent`.",
+                "`balance * ratePercent / 100` multiplies first, so the division does not lose everything.",
+                "Outside, the type is spelled `Bank.Account`."
+              ],
+              "language": "java",
+              "kind": "challenge",
+              "difficulty": "Medium",
+              "starter": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\n\nclass Bank {\n    private final int ratePercent;\n\n    Bank(int ratePercent) {\n        this.ratePercent = ratePercent;\n    }\n\n    class Account {\n        private final String owner;\n        private final int balance;\n\n        Account(String owner, int balance) {\n            this.owner = owner;\n            this.balance = balance;\n        }\n\n____\n\n        String describe() {\n            return owner + \" \" + balance + \" +\" + interest();\n        }\n    }\n\n    Account open(String owner, int balance) {\n        return new Account(owner, balance);\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        Bank bank = new Bank(sc.nextInt());\n        int n = sc.nextInt();\n        for (int i = 0; i < n; i++) {\n            Bank.Account a = bank.open(sc.next(), sc.nextInt());\n            System.out.println(a.describe());\n        }\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\n\nclass Bank {\n    private final int ratePercent;\n\n    Bank(int ratePercent) {\n        this.ratePercent = ratePercent;\n    }\n\n    class Account {\n        private final String owner;\n        private final int balance;\n\n        Account(String owner, int balance) {\n            this.owner = owner;\n            this.balance = balance;\n        }\n\n        int interest() {\n            return balance * ratePercent / 100;\n        }\n\n        String describe() {\n            return owner + \" \" + balance + \" +\" + interest();\n        }\n    }\n\n    Account open(String owner, int balance) {\n        return new Account(owner, balance);\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        Bank bank = new Bank(sc.nextInt());\n        int n = sc.nextInt();\n        for (int i = 0; i < n; i++) {\n            Bank.Account a = bank.open(sc.next(), sc.nextInt());\n            System.out.println(a.describe());\n        }\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "5\n2\nada 1000\nbo 250",
+                  "output": "ada 1000 +50\nbo 250 +12"
+                },
+                {
+                  "input": "10\n1\ncy 99",
+                  "output": "cy 99 +9"
+                },
+                {
+                  "input": "3\n2\nx 0\ny 700",
+                  "output": "x 0 +0\ny 700 +21"
+                },
+                {
+                  "input": "0\n1\nsolo 500",
+                  "output": "solo 500 +0"
+                },
+                {
+                  "input": "12\n3\npear 1234\nfig 50\nplum 800",
+                  "output": "pear 1234 +148\nfig 50 +6\nplum 800 +96"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "j33-pd-reverse",
+              "title": "Iterating backwards",
+              "prompt": "`Reversed` makes any list iterable from the end. Write `iterator()`'s body: return an ANONYMOUS `Iterator<String>` holding its own index, starting at the last element.",
+              "hint": "An `Iterator` has two methods, so a lambda cannot implement it.",
+              "hints": [
+                "An `Iterator` has two methods, so a lambda cannot implement it.",
+                "`new Iterator<String>() { ... }` with a field `index`.",
+                "`hasNext()` is `index >= 0`; `next()` returns `items.get(index--)`.",
+                "The original list is untouched - the last line proves it."
+              ],
+              "language": "java",
+              "kind": "challenge",
+              "difficulty": "Medium",
+              "starter": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\n\nclass Reversed implements Iterable<String> {\n    private final List<String> items;\n\n    Reversed(List<String> items) {\n        this.items = items;\n    }\n\n    @Override\n    public Iterator<String> iterator() {\n____\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        List<String> items = new ArrayList<>();\n        for (int i = 0; i < n; i++) {\n            items.add(sc.next());\n        }\n        for (String s : new Reversed(items)) {\n            System.out.println(s);\n        }\n        System.out.println(items);\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\n\nclass Reversed implements Iterable<String> {\n    private final List<String> items;\n\n    Reversed(List<String> items) {\n        this.items = items;\n    }\n\n    @Override\n    public Iterator<String> iterator() {\n        return new Iterator<String>() {\n            private int index = items.size() - 1;\n\n            @Override\n            public boolean hasNext() {\n                return index >= 0;\n            }\n\n            @Override\n            public String next() {\n                return items.get(index--);\n            }\n        };\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        List<String> items = new ArrayList<>();\n        for (int i = 0; i < n; i++) {\n            items.add(sc.next());\n        }\n        for (String s : new Reversed(items)) {\n            System.out.println(s);\n        }\n        System.out.println(items);\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "3\na b c",
+                  "output": "c\nb\na\n[a, b, c]"
+                },
+                {
+                  "input": "1\nsolo",
+                  "output": "solo\n[solo]"
+                },
+                {
+                  "input": "2\npear fig",
+                  "output": "fig\npear\n[pear, fig]"
+                },
+                {
+                  "input": "4\nx y z w",
+                  "output": "w\nz\ny\nx\n[x, y, z, w]"
+                },
+                {
+                  "input": "3\none two three",
+                  "output": "three\ntwo\none\n[one, two, three]"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "j33-pd-local",
+              "title": "A local class",
+              "prompt": "Inside `main`, declare a LOCAL class `Stats` that tracks the count, sum, minimum and maximum of the numbers added to it. Feed it the input and print `count sum min max`.",
+              "hint": "A class can be declared inside a method body, like a local variable.",
+              "hints": [
+                "A class can be declared inside a method body, like a local variable.",
+                "It is visible only inside `main`.",
+                "Start `min` at `Integer.MAX_VALUE` and `max` at `Integer.MIN_VALUE`.",
+                "A local class is rare in practice - but it is the honest shape for a helper nothing else should see."
+              ],
+              "language": "java",
+              "kind": "challenge",
+              "difficulty": "Hard",
+              "starter": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n____\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        class Stats {\n            int count;\n            int sum;\n            int min = Integer.MAX_VALUE;\n            int max = Integer.MIN_VALUE;\n\n            void add(int x) {\n                count++;\n                sum += x;\n                min = Math.min(min, x);\n                max = Math.max(max, x);\n            }\n        }\n        int n = sc.nextInt();\n        Stats stats = new Stats();\n        for (int i = 0; i < n; i++) {\n            stats.add(sc.nextInt());\n        }\n        System.out.println(stats.count + \" \" + stats.sum + \" \" + stats.min + \" \" + stats.max);\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "3\n3 1 2",
+                  "output": "3 6 1 3"
+                },
+                {
+                  "input": "1\n7",
+                  "output": "1 7 7 7"
+                },
+                {
+                  "input": "3\n-4 -8 -3",
+                  "output": "3 -15 -8 -3"
+                },
+                {
+                  "input": "3\n10 10 4",
+                  "output": "3 24 4 10"
+                },
+                {
+                  "input": "4\n5 -5 0 9",
+                  "output": "4 9 -5 9"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            }
+          ]
+        },
+        {
+          "key": "p33-machines",
+          "title": "State machines",
+          "pattern": "An enum of states, and a switch that says what each event does in each state.",
+          "intro": "```java\nenum DoorState { OPEN, CLOSED, LOCKED }\n\nDoorState next = switch (state) {           // every state covered, no default\n    case OPEN   -> event.equals(\"close\") ? DoorState.CLOSED : null;\n    case CLOSED -> switch (event) { case \"open\" -> DoorState.OPEN;\n                                    case \"lock\" -> DoorState.LOCKED;\n                                    default -> null; };\n    case LOCKED -> event.equals(\"unlock\") ? DoorState.CLOSED : null;\n};\n```\n\nWrite down the transition table first - state down the side, event across the\ntop - and the switch is a transcription of it. Everything the table leaves blank\nis an invalid event, and it is worth deciding explicitly what that does:\nignore it, count it, or throw.\n",
+          "exercises": [
+            {
+              "id": "j33-pe-cycle",
+              "title": "Seasons forward",
+              "prompt": "Print the season `k` steps after the given one.",
+              "hint": "`next()` is already written; call it `k` times.",
+              "hints": [
+                "`next()` is already written; call it `k` times.",
+                "Assign the result - an enum constant never changes.",
+                "Nine steps from WINTER lands on SPRING."
+              ],
+              "language": "java",
+              "kind": "challenge",
+              "difficulty": "Intro",
+              "starter": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\n\nenum Season {\n    WINTER, SPRING, SUMMER, AUTUMN;\n\n    Season next() {\n        return values()[(ordinal() + 1) % values().length];\n    }\n\n    Season previous() {\n        return values()[Math.floorMod(ordinal() - 1, values().length)];\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        Season s = Season.valueOf(sc.next());\n        int k = sc.nextInt();\n____\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\n\nenum Season {\n    WINTER, SPRING, SUMMER, AUTUMN;\n\n    Season next() {\n        return values()[(ordinal() + 1) % values().length];\n    }\n\n    Season previous() {\n        return values()[Math.floorMod(ordinal() - 1, values().length)];\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        Season s = Season.valueOf(sc.next());\n        int k = sc.nextInt();\n        for (int i = 0; i < k; i++) {\n            s = s.next();\n        }\n        System.out.println(s);\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "WINTER 1",
+                  "output": "SPRING"
+                },
+                {
+                  "input": "AUTUMN 1",
+                  "output": "WINTER"
+                },
+                {
+                  "input": "SPRING 6",
+                  "output": "AUTUMN"
+                },
+                {
+                  "input": "SUMMER 0",
+                  "output": "SUMMER"
+                },
+                {
+                  "input": "WINTER 9",
+                  "output": "SPRING"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "j33-pe-back",
+              "title": "Seasons backward",
+              "prompt": "Print the season `k` steps BEFORE the given one, using `previous()`.",
+              "hint": "`previous()` uses `Math.floorMod(ordinal() - 1, ...)` - module 32 - because `ordinal() - 1` is -1 for WINTER.",
+              "hints": [
+                "`previous()` uses `Math.floorMod(ordinal() - 1, ...)` - module 32 - because `ordinal() - 1` is -1 for WINTER.",
+                "Call it `k` times.",
+                "One step back from WINTER is AUTUMN."
+              ],
+              "language": "java",
+              "kind": "challenge",
+              "difficulty": "Easy",
+              "starter": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\n\nenum Season {\n    WINTER, SPRING, SUMMER, AUTUMN;\n\n    Season next() {\n        return values()[(ordinal() + 1) % values().length];\n    }\n\n    Season previous() {\n        return values()[Math.floorMod(ordinal() - 1, values().length)];\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        Season s = Season.valueOf(sc.next());\n        int k = sc.nextInt();\n____\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\n\nenum Season {\n    WINTER, SPRING, SUMMER, AUTUMN;\n\n    Season next() {\n        return values()[(ordinal() + 1) % values().length];\n    }\n\n    Season previous() {\n        return values()[Math.floorMod(ordinal() - 1, values().length)];\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        Season s = Season.valueOf(sc.next());\n        int k = sc.nextInt();\n        for (int i = 0; i < k; i++) {\n            s = s.previous();\n        }\n        System.out.println(s);\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "WINTER 1",
+                  "output": "AUTUMN"
+                },
+                {
+                  "input": "SPRING 1",
+                  "output": "WINTER"
+                },
+                {
+                  "input": "SUMMER 6",
+                  "output": "WINTER"
+                },
+                {
+                  "input": "AUTUMN 0",
+                  "output": "AUTUMN"
+                },
+                {
+                  "input": "SPRING 9",
+                  "output": "WINTER"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "j33-pe-door",
+              "title": "A door with a lock",
+              "prompt": "A door starts CLOSED. OPEN + close → CLOSED; CLOSED + open → OPEN; CLOSED + lock → LOCKED; LOCKED + unlock → CLOSED. Anything else is ignored and counted. Write the switch expression that computes `next` (null for an ignored event).",
+              "hint": "One arm per state; three states, no `default`.",
+              "hints": [
+                "One arm per state; three states, no `default`.",
+                "OPEN and LOCKED accept a single event each: a `? :` is enough.",
+                "CLOSED accepts two, so its arm is itself a switch over the event String.",
+                "An inner String switch DOES need a `default` - here `null` for 'ignored'."
+              ],
+              "language": "java",
+              "kind": "challenge",
+              "difficulty": "Medium",
+              "starter": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\n\nenum DoorState {\n    OPEN, CLOSED, LOCKED\n}\n\nclass Door {\n    private DoorState state = DoorState.CLOSED;\n    private int ignored;\n\n    void handle(String event) {\n____\n        if (next == null) {\n            ignored++;\n        } else {\n            state = next;\n        }\n    }\n\n    DoorState state() {\n        return state;\n    }\n\n    int ignored() {\n        return ignored;\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        Door door = new Door();\n        StringBuilder trail = new StringBuilder();\n        for (int i = 0; i < n; i++) {\n            door.handle(sc.next());\n            if (trail.length() > 0) trail.append(' ');\n            trail.append(door.state());\n        }\n        System.out.println(trail);\n        System.out.println(door.state() + \" ignored \" + door.ignored());\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\n\nenum DoorState {\n    OPEN, CLOSED, LOCKED\n}\n\nclass Door {\n    private DoorState state = DoorState.CLOSED;\n    private int ignored;\n\n    void handle(String event) {\n        DoorState next = switch (state) {\n            case OPEN -> event.equals(\"close\") ? DoorState.CLOSED : null;\n            case CLOSED -> switch (event) {\n                case \"open\" -> DoorState.OPEN;\n                case \"lock\" -> DoorState.LOCKED;\n                default -> null;\n            };\n            case LOCKED -> event.equals(\"unlock\") ? DoorState.CLOSED : null;\n        };\n        if (next == null) {\n            ignored++;\n        } else {\n            state = next;\n        }\n    }\n\n    DoorState state() {\n        return state;\n    }\n\n    int ignored() {\n        return ignored;\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        Door door = new Door();\n        StringBuilder trail = new StringBuilder();\n        for (int i = 0; i < n; i++) {\n            door.handle(sc.next());\n            if (trail.length() > 0) trail.append(' ');\n            trail.append(door.state());\n        }\n        System.out.println(trail);\n        System.out.println(door.state() + \" ignored \" + door.ignored());\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "3\nopen close lock",
+                  "output": "OPEN CLOSED LOCKED\nLOCKED ignored 0"
+                },
+                {
+                  "input": "4\nlock open unlock open",
+                  "output": "LOCKED LOCKED CLOSED OPEN\nOPEN ignored 1"
+                },
+                {
+                  "input": "1\nclose",
+                  "output": "CLOSED\nCLOSED ignored 1"
+                },
+                {
+                  "input": "5\nopen lock open close close",
+                  "output": "OPEN OPEN OPEN CLOSED CLOSED\nCLOSED ignored 3"
+                },
+                {
+                  "input": "5\nlock unlock lock unlock open",
+                  "output": "LOCKED CLOSED LOCKED CLOSED OPEN\nOPEN ignored 0"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "j33-pe-words",
+              "title": "Counting words with two states",
+              "prompt": "Count the words in a line, where a word is a maximal run of ASCII letters. Walk the characters with a two-state machine - INSIDE a word or OUTSIDE - and count each OUTSIDE → INSIDE transition.",
+              "hint": "A boolean is a perfectly good two-state machine.",
+              "hints": [
+                "A boolean is a perfectly good two-state machine.",
+                "A word STARTS when a letter follows a non-letter.",
+                "Update the state after every character: `inside = letter;`.",
+                "`a-b c3d` has four words: a, b, c and d."
+              ],
+              "language": "java",
+              "kind": "challenge",
+              "difficulty": "Medium",
+              "starter": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n____\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        String line = sc.nextLine();\n        boolean inside = false;\n        int words = 0;\n        for (char c : line.toCharArray()) {\n            boolean letter = (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');\n            if (letter && !inside) {\n                words++;\n            }\n            inside = letter;\n        }\n        System.out.println(words);\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "hello world\n",
+                  "output": "2"
+                },
+                {
+                  "input": "  leading and trailing  \n",
+                  "output": "3"
+                },
+                {
+                  "input": "one\n",
+                  "output": "1"
+                },
+                {
+                  "input": "a-b c3d\n",
+                  "output": "4"
+                },
+                {
+                  "input": "no...words!!here\n",
+                  "output": "3"
+                }
+              ],
+              "source_slug": "",
+              "dataset": ""
+            },
+            {
+              "id": "j33-pe-vending",
+              "title": "A vending machine",
+              "prompt": "The machine is IDLE or HAS_COIN. IDLE + coin → HAS_COIN (`accepted`). HAS_COIN + select → IDLE (`vended`); HAS_COIN + refund → IDLE (`refunded`). Anything else is `ignored` and changes nothing. Print `event: result` per event, then how many were vended and whether a coin is still held. Write the whole of `main`'s loop.",
+              "hint": "Switch on the STATE; inside each arm, decide on the event.",
+              "hints": [
+                "Switch on the STATE; inside each arm, decide on the event.",
+                "A switch STATEMENT over an enum is not checked for exhaustiveness, so `result` would not be definitely assigned without the `default` arm.",
+                "`default -> throw new IllegalStateException();` satisfies the compiler and documents 'cannot happen'.",
+                "A second coin while holding one is ignored, not refunded."
+              ],
+              "language": "java",
+              "kind": "challenge",
+              "difficulty": "Hard",
+              "starter": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\n\nenum VendState {\n    IDLE, HAS_COIN\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        VendState state = VendState.IDLE;\n        int vended = 0;\n____\n        System.out.println(\"vended \" + vended + \", holding coin: \" + (state == VendState.HAS_COIN));\n    }\n}\n",
+              "solution": "import java.util.*;\nimport java.util.function.*;\nimport java.time.*;\n\n\nenum VendState {\n    IDLE, HAS_COIN\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        VendState state = VendState.IDLE;\n        int vended = 0;\n        for (int i = 0; i < n; i++) {\n            String event = sc.next();\n            String result;\n            switch (state) {\n                case IDLE -> {\n                    if (event.equals(\"coin\")) {\n                        state = VendState.HAS_COIN;\n                        result = \"accepted\";\n                    } else {\n                        result = \"ignored\";\n                    }\n                }\n                case HAS_COIN -> {\n                    if (event.equals(\"select\")) {\n                        state = VendState.IDLE;\n                        vended++;\n                        result = \"vended\";\n                    } else if (event.equals(\"refund\")) {\n                        state = VendState.IDLE;\n                        result = \"refunded\";\n                    } else {\n                        result = \"ignored\";\n                    }\n                }\n                default -> throw new IllegalStateException();\n            }\n            System.out.println(event + \": \" + result);\n        }\n        System.out.println(\"vended \" + vended + \", holding coin: \" + (state == VendState.HAS_COIN));\n    }\n}\n",
+              "tests": [
+                {
+                  "input": "2\ncoin select",
+                  "output": "coin: accepted\nselect: vended\nvended 1, holding coin: false"
+                },
+                {
+                  "input": "4\nselect coin coin refund",
+                  "output": "select: ignored\ncoin: accepted\ncoin: ignored\nrefund: refunded\nvended 0, holding coin: false"
+                },
+                {
+                  "input": "5\ncoin select coin select select",
+                  "output": "coin: accepted\nselect: vended\ncoin: accepted\nselect: vended\nselect: ignored\nvended 2, holding coin: false"
+                },
+                {
+                  "input": "1\nrefund",
+                  "output": "refund: ignored\nvended 0, holding coin: false"
+                },
+                {
+                  "input": "5\ncoin refund coin select coin",
+                  "output": "coin: accepted\nrefund: refunded\ncoin: accepted\nselect: vended\ncoin: accepted\nvended 1, holding coin: true"
                 }
               ],
               "source_slug": "",

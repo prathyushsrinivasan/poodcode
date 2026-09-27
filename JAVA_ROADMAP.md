@@ -13,9 +13,9 @@ looking it up.
 **Status legend** — ✅ built and shipping in the app · 🚧 partially built ·
 ⬜ planned.
 
-**Built so far:** Parts 1–8, 10 and 11, complete (modules 1–32) — **32 modules,
-152 lessons, 654 judged exercises, plus 800 practice problems** in 160 variation
-families.
+**Built so far:** Parts 1–8, 10 and 11 complete, Part 13 under way (modules
+1–33) — **33 modules, 157 lessons, 675 judged exercises, plus 825 practice
+problems** in 165 variation families.
 
 **Scope note.** Parts 9 and 14, and the JDBC/Maven/JUnit/logging half of Part
 13, are deliberately **not planned** — file I/O, build tools and the backend
@@ -438,13 +438,37 @@ prefix sums · backtracking · dynamic programming basics · greedy
 a lot of this ground with judged problems — this part is about sequencing it
 rather than authoring it from nothing.)*
 
-## Part 13 — Advanced Java ⬜
+## Part 13 — Advanced Java 🚧
 
-JDBC · SQL basics · database connectivity · Maven / Gradle · JUnit ·
-logging · annotations · reflection · design patterns · JVM basics ·
-garbage collection · memory management · concurrency in depth
+Modules 33–37: the language-and-runtime half of the original list. JDBC, SQL,
+Maven/Gradle, JUnit and logging stay unplanned (see the scope note) — SQL
+already ships as its own Learn track, and "concurrency in depth" is Part 10.
 
-*(SQL basics already ship as their own Learn track.)*
+Auditing the course for this part turned up a real gap: after thirty-two modules
+no program had ever **declared an `enum`**, written a **`switch`**, or put a
+class inside another class — and the design-patterns module cannot be written
+without all three. So the part opens by closing it.
+
+**33. Enums, switch and nested classes** ✅
+An enum as a class with a fixed set of instances · `==` · `values()` /
+`valueOf()` (case-sensitive, and `toUpperCase(Locale.ROOT)`) / `name()` /
+`ordinal()` and why it must never be persisted · fields and private
+constructors · a lambda per constant (the strategy pattern in five lines) ·
+constant-specific bodies over an abstract method · wrap-around `next()` ·
+**`EnumMap` / `EnumSet`** and declaration-order iteration · the `switch`
+statement and **fall-through** · switch **expressions** (Java 14): arrow arms,
+shared labels, `yield`, **exhaustiveness** and why a switch expression over an
+enum needs no `default` · static nested vs inner classes, `Outer.this`, and the
+memory an inner class can pin · local and anonymous classes · `Iterable` with an
+inner iterator · state machines as an enum plus an exhaustive switch
+
+**34. Records, sealed types and pattern matching** ⬜ *(Java 16–21)*
+
+**35. Design patterns** ⬜
+
+**36. Annotations and reflection** ⬜
+
+**37. The JVM: class loading, memory and garbage collection** ⬜
 
 ## Part 14 — Java backend development ⬜
 

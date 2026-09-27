@@ -20,7 +20,7 @@
 # Strings (6-8), Methods and recursion (9-10), object-oriented programming
 # (11-14), exception handling (15-16), the collections framework (17-20),
 # generics (21-24), Java 8+ (25-28), multithreading (29-31) and the APIs worth
-# knowing cold (32). The roadmap's Parts 9, 12 and 14 are deliberately NOT
+# knowing cold (32); Part 13 (advanced Java) is under way from module 33. The roadmap's Parts 9, 12 and 14 are deliberately NOT
 # planned: file I/O and the backend stack are job skills rather than
 # interview-coding material, and the DSA ground is already covered by the DSA
 # Curriculum and the Mastery track.
@@ -390,6 +390,7 @@ _MODULE_FILES = (
     "java_m30_sync.py",        #          shared state: races, locks, visibility
     "java_m31_executors.py",   #          executors, tasks and results - closes Part 10
     "java_m32_stdlib.py",      # Part 11 - Math, Objects, Random, java.time, formatting
+    "java_m33_enums.py",       # Part 13 - enums, switch and nested classes
     # Parts 9 and 11-14 are deliberately NOT planned; see JAVA_ROADMAP.md for
     # what was dropped and why.
 )
@@ -450,6 +451,7 @@ _PRACTICE_FILES = (
     "java_p30_practice.py",
     "java_p31_practice.py",
     "java_p32_practice.py",
+    "java_p33_practice.py",
 )
 
 for _prac_file in _PRACTICE_FILES:
@@ -542,6 +544,11 @@ _SCOPE_RULES = [
     ("java.time", 32), ("LocalDate", 32), ("LocalTime", 32), ("Duration", 32),
     ("DateTimeFormatter", 32), ("ChronoUnit", 32), ("Period.", 32),
     ("String.format", 32), ("printf", 32), ("Locale", 32),
+    # --- Part 13: advanced Java (modules 33-37) -----------------------------
+    # DECLARING an enum is new in 33; USING a JDK one (module 32's DayOfWeek)
+    # was always fine, which is why the rule is "enum " with a space.
+    ("enum ", 33), ("switch", 33), ("yield", 33), ("EnumMap", 33), ("EnumSet", 33),
+    ("static class", 33), ("Iterable<", 33),
 ]
 
 # Text that every program (or many early ones) contains and that would trip a
@@ -623,9 +630,10 @@ JAVA_COURSE = {
         "part that turns that into fluency: arrays in depth, strings in depth, "
         "methods, object-oriented programming, exceptions, the collections "
         "framework, generics down to erasure and what it costs, then lambdas, "
-        "stream pipelines from `filter` to `groupingBy`, `Optional`, multithreading from `start()` to thread pools, and the "
-        "standard-library corners that fail quietly, in "
-        "thirty-two judged modules. "
+        "stream pipelines from `filter` to `groupingBy`, `Optional`, multithreading from `start()` to thread pools, the "
+        "standard-library corners that fail quietly, and enums, switch and nested "
+        "classes, in "
+        "thirty-three judged modules. "
         "Each module is a goal, four to six lessons, warm-ups that make you "
         "predict the output, fill-in-the-blank drills, fix-the-bug programs, a "
         "coding challenge, a glossary, a cheat sheet and a project - plus a "

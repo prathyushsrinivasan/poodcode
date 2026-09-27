@@ -59,3 +59,4 @@ tools/java_m23_wildcards.py text eol=lf
 tools/java_p21_practice.py text eol=lf
 tools/java_p22_practice.py text eol=lf
 tools/java_p23_practice.py text eol=lf
+tools/java_*.py text eol=lf
