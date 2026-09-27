@@ -21,54 +21,68 @@ Most of the rest of the app predates that work.
 
 ---
 
-## Status, 2026-09-18
+## Status, 2026-09-28 — complete
 
-Steps 1-6 of the order of work below are **done**, plus most of the guards in
-§L and the contained items from §C, §J and §K. The measures at the top of this
-file are the *original* audit; the current numbers are in the table beneath it.
+Every item is done, bar one deliberate exception (a custom title bar, under
+C12). The first pass (2026-09-18) did steps 1–6 of the order of work; the
+second pass did the rest. The measures further down are the *original* audit;
+the current numbers are in the table beneath this section.
 
-**Done:** A1 A2 A4 A5 A6 A7 A8 A9 A10 · B1 B2 B3 B4 B5 · C1 C5 C7 C8 C9 C10 C11
-· D1 D2 D4 D5 D6 D7 D8 · E1 E3 E4 E5 · F1 F2 F3 F4 F5 F6 F8 · **G1** G2 G3 G5 ·
-I2 · J2 J3 · K1 K2 K3 K4 K5 · L1 L2 L3 L4 L5 L6.
+**First pass (2026-09-18):** A1 A2 A4–A10 · B1–B5 · C1 C5 C7–C11 · D1 D2 D4–D8 ·
+E1 E3–E5 · F1–F8 (F7 retired with the modes it described) · G1 G2 G3 G5 · I2 ·
+J2 J3 · K1–K5 · L1–L6.
 
-**Not done, and why:**
+**Second pass (2026-09-28):**
 
-| Item | Why it is still open |
+| Item | What was done |
 |---|---|
-| A3 | Learning Paths vs the curriculum is a content decision, not a UI one. |
-| C2 C3 | The component set exists (`components/ui/`, `Toast`, `Skeleton`, `SaveState`) and the shell, Today, Solve and Settings are on it. The five track pages in §G still carry their own layouts. |
-| C4 | The exercise card is still implemented five ways. G1 unified the *layouts*; this is the card inside them. |
-| C6 | Emoji are still the icon set. Replacing them is a whole-app sweep, and it is cosmetic next to everything above. |
-| C12 | Brand mark, app icon and custom title bar — design work, not a code change. |
-| D3 D9 | The clickable `div`s on Solve, the Dashboard and the course cards are converted; Projects, Learn and Mastery still have theirs. Landmark/heading audit is per page and belongs with G6/G7. |
-| E2 E6 | 42 silent catches: the ones on Solve, Settings and the draft writes now report. The rest are in the pages G6/G7 will rewrite. |
-| F7 | Gone: the modes it describes were deleted under A1. |
-| G4 G6 G7 G8 | Lesson wayfinding, and the Learn and Projects file splits. G1 put all five tracks on one template (`components/track/TrackShell.tsx`): one hero, one group rail, one set of unit rows, one pager. What remains is the *contents* of a unit page, not its frame. |
-| H1 H2 H3 H4 | Browse keeps its filters and has a sticky header; presets, virtualisation, the column chooser, keyboard rows and the problem form are open. |
-| I1 | Statistics was deleted under A1. Per-track insights need rebuilding from scratch. |
-| J1 J4 | The layout contract between 960 and 1400px, and multiple windows. |
+| A3 | Learning Paths are *topic playlists*: short practice lists, each linking the curriculum units that teach its problems. The curriculum is the course. |
+| C2 | Every track page is on the shared components; a codemod (`tools/style-codemod.mjs`) mapped the remaining static inline values onto token utilities. |
+| C3 | `components/ui`: Button, IconButton, Card, CardHeader, PageHeader, Badge, Chip, ProgressBar, Kbd, Tooltip, EmptyState, ErrorState, StatTile, Field, Toggle, Segmented, NumberInput, Heading — all in the gallery. |
+| C4 / G8 | One exercise card, quiz card, hint ladder and verdict panel for every track (`components/exercise`). |
+| C6 | Lucide icons, bundled, named by meaning in one table. Emoji remain only as content (🎉, ✓/✗ in prose, 日本語). |
+| C12 | A drawn brand mark (a P that is also `>_`), themed in the UI; every app icon regenerated from `src-tauri/icons/source.svg`. **Not done, deliberately:** a custom title bar — the in-app top bar already holds history and the breadcrumb, and a frameless window loses Windows' native snap and caption behaviour. |
+| D3 | No `div`/`span` with `onClick` acting as a control; rows that navigate are links (stretched over their card where the whole card is the target). |
+| D9 | A heading-level context gives every page one h1 and no skipped levels; all 31 routes audited, including named controls. |
+| E2 | `lib/failures`: `ignore(reason)`, `loadFailed(what)`, `saveFailed(what)` — the last two toast; every failure is listed in Settings → About. |
+| E6 | Every empty state names the action that fills it; load failures are ErrorStates with Retry. |
+| G4 | Lessons sit on a reader layout: an "On this page" rail with scrollspy, a reading-progress bar, and the completion rule as a checklist. |
+| G6 | Learn split into a library (tracks in the URL, search, filters), a chapter page and a 日本語 page. `Learn.tsx` is a 30-line router. |
+| G7 | Projects split into overview, module page, handbook, history, workbench and review. `Projects.tsx` is a 155-line router. |
+| H1 / H2 | Browse: saved filter presets, a column chooser, keyboard rows, and rows rendered a hundred at a time. |
+| H3 | The problem form: sections, live Markdown preview, a test-case table editor, validation beside each field (`lib/problemForm`). |
+| H4 | A foldable stage rail, a distinct optional stage, and a unit outline across all its tabs. |
+| I1 | `/insights`: every track's progress in its own unit, review-deck health, practice numbers, and measured time — with what is *not* measured said plainly. |
+| J1 | `lib/layout`: compact < 1180 ≤ regular < 1440 ≤ wide, exposed as `data-layout`; checked by `npm run check:layout`. It found three real bugs, all fixed. |
+| J4 | Pop a lesson, a statement or an editorial into its own window. |
 
 ### Current numbers
 
-| Measure | Audit | Now |
-|---|---|---|
-| Inline `style={{…}}` objects | ~1,500 | **1,071** (ratcheted by `tools/inline-styles.mjs`) |
-| Token pairs failing WCAG AA | 21 of 42 | **0 of 84** (both themes, plus high contrast) |
-| Tab bars with `role="tab"` | 1 | every one |
-| Pages with a loading skeleton | 3 of 27 | 9 of 19 |
-| `window.confirm` for destructive actions | 4 | **0** |
-| Built pages with no route | 9 | **0** |
-| `global.css` | 1,698 lines, one file | 13 files behind an index |
-| Track overview layouts | 5 | **1** (`TrackShell`) |
+| Measure | Audit | 2026-09-18 | Now |
+|---|---|---|---|
+| Inline `style={{…}}` objects | ~1,500 | 1,071 | **246**, all dynamic or one-off (ratchet baseline) |
+| Token pairs failing WCAG AA | 21 of 42 | 0 of 84 | **0 of 84** |
+| Clickable non-controls (`div`/`span onClick`) | dozens | some | **0** (backdrops excepted) |
+| `.catch(() => {})` in app code | 42 | — | **0** — every catch names a reason |
+| `window.confirm` | 4 | 0 | **0** |
+| Chrome emoji | ~500 | ~500 | **0**; 50 remain as content |
+| Largest page files | Projects 1,880 · Learn 1,501 | — | Learn 29 · Projects 155 (split into `pages/learn/`, `pages/projects/`) |
+| Routes with one h1 and no skipped heading levels | — | — | **31 of 31** |
+| Pages scrolling sideways at 960 / 1180 / 1440 | — | — | **0** |
+| `global.css` | 1,698 lines, one file | 13 files | 21 files behind an index |
 
-### New tooling
+### Tooling
 
-- `npm run dev:mock` — the whole app in a browser, on JSON fixtures
-  (`src/dev/mockBackend.ts`). Deterministic, so screenshots mean something.
+- `npm run dev:mock` — the whole app in a browser, on fixtures.
 - `/ui` — the component gallery, in that mode.
-- `npm run check:contrast` — every token pair against WCAG AA. In CI.
-- `npm run check:styles` — the inline-style ratchet. In CI.
+- `npm run check:contrast` — every token pair against WCAG AA.
+- `npm run check:styles` — the inline-style ratchet.
+- `npm run check:layout` — every page at 960, 1180 and 1440 (needs playwright-core).
 - `node tools/screenshots.mjs` — visual regression, both themes.
+- `node tools/style-codemod.mjs` — static inline styles onto token utilities.
+
+The CI wiring for the contrast and style guards is still in `ci-guards.patch`,
+held back because the push token lacks the `workflow` scope.
 
 ---
 
