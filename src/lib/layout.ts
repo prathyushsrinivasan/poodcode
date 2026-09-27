@@ -11,8 +11,8 @@
  *   ---------    -------   ----------------   -------------------   ------------------
  *   < 1180       compact   folds to icons     one column; the       side by side,
  *                          (transiently —     outline rail moves    resizable; stacks
- *                          your choice is     above the content     under 900px of pane
- *                          kept for wider)
+ *                          your choice is     above, the outline    in a window under
+ *                          kept for wider)    a disclosure          900px (dev only)
  *   1180–1439    regular   as you left it     body + 190px rail     side by side
  *   ≥ 1440       wide      as you left it     body + 210px rail     side by side
  *
