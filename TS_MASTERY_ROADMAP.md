@@ -97,6 +97,7 @@ the gap stays visible. This is what has landed since.
 | Same problem, three ways (X-26) | — | four sets (weeks 7, 12, 18, 24): loops / pipeline / class-or-generator, each style enforced by the judge, the three references asserted to agree, and the comparison shown once solved | `tools/mastery_ts_three_ways.py` |
 | Repairs and comparisons (X-11, X-09) | 42 fix exercises; comparisons for Java only | **68 repair exercises** from pitfalls too spread out for spot-the-bug (fix 42 → 102, diagnose 51 → 59); every chapter's comparison box now speaks to **Python and JavaScript** programmers too | `_tsd_repair` in `mastery_ts_derived.py`, `tools/ts_compare_notes.py` |
 | Key terms (X-08) | none | the TS course's glossary mapped onto the chapters — each term in the first chapter (programme order, read from the week tables) whose prose uses it: **270 terms in 70 chapters**, in the lesson and on the cheat sheet | `tools/ts_chapter_glossary.py` |
+| Read the error, per chapter (X-10) | 59 diagnose exercises | **240**: every compiler error a chapter shows (181 of 191 — the rest cannot run under type stripping) becomes a repair judged by the checker, the chapter's snippet as starter and its real diagnostic quoted; each model repair is proven to compile and run | `tools/ts_error_fixes.py`, `_tsd_diagnoses` |
 | Practice families (X-19) | none | **26 families, 130 exercises** — one per core week, five variations each that twist one dimension (input shape, output format, an edge case, a rule, a generalisation); weeks 17, 19, 20, 21 and 22 are type-level families. Every exercise verified through the real judge | `tools/mastery_ts_families.py` |
 | Fast authoring loop (X-102) | none for Mastery | `python tools/verify_ts_mastery.py --weeks 11-14` / `--only ts_regex` — type-checks and runs chapters, practice, problems, finals and projects in seconds | `tools/verify_ts_mastery.py` |
 
@@ -829,7 +830,7 @@ concurrency and cancellation.
 |---|---|---|
 | TypeScript Learn chapters | 50 | **87** (37 new) |
 | Lesson length | 0.9–2.1k chars | 4–8k chars, templated |
-| Learn exercises on those chapters | 176 (2 kinds) | **~1,300** (10+ kinds, ~20% type-graded) — ✅ **1,473** across Learn (301), week practice (884) and problem sets (288); 10 kinds; 296 type-graded (20%) |
+| Learn exercises on those chapters | 176 (2 kinds) | **~1,300** (10+ kinds, ~20% type-graded) — ✅ **1,654** across Learn (301), week practice (1,065) and problem sets (288); 10 kinds; 477 type-graded (29%) |
 | Curated problems | 85 slots, 26 TS-startable | **~380 slots, all TS-startable** (~300 new originals, ~100 of them type-graded) |
 | Type-challenge bank | 0 | **~120** — ✅ 121-rung ladder, 138 type-level exercises |
 | Quiz bank | 170 | **~1,050**, 10 sampled — ✅ **1,679** (multi-select, fill-the-type and code-output included; 8 sampled per sitting) |
@@ -840,7 +841,7 @@ concurrency and cancellation.
 
 ---
 
-**Status, 2026-09-27 (end of the third build session).** Every volume target in the table above is met: 1,473 exercises in 10 kinds (20% type-graded), 1,679 quiz questions, 1,260 cards, 121 type-ladder rungs, all 26 core weeks with projects, finals, alternates and families, and 81 curated Library problems with verified idiomatic TypeScript editorials. What remains is listed under *Handoff*: mostly per-chapter authoring (X-10 predict/diagnose/retype/design per chapter, more families, why-not notes for the authored single-choice bank), and X-105, which needs registry access.
+**Status, 2026-09-27 (end of the third build session).** Every volume target in the table above is met: 1,654 exercises in 10 kinds (29% type-graded), 1,679 quiz questions, 1,260 cards, 121 type-ladder rungs, all 26 core weeks with projects, finals, alternates and families, and 81 curated Library problems with verified idiomatic TypeScript editorials. What remains is listed under *Handoff*: mostly per-chapter authoring (X-10 predict/diagnose/retype/design per chapter, more families, why-not notes for the authored single-choice bank), and X-105, which needs registry access.
 
 ---
 
@@ -858,7 +859,7 @@ month-6 checkpoint · 31b5280 29 type challenges · 56e0cfb predict-first + ques
 
 | # | Item | Notes |
 |---|---|---|
-| X-10 / X-11 | ≥ 3 predict / diagnose / retype / design and ≥ 2 fix **per chapter** | predict 106, diagnose 59, fix 102, retype 24, design 22, refactor 17, plus 183 spot-the-bug cards that each end in a judged repair and 131 order — fix is covered for all but two chapters (`ts_type_testing`, `ts_aliases`); predict/diagnose/retype/design per chapter are still short (authoring). |
+| X-10 | ≥ 3 predict / diagnose / retype / design **per chapter** | predict 158, **diagnose 240** (every compiler error a chapter shows is now a read-the-error exercise, `tools/ts_error_fixes.py`), fix 102 plus 183 spot-then-fix, retype 24, design 22, refactor 17. Diagnose and fix are covered per chapter; predict reaches 54 chapters; retype/design per chapter are still authoring. |
 | X-17 | Chapter-level strictness for Learn exercises | Learn's `ExerciseCard` (in `Learn.tsx`) does not pass strictness/harness to the judge yet — no Learn exercise needs it today. |
 | X-37 | Explanations for wrong options | Field and UI shipped; the 251 code-output questions have them. The ~1,100 authored bank questions need authoring. |
 | X-12 | Type-graded **Library** problems | Deliberately not done: a type-only problem cannot have the Java starter every Library problem is required to have (`verify_seeds`), and the Mastery weeks already carry 55 type-graded problems plus the 121-rung ladder. Revisit only with a TypeScript-only Library category. |
