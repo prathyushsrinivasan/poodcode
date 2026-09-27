@@ -856,7 +856,7 @@ month-6 checkpoint · 31b5280 29 type challenges · 56e0cfb predict-first + ques
 
 | # | Item | Notes |
 |---|---|---|
-| X-10 / X-11 | ≥ 3 predict / diagnose / retype / design and ≥ 2 fix **per chapter** | 67 predict, 51 diagnose, 42 fix, 24 retype, 22 design (plus 183 spot, 131 order, 17 refactor) — per-chapter volume is still short; authoring. |
+| X-10 / X-11 | ≥ 3 predict / diagnose / retype / design and ≥ 2 fix **per chapter** | predict 106, diagnose 59, fix 102, retype 24, design 22, refactor 17, plus 183 spot-the-bug cards that each end in a judged repair and 131 order — fix is covered for all but two chapters (`ts_type_testing`, `ts_aliases`); predict/diagnose/retype/design per chapter are still short (authoring). |
 | X-17 | Chapter-level strictness for Learn exercises | Learn's `ExerciseCard` (in `Learn.tsx`) does not pass strictness/harness to the judge yet — no Learn exercise needs it today. |
 | X-37 | Explanations for wrong options | Field and UI shipped; the 251 code-output questions have them. The ~1,100 authored bank questions need authoring. |
 | X-12 | Type-graded **Library** problems | Deliberately not done: a type-only problem cannot have the Java starter every Library problem is required to have (`verify_seeds`), and the Mastery weeks already carry 55 type-graded problems plus the 121-rung ladder. Revisit only with a TypeScript-only Library category. |
