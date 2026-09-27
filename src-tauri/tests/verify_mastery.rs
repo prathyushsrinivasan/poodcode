@@ -257,7 +257,12 @@ fn every_practice_solution_passes_and_every_starter_fails() {
     }
     for (label, ex) in &items {
         assert_ne!(ex.starter, ex.solution, "{label}: starter equals solution");
-        if ex.judge_mode == "types" {
+        if ex.judge_mode == "types" && ex.kind == "diagnose" {
+            // A "read the error" repair judged by the checker alone: the
+            // starter is the chapter's snippet (no blank, no claims), and the
+            // check below proves it really reports the quoted code.
+            assert!(ex.tests.is_empty(), "{label}: a type-graded exercise must not carry tests");
+        } else if ex.judge_mode == "types" {
             assert!(ex.starter.contains("____"), "{label}: a type-graded starter needs a ____ blank");
             assert!(ex.tests.is_empty(), "{label}: a type-graded exercise must not carry tests");
             assert!(ex.harness.contains("Expect<"), "{label}: a type-graded exercise needs claims");

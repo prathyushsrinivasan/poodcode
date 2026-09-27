@@ -169,6 +169,39 @@ def _tsd_repair(key, name, p, eid):
     }
 
 
+from ts_error_fixes import TS_ERROR_FIXES as _TSD_FIXES  # noqa: E402  (tools/ is on sys.path)
+
+
+def _tsd_diagnoses(key, name, data):
+    """Every compiler error the chapter shows, as a "read the error" exercise
+    (X-10): the chapter's snippet is the starter, and the repair is judged by
+    the checker alone — the snippets print nothing, so there is no output to
+    compare. The model repair (tools/ts_error_fixes.py) is the reveal."""
+    fixes = _TSD_FIXES.get(key)
+    if fixes is None:
+        return []
+    assert len(fixes) == len(data["errors"]), \
+        f"{key}: ts_error_fixes.py has {len(fixes)} fixes for {len(data['errors'])} compiler errors"
+    out = []
+    for i, (er, fix) in enumerate(zip(data["errors"], fixes), start=1):
+        if fix is None:
+            continue
+        message = er["message"].split(": ", 1)[1] if er["message"].startswith("line ") else er["message"]
+        flag = " (with `noUncheckedIndexedAccess` on)" if er["strictness"] == "strict+indexed" else ""
+        out.append({
+            "id": f"tsm-{key}-dx{i}", "title": f"Read the error: {name} #{i}",
+            "prompt": (f"The compiler rejects this program{flag}:\n\n    {message.split(chr(10))[0]}\n\n"
+                       "Fix the cause so it compiles — keep what the program is for; deleting the line that "
+                       "fails is not a fix."),
+            "hint": er["note"].split(". ")[0].rstrip(".") + ".", "hints": [er["note"]],
+            "language": "typescript", "kind": "diagnose", "difficulty": "",
+            "strictness": er["strictness"] or "", "harness": "", "judge_mode": "types", "forbid": [],
+            "starter": er["code"], "solution": fix.strip("\n") + "\n", "tests": [],
+            "source_slug": "", "dataset": "",
+        })
+    return out
+
+
 def _tsd_cards(name, data):
     cards = []
     for ex in data["examples"]:
@@ -258,7 +291,7 @@ def _tsd_predicts(key, name, data):
     return out
 
 
-TS_DERIVED_COUNTS = {"order": 0, "spot": 0, "cards": 0, "output": 0, "predict": 0, "repair": 0}
+TS_DERIVED_COUNTS = {"order": 0, "spot": 0, "cards": 0, "output": 0, "predict": 0, "repair": 0, "diagnose": 0}
 _tsd_fronts = {c["front"] for w in TS_WEEKS for c in w["flashcards"]}
 _tsd_fronts |= {f for cs in TS_CARDS_MORE.values() for f, _ in cs}
 for _tsd_w in TS_WEEKS:
@@ -292,6 +325,9 @@ for _tsd_w in TS_WEEKS:
                 _tsd_r += 1
                 _tsd_more.append(_tsd_ex)
                 TS_DERIVED_COUNTS["repair"] += 1
+        for _tsd_ex in _tsd_diagnoses(_tsd_key, _tsd_name, _tsd_data):
+            _tsd_more.append(_tsd_ex)
+            TS_DERIVED_COUNTS["diagnose"] += 1
         for _tsd_ex in _tsd_predicts(_tsd_key, _tsd_name, _tsd_data):
             _tsd_more.append(_tsd_ex)
             TS_DERIVED_COUNTS["predict"] += 1
@@ -313,7 +349,7 @@ for _tsd_w in TS_WEEKS:
             TS_DERIVED_COUNTS["cards"] += 1
 print(f"  derived from chapters: {TS_DERIVED_COUNTS['cards']} cards, "
       f"{TS_DERIVED_COUNTS['order']} order, {TS_DERIVED_COUNTS['spot']} spot exercises, "
-      f"{TS_DERIVED_COUNTS['output']} code-output questions, {TS_DERIVED_COUNTS['predict']} predict drills, {TS_DERIVED_COUNTS['repair']} repairs")
+      f"{TS_DERIVED_COUNTS['output']} code-output questions, {TS_DERIVED_COUNTS['predict']} predict drills, {TS_DERIVED_COUNTS['repair']} repairs, {TS_DERIVED_COUNTS['diagnose']} read-the-error")
 
 # X-07: every compiler error a chapter shows has a glossary entry, so its
 # TsErrorLinks badge leads somewhere. Add missing ones to ts_errors_more.py.
