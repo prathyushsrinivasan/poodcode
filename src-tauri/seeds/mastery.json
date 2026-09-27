@@ -16582,6 +16582,128 @@
             ],
             "source_slug": "",
             "dataset": ""
+          },
+          {
+            "id": "tsm-w7-3w-tally-1",
+            "title": "Three ways (1/3): Word tally — with loops",
+            "prompt": "Read one line of lowercase words. Print each distinct word and how often it appears, `word count`, most frequent first; break ties alphabetically.\n\nUse statements and loops — no `map`/`reduce`/`filter`/`forEach`, no class.",
+            "hint": "Use statements and loops — no `map`/`reduce`/`filter`/`forEach`, no class.",
+            "hints": [
+              "Use statements and loops — no `map`/`reduce`/`filter`/`forEach`, no class.",
+              "The reference solution uses `split`, `sort`, a `for` loop, `localeCompare` and `??`.",
+              "The reference solution is 4 lines and begins: `const counts: Record<string, number> = {};`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [
+              ".map(",
+              ".reduce(",
+              ".filter(",
+              ".forEach(",
+              "class "
+            ],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst counts: Record<string, number> = {};\nfor (const w of input.split(/\\s+/)) counts[w] = (counts[w] ?? 0) + 1;\nconst words = Object.keys(counts).sort((a, b) => counts[b] - counts[a] || a.localeCompare(b));\nfor (const w of words) console.log(`${w} ${counts[w]}`);\n",
+            "tests": [
+              {
+                "input": "the cat and the hat and the bat",
+                "output": "the 3\nand 2\nbat 1\ncat 1\nhat 1"
+              },
+              {
+                "input": "b a b c",
+                "output": "b 2\na 1\nc 1"
+              },
+              {
+                "input": "solo",
+                "output": "solo 1"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": "**Three ways, compared.** The **loop** version is the most direct to write and to step through, and a plain object is a fine counter — but the counting, sorting and printing are interleaved statements you have to read in order. The **pipeline** says the same thing as three transformations (count → sort → format); `reduce` into a `Map` is dense the first time you meet it and very readable after that, and nothing is mutated after it is built. The **class** hides the counting behind `add` and `ranked`: more code for a one-off script, but the only version you could reuse — another program can tally words without knowing it uses a `Map`."
+          },
+          {
+            "id": "tsm-w7-3w-tally-2",
+            "title": "Three ways (2/3): Word tally — as a pipeline",
+            "prompt": "Read one line of lowercase words. Print each distinct word and how often it appears, `word count`, most frequent first; break ties alphabetically.\n\nUse expressions over the data — no `for`/`while` loops, no `let`, no class.",
+            "hint": "Use expressions over the data — no `for`/`while` loops, no `let`, no class.",
+            "hints": [
+              "Use expressions over the data — no `for`/`while` loops, no `let`, no class.",
+              "The reference solution uses `split`, a `Map`, `reduce`, `map`, `toSorted`, `join`, `localeCompare` and `??`.",
+              "The reference solution is 3 lines and begins: `const counts = input.split(/\\s+/).reduce((m, w) => m.set(w, (m.get(w) ?? 0) + 1), new Map<string, number>());`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [
+              "for (",
+              "while (",
+              "let ",
+              "class "
+            ],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst counts = input.split(/\\s+/).reduce((m, w) => m.set(w, (m.get(w) ?? 0) + 1), new Map<string, number>());\nconst lines = [...counts].toSorted((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).map(([w, n]) => `${w} ${n}`);\nconsole.log(lines.join(\"\\n\"));\n",
+            "tests": [
+              {
+                "input": "the cat and the hat and the bat",
+                "output": "the 3\nand 2\nbat 1\ncat 1\nhat 1"
+              },
+              {
+                "input": "b a b c",
+                "output": "b 2\na 1\nc 1"
+              },
+              {
+                "input": "solo",
+                "output": "solo 1"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": "**Three ways, compared.** The **loop** version is the most direct to write and to step through, and a plain object is a fine counter — but the counting, sorting and printing are interleaved statements you have to read in order. The **pipeline** says the same thing as three transformations (count → sort → format); `reduce` into a `Map` is dense the first time you meet it and very readable after that, and nothing is mutated after it is built. The **class** hides the counting behind `add` and `ranked`: more code for a one-off script, but the only version you could reuse — another program can tally words without knowing it uses a `Map`."
+          },
+          {
+            "id": "tsm-w7-3w-tally-3",
+            "title": "Three ways (3/3): Word tally — as a class",
+            "prompt": "Read one line of lowercase words. Print each distinct word and how often it appears, `word count`, most frequent first; break ties alphabetically.\n\nWrite only `class Tally` with `add(word: string): void` and `ranked(): [string, number][]` (most frequent first, ties alphabetical). A hidden driver reads the words, adds each, and prints `ranked()`.",
+            "hint": "Write only `class Tally` with `add(word: string): void` and `ranked(): [string, number][]` (most frequent first, ties alphabetical). A hidden driver reads the words, adds each, and prints `ranked()`.",
+            "hints": [
+              "Write only `class Tally` with `add(word: string): void` and `ranked(): [string, number][]` (most frequent first, ties alphabetical). A hidden driver reads the words, adds each, and prints `ranked()`.",
+              "The reference solution uses a `Map`, `toSorted`, `localeCompare`, `??` and a class.",
+              "The reference solution is 9 lines and begins: `class Tally {`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "import * as __fs from \"fs\";\nconst __lines = __fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nconst __t = new Tally();\nfor (const __w of __lines.join(\" \").split(/\\s+/)) __t.add(__w);\nfor (const [__w, __n] of __t.ranked()) console.log(`${__w} ${__n}`);\n",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "____\n",
+            "solution": "class Tally {\n  readonly #counts = new Map<string, number>();\n  add(word: string): void {\n    this.#counts.set(word, (this.#counts.get(word) ?? 0) + 1);\n  }\n  ranked(): [string, number][] {\n    return [...this.#counts].toSorted((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));\n  }\n}\n",
+            "tests": [
+              {
+                "input": "the cat and the hat and the bat",
+                "output": "the 3\nand 2\nbat 1\ncat 1\nhat 1"
+              },
+              {
+                "input": "b a b c",
+                "output": "b 2\na 1\nc 1"
+              },
+              {
+                "input": "solo",
+                "output": "solo 1"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": "**Three ways, compared.** The **loop** version is the most direct to write and to step through, and a plain object is a fine counter — but the counting, sorting and printing are interleaved statements you have to read in order. The **pipeline** says the same thing as three transformations (count → sort → format); `reduce` into a `Map` is dense the first time you meet it and very readable after that, and nothing is mutated after it is built. The **class** hides the counting behind `add` and `ranked`: more code for a one-off script, but the only version you could reuse — another program can tally words without knowing it uses a `Map`."
           }
         ],
         "project_spec": {
@@ -27546,6 +27668,128 @@
             ],
             "source_slug": "",
             "dataset": ""
+          },
+          {
+            "id": "tsm-w12-3w-ledger-1",
+            "title": "Three ways (1/3): An account ledger — with loops",
+            "prompt": "Each input line is `deposit N`, `withdraw N` or `balance`. Start at 0. A withdrawal larger than the balance prints `declined` and changes nothing; `balance` prints the balance. After the last line print `final <balance>`.\n\nUse statements and loops — no `map`/`reduce`/`filter`/`forEach`, no class.",
+            "hint": "Use statements and loops — no `map`/`reduce`/`filter`/`forEach`, no class.",
+            "hints": [
+              "Use statements and loops — no `map`/`reduce`/`filter`/`forEach`, no class.",
+              "The reference solution uses `split`, a `switch` and a `for` loop.",
+              "The reference solution is 18 lines and begins: `let balance = 0;`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [
+              ".map(",
+              ".reduce(",
+              ".filter(",
+              ".forEach(",
+              "class "
+            ],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nlet balance = 0;\nfor (const line of input.split(\"\\n\")) {\n  const [op, arg] = line.trim().split(/\\s+/);\n  const n = Number(arg);\n  switch (op) {\n    case \"deposit\":\n      balance += n;\n      break;\n    case \"withdraw\":\n      if (n > balance) console.log(\"declined\");\n      else balance -= n;\n      break;\n    case \"balance\":\n      console.log(balance);\n      break;\n  }\n}\nconsole.log(`final ${balance}`);\n",
+            "tests": [
+              {
+                "input": "deposit 50\nwithdraw 20\nbalance\nwithdraw 100\ndeposit 5\nbalance",
+                "output": "30\ndeclined\n35\nfinal 35"
+              },
+              {
+                "input": "balance",
+                "output": "0\nfinal 0"
+              },
+              {
+                "input": "withdraw 1\ndeposit 1",
+                "output": "declined\nfinal 1"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": "**Three ways, compared.** The **loop** keeps one mutable `balance` and prints as it goes — short, and fine until you want to test a single step on its own. The **pipeline** turns each line into a typed command (a discriminated union) and folds them into an immutable state, collecting output instead of printing it: longer, but every step is a pure function you can test with plain values, and adding a command is a compile error until `step` handles it. The **class** puts the rule (\"no overdrafts\") next to the balance it protects, and `#balance` means nothing outside can break it — the shape most real code ends up in when state has invariants."
+          },
+          {
+            "id": "tsm-w12-3w-ledger-2",
+            "title": "Three ways (2/3): An account ledger — as a pipeline",
+            "prompt": "Each input line is `deposit N`, `withdraw N` or `balance`. Start at 0. A withdrawal larger than the balance prints `declined` and changes nothing; `balance` prints the balance. After the last line print `final <balance>`.\n\nUse expressions over the data — no `for`/`while` loops, no `let`, no class.",
+            "hint": "Use expressions over the data — no `for`/`while` loops, no `let`, no class.",
+            "hints": [
+              "Use expressions over the data — no `for`/`while` loops, no `let`, no class.",
+              "The reference solution uses `split`, `reduce`, `map`, `join` and a `switch`.",
+              "The reference solution is 19 lines and begins: `type Cmd = { op: \"deposit\" | \"withdraw\"; n: number } | { op: \"balance\" };`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [
+              "for (",
+              "while (",
+              "let ",
+              "class "
+            ],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Cmd = { op: \"deposit\" | \"withdraw\"; n: number } | { op: \"balance\" };\ntype State = { readonly balance: number; readonly out: readonly string[] };\nconst parse = (line: string): Cmd => {\n  const [op = \"\", arg = \"0\"] = line.trim().split(/\\s+/);\n  return op === \"balance\" ? { op: \"balance\" } : { op: op === \"withdraw\" ? \"withdraw\" : \"deposit\", n: Number(arg) };\n};\nconst step = (s: State, c: Cmd): State => {\n  switch (c.op) {\n    case \"deposit\":\n      return { ...s, balance: s.balance + c.n };\n    case \"withdraw\":\n      return c.n > s.balance ? { ...s, out: [...s.out, \"declined\"] } : { ...s, balance: s.balance - c.n };\n    case \"balance\":\n      return { ...s, out: [...s.out, String(s.balance)] };\n  }\n};\nconst start: State = { balance: 0, out: [] };\nconst end = input.split(\"\\n\").map(parse).reduce(step, start);\nconsole.log([...end.out, `final ${end.balance}`].join(\"\\n\"));\n",
+            "tests": [
+              {
+                "input": "deposit 50\nwithdraw 20\nbalance\nwithdraw 100\ndeposit 5\nbalance",
+                "output": "30\ndeclined\n35\nfinal 35"
+              },
+              {
+                "input": "balance",
+                "output": "0\nfinal 0"
+              },
+              {
+                "input": "withdraw 1\ndeposit 1",
+                "output": "declined\nfinal 1"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": "**Three ways, compared.** The **loop** keeps one mutable `balance` and prints as it goes — short, and fine until you want to test a single step on its own. The **pipeline** turns each line into a typed command (a discriminated union) and folds them into an immutable state, collecting output instead of printing it: longer, but every step is a pure function you can test with plain values, and adding a command is a compile error until `step` handles it. The **class** puts the rule (\"no overdrafts\") next to the balance it protects, and `#balance` means nothing outside can break it — the shape most real code ends up in when state has invariants."
+          },
+          {
+            "id": "tsm-w12-3w-ledger-3",
+            "title": "Three ways (3/3): An account ledger — as a class",
+            "prompt": "Each input line is `deposit N`, `withdraw N` or `balance`. Start at 0. A withdrawal larger than the balance prints `declined` and changes nothing; `balance` prints the balance. After the last line print `final <balance>`.\n\nWrite only `class Account` with `deposit(n: number): void`, `withdraw(n: number): boolean` (false, and no change, when it would overdraw) and a `balance` getter. A hidden driver runs the commands and prints what they report.",
+            "hint": "Write only `class Account` with `deposit(n: number): void`, `withdraw(n: number): boolean` (false, and no change, when it would overdraw) and a `balance` getter. A hidden driver runs the commands and prints what they report.",
+            "hints": [
+              "Write only `class Account` with `deposit(n: number): void`, `withdraw(n: number): boolean` (false, and no change, when it would overdraw) and a `balance` getter. A hidden driver runs the commands and prints what they report.",
+              "The reference solution uses a class.",
+              "The reference solution is 14 lines and begins: `class Account {`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "import * as __fs from \"fs\";\nconst __lines = __fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nconst __acct = new Account();\nfor (const __line of __lines) {\n  const [__op, __arg] = __line.trim().split(/\\s+/);\n  const __n = Number(__arg);\n  if (__op === \"deposit\") __acct.deposit(__n);\n  else if (__op === \"withdraw\") {\n    if (!__acct.withdraw(__n)) console.log(\"declined\");\n  } else if (__op === \"balance\") console.log(__acct.balance);\n}\nconsole.log(`final ${__acct.balance}`);\n",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "____\n",
+            "solution": "class Account {\n  #balance = 0;\n  deposit(n: number): void {\n    this.#balance += n;\n  }\n  withdraw(n: number): boolean {\n    if (n > this.#balance) return false;\n    this.#balance -= n;\n    return true;\n  }\n  get balance(): number {\n    return this.#balance;\n  }\n}\n",
+            "tests": [
+              {
+                "input": "deposit 50\nwithdraw 20\nbalance\nwithdraw 100\ndeposit 5\nbalance",
+                "output": "30\ndeclined\n35\nfinal 35"
+              },
+              {
+                "input": "balance",
+                "output": "0\nfinal 0"
+              },
+              {
+                "input": "withdraw 1\ndeposit 1",
+                "output": "declined\nfinal 1"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": "**Three ways, compared.** The **loop** keeps one mutable `balance` and prints as it goes — short, and fine until you want to test a single step on its own. The **pipeline** turns each line into a typed command (a discriminated union) and folds them into an immutable state, collecting output instead of printing it: longer, but every step is a pure function you can test with plain values, and adding a command is a compile error until `step` handles it. The **class** puts the rule (\"no overdrafts\") next to the balance it protects, and `#balance` means nothing outside can break it — the shape most real code ends up in when state has invariants."
           }
         ],
         "project_spec": {
@@ -40229,6 +40473,128 @@
             "tests": [],
             "source_slug": "",
             "dataset": ""
+          },
+          {
+            "id": "tsm-w18-3w-topk-1",
+            "title": "Three ways (1/3): Top k by score — with loops",
+            "prompt": "The first line is `k`; each further line is `name score`. Print the `k` highest-scoring entries, `name score`, highest first; break ties alphabetically by name. (Fewer than `k` entries: print them all.)\n\nUse statements and loops — no `map`/`reduce`/`filter`/`forEach`, no class.",
+            "hint": "Use statements and loops — no `map`/`reduce`/`filter`/`forEach`, no class.",
+            "hints": [
+              "Use statements and loops — no `map`/`reduce`/`filter`/`forEach`, no class.",
+              "The reference solution uses `split`, a `while` loop, a `for` loop and `localeCompare`.",
+              "The reference solution is 16 lines and begins: `const [head = \"0\", ...rows] = input.split(\"\\n\");`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [
+              ".map(",
+              ".reduce(",
+              ".filter(",
+              ".forEach(",
+              "class "
+            ],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst [head = \"0\", ...rows] = input.split(\"\\n\");\nconst k = Number(head);\nconst top: [string, number][] = [];\nfor (const row of rows) {\n  const [name = \"\", s = \"0\"] = row.trim().split(/\\s+/);\n  const score = Number(s);\n  let i = top.length;\n  while (i > 0) {\n    const prev = top[i - 1];\n    if (prev === undefined || prev[1] > score || (prev[1] === score && prev[0].localeCompare(name) < 0)) break;\n    i--;\n  }\n  top.splice(i, 0, [name, score]);\n  if (top.length > k) top.pop();\n}\nfor (const [name, score] of top) console.log(`${name} ${score}`);\n",
+            "tests": [
+              {
+                "input": "2\nann 5\nbob 9\ncy 5\ndee 7",
+                "output": "bob 9\ndee 7"
+              },
+              {
+                "input": "3\nx 1\ny 1",
+                "output": "x 1\ny 1"
+              },
+              {
+                "input": "1\nsolo 3",
+                "output": "solo 3"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": "**Three ways, compared.** The **loop** never holds more than `k` entries — an insertion into a small sorted array — which is what you want for a huge stream, at the price of index arithmetic that is easy to get wrong by one. The **pipeline** sorts everything and slices: one readable line, `O(n log n)` and all entries in memory, and the generic `topK<T>` works for any item type. The **generic class** keeps the bounded memory of the loop behind the API of the pipeline, and the type parameter means the same `TopK` ranks players, files or anything with a score — the payoff of week 18."
+          },
+          {
+            "id": "tsm-w18-3w-topk-2",
+            "title": "Three ways (2/3): Top k by score — as a pipeline",
+            "prompt": "The first line is `k`; each further line is `name score`. Print the `k` highest-scoring entries, `name score`, highest first; break ties alphabetically by name. (Fewer than `k` entries: print them all.)\n\nUse expressions over the data — no `for`/`while` loops, no `let`, no class.",
+            "hint": "Use expressions over the data — no `for`/`while` loops, no `let`, no class.",
+            "hints": [
+              "Use expressions over the data — no `for`/`while` loops, no `let`, no class.",
+              "The reference solution uses `split`, `map`, `toSorted`, `join`, `slice` and `localeCompare`.",
+              "The reference solution is 10 lines and begins: `function topK<T>(items: readonly T[], k: number, score: (x: T) => number, tie: (a: T, b: T) => number): T[] {`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [
+              "for (",
+              "while (",
+              "let ",
+              "class "
+            ],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nfunction topK<T>(items: readonly T[], k: number, score: (x: T) => number, tie: (a: T, b: T) => number): T[] {\n  return items.toSorted((a, b) => score(b) - score(a) || tie(a, b)).slice(0, k);\n}\nconst [head = \"0\", ...rows] = input.split(\"\\n\");\nconst entries = rows.map((r) => {\n  const [name = \"\", s = \"0\"] = r.trim().split(/\\s+/);\n  return { name, score: Number(s) };\n});\nconst best = topK(entries, Number(head), (e) => e.score, (a, b) => a.name.localeCompare(b.name));\nconsole.log(best.map((e) => `${e.name} ${e.score}`).join(\"\\n\"));\n",
+            "tests": [
+              {
+                "input": "2\nann 5\nbob 9\ncy 5\ndee 7",
+                "output": "bob 9\ndee 7"
+              },
+              {
+                "input": "3\nx 1\ny 1",
+                "output": "x 1\ny 1"
+              },
+              {
+                "input": "1\nsolo 3",
+                "output": "solo 3"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": "**Three ways, compared.** The **loop** never holds more than `k` entries — an insertion into a small sorted array — which is what you want for a huge stream, at the price of index arithmetic that is easy to get wrong by one. The **pipeline** sorts everything and slices: one readable line, `O(n log n)` and all entries in memory, and the generic `topK<T>` works for any item type. The **generic class** keeps the bounded memory of the loop behind the API of the pipeline, and the type parameter means the same `TopK` ranks players, files or anything with a score — the payoff of week 18."
+          },
+          {
+            "id": "tsm-w18-3w-topk-3",
+            "title": "Three ways (3/3): Top k by score — as a generic class",
+            "prompt": "The first line is `k`; each further line is `name score`. Print the `k` highest-scoring entries, `name score`, highest first; break ties alphabetically by name. (Fewer than `k` entries: print them all.)\n\nWrite only the generic `class TopK<T>`: `constructor(k: number, score: (x: T) => number, tie: (a: T, b: T) => number)`, `add(x: T): void` and `items(): T[]` (best first, at most `k`). A hidden driver feeds it `{ name, score }` entries and prints `items()`.",
+            "hint": "Write only the generic `class TopK<T>`: `constructor(k: number, score: (x: T) => number, tie: (a: T, b: T) => number)`, `add(x: T): void` and `items(): T[]` (best first, at most `k`). A hidden driver feeds it `{ name, score }` entries and prints `items()`.",
+            "hints": [
+              "Write only the generic `class TopK<T>`: `constructor(k: number, score: (x: T) => number, tie: (a: T, b: T) => number)`, `add(x: T): void` and `items(): T[]` (best first, at most `k`). A hidden driver feeds it `{ name, score }` entries and prints `items()`.",
+              "The reference solution uses `toSorted`, `slice` and a class.",
+              "The reference solution is 19 lines and begins: `class TopK<T> {`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "import * as __fs from \"fs\";\nconst __lines = __fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nconst [__head = \"0\", ...__rows] = __lines;\nconst __top = new TopK<{ name: string; score: number }>(\n  Number(__head),\n  (e) => e.score,\n  (a, b) => a.name.localeCompare(b.name),\n);\nfor (const __r of __rows) {\n  const [__n = \"\", __s = \"0\"] = __r.trim().split(/\\s+/);\n  __top.add({ name: __n, score: Number(__s) });\n}\nfor (const __e of __top.items()) console.log(`${__e.name} ${__e.score}`);\n",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "____\n",
+            "solution": "class TopK<T> {\n  readonly #k: number;\n  readonly #score: (x: T) => number;\n  readonly #tie: (a: T, b: T) => number;\n  #items: T[] = [];\n  constructor(k: number, score: (x: T) => number, tie: (a: T, b: T) => number) {\n    this.#k = k;\n    this.#score = score;\n    this.#tie = tie;\n  }\n  add(x: T): void {\n    this.#items = [...this.#items, x]\n      .toSorted((a, b) => this.#score(b) - this.#score(a) || this.#tie(a, b))\n      .slice(0, this.#k);\n  }\n  items(): T[] {\n    return [...this.#items];\n  }\n}\n",
+            "tests": [
+              {
+                "input": "2\nann 5\nbob 9\ncy 5\ndee 7",
+                "output": "bob 9\ndee 7"
+              },
+              {
+                "input": "3\nx 1\ny 1",
+                "output": "x 1\ny 1"
+              },
+              {
+                "input": "1\nsolo 3",
+                "output": "solo 3"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": "**Three ways, compared.** The **loop** never holds more than `k` entries — an insertion into a small sorted array — which is what you want for a huge stream, at the price of index arithmetic that is easy to get wrong by one. The **pipeline** sorts everything and slices: one readable line, `O(n log n)` and all entries in memory, and the generic `topK<T>` works for any item type. The **generic class** keeps the bounded memory of the loop behind the API of the pipeline, and the type parameter means the same `TopK` ranks players, files or anything with a score — the payoff of week 18."
           }
         ],
         "project_spec": {
@@ -51449,6 +51815,116 @@
             "tests": [],
             "source_slug": "",
             "dataset": ""
+          },
+          {
+            "id": "tsm-w24-3w-range-1",
+            "title": "Three ways (1/3): Ranges and their sums — with loops",
+            "prompt": "Each input line is `start end step`. Print the numbers from `start` (included) to `end` (excluded) in steps of `step`, space-separated, then ` | ` and their sum.\n\nUse statements and loops — no `map`/`reduce`/`filter`/`forEach`, no class.",
+            "hint": "Use statements and loops — no `map`/`reduce`/`filter`/`forEach`, no class.",
+            "hints": [
+              "Use statements and loops — no `map`/`reduce`/`filter`/`forEach`, no class.",
+              "The reference solution uses `split`, `join`, a `for` loop and `??`.",
+              "The reference solution is 11 lines and begins: `for (const line of input.split(\"\\n\")) {`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [
+              ".map(",
+              ".reduce(",
+              ".filter(",
+              ".forEach(",
+              "class "
+            ],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nfor (const line of input.split(\"\\n\")) {\n  const parts = line.trim().split(/\\s+/);\n  const a = Number(parts[0] ?? 0);\n  const b = Number(parts[1] ?? 0);\n  const s = Number(parts[2] ?? 1);\n  const out: number[] = [];\n  for (let x = a; x < b; x += s) out.push(x);\n  let sum = 0;\n  for (const x of out) sum += x;\n  console.log(`${out.join(\" \")} | ${sum}`);\n}\n",
+            "tests": [
+              {
+                "input": "0 10 3\n5 6 1",
+                "output": "0 3 6 9 | 18\n5 | 5"
+              },
+              {
+                "input": "1 8 2",
+                "output": "1 3 5 7 | 16"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": "**Three ways, compared.** The **loop** is the obvious translation and builds the whole list. The **pipeline** has to compute the length up front (`Math.ceil((end - start) / step)`) to use `Array.from` — correct, but the off-by-one lives in that formula now. The **generator** is the loop again, except it produces values only when asked: `[...range(0, 1e9, 1)]` would still be a problem, but `range(0, 1e9, 1).take(3)` (an iterator helper) costs three steps — laziness is what week 24 adds."
+          },
+          {
+            "id": "tsm-w24-3w-range-2",
+            "title": "Three ways (2/3): Ranges and their sums — as a pipeline",
+            "prompt": "Each input line is `start end step`. Print the numbers from `start` (included) to `end` (excluded) in steps of `step`, space-separated, then ` | ` and their sum.\n\nUse expressions over the data — no `for`/`while` loops, no `let`, no class.",
+            "hint": "Use expressions over the data — no `for`/`while` loops, no `let`, no class.",
+            "hints": [
+              "Use expressions over the data — no `for`/`while` loops, no `let`, no class.",
+              "The reference solution uses `split`, `reduce`, `map`, `join` and `Math`.",
+              "The reference solution is 6 lines and begins: `const lines = input.split(\"\\n\").map((line) => {`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [
+              "for (",
+              "while (",
+              "let ",
+              "class "
+            ],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst lines = input.split(\"\\n\").map((line) => {\n  const [a = 0, b = 0, s = 1] = line.trim().split(/\\s+/).map(Number);\n  const xs = Array.from({ length: Math.max(0, Math.ceil((b - a) / s)) }, (_, i) => a + i * s);\n  return `${xs.join(\" \")} | ${xs.reduce((t, x) => t + x, 0)}`;\n});\nconsole.log(lines.join(\"\\n\"));\n",
+            "tests": [
+              {
+                "input": "0 10 3\n5 6 1",
+                "output": "0 3 6 9 | 18\n5 | 5"
+              },
+              {
+                "input": "1 8 2",
+                "output": "1 3 5 7 | 16"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": "**Three ways, compared.** The **loop** is the obvious translation and builds the whole list. The **pipeline** has to compute the length up front (`Math.ceil((end - start) / step)`) to use `Array.from` — correct, but the off-by-one lives in that formula now. The **generator** is the loop again, except it produces values only when asked: `[...range(0, 1e9, 1)]` would still be a problem, but `range(0, 1e9, 1).take(3)` (an iterator helper) costs three steps — laziness is what week 24 adds."
+          },
+          {
+            "id": "tsm-w24-3w-range-3",
+            "title": "Three ways (3/3): Ranges and their sums — with a generator",
+            "prompt": "Each input line is `start end step`. Print the numbers from `start` (included) to `end` (excluded) in steps of `step`, space-separated, then ` | ` and their sum.\n\nWrite only `function* range(start: number, end: number, step: number)`, yielding the numbers lazily. A hidden driver spreads each range into an array and prints it with its sum.",
+            "hint": "Write only `function* range(start: number, end: number, step: number)`, yielding the numbers lazily. A hidden driver spreads each range into an array and prints it with its sum.",
+            "hints": [
+              "Write only `function* range(start: number, end: number, step: number)`, yielding the numbers lazily. A hidden driver spreads each range into an array and prints it with its sum.",
+              "The reference solution uses a `for` loop and a generator.",
+              "The reference solution is 3 lines and begins: `function* range(start: number, end: number, step: number): Generator<number> {`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "import * as __fs from \"fs\";\nconst __lines = __fs.readFileSync(0, \"utf8\").trim().split(\"\\n\");\nfor (const __line of __lines) {\n  const [__a = 0, __b = 0, __s = 1] = __line.trim().split(/\\s+/).map(Number);\n  const __xs = [...range(__a, __b, __s)];\n  console.log(`${__xs.join(\" \")} | ${__xs.reduce((t, x) => t + x, 0)}`);\n}\n",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "____\n",
+            "solution": "function* range(start: number, end: number, step: number): Generator<number> {\n  for (let x = start; x < end; x += step) yield x;\n}\n",
+            "tests": [
+              {
+                "input": "0 10 3\n5 6 1",
+                "output": "0 3 6 9 | 18\n5 | 5"
+              },
+              {
+                "input": "1 8 2",
+                "output": "1 3 5 7 | 16"
+              }
+            ],
+            "source_slug": "",
+            "dataset": "",
+            "explanation": "**Three ways, compared.** The **loop** is the obvious translation and builds the whole list. The **pipeline** has to compute the length up front (`Math.ceil((end - start) / step)`) to use `Array.from` — correct, but the off-by-one lives in that formula now. The **generator** is the loop again, except it produces values only when asked: `[...range(0, 1e9, 1)]` would still be a problem, but `range(0, 1e9, 1).take(3)` (an iterator helper) costs three steps — laziness is what week 24 adds."
           }
         ],
         "project_spec": {

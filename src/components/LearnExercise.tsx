@@ -330,6 +330,14 @@ function CodeExerciseCard({
 
       {report && <Feedback report={report} check={exercise.judge_mode === "types" ? { harness: exercise.harness ?? "", code } : undefined} />}
 
+      {/* Why the answer is the answer — a repair's pitfall, or a "three ways"
+          comparison. Kept until solved: it would give the fix away. */}
+      {solved && exercise.explanation && (
+        <div className="card" style={{ marginTop: 10, marginBottom: 0, background: "var(--accent-dim)" }}>
+          <Markdown>{exercise.explanation}</Markdown>
+        </div>
+      )}
+
       {showSolution && (
         <div style={{ marginTop: 10 }}>
           <Markdown>{"```" + lang + "\n" + exercise.solution + "\n```"}</Markdown>
