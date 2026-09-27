@@ -832,7 +832,7 @@ concurrency and cancellation.
 |---|---|---|
 | TypeScript Learn chapters | 50 | **87** (37 new) |
 | Lesson length | 0.9–2.1k chars | 4–8k chars, templated |
-| Learn exercises on those chapters | 176 (2 kinds) | **~1,300** (10+ kinds, ~20% type-graded) — ✅ **1,654** across Learn (301), week practice (1,065) and problem sets (288); 10 kinds; 477 type-graded (29%) |
+| Learn exercises on those chapters | 176 (2 kinds) | **~1,300** (10+ kinds, ~20% type-graded) — ✅ **1,778** across Learn (301), week practice (1,189) and problem sets (288); 10 kinds; 477 type-graded (27%) |
 | Curated problems | 85 slots, 26 TS-startable | **~380 slots, all TS-startable** (~300 new originals, ~100 of them type-graded) |
 | Type-challenge bank | 0 | **~120** — ✅ 121-rung ladder, 138 type-level exercises |
 | Quiz bank | 170 | **~1,050**, 10 sampled — ✅ **1,679** (multi-select, fill-the-type and code-output included; 8 sampled per sitting) |
@@ -843,13 +843,13 @@ concurrency and cancellation.
 
 ---
 
-**Status, 2026-09-27 (end of the third build session).** Every volume target in the table above is met: 1,654 exercises in 10 kinds (29% type-graded), 1,679 quiz questions, 1,260 cards, 121 type-ladder rungs, all 26 core weeks with projects, finals, alternates and families, and 81 curated Library problems with verified idiomatic TypeScript editorials. What remains is listed under *Handoff*: mostly per-chapter authoring (X-10 predict/diagnose/retype/design per chapter, more families, why-not notes for the authored single-choice bank), and X-105, which needs registry access.
+**Status, 2026-09-27 (end of the third build session).** Every volume target in the table above is met: 1,778 exercises in 10 kinds (27% type-graded), 1,679 quiz questions, 1,260 cards, 121 type-ladder rungs, all 26 core weeks with projects, finals, alternates and families, and 81 curated Library problems with verified idiomatic TypeScript editorials. What remains is listed under *Handoff*: mostly per-chapter authoring (X-10 predict/diagnose/retype/design per chapter, more families, why-not notes for the authored single-choice bank), and X-105, which needs registry access.
 
 ---
 
 ## Handoff — where the next session starts (2026-09-27)
 
-**Session 3 (2026-09-27, continued):** ebddbce arc projects v1–v3 committed after cargo/vitest/preview checks · aa98fa8 put-it-in-order + spot-the-bug practice and 733 chapter-derived cards · dc6fe42 quiz kinds (multi-select, fill-the-type, code-output) · 9e60a47 scope lint (56 rules; the commit message says 58) · 242cd8e determinism check · 88b6793 heatmap/streak · 5f5d8cb retype/design/refactor · 1f5c31b + a1993a0 error glossary coverage · afe5155 hint ladders · 2d06f7e why-not notes · 3bebeb1 type stepper · c0b5cee pitfall cards · 6276f74 cheat sheets · 7598ebb predict drills · 3a8cb73 state machines · 1e98b38 Python/JS notes · 9401e7a repairs · 52b6e36 Library weeks · b3c0c45 three ways · 27c155a idiomatic editorials · d53a080 spot-then-fix · bc95215 + 042676b practice families.
+**Session 3 (2026-09-27, continued):** ebddbce arc projects v1–v3 committed after cargo/vitest/preview checks · aa98fa8 put-it-in-order + spot-the-bug practice and 733 chapter-derived cards · dc6fe42 quiz kinds (multi-select, fill-the-type, code-output) · 9e60a47 scope lint (56 rules; the commit message says 58) · 242cd8e determinism check · 88b6793 heatmap/streak · 5f5d8cb retype/design/refactor · 1f5c31b + a1993a0 error glossary coverage · afe5155 hint ladders · 2d06f7e why-not notes · 3bebeb1 type stepper · c0b5cee pitfall cards · 6276f74 cheat sheets · 7598ebb predict drills · 3a8cb73 state machines · 1e98b38 Python/JS notes · 9401e7a repairs · 52b6e36 Library weeks · b3c0c45 three ways · 27c155a idiomatic editorials · d53a080 spot-then-fix · bc95215 + 042676b practice families · 0c93679 more predict drills · b5bb2a8 multi-select why-not · 35b455b key terms · b1cf556 read-the-error per chapter · f7ef96c folded practice sections · da3b20b retype drills · 107fbf0 design drills.
 
 **Commits this session (branch `java-course`):** bee8ab4 week 27 · d461dc6 finals round two, final exam,
 multi-file projects, Monaco lib fix · 613aa57 playground + stdin/stdout visualiser · 6e5a1ef event loop +
