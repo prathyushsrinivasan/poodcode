@@ -534,3 +534,102 @@ for _qk_week, _qk_list in TS_QUIZ_KINDS.items():
     for _qk in _qk_list:
         if _qk["kind"] == "type" and _qk_strict:
             _qk["strictness"] = _qk_strict
+
+
+# X-37: why each wrong option of a multi-select question is wrong, keyed by
+# week and option text. Every wrong option must have one (asserted below).
+_QK_WHY_NOT = {
+    1: {'let c = "x"': "`let` widens: the variable may later hold any string, so it is `string`.",
+        "let d: number = 42": "The annotation wins: `d` is `number`, whatever the initializer.",
+        "undefined": '`typeof undefined` is "undefined".',
+        "() => 1": 'Functions report "function", even though they are objects.'},
+    2: {"NaN === NaN": "NaN is not equal to anything, itself included.",
+        '"0"': 'A non-empty string is truthy — even "0".',
+        "[]": "Every object is truthy, empty arrays included."},
+    3: {"Math.floor(3.14159 * 100) / 100": "That is the number 3.14, not a string.",
+        "for (const x in xs)": "`for…in` walks the indices, as strings.",
+        "for (const [x] of xs.entries())": "`entries()` yields `[index, value]`; `[x]` takes the index."},
+    4: {'s.split(",")': "It returns `string[]`.",
+        "s.at(0)": "It returns `string | undefined` — the index may be out of range.",
+        "s.match(/a/)": "It returns a match array or `null`.",
+        's.normalize("NFD").length': "NFD splits é into `e` plus a combining accent: 6."},
+    5: {"function greet(name: string | undefined) {}": "The parameter is still required — you would have to pass `undefined` yourself.",
+        "A closure captures a copy of each variable's value when it is created": "It captures the variable itself; later changes are visible to it."},
+    6: {"(n: number) => n * 2": "It takes and returns a number — no function comes in or goes out.",
+        "[1, 2].forEach((x) => x * 2)": "`forEach` always returns `undefined`."},
+    7: {"sort": "`sort` reorders the array in place.",
+        "splice": "`splice` removes and inserts in place.",
+        "t.push(2)": "Allowed: mutable tuples keep `push` — a known hole, and a reason to make them `readonly`.",
+        "t[0].toUpperCase()": "Position 0 is a `string`, so this is fine."},
+    8: {"const scores = {};": "`{}` declares no keys, so writing a new one is an error.",
+        "const scores: Map<string, number> = new Map();": "A `Map` is written with `set`, not brackets.",
+        "nested objects are left out": "Nested plain objects serialise fine."},
+    9: {"JSON.stringify serialises its entries": "`JSON.stringify(map)` is `{}` — convert with `Object.fromEntries` first.",
+        "s.size === 4": "The second 2 is not stored: the size is 3."},
+    10: {'let mode = "dark";': "A `let` widens the literal to `string`.",
+         'const mode: string = "dark";': "The annotation says `string`, so that is the type.",
+         'const c: Level = "medium";': '"medium" is not one of the listed literals (TS2322).'},
+    11: {"null": "Truthiness removes `null`.",
+         "undefined": "Truthiness removes `undefined`.",
+         "||": "`||` treats 0 as missing and replaces it."},
+    12: {"{}": "`{}` excludes `null` and `undefined`.",
+         "object": "`object` excludes every primitive.",
+         'a default branch that throws `new Error("?")`': "It compiles with a case missing; the gap only shows up at runtime."},
+    13: {"() => string": "Callers of that type pass nothing, but `f` needs its `n`.",
+         "any  and  unknown": "`Equal` tells `any` and `unknown` apart.",
+         "readonly string[]  and  string[]": "`readonly` is part of the type."},
+    14: {"enum Color { Red }": "An `enum` generates an object at runtime.",
+         "constructor(private id: number) {}": "A parameter property generates an assignment in the constructor.",
+         "noUncheckedIndexedAccess": "Not part of `strict`; it has to be turned on separately.",
+         "exactOptionalPropertyTypes": "Not part of `strict`; it has to be turned on separately."},
+    15: {"{ … } as Theme": "`as` replaces the type with `Theme`, so `mode` becomes the whole union.",
+         "an annotation `: Theme`": "An annotation also replaces the inferred type with `Theme`.",
+         "const p: Point = { x: 1, y: 2, z: 3 };": "A fresh literal with an unknown property fails the excess-property check (TS2353).",
+         "const p: Point = { x: 1 };": "`y` is missing."},
+    16: {"const xs = [1];": "`const` fixes the binding, not the array's contents.",
+         "The brand property exists on the value at runtime": "The brand exists only for the checker; the value is a plain string."},
+    17: {"Required<U>": "`Required` removes `?`; it does not add it.",
+         "Readonly<U>": "`Readonly` adds `readonly`, not `?`.",
+         "Omit": "`Omit` selects object keys, not union members.",
+         "Pick": "`Pick` selects object keys, not union members."},
+    18: {"first(42)": "A number has no `length` (TS2345).",
+         "It makes the function run faster": "Types are erased; generics change nothing at runtime.",
+         "It is used exactly once, only in a parameter": "A type parameter used once relates nothing — `unknown` would say the same."},
+    19: {"keyof colors": "`keyof` needs a type: `keyof typeof colors`.",
+         "(typeof colors)[keyof typeof colors]": "That is the type of the values, `string`.",
+         "keyof typeof xs": "That is the array's keys — `number` and the method names."},
+    20: {"{ [K in keyof T]-?: T[K] }": "`-?` strips the `?` modifier.",
+         "Record<keyof T, number>": "`Record` builds fresh, required keys.",
+         "{ [K in keyof T]: T[K] }": "A plain homomorphic mapping copies `readonly`.",
+         "{ readonly [K in keyof T]: T[K] }": "That adds `readonly`."},
+    21: {"type B<T> = [T] extends [string] ? 1 : 2": "Wrapping `T` in a tuple turns distribution off.",
+         "type D<T> = T[]": "Not a conditional type at all.",
+         'Exclude<"a" | "b", "a">': 'It leaves `"b"`.',
+         "NonNullable<string | null>": "It leaves `string`."},
+    22: {'"v.1"': "The first `${number}` would have to match an empty string.",
+         '"v1.x"': '`"x"` is not a number.',
+         "Titlecase": "There is no `Titlecase`: the four are `Uppercase`, `Lowercase`, `Capitalize` and `Uncapitalize`."},
+    23: {"a.owner": "`private` is enforced by the checker everywhere outside the class.",
+         "a.#bal": "`#bal` cannot even be named outside the class.",
+         "It adds the interface's methods to the class": "It only checks — you still write the methods.",
+         "It changes the class's runtime prototype": "`implements` is erased completely."},
+    24: {"{ a: 1 }": "Plain objects are not iterable; walk them with `Object.entries`.",
+         "It can only yield numbers": "A generator can yield anything."},
+    25: {"catch (e: Error)": "Not allowed (TS1196): a caught value may be anything.",
+         "(e as Error)": "It compiles but proves nothing — a thrown string has no `message`.",
+         "it works with any object that has a close() method": "`using` calls `[Symbol.dispose]()`, not `close()`."},
+    26: {"a setTimeout(fn, 0) callback": "Timers are macrotasks: they wait until the microtask queue is empty.",
+         "It runs on another thread": "It runs on the same thread; only when its parts run changes."},
+}
+for _qk_week, _qk_list in TS_QUIZ_KINDS.items():
+    _qk_reasons = _QK_WHY_NOT.get(_qk_week, {})
+    for _qk in _qk_list:
+        if _qk["kind"] != "multi":
+            continue
+        _qk["why_not"] = []
+        for _qk_i, _qk_opt in enumerate(_qk["options"]):
+            if _qk_i in _qk["answers"]:
+                _qk["why_not"].append("")
+                continue
+            assert _qk_opt in _qk_reasons, f"X-37: week {_qk_week}: no why-not for option {_qk_opt!r}"
+            _qk["why_not"].append(_qk_reasons[_qk_opt])

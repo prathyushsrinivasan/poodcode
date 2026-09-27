@@ -670,7 +670,13 @@
               1
             ],
             "kind": "multi",
-            "explanation": "A `const` can never be reassigned, so a primitive initializer keeps its literal type. `let` widens to `string`/`number`, and an annotation always wins."
+            "explanation": "A `const` can never be reassigned, so a primitive initializer keeps its literal type. `let` widens to `string`/`number`, and an annotation always wins.",
+            "why_not": [
+              "",
+              "",
+              "`let` widens: the variable may later hold any string, so it is `string`.",
+              "The annotation wins: `d` is `number`, whatever the initializer."
+            ]
           },
           {
             "question": "Which values does `typeof` report as \"object\" at runtime?",
@@ -688,7 +694,14 @@
               2
             ],
             "kind": "multi",
-            "explanation": "`typeof null` is \"object\" (a historic bug), arrays and dates are objects; `undefined` is \"undefined\" and a function is \"function\"."
+            "explanation": "`typeof null` is \"object\" (a historic bug), arrays and dates are objects; `undefined` is \"undefined\" and a function is \"function\".",
+            "why_not": [
+              "",
+              "",
+              "",
+              "`typeof undefined` is \"undefined\".",
+              "Functions report \"function\", even though they are objects."
+            ]
           },
           {
             "question": "Write the type TypeScript infers for `retries`.",
@@ -3430,7 +3443,13 @@
               3
             ],
             "kind": "multi",
-            "explanation": "`==` treats null and undefined as equal and coerces `\"\"` to 0. `NaN` is never `===` to anything, itself included; `Object.is` is the one comparison that says two NaNs are the same."
+            "explanation": "`==` treats null and undefined as equal and coerces `\"\"` to 0. `NaN` is never `===` to anything, itself included; `Object.is` is the one comparison that says two NaNs are the same.",
+            "why_not": [
+              "",
+              "",
+              "NaN is not equal to anything, itself included.",
+              ""
+            ]
           },
           {
             "question": "Which values are falsy?",
@@ -3448,7 +3467,14 @@
               4
             ],
             "kind": "multi",
-            "explanation": "The falsy values are `false`, `0`, `-0`, `0n`, `\"\"`, `null`, `undefined` and `NaN`. The string `\"0\"` and an empty array are both truthy."
+            "explanation": "The falsy values are `false`, `0`, `-0`, `0n`, `\"\"`, `null`, `undefined` and `NaN`. The string `\"0\"` and an empty array are both truthy.",
+            "why_not": [
+              "",
+              "",
+              "A non-empty string is truthy — even \"0\".",
+              "Every object is truthy, empty arrays included.",
+              ""
+            ]
           },
           {
             "question": "Write the type TypeScript infers for `size`.",
@@ -6141,7 +6167,13 @@
               3
             ],
             "kind": "multi",
-            "explanation": "`toFixed` and `toPrecision` return strings, and so does `String(…)`. `Math.floor(…) / 100` is the number 3.14, not a string."
+            "explanation": "`toFixed` and `toPrecision` return strings, and so does `String(…)`. `Math.floor(…) / 100` is the number 3.14, not a string.",
+            "why_not": [
+              "",
+              "",
+              "That is the number 3.14, not a string.",
+              ""
+            ]
           },
           {
             "question": "Which of these give you each element of `xs` (not its index) as `x`?",
@@ -6157,7 +6189,13 @@
               2
             ],
             "kind": "multi",
-            "explanation": "`for…of` and `forEach` hand over values. `for…in` walks the keys (as strings), and `entries()` yields `[index, value]` pairs, so `[x]` is the index."
+            "explanation": "`for…of` and `forEach` hand over values. `for…in` walks the keys (as strings), and `entries()` yields `[index, value]` pairs, so `[x]` is the index.",
+            "why_not": [
+              "",
+              "`for…in` walks the indices, as strings.",
+              "",
+              "`entries()` yields `[index, value]`; `[x]` takes the index."
+            ]
           },
           {
             "question": "Write the type TypeScript infers for `report`.",
@@ -8560,7 +8598,14 @@
               3
             ],
             "kind": "multi",
-            "explanation": "`split` returns `string[]`, `at` returns `string | undefined` (the index may be out of range) and `match` returns a match array or `null`. `slice` and `charAt` always return a string."
+            "explanation": "`split` returns `string[]`, `at` returns `string | undefined` (the index may be out of range) and `match` returns a match array or `null`. `slice` and `charAt` always return a string.",
+            "why_not": [
+              "It returns `string[]`.",
+              "It returns `string | undefined` — the index may be out of range.",
+              "",
+              "",
+              "It returns a match array or `null`."
+            ]
           },
           {
             "question": "`const s = \"héllo\"`, written with a single precomposed é. Which expressions equal 5?",
@@ -8577,7 +8622,13 @@
               3
             ],
             "kind": "multi",
-            "explanation": "A precomposed é is one code unit, so all the plain counts are 5. NFD splits it into `e` plus a combining accent, which makes 6."
+            "explanation": "A precomposed é is one code unit, so all the plain counts are 5. NFD splits it into `e` plus a combining accent, which makes 6.",
+            "why_not": [
+              "",
+              "",
+              "NFD splits é into `e` plus a combining accent: 6.",
+              ""
+            ]
           },
           {
             "question": "Write the type TypeScript infers for `m`.",
@@ -11381,7 +11432,13 @@
               3
             ],
             "kind": "multi",
-            "explanation": "An optional parameter, a default and a rest parameter can all be left out. A parameter typed `string | undefined` still has to be passed — even if you pass `undefined`."
+            "explanation": "An optional parameter, a default and a rest parameter can all be left out. A parameter typed `string | undefined` still has to be passed — even if you pass `undefined`.",
+            "why_not": [
+              "",
+              "",
+              "The parameter is still required — you would have to pass `undefined` yourself.",
+              ""
+            ]
           },
           {
             "question": "Which statements about closures are true?",
@@ -11398,7 +11455,13 @@
               3
             ],
             "kind": "multi",
-            "explanation": "Closures capture variables, not values — a later change is visible. Each call makes new variables, and `let` in a loop header makes one per iteration, which is why loop closures work with `let` and not `var`."
+            "explanation": "Closures capture variables, not values — a later change is visible. Each call makes new variables, and `let` in a loop header makes one per iteration, which is why loop closures work with `let` and not `var`.",
+            "why_not": [
+              "",
+              "",
+              "It captures the variable itself; later changes are visible to it.",
+              ""
+            ]
           },
           {
             "question": "Write the type TypeScript infers for `next`.",
@@ -13754,7 +13817,13 @@
               3
             ],
             "kind": "multi",
-            "explanation": "A higher-order function takes or returns a function. `map`, the wrapper and `setTimeout` all take one; doubling a number takes and returns plain numbers."
+            "explanation": "A higher-order function takes or returns a function. `map`, the wrapper and `setTimeout` all take one; doubling a number takes and returns plain numbers.",
+            "why_not": [
+              "",
+              "",
+              "It takes and returns a number — no function comes in or goes out.",
+              ""
+            ]
           },
           {
             "question": "Which calls return `[2, 4]`?",
@@ -13771,7 +13840,13 @@
               3
             ],
             "kind": "multi",
-            "explanation": "`forEach` returns `undefined` whatever its callback returns — it is for side effects, never for building a result."
+            "explanation": "`forEach` returns `undefined` whatever its callback returns — it is for side effects, never for building a result.",
+            "why_not": [
+              "",
+              "",
+              "`forEach` always returns `undefined`.",
+              ""
+            ]
           },
           {
             "question": "Write the type TypeScript infers for `results`.",
@@ -15916,7 +15991,14 @@
               4
             ],
             "kind": "multi",
-            "explanation": "The ES2023 copying methods — `toSorted`, `toReversed`, `toSpliced`, `with` — return a new array. `sort` and `splice` change the array in place."
+            "explanation": "The ES2023 copying methods — `toSorted`, `toReversed`, `toSpliced`, `with` — return a new array. `sort` and `splice` change the array in place.",
+            "why_not": [
+              "",
+              "`sort` reorders the array in place.",
+              "",
+              "`splice` removes and inserts in place.",
+              ""
+            ]
           },
           {
             "question": "With `const t: [string, number] = [\"a\", 1]`, which lines are compile errors?",
@@ -15932,7 +16014,13 @@
               2
             ],
             "kind": "multi",
-            "explanation": "Reading past a tuple's length is TS2493, in an index or a destructuring. `push` is allowed — a known hole in mutable tuples, and a reason to make them `readonly`."
+            "explanation": "Reading past a tuple's length is TS2493, in an index or a destructuring. `push` is allowed — a known hole in mutable tuples, and a reason to make them `readonly`.",
+            "why_not": [
+              "",
+              "Allowed: mutable tuples keep `push` — a known hole, and a reason to make them `readonly`.",
+              "",
+              "Position 0 is a `string`, so this is fine."
+            ]
           },
           {
             "question": "Write the type TypeScript infers for `swapped`.",
@@ -18916,7 +19004,13 @@
               1
             ],
             "kind": "multi",
-            "explanation": "Only an index signature (or `Record<string, …>`, which is one) accepts any string key. `{}` has no keys at all, and a `Map` is read and written with `get`/`set`, not brackets."
+            "explanation": "Only an index signature (or `Record<string, …>`, which is one) accepts any string key. `{}` has no keys at all, and a `Map` is read and written with `get`/`set`, not brackets.",
+            "why_not": [
+              "",
+              "",
+              "`{}` declares no keys, so writing a new one is an error.",
+              "A `Map` is written with `set`, not brackets."
+            ]
           },
           {
             "question": "What does `JSON.stringify` drop or change?",
@@ -18935,7 +19029,14 @@
               3
             ],
             "kind": "multi",
-            "explanation": "JSON has no undefined, Date, Map or NaN. Dates go through `toJSON`, a Map has no enumerable own properties, and NaN is written as `null`. Nested plain objects serialise fine."
+            "explanation": "JSON has no undefined, Date, Map or NaN. Dates go through `toJSON`, a Map has no enumerable own properties, and NaN is written as `null`. Nested plain objects serialise fine.",
+            "why_not": [
+              "",
+              "",
+              "",
+              "",
+              "Nested plain objects serialise fine."
+            ]
           },
           {
             "question": "Write the type TypeScript infers for `rest`.",
@@ -21876,7 +21977,13 @@
               3
             ],
             "kind": "multi",
-            "explanation": "Maps take any key, know their size and iterate in insertion order. `JSON.stringify(map)` is `{}` — convert with `Object.fromEntries` first."
+            "explanation": "Maps take any key, know their size and iterate in insertion order. `JSON.stringify(map)` is `{}` — convert with `Object.fromEntries` first.",
+            "why_not": [
+              "",
+              "",
+              "`JSON.stringify(map)` is `{}` — convert with `Object.fromEntries` first.",
+              ""
+            ]
           },
           {
             "question": "Which are true for `const s = new Set([1, 2, 2, 3])`?",
@@ -21893,7 +22000,13 @@
               3
             ],
             "kind": "multi",
-            "explanation": "A Set keeps one copy of each value, so the duplicate 2 is dropped: three values."
+            "explanation": "A Set keeps one copy of each value, so the duplicate 2 is dropped: three values.",
+            "why_not": [
+              "",
+              "",
+              "The second 2 is not stored: the size is 3.",
+              ""
+            ]
           },
           {
             "question": "Write the type TypeScript infers for `got`.",
@@ -24110,7 +24223,13 @@
               1
             ],
             "kind": "multi",
-            "explanation": "`const` keeps the literal, and `as const` does so even on a `let`. A plain `let` widens, and an annotation says exactly what you wrote."
+            "explanation": "`const` keeps the literal, and `as const` does so even on a `let`. A plain `let` widens, and an annotation says exactly what you wrote.",
+            "why_not": [
+              "",
+              "",
+              "A `let` widens the literal to `string`.",
+              "The annotation says `string`, so that is the type."
+            ]
           },
           {
             "question": "Given `type Level = \"low\" | \"high\" | number`, which assignments compile?",
@@ -24127,7 +24246,13 @@
               3
             ],
             "kind": "multi",
-            "explanation": "Any number fits, and only the two listed strings do. `\"medium\"` is TS2322."
+            "explanation": "Any number fits, and only the two listed strings do. `\"medium\"` is TS2322.",
+            "why_not": [
+              "",
+              "",
+              "\"medium\" is not one of the listed literals (TS2322).",
+              ""
+            ]
           },
           {
             "question": "Write the type TypeScript infers for `pick`.",
@@ -26642,7 +26767,13 @@
               1
             ],
             "kind": "multi",
-            "explanation": "Truthiness removes `null` and `undefined`. It does not remove `string` or `number` — the narrowed `x` may still be a non-empty string or a non-zero number."
+            "explanation": "Truthiness removes `null` and `undefined`. It does not remove `string` or `number` — the narrowed `x` may still be a non-empty string or a non-zero number.",
+            "why_not": [
+              "",
+              "",
+              "Truthiness removes `null`.",
+              "Truthiness removes `undefined`."
+            ]
           },
           {
             "question": "Which of these treat `0` as a present value?",
@@ -26659,7 +26790,13 @@
               3
             ],
             "kind": "multi",
-            "explanation": "`??`, `?.` and `??=` only react to `null` and `undefined`. `||` reacts to every falsy value, so it replaces a real 0."
+            "explanation": "`??`, `?.` and `??=` only react to `null` and `undefined`. `||` reacts to every falsy value, so it replaces a real 0.",
+            "why_not": [
+              "",
+              "`||` treats 0 as missing and replaces it.",
+              "",
+              ""
+            ]
           },
           {
             "question": "Write the return type TypeScript infers for `f`.",
@@ -29056,7 +29193,13 @@
               1
             ],
             "kind": "multi",
-            "explanation": "`unknown` and `any` are the two top types. `{}` excludes `null` and `undefined`, and `object` excludes every primitive."
+            "explanation": "`unknown` and `any` are the two top types. `{}` excludes `null` and `undefined`, and `object` excludes every primitive.",
+            "why_not": [
+              "",
+              "",
+              "`{}` excludes `null` and `undefined`.",
+              "`object` excludes every primitive."
+            ]
           },
           {
             "question": "Which make a `switch` over a discriminated union fail to compile when a case is missing?",
@@ -29073,7 +29216,13 @@
               3
             ],
             "kind": "multi",
-            "explanation": "A missing case leaves a member for `never` to reject, or a path that returns nothing (TS2366). A default that just throws satisfies the compiler and hides the gap until runtime."
+            "explanation": "A missing case leaves a member for `never` to reject, or a path that returns nothing (TS2366). A default that just throws satisfies the compiler and hides the gap until runtime.",
+            "why_not": [
+              "",
+              "",
+              "It compiles with a case missing; the gap only shows up at runtime.",
+              ""
+            ]
           },
           {
             "question": "Write the return type TypeScript infers for `other`.",
@@ -30885,7 +31034,13 @@
               3
             ],
             "kind": "multi",
-            "explanation": "A function may ignore extra arguments, and a `string` result is fine where `unknown` is expected. It cannot go where callers pass no argument at all — it needs its `n`."
+            "explanation": "A function may ignore extra arguments, and a `string` result is fine where `unknown` is expected. It cannot go where callers pass no argument at all — it needs its `n`.",
+            "why_not": [
+              "",
+              "",
+              "Callers of that type pass nothing, but `f` needs its `n`.",
+              ""
+            ]
           },
           {
             "question": "Which pairs does `Equal<A, B>` consider the same type?",
@@ -30901,7 +31056,13 @@
               3
             ],
             "kind": "multi",
-            "explanation": "Union order does not matter and `never` vanishes from a union. `any` is not `unknown`, and `readonly` is part of the type."
+            "explanation": "Union order does not matter and `never` vanishes from a union. `any` is not `unknown`, and `readonly` is part of the type.",
+            "why_not": [
+              "",
+              "`Equal` tells `any` and `unknown` apart.",
+              "`readonly` is part of the type.",
+              ""
+            ]
           },
           {
             "question": "Write the type TypeScript infers for `handler`.",
@@ -33124,7 +33285,14 @@
               4
             ],
             "kind": "multi",
-            "explanation": "Interfaces, assertions and type-only imports simply disappear. `enum` and parameter properties generate code, so Node's type stripping rejects them."
+            "explanation": "Interfaces, assertions and type-only imports simply disappear. `enum` and parameter properties generate code, so Node's type stripping rejects them.",
+            "why_not": [
+              "",
+              "",
+              "An `enum` generates an object at runtime.",
+              "A parameter property generates an assignment in the constructor.",
+              ""
+            ]
           },
           {
             "question": "Which options does `strict: true` switch on?",
@@ -33142,7 +33310,14 @@
               3
             ],
             "kind": "multi",
-            "explanation": "`strict` is a family: null checks, implicit any, function types, bind/call/apply, class field init and more. `noUncheckedIndexedAccess` and `exactOptionalPropertyTypes` must be turned on separately."
+            "explanation": "`strict` is a family: null checks, implicit any, function types, bind/call/apply, class field init and more. `noUncheckedIndexedAccess` and `exactOptionalPropertyTypes` must be turned on separately.",
+            "why_not": [
+              "",
+              "",
+              "Not part of `strict`; it has to be turned on separately.",
+              "",
+              "Not part of `strict`; it has to be turned on separately."
+            ]
           },
           {
             "question": "Write the type TypeScript infers for `label`.",
@@ -35726,7 +35901,13 @@
               3
             ],
             "kind": "multi",
-            "explanation": "`satisfies` checks without changing the inferred type. `as` and an annotation replace it with `Theme`, where `mode` is the whole union."
+            "explanation": "`satisfies` checks without changing the inferred type. `as` and an annotation replace it with `Theme`, where `mode` is the whole union.",
+            "why_not": [
+              "",
+              "`as` replaces the type with `Theme`, so `mode` becomes the whole union.",
+              "An annotation also replaces the inferred type with `Theme`.",
+              ""
+            ]
           },
           {
             "question": "With `type Point = { x: number; y: number }`, which lines compile?",
@@ -35742,7 +35923,13 @@
               1
             ],
             "kind": "multi",
-            "explanation": "Structural typing lets extra properties through — except on a fresh object literal, where the excess property check (TS2353) catches a likely typo. A missing `y` is always an error."
+            "explanation": "Structural typing lets extra properties through — except on a fresh object literal, where the excess property check (TS2353) catches a likely typo. A missing `y` is always an error.",
+            "why_not": [
+              "",
+              "",
+              "A fresh literal with an unknown property fails the excess-property check (TS2353).",
+              "`y` is missing."
+            ]
           },
           {
             "question": "Write the type TypeScript infers for `m`.",
@@ -38142,7 +38329,14 @@
               3
             ],
             "kind": "multi",
-            "explanation": "Readonly arrays have no `push`. `Object.freeze` is typed to return a readonly array too. A `const` binding still allows mutating the array itself."
+            "explanation": "Readonly arrays have no `push`. `Object.freeze` is typed to return a readonly array too. A `const` binding still allows mutating the array itself.",
+            "why_not": [
+              "",
+              "",
+              "",
+              "",
+              "`const` fixes the binding, not the array's contents."
+            ]
           },
           {
             "question": "Which are true of `type UserId = string & { readonly __brand: \"UserId\" }`?",
@@ -38159,7 +38353,13 @@
               2
             ],
             "kind": "multi",
-            "explanation": "The brand exists only in the type system: values are plain strings, so they work anywhere a string does, while an unbranded string needs a checked constructor to become one."
+            "explanation": "The brand exists only in the type system: values are plain strings, so they work anywhere a string does, while an unbranded string needs a checked constructor to become one.",
+            "why_not": [
+              "",
+              "",
+              "",
+              "The brand exists only for the checker; the value is a plain string."
+            ]
           },
           {
             "question": "Write the type TypeScript infers for `inner`.",
@@ -40418,7 +40618,13 @@
               1
             ],
             "kind": "multi",
-            "explanation": "`Pick` over a `Partial` keeps the `?` modifiers — mapped types over `keyof` preserve them. `Required` removes them and `Readonly` adds `readonly` instead."
+            "explanation": "`Pick` over a `Partial` keeps the `?` modifiers — mapped types over `keyof` preserve them. `Required` removes them and `Readonly` adds `readonly` instead.",
+            "why_not": [
+              "",
+              "",
+              "`Required` removes `?`; it does not add it.",
+              "`Readonly` adds `readonly`, not `?`."
+            ]
           },
           {
             "question": "Which utilities work on the members of a union, rather than the keys of an object?",
@@ -40436,7 +40642,14 @@
               3
             ],
             "kind": "multi",
-            "explanation": "`Exclude`, `Extract` and `NonNullable` filter union members. `Omit` and `Pick` select object keys."
+            "explanation": "`Exclude`, `Extract` and `NonNullable` filter union members. `Omit` and `Pick` select object keys.",
+            "why_not": [
+              "",
+              "",
+              "`Omit` selects object keys, not union members.",
+              "",
+              "`Pick` selects object keys, not union members."
+            ]
           },
           {
             "question": "Write the type TypeScript infers for `d`.",
@@ -42580,7 +42793,13 @@
               3
             ],
             "kind": "multi",
-            "explanation": "The constraint only asks for a numeric `length`: strings, arrays and that object have one; a number does not (TS2345)."
+            "explanation": "The constraint only asks for a numeric `length`: strings, arrays and that object have one; a number does not (TS2345).",
+            "why_not": [
+              "",
+              "",
+              "A number has no `length` (TS2345).",
+              ""
+            ]
           },
           {
             "question": "Which are good reasons to add a type parameter to a function?",
@@ -42596,7 +42815,13 @@
               1
             ],
             "kind": "multi",
-            "explanation": "A type parameter earns its place by relating types — input to output, or parameter to parameter. One used once relates nothing; plain `unknown` says the same thing."
+            "explanation": "A type parameter earns its place by relating types — input to output, or parameter to parameter. One used once relates nothing; plain `unknown` says the same thing.",
+            "why_not": [
+              "",
+              "",
+              "Types are erased; generics change nothing at runtime.",
+              "A type parameter used once relates nothing — `unknown` would say the same."
+            ]
           },
           {
             "question": "Write the type TypeScript infers for `p`.",
@@ -44956,7 +45181,13 @@
               2
             ],
             "kind": "multi",
-            "explanation": "`keyof` works on a type, so it needs `typeof colors`; `keyof colors` is an error. Indexing by the keys gives the values' type, `string`."
+            "explanation": "`keyof` works on a type, so it needs `typeof colors`; `keyof colors` is an error. Indexing by the keys gives the values' type, `string`.",
+            "why_not": [
+              "",
+              "`keyof` needs a type: `keyof typeof colors`.",
+              "",
+              "That is the type of the values, `string`."
+            ]
           },
           {
             "question": "Which give the element type of `const xs = [1, \"a\"]`?",
@@ -44973,7 +45204,13 @@
               2
             ],
             "kind": "multi",
-            "explanation": "`xs` is an array, not a tuple, so any numeric index gives `string | number`, as does `infer`. `keyof` an array gives its method names and `number`."
+            "explanation": "`xs` is an array, not a tuple, so any numeric index gives `string | number`, as does `infer`. `keyof` an array gives its method names and `number`.",
+            "why_not": [
+              "",
+              "",
+              "",
+              "That is the array's keys — `number` and the method names."
+            ]
           },
           {
             "question": "Write the type TypeScript infers for `path`.",
@@ -46877,7 +47114,13 @@
               2
             ],
             "kind": "multi",
-            "explanation": "A mapped type over `keyof T` is homomorphic and copies modifiers, `as` clause or not. `-?` strips them, and `Record` builds fresh required keys."
+            "explanation": "A mapped type over `keyof T` is homomorphic and copies modifiers, `as` clause or not. `-?` strips them, and `Record` builds fresh required keys.",
+            "why_not": [
+              "",
+              "`-?` strips the `?` modifier.",
+              "",
+              "`Record` builds fresh, required keys."
+            ]
           },
           {
             "question": "Which remove the `readonly` modifier from `T`'s properties?",
@@ -46893,7 +47136,13 @@
               3
             ],
             "kind": "multi",
-            "explanation": "Only `-readonly` removes the modifier; a plain homomorphic mapping copies it, and `readonly` adds it."
+            "explanation": "Only `-readonly` removes the modifier; a plain homomorphic mapping copies it, and `readonly` adds it.",
+            "why_not": [
+              "",
+              "A plain homomorphic mapping copies `readonly`.",
+              "That adds `readonly`.",
+              ""
+            ]
           },
           {
             "question": "Write the type of `f`, spelled out as an object type.",
@@ -48772,7 +49021,13 @@
               2
             ],
             "kind": "multi",
-            "explanation": "Only a conditional type whose checked type is a naked type parameter distributes. Wrapping it in a tuple switches that off, and `T[]` is not conditional at all."
+            "explanation": "Only a conditional type whose checked type is a naked type parameter distributes. Wrapping it in a tuple switches that off, and `T[]` is not conditional at all.",
+            "why_not": [
+              "",
+              "Wrapping `T` in a tuple turns distribution off.",
+              "",
+              "Not a conditional type at all."
+            ]
           },
           {
             "question": "Which evaluate to `never`?",
@@ -48790,7 +49045,14 @@
               4
             ],
             "kind": "multi",
-            "explanation": "Nothing is extracted, no value is both a string and a number, and `{}` declares no keys. The others leave `\"b\"` and `string`."
+            "explanation": "Nothing is extracted, no value is both a string and a number, and `{}` declares no keys. The others leave `\"b\"` and `string`.",
+            "why_not": [
+              "It leaves `\"b\"`.",
+              "",
+              "It leaves `string`.",
+              "",
+              ""
+            ]
           },
           {
             "question": "Write the type of `x`.",
@@ -50756,7 +51018,13 @@
               1
             ],
             "kind": "multi",
-            "explanation": "Each `${number}` must match text that parses as a number. An empty major version and `x` do not."
+            "explanation": "Each `${number}` must match text that parses as a number. An empty major version and `x` do not.",
+            "why_not": [
+              "",
+              "",
+              "The first `${number}` would have to match an empty string.",
+              "`\"x\"` is not a number."
+            ]
           },
           {
             "question": "Which intrinsic string-manipulation types does TypeScript provide?",
@@ -50775,7 +51043,14 @@
               4
             ],
             "kind": "multi",
-            "explanation": "There are four: `Uppercase`, `Lowercase`, `Capitalize` and `Uncapitalize`."
+            "explanation": "There are four: `Uppercase`, `Lowercase`, `Capitalize` and `Uncapitalize`.",
+            "why_not": [
+              "",
+              "",
+              "",
+              "There is no `Titlecase`: the four are `Uppercase`, `Lowercase`, `Capitalize` and `Uncapitalize`.",
+              ""
+            ]
           },
           {
             "question": "Write the type of `h`.",
@@ -53025,7 +53300,14 @@
               4
             ],
             "kind": "multi",
-            "explanation": "`private` is a compile-time rule that `any` walks straight past; `#bal` is private at runtime too and cannot even be named outside. `readonly` fields can be read and statics live on the class."
+            "explanation": "`private` is a compile-time rule that `any` walks straight past; `#bal` is private at runtime too and cannot even be named outside. `readonly` fields can be read and statics live on the class.",
+            "why_not": [
+              "",
+              "`private` is enforced by the checker everywhere outside the class.",
+              "",
+              "`#bal` cannot even be named outside the class.",
+              ""
+            ]
           },
           {
             "question": "Which are true of `implements`?",
@@ -53041,7 +53323,13 @@
               2
             ],
             "kind": "multi",
-            "explanation": "`implements` is a check only: it adds nothing, generates nothing, and a class may list many interfaces."
+            "explanation": "`implements` is a check only: it adds nothing, generates nothing, and a class may list many interfaces.",
+            "why_not": [
+              "",
+              "It only checks — you still write the methods.",
+              "",
+              "`implements` is erased completely."
+            ]
           },
           {
             "question": "Write the type TypeScript infers for `s`.",
@@ -55102,7 +55390,14 @@
               4
             ],
             "kind": "multi",
-            "explanation": "Strings, Maps, Sets and array iterators all implement `Symbol.iterator`. A plain object does not — use `Object.entries` to walk it."
+            "explanation": "Strings, Maps, Sets and array iterators all implement `Symbol.iterator`. A plain object does not — use `Object.entries` to walk it.",
+            "why_not": [
+              "",
+              "",
+              "Plain objects are not iterable; walk them with `Object.entries`.",
+              "",
+              ""
+            ]
           },
           {
             "question": "Which are true of a generator function?",
@@ -55119,7 +55414,13 @@
               2
             ],
             "kind": "multi",
-            "explanation": "A generator is lazy: the call builds a paused iterator. Each `next()` runs to the next `yield`; `return` finishes it. It can yield anything."
+            "explanation": "A generator is lazy: the call builds a paused iterator. Each `next()` runs to the next `yield`; `return` finishes it. It can yield anything.",
+            "why_not": [
+              "",
+              "",
+              "",
+              "A generator can yield anything."
+            ]
           },
           {
             "question": "Write the type TypeScript infers for `it`.",
@@ -57380,7 +57681,13 @@
               2
             ],
             "kind": "multi",
-            "explanation": "A caught value is `unknown`: narrow it. Annotating it as `Error` is not allowed (TS1196), and `as Error` compiles but proves nothing — a thrown string has no message."
+            "explanation": "A caught value is `unknown`: narrow it. Annotating it as `Error` is not allowed (TS1196), and `as Error` compiles but proves nothing — a thrown string has no message.",
+            "why_not": [
+              "",
+              "Not allowed (TS1196): a caught value may be anything.",
+              "",
+              "It compiles but proves nothing — a thrown string has no `message`."
+            ]
           },
           {
             "question": "Which are true of `using`?",
@@ -57397,7 +57704,13 @@
               3
             ],
             "kind": "multi",
-            "explanation": "`using` calls `[Symbol.dispose]()` at scope exit, last declared first. A `close()` method alone is not enough."
+            "explanation": "`using` calls `[Symbol.dispose]()` at scope exit, last declared first. A `close()` method alone is not enough.",
+            "why_not": [
+              "",
+              "",
+              "`using` calls `[Symbol.dispose]()`, not `close()`.",
+              ""
+            ]
           },
           {
             "question": "Write the type TypeScript infers for `out`.",
@@ -59438,7 +59751,13 @@
               3
             ],
             "kind": "multi",
-            "explanation": "Promise reactions (including resuming after `await`) and `queueMicrotask` are microtasks. Timers are macrotasks and wait until the microtask queue is empty."
+            "explanation": "Promise reactions (including resuming after `await`) and `queueMicrotask` are microtasks. Timers are macrotasks and wait until the microtask queue is empty.",
+            "why_not": [
+              "",
+              "",
+              "Timers are macrotasks: they wait until the microtask queue is empty.",
+              ""
+            ]
           },
           {
             "question": "Which are true of an `async` function?",
@@ -59455,7 +59774,13 @@
               2
             ],
             "kind": "multi",
-            "explanation": "An async function is ordinary code on the same thread, wrapped so that its result — or its exception — arrives as a promise."
+            "explanation": "An async function is ordinary code on the same thread, wrapped so that its result — or its exception — arrives as a promise.",
+            "why_not": [
+              "",
+              "",
+              "",
+              "It runs on the same thread; only when its parts run changes."
+            ]
           },
           {
             "question": "Write the type TypeScript infers for `p`.",
