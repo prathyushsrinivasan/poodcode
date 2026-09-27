@@ -14,8 +14,8 @@ looking it up.
 ⬜ planned.
 
 **Built so far:** Parts 1–8, 10 and 11 complete, Part 13 under way (modules
-1–34) — **34 modules, 162 lessons, 696 judged exercises, plus 850 practice
-problems** in 170 variation families.
+1–35) — **35 modules, 167 lessons, 717 judged exercises, plus 875 practice
+problems** in 175 variation families.
 
 **Scope note.** Parts 9 and 14, and the JDBC/Maven/JUnit/logging half of Part
 13, are deliberately **not planned** — file I/O, build tools and the backend
@@ -475,11 +475,24 @@ matching in `switch`**: type patterns, **record patterns** and nesting, `when`
 guards, **domination**, `case null`, and exhaustiveness over a sealed hierarchy
 with no `default` · an expression evaluator and simplifier
 
-*(The one module that requires JDK 21 — every other module compiles on 17. Its
+*(The one module that requires JDK 21 — every other module's programs were
+checked to compile with `javac --release 17`. Its
 scope rules keep `record `, `sealed`, `permits`, `case null` and `List.copyOf`
 out of every earlier module.)*
 
-**35. Design patterns** ⬜
+**35. Design patterns** ✅
+Static factories (named, cached — `Integer.valueOf` and the -128..127 cache) ·
+the **Builder** as a static nested class, and why `build()` must copy ·
+`toBuilder()` · singletons by eager field, **holder idiom** (lazy and thread-safe
+by class initialisation) and **enum** · why a singleton is hidden global state,
+and **dependency injection** as the usual better answer — a fake `Mailer`, an
+injected seeded `Random` · **strategy** as a lambda in a map, as enum constants
+and as composable classes · **command** with undo/redo stacks, macro commands
+that undo in reverse, and all-or-nothing rollback · **observer** with
+`Consumer` listeners, unsubscribe handles, filtered and run-once subscriptions,
+isolating a throwing listener, and the self-removal
+`ConcurrentModificationException` · **decorator** (classes and a lambda that
+wraps a lambda), **adapter**, and **composite** (file trees, menus, org charts)
 
 **36. Annotations and reflection** ⬜
 
