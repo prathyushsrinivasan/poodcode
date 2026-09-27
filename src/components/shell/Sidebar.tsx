@@ -41,7 +41,10 @@ interface NavItem {
 const GROUPS: { section: string; items: NavItem[] }[] = [
   {
     section: "Today",
-    items: [{ to: "/", label: "Today", icon: "today", end: true }],
+    items: [
+      { to: "/", label: "Today", icon: "today", end: true },
+      { to: "/insights", label: "Insights", icon: "insights" },
+    ],
   },
   {
     section: "Learn",

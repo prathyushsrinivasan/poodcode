@@ -263,9 +263,11 @@ export function CommandPalette() {
   const navCmds = useMemo<Cmd[]>(
     () => [
       { id: "dash", label: "Today", group: "Go to", run: () => navigate("/") },
+      { id: "insights", label: "Insights — every track's progress, review health", run: () => navigate("/insights") },
       { id: "lib", label: "DSA Curriculum", run: () => navigate("/library") },
       { id: "browse", label: "Browse all problems", run: () => navigate("/library/browse") },
       { id: "learn", label: "Learn", run: () => navigate("/learn") },
+      { id: "japanese", label: "日本語 vocabulary", run: () => navigate("/japanese") },
       { id: "course", label: "TypeScript Course", run: () => navigate("/course") },
       { id: "java-course", label: "Java Course", run: () => navigate("/java-course") },
       { id: "backend", label: "Backend Lab", run: () => navigate("/backend") },

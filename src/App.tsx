@@ -30,6 +30,7 @@ import AsyncVisualiser from "./pages/AsyncVisualiser";
 import Contest from "./pages/Contest";
 import JapaneseBridge from "./pages/JapaneseBridge";
 import Paths from "./pages/Paths";
+import Insights from "./pages/Insights";
 import Gallery from "./pages/Gallery";
 import { ignore } from "./lib/failures";
 // Dev-only: the component gallery is not part of the shipped app, and the
@@ -101,6 +102,7 @@ function Shell() {
           <Route path="/problem/:id/edit" element={<ProblemForm />} />
           <Route path="/solve/:id" element={<SolveRoute />} />
           <Route path="/paths" element={<Paths />} />
+          <Route path="/insights" element={<Insights />} />
           <Route path="/settings" element={<Settings />} />
           {DEV_UI && <Route path="/ui" element={<Gallery />} />}
           <Route path="*" element={<NotFound />} />
