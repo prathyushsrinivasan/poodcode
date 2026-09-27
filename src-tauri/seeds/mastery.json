@@ -14191,6 +14191,161 @@
             "dataset": ""
           },
           {
+            "id": "tsm-w6-fam-ops-1",
+            "title": "A chain of operations (1/5)",
+            "prompt": "The base problem. Line 1 is a number, line 2 a list of operation names (`double`, `inc`, `square`). Apply them left to right and print the result. Keep the operations in a table of functions.",
+            "hint": "The reference solution uses `split` and `reduce`.",
+            "hints": [
+              "The reference solution uses `split` and `reduce`.",
+              "The reference solution is 3 lines and begins: `const OPS: Record<string, (n: number) => number> = { double: (n) => n * 2, inc: (n) => n + 1, square: (n) => n * n };`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Easy",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst OPS: Record<string, (n: number) => number> = { double: (n) => n * 2, inc: (n) => n + 1, square: (n) => n * n };\nconst [start = \"0\", names = \"\"] = input.split(\"\\n\");\nconsole.log(names.split(/\\s+/).reduce((acc, name) => OPS[name](acc), Number(start)));\n",
+            "tests": [
+              {
+                "input": "3\ndouble inc square",
+                "output": "49"
+              },
+              {
+                "input": "5\ninc",
+                "output": "6"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w6-fam-ops-2",
+            "title": "A chain of operations (2/5) — show the steps",
+            "prompt": "Twist 1: show the steps. Print every intermediate value: `3 -> 6 -> 7 -> 49`.",
+            "hint": "The reference solution uses `split`, `join` and a `for` loop.",
+            "hints": [
+              "The reference solution uses `split`, `join` and a `for` loop.",
+              "The reference solution is 5 lines and begins: `const OPS: Record<string, (n: number) => number> = { double: (n) => n * 2, inc: (n) => n + 1, square: (n) => n * n };`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Easy",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst OPS: Record<string, (n: number) => number> = { double: (n) => n * 2, inc: (n) => n + 1, square: (n) => n * n };\nconst [start = \"0\", names = \"\"] = input.split(\"\\n\");\nconst steps = [Number(start)];\nfor (const name of names.split(/\\s+/)) steps.push(OPS[name](steps[steps.length - 1]));\nconsole.log(steps.join(\" -> \"));\n",
+            "tests": [
+              {
+                "input": "3\ndouble inc square",
+                "output": "3 -> 6 -> 7 -> 49"
+              },
+              {
+                "input": "5\ninc",
+                "output": "5 -> 6"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w6-fam-ops-3",
+            "title": "A chain of operations (3/5) — operations with arguments",
+            "prompt": "Twist 2: operations with arguments. Operations now carry an argument: `add:5`, `mul:2`, `pow:3`. Build each function from its argument (a function returning a function).",
+            "hint": "The reference solution uses `split`, `reduce` and `map`.",
+            "hints": [
+              "The reference solution uses `split`, `reduce` and `map`.",
+              "The reference solution is 11 lines and begins: `const MAKERS: Record<string, (arg: number) => (n: number) => number> = {`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst MAKERS: Record<string, (arg: number) => (n: number) => number> = {\n  add: (a) => (n) => n + a,\n  mul: (a) => (n) => n * a,\n  pow: (a) => (n) => n ** a,\n};\nconst [start = \"0\", specs = \"\"] = input.split(\"\\n\");\nconst fns = specs.split(/\\s+/).map((spec) => {\n  const [name, arg] = spec.split(\":\");\n  return MAKERS[name](Number(arg));\n});\nconsole.log(fns.reduce((acc, f) => f(acc), Number(start)));\n",
+            "tests": [
+              {
+                "input": "3\nadd:5 mul:2 add:-1",
+                "output": "15"
+              },
+              {
+                "input": "2\npow:10",
+                "output": "1024"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w6-fam-ops-4",
+            "title": "A chain of operations (4/5) — the other order",
+            "prompt": "Twist 3: the other order. Back to named operations, but apply them right to left — the order of mathematical composition (`f ∘ g` runs `g` first).",
+            "hint": "The reference solution uses `split`.",
+            "hints": [
+              "The reference solution uses `split`.",
+              "The reference solution is 3 lines and begins: `const OPS: Record<string, (n: number) => number> = { double: (n) => n * 2, inc: (n) => n + 1, square: (n) => n * n };`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst OPS: Record<string, (n: number) => number> = { double: (n) => n * 2, inc: (n) => n + 1, square: (n) => n * n };\nconst [start = \"0\", names = \"\"] = input.split(\"\\n\");\nconsole.log(names.split(/\\s+/).reduceRight((acc, name) => OPS[name](acc), Number(start)));\n",
+            "tests": [
+              {
+                "input": "3\ndouble inc square",
+                "output": "20"
+              },
+              {
+                "input": "5\ninc",
+                "output": "6"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w6-fam-ops-5",
+            "title": "A chain of operations (5/5) — without a loop",
+            "prompt": "Twist 4: without a loop. Left to right again, written as a recursive function `run(x, ops)` — no loop and no `reduce`.",
+            "hint": "The reference solution uses `split` and `slice`.",
+            "hints": [
+              "The reference solution uses `split` and `slice`.",
+              "The reference solution is 4 lines and begins: `const OPS: Record<string, (n: number) => number> = { double: (n) => n * 2, inc: (n) => n + 1, square: (n) => n * n };`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst OPS: Record<string, (n: number) => number> = { double: (n) => n * 2, inc: (n) => n + 1, square: (n) => n * n };\nconst run = (x: number, ops: string[]): number => (ops.length === 0 ? x : run(OPS[ops[0]](x), ops.slice(1)));\nconst [start = \"0\", names = \"\"] = input.split(\"\\n\");\nconsole.log(run(Number(start), names.split(/\\s+/)));\n",
+            "tests": [
+              {
+                "input": "3\ndouble inc square",
+                "output": "49"
+              },
+              {
+                "input": "5\ninc",
+                "output": "6"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
             "id": "tsm-ts_higher_order-order1",
             "title": "Put it in order: A wrapper that counts calls",
             "prompt": "The lines of the worked example “A wrapper that counts calls” from Higher-Order Functions & Currying, shuffled. Put them back in an order that compiles and prints exactly:\n\n    6 20\n    called 2 times",
@@ -24071,6 +24226,180 @@
             "dataset": ""
           },
           {
+            "id": "tsm-w10-fam-status-1",
+            "title": "Order status (1/5)",
+            "prompt": "The base problem. The input is one status: `draft`, `paid`, `shipped` or `delivered`. Print its label from a `Record<Status, string>` — `Draft`, `Paid`, `On its way`, `Delivered` — or `unknown status`.",
+            "hint": "The reference solution is 6 lines and begins: `const STATUSES = [\"draft\", \"paid\", \"shipped\", \"delivered\"] as const;`",
+            "hints": [
+              "The reference solution is 6 lines and begins: `const STATUSES = [\"draft\", \"paid\", \"shipped\", \"delivered\"] as const;`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Easy",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst STATUSES = [\"draft\", \"paid\", \"shipped\", \"delivered\"] as const;\ntype Status = (typeof STATUSES)[number];\nconst toStatus = (s: string): Status | undefined => STATUSES.find((x) => x === s);\n\nconst LABEL: Record<Status, string> = { draft: \"Draft\", paid: \"Paid\", shipped: \"On its way\", delivered: \"Delivered\" };\nconst s = toStatus(input);\nconsole.log(s === undefined ? \"unknown status\" : LABEL[s]);\n",
+            "tests": [
+              {
+                "input": "shipped",
+                "output": "On its way"
+              },
+              {
+                "input": "draft",
+                "output": "Draft"
+              },
+              {
+                "input": "lost",
+                "output": "unknown status"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w10-fam-status-2",
+            "title": "Order status (2/5) — what comes next",
+            "prompt": "Twist 1: what comes next. Print the status that follows (or `final` after `delivered`, `unknown status` for anything else).",
+            "hint": "The reference solution uses `??`.",
+            "hints": [
+              "The reference solution uses `??`.",
+              "The reference solution is 6 lines and begins: `const STATUSES = [\"draft\", \"paid\", \"shipped\", \"delivered\"] as const;`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Easy",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst STATUSES = [\"draft\", \"paid\", \"shipped\", \"delivered\"] as const;\ntype Status = (typeof STATUSES)[number];\nconst toStatus = (s: string): Status | undefined => STATUSES.find((x) => x === s);\n\nconst s = toStatus(input);\nif (s === undefined) console.log(\"unknown status\");\nelse console.log(STATUSES[STATUSES.indexOf(s) + 1] ?? \"final\");\n",
+            "tests": [
+              {
+                "input": "draft",
+                "output": "paid"
+              },
+              {
+                "input": "delivered",
+                "output": "final"
+              },
+              {
+                "input": "x",
+                "output": "unknown status"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w10-fam-status-3",
+            "title": "Order status (3/5) — allowed moves",
+            "prompt": "Twist 2: allowed moves. The input is `from to`. Print `ok` if `to` is the next status after `from`, otherwise `not allowed`.",
+            "hint": "The reference solution uses `split`.",
+            "hints": [
+              "The reference solution uses `split`.",
+              "The reference solution is 7 lines and begins: `const STATUSES = [\"draft\", \"paid\", \"shipped\", \"delivered\"] as const;`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst STATUSES = [\"draft\", \"paid\", \"shipped\", \"delivered\"] as const;\ntype Status = (typeof STATUSES)[number];\nconst toStatus = (s: string): Status | undefined => STATUSES.find((x) => x === s);\n\nconst [from = \"\", to = \"\"] = input.split(/\\s+/);\nconst a = toStatus(from);\nconst b = toStatus(to);\nconsole.log(a !== undefined && b !== undefined && STATUSES.indexOf(b) === STATUSES.indexOf(a) + 1 ? \"ok\" : \"not allowed\");\n",
+            "tests": [
+              {
+                "input": "paid shipped",
+                "output": "ok"
+              },
+              {
+                "input": "draft shipped",
+                "output": "not allowed"
+              },
+              {
+                "input": "delivered draft",
+                "output": "not allowed"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w10-fam-status-4",
+            "title": "Order status (4/5) — a tally",
+            "prompt": "Twist 3: a tally. The input is a list of statuses; print the count of each, in the declared order: `draft:1 paid:0 shipped:2 delivered:0`. Ignore unknown words.",
+            "hint": "The reference solution uses `split`, a `Map`, `map`, `join`, a `for` loop and `??`.",
+            "hints": [
+              "The reference solution uses `split`, a `Map`, `map`, `join`, a `for` loop and `??`.",
+              "The reference solution is 9 lines and begins: `const STATUSES = [\"draft\", \"paid\", \"shipped\", \"delivered\"] as const;`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst STATUSES = [\"draft\", \"paid\", \"shipped\", \"delivered\"] as const;\ntype Status = (typeof STATUSES)[number];\nconst toStatus = (s: string): Status | undefined => STATUSES.find((x) => x === s);\n\nconst counts = new Map<Status, number>(STATUSES.map((s) => [s, 0]));\nfor (const w of input.split(/\\s+/)) {\n  const s = toStatus(w);\n  if (s !== undefined) counts.set(s, (counts.get(s) ?? 0) + 1);\n}\nconsole.log(STATUSES.map((s) => `${s}:${counts.get(s) ?? 0}`).join(\" \"));\n",
+            "tests": [
+              {
+                "input": "shipped draft shipped oops",
+                "output": "draft:1 paid:0 shipped:2 delivered:0"
+              },
+              {
+                "input": "paid",
+                "output": "draft:0 paid:1 shipped:0 delivered:0"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w10-fam-status-5",
+            "title": "Order status (5/5) — a new status",
+            "prompt": "Twist 4: a new status. Add `cancelled`: it can follow `draft` or `paid` only, and nothing follows it. The input is `from to`; print `ok` or `not allowed`. Keep the rules in a table keyed by status.",
+            "hint": "The reference solution uses `split`.",
+            "hints": [
+              "The reference solution uses `split`.",
+              "The reference solution is 14 lines and begins: `const STATUSES = [\"draft\", \"paid\", \"shipped\", \"delivered\", \"cancelled\"] as const;`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst STATUSES = [\"draft\", \"paid\", \"shipped\", \"delivered\", \"cancelled\"] as const;\ntype Status = (typeof STATUSES)[number];\nconst toStatus = (s: string): Status | undefined => STATUSES.find((x) => x === s);\nconst NEXT: Record<Status, readonly Status[]> = {\n  draft: [\"paid\", \"cancelled\"],\n  paid: [\"shipped\", \"cancelled\"],\n  shipped: [\"delivered\"],\n  delivered: [],\n  cancelled: [],\n};\nconst [from = \"\", to = \"\"] = input.split(/\\s+/);\nconst a = toStatus(from);\nconst b = toStatus(to);\nconsole.log(a !== undefined && b !== undefined && NEXT[a].includes(b) ? \"ok\" : \"not allowed\");\n",
+            "tests": [
+              {
+                "input": "paid cancelled",
+                "output": "ok"
+              },
+              {
+                "input": "shipped cancelled",
+                "output": "not allowed"
+              },
+              {
+                "input": "cancelled draft",
+                "output": "not allowed"
+              },
+              {
+                "input": "draft paid",
+                "output": "ok"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
             "id": "tsm-ts_unions-order1",
             "title": "Put it in order: A literal union of commands",
             "prompt": "The lines of the worked example “A literal union of commands” from Union & Literal Types, shuffled. Put them back in an order that compiles and prints exactly:\n\n    running -> paused -> stopped",
@@ -30781,6 +31110,161 @@
             "dataset": ""
           },
           {
+            "id": "tsm-w13-fam-checks-1",
+            "title": "Validators as functions (1/5)",
+            "prompt": "The base problem. A check is a function `(s: string) => string | null` — an error message or `null`. Apply `nonEmpty`, `noSpaces` and `maxLen10` to each input line and print `ok` or the first error.",
+            "hint": "The reference solution uses `split`, a `for` loop and `??`.",
+            "hints": [
+              "The reference solution uses `split`, a `for` loop and `??`.",
+              "The reference solution is 13 lines and begins: `type Check = (s: string) => string | null;`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Easy",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Check = (s: string) => string | null;\nconst nonEmpty: Check = (s) => (s.length === 0 ? \"empty\" : null);\nconst noSpaces: Check = (s) => (s.includes(\" \") ? \"has spaces\" : null);\nconst maxLen10: Check = (s) => (s.length > 10 ? \"too long\" : null);\nconst CHECKS: Check[] = [nonEmpty, noSpaces, maxLen10];\nfor (const line of input.split(\"\\n\")) {\n  let error: string | null = null;\n  for (const check of CHECKS) {\n    error = check(line);\n    if (error !== null) break;\n  }\n  console.log(error ?? \"ok\");\n}\n",
+            "tests": [
+              {
+                "input": "alice\nhas space\nwaytoolongname",
+                "output": "ok\nhas spaces\ntoo long"
+              },
+              {
+                "input": "bob",
+                "output": "ok"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w13-fam-checks-2",
+            "title": "Validators as functions (2/5) — every error",
+            "prompt": "Twist 1: every error. Print all the errors for a line, joined by `; ` (or `ok`).",
+            "hint": "The reference solution uses `split`, `map`, `filter`, `join` and a `for` loop.",
+            "hints": [
+              "The reference solution uses `split`, `map`, `filter`, `join` and a `for` loop.",
+              "The reference solution is 10 lines and begins: `type Check = (s: string) => string | null;`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Easy",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Check = (s: string) => string | null;\nconst CHECKS: Check[] = [\n  (s) => (s.length === 0 ? \"empty\" : null),\n  (s) => (s.includes(\" \") ? \"has spaces\" : null),\n  (s) => (s.length > 10 ? \"too long\" : null),\n];\nfor (const line of input.split(\"\\n\")) {\n  const errors = CHECKS.map((c) => c(line)).filter((e): e is string => e !== null);\n  console.log(errors.length ? errors.join(\"; \") : \"ok\");\n}\n",
+            "tests": [
+              {
+                "input": "alice\nhas a very long space\nwaytoolongname",
+                "output": "ok\nhas spaces; too long\ntoo long"
+              },
+              {
+                "input": "bob",
+                "output": "ok"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w13-fam-checks-3",
+            "title": "Validators as functions (3/5) — checks from settings",
+            "prompt": "Twist 2: checks from settings. Line 1 is `min=<n> max=<n>`; build `minLen(n)` and `maxLen(n)` checks with functions that return functions, then check each following line.",
+            "hint": "The reference solution uses `split`, a `Map`, `map`, a `for` loop and `??`.",
+            "hints": [
+              "The reference solution uses `split`, a `Map`, `map`, a `for` loop and `??`.",
+              "The reference solution is 10 lines and begins: `type Check = (s: string) => string | null;`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Check = (s: string) => string | null;\nconst minLen = (n: number): Check => (s) => (s.length < n ? `shorter than ${n}` : null);\nconst maxLen = (n: number): Check => (s) => (s.length > n ? `longer than ${n}` : null);\nconst [header = \"\", ...words] = input.split(\"\\n\");\nconst opts = new Map(header.split(\" \").map((kv) => kv.split(\"=\")).map(([k, v]) => [k, Number(v)] as const));\nconst checks: Check[] = [minLen(opts.get(\"min\") ?? 0), maxLen(opts.get(\"max\") ?? Infinity)];\nfor (const w of words) {\n  const error = checks.map((c) => c(w)).find((e) => e !== null);\n  console.log(error ?? \"ok\");\n}\n",
+            "tests": [
+              {
+                "input": "min=3 max=8\nab\nabcdef\nabcdefghij",
+                "output": "shorter than 3\nok\nlonger than 8"
+              },
+              {
+                "input": "min=1 max=1\nx",
+                "output": "ok"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w13-fam-checks-4",
+            "title": "Validators as functions (4/5) — combine them",
+            "prompt": "Twist 3: combine them. Write `firstError(...checks: Check[]): Check` — one check made of several — and use it on each line.",
+            "hint": "The reference solution uses `split`, a `for` loop and `??`.",
+            "hints": [
+              "The reference solution uses `split`, a `for` loop and `??`.",
+              "The reference solution is 16 lines and begins: `type Check = (s: string) => string | null;`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Check = (s: string) => string | null;\nconst firstError =\n  (...checks: Check[]): Check =>\n  (s) => {\n    for (const c of checks) {\n      const e = c(s);\n      if (e !== null) return e;\n    }\n    return null;\n  };\nconst username = firstError(\n  (s) => (s.length === 0 ? \"empty\" : null),\n  (s) => (/^[a-z]/.test(s) ? null : \"must start with a letter\"),\n  (s) => (s.length > 10 ? \"too long\" : null),\n);\nfor (const line of input.split(\"\\n\")) console.log(username(line) ?? \"ok\");\n",
+            "tests": [
+              {
+                "input": "alice\n9lives\nwaytoolongname",
+                "output": "ok\nmust start with a letter\ntoo long"
+              },
+              {
+                "input": "Bob",
+                "output": "must start with a letter"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w13-fam-checks-5",
+            "title": "Validators as functions (5/5) — count the calls",
+            "prompt": "Twist 4: count the calls. Wrap each check so a closure counts how often it runs. Check each line with the first-error rule, then print `calls: <name>=<n> …` — later checks run less often.",
+            "hint": "The reference solution uses `split`, a `Map`, `map`, `join`, a `for` loop and `??`.",
+            "hints": [
+              "The reference solution uses `split`, a `Map`, `map`, `join`, a `for` loop and `??`.",
+              "The reference solution is 16 lines and begins: `type Check = (s: string) => string | null;`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Check = (s: string) => string | null;\nconst calls = new Map<string, number>();\nconst counted = (name: string, check: Check): Check => (s) => {\n  calls.set(name, (calls.get(name) ?? 0) + 1);\n  return check(s);\n};\nconst CHECKS: Check[] = [\n  counted(\"nonEmpty\", (s) => (s.length === 0 ? \"empty\" : null)),\n  counted(\"noSpaces\", (s) => (s.includes(\" \") ? \"has spaces\" : null)),\n  counted(\"maxLen\", (s) => (s.length > 10 ? \"too long\" : null)),\n];\nfor (const line of input.split(\"\\n\")) {\n  const error = CHECKS.reduce<string | null>((e, c) => e ?? c(line), null);\n  console.log(error ?? \"ok\");\n}\nconsole.log(`calls: ${[...calls].map(([k, n]) => `${k}=${n}`).join(\" \")}`);\n",
+            "tests": [
+              {
+                "input": "alice\nhas space\nbob",
+                "output": "ok\nhas spaces\nok\ncalls: nonEmpty=3 noSpaces=3 maxLen=2"
+              },
+              {
+                "input": "x",
+                "output": "ok\ncalls: nonEmpty=1 noSpaces=1 maxLen=1"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
             "id": "tsm-ts_function_types-order1",
             "title": "Put it in order: A function that carries a property",
             "prompt": "The lines of the worked example “A function that carries a property” from Function Types in Depth, shuffled. Put them back in an order that compiles and prints exactly:\n\n    money: $0.26\n    percent: 26%",
@@ -32740,6 +33224,169 @@
               {
                 "input": "DEBUG=1",
                 "output": "development 3000 true"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w14-fam-flags-1",
+            "title": "Command-line flags (1/5)",
+            "prompt": "The base problem. The input is command-line arguments, e.g. `--port 8080 --verbose`. Print `port <n>` (default 3000) and `verbose <true|false>`.",
+            "hint": "The reference solution uses `split` and `??`.",
+            "hints": [
+              "The reference solution uses `split` and `??`.",
+              "The reference solution is 4 lines and begins: `const args = input.split(/\\s+/);`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst args = input.split(/\\s+/);\nconst i = args.indexOf(\"--port\");\nconsole.log(`port ${i >= 0 ? (args[i + 1] ?? \"3000\") : \"3000\"}`);\nconsole.log(`verbose ${args.includes(\"--verbose\")}`);\n",
+            "tests": [
+              {
+                "input": "--port 8080 --verbose",
+                "output": "port 8080\nverbose true"
+              },
+              {
+                "input": "--verbose",
+                "output": "port 3000\nverbose true"
+              },
+              {
+                "input": "--port 1",
+                "output": "port 1\nverbose false"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w14-fam-flags-2",
+            "title": "Command-line flags (2/5) — equals form",
+            "prompt": "Twist 1: equals form. Flags may also be written `--port=8080`. Support both forms.",
+            "hint": "The reference solution uses `split`, `slice`, a `for` loop and `??`.",
+            "hints": [
+              "The reference solution uses `split`, `slice`, a `for` loop and `??`.",
+              "The reference solution is 11 lines and begins: `const args = input.split(/\\s+/);`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst args = input.split(/\\s+/);\nlet port = \"3000\";\nlet verbose = false;\nfor (let i = 0; i < args.length; i++) {\n  const arg = args[i] ?? \"\";\n  if (arg === \"--verbose\") verbose = true;\n  else if (arg === \"--port\") port = args[++i] ?? port;\n  else if (arg.startsWith(\"--port=\")) port = arg.slice(\"--port=\".length);\n}\nconsole.log(`port ${port}`);\nconsole.log(`verbose ${verbose}`);\n",
+            "tests": [
+              {
+                "input": "--port=8080 --verbose",
+                "output": "port 8080\nverbose true"
+              },
+              {
+                "input": "--port 1",
+                "output": "port 1\nverbose false"
+              },
+              {
+                "input": "--verbose",
+                "output": "port 3000\nverbose true"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w14-fam-flags-3",
+            "title": "Command-line flags (3/5) — unknown flags",
+            "prompt": "Twist 2: unknown flags. Any other flag is an error: print `unknown flag <flag>` and nothing else.",
+            "hint": "The reference solution uses `split`, `slice`, a `for` loop and `??`.",
+            "hints": [
+              "The reference solution uses `split`, `slice`, a `for` loop and `??`.",
+              "The reference solution is 16 lines and begins: `const args = input.split(/\\s+/);`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst args = input.split(/\\s+/);\nlet port = \"3000\";\nlet verbose = false;\nlet error = \"\";\nfor (let i = 0; i < args.length && !error; i++) {\n  const arg = args[i] ?? \"\";\n  if (arg === \"--verbose\") verbose = true;\n  else if (arg === \"--port\") port = args[++i] ?? port;\n  else if (arg.startsWith(\"--port=\")) port = arg.slice(\"--port=\".length);\n  else error = `unknown flag ${arg}`;\n}\nif (error) console.log(error);\nelse {\n  console.log(`port ${port}`);\n  console.log(`verbose ${verbose}`);\n}\n",
+            "tests": [
+              {
+                "input": "--port 1 --colour red",
+                "output": "unknown flag --colour"
+              },
+              {
+                "input": "--verbose",
+                "output": "port 3000\nverbose true"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w14-fam-flags-4",
+            "title": "Command-line flags (4/5) — repeated flags",
+            "prompt": "Twist 3: repeated flags. Add `--tag <name>`, which may repeat. Print the port, then `tags <a,b>` (or `tags none`).",
+            "hint": "The reference solution uses `split`, `join`, a `for` loop and `??`.",
+            "hints": [
+              "The reference solution uses `split`, `join`, a `for` loop and `??`.",
+              "The reference solution is 13 lines and begins: `const args = input.split(/\\s+/);`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst args = input.split(/\\s+/);\nlet port = \"3000\";\nconst tags: string[] = [];\nfor (let i = 0; i < args.length; i++) {\n  const arg = args[i] ?? \"\";\n  if (arg === \"--port\") port = args[++i] ?? port;\n  else if (arg === \"--tag\") {\n    const t = args[++i];\n    if (t !== undefined) tags.push(t);\n  }\n}\nconsole.log(`port ${port}`);\nconsole.log(`tags ${tags.length ? tags.join(\",\") : \"none\"}`);\n",
+            "tests": [
+              {
+                "input": "--tag a --port 80 --tag b",
+                "output": "port 80\ntags a,b"
+              },
+              {
+                "input": "--port 1",
+                "output": "port 1\ntags none"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w14-fam-flags-5",
+            "title": "Command-line flags (5/5) — a typed result",
+            "prompt": "Twist 4: a typed result. Parse into a typed object `{ port: number; verbose: boolean; tags: string[] }` and print it with `JSON.stringify`.",
+            "hint": "The reference solution uses `split`, a `for` loop and `??`.",
+            "hints": [
+              "The reference solution uses `split`, a `for` loop and `??`.",
+              "The reference solution is 15 lines and begins: `type Options = { port: number; verbose: boolean; tags: string[] };`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Options = { port: number; verbose: boolean; tags: string[] };\nfunction parseArgs(args: readonly string[]): Options {\n  const opts: Options = { port: 3000, verbose: false, tags: [] };\n  for (let i = 0; i < args.length; i++) {\n    const arg = args[i];\n    if (arg === \"--verbose\") opts.verbose = true;\n    else if (arg === \"--port\") opts.port = Number(args[++i] ?? opts.port);\n    else if (arg === \"--tag\") {\n      const t = args[++i];\n      if (t !== undefined) opts.tags.push(t);\n    }\n  }\n  return opts;\n}\nconsole.log(JSON.stringify(parseArgs(input.split(/\\s+/))));\n",
+            "tests": [
+              {
+                "input": "--tag a --port 80 --verbose",
+                "output": "{\"port\":80,\"verbose\":true,\"tags\":[\"a\"]}"
+              },
+              {
+                "input": "--tag x",
+                "output": "{\"port\":3000,\"verbose\":false,\"tags\":[\"x\"]}"
               }
             ],
             "source_slug": "",
@@ -35092,6 +35739,169 @@
             "dataset": ""
           },
           {
+            "id": "tsm-w15-fam-colours-1",
+            "title": "A colour palette (1/5)",
+            "prompt": "The base problem. The palette is checked with `satisfies Record<string, Rgb>`. For each colour name on the input line, print its hex code, or `unknown <name>`.",
+            "hint": "The reference solution uses `split`, `map`, `join`, a `for` loop and `padStart`.",
+            "hints": [
+              "The reference solution uses `split`, `map`, `join`, a `for` loop and `padStart`.",
+              "The reference solution is 13 lines and begins: `type Rgb = { r: number; g: number; b: number };`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Rgb = { r: number; g: number; b: number };\nconst PALETTE = {\n  red: { r: 255, g: 0, b: 0 },\n  teal: { r: 0, g: 128, b: 128 },\n  navy: { r: 0, g: 0, b: 128 },\n  gold: { r: 255, g: 215, b: 0 },\n} satisfies Record<string, Rgb>;\nconst hex = (c: Rgb): string => \"#\" + [c.r, c.g, c.b].map((n) => n.toString(16).padStart(2, \"0\")).join(\"\");\n\nconst names: Record<string, Rgb> = PALETTE;\nfor (const name of input.split(/\\s+/)) {\n  const c = names[name];\n  console.log(c === undefined ? `unknown ${name}` : hex(c));\n}\n",
+            "tests": [
+              {
+                "input": "red teal pink",
+                "output": "#ff0000\n#008080\nunknown pink"
+              },
+              {
+                "input": "gold",
+                "output": "#ffd700"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w15-fam-colours-2",
+            "title": "A colour palette (2/5) — from numbers",
+            "prompt": "Twist 1: from numbers. Each input line is `r,g,b`; print the hex code.",
+            "hint": "The reference solution uses `split`, `map`, `join`, a `for` loop and `padStart`.",
+            "hints": [
+              "The reference solution uses `split`, `map`, `join`, a `for` loop and `padStart`.",
+              "The reference solution is 12 lines and begins: `type Rgb = { r: number; g: number; b: number };`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Rgb = { r: number; g: number; b: number };\nconst PALETTE = {\n  red: { r: 255, g: 0, b: 0 },\n  teal: { r: 0, g: 128, b: 128 },\n  navy: { r: 0, g: 0, b: 128 },\n  gold: { r: 255, g: 215, b: 0 },\n} satisfies Record<string, Rgb>;\nconst hex = (c: Rgb): string => \"#\" + [c.r, c.g, c.b].map((n) => n.toString(16).padStart(2, \"0\")).join(\"\");\n\nfor (const line of input.split(\"\\n\")) {\n  const [r = 0, g = 0, b = 0] = line.split(\",\").map(Number);\n  console.log(hex({ r, g, b }));\n}\n",
+            "tests": [
+              {
+                "input": "255,0,0\n0,128,128",
+                "output": "#ff0000\n#008080"
+              },
+              {
+                "input": "1,2,3",
+                "output": "#010203"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w15-fam-colours-3",
+            "title": "A colour palette (3/5) — the other way",
+            "prompt": "Twist 2: the other way. Each input line is a hex code `#rrggbb`; print `r,g,b`.",
+            "hint": "The reference solution uses `split`, `slice` and a `for` loop.",
+            "hints": [
+              "The reference solution uses `split`, `slice` and a `for` loop.",
+              "The reference solution is 4 lines and begins: `for (const line of input.split(\"\\n\")) {`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nfor (const line of input.split(\"\\n\")) {\n  const n = Number.parseInt(line.slice(1), 16);\n  console.log(`${(n >> 16) & 255},${(n >> 8) & 255},${n & 255}`);\n}\n",
+            "tests": [
+              {
+                "input": "#ff0000\n#008080",
+                "output": "255,0,0\n0,128,128"
+              },
+              {
+                "input": "#010203",
+                "output": "1,2,3"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w15-fam-colours-4",
+            "title": "A colour palette (4/5) — mixing",
+            "prompt": "Twist 3: mixing. The input is two palette names; print the hex of their average (each channel rounded).",
+            "hint": "The reference solution uses `split`, `map`, `join`, `Math` and `padStart`.",
+            "hints": [
+              "The reference solution uses `split`, `map`, `join`, `Math` and `padStart`.",
+              "The reference solution is 14 lines and begins: `type Rgb = { r: number; g: number; b: number };`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Rgb = { r: number; g: number; b: number };\nconst PALETTE = {\n  red: { r: 255, g: 0, b: 0 },\n  teal: { r: 0, g: 128, b: 128 },\n  navy: { r: 0, g: 0, b: 128 },\n  gold: { r: 255, g: 215, b: 0 },\n} satisfies Record<string, Rgb>;\nconst hex = (c: Rgb): string => \"#\" + [c.r, c.g, c.b].map((n) => n.toString(16).padStart(2, \"0\")).join(\"\");\n\nconst names: Record<string, Rgb> = PALETTE;\nconst [a = \"\", b = \"\"] = input.split(/\\s+/);\nconst x = names[a];\nconst y = names[b];\nif (x === undefined || y === undefined) console.log(\"unknown colour\");\nelse console.log(hex({ r: Math.round((x.r + y.r) / 2), g: Math.round((x.g + y.g) / 2), b: Math.round((x.b + y.b) / 2) }));\n",
+            "tests": [
+              {
+                "input": "red gold",
+                "output": "#ff6c00"
+              },
+              {
+                "input": "teal navy",
+                "output": "#004080"
+              },
+              {
+                "input": "red pink",
+                "output": "unknown colour"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w15-fam-colours-5",
+            "title": "A colour palette (5/5) — nearest",
+            "prompt": "Twist 4: nearest. The input is `r,g,b`; print the palette name nearest to it (smallest squared distance).",
+            "hint": "The reference solution uses `split`, `reduce`, `map`, `join`, `padStart` and `Object.entries`.",
+            "hints": [
+              "The reference solution uses `split`, `reduce`, `map`, `join`, `padStart` and `Object.entries`.",
+              "The reference solution is 12 lines and begins: `type Rgb = { r: number; g: number; b: number };`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Rgb = { r: number; g: number; b: number };\nconst PALETTE = {\n  red: { r: 255, g: 0, b: 0 },\n  teal: { r: 0, g: 128, b: 128 },\n  navy: { r: 0, g: 0, b: 128 },\n  gold: { r: 255, g: 215, b: 0 },\n} satisfies Record<string, Rgb>;\nconst hex = (c: Rgb): string => \"#\" + [c.r, c.g, c.b].map((n) => n.toString(16).padStart(2, \"0\")).join(\"\");\n\nconst [r = 0, g = 0, b = 0] = input.split(\",\").map(Number);\nconst dist = (c: Rgb) => (c.r - r) ** 2 + (c.g - g) ** 2 + (c.b - b) ** 2;\nconst nearest = Object.entries(PALETTE).reduce((best, cur) => (dist(cur[1]) < dist(best[1]) ? cur : best));\nconsole.log(nearest[0]);\n",
+            "tests": [
+              {
+                "input": "250,10,10",
+                "output": "red"
+              },
+              {
+                "input": "0,100,150",
+                "output": "teal"
+              },
+              {
+                "input": "200,200,0",
+                "output": "gold"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
             "id": "tsm-ts_assertions-order1",
             "title": "Put it in order: An assertion after a check the compiler can't follow",
             "prompt": "The lines of the worked example “An assertion after a check the compiler can't follow” from Type Assertions (as), shuffled. Put them back in an order that compiles and prints exactly:\n\n    pen: 2 left | no ink",
@@ -37213,6 +38023,161 @@
               {
                 "input": "x",
                 "output": "xx1"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w16-fam-stock-1",
+            "title": "Immutable stock (1/5)",
+            "prompt": "The base problem. Line 1 is the stock, `apple:3,pear:2`; each further line is `sell <item> <n>` or `restock <item> <n>`. Apply them without mutating — each step returns a new `ReadonlyMap` — and print the final stock as `item:n` pairs sorted by name.",
+            "hint": "The reference solution uses `split`, a `Map`, `reduce`, `map`, `toSorted`, `join`, `localeCompare` and `??`.",
+            "hints": [
+              "The reference solution uses `split`, a `Map`, `reduce`, `map`, `toSorted`, `join`, `localeCompare` and `??`.",
+              "The reference solution is 16 lines and begins: `type Stock = ReadonlyMap<string, number>;`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Stock = ReadonlyMap<string, number>;\nconst parseStock = (line: string): Stock =>\n  new Map(line.split(\",\").map((pair) => {\n    const [item = \"\", n = \"0\"] = pair.split(\":\");\n    return [item, Number(n)];\n  }));\nconst apply = (stock: Stock, op: string): Stock => {\n  const [verb, item = \"\", n = \"0\"] = op.split(\" \");\n  const have = stock.get(item) ?? 0;\n  const next = new Map(stock);\n  next.set(item, verb === \"sell\" ? have - Number(n) : have + Number(n));\n  return next;\n};\nconst show = (s: Stock) => [...s].toSorted(([a], [b]) => a.localeCompare(b)).map(([k, v]) => `${k}:${v}`).join(\",\");\nconst [first = \"\", ...ops] = input.split(\"\\n\");\nconsole.log(show(ops.reduce(apply, parseStock(first))));\n",
+            "tests": [
+              {
+                "input": "apple:3,pear:2\nsell apple 1\nrestock pear 5",
+                "output": "apple:2,pear:7"
+              },
+              {
+                "input": "fig:1",
+                "output": "fig:1"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w16-fam-stock-2",
+            "title": "Immutable stock (2/5) — no overselling",
+            "prompt": "Twist 1: no overselling. Selling more than is in stock prints `cannot sell <item>` and leaves the stock unchanged.",
+            "hint": "The reference solution uses `split`, a `Map`, `reduce`, `map`, `toSorted`, `join`, `localeCompare` and `??`.",
+            "hints": [
+              "The reference solution uses `split`, a `Map`, `reduce`, `map`, `toSorted`, `join`, `localeCompare` and `??`.",
+              "The reference solution is 18 lines and begins: `type Stock = ReadonlyMap<string, number>;`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Stock = ReadonlyMap<string, number>;\nconst parseStock = (line: string): Stock =>\n  new Map(line.split(\",\").map((pair) => {\n    const [item = \"\", n = \"0\"] = pair.split(\":\");\n    return [item, Number(n)];\n  }));\nconst apply = (stock: Stock, op: string): Stock => {\n  const [verb, item = \"\", n = \"0\"] = op.split(\" \");\n  const have = stock.get(item) ?? 0;\n  if (verb === \"sell\" && Number(n) > have) {\n    console.log(`cannot sell ${item}`);\n    return stock;\n  }\n  return new Map(stock).set(item, verb === \"sell\" ? have - Number(n) : have + Number(n));\n};\nconst show = (s: Stock) => [...s].toSorted(([a], [b]) => a.localeCompare(b)).map(([k, v]) => `${k}:${v}`).join(\",\");\nconst [first = \"\", ...ops] = input.split(\"\\n\");\nconsole.log(show(ops.reduce(apply, parseStock(first))));\n",
+            "tests": [
+              {
+                "input": "apple:3,pear:2\nsell apple 5\nsell pear 2",
+                "output": "cannot sell apple\napple:3,pear:0"
+              },
+              {
+                "input": "fig:1\nsell fig 1",
+                "output": "fig:0"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w16-fam-stock-3",
+            "title": "Immutable stock (3/5) — keep every version",
+            "prompt": "Twist 2: keep every version. Keep the whole history as a `readonly` array of stocks. Print how many versions there are, then the first and last.",
+            "hint": "The reference solution uses `split`, a `Map`, `map`, `toSorted`, `join`, `localeCompare` and `??`.",
+            "hints": [
+              "The reference solution uses `split`, a `Map`, `map`, `toSorted`, `join`, `localeCompare` and `??`.",
+              "The reference solution is 21 lines and begins: `type Stock = ReadonlyMap<string, number>;`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Stock = ReadonlyMap<string, number>;\nconst parseStock = (line: string): Stock =>\n  new Map(line.split(\",\").map((pair) => {\n    const [item = \"\", n = \"0\"] = pair.split(\":\");\n    return [item, Number(n)];\n  }));\nconst apply = (stock: Stock, op: string): Stock => {\n  const [verb, item = \"\", n = \"0\"] = op.split(\" \");\n  const have = stock.get(item) ?? 0;\n  return new Map(stock).set(item, verb === \"sell\" ? have - Number(n) : have + Number(n));\n};\nconst show = (s: Stock | undefined) =>\n  s === undefined ? \"\" : [...s].toSorted(([a], [b]) => a.localeCompare(b)).map(([k, v]) => `${k}:${v}`).join(\",\");\nconst [first = \"\", ...ops] = input.split(\"\\n\");\nconst history: readonly Stock[] = ops.reduce<readonly Stock[]>(\n  (h, op) => [...h, apply(h[h.length - 1] ?? new Map(), op)],\n  [parseStock(first)],\n);\nconsole.log(history.length);\nconsole.log(show(history[0]));\nconsole.log(show(history.at(-1)));\n",
+            "tests": [
+              {
+                "input": "apple:3,pear:2\nsell apple 1\nrestock pear 5",
+                "output": "3\napple:3,pear:2\napple:2,pear:7"
+              },
+              {
+                "input": "fig:1",
+                "output": "1\nfig:1\nfig:1"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w16-fam-stock-4",
+            "title": "Immutable stock (4/5) — undo",
+            "prompt": "Twist 3: undo. An `undo` line returns to the previous version (no effect at the start). Print the final stock.",
+            "hint": "The reference solution uses `split`, a `Map`, `map`, `toSorted`, `join`, `slice`, a `for` loop, `localeCompare` and `??`.",
+            "hints": [
+              "The reference solution uses `split`, a `Map`, `map`, `toSorted`, `join`, `slice`, a `for` loop, `localeCompare` and `??`.",
+              "The reference solution is 20 lines and begins: `type Stock = ReadonlyMap<string, number>;`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Stock = ReadonlyMap<string, number>;\nconst parseStock = (line: string): Stock =>\n  new Map(line.split(\",\").map((pair) => {\n    const [item = \"\", n = \"0\"] = pair.split(\":\");\n    return [item, Number(n)];\n  }));\nconst apply = (stock: Stock, op: string): Stock => {\n  const [verb, item = \"\", n = \"0\"] = op.split(\" \");\n  const have = stock.get(item) ?? 0;\n  return new Map(stock).set(item, verb === \"sell\" ? have - Number(n) : have + Number(n));\n};\nconst show = (s: Stock | undefined) =>\n  s === undefined ? \"\" : [...s].toSorted(([a], [b]) => a.localeCompare(b)).map(([k, v]) => `${k}:${v}`).join(\",\");\nconst [first = \"\", ...ops] = input.split(\"\\n\");\nlet history: readonly Stock[] = [parseStock(first)];\nfor (const op of ops) {\n  if (op === \"undo\") history = history.length > 1 ? history.slice(0, -1) : history;\n  else history = [...history, apply(history[history.length - 1] ?? new Map(), op)];\n}\nconsole.log(show(history.at(-1)));\n",
+            "tests": [
+              {
+                "input": "apple:3,pear:2\nsell apple 1\nundo\nrestock pear 5\nundo\nundo",
+                "output": "apple:3,pear:2"
+              },
+              {
+                "input": "fig:1\nundo",
+                "output": "fig:1"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w16-fam-stock-5",
+            "title": "Immutable stock (5/5) — parse, don't trust",
+            "prompt": "Twist 4: parse, don't trust. Lines may be malformed. Parse each into `{ verb: \"sell\" | \"restock\"; item: string; n: number } | { error: string }` first; print `bad line: <text>` for errors and apply the rest.",
+            "hint": "The reference solution uses `split`, a `Map`, `map`, `toSorted`, `join`, a `for` loop, `localeCompare` and `??`.",
+            "hints": [
+              "The reference solution uses `split`, a `Map`, `map`, `toSorted`, `join`, a `for` loop, `localeCompare` and `??`.",
+              "The reference solution is 26 lines and begins: `type Stock = ReadonlyMap<string, number>;`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Stock = ReadonlyMap<string, number>;\ntype Op = { verb: \"sell\" | \"restock\"; item: string; n: number } | { error: string };\nconst parseOp = (line: string): Op => {\n  const [verb, item, n] = line.split(\" \");\n  const qty = Number(n);\n  if ((verb !== \"sell\" && verb !== \"restock\") || !item || !Number.isInteger(qty) || qty <= 0) return { error: line };\n  return { verb, item, n: qty };\n};\nconst parseStock = (line: string): Stock =>\n  new Map(line.split(\",\").map((pair) => {\n    const [item = \"\", n = \"0\"] = pair.split(\":\");\n    return [item, Number(n)];\n  }));\nconst show = (s: Stock) => [...s].toSorted(([a], [b]) => a.localeCompare(b)).map(([k, v]) => `${k}:${v}`).join(\",\");\nconst [first = \"\", ...lines] = input.split(\"\\n\");\nlet stock = parseStock(first);\nfor (const line of lines) {\n  const op = parseOp(line);\n  if (\"error\" in op) {\n    console.log(`bad line: ${op.error}`);\n    continue;\n  }\n  const have = stock.get(op.item) ?? 0;\n  stock = new Map(stock).set(op.item, op.verb === \"sell\" ? have - op.n : have + op.n);\n}\nconsole.log(show(stock));\n",
+            "tests": [
+              {
+                "input": "apple:3\nsell apple 1\nsteal apple 2\nsell apple -1\nrestock kiwi 4",
+                "output": "bad line: steal apple 2\nbad line: sell apple -1\napple:2,kiwi:4"
+              },
+              {
+                "input": "fig:1",
+                "output": "fig:1"
               }
             ],
             "source_slug": "",
@@ -41392,6 +42357,161 @@
             "dataset": ""
           },
           {
+            "id": "tsm-w18-fam-generic-1",
+            "title": "Small generic helpers (1/5)",
+            "prompt": "The base problem. Write `firstWhere<T>(xs: readonly T[], test: (x: T) => boolean): T | undefined`. Use it to print the first even number on the input line, or `none`.",
+            "hint": "The reference solution uses `split`, `map`, a `for` loop and `??`.",
+            "hints": [
+              "The reference solution uses `split`, `map`, a `for` loop and `??`.",
+              "The reference solution is 5 lines and begins: `function firstWhere<T>(xs: readonly T[], test: (x: T) => boolean): T | undefined {`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nfunction firstWhere<T>(xs: readonly T[], test: (x: T) => boolean): T | undefined {\n  for (const x of xs) if (test(x)) return x;\n  return undefined;\n}\nconsole.log(firstWhere(input.split(/\\s+/).map(Number), (n) => n % 2 === 0) ?? \"none\");\n",
+            "tests": [
+              {
+                "input": "3 7 8 10",
+                "output": "8"
+              },
+              {
+                "input": "1 3",
+                "output": "none"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w18-fam-generic-2",
+            "title": "Small generic helpers (2/5) — grouping",
+            "prompt": "Twist 1: grouping. Write `groupBy<T, K extends string | number>(xs, key)` returning a `Map<K, T[]>`; group the input words by length and print `len: words` lines, shortest first.",
+            "hint": "The reference solution uses `split`, a `Map`, `toSorted`, `join`, a `for` loop and `??`.",
+            "hints": [
+              "The reference solution uses `split`, a `Map`, `toSorted`, `join`, a `for` loop and `??`.",
+              "The reference solution is 10 lines and begins: `function groupBy<T, K extends string | number>(xs: readonly T[], key: (x: T) => K): Map<K, T[]> {`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nfunction groupBy<T, K extends string | number>(xs: readonly T[], key: (x: T) => K): Map<K, T[]> {\n  const out = new Map<K, T[]>();\n  for (const x of xs) {\n    const k = key(x);\n    out.set(k, [...(out.get(k) ?? []), x]);\n  }\n  return out;\n}\nconst groups = groupBy(input.split(/\\s+/), (w) => w.length);\nfor (const [len, words] of [...groups].toSorted((a, b) => a[0] - b[0])) console.log(`${len}: ${words.join(\",\")}`);\n",
+            "tests": [
+              {
+                "input": "cat horse dog ox mouse",
+                "output": "2: ox\n3: cat,dog\n5: horse,mouse"
+              },
+              {
+                "input": "a",
+                "output": "1: a"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w18-fam-generic-3",
+            "title": "Small generic helpers (3/5) — pairs",
+            "prompt": "Twist 2: pairs. Write `zip<A, B>(as: readonly A[], bs: readonly B[]): [A, B][]` (as long as the shorter list). Line 1 is names, line 2 scores; print `name score` lines.",
+            "hint": "The reference solution uses `split`, `map`, a `for` loop and `Math`.",
+            "hints": [
+              "The reference solution uses `split`, `map`, a `for` loop and `Math`.",
+              "The reference solution is 11 lines and begins: `function zip<A, B>(as: readonly A[], bs: readonly B[]): [A, B][] {`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nfunction zip<A, B>(as: readonly A[], bs: readonly B[]): [A, B][] {\n  const out: [A, B][] = [];\n  for (let i = 0; i < Math.min(as.length, bs.length); i++) {\n    const a = as[i];\n    const b = bs[i];\n    if (a !== undefined && b !== undefined) out.push([a, b]);\n  }\n  return out;\n}\nconst [names = \"\", scores = \"\"] = input.split(\"\\n\");\nfor (const [n, s] of zip(names.split(/\\s+/), scores.split(/\\s+/).map(Number))) console.log(`${n} ${s}`);\n",
+            "tests": [
+              {
+                "input": "ana bo cy\n3 5 8",
+                "output": "ana 3\nbo 5\ncy 8"
+              },
+              {
+                "input": "x y\n1",
+                "output": "x 1"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w18-fam-generic-4",
+            "title": "Small generic helpers (4/5) — the best one",
+            "prompt": "Twist 3: the best one. Write `maxBy<T>(xs: readonly T[], score: (x: T) => number): T | undefined` and print the longest input word (the first, on a tie).",
+            "hint": "The reference solution uses `split`, a `for` loop and `??`.",
+            "hints": [
+              "The reference solution uses `split`, a `for` loop and `??`.",
+              "The reference solution is 12 lines and begins: `function maxBy<T>(xs: readonly T[], score: (x: T) => number): T | undefined {`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nfunction maxBy<T>(xs: readonly T[], score: (x: T) => number): T | undefined {\n  let best: T | undefined;\n  let bestScore = -Infinity;\n  for (const x of xs) {\n    if (score(x) > bestScore) {\n      best = x;\n      bestScore = score(x);\n    }\n  }\n  return best;\n}\nconsole.log(maxBy(input.split(/\\s+/), (w) => w.length) ?? \"\");\n",
+            "tests": [
+              {
+                "input": "cat horse dog mouse",
+                "output": "horse"
+              },
+              {
+                "input": "a",
+                "output": "a"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w18-fam-generic-5",
+            "title": "Small generic helpers (5/5) — chunks",
+            "prompt": "Twist 4: chunks. Write `chunk<T>(xs: readonly T[], size: number): T[][]` and print the input words in chunks of 3, one chunk per line, comma-separated.",
+            "hint": "The reference solution uses `split`, `join`, `slice` and a `for` loop.",
+            "hints": [
+              "The reference solution uses `split`, `join`, `slice` and a `for` loop.",
+              "The reference solution is 6 lines and begins: `function chunk<T>(xs: readonly T[], size: number): T[][] {`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nfunction chunk<T>(xs: readonly T[], size: number): T[][] {\n  const out: T[][] = [];\n  for (let i = 0; i < xs.length; i += size) out.push(xs.slice(i, i + size));\n  return out;\n}\nfor (const c of chunk(input.split(/\\s+/), 3)) console.log(c.join(\",\"));\n",
+            "tests": [
+              {
+                "input": "a b c d e f g",
+                "output": "a,b,c\nd,e,f\ng"
+              },
+              {
+                "input": "x",
+                "output": "x"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
             "id": "tsm-ts_generics-order1",
             "title": "Put it in order: A generic result wrapper",
             "prompt": "The lines of the worked example “A generic result wrapper” from Generics (Basics), shuffled. Put them back in an order that compiles and prints exactly:\n\n    42 | error caught",
@@ -43507,6 +44627,111 @@
                 "output": "port=8080\nhost=localhost\ntls=false\nno nope"
               }
             ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w19-fam-lookups-1",
+            "title": "Looking types up (1/5)",
+            "prompt": "The base problem. Write `ValueOf<T>`: the union of `T`'s property types.",
+            "hint": "The answer begins `T[keyof …`",
+            "hints": [
+              "The answer begins `T[keyof …`"
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\nconst config = { server: { host: \"localhost\", port: 8080 }, flags: [\"a\", \"b\"] as const, debug: false };\ntype Config = typeof config;\ntype _1 = Expect<Equal<ValueOf<{ a: 1; b: \"x\" }>, 1 | \"x\">>;\ntype _2 = Expect<Equal<ValueOf<{ n: number }>, number>>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type ValueOf<T> = ____;\n",
+            "solution": "type ValueOf<T> = T[keyof T];\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w19-fam-lookups-2",
+            "title": "Looking types up (2/5) — one property",
+            "prompt": "Twist 1: one property. Write `PropType<T, K extends keyof T>`: the type of one property.",
+            "hint": "The answer is 4 characters long and begins `T[`.",
+            "hints": [
+              "The answer is 4 characters long and begins `T[`."
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\nconst config = { server: { host: \"localhost\", port: 8080 }, flags: [\"a\", \"b\"] as const, debug: false };\ntype Config = typeof config;\ntype _1 = Expect<Equal<PropType<Config, \"debug\">, boolean>>;\ntype _2 = Expect<Equal<PropType<Config, \"server\">, { host: string; port: number }>>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type PropType<T, K extends keyof T> = ____;\n",
+            "solution": "type PropType<T, K extends keyof T> = T[K];\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w19-fam-lookups-3",
+            "title": "Looking types up (3/5) — an element",
+            "prompt": "Twist 2: an element. Write `ElementType<A extends readonly unknown[]>`: the type of the array's elements.",
+            "hint": "The answer is 9 characters long and begins `A[nu`.",
+            "hints": [
+              "The answer is 9 characters long and begins `A[nu`."
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\nconst config = { server: { host: \"localhost\", port: 8080 }, flags: [\"a\", \"b\"] as const, debug: false };\ntype Config = typeof config;\ntype _1 = Expect<Equal<ElementType<Config[\"flags\"]>, \"a\" | \"b\">>;\ntype _2 = Expect<Equal<ElementType<string[]>, string>>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type ElementType<A extends readonly unknown[]> = ____;\n",
+            "solution": "type ElementType<A extends readonly unknown[]> = A[number];\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w19-fam-lookups-4",
+            "title": "Looking types up (4/5) — two levels down",
+            "prompt": "Twist 3: two levels down. Write `PathValue<T, A extends keyof T, B extends keyof T[A]>`: the type at `T[A][B]`.",
+            "hint": "The answer is 7 characters long and begins `T[A`.",
+            "hints": [
+              "The answer is 7 characters long and begins `T[A`."
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\nconst config = { server: { host: \"localhost\", port: 8080 }, flags: [\"a\", \"b\"] as const, debug: false };\ntype Config = typeof config;\ntype _1 = Expect<Equal<PathValue<Config, \"server\", \"port\">, number>>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type PathValue<T, A extends keyof T, B extends keyof T[A]> = ____;\n",
+            "solution": "type PathValue<T, A extends keyof T, B extends keyof T[A]> = T[A][B];\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w19-fam-lookups-5",
+            "title": "Looking types up (5/5) — a function's argument",
+            "prompt": "Twist 4: a function's argument. Write `FirstArg<F extends (arg: never) => unknown>`: the type of the function's first parameter.",
+            "hint": "The answer is 16 characters long and begins `Paramete`.",
+            "hints": [
+              "The answer is 16 characters long and begins `Paramete`."
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\nconst config = { server: { host: \"localhost\", port: 8080 }, flags: [\"a\", \"b\"] as const, debug: false };\ntype Config = typeof config;\ntype _1 = Expect<Equal<FirstArg<(s: string) => void>, string>>;\ntype _2 = Expect<Equal<FirstArg<(n: { id: number }) => boolean>, { id: number }>>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type FirstArg<F extends (arg: never) => unknown> = ____;\n",
+            "solution": "type FirstArg<F extends (arg: never) => unknown> = Parameters<F>[0];\n",
+            "tests": [],
             "source_slug": "",
             "dataset": ""
           },
@@ -47182,6 +48407,111 @@
             "dataset": ""
           },
           {
+            "id": "tsm-w21-fam-conditionals-1",
+            "title": "Conditional types (1/5)",
+            "prompt": "The base problem. Write `IsString<T>`: `true` when `T` is a string type, otherwise `false`.",
+            "hint": "The answer begins `T extends string ? …`",
+            "hints": [
+              "The answer begins `T extends string ? …`"
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<IsString<\"a\">, true>>;\ntype _2 = Expect<Equal<IsString<3>, false>>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type IsString<T> = ____;\n",
+            "solution": "type IsString<T> = T extends string ? true : false;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w21-fam-conditionals-2",
+            "title": "Conditional types (2/5) — pull out a part",
+            "prompt": "Twist 1: pull out a part. Write `ElementOr<T>`: an array's element type, or `T` itself when it is not an array.",
+            "hint": "The answer begins `T extends readonly (infer E)[] …`",
+            "hints": [
+              "The answer begins `T extends readonly (infer E)[] …`"
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<ElementOr<number[]>, number>>;\ntype _2 = Expect<Equal<ElementOr<string>, string>>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type ElementOr<T> = ____;\n",
+            "solution": "type ElementOr<T> = T extends readonly (infer E)[] ? E : T;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w21-fam-conditionals-3",
+            "title": "Conditional types (3/5) — unwrap once",
+            "prompt": "Twist 2: unwrap once. Write `UnwrapPromise<T>`: the value a promise resolves to, one level only; anything else unchanged.",
+            "hint": "The answer begins `T extends Promise<infer V> …`",
+            "hints": [
+              "The answer begins `T extends Promise<infer V> …`"
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<UnwrapPromise<Promise<number>>, number>>;\ntype _2 = Expect<Equal<UnwrapPromise<Promise<Promise<1>>>, Promise<1>>>;\ntype _3 = Expect<Equal<UnwrapPromise<\"x\">, \"x\">>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type UnwrapPromise<T> = ____;\n",
+            "solution": "type UnwrapPromise<T> = T extends Promise<infer V> ? V : T;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w21-fam-conditionals-4",
+            "title": "Conditional types (4/5) — unwrap all the way",
+            "prompt": "Twist 3: unwrap all the way. Write `DeepUnwrap<T>`: keep unwrapping until it is not a promise.",
+            "hint": "The answer begins `T extends Promise<infer V> …`",
+            "hints": [
+              "The answer begins `T extends Promise<infer V> …`"
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<DeepUnwrap<Promise<Promise<1>>>, 1>>;\ntype _2 = Expect<Equal<DeepUnwrap<string>, string>>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type DeepUnwrap<T> = ____;\n",
+            "solution": "type DeepUnwrap<T> = T extends Promise<infer V> ? DeepUnwrap<V> : T;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w21-fam-conditionals-5",
+            "title": "Conditional types (5/5) — the whole parameter list",
+            "prompt": "Twist 4: the whole parameter list. Write `Args<F>`: a function type's parameter list as a tuple (`never` for non-functions).",
+            "hint": "The answer begins `F extends (...args: infer A) => …`",
+            "hints": [
+              "The answer begins `F extends (...args: infer A) => …`"
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<Args<(a: string, b: number) => void>, [a: string, b: number]>>;\ntype _2 = Expect<Equal<Args<42>, never>>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type Args<F> = ____;\n",
+            "solution": "type Args<F> = F extends (...args: infer A) => unknown ? A : never;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
             "id": "tsm-ts_conditional_types-order1",
             "title": "Put it in order: A return type chosen by the argument",
             "prompt": "The lines of the worked example “A return type chosen by the argument” from Conditional Types & infer, shuffled. Put them back in an order that compiles and prints exactly:\n\n    42 3 a+b+c",
@@ -49064,6 +50394,111 @@
                 "output": "london\nada\nno getAge"
               }
             ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w22-fam-templates-1",
+            "title": "Template literal types (1/5)",
+            "prompt": "The base problem. Write `EventName<T extends string>`: `\"click\"` becomes `\"onClick\"`.",
+            "hint": "The answer is 20 characters long and begins ``on${Capit`.",
+            "hints": [
+              "The answer is 20 characters long and begins ``on${Capit`."
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<EventName<\"click\">, \"onClick\">>;\ntype _2 = Expect<Equal<EventName<\"a\" | \"b\">, \"onA\" | \"onB\">>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type EventName<T extends string> = ____;\n",
+            "solution": "type EventName<T extends string> = `on${Capitalize<T>}`;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w22-fam-templates-2",
+            "title": "Template literal types (2/5) — a prefix",
+            "prompt": "Twist 1: a prefix. Write `CssVar<T extends string>`: `\"gap\"` becomes `\"--gap\"`.",
+            "hint": "The answer is 8 characters long and begins ``--$`.",
+            "hints": [
+              "The answer is 8 characters long and begins ``--$`."
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<CssVar<\"gap\">, \"--gap\">>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type CssVar<T extends string> = ____;\n",
+            "solution": "type CssVar<T extends string> = `--${T}`;\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w22-fam-templates-3",
+            "title": "Template literal types (3/5) — taking apart",
+            "prompt": "Twist 2: taking apart. Write `Split<S extends string, D extends string>`: split a string type into a tuple at every `D`.",
+            "hint": "The answer begins `S extends `${infer H}${D}${infer T}` ? …`",
+            "hints": [
+              "The answer begins `S extends `${infer H}${D}${infer T}` ? …`"
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<Split<\"a.b.c\", \".\">, [\"a\", \"b\", \"c\"]>>;\ntype _2 = Expect<Equal<Split<\"x\", \".\">, [\"x\"]>>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type Split<S extends string, D extends string> = ____;\n",
+            "solution": "type Split<S extends string, D extends string> = S extends `${infer H}${D}${infer T}` ? [H, ...Split<T, D>] : [S];\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w22-fam-templates-4",
+            "title": "Template literal types (4/5) — putting together",
+            "prompt": "Twist 3: putting together. Write `Join<T extends string[], D extends string>`: the reverse of `Split`.",
+            "hint": "The answer begins `T extends [infer H extends string, ...infer R extends string[]] ? …`",
+            "hints": [
+              "The answer begins `T extends [infer H extends string, ...infer R extends string[]] ? …`"
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<Join<[\"a\", \"b\", \"c\"], \"-\">, \"a-b-c\">>;\ntype _2 = Expect<Equal<Join<[], \"-\">, \"\">>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type Join<T extends string[], D extends string> = ____;\n",
+            "solution": "type Join<T extends string[], D extends string> = T extends [infer H extends string, ...infer R extends string[]] ? R extends [] ? H : `${H}${D}${Join<R, D>}` : \"\";\n",
+            "tests": [],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w22-fam-templates-5",
+            "title": "Template literal types (5/5) — trimming",
+            "prompt": "Twist 4: trimming. Write `TrimLeft<S extends string>`: remove leading spaces.",
+            "hint": "The answer begins `S extends ` ${infer R}` …`",
+            "hints": [
+              "The answer begins `S extends ` ${infer R}` …`"
+            ],
+            "language": "typescript",
+            "kind": "typelevel",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "// Supplied by the checker. Equal<X, Y> is true only when X and Y are the SAME\n// type, not merely assignable to each other.\ntype Equal<X, Y> =\n  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? true : false;\ntype Expect<T extends true> = T;\n\ntype _1 = Expect<Equal<TrimLeft<\"   hi \">, \"hi \">>;\ntype _2 = Expect<Equal<TrimLeft<\"x\">, \"x\">>;\n",
+            "judge_mode": "types",
+            "forbid": [],
+            "starter": "type TrimLeft<S extends string> = ____;\n",
+            "solution": "type TrimLeft<S extends string> = S extends ` ${infer R}` ? TrimLeft<R> : S;\n",
+            "tests": [],
             "source_slug": "",
             "dataset": ""
           },
@@ -53134,6 +54569,165 @@
             "dataset": ""
           },
           {
+            "id": "tsm-w24-fam-gen-1",
+            "title": "Generators (1/5)",
+            "prompt": "The base problem. Write `function* range(n: number)` yielding 0 … n-1. The input is `n`; print the sum of the squares of the range.",
+            "hint": "The reference solution uses a `for` loop and a generator.",
+            "hints": [
+              "The reference solution uses a `for` loop and a generator.",
+              "The reference solution is 6 lines and begins: `function* range(n: number): Generator<number> {`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nfunction* range(n: number): Generator<number> {\n  for (let i = 0; i < n; i++) yield i;\n}\nlet sum = 0;\nfor (const i of range(Number(input))) sum += i * i;\nconsole.log(sum);\n",
+            "tests": [
+              {
+                "input": "4",
+                "output": "14"
+              },
+              {
+                "input": "1",
+                "output": "0"
+              },
+              {
+                "input": "10",
+                "output": "285"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w24-fam-gen-2",
+            "title": "Generators (2/5) — infinite, taken",
+            "prompt": "Twist 1: infinite, taken. Write an endless `naturals()` generator and `take(it, k)`; print the first `k` naturals (from 1), space-separated.",
+            "hint": "The reference solution uses `join`, a `for` loop and a generator.",
+            "hints": [
+              "The reference solution uses `join`, a `for` loop and a generator.",
+              "The reference solution is 12 lines and begins: `function* naturals(): Generator<number> {`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nfunction* naturals(): Generator<number> {\n  for (let n = 1; ; n++) yield n;\n}\nfunction* take<T>(it: Iterable<T>, k: number): Generator<T> {\n  if (k <= 0) return;\n  let i = 0;\n  for (const x of it) {\n    yield x;\n    if (++i >= k) return;\n  }\n}\nconsole.log([...take(naturals(), Number(input))].join(\" \"));\n",
+            "tests": [
+              {
+                "input": "5",
+                "output": "1 2 3 4 5"
+              },
+              {
+                "input": "1",
+                "output": "1"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w24-fam-gen-3",
+            "title": "Generators (3/5) — filtered",
+            "prompt": "Twist 2: filtered. Add a generator `filter(it, test)`; print the first `k` even naturals.",
+            "hint": "The reference solution uses `join`, a `for` loop and a generator.",
+            "hints": [
+              "The reference solution uses `join`, a `for` loop and a generator.",
+              "The reference solution is 15 lines and begins: `function* naturals(): Generator<number> {`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nfunction* naturals(): Generator<number> {\n  for (let n = 1; ; n++) yield n;\n}\nfunction* filter<T>(it: Iterable<T>, test: (x: T) => boolean): Generator<T> {\n  for (const x of it) if (test(x)) yield x;\n}\nfunction* take<T>(it: Iterable<T>, k: number): Generator<T> {\n  if (k <= 0) return;\n  let i = 0;\n  for (const x of it) {\n    yield x;\n    if (++i >= k) return;\n  }\n}\nconsole.log([...take(filter(naturals(), (n) => n % 2 === 0), Number(input))].join(\" \"));\n",
+            "tests": [
+              {
+                "input": "5",
+                "output": "2 4 6 8 10"
+              },
+              {
+                "input": "1",
+                "output": "2"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w24-fam-gen-4",
+            "title": "Generators (4/5) — with iterator helpers",
+            "prompt": "Twist 3: with iterator helpers. Do the same — the first `k` squares of odd naturals — with iterator helpers (`filter`, `map`, `take`, `toArray`) instead of hand-written generators.",
+            "hint": "The reference solution uses `map`, `filter`, `join`, a `for` loop and a generator.",
+            "hints": [
+              "The reference solution uses `map`, `filter`, `join`, a `for` loop and a generator.",
+              "The reference solution is 11 lines and begins: `function* naturals(): Generator<number> {`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nfunction* naturals(): Generator<number> {\n  for (let n = 1; ; n++) yield n;\n}\nconsole.log(\n  naturals()\n    .filter((n) => n % 2 === 1)\n    .map((n) => n * n)\n    .take(Number(input))\n    .toArray()\n    .join(\" \"),\n);\n",
+            "tests": [
+              {
+                "input": "4",
+                "output": "1 9 25 49"
+              },
+              {
+                "input": "1",
+                "output": "1"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w24-fam-gen-5",
+            "title": "Generators (5/5) — your own iterable",
+            "prompt": "Twist 4: your own iterable. Write `class Countdown` implementing `[Symbol.iterator]` so `for…of` counts down from `n` to 1; print the values.",
+            "hint": "The reference solution uses `join`, a `for` loop and a class.",
+            "hints": [
+              "The reference solution uses `join`, a `for` loop and a class.",
+              "The reference solution is 10 lines and begins: `class Countdown implements Iterable<number> {`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nclass Countdown implements Iterable<number> {\n  readonly #from: number;\n  constructor(from: number) {\n    this.#from = from;\n  }\n  *[Symbol.iterator](): Generator<number> {\n    for (let n = this.#from; n >= 1; n--) yield n;\n  }\n}\nconsole.log([...new Countdown(Number(input))].join(\" \"));\n",
+            "tests": [
+              {
+                "input": "5",
+                "output": "5 4 3 2 1"
+              },
+              {
+                "input": "1",
+                "output": "1"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
             "id": "tsm-ts_iterators-spot1",
             "title": "Spot the bug: Iterators & Generators #1",
             "prompt": "This program runs, but prints the wrong thing.\n\nIt prints:\n    3 0\n\nIt should print:\n    3 3\n\nClick the line that causes it.",
@@ -55183,6 +56777,165 @@
               {
                 "input": "a x y",
                 "output": "ok a\nhandling x: bad x (error cause)\nhandling y: 42 (cause 42)"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w25-fam-errors-1",
+            "title": "Handling bad input (1/5)",
+            "prompt": "The base problem. Each line should be an integer. Parse them with a function that throws on a bad line; catch it and print `line <n>: bad number <text>` — and print `sum <total>` if every line was good.",
+            "hint": "The reference solution uses `split`, `reduce`, `map` and `try`/`catch`.",
+            "hints": [
+              "The reference solution uses `split`, `reduce`, `map` and `try`/`catch`.",
+              "The reference solution is 11 lines and begins: `function parseLine(text: string, n: number): number {`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nfunction parseLine(text: string, n: number): number {\n  const v = Number(text);\n  if (text.trim() === \"\" || !Number.isInteger(v)) throw new Error(`line ${n}: bad number ${text}`);\n  return v;\n}\ntry {\n  const nums = input.split(\"\\n\").map((t, i) => parseLine(t, i + 1));\n  console.log(`sum ${nums.reduce((a, b) => a + b, 0)}`);\n} catch (e) {\n  console.log(e instanceof Error ? e.message : String(e));\n}\n",
+            "tests": [
+              {
+                "input": "1\n2\n3",
+                "output": "sum 6"
+              },
+              {
+                "input": "1\nx\n3",
+                "output": "line 2: bad number x"
+              },
+              {
+                "input": "4.5",
+                "output": "line 1: bad number 4.5"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w25-fam-errors-2",
+            "title": "Handling bad input (2/5) — every problem",
+            "prompt": "Twist 1: every problem. Report every bad line, not just the first; then print `<k> bad` or the sum.",
+            "hint": "The reference solution uses `split` and a `for` loop.",
+            "hints": [
+              "The reference solution uses `split` and a `for` loop.",
+              "The reference solution is 9 lines and begins: `const errors: string[] = [];`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Easy",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nconst errors: string[] = [];\nlet sum = 0;\ninput.split(\"\\n\").forEach((text, i) => {\n  const v = Number(text);\n  if (text.trim() === \"\" || !Number.isInteger(v)) errors.push(`line ${i + 1}: bad number ${text}`);\n  else sum += v;\n});\nfor (const e of errors) console.log(e);\nconsole.log(errors.length ? `${errors.length} bad` : `sum ${sum}`);\n",
+            "tests": [
+              {
+                "input": "1\nx\n3\ny",
+                "output": "line 2: bad number x\nline 4: bad number y\n2 bad"
+              },
+              {
+                "input": "1\n2",
+                "output": "sum 3"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w25-fam-errors-3",
+            "title": "Handling bad input (3/5) — no exceptions",
+            "prompt": "Twist 2: no exceptions. Return a `Result<number>` — `{ ok: true; value } | { ok: false; error }` — from the parser instead of throwing, and print the same report as before.",
+            "hint": "The reference solution uses `split`, `map` and a `for` loop.",
+            "hints": [
+              "The reference solution uses `split`, `map` and a `for` loop.",
+              "The reference solution is 16 lines and begins: `type Result<T> = { ok: true; value: T } | { ok: false; error: string };`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\ntype Result<T> = { ok: true; value: T } | { ok: false; error: string };\nconst parseLine = (text: string, n: number): Result<number> => {\n  const v = Number(text);\n  return text.trim() === \"\" || !Number.isInteger(v) ? { ok: false, error: `line ${n}: bad number ${text}` } : { ok: true, value: v };\n};\nconst results = input.split(\"\\n\").map((t, i) => parseLine(t, i + 1));\nlet sum = 0;\nlet bad = 0;\nfor (const r of results) {\n  if (r.ok) sum += r.value;\n  else {\n    console.log(r.error);\n    bad++;\n  }\n}\nconsole.log(bad ? `${bad} bad` : `sum ${sum}`);\n",
+            "tests": [
+              {
+                "input": "1\nx\n3\ny",
+                "output": "line 2: bad number x\nline 4: bad number y\n2 bad"
+              },
+              {
+                "input": "1\n2",
+                "output": "sum 3"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w25-fam-errors-4",
+            "title": "Handling bad input (4/5) — with a cause",
+            "prompt": "Twist 3: with a cause. Stop at the first bad line, but wrap the parser's error with context: throw `new Error(\"could not total the input\", { cause })` and print the message, then `because: <cause message>`.",
+            "hint": "The reference solution uses `split`, `reduce`, `map` and `try`/`catch`.",
+            "hints": [
+              "The reference solution uses `split`, `reduce`, `map` and `try`/`catch`.",
+              "The reference solution is 20 lines and begins: `function parseLine(text: string, n: number): number {`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nfunction parseLine(text: string, n: number): number {\n  const v = Number(text);\n  if (text.trim() === \"\" || !Number.isInteger(v)) throw new Error(`line ${n}: bad number ${text}`);\n  return v;\n}\nfunction total(lines: readonly string[]): number {\n  try {\n    return lines.map((t, i) => parseLine(t, i + 1)).reduce((a, b) => a + b, 0);\n  } catch (cause) {\n    throw new Error(\"could not total the input\", { cause });\n  }\n}\ntry {\n  console.log(`sum ${total(input.split(\"\\n\"))}`);\n} catch (e) {\n  if (e instanceof Error) {\n    console.log(e.message);\n    if (e.cause instanceof Error) console.log(`because: ${e.cause.message}`);\n  }\n}\n",
+            "tests": [
+              {
+                "input": "1\nx\n3",
+                "output": "could not total the input\nbecause: line 2: bad number x"
+              },
+              {
+                "input": "5\n6",
+                "output": "sum 11"
+              }
+            ],
+            "source_slug": "",
+            "dataset": ""
+          },
+          {
+            "id": "tsm-w25-fam-errors-5",
+            "title": "Handling bad input (5/5) — clean up anyway",
+            "prompt": "Twist 4: clean up anyway. A `Log` resource prints `open` when created and `close` when disposed. Hold it with `using` around the work, so `close` prints even when a bad line throws.",
+            "hint": "The reference solution uses `split`, a `for` loop, a class and `try`/`catch`.",
+            "hints": [
+              "The reference solution uses `split`, a `for` loop, a class and `try`/`catch`.",
+              "The reference solution is 23 lines and begins: `class Log implements Disposable {`"
+            ],
+            "language": "typescript",
+            "kind": "challenge",
+            "difficulty": "Medium",
+            "strictness": "strict+indexed",
+            "harness": "",
+            "judge_mode": "",
+            "forbid": [],
+            "starter": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\n____\n",
+            "solution": "import * as fs from \"fs\";\nconst input = fs.readFileSync(0, \"utf8\").trim();\nclass Log implements Disposable {\n  constructor() {\n    console.log(\"open\");\n  }\n  [Symbol.dispose](): void {\n    console.log(\"close\");\n  }\n}\nfunction run(lines: readonly string[]): void {\n  using _log = new Log();\n  let sum = 0;\n  for (const [i, t] of lines.entries()) {\n    const v = Number(t);\n    if (!Number.isInteger(v)) throw new Error(`line ${i + 1}: bad number ${t}`);\n    sum += v;\n  }\n  console.log(`sum ${sum}`);\n}\ntry {\n  run(input.split(\"\\n\"));\n} catch (e) {\n  console.log(e instanceof Error ? e.message : String(e));\n}\n",
+            "tests": [
+              {
+                "input": "1\n2",
+                "output": "open\nsum 3\nclose"
+              },
+              {
+                "input": "1\nx",
+                "output": "open\nclose\nline 2: bad number x"
               }
             ],
             "source_slug": "",

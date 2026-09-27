@@ -754,3 +754,722 @@ async function main(): Promise<void> {
 main();
 ''', ["1 2 3 4 5", "9"]),
 ])
+
+
+_family(6, "ops", "A chain of operations", [
+    ("", "Line 1 is a number, line 2 a list of operation names (`double`, `inc`, `square`). Apply them left to right and print the result. Keep the operations in a table of functions.",
+     r'''
+const OPS: Record<string, (n: number) => number> = { double: (n) => n * 2, inc: (n) => n + 1, square: (n) => n * n };
+const [start = "0", names = ""] = input.split("\n");
+console.log(names.split(/\s+/).reduce((acc, name) => OPS[name](acc), Number(start)));
+''', ["3\ndouble inc square", "5\ninc"]),
+    ("show the steps", "Print every intermediate value: `3 -> 6 -> 7 -> 49`.",
+     r'''
+const OPS: Record<string, (n: number) => number> = { double: (n) => n * 2, inc: (n) => n + 1, square: (n) => n * n };
+const [start = "0", names = ""] = input.split("\n");
+const steps = [Number(start)];
+for (const name of names.split(/\s+/)) steps.push(OPS[name](steps[steps.length - 1]));
+console.log(steps.join(" -> "));
+''', ["3\ndouble inc square", "5\ninc"]),
+    ("operations with arguments", "Operations now carry an argument: `add:5`, `mul:2`, `pow:3`. Build each function from its argument (a function returning a function).",
+     r'''
+const MAKERS: Record<string, (arg: number) => (n: number) => number> = {
+  add: (a) => (n) => n + a,
+  mul: (a) => (n) => n * a,
+  pow: (a) => (n) => n ** a,
+};
+const [start = "0", specs = ""] = input.split("\n");
+const fns = specs.split(/\s+/).map((spec) => {
+  const [name, arg] = spec.split(":");
+  return MAKERS[name](Number(arg));
+});
+console.log(fns.reduce((acc, f) => f(acc), Number(start)));
+''', ["3\nadd:5 mul:2 add:-1", "2\npow:10"]),
+    ("the other order", "Back to named operations, but apply them right to left — the order of mathematical composition (`f ∘ g` runs `g` first).",
+     r'''
+const OPS: Record<string, (n: number) => number> = { double: (n) => n * 2, inc: (n) => n + 1, square: (n) => n * n };
+const [start = "0", names = ""] = input.split("\n");
+console.log(names.split(/\s+/).reduceRight((acc, name) => OPS[name](acc), Number(start)));
+''', ["3\ndouble inc square", "5\ninc"]),
+    ("without a loop", "Left to right again, written as a recursive function `run(x, ops)` — no loop and no `reduce`.",
+     r'''
+const OPS: Record<string, (n: number) => number> = { double: (n) => n * 2, inc: (n) => n + 1, square: (n) => n * n };
+const run = (x: number, ops: string[]): number => (ops.length === 0 ? x : run(OPS[ops[0]](x), ops.slice(1)));
+const [start = "0", names = ""] = input.split("\n");
+console.log(run(Number(start), names.split(/\s+/)));
+''', ["3\ndouble inc square", "5\ninc"]),
+])
+
+_FAM_STATUS = r'''
+const STATUSES = ["draft", "paid", "shipped", "delivered"] as const;
+type Status = (typeof STATUSES)[number];
+const toStatus = (s: string): Status | undefined => STATUSES.find((x) => x === s);
+'''
+
+_family(10, "status", "Order status", [
+    ("", "The input is one status: `draft`, `paid`, `shipped` or `delivered`. Print its label from a `Record<Status, string>` — `Draft`, `Paid`, `On its way`, `Delivered` — or `unknown status`.",
+     _FAM_STATUS + r'''
+const LABEL: Record<Status, string> = { draft: "Draft", paid: "Paid", shipped: "On its way", delivered: "Delivered" };
+const s = toStatus(input);
+console.log(s === undefined ? "unknown status" : LABEL[s]);
+''', ["shipped", "draft", "lost"]),
+    ("what comes next", "Print the status that follows (or `final` after `delivered`, `unknown status` for anything else).",
+     _FAM_STATUS + r'''
+const s = toStatus(input);
+if (s === undefined) console.log("unknown status");
+else console.log(STATUSES[STATUSES.indexOf(s) + 1] ?? "final");
+''', ["draft", "delivered", "x"]),
+    ("allowed moves", "The input is `from to`. Print `ok` if `to` is the next status after `from`, otherwise `not allowed`.",
+     _FAM_STATUS + r'''
+const [from = "", to = ""] = input.split(/\s+/);
+const a = toStatus(from);
+const b = toStatus(to);
+console.log(a !== undefined && b !== undefined && STATUSES.indexOf(b) === STATUSES.indexOf(a) + 1 ? "ok" : "not allowed");
+''', ["paid shipped", "draft shipped", "delivered draft"]),
+    ("a tally", "The input is a list of statuses; print the count of each, in the declared order: `draft:1 paid:0 shipped:2 delivered:0`. Ignore unknown words.",
+     _FAM_STATUS + r'''
+const counts = new Map<Status, number>(STATUSES.map((s) => [s, 0]));
+for (const w of input.split(/\s+/)) {
+  const s = toStatus(w);
+  if (s !== undefined) counts.set(s, (counts.get(s) ?? 0) + 1);
+}
+console.log(STATUSES.map((s) => `${s}:${counts.get(s) ?? 0}`).join(" "));
+''', ["shipped draft shipped oops", "paid"]),
+    ("a new status", "Add `cancelled`: it can follow `draft` or `paid` only, and nothing follows it. The input is `from to`; print `ok` or `not allowed`. Keep the rules in a table keyed by status.",
+     r'''
+const STATUSES = ["draft", "paid", "shipped", "delivered", "cancelled"] as const;
+type Status = (typeof STATUSES)[number];
+const toStatus = (s: string): Status | undefined => STATUSES.find((x) => x === s);
+const NEXT: Record<Status, readonly Status[]> = {
+  draft: ["paid", "cancelled"],
+  paid: ["shipped", "cancelled"],
+  shipped: ["delivered"],
+  delivered: [],
+  cancelled: [],
+};
+const [from = "", to = ""] = input.split(/\s+/);
+const a = toStatus(from);
+const b = toStatus(to);
+console.log(a !== undefined && b !== undefined && NEXT[a].includes(b) ? "ok" : "not allowed");
+''', ["paid cancelled", "shipped cancelled", "cancelled draft", "draft paid"]),
+])
+
+_family(13, "checks", "Validators as functions", [
+    ("", "A check is a function `(s: string) => string | null` — an error message or `null`. Apply `nonEmpty`, `noSpaces` and `maxLen10` to each input line and print `ok` or the first error.",
+     r'''
+type Check = (s: string) => string | null;
+const nonEmpty: Check = (s) => (s.length === 0 ? "empty" : null);
+const noSpaces: Check = (s) => (s.includes(" ") ? "has spaces" : null);
+const maxLen10: Check = (s) => (s.length > 10 ? "too long" : null);
+const CHECKS: Check[] = [nonEmpty, noSpaces, maxLen10];
+for (const line of input.split("\n")) {
+  let error: string | null = null;
+  for (const check of CHECKS) {
+    error = check(line);
+    if (error !== null) break;
+  }
+  console.log(error ?? "ok");
+}
+''', ["alice\nhas space\nwaytoolongname", "bob"]),
+    ("every error", "Print all the errors for a line, joined by `; ` (or `ok`).",
+     r'''
+type Check = (s: string) => string | null;
+const CHECKS: Check[] = [
+  (s) => (s.length === 0 ? "empty" : null),
+  (s) => (s.includes(" ") ? "has spaces" : null),
+  (s) => (s.length > 10 ? "too long" : null),
+];
+for (const line of input.split("\n")) {
+  const errors = CHECKS.map((c) => c(line)).filter((e): e is string => e !== null);
+  console.log(errors.length ? errors.join("; ") : "ok");
+}
+''', ["alice\nhas a very long space\nwaytoolongname", "bob"]),
+    ("checks from settings", "Line 1 is `min=<n> max=<n>`; build `minLen(n)` and `maxLen(n)` checks with functions that return functions, then check each following line.",
+     r'''
+type Check = (s: string) => string | null;
+const minLen = (n: number): Check => (s) => (s.length < n ? `shorter than ${n}` : null);
+const maxLen = (n: number): Check => (s) => (s.length > n ? `longer than ${n}` : null);
+const [header = "", ...words] = input.split("\n");
+const opts = new Map(header.split(" ").map((kv) => kv.split("=")).map(([k, v]) => [k, Number(v)] as const));
+const checks: Check[] = [minLen(opts.get("min") ?? 0), maxLen(opts.get("max") ?? Infinity)];
+for (const w of words) {
+  const error = checks.map((c) => c(w)).find((e) => e !== null);
+  console.log(error ?? "ok");
+}
+''', ["min=3 max=8\nab\nabcdef\nabcdefghij", "min=1 max=1\nx"]),
+    ("combine them", "Write `firstError(...checks: Check[]): Check` — one check made of several — and use it on each line.",
+     r'''
+type Check = (s: string) => string | null;
+const firstError =
+  (...checks: Check[]): Check =>
+  (s) => {
+    for (const c of checks) {
+      const e = c(s);
+      if (e !== null) return e;
+    }
+    return null;
+  };
+const username = firstError(
+  (s) => (s.length === 0 ? "empty" : null),
+  (s) => (/^[a-z]/.test(s) ? null : "must start with a letter"),
+  (s) => (s.length > 10 ? "too long" : null),
+);
+for (const line of input.split("\n")) console.log(username(line) ?? "ok");
+''', ["alice\n9lives\nwaytoolongname", "Bob"]),
+    ("count the calls", "Wrap each check so a closure counts how often it runs. Check each line with the first-error rule, then print `calls: <name>=<n> …` — later checks run less often.",
+     r'''
+type Check = (s: string) => string | null;
+const calls = new Map<string, number>();
+const counted = (name: string, check: Check): Check => (s) => {
+  calls.set(name, (calls.get(name) ?? 0) + 1);
+  return check(s);
+};
+const CHECKS: Check[] = [
+  counted("nonEmpty", (s) => (s.length === 0 ? "empty" : null)),
+  counted("noSpaces", (s) => (s.includes(" ") ? "has spaces" : null)),
+  counted("maxLen", (s) => (s.length > 10 ? "too long" : null)),
+];
+for (const line of input.split("\n")) {
+  const error = CHECKS.reduce<string | null>((e, c) => e ?? c(line), null);
+  console.log(error ?? "ok");
+}
+console.log(`calls: ${[...calls].map(([k, n]) => `${k}=${n}`).join(" ")}`);
+''', ["alice\nhas space\nbob", "x"]),
+])
+
+_family(14, "flags", "Command-line flags", [
+    ("", "The input is command-line arguments, e.g. `--port 8080 --verbose`. Print `port <n>` (default 3000) and `verbose <true|false>`.",
+     r'''
+const args = input.split(/\s+/);
+const i = args.indexOf("--port");
+console.log(`port ${i >= 0 ? (args[i + 1] ?? "3000") : "3000"}`);
+console.log(`verbose ${args.includes("--verbose")}`);
+''', ["--port 8080 --verbose", "--verbose", "--port 1"]),
+    ("equals form", "Flags may also be written `--port=8080`. Support both forms.",
+     r'''
+const args = input.split(/\s+/);
+let port = "3000";
+let verbose = false;
+for (let i = 0; i < args.length; i++) {
+  const arg = args[i] ?? "";
+  if (arg === "--verbose") verbose = true;
+  else if (arg === "--port") port = args[++i] ?? port;
+  else if (arg.startsWith("--port=")) port = arg.slice("--port=".length);
+}
+console.log(`port ${port}`);
+console.log(`verbose ${verbose}`);
+''', ["--port=8080 --verbose", "--port 1", "--verbose"]),
+    ("unknown flags", "Any other flag is an error: print `unknown flag <flag>` and nothing else.",
+     r'''
+const args = input.split(/\s+/);
+let port = "3000";
+let verbose = false;
+let error = "";
+for (let i = 0; i < args.length && !error; i++) {
+  const arg = args[i] ?? "";
+  if (arg === "--verbose") verbose = true;
+  else if (arg === "--port") port = args[++i] ?? port;
+  else if (arg.startsWith("--port=")) port = arg.slice("--port=".length);
+  else error = `unknown flag ${arg}`;
+}
+if (error) console.log(error);
+else {
+  console.log(`port ${port}`);
+  console.log(`verbose ${verbose}`);
+}
+''', ["--port 1 --colour red", "--verbose"]),
+    ("repeated flags", "Add `--tag <name>`, which may repeat. Print the port, then `tags <a,b>` (or `tags none`).",
+     r'''
+const args = input.split(/\s+/);
+let port = "3000";
+const tags: string[] = [];
+for (let i = 0; i < args.length; i++) {
+  const arg = args[i] ?? "";
+  if (arg === "--port") port = args[++i] ?? port;
+  else if (arg === "--tag") {
+    const t = args[++i];
+    if (t !== undefined) tags.push(t);
+  }
+}
+console.log(`port ${port}`);
+console.log(`tags ${tags.length ? tags.join(",") : "none"}`);
+''', ["--tag a --port 80 --tag b", "--port 1"]),
+    ("a typed result", "Parse into a typed object `{ port: number; verbose: boolean; tags: string[] }` and print it with `JSON.stringify`.",
+     r'''
+type Options = { port: number; verbose: boolean; tags: string[] };
+function parseArgs(args: readonly string[]): Options {
+  const opts: Options = { port: 3000, verbose: false, tags: [] };
+  for (let i = 0; i < args.length; i++) {
+    const arg = args[i];
+    if (arg === "--verbose") opts.verbose = true;
+    else if (arg === "--port") opts.port = Number(args[++i] ?? opts.port);
+    else if (arg === "--tag") {
+      const t = args[++i];
+      if (t !== undefined) opts.tags.push(t);
+    }
+  }
+  return opts;
+}
+console.log(JSON.stringify(parseArgs(input.split(/\s+/))));
+''', ["--tag a --port 80 --verbose", "--tag x"]),
+])
+
+_FAM_PALETTE = r'''
+type Rgb = { r: number; g: number; b: number };
+const PALETTE = {
+  red: { r: 255, g: 0, b: 0 },
+  teal: { r: 0, g: 128, b: 128 },
+  navy: { r: 0, g: 0, b: 128 },
+  gold: { r: 255, g: 215, b: 0 },
+} satisfies Record<string, Rgb>;
+const hex = (c: Rgb): string => "#" + [c.r, c.g, c.b].map((n) => n.toString(16).padStart(2, "0")).join("");
+'''
+
+_family(15, "colours", "A colour palette", [
+    ("", "The palette is checked with `satisfies Record<string, Rgb>`. For each colour name on the input line, print its hex code, or `unknown <name>`.",
+     _FAM_PALETTE + r'''
+const names: Record<string, Rgb> = PALETTE;
+for (const name of input.split(/\s+/)) {
+  const c = names[name];
+  console.log(c === undefined ? `unknown ${name}` : hex(c));
+}
+''', ["red teal pink", "gold"]),
+    ("from numbers", "Each input line is `r,g,b`; print the hex code.",
+     _FAM_PALETTE + r'''
+for (const line of input.split("\n")) {
+  const [r = 0, g = 0, b = 0] = line.split(",").map(Number);
+  console.log(hex({ r, g, b }));
+}
+''', ["255,0,0\n0,128,128", "1,2,3"]),
+    ("the other way", "Each input line is a hex code `#rrggbb`; print `r,g,b`.",
+     r'''
+for (const line of input.split("\n")) {
+  const n = Number.parseInt(line.slice(1), 16);
+  console.log(`${(n >> 16) & 255},${(n >> 8) & 255},${n & 255}`);
+}
+''', ["#ff0000\n#008080", "#010203"]),
+    ("mixing", "The input is two palette names; print the hex of their average (each channel rounded).",
+     _FAM_PALETTE + r'''
+const names: Record<string, Rgb> = PALETTE;
+const [a = "", b = ""] = input.split(/\s+/);
+const x = names[a];
+const y = names[b];
+if (x === undefined || y === undefined) console.log("unknown colour");
+else console.log(hex({ r: Math.round((x.r + y.r) / 2), g: Math.round((x.g + y.g) / 2), b: Math.round((x.b + y.b) / 2) }));
+''', ["red gold", "teal navy", "red pink"]),
+    ("nearest", "The input is `r,g,b`; print the palette name nearest to it (smallest squared distance).",
+     _FAM_PALETTE + r'''
+const [r = 0, g = 0, b = 0] = input.split(",").map(Number);
+const dist = (c: Rgb) => (c.r - r) ** 2 + (c.g - g) ** 2 + (c.b - b) ** 2;
+const nearest = Object.entries(PALETTE).reduce((best, cur) => (dist(cur[1]) < dist(best[1]) ? cur : best));
+console.log(nearest[0]);
+''', ["250,10,10", "0,100,150", "200,200,0"]),
+])
+
+_family(16, "stock", "Immutable stock", [
+    ("", "Line 1 is the stock, `apple:3,pear:2`; each further line is `sell <item> <n>` or `restock <item> <n>`. Apply them without mutating — each step returns a new `ReadonlyMap` — and print the final stock as `item:n` pairs sorted by name.",
+     r'''
+type Stock = ReadonlyMap<string, number>;
+const parseStock = (line: string): Stock =>
+  new Map(line.split(",").map((pair) => {
+    const [item = "", n = "0"] = pair.split(":");
+    return [item, Number(n)];
+  }));
+const apply = (stock: Stock, op: string): Stock => {
+  const [verb, item = "", n = "0"] = op.split(" ");
+  const have = stock.get(item) ?? 0;
+  const next = new Map(stock);
+  next.set(item, verb === "sell" ? have - Number(n) : have + Number(n));
+  return next;
+};
+const show = (s: Stock) => [...s].toSorted(([a], [b]) => a.localeCompare(b)).map(([k, v]) => `${k}:${v}`).join(",");
+const [first = "", ...ops] = input.split("\n");
+console.log(show(ops.reduce(apply, parseStock(first))));
+''', ["apple:3,pear:2\nsell apple 1\nrestock pear 5", "fig:1"]),
+    ("no overselling", "Selling more than is in stock prints `cannot sell <item>` and leaves the stock unchanged.",
+     r'''
+type Stock = ReadonlyMap<string, number>;
+const parseStock = (line: string): Stock =>
+  new Map(line.split(",").map((pair) => {
+    const [item = "", n = "0"] = pair.split(":");
+    return [item, Number(n)];
+  }));
+const apply = (stock: Stock, op: string): Stock => {
+  const [verb, item = "", n = "0"] = op.split(" ");
+  const have = stock.get(item) ?? 0;
+  if (verb === "sell" && Number(n) > have) {
+    console.log(`cannot sell ${item}`);
+    return stock;
+  }
+  return new Map(stock).set(item, verb === "sell" ? have - Number(n) : have + Number(n));
+};
+const show = (s: Stock) => [...s].toSorted(([a], [b]) => a.localeCompare(b)).map(([k, v]) => `${k}:${v}`).join(",");
+const [first = "", ...ops] = input.split("\n");
+console.log(show(ops.reduce(apply, parseStock(first))));
+''', ["apple:3,pear:2\nsell apple 5\nsell pear 2", "fig:1\nsell fig 1"]),
+    ("keep every version", "Keep the whole history as a `readonly` array of stocks. Print how many versions there are, then the first and last.",
+     r'''
+type Stock = ReadonlyMap<string, number>;
+const parseStock = (line: string): Stock =>
+  new Map(line.split(",").map((pair) => {
+    const [item = "", n = "0"] = pair.split(":");
+    return [item, Number(n)];
+  }));
+const apply = (stock: Stock, op: string): Stock => {
+  const [verb, item = "", n = "0"] = op.split(" ");
+  const have = stock.get(item) ?? 0;
+  return new Map(stock).set(item, verb === "sell" ? have - Number(n) : have + Number(n));
+};
+const show = (s: Stock | undefined) =>
+  s === undefined ? "" : [...s].toSorted(([a], [b]) => a.localeCompare(b)).map(([k, v]) => `${k}:${v}`).join(",");
+const [first = "", ...ops] = input.split("\n");
+const history: readonly Stock[] = ops.reduce<readonly Stock[]>(
+  (h, op) => [...h, apply(h[h.length - 1] ?? new Map(), op)],
+  [parseStock(first)],
+);
+console.log(history.length);
+console.log(show(history[0]));
+console.log(show(history.at(-1)));
+''', ["apple:3,pear:2\nsell apple 1\nrestock pear 5", "fig:1"]),
+    ("undo", "An `undo` line returns to the previous version (no effect at the start). Print the final stock.",
+     r'''
+type Stock = ReadonlyMap<string, number>;
+const parseStock = (line: string): Stock =>
+  new Map(line.split(",").map((pair) => {
+    const [item = "", n = "0"] = pair.split(":");
+    return [item, Number(n)];
+  }));
+const apply = (stock: Stock, op: string): Stock => {
+  const [verb, item = "", n = "0"] = op.split(" ");
+  const have = stock.get(item) ?? 0;
+  return new Map(stock).set(item, verb === "sell" ? have - Number(n) : have + Number(n));
+};
+const show = (s: Stock | undefined) =>
+  s === undefined ? "" : [...s].toSorted(([a], [b]) => a.localeCompare(b)).map(([k, v]) => `${k}:${v}`).join(",");
+const [first = "", ...ops] = input.split("\n");
+let history: readonly Stock[] = [parseStock(first)];
+for (const op of ops) {
+  if (op === "undo") history = history.length > 1 ? history.slice(0, -1) : history;
+  else history = [...history, apply(history[history.length - 1] ?? new Map(), op)];
+}
+console.log(show(history.at(-1)));
+''', ["apple:3,pear:2\nsell apple 1\nundo\nrestock pear 5\nundo\nundo", "fig:1\nundo"]),
+    ("parse, don't trust", "Lines may be malformed. Parse each into `{ verb: \"sell\" | \"restock\"; item: string; n: number } | { error: string }` first; print `bad line: <text>` for errors and apply the rest.",
+     r'''
+type Stock = ReadonlyMap<string, number>;
+type Op = { verb: "sell" | "restock"; item: string; n: number } | { error: string };
+const parseOp = (line: string): Op => {
+  const [verb, item, n] = line.split(" ");
+  const qty = Number(n);
+  if ((verb !== "sell" && verb !== "restock") || !item || !Number.isInteger(qty) || qty <= 0) return { error: line };
+  return { verb, item, n: qty };
+};
+const parseStock = (line: string): Stock =>
+  new Map(line.split(",").map((pair) => {
+    const [item = "", n = "0"] = pair.split(":");
+    return [item, Number(n)];
+  }));
+const show = (s: Stock) => [...s].toSorted(([a], [b]) => a.localeCompare(b)).map(([k, v]) => `${k}:${v}`).join(",");
+const [first = "", ...lines] = input.split("\n");
+let stock = parseStock(first);
+for (const line of lines) {
+  const op = parseOp(line);
+  if ("error" in op) {
+    console.log(`bad line: ${op.error}`);
+    continue;
+  }
+  const have = stock.get(op.item) ?? 0;
+  stock = new Map(stock).set(op.item, op.verb === "sell" ? have - op.n : have + op.n);
+}
+console.log(show(stock));
+''', ["apple:3\nsell apple 1\nsteal apple 2\nsell apple -1\nrestock kiwi 4", "fig:1"]),
+])
+
+_family(18, "generic", "Small generic helpers", [
+    ("", "Write `firstWhere<T>(xs: readonly T[], test: (x: T) => boolean): T | undefined`. Use it to print the first even number on the input line, or `none`.",
+     r'''
+function firstWhere<T>(xs: readonly T[], test: (x: T) => boolean): T | undefined {
+  for (const x of xs) if (test(x)) return x;
+  return undefined;
+}
+console.log(firstWhere(input.split(/\s+/).map(Number), (n) => n % 2 === 0) ?? "none");
+''', ["3 7 8 10", "1 3"]),
+    ("grouping", "Write `groupBy<T, K extends string | number>(xs, key)` returning a `Map<K, T[]>`; group the input words by length and print `len: words` lines, shortest first.",
+     r'''
+function groupBy<T, K extends string | number>(xs: readonly T[], key: (x: T) => K): Map<K, T[]> {
+  const out = new Map<K, T[]>();
+  for (const x of xs) {
+    const k = key(x);
+    out.set(k, [...(out.get(k) ?? []), x]);
+  }
+  return out;
+}
+const groups = groupBy(input.split(/\s+/), (w) => w.length);
+for (const [len, words] of [...groups].toSorted((a, b) => a[0] - b[0])) console.log(`${len}: ${words.join(",")}`);
+''', ["cat horse dog ox mouse", "a"]),
+    ("pairs", "Write `zip<A, B>(as: readonly A[], bs: readonly B[]): [A, B][]` (as long as the shorter list). Line 1 is names, line 2 scores; print `name score` lines.",
+     r'''
+function zip<A, B>(as: readonly A[], bs: readonly B[]): [A, B][] {
+  const out: [A, B][] = [];
+  for (let i = 0; i < Math.min(as.length, bs.length); i++) {
+    const a = as[i];
+    const b = bs[i];
+    if (a !== undefined && b !== undefined) out.push([a, b]);
+  }
+  return out;
+}
+const [names = "", scores = ""] = input.split("\n");
+for (const [n, s] of zip(names.split(/\s+/), scores.split(/\s+/).map(Number))) console.log(`${n} ${s}`);
+''', ["ana bo cy\n3 5 8", "x y\n1"]),
+    ("the best one", "Write `maxBy<T>(xs: readonly T[], score: (x: T) => number): T | undefined` and print the longest input word (the first, on a tie).",
+     r'''
+function maxBy<T>(xs: readonly T[], score: (x: T) => number): T | undefined {
+  let best: T | undefined;
+  let bestScore = -Infinity;
+  for (const x of xs) {
+    if (score(x) > bestScore) {
+      best = x;
+      bestScore = score(x);
+    }
+  }
+  return best;
+}
+console.log(maxBy(input.split(/\s+/), (w) => w.length) ?? "");
+''', ["cat horse dog mouse", "a"]),
+    ("chunks", "Write `chunk<T>(xs: readonly T[], size: number): T[][]` and print the input words in chunks of 3, one chunk per line, comma-separated.",
+     r'''
+function chunk<T>(xs: readonly T[], size: number): T[][] {
+  const out: T[][] = [];
+  for (let i = 0; i < xs.length; i += size) out.push(xs.slice(i, i + size));
+  return out;
+}
+for (const c of chunk(input.split(/\s+/), 3)) console.log(c.join(","));
+''', ["a b c d e f g", "x"]),
+])
+
+_CFG = "const config = { server: { host: \"localhost\", port: 8080 }, flags: [\"a\", \"b\"] as const, debug: false };\ntype Config = typeof config;\n"
+
+_type_family(19, "lookups", "Looking types up", [
+    ("", "Write `ValueOf<T>`: the union of `T`'s property types.",
+     "type ValueOf<T> = T[keyof T];", "T[keyof T]",
+     'type _1 = Expect<Equal<ValueOf<{ a: 1; b: "x" }>, 1 | "x">>;\ntype _2 = Expect<Equal<ValueOf<{ n: number }>, number>>;\n'),
+    ("one property", "Write `PropType<T, K extends keyof T>`: the type of one property.",
+     "type PropType<T, K extends keyof T> = T[K];", "T[K]",
+     'type _1 = Expect<Equal<PropType<Config, "debug">, boolean>>;\ntype _2 = Expect<Equal<PropType<Config, "server">, { host: string; port: number }>>;\n'),
+    ("an element", "Write `ElementType<A extends readonly unknown[]>`: the type of the array's elements.",
+     "type ElementType<A extends readonly unknown[]> = A[number];", "A[number]",
+     'type _1 = Expect<Equal<ElementType<Config["flags"]>, "a" | "b">>;\ntype _2 = Expect<Equal<ElementType<string[]>, string>>;\n'),
+    ("two levels down", "Write `PathValue<T, A extends keyof T, B extends keyof T[A]>`: the type at `T[A][B]`.",
+     "type PathValue<T, A extends keyof T, B extends keyof T[A]> = T[A][B];", "T[A][B]",
+     'type _1 = Expect<Equal<PathValue<Config, "server", "port">, number>>;\n'),
+    ("a function's argument", "Write `FirstArg<F extends (arg: never) => unknown>`: the type of the function's first parameter.",
+     "type FirstArg<F extends (arg: never) => unknown> = Parameters<F>[0];", "Parameters<F>[0]",
+     'type _1 = Expect<Equal<FirstArg<(s: string) => void>, string>>;\ntype _2 = Expect<Equal<FirstArg<(n: { id: number }) => boolean>, { id: number }>>;\n'),
+], prelude=_CFG)
+
+_type_family(21, "conditionals", "Conditional types", [
+    ("", "Write `IsString<T>`: `true` when `T` is a string type, otherwise `false`.",
+     "type IsString<T> = T extends string ? true : false;", "T extends string ? true : false",
+     'type _1 = Expect<Equal<IsString<"a">, true>>;\ntype _2 = Expect<Equal<IsString<3>, false>>;\n'),
+    ("pull out a part", "Write `ElementOr<T>`: an array's element type, or `T` itself when it is not an array.",
+     "type ElementOr<T> = T extends readonly (infer E)[] ? E : T;", "T extends readonly (infer E)[] ? E : T",
+     'type _1 = Expect<Equal<ElementOr<number[]>, number>>;\ntype _2 = Expect<Equal<ElementOr<string>, string>>;\n'),
+    ("unwrap once", "Write `UnwrapPromise<T>`: the value a promise resolves to, one level only; anything else unchanged.",
+     "type UnwrapPromise<T> = T extends Promise<infer V> ? V : T;", "T extends Promise<infer V> ? V : T",
+     'type _1 = Expect<Equal<UnwrapPromise<Promise<number>>, number>>;\ntype _2 = Expect<Equal<UnwrapPromise<Promise<Promise<1>>>, Promise<1>>>;\ntype _3 = Expect<Equal<UnwrapPromise<"x">, "x">>;\n'),
+    ("unwrap all the way", "Write `DeepUnwrap<T>`: keep unwrapping until it is not a promise.",
+     "type DeepUnwrap<T> = T extends Promise<infer V> ? DeepUnwrap<V> : T;", "T extends Promise<infer V> ? DeepUnwrap<V> : T",
+     'type _1 = Expect<Equal<DeepUnwrap<Promise<Promise<1>>>, 1>>;\ntype _2 = Expect<Equal<DeepUnwrap<string>, string>>;\n'),
+    ("the whole parameter list", "Write `Args<F>`: a function type's parameter list as a tuple (`never` for non-functions).",
+     "type Args<F> = F extends (...args: infer A) => unknown ? A : never;", "F extends (...args: infer A) => unknown ? A : never",
+     'type _1 = Expect<Equal<Args<(a: string, b: number) => void>, [a: string, b: number]>>;\ntype _2 = Expect<Equal<Args<42>, never>>;\n'),
+])
+
+_type_family(22, "templates", "Template literal types", [
+    ("", "Write `EventName<T extends string>`: `\"click\"` becomes `\"onClick\"`.",
+     "type EventName<T extends string> = `on${Capitalize<T>}`;", "`on${Capitalize<T>}`",
+     'type _1 = Expect<Equal<EventName<"click">, "onClick">>;\ntype _2 = Expect<Equal<EventName<"a" | "b">, "onA" | "onB">>;\n'),
+    ("a prefix", "Write `CssVar<T extends string>`: `\"gap\"` becomes `\"--gap\"`.",
+     "type CssVar<T extends string> = `--${T}`;", "`--${T}`",
+     'type _1 = Expect<Equal<CssVar<"gap">, "--gap">>;\n'),
+    ("taking apart", "Write `Split<S extends string, D extends string>`: split a string type into a tuple at every `D`.",
+     "type Split<S extends string, D extends string> = S extends `${infer H}${D}${infer T}` ? [H, ...Split<T, D>] : [S];",
+     "S extends `${infer H}${D}${infer T}` ? [H, ...Split<T, D>] : [S]",
+     'type _1 = Expect<Equal<Split<"a.b.c", ".">, ["a", "b", "c"]>>;\ntype _2 = Expect<Equal<Split<"x", ".">, ["x"]>>;\n'),
+    ("putting together", "Write `Join<T extends string[], D extends string>`: the reverse of `Split`.",
+     "type Join<T extends string[], D extends string> = T extends [infer H extends string, ...infer R extends string[]] ? R extends [] ? H : `${H}${D}${Join<R, D>}` : \"\";",
+     "T extends [infer H extends string, ...infer R extends string[]] ? R extends [] ? H : `${H}${D}${Join<R, D>}` : \"\"",
+     'type _1 = Expect<Equal<Join<["a", "b", "c"], "-">, "a-b-c">>;\ntype _2 = Expect<Equal<Join<[], "-">, "">>;\n'),
+    ("trimming", "Write `TrimLeft<S extends string>`: remove leading spaces.",
+     "type TrimLeft<S extends string> = S extends ` ${infer R}` ? TrimLeft<R> : S;", "S extends ` ${infer R}` ? TrimLeft<R> : S",
+     'type _1 = Expect<Equal<TrimLeft<"   hi ">, "hi ">>;\ntype _2 = Expect<Equal<TrimLeft<"x">, "x">>;\n'),
+])
+
+_family(24, "gen", "Generators", [
+    ("", "Write `function* range(n: number)` yielding 0 … n-1. The input is `n`; print the sum of the squares of the range.",
+     r'''
+function* range(n: number): Generator<number> {
+  for (let i = 0; i < n; i++) yield i;
+}
+let sum = 0;
+for (const i of range(Number(input))) sum += i * i;
+console.log(sum);
+''', ["4", "1", "10"]),
+    ("infinite, taken", "Write an endless `naturals()` generator and `take(it, k)`; print the first `k` naturals (from 1), space-separated.",
+     r'''
+function* naturals(): Generator<number> {
+  for (let n = 1; ; n++) yield n;
+}
+function* take<T>(it: Iterable<T>, k: number): Generator<T> {
+  if (k <= 0) return;
+  let i = 0;
+  for (const x of it) {
+    yield x;
+    if (++i >= k) return;
+  }
+}
+console.log([...take(naturals(), Number(input))].join(" "));
+''', ["5", "1"]),
+    ("filtered", "Add a generator `filter(it, test)`; print the first `k` even naturals.",
+     r'''
+function* naturals(): Generator<number> {
+  for (let n = 1; ; n++) yield n;
+}
+function* filter<T>(it: Iterable<T>, test: (x: T) => boolean): Generator<T> {
+  for (const x of it) if (test(x)) yield x;
+}
+function* take<T>(it: Iterable<T>, k: number): Generator<T> {
+  if (k <= 0) return;
+  let i = 0;
+  for (const x of it) {
+    yield x;
+    if (++i >= k) return;
+  }
+}
+console.log([...take(filter(naturals(), (n) => n % 2 === 0), Number(input))].join(" "));
+''', ["5", "1"]),
+    ("with iterator helpers", "Do the same — the first `k` squares of odd naturals — with iterator helpers (`filter`, `map`, `take`, `toArray`) instead of hand-written generators.",
+     r'''
+function* naturals(): Generator<number> {
+  for (let n = 1; ; n++) yield n;
+}
+console.log(
+  naturals()
+    .filter((n) => n % 2 === 1)
+    .map((n) => n * n)
+    .take(Number(input))
+    .toArray()
+    .join(" "),
+);
+''', ["4", "1"]),
+    ("your own iterable", "Write `class Countdown` implementing `[Symbol.iterator]` so `for…of` counts down from `n` to 1; print the values.",
+     r'''
+class Countdown implements Iterable<number> {
+  readonly #from: number;
+  constructor(from: number) {
+    this.#from = from;
+  }
+  *[Symbol.iterator](): Generator<number> {
+    for (let n = this.#from; n >= 1; n--) yield n;
+  }
+}
+console.log([...new Countdown(Number(input))].join(" "));
+''', ["5", "1"]),
+])
+
+_family(25, "errors", "Handling bad input", [
+    ("", "Each line should be an integer. Parse them with a function that throws on a bad line; catch it and print `line <n>: bad number <text>` — and print `sum <total>` if every line was good.",
+     r'''
+function parseLine(text: string, n: number): number {
+  const v = Number(text);
+  if (text.trim() === "" || !Number.isInteger(v)) throw new Error(`line ${n}: bad number ${text}`);
+  return v;
+}
+try {
+  const nums = input.split("\n").map((t, i) => parseLine(t, i + 1));
+  console.log(`sum ${nums.reduce((a, b) => a + b, 0)}`);
+} catch (e) {
+  console.log(e instanceof Error ? e.message : String(e));
+}
+''', ["1\n2\n3", "1\nx\n3", "4.5"]),
+    ("every problem", "Report every bad line, not just the first; then print `<k> bad` or the sum.",
+     r'''
+const errors: string[] = [];
+let sum = 0;
+input.split("\n").forEach((text, i) => {
+  const v = Number(text);
+  if (text.trim() === "" || !Number.isInteger(v)) errors.push(`line ${i + 1}: bad number ${text}`);
+  else sum += v;
+});
+for (const e of errors) console.log(e);
+console.log(errors.length ? `${errors.length} bad` : `sum ${sum}`);
+''', ["1\nx\n3\ny", "1\n2"]),
+    ("no exceptions", "Return a `Result<number>` — `{ ok: true; value } | { ok: false; error }` — from the parser instead of throwing, and print the same report as before.",
+     r'''
+type Result<T> = { ok: true; value: T } | { ok: false; error: string };
+const parseLine = (text: string, n: number): Result<number> => {
+  const v = Number(text);
+  return text.trim() === "" || !Number.isInteger(v) ? { ok: false, error: `line ${n}: bad number ${text}` } : { ok: true, value: v };
+};
+const results = input.split("\n").map((t, i) => parseLine(t, i + 1));
+let sum = 0;
+let bad = 0;
+for (const r of results) {
+  if (r.ok) sum += r.value;
+  else {
+    console.log(r.error);
+    bad++;
+  }
+}
+console.log(bad ? `${bad} bad` : `sum ${sum}`);
+''', ["1\nx\n3\ny", "1\n2"]),
+    ("with a cause", "Stop at the first bad line, but wrap the parser's error with context: throw `new Error(\"could not total the input\", { cause })` and print the message, then `because: <cause message>`.",
+     r'''
+function parseLine(text: string, n: number): number {
+  const v = Number(text);
+  if (text.trim() === "" || !Number.isInteger(v)) throw new Error(`line ${n}: bad number ${text}`);
+  return v;
+}
+function total(lines: readonly string[]): number {
+  try {
+    return lines.map((t, i) => parseLine(t, i + 1)).reduce((a, b) => a + b, 0);
+  } catch (cause) {
+    throw new Error("could not total the input", { cause });
+  }
+}
+try {
+  console.log(`sum ${total(input.split("\n"))}`);
+} catch (e) {
+  if (e instanceof Error) {
+    console.log(e.message);
+    if (e.cause instanceof Error) console.log(`because: ${e.cause.message}`);
+  }
+}
+''', ["1\nx\n3", "5\n6"]),
+    ("clean up anyway", "A `Log` resource prints `open` when created and `close` when disposed. Hold it with `using` around the work, so `close` prints even when a bad line throws.",
+     r'''
+class Log implements Disposable {
+  constructor() {
+    console.log("open");
+  }
+  [Symbol.dispose](): void {
+    console.log("close");
+  }
+}
+function run(lines: readonly string[]): void {
+  using _log = new Log();
+  let sum = 0;
+  for (const [i, t] of lines.entries()) {
+    const v = Number(t);
+    if (!Number.isInteger(v)) throw new Error(`line ${i + 1}: bad number ${t}`);
+    sum += v;
+  }
+  console.log(`sum ${sum}`);
+}
+try {
+  run(input.split("\n"));
+} catch (e) {
+  console.log(e instanceof Error ? e.message : String(e));
+}
+''', ["1\n2", "1\nx"]),
+])

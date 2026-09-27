@@ -9101,6 +9101,46 @@
    "24"
   ]
  },
+ "tsm-w10-fam-status-1": {
+  "hash": "2cbdb5fbd2574e9f7c44",
+  "outputs": [
+   "On its way",
+   "Draft",
+   "unknown status"
+  ]
+ },
+ "tsm-w10-fam-status-2": {
+  "hash": "d8cf9baacdd9b3d84f2c",
+  "outputs": [
+   "paid",
+   "final",
+   "unknown status"
+  ]
+ },
+ "tsm-w10-fam-status-3": {
+  "hash": "5833a42998ce5229bb2a",
+  "outputs": [
+   "ok",
+   "not allowed",
+   "not allowed"
+  ]
+ },
+ "tsm-w10-fam-status-4": {
+  "hash": "007d286b2cf3f8dbb35f",
+  "outputs": [
+   "draft:1 paid:0 shipped:2 delivered:0",
+   "draft:0 paid:1 shipped:0 delivered:0"
+  ]
+ },
+ "tsm-w10-fam-status-5": {
+  "hash": "d1886aad41d943c21d45",
+  "outputs": [
+   "ok",
+   "not allowed",
+   "not allowed",
+   "ok"
+  ]
+ },
  "tsm-w10-lock": {
   "hash": "e72f9ed021c08a900290",
   "outputs": [
@@ -9470,6 +9510,41 @@
    "X!"
   ]
  },
+ "tsm-w13-fam-checks-1": {
+  "hash": "6f65aa0d2778a03498c3",
+  "outputs": [
+   "ok\nhas spaces\ntoo long",
+   "ok"
+  ]
+ },
+ "tsm-w13-fam-checks-2": {
+  "hash": "e1eb7fdbd53ff9dec618",
+  "outputs": [
+   "ok\nhas spaces; too long\ntoo long",
+   "ok"
+  ]
+ },
+ "tsm-w13-fam-checks-3": {
+  "hash": "13763c8b6ff88d8cf291",
+  "outputs": [
+   "shorter than 3\nok\nlonger than 8",
+   "ok"
+  ]
+ },
+ "tsm-w13-fam-checks-4": {
+  "hash": "bff0e8526504099c24d5",
+  "outputs": [
+   "ok\nmust start with a letter\ntoo long",
+   "must start with a letter"
+  ]
+ },
+ "tsm-w13-fam-checks-5": {
+  "hash": "8d75b48f275e02526fe6",
+  "outputs": [
+   "ok\nhas spaces\nok\ncalls: nonEmpty=3 noSpaces=3 maxLen=2",
+   "ok\ncalls: nonEmpty=1 noSpaces=1 maxLen=1"
+  ]
+ },
  "tsm-w13-handlers": {
   "hash": "125504b407bf29ba5034",
   "outputs": [
@@ -9540,6 +9615,43 @@
    "a.cts: CJS\nb.js: ESM\nREADME: not a module file\nesm=1 cjs=1"
   ]
  },
+ "tsm-w14-fam-flags-1": {
+  "hash": "1b2a8802d8fbbded6c82",
+  "outputs": [
+   "port 8080\nverbose true",
+   "port 3000\nverbose true",
+   "port 1\nverbose false"
+  ]
+ },
+ "tsm-w14-fam-flags-2": {
+  "hash": "f3ffb2b8bcc31c9946f4",
+  "outputs": [
+   "port 8080\nverbose true",
+   "port 1\nverbose false",
+   "port 3000\nverbose true"
+  ]
+ },
+ "tsm-w14-fam-flags-3": {
+  "hash": "ce3f157c945951988991",
+  "outputs": [
+   "unknown flag --colour",
+   "port 3000\nverbose true"
+  ]
+ },
+ "tsm-w14-fam-flags-4": {
+  "hash": "8dcda8a84dc4d2c54661",
+  "outputs": [
+   "port 80\ntags a,b",
+   "port 1\ntags none"
+  ]
+ },
+ "tsm-w14-fam-flags-5": {
+  "hash": "b372a4fa000ee52a66ce",
+  "outputs": [
+   "{\"port\":80,\"verbose\":true,\"tags\":[\"a\"]}",
+   "{\"port\":3000,\"verbose\":false,\"tags\":[\"x\"]}"
+  ]
+ },
  "tsm-w14-flags": {
   "hash": "40867222fe7c4b9ab317",
   "outputs": [
@@ -9602,6 +9714,43 @@
   "hash": "6fc2454b74b07750f239",
   "outputs": [
    "listUsers\ngetUser id=42\n401 deleteUser\ndeleteUser id=42\nuserPosts id=7,postId=3\n405\ncreatePost\n404\n404"
+  ]
+ },
+ "tsm-w15-fam-colours-1": {
+  "hash": "c65e27c27b64cfdd69e6",
+  "outputs": [
+   "#ff0000\n#008080\nunknown pink",
+   "#ffd700"
+  ]
+ },
+ "tsm-w15-fam-colours-2": {
+  "hash": "4fa2f33613ddbc995546",
+  "outputs": [
+   "#ff0000\n#008080",
+   "#010203"
+  ]
+ },
+ "tsm-w15-fam-colours-3": {
+  "hash": "9a964617e94d92f6b55d",
+  "outputs": [
+   "255,0,0\n0,128,128",
+   "1,2,3"
+  ]
+ },
+ "tsm-w15-fam-colours-4": {
+  "hash": "34300458de0cc52e6e9f",
+  "outputs": [
+   "#ff6c00",
+   "#004080",
+   "unknown colour"
+  ]
+ },
+ "tsm-w15-fam-colours-5": {
+  "hash": "604ee579e534996740db",
+  "outputs": [
+   "red",
+   "teal",
+   "gold"
   ]
  },
  "tsm-w15-form": {
@@ -9681,6 +9830,41 @@
   "hash": "b6218d8e4f4458da228c",
   "outputs": [
    "rejected cy@@x.io\nrejected @x.io\nrejected dee@localhost\nana@example.com\nbo@mail.io\neve@mail.io\nmail.io 2\nexample.com 1"
+  ]
+ },
+ "tsm-w16-fam-stock-1": {
+  "hash": "a07694458911bdae2baa",
+  "outputs": [
+   "apple:2,pear:7",
+   "fig:1"
+  ]
+ },
+ "tsm-w16-fam-stock-2": {
+  "hash": "af4f45a1e71a674e6e8f",
+  "outputs": [
+   "cannot sell apple\napple:3,pear:0",
+   "fig:0"
+  ]
+ },
+ "tsm-w16-fam-stock-3": {
+  "hash": "8dd0f3ae8ff6ddb1f91c",
+  "outputs": [
+   "3\napple:3,pear:2\napple:2,pear:7",
+   "1\nfig:1\nfig:1"
+  ]
+ },
+ "tsm-w16-fam-stock-4": {
+  "hash": "23602e5e158c6f0222ef",
+  "outputs": [
+   "apple:3,pear:2",
+   "fig:1"
+  ]
+ },
+ "tsm-w16-fam-stock-5": {
+  "hash": "809f7f43ea176e99cc16",
+  "outputs": [
+   "bad line: steal apple 2\nbad line: sell apple -1\napple:2,kiwi:4",
+   "fig:1"
   ]
  },
  "tsm-w16-money": {
@@ -9820,6 +10004,41 @@
   "outputs": [
    "page 2/3: c d",
    "page 1/1: x"
+  ]
+ },
+ "tsm-w18-fam-generic-1": {
+  "hash": "fad3bf805b69aec8bd0e",
+  "outputs": [
+   "8",
+   "none"
+  ]
+ },
+ "tsm-w18-fam-generic-2": {
+  "hash": "ed46a5ecaa8a02e3a99a",
+  "outputs": [
+   "2: ox\n3: cat,dog\n5: horse,mouse",
+   "1: a"
+  ]
+ },
+ "tsm-w18-fam-generic-3": {
+  "hash": "8d919145d459a65a96c5",
+  "outputs": [
+   "ana 3\nbo 5\ncy 8",
+   "x 1"
+  ]
+ },
+ "tsm-w18-fam-generic-4": {
+  "hash": "3f7008bd72a23109bf2c",
+  "outputs": [
+   "horse",
+   "a"
+  ]
+ },
+ "tsm-w18-fam-generic-5": {
+  "hash": "2d2300c980ce9fcf713b",
+  "outputs": [
+   "a,b,c\nd,e,f\ng",
+   "x"
   ]
  },
  "tsm-w18-lru": {
@@ -10349,6 +10568,42 @@
    "empty\n0 left:"
   ]
  },
+ "tsm-w24-fam-gen-1": {
+  "hash": "7a07fd42e1819cd2958b",
+  "outputs": [
+   "14",
+   "0",
+   "285"
+  ]
+ },
+ "tsm-w24-fam-gen-2": {
+  "hash": "c3feb08a42639597b918",
+  "outputs": [
+   "1 2 3 4 5",
+   "1"
+  ]
+ },
+ "tsm-w24-fam-gen-3": {
+  "hash": "3e5e93a0314bd4b06e5e",
+  "outputs": [
+   "2 4 6 8 10",
+   "2"
+  ]
+ },
+ "tsm-w24-fam-gen-4": {
+  "hash": "a8c72886957f64617773",
+  "outputs": [
+   "1 9 25 49",
+   "1"
+  ]
+ },
+ "tsm-w24-fam-gen-5": {
+  "hash": "a50c2bfecb5968937022",
+  "outputs": [
+   "5 4 3 2 1",
+   "1"
+  ]
+ },
  "tsm-w24-interleave": {
   "hash": "20e367286fe1e666b342",
   "outputs": [
@@ -10426,6 +10681,42 @@
    "line 2 name: needs 2+ letters\nline 2 age: must be 0-150\nline 2 email: must contain @\nline 4 age: must be 0-150\n4 error(s)",
    "line 2 name: needs 2+ letters\n1 error(s)",
    "all 1 valid"
+  ]
+ },
+ "tsm-w25-fam-errors-1": {
+  "hash": "94faca2cdb06f5d7bad1",
+  "outputs": [
+   "sum 6",
+   "line 2: bad number x",
+   "line 1: bad number 4.5"
+  ]
+ },
+ "tsm-w25-fam-errors-2": {
+  "hash": "d2c155dfc09e69855cf6",
+  "outputs": [
+   "line 2: bad number x\nline 4: bad number y\n2 bad",
+   "sum 3"
+  ]
+ },
+ "tsm-w25-fam-errors-3": {
+  "hash": "a5265069bf6531fe613c",
+  "outputs": [
+   "line 2: bad number x\nline 4: bad number y\n2 bad",
+   "sum 3"
+  ]
+ },
+ "tsm-w25-fam-errors-4": {
+  "hash": "c40171c3b7f5b963b8e1",
+  "outputs": [
+   "could not total the input\nbecause: line 2: bad number x",
+   "sum 11"
+  ]
+ },
+ "tsm-w25-fam-errors-5": {
+  "hash": "15b57b4fed1224ef7f94",
+  "outputs": [
+   "open\nsum 3\nclose",
+   "open\nclose\nline 2: bad number x"
   ]
  },
  "tsm-w25-result-chain": {
@@ -11099,6 +11390,41 @@
   "outputs": [
    "11 3",
    "4 3"
+  ]
+ },
+ "tsm-w6-fam-ops-1": {
+  "hash": "da079d94f17b6b58dd56",
+  "outputs": [
+   "49",
+   "6"
+  ]
+ },
+ "tsm-w6-fam-ops-2": {
+  "hash": "20b430913ff1aabde1f1",
+  "outputs": [
+   "3 -> 6 -> 7 -> 49",
+   "5 -> 6"
+  ]
+ },
+ "tsm-w6-fam-ops-3": {
+  "hash": "dc408905947df8f2baf5",
+  "outputs": [
+   "15",
+   "1024"
+  ]
+ },
+ "tsm-w6-fam-ops-4": {
+  "hash": "996d59e4f007cd1f6be7",
+  "outputs": [
+   "20",
+   "6"
+  ]
+ },
+ "tsm-w6-fam-ops-5": {
+  "hash": "a821b93bcb87bbef0b1b",
+  "outputs": [
+   "49",
+   "6"
   ]
  },
  "tsm-w6-find-from": {
