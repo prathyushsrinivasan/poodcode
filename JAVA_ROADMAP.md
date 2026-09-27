@@ -14,8 +14,8 @@ looking it up.
 ⬜ planned.
 
 **Built so far:** Parts 1–8, 10 and 11 complete, Part 13 under way (modules
-1–35) — **35 modules, 167 lessons, 717 judged exercises, plus 875 practice
-problems** in 175 variation families.
+1–36) — **36 modules, 172 lessons, 738 judged exercises, plus 900 practice
+problems** in 180 variation families.
 
 **Scope note.** Parts 9 and 14, and the JDBC/Maven/JUnit/logging half of Part
 13, are deliberately **not planned** — file I/O, build tools and the backend
@@ -494,7 +494,20 @@ isolating a throwing listener, and the self-removal
 `ConcurrentModificationException` · **decorator** (classes and a lambda that
 wraps a lambda), **adapter**, and **composite** (file trees, menus, org charts)
 
-**36. Annotations and reflection** ⬜
+**36. Annotations and reflection** ✅
+The `Class` object three ways, `Class.forName` and fully qualified names ·
+superclass chains, `getInterfaces()` (declared order) and `isAssignableFrom` ·
+`getDeclaredFields`/`Methods` vs `getMethods` · **member order is unspecified,
+so every program sorts** · `get`/`set`/`invoke`, `setAccessible`, and
+**`InvocationTargetException`** with `getCause()` · declaring annotations
+(`@interface`, elements, defaults, the `value` shorthand, array and enum
+elements, `@Target`) · **`@Retention(RUNTIME)`** and the default CLASS retention
+that makes an annotation invisible · frameworks in miniature: a test runner
+(fresh instance per test, `@BeforeEach`, FAIL vs ERROR), a validator, an options
+parser, a DI container, a CSV mapper, an annotation-driven event bus · **dynamic
+proxies** for logging, counting, caching, retrying, read-only views and
+interfaces with no implementation · reflection's costs, and the JDK's **strong
+encapsulation** (`InaccessibleObjectException`)
 
 **37. The JVM: class loading, memory and garbage collection** ⬜
 

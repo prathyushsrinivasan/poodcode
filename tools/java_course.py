@@ -393,6 +393,7 @@ _MODULE_FILES = (
     "java_m33_enums.py",       # Part 13 - enums, switch and nested classes
     "java_m34_records.py",     #           records, sealed types, pattern matching
     "java_m35_patterns.py",    #           design patterns
+    "java_m36_reflection.py",  #           annotations and reflection
     # Parts 9 and 11-14 are deliberately NOT planned; see JAVA_ROADMAP.md for
     # what was dropped and why.
 )
@@ -456,6 +457,7 @@ _PRACTICE_FILES = (
     "java_p33_practice.py",
     "java_p34_practice.py",
     "java_p35_practice.py",
+    "java_p36_practice.py",
 )
 
 for _prac_file in _PRACTICE_FILES:
@@ -556,6 +558,10 @@ _SCOPE_RULES = [
     # Module 34 is the one module that needs JDK 21 - keep it that way.
     ("record ", 34), ("sealed", 34), ("permits", 34), ("case null", 34),
     ("List.copyOf", 34),   # (" when " is not a rule: module 30 prints the word)
+    # Reflection and annotation declarations are module 36's subject.
+    ("@interface", 36), ("@Retention", 36), ("java.lang.reflect", 36),
+    ("Class.forName", 36), ("getDeclared", 36), ("getMethod(", 36), (".invoke(", 36),
+    ("setAccessible", 36), ("Proxy.", 36),
 ]
 
 # Text that every program (or many early ones) contains and that would trip a
@@ -639,9 +645,9 @@ JAVA_COURSE = {
         "framework, generics down to erasure and what it costs, then lambdas, "
         "stream pipelines from `filter` to `groupingBy`, `Optional`, multithreading from `start()` to thread pools, the "
         "standard-library corners that fail quietly, enums and switch, and "
-        "records, sealed types and pattern matching, and the design patterns "
-        "interviews ask about, in "
-        "thirty-five judged modules. "
+        "records, sealed types and pattern matching, the design patterns "
+        "interviews ask about, and annotations and reflection, in "
+        "thirty-six judged modules. "
         "Each module is a goal, four to six lessons, warm-ups that make you "
         "predict the output, fill-in-the-blank drills, fix-the-bug programs, a "
         "coding challenge, a glossary, a cheat sheet and a project - plus a "
