@@ -101,3 +101,16 @@ describe("withLeafLabel", () => {
     expect(withLeafLabel(before, null)).toEqual(before);
   });
 });
+
+describe("withLeafLabel with parents", () => {
+  it("names the project as well as the module", () => {
+    const out = withLeafLabel(breadcrumb("/projects/todo-api/todo-shape"), "What a todo is", ["Todo API"]);
+    expect(out.map((c) => c.label)).toEqual(["Today", "Projects", "Todo API", "What a todo is"]);
+    expect(out.every((c) => !c.dynamic)).toBe(true);
+  });
+
+  it("fills only as many crumbs as there are dynamic ones", () => {
+    const out = withLeafLabel(breadcrumb("/learn/arrays"), "Arrays", ["unused", "also unused"]);
+    expect(out.map((c) => c.label)).toEqual(["Today", "Learn", "Arrays"]);
+  });
+});

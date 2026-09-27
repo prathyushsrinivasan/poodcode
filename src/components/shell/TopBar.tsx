@@ -25,6 +25,7 @@ export function TopBar() {
   const toggleSidebar = useStore((s) => s.toggleSidebar);
   const collapsed = useStore((s) => s.sidebarAuto ?? s.prefs.sidebarCollapsed);
   const crumbLabel = useStore((s) => s.crumbLabel);
+  const crumbParents = useStore((s) => s.crumbParents);
 
   // "Can I go forward?" is not answerable from the History API — it exposes
   // `length` but not the position within it. React Router stamps each entry
@@ -69,7 +70,7 @@ export function TopBar() {
     };
   }, [nav]);
 
-  const crumbs = withLeafLabel(breadcrumb(pathname), crumbLabel);
+  const crumbs = withLeafLabel(breadcrumb(pathname), crumbLabel, crumbParents);
 
   return (
     <header className="topbar">

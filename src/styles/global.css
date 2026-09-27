@@ -27,3 +27,4 @@
 @import "./parts/exercise.css"; /* Exercise cards, quizzes, verdicts (C4) */
 @import "./parts/reader.css"; /* Lesson outline, reading progress (G4) */
 @import "./parts/learn.css"; /* Learn library, chapters, 日本語 (G6) */
+@import "./parts/projects.css"; /* Projects track (G7) */

@@ -161,11 +161,17 @@ export function breadcrumb(pathname: string): Crumb[] {
  *
  * Pages know their own title long after the router does, so the trail renders
  * with "Problem" and sharpens to "Count Inversions" when the fetch lands. */
-export function withLeafLabel(crumbs: Crumb[], label: string | null): Crumb[] {
+export function withLeafLabel(crumbs: Crumb[], label: string | null, parents: string[] = []): Crumb[] {
   if (!label) return crumbs;
-  const i = crumbs.map((c) => !!c.dynamic).lastIndexOf(true);
-  if (i === -1) return crumbs;
+  const dynamicAt = crumbs.flatMap((c, i) => (c.dynamic ? [i] : []));
+  if (dynamicAt.length === 0) return crumbs;
   const copy = crumbs.slice();
-  copy[i] = { ...copy[i], label, dynamic: false };
+  // The leaf label names the last dynamic crumb; `parents` name the ones
+  // before it, right-aligned — /projects/:p/:m is [project, module].
+  const names = [...parents, label].slice(-dynamicAt.length);
+  const slots = dynamicAt.slice(-names.length);
+  slots.forEach((at, k) => {
+    copy[at] = { ...copy[at], label: names[k], dynamic: false };
+  });
   return copy;
 }

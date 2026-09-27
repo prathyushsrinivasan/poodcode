@@ -53,6 +53,9 @@ interface AppStore {
   /** The real name of the page you are on, for the breadcrumb's last crumb.
    * Pages set it once their own data lands; the router only knows the id. */
   crumbLabel: string | null;
+  /** Names for the dynamic crumbs *before* the leaf, left to right — a module
+   * page names its project as well as itself. */
+  crumbParents: string[];
   /** A transient override of `prefs.sidebarCollapsed`, set by editor pages.
    * Kept out of `prefs` on purpose: borrowing the sidebar for Solve must not
    * overwrite what the user chose for everywhere else. */
@@ -67,7 +70,7 @@ interface AppStore {
   resolvedTheme: () => "dark" | "light";
   setPalette: (open: boolean) => void;
   toggleSidebar: () => void;
-  setCrumbLabel: (label: string | null) => void;
+  setCrumbLabel: (label: string | null, parents?: string[]) => void;
   /** Re-probe the toolchains and refresh `languages`. Resolves to how many
    * are installed, so the caller can say what changed. */
   redetectLanguages: () => Promise<number>;
@@ -101,6 +104,7 @@ export const useStore = create<AppStore>((set, get) => ({
   paletteOpen: false,
   loaded: false,
   crumbLabel: null,
+  crumbParents: [],
   sidebarAuto: null,
 
   init: async () => {
@@ -173,7 +177,7 @@ export const useStore = create<AppStore>((set, get) => ({
     get().setPref("sidebarCollapsed", next);
   },
 
-  setCrumbLabel: (crumbLabel) => set({ crumbLabel }),
+  setCrumbLabel: (crumbLabel, parents = []) => set({ crumbLabel, crumbParents: parents }),
 
   redetectLanguages: async () => {
     const languages = await api.redetectLanguages();
@@ -188,10 +192,11 @@ export const useStore = create<AppStore>((set, get) => ({
  * A page that knows its own name is also a page worth offering again, so the
  * same call records it in the palette's "Recent" list. Pass `hint` for the
  * one-line context shown beside it there. */
-export function useCrumb(label: string | null | undefined, hint?: string) {
+export function useCrumb(label: string | null | undefined, hint?: string, parents: string[] = []) {
   const setCrumbLabel = useStore((s) => s.setCrumbLabel);
+  const parentKey = JSON.stringify(parents);
   useEffect(() => {
-    setCrumbLabel(label ?? null);
+    setCrumbLabel(label ?? null, JSON.parse(parentKey) as string[]);
     if (label) {
       pushRecent({
         // The hash is the app's address; strip it back to a router path.
@@ -201,5 +206,5 @@ export function useCrumb(label: string | null | undefined, hint?: string) {
       });
     }
     return () => setCrumbLabel(null);
-  }, [label, hint, setCrumbLabel]);
+  }, [label, hint, parentKey, setCrumbLabel]);
 }

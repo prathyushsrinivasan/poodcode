@@ -6,9 +6,9 @@
 // remembered (per viewer, in localStorage) and asked first next time.
 
 import { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import type { Project } from "../types";
-import { QuizItem } from "../components/exercise";
+import { Link } from "react-router-dom";
+import type { Project } from "../../types";
+import { QuizItem } from "../../components/exercise";
 import {
   collectQuestions,
   pickRound,
@@ -16,11 +16,13 @@ import {
   recordAnswer,
   type ReviewHistory,
   type ReviewQuestion,
-} from "../lib/projectReview";
-import { ConfirmDialog } from "../components/ui/Modal";
-import { useToast } from "../components/Toast";
-import { plural } from "../lib/trackProgress";
-import { EmptyState } from "../components/ui";
+} from "../../lib/projectReview";
+import { useToast } from "../../components/Toast";
+import { plural } from "../../lib/trackProgress";
+import { Badge, Button, Card, Chip, ConfirmDialog, EmptyState, Icon, PageHeader, ProgressBar, Segmented } from "../../components/ui";
+import { UnitPart } from "../../components/track/UnitParts";
+import { inlineCode } from "../../components/common";
+import { useCrumb } from "../../store";
 
 const historyKey = (projectKey: string) => `poodcode:project-review:${projectKey}`;
 
@@ -57,7 +59,7 @@ export default function ProjectReview({
   /** Keys of the modules this viewer has completed. */
   doneKeys: Set<string>;
 }) {
-  const nav = useNavigate();
+  useCrumb(project.title, "Review");
   const all = useMemo(() => collectQuestions(project), [project]);
   const [history, setHistory] = useState<ReviewHistory>(() => readHistory(project.key));
   const finishedCount = new Set(all.filter((q) => doneKeys.has(q.moduleKey)).map((q) => q.moduleKey)).size;
@@ -124,21 +126,14 @@ export default function ProjectReview({
     });
   }
 
-  const openStep = (q: ReviewQuestion) =>
-    nav(`/projects/${project.key}/${q.moduleKey}${q.stepKey ? `?step=${q.stepKey}` : ""}`);
+  const stepHref = (q: ReviewQuestion) => `/projects/${project.key}/${q.moduleKey}${q.stepKey ? `?step=${q.stepKey}` : ""}`;
 
   const header = (
-    <>
-      <div className="row" style={{ marginBottom: 4 }}>
-        <button className="ghost" onClick={() => nav(`/projects/${project.key}`)}>
-          ← {project.title}
-        </button>
-        <span className="badge">{plural(all.length, "question")} in the written modules</span>
-      </div>
-      <h1 className="page-title" style={{ marginTop: 6 }}>
-        Review
-      </h1>
-    </>
+    <PageHeader
+      eyebrow={<Link to={`/projects/${project.key}`}>{project.title}</Link>}
+      title="Review"
+      actions={<Badge icon="help">{plural(all.length, "question")} in the written modules</Badge>}
+    />
   );
 
   if (all.length === 0) {
@@ -159,19 +154,17 @@ export default function ProjectReview({
     return (
       <div className="page">
         {header}
-        <div className="row" style={{ alignItems: "center", gap: 10, margin: "4px 0 14px" }}>
-          <div className="progress" style={{ flex: 1 }}>
-            <span style={{ width: `${Math.round((answered / stage.questions.length) * 100)}%` }} />
-          </div>
-          <span className="dim mono" style={{ fontSize: 12 }}>
+        <div className="review-bar">
+          <ProgressBar value={answered} max={stage.questions.length} label="Questions answered this round" />
+          <span className="dim mono cell-small">
             {stage.at + 1}/{stage.questions.length} · {right} right
           </span>
-          <button className="ghost" style={{ padding: "2px 8px", fontSize: 12 }} onClick={() => setStage({ kind: "setup" })}>
+          <Button variant="ghost" size="sm" icon="close" onClick={() => setStage({ kind: "setup" })}>
             Stop
-          </button>
+          </Button>
         </div>
 
-        <p className="faint" style={{ fontSize: 12, margin: "0 0 6px" }}>
+        <p className="exercise-note review-source">
           Module {q.moduleNumber} · {q.moduleTitle}
           {q.stepTitle && ` · ${q.stepTitle}`} · {q.source}
         </p>
@@ -184,14 +177,14 @@ export default function ProjectReview({
           salt={String(stage.round)}
         />
         {picked >= 0 && (
-          <div className="row" style={{ gap: 8 }}>
-            <button className="primary" onClick={advance} autoFocus>
-              {stage.at + 1 < stage.questions.length ? "Next question →" : "See how it went →"}
-            </button>
+          <div className="exercise-actions">
+            <Button variant="primary" iconRight="forward" onClick={advance} autoFocus>
+              {stage.at + 1 < stage.questions.length ? "Next question" : "See how it went"}
+            </Button>
             {picked !== q.answer && (
-              <button className="ghost" onClick={() => openStep(q)}>
-                Read the {q.stepTitle ? "step" : "module"} that covers this
-              </button>
+              <Link className="btn ghost" to={stepHref(q)}>
+                <Icon name="learn" size={14} /> Read the {q.stepTitle ? "step" : "module"} that covers this
+              </Link>
             )}
           </div>
         )}
@@ -207,12 +200,9 @@ export default function ProjectReview({
     return (
       <div className="page">
         {header}
-        <div
-          className="card"
-          style={{ marginBottom: 14, borderColor: pct === 100 ? "var(--good)" : "var(--accent)" }}
-        >
-          <div className="row" style={{ alignItems: "baseline", gap: 10 }}>
-            <strong style={{ fontSize: 22 }}>
+        <Card tone={pct === 100 ? "good" : "accent"} className="unit-block">
+          <div className="review-score">
+            <strong className="review-score-num">
               {score}/{stage.questions.length}
             </strong>
             <span className="dim">
@@ -223,41 +213,37 @@ export default function ProjectReview({
                   : "Worth going back over the steps below before moving on."}
             </span>
           </div>
-          <div className="row" style={{ gap: 8, marginTop: 12, flexWrap: "wrap" }}>
+          <div className="exercise-actions review-actions">
             {missed.length > 0 && (
-              <button className="primary" onClick={() => start(missed, missed.length)}>
+              <Button variant="primary" icon="reset" onClick={() => start(missed, missed.length)}>
                 {missed.length === 1 ? "Retry the one I missed" : `Retry the ${missed.length} I missed`}
-              </button>
+              </Button>
             )}
-            <button className={missed.length ? "ghost" : "primary"} onClick={() => start(pool, size)}>
+            <Button variant={missed.length ? "ghost" : "primary"} icon="shuffle" onClick={() => start(pool, size)}>
               Another round
-            </button>
-            <button className="ghost" onClick={() => setStage({ kind: "setup" })}>
+            </Button>
+            <Button variant="ghost" icon="sliders" onClick={() => setStage({ kind: "setup" })}>
               Change what to draw from
-            </button>
+            </Button>
           </div>
-        </div>
+        </Card>
 
         {missed.length > 0 && (
-          <>
-            <h3 style={{ marginBottom: 6 }}>What you missed</h3>
+          <UnitPart title="What you missed" icon="failed">
             {missed.map((q) => (
-              <div key={q.id} className="card" style={{ marginBottom: 10, borderColor: "var(--bad)" }}>
-                <strong>{q.question}</strong>
-                <p style={{ margin: "8px 0 4px" }}>
-                  <span style={{ color: "var(--good)" }}>✓ </span>
-                  {q.options[q.answer]}
+              <Card key={q.id} tone="bad" className="unit-block">
+                <strong>{inlineCode(q.question)}</strong>
+                <p className="review-answer">
+                  <Icon name="check" size={14} className="is-good" /> {inlineCode(q.options[q.answer] ?? "")}
                 </p>
-                <p className="dim" style={{ margin: "0 0 8px", fontSize: 13 }}>
-                  {q.explanation}
-                </p>
-                <button className="ghost" style={{ padding: "2px 8px", fontSize: 12 }} onClick={() => openStep(q)}>
+                <p className="section-lead">{q.explanation}</p>
+                <Link className="btn ghost btn-sm" to={stepHref(q)}>
                   Module {q.moduleNumber}
-                  {q.stepTitle ? ` · ${q.stepTitle}` : ""} →
-                </button>
-              </div>
+                  {q.stepTitle ? ` · ${q.stepTitle}` : ""} <Icon name="forward" size={13} />
+                </Link>
+              </Card>
             ))}
-          </>
+          </UnitPart>
         )}
       </div>
     );
@@ -268,49 +254,42 @@ export default function ProjectReview({
     <div className="page">
       {header}
       <p className="page-sub">
-        The questions {project.title} asks along the way — warm-ups, step checks and module reviews
-        — asked again, out of order and mixed together. Each was answered once, right under the
-        explanation; this is where you find out whether it stuck. The ones you get wrong come back
-        first next time.
+        The questions {project.title} asks along the way — warm-ups, step checks and module reviews — asked again, out of
+        order and mixed together. Each was answered once, right under the explanation; this is where you find out whether
+        it stuck. The ones you get wrong come back first next time.
       </p>
 
-      <div className="card" style={{ marginBottom: 14 }}>
+      <Card className="unit-block review-setup">
         <div className="io-label">Draw questions from</div>
-        <div className="row" style={{ gap: 8, flexWrap: "wrap", marginTop: 6 }}>
-          <button
-            className={scope === "done" ? "primary" : "ghost"}
+        <div className="pill-toggle" role="group" aria-label="Draw questions from">
+          <Chip
+            pressed={scope === "done"}
             onClick={() => setScope("done")}
             disabled={finishedCount === 0}
+            count={finishedCount}
             title={finishedCount === 0 ? "Finish a module first" : undefined}
           >
-            Modules I've finished · {finishedCount}
-          </button>
-          <button className={scope === "all" ? "primary" : "ghost"} onClick={() => setScope("all")}>
+            Modules I've finished
+          </Chip>
+          <Chip pressed={scope === "all"} onClick={() => setScope("all")}>
             Every written module
-          </button>
+          </Chip>
           {phases.map((ph) => (
-            <button
-              key={ph.key}
-              className={scope === ph.key ? "primary" : "ghost"}
-              onClick={() => setScope(ph.key)}
-            >
+            <Chip key={ph.key} pressed={scope === ph.key} onClick={() => setScope(ph.key)}>
               {ph.title.replace(/^Phase (\d+) · /, "P$1 · ")}
-            </button>
+            </Chip>
           ))}
         </div>
 
-        <div className="io-label" style={{ marginTop: 14 }}>
-          Round length
-        </div>
-        <div className="row" style={{ gap: 8, marginTop: 6 }}>
-          {SIZES.map((n) => (
-            <button key={n} className={size === n ? "primary" : "ghost"} onClick={() => setSize(n)}>
-              {n}
-            </button>
-          ))}
-        </div>
+        <div className="io-label">Round length</div>
+        <Segmented
+          label="Round length"
+          value={String(size)}
+          onChange={(v) => setSize(Number(v))}
+          options={SIZES.map((n) => ({ value: String(n), label: String(n) }))}
+        />
 
-        <p className="dim" style={{ fontSize: 13, margin: "14px 0 0" }}>
+        <p className="section-lead">
           {pool.length === 0
             ? "Nothing to draw from here yet."
             : `${plural(pool.length, "question")} to draw from: ` +
@@ -325,18 +304,18 @@ export default function ProjectReview({
               "."}
         </p>
 
-        <div className="row" style={{ gap: 8, marginTop: 14 }}>
-          <button className="primary" disabled={pool.length === 0} onClick={() => start(pool, size)}>
-            Start a round of {Math.min(size, pool.length)} →
-          </button>
+        <div className="exercise-actions">
+          <Button variant="primary" iconRight="forward" disabled={pool.length === 0} onClick={() => start(pool, size)}>
+            Start a round of {Math.min(size, pool.length)}
+          </Button>
           <span className="spacer" />
           {Object.keys(history).length > 0 && (
-            <button className="ghost" style={{ fontSize: 12 }} onClick={() => setConfirmForget(true)}>
+            <Button variant="ghost" size="sm" icon="delete" onClick={() => setConfirmForget(true)}>
               Forget my answers
-            </button>
+            </Button>
           )}
         </div>
-      </div>
+      </Card>
 
       <ConfirmDialog
         open={confirmForget}
@@ -345,9 +324,8 @@ export default function ProjectReview({
         title="Forget your review answers?"
         consequence={
           <>
-            This clears which of {project.title}'s {all.length} questions you have
-            got right and wrong, so the next round stops asking your weak ones
-            first. Your module progress is not affected.
+            This clears which of {project.title}'s {all.length} questions you have got right and wrong, so the next round
+            stops asking your weak ones first. Your module progress is not affected.
           </>
         }
         confirmLabel="Forget answers"

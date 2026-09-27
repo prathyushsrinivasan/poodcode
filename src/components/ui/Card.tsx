@@ -139,11 +139,13 @@ export function Chip({
   icon,
   count,
   title,
+  disabled,
   className = "",
 }: {
   children: ReactNode;
   onClick: () => void;
   pressed?: boolean;
+  disabled?: boolean;
   icon?: IconName;
   count?: number;
   title?: string;
@@ -156,6 +158,7 @@ export function Chip({
       aria-pressed={pressed}
       onClick={onClick}
       title={title}
+      disabled={disabled}
     >
       {icon && <Icon name={icon} size={12} />}
       {children}

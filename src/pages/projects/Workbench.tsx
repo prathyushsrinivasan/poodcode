@@ -17,21 +17,21 @@
 // tests" is there to answer "did my experiment break it?", not to score it.
 
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { ConfirmDialog } from "../components/ui/Modal";
-import { api } from "../api";
-import type { Exercise, JudgeReport, ProcOut, Project, ProjectModule, TestCase } from "../types";
-import { CodeEditor } from "../components/CodeEditor";
-import { JudgeFeedback as Feedback } from "../components/exercise";
-import { pairExchanges, sampleRequests } from "../lib/workbench";
-import { EmptyState } from "../components/ui";
+import { Link, useSearchParams } from "react-router-dom";
+import { api } from "../../api";
+import type { Exercise, JudgeReport, ProcOut, Project, ProjectModule, TestCase } from "../../types";
+import { CodeEditor } from "../../components/CodeEditor";
+import { ErrorText, JudgeFeedback as Feedback, VerdictPanel } from "../../components/exercise";
+import { pairExchanges, sampleRequests } from "../../lib/workbench";
+import { Badge, Button, Card, CardHeader, Chip, ConfirmDialog, EmptyState, Icon, PageHeader } from "../../components/ui";
+import { useCrumb } from "../../store";
 
 /** Where the judged programs' given replayer starts. Mirrors `_GIVEN_MARKER` in
  * tools/projects_track.py — a program containing it boots a server. */
 const REPLAYER_MARKER = "// ---- request replayer (given";
 
 /** Where the exercise cards keep a learner's code, per exercise. Mirrors
- * `storeKey` in components/LearnExercise.tsx. */
+ * `storeKey` in components/exercise/ExerciseCard.tsx. */
 const draftKey = (exerciseId: string) => `poodcode:learn-ex:${exerciseId}`;
 const benchKey = (projectKey: string) => `poodcode:workbench:${projectKey}`;
 
@@ -72,11 +72,10 @@ function readDraft(ex: Exercise): string | null {
   }
 }
 
-const statusColor = (s: number) =>
-  s >= 500 ? "var(--bad)" : s >= 400 ? "var(--warn)" : s >= 300 ? "var(--accent)" : "var(--good)";
+const statusClass = (s: number) => (s >= 500 ? "is-bad" : s >= 400 ? "is-warn" : s >= 300 ? "is-accent" : "is-good");
 
 export default function ProjectWorkbench({ project }: { project: Project }) {
-  const nav = useNavigate();
+  useCrumb(project.title, "Workbench");
   const [params, setParams] = useSearchParams();
   const builds = useMemo(
     () => project.modules.filter((m): m is ProjectModule & { final_build: Exercise } =>
@@ -215,214 +214,176 @@ export default function ProjectWorkbench({ project }: { project: Project }) {
   if (builds.length === 0) {
     return (
       <div className="page">
-        <button className="ghost" onClick={() => nav(`/projects/${project.key}`)}>
-          ← {project.title}
-        </button>
+        <PageHeader eyebrow={<Link to={`/projects/${project.key}`}>{project.title}</Link>} title="Workbench" />
         <EmptyState icon="build" title="No module of this project has a build to load yet." />
       </div>
     );
   }
 
   return (
-    <div className="page">
-      <div className="row" style={{ marginBottom: 4 }}>
-        <button className="ghost" onClick={() => nav(`/projects/${project.key}`)}>
-          ← {project.title}
-        </button>
-        {current && <span className="badge">on the bench: module {current.number}</span>}
-      </div>
-
-      <h1 className="page-title" style={{ marginTop: 6 }}>
-        Workbench
-      </h1>
-      <p className="page-sub">
-        Load a module build, change it, and throw your own {isServer ? "requests" : "input"} at it.
-        It runs through the same judge as the exercises — type-check first, at{" "}
-        <code>strict</code> + <code>noUncheckedIndexedAccess</code> — and nothing here is graded.
-      </p>
+    <div className="page workbench">
+      <PageHeader
+        eyebrow={<Link to={`/projects/${project.key}`}>{project.title}</Link>}
+        title="Workbench"
+        subtitle={
+          <>
+            Load a module build, change it, and throw your own {isServer ? "requests" : "input"} at it. It runs through the
+            same judge as the exercises — type-check first, at <code>strict</code> + <code>noUncheckedIndexedAccess</code>{" "}
+            — and nothing here is graded.
+          </>
+        }
+        actions={current && <Badge icon="build">on the bench: module {current.number}</Badge>}
+      />
 
       {loadTarget && loadTarget.key !== bench.moduleKey && (
-        <div className="card" style={{ marginBottom: 12, borderColor: "var(--accent)" }}>
-          <div className="row" style={{ gap: 8, flexWrap: "wrap", alignItems: "center" }}>
-            <span style={{ flex: 1 }}>
+        <Card tone="accent" className="unit-block">
+          <div className="bench-row">
+            <span className="bench-grow">
               Load <strong>module {loadTarget.number}'s build</strong> onto the workbench?
               {bench.code.trim() && " It replaces the code there now."}
             </span>
-            <button
-              className="primary"
-              onClick={() => load(loadTarget, "mine")}
-            >
+            <Button variant="primary" onClick={() => load(loadTarget, "mine")}>
               {readDraft(loadTarget.final_build) ? "Load my version" : "Load the reference"}
-            </button>
-            <button className="ghost" onClick={clearLoadParam}>
+            </Button>
+            <Button variant="ghost" onClick={clearLoadParam}>
               Keep what is there
-            </button>
+            </Button>
           </div>
-        </div>
+        </Card>
       )}
 
-      <div className="card" style={{ marginBottom: 12 }}>
-        <div className="row" style={{ gap: 8, flexWrap: "wrap", alignItems: "center" }}>
-          <span className="dim" style={{ fontSize: 13 }}>
-            Load
-          </span>
-          <select value={pick} onChange={(e) => setPick(e.target.value)} aria-label="Module build to load">
-            {builds.map((m) => (
-              <option key={m.key} value={m.key}>
-                module {m.number} — {m.title}
-              </option>
-            ))}
-          </select>
+      <Card className="unit-block">
+        <div className="bench-row">
+          <label className="history-compare">
+            <span className="dim">Load</span>
+            <select value={pick} onChange={(e) => setPick(e.target.value)}>
+              {builds.map((m) => (
+                <option key={m.key} value={m.key}>
+                  module {m.number} — {m.title}
+                </option>
+              ))}
+            </select>
+          </label>
           {picked && (
             <>
-              <button
+              <Button
                 onClick={() => confirmLoad(picked, "mine")}
                 disabled={!pickedDraft}
-                title={
-                  pickedDraft
-                    ? "Your own attempt at this module's build, as you last left it"
-                    : "You have not written this module's build yet"
-                }
+                title={pickedDraft ? "Your own attempt at this module's build, as you last left it" : "You have not written this module's build yet"}
               >
                 My version
-              </button>
-              <button className="ghost" onClick={() => confirmLoad(picked, "reference")}>
+              </Button>
+              <Button variant="ghost" onClick={() => confirmLoad(picked, "reference")}>
                 Reference
-              </button>
-              <button
-                className="ghost"
-                onClick={() => confirmLoad(picked, "starter")}
-                title="The build with its blank still in it"
-              >
+              </Button>
+              <Button variant="ghost" onClick={() => confirmLoad(picked, "starter")} title="The build with its blank still in it">
                 Starter
-              </button>
+              </Button>
             </>
           )}
           <span className="spacer" />
           {current && (
-            <button
-              className="ghost"
-              onClick={() => nav(`/projects/${project.key}/${current.key}`)}
-              title={`Open module ${current.number}`}
-            >
-              Module {current.number} →
-            </button>
+            <Link className="btn ghost" to={`/projects/${project.key}/${current.key}`} title={`Open module ${current.number}`}>
+              Module {current.number} <Icon name="forward" size={14} />
+            </Link>
           )}
         </div>
+      </Card>
+
+      <div className="exercise-editor bench-editor">
+        <CodeEditor language="typescript" value={bench.code} onChange={(code) => setBench((b) => ({ ...b, code }))} onRun={run} />
       </div>
 
-      <div
-        style={{
-          height: 460,
-          border: "1px solid var(--border)",
-          borderRadius: 6,
-          overflow: "hidden",
-          marginBottom: 12,
-        }}
-      >
-        <CodeEditor
-          language="typescript"
-          value={bench.code}
-          onChange={(code) => setBench((b) => ({ ...b, code }))}
-          onRun={run}
+      <Card className="unit-block">
+        <CardHeader
+          level={2}
+          title={
+            <label htmlFor="bench-stdin" className="io-label bench-label">
+              {isServer ? "Request script — one per line: METHOD /path [json body]" : "stdin"}
+            </label>
+          }
+          actions={
+            current &&
+            current.final_build.tests[0] && (
+              <Button
+                variant="ghost"
+                size="sm"
+                icon="reset"
+                onClick={() => setBench({ ...bench, stdin: current.final_build.tests[0]!.input })}
+                title="Put back the request script from the module's own test"
+              >
+                Module {current.number}'s script
+              </Button>
+            )
+          }
         />
-      </div>
-
-      <div className="card" style={{ marginBottom: 12 }}>
-        <div className="row" style={{ marginBottom: 6, alignItems: "baseline" }}>
-          <div className="io-label" style={{ margin: 0 }}>
-            {isServer ? "Request script — one per line: METHOD /path [json body]" : "stdin"}
-          </div>
-          <span className="spacer" />
-          {current && current.final_build.tests[0] && (
-            <button
-              className="ghost"
-              style={{ padding: "2px 8px", fontSize: 12 }}
-              onClick={() => setBench({ ...bench, stdin: current.final_build.tests[0]!.input })}
-              title="Put back the request script from the module's own test"
-            >
-              ↺ module {current.number}'s script
-            </button>
-          )}
-        </div>
         <textarea
+          id="bench-stdin"
+          className="bench-stdin"
           value={bench.stdin}
           onChange={(e) => setBench({ ...bench, stdin: e.target.value })}
           rows={Math.min(12, Math.max(4, bench.stdin.split("\n").length + 1))}
           spellCheck={false}
           placeholder={isServer ? 'GET /todos\nPOST /todos {"title":"Buy milk"}' : "1 + 2"}
-          style={{ width: "100%", fontFamily: "var(--font-mono)", fontSize: 13, resize: "vertical" }}
         />
         {isServer && project.endpoints.length > 0 && (
-          <div className="row" style={{ gap: 6, flexWrap: "wrap", marginTop: 8 }}>
-            <span className="faint" style={{ fontSize: 12 }}>
-              Add:
-            </span>
+          <div className="bench-samples">
+            <span className="faint cell-small">Add:</span>
             {sampleRequests(project).map((r) => (
-              <button
-                key={r}
-                className="ghost mono"
-                style={{ padding: "1px 7px", fontSize: 11.5 }}
-                onClick={() => addRequest(r)}
-                title="Append this request to the script"
-              >
+              <Chip key={r} className="mono" onClick={() => addRequest(r)} title="Append this request to the script">
                 {r}
-              </button>
+              </Chip>
             ))}
           </div>
         )}
-      </div>
+      </Card>
 
-      <div className="row" style={{ gap: 8, marginBottom: 12 }}>
-        <button className="primary" onClick={run} disabled={!!running}>
-          {running === "run" ? "Running…" : "▶ Run"}
-        </button>
+      <div className="exercise-actions unit-block">
+        <Button variant="primary" icon="run" onClick={run} loading={running === "run"} disabled={!!running} shortcut="Ctrl+Enter">
+          {running === "run" ? "Running…" : "Run"}
+        </Button>
         {current && (
-          <button
-            className="ghost"
+          <Button
+            variant="ghost"
+            icon="checklist"
             onClick={check}
+            loading={running === "check"}
             disabled={!!running}
             title={`Run module ${current.number}'s build tests against what is on the bench. Nothing is marked solved.`}
           >
             {running === "check" ? "Checking…" : `Check against module ${current.number}'s tests`}
-          </button>
+          </Button>
         )}
-        <span className="faint" style={{ fontSize: 12, alignSelf: "center" }}>
-          Ctrl+Enter runs
-        </span>
       </div>
 
       {compileError && (
-        <div className="card" style={{ borderColor: "var(--bad)" }}>
-          <div className="io-label" style={{ color: "var(--bad)" }}>
-            Didn't compile — nothing ran
-          </div>
-          <pre style={{ margin: 0, whiteSpace: "pre-wrap", fontSize: 12 }}>{compileError}</pre>
-        </div>
+        <VerdictPanel tone="bad" title="Didn't compile — nothing ran">
+          <ErrorText>{compileError}</ErrorText>
+        </VerdictPanel>
       )}
 
       {report && <Feedback report={report} />}
 
       {out && (
-        <div className="card" style={{ borderColor: out.exit_code === 0 ? "var(--border)" : "var(--bad)" }}>
-          <div className="row" style={{ marginBottom: 8 }}>
-            <div className="io-label" style={{ margin: 0 }}>
-              {exchanges ? `${exchanges.length} requests, ${exchanges.length} replies` : "Output"}
-            </div>
-            <span className="spacer" />
-            <span className="dim mono" style={{ fontSize: 12 }}>
-              {out.timed_out ? "timed out" : `exit ${out.exit_code ?? "?"} · ${out.runtime_ms} ms`}
-            </span>
-          </div>
+        <Card tone={out.exit_code === 0 && !out.timed_out ? undefined : "bad"} className="unit-block">
+          <CardHeader
+            level={2}
+            title={exchanges ? `${exchanges.length} requests, ${exchanges.length} replies` : "Output"}
+            actions={
+              <span className="dim mono cell-small">
+                {out.timed_out ? "timed out" : `exit ${out.exit_code ?? "?"} · ${out.runtime_ms} ms`}
+              </span>
+            }
+          />
 
           {out.timed_out && (
-            <p style={{ color: "var(--bad)", marginTop: 0 }}>
+            <p className="is-bad">
               The program never finished.{" "}
               {isServer ? (
                 <>
-                  On a server program that almost always means a request was never answered — a
-                  route with no <code>send</code> or <code>res.end</code>, or a handler with no
-                  fall-through. Module 4 step 3 is the one about this.
+                  On a server program that almost always means a request was never answered — a route with no{" "}
+                  <code>send</code> or <code>res.end</code>, or a handler with no fall-through. Module 4 step 3 is the one
+                  about this.
                 </>
               ) : (
                 "Look for a loop whose condition never becomes false."
@@ -431,56 +392,42 @@ export default function ProjectWorkbench({ project }: { project: Project }) {
           )}
 
           {exchanges ? (
-            <div style={{ overflowX: "auto" }}>
-              <table className="data" style={{ cursor: "default" }}>
+            <div className="table-card">
+              <table className="data static">
                 <thead>
                   <tr>
-                    <th style={{ cursor: "default" }}>Request</th>
-                    <th style={{ cursor: "default" }}>Status</th>
-                    <th style={{ cursor: "default" }}>Body</th>
+                    <th scope="col">Request</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Body</th>
                   </tr>
                 </thead>
                 <tbody>
                   {exchanges.map((x, i) => (
-                    <tr key={i} style={{ cursor: "default" }}>
-                      <td className="mono" style={{ fontSize: 12, whiteSpace: "nowrap" }}>
-                        {x.request}
-                      </td>
-                      <td className="mono" style={{ color: statusColor(x.status), fontWeight: 600 }}>
-                        {x.status}
-                      </td>
-                      <td className="mono" style={{ fontSize: 12, wordBreak: "break-all" }}>
-                        {x.body || <span className="faint">(empty)</span>}
-                      </td>
+                    <tr key={i}>
+                      <td className="mono nowrap cell-small">{x.request}</td>
+                      <td className={`mono status-code ${statusClass(x.status)}`}>{x.status}</td>
+                      <td className="mono cell-small break-all">{x.body || <span className="faint">(empty)</span>}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
           ) : (
-            !out.timed_out && (
-              <pre style={{ margin: 0, whiteSpace: "pre-wrap", fontSize: 12.5 }}>
-                {out.stdout || <span className="faint">(nothing on stdout)</span>}
-              </pre>
-            )
+            !out.timed_out && <pre className="verdict-pre">{out.stdout || <span className="faint">(nothing on stdout)</span>}</pre>
           )}
 
           {out.stderr.trim() && (
-            <details style={{ marginTop: 10 }} open={out.exit_code !== 0}>
-              <summary className="dim" style={{ fontSize: 12, cursor: "pointer" }}>
+            <details className="verdict-details" open={out.exit_code !== 0}>
+              <summary className="dim cell-small">
                 stderr{isServer ? " — including anything the replayer's error boundary caught" : ""}
               </summary>
-              <pre style={{ margin: "6px 0 0", whiteSpace: "pre-wrap", fontSize: 12 }}>{out.stderr}</pre>
+              <pre className="verdict-pre">{out.stderr}</pre>
             </details>
           )}
-          {out.truncated && (
-            <p className="faint" style={{ fontSize: 12, margin: "8px 0 0" }}>
-              Output was truncated.
-            </p>
-          )}
-        </div>
+          {out.truncated && <p className="exercise-note">Output was truncated.</p>}
+        </Card>
       )}
-    <ConfirmDialog
+      <ConfirmDialog
         open={pendingLoad !== null}
         onClose={() => setPendingLoad(null)}
         onConfirm={() => {
@@ -495,10 +442,9 @@ export default function ProjectWorkbench({ project }: { project: Project }) {
               {pendingLoad.which === "mine"
                 ? "build (your version)"
                 : pendingLoad.which === "reference"
-                ? "reference build"
-                : "starter"}{" "}
-              over what is on the workbench now. What is there has not been saved
-              anywhere else, so it will be lost.
+                  ? "reference build"
+                  : "starter"}{" "}
+              over what is on the workbench now. What is there has not been saved anywhere else, so it will be lost.
             </>
           )
         }

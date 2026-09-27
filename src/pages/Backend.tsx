@@ -25,6 +25,7 @@ import { Badge, EmptyState, ErrorState, Icon, PageHeader, type Tone } from "../c
 import { ReaderLayout, ReadStatus, useSeenBottom } from "../components/reader/Reader";
 import { Glossary, Milestone, SubHeading, UnitContents, UnitGoal, UnitList, UnitPart, scrollToPart } from "../components/track/UnitParts";
 import { inlineCode } from "../components/common";
+import { EndpointTable } from "../components/track/EndpointTable";
 import { useCrumb } from "../store";
 import { loadFailed } from "../lib/failures";
 
@@ -279,32 +280,7 @@ function ProjectDetail({
             icon="document"
             lead="Build against this. Every row is something you can check with curl when you're done."
           >
-            <div className="card table-card">
-              <table className="data static">
-                <thead>
-                  <tr>
-                    <th scope="col">Method</th>
-                    <th scope="col">Path</th>
-                    <th scope="col">Purpose</th>
-                    <th scope="col">Request</th>
-                    <th scope="col">Response</th>
-                    <th scope="col">Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {project.endpoints.map((e, i) => (
-                    <tr key={i}>
-                      <td className="mono nowrap endpoint-method">{e.method}</td>
-                      <td className="mono nowrap">{e.path}</td>
-                      <td>{e.purpose}</td>
-                      <td className="mono faint cell-small">{e.request || "—"}</td>
-                      <td className="mono faint cell-small">{e.response || "—"}</td>
-                      <td className="mono nowrap cell-small">{e.status}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <EndpointTable endpoints={project.endpoints} />
           </UnitPart>
         )}
 
