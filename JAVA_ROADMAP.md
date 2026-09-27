@@ -13,9 +13,9 @@ looking it up.
 **Status legend** — ✅ built and shipping in the app · 🚧 partially built ·
 ⬜ planned.
 
-**Built so far:** Parts 1–8, 10 and 11 complete, Part 13 under way (modules
-1–36) — **36 modules, 172 lessons, 738 judged exercises, plus 900 practice
-problems** in 180 variation families.
+**Built:** every planned part — Parts 1–8, 10, 11 and 13 (modules 1–37) —
+**37 modules, 177 lessons, 759 judged exercises, plus 925 practice problems** in
+185 variation families. The roadmap as planned is complete.
 
 **Scope note.** Parts 9 and 14, and the JDBC/Maven/JUnit/logging half of Part
 13, are deliberately **not planned** — file I/O, build tools and the backend
@@ -438,7 +438,7 @@ prefix sums · backtracking · dynamic programming basics · greedy
 a lot of this ground with judged problems — this part is about sequencing it
 rather than authoring it from nothing.)*
 
-## Part 13 — Advanced Java 🚧
+## Part 13 — Advanced Java ✅
 
 Modules 33–37: the language-and-runtime half of the original list. JDBC, SQL,
 Maven/Gradle, JUnit and logging stay unplanned (see the scope note) — SQL
@@ -509,7 +509,27 @@ proxies** for logging, counting, caching, retrying, read-only views and
 interfaces with no implementation · reflection's costs, and the JDK's **strong
 encapsulation** (`InaccessibleObjectException`)
 
-**37. The JVM: class loading, memory and garbage collection** ⬜
+**37. The JVM: class loading, memory and garbage collection** ✅
+Loading, linking and initialisation on first active use · the **exact
+initialisation order** across a hierarchy (statics once, superclass first; then
+per object: instance initialisers and constructor, parent first) · compile-time
+constants that never initialise their class · the overridable-method-in-a-
+constructor bug · stack frames and the heap · stack traces as frames ·
+`StackOverflowError`, no tail-call elimination, and explicit stacks (iterative
+DFS, in-order traversal, Hanoi with hand-made frames) · the **String pool**,
+`intern`, constant folding · the Integer cache, unboxing `null`, and
+`Long.equals(Integer)` · GC roots and reachability · **mark-and-sweep**,
+reference counting and the cycles it leaks, mark-compact, tri-colour marking,
+a generational heap - all *simulated* · leaks a collector cannot fix, and an
+**LRU cache** from `LinkedHashMap` · bytecode and the **stack machine** — operand
+order, jumps instead of loops, `max_stack`, the shunting-yard algorithm, and a
+small VM with locals, jumps and calls · the JIT and why warm-up matters
+
+*(Judging: garbage collection, JIT compilation and stack depth are deliberately
+unspecified, so no exercise waits for them. Initialisation order, the String
+pool and the Integer cache are fixed by the JLS; the collectors are run as
+algorithms over object graphs read from stdin; the one exercise that relies on
+a `StackOverflowError` recurses three million frames deep.)*
 
 ## Part 14 — Java backend development ⬜
 

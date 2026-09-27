@@ -6687,12 +6687,12 @@ print(
 )
 
 # ---------------------------------------------------------------------------
-# Java course — ten topic modules for someone past the basics (arrays, strings,
-# methods; seeds/java_course.json, served by the `java_course` command).
+# Java course — topic modules for someone past the basics, arrays through the
+# JVM (seeds/java_course.json, served by the `java_course` command).
 # Exec'd LAST, for the same reason as the Backend Lab: it defines short private
 # helpers of its own (_je/_jch/_jfix/_jq and friends), so running it after
 # everything else means it can only shadow names nothing still needs. It reads
-# its content from tools/java_m01_arrays.py … java_m10_recursion.py and is also
+# its content from tools/java_m01_arrays.py … java_m37_jvm.py and is also
 # runnable standalone (`python tools/java_course.py`) for the fast verifier.
 # ---------------------------------------------------------------------------
 _jc_path = os.path.join(HERE, "java_course.py")

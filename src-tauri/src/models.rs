@@ -711,8 +711,9 @@ pub struct JpVocab {
 //
 //   * seeds/ts_course.json   — TypeScript, an 8-month WEEK-by-week curriculum
 //                              (`ts_course` command, tools/typescript_course.py)
-//   * seeds/java_course.json — Java after the basics, ten topic MODULES
-//                              (`java_course` command, tools/java_course.py)
+//   * seeds/java_course.json — Java after the basics, topic MODULES grouped
+//                              into Parts (`java_course` command,
+//                              tools/java_course.py)
 //
 // The two levels are called Week/Month in one and Module/Part in the other, so
 // the course itself carries the labels the UI should use — see `unit_label`.

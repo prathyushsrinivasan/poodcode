@@ -16,14 +16,19 @@
 # over it. So Module 1 opens on the memory model and traversal *fluency*, not on
 # `int x = 5;`. The full roadmap (and what each part covers) is JAVA_ROADMAP.md.
 #
-# SHIPPED SCOPE: Parts 1-8, 10 and 11 of that roadmap, COMPLETE - Arrays (modules 1-5),
-# Strings (6-8), Methods and recursion (9-10), object-oriented programming
-# (11-14), exception handling (15-16), the collections framework (17-20),
-# generics (21-24), Java 8+ (25-28), multithreading (29-31) and the APIs worth
-# knowing cold (32); Part 13 (advanced Java) is under way from module 33. The roadmap's Parts 9, 12 and 14 are deliberately NOT
-# planned: file I/O and the backend stack are job skills rather than
+# SHIPPED SCOPE: the whole roadmap as planned - Arrays (modules 1-5), Strings
+# (6-8), Methods and recursion (9-10), object-oriented programming (11-14),
+# exception handling (15-16), the collections framework (17-20), generics
+# (21-24), Java 8+ (25-28), multithreading (29-31), the APIs worth knowing cold
+# (32), and advanced Java (33-37: enums/switch/nested classes, records/sealed/
+# pattern matching, design patterns, annotations/reflection, the JVM). The
+# roadmap's Parts 9, 12 and 14 and the build-tool half of 13 are deliberately
+# NOT planned: file I/O and the backend stack are job skills rather than
 # interview-coding material, and the DSA ground is already covered by the DSA
 # Curriculum and the Mastery track.
+#
+# JDK: module 34 (pattern matching in switch) needs JDK 21; every other
+# module's programs compile with `javac --release 17`.
 #
 # PART 10 AND THE JUDGE: threads are the one topic where the same program can
 # print different things on different runs, and every exercise here is graded
@@ -44,12 +49,12 @@
 #      for the problem bank. Typing an expected output by hand is a bug waiting
 #      to happen, especially for multi-line traces like "print each sorting
 #      pass".
-#   3. NO COLLECTIONS BEFORE PART 6, AND NO STREAMS AT ALL. Parts 1-4 are about
-#      arrays, strings, methods and objects, so HashMap/ArrayList are banned
-#      until module 17 and streams/lambdas are banned outright — they belong to
-#      Part 8 of the roadmap, which is not authored. In particular an interface
-#      in module 14 is always implemented by a NAMED class, never by a lambda,
-#      and so is a `Comparator` in module 20 or a bound in module 22.
+#   3. NO COLLECTIONS BEFORE PART 6, AND NO LAMBDAS BEFORE PART 8. Parts 1-4 are
+#      about arrays, strings, methods and objects, so HashMap/ArrayList are
+#      banned until module 17, and lambdas and streams until modules 25-26. In
+#      particular an interface in module 14 is always implemented by a NAMED
+#      class, never by a lambda, and so is a `Comparator` in module 20 or a
+#      bound in module 22 - which is what lets module 25 open by collapsing them.
 #
 # EXECUTION MODEL: exercises run through the same stdin/stdout judge as every
 # other track (`javac Main.java` -> `java Main`). Programs read stdin with a
@@ -394,6 +399,7 @@ _MODULE_FILES = (
     "java_m34_records.py",     #           records, sealed types, pattern matching
     "java_m35_patterns.py",    #           design patterns
     "java_m36_reflection.py",  #           annotations and reflection
+    "java_m37_jvm.py",         #           the JVM - closes Part 13 and the course
     # Parts 9 and 11-14 are deliberately NOT planned; see JAVA_ROADMAP.md for
     # what was dropped and why.
 )
@@ -458,6 +464,7 @@ _PRACTICE_FILES = (
     "java_p34_practice.py",
     "java_p35_practice.py",
     "java_p36_practice.py",
+    "java_p37_practice.py",
 )
 
 for _prac_file in _PRACTICE_FILES:
@@ -643,11 +650,12 @@ JAVA_COURSE = {
         "part that turns that into fluency: arrays in depth, strings in depth, "
         "methods, object-oriented programming, exceptions, the collections "
         "framework, generics down to erasure and what it costs, then lambdas, "
-        "stream pipelines from `filter` to `groupingBy`, `Optional`, multithreading from `start()` to thread pools, the "
-        "standard-library corners that fail quietly, enums and switch, and "
-        "records, sealed types and pattern matching, the design patterns "
-        "interviews ask about, and annotations and reflection, in "
-        "thirty-six judged modules. "
+        "stream pipelines from `filter` to `groupingBy`, `Optional`, and "
+        "multithreading from `start()` to thread pools. Then the senior half: the "
+        "standard-library corners that fail quietly, enums and switch, records, "
+        "sealed types and pattern matching, the design patterns interviews ask "
+        "about, annotations and reflection, and the JVM underneath it all - "
+        "thirty-seven judged modules in all. "
         "Each module is a goal, four to six lessons, warm-ups that make you "
         "predict the output, fill-in-the-blank drills, fix-the-bug programs, a "
         "coding challenge, a glossary, a cheat sheet and a project - plus a "

@@ -100,9 +100,10 @@ pub fn ts_course() -> AppResult<crate::models::WeeklyCourse> {
     Ok(serde_json::from_str(TS_COURSE_JSON)?)
 }
 
-/// The Java course — ten topic modules covering arrays, strings and methods
-/// for someone who already has the basics (authored in tools/java_course.py,
-/// one file per module). Same model and same judge as the TypeScript course;
+/// The Java course — topic modules from arrays and strings through OOP,
+/// collections, generics, streams, threads and on to the JVM, for someone who
+/// already has the basics (authored in tools/java_course.py, one file per
+/// module; JAVA_ROADMAP.md is the map). Same model and same judge as the TypeScript course;
 /// completion is tracked in the shared `chapter_progress` table.
 const JAVA_COURSE_JSON: &str = include_str!("../seeds/java_course.json");
 
